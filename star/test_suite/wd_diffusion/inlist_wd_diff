@@ -45,7 +45,7 @@
       
       min_dq = 1d-20
       mesh_delta_coeff = 0.75
-      varcontrol_target = 2d-4
+      !varcontrol_target = 2d-4
       max_timestep_factor = 1.05d0 ! 1.2d0
       
 

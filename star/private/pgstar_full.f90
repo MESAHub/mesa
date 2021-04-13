@@ -111,6 +111,8 @@
             write(*,*) 'PGSTAR failed in reading ' // trim(inlist_fname)
             return
          end if
+         if (s% use_other_set_pgstar_controls) &
+            call s% other_set_pgstar_controls(s% id)
          call set_win_file_data(s, ierr)
       end subroutine do_read_pgstar_controls
 
@@ -1305,9 +1307,16 @@
          
          call update_pgstar_history_file(s,ierr)
          if (failed('save_text_data')) return
-         pause = s% pause
-         if ((.not. pause) .and. s% pause_interval > 0) &
+         
+         if (s% pause_interval > 0) then
             pause = (mod(s% model_number, s% pause_interval) == 0)
+         else
+            pause = s% pause
+         end if
+         
+         if (pause .and. s% pgstar_interval > 0) &
+            pause = (mod(s% model_number, s% pgstar_interval) == 0)
+            
          if (pause) then
             write(*,*)
             write(*,*) 'model_number', s% model_number
@@ -1574,34 +1583,10 @@
 
          integer :: num, i
          type (pgstar_hist_node), pointer :: pg
-         integer, parameter :: num_epsnuc_out = 12
-         real(dp) :: &
-            epsnuc_out(num_epsnuc_out), csound_surf, v_surf, envelope_fraction_left
 
          include 'formats'
 
          ierr = 0
-
-         epsnuc_out(1:4) = s% burn_zone_mass(1:4,1)
-         epsnuc_out(5:8) = s% burn_zone_mass(1:4,2)
-         epsnuc_out(9:12) = s% burn_zone_mass(1:4,3)
-
-         csound_surf = eval_csound(s,1,ierr)
-         if (ierr /= 0) return
-
-         if (.not. s% v_flag) then
-            v_surf =  s% r(1)*s% dlnR_dt(1)
-         else
-            v_surf = s% v(1)
-         end if
-
-         if (s% initial_mass > s% he_core_mass) then
-            envelope_fraction_left = &
-               (s% star_mass - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
-         else
-            envelope_fraction_left = 1
-         end if
-
          allocate(pg)
          pg% step = s% model_number
          pg% age = s% star_age
@@ -1615,9 +1600,7 @@
          end if
          call add_to_pgstar_hist(s, pg)
 
-
          contains
-
 
          subroutine get_hist_values(num,ierr)
             use history, only: do_get_data_for_history_columns
@@ -1636,7 +1619,6 @@
                pg% vals(i) = s% history_values(i)
             end do
          end subroutine get_hist_values
-
 
       end subroutine update_pgstar_data
 

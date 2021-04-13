@@ -133,7 +133,7 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer :: ierr
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
 !         p    p    d                       bet+w     1.44206d+00          
          call reaclib_rate_for_handle('r_h1_h1_wk_h2', tf% T9, fr, rr, ierr)
@@ -191,7 +191,7 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: term, rev, aa, bb
-         include 'formats.dek'
+         include 'formats'
 
          if (tf% t9 < lowT9pp_cutoff) then
             fr = 0; rr = 0; return
@@ -452,7 +452,7 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
       real(dp) :: fr1, rr1
-      include 'formats.dek'
+      include 'formats'
       
 !       he4  he4  he4  c12                  fy05r     7.27500d+00          
          call jina_reaclib_3_1(ihe4, ihe4, ihe4, ic12, tf, fr, rr, 'rate_tripalf_jina')
@@ -938,7 +938,7 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, termE1, termE2, termRes, aa, bb, cc
-         include 'formats.dek'
+         include 'formats'
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -970,7 +970,7 @@
          real(dp), parameter :: &
             a0 = 1.21d8, a1 = 6.06d-2, a2 = 32.12d0, a3 = 1.7d0, a4 = 7.4d8, &
             a5 = 0.47d0, a6 = 32.12d0, a9tilda = 3.06d10, a11 = 38.534d0   
-         include 'formats.dek'
+         include 'formats'
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -1037,7 +1037,7 @@
             real(dp), intent(out) :: fr, rr
             real(dp) :: term,t9a,t9a13,t9a56,aa,zz
             
-            include 'formats.dek'
+            include 'formats'
 
             if (tf% t9 < lowT9_cutoff) then
                fr = 0; rr = 0; return
@@ -2364,7 +2364,7 @@
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1, rr1
-      include 'formats.dek'
+      include 'formats'
 !       he4 ne20    p na23                  ha04rv   -2.37900d+00          
       call jina_reaclib_2_2(ih1, ina23, ihe4, ine20, tf, rr, fr, 'rate_ne20ap_jina')
       end subroutine rate_ne20ap_jina
@@ -2641,7 +2641,7 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
-         include 'formats.dek'
+         include 'formats'
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -2892,7 +2892,7 @@
       type (T_Factors), pointer :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      include 'formats.dek'
+      include 'formats'
 !       he4 ca40 ti44                       rath      5.12700d+00          
          call jina_reaclib_2_1(ihe4, ica40, iti44, tf, fr, rr, 'rate_ca40ag_jina')
       end subroutine rate_ca40ag_jina
@@ -3362,7 +3362,7 @@
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1, fr2, fr3
-      include 'formats.dek'
+      include 'formats'
       call rate_fe54ag_jina(tf, temp, fr1,  rr)
       call rate_fe54an_jina(tf, temp, fr2,  rr)
       call rate_fe54ap_jina(tf, temp, fr3,  rr)
@@ -3663,7 +3663,7 @@
          real(dp), intent(in) :: a0, a1, a2, b0, b1, b2, b3, b4,  &
                c0, c1, d0, d1, e0, e1, e2
          
-         include 'formats.dek'
+         include 'formats'
          real(dp) :: aa, bb, cc, dd, ee
          aa   = a0 * (tf% T9i23) * exp(-a1*(tf% T9i13) - (tf% T92)*(a2*a2)) 
          bb   = 1 + b0*(tf% T9) + b1*(tf% T92) +  b2*(tf% T93) +   b3*(tf% T94) +   b4*(tf% T95)
@@ -3909,7 +3909,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 1
          nuclides_in(1) = i1
@@ -3930,7 +3930,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 1
          nuclides_in(1) = i1
@@ -3952,7 +3952,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 1
          nuclides_in(1) = i1
@@ -3975,7 +3975,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 1
          nuclides_in(1) = i1
@@ -3999,7 +3999,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 2
          nuclides_in(1) = i1
@@ -4021,7 +4021,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 2
          nuclides_in(1) = i1
@@ -4044,7 +4044,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 2
          nuclides_in(1) = i1
@@ -4068,7 +4068,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 2
          nuclides_in(1) = i1
@@ -4093,7 +4093,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 3
          nuclides_in(1) = i1
@@ -4116,7 +4116,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 3
          nuclides_in(1) = i1
@@ -4140,7 +4140,7 @@
          integer :: num_in, num_out
          integer, dimension(4) :: nuclides_in, nuclides_out
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          num_in = 4
          nuclides_in(1) = i1
@@ -4169,7 +4169,7 @@
          character (len=max_id_length) :: handle
          integer :: lo, hi, i
          integer :: iso_ids(num_in+num_out)
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          iso_ids(1:num_in) = nuclides_in(1:num_in)
          iso_ids(1+num_in:num_out+num_in) = nuclides_out(1:num_out)
@@ -4187,7 +4187,7 @@
          real(dp) :: dlambda_dlnT, drlambda_dlnT         
          integer :: lo, hi, i
          logical, parameter :: forward_only = .false.
-         include 'formats.dek'         
+         include 'formats'
          ierr = 0
          call do_reaclib_indices_for_reaction(handle, reaclib_rates, lo, hi, ierr)
          if (ierr /= 0) then
@@ -4225,7 +4225,7 @@
          real(dp), intent(out) :: lambda, dlambda_dlnT, rlambda, drlambda_dlnT
          integer, intent(out) :: ierr                 
          integer :: lo, hi
-         include 'formats.dek'         
+         include 'formats'
          ierr = 0
          call do_reaclib_indices_for_reaction(handle, reaclib_rates, lo, hi, ierr)
          if (ierr /= 0) then
@@ -4249,7 +4249,7 @@
          real(dp), intent(out) :: lambda, dlambda_dlnT, rlambda, drlambda_dlnT
          integer, intent(out) :: ierr                 
          logical, parameter :: forward_only = .false.
-         include 'formats.dek'         
+         include 'formats'
          ierr = 0
          if (T9 < reaclib_min_T9 .and. reaclib_rates% reaction_flag(lo) /= 'w') then
             lambda = 0; dlambda_dlnT = 0
@@ -4283,7 +4283,7 @@
          real(dp), intent(in) :: a1, a2, a3, a4, a5, a6, a7
          real(dp), intent(out) :: term
          real(dp) :: exponent
-         include 'formats.dek'
+         include 'formats'
          !rate = exp(a1 + a2/T9 + a3/T913 + a4*T913 + a5*T9 + a6*T953 + a7*ln(T9))
          if (tf% T9 < reaclib_min_T9) then
             term = 0; return

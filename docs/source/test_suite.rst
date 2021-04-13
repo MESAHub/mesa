@@ -46,7 +46,7 @@ a copy the directory and then edit this copy.
    cp -r $MESA_DIR/star/test_suite/high_mass my_high_mass
 
 The test_suite examples require a few tweaks in order to be used
-"outside" the of the test_suite directory. First, you need to edit
+"outside" of the test_suite directory. First, you need to edit
 make/makefile and delete the line
 
 ::
@@ -188,3 +188,15 @@ surface_effects
 
 Tests the implementation of the various surface effect corrections
 available in MESA.
+
+
+Test Index
+----------
+
+This index only includes tests that are documented via a ``README.rst``.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   test_suite/*

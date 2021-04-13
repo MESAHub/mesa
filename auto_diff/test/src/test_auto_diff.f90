@@ -5,7 +5,7 @@ program test_auto_diff
 
    call do_test_auto_diff_1var_order1()
    call do_test_auto_diff_2var_order1()
-   call do_test_auto_diff_18var_order1()
+   call do_test_auto_diff_star_order1()
 
    contains
 
@@ -50,8 +50,8 @@ program test_auto_diff
    end subroutine should_print2
 
 
-   subroutine do_test_auto_diff_18var_order1()
-      type(auto_diff_real_18var_order1) :: x, y, z
+   subroutine do_test_auto_diff_star_order1()
+      type(auto_diff_real_star_order1) :: x, y, z
       real(dp) :: a, b, c
       integer :: i, j, k
 
@@ -73,13 +73,13 @@ program test_auto_diff
       do i=1,15
          x%d1Array(i) = 1d0 * i
       end do
-      y = x**2
+      y = pow2(x)
       do i=1,15
          call should_print0('', 6d0 * i, y%d1Array(i))
       end do
 
       write(*,*) 'Test x = x**2'
-      x = x**2
+      x = pow2(x)
       do i=1,15
          call should_print0('', 6d0 * i, x%d1Array(i))
       end do
@@ -119,7 +119,7 @@ program test_auto_diff
          call should_print0('', exp(3d0) * (1d0 * i) * 2d0 + (1d0 - i) * exp(3d0), y%d1Array(i))
       end do
 
-   end subroutine do_test_auto_diff_18var_order1
+   end subroutine do_test_auto_diff_star_order1
 
    subroutine do_test_auto_diff_1var_order1()
       type(auto_diff_real_1var_order1) :: x, y, z

@@ -4,8 +4,6 @@
 
       character (len=1000) :: mesa_dir, &
          eosDT_cache_dir, &
-         eosPT_cache_dir, &
-         eosDE_cache_dir, &
          ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir
@@ -21,7 +19,8 @@
 
       logical :: show_eqns_and_vars_names
 
-      logical :: pgstar_flag, save_pgstar_files_when_terminate
+      logical :: pgstar_flag, save_pgstar_files_when_terminate, &
+         clear_initial_pgstar_history, clear_pgstar_history
 
       logical :: save_photo_when_terminate
       logical :: write_profile_when_terminate
@@ -71,6 +70,9 @@
       logical :: relax_mass_scale, relax_initial_mass_scale
       real(dp) :: dlgm_per_step, relax_M_center_dt, change_mass_years_for_dt
       logical :: relax_M_center, relax_initial_M_center
+     
+      logical :: relax_mass_to_remove_H_env, relax_initial_mass_to_remove_H_env
+      real(dp) :: extra_mass_retained_by_remove_H_env
 
       logical :: relax_core, relax_initial_core
       real(dp) :: new_core_mass, dlg_core_mass_per_step, &
@@ -93,6 +95,7 @@
       real(dp) :: dlgL_per_step, relax_L_center_dt
 
       integer :: remove_center_at_cell_k, remove_initial_center_at_cell_k
+      logical :: remove_center_at_max_infall_speed, remove_initial_center_at_cmax_infall_speed
       real(dp) :: remove_center_by_temperature, remove_initial_center_by_temperature
       real(dp) :: remove_center_by_mass_fraction_q, remove_initial_center_by_mass_fraction_q
       real(dp) :: remove_center_by_delta_mass_gm, remove_initial_center_by_delta_mass_gm
@@ -114,9 +117,11 @@
          retain_fallback_at_each_step, fallback_check_total_energy
          
       real(dp) :: limit_center_logP_at_each_step
+      real(dp) :: min_q_for_remove_surface_by_v_surf_div_v_escape, &
+         max_q_for_remove_surface_by_v_surf_div_v_escape
 
-      logical :: repeat_remove_surface_for_each_step
       integer :: remove_surface_at_cell_k, remove_initial_surface_at_cell_k
+      real(dp) :: remove_surface_at_he_core_boundary, remove_initial_surface_at_he_core_boundary
       real(dp) :: remove_surface_by_optical_depth, remove_initial_surface_by_optical_depth
       real(dp) :: remove_surface_by_density, remove_initial_surface_by_density
       real(dp) :: remove_surface_by_pressure, remove_initial_surface_by_pressure
@@ -141,9 +146,6 @@
       logical :: relax_eps_nuc_factor, relax_initial_eps_nuc_factor
       real(dp) :: new_eps_nuc_factor
       real(dp) :: eps_nuc_factor_multiplier
-
-      logical :: relax_fixed_L_for_BB_outer_BC, relax_initial_fixed_L_for_BB_outer_BC
-      integer :: steps_for_relax_fixed_L
 
       logical :: relax_opacity_max, relax_initial_opacity_max
       real(dp) :: new_opacity_max
@@ -190,7 +192,6 @@
       logical :: change_am_nu_rot_flag, change_initial_am_nu_rot_flag, &
          new_am_nu_rot_flag, use_D_omega_for_am_nu_rot
       real(dp) :: center_ye_limit_for_v_flag
-      real(dp) :: gamma1_integral_for_v_flag
       logical :: change_u_flag, change_initial_u_flag, new_u_flag
       logical :: change_reconstruction_flag, change_initial_reconstruction_flag, &
          new_reconstruction_flag
@@ -330,13 +331,13 @@
          max_Z_for_add, max_N_for_add, max_A_for_add
 
       integer :: save_model_number
-      character (len=strlen) :: save_model_filename, required_termination_code_string
+      character (len=strlen) :: save_model_filename
       logical :: save_model_when_terminate
+
+      character (len=strlen) :: required_termination_code_string(num_termination_code_strings)
 
       logical :: profile_starting_model
       integer :: profile_model_number
-
-      integer :: internals_num
 
       logical :: report_retries
 

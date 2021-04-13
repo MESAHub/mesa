@@ -339,11 +339,6 @@
 
  done
 
- do_test_psi_derivs
-    intentionally skipping test
- done
-
-
  do_test_coulomb
         mu      -43.7453051893886027      -37.5095737212022584   169926.1797009507135954
         vs        0.0079074257877945
@@ -356,8 +351,8 @@
       na24  mg24      3.7018793325371620E-40
 
  special weak rates
-      mg24  na24      3.8699849471476970E-03
-      na24  mg24      5.1451546670900257E-40
+      mg24  na24      3.8699849471477109E-03
+      na24  mg24      5.1451546670900355E-40
 
  done
 

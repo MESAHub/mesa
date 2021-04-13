@@ -283,16 +283,6 @@
             end if
          end function failed
          
-         subroutine dump_initial_model 
-            character (len=256) :: fname
-            fname = 'initial_model.data'
-            write(*, *) 'dump initial model to ' // trim(fname)
-            call write_internals(s% id, fname, ierr)
-            
-            stop 'dump_initial_model'
-            
-         end subroutine dump_initial_model
-
       end subroutine do_create_zams
 
       

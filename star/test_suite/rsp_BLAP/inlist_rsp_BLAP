@@ -1,4 +1,4 @@
-! inlist_rsp_blap_0.3M   a Z-bump unstable pulsator.  
+! inlist_rsp_blap_0.36M   a Z-bump unstable pulsator.  
 ! original test case contributed by Alfred Gautschy.
 
 &star_job
@@ -25,13 +25,16 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
+      !pgstar_flag = .true.
+
 / ! end of star_job namelist
 
 &eos
 /
 
 &kap
-   Zbase    = 0.05d0
+
+      Zbase    = 0.05d0
 
       kap_file_prefix = 'a09'
       kap_lowT_prefix = 'lowT_fa05_a09p'
@@ -67,10 +70,15 @@
 
    ! initial kick velocity-amplitude
    RSP_kick_vsurf_km_per_sec = 0.5d0
+   
+! solver
 
 ! output controls
    
-      terminal_show_age_units = 'days'
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
 
    ! for cases in which you have a run that has reached steady pulses
    ! and you want to look at plots of just a few periods to see the details,
@@ -99,7 +107,9 @@
          
       Grid2_win_flag = .true.
 
-      Grid2_title = '0.55 M\d\(2281)\u Z=0.0001 type-II Cepheid, BL Her type'
+
+      Grid2_title = '0.36 M\d\(2281)\u Z=0.05 Blue Large Amplitude Pulsator (BLAP)'
+
       
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

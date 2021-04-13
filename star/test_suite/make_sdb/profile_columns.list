@@ -65,7 +65,6 @@
    !logS ! log10(specific entropy)
    !gamma1 ! dlnP_dlnRho at constant S
    !gamma3 ! gamma3 - 1 = dlnT_dlnRho at constant S
-   !theta_e ! electron degeneracy factor for graboske screening
    !gam ! plasma interaction parameter (> 160 or so means starting crystallization)
    free_e ! free_e is mean number of free electrons per nucleon
    !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
@@ -93,8 +92,6 @@
    pressure_scale_height ! in Rsun units
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP required for purely radiative transport
-   dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Lagrangian)
-   dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
    !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
    !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.

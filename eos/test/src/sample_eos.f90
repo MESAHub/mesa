@@ -82,7 +82,7 @@
          write(*,*) 'call eosDT_get'
          
          ! get a set of results for given temperature and density
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, log10(Rho), T, log10(T), &
@@ -149,7 +149,7 @@
          integer :: ierr
          logical, parameter :: use_cache = .true.
 
-         call eos_init(' ', ' ', ' ', use_cache, ierr)
+         call eos_init(' ', use_cache, ierr)
          if (ierr /= 0) then
             write(*,*) 'eos_init failed in Setup_eos'
             stop 1

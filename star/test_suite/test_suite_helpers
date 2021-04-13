@@ -48,14 +48,7 @@ function do_one {
         mv LOGS "$3"
     fi
 
-    echo
     echo "finished $1"
-    echo
-    echo '***'
-    echo '***'
-    echo '***'
-    echo '***'
-    echo
 }
 
 

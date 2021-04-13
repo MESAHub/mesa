@@ -81,12 +81,12 @@
          use chem_lib, only: basic_composition_info, chem_Xsol
          use adjust_xyz, only: get_xa_for_standard_metals
          use alloc, only: allocate_star_info_arrays
+         use star_utils, only: store_r_in_xh, store_rho_in_xh, store_T_in_xh
 
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: initial_zfracs, i_lnd, i_lnT, i_lnR, i_lum, i, j, k, itry, max_try, &
-            id0, id1, id2
+         integer :: initial_zfracs, i_lum, i, j, k, itry, max_try, id0, id1, id2
          real(dp) :: M, R, initial_y, initial_h1, initial_h2, initial_he3, initial_he4, &
             S0, Pc0, rhoc0, e0(2), S1, Pc1, e1(2), S2, Pc2, e2(2), det, dPc, dS, safefac, &
             initial_z, xsol_he3, xsol_he4, mass_correction, mat(2,2), minv(2,2), sumx
@@ -233,27 +233,18 @@
          s% star_mass = cs% mass/Msun
          s% xmstar = cs% mass
 
-         i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
-         i_lnR = s% i_lnR
          i_lum = s% i_lum
-
-         if (i_lnT == 0) then
-            ierr = -1
-            write(*,*) 'must have lnT variables for create_initial_model'
-            return
-         end if
 
          do k=1, s% nz
             i = s% nz - k + 2 ! skip center point
-            s% xh(i_lnd, k) = log(cs% rhog(i))
-            s% xh(i_lnT, k) = log(cs% Tg(i))
-            s% xh(i_lnR, k) = log(cs% rg(i))
+            call store_rho_in_xh(s, k, cs% rhog(i))
+            call store_T_in_xh(s, k, cs% Tg(i))
+            call store_r_in_xh(s, k, cs% rg(i))
             if (i_lum /= 0) s% xh(i_lum, k) = cs% Lg(i)
             do j=1,species
                s% xa(j,k) = xa(j)
             end do
-            s% q(k) = cs% mg(i)/cs% mg(s% nz)
+            s% q(k) = cs% mg(i)/s% xmstar
          end do
          s% dq(s% nz) = s% q(s% nz)
          do k=1, s% nz - 1
@@ -318,8 +309,8 @@
          ! compute first point off center
          r1 = 1.d-2 * R_try * min(0.1d0,eps)
 
-         m1=4.d0*pi/3.d0 * rhoc * r1*r1*r1
-         P=Pc-2.d0*pi/3.d0 * G*rhoc*rhoc*r1*r1
+         m1 = four_thirds_pi * rhoc * r1*r1*r1
+         P = Pc - two_thirds*pi * G*rhoc*rhoc*r1*r1
          intdmT1=m1*Tc
          y=(/r1,m1,intdmT1/)
          call get_TRho_from_PS(cs,P,S,T,rho)
@@ -396,7 +387,7 @@
          cs% mass = cs% mg(nz)
          cs% radius = cs% rg(nz)
          cs% Teff = cs% Tg(nz)
-         cs% luminosity = 4.d0*pi*pow2(cs% radius)*boltz_sigma*pow4(cs% Teff)
+         cs% luminosity = pi4*pow2(cs% radius)*boltz_sigma*pow4(cs% Teff)
          do k=1,nz
             cs% Lg(k)=cs% luminosity*cs% intdmTg(k)/cs% intdmTg(nz)
          end do
@@ -427,7 +418,7 @@
          call get_TRho_from_PS(cs,P,S,T,rho)
          !write(*,"(a24,10(2x,es15.8))") "S*mp/kb,lgPc,lgTc,rhoc=",S*mp/boltzm,log10(P),log10(T),rho
          dydP(1)=-r*r/(G*m*rho)
-         dydP(2)=-4.d0*pi*r*r*r*r/(G*m)
+         dydP(2)=-pi4*r*r*r*r/(G*m)
          dydP(3)=dydP(2)*T
 
       end subroutine

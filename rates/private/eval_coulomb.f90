@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013-2019  Josiah Schwab, Bill Paxton & The MESA Team
+!   Copyright (C) 2013-2021  Josiah Schwab, Bill Paxton & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -27,6 +27,7 @@ module eval_coulomb
 
   use const_def, only: dp
   use math_lib
+  use auto_diff
 
   implicit none
 
@@ -52,7 +53,7 @@ contains
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z ! nuclear charge
 
-    real(dp) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
 
     select case (which_mui_coulomb)
     case (None)
@@ -81,11 +82,11 @@ contains
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z ! nuclear charge
 
-    real(dp) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
 
     ! calulate the chemical potential of an ion
 
-    real(dp) :: gamma
+    type(auto_diff_real_2var_order1) :: gamma
     real(dp) :: zr, zr_m1o3
 
     ! define parameters
@@ -94,8 +95,6 @@ contains
     real(dp), parameter :: c2 = -0.054d0
     real(dp), parameter :: d0 = -9d0/ 16d0
     real(dp), parameter :: d1 = 0.460d0
-
-    logical :: debug = .false.
 
     ! from Dewitt, H. E., Graboske, H. C., & Cooper, M. S. 1973, ApJ, 181, 439
     ! via Couch & Loumos ApJ, vol. 194, Dec. 1, 1974, pt. 1, p. 385-392
@@ -129,7 +128,7 @@ contains
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z ! nuclear charge
 
-    real(dp) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
 
     ! calulate the chemical potential of an ion
 
@@ -137,7 +136,7 @@ contains
     ! values from Ichimaru, S. 1993, Reviews of Modern Physics, 65, 255
     ! via Juodagalvis et al. (2010)
 
-    real(dp) :: gamma, gamma14
+    type(auto_diff_real_2var_order1) :: gamma, gamma14
 
     ! define parameters
     real(dp), parameter :: a = -0.898004d0
@@ -145,8 +144,6 @@ contains
     real(dp), parameter :: c = 0.220703d0
     real(dp), parameter :: d = -0.86097d0
     real(dp), parameter :: e = -2.52692d0
-
-    logical :: debug = .false.
 
     ! coulomb coupling parameter for species with charge Z
     gamma = cc% gamma_e * pow(Z,5d0/3d0)
@@ -172,12 +169,9 @@ contains
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z ! nuclear charge
 
-    real(dp) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
 
-    real(dp) :: a, b
-    real(dp) :: alpha, beta, gamma, delta
-
-    logical :: debug = .false.
+    type(auto_diff_real_2var_order1) :: gamma
 
     ! expressions taken from 
     ! [CP98]: Chabrier, G., \& Potekhin, A.~Y.\ 1998, \pre, 58, 4941
@@ -193,22 +187,7 @@ contains
 
     mu = fii(gamma) + fie(cc% rs, cc% gamma_e, Z)
 
-    ! no need to do LMR corrections for now
-
-    ! ! next, calculate the correction to the linear mixing relation (LMR)
-
-    ! ! equations 10a, 11 & 12 from [P+09b]
-    ! alpha = pow(zbar, 2d0/5d0) / pow(z2bar, 1d0/5d0)
-    ! beta = 3d0 / (2d0 * alpha) - 1d0
-    ! delta = 1d0 - pow(zbar2, 3d0/2d0) / (sqrt(zbar) * z52bar)
-    ! a = (2.6d0 * delta + 14 * pow(delta, 3d0)) / (1d0 - alpha)
-    ! b = 0.0117d0 * pow(z2bar/(zbar*zbar), 2d0) * a
-
-    ! ! equation 9 from [P+09b]
-    ! deltaf = (gamma_e * z52bar / sqrt(3d0)) * & 
-    !      (delta / ((1d0 + a * pow(gamma, alpha)) * pow(1d0 + b * pow(gamma, alpha), beta)))
-
-
+    ! skip LMR corrections
 
     return
 
@@ -218,8 +197,8 @@ contains
 
       implicit none
 
-      real(dp), intent(in) :: gamma
-      real(dp) :: f
+      type(auto_diff_real_2var_order1), intent(in) :: gamma
+      type(auto_diff_real_2var_order1) :: f
 
       ! define parameters
       real(dp), parameter :: A1 = -0.907347d0
@@ -244,15 +223,17 @@ contains
 
       implicit none
 
-      real(dp), intent(in) :: rs
-      real(dp), intent(in) :: gamma_e
+      type(auto_diff_real_2var_order1), intent(in) :: rs
+      type(auto_diff_real_2var_order1), intent(in) :: gamma_e
       real(dp), intent(in) :: Z
 
-      real(dp) :: f
+      type(auto_diff_real_2var_order1) :: f
 
       real(dp) :: logZ
-      real(dp) :: c_DH, c_inf, c_TF, g1, g2, h1, h2
-      real(dp) :: a, b, x, nu
+      real(dp) :: c_DH, c_inf, c_TF
+      real(dp) :: a, b, nu
+
+      type(auto_diff_real_2var_order1) :: x, g1, g2, h1, h2
 
       ! [CP00], between eq 31 and 32
       logZ = log(Z)
@@ -295,7 +276,7 @@ contains
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z ! nuclear charge
 
-    real(dp) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
 
     select case (which_Vs_coulomb)
     case (None)
@@ -323,7 +304,7 @@ contains
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z ! nuclear charge
 
-    real(dp) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
 
     ! this uses the thomas-fermi approximation, in the relativistic limit
     Vs = 2d0 * Z * fine * sqrt(fine/pi)
@@ -342,12 +323,12 @@ contains
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z ! nuclear charge
 
-    real(dp) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
 
     ! code from Itoh, N., Tomizawa, N., Tamamura, M., Wanajo, S., & Nozawa, S. 2002, ApJ, 579, 380 
 
     integer :: i
-    real(dp) :: rs, rs0, s, fj
+    type(auto_diff_real_2var_order1) :: rs, rs0, s, fj
     real(dp), dimension(11), parameter :: c(0:10) = (/ &
         0.450861D-01, 0.113078D-02, 0.312104D-02, 0.864302D-03, &
         0.157214D-01, 0.816962D-01, 0.784921D-01,-0.680863D-01, &

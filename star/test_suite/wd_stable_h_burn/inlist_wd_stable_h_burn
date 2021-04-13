@@ -78,6 +78,7 @@
 
       max_center_cell_dq = 1d-6
       max_surface_cell_dq = 1d-8
+      mesh_delta_coeff = 2
       
       min_timestep_limit = 1d-12
       
@@ -95,7 +96,7 @@
 		xa_function_weight(2) = 20
 		xa_function_param(2) = 1d-2
 
-      dH_div_H_limit = 0.8d0   ! 10.7 101 3 2137
+      !dH_div_H_limit = 0.8d0   ! 10.7 101 3 2137
 
       delta_lgL_H_limit = 0.1 ! limit for magnitude of change in lgL_H
       delta_lgL_H_hard_limit = 0.5

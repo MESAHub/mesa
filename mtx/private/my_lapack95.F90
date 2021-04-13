@@ -230,7 +230,7 @@
          real(fltp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
          integer :: j, i
          real(fltp), parameter :: zero=0
-         include 'formats.dek'
+         include 'formats'
          ! transa = 'n'
          ! transb = 'n'
          ! alpha = -1
@@ -251,7 +251,7 @@
          real(fltp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
          integer :: j, i
          real(fltp), parameter :: zero=0
-         include 'formats.dek'
+         include 'formats'
          ! transa = 'n'
          ! transb = 'n'
          ! alpha = -1

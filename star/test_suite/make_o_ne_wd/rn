@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# uncomment the following line to run all parts of the test
+# MESA_RUN_OPTIONAL=t
+
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
 MESA_DIR=../../..
@@ -15,7 +18,13 @@ else
     cp zams.mod standard_zams.mod
 fi
 
-do_one inlist_to_agb_header agb.mod 
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+    cp standard_agb.mod agb.mod
+else
+    do_one inlist_to_agb_header agb.mod 
+    cp agb.mod standard_agb.mod
+fi
+
 do_one inlist_c_burn_header c_burn.mod 
 do_one inlist_o_ne_wd_header o_ne_wd.mod
 do_one inlist_settle_envelope_header settled_envelope.mod

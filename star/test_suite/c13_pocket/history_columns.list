@@ -325,71 +325,10 @@
 
 !# information about core and envelope
 
-   !## helium core
       he_core_mass
-      !he_core_radius
-      !he_core_lgT
-      !he_core_lgRho
-      !he_core_L
-      !he_core_v
-      !he_core_omega
-      !he_core_omega_div_omega_crit
-      !he_core_k
-
-   !## carbon core
-      c_core_mass
-      !c_core_radius
-      !c_core_lgT
-      !c_core_lgRho
-      !c_core_L
-      !c_core_v
-      !c_core_omega
-      !c_core_omega_div_omega_crit
-      !c_core_k
-
-   !## oxygen core
-      o_core_mass
-      !o_core_radius
-      !o_core_lgT
-      !o_core_lgRho
-      !o_core_L
-      !o_core_v
-      !o_core_omega
-      !o_core_omega_div_omega_crit
-      !o_core_k
-
-   !## silicon core
-      si_core_mass
-      !si_core_radius
-      !si_core_lgT
-      !si_core_lgRho
-      !si_core_L
-      !si_core_v
-      !si_core_omega
-      !si_core_omega_div_omega_crit
-      !si_core_k
-
-   !## iron core
+      co_core_mass
       fe_core_mass
-      !fe_core_radius
-      !fe_core_lgT
-      !fe_core_lgRho
-      !fe_core_L
-      !fe_core_v
-      !fe_core_omega
-      !fe_core_omega_div_omega_crit
-      !fe_core_k
-
-   !## neuton rich core
       neutron_rich_core_mass
-      !neutron_rich_core_radius
-      !neutron_rich_core_lgT
-      !neutron_rich_core_lgRho
-      !neutron_rich_core_L
-      !neutron_rich_core_v
-      !neutron_rich_core_omega
-      !neutron_rich_core_omega_div_omega_crit
-      !neutron_rich_core_k
 
    !## envelope
 
@@ -858,7 +797,7 @@
          ! sqrt(2) pi^2/(integral of brunt_N/r dr)
       !log_delta_Pg
       !nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       !nu_max_3_4th_div_delta_nu ! nu_max^0.75/delta_nu
       !acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
@@ -1071,24 +1010,6 @@
 
       !diffusion_solver_steps
       !diffusion_solver_iters
-
-
-   !## maximum solver residuals
-      !log_max_abs_lgE_residual
-      !log_max_abs_v_residual
-      !log_max_dlnEdt_residual
-      !log_max_drdt_residual
-      !log_max_dvdt_residual
-      !log_max_lnd_residual
-
-      !avg_lgE_residual
-      !avg_v_residual
-
-      !log_avg_lgE_residual
-      !log_avg_v_residual
-
-      !max_abs_lgE_residual
-      !max_abs_v_residual
 
    !## conservation during mesh adjust
       !log_mesh_adjust_IE_conservation

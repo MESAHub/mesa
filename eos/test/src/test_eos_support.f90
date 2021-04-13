@@ -20,7 +20,7 @@
          real(dp) :: Z, X, logPgas, logT, logRho, logP, T, Prad, Pgas, P
          real(dp) :: logT_min, logT_max, dlogT
          integer :: iounit
-         include 'formats.dek'
+         include 'formats'
          call Setup_eos
          Z =  0.02d0
          X =  0.0d0
@@ -52,7 +52,7 @@
          real(dp) :: Z, X, logPgas, logT, logRho, logP, T, Prad, Pgas, P
          real(dp) :: logT_min, logT_max, dlogT
          integer :: iounit
-         include 'formats.dek'
+         include 'formats'
          call Setup_eos
          Z =  0.02d0
          X =  0.0d0
@@ -93,20 +93,11 @@
       subroutine test_eosPT(which)
          integer, intent(in) :: which
          real(dp) :: Z, X, logPgas, logT, logRho, logP
-         logical :: save_use_max_SCVH_for_PT
          Z =  0.02d0
          X =  0.6d0
          logT = 4d0
          logPgas = 5d0
-         save_use_max_SCVH_for_PT = rq% use_max_SCVH_for_PT
-         if (which == 1) then
-            rq% use_max_SCVH_for_PT = .true.
-         else
-            rq% use_max_SCVH_for_PT = .false.
-         end if
-         write(*,*) 'test_eosPT rq% use_max_SCVH_for_PT', rq% use_max_SCVH_for_PT
          call test1_eosPT(Z, X, logPgas, logT, .false., .false., logRho, logP)
-         rq% use_max_SCVH_for_PT = save_use_max_SCVH_for_PT
       end subroutine test_eosPT
             
       
@@ -128,7 +119,7 @@
          character (len=eos_name_length) :: names(num_eos_basic_results)
          
          
-         include 'formats.dek'
+         include 'formats'
  
          ierr = 0
 
@@ -183,8 +174,8 @@
          write(*,1) 'logT', logT
          write(*,1) 'logPgas', logPgas
          write(*,*)
-     
-         call eos_result_names(names)
+
+         names = eosDT_result_names
          
          if (.not. do_compare) then ! simple form of output
             write(*,1) 'dlnRho_dlnPgas_c_T', dlnRho_dlnPgas_c_T
@@ -201,7 +192,7 @@
             return
          end if
 
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, &
@@ -337,7 +328,7 @@
          integer, pointer, dimension(:) :: chem_id1, net_iso1
          real(dp) :: xa1(species)
                   
-         include 'formats.dek'
+         include 'formats'
  
          ierr = 0
 
@@ -397,7 +388,8 @@
          write(*,1) 'logT', logT
          write(*,*)
      
-         call eos_result_names(names)
+         names = eosDT_result_names
+
          logPgas = res(i_lnPgas)/ln10
          if (.not. do_compare) then ! simple form of output
             write(*,1) 'logPgas', res(i_lnPgas)/ln10
@@ -413,7 +405,7 @@
             return
          end if
 
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, &
@@ -523,7 +515,7 @@
 
          write(*,*) 'call eosDT_get'
          info = 0
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, &
@@ -703,7 +695,7 @@
             if (doing_d_dlnd) then
                log_var = (lnd + delta_x)/ln10
                var = exp10(log_var)
-               call eosDT_get( &
+               call eosDT_get_legacy( &
                   handle, Z, X, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   var, log_var, T, logT, &
@@ -711,7 +703,7 @@
             else
                log_var = (lnT + delta_x)/ln10
                var = exp10(log_var)
-               call eosDT_get( &
+               call eosDT_get_legacy( &
                   handle, Z, X, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   Rho, logRho, var, log_var, &
@@ -806,9 +798,9 @@
             abar_ci, zbar_ci, z2bar_ci, z53bar_ci, ye_ci, mass_correction, &
             sumx, dabar_dx, dzbar_dx, dmc_dx)
 
-         write(*,*) 'call eosDT_get_new'
+         write(*,*) 'call eosDT_get'
          info = 0
-         call eosDT_get_new( &
+         call eosDT_get( &
             handle, species, chem_id, net_iso, xa, &
             Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, info)
@@ -877,7 +869,7 @@
             !val = zbar_ci
             !write(*,*) abar_ci, sumx
 
-            call eosDT_get_new( &
+            call eosDT_get( &
                handle, species, chem_id, net_iso, xa_var, &
                Rho, logRho, T, logT, &
                res, d_dlnd, d_dlnT, d_dxa, info)
@@ -1101,7 +1093,7 @@
                res2, d_dlnd2, d_dlnT2, d_dabar2, d_dzbar2
          integer :: info, i
       
-         include 'formats.dek'
+         include 'formats'
 
          info = 0
 
@@ -1116,7 +1108,7 @@
          logRho = -1d0
          Rho = exp10(logRho)
          
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, &
@@ -1131,7 +1123,7 @@
          logRho2 = (lnd + dlnd)/ln10
          Rho2 = exp10(logRho2)
 
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho2, logRho2, T, logT, &
@@ -1169,7 +1161,7 @@
          logical, parameter :: quietly = .true.
          integer :: ierr
          
-         include 'formats.dek'
+         include 'formats'
 
          call Setup_eos
 
@@ -1206,7 +1198,7 @@
          contains
          
          subroutine do1
-            include 'formats.dek'
+            include 'formats'
             rq% logT_all_HELM = logT_all_HELM
             rq% logT_all_OPAL = logT_all_OPAL
             write(*,1) 'logT_all_HELM', logT_all_HELM
@@ -1293,8 +1285,6 @@
             if (.not. quietly) write(*,*) trim(str)
 
             
-            T = 1d2; rho = 1d-8
-            call Do_One_Ideal_Gas_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)
             T = 1d6; rho = 1d-2
             call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! opal
             T = 1d4; rho = 1d-1
@@ -1346,7 +1336,7 @@
             logRho_bnd2 = arg_not_provided
             other_at_bnd1 = arg_not_provided
             other_at_bnd2 = arg_not_provided
-            call eosDT_get_Rho( &
+            call eosDT_get_Rho_legacy( &
                   handle, Z, X, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   log10_T, i_lnS, lnS, &
@@ -1374,7 +1364,7 @@
             logT_guess = result_log10
             logT_bnd1 = 3
             logT_bnd2 = 9
-            call eosDT_get_T( &
+            call eosDT_get_T_legacy( &
                   handle, Z, X, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   log10_rho, i_lnS, lnS, &
@@ -1520,7 +1510,7 @@
             logRho_bnd2 = arg_not_provided
             other_at_bnd1 = arg_not_provided
             other_at_bnd2 = arg_not_provided
-            call eosDT_get_Rho( &
+            call eosDT_get_Rho_legacy( &
                   handle, Z, X, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   log10_T, i_lnS, lnS, &
@@ -1548,7 +1538,7 @@
             logT_guess = result_log10
             logT_bnd1 = 3
             logT_bnd2 = 9
-            call eosDT_get_T( &
+            call eosDT_get_T_legacy( &
                   handle, Z, X, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   log10_rho, i_lnS, lnS, &
@@ -1666,7 +1656,7 @@
          write(*,1) 'other_tol', other_tol
          write(*,*)
 
-         call eosDT_get_T( &
+         call eosDT_get_T_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                logRho, which_other, other, &
@@ -1737,7 +1727,7 @@
          write(*,1) 'other_tol', other_tol
          write(*,*)
 
-         call eosDT_get_Rho( &
+         call eosDT_get_Rho_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                logT, which_other, other, &
@@ -2067,12 +2057,11 @@
             integer, intent(in) :: which_eos
             character (len=*), intent(in) :: str
             include 'formats'
-            call eosDT_test_component( &
-               handle, which_eos, Z, X, abar, zbar, &
+            call eosDT_get_component( &
+               handle, which_eos, &
                species, chem_id, net_iso, xa, &
                exp10(logRho), logRho, exp10(logT), logT, &
-               res, d_dlnd, d_dlnT, &
-               Pgas, Prad, energy, entropy, ierr)       
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
             if (ierr /= 0) then
                write(*,1) trim(str) // ' no results'
             else
@@ -2203,7 +2192,7 @@
             write(*,*)
          end if
          
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, arg_not_provided, T, arg_not_provided, &
@@ -2245,102 +2234,6 @@
 
       end subroutine Do_One_TRho
 
-      
-      subroutine Do_One_Ideal_Gas_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)
-         logical, intent(in) :: quietly
-         real(dp), intent(in) :: T, Rho, X, Zinit, dXC, dXO
-         real(dp), intent(out) :: Y, Z
-         real(dp), intent(out), dimension(num_eos_basic_results) :: res
-
-         real(dp), dimension(num_eos_basic_results) :: &
-               d_dlnd, d_dlnT, d_dabar, d_dzbar
-         integer :: info, i
-         real(dp) :: dlnT, dlnRho, lnRho_2, Prad, Pgas, P
-
-  101    format(a30,4x,1pe24.16)
-  102    format(a30,3x,1pe24.16)
-         
-         Z = Zinit + dXC + dXO
-         Y = 1 - (X+Z)
-                        
-         call Init_Composition(X, Zinit, dXC, dXO)
-         
-         if (.not. quietly) then
-            write(*,*)
-            write(*,*)
-            write(*,102) 'X', X
-            write(*,102) 'Y', Y
-            write(*,102) 'Z', Z
-            write(*,102) 'abar', abar
-            write(*,102) 'zbar', zbar
-            write(*,102) 'logRho', log10(Rho)
-            write(*,102) 'logT', log10(T)
-            write(*,102) 'T6', T * 1d-6
-            write(*,*)
-         end if
-         
-         call eosDT_ideal_gas_get( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Rho, arg_not_provided, T, arg_not_provided, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, info)
-         if (.true. .and. info /= 0) then
-            write(*,*) 'info', info, 'Rho', Rho, 'T', T
-            write(*,*) 'failed in eosDT_ideal_gas_get'
-            stop 1
-         end if
-         
-         if (.not. quietly) then
-            
-            write(*,*) 'eosDT_ideal_gas_get'
-            Prad = crad*T*T*T*T/3
-            Pgas = exp(res(i_lnPgas))
-            P = Pgas + Prad
-            write(*,101) 'P', P
-            write(*,101) 'E', exp(res(i_lnE))
-            write(*,101) 'S', exp(res(i_lnS))
-            do i = 4, 9
-               write(*,101) trim(eos_names(i)), res(i)
-            end do
-            write(*,101) trim(eos_names(i_gamma1)), res(i_gamma1)
-            write(*,101) trim(eos_names(i_gamma3)), res(i_gamma3)
-            write(*,101) trim(eos_names(i_eta)), res(i_eta)
-            
-            if (.false.) then ! debugging
-               do i = 1, num_eos_basic_results
-                  write(*,101) 'd_dlnd ' // trim(eos_names(i)), d_dlnd(i)
-               end do
-               write(*,*)
-               do i = 1, num_eos_basic_results
-                  write(*,101) 'd_dlnT ' // trim(eos_names(i)), d_dlnT(i)
-               end do
-               write(*,*)
-               stop
-            end if
-            
-         end if
-
-      end subroutine Do_One_Ideal_Gas_TRho
-      
-      
-      subroutine test_theta_e
-         integer :: i
-         real(dp), parameter :: eta_min = -10d0
-         real(dp), parameter :: eta_max = 75d0
-         real(dp), parameter :: d_eta = 5d0
-         real(dp) :: eta, theta_e, d_theta_e_deta
- 3       format(f14.2,2x,2(1pe16.6,2x))
-         write(*,*) 'test_theta_e'
-         eta = eta_min
-         write(*,'(a14,99a18)') 'eta', 'theta_e'
-         do while (eta <= eta_max)
-            theta_e = eos_theta_e(eta, d_theta_e_deta)
-            write(*,3) eta, theta_e
-            eta = eta + d_eta
-         end do
-         write(*,*)
-      end subroutine test_theta_e
-      
       
       subroutine test_dirac_integrals
          real(dp) :: dk, T, eta, theta, fdph, fdmh, fdeta, fdtheta, theta_e

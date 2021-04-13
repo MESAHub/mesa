@@ -1,0 +1,71 @@
+! Candidate for a double-mode delta Scuti variable:
+! 2 Msol star leaving the main-sequence phase through
+! the upper part of the S-bend on its HR track.
+! Both F (0.171 d) and O1 (0.127 d) modes are linearly overstable  
+! with very small growth rates (of the order of 10**-5).
+! It takes more than 10**4 star-days for the pulsations to saturate. 
+! 
+! original test case contributed by Alfred Gautschy.
+
+&star_job
+   saved_model_name = 'Delta_Scuti.mod'
+   
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 15 ! for debugging
+   
+/ ! end of star_job namelist
+
+&eos
+   use_Skye = .true.
+/ ! end of eos namelist
+
+&kap
+   Zbase = 0.02d0
+   kap_file_prefix = 'a09'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   kap_CO_prefix = 'a09_co'
+/ ! end of kap namelist
+   
+&controls  
+   initial_z = 0.02d0
+   initial_mass = 2.0d0
+   
+   force_timestep = 15 ! for debugging
+
+! TDC
+
+   mixing_length_alpha  =     1.2d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
+   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
+   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
+
+   TDC_num_outermost_cells_forced_nonturbulent = 1
+   TDC_num_innermost_cells_forced_nonturbulent = 5
+
+! RSP
+
+   !x_integer_ctrl(1) = 10 ! which period to check
+   !x_ctrl(1) = 0.14715d0 ! expected period (in days) 
+
+   RSP_mass =    2.0d0
+   RSP_Teff =   6900d0
+   RSP_L    =     30d0   
+   RSP_X    =    0.7d0
+   RSP_Z    =   0.02d0
+      
+   ! parameters for equations
+   RSP_alfam = 0.25d0 ! eddy viscosity; Chi & Eq ~ RSP_alfam
+   RSP_alfa  = 1.2d0  ! mixing length; alfa = 0: purely radiative model.
+
+/ ! end of controls namelist
+
+
+&pgstar
+   Grid2_title = 'Delta_Scuti'
+/ ! end of pgstar namelist
+   
+
+
+   
+

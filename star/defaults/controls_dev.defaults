@@ -3,92 +3,100 @@
 ! ============
 
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
-! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
+! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
-
-      D_mix_zero_region_bottom_q = 1d99
-      D_mix_zero_region_top_q = -1d99
-      dq_D_mix_zero_at_H_He_crossover = -1d0
-      dq_D_mix_zero_at_H_C_crossover = -1d0
-      
-      
-      
-      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
-      ! ok for create pre ms etc., but not for read model
-      ! create_pre_ms calls normalize_dqs even if this flag is false.
-      do_normalize_dqs_as_part_of_set_qs = .false.
-      
-      
       
 
-      ! Eturb parameters
+      ! TDC parameters
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          
-      !   Eturb_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-      !   Eturb_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   Eturb_alfat =     0.0d0         ! turbulent flux; Lt ~ Eturb_alfat
-      !   Eturb_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ Eturb_alfam
-      !   Eturb_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ Eturb_alfar    
+      !   TDC_alfad =     1.0d0         ! turbulent dissipation; damp ~ TDC_alfad    
+      !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
+      !   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
+      !   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar    
       !      
-      ! Eturb time weighting is determined by the Fraley_time_centering controls.
+      ! TDC time weighting is determined by the velocity_time_centering controls.
       !     for Pt and Lt in turbulent energy equation
       !     for P and grav in momentum equation
       !     for P and L in energy equation
       !     for area when multiplied by P
-      ! Eturb_Lsurf_factor: Lsurf = Eturb_Lsurf_factor*area(1)*clight*crad*T(1)**4
+      ! TDC_Lsurf_factor: Lsurf = TDC_Lsurf_factor*area(1)*clight*crad*T(1)**4
+      ! TDC_use_Stellingwerf_Lr as in RSP
       !   
 
       ! ::
 
-    Eturb_alfa  = 1.5d0
-    Eturb_alfap = 0.0d0
-    Eturb_alfat = 0.0d0
-    Eturb_alfam = 0.25d0
-    Eturb_alfar = 0.0d0
+    TDC_alfad = 1.0d0  ! RSP standard.  1.3 does better matching mesa MLT.
+    TDC_alfap = 0.0d0
+    TDC_alfat = 0.0d0
+    TDC_alfam = 0.25d0
+    TDC_alfar = 0.0d0
+    
+    TDC_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
+    TDC_min_Lc_div_L_for_convective_mixing_type = 1d-4
 
-    Eturb_Lsurf_factor = 0.5d0
+    TDC_Lsurf_factor = 0.5d0
+    
+    TDC_use_L_eqn_at_surface = .true.
+    TDC_assume_HSE = .true.
+    TDC_use_RSP_eqn_for_Y_face = .true.
+    TDC_use_mass_interp_face_values = .false.
+    TDC_use_Stellingwerf_Lr = .true.
+    TDC_use_RSP_form_of_etrb_eqn = .true.
+    
+    TDC_num_outermost_cells_forced_nonturbulent = 0
+    TDC_num_innermost_cells_forced_nonturbulent = 0
+    
+    TDC_min_dt_div_tau_conv_switch_to_MLT = -1
+    TDC_min_dt_years_switch_to_MLT = 20d0
 
+     TDC_w_min_for_damping = 1d2
+     TDC_source_seed = 0d0
 
-      ! use_DGESVX_in_bcyclic
-      ! use_equilibration_in_DGESVX
-      ! report_min_rcond_from_DGESXV
-      
-      ! FOR DEBUGGING ONLY.   NOT FOR GENERAL USE.
-
-      ! ::
-
-    use_DGESVX_in_bcyclic = .false.
-    use_equilibration_in_DGESVX = .false.
-    report_min_rcond_from_DGESXV = .false.
-
-
-      ! mlt_make_surface_no_mixing
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! this defaults to false for (temoporary) backward compatibility.
-      ! it should be true.
-
-      ! ::
-
-    mlt_make_surface_no_mixing = .false.
-
-
-      ! drag_coefficient
-      ! ~~~~~~~~~~~~~~~~
-      ! min_q_for_drag
-      ! ~~~~~~~~~~~~~~
-      ! turn_on_drag_in_H_envelope
-      ! ~~~~~~~~~~~~~~
-
-      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
-      ! only for v(k) when q(k) > min_q_for_drag.
-      ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
+      ! period controls
 
       ! ::
 
-    drag_coefficient = 0d0
-    min_q_for_drag = 0d0
-    turn_on_drag_in_H_envelope = .false.
+    TDC_target_steps_per_cycle = 600
+    TDC_min_max_R_for_periods = -1
+
+      ! when to stop
+
+      ! ::
+
+    TDC_max_num_periods = -1
+    TDC_GREKM_avg_abs_frac_new = 0.1d0
+    TDC_GREKM_avg_abs_limit = -1
+
+      ! output data for work integrals during a particular period
+
+      ! ::
+
+    TDC_work_period = -1
+    TDC_work_filename = 'work.data'
+
+      ! output data for 3d map.  format same as for gnuplot pm3d
+
+      ! ::
+
+    TDC_write_map = .false.
+    TDC_map_columns_filename = 'map_columns.list'
+
+      ! items listed in your map columns must also appear in your profile columns
+
+      ! ::
+
+    TDC_map_filename = 'map.data'
+    TDC_map_first_period = -1
+    TDC_map_last_period = -1
+    TDC_map_zone_interval = 2
+    TDC_map_history_filename = 'map_history.data'
+
+
+
+
+    
 
 
       ! use_superad_reduction

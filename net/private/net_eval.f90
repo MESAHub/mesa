@@ -101,7 +101,6 @@
             rate_screened, rate_screened_dT, rate_screened_dRho
          real(dp), target, dimension(num_rvs, num_isos) :: screen_h1, screen_he4
          integer, parameter :: max_z_for_cache = 14
-         real(dp), target :: graboske_cache(3, max_z_for_cache, max_z_for_cache)
          real(qp), target :: dydt_a(num_rvs*num_isos)
          real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
          real(dp), target :: mion_a(num_isos)
@@ -127,7 +126,7 @@
          logical, parameter :: dbg = .false.
          !logical, parameter :: dbg = .true.
          
-         include 'formats.dek'
+         include 'formats'
 
          if (dbg) write(*,*) 'enter eval_net'
          
@@ -164,7 +163,6 @@
             screen_he4(:,:) = 0
          end if
          
-         n% graboske_cache => graboske_cache
          n% reaction_Qs => reaction_Qs
          n% reaction_neuQs => reaction_neuQs
          n% eps_neu_total = 0
@@ -604,7 +602,7 @@
             real(dp) :: f
             logical :: okay
             
-            include 'formats.dek'
+            include 'formats'
 
             do i=1,num_reactions
                if (g% reaction_id(i) <= 0) then
@@ -696,7 +694,7 @@
 
             integer, intent(out) :: ierr
             integer :: i, j, id, ir
-            include 'formats.dek'
+            include 'formats'
 
             ! before getting the weaklib rates, the Coulomb_Info
             ! structure must be populated.  the ecapture routines need
@@ -708,8 +706,7 @@
             cc => cc_info
 
             call coulomb_set_context( &
-               cc, temp, rho, logtemp, logrho, zbar, abar, z2bar,  &
-               num_isos, n% y, g% z52)
+               cc, temp, rho, logtemp, logrho, zbar, abar, z2bar)
             
             call eval_weak_reaction_info( &
                num_wk_reactions, &
@@ -774,7 +771,7 @@
          real(dp) :: sum
          integer :: i, ci
          character (len=256) :: message
-         include 'formats.dek'
+         include 'formats'
          sum = 0
          do i = 1, g% num_isos
             sum = sum + x(i)

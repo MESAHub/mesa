@@ -109,7 +109,7 @@ contains
     real(dp) :: dT_dlnT
     real(dp) :: dT_dlnTeff
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 
@@ -201,7 +201,9 @@ contains
        write(*,1) 'dT_dTeff', dT_dTeff
        write(*,1) 'dT_dlogg', dT_dlogg
        write(*,*)
-       if (is_bad(lnP) .or. is_bad(lnT)) stop 'eval_table'
+       ierr = -1
+       return
+       !if (is_bad(lnP) .or. is_bad(lnT)) stop 'eval_table'
     end if
 
     ! Finish
@@ -267,7 +269,7 @@ contains
     integer                 :: ng
     integer                 :: j
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 

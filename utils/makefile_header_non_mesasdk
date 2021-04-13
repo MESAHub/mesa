@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # NOTE: MESA is no longer supported on 32-bit systems.  This isn't by design;
 # we simply haven't been able to get it to work!  So if you really-really want 
 # to use an antique 32-bit system for mesa, you'll have to try to make it work yourself.
@@ -48,46 +46,46 @@ WHICH_BLAS = USE_SRCS
 LOAD_BLAS = -lmesablas
 MKL_INCLUDE = 
 
-# step 4) do you want to use PGPLOT with mesa/star?                                                                                     
-# you can have onscreen plots updated at each step,                                                                                     
-# and you can save files for making movies.  very cool!                                                                                 
+# step 4) do you want to use PGPLOT with mesa/star?
+# you can have onscreen plots updated at each step,
+# and you can save files for making movies.  very cool!
 
-# NOTE: you need to have a PGPLOT built using the same fortran and c compiler as you                                                    
-# are using for mesa.                                                                                                                   
+# NOTE: you need to have a PGPLOT built using the same fortran and c compiler as you
+# are using for mesa.
 
-# if you don't already have a compatible pgplot,                                                                                         
-# follow the instructions in pgplot/README                                                                                               
+# if you don't already have a compatible pgplot,
+# follow the instructions in pgplot/README
 
-# to access pgplot from mesa/star,                                                                                                       
-# set USE_PGSTAR = YES and set LOAD_PGPLOT to load the libraries.                                                                       
-# in mesa/star, set the control parameter pgstar_flag = .true. in &star_job                                                             
-# when you run star it will open a window using X and draw plots using PGSTAR                                                           
-# the plots will be updated each time a log entry is made.                                                                               
-# see star/test/src/pgstar_defaults.dek for details.                                                                                     
+# to access pgplot from mesa/star,
+# set USE_PGSTAR = YES and set LOAD_PGPLOT to load the libraries.
+# in mesa/star, set the control parameter pgstar_flag = .true. in &star_job
+# when you run star it will open a window using X and draw plots using PGSTAR
+# the plots will be updated each time a log entry is made.
+# see star/test/src/pgstar_defaults.dek for details.
 
-# NOTE: if you have libpng, then include '-lpng' in the LOAD_PGPLOT line.                                                               
-# the *.png files are excellent for making movies.                                                                                       
-# but if you don't have libpng and can't get it, no problem; it isn't required.                                                         
-# just remove '-lpng' from the LOAD_PGPLOT line.                                                                                         
+# NOTE: if you have libpng, then include '-lpng' in the LOAD_PGPLOT line.
+# the *.png files are excellent for making movies.
+# but if you don't have libpng and can't get it, no problem; it isn't required.
+# just remove '-lpng' from the LOAD_PGPLOT line.
 
-# Similarly, if you don't have X windows and don't want to make onscreen plots,                                                         
-# then you can load PGPLOT without it.  Just delete the X stuff from LOAD_PGPLOT.                                                       
+# Similarly, if you don't have X windows and don't want to make onscreen plots,
+# then you can load PGPLOT without it.  Just delete the X stuff from LOAD_PGPLOT.
 
-# for users of Red Hat OS: Georgios Magkotsios reports success with these settings:                                                     
-#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot -L/usr/lib64 -lX11 -lsvml -lpng                                                                 
-#FCstatic = -shared-intel #-Bstatic -static-intel                                                                                       
+# for users of Red Hat OS: Georgios Magkotsios reports success with these settings:
+#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot -L/usr/lib64 -lX11 -lsvml -lpng
+#FCstatic = -shared-intel #-Bstatic -static-intel
 
-# for Ubuntu, Philip Pinto found these libraries to be necessary:                                                                       
-#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot  -lX11 -lxcb -lXau -lXdmcp -lXext -lpng -lz                                                    
+# for Ubuntu, Philip Pinto found these libraries to be necessary:
+#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot  -lX11 -lxcb -lXau -lXdmcp -lXext -lpng -lz
 
-# for Fedora 12 (x86_64), Mike Zingale reported that the following worked                                                               
-# 1. at the terminal:                                                                                                                   
-#  yum install pgplot pgplot-devel                                                                                                       
-# 2. in the mesa/util/makefile_header                                                                                                   
-# USE_PGSTAR = YES                                                                                                                       
-# LOAD_PGPLOT = -lpgplot -L/usr/lib64 -lX11 -lpng                                                                                       
-# 3. it is also important that the following environment variable be set:                                                               
-# export PGPLOT_DIR=/usr/share/pgplot/  
+# for Fedora 12 (x86_64), Mike Zingale reported that the following worked
+# 1. at the terminal:
+#  yum install pgplot pgplot-devel
+# 2. in the mesa/util/makefile_header
+# USE_PGSTAR = YES
+# LOAD_PGPLOT = -lpgplot -L/usr/lib64 -lX11 -lpng
+# 3. it is also important that the following environment variable be set:
+# export PGPLOT_DIR=/usr/share/pgplot/
 
 
 # NOTE: a change in USE_PGSTAR doesn't take effect until you next recompile mesa/star
@@ -155,10 +153,8 @@ endif
 LOAD_HDF5 = `mesasdk_hdf5_link`
 INCLUDE_HDF5 = -I${MESASDK_ROOT}/include
 
-# If not YES then we don't use HDF5, thus you wont have access to custom weak rates
-# Also the rates test suite will not pass so do: /usr/bin/touch $MESA_DIR/rates/skip_test
-# if you change this option
-USE_HDF5 = NO
+# Note that the USE_HDF5 flag (which used to default to NO) has been retired; you now need
+# an HDF5 library installed to build mesa
 
 
 # step 6) now do the mesa install
@@ -212,7 +208,7 @@ FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=100 $(SPECIAL_FC_FLAG
 FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan
 # -Warray-temporaries
  
-FCimpno = -fimplicit-none  
+FCimpno = -fimplicit-none
 FCchecks = -fbounds-check
 FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination
 #FCwarn = -Wunused-value -Werror -W -Wno-compare-reals -Wno-unused-parameter
@@ -358,7 +354,7 @@ LOAD_MATRIX_INT = $(addprefix -l,$(LIBS_MATRIX))
 LOAD_MATRIX_EXT = $(LOAD_CRMATH) $(LOAD_LAPACK) $(LOAD_BLAS)
 LOAD_MATRIX = $(LOAD_MATRIX_INT) $(LOAD_MATRIX_EXT)
 
-LIBS_MESA_NUMERICS = interp_2d interp_1d num auto_diff $(LIBS_MATRIX)
+LIBS_MESA_NUMERICS = interp_2d interp_1d num auto_diff hdf5io $(LIBS_MATRIX)
 LOAD_MESA_NUMERICS_INT = $(addprefix -l,$(LIBS_MESA_NUMERICS))
 LOAD_MESA_NUMERICS_EXT = $(LOAD_MATRIX_EXT) $(LOAD_HDF5)
 LOAD_MESA_NUMERICS = $(LOAD_MESA_NUMERICS_INT) $(LOAD_MESA_NUMERICS_EXT)
@@ -388,7 +384,7 @@ LOAD_MESA_STAR_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_STAR))
 ifeq ($(USE_PGSTAR),YES)
    LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
 else
-   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
+   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT)
 endif
 LOAD_MESA_STAR = $(LOAD_MESA_STAR_INT) $(LOAD_MESA_STAR_EXT)
 
@@ -404,7 +400,7 @@ STAR_WORK_OBJS = \
    run_star_extras.o run_star.o 
 
 BINARY_WORK_OBJS = \
-   $(STAR_WORK_OBJS) run_binary_extras.o run_binary.o
+   run_star_extras.o run_binary_extras.o run_binary.o
    
 #Test if we are on windows
 BUILD_ON_WINDOWS=NO
@@ -421,7 +417,7 @@ CP_IF_NEWER = $(MESA_DIR)/utils/cp_if_newer
 # makedepf90 invocation (depends on whether we have the SDK2-patched version that
 # supports the -X flag)
 ifneq ($(shell makedepf90 -V | grep sdk2),)
-    MAKEDEPF90_IGNORE_MODS = intrinsic omp_lib iso_c_binding iso_fortran_env crmath hdf5
+    MAKEDEPF90_IGNORE_MODS = intrinsic omp_lib iso_c_binding iso_fortran_env ieee_arithmetic crmath hdf5
     MAKEDEPF90 = makedepf90 -m %m.mod -X $(addprefix -u,$(MAKEDEPF90_IGNORE_MODS))
 else
     MAKEDEPF90 = makedepf90 -m %m.mod

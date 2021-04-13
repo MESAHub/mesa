@@ -74,6 +74,8 @@
     ! this is mainly to resolve properly when the star goes off the main sequence
     delta_HR_limit = 0.005d0
     delta_XH_cntr_limit = 0.005d0
+    
+    varcontrol_target = 1d-4
 
     use_dedt_form_of_energy_eqn = .true.
      
@@ -109,8 +111,8 @@
   ! implicit wind scheme when critical rotation is reached
     max_mdot_redo_cnt = 200
     min_years_dt_for_redo_mdot = 1d-5
-    surf_w_div_w_crit_limit = 0.99d0
-    surf_w_div_w_crit_tol = 0.01d0
+    surf_omega_div_omega_crit_limit = 0.99d0
+    surf_omega_div_omega_crit_tol = 0.01d0
     rotational_mdot_boost_fac = 1d10
     rotational_mdot_kh_fac = 1d10
     mdot_revise_factor = 1.1

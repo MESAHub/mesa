@@ -253,10 +253,6 @@
             write(*,*) 'finished pre-MS model'
             write(*,1) 'mstar1/Msun', mstar1/Msun
             write(*,1) '(mstar-mstar1)/mstar', (mstar-mstar1)/mstar
-            write(*,1) 'log10(r/Rsun)', log10(exp(xh(s% i_lnR,1))/Rsun)
-            if (s% i_lum /= 0) write(*,1) 'log10(L/Lsun)', log10(xh(s% i_lum,1)/Lsun)
-            write(*,1) 'log10(Tsurf)', xh(s% i_lnT,1)/ln10
-            write(*,1) 'Tsurf', exp(xh(s% i_lnT,1))
             write(*,*) 'nz', nz
             write(*,*)
             stop 'debug: pre ms'
@@ -267,7 +263,6 @@
          ! overwritten during the call to allocate_star_info_arrays
 
          if (ASSOCIATED(s% xh_old)) deallocate(s% xh_old)
-         if (ASSOCIATED(s% equ1)) deallocate(s% equ1)
          if (ASSOCIATED(s% xh_start)) deallocate(s% xh_start)
          
          call allocate_star_info_arrays(s, ierr)
@@ -390,7 +385,8 @@
          use chem_lib
          use eos_lib, only: Radiation_Pressure
          use eos_support, only: get_eos, solve_eos_given_PgasT_auto
-         use star_utils, only: normalize_dqs, set_qs
+         use star_utils, only: normalize_dqs, set_qs, &
+            store_r_in_xh, store_lnT_in_xh, store_lnd_in_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: &
             T_c, rho_c, d_log10_P_in, eps_grav_in, &
@@ -402,15 +398,14 @@
          real(dp), parameter :: LOGRHO_TOL = 1E-6_dp
          real(dp), parameter :: LOGPGAS_TOL = 1E-6_dp
          
-         integer :: i, ii, k, j, i_lnd, i_lnT, i_lnR, prune, max_retries
+         integer :: i, ii, k, j, prune, max_retries
          real(dp), parameter :: &
             delta_logPgas = 0.004d0, q_at_nz = 1d-5
          real(dp) :: &
             P_surf_limit, y, dlogPgas, logPgas, Prad, Pgas, try_dlogPgas, logPgas0, &
             res(num_eos_basic_results), eps_grav, P_c, logP, m, &
             d_eos_dlnd(num_eos_basic_results), d_eos_dlnT(num_eos_basic_results), &
-            d_eos_dabar(num_eos_basic_results), d_eos_dzbar(num_eos_basic_results), &
-            dres_dxa(num_eos_basic_results,s% species), &
+            d_eos_dxa(num_eos_basic_results,s% species), &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
             cgrav, r, rmid, rho, logRho, T, lnT, L, P, P0, dm, m0, L0, r0, lnT0, T0, &
@@ -434,10 +429,6 @@
          
          if (dbg) write(*,1) 'logT_surf_limit', logT_surf_limit
 
-         i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
-         i_lnR = s% i_lnR
-         
          cgrav = standard_cgrav
          
          eps_grav = eps_grav_in
@@ -454,7 +445,7 @@
                s, 0, xa, &
                rho_c, log10(rho_c), T_c, log10(T_c), &
                res, d_eos_dlnd, d_eos_dlnT, &
-               dres_dxa, ierr)
+               d_eos_dxa, ierr)
          if (ierr /= 0) return
          call unpack_eos_results
          
@@ -478,9 +469,9 @@
          
          ! density at nz
          call solve_eos_given_PgasT_auto( &
-              s, 0, z, xa(s% net_iso(ih1)), abar, zbar, xa, &
+              s, 0, xa, &
               lnT/ln10, log10(Pgas), LOGRHO_TOL, LOGPGAS_TOL, &
-              logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dabar, d_eos_dzbar, &
+              logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dxa, &
               ierr)
          if (ierr /= 0) return
          rho = exp10(logRho)
@@ -515,9 +506,9 @@
          s% dq => dq
          s% q => q
          
-         xh(i_lnd, nz) = logRho*ln10
-         xh(i_lnT, nz) = lnT
-         xh(i_lnR, nz) = log(r)
+         call store_lnd_in_xh(s, nz, logRho*ln10, xh)
+         call store_lnT_in_xh(s, nz, lnT, xh)
+         call store_r_in_xh(s, nz, r, xh)
          if (s% i_lum /= 0) xh(s% i_lum,nz) = L
          
          q(nz) = q_at_nz
@@ -566,7 +557,7 @@
                      if (ii == 10) exit
                      dm = -pi4*pow4(rmid)*(P-P0)/(cgrav*mmid)
                      m = m0 + dm ! mass at point k
-                     r = pow(r0*r0*r0 + dm/((4*pi/3)*rho_mid),one_third)
+                     r = pow(r0*r0*r0 + dm/(four_thirds_pi*rho_mid),one_third)
                      if (dbg) write(*,2) 'r', ii, r, m, dm
                   end do
                   
@@ -597,9 +588,9 @@
                   if (i == 2) exit
                   
                   call solve_eos_given_PgasT_auto( &
-                       s, 0, z, x, abar, zbar, xa, &
+                       s, 0, xa, &
                        lnT/ln10, logPgas, LOGRHO_TOL, LOGPGAS_TOL, &
-                       logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dabar, d_eos_dzbar, &
+                       logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dxa, &
                        ierr)
                   rho = exp10(logRho)
                   if (ierr /= 0) return
@@ -619,17 +610,14 @@
                   exit step_loop
                end if
          
-               xh(i_lnd, k) = logRho*ln10
-               xh(i_lnT, k) = lnT
-               xh(i_lnR, k) = log(r)
+               call store_lnd_in_xh(s, k, logRho*ln10, xh)
+               call store_lnT_in_xh(s, k, lnT, xh)
+               call store_r_in_xh(s, k, r, xh)
                if (s% i_lum /= 0) xh(s% i_lum,k) = L
                q(k) = m/mstar
                dq(k) = dm/mstar
                
                if (dbg) then
-                  write(*,2) 'xh(i_lnd, k)', k, xh(i_lnd, k)
-                  write(*,2) 'xh(i_lnT, k)', k, xh(i_lnT, k)
-                  write(*,2) 'xh(i_lnR, k)', k, xh(i_lnR, k)
                   write(*,2) 'L', k, L
                   write(*,2) 'q(k)', k, q(k)
                   write(*,2) 'dq(k)', k, dq(k)

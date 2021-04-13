@@ -179,7 +179,7 @@
             d_Gamma_factor_dvb(nvbs), d_grad_scale_dvb(nvbs), d_Gamma_inv_threshold_dvb(nvbs), &
             d_Gamma_term_dvb(nvbs)
 
-         include 'formats.dek'
+         include 'formats'
 
          !test_partials = (kz == ss% solver_test_partials_k)
          test_partials = .false.
@@ -250,10 +250,10 @@
          
          !gradr = eval_Paczynski_gradr(P,opacity,L,m,cgrav,Pr,tau,T,r,rho)
          gradr = P*opacity*L / (16*pi*clight*m*cgrav*Pr)
-         if (tau < 2d0/3d0) then ! B. Paczynski, 1969, Acta Astr., vol. 19, 1., eqn 14.
+         if (tau < two_thirds) then ! B. Paczynski, 1969, Acta Astr., vol. 19, 1., eqn 14.
             s_gradr = (2d0*crad*T*T*T*sqrt(r))/(3d0*cgrav*m*rho)*pow(L/(8d0*pi*boltz_sigma), 0.25d0) ! eqn 15
             f_gradr = 1d0 - 1.5d0*tau ! Paczynski, 1969, eqn 8
-            dilute_factor = (1 + f_gradr*s_gradr*(4*pi*cgrav*clight*m)/(opacity*L))/(1 + f_gradr*s_gradr)
+            dilute_factor = (1 + f_gradr*s_gradr*(pi4*cgrav*clight*m)/(opacity*L))/(1 + f_gradr*s_gradr)
             gradr = gradr*dilute_factor
          end if
          gradr = gradr*gradr_factor
@@ -413,7 +413,7 @@
             return
          end if
                      
-         radiative_conductivity = (4*crad*clight/3)*T*T*T / (opacity*rho) ! erg / (K cm sec)
+         radiative_conductivity = (four_thirds*crad*clight)*T*T*T / (opacity*rho) ! erg / (K cm sec)
          if (debug) write(*,1) 'radiative_conductivity', radiative_conductivity
          d_rc_dvb = radiative_conductivity*(3d0*dT_dvb/T - dRho_dvb/rho - d_opacity_dvb/opacity)
          
@@ -446,9 +446,9 @@
             end if
             if (debug) write(*,1) 'final D', D
             if (conv_vel > 0d0) then
-               D = conv_vel*Lambda/3     ! diffusion coefficient [cm^2/sec]
+               D = one_third*conv_vel*Lambda     ! diffusion coefficient [cm^2/sec]
                if (debug) write(*,1) 'D', D
-               d_D_dvb = (d_conv_vel_dvb*Lambda + conv_vel*d_Lambda_dvb)/3
+               d_D_dvb = one_third*(d_conv_vel_dvb*Lambda + conv_vel*d_Lambda_dvb)
                if (mixing_type == no_mixing) then
                   mixing_type = leftover_convective_mixing
                end if
@@ -488,7 +488,7 @@
             scale_value2 = ss% superad_reduction_Gamma_inv_scale
             diff_grads_limit = ss% superad_reduction_diff_grads_limit
             reduction_limit = ss% superad_reduction_limit
-            Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
+            Lrad_div_Ledd = four_thirds*crad*pow4(T)/P*gradT
             d_Lrad_div_Ledd_dvb = Lrad_div_Ledd*(4*dT_dvb/T-dP_dvb/P+d_gradT_dvb/gradT)
             Gamma_inv_threshold = 4*(1-beta)/chiT
             d_Gamma_inv_threshold_dvb = Gamma_inv_threshold*(-d_beta_dvb/(1-beta)-d_chiT_dvb/chiT)
@@ -549,9 +549,9 @@
             end if
          end if
          
-         D = conv_vel*Lambda/3     ! diffusion coefficient [cm^2/sec]
+         D = one_third*conv_vel*Lambda     ! diffusion coefficient [cm^2/sec]
          if (debug) write(*,1) 'D', D
-         d_D_dvb = (d_conv_vel_dvb*Lambda + conv_vel*d_Lambda_dvb)/3
+         d_D_dvb = one_third*(d_conv_vel_dvb*Lambda + conv_vel*d_Lambda_dvb)
 
          mixing_type = convective_mixing
          
@@ -846,7 +846,7 @@
                lambdamax = dsqrt(prandtl) - prandtl*dsqrt(1d0+phi)   !Equation (B5)
             endif
          else
-            maxl = pow((1d0/3d0)*(1d0-r_th) + (1d0-r_th)*(1d0-r_th)*(5d0-4d0*phi)/27d0,0.25d0)
+            maxl = pow((one_third)*(1d0-r_th) + (1d0-r_th)*(1d0-r_th)*(5d0-4d0*phi)/27d0,0.25d0)
                ! Equation (B19) carried to next order (doesn't work well otherwise)
             maxl4 = maxl*maxl*maxl*maxl
             maxl6 = maxl4*maxl*maxl
@@ -942,7 +942,7 @@
          
          subroutine set_convective_mixing
             ! need to set gradT, d_gradT_dvb, conv_vel, d_conv_vel_dvb
-            include 'formats.dek'
+            include 'formats'
             real(dp) ff1, ff2, ff3, ff4, ff5, aa, bb, y0, xres, a1, a2, sqrt_x
             real(dp) :: A_0, A_1, A_2, A_numerator, A_denom, inv_sqrt_x
             real(dp), dimension(nvbs) :: &
@@ -952,9 +952,6 @@
             real(qp) :: q1, q2, q3
             real(qp), dimension(nvbs) :: qd_dvb1, qd_dvb2, qd_dvb3
             
-            real(dp), parameter :: two_13 = 1.2599210498948730d0 ! = pow(2d0,1d0/3d0)
-            real(dp), parameter :: four_13 = 1.5874010519681994d0 ! = pow(4d0,1d0/3d0)
-
 ! options for MLT_option are:
 !    'ML1'        Bohm-Vitense 1958 MLT
 !    'ML2'        Bohm and Cassinelli 1971 MLT
@@ -1324,7 +1321,7 @@
                d_a5_dvb, d_a6_dvb, d_a_dvb, d_b1_dvb, d_b2_dvb, d_b3_dvb, d_b4_dvb, &
                d_b5_dvb, d_b6_dvb, d_b7_dvb, d_b_dvb, d_div_dvb
             
-            include 'formats.dek'
+            include 'formats'
             if (dbg) write(*,*) 'check for semiconvection'
             call set_no_mixing ! sets gradT = gradr
             D_semi = alpha_semiconvection*radiative_conductivity/(6*Cp*rho) &
@@ -1374,7 +1371,7 @@
             bc = 32 - 24*beta - beta*beta
             d_bc_dvb = - 24*d_beta_dvb - 2*d_beta_dvb*beta
             
-            LG = (16d0/3d0*pi*clight*m*cgrav*crad*T*T*T*T)/(P*opacity)
+            LG = (16d0*one_third*pi*clight*m*cgrav*crad*T*T*T*T)/(P*opacity)
             d_LG_dvb = LG*(4d0*dT_dvb/T - dP_dvb/P - d_opacity_dvb/opacity)
             
             a0 = alpha*gradL_composition_term*LG
@@ -1480,7 +1477,7 @@
             ! only changes D, d_D_dvb, gradT, d_gradT_dvb
             ! does NOT change any others such as mlt_vc
             
-            include 'formats.dek'
+            include 'formats'
             real(dp) ff1, ff2, ff3, ff4, sqrt_x, tmp
             real(dp) :: cv_var, A_0, A_1, A_2, A_numerator, A_denom, &
                inv_sqrt_x, save_gradT
@@ -1515,9 +1512,9 @@
             d_D_dvb(mlt_cv_var) = 0d0
             d_gradT_dvb(mlt_cv_var) = 0d0
 
-            D = cv_var*Lambda/3     ! diffusion coefficient [cm^2/sec]
+            D = one_third*cv_var*Lambda     ! diffusion coefficient [cm^2/sec]
             if (debug) write(*,1) 'D', D
-            d_D_dvb = (d_cv_var_dvb*Lambda + cv_var*d_Lambda_dvb)/3
+            d_D_dvb = one_third*(d_cv_var_dvb*Lambda + cv_var*d_Lambda_dvb)
 
             x = Q*Rho / (2d0*P) ! using x as a temporary variable here
             d_x_dvb = x*(drho_dvb/rho + dQ_dvb/Q - dP_dvb/P)

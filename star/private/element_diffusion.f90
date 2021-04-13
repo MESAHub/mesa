@@ -52,42 +52,33 @@
          integer, intent(out) :: ierr
 
          integer :: i, j, k, kk, nc, m, nzlo, nzhi, nz, species, iounit, &
-            steps_used, total_num_iters, total_num_retries, cid, he4, &
-            ierr_dealloc
+            steps_used, total_num_iters, total_num_retries, cid, he4
          integer(8) :: time0
-
-         integer, dimension(:), pointer :: &
-            class, class_chem_id, mixing_type, mixing_type_arg
          real(dp) :: s1, s2, dqsum, dist, r, Hp, dt, total, &
             gradT_mid, gradRho_mid, alfa, gradRho_face, chiRho_face, chiT_face
-         real(dp), dimension(:), pointer :: &
+         real(dp) :: rho, Pgas, T, &
+            logRho, dlnRho_dlnPgas, dlnRho_dlnT, &
+            e, de, e_with_xa, Amass, Zcharge, min_D_mix
+
+         integer, dimension(:), allocatable :: &
+            class, class_chem_id, mixing_type, mixing_type_arg
+         real(dp), dimension(:), allocatable :: &
             gamma, free_e, &
             dlnPdm_face, dlnT_dm_face, dlnRho_dm_face, &
             dlnPdm, dlnT_dm, dlnPdm_mid, dlnT_dm_mid, dlnRho_dm_mid, dm_hat
-         real(dp), dimension(:,:), pointer :: &
+         real(dp), dimension(:,:), allocatable :: &
             X_init, X_final, typical_charge, &
             D_self, v_advection, v_total, &
             vlnP, vlnT, v_rad, g_rad, GT, xa_save
-         real(dp), dimension(:,:,:), pointer :: CD
-         character (len=8), pointer :: class_name(:)
-         real(dp), pointer, dimension(:) :: CD1, &
-            X_init1, X_final1, typical_charge1, &
-            D_self1, v_advection1, v_total1, &
-            vlnP1, vlnT1, v_rad1, g_rad1, GT1, xa_save1
+         real(dp), dimension(:,:,:), allocatable :: CD
+         character (len=8), allocatable :: class_name(:)
 
-         real(dp) :: rho, Pgas, T, &
-            logRho, dlnRho_dlnPgas, dlnRho_dlnT, &
-            e, de, e_with_xa
-         real(dp) :: Amass, Zcharge
-
-         real(dp) :: min_D_mix
 
          logical :: dumping, okay
 
          include 'formats'
 
          ierr = 0
-         ierr_dealloc = 0
          dt = dt_in
          nz = s% nz
 
@@ -144,16 +135,17 @@
          end if
          m = nc+1
 
-         call do_alloc(ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'do_element_diffusion failed in allocate'
-            return
-         end if
+         allocate( &
+            class(species), class_chem_id(nc), class_name(nc), CD(nc,nc,nz), mixing_type(nz), &
+            gamma(nz), free_e(nz), dlnPdm_face(nz), dlnT_dm_face(nz), dlnRho_dm_face(nz), &
+            dlnPdm(nz), dlnT_dm(nz), dlnPdm_mid(nz), dlnT_dm_mid(nz), dlnRho_dm_mid(nz), dm_hat(nz), &
+            X_init(nc,nz), X_final(nc,nz), typical_charge(nc,nz), &
+            D_self(nc,nz), v_advection(nc,nz), v_total(nc,nz), xa_save(species,nz), &
+            vlnP(nc,nz), vlnT(nc,nz), v_rad(nc,nz), g_rad(nc,nz), GT(nc,nz))
 
          call set_extras(ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'do_element_diffusion failed in set_extras'
-            call dealloc
             return
          end if
 
@@ -237,7 +229,6 @@
                if (cid <= 0) then
                   write(*,'(a,3x,i3)') 'bad entry for diffusion_class_representative: ' // &
                        trim(s% diffusion_class_representative(j)), j
-                  call dealloc
                   return
                end if
                class_chem_id(j) = cid
@@ -268,7 +259,6 @@
          end do
 
          mixing_type(1:nz) = no_mixing
-         mixing_type_arg => mixing_type
 
          do k=1,nz-1
             s1 = dlnPdm(k)
@@ -443,120 +433,10 @@
             s% E_field(k) = 0d0 ! s% E_field(nzhi)
             s% g_field_element_diffusion(k) = 0d0 ! s% g_field_element_diffusion(nzhi)
          end do
-         
-         call dealloc
 
          if (s% doing_timing) call update_time(s, time0, total, s% time_element_diffusion)
 
          contains
-
-         subroutine do_alloc(ierr)
-            use alloc, only: get_integer_work_array
-            integer, intent(out) :: ierr
-            call get_integer_work_array(s, mixing_type, nz, nz_alloc_extra, ierr)
-            if (ierr /= 0) return
-            call do_work_arrays(.true.,ierr)
-            if (ierr /= 0) return
-            X_init(1:nc,1:nz) => X_init1(1:nc*nz)
-            X_final(1:nc,1:nz) => X_final1(1:nc*nz)
-            typical_charge(1:nc,1:nz) => typical_charge1(1:nc*nz)
-            D_self(1:nc,1:nz) => D_self1(1:nc*nz)
-            v_advection(1:nc,1:nz) => v_advection1(1:nc*nz)
-            v_total(1:nc,1:nz) => v_total1(1:nc*nz)
-            vlnP(1:nc,1:nz) => vlnP1(1:nc*nz)
-            vlnT(1:nc,1:nz) => vlnT1(1:nc*nz)
-            v_rad(1:nc,1:nz) => v_rad1(1:nc*nz)
-            g_rad(1:nc,1:nz) => g_rad1(1:nc*nz)
-            GT(1:nc,1:nz) => GT1(1:nc*nz)
-            xa_save(1:species,1:nz) => xa_save1(1:species*nz)
-            CD(1:nc,1:nc,1:nz) => CD1(1:nc*nc*nz)
-            allocate(class(species), class_chem_id(nc), class_name(nc), stat=ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            use alloc, only: return_integer_work_array
-            call return_integer_work_array(s, mixing_type)
-            call do_work_arrays(.false.,ierr_dealloc)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use interp_1d_def
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               gamma, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnPdm, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnT_dm, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnPdm_mid, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnT_dm_mid, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnRho_dm_mid, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               free_e, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnPdm_face, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnT_dm_face, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnRho_dm_face, nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               X_init1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               X_final1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               typical_charge1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               D_self1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               v_advection1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               v_total1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               vlnP1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               vlnT1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               v_rad1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               g_rad1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               GT1, nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               xa_save1, species*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               CD1, nc*nc*nz, nz_alloc_extra, 'diffusion', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
-
 
          subroutine check_xa_sums(ierr)
             integer, intent(out) :: ierr
@@ -575,7 +455,6 @@
                end if
             end do
          end subroutine check_xa_sums
-
 
          subroutine dump_diffusion_info
             use utils_lib
@@ -683,8 +562,8 @@
                dlnPdm(k) = 0; dlnT_dm(k) = 0; return
             end if
             grav = -s% cgrav(k)*s% m(k)/s% r(k)**2
-            area = 4d0*pi*s% r(k)**2
-            P_face = 0.5d0*(s% P(k) + s% P(k-1))
+            area = pi4*s% r(k)**2
+            P_face = 0.5d0*(s% Peos(k) + s% Peos(k-1))
             dlnPdm(k) = grav/(area*P_face) ! estimate based on QHSE
             dlnT_dm(k) = s% gradT(k)*dlnPdm(k)
          end subroutine set1_extras

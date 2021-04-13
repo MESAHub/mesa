@@ -46,13 +46,9 @@ module math_lib
 
   ! Generic interfaces
 
-  interface log1p
-     module procedure log1p_
-  end interface log1p
-
-  interface log2
-     module procedure log2_
-  end interface log2
+  interface safe_sqrt
+     module procedure safe_sqrt_
+  end interface safe_sqrt
 
   interface safe_log
      module procedure safe_log_
@@ -61,6 +57,14 @@ module math_lib
   interface safe_log10
      module procedure safe_log10_
   end interface safe_log10
+
+  interface log1p
+     module procedure log1p_
+  end interface log1p
+
+  interface log2
+     module procedure log2_
+  end interface log2
 
   interface exp10
      module procedure exp10_
@@ -110,6 +114,7 @@ module math_lib
   public :: MATH_BACKEND
 
   public :: math_init
+  public :: safe_sqrt
   public :: safe_log
   public :: safe_log10
   public :: log1p
@@ -145,6 +150,17 @@ contains
 
   end subroutine math_init
 
+  !****
+
+  elemental function safe_sqrt_ (x) result (sqrt_x)
+
+    real(dp), intent(in) :: x
+    real(dp)             :: sqrt_x
+
+    sqrt_x = SQRT(MAX(x, 0._dp))
+
+  end function safe_sqrt_
+  
   !****
 
   elemental function safe_log_ (x) result (log_x)

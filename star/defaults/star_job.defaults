@@ -8,7 +8,7 @@
 
 
       ! mesa_dir
-      ! ~~~~~~~~~
+      ! ~~~~~~~~
 
       ! if set to the empty string, '', then it defaults to using
       ! environment variable ``$(MESA_DIR)``
@@ -46,10 +46,6 @@
 
       ! eosDT_cache_dir
       ! ~~~~~~~~~~~~~~~
-      ! eosPT_cache_dir
-      ! ~~~~~~~~~~~~~~~
-      ! eosDE_cache_dir
-      ! ~~~~~~~~~~~~~~~
       ! ionization_cache_dir
       ! ~~~~~~~~~~~~~~~~~~~~
       ! kap_cache_dir
@@ -77,8 +73,6 @@
       ! ::
 
       !     eosDT_cache_dir = '/Users/bpaxton/mesa_caches/eosDT_cache'
-      !     eosPT_cache_dir = '/Users/bpaxton/mesa_caches/eosPT_cache'
-      !     eosDE_cache_dir = '/Users/bpaxton/mesa_caches/eosDE_cache'
       !     ionization_cache_dir = '/Users/bpaxton/mesa_caches/ionization_cache'
       !     kap_cache_dir = '/Users/bpaxton/mesa_caches/kap_cache'
       !     rates_cache_dir = '/Users/bpaxton/mesa_caches/rates_cache'
@@ -86,7 +80,7 @@
       ! If you give an empty string for the ``cache_dir``, then
       ! if you have set the environment variable ``MESA_CACHES_DIR``, then
       ! the cache is a subdirectory of that with one of the following names:
-      ! ``eosDT_cache``, ``eosPT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
+      ! ``eosDT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
       ! if ``MESA_CACHES_DIR`` is not set or is the empty string, then
       ! the cache is a subdirectory of the corresponding data subdirectory,
       ! such as ``data/rates_data/cache`` for the rates cache.
@@ -94,8 +88,6 @@
       ! ::
 
     eosDT_cache_dir = ''
-    eosPT_cache_dir = ''
-    eosDE_cache_dir = ''
     ionization_cache_dir = ''
     kap_cache_dir = ''
     rates_cache_dir = ''
@@ -180,6 +172,17 @@
     pgstar_flag = .false.
 
 
+      ! clear_initial_pgstar_history
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! clear_pgstar_history
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    clear_initial_pgstar_history = .true.
+    clear_pgstar_history = .false.
+
+
       ! save_pgstar_files_when_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -230,11 +233,12 @@
       ! save final model when a run terminates
       ! only happens if satisfy required termination code
       ! if string is empty, then this matches all termination codes
+      ! there can be several different alternative termination codes
 
       ! ::
 
     save_model_when_terminate = .false.
-    required_termination_code_string = ''
+    required_termination_code_string(:) = ''
 
 
       ! save_model_filename
@@ -277,8 +281,8 @@
 
       ! ::
 
-    show_retry_counts_when_terminate = .false.
-    show_timestep_limit_counts_when_terminate = .false.
+    show_retry_counts_when_terminate = .true.
+    show_timestep_limit_counts_when_terminate = .true.
 
 
       ! write_profile_when_terminate
@@ -308,17 +312,6 @@
     save_pulse_data_for_model_number = -111
     save_pulse_data_when_terminate = .false.
     save_pulse_data_filename = 'undefined'
-
-
-      ! internals_num
-      ! ~~~~~~~~~~~~~
-
-      ! write internals -- for debugging
-      ! only write if >= 0
-
-      ! ::
-
-    internals_num = -1
 
 
       ! report_retries
@@ -583,9 +576,9 @@
       ! steps_to_take_before_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If > 0, stop after taking this many steps.
+      ! If >= 0, stop after taking this many steps.
       ! Sets ``max_model_number`` = ``model_number`` + ``steps_to_take_before_terminate``.
-      ! Ignore if <= 0.
+      ! Ignore if < 0.
 
       ! ::
 
@@ -639,9 +632,9 @@
 
 
       ! set_initial_number_retries
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! initial_number_retries
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, set initial number of retries
       ! if false, number of retries set from initial model info
@@ -1003,6 +996,23 @@
     lg_max_abs_mdot = -100
 
 
+      ! relax_mass_to_remove_H_env
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! relax_initial_mass_to_remove_H_env
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! extra_mass_retained_by_remove_H_env
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Gradually reduce total mass by a wind to remove the H envelope.
+      ! Equivalent to relax_mass with new_mass = He_core_mass + extra_mass.
+
+      ! ::
+
+    relax_mass_to_remove_H_env = .false.
+    relax_initial_mass_to_remove_H_env = .false.
+    extra_mass_retained_by_remove_H_env = 5d-3 ! (Msun)
+
+
       ! relax_mass_scale
       ! ~~~~~~~~~~~~~~~~
       ! relax_initial_mass_scale
@@ -1224,22 +1234,6 @@
     relax_initial_opacity_max = .false.
     new_opacity_max = 0
     opacity_max_multiplier = 0
-
-
-      ! relax_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! relax_initial_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! steps_for_relax_fixed_L
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Gradually modify ``fixed_L_for_BB_outer_BC``.
-
-      ! ::
-
-    relax_fixed_L_for_BB_outer_BC = .false.
-    relax_initial_fixed_L_for_BB_outer_BC = .false.
-    steps_for_relax_fixed_L = 0
 
 
       ! relax_max_surf_dq
@@ -1522,18 +1516,6 @@
       ! ::
 
     center_ye_limit_for_v_flag = 0.45d0
-
-
-      ! gamma1_integral_for_v_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! automatically turn on velocities if ``center_gamma1_integral`` drops below this limit.
-      ! this is useful for evolution leading up to pair instability core collapse.
-      ! integral is sum over all cells of ``(gamma1-4d0/3d0)`` weighted by ``dm*P/rho``
-
-      ! ::
-
-    gamma1_integral_for_v_flag = 0d0
 
 
       ! change_u_flag
@@ -2216,6 +2198,8 @@
 
       ! remove_initial_surface_at_cell_k
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_initial_surface_at_he_core_boundary
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_optical_depth
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_density
@@ -2244,6 +2228,7 @@
       ! ::
 
     remove_initial_surface_at_cell_k = 0
+    remove_initial_surface_at_he_core_boundary = 0
     remove_initial_surface_by_optical_depth = 0
     remove_initial_surface_by_density = 0
     remove_initial_surface_by_pressure = 0
@@ -2259,6 +2244,8 @@
 
       ! remove_surface_at_cell_k
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_surface_at_he_core_boundary
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_by_optical_depth
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_by_density
@@ -2281,12 +2268,17 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_by_v_surf_div_v_escape
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_q_for_remove_surface_by_v_surf_div_v_escape
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_remove_surface_by_v_surf_div_v_escape
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! allows the outer envelope to be removed. ignored if <= 0
 
       ! ::
 
     remove_surface_at_cell_k = 0
+    remove_surface_at_he_core_boundary = 0
     remove_surface_by_optical_depth = 0
     remove_surface_by_density = 0
     remove_surface_by_pressure = 0
@@ -2298,19 +2290,8 @@
     remove_surface_by_v_surf_km_s = 0
     remove_surface_by_v_surf_div_cs = 0
     remove_surface_by_v_surf_div_v_escape = 0
-
-
-      ! repeat_remove_surface_for_each_step
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if true, then at each step removes surface as specified.
-      ! e.g., if doing remove at specific density and
-      ! expansion has lowered the surface density to below the limit,
-      ! then remove surface mass down to the limit.
-
-      ! ::
-
-    repeat_remove_surface_for_each_step = .false.
+    min_q_for_remove_surface_by_v_surf_div_v_escape = 0d0
+    max_q_for_remove_surface_by_v_surf_div_v_escape = 1d0
 
 
       ! report_mass_not_fe56
@@ -2394,7 +2375,7 @@
       ! ~~~~~~~~~~~~~~~~~~
 
       ! For switching reaction networks.
-      ! ``new_net_name`` only used if ``change_net`` if true.
+      ! ``new_net_name`` only used if ``change_net`` if true. The list of network names can be found in `$MESA_DIR/data/net_data/nets`. 
 
       ! ::
 

@@ -14,7 +14,7 @@ build.log
 *.so
 /lib/
 /include/
-
+*.pyc
 
 ## Debugging/Profiling
 gmon.out
@@ -63,6 +63,7 @@ restart_photo
 ## Test Suite
 .running
 checks.md5
+mk.txt
 err.txt
 mem-rn.txt
 mem-re.txt

@@ -110,10 +110,12 @@ SRCS = \
    other_solver_monitor.f90 \
    other_photo_write.f90 \
    other_photo_read.f90 \
+   other_set_pgstar_controls.f90 \
    other_astero_freq_corr.f90 \
    other_eval_fp_ft.f90 \
    other_eval_i_rot.f90 \
    other_timestep_limit.f90 \
+   other_screening.f90 \
    star_utils.f90 \
    ctrls_io.f90 \
    alloc.f90 \
@@ -131,13 +133,11 @@ SRCS = \
    kap_support.f90 \
    eos_support.f90 \
    atm_support.f90 \
-   create_atm_paczyn.f90 \
    net.f90 \
    neu.f90 \
    micro.f90 \
    hydro_rotation.f90 \
    brunt.f90 \
-   hydro_reconstruct.f90 \
    hydro_riemann.f90 \
    hydro_vars.f90 \
    report.f90 \
@@ -157,6 +157,7 @@ SRCS = \
    pulse_fgong.f90 \
    pulse_osc.f90 \
    pulse_gyre.f90 \
+   pulse_gsm.f90 \
    pulse_saio.f90 \
    pulse_gr1d.f90 \
    pulse_utils.f90 \
@@ -170,7 +171,8 @@ SRCS = \
    hydro_alpha_rti_eqns.f90 \
    hydro_energy.f90 \
    hydro_momentum.f90 \
-   hydro_eturb.f90 \
+   hydro_temperature.f90 \
+   hydro_tdc.f90 \
    hydro_eqns.f90 \
    hydro_mtx.f90 \
    hydro_solver_procs.f90 \
@@ -185,7 +187,6 @@ SRCS = \
    adjust_mass.f90 \
    adjust_mesh_split_merge.f90 \
    adjust_mesh_support.f90 \
-   adjust_mesh_plot.f90 \
    adjust_mesh.f90 \
    paquette_coeffs.f90 \
    diffusion_support.f90 \
@@ -258,6 +259,7 @@ ifeq ($(FC),ifort)
 	@$(CP_IF_NEWER) overshoot_utils.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) auto_diff_support.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) star_private_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) star_utils.mod $(MESA_DIR)/include
 endif
 	@$(CP_IF_NEWER) ../job/*.inc $(MESA_DIR)/include
 	@$(CP_IF_NEWER) ../job/*.dek $(MESA_DIR)/include

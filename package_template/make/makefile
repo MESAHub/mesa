@@ -10,9 +10,9 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCE FILES
 
-SRCS = pkg_mod.f \
-   pkg_def.f \
-   pkg_lib.f
+SRCS = pkg_mod.f90 \
+   pkg_def.f90 \
+   pkg_lib.f90
 
 #################################################################
 #

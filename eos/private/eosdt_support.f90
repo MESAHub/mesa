@@ -51,7 +51,6 @@
          real(dp), intent(inout), dimension(nv) :: fval, df_dx, df_dy
          integer, intent(out) :: ierr
    
-         real(dp), parameter :: z36th = 1d0/36d0
          real(dp) :: xp, xpi, xp2, xpi2, ax, axbar, bx, bxbar, cx, cxi, hx2, cxd, cxdi, hx, hxi
          real(dp) :: yp, ypi, yp2, ypi2, ay, aybar, by, bybar, cy, cyi, hy2, cyd, cydi, hy, hyi
          real(dp) :: sixth_hx2, sixth_hy2, z36th_hx2_hy2
@@ -60,7 +59,7 @@
          integer :: k, ip1, jp1
          real(dp), pointer :: fin(:,:,:,:)
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -111,15 +110,15 @@
                   
          sixth_hx2 = one_sixth*hx2
          sixth_hy2 = one_sixth*hy2
-         z36th_hx2_hy2 = z36th*hx2*hy2
+         z36th_hx2_hy2 = sixth_hx2*sixth_hy2
          
          sixth_hx = one_sixth*hx
-         sixth_hxi_hy2 = one_sixth*hxi*hy2
-         z36th_hx_hy2 = z36th*hx*hy2
+         sixth_hxi_hy2 = sixth_hy2*hxi
+         z36th_hx_hy2 = sixth_hx*sixth_hy2
          
-         sixth_hx2_hyi = one_sixth*hx2*hyi
+         sixth_hx2_hyi = sixth_hx2*hyi
          sixth_hy = one_sixth*hy
-         z36th_hx2_hy = z36th*hx2*hy
+         z36th_hx2_hy = sixth_hx2*sixth_hy
          
          ip1 = i+1
          jp1 = j+1

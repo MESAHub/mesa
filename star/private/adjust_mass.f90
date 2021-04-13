@@ -43,7 +43,6 @@
       contains
 
       real(dp) function compute_delta_m(s) result(delta_m)
-         use star_utils, only: save_for_d_dt
          type (star_info), pointer :: s
          include 'formats'
          delta_m = s% dt*s% mstar_dot
@@ -61,7 +60,6 @@
             .or. (delta_m > 0 .and. s% max_star_mass_for_gain > 0 &
                   .and. s% star_mass >= s% max_star_mass_for_gain)) then
             s% mstar_dot = 0d0
-            call save_for_d_dt(s)
          end if
 
          delta_m = s% dt*s% mstar_dot
@@ -146,6 +144,7 @@
       ! places in s. Currently those are: r, r_start, rmid, rmid_start, R2 (r^2), and lnR (log(r)).
       ! If more of these are added they should also be updated here.
       subroutine update_radius(s)
+         use star_utils, only: store_r_in_xh, get_r_and_lnR_from_xh
          ! Inputs
          type (star_info), pointer :: s
 
@@ -159,24 +158,24 @@
          call compute_prev_mesh_dm(s, prev_mesh_dm, dm, change_in_dm)
 
 
-         vol00 = (4*pi/3)*s% R_center*s% R_center*s% R_center
+         vol00 = four_thirds_pi*s% R_center*s% R_center*s% R_center
          do j=nz,1,-1
 
             volp1 = vol00
             cell_vol = s% dm(j)/s% rho(j)
             vol00 = volp1 + cell_vol
 
-            r_new = exp(log(vol00/(4*pi/3))/3)
+            r_new = exp(log(vol00/four_thirds_pi)*one_third)
 
             s%r(j) = r_new
             s%R2(j) = pow2(r_new)
             s%r_start(j) = s%r(j)
             s%rmid(j) = r_new
             s%rmid_start(j) = r_new
-            s%lnR(j) = log(s%r(j))
-
-            s% xh(s% i_lnR, j) = s%lnR(j)
-            s% xh_start(s% i_lnR, j) = s%lnR(j)
+            call store_r_in_xh(s, j, r_new)
+            call get_r_and_lnR_from_xh(s, j, s% r(j), s% lnR(j))
+            s% xh_start(s% i_lnR,j) = s% xh(s% i_lnR,j)
+            
          end do
 
       end subroutine update_radius
@@ -197,15 +196,14 @@
             frac, env_mass, mmax, alfa, new_xmstar, old_xmstar, removed, &
             q_for_just_added, xq_for_CpT_absMdot_div_L, sum_dq, dm, sumx
 
-         real(dp), target, dimension(species) :: &
-            xaccrete_array, mtot_init_array, mtot_final_array
-         real(dp), dimension(:), pointer :: &
-            xaccrete, mtot_init, mtot_final, &
+         real(dp), dimension(species) :: &
+            xaccrete, mtot_init, mtot_final
+         real(dp), dimension(:), allocatable :: &
             rxm_old, rxm_new, old_cell_mass, new_cell_mass, &
-            oldloc, newloc, oldval, newval, work, xm_old, xm_new, &
+            oldloc, newloc, oldval, newval, xm_old, xm_new, &
             xq_center_old, xq_center_new
-         real(dp), dimension(:), pointer :: xa_old1
-         real(dp), dimension(:,:), pointer :: xa_old
+         real(dp), dimension(:,:), allocatable :: xa_old
+         real(dp), pointer :: work(:)
 
          integer :: j, k, l, m, k_const_mass, nz, k_below_just_added, k_newval
          integer(8) :: time0
@@ -222,10 +220,6 @@
 
          ierr = 0
 
-         xaccrete => xaccrete_array
-         mtot_init => mtot_init_array
-         mtot_final => mtot_final_array
-
          nz = s% nz
          dt = s% dt
          
@@ -238,9 +232,6 @@
          s% k_below_just_added = 1
 
          ! NOTE: don't assume that vars are all set at this point.
-         ! use values from s% xh(:,:) and s% xa(:,:) only.
-         ! e.g., don't use s% lnT(:) -- use s% xh(s% i_lnT,:) instead.
-
          ! exceptions: omega, i_rot, j_rot, and total_angular_momentum have been set.
          ! store surface j_rot, to later adjust angular momentum lost
          if (s% rotation_flag) then
@@ -442,29 +433,6 @@
             end if
          end do
 
-         call set_cell_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, xq_center_old, xq_center_new, &
-            old_cell_mass, new_cell_mass, delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         if (ierr /= 0) then
-            s% retry_message = 'set_cell_stuff_for_d_dt failed in adjust mass'
-            if (s% report_ierr) write(*,*) s% retry_message
-            call dealloc
-            return
-         end if
-
-         call set_face_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         if (ierr /= 0) then
-            s% retry_message = 'set_face_stuff_for_d_dt failed in adjust mass'
-            if (s% report_ierr) write(*,*) s% retry_message
-            call dealloc
-            return
-         end if
-
          call set_xa(s, nz, k_const_mass, species, xa_old, xaccrete, &
             rxm_old, rxm_new, mmax, old_cell_mass, new_cell_mass, ierr)
          if (ierr /= 0) then
@@ -625,6 +593,9 @@
             
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr
+            allocate(rxm_old(nz), rxm_new(nz), old_cell_mass(nz), new_cell_mass(nz), &
+               xa_old(species,nz), oldloc(nz), newloc(nz), oldval(nz), newval(nz), &
+               xm_old(nz), xm_new(nz), xq_center_old(nz), xq_center_new(nz))
             call do_work_arrays(.true.,ierr)
          end subroutine do_alloc
 
@@ -641,47 +612,7 @@
             logical, parameter :: crit = .false.
             ierr = 0
             call work_array(s, alloc_flag, crit, &
-               rxm_old, nz, nz_alloc_extra, 'adjust_mass rxm_old', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                rxm_new, nz, nz_alloc_extra, 'adjust_mass rxm_new', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                old_cell_mass, nz, nz_alloc_extra, 'adjust_mass old_cell_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                new_cell_mass, nz, nz_alloc_extra, 'adjust_mass new_cell_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xa_old1, species*nz, nz_alloc_extra, 'adjust_mass xa_old', ierr)
-            if (ierr /= 0) return
-            xa_old(1:species,1:nz) => xa_old1(1:species*nz)
-            call work_array(s, alloc_flag, crit, &
-                oldloc, nz, nz_alloc_extra, 'adjust_mass oldloc', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                newloc, nz, nz_alloc_extra, 'adjust_mass newloc', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                oldval, nz, nz_alloc_extra, 'adjust_mass oldval', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                newval, nz, nz_alloc_extra, 'adjust_mass newval', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
                 work, nz*pm_work_size, nz_alloc_extra, 'adjust_mass work', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xm_old, nz, 0, 'adjust_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xm_new, nz, 0, 'adjust_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xq_center_old, nz, 0, 'adjust_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xq_center_new, nz, 0, 'adjust_mass', ierr)
             if (ierr /= 0) return
          end subroutine do_work_arrays            
 
@@ -690,12 +621,13 @@
 
       subroutine revise_q_and_dq( &
             s, nz, old_xmstar, new_xmstar, delta_m, k_const_mass, ierr)
+         use star_utils, only: get_lnT_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nz
          real(dp), intent(in) :: old_xmstar, new_xmstar, delta_m
          integer, intent(out) :: k_const_mass, ierr
 
-         integer :: k, kA, kB, i_lnT, j00, jp1, k_check
+         integer :: k, kA, kB, j00, jp1, k_check
          real(dp) :: lnTlim_A, lnTlim_B, sumdq, sumdq1, sumdq2, sumdq3, &
             min_xq_const_mass, min_q_for_kB, mold_o_mnew, lnTmax, lnT_A, lnT_B, &
             xqA, xqB_old, xqB_new, qfrac, frac, dqacc
@@ -765,15 +697,10 @@
          do k = 2, nz
             xq(k) = xq(k-1) + s% dq(k-1)
          end do
-
-         i_lnT = s% i_lnT
-         if (i_lnT /= 0) then
-            lnTmax = maxval(s% xh(i_lnT,1:nz))
-            lnT_A = min(lnTmax, lnTlim_A)
-         else
-            lnTmax = 0
-            lnT_A = 0
-         end if
+         
+         k = maxloc(s% xh(s% i_lnT,1:nz),dim=1)
+         lnTmax = get_lnT_from_xh(s, k)
+         lnT_A = min(lnTmax, lnTlim_A)
          
          if (is_bad(s% max_q_for_k_below_const_q)) then
             write(*,*) 's% max_q_for_k_below_const_q', s% max_q_for_k_below_const_q
@@ -789,17 +716,11 @@
             kA = k
             if ( (1-xq(k)) > s% max_q_for_k_below_const_q) cycle
             if ( 1.0d0-xq(k) <= s% min_q_for_k_below_const_q) exit
-            if (i_lnT /= 0) then
-               if (s% xh(i_lnT,k) >= lnT_A) exit
-            end if
+            if (get_lnT_from_xh(s, k) >= lnT_A) exit
          end do
          xqA = xq(kA)
 
-         if (i_lnT /= 0) then
-            lnT_B = min(lnTmax, lnTlim_B)
-         else
-            lnT_B = 0
-         end if
+         lnT_B = min(lnTmax, lnTlim_B)
          
          if (is_bad(s% max_q_for_k_const_mass)) then
             write(*,*) 's% max_q_for_k_const_mass', s% max_q_for_k_const_mass
@@ -815,9 +736,7 @@
             kB = k
             if ( (1-xq(k)) > s% max_q_for_k_const_mass) cycle
             if ( (1-xq(k)) <= s% min_q_for_k_const_mass) exit
-            if (i_lnT /= 0) then
-               if (s% xh(i_lnT,k) >= lnT_B) exit
-            end if
+            if (get_lnT_from_xh(s, k) >= lnT_B) exit
          end do
 
          xqB_old = xq(kB)
@@ -937,8 +856,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, species
          real(dp), intent(in) :: mmax
-         real(dp), intent(in), pointer :: xa_old(:, :), xaccrete(:)
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), intent(in) :: xa_old(:, :), xaccrete(:)
+         real(dp), dimension(:), intent(in) :: &
             old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass ! (nz)
          integer, intent(out) :: ierr
          integer :: k, j, op_err
@@ -980,8 +899,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, species
          real(dp), intent(in) :: mmax
-         real(dp), intent(in), pointer :: xa_old(:,:), xaccrete(:)
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), intent(in) :: xa_old(:,:), xaccrete(:)
+         real(dp), dimension(:), intent(in) :: &
             old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass
          integer, intent(out) :: ierr
 
@@ -1220,9 +1139,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_below_just_added
          real(dp), intent(in) :: mmax, delta_m
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), dimension(:), intent(in) :: &
             old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass ! (nz)
-         real(dp), pointer, dimension(:) :: &
+         real(dp), dimension(:) :: &
             old_xout, new_xout, old_dmbar, new_dmbar, old_j_rot, extra_work
          integer, intent(out) :: ierr
 
@@ -1232,7 +1151,7 @@
             f, jtot_bdy, goal_total, bdy_j, bdy_total, inner_total, outer_total, &
             msum, isum, jsum, omega_uniform
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
@@ -1331,6 +1250,7 @@
 
       subroutine set1_irot(s, k, k_below_just_added, jrot_known) ! using lnR_for_d_dt_const_m
          use hydro_rotation, only: eval_i_rot, w_div_w_roche_jrot, w_div_w_roche_omega
+         use star_utils, only: get_r_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: k, k_below_just_added
          logical, intent(in) :: jrot_known
@@ -1338,8 +1258,7 @@
          real(dp) :: r00, r003, ri, ro, rp13, rm13
          real(dp) :: w_div_wcrit_roche
 
-         !r00 = exp(s% lnR_for_d_dt_const_m(k))
-         r00 = exp(s% xh(s% i_lnR, k))
+         r00 = get_r_from_xh(s,k)
          ! when using the fitted i_rot, the moment of inertia depends
          ! on the ratio of rotational frequency to its critical value.
          ! This ratio is computed in two different ways depending on whether
@@ -1362,15 +1281,15 @@
             if (k == s% nz) then
                rp13 = pow3(s% R_center)
             else
-               rp13 = exp(3*s% lnR_for_d_dt_const_m(k+1))
+               rp13 = pow3(get_r_from_xh(s,k+1))
             end if
             if (k == 1) then
                rm13 = r003
             else
-               rm13 = exp(3*s% lnR_for_d_dt_const_m(k-1))
+               rm13 = pow3(get_r_from_xh(s,k-1))
             end if
-            ri = pow((r003 + rp13)/2,1d0/3d0)
-            ro = pow((r003 + rm13)/2,1d0/3d0)
+            ri = pow((r003 + rp13)/2,one_third)
+            ro = pow((r003 + rm13)/2,one_third)
             call eval_i_rot(s, k, ri, r00, ro, 0d0,&
                s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
          end if
@@ -1386,7 +1305,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k, k_below_just_added, nz
          real(dp), intent(in) :: mmax
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), dimension(:), intent(in) :: &
             old_xout, new_xout, old_dmbar, new_dmbar, old_j_rot
          integer, intent(out) :: ierr
 
@@ -1396,7 +1315,7 @@
 
          integer, parameter :: k_dbg = -1
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
@@ -1688,212 +1607,6 @@
 
       end subroutine adjust_J_lost
 
-      subroutine set_cell_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, xq_center_old, xq_center_new,&
-             old_cell_mass, new_cell_mass, &
-            delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         use interp_1d_lib
-         use interp_1d_def
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: &
-            rxm_old, rxm_new, xq_center_old, xq_center_new, &
-            old_cell_mass, new_cell_mass ! (nz)
-         real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: oldloc, newloc, oldval, newval
-         real(dp), pointer :: work(:)
-         integer, intent(out) :: ierr
-
-         integer :: n, nwork, j, i_lnT, i_lnd, i_eturb, i_u
-         logical :: dbg
-         real(dp), pointer :: p(:)
-
-         include 'formats'
-         ierr = 0
-
-         dbg = .false.
-         n = nz ! k_const_mass
-         nwork = pm_work_size
-
-         i_lnT = s% i_lnT
-         i_lnd = s% i_lnd
-         i_eturb = s% i_eturb
-         i_u = s% i_u
-
-         oldloc(1) = 0
-         do j=2,n
-            oldloc(j) = rxm_old(j) + 0.5d0*old_cell_mass(j)
-         end do
-
-         do j=1,n
-            newloc(j) = rxm_new(j) + 0.5d0*new_cell_mass(j)
-         end do
-         
-         call set(oldloc, newloc, k_newval, &
-            s% lnd_for_d_dt_const_m, s% lnT_for_d_dt_const_m, &
-            s% eturb_for_d_dt_const_m, s% u_for_d_dt_const_m)
-
-         nullify(p)
-         call set(xq_center_old, xq_center_new, 1, &
-            s% lnd_for_d_dt_const_q, s% lnT_for_d_dt_const_q, p, p)
-
-         contains
-
-         subroutine set(oldloc, newloc, k_below, &
-               lnd_for_d_dt, lnT_for_d_dt, eturb_for_d_dt, u_for_d_dt)
-            real(dp), pointer, dimension(:), intent(in) :: oldloc, newloc
-            real(dp), pointer, dimension(:), intent(inout) :: &
-               lnd_for_d_dt, lnT_for_d_dt, eturb_for_d_dt, u_for_d_dt
-            integer, intent(in) :: k_below
-            call set1var(oldloc, newloc, k_below, i_eturb, eturb_for_d_dt)
-            call set1var(oldloc, newloc, k_below, i_u, u_for_d_dt)
-            call set1var(oldloc, newloc, k_below, i_lnd, lnd_for_d_dt)
-            call set1var(oldloc, newloc, k_below, i_lnT, lnT_for_d_dt)
-         end subroutine set
-
-
-         subroutine set1var(oldloc, newloc, k_below, i, v)
-            real(dp), pointer, dimension(:), intent(in) :: oldloc, newloc
-            integer, intent(in) :: k_below,i
-            real(dp), pointer, intent(inout) :: v(:)
-            integer :: j
-            include 'formats'
-            if (i == 0) return
-            if (.not. associated(v)) return
-            do j=1,n
-               oldval(j) = s% xh(i,j)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_cell_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do j=1,k_below-1
-               v(j) = 0
-            end do
-            do j=k_below,n
-               v(j) = newval(j)
-            end do
-         end subroutine set1var
-
-      end subroutine set_cell_stuff_for_d_dt
-
-
-      subroutine set_face_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         use interp_1d_lib
-         use interp_1d_def
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: rxm_old, rxm_new ! (nz)
-         real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: oldloc, newloc, oldval, newval
-
-         real(dp), pointer :: work(:)
-
-         integer, intent(out) :: ierr
-
-         integer :: n, nwork, k
-         logical :: dbg
-
-         include 'formats'
-
-         ierr = 0
-
-         dbg = .false.
-         n = nz! k_const_mass
-         nwork = pm_work_size
-
-         oldloc(1) = 0
-         do k=2,n
-            oldloc(k) = rxm_old(k)
-         end do
-         do k=1,n
-            newloc(k) = rxm_new(k)
-            oldval(k) = s% xh(s% i_lnR, k)
-         end do
-         call interpolate_vector( &
-            n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-            'adjust_mass set_face_stuff_for_d_dt', ierr)
-         if (ierr /= 0) return
-         do k=1,k_newval-1
-            s% lnR_for_d_dt_const_m(k) = s% xh(s% i_lnR, 1)
-         end do
-         do k=k_newval,n
-            s% lnR_for_d_dt_const_m(k) = newval(k)
-         end do
-
-         if (s% v_flag) then
-            do k=1,n
-               oldval(k) = s% xh(s% i_v, k)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,k_newval-1
-               s% v_for_d_dt_const_m(k) = 0
-            end do
-            do k=k_newval,n
-               s% v_for_d_dt_const_m(k) = newval(k)
-            end do
-         end if
-
-         if (s% RTI_flag) then
-            do k=1,n
-               oldval(k) = s% xh(s% i_alpha_RTI, k)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,k_newval-1
-               s% alpha_RTI_for_d_dt_const_m(k) = 0
-            end do
-            do k=k_newval,n
-               s% alpha_RTI_for_d_dt_const_m(k) = newval(k)
-            end do
-         end if
-
-         if (s% conv_vel_flag) then
-            do k=1,n
-               oldval(k) = max(0d0, exp(s% xh(s% i_ln_cvpv0, k)) - s% conv_vel_v0)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,k_newval-1
-               s% ln_cvpv0_for_d_dt_const_m(k) = log(s% conv_vel_v0)
-            end do
-            do k=k_newval,n
-               if (newval(k) + s% conv_vel_v0 <= 0) then
-                  s% ln_cvpv0_for_d_dt_const_m(k) = log(s% conv_vel_v0)
-               else
-                  s% ln_cvpv0_for_d_dt_const_m(k) = log(newval(k) + s% conv_vel_v0)
-               end if
-            end do
-            ! setup for derivatives wrt to q as well
-            oldloc(1:n) = (oldloc(1:n) - oldloc(1))/oldloc(n)
-            newloc(1:n) = (newloc(1:n) - newloc(1))/newloc(n)
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,n
-               if (newval(k) + s% conv_vel_v0 <= 0) then
-                  s% ln_cvpv0_for_d_dt_const_q(k) = log(s% conv_vel_v0)
-               else
-                  s% ln_cvpv0_for_d_dt_const_q(k) = log(newval(k) + s% conv_vel_v0)
-               end if
-            end do
-         end if
-
-      end subroutine set_face_stuff_for_d_dt
-
 
       subroutine set_D_omega( &
             s, nz, k_const_mass, k_newval, &
@@ -1903,9 +1616,9 @@
          use interp_1d_def
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: rxm_old, rxm_new ! (nz)
+         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
          real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: &
+         real(dp), dimension(:) :: &
             D_omega, oldloc, newloc, oldval, newval
 
          real(dp), pointer :: work(:)
@@ -1954,9 +1667,9 @@
          use interp_1d_def
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: rxm_old, rxm_new ! (nz)
+         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
          real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: &
+         real(dp), dimension(:) :: &
             D_smooth, oldloc, newloc, oldval, newval
 
          real(dp), pointer :: work(:)

@@ -82,16 +82,22 @@
             ! T*dS/dlnRho from phase transition
 
       ! blend information
+      integer, parameter :: i_eos_HELM = 1
       integer, parameter :: i_frac_HELM = i_latent_ddlnRho+1
             ! fraction HELM
+      integer, parameter :: i_eos_OPAL_SCVH = 2
       integer, parameter :: i_frac_OPAL_SCVH = i_frac_HELM+1
             ! fraction OPAL/SCVH
+      integer, parameter :: i_eos_FreeEOS = 3
       integer, parameter :: i_frac_FreeEOS = i_frac_OPAL_SCVH+1
             ! fraction FreeEOS
+      integer, parameter :: i_eos_PC = 4
       integer, parameter :: i_frac_PC = i_frac_FreeEOS+1
             ! fraction PC
+      integer, parameter :: i_eos_Skye = 5
       integer, parameter :: i_frac_Skye = i_frac_PC+1
             ! fraction Skye
+      integer, parameter :: i_eos_CMS = 6
       integer, parameter :: i_frac_CMS = i_frac_Skye+1
             ! fraction CMS
 
@@ -106,9 +112,6 @@
       ! only return d_dxa of lnE and lnPgas to star
       integer, parameter :: num_eos_d_dxa_results = 2
 
-      integer, parameter :: eosPT_ilnRho = i_lnPgas
-      integer, parameter :: eosPT_ilnE = i_lnE
-  
       character (len=eos_name_length) :: eosDT_result_names(nv)
 
       
@@ -148,12 +151,9 @@
       type (DT_XZ_Info), target :: eosDT_XZ_struct, FreeEOS_XZ_struct
 
       integer, parameter :: sz_per_eos_point = 4 ! for bicubic spline interpolation
-      integer, parameter :: num_2nd_ds = 3
 
       type EoS_General_Info
 
-         logical :: use_max_SCVH_for_PT, use_max_CMS_for_PT
-         
          ! limits for HELM
          real(dp) :: Z_all_HELM ! all HELM for Z >= this unless eos_use_FreeEOS
          real(dp) :: logT_all_HELM ! all HELM for lgT >= this
@@ -229,6 +229,11 @@
          real(dp) :: mass_fraction_limit_for_Skye
          real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
          real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+         character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
+
+         logical :: use_simple_Skye_blends
+         real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
+         real(dp) :: logT_min_for_any_Skye, logT_min_for_all_Skye
 
          ! misc
          logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
@@ -236,7 +241,6 @@
          logical :: eosDT_use_linear_interp_to_HELM
       
          character(len=128) :: eosDT_file_prefix
-         character(len=128) :: eosPT_file_prefix
 
          logical :: okay_to_convert_ierr_to_skip
          
@@ -279,50 +283,17 @@
          integer :: version
       end type EosDT_XZ_Info
 
-      ! for mesa (logW,logT) tables
-      type EosPT_XZ_Info
-         real(dp) :: logW_min ! logW = logPgas - 4*logT
-         real(dp) :: logW_max
-         real(dp) :: del_logW ! spacing for the logWs
-         integer :: num_logWs
-         real(dp) :: logT_min
-         real(dp) :: logT_max
-         real(dp) :: del_logT ! spacing for the logTs
-         integer :: num_logTs
-         real(dp), pointer :: logWs(:), logTs(:)
-         real(dp), pointer :: tbl1(:)
-         integer :: version
-      end type EosPT_XZ_Info
 
-        
       ! data table variables
-      integer, parameter :: num_eosPT_Zs = 3
-      real(dp), parameter :: eosPT_Zs(num_eosPT_Zs) = (/ 0.00d0, 0.02d0, 0.04d0 /)
-      integer, parameter :: num_eosPT_Xs_for_Z(num_eosPT_Zs) = (/ 6, 5, 5 /)
-      integer, parameter :: num_eosPT_Xs = 6
-      real(dp), parameter :: eosPT_Xs(num_eosPT_Xs) = &
-            (/ 0.0d0, 0.2d0, 0.4d0, 0.6d0, 0.8d0, 1.0d0 /)
-   
       type (EosDT_XZ_Info), dimension(num_eosDT_Xs, num_eosDT_Zs), target :: &
          eosDT_XZ_data, eosSCVH_XZ_data, eosCMS_XZ_data
       type (EosDT_XZ_Info), dimension(num_FreeEOS_Xs, num_FreeEOS_Zs), target :: &
          FreeEOS_XZ_data
 
-      type (EosPT_XZ_Info), dimension(num_eosPT_Xs, num_eosPT_Zs), target :: &
-         eosPT_XZ_data, eosSCVH_PT_XZ_data, eosCMS_PT_XZ_data
-      
       logical, dimension(num_eosDT_Xs, num_eosDT_Zs) :: &
          eosDT_XZ_loaded, eosSCVH_XZ_loaded, eosCMS_XZ_loaded
       logical, dimension(num_FreeEOS_Xs, num_FreeEOS_Zs) :: FreeEOS_XZ_loaded
-      logical, dimension(num_eosPT_Xs, num_eosPT_Zs) :: &
-         eosPT_XZ_loaded, eosSCVH_PT_XZ_loaded, eosCMS_PT_XZ_loaded
       
-
-      ! interpolation info for theta_e
-      integer :: theta_e_nx
-      real(dp), pointer :: f_theta_e1(:), f_theta_e(:,:)
-      real(dp), pointer :: x_theta_e(:)
-
 
       ! interpolation info for eosPC support tables FITION9
       type FITION_Info
@@ -357,8 +328,8 @@
       logical :: use_cache_for_eos = .true.
       logical :: eos_root_is_initialized = .false.
 
-      character(len=1000) :: eosDT_cache_dir, eosPT_cache_dir
-      character(len=1000) :: eosDT_temp_cache_dir, eosPT_temp_cache_dir
+      character(len=1000) :: eosDT_cache_dir
+      character(len=1000) :: eosDT_temp_cache_dir
 
       logical :: eos_test_partials
       real(dp) :: eos_test_partials_val, eos_test_partials_dval_dx ! for dfridr from star
@@ -419,10 +390,6 @@
          FreeEOS_XZ_loaded(:,:)=.false.
          eosCMS_XZ_loaded(:,:)=.false.
          
-         eosPT_XZ_loaded(:,:)=.false.
-         eosSCVH_PT_XZ_loaded(:,:)=.false.
-         eosCMS_PT_XZ_loaded(:,:)=.false.
-         
          eosDT_result_names(i_lnPgas) = 'lnPgas'
          eosDT_result_names(i_lnE) = 'lnE'
          eosDT_result_names(i_lnS) = 'lnS'
@@ -478,36 +445,6 @@
       end function do_alloc_eos
 
 
-      subroutine get_result_names(names)
-         character (len=eos_name_length) :: names(nv)
-         names(i_lnPgas) = 'lnPgas'  
-         names(i_lnE) = 'lnE' ! internal energy per gram
-         names(i_lnS) = 'lnS' ! entropy per gram
-         names(i_mu) = 'mu'  
-         names(i_lnfree_e) = 'lnfree_e'   
-         names(i_eta) = 'eta'    
-         names(i_grad_ad) = 'grad_ad' ! dlnT_dlnP at constant S
-         names(i_chiRho) = 'chiRho' ! dlnP_dlnRho at constant T      
-         names(i_chiT) = 'chiT' ! dlnP_dlnT at constant Rho      
-         names(i_Cp) = 'Cp' ! dE_dT at constant P, specific heat at constant pressure     
-         names(i_Cv) = 'Cv' ! dE_dT at constant Rho, specific heat at constant volume
-         names(i_dE_dRho) = 'dE_dRho' ! at constant T      
-         names(i_dS_dT) = 'dS_dT' ! at constant Rho      
-         names(i_dS_dRho) = 'dS_dRho'  ! at constant T            
-         names(i_gamma1) = 'gamma1'  ! dlnP_dlnRho at constant S      
-         names(i_gamma3) = 'gamma3'  ! gamma3 - 1) = '' dlnT_dlnRho at constant S   
-         names(i_phase) = 'phase'
-         names(i_latent_ddlnT) = 'latdlnT'
-         names(i_latent_ddlnRho) = 'latdlnRh'        
-         names(i_frac_OPAL_SCVH) = 'OPAL/SCVH'
-         names(i_frac_HELM) = 'HELM'
-         names(i_frac_Skye) = 'Skye'
-         names(i_frac_PC) = 'PC'
-         names(i_frac_FreeEOS) = 'FreeEOS'
-         names(i_frac_CMS) = 'CMS'
-      end subroutine get_result_names
-      
-      
       subroutine init_eos_handle_data(handle)
          use math_lib
          integer, intent(in) :: handle
@@ -557,16 +494,7 @@
          call free_EosDT_XZ_Info( &
             FreeEOS_XZ_data, FreeEOS_XZ_loaded, num_FreeEOS_Xs, num_FreeEOS_Zs)
 
-         ! PT tables
-         call free_EosPT_XZ_Info(eosPT_XZ_data, eosPT_XZ_loaded)
-         call free_EosPT_XZ_Info(eosSCVH_PT_XZ_data, eosSCVH_PT_XZ_loaded)
-         call free_EosPT_XZ_Info(eosCMS_PT_XZ_data, eosCMS_PT_XZ_loaded)
-
          ! Misc. stuff
-
-         if (ASSOCIATED(f_theta_e1)) deallocate(f_theta_e1)
-         nullify(f_theta_e)
-         if (ASSOCIATED(x_theta_e)) deallocate(x_theta_e)
 
          if (FITION9_loaded) then
             do iz = 1, FITION_vals
@@ -601,26 +529,6 @@
             if (ASSOCIATED(fq% tbl1)) deallocate(fq% tbl1)
             nullify(fq% tbl)
          end subroutine free_eosPC_support_Info
-         
-         subroutine free_EosPT_XZ_Info(d,flgs)
-            type (EosPT_XZ_Info), dimension(num_eosPT_Xs, num_eosPT_Zs) :: d
-            logical, dimension(num_eosPT_Xs, num_eosPT_Zs) :: flgs
-            integer :: ix, iz
-            do ix = 1, num_eosPT_Xs
-               do iz = 1, num_eosPT_Zs
-                  if (ASSOCIATED(d(ix,iz)% tbl1)) then
-                     deallocate(d(ix,iz)% tbl1)
-                  end if
-                  if (ASSOCIATED(d(ix,iz)% logWs)) then
-                     deallocate(d(ix,iz)% logWs)
-                  end if
-                  if (ASSOCIATED(d(ix,iz)% logTs)) then
-                     deallocate(d(ix,iz)% logTs)
-                  end if
-               end do
-            end do
-            flgs(:,:)=.false.
-         end subroutine free_EosPT_XZ_Info
          
          subroutine free_EosDT_XZ_Info(d, flgs, numXs, numZs)
             integer, intent(in) :: numXs, numZs

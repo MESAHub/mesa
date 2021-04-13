@@ -31,5 +31,11 @@
 &controls
 
   initial_z = 0.02
+      
+      photo_interval = 1
+      !profile_interval = 1
+      !history_interval = 1
+      terminal_interval = 1
+
 
 / ! end of controls namelist

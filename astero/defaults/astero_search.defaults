@@ -82,7 +82,7 @@
    ! Teff_target
    ! ~~~~~~~~~~~
    ! Teff_sigma
-   ! ~~~~~~~~~~~
+   ! ~~~~~~~~~~
    ! ``Teff`` is the effective temperature, in kelvin. ::
 
       include_Teff_in_chi2_spectro = .true.
@@ -94,7 +94,7 @@
    ! logg_target
    ! ~~~~~~~~~~~
    ! logg_sigma
-   ! ~~~~~~~~~~~
+   ! ~~~~~~~~~~
    ! ``logg`` is the logarithm (base 10) of the surface gravity, in cgs units. ::
 
       include_logg_in_chi2_spectro = .true.
@@ -106,7 +106,7 @@
    ! logL_target
    ! ~~~~~~~~~~~
    ! logL_sigma
-   ! ~~~~~~~~~~~
+   ! ~~~~~~~~~~
    ! ``logL`` is the logarithm (base 10) of the luminosity in solar units. ::
 
       include_logL_in_chi2_spectro = .false.
@@ -114,11 +114,11 @@
       logL_sigma = -1
 
    ! include_FeH_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! FeH_target
-   ! ~~~~~~~~~~~
+   ! ~~~~~~~~~~
    ! FeH_sigma
-   ! ~~~~~~~~~~~
+   ! ~~~~~~~~~
    ! Z_div_X_solar
    ! ~~~~~~~~~~~~~
    ! ``FeH`` is the the model [Fe/H] computed as ``log10((Z/X)/Z_div_X_solar)``
@@ -134,7 +134,7 @@
    ! logR_target
    ! ~~~~~~~~~~~
    ! logR_sigma
-   ! ~~~~~~~~~~~
+   ! ~~~~~~~~~~
    ! ``logR`` is the logarithm (base 10) of the radius, in solar units. ::
 
       include_logR_in_chi2_spectro = .false.
@@ -362,11 +362,11 @@
    ! -------------------
 
    ! nl
-   ! ~~~
+   ! ~~
    ! freq_target
    ! ~~~~~~~~~~~
    ! freq_sigma
-   ! ~~~~~~~~~~~~
+   ! ~~~~~~~~~~
 
    ! Data for oscillation modes.  ``nl(el)`` is the number of modes of degree ``el``,
    ! ``freq_target(el,1)`` to ``freq_target(el,nl(el))`` are the
@@ -1012,9 +1012,9 @@
    ! sigmas_coeff_for_surface_He_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! sigmas_coeff_for_Rcz_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! sigmas_coeff_for_delta_nu_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! sigmas_coeff_for_my_var1_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! sigmas_coeff_for_my_var2_limit
@@ -1055,16 +1055,20 @@
 
    ! You can stop the run if |chi^2| is rising.
 
-   ! chi2_relative_increase_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! limit_num_chi2_too_big
    ! ~~~~~~~~~~~~~~~~~~~~~~
-   ! If ``limit_num_chi2_too_big`` consecutive values of |chi^2|
-   ! are greater than ``chi2_relative_increase_limit`` times the best |chi^2| for the run,
-   ! then stop the run. ::
+   ! chi2_relative_increase_limit
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! If any of the following conditions are met in ``limit_num_chi2_too_big`` consecutive models
+   ! after a minimum |chi^2| has been found, stop the run for that sample.
 
-      chi2_relative_increase_limit = 2.0
+   ! + |chi^2| is greater than ``chi2_relative_increase_limit`` times the best |chi^2| for the run.
+   ! + ``chi2_spectro``, ``chi2_delta_nu`` or ``chi2_radial`` is greater than its corresponding ``_limit``.
+   ! + MESA fails to evaluate |chi^2| (because e.g. it can't match all the modes of a particular degree).
+   ! ::
+
       limit_num_chi2_too_big = 20
+      chi2_relative_increase_limit = 2.0
 
    ! chi2_search_limit1
    ! ~~~~~~~~~~~~~~~~~~
@@ -1458,7 +1462,7 @@
 
 
    ! iscan_factor
-   ! ~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~
    ! ADIPLS will scan for frequencies at ``iscan_factor(l)`` times the number
    ! of observed ``l`` modes. ::
 

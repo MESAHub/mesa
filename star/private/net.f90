@@ -43,6 +43,7 @@
       subroutine do_net(s, nzlo, nzhi, reuse_given_rates, ierr)
          use star_utils, only: start_time, update_time
          use net_lib, only: net_work_size
+         use rates_def, only: rates_other_screening
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
@@ -80,6 +81,11 @@
                end if
             end do
             return
+         end if
+
+         rates_other_screening => null()
+         if(s% use_other_screening) then
+            rates_other_screening => s% other_screening
          end if
 
          net_lwork = net_work_size(s% net_handle, ierr)
@@ -125,7 +131,8 @@
          use rates_def, only: std_reaction_Qs, std_reaction_neuQs, i_rate, &
             star_debugging_rates_flag, rates_test_partials_val, rates_test_partials_dval_dx
          use net_def, only: Net_Info, net_test_partials, &
-            net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i
+            net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i, &
+            net_test_partials_iother
          use net_lib, only: net_get
          use star_utils, only: lookup_nameofvar
          use chem_def, only: chem_isos, category_name, i_ni56_co56, i_co56_fe56, &
@@ -222,6 +229,7 @@
                 s% solver_test_partials_dx_sink = 0
              end if
              net_test_partials_i = i_var - s% nvar_hydro ! index in xa for var
+             net_test_partials_iother = i_var_sink - s% nvar_hydro ! index in xa for var
          end if
          
          if (s% use_other_net_get) then
@@ -294,7 +302,7 @@
                   .not. s% nonlocal_NiCo_decay_heat) then
                tau_gamma = 0
                do kk = 1, k
-                  tau_gamma = tau_gamma + s% dm(kk)/(4*pi*s% rmid(kk)*s% rmid(kk))
+                  tau_gamma = tau_gamma + s% dm(kk)/(pi4*s% rmid(kk)*s% rmid(kk))
                end do
                tau_gamma = tau_gamma*s% nonlocal_NiCo_kap_gamma
                s% eps_nuc(k) = s% eps_nuc(k)*(1d0 - exp(-tau_gamma))

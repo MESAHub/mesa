@@ -146,16 +146,6 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, compa
 		interfaces.append('end interface ' + interopname)
 		interfaces.append('')
 
-
-	# The ** operator needs to have an interface named pow as well.
-	for i,l in enumerate(interfaces):
-		if '**' in l:
-			for j in range(8):
-				interfaces.append(interfaces[i+j].replace('operator(**)','pow'))
-			begin.append(tab + 'pow, &')
-			break
-
-
 	# Derivative functions
 	if auto_diff_type.array:
 		num_independent_non_array = auto_diff_type.num_independent - 1

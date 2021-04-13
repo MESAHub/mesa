@@ -67,9 +67,9 @@
          real(dp) :: j_dot, check_delta_j, i_tot, j_tot, delta_j
          real(dp) :: residual_jdot, torque, j_average
 
-
          type (star_info), pointer :: s
          integer :: k, j
+         include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -120,8 +120,8 @@
           ! In extras_finish_step check that dt < t_spindown. If not, decrease timestep
           t_spindown = abs(j_tot / j_dot) ! Estimate spindown timescale
           if (s% x_logical_ctrl(1)) then
-             write(*,*) 'Spindown Timescale (Myr)', t_spindown / (1d6*secyer)
-             write(*,*) 'Spindown Timescale / dt: ', t_spindown / s% dt
+             write(*,1) 'Spindown Timescale (Myr): ', t_spindown / (1d6*secyer)
+             write(*,1) 'Spindown Timescale / dt: ', t_spindown / s% dt
           end if
 
 
@@ -163,8 +163,8 @@
 
           ! Angular Momentum Conservation check
           if (s% x_logical_ctrl(1)) then
-             write(*,*) 'Fraction of total angular momentum to remove', (j_dot * s% dt) / j_tot
-             write(*,*) 'Torque / J_dot (if = 1.0 angular momentum is conserved): ', ((torque) / j_dot)
+             write(*,1) 'Fraction of total angular momentum to remove', (j_dot * s% dt) / j_tot
+             write(*,1) 'Torque/J_dot (if = 1.0 angular momentum is conserved): ', (torque / j_dot)
           end if
 
         else
@@ -186,6 +186,9 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
+
+         t_spindown = 0d0
+
       end subroutine extras_startup
 
       subroutine extras_after_evolve(id, ierr)
@@ -193,13 +196,14 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: dt
+         include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (s% v_rot_avg_surf < 1d5) then
-            write(*,*) 'Test is ok: surf_avg_v_rot < 1'
+            write(*,1) 'Test is ok: surf_avg_v_rot < 1'
          else
-            write(*,*) 'Test failed: surf_avg_v_rot > 1'
+            write(*,1) 'Test failed: surf_avg_v_rot > 1'
          end if
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
@@ -277,15 +281,16 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
+         include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         !write(*,*) t_spindown/s% dt
-         if (s% dt > 0) then
+         !write(*,1) 't_spindown/s% dt', t_spindown/s% dt
+         if (s% use_other_torque .and. s% dt > 0) then
             if ((t_spindown / s% dt) .lt. 10) then
                s% dt_next = s% dt * 0.5d0
-               write(*,*) "Warning: Torque too large. Decreasing timestep to ",s% dt_next
+               write(*,1) "Warning: Torque too large. Decreasing timestep to ", s% dt_next
             end if
          end if
 

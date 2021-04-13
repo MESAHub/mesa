@@ -207,7 +207,7 @@ If you decided to make a new branch this can be done with::
 
 or::
 
-  git switch -b mynewbranch
+  git switch -c mynewbranch
 
 Any changes you now make will not apply to ``main`` but instead to ``mynewbranch``.
 
@@ -219,7 +219,13 @@ If you want to push that branch to GitHub to share it with others, do::
 
   git push --set-upstream origin mynewbranch
 
-This will create a new branch on GitHub named ``mynewbranch`` and associate it with the local branch on your machine of the same name.  
+This will create a new branch on GitHub named ``mynewbranch`` and associate it with the local branch on your machine of the same name.
+
+.. note::
+
+  Give the branch a short, descriptive name.  To help others quickly
+  see who a branch belongs to, you can prepend your initials (e.g.,
+  ``jws/kap-compton`` or ``rf/rates-nullify``).
 
 Once you have set the upstream branch, you may omit the branch name when you push additional changes to this branch::
 
@@ -233,11 +239,13 @@ or pull additional changes from others on this branch::
 When you are ready to merge the changes from ``mynewbranch`` into ``main`` then push ``mynewbranch`` to GitHub and make a pull request.
 
 
-If someone else has created a new branch, you can switch to it with::
-  
-    git switch -c theirnewbranch origin/theirnewbranch
+If someone else has created a new branch and pushed it to GitHub, you can switch to it with::
 
-This will check out the branch ``theirnewbranch`` and associate it with the remote branch.
+    git checkout theirnewbranch
+
+That shortcut command works when ``theirnewbranch`` does not exist locally, but there does exist a tracking branch with that name in exactly one remote (i.e., in `origin`).  This will check out the branch ``theirnewbranch`` and associate it with the remote branch.  This is equivalent to::
+
+    git switch -c theirnewbranch --track origin/theirnewbranch
 
 
 Stashing changes
@@ -303,16 +311,57 @@ Git testing tips
 
 Fetches all commits over all branches
 
-Adding:
-::
-
-  fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
-
-To your ``.git/config`` in the ``[remote "origin"]`` section enables fetching pull requests
-
 ::
 
   $(git log -1) == *'[ci skip]'*
 
 Tests to see if we should skip testing the test cases. Note we still want to compile test MESA even if we
 skip the full test suite.
+
+
+Pull requests
+=============
+
+Preparing to make a PR
+----------------------
+
+After you have made a branch and pushed it to GitHub (see
+:ref:`Branching`), the test suite will automatically be run and the
+results reported to MESA TestHub.  You should wait for the TestHub to
+confirm that the test suite is passing before merging a PR.
+
+If the changes in your branch conflict or interact with changes that
+have occurred on ``main``, it is recommended that you merge ``main`` into your
+branch (or rebase your branch to the tip of ``main``) before issuing the
+PR. This allows you to handle conflicts in advance and ensure that the
+test suite will re``main`` passing after you merge your branch back into
+``main``.
+
+     
+
+Making a pull request
+---------------------
+
+After you have made a branch and pushed it to GitHub (see
+:ref:`Branching`), you can issue a pull request for the code on your
+branch to be merged into ``main``.
+
+If you have recently pushed a branch, GitHub will offer you the option to make a PR on the `main page <https://github.com/MESAHub/mesa>`_.  Otherwise, the most general approach is to visit the `new pull request page <https://github.com/MESAHub/mesa/compare>`_, select the code you want to merge from the 'compare' dropdown, and then click the green 'Create pull request' button.  You will be asked to provide a title and description for the PR as well as other optional information (like selecting a reviewer).  Then click 'Create pull request'.  Once you have made the PR, it will show up in the `list of pull requests <https://github.com/MESAHub/mesa/pulls>`_.
+
+A set of code reviewers is automatically selected for each PR based on the contents of the ``CODEOWNERS`` file.  For now, this request for review can be treated as a heads up that there are changes in a part of the code you may be interested in.  Reviewers are not required to complete requested reviews and reviews are not required before a PR is merged from a MESA developer.  However, please exercise good judgment and solicit feedback before merging, especially for significant changes or changes that you feel uncertain about.  You may want to ping relevant individuals or channels in Slack.
+
+
+Merging a pull request
+----------------------
+
+Once the code is ready, it can be merged by visiting the page associated with the PR (e.g., `<https://github.com/MESAHub/mesa/pull/161>`_).
+
+GitHub offers several strategies for merging pull requests.  Each one may be appropriate in different circumstances.  The merge strategy is selected by using the dropdown arrow on the big green button at the bottom of the PR.
+
+* If the PR is a small set of simple, well-contained changes, the 'Rebase and merge' strategy is recommended.  This will take the commits and add them to the tip of ``main``, ensuring that the commit history of ``main`` remains linear.
+
+
+* If the PR is a set of changes whose detailed history is not relevant, the 'Squash and merge' strategy is recommended.  This will take the commits, combine them into a single commit, and then add it to the tip of ``main``. This stragegy is most useful when the series of individual commits simply reflects the (possibly wandering) path to achieving the final cumulative change.
+
+
+* If the PR is a set of changes where each commit is a meaningful, self-contained change, but the cumulative change is not simple enough for the 'Rebase and merge' strategy, then the 'Create a merge commit' strategy is appropriate.  This will preserve the full history of your branch when it is joined with ``main``.  If a change has this level of complexity, it is also recommended that its interaction with ``main`` should be tested by merging ``main`` into the branch.

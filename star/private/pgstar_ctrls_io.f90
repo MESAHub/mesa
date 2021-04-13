@@ -94,6 +94,8 @@
             pgstar_right_yaxis_label_disp, &
             pgstar_num_scale, &
             pgstar_lw, &
+            pgstar_profile_line_style, &
+            pgstar_history_line_style, &
             pgstar_model_lw, &
             pgstar_box_lw, &
 
@@ -1773,6 +1775,7 @@
             History_Panels1_max_width, &
             History_Panels1_num_panels, &
             History_Panels1_xaxis_name, &
+            History_Panels1_automatic_star_age_units, &
             History_Panels1_yaxis_name, &
             History_Panels1_xaxis_reversed, &
             History_Panels1_yaxis_reversed, &
@@ -1815,6 +1818,7 @@
             History_Panels2_max_width, &
             History_Panels2_num_panels, &
             History_Panels2_xaxis_name, &
+            History_Panels2_automatic_star_age_units, &
             History_Panels2_yaxis_name, &
             History_Panels2_xaxis_reversed, &
             History_Panels2_yaxis_reversed, &
@@ -1857,6 +1861,7 @@
             History_Panels3_max_width, &
             History_Panels3_num_panels, &
             History_Panels3_xaxis_name, &
+            History_Panels3_automatic_star_age_units, &
             History_Panels3_yaxis_name, &
             History_Panels3_xaxis_reversed, &
             History_Panels3_yaxis_reversed, &
@@ -1899,6 +1904,7 @@
             History_Panels4_max_width, &
             History_Panels4_num_panels, &
             History_Panels4_xaxis_name, &
+            History_Panels4_automatic_star_age_units, &
             History_Panels4_yaxis_name, &
             History_Panels4_xaxis_reversed, &
             History_Panels4_yaxis_reversed, &
@@ -1941,6 +1947,7 @@
             History_Panels5_max_width, &
             History_Panels5_num_panels, &
             History_Panels5_xaxis_name, &
+            History_Panels5_automatic_star_age_units, &
             History_Panels5_yaxis_name, &
             History_Panels5_xaxis_reversed, &
             History_Panels5_yaxis_reversed, &
@@ -1983,6 +1990,7 @@
             History_Panels6_max_width, &
             History_Panels6_num_panels, &
             History_Panels6_xaxis_name, &
+            History_Panels6_automatic_star_age_units, &
             History_Panels6_yaxis_name, &
             History_Panels6_xaxis_reversed, &
             History_Panels6_yaxis_reversed, &
@@ -2025,6 +2033,7 @@
             History_Panels7_max_width, &
             History_Panels7_num_panels, &
             History_Panels7_xaxis_name, &
+            History_Panels7_automatic_star_age_units, &
             History_Panels7_yaxis_name, &
             History_Panels7_xaxis_reversed, &
             History_Panels7_yaxis_reversed, &
@@ -2067,6 +2076,7 @@
             History_Panels8_max_width, &
             History_Panels8_num_panels, &
             History_Panels8_xaxis_name, &
+            History_Panels8_automatic_star_age_units, &
             History_Panels8_yaxis_name, &
             History_Panels8_xaxis_reversed, &
             History_Panels8_yaxis_reversed, &
@@ -2109,6 +2119,7 @@
             History_Panels9_max_width, &
             History_Panels9_num_panels, &
             History_Panels9_xaxis_name, &
+            History_Panels9_automatic_star_age_units, &
             History_Panels9_yaxis_name, &
             History_Panels9_xaxis_reversed, &
             History_Panels9_yaxis_reversed, &
@@ -3252,6 +3263,8 @@
          s% pgstar_right_yaxis_label_disp = pgstar_right_yaxis_label_disp
          s% pgstar_num_scale = pgstar_num_scale
          s% pgstar_lw = pgstar_lw
+         s% pgstar_profile_line_style = pgstar_profile_line_style
+         s% pgstar_history_line_style = pgstar_history_line_style
          s% pgstar_model_lw = pgstar_model_lw
          s% pgstar_box_lw = pgstar_box_lw
 
@@ -5041,6 +5054,7 @@
          s% History_Panels1_max_width = History_Panels1_max_width
          s% History_Panels1_num_panels = History_Panels1_num_panels
          s% History_Panels1_xaxis_name = History_Panels1_xaxis_name
+         s% History_Panels1_automatic_star_age_units = History_Panels1_automatic_star_age_units
          s% History_Panels1_yaxis_name = History_Panels1_yaxis_name
          s% History_Panels1_xaxis_reversed = History_Panels1_xaxis_reversed
          s% History_Panels1_yaxis_reversed = History_Panels1_yaxis_reversed
@@ -5083,6 +5097,7 @@
          s% History_Panels2_max_width = History_Panels2_max_width
          s% History_Panels2_num_panels = History_Panels2_num_panels
          s% History_Panels2_xaxis_name = History_Panels2_xaxis_name
+         s% History_Panels2_automatic_star_age_units = History_Panels2_automatic_star_age_units
          s% History_Panels2_yaxis_name = History_Panels2_yaxis_name
          s% History_Panels2_xaxis_reversed = History_Panels2_xaxis_reversed
          s% History_Panels2_yaxis_reversed = History_Panels2_yaxis_reversed
@@ -5125,6 +5140,7 @@
          s% History_Panels3_max_width = History_Panels3_max_width
          s% History_Panels3_num_panels = History_Panels3_num_panels
          s% History_Panels3_xaxis_name = History_Panels3_xaxis_name
+         s% History_Panels3_automatic_star_age_units = History_Panels3_automatic_star_age_units
          s% History_Panels3_yaxis_name = History_Panels3_yaxis_name
          s% History_Panels3_xaxis_reversed = History_Panels3_xaxis_reversed
          s% History_Panels3_yaxis_reversed = History_Panels3_yaxis_reversed
@@ -5167,6 +5183,7 @@
          s% History_Panels4_max_width = History_Panels4_max_width
          s% History_Panels4_num_panels = History_Panels4_num_panels
          s% History_Panels4_xaxis_name = History_Panels4_xaxis_name
+         s% History_Panels4_automatic_star_age_units = History_Panels4_automatic_star_age_units
          s% History_Panels4_yaxis_name = History_Panels4_yaxis_name
          s% History_Panels4_xaxis_reversed = History_Panels4_xaxis_reversed
          s% History_Panels4_yaxis_reversed = History_Panels4_yaxis_reversed
@@ -5209,6 +5226,7 @@
          s% History_Panels5_max_width = History_Panels5_max_width
          s% History_Panels5_num_panels = History_Panels5_num_panels
          s% History_Panels5_xaxis_name = History_Panels5_xaxis_name
+         s% History_Panels5_automatic_star_age_units = History_Panels5_automatic_star_age_units
          s% History_Panels5_yaxis_name = History_Panels5_yaxis_name
          s% History_Panels5_xaxis_reversed = History_Panels5_xaxis_reversed
          s% History_Panels5_yaxis_reversed = History_Panels5_yaxis_reversed
@@ -5251,6 +5269,7 @@
          s% History_Panels6_max_width = History_Panels6_max_width
          s% History_Panels6_num_panels = History_Panels6_num_panels
          s% History_Panels6_xaxis_name = History_Panels6_xaxis_name
+         s% History_Panels6_automatic_star_age_units = History_Panels6_automatic_star_age_units
          s% History_Panels6_yaxis_name = History_Panels6_yaxis_name
          s% History_Panels6_xaxis_reversed = History_Panels6_xaxis_reversed
          s% History_Panels6_yaxis_reversed = History_Panels6_yaxis_reversed
@@ -5293,6 +5312,7 @@
          s% History_Panels7_max_width = History_Panels7_max_width
          s% History_Panels7_num_panels = History_Panels7_num_panels
          s% History_Panels7_xaxis_name = History_Panels7_xaxis_name
+         s% History_Panels7_automatic_star_age_units = History_Panels7_automatic_star_age_units
          s% History_Panels7_yaxis_name = History_Panels7_yaxis_name
          s% History_Panels7_xaxis_reversed = History_Panels7_xaxis_reversed
          s% History_Panels7_yaxis_reversed = History_Panels7_yaxis_reversed
@@ -5335,6 +5355,7 @@
          s% History_Panels8_max_width = History_Panels8_max_width
          s% History_Panels8_num_panels = History_Panels8_num_panels
          s% History_Panels8_xaxis_name = History_Panels8_xaxis_name
+         s% History_Panels8_automatic_star_age_units = History_Panels8_automatic_star_age_units
          s% History_Panels8_yaxis_name = History_Panels8_yaxis_name
          s% History_Panels8_xaxis_reversed = History_Panels8_xaxis_reversed
          s% History_Panels8_yaxis_reversed = History_Panels8_yaxis_reversed
@@ -5377,6 +5398,7 @@
          s% History_Panels9_max_width = History_Panels9_max_width
          s% History_Panels9_num_panels = History_Panels9_num_panels
          s% History_Panels9_xaxis_name = History_Panels9_xaxis_name
+         s% History_Panels9_automatic_star_age_units = History_Panels9_automatic_star_age_units
          s% History_Panels9_yaxis_name = History_Panels9_yaxis_name
          s% History_Panels9_xaxis_reversed = History_Panels9_xaxis_reversed
          s% History_Panels9_yaxis_reversed = History_Panels9_yaxis_reversed

@@ -1,3 +1,9 @@
+.. _R_CrB_star:
+
+**********
+R_CrB_star
+**********
+
 This test case creates and evolves a simple model of an R Corona
 Borealis star.  The model is constructed from an 0.875 |Msun|
 homogeneous He star and evolved until it first reaches a low effective

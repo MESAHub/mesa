@@ -1,7 +1,7 @@
 program kap_plotter
 
    use eos_def
-   use eos_lib, only: eosDT_get_new
+   use eos_lib, only: eosDT_get
    use kap_def
    use kap_lib
    use chem_def
@@ -278,7 +278,7 @@ program kap_plotter
          call Set_Composition
 
          ! get a set of results for given temperature and density
-         call eosDT_get_new(&
+         call eosDT_get(&
             eos_handle, species, chem_id, net_iso, xa, &
             Rho, log10Rho, T, log10T, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
@@ -352,7 +352,7 @@ contains
 
       eos_file_prefix = 'mesa'
 
-      call eos_init(' ', ' ', ' ', use_cache, ierr)
+      call eos_init(' ', use_cache, ierr)
       if (ierr /= 0) then
          write(*,*) 'eos_init failed in Setup_eos'
          stop 1
@@ -480,7 +480,7 @@ contains
       if (doing_d_dlnd) then
          log_var = (lnd + delta_x)/ln10
          var = exp10(log_var)
-         call eosDT_get_new( &
+         call eosDT_get( &
             eos_handle, species, chem_id, net_iso, xa, &
             var, log_var, T, log10T, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
@@ -492,7 +492,7 @@ contains
       else
          log_var = (lnT + delta_x)/ln10
          var = exp10(log_var)
-         call eosDT_get_new( &
+         call eosDT_get( &
             eos_handle, species, chem_id, net_iso, xa, &
             Rho, log10Rho, var, log_var, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)

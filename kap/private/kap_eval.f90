@@ -70,7 +70,7 @@
          
          logical :: dbg
 
-         include 'formats.dek'
+         include 'formats'
 
          dbg = rq% dbg
          if (dbg) dbg = & ! check limits
@@ -156,6 +156,8 @@
                   kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
             end if
 
+            if (ierr /= 0) return
+
          else ! no Compton
 
             kap_compton = 1d-30
@@ -176,6 +178,7 @@
                  rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
                  frac_lowT, frac_highT, frac_Type2, &
                  kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+            if (ierr /= 0) return
 
             ! revise reported fractions based on Compton blend
             frac_lowT = (1d0 - blend% val) * frac_lowT
@@ -817,7 +820,7 @@
             c31    = -0.037d0, &
             c32    =  0.0031d0
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 

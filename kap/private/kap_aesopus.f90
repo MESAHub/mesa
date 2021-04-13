@@ -25,9 +25,7 @@
 
 module kap_aesopus
 
-  use hdf5
-  use iso_c_binding
-
+  use hdf5io_lib
   use math_lib
   use kap_def
 
@@ -79,14 +77,11 @@ contains
     integer :: n, io
     integer :: iX, iCO, iC, iN
 
-    integer(hid_t) :: file_id, subgroup_id, group_id, dspace_id, dset_id
-    integer(hsize_t), dimension(6) :: data_dims, max_dims
+    type(hdf5io_t) :: hi, hi_ts
 
-    real(dp), dimension(:,:,:,:,:,:), allocatable :: table_data
+    real(dp), allocatable :: table_data(:,:,:,:,:,:)
     integer :: table_size
 
-    integer(hsize_t) :: idx ! index
-    integer(size_t) :: size ! size of group_name
     character(len=80) :: group_name ! output buffer
 
     character(len=30) :: efmt = '(A14, 99ES12.3)'
@@ -120,42 +115,24 @@ contains
 
     ierr = 0
 
-    ! open hdf5 interface
-    call h5open_f(ierr)
-    if (ierr /= 0) return
-
     ! open file (read-only)
-    call h5fopen_f(filename, h5f_acc_rdonly_f, file_id, ierr)
-    if (ierr /= 0) return
-
-    ! open root group
-    call h5gopen_f(file_id, "/", group_id, ierr)
-    if (ierr /= 0) return
-
+    hi = hdf5io_t(filename, OPEN_FILE_RO)
+    
     if (rq% show_info) write(*,*) 'AESOPUS composition parameters'
 
     ! read composition parameters
-    data_dims = 0
-    call h5dopen_f(group_id, "Zsun", dset_id, ierr)
-    call h5dread_f(dset_id, H5T_IEEE_F64LE, kA% Zsun, data_dims, ierr)
-    call h5dclose_f(dset_id, ierr)
+
+    call hi% read_dset('Zsun', kA% Zsun)
     if (rq% show_info) write(*,efmt) 'Zsun =', kA % Zsun
 
-    call h5dopen_f(group_id, "fCO_ref", dset_id, ierr)
-    call h5dread_f(dset_id, H5T_IEEE_F64LE, kA% fCO_ref, data_dims, ierr)
-    call h5dclose_f(dset_id, ierr)
+    call hi% read_dset('fCO_ref', kA% fCO_ref)
     if (rq% show_info) write(*,ffmt) 'fCO_ref =', kA % fCO_ref
 
-    call h5dopen_f(group_id, "fC_ref", dset_id, ierr)
-    call h5dread_f(dset_id, H5T_IEEE_F64LE, kA% fC_ref, data_dims, ierr)
-    call h5dclose_f(dset_id, ierr)
+    call hi% read_dset('fC_ref', kA% fC_ref)
     if (rq% show_info) write(*,ffmt) 'fC_ref =', kA % fC_ref
 
-    call h5dopen_f(group_id, "fN_ref", dset_id, ierr)
-    call h5dread_f(dset_id, H5T_IEEE_F64LE, kA% fN_ref, data_dims, ierr)
-    call h5dclose_f(dset_id, ierr)
+    call hi% read_dset('fN_ref', kA% fN_ref)
     if (rq% show_info) write(*,ffmt) 'fN_ref =', kA % fN_ref
-
 
     if (rq% show_info) then
        write(*,*)
@@ -163,15 +140,10 @@ contains
     end if
 
     ! read logT
-    data_dims = 0
-    call h5dopen_f(group_id, "logTs", dset_id, ierr)
-    call h5dget_space_f(dset_id, dspace_id, ierr)
-    call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-    if (rq% show_info) write(*,ifmt) "num logTs =", data_dims(1)
-    kA % num_logTs = data_dims(1)
-    allocate(kA% logTs(kA % num_logTs))
-    call h5dread_f(dset_id, H5T_IEEE_F64LE, kA% logTs, data_dims, ierr)
-    call h5dclose_f(dset_id, ierr)
+
+    call hi% alloc_read_dset('logTs', kA% logTs)
+    kA% num_logTs = SIZE(kA% logTs)
+    if (rq% show_info) write(*,ifmt) "num logTs =", kA% num_logTs
 
     kA% min_logT = minval(kA% logTs)
     kA% max_logT = maxval(kA% logTs)
@@ -181,15 +153,10 @@ contains
     end if
 
     ! read logR
-    data_dims = 0
-    call h5dopen_f(group_id, "logRs", dset_id, ierr)
-    call h5dget_space_f(dset_id, dspace_id, ierr)
-    call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-    if (rq% show_info) write(*,ifmt) "num logRs =", data_dims(1)
-    kA % num_logRs = data_dims(1)
-    allocate(kA% logRs(kA % num_logRs))
-    call h5dread_f(dset_id, H5T_IEEE_F64LE, kA% logRs, data_dims, ierr)
-    call h5dclose_f(dset_id, ierr)
+
+    call hi% alloc_read_dset('logRs', kA% logRs)
+    kA% num_logRs = SIZE(kA% logRs)
+    if (rq% show_info) write(*,ifmt) "num logRs =", kA% num_logRs
 
     kA% min_logR = minval(kA% logRs)
     kA% max_logR = maxval(kA% logRs)
@@ -205,23 +172,19 @@ contains
     end if
 
     ! read Zs
-    data_dims = 0
-    call h5dopen_f(group_id, "Zs", dset_id, ierr)
-    call h5dget_space_f(dset_id, dspace_id, ierr)
-    call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-    if (rq% show_info) write(*,ifmt) "num Zs =", data_dims(1)
-    kA % num_Zs = data_dims(1)
-    allocate(kA% Zs(kA % num_Zs))
-    call h5dread_f(dset_id, H5T_IEEE_F64LE, kA% Zs, data_dims, ierr)
-    call h5dclose_f(dset_id, ierr)
+
+    call hi% alloc_read_dset('Zs', kA% Zs)
+    kA% num_Zs = SIZE(kA% Zs)
+    if (rq% show_info) write(*,ifmt) "num Zs =", kA% num_Zs
+    
     if (debug) write(*,*) 'Zs', kA% Zs
 
     if (rq% show_info) then
        write(*,efmt) "Zs =", kA% Zs
     end if
 
-
     ! pre-compute logZs
+
     allocate(kA% logZs(kA % num_Zs))
     do n = 1, kA % num_Zs
        kA% logZs(n) = safe_log10(kA% Zs(n))
@@ -237,92 +200,64 @@ contains
        associate(ts => kA% ts(n))
 
        ! get group name and open group
-       idx = n - 1
-       call h5lget_name_by_idx_f(file_id, ".", H5_INDEX_NAME_F, H5_ITER_INC_F, idx, group_name, ierr, size)
+
+       write(group_name, 100) kA% Zs(n)
+100    format(F8.6)  
+
        if (rq% show_info) then
           write(*,*)
           write(*,'(3A, ES9.3)') "Table ",  trim(group_name), ": Z = ", kA% Zs(n)
        end if
-       call h5gopen_f(group_id, group_name, subgroup_id, ierr)
+
+       hi_ts = hdf5io_t(hi, group_name)
 
        ! read Xs
-       data_dims = 0
-       call h5dopen_f(subgroup_id, "Xs", dset_id, ierr)
-       call h5dget_space_f(dset_id, dspace_id, ierr)
-       call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-       if (rq% show_info) write(*,ifmt) "num Xs =", data_dims(1)
-       ts % num_Xs = data_dims(1)
-       allocate(ts% Xs(ts % num_Xs))
-       call h5dread_f(dset_id, H5T_IEEE_F64LE, ts% Xs, data_dims, ierr)
-       call h5dclose_f(dset_id, ierr)
+
+       call hi_ts%  alloc_read_dset('Xs', ts% Xs)
        if (debug) write(*,*) "Xs", ts% Xs
+       ts% num_Xs = SIZE(ts% Xs)
+       if (rq% show_info) write(*,ifmt) "num Xs =", ts% num_Xs
 
        if (rq% show_info) then
           write(*,ffmt) "Xs =", ts% Xs
        end if
 
-
        ! read fCOs
-       data_dims = 0
-       call h5dopen_f(subgroup_id, "fCOs", dset_id, ierr)
-       call h5dget_space_f(dset_id, dspace_id, ierr)
-       call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-       if (rq% show_info) write(*,ifmt) "num fCOs =", data_dims(1)
-       ts % num_fCOs = data_dims(1)
-       allocate(ts% fCOs(ts % num_fCOs))
-       call h5dread_f(dset_id, H5T_IEEE_F64LE, ts% fCOs, data_dims, ierr)
-       call h5dclose_f(dset_id, ierr)
+
+       call hi_ts% alloc_read_dset('fCOs', ts% fCOs)
        if (debug) write(*,*) "fCOs", ts% fCOs
+       ts% num_fCOs = SIZE(ts% fCOs)
+       if (rq% show_info) write(*,ifmt) "num fCOs =", ts% num_fCOs
 
        if (rq% show_info) then
           write(*,ffmt) "fCOs =", ts% fCOs
        end if
 
-
        ! read fCs
-       data_dims = 0
-       call h5dopen_f(subgroup_id, "fCs", dset_id, ierr)
-       call h5dget_space_f(dset_id, dspace_id, ierr)
-       call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-       if (rq% show_info) write(*,ifmt) "num fCs =", data_dims(1)
-       ts % num_fCs = data_dims(1)
-       allocate(ts% fCs(ts % num_fCs))
-       call h5dread_f(dset_id, H5T_IEEE_F64LE, ts% fCs, data_dims, ierr)
-       call h5dclose_f(dset_id, ierr)
+
+       call hi_ts% alloc_read_dset('fCs', ts% fCs)
        if (debug) write(*,*) "fCs", ts% fCs
+       ts% num_fCs = SIZE(ts% fCs)
+       if (rq% show_info) write(*,ifmt) "num fCs =", ts% num_fCs
 
        if (rq% show_info) then
           write(*,ffmt) "fCs =", ts% fCs
        end if
 
        ! read fNs
-       data_dims = 0
-       call h5dopen_f(subgroup_id, "fNs", dset_id, ierr)
-       call h5dget_space_f(dset_id, dspace_id, ierr)
-       call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-       if (rq% show_info) write(*,ifmt) "num fNs =", data_dims(1)
-       ts % num_fNs = data_dims(1)
-       allocate(ts% fNs(ts % num_fNs))
-       call h5dread_f(dset_id, H5T_IEEE_F64LE, ts% fNs, data_dims, ierr)
-       call h5dclose_f(dset_id, ierr)
+
+       call hi_ts% alloc_read_dset('fNs', ts% fNs)
        if (debug) write(*,*) "fNs", ts% fNs
+       ts% num_fNs = SIZE(ts% fNs)
+       if (rq% show_info) write(*,ifmt) "num fNs =", ts% num_fNs
 
        if (rq% show_info) then
           write(*,ffmt) "fNs =", ts% fNs
        end if
 
-
        ! read opacities
-       data_dims = 0
-       call h5dopen_f(subgroup_id, "kap", dset_id, ierr)
-       call h5dget_space_f(dset_id, dspace_id, ierr)
-       call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-       if (debug) write(*,*) "data_dims", data_dims
-       allocate(table_data(data_dims(1), data_dims(2), data_dims(3), &
-                           data_dims(4), data_dims(5), data_dims(6)))
-       call h5dread_f(dset_id, H5T_IEEE_F64LE, table_data, data_dims, ierr)
-       call h5dclose_f(dset_id, ierr)
 
+       call hi_ts% alloc_read_dset('kap', table_data)
 
        allocate(ts% t(ts % num_Xs, ts % num_fCOs, ts % num_fCs, ts % num_fNs))
 
@@ -373,20 +308,15 @@ contains
 
        deallocate(table_data)
 
-       call h5gclose_f(subgroup_id, ierr)
+       call hi_ts%final()
 
        end associate
 
     end do
 
     ! close file
-    call h5fclose_f(file_id, ierr)
-    if (ierr /= 0) return
 
-    ! close interface
-    call h5close_f(ierr)
-    if (ierr /= 0) return
-
+    call hi%final()
 
     if (rq% show_info) then
        write(*,*)

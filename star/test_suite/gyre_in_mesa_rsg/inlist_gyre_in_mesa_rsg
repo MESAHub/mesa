@@ -58,7 +58,7 @@
       x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
       x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
-      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      x_integer_ctrl(2) = 1 ! max number of modes to output per call
       x_logical_ctrl(2) = .false. ! output eigenfunction files
 
       x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
@@ -100,7 +100,8 @@
 
 ! mesh controls
 
-! timestep controls      
+! timestep controls   
+      varcontrol_target = 1d-4
 
 ! output controls
 

@@ -30,6 +30,10 @@
 
 &eos
 	  use_Skye = .true.
+
+          ! For more accurate C/O phase diagram
+          Skye_solid_mixing_rule = "Ogata"
+
    !dbg = .true.
    logT_lo = 6.59473
    logT_hi = 6.59473
@@ -72,9 +76,6 @@
       diffusion_use_full_net = .true.
       do_WD_sedimentation_heating = .true.
       do_diffusion_heating = .false.
-      diffusion_gamma_full_on = 174d0
-      diffusion_gamma_full_off = 176d0
-
 
       mesh_delta_coeff = 0.75
       
@@ -87,12 +88,13 @@
 
       mixing_length_alpha = 1.8
 
+      clip_D_limit = 0 ! zero mixing diffusion coeffs that are smaller than this 
+              
       prune_bad_cz_min_Hp_height = 0 ! lower limit on radial extent of cz
       remove_mixing_glitches = .true. ! if true, then okay to remove gaps and singletons
       
                ! the following controls are for different kinds of "glitches" that can be removed
             
-               clip_D_limit = 0 ! zero mixing diffusion coeffs that are smaller than this         
 
                okay_to_remove_mixing_singleton = .true.
          

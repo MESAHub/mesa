@@ -58,6 +58,7 @@ contains
     call test_T_tau_varying(ATM_T_TAU_EDDINGTON, 'Eddington', -1._dp)
     call test_T_tau_varying(ATM_T_TAU_KRISHNA_SWAMY, 'Krishna-Swamy', -1._dp)
     call test_T_tau_varying(ATM_T_TAU_SOLAR_HOPF, 'solar Hopf', -1._dp)
+    call test_T_tau_varying(ATM_T_TAU_TRAMPEDACH_SOLAR, 'Trampedach solar', -1._dp)
     call test_T_tau_varying(ATM_T_TAU_EDDINGTON, 'Eddington', 100._dp)
 
     call test_T_tau_uniform('fixed', 100._dp)
@@ -74,7 +75,7 @@ contains
     integer, intent(in)      :: table_id
     character(*), intent(in) :: label
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 
@@ -143,7 +144,7 @@ contains
     real(dp) :: errtol
     integer  :: max_steps
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 
@@ -221,7 +222,7 @@ contains
     real(dp) :: tau_base
     real(dp) :: errtol
 
-    include 'formats.dek'
+    include 'formats'
 
     if (test_verbosely) then
        write(*,*)
@@ -305,8 +306,9 @@ contains
   subroutine test_irradiated()
 
     real(dp) :: errtol
+    type (Kap_General_Info), pointer :: rq
 
-    include 'formats.dek'
+    include 'formats'
 
     if (test_verbosely) then
        write(*,*)
@@ -322,6 +324,15 @@ contains
     XO = 8.8218000000000601d-03
 
     call set_composition()
+
+    ! at these conditions, the appropriate lowT opacity table is Freedman11
+    ! this is around logR = 3.5, way off the default tables (max logR = 1)
+    call kap_ptr(kap_handle,rq,ierr)
+    if (ierr /= 0) return
+    rq% kap_lowT_option = kap_lowT_Freedman11
+
+    ! must set up tables again after changing options
+    call kap_setup_tables(kap_handle, ierr)
 
     errtol = 1.E-6_dp
     max_iters = 30

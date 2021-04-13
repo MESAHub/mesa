@@ -74,6 +74,25 @@
       end subroutine set_phot_info
 
 
+      subroutine set_min_gamma1(s)
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp) :: vesc
+         include 'formats'
+         s% min_gamma1 = 1d99
+         do k = s% nz, 1, -1
+            if (s% q(k) > s% gamma1_limit_max_q) exit
+            vesc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
+            if (s% u_flag) then
+               if (s% u(k) > vesc*s% gamma1_limit_max_v_div_vesc) exit
+            else if (s% v_flag) then
+               if (s% v(k) > vesc*s% gamma1_limit_max_v_div_vesc) exit
+            end if
+            if (s% gamma1(k) < s% min_gamma1) s% min_gamma1 = s% gamma1(k)
+         end do
+      end subroutine set_min_gamma1
+
+
       subroutine set_power_info(s)
          use chem_def, only: category_name
          type (star_info), pointer :: s
@@ -209,12 +228,13 @@
          use rates_def, only: &
             i_rate, i_rate_dRho, i_rate_dT, std_reaction_Qs, std_reaction_neuQs
          use star_utils, only: get_phot_info
+         use hydro_rotation, only: set_surf_avg_rotation_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
          integer :: k, i, j, ic, nz, kcore, &
             h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
-         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, &
+         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
             twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
             prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
             prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum
@@ -239,17 +259,13 @@
          co56 = net_iso(ico56)
          ni56 = net_iso(ini56)
          
-         s% log_P_center = s% lnP(nz)/ln10
-         
-         call set_phot_info(s)
-
          radius = s% r(1)  !  radius in cm
          s% log_surface_radius = log10(radius/Rsun)
             ! log10(stellar radius in solar units)
          s% log_center_density = center_value(s, s% lnd)/ln10
          s% log_max_temperature = maxval(s% lnT(1:nz))/ln10
          s% log_center_temperature = center_value(s, s% lnT)/ln10
-         s% log_center_pressure = center_value(s, s% lnP)/ln10
+         s% log_center_pressure = center_value(s, s% lnPeos)/ln10
          s% center_degeneracy = center_value(s, s% eta)
 
          s% center_eps_nuc = center_value(s, s% eps_nuc)
@@ -276,23 +292,23 @@
          end if
 
          s% log_surface_temperature = s% lnT(1)/ln10 ! log10(temperature at surface)
-         s% log_surface_pressure = s% lnP(1)/ln10 ! log10(pressure at surface)
+         s% log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
          s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
          s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
          
          luminosity = s% L(1)
-         s% total_radiation = s% total_radiation + &
-            s% dt*(luminosity + s% power_neutrinos)
 
          if (s% u_flag) then
             s% v_surf = s% u(1)
          else if (s% v_flag) then
             s% v_surf = s% v(1)
          else
-            s% v_surf = s% r(1)*s% dlnR_dt(1)
+            s% v_surf = 0d0
          end if
 
          call set_surf_avg_rotation_info(s)
+         
+         call set_min_gamma1(s)
 
          ! s% time is in seconds
          s% star_age = s% time/secyer
@@ -311,7 +327,6 @@
          
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units
-         s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
 
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)
@@ -400,7 +415,7 @@
             else if (s% v_flag) then
                v = s% v(k)
             else
-               v = s% r(k)*s% dlnR_dt(k)
+               v = 0d0
             end if
 
             if (is_bad(v)) then
@@ -445,29 +460,20 @@
          call get_mass_info(s, s% dm, ierr)
          if (failed('get_mass_info')) return
          
-         if (s% zero_gravity) then
-            s% nu_max = 0
-            s% acoustic_cutoff = 0
-            s% delta_Pg = 0
-            return
-         end if
-         
          s% nu_max = s% nu_max_sun*s% star_mass/ &
             (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
          s% acoustic_cutoff = &
-            0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% P(1))
+            0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
          if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
          call get_delta_Pg(s, nu_for_delta_Pg, s% delta_Pg)
          
-         if (.not. s% constant_L) then
-            call get_tau(s, ierr)
-            if (failed('get_tau')) return
-            call check_tau(10d0, s% tau10_radius, s% tau10_mass, &
-                  s% tau10_lgP, s% tau10_lgT, s% tau10_lgRho, s% tau10_L)
-            call check_tau(100d0, s% tau100_radius, s% tau100_mass, &
-                  s% tau100_lgP, s% tau100_lgT, s% tau100_lgRho, s% tau100_L)
-         end if
+         call get_tau(s, ierr)
+         if (failed('get_tau')) return
+         call check_tau(10d0, s% tau10_radius, s% tau10_mass, &
+               s% tau10_lgP, s% tau10_lgT, s% tau10_lgRho, s% tau10_L)
+         call check_tau(100d0, s% tau100_radius, s% tau100_mass, &
+               s% tau100_lgP, s% tau100_lgT, s% tau100_lgRho, s% tau100_L)
 
          if (s% rsp_flag) return
 
@@ -498,16 +504,17 @@
                      s% fe_core_infall = -s% u(k)
                end do
             end if
-            non_fe_core_mass = max( &
-               s% he_core_mass, s% c_core_mass, s% o_core_mass, s% si_core_mass)
+            non_fe_core_mass = s% he_core_mass
             if (non_fe_core_mass > 0) then
                do k = 1, nz
                   if (s% m(k) > Msun*non_fe_core_mass) cycle
                   if (s% m(k) < Msun*s% fe_core_mass) exit
                   if (-s% u(k) > s% non_fe_core_infall) &
                      s% non_fe_core_infall = -s% u(k)
-                  if (s% u(k) > s% non_fe_core_rebound) &
-                     s% non_fe_core_rebound = -s% u(k)
+                  if (s% u(k) > s% non_fe_core_rebound) then
+                     s% non_fe_core_rebound = s% u(k)
+                     !write(*,2) 's% non_fe_core_rebound', k, s% non_fe_core_rebound, s% m(k)/Msun
+                  end if
                end do
             end if
          else if (s% v_flag) then
@@ -524,8 +531,7 @@
                      s% fe_core_infall = -s% v(k)
                end do
             end if
-            non_fe_core_mass = max( &
-               s% he_core_mass, s% c_core_mass, s% o_core_mass, s% si_core_mass)
+            non_fe_core_mass = max(s% he_core_mass, s% co_core_mass)
             if (non_fe_core_mass > 0) then
                do k = 1, nz
                   if (s% m(k) > Msun*non_fe_core_mass) cycle
@@ -627,7 +633,7 @@
                return
             end if
 
-            tau_lgP = (s% lnP(k) + (s% lnP(k+1)-s% lnP(k))*frac)/ln10
+            tau_lgP = (s% lnPeos(k) + (s% lnPeos(k+1)-s% lnPeos(k))*frac)/ln10
             tau_lgT = (s% lnT(k) + (s% lnT(k+1)-s% lnT(k))*frac)/ln10
             tau_lgd = (s% lnd(k) + (s% lnd(k+1)-s% lnd(k))*frac)/ln10
 
@@ -667,7 +673,7 @@
             end if
 
             if (q <= s% q(nz)) then
-               volume_at_q = (q/s% q(nz))*(4*pi/3)*s% r(nz)*s% r(nz)*s% r(nz)
+               volume_at_q = (q/s% q(nz))*four_thirds_pi*s% r(nz)*s% r(nz)*s% r(nz)
                return
             end if
             k00 = 1
@@ -677,7 +683,7 @@
                end if
             end do
             if (k00 == 1) then
-               volume_at_q = (4*pi/3)*q*s% r(1)*s% r(1)*s% r(1)
+               volume_at_q = four_thirds_pi*q*s% r(1)*s% r(1)*s% r(1)
                write(*,1) 'volume_at_q', volume_at_q
                return
             end if
@@ -711,7 +717,7 @@
                return
             end if
 
-            volume_at_q = (4*pi/3)*v_new(1)
+            volume_at_q = four_thirds_pi*v_new(1)
 
          end function volume_at_q
 
@@ -1067,7 +1073,7 @@
          k = maxloc(s% lnT(1:s% nz),dim=1)
          s% max_T_lgT = s% lnT(k)/ln10
          s% max_T_lgRho = s% lnd(k)/ln10
-         s% max_T_lgP = s% lnP(k)/ln10
+         s% max_T_lgP = s% lnPeos(k)/ln10
          if (k == s% nz) then
             s% max_T_mass = s% M_center/Msun ! (Msun)
             s% max_T_radius = s% R_center/Rsun ! (Rsun)
@@ -1084,19 +1090,19 @@
             s% max_T_lgP_thin_shell = -1d99
          else
             s% max_T_lgP_thin_shell = &
-               log10(s% cgrav(k)*s% m(k)*(s% m(1)-s% m(k))/(4*pi*pow4(s% r(k))))
+               log10(s% cgrav(k)*s% m(k)*(s% m(1)-s% m(k))/(pi4*pow4(s% r(k))))
             if (s% v_flag) then
                do kk = 1, k
                   s% max_T_shell_binding_energy = s% max_T_shell_binding_energy + &
                      s% dm(kk)*(s% energy(kk) + &
-                           s% P(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk) + &
+                           s% Peos(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk) + &
                            0.5d0*s% v(kk)*s% v(kk))
                end do
             else
                do kk = 1, k
                   s% max_T_shell_binding_energy = s% max_T_shell_binding_energy + &
                      s% dm(kk)*(s% energy(kk) + &
-                           s% P(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk))
+                           s% Peos(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk))
                end do
             end if
          end if
@@ -1127,7 +1133,7 @@
          s% max_abs_v_v_div_cs = s% max_abs_v_velocity/s% csound_face(k)
          s% max_abs_v_lgT = s% lnT(k)/ln10
          s% max_abs_v_lgRho = s% lnd(k)/ln10
-         s% max_abs_v_lgP = s% lnP(k)/ln10
+         s% max_abs_v_lgP = s% lnPeos(k)/ln10
          s% max_abs_v_mass = s% m(k)/Msun ! (Msun)
          s% max_abs_v_radius = s% r(k)/Rsun ! (Rsun)
          s% max_abs_v_L = s% L(k)/Lsun! (Lsun)
@@ -1171,8 +1177,10 @@
          bdy_L = s% L(1)/Lsun
          if (s% v_flag) then
             bdy_v = s% v(1)
+         else if (s% u_flag) then
+            bdy_v = s% u_face_ad(1)%val
          else
-            bdy_v = s% r(1)*s% dlnR_dt(1)
+            bdy_v = 0d0
          end if
          if (s% rotation_flag) then
             bdy_omega = s% omega_avg_surf
@@ -1398,7 +1406,7 @@
          mach1_csound = s% csound(k)
          mach1_lgT = s% lnT(k)/ln10
          mach1_lgRho = s% lnd(k)/ln10
-         mach1_lgP = s% lnP(k)/ln10
+         mach1_lgP = s% lnPeos(k)/ln10
          mach1_gamma1 = s% gamma1(k)
          mach1_entropy = s% entropy(k)
          mach1_tau = s% tau(k)
@@ -1409,15 +1417,15 @@
       subroutine get_core_info(s)
          type (star_info), pointer :: s
 
-         integer :: k, j, A_max, h1, he4, c12, o16, si28, species, nz
+         integer :: k, j, A_max, h1, he4, c12, o16, ne20, si28, species, nz
          integer, pointer :: net_iso(:)
-         logical :: have_he, have_c, have_o, have_si, have_fe
+         logical :: have_he, have_co, have_one, have_fe
          real(dp) :: sumx, min_x
          integer, parameter :: &
             A_max_fe = 47, &
             A_max_si = 28, &
-            A_max_o = 16, &
-            A_max_c = 12, &
+            A_max_one = 20, &
+            A_max_co = 16, &
             A_max_he = 4
 
          include 'formats'
@@ -1429,6 +1437,7 @@
          he4 = net_iso(ihe4)
          c12 = net_iso(ic12)
          o16 = net_iso(io16)
+         ne20 = net_iso(ine20)
          si28 = net_iso(isi28)
          min_x = s% min_boundary_fraction
 
@@ -1451,27 +1460,22 @@
             s% fe_core_mass, s% fe_core_radius, s% fe_core_lgT, &
             s% fe_core_lgRho, s% fe_core_L, s% fe_core_v, &
             s% fe_core_omega, s% fe_core_omega_div_omega_crit)
-         call clear_core_info(s% si_core_k, &
-            s% si_core_mass, s% si_core_radius, s% si_core_lgT, &
-            s% si_core_lgRho, s% si_core_L, s% si_core_v, &
-            s% si_core_omega, s% si_core_omega_div_omega_crit)
-         call clear_core_info(s% o_core_k, &
-            s% o_core_mass, s% o_core_radius, s% o_core_lgT, &
-            s% o_core_lgRho, s% o_core_L, s% o_core_v, &
-            s% o_core_omega, s% o_core_omega_div_omega_crit)
-         call clear_core_info(s% c_core_k, &
-            s% c_core_mass, s% c_core_radius, s% c_core_lgT, &
-            s% c_core_lgRho, s% c_core_L, s% c_core_v, &
-            s% c_core_omega, s% c_core_omega_div_omega_crit)
+         call clear_core_info(s% co_core_k, &
+            s% co_core_mass, s% co_core_radius, s% co_core_lgT, &
+            s% co_core_lgRho, s% co_core_L, s% co_core_v, &
+            s% co_core_omega, s% co_core_omega_div_omega_crit)
+         call clear_core_info(s% one_core_k, &
+            s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
+            s% one_core_lgRho, s% one_core_L, s% one_core_v, &
+            s% one_core_omega, s% one_core_omega_div_omega_crit)
          call clear_core_info(s% he_core_k, &
             s% he_core_mass, s% he_core_radius, s% he_core_lgT, &
             s% he_core_lgRho, s% he_core_L, s% he_core_v, &
             s% he_core_omega, s% he_core_omega_div_omega_crit)
 
          have_he = .false.
-         have_c = .false.
-         have_o = .false.
-         have_si = .false.
+         have_co = .false.
+         have_one = .false.
          have_fe = .false.
 
          do k=1,nz
@@ -1506,65 +1510,44 @@
                end if
             end if
 
-            if (.not. have_si) then
-               if (s% si_core_boundary_o16_fraction < 0) then
-                  if (A_max >= A_max_si) then
-                     call set_core_info(s, k, s% si_core_k, &
-                        s% si_core_mass, s% si_core_radius, s% si_core_lgT, &
-                        s% si_core_lgRho, s% si_core_L, s% si_core_v, &
-                        s% si_core_omega, s% si_core_omega_div_omega_crit)
-                     have_si = .true.
+            if (.not. have_one) then
+               if (s% one_core_boundary_he4_c12_fraction < 0) then
+                  if (A_max >= A_max_one) then
+                     call set_core_info(s, k, s% one_core_k, &
+                        s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
+                        s% one_core_lgRho, s% one_core_L, s% one_core_v, &
+                        s% one_core_omega, s% one_core_omega_div_omega_crit)
+                     have_one = .true.
                   end if
-               else if (o16 /= 0 .and.si28 /= 0) then
-                  if (s% xa(o16,k) <= s% si_core_boundary_o16_fraction .and. &
-                      s% xa(si28,k) >= min_x) then
-                     call set_core_info(s, k, s% si_core_k, &
-                        s% si_core_mass, s% si_core_radius, s% si_core_lgT, &
-                        s% si_core_lgRho, s% si_core_L, s% si_core_v, &
-                        s% si_core_omega, s% si_core_omega_div_omega_crit)
-                     have_si = .true.
-                  end if
-               end if
-            end if
-
-            if (.not. have_o) then
-               if (s% o_core_boundary_c12_fraction < 0) then
-                  if (A_max >= A_max_o) then
-                     call set_core_info(s, k, s% o_core_k, &
-                        s% o_core_mass, s% o_core_radius, s% o_core_lgT, &
-                        s% o_core_lgRho, s% o_core_L, s% o_core_v, &
-                        s% o_core_omega, s% o_core_omega_div_omega_crit)
-                     have_o = .true.
-                  end if
-               else if (c12 /= 0 .and. o16 /= 0) then
-                  if (s% xa(c12,k) <= s% o_core_boundary_c12_fraction .and. &
-                      s% xa(o16,k) >= min_x) then
-                     call set_core_info(s, k, s% o_core_k, &
-                        s% o_core_mass, s% o_core_radius, s% o_core_lgT, &
-                        s% o_core_lgRho, s% o_core_L, s% o_core_v, &
-                        s% o_core_omega, s% o_core_omega_div_omega_crit)
-                     have_o = .true.
+               else if (he4 /= 0 .and. c12 /= 0 .and. o16 /= 0) then
+                  if (s% xa(he4,k)+s% xa(c12,k) <= s% one_core_boundary_he4_c12_fraction .and. &
+                      s% xa(o16,k)+s% xa(ne20,k) >= min_x) then
+                     call set_core_info(s, k, s% one_core_k, &
+                        s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
+                        s% one_core_lgRho, s% one_core_L, s% one_core_v, &
+                        s% one_core_omega, s% one_core_omega_div_omega_crit)
+                     have_one = .true.
                   end if
                end if
             end if
 
-            if (.not. have_c) then
-               if (s% c_core_boundary_he4_fraction < 0) then
-                  if (A_max >= A_max_c) then
-                     call set_core_info(s, k, s% c_core_k, &
-                        s% c_core_mass, s% c_core_radius, s% c_core_lgT, &
-                        s% c_core_lgRho, s% c_core_L, s% c_core_v, &
-                        s% c_core_omega, s% c_core_omega_div_omega_crit)
-                     have_c = .true.
+            if (.not. have_co) then
+               if (s% co_core_boundary_he4_fraction < 0) then
+                  if (A_max >= A_max_co) then
+                     call set_core_info(s, k, s% co_core_k, &
+                        s% co_core_mass, s% co_core_radius, s% co_core_lgT, &
+                        s% co_core_lgRho, s% co_core_L, s% co_core_v, &
+                        s% co_core_omega, s% co_core_omega_div_omega_crit)
+                     have_co = .true.
                   end if
-               else if (he4 /= 0 .and. c12 /= 0) then
-                  if (s% xa(he4,k) <= s% c_core_boundary_he4_fraction .and. &
-                      s% xa(c12,k) >= min_x) then
-                     call set_core_info(s, k, s% c_core_k, &
-                        s% c_core_mass, s% c_core_radius, s% c_core_lgT, &
-                        s% c_core_lgRho, s% c_core_L, s% c_core_v, &
-                        s% c_core_omega, s% c_core_omega_div_omega_crit)
-                     have_c = .true.
+               else if (he4 /= 0 .and. c12 /= 0 .and. o16 /= 0) then
+                  if (s% xa(he4,k) <= s% co_core_boundary_he4_fraction .and. &
+                      s% xa(c12,k)+s% xa(o16,k) >= min_x) then
+                     call set_core_info(s, k, s% co_core_k, &
+                        s% co_core_mass, s% co_core_radius, s% co_core_lgT, &
+                        s% co_core_lgRho, s% co_core_L, s% co_core_v, &
+                        s% co_core_omega, s% co_core_omega_div_omega_crit)
+                     have_co = .true.
                   end if
                end if
             end if
@@ -1707,7 +1690,7 @@
             else if (s% v_flag) then
                bdy_v = s% v(1)
             end if
-            bdy_lgP = s% lnP(1)/ln10
+            bdy_lgP = s% lnPeos(1)/ln10
             bdy_g = s% grav(1)
             bdy_X = s% X(1)
             bdy_Y = s% Y(1)
@@ -1743,12 +1726,12 @@
 
          bdy_lgT = interp3(s% lnT(k-1), s% lnT(k), s% lnT(k+1))/ln10
          bdy_lgRho = interp3(s% lnd(k-1), s% lnd(k), s% lnd(k+1))/ln10
-         bdy_lgP = interp3(s% lnP(k-1), s% lnP(k), s% lnP(k+1))/ln10
+         bdy_lgP = interp3(s% lnPeos(k-1), s% lnPeos(k), s% lnPeos(k+1))/ln10
          bdy_X = interp3(s% X(k-1), s% X(k), s% X(k+1))
          bdy_Y = interp3(s% Y(k-1), s% Y(k), s% Y(k+1))
 
          bdy_r = pow( &
-            interp2(s% r(k)*s% r(k)*s% r(k), s% r(k+1)*s% r(k+1)*s% r(k+1)),1d0/3d0)/Rsun
+            interp2(s% r(k)*s% r(k)*s% r(k), s% r(k+1)*s% r(k+1)*s% r(k+1)),one_third)/Rsun
          bdy_L = interp2(s% L(k), s% L(k+1))/Lsun
          bdy_g = interp2(s% grav(k), s% grav(k+1))
          bdy_scale_height = interp2(s% scale_height(k), s% scale_height(k+1))

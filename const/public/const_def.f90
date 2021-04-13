@@ -50,6 +50,7 @@
       real(dp), parameter :: pi2 = pi * pi
       real(dp), parameter :: pi4 = 4*pi
       real(dp), parameter :: eulercon = 0.577215664901532861d0
+      real(dp), parameter :: eulernum = 2.71828182845904523536028747135266249d0
       real(dp), parameter :: ln2 = 6.9314718055994529D-01 ! = log(2d0)
       real(dp), parameter :: ln3 = 1.0986122886681096D+00 ! = log(3d0)
       real(dp), parameter :: lnPi = 1.14472988584940017414343_dp ! = log(pi)
@@ -62,10 +63,12 @@
       real(dp), parameter :: four_thirds = 4d0/3d0
       real(dp), parameter :: five_thirds = 5d0/3d0
       real(dp), parameter :: one_sixth = 1d0/6d0
+      real(dp), parameter :: four_thirds_pi = four_thirds*pi
       real(dp), parameter :: ln4pi3 = 1.4324119583011810d0 ! = log(4*pi/3)
       real(dp), parameter :: two_13 = 1.2599210498948730d0 ! = pow(2d0,1d0/3d0)
       real(dp), parameter :: four_13 = 1.5874010519681994d0 ! = pow(4d0,1d0/3d0)
       real(dp), parameter :: sqrt2 = 1.414213562373095d0 ! = sqrt(2)
+      real(dp), parameter :: sqrt_2_div_3 = 0.8164965809d0 ! = sqrt(2/3)
 
 ! exact physical constants
 
@@ -85,7 +88,7 @@
       real(dp), parameter :: Qconv = mev_to_ergs*avo
       real(dp), parameter :: kev = kerg / ev2erg ! converts temp to ev (ev K^-1)
       real(dp), parameter :: boltz_sigma = (pi*pi * boltzm*boltzm*boltzm*boltzm) / (60 * hbar*hbar*hbar * clight*clight) ! Stefan-Boltzmann constant (erg cm^-2 K^-4 s^-1)
-      real(dp), parameter :: crad = boltz_sigma*4/clight ! radiation density constant, a (erg cm^-3 K^-4); Prad = crad * T^4 / 3
+      real(dp), parameter :: crad = boltz_sigma*4/clight ! radiation density constant, AKA "a" (erg cm^-3 K^-4); Prad = crad * T^4 / 3
 
       ! IAU
       real(dp), parameter :: au = 1.49597870700D13 ! (cm) - exact value defined by IAU 2009, 2012

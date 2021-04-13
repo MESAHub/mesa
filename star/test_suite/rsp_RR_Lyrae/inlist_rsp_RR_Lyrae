@@ -61,7 +61,10 @@
 
 ! output controls
    
-      terminal_show_age_units = 'days'
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
 
       !num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -92,7 +95,9 @@
          
       Grid2_win_flag = .true.
 
-      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
+
+      Grid2_title = '0.65 M\d\(2281)\u  Z=0.0004  RR Lyrae'
+
       
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

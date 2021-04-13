@@ -597,7 +597,7 @@ contains
 
     ! Store the mass-fractional location of the new convective
     ! boundary, and reset the locations for the old convective
-    ! boundary (cf. set_mlt_cz_boundary_info)
+    ! boundary (cf. set_cz_boundary_info)
 
     if (outward) then
 
@@ -914,8 +914,7 @@ contains
 
     real(dp) :: logRho
     real(dp) :: res(num_eos_basic_results)
-    real(dp) :: d_dabar(num_eos_basic_results)
-    real(dp) :: d_dzbar(num_eos_basic_results)
+    real(dp) :: d_dxa(num_eos_d_dxa_results,s%species)
 
     ! Evaluate EOS data in cell k, assuming the cell's temperature and
     ! pressure are as specified in the model, but with abundances
@@ -924,9 +923,9 @@ contains
     ! (NEEDS FIXING TO HANDLE CASE WHEN LNPGAS_FLAG = .TRUE.)
 
     call solve_eos_given_PgasT( &
-         s, k, z, x, abar, zbar, xa, &
+         s, k, xa, &
          s%lnT(k)/ln10, s%lnPgas(k)/ln10, s%lnd(k)/ln10, LOGRHO_TOL, LOGPGAS_TOL, &
-         logRho, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+         logRho, res, d_dlnd, d_dlnT, d_dxa, &
        ierr)
     if (ierr /= 0) then
        if (DEBUG) write(*,*) 'Non-zero return from solve_eos_given_PgasT in eval_eos/predictive_mix'

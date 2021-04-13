@@ -26,7 +26,7 @@
 
       module star_data_def
 
-      use rates_def, only: rates_reaction_id_max
+      use rates_def, only: rates_reaction_id_max, other_screening_interface
       use utils_def, only: integer_dict
       use chem_def, only: num_categories, iso_name_length
       use const_def, only: sp, dp, qp, strlen
@@ -35,6 +35,7 @@
       use kap_def, only: Kap_General_Info
       use net_def, only: Net_General_Info
       use colors_def, only:  max_num_color_files, max_num_bcs_per_file
+      use auto_diff, only: auto_diff_real_star_order1
       
       implicit none      
       
@@ -73,9 +74,9 @@
          
          ! private
             logical :: in_use
-            logical :: do_struct_hydro, do_struct_thermo, do_burn, do_mix
+            logical :: do_burn, do_mix
             logical :: used_extra_iter_in_solver_for_accretion
-            integer :: retry_cnt, redo_cnt, hydro_decsol_option
+            integer :: retry_cnt, redo_cnt
             type (EoS_General_Info), pointer :: eos_rq ! from call eos_ptr(s% eos_handle,s% eos_rq,ierr)
             type (Kap_General_Info), pointer :: kap_rq ! from call kap_ptr(s% kap_handle,s% kap_rq,ierr)
             type (Net_General_Info), pointer :: net_rq ! from call net_ptr(s% net_handle,s% net_rq, ierr)
@@ -161,6 +162,7 @@
          result_reason_str(variable_change_limits) = 'variable_change_limits'
          result_reason_str(explicit_hydro_failed) = 'explicit_hydro_failed'
          result_reason_str(abs_rel_run_E_err) = 'abs_rel_run_E_err'
+         result_reason_str(forced_stop) = 'forced_stop'
       end subroutine result_reason_init
 
       

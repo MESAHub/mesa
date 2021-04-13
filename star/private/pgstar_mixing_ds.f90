@@ -518,7 +518,7 @@
             end if
             if (s% RTI_flag) then
                cnt = mixing_line_legend(cnt, clr_rayleigh_taylor, &
-                  lw, lw_sav, txt_scale, 'rayleigh_taylor')
+                  lw, lw_sav, txt_scale, 'RTI')
             end if
             if (s% conv_vel_flag) then
                cnt = mixing_line_legend(cnt, clr_leftover_convection, &

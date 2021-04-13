@@ -86,7 +86,7 @@
 
          if (s% TRho_switch_to_Column_Depth) then
             do k=1,nz
-               xvec(k) = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(4*pi*s% r(k)*s% r(k)))
+               xvec(k) = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(pi4*s% r(k)*s% r(k)))
             end do
          else ! log rho
             do k=1,nz
@@ -131,13 +131,13 @@
             end if
             if(s% TRho_switch_to_Column_Depth) then
                call do_accretion_mesh_borders(safe_log10(s% xmstar*sum(s% &
-                    dq(1:s% k_const_mass-1))/(4*pi*s% r(s% k_const_mass)&
+                    dq(1:s% k_const_mass-1))/(pi4*s% r(s% k_const_mass)&
                                      *s% r(s% k_const_mass))), &
                                     safe_log10(s% xmstar*sum(s% &
-                    dq(1:s% k_below_const_q-1))/(4*pi*s% r(s% k_below_const_q)&
+                    dq(1:s% k_below_const_q-1))/(pi4*s% r(s% k_below_const_q)&
                                      * s% r(s% k_below_const_q))), &
                                     safe_log10(s% xmstar*sum(s% &
-                    dq(1:s% k_below_just_added-1))/(4*pi*s% r(s% k_below_just_added)&
+                    dq(1:s% k_below_just_added-1))/(pi4*s% r(s% k_below_just_added)&
                                      * s% r(s% k_below_just_added))),&
                                     ymin, ymax)
             end if
@@ -583,7 +583,7 @@
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_flt(cnt, ypos, xpos0, dxpos, dxval, &
-                  'C core', s% c_core_mass)
+                  'CO core', s% co_core_mass)
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_flt(cnt, ypos, xpos0, dxpos, dxval, &

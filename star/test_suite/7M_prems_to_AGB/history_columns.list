@@ -47,8 +47,6 @@
       log_dt ! log10 time_step
       num_zones ! number of zones in the model
       
-      log_max_residual
-      log_residual_norm
       num_solver_iterations ! iterations at this step
       rel_E_err
       log_rel_E_err
@@ -96,9 +94,7 @@
    ! information about abundance transitions
    
       he_core_mass
-      c_core_mass
-      o_core_mass   
-      si_core_mass
+      co_core_mass
       fe_core_mass
 
    ! timescales

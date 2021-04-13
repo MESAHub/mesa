@@ -67,7 +67,6 @@
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
       
       use_compression_outer_BC = .true.
-      use_T_Paczynski_outer_BC = .true.
 
 ! mixing controls
       mixing_length_alpha = 1.9
@@ -112,6 +111,7 @@
       profile_interval = 100
       history_interval = 10
       terminal_interval = 10
+      
 
 / ! end of controls namelist
 

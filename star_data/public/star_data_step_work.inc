@@ -36,12 +36,10 @@
       real(dp), pointer :: rho(:) ! density
       real(dp), pointer :: lnd(:) ! log(rho)
       real(dp), pointer :: lnPgas(:) ! log(Pgas)
-      real(dp), pointer :: L(:)
-         ! L(k) is luminosity at outer edge of cell k
-      real(dp), pointer :: r(:)
-         ! r(k) is radius at outer edge of cell k
-      real(dp), pointer :: lnR(:)
-         ! lnR(k) is log(r(k))
+      real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
+      real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
+      real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
+      real(dp), pointer :: w(:) ! cell turbulent velocity.  only used when TDC_flag is true
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
       real(dp), pointer :: u(:) ! only used when u_flag is true
@@ -80,20 +78,19 @@
       real(dp), pointer :: erad(:) ! specific radiation energy (erg/g)
       real(dp), pointer :: Pgas(:) ! gas pressure (Pgas = Pion + Pelec)
       real(dp), pointer :: Prad(:) ! radiation pressure
-      real(dp), pointer :: P(:) ! total pressure (P = Prad + Pgas)
-      real(dp), pointer :: lnP(:) ! log(P)
+      real(dp), pointer :: Peos(:) ! eos pressure (Peos = Prad + Pgas)
+      real(dp), pointer :: lnPeos(:) ! log(Peos)
       real(dp), pointer :: grada(:)   ! d ln T / d ln P | adiabatic
       real(dp), pointer :: dE_dRho(:) ! dE_dRho at constant T&abundances
       real(dp), pointer :: Cv(:)   ! dE/dT at constant density&abundances
-      real(dp), pointer :: Cp(:)         ! heat capacity at constant pressure&abundances
-         ! Cp := dh_dT at constant P, specific heat at constant pressure
-         ! where h is enthalpy, h = E + P/Rho
+      real(dp), pointer :: Cp(:)         ! heat capacity at constant Peos&abundances
+         ! Cp := dh_dT at constant Peos, specific heat at constant pressure
+         ! where h is enthalpy, h = E + Peos/Rho
       real(dp), pointer :: lnS(:)   ! log(specific entropy)
       real(dp), pointer :: gamma1(:)      ! adiabatic coefficient.
          ! (d_ln(p)/d_ln(rho)) at constant entropy.
       real(dp), pointer :: gamma3(:)      ! gamma3 := 1 + dlnT_dlnRho at constant S, 
       real(dp), pointer :: eta(:)        ! electron degeneracy parameter
-      real(dp), pointer :: theta_e(:)    ! electron degeneracy factor for graboske screening
       real(dp), pointer :: gam(:)        ! plasma interaction parameter
       real(dp), pointer :: mu(:)         
          ! mean molecular weight per particle (ions + free electrons)
@@ -101,8 +98,8 @@
       real(dp), pointer :: phase(:) ! phase (0 for liquid, 1 for solid, in-between for blend)
       real(dp), pointer :: latent_ddlnT(:) ! latent heat of phase transition per unit lnT (erg/g) because we blur the transition
       real(dp), pointer :: latent_ddlnRho(:) ! latent heat of phase transition per unit lnRho (erg/g) because we blur the transition
-      real(dp), pointer :: chiRho(:) ! dlnP_dlnRho at constant T
-      real(dp), pointer :: chiT(:) ! dlnP_dlnT at constant Rho
+      real(dp), pointer :: chiRho(:) ! dlnPeos_dlnRho at constant T
+      real(dp), pointer :: chiT(:) ! dlnPeos_dlnT at constant Rho
       real(dp), pointer :: QQ(:) ! thermal expansion coefficient
       real(dp), pointer :: d_QQ_dlnd(:)
       real(dp), pointer :: d_QQ_dlnT(:)
@@ -118,10 +115,6 @@
       real(dp), pointer :: d_eos_dlnd(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dlnT(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dxa(:,:,:) ! (num_eos_d_dxa_results,species,nz)
-      real(dp), pointer :: d_eos_dabar(:,:) ! (num_eos_basic_results,nz)
-      real(dp), pointer :: d_eos_dzbar(:,:) ! (num_eos_basic_results,nz)
-      real(dp), pointer :: dlnRho_dlnPgas_const_T(:)    
-      real(dp), pointer :: dlnRho_dlnT_const_Pgas(:)  
 
       ! eos partials for use in calculating equation partials for Jacobian matrix
       ! calculated using partials of interpolating polynomials of lnPgas, lnE, lnS where appropriate
@@ -132,7 +125,7 @@
       real(dp), pointer :: dS_dRho_for_partials(:)
       real(dp), pointer :: dS_dT_for_partials(:)
       real(dp), pointer :: dlnE_dxa_for_partials(:,:) ! (species,nz)
-      real(dp), pointer :: dlnP_dxa_for_partials(:,:) ! (species,nz)
+      real(dp), pointer :: dlnPeos_dxa_for_partials(:,:) ! (species,nz)
       
       real(dp), pointer :: csound(:) ! at cell center -- set when call eos
       real(dp), pointer :: csound_face(:) ! interpolated 
@@ -144,16 +137,6 @@
       real(dp), pointer :: tau(:) ! optical depth at cell outer boundary
       real(dp), pointer :: lntau(:) ! log(tau)
       real(dp), pointer :: dr_div_csound(:) ! sound crossing time for cell
-
-      real(dp), pointer :: lnR_residual(:)
-      real(dp), pointer :: lnd_residual(:)
-      real(dp), pointer :: equL_residual(:)
-      real(dp), pointer :: E_residual(:)
-      real(dp), pointer :: Et_residual(:)
-      real(dp), pointer :: v_residual(:)
-      real(dp), pointer :: u_residual(:)
-      real(dp), pointer :: Vol_residual(:)
-      real(dp), pointer :: max_abs_xa_residual(:)
 
       real(dp), pointer :: ergs_error(:)
 
@@ -324,7 +307,7 @@
          d_extra_jdot_domega_00, d_extra_omegadot_domega_00, &
          d_extra_jdot_domega_p1, d_extra_omegadot_domega_p1
 
-      ! Fraley time centering
+      ! velocity time centering
       real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
       real(dp) :: d_vc_dv
    
@@ -342,20 +325,13 @@
       logical, pointer :: amr_split_merge_has_undergone_remesh(:)
 
       ! -T*Ds/Dt energy generation rate related to change in entropy
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: eps_grav_ad(:) ! '_ad' for auto diff
       real(dp), pointer :: eps_grav(:)
       ! partials
       real(dp), pointer, dimension(:) :: &
          d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1
       real(dp), pointer, dimension(:) :: &
          d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1
-      real(dp), pointer, dimension(:) :: &
-         d_eps_grav_dlnPgasm1_const_T, &
-         d_eps_grav_dlnPgas00_const_T, &
-         d_eps_grav_dlnPgasp1_const_T
-      real(dp), pointer, dimension(:) :: &
-         d_eps_grav_dlnTm1_const_Pgas, &
-         d_eps_grav_dlnT00_const_Pgas, &
-         d_eps_grav_dlnTp1_const_Pgas
       real(dp), pointer, dimension(:) :: &
          d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &
          d_eps_grav_dL00, d_eps_grav_dLp1, &
@@ -431,6 +407,9 @@
             ! Q_face = chiT_face/(T_face*chiRho_face)
          real(dp), pointer :: grad_superad_actual(:) ! face, actual dlnT/dlnP - grada
          
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            gradT_ad, gradr_ad, mlt_vc_ad ! 'ad' for auto_diff
+         
          real(dp), pointer :: actual_gradT(:) ! actual dlnT/dlnP (at boundary)
             ! (dT/T_face)/(dP/P_face) with face values interpolated by mass
          
@@ -463,35 +442,35 @@
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
-      ! Convective turbulent energy Eturb
+      ! Convective turbulent velocity w -- when TDC_flag is true
          
          real(dp), pointer, dimension(:) :: &
-            Eturb, Eturb_start, Pt, Eq, Uq, avQ, avQ_start, &
-            Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
+            Ptrb, Pvsc, Pvsc_start, Hp_face, Y_face, Y_face_start, PII, Chi, Eq, Uq, &
+            SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start
+         integer :: TDC_num_periods
+         real(dp) :: TDC_period, &
+            TDC_DeltaR, TDC_DeltaMag, TDC_GRPDV, TDC_GREKM, TDC_GREKM_avg_abs
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
          real(dp), pointer, dimension(:) :: &
-            Vol, Vol_start, w, w_start, Et, COUPL_start, &
-            Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
-            Hp_face, d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
+            Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
+            Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &               
+            d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
-            Y_face, d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
+            d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
                d_Y_face_dlndm1, d_Y_face_dlnTm1, &
-            PII, d_PII_dlnR, d_PII_dlnd00, d_PII_dlnT00, &
+            d_PII_dlnR, d_PII_dlnd00, d_PII_dlnT00, &
                d_PII_dlndm1, d_PII_dlnTm1, &
-            Chi, Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
+            Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
                d_Chi_dv00, d_Chi_dvp1, d_Chi_dlnR00, d_Chi_dlnRp1, &
-            f_Edd, rsp_mesh_function
+            f_Edd
          integer :: RSP_num_periods
          real(dp) :: RSP_dt, RSP_period, g_Edd, &
             rsp_DeltaR, rsp_DeltaMag, rsp_GRPDV, rsp_GREKM, rsp_GREKM_avg_abs
          real(dp), dimension(max_num_rsp_LINA_modes) :: &
             rsp_LINA_periods, rsp_LINA_growth_rates
       
-      ! convection velocity equation info
-
-         real(dp), pointer, dimension(:) :: conv_vel_residual
 
       ! adjusted (non-local) mixing info -- evaluated at start of step.
          
@@ -559,39 +538,18 @@
       real(dp), pointer :: eps_WD_sedimentation(:) ! (nz)
       real(dp), pointer :: eps_diffusion(:) ! (nz)
       real(dp), pointer :: g_field_element_diffusion(:) ! (nz)
-            
-
-      ! gradients expected from structure equations
-      ! to be compared to actual gradients in model
-      ! note: these may not be set when you are using hydro-dynamics
-      real(dp), pointer :: dL_dm_expected(:) ! expected difference across cell
-      real(dp), pointer :: dlnP_dm_expected(:) ! expected difference at outer boundary of cell    
-      real(dp), pointer :: dlnT_dm_expected(:) ! expected difference at outer boundary of cell    
       
       
       ! for Riemann solver      
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+         u_face_ad, P_face_ad ! 'ad' for auto_diff
       real(dp), pointer, dimension(:) :: &
-         u_face, &
-         d_uface_dlnR, &
-         d_uface_du00, &
-         d_uface_dum1, &
-         d_uface_dlnd00, &
-         d_uface_dlndm1, &
-         d_uface_dlnT00, &
-         d_uface_dlnTm1, &
-         d_uface_dw, &
-         RTI_du_diffusion_kick
+         d_uface_domega, &
+         RTI_du_diffusion_kick, &
+         u_face_start
       real(dp), pointer, dimension(:) :: &
-         P_face, &
-         d_Pface_dL, &
-         d_Pface_dlnR, &
-         d_Pface_du00, &
-         d_Pface_dum1, &
-         d_Pface_dlnd00, &
-         d_Pface_dlndm1, &
-         d_Pface_dlnT00, &
-         d_Pface_dlnTm1, &
-         d_Pface_dw
+         d_Pface_domega, &
+         P_face_start
       real(dp), pointer, dimension(:) :: &
          abs_du_div_cs, &
          abs_du_plus_cs
@@ -614,7 +572,7 @@
       real(dp) :: delta_Pg ! g-mode period spacing for l=1 (seconds)
          ! sqrt(2)*pi^2/(integral of brunt_N/r dr)
       real(dp) :: nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       real(dp) :: acoustic_cutoff ! 1e6*0.5*g*sqrt(gamma1*rho/P) at surface (micro Hz)
       ! asteroseismology
@@ -627,52 +585,16 @@
          ! defined at points in atmosphere
          ! atm_structure(:,1) is base of atmosphere
          ! atm_structure(:,atm_structure_num_pts) is top of atmosphere
-         
-      ! for time derivatives
-         
-         ! for calculating Lagrangian time derivatives using differences at constant m
-         ! holds values from previous model interpolated to new m(k)
-         real(dp), pointer :: lnd_for_d_dt_const_m(:)
-         real(dp), pointer :: lnT_for_d_dt_const_m(:)
-         real(dp), pointer :: lnR_for_d_dt_const_m(:)
-         real(dp), pointer :: Eturb_for_d_dt_const_m(:) ! only set when Eturb_flag is true
-         real(dp), pointer :: v_for_d_dt_const_m(:) ! only set when v_flag is true
-         real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
-         real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
-         real(dp), pointer :: ln_cvpv0_for_d_dt_const_m(:) ! only set when conv_vel_flag is true
-         
-         ! for calculating "Eulerian" time derivatives using differences at constant q
-         ! holds values from previous model interpolated to new q(k)
-         ! these are only used for eps_grav
-         real(dp), pointer :: lnd_for_d_dt_const_q(:)
-         real(dp), pointer :: lnT_for_d_dt_const_q(:)
-         real(dp), pointer :: ln_cvpv0_for_d_dt_const_q(:)
         
-      ! lagrangian time derivatives
+      ! changes in values for cells during solver iterations 
       
-         real(dp), pointer :: dlnd_dt(:)
-         real(dp), pointer :: dlnT_dt(:)
-         real(dp), pointer :: dlnR_dt(:)
-         real(dp), pointer :: dEturb_dt(:) ! only set when Eturb_flag is true
-         real(dp), pointer :: dv_dt(:) ! only set when v_flag is true
-         real(dp), pointer :: du_dt(:) ! only set when u_flag is true
-         real(dp), pointer :: dEt_dt(:) ! only used when RSP_flag is true
-         real(dp), pointer :: dln_cvpv0_dt(:) ! only set when conv_vel_flag is true
-         real(dp), pointer :: dj_rot_dt(:) ! only set when implicit_j_rot_flag is true
-         real(dp), pointer :: dalpha_RTI_dt(:) ! only set when alpha_RTI_flag is true
-         
-         ! these are only used for eps_grav
-         real(dp), pointer :: dlnd_dt_const_q(:)
-         real(dp), pointer :: dlnT_dt_const_q(:)
-         ! this is for the calculation of the time derivative of convective velocities
-         real(dp), pointer :: dln_cvpv0_dt_const_q(:)
-        
-      ! changes in values for cells during solver iterations
-         real(dp), pointer :: dxh_lnPgas(:) ! lnPgas(k) = dxh_lnPgas(k) + lnPgas_start(k); dxh_lnPgas from solver.
+         real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
          real(dp), pointer :: dxh_lnd(:) ! lnd(k) = dxh_lnd(k) + lnd_start(k); dxh_lnd from solver.
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
-         real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
-         real(dp), pointer :: dxh_Eturb(:) ! Eturb(k) = dxh_Eturb(k) + Eturb_start(k); dxh_Eturb from solver.
+         real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
+         real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
+         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_etrb from solver.
+         real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
@@ -902,35 +824,25 @@
       real(dp) :: he_core_omega_div_omega_crit
       integer :: he_core_k ! boundary is in this cell
       
-      real(dp) :: c_core_mass ! baryonic (Msun)
-      real(dp) :: c_core_radius ! Rsun
-      real(dp) :: c_core_lgT
-      real(dp) :: c_core_lgRho
-      real(dp) :: c_core_L ! Lsun
-      real(dp) :: c_core_v
-      real(dp) :: c_core_omega ! (s^-1)
-      real(dp) :: c_core_omega_div_omega_crit
-      integer :: c_core_k ! boundary is in this cell
+      real(dp) :: co_core_mass ! baryonic (Msun)
+      real(dp) :: co_core_radius ! Rsun
+      real(dp) :: co_core_lgT
+      real(dp) :: co_core_lgRho
+      real(dp) :: co_core_L ! Lsun
+      real(dp) :: co_core_v
+      real(dp) :: co_core_omega ! (s^-1)
+      real(dp) :: co_core_omega_div_omega_crit
+      integer :: co_core_k ! boundary is in this cell
       
-      real(dp) :: o_core_mass ! baryonic (Msun)
-      real(dp) :: o_core_radius ! Rsun
-      real(dp) :: o_core_lgT
-      real(dp) :: o_core_lgRho
-      real(dp) :: o_core_L ! Lsun
-      real(dp) :: o_core_v
-      real(dp) :: o_core_omega ! (s^-1)
-      real(dp) :: o_core_omega_div_omega_crit
-      integer :: o_core_k ! boundary is in this cell
-      
-      real(dp) :: si_core_mass ! baryonic (Msun)
-      real(dp) :: si_core_radius ! Rsun
-      real(dp) :: si_core_lgT
-      real(dp) :: si_core_lgRho
-      real(dp) :: si_core_L ! Lsun
-      real(dp) :: si_core_v
-      real(dp) :: si_core_omega ! (s^-1)
-      real(dp) :: si_core_omega_div_omega_crit
-      integer :: si_core_k ! boundary is in this cell
+      real(dp) :: one_core_mass ! baryonic (Msun)
+      real(dp) :: one_core_radius ! Rsun
+      real(dp) :: one_core_lgT
+      real(dp) :: one_core_lgRho
+      real(dp) :: one_core_L ! Lsun
+      real(dp) :: one_core_v
+      real(dp) :: one_core_omega ! (s^-1)
+      real(dp) :: one_core_omega_div_omega_crit
+      integer :: one_core_k ! boundary is in this cell
 
       real(dp) :: fe_core_mass ! baryonic (Msun)
       real(dp) :: fe_core_radius ! Rsun
@@ -1057,6 +969,8 @@
       real(dp) :: tau100_lgRho
       real(dp) :: tau100_L
 
+      real(dp) :: min_gamma1
+
       ! timescales
       real(dp) :: dynamic_timescale 
          ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
@@ -1077,15 +991,15 @@
    
       ! for solvers
       
-         integer, pointer :: hydro_iwork(:)
-         real(dp), pointer :: hydro_work(:)
+         integer, pointer :: solver_iwork(:)
+         real(dp), pointer :: solver_work(:)
          
          real(dp), pointer :: xh_start(:,:) ! (nvar_hydro,nz)
          real(dp), pointer :: xa_start(:,:) ! (species,nz)         
          real(dp), pointer :: xa_sub_xa_start(:,:) ! (species,nz)          
          real(dp), pointer :: lnd_start(:) ! (nz)
-         real(dp), pointer :: lnP_start(:) ! (nz)
-         real(dp), pointer :: P_start(:) ! (nz)
+         real(dp), pointer :: lnPeos_start(:) ! (nz)
+         real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)
          real(dp), pointer :: lnE_start(:) ! (nz)
@@ -1096,6 +1010,7 @@
          real(dp), pointer :: Pgas_start(:) ! (nz)
          real(dp), pointer :: lnS_start(:) ! (nz)
          real(dp), pointer :: lnR_start(:) ! (nz)
+         real(dp), pointer :: w_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: uface_start(:) ! (nz)
@@ -1161,9 +1076,6 @@
          integer :: burner_storage_sz_per_thread, burner_num_threads
          real(dp), pointer :: burner_storage(:)
             
-         real(dp), pointer :: solver_dx(:,:)
-         integer :: solver_iter, solver_adjust_iter
-            
          real(dp), pointer, dimension(:) :: & ! (nz)
             max_burn_correction, avg_burn_correction
          real(dp), pointer :: xa_extra1(:,:) ! (species,nz) -- for use by op split
@@ -1193,12 +1105,11 @@
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
+            RSP_just_set_velocities, previous_step_was_using_TDC, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
+            need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
-         real(dp) :: profile_age
          real(dp) :: h1_czb_mass
          real(dp) :: total_angular_momentum
          real(dp) :: total_abs_angular_momentum
@@ -1213,7 +1124,7 @@
          real(dp) :: initial_v_center
          real(dp) :: tau_center  
          real(dp) :: super_eddington_wind_mdot
-         real(dp) :: vsurf_wind_mdot
+         real(dp) :: max_conv_time_scale, max_QHSE_time_scale
          
          integer :: init_model_number
          integer :: start_H_envelope_base_k
@@ -1291,26 +1202,22 @@
       ! these arrays are NOT automatically managed during restarts
 
          integer, pointer, dimension(:) :: &
-            ixtra1_array, ixtra2_array, ixtra3_array, ixtra4_array, ixtra5_array
+            ixtra1_array, ixtra2_array, ixtra3_array, &
+            ixtra4_array, ixtra5_array, ixtra6_array
          real(dp), pointer, dimension(:) :: &
-            xtra1_array, xtra2_array, xtra3_array, xtra4_array, xtra5_array
+            xtra1_array, xtra2_array, xtra3_array, &
+            xtra4_array, xtra5_array, xtra6_array
 
 
-      ! equation residuals
+      ! equation residuals, etc
+      
          ! equ(i,k) is residual for equation i of cell k            
          real(dp), dimension(:,:), pointer :: equ ! (nvar,nz);  equ => equ1
          real(dp), dimension(:), pointer :: equ1 ! (nvar*nz); data for equ
-         
-      ! equation weights
-         ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
-         ! these are = 1d0 in most case, but are sometimes reduced to tell the solver "don't worry, be happy."
-         ! weight = 0d0 means just ignore this item in making decisions.
-         real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
-         real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
-         
-      ! equation Jacobian
+            ! pointer set by star_solver
+
          real(dp), dimension(:,:), pointer :: jacobian
-            ! NOT ALLOCATED. pointer set by enter_setmatrix
+            ! pointer set by enter_setmatrix
          
          real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! (nvar,nvar,nz) 
          ! dblk(i,j,k) = dequ(i,k)/dx(j,k)
@@ -1318,8 +1225,17 @@
          ! ublk(i,j,k) = dequ(i,k)/dx(j,k+1)
          
          real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
-            ! will be allocated or reallocated as necessary by solver.
-            ! deallocate when free_star
+
+         real(dp), pointer :: solver_dx(:,:), solver_dx1(:)
+         integer :: solver_iter, solver_adjust_iter
+         real(dp), pointer :: x_scale(:,:), x_scale1(:)
+
+         ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
+         ! these are = 1d0 in most case, but are sometimes reduced to tell the solver "don't worry, be happy."
+         ! weight = 0d0 means just ignore this item in making decisions.
+         real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
+         real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
+
          
       ! sizeB info
          integer :: max_zone1, max_var1, max_zone2, max_var2
@@ -1332,6 +1248,7 @@
       ! misc
          
          character (len=strlen) :: retry_message
+         integer :: retry_message_k
 
          real(dp), pointer :: eps_pre_mix(:) ! (nz)
          real(dp), pointer, dimension(:) :: burn_avg_epsnuc
@@ -1341,7 +1258,6 @@
          integer :: boost_mlt_alfa
          integer :: burn_nstep_max
          integer :: burn_nfcn_total
-         integer :: k_CpTMdot_lt_L
          integer :: dX_nuc_drop_max_k
          integer :: dX_nuc_drop_max_j
          integer :: solver_test_partials_var
@@ -1352,7 +1268,6 @@
          logical :: doing_solver_iterations
          logical :: doing_flash_wind
          logical :: doing_rlo_wind
-         logical :: doing_nova_wind
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          
@@ -1384,7 +1299,7 @@
          real(dp) :: total_angular_momentum_old
          real(dp) :: h1_czb_mass_old ! baryonic (Msun)
          real(dp) :: he_core_mass_old
-         real(dp) :: c_core_mass_old
+         real(dp) :: co_core_mass_old
          real(dp) :: Teff_old
          real(dp) :: center_eps_nuc_old
 
@@ -1397,7 +1312,7 @@
 
          logical, pointer :: eps_grav_form_for_energy_eqn(:)
          real(dp), pointer, dimension(:)  :: &
-            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, PdVdt
+            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, detrbdt
             
          real(dp) :: &
             total_internal_energy_old, &
@@ -1451,7 +1366,6 @@
             virial_thm_P_avg, &
             total_eps_grav, &
             total_eps_mdot, &
-            total_radiation, &
             work_outward_at_surface, &
             work_inward_at_center, &
             non_epsnuc_energy_change_from_split_burn, &
@@ -1461,18 +1375,16 @@
             total_WD_sedimentation_heating, &
             total_energy_from_diffusion, &
             total_extra_heating, &
-            error_in_energy_conservation, &
-            log_P_center
+            error_in_energy_conservation
          
          real(dp) :: &
-            log_P_center_old, &
             cumulative_energy_error_old, &
-            cumulative_extra_heating_old, &
-            total_radiation_old
+            cumulative_extra_heating_old
             
          real(dp) :: mesh_adjust_IE_conservation
          real(dp) :: mesh_adjust_PE_conservation
          real(dp) :: mesh_adjust_KE_conservation
+         real(dp) :: mesh_adjust_Eturb_conservation
          
          character (len=strlen) :: most_recent_photo_name
          
@@ -1492,9 +1404,9 @@
          real(dp), pointer :: extra_profile_col_vals(:,:) ! (nz,num_extra)
 
       ! system clock 
-         integer :: starting_system_clock_time
-         integer :: current_system_clock_time
-         integer :: system_clock_rate
+         integer(8) :: starting_system_clock_time
+         integer(8) :: current_system_clock_time
+         integer(8) :: system_clock_rate
          real(dp) :: total_elapsed_time ! (current - starting)/rate
          integer(8) :: system_clock_at_start_of_step
          

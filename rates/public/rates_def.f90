@@ -27,6 +27,7 @@
       use utils_def, only: integer_dict
       use const_def, only: dp
       use chem_def, only: iso_name_length, nuclide_data, npart
+      use auto_diff
       
       implicit none
 
@@ -722,6 +723,7 @@
       ! screening
       
       integer, parameter :: no_screening = 0
+      ! 1 was graboske screening so leave undefined so its an error if people keep trying to use it
       integer, parameter :: extended_screening = 2
          ! based on code from Frank Timmes
          ! extends the Graboske method using results from Alastuey and Jancovici (1978),
@@ -732,6 +734,7 @@
       integer, parameter :: chugunov_screening = 4
         ! based on code from Sam Jones
         ! Implements screening from Chugunov et al (2007) 
+      integer, parameter :: other_screening = 5 ! User defined screening
 
       type Screen_Info
          real(dp) :: temp
@@ -742,13 +745,7 @@
          real(dp) :: abar
          real(dp) :: z2bar
          real(dp) :: zbar13
-         real(dp) :: zbar0pt28
          real(dp) :: z1pt58bar
-         real(dp) :: ztilda ! sqrt(z2bar + zbar*theta_e)  ! (Dewitt eqn 4)
-         real(dp) :: ztilda0pt58
-         real(dp) :: Lambda0 ! = 1.88d8*sqrt(rho/(abar*T**3)) ! (Graboske eqn 19; mu_I = abar)
-         real(dp) :: Lambda0b ! Lambda0**0.86
-         real(dp) :: Lambda0_23 ! Lambda0**(2d0/3d0)
          real(dp) :: ytot
          real(dp) :: rr
          real(dp) :: tempi
@@ -770,25 +767,34 @@
          real(dp) :: ntot, a_e
          integer :: num_calls, num_cache_hits
       end type Screen_Info
+
+
+      interface
+         subroutine other_screening_interface(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
+            import dp, screen_info
+            implicit none
+      
+            type (Screen_Info), pointer :: sc ! See rates_def
+            real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
+            real(dp),intent(in) ::    a1, a2     !< mass numbers of reactants
+            real(dp),intent(out) ::   screen     !< on return, screening factor for this reaction
+            real(dp),intent(out) ::   dscreendt     !< on return, temperature derivative of the screening factor
+            real(dp),intent(out) ::   dscreendd    !< on return, density derivative of the screening factor
+            integer, intent(out) ::   ierr
+         
+         end subroutine other_screening_interface
+      end interface
       
       
       real(dp) :: reaclib_min_T9 ! for T9 < this, return 0 for reaclib strong rates
-      
-
-      ! integers to 1/3 (for graboske screening)
-      integer, parameter :: num_one_thirds = 60
-      real(dp) :: one_third_power(num_one_thirds)
-      ! integers to 1.86 (for graboske screening)
-      integer, parameter :: num_pow_186 = 60
-      real(dp) :: pow_186(num_pow_186)
-
 
       type (integer_dict), pointer :: reaction_names_dict
       
       logical :: have_finished_initialization = .false.
       logical :: rates_use_cache = .true.
 
-      
+      procedure (other_screening_interface), pointer :: &
+         rates_other_screening => null()
 
 
       ! choices for various rates
@@ -890,16 +896,8 @@
          real(dp) :: abar
          real(dp) :: z2bar
          real(dp) :: ye
-         real(dp) :: z52bar
-         real(dp) :: zbar13
-         real(dp) :: abari
-         real(dp) :: rr
-         real(dp) :: tempi
-         real(dp) :: dtempi
-         real(dp) :: deni
-         real(dp) :: pp
-         real(dp) :: rs
-         real(dp) :: gamma_e
+         type(auto_diff_real_2var_order1) :: rs
+         type(auto_diff_real_2var_order1) :: gamma_e
       end type Coulomb_Info
       
       
@@ -1188,12 +1186,6 @@
          integer, intent(out) :: ierr
          integer :: i         
          ierr = 0
-         do i=1,num_one_thirds
-            one_third_power(i) = pow(dble(i),1d0/3d0)
-         end do
-         do i=1,num_pow_186
-            pow_186(i) = pow(dble(i),1.86d0)
-         end do
          call set_rattab_range(5.30102999566398d0, 10.301029995664d0)
          
          reaclib_min_T9 = 1d-2 
@@ -1300,7 +1292,7 @@
       integer function get_num_reaction_inputs(ir)
          integer, intent(in) :: ir
          integer :: j
-         include 'formats.dek'
+         include 'formats'
          if (max_num_reaction_inputs == 3) then
             if (reaction_inputs(5,ir) /= 0) then
                get_num_reaction_inputs = 3

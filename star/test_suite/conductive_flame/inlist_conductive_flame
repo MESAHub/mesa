@@ -69,10 +69,8 @@
 
     ! set up constant pressure/temperature boundary conditions
       use_other_surface_PT = .true.
-      use_atm_PT_at_center_of_surface_cell = .true.
 
-    ! there's no surface here; ignore change in lgL_phot & lgL_surf
-      delta_lgL_phot_limit_L_min = 1d99
+    ! there's no surface here; ignore change in lgL_surf
       delta_lgL_limit_L_min = 1d99
 
     ! specify base metallicity for opacities
@@ -97,6 +95,9 @@
 
     ! we know rates are truncated above 1e10 K, so turn off warnings
       warn_rates_for_high_temp = .false.
+   
+    ! cannot include L corrections
+      include_L_in_correction_limits = .false.
 
       terminal_show_age_units = 'seconds'
 

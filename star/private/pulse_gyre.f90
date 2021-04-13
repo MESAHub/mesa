@@ -95,7 +95,7 @@ contains
     ! Determine data dimensiones
 
     if (add_atmosphere) then
-       call build_atm(s, ierr)
+       call build_atm(s, s%L(1), s%r(1), s%m_grav(1), s%cgrav(1), ierr)
        if (ierr /= 0) then
           write(*,*) 'failed in build_atm'
           return
@@ -294,7 +294,7 @@ contains
         r = s%r(k)
         m = s%m_grav(k)
         L = s%L(k)
-        P = eval_face(s%dq, s%P, k, 1, s%nz)
+        P = eval_face(s%dq, s%Peos, k, 1, s%nz)
         if (s%interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, k_a, k_b)
         else
@@ -361,7 +361,7 @@ contains
         r = 0d0
         m = 0d0
         L = 0d0
-        P = eval_center(s%rmid, s%P, 1, s%nz)
+        P = eval_center(s%rmid, s%Peos, 1, s%nz)
         if (s%interpolate_rho_for_pulse_data) then
            rho = eval_center(s%rmid, s%rho, k_a, k_b)
         else
@@ -370,7 +370,7 @@ contains
 
         ! at the centre d²P/dr² = -4πGρ²/3
         d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho**2
-        P = s%P(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+        P = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
         T = eval_center(s%rmid, s%T, 1, s%nz)
         N2 = 0d0
         Gamma_1 = eval_center(s%rmid, s%gamma1, k_a, k_b)

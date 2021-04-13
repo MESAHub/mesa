@@ -31,6 +31,7 @@
       use num_lib
       use utils_lib
       use mlt_get_results, only: Get_results
+      use auto_diff_support, only: wrap
 
       implicit none
 
@@ -75,6 +76,7 @@
             call do1_mlt_2(s, k, s% alpha_mlt(k), gradL_composition_term, &
                opacity, chiRho, chiT, Cp, grada, P, xh, &
                make_gradr_sticky_in_solver_iters, op_err)
+            call wrap_mlt_ad(s,k)
             if (op_err /= 0) then
                ierr = op_err
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
@@ -110,7 +112,60 @@
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             make_gradr_sticky_in_solver_iters, ierr)
+         call wrap_mlt_ad(s,k)
       end subroutine do1_mlt
+      
+      
+      subroutine wrap_mlt_ad(s,k)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: dlnR00, dlnTm1, dlnT00, dlndm1, dlnd00
+         dlnR00 = s% d_gradT_dlnR(k)
+         dlnTm1 = s% d_gradT_dlnTm1(k)
+         dlnT00 = s% d_gradT_dlnT00(k)
+         dlndm1 = s% d_gradT_dlndm1(k)
+         dlnd00 = s% d_gradT_dlnd00(k)
+         call wrap(s% gradT_ad(k), s% gradT(k), &
+            dlndm1, dlnd00, 0d0, &
+            dlnTm1, dlnT00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, dlnR00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradT_dL(k), 0d0, &
+            0d0, s% d_gradT_dln_cvpv0(k), 0d0, &   ! xtra1 is ln_cvpv0
+            0d0, s% d_gradT_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
+            0d0, 0d0, 0d0)
+         dlnR00 = s% d_mlt_vc_dlnR(k)
+         dlnTm1 = s% d_mlt_vc_dlnR(k)
+         dlnT00 = s% d_mlt_vc_dlnR(k)
+         dlndm1 = s% d_mlt_vc_dlnR(k)
+         dlnd00 = s% d_mlt_vc_dlnR(k)
+         call wrap(s% mlt_vc_ad(k), s% mlt_vc(k), &
+            dlndm1, dlnd00, 0d0, &
+            dlnTm1, dlnT00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, dlnR00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_mlt_vc_dL(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0)            
+         dlnR00 = s% d_gradr_dlnR(k)
+         dlnTm1 = s% d_gradr_dlnTm1(k)
+         dlnT00 = s% d_gradr_dlnT00(k)
+         dlndm1 = s% d_gradr_dlndm1(k)
+         dlnd00 = s% d_gradr_dlnd00(k)
+         call wrap(s% gradr_ad(k), s% gradr(k), &
+            dlndm1, dlnd00, 0d0, &
+            dlnTm1, dlnT00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, dlnR00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradr_dL(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradr_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
+            0d0, 0d0, 0d0)
+      end subroutine wrap_mlt_ad
 
 
       subroutine do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
@@ -166,11 +221,6 @@
          include 'formats'
 
          ierr = 0
-         if (s% gamma_law_hydro > 0d0) then  
-            call set_no_MLT_results
-            return
-         end if
-
          nz = s% nz
          
          if (k < 1 .or. k > nz) then
@@ -301,7 +351,7 @@
          gradL_composition_term = gradL_composition_term_in      
          rho_00 = s% rho(k)
          T_00 = s% T(k)
-         P_00 = s% P(k)
+         P_00 = s% Peos(k)
          chiRho_00 = s% chiRho(k)
          chiT_00 = s% chiT(k)
          chiRho_for_partials_00 = s% chiRho_for_partials(k)
@@ -339,7 +389,7 @@
          
             rho_m1 = s% rho(k-1)
             T_m1 = s% T(k-1)
-            P_m1 = s% P(k-1)
+            P_m1 = s% Peos(k-1)
             chiRho_m1 = s% chiRho(k-1)
             chiT_m1 = s% chiT(k-1)
             chiRho_for_partials_m1 = s% chiRho_for_partials(k-1)
@@ -645,15 +695,15 @@
          else
             Q_face = chiT_face/(T_face*chiRho_face)
             s% grad_superad(k) = &
-               4*pi*r*r*s% scale_height(k)*rho_face* &
-                  (Q_face/Cp_face*(s% P(k-1)-s% P(k)) - (s% lnT(k-1)-s% lnT(k)))/s% dm_bar(k)
+               pi4*r*r*s% scale_height(k)*rho_face* &
+                  (Q_face/Cp_face*(s% Peos(k-1)-s% Peos(k)) - (s% lnT(k-1)-s% lnT(k)))/s% dm_bar(k)
             ! grad_superad = area*Hp_face*rho_face*(Q_face/Cp_face*dP - dlogT)/dmbar
             ! Q_face = chiT_face/(T_face*chiRho_face)
-            if (abs(s% lnP(k-1)-s% lnP(k)) < 1d-10) then
+            if (abs(s% lnPeos(k-1)-s% lnPeos(k)) < 1d-10) then
                s% grad_superad_actual(k) = 0
             else
                s% grad_superad_actual(k) = &
-                  (s% lnT(k-1)-s% lnT(k))/(s% lnP(k-1)-s% lnP(k)) - grada_face
+                  (s% lnT(k-1)-s% lnT(k))/(s% lnPeos(k-1)-s% lnPeos(k)) - grada_face
             end if
          end if
 
@@ -874,11 +924,7 @@
             s% mlt_vc(k) = 0d0
             s% mlt_Gamma(k) = 0d0
             s% grada_face(k) = 0d0
-            if (s% zero_gravity) then
-               s% scale_height(k) = 0
-            else
-               s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
-            end if
+            s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0
             s% gradT(k) = 0d0
@@ -905,7 +951,7 @@
             s% mlt_mixing_length(k) = 0d0
             s% mlt_vc(k) = 0d0
             s% mlt_Gamma(k) = 0d0
-            s% grada_face(k) = 0d0
+            s% grada_face(k) = grada_face
             s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0
@@ -1122,7 +1168,7 @@
          if (ierr /= 0) return
 
          do k = 2, nz
-            dlnP(k) = s% lnP(k-1) - s% lnP(k)
+            dlnP(k) = s% lnPeos(k-1) - s% lnPeos(k)
             dlnd(k) = s% lnd(k-1) - s% lnd(k)
             dlnT(k) = s% lnT(k-1) - s% lnT(k)
          end do
@@ -1149,7 +1195,7 @@
          call smooth(s% grad_density,nz)
          call smooth(s% grad_temperature,nz)
 
-         if (s% use_Ledoux_criterion) then
+         if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
             do k=1,nz
                s% gradL_composition_term(k) = s% unsmoothed_brunt_B(k)
             end do

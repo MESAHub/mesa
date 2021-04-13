@@ -225,7 +225,7 @@
          type (Net_Info), pointer :: netinfo
          type (Net_General_Info), pointer :: g
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          told = 0
@@ -541,7 +541,7 @@
             logRho = burn_logRho
             
             call net_1_zone_burn_const_density( &
-               handle, species, num_reactions, &
+               net_handle, eos_handle, species, num_reactions, &
                0d0, burn_tend, xin, logT, logRho, &
                get_eos_info_for_burn_at_const_density, &
                rate_factors, weak_rate_factor, &
@@ -586,7 +586,7 @@
             end if
             
             call net_1_zone_burn_const_P( &
-               handle, eos_handle, species, num_reactions, &
+               net_handle, eos_handle, species, num_reactions, &
                solver_choice, starting_temp, xin, clip, &
                num_times, times, log10Ps_f1, &
                rate_factors, weak_rate_factor, &
@@ -625,7 +625,7 @@
             call set_nan(burn_work_array) ! TESTING
             
             call net_1_zone_burn( &
-               handle, species, num_reactions, 0d0, burn_tend, xin, &
+               net_handle, eos_handle, species, num_reactions, 0d0, burn_tend, xin, &
                num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
                rate_factors, weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
@@ -761,20 +761,23 @@
          
          
          subroutine get_eos_info_for_burn_at_const_density( &
-               z, xh, abar, zbar, xa, rho, logRho, T, logT, &
+               eos_handle, species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, &
                Cv, d_Cv_dlnT, eta, d_eta_dlnT, ierr)
-            use eos_lib, only: eos_get_helm_results
+            use eos_lib, only: eosDT_get
             use eos_def
+            integer, intent(in) :: eos_handle, species
+            integer, pointer :: chem_id(:) ! maps species to chem id
+            integer, pointer :: net_iso(:) ! maps chem id to species number
             real(dp), intent(in) :: &
-               z, xh, abar, zbar, xa(:), rho, logRho, T, logT
+               xa(:), rho, logRho, T, logT
             real(dp), intent(out) :: &
                Cv, d_Cv_dlnT, eta, d_eta_dlnT
             integer, intent(out) :: ierr
-            
-            real(dp) :: res(num_helm_results)
-      
-            real(dp), parameter :: coulomb_temp_cut = 1d6, coulomb_den_cut = 1d3
 
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
+            real(dp) :: d_dxa(num_eos_d_dxa_results,species)
+            
             include 'formats'
             ierr = 0
             
@@ -784,23 +787,22 @@
             d_eta_dlnT = burn_deta_dlnT
             
             if (burn_Cv <= 0d0 .or. burn_eta <= 0d0) then
-               call eos_get_helm_results( &
-                  xh, abar, zbar, rho, logRho, T, logT, &
-                  coulomb_temp_cut, coulomb_den_cut, &
-                  .true., .false., .false., &
-                  5d0, 4.5d0, & ! logT_ion_HELM, logT_neutral_HELM
-                  res, ierr)
+               call eosDT_get( &
+                  eos_handle, species, chem_id, net_iso, xa, &
+                  Rho, logRho, T, logT, &
+                  res, d_dlnd, d_dlnT, d_dxa, ierr)
+
                if (ierr /= 0) then
-                  write(*,*) 'failed in eos_get_helm_results'
+                  write(*,*) 'failed in eosDT_get'
                   return
                end if
                if (burn_Cv <= 0d0) then
-                  Cv = res(h_cv)
-                  d_Cv_dlnT = res(h_dcvdt)*T
+                  Cv = res(i_cv)
+                  d_Cv_dlnT = d_dlnT(i_cv)
                end if
                if (burn_eta <= 0d0) then
-                  eta = res(h_etaele)
-                  d_eta_dlnT = res(h_detat)*T
+                  eta = res(i_eta)
+                  d_eta_dlnT = d_dlnT(i_eta)
                end if
             end if
          
@@ -852,7 +854,7 @@
             character (len=256) :: buffer, string
             integer :: i, n, iounit, t, num_isos, id, k
             
-            include 'formats.dek'
+            include 'formats'
             
             ierr = 0
             write(*,*) 'read T Rho history from ' // trim(T_Rho_history_filename)
@@ -904,7 +906,7 @@
             character (len=256) :: buffer, string
             integer :: i, n, iounit, t, num_isos, id, k
             
-            include 'formats.dek'
+            include 'formats'
             
             write(*,*) 'read initial abundances from ' // trim(initial_abundances_filename)
             open(newunit=iounit, file=trim(initial_abundances_filename), &
@@ -975,7 +977,7 @@
             integer, pointer :: index(:) 
             integer :: j
             real(dp) :: xsum
-            include 'formats.dek'
+            include 'formats'
             v => v_t
             index => index_t
 
@@ -1088,7 +1090,7 @@
             type (Net_General_Info), pointer  :: g
             logical :: skip_jacobian
 
-            include 'formats.dek'
+            include 'formats'
          
             irtrn = 0
             if (time == 0) return
@@ -1151,7 +1153,7 @@
                T = exp10(logT)
                Rho = exp10(logRho)
          
-               call eosDT_get( &
+               call eosDT_get_legacy( &
                   eos_handle, Z, xh, abar, zbar, &
                   species, chem_id, net_iso, x, &
                   Rho, logRho, T, logT, &
@@ -1325,7 +1327,7 @@
          character (len=*), intent(in) :: net_file_in
          integer :: ierr, i
          
-         include 'formats.dek'
+         include 'formats'
          
          net_file = net_file_in
 
@@ -1517,7 +1519,7 @@
       character(len=*) :: filename
       logical, intent(in) :: qt
       
-      include 'formats.dek'
+      include 'formats'
       
       ! set defaults
       

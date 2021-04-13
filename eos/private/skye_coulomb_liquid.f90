@@ -5,6 +5,8 @@ module skye_coulomb_liquid
 
    implicit none
 
+   real(dp), parameter :: me_in_amu = me / amu
+   
    contains
 
    !> Calculates the free energy of a classical one-component
@@ -15,7 +17,7 @@ module skye_coulomb_liquid
    !! routine, which is based on the fits of Baiko & Yakolev 2019 (who were correcting relative
    !! to the DeWitt & Slattery fits).
    !!
-   !! @param g ion degeneracy parameter
+   !! @param g ion interaction parameter
    !! @param F non-ideal free energy
    function classical_ocp_liquid_free_energy(g) result(F)
       type(auto_diff_real_2var_order3), intent(in) :: g
@@ -57,10 +59,47 @@ module skye_coulomb_liquid
          real(dp), parameter :: Q4 = 22.7d0
          real(dp), parameter :: Q3 = (0.25d0 - Q1 / Q2) * Q4
 
-         eta = TPT / sqrt(3d0)
+         eta = TPT / sqrt(3d0) ! Note that this is the BK19 definition of eta. PC typically use eta = TPT.
 
          F = Q1 * eta - Q1 * Q2 * log(1d0 + eta / Q2) + 0.5d0 * Q3 * log(1d0 + pow2(eta) / Q4)
    end function quantum_ocp_liquid_free_energy_correction
+
+   !> Calculates the electron-ion screening corrections to the free energy
+   !! of a one-component plasma in the liquid phase using the fits of Potekhin & Chabrier 2013.
+   !!
+   !! @param Z ion charge
+   !! @param mi ion mass in amu
+   !! @param ge electron interaction parameter
+   !! @param rs non-dimensionalized electron radius
+   !! @param F non-ideal free energy
+   function ocp_liquid_screening_free_energy_correction(Z, mi, ge, rs) result(F)
+         real(dp), intent(in) :: Z, mi
+         type(auto_diff_real_2var_order3), intent(in) :: ge, rs
+
+         real(dp) :: cDH, cTF, a, b, nu, COTPT
+
+         type(auto_diff_real_2var_order3) :: TPT, g, g1, g2, h, gr, xr
+         type(auto_diff_real_2var_order3) :: F
+
+         a = 1.11d0 * pow(Z, 0.475d0)
+         b = 0.2d0 + 0.078d0 * pow2(log(Z))
+         nu = 1.16d0 + 0.08d0 * log(Z)
+         cDH = (Z / sqrt(3d0)) * (pow(1d0 + Z, 1.5d0) - 1d0 - pow(Z, 1.5d0))
+         cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pow(Z, 7d0/3d0) * (1d0 - pow(Z, -1d0/3d0) + 0.2d0 * pow(Z, -0.5d0))
+
+         g = ge * pow(Z, 5d0/3d0)
+         COTPT = sqrt(3d0 * me_in_amu / mi) / pow(Z, 7d0/6d0)
+         TPT = g * COTPT / sqrt(rs)
+
+         xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
+         gr = sqrt(1d0 + pow2(xr))
+         g1 = 1d0 + 0.78d0 * sqrt(ge / z) / (21d0 + ge * pow3(Z / rs))
+         g2 = 1d0 + ((Z - 1d0) / 9d0) * (1d0 + 1d0 / (0.001d0 * pow2(Z) + 2d0 * ge)) * (pow3(rs) / (1d0 + 6d0 * pow2(rs)))
+         h = (1d0 + 0.2d0 * pow2(xr)) / (1d0 + 0.18d0 * xr * pow(Z, -0.25d0) + 0.37d0 * pow(Z, -0.5d0) * pow2(xr) + 0.2d0 * pow2(xr))
+
+         F = -ge * (cDH * sqrt(ge) + cTF * a * pow(ge, nu) * g1 * h) / (1d0 + (b * sqrt(ge) + a * g2 * pow(ge, nu) / rs) / gr)
+
+   end function ocp_liquid_screening_free_energy_correction
 
 
    !> Calculates the correction to the linear mixing rule for a Coulomb liquid mixture.

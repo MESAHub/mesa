@@ -1,3 +1,9 @@
+.. _c13_pocket:
+
+**********
+c13_pocket
+**********
+
 This test suite case shows a 2.0 |Msun|, :math:`Z = 0.01` thermally
 pulsing AGB star undergoing third dredge up.  It is a
 re-implementation of the example shown in Section 7.2.1 of |MESA I|.

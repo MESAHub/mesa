@@ -91,7 +91,7 @@
 
       
       subroutine burn_const_density_1_zone( &
-            handle, species, nvar, num_reactions, t_start, t_end, &
+            net_handle, eos_handle, species, nvar, num_reactions, t_start, t_end, &
             starting_x, starting_log10T, log10Rho, &
             get_eos_info_for_burn_at_const_density, &
             rate_factors, weak_rate_factor, reaction_Qs, reaction_neuQs, &
@@ -112,7 +112,7 @@
          use net_initialize, only: work_size
          use net_approx21, only: approx21_nrat
          
-         integer, intent(in) :: handle, species, nvar, num_reactions
+         integer, intent(in) :: net_handle, eos_handle, species, nvar, num_reactions
          real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (species)
          real(dp), intent(in) :: starting_log10T, log10Rho
          interface
@@ -173,7 +173,7 @@
             rate_screened, rate_screened_dT, rate_screened_dRho
          integer :: iwork, cid
          
-         include 'formats.dek'
+         include 'formats'
          
          !dbg = .true.
          dbg = burn_dbg
@@ -209,7 +209,7 @@
          prev_lgRho = -1d99
          
          ierr = 0
-         call get_net_ptr(handle, g, ierr)
+         call get_net_ptr(net_handle, g, ierr)
          if (ierr /= 0) then
             write(*,*) 'invalid handle for burn_const_density_1_zone'
             return
@@ -385,9 +385,6 @@
             use net_eval, only: eval_net
             use rates_def, only: rates_reaction_id_max, i_rate, i_rate_dT, i_rate_dRho
             use interp_1d_lib, only: interp_value
-            use eos_def, only: num_helm_results, h_etaele, h_detat, h_Cv, h_dcvdt
-            use eos_lib, only: eos_get_helm_results
-            use chem_def, only: ih1
          
             real(dp) :: time, y(:), f(:)
             real(dp), pointer :: dfdy(:,:)
@@ -413,10 +410,9 @@
             
             real(dp), target :: x_a(nvar), dfdx_a(nvar,nvar)
             real(dp), pointer :: x(:), dfdx(:,:)
-            real(dp) :: res(num_helm_results)
             real(dp) :: d_eta_dlnRho
          
-            include 'formats.dek'
+            include 'formats'
          
             ierr = 0
 
@@ -449,7 +445,8 @@
                abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
                
             call get_eos_info_for_burn_at_const_density( &
-               z, xh, abar, zbar, x, rho, lgRho, T, lgT, &
+               eos_handle, species, g% chem_id, g% net_iso, x, &
+               Rho, lgRho, T, lgT, &
                Cv, d_Cv_dlnT, eta, d_eta_dlnT, ierr)
             if (ierr /= 0) then
                !write(*,*) 'failed in get_eos_info_for_burn_at_const_density'

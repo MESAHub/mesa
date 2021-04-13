@@ -216,12 +216,6 @@ module kap_def
       real(dp) :: kap_Type2_full_off_dZ ! Type2 is full off for dZ <= this
       real(dp) :: kap_Type2_full_on_dZ ! Type2 can be full on for dZ >= this
 
-      ! for logR > 1, we extrapolate the radiative opacities.
-      ! for low T, this can run into problems, so we need to clip logT when logR > 1.
-      real(dp) :: min_logT_for_logR_gt_1
-      ! this clipping doesn't apply to special low T tables
-      ! i.e. skip it if min logT in table is < 2.5
-      
       real(dp) :: logT_Compton_blend_hi, logR_Compton_blend_lo
 
       logical :: show_info

@@ -170,7 +170,7 @@
    ! kap_Type2_full_off_dZ
    ! ~~~~~~~~~~~~~~~~~~~~~
    ! kap_Type2_full_on_dZ
-   ! ~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~~~~
 
    ! Switch to Type1 if dZ too small ``(dZ = Z - Zbase)``.
    ! Type2 is full off for ``dZ <= kap_Type2_full_off_dZ``.

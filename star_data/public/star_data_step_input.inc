@@ -12,7 +12,7 @@
       integer :: nvar_chem ! the number of chemical abundance variables per zone
          ! = 0 for operator splitting with separate evolution of abundances
          ! = species to solve for all abundances solved coupled with structure
-      integer :: nvar ! = nvar_hydro + nvar_chem
+      integer :: nvar_total ! = nvar_hydro + nvar_chem
       integer :: nz ! the number of zones in the model
       
       ! inner boundary
@@ -51,6 +51,7 @@
          logical :: rotation_flag ! true for rotation variables     
          logical :: RTI_flag ! true for Rayleigh-Taylor instabilities     
          logical :: RSP_flag ! true if we using RSP      
+         logical :: TDC_flag ! true for turbulent velocity as a solver variable    
 
       ! index definitions for the variables (= 0 if variable not in use)
          integer :: i_lnd ! ln(cell density average by mass)
@@ -60,7 +61,8 @@
          integer :: i_v ! Lagrangian velocity at outer face of cell
          integer :: i_u ! Lagrangian velocity at center of cell
          integer :: i_alpha_RTI ! alpha for Rayleigh-Taylor instabilities
-         integer :: i_eturb_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
+         integer :: i_Et_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
+         integer :: i_w ! cell turbulent velocity. only when TDC_flag is true.
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r
@@ -70,7 +72,8 @@
          integer :: i_dlnE_dt ! energy conservation
          integer :: i_equL ! luminosity
          integer :: i_dalpha_RTI_dt ! alpha for Rayleigh-Taylor instabilities
-         integer :: i_deturb_RSP_dt, i_derad_RSP_dt, i_dFr_RSP_dt ! only when RSP_flag is true.
+         integer :: i_dEt_RSP_dt, i_derad_RSP_dt, i_dFr_RSP_dt ! only when RSP_flag is true.
+         integer :: i_detrb_dt ! turbulent energy equation. only when TDC_flag is true.
 
       ! names of variables and equations
          character (len=name_len), dimension(:), pointer :: nameofvar, nameofequ ! (nvar)
@@ -142,6 +145,7 @@
          logical :: am_nu_rot_flag ! smooth am_nu_rot like D_omega
          logical :: was_in_implicit_wind_limit
          logical :: rsp_have_set_velocities
+         logical :: using_TDC ! at start of step, this refers to the previous step
          
          integer :: total_num_solver_iterations, total_num_solver_relax_iterations
          integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made
@@ -160,24 +164,21 @@
          real(dp) :: power_z_burn
          real(dp) :: power_photo
    
+      ! for read_model/write_model
+         logical :: have_previous_conv_vel
    
-      ! experimental work in progress.  not for public use yet.
+      ! experimental work in progress.
       
          logical :: conv_vel_flag ! true for conv_vel as a solver variable     
          logical :: w_div_wc_flag ! true for w_div_wc as a solver variable     
          logical :: j_rot_flag ! true for j_rot as a solver variable     
-         logical :: Eturb_flag ! true for turbulent energy as a solver variable    
 
          integer :: i_ln_cvpv0 ! ln(conv_vel + v0) at face of cell. v0 is an arbitrary user defined value.
          integer :: i_w_div_wc ! ratio of omega to critical value without the Eddington factor
          integer :: i_j_rot ! specific angular momentum associated to cell face
-         integer :: i_eturb ! cell specific turbulent energy. only when Eturb_flag is true.
 
          integer :: i_dln_cvpv0_dt ! equation for convection velocities
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
-         integer :: i_deturb_dt ! turbulent energy equation. only when Eturb_flag is true.
-
-         logical :: have_previous_conv_vel ! only needed when set conv_vel_flag true
 
 

@@ -12,9 +12,6 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-#   eospteh_load_tables.f90 \
-#   eospteh_eval.f90 \
-
 SRCS = \
    eos_def.f90 \
    eos_blend.f90 \
@@ -33,7 +30,6 @@ SRCS = \
    helm.f90 \
    gauss_fermi.f90 \
    eosdt_load_tables.f90 \
-   eospt_load_tables.f90 \
    eoscms_eval.f90 \
    eospc_eval.f90 \
    eosdt_support.f90 \
@@ -99,14 +95,6 @@ COMPILE_FIXED = $(COMPILE_TO_DEPLOY) $(FCfixed) $(MOD_INCLUDES)
 COMPILE_FIXED_LEGACY = $(filter-out -std=f2008, $(COMPILE_FIXED))
 
 COMPILE_CMD = $(COMPILE)
-
-p_eos.o : p_eos.f
-ifneq ($(QUIET),)
-	@echo COMPILE_FIXED $<
-	@$(COMPILE_FIXED) $(FCfree) $<
-else
-	$(COMPILE_FIXED) $(FCfree) $<
-endif
 
 %.o : %.mod
 

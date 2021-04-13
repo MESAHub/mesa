@@ -91,9 +91,6 @@
    velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s
    
-   dr_dt ! time derivative of radius at fixed mass coordinate (Langranian)
-   dv_dt ! time derivative of velocity at fixed mass coordinate (Langranian)
-   dlnR_dt ! time derivative of log(radius) at fixed mass coordinate (Langranian)
    log_sig_RTI
 
    v_div_csound ! velocity divided by sound speed
@@ -125,7 +122,6 @@
    !logS ! log10(specific entropy)
    !gamma1 ! dlnP_dlnRho at constant S
    !gamma3 ! gamma3 - 1 = dlnT_dlnRho at constant S
-   !theta_e ! electron degeneracy factor for graboske screening
    !gam ! plasma interaction parameter (> 160 or so means starting crystallization)
    free_e ! free_e is mean number of free electrons per nucleon
    logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon

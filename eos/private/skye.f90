@@ -11,7 +11,7 @@ module skye
       
       
       private
-      public :: Get_Skye_EOS_Results, Get_Skye_alfa, get_Skye_for_eosdt
+      public :: Get_Skye_EOS_Results, Get_Skye_alfa, Get_Skye_alfa_simple, get_Skye_for_eosdt
 
       contains
 
@@ -43,10 +43,10 @@ module skye
          big = 12d0
          skye_blend_width = 0.1d0
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = 8d0
+         bounds(1,2) = 7.5d0
 
          bounds(2,1) = 4d0
-         bounds(2,2) = 8d0
+         bounds(2,2) = 7.5d0
 
          bounds(3,1) = 0.6d0
          bounds(3,2) = 6.2d0
@@ -88,6 +88,63 @@ module skye
          d_alfa_dlogT = blend%d1val2
 
       end subroutine Get_Skye_alfa
+
+
+      subroutine Get_Skye_alfa_simple( &
+            rq, logRho, logT, Z, abar, zbar, &
+            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+            ierr)
+         use const_def
+         use eos_blend
+         type (EoS_General_Info), pointer :: rq
+         real(dp), intent(in) :: logRho, logT, Z, abar, zbar
+         real(dp), intent(out) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_2var_order1) :: logT_auto, logRho_auto
+         type(auto_diff_real_2var_order1) :: blend, blend_logT, blend_logRho
+
+         include 'formats'
+
+         ierr = 0
+
+         ! logRho is val1
+         logRho_auto% val = logRho
+         logRho_auto% d1val1 = 1d0
+         logRho_auto% d1val2 = 0d0
+
+         ! logT is val2
+         logT_auto% val = logT
+         logT_auto% d1val1 = 0d0
+         logT_auto% d1val2 = 1d0
+
+         ! logT blend
+         if (logT_auto < rq% logT_min_for_any_Skye) then
+            blend_logT = 0d0
+         else if (logT_auto <= rq% logT_min_for_all_Skye) then
+            blend_logT = (logT_auto - rQ% logT_min_for_any_Skye) / (rq% logT_min_for_all_Skye - rq% logT_min_for_any_Skye)
+         else if (logT_auto > rq% logT_min_for_all_Skye) then
+            blend_logT = 1d0
+         end if
+
+
+         ! logRho blend
+         if (logRho_auto < rq% logRho_min_for_any_Skye) then
+            blend_logRho = 0d0
+         else if (logRho_auto <= rq% logRho_min_for_all_Skye) then
+            blend_logRho = (logRho_auto - rQ% logRho_min_for_any_Skye) / (rq% logRho_min_for_all_Skye - rq% logRho_min_for_any_Skye)
+         else if (logRho_auto > rq% logRho_min_for_all_Skye) then
+            blend_logRho = 1d0
+         end if
+
+         ! combine blends
+         blend = (1d0 - blend_logRho) * (1d0 - blend_logT)
+
+         alfa = blend% val
+         d_alfa_dlogRho = blend% d1val1
+         d_alfa_dlogT = blend% d1val2
+
+      end subroutine get_Skye_alfa_simple
 
 
       subroutine get_Skye_for_eosdt(handle, dbg, Z, X, abar, zbar, species, chem_id, net_iso, xa, &
@@ -137,14 +194,15 @@ module skye
          
          real(dp) :: logT_ion, logT_neutral
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
          call skye_eos( &
             T, Rho, X, abar, zbar, &
             rq%Skye_min_gamma_for_solid, rq%Skye_max_gamma_for_liquid, &
-            rq%mass_fraction_limit_for_Skye, species, chem_id, xa, &
+            rq%Skye_solid_mixing_rule, rq%mass_fraction_limit_for_Skye, &
+            species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
          ! composition derivatives not provided
@@ -152,7 +210,7 @@ module skye
 
          if (ierr /= 0) then
             if (dbg) then
-               write(*,*) 'failed in Get_Skye_EOS_Resultskye_EOS'
+               write(*,*) 'failed in Get_Skye_EOS_Results'
                write(*,1) 'T', T
                write(*,1) 'logT', logT
                write(*,1) 'Rho', Rho
@@ -191,6 +249,7 @@ module skye
       subroutine skye_eos( &
             temp_in, den_in, Xfrac, abar, zbar,  &
             Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
+            Skye_solid_mixing_rule, &
             mass_fraction_limit, species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
@@ -210,18 +269,19 @@ module skye
          real(dp), intent(in) :: xa(:)
          real(dp), intent(in) :: temp_in, den_in, mass_fraction_limit, Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid
          real(dp), intent(in) :: Xfrac, abar, zbar
+         character(len=128), intent(in) :: Skye_solid_mixing_rule
          integer, intent(out) :: ierr
          real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(out), dimension(nv, species) :: d_dxa
          
          integer :: relevant_species, lookup(species)
          type(auto_diff_real_2var_order3) :: temp, logtemp, den, logden, din
-         real(dp) :: AZION(species), ACMI(species), select_xa(species), ya(species)
+         real(dp) :: AZION(species), ACMI(species), A(species), select_xa(species), ya(species)
          type (Helm_Table), pointer :: ht
          real(dp) :: ytot1, ye, norm
          type(auto_diff_real_2var_order3) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
          type(auto_diff_real_2var_order3) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
-         type(auto_diff_real_2var_order3) :: pele, eele, eep, sele
+         type(auto_diff_real_2var_order3) :: F_ele
 
          ht => eos_ht
 
@@ -244,9 +304,7 @@ module skye
          F_ion_gas = 0d0
          F_ideal_ion = 0d0
          F_coul = 0d0
-         sele = 0d0
-         pele = 0d0
-         eele = 0d0
+         F_ele = 0d0
 
          ! Radiation free energy, independent of composition
          F_rad = compute_F_rad(temp, den)
@@ -259,6 +317,7 @@ module skye
                relevant_species = relevant_species + 1
                AZION(relevant_species) = chem_isos% Z(chem_id(j))
                ACMI(relevant_species) = chem_isos% W(chem_id(j))
+               A(relevant_species) = chem_isos% Z_plus_N(chem_id(j))
                select_xa(relevant_species) = xa(j)
                norm = norm + xa(j)
             end if
@@ -272,7 +331,7 @@ module skye
          ! Compute number fractions
          norm = 0d0
          do j=1,relevant_species
-            ya(j) = select_xa(j) / ACMI(j)
+            ya(j) = select_xa(j) / A(j)
             norm = norm + ya(j)
          end do
          do j=1,relevant_species
@@ -285,7 +344,7 @@ module skye
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
          call compute_ideal_ele(temp%val, den%val, din%val, logtemp%val, logden%val, zbar, ytot1, ye, ht, &
-                               sele, eele, pele, etaele, xnefer, ierr)
+                               F_ele, etaele, xnefer, ierr)
 
          xnefer = compute_xne(den, ytot1, zbar)
 
@@ -298,13 +357,11 @@ module skye
          call nonideal_corrections(relevant_species, ya(1:relevant_species), &
                                      AZION(1:relevant_species), ACMI(1:relevant_species), &
                                      Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
-                                     den, temp, xnefer, abar, &
+                                     Skye_solid_mixing_rule, den, temp, xnefer, abar, &
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
-
-         call  pack_for_export(F_ideal_ion, F_coul, F_rad, temp, den, xnefer, etaele, abar, zbar, &
-                                 pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
-                                 res, d_dlnd, d_dlnT)
+         call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
+                                 phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
 
       end subroutine skye_eos
 

@@ -57,7 +57,7 @@
          real(dp) :: alfa, beta, d_alfa_dlnT, alfa_hi_Z, beta_hi_Z, d_alfa_hi_Z_dlnT
          integer :: i, ir, cid
 
-         include 'formats.dek'
+         include 'formats'
          
          call do_eval_weaklib_reaction_info( &
             n, ids, T9, YeRho, &
@@ -168,7 +168,7 @@
 
          class(weak_rate_table), pointer :: table
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          
@@ -252,7 +252,6 @@
             out = weak_rhs_nuclide_id(ir)
             Qx = chem_isos% mass_excess(in) - chem_isos% mass_excess(out)
 
-#ifdef USE_HDF5
             if (use_suzuki_tables) then
                ! now, if there's a suzuki reaction, use that one instead
                call create_weak_dict_key(weak_lhs_nuclide_name(ir), weak_rhs_nuclide_name(ir), key)
@@ -281,7 +280,6 @@
                   ierr = 0
                end if
             end if
-#endif
 
           ! neg is true for electron capture and positron emission
           neg = ((chem_isos% Z(in) - chem_isos% Z(out)) == 1.0d0)
@@ -328,7 +326,7 @@
          contains
          
          subroutine show_stuff
-            include 'formats.dek'
+            include 'formats'
             write(*,1) 'T9', T9
             write(*,1) 'lYeRho', lYeRho
             write(*,1) 'eta', eta

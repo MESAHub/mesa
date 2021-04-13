@@ -32,7 +32,7 @@
       use eosDT_load_tables, only: load_single_eosDT_table_by_id
       use eos_HELM_eval
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
-      use skye, only: get_Skye_for_eosdt, get_Skye_alfa
+      use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
 
 
       implicit none
@@ -96,8 +96,7 @@
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             arho, alogrho, atemp, alogtemp, &
-            res, d_dlnd, d_dlnT, d_dxa, &
-            Pgas, Prad, energy, entropy, ierr)
+            res, d_dlnd, d_dlnT, d_dxa, ierr)
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, X, abar, zbar
          integer, intent(in) :: which_eos, species
@@ -106,7 +105,6 @@
          real(dp), intent(in) :: arho, alogrho, atemp, alogtemp
          real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
-         real(dp), intent(out) :: Pgas, Prad, energy, entropy
          integer, intent(out) :: ierr
          
          real(dp) :: rho, logRho, T, logT
@@ -141,52 +139,53 @@
             ierr = -1
             return
          end if
-         
-         if (which_eos == 1) then !
-            call get_opal_scvh_for_eosdt( &
-               rq% handle, dbg, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               rho, logRho, T, logT, 1d0, &
-               res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
-         else if (which_eos == 2) then !
+
+         select case(which_eos)
+         case(i_eos_HELM)
             call get_helm_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 4) then !
-            call get_PC_for_eosdt( &
+         case(i_eos_OPAL_SCVH)
+            call get_opal_scvh_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 5) then !
+         case(i_eos_FreeEOS)
             call get_FreeEOS_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 6) then !
-            call get_CMS_for_eosdt( &
+         case(i_eos_PC)
+            call get_PC_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 7) then !
+         case(i_eos_Skye)
             call get_Skye_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else
+         case(i_eos_CMS)
+            call get_CMS_for_eosdt( &
+               rq% handle, dbg, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, 1d0, &
+               res, d_dlnd, d_dlnT, d_dxa, &
+               skip, ierr)
+         case default
             ierr = -1
-         end if
+         end select
          
          if (ierr /= 0) then
             write(*,*) 'failed in Test_one_eosDT_component', which_eos
@@ -198,11 +197,6 @@
             return
          end if
          
-         Pgas = exp(res(i_lnPgas))
-         Prad = crad*T*T*T*T/3d0
-         energy = exp(res(i_lnE))
-         entropy = exp(res(i_lnS))
-         
       end subroutine Test_one_eosDT_component
 
 
@@ -210,8 +204,7 @@
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             arho, alogrho, atemp, alogtemp, &
-            res, d_dlnd, d_dlnT, d_dxa, &
-            Pgas, Prad, energy, entropy, ierr)
+            res, d_dlnd, d_dlnT, d_dxa, ierr)
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, X, abar, zbar          
          integer, intent(in) :: species
@@ -220,7 +213,6 @@
          real(dp), intent(in) :: arho, alogrho, atemp, alogtemp
          real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
-         real(dp), intent(out) :: Pgas, Prad, energy, entropy
          integer, intent(out) :: ierr
          
          real(dp) :: rho, logRho, T, logT
@@ -273,11 +265,6 @@
          if (skip) ierr = -1
          if (ierr /= 0) return
          
-         Pgas = exp(res(i_lnPgas))
-         Prad = crad*T*T*T*T/3d0
-         energy = exp(res(i_lnE))
-         entropy = exp(res(i_lnS))
-         
          if (eos_test_partials) then   
             eos_test_partials_val = abar
             eos_test_partials_dval_dx = 0
@@ -316,11 +303,17 @@
          ierr = 0
          rq => eos_handles(handle)
 
-         call Get_CMS_alfa( & 
-            rq, logRho, logT, Z, abar, zbar, &
-            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-            ierr)
-         if (ierr /= 0) return
+         if (rq% use_CMS) then
+            call Get_CMS_alfa( &
+               rq, logRho, logT, Z, abar, zbar, &
+               alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+               ierr)
+            if (ierr /= 0) return
+         else
+            alfa = 1d0 ! no CMS
+            d_alfa_dlogT = 0d0
+            d_alfa_dlogRho = 0d0
+         end if
          
          if (dbg) write(*,1) 'CMS', (1d0 - alfa)*remaining_fraction
          
@@ -371,10 +364,17 @@
          rq => eos_handles(handle)
 
          if (rq% use_Skye) then
-            call Get_Skye_alfa( & 
-               rq, logRho, logT, Z, abar, zbar, &
-               alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-               ierr)
+            if (rq% use_simple_Skye_blends) then
+               call Get_Skye_alfa_simple( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                  ierr)
+            else
+               call Get_Skye_alfa( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                  ierr)
+            end if
             if (ierr /= 0) return               
          else
             alfa = 1d0 ! no Skye
@@ -861,7 +861,7 @@
          
          logical :: debug
          
-         include 'formats.dek' 
+         include 'formats'
 
          logRho1_max = 3.71d0
 
@@ -1181,7 +1181,7 @@
             
             real(dp) :: zfactor
             
-            include 'formats.dek'
+            include 'formats'
             
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0
@@ -1429,7 +1429,7 @@
 
          integer :: iz, j, ci
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          tiny = rq% tiny_fuzz
@@ -1552,7 +1552,7 @@
          logical, parameter :: dbg_for_X = dbg ! .or. .true.
          logical :: what_we_use_is_equal_spaced
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          tiny = rq% tiny_fuzz
@@ -1886,7 +1886,7 @@
          logical, parameter :: show = .false.
          real(dp) :: logRho, logT, logQ
          
-         include 'formats.dek'
+         include 'formats'
 
          logRho = logRho_in
          logT = logT_in
@@ -2417,8 +2417,13 @@
             call Get_eosDT_Results(rq, Z, XH1, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   rho, logRho, T, logT, &
-                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, &
-                  Pgas, Prad, energy, entropy, ierr)
+                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, ierr)
+
+            Pgas = exp(res(i_lnPgas))
+            Prad = crad*T*T*T*T/3d0
+            energy = exp(res(i_lnE))
+            entropy = exp(res(i_lnS))
+
             if (ierr /= 0) then
                if (.false.) then
                   write(*,*) 'Get_eosDT_Results returned ierr', ierr

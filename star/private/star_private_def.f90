@@ -41,8 +41,6 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-      real(dp), parameter :: min_Eturb = 1d-20, min_Eturb_pow_1_pt_5 = 1d-30
-
 
       contains
 
@@ -100,6 +98,8 @@
          termination_code_str(t_HB_limit) = 'HB_limit'
          termination_code_str(t_star_mass_min_limit) = 'star_mass_min_limit'
          termination_code_str(t_star_mass_max_limit) = 'star_mass_max_limit'
+         termination_code_str(t_remnant_mass_min_limit) = 'remnant_mass_min_limit'
+         termination_code_str(t_ejecta_mass_max_limit) = 'ejecta_mass_max_limit'
          
          termination_code_str(t_star_species_mass_min_limit) = 'star_species_mass_min_limit'
          termination_code_str(t_star_species_mass_max_limit) = 'star_species_mass_max_limit'
@@ -110,9 +110,8 @@
          termination_code_str(t_envelope_fraction_left_limit) = 'envelope_fraction_left_limit'
 
          termination_code_str(t_he_core_mass_limit) = 'he_core_mass_limit'
-         termination_code_str(t_c_core_mass_limit) = 'c_core_mass_limit'
-         termination_code_str(t_o_core_mass_limit) = 'o_core_mass_limit'
-         termination_code_str(t_si_core_mass_limit) = 'si_core_mass_limit'
+         termination_code_str(t_co_core_mass_limit) = 'co_core_mass_limit'
+         termination_code_str(t_one_core_mass_limit) = 'one_core_mass_limit'
          termination_code_str(t_fe_core_mass_limit) = 'fe_core_mass_limit'
          termination_code_str(t_neutron_rich_core_mass_limit) = 'neutron_rich_core_mass_limit'
 
@@ -135,6 +134,8 @@
          termination_code_str(t_log_Teff_upper_limit) = 'log_Teff_upper_limit'
          termination_code_str(t_log_Tsurf_lower_limit) = 'log_Tsurf_lower_limit'
          termination_code_str(t_log_Tsurf_upper_limit) = 'log_Tsurf_upper_limit'
+         termination_code_str(t_log_Rsurf_lower_limit) = 'log_Rsurf_lower_limit'
+         termination_code_str(t_log_Rsurf_upper_limit) = 'log_Rsurf_upper_limit'
          termination_code_str(t_log_Psurf_lower_limit) = 'log_Psurf_lower_limit'
          termination_code_str(t_log_Psurf_upper_limit) = 'log_Psurf_upper_limit'
          termination_code_str(t_log_Dsurf_lower_limit) = 'log_Dsurf_lower_limit'
@@ -151,7 +152,6 @@
          termination_code_str(t_power_h_burn_lower_limit) = 'power_h_burn_lower_limit'
          termination_code_str(t_power_he_burn_lower_limit) = 'power_he_burn_lower_limit'
          termination_code_str(t_power_z_burn_lower_limit) = 'power_z_burn_lower_limit'
-         termination_code_str(t_phase_of_evolution_stop) = 'phase_of_evolution_stop'
          termination_code_str(t_center_R_lower_limit) = 'center_R_lower_limit'
          termination_code_str(t_center_Ye_lower_limit) = 'center_Ye_lower_limit'
          termination_code_str(t_fe_core_infall_limit) = 'fe_core_infall_limit'
@@ -238,13 +238,10 @@
          dt_why_str(Tlim_struc) = 'varcontrol'
          dt_why_str(Tlim_max_timestep_factor) = 'max increase'
          dt_why_str(Tlim_min_timestep_factor) = 'max decrease'
-         dt_why_str(Tlim_solver) = 'solver iters'
+         dt_why_str(Tlim_solver) = 'solver'
          dt_why_str(Tlim_num_burn_steps) = 'burn steps'
          dt_why_str(Tlim_num_diff_solver_steps) = 'diff steps'
          dt_why_str(Tlim_num_diff_solver_iters) = 'diff iters'
-         dt_why_str(Tlim_burn_max_num_substeps) = 'burn steps'
-         dt_why_str(Tlim_burn_max_num_iters) = 'burn iters'
-         dt_why_str(Tlim_max_mix_fixup) = 'mix fixup'
          dt_why_str(Tlim_dH) = 'dH'
          dt_why_str(Tlim_dHe) = 'dHe'
          dt_why_str(Tlim_dHe3) = 'dHe3'
@@ -263,9 +260,7 @@
          dt_why_str(Tlim_dlgL_H) = 'Lnuc_H'
          dt_why_str(Tlim_dlgL_He) = 'Lnuc_He'
          dt_why_str(Tlim_dlgL_z) = 'Lnuc_z'
-         dt_why_str(Tlim_dlgL_photo) = 'Lnuc_photo'
          dt_why_str(Tlim_dlgL_nuc) = 'Lnuc'
-         dt_why_str(Tlim_dvsurf_kms) = 'vsurf'
          dt_why_str(Tlim_dlgTeff) = 'lgTeff'
          dt_why_str(Tlim_dlgRho_cntr) = 'lgRho_cntr'
          dt_why_str(Tlim_dlgT_max) = 'lgT_max'
@@ -275,12 +270,12 @@
          dt_why_str(Tlim_dlog_eps_nuc) = 'log_eps_nuc'
          dt_why_str(Tlim_lg_XH_cntr) = 'lg_XH_cntr'
          dt_why_str(Tlim_dmstar) = 'delta_mstar'
+         dt_why_str(Tlim_dt_div_dt_cell_collapse) = 'dt_collapse'
          dt_why_str(Tlim_dt_div_min_dr_div_cs) = 'min_dr_div_cs'
-         dt_why_str(Tlim_lgL_phot) = 'lgL_phot'
          dt_why_str(Tlim_lgL) = 'lgL'
          dt_why_str(Tlim_max_timestep) = 'max_dt'
          dt_why_str(Tlim_timestep_hold) = 'hold'
-         dt_why_str(Tlim_dX_nuc_drop) = 'dX_burn'
+         dt_why_str(Tlim_dX_nuc_drop) = 'dX_nuc'
          dt_why_str(Tlim_dX_div_X_cntr) = 'dX_div_X_cntr'
          dt_why_str(Tlim_lg_XHe_cntr) = 'lg_XHe_cntr'
          dt_why_str(Tlim_lg_XC_cntr) = 'lg_XC_cntr'
@@ -295,15 +290,11 @@
          dt_why_str(Tlim_XSi_cntr) = 'XSi_cntr'
          dt_why_str(Tlim_neg_X) = 'neg_mass_frac'
          dt_why_str(Tlim_bad_Xsum) = 'bad_X_sum'
+         dt_why_str(Tlim_dlgL_power_photo) = 'lgL_power_phot'
          dt_why_str(Tlim_delta_HR) = 'delta_HR'
          dt_why_str(Tlim_del_mdot) = 'delta mdot'
          dt_why_str(Tlim_adjust_J_q) = 'adjust_J_q'
          dt_why_str(Tlim_delta_Ye_highT) = 'highT del Ye'
-         dt_why_str(Tlim_error_rate_energy_conservation) = 'error rate'
-         dt_why_str(Tlim_avg_v_residual) = 'avg v resid'
-         dt_why_str(Tlim_max_abs_v_residual) = 'max v resid'
-         dt_why_str(Tlim_avg_lgE_residual) = 'avg lgE resid'
-         dt_why_str(Tlim_max_abs_lgE_residual) = 'max lgE resid'
          dt_why_str(Tlim_error_in_energy_conservation) = 'rel_E_err'
          dt_why_str(Tlim_retry) = 'retry'
          dt_why_str(Tlim_binary) = 'binary'
@@ -374,7 +365,6 @@
       
       integer function find_next_star_id()
          integer :: id
-         
          id = 0
 !$omp critical (star_handle_next)
          if (have_initialized_star_handles) then
@@ -383,9 +373,20 @@
             end do
          end if
 !$omp end critical (star_handle_next)         
-      
-      find_next_star_id  = id
+         find_next_star_id  = id
       end function find_next_star_id
+      
+      
+      integer function how_many_allocated_star_ids()
+         integer :: id
+         how_many_allocated_star_ids = 0
+         if (have_initialized_star_handles) then
+            do id = 1, max_star_handles
+               if (star_handles(id)% in_use .eqv. .true.) &
+                  how_many_allocated_star_ids = how_many_allocated_star_ids+1
+            end do
+         end if
+      end function how_many_allocated_star_ids
       
 
 
@@ -403,7 +404,7 @@
             reaclib_min_T9_in, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -428,7 +429,7 @@
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          integer, intent(in) :: color_num_files
          character (len=*), intent(in) :: color_file_names(:)
@@ -477,11 +478,8 @@
          if (dbg) write(*,*) 'call eos_init'
          !write(*,*) 'eos_file_prefix "' // trim(eos_file_prefix) // '"'
          !write(*,*) 'eosDT_cache_dir "' // trim(eosDT_cache_dir) // '"'
-         !write(*,*) 'eosPT_cache_dir "' // trim(eosPT_cache_dir) // '"'
-         !write(*,*) 'eosDE_cache_dir "' // trim(eosDE_cache_dir) // '"'
          call eos_init( &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
-            use_cache, ierr)
+            eosDT_cache_dir, use_cache, ierr)
          if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call kap_init'

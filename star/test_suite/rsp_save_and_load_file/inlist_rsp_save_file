@@ -1,0 +1,81 @@
+
+&star_job
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'test_loading.mod'
+
+      !pgstar_flag = .true.
+   
+/ ! end of star_job namelist
+
+
+&controls
+
+! check for retries and backups as part of test_suite
+   !max_number_retries = 5
+   max_model_number = 50
+
+! RSP controls
+
+   RSP_mass = 4.165d0
+   RSP_Teff = 6050
+   RSP_L = 1438.8d0
+   RSP_X = 0.73d0
+   RSP_Z = 0.007d0
+   
+! solver
+
+! output controls
+
+      !num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+   ! for cases in which you have a run that has reached steady pulses
+   ! and you want to look at plots of just a few periods to see the details,
+   ! i suggest the following method. interrupt the run soon after
+   ! it makes a photo.  remove or delete LOGS/history.data to force
+   ! creation of a new one when restart.  edit the inlist to set
+   ! history_interval to 1 to get maximum time resolution.  
+   ! restart the run and let it go for as many periods as desired.   
+
+      photo_interval = 1000
+      profile_interval = 1000
+      history_interval = 10
+      terminal_interval = 1500
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+      !pause = .true.
+
+      pgstar_interval = 6
+         
+      Grid2_win_flag = .true.
+
+      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
+      
+      History_Panels1_xaxis_name='star_age_day'
+      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+
+      !  Grid2_file_flag = .true.
+      file_digits = 7
+      Grid2_file_dir = 'png'
+      Grid2_file_prefix = 'grid'
+      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+      
+      !Profile_Panels1_show_grid = .true.
+
+      Profile_Panels1_xaxis_name = 'logtau'
+      Profile_Panels1_xaxis_reversed = .true.
+      Profile_Panels1_xmin = -101D0
+      Profile_Panels1_xmax = -101D0
+
+      Profile_Panels1_dymin(4) = 0.02
+      !Profile_Panels1_yaxis_name(2) = 'avg_charge_He'         
+
+/ ! end of pgstar namelist

@@ -81,7 +81,7 @@
          real(dp) :: Tfactor, dTfactordt
          logical :: all_okay
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          sc => scrn_info
@@ -182,8 +182,8 @@
             if (init) then
                call screen_init_AZ_info( &
                   a1, z1, a2, z2, &
-                  g% zg1(jscr), g% zg2(jscr), g% zg3(jscr), g% zg4(jscr), g% zs13(jscr),  &
-                  g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), g% aznut(jscr), g% zs13inv(jscr), &
+                  g% zs13(jscr), g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), &
+                  g% aznut(jscr), g% zs13inv(jscr), &
                   ierr)
                if (ierr /= 0) write(*,*) 'screen_init_AZ_info failed in screening_pair ' // &
                      trim(reaction_name(ir))    
@@ -228,8 +228,8 @@
                end if 
                call screen_pair( &
                   sc, a1, z1, a2, z2, screening_mode, &
-                  g% zg1(jscr), g% zg2(jscr), g% zg3(jscr), g% zg4(jscr), g% zs13(jscr),  &
-                  g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), g% aznut(jscr), g% zs13inv(jscr), &
+                  g% zs13(jscr), g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), &
+                  g% aznut(jscr), g% zs13inv(jscr), g% logTcut_lo, &
                   scor, scordt, scordd, ierr) 
                if (ierr /= 0) write(*,*) 'screen_pair failed in screening_pair ' // &
                      trim(reaction_name(ir)) 
@@ -267,7 +267,7 @@
          subroutine set_rate_screening(i, sc1a, sc1adt, sc1add)
             integer, intent(in) :: i
             real(dp), intent(in) :: sc1a, sc1adt, sc1add
-            include 'formats.dek'
+            include 'formats'
             if (i == 0) return         
             rate_screened(i) = rate_raw(i)*sc1a
             rate_screened_dT(i) = rate_raw_dT(i)*sc1a + rate_raw(i)*sc1adt
@@ -284,7 +284,7 @@
             integer, intent(in) :: ir
             integer, intent(out) :: ierr
             real(dp) :: sc1a, sc1adt, sc1add, a1, z1, a2, z2
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             a1 = chem_isos% Z_plus_N(i1)
             z1 = dble(chem_isos% Z(i1))
@@ -316,7 +316,7 @@
             real(dp) :: sc2, sc2dt, sc2dd
             real(dp) :: scor, scordt, scordd
             real(dp) :: a1, z1, a2, z2, a3, z3
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             i1 = i1_in; i2 = i2_in; i3 = i3_in
             a1 = chem_isos% Z_plus_N(i1)
@@ -380,7 +380,7 @@
             integer, pointer :: rtab(:)
             real(dp) :: rateII, rateIII, rsum, fII, fIII
 
-            include 'formats.dek'
+            include 'formats'
           
             rtab => g% net_reaction
             ierr = 0

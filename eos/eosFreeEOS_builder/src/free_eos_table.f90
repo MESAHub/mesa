@@ -187,7 +187,7 @@ program make_free_eos_table
 
    character(len=64) :: eosDT_file, mass_list, data_dir, table_file, arg
    integer :: io, num_logQs, num_logTs, num_logWs, table_version, i
-   integer :: eos_version, ierr, num_DT, num_PT, num_PTEH
+   integer :: eos_version, ierr, num_DT, num_FreeEOS
    real(dp) :: log10T, log10Rho, logT, logRho, mass_frac(Neps)
    real(dp) :: dlog10T, dlog10Q, log10Qmin, log10Qmax, log10Tmin, log10Tmax
    real(dp) :: log10Pgas, logPgas, X, Y, Z
@@ -242,12 +242,11 @@ program make_free_eos_table
    close(io)
 
    !final check
-   call num_eos_files_loaded(num_DT, num_PT, num_PTEH)
+   call num_eos_files_loaded(num_DT, num_FreeEOS)
 
    write(*,*) ' final counts: '
    write(*,*) ' num DT tables loaded = ', num_DT
-   write(*,*) ' num PT tables loaded = ', num_PT
-   write(*,*) ' num PTEH tables loaded = ', num_PTEH
+   write(*,*) ' num FreeEOS tables loaded = ', num_FreeEOS
    
 contains
 
@@ -361,7 +360,7 @@ contains
          !original  '(99(a40,1x))'
          write(io_unit,'(99(a22))') 'logT', &
             'logPgas', 'logE', 'logS', 'chiRho', 'chiT', 'Cp', 'Cv', 'dE_dRho', &
-            'dS_dT', 'dS_dRho', 'mu', 'log_free_e', 'gamma1', 'gamma3', 'grad_ad', &
+            'dS_dT', 'dS_dRho', 'mu', 'log10_free_e', 'gamma1', 'gamma3', 'grad_ad', &
             'eta', 'MESA', 'logRho', 'dpe', 'dsp', 'dse'
          
          do while (log10T >= log10Tmin)
@@ -420,10 +419,10 @@ contains
                results(i_dS_dT,iT),    &
                results(i_dS_dRho,iT),  &
                results(i_mu,iT),       &
-               results(i_lnfree_e,iT), &
-               results(i_gamma1,iT),   &
-               results(i_gamma3,iT),   &
-               results(i_grad_ad,iT),  &
+               results(i_lnfree_e,iT)/ln10, &  !MESA tables are based on OPAL tables, which
+               results(i_gamma1,iT),        &  !list  log10(free_e) rather than ln(free_e)
+               results(i_gamma3,iT),        & 
+               results(i_grad_ad,iT),  &       
                results(i_eta,iT),      &
                mesa_fracs(iT),         &
                logRhos(iT),            &
@@ -468,7 +467,7 @@ contains
 
       use_cache = .true.
 
-      call eos_init( ' ', ' ', ' ', use_cache, info)
+      call eos_init( ' ', use_cache, info)
       if (info /= 0) then
          write(*,*) 'failed in eos_init'
          stop 1
@@ -529,10 +528,8 @@ contains
       real(dp) :: T, Pgas, Rho, log10Rho, log10Pgas, log10T, logRho
       real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
       real(dp), dimension(num_eos_basic_results) :: &
-         res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-         d_dabar_const_TRho, d_dzbar_const_TRho, &
-         d_dlnR
-      real(dp) :: helm_res(num_helm_results)
+         res, d_dlnRho_const_T, d_dlnT_const_Rho
+      real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results,neps)
       logical :: off_table
       real(dp), parameter :: logRho_min = -32.23619130191664_dp !-14 * ln10
       integer :: ierr      
@@ -544,11 +541,11 @@ contains
       Rho = exp(logRho)
       log10Rho = logRho/ln10
          
-      call eosDT_get(eos_handle, X, Z, abar, zbar, &
+      call eosDT_get(eos_handle, &
          Neps, chem_id, net_iso, mass_frac, &
          Rho, log10Rho, T, log10T, &
          res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-         d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
+         d_dxa_const_TRho, ierr)
 
       if (ierr/=0) then !bail to HELM
 
@@ -556,13 +553,11 @@ contains
          Rho = exp(logRho)
          log10Rho = logRho/ln10
          
-         call eosDT_HELMEOS_get( eos_handle, X, Z, abar, zbar, &
+         call eosDT_get_component(eos_handle, i_eos_HELM, &
             Neps, chem_id, net_iso, mass_frac, &
             Rho, log10Rho, T, log10T, &
-            .true., .false., .false., 5.0_dp, 4.5_dp, &
             res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-            d_dabar_const_TRho, d_dzbar_const_TRho, &
-            helm_res, off_table, ierr)
+            d_dxa_const_TRho, ierr)
       endif
 
       if(ierr/=0) then
@@ -580,6 +575,8 @@ contains
       eos_result(i_dpe) = 0._dp
       eos_result(i_dsp) = 0._dp
       eos_result(i_dse) = 0._dp
+
+      eos_result(i_lnfree_e) = res(i_lnfree_e)/ln10
    end subroutine mesa_eos_eval
 
 end program make_free_eos_table

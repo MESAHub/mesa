@@ -939,13 +939,13 @@
             call pgsci(1)
             if (j < panels_num_panels) then
                if (other_yaxis_id <= 0 .and. other_yfile_data_len <= 0) then
-                  call show_box_pgstar(s,'BCST1','BCMNSTV1')
+                  call show_box_pgstar(s,'BCST','BCMNSTV')
                else
                   call show_box_pgstar(s,'BCST','BNSTV')
                end if
             else
                if (other_yaxis_id <= 0 .and. other_yfile_data_len <= 0) then
-                  call show_box_pgstar(s,'BCNST1','BCMNSTV1')
+                  call show_box_pgstar(s,'BCNST','BCMNSTV')
                else
                   call show_box_pgstar(s,'BCNST','BNSTV')
                end if
@@ -960,11 +960,15 @@
             end if
             call pgslw(s% pgstar_lw)
             if (yfile_data_len > 0) then
+               call pgsls(s% pgstar_profile_line_style)
                call pgline(yfile_data_len, yfile_xdata, yfile_ydata)
+               call pgsls(1)
                deallocate(yfile_xdata, yfile_ydata)
                nullify(yfile_xdata, yfile_ydata)
             else
+               call pgsls(s% pgstar_profile_line_style)
                call pgline(npts, xvec, yvec)
+               call pgsls(1)
                if (panels_show_grid) then
                   ishape = 21
                   do k=1,npts

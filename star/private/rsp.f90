@@ -44,7 +44,6 @@
          ! multiple calls are ok to search.
          use rsp_build, only: do_rsp_build
          use hydro_vars, only: set_vars, set_Teff
-         !use report, only: do_report
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k
@@ -67,8 +66,6 @@
          s% doing_finish_load_model = .false.
          call set_Teff(s, ierr)
          if (ierr /= 0) return
-         !call do_report(s, ierr)
-         !if (ierr /= 0) return
       end subroutine do1_rsp_build
 
 
@@ -80,7 +77,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: i, j, k
-         include 'formats'         
+         include 'formats'
          NSTART = 1
          s% nz = s% RSP_nz         
          if (s% job% change_initial_net) then
@@ -98,12 +95,12 @@
          call allocate_star_info_arrays(s, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in allocate_star_info_arrays'
-            stop 'build_rsp_model'
+            return
          end if
          call set_RSP_flag(s% id, .true., ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in set_RSP_flag'
-            stop 'build_rsp_model'
+            return
          end if
          call init_for_rsp_eos_and_kap(s)  
          s% rsp_period = 0d0
@@ -115,13 +112,13 @@
             call s% other_rsp_build_model(s% id,ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in other_rsp_build_model'
-               stop 'build_rsp_model'
+               return
             end if
          else
             call do_rsp_build(s,ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in do_rsp_build'
-               stop 'build_rsp_model'
+               return
             end if            
          end if
          if (.not. s% use_RSP_new_start_scheme) &
@@ -137,7 +134,7 @@
          s% dt = s% rsp_dt
          if (is_bad(s% dt)) then
             write(*,1) 'dt', s% dt
-            stop 'build_rsp_model'
+            return
          end if
          call finish_build_rsp_model(s, ierr)                     
       end subroutine build_rsp_model
@@ -145,7 +142,8 @@
 
       subroutine finish_build_rsp_model(s,ierr)
          use star_utils, only: &
-            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
+            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
+            store_rho_in_xh, store_T_in_xh, store_r_in_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: i, k, j
@@ -164,10 +162,10 @@
                write(*,2) 's% Vol(k)', I, s% Vol(k)
                stop 'build_rsp_model'
             end if
-            s% xh(s% i_lnd,k) = log(1d0/s% Vol(k))
-            s% xh(s% i_lnT,k) = log(s% T(k))
-            s% xh(s% i_lnR,k) = log(s% r(k))
-            s% xh(s% i_eturb_RSP,k) = s% w(k)*s% w(k)
+            call store_rho_in_xh(s, k, 1d0/s% Vol(k))
+            call store_T_in_xh(s, k, s% T(k))
+            call store_r_in_xh(s, k, s% r(k))
+            s% xh(s% i_Et_RSP,k) = s% RSP_w(k)*s% RSP_w(k)
             do j=1,s% species
                s% xa(j,k) = xa(j)
             end do
@@ -336,9 +334,9 @@
             end do
             !$OMP END PARALLEL DO
             if (ALFAC == 0d0 .or. ALFAS == 0d0) then
-               s% w(1:nz) = 0d0
-               s% Et(1:nz) = 0d0
-               s% xh(s% i_eturb_RSP,1:nz) = 0d0
+               s% RSP_w(1:nz) = 0d0
+               s% RSP_Et(1:nz) = 0d0
+               s% xh(s% i_Et_RSP,1:nz) = 0d0
             else
                !$OMP PARALLEL DO PRIVATE(I) SCHEDULE(dynamic,2)
                do i = 1,nz
@@ -354,14 +352,14 @@
                   POM = P4*(s% r(k)**2)*(ALFAC/ALFAS)*s% T(k)/s% Vol(k)
                   w_avg(k) = Lc/(POM*s% PII(k))
                end do
-               s% w(1) = 0d0
-               s% w(nz) = 0d0
+               s% RSP_w(1) = 0d0
+               s% RSP_w(nz) = 0d0
                do k=2,nz-1
-                  s% w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
-                  if (s% w(k) < 0d0) s% w(k) = 0d0
-                  s% Et(k) = s% w(k)**2
-                  s% xh(s% i_eturb_RSP,k) = s% Et(k)               
-                  s% w(k) = sqrt(s% xh(s% i_eturb_RSP,k))
+                  s% RSP_w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
+                  if (s% RSP_w(k) < 0d0) s% RSP_w(k) = 0d0
+                  s% RSP_Et(k) = s% RSP_w(k)**2
+                  s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)               
+                  s% RSP_w(k) = sqrt(s% xh(s% i_Et_RSP,k))
                end do   
             end if         
          end if
@@ -381,7 +379,7 @@
          end if
          if (s% use_other_rsp_build_model .and. &
                s% set_RSP_Psurf_to_multiple_of_initial_P1 > 0d0) then
-            s% RSP_Psurf = s% P(1)*s% set_RSP_Psurf_to_multiple_of_initial_P1
+            s% RSP_Psurf = s% Peos(1)*s% set_RSP_Psurf_to_multiple_of_initial_P1
             write(*,1) 'rsp_setup_part2 set RSP_Psurf', s% RSP_Psurf
          end if
       end subroutine rsp_setup_part2
@@ -394,7 +392,7 @@
          
          real(dp), allocatable :: VEL(:,:)
          real(dp), allocatable, dimension(:) :: &
-            M, DM, DM_BAR, R, Vol, T, Et, Lr
+            M, DM, DM_BAR, R, Vol, T, RSP_Et, Lr
          integer :: NMODES, I, k, sz
          real(dp) :: amix1, amix2, velkm
          
@@ -409,7 +407,7 @@
          sz = NZN+1
          
          allocate(VEL(sz,15), &
-            M(sz), DM(sz), DM_BAR(sz), R(sz), Vol(sz), T(sz), Et(sz), Lr(sz))
+            M(sz), DM(sz), DM_BAR(sz), R(sz), Vol(sz), T(sz), RSP_Et(sz), Lr(sz))
             
          do i=1,NZN
             k = NZN+1-i 
@@ -419,7 +417,7 @@
             R(i) = s% r(k)
             Vol(i) = s% Vol(k)
             T(i) = s% T(k)
-            Et(i) = s% Et(k)
+            RSP_Et(i) = s% RSP_Et(k)
             Lr(i) = 4d0*pi*s% r(k)**2*s% Fr(k)
          end do                    
         
@@ -427,7 +425,7 @@
 
          call do_LINA(s, s% RSP_L*SUNL, NZN, NMODES, VEL, &
             s% rsp_LINA_periods, s% rsp_LINA_growth_rates, &
-            M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
+            M, DM, DM_BAR, R, Vol, T, RSP_Et, Lr, ierr)
          if (ierr /= 0) return
 
          write(*,'(a)') '            P(days)         growth'
@@ -475,7 +473,7 @@
             k_max_abs_rel_hse_err = 0
             do k=2,s% nz
                hse_err = &
-                  (s% P(k-1) - s% P(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(4d0*pi*s% r(k)**4)) - 1d0
+                  (s% Peos(k-1) - s% Peos(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(4d0*pi*s% r(k)**4)) - 1d0
                if (abs(hse_err) >= max_abs_rel_hse_err) then
                   max_abs_rel_hse_err = abs(hse_err)
                   k_max_abs_rel_hse_err = k
@@ -602,7 +600,7 @@
                      !write(io,778) FASE,I,s% T(k), &
                      !    s% Hp_face(k),s% Y_face(k),s% PII(k),s% Lc(k)/s% L(k), &
                      !    4d0*pi*s% r(k)**2*s% Fr(k)/s% L(k),s% Lt(k)/s% L(k), &
-                     !    s% w(k)**2,s% egas(k)+s% erad(k),s% csound(k), &
+                     !    s% RSP_w(k)**2,s% egas(k)+s% erad(k),s% csound(k), &
                      !    s% Pt(k),s% Pgas(k)+s% Prad(k),s% Eq(k), &
                      !    s% COUPL(k)
                   endif
@@ -702,10 +700,10 @@
       
          !call rsp_dump_for_debug(s)
          !stop 'rsp_dump_for_debug'
-                  
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
+         if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
          s% dt = target_dt
 
          if (is_bad(s% dt)) then
@@ -774,22 +772,9 @@
          call calculate_work_integrals(s)      
          call calculate_energies(s,total_radiation)
          call gather_pulse_statistics(s)
-
          if (s% RSP_max_num_periods < 0 .or. &
              s% rsp_num_periods < s% RSP_max_num_periods) return
-         PDVWORK=0.d0
-         do I=1,NZN
-            k = NZN+1-i
-            WORK(I)=  WORK(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
-                 (THETA*(PPP0(I)+PPQ0(I))+ &
-                 THETA1*((s% Pgas(k)+s% Prad(k))+s% avQ(k))) &
-                 -s% dt*s% dm(k)*s% Eq(k)
-            WORKQ(I)=  WORKQ(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
-                 (THETA*PPQ0(I)+THETA1*s% avQ(k))
-            PDVWORK=PDVWORK+WORK(i)
-         enddo
-         s% rsp_GRPDV=PDVWORK/EKDEL
-         if (is_bad(s% rsp_GRPDV)) s% rsp_GRPDV=0d0
+         call get_GRPDV(s)
                   
          contains
 
@@ -855,6 +840,25 @@
             LMAX = -LMIN
          end if
       end subroutine gather_pulse_statistics
+
+
+      subroutine get_GRPDV(s)
+         type (star_info), pointer :: s
+         integer :: I, k
+         PDVWORK=0.d0
+         do I=1,NZN
+            k = NZN+1-i
+            WORK(I)=  WORK(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
+                 (THETA*(PPP0(I)+PPQ0(I))+ &
+                 THETA1*((s% Pgas(k)+s% Prad(k))+s% Pvsc(k))) &
+                 -s% dt*s% dm(k)*s% Eq(k)
+            WORKQ(I)=  WORKQ(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
+                 (THETA*PPQ0(I)+THETA1*s% Pvsc(k))
+            PDVWORK=PDVWORK+WORK(i)
+         enddo
+         s% rsp_GRPDV=PDVWORK/EKDEL
+         if (is_bad(s% rsp_GRPDV)) s% rsp_GRPDV=0d0
+      end subroutine get_GRPDV
       
       
       subroutine begin_calculation(s,restart,ierr)
@@ -902,7 +906,7 @@
       subroutine calculate_work_integrals(s)
          type (star_info), pointer :: s
          integer :: i, k
-         real(dp) :: dt, dm, dVol, P_tw, avQ_tw, Pt_tw
+         real(dp) :: dt, dm, dVol, P_tw, Pvsc_tw, Ptrb_tw
          character (len=256) :: fname
          dt = s% dt
          ! LAST STEP OF PdV
@@ -914,13 +918,13 @@
                dVol = VV0(I) - s% Vol_start(k)
                P_tw = THETA*PPP0(I) + &
                   THETA1*(s% Pgas_start(k) + s% Prad_start(k))
-               avQ_tw = THETA*PPQ0(I) + THETA1*s% avQ_start(k)
-               Pt_tw = THETAT*PPT0(I) + THETAT1*s% Pt_start(k)
+               Pvsc_tw = THETA*PPQ0(I) + THETA1*s% Pvsc_start(k)
+               Ptrb_tw = THETAT*PPT0(I) + THETAT1*s% Ptrb_start(k)
                WORK(I) = WORK(I) + &
-                    dVol*s% dm(k)*(P_tw + avQ_tw + Pt_tw) &
+                    dVol*s% dm(k)*(P_tw + Pvsc_tw + Ptrb_tw) &
                   - dt*dm*s% Eq(k)
-               WORKQ(I) = WORKQ(I) + dVol*dm*avQ_tw
-               WORKT(I) = WORKT(I) + dVol*dm*Pt_tw
+               WORKQ(I) = WORKQ(I) + dVol*dm*Pvsc_tw
+               WORKT(I) = WORKT(I) + dVol*dm*Ptrb_tw
                WORKC(I) = WORKC(I) - dt*dm*s% Eq(k)
             enddo
             if (s% rsp_num_periods == s% RSP_work_period) then
@@ -956,8 +960,8 @@
                k = NZN+1-i
                VV0(I) = s% Vol_start(k)
                PPP0(I) = s% Pgas_start(k) + s% Prad_start(k)
-               PPQ0(I) = s% avQ_start(k)
-               PPT0(I) = s% Pt_start(k)
+               PPQ0(I) = s% Pvsc_start(k)
+               PPT0(I) = s% Ptrb_start(k)
                PPC0(I) = s% Chi_start(k)
             enddo      
          endif
@@ -970,12 +974,12 @@
                dVol = s% Vol(k) - s% Vol_start(k)
                P_tw = THETA*(s% Pgas(k) + s% Prad(k)) &
                   + THETA1*(s% Pgas_start(k) + s% Prad_start(k))
-               avQ_tw = THETA*s% avQ(k) + THETA1*s% avQ_start(k)
-               Pt_tw = THETAT*s% Pt(k) + THETAT1*s% Pt_start(k)
+               Pvsc_tw = THETA*s% Pvsc(k) + THETA1*s% Pvsc_start(k)
+               Ptrb_tw = THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k)
                WORK(I) = WORK(I) + &
-                  dm*(dVol*(P_tw + avQ_tw + Pt_tw) - dt*s% Eq(k))
-               WORKQ(I)=  WORKQ(I) + dm*dVol*avQ_tw
-               WORKT(I)=  WORKT(I) + dm*dVol*Pt_tw
+                  dm*(dVol*(P_tw + Pvsc_tw + Ptrb_tw) - dt*s% Eq(k))
+               WORKQ(I)=  WORKQ(I) + dm*dVol*Pvsc_tw
+               WORKT(I)=  WORKT(I) + dm*dVol*Ptrb_tw
                WORKC(I)=  WORKC(I) - dt*dm*s% Eq(k)
             enddo       
          endif

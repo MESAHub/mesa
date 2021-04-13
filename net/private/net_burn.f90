@@ -93,7 +93,7 @@
 
       
       subroutine burn_1_zone( &
-            handle, species, num_reactions, t_start, t_end, starting_x, &
+            net_handle, eos_handle, species, num_reactions, t_start, t_end, starting_x, &
             ntimes, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
             rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, &
@@ -116,7 +116,7 @@
          use net_initialize, only: work_size
          use net_approx21, only: approx21_nrat
          
-         integer, intent(in) :: handle
+         integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: species
          integer, intent(in) :: num_reactions
          real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (species)
@@ -186,7 +186,7 @@
             rate_screened, rate_screened_dT, rate_screened_dRho
          integer :: iwork, cid
          
-         include 'formats.dek'
+         include 'formats'
          
          !dbg = .true.
          dbg = burn_dbg
@@ -214,7 +214,7 @@
          prev_lgRho = -1d99
          
          ierr = 0
-         call get_net_ptr(handle, g, ierr)
+         call get_net_ptr(net_handle, g, ierr)
          if (ierr /= 0) then
             if (report_ierr) write(*,*) 'invalid handle for burn_1_zone'
             return
@@ -381,8 +381,8 @@
             use net_eval, only: eval_net
             use rates_def, only: rates_reaction_id_max, i_rate, i_rate_dT, i_rate_dRho
             use interp_1d_lib, only: interp_value
-            use eos_def, only: num_helm_results, h_etaele
-            use eos_lib, only: eos_get_helm_results
+            use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_eta
+            use eos_lib, only: eosDT_get
          
             real(dp) :: time, y(:), f(:)
             real(dp), pointer :: dfdy(:,:)
@@ -409,11 +409,11 @@
             
             real(dp), target :: x_a(species), dfdx_a(species,species)
             real(dp), pointer :: x(:), dfdx(:,:)
-            real(dp) :: res(num_helm_results)
-      
-            real(dp), parameter :: coulomb_temp_cut = 1d6, coulomb_den_cut = 1d3
+
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
+            real(dp) :: d_dxa(num_eos_d_dxa_results,species)
          
-            include 'formats.dek'
+            include 'formats'
          
             ierr = 0
 
@@ -471,19 +471,17 @@
             
             if (.not. (okay_to_reuse_rate_screened .and. &
                        have_set_rate_screened)) then
-               call eos_get_helm_results( &
-                  xh, abar, zbar, rho, lgRho, T, lgT, &
-                  coulomb_temp_cut, coulomb_den_cut, &
-                  .true., .false., .false., &
-                  5d0, 4.5d0, & ! logT_ion_HELM, logT_neutral_HELM
-                  res, ierr)
+               call eosDT_get( &
+                  eos_handle, species, g% chem_id, g% net_iso, x, &
+                  Rho, lgRho, T, lgT, &
+                  res, d_dlnd, d_dlnT, d_dxa, ierr)
                if (ierr /= 0) then
                   if (report_ierr) write(*,*) 'failed in eos_get_helm_results'
                   return
                end if
-               eta = res(h_etaele)
-               d_eta_dlnT = 0
-               d_eta_dlnRho = 0
+               eta = res(i_eta)
+               d_eta_dlnT = d_dlnT(i_eta)
+               d_eta_dlnRho = d_dlnd(i_eta)
             end if
             
             rates_only = .false.

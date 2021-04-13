@@ -1,7 +1,7 @@
 program eos_plotter
 
    use eos_def
-   use eos_lib, only: eosDT_get_new
+   use eos_lib, only: eosDT_get
    use chem_def
    use chem_lib
    use const_lib
@@ -137,14 +137,14 @@ program eos_plotter
             end if
          else if (doing_consistency) then
             if (i_cons == 1) then
-               write(*,*) 'plotting thermodynamic consistency metric log10(dpe)'
-               write(iounit,*) 'log10(dpe)'
+               write(*,*) 'plotting thermodynamic consistency metric dpe'
+               write(iounit,*) 'dpe'
             else if (i_cons == 2) then
-               write(*,*) 'plotting thermodynamic consistency metric log10(dse)'
-               write(iounit,*) 'log10(dse)'
+               write(*,*) 'plotting thermodynamic consistency metric dse'
+               write(iounit,*) 'dse'
             else if (i_cons == 3) then
-               write(*,*) 'plotting thermodynamic consistency metric log10(dsp)'
-               write(iounit,*) 'log10(dsp)'
+               write(*,*) 'plotting thermodynamic consistency metric dsp'
+               write(iounit,*) 'dsp'
             end if
          else
             write(*,*) 'plotting ' // eosDT_result_names(i_var)
@@ -366,7 +366,7 @@ program eos_plotter
             else if (i_cons == 3) then
                res1 = -T * rho * (exp(res(i_lnS)) * d_dlnd(i_lnS)) / (d_dlnT(i_lnPgas) * exp(res(i_lnPgas)) + (4d0 / 3d0) * crad * pow4(T)) - 1
             end if
-            res1 = log10(abs(res1))
+            res1 = abs(res1)
          end if
 
 
@@ -417,7 +417,7 @@ contains
 
       eos_file_prefix = 'mesa'
 
-      call eos_init(' ', ' ', ' ', use_cache, ierr)
+      call eos_init(' ', use_cache, ierr)
       if (ierr /= 0 .and. .not. ignore_ierr) then
          write(*,*) 'eos_init failed in Setup_eos'
          stop 1
@@ -536,10 +536,8 @@ contains
          real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_d_dxa_results,species)
          integer, intent(out) :: ierr ! 0 means AOK.
-         real(dp) :: d_dxa_eos(num_eos_basic_results,species) ! eos internally returns derivs of all quantities
          type (EoS_General_Info), pointer :: rq
-         real(dp) :: Pgas, Prad, energy, entropy, Y, Z, X, abar, zbar, &
-            z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          call get_eos_ptr(handle,rq,ierr)
          if (ierr /= 0 .and. .not. ignore_ierr) then
             write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
@@ -547,22 +545,15 @@ contains
          end if
 
          if (i_eos == 0) then
-            call eosDT_get_new( &
+            call eosDT_get( &
             handle, species, chem_id, net_iso, xa, &
-            Rho, log10Rho, T, logT, &
+            Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          else
-            call basic_composition_info( &
-               species, chem_id, xa, X, Y, Z, &
-               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-            d_dxa = 0
-
-            call eosDT_test_component( &
-                  handle, i_eos, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
+            call eosDT_get_component( &
+                  handle, i_eos, species, chem_id, net_iso, xa, &
                   Rho, logRho, T, logT, &
-                  res, d_dlnd, d_dlnT, &
-                  Pgas, Prad, energy, entropy, ierr)
+                  res, d_dlnd, d_dlnT, d_dxa, ierr)
          end if
 
    end subroutine eos_call

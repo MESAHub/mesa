@@ -1,3 +1,9 @@
+.. _hb_2M:
+
+*****
+hb_2M
+*****
+
 This test case shows a 2 solar mass stellar model evolving on the Horizontal Branch, from ZACHeB (Zero Age Core Helium Burning) to TACHeB (Terminal Age Core Helium Burning). The convective core boundary is determined using predictive mixing (see |MESA IV|). We also provide in this doc  figures comparing the results obtained using Predictive Mixing with results obtained using CPM (see |MESA V|) schemes (see section `Comparing results obtained with CPM and Predictive mixing`_ below).
 
 

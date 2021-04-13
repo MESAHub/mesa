@@ -175,13 +175,14 @@ endif
 ## For gfortran fortran
 ifeq ($(SYSTYPE),gfortran)
   FC = gfortran
-  FFLAGS_FIX = -c -g -fbounds-check  -fno-automatic
-  FFLAGS_FIX = -c -g  -fno-automatic
-  FFLAGS_FIX = -c -O0  -ffixed-line-length-132 -fno-automatic -Wall
-  FFLAGS_FIX = -c -O2  -ffixed-line-length-132 -fno-automatic -w
+  FFLAGS_FIX = -c -g -fbounds-check
+  FFLAGS_FIX = -c -g  
+  FFLAGS_FIX = -c -O0  -ffixed-line-length-132  -Wall
+  FFLAGS_FIX = -c -O2  -ffixed-line-length-132  -w
 #  FFLAGS_FIX = -c -O2 -g -fbounds-check  -ffixed-line-length-132 -fno-automatic -Wall
   FFLAGS := -ffree-form
   FFLAGS := $(FFLAGS_FIX) $(FFLAGS)
+  FFLAGS_FIX += -fno-automatic
   LDFLAGS =
   #LIBS= $(HOME)/lib/libsparseGF.a $(HOME)/lib/liblnagGF.a
   #LIBS= $(HOMEStella)/lib/libsparseGF.a $(HOMEStella)/lib/liblnagGF.a

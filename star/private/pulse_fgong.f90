@@ -132,7 +132,7 @@ contains
     ! Determine data dimensiones
 
     if (add_atmosphere) then
-       call build_atm(s, ierr)
+       call build_atm(s, s%L(1), s%r(1), s%m_grav(1), s%cgrav(1), ierr)
        if (ierr /= 0) then
           write(*,*) 'failed in build_atm'
           return
@@ -183,7 +183,7 @@ contains
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
-    P_c = s%P(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+    P_c = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
     global_data(11) = r_outer**2*d2P_dr2_c/P_c
     global_data(12) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
     global_data(13) = s%star_age
@@ -390,7 +390,7 @@ contains
         r = s%r(k)
         lnq = log(s%m_grav(k)/m_outer)
         T = eval_face(s%dq, s%T, k, 1, s%nz)
-        P = eval_face(s%dq, s%P, k, 1, s%nz)
+        P = eval_face(s%dq, s%Peos, k, 1, s%nz)
         if (s%interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, k_a, k_b)
         else

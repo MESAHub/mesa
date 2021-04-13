@@ -169,7 +169,7 @@
          if (delta_mdot == 0) return
          if (delta_mdot_hard_limit > 0 .and. (.not. skip_hard_limit)) then
             if (delta_mdot > delta_mdot_hard_limit) then
-               if (s% report_all_dt_limits) &
+               if (s% report_dt_hard_limit_retries) &
                   write(*, '(a30, f20.10, 99e20.10)') 'delta_mdot_hard_limit', &
                      delta_mdot, delta_mdot_hard_limit
                   check_delta_mdot= retry
@@ -178,12 +178,7 @@
          end if
          if (delta_mdot_limit <= 0) return
          dt_limit_ratio = delta_mdot/delta_mdot_limit
-         if (dt_limit_ratio <= 1d0) then
-            dt_limit_ratio = 0
-         else if (s% report_all_dt_limits) then
-            write(*, '(a30, f20.10, 99e20.10)') 'delta_mdot_limit', &
-               dt_limit_ratio, delta_mdot, delta_mdot_limit
-         end if
+         if (dt_limit_ratio <= 1d0) dt_limit_ratio = 0
       end function check_delta_mdot
       
       

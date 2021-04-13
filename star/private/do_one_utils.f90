@@ -106,9 +106,9 @@
          write(*,'(a)') "      'Mass' is the total stellar baryonic mass (Msun),"
          write(*,'(a)') "      'lg_Mdot' is log10 magnitude of rate of change of mass (Msun/year),"
          write(*,'(a)') "      'lg_Dsurf' is log10 surface density (g/cm^3),"
-         write(*,'(a)') "      'H_env' is the amount of mass where H is the most abundant iso,"
-         write(*,'(a,e9.2)') "      'He_core' is the largest mass where He is most abundant iso."
-         write(*,'(a,e9.2)') "      'C_core' is the largest mass where C is most abundant iso."
+         write(*,'(a)') "      'H_env' is the amount of mass where H is dominant,"
+         write(*,'(a,e9.2)') "      'He_core' is the largest mass where He is dominant."
+         write(*,'(a,e9.2)') "      'CO_core' is the largest mass where CO is dominant."
          write(*,'(a)') "      'H_cntr' is the center H1 mass fraction,"
          write(*,'(a)') "      'He_cntr' is the center He4 mass fraction,"
          write(*,'(a)') "      'C_cntr' is the center C12 mass fraction,"
@@ -226,11 +226,11 @@
          if (s% net_iso(isi28) == 0) then
             write(io,'(a)') &
                '    lg_Dcntr    lg_L     lg_LZ      lg_Lphoto   lg_Dsurf   ' // &
-               'C_core     C_cntr     Ne_cntr    Z_cntr   v_div_cs       dt_limit'
+               'CO_core    C_cntr     Ne_cntr    Z_cntr   v_div_cs       dt_limit'
          else
             write(io,'(a)') &
                '    lg_Dcntr    lg_L     lg_LZ      lg_Lphoto   lg_Dsurf   ' // &
-               'C_core     C_cntr     Ne_cntr    Si_cntr  v_div_cs       dt_limit'
+               'CO_core    C_cntr     Ne_cntr    Si_cntr  v_div_cs       dt_limit'
          end if
          write(io,'(a)') &
             '_______________________________________________________________________' // &
@@ -308,7 +308,7 @@
          else if (s% v_flag) then
             v = s% v(1)
          else
-            v = 0 ! s% r(1)*s% dlnR_dt(1)
+            v = 0d0
          end if
          vsurf_div_csound = v / s% csound(1)
 
@@ -320,7 +320,7 @@
          sum_Lphoto = abs(s% power_photo)
          sum_Lz = s% power_z_burn 
          
-         if (s% id == 1) then
+         if (how_many_allocated_star_ids() == 1) then
             id_str = ''
          else
             write(id_str,'(i3)') s% id
@@ -356,7 +356,7 @@
             safe_log10(sum_LH), & ! fmt3
             safe_log10(sum_Lnuc), &
             s% star_mass, &            
-            s% star_mass - max(s% he_core_mass, s% c_core_mass, s% o_core_mass), &
+            s% star_mass - max(s% he_core_mass, s% co_core_mass), &
             s% center_h1, & ! fmt4
             s% center_n14, &
             s% surface_he3 + s% surface_he4, &
@@ -431,7 +431,7 @@
                safe_log10(sum_Lz), &
                safe_log10(abs(s% power_photo)), &
                s% lnd(1)/ln10, &
-               s% c_core_mass, &
+               s% co_core_mass, &
                s% center_c12, &
                s% center_ne20, &
                tmp, &
@@ -448,7 +448,7 @@
                safe_log10(sum_Lz), &
                safe_log10(abs(s% power_photo)), &
                s% lnd(1)/ln10, &
-               s% c_core_mass, &
+               s% co_core_mass, &
                s% center_c12, &
                s% center_ne20, &
                tmp, &
@@ -466,7 +466,8 @@
 
          
          subroutine show_trace_history_values(num)
-            use history, only: get_history_specs, get_history_values, get1_hist_value
+            use history, only: do_get_data_for_history_columns, &
+               get_history_specs, get_history_values, get1_hist_value
             integer, intent(in) :: num
             real(dp) :: values(num)
             integer :: int_values(num), specs(num)
@@ -475,12 +476,16 @@
             real(dp) :: val
             integer :: i
             include 'formats'
+            if (num == 0) return
+            call do_get_data_for_history_columns(s, ierr)
+            if (ierr /= 0) return
             call get_history_specs(s, num, s% trace_history_value_name, specs, .false.)
             call get_history_values( &
                s, num, specs, is_int_value, int_values, values, failed_to_find_value)
             do i = 1, num
                if (failed_to_find_value(i)) then
                   if (.not. get1_hist_value(s, s% trace_history_value_name(i), val)) then
+                     write(*,*) 'failed to find history value ' // trim(s% trace_history_value_name(i))
                      cycle
                   end if
                   values(i) = val
@@ -572,17 +577,17 @@
          use rates_def
          use chem_def
          use chem_lib, only: chem_get_iso_id
-         use star_utils, only: omega_crit, center_avg_x, surface_avg_x
+         use star_utils
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
-         real(dp) :: log_surface_gravity, v_div_csound_max, &
+         real(dp) :: log_surface_gravity, v_div_csound_max, remnant_mass, ejecta_mass, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
             max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_abs_vel, &
-            species_mass_for_min_limit, species_mass_for_max_limit, min_gamma1
+            species_mass_for_min_limit, species_mass_for_max_limit
             
          include 'formats'
          
@@ -617,9 +622,12 @@
             v_surf = s% v(1)
             v_div_csound_max = maxval(abs(s% v(1:nz)/s% csound_face(1:nz)))
          else
-            v_surf = abs(s% r(1) * s% dlnR_dt(1))
+            v_surf = 0d0
             v_div_csound_max = 0d0
          end if
+         
+         remnant_mass = get_remnant_mass(s)/Msun
+         ejecta_mass = get_ejecta_mass(s)/Msun
          
          if(s%u_flag) then
             max_abs_vel_loc = maxloc(abs(s%u(1:nz)),dim=1)
@@ -692,13 +700,7 @@
          min_pgas_div_p = 1d99
          do k = s% nz, 1, -1
             if (s% q(k) > s% Pgas_div_P_limit_max_q) exit
-            if (s% pgas(k)/s% p(k) < min_pgas_div_p) min_pgas_div_p = s% pgas(k)/s% p(k)
-         end do
-         
-         min_gamma1 = 1d99
-         do k = s% nz, 1, -1
-            if (s% q(k) > s% gamma1_limit_max_q) exit
-            if (s% gamma1(k) < min_gamma1) min_gamma1 = s% gamma1(k)
+            if (s% pgas(k)/s% Peos(k) < min_pgas_div_p) min_pgas_div_p = s% pgas(k)/s% Peos(k)
          end do
          
          max_omega_div_omega_crit = 0; k_omega = 0
@@ -766,6 +768,10 @@
          if (s% star_age >= s% max_age .and. s% max_age > 0) then 
             call compare_to_target('star_age >= max_age', s% star_age, s% max_age, &
                   t_max_age)
+                  
+         else if (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) then 
+            call compare_to_target('time >= max_age_in_days', &
+               s% time/(60*60*24), s% max_age_in_days, t_max_age)
                   
          else if (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0) then 
             call compare_to_target('time >= max_age_in_seconds', &
@@ -875,6 +881,14 @@
             call compare_to_target('star_mass >= star_mass_max_limit', &
                s% star_mass, s% star_mass_max_limit, t_star_mass_max_limit)
             
+         else if (s% remnant_mass_min_limit > 0 .and. remnant_mass <= s% remnant_mass_min_limit) then 
+            call compare_to_target('remnant_mass <= remnant_mass_min_limit', &
+               remnant_mass, s% remnant_mass_min_limit, t_remnant_mass_min_limit)
+            
+         else if (s% ejecta_mass_max_limit > 0 .and. ejecta_mass >= s% ejecta_mass_max_limit) then 
+            call compare_to_target('ejecta_mass >= ejecta_mass_max_limit', &
+               ejecta_mass, s% ejecta_mass_max_limit, t_ejecta_mass_max_limit)
+            
          else if (species_mass_for_min_limit >= 0 .and. &
                species_mass_for_min_limit <= s% star_species_mass_min_limit) then 
             call compare_to_target( &
@@ -908,17 +922,13 @@
             call compare_to_target('he_core_mass >= he_core_mass_limit', &
                s% he_core_mass, s% he_core_mass_limit, t_he_core_mass_limit)
             
-         else if (s% c_core_mass >= s% c_core_mass_limit) then 
-            call compare_to_target('c_core_mass >= c_core_mass_limit', &
-               s% c_core_mass, s% c_core_mass_limit, t_c_core_mass_limit)
-
-         else if (s% o_core_mass >= s% o_core_mass_limit) then 
-            call compare_to_target('o_core_mass >= o_core_mass_limit', &
-               s% o_core_mass, s% o_core_mass_limit, t_o_core_mass_limit)
+         else if (s% co_core_mass >= s% co_core_mass_limit) then 
+            call compare_to_target('co_core_mass >= co_core_mass_limit', &
+               s% co_core_mass, s% co_core_mass_limit, t_co_core_mass_limit)
             
-         else if (s% si_core_mass >= s% si_core_mass_limit) then 
-            call compare_to_target('si_core_mass >= si_core_mass_limit', &
-               s% si_core_mass, s% si_core_mass_limit, t_si_core_mass_limit)
+         else if (s% one_core_mass >= s% one_core_mass_limit) then 
+            call compare_to_target('one_core_mass >= one_core_mass_limit', &
+               s% one_core_mass, s% one_core_mass_limit, t_one_core_mass_limit)
             
          else if (s% fe_core_mass >= s% fe_core_mass_limit) then 
             call compare_to_target('fe_core_mass >= fe_core_mass_limit', &
@@ -929,12 +939,12 @@
                s% neutron_rich_core_mass, s% neutron_rich_core_mass_limit, t_neutron_rich_core_mass_limit)
             
          else if ( &
-               s% he_core_mass >= s% c_core_mass .and. &
-               s% c_core_mass > 0 .and. &
+               s% he_core_mass >= s% co_core_mass .and. &
+               s% co_core_mass > 0 .and. &
                s% center_he4 < 1d-4 .and. &
-               s% he_core_mass - s% c_core_mass < s% he_layer_mass_lower_limit) then 
+               s% he_core_mass - s% co_core_mass < s% he_layer_mass_lower_limit) then 
             call compare_to_target('he layer mass < he_layer_mass_lower_limit', &
-               s% he_core_mass - s% c_core_mass, s% he_layer_mass_lower_limit, &
+               s% he_core_mass - s% co_core_mass, s% he_layer_mass_lower_limit, &
                t_he_layer_mass_lower_limit)
             
          else if (abs(safe_log10(power_h_burn) - s% log_surface_luminosity) <= &
@@ -1016,6 +1026,14 @@
          else if (s% log_surface_temperature >= s% log_Tsurf_upper_limit) then 
             call compare_to_target('log_surface_temperature >= log_Tsurf_upper_limit', &
                s% log_surface_temperature, s% log_Tsurf_upper_limit, t_log_Tsurf_upper_limit)
+
+         else if (s% log_surface_radius <= s% log_Rsurf_lower_limit) then 
+            call compare_to_target('log_surface_radius <= log_Rsurf_lower_limit', &
+               s% log_surface_radius, s% log_Rsurf_lower_limit, t_log_Rsurf_lower_limit)
+               
+         else if (s% log_surface_radius >= s% log_Rsurf_upper_limit) then 
+            call compare_to_target('log_surface_radius >= log_Rsurf_upper_limit', &
+               s% log_surface_radius, s% log_Rsurf_upper_limit, t_log_Rsurf_upper_limit)
 
          else if (s% log_surface_pressure <= s% log_Psurf_lower_limit) then 
             call compare_to_target('log_surface_pressure <= log_Psurf_lower_limit', &
@@ -1119,9 +1137,9 @@
             call compare_to_target('v_div_csound_max > v_div_csound_max_limit', &
                v_div_csound_max, s% v_div_csound_max_limit, t_v_div_csound_max_limit)
 
-         else if (min_gamma1 < s% gamma1_limit) then 
+         else if (s% min_gamma1 < s% gamma1_limit) then 
             call compare_to_target('min_gamma1 < gamma1_limit', &
-               min_gamma1, s% gamma1_limit, t_gamma1_limit)            
+               s% min_gamma1, s% gamma1_limit, t_gamma1_limit)            
 
          else if (min_pgas_div_p < s% Pgas_div_P_limit) then 
             call compare_to_target('min_pgas_div_p < Pgas_div_P_limit', &
@@ -1494,17 +1512,12 @@
          else if (s% v_flag) then
             v = s% v(1)
          else
-            v = s% r(1) * s% dlnR_dt(1)
+            v = 0d0
          end if
          
          power_he_burn = s% power_he_burn
          power_z_burn = s% power_z_burn
          power_neutrinos = s% power_neutrinos
-         
-         if ( s% star_age < s% profile_age ) then
-            if (dbg) write(*,*) 'must_do_profile for age < profile_age'
-            must_do_profile = .true.
-         end if
          
          if (must_do_profile) profile_priority = phase_priority
          

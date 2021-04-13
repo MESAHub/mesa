@@ -166,7 +166,7 @@
          integer :: reactants(num_in + num_out)
          real(dp) :: Qtotal
          
-         include 'formats.dek'
+         include 'formats'
          
          write(*,*) 'test Qtotal for 2 he3 => 2 h1 + he4'
          write(*,*)

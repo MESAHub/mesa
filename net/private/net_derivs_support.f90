@@ -25,7 +25,9 @@
 ! ***********************************************************************
 
       module net_derivs_support
-      use net_def, only: Net_General_Info, Net_Info
+      use net_def, only: Net_General_Info, Net_Info, net_test_partials, &
+         net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i, &
+         net_test_partials_iother
       use const_def
       use chem_def
       use rates_def
@@ -129,7 +131,7 @@
 
         logical :: condition ! for debugging output
 
-        include 'formats.dek'
+        include 'formats'
 
         ! enforce minimum rate threshold
         r = r_in
@@ -280,7 +282,7 @@
          integer, pointer :: chem_id(:)
          chem_id => n% g% chem_id
 
-         include 'formats.dek'
+         include 'formats'
 
          if (symbolic) then
             n% d_dydt_dy(i1, i2) = 1
@@ -369,7 +371,7 @@
          integer, pointer :: chem_id(:)
          chem_id => n% g% chem_id
 
-         include 'formats.dek'
+         include 'formats'
 
          if (symbolic) then
             n% d_dydt_dy(i1, i2) = 1

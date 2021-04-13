@@ -1,3 +1,9 @@
+.. _conductive_flame:
+
+****************
+conductive_flame
+****************
+
 This test suite case models a conductively-propagated deflagration
 wave ("flame") in a high-density, degenerate carbon-oxygen mixture.
 It is similar to a calculation presented by |Timmes1992|.

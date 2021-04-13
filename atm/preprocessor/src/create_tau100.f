@@ -73,7 +73,7 @@ contains
     integer, parameter :: nt_for_CK = 76, max_ng_for_CK = 11
     integer :: ng_for_CK_Teff(nt_for_CK)
 
-    include 'formats.dek'       
+    include 'formats'
 
     write(*,1) 'tau_base', tau_base     
 
@@ -177,7 +177,7 @@ contains
       real(dp) :: d0, d1, Pinterp, Tinterp
       real(dp), parameter :: Pfill = 10
       real(dp), parameter :: Tfill = 1d5
-      include 'formats.dek'
+      include 'formats'
 
       do i=1,ng
          j=1
@@ -242,7 +242,7 @@ contains
       integer, intent(in) :: n
       real(dp) :: logg, Teff
       integer :: k, ii, jj
-      include 'formats.dek'
+      include 'formats'
       do k = 1, n
          do ii = 1, ng
             logg = loggs(ii)
@@ -648,7 +648,7 @@ contains
     call math_init()
     call chem_init('isotopes.data', ierr)
     if (ierr /= 0) call mesa_error(__FILE__,__LINE__)         
-    call eos_init(' ', ' ', ' ', use_cache, ierr)
+    call eos_init(' ', use_cache, ierr)
     if (ierr /= 0) call mesa_error(__FILE__,__LINE__)            
     eos_handle = alloc_eos_handle(ierr)
     if (ierr /= 0) call mesa_error(__FILE__,__LINE__)            

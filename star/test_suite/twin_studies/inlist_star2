@@ -1,0 +1,46 @@
+
+&star_job
+
+   pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls  
+
+! mixing
+
+      overshoot_scheme(1) = 'none'
+      overshoot_scheme(2) = 'none'      
+      overshoot_scheme(3) = 'none'
+
+! solver
+
+! output
+
+   photo_directory = 'photos2'
+   log_directory = 'LOGS2'
+
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+   !pause = .true.
+   !pause_interval = 10
+   pgstar_interval = 1
+
+   Grid1_title = 'star2 - without overshooting'
+   
+   !Grid1_file_flag = .true.
+   Grid1_file_dir = 'png2'
+   Grid1_file_prefix = 'star2'
+   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+
+/ ! end of pgstar namelist

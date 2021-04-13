@@ -185,7 +185,7 @@
    mass_fraction_limit_for_Skye = 1d-4
 
    ! Skye Gamma Limits
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~
    ! The one-component plasma fits in Skye are only valid in certain ranges of the ion interaction parameter Gamma.
    ! Beyond these, Skye employs thermodynamic extrapolation.
    ! The default limits are set to the edges of the data that went into the fits.
@@ -194,6 +194,26 @@
 
    Skye_min_gamma_for_solid = 170
    Skye_max_gamma_for_liquid = 200
+
+   ! Skye Solid Mixing Corrections
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! Skye computes corrections to the linear mixing rule in the solid phase using the prescription from either
+   ! Ogata+1993 or Potekhin & Chabrier 2013. The former provides better agreement with calculations done at
+   ! typical white dwarf charge ratios (R = Z2 / Z1 ~ 4/3 for C/O), see e.g. Blouin+2020. The latter gives better
+   ! agreement with analytic expectations at large charge ratios R > 2.
+   ! Select between these choices by specifying either `"Ogata" or "PC".
+   ! :: 
+
+   Skye_solid_mixing_rule = "PC"
+
+   ! Skye Blending
+   ! ::
+   ! replace the polygon blend with simple Rho/T blends
+   use_simple_Skye_blends = .false.
+   logRho_min_for_any_Skye = 1.8
+   logRho_min_for_all_Skye = 2.0
+   logT_min_for_any_Skye = 6.8
+   logT_min_for_all_Skye = 7.0
 
 
 ! CMS controls
@@ -224,14 +244,6 @@
    logT_max_for_any_CMS_pure_He = -1
 
 
-! eosPT controls
-! --------------
-! choose which component EOSes to use with eosPT
-! ::
-
-   use_max_SCVH_for_PT = .false.
-   use_max_CMS_for_PT = .false.
-
 ! Miscellaneous controls
 ! ----------------------
 ! ::
@@ -239,7 +251,6 @@
    eosDT_use_linear_interp_for_X = .false.
    eosDT_use_linear_interp_to_HELM = .false.
    eosDT_file_prefix = 'mesa'
-   eosPT_file_prefix = 'mesa'
    okay_to_convert_ierr_to_skip = .true.
    tiny_fuzz = 1d-6
 

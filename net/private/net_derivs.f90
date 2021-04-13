@@ -1057,7 +1057,7 @@
 
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          y => n% y
          g => n% g
@@ -1657,7 +1657,7 @@
 
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          y => n% y
          g => n% g
@@ -1735,7 +1735,7 @@
             integer :: he4, c12
             real(dp) :: UE, XHe4, YHe4, &
                   FLeps_nuc, dFLeps_nuc_dT, dFLeps_nuc_dRho, r, drdT, drdRho, conv
-            include 'formats.dek'
+            include 'formats'
             he4 = itab(ihe4)
             c12 = itab(ic12)
             UE = abar/zbar

@@ -99,42 +99,34 @@ contains
     do k=nzlo, nzhi
        if (k == 1) then
           s% rho_face(k) = s% rho(k)
-          if (.not. s% u_flag) s% P_face(k) = s% P(k)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = s% Peos(k)
           s% csound_face(1) = s% csound(1)
        else
           alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
           beta = 1 - alfa
           s% rho_face(k) = alfa*s% rho(k) + beta*s% rho(k-1)
-          if (.not. s% u_flag) s% P_face(k) = alfa*s% P(k) + beta*s% P(k-1)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = alfa*s% Peos(k) + beta*s% Peos(k-1)
           s% csound_face(k) = alfa*s% csound(k) + beta*s% csound(k-1)
        end if
     end do
 
     if (.not. (skip_kap .and. skip_neu)) then
 
-       if (s% constant_L) then ! need opacities
-          if (.not. skip_kap) then
-             do k = 1, s% nz
-                s% opacity(k) = 1d0
-             end do
-          end if
-       else
-          if (.not. skip_kap) then
-             call prepare_kap(s, ierr)
-             if (ierr /= 0) return
-             if (s% use_other_opacity_factor) then
-                call s% other_opacity_factor(s% id, ierr)
-                if (ierr /= 0) return
-             else
-                s% extra_opacity_factor(1:s% nz) = s% opacity_factor
-             end if
-          endif
+       if (.not. skip_kap) then
+          call prepare_kap(s, ierr)
+          if (ierr /= 0) return
           if (s% use_other_opacity_factor) then
              call s% other_opacity_factor(s% id, ierr)
              if (ierr /= 0) return
           else
              s% extra_opacity_factor(1:s% nz) = s% opacity_factor
           end if
+       endif
+       if (s% use_other_opacity_factor) then
+          call s% other_opacity_factor(s% id, ierr)
+          if (ierr /= 0) return
+       else
+          s% extra_opacity_factor(1:s% nz) = s% opacity_factor
        end if
 
        if (s% doing_timing) call start_time(s, time0, total)
@@ -289,7 +281,7 @@ contains
     integer, intent(out) :: ierr
 
     real(dp), dimension(num_eos_basic_results) :: &
-         res, res_a, res_b, d_dlnd, d_dlnT, d_eos_dabar, d_eos_dzbar
+         res, res_a, res_b, d_dlnd, d_dlnT
     real(dp) :: &
          sumx, dx, dxh_a, dxh_b, &
          Rho, logRho, lnd, lnE, logT, T, energy, logQ, frac
@@ -374,14 +366,6 @@ contains
          return
       end if
 
-      if (k == s% trace_k) then
-         write(*,5) 'grada', k, s% solver_iter, s% solver_adjust_iter, &
-              s% model_number, s% grada(k)
-      end if
-      if (s% model_number == -1) then
-         write(*,4) 'grada', k, s% solver_iter, s% model_number, s% grada(k)
-      end if
-
     end subroutine store_stuff
 
   end subroutine do_eos_for_cell
@@ -392,7 +376,6 @@ contains
 
     use eos_def
     use chem_def
-    use eos_lib, only: eos_theta_e
     use star_utils, only: eval_csound, write_eos_call_info
 
     type (star_info), pointer :: s
@@ -402,7 +385,7 @@ contains
     integer, intent(out) :: ierr
     integer :: i, j
 
-    real(dp) :: d_theta_e_deta, T, rho, &
+    real(dp) :: T, rho, &
          dlnd_dV, Pgas, Prad, &
          P, PV, PT, E, EV, ET, CP, dCp_dV, dCp_dT, &
          chiT, dchiT_dlnd, dchiT_dlnT, &
@@ -433,7 +416,7 @@ contains
 
     T = s% T(k)
     rho = s% rho(k)
-    if ((T > 1d15 .or. rho > 1d15) .and. s% gamma_law_hydro == 0d0) then
+    if (T > 1d15 .or. rho > 1d15) then
        ierr = -1
        if (s% report_ierr) then
           write(*,4) 'bad T or rho for eos', k, s% solver_iter, s% model_number
@@ -443,12 +426,8 @@ contains
        return
     end if
     s% Prad(k) = crad * T*T*T*T / 3
-    if (s% gamma_law_hydro > 0d0 .or. s% use_eosDT_ideal_gas) then
-       s% P(k) = s% Pgas(k)
-    else
-       s% P(k) = s% Prad(k) + s% Pgas(k)
-    end if
-    s% lnP(k) = log(s% P(k))
+    s% Peos(k) = s% Prad(k) + s% Pgas(k)
+    s% lnPeos(k) = log(s% Peos(k))
     s% lnS(k) = res(i_lnS)
     s% lnE(k) = res(i_lnE)
     s% energy(k) = exp(s% lnE(k))
@@ -463,7 +442,7 @@ contains
     s% gamma3(k) = res(i_gamma3)
     s% eta(k) = res(i_eta)
     s% gam(k) = s% z53bar(k)*qe*qe * &
-         pow((4d0/3d0)*pi*avo*rho*s% zbar(k)/s% abar(k),one_third) / (kerg*T)
+         pow(four_thirds_pi*avo*rho*s% zbar(k)/s% abar(k),one_third) / (kerg*T)
     s% mu(k) = res(i_mu)
     s% lnfree_e(k) = res(i_lnfree_e)
 
@@ -478,25 +457,20 @@ contains
     s% eos_frac_FreeEOS(k) = res(i_frac_FreeEOS)
     s% eos_frac_CMS(k) = res(i_frac_CMS)
 
-    s% chiRho_for_partials(k) = s% Pgas(k)*d_dlnd(i_lnPgas)/s% P(k)
-    s% chiT_for_partials(k) = (s% Pgas(k)*d_dlnT(i_lnPgas) + 4d0*s% Prad(k))/s% P(k)
+    s% chiRho_for_partials(k) = s% Pgas(k)*d_dlnd(i_lnPgas)/s% Peos(k)
+    s% chiT_for_partials(k) = (s% Pgas(k)*d_dlnT(i_lnPgas) + 4d0*s% Prad(k))/s% Peos(k)
     s% dE_drho_for_partials(k) = d_dlnd(i_lnE)*s% energy(k)/s% rho(k)
     s% Cv_for_partials(k) = d_dlnT(i_lnE)*s% energy(k)/s% T(k)
     s% dS_drho_for_partials(k) = d_dlnd(i_lnS)*s% entropy(k)/s% rho(k)
     s% dS_dT_for_partials(k) = d_dlnT(i_lnS)*s% entropy(k)/s% T(k)
     do j=1, s% species
        s% dlnE_dxa_for_partials(j,k) = d_dxa(i_lnE,j)
-       s% dlnP_dxa_for_partials(j,k) = s% Pgas(k)*d_dxa(i_lnPgas,j)/s% P(k)
+       s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*d_dxa(i_lnPgas,j)/s% Peos(k)
     end do
     
     s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
     s% d_QQ_dlnd(k) = s% QQ(k)*(d_dlnd(i_chiT)/s% chiT(k) - d_dlnd(i_chiRho)/s% chiRho(k) - 1d0)
     s% d_QQ_dlnT(k) = s% QQ(k)*(d_dlnT(i_chiT)/s% chiT(k) - d_dlnT(i_chiRho)/s% chiRho(k) - 1d0)
-    if (s% screening_mode == 'classic') then
-       s% theta_e(k) = eos_theta_e(res(i_eta), d_theta_e_deta)
-    else
-       s% theta_e(k) = 0d0
-    end if
     s% csound(k) = eval_csound(s,k,ierr)
 
     ! check some key values
@@ -515,9 +489,9 @@ contains
           !$OMP critical (micro_crit1)
           write(*,2) 's% cp(k)', k, s% cp(k)
           write(*,2) 's% csound(k)', k, s% csound(k)
-          write(*,2) 's% lnP(k)', k, s% lnP(k)
+          write(*,2) 's% lnPeos(k)', k, s% lnPeos(k)
           write(*,2) 's% gam(k)', k, s% gam(k)
-          write(*,2) 's% P(k)', k, s% P(k)
+          write(*,2) 's% Peos(k)', k, s% Peos(k)
           write(*,2) 's% Pgas(k)', k, s% Pgas(k)
           write(*,2) 's% rho(k)', k, s% rho(k)
           write(*,2) 's% T(k)', k, s% T(k)
@@ -573,13 +547,6 @@ contains
 
     ierr = 0
 
-    if (s% constant_L) then
-       s% opacity(k) = 0.2d0
-       s% d_opacity_dlnd(k) = 0
-       s% d_opacity_dlnT(k) = 0
-       return
-    end if
-
     log10_rho = s% lnd(k)/ln10
     log10_T = s% lnT(k)/ln10
 
@@ -613,19 +580,14 @@ contains
 
     if (is_bad_num(s% opacity(k)) .or. ierr /= 0) then
        if (s% report_ierr) then
+          write(*,*) 'do_kap_for_cell: get_kap ierr', ierr
           !$omp critical (star_kap_get)
           call show_stuff()
-          stop 'debug1: do_kap_for_cell'
+          if (s% stop_for_bad_nums) stop 'do_kap_for_cell'
           !$omp end critical (star_kap_get)
        end if
        ierr = -1
        return
-    end if
-
-    if (s% opacity(k) < 1d-99) then
-       s% opacity(k) = 1d-99
-       dlnkap_dlnd = 0
-       dlnkap_dlnT = 0
     end if
 
     opacity_factor = s% extra_opacity_factor(k)
@@ -654,24 +616,12 @@ contains
        s% d_opacity_dlnT(k) = 0
     end if
 
-    if (ierr /= 0 .or. is_bad_num(s% opacity(k))) then
+    if (is_bad_num(s% opacity(k))) then
        if (s% stop_for_bad_nums) then
           !$omp critical (star_kap_get_bad_num)
-          write(*,*)
-          write(*,2) 's% opacity(k)', k, s% opacity(k)
-          write(*,2) 's% kap_frac_Type2(k)', k, s% kap_frac_Type2(k)
-          write(*,*)
           call show_stuff()
           stop 'do_kap_for_cell'
           !$omp end critical (star_kap_get_bad_num)
-       end if
-       if (s% report_ierr) then
-          return
-          !$omp critical (star_kap_get_bad_num2)
-          write(*,*) 'do_kap_for_cell: kap_get failure for cell ', k
-          call show_stuff()
-          stop 'debug: do_kap_for_cell'
-          !$omp end critical (star_kap_get_bad_num2)
        end if
        ierr = -1
        return
@@ -756,8 +706,11 @@ contains
       write(*,*)
       write(*,1) 'logQ = ', s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
       write(*,*)
-      write(*,*)
+      write(*,1) 'kap_frac_lowT', s% kap_frac_lowT(k)
+      write(*,1) 'kap_frac_highT', s% kap_frac_highT(k)
       write(*,1) 'kap_frac_Type2', s% kap_frac_Type2(k)
+      write(*,1) 'kap_frac_Compton', s% kap_frac_Compton(k)
+      write(*,*)
       write(*,1) 'extra_opacity_factor', s% extra_opacity_factor(k)
       write(*,*)
       write(*,*)

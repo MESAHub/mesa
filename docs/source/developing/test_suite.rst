@@ -28,8 +28,8 @@ You can run an individual test by specifying a single integer, corresponding to 
 
   ./each_test_run <N>
 
-After a test runs, the file ``out.txt`` will contain the concatenated
-output from stdout and stderr.
+After a test runs, the files ``out.txt`` and ``err.txt`` will contain
+the output from stdout and stderr respectively.
 
 
 Anatomy of a test
@@ -63,6 +63,11 @@ something like
 
 It is essential to make use of ``test_suite_helpers`` as this ensures
 that important information is produced in a TestHub-friendly format.
+
+A test case must not write to stderr.  The presence of output on
+stderr will cause the test to be classified as a failure.  This
+restriction catches ``stop`` statements, calls to ``mesa_error``, or
+other error conditions.
 
 A good test should run relatively quickly.  Costly parts can be
 skipped over using a saved model and only run when
@@ -117,16 +122,19 @@ In the test case directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: ../../../star/test_suite/test_case_template/README.rst
+    :start-line: 6
 
 
 In the docs directory
 ^^^^^^^^^^^^^^^^^^^^^
 
-Once the ``README.rst`` file is created, a file in
-``docs/source/test_suite`` should be created.  This is the location of
-the include directive that incorporates the contents of the
-``README.rst`` file.  This also includes the anchor to the test suite
-for use in cross-references.
+Once the ``README.rst`` file is created, a link in ``docs/source/test_suite`` should be created.
+
+.. code-block:: sh
+
+  ln -s ../../../star/test_suite/test_case/README.rst test_case.rst
+
+This instructs Sphinx to incorporate the contents of the ``README.rst`` file.
 
 An entry linking to the test case page should be included in
 ``docs/source/test_suite.rst``.  This page will eventually list all
@@ -153,41 +161,54 @@ the TestHub by ``mesa_test``.  The file will look similar to this:
     ---
     test_case: make_co_wd
     module: :star
-    omp_num_threads: 2
+    omp_num_threads: 36
+    run_optional: false
+    fpe_checks: false
     inlists:
         - inlist: inlist_co_core_header
-          runtime_minutes:   2.29
-          steps:    151
-          retries:      0
-          redos:      0
-          solver_calls_made:    151
-          solver_calls_failed:      0
-          solver_iterations:    846
-          log_rel_run_E_err:        -3.8240036219155993
+          runtime_minutes:   3.20
+          model_number:         1008
+          star_age:     4.3063267775397134E+08
+          num_retries:            7
+          log_rel_run_E_err:        -7.0353816429993685
+          steps:         1008
+          retries:            7
+          redos:            0
+          solver_calls_made:         1015
+          solver_calls_failed:            7
+          solver_iterations:        10280
         - inlist: inlist_remove_env_header
-          runtime_minutes:   2.08
-          steps:    438
-          retries:     18
-          redos:      0
-          solver_calls_made:    456
-          solver_calls_failed:     18
-          solver_iterations:   1361
-          log_rel_run_E_err:        -3.8220395900315363
+          runtime_minutes:   2.62
+          model_number:         1568
+          star_age:     4.3064418442484504E+08
+          num_retries:           30
+          log_rel_run_E_err:        -6.9640200618973518
+          steps:          961
+          retries:           34
+          redos:            0
+          solver_calls_made:          995
+          solver_calls_failed:           34
+          solver_iterations:         6403
         - inlist: inlist_settle_header
-          runtime_minutes:   3.55
-          steps:    161
-          retries:      0
-          redos:      0
-          solver_calls_made:    161
-          solver_calls_failed:      0
-          solver_iterations:    735
-          log_rel_run_E_err:        -7.2371589938451679
-    mem_rn: 7814204
+          runtime_minutes:   2.44
+          model_number:         1746
+          star_age:     4.3359174056506151E+08
+          num_retries:           10
+          log_rel_run_E_err:       -10.1236273392339484
+          steps:          184
+          retries:            4
+          redos:            0
+          solver_calls_made:          184
+          solver_calls_failed:            0
+          solver_iterations:         1097
+    mem_rn: 11815904
     success_type: :run_test_string
-    mem_re: 3471908
+    restart_photo: x650
+    mem_re: 4635248
     success_type: :photo_checksum
-    checksum: 48f31b30ef89bb579de45f68919d57be
+    checksum: cb6df95a221722e7317a6e53c9c61272
     outcome: :pass
+
 
 The output is collected in a variety of places.  The highest level
 information (i.e. no indent) that summarizes the test case itself
@@ -209,8 +230,30 @@ In particular, in the star/binary ``after_evolve`` hook, the call to
 ``test_suite_after_evolve`` (and its callees) append the relevant info
 to the ``testhub.yml`` file.
 
-The aforementioned routines control output that should be present for
-every MESA test case.  Some test cases may want to output additional
+This output is generated each time MESA terminates (except after a restart).  Therefore, the per-inlist quantities that can be reported by TestHub are those accessible within a single part of a MESA run.  By default, we report
+
+   + ``runtime_minutes``
+   + ``steps``
+   + ``retries``
+   + ``redos``
+   + ``solver_calls_made``
+   + ``solver_calls_failed``
+   + ``solver_iterations``
+
+In a multi-part test case, the per-part values can be summed to give the properties of the complete run.
+
+TestHub also reports quantities that can reflect information preserved by MESA across parts.  These are transmitted via their inclusion in the model file.  That means the values reported by cases that use saved models to skip optional parts will be influenced by the performance at the time the saved model was generated.  Additionally, some parts may include inlist options that reset or modify these quantities.  TestHub reports the values at the end of each part, but the precise meaning of these quantities cannot be understood without reference to the details of the test case.
+
+   + ``model_number``
+   + ``star_age``
+   + ``num_retries``
+   + ``log_rel_run_E_err``
+
+.. note ::
+
+  These values can be useful when diagnosing test case issues because they directly correspond to quantities in the terminal output.
+
+Some test cases may want to output additional
 information.  To do so, set elements in the provided arrays
 ``testhub_extras_names`` and ``testhub_extras_values``.  The values in
 these arrays (at the time the after evolve hook is called) will be
@@ -250,3 +293,38 @@ which results in the additional output
             -     3.3303926652486070E-05
             -     7.2015481753889745E-05
 
+Continuous integration testing
+------------------------------
+
+Multiple developers have set up their machines to enable continuous integration testing. These machines will
+automatically pull the changes in the repository, run the test suite, and report back to testhub.
+To make more efficient the usage of these machines they will respond to certain keywords if found in the
+commit message.
+
+.. note ::
+    It is up to each person providing the computing resources to implement each keyword. Thus some 
+    machines will ignore these keywords and run the test suite normally. Therefore, these are only
+    "requests" for the computing machines not "orders".
+
+The message (with brackets) may appear anywhere in the commit message. 
+
+
+[ci skip]
+^^^^^^^^^
+
+Compile ``MESA`` but do not run the test suite. Useful when changes only touch documentation or the changes can not affect the final result.
+
+[ci split]
+^^^^^^^^^^
+
+Splits the running of the test suite between machines. Current, if set, cannon will run the first half of the test cases while helios will run the second half.
+
+[ci optional]
+^^^^^^^^^^^^^
+
+Runs ``MESA`` with the environment variable ``MESA_RUN_OPTIONAL=t`` set. This requests that the slower optional parts of each test case be ran.
+
+[ci optional n]
+^^^^^^^^^^^^^^^
+
+Where ``n`` is an integer. Same as ``[ci optional]`` but only run the first ``n`` test cases.

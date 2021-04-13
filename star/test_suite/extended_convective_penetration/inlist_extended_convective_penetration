@@ -51,7 +51,7 @@
     profile_interval = 100    
     history_interval = 1
     terminal_interval = 10
-    photo_interval = 25
+    photo_interval = 10
 
 !OPTIONS
     do_conv_premix = .true.
@@ -77,7 +77,7 @@
 
 
 ! MESH & TIMESTEPS
-    varcontrol_target = 1d-4
+    !varcontrol_target = 1d-4
     mesh_delta_coeff = 1
     okay_to_remesh = .true.
 

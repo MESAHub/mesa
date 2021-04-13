@@ -517,9 +517,7 @@
                call do_val(i, 'star_mass_o16', s% star_mass_o16)
                call do_val(i, 'star_mass_ne20', s% star_mass_ne20)
                call do_val(i, 'he_core_mass', s% he_core_mass)
-               call do_val(i, 'c_core_mass', s% c_core_mass)
-               call do_val(i, 'o_core_mass', s% o_core_mass)
-               call do_val(i, 'si_core_mass', s% si_core_mass)
+               call do_val(i, 'co_core_mass', s% co_core_mass)
                call do_val(i, 'fe_core_mass', s% fe_core_mass)
                call do_val(i, 'neutron_rich_core_mass', s% neutron_rich_core_mass)
                call do_val(i, 'tau10_mass', s% tau10_mass)
@@ -897,13 +895,9 @@
          nz = s% nz
 
          if (.not. s% write_profiles_flag) return
-         if (.not. s% v_flag) then
-            s% v(1:nz) = 0
-            s% dv_dt(1:nz)  = 0
-         end if
-         if (.not. s% rotation_flag) then
-            s% omega(1:nz) = 0
-         end if
+         if (.not. s% v_flag) s% v(1:nz) = 0
+         if (.not. s% u_flag) s% u(1:nz) = 0
+         if (.not. s% rotation_flag) s% omega(1:nz) = 0
 
          max_num_mods = s% max_num_profile_models
          if (max_num_mods < 0) max_num_mods = s% model_number
@@ -952,8 +946,6 @@
          if (ierr /= 0) then
             call dealloc; return
          end if
-
-         s% profile_age = s% star_age
 
          call dealloc
 

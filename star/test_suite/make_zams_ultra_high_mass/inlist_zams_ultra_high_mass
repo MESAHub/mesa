@@ -25,8 +25,6 @@
       !set_cumulative_energy_error_each_step_if_age_less_than = -1d99 ! years
       new_cumulative_energy_error = 0d0
 
-      !pgstar_flag = .true.
-
 / ! end of star_job namelist
 
 &eos

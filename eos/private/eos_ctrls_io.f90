@@ -34,8 +34,6 @@
    public :: read_namelist, write_namelist
    private
 
-   logical :: use_max_SCVH_for_PT, use_max_CMS_for_PT
-
    ! controls for HELM
    real(dp) :: Z_all_HELM ! all HELM for Z >= this unless use_FreeEOS
    real(dp) :: logT_all_HELM ! all HELM for lgT >= this
@@ -110,14 +108,17 @@
    real(dp) :: mass_fraction_limit_for_Skye
    real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
    real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
-   
+   character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
+
+   logical :: use_simple_Skye_blends
+   real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
+   real(dp) :: logT_min_for_any_Skye, logT_min_for_all_Skye
 
    ! misc
    logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
    logical :: eosDT_use_linear_interp_for_X
    logical :: eosDT_use_linear_interp_to_HELM
    character(len=128) :: eosDT_file_prefix
-   character(len=128) :: eosPT_file_prefix
    logical :: okay_to_convert_ierr_to_skip
    real(dp) :: tiny_fuzz
 
@@ -147,9 +148,6 @@
 
    namelist /eos/ &
       use_FreeEOS, &
-      use_max_SCVH_for_PT, &
-      use_max_CMS_for_PT, &
-
       
       ! controls for HELM
       Z_all_HELM, & ! all HELM for Z >= this unless use_FreeEOS
@@ -235,6 +233,13 @@
       mass_fraction_limit_for_Skye, &
       Skye_min_gamma_for_solid, & ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
       Skye_max_gamma_for_liquid, & ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+      Skye_solid_mixing_rule, &
+
+      use_simple_Skye_blends, &
+      logRho_min_for_any_Skye, &
+      logRho_min_for_all_Skye, &
+      logT_min_for_any_Skye, &
+      logT_min_for_all_Skye, &
 
       ! misc
       include_radiation, &
@@ -243,7 +248,6 @@
       eosDT_use_linear_interp_for_X, &
       eosDT_use_linear_interp_to_HELM, &
       eosDT_file_prefix, &
-      eosPT_file_prefix, &
       
       okay_to_convert_ierr_to_skip, &
       tiny_fuzz, &
@@ -404,8 +408,6 @@
 
    subroutine store_controls(rq)
       type (EoS_General_Info), pointer :: rq
-      rq% use_max_SCVH_for_PT = use_max_SCVH_for_PT
-      rq% use_max_CMS_for_PT = use_max_CMS_for_PT      
       ! controls for HELM
       rq% Z_all_HELM = Z_all_HELM
       rq% logT_all_HELM = logT_all_HELM
@@ -485,6 +487,13 @@
       rq% mass_fraction_limit_for_Skye = mass_fraction_limit_for_Skye
       rq%Skye_min_gamma_for_solid = Skye_min_gamma_for_solid
       rq%Skye_max_gamma_for_liquid = Skye_max_gamma_for_liquid
+      rq%Skye_solid_mixing_rule = Skye_solid_mixing_rule
+      rq% use_simple_Skye_blends = use_simple_Skye_blends
+      rq% logRho_min_for_any_Skye = logRho_min_for_any_Skye
+      rq% logRho_min_for_all_Skye = logRho_min_for_all_Skye
+      rq% logT_min_for_any_Skye = logT_min_for_any_Skye
+      rq% logT_min_for_all_Skye = logT_min_for_all_Skye
+
       ! misc
       rq% include_radiation = include_radiation
       rq% always_skip_elec_pos = always_skip_elec_pos
@@ -492,7 +501,6 @@
       rq% eosDT_use_linear_interp_for_X = eosDT_use_linear_interp_for_X
       rq% eosDT_use_linear_interp_to_HELM = eosDT_use_linear_interp_to_HELM      
       rq% eosDT_file_prefix = eosDT_file_prefix      
-      rq% eosPT_file_prefix = eosPT_file_prefix
       rq% okay_to_convert_ierr_to_skip = okay_to_convert_ierr_to_skip
       rq% tiny_fuzz = tiny_fuzz
       ! debugging
@@ -533,8 +541,6 @@
 
    subroutine set_controls_for_writing(rq)
       type (EoS_General_Info), pointer :: rq
-      use_max_SCVH_for_PT = rq% use_max_SCVH_for_PT
-      use_max_CMS_for_PT = rq% use_max_CMS_for_PT      
       ! controls for HELM
       Z_all_HELM = rq% Z_all_HELM
       logT_all_HELM = rq% logT_all_HELM
@@ -613,7 +619,14 @@
       use_Skye = rq% use_Skye
       mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye   
       Skye_min_gamma_for_solid = rq% Skye_min_gamma_for_solid
-      Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid   
+      Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid  
+      Skye_solid_mixing_rule = rq% Skye_solid_mixing_rule
+      use_simple_Skye_blends = rq% use_simple_Skye_blends
+      logRho_min_for_any_Skye = rq% logRho_min_for_any_Skye
+      logRho_min_for_all_Skye = rq% logRho_min_for_all_Skye
+      logT_min_for_any_Skye = rq% logT_min_for_any_Skye
+      logT_min_for_all_Skye = rq% logT_min_for_all_Skye
+
       ! misc
       include_radiation = rq% include_radiation
       always_skip_elec_pos = rq% always_skip_elec_pos
@@ -621,7 +634,6 @@
       eosDT_use_linear_interp_for_X = rq% eosDT_use_linear_interp_for_X
       eosDT_use_linear_interp_to_HELM = rq% eosDT_use_linear_interp_to_HELM      
       eosDT_file_prefix = rq% eosDT_file_prefix      
-      eosPT_file_prefix = rq% eosPT_file_prefix
       okay_to_convert_ierr_to_skip = rq% okay_to_convert_ierr_to_skip
       tiny_fuzz = rq% tiny_fuzz
       ! debugging

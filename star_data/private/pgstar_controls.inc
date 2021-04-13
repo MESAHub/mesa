@@ -31,7 +31,9 @@
          pgstar_model_lw, &
          pgstar_xaxis_label_lw, &
          pgstar_left_yaxis_label_lw, &
-         pgstar_right_yaxis_label_lw
+         pgstar_right_yaxis_label_lw, &
+         pgstar_profile_line_style, &
+         pgstar_history_line_style
 
       real :: &
          pgstar_grid_title_scale, &
@@ -1162,7 +1164,7 @@
       logical :: do_History_Panels1_win, do_History_Panels1_file
       integer :: id_History_Panels1_win, id_History_Panels1_file, History_Panels1_file_interval
       character (len=strlen) :: History_Panels1_file_dir, History_Panels1_file_prefix
-      logical :: History_Panels1_xaxis_reversed,History_Panels1_xaxis_log
+      logical :: History_Panels1_xaxis_reversed, History_Panels1_automatic_star_age_units, History_Panels1_xaxis_log
       character (len=strlen) :: History_Panels1_xaxis_name, History_Panels1_title
       real :: &
          History_Panels1_xmin, History_Panels1_xmax, History_Panels1_dxmin,&
@@ -1192,7 +1194,7 @@
       logical :: do_History_Panels2_win, do_History_Panels2_file
       integer :: id_History_Panels2_win, id_History_Panels2_file, History_Panels2_file_interval
       character (len=strlen) :: History_Panels2_file_dir, History_Panels2_file_prefix
-      logical :: History_Panels2_xaxis_reversed,History_Panels2_xaxis_log
+      logical :: History_Panels2_xaxis_reversed, History_Panels2_automatic_star_age_units, History_Panels2_xaxis_log
       character (len=strlen) :: History_Panels2_xaxis_name, History_Panels2_title
       real :: &
          History_Panels2_xmin, History_Panels2_xmax, History_Panels2_dxmin,&
@@ -1222,7 +1224,7 @@
       logical :: do_History_Panels3_win, do_History_Panels3_file
       integer :: id_History_Panels3_win, id_History_Panels3_file, History_Panels3_file_interval
       character (len=strlen) :: History_Panels3_file_dir, History_Panels3_file_prefix
-      logical :: History_Panels3_xaxis_reversed,History_Panels3_xaxis_log
+      logical :: History_Panels3_xaxis_reversed, History_Panels3_automatic_star_age_units, History_Panels3_xaxis_log
       character (len=strlen) :: History_Panels3_xaxis_name, History_Panels3_title
       real :: &
          History_Panels3_xmin, History_Panels3_xmax, History_Panels3_dxmin,&
@@ -1252,7 +1254,7 @@
       logical :: do_History_Panels4_win, do_History_Panels4_file
       integer :: id_History_Panels4_win, id_History_Panels4_file, History_Panels4_file_interval
       character (len=strlen) :: History_Panels4_file_dir, History_Panels4_file_prefix
-      logical :: History_Panels4_xaxis_reversed,History_Panels4_xaxis_log
+      logical :: History_Panels4_xaxis_reversed, History_Panels4_automatic_star_age_units, History_Panels4_xaxis_log
       character (len=strlen) :: History_Panels4_xaxis_name, History_Panels4_title
       real :: &
          History_Panels4_xmin, History_Panels4_xmax, History_Panels4_dxmin,&
@@ -1281,7 +1283,7 @@
       logical :: do_History_Panels5_win, do_History_Panels5_file
       integer :: id_History_Panels5_win, id_History_Panels5_file, History_Panels5_file_interval
       character (len=strlen) :: History_Panels5_file_dir, History_Panels5_file_prefix
-      logical :: History_Panels5_xaxis_reversed,History_Panels5_xaxis_log
+      logical :: History_Panels5_xaxis_reversed, History_Panels5_automatic_star_age_units, History_Panels5_xaxis_log
       character (len=strlen) :: History_Panels5_xaxis_name, History_Panels5_title
       real :: &
          History_Panels5_xmin, History_Panels5_xmax, History_Panels5_dxmin,&
@@ -1310,7 +1312,7 @@
       logical :: do_History_Panels6_win, do_History_Panels6_file
       integer :: id_History_Panels6_win, id_History_Panels6_file, History_Panels6_file_interval
       character (len=strlen) :: History_Panels6_file_dir, History_Panels6_file_prefix
-      logical :: History_Panels6_xaxis_reversed,History_Panels6_xaxis_log
+      logical :: History_Panels6_xaxis_reversed, History_Panels6_automatic_star_age_units, History_Panels6_xaxis_log
       character (len=strlen) :: History_Panels6_xaxis_name, History_Panels6_title
       real :: &
          History_Panels6_xmin, History_Panels6_xmax, History_Panels6_dxmin,&
@@ -1339,7 +1341,7 @@
       logical :: do_History_Panels7_win, do_History_Panels7_file
       integer :: id_History_Panels7_win, id_History_Panels7_file, History_Panels7_file_interval
       character (len=strlen) :: History_Panels7_file_dir, History_Panels7_file_prefix
-      logical :: History_Panels7_xaxis_reversed,History_Panels7_xaxis_log
+      logical :: History_Panels7_xaxis_reversed, History_Panels7_automatic_star_age_units, History_Panels7_xaxis_log
       character (len=strlen) :: History_Panels7_xaxis_name, History_Panels7_title
       real :: &
          History_Panels7_xmin, History_Panels7_xmax, History_Panels7_dxmin,&
@@ -1368,7 +1370,7 @@
       logical :: do_History_Panels8_win, do_History_Panels8_file
       integer :: id_History_Panels8_win, id_History_Panels8_file, History_Panels8_file_interval
       character (len=strlen) :: History_Panels8_file_dir, History_Panels8_file_prefix
-      logical :: History_Panels8_xaxis_reversed,History_Panels8_xaxis_log
+      logical :: History_Panels8_xaxis_reversed, History_Panels8_automatic_star_age_units, History_Panels8_xaxis_log
       character (len=strlen) :: History_Panels8_xaxis_name, History_Panels8_title
       real :: &
          History_Panels8_xmin, History_Panels8_xmax, History_Panels8_dxmin,&
@@ -1397,7 +1399,7 @@
       logical :: do_History_Panels9_win, do_History_Panels9_file
       integer :: id_History_Panels9_win, id_History_Panels9_file, History_Panels9_file_interval
       character (len=strlen) :: History_Panels9_file_dir, History_Panels9_file_prefix
-      logical :: History_Panels9_xaxis_reversed,History_Panels9_xaxis_log
+      logical :: History_Panels9_xaxis_reversed, History_Panels9_automatic_star_age_units, History_Panels9_xaxis_log
       character (len=strlen) :: History_Panels9_xaxis_name, History_Panels9_title
       real :: &
          History_Panels9_xmin, History_Panels9_xmax, History_Panels9_dxmin,&

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013-2019  Josiah Schwab, Bill Paxton & The MESA Team
+!   Copyright (C) 2013-2021  Josiah Schwab, Bill Paxton & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -28,6 +28,7 @@ module eval_ecapture
   use rates_def
   use const_def, only: dp, ln2
   use math_lib
+  use auto_diff
 
   implicit none
 
@@ -44,8 +45,7 @@ contains
     use rates_def, only: Coulomb_Info
     use eval_psi
     use eval_coulomb
-    use const_def, only: ln10, kerg, mev_to_ergs, keV, me, clight, ev2erg, fine
-    use const_def, only: const_pi => pi
+    use const_def, only: ln10, kerg, mev_to_ergs, keV, me, clight, ev2erg, fine, pi
     use chem_def
     use utils_lib, only: is_bad, &
       integer_dict_lookup, integer_dict_size
@@ -66,60 +66,61 @@ contains
     integer :: offset_lhs, nstates_lhs, lo_lhs, hi_lhs
     integer :: offset_rhs, nstates_rhs, lo_rhs, hi_rhs
 
-    real(dp) :: mue, dmue_dlnRho, dmue_dlnT ! chem pot and derivatives
+    type(auto_diff_real_2var_order1) :: mue, eta, beta, kT
 
     character(len=iso_name_length) :: ecapture_lhs, ecapture_rhs
 
-    real(dp) :: Qx, T, beta, kT, mec2, Z, Eavg, Ei, Ef, G_GM
-    real(dp) :: eta, deta_dlnT, deta_dlnRho
+    real(dp) :: Qx, mec2, Ei, Ef, G_GM, ln2ft
 
     real(dp), dimension(max_num_ecapture_states) :: E_lhs, E_rhs, J_lhs, J_rhs
-    real(dp), dimension(max_num_ecapture_states) :: bf, Pi, dPi_dlnT
+    type(auto_diff_real_2var_order1), dimension(max_num_ecapture_states) :: bf, PPi
+    type(auto_diff_real_2var_order1) :: Z, Eavg
 
     integer, dimension(max_num_ecapture_transitions) :: Si, Sf
     real(dp), dimension(max_num_ecapture_transitions) :: logft
 
-    real(dp), dimension(max_num_ecapture_transitions) :: zeta
-    real(dp), dimension(max_num_ecapture_transitions) :: Ie, dIe_dlnT, dIe_dlnRho
-    real(dp), dimension(max_num_ecapture_transitions) :: Je, dJe_dlnT, dJe_dlnRho
-    real(dp), dimension(max_num_ecapture_transitions) :: Pj, dPj_dlnT
-
-    real(dp), dimension(max_num_ecapture_transitions) :: lambdaj, lambdaj_neu
+    type(auto_diff_real_2var_order1), dimension(max_num_ecapture_transitions) :: zeta
+    type(auto_diff_real_2var_order1) :: Ie_ad, Je_ad, lambda_ad, neutrino_ad, Qneu_ad
+    type(auto_diff_real_2var_order1), dimension(max_num_ecapture_transitions) :: Pj
 
     ! for coulomb corrections
-    real(dp) :: Z_lhs, Z_rhs, muI_lhs, muI_rhs, delta_muI, delta_Q, Vs, f_muE
+    real(dp) :: Z_lhs, Z_rhs
+    type(auto_diff_real_2var_order1) :: muI_lhs, muI_rhs, delta_muI, delta_Q, Vs, f_muE
 
-    real(dp) :: neutrino, dneutrino_dlnT, dneutrino_dlnRho, &
-         gammaray, dgammaray_dlnT, dgammaray_dlnRho, lambdam1
     character(len=2*iso_name_length+1) :: key
 
     integer :: rxn_type, ii
     integer, parameter :: rxn_ecapture = 1, rxn_betadecay = -1
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
+
+    ! auto_diff variables have
+    ! var1: lnT
+    ! var2: lnRho
 
     ! first, translate the density, temperature, etc into appropriate units
 
     kT = 1d3 * keV * T9 ! in MeV
+    kT% d1val1 = kT% val
+    kT% d1val2 = 0d0
+    
     mec2 = me * clight*clight / mev_to_ergs ! in MeV
     beta = mec2/kT ! dimesionless
 
     ! the chemical potentials from the equation of state are kinetic
     ! so add in the rest mass terms
 
-    eta = etak + beta
-    deta_dlnT = d_etak_dlnT - beta
-    deta_dlnRho = d_etak_dlnRho
+    eta% val = etak + beta% val
+    eta% d1val1 = d_etak_dlnT + beta % d1val1
+    eta% d1val2 = d_etak_dlnRho + beta % d1val2
 
     ! only evaluate this for really degenerate stuff
     if (eta .lt. 2*beta) return
 
     ! also need chemical potential in MeV
     mue = eta * kT
-    dmue_dlnRho = deta_dlnRho * kT
-    dmue_dlnT = deta_dlnT * kT + mue
 
     do i = 1, n ! loop over reactions
 
@@ -167,12 +168,12 @@ contains
        case(rxn_ecapture)
           ! use the *atomic* isotope data to get the *nuclear* mass excess
           Qx = chem_isos% mass_excess(lhs) - chem_isos% mass_excess(rhs) - mec2
-          G_GM = exp(const_pi* fine * Z_lhs)
+          G_GM = exp(pi* fine * Z_lhs)
           if (dbg) write(*,*) "ecapture ", key
        case(rxn_betadecay)
           ! use the *atomic* isotope data to get the *nuclear* mass excess
           Qx = chem_isos% mass_excess(lhs) - chem_isos% mass_excess(rhs) + mec2
-          G_GM = exp(const_pi * fine * Z_rhs)
+          G_GM = exp(pi * fine * Z_rhs)
           if (dbg) write(*,*) "betadecay ", key
        end select
 
@@ -217,20 +218,23 @@ contains
        ! we assume the left hand side states have thermal occupation fractions
 
        ! calculate boltzmann factor (bf), partition function (Z), and <E>
+       Z = 0d0
+       Eavg = 0d0
        do ii=1,nstates_lhs
          bf(ii) = (2 * J_lhs(ii) + 1) * exp(-E_lhs(ii)/ kT)
+         Z = Z + bf(ii)
+         Eavg = Eavg + bf(ii) * E_lhs(ii)
        end do
-       Z = sum(bf(1:nstates_lhs))
-       Eavg = sum(bf(1:nstates_lhs)* E_lhs(1:nstates_lhs))/ Z
+       Eavg = Eavg / Z
 
-       ! occupation probability (& derivative)
-       Pi(1:nstates_lhs) = bf(1:nstates_lhs)/Z
-       dPi_dlnT(1:nstates_lhs) = Pi(1:nstates_lhs) * (E_lhs(1:nstates_lhs) - Eavg) / kT
+       ! occupation probability
+       do ii=1,nstates_lhs
+          PPi(ii) = bf(ii)/Z
+       end do
 
-       ! now rearrange these rates to they apply to the transitions
+       ! now rearrange these rates so they apply to the transitions
        do j = 1, ntrans
-          Pj(j) = Pi(Si(j))
-          dPj_dlnT(j) = dPi_dlnT(Si(j))
+          Pj(j) = PPi(Si(j))
        end do
 
        if (dbg) then
@@ -256,6 +260,9 @@ contains
 
        if (dbg) write(*,*) eta, muI_lhs, muI_rhs, delta_muI, Vs
 
+       lambda_ad = 0d0
+       neutrino_ad = 0d0
+
        ! do the phase space integrals
        do j = 1, ntrans
 
@@ -267,61 +274,39 @@ contains
 
           select case(rxn_type)
           case(rxn_ecapture)
-             call do_psi_Iec_and_Jec(beta, zeta(j), &
-                  f_muE * eta, f_muE * deta_dlnT, f_muE * deta_dlnRho, &
-                  Ie(j), dIe_dlnT(j), dIe_dlnRho(j), Je(j), dJe_dlnT(j), dJe_dlnRho(j))
+             call do_psi_Iec_and_Jec(beta, zeta(j), f_muE*eta, Ie_ad, Je_ad)
           case(rxn_betadecay)
-             call do_psi_Iee_and_Jee(beta, zeta(j), &
-                  f_muE * eta, f_muE * deta_dlnT, f_muE * deta_dlnRho, &
-                  Ie(j), dIe_dlnT(j), dIe_dlnRho(j), Je(j), dJe_dlnT(j), dJe_dlnRho(j))
+             call do_psi_Iee_and_Jee(beta, zeta(j), f_muE*eta, Ie_ad, Je_ad)
           end select
 
+          ! apply fermi-function correction factor
+          Ie_ad = G_GM * Ie_ad
+          Je_ad = G_GM * Je_ad
+
+          ! convert to rates
+          ln2ft = ln2 * exp10(-logft(j))
+          ! protect against 0s
+          if ((Ie_ad .gt. 0) .and. (Je_ad .gt. 0)) then
+             lambda_ad = lambda_ad + Ie_ad * ln2ft * Pj(j)
+             neutrino_ad = neutrino_ad + mec2 * Je_ad * ln2ft * Pj(j)
+          end if
+
        end do
 
-       ! apply fermi-function correction factor
-       Ie(1:ntrans) = G_GM * Ie(1:ntrans)
-       dIe_dlnT(1:ntrans) = G_GM * dIe_dlnT(1:ntrans)
-       dIe_dlnRho(1:ntrans) = G_GM * dIe_dlnRho(1:ntrans)
-
-       Je(1:ntrans) = G_GM * Je(1:ntrans)
-       dJe_dlnT(1:ntrans) = G_GM * dJe_dlnT(1:ntrans)
-       dJe_dlnRho(1:ntrans) = G_GM * dJe_dlnRho(1:ntrans)
-
-       ! add approximate fermi-function corrections
-
-       do j=1,ntrans
-         lambdaj(j) =  Ie(j) * exp10(-logft(j)) * ln2
-         lambdaj_neu(j) = Je(j) * exp10(-logft(j)) * ln2
-       end do
-
-       ! masked arrays prevent dividing by zero in derivatives
-       ! if Ie is 0, we also expect dIe_dlnT, dIe_dlnRho is 0
-
-       lambda(i) = sum(lambdaj(1:ntrans) * Pj(1:ntrans))
-       dlambda_dlnT(i) = sum(lambdaj(1:ntrans) *  &
-            ( dPj_dlnT(1:ntrans) + Pj(1:ntrans) * dIe_dlnT(1:ntrans)/Ie(1:ntrans)), &
-            MASK=(Ie(1:ntrans).ne.0))
-       dlambda_dlnRho(i) = sum(lambdaj(1:ntrans) * &
-            Pj(1:ntrans) * dIe_dlnRho(1:ntrans)/Ie(1:ntrans), &
-            MASK=(Ie(1:ntrans).ne.0))
-
-       neutrino = mec2 * sum(lambdaj_neu(1:ntrans) * Pj(1:ntrans))
-       dneutrino_dlnT = mec2 * sum(lambdaj_neu(1:ntrans) * &
-            ( dPj_dlnT(1:ntrans) + Pj(1:ntrans) * dJe_dlnT(1:ntrans)/Je(1:ntrans)), &
-            MASK=(Je(1:ntrans).ne.0))
-       dneutrino_dlnRho = mec2 * sum(lambdaj_neu(1:ntrans) * &
-            Pj(1:ntrans) * dJe_dlnRho(1:ntrans)/Je(1:ntrans), &
-            MASK=(Je(1:ntrans).ne.0))
-
-       if (lambda(i) .gt. 1d-30) then
-          lambdam1 = 1.0_dp / lambda(i)
+       if (lambda_ad .gt. 1d-30) then
+          Qneu_ad = neutrino_ad / lambda_ad
        else
-          lambdam1 = 0
+          Qneu_ad = 0d0
        end if
 
-       Qneu(i) = neutrino * lambdam1
-       dQneu_dlnT(i) = (dneutrino_dlnT - dlambda_dlnT(i) * Qneu(i)) * lambdam1
-       dQneu_dlnRho(i) = (dneutrino_dlnRho - dlambda_dlnRho(i) * Qneu(i)) * lambdam1
+       ! unpack from auto_diff
+       lambda(i) = lambda_ad % val
+       dlambda_dlnT(i) = lambda_ad % d1val1
+       dlambda_dlnRho(i) = lambda_ad % d1val2
+
+       Qneu(i) = Qneu_ad% val
+       dQneu_dlnT(i) = Qneu_ad% d1val1
+       dQneu_dlnRho(i) = Qneu_ad% d1val2
 
        ! this is the *total* energy per decay (neu losses are subtracted later)
 

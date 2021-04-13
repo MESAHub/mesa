@@ -214,6 +214,7 @@
          integer :: k, k0, k1, nz
          real(dp) :: ie, ke, pe, rR, rL, rC, m_cntr, &
             sum_total_energy, speed_limit
+         real(dp), pointer :: v(:)
          
          include 'formats'
          
@@ -223,9 +224,11 @@
             return
          end if
          
-         if (.not. s% u_flag) then
-            write(*,*) 'only remove fallback with u_flag'
-            ierr = -1
+         if (s% u_flag) then
+            v => s% u
+         else if (s% v_flag) then
+            v => s% v
+         else
             return
          end if
          
@@ -239,7 +242,7 @@
             sum_total_energy = 0d0
             do k = nz,1,-1
                ie = s% energy(k)*s% dm(k)
-               ke = 0.5d0*s% u(k)*s% u(k)*s% dm(k)
+               ke = 0.5d0*v(k)*v(k)*s% dm(k)
                if (k == s% nz) then   
                   rL = s% R_center
                else
@@ -273,7 +276,7 @@
             end if
             do k=k0-1,1,-1
                ie = s% energy(k)*s% dm(k)
-               ke = 0.5d0*s% u(k)*s% u(k)*s% dm(k)
+               ke = 0.5d0*v(k)*v(k)*s% dm(k)
                rL = s% r(k+1)
                rR = s% r(k)
                rC = 0.5d0*(rR + rL)
@@ -287,12 +290,10 @@
             end do
          else
             speed_limit = s% job% remove_fallback_speed_limit
-            !write(*,3) '-u/limit', s% model_number, nz, -s% u(nz)/(speed_limit*s% csound(nz))
-            if (-s% u(nz) <= speed_limit*s% csound(nz)) return
+            if (-v(nz) <= speed_limit*s% csound(nz)) return
             do k = nz-1,1,-1
                k0 = k+1
-               !write(*,3) '-u/limit', s% model_number, k, -s% u(k)/(speed_limit*s% csound(k))
-               if (-s% u(k) < speed_limit*s% csound(k)) exit
+               if (-v(k) < speed_limit*s% csound(k)) exit
             end do
          end if
          
@@ -352,7 +353,7 @@
          type (star_info), pointer :: s
          integer :: k, k0
          real(dp) :: lnP_limit
-         include 'formats'        
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_limit_center_logP: get_star_ptr ierr', ierr
@@ -360,11 +361,11 @@
          end if         
          lnP_limit = logP_limit*ln10
          k = s% nz
-         if (s% lnP(k) > lnP_limit) then
+         if (s% lnPeos(k) > lnP_limit) then
             call do_remove_inner_fraction_q(id, s% q(k), ierr)
             if (ierr == 0) &
                write(*,3)' remove center for logP_limit', &
-                  k, s% nz, s% m(k)/Msun, s% lnP(k)/ln10, logP_limit
+                  k, s% nz, s% m(k)/Msun, s% lnPeos(k)/ln10, logP_limit
          end if
       end subroutine do_limit_center_logP
 
@@ -416,21 +417,32 @@
          real(dp), intent(in) :: infall_kms
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
-         real(dp) :: v
+         integer :: k, k_infall
+         real(dp) :: v_infall, v
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_center_by_infall_kms: get_star_ptr ierr', ierr
             return
          end if
-         v = -abs(infall_kms)*1d5
-         do k=1,s% nz
-            if (s% v(k) <= v) then
-               call do_remove_inner_fraction_q(id, s% q(k), ierr)
+         v_infall = -abs(infall_kms)*1d5
+         k_infall = 0
+         do k=s% nz,1,-1
+            if (s% v_flag) then
+               v = s% v(k)
+            else if (s% u_flag) then
+               v = s% u(k)
+            else
+               write(*,*) 'must have v or u for do_remove_center_by_infall_kms'
+               ierr = -1
                return
             end if
+            if (v > v_infall) exit ! not falling fast enough
+            k_infall = k
          end do
-         ierr = -1
+         if (k_infall == 0) return ! no infall
+         call do_remove_inner_fraction_q(id, s% q(k_infall), ierr)
+         write(*,1) 'new inner boundary mass', s% m_center/Msun
       end subroutine do_remove_center_by_infall_kms
 
 
@@ -480,22 +492,27 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: q_max, abs_v_max
-         integer :: k
+         integer :: k_max
+         real(dp), pointer :: v(:)
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_center_at_inner_max_abs_v: get_star_ptr ierr', ierr
             return
          end if
-         q_max = 0
-         abs_v_max = 0
-         do k=s% nz-1, 1, -1
-            if (abs(s% v(k)) > abs_v_max) then
-               q_max = s% q(k)
-               abs_v_max = abs(s% v(k))
-               exit
-            end if
-         end do
-         call do_remove_inner_fraction_q(id, q_max, ierr)
+         if (s% u_flag) then
+            v => s% u
+         else if (s% v_flag) then
+            v => s% v
+         else
+            stop 'no u or v for do_remove_center_at_inner_max_abs_v?'
+            return
+         end if
+         k_max = minloc(v(1:s% nz),dim=1)
+         q_max = s% q(k_max)
+         abs_v_max = abs(v(k_max))
+         !write(*,2) 'v abs_v_max q_max', k_max, v(k_max), abs_v_max, q_max
+         call do_remove_center(id, k_max, ierr)
       end subroutine do_remove_center_at_inner_max_abs_v
 
 
@@ -582,17 +599,20 @@
          new_xmstar = s% m(1) - s% M_center
          s% xmstar = new_xmstar
          s% R_center = s% r(k)
+         
+         
          if (s% job% remove_center_adjust_L_center) s% L_center = s% L(k)
          if (s% u_flag) then
+            kk = minloc(s% u(1:s% nz),dim=1)
             s% v_center = s% u(k)
             if (is_bad(s% v_center)) then
-               write(*,2) 's% u(k)', k, s% u(k)
+               write(*,2) 'center s% u(k)', k, s% u(k)
                stop 'do_remove_center'
             end if
          else if (s% v_flag) then
             s% v_center = s% v(k)
             if (is_bad(s% v_center)) then
-               write(*,2) 's% v(k)', k, s% v(k)
+               write(*,2) 'center s% v(k)', k, s% v(k)
                stop 'do_remove_center'
             end if
          else
@@ -661,6 +681,28 @@
          if (k <= 1) return
          call do_remove_surface(id, k, ierr)
       end subroutine do_remove_surface_at_cell_k
+
+
+      subroutine do_remove_surface_at_he_core_boundary(id, h1_fraction, ierr)
+         integer, intent(in) :: id
+         real(dp), intent(in) :: h1_fraction
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         integer :: k
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'do_remove_surface_at_he_core_boundary: get_star_ptr ierr', ierr
+            return
+         end if
+         if (s% X(1) <= h1_fraction) return
+         do k=2,s% nz
+            if (s% X(k) <= h1_fraction) then
+               call do_remove_surface(id, k-1, ierr)
+               return
+            end if
+         end do
+         ierr = -1
+      end subroutine do_remove_surface_at_he_core_boundary
 
 
       subroutine do_remove_surface_by_optical_depth(id, optical_depth, ierr)
@@ -756,7 +798,7 @@
          real(dp), intent(in) :: v_surf_div_v_escape
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
+         integer :: k, k_vesc
          real(dp) :: vesc, vesc_m1
          real(dp), dimension(:), pointer :: v
          include 'formats'
@@ -772,17 +814,16 @@
          else
             return
          end if
-         vesc = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
-         if (v(1) < vesc*v_surf_div_v_escape) return
-         do k=2,3 ! s% nz
-            vesc_m1 = vesc
+         k_vesc = 0
+         do k=2, s% nz
+            if (s% q(k) > s% job% max_q_for_remove_surface_by_v_surf_div_v_escape) cycle
+            if (s% q(k) < s% job% min_q_for_remove_surface_by_v_surf_div_v_escape) exit
             vesc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-            if (v(k) < vesc*v_surf_div_v_escape) exit
-            write(*,2) 'v/vesc', k-1, v(k-1)/vesc_m1
+            if (v(k) >= vesc*v_surf_div_v_escape) k_vesc = k
          end do
-         write(*,2) 'do_remove_surface_by_v_surf_div_v_escape', k-1, v(k-1)/vesc_m1
-         call do_remove_surface(id, k-1, ierr)
-         return
+         if (k_vesc == 0) return
+         write(*,2) 'do_remove_surface_by_v_surf_div_v_escape q', k_vesc, s% q(k_vesc)
+         call do_remove_surface(id, k_vesc, ierr)
       end subroutine do_remove_surface_by_v_surf_div_v_escape
 
 
@@ -797,9 +838,9 @@
             write(*,*) 'do_remove_surface_by_pressure: get_star_ptr ierr', ierr
             return
          end if
-         if (pressure <= s% P(1)) return
+         if (pressure <= s% Peos(1)) return
          do k=1,s% nz
-            if (s% P(k) >= pressure) then
+            if (s% Peos(k) >= pressure) then
                call do_remove_surface(id, k, ierr)
                return
             end if
@@ -925,6 +966,19 @@
             return
          end if
 
+         if (s% job% remove_surface_by_relax_to_star_cut) then
+            if (s% R_center /= 0d0) then
+               write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
+               ierr = -1
+               stop 'do_remove_surface'
+            end if         
+            call do_relax_to_star_cut( &
+               id, surface_k, s% job% remove_surface_do_jrot, &
+               s% job% remove_surface_do_entropy, &
+               s% job% remove_surface_turn_off_energy_sources_and_sinks, ierr)
+            return
+         end if
+
          nz_old = s% nz
          skip = surface_k - 1
 
@@ -942,7 +996,7 @@
          rmid = s% rmid(1+skip)
          Lmid = (s% L(1+skip) + s% L(2+skip))/2
          T = s% T(1+skip)
-         P = s% P(1+skip)
+         P = s% Peos(1+skip)
 
          if (.not. associated(s% other_star_info)) then
             allocate(s% other_star_info)
@@ -1013,7 +1067,7 @@
          if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
 
          if (Lmid > 0d0) then
-            T_black_body = pow(Lmid/(4*pi*rmid*rmid*boltz_sigma), 0.25d0)
+            T_black_body = pow(Lmid/(pi4*rmid*rmid*boltz_sigma), 0.25d0)
             s% Tsurf_factor = T/T_black_body
          else
             s% Tsurf_factor = 1d0
@@ -1039,8 +1093,252 @@
             s% tau_factor, s% Tsurf_factor
             
          if (dbg) stop 'do_remove_surface'
-
+            
       end subroutine do_remove_surface
+
+
+      ! Relax to a trimmed stellar model with surface cells removed down to k_remove
+      ! (the cell k_remove will be the outermost in the new model).
+      subroutine do_relax_to_star_cut( &
+            id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)
+
+         use interp_1d_def, only: pm_work_size
+         use interp_1d_lib, only: interp_pm, interp_values, interp_value
+         use adjust_xyz, only: change_net
+         use alloc, only: set_conv_vel_flag, set_v_flag, set_u_flag, set_rotation_flag
+         use rotation_mix_info, only: set_rotation_mixing_info
+         use hydro_rotation, only: set_i_rot, set_rotation_info
+         use relax, only: do_relax_composition, do_relax_angular_momentum, do_relax_entropy
+         use init, only: load_zams_model
+
+         integer, intent(in) :: id, k_remove
+         logical, intent(in) :: do_jrot, do_entropy
+         logical, intent(in) :: turn_off_energy_sources_and_sinks 
+            ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
+         integer, intent(out) :: ierr
+
+         logical :: conv_vel_flag, v_flag, u_flag, rotation_flag
+         type (star_info), pointer :: s
+         character (len=net_name_len) :: net_name
+         integer :: model_number, num_trace_history_values, photo_interval
+         real(dp) :: eps_nuc_factor, non_nuc_neu_factor, &
+            initial_z, initial_y, initial_mass, &
+            cumulative_energy_error, cumulative_extra_heating
+
+         real(dp), pointer :: interp_work(:), conv_vel_interp(:)
+         real(dp), pointer :: q(:), xq(:), xa(:,:), j_rot(:), entropy(:)
+         real(dp) :: conv_vel_temp, time
+         integer :: num_pts, k, k0, species
+
+         logical :: dbg = .false.
+
+         ierr = 0
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         eps_nuc_factor = s% eps_nuc_factor
+         non_nuc_neu_factor = s% non_nuc_neu_factor
+         net_name = s% net_name
+         num_trace_history_values = s% num_trace_history_values
+
+         time = s% time
+         model_number = s% model_number
+         num_trace_history_values = s% num_trace_history_values
+         cumulative_energy_error = s% cumulative_energy_error
+         cumulative_extra_heating = s% cumulative_extra_heating
+
+         ! zero model_number and time (will restore later)
+         s% model_number = 0
+         s% time = 0
+
+         species = s% species
+         num_pts = s% nz - k_remove + 1
+         allocate(q(num_pts), xq(num_pts), xa(species, num_pts))
+         rotation_flag = .false.
+         if (do_jrot .and. s% rotation_flag) then
+            allocate(j_rot(num_pts))
+            rotation_flag = .true.
+         end if
+         if (do_entropy) then
+            allocate(entropy(num_pts))
+         end if
+         !need to compute cell-centered q for remaining mass
+         xq(1) = s% dq(k_remove)/2/s% q(k_remove)
+         do k0 = 1, num_pts-1
+            xq(1+k0) = xq(1+k0-1) + (s% dq(k_remove+k0) + s% dq(k_remove+k0-1))/s% q(k_remove)/2
+         end do
+
+         !create interpolant for convective velocities
+         conv_vel_flag = .false.
+         if (s% conv_vel_flag) then
+            conv_vel_flag = .true.
+            allocate(interp_work((num_pts)*pm_work_size), &
+               conv_vel_interp(4*(num_pts)), stat=ierr)
+            do k0 = 1, num_pts
+               conv_vel_interp(4*k0-3) = s% conv_vel(k0+k_remove-1)
+               q(k0) = s% q(k0+k_remove-1)/s% q(k_remove)
+            end do
+            call interp_pm(q, num_pts, conv_vel_interp,&
+               pm_work_size, interp_work, 'conv_vel interpolant', ierr)
+
+            ! turn off conv vel flag to load model
+            call set_conv_vel_flag(id, .false., ierr)
+            if (dbg) write(*,*) "set_conv_vel_flag ierr", ierr
+         end if
+
+
+         !save composition and entropy profiles
+         xa(:,:) = s% xa(:,k_remove:s% nz)
+         if (rotation_flag) then
+            j_rot(:) = s% j_rot(k_remove:s% nz)
+         end if
+         if (do_entropy) then
+            entropy(:) = s% entropy(k_remove:s% nz)*avo*kerg
+         end if
+
+         ! various flags need to be turned off for the ZAMS model to load
+         v_flag = .false.
+         if (s% v_flag) then
+            call set_v_flag(id, .false., ierr)
+            if (dbg) write(*,*) "set_v_flag ierr", ierr
+            v_flag = .true.
+         end if
+         u_flag = .false.
+         if (s% u_flag) then
+            call set_u_flag(id, .false., ierr)
+            if (dbg) write(*,*) "set_u_flag ierr", ierr
+            u_flag = .true.
+         end if
+
+         if (s% rotation_flag) then
+            call set_rotation_flag(id, .false., ierr)
+            if (dbg) write(*,*) "set_rotation_flag ierr", ierr
+         end if
+
+         ! avoid making photos
+         photo_interval = s% photo_interval
+         s% photo_interval = 10000000
+         s% have_previous_conv_vel = .false.
+         s% have_j_rot = .false.
+         ! WARNING, might need to add stuff here to actually get the ZAMS model to load.
+         ! otherwise can get an error of the form "error in reading model data  j+species > nvec"
+         ! if you happen to run into these problem, check for flags being checked in read1_model in read_model.f90
+         ! and be sure they're turned off.
+
+         ! set values used to load the starting model that will be relaxed
+         initial_z = s% initial_z
+         initial_y = s% initial_y
+         initial_mass = s% initial_mass
+         s% initial_z = 0.02d0
+         s% initial_y = 0.28d0
+         s% initial_mass = s% m(k_remove)/Msun
+
+         s% prev_mesh_nz = 0
+
+         call change_net(id, .true., 'basic.net', ierr) ! TODO:need to allow specification of different net
+         if (dbg) write(*,*) "check change_net ierr", ierr
+         if (ierr /= 0) return
+         call load_zams_model(id, ierr)
+         if (dbg) write(*,*) "check load_zams ierr", ierr
+         if (ierr /= 0) return
+         call change_net(id, .true., net_name, ierr)
+         if (dbg) write(*,*) "check ierr", ierr
+         if (ierr /= 0) return
+
+         if (conv_vel_flag) then
+            call set_conv_vel_flag(id, .true., ierr)
+            if (dbg) write(*,*) "check set_conv_vel_flag ierr", ierr
+            if (ierr /= 0) return
+         end if
+
+         if (turn_off_energy_sources_and_sinks) then
+            s% non_nuc_neu_factor = 0d0
+            s% eps_nuc_factor = 0d0
+         end if
+
+         s% num_trace_history_values = 0
+         call do_relax_composition( &
+            id, s% job% num_steps_to_relax_composition, num_pts, species, xa, xq, ierr)
+         if (dbg) write(*,*) "check ierr", ierr
+         if (ierr /= 0) return
+         deallocate(xa)
+
+         if (rotation_flag) then
+            call set_rotation_flag(id, .true., ierr)
+            if (dbg) write(*,*) "set_rotation_flag true ierr", ierr
+            if (ierr /= 0) return
+            call set_rotation_info(s, .false., ierr)
+            if (dbg) write(*,*) "set_rotation_info ierr", ierr
+            if (ierr /= 0) return
+            call set_rotation_mixing_info(s, ierr)
+            if (dbg) write(*,*) "set_rotation_mixing_info ierr", ierr
+            if (ierr /= 0) return
+            call do_relax_angular_momentum( &
+               id, s% job% max_steps_to_relax_angular_momentum, num_pts, j_rot, xq, ierr)
+            if (dbg) write(*,*) "check ierr", ierr
+            if (ierr /= 0) return
+            deallocate(j_rot)
+         end if
+
+         if (do_entropy) then
+            call do_relax_entropy( &
+               id, s% job% max_steps_to_relax_entropy, num_pts, entropy, xq, ierr)
+            if (dbg) write(*,*) "check ierr", ierr
+            if (ierr /= 0) return
+            deallocate(entropy)
+         end if
+
+         !take care of convective velocities
+         if (s% conv_vel_flag) then
+            do k0=1, s% nz
+               call interp_value(q, num_pts, conv_vel_interp, s% q(k0), s% conv_vel(k0), ierr)
+               !avoid extending regions with non-zero conv vel
+               do k=2, num_pts-1
+                  if(s% q(k0) < q(k) .and. s% q(k0) > q(k+1) &
+                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
+                     s% conv_vel(k0) = 0d0
+                     exit
+                  end if
+               end do
+               s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
+            end do
+            write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
+            stop 'do_relax_to_star_cut'
+            deallocate(conv_vel_interp, interp_work)
+         end if
+
+         s% generations = 1
+
+         ! restore v_flag and u_flag
+         if (v_flag) then
+            call set_v_flag(id, .true., ierr)
+         end if
+         if (u_flag) then
+            call set_u_flag(id, .true., ierr)
+         end if
+
+         ! this avoids the history file from being rewritten
+         s% doing_first_model_of_run = .false.
+
+         s% time = time
+         s% model_number = model_number
+         s% num_trace_history_values = num_trace_history_values
+         s% cumulative_energy_error = cumulative_energy_error
+         s% cumulative_extra_heating = cumulative_extra_heating
+
+         s% non_nuc_neu_factor = non_nuc_neu_factor
+         s% eps_nuc_factor = eps_nuc_factor
+
+         s% initial_z = initial_z
+         s% initial_y = initial_y
+         s% initial_mass = initial_mass
+         s% photo_interval = photo_interval
+
+         deallocate(q, xq)
+         
+         s% need_to_setvars = .true.
+
+      end subroutine do_relax_to_star_cut
 
 
       end module remove_shells

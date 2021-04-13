@@ -236,7 +236,7 @@
 
          type (Atm_Info), pointer :: ai
          
-         include 'formats.dek'
+         include 'formats'
          
          gtv_dbg = dbg
          
@@ -383,7 +383,9 @@
             write(*,1) 'dT_dTeff', dT_dTeff
             write(*,1) 'dT_dlogg', dT_dlogg
             write(*,*)
-            if (is_bad(newPgas) .or. is_bad(newT)) stop 'get_table_values'
+            ierr = -1
+            return
+            !if (is_bad(newPgas) .or. is_bad(newT)) stop 'get_table_values'
          end if
          
          !if (dbg) write(*,*) 'loaded tables: ', ai% have_atm_table(:)
@@ -401,7 +403,7 @@
             integer :: j
             real(dp), pointer :: f(:)
             
-            include 'formats.dek'
+            include 'formats'
             
             ierr = 0
             
@@ -582,7 +584,8 @@
                   write(*,*) 'len_trim(buf)', len_trim(buf)
                   write(*,*) 'nvec', nvec
                   write(*,*) 'ng', ng
-                  stop
+                  return
+                  !stop
                end if
                if (failed(4)) return
                Teff_tmp(j) = vec(1)
@@ -688,7 +691,7 @@
             if (failed) then
                write(*,'(a,i6)') &
                   'failed in reading atm table ' // trim(filename), i
-               stop 'get_table_values'
+               !stop 'get_table_values'
             end if
          end function failed
          

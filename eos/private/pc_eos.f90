@@ -427,7 +427,7 @@
              X2=AY(J)/(AY(I)+AY(J))
              X1=dim(1.d0,X2)
              if (X2.lt.TINY) cycle
-             X=X2/RZ+(1.d0-1.d0/RZ)*X2**RZ
+             X=X2/RZ+(1.d0-1.d0/RZ)*pow(X2, RZ)
              GAMI=pow(AZion(I),5d0/3d0)*GAME ! Gamma_i corrected 14.05.13
              DeltaG=.012d0*(1.d0-1.d0/pow2(RZ))*(X1+X2*pow(RZ,5d0/3d0))
              DeltaG=DeltaG*X/X2*dim(1.d0,X)/X1
@@ -1254,11 +1254,11 @@
       type(auto_diff_real_2var_order1), intent(out) :: Fharm,Uharm,Pharm,CVth,Sharm,PDTharm,PDRharm
 
       type(auto_diff_real_2var_order1) :: Fth,Uth,Sth,U0,E0
-      type(auto_diff_real_2var_order1) :: F,U,U1,CW
+      type(auto_diff_real_2var_order1) :: F,U,U1
       
       real(dp), parameter :: CM = .895929256d0 ! Madelung
       
-      call HLfit12(TPT,F,U,CVth,Sth,U1,CW,1)
+      call HLfit12(TPT,F,U,CVth,Sth,U1,1)
       U0=-CM*GAMI ! perfect lattice
       E0=1.5d0*U1*TPT ! zero-point energy
       Uth=U+E0
@@ -1272,7 +1272,7 @@
       return
       end subroutine FHARM12
 
-      subroutine HLfit12(eta,F,U,CV,S,U1,CW,LATTICE)
+      subroutine HLfit12(eta,F,U,CV,S,U1,LATTICE)
 !                                                       Version 24.04.12
 ! Stems from HLfit8 v.03.12.08;
 !   differences: E0 excluded from  U and F;
@@ -1284,20 +1284,19 @@
 ! Output: F and U (normalized to NkT) - due to phonon excitations,
 !   CV and S (normalized to Nk) in the HL model,
 !   U1 - the 1st phonon moment,
-!   CW=d(CV)/d\ln(T)
 
       type(auto_diff_real_2var_order1) :: eta ! can be modified, not sure if this is an intended side-effect
-      type(auto_diff_real_2var_order1), intent(out) :: F, U, CV, S, U1, CW
+      type(auto_diff_real_2var_order1), intent(out) :: F, U, CV, S, U1
       integer, intent(in) :: LATTICE
 
-      type(auto_diff_real_2var_order1) :: CLM, ALPHA, BETA, GAMMA
-      type(auto_diff_real_2var_order1) :: A1, A2, A3, A4, A6, A8
-      type(auto_diff_real_2var_order1) :: B0, B2, B4, B5, B6, B7, B9, B11
-      type(auto_diff_real_2var_order1) :: C9, C11
+      real(dp) :: CLM, ALPHA, BETA, GAMMA
+      real(dp) :: A1, A2, A3, A4, A6, A8
+      real(dp) :: B0, B2, B4, B5, B6, B7, B9, B11
+      real(dp) :: C9, C11
       type(auto_diff_real_2var_order1) :: UP, DN, EA, EB, EG, UP1, UP2, DN1, DN2, E0
       
-      type(auto_diff_real_2var_order1) :: EPS
-      type(auto_diff_real_2var_order1) :: TINY
+      real(dp) :: EPS
+      real(dp) :: TINY
       
       EPS=1.d-5
       TINY=1.d-99
@@ -1416,7 +1415,7 @@
       type(auto_diff_real_2var_order1) :: GAMImean, Dif0, DifR, DifFDH, D
       type(auto_diff_real_2var_order1) :: P3, D0, GP, FMIX0, Q, R, GQ, G, GDG, UDG
       
-      type(auto_diff_real_2var_order1) :: TINY
+      real(dp) :: TINY
 
       TINY=1.d-9
       

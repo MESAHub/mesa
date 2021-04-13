@@ -42,9 +42,9 @@
       integer, parameter :: do_fill_arrays_with_NaNs = 6
 
       logical, parameter :: work_array_debug = .false.
-      logical, parameter :: quad_array_debug = .false.
-
       logical, parameter :: work_array_trace = .false.
+
+      logical, parameter :: quad_array_debug = .false.
       logical, parameter :: quad_array_trace = .false.
 
 
@@ -84,6 +84,25 @@
 
 
       contains
+
+      
+      subroutine init_alloc
+         integer :: i
+         num_calls=0; num_returns=0
+         num_allocs=0; num_deallocs=0
+         do i=1,num_work_arrays
+            nullify(work_pointers(i)%p)
+         end do
+         do i=1,num_quad_arrays
+            nullify(quad_pointers(i)%p)
+         end do
+         do i=1,num_int_work_arrays
+            nullify(int_work_pointers(i)%p)
+         end do
+         do i=1,num_logical_work_arrays
+            nullify(logical_work_pointers(i)%p)
+         end do
+      end subroutine init_alloc
 
 
       subroutine alloc_extras(id, liwork, lwork, ierr)
@@ -160,7 +179,7 @@
          if ((nvar_chem_old == nvar_chem) .and. (nvar_hydro_old == nvar_hydro)) return
 
          nvar = nvar_chem + nvar_hydro
-         s% nvar = nvar
+         s% nvar_total = nvar
          nz = max(s% nz, s% prev_mesh_nz)
 
          if (nvar_chem_old == 0) return
@@ -172,10 +191,6 @@
             s% xh_old, nvar_hydro, s% nz_old + nz_alloc_extra, ierr)
          if (ierr /= 0) return
 
-         call realloc_double(s% equ1, nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
-
          call realloc_double(s% residual_weight1, nvar*(nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
          s% residual_weight(1:nvar,1:nz) => s% residual_weight1(1:nvar*nz)
@@ -183,6 +198,14 @@
          call realloc_double(s% correction_weight1, nvar*(nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
          s% correction_weight(1:nvar,1:nz) => s% correction_weight1(1:nvar*nz)
+
+         call realloc_double(s% solver_dx1, nvar*(nz + nz_alloc_extra), ierr)
+         if (ierr /= 0) return
+         s% solver_dx(1:nvar,1:nz) => s% solver_dx1(1:nvar*nz)
+
+         call realloc_double(s% x_scale1, nvar*(nz + nz_alloc_extra), ierr)
+         if (ierr /= 0) return
+         s% x_scale(1:nvar,1:nz) => s% x_scale1(1:nvar*nz)
 
          call realloc_double2(s% xh_start, nvar_hydro, (nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
@@ -311,8 +334,8 @@
          if (ASSOCIATED(s% nameofvar)) deallocate(s% nameofvar)
          if (ASSOCIATED(s% nameofequ)) deallocate(s% nameofequ)
 
-         if (ASSOCIATED(s% hydro_work)) deallocate(s% hydro_work)
-         if (ASSOCIATED(s% hydro_iwork)) deallocate(s% hydro_iwork)
+         if (ASSOCIATED(s% solver_work)) deallocate(s% solver_work)
+         if (ASSOCIATED(s% solver_iwork)) deallocate(s% solver_iwork)
 
          if (ASSOCIATED(s% AF1)) deallocate(s% AF1)
 
@@ -456,7 +479,7 @@
          
          species = s% species
          num_reactions = s% num_reactions
-         nvar = s% nvar
+         nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nvar_chem = s% nvar_chem
 
@@ -576,8 +599,8 @@
             if (failed('lnT')) exit
             call do1(s% lnR, c% lnR)
             if (failed('lnR')) exit
-            call do1(s% Et, c% Et)
-            if (failed('Et')) exit
+            call do1(s% RSP_Et, c% RSP_Et)
+            if (failed('RSP_Et')) exit
             call do1(s% L, c% L)
             if (failed('L')) exit
             call do1(s% v, c% v)
@@ -586,57 +609,32 @@
             if (failed('u')) exit
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
+            call do1(s% w, c% w)
+            if (failed('w')) exit
+            call do1(s% w_start, c% w_start)
+            if (failed('w_start')) exit
             
-            call do1(s% Eturb, c% Eturb)
-            if (failed('Eturb')) exit
-            call do1(s% Eturb_start, c% Eturb_start)
-            if (failed('Eturb_start')) exit
-            
-            call do1(s% dxh_lnd, c% dxh_lnd)
-            if (failed('dxh_lnd')) exit
-            call do1(s% dxh_lnPgas, c% dxh_lnPgas)
-            if (failed('dxh_lnPgas')) exit
-            call do1(s% dxh_lnT, c% dxh_lnT)
-            if (failed('dxh_lnT')) exit
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
-            call do1(s% dxh_Eturb, c% dxh_Eturb)
-            if (failed('dxh_Eturb')) exit
+            call do1(s% dxh_lnd, c% dxh_lnd)
+            if (failed('dxh_lnd')) exit
+            call do1(s% dxh_lnT, c% dxh_lnT)
+            if (failed('dxh_lnT')) exit
+            call do1(s% dxh_v, c% dxh_v)
+            if (failed('dxh_v')) exit
+            call do1(s% dxh_u, c% dxh_u)
+            if (failed('dxh_u')) exit
+            call do1(s% dxh_w, c% dxh_w)
+            if (failed('dxh_w')) exit
+            call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
+            if (failed('dxh_alpha_RTI')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
             if (failed('dxh_ln_cvpv0')) exit
-
-            call do1(s% dlnd_dt, c% dlnd_dt)
-            if (failed('dlnd_dt')) exit
-            call do1(s% dlnT_dt, c% dlnT_dt)
-            if (failed('dlnT_dt')) exit
-            call do1(s% dlnR_dt, c% dlnR_dt)
-            if (failed('dlnR_dt')) exit
-            call do1(s% dEturb_dt, c% dEturb_dt)
-            if (failed('dEturb_dt')) exit
-            call do1(s% dv_dt, c% dv_dt)
-            if (failed('dv_dt')) exit
-            call do1(s% du_dt, c% du_dt)
-            if (failed('du_dt')) exit
-            call do1(s% dalpha_RTI_dt, c% dalpha_RTI_dt)
-            if (failed('dalpha_RTI_dt')) exit
-            call do1(s% dEt_dt, c% dEt_dt)
-            if (failed('dEt_dt')) exit
-            call do1(s% dln_cvpv0_dt, c% dln_cvpv0_dt)
-            if (failed('dln_cvpv0_dt')) exit
-            call do1(s% dj_rot_dt, c% dj_rot_dt)
-            if (failed('dj_rot_dt')) exit
 
             call do1(s% dudt_RTI, c% dudt_RTI)
             if (failed('dudt_RTI')) exit
             call do1(s% dedt_RTI, c% dedt_RTI)
             if (failed('dedt_RTI')) exit
-
-            call do1(s% dlnd_dt_const_q, c% dlnd_dt_const_q)
-            if (failed('dlnd_dt_const_q')) exit
-            call do1(s% dlnT_dt_const_q, c% dlnT_dt_const_q)
-            if (failed('dlnT_dt_const_q')) exit
-            call do1(s% dln_cvpv0_dt_const_q, c% dln_cvpv0_dt_const_q)
-            if (failed('dln_cvpv0_dt_const_q')) exit
 
             call do1(s% T, c% T)
             if (failed('T')) exit
@@ -678,10 +676,10 @@
             call do1(s% m_grav, c% m_grav)
             if (failed('m_grav')) exit
 
-            call do1(s% P, c% P)
-            if (failed('P')) exit
-            call do1(s% lnP, c% lnP)
-            if (failed('lnP')) exit
+            call do1(s% Peos, c% Peos)
+            if (failed('Peos')) exit
+            call do1(s% lnPeos, c% lnPeos)
+            if (failed('lnPeos')) exit
             call do1(s% lnPgas, c% lnPgas)
             if (failed('lnPgas')) exit
             call do1(s% Pgas, c% Pgas)
@@ -712,8 +710,6 @@
             if (failed('gamma3')) exit
             call do1(s% eta, c% eta)
             if (failed('eta')) exit
-            call do1(s% theta_e, c% theta_e)
-            if (failed('theta_e')) exit
             call do1(s% gam, c% gam)
             if (failed('gam')) exit
             call do1(s% mu, c% mu)
@@ -758,14 +754,6 @@
             if (failed('d_eos_dlnT')) exit
             call do3(s% d_eos_dxa, c% d_eos_dxa, num_eos_d_dxa_results, species)
             if (failed('d_eos_dxa')) exit
-            call do2(s% d_eos_dabar, c% d_eos_dabar, num_eos_basic_results, null_str)
-            if (failed('d_eos_dabar')) exit
-            call do2(s% d_eos_dzbar, c% d_eos_dzbar, num_eos_basic_results, null_str)
-            if (failed('d_eos_dzbar')) exit
-            call do1(s% dlnRho_dlnPgas_const_T, c% dlnRho_dlnPgas_const_T)
-            if (failed('dlnRho_dlnPgas_const_T')) exit
-            call do1(s% dlnRho_dlnT_const_Pgas, c% dlnRho_dlnT_const_Pgas)
-            if (failed('dlnRho_dlnT_const_Pgas')) exit
 
             call do1(s% chiRho_for_partials, c% chiRho_for_partials)
             if (failed('chiRho_for_partials')) exit
@@ -781,8 +769,8 @@
             if (failed('dS_dT_for_partials')) exit
             call do2(s% dlnE_dxa_for_partials, c% dlnE_dxa_for_partials, species, null_str)
             if (failed('dlnE_dxa_for_partials')) exit
-            call do2(s% dlnP_dxa_for_partials, c% dlnP_dxa_for_partials, species, null_str)
-            if (failed('dlnP_dxa_for_partials')) exit
+            call do2(s% dlnPeos_dxa_for_partials, c% dlnPeos_dxa_for_partials, species, null_str)
+            if (failed('dlnPeos_dxa_for_partials')) exit
 
             ! other model variables
             call do1(s% csound, c% csound)
@@ -807,25 +795,6 @@
             if (failed('lntau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
-
-            call do1(s% lnR_residual, c% lnR_residual)
-            if (failed('lnR_residual')) exit
-            call do1(s% lnd_residual, c% lnd_residual)
-            if (failed('lnd_residual')) exit
-            call do1(s% equL_residual, c% equL_residual)
-            if (failed('equL_residual')) exit
-            call do1(s% E_residual, c% E_residual)
-            if (failed('E_residual')) exit
-            call do1(s% Et_residual, c% Et_residual)
-            if (failed('Et_residual')) exit
-            call do1(s% v_residual, c% v_residual)
-            if (failed('v_residual')) exit
-            call do1(s% u_residual, c% u_residual)
-            if (failed('u_residual')) exit
-            call do1(s% Vol_residual, c% Vol_residual)
-            if (failed('Vol_residual')) exit
-            call do1(s% max_abs_xa_residual, c% max_abs_xa_residual)
-            if (failed('max_abs_xa_residual')) exit
 
             call do1(s% ergs_error, c% ergs_error)
             if (failed('ergs_error')) exit            
@@ -1066,6 +1035,8 @@
             call do1(s% d_R2_dlnR, c% d_R2_dlnR)
             if (failed('d_R2_dlnR')) exit
 
+            call do1_ad(s% eps_grav_ad, c% eps_grav_ad)
+            if (failed('eps_grav_ad')) exit
             call do1(s% eps_grav, c% eps_grav)
             if (failed('eps_grav')) exit
             call do1(s% d_eps_grav_dlndm1, c% d_eps_grav_dlndm1)
@@ -1080,18 +1051,6 @@
             if (failed('d_eps_grav_dlnT00')) exit
             call do1(s% d_eps_grav_dlnTp1, c% d_eps_grav_dlnTp1)
             if (failed('d_eps_grav_dlnTp1')) exit
-            call do1(s% d_eps_grav_dlnPgasm1_const_T, c% d_eps_grav_dlnPgasm1_const_T)
-            if (failed('d_eps_grav_dlnPgasm1_const_T')) exit
-            call do1(s% d_eps_grav_dlnPgas00_const_T, c% d_eps_grav_dlnPgas00_const_T)
-            if (failed('d_eps_grav_dlnPgas00_const_T')) exit
-            call do1(s% d_eps_grav_dlnPgasp1_const_T, c% d_eps_grav_dlnPgasp1_const_T)
-            if (failed('d_eps_grav_dlnPgasp1_const_T')) exit
-            call do1(s% d_eps_grav_dlnTm1_const_Pgas, c% d_eps_grav_dlnTm1_const_Pgas)
-            if (failed('d_eps_grav_dlnTm1_const_Pgas')) exit
-            call do1(s% d_eps_grav_dlnT00_const_Pgas, c% d_eps_grav_dlnT00_const_Pgas)
-            if (failed('d_eps_grav_dlnT00_const_Pgas')) exit
-            call do1(s% d_eps_grav_dlnTp1_const_Pgas, c% d_eps_grav_dlnTp1_const_Pgas)
-            if (failed('d_eps_grav_dlnTp1_const_Pgas')) exit
 
             call do1(s% d_eps_grav_dlnR00, c% d_eps_grav_dlnR00)
             if (failed('d_eps_grav_dlnR00')) exit
@@ -1137,8 +1096,8 @@
             if (failed('dpedt')) exit
             call do1(s% dedt, c% dedt)
             if (failed('dedt')) exit
-            call do1(s% PdVdt, c% PdVdt)
-            if (failed('PdVdt')) exit
+            call do1(s% detrbdt, c% detrbdt)
+            if (failed('detrbdt')) exit
 
             call do1_integer(s% mlt_mixing_type, c% mlt_mixing_type)
             if (failed('mlt_mixing_type')) exit
@@ -1168,9 +1127,6 @@
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
-
-            call do1(s% conv_vel_residual, c% conv_vel_residual)
-            if (failed('conv_vel_residual')) exit
             
             call do1(s% mlt_Gamma, c% mlt_Gamma)
             if (failed('mlt_Gamma')) exit
@@ -1198,6 +1154,13 @@
             if (failed('mixing_type')) exit
             call do1(s% cz_bdy_dq, c% cz_bdy_dq)
             if (failed('cz_bdy_dq')) exit
+
+            call do1_ad(s% gradT_ad, c% gradT_ad)
+            if (failed('gradT_ad')) exit
+            call do1_ad(s% gradr_ad, c% gradr_ad)
+            if (failed('gradr_ad')) exit
+            call do1_ad(s% mlt_vc_ad, c% mlt_vc_ad)
+            if (failed('mlt_vc_ad')) exit
 
             call do1(s% actual_gradT, c% actual_gradT)
             if (failed('actual_gradT')) exit
@@ -1267,57 +1230,58 @@
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
 
-            call do1(s% u_face, c% u_face)
-            if (failed('u_face')) exit
-            call do1(s% d_uface_dlnR, c% d_uface_dlnR)
-            if (failed('d_uface_dlnR')) exit
-            call do1(s% d_uface_du00, c% d_uface_du00)
-            if (failed('d_uface_du00')) exit
-            call do1(s% d_uface_dum1, c% d_uface_dum1)
-            if (failed('d_uface_dum1')) exit
-            call do1(s% d_uface_dlnd00, c% d_uface_dlnd00)
-            if (failed('d_uface_dlnd00')) exit
-            call do1(s% d_uface_dlndm1, c% d_uface_dlndm1)
-            if (failed('d_uface_dlndm1')) exit
-            call do1(s% d_uface_dlnT00, c% d_uface_dlnT00)
-            if (failed('d_uface_dlnT00')) exit
-            call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
-            if (failed('d_uface_dlnTm1')) exit
-            call do1(s% d_uface_dw, c% d_uface_dw)
-            if (failed('d_uface_dw')) exit
+            call do1_ad(s% u_face_ad, c% u_face_ad)
+            if (failed('u_face_ad')) exit
+            call do1(s% u_face_start, c% u_face_start)
+            if (failed('u_face_start')) exit
+            !call do1(s% u_face, c% u_face)
+            !if (failed('u_face')) exit
+            !call do1(s% d_uface_dlnR, c% d_uface_dlnR)
+            !if (failed('d_uface_dlnR')) exit
+            !call do1(s% d_uface_du00, c% d_uface_du00)
+            !if (failed('d_uface_du00')) exit
+            !call do1(s% d_uface_dum1, c% d_uface_dum1)
+            !if (failed('d_uface_dum1')) exit
+            !call do1(s% d_uface_dlnd00, c% d_uface_dlnd00)
+            !if (failed('d_uface_dlnd00')) exit
+            !call do1(s% d_uface_dlndm1, c% d_uface_dlndm1)
+            !if (failed('d_uface_dlndm1')) exit
+            !call do1(s% d_uface_dlnT00, c% d_uface_dlnT00)
+            !if (failed('d_uface_dlnT00')) exit
+            !call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
+            !if (failed('d_uface_dlnTm1')) exit
+            call do1(s% d_uface_domega, c% d_uface_domega)
+            if (failed('d_uface_domega')) exit
 
-            call do1(s% P_face, c% P_face)
-            if (failed('P_face')) exit
-            call do1(s% d_Pface_dL, c% d_Pface_dL)
-            if (failed('d_Pface_dL')) exit
-            call do1(s% d_Pface_dlnR, c% d_Pface_dlnR)
-            if (failed('d_Pface_dlnR')) exit
-            call do1(s% d_Pface_du00, c% d_Pface_du00)
-            if (failed('d_Pface_du00')) exit
-            call do1(s% d_Pface_dum1, c% d_Pface_dum1)
-            if (failed('d_Pface_dum1')) exit
-            call do1(s% d_Pface_dlnd00, c% d_Pface_dlnd00)
-            if (failed('d_Pface_dlnd00')) exit
-            call do1(s% d_Pface_dlndm1, c% d_Pface_dlndm1)
-            if (failed('d_Pface_dlndm1')) exit
-            call do1(s% d_Pface_dlnT00, c% d_Pface_dlnT00)
-            if (failed('d_Pface_dlnT00')) exit
-            call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
-            if (failed('d_Pface_dlnTm1')) exit
-            call do1(s% d_Pface_dw, c% d_Pface_dw)
-            if (failed('d_Pface_dw')) exit
+            call do1_ad(s% P_face_ad, c% P_face_ad)
+            if (failed('P_face_ad')) exit
+            call do1(s% P_face_start, c% P_face_start)
+            if (failed('P_face_start')) exit
+            !call do1(s% P_face, c% P_face)
+            !if (failed('P_face')) exit
+            !call do1(s% d_Pface_dL, c% d_Pface_dL)
+            !if (failed('d_Pface_dL')) exit
+            !call do1(s% d_Pface_dlnR, c% d_Pface_dlnR)
+            !if (failed('d_Pface_dlnR')) exit
+            !call do1(s% d_Pface_du00, c% d_Pface_du00)
+            !if (failed('d_Pface_du00')) exit
+            !call do1(s% d_Pface_dum1, c% d_Pface_dum1)
+            !if (failed('d_Pface_dum1')) exit
+            !call do1(s% d_Pface_dlnd00, c% d_Pface_dlnd00)
+            !if (failed('d_Pface_dlnd00')) exit
+            !call do1(s% d_Pface_dlndm1, c% d_Pface_dlndm1)
+            !if (failed('d_Pface_dlndm1')) exit
+            !call do1(s% d_Pface_dlnT00, c% d_Pface_dlnT00)
+            !if (failed('d_Pface_dlnT00')) exit
+            !call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
+            !if (failed('d_Pface_dlnTm1')) exit
+            call do1(s% d_Pface_domega, c% d_Pface_domega)
+            if (failed('d_Pface_domega')) exit
 
             call do1(s% abs_du_div_cs, c% abs_du_div_cs)
             if (failed('abs_du_div_cs')) exit
             call do1(s% abs_du_plus_cs, c% abs_du_plus_cs)
             if (failed('abs_du_plus_cs')) exit
-
-            call do1(s% dL_dm_expected, c% dL_dm_expected)
-            if (failed('dL_dm_expected')) exit
-            call do1(s% dlnP_dm_expected, c% dlnP_dm_expected)
-            if (failed('dlnP_dm_expected')) exit
-            call do1(s% dlnT_dm_expected, c% dlnT_dm_expected)
-            if (failed('dlnT_dm_expected')) exit
 
             call do1(s% dPdr_dRhodr_info, c% dPdr_dRhodr_info)
             if (failed('dPdr_dRhodr_info')) exit
@@ -1345,30 +1309,6 @@
             call do1(s% L_nuc_burn, c% L_nuc_burn)
             if (failed('L_nuc_burn')) exit
 
-            call do1(s% lnT_for_d_dt_const_m, c% lnT_for_d_dt_const_m)
-            if (failed('lnT_for_d_dt_const_m')) exit
-            call do1(s% lnd_for_d_dt_const_m, c% lnd_for_d_dt_const_m)
-            if (failed('lnd_for_d_dt_const_m')) exit
-            call do1(s% lnR_for_d_dt_const_m, c% lnR_for_d_dt_const_m)
-            if (failed('lnR_for_d_dt_const_m')) exit
-            call do1(s% Eturb_for_d_dt_const_m, c% Eturb_for_d_dt_const_m)
-            if (failed('Eturb_for_d_dt_const_m')) exit
-            call do1(s% v_for_d_dt_const_m, c% v_for_d_dt_const_m)
-            if (failed('v_for_d_dt_const_m')) exit
-            call do1(s% u_for_d_dt_const_m, c% u_for_d_dt_const_m)
-            if (failed('u_for_d_dt_const_m')) exit
-            call do1(s% alpha_RTI_for_d_dt_const_m, c% alpha_RTI_for_d_dt_const_m)
-            if (failed('alpha_RTI_for_d_dt_const_m')) exit
-            call do1(s% ln_cvpv0_for_d_dt_const_m, c% ln_cvpv0_for_d_dt_const_m)
-            if (failed('ln_cvpv0_for_d_dt_const_m')) exit
-
-            call do1(s% lnT_for_d_dt_const_q, c% lnT_for_d_dt_const_q)
-            if (failed('lnT_for_d_dt_const_q')) exit
-            call do1(s% lnd_for_d_dt_const_q, c% lnd_for_d_dt_const_q)
-            if (failed('lnd_for_d_dt_const_q')) exit
-            call do1(s% ln_cvpv0_for_d_dt_const_q, c% ln_cvpv0_for_d_dt_const_q)
-            if (failed('ln_cvpv0_for_d_dt_const_q')) exit
-
             call do2(s% xa_start, c% xa_start, species, 'xa_start')
             if (failed('xa_start')) exit
             call do2(s% xa_sub_xa_start, c% xa_sub_xa_start, species, 'xa_sub_xa_start')
@@ -1378,10 +1318,10 @@
             if (failed('lnd_start')) exit
             call do1(s% lnPgas_start, c% lnPgas_start)
             if (failed('lnPgas_start')) exit
-            call do1(s% lnP_start, c% lnP_start)
-            if (failed('lnP_start')) exit
-            call do1(s% P_start, c% P_start)
-            if (failed('P_start')) exit
+            call do1(s% lnPeos_start, c% lnPeos_start)
+            if (failed('lnPeos_start')) exit
+            call do1(s% Peos_start, c% Peos_start)
+            if (failed('Peos_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
             call do1(s% lnE_start, c% lnE_start)
@@ -1402,8 +1342,6 @@
             if (failed('v_start')) exit
             call do1(s% u_start, c% u_start)
             if (failed('u_start')) exit
-            call do1(s% uface_start, c% uface_start)
-            if (failed('uface_start')) exit
             call do1(s% L_start, c% L_start)
             if (failed('L_start')) exit
             call do1(s% r_start, c% r_start)
@@ -1520,12 +1458,6 @@
             call do1_integer(s% burn_num_iters, c% burn_num_iters)
             if (failed('burn_num_iters')) exit
 
-            call do1_neq(s% equ1, c% equ1)
-            if (failed('equ1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
-
             call do1_neq(s% residual_weight1, c% residual_weight1)
             if (failed('residual_weight1')) exit
             if (action == do_remove_from_center .or. action == do_reallocate .or. &
@@ -1537,6 +1469,18 @@
             if (action == do_remove_from_center .or. action == do_reallocate .or. &
                   (action /= do_check_size .and. action /= do_deallocate)) &
                s% correction_weight(1:nvar,1:nz) => s% correction_weight1(1:nvar*nz)
+
+            call do1_neq(s% solver_dx1, c% solver_dx1)
+            if (failed('solver_dx1')) exit
+            if (action == do_remove_from_center .or. action == do_reallocate .or. &
+                  (action /= do_check_size .and. action /= do_deallocate)) &
+               s% solver_dx(1:nvar,1:nz) => s% solver_dx1(1:nvar*nz)
+
+            call do1_neq(s% x_scale1, c% x_scale1)
+            if (failed('x_scale1')) exit
+            if (action == do_remove_from_center .or. action == do_reallocate .or. &
+                  (action /= do_check_size .and. action /= do_deallocate)) &
+               s% x_scale(1:nvar,1:nz) => s% x_scale1(1:nvar*nz)
 
             call do1(s% eps_pre_mix, c% eps_pre_mix)
             if (failed('eps_pre_mix')) exit
@@ -1552,6 +1496,7 @@
             call do1(s% d_Hp_face_dlnTm1, c% d_Hp_face_dlnTm1); if (failed('d_Hp_face_dlnTm1')) exit
 
             call do1(s% Y_face, c% Y_face); if (failed('Y_face')) exit
+            call do1(s% Y_face_start, c% Y_face_start); if (failed('Y_face_start')) exit
             call do1(s% d_Y_face_dlnR, c% d_Y_face_dlnR); if (failed('d_Y_face_dlnR')) exit
             call do1(s% d_Y_face_dlnd00, c% d_Y_face_dlnd00); if (failed('d_Y_face_dlnd00')) exit
             call do1(s% d_Y_face_dlnT00, c% d_Y_face_dlnT00); if (failed('d_Y_face_dlnT00')) exit
@@ -1583,20 +1528,20 @@
             
             call do1(s% Fr, c% Fr); if (failed('Fr')) exit
             call do1(s% Fr_start, c% Fr_start); if (failed('Fr_start')) exit
-            call do1(s% avQ, c% avQ); if (failed('avQ')) exit
-            call do1(s% avQ_start, c% avQ_start); if (failed('avQ_start')) exit
-            call do1(s% Pt, c% Pt); if (failed('Pt')) exit
-            call do1(s% Pt_start, c% Pt_start); if (failed('Pt_start')) exit
-            call do1(s% d_Pt_dV_00, c% d_Pt_dV_00); if (failed('d_Pt_dV_00')) exit
-            call do1(s% d_Pt_dw_00, c% d_Pt_dw_00); if (failed('d_Pt_dw_00')) exit
+            call do1(s% Pvsc, c% Pvsc); if (failed('Pvsc')) exit
+            call do1(s% Pvsc_start, c% Pvsc_start); if (failed('Pvsc_start')) exit
+            call do1(s% Ptrb, c% Ptrb); if (failed('Ptrb')) exit
+            call do1(s% Ptrb_start, c% Ptrb_start); if (failed('Ptrb_start')) exit
+            call do1(s% d_Ptrb_dV_00, c% d_Ptrb_dV_00); if (failed('d_Ptrb_dV_00')) exit
+            call do1(s% d_Ptrb_dw_00, c% d_Ptrb_dw_00); if (failed('d_Ptrb_dw_00')) exit
             call do1(s% Eq, c% Eq); if (failed('Eq')) exit
             call do1(s% SOURCE, c% SOURCE); if (failed('SOURCE')) exit
             call do1(s% DAMP, c% DAMP); if (failed('DAMP')) exit
             call do1(s% DAMPR, c% DAMPR); if (failed('DAMPR')) exit
             call do1(s% COUPL, c% COUPL); if (failed('COUPL')) exit
             call do1(s% COUPL_start, c% COUPL_start); if (failed('COUPL_start')) exit
-            call do1(s% w, c% w); if (failed('w')) exit
-            call do1(s% w_start, c% w_start); if (failed('w_start')) exit
+            call do1(s% RSP_w, c% RSP_w); if (failed('w')) exit
+            call do1(s% RSP_w_start, c% RSP_w_start); if (failed('w_start')) exit
             call do1(s% Vol, c% Vol); if (failed('Vol')) exit
             call do1(s% Vol_start, c% Vol_start); if (failed('Vol_start')) exit
             call do1(s% Uq, c% Uq); if (failed('Uq')) exit
@@ -1612,6 +1557,8 @@
             if (failed('xtra4_array')) exit
             call do1(s% xtra5_array, c% xtra5_array)
             if (failed('xtra5_array')) exit
+            call do1(s% xtra6_array, c% xtra6_array)
+            if (failed('xtra6_array')) exit
 
             call do1_integer(s% ixtra1_array, c% ixtra1_array)
             if (failed('ixtra1_array')) exit
@@ -1623,6 +1570,8 @@
             if (failed('ixtra4_array')) exit
             call do1_integer(s% ixtra5_array, c% ixtra5_array)
             if (failed('ixtra5_array')) exit
+            call do1_integer(s% ixtra6_array, c% ixtra6_array)
+            if (failed('ixtra6_array')) exit
 
             if (action_in /= do_check_size) then
                if (action_in /= do_copy_pointers_and_resize .and. &
@@ -1655,6 +1604,34 @@
          contains
 
 
+         subroutine do1_ad(ptr, other)
+            type(auto_diff_real_star_order1), dimension(:), pointer :: ptr, other
+            type(auto_diff_real_star_order1), dimension(:), pointer :: tmp
+            if (action == do_fill_arrays_with_NaNs) then
+               call fill_ad_with_NaNs(ptr,1,-1)
+            else if (action == do_copy_pointers_and_resize) then
+               ptr => other
+               if (nz <= size(ptr,dim=1)) then
+                  if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+                  return
+               end if
+               deallocate(ptr)
+               allocate(ptr(sz_new), stat=ierr)
+               if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+               if (s% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
+            else
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
+               call do1D_ad(s, ptr, sz_new, action, ierr)
+               if (action == do_allocate) then
+                  if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+                  if (s% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
+               end if
+            end if
+         end subroutine do1_ad
+
+
          subroutine do1(ptr, other)
             real(dp), dimension(:), pointer :: ptr, other
             real(dp), dimension(:), pointer :: tmp
@@ -1662,6 +1639,9 @@
                call fill_with_NaNs(ptr)
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
+               if (.not. associated(ptr)) then
+                  stop 'do1 ptr not associated'
+               end if
                if (nz <= size(ptr,dim=1)) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                   return
@@ -1671,8 +1651,9 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                if (s% zero_when_allocate) ptr(:) = 0
             else
-               if (action == do_reallocate .and. &
-                   nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
                call do1D(s, ptr, sz_new, action, ierr)
                if (action == do_allocate) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
@@ -1699,8 +1680,9 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                if (s% zero_when_allocate) ptr(:) = 0
             else
-               if (action == do_reallocate .and. &
-                   nvar*nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nvar*nz <= size(ptr,dim=1)) return
+               end if
                call do1D(s, ptr, nvar*sz_new, action, ierr)
                if (action == do_allocate) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
@@ -1719,8 +1701,9 @@
                deallocate(ptr)
                allocate(ptr(sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
                call do1D_integer(s, ptr, sz_new, action, ierr)
             end if
          end subroutine do1_integer
@@ -1736,8 +1719,9 @@
                deallocate(ptr)
                allocate(ptr(sz1, sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
+               if (action == do_reallocate) then
+                  if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
+               end if
                call do2D_integer(s, ptr, sz1, sz_new, action, ierr)
             end if
          end subroutine do2_integer
@@ -1752,8 +1736,9 @@
                deallocate(ptr)
                allocate(ptr(sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
                call do1D_logical(s, ptr, sz_new, action, ierr)
             end if
          end subroutine do1_logical
@@ -1779,10 +1764,8 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
                if (s% zero_when_allocate) ptr(:,:) = 0
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. &
-                   nz <= size(ptr, dim=2)) then
-                  return
+               if (action == do_reallocate) then
+                  if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
                end if
                call do2D(s, ptr, sz1, sz_new, action, ierr)
                if (action == do_allocate) then
@@ -1812,10 +1795,11 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
                if (s% zero_when_allocate) ptr(:,:,:) = 0
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. &
-                   sz2 == size(ptr, dim=2) .and. &
-                   nz <= size(ptr, dim=3)) return
+               if (action == do_reallocate) then
+                   if (sz1 == size(ptr, dim=1) .and. &
+                       sz2 == size(ptr, dim=2) .and. &
+                       nz <= size(ptr, dim=3)) return
+               end if
                call do3D(s, ptr, sz1, sz2, sz_new, action, ierr)
                if (action == do_allocate) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
@@ -1835,9 +1819,9 @@
                deallocate(ptr)
                allocate(ptr(sz1, sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. &
-                   nz <= size(ptr, dim=2)) return
+               if (action == do_reallocate) then
+                  if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
+               end if
                call do2D_quad(s, ptr, sz1, sz_new, action, ierr)
             end if
          end subroutine do2_quad
@@ -1857,10 +1841,100 @@
 
 
       end subroutine star_info_arrays
+         
+         
+      subroutine fill_ad_with_NaNs(ptr, klo, khi_in)
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
+         integer, intent(in) :: klo, khi_in
+         integer :: k, khi
+         if (khi_in == -1) then
+            khi = size(ptr,dim=1)
+         else
+            khi = khi_in
+         end if
+         do k=klo,khi
+            call set_nan(ptr(k)% val)
+            call fill_with_NaNs(ptr(k)% d1Array)
+         end do
+      end subroutine fill_ad_with_NaNs
+      
+      
+      subroutine fill_ad_with_zeros(ptr, klo, khi_in)
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
+         integer, intent(in) :: klo, khi_in
+         integer :: k, khi
+         if (khi_in == -1) then
+            khi = size(ptr,dim=1)
+         else
+            khi = khi_in
+         end if
+         do k=klo,khi
+            ptr(k)% val = 0d0
+            ptr(k)% d1Array(:) = 0d0
+         end do
+      end subroutine fill_ad_with_zeros
+
+
+      subroutine do1D_ad(s, ptr, sz, action, ierr)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
+         integer, intent(in) :: sz, action
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr2
+         integer :: old_sz, j
+         include 'formats'
+         ierr = 0
+         select case(action)
+            case (do_deallocate)
+               if (associated(ptr)) then
+                  deallocate(ptr)
+                  nullify(ptr)
+               end if
+            case (do_allocate)
+               allocate(ptr(sz), stat=ierr)
+               if (s% fill_arrays_with_NaNs) then
+                  call fill_ad_with_NaNs(ptr,1,-1)
+               else if (s% zero_when_allocate) then
+                  call fill_ad_with_zeros(ptr,1,-1)
+               end if
+            case (do_check_size)
+               if (size(ptr,dim=1) < sz) ierr = -1
+            case (do_remove_from_center)
+               allocate(ptr2(sz), stat=ierr)
+               old_sz = size(ptr,dim=1)
+               do j=1,min(old_sz,sz)
+                  ptr2(j) = ptr(j)
+               end do
+               deallocate(ptr)
+               if (ierr /= 0) return
+               ptr => ptr2
+            case (do_reallocate)
+               if (associated(ptr)) then
+                  if (size(ptr,dim=1) >= sz) return
+               else
+                  ierr = -1
+                  return
+               end if
+               allocate(ptr2(sz), stat=ierr)
+               old_sz = size(ptr,dim=1)
+               do j=1,old_sz
+                  ptr2(j) = ptr(j)
+               end do
+               if (s% fill_arrays_with_NaNs) then
+                  call fill_ad_with_NaNs(ptr,old_sz+1,sz)                  
+               else if (s% zero_when_allocate) then
+                  call fill_ad_with_zeros(ptr,old_sz+1,sz)                  
+               end if
+               deallocate(ptr)
+               if (ierr /= 0) return
+               ptr => ptr2
+            case (do_fill_arrays_with_NaNs)
+               if (associated(ptr)) call fill_ad_with_NaNs(ptr,1,-1)
+         end select
+      end subroutine do1D_ad
 
 
       subroutine do1D(s, ptr, sz, action, ierr)
-
          type (star_info), pointer :: s
          real(dp), dimension(:), pointer :: ptr
          integer, intent(in) :: sz, action
@@ -2424,24 +2498,6 @@
       end subroutine do1D_logical
 
 
-      subroutine non_crit_do1_alloc_if_necessary(s, p, sz, str, ierr)
-         type (star_info), pointer :: s
-         real(dp), pointer :: p(:)
-         integer, intent(in) :: sz
-         character (len=*), intent(in) :: str
-         integer, intent(out) :: ierr
-         ierr = 0
-         if (.not. associated(p)) then
-            call non_crit_get_work_array( &
-               s, p, sz, nz_alloc_extra, str, ierr)
-         else if (sz > size(p,dim=1)) then
-            call non_crit_return_work_array(s, p, str)
-            call non_crit_get_work_array( &
-               s, p, sz, nz_alloc_extra, str, ierr)
-         end if
-      end subroutine non_crit_do1_alloc_if_necessary
-
-
       subroutine set_var_info(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -2452,82 +2508,28 @@
 
          ierr = 0
          i = 0
+         
+         ! first assign variable numbers
+         i = i+1; s% i_lnd = i
+         i = i+1; s% i_lnT = i
+         i = i+1; s% i_lnR = i
+      
+         if (.not. s% RSP_flag) then
+            i = i+1; s% i_lum = i
+         else
+            s% i_lum = 0
+         end if
+      
+         if (s% v_flag) then
+            i = i+1; s% i_v = i
+         else
+            s% i_v = 0
+         end if
 
-         s% i_u = 0
-         s% i_du_dt = 0
-
-         if (((.not. s% Eturb_flag) .and. (s% u_flag .or. s% v_flag)) .or. s% RSP_flag) then
-
-            i = i+1
-            s% i_lnd = i
-            s% i_dlnd_dt = i
-
-            i = i+1
-            s% i_lnT = i
-            s% i_dlnE_dt = i
-
-            if (s% RSP_flag) then
-               s% i_lum = 0
-            else
-               i = i+1
-               s% i_lum = i
-            end if
-            s% i_equL = s% i_lum
-
-            s% i_eturb = 0
-            s% i_deturb_dt = s% i_eturb
-
-            i = i+1
-            s% i_lnR = i
-            s% i_dlnR_dt = i
-
-            if (s% u_flag) then
-               i = i+1
-               s% i_u = i
-               s% i_du_dt = i
-            end if
-
-            if (s% v_flag) then
-               i = i+1
-               s% i_v = i
-               s% i_dv_dt = i
-            else
-               s% i_v = 0
-               s% i_dv_dt = 0
-            end if
-
-         else ! change equation order in this case for ancient numerical issues with matrix solves
-
-            i = i+1
-            s% i_lnd = i
-            s% i_dv_dt = s% i_lnd
-               
-            i = i+1
-            s% i_lnT = i
-            s% i_equL = s% i_lnT
-
-            i = i+1
-            s% i_lum = i
-            s% i_dlnE_dt = s% i_lum
-            
-            if (s% Eturb_flag) then
-               i = i+1; s% i_eturb = i
-            else 
-               s% i_eturb = 0
-            end if
-            s% i_deturb_dt = s% i_eturb
-
-            i = i+1
-            s% i_lnR = i
-            s% i_dlnd_dt = s% i_lnR
-
-            if (s% v_flag) then
-               i = i+1; s% i_v = i
-            else
-               s% i_v = 0
-            end if
-            s% i_dlnR_dt = s% i_v
-
+         if (s% u_flag) then
+            i = i+1;s% i_u = i
+         else
+            s% i_u = 0
          end if
 
          if (s% RTI_flag) then
@@ -2535,48 +2537,73 @@
          else
             s% i_alpha_RTI = 0
          end if
-         s% i_dalpha_RTI_dt = s% i_alpha_RTI
+
+         if (s% RSP_flag) then
+            i = i+1; s% i_Et_RSP = i
+            i = i+1; s% i_erad_RSP = i
+            i = i+1; s% i_Fr_RSP = i
+         else
+            s% i_Et_RSP = 0
+            s% i_erad_RSP = 0
+            s% i_Fr_RSP = 0
+         end if
+         
+         if (s% TDC_flag) then
+            i = i+1; s% i_w = i
+         else 
+            s% i_w = 0
+         end if
 
          if (s% conv_vel_flag) then
             i = i+1; s% i_ln_cvpv0 = i
          else
             s% i_ln_cvpv0 = 0
          end if
-         s% i_dln_cvpv0_dt = s% i_ln_cvpv0
 
          if (s% w_div_wc_flag) then
             i = i+1; s% i_w_div_wc = i
          else
             s% i_w_div_wc = 0
          end if
-         s% i_equ_w_div_wc = s% i_w_div_wc
 
          if (s% j_rot_flag) then
             i = i+1; s% i_j_rot = i
          else
             s% i_j_rot = 0
          end if
-         s% i_dj_rot_dt = s% i_j_rot
-
-         if (s% RSP_flag) then
-            i = i+1; s% i_eturb_RSP = i
-            i = i+1; s% i_erad_RSP = i
-            i = i+1; s% i_Fr_RSP = i
-         else
-            s% i_eturb_RSP = 0
-            s% i_erad_RSP = 0
-            s% i_Fr_RSP = 0
+         
+         ! now assign equation numbers
+         if (s% i_v /= 0 .or. s% i_u /= 0) then
+            s% i_dlnd_dt = s% i_lnd
+            s% i_dlnE_dt = s% i_lnT
+            s% i_equL = s% i_lum
+            s% i_dlnR_dt = s% i_lnR
+            s% i_dv_dt = s% i_v
+            s% i_du_dt = s% i_u
+         else ! HSE is included in dv_dt, so drop dlnR_dt
+            s% i_equL = s% i_lnd
+            s% i_dv_dt = s% i_lnT
+            s% i_dlnE_dt = s% i_lum
+            s% i_dlnd_dt = s% i_lnR
+            s% i_dlnR_dt = 0
+            s% i_du_dt = 0
          end if
-         s% i_deturb_RSP_dt = s% i_eturb_RSP
+      
+         s% i_detrb_dt = s% i_w
+         s% i_dalpha_RTI_dt = s% i_alpha_RTI
+         s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
+         s% i_dln_cvpv0_dt = s% i_ln_cvpv0
+         s% i_equ_w_div_wc = s% i_w_div_wc
+         s% i_dj_rot_dt = s% i_j_rot
 
          s% nvar_hydro = i
 
          s% i_chem1 = s% nvar_hydro + 1
          s% equchem1 = s% i_chem1
 
-         s% nvar = s% nvar_hydro + s% nvar_chem
+         s% nvar_total = s% nvar_hydro + s% nvar_chem
 
          ! Names of the variables
          if (s% i_lnd /= 0) s% nameofvar(s% i_lnd) = 'lnd'
@@ -2584,9 +2611,9 @@
          if (s% i_lnR /= 0) s% nameofvar(s% i_lnR) = 'lnR'
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
-         if (s% i_eturb /= 0) s% nameofvar(s% i_eturb) = 'eturb'
+         if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
-         if (s% i_eturb_RSP /= 0) s% nameofvar(s% i_eturb_RSP) = 'eturb_RSP'
+         if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
          if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
@@ -2600,9 +2627,9 @@
          if (s% i_dlnd_dt /= 0) s% nameofequ(s% i_dlnd_dt) = 'dlnd_dt'
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
-         if (s% i_deturb_dt /= 0) s% nameofequ(s% i_deturb_dt) = 'deturb_dt'
+         if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
-         if (s% i_deturb_RSP_dt /= 0) s% nameofequ(s% i_deturb_RSP_dt) = 'deturb_RSP_dt'
+         if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
          if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
@@ -2611,6 +2638,7 @@
          if (s% i_du_dt /= 0) s% nameofequ(s% i_du_dt) = 'du_dt'
 
          ! chem names are done later by set_chem_names when have set up the net
+         
 
          s% need_to_setvars = .true.
 
@@ -2627,7 +2655,7 @@
          if (s% nvar_hydro == 0) return ! not ready to set chem names yet
 
          old_size = size(s% nameofvar,dim=1)
-         if (old_size < s% nvar) then
+         if (old_size < s% nvar_total) then
             call realloc(s% nameofvar)
             call realloc(s% nameofequ)
          end if
@@ -2646,8 +2674,8 @@
             integer :: cpy_len, j
             old_p => p
             old_size = size(p,dim=1)
-            allocate(p(s% nvar))
-            cpy_len = min(old_size, s% nvar)
+            allocate(p(s% nvar_total))
+            cpy_len = min(old_size, s% nvar_total)
             do j=1,cpy_len
                p(j) = old_p(j)
             end do
@@ -2660,8 +2688,8 @@
             integer :: cpy_len, j
             old_p => p
             old_size = size(p,dim=1)
-            allocate(p(s% nvar))
-            cpy_len = min(old_size, s% nvar)
+            allocate(p(s% nvar_total))
+            cpy_len = min(old_size, s% nvar_total)
             do j=1,cpy_len
                p(j) = old_p(j)
             end do
@@ -2723,7 +2751,7 @@
                s% v(1:nz) = 0d0
             else
                do k=1,nz
-                  s% xh(i_v,k) = s% r(k)*s% dlnR_dt(k)
+                  s% xh(i_v,k) = 0d0
                   if (is_bad(s% xh(i_v,k))) s% xh(i_v,k) = 0d0
                   s% v(k) = s% xh(i_v,k)
                end do
@@ -2811,17 +2839,13 @@
                k = nz
                s% xh(i_u,k) = 0.5d0*(s% xh(i_v,k) + s% v_center)
             else
-               do k=1,nz-1
-                  s% xh(i_u,k) = 0.5d0* &
-                     (s% r(k)*s% dlnR_dt(k) + s% r(k+1)*s% dlnR_dt(k+1))
+               do k=1,nz
+                  s% xh(i_u,k) = 0d0
                end do
-               k = nz
-               s% xh(i_u,k) = 0.5d0*(s% r(k)*s% dlnR_dt(k) + s% v_center)
             end if
             if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-            s% u_face(1:nz) = 0
-            s% P_face(1:nz) = 0
-            s% du_dt(1:nz) = 0
+            call fill_ad_with_zeros(s% u_face_ad,1,-1)
+            call fill_ad_with_zeros(s% P_face_ad,1,-1)
          end if
 
          call set_chem_names(s)
@@ -2944,58 +2968,58 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_Eturb_flag(id, Eturb_flag, ierr)
+      subroutine set_TDC_flag(id, TDC_flag, ierr)
          integer, intent(in) :: id
-         logical, intent(in) :: Eturb_flag
+         logical, intent(in) :: TDC_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, j, nz, iounit
-         real(dp), pointer :: eturb_RSP(:)
+         integer :: nvar_hydro_old, i, k, j, nz, iounit
          logical, parameter :: dbg = .false.
-         logical :: have_eturb_RSP
 
          include 'formats'
 
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% Eturb_flag .eqv. Eturb_flag) return
+         
+         write(*,*) 'set_TDC_flag previous s% TDC_flag', s% TDC_flag
+         write(*,*) 'set_TDC_flag new TDC_flag', TDC_flag
+         if (s% TDC_flag .eqv. TDC_flag) return
 
          nz = s% nz
          
-         have_eturb_RSP = .false.
-         if (Eturb_flag .and. s% RSP_flag) then ! turn RSP off before turn Eturb on
-            have_eturb_RSP = .true.
-            allocate(eturb_RSP(nz))
-            do k=1,nz
-               eturb_RSP(k) = s% xh(s% i_eturb_RSP,k)
-            end do
+         if (TDC_flag .and. s% RSP_flag) then ! turn RSP off before turn TDC on
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
          
-         s% Eturb_flag = Eturb_flag
+         s% TDC_flag = TDC_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. Eturb_flag) call remove1(s% i_eturb)
+         if (.not. TDC_flag) then
+            call remove1(s% i_w)
+         end if
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
-         !do j=1,s% nvar_hydro
-         !   write(*,2) trim(s% nameofvar(j)) // ' ' // trim(s% nameofequ(j)), j
-         !end do
-         !write(*,*)
-
+         write(*,*) 'set_TDC variables and equations'
+         if (.true.) then
+            do i=1,s% nvar_hydro
+               write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
+            end do
+         end if
+         
          call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
          if (ierr /= 0) return
 
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (Eturb_flag) call insert1(s% i_eturb)
-         
-         if (have_eturb_RSP) deallocate(eturb_RSP)
+         if (TDC_flag) then
+            call insert1(s% i_w) 
+            s% need_to_reset_w = .true.
+         end if
 
          call set_chem_names(s)
          
@@ -3007,9 +3031,8 @@
             call insert(s% xh,i_var)
             call insert(s% xh_start,i_var)
             do k=1,nz
-               s% xh(i_var,k) = min_Eturb
+               s% xh(i_var,k) = 0d0
             end do
-            s% need_to_reset_Eturb = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then
                call insert(s% xh_old,i_var)
             end if
@@ -3049,7 +3072,7 @@
             xs(i_var,1:nz) = 0d0
          end subroutine insert
 
-      end subroutine set_Eturb_flag
+      end subroutine set_TDC_flag
 
 
       subroutine set_RSP_flag(id, RSP_flag, ierr)
@@ -3074,7 +3097,7 @@
          if (.not. RSP_flag) then
             call remove1(s% i_Fr_RSP)
             call remove1(s% i_erad_RSP)
-            call remove1(s% i_eturb_RSP)
+            call remove1(s% i_Et_RSP)
          else if (s% i_lum /= 0) then
             call remove1(s% i_lum)
          end if
@@ -3089,7 +3112,7 @@
          if (ierr /= 0) return
 
          if (RSP_flag) then
-            call insert1(s% i_eturb_RSP)
+            call insert1(s% i_Et_RSP)
             call insert1(s% i_erad_RSP)
             call insert1(s% i_Fr_RSP)
          else
@@ -3520,7 +3543,7 @@
 
          if (crit) then
 !$omp critical (alloc_work_array1)
-            num_calls = num_calls + 1
+            num_calls = num_calls + 1 ! not safe, but just for info
             do i = 1, num_work_arrays
                if (get1(i)) then
                   okay = .true.
@@ -3593,8 +3616,8 @@
          logical :: okay
 
          if (.not. associated(ptr)) then
-            write(*,*) 'bogus call on do_return_work_array with nil ptr ' // trim(str)
-            stop 'do_return_work_array'
+            !write(*,*) 'bogus call on do_return_work_array with nil ptr ' // trim(str)
+            !stop 'do_return_work_array'
             return
          end if
 
@@ -4045,22 +4068,6 @@
 
       end subroutine return_logical_work_array
 
-
-      subroutine init_alloc
-         integer :: i
-         num_calls=0; num_returns=0
-         num_allocs=0; num_deallocs=0
-         do i=1,num_work_arrays
-            work_pointers(i)%p => null()
-         end do
-         do i=1,num_int_work_arrays
-            int_work_pointers(i)%p => null()
-         end do
-         do i=1,num_logical_work_arrays
-            logical_work_pointers(i)%p => null()
-         end do
-      end subroutine init_alloc
-
       
       subroutine shutdown_alloc ()
 
@@ -4187,17 +4194,6 @@
          integer, intent(out) :: ierr
          call do_get_work_array(s, .true., ptr, sz, extra, str, ierr)
       end subroutine get_work_array
-
-
-      ! okay to use this if sure don't need reentrant allocation
-      subroutine non_crit_get_work_array(s, ptr, sz, extra, str, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: sz, extra
-         real(dp), pointer :: ptr(:)
-         character (len=*), intent(in) :: str
-         integer, intent(out) :: ierr
-         call do_get_work_array(s, .false., ptr, sz, extra, str, ierr)
-      end subroutine non_crit_get_work_array
 
 
       subroutine return_work_array(s, ptr, str)

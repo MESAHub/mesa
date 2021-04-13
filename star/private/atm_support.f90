@@ -50,16 +50,14 @@ module atm_support
 contains
 
   subroutine get_atm_PT( &
-       s, tau_surf, skip_partials, &
+       s, tau_surf, L, R, M, cgrav, skip_partials, &
        Teff, &
        lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
        ierr)
-       
-    use create_atm_paczyn, only: get_Paczynski_atm_surf_PT
 
     type (star_info), pointer :: s
-    real(dp), intent(in)      :: tau_surf
+    real(dp), intent(in)      :: tau_surf, L, R, M, cgrav
     logical, intent(in)       :: skip_partials
     real(dp), intent(out)     :: Teff
     real(dp), intent(out)     :: lnT_surf
@@ -81,6 +79,8 @@ contains
     
     if (is_bad(tau_surf)) then
        write(*,*) 'tau_surf', tau_surf
+       ierr = -1
+       return
        stop 'bad tau_surf arg for get_atm_PT'
     end if
 
@@ -92,7 +92,7 @@ contains
     case ('T_tau')
 
        call get_T_tau( &
-            s, tau_surf, &
+            s, tau_surf, L, R, M, cgrav, &
             s% atm_T_tau_relation, s% atm_T_tau_opacity, skip_partials, &
             Teff, kap, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
@@ -102,28 +102,17 @@ contains
     case ('table')
 
        call get_table( &
-            s, skip_partials, &
+            s, skip_partials, L, R, M, cgrav, &
             Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
 
     case ('irradiated_grey')
-
+    
        call get_irradiated( &
-            s, s% atm_irradiated_opacity, skip_partials, &
+            s, s% atm_irradiated_opacity, skip_partials, L, R, M, cgrav, &
             Teff, &
-            lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-            lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
-            ierr)
-
-    case ('Paczynski_grey')
-
-       R_surf = s% r(1)
-       L_surf = s% L(1)
-
-       call get_Paczynski_atm_surf_PT( &
-            s, R_surf, L_surf, skip_partials, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -141,14 +130,14 @@ contains
   !****
 
   subroutine get_atm_PT_legacy_grey_and_kap( &
-       s, tau_surf, skip_partials, &
+       s, tau_surf, L, R, M, cgrav, skip_partials, &
        Teff, kap, &
        lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
        ierr)
 
     type(star_info), pointer :: s
-    real(dp), intent(in)     :: tau_surf
+    real(dp), intent(in)     :: tau_surf, L, R, M, cgrav
     logical, intent(in)      :: skip_partials
     real(dp), intent(out)    :: Teff
     real(dp), intent(out)    :: kap
@@ -168,7 +157,7 @@ contains
     ! grey_and_kap behavior
 
     call get_T_tau( &
-       s, tau_surf, 'Eddington', 'iterated', skip_partials, &
+       s, tau_surf, L, R, M, cgrav, 'Eddington', 'iterated', skip_partials, &
        Teff, kap, &
        lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -237,10 +226,6 @@ contains
 
        tau_base = 2._dp/3._dp
 
-    case ('Paczynski_grey')
-
-       tau_base = 2._dp/3._dp
-
     case default
 
        ! All other options use this
@@ -258,7 +243,7 @@ contains
   !****
 
   subroutine get_T_tau( &
-       s, tau_surf, T_tau_relation, T_tau_opacity, skip_partials, &
+       s, tau_surf, L, R, M, cgrav, T_tau_relation, T_tau_opacity, skip_partials, &
        Teff, kap, &
        lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -270,7 +255,7 @@ contains
     use kap_support, only : prepare_kap
 
     type (star_info), pointer :: s
-    real(dp), intent(in)      :: tau_surf
+    real(dp), intent(in)      :: tau_surf, L, R, M, cgrav
     character(*), intent(in)  :: T_tau_relation
     character(*), intent(in)  :: T_tau_opacity
     logical, intent(in)       :: skip_partials
@@ -288,21 +273,10 @@ contains
     real(dp), intent(out)     :: dlnP_dlnkap
     integer, intent(out)      :: ierr
 
-    real(dp) :: L
-    real(dp) :: R
-    real(dp) :: M
-    real(dp) :: cgrav
     integer  :: T_tau_id
+    real(dp) :: kap_guess
 
-    include 'formats.dek'
-
-    ! Set up stellar surface parameters
-
-    L = s% L(1)
-    R = s% r(1)
-    M = s% m_grav(1)
-
-    cgrav = s% cgrav(1)
+    include 'formats'
 
     ! Sanity check on L
 
@@ -331,7 +305,8 @@ contains
     select case (T_tau_opacity)
 
     case ('fixed')
-
+       
+       ! ok to use s% opacity(1) for fixed
        call atm_eval_T_tau_uniform( &
             tau_surf, L, R, M, cgrav, s% opacity(1), s% Pextra_factor, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
@@ -349,9 +324,15 @@ contains
          if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
-
+       
+       ! need to start iterations from same kap each time, so use opacity_start
+       if (s% solver_iter > 0) then
+          kap_guess = s% opacity_start(1)
+       else
+          kap_guess = s% opacity(1)
+       end if
        call atm_eval_T_tau_uniform( &
-            tau_surf, L, R, M, cgrav, s% opacity_start(1), s% Pextra_factor, &
+            tau_surf, L, R, M, cgrav, kap_guess, s% Pextra_factor, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
             s%atm_T_tau_errtol, s%atm_T_tau_max_iters, skip_partials, &
             Teff, kap, &
@@ -404,7 +385,7 @@ contains
       real(dp), intent(out) :: dres_dlnRho(:)
       real(dp), intent(out) :: dres_dlnT(:)
       integer, intent(out)  :: ierr
-      include 'formats.dek'
+      include 'formats'
       
       call eos_proc( &
            s, lnP, lnT, &
@@ -429,7 +410,7 @@ contains
       real(dp), intent(out) :: dlnkap_dlnRho
       real(dp), intent(out) :: dlnkap_dlnT
       integer, intent(out)  :: ierr
-      include 'formats.dek'
+      include 'formats'
       
       call kap_proc( &
            s, lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
@@ -447,7 +428,8 @@ contains
     use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
-         ATM_T_TAU_KRISHNA_SWAMY
+         ATM_T_TAU_KRISHNA_SWAMY, &
+         ATM_T_TAU_TRAMPEDACH_SOLAR
     
     character(*), intent(in) :: T_tau_relation
     integer, intent(out)     :: T_tau_id
@@ -464,6 +446,8 @@ contains
        T_tau_id = ATM_T_TAU_SOLAR_HOPF
     case ('Krishna_Swamy')
        T_tau_id = ATM_T_TAU_KRISHNA_SWAMY
+    case ('Trampedach_solar')
+       T_tau_id = ATM_T_TAU_TRAMPEDACH_SOLAR
     case default
        write(*,*) 'Unknown value for atm_T_tau_relation: ' // trim(T_tau_relation)
        stop 'Please amend your inlist file to correct this problem'
@@ -478,7 +462,7 @@ contains
   !****
 
   subroutine get_table( &
-       s, skip_partials, &
+       s, skip_partials, L, R, M, cgrav, &
        Teff, &
        lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -492,6 +476,7 @@ contains
 
     type (star_info), pointer :: s
     logical, intent(in)       :: skip_partials
+    real(dp), intent(in)      :: L, R, M, cgrav
     real(dp), intent(out)     :: Teff
     real(dp), intent(out)     :: lnT
     real(dp), intent(out)     :: dlnT_dL
@@ -505,10 +490,6 @@ contains
     real(dp), intent(out)     :: dlnP_dlnkap
     integer, intent(out)      :: ierr
 
-    real(dp) :: L
-    real(dp) :: R
-    real(dp) :: M
-    real(dp) :: cgrav
     real(dp) :: Z
     real(dp) :: tau_base
     integer  :: T_tau_id
@@ -540,7 +521,7 @@ contains
     real(dp) :: kap_a
     real(dp) :: tau_b
 
-    include 'formats.dek'
+    include 'formats'
 
     ! Check that tau_factor is correct
 
@@ -548,14 +529,6 @@ contains
        write(*,*) 'Cannot use atm_option == ''table'' with tau_factor /= 1'
        stop 'Please amend your inlist file to correct this problem'
     end if
-
-    ! Set up stellar surface parameters
-
-    L = s% L(1)
-    R = s% r(1)
-    M = s% m_grav(1)
-
-    cgrav = s% cgrav(1)
 
     Z = s% Z(1)
 
@@ -673,7 +646,7 @@ contains
        case ('T_tau')
 
           call get_T_tau( &
-               s, s% tau_base, &
+               s, s% tau_base, L, R, M, cgrav, &
                s% atm_T_tau_relation, s% atm_T_tau_opacity, skip_partials, &
                Teff_a, kap_a, &
                lnT_a, dlnT_dL_a, dlnT_dlnR_a, dlnT_dlnM_a, dlnT_dlnkap_a, &
@@ -805,7 +778,7 @@ contains
   !****
     
   subroutine get_irradiated( &
-       s, irradiated_opacity, skip_partials, &
+       s, irradiated_opacity, skip_partials, L, R, M, cgrav, &
        Teff, &
        lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -817,6 +790,7 @@ contains
     type (star_info), pointer :: s
     character(*), intent(in)  :: irradiated_opacity
     logical, intent(in)       :: skip_partials
+    real(dp), intent(in)      :: L, R, M, cgrav
     real(dp), intent(out)     :: Teff
     real(dp), intent(out)     :: lnT_surf
     real(dp), intent(out)     :: dlnT_dL
@@ -830,25 +804,17 @@ contains
     real(dp), intent(out)     :: dlnP_dlnkap
     integer, intent(out)      :: ierr
 
-    real(dp) :: L
-    real(dp) :: R
-    real(dp) :: M
-    real(dp) :: cgrav
-    real(dp) :: kap_guess
+    real(dp) :: kap_for_atm
     real(dp) :: kap
     real(dp) :: tau_surf
 
-    include 'formats.dek'
-
-    ! Set up stellar surface parameters
-
-    L = s% L(1)
-    R = s% r(1)
-    M = s% m_grav(1)
-
-    cgrav = s% cgrav(1)
-
-    kap_guess = s% opacity_start(1)
+    include 'formats'
+    
+    if (s% solver_iter > 0) then
+       kap_for_atm = s% opacity_start(1)
+    else
+       kap_for_atm = s% opacity(1)
+    end if
 
     ! Sanity check on L
 
@@ -871,7 +837,7 @@ contains
 
        call atm_eval_irradiated( &
             L, R, M, cgrav, s% atm_irradiated_T_eq, s% atm_irradiated_P_surf, &
-            kap_guess, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
+            kap_for_atm, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
             eos_proc_for_get_irradiated, kap_proc_for_get_irradiated, &
             s% atm_irradiated_errtol, 0, skip_partials, &
             Teff, kap, tau_surf, &
@@ -889,7 +855,7 @@ contains
 
        call atm_eval_irradiated( &
             L, R, M, cgrav, s% atm_irradiated_T_eq, s% atm_irradiated_P_surf, &
-            kap_guess, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
+            kap_for_atm, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
             eos_proc_for_get_irradiated, kap_proc_for_get_irradiated, &
             s% atm_irradiated_errtol, s% atm_irradiated_max_iters, skip_partials, &
             Teff, kap, tau_surf, &
@@ -1084,9 +1050,10 @@ contains
   !****
 
   subroutine build_atm( &
-       s, ierr)
+       s, L, R, M, cgrav, ierr)
 
     type(star_info), pointer :: s
+    real(dp), intent(in)     :: L, R, M, cgrav
     integer, intent(out)     :: ierr
        
     ! Create the atmosphere structure by dispatching to the
@@ -1097,14 +1064,10 @@ contains
     case ('T_tau')
 
        call build_T_tau( &
-            s, s% tau_factor*s% tau_base, &
+            s, s% tau_factor*s% tau_base, L, R, M, cgrav, &
             s% atm_T_tau_relation, s% atm_T_tau_opacity, &
             s% atm_structure_num_pts, s% atm_structure, &
             ierr)
-
-    case ('Paczynski_grey')
-
-       stop 'paczynski_grey not yet implemented'
 
     case default
 
@@ -1120,7 +1083,7 @@ contains
   !****
 
   subroutine build_T_tau( &
-       s, tau_surf, T_tau_relation, T_tau_opacity, &
+       s, tau_surf, L, R, M, cgrav, T_tau_relation, T_tau_opacity, &
        atm_structure_num_pts, atm_structure, &
        ierr)
 
@@ -1129,7 +1092,7 @@ contains
          atm_build_T_tau_varying
     
     type(star_info), pointer :: s
-    real(dp), intent(in)     :: tau_surf
+    real(dp), intent(in)     :: tau_surf, L, R, M, cgrav
     character(*), intent(in) :: T_tau_relation
     character(*), intent(in) :: T_tau_opacity
     integer, intent(out)     :: atm_structure_num_pts
@@ -1148,10 +1111,6 @@ contains
     real(dp) :: dlnP_dlnR
     real(dp) :: dlnP_dlnM
     real(dp) :: dlnP_dlnkap
-    real(dp) :: L
-    real(dp) :: R
-    real(dp) :: M
-    real(dp) :: cgrav
     integer  :: T_tau_id
 
     ierr = 0
@@ -1159,7 +1118,7 @@ contains
     ! First evaluate the temperature, pressure and opacity
 
     call get_T_tau( &
-         s, tau_surf, T_tau_relation, T_tau_opacity, .TRUE., &
+         s, tau_surf, L, R, M, cgrav, T_tau_relation, T_tau_opacity, .TRUE., &
          Teff, kap, &
          lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
          lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -1168,14 +1127,6 @@ contains
        s% retry_message = 'Call to get_T_tau failed in build_T_tau'
        if (s% report_ierr) write(*, *) s% retry_message
     end if
-
-    ! Set up stellar surface parameters
-
-    L = s% L(1)
-    R = s% r(1)
-    M = s% m_grav(1)
-
-    cgrav = s% cgrav(1)
 
     ! Get the T-tau id
 
@@ -1309,8 +1260,6 @@ contains
     real(dp) :: logRho, logRho_guess
     real(dp) :: dlnRho_dlnPgas
     real(dp) :: dlnRho_dlnT
-    real(dp) :: dres_dabar(num_eos_basic_results)
-    real(dp) :: dres_dzbar(num_eos_basic_results)
     real(dp) :: dres_dxa(num_eos_basic_results,s% species)
 
     T = exp(lnT)
@@ -1330,9 +1279,9 @@ contains
     logRho_guess = log10(rho)
 
     call solve_eos_given_PgasT( &
-         s, 0, s% Z(1), s% X(1), s% abar(1), s% zbar(1), s% xa(:,1), &
+         s, 0, s% xa(:,1), &
          lnT/ln10, log10(Pgas), logRho_guess, LOGRHO_TOL, LOGPGAS_TOL, &
-         logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+         logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
          ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to solve_eos_given_PgasT failed in eos_proc'
@@ -1371,6 +1320,8 @@ contains
     integer, intent(out)     :: ierr
 
     real(dp) :: kap_fracs(num_kap_fracs)
+    
+    include 'formats'
 
     call get_kap( &
          s, 0, s% zbar(1), s% xa(:,1), lnRho/ln10, lnT/ln10, &
@@ -1384,6 +1335,17 @@ contains
     end if
 
     ! Finish
+    
+    if (kap <= 0d0 .or. is_bad(kap)) then
+       write(*,1) 'bad kap', kap
+       write(*,1) 's% zbar(1)', s% zbar(1)
+       write(*,1) 'lnRho/ln10', lnRho/ln10
+       write(*,1) 'lnT/ln10', lnT/ln10
+       write(*,1) 'res(i_eta)', res(i_eta)
+       ierr = -1
+       return
+       stop 'atm kap_proc'
+    end if
 
     return
 

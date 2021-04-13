@@ -10,9 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('./_ext/'))
 
 
 # -- Project information -----------------------------------------------------
@@ -31,6 +31,7 @@ version = '15140'
 # ones.
 extensions = [
     'sphinx.ext.autosectionlabel',
+    'defaults2rst',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -73,11 +74,10 @@ master_doc = 'index'
 html_logo = 'mesa-logo-200.png'
 
 # Override theme stylesheet
-html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',  # overrides for wide tables in RTD theme
-        ],
-    }
+html_css_files = [
+    'theme_overrides.css',  # overrides for wide tables in RTD theme
+]
+
 
 # standard substitutions
 rst_prolog = r"""

@@ -473,6 +473,12 @@
             do j=1, species ! interpolate target composition
                f(1:4*num_pts) => f1(1+(j-1)*4*num_pts:j*4*num_pts)
                call interp_values(x, num_pts, f, nz, xq, vals(j,:), op_err)
+               ! enforce non-negative mass fractions
+               ! if the abundance switches back and forth between 0 and 1d-99,
+               ! then small negative abundances ~ -1d-115 can be generated
+               do k = 1, nz
+                  if (vals(j,k) .lt. 0d0) vals(j,k) = 0d0
+               end do
                if (op_err /= 0) ierr = op_err
                s% xa(j,1:nz) = (1d0-lambda)*s% xa(j,1:nz) + lambda*vals(j,1:nz)
             end do
@@ -1299,8 +1305,8 @@
 
       integer function relax_omega_check_model(s, id, lipar, ipar, lrpar, rpar)
          use do_one_utils, only: do_bare_bones_check_model
-         use hydro_rotation, only: set_uniform_omega, set_i_rot
-         use star_utils, only: set_surf_avg_rotation_info
+         use hydro_rotation, only: set_uniform_omega, set_i_rot, &
+            set_surf_avg_rotation_info
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -2154,7 +2160,7 @@
          next_M_center = next*Msun
          s% M_center = next_M_center
          s% xmstar = s% mstar - s% M_center
-         next_R_center = pow(s% M_center/(core_avg_rho*4*pi/3),1d0/3d0)
+         next_R_center = pow(s% M_center/(core_avg_rho*four_thirds_pi),one_third)
          call do1_relax_R_center(s, next_R_center, ierr)
          if (ierr /= 0) return
          next_L_center = s% M_center*core_avg_eps
@@ -2585,7 +2591,7 @@
 
       subroutine do1_relax_R_center(s, new_Rcenter, ierr)
          ! adjust all lnR's to keep same density for each cell as 1st guess for next model
-         use star_utils, only: set_qs
+         use star_utils, only: set_qs, store_lnR_in_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: new_Rcenter ! cm
          integer, intent(out) :: ierr
@@ -2599,8 +2605,8 @@
          do k = s% nz, 1, -1
             dm = s% dm(k)
             rho = s% rho(k)
-            dr3 = (dm/rho)/(pi4/3) ! dm/rho is cell volume
-            s% xh(s% i_lnR,k) = log(rp13 + dr3)/3
+            dr3 = dm/(rho*four_thirds_pi) ! dm/rho is cell volume
+            call store_lnR_in_xh(s, k, log(rp13 + dr3)*one_third)
             rp13 = rp13 + dr3
          end do
       end subroutine do1_relax_R_center
@@ -3181,94 +3187,6 @@
       end function relax_opacity_max_check_model
 
 
-      subroutine do_relax_fixed_L(id, steps, ierr)
-         integer, intent(in) :: id
-         integer, intent(in) :: steps
-         integer, intent(out) :: ierr
-         integer, parameter ::  lipar=1, lrpar=1
-         integer :: max_model_number
-         type (star_info), pointer :: s
-         integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:)
-         real(dp), target :: rpar_ary(lrpar)
-         real(dp), pointer :: rpar(:)
-         rpar => rpar_ary
-         ipar => ipar_ary
-         include 'formats'
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (.not. s% use_fixed_L_for_BB_outer_BC) return
-         if (steps <= 0) return
-         ipar(1) = steps
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
-         call do_internal_evolve( &
-               id, before_evolve_relax_fixed_L, &
-               relax_fixed_L_adjust_model, relax_fixed_L_check_model, &
-               null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-
-         s% max_model_number = max_model_number
-         s% use_fixed_L_for_BB_outer_BC = .false.
-         s% dt_next = rpar(1) ! keep dt from relax
-         call error_check('relax fixed L',ierr)
-      end subroutine do_relax_fixed_L
-
-
-      subroutine before_evolve_relax_fixed_L(s, id, lipar, ipar, lrpar, rpar, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(out) :: ierr
-         ierr = 0
-         s% max_model_number = -111
-         s% dt_next = secyer*1d-3
-         call turn_off_winds(s)
-      end subroutine before_evolve_relax_fixed_L
-
-      integer function relax_fixed_L_adjust_model(s, id, lipar, ipar, lrpar, rpar)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         relax_fixed_L_adjust_model = keep_going
-      end function relax_fixed_L_adjust_model
-
-      integer function relax_fixed_L_check_model(s, id, lipar, ipar, lrpar, rpar)
-         use do_one_utils, only: do_bare_bones_check_model
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: steps_remaining
-         real(dp) :: f
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         relax_fixed_L_check_model = do_bare_bones_check_model(id)
-         if (relax_fixed_L_check_model /= keep_going) return
-
-         steps_remaining = ipar(1)
-         
-         if (steps_remaining <= 0) then
-            relax_fixed_L_check_model = terminate
-            s% termination_code = t_relax_finished_okay
-            rpar(1) = s% dt
-            return
-         end if
-         
-         f = 1d0/dble(steps_remaining)
-         steps_remaining = steps_remaining - 1
-         ipar(1) = steps_remaining         
-         s% fixed_L_for_BB_outer_BC = f*s% L(1) + (1d0 - f)*s% fixed_L_for_BB_outer_BC
-         if (mod(s% model_number, s% terminal_interval) == 0) &
-            write(*,1) 's% fixed_L_for_BB_outer_BC/Lsun', s% fixed_L_for_BB_outer_BC/Lsun
-
-      end function relax_fixed_L_check_model
-
-
       subroutine do_relax_max_surf_dq(id, new_value, per_step_multiplier, ierr)
          integer, intent(in) :: id
          real(dp), intent(in) :: new_value, per_step_multiplier
@@ -3388,6 +3306,7 @@
          integer, parameter ::  lipar=1, lrpar=1
          integer :: max_model_number, model_number
          real(dp) :: save_max_timestep, save_max_years_for_timestep
+         logical :: save_use_gradT
          type (star_info), pointer :: s
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:)
@@ -3417,6 +3336,8 @@
          model_number = s% model_number
          save_max_timestep = s% max_timestep
          save_max_years_for_timestep = s% max_years_for_timestep
+         save_use_gradT = s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+         s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
          s% model_number = 0
          call do_internal_evolve( &
                id, before_evolve_relax_num_steps, &
@@ -3426,6 +3347,7 @@
          s% model_number = model_number
          s% max_timestep = save_max_timestep
          s% max_years_for_timestep = save_max_years_for_timestep
+         s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = save_use_gradT
          call error_check('relax num steps',ierr)
 
       end subroutine do_relax_num_steps
@@ -3941,6 +3863,7 @@
          type (star_info), pointer :: s
          s% dxdt_nuc_factor = 0
          s% max_age = 1d50
+         s% max_age_in_days = 1d50
          s% max_age_in_seconds = 1d50
          s% max_timestep_factor = 2
          s% max_model_number = -1111
@@ -4014,7 +3937,7 @@
             model_number_old, max_number_retries, &
             solver_iters_timestep_limit, iter_for_resid_tol2, iter_for_resid_tol3, &
             steps_before_use_gold_tolerances, steps_before_use_gold2_tolerances
-         real(dp) :: star_age, time, max_age, max_age_in_seconds, max_timestep, &
+         real(dp) :: star_age, time, max_age, max_age_in_days, max_age_in_seconds, max_timestep, &
             Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, Dutch_scaling_factor, &
             van_Loon_scaling_factor, Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
             dxdt_nuc_factor, tol_correction_norm, tol_max_correction, warning_limit_for_max_residual, &
@@ -4240,6 +4163,7 @@
             model_number = s% model_number
             dxdt_nuc_factor = s% dxdt_nuc_factor
             max_age = s% max_age
+            max_age_in_days = s% max_age_in_days
             max_age_in_seconds = s% max_age_in_seconds
             max_timestep_factor = s% max_timestep_factor
             varcontrol_target = s% varcontrol_target
@@ -4294,6 +4218,7 @@
             s% model_number = model_number
             s% dxdt_nuc_factor = dxdt_nuc_factor
             s% max_age = max_age
+            s% max_age_in_days = max_age_in_days
             s% max_age_in_seconds = max_age_in_seconds
             s% max_timestep_factor = max_timestep_factor
             s% varcontrol_target = varcontrol_target
@@ -4370,7 +4295,7 @@
       subroutine error_check(name,ierr)
          character(len=*), intent(in) :: name
          integer, intent(in) :: ierr
-         include 'formats.inc'
+         include 'formats'
 
          if (ierr /= 0) then
             write(*,*) 'failed in ', name

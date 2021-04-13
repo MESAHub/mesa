@@ -61,7 +61,7 @@
 
          logical :: dbg
          
-         include 'formats.dek'
+         include 'formats'
          
          dbg = .false.
          if (dbg) write(*,1) 'Get1_kap_fixed_metal_Results logT', logT
@@ -347,7 +347,7 @@
       
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          x_tables => z_tables(iz)% x_tables
@@ -620,29 +620,26 @@
       
       subroutine Get_Kap_for_logRho_logT( &
                z_tables, rq, iz, x_tables, ix, &
-               logRho, logT_in, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
+               logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
          use load_kap, only: load_one
          use kap_def
          type (Kap_Z_Table), dimension(:), pointer :: z_tables
          type (Kap_General_Info), pointer :: rq
          type (Kap_X_Table), dimension(:), pointer :: x_tables
          integer :: iz, ix
-         real(dp), intent(inout) :: logRho, logT_in
+         real(dp), intent(inout) :: logRho, logT
          real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
          integer, intent(out) :: ierr
 
-         real(dp) :: logR0, logR1, logT, logT0, logT1, logR
-         real(dp) :: df_dx, df_dy, logKap_es, fac
-         real(dp) :: logR_blend1, logR_blend2, logR_in
-         real(dp), parameter :: logR_blend_width = 0.5d0
-         real(dp) :: Zbase, X, dXC, dXO, logKcond, dlogT, alfa, beta
+         real(dp) :: logR0, logR1, logT0, logT1, logR, logR_in
+         real(dp) :: df_dx, df_dy
          integer :: iR, jtemp, i, num_logRs, num_logTs
-         logical :: clipped_logT, clipped_logR
+         logical :: clipped_logR
          logical, parameter :: read_later = .false.
       
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          if (x_tables(ix)% not_loaded_yet) then ! avoid doing critical section if possible
@@ -658,147 +655,93 @@
             !stop 'load_one failed in Get_Kap_for_logRho_logT'
             return
          end if
+
+         ! logR from inputs
+         logR_in = logRho - 3d0*logT + 18d0
          
-         logT = logT_in
-         clipped_logT = .false.
-         
+         ! blends at higher levels MUST prevent
+         ! these tables from being called off their
+         ! high/low T and low R edges
+
          if (logT > x_tables(ix)% logT_max) then
-            logK = log10(0.2d0*(1d0 + x_tables(ix)% X))
-            dlogK_dlogRho = 0d0
-            dlogK_dlogT = 0d0
+            ierr = -1
             return
          end if
+
+         if (logT < x_tables(ix)% logT_min) then
+            ierr = -1
+            return
+         end if
+
+         if (logR_in < x_tables(ix)% logR_min) then
+            ierr = -1
+            return
+         end if
+
          
-         logR = logRho -3d0*logT + 18d0
-         logR_in = logR
-         clipped_logR = .false.
-         
+         ! off the high R edge, we use the input temperature
+         ! but clip logR to the table edge value
+
+         if (logR_in > x_tables(ix)% logR_max) then
+            logR = x_tables(ix)% logR_max
+            clipped_logR = .true.
+         else
+            logR = logR_in
+            clipped_logR = .false.
+         end if
+
+
          num_logRs = x_tables(ix)% num_logRs
          num_logTs = x_tables(ix)% num_logTs
-         
-         !if (logR < x_tables(ix)% logR_min) then
-         !   logR = x_tables(ix)% logR_min
-         !   clipped_logR = .true.
-         !end if
-         
-         if (logR > 1 .and. logT < rq% min_logT_for_logR_gt_1 .and. &
-               x_tables(ix)% logT_min >= 2.5d0) then
-            logT = rq% min_logT_for_logR_gt_1
-            clipped_logT = .true.
-         end if
-         
-         logR_blend1 = -20d0 ! x_tables(ix)% logR_min
-         logR_blend2 = logR_blend1 + logR_blend_width
-         
-         if (logR_in >= logR_blend1) then ! evaluate using table
-         
-            if (num_logRs <= 0) then
-               write(*,*) 'num_logRs', num_logRs
-               write(*,*) 'ix', ix
-               !write(*,*) 'x_tables(ix)% not_loaded_yet', x_tables(ix)% not_loaded_yet
-               stop 'Get_Kap_for_logRho_logT'
-            end if
-            
-            call Locate_logR( &
-               rq, num_logRs, x_tables(ix)% logR_min, x_tables(ix)% logR_max, &
-               x_tables(ix)% ili_logRs, x_tables(ix)% logRs, logR, iR, logR0, logR1, ierr)
-            if (ierr /= 0) then
-               write(*,1) 'x_tables(ix)% logR_min', x_tables(ix)% logR_min
-               write(*,1) 'x_tables(ix)% logR_max', x_tables(ix)% logR_max
-               write(*,2) 'num_logRs', num_logRs
-               write(*,2) 'iR', iR
-               write(*,1) 'logR', logR
-               write(*,1) 'logR0', logR0
-               write(*,1) 'logR1', logR1
-               do i=1,num_logRs
-                  write(*,2) 'logR', i, x_tables(ix)% logRs(i)
-               end do
-               write(*,*) 'clip_to_kap_table_boundaries', clip_to_kap_table_boundaries
-               stop 'failed in Locate_logR'
-               return
-            end if
-        
-            if (num_logTs <= 0) then
-               write(*,*) 'num_logTs', num_logRs
-               stop 'Get_Kap_for_logRho_logT'
-            end if
-         
-            call Locate_logT( &
-               rq, num_logTs, x_tables(ix)% logT_min, x_tables(ix)% logT_max, &
-               x_tables(ix)% ili_logTs, x_tables(ix)% logTs, logT, jtemp, logT0, logT1, ierr)
-            if (ierr /= 0) return
-            
-            call Do_Kap_Interpolations( &
-                  x_tables(ix)% kap1, num_logRs, num_logTs, &
-                  iR, jtemp, logR0, logR, logR1, logT0, logT, logT1, &
-                  logK, df_dx, df_dy)
-            
-            if (logR_in < logR0) then
-            else if (logR_in > logR1) then
-               !write(*,*) 'logR_in > logR', logK, logR_in, logR, logRho, logT
-            endif
-            
-            if (logR_in < logR0 .or. logR_in > logR1) df_dx = 0d0
-            if (logT_in < logT0 .or. logT_in > logT1) df_dy = 0d0
-            
-            if (dbg) write(*,1) 'Do_Kap_Interpolations: logK', logK
-            ! convert df_dx and df_dy to dlogK_dlogRho, dlogK_dlogT
-            dlogK_dlogRho = df_dx
-            if (clipped_logT) then
-               dlogK_dlogT = 0d0
-            else
-               dlogK_dlogT = df_dy - 3d0*df_dx
-            end if      
-            
-         end if
-         
-         if (logR_in <= logR_blend2) then ! evaluate electron scattering
-         
-            logKap_es = log10(0.2d0*(1d0 + x_tables(ix)% X))
-            if (dbg) write(*,1) 'logKap_es', logKap_es
 
-            !write(*,*) '    logR_in', logR_in
-            !write(*,*) 'logR_blend1', logR_blend1
-            !write(*,*) 'logR_blend2', logR_blend2
-            !write(*,*)
-            
-            if (logR_in <= logR_blend1) then
-               
-               logK = logKap_es
-               dlogK_dlogRho = 0d0
-               dlogK_dlogT = 0d0
-               
-            else
-               
-               fac = (logR_in - logR_blend1) / (logR_blend2 - logR_blend1)
-               if (dbg) then
-                  write(*,1) 'logR_in', logR_in
-                  write(*,1) 'logR_blend1', logR_blend1
-                  write(*,1) 'logR_blend2', logR_blend2
-                  write(*,1) 'fac', fac
-               end if
-               fac = 0.5d0*(1d0 - cospi(fac))
-               
-               !write(*,*) '      fac', fac
-               !write(*,*) 'logKap_es', logKap_es
-               !write(*,*) '     logK', logK
-               !write(*,*) '      new', fac*logK + (1-fac)*logKap_es
-               !write(*,*)
-
-               logK = fac*logK + (1d0-fac)*logKap_es
-               dlogK_dlogRho = fac*dlogK_dlogRho
-               dlogK_dlogT = fac*dlogK_dlogRho
-               if (dbg) then
-                  write(*,1) 'fac', fac
-                  write(*,1) 'fac*logK', fac*logK
-                  write(*,1) '(1-fac)', (1-fac)
-                  write(*,1) '(1-fac)*logKap_es', (1-fac)*logKap_es
-               end if
-               
-            end if
-         
+         if (num_logRs <= 0) then
+            write(*,*) 'num_logRs', num_logRs
+            write(*,*) 'ix', ix
+            stop 'Get_Kap_for_logRho_logT'
          end if
+
+         if (num_logTs <= 0) then
+            write(*,*) 'num_logTs', num_logRs
+            write(*,*) 'ix', ix
+            stop 'Get_Kap_for_logRho_logT'
+         end if
+
+         call Locate_logR( &
+            rq, num_logRs, x_tables(ix)% logR_min, x_tables(ix)% logR_max, &
+            x_tables(ix)% ili_logRs, x_tables(ix)% logRs, logR, iR, logR0, logR1, ierr)
+         if (ierr /= 0) then
+            write(*,1) 'x_tables(ix)% logR_min', x_tables(ix)% logR_min
+            write(*,1) 'x_tables(ix)% logR_max', x_tables(ix)% logR_max
+            write(*,2) 'num_logRs', num_logRs
+            write(*,2) 'iR', iR
+            write(*,1) 'logR', logR
+            write(*,1) 'logR0', logR0
+            write(*,1) 'logR1', logR1
+            do i=1,num_logRs
+               write(*,2) 'logR', i, x_tables(ix)% logRs(i)
+            end do
+            write(*,*) 'clip_to_kap_table_boundaries', clip_to_kap_table_boundaries
+            stop 'failed in Locate_logR'
+            return
+         end if
+
+         call Locate_logT( &
+            rq, num_logTs, x_tables(ix)% logT_min, x_tables(ix)% logT_max, &
+            x_tables(ix)% ili_logTs, x_tables(ix)% logTs, logT, jtemp, logT0, logT1, ierr)
+         if (ierr /= 0) return
+
+         call Do_Kap_Interpolations( &
+            x_tables(ix)% kap1, num_logRs, num_logTs, &
+            iR, jtemp, logR0, logR, logR1, logT0, logT, logT1, &
+            logK, df_dx, df_dy)
+         if (clipped_logR) df_dx = 0
          
+         if (dbg) write(*,1) 'Do_Kap_Interpolations: logK', logK
+
+         ! convert df_dx and df_dy to dlogK_dlogRho, dlogK_dlogT
+         dlogK_dlogRho = df_dx
+         dlogK_dlogT = df_dy - 3d0*df_dx
+
          if (dbg) then
             write(*,1) 'logK', logK, logT, logRho, x_tables(ix)% X, z_tables(iz)% Z
          end if

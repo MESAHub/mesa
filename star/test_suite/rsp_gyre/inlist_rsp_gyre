@@ -63,10 +63,15 @@
    RSP_nz_outer = 40 ! number of zones in outer region of initial model
    RSP_T_anchor = 11d3 ! approx temperature at base of outer region
    RSP_T_inner = 2d6 ! T at inner boundary of initial model
+   
+! solver
 
 ! output controls
    
-      terminal_show_age_units = 'days'
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
 
       !num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -97,7 +102,7 @@
          
       Grid2_win_flag = .true.
 
-      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
+      Grid2_title = ''
       
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

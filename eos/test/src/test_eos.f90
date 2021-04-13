@@ -20,8 +20,6 @@
 
       call Do_One(quietly)
 
-      call test_theta_e
-
       call test1_eosPT_for_ck(quietly)
       
       call test1_eosDE_for_ck(quietly)

@@ -883,7 +883,7 @@
         Xty = 0d0
 
         do i = 1, nl(0)
-           X = freq(0,i)**3/inertia(0,i)/sigma(0,i)
+           X = pow3(freq(0,i))/inertia(0,i)/sigma(0,i)
            y = (obs(0,i) - freq(0,i))/sigma(0,i)
 
            XtX = XtX + X*X
@@ -893,7 +893,7 @@
         if (.not. radial_only) then
            do l = 1, 3
               do i = 1, nl(l)
-                 X = freq(l,i)**3/inertia(l,i)/sigma(l,i)
+                 X = pow3(freq(l,i))/inertia(l,i)/sigma(l,i)
                  y = (obs(l,i) - freq(l,i))/sigma(l,i)
 
                  XtX = XtX + X*X
@@ -906,7 +906,7 @@
 
         do l = 0, 3
            do i = 1, nl(l)
-              freq_corr(l,i) = freq(l,i) + correction_factor*a3*freq(l,i)**3/inertia(l,i)
+              freq_corr(l,i) = freq(l,i) + correction_factor*a3*pow3(freq(l,i))/inertia(l,i)
            end do
         end do
 
@@ -952,8 +952,8 @@
         Xty = 0d0
 
         do i = 1, nl(0)
-           X(1) = freq(0,i)**(-1)/inertia(0,i)/sigma(0,i)
-           X(2) = freq(0,i)**3/inertia(0,i)/sigma(0,i)
+           X(1) = powm1(freq(0,i))/inertia(0,i)/sigma(0,i)
+           X(2) = pow3(freq(0,i))/inertia(0,i)/sigma(0,i)
            y = (obs(0,i) - freq(0,i))/sigma(0,i)
 
            XtX(1,1) = XtX(1,1) + X(1)*X(1)
@@ -966,8 +966,8 @@
         if (.not. radial_only) then
            do l = 1, 3
               do i = 1, nl(l)
-                 X(1) = freq(l,i)**(-1)/inertia(l,i)/sigma(l,i)
-                 X(2) = freq(l,i)**3/inertia(l,i)/sigma(l,i)
+                 X(1) = powm1(freq(l,i))/inertia(l,i)/sigma(l,i)
+                 X(2) = pow3(freq(l,i))/inertia(l,i)/sigma(l,i)
                  y = (obs(l,i) - freq(l,i))/sigma(l,i)
 
                  XtX(1,1) = XtX(1,1) + X(1)*X(1)
@@ -995,7 +995,7 @@
         do l = 0, 3
            do i = 1, nl(l)
               freq_corr(l,i) = freq(l,i) + &
-                    correction_factor*(a1*freq(l,i)**(-1)+a3*freq(l,i)**3)/inertia(l,i)
+                    correction_factor*(a1*powm1(freq(l,i))+a3*pow3(freq(l,i)))/inertia(l,i)
            end do
         end do
 
@@ -1183,7 +1183,7 @@
       real(dp) function dsonoi_db(freq, freq_ref, a, b)
         real(dp), intent(in) :: freq, freq_ref, a, b
         
-        dsonoi_db = a*freq_ref*pow(freq/freq_ref,b)*log(freq/freq_ref)/(1d0+pow(freq/freq_ref,b))**2d0
+        dsonoi_db = a*freq_ref*pow(freq/freq_ref,b)*log(freq/freq_ref)/(1d0+pow(freq/freq_ref,b))**2
       end function dsonoi_db
 
 

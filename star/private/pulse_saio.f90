@@ -90,7 +90,7 @@ contains
     ! Determine data dimensiones
 
     if (add_atmosphere) then
-       call build_atm(s, ierr)
+       call build_atm(s, s%L(1), s%r(1), s%m_grav(1), s%cgrav(1), ierr)
        if (ierr /= 0) then
           write(*,*) 'failed in build_atm'
           return
@@ -284,7 +284,7 @@ contains
         else
            rho = eval_face_rho(s, k, k_a, k_b)
         end if
-        P = eval_face(s%dq, s%P, k, 1, s%nz)
+        P = eval_face(s%dq, s%Peos, k, 1, s%nz)
         eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav, k, k_a, k_b)
         c_V = eval_face(s%dq, s%Cv, k, k_a, k_b)
         chi_rho = eval_face(s%dq, s%chiRho, k, k_a, k_b)

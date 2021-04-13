@@ -1,3 +1,9 @@
+.. _ppisn:
+
+*****
+ppisn
+*****
+
 This test case evolves a very massive helium star from the He-ZAMS
 up to the ocurrence of a pulsational pair-instability event (see |Marchant2019|).
 
