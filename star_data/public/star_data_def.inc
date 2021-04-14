@@ -566,6 +566,7 @@
       integer, parameter :: mlt_debug = 9
             
       integer, parameter :: num_mlt_results = 9
+      character (len=24) :: mlt_results_str(num_mlt_results)
       
       
       ! partials

@@ -4012,7 +4012,7 @@
       end function wrap_mlt
       
       
-      subroutine upwrap_mlt(val_ad, val, d_val_dvb)
+      subroutine unwrap_mlt(val_ad, val, d_val_dvb)
          type(auto_diff_real_star_order1), intent(in) :: val_ad
          real(dp), intent(out) :: val, d_val_dvb(:)
          val = val_ad%val
@@ -4022,7 +4022,7 @@
          d_val_dvb(mlt_dlnTm1) = val_ad%d1Array(i_lnT_m1)
          d_val_dvb(mlt_dlnR) = val_ad%d1Array(i_lnR_00)
          d_val_dvb(mlt_dL) = val_ad%d1Array(i_L_00)
-      end subroutine upwrap_mlt
+      end subroutine unwrap_mlt
 
 
       end module star_utils

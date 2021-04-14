@@ -45,7 +45,7 @@
       contains
 
 
-      subroutine do1_mlt_eval_new(s, k, &
+      subroutine do1_mlt_eval_new(s, k, & ! k=0 is valid
             cgrav, m, mstar, r, L, X, &            
             T_face, rho_face, P_face, &
             chiRho_face, chiT_face, &
@@ -117,6 +117,11 @@
          
          include 'formats'
          ierr = 0
+
+         if (s% use_other_mlt) then
+            !call s% other_mlt(  &      
+            return
+         end if         
          
          if (k > 0 .and. (s% using_mlt_get_newer .or. s% compare_to_mlt_get_newer)) then
             gradr_ad = gradr_factor*get_gradr_face(s,k)

@@ -54,6 +54,17 @@
 
          okay = .true.
          
+         mlt_results_str(1:num_mlt_results) = ''
+         mlt_results_str(mlt_gradT) = 'mlt_gradT'
+         mlt_results_str(mlt_gradr) = 'mlt_gradr'
+         mlt_results_str(mlt_gradL) = 'mlt_gradL'
+         mlt_results_str(mlt_scale_height) = 'mlt_scale_height'
+         mlt_results_str(mlt_Lambda) = 'mlt_Lambda'
+         mlt_results_str(mlt_convection_velocity) = 'mlt_convection_velocity'
+         mlt_results_str(mlt_D) = 'mlt_D'
+         mlt_results_str(mlt_Gamma) = 'mlt_Gamma'
+         mlt_results_str(mlt_debug) = 'mlt_debug'
+         
          mlt_partial_str(1:num_mlt_partials) = ''
          mlt_partial_str(mlt_dlnd00) = 'mlt_dlnd00'
          mlt_partial_str(mlt_dlnT00) = 'mlt_dlnT00'
