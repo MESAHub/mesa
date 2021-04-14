@@ -172,7 +172,7 @@ SRCS = \
    hydro_energy.f90 \
    hydro_momentum.f90 \
    hydro_temperature.f90 \
-   hydro_tdc.f90 \
+   hydro_rsp2.f90 \
    hydro_eqns.f90 \
    hydro_mtx.f90 \
    hydro_solver_procs.f90 \

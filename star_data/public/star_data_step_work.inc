@@ -39,7 +39,7 @@
       real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
       real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
       real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
-      real(dp), pointer :: w(:) ! cell turbulent velocity.  only used when TDC_flag is true
+      real(dp), pointer :: w(:) ! cell turbulent velocity.  only used when RSP2_flag is true
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
       real(dp), pointer :: u(:) ! only used when u_flag is true
@@ -442,14 +442,14 @@
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
-      ! Convective turbulent velocity w -- when TDC_flag is true
+      ! Convective turbulent velocity w -- when RSP2_flag is true
          
          real(dp), pointer, dimension(:) :: &
             Ptrb, Pvsc, Pvsc_start, Hp_face, Y_face, Y_face_start, PII, Chi, Eq, Uq, &
             SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start
-         integer :: TDC_num_periods
-         real(dp) :: TDC_period, &
-            TDC_DeltaR, TDC_DeltaMag, TDC_GRPDV, TDC_GREKM, TDC_GREKM_avg_abs
+         integer :: RSP2_num_periods
+         real(dp) :: RSP2_period, &
+            RSP2_DeltaR, RSP2_DeltaMag, RSP2_GRPDV, RSP2_GREKM, RSP2_GREKM_avg_abs
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
@@ -1105,7 +1105,7 @@
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            RSP_just_set_velocities, previous_step_was_using_TDC, &
+            RSP_just_set_velocities, previous_step_was_using_RSP2, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
          

@@ -335,7 +335,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% TDC_flag = BTEST(file_type, bit_for_w)
+         s% RSP2_flag = BTEST(file_type, bit_for_w)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -360,15 +360,15 @@
          if (want_RSP_model .and. .not. is_RSP_model) then
             write(*,*) 'automatically converting to RSP form'
             s% RSP_flag = .true.
-            s% TDC_flag = .false.
+            s% RSP2_flag = .false.
          end if
          
          if (is_RSP_model .and. .not. want_RSP_model) then
-            write(*,*) 'automatically converting from RSP to TDC form'
+            write(*,*) 'automatically converting from RSP to RSP2 form'
             s% RSP_flag = .false.
-            s% TDC_flag = .true.
-            s% using_TDC = .true.
-            s% previous_step_was_using_TDC = .true.
+            s% RSP2_flag = .true.
+            s% using_RSP2 = .true.
+            s% previous_step_was_using_RSP2 = .true.
             s% need_to_reset_w = .false.
          end if
          
@@ -627,7 +627,7 @@
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
-               else if (i_w /= 0) then ! convert Et from RSP to w in TDC
+               else if (i_w /= 0) then ! convert Et from RSP to w in RSP2
                   j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j)))
                   j=j+1; ! discard
                   j=j+1; ! discard

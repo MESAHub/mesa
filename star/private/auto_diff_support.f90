@@ -31,7 +31,6 @@
 
       implicit none
  
-      integer, parameter :: auto_diff_star_num_vars = 27 ! for 9 solver vars at 3 cells each
       public :: auto_diff_star_num_vars
      
       ! current use of xtra's
@@ -367,7 +366,7 @@
          get_etrb_start = pow2(s% w_start(k))
       end function get_etrb_start
       
-      real(dp) function get_TDC_conv_velocity(s,k) result (cv) ! at face k
+      real(dp) function get_RSP2_conv_velocity(s,k) result (cv) ! at face k
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp) :: alfa, beta
@@ -378,7 +377,7 @@
             beta = 1d0 - alfa
             cv = sqrt_2_div_3*(alfa*s% w(k) + beta*s% w(k-1))
          end if
-      end function get_TDC_conv_velocity
+      end function get_RSP2_conv_velocity
       
       real(dp) function get_w(s,k)
          type (star_info), pointer :: s

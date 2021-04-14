@@ -379,7 +379,7 @@
       ! other = s% extra_grav(k) - s% dv_dt(k)
       subroutine expected_non_HSE_term( &
             s, k, other_ad, other, accel_ad, Uq_ad, ierr)
-         use hydro_tdc, only: compute_Uq_face
+         use hydro_rsp2, only: compute_Uq_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s

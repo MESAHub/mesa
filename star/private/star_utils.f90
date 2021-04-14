@@ -630,7 +630,7 @@
             dm_bar(k) = 0.5d0*(dm(k-1) + dm(k))
          end do
          dm_bar(1) = 0.5d0*dm(1)
-         if (s% rsp_flag .or. s% tdc_flag) then ! rsp and tdc use this definition
+         if (s% rsp_flag .or. s% RSP2_flag) then ! rsp and tdc use this definition
             dm_bar(nz) = 0.5d0*(dm(nz-1) + dm(nz))
          else
             dm_bar(nz) = 0.5d0*dm(nz-1) + dm(nz)
@@ -2032,7 +2032,7 @@
             get_Lconv = 0d0
             return
          end if
-         if (s% using_TDC .or. s% RSP_flag) then
+         if (s% using_RSP2 .or. s% RSP_flag) then
             get_Lconv = s% Lc(k)
          else
             get_Lconv = s% L_conv(k) ! L_conv set by last call on mlt
@@ -2331,7 +2331,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% using_TDC) cell_total = cell_total + pow2(s% w(k))
+         if (s% using_RSP2) cell_total = cell_total + pow2(s% w(k))
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2414,7 +2414,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% using_TDC) then
+            if (s% using_RSP2) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
@@ -2463,7 +2463,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% using_TDC) then
+            if (s% using_RSP2) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
             end if
@@ -3318,19 +3318,19 @@
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% TDC_alfap == 0 .or. s% mixing_length_alpha  == 0) then
+         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha  == 0) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
          end if
          rho = wrap_d_00(s,k)
          etrb = wrap_etrb_00(s,k)
-         Ptrb_div_etrb = s% TDC_alfap*x_ALFAP*etrb*rho
+         Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*etrb*rho
          Ptrb = Ptrb_div_etrb*etrb ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Ptrb_start = s% TDC_alfap*get_etrb_start(s,k)*s% rho_start(k)
+            Ptrb_start = s% RSP2_alfap*get_etrb_start(s,k)*s% rho_start(k)
             Ptrb = 0.5d0*(Ptrb + Ptrb_start)
          end if
 
@@ -3393,7 +3393,7 @@
          end if
          
          Ptrb_ad = 0d0
-         if (s% using_TDC) then
+         if (s% using_RSP2) then
             call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr) 
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted

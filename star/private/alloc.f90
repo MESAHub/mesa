@@ -2548,7 +2548,7 @@
             s% i_Fr_RSP = 0
          end if
          
-         if (s% TDC_flag) then
+         if (s% RSP2_flag) then
             i = i+1; s% i_w = i
          else 
             s% i_w = 0
@@ -2968,9 +2968,9 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_TDC_flag(id, TDC_flag, ierr)
+      subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          integer, intent(in) :: id
-         logical, intent(in) :: TDC_flag
+         logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, i, k, j, nz, iounit
@@ -2982,28 +2982,28 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_TDC_flag previous s% TDC_flag', s% TDC_flag
-         write(*,*) 'set_TDC_flag new TDC_flag', TDC_flag
-         if (s% TDC_flag .eqv. TDC_flag) return
+         write(*,*) 'set_RSP2_flag previous s% RSP2_flag', s% RSP2_flag
+         write(*,*) 'set_RSP2_flag new RSP2_flag', RSP2_flag
+         if (s% RSP2_flag .eqv. RSP2_flag) return
 
          nz = s% nz
          
-         if (TDC_flag .and. s% RSP_flag) then ! turn RSP off before turn TDC on
+         if (RSP2_flag .and. s% RSP_flag) then ! turn RSP off before turn RSP2 on
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
          
-         s% TDC_flag = TDC_flag
+         s% RSP2_flag = RSP2_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. TDC_flag) then
+         if (.not. RSP2_flag) then
             call remove1(s% i_w)
          end if
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_TDC variables and equations'
+         write(*,*) 'set_RSP2 variables and equations'
          if (.true.) then
             do i=1,s% nvar_hydro
                write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
@@ -3016,7 +3016,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (TDC_flag) then
+         if (RSP2_flag) then
             call insert1(s% i_w) 
             s% need_to_reset_w = .true.
          end if
@@ -3072,7 +3072,7 @@
             xs(i_var,1:nz) = 0d0
          end subroutine insert
 
-      end subroutine set_TDC_flag
+      end subroutine set_RSP2_flag
 
 
       subroutine set_RSP_flag(id, RSP_flag, ierr)

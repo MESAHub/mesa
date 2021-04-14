@@ -386,7 +386,7 @@
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% generations = 1
-         s% previous_step_was_using_TDC = s% using_TDC
+         s% previous_step_was_using_RSP2 = s% using_RSP2
          
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number

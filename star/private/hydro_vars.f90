@@ -498,7 +498,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs, set_max_conv_time_scale
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_tdc, only: set_TDC_vars, set_using_TDC
+         use hydro_rsp2, only: set_RSP2_vars, set_using_RSP2
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -567,7 +567,7 @@
          end if
 
          if (.not. skip_mixing_info) then         
-            if (.not. s% using_TDC) then
+            if (.not. s% using_RSP2) then
                if (dbg) write(*,*) 'call other_adjust_mlt_gradT_fraction'
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
@@ -627,14 +627,14 @@
             call do_brunt_N2(s, nzlo, nzhi, ierr)
             if (failed('do_brunt_N2')) return
             call set_max_conv_time_scale(s) ! max(1/sqrt(abs(N2)))
-            call set_using_TDC(s)
-            s% need_to_reset_w = s% using_TDC .and. .not. s% previous_step_was_using_TDC
+            call set_using_RSP2(s)
+            s% need_to_reset_w = s% using_RSP2 .and. .not. s% previous_step_was_using_RSP2
          end if
          
-         if (s% using_TDC) then
-            call set_TDC_vars(s,ierr)
-            if (failed('set_TDC_vars')) return
-            s% previous_step_was_using_TDC = .true.
+         if (s% using_RSP2) then
+            call set_RSP2_vars(s,ierr)
+            if (failed('set_RSP2_vars')) return
+            s% previous_step_was_using_RSP2 = .true.
          end if
 
          if (.not. skip_mixing_info) then

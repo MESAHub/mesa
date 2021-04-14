@@ -51,7 +51,7 @@
          use star_utils, only: start_time, update_time
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
-         use auto_diff_support, only: get_TDC_conv_velocity
+         use auto_diff_support, only: get_RSP2_conv_velocity
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
@@ -61,7 +61,7 @@
             region_bottom_q, region_top_q, L_val
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
-         logical :: TDC_or_RSP
+         logical :: RSP2_or_RSP
 
          integer(8) :: time0
          real(dp) :: total
@@ -73,7 +73,7 @@
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
-         TDC_or_RSP = s% RSP_flag .or. s% using_TDC
+         RSP2_or_RSP = s% RSP_flag .or. s% using_RSP2
 
          if (s% doing_timing) call start_time(s, time0, total)
          
@@ -105,7 +105,7 @@
 
          allocate(eps_h(nz), eps_he(nz), eps_z(nz), cdc_factor(nz))
          
-         if (.not. TDC_or_RSP) then
+         if (.not. RSP2_or_RSP) then
             do k = 1, nz
                s% mixing_type(k) = s% mlt_mixing_type(k)
             end do
@@ -126,17 +126,17 @@
                s% cdc(k) = 0d0
                s% conv_vel(k) = 0d0
             end do
-         else if (s% using_TDC) then
+         else if (s% using_RSP2) then
             do k = 1, nz
-               s% conv_vel(k) = get_TDC_conv_velocity(s,k)
+               s% conv_vel(k) = get_RSP2_conv_velocity(s,k)
                s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))
                if (abs(s% Lt(k)) > &
-                     L_val*s% TDC_min_Lt_div_L_for_overshooting_mixing_type) then
+                     L_val*s% RSP2_min_Lt_div_L_for_overshooting_mixing_type) then
                   s% mixing_type(k) = overshoot_mixing
                else if (abs(s% Lc(k)) > &
-                     L_val*s% TDC_min_Lc_div_L_for_convective_mixing_type) then
+                     L_val*s% RSP2_min_Lc_div_L_for_convective_mixing_type) then
                   s% mixing_type(k) = convective_mixing
                else
                   s% mixing_type(k) = no_mixing
@@ -163,7 +163,7 @@
          
          call check('after get mlt_D')
          
-         if (s% remove_mixing_glitches .and. .not. TDC_or_RSP) then
+         if (s% remove_mixing_glitches .and. .not. RSP2_or_RSP) then
 
             call remove_tiny_mixing(s, ierr)
             if (failed('remove_tiny_mixing')) return
@@ -242,7 +242,7 @@
          call s% other_after_set_mixing_info(s% id, ierr)
          if (failed('other_after_set_mixing_info')) return
 
-         if (.not. (skip_set_cz_bdy_mass .or. TDC_or_RSP)) then
+         if (.not. (skip_set_cz_bdy_mass .or. RSP2_or_RSP)) then
             call set_cz_bdy_mass(s, ierr)
             if (failed('set_cz_bdy_mass')) return
          end if
