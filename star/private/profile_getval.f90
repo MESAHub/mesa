@@ -225,8 +225,7 @@
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
          use chem_def
          use rates_def
-         use ionization_def
-         use ionization_lib, only: eval_typical_charge
+         use mod_typical_charge, only: eval_typical_charge
          use rsp_def, only: rsp_WORK, rsp_WORKQ, rsp_WORKT, rsp_WORKC
          type (star_info), pointer :: s
          integer, intent(in) :: c, k
@@ -239,7 +238,6 @@
             r00_start, rp1_start, dr3, dr3_start, d_drL, d_drR, flxR, mmid, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          integer :: j, nz, ionization_k, klo, khi, i, ii, kk, ierr
-         real(dp) :: ionization_res(num_ion_vals)
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor, Lconv, conv_vel
          logical :: rsp_or_w
          include 'formats'

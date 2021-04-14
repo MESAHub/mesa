@@ -95,9 +95,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use paquette_coeffs, only: initialise_collision_integrals
@@ -108,9 +107,8 @@
             jina_reaclib_filename, rate_tables_dir, &
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir
+            kap_cache_dir, rates_cache_dir
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          real(dp), intent(in) :: reaclib_min_T9
          integer, intent(in) :: color_num_files
@@ -131,9 +129,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          if (ierr /= 0) then
