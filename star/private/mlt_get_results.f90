@@ -113,7 +113,7 @@
          real(dp) :: gradT_val, alt_mlt_basics(num_mlt_results), &
             alt_mlt_partials(num_mlt_partials, num_mlt_results)
          logical :: okay
-         integer :: alt_mixing_type, j
+         integer :: alt_mixing_type, j, i
          include 'formats'
 
          if (s% use_other_mlt) then
@@ -148,6 +148,12 @@
             return
          end if
 
+         
+         mlt_partials(1:num_mlt_partials,1:num_mlt_results) => &
+            mlt_partials1(1:num_mlt_partials*num_mlt_results)
+         ierr = 0
+         mlt_basics = 0
+         mlt_partials = 0
          
          
          if (k > 0 .and. (s% using_mlt_get_new .or. s% compare_to_mlt_get_new)) then
@@ -195,16 +201,35 @@
                mixing_type = alt_mixing_type
                mlt_basics = alt_mlt_basics
                mlt_partials = alt_mlt_partials
+               okay = .true.
+               do j=1,num_mlt_results
+                  if (j == mlt_debug) cycle
+                  if (is_bad(mlt_basics(j))) then
+                     write(*,2) mlt_results_str(j), k, mlt_basics(j)
+                     okay = .false.
+                  end if
+               end do
+               if (.not. okay) then
+                  write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+                  stop 'using_mlt_get_new'
+               end if
+               do j=1,num_mlt_results
+                  if (j == mlt_debug) cycle
+                  do i=1,num_mlt_partials
+                     if (is_bad(mlt_partials(i,j))) then
+                        write(*,2) mlt_results_str(j) // ' ' // mlt_partial_str(i), k, mlt_partials(i,j)
+                        okay = .false.
+                     end if
+                  end do
+               end do
+               if (.not. okay) then
+                  write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+                  stop 'using_mlt_get_new'
+               end if
                return
             end if            
          end if
          
-         mlt_partials(1:num_mlt_partials,1:num_mlt_results) => &
-            mlt_partials1(1:num_mlt_partials*num_mlt_results)
-         
-         ierr = 0
-         mlt_basics = 0
-         mlt_partials = 0
          call Get_results(s, k, &
             cgrav, m, mstar, r, L, X, &            
             T_face, rho_face, P_face, &
@@ -255,6 +280,16 @@
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
                call compare(mlt_basics(j), alt_mlt_basics(j), mlt_results_str(j))
+            end do
+            if (.not. okay) then
+               write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+               stop 'compare_to_mlt_get_new'
+            end if
+            do j=1,num_mlt_results
+               if (j == mlt_debug) cycle
+               do i=1,num_mlt_partials
+                  call compare(mlt_partials(i,j), alt_mlt_partials(i,j), mlt_results_str(j) // ' ' // mlt_partial_str(i))
+               end do
             end do
             if (.not. okay) then
                write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type

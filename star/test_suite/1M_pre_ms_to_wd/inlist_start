@@ -44,7 +44,7 @@
       photo_interval = 100
       profile_interval = 100
       history_interval = 10
-      terminal_interval = 50
+      terminal_interval = 10
       write_header_frequency = 10
 
 / ! end of controls namelist
