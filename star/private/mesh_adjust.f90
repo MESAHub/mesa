@@ -55,7 +55,7 @@
             s, nz, nz_old, xh_old, xa_old, &
             energy_old, eta_old, lnd_old, lnPgas_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, &
-            conv_vel_old, lnT_old, w_old, specific_PE_old, specific_KE_old, &
+            mlt_vc_old, lnT_old, w_old, specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
             cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
          use interp_1d_def
@@ -65,7 +65,7 @@
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, conv_vel_old, lnT_old, w_old, &
+            lnd_old, lnPgas_old, mlt_vc_old, lnT_old, w_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, D_mix_old
@@ -532,7 +532,7 @@
       subroutine do_prune_mesh_surface( &
             s, nz, nz_old, xh_old, xa_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
-            conv_vel_old, lnT_old, &
+            mlt_vc_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
             xh, xa, ierr)
@@ -540,7 +540,7 @@
          integer, intent(in) :: nz, nz_old
          real(dp), dimension(:), pointer :: &
             j_rot_old, i_rot_old, omega_old, &
-            D_omega_old, am_nu_rot_old, conv_vel_old, lnT_old, &
+            D_omega_old, am_nu_rot_old, mlt_vc_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old

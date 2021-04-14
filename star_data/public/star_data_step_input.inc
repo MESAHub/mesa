@@ -34,6 +34,7 @@
       real(dp), pointer, dimension(:) :: j_rot ! (nz)
         ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
       real(dp), pointer, dimension(:) :: omega ! (nz)
+      real(dp), pointer, dimension(:) :: mlt_vc ! (nz)
         
       ! vectors of structure variables: xh(i,k) holds hydro structure variable i for point k.
          ! note: abundances are in xa, not in xh.  dq, j_rot, and omega are not in xh.
@@ -51,7 +52,7 @@
          logical :: rotation_flag ! true for rotation variables     
          logical :: RTI_flag ! true for Rayleigh-Taylor instabilities     
          logical :: RSP_flag ! true if we using RSP      
-         logical :: TDC_flag ! true for turbulent velocity as a solver variable    
+         logical :: RSP2_flag ! true for turbulent velocity as a solver variable    
 
       ! index definitions for the variables (= 0 if variable not in use)
          integer :: i_lnd ! ln(cell density average by mass)
@@ -62,7 +63,7 @@
          integer :: i_u ! Lagrangian velocity at center of cell
          integer :: i_alpha_RTI ! alpha for Rayleigh-Taylor instabilities
          integer :: i_Et_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
-         integer :: i_w ! cell turbulent velocity. only when TDC_flag is true.
+         integer :: i_w ! cell turbulent velocity. only when RSP2_flag is true.
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r
@@ -73,7 +74,7 @@
          integer :: i_equL ! luminosity
          integer :: i_dalpha_RTI_dt ! alpha for Rayleigh-Taylor instabilities
          integer :: i_dEt_RSP_dt, i_derad_RSP_dt, i_dFr_RSP_dt ! only when RSP_flag is true.
-         integer :: i_detrb_dt ! turbulent energy equation. only when TDC_flag is true.
+         integer :: i_detrb_dt ! turbulent energy equation. only when RSP2_flag is true.
 
       ! names of variables and equations
          character (len=name_len), dimension(:), pointer :: nameofvar, nameofequ ! (nvar)
@@ -145,7 +146,7 @@
          logical :: am_nu_rot_flag ! smooth am_nu_rot like D_omega
          logical :: was_in_implicit_wind_limit
          logical :: rsp_have_set_velocities
-         logical :: using_TDC ! at start of step, this refers to the previous step
+         logical :: using_RSP2 ! at start of step, this refers to the previous step
          
          integer :: total_num_solver_iterations, total_num_solver_relax_iterations
          integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made

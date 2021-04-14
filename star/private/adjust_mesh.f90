@@ -417,7 +417,7 @@
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
             prv% j_rot, prv% i_rot, prv% omega, prv% D_omega, &
-            prv% conv_vel, prv% lnT, prv% w, specific_PE, specific_KE, &
+            prv% mlt_vc, prv% lnT, prv% w, specific_PE, specific_KE, &
             prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, prv% D_mix, &
             cell_type, comes_from, prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
          if (ierr /= 0) then

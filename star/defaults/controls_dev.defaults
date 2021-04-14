@@ -5,93 +5,126 @@
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
+
+
+
+      using_mlt_info_new = .false.
+      compare_to_mlt_info_new = .false.
+
+      using_mlt_get_new = .false.
+      compare_to_mlt_get_new = .false.
+   
+
+      using_mlt_info_newer = .false.
+      compare_to_mlt_info_newer = .false.
+
+      using_mlt_get_newer = .false.
+      compare_to_mlt_get_newer = .false.
+      
       
 
-      ! TDC parameters
+      max_dt_div_tau_conv_for_TDC = -1d0
+      max_dt_years_for_TDC = -1d0
+   
+      alpha_TDC_DAMP = 1d0
+      alpha_TDC_DAMPR = 0d0
+      alpha_TDC_eddy_viscosity = 0.25d0
+      alpha_TDC_turbulent_pressure = 0d0
+   
+      max_X_for_TDC = -1
+      max_X_for_gradT_eqn = -1
+   
+   
+   
+      
+
+      ! RSP2 parameters
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          
-      !   TDC_alfad =     1.0d0         ! turbulent dissipation; damp ~ TDC_alfad    
-      !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
-      !   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
-      !   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar    
+      !   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad    
+      !   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+      !   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+      !   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar    
       !      
-      ! TDC time weighting is determined by the velocity_time_centering controls.
+      ! RSP2 time weighting is determined by the velocity_time_centering controls.
       !     for Pt and Lt in turbulent energy equation
       !     for P and grav in momentum equation
       !     for P and L in energy equation
       !     for area when multiplied by P
-      ! TDC_Lsurf_factor: Lsurf = TDC_Lsurf_factor*area(1)*clight*crad*T(1)**4
-      ! TDC_use_Stellingwerf_Lr as in RSP
+      ! RSP2_Lsurf_factor: Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4
+      ! RSP2_use_Stellingwerf_Lr as in RSP
       !   
+
+
 
       ! ::
 
-    TDC_alfad = 1.0d0  ! RSP standard.  1.3 does better matching mesa MLT.
-    TDC_alfap = 0.0d0
-    TDC_alfat = 0.0d0
-    TDC_alfam = 0.25d0
-    TDC_alfar = 0.0d0
+    RSP2_alfad = 1.0d0  ! RSP standard.  1.3 does better matching mesa MLT.
+    RSP2_alfap = 0.0d0
+    RSP2_alfat = 0.0d0
+    RSP2_alfam = 0.25d0
+    RSP2_alfar = 0.0d0
     
-    TDC_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
-    TDC_min_Lc_div_L_for_convective_mixing_type = 1d-4
+    RSP2_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
+    RSP2_min_Lc_div_L_for_convective_mixing_type = 1d-4
 
-    TDC_Lsurf_factor = 0.5d0
+    RSP2_Lsurf_factor = 0.5d0
     
-    TDC_use_L_eqn_at_surface = .true.
-    TDC_assume_HSE = .true.
-    TDC_use_RSP_eqn_for_Y_face = .true.
-    TDC_use_mass_interp_face_values = .false.
-    TDC_use_Stellingwerf_Lr = .true.
-    TDC_use_RSP_form_of_etrb_eqn = .true.
+    RSP2_use_L_eqn_at_surface = .true.
+    RSP2_assume_HSE = .true.
+    RSP2_use_RSP_eqn_for_Y_face = .true.
+    RSP2_use_mass_interp_face_values = .false.
+    RSP2_use_Stellingwerf_Lr = .true.
+    RSP2_use_RSP_form_of_etrb_eqn = .true.
     
-    TDC_num_outermost_cells_forced_nonturbulent = 0
-    TDC_num_innermost_cells_forced_nonturbulent = 0
+    RSP2_num_outermost_cells_forced_nonturbulent = 0
+    RSP2_num_innermost_cells_forced_nonturbulent = 0
     
-    TDC_min_dt_div_tau_conv_switch_to_MLT = -1
-    TDC_min_dt_years_switch_to_MLT = 20d0
+    RSP2_min_dt_div_tau_conv_switch_to_MLT = -1
+    RSP2_min_dt_years_switch_to_MLT = 20d0
 
-     TDC_w_min_for_damping = 1d2
-     TDC_source_seed = 0d0
+     RSP2_w_min_for_damping = 1d2
+     RSP2_source_seed = 0d0
 
       ! period controls
 
       ! ::
 
-    TDC_target_steps_per_cycle = 600
-    TDC_min_max_R_for_periods = -1
+    RSP2_target_steps_per_cycle = 600
+    RSP2_min_max_R_for_periods = -1
 
       ! when to stop
 
       ! ::
 
-    TDC_max_num_periods = -1
-    TDC_GREKM_avg_abs_frac_new = 0.1d0
-    TDC_GREKM_avg_abs_limit = -1
+    RSP2_max_num_periods = -1
+    RSP2_GREKM_avg_abs_frac_new = 0.1d0
+    RSP2_GREKM_avg_abs_limit = -1
 
       ! output data for work integrals during a particular period
 
       ! ::
 
-    TDC_work_period = -1
-    TDC_work_filename = 'work.data'
+    RSP2_work_period = -1
+    RSP2_work_filename = 'work.data'
 
       ! output data for 3d map.  format same as for gnuplot pm3d
 
       ! ::
 
-    TDC_write_map = .false.
-    TDC_map_columns_filename = 'map_columns.list'
+    RSP2_write_map = .false.
+    RSP2_map_columns_filename = 'map_columns.list'
 
       ! items listed in your map columns must also appear in your profile columns
 
       ! ::
 
-    TDC_map_filename = 'map.data'
-    TDC_map_first_period = -1
-    TDC_map_last_period = -1
-    TDC_map_zone_interval = 2
-    TDC_map_history_filename = 'map_history.data'
+    RSP2_map_filename = 'map.data'
+    RSP2_map_first_period = -1
+    RSP2_map_last_period = -1
+    RSP2_map_zone_interval = 2
+    RSP2_map_history_filename = 'map_history.data'
 
 
 

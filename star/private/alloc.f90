@@ -386,6 +386,8 @@
          if (failed('xa_old')) return
          call do1D(s, s% dq_old, nz, action, ierr)
          if (failed('dq_old')) return
+         call do1D(s, s% mlt_vc_old, nz, action, ierr)
+         if (failed('mlt_vc_old')) return
          call do1D(s, s% omega_old, nz, action, ierr)
          if (failed('omega_old')) return
          call do1D(s, s% j_rot_old, nz, action, ierr)
@@ -1105,10 +1107,6 @@
             if (failed('mlt_mixing_length')) exit
             call do1(s% mlt_D, c% mlt_D)
             if (failed('mlt_D')) exit
-            call do1(s% mlt_D_semi, c% mlt_D_semi)
-            if (failed('mlt_D_semi')) exit
-            call do1(s% mlt_D_thrm, c% mlt_D_thrm)
-            if (failed('mlt_D_thrm')) exit
 
             call do1(s% mlt_vc, c% mlt_vc)
             if (failed('mlt_vc')) exit
@@ -1127,6 +1125,10 @@
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
+            call do1_logical(s% new_fixed_gradr_for_rest_of_solver_iters, c% new_fixed_gradr_for_rest_of_solver_iters)
+            if (failed('new_fixed_gradr_for_rest_of_solver_iters')) exit
+            call do1_logical(s% newer_fixed_gradr_for_rest_of_solver_iters, c% newer_fixed_gradr_for_rest_of_solver_iters)
+            if (failed('newer_fixed_gradr_for_rest_of_solver_iters')) exit
             
             call do1(s% mlt_Gamma, c% mlt_Gamma)
             if (failed('mlt_Gamma')) exit
@@ -1154,13 +1156,27 @@
             if (failed('mixing_type')) exit
             call do1(s% cz_bdy_dq, c% cz_bdy_dq)
             if (failed('cz_bdy_dq')) exit
-
+            
             call do1_ad(s% gradT_ad, c% gradT_ad)
             if (failed('gradT_ad')) exit
             call do1_ad(s% gradr_ad, c% gradr_ad)
             if (failed('gradr_ad')) exit
+            call do1_ad(s% Y_face_ad, c% Y_face_ad)
+            if (failed('Y_face_ad')) exit
+            call do1_ad(s% grada_face_ad, c% grada_face_ad)
+            if (failed('grada_face_ad')) exit
             call do1_ad(s% mlt_vc_ad, c% mlt_vc_ad)
             if (failed('mlt_vc_ad')) exit
+            call do1_ad(s% gradL_ad, c% gradL_ad)
+            if (failed('gradL_ad')) exit
+            call do1_ad(s% scale_height_ad, c% scale_height_ad)
+            if (failed('scale_height_ad')) exit
+            call do1_ad(s% Lambda_ad, c% Lambda_ad)
+            if (failed('Lambda_ad')) exit
+            call do1_ad(s% mlt_D_ad, c% mlt_D_ad)
+            if (failed('mlt_D_ad')) exit
+            call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
+            if (failed('mlt_Gamma_ad')) exit
 
             call do1(s% actual_gradT, c% actual_gradT)
             if (failed('actual_gradT')) exit
@@ -1592,6 +1608,8 @@
             if (failed('prev_mesh_j_rot')) exit
             call do1(s% prev_mesh_omega, c% prev_mesh_omega)
             if (failed('prev_mesh_omega')) exit
+            call do1(s% prev_mesh_mlt_vc, c% prev_mesh_mlt_vc)
+            if (failed('prev_mesh_mlt_vc')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
 
@@ -2548,7 +2566,7 @@
             s% i_Fr_RSP = 0
          end if
          
-         if (s% TDC_flag) then
+         if (s% RSP2_flag) then
             i = i+1; s% i_w = i
          else 
             s% i_w = 0
@@ -2968,9 +2986,9 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_TDC_flag(id, TDC_flag, ierr)
+      subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          integer, intent(in) :: id
-         logical, intent(in) :: TDC_flag
+         logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, i, k, j, nz, iounit
@@ -2982,28 +3000,28 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_TDC_flag previous s% TDC_flag', s% TDC_flag
-         write(*,*) 'set_TDC_flag new TDC_flag', TDC_flag
-         if (s% TDC_flag .eqv. TDC_flag) return
+         write(*,*) 'set_RSP2_flag previous s% RSP2_flag', s% RSP2_flag
+         write(*,*) 'set_RSP2_flag new RSP2_flag', RSP2_flag
+         if (s% RSP2_flag .eqv. RSP2_flag) return
 
          nz = s% nz
          
-         if (TDC_flag .and. s% RSP_flag) then ! turn RSP off before turn TDC on
+         if (RSP2_flag .and. s% RSP_flag) then ! turn RSP off before turn RSP2 on
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
          
-         s% TDC_flag = TDC_flag
+         s% RSP2_flag = RSP2_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. TDC_flag) then
+         if (.not. RSP2_flag) then
             call remove1(s% i_w)
          end if
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_TDC variables and equations'
+         write(*,*) 'set_RSP2 variables and equations'
          if (.true.) then
             do i=1,s% nvar_hydro
                write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
@@ -3016,7 +3034,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (TDC_flag) then
+         if (RSP2_flag) then
             call insert1(s% i_w) 
             s% need_to_reset_w = .true.
          end if
@@ -3072,7 +3090,7 @@
             xs(i_var,1:nz) = 0d0
          end subroutine insert
 
-      end subroutine set_TDC_flag
+      end subroutine set_RSP2_flag
 
 
       subroutine set_RSP_flag(id, RSP_flag, ierr)

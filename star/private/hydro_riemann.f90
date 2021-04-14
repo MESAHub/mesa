@@ -306,7 +306,7 @@
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
          use star_utils, only: calc_Ptot_ad_tw
-         use hydro_tdc, only: compute_Uq_face
+         use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          integer, intent(out) :: ierr

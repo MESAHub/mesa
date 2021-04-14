@@ -285,6 +285,7 @@
       integer, parameter :: i_xtra3_m1 = 25
       integer, parameter :: i_xtra3_00 = 26
       integer, parameter :: i_xtra3_p1 = 27
+      integer, parameter :: auto_diff_star_num_vars = i_xtra3_p1
       
 
       ! mesh cell types
@@ -559,16 +560,12 @@
       
       integer, parameter :: mlt_D = 7 ! diffusion coefficient in units of cm^2/second
             ! D = convection_velocity*mixing_length/3
-
-      integer, parameter :: mlt_D_semi = 8 ! diffusion coefficient for semiconvective mixing
-
-      integer, parameter :: mlt_D_thrm = 9 ! diffusion coefficient for thermohaline mixing
       
-      integer, parameter :: mlt_Gamma = 10 ! convective efficiency
+      integer, parameter :: mlt_Gamma = 8 ! convective efficiency
       
-      integer, parameter :: mlt_debug = 11
+      integer, parameter :: mlt_debug = 9
             
-      integer, parameter :: num_mlt_results = 11
+      integer, parameter :: num_mlt_results = 9
       
       
       ! partials

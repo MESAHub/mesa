@@ -619,11 +619,11 @@
             if (ierr /= 0) return
          end if
          
-         if (s% job% change_TDC_flag_at_model_number == s% model_number) then
-            write(*,*) 'have reached model number for new_TDC_flag', &
-               s% model_number, s% job% new_TDC_flag
-            call star_set_TDC_flag(id, s% job% new_TDC_flag, ierr)
-            if (failed('star_set_TDC_flag',ierr)) return
+         if (s% job% change_RSP2_flag_at_model_number == s% model_number) then
+            write(*,*) 'have reached model number for new_RSP2_flag', &
+               s% model_number, s% job% new_RSP2_flag
+            call star_set_RSP2_flag(id, s% job% new_RSP2_flag, ierr)
+            if (failed('star_set_RSP2_flag',ierr)) return
          end if
          
          if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
@@ -2278,11 +2278,11 @@
             if (failed('star_set_RTI_flag',ierr)) return
          end if
          
-         if (s% job% change_TDC_flag .or. &
-               (s% job% change_initial_TDC_flag .and. .not. restart)) then
-            write(*,*) 'new_TDC_flag', s% job% new_TDC_flag
-            call star_set_TDC_flag(id, s% job% new_TDC_flag, ierr)
-            if (failed('star_set_TDC_flag',ierr)) return
+         if (s% job% change_RSP2_flag .or. &
+               (s% job% change_initial_RSP2_flag .and. .not. restart)) then
+            write(*,*) 'new_RSP2_flag', s% job% new_RSP2_flag
+            call star_set_RSP2_flag(id, s% job% new_RSP2_flag, ierr)
+            if (failed('star_set_RSP2_flag',ierr)) return
          end if
 
          if (s% job% change_RSP_flag .or. &

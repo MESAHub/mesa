@@ -1198,11 +1198,7 @@
                if (s% mixing_type(k) == semiconvective_mixing) then
                   val = safe_log10(s% D_mix_non_rotation(k))
                else
-                  if (s% conv_vel_flag .and. s% conv_vel_ignore_semiconvection) then
-                     val = safe_log10(s% mlt_D_semi(k))
-                  else
-                     val = -99
-                  end if
+                  val = -99
                end if
             case (p_log_D_ovr)
                if (s% mixing_type(k) == overshoot_mixing) then
@@ -1225,12 +1221,8 @@
             case (p_log_D_thrm)
                if (s% mixing_type(k) == thermohaline_mixing) then
                   val = safe_log10(s% D_mix_non_rotation(k))
-               else
-                  if (s% conv_vel_flag .and. s% conv_vel_ignore_thermohaline) then
-                     val = safe_log10(s% mlt_D_thrm(k))
-                  else
-                     val = -99
-                  end if
+               else 
+                  val = -99
                end if
 
             case (p_log_D_minimum)
