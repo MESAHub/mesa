@@ -161,6 +161,8 @@ SRCS = \
    pulse_saio.f90 \
    pulse_gr1d.f90 \
    pulse_utils.f90 \
+   ionization_potentials.f90 \
+   typical_charge.f90 \
    profile_getval.f90 \
    profile.f90 \
    mesh_functions.f90 \
