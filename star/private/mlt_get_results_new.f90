@@ -181,7 +181,7 @@
             mixing_type, gradT_val, ierr)
          if (ierr /= 0) return
          
-         if (s% compare_to_mlt_get_newer) then
+         if (k > 0 .and. s% compare_to_mlt_get_newer) then
             okay = .true.
             call compare(grada_ad, s% grada_face_ad(k), 'grada')
             call compare(gradT_ad, s% gradT_ad(k), 'gradT')
