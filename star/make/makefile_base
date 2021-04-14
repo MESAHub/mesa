@@ -126,7 +126,11 @@ SRCS = \
    overshoot_utils.f90 \
    overshoot_exp.f90 \
    overshoot_step.f90 \
+   mlt_get_results_newer.f90 \
+   mlt_get_results_new.f90 \
    mlt_get_results.f90 \
+   mlt_info_newer.f90 \
+   mlt_info_new.f90 \
    mlt_info.f90 \
    rotation_mix_info.f90 \
    mix_info.f90 \

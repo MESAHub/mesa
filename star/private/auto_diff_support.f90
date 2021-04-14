@@ -30,8 +30,6 @@
       use auto_diff
 
       implicit none
- 
-      public :: auto_diff_star_num_vars
      
       ! current use of xtra's
       ! xtra1 is ln_cvpv0

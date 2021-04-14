@@ -122,6 +122,10 @@
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     mass_depth_for_L_surf, conv_core_gap_dq_limit, &
+    using_mlt_info_new, compare_to_mlt_info_new, using_mlt_get_new, compare_to_mlt_get_new, &
+    using_mlt_info_newer, compare_to_mlt_info_newer, using_mlt_get_newer, compare_to_mlt_get_newer, &
+    max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC, max_X_for_TDC, max_X_for_gradT_eqn, &
+    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_eddy_viscosity, alpha_TDC_turbulent_pressure, &
     
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -2057,6 +2061,23 @@
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
+ s% using_mlt_info_new = using_mlt_info_new
+ s% compare_to_mlt_info_new = compare_to_mlt_info_new
+ s% using_mlt_get_new = using_mlt_get_new
+ s% compare_to_mlt_get_new = compare_to_mlt_get_new
+ s% using_mlt_info_newer = using_mlt_info_newer
+ s% compare_to_mlt_info_newer = compare_to_mlt_info_newer
+ s% using_mlt_get_newer = using_mlt_get_newer
+ s% compare_to_mlt_get_newer = compare_to_mlt_get_newer
+ s% max_dt_div_tau_conv_for_TDC = max_dt_div_tau_conv_for_TDC
+ s% max_dt_years_for_TDC = max_dt_years_for_TDC
+ s% alpha_TDC_DAMP = alpha_TDC_DAMP
+ s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
+ s% alpha_TDC_eddy_viscosity = alpha_TDC_eddy_viscosity
+ s% alpha_TDC_turbulent_pressure = alpha_TDC_turbulent_pressure
+ s% max_X_for_TDC = max_X_for_TDC
+ s% max_X_for_gradT_eqn = max_X_for_gradT_eqn
+
  s% RSP2_alfap = RSP2_alfap
  s% RSP2_alfad = RSP2_alfad
  s% RSP2_alfat = RSP2_alfat 
@@ -3714,6 +3735,23 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  warn_rates_for_high_temp = s% warn_rates_for_high_temp
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
+
+ using_mlt_info_new = s% using_mlt_info_new
+ compare_to_mlt_info_new = s% compare_to_mlt_info_new
+ using_mlt_get_new = s% using_mlt_get_new
+ compare_to_mlt_get_new = s% compare_to_mlt_get_new
+ using_mlt_info_newer = s% using_mlt_info_newer
+ compare_to_mlt_info_newer = s% compare_to_mlt_info_newer
+ using_mlt_get_newer = s% using_mlt_get_newer
+ compare_to_mlt_get_newer = s% compare_to_mlt_get_newer
+ max_dt_div_tau_conv_for_TDC = s% max_dt_div_tau_conv_for_TDC
+ max_dt_years_for_TDC = s% max_dt_years_for_TDC
+ alpha_TDC_DAMP = s% alpha_TDC_DAMP
+ alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
+ alpha_TDC_eddy_viscosity = s% alpha_TDC_eddy_viscosity
+ alpha_TDC_turbulent_pressure = s% alpha_TDC_turbulent_pressure
+ max_X_for_TDC = s% max_X_for_TDC
+ max_X_for_gradT_eqn = s% max_X_for_gradT_eqn
 
  RSP2_alfap= s% RSP2_alfap
  RSP2_alfad = s% RSP2_alfad

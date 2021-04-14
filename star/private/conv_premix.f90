@@ -1021,7 +1021,7 @@ contains
 
     end if
 
-    if (zi%vp_b == 0._dp) print *,'Bottom bdy has zero vp', zi%vp_b, zi%vc_b, z_s
+    if (zi%vp_b == 0._dp) print *,'Bottom bdy has zero vp', zi%kc_b, zi%vp_b, zi%vc_b, z_s
 
     ! Top boundary
 
@@ -1046,7 +1046,7 @@ contains
 
     end if
 
-    if (zi%vp_t == 0._dp) print *,'Top bdy has zero vp', zi%vp_t, zi%vc_t, z_s
+    if (zi%vp_t == 0._dp) print *,'Top bdy has zero vp', zi%kc_t, zi%vp_t, zi%vc_t, z_s
 
     ! Finish
 

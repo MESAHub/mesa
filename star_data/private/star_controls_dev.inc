@@ -1,3 +1,23 @@
+         logical :: using_mlt_info_new, compare_to_mlt_info_new
+         logical :: using_mlt_get_new, compare_to_mlt_get_new
+         
+         logical :: using_mlt_info_newer, compare_to_mlt_info_newer
+         logical :: using_mlt_get_newer, compare_to_mlt_get_newer
+
+         real(dp) :: max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC
+         real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad
+         real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
+         real(dp) :: alpha_TDC_eddy_viscosity   ! RSP2_alfam
+         real(dp) :: alpha_TDC_turbulent_pressure  ! RSP2_alfap
+         
+         real(dp) :: max_X_for_TDC
+         real(dp) :: max_X_for_gradT_eqn
+
+
+
+
+
+
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap
          real(dp) :: RSP2_alfat

@@ -1908,6 +1908,7 @@
                s% prev_mesh_j_rot(k) = s% j_rot(k)
                s% prev_mesh_omega(k) = s% omega(k)
                s% prev_mesh_dq(k) = s% dq(k)
+               s% prev_mesh_mlt_vc(k) = s% mlt_vc(k)
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
@@ -2095,12 +2096,13 @@
 
             do k = 1, nz
                do j=1,nvar_hydro
-                  s% xh(j,k) = s% xh_old(j,k) ! start from copy of old structure
+                  s% xh(j,k) = s% xh_old(j,k)
                end do
                do j=1,s% species
-                  s% xa(j,k) = s% xa_old(j,k) ! start from copy of old composition
+                  s% xa(j,k) = s% xa_old(j,k)
                end do
-               s% dq(k) = s% dq_old(k) ! start with same dq's
+               s% dq(k) = s% dq_old(k)
+               s% mlt_vc(k) = s% mlt_vc_old(k)
             end do
             
             call set_qs(s, nz, s% q, s% dq, ierr)
@@ -2302,6 +2304,7 @@
                   s% dq_old(k) = s% prev_mesh_dq(k)
                   s% omega_old(k) = s% prev_mesh_omega(k)
                   s% j_rot_old(k) = s% prev_mesh_j_rot(k)
+                  s% mlt_vc_old(k) = s% prev_mesh_mlt_vc(k)
                end do
                call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
                if (ierr /= 0) then

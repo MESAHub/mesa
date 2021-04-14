@@ -145,12 +145,6 @@
          else if (s% conv_vel_flag) then
             do k = 1, nz
                s% D_mix(k) = s% conv_vel(k)*s% mlt_mixing_length(k)/3d0
-               if (s% conv_vel_ignore_thermohaline) then
-                  s% D_mix(k) = s% D_mix(k) + s% mlt_D_thrm(k)
-               end if
-               if (s% conv_vel_ignore_semiconvection) then
-                  s% D_mix(k) = s% D_mix(k) + s% mlt_D_semi(k)
-               end if
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
             end do
          else

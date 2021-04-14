@@ -29,6 +29,7 @@
       use const_def
       use num_lib
       use utils_lib
+      use auto_diff_support
 
       implicit none
 
@@ -630,7 +631,7 @@
             dm_bar(k) = 0.5d0*(dm(k-1) + dm(k))
          end do
          dm_bar(1) = 0.5d0*dm(1)
-         if (s% rsp_flag .or. s% RSP2_flag) then ! rsp and tdc use this definition
+         if (s% rsp_flag .or. s% RSP2_flag) then ! rsp and RSP2 use this definition
             dm_bar(nz) = 0.5d0*(dm(nz-1) + dm(nz))
          else
             dm_bar(nz) = 0.5d0*dm(nz-1) + dm(nz)
@@ -3401,13 +3402,13 @@
 
          mlt_Pturb_ad = 0d0
          if ((.not. skip_mlt_Pturb) .and. &
-             s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
+             s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
             rho_m1 = wrap_d_m1(s,k)
             rho_00 = wrap_d_00(s,k)
-            mlt_Pturb_ad = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(rho_m1 + rho_00)/6d0
+            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_ad(k))*(rho_m1 + rho_00)/6d0
             if (time_center) then
                mlt_Pturb_start = &
-                  s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho_start(k-1) + s% rho_start(k))/6d0
+                  s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
                mlt_Pturb_ad = 0.5d0*(mlt_Pturb_ad + mlt_Pturb_start)
             end if
          end if           
@@ -3747,6 +3748,281 @@
          thermal_conductivity = (4d0*crad*clight*pow3(s% T(k)))/(3d0*s% opacity(k)*s% rho(k)*s% Cp(k))
          tau_cool = pow2(s% scale_height(k)) / thermal_conductivity
       end function cooling_time_scale
+      
+      
+      function get_rho_face(s,k) result(rho_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: rho_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            rho_face = wrap_d_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
+      end function get_rho_face
+      
+      
+      function get_T_face(s,k) result(T_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: T_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            T_face = wrap_T_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         T_face = alfa*wrap_T_00(s,k) + beta*wrap_T_m1(s,k)
+      end function get_T_face
+      
+      
+      function get_Prad_face(s,k) result(Prad_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Prad_face
+         Prad_face = crad*pow4(get_T_face(s,k))/3d0
+      end function get_Prad_face
+      
+      
+      function get_Peos_face(s,k) result(Peos_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Peos_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            Peos_face = wrap_Peos_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         Peos_face = alfa*wrap_Peos_00(s,k) + beta*wrap_Peos_m1(s,k)
+      end function get_Peos_face
+      
+      
+      function get_Cp_face(s,k) result(Cp_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Cp_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            Cp_face = wrap_Cp_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         Cp_face = alfa*wrap_Cp_00(s,k) + beta*wrap_Cp_m1(s,k)
+      end function get_Cp_face
+      
+      
+      function get_ChiRho_face(s,k) result(ChiRho_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: ChiRho_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            ChiRho_face = wrap_ChiRho_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         ChiRho_face = alfa*wrap_ChiRho_00(s,k) + beta*wrap_ChiRho_m1(s,k)
+      end function get_ChiRho_face
+      
+      
+      function get_ChiT_face(s,k) result(ChiT_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: ChiT_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            ChiT_face = wrap_ChiT_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         ChiT_face = alfa*wrap_ChiT_00(s,k) + beta*wrap_ChiT_m1(s,k)
+      end function get_ChiT_face
+      
+      
+      function get_kap_face(s,k) result(kap_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: kap_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            kap_face = wrap_kap_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         kap_face = alfa*wrap_kap_00(s,k) + beta*wrap_kap_m1(s,k)
+      end function get_kap_face
+      
+      
+      function get_grada_face(s,k) result(grada_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: grada_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            grada_face = wrap_grad_ad_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         grada_face = alfa*wrap_grad_ad_00(s,k) + beta*wrap_grad_ad_m1(s,k)
+      end function get_grada_face
+      
+      
+      real(dp) function get_grada_face_val(s,k) result(grada_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: alfa, beta, grada_00, grada_m1
+         if (k == 1) then
+            grada_face = s% grada(k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
+      end function get_grada_face_val
+      
+      
+      function get_gradr_face(s,k) result(gradr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: gradr
+         type(auto_diff_real_star_order1) :: P, opacity, L, Pr
+         !include 'formats'
+         P = get_Peos_face(s,k)
+         opacity = get_kap_face(s,k)
+         L = wrap_L_00(s,k)
+         Pr = get_Prad_face(s,k)
+         gradr = P*opacity*L/(16d0*pi*clight*s% m_grav(k)*s% cgrav(k)*Pr) 
+      end function get_gradr_face
+      
+      
+      function get_scale_height_face(s,k) result(scale_height)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: scale_height
+         type(auto_diff_real_star_order1) :: grav, scale_height2, P, rho
+         real(dp) :: G
+         include 'formats'
+         G = s% cgrav(k)
+         grav = G*s% m_grav(k)/pow2(wrap_r_00(s,k))
+         P = get_Peos_face(s,k)
+         rho = get_rho_face(s,k)
+         scale_height = P/(grav*rho) ! this assumes HSE
+         if (s% alt_scale_height_flag) then
+            ! consider sound speed*hydro time scale as an alternative scale height
+            ! (this comes from Eggleton's code.)
+            scale_height2 = sqrt(P/G)/rho
+            if (scale_height2 < scale_height) then
+               scale_height = scale_height2
+            end if
+         end if
+      end function get_scale_height_face
+      
+      
+      real(dp) function get_scale_height_face_val(s,k) result(scale_height)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: G, grav, scale_height2, P, rho
+         type(auto_diff_real_star_order1) :: P_face, rho_face
+         G = s% cgrav(k)
+         grav = G*s% m_grav(k)/pow2(s% r(k))
+         P_face = get_Peos_face(s,k)
+         P = P_face%val
+         rho_face = get_rho_face(s,k)
+         rho = rho_face%val
+         scale_height = P/(grav*rho) ! this assumes HSE
+         if (s% alt_scale_height_flag) then
+            ! consider sound speed*hydro time scale as an alternative scale height
+            ! (this comes from Eggleton's code.)
+            scale_height2 = sqrt(P/G)/rho
+            if (scale_height2 < scale_height) then
+               scale_height = scale_height2
+            end if
+         end if
+      end function get_scale_height_face_val
+      
+      
+      function get_grav_face(s,k) result(grav)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: grav
+         grav = s% cgrav(k)*s% m_grav(k)/pow2(wrap_r_00(s,k))
+      end function get_grav_face
+
+      
+      function get_QQ_cell(s,k) result(QQ_cell)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: QQ_cell
+         type(auto_diff_real_star_order1) :: &
+            T_00, d_00, chiT_00, chiRho_00
+         T_00 = wrap_T_00(s,k)                  
+         d_00 = wrap_d_00(s,k)         
+         chiT_00 = wrap_chiT_00(s,k)
+         chiRho_00 = wrap_chiRho_00(s,k)
+         QQ_cell = chiT_00/(d_00*T_00*chiRho_00)
+      end function get_QQ_cell
+      
+      
+      function get_QQ_face(s,k) result(QQ_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: QQ_face
+         type(auto_diff_real_star_order1) :: QQ_00, QQ_m1
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            QQ_face = get_QQ_cell(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         QQ_00 = get_QQ_cell(s,k)
+         QQ_m1 = shift_m1(get_QQ_cell(s,k-1)) !, 'get_QQ_face')
+         QQ_face = alfa*QQ_00 + beta*QQ_m1
+      end function get_QQ_face
+      
+      
+      subroutine get_face_weights(s, k, alfa, beta)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: alfa, beta
+         ! face_value(k) = alfa*cell_value(k) + beta*cell_value(k-1)
+         if (k == 1) stop 'bad k==1 for get_face_weights'
+         !if ((.not. s% using_RSP2) .or. s% RSP2_use_mass_interp_face_values) then
+            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+            beta = 1d0 - alfa
+         !else
+         !   alfa = 0.5d0
+         !   beta = 0.5d0
+         !end if
+      end subroutine get_face_weights
+      
+      
+      function wrap_mlt(val, d_val_dvb) result(val_ad)
+         real(dp), intent(in) :: val, d_val_dvb(:)
+         type(auto_diff_real_star_order1) :: val_ad
+         val_ad = 0d0
+         val_ad%val = val
+         val_ad%d1Array(i_lnd_00) = d_val_dvb(mlt_dlnd00)
+         val_ad%d1Array(i_lnT_00) = d_val_dvb(mlt_dlnT00)
+         val_ad%d1Array(i_lnd_m1) = d_val_dvb(mlt_dlndm1)
+         val_ad%d1Array(i_lnT_m1) = d_val_dvb(mlt_dlnTm1)
+         val_ad%d1Array(i_lnR_00) = d_val_dvb(mlt_dlnR)
+         val_ad%d1Array(i_L_00) = d_val_dvb(mlt_dL)
+      end function wrap_mlt
+      
+      
+      subroutine upwrap_mlt(val_ad, val, d_val_dvb)
+         type(auto_diff_real_star_order1), intent(in) :: val_ad
+         real(dp), intent(out) :: val, d_val_dvb(:)
+         val = val_ad%val
+         d_val_dvb(mlt_dlnd00) = val_ad%d1Array(i_lnd_00)
+         d_val_dvb(mlt_dlnT00) = val_ad%d1Array(i_lnT_00)
+         d_val_dvb(mlt_dlndm1) = val_ad%d1Array(i_lnd_m1)
+         d_val_dvb(mlt_dlnTm1) = val_ad%d1Array(i_lnT_m1)
+         d_val_dvb(mlt_dlnR) = val_ad%d1Array(i_lnR_00)
+         d_val_dvb(mlt_dL) = val_ad%d1Array(i_L_00)
+      end subroutine upwrap_mlt
 
 
       end module star_utils

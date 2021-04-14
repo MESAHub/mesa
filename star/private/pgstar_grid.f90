@@ -695,39 +695,39 @@
             case ('text_summary1')
                call do_Text_Summary1_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary1_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary1_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary1_txt_scale, s% Text_Summary1_dxval, ierr)
             case ('text_summary2')
                call do_Text_Summary2_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary2_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary2_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary2_txt_scale, s% Text_Summary2_dxval, ierr)
             case ('text_summary3')
                call do_Text_Summary3_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary3_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary3_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary3_txt_scale, s% Text_Summary3_dxval, ierr)
             case ('text_summary4')
                call do_Text_Summary4_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary4_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary4_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary4_txt_scale, s% Text_Summary4_dxval, ierr)
             case ('text_summary5')
                call do_Text_Summary5_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary5_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary5_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary5_txt_scale, s% Text_Summary5_dxval, ierr)
             case ('text_summary6')
                call do_Text_Summary6_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary6_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary6_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary6_txt_scale, s% Text_Summary6_dxval, ierr)
             case ('text_summary7')
                call do_Text_Summary7_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary7_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary7_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary7_txt_scale, s% Text_Summary7_dxval, ierr)
             case ('text_summary8')
                call do_Text_Summary8_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary8_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary8_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary8_txt_scale, s% Text_Summary8_dxval, ierr)
             case ('text_summary9')
                call do_Text_Summary9_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary9_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary9_txt_scale, ierr)
+                  Grid_txt_scale_factor(i)*s% Text_Summary9_txt_scale, s% Text_Summary9_dxval, ierr)
             case default
                ! check for "other" plot
                found_it = .false.

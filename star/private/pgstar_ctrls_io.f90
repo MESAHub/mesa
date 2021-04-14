@@ -573,7 +573,7 @@
             Text_Summary1_file_width, &
             Text_Summary1_file_aspect_ratio, &
             Text_Summary1_title, Text_Summary1_xleft, Text_Summary1_xright, &
-            Text_Summary1_ybot, Text_Summary1_ytop, Text_Summary1_txt_scale, &
+            Text_Summary1_ybot, Text_Summary1_ytop, Text_Summary1_txt_scale, Text_Summary1_dxval, &
 
             Text_Summary2_win_flag, &
             Text_Summary2_file_flag, &
@@ -586,7 +586,7 @@
             Text_Summary2_file_width, &
             Text_Summary2_file_aspect_ratio, &
             Text_Summary2_title, Text_Summary2_xleft, Text_Summary2_xright, &
-            Text_Summary2_ybot, Text_Summary2_ytop, Text_Summary2_txt_scale, &
+            Text_Summary2_ybot, Text_Summary2_ytop, Text_Summary2_txt_scale, Text_Summary2_dxval, &
 
             Text_Summary3_win_flag, &
             Text_Summary3_file_flag, &
@@ -599,7 +599,7 @@
             Text_Summary3_file_width, &
             Text_Summary3_file_aspect_ratio, &
             Text_Summary3_title, Text_Summary3_xleft, Text_Summary3_xright, &
-            Text_Summary3_ybot, Text_Summary3_ytop, Text_Summary3_txt_scale, &
+            Text_Summary3_ybot, Text_Summary3_ytop, Text_Summary3_txt_scale, Text_Summary3_dxval, &
 
             Text_Summary4_win_flag, &
             Text_Summary4_file_flag, &
@@ -612,7 +612,7 @@
             Text_Summary4_file_width, &
             Text_Summary4_file_aspect_ratio, &
             Text_Summary4_title, Text_Summary4_xleft, Text_Summary4_xright, &
-            Text_Summary4_ybot, Text_Summary4_ytop, Text_Summary4_txt_scale, &
+            Text_Summary4_ybot, Text_Summary4_ytop, Text_Summary4_txt_scale, Text_Summary4_dxval, &
 
             Text_Summary5_win_flag, &
             Text_Summary5_file_flag, &
@@ -625,7 +625,7 @@
             Text_Summary5_file_width, &
             Text_Summary5_file_aspect_ratio, &
             Text_Summary5_title, Text_Summary5_xleft, Text_Summary5_xright, &
-            Text_Summary5_ybot, Text_Summary5_ytop, Text_Summary5_txt_scale, &
+            Text_Summary5_ybot, Text_Summary5_ytop, Text_Summary5_txt_scale, Text_Summary5_dxval, &
 
             Text_Summary6_win_flag, &
             Text_Summary6_file_flag, &
@@ -638,7 +638,7 @@
             Text_Summary6_file_width, &
             Text_Summary6_file_aspect_ratio, &
             Text_Summary6_title, Text_Summary6_xleft, Text_Summary6_xright, &
-            Text_Summary6_ybot, Text_Summary6_ytop, Text_Summary6_txt_scale, &
+            Text_Summary6_ybot, Text_Summary6_ytop, Text_Summary6_txt_scale, Text_Summary6_dxval, &
 
             Text_Summary7_win_flag, &
             Text_Summary7_file_flag, &
@@ -651,7 +651,7 @@
             Text_Summary7_file_width, &
             Text_Summary7_file_aspect_ratio, &
             Text_Summary7_title, Text_Summary7_xleft, Text_Summary7_xright, &
-            Text_Summary7_ybot, Text_Summary7_ytop, Text_Summary7_txt_scale, &
+            Text_Summary7_ybot, Text_Summary7_ytop, Text_Summary7_txt_scale, Text_Summary7_dxval, &
 
             Text_Summary8_win_flag, &
             Text_Summary8_file_flag, &
@@ -664,7 +664,7 @@
             Text_Summary8_file_width, &
             Text_Summary8_file_aspect_ratio, &
             Text_Summary8_title, Text_Summary8_xleft, Text_Summary8_xright, &
-            Text_Summary8_ybot, Text_Summary8_ytop, Text_Summary8_txt_scale, &
+            Text_Summary8_ybot, Text_Summary8_ytop, Text_Summary8_txt_scale, Text_Summary8_dxval, &
 
             Text_Summary9_win_flag, &
             Text_Summary9_file_flag, &
@@ -677,7 +677,7 @@
             Text_Summary9_file_width, &
             Text_Summary9_file_aspect_ratio, &
             Text_Summary9_title, Text_Summary9_xleft, Text_Summary9_xright, &
-            Text_Summary9_ybot, Text_Summary9_ytop, Text_Summary9_txt_scale, &
+            Text_Summary9_ybot, Text_Summary9_ytop, Text_Summary9_txt_scale, Text_Summary9_dxval, &
 
             logg_Teff_win_flag, &
             logg_Teff_file_flag, &
@@ -3751,6 +3751,7 @@
          s% Text_Summary1_ybot = Text_Summary1_ybot
          s% Text_Summary1_ytop = Text_Summary1_ytop
          s% Text_Summary1_txt_scale = Text_Summary1_txt_scale
+         s% Text_Summary1_dxval = Text_Summary1_dxval
 
          s% Text_Summary2_win_flag = Text_Summary2_win_flag
          s% Text_Summary2_file_flag = Text_Summary2_file_flag
@@ -3770,6 +3771,7 @@
          s% Text_Summary2_ybot = Text_Summary2_ybot
          s% Text_Summary2_ytop = Text_Summary2_ytop
          s% Text_Summary2_txt_scale = Text_Summary2_txt_scale
+         s% Text_Summary2_dxval = Text_Summary2_dxval
 
          s% Text_Summary3_win_flag = Text_Summary3_win_flag
          s% Text_Summary3_file_flag = Text_Summary3_file_flag
@@ -3789,6 +3791,7 @@
          s% Text_Summary3_ybot = Text_Summary3_ybot
          s% Text_Summary3_ytop = Text_Summary3_ytop
          s% Text_Summary3_txt_scale = Text_Summary3_txt_scale
+         s% Text_Summary3_dxval = Text_Summary3_dxval
 
          s% Text_Summary4_win_flag = Text_Summary4_win_flag
          s% Text_Summary4_file_flag = Text_Summary4_file_flag
@@ -3808,6 +3811,7 @@
          s% Text_Summary4_ybot = Text_Summary4_ybot
          s% Text_Summary4_ytop = Text_Summary4_ytop
          s% Text_Summary4_txt_scale = Text_Summary4_txt_scale
+         s% Text_Summary4_dxval = Text_Summary4_dxval
 
          s% Text_Summary5_win_flag = Text_Summary5_win_flag
          s% Text_Summary5_file_flag = Text_Summary5_file_flag
@@ -3827,6 +3831,7 @@
          s% Text_Summary5_ybot = Text_Summary5_ybot
          s% Text_Summary5_ytop = Text_Summary5_ytop
          s% Text_Summary5_txt_scale = Text_Summary5_txt_scale
+         s% Text_Summary5_dxval = Text_Summary5_dxval
 
          s% Text_Summary6_win_flag = Text_Summary6_win_flag
          s% Text_Summary6_file_flag = Text_Summary6_file_flag
@@ -3846,6 +3851,7 @@
          s% Text_Summary6_ybot = Text_Summary6_ybot
          s% Text_Summary6_ytop = Text_Summary6_ytop
          s% Text_Summary6_txt_scale = Text_Summary6_txt_scale
+         s% Text_Summary6_dxval = Text_Summary6_dxval
 
          s% Text_Summary7_win_flag = Text_Summary7_win_flag
          s% Text_Summary7_file_flag = Text_Summary7_file_flag
@@ -3865,6 +3871,7 @@
          s% Text_Summary7_ybot = Text_Summary7_ybot
          s% Text_Summary7_ytop = Text_Summary7_ytop
          s% Text_Summary7_txt_scale = Text_Summary7_txt_scale
+         s% Text_Summary7_dxval = Text_Summary7_dxval
 
          s% Text_Summary8_win_flag = Text_Summary8_win_flag
          s% Text_Summary8_file_flag = Text_Summary8_file_flag
@@ -3884,6 +3891,7 @@
          s% Text_Summary8_ybot = Text_Summary8_ybot
          s% Text_Summary8_ytop = Text_Summary8_ytop
          s% Text_Summary8_txt_scale = Text_Summary8_txt_scale
+         s% Text_Summary8_dxval = Text_Summary8_dxval
 
          s% Text_Summary9_win_flag = Text_Summary9_win_flag
          s% Text_Summary9_file_flag = Text_Summary9_file_flag
@@ -3903,6 +3911,7 @@
          s% Text_Summary9_ybot = Text_Summary9_ybot
          s% Text_Summary9_ytop = Text_Summary9_ytop
          s% Text_Summary9_txt_scale = Text_Summary9_txt_scale
+         s% Text_Summary9_dxval = Text_Summary9_dxval
 
          s% logg_Teff_win_flag = logg_Teff_win_flag
          s% logg_Teff_file_flag = logg_Teff_file_flag

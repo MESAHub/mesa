@@ -34,6 +34,7 @@
       real(dp), pointer, dimension(:) :: j_rot ! (nz)
         ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
       real(dp), pointer, dimension(:) :: omega ! (nz)
+      real(dp), pointer, dimension(:) :: mlt_vc ! (nz)
         
       ! vectors of structure variables: xh(i,k) holds hydro structure variable i for point k.
          ! note: abundances are in xa, not in xh.  dq, j_rot, and omega are not in xh.

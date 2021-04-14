@@ -358,7 +358,7 @@
          prev_mesh_D_ST, prev_mesh_D_DSI, prev_mesh_D_SH, &
          prev_mesh_D_SSI, prev_mesh_D_ES, prev_mesh_D_GSF, &
          prev_mesh_D_mix, prev_mesh_D_omega, prev_mesh_am_nu_rot, &
-         prev_mesh_conv_vel, prev_mesh_cv, prev_mesh_dq
+         prev_mesh_conv_vel, prev_mesh_cv, prev_mesh_dq, prev_mesh_mlt_vc
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
 
@@ -387,7 +387,7 @@
             ! mixing_length_alpha * scale_height as computed by mlt
          integer, pointer :: mlt_mixing_type(:) ! as defined in mesa/const
             ! this is the value from mlt, before overshooting has been added.
-         real(dp), pointer :: mlt_D(:), mlt_D_semi(:), mlt_D_thrm(:)
+         real(dp), pointer :: mlt_D(:)
             ! mlt diffusion coeff. (cm^2/sec)
          real(dp), pointer :: mlt_Gamma(:) 
             ! local mlt convection efficiency.
@@ -408,7 +408,8 @@
          real(dp), pointer :: grad_superad_actual(:) ! face, actual dlnT/dlnP - grada
          
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
-            gradT_ad, gradr_ad, mlt_vc_ad ! 'ad' for auto_diff
+            gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
+            gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
          
          real(dp), pointer :: actual_gradT(:) ! actual dlnT/dlnP (at boundary)
             ! (dT/T_face)/(dP/P_face) with face values interpolated by mass
@@ -432,7 +433,6 @@
          real(dp), pointer :: d_gradr_dL(:)
          real(dp), pointer :: d_gradr_dw_div_wc(:) ! when w_div_wc_flag is true
          
-         real(dp), pointer :: mlt_vc(:)
          real(dp), pointer :: d_mlt_vc_dlnd00(:)
          real(dp), pointer :: d_mlt_vc_dlnT00(:)
          real(dp), pointer :: d_mlt_vc_dlndm1(:)
@@ -441,6 +441,8 @@
          real(dp), pointer :: d_mlt_vc_dL(:)
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
+         logical, pointer :: new_fixed_gradr_for_rest_of_solver_iters(:)
+         logical, pointer :: newer_fixed_gradr_for_rest_of_solver_iters(:)
          
       ! Convective turbulent velocity w -- when RSP2_flag is true
          
@@ -625,7 +627,8 @@
                ! 2 means have current and old
 
          real(dp), pointer, dimension(:,:) :: xh_old, xa_old
-         real(dp), pointer, dimension(:) :: dq_old, q_old, j_rot_old, omega_old, D_omega_old
+         real(dp), pointer, dimension(:) :: &
+            dq_old, q_old, j_rot_old, omega_old, mlt_vc_old
          real(dp) :: time_old, dt_old, mstar_old, xmstar_old, mstar_dot_old, &
             M_center_old, v_center_old, R_center_old, L_center_old
          integer :: nz_old, model_number_old
@@ -1104,10 +1107,11 @@
 
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
-         logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
+         logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, using_TDC, &
             RSP_just_set_velocities, previous_step_was_using_RSP2, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
+            need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info, &
+            okay_to_set_mlt_vc, have_mlt_vc
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

@@ -5,6 +5,37 @@
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
+
+
+
+      using_mlt_info_new = .false.
+      compare_to_mlt_info_new = .false.
+
+      using_mlt_get_new = .false.
+      compare_to_mlt_get_new = .false.
+   
+
+      using_mlt_info_newer = .false.
+      compare_to_mlt_info_newer = .false.
+
+      using_mlt_get_newer = .false.
+      compare_to_mlt_get_newer = .false.
+      
+      
+
+      max_dt_div_tau_conv_for_TDC = -1d0
+      max_dt_years_for_TDC = -1d0
+   
+      alpha_TDC_DAMP = 1d0
+      alpha_TDC_DAMPR = 0d0
+      alpha_TDC_eddy_viscosity = 0.25d0
+      alpha_TDC_turbulent_pressure = 0d0
+   
+      max_X_for_TDC = -1
+      max_X_for_gradT_eqn = -1
+   
+   
+   
       
 
       ! RSP2 parameters

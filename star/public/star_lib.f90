@@ -3200,8 +3200,6 @@
             mlt_basics(mlt_Lambda), mlt_partials(:,mlt_Lambda), &
             mlt_basics(mlt_convection_velocity), mlt_partials(:,mlt_convection_velocity), &
             mlt_basics(mlt_D), mlt_partials(:,mlt_D), &
-            mlt_basics(mlt_D_semi), mlt_partials(:,mlt_D_semi), &
-            mlt_basics(mlt_D_thrm), mlt_partials(:,mlt_D_thrm), &
             mlt_basics(mlt_gamma), mlt_partials(:,mlt_gamma), &
             ierr)
       end subroutine star_mlt_eval

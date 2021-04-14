@@ -62,6 +62,9 @@
             call flip(s% j_rot, s% j_rot_old, ierr)
             if (ierr /= 0) return
 
+            call flip(s% mlt_vc, s% mlt_vc_old, ierr)
+            if (ierr /= 0) return
+
             tmp => s% xh_old
             s% xh_old => s% xh
             call enlarge_if_needed_2(tmp,s% nvar_hydro,nz,nz_alloc_extra,ierr)
