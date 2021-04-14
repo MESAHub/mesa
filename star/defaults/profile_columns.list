@@ -291,11 +291,13 @@
       
 
    ! typical charge for given species
+   ! (used by diffusion)
    !typical_charge he4
    !typical_charge c12
    !typical_charge fe52
       
    ! ionization state for given species
+   ! (same as typical charge, except that it's unsmoothed)
    !ionization he4
    !ionization c12
    !ionization fe52

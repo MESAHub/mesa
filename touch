@@ -30,7 +30,6 @@ do_one gyre
 do_one hdf5io
 do_one interp_1d
 do_one interp_2d
-do_one ionization
 do_one kap
 do_one math
 do_one mtx
