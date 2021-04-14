@@ -13,7 +13,6 @@ echo "removing some data to force reinstall"
 rm -rf data/atm_data
 rm -rf data/eosDT_data
 rm -rf data/kap_data
-rm -rf data/ionization_data
 rm -rf data/chem_data
 rm -rf data/colors_data
 rm -rf data/rates_data/cache
