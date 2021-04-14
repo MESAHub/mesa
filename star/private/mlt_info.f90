@@ -915,6 +915,32 @@
          end subroutine show_stuff
 
          subroutine set_no_mixing()
+            call get_mlt_eval_gradr_info(ierr)
+            if (ierr /= 0) return
+            s% mlt_mixing_type(k) = no_mixing
+            s% mlt_mixing_length(k) = 0d0
+            s% mlt_vc(k) = 0d0
+            s% mlt_Gamma(k) = 0d0
+            s% grada_face(k) = grada_face
+            s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
+            s% gradL(k) = 0d0
+            s% L_conv(k) = 0d0
+            s% gradT(k) = s% gradr(k)
+            s% d_gradT_dlnR(k) = s% d_gradr_dlnR(k)
+            s% d_gradT_dL(k) = s% d_gradr_dL(k)
+            s% d_gradT_dw_div_wc(k) = s% d_gradr_dw_div_wc(k)
+            if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0d0
+            s% d_gradT_dlnd00(k) = s% d_gradr_dlnd00(k)
+            s% d_gradT_dlnT00(k) = s% d_gradr_dlnT00(k)
+            s% d_gradT_dlndm1(k) = s% d_gradr_dlndm1(k)
+            s% d_gradT_dlnTm1(k) = s% d_gradr_dlnTm1(k)
+            s% mlt_D(k) = 0d0
+            s% mlt_cdc(k) = 0d0
+            s% actual_gradT(k) = 0
+            s% grad_superad(k) = 0
+         end subroutine set_no_mixing
+
+         subroutine set_no_mixing_bad()
             use star_utils
             type(auto_diff_real_star_order1) :: &
                gradr_ad, grada_face_ad, scale_height_ad
@@ -941,7 +967,7 @@
             s% mlt_cdc(k) = 0d0
             s% actual_gradT(k) = 0d0 ! not used
             s% grad_superad(k) = s% gradT(k) - s% gradL(k)
-         end subroutine set_no_mixing
+         end subroutine set_no_mixing_bad
 
       end subroutine do1_mlt_2
 
