@@ -1,33 +1,53 @@
-         real(dp) :: TDC_Lsurf_factor
-         real(dp) :: TDC_alfap
-         real(dp) :: TDC_alfat
-         real(dp) :: TDC_alfam
-         real(dp) :: TDC_alfar
-         real(dp) :: TDC_alfad
+         logical :: using_mlt_info_new, compare_to_mlt_info_new
+         logical :: using_mlt_get_new, compare_to_mlt_get_new
          
-         real(dp) :: TDC_min_Lt_div_L_for_overshooting_mixing_type
-         real(dp) :: TDC_min_Lc_div_L_for_convective_mixing_type
-         
-         real(dp) :: TDC_min_dt_div_tau_conv_switch_to_MLT
-         real(dp) :: TDC_min_dt_years_switch_to_MLT
-         
-         real(dp) :: TDC_w_min_for_damping, TDC_source_seed
-         logical :: TDC_use_RSP_form_of_etrb_eqn
-         
-         logical :: TDC_use_L_eqn_at_surface, TDC_assume_HSE
-         logical :: TDC_use_RSP_eqn_for_Y_face, include_w_in_correction_limits
-         logical :: TDC_use_mass_interp_face_values
-         logical :: TDC_use_Stellingwerf_Lr
-         integer :: TDC_num_outermost_cells_forced_nonturbulent, &
-            TDC_num_innermost_cells_forced_nonturbulent
+         logical :: using_mlt_info_newer, compare_to_mlt_info_newer
+         logical :: using_mlt_get_newer, compare_to_mlt_get_newer
 
-         integer :: TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, &
-            TDC_map_first_period, TDC_map_last_period, TDC_map_zone_interval
-         real(dp) :: TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, &
-            TDC_GREKM_avg_abs_limit
-         character(256) :: TDC_work_filename, TDC_map_columns_filename, &
-            TDC_map_filename, TDC_map_history_filename
-         logical :: TDC_write_map
+         real(dp) :: max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC
+         real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad
+         real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
+         real(dp) :: alpha_TDC_eddy_viscosity   ! RSP2_alfam
+         real(dp) :: alpha_TDC_turbulent_pressure  ! RSP2_alfap
+         
+         real(dp) :: max_X_for_TDC
+         real(dp) :: max_X_for_gradT_eqn
+
+
+
+
+
+
+         real(dp) :: RSP2_Lsurf_factor
+         real(dp) :: RSP2_alfap
+         real(dp) :: RSP2_alfat
+         real(dp) :: RSP2_alfam
+         real(dp) :: RSP2_alfar
+         real(dp) :: RSP2_alfad
+         
+         real(dp) :: RSP2_min_Lt_div_L_for_overshooting_mixing_type
+         real(dp) :: RSP2_min_Lc_div_L_for_convective_mixing_type
+         
+         real(dp) :: RSP2_min_dt_div_tau_conv_switch_to_MLT
+         real(dp) :: RSP2_min_dt_years_switch_to_MLT
+         
+         real(dp) :: RSP2_w_min_for_damping, RSP2_source_seed
+         logical :: RSP2_use_RSP_form_of_etrb_eqn
+         
+         logical :: RSP2_use_L_eqn_at_surface, RSP2_assume_HSE
+         logical :: RSP2_use_RSP_eqn_for_Y_face, include_w_in_correction_limits
+         logical :: RSP2_use_mass_interp_face_values
+         logical :: RSP2_use_Stellingwerf_Lr
+         integer :: RSP2_num_outermost_cells_forced_nonturbulent, &
+            RSP2_num_innermost_cells_forced_nonturbulent
+
+         integer :: RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, &
+            RSP2_map_first_period, RSP2_map_last_period, RSP2_map_zone_interval
+         real(dp) :: RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, &
+            RSP2_GREKM_avg_abs_limit
+         character(256) :: RSP2_work_filename, RSP2_map_columns_filename, &
+            RSP2_map_filename, RSP2_map_history_filename
+         logical :: RSP2_write_map
 
             
             

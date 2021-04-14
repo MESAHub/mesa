@@ -6269,6 +6269,7 @@
     Text_Summary1_ybot = 0.08
     Text_Summary1_ytop = 0.98
     Text_Summary1_txt_scale = 4.5
+    Text_Summary1_dxval = 0.02
     Text_Summary1_title = ''
 
       ! setup default
@@ -6351,6 +6352,7 @@
     Text_Summary2_ybot = 0.08
     Text_Summary2_ytop = 0.98
     Text_Summary2_txt_scale = 4.5
+    Text_Summary2_dxval = 0.02
     Text_Summary2_title = ''
 
       ! ::
@@ -6387,6 +6389,7 @@
     Text_Summary3_ybot = 0.08
     Text_Summary3_ytop = 0.98
     Text_Summary3_txt_scale = 4.5
+    Text_Summary3_dxval = 0.02
     Text_Summary3_title = ''
 
       ! ::
@@ -6423,6 +6426,7 @@
     Text_Summary4_ybot = 0.08
     Text_Summary4_ytop = 0.98
     Text_Summary4_txt_scale = 4.5
+    Text_Summary4_dxval = 0.02
     Text_Summary4_title = ''
 
       ! ::
@@ -6459,6 +6463,7 @@
     Text_Summary5_ybot = 0.08
     Text_Summary5_ytop = 0.98
     Text_Summary5_txt_scale = 4.5
+    Text_Summary5_dxval = 0.02
     Text_Summary5_title = ''
 
       ! ::
@@ -6495,6 +6500,7 @@
     Text_Summary6_ybot = 0.08
     Text_Summary6_ytop = 0.98
     Text_Summary6_txt_scale = 4.5
+    Text_Summary6_dxval = 0.02
     Text_Summary6_title = ''
 
       ! ::
@@ -6531,6 +6537,7 @@
     Text_Summary7_ybot = 0.08
     Text_Summary7_ytop = 0.98
     Text_Summary7_txt_scale = 4.5
+    Text_Summary7_dxval = 0.02
     Text_Summary7_title = ''
 
       ! ::
@@ -6567,6 +6574,7 @@
     Text_Summary8_ybot = 0.08
     Text_Summary8_ytop = 0.98
     Text_Summary8_txt_scale = 4.5
+    Text_Summary8_dxval = 0.02
     Text_Summary8_title = ''
 
       ! ::
@@ -6603,6 +6611,7 @@
     Text_Summary9_ybot = 0.08
     Text_Summary9_ytop = 0.98
     Text_Summary9_txt_scale = 4.5
+    Text_Summary9_dxval = 0.02
     Text_Summary9_title = ''
 
       ! ::

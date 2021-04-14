@@ -520,10 +520,6 @@
                cnt = mixing_line_legend(cnt, clr_rayleigh_taylor, &
                   lw, lw_sav, txt_scale, 'RTI')
             end if
-            if (s% conv_vel_flag) then
-               cnt = mixing_line_legend(cnt, clr_leftover_convection, &
-                  lw, lw_sav, txt_scale, 'leftover')
-            end if
             if (rotation .and. s% Mixing_show_rotation_details) then
                cnt = mixing_line_legend(cnt, clr_IndianRed, &
                   lw, lw_sav, txt_scale, 'ST')

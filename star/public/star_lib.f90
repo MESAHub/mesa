@@ -855,16 +855,16 @@
       end subroutine star_set_j_rot_flag
 
 
-      subroutine star_set_TDC_flag(id, et_flag, ierr)
-         use alloc, only: set_TDC_flag
+      subroutine star_set_RSP2_flag(id, et_flag, ierr)
+         use alloc, only: set_RSP2_flag
          integer, intent(in) :: id
          logical, intent(in) :: et_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call set_TDC_flag(id, et_flag, ierr)
-      end subroutine star_set_TDC_flag
+         call set_RSP2_flag(id, et_flag, ierr)
+      end subroutine star_set_RSP2_flag
 
 
       subroutine star_set_RSP_flag(id, RSP_flag, ierr)
@@ -3200,8 +3200,6 @@
             mlt_basics(mlt_Lambda), mlt_partials(:,mlt_Lambda), &
             mlt_basics(mlt_convection_velocity), mlt_partials(:,mlt_convection_velocity), &
             mlt_basics(mlt_D), mlt_partials(:,mlt_D), &
-            mlt_basics(mlt_D_semi), mlt_partials(:,mlt_D_semi), &
-            mlt_basics(mlt_D_thrm), mlt_partials(:,mlt_D_thrm), &
             mlt_basics(mlt_gamma), mlt_partials(:,mlt_gamma), &
             ierr)
       end subroutine star_mlt_eval

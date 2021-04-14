@@ -214,7 +214,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
-            use hydro_tdc, only: compute_Eq_cell
+            use hydro_rsp2, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_div_w, RTI_diffusion_ad

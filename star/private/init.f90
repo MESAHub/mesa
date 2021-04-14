@@ -521,13 +521,14 @@
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
-         s% TDC_flag = .false.
-         s% using_TDC = .false.
+         s% RSP2_flag = .false.
+         s% using_RSP2 = .false.
 
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
+         s% okay_to_set_mlt_vc = .true.      ! .false. ! not until have set mlt_cv_old
          s% need_to_reset_w = .false.
 
          s% just_wrote_terminal_header = .false.

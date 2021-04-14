@@ -435,6 +435,8 @@
             end if
 
          end do
+         
+         call set_phot_info(s)
 
          if (s% photosphere_r*Rsun >= s% r(1)) then
             s% photosphere_acoustic_r = sum(s% dr_div_csound(1:nz)) + &

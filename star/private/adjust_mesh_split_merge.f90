@@ -47,6 +47,10 @@
          integer :: ierr
 
          include 'formats'
+         
+         if (s% using_TDC) then
+            stop 'need to add mlt_vc to remesh_split_merge'
+         end if
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 
@@ -491,9 +495,7 @@
             end if
          end if
 
-         merge_center = (i == nz)
-
-         
+         merge_center = (i == nz)         
          if (merge_center) i = i-1
          ip = i+1
          if (s% split_merge_amr_avoid_repeated_remesh .and. &
@@ -580,7 +582,7 @@
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
          
-         if (s% using_TDC) then
+         if (s% using_RSP2) then
             cell_etrb = Etrb_i + Etrb_ip
             s% w(i) = sqrt(cell_etrb/dm)
          end if
@@ -613,14 +615,14 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
-            if (s% using_TDC) s% w(im) = s% w(i0)
+            if (s% using_RSP2) s% w(im) = s% w(i0)
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
             s% alpha_mlt(im) = s% alpha_mlt(i0)
             s% lnT(im) = s% lnT(i0)
             s% D_mix(im) = s% D_mix(i0)
-            s% conv_vel(im) = s% conv_vel(i0)
+            s% mlt_vc(im) = s% mlt_vc(i0)
             s% csound(im) = s% csound(i0)
             s% tau(im) = s% tau(i0)
             s% opacity(im) = s% opacity(i0)
@@ -641,9 +643,7 @@
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
          
-         if (s% using_TDC) s% xh(s% i_w,i) = s% w(i)
-         
-         if (s% conv_vel_flag) s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
+         if (s% using_RSP2) s% xh(s% i_w,i) = s% w(i)
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
@@ -720,7 +720,7 @@
             KE = 0.25d0*dm*(v0**2 + v1**2)
          end if
          IE = s% energy(k)*dm
-         if (s% using_TDC) then
+         if (s% using_RSP2) then
             Etrb = pow2(s% w(k))*dm
          else
             Etrb = 0d0
@@ -793,7 +793,7 @@
             got_cell_Esum_R, got_cell_KE_R, got_cell_PE_R, got_cell_IE_R, &
             got_cell_Esum_L, got_cell_KE_L, got_cell_PE_L, got_cell_IE_L, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
-            conv_velL, conv_velR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
+            mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
          logical :: okay, done, use_new_grad_rho
          include 'formats'
@@ -830,14 +830,14 @@
          end if
 
          rR = s% r(i)
-         conv_velR = s% conv_vel(i)
+         mlt_vcR = s% mlt_vc(i)
          if (i == nz) then
             rL = s% R_center
-            conv_velL = 0d0
+            mlt_vcL = 0d0
             tauL = tau_center
          else
             rL = s% r(ip)
-            conv_velL = s% conv_vel(ip)
+            mlt_vcL = s% mlt_vc(ip)
             tauL = s% tau(ip)
          end if
          
@@ -871,7 +871,7 @@
          v2 = v*v
          
          energy = s% energy(i)
-         if (s% using_TDC) etrb = get_etrb(s,i)
+         if (s% using_RSP2) etrb = pow2(s% w(i))
             
          ! estimate values of energy and velocity^2 at cell boundaries
 
@@ -928,10 +928,10 @@
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
          
-         if (s% using_TDC) then
-            etrb_R = get_etrb(s,iR)
-            etrb_C = get_etrb(s,iC)
-            etrb_L = get_etrb(s,iL)
+         if (s% using_RSP2) then
+            etrb_R = pow2(s% w(iR))
+            etrb_C = pow2(s% w(iC))
+            etrb_L = pow2(s% w(iL))
             grad_etrb = get1_grad(etrb_L, etrb_C, etrb_R, dLeft, dCntr, dRght)
          end if
          
@@ -997,7 +997,7 @@
                s% alpha_mlt(jp) = s% alpha_mlt(j)
                s% lnT(jp) = s% lnT(j)
                s% D_mix(jp) = s% D_mix(j)
-               s% conv_vel(jp) = s% conv_vel(j)
+               s% mlt_vc(jp) = s% mlt_vc(j)
                s% csound(jp) = s% csound(j)
                s% tau(jp) = s% tau(j)
                s% opacity(jp) = s% opacity(j)
@@ -1094,7 +1094,7 @@
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
          
-         if (s% using_TDC) then
+         if (s% using_RSP2) then
             etrb_R = etrb + grad_etrb*dr/4
             etrb_L = (dm*etrb - dmR*etrb_R)/dmL
             if (etrb_R < 0d0 .or. etrb_L < 0d0) then
@@ -1135,12 +1135,10 @@
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
          end if
          
-         if (s% conv_vel_flag) then ! set new conv_vel
-            if (i == 1) then
-               s% conv_vel(ip) = s% conv_vel(i)
-            else
-               s% conv_vel(ip) = (conv_velL*dML + conv_velR*dMR)/dM
-            end if
+         if (i == 1) then
+            s% mlt_vc(ip) = s% mlt_vc(i)
+         else
+            s% mlt_vc(ip) = (mlt_vcL*dML + mlt_vcR*dMR)/dM
          end if
          
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
@@ -1204,7 +1202,7 @@
          s% lnT(ip) = s% lnT(i)
          s% T(ip) = s% T(i)
          s% D_mix(ip) = s% D_mix(i)
-         s% conv_vel(ip) = s% conv_vel(i)
+         s% mlt_vc(ip) = s% mlt_vc(i)
          s% csound(ip) = s% csound(i)
          s% opacity(ip) = s% opacity(i)
          if (s% RTI_flag) s% alpha_RTI(ip) = s% alpha_RTI(i)
@@ -1263,10 +1261,6 @@
          if (s% RTI_flag) then
             s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
             s% xh(s% i_alpha_RTI,ip) = s% alpha_RTI(ip)
-         end if
-         if (s% conv_vel_flag) then
-            s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
-            s% xh(s% i_ln_cvpv0,ip) = log(s% conv_vel(ip)+s% conv_vel_v0)
          end if
 
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)

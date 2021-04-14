@@ -75,7 +75,7 @@
          Text_Summary1_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary1_xleft, Text_Summary1_xright, &
-         Text_Summary1_ybot, Text_Summary1_ytop, Text_Summary1_txt_scale, &
+         Text_Summary1_ybot, Text_Summary1_ytop, Text_Summary1_txt_scale, Text_Summary1_dxval, &
          Text_Summary1_win_width, Text_Summary1_win_aspect_ratio, &
          prev_Text_Summary1_win_width, prev_Text_Summary1_win_ratio, &
          Text_Summary1_file_width, Text_Summary1_file_aspect_ratio, &
@@ -92,7 +92,7 @@
          Text_Summary2_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary2_xleft, Text_Summary2_xright, &
-         Text_Summary2_ybot, Text_Summary2_ytop, Text_Summary2_txt_scale, &
+         Text_Summary2_ybot, Text_Summary2_ytop, Text_Summary2_txt_scale, Text_Summary2_dxval, &
          Text_Summary2_win_width, Text_Summary2_win_aspect_ratio, &
          prev_Text_Summary2_win_width, prev_Text_Summary2_win_ratio, &
          Text_Summary2_file_width, Text_Summary2_file_aspect_ratio, &
@@ -109,7 +109,7 @@
          Text_Summary3_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary3_xleft, Text_Summary3_xright, &
-         Text_Summary3_ybot, Text_Summary3_ytop, Text_Summary3_txt_scale, &
+         Text_Summary3_ybot, Text_Summary3_ytop, Text_Summary3_txt_scale, Text_Summary3_dxval, &
          Text_Summary3_win_width, Text_Summary3_win_aspect_ratio, &
          prev_Text_Summary3_win_width, prev_Text_Summary3_win_ratio, &
          Text_Summary3_file_width, Text_Summary3_file_aspect_ratio, &
@@ -126,7 +126,7 @@
          Text_Summary4_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary4_xleft, Text_Summary4_xright, &
-         Text_Summary4_ybot, Text_Summary4_ytop, Text_Summary4_txt_scale, &
+         Text_Summary4_ybot, Text_Summary4_ytop, Text_Summary4_txt_scale, Text_Summary4_dxval, &
          Text_Summary4_win_width, Text_Summary4_win_aspect_ratio, &
          prev_Text_Summary4_win_width, prev_Text_Summary4_win_ratio, &
          Text_Summary4_file_width, Text_Summary4_file_aspect_ratio, &
@@ -142,7 +142,7 @@
          Text_Summary5_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary5_xleft, Text_Summary5_xright, &
-         Text_Summary5_ybot, Text_Summary5_ytop, Text_Summary5_txt_scale, &
+         Text_Summary5_ybot, Text_Summary5_ytop, Text_Summary5_txt_scale, Text_Summary5_dxval, &
          Text_Summary5_win_width, Text_Summary5_win_aspect_ratio, &
          prev_Text_Summary5_win_width, prev_Text_Summary5_win_ratio, &
          Text_Summary5_file_width, Text_Summary5_file_aspect_ratio, &
@@ -158,7 +158,7 @@
          Text_Summary6_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary6_xleft, Text_Summary6_xright, &
-         Text_Summary6_ybot, Text_Summary6_ytop, Text_Summary6_txt_scale, &
+         Text_Summary6_ybot, Text_Summary6_ytop, Text_Summary6_txt_scale, Text_Summary6_dxval, &
          Text_Summary6_win_width, Text_Summary6_win_aspect_ratio, &
          prev_Text_Summary6_win_width, prev_Text_Summary6_win_ratio, &
          Text_Summary6_file_width, Text_Summary6_file_aspect_ratio, &
@@ -174,7 +174,7 @@
          Text_Summary7_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary7_xleft, Text_Summary7_xright, &
-         Text_Summary7_ybot, Text_Summary7_ytop, Text_Summary7_txt_scale, &
+         Text_Summary7_ybot, Text_Summary7_ytop, Text_Summary7_txt_scale, Text_Summary7_dxval, &
          Text_Summary7_win_width, Text_Summary7_win_aspect_ratio, &
          prev_Text_Summary7_win_width, prev_Text_Summary7_win_ratio, &
          Text_Summary7_file_width, Text_Summary7_file_aspect_ratio, &
@@ -190,7 +190,7 @@
          Text_Summary8_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary8_xleft, Text_Summary8_xright, &
-         Text_Summary8_ybot, Text_Summary8_ytop, Text_Summary8_txt_scale, &
+         Text_Summary8_ybot, Text_Summary8_ytop, Text_Summary8_txt_scale, Text_Summary8_dxval, &
          Text_Summary8_win_width, Text_Summary8_win_aspect_ratio, &
          prev_Text_Summary8_win_width, prev_Text_Summary8_win_ratio, &
          Text_Summary8_file_width, Text_Summary8_file_aspect_ratio, &
@@ -206,7 +206,7 @@
          Text_Summary9_name(max_num_rows_Text_Summary, max_num_cols_Text_Summary)
       real :: &
          Text_Summary9_xleft, Text_Summary9_xright, &
-         Text_Summary9_ybot, Text_Summary9_ytop, Text_Summary9_txt_scale, &
+         Text_Summary9_ybot, Text_Summary9_ytop, Text_Summary9_txt_scale, Text_Summary9_dxval, &
          Text_Summary9_win_width, Text_Summary9_win_aspect_ratio, &
          prev_Text_Summary9_win_width, prev_Text_Summary9_win_ratio, &
          Text_Summary9_file_width, Text_Summary9_file_aspect_ratio, &

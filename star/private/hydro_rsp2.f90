@@ -23,7 +23,7 @@
 !
 ! ***********************************************************************
 
-      module hydro_tdc
+      module hydro_rsp2
 
       use star_private_def
       use const_def
@@ -37,8 +37,8 @@
 
       private
       public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, compute_Eq_cell, &
-         compute_Uq_face, set_TDC_vars, &
-         set_using_TDC, set_etrb_start_vars
+         compute_Uq_face, set_RSP2_vars, &
+         set_using_RSP2, set_etrb_start_vars
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
@@ -50,54 +50,54 @@
       contains
       
       
-      subroutine set_using_TDC(s)
+      subroutine set_using_RSP2(s)
          type (star_info), pointer :: s      
          real(dp) :: alfa, beta
-         call get_TDC_frac(s, alfa, beta)
-         s% using_TDC = (alfa > 0d0)
-      end subroutine set_using_TDC
+         call get_RSP2_frac(s, alfa, beta)
+         s% using_RSP2 = (alfa > 0d0)
+      end subroutine set_using_RSP2
       
       
-      subroutine get_TDC_frac(s, alfa, beta)
+      subroutine get_RSP2_frac(s, alfa, beta)
          type (star_info), pointer :: s
          real(dp), intent(out) :: alfa, beta
          real(dp) :: dt, switch
          include 'formats'
-         if (.not. s% TDC_flag) then
+         if (.not. s% RSP2_flag) then
             alfa = 0d0; beta = 1d0
             return
          end if
          dt = s% dt
-         if (s% TDC_min_dt_div_tau_conv_switch_to_MLT > 0) then
-            switch = s% max_conv_time_scale*s% TDC_min_dt_div_tau_conv_switch_to_MLT
-         else if (s% TDC_min_dt_years_switch_to_MLT > 0) then
-            switch = s% TDC_min_dt_years_switch_to_MLT*secyer
+         if (s% RSP2_min_dt_div_tau_conv_switch_to_MLT > 0) then
+            switch = s% max_conv_time_scale*s% RSP2_min_dt_div_tau_conv_switch_to_MLT
+         else if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
+            switch = s% RSP2_min_dt_years_switch_to_MLT*secyer
          else
             switch = 0d0
          end if
          
          if (.false.) then ! blending
-            !if (dt >= s% TDC_dt_seconds_etrb_all_MLT) then
-            !   alfa = 0d0 ! all MLT, no TDC
-            !else if (dt <= s% TDC_dt_seconds_etrb_no_MLT) then
-            !   alfa = 1d0 ! no MLT, all TDC
-            !else ! blend 0 < alfa < 1 = fraction TDC, beta = 1 - alfa = fraction MLT
-            !   alfa = (s% TDC_dt_seconds_etrb_all_MLT - dt)/ &
-            !       (s% TDC_dt_seconds_etrb_all_MLT - s% TDC_dt_seconds_etrb_no_MLT)
+            !if (dt >= s% RSP2_dt_seconds_etrb_all_MLT) then
+            !   alfa = 0d0 ! all MLT, no RSP2
+            !else if (dt <= s% RSP2_dt_seconds_etrb_no_MLT) then
+            !   alfa = 1d0 ! no MLT, all RSP2
+            !else ! blend 0 < alfa < 1 = fraction RSP2, beta = 1 - alfa = fraction MLT
+            !   alfa = (s% RSP2_dt_seconds_etrb_all_MLT - dt)/ &
+            !       (s% RSP2_dt_seconds_etrb_all_MLT - s% RSP2_dt_seconds_etrb_no_MLT)
             !end if
          else
             if (dt >= switch) then
-               alfa = 0d0 ! all MLT, no TDC
+               alfa = 0d0 ! all MLT, no RSP2
             else
-               alfa = 1d0 ! no MLT, all TDC
+               alfa = 1d0 ! no MLT, all RSP2
             end if
          end if
          
          beta = 1d0 - alfa
-      end subroutine get_TDC_frac
+      end subroutine get_RSP2_frac
       
       
-      subroutine set_TDC_vars(s,ierr)
+      subroutine set_RSP2_vars(s,ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr    
          type(auto_diff_real_star_order1) :: x
@@ -123,7 +123,7 @@
          s% PII(1) = 0d0
          s% Lc(1) = 0d0
          s% Lt(1) = 0d0
-      end subroutine set_TDC_vars
+      end subroutine set_RSP2_vars
       
 
       subroutine do1_tdc_L_eqn(s, k, skip_partials, nvar, ierr)
@@ -141,7 +141,7 @@
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
-         if (.not. s% using_TDC) then
+         if (.not. s% using_RSP2) then
             ierr = -1
             return
          end if
@@ -416,18 +416,18 @@
          
          non_turbulent_cell = &
             s% mixing_length_alpha == 0d0 .or. &
-            k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
-            k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent
+            k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+            k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent
          
-         if (.not. s% using_TDC) then
+         if (.not. s% using_RSP2) then
              
-            resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using TDC
+            resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP2
 
          else if (non_turbulent_cell) then
 
             resid_ad = w_00/s% csound(k) ! make w = 0
             
-         else if (s% TDC_use_RSP_form_of_etrb_eqn) then          ! OLD WAY
+         else if (s% RSP2_use_RSP_form_of_etrb_eqn) then          ! OLD WAY
 
             call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
             call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return ! erg g^-1
@@ -451,7 +451,7 @@
             A0 = max(0d0, get_w_start(s,k))
             call eval_Af_from_A0(s, k, xi0, xi1, xi2, A0, Af, s%dt, k)
 
-            if (s% TDC_alfat == 0d0) then
+            if (s% RSP2_alfat == 0d0) then
                resid_ad = w_00 - Af
             else
                call setup_dt_dLt_dm_ad(ierr)
@@ -620,20 +620,20 @@
       end function compute_Hp_cell
       
       
-      subroutine get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+      subroutine get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: alfa, beta
          ! face_value = alfa*cell_value(k) + beta*cell_value(k-1)
-         if (k == 1) stop 'bad k==1 for get_TDC_alfa_beta_face_weights'
-         if (s% TDC_use_mass_interp_face_values) then
+         if (k == 1) stop 'bad k==1 for get_RSP2_alfa_beta_face_weights'
+         if (s% RSP2_use_mass_interp_face_values) then
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta = 1d0 - alfa
          else
             alfa = 0.5d0
             beta = 0.5d0
          end if
-      end subroutine get_TDC_alfa_beta_face_weights
+      end subroutine get_RSP2_alfa_beta_face_weights
       
       
       function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
@@ -654,8 +654,8 @@
             s% Hp_face(k) = Hp_face%val
             return
          end if
-         if (k > 1 .and. .not. s% TDC_assume_HSE) then
-            call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         if (k > 1 .and. .not. s% RSP2_assume_HSE) then
+            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
             rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
             area = 4d0*pi*pow2(wrap_r_00(s,k))
             dlnPeos = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
@@ -670,7 +670,7 @@
             else
                d_m1 = wrap_d_m1(s, k)
                Peos_m1 = wrap_Peos_m1(s, k)
-               call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+               call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
                Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
                Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
                if (s% alt_scale_height_flag) then
@@ -714,9 +714,9 @@
             return
          end if
          
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          
-         if (s% TDC_use_RSP_eqn_for_Y_face) then
+         if (s% RSP2_use_RSP_eqn_for_Y_face) then
       
             dm_bar = s% dm_bar(k)
             Hp_face = compute_Hp_face(s,k,ierr)
@@ -798,7 +798,7 @@
             return
          end if
          if (k == 1 .or. s% mixing_length_alpha == 0d0 .or. &
-               k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+               k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
             PII_face = 0d0
             s% PII(k) = 0d0
             s% Y_face(k) = 0d0
@@ -808,7 +808,7 @@
          if (ierr /= 0) return
          Cp_00 = wrap_Cp_00(s, k)
          Cp_m1 = wrap_Cp_m1(s, k)
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          Cp_face = alfa*Cp_00 + beta*Cp_m1 ! ergs g^-1 K^-1
          ALFAS_ALFA = x_ALFAS*s% mixing_length_alpha
          PII_face = ALFAS_ALFA*Cp_face*Y_face
@@ -854,10 +854,10 @@
          real(dp) :: f, ALFAM_ALFA
          include 'formats'
          ierr = 0
-         ALFAM_ALFA = s% TDC_alfam*s% mixing_length_alpha
+         ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha
          if (ALFAM_ALFA == 0d0 .or. &
-               k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
-               k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+               k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+               k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
             Chi_div_w_cell = 0d0
             Chi_cell = 0d0
          else
@@ -893,10 +893,10 @@
             d_v_div_r_m1, w_rho2_m1, f_m1, Chi_m1_div_r6_Hp, &
             Hp_face, r6_face, Chi_00, Chi_out, Chi_div_w_cell
          real(dp) :: alfa, beta, ALFAM_ALFA
-         if (k > 1 .and. .not. s% TDC_assume_HSE) then
+         if (k > 1 .and. .not. s% RSP2_assume_HSE) then
             ! complexity needed to keep to block tridiagonal.
-            ALFAM_ALFA = s% TDC_alfam*s% mixing_length_alpha
-            call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+            ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha
+            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
             d_v_div_r_00 = compute_d_v_div_r(s, k, ierr)
             if (ierr /= 0) return
             w_rho2_00 = wrap_w_00(s,k)*pow2(wrap_d_00(s,k))
@@ -932,8 +932,8 @@
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell, Chi_div_w_cell
          include 'formats'
          ierr = 0
-         if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+         if (k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
             Eq_div_w = 0d0
             Eq_cell = 0d0
          else
@@ -956,8 +956,8 @@
          type(auto_diff_real_star_order1) :: dChi_dm_bar, r_00
          include 'formats'
          ierr = 0         
-         if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+         if (k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
             Uq_face = 0d0
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
@@ -974,7 +974,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Source, source_div_w
-         ! source_div_w assumes TDC_source_seed == 0
+         ! source_div_w assumes RSP2_source_seed == 0
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             w_00, T_00, d_00, Peos_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
@@ -1009,8 +1009,8 @@
          ! Peos_00*QQ_00/Cp_00 = grad_ad
          grad_ad_00 = wrap_grad_ad_00(s, k)
          source_div_w = PII_div_Hp_cell*T_00*grad_ad_00
-         ! new analytic TDC requires s% TDC_source_seed == 0 for this
-         Source = (w_00 + s% TDC_source_seed)*source_div_w
+         ! new analytic RSP2 requires s% RSP2_source_seed == 0 for this
+         Source = (w_00 + s% RSP2_source_seed)*source_div_w
          
          ! PII units same as Cp = erg g^-1 K^-1
          ! P*QQ/Cp is unitless (see Y_face)
@@ -1035,7 +1035,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: D, dw3, D_div_dw3
-         ! D_div_dw3 assumes TDC_w_min_for_damping == 0d0
+         ! D_div_dw3 assumes RSP2_w_min_for_damping == 0d0
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
          include 'formats'
@@ -1046,9 +1046,9 @@
          else
             Hp_cell = compute_Hp_cell(s,k,ierr)
             if (ierr /= 0) return
-            ! analytic TDC requires TDC_w_min_for_damping == 0d0 for this
-            dw3 = pow3(wrap_w_00(s,k)) - pow3(s% TDC_w_min_for_damping)
-            D_div_dw3 = (s% TDC_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell
+            ! analytic RSP2 requires RSP2_w_min_for_damping == 0d0 for this
+            dw3 = pow3(wrap_w_00(s,k)) - pow3(s% RSP2_w_min_for_damping)
+            D_div_dw3 = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell
             D = D_div_dw3*dw3
             ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          end if
@@ -1067,7 +1067,7 @@
          include 'formats'
          ierr = 0
          alpha = s% mixing_length_alpha
-         gammar = s% TDC_alfar*x_GAMMAR
+         gammar = s% RSP2_alfar*x_GAMMAR
          if (gammar == 0d0) then
             Dr = 0d0
             Dr_div_etrb = 0d0
@@ -1100,8 +1100,8 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             Source, source_div_w, D, D_div_w3, Dr, Dr_div_etrb
-         if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+         if (k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
             s% SOURCE(k) = 0d0
             s% DAMP(k) = 0d0
             s% DAMPR(k) = 0d0
@@ -1181,7 +1181,7 @@
             T400 = pow4(T_00)
             if (k == 1) then ! Lr(1) proportional to Erad in cell(1)
                Erad = crad * T400
-               Lr = s% TDC_Lsurf_factor * area * clight * Erad
+               Lr = s% RSP2_Lsurf_factor * area * clight * Erad
                s% Lr(k) = Lr%val
                return
             end if
@@ -1193,7 +1193,7 @@
             kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
             diff_T4_div_kap = (T4m1 - T400)/kap_face
 
-            if (s% TDC_use_Stellingwerf_Lr) then ! RSP style
+            if (s% RSP2_use_Stellingwerf_Lr) then ! RSP style
                BW = log(T4m1/T400)
                if (abs(BW%val) > 1d-20) then
                   BK = log(kap_m1/kap_00)
@@ -1251,7 +1251,7 @@
          d_00 = wrap_d_00(s, k)
          w_m1 = wrap_w_m1(s, k)
          w_00 = wrap_w_00(s, k)
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          T_rho_face = alfa*T_00*d_00 + beta*T_m1*d_m1
          PII_face = compute_PII_face(s, k, ierr)
          w_face = alfa*w_00 + beta*w_m1
@@ -1288,7 +1288,7 @@
             Lt = 0d0
             return
          end if 
-         alpha_alpha_t = s% mixing_length_alpha*s% TDC_alfat
+         alpha_alpha_t = s% mixing_length_alpha*s% RSP2_alfat
          if (k == 1 .or. alpha_alpha_t == 0d0) then
             Lt = 0d0
             s% Lt(k) = 0d0
@@ -1298,7 +1298,7 @@
          area2 = (4d0*pi)**2*pow4(r_00)
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          rho2_face = alfa*pow2(d_00) + beta*pow2(d_m1)
          w_m1 = wrap_w_m1(s,k)
          w_00 = wrap_w_00(s,k)
@@ -1313,7 +1313,7 @@
          ! Lt = area * Ft
          ! Lt = -alpha_alpha_t * (area*rho_face)**2 * Hp_face * w_face * (etrb(k-1) - etrb(k))/dm_bar
          Lt = - alpha_alpha_t * area2 * rho2_face * Hp_face * w_face * (etrb_m1 - etrb_00) / s% dm_bar(k)  
-         ! this is slightly rewritten from the RSP form to use the TDC etrb variable
+         ! this is slightly rewritten from the RSP form to use the RSP2 etrb variable
          ! units = (cm^4) (g^2 cm^-6) (cm) (cm s^-1) (ergs g^-1) g^-1 = erg s^-1
          s% Lt(k) = Lt%val      
       end function compute_Lt
@@ -1388,5 +1388,5 @@
       end subroutine reset_etrb_using_L
 
 
-      end module hydro_tdc
+      end module hydro_rsp2
 
