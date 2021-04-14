@@ -286,6 +286,7 @@
       integer, parameter :: i_xtra3_00 = 26
       integer, parameter :: i_xtra3_p1 = 27
       integer, parameter :: auto_diff_star_num_vars = i_xtra3_p1
+      character (len=128) :: auto_diff_star_d1_names(auto_diff_star_num_vars)
       
 
       ! mesh cell types
