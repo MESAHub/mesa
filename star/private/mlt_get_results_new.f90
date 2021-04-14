@@ -209,10 +209,14 @@
             character (len=*) :: str
             integer :: j
             include 'formats'
-            call check_vals(new%val, old%val, 1d-16, 1d-8, str)
+            call check_vals(new%val, old%val, 1d-4, 1d-4, str)
             if (.not. okay) return
-            do j=1,auto_diff_star_num_vars
-               call check_vals(new%d1Array(j), old%d1Array(j), 1d-12, 1d-8, &
+            ! skip partials in some cases
+            if (str == 'mlt_vc') return
+            if (str == 'D') return
+            if (str == 'Gamma') return
+            do j=1,auto_diff_star_num_vars ! small diffs in partials are not from newer
+               call check_vals(new%d1Array(j), old%d1Array(j), 1d-1, 1d-1, &
                   str // ' ' // auto_diff_star_d1_names(j))
             end do
          end subroutine compare
@@ -220,12 +224,12 @@
          subroutine check_vals(new, old, atol, rtol, str)
             character (len=*) :: str
             real(dp), intent(in) :: new, old, atol, rtol
+            real(dp) :: err
             include 'formats'
-            if (is_bad(new) .or. is_bad(old) .or. &
-               abs(new-old) > atol + rtol*max(abs(new),abs(old))) then
-               write(*,4) trim(str) // ' newer new val k model iter', &
-                  k, s% model_number, s% solver_iter, &
-                  (new - old)/max(1d-99,abs(old)), new, old
+            err = abs(abs(new-old) / (atol + rtol*max(abs(new),abs(old)))) - 1d0
+            if (err > 0d0) then
+               write(*,4) trim(str) // ' k model iter newer err new val', &
+                  k, s% model_number, s% solver_iter, err, new, old
                okay = .false.
             end if
          end subroutine check_vals
