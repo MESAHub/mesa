@@ -275,8 +275,8 @@
             if (s% stop_for_bad_nums) stop 'do1_mlt_eval'
          end if
          
-         if (k > 0 .and. s% compare_to_mlt_get_new) then
-         !if (k > 0 .and. s% compare_to_mlt_get_new .and. k==7) then
+         !if (k > 0 .and. s% compare_to_mlt_get_new) then
+         if (k > 0 .and. s% compare_to_mlt_get_new .and. k==135) then
             okay = .true.
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
@@ -1724,8 +1724,8 @@
             character (len=*), intent(in) :: str
             mixing_type = no_mixing
             gradT = gradr
-            !if (is_bad(gradT)) then
-            if (kz==7 .and. ss% solver_iter==-5) then
+            if (is_bad(gradT)) then
+            !if (kz==135 .and. ss% solver_iter==2) then
                write(*,*) 'set_no_mixing gradT ' // trim(str), gradT
                !stop 'set_no_mixing'
             end if

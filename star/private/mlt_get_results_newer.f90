@@ -187,6 +187,12 @@
          
          call set_no_mixing()
          if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
+
+         if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
+               .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) then
+            call set_no_mixing
+            return
+         end if
            
          conv_vel = 0d0 ! will be set below if needed
          if (k > 0) then ! will be set below if TDC
