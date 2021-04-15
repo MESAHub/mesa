@@ -1163,7 +1163,7 @@
 
 
          subroutine do1(k)
-            use ionization_lib, only: eval_typical_charge
+            use mod_typical_charge, only: eval_typical_charge
             integer, intent(in) :: k
             integer :: i
 

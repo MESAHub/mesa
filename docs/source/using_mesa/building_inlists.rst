@@ -77,9 +77,6 @@ For example when evolving a stellar model on the horizontal branch (helium burni
    :end-before: ! eos
 
 
-ionization controls
--------------------
-
 &controls
 =========
 

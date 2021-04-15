@@ -170,9 +170,8 @@
             s% job% special_weak_transitions_file, &
             s% job% jina_reaclib_min_T9, &
             s% job% rate_tables_dir, s% job% rate_cache_suffix, &
-            s% job% ionization_file_prefix, s% job% ionization_Z1_suffix, &
             s% job% eosDT_cache_dir, &
-            s% job% ionization_cache_dir, s% job% kap_cache_dir, s% job% rates_cache_dir, &
+            s% job% kap_cache_dir, s% job% rates_cache_dir, &
             s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
             ierr)
       end subroutine starlib_init
@@ -186,9 +185,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use init, only: do_star_init
@@ -197,9 +195,8 @@
             jina_reaclib_filename, rate_tables_dir, &
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir
+            kap_cache_dir, rates_cache_dir
          real(dp), intent(in) :: &
             reaclib_min_T9
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
@@ -215,9 +212,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
       end subroutine do_starlib_init
