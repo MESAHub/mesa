@@ -1,7 +1,7 @@
 program kap_plotter
 
    use eos_def
-   use eos_lib, only: eosDT_get
+   use eos_lib, only: eos_ptr, eosDT_get
    use kap_def
    use kap_lib
    use chem_def
@@ -16,10 +16,12 @@ program kap_plotter
    integer, parameter :: h1=1, he3=2, he4=3, c12=4, n14=5, o16=6, ne20=7, f20=8, o20=9, &
       mg24=10, na24=11, ne24=12, si28=13, fe56=14
    integer, pointer, dimension(:) :: net_iso, chem_id
-   type (EoS_General_Info), pointer :: rq
    real(dp) :: xa(species)
 
    integer :: eos_handle, kap_handle
+   type (EoS_General_Info), pointer :: eos_rq
+   type (Kap_General_Info), pointer :: kap_rq
+
    real(dp) :: Rho, T, log10Rho, log10T, X, Z
    real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
    real(dp), dimension(num_eos_basic_results, species) :: d_dxa
@@ -87,10 +89,11 @@ program kap_plotter
 
    ! allocate and initialize the eos tables
    call Setup_eos(eos_handle)
-   rq => eos_handles(eos_handle)
+   call eos_ptr(eos_handle, eos_rq, ierr)
 
    ! setup kap
    call Setup_kap(kap_handle)
+   call kap_ptr(kap_handle, kap_rq, ierr)
 
    allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
    if (ierr /= 0) stop 'allocate failed'
