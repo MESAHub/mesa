@@ -286,6 +286,7 @@
       integer, parameter :: i_xtra3_00 = 26
       integer, parameter :: i_xtra3_p1 = 27
       integer, parameter :: auto_diff_star_num_vars = i_xtra3_p1
+      character (len=128) :: auto_diff_star_d1_names(auto_diff_star_num_vars)
       
 
       ! mesh cell types
@@ -566,6 +567,7 @@
       integer, parameter :: mlt_debug = 9
             
       integer, parameter :: num_mlt_results = 9
+      character (len=24) :: mlt_results_str(num_mlt_results)
       
       
       ! partials

@@ -45,7 +45,7 @@
       contains
 
 
-      subroutine do1_mlt_eval_new(s, k, &
+      subroutine do1_mlt_eval_new(s, k, & ! k=0 is valid
             cgrav, m, mstar, r, L, X, &            
             T_face, rho_face, P_face, &
             chiRho_face, chiT_face, &
@@ -117,10 +117,15 @@
          
          include 'formats'
          ierr = 0
+
+         if (s% use_other_mlt) then
+            !call s% other_mlt(  &      
+            return
+         end if         
          
          if (k > 0 .and. (s% using_mlt_get_newer .or. s% compare_to_mlt_get_newer)) then
             gradr_ad = gradr_factor*get_gradr_face(s,k)
-            grada_ad = get_grada_face_val(s,k)
+            grada_ad = get_grada_face(s,k)
             scale_height_ad = get_scale_height_face(s,k)
             call do1_mlt_eval_newer(s, k, MLT_option, gradL_composition_term, &
                gradr_ad, grada_ad, scale_height_ad, mixing_length_alpha, alt_mixing_type, &
@@ -129,19 +134,21 @@
                write(*,2) 'failed in do1_mlt_eval_newer', k
                stop 'do1_mlt_eval_new'
             end if
-            mixing_type = alt_mixing_type
-            gradT_val = gradT_ad%val
-            s% gradT_ad(k) = gradT_ad
-            s% gradr_ad(k) = gradr_ad
-            s% mlt_vc_ad(k) = mlt_vc_ad
-            s% grada_face_ad(k) = grada_ad
-            s% gradL_ad(k) = grada_ad + gradL_composition_term
-            s% scale_height_ad(k) = scale_height_ad
-            s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
-            s% mlt_D_ad(k) = D_ad
-            s% mlt_Gamma_ad(k) = Gamma_ad
-            s% Y_face_ad(k) = gradT_ad - grada_ad
-            return
+            if (s% using_mlt_get_newer) then
+               s% gradT_ad(k) = gradT_ad
+               s% gradr_ad(k) = gradr_ad
+               s% mlt_vc_ad(k) = mlt_vc_ad
+               s% grada_face_ad(k) = grada_ad
+               s% gradL_ad(k) = grada_ad + gradL_composition_term
+               s% scale_height_ad(k) = scale_height_ad
+               s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
+               s% mlt_D_ad(k) = D_ad
+               s% mlt_Gamma_ad(k) = Gamma_ad
+               s% Y_face_ad(k) = gradT_ad - grada_ad
+               mixing_type = alt_mixing_type
+               gradT_val = gradT_ad%val
+               return
+            end if
             
          end if
          
@@ -176,30 +183,22 @@
             mixing_type, gradT_val, ierr)
          if (ierr /= 0) return
          
-         if (s% compare_to_mlt_get_newer) then
+         if (k > 0 .and. s% compare_to_mlt_get_newer) then
             okay = .true.
-            call compare(grada_ad, s% grada_face_ad(k), 'grada')
+            if (alt_mixing_type /= mixing_type) then
+               write(*,4) 'mixing type newer new', k, alt_mixing_type, mixing_type
+               okay = .false.
+            end if
             call compare(gradT_ad, s% gradT_ad(k), 'gradT')
+            call compare(grada_ad, s% grada_face_ad(k), 'grada')
+            call compare(gradr_ad, s% gradr_ad(k), 'gradr_ad')
             call compare(mlt_vc_ad, s% mlt_vc_ad(k), 'mlt_vc')
             call compare(D_ad, s% mlt_D_ad(k), 'D')
             call compare(Gamma_ad, s% mlt_Gamma_ad(k), 'Gamma')
-            if (alt_mixing_type /= mixing_type) then
-               write(*,4) 'mixing type newer new', k, alt_mixing_type, mixing_type
-            end if
-            !if (okay) then
-            if (.false.) then 
-               ! Y_face from gradT-gradL is less accurate because of subtraction round off
-               call compare(Y_face_ad, s% Y_face_ad(k), 'Y_face')
-               if (.not. okay) then
-                  write(*,2) 'newer grada gradT Y_face', &
-                     k, grada_ad%val, gradT_ad%val, Y_face_ad%val
-                  write(*,2) 'new grada gradT Y_face', &
-                     k, s% grada_face_ad(k)%val, s% gradT_ad(k)%val, s% Y_face_ad(k)%val
-               end if
-            end if
+            call compare(scale_height_ad, s% scale_height_ad(k), 'scale_height_ad')
             if (.not. okay) then
                write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
-               stop 'compare_to_mlt_newer'
+               stop 'compare_to_mlt_get_newer'
             end if
          end if
          
@@ -210,26 +209,27 @@
             character (len=*) :: str
             integer :: j
             include 'formats'
-            call check_vals(new%val, old%val, 1d-16, 1d-8, str)
-
-            if (str == 'mlt_vc') return ! skip mlt_vc partials
-            
-            return
-            
-            do j=1,auto_diff_star_num_vars
-               call check_vals(new%d1Array(j), old%d1Array(j), 1d-12, 1d-8, str)
+            call check_vals(new%val, old%val, 1d-4, 1d-4, str)
+            if (.not. okay) return
+            ! skip partials in some cases
+            if (str == 'mlt_vc') return
+            if (str == 'D') return
+            if (str == 'Gamma') return
+            do j=1,auto_diff_star_num_vars ! small diffs in partials are not from newer
+               call check_vals(new%d1Array(j), old%d1Array(j), 1d-1, 1d-1, &
+                  str // ' ' // auto_diff_star_d1_names(j))
             end do
          end subroutine compare
          
          subroutine check_vals(new, old, atol, rtol, str)
             character (len=*) :: str
             real(dp), intent(in) :: new, old, atol, rtol
+            real(dp) :: err
             include 'formats'
-            if (is_bad(new) .or. is_bad(old) .or. &
-               abs(new-old) > atol + rtol*max(abs(new),abs(old))) then
-               write(*,4) trim(str) // ' newer new val k model iter', &
-                  k, s% model_number, s% solver_iter, &
-                  (new - old)/max(1d-99,abs(old)), new, old
+            err = abs(abs(new-old) / (atol + rtol*max(abs(new),abs(old)))) - 1d0
+            if (err > 0d0) then
+               write(*,4) trim(str) // ' k model iter newer err new val', &
+                  k, s% model_number, s% solver_iter, err, new, old
                okay = .false.
             end if
          end subroutine check_vals

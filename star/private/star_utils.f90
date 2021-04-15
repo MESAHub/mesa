@@ -3988,13 +3988,8 @@
          real(dp), intent(out) :: alfa, beta
          ! face_value(k) = alfa*cell_value(k) + beta*cell_value(k-1)
          if (k == 1) stop 'bad k==1 for get_face_weights'
-         !if ((.not. s% using_RSP2) .or. s% RSP2_use_mass_interp_face_values) then
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            beta = 1d0 - alfa
-         !else
-         !   alfa = 0.5d0
-         !   beta = 0.5d0
-         !end if
+         alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+         beta = 1d0 - alfa
       end subroutine get_face_weights
       
       
@@ -4012,17 +4007,18 @@
       end function wrap_mlt
       
       
-      subroutine upwrap_mlt(val_ad, val, d_val_dvb)
+      subroutine unwrap_mlt(val_ad, val, d_val_dvb)
          type(auto_diff_real_star_order1), intent(in) :: val_ad
          real(dp), intent(out) :: val, d_val_dvb(:)
          val = val_ad%val
+         d_val_dvb(:) = 0d0
          d_val_dvb(mlt_dlnd00) = val_ad%d1Array(i_lnd_00)
          d_val_dvb(mlt_dlnT00) = val_ad%d1Array(i_lnT_00)
          d_val_dvb(mlt_dlndm1) = val_ad%d1Array(i_lnd_m1)
          d_val_dvb(mlt_dlnTm1) = val_ad%d1Array(i_lnT_m1)
          d_val_dvb(mlt_dlnR) = val_ad%d1Array(i_lnR_00)
          d_val_dvb(mlt_dL) = val_ad%d1Array(i_L_00)
-      end subroutine upwrap_mlt
+      end subroutine unwrap_mlt
 
 
       end module star_utils

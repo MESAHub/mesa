@@ -683,7 +683,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             gradT, ierr )
          use chem_def, only: ih1
-         use mlt_info, only: do1_mlt_eval
+         use mlt_get_results, only: do1_mlt_eval
          use kap_def, only : num_kap_fracs
          use kap_lib, only : kap_get
 
