@@ -275,8 +275,8 @@
             if (s% stop_for_bad_nums) stop 'do1_mlt_eval'
          end if
          
-         !if (k > 0 .and. s% compare_to_mlt_get_new) then
-         if (k > 0 .and. s% compare_to_mlt_get_new .and. k==7) then
+         if (k > 0 .and. s% compare_to_mlt_get_new) then
+         !if (k > 0 .and. s% compare_to_mlt_get_new .and. k==7) then
             okay = .true.
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
