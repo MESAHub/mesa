@@ -166,6 +166,7 @@
             
          if (s% compare_to_mlt_get_newer) then
             okay = .true.
+            ! don't bother with checking partials since trust newer for those
             call compare(gradT, s% gradT(k), 'gradT')
             call compare(gradr, s% gradr(k), 'gradr')
             call compare(mlt_vc, s% mlt_vc(k), 'mlt_vc')
@@ -187,7 +188,7 @@
          subroutine compare(new, old, str)
             real(dp) :: new, old
             character (len=*) :: str
-            call check_vals(new, old, 1d-16, 1d-8, str)
+            call check_vals(new, old, 1d-6, 1d-3, str)
          end subroutine compare
          
          subroutine check_vals(new, old, atol, rtol, str)

@@ -121,6 +121,7 @@
          real(dp), pointer :: vel(:)
          real(dp) :: cs, gradL_composition_term, abs_du_div_cs, gradr_factor
          integer :: i, mixing_type, k_T_max
+         logical :: just_gradr
          type(auto_diff_real_star_order1) :: grada_face_ad, rho_face, &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, Gamma, D, scale_height
          include 'formats'
@@ -173,8 +174,9 @@
          if (s% rotation_flag .and. s% mlt_use_rotation_correction) &
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*gradr_factor
          gradr_ad = gradr_factor*gradr_ad
-
-         call do1_mlt_eval_newer(s, k, s% MLT_option, gradL_composition_term, &
+         
+         just_gradr = .false.
+         call do1_mlt_eval_newer(s, k, s% MLT_option, just_gradr, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D, Gamma, ierr)
          if (ierr /= 0) then

@@ -275,46 +275,42 @@
             if (s% stop_for_bad_nums) stop 'do1_mlt_eval'
          end if
          
-         if (k > 0 .and. s% compare_to_mlt_get_new) then
+         !if (k > 0 .and. s% compare_to_mlt_get_new) then
+         if (k > 0 .and. s% compare_to_mlt_get_new .and. k==7) then
             okay = .true.
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
-               call compare(mlt_basics(j), alt_mlt_basics(j), mlt_results_str(j))
+               call check_vals(alt_mlt_basics(j), mlt_basics(j), 1d-6, 1d-3, mlt_results_str(j))
             end do
             if (.not. okay) then
-               write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+               write(*,4) trim(MLT_option) // ' k, alt_mixing_type, mixing_type', k, alt_mixing_type, mixing_type
                stop 'compare_to_mlt_get_new'
             end if
+            return ! don't bother with checking partials since trust newer for those
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
                do i=1,num_mlt_partials
-                  call compare(mlt_partials(i,j), alt_mlt_partials(i,j), mlt_results_str(j) // ' ' // mlt_partial_str(i))
+                  call check_vals(alt_mlt_partials(i,j), mlt_partials(i,j), 1d-2, 1d-2, &
+                     'd' // trim(mlt_results_str(j)) // '_' // trim(mlt_partial_str(i)))
                end do
             end do
             if (.not. okay) then
-               write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+               write(*,4) trim(MLT_option) // ' k, alt_mixing_type, mixing_type', k, alt_mixing_type, mixing_type
                stop 'compare_to_mlt_get_new'
             end if
          end if
          
          contains
          
-         subroutine compare(new, old, str)
-            real(dp), intent(in) :: new, old
-            character (len=*) :: str
-            include 'formats'
-            call check_vals(new, old, 1d-16, 1d-8, str)
-         end subroutine compare
-         
          subroutine check_vals(new, old, atol, rtol, str)
             character (len=*) :: str
             real(dp), intent(in) :: new, old, atol, rtol
+            real(dp) :: err
             include 'formats'
-            if (is_bad(new) .or. is_bad(old) .or. &
-               abs(new-old) > atol + rtol*max(abs(new),abs(old))) then
-               write(*,4) trim(str) // ' new old val k model iter', &
-                  k, s% model_number, s% solver_iter, &
-                  (new - old)/max(1d-99,abs(old)), new, old
+            err = abs(abs(new-old) / (atol + rtol*max(abs(new),abs(old)))) - 1d0
+            if (err > 0d0 .or. is_bad(new) .or. is_bad(old)) then
+               write(*,6) trim(str) // ' k model iter alt type err new old', &
+                  k, s% model_number, s% solver_iter, alt_mixing_type, mixing_type, err, new, old
                okay = .false.
             end if
          end subroutine check_vals
@@ -459,6 +455,8 @@
 
          !test_partials = (kz == ss% solver_test_partials_k)
          test_partials = .false.
+
+         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'enter Get_results'
       
          ierr = 0
          gradT_temp = 0
@@ -503,7 +501,7 @@
 
          if (is_bad(d_grada_dvb(mlt_dlnd00))) then
             ierr = -1
-            if (.not. ss% report_ierr) return
+            !if (.not. ss% report_ierr) return
 !$OMP critical (mlt_info_crit5)
             write(*,2) 'd_grada_dvb(mlt_dlnd00)', kz, d_grada_dvb(mlt_dlnd00)
             write(*,2) 'a_00', kz, a_00
@@ -517,6 +515,7 @@
 !$OMP end critical (mlt_info_crit5)
             return
          end if
+         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'Get_results before call Pr'
 
          Pr = one_third*crad*T*T*T*T
          if (debug) write(*,1) 'Pr', Pr
@@ -542,7 +541,7 @@
          
          if (is_bad(gradr)) then
             ierr = -1
-            if (.not. ss% report_ierr) return
+            !if (.not. ss% report_ierr) return
 !$OMP critical (mlt_info_crit6)
             write(*,2) 'gradr', kz, gradr
             write(*,2) 'P', kz, P
@@ -560,8 +559,8 @@
             call mesa_error(__FILE__,__LINE__)
 !$OMP end critical (mlt_info_crit6)
          end if
-         
-         if (just_gradr) return
+
+         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'Get_results before if (just_gradr) return', just_gradr
 
          grav = cgrav*m / (r*r)
          d_grav_dvb = 0d0
@@ -592,7 +591,7 @@
 
          if (scale_height <= 0d0 .or. is_bad(scale_height)) then
             ierr = -1
-            return
+            !return
 !$OMP critical (mlt_info_crit7)
             write(*,1) 'scale_height', scale_height
             stop 'set_convective_mixing'
@@ -601,7 +600,7 @@
 
          if (is_bad(d_scale_height_dvb(mlt_dlnd00))) then
             ierr = -1
-            return
+            !return
 !$OMP critical (mlt_info_crit8)
             write(*,1) 'd_scale_height_dvb(mlt_dlnd00)', d_scale_height_dvb(mlt_dlnd00)
             stop 'set_convective_mixing'
@@ -618,10 +617,11 @@
          d_gradL_dvb = d_grada_dvb ! ignore partials of composition term
          
          diff_grads = gradr - gradL ! convective if this is > 0
+         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'Get_results diff_grads', diff_grads
          d_diff_grads_dvb = d_gradr_dvb - d_gradL_dvb
          if (is_bad(d_diff_grads_dvb(mlt_dlnT00))) then
             ierr = -1
-            return
+            !return
 !$omp critical (mlt_info_crit9)
             write(*,1) 'd_grada_dvb(mlt_dlnT00)', d_grada_dvb(mlt_dlnT00)
             write(*,1) 'd_gradr_dvb(mlt_dlnT00)', d_gradr_dvb(mlt_dlnT00)
@@ -634,7 +634,7 @@
          Pg = P - Pr
          if (debug) write(*,1) 'Pg', Pg
          if (Pg < tiny) then
-            call set_no_mixing
+            call set_no_mixing('1')
             return
          end if
          
@@ -650,14 +650,20 @@
          Lambda = mixing_length_alpha*scale_height
          if (debug) write(*,1) 'Lambda', Lambda
          d_Lambda_dvb = mixing_length_alpha*d_scale_height_dvb
+         
+         if (just_gradr) then
+            ! set_no_mixing assumes have set gradr, scale_height, gradL, and Lambda.
+            call set_no_mixing('just_gradr')
+            return
+         end if
                   
          if (mixing_length_alpha <= 0) then
-            call set_no_mixing
+            call set_no_mixing('2')
             return
          end if
          
          if (MLT_option == 'none') then
-            call set_no_mixing
+            call set_no_mixing('3')
             return
          end if
          
@@ -677,7 +683,7 @@
                write(*,*) "MLT_option == 'none' ", MLT_option == 'none'      
                call mesa_error(__FILE__,__LINE__)
             end if
-            call set_no_mixing
+            call set_no_mixing('4')
             return
          end if
 
@@ -685,7 +691,7 @@
          Q = chiT/chiRho
          dQ_dvb = Q*( d_chiT_dvb/chiT - d_chiRho_dvb/chiRho )
          if (Q <= 0) then
-            call set_no_mixing
+            call set_no_mixing('5')
             return
          end if
                      
@@ -694,7 +700,7 @@
          d_rc_dvb = radiative_conductivity*(3d0*dT_dvb/T - dRho_dvb/rho - d_opacity_dvb/opacity)
          
          if (diff_grads <= 0d0) then ! not convective (Ledoux stable)    
-            call set_no_mixing ! also sets gradT = gradr    
+            call set_no_mixing('6') ! also sets gradT = gradr    
             if (gradL_composition_term < 0) then ! composition unstable
                call set_thermohaline
                D = D_thrm
@@ -718,7 +724,7 @@
             end if
             if (debug) write(*,1) 'remove_small_D_limit', remove_small_D_limit
             if (D < remove_small_D_limit .or. is_bad(D)) then
-               call set_no_mixing
+               call set_no_mixing('7')
             end if
             if (debug) write(*,1) 'final D', D
             if (conv_vel > 0d0) then
@@ -752,9 +758,11 @@
             end if
             return            
          end if
+         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'Get_results before call set_convective_mixing', mixing_type
          
          call set_convective_mixing
          if (quit) return
+         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'Get_results after call set_convective_mixing', mixing_type
 
          ! Reduce gradr-grada
          if (ss% use_superad_reduction) then
@@ -853,7 +861,7 @@
          end if
 
          if (D < remove_small_D_limit .or. is_bad(D)) then
-            call set_no_mixing
+            call set_no_mixing('8')
          end if
 
          if (ss% conv_vel_flag) then
@@ -877,6 +885,11 @@
                   mixing_type = leftover_convective_mixing
                end if
             end if
+         end if
+         
+         if (kz==7 .and. ss%solver_iter==-5) then
+            write(*,*) 'returning with mixing_type', mixing_type
+            stop 'mlt'
          end if
          
          contains
@@ -949,7 +962,7 @@
             d_D_thrm_dvb = 0
                         
             if (D_thrm < min_D_th .or. D_thrm <= 0) then
-               call set_no_mixing
+               call set_no_mixing('9')
                return
             end if
             
@@ -1453,7 +1466,7 @@
             end if   
 
             if (f1 < 0) then
-               call set_no_mixing
+               call set_no_mixing('10')
                return
             end if   
             f1 = pow(f1,one_third)     
@@ -1476,13 +1489,10 @@
                write(*,1) 'd_f2_dvb', d_f2_dvb
                stop 'MLT: bad f1'
 !$omp end critical (mlt_info_crit12)
-!               call set_no_mixing
-!               quit = .true.
-!               return
             end if
 
             if (Gamma < 0) then
-               call set_no_mixing
+               call set_no_mixing('11')
                return
             end if
             
@@ -1581,7 +1591,7 @@
             
             
             if (is_bad(gradT)) then
-               call set_no_mixing
+               call set_no_mixing('12')
                quit = .true.
                return
             end if
@@ -1599,7 +1609,7 @@
             
             include 'formats'
             if (dbg) write(*,*) 'check for semiconvection'
-            call set_no_mixing ! sets gradT = gradr
+            call set_no_mixing('13') ! sets gradT = gradr
             D_semi = alpha_semiconvection*radiative_conductivity/(6*Cp*rho) &
                   *(gradr - grada)/(gradL - gradr)
             if (D_semi <= 0) then
@@ -1611,14 +1621,14 @@
                   write(*,1) 'gradL - gradr', gradL - gradr
                   stop
                end if
-               call set_no_mixing
+               call set_no_mixing('14')
                return
             end if
             d_D_semi_dvb = 0 ! not used, so skip for now.
             conv_vel = 3*D_semi/Lambda 
             d_conv_vel_dvb = 0
             if (D_semi <= 0) then
-               call set_no_mixing
+               call set_no_mixing('15')
                return
             end if
             
@@ -1710,8 +1720,15 @@
             
          end subroutine set_semiconvection
                   
-         subroutine set_no_mixing
-            ! assumes have set gradr, scale_height, gradL, and Lambda.
+         subroutine set_no_mixing(str) ! assumes have set gradr, scale_height, gradL, and Lambda.
+            character (len=*), intent(in) :: str
+            mixing_type = no_mixing
+            gradT = gradr
+            !if (is_bad(gradT)) then
+            if (kz==7 .and. ss% solver_iter==-5) then
+               write(*,*) 'set_no_mixing gradT ' // trim(str), gradT
+               !stop 'set_no_mixing'
+            end if
             mixing_type = no_mixing
             gradT = gradr
             d_gradT_dvb = d_gradr_dvb
