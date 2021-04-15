@@ -1,3 +1,5 @@
+return
+
 do_one star_plus_point_mass "termination code: xa_central_lower_limit" "final.mod" x100
 do_one star_plus_point_mass_explicit_mdot "termination code: xa_central_lower_limit" "final.mod" x400
 do_one evolve_both_stars "Terminate because accretor (r-rl)/rl > accretor_overflow_terminate" "final.mod" x100
