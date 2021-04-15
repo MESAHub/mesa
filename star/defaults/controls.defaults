@@ -2348,9 +2348,6 @@
       ! mlt_make_surface_no_mixing
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! this defaults to false for (temoporary) backward compatibility.
-      ! it should be true.
-
       ! ::
 
     mlt_make_surface_no_mixing = .false.

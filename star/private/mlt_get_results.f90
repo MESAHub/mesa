@@ -34,7 +34,7 @@
       implicit none
 
       private
-      public :: Get_results
+      public :: do1_mlt_eval, Get_results
 
       logical, parameter :: dbg = .false.
       integer, parameter :: kdbg = -1
@@ -42,6 +42,284 @@
       integer, parameter :: nvbs = num_mlt_partials
 
       contains
+
+
+      subroutine do1_mlt_eval(s, k, &  ! k=0 is valid
+            cgrav, m, mstar, r, L, X, &            
+            T_face, rho_face, P_face, &
+            chiRho_face, chiT_face, &
+            Cp_face, opacity_face, grada_face, &            
+            alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
+            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
+            chiRho_for_partials_00, chiT_for_partials_00, &
+            chiRho_for_partials_m1, chiT_for_partials_m1, &
+            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
+            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
+            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
+            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
+            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
+            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
+            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
+            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
+            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
+            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
+            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
+            alpha_semiconvection, semiconvection_option, &
+            thermohaline_coeff, thermohaline_option, &
+            dominant_iso_for_thermohaline, &
+            mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
+            MLT_option, Henyey_y_param, Henyey_nu_param, &
+            normal_mlt_gradT_factor, &
+            max_conv_vel, dt, tau, just_gradr, &
+            mixing_type, mlt_basics, mlt_partials1, ierr)
+         use mlt_get_results_new, only: do1_mlt_eval_new
+         use star_utils, only: unwrap_mlt
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: &
+            cgrav, m, mstar, r, L, X, &            
+            T_face, rho_face, P_face, &
+            chiRho_face, chiT_face, &
+            Cp_face, opacity_face, grada_face, &            
+            alfa, beta, &
+            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
+            chiRho_for_partials_00, chiT_for_partials_00, &
+            chiRho_for_partials_m1, chiT_for_partials_m1, &
+            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
+            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
+            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
+            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
+            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
+            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
+            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
+            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
+            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
+            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &
+            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
+            alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
+            Henyey_y_param, Henyey_nu_param, &
+            max_conv_vel, dt, tau, remove_small_D_limit, &
+            normal_mlt_gradT_factor
+         logical, intent(in) :: alt_scale_height
+         character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
+         integer, intent(in) :: dominant_iso_for_thermohaline
+         logical, intent(in) :: just_gradr
+         integer, intent(out) :: mixing_type
+         real(dp), intent(inout) :: mlt_basics(:) ! (num_mlt_results)
+         real(dp), intent(inout), pointer :: mlt_partials1(:) ! =(num_mlt_partials, num_mlt_results)
+         integer, intent(out) :: ierr
+         
+         real(dp), pointer :: mlt_partials(:,:)
+         real(dp) :: gradT_val, alt_mlt_basics(num_mlt_results), &
+            alt_mlt_partials(num_mlt_partials, num_mlt_results)
+         logical :: okay
+         integer :: alt_mixing_type, j, i
+         include 'formats'
+
+         if (s% use_other_mlt) then
+            call s% other_mlt(  &               
+               s% id, k, cgrav, m, mstar, r, L, X, &            
+               T_face, rho_face, P_face, &
+               chiRho_face, chiT_face, &
+               Cp_face, opacity_face, grada_face, &            
+               alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
+               T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
+               chiRho_for_partials_00, chiT_for_partials_00, &
+               chiRho_for_partials_m1, chiT_for_partials_m1, &
+               chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
+               chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
+               chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
+               chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
+               Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
+               Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
+               opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
+               opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
+               grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
+               grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
+               gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
+               alpha_semiconvection, semiconvection_option, &
+               thermohaline_coeff, thermohaline_option, &
+               dominant_iso_for_thermohaline, &
+               mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
+               MLT_option, Henyey_y_param, Henyey_nu_param, &
+               normal_mlt_gradT_factor, &
+               max_conv_vel, dt, tau, just_gradr, &
+               mixing_type, mlt_basics, mlt_partials1, ierr)
+            return
+         end if
+
+         
+         mlt_partials(1:num_mlt_partials,1:num_mlt_results) => &
+            mlt_partials1(1:num_mlt_partials*num_mlt_results)
+         ierr = 0
+         mlt_basics = 0
+         mlt_partials = 0
+         
+         
+         if (k > 0 .and. (s% using_mlt_get_new .or. s% compare_to_mlt_get_new)) then
+            call do1_mlt_eval_new(s, k, & ! k=0 is valid
+               cgrav, m, mstar, r, L, X, &            
+               T_face, rho_face, P_face, &
+               chiRho_face, chiT_face, &
+               Cp_face, opacity_face, grada_face, &            
+               alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
+               T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
+               chiRho_for_partials_00, chiT_for_partials_00, &
+               chiRho_for_partials_m1, chiT_for_partials_m1, &
+               chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
+               chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
+               chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
+               chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
+               Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
+               Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
+               opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
+               opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
+               grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
+               grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
+               gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
+               alpha_semiconvection, semiconvection_option, &
+               thermohaline_coeff, thermohaline_option, &
+               dominant_iso_for_thermohaline, &
+               mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
+               MLT_option, Henyey_y_param, Henyey_nu_param, &
+               normal_mlt_gradT_factor, &
+               max_conv_vel, dt, tau, just_gradr, &
+               alt_mixing_type, gradT_val, ierr)
+            if (ierr /= 0) then
+               write(*,2) 'failed in do1_mlt_eval_newer', k
+               stop 'do1_mlt_eval_new'
+            end if
+            call unwrap_mlt(s% gradT_ad(k), alt_mlt_basics(mlt_gradT), alt_mlt_partials(:,mlt_gradT))
+            call unwrap_mlt(s% gradr_ad(k), alt_mlt_basics(mlt_gradr), alt_mlt_partials(:,mlt_gradr))
+            call unwrap_mlt(s% gradL_ad(k), alt_mlt_basics(mlt_gradL), alt_mlt_partials(:,mlt_gradL))
+            call unwrap_mlt(s% scale_height_ad(k), alt_mlt_basics(mlt_scale_height), alt_mlt_partials(:,mlt_scale_height))
+            call unwrap_mlt(s% Lambda_ad(k), alt_mlt_basics(mlt_Lambda), alt_mlt_partials(:,mlt_Lambda))
+            call unwrap_mlt(s% mlt_vc_ad(k), alt_mlt_basics(mlt_convection_velocity), alt_mlt_partials(:,mlt_convection_velocity))
+            call unwrap_mlt(s% mlt_D_ad(k), alt_mlt_basics(mlt_D), alt_mlt_partials(:,mlt_D))
+            call unwrap_mlt(s% mlt_Gamma_ad(k), alt_mlt_basics(mlt_gamma), alt_mlt_partials(:,mlt_gamma))
+            if (s% using_mlt_get_new) then
+               mixing_type = alt_mixing_type
+               mlt_basics = alt_mlt_basics
+               mlt_partials = alt_mlt_partials
+               okay = .true.
+               do j=1,num_mlt_results
+                  if (j == mlt_debug) cycle
+                  if (is_bad(mlt_basics(j))) then
+                     write(*,2) mlt_results_str(j), k, mlt_basics(j)
+                     okay = .false.
+                  end if
+               end do
+               if (.not. okay) then
+                  write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+                  stop 'using_mlt_get_new'
+               end if
+               do j=1,num_mlt_results
+                  if (j == mlt_debug) cycle
+                  do i=1,num_mlt_partials
+                     if (is_bad(mlt_partials(i,j))) then
+                        write(*,2) mlt_results_str(j) // ' ' // mlt_partial_str(i), k, mlt_partials(i,j)
+                        okay = .false.
+                     end if
+                  end do
+               end do
+               if (.not. okay) then
+                  write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+                  stop 'using_mlt_get_new'
+               end if
+               return
+            end if            
+         end if
+         
+         call Get_results(s, k, &
+            cgrav, m, mstar, r, L, X, &            
+            T_face, rho_face, P_face, &
+            chiRho_face, chiT_face, &
+            Cp_face, opacity_face, grada_face, &            
+            alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
+            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
+            chiRho_for_partials_00, chiT_for_partials_00, &
+            chiRho_for_partials_m1, chiT_for_partials_m1, &
+            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
+            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
+            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
+            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
+            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
+            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
+            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
+            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
+            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
+            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
+            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
+            alpha_semiconvection, semiconvection_option, &
+            thermohaline_coeff, thermohaline_option, &
+            dominant_iso_for_thermohaline, &
+            mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
+            MLT_option, Henyey_y_param, Henyey_nu_param, &
+            normal_mlt_gradT_factor, &
+            max_conv_vel, dt, tau, just_gradr, &
+            mixing_type, &
+            mlt_basics(mlt_gradT), mlt_partials(:,mlt_gradT), &
+            mlt_basics(mlt_gradr), mlt_partials(:,mlt_gradr), &
+            mlt_basics(mlt_gradL), mlt_partials(:,mlt_gradL), &
+            mlt_basics(mlt_scale_height), mlt_partials(:,mlt_scale_height), &
+            mlt_basics(mlt_Lambda), mlt_partials(:,mlt_Lambda), &
+            mlt_basics(mlt_convection_velocity), mlt_partials(:,mlt_convection_velocity), &
+            mlt_basics(mlt_D), mlt_partials(:,mlt_D), &
+            mlt_basics(mlt_gamma), mlt_partials(:,mlt_gamma), &
+            ierr)
+         
+         if (is_bad(mlt_partials(mlt_cv_var,mlt_gradT))) then
+            if (s% report_ierr) &
+               write(*,2) 'mlt_partials(mlt_cv_var,mlt_gradT)', k, mlt_partials(mlt_cv_var,mlt_gradT)
+            ierr = -1
+            if (s% stop_for_bad_nums) stop 'do1_mlt_eval'
+         end if
+         
+         if (k > 0 .and. s% compare_to_mlt_get_new) then
+            okay = .true.
+            do j=1,num_mlt_results
+               if (j == mlt_debug) cycle
+               call compare(mlt_basics(j), alt_mlt_basics(j), mlt_results_str(j))
+            end do
+            if (.not. okay) then
+               write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+               stop 'compare_to_mlt_get_new'
+            end if
+            do j=1,num_mlt_results
+               if (j == mlt_debug) cycle
+               do i=1,num_mlt_partials
+                  call compare(mlt_partials(i,j), alt_mlt_partials(i,j), mlt_results_str(j) // ' ' // mlt_partial_str(i))
+               end do
+            end do
+            if (.not. okay) then
+               write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
+               stop 'compare_to_mlt_get_new'
+            end if
+         end if
+         
+         contains
+         
+         subroutine compare(new, old, str)
+            real(dp), intent(in) :: new, old
+            character (len=*) :: str
+            include 'formats'
+            call check_vals(new, old, 1d-16, 1d-8, str)
+         end subroutine compare
+         
+         subroutine check_vals(new, old, atol, rtol, str)
+            character (len=*) :: str
+            real(dp), intent(in) :: new, old, atol, rtol
+            include 'formats'
+            if (is_bad(new) .or. is_bad(old) .or. &
+               abs(new-old) > atol + rtol*max(abs(new),abs(old))) then
+               write(*,4) trim(str) // ' new old val k model iter', &
+                  k, s% model_number, s% solver_iter, &
+                  (new - old)/max(1d-99,abs(old)), new, old
+               okay = .false.
+            end if
+         end subroutine check_vals
+         
+      end subroutine do1_mlt_eval
       
 
       subroutine Get_results(ss, kz, &

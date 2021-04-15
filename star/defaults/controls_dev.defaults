@@ -8,18 +8,32 @@
 
 
 
-      using_mlt_info_new = .false.
-      compare_to_mlt_info_new = .false.
 
-      using_mlt_get_new = .false.
+!   STAGES.  merge to main after each
+! - compare get new
+! - use get new
+! - compare get newer
+! - use get newer
+! - compare info new
+! - use info new
+! - compare info newer
+! - use info newer
+
+! - these flags will go true one-by-one from top
+
       compare_to_mlt_get_new = .false.
-   
+      using_mlt_get_new = .false.
 
-      using_mlt_info_newer = .false.
-      compare_to_mlt_info_newer = .false.
-
-      using_mlt_get_newer = .false.
       compare_to_mlt_get_newer = .false.
+      using_mlt_get_newer = .false.
+
+
+      compare_to_mlt_info_new = .false.
+      using_mlt_info_new = .false.
+
+      compare_to_mlt_info_newer = .false.
+      using_mlt_info_newer = .false.
+
       
       
 

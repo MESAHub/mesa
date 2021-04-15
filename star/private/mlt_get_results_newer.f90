@@ -176,8 +176,7 @@
          grav = cgrav*m/pow2(r)
          
          call set_no_mixing()
-         if (k == 1 .or. MLT_option == 'none' .or. &
-               beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
+         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
            
          conv_vel = 0d0 ! will be set below if needed
          if (k > 0) then ! will be set below if TDC
@@ -208,7 +207,6 @@
          end if         
          
          if (D < s% remove_small_D_limit .or. is_bad(D%val)) then
-            if (k == -1) write(*,2) 'D bad', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
          end if
          
@@ -264,16 +262,20 @@
 
          subroutine set_TDC
             include 'formats'
-            gradT = (wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)) / &
-                    (wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
-            Y_guess = gradT - grada ! use actual gradT to guess Y_face
-            call get_TDC_solution(s, k, &
-               mixing_length_alpha, cgrav, m, Y_guess, &
-               mixing_type, L, r, P, T, rho, Cp, opacity, &
-               scale_height, grada, conv_vel, Y_face, ierr)
-            if (ierr /= 0) then
-               write(*,2) 'get_TDC_solution failed in set_TDC', k
-               stop 'get_TDC_solution failed in set_TDC'
+            if (k == 1) then
+               call set_no_mixing
+            else
+               gradT = (wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)) / &
+                       (wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
+               Y_guess = gradT - grada ! use actual gradT to guess Y_face
+               call get_TDC_solution(s, k, &
+                  mixing_length_alpha, cgrav, m, Y_guess, &
+                  mixing_type, L, r, P, T, rho, Cp, opacity, &
+                  scale_height, grada, conv_vel, Y_face, ierr)
+               if (ierr /= 0) then
+                  write(*,2) 'get_TDC_solution failed in set_TDC', k
+                  stop 'get_TDC_solution failed in set_TDC'
+               end if
             end if
             gradT = Y_face + grada
          end subroutine set_TDC

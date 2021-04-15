@@ -24,6 +24,12 @@
 / ! end of kap namelist
 
 &controls
+   compare_to_mlt_get_new = .false.
+   using_mlt_get_new = .false.
+   compare_to_mlt_get_newer = .false.
+   mlt_make_surface_no_mixing = .false.
+   
+   
    
    convergence_ignore_equL_residuals = .true.
    make_gradr_sticky_in_solver_iters = .true.
