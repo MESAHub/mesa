@@ -28,7 +28,7 @@ do_one custom_rates "stop because log_center_temperature >= log_center_temp_limi
 do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_pulses_80_800 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_TDC_RSP "TDC good match for period" "tdc_final.mod" skip
+# do_one dev_TDC_RSP "TDC good match for period" "tdc_final.mod" skip
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 #   under construction.   do_one dev_TDC "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
