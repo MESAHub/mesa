@@ -21,7 +21,7 @@
 
 ! - these flags will go true one-by-one from top
 
-      compare_to_mlt_get_new = .false.
+      compare_to_mlt_get_new = .true.
       using_mlt_get_new = .false.
 
       compare_to_mlt_get_newer = .false.
