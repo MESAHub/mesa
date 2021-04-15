@@ -100,8 +100,8 @@
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
             end if
             if (make_gradr_sticky_in_solver_iters .and. s% solver_iter > 3) then
-               if (.not. s% new_fixed_gradr_for_rest_of_solver_iters(k)) &
-                  s% new_fixed_gradr_for_rest_of_solver_iters(k) = &
+               if (.not. s% newer_fixed_gradr_for_rest_of_solver_iters(k)) &
+                  s% newer_fixed_gradr_for_rest_of_solver_iters(k) = &
                      (s% mlt_mixing_type(k) == no_mixing)
             end if            
          end do
@@ -152,7 +152,7 @@
          end if
          
          if (make_gradr_sticky_in_solver_iters) then
-            if (s% new_fixed_gradr_for_rest_of_solver_iters(k)) then
+            if (s% newer_fixed_gradr_for_rest_of_solver_iters(k)) then
                return
             end if
          end if

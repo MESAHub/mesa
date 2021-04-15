@@ -50,6 +50,7 @@
 
       subroutine set_mlt_vars(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
+         use mlt_info_newer, only: set_mlt_vars_newer
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
@@ -60,6 +61,14 @@
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
          ierr = 0
+         if (s% using_mlt_info_newer) then
+            call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
+            return
+         end if
+         if (s% compare_to_mlt_info_newer) then
+            call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
+            if (ierr /= 0) return
+         end if
          if (dbg) write(*, *) 'doing set_mlt_vars'
          gradL_composition_term = -1d0
          opacity = -1d0
@@ -169,6 +178,94 @@
 
 
       subroutine do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
+            opacity_face_in, chiRho_face_in, &
+            chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
+            make_gradr_sticky_in_solver_iters, ierr)
+         ! get convection info for point k
+         !use mlt_lib
+         use eos_def
+         use chem_def, only: ih1
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: mixing_length_alpha, &
+            gradL_composition_term_in, opacity_face_in, &
+            chiRho_face_in, chiT_face_in, &
+            Cp_face_in, grada_face_in, P_face_in, xh_face_in
+         logical, intent(out) :: make_gradr_sticky_in_solver_iters
+         integer, intent(out) :: ierr
+         
+         real(dp) :: & ! for testing
+            gradT, gradr, mlt_vc, gradL, scale_height, mlt_mixing_length, mlt_D, mlt_Gamma
+         integer :: mixing_type
+         logical :: okay
+         include 'formats'
+         ierr = 0
+
+         if (s% compare_to_mlt_get_newer) then ! save newer results
+            mixing_type = s% mlt_mixing_type(k)
+            gradT = s% gradT(k)
+            gradr = s% gradr(k)
+            mlt_vc = s% mlt_vc(k)
+            gradL = s% gradL(k)
+            scale_height = s% scale_height(k)
+            mlt_mixing_length = s% mlt_mixing_length(k)
+            mlt_D = s% mlt_D(k)
+            mlt_Gamma = s% mlt_Gamma(k)
+         end if
+         
+         call test_do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
+            opacity_face_in, chiRho_face_in, &
+            chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
+            make_gradr_sticky_in_solver_iters, ierr)
+         if (ierr /= 0) return
+            
+         if (s% compare_to_mlt_get_newer) then
+            okay = .true.
+            ! don't bother with checking partials since trust newer for those
+            call compare(gradT, s% gradT(k), 'gradT')
+            call compare(gradr, s% gradr(k), 'gradr')
+            call compare(mlt_vc, s% mlt_vc(k), 'mlt_vc')
+            call compare(gradL, s% gradL(k), 'gradL')
+            call compare(scale_height, s% scale_height(k), 'scale_height')
+            call compare(mlt_mixing_length, s% mlt_mixing_length(k), 'mlt_mixing_length')
+            call compare(mlt_D, s% mlt_D(k), 'mlt_D')
+            call compare(mlt_Gamma, s% mlt_Gamma(k), 'mlt_Gamma')
+            if (mixing_type /= s% mlt_mixing_type(k)) &
+               write(*,4) 'mixing type newer new', k, mixing_type, s% mlt_mixing_type(k)
+            if (.not. okay) then
+               write(*,3) trim(s% MLT_option) // ' mixing_type', k, mixing_type
+               stop 'compare_to_mlt_newer'
+            end if
+         end if
+         
+         contains
+         
+         subroutine compare(new, old, str)
+            real(dp) :: new, old
+            character (len=*) :: str
+            call check_vals(new, old, 1d-6, 1d-3, str)
+         end subroutine compare
+         
+         subroutine check_vals(new, old, atol, rtol, str)
+            character (len=*) :: str
+            real(dp), intent(in) :: new, old, atol, rtol
+            include 'formats'
+            if (is_bad(new) .or. is_bad(old) .or. &
+               abs(new-old) > atol + rtol*max(abs(new),abs(old))) then
+               write(*,4) trim(str) // ' newer new val k model iter', &
+                  k, s% model_number, s% solver_iter, &
+                  (new - old)/max(1d-99,abs(old)), new, old
+               okay = .false.
+            end if
+         end subroutine check_vals
+            
+         
+      end subroutine do1_mlt_2
+
+
+
+
+      subroutine test_do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             make_gradr_sticky_in_solver_iters, ierr)
@@ -969,7 +1066,7 @@
             s% grad_superad(k) = s% gradT(k) - s% gradL(k)
          end subroutine set_no_mixing_bad
 
-      end subroutine do1_mlt_2
+      end subroutine test_do1_mlt_2
 
 
       logical function must_limit_conv_vel(s,k0)
