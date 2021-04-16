@@ -118,6 +118,11 @@ Nuclear reaction networks (``net``)
 
 The ``net`` module implements nuclear reaction networks.  
 
+.. toctree::
+   :maxdepth: 1
+
+   net/overview
+   net/nets
 
 .. _neu:
 
