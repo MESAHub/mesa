@@ -676,6 +676,77 @@
       end subroutine build1_pre_ms_model
       
             
+      subroutine eval_gradT_newer( &
+            s, zbar, x, y, xa, rho, m, mstar, r, T, lnT, L, P, &
+            chiRho, chiT, Cp, grada, &
+            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            gradT, ierr )
+         use chem_def, only: ih1
+         use mlt_get_results_newer, only: get_gradT_newer
+         use kap_def, only : num_kap_fracs
+         use kap_lib, only : kap_get
+
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: &
+            zbar, x, y, xa(:), rho, m, mstar, r, T, lnT, L, P, &
+            chiRho, chiT, Cp, grada, &
+            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT
+         real(dp), intent(out) :: gradT
+         integer, intent(out) :: ierr
+         
+         real(dp) :: old_gradT, opacity, dlnkap_dlnd, dlnkap_dlnT, cgrav, &
+            gradL_composition_term, gradr, scale_height, scale_height2
+         real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
+         integer :: mixing_type
+         
+         include 'formats'
+         
+         call eval_gradT( &
+            s, zbar, x, y, xa, rho, m, mstar, r, T, lnT, L, P, &
+            chiRho, chiT, Cp, grada, &
+            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            old_gradT, ierr )
+         if (ierr /= 0) return
+
+         if (s% use_simple_es_for_kap) then
+            opacity = 0.2d0*(1 + x)
+            dlnkap_dlnd = 0
+            dlnkap_dlnT = 0
+         else
+            call kap_get( &
+                 s% kap_handle, s% species, s% chem_id, s% net_iso, xa, &
+                 log10(Rho), lnT/ln10, &
+                 lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+                 eta, d_eta_dlnRho, d_eta_dlnT, &
+                 kap_fracs, opacity, dlnkap_dlnd, dlnkap_dlnT, dlnkap_dxa, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'failed in kap_get in eval_gradT'
+               return
+            end if
+         end if
+         
+         cgrav = standard_cgrav
+         scale_height = P/(rho*cgrav/pow2(r))
+         if (s% alt_scale_height_flag) then
+            scale_height2 = sqrt(P/cgrav)/rho
+            if (scale_height2 < scale_height) then
+               scale_height = scale_height2
+            end if
+         end if
+         
+         gradr = P*opacity*L / (16*pi*clight*m*cgrav*crad*pow4(T)/3d0)
+         
+         call get_gradT_newer(s, s% MLT_option, &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            ih1, x, cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
+            gradT, mixing_type, ierr)
+            
+      end subroutine eval_gradT_newer
+      
+            
       subroutine eval_gradT( &
             s, zbar, x, y, xa, rho, m, mstar, r, T, lnT, L, P, &
             chiRho, chiT, Cp, grada, &

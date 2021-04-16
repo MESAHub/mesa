@@ -316,6 +316,8 @@
          
          include 'formats'
          
+         stop 'Get_results_new'
+         
          call Get_results(s, k, &
             cgrav, m, mstar, r, L, xh, &            
             T, rho, P, chiRho, chiT, Cp, opacity, grada, &            

@@ -65,6 +65,7 @@
             call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
             return
          end if
+         stop 'set_mlt_vars'
          if (s% compare_to_mlt_info_newer) then
             call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
             if (ierr /= 0) return

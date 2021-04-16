@@ -452,6 +452,8 @@
             d_Gamma_term_dvb(nvbs)
 
          include 'formats'
+         
+         if (kz /= 0) stop 'Get_results'
 
          !test_partials = (kz == ss% solver_test_partials_k)
          test_partials = .false.
