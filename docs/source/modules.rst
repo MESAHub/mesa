@@ -50,6 +50,18 @@ subsidiary controls.
    atm/mapping
    atm/structure
 
+.. _auto_diff:
+
+Automatic Differentiation (``auto_diff``)
+=========================================
+
+The ``auto_diff`` module provides Fortran derived types that support
+automatic calculation of analytic derivatives using the chain rule.
+
+.. toctree::
+
+   auto_diff/overview
+
 
 .. _chem:
 
