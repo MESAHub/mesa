@@ -65,7 +65,6 @@
             call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
             return
          end if
-         stop 'set_mlt_vars'
          if (s% compare_to_mlt_info_newer) then
             call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
             if (ierr /= 0) return
@@ -675,8 +674,6 @@
             normal_mlt_gradT_factor = min(1d0, normal_mlt_gradT_factor)
             normal_mlt_gradT_factor = max(0d0, normal_mlt_gradT_factor)
          end if
-         
-         stop 'test_do1_mlt_2'
 
          call do1_mlt_eval(s, k, &
             s% cgrav(k), m, mstar, r, L, xh_face, &            

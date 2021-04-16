@@ -230,7 +230,6 @@
             end if            
          end if
          
-         write(*,*) 'mlt_get_results do1_mlt_eval call Get_results'
          call Get_results(s, k, &
             cgrav, m, mstar, r, L, X, &            
             T_face, rho_face, P_face, &
@@ -276,8 +275,8 @@
             if (s% stop_for_bad_nums) stop 'do1_mlt_eval'
          end if
          
-         !if (k > 0 .and. s% compare_to_mlt_get_new) then
-         if (k > 0 .and. s% compare_to_mlt_get_new .and. k==135) then
+         if (k > 0 .and. s% compare_to_mlt_get_new) then
+         !if (k > 0 .and. s% compare_to_mlt_get_new .and. k==135) then
             okay = .true.
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
@@ -453,8 +452,6 @@
             d_Gamma_term_dvb(nvbs)
 
          include 'formats'
-         
-         if (kz /= 0) stop 'Get_results'
 
          !test_partials = (kz == ss% solver_test_partials_k)
          test_partials = .false.
