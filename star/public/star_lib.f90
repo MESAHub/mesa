@@ -2422,40 +2422,6 @@
       end subroutine star_set_dm_bar
       
       
-      subroutine star_adjust_gradT_fraction(id, k, f)
-         ! replace gradT by combo of grada_at_face and gradr
-         ! s% gradT(k) = f*s% grada_at_face(k) + (1-f)*s% gradr(k)
-         ! and fixup other info that depends on this (e.g. partials)
-         use mlt_info, only: adjust_gradT_fraction
-         integer, intent(in) :: id, k        
-         real(dp), intent(in) :: f
-         integer :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) then
-            return
-         end if
-         call adjust_gradT_fraction(s, k, f)
-      end subroutine star_adjust_gradT_fraction
-
-      
-      ! call this if you change gradT
-      subroutine star_adjust_gradT_excess(id, k)
-         ! adjust efficiency of energy transport
-         use mlt_info, only: adjust_gradT_excess
-         integer, intent(in) :: id, k        
-         integer :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) then
-            return
-         end if
-         call adjust_gradT_excess(s, k)
-      end subroutine star_adjust_gradT_excess
-      
-      
       subroutine star_remove_center_at_cell_k(id, k, ierr)
          use remove_shells, only: do_remove_center_at_cell_k
          integer, intent(in) :: id, k

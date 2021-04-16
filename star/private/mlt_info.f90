@@ -30,15 +30,15 @@
       use const_def
       use num_lib
       use utils_lib
-      use mlt_get_results, only: do1_mlt_eval, Get_results
+      use mlt_get_results, only: do1_mlt_eval
       use auto_diff_support, only: wrap
 
       implicit none
 
       private
-      public :: set_mlt_vars, do1_mlt, set_grads, &
-         set_gradT_excess_alpha, adjust_gradT_fraction, adjust_gradT_excess, &
-         switch_to_no_mixing, switch_to_radiative, check_for_redo_MLT
+      public :: &
+         set_mlt_vars, do1_mlt, set_grads, switch_to_radiative, check_for_redo_MLT
+         
 
       logical, parameter :: dbg = .false.
       integer, parameter :: kdbg = -1
@@ -675,6 +675,8 @@
             normal_mlt_gradT_factor = min(1d0, normal_mlt_gradT_factor)
             normal_mlt_gradT_factor = max(0d0, normal_mlt_gradT_factor)
          end if
+         
+         stop 'test_do1_mlt_2'
 
          call do1_mlt_eval(s, k, &
             s% cgrav(k), m, mstar, r, L, xh_face, &            
@@ -839,7 +841,8 @@
             integer, intent(out) :: ierr
             logical, parameter :: just_get_gradr = .true.
             include 'formats'
-
+            
+            stop 'get_mlt_eval_gradr_info'
             call do1_mlt_eval(s, k, &
                s% cgrav(k), m, mstar, r, L, xh_face, &            
                T_face, rho_face, P_face, &
@@ -1383,6 +1386,7 @@
       subroutine switch_to_radiative(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         call switch_to_no_mixing(s,k)
          s% gradT(k) = s% gradr(k)
          s% d_gradT_dlnd00(k) = s% d_gradr_dlnd00(k)
          s% d_gradT_dlnT00(k) = s% d_gradr_dlnT00(k)

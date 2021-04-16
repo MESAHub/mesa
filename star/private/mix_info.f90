@@ -798,11 +798,15 @@
 
 
       subroutine set_use_gradr(s,k)
-         use mlt_info
+         use mlt_info, only: switch_to_radiative
+         use mlt_info_newer, only: switch_to_radiative_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         call switch_to_no_mixing(s,k)
-         call switch_to_radiative(s,k)
+         if (s% using_mlt_info_newer) then
+            call switch_to_radiative_newer(s,k)
+         else
+            call switch_to_radiative(s,k)
+         end if
       end subroutine set_use_gradr
 
 

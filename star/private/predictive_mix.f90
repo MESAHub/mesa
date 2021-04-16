@@ -690,7 +690,8 @@ contains
 
     use eos_def
     use micro
-    use mlt_info
+    use mlt_info, only: do1_mlt
+    use mlt_info_newer, only: do1_mlt_newer
 
     type(star_info), pointer :: s
     integer, intent(in)      :: k_bot_mz
@@ -732,6 +733,7 @@ contains
     real(dp) :: w
     real(dp) :: rho_face_save(s%nz)
     integer  :: op_err
+    logical  :: make_gradr_sticky_in_solver_iters
 
     ! Evaluate abundance data
 
@@ -815,9 +817,13 @@ contains
        s%rho_face(k) = w*exp(s%lnd(k)) + (1._dp-w)*exp(s%lnd(k-1))
 
        ! Evaluate mixing coefficients etc.
-
-       call do1_mlt(s, k, s% alpha_mlt(k), 0._dp, &
-            -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, op_err)
+       
+       if (s% using_mlt_info_newer) then
+          call do1_mlt_newer(s, k, s% alpha_mlt(k), make_gradr_sticky_in_solver_iters, op_err)
+       else
+          call do1_mlt(s, k, s% alpha_mlt(k), 0._dp, &
+               -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, op_err)
+       end if
        if (op_err /= 0) stop 'non-zero op_err'
 
        D(k) = s%mlt_D(k)
@@ -868,8 +874,12 @@ contains
 
        s%rho_face(k) = rho_face_save(k)
 
-       call do1_mlt(s, k, s% alpha_mlt(k), -1._dp, &
+       if (s% using_mlt_info_newer) then
+          call do1_mlt_newer(s, k, s% alpha_mlt(k), make_gradr_sticky_in_solver_iters, op_err)
+       else
+          call do1_mlt(s, k, s% alpha_mlt(k), -1._dp, &
             -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, op_err)
+       end if
        if (op_err /= 0) stop 'non-zero op_err'
 
     end do restore_face_loop

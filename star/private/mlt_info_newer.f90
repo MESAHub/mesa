@@ -64,8 +64,9 @@
       implicit none
 
       private
-      public :: set_mlt_vars_newer, do1_mlt_newer, set_grads, &
-         switch_to_radiative_newer, check_for_redo_MLT
+      public :: set_mlt_vars_newer, set_grads_newer, do1_mlt_newer, &
+         switch_to_radiative_newer, check_for_redo_MLT_newer, &
+         set_gradT_excess_alpha_newer, adjust_gradT_fraction_newer, adjust_gradT_excess_newer
 
       contains
 
@@ -82,7 +83,7 @@
          ierr = 0
          !write(*,*) 'set_mlt_vars_newer'
          if (s% doing_timing) call start_time(s, time0, total)
-         call set_gradT_excess_alpha(s, ierr)
+         call set_gradT_excess_alpha_newer(s, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'set_gradT_excess_alpha failed', k
             return
@@ -222,7 +223,7 @@
             rho_face = get_rho_face(s,k)
             s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*pow2(s%r(k))*rho_face%val)
 
-            call adjust_gradT_fraction(s, k, grada_face_ad, gradr_ad)         
+            call adjust_gradT_fraction_newer(s, k, grada_face_ad, gradr_ad)         
             if (s% mlt_mixing_type(k) /= no_mixing .and. &
                 s% mlt_option /= 'none' .and. abs(s% gradr(k)) > 0d0) then
                s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k)) ! C&G 14.109
@@ -246,7 +247,7 @@
       end subroutine do1_mlt_newer
 
 
-      subroutine adjust_gradT_fraction(s, k, grada_face_ad, gradr_ad)
+      subroutine adjust_gradT_fraction_newer(s, k, grada_face_ad, gradr_ad)
          ! replace gradT by combo of grada_face and gradr
          ! then check excess
          use eos_def
@@ -261,12 +262,12 @@
             s% gradT(k) = s% gradT_ad(k)%val
          end if
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! gradT_excess
-         call adjust_gradT_excess(s, k, grada_face_ad)
+         call adjust_gradT_excess_newer(s, k, grada_face_ad)
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! new gradT_excess from adjusted gradT
-      end subroutine adjust_gradT_fraction
+      end subroutine adjust_gradT_fraction_newer
 
 
-      subroutine adjust_gradT_excess(s, k, grada_face_ad)
+      subroutine adjust_gradT_excess_newer(s, k, grada_face_ad)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: grada_face_ad
@@ -289,10 +290,10 @@
          s% gradT_ad(k) = alfa*s% gradT_ad(k) + beta*grada_face_ad
          s% gradT(k) = s% gradT_ad(k)%val
          s% gradT_excess_effect(k) = beta
-      end subroutine adjust_gradT_excess
+      end subroutine adjust_gradT_excess_newer
 
 
-      subroutine set_grads(s, ierr)
+      subroutine set_grads_newer(s, ierr)
          use chem_def, only: chem_isos
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -411,7 +412,7 @@
             if (ierr /= 0) return
          end subroutine do_work_arrays
 
-      end subroutine set_grads
+      end subroutine set_grads_newer
 
 
       subroutine switch_to_radiative_newer(s,k)
@@ -431,18 +432,7 @@
       end subroutine switch_to_radiative_newer
 
 
-      subroutine switch_to_no_mixing_newer(s,k)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         s% mlt_mixing_type(k) = no_mixing
-         s% mlt_mixing_length(k) = 0
-         s% mlt_D(k) = 0
-         s% mlt_cdc(k) = 0d0
-         if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0d0
-      end subroutine switch_to_no_mixing_newer
-
-
-      subroutine set_gradT_excess_alpha(s, ierr)
+      subroutine set_gradT_excess_alpha_newer(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          ierr = 0
@@ -451,10 +441,10 @@
             return
          end if
          s% gradT_excess_alpha = 1d0
-      end subroutine set_gradT_excess_alpha
+      end subroutine set_gradT_excess_alpha_newer
 
 
-      subroutine check_for_redo_MLT(s, nzlo, nzhi, ierr)
+      subroutine check_for_redo_MLT_newer(s, nzlo, nzhi, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
@@ -556,7 +546,7 @@
          end subroutine redo1_mlt_newer
 
 
-      end subroutine check_for_redo_MLT
+      end subroutine check_for_redo_MLT_newer
 
 
       end module mlt_info_newer

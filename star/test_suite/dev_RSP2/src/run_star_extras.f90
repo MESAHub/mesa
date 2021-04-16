@@ -33,8 +33,8 @@
       include 'test_suite_extras_def.inc'
       include 'multi_stars_extras_def.inc'
 
-      integer :: TDC_num_periods
-      real(dp) :: TDC_period, time_started
+      integer :: RSP2_num_periods
+      real(dp) :: RSP2_period, time_started
             
       contains
 
@@ -66,7 +66,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (.not. s% TDC_flag) return
+         if (.not. s% RSP2_flag) return
          if (s% x_integer_ctrl(1) <= 0) return
          ! check_cycle_completed when v(1) goes from positive to negative
          if (s% v(1)*s% v_start(1) > 0d0 .or. s% v(1) > 0d0) return
@@ -74,33 +74,33 @@
          ! either start of 1st cycle, or end of current
          if (time_started == 0) then
             time_started = s% time
-            write(*,*) 'TDC first maximum radius, period calculations start at model, day', &
+            write(*,*) 'RSP2 first maximum radius, period calculations start at model, day', &
                s% model_number, s% time/(24*3600)
             return
          end if
-         TDC_num_periods = TDC_num_periods + 1
+         RSP2_num_periods = RSP2_num_periods + 1
          time_ended = s% time
          !if (abs(s% v(1)-s% v_start(1)).gt.1.0d-10) & ! tweak the end time
          !   time_ended = time_started + (s% time - time_started)*s% v_start(1)/(s% v_start(1) - s% v(1))
-         TDC_period = time_ended - time_started
-         write(*,*) 'TDC period', TDC_num_periods, TDC_period/(24*3600)
+         RSP2_period = time_ended - time_started
+         write(*,*) 'RSP2 period', RSP2_num_periods, RSP2_period/(24*3600)
          time_started = time_ended
-         if (TDC_num_periods < s% x_integer_ctrl(1)) return
+         if (RSP2_num_periods < s% x_integer_ctrl(1)) return
          write(*,*)
          write(*,*)
          write(*,*)
          target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
-         write(*,*) 'TDC rel_run_E_err', rel_run_E_err
+         write(*,*) 'RSP2 rel_run_E_err', rel_run_E_err
          if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
-            write(*,*) '*** TDC BAD rel_run_E_error ***', &
+            write(*,*) '*** RSP2 BAD rel_run_E_error ***', &
             s% cumulative_energy_error/s% total_energy
-         else if (abs(TDC_period/(24*3600) - target_period) > 1d-2) then
-            write(*,*) '*** TDC BAD period ***', TDC_period/(24*3600) - target_period, &
-               TDC_period/(24*3600), target_period
+         else if (abs(RSP2_period/(24*3600) - target_period) > 1d-2) then
+            write(*,*) '*** RSP2 BAD period ***', RSP2_period/(24*3600) - target_period, &
+               RSP2_period/(24*3600), target_period
          else
-            write(*,*) 'TDC good match for period', &
-               TDC_period/(24*3600), target_period
+            write(*,*) 'RSP2 good match for period', &
+               RSP2_period/(24*3600), target_period
          end if
          write(*,*)
          write(*,*)
@@ -143,13 +143,13 @@
             stop 'extras_startup'
          end if
          
-         if (id == 2 .and. .not. s% TDC_flag) then
-            write(*,*) 'star id==2, but not TDC_flag'
+         if (id == 2 .and. .not. s% RSP2_flag) then
+            write(*,*) 'star id==2, but not RSP2_flag'
             stop 'extras_startup'
          end if
          
-         TDC_num_periods = 0
-         TDC_period = 0
+         RSP2_num_periods = 0
+         RSP2_period = 0
          time_started = 0
 
       end subroutine extras_startup
@@ -305,7 +305,7 @@
             do k=1,nz
                vals(k,1) = s_other% v(k)*1d-5
                vals(k,2) = s_other% Y_face(k)
-               if (s_other% TDC_flag) then
+               if (s_other% RSP2_flag) then
                   vals(k,3) = pow2(s_other% w(k))
                else if (s_other% RSP_flag) then
                   vals(k,3) = s_other% RSP_w(k)

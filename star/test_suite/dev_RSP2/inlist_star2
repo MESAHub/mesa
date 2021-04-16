@@ -1,11 +1,16 @@
 
 &star_job
    
-   load_saved_model_for_RSP = .true.
+   load_saved_model = .true.
+   change_initial_RSP2_flag = .true.
+   new_RSP2_flag = .true.
    save_model_when_terminate = .true.
-   save_model_filename = 'rsp_final.mod'
+   save_model_filename = 'tdc_final.mod'
+   
+   change_initial_v_flag = .true.
+   new_v_flag = .true.
 
-   pgstar_flag = .false.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -17,20 +22,28 @@
 
 &controls  
 
-! solver
-
-! RSP
-
-   RSP_fixed_Psurf = .true.
-   RSP_Psurf = 0d0   
-   RSP_initial_dt_factor = 1d0
+! solver   
+   RSP2_assume_HSE = .true.
+   RSP2_use_RSP_form_of_etrb_eqn = .true.
+   include_w_in_correction_limits = .false.
+   include_v_in_correction_limits = .false.
+   include_L_in_correction_limits = .false.
+   RSP2_alfad = 1d0
    
-   !RSP_report_undercorrections = .true.
-
+   steps_before_use_velocity_time_centering = 0
+   include_P_in_velocity_time_centering = .true.
+   include_L_in_velocity_time_centering = .true.
+   use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
+   use_fixed_Psurf_outer_BC = .true.
+   fixed_Psurf = 0
+   
+   alt_scale_height_flag = .false.
+   
 ! output
 
-   photo_directory = 'photos1'
-   log_directory = 'LOGS1'
+   photo_directory = 'photos2'
+   log_directory = 'LOGS2'
 
       photo_interval = 1000
       !profile_interval = 1
@@ -41,6 +54,13 @@
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 50
+
+      !photo_interval = 10
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
+
+      !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
@@ -75,7 +95,7 @@
       
       !solver_test_eos_partials = .true.
       !solver_test_kap_partials = .true.
-      !solver_test_nTDC_partials = .true.
+      !solver_test_nRSP2_partials = .true.
       !solver_test_atm_partials = .true.
 
       !report_why_dt_limits = .true.
@@ -104,8 +124,7 @@
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.
       !report_bad_negative_xa = .true.
-      
-      !trace_k = 0
+
 
 / ! end of controls namelist
 
@@ -114,11 +133,14 @@
 
    !pause = .true.
    !pause_interval = 100
-   !pgstar_interval = 1
+   pgstar_interval = 2 ! 10
    
    !Grid2_file_flag = .true.
-   Grid2_file_dir = 'png1'
-   Grid2_file_prefix = 'RSP'
+   Grid2_file_dir = 'png2'
+   Grid2_file_prefix = 'RSP2'
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
+   
+   Profile_Panels1_xmin = -101D0
+   Profile_Panels1_xmax = -101D0
 
 / ! end of pgstar namelist

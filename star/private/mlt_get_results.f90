@@ -230,6 +230,7 @@
             end if            
          end if
          
+         write(*,*) 'mlt_get_results do1_mlt_eval call Get_results'
          call Get_results(s, k, &
             cgrav, m, mstar, r, L, X, &            
             T_face, rho_face, P_face, &
