@@ -377,9 +377,9 @@
             D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
             Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80            
             ! Zeta must be >= 0 and <= 1
-            if (is_bad(Zeta%val) .or. Zeta < 0d0) then
+            if (is_bad(Zeta%val) .or. Zeta < 1d-12) then
                Zeta = 0d0
-            else if (Zeta > 1d0) then
+            else if (Zeta > 1d0-1d-12) then
                Zeta = 1d0
             end if            
             gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
@@ -388,6 +388,9 @@
             if (k > 0) then
                s% xtra1_array(k) = conv_vel%val
                s% xtra2_array(k) = gradT%val
+            end if
+            if (k == -121 .and. s% solver_iter == 3) then
+               write(*,2) 'newer gradT Zeta gradr grada', k, gradT%val, Zeta%val, gradr%val, grada%val
             end if
          end subroutine set_MLT   
 

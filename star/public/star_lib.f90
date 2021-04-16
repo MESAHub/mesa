@@ -3053,6 +3053,19 @@
          if (ierr /= 0) return
          star_get_history_output_by_id = star_get_history_output(s, name)
       end function star_get_history_output_by_id
+      
+      
+      subroutine star_set_mlt_vars(id, nzlo, nzhi, ierr)
+         use mlt_info, only: set_mlt_vars
+         use star_def
+         integer, intent(in) :: id ! id for star         
+         integer, intent(in) :: nzlo, nzhi ! range of cell numbers   
+         integer, intent(inout) :: ierr
+         type (star_info), pointer :: s         
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return                  
+         call set_mlt_vars(s, nzlo, nzhi, ierr)
+      end subroutine star_set_mlt_vars
 
 
       subroutine star_do_garbage_collection(id, ierr)

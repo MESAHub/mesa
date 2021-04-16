@@ -1582,10 +1582,10 @@
             !   a0*Gamma*Gamma/(1+Gamma*(1+a0*Gamma)) ! C&G, eq. (14.78)
             
             ! Zeta must be >= 0 and < 1
-            if (Zeta < 0d0) then
+            if (Zeta < 1d-12) then
                Zeta = 0
                d_Zeta_dvb = 0
-            else if (Zeta >= 1d0) then
+            else if (Zeta >= 1d0-1d-12) then
                Zeta = 1d0
                d_Zeta_dvb = 0
             end if
@@ -1598,6 +1598,9 @@
                         (grada - gradr)*d_Zeta_dvb
 
             
+            if (kz == -121 .and. ss% solver_iter == 3) then
+               write(*,2) 'old gradT Zeta gradr grada', kz, gradT, Zeta, gradr, grada
+            end if
 
             if (test_partials) then
                ss% solver_test_partials_val = gradT
