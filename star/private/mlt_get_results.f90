@@ -313,7 +313,11 @@
             okay = .true.
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
-               call check_vals(alt_mlt_basics(j), mlt_basics(j), 1d-6, 1d-3, mlt_results_str(j))
+               if (j == mlt_gradT .or. j == mlt_gradr .or. j == mlt_gradL) then
+                  call check_vals(alt_mlt_basics(j), mlt_basics(j), 1d-2, 1d-2, mlt_results_str(j))
+               else
+                  call check_vals(alt_mlt_basics(j), mlt_basics(j), 1d-1, 1d-1, mlt_results_str(j))
+               end if
             end do
             if (.not. okay) then
                write(*,4) trim(MLT_option) // ' k, alt_mixing_type, mixing_type', k, alt_mixing_type, mixing_type

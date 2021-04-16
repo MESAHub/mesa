@@ -1,7 +1,3 @@
-do_one 16M_predictive_mix "termination code: xa_central_lower_limit" "tams.mod" auto
-do_one hot_cool_wind "all values are within tolerance" "final.mod" auto                                
-do_one make_env "stop because star_age >= max_age" "env.mod" skip 
-do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
 do_one make_planets "stop because star_age >= max_age"  "planet_evolve_1.0_MJ_10.0_ME_2.0_RJ.mod" auto
 do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
 
