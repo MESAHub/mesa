@@ -766,8 +766,6 @@
                gradT, mixing_type, ierr)    
             return     
          end if
-         
-         stop 'pre_ms_model'
                   
          Cv = Cp
          tau = 1

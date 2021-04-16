@@ -34,7 +34,7 @@
       implicit none
 
       private
-      public :: do1_mlt_eval, Get_results
+      public :: do1_mlt_eval
 
       logical, parameter :: dbg = .false.
       integer, parameter :: kdbg = -1
@@ -44,7 +44,7 @@
       contains
 
 
-      subroutine do1_mlt_eval(s, k, &  ! k=0 is valid
+      subroutine do1_mlt_eval(s, k, &  ! k=0 is valid       called from mlt_info (k > 0) and pre_ms_model (k == 0)
             cgrav, m, mstar, r, L, X, &            
             T_face, rho_face, P_face, &
             chiRho_face, chiT_face, &
@@ -73,7 +73,8 @@
             max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
          use mlt_get_results_new, only: do1_mlt_eval_new
-         use star_utils, only: unwrap_mlt
+         use mlt_get_results_newer, only: do1_mlt_eval_newer
+         use star_utils
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: &
@@ -114,6 +115,9 @@
             alt_mlt_partials(num_mlt_partials, num_mlt_results)
          logical :: okay
          integer :: alt_mixing_type, j, i
+         type(auto_diff_real_star_order1) :: &
+            gradr_ad, grada_ad, scale_height_ad, &
+            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad
          include 'formats'
 
          if (s% use_other_mlt) then
@@ -156,39 +160,68 @@
          mlt_partials = 0
          
          
-         if (k > 0 .and. (s% using_mlt_get_new .or. s% compare_to_mlt_get_new)) then
-            call do1_mlt_eval_new(s, k, & ! k=0 is valid
-               cgrav, m, mstar, r, L, X, &            
-               T_face, rho_face, P_face, &
-               chiRho_face, chiT_face, &
-               Cp_face, opacity_face, grada_face, &            
-               alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
-               T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-               chiRho_for_partials_00, chiT_for_partials_00, &
-               chiRho_for_partials_m1, chiT_for_partials_m1, &
-               chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-               chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-               chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-               chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-               Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-               Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-               opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-               opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-               grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-               grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
-               gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-               alpha_semiconvection, semiconvection_option, &
-               thermohaline_coeff, thermohaline_option, &
-               dominant_iso_for_thermohaline, &
-               mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
-               MLT_option, Henyey_y_param, Henyey_nu_param, &
-               normal_mlt_gradT_factor, &
-               max_conv_vel, dt, tau, just_gradr, &
-               alt_mixing_type, gradT_val, ierr)
+         if (k > 0 .and. &
+               (s% using_mlt_get_new .or. s% compare_to_mlt_get_new .or. &
+                s% using_mlt_get_newer .or. s% compare_to_mlt_get_newer)) then
+                
+            if (s% using_mlt_get_newer .or. s% compare_to_mlt_get_newer) then
+               gradr_ad = gradr_factor*get_gradr_face(s,k)
+               grada_ad = get_grada_face(s,k)
+               scale_height_ad = get_scale_height_face(s,k)
+               call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
+                  gradr_ad, grada_ad, scale_height_ad, mixing_length_alpha, alt_mixing_type, &
+                  gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+            else
+               call do1_mlt_eval_new(s, k, & ! k=0 is valid
+                  cgrav, m, mstar, r, L, X, &            
+                  T_face, rho_face, P_face, &
+                  chiRho_face, chiT_face, &
+                  Cp_face, opacity_face, grada_face, &            
+                  alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
+                  T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
+                  chiRho_for_partials_00, chiT_for_partials_00, &
+                  chiRho_for_partials_m1, chiT_for_partials_m1, &
+                  chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
+                  chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
+                  chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
+                  chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
+                  Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
+                  Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
+                  opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
+                  opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
+                  grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
+                  grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
+                  gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
+                  alpha_semiconvection, semiconvection_option, &
+                  thermohaline_coeff, thermohaline_option, &
+                  dominant_iso_for_thermohaline, &
+                  mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
+                  MLT_option, Henyey_y_param, Henyey_nu_param, &
+                  normal_mlt_gradT_factor, &
+                  max_conv_vel, dt, tau, just_gradr, &
+                  alt_mixing_type, gradT_val, ierr)
+            end if
             if (ierr /= 0) then
                write(*,2) 'failed in do1_mlt_eval_newer', k
                stop 'do1_mlt_eval_new'
             end if
+            
+            ! convert newer to new
+            if (s% using_mlt_get_newer .or. s% compare_to_mlt_get_newer) then
+               s% gradT_ad(k) = gradT_ad
+               s% gradr_ad(k) = gradr_ad
+               s% mlt_vc_ad(k) = mlt_vc_ad
+               s% grada_face_ad(k) = grada_ad
+               s% gradL_ad(k) = grada_ad + gradL_composition_term
+               s% scale_height_ad(k) = scale_height_ad
+               s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
+               s% mlt_D_ad(k) = D_ad
+               s% mlt_Gamma_ad(k) = Gamma_ad
+               s% Y_face_ad(k) = gradT_ad - grada_ad
+               mixing_type = alt_mixing_type
+            end if
+            
+            ! convert new to old
             call unwrap_mlt(s% gradT_ad(k), alt_mlt_basics(mlt_gradT), alt_mlt_partials(:,mlt_gradT))
             call unwrap_mlt(s% gradr_ad(k), alt_mlt_basics(mlt_gradr), alt_mlt_partials(:,mlt_gradr))
             call unwrap_mlt(s% gradL_ad(k), alt_mlt_basics(mlt_gradL), alt_mlt_partials(:,mlt_gradL))
@@ -197,8 +230,8 @@
             call unwrap_mlt(s% mlt_vc_ad(k), alt_mlt_basics(mlt_convection_velocity), alt_mlt_partials(:,mlt_convection_velocity))
             call unwrap_mlt(s% mlt_D_ad(k), alt_mlt_basics(mlt_D), alt_mlt_partials(:,mlt_D))
             call unwrap_mlt(s% mlt_Gamma_ad(k), alt_mlt_basics(mlt_gamma), alt_mlt_partials(:,mlt_gamma))
-            if (s% using_mlt_get_new) then
-               mixing_type = alt_mixing_type
+            
+            if (s% using_mlt_get_new .or. s% using_mlt_get_newer) then ! check for is_bad
                mlt_basics = alt_mlt_basics
                mlt_partials = alt_mlt_partials
                okay = .true.
@@ -227,7 +260,8 @@
                   stop 'using_mlt_get_new'
                end if
                return
-            end if            
+            end if      
+                  
          end if
          
          call Get_results(s, k, &
@@ -275,8 +309,7 @@
             if (s% stop_for_bad_nums) stop 'do1_mlt_eval'
          end if
          
-         if (k > 0 .and. s% compare_to_mlt_get_new) then
-         !if (k > 0 .and. s% compare_to_mlt_get_new .and. k==135) then
+         if (k > 0 .and. (s% compare_to_mlt_get_new .or. s% compare_to_mlt_get_newer)) then
             okay = .true.
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
@@ -284,9 +317,9 @@
             end do
             if (.not. okay) then
                write(*,4) trim(MLT_option) // ' k, alt_mixing_type, mixing_type', k, alt_mixing_type, mixing_type
-               stop 'compare_to_mlt_get_new'
+               stop 'do1_mlt_eval'
             end if
-            return ! don't bother with checking partials since trust newer for those
+            if (s% compare_to_mlt_get_newer) return ! don't bother with checking partials since trust newer for those
             do j=1,num_mlt_results
                if (j == mlt_debug) cycle
                do i=1,num_mlt_partials
@@ -296,7 +329,7 @@
             end do
             if (.not. okay) then
                write(*,4) trim(MLT_option) // ' k, alt_mixing_type, mixing_type', k, alt_mixing_type, mixing_type
-               stop 'compare_to_mlt_get_new'
+               stop 'do1_mlt_eval'
             end if
          end if
          

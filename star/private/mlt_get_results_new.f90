@@ -316,9 +316,9 @@
          
          include 'formats'
          
-         stop 'Get_results_new'
+         stop 'should not be calling Get_results_new'
          
-         call Get_results(s, k, &
+         call do_Get_results_new(s, k, &
             cgrav, m, mstar, r, L, xh, &            
             T, rho, P, chiRho, chiT, Cp, opacity, grada, &            
             a_00, a_m1, &
@@ -377,7 +377,7 @@
       end subroutine Get_results_new
       
 
-      subroutine Get_results(ss, kz, &
+      subroutine do_Get_results_new(ss, kz, &
             cgrav, m, mstar, r, L, xh, &            
             T, rho, P, chiRho, chiT, Cp, opacity, grada, &            
             a_00, a_m1, &
@@ -2152,7 +2152,7 @@
          end subroutine revise_using_cv_var_variable
 
 
-      end subroutine Get_results
+      end subroutine do_Get_results_new
 
 
       end module mlt_get_results_new

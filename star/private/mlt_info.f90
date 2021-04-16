@@ -37,7 +37,8 @@
 
       private
       public :: &
-         set_mlt_vars, do1_mlt, set_grads, switch_to_radiative, check_for_redo_MLT
+         set_mlt_vars, do1_mlt, set_grads, switch_to_radiative, check_for_redo_MLT, &
+         set_gradT_excess_alpha
          
 
       logical, parameter :: dbg = .false.
@@ -61,13 +62,13 @@
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
          ierr = 0
-         if (s% using_mlt_info_newer) then
+         if (s% using_mlt_info_new .or. s% compare_to_mlt_info_new .or. &
+             s% using_mlt_get_new .or. s% compare_to_mlt_get_new) &
+            stop 'no more using_mlt_info/get_new or compare_to_mlt_info/get_new'
+         if (s% using_mlt_info_newer .or. s% compare_to_mlt_info_newer) then
             call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
-            return
-         end if
-         if (s% compare_to_mlt_info_newer) then
-            call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
-            if (ierr /= 0) return
+            if (s% using_mlt_info_newer) return
+            ! compare is done by do1_mlt_2
          end if
          if (dbg) write(*, *) 'doing set_mlt_vars'
          gradL_composition_term = -1d0
@@ -201,7 +202,7 @@
          include 'formats'
          ierr = 0
 
-         if (s% compare_to_mlt_get_newer) then ! save newer results
+         if (s% compare_to_mlt_info_newer) then ! save newer results
             mixing_type = s% mlt_mixing_type(k)
             gradT = s% gradT(k)
             gradr = s% gradr(k)
@@ -219,7 +220,7 @@
             make_gradr_sticky_in_solver_iters, ierr)
          if (ierr /= 0) return
             
-         if (s% compare_to_mlt_get_newer) then
+         if (s% compare_to_mlt_info_newer) then
             okay = .true.
             ! don't bother with checking partials since trust newer for those
             call compare(gradT, s% gradT(k), 'gradT')
@@ -227,14 +228,16 @@
             call compare(mlt_vc, s% mlt_vc(k), 'mlt_vc')
             call compare(gradL, s% gradL(k), 'gradL')
             call compare(scale_height, s% scale_height(k), 'scale_height')
-            call compare(mlt_mixing_length, s% mlt_mixing_length(k), 'mlt_mixing_length')
-            call compare(mlt_D, s% mlt_D(k), 'mlt_D')
-            call compare(mlt_Gamma, s% mlt_Gamma(k), 'mlt_Gamma')
-            if (mixing_type /= s% mlt_mixing_type(k)) &
-               write(*,4) 'mixing type newer new', k, mixing_type, s% mlt_mixing_type(k)
+            call compare(mlt_mixing_length, s% mlt_mixing_length(k), 'mixing_length')
+            call compare(mlt_D, s% mlt_D(k), 'D')
+            call compare(mlt_Gamma, s% mlt_Gamma(k), 'Gamma')
+            if (mixing_type /= s% mlt_mixing_type(k)) then
+               write(*,4) 'mixing type newer old', k, mixing_type, s% mlt_mixing_type(k)
+               okay = .false.
+            end if
             if (.not. okay) then
-               write(*,3) trim(s% MLT_option) // ' mixing_type', k, mixing_type
-               stop 'compare_to_mlt_newer'
+               write(*,4) trim(s% MLT_option) // ' mixing_type', k, mixing_type, s% solver_iter
+               stop 'do1_mlt_2 compare_to_mlt_newer'
             end if
          end if
          
@@ -243,7 +246,7 @@
          subroutine compare(new, old, str)
             real(dp) :: new, old
             character (len=*) :: str
-            call check_vals(new, old, 1d-6, 1d-3, str)
+            call check_vals(new, old, 1d-7, 1d-3, str)
          end subroutine compare
          
          subroutine check_vals(new, old, atol, rtol, str)
@@ -839,7 +842,6 @@
             logical, parameter :: just_get_gradr = .true.
             include 'formats'
             
-            stop 'get_mlt_eval_gradr_info'
             call do1_mlt_eval(s, k, &
                s% cgrav(k), m, mstar, r, L, xh_face, &            
                T_face, rho_face, P_face, &
