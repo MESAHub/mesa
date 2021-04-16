@@ -18,6 +18,7 @@ data/ @rjfarmer
 #docs/ 
 eos/ @fxt @aarondotter @jschwab @adamjermyn @evbauer
 gyre/ @rhdtownsend @warrickball
+hdfio5 @richtownsend
 interp_1d/ @rhdtownsend @adamjermyn
 interp_2d/ @rhdtownsend @adamjermyn
 kap/ @fxt @aarondotter @jschwab
