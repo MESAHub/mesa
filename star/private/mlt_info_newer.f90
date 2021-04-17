@@ -81,7 +81,7 @@
          integer, intent(out) :: ierr
          integer :: k, op_err
          integer(8) :: time0
-         real(dp) :: total
+         real(dp) :: total, gradL_composition_term
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
          ierr = 0
@@ -96,10 +96,16 @@
             write(*,*) 's% using_TDC .and. .not. s% have_mlt_vc'
             stop 'set_mlt_vars'
          end if
-!$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
+!$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters,gradL_composition_term) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             op_err = 0
-            call do1_mlt_newer(s, k, s% alpha_mlt(k), make_gradr_sticky_in_solver_iters, op_err)
+            if (s% use_Ledoux_criterion) then
+               gradL_composition_term = s% gradL_composition_term(k)
+            else
+               gradL_composition_term = 0d0
+            end if
+            call do1_mlt_newer(s, k, s% alpha_mlt(k), gradL_composition_term, &
+               make_gradr_sticky_in_solver_iters, op_err)
             if (op_err /= 0) then
                ierr = op_err
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
@@ -116,27 +122,26 @@
 
 
       subroutine do1_mlt_newer( &
-            s, k, mixing_length_alpha, make_gradr_sticky_in_solver_iters, ierr)
+            s, k, mixing_length_alpha, gradL_composition_term, &
+            make_gradr_sticky_in_solver_iters, ierr)
          use mlt_get_results_newer, only: do1_mlt_eval_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: mixing_length_alpha
+         real(dp), intent(in) :: mixing_length_alpha, gradL_composition_term
          logical, intent(out) :: make_gradr_sticky_in_solver_iters
          integer, intent(out) :: ierr
          real(dp), pointer :: vel(:)
-         real(dp) :: cs, gradL_composition_term, abs_du_div_cs, gradr_factor
+         real(dp) :: cs, abs_du_div_cs, gradr_factor
          integer :: i, mixing_type, k_T_max
          logical :: just_gradr
          type(auto_diff_real_star_order1) :: grada_face_ad, rho_face, &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, Gamma, D, scale_height
          include 'formats'
-         ierr = 0         
-         
-         if (s% use_Ledoux_criterion) then
-            gradL_composition_term = s% gradL_composition_term(k)
-         else
-            gradL_composition_term = 0d0
-         end if
+         ierr = 0    
+              
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'do1_mlt_newer', k, s% solver_iter
+            end if
          
          gradr_ad = get_gradr_face(s,k)
          grada_face_ad = get_grada_face_val(s,k)
@@ -196,8 +201,8 @@
          subroutine set_results
             include 'formats'
             
-            if (k==1579 .and. s% solver_iter == 0) then
-               write(*,3) 'mixing_type gradT', k, mixing_type, s% gradT_ad(k)%val
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'set_results newer mixing_type gradT', k, mixing_type, s% gradT_ad(k)%val
             end if
             
             if (mixing_type == no_mixing) then
@@ -542,7 +547,7 @@
             integer, intent(in) :: k
             real(dp), intent(in) :: dr
             integer, intent(out) :: ierr
-            real(dp) :: Hp, reduced_alpha
+            real(dp) :: Hp, reduced_alpha, gradL_composition_term
             logical :: make_gradr_sticky_in_solver_iters
             include 'formats'
             ierr = 0
@@ -551,7 +556,13 @@
             ! redo MLT with reduced alpha so mixing_length = dr
             Hp = s% scale_height(k)
             reduced_alpha = dr/Hp
-            call do1_mlt_newer(s, k, reduced_alpha, make_gradr_sticky_in_solver_iters, ierr)
+            if (s% use_Ledoux_criterion) then
+               gradL_composition_term = s% gradL_composition_term(k)
+            else
+               gradL_composition_term = 0d0
+            end if
+            call do1_mlt_newer(s, k, reduced_alpha, gradL_composition_term, &
+               make_gradr_sticky_in_solver_iters, ierr)
          end subroutine redo1_mlt_newer
 
 

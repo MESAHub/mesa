@@ -173,6 +173,10 @@
          
          compare_TDC_to_MLT = .false.
 
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,2) 'enter Get_results_newer k gradL_composition_term', k, gradL_composition_term
+            end if
+
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0          
@@ -209,6 +213,13 @@
             okay_to_use_TDC = .false.
          end if
          
+
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,2) 'Get_results_newer gradr gradL grada gradL_composition_term', k, &
+                  gradr%val, gradL%val, grada%val, gradL_composition_term
+            end if
+
+
          Lambda = mixing_length_alpha*scale_height
          if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
             ! this means TDC must do all types:
@@ -221,6 +232,12 @@
          else if (gradr > grada) then
             call set_semiconvection
          end if         
+         
+         if (k == -1266 .and. s% model_number == 2110 .and. s% solver_iter == 0) then
+            write(*,5) 'mlt newer k model iter mix_type gradr gradL grada', &
+               k, s% model_number, s% solver_iter, mixing_type, &
+               gradr%val, gradL%val, grada%val
+         end if
          
          if (D < s% remove_small_D_limit .or. is_bad(D%val)) then
             mixing_type = no_mixing

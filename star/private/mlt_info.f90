@@ -51,7 +51,6 @@
 
       subroutine set_mlt_vars(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
-         use mlt_info_newer, only: set_mlt_vars_newer
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
@@ -62,14 +61,6 @@
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
          ierr = 0
-         if (s% using_mlt_info_new .or. s% compare_to_mlt_info_new .or. &
-             s% using_mlt_get_new .or. s% compare_to_mlt_get_new) &
-            stop 'no more using_mlt_info/get_new or compare_to_mlt_info/get_new'
-         if (s% using_mlt_info_newer .or. s% compare_to_mlt_info_newer) then
-            call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
-            if (s% using_mlt_info_newer) return
-            ! compare is done by do1_mlt_2
-         end if
          if (dbg) write(*, *) 'doing set_mlt_vars'
          gradL_composition_term = -1d0
          opacity = -1d0
@@ -80,12 +71,19 @@
          P = -1d0
          xh = -1d0 
          if (s% doing_timing) call start_time(s, time0, total)
+         if (s% x_integer_ctrl(19) > 0) write(*,*) 'start set_mlt_vars'
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             op_err = 0
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'set_mlt_vars call do1_mlt_2', k
+            end if
             call do1_mlt_2(s, k, s% alpha_mlt(k), gradL_composition_term, &
                opacity, chiRho, chiT, Cp, grada, P, xh, &
-               make_gradr_sticky_in_solver_iters, op_err)
+               .false., make_gradr_sticky_in_solver_iters, op_err)
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'set_mlt_vars done do1_mlt_2', k
+            end if
             call wrap_mlt_ad(s,k)
             if (op_err /= 0) then
                ierr = op_err
@@ -98,18 +96,16 @@
             end if            
          end do
 !$OMP END PARALLEL DO
+         if (s% x_integer_ctrl(19) > 0) write(*,*) 'done set_mlt_vars'
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
       end subroutine set_mlt_vars
 
-
+      
+      ! this is only used by predictive_mix
       subroutine do1_mlt(s, k, mixing_length_alpha, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             ierr)
-         ! get convection info for point k
-         use eos_def
-         use chem_def, only: ih1
-         use mlt_info_newer, only: do1_mlt_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, &
@@ -118,15 +114,10 @@
             Cp_face_in, grada_face_in, P_face_in, xh_face_in
          integer, intent(out) :: ierr
          logical :: make_gradr_sticky_in_solver_iters
-         if (s% using_mlt_info_newer) then
-            call do1_mlt_newer(s, k, mixing_length_alpha, &
-               make_gradr_sticky_in_solver_iters, ierr)
-            return
-         end if
          call do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-            make_gradr_sticky_in_solver_iters, ierr)
+            .true., make_gradr_sticky_in_solver_iters, ierr)
          call wrap_mlt_ad(s,k)
       end subroutine do1_mlt
       
@@ -186,28 +177,44 @@
       subroutine do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-            make_gradr_sticky_in_solver_iters, ierr)
+            from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
          ! get convection info for point k
          !use mlt_lib
          use eos_def
          use chem_def, only: ih1
+         use mlt_info_newer, only: do1_mlt_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, &
             gradL_composition_term_in, opacity_face_in, &
             chiRho_face_in, chiT_face_in, &
             Cp_face_in, grada_face_in, P_face_in, xh_face_in
+         logical, intent(in) :: from_do1_mlt
          logical, intent(out) :: make_gradr_sticky_in_solver_iters
          integer, intent(out) :: ierr
          
-         real(dp) :: & ! for testing
+         real(dp) :: gradL_composition_term, & ! for testing
             gradT, gradr, mlt_vc, gradL, scale_height, mlt_mixing_length, mlt_D, mlt_Gamma
          integer :: mixing_type
          logical :: okay
          include 'formats'
          ierr = 0
 
-         if (s% compare_to_mlt_info_newer) then ! save newer results
+         if (s% using_mlt_info_newer .or. s% compare_to_mlt_info_newer) then
+            if (s% use_Ledoux_criterion .and. gradL_composition_term_in < 0) then
+               gradL_composition_term = s% gradL_composition_term(k)
+            else
+               gradL_composition_term = 0d0
+            end if
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'do1_mlt_2 call do1_mlt_newer gradL_composition_term', k, s% solver_iter, gradL_composition_term
+            end if
+            call do1_mlt_newer(s, k, mixing_length_alpha, gradL_composition_term, &
+               make_gradr_sticky_in_solver_iters, ierr)
+            if (ierr /= 0 .or. s% using_mlt_info_newer) return
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'do1_mlt_2 done do1_mlt_newer', k
+            end if
             mixing_type = s% mlt_mixing_type(k)
             gradT = s% gradT(k)
             gradr = s% gradr(k)
@@ -218,14 +225,24 @@
             mlt_D = s% mlt_D(k)
             mlt_Gamma = s% mlt_Gamma(k)
          end if
+
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'call test_do1_mlt_2', k
+            end if
          
          call test_do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-            make_gradr_sticky_in_solver_iters, ierr)
+            from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
          if (ierr /= 0) return
+         if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            write(*,3) 'done test_do1_mlt_2', k
+         end if
             
          if (s% compare_to_mlt_info_newer) then
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'compare_to_mlt_info_newer', k
+            end if
             okay = .true.
             ! don't bother with checking partials since trust newer for those
             ! just check gradT and mixing_type
@@ -242,6 +259,9 @@
                write(*,6) trim(s% MLT_option) // ' k model iter mixing_type newer old', &
                   k, s% model_number, s% solver_iter, mixing_type, s% mlt_mixing_type(k)
                stop 'mlt_info do1_mlt_2 compare_to_mlt_newer'
+            end if
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'done compare_to_mlt_info_newer', k
             end if
          end if
          
@@ -268,7 +288,7 @@
       subroutine test_do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-            make_gradr_sticky_in_solver_iters, ierr)
+            from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
          ! get convection info for point k
          !use mlt_lib
          use eos_def
@@ -279,6 +299,7 @@
             gradL_composition_term_in, opacity_face_in, &
             chiRho_face_in, chiT_face_in, &
             Cp_face_in, grada_face_in, P_face_in, xh_face_in
+         logical, intent(in) :: from_do1_mlt
          logical, intent(out) :: make_gradr_sticky_in_solver_iters
          integer, intent(out) :: ierr
 
@@ -551,18 +572,18 @@
 
          if (s% RTI_flag .and. tau_face > 0.667d0) then
             if (s% alpha_RTI(k) > 0d0) then ! RTI takes priority over MLT
-               call set_no_mixing
+               call set_no_mixing('alpha_RTI')
                return
             end if
          end if
          
          if (k == 1 .and. s% mlt_make_surface_no_mixing) then
-            call set_no_mixing
+            call set_no_mixing('mlt_make_surface_no_mixing')
             return
          end if
          
          if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
-            call set_no_mixing
+            call set_no_mixing('max_logT_for_mlt')
             return
          end if
          
@@ -575,7 +596,7 @@
             do i=k-1,1,-1
                cs = s% csound(i)
                if (vel(i+1) >= cs .and. vel(i) < cs) then
-                  call set_no_mixing
+                  call set_no_mixing('no_MLT_below_shock')
                   return
                end if
             end do
@@ -584,7 +605,7 @@
          if (s% no_MLT_below_T_max) then
             k_T_max = maxloc(s% T_start(1:nz),dim=1)
             if (k > k_T_max) then
-               call set_no_mixing
+               call set_no_mixing('no_MLT_below_T_max')
                return
             end if
          end if
@@ -599,7 +620,7 @@
          
          if (make_gradr_sticky_in_solver_iters) then
             if (s% fixed_gradr_for_rest_of_solver_iters(k)) then
-               call set_no_mixing
+               call set_no_mixing('make_gradr_sticky_in_solver_iters')
                return
             end if
          end if
@@ -712,6 +733,9 @@
             end if
             return
          end if
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,4) 'after do1_mlt_eval new mixing_type old', k, mixing_type, s% mlt_mixing_type(k)
+            end if
 
          s% mlt_mixing_type(k) = mixing_type
          s% mlt_mixing_length(k) = mlt_basics(mlt_Lambda)
@@ -1011,7 +1035,12 @@
 
          end subroutine show_stuff
 
-         subroutine set_no_mixing()
+         subroutine set_no_mixing(str)
+            character (len=*) :: str
+            include 'formats'
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'test_do1_mlt_2 set_no_mixing ' // trim(str), k
+            end if
             call get_mlt_eval_gradr_info(ierr)
             if (ierr /= 0) return
             s% mlt_mixing_type(k) = no_mixing

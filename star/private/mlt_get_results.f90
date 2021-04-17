@@ -168,6 +168,11 @@
                gradr_ad = gradr_factor*get_gradr_face(s,k)
                grada_ad = get_grada_face(s,k)
                scale_height_ad = get_scale_height_face(s,k)
+               
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,2) 'do1_mlt_eval call do1_mlt_eval_newer', k
+            end if
+
                call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
                   gradr_ad, grada_ad, scale_height_ad, mixing_length_alpha, alt_mixing_type, &
                   gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
@@ -259,6 +264,11 @@
                   write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
                   stop 'using_mlt_get_new'
                end if
+               
+            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+               write(*,3) 'do1_mlt_eval done do1_mlt_eval_newer mixing_type', k, mixing_type
+            end if
+            
                return
             end if      
                   
@@ -492,8 +502,6 @@
 
          !test_partials = (kz == ss% solver_test_partials_k)
          test_partials = .false.
-
-         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'enter Get_results'
       
          ierr = 0
          gradT_temp = 0
@@ -736,6 +744,12 @@
          if (debug) write(*,1) 'radiative_conductivity', radiative_conductivity
          d_rc_dvb = radiative_conductivity*(3d0*dT_dvb/T - dRho_dvb/rho - d_opacity_dvb/opacity)
          
+         if (kz == -1266 .and. ss% model_number == 2110 .and. ss% solver_iter == 0) then
+            write(*,5) 'mlt newer k model iter mix_type gradr gradL grada', &
+               kz, ss% model_number, ss% solver_iter, mixing_type, &
+               gradr, gradL, grada
+         end if
+         
          if (diff_grads <= 0d0) then ! not convective (Ledoux stable)    
             call set_no_mixing('6') ! also sets gradT = gradr    
             if (gradL_composition_term < 0) then ! composition unstable
@@ -795,11 +809,9 @@
             end if
             return            
          end if
-         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'Get_results before call set_convective_mixing', mixing_type
          
          call set_convective_mixing
          if (quit) return
-         if (kz==7 .and. ss% solver_iter==-5) write(*,*) 'Get_results after call set_convective_mixing', mixing_type
 
          ! Reduce gradr-grada
          if (ss% use_superad_reduction) then
@@ -1764,11 +1776,6 @@
             character (len=*), intent(in) :: str
             mixing_type = no_mixing
             gradT = gradr
-            if (is_bad(gradT)) then
-            !if (kz==135 .and. ss% solver_iter==2) then
-               write(*,*) 'set_no_mixing gradT ' // trim(str), gradT
-               !stop 'set_no_mixing'
-            end if
             mixing_type = no_mixing
             gradT = gradr
             d_gradT_dvb = d_gradr_dvb
