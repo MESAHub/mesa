@@ -1787,7 +1787,6 @@
          use report, only: do_report
          use hydro_vars, only: set_vars_if_needed
          use mlt_info, only: set_gradT_excess_alpha
-         use mlt_info_newer, only: set_gradT_excess_alpha_newer
          use solve_hydro, only: set_luminosity_by_category
          use star_utils, only: min_dr_div_cs, &
             total_angular_momentum, eval_Ledd
@@ -1831,11 +1830,7 @@
          if (failed('eval_Ledd ierr')) return
          
          if (.not. s% RSP_flag) then
-            if (s% using_mlt_info_newer) then
-               call set_gradT_excess_alpha_newer(s, ierr)
-            else
-               call set_gradT_excess_alpha(s, ierr)
-            end if
+            call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
          end if
 

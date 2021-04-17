@@ -107,9 +107,9 @@
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             ierr)
          ! get convection info for point k
-         !use mlt_lib
          use eos_def
          use chem_def, only: ih1
+         use mlt_info_newer, only: do1_mlt_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, &
@@ -118,6 +118,11 @@
             Cp_face_in, grada_face_in, P_face_in, xh_face_in
          integer, intent(out) :: ierr
          logical :: make_gradr_sticky_in_solver_iters
+         if (s% using_mlt_info_newer) then
+            call do1_mlt_newer(s, k, mixing_length_alpha, &
+               make_gradr_sticky_in_solver_iters, ierr)
+            return
+         end if
          call do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
@@ -223,14 +228,14 @@
          if (s% compare_to_mlt_info_newer) then
             okay = .true.
             ! don't bother with checking partials since trust newer for those
-            call compare(gradT, s% gradT(k), 'gradT')
-            call compare(gradr, s% gradr(k), 'gradr')
-            call compare(mlt_vc, s% mlt_vc(k), 'mlt_vc')
-            call compare(gradL, s% gradL(k), 'gradL')
-            call compare(scale_height, s% scale_height(k), 'scale_height')
-            call compare(mlt_mixing_length, s% mlt_mixing_length(k), 'mixing_length')
-            call compare(mlt_D, s% mlt_D(k), 'D')
-            call compare(mlt_Gamma, s% mlt_Gamma(k), 'Gamma')
+            call check_vals(gradT, s% gradT(k), 1d-2, 1d-2, 'gradT')
+            call check_vals(gradr, s% gradr(k), 1d-2, 1d-2, 'gradr')
+            call check_vals(gradL, s% gradL(k), 1d-2, 1d-2, 'gradL')
+            call check_vals(mlt_vc, s% mlt_vc(k), 1d-1, 1d-1, 'mlt_vc')
+            call check_vals(scale_height, s% scale_height(k), 1d-1, 1d-1, 'scale_height')
+            call check_vals(mlt_mixing_length, s% mlt_mixing_length(k), 1d-1, 1d-1, 'mixing_length')
+            call check_vals(mlt_D, s% mlt_D(k), 1d-1, 1d-1, 'D')
+            call check_vals(mlt_Gamma, s% mlt_Gamma(k), 1d-1, 1d-1, 'Gamma')
             if (mixing_type /= s% mlt_mixing_type(k)) then
                write(*,4) 'mixing type newer old', k, mixing_type, s% mlt_mixing_type(k)
                okay = .false.
@@ -242,12 +247,6 @@
          end if
          
          contains
-         
-         subroutine compare(new, old, str)
-            real(dp) :: new, old
-            character (len=*) :: str
-            call check_vals(new, old, 1d-7, 1d-3, str)
-         end subroutine compare
          
          subroutine check_vals(new, old, atol, rtol, str)
             character (len=*) :: str
@@ -264,8 +263,6 @@
             
          
       end subroutine do1_mlt_2
-
-
 
 
       subroutine test_do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
@@ -1250,6 +1247,7 @@
       subroutine set_grads(s, ierr)
          use chem_def, only: chem_isos
          use star_utils, only: smooth
+         use mlt_info_newer, only: set_grads_newer
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
@@ -1258,6 +1256,11 @@
          real(dp), pointer, dimension(:) :: dlnP, dlnd, dlnT
 
          include 'formats'
+         
+         if (s% using_mlt_info_newer) then
+            call set_grads_newer(s, ierr)
+            return
+         end if
 
          ierr = 0
          nz = s% nz
@@ -1383,8 +1386,13 @@
 
 
       subroutine switch_to_radiative(s,k)
+         use mlt_info_newer, only: switch_to_radiative_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         if (s% using_mlt_info_newer) then
+            call switch_to_radiative_newer(s,k)
+            return
+         end if
          call switch_to_no_mixing(s,k)
          s% gradT(k) = s% gradr(k)
          s% d_gradT_dlnd00(k) = s% d_gradr_dlnd00(k)
@@ -1418,6 +1426,7 @@
          use alloc
          use star_utils, only: get_Lrad_div_Ledd, after_C_burn
          use chem_def, only: ih1, ihe4
+         use mlt_info_newer, only: set_gradT_excess_alpha_newer
 
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -1437,6 +1446,11 @@
          logical, parameter :: dbg = .false.
 
          include 'formats'
+         
+         if (s% using_mlt_info_newer) then
+            call set_gradT_excess_alpha_newer(s, ierr)
+            return
+         end if
 
          if (dbg) write(*,*) 'enter set_gradT_excess_alpha'
 
@@ -1473,6 +1487,7 @@
 
 
       subroutine check_for_redo_MLT(s, nzlo, nzhi, ierr)
+         use mlt_info_newer, only: check_for_redo_MLT_newer
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
@@ -1483,6 +1498,11 @@
          logical :: dbg
 
          include 'formats'
+         
+         if (s% using_mlt_info_newer) then
+            call check_for_redo_MLT_newer(s, nzlo, nzhi, ierr)
+            return
+         end if
 
          ! check_for_redo_MLT assumes that nzlo = 1, nzhi = nz
          ! that is presently true; make sure that assumption doesn't change

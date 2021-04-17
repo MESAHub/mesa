@@ -64,9 +64,13 @@
       implicit none
 
       private
-      public :: set_mlt_vars_newer, set_grads_newer, do1_mlt_newer, &
-         switch_to_radiative_newer, check_for_redo_MLT_newer, &
-         set_gradT_excess_alpha_newer, adjust_gradT_fraction_newer, adjust_gradT_excess_newer
+      public :: &
+         set_mlt_vars_newer, &            ! conv_premix.f90, hydro_vars.f90
+         set_grads_newer, &               ! conv_premix.f90
+         do1_mlt_newer, &                 ! predictive_mix.f90
+         switch_to_radiative_newer, &     ! mix_info.f90
+         check_for_redo_MLT_newer, &      ! hydro_vars.f90
+         set_gradT_excess_alpha_newer  ! evolve.f90
 
       contains
 
@@ -83,11 +87,11 @@
          ierr = 0
          !write(*,*) 'set_mlt_vars_newer'
          if (s% doing_timing) call start_time(s, time0, total)
-         call set_gradT_excess_alpha_newer(s, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'set_gradT_excess_alpha failed', k
-            return
-         end if
+         !call set_gradT_excess_alpha_newer(s, ierr)  evolve set_start_of_step_info -> set_gradT_excess_alpha -> this 
+         !if (ierr /= 0) then
+         !   if (s% report_ierr) write(*,2) 'set_gradT_excess_alpha failed', k
+         !   return
+         !end if
          if (s% using_TDC .and. .not. s% have_mlt_vc) then
             write(*,*) 's% using_TDC .and. .not. s% have_mlt_vc'
             stop 'set_mlt_vars'
