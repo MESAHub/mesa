@@ -228,21 +228,20 @@
          if (s% compare_to_mlt_info_newer) then
             okay = .true.
             ! don't bother with checking partials since trust newer for those
+            ! just check gradT and mixing_type
             call check_vals(gradT, s% gradT(k), 1d-2, 1d-2, 'gradT')
-            call check_vals(gradr, s% gradr(k), 1d-2, 1d-2, 'gradr')
-            call check_vals(gradL, s% gradL(k), 1d-2, 1d-2, 'gradL')
-            call check_vals(mlt_vc, s% mlt_vc(k), 1d-1, 1d-1, 'mlt_vc')
-            call check_vals(scale_height, s% scale_height(k), 1d-1, 1d-1, 'scale_height')
-            call check_vals(mlt_mixing_length, s% mlt_mixing_length(k), 1d-1, 1d-1, 'mixing_length')
-            call check_vals(mlt_D, s% mlt_D(k), 1d-1, 1d-1, 'D')
-            call check_vals(mlt_Gamma, s% mlt_Gamma(k), 1d-1, 1d-1, 'Gamma')
-            if (mixing_type /= s% mlt_mixing_type(k)) then
-               write(*,4) 'mixing type newer old', k, mixing_type, s% mlt_mixing_type(k)
-               okay = .false.
-            end if
+            !call check_vals(gradr, s% gradr(k), 1d-2, 1d-2, 'gradr')
+            !call check_vals(gradL, s% gradL(k), 1d-2, 1d-2, 'gradL')
+            !call check_vals(mlt_vc, s% mlt_vc(k), 1d-1, 1d-1, 'mlt_vc')
+            !call check_vals(scale_height, s% scale_height(k), 1d-1, 1d-1, 'scale_height')
+            !call check_vals(mlt_mixing_length, s% mlt_mixing_length(k), 1d-1, 1d-1, 'mixing_length')
+            !call check_vals(mlt_D, s% mlt_D(k), 1d-1, 1d-1, 'D')
+            !call check_vals(mlt_Gamma, s% mlt_Gamma(k), 1d-1, 1d-1, 'Gamma')
+            if (mixing_type /= s% mlt_mixing_type(k)) okay = .false.
             if (.not. okay) then
-               write(*,4) trim(s% MLT_option) // ' mixing_type', k, mixing_type, s% solver_iter
-               stop 'do1_mlt_2 compare_to_mlt_newer'
+               write(*,6) trim(s% MLT_option) // ' k model iter mixing_type newer old', &
+                  k, s% model_number, s% solver_iter, mixing_type, s% mlt_mixing_type(k)
+               stop 'mlt_info do1_mlt_2 compare_to_mlt_newer'
             end if
          end if
          
