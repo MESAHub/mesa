@@ -251,10 +251,11 @@
          subroutine check_vals(new, old, atol, rtol, str)
             character (len=*) :: str
             real(dp), intent(in) :: new, old, atol, rtol
+            real(dp) :: err
             include 'formats'
-            if (is_bad(new) .or. is_bad(old) .or. &
-               abs(new-old) > atol + rtol*max(abs(new),abs(old))) then
-               write(*,4) trim(str) // ' newer new val k model iter', &
+            err = abs(new-old)/(atol + rtol*max(abs(new),abs(old))) - 1d0
+            if (is_bad(new) .or. is_bad(old) .or. err > 0d0) then
+               write(*,4) trim(str) // ' k model iter err new old', &
                   k, s% model_number, s% solver_iter, &
                   (new - old)/max(1d-99,abs(old)), new, old
                okay = .false.

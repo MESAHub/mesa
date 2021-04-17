@@ -952,39 +952,11 @@
             if (failed('eps_heat')) exit
             call do1(s% irradiation_heat, c% irradiation_heat)
             if (failed('irradiation_heat')) exit
-            call do1(s% extra_heat, c% extra_heat)
+            
+            call do1_ad(s% extra_heat, c% extra_heat)
             if (failed('extra_heat')) exit
-            call do1(s% d_extra_heat_dlndm1, c% d_extra_heat_dlndm1)
-            if (failed('d_extra_heat_dlndm1')) exit
-            call do1(s% d_extra_heat_dlnd00, c% d_extra_heat_dlnd00)
-            if (failed('d_extra_heat_dlnd00')) exit
-            call do1(s% d_extra_heat_dlndp1, c% d_extra_heat_dlndp1)
-            if (failed('d_extra_heat_dlndp1')) exit
-            call do1(s% d_extra_heat_dlnTm1, c% d_extra_heat_dlnTm1)
-            if (failed('d_extra_heat_dlnTm1')) exit
-            call do1(s% d_extra_heat_dlnT00, c% d_extra_heat_dlnT00)
-            if (failed('d_extra_heat_dlnT00')) exit
-            call do1(s% d_extra_heat_dlnTp1, c% d_extra_heat_dlnTp1)
-            if (failed('d_extra_heat_dlnTp1')) exit
-            call do1(s% d_extra_heat_dlnR00, c% d_extra_heat_dlnR00)
-            if (failed('d_extra_heat_dlnR00')) exit
-            call do1(s% d_extra_heat_dlnRp1, c% d_extra_heat_dlnRp1)
-            if (failed('d_extra_heat_dlnRp1')) exit
-
-            call do1(s% extra_grav, c% extra_grav)
+            call do1_ad(s% extra_grav, c% extra_grav)
             if (failed('extra_grav')) exit
-            call do1(s% d_extra_grav_dlndm1, c% d_extra_grav_dlndm1)
-            if (failed('d_extra_grav_dlndm1')) exit
-            call do1(s% d_extra_grav_dlnd00, c% d_extra_grav_dlnd00)
-            if (failed('d_extra_grav_dlnd00')) exit
-            call do1(s% d_extra_grav_dlnTm1, c% d_extra_grav_dlnTm1)
-            if (failed('d_extra_grav_dlnTm1')) exit
-            call do1(s% d_extra_grav_dlnT00, c% d_extra_grav_dlnT00)
-            if (failed('d_extra_grav_dlnT00')) exit
-            call do1(s% d_extra_grav_dlnR, c% d_extra_grav_dlnR)
-            if (failed('d_extra_grav_dlnR')) exit
-            call do1(s% d_extra_grav_dL, c% d_extra_grav_dL)
-            if (failed('d_extra_grav_dL')) exit
 
             call do1(s% extra_jdot, c% extra_jdot)
             if (failed('extra_jdot')) exit

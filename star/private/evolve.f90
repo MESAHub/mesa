@@ -1332,7 +1332,7 @@
             phase2_total_energy_from_mdot = &
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             
-            s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz))
+            s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)
 
             phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
@@ -1673,15 +1673,9 @@
 
          nz = s% nz
          dt = s% dt
-         s% extra_heat(1:nz) = s% extra_power_source
-         s% d_extra_heat_dlndm1(1:nz) = 0d0
-         s% d_extra_heat_dlnd00(1:nz) = 0d0
-         s% d_extra_heat_dlndp1(1:nz) = 0d0
-         s% d_extra_heat_dlnTm1(1:nz) = 0d0
-         s% d_extra_heat_dlnT00(1:nz) = 0d0
-         s% d_extra_heat_dlnTp1(1:nz) = 0d0
-         s% d_extra_heat_dlnR00(1:nz) = 0d0
-         s% d_extra_heat_dlnRp1(1:nz) = 0d0
+         do k=1,nz
+            s% extra_heat(k) = s% extra_power_source
+         end do
          
          if (s% use_other_energy) then
             call s% other_energy(s% id, ierr)

@@ -46,14 +46,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         ! nz = s% nz
-         ! s% extra_grav(1:nz) = 0 ! this is added to -G*m/r^2
-         ! s% d_extra_grav_dlndm1(1:nz) = 0
-         ! s% d_extra_grav_dlnd00(1:nz) = 0
-         ! s% d_extra_grav_dlnTm1(1:nz) = 0
-         ! s% d_extra_grav_dlnT00(1:nz) = 0
-         ! s% d_extra_grav_dlnR(1:nz) = 0
-         ! s% d_extra_grav_dL(1:nz) = 0
+         ! s% extra_grav(1:s%nz) = 0 ! this is added to -G*m/r^2
+         ! note that extra_grav is type(auto_diff_real_star_order1) so includes partials.
       end subroutine default_other_momentum_implicit
 
 

@@ -195,6 +195,11 @@
          
          subroutine set_results
             include 'formats'
+            
+            if (k==1579 .and. s% solver_iter == 0) then
+               write(*,3) 'mixing_type gradT', k, mixing_type, s% gradT_ad(k)%val
+            end if
+            
             if (mixing_type == no_mixing) then
                gradT_ad = gradr_ad
                Y_face_ad = gradT_ad - grada_face_ad

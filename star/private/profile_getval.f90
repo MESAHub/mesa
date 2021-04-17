@@ -1014,14 +1014,14 @@
             case (p_extra_omegadot)
                val = s% extra_omegadot(k)
             case (p_extra_heat)
-               val = s% extra_heat(k)
+               val = s% extra_heat(k)%val
             case (p_extra_grav)
-               val = s% extra_grav(k)
+               val = s% extra_grav(k)%val
             case (p_extra_L)
-               val = dot_product(s% dm(k:s% nz),s% extra_heat(k:s% nz))/Lsun
+               val = dot_product(s% dm(k:s% nz),s% extra_heat(k:s% nz)%val)/Lsun
             case (p_log_extra_L)
                val = safe_log10( &
-                  dot_product(s% dm(k:s% nz),s% extra_heat(k:s% nz))/Lsun)
+                  dot_product(s% dm(k:s% nz),s% extra_heat(k:s% nz)%val)/Lsun)
 
             case (p_log_abs_eps_grav_dm_div_L)
                val = safe_log10( &

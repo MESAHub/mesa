@@ -389,8 +389,7 @@
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: extra_ad, v_00
-         real(dp) :: accel, d_accel_dv, fraction_on, dlnR00, &
-            dlnTm1, dlnT00, dlndm1, dlnd00
+         real(dp) :: accel, d_accel_dv, fraction_on
          logical :: test_partials, local_v_flag
 
          include 'formats'
@@ -399,25 +398,7 @@
          
          extra_ad = 0d0
          if (s% use_other_momentum .or. s% use_other_momentum_implicit) then
-            if (s% use_other_momentum_implicit) then
-               dlnR00 = s% d_extra_grav_dlnR(k)
-               dlnTm1 = s% d_extra_grav_dlnTm1(k)
-               dlnT00 = s% d_extra_grav_dlnT00(k)
-               dlndm1 = s% d_extra_grav_dlndm1(k)
-               dlnd00 = s% d_extra_grav_dlnd00(k)
-               call wrap(extra_ad, s% extra_grav(k), &
-                  dlndm1, dlnd00, 0d0, &
-                  dlnTm1, dlnT00, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, dlnR00, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, s% d_extra_grav_dL(k), 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, 0d0, 0d0)
-            else
-               extra_ad%val = s% extra_grav(k)
-            end if
+            extra_ad = s% extra_grav(k)
          end if
          
          accel_ad = 0d0

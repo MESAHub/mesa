@@ -893,6 +893,7 @@
 
       subroutine entropy_relax_other_energy(id, ierr)
          use interp_1d_lib, only: interp_values
+         use auto_diff_support
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -910,13 +911,10 @@
          do k = 2, nz
             xq(k) = xq(k-1) + (s% dq(k) + s% dq(k-1))/2
          end do
-         call interp_values(x, num_pts, f, nz, xq, vals(:), op_err)
-         if (op_err /= 0) ierr = op_err
-
+         call interp_values(x, num_pts, f, nz, xq, vals(:), ierr)
          if (ierr /= 0) return
-         s% extra_heat(:) = 0d0
          do k = 1, s% nz
-            s% extra_heat(k) =  ( 1d0 - exp(s%lnS(k))/vals(k) ) * exp(s%lnE(k))
+            s% extra_heat(k) = ( 1d0 - exp(s%lnS(k))/vals(k) ) * exp(s%lnE(k))
             s% extra_heat(k) = s% extra_heat(k) / (s% job% timescale_for_relax_entropy * secyer)
          end do
       end subroutine entropy_relax_other_energy
