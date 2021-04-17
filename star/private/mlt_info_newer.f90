@@ -139,7 +139,7 @@
          include 'formats'
          ierr = 0    
               
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'do1_mlt_newer', k, s% solver_iter
             end if
          
@@ -201,7 +201,7 @@
          subroutine set_results
             include 'formats'
             
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'set_results newer mixing_type gradT', k, mixing_type, s% gradT_ad(k)%val
             end if
             

@@ -75,13 +75,13 @@
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             op_err = 0
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'set_mlt_vars call do1_mlt_2', k
             end if
             call do1_mlt_2(s, k, s% alpha_mlt(k), gradL_composition_term, &
                opacity, chiRho, chiT, Cp, grada, P, xh, &
                .false., make_gradr_sticky_in_solver_iters, op_err)
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'set_mlt_vars done do1_mlt_2', k
             end if
             call wrap_mlt_ad(s,k)
@@ -206,13 +206,13 @@
             else
                gradL_composition_term = 0d0
             end if
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'do1_mlt_2 call do1_mlt_newer gradL_composition_term', k, s% solver_iter, gradL_composition_term
             end if
             call do1_mlt_newer(s, k, mixing_length_alpha, gradL_composition_term, &
                make_gradr_sticky_in_solver_iters, ierr)
             if (ierr /= 0 .or. s% using_mlt_info_newer) return
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'do1_mlt_2 done do1_mlt_newer', k
             end if
             mixing_type = s% mlt_mixing_type(k)
@@ -226,7 +226,7 @@
             mlt_Gamma = s% mlt_Gamma(k)
          end if
 
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'call test_do1_mlt_2', k
             end if
          
@@ -235,12 +235,12 @@
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
          if (ierr /= 0) return
-         if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
             write(*,3) 'done test_do1_mlt_2', k
          end if
             
          if (s% compare_to_mlt_info_newer) then
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'compare_to_mlt_info_newer', k
             end if
             okay = .true.
@@ -260,7 +260,7 @@
                   k, s% model_number, s% solver_iter, mixing_type, s% mlt_mixing_type(k)
                stop 'mlt_info do1_mlt_2 compare_to_mlt_newer'
             end if
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'done compare_to_mlt_info_newer', k
             end if
          end if
@@ -733,7 +733,7 @@
             end if
             return
          end if
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,4) 'after do1_mlt_eval new mixing_type old', k, mixing_type, s% mlt_mixing_type(k)
             end if
 
@@ -1038,7 +1038,7 @@
          subroutine set_no_mixing(str)
             character (len=*) :: str
             include 'formats'
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'test_do1_mlt_2 set_no_mixing ' // trim(str), k
             end if
             call get_mlt_eval_gradr_info(ierr)

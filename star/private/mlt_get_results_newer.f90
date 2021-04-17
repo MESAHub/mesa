@@ -173,7 +173,7 @@
          
          compare_TDC_to_MLT = .false.
 
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,2) 'enter Get_results_newer k gradL_composition_term', k, gradL_composition_term
             end if
 
@@ -214,7 +214,7 @@
          end if
          
 
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,2) 'Get_results_newer gradr gradL grada gradL_composition_term', k, &
                   gradr%val, gradL%val, grada%val, gradL_composition_term
             end if

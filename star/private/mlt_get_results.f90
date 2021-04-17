@@ -169,7 +169,7 @@
                grada_ad = get_grada_face(s,k)
                scale_height_ad = get_scale_height_face(s,k)
                
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,2) 'do1_mlt_eval call do1_mlt_eval_newer', k
             end if
 
@@ -265,7 +265,7 @@
                   stop 'using_mlt_get_new'
                end if
                
-            if (k==s% x_integer_ctrl(19) .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
                write(*,3) 'do1_mlt_eval done do1_mlt_eval_newer mixing_type', k, mixing_type
             end if
             
