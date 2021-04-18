@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# uncomment the following line to run all parts of the test
-# MESA_RUN_OPTIONAL=t
-
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
 MESA_DIR=../../..
