@@ -583,8 +583,6 @@
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) then
                   s% fixed_gradr_for_rest_of_solver_iters(nzlo:nzhi) = .false.   
-                  s% new_fixed_gradr_for_rest_of_solver_iters(nzlo:nzhi) = .false.   
-                  s% newer_fixed_gradr_for_rest_of_solver_iters(nzlo:nzhi) = .false.   
                end if         
                s% alpha_mlt(nzlo:nzhi) = s% mixing_length_alpha
                if (s% use_other_alpha_mlt) then

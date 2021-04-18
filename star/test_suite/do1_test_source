@@ -4,12 +4,12 @@
 
 
 
-do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto
+#do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
 #do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
-do_one hb_2M "termination code: xa_central_lower_limit" "final.mod" auto                                 
+#do_one hb_2M "termination code: xa_central_lower_limit" "final.mod" auto                                 
 do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
-do_one semiconvection "all values are within tolerances" "final.mod" auto  
+#do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one wd_he_shell_ignition "stop because power_he_burn >= power_he_burn_upper_limit" "final.mod" auto
 do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto

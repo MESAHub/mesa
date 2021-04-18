@@ -46,7 +46,6 @@
 ! mesh controls
       split_merge_amr_okay_to_split_nz = .false.
 
-
 / ! end of controls namelist
 
 &pgstar        

@@ -100,7 +100,7 @@
             gradT, Y_face, mlt_vc, D, Gamma
          integer, intent(out) :: ierr 
                  
-         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
+         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old, alpha_semiconvection
          integer :: iso, old_mix_type
          type(auto_diff_real_star_order1) :: &
             r, L, T, P, opacity, rho, chiRho, chiT, Cp
@@ -128,6 +128,8 @@
          Cp = get_Cp_face(s,k)
          iso = s% dominant_iso_for_thermohaline(k)
          XH1 = s% xa(s% net_iso(ih1),k)
+         alpha_semiconvection = s% alpha_semiconvection
+         if (s% center_h1 > s% semiconvection_upper_limit_center_h1) alpha_semiconvection = 0
          if (s% use_other_mlt) then
             !call s% other_mlt(s% id, k, &               
             !   gradr_factor, gradL_composition_term, &
@@ -137,7 +139,7 @@
             call Get_results_newer(s, k, MLT_option, &
                r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
                iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-               s% alpha_semiconvection, s% thermohaline_coeff, s% using_TDC, &
+               alpha_semiconvection, s% thermohaline_coeff, s% using_TDC, &
                mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
          end if
 
@@ -173,7 +175,7 @@
          
          compare_TDC_to_MLT = .false.
 
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
                write(*,2) 'enter Get_results_newer k gradL_composition_term', k, gradL_composition_term
             end if
 
@@ -214,7 +216,7 @@
          end if
          
 
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
                write(*,2) 'Get_results_newer gradr gradL grada gradL_composition_term', k, &
                   gradr%val, gradL%val, grada%val, gradL_composition_term
             end if
@@ -233,7 +235,7 @@
             call set_semiconvection
          end if         
          
-         if (k == -1266 .and. s% model_number == 2110 .and. s% solver_iter == 0) then
+         if (k == -1266 .and. s% model_number == 2110 .and. s% solver_iter == s% x_integer_ctrl(20)) then
             write(*,5) 'mlt newer k model iter mix_type gradr gradL grada', &
                k, s% model_number, s% solver_iter, mixing_type, &
                gradr%val, gradL%val, grada%val
@@ -246,6 +248,10 @@
          if (mixing_type == no_mixing) call set_no_mixing()
          
          if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT
+
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'done Get_results_newer k gradT', k, gradT%val
+            end if
          
          contains
 

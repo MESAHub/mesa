@@ -168,10 +168,6 @@
                gradr_ad = gradr_factor*get_gradr_face(s,k)
                grada_ad = get_grada_face(s,k)
                scale_height_ad = get_scale_height_face(s,k)
-               
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
-               write(*,2) 'do1_mlt_eval call do1_mlt_eval_newer', k
-            end if
 
                call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
                   gradr_ad, grada_ad, scale_height_ad, mixing_length_alpha, alt_mixing_type, &
@@ -264,10 +260,6 @@
                   write(*,3) trim(MLT_option) // ' mixing_type', k, mixing_type
                   stop 'using_mlt_get_new'
                end if
-               
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
-               write(*,3) 'do1_mlt_eval done do1_mlt_eval_newer mixing_type', k, mixing_type
-            end if
             
                return
             end if      
@@ -744,7 +736,7 @@
          if (debug) write(*,1) 'radiative_conductivity', radiative_conductivity
          d_rc_dvb = radiative_conductivity*(3d0*dT_dvb/T - dRho_dvb/rho - d_opacity_dvb/opacity)
          
-         if (kz == -1266 .and. ss% model_number == 2110 .and. ss% solver_iter == 0) then
+         if (kz == -1266 .and. ss% model_number == 2110 .and. ss% solver_iter == ss% x_integer_ctrl(20)) then
             write(*,5) 'mlt newer k model iter mix_type gradr gradL grada', &
                kz, ss% model_number, ss% solver_iter, mixing_type, &
                gradr, gradL, grada

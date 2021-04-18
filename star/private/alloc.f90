@@ -1097,10 +1097,6 @@
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
-            call do1_logical(s% new_fixed_gradr_for_rest_of_solver_iters, c% new_fixed_gradr_for_rest_of_solver_iters)
-            if (failed('new_fixed_gradr_for_rest_of_solver_iters')) exit
-            call do1_logical(s% newer_fixed_gradr_for_rest_of_solver_iters, c% newer_fixed_gradr_for_rest_of_solver_iters)
-            if (failed('newer_fixed_gradr_for_rest_of_solver_iters')) exit
             
             call do1(s% mlt_Gamma, c% mlt_Gamma)
             if (failed('mlt_Gamma')) exit

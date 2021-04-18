@@ -87,11 +87,6 @@
          ierr = 0
          !write(*,*) 'set_mlt_vars_newer'
          if (s% doing_timing) call start_time(s, time0, total)
-         !call set_gradT_excess_alpha_newer(s, ierr)  evolve set_start_of_step_info -> set_gradT_excess_alpha -> this 
-         !if (ierr /= 0) then
-         !   if (s% report_ierr) write(*,2) 'set_gradT_excess_alpha failed', k
-         !   return
-         !end if
          if (s% using_TDC .and. .not. s% have_mlt_vc) then
             write(*,*) 's% using_TDC .and. .not. s% have_mlt_vc'
             stop 'set_mlt_vars'
@@ -111,8 +106,8 @@
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
             end if
             if (make_gradr_sticky_in_solver_iters .and. s% solver_iter > 3) then
-               if (.not. s% newer_fixed_gradr_for_rest_of_solver_iters(k)) &
-                  s% newer_fixed_gradr_for_rest_of_solver_iters(k) = &
+               if (.not. s% fixed_gradr_for_rest_of_solver_iters(k)) &
+                  s% fixed_gradr_for_rest_of_solver_iters(k) = &
                      (s% mlt_mixing_type(k) == no_mixing)
             end if            
          end do
@@ -133,39 +128,39 @@
          real(dp), pointer :: vel(:)
          real(dp) :: cs, abs_du_div_cs, gradr_factor
          integer :: i, mixing_type, k_T_max
-         logical :: just_gradr
+         logical :: just_gradr, fixed_gradr
          type(auto_diff_real_star_order1) :: grada_face_ad, rho_face, &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, Gamma, D, scale_height
          include 'formats'
          ierr = 0    
               
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
-               write(*,3) 'do1_mlt_newer', k, s% solver_iter
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,3) 'start do1_mlt_newer k iter', k, s% solver_iter
             end if
          
          gradr_ad = get_gradr_face(s,k)
-         grada_face_ad = get_grada_face_val(s,k)
+         grada_face_ad = get_grada_face(s,k)
          scale_height = get_scale_height_face(s,k)
-         
-         mixing_type = no_mixing
-         call set_results
-         
-         if (k == 1 .and. s% mlt_make_surface_no_mixing) return
-         if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) return         
-         
-         make_gradr_sticky_in_solver_iters = s% make_gradr_sticky_in_solver_iters
-         if (.not. make_gradr_sticky_in_solver_iters .and. &
-               s% min_logT_for_make_gradr_sticky_in_solver_iters < 1d20) then
-            k_T_max = maxloc(s% lnT_start(1:s%nz),dim=1)
-            make_gradr_sticky_in_solver_iters = &
-               (s% lnT_start(k_T_max)/ln10 >= s% min_logT_for_make_gradr_sticky_in_solver_iters)
-         end if
-         
-         if (make_gradr_sticky_in_solver_iters) then
-            if (s% newer_fixed_gradr_for_rest_of_solver_iters(k)) then
-               return
+
+         gradr_factor = s% gradr_factor(k)
+         if (s% rotation_flag .and. s% mlt_use_rotation_correction) &
+            gradr_factor = s% ft_rot(k)/s% fp_rot(k)*gradr_factor
+                  
+         if (k == 1 .and. s% mlt_make_surface_no_mixing) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,3) 'k == 1 .and. s% mlt_make_surface_no_mixing gradT', k, s% solver_iter, s% gradT(k)
             end if
+            call set_no_mixing('mlt_make_surface_no_mixing')
+            return
          end if
+         
+         if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,3) 's% lnT_start(k)/ln10 > s% max_logT_for_mlt', k, s% solver_iter
+            end if
+            call set_no_mixing('max_logT_for_mlt')
+            return     
+         end if    
 
          if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then 
             ! check for outward moving shock above k
@@ -176,16 +171,52 @@
             end if
             do i=k-1,1,-1
                cs = s% csound(i)
-               if (vel(i+1) >= cs .and. vel(i) < cs) return
+               if (vel(i+1) >= cs .and. vel(i) < cs) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,3) 'no_MLT_below_shock', k, s% solver_iter
+                  end if
+                  call set_no_mixing('no_MLT_below_shock')
+                  return
+               end if
             end do
          end if
-
-         gradr_factor = s% gradr_factor(k)
-         if (s% rotation_flag .and. s% mlt_use_rotation_correction) &
-            gradr_factor = s% ft_rot(k)/s% fp_rot(k)*gradr_factor
-         gradr_ad = gradr_factor*gradr_ad
          
-         just_gradr = .false.
+         if (s% no_MLT_below_T_max) then
+            k_T_max = maxloc(s% T_start(1:s%nz),dim=1)
+            if (k > k_T_max) then
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  write(*,3) 'no_MLT_below_T_max', k, s% solver_iter
+               end if
+               call set_no_mixing('no_MLT_below_T_max')
+               return
+            end if
+         end if
+         
+         make_gradr_sticky_in_solver_iters = s% make_gradr_sticky_in_solver_iters
+         if (.not. make_gradr_sticky_in_solver_iters .and. &
+               s% min_logT_for_make_gradr_sticky_in_solver_iters < 1d20) then
+            k_T_max = maxloc(s% lnT_start(1:s%nz),dim=1)
+            make_gradr_sticky_in_solver_iters = &
+               (s% lnT_start(k_T_max)/ln10 >= s% min_logT_for_make_gradr_sticky_in_solver_iters)
+         end if
+         
+         if (make_gradr_sticky_in_solver_iters) then
+            if (s% fixed_gradr_for_rest_of_solver_iters(k)) then
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  write(*,3) 'make_gradr_sticky_in_solver_iters', k, s% solver_iter
+               end if
+               call set_no_mixing('make_gradr_sticky_in_solver_iters')
+               return
+            end if
+         end if
+
+
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'before call do1_mlt_eval_newer gradr_factor', k, gradr_factor
+            end if
+
+         just_gradr = .false.         
+         gradr_ad = gradr_factor*gradr_ad
          call do1_mlt_eval_newer(s, k, s% MLT_option, just_gradr, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D, Gamma, ierr)
@@ -193,25 +224,61 @@
             if (s% report_ierr) write(*,*) 'ierr in do1_mlt_newer_eval', k
             return
          end if
+
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'after call do1_mlt_eval_newer gradT', k, gradT_ad%val
+            end if
          
          call set_results
 
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'done do1_mlt_newer_eval gradT', k, s% gradT(k)
+            end if
+
          contains
+
+         subroutine set_no_mixing(str)
+            character (len=*) :: str
+            include 'formats'
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,3) 'test_do1_mlt_2 set_no_mixing ' // trim(str), k
+            end if
+
+            s% mlt_mixing_type(k) = no_mixing
+            gradT_ad = gradr_ad
+            s% gradT_ad(k) = gradT_ad
+            s% gradT(k) = s% gradT_ad(k)%val
+
+            s% mlt_vc_ad(k) = 0d0
+            if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0d0
+            s% mlt_D_ad(k) = 0d0
+            s% mlt_D(k) = 0d0
+            s% mlt_Gamma_ad(k) = 0d0
+            s% mlt_Gamma(k) = 0d0
+            s% gradr_ad(k) = gradr_ad
+            s% gradr(k) = s% gradr_ad(k)%val
+            s% grada_face_ad(k) = grada_face_ad
+            s% grada_face(k) = grada_face_ad%val
+            s% scale_height_ad(k) = scale_height
+            s% scale_height(k) = scale_height%val             
+            s% Lambda_ad(k) = mixing_length_alpha*scale_height
+            s% mlt_mixing_length(k) = mixing_length_alpha*s% scale_height(k)    
+            s% gradL_ad(k) = 0d0
+            s% gradL(k) = 0d0
+            Y_face_ad = gradT_ad - grada_face_ad
+            s% Y_face_ad(k) = Y_face_ad
+            s% Y_face(k) = s% Y_face_ad(k)%val
+            s% mlt_cdc(k) = 0d0
+
+
+            s% actual_gradT(k) = 0d0
+            s% grad_superad(k) = 0d0
+
+         end subroutine set_no_mixing
          
          subroutine set_results
             include 'formats'
             
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == 0) then
-               write(*,3) 'set_results newer mixing_type gradT', k, mixing_type, s% gradT_ad(k)%val
-            end if
-            
-            if (mixing_type == no_mixing) then
-               gradT_ad = gradr_ad
-               Y_face_ad = gradT_ad - grada_face_ad
-               mlt_vc_ad = 0d0
-               D = 0d0
-               Gamma = 0d0
-            end if         
             s% mlt_mixing_type(k) = mixing_type
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
@@ -236,14 +303,24 @@
             
             rho_face = get_rho_face(s,k)
             s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*pow2(s%r(k))*rho_face%val)
+         
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'do1_mlt_newer before adjust_gradT_fraction gradT', k, s% gradT(k) 
+            end if
 
-            call adjust_gradT_fraction_newer(s, k, grada_face_ad, gradr_ad)         
+            call adjust_gradT_fraction_newer(s, k, grada_face_ad, gradr_ad)
+         
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'do1_mlt_newer after adjust_gradT_fraction gradT', k, s% gradT(k)
+            end if
+                     
             if (s% mlt_mixing_type(k) /= no_mixing .and. &
                 s% mlt_option /= 'none' .and. abs(s% gradr(k)) > 0d0) then
                s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k)) ! C&G 14.109
             else
                s% L_conv(k) = 0d0
             end if         
+            
             if (k == 1 .or. s% MLT_option == 'none') then
                s% grad_superad(k) = 0d0
             else
@@ -270,14 +347,31 @@
          type(auto_diff_real_star_order1), intent(in) :: grada_face_ad, gradr_ad
          include 'formats'         
          real(dp) :: f
-         f = s% adjust_mlt_gradT_fraction(k)
+         
+         if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
+            f = s% mlt_gradT_fraction
+         else
+            f = s% adjust_mlt_gradT_fraction(k)
+         end if
+         
          if (f >= 0d0 .and. f <= 1d0) then
             s% gradT_ad(k) = f*grada_face_ad + (1d0 - f)*gradr_ad
             s% gradT(k) = s% gradT_ad(k)%val
          end if
+         
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            write(*,2) 'adjust_gradT_fraction_newer f', k, f
+         end if
+         
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! gradT_excess
          call adjust_gradT_excess_newer(s, k, grada_face_ad)
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! new gradT_excess from adjusted gradT
+         
+         
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            write(*,2) 'after adjust_gradT_excess_newer gradT', k, s% gradT(k)
+         end if
+         
       end subroutine adjust_gradT_fraction_newer
 
 
@@ -285,14 +379,40 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: grada_face_ad
-         real(dp) :: alfa, beta, gradT_excess_alpha, excess
+         real(dp) :: alfa, beta, gradT_excess_alpha, excess, log_tau
          include 'formats'
          !s% gradT_excess_alpha is calculated at start of step and held constant during iterations
          ! gradT_excess_alpha = 0 means no efficiency boost; = 1 means full efficiency boost
          gradT_excess_alpha = s% gradT_excess_alpha
          s% gradT_excess_effect(k) = 0.0d0
          excess = s% gradT(k) - s% grada_face(k)
-         if (gradT_excess_alpha <= 0.0 .or. excess <= s% gradT_excess_f1) return
+         
+         if (gradT_excess_alpha <= 0.0 .or. excess <= s% gradT_excess_f1) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,*) 'gradT_excess_alpha <= 0.0', gradT_excess_alpha <= 0.0
+               write(*,*) 's% gradT_sub_grada(k) <= s% gradT_excess_f1', &
+                  s% gradT_sub_grada(k) <= s% gradT_excess_f1
+            end if
+            return
+         end if
+         
+
+         if (s% lnT(k)/ln10 > s% gradT_excess_max_logT) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,*) 's% lnT(k)/ln10 > s% gradT_excess_max_logT', k, s% lnT(k)/ln10, s% gradT_excess_max_logT
+            end if
+            return
+         end if
+
+         log_tau = log10(s% tau(k))
+         if (log_tau < s% gradT_excess_max_log_tau_full_off) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,*) 'log_tau < s% gradT_excess_max_log_tau_full_off', k, log_tau, s% gradT_excess_max_log_tau_full_off
+            end if
+            return
+         end if
+         
+         
          ! boost efficiency of energy transport
          alfa = s% gradT_excess_f2 ! for full boost, use this fraction of gradT
          if (gradT_excess_alpha < 1) then ! only partial boost, so increase alfa
@@ -301,6 +421,9 @@
             alfa = alfa + (1d0 - alfa)*(1d0 - gradT_excess_alpha)
          end if
          beta = 1.d0 - alfa
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            write(*,2) 'adjust_gradT_excess_newer alfa gradT grada', k, alfa, s% gradT_ad(k)%val, grada_face_ad%val
+         end if
          s% gradT_ad(k) = alfa*s% gradT_ad(k) + beta*grada_face_ad
          s% gradT(k) = s% gradT_ad(k)%val
          s% gradT_excess_effect(k) = beta

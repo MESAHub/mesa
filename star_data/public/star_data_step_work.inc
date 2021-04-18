@@ -434,8 +434,6 @@
          real(dp), pointer :: d_mlt_vc_dL(:)
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
-         logical, pointer :: new_fixed_gradr_for_rest_of_solver_iters(:)
-         logical, pointer :: newer_fixed_gradr_for_rest_of_solver_iters(:)
          
       ! Convective turbulent velocity w -- when RSP2_flag is true
          
