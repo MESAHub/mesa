@@ -169,6 +169,10 @@
                grada_ad = get_grada_face(s,k)
                scale_height_ad = get_scale_height_face(s,k)
 
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  write(*,2) 'call do1_mlt_eval_newer gradr grada Hp', k, gradr_ad%val, grada_ad%val, scale_height_ad%val
+               end if
+               
                call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
                   gradr_ad, grada_ad, scale_height_ad, mixing_length_alpha, alt_mixing_type, &
                   gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)

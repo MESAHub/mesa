@@ -651,7 +651,7 @@
          end if
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'before call do1_mlt_eval gradr_factor ' // trim(mlt_option), k, gradr_factor
+               write(*,2) 'before call do1_mlt_eval gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
             end if
 
          call do1_mlt_eval(s, k, &
@@ -1193,7 +1193,8 @@
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
                write(*,*) 'gradT_excess_alpha <= 0.0', gradT_excess_alpha <= 0.0
                write(*,*) 's% gradT_sub_grada(k) <= s% gradT_excess_f1', &
-                  s% gradT_sub_grada(k) <= s% gradT_excess_f1
+                  s% gradT_sub_grada(k) <= s% gradT_excess_f1, &
+                  s% gradT_sub_grada(k), s% gradT(k), s% grada_face(k), s% gradT_excess_f1
             end if
             return
          end if

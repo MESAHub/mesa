@@ -195,24 +195,18 @@
          logical, intent(out) :: make_gradr_sticky_in_solver_iters
          integer, intent(out) :: ierr
          
-         real(dp) :: gradL_composition_term, & ! for testing
-            gradT, gradr, mlt_vc, gradL, scale_height, mlt_mixing_length, mlt_D, mlt_Gamma
+         real(dp) :: gradT, gradr, mlt_vc, gradL, scale_height, mlt_mixing_length, mlt_D, mlt_Gamma
          integer :: mixing_type
          logical :: okay
          include 'formats'
          ierr = 0
 
          if (s% using_mlt_info_newer .or. s% compare_to_mlt_info_newer) then
-            if (s% use_Ledoux_criterion .and. gradL_composition_term_in < 0) then
-               gradL_composition_term = s% gradL_composition_term(k)
-            else
-               gradL_composition_term = 0d0
-            end if
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
                write(*,*) '***'
                write(*,2) 'call do1_mlt_2_newer', k
             end if               
-            call do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term, &
+            call do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term_in, &
                opacity_face_in, chiRho_face_in, &
                chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
                from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
@@ -744,7 +738,7 @@
          end if
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'before call do1_mlt_eval gradr_factor ' // trim(mlt_option), k, gradr_factor
+               write(*,2) 'before call do1_mlt_eval gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
             end if
 
          call do1_mlt_eval(s, k, &
@@ -1286,7 +1280,8 @@
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
                write(*,*) 'gradT_excess_alpha <= 0.0', gradT_excess_alpha <= 0.0
                write(*,*) 's% gradT_sub_grada(k) <= s% gradT_excess_f1', &
-                  s% gradT_sub_grada(k) <= s% gradT_excess_f1
+                  s% gradT_sub_grada(k) <= s% gradT_excess_f1, &
+                  s% gradT_sub_grada(k), s% gradT(k), s% grada_face(k), s% gradT_excess_f1
             end if
             return
          end if

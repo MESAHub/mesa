@@ -186,13 +186,19 @@
          ! Ledoux temperature gradient (same as Schwarzschild if composition term = 0)
          gradL = grada + gradL_composition_term
          grav = cgrav*m/pow2(r)
+
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            write(*,2) 'Get_results_newer ' // trim(MLT_option), k
+         end if
          
-         call set_no_mixing()
-         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
+         call set_no_mixing('')
+         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) then
+            return
+         end if
 
          if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
                .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) then
-            call set_no_mixing
+            call set_no_mixing('vals too smqll')
             return
          end if
            
@@ -211,31 +217,55 @@
             okay_to_use_TDC = .false.
          end if
          
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            write(*,2) 'gradr gradL grada comp_term', k, gradr%val, gradL%val, grada%val, gradL_composition_term
+         end if
          Lambda = mixing_length_alpha*scale_height
          if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
             ! this means TDC must do all types:
             ! convective, radiative, thermohaline, semiconvective
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'call set_TDC', k
+            end if
             call set_TDC
          else if (gradr > gradL) then ! convective
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'call set_MLT', k
+            end if
             call set_MLT
          else if (gradL_composition_term < 0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'call set_thermohaline', k
+            end if
             call set_thermohaline
          else if (gradr > grada) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'call set_semiconvection', k
+            end if
             call set_semiconvection
          end if         
          
-         if (D < s% remove_small_D_limit .or. is_bad(D%val)) then
+         if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
+            end if
             mixing_type = no_mixing
          end if
          
-         if (mixing_type == no_mixing) call set_no_mixing()
+         if (mixing_type == no_mixing) call set_no_mixing('final mixing_type == no_mixing')
          
          if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT
          
          contains
 
 
-         subroutine set_no_mixing()
+         subroutine set_no_mixing(str)
+            character (len=*) :: str
+            include 'formats'            
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                  s% solver_iter == s% x_integer_ctrl(20) .and. len_trim(str) > 0) then
+               write(*,2) 'Get_results_newer set_no_mixing ' // trim(str), k
+            end if
             mixing_type = no_mixing
             gradT = gradr
             Y_face = gradT - gradL
@@ -281,7 +311,7 @@
          subroutine set_TDC
             include 'formats'
             if (k == 1) then
-               call set_no_mixing
+               call set_no_mixing('set_TDC')
             else
                gradT = (wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)) / &
                        (wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
@@ -391,6 +421,11 @@
                s% xtra1_array(k) = conv_vel%val
                s% xtra2_array(k) = gradT%val
             end if
+
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               write(*,2) 'set_MLT Zeta gradr grada gradT', k, Zeta%val, gradr%val, grada%val, gradT%val
+            end if
+
          end subroutine set_MLT   
 
 
