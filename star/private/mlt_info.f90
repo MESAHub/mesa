@@ -184,7 +184,7 @@
          !use mlt_lib
          use eos_def
          use chem_def, only: ih1
-         use mlt_info_newer, only: do1_mlt_newer
+         use mlt_info_newer, only: do1_mlt_2_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, &
@@ -210,12 +210,15 @@
             end if
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
                write(*,*) '***'
-            end if
-            call do1_mlt_newer(s, k, mixing_length_alpha, gradL_composition_term, &
-               make_gradr_sticky_in_solver_iters, ierr)
+               write(*,2) 'call do1_mlt_2_newer', k
+            end if               
+            call do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term, &
+               opacity_face_in, chiRho_face_in, &
+               chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
+               from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
             if (ierr /= 0 .or. s% using_mlt_info_newer) return
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'do1_mlt_2 done do1_mlt_newer', k
+               write(*,2) 'done do1_mlt_2_newer', k
                write(*,*) '***'
             end if
             mixing_type = s% mlt_mixing_type(k)
