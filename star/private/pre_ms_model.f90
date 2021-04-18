@@ -684,7 +684,6 @@
             gradT, ierr )
          use chem_def, only: ih1
          use mlt_get_results, only: do1_mlt_eval
-         use mlt_get_results_newer, only: get_gradT_newer
          use kap_def, only : num_kap_fracs
          use kap_lib, only : kap_get
 
@@ -696,6 +695,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(out) :: gradT
          integer, intent(out) :: ierr
+
          
          real(dp) :: &
             cgrav, opacity, dlnkap_dlnd, dlnkap_dlnT, Cv, csound, &
@@ -721,8 +721,7 @@
             opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
             opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
             grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &
-            gradr, scale_height, scale_height2
+            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT 
          normal_mlt_gradT_factor = 1d0
          
          ierr = 0
@@ -750,23 +749,6 @@
          
          cgrav = standard_cgrav
          gradL_composition_term = 0
-
-         if (s% using_mlt_get_newer) then
-            scale_height = P/(rho*cgrav/pow2(r))
-            if (s% alt_scale_height_flag) then
-               scale_height2 = sqrt(P/cgrav)/rho
-               if (scale_height2 < scale_height) then
-                  scale_height = scale_height2
-               end if
-            end if
-            gradr = P*opacity*L / (16*pi*clight*m*cgrav*crad*pow4(T)/3d0)
-            call get_gradT_newer(s, s% MLT_option, &
-               r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
-               ih1, x, cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
-               gradT, mixing_type, ierr)    
-            return     
-         end if
-                  
          Cv = Cp
          tau = 1
          max_conv_vel = 1d99
