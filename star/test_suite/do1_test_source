@@ -1,4 +1,16 @@
 
+# fail with compare_to_mlt_info_newer = .true.
+
+do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
+do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
+do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+
+do_one make_co_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto                     6
+do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto               41
+do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto               58
+
+return
+
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 

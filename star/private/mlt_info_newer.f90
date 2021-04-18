@@ -126,9 +126,10 @@
          logical, intent(out) :: make_gradr_sticky_in_solver_iters
          integer, intent(out) :: ierr
          real(dp), pointer :: vel(:)
-         real(dp) :: cs, abs_du_div_cs, gradr_factor
+         real(dp) :: cs, abs_du_div_cs, gradr_factor, max_conv_vel
          integer :: i, mixing_type, k_T_max
          logical :: just_gradr, fixed_gradr
+         character (len=32) :: MLT_option
          type(auto_diff_real_star_order1) :: grada_face_ad, rho_face, &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, Gamma, D, scale_height
          include 'formats'
@@ -210,14 +211,79 @@
             end if
          end if
 
+         max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
+         if (s% dt < s% min_dt_for_increases_in_convection_velocity) then
+            max_conv_vel = 1d-2*s% dt*s% cgrav(k)
+         end if
+
+         MLT_option = s% MLT_option
+         if (s% csound_start(k) > 0d0) then
+            if (s% u_flag) then        
+               abs_du_div_cs = 0d0
+               if (s% u_start(k)/1d5 > s% max_v_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 'u_start(k)/1d5 > s% max_v_for_convection', k, s% u_start(k)/1d5
+                  end if
+                  max_conv_vel = 0d0              
+               else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+                  end if
+                  max_conv_vel = 0d0
+               else if ((abs(s% u_start(k))) >= &
+                     s% csound_start(k)*s% max_v_div_cs_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 'abs(s% u_start(k)))', k, abs(s% u_start(k))/1d5
+                  end if
+                  max_conv_vel = 0d0              
+               else
+                  if (k == 1) then
+                     abs_du_div_cs = 1d99
+                  else if (k < s%nz) then
+                     abs_du_div_cs = max(abs(s% u_start(k) - s% u_start(k+1)), &
+                         abs(s% u_start(k) - s% u_start(k-1))) / s% csound_start(k)
+                  end if
+                  if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
+                     if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                        write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
+                     end if
+                     max_conv_vel = 0d0
+                  end if
+               end if
+            else if (s% v_flag) then
+               if (s% v_start(k)/1d5 > s% max_v_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 's% v_start(k)/1d5 > s% max_v_for_convection', k, s% v_start(k)/1d5
+                  end if
+                  max_conv_vel = 0d0              
+               else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+                  end if
+                  max_conv_vel = 0d0
+               else if ((abs(s% v_start(k))) >= &
+                     s% csound_start(k)*s% max_v_div_cs_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
+                  end if
+                  max_conv_vel = 0d0
+               end if
+            end if
+            if (max_conv_vel == 0d0) then
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  write(*,2) 'max_conv_vel == 0d0', k, max_conv_vel
+               end if
+               MLT_option = 'none'
+            end if
+         end if
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'before call do1_mlt_eval_newer gradr_factor', k, gradr_factor
+               write(*,2) 'before call do1_mlt_eval_newer gradr_factor ' // trim(s% MLT_option), k, gradr_factor
             end if
 
          just_gradr = .false.         
          gradr_ad = gradr_factor*gradr_ad
-         call do1_mlt_eval_newer(s, k, s% MLT_option, just_gradr, gradL_composition_term, &
+         call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D, Gamma, ierr)
          if (ierr /= 0) then

@@ -661,11 +661,20 @@
             if (s% u_flag) then        
                abs_du_div_cs = 0d0
                if (s% u_start(k)/1d5 > s% max_v_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 'u_start(k)/1d5 > s% max_v_for_convection', k, s% u_start(k)/1d5
+                  end if
                   max_conv_vel = 0d0              
                else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+                  end if
                   max_conv_vel = 0d0
                else if ((abs(s% u_start(k))) >= &
                      s% csound_start(k)*s% max_v_div_cs_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 'abs(s% u_start(k)))', k, abs(s% u_start(k))/1d5
+                  end if
                   max_conv_vel = 0d0              
                else
                   if (k == 1) then
@@ -675,21 +684,35 @@
                          abs(s% u_start(k) - s% u_start(k-1))) / s% csound_start(k)
                   end if
                   if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
-                     ! main purpose is to force radiative in shock face
+                     if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                        write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
+                     end if
                      max_conv_vel = 0d0
                   end if
                end if
             else if (s% v_flag) then
                if (s% v_start(k)/1d5 > s% max_v_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 's% v_start(k)/1d5 > s% max_v_for_convection', k, s% v_start(k)/1d5
+                  end if
                   max_conv_vel = 0d0              
                else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+                  end if
                   max_conv_vel = 0d0
                else if ((abs(s% v_start(k))) >= &
                      s% csound_start(k)*s% max_v_div_cs_for_convection) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
+                  end if
                   max_conv_vel = 0d0
                end if
             end if
             if (max_conv_vel == 0d0) then
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  write(*,2) 'max_conv_vel == 0d0', k, max_conv_vel
+               end if
                MLT_option = 'none'
             end if
          end if
@@ -718,7 +741,7 @@
          end if
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'before call do1_mlt_eval gradr_factor', k, gradr_factor
+               write(*,2) 'before call do1_mlt_eval gradr_factor ' // trim(mlt_option), k, gradr_factor
             end if
 
          call do1_mlt_eval(s, k, &

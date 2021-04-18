@@ -192,8 +192,8 @@
       !history_interval = 1
       !terminal_interval = 1
       
-      x_integer_ctrl(19) = 1
-      x_integer_ctrl(20) = 0
+      !x_integer_ctrl(19) = 1
+      !x_integer_ctrl(20) = 0
 
 ! FOR DEBUGGING
 

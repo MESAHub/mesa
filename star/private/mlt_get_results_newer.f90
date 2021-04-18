@@ -176,7 +176,7 @@
          compare_TDC_to_MLT = .false.
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'enter Get_results_newer k gradL_composition_term', k, gradL_composition_term
+               write(*,2) 'enter Get_results_newer k gradL_comp term', k, gradL_composition_term
             end if
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -192,11 +192,25 @@
          grav = cgrav*m/pow2(r)
          
          call set_no_mixing()
-         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
+         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               if (beta < 1d-10) write(*,2) 'beta < 1d-10 Pg P', k, beta, Pg, P
+               if (mixing_length_alpha < 0d0) write(*,2) 'mixing_length_alpha < 0d0', k, mixing_length_alpha
+               if (MLT_option == 'none') write(*,2) 'MLT_option == "none"', k
+            end if
+            return
+         end if
 
          if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
                .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) then
             call set_no_mixing
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               if (opacity%val < 1d-10) write(*,2) 'opacity%val < 1d-10', k, opacity%val
+               if (P%val < 1d-20) write(*,2) 'P%val < 1d-20', k, P%val
+               if (T%val < 1d-20) write(*,2) 'T%val < 1d-20', k, T%val
+               if (Rho%val < 1d-20) write(*,2) 'Rho%val < 1d-20', k, Rho%val
+               if (r%val < 1d-10) write(*,2) 'r%val < 1d-10', k, r%val
+            end if
             return
          end if
            
@@ -217,7 +231,7 @@
          
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'Get_results_newer gradr gradL grada gradL_composition_term', k, &
+               write(*,2) 'Get_results_newer gradr gradL grada gradL_comp term', k, &
                   gradr%val, gradL%val, grada%val, gradL_composition_term
             end if
 
@@ -235,12 +249,6 @@
             call set_semiconvection
          end if         
          
-         if (k == -1266 .and. s% model_number == 2110 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-            write(*,5) 'mlt newer k model iter mix_type gradr gradL grada', &
-               k, s% model_number, s% solver_iter, mixing_type, &
-               gradr%val, gradL%val, grada%val
-         end if
-         
          if (D < s% remove_small_D_limit .or. is_bad(D%val)) then
             mixing_type = no_mixing
          end if
@@ -250,7 +258,7 @@
          if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'done Get_results_newer k gradT', k, gradT%val
+               write(*,3) 'done Get_results_newer k mixing_type gradT', k, mixing_type, gradT%val
             end if
          
          contains
