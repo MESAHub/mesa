@@ -175,10 +175,6 @@
          
          compare_TDC_to_MLT = .false.
 
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'enter Get_results_newer k gradL_comp term', k, gradL_composition_term
-            end if
-
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0          
@@ -192,25 +188,11 @@
          grav = cgrav*m/pow2(r)
          
          call set_no_mixing()
-         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               if (beta < 1d-10) write(*,2) 'beta < 1d-10 Pg P', k, beta, Pg, P
-               if (mixing_length_alpha < 0d0) write(*,2) 'mixing_length_alpha < 0d0', k, mixing_length_alpha
-               if (MLT_option == 'none') write(*,2) 'MLT_option == "none"', k
-            end if
-            return
-         end if
+         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
 
          if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
                .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) then
             call set_no_mixing
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               if (opacity%val < 1d-10) write(*,2) 'opacity%val < 1d-10', k, opacity%val
-               if (P%val < 1d-20) write(*,2) 'P%val < 1d-20', k, P%val
-               if (T%val < 1d-20) write(*,2) 'T%val < 1d-20', k, T%val
-               if (Rho%val < 1d-20) write(*,2) 'Rho%val < 1d-20', k, Rho%val
-               if (r%val < 1d-10) write(*,2) 'r%val < 1d-10', k, r%val
-            end if
             return
          end if
            
@@ -229,13 +211,6 @@
             okay_to_use_TDC = .false.
          end if
          
-
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'Get_results_newer gradr gradL grada gradL_comp term', k, &
-                  gradr%val, gradL%val, grada%val, gradL_composition_term
-            end if
-
-
          Lambda = mixing_length_alpha*scale_height
          if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
             ! this means TDC must do all types:
@@ -256,10 +231,6 @@
          if (mixing_type == no_mixing) call set_no_mixing()
          
          if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT
-
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,3) 'done Get_results_newer k mixing_type gradT', k, mixing_type, gradT%val
-            end if
          
          contains
 
@@ -408,9 +379,9 @@
             D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
             Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80            
             ! Zeta must be >= 0 and <= 1
-            if (is_bad(Zeta%val) .or. Zeta < 1d-12) then
+            if (is_bad(Zeta%val) .or. Zeta < 0d0) then
                Zeta = 0d0
-            else if (Zeta > 1d0-1d-12) then
+            else if (Zeta > 1d0) then
                Zeta = 1d0
             end if            
             gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
@@ -419,9 +390,6 @@
             if (k > 0) then
                s% xtra1_array(k) = conv_vel%val
                s% xtra2_array(k) = gradT%val
-            end if
-            if (k == -121 .and. s% solver_iter == 3) then
-               write(*,2) 'newer gradT Zeta gradr grada', k, gradT%val, Zeta%val, gradr%val, grada%val
             end if
          end subroutine set_MLT   
 
