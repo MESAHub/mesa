@@ -162,7 +162,7 @@
          logical, intent(out) :: make_gradr_sticky_in_solver_iters
          integer, intent(out) :: ierr
 
-         real(dp) :: m, mstar, L, r, dlnm_dlnq, v0, thc, asc, &
+         real(dp) :: m, mstar, L, r, dlnm_dlnq, v0, &
             a, b, Pgas_div_P_limit, da_dlnd, da_dlnT, db_dlnd, db_dlnT, &
             max_q_for_Pgas_div_P_limit, min_q_for_Pgas_div_P_limit, &
             mlt_basics(num_mlt_results), max_conv_vel, dt, alfa, beta, &
@@ -172,25 +172,10 @@
             d_grada_face_dlnd00, d_grada_face_dlnT00, &
             d_grada_face_dlndm1, d_grada_face_dlnTm1, &
             gradL_composition_term, dlnT, dlnP, &
-            abs_du_div_cs, cs, T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-            chiRho_for_partials_00, chiT_for_partials_00, &
-            chiRho_for_partials_m1, chiT_for_partials_m1, &
-            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &
-            normal_mlt_gradT_factor
-         real(dp), target :: mlt_partials1_ary(num_mlt_partials*num_mlt_results)
-         real(dp), pointer :: mlt_partials1(:), mlt_partials(:,:), vel(:)
+            abs_du_div_cs, cs
+         real(dp), pointer :: vel(:)
          integer :: i, mixing_type, h1, nz, k_T_max
          real(dp), parameter :: conv_vel_mach_limit = 0.9d0
-         logical :: Schwarzschild_stable, Ledoux_stable
          character (len=32) :: MLT_option
          logical, parameter :: just_gradr = .false.
 
@@ -217,10 +202,6 @@
          end if
          
          MLT_option = s% MLT_option
-
-         mlt_partials1 => mlt_partials1_ary
-         mlt_partials(1:num_mlt_partials,1:num_mlt_results) => &
-            mlt_partials1(1:num_mlt_partials*num_mlt_results)
 
          m = s% m_grav(k)
          mstar = s% m_grav(1)
@@ -249,141 +230,8 @@
          end if
          beta = 1d0 - alfa
          h1 = s% net_iso(ih1)
-         
-         if (k > 0) then
-            d_chiRho_00_dlnd = s% d_eos_dlnd(i_chiRho, k)
-            d_chiRho_00_dlnT = s% d_eos_dlnT(i_chiRho, k)
-            d_chiT_00_dlnd = s% d_eos_dlnd(i_chiT, k)
-            d_chiT_00_dlnT = s% d_eos_dlnT(i_chiT, k)
-            d_Cp_00_dlnd = s% d_eos_dlnd(i_Cp, k)
-            d_Cp_00_dlnT = s% d_eos_dlnT(i_Cp, k)
-            d_grada_00_dlnd = s% d_eos_dlnd(i_grad_ad, k)
-            d_grada_00_dlnT = s% d_eos_dlnT(i_grad_ad, k)
-            d_opacity_00_dlnd = s% d_opacity_dlnd(k)
-            d_opacity_00_dlnT = s% d_opacity_dlnT(k)
-         else
-            d_chiRho_00_dlnd = 0d0
-            d_chiRho_00_dlnT = 0d0
-            d_chiT_00_dlnd = 0d0
-            d_chiT_00_dlnT = 0d0
-            d_Cp_00_dlnd = 0d0
-            d_Cp_00_dlnT = 0d0
-            d_grada_00_dlnd = 0d0
-            d_grada_00_dlnT = 0d0
-            d_opacity_00_dlnd = 0d0
-            d_opacity_00_dlnT = 0d0
-         end if
-         
-         if (k > 1) then
-            d_chiRho_m1_dlnd = s% d_eos_dlnd(i_chiRho, k-1)
-            d_chiRho_m1_dlnT = s% d_eos_dlnT(i_chiRho, k-1)
-            d_chiT_m1_dlnd = s% d_eos_dlnd(i_chiT, k-1)
-            d_chiT_m1_dlnT = s% d_eos_dlnT(i_chiT, k-1)
-            d_Cp_m1_dlnd = s% d_eos_dlnd(i_Cp, k-1)
-            d_Cp_m1_dlnT = s% d_eos_dlnT(i_Cp, k-1)
-            d_grada_m1_dlnd = s% d_eos_dlnd(i_grad_ad, k-1)
-            d_grada_m1_dlnT = s% d_eos_dlnT(i_grad_ad, k-1)
-            d_opacity_m1_dlnd = s% d_opacity_dlnd(k-1)
-            d_opacity_m1_dlnT = s% d_opacity_dlnT(k-1)
-         else
-            d_chiRho_m1_dlnd = 0d0
-            d_chiRho_m1_dlnT = 0d0
-            d_chiT_m1_dlnd = 0d0
-            d_chiT_m1_dlnT = 0d0
-            d_Cp_m1_dlnd = 0d0
-            d_Cp_m1_dlnT = 0d0
-            d_grada_m1_dlnd = 0d0
-            d_grada_m1_dlnT = 0d0
-            d_opacity_m1_dlnd = 0d0
-            d_opacity_m1_dlnT = 0d0
-         end if
 
          gradL_composition_term = gradL_composition_term_in      
-         rho_00 = s% rho(k)
-         T_00 = s% T(k)
-         P_00 = s% Peos(k)
-         chiRho_00 = s% chiRho(k)
-         chiT_00 = s% chiT(k)
-         chiRho_for_partials_00 = s% chiRho_for_partials(k)
-         chiT_for_partials_00 = s% chiT_for_partials(k)
-         Cp_00 = s% Cp(k)
-         opacity_00 = s% opacity(k)
-         grada_00 = s% grada(k)
-
-         if (alfa == 1d0) then
-            
-            rho_m1 = 0d0
-            T_m1 = 0d0
-            P_m1 = 0d0
-            chiRho_m1 = 0d0
-            chiT_m1 = 0d0
-            chiRho_for_partials_m1 = 0d0
-            chiT_for_partials_m1 = 0d0
-            Cp_m1 = 0d0
-            opacity_m1 = 0d0
-            grada_m1 = 0d0
-
-            rho_face = rho_00
-            tau_face = s% tau_start(k)
-            s% actual_gradT(k) = 0
-
-         else
-         
-            rho_m1 = s% rho(k-1)
-            T_m1 = s% T(k-1)
-            P_m1 = s% Peos(k-1)
-            chiRho_m1 = s% chiRho(k-1)
-            chiT_m1 = s% chiT(k-1)
-            chiRho_for_partials_m1 = s% chiRho_for_partials(k-1)
-            chiT_for_partials_m1 = s% chiT_for_partials(k-1)
-            Cp_m1 = s% Cp(k-1)
-            opacity_m1 = s% opacity(k-1)
-            grada_m1 = s% grada(k-1)
-
-            tau_face = alfa*s% tau_start(k) + beta*s% tau_start(k-1)
-            dlnT = (T_m1 - T_00)/T_face
-            dlnP = (P_m1 - P_00)/P_face
-            if (abs(dlnP) > 1d-20) then
-               s% actual_gradT(k) = dlnT/dlnP
-            else
-               s% actual_gradT(k) = 0
-            end if
-         end if
-
-         s% grada_face(k) = alfa*grada_00 + beta*grada_m1
-         !s% d_grada_face_dlnd00(k) = alfa*d_grada_00_dlnd
-         !s% d_grada_face_dlnT00(k) = alfa*d_grada_00_dlnT
-         !if (k == 1) then
-         !   s% d_grada_face_dlndm1(k) = 0d0
-         !   s% d_grada_face_dlnTm1(k) = 0d0
-         !else
-         !   s% d_grada_face_dlndm1(k) = beta*d_grada_m1_dlnd
-         !   s% d_grada_face_dlnTm1(k) = beta*d_grada_m1_dlnT
-         !end if
-
-         if (Cp_face <= 0d0) then
-            ierr = -1
-            if (.not. s% report_ierr) return
-          !$OMP critical (mlt_crit)
-            write(*,2) 'Cp_face', k, Cp_face
-            write(*,2) 'T_face', k, T_face
-            write(*,2) 'rho_face', k, rho_face
-            write(*,2) 'P_face', k, P_face
-            write(*,2) 'chiRho_face', k, chiRho_face
-            write(*,2) 'chiT_face', k, chiT_face
-            write(*,2) 'opacity_face', k, opacity_face
-            write(*,2) 'grada_face', k, grada_face
-            write(*,2) 'tau_face', k, tau_face
-            write(*,2) 'Cp_00', k, Cp_00
-            write(*,2) 'Cp_m1', k, Cp_m1
-            write(*,2) 'alfa', k, alfa
-            write(*,2) 'beta', k, beta
-            write(*,*) 'MLT_option ', trim(MLT_option)
-            call mesa_error(__FILE__,__LINE__)
-          !$OMP end critical (mlt_crit)
-         end if
-         
-
 
          opacity_face_ad = opacity_face_in
          if (opacity_face_in < 0) opacity_face_ad = get_kap_face(s,k)
@@ -486,10 +334,6 @@
             end if
          end if
          
-         thc = s% thermohaline_coeff
-         asc = s% alpha_semiconvection
-         if (s% center_h1 > s% semiconvection_upper_limit_center_h1) asc = 0
-         
          dt = -1
 
          max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
@@ -571,23 +415,6 @@
             gradL_composition_term = 0d0
          end if
 
-         if (.not. s% conv_vel_flag) then
-            normal_mlt_gradT_factor = 1d0
-         else if (abs(s% max_q_for_normal_mlt_gradT_full_on - &
-                  s% min_q_for_normal_mlt_gradT_full_off) < 1d-10) then
-            if (s% q(k) > s% min_q_for_normal_mlt_gradT_full_off) then
-               normal_mlt_gradT_factor = 1d0
-            else
-               normal_mlt_gradT_factor = 0d0
-            end if
-         else
-            normal_mlt_gradT_factor = &
-               (s% q(k) - s% min_q_for_normal_mlt_gradT_full_off)/&
-               (s% max_q_for_normal_mlt_gradT_full_on - s% min_q_for_normal_mlt_gradT_full_off)
-            normal_mlt_gradT_factor = min(1d0, normal_mlt_gradT_factor)
-            normal_mlt_gradT_factor = max(0d0, normal_mlt_gradT_factor)
-         end if
-
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'before call do1_mlt_eval_newer gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
@@ -598,11 +425,7 @@
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) then
-!$OMP critical (mlt_info_crit1)
                write(*,*) 'ierr in do1_mlt_eval_newer for k', k
-               call show_stuff(.true.)
-               stop 
-!$OMP end critical (mlt_info_crit1)
             end if
             return
          end if
@@ -680,148 +503,12 @@
             end if
          end if
 
-         if (is_bad_num(s% d_gradT_dlnT00(k))) then
-            if (s% report_ierr) then
-               write(*,2) 's% d_gradT_dlnT00(k)', k, s% d_gradT_dlnT00(k)
-               return
-            end if
-            if (s% stop_for_bad_nums) then
-!$OMP critical (mlt_info_crit3)
-               write(*,2) 's% d_gradT_dlnT00(k)', k, s% d_gradT_dlnT00(k)
-               call show_stuff(.true.)
-               stop 'mlt info'
-!$OMP end critical (mlt_info_crit3)
-            end if
-            ierr = -1
-            return
-         end if
-
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'done test_do1_mlt_2_newer gradT', k, s% gradT(k)
             end if
-         
-         !if (k == 100) then
-         !   call show_stuff(.true.)
-         !   call mesa_error(__FILE__,__LINE__)
-         !end if
-         
-         !if (k == 738) write(*,4) 'gradT', k, s% solver_iter, mixing_type, s% gradT(k)
-         
-         !if (.false. .and. k == s% solver_test_partials_k .and. &
-         !      s% solver_iter == s% hydro_dump_iter_number) then
-         !   call show_stuff(.true.)
-         !   call mesa_error(__FILE__,__LINE__)
-         !end if
 
          contains
-
-
-         subroutine show_stuff(with_results)
-            logical, intent(in) :: with_results
-            real(dp) :: vsem, Lambda, D, radiative_conductivity
-            include 'formats'
-            write(*,*)
-            write(*,*) 'do1_mlt info for k, nz', k, s% nz
-            write(*,2) 's% model_number', s% model_number
-            write(*,2) 's% solver_iter', s% solver_iter
-            write(*,*)
-            write(*,1) 'cgrav =', s% cgrav(k)
-            write(*,1) 'm =', m
-            write(*,1) 'r =', r
-            write(*,1) 'T =', T_face
-            write(*,1) 'rho =', rho_face
-            write(*,1) 'L =', L
-            write(*,1) 'P =', P_face
-            write(*,1) 'chiRho =', chiRho_face
-            write(*,1) 'chiT =', chiT_face
-            write(*,1) 'Cp =', Cp_face
-            write(*,1) 'X =', xh_face
-            write(*,1) 'opacity =', opacity_face
-            write(*,1) 'grada =', grada_face
-            write(*,*)
-            write(*,1) 'gradr_factor =', gradr_factor
-            write(*,1) 'gradL_composition_term =', s% gradL_composition_term(k)
-            write(*,*)
-            write(*,1) 'alpha_semiconvection =', asc
-            write(*,'(a)') 'semiconvection_option = "' // trim(s% semiconvection_option) // '" '
-            write(*,*)
-            write(*,1) 'thermohaline_coeff =', thc
-            write(*,'(a)') 'thermohaline_option = "' // trim(s% thermohaline_option) // '"'
-            write(*,2) 'dominant_iso_for_thermohaline =', s% dominant_iso_for_thermohaline(k)
-            write(*,*)
-            write(*,1) 'mixing_length_alpha =', mixing_length_alpha
-            if (s% alt_scale_height_flag) then
-               write(*,'(a50)') '         alt_scale_height = .true.'
-            else
-               write(*,'(a50)') '         alt_scale_height = .false.'
-            end if
-            write(*,*)
-            write(*,1) 'Henyey_y_param =', s% Henyey_MLT_y_param
-            write(*,1) 'Henyey_nu_param =', s% Henyey_MLT_nu_param
-            write(*,*)
-            write(*,'(a)') "MLT_option = '" // trim(s% MLT_option) // "'"
-            write(*,*)
-            write(*,1) 'max_conv_vel =', min(1d99,max_conv_vel)
-            write(*,*)
-            write(*,1) 'dt =', dt
-            write(*,1) 'tau =', tau_face
-            write(*,*)
-            write(*,*) '--------------------------------------'
-            write(*,*)
-            write(*,*)
-            write(*,*)
-
-            write(*,1) 'logRho =', s% lnd(k)/ln10
-            write(*,1) 'logT =', s% lnT(k)/ln10
-            write(*,1) 'x =', s% x(k)
-            write(*,1) 'z =', 1d0 - (s% x(k) + s% y(k))
-            write(*,1) 'abar =', s% abar(k)
-            write(*,1) 'zbar =', s% zbar(k)
-            write(*,*)
-            write(*,*)
-            write(*,3) 'k, nz', k, s% nz
-            write(*,*)
-            write(*,*)
-            if (k > 1) then
-               write(*,2) 's% opacity(k)', k, s% opacity(k)
-               write(*,2) 's% opacity(k-1)', k-1, s% opacity(k-1)
-               write(*,1) 'alfa', alfa
-               write(*,1) 'beta', beta
-               write(*,1) 'alfa', alfa*s% opacity(k)
-               write(*,1) 'beta', beta*s% opacity(k-1)
-               write(*,1) 'opacity_face', opacity_face
-            end if
-
-            if (ierr /= 0 .or. .not. with_results) return
-            write(*,1) 's% gradr(k)', s% gradr(k)
-            write(*,1) 's% gradT(k)', s% gradT(k)
-            write(*,1) 's% gradL(k)', s% gradL(k)
-            write(*,1) 's% gradL(k) - grada_face', s% gradL(k) - grada_face
-            write(*,*)
-            write(*,1) 's% mlt_D(k)', s% mlt_D(k)
-            write(*,1) 's% mlt_vc(k)', s% mlt_vc(k)
-            write(*,2) 's% mlt_mixing_type(k)', s% mlt_mixing_type(k)
-            write(*,1) 's% mlt_mixing_length(k)', s% mlt_mixing_length(k)
-            write(*,1) 's% d_gradT_dlnd00(k)', s% d_gradT_dlnd00(k)
-            write(*,1) 's% d_gradT_dlnT00(k)', s% d_gradT_dlnT00(k)
-            write(*,1) 's% d_gradT_dlndm1(k)', s% d_gradT_dlndm1(k)
-            write(*,1) 's% d_gradT_dlnTm1(k)', s% d_gradT_dlnTm1(k)
-            write(*,1) 's% d_gradT_dlnR(k)', s% d_gradT_dlnR(k)
-            write(*,1) 's% d_gradT_dL(k)', s% d_gradT_dL(k)
-            write(*,*)
-            write(*,1) 's% d_gradr_dlnd00(k)', s% d_gradr_dlnd00(k)
-            write(*,1) 's% d_gradr_dlnT00(k)', s% d_gradr_dlnT00(k)
-            write(*,1) 's% d_gradr_dlndm1(k)', s% d_gradr_dlndm1(k)
-            write(*,1) 's% d_gradr_dlnTm1(k)', s% d_gradr_dlnTm1(k)
-            write(*,1) 's% d_gradr_dlnR(k)', s% d_gradr_dlnR(k)
-            write(*,1) 's% d_gradr_dL(k)', s% d_gradr_dL(k)
-            write(*,*)
-            write(*,*) 'Schwarzschild_stable', Schwarzschild_stable
-            write(*,*) 'Ledoux_stable', Ledoux_stable
-            write(*,*)
-
-         end subroutine show_stuff
 
          subroutine set_no_mixing(str)
             character (len=*) :: str

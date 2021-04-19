@@ -6,9 +6,10 @@
 ! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
       compare_to_mlt_get_newer = .false.
+      
       using_mlt_get_newer = .true.
-
       compare_to_mlt_info_newer = .true.
+      
       using_mlt_info_newer = .false.
 
 
