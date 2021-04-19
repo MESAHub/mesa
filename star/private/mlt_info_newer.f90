@@ -165,7 +165,7 @@
          real(dp) :: m, mstar, L, r, dlnm_dlnq, v0, &
             a, b, Pgas_div_P_limit, da_dlnd, da_dlnT, db_dlnd, db_dlnT, &
             max_q_for_Pgas_div_P_limit, min_q_for_Pgas_div_P_limit, &
-            mlt_basics(num_mlt_results), max_conv_vel, dt, alfa, beta, &
+            max_conv_vel, dt, alfa, beta, &
             T_face, rho_face, P_face, Cv_face, gamma1_face, Q_face, &
             chiRho_face, chiT_face, Cp_face, opacity_face, grada_face, v, &
             gradr_factor, d_gradr_factor_dw, f, xh_face, tau_face, &
@@ -433,7 +433,7 @@
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'after call do1_mlt_eval_newer gradT', k, mlt_basics(mlt_gradT) 
+               write(*,2) 'after call do1_mlt_eval_newer gradT', k, gradT_ad%val
             end if
 
          s% mlt_mixing_type(k) = mixing_type

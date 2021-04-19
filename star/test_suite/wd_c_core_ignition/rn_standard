@@ -10,7 +10,11 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-do_one inlist_relax_mass_header wd_c_core_ignition.mod
+# set MESA_RUN_OPTIONAL to run all parts of test
+if [ -n "$MESA_RUN_OPTIONAL" ]; then
+    do_one inlist_relax_mass_header wd_c_core_ignition.mod
+fi
+
 do_one inlist_wd_c_core_ignition_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

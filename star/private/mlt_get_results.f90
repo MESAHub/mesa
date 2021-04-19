@@ -237,7 +237,10 @@
             call unwrap_mlt(s% mlt_D_ad(k), alt_mlt_basics(mlt_D), alt_mlt_partials(:,mlt_D))
             call unwrap_mlt(s% mlt_Gamma_ad(k), alt_mlt_basics(mlt_gamma), alt_mlt_partials(:,mlt_gamma))
             
-            if (s% using_mlt_get_new .or. s% using_mlt_get_newer) then ! check for is_bad
+            if ((s% using_mlt_get_new .or. s% using_mlt_get_newer) .and. &
+                  k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                  s% solver_iter == s% x_integer_ctrl(20) .and. &
+                  (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                mlt_basics = alt_mlt_basics
                mlt_partials = alt_mlt_partials
                okay = .true.

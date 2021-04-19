@@ -418,7 +418,8 @@
             ! average convection velocity   C&G 14.86b
             conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
             D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
-            Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80            
+            !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80     
+            Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
             ! Zeta must be >= 0 and <= 1
             if (is_bad(Zeta%val) .or. Zeta < 0d0) then
                Zeta = 0d0
@@ -435,7 +436,10 @@
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'set_MLT Zeta gradr grada gradT', k, Zeta%val, gradr%val, grada%val, gradT%val
+               write(*,2) 'set_MLT Zeta gradr grada gradT dgradT_dlnd', k, &
+                  Zeta%val, gradr%val, grada%val, gradT%val
+               write(*,2) 'set_MLT d_dlnd_00 Zeta gradr grada gradT', k, &
+                  Zeta%d1Array(i_lnd_00), gradr%d1Array(i_lnd_00), grada%d1Array(i_lnd_00), gradT%d1Array(i_lnd_00)
             end if
 
          end subroutine set_MLT   
