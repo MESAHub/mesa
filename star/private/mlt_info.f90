@@ -84,7 +84,6 @@
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'set_mlt_vars done do1_mlt_2', k
             end if
-            call wrap_mlt_ad(s,k)
             if (op_err /= 0) then
                ierr = op_err
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
@@ -118,7 +117,6 @@
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             .true., make_gradr_sticky_in_solver_iters, ierr)
-         call wrap_mlt_ad(s,k)
       end subroutine do1_mlt
       
       
@@ -194,7 +192,8 @@
          integer, intent(out) :: ierr
          
          real(dp) :: gradT, gradr, mlt_vc, gradL, scale_height, mlt_mixing_length, mlt_D, mlt_Gamma
-         integer :: mixing_type
+         type(auto_diff_real_star_order1) :: gradT_ad
+         integer :: mixing_type, j
          logical :: okay
          include 'formats'
          ierr = 0
@@ -209,12 +208,12 @@
                opacity_face_in, chiRho_face_in, &
                chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
                from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
-            if (ierr /= 0 .or. s% using_mlt_info_newer) return
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'done do1_mlt_2_newer', k
-               write(*,*) '***'
-            end if
+            if (ierr /= 0) return
+            
+            
+            if (s% using_mlt_info_newer) return
+            
+            
             mixing_type = s% mlt_mixing_type(k)
             gradT = s% gradT(k)
             gradr = s% gradr(k)
@@ -224,6 +223,16 @@
             mlt_mixing_length = s% mlt_mixing_length(k)
             mlt_D = s% mlt_D(k)
             mlt_Gamma = s% mlt_Gamma(k)
+            gradT_ad = s% gradT_ad(k)
+            
+            
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
+               write(*,2) 'done do1_mlt_2_newer gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
+               write(*,*) '***'
+            end if
+            
+            
          end if
          
          call test_do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
@@ -231,31 +240,44 @@
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
          if (ierr /= 0) return
+
+         call wrap_mlt_ad(s,k)
+
+
          if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-            write(*,2) 'done test_do1_mlt_2', k
+            write(*,2) 'done test_do1_mlt_2 gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
             write(*,*) '***'
          end if
+         
+
+
             
-         if (s% compare_to_mlt_info_newer .and. &
+         if ((s% compare_to_mlt_info_newer .or. s% using_mlt_info_newer) .and. &
                (k==s% x_integer_ctrl(19) .or. s% x_integer_ctrl(19) <= 0)) then
                
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'compare_to_mlt_info_newer', k
             end if
+            
             okay = .true.
-            ! don't bother with checking partials since trust newer for those
-            ! just check gradT and mixing_type
             call check_vals(gradT, s% gradT(k), 1d-2, 1d-2, 'gradT')
-            !call check_vals(gradr, s% gradr(k), 1d-2, 1d-2, 'gradr')
-            !call check_vals(gradL, s% gradL(k), 1d-2, 1d-2, 'gradL')
-            !call check_vals(mlt_vc, s% mlt_vc(k), 1d-1, 1d-1, 'mlt_vc')
-            !call check_vals(scale_height, s% scale_height(k), 1d-1, 1d-1, 'scale_height')
-            !call check_vals(mlt_mixing_length, s% mlt_mixing_length(k), 1d-1, 1d-1, 'mixing_length')
-            !call check_vals(mlt_D, s% mlt_D(k), 1d-1, 1d-1, 'D')
-            !call check_vals(mlt_Gamma, s% mlt_Gamma(k), 1d-1, 1d-1, 'Gamma')
+            call check_vals(gradr, s% gradr(k), 1d-2, 1d-2, 'gradr')
+            call check_vals(gradL, s% gradL(k), 1d-2, 1d-2, 'gradL')
+            call check_vals(mlt_vc, s% mlt_vc(k), 1d-1, 1d-1, 'mlt_vc')
+            call check_vals(scale_height, s% scale_height(k), 1d-1, 1d-1, 'scale_height')
+            call check_vals(mlt_mixing_length, s% mlt_mixing_length(k), 1d-1, 1d-1, 'mixing_length')
+            call check_vals(mlt_D, s% mlt_D(k), 1d-1, 1d-1, 'D')
+            call check_vals(mlt_Gamma, s% mlt_Gamma(k), 1d-1, 1d-1, 'Gamma')
             if (mixing_type /= s% mlt_mixing_type(k)) okay = .false.
+            do j=1,auto_diff_star_num_vars
+               call check_vals(gradT_ad%d1Array(j), s% gradT_ad(k)%d1Array(j), 1d-1, 1d-1, &
+                  'gradT ' // trim(auto_diff_star_d1_names(j)))
+               if (j > 2 .and. .not. okay) exit
+            end do
+            
+            
             if (.not. okay) then
                write(*,6) trim(s% MLT_option) // ' k model iter mixing_type newer old', &
                   k, s% model_number, s% solver_iter, mixing_type, s% mlt_mixing_type(k)
@@ -779,7 +801,7 @@
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'after call do1_mlt_eval gradT', k, mlt_basics(mlt_gradT) 
+               write(*,2) 'after call do1_mlt_eval gradT', k, mlt_basics(mlt_gradT)
             end if
 
          s% mlt_mixing_type(k) = mixing_type
@@ -840,7 +862,7 @@
          
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'do1_mlt_eval before adjust_gradT_fraction gradT', k, s% gradT(k) 
+               write(*,2) 'do1_mlt_eval before adjust_gradT_fraction gradT d_dlnd_00', k, s% gradT(k), mlt_partials(mlt_dlnd00, mlt_gradT)  
             end if
 
          if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
@@ -852,7 +874,7 @@
          
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'do1_mlt_eval after adjust_gradT_fraction gradT', k, s% gradT(k)
+               write(*,2) 'do1_mlt_eval after adjust_gradT_fraction gradT d_dlnd_00', k, s% gradT(k), mlt_partials(mlt_dlnd00, mlt_gradT)  
             end if
 
          ! Note that L_conv can be negative when conv_vel /= 0 in a convectively
@@ -896,11 +918,6 @@
             ierr = -1
             return
          end if
-
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'done test_do1_mlt_2 gradT', k, s% gradT(k)
-            end if
          
          !if (k == 100) then
          !   call show_stuff(.true.)
@@ -1259,7 +1276,7 @@
          
          if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-            write(*,2) 'after adjust_gradT_excess gradT', k, s% gradT(k)
+            write(*,2) 'after adjust_gradT_excess gradT d_dlnd_00', k, s% gradT(k), s% d_gradT_dlnd00(k)
          end if
 
       end subroutine adjust_gradT_fraction

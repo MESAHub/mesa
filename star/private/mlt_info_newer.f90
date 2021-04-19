@@ -134,11 +134,6 @@
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
          if (ierr /= 0) return
-         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-            write(*,2) 'done test_do1_mlt_2_newer', k
-            write(*,*) '***'
-         end if
          
       end subroutine do1_mlt_2_newer
 
@@ -433,7 +428,7 @@
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'after call do1_mlt_eval_newer gradT', k, gradT_ad%val
+               write(*,2) 'after call do1_mlt_eval_newer gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
             end if
 
          s% mlt_mixing_type(k) = mixing_type
@@ -462,7 +457,7 @@
          
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'do1_mlt_eval_newer before adjust_gradT_fraction gradT', k, s% gradT(k) 
+               write(*,2) 'do1_mlt_eval_newer before adjust_gradT_fraction gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
             end if
 
          if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
@@ -474,7 +469,7 @@
          
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'do1_mlt_eval_newer after adjust_gradT_fraction gradT', k, s% gradT(k)
+               write(*,2) 'do1_mlt_eval_newer after adjust_gradT_fraction gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
             end if
 
          ! Note that L_conv can be negative when conv_vel /= 0 in a convectively
@@ -505,7 +500,7 @@
 
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,2) 'done test_do1_mlt_2_newer gradT', k, s% gradT(k)
+               write(*,2) 'done test_do1_mlt_2_newer gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
             end if
 
          contains
