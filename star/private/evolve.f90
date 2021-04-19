@@ -2382,9 +2382,7 @@
       end subroutine report_problems
 
 
-      integer function finish_step( &
-            id, do_photo, &
-            ierr)
+      integer function finish_step(id, ierr)
          ! returns keep_going or terminate
          ! if don't return keep_going, then set result_reason to say why.
          use evolve_support, only: output
@@ -2394,8 +2392,6 @@
          use alloc, only: size_work_arrays
 
          integer, intent(in) :: id
-         logical, intent(in) :: do_photo ! if true, then save "photo" for restart
-
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
@@ -2442,12 +2438,14 @@
 
          call check(2)
 
-         will_do_photo = do_photo
-         if(s% photo_interval > 0) then
-            if(mod(s% model_number, s% photo_interval) == 0) will_do_photo = .true.
-         end if
-         if(s% solver_save_photo_call_number > 0)then
-            if(s% solver_call_number == s% solver_save_photo_call_number - 1) will_do_photo = .true.
+         will_do_photo = .false.
+         if (.not. s% doing_relax) then
+            if(s% photo_interval > 0) then
+               if(mod(s% model_number, s% photo_interval) == 0) will_do_photo = .true.
+            end if
+            if(s% solver_save_photo_call_number > 0)then
+               if(s% solver_call_number == s% solver_save_photo_call_number - 1) will_do_photo = .true.
+            end if
         end if
 
          if (will_do_photo) then

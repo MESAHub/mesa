@@ -644,7 +644,7 @@
          use evolve, only: finish_step
          integer, intent(in) :: id
          integer, intent(out) :: ierr
-         star_finish_step = finish_step(id, .false., ierr)
+         star_finish_step = finish_step(id, ierr)
       end function star_finish_step
 
       

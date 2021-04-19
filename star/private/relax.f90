@@ -4083,7 +4083,7 @@
             s% how_many_extra_history_columns => no_extra_history_columns
             s% data_for_extra_history_columns => none_for_extra_history_columns
 
-            result = finish_step(id, .false., ierr)
+            result = finish_step(id, ierr)
             s% how_many_extra_history_columns => tmp_ptr1
             s% data_for_extra_history_columns => tmp_ptr2
             s% how_many_extra_profile_columns => tmp_ptr3

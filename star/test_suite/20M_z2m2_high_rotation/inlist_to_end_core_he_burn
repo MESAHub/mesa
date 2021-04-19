@@ -268,14 +268,14 @@
       history_interval = 10
       terminal_interval = 10
       
-      !photo_interval = 1
+      !photo_interval = 5
       !profile_interval = 1
       !history_interval = 1
       !terminal_interval = 1
       
-      !x_integer_ctrl(19) = 70
-      !x_integer_ctrl(20) = 0
-      !x_integer_ctrl(21) = 13
+      !x_integer_ctrl(19) = 35
+      !x_integer_ctrl(20) = 5
+      !x_integer_ctrl(21) = 73
 
 ! FOR DEBUGGING
 

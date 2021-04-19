@@ -90,11 +90,6 @@
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'set_mlt_vars_newer done do1_mlt_2_newer', k
             end if
-            call wrap_mlt_ad(s,k)
-            if (op_err /= 0) then
-               ierr = op_err
-               if (s% report_ierr) write(*,2) 'set_mlt_vars_newer failed', k
-            end if
             if (make_gradr_sticky_in_solver_iters .and. s% solver_iter > 3) then
                if (.not. s% fixed_gradr_for_rest_of_solver_iters(k)) then
                   s% fixed_gradr_for_rest_of_solver_iters(k) = &
@@ -107,58 +102,6 @@
          if (s% x_integer_ctrl(19) > 0) write(*,*)
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
       end subroutine set_mlt_vars_newer
-      
-      
-      subroutine wrap_mlt_ad(s,k)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp) :: dlnR00, dlnTm1, dlnT00, dlndm1, dlnd00
-         dlnR00 = s% d_gradT_dlnR(k)
-         dlnTm1 = s% d_gradT_dlnTm1(k)
-         dlnT00 = s% d_gradT_dlnT00(k)
-         dlndm1 = s% d_gradT_dlndm1(k)
-         dlnd00 = s% d_gradT_dlnd00(k)
-         call wrap(s% gradT_ad(k), s% gradT(k), &
-            dlndm1, dlnd00, 0d0, &
-            dlnTm1, dlnT00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, dlnR00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, s% d_gradT_dL(k), 0d0, &
-            0d0, s% d_gradT_dln_cvpv0(k), 0d0, &   ! xtra1 is ln_cvpv0
-            0d0, s% d_gradT_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
-            0d0, 0d0, 0d0)
-         dlnR00 = s% d_mlt_vc_dlnR(k)
-         dlnTm1 = s% d_mlt_vc_dlnR(k)
-         dlnT00 = s% d_mlt_vc_dlnR(k)
-         dlndm1 = s% d_mlt_vc_dlnR(k)
-         dlnd00 = s% d_mlt_vc_dlnR(k)
-         call wrap(s% mlt_vc_ad(k), s% mlt_vc(k), &
-            dlndm1, dlnd00, 0d0, &
-            dlnTm1, dlnT00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, dlnR00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, s% d_mlt_vc_dL(k), 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0)            
-         dlnR00 = s% d_gradr_dlnR(k)
-         dlnTm1 = s% d_gradr_dlnTm1(k)
-         dlnT00 = s% d_gradr_dlnT00(k)
-         dlndm1 = s% d_gradr_dlndm1(k)
-         dlnd00 = s% d_gradr_dlnd00(k)
-         call wrap(s% gradr_ad(k), s% gradr(k), &
-            dlndm1, dlnd00, 0d0, &
-            dlnTm1, dlnT00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, dlnR00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, s% d_gradr_dL(k), 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, s% d_gradr_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
-            0d0, 0d0, 0d0)
-      end subroutine wrap_mlt_ad
 
 
       subroutine do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term_in, &
@@ -296,22 +239,6 @@
          if (is_bad_num(L)) then
             write(*,2) 'do1_mlt L', k, L
             call mesa_error(__FILE__,__LINE__)
-         end if
-
-         if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
-            gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
-            if (s% w_div_wc_flag) then
-               d_gradr_factor_dw = gradr_factor*(s% dft_rot_dw_div_wc(k)/s%ft_rot(k) &
-                  -s% dfp_rot_dw_div_wc(k)/s%fp_rot(k) )
-            end if
-         else
-            gradr_factor = s% gradr_factor(k)
-            d_gradr_factor_dw = 0d0
-         end if
-
-         if (is_bad_num(gradr_factor)) then
-            ierr = -1
-            return
          end if
 
          ! alfa is the fraction coming from k; (1-alfa) from k-1.
@@ -472,6 +399,7 @@
 
          grada_face_ad = grada_face_in
          if (grada_face_in < 0) grada_face_ad = get_grada_face(s,k)
+         s% grada_face(k) = grada_face_ad%val         
 
          P_face_ad = P_face_in
          if (P_face < 0) P_face_ad = get_Peos_face(s,k)
@@ -480,15 +408,27 @@
    
          rho_face_ad = get_rho_face(s,k)
 
-         gradr_ad = get_gradr_face(s,k)
-
          scale_height_ad = get_scale_height_face(s,k)
 
          xh_face = xh_face_in   
          if (h1 /= 0 .and. xh_face < 0) xh_face = s% xa(h1, k)
 
-         s% grada_face(k) = grada_face_ad%val         
-         
+         if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
+            gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
+            if (s% w_div_wc_flag) then
+               d_gradr_factor_dw = gradr_factor*(s% dft_rot_dw_div_wc(k)/s%ft_rot(k) &
+                  -s% dfp_rot_dw_div_wc(k)/s%fp_rot(k) )
+            end if
+         else
+            gradr_factor = s% gradr_factor(k)
+            d_gradr_factor_dw = 0d0
+         end if
+         if (is_bad_num(gradr_factor)) then
+            ierr = -1
+            return
+         end if
+         gradr_ad = get_gradr_face(s,k)*gradr_factor
+
          tau_face = 1d0 ! disable this for now.
 
          if (s% RTI_flag .and. tau_face > 0.667d0) then
@@ -499,20 +439,12 @@
          end if
          
          if (k == 1 .and. s% mlt_make_surface_no_mixing) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,3) 'k == 1 .and. s% mlt_make_surface_no_mixing gradT', k, s% solver_iter, s% gradT(k)
-            end if
-            call set_no_mixing('mlt_make_surface_no_mixing')
+            call set_no_mixing('surface_no_mixing')
             return
          end if
          
          if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,3) 's% lnT_start(k)/ln10 > s% max_logT_for_mlt', k, s% solver_iter
-            end if
-            call set_no_mixing('max_logT_for_mlt')
+            call set_no_mixing('max_logT')
             return
          end if
          
@@ -525,11 +457,7 @@
             do i=k-1,1,-1
                cs = s% csound(i)
                if (vel(i+1) >= cs .and. vel(i) < cs) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-                     write(*,3) 'no_MLT_below_shock', k, s% solver_iter
-                  end if
-                  call set_no_mixing('no_MLT_below_shock')
+                  call set_no_mixing('below_shock')
                   return
                end if
             end do
@@ -538,11 +466,7 @@
          if (s% no_MLT_below_T_max) then
             k_T_max = maxloc(s% T_start(1:nz),dim=1)
             if (k > k_T_max) then
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-                  write(*,3) 'no_MLT_below_T_max', k, s% solver_iter
-               end if
-               call set_no_mixing('no_MLT_below_T_max')
+               call set_no_mixing('below_T_max')
                return
             end if
          end if
@@ -557,11 +481,7 @@
          
          if (make_gradr_sticky_in_solver_iters) then
             if (s% fixed_gradr_for_rest_of_solver_iters(k)) then
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-                  write(*,3) 'make_gradr_sticky_in_solver_iters', k, s% solver_iter
-               end if
-               call set_no_mixing('make_gradr_sticky_in_solver_iters')
+               call set_no_mixing('gradr_sticky')
                return
             end if
          end if
@@ -668,11 +588,11 @@
             normal_mlt_gradT_factor = max(0d0, normal_mlt_gradT_factor)
          end if
 
-         gradr_ad = gradr_ad*gradr_factor
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'before call do1_mlt_eval_newer gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
             end if
+            
          call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
@@ -906,11 +826,8 @@
          subroutine set_no_mixing(str)
             character (len=*) :: str
             include 'formats'
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,3) 'test_do1_mlt_2_newer set_no_mixing ' // trim(str), k
-            end if
             s% mlt_mixing_type(k) = no_mixing
+            !gradr_ad = gradr_factor*gradr_ad
             gradT_ad = gradr_ad
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
@@ -936,6 +853,10 @@
             s% mlt_cdc(k) = 0d0
             s% actual_gradT(k) = 0d0
             s% grad_superad(k) = 0d0
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
+               write(*,2) 'test_do1_mlt_2_newer set_no_mixing gradT ' // trim(str), k, s% gradT(k)
+            end if
          end subroutine set_no_mixing
 
       end subroutine test_do1_mlt_2_newer

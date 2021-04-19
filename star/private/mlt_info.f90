@@ -585,11 +585,7 @@
          end if
          
          if (k == 1 .and. s% mlt_make_surface_no_mixing) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,3) 'k == 1 .and. s% mlt_make_surface_no_mixing gradT', k, s% solver_iter, s% gradT(k)
-            end if
-            call set_no_mixing('mlt_make_surface_no_mixing')
+            call set_no_mixing('surface_no_mixing')
             return
          end if
          
@@ -598,7 +594,7 @@
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 's% lnT_start(k)/ln10 > s% max_logT_for_mlt', k, s% solver_iter
             end if
-            call set_no_mixing('max_logT_for_mlt')
+            call set_no_mixing('max_logT')
             return
          end if
          
@@ -611,11 +607,7 @@
             do i=k-1,1,-1
                cs = s% csound(i)
                if (vel(i+1) >= cs .and. vel(i) < cs) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-                     write(*,3) 'no_MLT_below_shock', k, s% solver_iter
-                  end if
-                  call set_no_mixing('no_MLT_below_shock')
+                  call set_no_mixing('below_shock')
                   return
                end if
             end do
@@ -624,11 +616,7 @@
          if (s% no_MLT_below_T_max) then
             k_T_max = maxloc(s% T_start(1:nz),dim=1)
             if (k > k_T_max) then
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-                  write(*,3) 'no_MLT_below_T_max', k, s% solver_iter
-               end if
-               call set_no_mixing('no_MLT_below_T_max')
+               call set_no_mixing('below_T_max')
                return
             end if
          end if
@@ -643,11 +631,7 @@
          
          if (make_gradr_sticky_in_solver_iters) then
             if (s% fixed_gradr_for_rest_of_solver_iters(k)) then
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-                  write(*,3) 'make_gradr_sticky_in_solver_iters', k, s% solver_iter
-               end if
-               call set_no_mixing('make_gradr_sticky_in_solver_iters')
+               call set_no_mixing('gradr_sticky')
                return
             end if
          end if
@@ -1114,10 +1098,6 @@
          subroutine set_no_mixing(str)
             character (len=*) :: str
             include 'formats'
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,3) 'test_do1_mlt_2 set_no_mixing ' // trim(str), k
-            end if
             call get_mlt_eval_gradr_info(ierr)
             if (ierr /= 0) return
             s% mlt_mixing_type(k) = no_mixing
@@ -1129,6 +1109,13 @@
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0
             s% gradT(k) = s% gradr(k)
+            
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
+               write(*,2) 'test_do1_mlt_2 set_no_mixing gradT ' // trim(str), k, s% gradT(k)
+            end if
+            
+            
             s% d_gradT_dlnR(k) = s% d_gradr_dlnR(k)
             s% d_gradT_dL(k) = s% d_gradr_dL(k)
             s% d_gradT_dw_div_wc(k) = s% d_gradr_dw_div_wc(k)
