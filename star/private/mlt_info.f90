@@ -192,7 +192,7 @@
          integer, intent(out) :: ierr
          
          real(dp) :: gradT, gradr, mlt_vc, gradL, scale_height, mlt_mixing_length, mlt_D, mlt_Gamma
-         type(auto_diff_real_star_order1) :: gradT_ad
+         type(auto_diff_real_star_order1) :: gradT_ad, mlt_vc_ad, gradr_ad
          integer :: mixing_type, j
          logical :: okay
          include 'formats'
@@ -213,6 +213,10 @@
             
             if (s% using_mlt_info_newer) return
             
+            
+            gradT_ad = s% gradT_ad(k)
+            mlt_vc_ad = s% mlt_vc_ad(k)
+            gradr_ad = s% gradr_ad(k)
             
             mixing_type = s% mlt_mixing_type(k)
             gradT = s% gradT(k)
@@ -267,9 +271,9 @@
             call check_vals(gradL, s% gradL(k), 1d-2, 1d-2, 'gradL')
             call check_vals(mlt_vc, s% mlt_vc(k), 1d-1, 1d-1, 'mlt_vc')
             call check_vals(scale_height, s% scale_height(k), 1d-1, 1d-1, 'scale_height')
-            call check_vals(mlt_mixing_length, s% mlt_mixing_length(k), 1d-1, 1d-1, 'mixing_length')
-            call check_vals(mlt_D, s% mlt_D(k), 1d-1, 1d-1, 'D')
-            call check_vals(mlt_Gamma, s% mlt_Gamma(k), 1d-1, 1d-1, 'Gamma')
+            !call check_vals(mlt_mixing_length, s% mlt_mixing_length(k), 1d-1, 1d-1, 'mixing_length')
+            !call check_vals(mlt_D, s% mlt_D(k), 1d-1, 1d-1, 'D')
+            !call check_vals(mlt_Gamma, s% mlt_Gamma(k), 1d-1, 1d-1, 'Gamma')
             if (mixing_type /= s% mlt_mixing_type(k)) okay = .false.
             do j=1,auto_diff_star_num_vars
                call check_vals(gradT_ad%d1Array(j), s% gradT_ad(k)%d1Array(j), 1d-1, 1d-1, &
@@ -287,6 +291,12 @@
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'done compare_to_mlt_info_newer', k
             end if
+         end if
+         
+         if (s% using_mlt_info_newer) then
+            s% gradT_ad(k) = gradT_ad
+            s% mlt_vc_ad(k) = mlt_vc_ad
+            s% gradr_ad(k) = gradr_ad
          end if
          
          contains

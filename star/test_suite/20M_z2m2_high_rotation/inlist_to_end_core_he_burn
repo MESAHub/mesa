@@ -22,7 +22,7 @@
       new_rotation_flag = .true.
       near_zams_relax_omega_div_omega_crit = .true.
       change_rotation_flag = .false.  ! rotation off until near zams
-      new_omega_div_omega_crit = 0.95d0
+      new_omega_div_omega_crit = 0.75d0
       num_steps_to_relax_rotation = 50
 
       change_D_omega_flag = .true.
@@ -246,36 +246,40 @@
 
       use_d_eos_dxa = .true.
 
-      Pextra_factor = 1 ! for atm
-      !Pextra_factor = 1d2 ! for atm
+      !Pextra_factor = 1 ! for atm
+      Pextra_factor = 1d2 ! for atm
 
-      op_split_burn = .true.
-      op_split_burn_min_T = 1d9
-      burn_steps_limit = 150
-      burn_steps_hard_limit = 250
-      op_split_burn_eps = 1d-6
-      op_split_burn_odescal = 1d-7
+      !op_split_burn = .true.
+      !op_split_burn_min_T = 1d9
+      !burn_steps_limit = 150
+      !burn_steps_hard_limit = 250
+      !op_split_burn_eps = 1d-6
+      !op_split_burn_odescal = 1d-7
+
+       max_abs_rel_run_E_err = 1d99
+       limit_for_rel_error_in_energy_conservation = 1d-3
+       hard_limit_for_rel_error_in_energy_conservation = -1
+
 
 ! output
-      num_trace_history_values = 4
-      trace_history_value_name(1) = 'burn_solver_maxsteps'
-      trace_history_value_name(2) = 'rel_E_err'
-      trace_history_value_name(3) = 'log_rel_run_E_err'
-      trace_history_value_name(4) = 'surf_avg_v_div_v_crit'
+      num_trace_history_values = 3
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+      trace_history_value_name(3) = 'surf_avg_v_div_v_crit'
 
       photo_interval = 50
       profile_interval = 100
       history_interval = 10
       terminal_interval = 10
       
-      !photo_interval = 5
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       !terminal_interval = 1
       
-      !x_integer_ctrl(19) = 35
-      !x_integer_ctrl(20) = 5
-      !x_integer_ctrl(21) = 73
+      !x_integer_ctrl(19) = 148
+      !x_integer_ctrl(20) = 4
+      !x_integer_ctrl(21) = 181
 
 ! FOR DEBUGGING
 
