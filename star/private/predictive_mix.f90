@@ -68,7 +68,6 @@ contains
     include 'formats'
 
     ! Initialize
-    if (s% x_integer_ctrl(19) > 0) write(*,*) 'start add_predictive_mixing'
 
     ierr = 0
 
@@ -200,7 +199,6 @@ contains
     end do check_loop
 
     ! Finish
-    if (s% x_integer_ctrl(19) > 0) write(*,*) 'done add_predictive_mixing'
 
     return
 

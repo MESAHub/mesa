@@ -186,10 +186,13 @@
          ! Ledoux temperature gradient (same as Schwarzschild if composition term = 0)
          gradL = grada + gradL_composition_term
          grav = cgrav*m/pow2(r)
-
-         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-            write(*,2) 'Get_results_newer ' // trim(MLT_option), k
+         
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+               s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
+            write(*,2) 'enter Get_results_newer gradr grada scale_height ' // trim(MLT_option), k, &
+               gradr%val, grada%val, scale_height%val
          end if
+               
          
          call set_no_mixing('')
          if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) then
@@ -217,36 +220,42 @@
             okay_to_use_TDC = .false.
          end if
          
-         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
             write(*,2) 'gradr gradL grada comp_term', k, gradr%val, gradL%val, grada%val, gradL_composition_term
          end if
          Lambda = mixing_length_alpha*scale_height
          if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
             ! this means TDC must do all types:
             ! convective, radiative, thermohaline, semiconvective
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'call set_TDC', k
             end if
             call set_TDC
          else if (gradr > gradL) then ! convective
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'call set_MLT', k
             end if
             call set_MLT
          else if (gradL_composition_term < 0) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'call set_thermohaline', k
             end if
             call set_thermohaline
          else if (gradr > grada) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'call set_semiconvection', k
             end if
             call set_semiconvection
          end if         
          
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             end if
             mixing_type = no_mixing
@@ -263,7 +272,9 @@
             character (len=*) :: str
             include 'formats'            
             if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                  s% solver_iter == s% x_integer_ctrl(20) .and. len_trim(str) > 0) then
+                  s% solver_iter == s% x_integer_ctrl(20) &
+                  .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0) &
+                  .and. len_trim(str) > 0) then
                write(*,2) 'Get_results_newer set_no_mixing ' // trim(str), k
             end if
             mixing_type = no_mixing
@@ -422,7 +433,8 @@
                s% xtra2_array(k) = gradT%val
             end if
 
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'set_MLT Zeta gradr grada gradT', k, Zeta%val, gradr%val, grada%val, gradT%val
             end if
 

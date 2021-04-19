@@ -61,7 +61,6 @@
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
          ierr = 0
-         if (s% x_integer_ctrl(19) > 0) write(*,3) 'doing set_mlt_vars solver model iter', s% model_number, s% solver_iter
          gradL_composition_term = -1d0
          opacity = -1d0
          chiRho = -1d0
@@ -71,17 +70,18 @@
          P = -1d0
          xh = -1d0 
          if (s% doing_timing) call start_time(s, time0, total)
-         if (s% x_integer_ctrl(19) > 0) write(*,*) 'start set_mlt_vars'
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             op_err = 0
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'set_mlt_vars call do1_mlt_2'
             end if
             call do1_mlt_2(s, k, s% alpha_mlt(k), gradL_composition_term, &
                opacity, chiRho, chiT, Cp, grada, P, xh, &
                .false., make_gradr_sticky_in_solver_iters, op_err)
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'set_mlt_vars done do1_mlt_2', k
             end if
             call wrap_mlt_ad(s,k)
@@ -97,8 +97,6 @@
             end if            
          end do
 !$OMP END PARALLEL DO
-         if (s% x_integer_ctrl(19) > 0) write(*,*) 'done set_mlt_vars'
-         if (s% x_integer_ctrl(19) > 0) write(*,*)
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
       end subroutine set_mlt_vars
 
@@ -202,7 +200,8 @@
          ierr = 0
 
          if (s% using_mlt_info_newer .or. s% compare_to_mlt_info_newer) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,*) '***'
                write(*,2) 'call do1_mlt_2_newer', k
             end if               
@@ -211,7 +210,8 @@
                chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
                from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
             if (ierr /= 0 .or. s% using_mlt_info_newer) return
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'done do1_mlt_2_newer', k
                write(*,*) '***'
             end if
@@ -231,7 +231,8 @@
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
          if (ierr /= 0) return
-         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
             write(*,2) 'done test_do1_mlt_2', k
             write(*,*) '***'
          end if
@@ -239,7 +240,8 @@
          if (s% compare_to_mlt_info_newer .and. &
                (k==s% x_integer_ctrl(19) .or. s% x_integer_ctrl(19) <= 0)) then
                
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'compare_to_mlt_info_newer', k
             end if
             okay = .true.
@@ -259,7 +261,8 @@
                   k, s% model_number, s% solver_iter, mixing_type, s% mlt_mixing_type(k)
                stop 'mlt_info do1_mlt_2 compare_to_mlt_newer'
             end if
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'done compare_to_mlt_info_newer', k
             end if
          end if
@@ -340,7 +343,8 @@
          ierr = 0
          nz = s% nz
 
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'start test_do1_mlt_2 k iter', k, s% solver_iter
             end if
          
@@ -581,7 +585,8 @@
          end if
          
          if (k == 1 .and. s% mlt_make_surface_no_mixing) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'k == 1 .and. s% mlt_make_surface_no_mixing gradT', k, s% solver_iter, s% gradT(k)
             end if
             call set_no_mixing('mlt_make_surface_no_mixing')
@@ -589,7 +594,8 @@
          end if
          
          if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 's% lnT_start(k)/ln10 > s% max_logT_for_mlt', k, s% solver_iter
             end if
             call set_no_mixing('max_logT_for_mlt')
@@ -605,7 +611,8 @@
             do i=k-1,1,-1
                cs = s% csound(i)
                if (vel(i+1) >= cs .and. vel(i) < cs) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                      write(*,3) 'no_MLT_below_shock', k, s% solver_iter
                   end if
                   call set_no_mixing('no_MLT_below_shock')
@@ -617,7 +624,8 @@
          if (s% no_MLT_below_T_max) then
             k_T_max = maxloc(s% T_start(1:nz),dim=1)
             if (k > k_T_max) then
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                   write(*,3) 'no_MLT_below_T_max', k, s% solver_iter
                end if
                call set_no_mixing('no_MLT_below_T_max')
@@ -635,7 +643,8 @@
          
          if (make_gradr_sticky_in_solver_iters) then
             if (s% fixed_gradr_for_rest_of_solver_iters(k)) then
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                   write(*,3) 'make_gradr_sticky_in_solver_iters', k, s% solver_iter
                end if
                call set_no_mixing('make_gradr_sticky_in_solver_iters')
@@ -658,18 +667,21 @@
             if (s% u_flag) then        
                abs_du_div_cs = 0d0
                if (s% u_start(k)/1d5 > s% max_v_for_convection) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                      write(*,2) 'u_start(k)/1d5 > s% max_v_for_convection', k, s% u_start(k)/1d5
                   end if
                   max_conv_vel = 0d0              
                else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                      write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
                   end if
                   max_conv_vel = 0d0
                else if ((abs(s% u_start(k))) >= &
                      s% csound_start(k)*s% max_v_div_cs_for_convection) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                      write(*,2) 'abs(s% u_start(k)))', k, abs(s% u_start(k))/1d5
                   end if
                   max_conv_vel = 0d0              
@@ -681,7 +693,8 @@
                          abs(s% u_start(k) - s% u_start(k-1))) / s% csound_start(k)
                   end if
                   if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
-                     if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                     if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                         write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
                      end if
                      max_conv_vel = 0d0
@@ -689,25 +702,29 @@
                end if
             else if (s% v_flag) then
                if (s% v_start(k)/1d5 > s% max_v_for_convection) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                      write(*,2) 's% v_start(k)/1d5 > s% max_v_for_convection', k, s% v_start(k)/1d5
                   end if
                   max_conv_vel = 0d0              
                else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                      write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
                   end if
                   max_conv_vel = 0d0
                else if ((abs(s% v_start(k))) >= &
                      s% csound_start(k)*s% max_v_div_cs_for_convection) then
-                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+                  if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                      write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
                   end if
                   max_conv_vel = 0d0
                end if
             end if
             if (max_conv_vel == 0d0) then
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                   write(*,2) 'max_conv_vel == 0d0', k, max_conv_vel
                end if
                MLT_option = 'none'
@@ -736,10 +753,6 @@
             normal_mlt_gradT_factor = min(1d0, normal_mlt_gradT_factor)
             normal_mlt_gradT_factor = max(0d0, normal_mlt_gradT_factor)
          end if
-
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-               write(*,2) 'before call do1_mlt_eval gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
-            end if
 
          call do1_mlt_eval(s, k, &
             s% cgrav(k), m, mstar, r, L, xh_face, &            
@@ -780,7 +793,8 @@
          end if
          
 
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'after call do1_mlt_eval gradT', k, mlt_basics(mlt_gradT) 
             end if
 
@@ -840,7 +854,8 @@
          Schwarzschild_stable = (s% gradr(k) < grada_face)
          Ledoux_stable = (s% gradr(k) < s% gradL(k))
          
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'do1_mlt_eval before adjust_gradT_fraction gradT', k, s% gradT(k) 
             end if
 
@@ -851,7 +866,8 @@
          end if
          call adjust_gradT_fraction(s, k, f)
          
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'do1_mlt_eval after adjust_gradT_fraction gradT', k, s% gradT(k)
             end if
 
@@ -897,7 +913,8 @@
             return
          end if
 
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,2) 'done test_do1_mlt_2 gradT', k, s% gradT(k)
             end if
          
@@ -1097,7 +1114,8 @@
          subroutine set_no_mixing(str)
             character (len=*) :: str
             include 'formats'
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,3) 'test_do1_mlt_2 set_no_mixing ' // trim(str), k
             end if
             call get_mlt_eval_gradr_info(ierr)
@@ -1194,7 +1212,8 @@
 
          include 'formats'
          
-         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
             write(*,2) 'adjust_gradT_fraction f', k, f
          end if
 
@@ -1251,7 +1270,8 @@
          call adjust_gradT_excess(s, k)
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! new gradT_excess from adjusted gradT
          
-         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
             write(*,2) 'after adjust_gradT_excess gradT', k, s% gradT(k)
          end if
 
@@ -1277,7 +1297,8 @@
 
          if (gradT_excess_alpha <= 0.0  .or. &
              s% gradT_sub_grada(k) <= s% gradT_excess_f1) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,*) 'gradT_excess_alpha <= 0.0', gradT_excess_alpha <= 0.0
                write(*,*) 's% gradT_sub_grada(k) <= s% gradT_excess_f1', &
                   s% gradT_sub_grada(k) <= s% gradT_excess_f1, &
@@ -1287,7 +1308,8 @@
          end if
 
          if (s% lnT(k)/ln10 > s% gradT_excess_max_logT) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,*) 's% lnT(k)/ln10 > s% gradT_excess_max_logT', k, s% lnT(k)/ln10, s% gradT_excess_max_logT
             end if
             return
@@ -1295,7 +1317,8 @@
 
          log_tau = log10(s% tau(k))
          if (log_tau < s% gradT_excess_max_log_tau_full_off) then
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,*) 'log_tau < s% gradT_excess_max_log_tau_full_off', k, log_tau, s% gradT_excess_max_log_tau_full_off
             end if
             return
@@ -1335,7 +1358,8 @@
          end if
          beta = 1.d0 - alfa
 
-         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
+         if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
             write(*,2) 'adjust_gradT_excess alfa gradT grada', k, alfa, s% gradT(k), s% grada_face(k)
          end if
 

@@ -273,8 +273,9 @@
       !history_interval = 1
       !terminal_interval = 1
       
-      !x_integer_ctrl(19) = 781
+      !x_integer_ctrl(19) = 70
       !x_integer_ctrl(20) = 0
+      !x_integer_ctrl(21) = 13
 
 ! FOR DEBUGGING
 

@@ -169,8 +169,9 @@
                grada_ad = get_grada_face(s,k)
                scale_height_ad = get_scale_height_face(s,k)
 
-               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. s% solver_iter == s% x_integer_ctrl(20)) then
-                  write(*,2) 'call do1_mlt_eval_newer gradr grada Hp', k, gradr_ad%val, grada_ad%val, scale_height_ad%val
+               if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
+                        s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
+                  write(*,2) 'do1_mlt_eval gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
                end if
                
                call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
@@ -739,12 +740,6 @@
          radiative_conductivity = (four_thirds*crad*clight)*T*T*T / (opacity*rho) ! erg / (K cm sec)
          if (debug) write(*,1) 'radiative_conductivity', radiative_conductivity
          d_rc_dvb = radiative_conductivity*(3d0*dT_dvb/T - dRho_dvb/rho - d_opacity_dvb/opacity)
-         
-         if (kz == -1266 .and. ss% model_number == 2110 .and. ss% solver_iter == ss% x_integer_ctrl(20)) then
-            write(*,5) 'mlt newer k model iter mix_type gradr gradL grada', &
-               kz, ss% model_number, ss% solver_iter, mixing_type, &
-               gradr, gradL, grada
-         end if
          
          if (diff_grads <= 0d0) then ! not convective (Ledoux stable)    
             call set_no_mixing('6') ! also sets gradT = gradr    
