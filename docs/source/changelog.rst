@@ -8,7 +8,7 @@ Changes in dev
 Backwards-incompatible changes
 ------------------------------
 
-
+``mixing_type`` now reports the mixing process that generates the largest D_mix, rather than prioritizing convection and thermohaline mixing over all others.
 
 
 Module-level changes
