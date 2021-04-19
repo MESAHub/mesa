@@ -771,11 +771,6 @@
          real(dp), pointer, dimension(:) :: dlnP, dlnd, dlnT
 
          include 'formats'
-         
-         if (s% using_mlt_info_newer) then
-            call set_grads_newer(s, ierr)
-            return
-         end if
 
          ierr = 0
          nz = s% nz
