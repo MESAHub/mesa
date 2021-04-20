@@ -765,7 +765,7 @@
             write(*,2) 'non_nuc_neu', k, s% non_nuc_neu(k)
             write(*,2) 'd_nonnucneu_dlnd', k, s% d_nonnucneu_dlnd(k)
             write(*,2) 'd_nonnucneu_dlnT', k, s% d_nonnucneu_dlnT(k)
-            write(*,2) 'eps_grav', k, s% eps_grav(k)
+            write(*,2) 'eps_grav', k, s% eps_grav_ad(k)% val
             write(*,2) 'gradT', k, s% gradT(k)
             !write(*,2) '', k, s% (k)
             do j=1,s% species

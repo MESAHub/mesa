@@ -139,7 +139,7 @@
          s% D_mix(1:nz) = 0
          s% adjust_mlt_gradT_fraction(1:nz) = -1
          s% eps_mdot(1:nz) = 0
-         s% eps_grav(1:nz) = 0
+         call fill_ad_with_zeros(s% eps_grav_ad,1,-1)
          s% ergs_error(1:nz) = 0
          if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then

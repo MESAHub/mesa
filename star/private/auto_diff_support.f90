@@ -765,6 +765,80 @@
          end if   
       end function wrap_gamma1_p1
 
+      function wrap_latent_ddlnT_m1(s, k) result(latent_ddlnT_m1)
+         use eos_def, only: i_latent_ddlnT
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnT_m1
+         integer, intent(in) :: k
+         latent_ddlnT_m1 = 0d0
+         if (k > 1) then
+            latent_ddlnT_m1%val = s% latent_ddlnT(k-1)
+            latent_ddlnT_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_latent_ddlnT,k-1)
+            latent_ddlnT_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_latent_ddlnT,k-1)
+         end if
+      end function wrap_latent_ddlnT_m1
+
+      function wrap_latent_ddlnT_00(s, k) result(latent_ddlnT_00)
+         use eos_def, only: i_latent_ddlnT
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnT_00
+         integer, intent(in) :: k
+         latent_ddlnT_00 = 0d0
+         latent_ddlnT_00%val = s% latent_ddlnT(k)
+         latent_ddlnT_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_latent_ddlnT,k)
+         latent_ddlnT_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_latent_ddlnT,k)
+      end function wrap_latent_ddlnT_00
+
+      function wrap_latent_ddlnT_p1(s, k) result(latent_ddlnT_p1)
+         use eos_def, only: i_latent_ddlnT
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnT_p1
+         integer, intent(in) :: k
+         latent_ddlnT_p1 = 0d0
+         if (k < s% nz) then
+            latent_ddlnT_p1%val = s% latent_ddlnT(k+1)
+            latent_ddlnT_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_latent_ddlnT,k+1)
+            latent_ddlnT_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_latent_ddlnT,k+1)
+         end if
+      end function wrap_latent_ddlnT_p1
+
+      function wrap_latent_ddlnRho_m1(s, k) result(latent_ddlnRho_m1)
+         use eos_def, only: i_latent_ddlnRho
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnRho_m1
+         integer, intent(in) :: k
+         latent_ddlnRho_m1 = 0d0
+         if (k > 1) then
+            latent_ddlnRho_m1%val = s% latent_ddlnRho(k-1)
+            latent_ddlnRho_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_latent_ddlnRho,k-1)
+            latent_ddlnRho_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_latent_ddlnRho,k-1)
+         end if
+      end function wrap_latent_ddlnRho_m1
+
+      function wrap_latent_ddlnRho_00(s, k) result(latent_ddlnRho_00)
+         use eos_def, only: i_latent_ddlnRho
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnRho_00
+         integer, intent(in) :: k
+         latent_ddlnRho_00 = 0d0
+         latent_ddlnRho_00%val = s% latent_ddlnRho(k)
+         latent_ddlnRho_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_latent_ddlnRho,k)
+         latent_ddlnRho_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_latent_ddlnRho,k)
+      end function wrap_latent_ddlnRho_00
+
+      function wrap_latent_ddlnRho_p1(s, k) result(latent_ddlnRho_p1)
+         use eos_def, only: i_latent_ddlnRho
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnRho_p1
+         integer, intent(in) :: k
+         latent_ddlnRho_p1 = 0d0
+         if (k < s% nz) then
+            latent_ddlnRho_p1%val = s% latent_ddlnRho(k+1)
+            latent_ddlnRho_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_latent_ddlnRho,k+1)
+            latent_ddlnRho_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_latent_ddlnRho,k+1)
+         end if
+      end function wrap_latent_ddlnRho_p1
+
       function wrap_L_m1(s, k) result(L_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: L_m1

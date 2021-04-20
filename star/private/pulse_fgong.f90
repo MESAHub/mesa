@@ -399,7 +399,7 @@ contains
         X = eval_face(s%dq, s%X, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
         L = s%L(k)
         kap = eval_face(s%dq, s%opacity, k, k_a, k_b)
-        eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav, k, k_a, k_b)
+        eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         Gamma_1 = eval_face(s%dq, s%gamma1, k, k_a, k_b)
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         delta = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
@@ -415,7 +415,7 @@ contains
              eval_face(s%dq, s%X, k, k_a, k_b) - &
              eval_face(s%dq, s%Y, k, k_a, k_b)))
         R_r = r_outer - s%r(k)
-        eps_grav = eval_face(s%dq, s%eps_grav, k, k_a, k_b)
+        eps_grav = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         X_He3 = eval_face_X(s, he3, k, k_a, k_b)
         X_C12 = eval_face_X(s, c12, k, k_a, k_b)
         X_C13 = eval_face_X(s, c13, k, k_a, k_b)
@@ -492,7 +492,7 @@ contains
         X = eval_center(s%rmid, s%X, k_a, k_b, v_lo=0d0, v_hi=1d0)
         L = 0d0
         kap = eval_center(s%rmid, s%opacity, k_a, k_b)
-        eps = eval_center(s%rmid, s%eps_nuc, k_a, k_b) + eval_center(s%rmid, s%eps_grav, k_a, k_b)
+        eps = eval_center(s%rmid, s%eps_nuc, k_a, k_b) + eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         Gamma_1 = eval_center(s%rmid, s%gamma1, k_a, k_b)
         nabla_ad = eval_center(s%rmid, s%grada, k_a, k_b)
         delta = eval_center(s%rmid, s%chiT, k_a, k_b)/eval_center(s%rmid, s%chiRho, k_a, k_b)
@@ -504,7 +504,7 @@ contains
              eval_center(s%rmid, s%X, k_a, k_b) - &
              eval_center(s%rmid, s%Y, k_a, k_b)))
         R_r = r_outer
-        eps_grav = eval_center(s%rmid, s%eps_grav, k_a, k_b)
+        eps_grav = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         X_He3 = eval_center_X(s, he3, k_a, k_b)
         X_C12 = eval_center_X(s, c12, k_a, k_b)
         X_C13 = eval_center_X(s, c13, k_a, k_b)
