@@ -1,0 +1,6 @@
+This test suite example creates a pre-core collapse model appropriate for use in a case like test/ccsn_IIp.
+
+Edit inlist_mass_Z_wind_rotation to specify the desired choices.
+
+Edit the rn script so that it will do the full set of inlists rather than just a few as it does for the test suite runs.
+
