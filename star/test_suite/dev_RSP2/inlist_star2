@@ -63,8 +63,10 @@
       !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
+      
+      max_number_retries = 0
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
+      report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 

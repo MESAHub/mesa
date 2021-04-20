@@ -1383,7 +1383,10 @@
             end if
             s% w(k) = w_00
             s% xh(s% i_w,k) = s% w(k)
+            !write(*,2) 'w', k, s% w(k)
          end do
+         
+         !stop 'reset_etrb_using_L'
          
       end subroutine reset_etrb_using_L
 

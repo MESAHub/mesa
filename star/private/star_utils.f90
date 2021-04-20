@@ -3319,7 +3319,7 @@
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha  == 0) then
+         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
