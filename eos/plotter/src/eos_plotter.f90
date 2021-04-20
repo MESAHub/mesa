@@ -1,7 +1,7 @@
 program eos_plotter
 
    use eos_def
-   use eos_lib, only: eosDT_get
+   use eos_lib, only: eos_ptr, eosDT_get
    use chem_def
    use chem_lib
    use const_lib
@@ -82,7 +82,7 @@ program eos_plotter
 
    ! allocate and initialize the eos tables
    call Setup_eos(handle)
-   rq => eos_handles(handle)
+   call eos_ptr(handle, rq, ierr)
 
    allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
    if (ierr /= 0 .and. .not. ignore_ierr) stop 'allocate failed'

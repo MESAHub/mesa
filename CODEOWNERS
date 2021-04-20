@@ -15,9 +15,10 @@ chem/ @rjfarmer @fxt @aarondotter
 colors/ @rjfarmer
 const/ @rjfarmer @fxt @aarondotter
 data/ @rjfarmer
-#docs/ 
+docs/ @rhdtownsend @jschwab
 eos/ @fxt @aarondotter @jschwab @adamjermyn @evbauer
 gyre/ @rhdtownsend @warrickball
+hdfio5 @richtownsend
 interp_1d/ @rhdtownsend @adamjermyn
 interp_2d/ @rhdtownsend @adamjermyn
 kap/ @fxt @aarondotter @jschwab

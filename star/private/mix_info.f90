@@ -295,7 +295,7 @@
             do k = 2, nz
                if (s% D_mix(k) < 1d-10) s% D_mix(k) = 0d0
                s% cdc(k) = s% D_mix(k)*cdc_factor(k)
-               if (s% D_mix(k) /= 0 .and. s% mixing_type(k) == no_mixing) then
+               if (s% D_mix(k) /= 0 .and. s% D_mix_non_rotation(k) < s% D_mix_rotation(k)) then
                   s% mixing_type(k) = rotation_mixing
                end if
             end do
