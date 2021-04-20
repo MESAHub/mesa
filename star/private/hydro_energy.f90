@@ -218,9 +218,6 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_div_w, RTI_diffusion_ad
-            real(dp) :: d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
-               d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
-               d_extra_heat_dlndm1, d_extra_heat_dlnd00, d_extra_heat_dlndp1
             include 'formats'
             ierr = 0
          
@@ -238,28 +235,12 @@
             
             non_nuc_neu_ad = 0d0
             ! for reasons lost in the past, we always time center non_nuc_neu
+            ! change that if you are feeling lucky.
             non_nuc_neu_ad%val = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
             non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
             non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
             
-            d_extra_heat_dlnR00 = s% d_extra_heat_dlnR00(k)
-            d_extra_heat_dlnRp1 = s% d_extra_heat_dlnRp1(k)
-            d_extra_heat_dlnTm1 = s% d_extra_heat_dlnTm1(k)
-            d_extra_heat_dlnT00 = s% d_extra_heat_dlnT00(k)
-            d_extra_heat_dlnTp1 = s% d_extra_heat_dlnTp1(k)
-            d_extra_heat_dlndm1 = s% d_extra_heat_dlndm1(k)
-            d_extra_heat_dlnd00 = s% d_extra_heat_dlnd00(k)
-            d_extra_heat_dlndp1 = s% d_extra_heat_dlndp1(k)
-            call wrap(extra_heat_ad, s% extra_heat(k), &
-               d_extra_heat_dlndm1, d_extra_heat_dlnd00, d_extra_heat_dlndp1, &
-               d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
-               0d0, 0d0, 0d0, &
-               0d0, d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0)
+            extra_heat_ad = s% extra_heat(k)
             
             ! other = eps_WD_sedimentation + eps_diffusion + eps_pre_mix
             ! no partials for any of these

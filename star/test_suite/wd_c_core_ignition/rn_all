@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# uncomment the following line to run all parts of the test
+# MESA_RUN_OPTIONAL=t
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+do_one inlist_relax_mass_header wd_c_core_ignition.mod
+do_one inlist_wd_c_core_ignition_header final.mod
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished all inlists for wd_c_core_ignition'

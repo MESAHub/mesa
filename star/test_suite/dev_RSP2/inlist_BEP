@@ -1,0 +1,67 @@
+! binary evolution pulsator, a model from: http://adsabs.harvard.edu/abs/2013MNRAS.428.3034S; 
+! M=0.26Ms,
+! L=33Ls, 
+! Teff=6968K,
+! X=0.70, Z=0.01.
+! This model needs ~1000 cycles to converge.
+
+! original test case contributed by Radek Smolec.
+
+&star_job
+   saved_model_name = 'BEP.mod'
+   
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 50 ! for debugging
+   
+/ ! end of star_job namelist
+
+&eos
+   use_Skye = .true.
+/ ! end of eos namelist
+
+&kap
+   Zbase = 0.01d0
+   kap_file_prefix = 'a09'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   kap_CO_prefix = 'a09_co'
+/ ! end of kap namelist
+   
+&controls  
+   initial_z = 0.01d0
+   initial_mass = 0.26d0
+   
+   force_timestep = 50 ! for debugging
+
+! RSP2
+
+   mixing_length_alpha  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
+
+   RSP2_num_outermost_cells_forced_nonturbulent = 1
+   RSP2_num_innermost_cells_forced_nonturbulent = 5
+
+! RSP
+
+   !x_integer_ctrl(1) = 10 ! which period to check
+   !x_ctrl(1) = 0.620728d0 ! expected period (in days) 
+
+   RSP_mass = 0.26d0
+   RSP_Teff = 6968d0
+   RSP_L = 33d0
+   RSP_X = 0.70d0
+   RSP_Z = 0.01d0
+
+/ ! end of controls namelist
+
+
+&pgstar
+   Grid2_title = 'BEP'
+/ ! end of pgstar namelist
+   
+
+
+   
+

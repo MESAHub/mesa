@@ -1332,7 +1332,7 @@
             phase2_total_energy_from_mdot = &
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             
-            s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz))
+            s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)
 
             phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
@@ -1673,15 +1673,9 @@
 
          nz = s% nz
          dt = s% dt
-         s% extra_heat(1:nz) = s% extra_power_source
-         s% d_extra_heat_dlndm1(1:nz) = 0d0
-         s% d_extra_heat_dlnd00(1:nz) = 0d0
-         s% d_extra_heat_dlndp1(1:nz) = 0d0
-         s% d_extra_heat_dlnTm1(1:nz) = 0d0
-         s% d_extra_heat_dlnT00(1:nz) = 0d0
-         s% d_extra_heat_dlnTp1(1:nz) = 0d0
-         s% d_extra_heat_dlnR00(1:nz) = 0d0
-         s% d_extra_heat_dlnRp1(1:nz) = 0d0
+         do k=1,nz
+            s% extra_heat(k) = s% extra_power_source
+         end do
          
          if (s% use_other_energy) then
             call s% other_energy(s% id, ierr)
@@ -2388,9 +2382,7 @@
       end subroutine report_problems
 
 
-      integer function finish_step( &
-            id, do_photo, &
-            ierr)
+      integer function finish_step(id, ierr)
          ! returns keep_going or terminate
          ! if don't return keep_going, then set result_reason to say why.
          use evolve_support, only: output
@@ -2400,8 +2392,6 @@
          use alloc, only: size_work_arrays
 
          integer, intent(in) :: id
-         logical, intent(in) :: do_photo ! if true, then save "photo" for restart
-
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
@@ -2448,12 +2438,14 @@
 
          call check(2)
 
-         will_do_photo = do_photo
-         if(s% photo_interval > 0) then
-            if(mod(s% model_number, s% photo_interval) == 0) will_do_photo = .true.
-         end if
-         if(s% solver_save_photo_call_number > 0)then
-            if(s% solver_call_number == s% solver_save_photo_call_number - 1) will_do_photo = .true.
+         will_do_photo = .false.
+         if (.not. s% doing_relax) then
+            if(s% photo_interval > 0) then
+               if(mod(s% model_number, s% photo_interval) == 0) will_do_photo = .true.
+            end if
+            if(s% solver_save_photo_call_number > 0)then
+               if(s% solver_call_number == s% solver_save_photo_call_number - 1) will_do_photo = .true.
+            end if
         end if
 
          if (will_do_photo) then

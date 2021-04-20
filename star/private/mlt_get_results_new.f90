@@ -127,7 +127,7 @@
             gradr_ad = gradr_factor*get_gradr_face(s,k)
             grada_ad = get_grada_face(s,k)
             scale_height_ad = get_scale_height_face(s,k)
-            call do1_mlt_eval_newer(s, k, MLT_option, gradL_composition_term, &
+            call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
                gradr_ad, grada_ad, scale_height_ad, mixing_length_alpha, alt_mixing_type, &
                gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
             if (ierr /= 0) then
@@ -227,9 +227,9 @@
             real(dp) :: err
             include 'formats'
             err = abs(abs(new-old) / (atol + rtol*max(abs(new),abs(old)))) - 1d0
-            if (err > 0d0) then
-               write(*,4) trim(str) // ' k model iter newer err new val', &
-                  k, s% model_number, s% solver_iter, err, new, old
+            if (err > 0d0 .or. is_bad(new) .or. is_bad(old)) then
+               write(*,6) trim(str) // ' k model iter alt type err new old', &
+                  k, s% model_number, s% solver_iter, alt_mixing_type, mixing_type, err, new, old
                okay = .false.
             end if
          end subroutine check_vals
@@ -316,7 +316,9 @@
          
          include 'formats'
          
-         call Get_results(s, k, &
+         stop 'should not be calling Get_results_new'
+         
+         call do_Get_results_new(s, k, &
             cgrav, m, mstar, r, L, xh, &            
             T, rho, P, chiRho, chiT, Cp, opacity, grada, &            
             a_00, a_m1, &
@@ -356,6 +358,11 @@
 
          if (k == 0) return
          
+         if (is_bad(gradT)) then
+            write(*,*) 'gradT k model iter mix_type', gradT, k, s% model_number, s% solver_iter, mixing_type
+            stop 'Get_results_new'
+         end if
+         
          s% gradT_ad(k) = wrap_mlt(gradT, d_gradT_dvb)
          s% gradr_ad(k) = wrap_mlt(gradr, d_gradr_dvb)
          s% mlt_vc_ad(k) = wrap_mlt(conv_vel, d_conv_vel_dvb)
@@ -370,7 +377,7 @@
       end subroutine Get_results_new
       
 
-      subroutine Get_results(ss, kz, &
+      subroutine do_Get_results_new(ss, kz, &
             cgrav, m, mstar, r, L, xh, &            
             T, rho, P, chiRho, chiT, Cp, opacity, grada, &            
             a_00, a_m1, &
@@ -592,7 +599,7 @@
          
          if (is_bad(gradr)) then
             ierr = -1
-            if (.not. ss% report_ierr) return
+            !if (.not. ss% report_ierr) return
 !$OMP critical (mlt_info_crit6)
             write(*,2) 'gradr', kz, gradr
             write(*,2) 'P', kz, P
@@ -642,7 +649,7 @@
 
          if (scale_height <= 0d0 .or. is_bad(scale_height)) then
             ierr = -1
-            return
+            !return
 !$OMP critical (mlt_info_crit7)
             write(*,1) 'scale_height', scale_height
             stop 'set_convective_mixing'
@@ -651,7 +658,7 @@
 
          if (is_bad(d_scale_height_dvb(mlt_dlnd00))) then
             ierr = -1
-            return
+            !return
 !$OMP critical (mlt_info_crit8)
             write(*,1) 'd_scale_height_dvb(mlt_dlnd00)', d_scale_height_dvb(mlt_dlnd00)
             stop 'set_convective_mixing'
@@ -671,7 +678,7 @@
          d_diff_grads_dvb = d_gradr_dvb - d_gradL_dvb
          if (is_bad(d_diff_grads_dvb(mlt_dlnT00))) then
             ierr = -1
-            return
+            !return
 !$omp critical (mlt_info_crit9)
             write(*,1) 'd_grada_dvb(mlt_dlnT00)', d_grada_dvb(mlt_dlnT00)
             write(*,1) 'd_gradr_dvb(mlt_dlnT00)', d_gradr_dvb(mlt_dlnT00)
@@ -684,7 +691,7 @@
          Pg = P - Pr
          if (debug) write(*,1) 'Pg', Pg
          if (Pg < tiny) then
-            call set_no_mixing
+            call set_no_mixing('1')
             return
          end if
          
@@ -702,12 +709,12 @@
          d_Lambda_dvb = mixing_length_alpha*d_scale_height_dvb
                   
          if (mixing_length_alpha <= 0) then
-            call set_no_mixing
+            call set_no_mixing('2')
             return
          end if
          
          if (MLT_option == 'none') then
-            call set_no_mixing
+            call set_no_mixing('3')
             return
          end if
          
@@ -727,7 +734,7 @@
                write(*,*) "MLT_option == 'none' ", MLT_option == 'none'      
                call mesa_error(__FILE__,__LINE__)
             end if
-            call set_no_mixing
+            call set_no_mixing('4')
             return
          end if
 
@@ -735,7 +742,7 @@
          Q = chiT/chiRho
          dQ_dvb = Q*( d_chiT_dvb/chiT - d_chiRho_dvb/chiRho )
          if (Q <= 0) then
-            call set_no_mixing
+            call set_no_mixing('5')
             return
          end if
                      
@@ -744,7 +751,7 @@
          d_rc_dvb = radiative_conductivity*(3d0*dT_dvb/T - dRho_dvb/rho - d_opacity_dvb/opacity)
          
          if (diff_grads <= 0d0) then ! not convective (Ledoux stable)    
-            call set_no_mixing ! also sets gradT = gradr    
+            call set_no_mixing('6') ! also sets gradT = gradr    
             if (gradL_composition_term < 0) then ! composition unstable
                call set_thermohaline
                D = D_thrm
@@ -768,7 +775,7 @@
             end if
             if (debug) write(*,1) 'remove_small_D_limit', remove_small_D_limit
             if (D < remove_small_D_limit .or. is_bad(D)) then
-               call set_no_mixing
+               call set_no_mixing('7')
             end if
             if (debug) write(*,1) 'final D', D
             if (conv_vel > 0d0) then
@@ -903,7 +910,7 @@
          end if
 
          if (D < remove_small_D_limit .or. is_bad(D)) then
-            call set_no_mixing
+            call set_no_mixing('8')
          end if
 
          if (ss% conv_vel_flag) then
@@ -999,7 +1006,7 @@
             d_D_thrm_dvb = 0
                         
             if (D_thrm < min_D_th .or. D_thrm <= 0) then
-               call set_no_mixing
+               call set_no_mixing('9')
                return
             end if
             
@@ -1503,7 +1510,7 @@
             end if   
 
             if (f1 < 0) then
-               call set_no_mixing
+               call set_no_mixing('10')
                return
             end if   
             f1 = pow(f1,one_third)     
@@ -1526,13 +1533,10 @@
                write(*,1) 'd_f2_dvb', d_f2_dvb
                stop 'MLT: bad f1'
 !$omp end critical (mlt_info_crit12)
-!               call set_no_mixing
-!               quit = .true.
-!               return
             end if
 
             if (Gamma < 0) then
-               call set_no_mixing
+               call set_no_mixing('11')
                return
             end if
             
@@ -1629,7 +1633,7 @@
             
             
             if (is_bad(gradT)) then
-               call set_no_mixing
+               call set_no_mixing('12')
                quit = .true.
                return
             end if
@@ -1647,7 +1651,7 @@
             
             include 'formats'
             if (dbg) write(*,*) 'check for semiconvection'
-            call set_no_mixing ! sets gradT = gradr
+            call set_no_mixing('13') ! sets gradT = gradr
             D_semi = alpha_semiconvection*radiative_conductivity/(6*Cp*rho) &
                   *(gradr - grada)/(gradL - gradr)
             if (D_semi <= 0) then
@@ -1659,14 +1663,14 @@
                   write(*,1) 'gradL - gradr', gradL - gradr
                   stop
                end if
-               call set_no_mixing
+               call set_no_mixing('14')
                return
             end if
             d_D_semi_dvb = 0 ! not used, so skip for now.
             conv_vel = 3*D_semi/Lambda 
             d_conv_vel_dvb = 0
             if (D_semi <= 0) then
-               call set_no_mixing
+               call set_no_mixing('15')
                return
             end if
             
@@ -1758,10 +1762,13 @@
             
          end subroutine set_semiconvection
                   
-         subroutine set_no_mixing
-            ! assumes have set gradr, scale_height, gradL, and Lambda.
+         subroutine set_no_mixing(str) ! assumes have set gradr, scale_height, gradL, and Lambda.
+            character (len=*), intent(in) :: str
             mixing_type = no_mixing
             gradT = gradr
+            if (is_bad(gradT)) then
+               write(*,*) 'set_no_mixing gradT ' // trim(str), gradT
+            end if
             d_gradT_dvb = d_gradr_dvb
             conv_vel = 0
             d_conv_vel_dvb = 0
@@ -1773,7 +1780,7 @@
             d_D_thrm_dvb = 0
             Gamma = 0
             d_Gamma_dvb = 0
-         end subroutine set_no_mixing         
+         end subroutine set_no_mixing
          
          subroutine show_args
  1          format(a30,1pe26.16)
@@ -2145,7 +2152,7 @@
          end subroutine revise_using_cv_var_variable
 
 
-      end subroutine Get_results
+      end subroutine do_Get_results_new
 
 
       end module mlt_get_results_new

@@ -278,27 +278,20 @@
       ! irradiation heat profile
       real(dp), pointer :: irradiation_heat(:) ! (ergs/gm/sec)      
       
-      ! extra pressure profile (can be set by user)
-      real(dp), pointer :: extra_pressure(:) ! (ergs/gm/sec)
-      
-      ! extra heat profile (can be set by user)
-      real(dp), pointer :: extra_heat(:) ! (ergs/gm/sec)
-      real(dp), pointer, dimension(:) :: &
-         d_extra_heat_dlndm1, d_extra_heat_dlnd00, d_extra_heat_dlndp1, &
-         d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
-         d_extra_heat_dlnR00, d_extra_heat_dlnRp1
-      
       ! eps_heat = eps_nuc - non_nuc_neu + extra_heat + irradiation_heat
       real(dp), pointer :: eps_heat(:) ! (ergs/gm/sec)
       
       ! extra factor for opacities (can be set by user)
       real(dp), pointer, dimension(:) :: extra_opacity_factor
       
+      ! extra pressure profile (can be set by user)
+      real(dp), pointer :: extra_pressure(:) ! (ergs/gm/sec)
+      
+      ! extra heat profile (can be set by user)
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: extra_heat
+      
       ! extra gravity (can be set by user)  added to -G*m/r^2 in momentum equation
-      real(dp), pointer, dimension(:) :: extra_grav, & ! at cell boundary
-         d_extra_grav_dlndm1, d_extra_grav_dlnd00, &
-         d_extra_grav_dlnTm1, d_extra_grav_dlnT00, &
-         d_extra_grav_dlnR, d_extra_grav_dL
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: extra_grav
       
       ! extra torque (can be set by user)
       real(dp), pointer, dimension(:) :: &
@@ -441,8 +434,6 @@
          real(dp), pointer :: d_mlt_vc_dL(:)
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
-         logical, pointer :: new_fixed_gradr_for_rest_of_solver_iters(:)
-         logical, pointer :: newer_fixed_gradr_for_rest_of_solver_iters(:)
          
       ! Convective turbulent velocity w -- when RSP2_flag is true
          

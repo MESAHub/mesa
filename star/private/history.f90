@@ -2148,9 +2148,9 @@
             case(h_eps_grav_integral)
                val = dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun
             case(h_extra_L)
-               val = dot_product(s% dm(1:nz), s% extra_heat(1:nz))/Lsun
+               val = dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)/Lsun
             case(h_log_extra_L)
-               val = safe_log10(dot_product(s% dm(1:nz), s% extra_heat(1:nz))/Lsun)
+               val = safe_log10(dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)/Lsun)
             case(h_log_abs_Lgrav)
                val = safe_log10(abs(dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun))
             case(h_log_Lnuc)
