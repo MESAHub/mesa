@@ -1,0 +1,78 @@
+! type-II Cepheid of BL Her type  0.55Ms, 136Ls, 6410K, X=0.76, Z=0.0001
+! convective parameters are such, that it should show deterministic chaos
+! - lots of struggling between low and high amplitudes. 
+! Growth rates are high, so only after ~20-40 cycles the attractor is approached. 
+! A model motivated by: http://adsabs.harvard.edu/abs/2014MNRAS.441..101S.
+! You can increase the alfa_m (eddy viscosity) to e.g. 0.25. Then it should pulsate regularly.
+
+! original test case contributed by Radek Smolec.
+
+&star_job
+   saved_model_name = 'Type_II_Cepheid.mod'
+   
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 100 ! for debugging
+
+/ ! end of star_job namelist
+
+&eos
+   use_Skye = .true.
+/ ! end of eos namelist
+
+&kap
+   Zbase = 0.0001d0
+   kap_file_prefix = 'a09'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   kap_CO_prefix = 'a09_co'
+/ ! end of kap namelist
+   
+&controls  
+   initial_z = 0.0001d0
+   initial_mass = 0.55d0
+
+   force_timestep = 100 ! for debugging
+
+! RSP2
+
+   mixing_length_alpha  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
+
+   !RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+   RSP2_alfam =     0.05d0        ! "lots of struggling"
+
+   RSP2_num_outermost_cells_forced_nonturbulent = 1
+   RSP2_num_innermost_cells_forced_nonturbulent = 5
+
+! RSP
+
+   !x_integer_ctrl(1) = 10 ! which period to check
+   !x_ctrl(1) = 1.58915d0 ! expected period (in days) 
+
+   RSP_mass = 0.55d0
+   RSP_Teff = 6410d0
+   RSP_L = 136d0
+   RSP_X = 0.76d0
+   RSP_Z = 0.0001d0
+   
+   ! parameters for equations
+   RSP_alfa   = 1.5d0
+   RSP_alfap  = 0.0d0
+   RSP_alfat  = 0.0d0
+   RSP_gammar = 0d0
+
+   !RSP_alfam  = 0.25d0 ! standard value        change RSP2_alfam to match
+   RSP_alfam  = 0.05d0
+
+/ ! end of controls namelist
+
+
+&pgstar
+   Grid2_title = 'Type_II_Cepheid'
+/ ! end of pgstar namelist
+   
+
+
+   
+

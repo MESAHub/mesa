@@ -863,6 +863,7 @@
             finish_load_model
          use relax, only: do_relax_to_limit, do_relax_mass, &
             do_relax_mass_scale, do_relax_num_steps, do_relax_to_radiative_core
+         use auto_diff_support
          integer, intent(in) :: id, do_which
          character (len=*), intent(in) :: model_info, restart_filename
          logical, intent(in) :: restart
@@ -1030,8 +1031,10 @@
                   return
             end select
          end if
-
-         s% extra_heat(1:s% nz) = 0
+         
+         do k=1,s% nz
+            s% extra_heat(k) = 0
+         end do
 
          call finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
          if (ierr /= 0) then

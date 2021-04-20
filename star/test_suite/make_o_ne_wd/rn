@@ -25,8 +25,20 @@ else
     cp agb.mod standard_agb.mod
 fi
 
-do_one inlist_c_burn_header c_burn.mod 
-do_one inlist_o_ne_wd_header o_ne_wd.mod
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+    cp standard_c_burn.mod c_burn.mod 
+else
+    do_one inlist_c_burn_header c_burn.mod 
+    cp c_burn.mod standard_c_burn.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+    cp standard_o_ne_wd.mod o_ne_wd.mod 
+else
+    do_one inlist_o_ne_wd_header o_ne_wd.mod 
+    cp o_ne_wd.mod standard_o_ne_wd.mod
+fi
+
 do_one inlist_settle_envelope_header settled_envelope.mod
 
 # for producing ns test case starting models:

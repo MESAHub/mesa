@@ -64,6 +64,7 @@
             call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
             return
          end if
+         stop 'set_mlt_vars_new'
          if (s% compare_to_mlt_info_newer) then
             call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
             if (ierr /= 0) return
@@ -90,8 +91,8 @@
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
             end if
             if (make_gradr_sticky_in_solver_iters .and. s% solver_iter > 3) then
-               if (.not. s% new_fixed_gradr_for_rest_of_solver_iters(k)) &
-                  s% new_fixed_gradr_for_rest_of_solver_iters(k) = &
+               if (.not. s% fixed_gradr_for_rest_of_solver_iters(k)) &
+                  s% fixed_gradr_for_rest_of_solver_iters(k) = &
                      (s% mlt_mixing_type(k) == no_mixing)
             end if            
          end do
@@ -166,6 +167,7 @@
             
          if (s% compare_to_mlt_get_newer) then
             okay = .true.
+            ! don't bother with checking partials since trust newer for those
             call compare(gradT, s% gradT(k), 'gradT')
             call compare(gradr, s% gradr(k), 'gradr')
             call compare(mlt_vc, s% mlt_vc(k), 'mlt_vc')
@@ -187,7 +189,7 @@
          subroutine compare(new, old, str)
             real(dp) :: new, old
             character (len=*) :: str
-            call check_vals(new, old, 1d-16, 1d-8, str)
+            call check_vals(new, old, 1d-6, 1d-3, str)
          end subroutine compare
          
          subroutine check_vals(new, old, atol, rtol, str)
@@ -525,7 +527,7 @@
          end if
          
          if (make_gradr_sticky_in_solver_iters) then
-            if (s% new_fixed_gradr_for_rest_of_solver_iters(k)) then
+            if (s% fixed_gradr_for_rest_of_solver_iters(k)) then
                call set_no_mixing
                return
             end if
