@@ -160,6 +160,57 @@ III|.
 Binary tests
 ------------
 
+double_bh
+^^^^^^^^^
+
+Creates a binary black hole from two stars in a very close orbit
+through the chemically-homogeneous evolution (CHE) mechanism.  Stars
+evolve through overcontact phases, so they test the overcontact
+prescription.
+
+evolve_both_stars
+^^^^^^^^^^^^^^^^^
+
+Tests MESA evolving two stars simultaneously including mass transfer.
+
+jdot_ml_check
+^^^^^^^^^^^^^
+
+Using pre-specified efficiency options, verifies that the evolution
+follows the analytical result from `Tauris & van den Heuvel (2006)
+<https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_. Shuts off
+all other ``jdot`` sources.
+
+jdot_gr_check
+^^^^^^^^^^^^^
+
+With all other ``jdot`` sources turned off, this verifies that the
+orbital evolution due to GW emission follows the analytical result of
+`Peters (1964) <https://ui.adsabs.harvard.edu/abs/1964PhRv..136.1224P>`_.
+
+jdot_ls_check
+^^^^^^^^^^^^^
+
+Verifies that models with tidal evolution conserve angular momentum.
+
+star_plus_point_mass
+^^^^^^^^^^^^^^^^^^^^
+
+Tests MESA evolving one star plus a point mass, including mass
+transfer to the point mass.
+
+star_plus_point_mass_explicit_mdot
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Same as above, but run using an explicit calculation for the mass
+transfer rate.
+
+wind_fed_hmxb
+^^^^^^^^^^^^^
+
+Model for a high mass X-ray binary, including both Roche lobe overflow
+and wind mass transfer. Verifies the Eddington limit is working, and
+that the accretion luminosity is computed correctly.
 
 Astero tests
 ------------
