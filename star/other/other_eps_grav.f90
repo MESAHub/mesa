@@ -47,9 +47,10 @@
          ! NOTE: this is called after 1st doing the standard eps_grav calculation.
          ! so if you decide you don't want to do anything special, just return.
          
-         ! NOTE: in addition to setting s% eps_grav(k),
+         ! NOTE: need to set the auto_diff variable s% eps_grav_ad(k)
+         ! this is type(auto_diff_real_star_order1) so includes partials.
+         ! in addition to setting the value,
          ! you must also set the partials, and there are lots of them.
-         ! see star_data.inc for the complete set.
          
       end subroutine null_other_eps_grav
 

@@ -1938,7 +1938,7 @@
             case(h_d_center_eps_nuc_dlnd)
                val = s% d_center_eps_nuc_dlnd
             case(h_center_eps_grav)
-               val = center_value(s, s% eps_grav)
+               val = center_value(s, s% eps_grav_ad(1:nz)% val)
             case(h_center_non_nuc_neu)
                val = s% center_non_nuc_neu
             case(h_center_gamma)
@@ -2146,13 +2146,13 @@
             case(h_tau_QHSE_yrs)
                val = s% max_QHSE_time_scale/secyer
             case(h_eps_grav_integral)
-               val = dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun
+               val = dot_product(s% dm(1:nz), s% eps_grav_ad(1:nz)% val)/Lsun
             case(h_extra_L)
                val = dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)/Lsun
             case(h_log_extra_L)
                val = safe_log10(dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)/Lsun)
             case(h_log_abs_Lgrav)
-               val = safe_log10(abs(dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun))
+               val = safe_log10(abs(dot_product(s% dm(1:nz), s% eps_grav_ad(1:nz)%val)/Lsun))
             case(h_log_Lnuc)
                power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto,1:nz))/Lsun
                val = safe_log10(s% power_nuc_burn - power_photo)

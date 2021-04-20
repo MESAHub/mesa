@@ -1011,34 +1011,6 @@
 
             call do1_ad(s% eps_grav_ad, c% eps_grav_ad)
             if (failed('eps_grav_ad')) exit
-            call do1(s% eps_grav, c% eps_grav)
-            if (failed('eps_grav')) exit
-            call do1(s% d_eps_grav_dlndm1, c% d_eps_grav_dlndm1)
-            if (failed('d_eps_grav_dlndm1')) exit
-            call do1(s% d_eps_grav_dlnd00, c% d_eps_grav_dlnd00)
-            if (failed('d_eps_grav_dlnd00')) exit
-            call do1(s% d_eps_grav_dlndp1, c% d_eps_grav_dlndp1)
-            if (failed('d_eps_grav_dlndp1')) exit
-            call do1(s% d_eps_grav_dlnTm1, c% d_eps_grav_dlnTm1)
-            if (failed('d_eps_grav_dlnTm1')) exit
-            call do1(s% d_eps_grav_dlnT00, c% d_eps_grav_dlnT00)
-            if (failed('d_eps_grav_dlnT00')) exit
-            call do1(s% d_eps_grav_dlnTp1, c% d_eps_grav_dlnTp1)
-            if (failed('d_eps_grav_dlnTp1')) exit
-
-            call do1(s% d_eps_grav_dlnR00, c% d_eps_grav_dlnR00)
-            if (failed('d_eps_grav_dlnR00')) exit
-            call do1(s% d_eps_grav_dlnRp1, c% d_eps_grav_dlnRp1)
-            if (failed('d_eps_grav_dlnRp1')) exit
-            call do1(s% d_eps_grav_dL00, c% d_eps_grav_dL00)
-            if (failed('d_eps_grav_dL00')) exit
-            call do1(s% d_eps_grav_dLp1, c% d_eps_grav_dLp1)
-            if (failed('d_eps_grav_dLp1')) exit
-            call do1(s% d_eps_grav_dv00, c% d_eps_grav_dv00)
-            if (failed('d_eps_grav_dv00')) exit
-            call do1(s% d_eps_grav_dvp1, c% d_eps_grav_dvp1)
-            if (failed('d_eps_grav_dvp1')) exit
-
             call do2(s% d_eps_grav_dx, c% d_eps_grav_dx, species, null_str)
             if (failed('d_eps_grav_dx')) exit
 
