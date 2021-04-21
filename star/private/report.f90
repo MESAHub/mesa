@@ -1521,7 +1521,7 @@
                         s% one_core_omega, s% one_core_omega_div_omega_crit)
                      have_one = .true.
                   end if
-               else if (he4 /= 0 .and. c12 /= 0 .and. o16 /= 0) then
+               else if (he4 /= 0 .and. c12 /= 0 .and. o16 /= 0 .and. ne20 /=0) then
                   if (s% xa(he4,k)+s% xa(c12,k) <= s% one_core_boundary_he4_c12_fraction .and. &
                       s% xa(o16,k)+s% xa(ne20,k) >= min_x) then
                      call set_core_info(s, k, s% one_core_k, &
