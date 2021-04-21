@@ -496,7 +496,7 @@
          use mlt_info, only: set_mlt_vars, check_for_redo_MLT, set_grads
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
-            set_abs_du_div_cs, set_max_conv_time_scale
+            set_abs_du_div_cs, set_max_conv_time_scale, set_using_TDC
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
          use hydro_rsp2, only: set_RSP2_vars, set_using_RSP2
          use brunt, only: do_brunt_B, do_brunt_N2
@@ -564,6 +564,10 @@
             if (dbg) write(*,*) 'call set_grads'
             call set_grads(s, ierr)
             if (failed('set_grads')) return
+            call set_max_conv_time_scale(s) ! uses brunt_B
+            call set_using_RSP2(s) ! uses max_conv_time_scale
+            call set_using_TDC(s) ! uses max_conv_time_scale
+            s% need_to_reset_w = s% using_RSP2 .and. .not. s% previous_step_was_using_RSP2
          end if
 
          if (.not. skip_mixing_info) then         
@@ -614,6 +618,7 @@
             else
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
+            
             call set_mlt_vars(s, nzlo, nzhi, ierr)
             if (failed('set_mlt_vars')) return
             if (dbg) write(*,*) 'call check_for_redo_MLT'
@@ -627,9 +632,6 @@
             if (dbg) write(*,*) 'call do_brunt_N2'
             call do_brunt_N2(s, nzlo, nzhi, ierr)
             if (failed('do_brunt_N2')) return
-            call set_max_conv_time_scale(s) ! max(1/sqrt(abs(N2)))
-            call set_using_RSP2(s)
-            s% need_to_reset_w = s% using_RSP2 .and. .not. s% previous_step_was_using_RSP2
          end if
          
          if (s% using_RSP2) then

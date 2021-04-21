@@ -5,4 +5,11 @@
 MESA_DIR=../../..
 source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
-do_one
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+do_one inlist_to_end_core_he_burn_for_TDC_header final.mod 
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'
+

@@ -516,9 +516,7 @@
       integer, parameter :: p_gradT_sub_actual_gradT = p_grada_sub_actual_gradT + 1
       integer, parameter :: p_actual_gradT = p_gradT_sub_actual_gradT + 1
 
-      integer, parameter :: p_grad_superad_actual = p_actual_gradT + 1
-      integer, parameter :: p_grad_superad = p_grad_superad_actual + 1
-      integer, parameter :: p_gradT_sub_grada = p_grad_superad + 1
+      integer, parameter :: p_gradT_sub_grada = p_actual_gradT + 1
       integer, parameter :: p_gradT = p_gradT_sub_grada + 1
       integer, parameter :: p_gradr = p_gradT + 1
       integer, parameter :: p_cno_div_z = p_gradr + 1
@@ -1131,8 +1129,6 @@
 
          profile_column_name(p_grada_sub_gradT) = 'grada_sub_gradT'
          profile_column_name(p_gradT_sub_grada) = 'gradT_sub_grada'
-         profile_column_name(p_grad_superad) = 'grad_superad'
-         profile_column_name(p_grad_superad_actual) = 'grad_superad_actual'
 
          profile_column_name(p_gradT_sub_a) = 'gradT_sub_a'
          profile_column_name(p_gradT_div_grada) = 'gradT_div_grada'

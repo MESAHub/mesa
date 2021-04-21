@@ -895,23 +895,6 @@
          else
             s% L_conv(k) = 0d0
          end if
-         
-         if (k == 1 .or. mlt_option == 'none') then
-            s% grad_superad(k) = 0d0
-         else
-            Q_face = chiT_face/(T_face*chiRho_face)
-            s% grad_superad(k) = &
-               pi4*r*r*s% scale_height(k)*rho_face* &
-                  (Q_face/Cp_face*(s% Peos(k-1)-s% Peos(k)) - (s% lnT(k-1)-s% lnT(k)))/s% dm_bar(k)
-            ! grad_superad = area*Hp_face*rho_face*(Q_face/Cp_face*dP - dlogT)/dmbar
-            ! Q_face = chiT_face/(T_face*chiRho_face)
-            if (abs(s% lnPeos(k-1)-s% lnPeos(k)) < 1d-10) then
-               s% grad_superad_actual(k) = 0
-            else
-               s% grad_superad_actual(k) = &
-                  (s% lnT(k-1)-s% lnT(k))/(s% lnPeos(k-1)-s% lnPeos(k)) - grada_face
-            end if
-         end if
 
          if (is_bad_num(s% d_gradT_dlnT00(k))) then
             if (s% report_ierr) then
@@ -1154,7 +1137,6 @@
             s% mlt_D(k) = 0d0
             s% mlt_cdc(k) = 0d0
             s% actual_gradT(k) = 0
-            s% grad_superad(k) = 0
          end subroutine set_no_mixing
 
          subroutine set_no_mixing_bad()
@@ -1183,7 +1165,6 @@
             s% mlt_D(k) = 0d0
             s% mlt_cdc(k) = 0d0
             s% actual_gradT(k) = 0d0 ! not used
-            s% grad_superad(k) = s% gradT(k) - s% gradL(k)
          end subroutine set_no_mixing_bad
 
       end subroutine test_do1_mlt_2
