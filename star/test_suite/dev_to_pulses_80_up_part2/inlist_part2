@@ -30,7 +30,7 @@
       max_model_number = 100000      
       !max_number_retries = 30
       
-      ejecta_mass_max_limit = 4d0
+      ejecta_mass_max_limit = 3.2d0
 
       log_Rsurf_upper_limit = 4d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses

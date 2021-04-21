@@ -40,9 +40,8 @@
 
   terminal_show_age_units = 'seconds'
 
-  num_trace_history_values = 2
-  trace_history_value_name(1) = 'cumulative_extra_heating'
-  trace_history_value_name(2) = 'total_energy'
+  num_trace_history_values = 1
+  trace_history_value_name(1) = 'total_energy'
 
   max_num_profile_models = 1000
 

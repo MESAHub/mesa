@@ -3319,7 +3319,7 @@
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha  == 0) then
+         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
@@ -3678,14 +3678,26 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k_in
          integer :: k
-         k = max(2,k_in)
-         if (s% calculate_Brunt_N2 .and. s% brunt_N2(k) /= 0d0) then
-            tau_conv = 1d0/sqrt(abs(s% brunt_N2(k)))
-         else if (s% conv_vel(k) > 0d0) then
-            tau_conv = s% scale_height(k)/s% conv_vel(k)
-         else
+         real(dp) :: brunt_B, alfa, beta, rho_face, Peos_face, chiT_face, chiRho_face, &
+            f, dlnP, dlnT, grada_face, gradT_actual, brunt_N2
+         if (.not. s% calculate_Brunt_B) then
             tau_conv = 0d0
+            return
          end if
+         k = max(2,k_in)
+         brunt_B = s% brunt_B(k)
+         call get_face_weights(s, k, alfa, beta)
+         rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
+         Peos_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
+         chiT_face = alfa*s% chiT(k) + beta*s% chiT(k-1)
+         chiRho_face = alfa*s% chiRho(k) + beta*s% chiRho(k-1)
+         f = pow2(s% grav(k))*rho_face/Peos_face*chiT_face/chiRho_face
+         dlnP = s% lnPeos(k-1) - s% lnPeos(k)
+         dlnT = s% lnT(k-1) - s% lnT(k)
+         grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
+         gradT_actual = dlnT/dlnP ! mlt has not been called yet when doing this
+         brunt_N2 = f*(brunt_B - (gradT_actual - grada_face))
+         tau_conv = 1d0/sqrt(abs(brunt_N2))
       end function conv_time_scale
       
       
@@ -3702,6 +3714,27 @@
                s% max_conv_time_scale = tau_conv
          end do
       end subroutine set_max_conv_time_scale
+      
+      
+      subroutine set_using_TDC(s)
+         type (star_info), pointer :: s      
+         real(dp) :: switch
+         s% using_TDC = .false.
+         if (s% max_dt_div_tau_conv_for_TDC > 0) then
+            switch = s% max_conv_time_scale*s% max_dt_div_tau_conv_for_TDC
+            if (s% dt < switch) then
+               s% using_TDC = .true.
+               return
+            end if
+         end if
+         if (s% max_dt_years_for_TDC > 0) then
+            switch = s% max_dt_years_for_TDC*secyer
+            if (s% dt < switch) then
+               s% using_TDC = .true.
+               return
+            end if
+         end if
+      end subroutine set_using_TDC
       
       
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)

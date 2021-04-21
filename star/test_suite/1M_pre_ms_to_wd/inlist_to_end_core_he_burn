@@ -1,5 +1,7 @@
 
 &star_job
+   !save_star_job_namelist = .true.
+   !star_job_namelist_name = 'namelist_star_job_he_flash_1M_pre_ms_to_wd'
 
       show_log_description_at_start = .false.
 
@@ -32,6 +34,8 @@
 / ! end of kap namelist
 
 &controls      
+   !save_controls_namelist = .true.
+   !controls_namelist_name = 'namelist_controls_he_flash_1M_pre_ms_to_wd'
 
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 0.0001

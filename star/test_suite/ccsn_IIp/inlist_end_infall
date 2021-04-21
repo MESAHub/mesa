@@ -132,7 +132,7 @@
 
       num_trace_history_values = 8
       trace_history_value_name(1) = 'm_center'
-      trace_history_value_name(2) = 'o_core_mass'
+      trace_history_value_name(2) = 'co_core_mass'
       trace_history_value_name(3) = 'he_core_mass'
       trace_history_value_name(4) = 'h_rich_layer_mass'
       trace_history_value_name(5) = 'total_energy'

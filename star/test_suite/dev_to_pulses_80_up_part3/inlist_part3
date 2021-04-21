@@ -32,7 +32,7 @@
       max_model_number = 100000      
       !max_number_retries = 30
       
-      ejecta_mass_max_limit = 8d0 ! tuned for test_suite to reduce work for testing
+      ejecta_mass_max_limit = 7.5d0 ! tuned for test_suite to reduce work for testing
 
       log_Rsurf_upper_limit = 4d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
@@ -144,7 +144,7 @@ Grid1_file_dir = 'png'
 Grid1_file_prefix = 'cc_'
 Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
 
-History_Panels2_xaxis_name = 'star_age'
+!History_Panels2_xaxis_name = 'star_age'
 History_Panels2_automatic_star_age_units = .true.
 
 History_Panels2_yaxis_name(1) = 'total_energy_foe'

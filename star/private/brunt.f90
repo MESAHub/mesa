@@ -51,6 +51,7 @@
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
          integer :: nz, k, i
+         real(dp), allocatable, dimension(:) :: smoothing_array
 
          include 'formats'
 
@@ -87,6 +88,29 @@
             end if
          end do
 
+         allocate(smoothing_array(nz))
+         call smooth_brunt_B(smoothing_array)
+         if (s% use_other_brunt_smoothing) then
+            call s% other_brunt_smoothing(s% id, ierr)
+            if (ierr /= 0) then
+               s% retry_message = 'failed in other_brunt_smoothing'
+               if (s% report_ierr) write(*, *) s% retry_message
+               return
+            end if
+         end if
+
+         contains
+
+         subroutine smooth_brunt_B(work)
+            use star_utils, only: threshold_smoothing
+            real(dp) :: work(:)
+            logical, parameter :: preserve_sign = .false.
+            if (s% num_cells_for_smooth_brunt_B <= 0) return
+            call threshold_smoothing( &
+               s% brunt_B, s% threshold_for_smooth_brunt_B, s% nz, &
+               s% num_cells_for_smooth_brunt_B, preserve_sign, work)
+         end subroutine smooth_brunt_B
+
       end subroutine do_brunt_B
 
 
@@ -117,16 +141,6 @@
          
          allocate(rho_P_chiT_chiRho(nz), rho_P_chiT_chiRho_face(nz))
 
-         call smooth_brunt_B(rho_P_chiT_chiRho) ! use rho_P_chiT_chiRho as work array here
-         if (s% use_other_brunt_smoothing) then
-            call s% other_brunt_smoothing(s% id, ierr)
-            if (ierr /= 0) then
-               s% retry_message = 'failed in other_brunt_smoothing'
-               if (s% report_ierr) write(*, *) s% retry_message
-               return
-            end if
-         end if
-
          do k=1,nz
             rho_P_chiT_chiRho(k) = (s% rho(k)/s% Peos(k))*(s% chiT(k)/s% chiRho(k))
          end do
@@ -146,7 +160,7 @@
                s% brunt_N2_composition_term(k) = 0
                cycle
             end if
-            f = s% grav(k)*s% grav(k)*rho_P_chiT_chiRho_face(k)
+            f = pow2(s% grav(k))*rho_P_chiT_chiRho_face(k)
             if (is_bad(f) .or. is_bad(s% brunt_B(k)) .or. is_bad(s% gradT_sub_grada(k))) then
                write(*,2) 'f', k, f
                write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
@@ -166,18 +180,6 @@
                   s% brunt_N2_coefficient*s% brunt_N2_composition_term(k)
             end do
          end if
-
-         contains
-
-         subroutine smooth_brunt_B(work)
-            use star_utils, only: threshold_smoothing
-            real(dp) :: work(:)
-            logical, parameter :: preserve_sign = .false.
-            if (s% num_cells_for_smooth_brunt_B <= 0) return
-            call threshold_smoothing( &
-               s% brunt_B, s% threshold_for_smooth_brunt_B, s% nz, &
-               s% num_cells_for_smooth_brunt_B, preserve_sign, work)
-         end subroutine smooth_brunt_B
 
       end subroutine do_brunt_N2
 

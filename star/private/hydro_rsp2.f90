@@ -52,49 +52,24 @@
       
       subroutine set_using_RSP2(s)
          type (star_info), pointer :: s      
-         real(dp) :: alfa, beta
-         call get_RSP2_frac(s, alfa, beta)
-         s% using_RSP2 = (alfa > 0d0)
-      end subroutine set_using_RSP2
-      
-      
-      subroutine get_RSP2_frac(s, alfa, beta)
-         type (star_info), pointer :: s
-         real(dp), intent(out) :: alfa, beta
-         real(dp) :: dt, switch
-         include 'formats'
-         if (.not. s% RSP2_flag) then
-            alfa = 0d0; beta = 1d0
-            return
-         end if
-         dt = s% dt
+         real(dp) :: switch         
+         s% using_RSP2 = .false.
+         if (.not. s% RSP2_flag) return
          if (s% RSP2_min_dt_div_tau_conv_switch_to_MLT > 0) then
             switch = s% max_conv_time_scale*s% RSP2_min_dt_div_tau_conv_switch_to_MLT
-         else if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
-            switch = s% RSP2_min_dt_years_switch_to_MLT*secyer
-         else
-            switch = 0d0
-         end if
-         
-         if (.false.) then ! blending
-            !if (dt >= s% RSP2_dt_seconds_etrb_all_MLT) then
-            !   alfa = 0d0 ! all MLT, no RSP2
-            !else if (dt <= s% RSP2_dt_seconds_etrb_no_MLT) then
-            !   alfa = 1d0 ! no MLT, all RSP2
-            !else ! blend 0 < alfa < 1 = fraction RSP2, beta = 1 - alfa = fraction MLT
-            !   alfa = (s% RSP2_dt_seconds_etrb_all_MLT - dt)/ &
-            !       (s% RSP2_dt_seconds_etrb_all_MLT - s% RSP2_dt_seconds_etrb_no_MLT)
-            !end if
-         else
-            if (dt >= switch) then
-               alfa = 0d0 ! all MLT, no RSP2
-            else
-               alfa = 1d0 ! no MLT, all RSP2
+            if (s% dt < switch) then
+               s% using_RSP2 = .true.
+               return
             end if
          end if
-         
-         beta = 1d0 - alfa
-      end subroutine get_RSP2_frac
+         if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
+            switch = s% RSP2_min_dt_years_switch_to_MLT*secyer
+            if (s% dt < switch) then
+               s% using_RSP2 = .true.
+               return
+            end if
+         end if
+      end subroutine set_using_RSP2
       
       
       subroutine set_RSP2_vars(s,ierr)
@@ -1383,7 +1358,10 @@
             end if
             s% w(k) = w_00
             s% xh(s% i_w,k) = s% w(k)
+            !write(*,2) 'w', k, s% w(k)
          end do
+         
+         !stop 'reset_etrb_using_L'
          
       end subroutine reset_etrb_using_L
 

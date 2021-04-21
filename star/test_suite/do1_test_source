@@ -1,4 +1,4 @@
-
+ 
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
@@ -26,13 +26,13 @@ do_one custom_colors "stop because have dropped below central lower limit for h1
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 #   Pablo needs to rewrite for auto diff   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   Pablo needs to rewrite for auto diff   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
+do_one dev_RSP2 "RSP2 good match for period" "final.mod" skip
 do_one dev_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-#   do_one dev_to_pulses_80_up_part1 "log_max_temp_upper_limit" "part1.mod" skip
-#   do_one dev_to_pulses_80_up_part2 "ejecta_mass_max_limit" "part2.mod" skip
-#   do_one dev_to_pulses_80_up_part3 "ejecta_mass_max_limit" "part3.mod" skip
-#   do_one dev_to_pulses_80_up_part4 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-# do_one dev_RSP_RSP2 "RSP2 good match for period" "final.mod" skip
+do_one dev_to_pulses_80_up_part1 "log_max_temperature >= log_max_temp_upper_limit" "part1.mod" skip
+do_one dev_to_pulses_80_up_part2 "stop because ejecta_mass >= ejecta_mass_max_limit" "part2.mod" skip
+do_one dev_to_pulses_80_up_part3 "stop because ejecta_mass >= ejecta_mass_max_limit" "part3.mod" skip
+do_one dev_to_pulses_80_up_part4 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
 do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
