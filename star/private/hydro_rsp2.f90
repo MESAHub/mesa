@@ -52,19 +52,23 @@
       
       subroutine set_using_RSP2(s)
          type (star_info), pointer :: s      
-         real(dp) :: switch
-         if (.not. s% RSP2_flag) then
-            s% using_RSP2 = .false.
-            return
-         end if
+         real(dp) :: switch         
+         s% using_RSP2 = .false.
+         if (.not. s% RSP2_flag) return
          if (s% RSP2_min_dt_div_tau_conv_switch_to_MLT > 0) then
             switch = s% max_conv_time_scale*s% RSP2_min_dt_div_tau_conv_switch_to_MLT
-         else if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
-            switch = s% RSP2_min_dt_years_switch_to_MLT*secyer
-         else
-            switch = 0d0
+            if (s% dt < switch) then
+               s% using_RSP2 = .true.
+               return
+            end if
          end if
-         s% using_RSP2 = (s% dt >= switch)
+         if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
+            switch = s% RSP2_min_dt_years_switch_to_MLT*secyer
+            if (s% dt < switch) then
+               s% using_RSP2 = .true.
+               return
+            end if
+         end if
       end subroutine set_using_RSP2
       
       
@@ -452,17 +456,8 @@
          if (test_partials) then
             tst = residual
             s% solver_test_partials_val = tst%val
-            !            esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
-
-            write(*,2) 'w_00', k, w_00%val
-            write(*,2) 'd_turbulent_energy_ad', k, d_turbulent_energy_ad%val
-            write(*,2) 'Ptrb_dV_ad', k, Ptrb_dV_ad%val
-            write(*,2) 'dt_dLt_dm_ad', k, dt_dLt_dm_ad%val
-            write(*,2) 'dt_C_ad', k, dt_C_ad%val
-            write(*,2) 'dt_Eq_ad', k, dt_Eq_ad%val
-            write(*,2) 'scal', k, scal%val
-            write(*,2) 'resid_ad', k, resid_ad%val
-            write(*,*)
+            if (s% solver_iter == 12) &
+               write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
          end if
          
          if (skip_partials) return
@@ -479,17 +474,8 @@
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: etrb_00
-            real(dp) :: etrb_start
-            include 'formats'
             ierr = 0
-            etrb_00 = wrap_etrb_00(s,k)
-            etrb_start = get_etrb_start(s,k)
-            d_turbulent_energy_ad = etrb_00 - etrb_start
-            if (test_partials) then
-               write(*,2) 'etrb_00', k, etrb_00%val
-               write(*,2) 'etrb_start', k, etrb_start
-            end if      
+            d_turbulent_energy_ad = wrap_etrb_00(s,k) - get_etrb_start(s,k)
          end subroutine setup_d_turbulent_energy
          
          ! Ptrb_dV_ad = Ptrb_ad*dV_ad

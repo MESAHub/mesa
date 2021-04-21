@@ -3719,14 +3719,21 @@
       subroutine set_using_TDC(s)
          type (star_info), pointer :: s      
          real(dp) :: switch
+         s% using_TDC = .false.
          if (s% max_dt_div_tau_conv_for_TDC > 0) then
             switch = s% max_conv_time_scale*s% max_dt_div_tau_conv_for_TDC
-         else if (s% max_dt_years_for_TDC > 0) then
-            switch = s% max_dt_years_for_TDC*secyer
-         else
-            switch = 0d0
+            if (s% dt < switch) then
+               s% using_TDC = .true.
+               return
+            end if
          end if
-         s% using_TDC = (s% dt >= switch)
+         if (s% max_dt_years_for_TDC > 0) then
+            switch = s% max_dt_years_for_TDC*secyer
+            if (s% dt < switch) then
+               s% using_TDC = .true.
+               return
+            end if
+         end if
       end subroutine set_using_TDC
       
       
