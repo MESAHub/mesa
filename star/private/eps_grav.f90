@@ -34,7 +34,7 @@
       implicit none
 
       private
-      public :: eval_eps_grav_and_partials
+      public :: eval_eps_grav_and_partials, zero_eps_grav_and_partials
 
       contains
 
@@ -51,6 +51,8 @@
             ierr = -1
             return
          end if
+
+         call zero_eps_grav_and_partials(s, k)
 
          ! zero composition derivatives
          ! if include_composition_in_eps_grav is true
@@ -383,6 +385,12 @@
 
       end subroutine eval_eps_grav_composition
 
+
+      subroutine zero_eps_grav_and_partials(s, k)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         s% eps_grav_ad(k) = 0
+      end subroutine zero_eps_grav_and_partials
 
       end module eps_grav
 
