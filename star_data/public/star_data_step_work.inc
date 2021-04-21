@@ -385,20 +385,11 @@
          real(dp), pointer :: mlt_Gamma(:) 
             ! local mlt convection efficiency.
          real(dp), pointer :: mlt_cdc(:) 
-         
          real(dp), pointer :: L_conv(:)
          
       ! mlt results related to gradT are evaluated at each iteration and at end of step
          real(dp), pointer :: gradT_sub_grada(:) ! difference at cell boundary
          real(dp), pointer :: grada_face(:) ! grada evaluated at cell boundary
-         !real(dp), pointer, dimension(:) :: &
-         !   d_grada_face_dlnd00, d_grada_face_dlnT00, &
-         !   d_grada_face_dlndm1, d_grada_face_dlnTm1
-
-         real(dp), pointer :: grad_superad(:)   ! face, gradT - grada, non-MLT version
-            ! area*Hp_face*rho_face*(Q_face/Cp_face*dP - dlogT)/dmbar
-            ! Q_face = chiT_face/(T_face*chiRho_face)
-         real(dp), pointer :: grad_superad_actual(:) ! face, actual dlnT/dlnP - grada
          
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &

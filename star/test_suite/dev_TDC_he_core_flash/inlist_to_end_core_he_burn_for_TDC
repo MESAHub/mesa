@@ -20,8 +20,11 @@
    set_initial_model_number = .true.
    initial_model_number = 0
 
-   change_initial_v_flag = .true.
-   new_v_flag = .true.
+   !change_initial_v_flag = .true.
+   !new_v_flag = .true.
+
+   change_D_omega_flag = .true.
+   new_D_omega_flag = .true.
    
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
@@ -59,9 +62,28 @@
 !      xa_central_lower_limit_species(1) = 'he4'
 !      xa_central_lower_limit(1) = 0.0001
 
+! wind
+      cool_wind_full_on_T = 9.99d9
+      hot_wind_full_on_T = 1d10 
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.8d0  
+      Blocker_scaling_factor = 0.7d0 ! 0.8d0        
+
+! rotation
+      am_nu_visc_factor = 0
+      am_D_mix_factor = 0.0333333333333333d0
+      D_DSI_factor = 0
+      D_SH_factor = 1
+      D_SSI_factor = 1
+      D_ES_factor = 1
+      D_GSF_factor = 1
+      D_ST_factor = 1
+      
 ! TDC
-   max_dt_div_tau_conv_for_TDC = -1 ! 1d99 ! 1d-2
-   max_dt_years_for_TDC = -1 ! 11d99 ! 1d-1
+   max_dt_div_tau_conv_for_TDC = 1 ! 1d99 ! 1d-2
+   max_dt_years_for_TDC = 1 ! 11d99 ! 1d-1
    
    alpha_TDC_DAMP = 1d0
    alpha_TDC_DAMPR = 0d0
@@ -79,8 +101,13 @@
 
 ! solver
    use_momentum_outer_BC = .true.
-   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
    set_rho_to_dm_div_dV = .false.
+
+!   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.\
+   max_X_for_gradT_eqn = 0.01
+
+   use_dedt_form_of_energy_eqn = .true.
+   convergence_ignore_equL_residuals = .true.
 
 ! output
    num_trace_history_values = 4

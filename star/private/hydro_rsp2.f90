@@ -52,22 +52,11 @@
       
       subroutine set_using_RSP2(s)
          type (star_info), pointer :: s      
-         real(dp) :: alfa, beta
-         call get_RSP2_frac(s, alfa, beta)
-         s% using_RSP2 = (alfa > 0d0)
-      end subroutine set_using_RSP2
-      
-      
-      subroutine get_RSP2_frac(s, alfa, beta)
-         type (star_info), pointer :: s
-         real(dp), intent(out) :: alfa, beta
-         real(dp) :: dt, switch
-         include 'formats'
+         real(dp) :: switch
          if (.not. s% RSP2_flag) then
-            alfa = 0d0; beta = 1d0
+            s% using_RSP2 = .false.
             return
          end if
-         dt = s% dt
          if (s% RSP2_min_dt_div_tau_conv_switch_to_MLT > 0) then
             switch = s% max_conv_time_scale*s% RSP2_min_dt_div_tau_conv_switch_to_MLT
          else if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
@@ -75,26 +64,8 @@
          else
             switch = 0d0
          end if
-         
-         if (.false.) then ! blending
-            !if (dt >= s% RSP2_dt_seconds_etrb_all_MLT) then
-            !   alfa = 0d0 ! all MLT, no RSP2
-            !else if (dt <= s% RSP2_dt_seconds_etrb_no_MLT) then
-            !   alfa = 1d0 ! no MLT, all RSP2
-            !else ! blend 0 < alfa < 1 = fraction RSP2, beta = 1 - alfa = fraction MLT
-            !   alfa = (s% RSP2_dt_seconds_etrb_all_MLT - dt)/ &
-            !       (s% RSP2_dt_seconds_etrb_all_MLT - s% RSP2_dt_seconds_etrb_no_MLT)
-            !end if
-         else
-            if (dt >= switch) then
-               alfa = 0d0 ! all MLT, no RSP2
-            else
-               alfa = 1d0 ! no MLT, all RSP2
-            end if
-         end if
-         
-         beta = 1d0 - alfa
-      end subroutine get_RSP2_frac
+         s% using_RSP2 = (s% dt >= switch)
+      end subroutine set_using_RSP2
       
       
       subroutine set_RSP2_vars(s,ierr)
@@ -481,8 +452,17 @@
          if (test_partials) then
             tst = residual
             s% solver_test_partials_val = tst%val
-            if (s% solver_iter == 12) &
-               write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
+            !            esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
+
+            write(*,2) 'w_00', k, w_00%val
+            write(*,2) 'd_turbulent_energy_ad', k, d_turbulent_energy_ad%val
+            write(*,2) 'Ptrb_dV_ad', k, Ptrb_dV_ad%val
+            write(*,2) 'dt_dLt_dm_ad', k, dt_dLt_dm_ad%val
+            write(*,2) 'dt_C_ad', k, dt_C_ad%val
+            write(*,2) 'dt_Eq_ad', k, dt_Eq_ad%val
+            write(*,2) 'scal', k, scal%val
+            write(*,2) 'resid_ad', k, resid_ad%val
+            write(*,*)
          end if
          
          if (skip_partials) return
@@ -499,8 +479,17 @@
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: etrb_00
+            real(dp) :: etrb_start
+            include 'formats'
             ierr = 0
-            d_turbulent_energy_ad = wrap_etrb_00(s,k) - get_etrb_start(s,k)
+            etrb_00 = wrap_etrb_00(s,k)
+            etrb_start = get_etrb_start(s,k)
+            d_turbulent_energy_ad = etrb_00 - etrb_start
+            if (test_partials) then
+               write(*,2) 'etrb_00', k, etrb_00%val
+               write(*,2) 'etrb_start', k, etrb_start
+            end if      
          end subroutine setup_d_turbulent_energy
          
          ! Ptrb_dV_ad = Ptrb_ad*dV_ad

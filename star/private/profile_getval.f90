@@ -263,7 +263,7 @@
          ionization_k = 0
 
          int_flag = .false.
-         rsp_or_w = s% RSP_flag .or. s% using_TDC
+         rsp_or_w = s% RSP_flag .or. s% using_RSP2
 
          if (c > extra_offset) then
             i = c - extra_offset
@@ -1584,10 +1584,6 @@
                val = s% gradT(k) - s% grada_face(k)
             case (p_gradT_sub_grada)
                val = s% gradT(k) - s% grada_face(k)
-            case (p_grad_superad)
-               if (k > 1) val = s% grad_superad(k)
-            case (p_grad_superad_actual)
-               if (k > 1) val = s% grad_superad_actual(k)
             case (p_gradT_div_grada)
                val = s% gradT(k) / s% grada_face(k)
             case (p_gradr_sub_gradT)
@@ -1767,38 +1763,38 @@
                   val = s% u(k-1)/s% rmid_start(k-1) - s% u(k)/s% rmid_start(k)
 
             case(p_Ptrb)
-               if (s% using_TDC) then
+               if (s% using_RSP2) then
                   val = get_etrb(s,k)*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Ptrb)
-               if (s% using_TDC) then
+               if (s% using_RSP2) then
                   val = safe_log10(get_etrb(s,k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_w)
-               if (s% using_TDC) then
+               if (s% using_RSP2) then
                   val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if               
             case(p_log_w)
-               if (s% using_TDC) then
+               if (s% using_RSP2) then
                   val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if    
                val = safe_log10(val)           
             case(p_etrb)
-               if (s% using_TDC) then
+               if (s% using_RSP2) then
                   val = get_etrb(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_etrb)
-               if (s% using_TDC) then
+               if (s% using_RSP2) then
                   val = safe_log10(get_etrb(s,k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))

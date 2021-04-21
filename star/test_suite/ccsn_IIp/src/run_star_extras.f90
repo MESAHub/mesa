@@ -103,38 +103,10 @@
          s% data_for_extra_profile_columns => data_for_extra_profile_columns
          s% other_wind => low_density_wind_routine
          s% other_alpha_mlt => alpha_mlt_routine
-         s% other_energy => other_energy
-         s% use_other_energy = (s% RTI_energy_floor > 0d0)
       end subroutine extras_controls
 
 
       include 'stella/stella.inc'
-      
-      
-      subroutine other_energy(id, ierr)
-         integer, intent(in)  :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nz, k
-         real(dp) :: dt
-         include 'formats'
-         ierr = 0
-         return
-         
-         
-         
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         dt = s% dt
-         if (dt <= 0d0) return
-         nz = s% nz
-         do k=1,nz
-            s% extra_heat(k) = 0
-            if (k < nz .and. s% alpha_RTI(k) < 1d-10) cycle
-            if (s% energy(k) >= s% RTI_energy_floor) cycle
-            s% extra_heat(k) = (s% RTI_energy_floor - s% energy(k))/dt
-         end do
-      end subroutine other_energy
 
 
       subroutine alpha_mlt_routine(id, ierr)
@@ -152,11 +124,6 @@
          alpha_other = s% x_ctrl(22)
          H_limit = s% x_ctrl(23)
          h1 = s% net_iso(ih1)
-         !write(*,1) 'alpha_H', alpha_H
-         !write(*,1) 'alpha_other', alpha_other
-         !write(*,1) 'H_limit', H_limit
-         !write(*,2) 'h1', h1
-         !write(*,2) 's% nz', s% nz
          if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
          do k=1,s% nz
             if (s% xa(h1,k) >= H_limit) then
@@ -164,9 +131,7 @@
             else
                s% alpha_mlt(k) = alpha_other
             end if
-            !write(*,2) 'alpha_mlt', k, s% alpha_mlt(k), 
          end do
-         !stop
       end subroutine alpha_mlt_routine
 
 
@@ -191,13 +156,11 @@
          msum = 0d0
          do k=1, s% nz
             if (s% xh(i_lnd,k) >= lnd_limit) exit
-            !write(*,2) 'lgRho', k, s% xh(i_lnd,k)/ln10
             msum = msum + s% dm(k)
          end do
          if (msum == 0d0) return
          w = (msum/Msun)/(s% dt/secyer)
          write(*,1) 'low_density_wind_routine lg(Mdot) msum/Msun', safe_log10(w), msum/Msun
-         !stop 'low_density_wind_routine'
       end subroutine low_density_wind_routine
       
       

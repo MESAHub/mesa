@@ -428,7 +428,7 @@
          end if ! v_flag
 
          Uq_ad = 0d0
-         if (s% using_TDC) then ! Uq(k) is turbulent viscosity drag at face k
+         if (s% using_RSP2) then ! Uq(k) is turbulent viscosity drag at face k
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
          end if

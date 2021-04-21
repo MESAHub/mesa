@@ -1543,12 +1543,17 @@
                else
                   equ_str = 'unknown'
                end if
-               write(*,'(a70,2x,i5,f10.3,3x,a,f10.3,99(3x,a,1pe26.16))') &
-                  'log dfridr rel_diff partials wrt  '  // trim(s% nameofvar(i_var)) // &
-                  '(k' // k_off_str // ' of ' // trim(equ_str) // '(k)', &
-                  k, safe_log10(xdum), 'log uncertainty', safe_log10(uncertainty), &
-                  'analytic', dvardx_0, 'numeric', dvardx, &
-                  'analytic/numeric', abs(dvardx_0)/max(1d-99,abs(dvardx))
+               write(*,'(a25,3x,i5,4x,a,f12.5,4x,a,f12.5,99(4x,a,1pe22.12))') &
+                  'd_' // trim(equ_str) // '(k)/d_' // trim(s% nameofvar(i_var)) // &
+                  '(k' // trim(k_off_str), &
+                  k, 'lg rel diff', safe_log10(xdum), 'lg uncertainty', safe_log10(uncertainty), &
+                  'Analytic', dvardx_0, 'Numeric', dvardx
+!               write(*,'(a70,2x,i5,f10.3,3x,a,f10.3,99(3x,a,1pe26.16))') &
+!                  'log dfridr rel_diff partials wrt  '  // trim(s% nameofvar(i_var)) // &
+!                  '(k' // k_off_str // ' of ' // trim(equ_str) // '(k)', &
+!                  k, safe_log10(xdum), 'log uncertainty', safe_log10(uncertainty), &
+!                  'analytic', dvardx_0, 'numeric', dvardx, &
+!                  'analytic/numeric', abs(dvardx_0)/max(1d-99,abs(dvardx))
                   
             else
                write(*,*)
@@ -1783,20 +1788,29 @@
             call store_mix_type_str(max_resid_mix_type_str, integer_string, 4, k+1)
             call store_mix_type_str(max_resid_mix_type_str, integer_string, 5, k+2)
 
-  111       format(i6, 2x, i3, 2x, a, f8.4, &
-               2x, a, 1x, e10.3, 2x, a19, 1x, i5, e11.3, 2x, a, &
-               2x, a, 1x, e10.3, 2x, a14, 1x, i5, e11.3, 2x, a, &
-               2x, a)
+  111       format(i6, i3, 2x, a, f7.4, &
+               1x, a, 1x, e10.3, 2x, a18, 1x, i5, e13.5, a, &
+               1x, a, 1x, e10.3, 2x, a16, 1x, i5, e13.5, a, &
+               1x, a)
+!  111       format(i6, 2x, i3, 2x, a, f8.4, &
+!               2x, a, 1x, e10.3, 2x, a19, 1x, i5, e11.3, 2x, a, &
+!               2x, a, 1x, e10.3, 2x, a14, 1x, i5, e11.3, 2x, a, &
+!               2x, a)
             write(*,111) &
                s% model_number, iter, &
                'coeff', coeff,  &
-               '   avg resid', residual_norm,  &
+               'avg resid', residual_norm,  &
+!               '   avg resid', residual_norm,  &
                trim(max_resid_str), max_resid_k, max_residual, &
-               'mix type ' // trim(max_resid_mix_type_str),  &
-               '   avg corr', correction_norm,  &
+               ' mix type ' // trim(max_resid_mix_type_str),  &
+               'avg corr', correction_norm,  &
+!               'mix type ' // trim(max_resid_mix_type_str),  &
+!               '   avg corr', correction_norm,  &
                trim(max_corr_str), max_corr_k, max_correction,  &
-               'mix type ' // trim(max_corr_mix_type_str),  &
-               '   ' // trim(msg)
+               ' mix type ' // trim(max_corr_mix_type_str),  &
+               ' ' // trim(msg)
+!               'mix type ' // trim(max_corr_mix_type_str),  &
+!               '   ' // trim(msg)
                
             if (is_bad(slope)) stop 'write_msg'
 

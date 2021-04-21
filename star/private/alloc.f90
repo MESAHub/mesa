@@ -1103,10 +1103,6 @@
             call do1(s% L_conv, c% L_conv)
             if (failed('L_conv')) exit
 
-            call do1(s% grad_superad, c% grad_superad)
-            if (failed('grad_superad')) exit
-            call do1(s% grad_superad_actual, c% grad_superad_actual)
-            if (failed('grad_superad_actual')) exit
             call do1(s% gradT_sub_grada, c% gradT_sub_grada)
             if (failed('gradT_sub_grada')) exit
             call do1(s% grada_face, c% grada_face)

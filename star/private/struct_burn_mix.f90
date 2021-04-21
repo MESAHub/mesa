@@ -349,7 +349,7 @@
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          
-         if (s% using_TDC) then
+         if (s% using_RSP2) then
             call set_etrb_start_vars(s,ierr)
          end if
 
