@@ -284,7 +284,7 @@
          old_total_ca = 0
          old_total_fe = 0
          old_total_co = 0
-         old_total_fe = 0
+         old_total_ni = 0
          old_other = 0
          do j=1, old_num_isos
             Z = chem_isos% Z(old_chem_id(j))
