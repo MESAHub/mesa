@@ -319,16 +319,7 @@
 
       ! -T*Ds/Dt energy generation rate related to change in entropy
       type(auto_diff_real_star_order1), pointer, dimension(:) :: eps_grav_ad(:) ! '_ad' for auto diff
-      real(dp), pointer :: eps_grav(:)
       ! partials
-      real(dp), pointer, dimension(:) :: &
-         d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1
-      real(dp), pointer, dimension(:) :: &
-         d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1
-      real(dp), pointer, dimension(:) :: &
-         d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &
-         d_eps_grav_dL00, d_eps_grav_dLp1, &
-         d_eps_grav_dv00, d_eps_grav_dvp1
       real(dp), pointer :: d_eps_grav_dx(:,:)  ! (species,nz)
          ! d_eps_grav_dx(j, k) is partial of eps_grav(k) wrt species(j)
          ! these derivatives generally occur as part of the composition term

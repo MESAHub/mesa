@@ -425,7 +425,7 @@ contains
         nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
         L = s%L(k)
         kap = eval_face(s%dq, s%opacity, k, k_a, k_b)
-        eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav, k, k_a, k_b)
+        eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         Gamma_1 = eval_face(s%dq, s%gamma1, k, k_a, k_b)
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         delta = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
@@ -522,7 +522,7 @@ contains
         nabla = eval_center(s%r, s%gradT, k_a, k_b)
         L = 0d0
         kap = eval_center(s%rmid, s%opacity, k_a, k_b)
-        eps = eval_center(s%rmid, s%eps_nuc, k_a, k_b) + eval_center(s%rmid, s%eps_grav, k_a, k_b)
+        eps = eval_center(s%rmid, s%eps_nuc, k_a, k_b) + eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         Gamma_1 = eval_center(s%rmid, s%gamma1, k_a, k_b)
         nabla_ad = eval_center(s%rmid, s%grada, k_a, k_b)
         delta = eval_center(s%rmid, s%chiT, k_a, k_b)/eval_center(s%rmid, s%chiRho, k_a, k_b)

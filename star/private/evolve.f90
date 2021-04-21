@@ -1239,7 +1239,12 @@
             virial = 3*sum(s% dm(1:nz)*s% Peos(1:nz)/s% rho(1:nz))
             s% virial_thm_P_avg = virial
 
-            s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
+            if (s% use_dedt_form_of_energy_eqn) then
+               s% total_eps_grav = 0d0
+            else
+               s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav_ad(1:nz)% val)
+            end if
+
             if (s% u_flag .and. s% total_eps_grav /= 0d0) then ! .or. s% use_dedt_form_of_energy_eqn) then
                write(*,2) 'u_flag energy accounting ignores total_eps_grav', s% model_number, s% total_eps_grav
                s% total_eps_grav = 0

@@ -409,7 +409,7 @@
             case (p_r_div_g)
                val = s% r(k)/s% grav(k)
             case (p_signed_log_eps_grav)
-               val = s% eps_grav(k)
+               val = s% eps_grav_ad(k)% val
                val = sign(1d0,val)*log10(max(1d0,abs(val)))
             case (p_net_nuclear_energy)
                val = s% eps_nuc(k) - s% eps_nuc_neu_total(k) - s% non_nuc_neu(k)
@@ -419,7 +419,7 @@
             case (p_eps_nuc_minus_non_nuc_neu)
                val = s% eps_nuc(k) - s% non_nuc_neu(k)
             case (p_net_energy)
-               val = s% eps_nuc(k) - s% non_nuc_neu(k) + s% eps_grav(k)
+               val = s% eps_nuc(k) - s% non_nuc_neu(k) + s% eps_grav_ad(k)% val
                val = sign(1d0,val)*log10(max(1d0,abs(val)))
             case (p_signed_log_power)
                val = s% L(k)
@@ -1025,16 +1025,16 @@
 
             case (p_log_abs_eps_grav_dm_div_L)
                val = safe_log10( &
-                  abs(s% eps_grav(k))*s% dm(k)/max(1d0,abs(s% L(k))))
+                  abs(s% eps_grav_ad(k)% val)*s% dm(k)/max(1d0,abs(s% L(k))))
 
             case (p_eps_grav_composition_term)
                if (s% include_composition_in_eps_grav) &
                   val = s% eps_grav_composition_term(k)
                   
             case (p_eps_grav_plus_eps_mdot)
-               val = s% eps_grav(k) + s% eps_mdot(k)
+               val = s% eps_grav_ad(k)% val + s% eps_mdot(k)
             case (p_ergs_eps_grav_plus_eps_mdot)
-               val = (s% eps_grav(k) + s% eps_mdot(k))*s% dm(k)*s% dt
+               val = (s% eps_grav_ad(k)% val + s% eps_mdot(k))*s% dm(k)*s% dt
                   
             case (p_eps_mdot)
                val = s% eps_mdot(k)
@@ -1123,9 +1123,9 @@
                if (k > 1) val = -pi4*s% r(k)*s% r(k)*(s% Peos(k-1) - s% Peos(k))/s% dm_bar(k)
 
             case (p_dm_eps_grav)
-               val = s% eps_grav(k)*s% dm(k)
+               val = s% eps_grav_ad(k)% val*s% dm(k)
             case (p_eps_grav)
-               val = s% eps_grav(k)
+               val = s% eps_grav_ad(k)% val
                
             case (p_log_xm_div_delta_m)
                val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))

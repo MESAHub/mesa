@@ -65,7 +65,6 @@
          use hydro_temperature, only: do1_dlnT_dm_eqn
          use hydro_rsp2, only: do1_turbulent_energy_eqn, do1_tdc_L_eqn
          use hydro_alpha_rti_eqns, only: do1_dalpha_RTI_dt_eqn
-         use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
          use star_utils, only: show_matrix, &
             no_extra_profile_columns, no_data_for_extra_profile_columns
@@ -241,7 +240,6 @@
             end if
 
             if (do_dlnE_dt) then
-               call zero_eps_grav_and_partials(s, k)
                call do1_energy_eqn(s, k, skip_partials, do_chem, nvar, op_err)
                if (op_err /= 0) then
                   if (s% report_ierr) write(*,2) 'ierr in do1_energy_eqn', k
