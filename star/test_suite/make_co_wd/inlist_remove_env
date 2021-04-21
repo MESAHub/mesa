@@ -72,7 +72,7 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       
-      photo_interval = 1
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
