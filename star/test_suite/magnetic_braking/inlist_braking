@@ -1,7 +1,4 @@
 
-! note: this inlist is done after 1st doing inlist_massive_defaults
-! so can override defaults as desired.
-
 &star_job
 
       show_log_description_at_start = .false.
@@ -23,6 +20,7 @@
       new_omega_div_omega_crit = 0.4
       near_zams_relax_omega_div_omega_crit = .true.
       num_steps_to_relax_rotation = 20 ! 50 ! use this many steps to change value
+      relax_omega_max_yrs_dt = 1d4 ! << MS lifetime
 
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
@@ -41,9 +39,9 @@
 / ! end of eos namelist
 
 &kap
-  Zbase = 2d-2
 
-      kap_file_prefix = 'gs98'
+   use_type2_opacities = .true
+   Zbase = 2d-2
 
 / ! end of kap namelist
 
@@ -63,6 +61,30 @@
   hot_wind_full_on_T = 1d0
   cool_wind_full_on_T = 0d0
   Dutch_scaling_factor = 0.8
+
+
+         delta_lgL_He_limit = 0.1 ! limit for magnitude of change in lgL_He
+
+         dX_nuc_drop_max_A_limit = 52
+         dX_nuc_drop_min_X_limit = 1d-4
+         dX_nuc_drop_hard_limit = 1d99
+
+         delta_lgRho_cntr_limit = 0.02
+
+         mixing_length_alpha = 1.5
+         MLT_option = 'Henyey'
+
+         use_Ledoux_criterion = .true.
+         alpha_semiconvection = 0.01
+         thermohaline_coeff = 2
+         thermohaline_option = 'Kippenhahn'
+
+    overshoot_scheme(1) = 'exponential'
+    overshoot_zone_type(1) = 'any'
+    overshoot_zone_loc(1) = 'any'
+    overshoot_bdy_loc(1) = 'any'
+    overshoot_f(1) = 0.001
+    overshoot_f0(1) = 0.0005
 
       ! limit max_model_number as part of test_suite
          max_model_number = 250
