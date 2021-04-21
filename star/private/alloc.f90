@@ -1875,9 +1875,9 @@
                   ptr2(j) = ptr(j)
                end do
                if (s% fill_arrays_with_NaNs) then
-                  call fill_ad_with_NaNs(ptr,old_sz+1,sz)                  
+                  call fill_ad_with_NaNs(ptr2,old_sz+1,sz)
                else if (s% zero_when_allocate) then
-                  call fill_ad_with_zeros(ptr,old_sz+1,sz)                  
+                  call fill_ad_with_zeros(ptr2,old_sz+1,sz)
                end if
                deallocate(ptr)
                if (ierr /= 0) return
