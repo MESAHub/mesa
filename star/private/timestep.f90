@@ -38,7 +38,6 @@
 
       logical, parameter :: dbg_timestep = .false.
       real(dp) :: max_dt
-      integer :: why_Tlim
 
       contains
 
