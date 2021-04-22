@@ -274,6 +274,8 @@
          include 'formats'
          ierr = 0
 
+         eps_grav_composition_term = 0
+
          ! for now, bail if in new material
          if (k < s% k_below_just_added) return
 
