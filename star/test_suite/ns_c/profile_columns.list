@@ -234,7 +234,7 @@
       
       cs_at_cell_bdy ! sound speed at cell boundary (csound is at cell center)
       
-      
+      burn_num_iters      
 
 ! the first few lines of the profile contain general info about the model.
 ! for completeness, those items are described here.
