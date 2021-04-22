@@ -192,7 +192,7 @@ endif
 
 # Turn on all FPE options
 ifeq ($(MESA_FPE_CHECKS_ON),1) 
-   FCbasic += $(FCtrapNANs) -fbounds-check -Wuninitialized -Warray-bounds -fstack-protector-all -D_FORTIFY_SOURCE=2
+   FCbasic += $(FCtrapNANs) -fbounds-check -finit-derived -Wuninitialized -Warray-bounds -fstack-protector-all -D_FORTIFY_SOURCE=2
    FCopt = -O0 -ftree-vectorize 
    SKIP_NAN_TRAPS = NO
 endif
