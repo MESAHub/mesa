@@ -124,7 +124,7 @@ module skye_coulomb_solid
 
    end function ocp_solid_harmonic_free_energy
 
-   !> Calculates a log with cutoffs to prevent over/underflow.
+   !> Calculates an exponential with cutoffs to prevent over/underflow.
    !!
    !! @param x Input to take the exponential of.
    !! @param ex Output (exp(x) clipped to avoid over/underflow).
@@ -132,6 +132,15 @@ module skye_coulomb_solid
       type(auto_diff_real_2var_order3), intent(in) :: x
       ex = exp(max(-1d2,min(1d2,x)))
    end function safe_exp
+
+   !> Calculates a tanh with cutoffs to prevent over/underflow.
+   !!
+   !! @param x Input to take the exponential of.
+   !! @param ex Output (exp(x) clipped to avoid over/underflow).
+   type(auto_diff_real_2var_order3) function safe_tanh(x) result(th)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      th = tanh(max(-1d2,min(1d2,x)))
+   end function safe_tanh
 
    !> Calculates the electron-ion screening corrections to the free energy
    !! of a one-component plasma in the solid phase using the fits of Potekhin & Chabrier 2013.
@@ -178,7 +187,7 @@ module skye_coulomb_solid
 
          Fliq = ocp_liquid_screening_free_energy_correction(Z, mi, ge, rs)
 
-         switch = pow3(tanh(2d0*alpha))
+         switch = pow3(safe_tanh(2d0*alpha))
          F = switch * Fliq + (1d0 - switch) * F
 
    end function ocp_solid_screening_free_energy_correction
