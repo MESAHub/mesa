@@ -1272,7 +1272,7 @@
          
          real(dp), dimension(nv) :: &
             res_1, d_dlnd_1, d_dlnT_1, res_2, d_dlnd_2, d_dlnT_2
-         real(dp), dimension(nv, species) :: d_dxa_1, d_dxa_2
+         real(dp), dimension(:,:), allocatable :: d_dxa_1, d_dxa_2
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
          logical :: skip_1st, skip_2nd
          logical, parameter :: linear_blend = .false.
@@ -1282,6 +1282,8 @@
          ierr = 0
          skip = .false.
          
+         allocate(d_dxa_1(nv, species), d_dxa_2(nv, species))
+
          alfa = alfa_in
          d_alfa_dlogT = d_alfa_dlogT_in
          d_alfa_dlogRho = d_alfa_dlogRho_in
