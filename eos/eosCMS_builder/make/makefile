@@ -38,13 +38,13 @@ SRC_DIR = ../src
 
 COMPILE_SIMPLE = $(FC) -pedantic -Wall -fcheck=all -fbacktrace $(FCdebug) -I$(MESA_INCLUDE_DIR) -c
 
-COMPILE = $(FC) $(FCbasic) $(FCopenmp) $(FCopt) $(FCstatic) $(FCstandard) $(FCdebug) -I$(MESA_INCLUDE_DIR)  -c
+#COMPILE = $(FC) $(FCbasic) $(FCopenmp) $(FCopt) $(FCstatic) $(FCstandard) $(FCdebug) -I$(MESA_INCLUDE_DIR)  -c
 
 cms_mixing.o: $(SRC_DIR)/cms_mixing.f90
 	$(COMPILE_SIMPLE) $(FCfree) $^
 
 cms_resample.o: $(SRC_DIR)/cms_resample.f90
-	$(COMPILE) $(FCfree) $^
+	$(COMPILE_SIMPLE) $(FCfree) $^
 
 clean:
 	-@rm -f *.o *mod ../$(MIX) ../$(RES)
