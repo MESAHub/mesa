@@ -151,12 +151,8 @@
          ! Intermediates
          integer j, nz
          real(dp) r_new, vol00, volp1, cell_vol         
-         real(qp), dimension(:), allocatable :: prev_mesh_dm, dm, change_in_dm
 
          nz = s%nz
-         allocate(prev_mesh_dm(nz), dm(nz), change_in_dm(nz))
-         call compute_prev_mesh_dm(s, prev_mesh_dm, dm, change_in_dm)
-
 
          vol00 = four_thirds_pi*s% R_center*s% R_center*s% R_center
          do j=nz,1,-1
