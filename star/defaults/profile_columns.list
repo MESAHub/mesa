@@ -247,7 +247,7 @@
    !tri_alfa
 
 
-
+   ! burn_num_iters ! Number of split_burn iterations taken
   
 !# Composition
    !x_mass_fraction_H

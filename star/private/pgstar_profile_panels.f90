@@ -85,6 +85,7 @@
             s% Profile_Panels1_num_panels, &
             s% Profile_Panels1_use_decorator, &
             s% Profile_Panels1_pgstar_decorator, &
+            1, &
             ierr)
       end subroutine do_profile_panels1_plot
 
@@ -138,6 +139,7 @@
             s% Profile_Panels2_num_panels, &
             s% Profile_Panels2_use_decorator, &
             s% Profile_Panels2_pgstar_decorator, &
+            2, &
             ierr)
       end subroutine do_profile_Panels2_plot
 
@@ -191,6 +193,7 @@
             s% Profile_Panels3_num_panels, &
             s% Profile_Panels3_use_decorator, &
             s% Profile_Panels3_pgstar_decorator, &
+            3, &
             ierr)
       end subroutine do_profile_Panels3_plot
 
@@ -244,6 +247,7 @@
             s% Profile_Panels4_num_panels, &
             s% Profile_Panels4_use_decorator, &
             s% Profile_Panels4_pgstar_decorator, &
+            4, &
             ierr)
       end subroutine do_profile_Panels4_plot
 
@@ -297,6 +301,7 @@
             s% Profile_Panels5_num_panels, &
             s% Profile_Panels5_use_decorator, &
             s% Profile_Panels5_pgstar_decorator, &
+            5, &
             ierr)
       end subroutine do_Profile_Panels5_plot
 
@@ -350,6 +355,7 @@
             s% Profile_Panels6_num_panels, &
             s% Profile_Panels6_use_decorator, &
             s% Profile_Panels6_pgstar_decorator, &
+            6, &
             ierr)
       end subroutine do_Profile_Panels6_plot
 
@@ -403,6 +409,7 @@
             s% Profile_Panels7_num_panels, &
             s% Profile_Panels7_use_decorator, &
             s% Profile_Panels7_pgstar_decorator, &
+            7, &
             ierr)
       end subroutine do_Profile_Panels7_plot
 
@@ -456,6 +463,7 @@
             s% Profile_Panels8_num_panels, &
             s% Profile_Panels8_use_decorator, &
             s% Profile_Panels8_pgstar_decorator, &
+            8, &
             ierr)
       end subroutine do_Profile_Panels8_plot
 
@@ -509,6 +517,7 @@
             s% Profile_Panels9_num_panels, &
             s% Profile_Panels9_use_decorator, &
             s% Profile_Panels9_pgstar_decorator, &
+            9, &
             ierr)
       end subroutine do_Profile_Panels9_plot
 
@@ -534,6 +543,7 @@
             panels_show_grid, &
             panels_num_panels, &
             use_decorator, pgstar_decorator, &
+            panels_id, &
             ierr)
 
          use pgstar_abundance, only: do_abundance_panel
@@ -547,7 +557,7 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: &
-            device_id, panels_num_panels
+            device_id, panels_num_panels, panels_id
          real, intent(in) :: &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
             panels_xmin_in, panels_xmax_in, panels_xmargin_in
@@ -629,7 +639,7 @@
                xwidth_left_of_shock > 0 .or. xwidth_right_of_shock > 0)) then
             found_shock = find_shock(s, xaxis_id, xshock)
             if (found_shock .and. xshock <= 0) then
-               write(*,*) 'shock location on xaxis must be positive for tracking location in plot.'
+               write(*,*) 'Panel:',panels_id,' shock location on xaxis must be positive for tracking location in plot.'
                if (panels_xaxis_name == 'logR') write(*,*) 'perhaps use logR_cm instead of logR?'
                write(*,*)
                found_shock = .false.
@@ -675,7 +685,7 @@
             xvec, xmin, xmax, xleft, xright, dx, &
             grid_min, grid_max, npts, ierr)
          if (ierr /= 0) then
-            write(*,*) 'set_xaxis_bounds error in Profile panels -- please check ' // &
+            write(*,*) 'Panel:',panels_id,' set_xaxis_bounds error in Profile panels -- please check ' // &
                trim(panels_xaxis_name)
             write(*,1) 'xleft', xleft
             write(*,1) 'xright', xright
@@ -722,7 +732,7 @@
                   photosphere_logxm = -99
                end if
                dx = 1 - (photosphere_logxm - xmin)/(xmax - xmin)
-               write(*,2) 'photosphere_xm xmin photo_x xmax dx', s% model_number, &
+               write(*,2) 'Panel:',panels_id,' photosphere_xm xmin photo_x xmax dx', s% model_number, &
                   s% star_mass - s% photosphere_m, &
                   xmin, photosphere_logxm, xmax, dx
             end if
@@ -765,7 +775,8 @@
                   panels_ymin(j), panels_ymax(j), &
                   .true., (j == panels_num_panels), ierr)
                if (ierr /= 0) then
-                  stop 'panels failed in do_abundance_panel'
+                  write(*,*) 'Panel:',panels_id,' panels failed in do_abundance_panel'
+                  stop
                end if
                cycle
 
@@ -777,7 +788,8 @@
                   panels_ymin(j), panels_ymax(j), &
                   .true., (j == panels_num_panels), ierr)
                if (ierr /= 0) then
-                  stop 'panels failed in do_power_panel'
+                  write(*,*) 'Panel:',panels_id,' panels failed in do_power_panel'
+                  stop
                end if
                cycle
 
@@ -788,7 +800,8 @@
                   panels_xaxis_name, xmin, xmax, panels_xaxis_reversed, &
                   .true., (j == panels_num_panels), ierr)
                if (ierr /= 0) then
-                  stop 'panels failed in do_Dynamo_panel'
+                  write(*,*) 'Panel:',panels_id,' panels failed in do_dynamo_panel'
+                  stop
                end if
                cycle
 
@@ -800,7 +813,8 @@
                   panels_ymin(j), panels_ymax(j), &
                   .true., (j == panels_num_panels), ierr)
                if (ierr /= 0) then
-                  stop 'panels failed in do_Mixing_panel'
+                  write(*,*) 'Panel:',panels_id,' panels failed in do_mixing_panel'
+                  stop
                end if
                cycle
 
@@ -811,7 +825,8 @@
                   panels_xaxis_name, xmin, xmax, panels_xaxis_reversed, &
                   .true., (j == panels_num_panels), ierr)
                if (ierr /= 0) then
-                  stop 'panels failed in do_mode_propagation_panel'
+                  write(*,*) 'Panel:',panels_id,' panels failed in do_mode_propagation_panel'
+                  stop
                end if
                cycle
 
@@ -822,7 +837,8 @@
                   panels_xaxis_name, xmin, xmax, panels_xaxis_reversed, &
                   .true., (j == panels_num_panels), ierr)
                if (ierr /= 0) then
-                  stop 'panels failed in do_summary_profile_panel'
+                  write(*,*) 'Panel:',panels_id,' panels failed in do_summary_profile_panel'
+                  stop
                end if
                cycle
 
@@ -838,8 +854,8 @@
                if (other_yaxis_id <= 0) then
                   if (.not. read_values_from_file(other_yname, &
                         other_yfile_xdata, other_yfile_ydata, other_yfile_data_len)) then
-                     write(*,*) &
-                        'bad other yaxis for Profile panels plot ' // trim(other_yname)
+                     write(*,'(A,1X,I1,A,1X,I1,A)') &
+                     'Panel:',panels_id,' bad other yaxis(',j,') for Profile panels plot name=',trim(other_yname)
                      return
                   end if
                   if (panels_other_yaxis_log(j)) then
@@ -871,8 +887,8 @@
             if (yaxis_id <= 0) then
                if (.not. read_values_from_file( &
                      yname, yfile_xdata, yfile_ydata, yfile_data_len)) then
-                  write(*,*) &
-                     'bad yaxis for Profile panels plot ' // trim(yname)
+                  write(*,'(A,1X,I1,A,1X,I1,A)') &
+                  'Panel:',panels_id,' bad yaxis(',j,') for Profile panels plot name=',trim(yname)
                   return
                end if
                if (panels_yaxis_log(j)) then
