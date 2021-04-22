@@ -328,3 +328,8 @@ Runs ``MESA`` with the environment variable ``MESA_RUN_OPTIONAL=t`` set. This re
 ^^^^^^^^^^^^^^^
 
 Where ``n`` is an integer. Same as ``[ci optional]`` but only run the first ``n`` test cases.
+
+[ci fpe]
+^^^^^^^^
+
+Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`` set. This requests that we turn on addtional debugging checks.
