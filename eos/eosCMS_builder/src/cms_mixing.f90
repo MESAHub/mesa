@@ -217,14 +217,14 @@ contains
 
 
       ! *** energy ***
-      UX = exp10( max( min(eosX% logU,8.0_dp), -0.5_dp))
-      UY = exp10( max( min(eosY% logU,8.0_dp), -0.5_dp))
+      UX = exp10( max( min(eosX% logU, 18.0_dp), 9.0_dp))
+      UY = exp10( max( min(eosY% logU, 18.0_dp), 9.0_dp))
       UXY = mass_frac_X*UX + mass_frac_Y*UY
 
 
       ! *** entropy ***
-      SX = exp10( max( min(eosX% logS, 200._dp), -50._dp))
-      SY = exp10( max( min(eosY% logS, 200._dp), -50._dp))
+      SX = exp10( max( min(eosX% logS, 16._dp), 0._dp))
+      SY = exp10( max( min(eosY% logS, 16._dp), 0._dp))
 
       !CMS equation 11
       Smix = - kerg * (Nx*log(Nx) + Ny*log(Ny))/(Abar*amu)
@@ -301,17 +301,13 @@ program cms_mixing
    H% He_mass_frac = 0.0_dp
    call read_one(H)
 
-
    J% filename     = 'DirEOS2019/TABLE_HE_TP_v1'
    J% H_mass_frac  = 0.0_dp
    J% He_mass_frac = Y   
    call read_one(J)
 
-
    call blend_tables(H,J,K,ierr)
 
-
    if(ierr==0) call write_one(K)
-
 
 end program cms_mixing

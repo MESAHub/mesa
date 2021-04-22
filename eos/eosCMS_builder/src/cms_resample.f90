@@ -89,7 +89,9 @@ program cms_resample
    !set composition variables
    He_mass_fraction = 1.0_dp - H_mass_fraction
 
+   write(*,*) 'io=', io
    open(newunit=io,file=trim(output),action='write',status='unknown',iostat=ierr)
+   if(ierr/=0) stop
    write(io,'(99a14)') 'version', 'X', 'Z', 'num logTs', 'logT min', 'logT max', 'del logT', &
       'num logRhos', 'logRho min', 'logRho max', 'del logRho'
    write(io,'(i14,2f14.4,2(i14,3f14.4))') version, H_mass_fraction, 0.0_dp, NT, logT(1,1), &

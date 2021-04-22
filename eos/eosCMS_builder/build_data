@@ -18,7 +18,7 @@ function do_one {
 ./mk
 check_okay
 
-#mkdir -p data/eosCMS_data
+mkdir -p data/eosCMS_data
 
 do_one 0.0 000
 do_one 0.1 010
