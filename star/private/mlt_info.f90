@@ -207,7 +207,7 @@
             call do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term_in, &
                opacity_face_in, chiRho_face_in, &
                chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-               from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
+               make_gradr_sticky_in_solver_iters, ierr)
             if (ierr /= 0) return
             
             

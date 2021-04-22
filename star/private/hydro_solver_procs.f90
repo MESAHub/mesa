@@ -370,7 +370,7 @@
             skip2 = s% i_v
          end if
 
-         if (s% using_TDC .and. s% include_w_in_correction_limits) then
+         if (s% using_RSP2 .and. s% include_w_in_correction_limits) then
             skip3 = 0
             do k=1,nz
                s% correction_weight(s% i_w,k) = 1d0/(frac*s% csound_start(k) + abs(s% w(k)))
@@ -641,7 +641,7 @@
          min_alpha = 1d0
          nz = s% nz
 
-         if (s% using_TDC) & ! clip change in w to maintain non-negativity.
+         if (s% using_RSP2) & ! clip change in w to maintain non-negativity.
             call clip_so_non_negative(s% i_w, 0d0)
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.

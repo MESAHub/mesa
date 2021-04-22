@@ -3699,7 +3699,7 @@
          dlnP = s% lnPeos(k-1) - s% lnPeos(k)
          dlnT = s% lnT(k-1) - s% lnT(k)
          grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
-         gradT_actual = dlnT/dlnP ! mlt has not been called yet when doing this
+         gradT_actual = safe_div_val(s, dlnT, dlnP) ! mlt has not been called yet when doing this
          brunt_N2 = f*(brunt_B - (gradT_actual - grada_face))
          tau_conv = 1d0/sqrt(abs(brunt_N2))
       end function conv_time_scale
@@ -3723,20 +3723,25 @@
       subroutine set_using_TDC(s)
          type (star_info), pointer :: s      
          real(dp) :: switch
+         logical :: prev_using_TDC
+         include 'formats'
+         prev_using_TDC = s% using_TDC
          s% using_TDC = .false.
          if (s% max_dt_div_tau_conv_for_TDC > 0) then
             switch = s% max_conv_time_scale*s% max_dt_div_tau_conv_for_TDC
             if (s% dt < switch) then
                s% using_TDC = .true.
-               return
             end if
          end if
          if (s% max_dt_years_for_TDC > 0) then
             switch = s% max_dt_years_for_TDC*secyer
             if (s% dt < switch) then
                s% using_TDC = .true.
-               return
             end if
+         end if
+         if ((.not. prev_using_TDC) .and. s% using_TDC) then
+            write(*,2) 'turn on TDC', s% model_number
+            write(*,*)
          end if
       end subroutine set_using_TDC
       
@@ -4057,5 +4062,43 @@
          d_val_dvb(mlt_dL) = val_ad%d1Array(i_L_00)
       end subroutine unwrap_mlt
 
+
+      real(dp) function safe_div_val(s, x, y, lim) result(x_div_y)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: x, y, lim
+         optional :: lim
+         real(dp) :: limit
+         if (present(lim)) then
+            limit = lim
+         else
+            limit = 1d-20
+         end if
+         if (abs(y) < limit) then
+            x_div_y = 0d0
+         else
+            x_div_y = x/y
+         end if
+      end function safe_div_val
+
+
+      function safe_div(s, x, y, lim) result(x_div_y)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1), intent(in) :: x, y
+         type(auto_diff_real_star_order1) :: x_div_y
+         real(dp), intent(in) :: lim
+         optional :: lim
+         real(dp) :: limit
+         if (present(lim)) then
+            limit = lim
+         else
+            limit = 1d-20
+         end if
+         if (abs(y) < limit) then
+            x_div_y = 0d0
+         else
+            x_div_y = x/y
+         end if
+      end function safe_div
+      
 
       end module star_utils

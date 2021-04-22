@@ -48,7 +48,7 @@
 
          include 'formats'
          
-         if (s% using_TDC) then
+         if (s% using_RSP2) then
             stop 'need to add mlt_vc to remesh_split_merge'
          end if
 

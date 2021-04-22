@@ -34,7 +34,7 @@
    
       max_X_for_TDC = -1
       max_X_for_gradT_eqn = -1
-   
+      compare_TDC_to_MLT = .false.
    
    
       

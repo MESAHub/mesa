@@ -62,7 +62,7 @@
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
-            s% species, s% num_reactions, &
+            s% have_mlt_vc, s% species, s% num_reactions, &
             s% model_number, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
             s% time, s% dt, s% have_previous_conv_vel, &
@@ -82,7 +82,7 @@
          call write_part_number(iounit)
          write(iounit) &
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
-            s% omega(1:nz), s% j_rot(1:nz)
+            s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz)
 
          call write_part_number(iounit)
          write(iounit) &
