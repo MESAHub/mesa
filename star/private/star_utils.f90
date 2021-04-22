@@ -2869,6 +2869,10 @@
          integer :: nz, j
          include 'formats'
          nz = s% nz
+
+         s% phase_of_evolution = phase_starting
+         if (s% model_number == 0) return
+
          
          j = s% net_iso(ih1)
          if (j > 0) then
