@@ -124,6 +124,11 @@
          integer :: num_hydro_splits
          integer :: bad_max_corr_cnt
 
+      ! past/future model numbers
+         integer :: timestep_hold
+         integer :: model_number_for_last_retry
+         integer :: model_number_for_last_retry_old
+
       ! history
          integer, pointer :: profile_column_spec(:)
          integer :: number_of_history_columns

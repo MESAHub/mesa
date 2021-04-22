@@ -105,9 +105,6 @@
             s% generations = -999
             s% start_H_envelope_base_k = -999
             s% num_solver_iterations = -999
-            s% timestep_hold = -999
-            s% model_number_for_last_retry = -999
-            s% model_number_for_last_retry_old = -999
             s% num_diffusion_solver_iters = -999
             s% num_diffusion_solver_steps = -999
             s% num_rotation_solver_steps = -999
