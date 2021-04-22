@@ -5,8 +5,8 @@
       
       real(dp) :: time ! elapsed time (seconds)
       real(dp) :: dt, dt_next ! timesteps (seconds)
-       
-      integer :: model_number
+
+      integer :: model_number, init_model_number
       integer :: nvar_hydro ! the number of structure variables per zone      
       integer :: species ! species = number of isotopes in the current net
       integer :: nvar_chem ! the number of chemical abundance variables per zone
@@ -100,7 +100,30 @@
             ! index from 1 to num_chem_isos
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         
+
+      ! timestep information
+         integer :: why_Tlim ! for the most recent timestep
+         integer :: dt_why_retry_count(numTlim) ! counts incremented at each step with hard limit retry
+         integer :: dt_why_count(numTlim) ! counts for non-hard limit steps
+
+      ! counters
+         integer :: total_step_attempts
+         integer :: total_relax_step_attempts
+         integer :: total_step_retries
+         integer :: total_relax_step_retries
+         integer :: total_step_redos
+         integer :: total_relax_step_redos
+         integer :: total_steps_finished
+         integer :: total_relax_steps_finished
+
+         integer :: num_skipped_setvars
+         integer :: num_setvars
+         integer :: num_solver_setvars
+
+         integer :: num_hydro_merges
+         integer :: num_hydro_splits
+         integer :: bad_max_corr_cnt
+
       ! history
          integer, pointer :: profile_column_spec(:)
          integer :: number_of_history_columns

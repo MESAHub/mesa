@@ -1102,24 +1102,10 @@
          real(dp) :: tau_center  
          real(dp) :: super_eddington_wind_mdot
          real(dp) :: max_conv_time_scale, max_QHSE_time_scale
-         
-         integer :: init_model_number
+
          integer :: start_H_envelope_base_k
-         integer :: total_step_attempts
-         integer :: total_relax_step_attempts
-         integer :: total_step_retries
-         integer :: total_relax_step_retries
-         integer :: total_step_redos
-         integer :: total_relax_step_redos
-         integer :: total_steps_finished
-         integer :: total_relax_steps_finished
+
          integer :: num_solver_iterations ! for this step
-         integer :: num_skipped_setvars
-         integer :: num_setvars
-         integer :: num_solver_setvars
-         integer :: num_hydro_merges
-         integer :: num_hydro_splits
-         integer :: bad_max_corr_cnt
          integer :: timestep_hold
          integer :: model_number_for_last_retry
          integer :: model_number_for_last_retry_old
@@ -1150,10 +1136,6 @@
          
          integer :: Tlim_dlgL_nuc_category
          integer :: Tlim_dlgL_nuc_cell
-   
-         integer :: why_Tlim ! for the most recent timestep
-         integer :: dt_why_retry_count(numTlim) ! counts incremented at each step with hard limit retry
-         integer :: dt_why_count(numTlim) ! counts for non-hard limit steps
    
          logical :: need_to_update_history_now
          logical :: need_to_save_profiles_now
