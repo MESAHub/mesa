@@ -2871,7 +2871,7 @@
          nz = s% nz
 
          s% phase_of_evolution = phase_starting
-         if (s% model_number == 0) return
+         if (s%doing_first_model_of_run) return
 
          
          j = s% net_iso(ih1)
