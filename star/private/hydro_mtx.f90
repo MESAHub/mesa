@@ -95,7 +95,7 @@
          integer :: i, j, k, kk, klo, khi, i_var, &
             i_lnd, i_lnT, i_lnR, i_lum, i_w, i_v, &
             i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
-            fe56, nvar_chem, species, i_chem1, nz, nvar_hydro
+            fe56, nvar_chem, species, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
          integer :: op_err, kbad, &
             cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
@@ -113,7 +113,6 @@
          species = s% species
          nvar_hydro = s% nvar_hydro
          d_dxdt_dx = 1d0/s% dt
-         i_chem1 = s% i_chem1
 
          xh_start => s% xh_start
          xa_start => s% xa_start
@@ -174,7 +173,7 @@
          do_j_rot = i_j_rot > 0 .and. i_j_rot <= nvar
 
          fe56 = s% net_iso(ife56)
-         if (fe56 /= 0) fe56 = i_chem1+fe56-1
+         if (fe56 /= 0) fe56 = nvar_hydro+fe56
 
          if (nvar > nvar_hydro) then
             do k=1,nz
@@ -312,12 +311,12 @@
                do k=1,nz
                   if (abs(1d0 - sum(s% xa(:,k))) > 1d-3) then
                      write(*,2) 'set_vars_for_solver: bad xa sum', k, &
-                        sum(s% xa(:,k)), sum(xa_start(:,k)), sum(s% solver_dx(i_chem1:nvar,k))
+                        sum(s% xa(:,k)), sum(xa_start(:,k)), sum(s% solver_dx(nvar_hydro+1:nvar,k))
                      write(*,'(51x,a)') 'xa, xa_start+dx, xa_start, dx'
                      do j=1,species
                         write(*,2) trim(chem_isos% name(s% chem_id(j))), k, &
-                           s% xa(j,k), xa_start(j,k) + s% solver_dx(i_chem1-1+j,k), &
-                           xa_start(j,k), s% solver_dx(i_chem1-1+j,k)
+                           s% xa(j,k), xa_start(j,k) + s% solver_dx(nvar_hydro+j,k), &
+                           xa_start(j,k), s% solver_dx(nvar_hydro+j,k)
                      end do
 
                      exit

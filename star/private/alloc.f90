@@ -2553,10 +2553,6 @@
          s% i_dj_rot_dt = s% i_j_rot
 
          s% nvar_hydro = i
-
-         s% i_chem1 = s% nvar_hydro + 1
-         s% equchem1 = s% i_chem1
-
          s% nvar_total = s% nvar_hydro + s% nvar_chem
 
          ! Names of the variables
