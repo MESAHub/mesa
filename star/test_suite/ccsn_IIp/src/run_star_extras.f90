@@ -1189,8 +1189,6 @@
          if (s% x_ctrl(2) <= 0) return
          shock_mass = s% shock_mass
          if (shock_mass >= s% x_ctrl(2)) then
-            !write(*,1) 'shock has reached target location', &
-            !   s% x_ctrl(2), shock_mass
             write(*,'(a,2f12.5)') 'shock has reached target location', &
                shock_mass, s% x_ctrl(2)
             extras_finish_step = terminate

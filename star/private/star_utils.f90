@@ -1356,7 +1356,7 @@
 
       subroutine get_shock_info(s)
          type (star_info), pointer :: s
-         integer :: k, nz, kk, kmin
+         integer :: k, nz
          real(dp) :: v_div_cs_00, v_div_cs_m1, v_div_cs_min, v_div_cs_max, shock_radius
          real(dp), pointer :: v(:)
 
@@ -1384,40 +1384,36 @@
          end if
 
          nz = s% nz
-         kmin = nz
          shock_radius = -1
-         if (kmin < nz) then ! search inward for 1st Mach 1 location
-            v_div_cs_00 = v(kmin)/s% csound(kmin)
-            do k = kmin+1,nz-1
-               v_div_cs_m1 = v_div_cs_00
-               v_div_cs_00 = v(k)/s% csound(k)
-               v_div_cs_max = max(v_div_cs_00, v_div_cs_m1)
-               v_div_cs_min = min(v_div_cs_00, v_div_cs_m1)
-               if (v_div_cs_max >= 1d0 .and. v_div_cs_min < 1d0) then
-                  if (v(k+1) > s% csound(k+1)) then ! skip single point glitches
-                     shock_radius = &
-                        find0(s% r(k), v_div_cs_00-1d0, s% r(k-1), v_div_cs_m1-1d0)
-                     if (shock_radius <= 0d0) then
-                        stop 'get_shock_info 1'
-                     end if
-                     exit
+         v_div_cs_00 = v(1)/s% csound(1)
+         do k = 2,nz-1
+            v_div_cs_m1 = v_div_cs_00
+            v_div_cs_00 = v(k)/s% csound(k)
+            v_div_cs_max = max(v_div_cs_00, v_div_cs_m1)
+            v_div_cs_min = min(v_div_cs_00, v_div_cs_m1)
+            if (v_div_cs_max >= 1d0 .and. v_div_cs_min < 1d0) then
+               if (v(k+1) > s% csound(k+1)) then ! skip single point glitches
+                  shock_radius = &
+                     find0(s% r(k), v_div_cs_00-1d0, s% r(k-1), v_div_cs_m1-1d0)
+                  if (shock_radius <= 0d0) then
+                     stop 'get_shock_info 1'
                   end if
+                  exit
                end if
-               if (v_div_cs_min <= -1d0 .and. v_div_cs_max > -1d0) then
-                  if (v(k+1) < -s% csound(k+1)) then ! skip single point glitches
-                     shock_radius = &
-                        find0(s% r(k), v_div_cs_00+1d0, s% r(k-1), v_div_cs_m1+1d0)
-                     if (shock_radius <= 0d0) then
-                        stop 'get_shock_info 2'
-                     end if
-                     exit
+            end if
+            if (v_div_cs_min <= -1d0 .and. v_div_cs_max > -1d0) then
+               if (v(k+1) < -s% csound(k+1)) then ! skip single point glitches
+                  shock_radius = &
+                     find0(s% r(k), v_div_cs_00+1d0, s% r(k-1), v_div_cs_m1+1d0)
+                  if (shock_radius <= 0d0) then
+                     stop 'get_shock_info 2'
                   end if
+                  exit
                end if
-            end do
-         end if
+            end if
+         end do
 
-
-
+         write(*,3) 'shock_radius', k-1, s% model_number, shock_radius
          if (shock_radius < 0d0) return
          
          call get_shock_location_info( &
