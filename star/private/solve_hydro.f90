@@ -292,10 +292,10 @@
             end do
          end do
 
-         if (nvar >= s% i_chem1) then
+         if (nvar >= s% nvar_hydro+1) then
             do k = 1, nz
                j2 = 1
-               do j1 = s% i_chem1, nvar
+               do j1 = s% nvar_hydro+1, nvar
                   s% xa_sub_xa_start(j2,k) = s% xa(j2,k) - s% xa_start(j2,k)
                   s% solver_dx(j1,k) = s% xa_sub_xa_start(j2,k)
                   j2 = j2+1

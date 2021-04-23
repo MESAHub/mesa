@@ -555,7 +555,6 @@
          s% i_v = 0
          s% i_u = 0
          s% i_alpha_RTI = 0
-         s% i_chem1 = 0
 
          s% i_dv_dt = 0
          s% i_du_dt = 0
@@ -564,7 +563,6 @@
          s% i_dlnE_dt = 0
          s% i_dlnR_dt = 0
          s% i_dalpha_RTI_dt = 0
-         s% equchem1 = 0
 
          s% op_mono_nptot = 0
          s% op_mono_ipe = 0

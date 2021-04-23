@@ -81,7 +81,7 @@
             i, k, j, nvar_hydro, nz, op_err
          integer :: &
             i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
-            i_alpha_RTI, i_chem1, i_xh1, i_xhe4, kmax_equ(nvar), species
+            i_alpha_RTI, i_xh1, i_xhe4, kmax_equ(nvar), species
          real(dp) :: max_equ(nvar), L_phot_old
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
@@ -379,9 +379,8 @@
             i_w_div_wc = s% i_w_div_wc
             i_j_rot = s% i_j_rot
 
-            i_chem1 = s% i_chem1
-            i_xh1 = i_chem1-1+s% net_iso(ih1)
-            i_xhe4 = i_chem1-1+s% net_iso(ihe4)
+            i_xh1 = s% nvar_hydro+s% net_iso(ih1)
+            i_xhe4 = s% nvar_hydro+s% net_iso(ihe4)
 
             L_phot_old = s% L_phot_old
             v_flag = s% v_flag
