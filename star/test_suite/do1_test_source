@@ -1,3 +1,6 @@
+do_one relax_composition_j_entropy "stop because have dropped below central lower limit for he4" "final.mod" auto
+
+return
 
 
 do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto

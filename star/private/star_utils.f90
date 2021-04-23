@@ -1412,8 +1412,6 @@
                end if
             end if
          end do
-
-         write(*,3) 'shock_radius', k-1, s% model_number, shock_radius
          if (shock_radius < 0d0) return
          
          call get_shock_location_info( &
