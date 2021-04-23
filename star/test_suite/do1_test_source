@@ -1,14 +1,3 @@
-do_one relax_composition_j_entropy "stop because have dropped below central lower limit for he4" "final.mod" auto
-
-return
-
-
-do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto
-do_one make_co_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
-do_one relax_composition_j_entropy "stop because have dropped below central lower limit for he4" "final.mod" auto
-
-return
- 
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
@@ -39,7 +28,7 @@ do_one custom_rates "stop because log_center_temperature >= log_center_temp_limi
 do_one dev_RSP2 "RSP2 good match for period" "final.mod" skip
 do_one dev_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-# broken     do_one dev_to_pulses_80_up_part1 "log_max_temperature >= log_max_temp_upper_limit" "part1.mod" skip
+#   broken     do_one dev_to_pulses_80_up_part1 "log_max_temperature >= log_max_temp_upper_limit" "part1.mod" skip
 do_one dev_to_pulses_80_up_part2 "stop because ejecta_mass >= ejecta_mass_max_limit" "part2.mod" skip
 do_one dev_to_pulses_80_up_part3 "stop because ejecta_mass >= ejecta_mass_max_limit" "part3.mod" skip
 do_one dev_to_pulses_80_up_part4 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip

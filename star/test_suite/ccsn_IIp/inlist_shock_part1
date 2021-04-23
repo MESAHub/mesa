@@ -49,11 +49,10 @@
 
       terminal_show_age_units = 'seconds'
 
-      
-      photo_interval = 1
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 ! FOR DEBUGGING
 
