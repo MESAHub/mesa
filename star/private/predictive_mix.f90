@@ -690,7 +690,7 @@ contains
 
     use eos_def
     use micro
-    use mlt_info, only: do1_mlt
+    use mlt_info_newer, only: do1_mlt_2_newer
 
     type(star_info), pointer :: s
     integer, intent(in)      :: k_bot_mz
@@ -818,9 +818,9 @@ contains
 
        ! Evaluate mixing coefficients etc.
        gradL_composition_term = 0._dp
-       
-         call do1_mlt(s, k, s% alpha_mlt(k), gradL_composition_term, &
-               -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, op_err)
+       call do1_mlt_2_newer(s, k, s% alpha_mlt(k), gradL_composition_term, &
+            -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, &
+            make_gradr_sticky_in_solver_iters, op_err)
        if (op_err /= 0) stop 'non-zero op_err'
 
        D(k) = s%mlt_D(k)
@@ -870,8 +870,10 @@ contains
     restore_face_loop: do k = k_a, k_b
 
        s%rho_face(k) = rho_face_save(k)
-       call do1_mlt(s, k, s% alpha_mlt(k), -1._dp, &
-            -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, op_err)
+       gradL_composition_term = 0._dp
+       call do1_mlt_2_newer(s, k, s% alpha_mlt(k), gradL_composition_term, &
+            -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, &
+            make_gradr_sticky_in_solver_iters, op_err)
        if (op_err /= 0) stop 'non-zero op_err'
 
     end do restore_face_loop

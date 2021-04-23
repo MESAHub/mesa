@@ -48,9 +48,9 @@
          integer :: iounit, i, k, nvar_hydro, nz, species, file_type
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
-         logical :: v_flag, RTI_flag, conv_vel_flag, &
+         logical :: v_flag, RTI_flag, &
             RSP2_flag, u_flag, prev_flag, rotation_flag, &
-            write_conv_vel, rsp_flag, no_L
+            write_mlt_vc, rsp_flag, no_L
 
          1 format(a32, 2x, 1pd26.16)
          11 format(a32, 2x, 1pd26.16, 2x, a, 2x, 99(1pd26.16))
@@ -65,14 +65,13 @@
          chem_id => s% chem_id
          nvar_hydro = s% nvar_hydro
          nz = s% nz
-         RSP2_flag = s% RSP2_flag
+         RSP2_flag = s% RSP2_flag 
          v_flag = s% v_flag
          u_flag = s% u_flag
          RTI_flag = s% RTI_flag
-         conv_vel_flag = s% conv_vel_flag
          rotation_flag = s% rotation_flag
          rsp_flag = s% rsp_flag
-         write_conv_vel = s% have_mixing_info
+         write_mlt_vc = s% have_mlt_vc
          
          species = s% species
          
@@ -83,14 +82,13 @@
          file_type = 0
          if (RSP2_flag) file_type = file_type + 2**bit_for_w
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
-         if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
          if (prev_flag) file_type = file_type + 2**bit_for_2models
          if (v_flag) file_type = file_type + 2**bit_for_velocity
          if (u_flag) file_type = file_type + 2**bit_for_u
          if (rotation_flag) file_type = file_type + 2**bit_for_rotation
          if (rotation_flag) file_type = file_type + 2**bit_for_j_rot
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
-         if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
+         if (write_mlt_vc) file_type = file_type + 2**bit_for_mlt_vc
          
          no_L = (s% rsp_flag .or. s% RSP2_flag)
          if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
@@ -111,14 +109,12 @@
             write(iounit,'(a)',advance='no') ', cell center Riemann velocities (u)'
          if (BTEST(file_type, bit_for_RTI)) &
             write(iounit,'(a)',advance='no') ', Rayleigh-Taylor instabilities (alpha_RTI)'
-         if (BTEST(file_type, bit_for_conv_vel)) &
-            write(iounit,'(a)',advance='no') ', convection velocity - not a solver variable (conv_vel)'
-         if (BTEST(file_type, bit_for_conv_vel_var)) &
-            write(iounit,'(a)',advance='no') ', convection velocity as solver variable (conv_vel)'
+         if (BTEST(file_type, bit_for_mlt_vc)) &
+            write(iounit,'(a)',advance='no') ', mlt convection velocity (mlt_vc)'
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
          if (BTEST(file_type, bit_for_w)) &
-            write(iounit,'(a)',advance='no') ', turbulent energy for cell (w)'
+            write(iounit,'(a)',advance='no') ', turbulent velocity (w)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -200,9 +196,9 @@
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             else if (RSP2_flag) then
                if (s% using_RSP2) then
-                  call write1(s% w(k),ierr)
+                  call write1(s% w(k),ierr); if (ierr /= 0) exit
                else ! cv = sqrt_2_div_3*w
-                  call write1(s% conv_vel(k)/sqrt_2_div_3,ierr)
+                  call write1(s% mlt_vc(k)/sqrt_2_div_3,ierr)
                end if
                if (ierr /= 0) exit
             end if            
@@ -223,8 +219,8 @@
             if (RTI_flag) then
                call write1(s% alpha_RTI(k),ierr); if (ierr /= 0) exit
             end if
-            if (write_conv_vel .or. conv_vel_flag) then
-               call write1(s% conv_vel(k),ierr); if (ierr /= 0) exit
+            if (write_mlt_vc) then
+               call write1(s% mlt_vc(k),ierr); if (ierr /= 0) exit
             end if
             do i=1, species
                call write1(s% xa(i,k),ierr); if (ierr /= 0) exit
@@ -287,8 +283,7 @@
             if (u_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'u'
             if (RTI_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'alpha_RTI'
-            if (write_conv_vel .or. conv_vel_flag) &
-               write(iounit, fmt='(a26, 1x)', advance='no') 'conv_vel'
+            if (write_mlt_vc) write(iounit, fmt='(a26, 1x)', advance='no') 'mlt_vc'
             do i=1, species
                write(iounit, fmt='(a26, 1x)', advance='no') chem_isos% name(chem_id(i))
             end do

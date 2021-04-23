@@ -984,11 +984,6 @@
                s% shock_mass_upper_limit > 0) then 
             call compare_to_target('shock_mass >= shock_mass_upper_limit', &
                s% shock_mass, s% shock_mass_upper_limit, t_shock_mass_upper_limit)
-               
-         else if (s% outer_mach1_mass >= s% mach1_mass_upper_limit .and. &
-               s% mach1_mass_upper_limit > 0) then 
-            call compare_to_target('mach1_mass >= mach1_mass_upper_limit', &
-               s% outer_mach1_mass, s% mach1_mass_upper_limit, t_mach1_mass_upper_limit)
 
          else if (s% photosphere_m - s% M_center/Msun <= s% photosphere_m_sub_M_center_limit) then 
             call compare_to_target( &

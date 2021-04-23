@@ -35,36 +35,34 @@
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
-      integer, parameter :: bit_for_conv_vel = 5 ! for saving the data, but not using as variable
+      integer, parameter :: bit_for_mlt_vc = 5
       integer, parameter :: bit_for_w = 6
       integer, parameter :: bit_for_RTI = 7
-      !integer, parameter ::  = 8 ! UNUSED
+      !integer, parameter ::  = 8
       integer, parameter :: bit_for_u = 9
       integer, parameter :: bit_for_D_omega = 10
       integer, parameter :: bit_for_am_nu_rot = 11
       integer, parameter :: bit_for_j_rot = 12
-      integer, parameter :: bit_for_conv_vel_var = 13
-      !integer, parameter ::   = 14 ! UNUSED
+      !integer, parameter ::  = 13
+      !integer, parameter ::  = 14
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
-      integer, parameter :: increment_for_i_w = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
+      integer, parameter :: increment_for_have_mlt_vc = 1
       integer, parameter :: increment_for_D_omega_flag = 1
       integer, parameter :: increment_for_am_nu_rot_flag = 1
       integer, parameter :: increment_for_RTI_flag = 1
       integer, parameter :: increment_for_RSP_flag = 3
-      integer, parameter :: increment_for_conv_vel_flag = 1
       
-      integer, parameter :: max_increment = increment_for_i_w &
-                                          + increment_for_rotation_flag &
+      integer, parameter :: max_increment = increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
+                                          + increment_for_have_mlt_vc &
                                           + increment_for_D_omega_flag &
                                           + increment_for_am_nu_rot_flag &
                                           + increment_for_RTI_flag &
-                                          + increment_for_RSP_flag &
-                                          + increment_for_conv_vel_flag
+                                          + increment_for_RSP_flag
 
       integer, parameter :: mesa_zams_file_type = 2**bit_for_zams_file
 
@@ -159,6 +157,11 @@
             end if
          end if
          
+         if (.not. s% have_mlt_vc) then
+            s% mlt_vc(1:nz) = 0
+            s% have_mlt_vc = .true.
+         end if
+         
          s% doing_finish_load_model = .true.  
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) then
@@ -208,7 +211,7 @@
          logical, intent(out) :: is_RSP_model
          integer, intent(out) :: ierr
 
-         integer :: iounit, n, i, t, file_type, &
+         integer :: iounit, n, i, k, t, file_type, &
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
@@ -340,10 +343,10 @@
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
          s% have_j_rot = BTEST(file_type, bit_for_j_rot)
+         s% have_mlt_vc = BTEST(file_type, bit_for_mlt_vc)
          s% D_omega_flag = BTEST(file_type, bit_for_D_omega)
          s% am_nu_rot_flag = BTEST(file_type, bit_for_am_nu_rot)
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
-         s% conv_vel_flag = BTEST(file_type, bit_for_conv_vel_var)
          is_RSP_model = BTEST(file_type, bit_for_RSP)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
          
@@ -380,7 +383,7 @@
             return
          end if
 
-         s% have_previous_conv_vel = BTEST(file_type, bit_for_conv_vel)
+         s% have_mlt_vc = BTEST(file_type, bit_for_mlt_vc)
          s% initial_z = initial_z
 
          s% mstar = initial_mass*Msun
@@ -441,8 +444,7 @@
          call read1_model( &
                s, s% species, s% nvar_hydro, nz, iounit, &
                is_RSP_model, want_RSP_model, &
-               s% xh, s% xa, s% q, s% dq, &
-               s% omega, s% j_rot, &
+               s% xh, s% xa, s% q, s% dq, s% omega, s% j_rot, &
                perm, ierr)
          deallocate(names, perm)
          if (ierr /= 0) then
@@ -557,8 +559,8 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Et_RSP, &
-            i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, &
+            i_Et_RSP, i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
          real(dp) :: r00, rm1
@@ -575,23 +577,21 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          no_L = (i_lum == 0)
-         i_w = s% i_w
+         i_w = s% i_w         
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
          i_Et_RSP = s% i_Et_RSP
          i_erad_RSP = s% i_erad_RSP
          i_Fr_RSP = s% i_Fr_RSP
-         i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_w /= 0) n = n+increment_for_i_w
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
+         if (s% have_mlt_vc) n = n+increment_for_have_mlt_vc
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
          if (is_RSP_model) n = n+increment_for_RSP_flag ! read RSP_et, erad, Fr
-         if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
@@ -653,10 +653,10 @@
                j=j+1; j_rot(k) = vec(j)
             end if
             if (s% D_omega_flag) then
-               j=j+1; !D_omega(k) = vec(j) ! no longer used
+               j=j+1; ! skip saving the file data
             end if
             if (s% am_nu_rot_flag) then
-               j=j+1; !am_nu_rot(k) = vec(j) ! no longer used
+               j=j+1; ! skip saving the file data
             end if
             if (i_u /= 0) then
                j=j+1; xh(i_u,k) = vec(j)
@@ -664,13 +664,8 @@
             if (s% RTI_flag) then
                j=j+1; xh(i_alpha_RTI,k) = vec(j)
             end if
-            if (s% conv_vel_flag .or. s% have_previous_conv_vel) then
-               j=j+1
-               if (s% conv_vel_flag) then
-                  xh(i_ln_cvpv0,k) = log(vec(j)+s% conv_vel_v0)
-               else
-                  s% conv_vel(k) = vec(j)
-               end if
+            if (s% have_mlt_vc) then
+               j=j+1; s% mlt_vc(k) = vec(j)
             end if
             if (j+species > nvec) then
                ierr = -1
@@ -698,7 +693,7 @@
          
          if (s% rotation_flag .and. .not. s% am_nu_rot_flag) &
             s% am_nu_rot(1:nz) = 0d0
-         
+
          if (want_RSP_model .and. .not. is_RSP_model) then
             ! proper values for these will be set in rsp_setup_part2
             s% xh(i_Et_RSP,1:nz) = 0d0 

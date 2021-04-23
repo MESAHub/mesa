@@ -1329,8 +1329,6 @@
             if (failed('mlt_mixing_type_start')) exit
             call do1(s% mlt_D_start, c% mlt_D_start)
             if (failed('mlt_D_start')) exit
-            call do1(s% mlt_vc_start, c% mlt_vc_start)
-            if (failed('mlt_vc_start')) exit
             call do1(s% mlt_Gamma_start, c% mlt_Gamma_start)
             if (failed('mlt_Gamma_start')) exit
             call do1(s% mlt_cdc_start, c% mlt_cdc_start)

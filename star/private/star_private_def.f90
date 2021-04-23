@@ -164,7 +164,6 @@
          termination_code_str(t_delta_Pg_lower_limit) = 'delta_Pg_lower_limit'
          termination_code_str(t_delta_Pg_upper_limit) = 'delta_Pg_upper_limit'
          termination_code_str(t_shock_mass_upper_limit) = 'shock_mass_upper_limit'
-         termination_code_str(t_mach1_mass_upper_limit) = 'mach1_mass_upper_limit'
          termination_code_str(t_photosphere_m_sub_M_center_limit) = 'photosphere_m_sub_M_center_limit'
          termination_code_str(t_photosphere_m_lower_limit) = 'photosphere_m_lower_limit'
          termination_code_str(t_photosphere_m_upper_limit) = 'photosphere_m_upper_limit'

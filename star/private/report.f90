@@ -469,13 +469,6 @@
          nu_for_delta_Pg = s% nu_max
          if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
          call get_delta_Pg(s, nu_for_delta_Pg, s% delta_Pg)
-         
-         call get_tau(s, ierr)
-         if (failed('get_tau')) return
-         call check_tau(10d0, s% tau10_radius, s% tau10_mass, &
-               s% tau10_lgP, s% tau10_lgT, s% tau10_lgRho, s% tau10_L)
-         call check_tau(100d0, s% tau100_radius, s% tau100_mass, &
-               s% tau100_lgP, s% tau100_lgT, s% tau100_lgRho, s% tau100_L)
 
          if (s% rsp_flag) return
 
@@ -604,54 +597,6 @@
             end do
             s% mass_semiconv_core = s% star_mass
          end subroutine set_mass_semiconv_core
-
-
-         subroutine check_tau(check, tau_radius, tau_mass, tau_lgP, tau_lgT, tau_lgd, tau_L)
-            use num_lib, only: binary_search
-            real(dp), intent(in) :: check
-            real(dp), intent(out) :: tau_radius, tau_mass, tau_lgP, tau_lgT, tau_lgd, tau_L
-            integer :: k, hint, nz
-            real(dp) :: frac, v00, vp1, taup1, tau00
-
-            include 'formats'
-
-            hint = 0
-            nz = s% nz
-            k = binary_search(nz, s% tau, hint, check)
-
-            if (k < 1 .or. k > nz-2) then
-               tau_radius=0; tau_mass=0; tau_lgP=0; tau_lgT=0; tau_lgd=0; tau_L=0
-               return
-            end if
-
-            tau00 = s% tau(k)
-            taup1 = s% tau(k+1)
-
-            ! tau00 <= check < taup1
-            frac = (check - tau00)/(taup1 - tau00)
-
-            if (frac > 1 .or. frac < 0) then
-               tau_radius=0; tau_mass=0; tau_lgP=0; tau_lgT=0; tau_lgd=0; tau_L=0
-               return
-            end if
-
-            tau_lgP = (s% lnPeos(k) + (s% lnPeos(k+1)-s% lnPeos(k))*frac)/ln10
-            tau_lgT = (s% lnT(k) + (s% lnT(k+1)-s% lnT(k))*frac)/ln10
-            tau_lgd = (s% lnd(k) + (s% lnd(k+1)-s% lnd(k))*frac)/ln10
-
-            v00 = (s% r(k+1) + s% r(k))/2
-            vp1 = (s% r(k+2) + s% r(k+1))/2
-            tau_radius = (v00 + (vp1 - v00)*frac)/Rsun
-
-            v00 = (s% q(k+1) + s% q(k))/2
-            vp1 = (s% q(k+2) + s% q(k+1))/2
-            tau_mass = (s% M_center + s% xmstar*(v00 + (vp1 - v00)*frac))/Msun
-
-            v00 = (s% L(k+1) + s% L(k))/2
-            vp1 = (s% L(k+2) + s% L(k+1))/2
-            tau_L = (v00 + (vp1 - v00)*frac)/Lsun
-
-         end subroutine check_tau
 
 
          real(dp) function volume_at_q(q)
@@ -1059,106 +1004,9 @@
          s% star_mass_ne20 = s% star_mass_ne20 / Msun
          
          call get_core_info(s)
-         call get_trace_mass_location_info(s)
-         call get_max_T_location_info(s)
-         call get_max_abs_v_location_info(s)
-         call get_inner_mach1_info(s)
-         call get_outer_mach1_info(s)
          call get_shock_info(s)
 
       end subroutine get_mass_info
-
-
-      subroutine get_max_T_location_info(s)
-         type (star_info), pointer :: s
-         integer :: k, kk
-         k = maxloc(s% lnT(1:s% nz),dim=1)
-         s% max_T_lgT = s% lnT(k)/ln10
-         s% max_T_lgRho = s% lnd(k)/ln10
-         s% max_T_lgP = s% lnPeos(k)/ln10
-         if (k == s% nz) then
-            s% max_T_mass = s% M_center/Msun ! (Msun)
-            s% max_T_radius = s% R_center/Rsun ! (Rsun)
-            s% max_T_L = s% L_center/Lsun! (Lsun)
-         else
-            s% max_T_mass = s% m(k)/Msun ! (Msun)
-            s% max_T_radius = s% r(k)/Rsun ! (Rsun)
-            s% max_T_L = s% L(k)/Lsun! (Lsun)
-         end if
-         s% max_T_entropy = s% entropy(k)
-         s% max_T_eps_nuc = s% eps_nuc(k) ! (erg/g/s)
-         s% max_T_shell_binding_energy = 0d0
-         if (s% cgrav(k) <= 0d0 .or. s% u_flag) then
-            s% max_T_lgP_thin_shell = -1d99
-         else
-            s% max_T_lgP_thin_shell = &
-               log10(s% cgrav(k)*s% m(k)*(s% m(1)-s% m(k))/(pi4*pow4(s% r(k))))
-            if (s% v_flag) then
-               do kk = 1, k
-                  s% max_T_shell_binding_energy = s% max_T_shell_binding_energy + &
-                     s% dm(kk)*(s% energy(kk) + &
-                           s% Peos(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk) + &
-                           0.5d0*s% v(kk)*s% v(kk))
-               end do
-            else
-               do kk = 1, k
-                  s% max_T_shell_binding_energy = s% max_T_shell_binding_energy + &
-                     s% dm(kk)*(s% energy(kk) + &
-                           s% Peos(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk))
-               end do
-            end if
-         end if
-      end subroutine get_max_T_location_info
-
-
-      subroutine get_max_abs_v_location_info(s)
-         type (star_info), pointer :: s
-         integer :: k, kk
-         if (s% min_tau_for_max_abs_v_location <= 0) then
-            kk = 1
-         else
-            do kk=1,s% nz
-               if (s% tau(kk) >= s% min_tau_for_max_abs_v_location) exit
-            end do
-            if (kk > s% nz) kk = s% nz
-         end if
-         if (s% u_flag) then
-            k = maxloc(abs(s% u(kk:s% nz)),dim=1)
-            s% max_abs_v_velocity = s% u(k)
-         else if (s% v_flag) then
-            k = maxloc(abs(s% v(kk:s% nz)),dim=1)
-            s% max_abs_v_velocity = s% v(k)
-         else
-            return
-         end if
-         s% max_abs_v_csound = s% csound_face(k)
-         s% max_abs_v_v_div_cs = s% max_abs_v_velocity/s% csound_face(k)
-         s% max_abs_v_lgT = s% lnT(k)/ln10
-         s% max_abs_v_lgRho = s% lnd(k)/ln10
-         s% max_abs_v_lgP = s% lnPeos(k)/ln10
-         s% max_abs_v_mass = s% m(k)/Msun ! (Msun)
-         s% max_abs_v_radius = s% r(k)/Rsun ! (Rsun)
-         s% max_abs_v_L = s% L(k)/Lsun! (Lsun)
-         s% max_abs_v_gamma1 = s% gamma1(k)
-         s% max_abs_v_entropy = s% entropy(k)
-         s% max_abs_v_eps_nuc = s% eps_nuc(k) ! (erg/g/s)
-      end subroutine get_max_abs_v_location_info
-
-
-      subroutine get_trace_mass_location_info(s)
-         type (star_info), pointer :: s
-         real(dp) :: q, m
-         integer :: kbdy
-         include 'formats'
-         q = max(0d0, min(1d0, s% trace_mass_location / s% star_mass))
-         call get_info_at_q(s, q, &
-            kbdy, m, s% trace_mass_radius, s% trace_mass_lgT, &
-            s% trace_mass_lgRho, s% trace_mass_L, s% trace_mass_v, &
-            s% trace_mass_lgP, s% trace_mass_g, s% trace_mass_X, s% trace_mass_Y, &
-            s% trace_mass_edv_H, s% trace_mass_edv_He, s% trace_mass_scale_height, &
-            s% trace_mass_dlnX_dr, s% trace_mass_dlnY_dr, s% trace_mass_dlnRho_dr, &
-            s% trace_mass_omega, s% trace_mass_omega_div_omega_crit)
-      end subroutine get_trace_mass_location_info
 
 
       subroutine get_info_at_surface( &
@@ -1194,144 +1042,6 @@
          end if
 
       end subroutine get_info_at_surface
-
-
-      subroutine get_inner_mach1_info(s)
-         type (star_info), pointer :: s
-         integer :: k, nz, kk, kmax
-         real(dp) :: v_div_cs_00, v_div_cs_p1, v_div_cs_min, v_div_cs_max, mach1_radius
-         real(dp), pointer :: v(:)
-
-         include 'formats'
-         
-         if (s% u_flag) then
-            v => s% u
-         else if (s% v_flag) then
-            v => s% v
-         else
-            return
-         end if
-
-         nz = s% nz
-         kmax = 0
-         do k=nz-1,1,-1
-            if (s% q(k) >= s% min_q_for_inner_mach1_location) then
-               kmax = k
-               exit
-            end if
-         end do
-
-         mach1_radius = -1
-         if (kmax > 0) then ! search outward from center for 1st Mach 1 location
-            v_div_cs_00 = v(kmax)/s% csound(kmax)
-            do k = kmax-1,1,-1
-               v_div_cs_p1 = v_div_cs_00
-               v_div_cs_00 = v(k)/s% csound(k)
-               v_div_cs_max = max(v_div_cs_00, v_div_cs_p1)
-               v_div_cs_min = min(v_div_cs_00, v_div_cs_p1)
-               if ((v_div_cs_max >= 1d0 .and. v_div_cs_min < 1d0)) then
-                  mach1_radius = &
-                     find0(s% r(k), v_div_cs_00-1d0, s% r(k+1), v_div_cs_p1-1d0)
-                  exit
-               end if
-               if ((v_div_cs_min <= -1d0 .and. v_div_cs_max > -1d0)) then
-                  mach1_radius = &
-                     find0(s% r(k), v_div_cs_00+1d0, s% r(k+1), v_div_cs_p1+1d0)
-                  exit
-               end if
-            end do
-         end if
-         
-         call get_mach1_location_info( &
-            s, .false., k, v, mach1_radius, &
-            s% inner_mach1_mass, &
-            s% inner_mach1_q, &
-            s% inner_mach1_radius, &
-            s% inner_mach1_velocity, &
-            s% inner_mach1_csound, &
-            s% inner_mach1_lgT, &
-            s% inner_mach1_lgRho, &
-            s% inner_mach1_lgP, &
-            s% inner_mach1_gamma1, &
-            s% inner_mach1_entropy, &
-            s% inner_mach1_tau, &
-            s% inner_mach1_k)
-            
-      end subroutine get_inner_mach1_info
-
-
-      subroutine get_outer_mach1_info(s)
-         type (star_info), pointer :: s
-         integer :: k, nz, kk, kmin
-         real(dp) :: v_div_cs_00, v_div_cs_m1, v_div_cs_min, v_div_cs_max, mach1_radius
-         real(dp), pointer :: v(:)
-
-         include 'formats'
-         
-         if (s% u_flag) then
-            v => s% u
-         else if (s% v_flag) then
-            v => s% v
-         else
-            return
-         end if
-
-         nz = s% nz
-         kmin = nz
-         do k=1,nz-1
-            if (s% q(k) <= s% max_q_for_outer_mach1_location) then
-               kmin = k
-               exit
-            end if
-         end do
-
-         mach1_radius = -1
-         if (kmin < nz) then ! search inward for 1st Mach 1 location
-            v_div_cs_00 = v(kmin)/s% csound(kmin)
-            do k = kmin+1,nz-1
-               v_div_cs_m1 = v_div_cs_00
-               v_div_cs_00 = v(k)/s% csound(k)
-               v_div_cs_max = max(v_div_cs_00, v_div_cs_m1)
-               v_div_cs_min = min(v_div_cs_00, v_div_cs_m1)
-               if (v_div_cs_max >= 1d0 .and. v_div_cs_min < 1d0) then
-                  if (v(k+1) > s% csound(k+1)) then ! skip single point glitches
-                     mach1_radius = &
-                        find0(s% r(k), v_div_cs_00-1d0, s% r(k-1), v_div_cs_m1-1d0)
-                     if (mach1_radius <= 0d0) then
-                        stop 'get_outer_mach1_info 1'
-                     end if
-                     exit
-                  end if
-               end if
-               if (v_div_cs_min <= -1d0 .and. v_div_cs_max > -1d0) then
-                  if (v(k+1) < -s% csound(k+1)) then ! skip single point glitches
-                     mach1_radius = &
-                        find0(s% r(k), v_div_cs_00+1d0, s% r(k-1), v_div_cs_m1+1d0)
-                     if (mach1_radius <= 0d0) then
-                        stop 'get_outer_mach1_info 2'
-                     end if
-                     exit
-                  end if
-               end if
-            end do
-         end if
-
-         call get_mach1_location_info( &
-            s, .false., k-1, v, mach1_radius, &
-            s% outer_mach1_mass, &
-            s% outer_mach1_q, &
-            s% outer_mach1_radius, &
-            s% outer_mach1_velocity, &
-            s% outer_mach1_csound, &
-            s% outer_mach1_lgT, &
-            s% outer_mach1_lgRho, &
-            s% outer_mach1_lgP, &
-            s% outer_mach1_gamma1, &
-            s% outer_mach1_entropy, &
-            s% outer_mach1_tau, &
-            s% outer_mach1_k)
-
-      end subroutine get_outer_mach1_info
 
 
       subroutine get_mach1_location_info( &
@@ -1611,7 +1321,7 @@
 
          integer :: j, jm1, j00
          real(dp) :: dm1, d00, qm1, q00, core_q, &
-            core_lgP, core_g, core_X, core_Y, core_edv_H, core_edv_He, &
+            core_lgP, core_g, core_X, core_Y, &
             core_scale_height, core_dlnX_dr, core_dlnY_dr, core_dlnRho_dr
 
          include 'formats'
@@ -1642,7 +1352,7 @@
 
          call get_info_at_q(s, core_q, &
             core_k, core_m, core_r, core_lgT, core_lgRho, core_L, core_v, &
-            core_lgP, core_g, core_X, core_Y, core_edv_H, core_edv_He, &
+            core_lgP, core_g, core_X, core_Y, &
             core_scale_height, core_dlnX_dr, core_dlnY_dr, core_dlnRho_dr, &
             core_omega, core_omega_div_omega_crit)
 
@@ -1651,7 +1361,7 @@
 
       subroutine get_info_at_q(s, bdy_q, &
             kbdy, bdy_m, bdy_r, bdy_lgT, bdy_lgRho, bdy_L, bdy_v, &
-            bdy_lgP, bdy_g, bdy_X, bdy_Y, bdy_edv_H, bdy_edv_He, &
+            bdy_lgP, bdy_g, bdy_X, bdy_Y, &
             bdy_scale_height, bdy_dlnX_dr, bdy_dlnY_dr, bdy_dlnRho_dr, &
             bdy_omega, bdy_omega_div_omega_crit)
 
@@ -1660,7 +1370,7 @@
          integer, intent(out) :: kbdy
          real(dp), intent(out) :: &
             bdy_m, bdy_r, bdy_lgT, bdy_lgRho, bdy_L, bdy_v, &
-            bdy_lgP, bdy_g, bdy_X, bdy_Y, bdy_edv_H, bdy_edv_He, &
+            bdy_lgP, bdy_g, bdy_X, bdy_Y, &
             bdy_scale_height, bdy_dlnX_dr, bdy_dlnY_dr, bdy_dlnRho_dr, &
             bdy_omega, bdy_omega_div_omega_crit
 
@@ -1670,7 +1380,7 @@
          include 'formats'
 
          bdy_m=0; bdy_r=0; bdy_lgT=0; bdy_lgRho=0; bdy_L=0; bdy_v=0
-         bdy_lgP=0; bdy_g=0; bdy_X=0; bdy_Y=0; bdy_edv_H=0; bdy_edv_He=0
+         bdy_lgP=0; bdy_g=0; bdy_X=0; bdy_Y=0
          bdy_scale_height=0; bdy_dlnX_dr=0; bdy_dlnY_dr=0; bdy_dlnRho_dr=0
          bdy_omega=0; bdy_omega_div_omega_crit=0
          kbdy = 0
@@ -1696,12 +1406,6 @@
             bdy_g = s% grav(1)
             bdy_X = s% X(1)
             bdy_Y = s% Y(1)
-            if (s% do_element_diffusion) then
-            ii = s% net_iso(ih1)
-            if (ii > 0) bdy_edv_H = s% edv(ii,1)
-            ii = s% net_iso(ihe4)
-            if (ii > 0) bdy_edv_He = s% edv(ii,1)
-            end if
             bdy_scale_height = s% scale_height(1)
             bdy_omega = s% omega(k)
             if (s% rotation_flag) then
@@ -1737,13 +1441,6 @@
          bdy_L = interp2(s% L(k), s% L(k+1))/Lsun
          bdy_g = interp2(s% grav(k), s% grav(k+1))
          bdy_scale_height = interp2(s% scale_height(k), s% scale_height(k+1))
-
-         if (s% do_element_diffusion) then
-            ii = s% net_iso(ih1)
-            if (ii > 0) bdy_edv_H = interp2(s% edv(ii,k), s% edv(ii,k+1))
-            ii = s% net_iso(ihe4)
-            if (ii > 0) bdy_edv_He = interp2(s% edv(ii,k), s% edv(ii,k+1))
-         end if
 
          klo = k-1
          khi = k+1

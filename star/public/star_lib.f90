@@ -1991,8 +1991,7 @@
       
       subroutine star_info_at_q(s, q, &
             kbdy, m, r, lgT, lgRho, L, v, &
-            lgP, g, X, Y, edv_H, edv_He, &
-            scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
+            lgP, g, X, Y, scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
             omega, omega_div_omega_crit)
          use report, only: get_info_at_q
          type (star_info), pointer :: s
@@ -2000,13 +1999,11 @@
          integer, intent(out) :: kbdy
          real(dp), intent(out) :: &
             m, r, lgT, lgRho, L, v, &
-            lgP, g, X, Y, edv_H, edv_He, &
-            scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
+            lgP, g, X, Y, scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
             omega, omega_div_omega_crit
          call get_info_at_q(s, q, &
             kbdy, m, r, lgT, lgRho, L, v, &
-            lgP, g, X, Y, edv_H, edv_He, &
-            scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
+            lgP, g, X, Y, scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
             omega, omega_div_omega_crit)
       end subroutine star_info_at_q
       
