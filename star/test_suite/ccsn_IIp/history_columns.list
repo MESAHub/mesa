@@ -220,19 +220,6 @@
       he_core_mass
       he_core_radius
       
-      outer_mach1_velocity
-      outer_mach1_csound
-      outer_mach1_lgT
-      outer_mach1_lgRho
-      outer_mach1_lgP
-      outer_mach1_mass
-      outer_mach1_q
-      outer_mach1_radius
-      outer_mach1_gamma1
-      outer_mach1_entropy
-      outer_mach1_tau
-      outer_mach1_k
-      
       shock_velocity
       shock_csound
       shock_lgT

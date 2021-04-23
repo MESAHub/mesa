@@ -1177,7 +1177,7 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         real(dp) :: age_days, log_L, mach1_mass, log_Lnuc_burn, xmax, xni56
+         real(dp) :: age_days, log_L, shock_mass, log_Lnuc_burn, xmax, xni56
          integer :: k
          include 'formats'
          extras_finish_step = keep_going
@@ -1187,12 +1187,12 @@
          call store_extra_info(s)
          
          if (s% x_ctrl(2) <= 0) return
-         mach1_mass = s% outer_mach1_mass
-         if (mach1_mass >= s% x_ctrl(2)) then
-            !write(*,1) 'mach1 has reached target location', &
-            !   s% x_ctrl(2), mach1_mass
-            write(*,'(a,2f12.5)') 'mach1 has reached target location', &
-               mach1_mass, s% x_ctrl(2)
+         shock_mass = s% shock_mass
+         if (shock_mass >= s% x_ctrl(2)) then
+            !write(*,1) 'shock has reached target location', &
+            !   s% x_ctrl(2), shock_mass
+            write(*,'(a,2f12.5)') 'shock has reached target location', &
+               shock_mass, s% x_ctrl(2)
             extras_finish_step = terminate
             s% termination_code = t_extras_finish_step
             ! restore Ni+Co mass
@@ -1203,9 +1203,9 @@
                   if (ierr /= 0) return
                end if
             end if
-         else if (mach1_mass >= 0.9995d0*s% x_ctrl(2)) then
-               write(*,1) 'mach1 has reached this fraction of target', &
-                  mach1_mass/s% x_ctrl(2)
+         else if (shock_mass >= 0.9995d0*s% x_ctrl(2)) then
+               write(*,1) 'shock has reached this fraction of target', &
+                  shock_mass/s% x_ctrl(2)
          end if
          
          if (s% x_integer_ctrl(1) == 5 .and. &
