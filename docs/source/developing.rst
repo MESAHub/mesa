@@ -9,6 +9,7 @@ Developing MESA
    developing/contributing
    developing/documentation
    developing/code_style
+   developing/tour
    developing/debugging
    developing/plotters
    developing/profiling

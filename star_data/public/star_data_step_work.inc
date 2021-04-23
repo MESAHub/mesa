@@ -1016,10 +1016,6 @@
          integer :: start_H_envelope_base_k
 
          integer :: num_solver_iterations ! for this step
-         integer :: timestep_hold
-         integer :: model_number_for_last_retry
-         integer :: model_number_for_last_retry_old
-         
          integer :: num_diffusion_solver_iters
          integer :: num_diffusion_solver_steps
          integer :: num_rotation_solver_steps

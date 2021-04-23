@@ -1264,6 +1264,22 @@
          end if
                   
          if (do_check_limits /= keep_going) return
+
+         if (s%u_flag .or. s% v_flag) then ! Things that depend on hydro related quantities
+            if (s% shock_mass >= s% shock_mass_upper_limit .and. &
+               s% shock_mass_upper_limit > 0) then 
+               call compare_to_target('shock_mass >= shock_mass_upper_limit', &
+                  s% shock_mass, s% shock_mass_upper_limit, t_shock_mass_upper_limit)
+               
+            else if (s% outer_mach1_mass >= s% mach1_mass_upper_limit .and. &
+               s% mach1_mass_upper_limit > 0) then 
+               call compare_to_target('mach1_mass >= mach1_mass_upper_limit', &
+                  s% outer_mach1_mass, s% mach1_mass_upper_limit, t_mach1_mass_upper_limit)
+            end if
+         end if
+
+         if (do_check_limits /= keep_going) return
+
          
          do j=1,num_xa_central_limits
             if (s% xa_central_lower_limit(j) <= 0) cycle
