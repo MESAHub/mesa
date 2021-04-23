@@ -743,7 +743,7 @@ must pick the various ``test_partials`` values in the source code.
 This can be tricky in that in some places the abundance is given as an
 index in xa and in others as a variable number for the solver.  This
 offset is ``s% nvar_hydro``, that is the index of the first chem
-equation is ``s% equchem1 == nvar_hydro + 1``.
+equation is ``s% nvar_hydro + 1``.
 
 If you set ``solver_test_partials_write_eos_call_info = .true.``, the
 output includes also includes composition information like the

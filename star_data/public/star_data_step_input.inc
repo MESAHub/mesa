@@ -79,14 +79,6 @@
       ! names of variables and equations
          character (len=name_len), dimension(:), pointer :: nameofvar, nameofequ ! (nvar)
 
-      ! chem variables, if any, follow the structure variables
-         integer :: i_chem1 ! index of the first chem variable (0 means no chem variables)
-            ! if i_chem1 /= 0, then i_chem1 == nvar_hydro + 1
-         
-      ! chem equations follow the structure equations
-         integer :: equchem1 ! index of the first chem equation (0 means no chem equations)
-            ! if equchem1 /= 0, then equchem1 == nvar_hydro + 1
-
       ! net_name identifies which net we are currently using
          character (len=net_name_len) :: net_name
       ! num_reactions = number of reactions in the current net

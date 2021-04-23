@@ -71,7 +71,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, j, i, jj, ii, equchem1, species
+         integer :: nz, j, i, jj, ii, species
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, &
             dxdt_expected_dlnd, dxdt_expected_dlnT, &
@@ -88,7 +88,6 @@
 
          ierr = 0
 
-         equchem1 = s% equchem1
          species = s% species
          nz = s% nz
 
@@ -120,7 +119,7 @@
             !test_partials = (k == s% solver_test_partials_k .and. s% net_iso(ihe4) == j)
             test_partials = .false.
 
-            i = equchem1+j-1
+            i = s%nvar_hydro+j
 
             dxdt_actual = s% xa_sub_xa_start(j,k)/s% dt
             
@@ -173,7 +172,7 @@
             if (s% do_burn) then
 
                do jj=1,species
-                  ii = equchem1+jj-1
+                  ii = s% nvar_hydro+jj
                   dxdt_expected_dxa = s% d_dxdt_nuc_dx(j,jj,k)
                   dequ = dxdt_expected_dxa/eqn_scale
                   if (checking) call check_dequ(dequ,'d_dxdt_nuc_dx')
