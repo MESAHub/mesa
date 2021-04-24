@@ -61,6 +61,12 @@
 ! mixing
 
 ! timesteps 
+     delta_XH_cntr_hard_limit = -1
+     delta_XHe_cntr_hard_limit = -1
+     delta_XC_cntr_hard_limit = -1
+     delta_XNe_cntr_hard_limit = -1
+     delta_XO_cntr_hard_limit = -1
+     delta_XSi_cntr_hard_limit = -1
 
 ! mesh
 

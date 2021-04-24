@@ -683,7 +683,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             gradT, ierr )
          use chem_def, only: ih1
-         use mlt_get_results, only: do1_mlt_eval
+         use mlt_get_results_newer, only: get_gradT_newer
          use kap_def, only : num_kap_fracs
          use kap_lib, only : kap_get
 
@@ -697,44 +697,19 @@
          integer, intent(out) :: ierr
 
          
-         real(dp) :: &
-            cgrav, opacity, dlnkap_dlnd, dlnkap_dlnT, Cv, csound, &
-            max_conv_vel, dt, gradL_composition_term, tau
+         real(dp) :: dlnkap_dlnd, dlnkap_dlnT, gradL_composition_term, &
+            opacity, grav, scale_height, scale_height2, gradr, cgrav
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
          integer :: mixing_type
-         real(dp) :: mlt_basics(num_mlt_results)
-         real(dp), target :: mlt_partials1_ary(num_mlt_partials*num_mlt_results)
-         real(dp), pointer :: mlt_partials1(:), mlt_partials(:,:)
-         real(dp), parameter :: alpha_semiconvection = 0, thermohaline_coeff = 0, &
-            gradr_factor = 1, d_gradr_factor_dw = 0d0
-         real(dp) :: alfa, beta, &
-            normal_mlt_gradT_factor, &
-            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-            chiRho_for_partials_00, chiT_for_partials_00, &
-            chiRho_for_partials_m1, chiT_for_partials_m1, &
-            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT 
-         normal_mlt_gradT_factor = 1d0
+         logical :: make_gradr_sticky_in_solver_iters
          
          ierr = 0
-         mlt_partials1 => mlt_partials1_ary
-         mlt_partials(1:num_mlt_partials,1:num_mlt_results) => &
-            mlt_partials1(1:num_mlt_partials*num_mlt_results)
 
          if (s% use_simple_es_for_kap) then
             opacity = 0.2d0*(1 + x)
             dlnkap_dlnd = 0
             dlnkap_dlnT = 0
          else
-
             call kap_get( &
                  s% kap_handle, s% species, s% chem_id, s% net_iso, xa, &
                  log10(Rho), lnT/ln10, &
@@ -747,60 +722,22 @@
             end if
          end if
          
+         gradL_composition_term = 0d0
          cgrav = standard_cgrav
-         gradL_composition_term = 0
-         Cv = Cp
-         tau = 1
-         max_conv_vel = 1d99
-         dt = -1
-         csound = 0 ! not used when dt <= 0
-         ! not used
-         alfa=0d0; beta=0d0;
-         T_00=0d0; T_m1=0d0; rho_00=0d0; rho_m1=0d0; P_00=0d0; P_m1=0d0
-         chiRho_for_partials_00=0d0; chiT_for_partials_00=0d0
-         chiRho_for_partials_m1=0d0; chiT_for_partials_m1=0d0
-         chiRho_00=0d0; d_chiRho_00_dlnd=0d0; d_chiRho_00_dlnT=0d0
-         chiRho_m1=0d0; d_chiRho_m1_dlnd=0d0; d_chiRho_m1_dlnT=0d0
-         chiT_00=0d0; d_chiT_00_dlnd=0d0; d_chiT_00_dlnT=0d0
-         chiT_m1=0d0; d_chiT_m1_dlnd=0d0; d_chiT_m1_dlnT=0d0
-         Cp_00=0d0; d_Cp_00_dlnd=0d0; d_Cp_00_dlnT=0d0
-         Cp_m1=0d0; d_Cp_m1_dlnd=0d0; d_Cp_m1_dlnT=0d0
-         opacity_00=0d0; d_opacity_00_dlnd=0d0; d_opacity_00_dlnT=0d0
-         opacity_m1=0d0; d_opacity_m1_dlnd=0d0; d_opacity_m1_dlnT=0d0
-         grada_00=0d0; d_grada_00_dlnd=0d0; d_grada_00_dlnT=0d0
-         grada_m1=0d0; d_grada_m1_dlnd=0d0; d_grada_m1_dlnT=0d0            
-
-         call do1_mlt_eval( &
-            s, 0, cgrav, m, mstar, r, L, x, T, rho, P, &
-            chiRho, chiT, Cp, opacity, grada, &
-            
-            ! not used
-               alfa, beta, &
-               T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-               chiRho_for_partials_00, chiT_for_partials_00, &
-               chiRho_for_partials_m1, chiT_for_partials_m1, &
-               chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-               chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-               chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-               chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-               Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-               Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-               opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-               opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-               grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-               grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
-            
-            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-            alpha_semiconvection, s% semiconvection_option, &
-            thermohaline_coeff, s% thermohaline_option, ih1, &
-            s% mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
-            s% MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
-            normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, .false., & 
-            mixing_type, mlt_basics, mlt_partials1, ierr)
-         if (ierr /= 0) return
+         grav = cgrav*m/pow2(r)
+         scale_height = P/(grav*rho) ! this assumes HSE
+         if (s% alt_scale_height_flag) then
+            scale_height2 = sqrt(P/cgrav)/rho
+            if (scale_height2 < scale_height) then
+               scale_height = scale_height2
+            end if
+         end if
+         gradr = P*opacity*L/(16d0*pi*clight*m*cgrav*crad*pow4(T)/3d0) 
          
-         gradT = mlt_basics(mlt_gradT) ! actual temperature gradient dlnT/dlnP
+         call get_gradT_newer(s, s% MLT_option, & ! used to create models
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            s% net_iso(ih1), x, standard_cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
+            gradT, mixing_type, ierr)
   
       end subroutine eval_gradT
 

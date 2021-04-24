@@ -220,7 +220,7 @@
             if (failed('do_u')) return
          end if
 
-         if (s% using_TDC) then ! calculate new etrb to conserve turbulent energy
+         if (s% using_RSP2) then ! calculate new etrb to conserve turbulent energy
             if (dbg) write(*,*) 'call do_etrb'
             call do_etrb( &
                s, nz, nz_old, cell_type, comes_from, &
@@ -250,6 +250,11 @@
                if (failed('D_omega')) return
             end if
          end if
+         
+         call do_interp_pt_val( &
+            s, nz, nz_old, nzlo, nzhi, s% mlt_vc, mlt_vc_old, &
+            0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
+         if (failed('mlt_cv')) return
          
          call do_interp_pt_val( &
             s, nz, nz_old, nzlo, nzhi, s% D_mix, D_mix_old, &

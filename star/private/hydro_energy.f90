@@ -578,7 +578,7 @@
          real(dp), dimension(s% species), intent(out) :: &
             d_work_dxa00, d_work_dxam1
          integer, intent(out) :: ierr
-         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face
+         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face, old2
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_star_order1) :: &
             P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
@@ -707,10 +707,11 @@
          
             ! set mlt_Pturb_ad
             mlt_Pturb_ad = 0d0
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
-               mlt_Pturb_ad%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
-               mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
-               mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
+               old2 = pow2(s% mlt_vc_old(k))
+               mlt_Pturb_ad%val = s% mlt_Pturb_factor*old2*(s% rho(k-1) + s% rho(k))/6d0
+               mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*old2*s% rho(k-1)/6d0
+               mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*old2*s% rho(k)/6d0
             end if            
          
             P_face_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad + extra_P
@@ -814,7 +815,7 @@
          dV = Av_face00_ad - Av_facep1_ad
 
          include_mlt_Pturb = s% mlt_Pturb_factor > 0d0 &
-            .and. s% mlt_vc_start(k) > 0d0 .and. k > 1
+            .and. s% mlt_vc_old(k) > 0d0 .and. k > 1
          
          call calc_Ptot_ad_tw( &
             s, k, skip_P, .not. include_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)

@@ -385,10 +385,7 @@
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
-         
-         real(dp), pointer :: actual_gradT(:) ! actual dlnT/dlnP (at boundary)
-            ! (dT/T_face)/(dP/P_face) with face values interpolated by mass
-         
+                  
          real(dp), pointer :: gradT(:) ! dlnT/dlnP (at boundary)
          real(dp), pointer :: d_gradT_dlnd00(:)
          real(dp), pointer :: d_gradT_dlnT00(:)
@@ -451,7 +448,6 @@
          
          real(dp), pointer :: cdc(:) ! convective diffusion coeff. (gm^2/sec)
          real(dp), pointer :: D_mix(:) ! diffusion coeff. (cm^2/sec)
-         real(dp), pointer :: conv_vel(:) ! convection velocity   
          integer, pointer :: mixing_type(:) ! mixing types are defined in mesa/mlt  
          real(dp), pointer :: cz_bdy_dq(:) ! sub-cell location of convection boundary
             ! gives dq distance inward from outer edge of cell(k)
@@ -840,51 +836,6 @@
       real(dp) :: neutron_rich_core_omega_div_omega_crit     
       integer :: neutron_rich_core_k ! boundary is in this cell
       
-      ! values at trace_mass_location
-      real(dp) :: trace_mass_radius
-      real(dp) :: trace_mass_lgT
-      real(dp) :: trace_mass_lgRho
-      real(dp) :: trace_mass_L
-      real(dp) :: trace_mass_v
-      real(dp) :: trace_mass_omega ! (s^-1)
-      real(dp) :: trace_mass_omega_div_omega_crit
-      real(dp) :: trace_mass_lgP
-      real(dp) :: trace_mass_g
-      real(dp) :: trace_mass_X
-      real(dp) :: trace_mass_Y
-      real(dp) :: trace_mass_edv_H
-      real(dp) :: trace_mass_edv_He
-      real(dp) :: trace_mass_scale_height
-      real(dp) :: trace_mass_dlnX_dr
-      real(dp) :: trace_mass_dlnY_dr
-      real(dp) :: trace_mass_dlnRho_dr
-      
-      ! values at location of max T
-      real(dp) :: max_T_lgT
-      real(dp) :: max_T_mass ! baryonic (Msun)
-      real(dp) :: max_T_radius ! (Rsun)
-      real(dp) :: max_T_lgRho
-      real(dp) :: max_T_lgP
-      real(dp) :: max_T_lgP_thin_shell
-      real(dp) :: max_T_shell_binding_energy
-      real(dp) :: max_T_entropy ! (kerg/baryon)
-      real(dp) :: max_T_L ! (Lsun)
-      real(dp) :: max_T_eps_nuc ! (erg/g/s)     
-      
-      ! values at location of max abs velocity
-      real(dp) :: max_abs_v_velocity
-      real(dp) :: max_abs_v_csound
-      real(dp) :: max_abs_v_v_div_cs
-      real(dp) :: max_abs_v_lgT
-      real(dp) :: max_abs_v_lgRho
-      real(dp) :: max_abs_v_lgP
-      real(dp) :: max_abs_v_mass ! baryonic (Msun)
-      real(dp) :: max_abs_v_radius ! (Rsun)
-      real(dp) :: max_abs_v_L ! (Lsun)
-      real(dp) :: max_abs_v_gamma1
-      real(dp) :: max_abs_v_entropy
-      real(dp) :: max_abs_v_eps_nuc
-      
       ! info about outermost outward moving shock
       ! excluding locations with q > max_q_for_outer_mach1_location
       real(dp) :: shock_mass ! baryonic (Msun)
@@ -900,50 +851,6 @@
       real(dp) :: shock_tau
       real(dp) :: shock_pre_lgRho
       integer :: shock_k
-      
-      ! info at innermost mach 1 location
-      ! excluding locations with q < min_q_for_inner_mach1_location
-      real(dp) :: inner_mach1_mass ! baryonic (Msun)
-      real(dp) :: inner_mach1_q
-      real(dp) :: inner_mach1_radius ! (Rsun)
-      real(dp) :: inner_mach1_velocity
-      real(dp) :: inner_mach1_csound
-      real(dp) :: inner_mach1_lgT
-      real(dp) :: inner_mach1_lgRho
-      real(dp) :: inner_mach1_lgP
-      real(dp) :: inner_mach1_gamma1
-      real(dp) :: inner_mach1_entropy
-      real(dp) :: inner_mach1_tau
-      integer :: inner_mach1_k
-            
-      ! info at outermost mach 1 location
-      ! excluding locations with q > max_q_for_outer_mach1_location
-      real(dp) :: outer_mach1_mass ! baryonic (Msun)
-      real(dp) :: outer_mach1_q
-      real(dp) :: outer_mach1_radius ! (Rsun)
-      real(dp) :: outer_mach1_velocity
-      real(dp) :: outer_mach1_csound
-      real(dp) :: outer_mach1_lgT
-      real(dp) :: outer_mach1_lgRho
-      real(dp) :: outer_mach1_lgP
-      real(dp) :: outer_mach1_gamma1
-      real(dp) :: outer_mach1_entropy
-      real(dp) :: outer_mach1_tau
-      integer :: outer_mach1_k
-      
-      real(dp) :: tau10_mass ! baryonic mass in solar units where optical depth = 10
-      real(dp) :: tau10_radius ! radius in solar units where optical depth = 10
-      real(dp) :: tau10_lgP ! estimate for log10(P) at tau = 10
-      real(dp) :: tau10_lgT ! estimate for log10(T) at tau = 10
-      real(dp) :: tau10_lgRho ! estimate for log10(density) at tau = 10
-      real(dp) :: tau10_L ! estimate for L/Lsun at tau = 10
-      
-      real(dp) :: tau100_mass ! baryonic location in solar units where optical depth = 100
-      real(dp) :: tau100_radius ! location in solar units where optical depth = 100
-      real(dp) :: tau100_lgP ! estimates for values at tau = 100
-      real(dp) :: tau100_lgT
-      real(dp) :: tau100_lgRho
-      real(dp) :: tau100_L
 
       real(dp) :: min_gamma1
 
@@ -1036,7 +943,6 @@
          real(dp), pointer :: mlt_mixing_length_start(:)
          integer, pointer :: mlt_mixing_type_start(:)
          real(dp), pointer :: mlt_D_start(:) 
-         real(dp), pointer :: mlt_vc_start(:) 
          real(dp), pointer :: mlt_Gamma_start(:) 
 
          real(dp), pointer :: mlt_cdc_start(:) 

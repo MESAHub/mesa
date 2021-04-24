@@ -595,8 +595,8 @@
             if (in_convective_region) then
                if (s% mixing_type(k) /= convective_mixing) then
                   call end_of_convective_region
-               else
-                  if(s% conv_vel(k).ne. 0d0) turnover_time = turnover_time + (s% rmid(k-1) - s% rmid(k))/s% conv_vel(k)
+               else if(s% conv_vel(k) .ne. 0d0) then
+                  turnover_time = turnover_time + (s% rmid(k-1) - s% rmid(k))/s% conv_vel(k)
                end if
             else ! in non-convective region
                if (s% mixing_type(k) == convective_mixing) then ! start of a convective region
@@ -798,10 +798,10 @@
 
 
       subroutine set_use_gradr(s,k)
-         use mlt_info, only: switch_to_radiative
+         use mlt_info_newer, only: switch_to_radiative_newer
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         call switch_to_radiative(s,k)
+         call switch_to_radiative_newer(s,k)
       end subroutine set_use_gradr
 
 

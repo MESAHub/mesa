@@ -186,9 +186,6 @@
    !log_D_anon ! D_mix for regions where mix_type = anonymous_mixing
    
    gradT ! mlt value for required temperature gradient dlnT/dlnP
-   !actual_gradT ! actual temperature gradient dlnT/dlnP in model
-   !gradT_sub_actual_gradT
-   !grada_at_face_sub_actual_gradT
 
    gradr ! dlnT/dlnP required for purely radiative transport
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary

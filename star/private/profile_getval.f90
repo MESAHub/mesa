@@ -1148,8 +1148,8 @@
                if (abs(s% gradr(k) - s% grada_face(k)) > 1d-20) &
                   val = (s% gradr(k) - s% gradT(k))/(s% gradr(k) - s% grada_face(k))
             case (p_mlt_Pturb)
-               if (k < s% nz) &
-                  val = s% mlt_Pturb_factor*s% rho(k)/3d0*(s% mlt_vc_start(k)**2 + s% mlt_vc_start(k+1)**2)/2d0
+               if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) &
+                  val = s% mlt_Pturb_factor*pow2(s% mlt_vc(k))*(s% rho(k-1) + s% rho(k))/6d0
 
             case (p_grad_density)
                val = s% grad_density(k)
@@ -1346,16 +1346,10 @@
                val = s% Peos(k)/(s% rho(k)*s% grav(k))/Rsun
             case (p_pressure_scale_height_cm)
                val = s% Peos(k)/(s% rho(k)*s% grav(k))
-            case (p_actual_gradT)
-               val = s% actual_gradT(k)
-            case (p_gradT_sub_actual_gradT)
-               val = s% gradT(k) - s% actual_gradT(k)
             case (p_gradT)
                val = s% gradT(k)
             case (p_gradr)
                val = s% gradr(k)
-            case (p_grada_sub_actual_gradT)
-               val = s% grada_face(k) - s% actual_gradT(k)
             case (p_grada_sub_gradT)
                val = s% grada_face(k) - s% gradT(k)
 
