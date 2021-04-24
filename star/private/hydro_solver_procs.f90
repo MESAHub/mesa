@@ -189,7 +189,7 @@
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, n, nz, i_chem1, nvar_hydro, nvar_chem, &
+         integer :: j, k, num_terms, n, nz, nvar_hydro, nvar_chem, &
             max_loc, skip_eqn1, skip_eqn2, skip_eqn3
          real(dp) :: sumequ, absq, max_energy_resid, avg_energy_resid
          
@@ -269,10 +269,9 @@
             end do
          end if
          if (s% do_burn .or. s% do_mix) then
-            i_chem1 = s% i_chem1
             num_terms = num_terms + nvar_chem*nz
             do k = 1, nz
-               do j = i_chem1, nvar
+               do j = nvar_hydro+1, nvar
                   absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                   sumequ = sumequ + absq
                   if (absq > equ_max) then
@@ -465,7 +464,7 @@
                sum_corr = sum_corr + sum_xa_corr/num_xa_terms
             end if
             if (s% do_burn .or. s% do_mix) then
-               species_loop: do j = s% i_chem1, nvar
+               species_loop: do j = nvar_hydro+1, nvar
                   i = j - s% nvar_hydro
                   if (check_for_bad_nums) then
                      if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
