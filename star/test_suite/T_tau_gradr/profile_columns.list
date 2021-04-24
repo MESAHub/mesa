@@ -380,9 +380,6 @@
    !d_gradT_dlnR
    !d_gradT_dL
    
-   !actual_gradT ! actual temperature gradient dlnT/dlnP in model
-   !gradT_sub_actual_gradT
-
    !gradr ! dlnT/dlnP required for purely radiative transport
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary
    !grad_density ! smoothed dlnRho/dlnP at cell boundary

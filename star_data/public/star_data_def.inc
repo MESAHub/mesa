@@ -150,8 +150,7 @@
       integer, parameter :: t_delta_nu_upper_limit = t_delta_nu_lower_limit + 1 
       integer, parameter :: t_delta_Pg_lower_limit = t_delta_nu_upper_limit + 1 
       integer, parameter :: t_delta_Pg_upper_limit = t_delta_Pg_lower_limit + 1 
-      integer, parameter :: t_mach1_mass_upper_limit = t_delta_Pg_upper_limit + 1 
-      integer, parameter :: t_shock_mass_upper_limit = t_mach1_mass_upper_limit + 1 
+      integer, parameter :: t_shock_mass_upper_limit = t_delta_Pg_upper_limit + 1 
       integer, parameter :: t_photosphere_m_sub_M_center_limit = t_shock_mass_upper_limit + 1 
       integer, parameter :: t_photosphere_m_lower_limit = t_photosphere_m_sub_M_center_limit + 1 
       integer, parameter :: t_photosphere_m_upper_limit = t_photosphere_m_lower_limit + 1 

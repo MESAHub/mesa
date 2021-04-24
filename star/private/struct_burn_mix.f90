@@ -345,7 +345,6 @@
             s% mlt_mixing_length_start(k) = s% mlt_mixing_length(k)
             s% mlt_mixing_type_start(k) = s% mlt_mixing_type(k)
             s% mlt_D_start(k) = s% mlt_D(k)
-            s% mlt_vc_start(k) = s% mlt_vc(k)
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          

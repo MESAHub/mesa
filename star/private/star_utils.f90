@@ -1356,14 +1356,27 @@
 
       subroutine get_shock_info(s)
          type (star_info), pointer :: s
-         integer :: k, nz, kk, kmin, k0, k1, ierr
-         real(dp) :: v_div_cs_00, v_div_cs_m1, rmax, vmax, alfa
+         integer :: k, nz
+         real(dp) :: v_div_cs_00, v_div_cs_m1, v_div_cs_min, v_div_cs_max, shock_radius
          real(dp), pointer :: v(:)
 
          include 'formats'
+
+         s% shock_mass = 0d0
+         s% shock_q = 0d0
+         s% shock_radius = 0d0
+         s% shock_velocity = 0d0
+         s% shock_csound = 0d0
+         s% shock_lgT = 0d0
+         s% shock_lgRho = 0d0
+         s% shock_lgP = 0d0
+         s% shock_gamma1 = 0d0
+         s% shock_entropy = 0d0
+         s% shock_tau = 0d0
+         s% shock_k = 0
          
          if (s% u_flag) then
-            v => s% u ! may not have u_face
+            v => s% u
          else if (s% v_flag) then
             v => s% v
          else
@@ -1371,84 +1384,134 @@
          end if
 
          nz = s% nz
-         kmin = nz
-         do k=1,nz-1
-            if (s% q(k) <= s% max_q_for_outer_mach1_location) then
-               kmin = k
-               exit
-            end if
-         end do
-
-         s% shock_velocity = 0
-         s% shock_csound = 0
-         s% shock_lgT = 0
-         s% shock_lgRho = 0
-         s% shock_lgP = 0
-         s% shock_mass = 0
-         s% shock_q = 0
-         s% shock_radius = 0
-         s% shock_gamma1 = 0
-         s% shock_entropy = 0
-         s% shock_tau = 0
-         s% shock_k = 0
-         s% shock_pre_lgRho = 0
-         
-         if (kmin < nz) then ! search inward for 1st shock moving outward
-            v_div_cs_00 = v(kmin)/s% csound_face(kmin)
-            do k = kmin+1,nz
-               v_div_cs_m1 = v_div_cs_00
-               v_div_cs_00 = v(k)/s% csound_face(k)
-               if (v_div_cs_00 > 0 .and. v_div_cs_m1 > 0 .and. &
-                     v_div_cs_00 >= 1d0 .and. v_div_cs_m1 < 1d0) then
-                  do kk = k+1, nz ! search inward for local max v
-                     if (v(kk) <= v(kk-1)) then
-                        s% shock_k = kk - 1
-                        exit
-                     end if
-                  end do
+         shock_radius = -1
+         v_div_cs_00 = v(1)/s% csound(1)
+         do k = 2,nz-1
+            v_div_cs_m1 = v_div_cs_00
+            v_div_cs_00 = v(k)/s% csound(k)
+            v_div_cs_max = max(v_div_cs_00, v_div_cs_m1)
+            v_div_cs_min = min(v_div_cs_00, v_div_cs_m1)
+            if (v_div_cs_max >= 1d0 .and. v_div_cs_min < 1d0) then
+               if (v(k+1) > s% csound(k+1)) then ! skip single point glitches
+                  shock_radius = &
+                     find0(s% r(k), v_div_cs_00-1d0, s% r(k-1), v_div_cs_m1-1d0)
+                  if (shock_radius <= 0d0) then
+                     stop 'get_shock_info 1'
+                  end if
                   exit
                end if
-            end do
-         end if
-
-         k = s% shock_k
-         if (k < nz .and. k > 1) then
-            if (v(k) > max(v(k-1),v(k+1))) then
-               rmax = s% r(k)
-               vmax = v(k)
-               s% shock_velocity = vmax
-               s% shock_radius = rmax/Rsun
-               if (rmax <= s% r(k)) then
-                  k0 = k-1
-                  k1 = k
-               else if (rmax <= s% r(k+1)) then
-                  k0 = k
-                  k1 = k+1
-               else
-                  k0 = k+1
-                  k1 = k+2
-               end if
-               alfa = (s% r(k0) - rmax)/(s% r(k0) - s% r(k1))
-               s% shock_q = s% q(k0) - alfa*s% dq(k0)
-               s% shock_mass = (s% m(k0) - alfa*s% dm(k0))/Msun
-               s% shock_csound = s% csound(k0)
-               s% shock_lgT = s% lnT(k0)/ln10
-               s% shock_lgRho = s% lnd(k0)/ln10
-               s% shock_lgP = s% lnPeos(k0)/ln10
-               s% shock_gamma1 = s% gamma1(k0)
-               s% shock_entropy = s% entropy(k0)
-               s% shock_tau = s% tau(k0)
-               s% shock_k = k0
-               do kk=k0-1,1,-1
-                  if (v(kk) < 0.1d0*s% csound_face(kk)) then
-                     s% shock_pre_lgRho = s% lnd(kk)/ln10
-                     exit
-                  end if
-               end do
             end if
-         end if
+            if (v_div_cs_min <= -1d0 .and. v_div_cs_max > -1d0) then
+               if (v(k+1) < -s% csound(k+1)) then ! skip single point glitches
+                  shock_radius = &
+                     find0(s% r(k), v_div_cs_00+1d0, s% r(k-1), v_div_cs_m1+1d0)
+                  if (shock_radius <= 0d0) then
+                     stop 'get_shock_info 2'
+                  end if
+                  exit
+               end if
+            end if
+         end do
+         if (shock_radius < 0d0) return
+         
+         call get_shock_location_info( &
+            s, .false., k-1, v, shock_radius, &
+            s% shock_mass, &
+            s% shock_q, &
+            s% shock_radius, &
+            s% shock_velocity, &
+            s% shock_csound, &
+            s% shock_lgT, &
+            s% shock_lgRho, &
+            s% shock_lgP, &
+            s% shock_gamma1, &
+            s% shock_entropy, &
+            s% shock_tau, &
+            s% shock_k)
 
       end subroutine get_shock_info
+
+
+      subroutine get_shock_location_info( &
+            s, dbg, k_shock, v, r, &
+            shock_mass, &
+            shock_q, &
+            shock_radius, &
+            shock_velocity, &
+            shock_csound, &
+            shock_lgT, &
+            shock_lgRho, &
+            shock_lgP, &
+            shock_gamma1, &
+            shock_entropy, &
+            shock_tau, &
+            shock_k)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k_shock
+         logical, intent(in) :: dbg
+         real(dp), intent(in), pointer :: v(:)
+         real(dp), intent(in) :: r
+         real(dp), intent(out) :: &
+            shock_mass, &
+            shock_q, &
+            shock_radius, &
+            shock_velocity, &
+            shock_csound, &
+            shock_lgT, &
+            shock_lgRho, &
+            shock_lgP, &
+            shock_gamma1, &
+            shock_entropy, &
+            shock_tau
+         integer, intent(out) :: shock_k
+
+         integer :: k
+         real(dp) :: alfa, beta
+
+         include 'formats'
+
+         k = k_shock
+         if (r < s% R_center .or. r > s% r(1) .or. &
+               k < 1 .or. k > s% nz .or. &
+               .not. associated(v) .or. &
+               .not. (s% v_flag .or. s% u_flag)) then
+            shock_mass = 0
+            shock_q = 0
+            shock_radius = 0
+            shock_velocity = 0
+            shock_csound = 0
+            shock_lgT = 0
+            shock_lgRho = 0
+            shock_lgP = 0
+            shock_gamma1 = 0
+            shock_entropy = 0
+            shock_tau = 0
+            shock_k = 0
+            return
+         end if
+         
+         shock_radius = r/Rsun
+         shock_k = k
+         if (k < s% nz) then
+            alfa = (r - s% r(k))/(s% r(k+1) - s% r(k))
+            beta = 1d0 - alfa
+            shock_mass = (alfa*s% m(k+1) + beta*s% m(k))/Msun
+            shock_q = alfa*s% q(k+1) + beta*s% q(k)
+            shock_velocity = alfa*v(k+1) + beta*v(k)
+         else
+            shock_mass = s% m(k)/Msun
+            shock_q = s% q(k)
+            shock_velocity = v(k)
+         end if
+         shock_csound = s% csound(k)
+         shock_lgT = s% lnT(k)/ln10
+         shock_lgRho = s% lnd(k)/ln10
+         shock_lgP = s% lnPeos(k)/ln10
+         shock_gamma1 = s% gamma1(k)
+         shock_entropy = s% entropy(k)
+         shock_tau = s% tau(k)
+
+      end subroutine get_shock_location_info
 
 
       real(dp) function min_dr_div_cs(s,min_k) ! seconds
@@ -3699,7 +3762,7 @@
          dlnP = s% lnPeos(k-1) - s% lnPeos(k)
          dlnT = s% lnT(k-1) - s% lnT(k)
          grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
-         gradT_actual = dlnT/dlnP ! mlt has not been called yet when doing this
+         gradT_actual = safe_div_val(s, dlnT, dlnP) ! mlt has not been called yet when doing this
          brunt_N2 = f*(brunt_B - (gradT_actual - grada_face))
          tau_conv = 1d0/sqrt(abs(brunt_N2))
       end function conv_time_scale
@@ -3723,20 +3786,25 @@
       subroutine set_using_TDC(s)
          type (star_info), pointer :: s      
          real(dp) :: switch
+         logical :: prev_using_TDC
+         include 'formats'
+         prev_using_TDC = s% using_TDC
          s% using_TDC = .false.
          if (s% max_dt_div_tau_conv_for_TDC > 0) then
             switch = s% max_conv_time_scale*s% max_dt_div_tau_conv_for_TDC
             if (s% dt < switch) then
                s% using_TDC = .true.
-               return
             end if
          end if
          if (s% max_dt_years_for_TDC > 0) then
             switch = s% max_dt_years_for_TDC*secyer
             if (s% dt < switch) then
                s% using_TDC = .true.
-               return
             end if
+         end if
+         if ((.not. prev_using_TDC) .and. s% using_TDC) then
+            write(*,2) 'turn on TDC', s% model_number
+            write(*,*)
          end if
       end subroutine set_using_TDC
       
@@ -4057,5 +4125,43 @@
          d_val_dvb(mlt_dL) = val_ad%d1Array(i_L_00)
       end subroutine unwrap_mlt
 
+
+      real(dp) function safe_div_val(s, x, y, lim) result(x_div_y)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: x, y, lim
+         optional :: lim
+         real(dp) :: limit
+         if (present(lim)) then
+            limit = lim
+         else
+            limit = 1d-20
+         end if
+         if (abs(y) < limit) then
+            x_div_y = 0d0
+         else
+            x_div_y = x/y
+         end if
+      end function safe_div_val
+
+
+      function safe_div(s, x, y, lim) result(x_div_y)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1), intent(in) :: x, y
+         type(auto_diff_real_star_order1) :: x_div_y
+         real(dp), intent(in) :: lim
+         optional :: lim
+         real(dp) :: limit
+         if (present(lim)) then
+            limit = lim
+         else
+            limit = 1d-20
+         end if
+         if (abs(y) < limit) then
+            x_div_y = 0d0
+         else
+            x_div_y = x/y
+         end if
+      end function safe_div
+      
 
       end module star_utils

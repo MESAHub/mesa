@@ -80,6 +80,9 @@
       terminal_interval = 10
       write_header_frequency = 10
 
+      !photo_interval = 1
+      !terminal_interval = 1
+
 / ! end of controls namelist
 
 

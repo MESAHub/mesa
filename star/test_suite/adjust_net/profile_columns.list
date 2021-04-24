@@ -110,9 +110,6 @@
    pressure_scale_height ! in Rsun units
 
    gradT ! mlt value for requared temperature gradient dlnT/dlnP
-   actual_gradT ! actual temperature gradient dlnT/dlnP in model
-   gradT_sub_actual_gradT
-   grada_sub_actual_gradT
    grada_sub_gradT
    
    gradr ! dlnT/dlnP requared for purely radiative transport

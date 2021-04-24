@@ -365,6 +365,7 @@
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% generations = 1
          s% previous_step_was_using_RSP2 = s% using_RSP2
+         s% okay_to_set_mlt_vc = .false. ! don't change mlt_vc until have set mlt_vc_old
          
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
@@ -746,8 +747,9 @@
          call set_power_info(s)
 
          s% total_angular_momentum = total_angular_momentum(s)
-         call do_report(s, ierr)
-         if (failed('do_report')) return
+         ! cannot call do_report yet since many things it needs are not yet set.
+         !call do_report(s, ierr)
+         !if (failed('do_report')) return
          call set_phase_of_evolution(s)
             
          call system_clock(time0,clock_rate)
@@ -1719,9 +1721,9 @@
          target_injection_ergs = &
             s% inject_until_reach_model_with_total_energy - s% total_energy_initial
          target_injection_time = end_time - start_time
-         s% inject_extra_ergs_sec = target_injection_ergs/target_injection_time               
+         s% inject_extra_ergs_sec = target_injection_ergs/target_injection_time 
          left_to_inject = &
-            s% inject_until_reach_model_with_total_energy - s% total_energy_start
+            s% inject_until_reach_model_with_total_energy - s% total_energy_old
          qp1 = 0d0
          qmin = max(0d0, Msun*s% base_of_inject_extra_ergs_sec - s% M_center)/s% xmstar
          qmax = min(1d0, qmin + Msun*s% total_mass_for_inject_extra_ergs_sec/s% xmstar)
@@ -1735,8 +1737,7 @@
          if (is_bad(extra)) then
             write(*,2) 'extra', s% model_number, extra
             write(*,2) 'left_to_inject', s% model_number, left_to_inject
-            write(*,2) 's% total_energy_initial', s% model_number, s% total_energy_initial
-            write(*,2) 's% total_energy_start', s% model_number, s% total_energy_start
+            write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
             stop 'check_for_extra_heat'
          end if
          do k=nz,1,-1
@@ -2077,6 +2078,8 @@
                s% dq(k) = s% dq_old(k)
                s% mlt_vc(k) = s% mlt_vc_old(k)
             end do
+            
+            s% okay_to_set_mlt_vc = .true.
             
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then

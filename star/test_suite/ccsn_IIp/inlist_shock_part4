@@ -45,12 +45,11 @@
       terminal_interval = 10
 
       
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
-      
-      max_number_retries = 0
+      !terminal_interval = 1
+      !max_number_retries = 0
 
 ! FOR DEBUGGING
 

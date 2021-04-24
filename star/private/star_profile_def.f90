@@ -512,11 +512,7 @@
       integer, parameter :: p_pressure_scale_height_cm = p_log_t_sound + 1
       integer, parameter :: p_pressure_scale_height = p_pressure_scale_height_cm + 1
 
-      integer, parameter :: p_grada_sub_actual_gradT = p_pressure_scale_height + 1
-      integer, parameter :: p_gradT_sub_actual_gradT = p_grada_sub_actual_gradT + 1
-      integer, parameter :: p_actual_gradT = p_gradT_sub_actual_gradT + 1
-
-      integer, parameter :: p_gradT_sub_grada = p_actual_gradT + 1
+      integer, parameter :: p_gradT_sub_grada = p_pressure_scale_height + 1
       integer, parameter :: p_gradT = p_gradT_sub_grada + 1
       integer, parameter :: p_gradr = p_gradT + 1
       integer, parameter :: p_cno_div_z = p_gradr + 1
@@ -1213,9 +1209,6 @@
          profile_column_name(p_log_t_sound) = 'log_t_sound'
          profile_column_name(p_pressure_scale_height_cm) = 'pressure_scale_height_cm'
          profile_column_name(p_pressure_scale_height) = 'pressure_scale_height'
-         profile_column_name(p_actual_gradT) = 'actual_gradT'
-         profile_column_name(p_gradT_sub_actual_gradT) = 'gradT_sub_actual_gradT'
-         profile_column_name(p_grada_sub_actual_gradT) = 'grada_sub_actual_gradT'
 
          profile_column_name(p_gradT) = 'gradT'
          profile_column_name(p_gradr) = 'gradr'

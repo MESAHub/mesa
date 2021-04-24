@@ -2097,34 +2097,6 @@
                val = s% star_mass - s% he_core_mass
             case(h_envelope_fraction_left)
                val = envelope_fraction_left
-            case(h_tau10_mass)
-               val = s% tau10_mass
-            case(h_tau10_radius)
-               val = s% tau10_radius
-            case(h_tau10_lgP)
-               val = s% tau10_lgP
-            case(h_tau10_T)
-               val = exp10(s% tau10_lgT)
-            case(h_tau10_lgT)
-               val = s% tau10_lgT
-            case(h_tau10_lgRho)
-               val = s% tau10_lgRho
-            case(h_tau10_L)
-               val = s% tau10_L
-            case(h_tau100_mass)
-               val = s% tau100_mass
-            case(h_tau100_radius)
-               val = s% tau100_radius
-            case(h_tau100_lgP)
-               val = s% tau100_lgP
-            case(h_tau100_T)
-               val = exp10(s% tau100_lgT)
-            case(h_tau100_lgT)
-               val = s% tau100_lgT
-            case(h_tau100_lgRho)
-               val = s% tau100_lgRho
-            case(h_tau100_L)
-               val = s% tau100_L
             case(h_dynamic_timescale)
                val = s% dynamic_timescale
             case(h_kh_timescale)
@@ -2172,44 +2144,6 @@
                k = maxloc(s% eps_nuc(1:nz), dim=1)
                val = (1d0 - s% q(k) + 0.5d0*s% dq(k))*s% xmstar/Msun
 
-            case(h_trace_mass_location)
-               val = s% trace_mass_location
-            case(h_trace_mass_radius)
-               val = s% trace_mass_radius
-            case(h_trace_mass_lgT)
-               val = s% trace_mass_lgT
-            case(h_trace_mass_lgRho)
-               val = s% trace_mass_lgRho
-            case(h_trace_mass_L)
-               val = s% trace_mass_L
-            case(h_trace_mass_v)
-               val = s% trace_mass_v
-            case(h_trace_mass_omega)
-               val = if_rot(s% trace_mass_omega)
-            case(h_trace_mass_omega_div_omega_crit)
-               val = if_rot(s% trace_mass_omega_div_omega_crit)
-
-            case(h_trace_mass_lgP)
-               val = s% trace_mass_lgP
-            case(h_trace_mass_g)
-               val = s% trace_mass_g
-            case(h_trace_mass_X)
-               val = s% trace_mass_X
-            case(h_trace_mass_Y)
-               val = s% trace_mass_Y
-            case(h_trace_mass_edv_H)
-               val = s% trace_mass_edv_H
-            case(h_trace_mass_edv_He)
-               val = s% trace_mass_edv_He
-            case(h_trace_mass_scale_height)
-               val = s% trace_mass_scale_height
-            case(h_trace_mass_dlnX_dr)
-               val = s% trace_mass_dlnX_dr
-            case(h_trace_mass_dlnY_dr)
-               val = s% trace_mass_dlnY_dr
-            case(h_trace_mass_dlnRho_dr)
-               val = s% trace_mass_dlnRho_dr
-
             case(h_diffusion_time_H_He_bdy)
                if (s% he_core_k > 0) then
                   val = (s% tau(s% he_core_k) - s% tau_factor*s% tau_base)* &
@@ -2217,104 +2151,12 @@
                end if
             case(h_temperature_H_He_bdy)
                if (s% he_core_k > 0) val = s% T(s% he_core_k)
-
-            case(h_max_abs_v_velocity)
-               val = s% max_abs_v_velocity
-            case(h_max_abs_v_csound)
-               val = s% max_abs_v_csound
-            case(h_max_abs_v_v_div_cs)
-               val = s% max_abs_v_v_div_cs
-            case(h_max_abs_v_lgT)
-               val = s% max_abs_v_lgT
-            case(h_max_abs_v_lgRho)
-               val = s% max_abs_v_lgRho
-            case(h_max_abs_v_lgP)
-               val = s% max_abs_v_lgP
-            case(h_max_abs_v_mass)
-               val = s% max_abs_v_mass
-            case(h_max_abs_v_radius)
-               val = s% max_abs_v_radius
-            case(h_max_abs_v_radius_cm)
-               val = s% max_abs_v_radius*Rsun
-            case(h_max_abs_v_lgR)
-               val = safe_log10(s% max_abs_v_radius)
-            case(h_max_abs_v_lgR_cm)
-               val = safe_log10(s% max_abs_v_radius*Rsun)
-            case(h_max_abs_v_L)
-               val = s% max_abs_v_L
-            case(h_max_abs_v_gamma1)
-               val = s% max_abs_v_gamma1
-            case(h_max_abs_v_entropy)
-               val = s% max_abs_v_entropy
-            case(h_max_abs_v_eps_nuc)
-               val = s% max_abs_v_eps_nuc
-            case(h_max_abs_v_E0) ! 4/3 pi R^3 crad T^4
-               val = s% max_abs_v_radius*Rsun
-               val = four_thirds_pi*val*val*val*crad*exp10(4*s% max_abs_v_lgT)
                
             case(h_total_ni_co_56)
                if (s% net_iso(ico56) > 0 .and. s% net_iso(ini56) > 0) &
                   val = dot_product(s% dm(1:nz), &
                      s% xa(s% net_iso(ico56),1:nz) + &
                      s% xa(s% net_iso(ini56),1:nz))/Msun
-               
-            case(h_inner_mach1_velocity)
-               val = s% inner_mach1_velocity
-            case(h_inner_mach1_csound)
-               val = s% inner_mach1_csound
-            case(h_inner_mach1_v_div_cs)
-               if (s% inner_mach1_csound > 0) &
-                  val = s% inner_mach1_velocity/s% inner_mach1_csound
-            case(h_inner_mach1_lgT)
-               val = s% inner_mach1_lgT
-            case(h_inner_mach1_lgRho)
-               val = s% inner_mach1_lgRho
-            case(h_inner_mach1_lgP)
-               val = s% inner_mach1_lgP
-            case(h_inner_mach1_q)
-               val = s% inner_mach1_q
-            case(h_inner_mach1_tau)
-               val = s% inner_mach1_tau
-            case(h_inner_mach1_mass)
-               val = s% inner_mach1_mass
-            case(h_inner_mach1_radius)
-               val = s% inner_mach1_radius
-            case(h_inner_mach1_gamma1)
-               val = s% inner_mach1_gamma1
-            case(h_inner_mach1_entropy)
-               val = s% inner_mach1_entropy
-            case(h_inner_mach1_k)
-               int_val = s% inner_mach1_k
-               is_int_val = .true.
-
-            case(h_outer_mach1_velocity)
-               val = s% outer_mach1_velocity
-            case(h_outer_mach1_csound)
-               val = s% outer_mach1_csound
-            case(h_outer_mach1_v_div_cs)
-               if (s% outer_mach1_csound > 0) &
-                  val = s% outer_mach1_velocity/s% outer_mach1_csound
-            case(h_outer_mach1_lgT)
-               val = s% outer_mach1_lgT
-            case(h_outer_mach1_lgRho)
-               val = s% outer_mach1_lgRho
-            case(h_outer_mach1_lgP)
-               val = s% outer_mach1_lgP
-            case(h_outer_mach1_q)
-               val = s% outer_mach1_q
-            case(h_outer_mach1_tau)
-               val = s% outer_mach1_tau
-            case(h_outer_mach1_mass)
-               val = s% outer_mach1_mass
-            case(h_outer_mach1_radius)
-               val = s% outer_mach1_radius
-            case(h_outer_mach1_gamma1)
-               val = s% outer_mach1_gamma1
-            case(h_outer_mach1_entropy)
-               val = s% outer_mach1_entropy
-            case(h_outer_mach1_k)
-               int_val = s% outer_mach1_k
-               is_int_val = .true.
 
             case(h_shock_velocity)
                if (s% shock_k > 0) val = s% shock_velocity
@@ -2350,27 +2192,6 @@
             case(h_shock_k)
                if (s% shock_k > 0) int_val = s% shock_k
                is_int_val = .true.
-
-            case(h_max_T_shell_binding_energy)
-               val = s% max_T_shell_binding_energy
-            case(h_max_T_lgP_thin_shell)
-               val = s% max_T_lgP_thin_shell
-            case(h_max_T_lgT)
-               val = s% max_T_lgT
-            case(h_max_T_lgP)
-               val = s% max_T_lgP
-            case(h_max_T_mass)
-               val = s% max_T_mass
-            case(h_max_T_radius)
-               val = s% max_T_radius
-            case(h_max_T_lgRho)
-               val = s% max_T_lgRho
-            case(h_max_T_L)
-               val = s% max_T_L
-            case(h_max_T_entropy)
-               val = s% max_T_entropy
-            case(h_max_T_eps_nuc)
-               val = s% max_T_eps_nuc
 
             case(h_surface_optical_depth)
                val = s% tau_base*s% tau_factor

@@ -687,9 +687,7 @@
       integer, parameter :: h_trace_mass_g = h_trace_mass_lgP + 1
       integer, parameter :: h_trace_mass_X = h_trace_mass_g + 1
       integer, parameter :: h_trace_mass_Y = h_trace_mass_X + 1
-      integer, parameter :: h_trace_mass_edv_H = h_trace_mass_Y + 1
-      integer, parameter :: h_trace_mass_edv_He = h_trace_mass_edv_H + 1
-      integer, parameter :: h_trace_mass_scale_height = h_trace_mass_edv_He + 1
+      integer, parameter :: h_trace_mass_scale_height = h_trace_mass_Y + 1
       integer, parameter :: h_trace_mass_dlnX_dr = h_trace_mass_scale_height + 1
       integer, parameter :: h_trace_mass_dlnY_dr = h_trace_mass_dlnX_dr + 1
       integer, parameter :: h_trace_mass_dlnRho_dr = h_trace_mass_dlnY_dr + 1
@@ -1259,8 +1257,6 @@
          history_column_name(h_trace_mass_g) = 'trace_mass_g'
          history_column_name(h_trace_mass_X) = 'trace_mass_X'
          history_column_name(h_trace_mass_Y) = 'trace_mass_Y'
-         history_column_name(h_trace_mass_edv_H) = 'trace_mass_edv_H'
-         history_column_name(h_trace_mass_edv_He) = 'trace_mass_edv_He'
          history_column_name(h_trace_mass_scale_height) = 'trace_mass_scale_height'
          history_column_name(h_trace_mass_dlnX_dr) = 'trace_mass_dlnX_dr'
          history_column_name(h_trace_mass_dlnY_dr) = 'trace_mass_dlnY_dr'

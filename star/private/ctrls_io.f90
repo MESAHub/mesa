@@ -355,7 +355,7 @@
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
     conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
-    conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, &
+    conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
 
     ! hydro solver
@@ -2077,6 +2077,7 @@
  s% alpha_TDC_turbulent_pressure = alpha_TDC_turbulent_pressure
  s% max_X_for_TDC = max_X_for_TDC
  s% max_X_for_gradT_eqn = max_X_for_gradT_eqn
+ s% compare_TDC_to_MLT = compare_TDC_to_MLT
 
  s% RSP2_alfap = RSP2_alfap
  s% RSP2_alfad = RSP2_alfad
@@ -3752,6 +3753,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  alpha_TDC_turbulent_pressure = s% alpha_TDC_turbulent_pressure
  max_X_for_TDC = s% max_X_for_TDC
  max_X_for_gradT_eqn = s% max_X_for_gradT_eqn
+ compare_TDC_to_MLT = s% compare_TDC_to_MLT
 
  RSP2_alfap= s% RSP2_alfap
  RSP2_alfad = s% RSP2_alfad

@@ -207,7 +207,7 @@
             call do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term_in, &
                opacity_face_in, chiRho_face_in, &
                chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-               from_do1_mlt, make_gradr_sticky_in_solver_iters, ierr)
+               make_gradr_sticky_in_solver_iters, ierr)
             if (ierr /= 0) return
             
             
@@ -540,7 +540,6 @@
             if (opacity_face < 0) opacity_face = opacity_00
             if (grada_face < 0) grada_face = grada_00
             if (h1 /= 0 .and. xh_face < 0) xh_face = s% xa(h1, k)
-            s% actual_gradT(k) = 0
 
          else
          
@@ -567,11 +566,6 @@
             if (h1 /= 0 .and. xh_face < 0) xh_face = alfa*s% xa(h1,k) + beta*s% xa(h1,k-1)
             dlnT = (T_m1 - T_00)/T_face
             dlnP = (P_m1 - P_00)/P_face
-            if (abs(dlnP) > 1d-20) then
-               s% actual_gradT(k) = dlnT/dlnP
-            else
-               s% actual_gradT(k) = 0
-            end if
          end if
 
          s% grada_face(k) = alfa*grada_00 + beta*grada_m1
@@ -1136,7 +1130,6 @@
             s% d_gradT_dlnTm1(k) = s% d_gradr_dlnTm1(k)
             s% mlt_D(k) = 0d0
             s% mlt_cdc(k) = 0d0
-            s% actual_gradT(k) = 0
          end subroutine set_no_mixing
 
          subroutine set_no_mixing_bad()
@@ -1164,7 +1157,6 @@
             s% L_conv(k) = 0d0
             s% mlt_D(k) = 0d0
             s% mlt_cdc(k) = 0d0
-            s% actual_gradT(k) = 0d0 ! not used
          end subroutine set_no_mixing_bad
 
       end subroutine test_do1_mlt_2
