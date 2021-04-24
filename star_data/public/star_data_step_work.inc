@@ -385,10 +385,7 @@
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
-         
-         real(dp), pointer :: actual_gradT(:) ! actual dlnT/dlnP (at boundary)
-            ! (dT/T_face)/(dP/P_face) with face values interpolated by mass
-         
+                  
          real(dp), pointer :: gradT(:) ! dlnT/dlnP (at boundary)
          real(dp), pointer :: d_gradT_dlnd00(:)
          real(dp), pointer :: d_gradT_dlnT00(:)
@@ -451,7 +448,6 @@
          
          real(dp), pointer :: cdc(:) ! convective diffusion coeff. (gm^2/sec)
          real(dp), pointer :: D_mix(:) ! diffusion coeff. (cm^2/sec)
-         real(dp), pointer :: conv_vel(:) ! convection velocity   
          integer, pointer :: mixing_type(:) ! mixing types are defined in mesa/mlt  
          real(dp), pointer :: cz_bdy_dq(:) ! sub-cell location of convection boundary
             ! gives dq distance inward from outer edge of cell(k)

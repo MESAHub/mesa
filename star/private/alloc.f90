@@ -526,6 +526,10 @@
                if (failed('omega')) exit
                call do1(s% j_rot, c% j_rot)
                if (failed('j_rot')) exit               
+               call do1(s% mlt_vc, c% mlt_vc)
+               if (failed('mlt_vc')) exit
+               call do1(s% conv_vel, c% conv_vel)
+               if (failed('conv_vel')) exit
             end if
             
             call do1(s% q, c% q)
@@ -536,9 +540,6 @@
             if (failed('dm')) exit
             call do1(s% dm_bar, c% dm_bar)
             if (failed('dm_bar')) exit   
-            
-            call do1(s% conv_vel, c% conv_vel)
-            if (failed('conv_vel')) exit
             
             call do1(s% am_nu_rot, c% am_nu_rot)
             if (failed('am_nu_rot')) exit
@@ -1052,8 +1053,6 @@
             call do1(s% mlt_D, c% mlt_D)
             if (failed('mlt_D')) exit
 
-            call do1(s% mlt_vc, c% mlt_vc)
-            if (failed('mlt_vc')) exit
             call do1(s% d_mlt_vc_dlnd00, c% d_mlt_vc_dlnd00)
             if (failed('d_mlt_vc_dlnd00')) exit
             call do1(s% d_mlt_vc_dlnT00, c% d_mlt_vc_dlnT00)
@@ -1114,8 +1113,6 @@
             call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
             if (failed('mlt_Gamma_ad')) exit
 
-            call do1(s% actual_gradT, c% actual_gradT)
-            if (failed('actual_gradT')) exit
             call do1(s% gradT, c% gradT)
             if (failed('gradT')) exit
             call do1(s% d_gradT_dlnd00, c% d_gradT_dlnd00)

@@ -82,7 +82,7 @@
          call write_part_number(iounit)
          write(iounit) &
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
-            s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz)
+            s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz), s% conv_vel(1:nz)
 
          call write_part_number(iounit)
          write(iounit) &

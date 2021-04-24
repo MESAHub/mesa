@@ -1346,16 +1346,10 @@
                val = s% Peos(k)/(s% rho(k)*s% grav(k))/Rsun
             case (p_pressure_scale_height_cm)
                val = s% Peos(k)/(s% rho(k)*s% grav(k))
-            case (p_actual_gradT)
-               val = s% actual_gradT(k)
-            case (p_gradT_sub_actual_gradT)
-               val = s% gradT(k) - s% actual_gradT(k)
             case (p_gradT)
                val = s% gradT(k)
             case (p_gradr)
                val = s% gradr(k)
-            case (p_grada_sub_actual_gradT)
-               val = s% grada_face(k) - s% actual_gradT(k)
             case (p_grada_sub_gradT)
                val = s% grada_face(k) - s% gradT(k)
 

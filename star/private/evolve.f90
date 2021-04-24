@@ -1721,9 +1721,9 @@
          target_injection_ergs = &
             s% inject_until_reach_model_with_total_energy - s% total_energy_initial
          target_injection_time = end_time - start_time
-         s% inject_extra_ergs_sec = target_injection_ergs/target_injection_time               
+         s% inject_extra_ergs_sec = target_injection_ergs/target_injection_time 
          left_to_inject = &
-            s% inject_until_reach_model_with_total_energy - s% total_energy_start
+            s% inject_until_reach_model_with_total_energy - s% total_energy_old
          qp1 = 0d0
          qmin = max(0d0, Msun*s% base_of_inject_extra_ergs_sec - s% M_center)/s% xmstar
          qmax = min(1d0, qmin + Msun*s% total_mass_for_inject_extra_ergs_sec/s% xmstar)
@@ -1737,8 +1737,7 @@
          if (is_bad(extra)) then
             write(*,2) 'extra', s% model_number, extra
             write(*,2) 'left_to_inject', s% model_number, left_to_inject
-            write(*,2) 's% total_energy_initial', s% model_number, s% total_energy_initial
-            write(*,2) 's% total_energy_start', s% model_number, s% total_energy_start
+            write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
             stop 'check_for_extra_heat'
          end if
          do k=nz,1,-1

@@ -122,7 +122,7 @@
          logical, intent(out) :: make_gradr_sticky_in_solver_iters
          integer, intent(out) :: ierr
 
-         real(dp) :: max_conv_vel, alfa, beta, v, gradr_factor, d_gradr_factor_dw, &
+         real(dp) :: max_conv_vel, v, gradr_factor, d_gradr_factor_dw, &
             f, xh_face, gradL_composition_term, abs_du_div_cs, cs
          real(dp), pointer :: vel(:)
          integer :: i, mixing_type, h1, nz, k_T_max
@@ -160,13 +160,6 @@
          
          MLT_option = s% MLT_option
 
-         ! alfa is the fraction coming from k; (1-alfa) from k-1.
-         if (k == 1) then
-            alfa = 1d0
-         else
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-         end if
-         beta = 1d0 - alfa
          h1 = s% net_iso(ih1)
 
          gradL_composition_term = gradL_composition_term_in      
@@ -436,7 +429,6 @@
             s% Y_face_ad(k) = Y_face_ad
             s% Y_face(k) = s% Y_face_ad(k)%val
             s% mlt_cdc(k) = 0d0
-            s% actual_gradT(k) = 0d0
             if (report_mlt_compare_info) then
                write(*,2) 'do1_mlt_2_newer set_no_mixing gradT ' // trim(str), k, s% gradT(k)
             end if
