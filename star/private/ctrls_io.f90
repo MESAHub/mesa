@@ -160,8 +160,7 @@
     overshoot_f, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_mix_zero_at_H_He_crossover, &
     overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, dq_D_mix_zero_at_H_C_crossover, &
     overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
-    overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, &
-    min_dt_for_increases_in_convection_velocity, max_conv_vel_div_csound, &
+    overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, max_conv_vel_div_csound, &
     max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
     max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
     calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
@@ -1139,7 +1138,6 @@
  s%overshoot_D_min = overshoot_D_min
  s%overshoot_brunt_B_max = overshoot_brunt_B_max
 
- s% min_dt_for_increases_in_convection_velocity = min_dt_for_increases_in_convection_velocity
  s% max_conv_vel_div_csound = max_conv_vel_div_csound
  s% max_v_for_convection = max_v_for_convection
  s% max_q_for_convection_with_hydro_on = max_q_for_convection_with_hydro_on
@@ -2825,7 +2823,6 @@
  overshoot_D_min = s%overshoot_D_min
  overshoot_brunt_B_max = s%overshoot_brunt_B_max
 
- min_dt_for_increases_in_convection_velocity = s% min_dt_for_increases_in_convection_velocity
  max_conv_vel_div_csound = s% max_conv_vel_div_csound
  max_v_for_convection = s% max_v_for_convection
  max_q_for_convection_with_hydro_on = s% max_q_for_convection_with_hydro_on

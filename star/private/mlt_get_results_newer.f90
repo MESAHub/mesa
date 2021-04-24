@@ -83,39 +83,26 @@
       end subroutine get_gradT_newer
       
          
-      subroutine do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
+      subroutine do1_mlt_eval_newer(s, k, MLT_option, gradL_composition_term, &
             gradr, grada, scale_height, mixing_length_alpha, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
          use chem_def, only: ih1
          type (star_info), pointer :: s
          integer, intent(in) :: k
          character (len=*), intent(in) :: MLT_option
-         logical, intent(in) :: just_gradr
          type(auto_diff_real_star_order1), intent(in) :: &
             gradr, grada, scale_height
-         real(dp), intent(in) :: &
-            gradL_composition_term, mixing_length_alpha
+         real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(out) :: &
             gradT, Y_face, mlt_vc, D, Gamma
          integer, intent(out) :: ierr 
                  
-         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old, alpha_semiconvection, &
-                     center_h1
+         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old, alpha_semiconvection, center_h1
          integer :: iso, old_mix_type, j
-         type(auto_diff_real_star_order1) :: &
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp
+         type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, chiRho, chiT, Cp
          include 'formats'
          ierr = 0
-         if (just_gradr) then
-            mixing_type = no_mixing
-            gradT = gradr
-            Y_face = gradT - (grada+gradL_composition_term)
-            mlt_vc = 0d0
-            D = 0d0
-            Gamma = 0d0
-            return
-         end if
          cgrav = s% cgrav(k)
          m = s% m_grav(k)
          L = wrap_L_00(s,k)

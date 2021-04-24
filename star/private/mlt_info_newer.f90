@@ -30,7 +30,6 @@
       use const_def
       use num_lib
       use utils_lib
-      use mlt_get_results_newer, only: do1_mlt_eval_newer
       use auto_diff_support
 
       implicit none
@@ -65,7 +64,6 @@
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
          ierr = 0
-         if (s% x_integer_ctrl(19) > 0) write(*,3) 'doing set_mlt_vars_newer solver model iter', s% model_number, s% solver_iter
          gradL_composition_term = -1d0
          opacity = -1d0
          chiRho = -1d0
@@ -75,21 +73,10 @@
          P = -1d0
          xh = -1d0 
          if (s% doing_timing) call start_time(s, time0, total)
-         if (s% x_integer_ctrl(19) > 0) write(*,*) 'start set_mlt_vars_newer'
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             op_err = 0
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,3) 'set_mlt_vars_newer call do1_mlt_2_newer'
-            end if
-            call do1_mlt_2_newer(s, k, s% alpha_mlt(k), gradL_composition_term, &
-               opacity, chiRho, chiT, Cp, grada, P, xh, &
-               make_gradr_sticky_in_solver_iters, op_err)
-            if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-               write(*,3) 'set_mlt_vars_newer done do1_mlt_2_newer', k
-            end if
+            call do1_mlt_2_newer(s, k, make_gradr_sticky_in_solver_iters, op_err)
             if (make_gradr_sticky_in_solver_iters .and. s% solver_iter > 3) then
                if (.not. s% fixed_gradr_for_rest_of_solver_iters(k)) then
                   s% fixed_gradr_for_rest_of_solver_iters(k) = &
@@ -98,38 +85,37 @@
             end if            
          end do
 !$OMP END PARALLEL DO
-         if (s% x_integer_ctrl(19) > 0) write(*,*) 'done set_mlt_vars_newer'
-         if (s% x_integer_ctrl(19) > 0) write(*,*)
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
       end subroutine set_mlt_vars_newer
 
 
-      subroutine do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term_in, &
+      subroutine do1_mlt_2_newer(s, k, &
+            make_gradr_sticky_in_solver_iters, ierr, &
+            mixing_length_alpha_in, gradL_composition_term_in, &
             opacity_face_in, chiRho_face_in, &
-            chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-            make_gradr_sticky_in_solver_iters, ierr)
+            chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in)
          ! get convection info for point k
          use star_utils
+         use mlt_get_results_newer, only: do1_mlt_eval_newer
          use eos_def
          use chem_def, only: ih1
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: mixing_length_alpha, &
+         logical, intent(out) :: make_gradr_sticky_in_solver_iters
+         integer, intent(out) :: ierr
+         real(dp), intent(in), optional :: mixing_length_alpha_in, &
             gradL_composition_term_in, opacity_face_in, &
             chiRho_face_in, chiT_face_in, &
             Cp_face_in, grada_face_in, P_face_in, xh_face_in
-         logical, intent(out) :: make_gradr_sticky_in_solver_iters
-         integer, intent(out) :: ierr
 
-         real(dp) :: max_conv_vel, v, gradr_factor, d_gradr_factor_dw, &
-            f, xh_face, gradL_composition_term, abs_du_div_cs, cs
+         real(dp) :: v, gradr_factor, d_gradr_factor_dw, f, xh_face, &
+            gradL_composition_term, abs_du_div_cs, cs, mixing_length_alpha
          real(dp), pointer :: vel(:)
          integer :: i, mixing_type, h1, nz, k_T_max
          real(dp), parameter :: conv_vel_mach_limit = 0.9d0
          character (len=32) :: MLT_option
-         logical, parameter :: just_gradr = .false.
-         logical :: report_mlt_compare_info
+         logical :: report_mlt_compare_info, no_mix
 
          type(auto_diff_real_star_order1) :: &
             opacity_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
@@ -159,29 +145,64 @@
          end if
          
          MLT_option = s% MLT_option
+         
+         if (present(mixing_length_alpha_in)) then
+            mixing_length_alpha = mixing_length_alpha_in
+         else
+            mixing_length_alpha = s% mixing_length_alpha
+         end if
 
-         h1 = s% net_iso(ih1)
+         if (present(gradL_composition_term_in)) then
+            gradL_composition_term = gradL_composition_term_in      
+         else if (s% use_Ledoux_criterion) then
+            gradL_composition_term = s% gradL_composition_term(k)
+         else
+            gradL_composition_term = 0d0
+         end if
+         
+         if (present(opacity_face_in)) then
+            opacity_face_ad = opacity_face_in
+         else 
+            opacity_face_ad = get_kap_face(s,k)
+         end if
 
-         gradL_composition_term = gradL_composition_term_in      
+         if (present(chiRho_face_in)) then
+            chiRho_face_ad = chiRho_face_in
+         else
+            chiRho_face_ad = get_ChiRho_face(s,k)
+         end if
 
-         opacity_face_ad = opacity_face_in
-         if (opacity_face_in < 0) opacity_face_ad = get_kap_face(s,k)
+         if (present(chiT_face_in)) then
+            chiT_face_ad = chiT_face_in
+         else
+            chiT_face_ad = get_ChiT_face(s,k)
+         end if
+         
+         if (present(Cp_face_in)) then
+            Cp_face_ad = Cp_face_in
+         else
+            Cp_face_ad = get_Cp_face(s,k)
+         end if
 
-         chiRho_face_ad = chiRho_face_in
-         if (chiRho_face_in < 0) chiRho_face_ad = get_ChiRho_face(s,k)
-
-         chiT_face_ad = chiT_face_in
-         if (chiT_face_in < 0) chiT_face_ad = get_ChiT_face(s,k)
-
-         Cp_face_ad = Cp_face_in
-         if (Cp_face_in < 0) Cp_face_ad = get_Cp_face(s,k)
-
-         grada_face_ad = grada_face_in
-         if (grada_face_in < 0) grada_face_ad = get_grada_face(s,k)
+         if (present(grada_face_in)) then
+            grada_face_ad = grada_face_in
+         else
+            grada_face_ad = get_grada_face(s,k)
+         end if
          s% grada_face(k) = grada_face_ad%val         
-
-         P_face_ad = P_face_in
-         if (P_face_in < 0) P_face_ad = get_Peos_face(s,k)
+         
+         if (present(P_face_in)) then
+            P_face_ad = P_face_in
+         else
+            P_face_ad = get_Peos_face(s,k)
+         end if
+         
+         h1 = s% net_iso(ih1)
+         if (present(xh_face_in)) then
+            xh_face = xh_face_in
+         else
+            xh_face = s% xa(h1, k)
+         end if
 
          T_face_ad = get_T_face(s,k)
    
@@ -189,9 +210,6 @@
 
          scale_height_ad = get_scale_height_face(s,k)
          if (report_mlt_compare_info) write(*,2) 'do1_mlt_2_newer scale_height', k, scale_height_ad%val
-
-         xh_face = xh_face_in   
-         if (h1 /= 0 .and. xh_face < 0) xh_face = s% xa(h1, k)
 
          if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
@@ -249,91 +267,46 @@
             make_gradr_sticky_in_solver_iters = &
                (s% lnT_start(k_T_max)/ln10 >= s% min_logT_for_make_gradr_sticky_in_solver_iters)
          end if
-         
-         if (make_gradr_sticky_in_solver_iters) then
-            if (s% fixed_gradr_for_rest_of_solver_iters(k)) then
-               call set_no_mixing('gradr_sticky')
+         if (make_gradr_sticky_in_solver_iters .and. s% fixed_gradr_for_rest_of_solver_iters(k)) then
+            call set_no_mixing('gradr_sticky')
+            return
+         end if
+
+         if (s% u_flag .or. s% v_flag) then
+            no_mix = .false.
+            if (s% u_flag) then
+               v = s% u_start(k)
+            else 
+               v = s% v_start(k)
+            end if
+            if (v/1d5 > s% max_v_for_convection) then
+               if (report_mlt_compare_info) then
+                  write(*,2) 'v/1d5 > s% max_v_for_convection', k, v/1d5
+               end if
+               no_mix = .true.
+            else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
+               if (report_mlt_compare_info) then
+                  write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+               end if
+               no_mix = .true.
+            else if ((abs(v)) >= &
+                  s% csound_start(k)*s% max_v_div_cs_for_convection) then
+               if (report_mlt_compare_info) then
+                  write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
+               end if
+               no_mix = .true.
+            end if
+            if (no_mix) then
+               call set_no_mixing('no_mix')
                return
             end if
-         end if
-
-         max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
-         if (s% dt < s% min_dt_for_increases_in_convection_velocity) then
-            max_conv_vel = 1d-2*s% dt*s% cgrav(k)
-         end if
-
-         if (s% csound_start(k) > 0d0) then
-            if (s% u_flag) then        
-               abs_du_div_cs = 0d0
-               if (s% u_start(k)/1d5 > s% max_v_for_convection) then
-                  if (report_mlt_compare_info) then
-                     write(*,2) 'u_start(k)/1d5 > s% max_v_for_convection', k, s% u_start(k)/1d5
-                  end if
-                  max_conv_vel = 0d0              
-               else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
-                  if (report_mlt_compare_info) then
-                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
-                  end if
-                  max_conv_vel = 0d0
-               else if ((abs(s% u_start(k))) >= &
-                     s% csound_start(k)*s% max_v_div_cs_for_convection) then
-                  if (report_mlt_compare_info) then
-                     write(*,2) 'abs(s% u_start(k)))', k, abs(s% u_start(k))/1d5
-                  end if
-                  max_conv_vel = 0d0              
-               else
-                  if (k == 1) then
-                     abs_du_div_cs = 1d99
-                  else if (k < nz) then
-                     abs_du_div_cs = max(abs(s% u_start(k) - s% u_start(k+1)), &
-                         abs(s% u_start(k) - s% u_start(k-1))) / s% csound_start(k)
-                  end if
-                  if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
-                     if (k==s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0 .and. &
-                     s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
-                        write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
-                     end if
-                     max_conv_vel = 0d0
-                  end if
-               end if
-            else if (s% v_flag) then
-               if (s% v_start(k)/1d5 > s% max_v_for_convection) then
-                  if (report_mlt_compare_info) then
-                     write(*,2) 's% v_start(k)/1d5 > s% max_v_for_convection', k, s% v_start(k)/1d5
-                  end if
-                  max_conv_vel = 0d0              
-               else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
-                  if (report_mlt_compare_info) then
-                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
-                  end if
-                  max_conv_vel = 0d0
-               else if ((abs(s% v_start(k))) >= &
-                     s% csound_start(k)*s% max_v_div_cs_for_convection) then
-                  if (report_mlt_compare_info) then
-                     write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
-                  end if
-                  max_conv_vel = 0d0
-               end if
-            end if
-            if (max_conv_vel == 0d0) then
-               if (report_mlt_compare_info) then
-                  write(*,2) 'max_conv_vel == 0d0', k, max_conv_vel
-               end if
-               MLT_option = 'none'
-            end if
-         end if
-
-         if (s% use_Ledoux_criterion .and. gradL_composition_term < 0) then
-            gradL_composition_term = s% gradL_composition_term(k)
-         else
-            gradL_composition_term = 0d0
          end if
 
          if (report_mlt_compare_info) then
             write(*,2) 'before call do1_mlt_eval_newer gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
          end if
             
-         call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
+         call do1_mlt_eval_newer(s, k, MLT_option, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          if (ierr /= 0) then
@@ -348,28 +321,37 @@
          end if
 
          s% mlt_mixing_type(k) = mixing_type
-         s% gradT_ad(k) = gradT_ad
-         s% gradT(k) = s% gradT_ad(k)%val
-         s% Y_face_ad(k) = Y_face_ad
-         s% Y_face(k) = s% Y_face_ad(k)%val
-         s% mlt_vc_ad(k) = mlt_vc_ad
-         if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = s% mlt_vc_ad(k)%val  
-         s% mlt_D_ad(k) = D_ad
-         s% mlt_D(k) = D_ad%val
-         s% mlt_Gamma_ad(k) = Gamma_ad
-         s% mlt_Gamma(k) = Gamma_ad%val
-         s% gradr_ad(k) = gradr_ad
-         s% gradr(k) = s% gradr_ad(k)%val
+         
          s% grada_face_ad(k) = grada_face_ad
          s% grada_face(k) = grada_face_ad%val
-         s% scale_height_ad(k) = scale_height_ad
-         s% scale_height(k) = scale_height_ad%val             
-         s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
-         s% mlt_mixing_length(k) = mixing_length_alpha*s% scale_height(k)    
-         s% gradL_ad(k) = grada_face_ad + gradL_composition_term
+         
+         s% gradT_ad(k) = gradT_ad
+         s% gradT(k) = s% gradT_ad(k)%val
+         
+         s% Y_face_ad(k) = Y_face_ad
+         s% Y_face(k) = s% Y_face_ad(k)%val
+         
+         s% mlt_vc_ad(k) = mlt_vc_ad
+         if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = s% mlt_vc_ad(k)%val  
+         
+         s% mlt_D_ad(k) = D_ad
+         s% mlt_D(k) = D_ad%val
+         s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*pow2(s%r(k))*rho_face_ad%val)
+         
+         s% mlt_Gamma_ad(k) = Gamma_ad
+         s% mlt_Gamma(k) = Gamma_ad%val
+         
+         s% gradr_ad(k) = gradr_ad
+         s% gradr(k) = s% gradr_ad(k)%val
+         
+         s% gradL_ad(k) = s% grada_face_ad(k) + gradL_composition_term
          s% gradL(k) = s% gradL_ad(k)%val
          
-         s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*pow2(s%r(k))*rho_face_ad%val)
+         s% scale_height_ad(k) = scale_height_ad
+         s% scale_height(k) = scale_height_ad%val     
+                 
+         s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
+         s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
          
          if (report_mlt_compare_info) then
             write(*,2) 'do1_mlt_eval_newer before adjust_gradT_fraction gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
@@ -385,53 +367,64 @@
          if (report_mlt_compare_info) then
             write(*,2) 'do1_mlt_eval_newer after adjust_gradT_fraction gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
          end if
-
-         ! Note that L_conv can be negative when conv_vel /= 0 in a convectively
-         ! stable region. This can happen when using conv_vel as a variable
-         ! Note make_brown_dwarf can have L=0 which means gradr = 0
-         if (mlt_option /= 'none' .and. abs(s% gradr(k))>0d0) then
-            s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k)) ! C&G 14.109
-         else
+         
+         if (s% mlt_mixing_type(k) == no_mixing .or. abs(s% gradr(k)) < 1d-20) then
             s% L_conv(k) = 0d0
+         else
+            s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k)) ! C&G 14.109            
          end if
 
          if (report_mlt_compare_info) then
             write(*,2) 'done do1_mlt_2_newer gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
          end if
 
+
          contains
+
 
          subroutine set_no_mixing(str)
             character (len=*) :: str
             include 'formats'
+            
             s% mlt_mixing_type(k) = no_mixing
-            !gradr_ad = gradr_factor*gradr_ad
+            
+            s% grada_face_ad(k) = grada_face_ad
+            s% grada_face(k) = grada_face_ad%val
+            
             gradT_ad = gradr_ad
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
-            s% mlt_vc_ad(k) = 0d0
-            if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0d0
-            s% mlt_D_ad(k) = 0d0
-            s% mlt_D(k) = 0d0
-            s% mlt_Gamma_ad(k) = 0d0
-            s% mlt_Gamma(k) = 0d0
-            s% gradr_ad(k) = gradr_ad
-            s% gradr(k) = s% gradr_ad(k)%val
-            s% grada_face_ad(k) = grada_face_ad
-            s% grada_face(k) = grada_face_ad%val
-            s% scale_height_ad(k) = scale_height_ad
-            s% scale_height(k) = scale_height_ad%val             
-            s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
-            s% mlt_mixing_length(k) = mixing_length_alpha*s% scale_height(k)    
-            s% gradL_ad(k) = 0d0
-            s% gradL(k) = 0d0
+            
             Y_face_ad = gradT_ad - grada_face_ad
             s% Y_face_ad(k) = Y_face_ad
             s% Y_face(k) = s% Y_face_ad(k)%val
+            
+            s% mlt_vc_ad(k) = 0d0
+            if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0d0
+            
+            s% mlt_D_ad(k) = 0d0
+            s% mlt_D(k) = 0d0
             s% mlt_cdc(k) = 0d0
+            
+            s% mlt_Gamma_ad(k) = 0d0
+            s% mlt_Gamma(k) = 0d0
+            
+            s% gradr_ad(k) = gradr_ad
+            s% gradr(k) = s% gradr_ad(k)%val
+               
+            s% gradL_ad(k) = 0d0
+            s% gradL(k) = 0d0
+            
+            s% scale_height_ad(k) = scale_height_ad
+            s% scale_height(k) = scale_height_ad%val    
+                     
+            s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
+            s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
+            
             if (report_mlt_compare_info) then
                write(*,2) 'do1_mlt_2_newer set_no_mixing gradT ' // trim(str), k, s% gradT(k)
             end if
+            
          end subroutine set_no_mixing
 
       end subroutine do1_mlt_2_newer
@@ -460,17 +453,9 @@
             end if
             s% gradT(k) = s% gradT_ad(k)%val
          end if
-
-! fxt 02jun2019
-! gradT_sub_grada was saved before calling adjust_gradT_excess,
-! but adjust_gradT_excess which adjusts gradT(k), making gradT(k) inconsistent with gradT_sub_grada
-!         s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! gradT_excess
-!         call adjust_gradT_excess(s, k)
-
-! just recalculate gradT_sub_grada after calling adjust_gradT_excess
-         s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! gradT_excess
          call adjust_gradT_excess(s, k, report_mlt_compare_info)
-         s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k) ! new gradT_excess from adjusted gradT
+         
+         s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k)
          
          if (report_mlt_compare_info) then
             write(*,2) 'after adjust_gradT_excess gradT d_dlnd_00', k, s% gradT(k), s% d_gradT_dlnd00(k)
@@ -484,7 +469,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in) :: report_mlt_compare_info
-         real(dp) :: alfa, beta, log_tau, gradT_excess_alpha
+         real(dp) :: alfa, beta, log_tau, gradT_excess_alpha, gradT_sub_grada
 
          include 'formats'
 
@@ -493,14 +478,16 @@
 
          gradT_excess_alpha = s% gradT_excess_alpha
          s% gradT_excess_effect(k) = 0.0d0
+         
+         gradT_sub_grada = s% gradT(k) - s% grada_face(k)
 
          if (gradT_excess_alpha <= 0.0  .or. &
-             s% gradT_sub_grada(k) <= s% gradT_excess_f1) then
+             gradT_sub_grada <= s% gradT_excess_f1) then
             if (report_mlt_compare_info) then
                write(*,*) 'gradT_excess_alpha <= 0.0', gradT_excess_alpha <= 0.0
-               write(*,*) 's% gradT_sub_grada(k) <= s% gradT_excess_f1', &
-                  s% gradT_sub_grada(k) <= s% gradT_excess_f1, &
-                  s% gradT_sub_grada(k), s% gradT(k), s% grada_face(k), s% gradT_excess_f1
+               write(*,*) 'gradT_sub_grada <= s% gradT_excess_f1', &
+                  gradT_sub_grada <= s% gradT_excess_f1, &
+                  gradT_sub_grada, s% gradT(k), s% grada_face(k), s% gradT_excess_f1
             end if
             return
          end if
@@ -670,7 +657,7 @@
       end subroutine set_grads_newer
 
 
-      subroutine switch_to_no_mixing(s,k)
+      subroutine switch_to_radiative_newer(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          s% mlt_mixing_type(k) = no_mixing
@@ -678,13 +665,6 @@
          s% mlt_D(k) = 0
          s% mlt_cdc(k) = 0d0
          s% mlt_vc(k) = 0
-      end subroutine switch_to_no_mixing
-
-
-      subroutine switch_to_radiative_newer(s,k)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         call switch_to_no_mixing(s,k)
          s% gradT_ad(k) = s% gradr_ad(k)
          s% gradT(k) = s% gradT_ad(k)%val
       end subroutine switch_to_radiative_newer
@@ -706,39 +686,22 @@
 
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-
-         real(dp) :: beta, lambda, phi, tmp, alpha, alpha2
-         real(dp) :: &
-            beta_limit, &
-            lambda1, &
-            beta1, &
-            lambda2, &
-            beta2, &
-            dlambda, &
-            dbeta
-
-         integer :: k, k_beta, k_lambda, nz, h1, he4
-
-         logical, parameter :: dbg = .false.
-
+         
+         integer :: nz, h1, he4
          include 'formats'
 
-         if (dbg) write(*,*) 'enter set_gradT_excess_alpha_newer'
-
          ierr = 0
+         nz = s% nz
+
          if (.not. s% okay_to_reduce_gradT_excess) then
             s% gradT_excess_alpha = 0
-            if (dbg) write(*,1) 'okay_to_reduce_gradT_excess'
             return
          end if
-
-         nz = s% nz
 
          h1 = s% net_iso(ih1)
          if (h1 /= 0) then
             if (s% xa(h1,nz) > s% gradT_excess_max_center_h1) then
                s% gradT_excess_alpha = 0
-               if (dbg) write(*,1) 'gradT_excess_max_center_h1'
                return
             end if
          end if
@@ -747,7 +710,6 @@
          if (he4 /= 0) then
             if (s% xa(he4,nz) < s% gradT_excess_min_center_he4) then
                s% gradT_excess_alpha = 0
-               if (dbg) write(*,1) 'gradT_excess_min_center_he4'
                return
             end if
          end if
@@ -841,34 +803,20 @@
          end subroutine end_of_convective_region
 
 
-         subroutine redo1_mlt(s,k,dr,ierr)
+         subroutine redo1_mlt(s, k, dr, ierr)
             type (star_info), pointer :: s
             integer, intent(in) :: k
             real(dp), intent(in) :: dr
             integer, intent(out) :: ierr
-            real(dp) :: Hp, reduced_alpha, &
-               gradL_composition_term, opacity_face, chiRho_face, &
-               chiT_face, Cp_face, grada_face, P_face, xh_face
             logical :: make_gradr_sticky_in_solver_iters
             include 'formats'
             ierr = 0
             if (dr >= s% mlt_mixing_length(k)) return
             ! if convection zone is smaller than mixing length
             ! redo MLT with reduced alpha so mixing_length = dr
-            Hp = s% scale_height(k)
-            reduced_alpha = dr/Hp
-            gradL_composition_term = -1
-            opacity_face = -1
-            chiRho_face = -1
-            chiT_face = -1
-            Cp_face = -1
-            grada_face = -1
-            P_face = -1
-            xh_face = -1
-            call do1_mlt_2_newer(s, k, reduced_alpha, &
-               gradL_composition_term, opacity_face, chiRho_face, &
-               chiT_face, Cp_face, grada_face, P_face, xh_face, &
-               make_gradr_sticky_in_solver_iters, ierr)
+            call do1_mlt_2_newer(s, k, &
+               make_gradr_sticky_in_solver_iters, ierr, &
+               mixing_length_alpha_in = dr/s% scale_height(k))
          end subroutine redo1_mlt
 
 

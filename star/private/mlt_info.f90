@@ -203,11 +203,12 @@
                      s% solver_iter == s% x_integer_ctrl(20) .and. (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0)) then
                write(*,*) '***'
                write(*,2) 'call do1_mlt_2_newer', k
-            end if               
-            call do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term_in, &
-               opacity_face_in, chiRho_face_in, &
-               chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
-               make_gradr_sticky_in_solver_iters, ierr)
+            end if   
+            stop 'has old call do1_mlt_2_newer'            
+            !call do1_mlt_2_newer(s, k, mixing_length_alpha, gradL_composition_term_in, &
+            !   opacity_face_in, chiRho_face_in, &
+            !   chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
+            !   make_gradr_sticky_in_solver_iters, ierr)
             if (ierr /= 0) return
             
             
@@ -669,9 +670,6 @@
          dt = -1
 
          max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
-         if (s% dt < s% min_dt_for_increases_in_convection_velocity) then
-            max_conv_vel = 1d-2*s% dt*s% cgrav(k)
-         end if
 
          if (s% csound_start(k) > 0d0) then
             if (s% u_flag) then        

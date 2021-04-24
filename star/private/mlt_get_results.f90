@@ -174,7 +174,7 @@
                   write(*,2) 'do1_mlt_eval gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
                end if
                
-               call do1_mlt_eval_newer(s, k, MLT_option, just_gradr, gradL_composition_term, &
+               call do1_mlt_eval_newer(s, k, MLT_option, gradL_composition_term, &
                   gradr_ad, grada_ad, scale_height_ad, mixing_length_alpha, alt_mixing_type, &
                   gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
             else

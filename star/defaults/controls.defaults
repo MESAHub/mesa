@@ -3268,16 +3268,6 @@
     mix_factor = 1
 
 
-      ! min_dt_for_increases_in_convection_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! convective velocities are not increased if dt < this value (in seconds)
-
-      ! ::
-
-    min_dt_for_increases_in_convection_velocity = -1d0
-
-
       ! max_conv_vel_div_csound
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
