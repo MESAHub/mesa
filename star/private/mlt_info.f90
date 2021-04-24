@@ -36,9 +36,9 @@
       implicit none
 
       private
-      public :: &
-         set_mlt_vars, do1_mlt, set_grads, switch_to_radiative, check_for_redo_MLT, &
-         set_gradT_excess_alpha
+      !public :: &
+      !   set_mlt_vars, do1_mlt, set_grads, switch_to_radiative, check_for_redo_MLT, &
+      !   set_gradT_excess_alpha
          
 
       logical, parameter :: dbg = .false.
