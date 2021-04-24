@@ -665,7 +665,7 @@
                j=j+1; xh(i_alpha_RTI,k) = vec(j)
             end if
             if (s% have_mlt_vc) then
-               j=j+1; s% mlt_vc(k) = vec(j)
+               j=j+1; s% mlt_vc(k) = vec(j); s% conv_vel(k) = s% mlt_vc(k)
             end if
             if (j+species > nvec) then
                ierr = -1

@@ -1129,7 +1129,7 @@
          real(dp), pointer :: q(:), xq(:), xa(:,:), j_rot(:), entropy(:)
          real(dp) :: conv_vel_temp, time
          integer :: num_pts, k, k0, species
-
+         logical :: save_have_mlt_vc
          logical :: dbg = .false.
 
          ierr = 0
@@ -1186,6 +1186,9 @@
             if (dbg) write(*,*) "set_conv_vel_flag ierr", ierr
          end if
 
+         ! save have_mlt_vc and set to false (to load ZAMS model)
+         save_have_mlt_vc = s% have_mlt_vc
+         s% have_mlt_vc = .false.
 
          !save composition and entropy profiles
          xa(:,:) = s% xa(:,k_remove:s% nz)
@@ -1250,6 +1253,9 @@
             if (dbg) write(*,*) "check set_conv_vel_flag ierr", ierr
             if (ierr /= 0) return
          end if
+
+         ! restore have_mlt_vc
+         s% have_mlt_vc = save_have_mlt_vc
 
          if (turn_off_energy_sources_and_sinks) then
             s% non_nuc_neu_factor = 0d0

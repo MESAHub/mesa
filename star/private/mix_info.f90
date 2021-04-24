@@ -549,7 +549,7 @@
          logical :: in_convective_region
          integer :: k, k_bot, i, j, iounit, max_conv_bdy
          real(dp) :: dgrad00, dgradp1, turnover_time, &
-            bot_Hp, bot_r, top_Hp, top_r, dr
+            bot_Hp, bot_r, top_Hp, top_r, dr, cv, rmid_00, rmid_m1
 
          logical :: dbg
          logical, parameter :: write_debug = .false.
@@ -596,7 +596,12 @@
                if (s% mixing_type(k) /= convective_mixing) then
                   call end_of_convective_region
                else
-                  if(s% conv_vel(k).ne. 0d0) turnover_time = turnover_time + (s% rmid(k-1) - s% rmid(k))/s% conv_vel(k)
+                  cv = s% conv_vel(k)
+                  if(cv.ne. 0d0) then
+                     rmid_00 = s% rmid(k)
+                     rmid_m1 = s% rmid(k-1)
+                     turnover_time = turnover_time + (rmid_m1 - rmid_00)/cv
+                  end if
                end if
             else ! in non-convective region
                if (s% mixing_type(k) == convective_mixing) then ! start of a convective region

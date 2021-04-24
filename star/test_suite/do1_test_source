@@ -1,3 +1,4 @@
+
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
@@ -17,18 +18,18 @@ do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
 do_one c13_pocket "all values are within tolerance" "final.mod" auto
 do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto
-do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto
+do_one ccsn_IIp "shock has reached target location    1" "shock_part5.mod" auto
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one conductive_flame "flame reached halfway point" "final.mod" auto
 do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
-#   Pablo needs to rewrite for auto diff   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
-#   Pablo needs to rewrite for auto diff   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
+#   Pablo needs to fix   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
+#   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
 do_one dev_RSP2 "RSP2 good match for period" "final.mod" skip
 do_one dev_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-#   broken     do_one dev_to_pulses_80_up_part1 "log_max_temperature >= log_max_temp_upper_limit" "part1.mod" skip
+#   Bill needs to fix     do_one dev_to_pulses_80_up_part1 "log_max_temperature >= log_max_temp_upper_limit" "part1.mod" skip
 do_one dev_to_pulses_80_up_part2 "stop because ejecta_mass >= ejecta_mass_max_limit" "part2.mod" skip
 do_one dev_to_pulses_80_up_part3 "stop because ejecta_mass >= ejecta_mass_max_limit" "part3.mod" skip
 do_one dev_to_pulses_80_up_part4 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
