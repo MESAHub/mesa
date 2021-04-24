@@ -272,29 +272,51 @@
             return
          end if
 
-         if (s% u_flag .or. s% v_flag) then
+         if (s% csound_start(k) > 0d0) then
             no_mix = .false.
-            if (s% u_flag) then
-               v = s% u_start(k)
-            else 
-               v = s% v_start(k)
-            end if
-            if (v/1d5 > s% max_v_for_convection) then
-               if (report_mlt_compare_info) then
-                  write(*,2) 'v/1d5 > s% max_v_for_convection', k, v/1d5
+            if (s% u_flag) then        
+               abs_du_div_cs = 0d0
+               if (s% u_start(k)/1d5 > s% max_v_for_convection) then
+                  if (report_mlt_compare_info) &
+                     write(*,2) 'u_start(k)/1d5 > s% max_v_for_convection', k, s% u_start(k)/1d5
+                  no_mix = .true.
+               else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
+                  if (report_mlt_compare_info) &
+                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+                  no_mix = .true.
+               else if ((abs(s% u_start(k))) >= &
+                     s% csound_start(k)*s% max_v_div_cs_for_convection) then
+                  if (report_mlt_compare_info) &
+                     write(*,2) 'abs(s% u_start(k)))', k, abs(s% u_start(k))/1d5
+                  no_mix = .true.              
+               else
+                  if (k == 1) then
+                     abs_du_div_cs = 1d99
+                  else if (k < nz) then
+                     abs_du_div_cs = max(abs(s% u_start(k) - s% u_start(k+1)), &
+                         abs(s% u_start(k) - s% u_start(k-1))) / s% csound_start(k)
+                  end if
+                  if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
+                     if (report_mlt_compare_info) &
+                        write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
+                     no_mix = .true.
+                  end if
                end if
-               no_mix = .true.
-            else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
-               if (report_mlt_compare_info) then
-                  write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+            else if (s% v_flag) then
+               if (s% v_start(k)/1d5 > s% max_v_for_convection) then
+                  if (report_mlt_compare_info) &
+                     write(*,2) 's% v_start(k)/1d5 > s% max_v_for_convection', k, s% v_start(k)/1d5
+                  no_mix = .true.              
+               else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
+                  if (report_mlt_compare_info) &
+                     write(*,2) 's% q(k) > s% max_q_for_convection_with_hydro_on', k, s% q(k)
+                  no_mix = .true.
+               else if ((abs(s% v_start(k))) >= &
+                     s% csound_start(k)*s% max_v_div_cs_for_convection) then
+                  if (report_mlt_compare_info) &
+                     write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
+                  no_mix = .true.
                end if
-               no_mix = .true.
-            else if ((abs(v)) >= &
-                  s% csound_start(k)*s% max_v_div_cs_for_convection) then
-               if (report_mlt_compare_info) then
-                  write(*,2) 'max_v_div_cs_for_convection', k, s% max_v_div_cs_for_convection
-               end if
-               no_mix = .true.
             end if
             if (no_mix) then
                call set_no_mixing('no_mix')
@@ -302,9 +324,9 @@
             end if
          end if
 
-         if (report_mlt_compare_info) then
-            write(*,2) 'before call do1_mlt_eval_newer gradr_factor comp_term ' // trim(mlt_option), k, gradr_factor, gradL_composition_term
-         end if
+         if (report_mlt_compare_info) &
+            write(*,2) 'before call do1_mlt_eval_newer gradr_factor comp_term ' // trim(mlt_option), &
+               k, gradr_factor, gradL_composition_term
             
          call do1_mlt_eval_newer(s, k, MLT_option, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
@@ -316,9 +338,8 @@
             return
          end if
 
-         if (report_mlt_compare_info) then
+         if (report_mlt_compare_info) &
             write(*,2) 'after call do1_mlt_eval_newer gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
-         end if
 
          s% mlt_mixing_type(k) = mixing_type
          
@@ -353,9 +374,8 @@
          s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
          s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
          
-         if (report_mlt_compare_info) then
+         if (report_mlt_compare_info) &
             write(*,2) 'do1_mlt_eval_newer before adjust_gradT_fraction gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
-         end if
 
          if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
             f = s% mlt_gradT_fraction
@@ -364,9 +384,8 @@
          end if
          call adjust_gradT_fraction(s, k, f, report_mlt_compare_info)
          
-         if (report_mlt_compare_info) then
+         if (report_mlt_compare_info) &
             write(*,2) 'do1_mlt_eval_newer after adjust_gradT_fraction gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
-         end if
          
          if (s% mlt_mixing_type(k) == no_mixing .or. abs(s% gradr(k)) < 1d-20) then
             s% L_conv(k) = 0d0
@@ -374,9 +393,8 @@
             s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k)) ! C&G 14.109            
          end if
 
-         if (report_mlt_compare_info) then
+         if (report_mlt_compare_info) &
             write(*,2) 'done do1_mlt_2_newer gradT d_dlnd_00', k, gradT_ad%val, gradT_ad%d1Array(i_lnd_00)
-         end if
 
 
          contains
@@ -421,9 +439,8 @@
             s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
             s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
             
-            if (report_mlt_compare_info) then
+            if (report_mlt_compare_info) &
                write(*,2) 'do1_mlt_2_newer set_no_mixing gradT ' // trim(str), k, s% gradT(k)
-            end if
             
          end subroutine set_no_mixing
 
@@ -441,9 +458,7 @@
 
          include 'formats'
          
-         if (report_mlt_compare_info) then
-            write(*,2) 'adjust_gradT_fraction f', k, f
-         end if
+         if (report_mlt_compare_info) write(*,2) 'adjust_gradT_fraction f', k, f
 
          if (f >= 0.0 .and. f <= 1.0) then
             if (f == 0d0) then
@@ -457,9 +472,8 @@
          
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k)
          
-         if (report_mlt_compare_info) then
+         if (report_mlt_compare_info) &
             write(*,2) 'after adjust_gradT_excess gradT d_dlnd_00', k, s% gradT(k), s% d_gradT_dlnd00(k)
-         end if
 
       end subroutine adjust_gradT_fraction
 
@@ -522,9 +536,8 @@
          end if
          beta = 1.d0 - alfa
 
-         if (report_mlt_compare_info) then
+         if (report_mlt_compare_info) &
             write(*,2) 'adjust_gradT_excess alfa gradT grada', k, alfa, s% gradT(k), s% grada_face(k)
-         end if
 
          s% gradT_ad(k) = alfa*s% gradT_ad(k) + beta*s% grada_face_ad(k)
          s% gradT(k) = s% gradT_ad(k)%val
