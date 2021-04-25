@@ -52,7 +52,7 @@
 ! mixing
       
 ! timesteps
-       !time_delta_coeff = 0.75d0
+      check_remnant_only_for_dt_div_min_dr_div_cs_limit = .true.
 
 ! mesh
 
@@ -153,6 +153,7 @@
 
 &pgstar
 
+
 !pause = .true.
 
 !Grid1_file_flag = .true.
@@ -193,7 +194,7 @@ Profile_Panels3_yaxis_name(4) = 'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
     Profile_Panels3_other_dymin(4) = 12
  
-Profile_Panels3_yaxis_name(5) =  'logT'
+Profile_Panels3_yaxis_name(5) = 'log_dr_div_cs' !  'logT'
     Profile_Panels3_ymin(5) = -101 
 Profile_Panels3_other_yaxis_name(5) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(5) = 0.15
@@ -209,6 +210,7 @@ TRho_Profile_xmin = 2.0
 !TRho_Profile_xmax = 7.5
 TRho_Profile_ymin = 8.3
 !TRho_Profile_ymax = 9.2
+
 
 
 / ! end of pgstar namelist

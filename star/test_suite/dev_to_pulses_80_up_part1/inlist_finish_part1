@@ -47,6 +47,7 @@
 ! mixing
       
 ! timesteps
+      check_remnant_only_for_dt_div_min_dr_div_cs_limit = .true.
 
 ! mesh
 

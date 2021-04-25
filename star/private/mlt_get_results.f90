@@ -212,10 +212,15 @@
             call set_no_mixing('vals too small')
             return
          end if
-            
-         gradT_actual = safe_div(s, wrap_lnT_m1(s,k) - wrap_lnT_00(s,k), &
-                          wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
-         Y_guess = gradT_actual - grada ! use actual gradT to guess Y_face
+         
+         if (okay_to_use_TDC) then
+            gradT_actual = safe_div(s, wrap_lnT_m1(s,k) - wrap_lnT_00(s,k), &
+                             wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
+            Y_guess = gradT_actual - grada ! use actual gradT to guess Y_face
+         else
+            gradT_actual = 0d0
+            Y_guess = 0d0 
+         end if
            
          if (report) write(*,2) 'gradr gradL grada comp_term gradT_actual Y_guess', &
             k, gradr%val, gradL%val, grada%val, gradL_composition_term, gradT_actual%val, Y_guess%val

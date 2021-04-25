@@ -51,7 +51,7 @@
 ! mixing
       
 ! timesteps
-       !time_delta_coeff = 0.75d0
+      check_remnant_only_for_dt_div_min_dr_div_cs_limit = .true.
 
 ! mesh
 
