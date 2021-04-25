@@ -348,7 +348,6 @@
             RSP_alpha_P_factor, RSP_alpha_s_factor, RSP_alpha_c_factor, &
             RSP_alpha_d_factor, RSP_gamma_r_factor, &
             RSP_min_tau, RSP_min_q, max_conv_vel_div_csound, &
-            min_dt_for_increases_in_convection_velocity, &
             max_v_for_convection, max_q_for_convection_with_hydro_on, &
             max_v_div_cs_for_convection, &
             max_abs_du_div_cs_for_convection, &
@@ -1328,10 +1327,10 @@
          logical :: use_other_kap
          logical :: use_other_diffusion
          logical :: use_other_diffusion_factor
-         logical :: use_other_mlt
          logical :: use_other_adjust_mdot
          logical :: use_other_j_for_adjust_J_lost
          logical :: use_other_alpha_mlt
+         logical :: use_other_mlt_results
          logical :: use_other_am_mixing
          logical :: use_other_brunt, use_other_brunt_smoothing
          logical :: use_other_solver_monitor

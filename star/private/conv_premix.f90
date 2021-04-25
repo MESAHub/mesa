@@ -1334,7 +1334,7 @@ contains
 
   subroutine update_model_ (s, update_mode, kc_t, kc_b)
 
-    use mlt_info
+    use mlt_info_newer, only: set_mlt_vars_newer
     use micro
 
     type(star_info), pointer :: s
@@ -1397,9 +1397,9 @@ contains
     kf_t = kc_t
     kf_b = kc_b + 1
 
-    call set_mlt_vars(s, kf_t+1, kf_b-1, ierr)
+    call set_mlt_vars_newer(s, kf_t+1, kf_b-1, ierr)
     if (ierr /= 0) then
-       write(*,*) 'conv_premix: failed in call to set_mlt_vars during update_model_'
+       write(*,*) 'conv_premix: failed in call to set_mlt_vars_newer during update_model_'
        stop
     endif
 
@@ -1414,7 +1414,7 @@ contains
   subroutine dump_snapshot_ (s, filename)
 
     use brunt
-    use mlt_info
+    use mlt_info_newer, only: set_grads_newer
 
     type(star_info), pointer :: s
     character(*), intent(in) :: filename
@@ -1441,9 +1441,9 @@ contains
        stop
     end if
 
-    call set_grads(s, ierr)
+    call set_grads_newer(s, ierr)
     if (ierr /= 0) then
-       write(*,*) 'conv_premix: error from call to set_grads'
+       write(*,*) 'conv_premix: error from call to set_grads_newer'
        stop
     end if
        

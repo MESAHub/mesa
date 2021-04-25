@@ -162,9 +162,8 @@
             tol_residual_norm3, tol_max_residual3, &
             tol_abs_slope_min, tol_corr_resid_product, &
             min_corr_coeff, max_corr_min, max_resid_min, max_abs_correction
-         integer :: nz, iter, max_tries, zone, tiny_corr_cnt, i, j, k, info, &
-            last_jac_iter, max_iterations_for_jacobian, force_iter_value, &
-            reuse_count, iter_for_resid_tol2, iter_for_resid_tol3, &
+         integer :: nz, iter, max_tries, zone, tiny_corr_cnt, i, j, k, &
+            force_iter_value, iter_for_resid_tol2, iter_for_resid_tol3, &
             max_corr_k, max_corr_j, max_resid_k, max_resid_j
          integer(8) :: test_time1, time0, time1, clock_rate
          character (len=strlen) :: err_msg
@@ -309,9 +308,8 @@
          else
             max_tries = s% solver_max_tries_before_reject
          end if
-         last_jac_iter = 0
          tiny_corr_cnt = 0
-         max_iterations_for_jacobian = 1
+
          s% num_solver_iterations = 0
          
       iter_loop: do while (.not. passed_tol_tests)
@@ -350,12 +348,9 @@
                convergence_failure = .true.
                exit iter_loop
             end if
-            last_jac_iter = iter
             s% num_solver_iterations = s% num_solver_iterations + 1
-            
-         reuse_mtx_loop: do reuse_count = 0, s% num_times_solver_reuse_mtx
          
-            if (.not. solve_equ(reuse_count)) then ! either singular or horribly ill-conditioned
+            if (.not. solve_equ()) then ! either singular or horribly ill-conditioned
                write(err_msg, '(a, i5, 3x, a)') 'info', ierr, 'bad_matrix'
                call oops(err_msg)
                exit iter_loop
@@ -620,8 +615,6 @@
                   exit iter_loop
                end if
             end if
-            
-            end do reuse_mtx_loop
 
             iter=iter+1
             s% solver_iter = iter
@@ -928,26 +921,24 @@
          end subroutine apply_coeff
 
 
-         logical function solve_equ(reuse_count)
+         logical function solve_equ()
             use star_utils, only: start_time, update_time
             use rsp_def, only: NV, MAX_NZN
-            integer, intent(in) :: reuse_count
-            integer ::  i, k
+            integer ::  i, k, ierr
             real(dp) :: ferr, berr, total_time
 
             include 'formats'
-
-            solve_equ=.true.
-            !$omp simd
-            do i=1,neq
-               b1(i) = -equ1(i)
-            end do
-
-            info = 0
+            ierr = 0
+            solve_equ = .true.
 
             if (s% doing_timing) then
                call start_time(s, time0, total_time)
             end if
+            
+            !$omp simd
+            do i=1,neq
+               b1(i) = -equ1(i)
+            end do
             
             if (s% use_DGESVX_in_bcyclic) then
                !$omp simd
@@ -958,8 +949,8 @@
                end do
             end if
             
-            if (reuse_count == 0) call factor_mtx
-            if (info == 0) call solve_mtx
+            call factor_mtx(ierr)
+            if (ierr == 0) call solve_mtx(ierr)
             
             if (s% use_DGESVX_in_bcyclic) then
                !$omp simd
@@ -973,32 +964,31 @@
             if (s% doing_timing) then
                call update_time(s, time0, total_time, s% time_solver_matrix)
             end if
-
-            if (info /= 0) then
-               solve_equ=.false.
-               b(1:nvar,1:nz)=0
+            if (ierr /= 0) then
+               solve_equ = .false.
+               b(1:nvar,1:nz) = 0d0
             end if
 
          end function solve_equ
 
 
-         subroutine factor_mtx
+         subroutine factor_mtx(ierr)
             use star_bcyclic, only: bcyclic_factor
-            include 'formats'
+            integer, intent(out) :: ierr
             call bcyclic_factor( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, row_scale_factors1, col_scale_factors1, &
-               equed1, iter, info)
+               equed1, iter, ierr)
          end subroutine factor_mtx
 
 
-         subroutine solve_mtx
+         subroutine solve_mtx(ierr)
             use star_bcyclic, only: bcyclic_solve
-            include 'formats'
+            integer, intent(out) :: ierr
             call bcyclic_solve( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, soln1, row_scale_factors1, col_scale_factors1, equed1, &
-               iter, info)
+               iter, ierr)
          end subroutine solve_mtx
 
 

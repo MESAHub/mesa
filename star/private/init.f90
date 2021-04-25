@@ -437,12 +437,12 @@
             default_other_after_enter_setmatrix
          use other_diffusion, only: null_other_diffusion
          use other_diffusion_factor, only: default_other_diffusion_factor
-         use other_mlt, only: null_other_mlt
          use other_neu, only: null_other_neu
          use other_net_get, only: null_other_net_get
          use other_cgrav, only: default_other_cgrav
          use other_mesh_delta_coeff_factor, only: default_other_mesh_delta_coeff_factor
          use other_alpha_mlt, only: default_other_alpha_mlt
+         use other_mlt_results, only: null_other_mlt_results
          use other_opacity_factor, only: default_other_opacity_factor
          use other_pgstar_plots, only: null_other_pgstar_plots_info
          use other_mesh_functions
@@ -615,7 +615,7 @@
          s% other_after_enter_setmatrix => default_other_after_enter_setmatrix
          s% other_diffusion => null_other_diffusion
          s% other_diffusion_factor => default_other_diffusion_factor
-         s% other_mlt => null_other_mlt
+         s% other_mlt_results => null_other_mlt_results
          s% other_neu => null_other_neu
          s% other_net_get => null_other_net_get
          s% other_eps_grav => null_other_eps_grav
