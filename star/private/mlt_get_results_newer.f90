@@ -69,16 +69,12 @@
          gradr_ad = gradr
          grada_ad = grada
          scale_height_ad = scale_height
-         if (s% use_other_mlt) then
-            !call s% other_mlt()
-         else         
-            call Get_results_newer(s, 0, MLT_option, &
-               r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, chiRho_ad, chiT_ad, Cp_ad, &
-               gradr_ad, grada_ad, scale_height_ad, &
-               iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-               s% alpha_semiconvection, s% thermohaline_coeff, s% using_TDC, &
-               mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
-         end if
+         call Get_results_newer(s, 0, MLT_option, &
+            r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, chiRho_ad, chiT_ad, Cp_ad, &
+            gradr_ad, grada_ad, scale_height_ad, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            s% alpha_semiconvection, s% thermohaline_coeff, &
+            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          gradT = gradT_ad%val
       end subroutine get_gradT_newer
       
@@ -126,18 +122,21 @@
          end if
 
          if (center_h1 > s% semiconvection_upper_limit_center_h1) alpha_semiconvection = 0
-         if (s% use_other_mlt) then
-            !call s% other_mlt(s% id, k, &               
-            !   gradr_factor, gradL_composition_term, &
-            !   mixing_length_alpha, alpha_semiconvection, &
-            !   mixing_type, gradT, gradr, mlt_vc, D, Gamma, scale_height, ierr)
-         else         
-            call Get_results_newer(s, k, MLT_option, &
+         
+         if (s% use_other_mlt_results) then
+            call s% other_mlt_results(s% id, k, MLT_option, &
                r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
                iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-               alpha_semiconvection, s% thermohaline_coeff, s% using_TDC, &
+               alpha_semiconvection, s% thermohaline_coeff, &
                mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
+            return
          end if
+
+         call Get_results_newer(s, k, MLT_option, &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            alpha_semiconvection, s% thermohaline_coeff, &
+            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
 
       end subroutine do1_mlt_eval_newer
 
@@ -145,7 +144,7 @@
       subroutine Get_results_newer(s, k, MLT_option, &  ! NOTE: k=0 is a valid arg
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            alpha_semiconvection, thermohaline_coeff, using_TDC, &
+            alpha_semiconvection, thermohaline_coeff, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use star_utils
          type (star_info), pointer :: s
@@ -157,7 +156,6 @@
          real(dp), intent(in) :: &
             XH1, cgrav, m, gradL_composition_term, &
             mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
-         logical, intent(in) :: using_TDC
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(out) :: &
             gradT, Y_face, conv_vel, D, Gamma
@@ -166,11 +164,9 @@
          type(auto_diff_real_star_order1) :: &
             Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess
          character (len=256) :: message        
-         logical ::  okay_to_use_TDC, test_partials, compare_TDC_to_MLT, report
+         logical ::  okay_to_use_TDC, test_partials, using_TDC, compare_TDC_to_MLT, report
          include 'formats'
          
-         compare_TDC_to_MLT = .false.
-
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0          
@@ -195,11 +191,13 @@
          end if
          
          ! check if this particular k can be done with TDC
+         using_TDC = s% using_TDC
          if (using_TDC .and. k > 0 .and. s% dt > 0d0) then
             okay_to_use_TDC = (s% X(k) <= s% max_X_for_TDC)
          else
             okay_to_use_TDC = .false.
          end if
+         compare_TDC_to_MLT = s% compare_TDC_to_MLT
          
          if (report) &
             write(*,2) 'enter Get_results_newer gradr grada scale_height ' // trim(MLT_option), &
@@ -273,16 +271,6 @@
             std_D = D
             std_Gamma = Gamma
             std_scale_height = scale_height
-            if (.false.) then
-               write(*,2) 'std_mixing_type', std_mixing_type
-               write(*,2) 'grada', k, grada%val
-               write(*,2) 'std_gradT', k, std_gradT%val
-               write(*,2) 'std_gradr', k, std_gradr%val
-               write(*,2) 'std_conv_vel', k, std_conv_vel%val
-               write(*,2) 'std_Gamma', k, std_Gamma%val
-               write(*,2) 'mlt_vc_old', k, s% mlt_vc_old(k)
-               write(*,2) 'std_Y_face', k, std_gradT%val - grada%val
-            end if
             call set_TDC
             if (std_mixing_type /= mixing_type .or. &
                 abs(std_gradT%val - gradT%val) > 1d-4) then
@@ -559,6 +547,7 @@
             end if
          end do
          if (.not. converged) then
+            !$OMP critical (tdc_crit0)
             write(*,4) 'get_TDC_solution failed to converge', s% model_number, k, iter
             write(*,2) 'Q', k, Q%val
             write(*,2) 'scale', k, scale
@@ -574,6 +563,7 @@
             write(*,2) 'L0', k, L0%val
             write(*,*)
             stop 'get_TDC_solution failed to converge'
+            !$OMP end critical (tdc_crit0)
          end if
          cv = sqrt_2_div_3*unconvert(Af)   
          Y_face = unconvert(Y)

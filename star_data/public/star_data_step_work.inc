@@ -381,36 +381,16 @@
       ! mlt results related to gradT are evaluated at each iteration and at end of step
          real(dp), pointer :: gradT_sub_grada(:) ! difference at cell boundary
          real(dp), pointer :: grada_face(:) ! grada evaluated at cell boundary
-         
+         real(dp), pointer :: gradT(:) ! dlnT/dlnP (at boundary)
+         real(dp), pointer :: gradr(:) ! grad_rad (at boundary)
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
-                  
-         real(dp), pointer :: gradT(:) ! dlnT/dlnP (at boundary)
-         real(dp), pointer :: d_gradT_dlnd00(:)
-         real(dp), pointer :: d_gradT_dlnT00(:)
-         real(dp), pointer :: d_gradT_dlndm1(:)
-         real(dp), pointer :: d_gradT_dlnTm1(:)
-         real(dp), pointer :: d_gradT_dlnR(:)
-         real(dp), pointer :: d_gradT_dL(:)
+         
+         
          real(dp), pointer :: d_gradT_dln_cvpv0(:) ! when conv_vel_flag is true
          real(dp), pointer :: d_gradT_dw_div_wc(:) ! when w_div_wc_flag is true
-   
-         real(dp), pointer :: gradr(:) ! grad_rad (at boundary)
-         real(dp), pointer :: d_gradr_dlnd00(:)
-         real(dp), pointer :: d_gradr_dlnT00(:)
-         real(dp), pointer :: d_gradr_dlndm1(:)
-         real(dp), pointer :: d_gradr_dlnTm1(:)
-         real(dp), pointer :: d_gradr_dlnR(:)
-         real(dp), pointer :: d_gradr_dL(:)
          real(dp), pointer :: d_gradr_dw_div_wc(:) ! when w_div_wc_flag is true
-         
-         real(dp), pointer :: d_mlt_vc_dlnd00(:)
-         real(dp), pointer :: d_mlt_vc_dlnT00(:)
-         real(dp), pointer :: d_mlt_vc_dlndm1(:)
-         real(dp), pointer :: d_mlt_vc_dlnTm1(:)
-         real(dp), pointer :: d_mlt_vc_dlnR(:)
-         real(dp), pointer :: d_mlt_vc_dL(:)
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          

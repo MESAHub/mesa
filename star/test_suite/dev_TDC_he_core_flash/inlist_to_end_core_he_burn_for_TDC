@@ -87,6 +87,8 @@
    
    alpha_TDC_DAMP = 1d0
    alpha_TDC_DAMPR = 0d0
+   
+   max_X_for_TDC = 0d0
 
 ! mix
    mlt_make_surface_no_mixing = .true.
@@ -127,10 +129,16 @@
       terminal_interval = 10
       write_header_frequency = 10
       
-      photo_interval = 10
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
+      
+      compare_TDC_to_MLT = .true.
+      
+      !x_integer_ctrl(19) = 1300 ! k
+      x_integer_ctrl(20) = 0 ! solver iter
+      x_integer_ctrl(21) = 0 ! model_number
 
 ! FOR DEBUGGING
 

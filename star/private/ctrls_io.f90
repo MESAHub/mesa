@@ -522,7 +522,7 @@
     ! misc
     min_chem_eqn_scale, zams_filename, set_rho_to_dm_div_dV, use_other_momentum_implicit, &
     use_other_eos, use_other_surface_PT, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
-    use_other_mlt, use_other_adjust_mdot, use_other_j_for_adjust_J_lost, use_other_alpha_mlt, use_other_remove_surface, &
+    use_other_adjust_mdot, use_other_j_for_adjust_J_lost, use_other_alpha_mlt, use_other_remove_surface, &
     use_other_am_mixing, use_other_brunt, use_other_brunt_smoothing, use_other_solver_monitor, &
     use_other_build_initial_model, use_other_cgrav, use_other_energy_implicit, use_other_momentum, &
     use_other_energy, use_other_mesh_functions, use_other_eps_grav, use_other_gradr_factor, &
@@ -2407,7 +2407,6 @@
  s% use_other_kap = use_other_kap
  s% use_other_diffusion = use_other_diffusion
  s% use_other_diffusion_factor = use_other_diffusion_factor
- s% use_other_mlt = use_other_mlt
  s% use_other_adjust_mdot = use_other_adjust_mdot
  s% use_other_j_for_adjust_J_lost = use_other_j_for_adjust_J_lost
  s% use_other_alpha_mlt = use_other_alpha_mlt
@@ -4082,7 +4081,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_other_kap = s% use_other_kap
  use_other_diffusion = s% use_other_diffusion
  use_other_diffusion_factor = s% use_other_diffusion_factor
- use_other_mlt = s% use_other_mlt
  use_other_adjust_mdot = s% use_other_adjust_mdot
  use_other_j_for_adjust_J_lost = s% use_other_j_for_adjust_J_lost
  use_other_alpha_mlt = s% use_other_alpha_mlt

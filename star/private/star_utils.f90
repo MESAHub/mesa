@@ -4096,34 +4096,6 @@
          alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
          beta = 1d0 - alfa
       end subroutine get_face_weights
-      
-      
-      function wrap_mlt(val, d_val_dvb) result(val_ad)
-         real(dp), intent(in) :: val, d_val_dvb(:)
-         type(auto_diff_real_star_order1) :: val_ad
-         val_ad = 0d0
-         val_ad%val = val
-         val_ad%d1Array(i_lnd_00) = d_val_dvb(mlt_dlnd00)
-         val_ad%d1Array(i_lnT_00) = d_val_dvb(mlt_dlnT00)
-         val_ad%d1Array(i_lnd_m1) = d_val_dvb(mlt_dlndm1)
-         val_ad%d1Array(i_lnT_m1) = d_val_dvb(mlt_dlnTm1)
-         val_ad%d1Array(i_lnR_00) = d_val_dvb(mlt_dlnR)
-         val_ad%d1Array(i_L_00) = d_val_dvb(mlt_dL)
-      end function wrap_mlt
-      
-      
-      subroutine unwrap_mlt(val_ad, val, d_val_dvb)
-         type(auto_diff_real_star_order1), intent(in) :: val_ad
-         real(dp), intent(out) :: val, d_val_dvb(:)
-         val = val_ad%val
-         d_val_dvb(:) = 0d0
-         d_val_dvb(mlt_dlnd00) = val_ad%d1Array(i_lnd_00)
-         d_val_dvb(mlt_dlnT00) = val_ad%d1Array(i_lnT_00)
-         d_val_dvb(mlt_dlndm1) = val_ad%d1Array(i_lnd_m1)
-         d_val_dvb(mlt_dlnTm1) = val_ad%d1Array(i_lnT_m1)
-         d_val_dvb(mlt_dlnR) = val_ad%d1Array(i_lnR_00)
-         d_val_dvb(mlt_dL) = val_ad%d1Array(i_L_00)
-      end subroutine unwrap_mlt
 
 
       real(dp) function safe_div_val(s, x, y, lim) result(x_div_y)

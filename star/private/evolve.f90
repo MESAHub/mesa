@@ -2078,7 +2078,6 @@
                s% dq(k) = s% dq_old(k)
                s% mlt_vc(k) = s% mlt_vc_old(k)
             end do
-            
             s% okay_to_set_mlt_vc = .true.
             
             call set_qs(s, nz, s% q, s% dq, ierr)

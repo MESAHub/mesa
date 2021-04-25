@@ -1327,10 +1327,10 @@
          logical :: use_other_kap
          logical :: use_other_diffusion
          logical :: use_other_diffusion_factor
-         logical :: use_other_mlt
          logical :: use_other_adjust_mdot
          logical :: use_other_j_for_adjust_J_lost
          logical :: use_other_alpha_mlt
+         logical :: use_other_mlt_results
          logical :: use_other_am_mixing
          logical :: use_other_brunt, use_other_brunt_smoothing
          logical :: use_other_solver_monitor

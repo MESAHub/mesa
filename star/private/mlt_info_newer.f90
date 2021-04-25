@@ -46,8 +46,6 @@
 
       logical, parameter :: dbg = .false.
       integer, parameter :: kdbg = -1
-      
-      integer, parameter :: nvbs = num_mlt_partials
 
       contains
 
@@ -455,11 +453,8 @@
          real(dp), intent(in) :: f
          integer, intent(in) :: k
          logical, intent(in) :: report_mlt_compare_info
-
-         include 'formats'
-         
+         include 'formats'         
          if (report_mlt_compare_info) write(*,2) 'adjust_gradT_fraction f', k, f
-
          if (f >= 0.0 .and. f <= 1.0) then
             if (f == 0d0) then
                s% gradT_ad(k) = s% gradr_ad(k)
@@ -468,13 +463,8 @@
             end if
             s% gradT(k) = s% gradT_ad(k)%val
          end if
-         call adjust_gradT_excess(s, k, report_mlt_compare_info)
-         
+         call adjust_gradT_excess(s, k, report_mlt_compare_info)         
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k)
-         
-         if (report_mlt_compare_info) &
-            write(*,2) 'after adjust_gradT_excess gradT d_dlnd_00', k, s% gradT(k), s% d_gradT_dlnd00(k)
-
       end subroutine adjust_gradT_fraction
 
 
