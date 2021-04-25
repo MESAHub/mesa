@@ -64,7 +64,20 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% other_remove_surface => remove_ejecta_one_cell_per_step
+         s% use_other_remove_surface = .true.
       end subroutine extras_controls
+      
+      
+      subroutine remove_ejecta_one_cell_per_step(id, ierr, j)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr, j
+         ierr = 0
+         if (star_ejecta_mass(id) > 0.1d0*Msun) then
+            call star_remove_surface_at_cell_k(id, 2, ierr)
+            write(*,2) 'remove_ejecta_one_cell_per_step', s% model_number
+         end if
+      end  subroutine remove_ejecta_one_cell_per_step
       
       
       subroutine extras_startup(id, restart, ierr)

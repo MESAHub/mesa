@@ -3198,6 +3198,28 @@
             s, limit, hard_limit, value, msg, skip_hard_limit, dt, dt_limit_ratio)
       end function check_change_integer_timestep_limit
       
+      
+      real(dp) function star_remnant_mass(id)
+         use star_utils, only: get_remnant_mass
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer ::  ierr
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         star_remnant_mass = get_remnant_mass(s)
+      end function star_remnant_mass
+      
+      
+      real(dp) function star_ejecta_mass(id)
+         use star_utils, only: get_ejecta_mass
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer ::  ierr
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         star_ejecta_mass = get_ejecta_mass(s)
+      end function star_ejecta_mass
+      
 
       ! Returns the next available star id
       integer function star_find_next_star_id()
