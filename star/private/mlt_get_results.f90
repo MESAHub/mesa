@@ -162,7 +162,7 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: &
-            Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess
+            Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess, gradT_actual
          character (len=256) :: message        
          logical ::  okay_to_use_TDC, test_partials, using_TDC, compare_TDC_to_MLT, report
          include 'formats'
@@ -212,9 +212,16 @@
             call set_no_mixing('vals too small')
             return
          end if
+            
+         gradT_actual = safe_div(s, wrap_lnT_m1(s,k) - wrap_lnT_00(s,k), &
+                          wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
+         Y_guess = gradT_actual - grada ! use actual gradT to guess Y_face
            
-         if (report) write(*,2) 'gradr gradL grada comp_term', &
-            k, gradr%val, gradL%val, grada%val, gradL_composition_term
+         if (report) write(*,2) 'gradr gradL grada comp_term gradT_actual Y_guess', &
+            k, gradr%val, gradL%val, grada%val, gradL_composition_term, gradT_actual%val, Y_guess%val
+            
+         ! using TDC only for Y_guess > 0 for now
+         okay_to_use_TDC = okay_to_use_TDC .and. Y_guess%val > 0d0
          
          if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
             ! TDC replaces all other types
@@ -272,11 +279,14 @@
             std_Gamma = Gamma
             std_scale_height = scale_height
             call set_TDC
-            if (std_mixing_type /= mixing_type .or. &
-                abs(std_gradT%val - gradT%val) > 1d-4) then
-               write(*,4) 'mix type gradT', k, std_mixing_type, mixing_type, &
-                  std_gradT%val - gradT%val
-               stop 'do_compare_TDC_to_MLT'
+            if (report .or. s% x_integer_ctrl(19) <= 0) then
+               if (std_mixing_type /= mixing_type .or. &
+                   abs(std_gradT%val - gradT%val) > 1d-4) then
+                  write(*,6) 'mix type gradT k, solvr_iter model std_mx tdc_mx', &
+                     k, s% solver_iter, s% model_number, std_mixing_type, mixing_type, &
+                     std_gradT%val, gradT%val
+                  stop 'do_compare_TDC_to_MLT'
+               end if
             end if
          end subroutine do_compare_TDC_to_MLT
 
@@ -286,11 +296,8 @@
             if (k == 1) then
                call set_no_mixing('set_TDC')
             else
-               gradT = (wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)) / &
-                       (wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
-               Y_guess = gradT - grada ! use actual gradT to guess Y_face
                call get_TDC_solution(s, k, &
-                  mixing_length_alpha, cgrav, m, Y_guess, &
+                  mixing_length_alpha, cgrav, m, Y_guess, report, &
                   mixing_type, L, r, P, T, rho, Cp, opacity, &
                   scale_height, grada, conv_vel, Y_face, ierr)
                if (ierr /= 0) then
@@ -488,7 +495,7 @@
       
       
       subroutine get_TDC_solution(s, k, &
-            mixing_length_alpha, cgrav, m, Y_guess, &
+            mixing_length_alpha, cgrav, m, Y_guess, report, &
             mixing_type, L, r, P, T, rho, Cp, kap, Hp, grada, cv, Y_face, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -496,12 +503,13 @@
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(in) :: &
             L, r, P, T, rho, Cp, kap, Hp, grada, Y_guess
+         logical, intent(in) :: report
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ
-         real(dp) ::  tolerance, gradT, Lr, Lc, scale
+         real(dp) ::  tolerance, gradT, Lr, Lc, scale, abs_Y_approaching_zero
          integer :: iter, max_iter
          logical :: converged, Y_is_positive
          include 'formats'
@@ -521,23 +529,36 @@
          if (Y == 0d0) Y = 1d-30
          Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
          Y_is_positive = (Y > 0d0)
-         tolerance = 1d-8 ! ??
-         max_iter = 20 ! ??
+         tolerance = 1d-4 ! ??
+         abs_Y_approaching_zero = 1d-7 ! ??
+         max_iter = 100 ! ??
          converged = .false.
          scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
+         if (report) write(*,*)
+         if (report) write(*,2) 'initial Y', 0, Y%val
          do iter = 1, max_iter
             call compute_Q(s, k, mixing_length_alpha, &
                Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, grada, Q, Af)
+            if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
             if (is_bad(Q%val)) exit
             if (abs(Q%val)/scale <= tolerance) then
+               if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
                converged = .true.
                exit
             end if
+!            if (abs(Y%val) < abs_Y_approaching_zero) then     ! TESTING
+!               if (report) write(*,2) 'abs_Y_approaching_zero', iter, Y%val
+!               converged = .true.
+!               exit
+!            end if
             dQdZ = differentiate_1(Q)
             if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
+               if (report) write(*,2) 'dQdZ', iter, dQdZ%val
                exit
             end if
-            Z_new = Z - Q / dQdZ
+            Z_new = Z - Q/dQdZ
+            if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
+               Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
             Z_new%d1val1 = 1d0            
             Z = Z_new
             if (Y_is_positive) then
@@ -545,25 +566,29 @@
             else
                Y = -exp(Z)
             end if
+            if (report) write(*,2) 'new Y', iter, Y%val
          end do
          if (.not. converged) then
+            if (report .or. s% x_integer_ctrl(19) <= 0) then
             !$OMP critical (tdc_crit0)
-            write(*,4) 'get_TDC_solution failed to converge', s% model_number, k, iter
-            write(*,2) 'Q', k, Q%val
-            write(*,2) 'scale', k, scale
-            write(*,2) 'Q/scale', k, Q%val/scale
-            write(*,2) 'tolerance', k, tolerance
-            write(*,2) 'dQdZ', k, dQdZ%val
-            write(*,2) 'Y', k, Y%val
-            write(*,2) 'exp(Z)', k, exp(Z%val)
-            write(*,2) 'Z', k, Z%val
-            write(*,2) 'Af', k, Af%val
-            write(*,2) 'A0', k, A0%val
-            write(*,2) 'c0', k, c0%val
-            write(*,2) 'L0', k, L0%val
-            write(*,*)
-            stop 'get_TDC_solution failed to converge'
+               write(*,4) 'failed get_TDC_solution k slvr_iter model', &
+                  k, s% solver_iter, s% model_number
+               write(*,2) 'Q', k, Q%val
+               write(*,2) 'scale', k, scale
+               write(*,2) 'Q/scale', k, Q%val/scale
+               write(*,2) 'tolerance', k, tolerance
+               write(*,2) 'dQdZ', k, dQdZ%val
+               write(*,2) 'Y', k, Y%val
+               write(*,2) 'exp(Z)', k, exp(Z%val)
+               write(*,2) 'Z', k, Z%val
+               write(*,2) 'Af', k, Af%val
+               write(*,2) 'A0', k, A0%val
+               write(*,2) 'c0', k, c0%val
+               write(*,2) 'L0', k, L0%val
+               write(*,*)
+               stop 'get_TDC_solution failed to converge'
             !$OMP end critical (tdc_crit0)
+            end if
          end if
          cv = sqrt_2_div_3*unconvert(Af)   
          Y_face = unconvert(Y)

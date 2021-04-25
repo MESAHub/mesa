@@ -819,10 +819,14 @@
             use hydro_rotation, only: set_surf_avg_rotation_info
             integer, intent(out) :: ierr
             include 'formats'
+            
             select_mdot_action = exit_loop
-            if (s% mstar_dot == 0) return
+            if (s% mstar_dot == 0 .or. max_mdot_redo_cnt <= 0) return
+               ! the test of max_mdot_redo_cnt <= 0 belongs here.  it was erroneously placed
+               ! after possible select_mdot_action = cycle_loop, return.  BP: Apr 25, 2021.
+            
             if (iwind_redo_cnt < iwind_max_redo_cnt .and. iwind_lambda > 0d0) then
-               ! check if mdot calculated at end of step is close enought to what used
+               ! check mdot calculated at end of step
                call get_phot_info(s, ph_x, ph_x, ph_x, ph_L, ph_x, ph_x, ph_x, ph_x, ph_x, ph_k)
                call set_mdot(s, ph_L, s% mstar, s% Teff, ierr)
                if (ierr /= 0) then
@@ -838,32 +842,23 @@
                   s% need_to_setvars = .true.
                   s% mstar_dot = explicit_mdot + &
                      iwind_lambda*(implicit_mdot - explicit_mdot)
-                  if (.false.) write(*,3) 'implicit mdot: diff/new old new next', &
-                     iwind_redo_cnt, s% model_number, &
-                     1d0 - explicit_mdot/implicit_mdot, &
-                     explicit_mdot, implicit_mdot, s% mstar_dot
                   explicit_mdot = s% mstar_dot
                   do_step_part2 = prepare_for_new_try(s)
                   if (do_step_part2 /= keep_going) return
                   iwind_redo_cnt = iwind_redo_cnt + 1
                   s% need_to_setvars = .true.
-                  !cycle implicit_mdot_loop
                   select_mdot_action = cycle_loop
                   return
                end if
                iwind_max_redo_cnt = iwind_redo_cnt ! done with implicit wind
-               if (.false.) write(*,3) 'implicit mdot: diff/new old new', &
-                  iwind_redo_cnt, s% model_number, &
-                  1d0 - explicit_mdot/implicit_mdot, explicit_mdot, implicit_mdot
             end if
 
-            ! check for omega > omega_crit
-
-            if (.not. s% rotation_flag .or. max_mdot_redo_cnt <= 0) then
-               !exit implicit_mdot_loop
+            if (.not. s% rotation_flag) then
                select_mdot_action = exit_loop
                return
             end if
+            
+            ! check for omega > omega_crit
 
             mstar_dot_prev = mstar_dot
             mstar_dot = s% mstar_dot
@@ -902,7 +897,6 @@
                   s% result_reason = nonzero_ierr
                   return
                end if
-               !exit implicit_mdot_loop
                select_mdot_action = exit_loop
                return
             end if
@@ -916,7 +910,6 @@
             if (w_div_w_crit <= surf_omega_div_omega_crit_limit &
                   .and. mdot_redo_cnt == 0) then
                s% was_in_implicit_wind_limit = .false.
-               !exit implicit_mdot_loop
                select_mdot_action = exit_loop
                return
             end if
@@ -936,7 +929,6 @@
                if (.true.) write(*,1) &
                   'dt too small for fix to fix w > w_crit; min_years_dt_for_redo_mdot', &
                   dt/secyer, s% min_years_dt_for_redo_mdot
-               !exit implicit_mdot_loop
                select_mdot_action = exit_loop
                return
             end if
@@ -969,7 +961,6 @@
                abs_mstar_delta = abs(s% mstar_dot)
 
                s% need_to_setvars = .true.
-               !cycle implicit_mdot_loop
                select_mdot_action = cycle_loop
                return
 
@@ -985,8 +976,7 @@
                write(*,3) 'OKAY', s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
                write(*,*)
-               !exit implicit_mdot_loop ! in bounds so accept it
-               select_mdot_action = exit_loop
+               select_mdot_action = exit_loop ! in bounds so accept it
                return
             end if
 
@@ -999,7 +989,6 @@
                   s% result_reason = nonzero_ierr
                   return
                end if
-               !exit implicit_mdot_loop
                select_mdot_action = exit_loop
                return
             end if

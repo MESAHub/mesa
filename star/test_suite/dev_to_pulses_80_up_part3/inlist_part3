@@ -6,8 +6,8 @@
       save_model_when_terminate = .true.
       save_model_filename = 'part3.mod'
       
-      required_termination_code_string(1) = 'fe_core_infall_limit'  ! for lower masses
-      required_termination_code_string(2) = 'log_Rsurf_upper_limit' ! for higher masses
+      required_termination_code_string(1) = 'fe_core_infall_limit'
+      required_termination_code_string(2) = 'log_Rsurf_upper_limit'
       required_termination_code_string(3) = 'ejecta_mass_max_limit'
       !required_termination_code_string(4) = 'max_model_number' ! for testing
       
@@ -29,15 +29,20 @@
 
 &controls   
       ! limit max_model_number as part of test_suite
-      max_model_number = 100000      
+      max_model_number = 8000     
       !max_number_retries = 30
       
-      ejecta_mass_max_limit = 6d0 ! tuned for test_suite to reduce work for testing
+      ejecta_mass_max_limit = 7.5d0
+      log_Rsurf_upper_limit = 4d0
+      fe_core_infall_limit = 1d7
 
-      log_Rsurf_upper_limit = 4d0 ! for higher masses
-      fe_core_infall_limit = 1d7 ! for lower masses
-
-! wind
+! wind         ! try using rlo wind in place of log_Rsurf_upper_limit
+      rlo_scaling_factor = 1d0
+      rlo_wind_min_L = 1d-6
+      rlo_wind_max_Teff = 1d99
+      rlo_wind_roche_lobe_radius = 1d4   ! Only on when R > this (Rsun).
+      rlo_wind_base_mdot = 1d-3  ! Base rate of mass loss when R = roche lobe radius (Msun/year).
+      rlo_wind_scale_height = 1d-1  ! Determines exponential growth rate of mass loss (Rsun).
 
 ! atmosphere
 
