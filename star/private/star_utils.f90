@@ -1951,7 +1951,13 @@
          v_div_vesc_prev = 0d0
          do k=1,s% nz
             if (s% u_flag) then
-               v = s% u_face_ad(k)%val
+               !v = s% u_face_ad(k)%val ! CANNOT USE u_face for this 
+               ! approximate value is good enough for this estimate
+               if (k == 1) then
+                  v = s% u(k)
+               else
+                  v = 0.5d0*(s% u(k-1) + s% u(k))
+               end if
             else
                v = s% v(k)
             end if

@@ -305,7 +305,7 @@
       
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
-         use star_utils, only: calc_Ptot_ad_tw
+         use star_utils, only: calc_Ptot_ad_tw, get_face_weights
          use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s 
          integer, intent(in) :: k
@@ -319,7 +319,7 @@
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
          real(dp), dimension(s% species) :: d_Ptot_dxa ! skip this
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
-         real(dp) :: dG_dw_div_wc, delta_m, f
+         real(dp) :: alfa, beta, dG_dw_div_wc, delta_m, f
             
          include 'formats'
          
@@ -369,6 +369,19 @@
 
          delta_m = -0.5d0*s% dm(k-1) ! negative delta_m from right center to edge
          PR_ad = PR_ad + delta_m*dPdm_grav_ad
+         
+         if (s% skip_HLLC_in_ejecta) then
+            if (s% m(k) > s% remnant_mass_start) then
+               call get_face_weights(s, k, alfa, beta)
+               s% u_face_ad(k) = alfa*uL_ad + beta*uR_ad
+               s% P_face_ad(k) = alfa*PL_ad + beta*PR_ad
+               if (s% P_face_start(k) < 0d0) then
+                  s% u_face_start(k) = s% u_face_ad(k)%val
+                  s% P_face_start(k) = s% P_face_ad(k)%val
+               end if
+               return
+            end if
+         end if
             
          ! acoustic wavespeeds (eqn 2.38)
          Sl1_ad = uL_ad - csL_ad

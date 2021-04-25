@@ -10333,6 +10333,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! check_remnant_only_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! skip_HLLC_in_ejecta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -10340,6 +10342,7 @@
     min_q_for_dt_div_min_dr_div_cs_limit = 0.005d0
     max_q_for_dt_div_min_dr_div_cs_limit = 0.995d0
     check_remnant_only_for_dt_div_min_dr_div_cs_limit = .false.
+    skip_HLLC_in_ejecta = .false.
 
 
       ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
