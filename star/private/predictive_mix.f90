@@ -690,7 +690,7 @@ contains
 
     use eos_def
     use micro
-    use mlt_info_newer, only: do1_mlt_2_newer
+    use mlt_info, only: do1_mlt_2
 
     type(star_info), pointer :: s
     integer, intent(in)      :: k_bot_mz
@@ -816,7 +816,7 @@ contains
        s%rho_face(k) = w*exp(s%lnd(k)) + (1._dp-w)*exp(s%lnd(k-1))
 
        ! Evaluate mixing coefficients etc.
-       call do1_mlt_2_newer(s, k, make_gradr_sticky_in_solver_iters, op_err)
+       call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err)
        if (op_err /= 0) stop 'non-zero op_err'
 
        D(k) = s%mlt_D(k)
@@ -866,7 +866,7 @@ contains
     restore_face_loop: do k = k_a, k_b
 
        s%rho_face(k) = rho_face_save(k)
-       call do1_mlt_2_newer(s, k, &
+       call do1_mlt_2(s, k, &
             make_gradr_sticky_in_solver_iters, op_err)
        if (op_err /= 0) stop 'non-zero op_err'
 
