@@ -35,13 +35,7 @@
       fe_core_infall_limit = 2.5d7
       remnant_mass_min_limit = 20d0 ! stop here for completely unbound cases
 
-! wind         ! try using rlo wind in place of log_Rsurf_upper_limit
-      rlo_scaling_factor = 1d0
-      rlo_wind_min_L = 1d-6
-      rlo_wind_max_Teff = 1d99
-      rlo_wind_roche_lobe_radius = 1d4   ! RLO wind is on when R > this (Rsun).
-      rlo_wind_base_mdot = 1d-2  ! Base rate of mass loss when R = roche lobe radius (Msun/year).
-      rlo_wind_scale_height = 1d-1  ! Determines exponential growth rate of mass loss (Rsun).
+! wind
 
 ! atmosphere
 
@@ -53,6 +47,7 @@
       
 ! timesteps
       check_remnant_only_for_dt_div_min_dr_div_cs_limit = .true.
+      max_q_for_dt_div_min_dr_div_cs_limit = 0.999999
 
 ! mesh
 
@@ -81,10 +76,10 @@
       trace_history_value_name(7) = 'log_rel_run_E_err'
       
 
-      photo_interval = 10
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
 
@@ -171,7 +166,7 @@ Profile_Panels3_xmin = 15 ! 0.0
 Profile_Panels3_xmax = -101d0
 Profile_Panels3_xaxis_reversed = .false.
 
-Profile_Panels3_xaxis_name = 'zone'
+Profile_Panels3_xaxis_name = 'zone' ! 'logxq' !  
 Profile_Panels3_xmin = -101d0
 Profile_Panels3_xmax = -101d0
 Profile_Panels3_xaxis_reversed = .true.
@@ -194,7 +189,7 @@ Profile_Panels3_yaxis_name(4) = 'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
     Profile_Panels3_other_dymin(4) = 12
  
-Profile_Panels3_yaxis_name(5) = 'log_dr_div_cs' !  'logT'
+Profile_Panels3_yaxis_name(5) = 'logT'
     Profile_Panels3_ymin(5) = -101 
 Profile_Panels3_other_yaxis_name(5) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(5) = 0.15

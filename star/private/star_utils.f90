@@ -1551,6 +1551,7 @@
          min_abs_du_div_cs = &
             s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          do k = k_min, nz-1
+            if (s% m(k) > remnant_mass) cycle
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit
             if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
