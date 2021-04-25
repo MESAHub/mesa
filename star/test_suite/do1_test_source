@@ -29,7 +29,7 @@ do_one custom_rates "stop because log_center_temperature >= log_center_temp_limi
 do_one dev_RSP2 "RSP2 good match for period" "final.mod" skip
 do_one dev_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-#   Bill needs to fix     do_one dev_to_pulses_80_up_part1 "log_max_temperature >= log_max_temp_upper_limit" "part1.mod" skip
+do_one dev_to_pulses_80_up_part1 "log_max_temperature >= log_max_temp_upper_limit" "part1.mod" skip
 do_one dev_to_pulses_80_up_part2 "stop because ejecta_mass >= ejecta_mass_max_limit" "part2.mod" skip
 do_one dev_to_pulses_80_up_part3 "stop because ejecta_mass >= ejecta_mass_max_limit" "part3.mod" skip
 do_one dev_to_pulses_80_up_part4 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
