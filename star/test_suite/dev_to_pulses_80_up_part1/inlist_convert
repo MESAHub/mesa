@@ -47,10 +47,10 @@
 ! output
       num_trace_history_values = 0
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 ! FOR DEBUGGING
 

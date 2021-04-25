@@ -84,10 +84,10 @@ SRCS = \
    other_energy_implicit.f90 \
    other_cgrav.f90 \
    other_opacity_factor.f90 \
-   other_mlt.f90 \
    other_adjust_mlt_gradt_fraction.f90 \
    other_after_set_mixing_info.f90 \
    other_after_enter_setmatrix.f90 \
+	other_mlt_results.f90 \
    other_neu.f90 \
    other_net_get.f90 \
    other_diffusion_coefficients.f90 \
@@ -127,10 +127,7 @@ SRCS = \
    overshoot_exp.f90 \
    overshoot_step.f90 \
    mlt_get_results_newer.f90 \
-   mlt_get_results_new.f90 \
-   mlt_get_results.f90 \
    mlt_info_newer.f90 \
-   mlt_info.f90 \
    rotation_mix_info.f90 \
    mix_info.f90 \
    kap_support.f90 \

@@ -537,55 +537,6 @@
       end type pgstar_hist_node
 
       
-      ! Basic MLT results
-      
-      integer, parameter :: mlt_gradT = 1 ! actual temperature gradient dlnT/dlnP
-      
-      integer, parameter :: mlt_gradr = 2 ! radiative temperature gradient
-            ! dlnT/dlnP required for purely radiative transport
-      
-      integer, parameter :: mlt_gradL = 3 ! Ledoux criterion temperature gradient
-            ! Ledoux stable if gradL > gradr
-      
-      integer, parameter :: mlt_scale_height = 4 ! [cm]
-            ! if alt_scale_height is false, then the usual P/(grav*rho)
-            ! otherwise, min of the usual and sound speed * hydro time scale, sqrt(P/G)/rho
-      
-      integer, parameter :: mlt_Lambda = 5 ! mixing_length [cm]
-            ! mixing_length_alpha * scale_height
-      
-      integer, parameter :: mlt_convection_velocity = 6 ! [cm/sec]
-            ! note that where the convective efficiency is small, the velocity becomes large
-            ! and MLT can actually return supersonic convection velocities in some cases
-      
-      integer, parameter :: mlt_D = 7 ! diffusion coefficient in units of cm^2/second
-            ! D = convection_velocity*mixing_length/3
-      
-      integer, parameter :: mlt_Gamma = 8 ! convective efficiency
-      
-      integer, parameter :: mlt_debug = 9
-            
-      integer, parameter :: num_mlt_results = 9
-      character (len=24) :: mlt_results_str(num_mlt_results)
-      
-      
-      ! partials
-
-      integer, parameter :: mlt_dlnd00 = 1
-      integer, parameter :: mlt_dlnT00 = mlt_dlnd00 + 1
-      integer, parameter :: mlt_dlndm1 = mlt_dlnT00 + 1
-      integer, parameter :: mlt_dlnTm1 = mlt_dlndm1 + 1
-      integer, parameter :: mlt_dlnR = mlt_dlnTm1 + 1
-      integer, parameter :: mlt_dL = mlt_dlnR + 1
-      integer, parameter :: mlt_cv_var = mlt_dL + 1
-      integer, parameter :: mlt_w_div_wc_var = mlt_cv_var + 1
-      
-      integer, parameter :: num_mlt_partials = mlt_w_div_wc_var
-
-      character (len=24) :: mlt_partial_str(num_mlt_partials)
-
-
-
       integer, parameter :: max_generations = 3
       integer, parameter :: net_name_len = strlen
       integer, parameter :: name_len = 80           
@@ -970,79 +921,36 @@
             real(dp), pointer :: work(:) ! (lwork)
             integer, intent(out) :: ierr ! 0 means okay
          end subroutine other_net_get_interface
-      
-      
-         subroutine other_mlt_interface( &
-            id, k, cgrav, m, mstar, r, L, X, &            
-            T_face, rho_face, P_face, &
-            chiRho_face, chiT_face, &
-            Cp_face, opacity_face, grada_face, &            
-            alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
-            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-            chiRho_for_partials_00, chiT_for_partials_00, &
-            chiRho_for_partials_m1, chiT_for_partials_m1, &
-            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
-            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-            alpha_semiconvection, semiconvection_option, &
-            thermohaline_coeff, thermohaline_option, &
-            dominant_iso_for_thermohaline, &
-            mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
-            MLT_option, Henyey_y_param, Henyey_nu_param, &
-            normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, just_gradr, &
-            mixing_type, mlt_basics, mlt_partials1, ierr)
-            use const_def, only: dp
-            integer, intent(in) :: id ! id for star         
-            integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
-            real(dp), intent(in) :: &
-               cgrav, m, mstar, r, L, X, &            
-               T_face, rho_face, P_face, &
-               chiRho_face, chiT_face, &
-               Cp_face, opacity_face, grada_face, &            
-               alfa, beta, &
-               T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-               chiRho_for_partials_00, chiT_for_partials_00, &
-               chiRho_for_partials_m1, chiT_for_partials_m1, &
-               chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-               chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-               chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-               chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-               Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-               Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-               opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-               opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-               grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-               grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &
-               gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-               alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
-               Henyey_y_param, Henyey_nu_param, &
-               max_conv_vel, dt, tau, remove_small_D_limit, &
-               normal_mlt_gradT_factor
-            logical, intent(in) :: alt_scale_height
-            character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
-            integer, intent(in) :: dominant_iso_for_thermohaline
-            logical, intent(in) :: just_gradr
-            integer, intent(out) :: mixing_type
-            real(dp), intent(inout) :: mlt_basics(:) ! (num_mlt_results)
-            real(dp), intent(inout), pointer :: mlt_partials1(:) ! =(num_mlt_partials, num_mlt_results)
-            integer, intent(out) :: ierr
-         end subroutine other_mlt_interface
 
          
          subroutine other_adjust_mlt_gradT_fraction_interface(id, ierr)
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine other_adjust_mlt_gradT_fraction_interface
-      
+
+
+         subroutine other_mlt_results_interface(id, k, MLT_option, &  ! NOTE: k=0 is a valid arg
+               r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+               iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+               alpha_semiconvection, thermohaline_coeff, &
+               mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+            use const_def, only: dp
+            use auto_diff
+            integer, intent(in) :: id
+            integer, intent(in) :: k
+            character (len=*), intent(in) :: MLT_option
+            type(auto_diff_real_star_order1), intent(in) :: &
+               r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height
+            integer, intent(in) :: iso
+            real(dp), intent(in) :: &
+               XH1, cgrav, m, gradL_composition_term, &
+               mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
+            integer, intent(out) :: mixing_type
+            type(auto_diff_real_star_order1), intent(out) :: &
+               gradT, Y_face, conv_vel, D, Gamma
+            integer, intent(out) :: ierr
+         end subroutine other_mlt_results_interface
+
       
          subroutine other_after_set_mixing_info_interface(id, ierr)
             integer, intent(in) :: id

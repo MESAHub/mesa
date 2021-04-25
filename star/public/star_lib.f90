@@ -3053,7 +3053,7 @@
       
       
       subroutine star_set_mlt_vars(id, nzlo, nzhi, ierr)
-         use mlt_info, only: set_mlt_vars
+         use mlt_info_newer, only: set_mlt_vars_newer
          use star_def
          integer, intent(in) :: id ! id for star         
          integer, intent(in) :: nzlo, nzhi ! range of cell numbers   
@@ -3061,8 +3061,39 @@
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return                  
-         call set_mlt_vars(s, nzlo, nzhi, ierr)
+         call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
       end subroutine star_set_mlt_vars
+
+      subroutine star_mlt_results(id, k, MLT_option, &  ! NOTE: k=0 is a valid arg
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            alpha_semiconvection, thermohaline_coeff, &
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+         use const_def, only: dp
+         use auto_diff
+         use mlt_get_results_newer, only: Get_results_newer
+         integer, intent(in) :: id
+         integer, intent(in) :: k
+         character (len=*), intent(in) :: MLT_option
+         type(auto_diff_real_star_order1), intent(in) :: &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height
+         integer, intent(in) :: iso
+         real(dp), intent(in) :: &
+            XH1, cgrav, m, gradL_composition_term, &
+            mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
+         integer, intent(out) :: mixing_type
+         type(auto_diff_real_star_order1), intent(out) :: &
+            gradT, Y_face, conv_vel, D, Gamma
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s         
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return  
+         call Get_results_newer(s, k, MLT_option, &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            alpha_semiconvection, thermohaline_coeff, &
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+      end subroutine star_mlt_results
 
 
       subroutine star_do_garbage_collection(id, ierr)

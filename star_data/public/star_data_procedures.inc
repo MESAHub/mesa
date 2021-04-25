@@ -101,16 +101,17 @@
          procedure (other_overshooting_scheme_interface), pointer, nopass :: &
             other_overshooting_scheme => null()
          
-         procedure (other_mlt_interface), pointer, nopass :: &
-            other_mlt => null()
          procedure (other_solver_monitor_interface), pointer, nopass :: &
             other_solver_monitor => null()
          procedure (other_neu_interface), pointer, nopass :: &
             other_neu => null()
          procedure (other_net_get_interface), pointer, nopass :: &
             other_net_get => null()
+            
          procedure (other_adjust_mlt_gradT_fraction_interface), pointer, nopass :: &
             other_adjust_mlt_gradT_fraction => null()
+         procedure (other_mlt_results_interface), pointer, nopass :: &
+            other_mlt_results => null()
          procedure (other_after_set_mixing_info_interface), pointer, nopass :: &
             other_after_set_mixing_info => null()
          procedure (other_diffusion_interface), pointer, nopass :: &

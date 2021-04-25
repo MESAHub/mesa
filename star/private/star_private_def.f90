@@ -82,40 +82,6 @@
          auto_diff_star_d1_names(i_xtra3_m1) = 'i_xtra3_m1'
          auto_diff_star_d1_names(i_xtra3_00) = 'i_xtra3_00'
          auto_diff_star_d1_names(i_xtra3_p1) = 'i_xtra3_p1'
-         
-         mlt_results_str(1:num_mlt_results) = ''
-         mlt_results_str(mlt_gradT) = 'gradT'
-         mlt_results_str(mlt_gradr) = 'gradr'
-         mlt_results_str(mlt_gradL) = 'gradL'
-         mlt_results_str(mlt_scale_height) = 'Hp'
-         mlt_results_str(mlt_Lambda) = 'Lambda'
-         mlt_results_str(mlt_convection_velocity) = 'vc'
-         mlt_results_str(mlt_D) = 'D'
-         mlt_results_str(mlt_Gamma) = 'Gamma'
-         mlt_results_str(mlt_debug) = 'debug'
-         
-         mlt_partial_str(1:num_mlt_partials) = ''
-         mlt_partial_str(mlt_dlnd00) = 'dlnd00'
-         mlt_partial_str(mlt_dlnT00) = 'dlnT00'
-         mlt_partial_str(mlt_dlndm1) = 'dlndm1'
-         mlt_partial_str(mlt_dlnTm1) = 'dlnTm1'
-         mlt_partial_str(mlt_dlnR) = 'dlnR'
-         mlt_partial_str(mlt_dL) = 'dL'
-         mlt_partial_str(mlt_cv_var) = 'cv_var'
-         mlt_partial_str(mlt_w_div_wc_var) = 'w_div_wc_var'
-
-         do i=1,num_mlt_partials
-            if (len_trim(mlt_partial_str(i)) == 0) then
-               if (i > 1) then
-                  im1 = i-1
-                  write(*,2) 'missing mlt_partial_str following ' // &
-                     trim(mlt_partial_str(im1)), i
-               else
-                  write(*,2) 'missing mlt_partial_str 1'
-               end if
-               okay = .false.
-            end if
-         end do
 
          termination_code_str(1:num_termination_codes) = ''
 

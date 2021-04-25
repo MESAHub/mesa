@@ -731,7 +731,6 @@ contains
     integer  :: k
     real(dp) :: w
     real(dp) :: rho_face_save(s%nz)
-    real(dp) :: gradL_composition_term
     integer  :: op_err
     logical  :: make_gradr_sticky_in_solver_iters
 
@@ -817,10 +816,7 @@ contains
        s%rho_face(k) = w*exp(s%lnd(k)) + (1._dp-w)*exp(s%lnd(k-1))
 
        ! Evaluate mixing coefficients etc.
-       gradL_composition_term = 0._dp
-       call do1_mlt_2_newer(s, k, s% alpha_mlt(k), gradL_composition_term, &
-            -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, &
-            make_gradr_sticky_in_solver_iters, op_err)
+       call do1_mlt_2_newer(s, k, make_gradr_sticky_in_solver_iters, op_err)
        if (op_err /= 0) stop 'non-zero op_err'
 
        D(k) = s%mlt_D(k)
@@ -870,9 +866,7 @@ contains
     restore_face_loop: do k = k_a, k_b
 
        s%rho_face(k) = rho_face_save(k)
-       gradL_composition_term = 0._dp
-       call do1_mlt_2_newer(s, k, s% alpha_mlt(k), gradL_composition_term, &
-            -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, -1._dp, &
+       call do1_mlt_2_newer(s, k, &
             make_gradr_sticky_in_solver_iters, op_err)
        if (op_err /= 0) stop 'non-zero op_err'
 
