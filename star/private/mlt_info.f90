@@ -36,11 +36,11 @@
 
       private
       public :: &
-         set_mlt_vars, &
-         do1_mlt_2, &
-         switch_to_radiative, &
-         check_for_redo_MLT, &
-         set_gradT_excess_alpha
+         set_mlt_vars, & ! for hydro_vars and conv_premix
+         do1_mlt_2, & ! for predictive_mix
+         switch_to_radiative, & ! mix_info
+         check_for_redo_MLT, & ! for hydro_vars
+         set_gradT_excess_alpha ! for evolve
 
 
       contains

@@ -36,7 +36,10 @@
       implicit none
       
       private
-      public :: get_gradT, do1_mlt_eval, Get_results
+      public :: &
+         get_gradT, & ! for pre_ms_model
+         do1_mlt_eval, & ! for mlt_info
+         Get_results ! for star_lib
 
       contains
       
