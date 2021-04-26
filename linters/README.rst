@@ -18,3 +18,17 @@ This script checks that the history and profile code and the
 *_columns.list files are in sync.  (NOTE: It currently exhibits some
 false positives, especially related to RSP due to case-sensitivity.)
 
+mesa_linter.py
+--------------
+
+Checks fortrans files for consistency with MESA's style guide.
+
+Run over files and provide details of failures:
+.. code-block:: shell
+	 python3 mesa-linter.py *.f90
+	 
+Provides only a count per file of the number of issues found:
+.. code-block:: shell
+	 python3 mesa-linter.py -s *.f90
+
+
