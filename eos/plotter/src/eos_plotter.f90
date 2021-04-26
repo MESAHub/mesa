@@ -7,6 +7,7 @@ program eos_plotter
    use const_lib
    use math_lib
    use num_lib, only : dfridr
+   use utils_lib, only: set_nan
 
    implicit none
 
@@ -45,6 +46,7 @@ program eos_plotter
 
    real(dp) :: var, dvardx_0, dvardx, err, dx_0, xdum
    logical :: doing_partial, doing_dfridr, doing_d_dlnd, doing_consistency, ignore_ierr
+   logical :: only_blend_regions
 
    character(len=4) :: xname, yname
 
@@ -58,7 +60,7 @@ program eos_plotter
       X_center, delta_X, Z_center, delta_Z, &
       X_min, X_max, Z_min, Z_max, &
       xname, yname, doing_partial, doing_dfridr, doing_d_dlnd, doing_consistency, &
-      i_var, i_eos, i_eos_other, i_cons, ignore_ierr
+      i_var, i_eos, i_eos_other, i_cons, ignore_ierr, only_blend_regions
 
 
    include 'formats'
@@ -394,6 +396,11 @@ program eos_plotter
             res1 = abs(res1)
          end if
 
+
+         if (only_blend_regions .and. .not. in_eos_blend(res)) then
+            call set_nan(res1)
+         end if
+
          write(iounit,*) kval, jval, res1
       end do
    end do
@@ -563,5 +570,26 @@ contains
          end if
 
    end subroutine eos_call
+
+
+   logical function in_eos_blend(res)
+      real(dp), dimension(num_eos_basic_results) :: res
+      integer :: i
+
+      if (i_eos_other .gt. 0) then
+         ! check for blends including i_eos_other
+         i = i_frac + i_eos_other - 1
+         in_eos_blend = ((res(i) .gt. 0) .and. (res(i) .lt. 1))
+      else
+         ! check for all blends
+         in_eos_blend = .false.
+         do i = i_frac, i_frac+num_eos_frac_results
+            in_eos_blend = in_eos_blend .or. &
+               ((res(i) .gt. 0) .and. (res(i) .lt. 1))
+         end do
+      end if
+
+   end function in_eos_blend
+
 
 end program eos_plotter

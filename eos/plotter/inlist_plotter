@@ -26,7 +26,14 @@
   !### pick which EOS to compare with
   ! no comparison if i_eos_other < 0
   ! result is eos - eos_other
-  i_eos_other = -1
+  i_eos_other = 6
+
+  !### limit output to blend regions
+  ! if true, value is set to NaN in non-blend regions
+  ! blend regions are those associated with i_eos
+  ! if i_eos_other > 0, then only blends including that component are considered
+  ! useful for comparing EOSes in overlap regions
+  only_blend_regions = .true.
 
   !### pick which eos quantity to plot
   ! below for convenience: truth in eos_def.f90
