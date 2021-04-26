@@ -331,8 +331,8 @@
       integer, parameter :: p_rel_diff_chiT_for_partials = p_rel_diff_chiRho_for_partials + 1
       integer, parameter :: p_QQ = p_rel_diff_chiT_for_partials + 1
 
-      integer, parameter :: p_phase = p_QQ + 1
-      integer, parameter :: p_latent_ddlnT = p_phase + 1
+      integer, parameter :: p_eos_phase = p_QQ + 1
+      integer, parameter :: p_latent_ddlnT = p_eos_phase + 1
       integer, parameter :: p_latent_ddlnRho = p_latent_ddlnT + 1
 
       integer, parameter :: p_x_mass_fraction_H = p_latent_ddlnRho + 1
@@ -1032,7 +1032,7 @@
          profile_column_name(p_chiT) = 'chiT'
          profile_column_name(p_QQ) = 'QQ'
 
-         profile_column_name(p_phase) = 'eos_phase'
+         profile_column_name(p_eos_phase) = 'eos_phase'
          profile_column_name(p_latent_ddlnT) = 'latent_ddlnT'
          profile_column_name(p_latent_ddlnRho) = 'latent_ddlnRho'
 
