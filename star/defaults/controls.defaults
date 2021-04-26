@@ -8940,8 +8940,6 @@
       !          'XSi_cntr'             delta_XSi_cntr_limit
       !          'log_eps_nuc'          delta_log_eps_nuc_limit
       !          'max_dt'               max_years_for_timestep
-      !          'max dt change'        max_timestep_factor
-      !          'min dt change'        min_timestep_factor
       !          'neg_mass_frac'        (solver found neg mass frac)
       !          'adjust_J_q'           adjust_J_q_limit
       !          'solver iters'         solver_iters_timestep_limit
