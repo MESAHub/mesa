@@ -48,8 +48,6 @@ program eos_plotter
 
    character(len=4) :: xname, yname
 
-   logical, parameter :: compare_to_old_eosDT = .false.
-
    real(dp), parameter :: UNSET = -999
    real(dp), parameter :: min_derivative_error = 1d-4
 
@@ -394,25 +392,6 @@ program eos_plotter
                res1 = -T * rho * (exp(res(i_lnS)) * d_dlnd(i_lnS)) / (d_dlnT(i_lnPgas) * exp(res(i_lnPgas)) + (4d0 / 3d0) * crad * pow4(T)) - 1
             end if
             res1 = abs(res1)
-         end if
-
-
-         if (compare_to_old_eosDT) then
-            rq% use_FreeEOS = .false.
-            call eos_call(&
-               handle, i_eos, species, chem_id, net_iso, xa, &
-               Rho, log10Rho, T, log10T, &
-               res, d_dlnd, d_dlnT, d_dxa, ierr)
-            if (ierr /= 0 .and. .not. ignore_ierr) then
-               write(*,*) 'failed in eosDT_get for old value'
-               write(*,1) 'log10Rho', log10Rho
-               write(*,1) 'log10T', log10T
-               stop 1
-            end if
-            rq% use_FreeEOS = .true.
-            res2 = res(i_grad_ad) ! res(i_lnE)/ln10
-            res1 = log10(abs(res1 - res2)/max(1d-99,abs(res1),abs(res2)))
-            ! if res1 == res2, then get bad num and plots as white
          end if
 
          write(iounit,*) kval, jval, res1
