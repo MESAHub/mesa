@@ -1,7 +1,0 @@
-Test cases with names beginning in "DEV_" are under development.
-This means that they are not ready for consideration by general users as a "how to" guide for research to be published.
-
-Play but don't publish!
-
-The situation is similar to that for options in controls_dev.defaults and star_job_dev.defaults.
-

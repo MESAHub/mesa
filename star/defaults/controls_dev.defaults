@@ -5,25 +5,6 @@
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
-      compare_to_mlt_get_newer = .false.
-      
-      using_mlt_get_newer = .true. 
-           
-      using_mlt_info_newer = .true.
-
-      compare_to_mlt_info_newer = .false.
-
-
-
-      compare_to_mlt_get_new = .false.
-      using_mlt_get_new = .false.
-      compare_to_mlt_info_new = .false.
-      using_mlt_info_new = .false.
-
-
-      
-      
-
       max_dt_div_tau_conv_for_TDC = -1d0
       max_dt_years_for_TDC = -1d0
    

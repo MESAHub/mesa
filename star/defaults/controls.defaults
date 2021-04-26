@@ -10331,12 +10331,15 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_q_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! check_remnant_only_for_dt_div_min_dr_div_cs_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
     min_k_for_dt_div_min_dr_div_cs_limit = 20
     min_q_for_dt_div_min_dr_div_cs_limit = 0.005d0
     max_q_for_dt_div_min_dr_div_cs_limit = 0.995d0
+    check_remnant_only_for_dt_div_min_dr_div_cs_limit = .false.
 
 
       ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
@@ -10799,7 +10802,7 @@
 
       ! ::
 
-    delta_XH_cntr_hard_limit = 0.05d0
+    delta_XH_cntr_hard_limit = -1
 
 
       ! delta_XHe_cntr_limit
@@ -10821,7 +10824,7 @@
 
       ! ::
 
-    delta_XHe_cntr_hard_limit = 0.05d0
+    delta_XHe_cntr_hard_limit = -1
 
 
       ! delta_XC_cntr_limit
@@ -10843,7 +10846,7 @@
 
       ! ::
 
-    delta_XC_cntr_hard_limit = 0.05d0
+    delta_XC_cntr_hard_limit = -1
 
 
       ! delta_XNe_cntr_limit
@@ -10865,7 +10868,7 @@
 
       ! ::
 
-    delta_XNe_cntr_hard_limit = 0.05d0
+    delta_XNe_cntr_hard_limit = -1
 
 
       ! delta_XO_cntr_limit
@@ -10887,7 +10890,7 @@
 
       ! ::
 
-    delta_XO_cntr_hard_limit = 0.05d0
+    delta_XO_cntr_hard_limit = -1
 
 
       ! delta_XSi_cntr_limit
@@ -10909,7 +10912,7 @@
 
       ! ::
 
-    delta_XSi_cntr_hard_limit = 0.05d0
+    delta_XSi_cntr_hard_limit = -1
 
 
       ! delta_dX_div_X_drop_only

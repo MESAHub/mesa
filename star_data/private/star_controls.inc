@@ -1101,6 +1101,7 @@
             min_q_for_dt_div_min_dr_div_cs_limit, &
             max_q_for_dt_div_min_dr_div_cs_limit
          integer :: min_k_for_dt_div_min_dr_div_cs_limit
+         logical :: check_remnant_only_for_dt_div_min_dr_div_cs_limit
 
          real(dp) :: dX_mix_dist_limit
 

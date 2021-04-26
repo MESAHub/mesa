@@ -122,8 +122,6 @@
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     mass_depth_for_L_surf, conv_core_gap_dq_limit, &
-    using_mlt_info_new, compare_to_mlt_info_new, using_mlt_get_new, compare_to_mlt_get_new, &
-    using_mlt_info_newer, compare_to_mlt_info_newer, using_mlt_get_newer, compare_to_mlt_get_newer, &
     max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC, max_X_for_TDC, max_X_for_gradT_eqn, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_eddy_viscosity, alpha_TDC_turbulent_pressure, &
     
@@ -425,7 +423,7 @@
     dt_div_dt_cell_collapse_limit, dt_div_dt_cell_collapse_hard_limit, &
     dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
-    min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, &
+    min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, check_remnant_only_for_dt_div_min_dr_div_cs_limit, &
     dX_mix_dist_limit, dH_limit_min_H, dH_limit, dH_hard_limit, dH_div_H_limit_min_H, &
     dH_div_H_limit, dH_div_H_hard_limit, dH_decreases_only, max_timestep_factor_at_high_T, &
     dHe_limit_min_He, dHe_limit, dHe_hard_limit, dHe_div_He_limit_min_He, &
@@ -2059,14 +2057,6 @@
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
- s% using_mlt_info_new = using_mlt_info_new
- s% compare_to_mlt_info_new = compare_to_mlt_info_new
- s% using_mlt_get_new = using_mlt_get_new
- s% compare_to_mlt_get_new = compare_to_mlt_get_new
- s% using_mlt_info_newer = using_mlt_info_newer
- s% compare_to_mlt_info_newer = compare_to_mlt_info_newer
- s% using_mlt_get_newer = using_mlt_get_newer
- s% compare_to_mlt_get_newer = compare_to_mlt_get_newer
  s% max_dt_div_tau_conv_for_TDC = max_dt_div_tau_conv_for_TDC
  s% max_dt_years_for_TDC = max_dt_years_for_TDC
  s% alpha_TDC_DAMP = alpha_TDC_DAMP
@@ -2165,6 +2155,7 @@
  s% min_k_for_dt_div_min_dr_div_cs_limit = min_k_for_dt_div_min_dr_div_cs_limit
  s% min_q_for_dt_div_min_dr_div_cs_limit = min_q_for_dt_div_min_dr_div_cs_limit
  s% max_q_for_dt_div_min_dr_div_cs_limit = max_q_for_dt_div_min_dr_div_cs_limit
+ s% check_remnant_only_for_dt_div_min_dr_div_cs_limit = check_remnant_only_for_dt_div_min_dr_div_cs_limit
 
  s% dX_mix_dist_limit = dX_mix_dist_limit
 
@@ -3733,14 +3724,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
 
- using_mlt_info_new = s% using_mlt_info_new
- compare_to_mlt_info_new = s% compare_to_mlt_info_new
- using_mlt_get_new = s% using_mlt_get_new
- compare_to_mlt_get_new = s% compare_to_mlt_get_new
- using_mlt_info_newer = s% using_mlt_info_newer
- compare_to_mlt_info_newer = s% compare_to_mlt_info_newer
- using_mlt_get_newer = s% using_mlt_get_newer
- compare_to_mlt_get_newer = s% compare_to_mlt_get_newer
  max_dt_div_tau_conv_for_TDC = s% max_dt_div_tau_conv_for_TDC
  max_dt_years_for_TDC = s% max_dt_years_for_TDC
  alpha_TDC_DAMP = s% alpha_TDC_DAMP
@@ -3839,6 +3822,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  min_k_for_dt_div_min_dr_div_cs_limit = s% min_k_for_dt_div_min_dr_div_cs_limit
  min_q_for_dt_div_min_dr_div_cs_limit = s% min_q_for_dt_div_min_dr_div_cs_limit
  max_q_for_dt_div_min_dr_div_cs_limit = s% max_q_for_dt_div_min_dr_div_cs_limit
+ check_remnant_only_for_dt_div_min_dr_div_cs_limit = s% check_remnant_only_for_dt_div_min_dr_div_cs_limit
 
  dX_mix_dist_limit = s% dX_mix_dist_limit
 

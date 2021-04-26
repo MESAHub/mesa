@@ -136,9 +136,9 @@
       
       compare_TDC_to_MLT = .true.
       
-      !x_integer_ctrl(19) = 1300 ! k
+      x_integer_ctrl(19) = 1658 ! k
       x_integer_ctrl(20) = 0 ! solver iter
-      x_integer_ctrl(21) = 0 ! model_number
+      x_integer_ctrl(21) = 65 ! model_number
 
 ! FOR DEBUGGING
 
