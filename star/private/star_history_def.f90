@@ -136,7 +136,17 @@
       integer, parameter :: h_co_core_omega_div_omega_crit = h_co_core_omega + 1
       integer, parameter :: h_co_core_k = h_co_core_omega_div_omega_crit + 1
 
-      integer, parameter :: h_fe_core_mass = h_co_core_k + 1
+      integer, parameter :: h_one_core_mass = h_co_core_k + 1
+      integer, parameter :: h_one_core_radius = h_one_core_mass + 1
+      integer, parameter :: h_one_core_lgT = h_one_core_radius + 1
+      integer, parameter :: h_one_core_lgRho = h_one_core_lgT + 1
+      integer, parameter :: h_one_core_L = h_one_core_lgRho + 1
+      integer, parameter :: h_one_core_v = h_one_core_L + 1
+      integer, parameter :: h_one_core_omega = h_one_core_v + 1
+      integer, parameter :: h_one_core_omega_div_omega_crit = h_one_core_omega + 1
+      integer, parameter :: h_one_core_k = h_one_core_omega_div_omega_crit + 1
+
+      integer, parameter :: h_fe_core_mass = h_one_core_k + 1
       integer, parameter :: h_fe_core_radius = h_fe_core_mass + 1
       integer, parameter :: h_fe_core_lgT = h_fe_core_radius + 1
       integer, parameter :: h_fe_core_lgRho = h_fe_core_lgT + 1
@@ -1115,6 +1125,16 @@
          history_column_name(h_co_core_omega) = 'co_core_omega'
          history_column_name(h_co_core_omega_div_omega_crit) = 'co_core_omega_div_omega_crit'
          history_column_name(h_co_core_k) = 'co_core_k'
+
+         history_column_name(h_one_core_mass) = 'one_core_mass'
+         history_column_name(h_one_core_radius) = 'one_core_radius'
+         history_column_name(h_one_core_lgT) = 'one_core_lgT'
+         history_column_name(h_one_core_lgRho) = 'one_core_lgRho'
+         history_column_name(h_one_core_L) = 'one_core_L'
+         history_column_name(h_one_core_v) = 'one_core_v'
+         history_column_name(h_one_core_omega) = 'one_core_omega'
+         history_column_name(h_one_core_omega_div_omega_crit) = 'one_core_omega_div_omega_crit'
+         history_column_name(h_one_core_k) = 'one_core_k'
 
          history_column_name(h_fe_core_mass) = 'fe_core_mass'
          history_column_name(h_fe_core_radius) = 'fe_core_radius'

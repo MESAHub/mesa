@@ -347,6 +347,17 @@
       !co_core_omega_div_omega_crit
       !co_core_k
 
+   !## ONe core
+      one_core_mass
+      !one_core_radius
+      !one_core_lgT
+      !one_core_lgRho
+      !one_core_L
+      !one_core_v
+      !one_core_omega
+      !one_core_omega_div_omega_crit
+      !one_core_k
+
    !## iron core
       fe_core_mass
       !fe_core_radius
