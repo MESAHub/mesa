@@ -54,7 +54,7 @@
 ! mixing
 
 ! timesteps
-      delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
+      delta_lgT_max_hard_limit = 0.1
 
 ! mesh
 
