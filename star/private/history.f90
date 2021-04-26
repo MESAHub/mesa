@@ -2053,6 +2053,26 @@
                int_val = s% co_core_k
                is_int_val = .true.
 
+            case(h_one_core_mass)
+               val = s% one_core_mass
+            case(h_one_core_radius)
+               val = s% one_core_radius
+            case(h_one_core_lgT)
+               val = s% one_core_lgT
+            case(h_one_core_lgRho)
+               val = s% one_core_lgRho
+            case(h_one_core_L)
+               val = s% one_core_L
+            case(h_one_core_v)
+               val = s% one_core_v
+            case(h_one_core_omega)
+               val = if_rot(s% one_core_omega)
+            case(h_one_core_omega_div_omega_crit)
+               val = if_rot(s% one_core_omega_div_omega_crit)
+            case(h_one_core_k)
+               int_val = s% one_core_k
+               is_int_val = .true.
+
             case(h_fe_core_mass)
                val = s% fe_core_mass
             case(h_fe_core_radius)
