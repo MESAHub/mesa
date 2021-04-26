@@ -929,7 +929,7 @@
             case (p_QQ)
                val = s% QQ(k)
 
-            case (p_phase)
+            case (p_eos_phase)
                val = s% phase(k)
             case (p_latent_ddlnT)
                val = s% latent_ddlnT(k)
