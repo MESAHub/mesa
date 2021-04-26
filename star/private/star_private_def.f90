@@ -73,15 +73,15 @@
          auto_diff_star_d1_names(i_L_m1) = 'i_L_m1'
          auto_diff_star_d1_names(i_L_00) = 'i_L_00'
          auto_diff_star_d1_names(i_L_p1) = 'i_L_p1'
+         auto_diff_star_d1_names(i_Hp_m1) = 'i_Hp_m1'
+         auto_diff_star_d1_names(i_Hp_00) = 'i_Hp_00'
+         auto_diff_star_d1_names(i_Hp_p1) = 'i_Hp_p1'
          auto_diff_star_d1_names(i_xtra1_m1) = 'i_xtra1_m1'
          auto_diff_star_d1_names(i_xtra1_00) = 'i_xtra1_00'
          auto_diff_star_d1_names(i_xtra1_p1) = 'i_xtra1_p1'
          auto_diff_star_d1_names(i_xtra2_m1) = 'i_xtra2_m1'
          auto_diff_star_d1_names(i_xtra2_00) = 'i_xtra2_00'
          auto_diff_star_d1_names(i_xtra2_p1) = 'i_xtra2_p1'
-         auto_diff_star_d1_names(i_xtra3_m1) = 'i_xtra3_m1'
-         auto_diff_star_d1_names(i_xtra3_00) = 'i_xtra3_00'
-         auto_diff_star_d1_names(i_xtra3_p1) = 'i_xtra3_p1'
 
          termination_code_str(1:num_termination_codes) = ''
 

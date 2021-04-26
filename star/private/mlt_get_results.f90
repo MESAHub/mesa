@@ -36,7 +36,7 @@
       implicit none
       
       private
-      public :: get_gradT, do1_mlt_eval, Get_results
+      public :: do1_mlt_eval, Get_results, get_gradT
 
       contains
       
@@ -199,11 +199,9 @@
          end if
          compare_TDC_to_MLT = s% compare_TDC_to_MLT
          
-         if (report) then
-            write(*,*)
+         if (report) &
             write(*,2) 'enter Get_results gradr grada scale_height ' // trim(MLT_option), &
                k, gradr%val, grada%val, scale_height%val
-         end if
          
          call set_no_mixing('') ! to initialize things
          if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
@@ -223,8 +221,11 @@
             gradT_actual = 0d0
             Y_guess = 0d0 
          end if
+           
+         if (report) write(*,2) 'gradr gradL grada comp_term gradT_actual Y_guess', &
+            k, gradr%val, gradL%val, grada%val, gradL_composition_term, gradT_actual%val, Y_guess%val
             
-! NOTE: TESTING TDC only for Y_guess > 0 for now
+         ! using TDC only for Y_guess > 0 for now
          okay_to_use_TDC = okay_to_use_TDC .and. Y_guess%val > 0d0
          
          if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
@@ -246,11 +247,14 @@
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
          end if
+         
          if (mixing_type == no_mixing) call set_no_mixing('final mixing_type == no_mixing')
          
-         if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT         
+         if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT
+         
          
          contains
+
 
          subroutine set_no_mixing(str)
             character (len=*) :: str
@@ -264,13 +268,14 @@
             D = 0d0
             Gamma = 0d0
          end subroutine set_no_mixing
+         
 
          subroutine do_compare_TDC_to_MLT
             ! for compare_TDC_to_MLT
             integer :: std_mixing_type
             type(auto_diff_real_star_order1) :: &
                std_gradT, std_gradr, std_conv_vel, std_D, std_Gamma, std_scale_height
-            include 'formats'         
+            include 'formats'            
             std_mixing_type = mixing_type
             std_gradT = gradT
             std_gradr = gradr
@@ -278,10 +283,6 @@
             std_D = D
             std_Gamma = Gamma
             std_scale_height = scale_height
-            if (report) then
-               write(*,*)
-               write(*,1) 'do_compare_TDC_to_MLT'
-            end if
             call set_TDC
             if (report .or. s% x_integer_ctrl(19) <= 0) then
                if (std_mixing_type /= mixing_type .or. &
@@ -293,6 +294,7 @@
                end if
             end if
          end subroutine do_compare_TDC_to_MLT
+
 
          subroutine set_TDC
             include 'formats'
@@ -309,7 +311,8 @@
                end if
             end if
             gradT = Y_face + grada
-         end subroutine set_TDC        
+         end subroutine set_TDC
+         
          
          subroutine set_MLT
             real(dp) :: ff1, ff2, ff3, ff4
@@ -404,15 +407,14 @@
             end if
 
             if (report) then
-               write(*,2) 'set_MLT val for Zeta gradr grada gradT Y_face', k, &
-                  Zeta%val, gradr%val, grada%val, gradT%val, gradT%val - grada%val
-               write(*,2) 'set_MLT d_dlnd_00 for Zeta gradr grada gradT Y_face', k, &
-                  Zeta%d1Array(i_lnd_00), gradr%d1Array(i_lnd_00), &
-                  grada%d1Array(i_lnd_00), gradT%d1Array(i_lnd_00), &
-                  gradT%d1Array(i_lnd_00) - grada%d1Array(i_lnd_00)
+               write(*,2) 'set_MLT Zeta gradr grada gradT dgradT_dlnd', k, &
+                  Zeta%val, gradr%val, grada%val, gradT%val
+               write(*,2) 'set_MLT d_dlnd_00 Zeta gradr grada gradT', k, &
+                  Zeta%d1Array(i_lnd_00), gradr%d1Array(i_lnd_00), grada%d1Array(i_lnd_00), gradT%d1Array(i_lnd_00)
             end if
 
          end subroutine set_MLT   
+
 
          subroutine set_semiconvection ! Langer 1983 & 1985
             type(auto_diff_real_star_order1) :: bc, LG, &
@@ -424,20 +426,23 @@
                (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho) ! erg / (K cm sec)
             D = alpha_semiconvection*radiative_conductivity/(6d0*Cp*rho) &
                   *(gradr - grada)/(gradL - gradr)
-            if (D%val <= 0) return         
+            if (D%val <= 0) return
+            
             if (s% semiconvection_option == 'Langer_85 mixing; gradT = gradr') then
                gradT = gradr
                Y_face = gradT - grada
                conv_vel = 3d0*D/Lambda             
                mixing_type = semiconvective_mixing
                return
-            end if            
+            end if
+            
             if (s% semiconvection_option /= 'Langer_85') then
                write(*,*) 'MLT: unknown values for semiconvection_option ' // &
                   trim(s% semiconvection_option)
                ierr = -1
                return
-            end if            
+            end if
+            
 !            Solve[{
 !                  L/Lrad - Lsc/Lrad - 1 == 0, 
 !                  Lrad == grad LG, 
@@ -445,6 +450,8 @@
 !                  Lsc/Lrad == alpha (grad - gradA)/(2 grad (gradL - grad))
 !                              (grad - gradA - (beta (8 - 3 beta))/bc gradMu)}, 
 !                  grad, {Lsc, Lrad, gradMu}] // Simplify
+
+            ! here's what Mathematica tells us to do
             alpha = min(1d0, alpha_semiconvection)
             bc = 32d0 - 24d0*beta - beta*beta            
             LG = (16d0*pi*clight*m*cgrav*Pr)/(P*opacity)            
@@ -471,7 +478,8 @@
             conv_vel = 3d0*D/Lambda             
             mixing_type = semiconvective_mixing
          end subroutine set_semiconvection
-        
+         
+         
          subroutine set_thermohaline
             real(dp), parameter :: min_D_th = 1d-3
             real(dp) :: D_thrm
@@ -486,6 +494,7 @@
             conv_vel = 3d0*D/Lambda
             mixing_type = thermohaline_mixing 
          end subroutine set_thermohaline
+
 
       end subroutine Get_results
       
@@ -505,7 +514,7 @@
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ
-         real(dp) ::  tolerance, gradT, Lr, Lc, scale
+         real(dp) ::  tolerance, gradT, Lr, Lc, scale, abs_Y_approaching_zero
          integer :: iter, max_iter
          logical :: converged, Y_is_positive
          include 'formats'
@@ -525,12 +534,12 @@
          if (Y == 0d0) Y = 1d-30
          Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
          Y_is_positive = (Y > 0d0)
-         
          tolerance = 1d-4 ! ??
-         max_iter = 100 ! ??   20 seems to be too small (at least for now)
-         
+         abs_Y_approaching_zero = 1d-7 ! ??
+         max_iter = 100 ! ??
          converged = .false.
          scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
+         if (report) write(*,*)
          if (report) write(*,2) 'initial Y', 0, Y%val
          do iter = 1, max_iter
             call compute_Q(s, k, mixing_length_alpha, &
@@ -542,6 +551,11 @@
                converged = .true.
                exit
             end if
+!            if (abs(Y%val) < abs_Y_approaching_zero) then     ! TESTING
+!               if (report) write(*,2) 'abs_Y_approaching_zero', iter, Y%val
+!               converged = .true.
+!               exit
+!            end if
             dQdZ = differentiate_1(Q)
             if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
                if (report) write(*,2) 'dQdZ', iter, dQdZ%val

@@ -275,16 +275,16 @@
       integer, parameter :: i_L_m1 = 16
       integer, parameter :: i_L_00 = 17
       integer, parameter :: i_L_p1 = 18
-      integer, parameter :: i_xtra1_m1 = 19
-      integer, parameter :: i_xtra1_00 = 20
-      integer, parameter :: i_xtra1_p1 = 21
-      integer, parameter :: i_xtra2_m1 = 22
-      integer, parameter :: i_xtra2_00 = 23
-      integer, parameter :: i_xtra2_p1 = 24
-      integer, parameter :: i_xtra3_m1 = 25
-      integer, parameter :: i_xtra3_00 = 26
-      integer, parameter :: i_xtra3_p1 = 27
-      integer, parameter :: auto_diff_star_num_vars = i_xtra3_p1
+      integer, parameter :: i_hp_m1 = 19
+      integer, parameter :: i_hp_00 = 20
+      integer, parameter :: i_hp_p1 = 21
+      integer, parameter :: i_xtra1_m1 = 22
+      integer, parameter :: i_xtra1_00 = 23
+      integer, parameter :: i_xtra1_p1 = 24
+      integer, parameter :: i_xtra2_m1 = 25
+      integer, parameter :: i_xtra2_00 = 26
+      integer, parameter :: i_xtra2_p1 = 27
+      integer, parameter :: auto_diff_star_num_vars = i_xtra2_p1
       character (len=128) :: auto_diff_star_d1_names(auto_diff_star_num_vars)
       
 
