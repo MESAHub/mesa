@@ -347,7 +347,12 @@
 
             ! Store the diffusion coefficient and velocity
             D(k) = (D0 + Delta0*D_ob)*factor
-            vc(k) = (D0/D_ob + Delta0)*vc_ob*factor
+            if(D_ob /= 0d0) then
+               vc(k) = (D0/D_ob + Delta0)*vc_ob*factor
+            else
+               vc(k) = 0d0
+            end if
+
 
             ! Check for early overshoot completion
 
