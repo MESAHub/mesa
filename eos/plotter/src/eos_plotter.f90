@@ -21,6 +21,8 @@ program eos_plotter
    real(dp) :: Rho, T, log10Rho, log10T, X, Z
    real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
    real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
+   real(dp), dimension(num_eos_basic_results) :: res_other, d_dlnd_other, d_dlnT_other
+   real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa_other
    integer :: ierr
    character (len=32) :: my_mesa_dir
 
@@ -37,7 +39,7 @@ program eos_plotter
 
    integer :: iounit
 
-   integer :: i_var, i_max, i_eos, i_cons, i
+   integer :: i_var, i_max, i_eos, i_eos_other, i_cons, i
    integer :: j,k, njs,nks
    real(dp) :: jval, kval
 
@@ -58,7 +60,7 @@ program eos_plotter
       X_center, delta_X, Z_center, delta_Z, &
       X_min, X_max, Z_min, Z_max, &
       xname, yname, doing_partial, doing_dfridr, doing_d_dlnd, doing_consistency, &
-      i_var, i_eos, i_cons, ignore_ierr
+      i_var, i_eos, i_eos_other, i_cons, ignore_ierr
 
 
    include 'formats'
@@ -147,8 +149,13 @@ program eos_plotter
                write(iounit,*) 'dsp'
             end if
          else
-            write(*,*) 'plotting ' // eosDT_result_names(i_var)
-            write(iounit,*) eosDT_result_names(i_var)
+            if (i_eos_other .ge. 0) then
+               write(*,*) 'plotting difference of ' // eosDT_result_names(i_var)
+               write(iounit,*) 'difference of ' // eosDT_result_names(i_var)
+            else
+               write(*,*) 'plotting ' // eosDT_result_names(i_var)
+               write(iounit,*) eosDT_result_names(i_var)
+            end if
          end if
       end if
    end if
@@ -309,6 +316,21 @@ program eos_plotter
             stop 1
          end if
 
+         if (i_eos_other .ge. 0) then
+            ! get a set of results for given temperature and density
+            call eos_call(&
+               handle, i_eos_other, species, chem_id, net_iso, xa, &
+               Rho, log10Rho, T, log10T, &
+               res_other, d_dlnd_other, d_dlnT_other, d_dxa_other, ierr)
+            if (ierr /= 0 .and. .not. ignore_ierr) then
+               write(*,*) 'failed in eosDT_get'
+               write(*,1) 'log10Rho', log10Rho
+               write(*,1) 'log10T', log10T
+               stop 1
+            end if
+         end if
+
+
          if (i_var .gt. 0) then
 
             ! return that part of the EOS results
@@ -319,7 +341,12 @@ program eos_plotter
                   res1 = d_dlnT(i_var)
                end if
             else
-               res1 = res(i_var)
+               if (i_eos_other .ge. 0) then
+                  ! doing comparison
+                  res1 = res(i_var) - res_other(i_var)
+               else
+                  res1 = res(i_var)
+               end if
             end if
 
 
