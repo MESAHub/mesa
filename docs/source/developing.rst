@@ -15,4 +15,5 @@ Developing MESA
    developing/plotters
    developing/profiling
    developing/test_suite
+   developing/infrastructure
    developing/release
