@@ -1358,6 +1358,13 @@
             call do1(s% mu_start, c% mu_start)
             if (failed('mu_start')) exit
 
+            call do1(s% phase_start, c% phase_start)
+            if (failed('phase_start')) exit
+            call do1(s% latent_ddlnT_start, c% latent_ddlnT_start)
+            if (failed('latent_ddlnT_start')) exit
+            call do1(s% latent_ddlnRho_start, c% latent_ddlnRho_start)
+            if (failed('latent_ddlnRho_start')) exit
+
             call do1(s% max_burn_correction, c% max_burn_correction)
             if (failed('max_burn_correction')) exit
             call do1(s% avg_burn_correction, c% avg_burn_correction)

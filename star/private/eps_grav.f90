@@ -169,6 +169,12 @@
          ! MESA I, Equation (12)
          eps_grav = -T*Cp * ((1d0 - grada*chiT)*dlnT_dt - grada*chiRho*dlnd_dt)
 
+         ! phase transition latent heat
+         ! Jermyn et al. (2021), Equation (47)
+         latent_ddlnRho = wrap_latent_ddlnRho_00(s,k)
+         latent_ddlnT = wrap_latent_ddlnT_00(s,k)
+         eps_grav = eps_grav - (dlnd_dt * latent_ddlnRho + dlnT_dt * latent_ddlnT)
+
 
          ! for time centered version
          if (s% use_time_centered_eps_grav) then
@@ -176,15 +182,13 @@
             ! start values are constants during Newton iters
             eps_grav_start = -s% T_start(k)*s% cp_start(k) * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
 
+            ! phase transition latent heat
+            eps_grav_start = eps_grav_start - (dlnd_dt * s% latent_ddlnRho_start(k) + dlnT_dt * s% latent_ddlnT_start(k))
+
             eps_grav = theta * eps_grav + (1d0-theta) * eps_grav_start
 
          end if
 
-         latent_ddlnRho = wrap_latent_ddlnRho_00(s,k)
-         latent_ddlnT = wrap_latent_ddlnT_00(s,k)
-
-         ! phase transition latent heat
-         eps_grav = eps_grav - (dlnd_dt * latent_ddlnRho + dlnT_dt * latent_ddlnT)
 
          if (s% include_composition_in_eps_grav) then
             call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
