@@ -35,6 +35,8 @@ ax.set_ylim(Yran.min(), Yran.max())
 cmap = copy.copy(mpl.cm.get_cmap("viridis"))
 cmap.set_over('white')
 cmap.set_under('black')
+cmap.set_bad('grey')
+
 
 # set color bar limits
 # None will auto-set limits
