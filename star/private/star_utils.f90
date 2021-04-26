@@ -3816,8 +3816,8 @@
             end if
          end if
          if ((.not. prev_using_TDC) .and. s% using_TDC) then
-            write(*,2) 'turn on TDC', s% model_number
             write(*,*)
+            write(*,2) 'turn on TDC', s% model_number
          end if
       end subroutine set_using_TDC
       

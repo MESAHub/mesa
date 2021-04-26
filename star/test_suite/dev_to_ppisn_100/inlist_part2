@@ -10,8 +10,6 @@
       required_termination_code_string(2) = 'log_Rsurf_upper_limit'
       required_termination_code_string(3) = 'ejecta_mass_max_limit'
       !required_termination_code_string(4) = 'max_model_number' ! for testing
-      
-      !set_initial_model_number = .false.
 
       !pgstar_flag = .false.
 
