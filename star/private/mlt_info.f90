@@ -239,14 +239,6 @@
             end do
          end if
          
-         if (s% no_MLT_below_T_max) then
-            k_T_max = maxloc(s% T_start(1:nz),dim=1)
-            if (k > k_T_max) then
-               call set_no_mixing('below_T_max')
-               return
-            end if
-         end if
-         
          make_gradr_sticky_in_solver_iters = s% make_gradr_sticky_in_solver_iters
          if (.not. make_gradr_sticky_in_solver_iters .and. &
                s% min_logT_for_make_gradr_sticky_in_solver_iters < 1d20) then

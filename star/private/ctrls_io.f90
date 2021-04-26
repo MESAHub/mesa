@@ -147,7 +147,7 @@
     fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
-    no_MLT_below_T_max, MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
+    MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
     max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, &
     limit_overshoot_Hp_using_size_of_convection_zone, RSP_min_tau_for_turbulent_flux, &
     predictive_mix, predictive_superad_thresh, predictive_avoid_reversal, predictive_limit_ingestion,&
@@ -1092,7 +1092,6 @@
  s% make_gradr_sticky_in_solver_iters = make_gradr_sticky_in_solver_iters
  s% min_logT_for_make_gradr_sticky_in_solver_iters = min_logT_for_make_gradr_sticky_in_solver_iters
  s% no_MLT_below_shock = no_MLT_below_shock
- s% no_MLT_below_T_max = no_MLT_below_T_max
  s% MLT_option = MLT_option
  s% mlt_use_rotation_correction = mlt_use_rotation_correction
  s% mlt_Pturb_factor = mlt_Pturb_factor
@@ -2769,7 +2768,6 @@
  make_gradr_sticky_in_solver_iters = s% make_gradr_sticky_in_solver_iters
  min_logT_for_make_gradr_sticky_in_solver_iters = s% min_logT_for_make_gradr_sticky_in_solver_iters
  no_MLT_below_shock = s% no_MLT_below_shock
- no_MLT_below_T_max = s% no_MLT_below_T_max
  MLT_option = s% MLT_option
  mlt_use_rotation_correction = s% mlt_use_rotation_correction
  mlt_Pturb_factor = s% mlt_Pturb_factor

@@ -2335,22 +2335,12 @@
     no_MLT_below_shock = .false.
 
 
-      ! no_MLT_below_T_max
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! if true, then no MLT below location of max T (just radiative).
-
-      ! ::
-
-    no_MLT_below_T_max = .false.
-
-
       ! mlt_make_surface_no_mixing
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
-    mlt_make_surface_no_mixing = .false.
+    mlt_make_surface_no_mixing = .true.
     
 
 
