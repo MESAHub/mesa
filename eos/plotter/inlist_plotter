@@ -23,6 +23,10 @@
   ! CMS = 6
   i_eos = 1
 
+  !### pick which EOS to compare with
+  ! no comparison if i_eos_other < 0
+  ! result is eos - eos_other
+  i_eos_other = -1
 
   !### pick which eos quantity to plot
   ! below for convenience: truth in eos_def.f90
