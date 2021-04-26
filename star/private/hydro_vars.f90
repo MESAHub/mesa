@@ -493,8 +493,8 @@
          use atm_lib, only: atm_eval_T_tau_dq_dtau
          use atm_support, only: get_T_tau_id
          use micro, only: set_micro_vars
-         use mlt_info_newer, only: &
-            set_mlt_vars_newer, check_for_redo_MLT_newer, set_grads_newer
+         use mlt_info, only: &
+            set_mlt_vars, check_for_redo_MLT, set_grads
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs, set_max_conv_time_scale, set_using_TDC
@@ -562,9 +562,9 @@
             if (dbg) write(*,*) 'call do_brunt_B'
             call do_brunt_B(s, nzlo, nzhi, ierr) ! for unsmoothed_brunt_B
             if (failed('do_brunt_B')) return
-            if (dbg) write(*,*) 'call set_grads_newer'
-            call set_grads_newer(s, ierr)
-            if (failed('set_grads_newer')) return
+            if (dbg) write(*,*) 'call set_grads'
+            call set_grads(s, ierr)
+            if (failed('set_grads')) return
             call set_max_conv_time_scale(s) ! uses brunt_B
             call set_using_RSP2(s) ! uses max_conv_time_scale
             call set_using_TDC(s) ! uses max_conv_time_scale
@@ -620,12 +620,12 @@
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
             
-            call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
-            if (failed('set_mlt_vars_newer')) return
-            if (dbg) write(*,*) 'call check_for_redo_MLT_newer'
+            call set_mlt_vars(s, nzlo, nzhi, ierr)
+            if (failed('set_mlt_vars')) return
+            if (dbg) write(*,*) 'call check_for_redo_MLT'
             
-            call check_for_redo_MLT_newer(s, nzlo, nzhi, ierr)
-            if (failed('check_for_redo_MLT_newer')) return
+            call check_for_redo_MLT(s, nzlo, nzhi, ierr)
+            if (failed('check_for_redo_MLT')) return
             
          end if
 

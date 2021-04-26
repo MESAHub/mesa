@@ -1,0 +1,16 @@
+! inlist_mass_Z_wind_rotation
+
+&star_job
+   new_Z = 0.02d0
+   new_omega_div_omega_crit = 0.0d0
+/ ! end of star_job namelist
+
+&kap
+   Zbase = 0.02d0
+/ ! end of kap namelist
+
+&controls
+   initial_mass = 12
+   initial_z = 0.02d0
+   Dutch_scaling_factor = 0.0
+/ ! end of controls namelist

@@ -3053,7 +3053,7 @@
       
       
       subroutine star_set_mlt_vars(id, nzlo, nzhi, ierr)
-         use mlt_info_newer, only: set_mlt_vars_newer
+         use mlt_info, only: set_mlt_vars
          use star_def
          integer, intent(in) :: id ! id for star         
          integer, intent(in) :: nzlo, nzhi ! range of cell numbers   
@@ -3061,7 +3061,7 @@
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return                  
-         call set_mlt_vars_newer(s, nzlo, nzhi, ierr)
+         call set_mlt_vars(s, nzlo, nzhi, ierr)
       end subroutine star_set_mlt_vars
 
       subroutine star_mlt_results(id, k, MLT_option, &  ! NOTE: k=0 is a valid arg
@@ -3071,7 +3071,7 @@
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
          use auto_diff
-         use mlt_get_results_newer, only: Get_results_newer
+         use mlt_get_results, only: Get_results
          integer, intent(in) :: id
          integer, intent(in) :: k
          character (len=*), intent(in) :: MLT_option
@@ -3088,7 +3088,7 @@
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return  
-         call Get_results_newer(s, k, MLT_option, &
+         call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             alpha_semiconvection, thermohaline_coeff, &
@@ -3197,6 +3197,28 @@
          check_change_integer_timestep_limit = check_integer_limit( &
             s, limit, hard_limit, value, msg, skip_hard_limit, dt, dt_limit_ratio)
       end function check_change_integer_timestep_limit
+      
+      
+      real(dp) function star_remnant_mass(id)
+         use star_utils, only: get_remnant_mass
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer ::  ierr
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         star_remnant_mass = get_remnant_mass(s)
+      end function star_remnant_mass
+      
+      
+      real(dp) function star_ejecta_mass(id)
+         use star_utils, only: get_ejecta_mass
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer ::  ierr
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         star_ejecta_mass = get_ejecta_mass(s)
+      end function star_ejecta_mass
       
 
       ! Returns the next available star id

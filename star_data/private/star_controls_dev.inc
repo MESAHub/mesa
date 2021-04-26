@@ -1,8 +1,3 @@
-         logical :: using_mlt_info_new, compare_to_mlt_info_new
-         logical :: using_mlt_get_new, compare_to_mlt_get_new
-         
-         logical :: using_mlt_info_newer, compare_to_mlt_info_newer
-         logical :: using_mlt_get_newer, compare_to_mlt_get_newer
 
          real(dp) :: max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC
          real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad

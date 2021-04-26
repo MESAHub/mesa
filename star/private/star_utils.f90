@@ -1519,7 +1519,7 @@
          integer, intent(out) :: min_k
          integer :: k, nz, j, k_min
          real(dp) :: dr, dt, D, abs_du, cs, min_q, max_q, &
-            min_abs_du_div_cs, r00, rp1, dr_div_cs
+            min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
          include 'formats'
          nz = s% nz
          min_k = nz
@@ -1527,8 +1527,14 @@
          min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
          max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
          k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
+         if (s% check_remnant_only_for_dt_div_min_dr_div_cs_limit) then
+            remnant_mass = get_remnant_mass(s)
+         else
+            remnant_mass = s% m(1)
+         end if
          if (s% v_flag) then
             do k = k_min, nz-1
+               if (s% m(k) > remnant_mass) cycle
                if (s% q(k) > max_q) cycle
                if (s% q(k) < min_q) exit
                r00 = s% r(k)
@@ -1545,6 +1551,7 @@
          min_abs_du_div_cs = &
             s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          do k = k_min, nz-1
+            if (s% m(k) > remnant_mass) cycle
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit
             if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
@@ -1945,7 +1952,13 @@
          v_div_vesc_prev = 0d0
          do k=1,s% nz
             if (s% u_flag) then
-               v = s% u_face_ad(k)%val
+               !v = s% u_face_ad(k)%val ! CANNOT USE u_face for this 
+               ! approximate value is good enough for this estimate
+               if (k == 1) then
+                  v = s% u(k)
+               else
+                  v = 0.5d0*(s% u(k-1) + s% u(k))
+               end if
             else
                v = s% v(k)
             end if

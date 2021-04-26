@@ -683,7 +683,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             gradT, ierr )
          use chem_def, only: ih1
-         use mlt_get_results_newer, only: get_gradT_newer
+         use mlt_get_results, only: get_gradT
          use kap_def, only : num_kap_fracs
          use kap_lib, only : kap_get
 
@@ -734,7 +734,7 @@
          end if
          gradr = P*opacity*L/(16d0*pi*clight*m*cgrav*crad*pow4(T)/3d0) 
          
-         call get_gradT_newer(s, s% MLT_option, & ! used to create models
+         call get_gradT(s, s% MLT_option, & ! used to create models
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             s% net_iso(ih1), x, standard_cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
             gradT, mixing_type, ierr)
