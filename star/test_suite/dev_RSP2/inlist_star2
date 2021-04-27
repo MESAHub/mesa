@@ -24,7 +24,6 @@
 
 ! solver   
    RSP2_assume_HSE = .true.
-   RSP2_use_RSP_form_of_etrb_eqn = .true.
    include_w_in_correction_limits = .false.
    include_v_in_correction_limits = .false.
    include_L_in_correction_limits = .false.

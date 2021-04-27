@@ -58,7 +58,6 @@
     RSP2_use_RSP_eqn_for_Y_face = .true.
     RSP2_use_mass_interp_face_values = .false.
     RSP2_use_Stellingwerf_Lr = .true.
-    RSP2_use_RSP_form_of_etrb_eqn = .true.
     
     RSP2_num_outermost_cells_forced_nonturbulent = 0
     RSP2_num_innermost_cells_forced_nonturbulent = 0

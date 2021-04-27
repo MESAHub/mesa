@@ -1638,6 +1638,7 @@
          call store_partials( &
             s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1, str, ierr)
       end subroutine save_eqn_residual_info
+      
 
 
       subroutine unpack_residual_partials(s, k, nvar, i_eqn, &
@@ -1650,9 +1651,10 @@
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, dxtra3_m1, dxtra3_00, dxtra3_p1, &
+            dw_m1, dw_00, dw_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1
          integer :: j
@@ -1663,9 +1665,9 @@
             dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1) 
+            dxtra2_m1, dxtra2_00, dxtra2_p1) 
                      
          d_dm1 = 0; d_d00 = 0; d_dp1 = 0
          call unpack1(s% i_lnd, dlnd_m1, dlnd_00, dlnd_p1)
@@ -1675,6 +1677,7 @@
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
          if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
+         if (s% i_Hp /= 0) call unpack1(s% i_Hp, dHp_m1, dHp_00, dHp_p1)
          
          contains
          
@@ -1687,7 +1690,6 @@
          end subroutine unpack1         
          
       end subroutine unpack_residual_partials
-      
       
       subroutine store_partials(s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1, str, ierr)
          type (star_info), pointer :: s
@@ -3816,8 +3818,8 @@
             end if
          end if
          if ((.not. prev_using_TDC) .and. s% using_TDC) then
-            write(*,2) 'turn on TDC', s% model_number
             write(*,*)
+            write(*,2) 'turn on TDC', s% model_number
          end if
       end subroutine set_using_TDC
       

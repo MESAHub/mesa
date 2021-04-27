@@ -56,25 +56,25 @@ fi
 #if [ -z "$MESA_RUN_OPTIONAL" ]; then
 #   cp standard_part1.mod part1.mod
 #else
-   do_one inlist_finish_part1_header part1.mod
+   do_one inlist_part1_header part1.mod
    cp part1.mod standard_part1.mod
 #fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_part2.mod part2.mod
 else
-   do_one inlist_finish_part2_header part2.mod
+   do_one inlist_part2_header part2.mod
    cp part2.mod standard_part2.mod
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_part3.mod part3.mod
 else
-   do_one inlist_finish_part3_header part3.mod
+   do_one inlist_part3_header part3.mod
    cp part3.mod standard_part3.mod
 fi
 
-do_one inlist_finish_part4_header final.mod
+do_one inlist_part4_header final.mod
 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

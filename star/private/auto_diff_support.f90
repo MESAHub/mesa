@@ -32,8 +32,8 @@
       implicit none
      
       ! current use of xtra's
-      ! xtra1 is ln_cvpv0
-      ! xtra2 is w_div_wc
+      ! Hp is ln_cvpv0
+      ! xtra1 is w_div_wc
 
       public
 
@@ -68,17 +68,17 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1)
+            dxtra2_m1, dxtra2_00, dxtra2_p1)
          type(auto_diff_real_star_order1), intent(in) :: var
          real(dp), intent(out) :: &
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1
+            dxtra2_m1, dxtra2_00, dxtra2_p1
          val = var%val
          dlnd_m1 = var%d1Array(i_lnd_m1)
          dlnd_00 = var%d1Array(i_lnd_00)
@@ -98,15 +98,15 @@
          dL_m1 = var%d1Array(i_L_m1)
          dL_00 = var%d1Array(i_L_00)
          dL_p1 = var%d1Array(i_L_p1)
+         dHp_m1 = var%d1Array(i_Hp_m1)
+         dHp_00 = var%d1Array(i_Hp_00)
+         dHp_p1 = var%d1Array(i_Hp_p1)
          dxtra1_m1 = var%d1Array(i_xtra1_m1)
          dxtra1_00 = var%d1Array(i_xtra1_00)
          dxtra1_p1 = var%d1Array(i_xtra1_p1)
          dxtra2_m1 = var%d1Array(i_xtra2_m1)
          dxtra2_00 = var%d1Array(i_xtra2_00)
          dxtra2_p1 = var%d1Array(i_xtra2_p1)
-         dxtra3_m1 = var%d1Array(i_xtra3_m1)
-         dxtra3_00 = var%d1Array(i_xtra3_00)
-         dxtra3_p1 = var%d1Array(i_xtra3_p1)
       end subroutine unwrap
 
       subroutine wrap(var, val, &
@@ -116,17 +116,17 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1)
+            dxtra2_m1, dxtra2_00, dxtra2_p1)
          type(auto_diff_real_star_order1), intent(out) :: var
          real(dp), intent(in) :: &
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1
+            dxtra2_m1, dxtra2_00, dxtra2_p1
          var%val = val
          var%d1Array(i_lnd_m1) = dlnd_m1
          var%d1Array(i_lnd_00) = dlnd_00
@@ -146,15 +146,15 @@
          var%d1Array(i_L_m1) = dL_m1
          var%d1Array(i_L_00) = dL_00
          var%d1Array(i_L_p1) = dL_p1
+         var%d1Array(i_Hp_m1) = dHp_m1
+         var%d1Array(i_Hp_00) = dHp_00
+         var%d1Array(i_Hp_p1) = dHp_p1
          var%d1Array(i_xtra1_m1) = dxtra1_m1
          var%d1Array(i_xtra1_00) = dxtra1_00
          var%d1Array(i_xtra1_p1) = dxtra1_p1
          var%d1Array(i_xtra2_m1) = dxtra2_m1
          var%d1Array(i_xtra2_00) = dxtra2_00
          var%d1Array(i_xtra2_p1) = dxtra2_p1
-         var%d1Array(i_xtra3_m1) = dxtra3_m1
-         var%d1Array(i_xtra3_00) = dxtra3_00
-         var%d1Array(i_xtra3_p1) = dxtra3_p1
       end subroutine wrap
 
 
@@ -1134,14 +1134,45 @@
          end if
       end function wrap_u_p1
 
+      function wrap_Hp_m1(s, k) result(Hp_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_m1
+         integer, intent(in) :: k
+         Hp_m1 = 0d0 
+         if (k > 1) then
+            Hp_m1 % val = s%Hp_face(k-1)
+            Hp_m1 % d1Array(i_Hp_m1) = 1d0
+         end if
+      end function wrap_Hp_m1
+
+      function wrap_Hp_00(s, k) result(Hp_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_00
+         integer, intent(in) :: k
+         Hp_00 = 0d0 
+         Hp_00 % val = s%Hp_face(k)
+         Hp_00 % d1Array(i_Hp_00) = 1d0
+      end function wrap_Hp_00
+
+      function wrap_Hp_p1(s, k) result(Hp_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_p1
+         integer, intent(in) :: k
+         Hp_p1 = 0d0 
+         if (k < s%nz) then
+            Hp_p1 % val = s%Hp_face(k+1)
+            Hp_p1 % d1Array(i_Hp_p1) = 1d0
+         end if
+      end function wrap_Hp_p1
+
 
       function wrap_xtra1_m1(s, k) result(xtra1_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: xtra1_m1
          integer, intent(in) :: k
          xtra1_m1 = 0d0 
-         if (k > 1) then 
-            xtra1_m1% val = s% xtra1_array(k)
+         if (k > 1) then
+            xtra1_m1 % val = 0d0
             xtra1_m1 % d1Array(i_xtra1_m1) = 1d0
          end if            
       end function wrap_xtra1_m1
@@ -1151,7 +1182,7 @@
          type(auto_diff_real_star_order1) :: xtra1_00
          integer, intent(in) :: k
          xtra1_00 = 0d0 
-         xtra1_00 % val = 0d0
+         xtra1_00 % val = 0d0 
          xtra1_00 % d1Array(i_xtra1_00) = 1d0
       end function wrap_xtra1_00
 
@@ -1183,7 +1214,7 @@
          type(auto_diff_real_star_order1) :: xtra2_00
          integer, intent(in) :: k
          xtra2_00 = 0d0 
-         xtra2_00 % val = 0d0 
+         xtra2_00 % val = 0d0
          xtra2_00 % d1Array(i_xtra2_00) = 1d0
       end function wrap_xtra2_00
 
@@ -1193,42 +1224,10 @@
          integer, intent(in) :: k
          xtra2_p1 = 0d0 
          if (k < s%nz) then
-            xtra2_p1 % val = 0d0 
+            xtra2_p1 % val = 0d0
             xtra2_p1 % d1Array(i_xtra2_p1) = 1d0
          end if
       end function wrap_xtra2_p1
-
-
-      function wrap_xtra3_m1(s, k) result(xtra3_m1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: xtra3_m1
-         integer, intent(in) :: k
-         xtra3_m1 = 0d0 
-         if (k > 1) then
-            xtra3_m1 % val = 0d0
-            xtra3_m1 % d1Array(i_xtra3_m1) = 1d0
-         end if            
-      end function wrap_xtra3_m1
-
-      function wrap_xtra3_00(s, k) result(xtra3_00)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: xtra3_00
-         integer, intent(in) :: k
-         xtra3_00 = 0d0 
-         xtra3_00 % val = 0d0
-         xtra3_00 % d1Array(i_xtra3_00) = 1d0
-      end function wrap_xtra3_00
-
-      function wrap_xtra3_p1(s, k) result(xtra3_p1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: xtra3_p1
-         integer, intent(in) :: k
-         xtra3_p1 = 0d0 
-         if (k < s%nz) then
-            xtra3_p1 % val = 0d0
-            xtra3_p1 % d1Array(i_xtra3_p1) = 1d0
-         end if
-      end function wrap_xtra3_p1
 
 
 end module auto_diff_support

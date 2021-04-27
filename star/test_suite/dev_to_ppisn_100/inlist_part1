@@ -26,7 +26,7 @@
       max_model_number = 4000 
       !max_number_retries = 30
 
-      ejecta_mass_max_limit = 2.5d0
+      ejecta_mass_max_limit = 0.1d0
       log_Rsurf_upper_limit = 4d0
       fe_core_infall_limit = 1d7
 

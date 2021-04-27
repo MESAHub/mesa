@@ -41,6 +41,7 @@
       subroutine do_write_model(id, filename, ierr)
          use utils_lib
          use chem_def
+         use star_utils, only: get_scale_height_face_val
          integer, intent(in) :: id
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
@@ -114,7 +115,7 @@
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
          if (BTEST(file_type, bit_for_w)) &
-            write(iounit,'(a)',advance='no') ', turbulent velocity (w)'
+            write(iounit,'(a)',advance='no') ', turbulent velocity (w), pressure scale height (Hp)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -197,8 +198,10 @@
             else if (RSP2_flag) then
                if (s% using_RSP2) then
                   call write1(s% w(k),ierr); if (ierr /= 0) exit
+                  call write1(s% Hp_face(k),ierr)
                else ! cv = sqrt_2_div_3*w
-                  call write1(s% mlt_vc(k)/sqrt_2_div_3,ierr)
+                  call write1(s% mlt_vc(k)/sqrt_2_div_3,ierr); if (ierr /= 0) exit
+                  call write1(get_scale_height_face_val(s,k),ierr)
                end if
                if (ierr /= 0) exit
             end if            
@@ -272,6 +275,7 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (RSP2_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'w'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'Hp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (.not. no_L) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'

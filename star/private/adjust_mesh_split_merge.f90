@@ -49,7 +49,11 @@
          include 'formats'
          
          if (s% using_RSP2) then
-            stop 'need to add mlt_vc to remesh_split_merge'
+            stop 'need to add mlt_vc and Hp_face to remesh_split_merge'
+         end if
+         
+         if (s% v_flag) then
+            stop 'need to check remesh_split_merge for v_flag'
          end if
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
@@ -615,7 +619,10 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
-            if (s% using_RSP2) s% w(im) = s% w(i0)
+            if (s% using_RSP2) then
+               s% w(im) = s% w(i0)
+               s% Hp_face(im) = s% Hp_face(i0)
+            end if
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
@@ -643,7 +650,10 @@
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
          
-         if (s% using_RSP2) s% xh(s% i_w,i) = s% w(i)
+         if (s% using_RSP2) then
+            s% xh(s% i_w,i) = s% w(i)
+            s% xh(s% i_Hp,i) = s% Hp_face(i)
+         end if
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)

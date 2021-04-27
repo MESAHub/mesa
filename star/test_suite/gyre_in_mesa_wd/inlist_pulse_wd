@@ -23,7 +23,6 @@
 / ! end of kap namelist
 
 &controls      
-      
       ! limit max_model_number as part of test_suite
       max_model_number = 2000
       
