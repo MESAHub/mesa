@@ -217,7 +217,7 @@
             use hydro_rsp2, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_div_w, RTI_diffusion_ad
+               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad
             include 'formats'
             ierr = 0
          
@@ -257,7 +257,7 @@
             
             Eq_ad = 0d0
             if (s% using_RSP2) then             
-               Eq_ad = compute_Eq_cell(s, k, Eq_div_w, ierr)
+               Eq_ad = compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if   
             

@@ -99,7 +99,8 @@
    Henyey_MLT_nu_param = 8
 
 ! mesh
-   okay_to_remesh = .false.
+   !okay_to_remesh = .false.
+   remesh_dt_limit = 1d0 ! turn off when dt smaller than this
 
 ! solver
    use_momentum_outer_BC = .true.
@@ -129,16 +130,16 @@
       terminal_interval = 10
       write_header_frequency = 10
       
-      photo_interval = 5
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
       
       compare_TDC_to_MLT = .true.
       
-      x_integer_ctrl(19) = 1658 ! k
-      x_integer_ctrl(20) = 0 ! solver iter
-      x_integer_ctrl(21) = 65 ! model_number
+      !x_integer_ctrl(19) = 1668 ! k
+      !x_integer_ctrl(20) = 0 ! solver iter
+      !x_integer_ctrl(21) = 65 ! model_number
 
 ! FOR DEBUGGING
 

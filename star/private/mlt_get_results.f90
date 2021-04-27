@@ -253,7 +253,10 @@
          s% xtra5_array(k) = D%val
          s% xtra6_array(k) = safe_log10(abs(gradT%val - grada%val))
          
-         if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT         
+         if (okay_to_use_TDC .and. compare_TDC_to_MLT) then
+            Y_guess = gradT - grada ! update the guess for use by TDC
+            call do_compare_TDC_to_MLT         
+         end if
          
          contains
 
@@ -526,9 +529,35 @@
             A0 = 0d0
          end if
 
+         ! First, find a guess for Y.
+         !
+         ! If Q(Y=0) is positive then the luminosity is too great to be carried radiatively, so
+         ! we'll necessarily have Y > 0.
+         !
+         ! If Q(Y=0) is negative then the luminosity can be carried by radiation alone, so we'll
+         ! necessarily have Y < 0.
+         !
+         ! This isn't just a physics argument: if unconvinced examine the mathematical form of Q and notice that it's
+         ! monotonically decreasing in Y, so if Q > 0 when Y=0 the solution to Q=0 has Y > 0. Likewise if Q < 0 when Y=0
+         ! the solution to Q=0 has Y < 0.
+         Y = 0d0
+         call compute_Q(s, k, mixing_length_alpha, &
+            Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, grada, Q, Af)
+         if (Q > 0d0) then
+            Y_is_positive = .true.
+         else
+            Y_is_positive = .false.
+         end if
+
+         ! Now we know the sign of Y, we need an actual guess as to its magnitude.
+         if (Y_is_positive) then
+            Y = convert(abs(Y_guess))
+         else
+            Y = convert(-abs(Y_guess))
+         end if
+
          ! Bisection method to find an initial guess, then we hand it off to Newton's method
          ! to optimize and imbue it with derivatives
-         Y = convert(Y_guess)
          first_Q_is_positive = .false.
          if (Y == 0d0) Y = 1d-30
          do iter=1,10
@@ -594,6 +623,7 @@
                Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
             Z_new%d1val1 = 1d0            
             Z = Z_new
+
             if (Y_is_positive) then
                Y = exp(Z)
             else

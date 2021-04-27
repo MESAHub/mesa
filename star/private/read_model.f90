@@ -76,10 +76,11 @@
 
       subroutine finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
          use hydro_vars, only: set_vars
-         use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, reset_epsnuc_vectors, &
-            set_qs, get_scale_height_face_val
-         use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, set_i_rot_from_omega_and_j_rot, &
-            use_xh_to_update_i_rot, set_rotation_info
+         use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, &
+            reset_epsnuc_vectors, set_qs
+         use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
+            set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
+         use hydro_rsp2, only: Hp_face_for_rsp2_val
          use rsp, only: rsp_setup_part1, rsp_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
@@ -178,7 +179,11 @@
             ! need to set xh(i_Hp,0) after have called eos to get P
             i_Hp = s% i_Hp
             do k=1,s%nz
-               s% Hp_face(k) = get_scale_height_face_val(s,k)
+               s% Hp_face(k) = Hp_face_for_rsp2_val(s, k, ierr)
+               if (ierr /= 0) then
+                  write(*,*) 'finish_load_model: Hp_face_for_rsp2_val returned ierr', ierr
+                  return
+               end if
                s% xh(i_Hp,k) = s% Hp_face(k)
             end do
          end if
