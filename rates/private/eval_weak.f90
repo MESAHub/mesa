@@ -326,6 +326,7 @@
          contains
          
          subroutine show_stuff
+            integer :: i
             include 'formats'
             write(*,1) 'T9', T9
             write(*,1) 'lYeRho', lYeRho
