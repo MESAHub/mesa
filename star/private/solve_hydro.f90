@@ -180,6 +180,10 @@
                do k = 1, nz
                   s% xh(j1,k) = s% w(k)
                end do
+            else if (j1 == s% i_Hp .and. s% i_Hp <= nvar) then
+               do k = 1, nz
+                  s% xh(j1,k) = s% Hp_face(k)
+               end do
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz
                   s% xh(j1,k) = s% v(k)

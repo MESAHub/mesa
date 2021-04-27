@@ -31,13 +31,14 @@
       use auto_diff
       use auto_diff_support
       use accurate_sum_auto_diff_star_order1
-      use star_utils, only: em1, e00, ep1
+      use star_utils
 
       implicit none
 
       private
-      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, compute_Eq_cell, &
-         compute_Uq_face, set_RSP2_vars, &
+      public :: &
+         do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
+         compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
          set_using_RSP2, set_etrb_start_vars
       
       real(dp), parameter :: &
@@ -89,8 +90,8 @@
             s% need_to_reset_w = .false.
          end if
          do k=1,s%nz
-            x = compute_Hp_face(s, k, ierr) ! sets Hp_face
-            if (ierr /= 0) return
+            ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
+            if (s% Hp_face(k) <= 0) s% Hp_face(k) = get_scale_height_face_val(s,k)
             x = compute_L_face(s, k, ierr) ! sets Lr, Lt, Lc
             if (ierr /= 0) return
          end do
@@ -99,9 +100,9 @@
          s% Lc(1) = 0d0
          s% Lt(1) = 0d0
       end subroutine set_RSP2_vars
-      
 
-      subroutine do1_tdc_L_eqn(s, k, skip_partials, nvar, ierr)
+
+      subroutine do1_rsp2_L_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -128,8 +129,8 @@
          L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
          if (is_bad(scale)) then
-            write(*,2) 'do1_tdc_L_eqn scale', k, scale
-            stop 'do1_tdc_L_eqn'
+            write(*,2) 'do1_rsp2_L_eqn scale', k, scale
+            stop 'do1_rsp2_L_eqn'
          end if
          resid = (L_expected - L_actual)*scale         
       
@@ -140,231 +141,119 @@
          end if
          
          if (skip_partials) return
-         call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_tdc_L_eqn', ierr)
+         call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_rsp2_L_eqn', ierr)
          if (ierr /= 0) return
 
          if (test_partials) then
             s% solver_test_partials_var = s% i_lnR
             s% solver_test_partials_dval_dx = resid%d1Array(i_lnR_00)
-            write(*,4) 'do1_tdc_L_eqn', s% solver_test_partials_var
+            write(*,4) 'do1_rsp2_L_eqn', s% solver_test_partials_var
          end if      
-      end subroutine do1_tdc_L_eqn
-
-
-      subroutine eval_xis(s, k, xi0, xi1, xi2, ierr)
-         use star_utils, only: calc_Ptrb_ad_tw
-         ! Inputs
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-
-         ! Outputs
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: xi0, xi1, xi2
-
-         ! Intermediates
-         type(auto_diff_real_star_order1) :: &
-            tst, Source, S0, Eq, Eq0, DAMP, D0, DAMPR, DR0, Ptrb, Pt0, dV
-         logical :: test_partials
-
-         !type(accurate_auto_diff_real_star_order1) :: esum_ad
-
-         include 'formats'
-
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-
-         ! Evaluate S0 = (Source / w)
-         Source = compute_Source(s, k, S0, ierr)
-         if (ierr /= 0) return
-
-         ! Evaluate Eq0 = (Eq / w)
-         Eq = compute_Eq_cell(s, k, Eq0, ierr)
-         if (ierr /= 0) return
-
-         ! Evaluate D0 = (DAMP / w)
-         DAMP = compute_D(s, k, D0, ierr)
-         if (ierr /= 0) return
-
-         ! Evaluate DR0 = (DAMPR / etrb)
-         DAMPR = compute_Dr(s, k, DR0, ierr)
-         if (ierr /= 0) return
-         
-         call calc_Ptrb_ad_tw(s, k, Ptrb, Pt0, ierr) 
-         if (ierr /= 0) return
-
-         ! Evaluate xi0
-         xi0 = Eq0 + S0
-
-         ! Evaluate xi1 (carefully to avoid subtraction)
-         ! dV = 1d0/d_00 - 1d0/s% rho_start(k) ! = (rho_start - rho)/(rho*rho_start)
-         ! dlnd = wrap_dxh_lnd = lnd(k) - lnd_start(k) from solver without subtraction
-         ! expm1(dlnd) = (rho - rho_start)/rho_start
-         dV = -expm1(wrap_dxh_lnd(s,k))/wrap_d_00(s,k)
-         xi1 = -(DR0 + Pt0 * dV)
-         
-         ! Evaluate xi2
-         xi2 = -D0
-
-         if (k < -60 .and. k > 30) then
-            write(*,*) D0%val, Eq0%val, S0%val
-         end if
-         
-         if (test_partials) then
-            tst = xi0
-            s% solver_test_partials_val = tst%val
-            s% solver_test_partials_var = s% i_lnd
-            s% solver_test_partials_dval_dx = tst%d1Array(i_lnd_00)
-            write(*,*) 'eval_xis', s% solver_test_partials_var, s% lnd(k)/ln10, tst%val
-         end if
-
-      end subroutine eval_xis
+      end subroutine do1_rsp2_L_eqn
       
-      !> Returns the smallest positive z such that tan(z) = y/x
-      type(auto_diff_real_star_order1) function two_var_pos_atan(x,y) result(z)
-         type(auto_diff_real_star_order1), intent(in) :: x,y
-         type(auto_diff_real_star_order1) :: x1, y1
 
-         x1 = abs(x) + 1d-50
-         y1 = abs(y) + 1d-50
-         z = atan(y1/x1)
-         if (z < 0d0) then
-            z = z + pi
-         end if
-      end function two_var_pos_atan
-
-      subroutine eval_Af_from_A0(s, k, xi0, xi1, xi2, A0, Af, dt, i)
+      subroutine do1_rsp2_Hp_eqn(s, k, skip_partials, nvar, ierr)
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: dt
-         integer, intent(in) :: i
-         type(auto_diff_real_star_order1), intent(in) :: xi0, xi1, xi2, A0
-         type(auto_diff_real_star_order1), intent(out) :: Af
-         
-         integer :: l
-         type(auto_diff_real_star_order1) :: J2, J, Jt, em1, ep1, num, den, root, y, tst
+         integer, intent(in) :: k, nvar
+         logical, intent(in) :: skip_partials
+         integer, intent(out) :: ierr         
+         type(auto_diff_real_star_order1) ::  &
+            Hp_expected, Hp_actual,resid
+         real(dp) :: scale, residual, Hp_start
          logical :: test_partials
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
-
-         J2 = pow2(xi1) - 4d0 * xi0 * xi2
-         !if (test_partials) write(*,2) 'J2', k, J2%val, pow2(xi1%val), 4d0 * xi0%val * xi2%val
-
-         if (J2 > 0d0) then
-            ! Hyperbolic branch
-
-            J = sqrt(J2)
-            Jt = dt * J
-
-            em1 = expm1(min(30d0, 0.5d0 * Jt)) ! avoid the subtraction
-            ep1 = em1 + 2d0
-
-            !num = em1 * (J2 - pow2(xi1))    - 2d0 * A0 * xi2 * (ep1 * J + em1 * xi1)
-            num =  em1 * (- 4d0 * xi0 * xi2) - 2d0 * A0 * xi2 * (ep1 * J + em1 * xi1) ! avoid the subtraction
-            den = 2d0 * xi2 * (-ep1 * J + em1 * (xi1 + 2d0 * A0 * xi2))
-
-            Af = num / den
-            if (Af < 0d0) then
-               Af = -Af
-            end if
-
-            if (test_partials) then
-               tst = Af
-               s% solver_test_partials_val = tst%val
-               s% solver_test_partials_var = s% i_lnd
-               s% solver_test_partials_dval_dx = tst%d1Array(i_lnd_00)
-               write(*,*) 'eval_Af_from_A0', s% solver_test_partials_var, &
-                  s% lnd(k)/ln10, tst%val, J2%val
-            end if
-
-            if (i > 30 .and. i < -60) then
-               write(*,*) 'k          ',i
-               write(*,*) 'xis        ',xi0%val, xi1%val, xi2%val
-               write(*,*) 'num,den    ',num%val, den%val
-               write(*,*) 'J2,J       ',J2%val, J%val
-               write(*,*) 'em1,ep1    ',em1%val, ep1%val
-               write(*,*) 'A0,Af,xiR  ',A0%val,Af%val,sqrt(abs(xi0%val/xi2%val))
-            end if
-
-            do l=1,27
-               if (is_bad(Af%d1Array(l))) then
-                  !$omp critical (eval_Af_crit)
-                  write(*,*) 'Bad partial in Af in Hyperbolic branch.'
-                  write(*,*) 'Partial      ',l
-                  write(*,*) 'Af           ',Af%val
-                  write(*,*) 'Af Partial   ',Af%d1Array(l)
-                  write(*,*) 'xi0          ',xi0%val
-                  write(*,*) 'xi0 Partial  ',xi0%d1Array(l)
-                  write(*,*) 'xi1          ',xi1%val
-                  write(*,*) 'xi1 Partial  ',xi1%d1Array(l)
-                  write(*,*) 'xi2          ',xi2%val
-                  write(*,*) 'xi2 Partial  ',xi2%d1Array(l)
-                  write(*,*) 'num          ',num%val
-                  write(*,*) 'num Partial  ',num%d1Array(l)
-                  write(*,*) 'den          ',den%val
-                  write(*,*) 'den Partial  ',den%d1Array(l)
-                  stop 'eval_Af_from_A0'
-                  !$omp end critical (eval_Af_crit)
-                  end if
-            end do
-
-         else
-            ! Trigonometric branch
-
-            J = sqrt(-J2)
-            Jt = dt * J
-
-            ! This branch contains decaying solutions that reach A = 0, at which point
-            ! they switch onto the 'zero' branch. So we have to calculate the position of
-            ! the first root to check it against dt.
-            y = xi1 + 2d0 * A0 * xi2
-
-            ! We had a choice above to pick which of +-I to use in switching branches.
-            ! That choice has to be consistent with a decaying solution, which we check now.
-            if ((J > 0d0 .and. y < 0d0) .or. (J < 0d0 .and. y > 0d0)) then
-               J = -J
-            end if
-
-            root = two_var_pos_atan(J, y) - two_var_pos_atan(J, xi1)
-
-            if (0.25d0 * Jt < root) then
-               num = -xi1 + J * tan(0.25d0 * Jt + atan(y / J)) 
-               den = 2d0 * xi2
-               Af = num / den
-            else
-               Af = 0d0
-            end if
-
-            do l=1,27
-               if (is_bad(Af%d1Array(l))) then
-                  !$omp critical (eval_Af_crit)
-                  write(*,*) 'Bad partial in Af in Trigonometric branch.'
-                  write(*,*) 'Partial      ',l
-                  write(*,*) 'Af           ',Af%val
-                  write(*,*) 'Af Partial   ',Af%d1Array(l)
-                  write(*,*) 'xi0          ',xi0%val
-                  write(*,*) 'xi0 Partial  ',xi0%d1Array(l)
-                  write(*,*) 'xi1          ',xi1%val
-                  write(*,*) 'xi1 Partial  ',xi1%d1Array(l)
-                  write(*,*) 'xi2          ',xi2%val
-                  write(*,*) 'xi2 Partial  ',xi2%d1Array(l)
-                  write(*,*) 'root         ',root%val
-                  write(*,*) 'root Partial ',root%d1Array(l)
-                  write(*,*) 'num          ',num%val
-                  write(*,*) 'num Partial  ',num%d1Array(l)
-                  write(*,*) 'den          ',den%val
-                  write(*,*) 'den Partial  ',den%d1Array(l)
-                  stop 'eval_Af_from_A0'
-                  !$omp end critical (eval_Af_crit)
-                  end if
-            end do
-
-            !write(*,*) 'trig',xi0%val,xi1%val,xi2%val,J%val,root%val,dt,num%val, den%val,Af%val
-
+         
+         if (.not. s% using_RSP2) then
+            ierr = -1
+            return
          end if
 
-      end subroutine eval_Af_from_A0
+         ierr = 0
+         Hp_expected = Hp_face_for_rsp2_eqn(s, k, ierr)
+         if (ierr /= 0) return        
+         Hp_actual = wrap_Hp_00(s, k)  
+         Hp_start = s% Hp_face_start(k)
+         scale = 1d0/Hp_start
+         if (is_bad(scale)) then
+            write(*,2) 'do1_rsp2_Hp_eqn scale', k, scale
+            stop 'do1_rsp2_Hp_eqn'
+         end if
+         resid = (Hp_expected - Hp_actual)*scale         
+      
+         residual = resid%val
+         s% equ(s% i_equ_Hp, k) = residual         
+         if (test_partials) then
+            s% solver_test_partials_val = residual 
+         end if
+         
+         if (skip_partials) return
+         call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp2_Hp_eqn', ierr)
+         if (ierr /= 0) return
+
+         if (test_partials) then
+            s% solver_test_partials_var = s% i_lnR
+            s% solver_test_partials_dval_dx = resid%d1Array(i_lnR_00)
+            write(*,4) 'do1_rsp2_Hp_eqn', s% solver_test_partials_var
+         end if      
+         
+         contains
+      
+         function Hp_face_for_rsp2_eqn(s, k, ierr) result(Hp_face) ! cm
+            type (star_info), pointer :: s
+            integer, intent(in) :: k
+            integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: Hp_face
+            type(auto_diff_real_star_order1) :: &
+               rho_face, area, dlnPeos, &
+               r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
+               d_face, Peos_face, alt_Hp_face, A
+            real(dp) :: alfa, beta
+            integer :: j
+            include 'formats'
+            ierr = 0
+            if (k > s% nz) then
+               Hp_face = 1d0 ! not used
+               return
+            end if
+            if (k > 1 .and. .not. s% RSP2_assume_HSE) then
+               call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+               rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
+               area = 4d0*pi*pow2(wrap_r_00(s,k))
+               dlnPeos = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
+               Hp_face = -s% dm_bar(k)/(area*rho_face*dlnPeos)
+            else
+               r_00 = wrap_opt_time_center_r_00(s, k)
+               d_00 = wrap_d_00(s, k)
+               Peos_00 = wrap_Peos_00(s, k)
+               if (k == 1) then
+                  Peos_div_rho = Peos_00/d_00
+                  Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
+               else
+                  d_m1 = wrap_d_m1(s, k)
+                  Peos_m1 = wrap_Peos_m1(s, k)
+                  call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+                  Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
+                  Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
+                  if (s% alt_scale_height_flag) then
+                     ! consider sound speed*hydro time scale as an alternative scale height
+                     d_face = alfa*d_00 + beta*d_m1
+                     Peos_face = alfa*Peos_00 + beta*Peos_m1
+                     alt_Hp_face = sqrt(Peos_face/s% cgrav(k))/d_face
+                     if (alt_Hp_face%val < Hp_face%val) then ! blend
+                        A = pow2(alt_Hp_face/Hp_face) ! 0 <= A%val < 1
+                        Hp_face = A*Hp_face + (1d0 - A)*alt_Hp_face
+                     end if
+                  end if
+               end if
+            end if
+         end function Hp_face_for_rsp2_eqn
+         
+      end subroutine do1_rsp2_Hp_eqn
+
 
       subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
@@ -377,10 +266,10 @@
          type(auto_diff_real_star_order1) :: &
             d_turbulent_energy_ad, Ptrb_dV_ad, dt_C_ad, dt_Eq_ad
          type(auto_diff_real_star_order1) :: xi0, xi1, xi2, A0, Af, w_00
-         type(auto_diff_real_star_order1) :: tst, resid_ad, scal, dt_dLt_dm_ad
+         type(auto_diff_real_star_order1) :: tst, resid_ad, dt_dLt_dm_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: non_turbulent_cell, test_partials
-         real(dp) :: residual, atol, rtol, old_scal
+         real(dp) :: residual, atol, rtol, scal
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -392,62 +281,22 @@
          non_turbulent_cell = &
             s% mixing_length_alpha == 0d0 .or. &
             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-            k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent
-         
-         if (.not. s% using_RSP2) then
-             
+            k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent         
+         if (.not. s% using_RSP2) then           
             resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP2
-
          else if (non_turbulent_cell) then
-
-            resid_ad = w_00/s% csound(k) ! make w = 0
-            
-         else if (s% RSP2_use_RSP_form_of_etrb_eqn) then          ! OLD WAY
-
+            resid_ad = w_00/s% csound(k) ! make w = 0         
+         else 
             call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
             call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return ! erg g^-1
             call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
             call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
             call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
-            call set_energy_eqn_scal(s, k, old_scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)         
+            call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)         
             ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
             esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
             resid_ad = esum_ad
-            resid_ad = resid_ad*old_scal/s%dt ! to make residual unitless, must cancel out the dt in scal
-
-         else
-         
-            call eval_xis(s, k, xi0, xi1, xi2, ierr)
-            if (ierr /= 0) then
-               if (s% report_ierr) write(*,2) 'ierr from do1_turbulent_energy_eqn eval_xis', k
-               return
-            end if
-
-            A0 = max(0d0, get_w_start(s,k))
-            call eval_Af_from_A0(s, k, xi0, xi1, xi2, A0, Af, s%dt, k)
-
-            if (s% RSP2_alfat == 0d0) then
-               resid_ad = w_00 - Af
-            else
-               call setup_dt_dLt_dm_ad(ierr)
-               if (ierr /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr from do1_turbulent_energy_eqn setup_dt_dLt_dm_ad', k
-                  return
-               end if
-               ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
-               ! 2*w*(w - A) = 2*w*B*(xi1 + (2*A+B)*xi2) - 2*w*Lambda
-               ! B = (w-A) so
-               ! 2*w*(w - A) = 2*w*(w-A)*(xi1 + (w+A)*xi2) - 2*w*Lambda
-               ! -2*w*Lambda = -dt_dLt_dm_ad
-               esum_ad = (w_00 - Af) * (1d0 - s%dt * (xi1 + (w_00 + Af) * xi2)) + dt_dLt_dm_ad / (2d0 * (1d3 + w_00))
-               resid_ad = esum_ad
-            end if
-
-            atol = 10d0*s%csound(k)
-            rtol = 1d4
-            scal = 1d0/(atol + rtol*w_00)
-            resid_ad = resid_ad*scal
-
+            resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
          end if
 
          residual = resid_ad%val
@@ -530,30 +379,6 @@
          end subroutine setup_dt_Eq_ad
       
       end subroutine do1_turbulent_energy_eqn
-
-
-      function compute_etrb_mlt_cell(s, k, ierr) result(etrb_mlt) ! erg g^-1
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: etrb_mlt
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: mlt_vc_00, mlt_vc_p1, vc_cell_mlt
-         include 'formats'
-         ierr = 0
-         if (k > 1) then
-            mlt_vc_00 = s% mlt_vc_ad(k)
-         else
-            mlt_vc_00 = 0d0
-         end if
-         if (k < s% nz) then
-            mlt_vc_p1 = shift_p1(s% mlt_vc_ad(k+1))
-         else
-            mlt_vc_p1 = 0d0
-         end if
-         vc_cell_mlt = 0.5d0*(mlt_vc_00 + mlt_vc_p1)
-         ! vc_mlt = sqrt(2/3)*w   
-         etrb_mlt = 1.5d0*pow2(vc_cell_mlt)
-      end function compute_etrb_mlt_cell
       
       
       function compute_Hp_cell(s, k, ierr) result(Hp_cell) ! cm
@@ -609,60 +434,6 @@
             beta = 0.5d0
          end if
       end subroutine get_RSP2_alfa_beta_face_weights
-      
-      
-      function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Hp_face
-         type(auto_diff_real_star_order1) :: &
-            rho_face, area, dlnPeos, &
-            r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
-            d_face, Peos_face, alt_Hp_face, A
-         real(dp) :: alfa, beta
-         integer :: j
-         include 'formats'
-         ierr = 0
-         if (k > s% nz) then
-            Hp_face = 1d0 ! not used
-            s% Hp_face(k) = Hp_face%val
-            return
-         end if
-         if (k > 1 .and. .not. s% RSP2_assume_HSE) then
-            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-            rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
-            area = 4d0*pi*pow2(wrap_r_00(s,k))
-            dlnPeos = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
-            Hp_face = -s% dm_bar(k)/(area*rho_face*dlnPeos)
-         else
-            r_00 = wrap_opt_time_center_r_00(s, k)
-            d_00 = wrap_d_00(s, k)
-            Peos_00 = wrap_Peos_00(s, k)
-            if (k == 1) then
-               Peos_div_rho = Peos_00/d_00
-               Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
-            else
-               d_m1 = wrap_d_m1(s, k)
-               Peos_m1 = wrap_Peos_m1(s, k)
-               call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-               Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
-               Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
-               if (s% alt_scale_height_flag) then
-                  ! consider sound speed*hydro time scale as an alternative scale height
-                  d_face = alfa*d_00 + beta*d_m1
-                  Peos_face = alfa*Peos_00 + beta*Peos_m1
-                  alt_Hp_face = sqrt(Peos_face/s% cgrav(k))/d_face
-                  if (alt_Hp_face%val < Hp_face%val) then ! blend
-                     A = pow2(alt_Hp_face/Hp_face) ! 0 <= A%val < 1
-                     Hp_face = A*Hp_face + (1d0 - A)*alt_Hp_face
-                  end if
-               end if
-            end if
-         end if
-         s% Hp_face(k) = Hp_face%val
-
-      end function compute_Hp_face
 
       
       function compute_Y_face(s, k, ierr) result(Y_face) ! superadiabatic gradient [unitless]
@@ -694,7 +465,7 @@
          if (s% RSP2_use_RSP_eqn_for_Y_face) then
       
             dm_bar = s% dm_bar(k)
-            Hp_face = compute_Hp_face(s,k,ierr)
+            Hp_face = wrap_Hp_00(s,k)
             if (ierr /= 0) return
       
             r_00 = wrap_opt_time_center_r_00(s, k)
@@ -882,7 +653,7 @@
             w_rho2_m1 = wrap_w_m1(s,k)*pow2(wrap_d_m1(s,k))
             f_m1 = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k-1)  
             Chi_m1_div_r6_Hp = f_m1*w_rho2_m1*d_v_div_r_m1
-            Hp_face = compute_Hp_face(s,k,ierr)
+            Hp_face = wrap_Hp_00(s,k)
             if (ierr /= 0) return            
             r6_face = pow6(wrap_r_00(s,k))
             dChi_dm_bar = (Chi_m1_div_r6_Hp - Chi_00_div_r6_Hp)*r6_face*Hp_face
@@ -966,15 +737,14 @@
          chiRho_00 = wrap_chiRho_00(s, k)
          QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
             
-         Hp_face_00 = compute_Hp_face(s,k,ierr)
-         if (ierr /= 0) return
+         Hp_face_00 = wrap_Hp_00(s,k)
          PII_face_00 = compute_PII_face(s, k, ierr)
          if (ierr /= 0) return
          
          if (k == s% nz) then
             PII_div_Hp_cell = PII_face_00/Hp_face_00
          else
-            Hp_face_p1 = shift_p1(compute_Hp_face(s,k+1,ierr))
+            Hp_face_p1 = wrap_Hp_p1(s,k)
             if (ierr /= 0) return
             PII_face_p1 = shift_p1(compute_PII_face(s, k+1, ierr))
             if (ierr /= 0) return
@@ -1280,8 +1050,7 @@
          w_face = alfa*w_00 + beta*w_m1
          etrb_m1 = wrap_etrb_m1(s,k)
          etrb_00 = wrap_etrb_00(s,k)
-         Hp_face = compute_Hp_face(s,k,ierr)
-         if (ierr /= 0) return         
+         Hp_face = wrap_Hp_00(s,k)      
          ! Ft = - alpha_t * rho_face * alpha * Hp_face * w_face * detrb/dr (thesis eqn 2.44)
          ! replace dr by dm_bar/(area*rho_face)
          ! Ft = - alpha_alpha_t * rho_face * Hp_face * w_face * (area*rho_face) * detrb/dm_bar
@@ -1309,19 +1078,20 @@
             if (ierr /= 0) return
             s% Lt_start(k) = Lt%val  
             s% w_start(k) = s% w(k)
+            s% Hp_face_start(k) = s% Hp_face(k)
          end do         
       end subroutine set_etrb_start_vars
       
       
       subroutine reset_etrb_using_L(s, ierr)
-         use star_utils, only: store_etrb_in_xh
+         use star_utils, only: get_scale_height_face, store_etrb_in_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
          integer :: k, nz, j, k_maxerr
          real(dp) :: Lc_val, w_00, maxerr, dlnP, dlnT, gradT_actual, &
             super_ad_actual, super_ad_expected
          type(auto_diff_real_star_order1) :: &
-            Lc_div_w_face, L, Lr, Lc, Lt, Y_face
+            Lc_div_w_face, L, Lr, Lc, Lt, Y_face, Hp_face
          real(dp), allocatable :: w_face(:), target_Lc(:)
          real(dp) :: alfa, beta
          real(dp), parameter :: atol = 1-6d0, rtol = 1d-9
@@ -1332,6 +1102,9 @@
          allocate(w_face(nz), target_Lc(nz))
 
          do k=1, nz
+            Hp_face = get_scale_height_face(s,k)
+            s% Hp_face(k) = Hp_face%val
+            s% xh(s% i_Hp,k) = s% Hp_face(k)
             Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'failed in compute_Lr'
             Lc = compute_Lc_terms(s, k, Lc_div_w_face, ierr)

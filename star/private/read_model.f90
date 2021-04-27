@@ -54,6 +54,7 @@
       integer, parameter :: increment_for_D_omega_flag = 1
       integer, parameter :: increment_for_am_nu_rot_flag = 1
       integer, parameter :: increment_for_RTI_flag = 1
+      integer, parameter :: increment_for_w = 1
       integer, parameter :: increment_for_RSP_flag = 3
       
       integer, parameter :: max_increment = increment_for_rotation_flag &
@@ -62,6 +63,7 @@
                                           + increment_for_D_omega_flag &
                                           + increment_for_am_nu_rot_flag &
                                           + increment_for_RTI_flag &
+                                          + increment_for_w &
                                           + increment_for_RSP_flag
 
       integer, parameter :: mesa_zams_file_type = 2**bit_for_zams_file
@@ -75,7 +77,7 @@
       subroutine finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, reset_epsnuc_vectors, &
-            set_qs
+            set_qs, get_scale_height_face_val
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, set_i_rot_from_omega_and_j_rot, &
             use_xh_to_update_i_rot, set_rotation_info
          use rsp, only: rsp_setup_part1, rsp_setup_part2
@@ -84,7 +86,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart, want_rsp_model, is_rsp_model
          integer, intent(out) :: ierr
-         integer :: k, i, j, i_u, i_du,  nz
+         integer :: k, i, j, i_u, i_du,  nz, i_Hp
          real(dp) :: u00, um1, xm, total_radiation
 
          logical, parameter :: dbg = .false.
@@ -170,8 +172,15 @@
          end if
          s% doing_finish_load_model = .false.
 
-         if (s% rotation_flag) then
-            s% total_angular_momentum = total_angular_momentum(s)
+         if (s% rotation_flag) s% total_angular_momentum = total_angular_momentum(s)
+
+         if (is_RSP_model .and. (.not. want_RSP_model) .and. s% i_Hp /= 0) then
+            ! need to set xh(i_Hp,0) after have called eos to get P
+            i_Hp = s% i_Hp
+            do k=1,s%nz
+               s% Hp_face(k) = get_scale_height_face_val(s,k)
+               s% xh(i_Hp,k) = s% Hp_face(k)
+            end do
          end if
 
          if (s% RSP_flag) then
@@ -559,7 +568,7 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Hp, &
             i_Et_RSP, i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -578,6 +587,7 @@
          i_lum = s% i_lum
          no_L = (i_lum == 0)
          i_w = s% i_w         
+         i_Hp = s% i_Hp         
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -633,10 +643,11 @@
                   j=j+1; ! discard
                   j=j+1; xh(i_lum,k) = vec(j)
                   ! attempt to compensate for exp(log(r)) /= r
-                  xh(i_lnR,k) = log(exp(xh(i_lnR,k)))
+                  !xh(i_lnR,k) = log(exp(xh(i_lnR,k)))
                end if
             else if (i_w /= 0) then
                j=j+1; xh(i_w,k) = vec(j)
+               j=j+1; xh(i_Hp,k) = vec(j)
                j=j+1; xh(i_lum,k) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,k) = vec(j)

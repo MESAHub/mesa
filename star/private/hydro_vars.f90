@@ -34,7 +34,7 @@
 
       private
       public :: set_vars_if_needed, set_vars, set_final_vars, set_cgrav, &
-         set_hydro_vars, set_Teff_info_for_eqns, set_Teff, get_surf_PT
+         set_hydro_vars, set_Teff_info_for_eqns, set_Teff, get_surf_PT, set_grads
 
       logical, parameter :: dbg = .false.
       logical, parameter :: trace_setvars = .false.
@@ -220,7 +220,7 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_w, &
+         integer :: i_lnd, i_lnT, i_lnR, i_w, i_Hp, &
             i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_Et_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
@@ -237,6 +237,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          i_w = s% i_w
+         i_Hp = s% i_Hp
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -312,6 +313,10 @@
                      s% w(k) = s% xh(i_w, k)
                      s% dxh_w(k) = 0d0
                   end do
+               else if (j == i_Hp) then
+                  do k=1,nz
+                     s% Hp_face(k) = s% xh(i_Hp, k)
+                  end do
                else if (j == i_lum) then
                   do k=1,nz
                      s% L(k) = s% xh(i_lum, k)
@@ -344,12 +349,10 @@
             end do
 
             if (i_lum == 0 .and. .not. s% RSP_flag) s% L(1:nz) = 0d0
-
             if (i_v == 0) s% v(1:nz) = 0d0
-
             if (i_u == 0) s% u(1:nz) = 0d0
-
             if (i_w == 0) s% w(1:nz) = 0d0
+            if (i_Hp == 0) s% Hp_face(1:nz) = 0d0
 
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
@@ -493,8 +496,7 @@
          use atm_lib, only: atm_eval_T_tau_dq_dtau
          use atm_support, only: get_T_tau_id
          use micro, only: set_micro_vars
-         use mlt_info, only: &
-            set_mlt_vars, check_for_redo_MLT, set_grads
+         use mlt_info, only: set_mlt_vars, check_for_redo_MLT
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs, set_max_conv_time_scale, set_using_TDC
@@ -916,6 +918,130 @@
          return
 
       end subroutine get_surf_PT
+
+
+      subroutine set_grads(s, ierr)
+         use chem_def, only: chem_isos
+         use star_utils, only: smooth, safe_div_val
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: k, nz, j, cid, max_cid
+         real(dp) :: val, max_val, A, Z
+         real(dp), pointer, dimension(:) :: dlnP, dlnd, dlnT
+
+         include 'formats'
+
+         ierr = 0
+         nz = s% nz
+         call do_alloc(ierr)
+         if (ierr /= 0) return
+
+         do k = 2, nz
+            dlnP(k) = s% lnPeos(k-1) - s% lnPeos(k)
+            dlnd(k) = s% lnd(k-1) - s% lnd(k)
+            dlnT(k) = s% lnT(k-1) - s% lnT(k)
+         end do
+         dlnP(1) = dlnP(2)
+         dlnd(1) = dlnd(2)
+         dlnT(1) = dlnT(2)
+
+         call smooth(dlnP,nz)
+         call smooth(dlnd,nz)
+         call smooth(dlnT,nz)
+
+         s% grad_density(1) = 0
+         s% grad_temperature(1) = 0
+         do k = 2, nz
+            if (dlnP(k) >= 0) then
+               s% grad_density(k) = 0
+               s% grad_temperature(k) = 0
+            else
+               s% grad_density(k) = safe_div_val(s, dlnd(k), dlnP(k))
+               s% grad_temperature(k) = safe_div_val(s, dlnT(k), dlnP(k))
+            end if
+         end do
+
+         call smooth(s% grad_density,nz)
+         call smooth(s% grad_temperature,nz)
+
+         if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
+            do k=1,nz
+               s% gradL_composition_term(k) = s% unsmoothed_brunt_B(k)
+            end do
+            call smooth_gradL_composition_term
+         else
+            do k=1,nz
+               s% gradL_composition_term(k) = 0d0
+            end do
+         end if
+
+         call dealloc
+
+         do k=3,nz-2
+            max_cid = 0
+            max_val = -1d99
+            do j=1,s% species
+               cid = s% chem_id(j)
+               A = dble(chem_isos% Z_plus_N(cid))
+               Z = dble(chem_isos% Z(cid))
+               val = (s% xa(j,k-2) + s% xa(j,k-1) - s% xa(j,k) - s% xa(j,k+1))*(1d0 + Z)/A
+               if (val > max_val) then
+                  max_val = val
+                  max_cid = cid
+               end if
+            end do
+            s% dominant_iso_for_thermohaline(k) = max_cid
+         end do
+         s% dominant_iso_for_thermohaline(1:2) = &
+            s% dominant_iso_for_thermohaline(3)
+         s% dominant_iso_for_thermohaline(nz-1:nz) = &
+            s% dominant_iso_for_thermohaline(nz-2)
+
+
+         contains
+
+         subroutine smooth_gradL_composition_term
+            use star_utils, only: weighed_smoothing, threshold_smoothing
+            logical, parameter :: preserve_sign = .false.
+            real(dp), pointer, dimension(:) :: work
+            integer :: k
+            include 'formats'
+            ierr = 0
+            work => dlnd
+            if (s% num_cells_for_smooth_gradL_composition_term <= 0) return
+            call threshold_smoothing( &
+               s% gradL_composition_term, s% threshold_for_smooth_gradL_composition_term, s% nz, &
+               s% num_cells_for_smooth_gradL_composition_term, preserve_sign, work)
+         end subroutine smooth_gradL_composition_term
+
+         subroutine do_alloc(ierr)
+            integer, intent(out) :: ierr
+            call do_work_arrays(.true.,ierr)
+         end subroutine do_alloc
+
+         subroutine dealloc
+            call do_work_arrays(.false.,ierr)
+         end subroutine dealloc
+
+         subroutine do_work_arrays(alloc_flag, ierr)
+            use alloc, only: work_array
+            logical, intent(in) :: alloc_flag
+            integer, intent(out) :: ierr
+            logical, parameter :: crit = .false.
+            ierr = 0
+            call work_array(s, alloc_flag, crit, &
+               dlnP, nz, nz_alloc_extra, 'mlt', ierr)
+            if (ierr /= 0) return
+            call work_array(s, alloc_flag, crit, &
+               dlnd, nz, nz_alloc_extra, 'mlt', ierr)
+            if (ierr /= 0) return
+            call work_array(s, alloc_flag, crit, &
+               dlnT, nz, nz_alloc_extra, 'mlt', ierr)
+            if (ierr /= 0) return
+         end subroutine do_work_arrays
+
+      end subroutine set_grads
 
    
       end module hydro_vars

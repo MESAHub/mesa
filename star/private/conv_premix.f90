@@ -1414,7 +1414,7 @@ contains
   subroutine dump_snapshot_ (s, filename)
 
     use brunt
-    use mlt_info, only: set_grads
+    use hydro_vars, only: set_grads
 
     type(star_info), pointer :: s
     character(*), intent(in) :: filename

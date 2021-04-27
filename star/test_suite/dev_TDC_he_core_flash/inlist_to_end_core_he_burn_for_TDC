@@ -105,7 +105,7 @@
    use_momentum_outer_BC = .true.
    set_rho_to_dm_div_dV = .false.
 
-!   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.\
+!   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
    max_X_for_gradT_eqn = 0.01
 
    use_dedt_form_of_energy_eqn = .true.

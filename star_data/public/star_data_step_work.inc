@@ -874,6 +874,7 @@
          real(dp), pointer :: lnS_start(:) ! (nz)
          real(dp), pointer :: lnR_start(:) ! (nz)
          real(dp), pointer :: w_start(:) ! (nz)
+         real(dp), pointer :: Hp_face_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: uface_start(:) ! (nz)

@@ -256,8 +256,7 @@
          real(dp) :: Henyey_MLT_y_param, Henyey_MLT_nu_param, mlt_Pturb_factor, &
             min_logT_for_make_gradr_sticky_in_solver_iters
          logical :: mlt_use_rotation_correction, make_gradr_sticky_in_solver_iters, &
-            no_MLT_below_shock, no_MLT_below_T_max
-         logical :: mlt_make_surface_no_mixing
+            no_MLT_below_shock, mlt_make_surface_no_mixing
 
          real(dp) :: T_mix_limit
 

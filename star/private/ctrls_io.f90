@@ -147,7 +147,7 @@
     fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
-    no_MLT_below_T_max, MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
+    MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
     max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, &
     limit_overshoot_Hp_using_size_of_convection_zone, RSP_min_tau_for_turbulent_flux, &
     predictive_mix, predictive_superad_thresh, predictive_avoid_reversal, predictive_limit_ingestion,&
@@ -408,7 +408,7 @@
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
-    RSP2_min_dt_div_tau_conv_switch_to_MLT, RSP2_min_dt_years_switch_to_MLT, RSP2_use_RSP_form_of_etrb_eqn, &
+    RSP2_min_dt_div_tau_conv_switch_to_MLT, RSP2_min_dt_years_switch_to_MLT, &
     RSP2_w_min_for_damping, RSP2_source_seed, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
@@ -1092,7 +1092,6 @@
  s% make_gradr_sticky_in_solver_iters = make_gradr_sticky_in_solver_iters
  s% min_logT_for_make_gradr_sticky_in_solver_iters = min_logT_for_make_gradr_sticky_in_solver_iters
  s% no_MLT_below_shock = no_MLT_below_shock
- s% no_MLT_below_T_max = no_MLT_below_T_max
  s% MLT_option = MLT_option
  s% mlt_use_rotation_correction = mlt_use_rotation_correction
  s% mlt_Pturb_factor = mlt_Pturb_factor
@@ -2098,7 +2097,6 @@
  s% RSP2_map_filename = RSP2_map_filename
  s% RSP2_map_history_filename = RSP2_map_history_filename
  s% RSP2_write_map = RSP2_write_map
- s% RSP2_use_RSP_form_of_etrb_eqn = RSP2_use_RSP_form_of_etrb_eqn
  s% RSP2_w_min_for_damping = RSP2_w_min_for_damping
  s% RSP2_source_seed = RSP2_source_seed
  
@@ -2769,7 +2767,6 @@
  make_gradr_sticky_in_solver_iters = s% make_gradr_sticky_in_solver_iters
  min_logT_for_make_gradr_sticky_in_solver_iters = s% min_logT_for_make_gradr_sticky_in_solver_iters
  no_MLT_below_shock = s% no_MLT_below_shock
- no_MLT_below_T_max = s% no_MLT_below_T_max
  MLT_option = s% MLT_option
  mlt_use_rotation_correction = s% mlt_use_rotation_correction
  mlt_Pturb_factor = s% mlt_Pturb_factor
@@ -3765,7 +3762,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_map_filename = s% RSP2_map_filename
  RSP2_map_history_filename = s% RSP2_map_history_filename
  RSP2_write_map = s% RSP2_write_map
- RSP2_use_RSP_form_of_etrb_eqn = s% RSP2_use_RSP_form_of_etrb_eqn
  RSP2_w_min_for_damping = s% RSP2_w_min_for_damping
  RSP2_source_seed = s% RSP2_source_seed
 

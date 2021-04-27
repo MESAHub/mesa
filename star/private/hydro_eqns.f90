@@ -38,9 +38,6 @@
       private
       public :: eval_equ
 
-      logical, parameter :: dbg = .false.
-      integer, parameter :: dbg_cell = -1
-
 
       contains
 
@@ -63,7 +60,7 @@
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
          use hydro_temperature, only: do1_dlnT_dm_eqn
-         use hydro_rsp2, only: do1_turbulent_energy_eqn, do1_tdc_L_eqn
+         use hydro_rsp2, only: do1_turbulent_energy_eqn, do1_rsp2_L_eqn, do1_rsp2_Hp_eqn
          use hydro_alpha_rti_eqns, only: do1_dalpha_RTI_dt_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
@@ -256,13 +253,19 @@
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_turbulent_energy_eqn'
                   ierr = op_err
                end if
+               call do1_rsp2_Hp_eqn(s, k, skip_partials, nvar, op_err)
+               if (op_err /= 0) then
+                  if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_Hp_eqn', k
+                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_Hp_eqn'
+                  ierr = op_err
+               end if
             end if
             if (do_equL) then
                if (s% using_RSP2 .and. (k > 1 .or. s% RSP2_use_L_eqn_at_surface)) then
-                  call do1_tdc_L_eqn(s, k, skip_partials, nvar, op_err)
+                  call do1_rsp2_L_eqn(s, k, skip_partials, nvar, op_err)
                   if (op_err /= 0) then
-                     if (s% report_ierr) write(*,2) 'ierr in do1_tdc_L_eqn', k
-                     if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_tdc_L_eqn'
+                     if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_L_eqn', k
+                     if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_L_eqn'
                      ierr = op_err
                   end if
                else if (k > 1) then ! k==1 is done by T_surf BC
@@ -287,11 +290,9 @@
 !$OMP END PARALLEL DO
          
          if (ierr == 0 .and. nzlo == 1) then
-            if (dbg) write(*,*) 'call PT_eqns_surf'
             call PT_eqns_surf( &
                s, skip_partials, nvar, &
                do_du_dt, do_dv_dt, do_equL, ierr)
-            if (dbg) write(*,*) 'done PT_eqns_surf'
             if (ierr /= 0) then
                if (s% report_ierr) write(*,2) 'ierr in PT_eqns_surf', ierr
                if (len_trim(s% retry_message) == 0) s% retry_message = 'error in PT_eqns_surf'

@@ -866,8 +866,7 @@ contains
     restore_face_loop: do k = k_a, k_b
 
        s%rho_face(k) = rho_face_save(k)
-       call do1_mlt_2(s, k, &
-            make_gradr_sticky_in_solver_iters, op_err)
+       call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err)
        if (op_err /= 0) stop 'non-zero op_err'
 
     end do restore_face_loop
