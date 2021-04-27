@@ -28,7 +28,7 @@ do_one custom_colors "stop because have dropped below central lower limit for h1
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-do_one dev_RSP2 "RSP2 good match for period" "final.mod" skip
+#   work in progress     do_one dev_RSP2 "RSP2 good match for period" "final.mod" skip
 
 do_one dev_to_cc_12 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_cc_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto

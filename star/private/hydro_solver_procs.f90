@@ -377,8 +377,8 @@
          else
             skip3 = s% i_w
          end if
-         
-         skip4 = 0         
+         skip4 = s% i_Hp
+                 
          skip5 = 0
 
          max_zone = 0

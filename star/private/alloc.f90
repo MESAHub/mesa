@@ -616,6 +616,8 @@
             if (failed('w')) exit
             call do1(s% w_start, c% w_start)
             if (failed('w_start')) exit
+            call do1(s% Hp_face_start, c% Hp_face_start)
+            if (failed('Hp_face_start')) exit
             
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
@@ -2462,8 +2464,10 @@
          
          if (s% RSP2_flag) then
             i = i+1; s% i_w = i
+            i = i+1; s% i_Hp = i
          else 
             s% i_w = 0
+            s% i_Hp = 0
          end if
 
          if (s% conv_vel_flag) then
@@ -2502,6 +2506,7 @@
          end if
       
          s% i_detrb_dt = s% i_w
+         s% i_equ_Hp = s% i_Hp
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
@@ -2520,6 +2525,7 @@
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
          if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
+         if (s% i_Hp/= 0) s% nameofvar(s% i_Hp) = 'Hp'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -2536,6 +2542,7 @@
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
          if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
+         if (s% i_equ_Hp /= 0) s% nameofequ(s% i_equ_Hp) = 'equ_Hp'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
          if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
@@ -2906,13 +2913,14 @@
 
          if (.not. RSP2_flag) then
             call remove1(s% i_w)
+            call remove1(s% i_Hp)
          end if
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
          write(*,*) 'set_RSP2 variables and equations'
-         if (.true.) then
+         if (.false.) then
             do i=1,s% nvar_hydro
                write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
             end do
@@ -2926,6 +2934,7 @@
 
          if (RSP2_flag) then
             call insert1(s% i_w) 
+            call insert1(s% i_Hp) 
             s% need_to_reset_w = .true.
          end if
 
