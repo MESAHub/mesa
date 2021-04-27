@@ -36,10 +36,7 @@
       implicit none
       
       private
-      public :: &
-         get_gradT, & ! for pre_ms_model
-         do1_mlt_eval, & ! for mlt_info
-         Get_results ! for star_lib
+      public :: get_gradT, do1_mlt_eval, Get_results
 
       contains
       
@@ -226,9 +223,6 @@
             gradT_actual = 0d0
             Y_guess = 0d0 
          end if
-            
-! NOTE: TESTING TDC only for Y_guess > 0 for now
-         okay_to_use_TDC = okay_to_use_TDC .and. Y_guess%val > 0d0
          
          if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
             ! TDC replaces all other types
@@ -250,6 +244,14 @@
             mixing_type = no_mixing
          end if
          if (mixing_type == no_mixing) call set_no_mixing('final mixing_type == no_mixing')
+
+         ! for debugging
+         s% xtra1_array(k) = dble(mixing_type)
+         s% xtra2_array(k) = gradT%val
+         s% xtra3_array(k) = gradr%val
+         s% xtra4_array(k) = conv_vel%val
+         s% xtra5_array(k) = D%val
+         s% xtra6_array(k) = safe_log10(abs(gradT%val - grada%val))
          
          if (okay_to_use_TDC .and. compare_TDC_to_MLT) call do_compare_TDC_to_MLT         
          
@@ -284,7 +286,7 @@
             if (report) then
                write(*,*)
                write(*,1) 'do_compare_TDC_to_MLT'
-            end if
+            end if            
             call set_TDC
             if (report .or. s% x_integer_ctrl(19) <= 0) then
                if (std_mixing_type /= mixing_type .or. &
@@ -507,10 +509,10 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
-         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ
+         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction
          real(dp) ::  tolerance, gradT, Lr, Lc, scale
          integer :: iter, max_iter
-         logical :: converged, Y_is_positive
+         logical :: converged, Y_is_positive, first_Q_is_positive
          include 'formats'
          ierr = 0
          if (mixing_length_alpha == 0d0 .or. k <= 1 .or. s% dt <= 0d0) then
@@ -523,13 +525,40 @@
          else
             A0 = 0d0
          end if
-         ! Newton's method to find solution Y
+
+         ! Bisection method to find an initial guess, then we hand it off to Newton's method
+         ! to optimize and imbue it with derivatives
          Y = convert(Y_guess)
+         first_Q_is_positive = .false.
          if (Y == 0d0) Y = 1d-30
+         do iter=1,10
+            call compute_Q(s, k, mixing_length_alpha, &
+                  Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, grada, Q, Af)
+            if (Q > 0d0) then
+               if (iter == 1) then
+                  first_Q_is_positive = .true.
+               end if
+               if (.not. first_Q_is_positive) then
+                  exit
+               end if
+               Y = Y * 2d0
+            else
+               if (iter == 1) then
+                  first_Q_is_positive = .false.
+               end if
+               if (first_Q_is_positive) then
+                  exit
+               end if
+               Y = Y / 2d0
+            end if
+         end do
+
+         ! Newton's method to find solution Y
          Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
          Y_is_positive = (Y > 0d0)
+         Z = log(abs(Y))
          
-         tolerance = 1d-4 ! ??
+         tolerance = 1d-8 ! ??
          max_iter = 100 ! ??   20 seems to be too small (at least for now)
          
          converged = .false.
@@ -550,7 +579,17 @@
                if (report) write(*,2) 'dQdZ', iter, dQdZ%val
                exit
             end if
-            Z_new = Z - Q/dQdZ
+
+            correction = -Q/dQdz
+
+            if (correction > 5d0) then
+               correction = 5d0
+            else if (correction < -5d0) then
+               correction = -5d0
+            end if
+
+            Z_new = Z + correction
+
             if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
                Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
             Z_new%d1val1 = 1d0            

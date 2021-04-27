@@ -367,22 +367,19 @@
 
       ! NOTE: the following values are from the most recent call on mlt
          ! values for these at start of step have "_start" at end of name
-         real(dp), pointer :: mlt_mixing_length(:)
-            ! mixing_length_alpha * scale_height as computed by mlt
-         integer, pointer :: mlt_mixing_type(:) ! as defined in mesa/const
-            ! this is the value from mlt, before overshooting has been added.
-         real(dp), pointer :: mlt_D(:)
-            ! mlt diffusion coeff. (cm^2/sec)
-         real(dp), pointer :: mlt_Gamma(:) 
-            ! local mlt convection efficiency.
+         real(dp), pointer :: mlt_mixing_length(:) ! mixing_length_alpha*scale_height as computed by mlt
+         integer, pointer :: mlt_mixing_type(:) ! as defined in mesa/const. before overshooting has been added.
+         real(dp), pointer :: mlt_D(:) ! mlt diffusion coeff. (cm^2/sec)
+         real(dp), pointer :: mlt_Gamma(:) ! local mlt convection efficiency.
+         real(dp), pointer :: mlt_gradT(:) ! prior to adjustments
          real(dp), pointer :: mlt_cdc(:) 
          real(dp), pointer :: L_conv(:)
          
       ! mlt results related to gradT are evaluated at each iteration and at end of step
-         real(dp), pointer :: gradT_sub_grada(:) ! difference at cell boundary
-         real(dp), pointer :: grada_face(:) ! grada evaluated at cell boundary
-         real(dp), pointer :: gradT(:) ! dlnT/dlnP (at boundary)
-         real(dp), pointer :: gradr(:) ! grad_rad (at boundary)
+         real(dp), pointer :: gradT_sub_grada(:) ! difference at face
+         real(dp), pointer :: grada_face(:) ! grada evaluated at face
+         real(dp), pointer :: gradT(:) ! desired dlnT/dlnP at face
+         real(dp), pointer :: gradr(:) ! grad_rad at face
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad

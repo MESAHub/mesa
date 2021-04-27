@@ -639,6 +639,9 @@
             d_v_div_r_m1, w_rho2_m1, f_m1, Chi_m1_div_r6_Hp, &
             Hp_face, r6_face, Chi_00, Chi_out, Chi_div_w_cell
          real(dp) :: alfa, beta, ALFAM_ALFA
+         
+         stop 'rewrite compute_dChi_dm_bar_face'
+         
          if (k > 1 .and. .not. s% RSP2_assume_HSE) then
             ! complexity needed to keep to block tridiagonal.
             ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha

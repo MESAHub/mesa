@@ -1067,6 +1067,8 @@
             if (failed('gradT_sub_grada')) exit
             call do1(s% grada_face, c% grada_face)
             if (failed('grada_face')) exit
+            call do1(s% mlt_gradT, c% mlt_gradT)
+            if (failed('mlt_gradT')) exit
 
             call do1(s% mlt_cdc, c% mlt_cdc)
             if (failed('mlt_cdc')) exit
