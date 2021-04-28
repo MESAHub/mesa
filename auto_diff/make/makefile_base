@@ -46,7 +46,7 @@ clean:
 install:
 	@$(CP_IF_NEWER) auto_diff.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
-ifeq ($(FC),ifort)
+ifneq (,$(findstring ifort,$(FC)))
 	@$(CP_IF_NEWER) auto_diff_*.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) support_functions.mod $(MESA_DIR)/include
 endif
