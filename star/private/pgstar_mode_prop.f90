@@ -97,7 +97,7 @@
          integer, intent(out) :: ierr
 
          character (len=strlen) :: str
-         real, pointer, dimension(:) :: xvec, log_brunt_nu, &
+         real, allocatable, dimension(:) :: xvec, log_brunt_nu, &
             log_lamb_Sl1, log_lamb_Sl2, log_lamb_Sl3, temp_vec
          real :: xmin, xmax, xleft, xright, dx, chScale, windy, &
             ymin, ymax, exp10_ymin, xmargin, &

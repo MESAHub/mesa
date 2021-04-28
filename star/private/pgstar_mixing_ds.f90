@@ -153,7 +153,7 @@
          real :: xmin, xmax, xleft, xright, dx, tmp, ymin, ymax, ymin2, ymax2, dy, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax
          integer :: grid_min, grid_max, npts, nz, number_of_legend_lines
-         real, pointer, dimension(:) :: &
+         real, allocatable, dimension(:) :: &
             xvec, yvec, y_conv, y_left, y_sc, y_ovr, y_th, y_min_mix, y_RTI_mix
 
          include 'formats'

@@ -75,7 +75,7 @@
          integer :: i, ii, n, step_min, step_max
          real :: xmin, xmax, ymin_L_axis, ymax_L_axis, &
             ymin_mass_axis, ymax_mass_axis, dx
-         real, pointer, dimension(:) :: xvec, star_mass, star_M_center, log_xmstar, &
+         real, allocatable, dimension(:) :: xvec, star_mass, star_M_center, log_xmstar, &
             he_core_mass, &
             c_core_mass, &
             o_core_mass, &
@@ -324,7 +324,7 @@
 
          logical function get1_yvec(name, vec)
             character (len=*) :: name
-            real, dimension(:), pointer :: vec
+            real, dimension(:), allocatable :: vec
             get1_yvec = get1_hist_yvec(s, step_min, step_max, n, name, vec)
          end function get1_yvec
 
