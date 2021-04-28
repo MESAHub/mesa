@@ -72,7 +72,7 @@
          integer :: nz, k
          real :: xmin, xmax, ymin, ymax, xpos, ypos, dx, dy, &
             txt_scale, vpxmin, vpxmax, vpymin, vpymax, vpymargin, vpwinheight, lgT1, lgT2
-         real, pointer, dimension(:) :: xvec, yvec
+         real, allocatable, dimension(:) :: xvec, yvec
          character (len=128) :: str
          real, parameter :: lgrho1 = -8, lgrho2 = 5
 
@@ -526,7 +526,7 @@
 
 
          subroutine write_burn_line(logRho, logT, label)
-            real, dimension(:), pointer :: logRho, logT
+            real, dimension(:), allocatable :: logRho, logT
             character (len=*), intent(in) :: label
             integer :: sz
             real :: xpos, ypos

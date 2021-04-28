@@ -98,7 +98,7 @@
          integer, intent(out) :: ierr
 
          character (len=strlen) :: yname
-         real, pointer, dimension(:) :: xvec, yvec, unshifted_xvec
+         real, allocatable, dimension(:) :: xvec, yvec, unshifted_xvec
          real :: xmin, xmax, xleft, xright, dx, windy, &
             ymin, ymax, xmargin, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax
