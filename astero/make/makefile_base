@@ -72,7 +72,7 @@ install:
 	@$(CP_IF_NEWER) astero_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 	@$(CP_IF_NEWER) ../public/*.inc $(MESA_DIR)/include
-ifeq ($(FC),ifort)
+ifneq (,$(findstring ifort,$(FC)))
 	@$(CP_IF_NEWER) astero_support.mod $(MESA_DIR)/include
 endif
 
