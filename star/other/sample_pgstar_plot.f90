@@ -218,7 +218,7 @@
          real :: windy, xmargin
          real :: xmin, xmax, xleft, xright, dx, tmp, ymin, ymax, ymin2, ymax2, dy
          integer :: grid_min, grid_max, npts, nz
-         real, pointer, dimension(:) :: xvec, yvec, yvec2, yvec3
+         real, allocatable, dimension(:) :: xvec, yvec, yvec2, yvec3
          
          logical :: dbg = .false.
          

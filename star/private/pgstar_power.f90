@@ -101,7 +101,7 @@
          integer, intent(out) :: ierr
 
          character (len=strlen) :: str
-         real, pointer, dimension(:) :: xvec, yvec
+         real, allocatable, dimension(:) :: xvec, yvec
          real :: xmin, xmax, xleft, xright, dx, chScale, windy, &
             ymin, ymax, exp10_ymin, xmargin, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax

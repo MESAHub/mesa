@@ -75,7 +75,7 @@
 
          character (len=strlen) :: yname, xaxis_name, str
          logical :: xaxis_reversed
-         real, pointer, dimension(:) :: xvec, yvec, yvec2, yvec3
+         real, allocatable, dimension(:) :: xvec, yvec, yvec2, yvec3
          real :: xmin, xmax, xleft, xright, dx, windy, dy, &
             ymin, ymax, xaxis_min, xaxis_max, xmargin, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax

@@ -637,9 +637,9 @@
          character (len=strlen) :: yname, other_yname
          character (len=strlen) :: yname1,yname2, &
             other_yname1,other_yname2
-         real, pointer, dimension(:) :: xvec1,xvec2, yvec1,yvec2,&
+         real, allocatable, dimension(:) :: xvec1,xvec2, yvec1,yvec2,&
             other_yvec1,other_yvec2
-         real, pointer, dimension(:) :: xvec, yvec, other_yvec
+         real, allocatable, dimension(:) :: xvec, yvec, other_yvec
 
          integer :: i, ii, n, j, k, max_width, step_min, step_max, &
             y_color, other_y_color, yaxis_id, other_yaxis_id, &
@@ -876,7 +876,7 @@
 
          logical function get1_yvec(name, vec)
             character (len=*) :: name
-            real, dimension(:), pointer :: vec
+            real, dimension(:), allocatable :: vec
             get1_yvec = get1_hist_yvec(s, step_min, step_max, n, name, vec)
          end function get1_yvec
 
