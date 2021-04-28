@@ -54,6 +54,7 @@
       initial_mass = 1.0
       initial_z = 0.02d0
       
+      remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
       am_nu_visc_factor = 0
       am_D_mix_factor = 0.0333333333333333d0
@@ -65,7 +66,8 @@
       D_ST_factor = 1
       
       varcontrol_target = 1d-3
-      delta_lgL_He_limit = 0.01d0
+      !delta_lgL_He_limit = 0.01d0
+      delta_lgL_He_limit = 0.006d0
      
       cool_wind_full_on_T = 9.99d9
       hot_wind_full_on_T = 1d10 
@@ -74,6 +76,11 @@
       RGB_to_AGB_wind_switch = 1d-4
       Reimers_scaling_factor = 0.8d0  
       Blocker_scaling_factor = 0.7d0 ! 0.8d0        
+
+      terminal_show_age_units = 'years'
+      terminal_show_timestep_units = 'seconds'
+      terminal_show_log_dt = .false.
+      terminal_show_log_age = .false.
 
       photo_interval = 50
       profile_interval = 100

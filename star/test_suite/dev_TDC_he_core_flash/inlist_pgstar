@@ -224,7 +224,7 @@
    
    Text_Summary1_name(1,1) = 'model_number'
    Text_Summary1_name(2,1) = 'star_age'
-   Text_Summary1_name(3,1) = 'time_step'
+   Text_Summary1_name(3,1) = 'time_step_sec'
    Text_Summary1_name(4,1) = 'max_tau_conv'
    Text_Summary1_name(5,1) = 'radius'
    Text_Summary1_name(6,1) = 'log_R'

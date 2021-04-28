@@ -51,36 +51,33 @@
    !controls_namelist_name = 'namelist_controls_he_flash'
       
    max_model_number = 12000
+   max_number_retries = 100
       
    initial_mass = 1.0
    initial_z = 0.02d0
-   
-   max_number_retries = 100
-   !delta_lgL_He_limit = 0.01d0
-   delta_lgL_He_limit = 0.003d0
 
     Teff_upper_limit = 3300
 !      xa_central_lower_limit_species(1) = 'he4'
 !      xa_central_lower_limit(1) = 0.0001
 
 ! wind
-      cool_wind_full_on_T = 9.99d9
-      hot_wind_full_on_T = 1d10 
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.8d0  
-      Blocker_scaling_factor = 0.7d0 ! 0.8d0        
+   cool_wind_full_on_T = 9.99d9
+   hot_wind_full_on_T = 1d10 
+   cool_wind_RGB_scheme = 'Reimers'
+   cool_wind_AGB_scheme = 'Blocker'
+   RGB_to_AGB_wind_switch = 1d-4
+   Reimers_scaling_factor = 0.8d0  
+   Blocker_scaling_factor = 0.7d0 ! 0.8d0        
 
 ! rotation
-      am_nu_visc_factor = 0
-      am_D_mix_factor = 0.0333333333333333d0
-      D_DSI_factor = 0
-      D_SH_factor = 1
-      D_SSI_factor = 1
-      D_ES_factor = 1
-      D_GSF_factor = 1
-      D_ST_factor = 1
+   am_nu_visc_factor = 0
+   am_D_mix_factor = 0.0333333333333333d0
+   D_DSI_factor = 0
+   D_SH_factor = 1
+   D_SSI_factor = 1
+   D_ES_factor = 1
+   D_GSF_factor = 1
+   D_ST_factor = 1
       
 ! TDC
    max_X_for_TDC = 0d0
@@ -100,9 +97,13 @@
    Henyey_MLT_y_param = 0.33333333d0
    Henyey_MLT_nu_param = 8
 
+! timesteps
+   !delta_lgL_He_limit = 0.003d0
+   delta_lgL_He_limit = 0.006d0
+
 ! mesh
-   okay_to_remesh = .false.
-   !remesh_dt_limit = 1d0 ! turn off when dt smaller than this
+   !okay_to_remesh = .false.
+   remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
 ! solver
    use_momentum_outer_BC = .true.
@@ -137,7 +138,7 @@
       !history_interval = 1
       terminal_interval = 1
       
-      compare_TDC_to_MLT = .true.
+      !compare_TDC_to_MLT = .true.
       
       !x_integer_ctrl(19) = 1870 ! k
       !x_integer_ctrl(20) = 3 ! solver iter
