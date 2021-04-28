@@ -152,7 +152,7 @@
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
       min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
-      remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
+      !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
 ! solver
       use_gold2_tolerances = .true.

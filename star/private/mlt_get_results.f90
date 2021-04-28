@@ -188,6 +188,7 @@
             s% DAMP(k) = 0d0
             s% DAMPR(k) = 0d0
             s% COUPL(k) = 0d0
+            s% tdc_num_iters(k) = 0
          end if
          
          ! check if this particular k can be done with TDC
@@ -595,6 +596,8 @@
             Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, gradL, Q, Af)
          if (abs(Q / scale) < tolerance) converged = .true.
 
+         iter = 0
+
          if (.not. converged) then
             if (Q > 0d0) then
                Y_is_positive = .true.
@@ -720,6 +723,8 @@
          else
             mixing_type = no_mixing
          end if
+         if (k > 0) s% tdc_num_iters(k) = iter
+         
       end subroutine get_TDC_solution
             
             

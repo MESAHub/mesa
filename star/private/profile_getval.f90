@@ -1618,6 +1618,13 @@
                val = s% Y_face(k)
             case (p_mlt_log_abs_Y)
                val = safe_log10(abs(s% Y_face(k)))
+            case (p_tdc_num_iters)
+               if (s% using_tdc) then
+                  int_val = s% tdc_num_iters(k); val = dble(int_val)
+               else
+                  int_val = 0; val = 0
+               end if
+               int_flag = .true.
             case(p_COUPL)
                val = s% COUPL(k)
             case(p_SOURCE)

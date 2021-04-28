@@ -149,7 +149,7 @@
    Profile_Panels1_xmax = -101D0
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
    
-   Profile_Panels1_num_panels = 9
+   Profile_Panels1_num_panels = 8
            
    Profile_Panels1_yaxis_name(1) = 'eps_nuc'  
    Profile_Panels1_other_yaxis_name(1) = 'L'
@@ -186,7 +186,7 @@
    Profile_Panels1_yaxis_name(6) = 'SOURCE' 
    Profile_Panels1_ymin(6) = -0.1      
    Profile_Panels1_other_yaxis_name(6) = 'S0' 
-   Profile_Panels1_other_ymin(6) = -5      
+   Profile_Panels1_other_ymin(6) = -1     
    !Profile_Panels1_same_yaxis_range(6) = .true.
          
    Profile_Panels1_yaxis_name(7) = 'DAMP' 
@@ -194,13 +194,13 @@
    !Profile_Panels1_same_yaxis_range(7) = .true.
    !Profile_Panels1_ymin(7) = -10      
          
-   Profile_Panels1_yaxis_name(8) = 'DAMPR'
-   Profile_Panels1_other_yaxis_name(8) = 'DR0'
+   Profile_Panels1_yaxis_name(8) = 'zone'
+   Profile_Panels1_other_yaxis_name(8) = 'tdc_num_iters'
    !Profile_Panels1_same_yaxis_range(8) = .true.
    !Profile_Panels1_ymin(8) = -2      
          
-   Profile_Panels1_yaxis_name(9) = 'zone'
-   Profile_Panels1_other_yaxis_name(9) = 'tau_conv'
+   Profile_Panels1_yaxis_name(9) = 'DAMPR'
+   Profile_Panels1_other_yaxis_name(9) = 'DR0'
    !Profile_Panels1_other_ymin(9) = -2       
 
 

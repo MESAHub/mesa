@@ -1063,6 +1063,9 @@
             call do1(s% L_conv, c% L_conv)
             if (failed('L_conv')) exit
 
+            call do1_integer(s% tdc_num_iters, c% tdc_num_iters)
+            if (failed('tdc_num_iters')) exit
+
             call do1(s% gradT_sub_grada, c% gradT_sub_grada)
             if (failed('gradT_sub_grada')) exit
             call do1(s% grada_face, c% grada_face)

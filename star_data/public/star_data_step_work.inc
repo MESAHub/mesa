@@ -375,6 +375,8 @@
          real(dp), pointer :: mlt_cdc(:) 
          real(dp), pointer :: L_conv(:)
          
+         integer, pointer :: tdc_num_iters(:)
+         
       ! mlt results related to gradT are evaluated at each iteration and at end of step
          real(dp), pointer :: gradT_sub_grada(:) ! difference at face
          real(dp), pointer :: grada_face(:) ! grada evaluated at face
