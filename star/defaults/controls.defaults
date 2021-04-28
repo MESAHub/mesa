@@ -8208,6 +8208,10 @@
 
 
 
+      ! max_X_for_conv_timescale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_X_for_conv_timescale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_q_for_conv_timescale
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_q_for_conv_timescale
@@ -8219,6 +8223,8 @@
 
       ! ::
     
+    max_X_for_conv_timescale = 1d0
+    min_X_for_conv_timescale = 0d0
     max_q_for_conv_timescale = 1d0
     min_q_for_conv_timescale = 0d0
     max_q_for_QHSE_timescale = 1d0

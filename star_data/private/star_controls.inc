@@ -831,6 +831,7 @@
          logical :: include_L_in_correction_limits, &
             include_v_in_correction_limits, include_u_in_correction_limits
          
+         real(dp) :: max_X_for_conv_timescale, min_X_for_conv_timescale
          real(dp) :: max_q_for_conv_timescale, min_q_for_conv_timescale
          real(dp) :: max_q_for_QHSE_timescale, min_q_for_QHSE_timescale
 

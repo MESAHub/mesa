@@ -600,14 +600,7 @@
             Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
             ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
             !       = g cm^2 s^-2
-            !       = erg
-            
-            if (k==30) then
-               if (s% model_number == 2) stop 'compute_Chi_cell'
-               write(*,4) 'RSP2 Chi rho2 r6_cell', k, s% solver_iter, s% model_number, &
-                  Chi_cell%val, rho2%val, r6_cell%val
-            end if
-            
+            !       = erg            
          end if
          s% Chi(k) = Chi_cell%val
 

@@ -50,9 +50,12 @@
       time_step_sec
       !num_zones ! number of zones in the model
       
-      dt_div_tau_conv
-      tau_conv
-      log_tau_conv
+      dt_div_max_tau_conv
+      max_tau_conv
+      log_max_tau_conv
+      dt_div_min_tau_conv
+      min_tau_conv
+      log_min_tau_conv
       using_TDC   
       
       num_solver_iterations ! iterations at this step
@@ -64,13 +67,11 @@
       virial_thm_P_avg
       virial_thm_rel_err
       
-  v_surf_km_s
-  radius
-  effective_T
-  luminosity
-  star_age_day
-      tau_conv
-      log_tau_conv
+      v_surf_km_s
+      radius
+      effective_T
+      luminosity
+      star_age_day
       
    ! mixing regions
    

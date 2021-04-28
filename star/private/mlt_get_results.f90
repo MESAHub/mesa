@@ -215,20 +215,7 @@
             return
          end if
          
-         if (okay_to_use_TDC) then
-            gradT_actual = safe_div(s, wrap_lnT_m1(s,k) - wrap_lnT_00(s,k), &
-                             wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k))
-            Y_guess = gradT_actual - grada ! use actual gradT to guess Y_face
-         else
-            gradT_actual = 0d0
-            Y_guess = 0d0 
-         end if
-         
-         if (okay_to_use_TDC .and. .not. compare_TDC_to_MLT) then 
-            ! TDC replaces all other types
-            if (report) write(*,2) 'call set_TDC', k
-            call set_TDC
-         else if (gradr > gradL) then ! convective
+         if (gradr > gradL) then ! convective
             if (report) write(*,2) 'call set_MLT', k
             call set_MLT
          else if (gradL_composition_term < 0) then
@@ -238,25 +225,26 @@
             if (report) write(*,2) 'call set_semiconvection', k
             call set_semiconvection
          end if         
+
+         ! save non-TDC values for debugging
+         s% xtra1_array(k) = safe_log10(abs(gradT%val - grada%val))
+         s% xtra2_array(k) = gradT%val
+         s% xtra3_array(k) = conv_vel%val
+         
+         Y_guess = gradT - grada ! set the guess for use by TDC
+         if (okay_to_use_TDC .and. Y_guess > 0d0) then
+            if (compare_TDC_to_MLT) then
+               call do_compare_TDC_to_MLT     
+            else
+               call set_TDC
+            end if
+         end if
          
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
          end if
          if (mixing_type == no_mixing) call set_no_mixing('final mixing_type == no_mixing')
-
-         ! for debugging
-         s% xtra1_array(k) = dble(mixing_type)
-         s% xtra2_array(k) = gradT%val
-         s% xtra3_array(k) = gradr%val
-         s% xtra4_array(k) = conv_vel%val
-         s% xtra5_array(k) = D%val
-         s% xtra6_array(k) = safe_log10(abs(gradT%val - grada%val))
-         
-         if (okay_to_use_TDC .and. compare_TDC_to_MLT) then
-            Y_guess = gradT - grada ! update the guess for use by TDC
-            call do_compare_TDC_to_MLT         
-         end if
          
          contains
 
@@ -276,10 +264,11 @@
          subroutine do_compare_TDC_to_MLT
             ! for compare_TDC_to_MLT
             integer :: std_mixing_type
-            type(auto_diff_real_star_order1) :: &
+            type(auto_diff_real_star_order1) :: std_Y_face, c0, L0, A0, &
                std_gradT, std_gradr, std_conv_vel, std_D, std_Gamma, std_scale_height
             include 'formats'         
             std_mixing_type = mixing_type
+            std_Y_face = gradT - gradL
             std_gradT = gradT
             std_gradr = gradr
             std_conv_vel = conv_vel
@@ -291,12 +280,44 @@
                write(*,1) 'do_compare_TDC_to_MLT'
             end if            
             call set_TDC
+            if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
+               if (report) write(*,2) 'TDC D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
+               mixing_type = no_mixing
+            end if
             if (report .or. s% x_integer_ctrl(19) <= 0) then
                if (std_mixing_type /= mixing_type .or. &
-                   abs(std_gradT%val - gradT%val) > 1d-4) then
-                  write(*,6) 'mix type gradT k, solvr_iter model std_mx tdc_mx', &
-                     k, s% solver_iter, s% model_number, std_mixing_type, mixing_type, &
-                     std_gradT%val, gradT%val
+                   abs(std_gradT%val - gradT%val) > 1d-2) then
+                  write(*,6) 'k solvr_iter model std_mxtyp tdc_mtyp', &
+                     k, s% solver_iter, s% model_number, std_mixing_type, mixing_type
+                  write(*,4) 'std_gradT tdc_gradT', k, s% solver_iter, s% model_number, std_gradT%val, gradT%val
+                  write(*,4) 'std_vc tdc_vc', k, s% solver_iter, s% model_number, std_conv_vel%val, conv_vel%val
+                  write(*,4) 'gradL', k, s% solver_iter, s% model_number, gradL%val
+                  write(*,4) 'gradr', k, s% solver_iter, s% model_number, gradr%val
+                  write(*,4) 'Y_guess', k, s% solver_iter, s% model_number, Y_guess%val
+                  write(*,4) 'std Y', k, s% solver_iter, s% model_number, std_Y_face%val
+                  write(*,4) 'tdc Y', k, s% solver_iter, s% model_number, Y_face%val
+                  write(*,4) 'std gradT-gradr', k, s% solver_iter, s% model_number, std_gradT%val - std_gradr%val
+                  write(*,4) 'tdc gradT-gradr', k, s% solver_iter, s% model_number, gradT%val - gradr%val
+                  write(*,4) 'L', k, s% solver_iter, s% model_number, L%val
+                  c0 = mixing_length_alpha*rho*T*Cp*4d0*pi*pow2(r)
+                  L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity) ! assumes QHSE for dP/dm
+                  if (s% okay_to_set_mlt_vc) then ! is also ok to use mlt_vc_old   
+                     A0 = s% mlt_vc_old(k)/sqrt_2_div_3
+                  else
+                     A0 = 0d0
+                  end if
+                  write(*,4) 'c0', k, s% solver_iter, s% model_number, c0%val
+                  write(*,4) 'L0', k, s% solver_iter, s% model_number, L0%val
+                  write(*,4) 'A0', k, s% solver_iter, s% model_number, A0%val
+                  write(*,4) 'Q(Y_tdc) for vc=0', k, s% solver_iter, s% model_number, &
+                     (L%val - L0%val*grada%val) - L0%val*Y_face%val
+                  write(*,4) 'Q(Y_guess) for vc=0', k, s% solver_iter, s% model_number, &
+                     (L%val - L0%val*grada%val) - L0%val*Y_guess%val
+                  write(*,4) 'gradL_composition_term', k, s% solver_iter, s% model_number, gradL_composition_term
+                  write(*,4) 'COUPL', k, s% solver_iter, s% model_number, s% COUPL(k)
+                  write(*,4) 'SOURCE', k, s% solver_iter, s% model_number, s% SOURCE(k)
+                  write(*,4) 'DAMP', k, s% solver_iter, s% model_number, s% DAMP(k)
+                  write(*,*)
                   stop 'do_compare_TDC_to_MLT'
                end if
             end if
@@ -591,7 +612,11 @@
          max_iter = 100 ! ??   20 seems to be too small (at least for now)
          
          converged = .false.
-         scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
+         if (s% solver_iter == 0) then
+            scale = max(abs(s% L(k)), 1d-3*maxval(s% L(1:s% nz)))
+         else
+            scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
+         end if
          if (report) write(*,2) 'initial Y', 0, Y%val
          do iter = 1, max_iter
             call compute_Q(s, k, mixing_length_alpha, &
@@ -658,7 +683,7 @@
          gradT = Y_face%val + grada%val
          Lr = L0%val*gradT
          Lc = L%val - Lr
-         if (Lc > L%val*1d-4) then
+         if (cv > 0d0) then
             mixing_type = convective_mixing
          else
             mixing_type = no_mixing
@@ -715,6 +740,9 @@
          xi0 = S0
          xi1 = -DR0
          xi2 = -D0         
+         s% xtra4_array(k) = S0%val
+         s% xtra5_array(k) = D0%val
+         s% xtra6_array(k) = DR0%val
       end subroutine eval_xis
       
       
@@ -763,8 +791,8 @@
          end if         
          if (k > 0) then ! save for plots
             s% SOURCE(k) = xi0%val*Af%val
-            s% DAMP(k) = -xi1%val*Af%val
-            s% DAMPR(k) = -xi2%val*pow2(Af%val)
+            s% DAMP(k) = -xi2%val*pow2(Af%val)
+            s% DAMPR(k) = -xi1%val*Af%val
             s% COUPL(k) = s% SOURCE(k) - s% DAMP(k) - s% DAMPR(k)
          end if
       end function eval_Af
@@ -851,9 +879,6 @@
             return
          end if
          call get_face_weights(s, k, alfa, beta)
-         ! dV = 1d0/d_00 - 1d0/s% rho_start(k) ! = (rho_start - rho)/(rho*rho_start)
-         ! dlnd = wrap_dxh_lnd = lnd(k) - lnd_start(k) from solver without subtraction
-         ! expm1(dlnd) = (rho - rho_start)/rho_start
          dV_00 = -expm1(wrap_dxh_lnd(s,k))/wrap_d_00(s,k)
          dV_m1 = -expm1(wrap_dxh_lnd(s,k-1))/wrap_d_m1(s,k)
          dVdt = (alfa*dV_00 + beta*dV_m1)/s% dt

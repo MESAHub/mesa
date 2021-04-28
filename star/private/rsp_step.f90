@@ -1610,13 +1610,7 @@
             POMT4 = POM*POM1*POM2*POM3
 
             s% Chi(k) = POMT1*POM1
-            
-            if (k==30) then
-               if (s% model_number == 2) stop 'calc_Chi'
-               write(*,4) 'RSP Chi Chi rho2 r6_cell', k, iter, s% model_number, &
-                  s% Chi(k), 1d0/Vol**2, POM2
-            end if
-            
+
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
                   !$OMP critical

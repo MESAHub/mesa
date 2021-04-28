@@ -409,7 +409,7 @@
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
     RSP2_min_dt_div_tau_conv_switch_to_MLT, RSP2_min_dt_years_switch_to_MLT, &
-    RSP2_w_min_for_damping, RSP2_source_seed, &
+    RSP2_w_min_for_damping, RSP2_source_seed, max_X_for_conv_timescale, min_X_for_conv_timescale, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
     
@@ -2100,6 +2100,8 @@
  s% RSP2_w_min_for_damping = RSP2_w_min_for_damping
  s% RSP2_source_seed = RSP2_source_seed
  
+ s% max_X_for_conv_timescale = max_X_for_conv_timescale
+ s% min_X_for_conv_timescale = min_X_for_conv_timescale
  s% max_q_for_conv_timescale = max_q_for_conv_timescale
  s% min_q_for_conv_timescale = min_q_for_conv_timescale
  s% max_q_for_QHSE_timescale = max_q_for_QHSE_timescale
@@ -3765,6 +3767,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_w_min_for_damping = s% RSP2_w_min_for_damping
  RSP2_source_seed = s% RSP2_source_seed
 
+ max_X_for_conv_timescale = s% max_X_for_conv_timescale
+ min_X_for_conv_timescale = s% min_X_for_conv_timescale
  max_q_for_conv_timescale = s% max_q_for_conv_timescale
  min_q_for_conv_timescale = s% min_q_for_conv_timescale
  max_q_for_QHSE_timescale = s% max_q_for_QHSE_timescale

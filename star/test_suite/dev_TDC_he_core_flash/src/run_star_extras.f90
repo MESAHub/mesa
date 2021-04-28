@@ -145,12 +145,12 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         names(1) = 'std_mxtyp'
+         names(1) = 'std_lg_absY'
          names(2) = 'std_gradT'
-         names(3) = 'std_gradr'
-         names(4) = 'std_vc'
-         names(5) = 'std_D'
-         names(6) = 'std_lg_absY'
+         names(3) = 'std_vc'
+         names(4) = 'S0'
+         names(5) = 'D0'
+         names(6) = 'DR0'
 
          do k=1,nz            
             vals(k,1) = s% xtra1_array(k)

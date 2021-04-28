@@ -56,7 +56,8 @@
    initial_z = 0.02d0
    
    max_number_retries = 100
-   delta_lgL_He_limit = 0.01d0
+   !delta_lgL_He_limit = 0.01d0
+   delta_lgL_He_limit = 0.003d0
 
     Teff_upper_limit = 3300
 !      xa_central_lower_limit_species(1) = 'he4'
@@ -82,13 +83,14 @@
       D_ST_factor = 1
       
 ! TDC
-   max_dt_div_tau_conv_for_TDC = 1 ! 1d99 ! 1d-2
-   max_dt_years_for_TDC = 1 ! 11d99 ! 1d-1
+   max_X_for_TDC = 0d0
+   max_X_for_conv_timescale = 0d0
+
+   max_dt_div_tau_conv_for_TDC = 1d2 ! 1d99 ! 1d-2
+   max_dt_years_for_TDC = 1d2 ! 11d99 ! 1d-1
    
    alpha_TDC_DAMP = 1d0
    alpha_TDC_DAMPR = 0d0
-   
-   max_X_for_TDC = 0d0
 
 ! mix
    mlt_make_surface_no_mixing = .true.
@@ -99,15 +101,15 @@
    Henyey_MLT_nu_param = 8
 
 ! mesh
-   !okay_to_remesh = .false.
-   remesh_dt_limit = 1d0 ! turn off when dt smaller than this
+   okay_to_remesh = .false.
+   !remesh_dt_limit = 1d0 ! turn off when dt smaller than this
 
 ! solver
    use_momentum_outer_BC = .true.
    set_rho_to_dm_div_dV = .false.
 
-!   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
-   max_X_for_gradT_eqn = 0.01
+   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
+   max_X_for_gradT_eqn = 0d0
 
    use_dedt_form_of_energy_eqn = .true.
    convergence_ignore_equL_residuals = .true.
@@ -116,11 +118,11 @@
    num_trace_history_values = 4
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'dt_div_tau_conv'
+   trace_history_value_name(3) = 'dt_div_max_tau_conv'
    trace_history_value_name(4) = 'using_TDC'
 
    terminal_show_age_units = 'years'
-   terminal_show_timestep_units = 'years'
+   terminal_show_timestep_units = 'seconds'
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
 
@@ -130,16 +132,16 @@
       terminal_interval = 10
       write_header_frequency = 10
       
-      photo_interval = 1
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
       
       compare_TDC_to_MLT = .true.
       
-      !x_integer_ctrl(19) = 1668 ! k
-      !x_integer_ctrl(20) = 0 ! solver iter
-      !x_integer_ctrl(21) = 65 ! model_number
+      !x_integer_ctrl(19) = 1870 ! k
+      !x_integer_ctrl(20) = 3 ! solver iter
+      !x_integer_ctrl(21) = 60 ! model_number
 
 ! FOR DEBUGGING
 

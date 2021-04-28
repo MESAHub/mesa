@@ -3783,19 +3783,24 @@
       end function conv_time_scale
       
       
-      subroutine set_max_conv_time_scale(s)
+      subroutine set_conv_time_scales(s)
          type (star_info), pointer :: s
          integer :: k
          real(dp) :: tau_conv
+         s% min_conv_time_scale = 1d99
          s% max_conv_time_scale = 0d0
          do k=1,s%nz
+            if (s% X(k) > s% max_X_for_conv_timescale) cycle
+            if (s% X(k) < s% min_X_for_conv_timescale) cycle
             if (s% q(k) > s% max_q_for_conv_timescale) cycle
             if (s% q(k) < s% min_q_for_conv_timescale) exit
             tau_conv = conv_time_scale(s,k)
+            if (tau_conv < s% min_conv_time_scale) &
+               s% min_conv_time_scale = tau_conv
             if (tau_conv > s% max_conv_time_scale) &
                s% max_conv_time_scale = tau_conv
          end do
-      end subroutine set_max_conv_time_scale
+      end subroutine set_conv_time_scales
       
       
       subroutine set_using_TDC(s)

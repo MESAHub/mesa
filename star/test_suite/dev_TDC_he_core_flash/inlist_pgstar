@@ -130,7 +130,7 @@
    History_Panels1_dymin(5) = 0.07
    History_Panels1_same_yaxis_range(5) = .true.
    
-   History_Panels1_other_yaxis_name(5) = 'log_tau_conv' ! 'L_1'
+   History_Panels1_other_yaxis_name(5) = 'log_max_tau_conv' ! 'L_1'
    History_Panels1_other_yaxis_reversed(5) = .false.
    History_Panels1_other_ymin(5) = -101d0 ! only used if /= -101d0
    History_Panels1_other_ymax(5) = -101d0 ! only used if /= -101d0        
@@ -157,7 +157,7 @@
    
    Profile_Panels1_num_panels = 9
            
-   Profile_Panels1_yaxis_name(1) = 'eps_nuc' ! 'v_kms'         
+   Profile_Panels1_yaxis_name(1) = 'eps_nuc'  
    Profile_Panels1_other_yaxis_name(1) = 'L'
    !Profile_Panels1_same_yaxis_range(1) = .true.
    Profile_Panels1_dymin(1) = 0.07         
@@ -167,9 +167,13 @@
    Profile_Panels1_other_yaxis_name(2) =  'lum_conv'
    Profile_Panels1_same_yaxis_range(2) = .true.
    
-   Profile_Panels1_yaxis_name(3) = 'mlt_vc'  
-   Profile_Panels1_other_yaxis_name(3) = 'std_vc'
+   Profile_Panels1_yaxis_name(3) = 'mlt_log_abs_Y' 
+   Profile_Panels1_other_yaxis_name(3) = 'std_lg_absY' 
    Profile_Panels1_same_yaxis_range(3) = .true.
+   Profile_Panels1_ymin(3) = -9       
+   Profile_Panels1_other_ymin(3) = -9      
+   Profile_Panels1_ymax(3) = 1        
+   Profile_Panels1_other_ymax(3) = 1      
    !Profile_Panels1_ymin(3) = -0.01       
    !Profile_Panels1_other_ymin(3) = -0.01       
             
@@ -181,33 +185,29 @@
    Profile_Panels1_ymax(4) = 1        
    Profile_Panels1_other_ymax(4) = 1      
          
-   Profile_Panels1_yaxis_name(5) = 'mlt_log_abs_Y'
-   Profile_Panels1_other_yaxis_name(5) = 'std_lg_absY'
+   Profile_Panels1_yaxis_name(5) = 'mlt_vc'  
+   Profile_Panels1_other_yaxis_name(5) = 'std_vc'
    !Profile_Panels1_same_yaxis_range(5) = .true.
-   Profile_Panels1_ymin(5) = -9       
-   Profile_Panels1_other_ymin(5) = -9      
-   Profile_Panels1_ymax(5) = 1        
-   Profile_Panels1_other_ymax(5) = 1      
 
-   Profile_Panels1_yaxis_name(6) = 'COUPL' 
+   Profile_Panels1_yaxis_name(6) = 'SOURCE' 
    !Profile_Panels1_ymin(6) = -0.1      
-   Profile_Panels1_other_yaxis_name(6) = '' 
+   Profile_Panels1_other_yaxis_name(6) = 'S0' 
    !Profile_Panels1_other_ymin(6) = 1       
    !Profile_Panels1_same_yaxis_range(6) = .true.
          
-   Profile_Panels1_yaxis_name(7) = 'SOURCE' 
-   Profile_Panels1_other_yaxis_name(7) = ''
+   Profile_Panels1_yaxis_name(7) = 'DAMP' 
+   Profile_Panels1_other_yaxis_name(7) = 'D0'
    !Profile_Panels1_same_yaxis_range(7) = .true.
    !Profile_Panels1_ymin(7) = -10      
          
-   Profile_Panels1_yaxis_name(8) = 'DAMP'
-   Profile_Panels1_other_yaxis_name(8) = ''
+   Profile_Panels1_yaxis_name(8) = 'DAMPR'
+   Profile_Panels1_other_yaxis_name(8) = 'DR0'
    !Profile_Panels1_same_yaxis_range(8) = .true.
    !Profile_Panels1_ymin(8) = -2      
          
    Profile_Panels1_yaxis_name(9) = 'zone'
-   Profile_Panels1_other_yaxis_name(9) = 'log_mlt_Gamma'
-   Profile_Panels1_other_ymin(9) = -0.1       
+   Profile_Panels1_other_yaxis_name(9) = 'tau_conv'
+   !Profile_Panels1_other_ymin(9) = -2       
 
 
    Profile_Panels1_file_flag = .false.
@@ -225,7 +225,7 @@
    Text_Summary1_name(1,1) = 'model_number'
    Text_Summary1_name(2,1) = 'star_age'
    Text_Summary1_name(3,1) = 'time_step'
-   Text_Summary1_name(4,1) = 'tau_conv'
+   Text_Summary1_name(4,1) = 'max_tau_conv'
    Text_Summary1_name(5,1) = 'radius'
    Text_Summary1_name(6,1) = 'log_R'
    Text_Summary1_name(7,1) = 'effective_T'
