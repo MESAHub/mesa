@@ -13,8 +13,8 @@
       alpha_TDC_eddy_viscosity = 0.25d0
       alpha_TDC_turbulent_pressure = 0d0
    
-      max_X_for_TDC = -1
-      max_X_for_gradT_eqn = -1
+      max_X_for_TDC = -1   ! only used if > 0
+      max_X_for_gradT_eqn = -1   ! only used if > 0
       compare_TDC_to_MLT = .false.
    
    

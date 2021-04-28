@@ -195,7 +195,7 @@
             call set_to_NaN(s% mesh_adjust_KE_conservation)
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% min_conv_time_scale)
-            call set_to_NaN(s% min_dr_div_cs_start)
+             call set_to_NaN(s% min_dr_div_cs_start)
             call set_to_NaN(s% mstar_dot_old)
             call set_to_NaN(s% mstar_old)
             call set_to_NaN(s% mx1_bot)

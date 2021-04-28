@@ -80,8 +80,8 @@
    D_ST_factor = 1
       
 ! TDC
-   max_X_for_TDC = 0d0
-   max_X_for_conv_timescale = 0d0
+   max_X_for_TDC = 1d-8
+   max_X_for_conv_timescale = 1d-8
 
    max_dt_div_tau_conv_for_TDC = 1d2 ! 1d99 ! 1d-2
    max_dt_years_for_TDC = 1d2 ! 11d99 ! 1d-1
@@ -110,7 +110,7 @@
    set_rho_to_dm_div_dV = .false.
 
    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
-   max_X_for_gradT_eqn = 0d0
+   max_X_for_gradT_eqn = 1d-8
 
    use_dedt_form_of_energy_eqn = .true.
    convergence_ignore_equL_residuals = .true.
@@ -140,9 +140,9 @@
       
       !compare_TDC_to_MLT = .true.
       
-      !x_integer_ctrl(19) = 1870 ! k
-      !x_integer_ctrl(20) = 3 ! solver iter
-      !x_integer_ctrl(21) = 60 ! model_number
+      !x_integer_ctrl(19) = 1740 ! k
+      !x_integer_ctrl(20) = 1 ! solver iter
+      !x_integer_ctrl(21) = 76 ! model_number
 
 ! FOR DEBUGGING
 
@@ -213,9 +213,15 @@
    !pause = .true.
    !pause_interval = 10
    pgstar_interval = 1
-
-   !Profile_Panels1_xmin = 1680 ! -101D0
-   !Profile_Panels1_xmax = 200 ! -101D0
+   
+   Profile_Panels1_xaxis_name = 'mass'
+   Profile_Panels1_xaxis_reversed = .false.
+   !Profile_Panels1_xaxis_name = 'zone'
+   !Profile_Panels1_xaxis_reversed = .true.
+   
+   !Profile_Panels1_xmin = 1550
+   !Profile_Panels1_xmax = 1750
+   Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
    Grid2_title = 'TDC He core flash'
    

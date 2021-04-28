@@ -140,16 +140,10 @@
    Profile_Panels1_win_flag = .false.
    Profile_Panels1_title = ''      
    
-   !Profile_Panels1_xaxis_name = 'logtau'
-   !Profile_Panels1_xaxis_reversed = .true.
-   !Profile_Panels1_xmin = -101D0
-   !Profile_Panels1_xmax = -101D0
-   !Profile_Panels1_show_mix_regions_on_xaxis = .true.
-   
    Profile_Panels1_xaxis_name = 'mass'
    Profile_Panels1_xaxis_reversed = .false.
-   !Profile_Panels1_xaxis_name = 'zone'
-   !Profile_Panels1_xaxis_reversed = .true.
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
    
    Profile_Panels1_xmin = -101D0
    Profile_Panels1_xmax = -101D0
@@ -190,9 +184,9 @@
    !Profile_Panels1_same_yaxis_range(5) = .true.
 
    Profile_Panels1_yaxis_name(6) = 'SOURCE' 
-   !Profile_Panels1_ymin(6) = -0.1      
+   Profile_Panels1_ymin(6) = -0.1      
    Profile_Panels1_other_yaxis_name(6) = 'S0' 
-   !Profile_Panels1_other_ymin(6) = 1       
+   Profile_Panels1_other_ymin(6) = -5      
    !Profile_Panels1_same_yaxis_range(6) = .true.
          
    Profile_Panels1_yaxis_name(7) = 'DAMP' 
