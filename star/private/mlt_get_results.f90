@@ -231,8 +231,10 @@
          s% xtra2_array(k) = gradT%val
          s% xtra3_array(k) = conv_vel%val
          
-         Y_guess = gradT - grada ! set the guess for use by TDC
-         if (okay_to_use_TDC .and. Y_guess > 0d0) then
+         ! need to make use of gradL instead of grada consistent - at least for TDC
+         
+         if (okay_to_use_TDC .and. gradr > gradL) then
+            Y_guess = gradT - gradL
             if (compare_TDC_to_MLT) then
                call do_compare_TDC_to_MLT     
             else
@@ -331,7 +333,7 @@
                call get_TDC_solution(s, k, &
                   mixing_length_alpha, cgrav, m, Y_guess, report, &
                   mixing_type, L, r, P, T, rho, Cp, opacity, &
-                  scale_height, grada, conv_vel, Y_face, ierr)
+                  scale_height, gradL, conv_vel, Y_face, ierr)
                if (ierr /= 0) then
                   write(*,2) 'get_TDC_solution failed in set_TDC', k
                   stop 'get_TDC_solution failed in set_TDC'
@@ -424,8 +426,8 @@
             else if (Zeta > 1d0) then
                Zeta = 1d0
             end if            
-            gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
-            Y_face = gradT - grada
+            gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
+            Y_face = gradT - gradL
             mixing_type = convective_mixing
             if (k > 0) then
                s% xtra1_array(k) = conv_vel%val
@@ -521,13 +523,13 @@
       
       subroutine get_TDC_solution(s, k, &
             mixing_length_alpha, cgrav, m, Y_guess, report, &
-            mixing_type, L, r, P, T, rho, Cp, kap, Hp, grada, cv, Y_face, ierr)
+            mixing_type, L, r, P, T, rho, Cp, kap, Hp, gradL, cv, Y_face, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, cgrav, m
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(in) :: &
-            L, r, P, T, rho, Cp, kap, Hp, grada, Y_guess
+            L, r, P, T, rho, Cp, kap, Hp, gradL, Y_guess
          logical, intent(in) :: report
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
          integer, intent(out) :: ierr
@@ -563,7 +565,7 @@
          ! the solution to Q=0 has Y < 0.
          Y = 0d0
          call compute_Q(s, k, mixing_length_alpha, &
-            Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, grada, Q, Af)
+            Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, gradL, Q, Af)
          if (Q > 0d0) then
             Y_is_positive = .true.
          else
@@ -583,7 +585,7 @@
          if (Y == 0d0) Y = 1d-30
          do iter=1,10
             call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, grada, Q, Af)
+                  Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, gradL, Q, Af)
             if (Q > 0d0) then
                if (iter == 1) then
                   first_Q_is_positive = .true.
@@ -620,7 +622,7 @@
          if (report) write(*,2) 'initial Y', 0, Y%val
          do iter = 1, max_iter
             call compute_Q(s, k, mixing_length_alpha, &
-               Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, grada, Q, Af)
+               Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, gradL, Q, Af)
             if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
             if (is_bad(Q%val)) exit
             if (abs(Q%val)/scale <= tolerance) then
@@ -680,7 +682,7 @@
          end if
          cv = sqrt_2_div_3*unconvert(Af)   
          Y_face = unconvert(Y)
-         gradT = Y_face%val + grada%val
+         gradT = Y_face%val + gradL%val
          Lr = L0%val*gradT
          Lc = L%val - Lr
          if (cv > 0d0) then
@@ -692,34 +694,34 @@
             
             
       subroutine compute_Q(s, k, mixing_length_alpha, &
-            Y, c0_in, L_in, L0_in, A0, T, rho, Cp, kap, Hp, grada_in, Q, Af)
+            Y, c0_in, L_in, L0_in, A0, T, rho, Cp, kap, Hp, gradL_in, Q, Af)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
          type(auto_diff_real_star_order1), intent(in) :: &
-            c0_in, L_in, L0_in, A0, T, rho, Cp, kap, Hp, grada_in
+            c0_in, L_in, L0_in, A0, T, rho, Cp, kap, Hp, gradL_in
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: Q, Af
-         type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, grada
+         type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, gradL
          call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, kap, Hp, grada_in, xi0, xi1, xi2) 
+            Y, T, rho, Cp, kap, Hp, gradL_in, xi0, xi1, xi2) 
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
          L = convert(L_in)
          L0 = convert(L0_in)
-         grada = convert(grada_in)
+         gradL = convert(gradL_in)
          c0 = convert(c0_in)
-         Q = (L - L0*grada) - (L0 + c0*Af)*Y
+         Q = (L - L0*gradL) - (L0 + c0*Af)*Y
       end subroutine compute_Q
 
 
       subroutine eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, kap, Hp, grada, xi0, xi1, xi2) 
+            Y, T, rho, Cp, kap, Hp, gradL, xi0, xi1, xi2) 
          ! eval_xis sets up Y with partial wrt Z
          ! so results come back with partials wrt Z
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
-         type(auto_diff_real_star_order1), intent(in) :: T, rho, Cp, kap, Hp, grada
+         type(auto_diff_real_star_order1), intent(in) :: T, rho, Cp, kap, Hp, gradL
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
          type(auto_diff_real_tdc) :: S0, D0, DR0
@@ -728,7 +730,7 @@
          real(dp), parameter :: x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3
          real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
          include 'formats'
-         S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*grada/Hp)
+         S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*gradL/Hp)
          S0 = S0*Y
          D0 = convert(s% alpha_TDC_DAMP*x_CEDE/(mixing_length_alpha*Hp))
          if (s% alpha_TDC_DAMPR == 0d0) then
