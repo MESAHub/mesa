@@ -226,13 +226,13 @@
             call set_semiconvection
          end if         
 
-         ! save non-TDC values for debugging
-         s% xtra1_array(k) = safe_log10(abs(gradT%val - grada%val))
-         s% xtra2_array(k) = gradT%val
-         s% xtra3_array(k) = conv_vel%val
+         if (k > 0) then ! save non-TDC values for debugging
+            s% xtra1_array(k) = safe_log10(abs(gradT%val - grada%val))
+            s% xtra2_array(k) = gradT%val
+            s% xtra3_array(k) = conv_vel%val
+         end if
          
          ! need to make use of gradL instead of grada consistent - at least for TDC
-         
          if (okay_to_use_TDC .and. gradr > gradL) then
             Y_guess = gradT - gradL
             if (compare_TDC_to_MLT) then
@@ -741,10 +741,12 @@
          end if
          xi0 = S0
          xi1 = -DR0
-         xi2 = -D0         
-         s% xtra4_array(k) = S0%val
-         s% xtra5_array(k) = D0%val
-         s% xtra6_array(k) = DR0%val
+         xi2 = -D0      
+         if (k > 0) then   
+            s% xtra4_array(k) = S0%val
+            s% xtra5_array(k) = D0%val
+            s% xtra6_array(k) = DR0%val
+         end if
       end subroutine eval_xis
       
       
