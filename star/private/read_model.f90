@@ -163,6 +163,12 @@
          if (.not. s% have_mlt_vc) then
             s% mlt_vc(1:nz) = 0
             s% have_mlt_vc = .true.
+         else
+            !write(*,*) 'size(s% mlt_vc_old,dim=1)', size(s% mlt_vc_old,dim=1)
+            do k=1,nz
+               !if (s% mlt_vc(k) /= 0d0) write(*,2) 's% mlt_vc(k)', k, s% mlt_vc(k)
+               s% mlt_vc_old(k) = s% mlt_vc(k) ! will be reset after remesh, but this is for mlt
+            end do
          end if
          
          s% doing_finish_load_model = .true.  

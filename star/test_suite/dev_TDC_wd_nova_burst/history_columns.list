@@ -41,15 +41,38 @@
    
       model_number ! counting from the start of the run
       star_age ! elapsed simulated time in years since the start of the run
-      star_mass ! in Msun units
-      !star_mdot ! d(star_mass)/dt (in msolar per year)
-      !time_step ! timestep in years since previous model
+      !star_age_sec ! elapsed simulated time in seconds since the start of the run
+      !star_age_min ! elapsed simulated time in minutes since the start of the run
+      !star_age_hr ! elapsed simulated time in hours since the start of the run
+      star_age_day ! elapsed simulated time in days since the start of the run
+      log_dt
+      log_dt_sec ! log10 time_step in seconds
       time_step_sec
-      log_dt ! log10 time_step
-      num_zones ! number of zones in the model
-      max_tau_conv
+      !num_zones ! number of zones in the model
       
-   
+      dt_div_max_tau_conv
+      max_tau_conv
+      log_max_tau_conv
+      dt_div_min_tau_conv
+      min_tau_conv
+      log_min_tau_conv
+      using_TDC   
+      
+      num_solver_iterations ! iterations at this step
+
+      rel_E_err
+      log_rel_E_err
+      log_rel_run_E_err
+      
+      virial_thm_P_avg
+      virial_thm_rel_err
+      
+      v_surf_km_s
+      radius
+      effective_T
+      luminosity
+      star_age_day
+      
    ! mixing regions
    
       !  mx1 refers to the largest (by mass) convective region.
@@ -94,6 +117,22 @@
       he_core_mass
       co_core_mass
       fe_core_mass
+   
+   ! info about locations where optical depth is 10 or 100
+
+      !tau10_mass ! mass in solar units where optical depth = 10
+      !tau10_radius ! radius in solar units where optical depth = 10
+      !tau10_lgP ! estimate for log10(P) at tau = 10
+      !tau10_lgT ! estimate for log10(T) at tau = 10
+      !tau10_lgRho ! estimate for log10(density) at tau = 10
+      !tau10_L ! estimate for L/Lsun at tau = 10
+      
+      !tau100_mass ! location in solar units where optical depth = 100
+      !tau100_radius ! location in solar units where optical depth = 100
+      !tau100_lgP ! estimates for values at tau = 100
+      !tau100_lgT
+      !tau100_lgRho
+      !tau100_L
 
    ! timescales
       
@@ -112,12 +151,17 @@
    
       log_L ! log10 luminosity in Lsun units
       log_Teff ! log10 effective temperature
-      effective_T
-      !log_R ! log10 radius in Rsun units
-      radius_cm
-      log_R_cm
+      log_R ! log10 radius in Rsun units
       log_g ! log10 gravity
-      !log_L_div_Ledd ! log10(L/Leddington)
+
+      surf_avg_j_rot
+      surf_avg_omega
+      surf_avg_omega_crit
+      surf_avg_omega_div_omega_crit
+      surf_avg_v_rot ! km/sec rotational velocity at equator
+      surf_avg_v_crit ! critical rotational velocity at equator
+      surf_avg_v_div_v_crit
+      surf_avg_Lrad_div_Ledd
    
    ! conditions near center
    
@@ -126,7 +170,40 @@
       log_center_P ! pressure
       !center_degeneracy ! the electron chemical potential in units of k*T
       !center_gamma ! plasma interaction parameter at the centermost meshpoint.
+      center_omega
+      center_omega_div_omega_crit
+      center_ye
+      center_entropy ! in kerg per baryon      
       
+
+
+      surface he4
+      surface c12
+      surface n14
+      surface o16
+
+
+      
+   ! mass fractions near center
+      
+      center h1
+      center he4
+      center c12
+      center n14
+      center o16
+      center ne20
+      center si28
+      center s32
+      center ar36
+      center ca40
+      center fe54
+      center fe56
+      center ni56
+      center cr56
+      ! etc. -- do as many of these 'center' commands as desired
+      
+      
+
    ! log10 mass fractions for entire star
       
       log_average h1
@@ -183,7 +260,7 @@
 
       ! you might want to get a more complete list of mixing regions by using the following
       
-      !mixing_regions 40
+      mixing_regions 40
       
       !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
          ! the <integer> is the number of regions to report
@@ -199,12 +276,14 @@
          
          ! the columns in the log file will have names like 'mix_type_1' and 'mix_qtop_1'
 
+      burning_regions 80
+
 
    ! misc
    
-      !v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
       num_retries ! total during the run
-
+      
 
 

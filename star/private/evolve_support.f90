@@ -61,7 +61,7 @@
 
             call flip(s% j_rot, s% j_rot_old, ierr)
             if (ierr /= 0) return
-
+            
             call flip(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
 

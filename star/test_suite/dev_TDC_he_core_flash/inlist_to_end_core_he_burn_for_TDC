@@ -51,12 +51,12 @@
    !controls_namelist_name = 'namelist_controls_he_flash'
       
    max_model_number = 12000
-   max_number_retries = 100
+   max_number_retries = 1000
       
    initial_mass = 1.0
    initial_z = 0.02d0
 
-    Teff_upper_limit = 3300
+    !Teff_upper_limit = 3300
 !      xa_central_lower_limit_species(1) = 'he4'
 !      xa_central_lower_limit(1) = 0.0001
 
@@ -83,8 +83,8 @@
    max_X_for_TDC = 1d-8
    max_X_for_conv_timescale = 1d-8
 
-   max_dt_div_tau_conv_for_TDC = 1d2 ! 1d99 ! 1d-2
-   max_dt_years_for_TDC = 1d2 ! 11d99 ! 1d-1
+   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
+   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
    
    alpha_TDC_DAMP = 1d0
    alpha_TDC_DAMPR = 0d0
@@ -102,7 +102,7 @@
    delta_lgL_He_limit = 0.006d0
 
 ! mesh
-   !okay_to_remesh = .false.
+   okay_to_remesh = .false.
    remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
 ! solver
@@ -140,9 +140,9 @@
       
       !compare_TDC_to_MLT = .true.
       
-      !x_integer_ctrl(19) = 1740 ! k
-      !x_integer_ctrl(20) = 1 ! solver iter
-      !x_integer_ctrl(21) = 76 ! model_number
+      x_integer_ctrl(19) = 1033 ! k
+      x_integer_ctrl(20) = 0 ! solver iter
+      x_integer_ctrl(21) = 1731 ! model_number
 
 ! FOR DEBUGGING
 

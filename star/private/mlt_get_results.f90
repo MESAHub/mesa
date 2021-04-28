@@ -314,7 +314,7 @@
                   if (s% okay_to_set_mlt_vc) then ! is also ok to use mlt_vc_old   
                      A0 = s% mlt_vc_old(k)/sqrt_2_div_3
                   else
-                     A0 = 0d0
+                     A0 = s% mlt_vc(k)/sqrt_2_div_3
                   end if
                   write(*,4) 'c0', k, s% solver_iter, s% model_number, c0%val
                   write(*,4) 'L0', k, s% solver_iter, s% model_number, L0%val
@@ -561,14 +561,8 @@
          L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap) ! assumes QHSE for dP/dm
          if (s% okay_to_set_mlt_vc) then
             A0 = s% mlt_vc_old(k)/sqrt_2_div_3
-            if (report) then
-               write(*,2) 'okay_to_set_mlt_vc A0', k, A0%val
-            end if
          else
-            A0 = 0d0
-            if (report) then
-               write(*,2) 'not okay_to_set_mlt_vc A0', k, A0%val
-            end if
+            A0 = s% mlt_vc(k)/sqrt_2_div_3
          end if
 
          ! Set scale for judging the solution.
@@ -724,7 +718,7 @@
             mixing_type = no_mixing
          end if
          if (k > 0) s% tdc_num_iters(k) = iter
-         
+                            
       end subroutine get_TDC_solution
             
             
