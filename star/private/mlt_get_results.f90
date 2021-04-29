@@ -204,8 +204,8 @@
          
          if (report) then
             write(*,*)
-            write(*,2) 'enter Get_results gradr grada scale_height ' // trim(MLT_option), &
-               k, gradr%val, grada%val, scale_height%val
+            write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
+               k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
          end if
          
          call set_no_mixing('') ! to initialize things
@@ -607,14 +607,12 @@
             else
                Y_is_positive = .false.
             end if
-
             ! Now we know the sign of Y, we need an actual guess as to its magnitude.
             if (Y_is_positive) then
                Y = convert(abs(Y_guess))
             else
                Y = convert(-abs(Y_guess))
             end if
-
             ! Bisection method to find an initial guess, then we hand it off to Newton's method
             ! to optimize and imbue it with derivatives
             first_Q_is_positive = .false.
@@ -626,7 +624,6 @@
                   converged = .true.
                   exit
                end if
-
                if (Q > 0d0) then
                   if (iter == 1) then
                      first_Q_is_positive = .true.
@@ -634,7 +631,11 @@
                   if (.not. first_Q_is_positive) then
                      exit
                   end if
-                  Y = Y * 4d0
+                  if (Y > 0d0) then
+                     Y = Y * 4d0
+                  else
+                     Y = Y / 4d0
+                  end if
                else
                   if (iter == 1) then
                      first_Q_is_positive = .false.
@@ -642,7 +643,11 @@
                   if (first_Q_is_positive) then
                      exit
                   end if
-                  Y = Y / 4d0
+                  if (Y > 0d0) then
+                     Y = Y / 4d0
+                  else
+                     Y = Y * 4d0
+                  end if
                end if
             end do
          end if
