@@ -1,0 +1,206 @@
+
+&star_job
+      show_log_description_at_start = .false.
+
+      change_initial_net = .true.
+      new_net_name = 'approx21_cr60_plus_co56.net'
+      dump_missing_metals_into_heaviest = .false.
+      
+      set_rates_preference = .true.
+      new_rates_preference = 2   ! 1 = nacre ; 2 = jina reaclib
+
+      change_initial_D_omega_flag = .true.
+      new_D_omega_flag = .true.
+      
+      change_initial_v_flag = .true.
+      new_v_flag = .true.
+
+      relax_to_this_tau_factor = 1.5d7
+      dlogtau_factor = 0.1d0
+      relax_initial_tau_factor = .true.
+
+      show_retry_counts_when_terminate = .true.
+      show_timestep_limit_counts_when_terminate = .true.
+
+      pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+      use_Skye = .true.
+      use_PC = .false.
+/ ! end of eos namelist
+
+&kap
+      kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
+      kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
+      kap_lowT_prefix = 'lowT_fa05_a09p'
+      use_Type2_opacities = .true.
+      
+/ ! end of kap namelist
+
+&controls
+
+! wind
+      cool_wind_full_on_T = 0.8d4
+      hot_wind_full_on_T = 1.2d4
+      cool_wind_RGB_scheme = 'Dutch'
+      cool_wind_AGB_scheme = 'Dutch'
+      hot_wind_scheme = 'Dutch'
+      Dutch_wind_lowT_scheme = 'de Jager'
+
+      max_T_center_for_any_mass_loss = 1.1d9
+
+! atmosphere
+      Pextra_factor = 4  
+      atm_option = 'T_tau'
+      atm_T_tau_relation = 'Eddington'
+      atm_T_tau_opacity = 'fixed'
+
+! rotation
+      am_nu_visc_factor = 0
+      am_D_mix_factor = 0.0333333333333333d00
+      D_DSI_factor = 0
+      D_SH_factor = 1
+      D_SSI_factor = 1
+      D_ES_factor = 1
+      D_GSF_factor = 1
+      D_ST_factor = 1
+
+! mlt
+      mixing_length_alpha = 1.5
+      MLT_option = 'Henyey'
+
+      use_Ledoux_criterion = .true.
+      semiconvection_option = 'Langer_85 mixing; gradT = gradr'
+      thermohaline_option = 'Kippenhahn'
+      alpha_semiconvection = 0
+      thermohaline_coeff = 0
+
+      mlt_make_surface_no_mixing = .true.
+
+      okay_to_reduce_gradT_excess = .true.
+      gradT_excess_f1 = 1d-4
+      gradT_excess_f2 = 1d-2
+  
+! mixing
+      D_omega_mixing_rate = 1d0
+      D_omega_mixing_across_convection_boundary = .false.
+
+! timesteps
+      varcontrol_target = 1d-3
+      
+      never_skip_hard_limits = .true
+      limit_for_rel_error_in_energy_conservation = 1d-7
+      hard_limit_for_rel_error_in_energy_conservation = 1d-6      
+      min_xa_hard_limit = -1d-5
+      min_xa_hard_limit_for_highT = -3d-5
+
+      delta_lgTeff_limit =  0.01
+      delta_lgL_limit = 0.1     
+      delta_lgL_He_limit = 0.1
+
+      delta_lgRho_cntr_limit = 0.03
+      delta_lgRho_cntr_hard_limit = -1
+      delta_lgRho_limit = 0.1
+      
+      delta_lgT_cntr_limit_only_after_near_zams = .true.
+      delta_lgT_cntr_limit = 0.002  
+      delta_lgT_cntr_hard_limit = 0.01
+
+      delta_lgT_max_limit_only_after_near_zams = .true.
+      delta_lgT_max_limit = 0.002     
+      delta_lgT_max_hard_limit = 0.01
+
+      dHe_div_He_limit = -1
+
+      dX_nuc_drop_limit = 5d-1 ! 2d-2
+      dX_nuc_drop_limit_at_high_T = -1
+      dX_nuc_drop_min_X_limit = 1d-3
+      dX_nuc_drop_max_A_limit = 52   
+      dX_nuc_drop_hard_limit = 1d99
+
+      delta_XHe_cntr_limit = 0.01d0
+      delta_XHe_cntr_hard_limit = 0.03d0
+      delta_lg_XH_cntr_limit = -1
+      delta_lg_XHe_cntr_limit = -1
+      delta_lg_XC_cntr_limit = -1
+      delta_lg_XNe_cntr_limit = -1
+      delta_lg_XO_cntr_limit = -1
+      delta_lg_XSi_cntr_limit = -1
+      delta_XC_cntr_limit = -1
+      delta_XC_cntr_hard_limit = -1
+      delta_XNe_cntr_limit = -1
+      delta_XNe_cntr_hard_limit = -1
+      delta_XO_cntr_limit = -1
+      delta_XO_cntr_hard_limit = -1
+      delta_XSi_cntr_limit = -1
+      delta_XSi_cntr_hard_limit = -1
+
+      delta_Ye_highT_limit = 1d-3
+
+! mesh
+      mesh_delta_coeff = 1d0
+      mesh_delta_coeff_for_highT = 1d0 
+      logT_max_for_standard_mesh_delta_coeff = 9.0 
+      logT_min_for_highT_mesh_delta_coeff = 9.5 
+      min_dq_for_xa = 1d-4 
+      !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
+
+! solver
+      use_gold2_tolerances = .true.
+      use_gold_tolerances = .true.
+      gold_tol_max_residual3 = 1d-4
+
+      always_use_dedt_form_of_energy_eqn = .true.       
+      max_tries_for_implicit_wind = 0      
+
+      convergence_ignore_equL_residuals = .true. 
+      make_gradr_sticky_in_solver_iters = .true.
+      use_d_eos_dxa = .true.
+      xa_scale = 1d-5
+      iter_for_resid_tol2 = 10
+      min_timestep_limit = 1d-12 ! (seconds)
+
+      warn_rates_for_high_temp = .true.
+      max_safe_logT_for_rates = 10.5d0
+
+      when_to_stop_rtol = 1d-3
+      when_to_stop_atol = 1d-3
+
+      sig_min_factor_for_high_Tcenter = 0.01
+      Tcenter_min_for_sig_min_factor_full_on = 3.2d9
+      Tcenter_max_for_sig_min_factor_full_off = 2.8d9
+
+      op_split_burn = .true.
+      op_split_burn_min_T = 1d9
+      burn_steps_limit = 150
+      burn_steps_hard_limit = 250
+      op_split_burn_eps = 1d-5
+      op_split_burn_odescal = 1d-5
+
+! output
+      gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 10
+      terminal_interval = 10
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+!pause = .true.
+
+!pgstar_interval = 1
+
+! x-axis limits and properties
+Profile_Panels3_xaxis_name = 'mass'
+Profile_Panels3_xmin = 0.0
+Profile_Panels3_xmax = 1.6
+Profile_Panels3_xaxis_reversed = .false.
+
+/ ! end of pgstar namelist
