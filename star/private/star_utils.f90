@@ -3800,6 +3800,8 @@
             if (tau_conv > s% max_conv_time_scale) &
                s% max_conv_time_scale = tau_conv
          end do
+         if (s% max_conv_time_scale == 0d0) s% max_conv_time_scale = 1d99
+         if (s% min_conv_time_scale == 1d99) s% min_conv_time_scale = 0d0
       end subroutine set_conv_time_scales
       
       
