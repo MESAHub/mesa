@@ -126,6 +126,10 @@
       op_split_burn_eps = 1d-5
       op_split_burn_odescal = 1d-5
 
+      calculate_Brunt_B = .true.     ! needed for tau_conv
+      max_q_for_conv_timescale = 0.2d0
+      max_X_for_conv_timescale = 1d-6   ! must be > 0
+
 ! output
 
       terminal_show_age_units = 'days'

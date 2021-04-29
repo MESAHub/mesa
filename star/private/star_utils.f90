@@ -3787,6 +3787,7 @@
          type (star_info), pointer :: s
          integer :: k
          real(dp) :: tau_conv
+         include 'formats'
          s% min_conv_time_scale = 1d99
          s% max_conv_time_scale = 0d0
          do k=1,s%nz
