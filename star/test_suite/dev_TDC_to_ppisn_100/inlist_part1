@@ -1,16 +1,19 @@
 
 &star_job   
-
+   !save_star_job_namelist = .true.
+   !star_job_namelist_name = 'namelist_star_job_tdc'
+   
       load_saved_model = .true.
-      saved_model_name = 'converted.mod'
+      saved_model_name = 'ppisn_100_test_tdc.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'part1.mod'
+      save_model_filename = 'final.mod'
+      !save_model_filename = 'ppisn_100_test_tdc.mod'
       
       required_termination_code_string(1) = 'fe_core_infall_limit'
       required_termination_code_string(2) = 'log_Rsurf_upper_limit'
       required_termination_code_string(3) = 'ejecta_mass_max_limit'
-      !required_termination_code_string(4) = 'max_model_number' ! for testing
+      required_termination_code_string(4) = 'max_model_number' ! for testing
 
       !pgstar_flag = .false.
 
@@ -23,6 +26,10 @@
 / ! end of kap namelist
 
 &controls   
+   !save_controls_namelist = .true.
+   !controls_namelist_name = 'namelist_controls_tdc'
+
+
       ! limit max_model_number as part of test_suite
       max_model_number = 4000 
       !max_number_retries = 30
@@ -30,6 +37,16 @@
       ejecta_mass_max_limit = 0.1d0
       log_Rsurf_upper_limit = 4d0
       fe_core_infall_limit = 1d7
+      
+! TDC
+   max_X_for_TDC = 1d-8
+   max_X_for_conv_timescale = 1d-8
+
+   max_dt_div_tau_conv_for_TDC = 1 ! 1d99 ! 1d-2
+   max_dt_years_for_TDC = -1 ! 11d99 ! 1d-1
+   
+   alpha_TDC_DAMP = 1d0
+   alpha_TDC_DAMPR = 0d0
 
 ! wind
 
@@ -50,6 +67,11 @@
 ! solver
 
 ! output
+   num_trace_history_values = 4
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
+   trace_history_value_name(3) = 'dt_div_max_tau_conv'
+   trace_history_value_name(4) = 'using_TDC'
 
       photo_interval = 10
       !profile_interval = 1

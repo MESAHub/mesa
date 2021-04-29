@@ -436,10 +436,10 @@
             end if            
             
             
-            if (.true.) then
+            if (.true.) then ! need this old form for cburn_inward, dev_to_cc_12, and dev_to_cc_20
                gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
                Y_face = gradT - grada
-            else
+            else ! switch to this when resolve the problems with those test cases
                gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
                Y_face = gradT - gradL
             end if
