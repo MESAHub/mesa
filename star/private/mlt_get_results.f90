@@ -434,8 +434,17 @@
             else if (Zeta > 1d0) then
                Zeta = 1d0
             end if            
-            gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
-            Y_face = gradT - gradL
+            
+            
+            if (.true.) then
+               gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
+               Y_face = gradT - grada
+            else
+               gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
+               Y_face = gradT - gradL
+            end if
+            
+            
             mixing_type = convective_mixing
             if (k > 0) then
                s% xtra1_array(k) = conv_vel%val
@@ -444,11 +453,11 @@
 
             if (report) then
                write(*,2) 'set_MLT val for Zeta gradr grada gradT Y_face', k, &
-                  Zeta%val, gradr%val, grada%val, gradT%val, gradT%val - grada%val
+                  Zeta%val, gradr%val, grada%val, gradT%val, Y_face%val
                write(*,2) 'set_MLT d_dlnd_00 for Zeta gradr grada gradT Y_face', k, &
                   Zeta%d1Array(i_lnd_00), gradr%d1Array(i_lnd_00), &
                   grada%d1Array(i_lnd_00), gradT%d1Array(i_lnd_00), &
-                  gradT%d1Array(i_lnd_00) - grada%d1Array(i_lnd_00)
+                  Y_face%d1Array(i_lnd_00)
             end if
 
          end subroutine set_MLT   
