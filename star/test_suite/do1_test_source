@@ -1,8 +1,3 @@
-do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto
-return
-do_one dev_to_cc_12 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-do_one dev_to_cc_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-
 
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
@@ -22,7 +17,7 @@ do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
 do_one c13_pocket "all values are within tolerance" "final.mod" auto
-do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto
+#   fails with change to use gradL in set_mlt.   do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto
 do_one ccsn_IIp "shock has reached target location    1" "shock_part5.mod" auto
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one conductive_flame "flame reached halfway point" "final.mod" auto

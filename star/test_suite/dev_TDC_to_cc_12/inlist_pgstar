@@ -123,7 +123,7 @@
    History_Panels1_other_ymax(4) = -101d0 ! only used if /= -101d0        
    History_Panels1_other_dymin(4) = 0.07
    
-   History_Panels1_yaxis_name(5) = 'log_dt'
+   History_Panels1_yaxis_name(5) = 'log_dt_sec'
    History_Panels1_yaxis_reversed(5) = .false.
    History_Panels1_ymin(5) = -101d0 ! only used if /= -101d0
    History_Panels1_ymax(5) = -101d0 ! only used if /= -101d0        

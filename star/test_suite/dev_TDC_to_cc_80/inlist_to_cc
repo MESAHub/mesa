@@ -1,131 +1,101 @@
 
+
 &star_job
-   !save_star_job_namelist = .true.
-   !star_job_namelist_name = 'namelist_star_job_he_flash'
+      show_log_description_at_start = .false.
 
-   show_log_description_at_start = .false.
+      load_saved_model = .true.
+      saved_model_name = 'after_core_c_burn.mod' ! 'lgTmax.mod'
 
-   load_saved_model = .true.
-   saved_model_name = 'start_he_core_flash.mod'
-   !saved_model_name = 'test.mod'
+      save_model_when_terminate = .true.
+      save_model_filename = 'start_core_collapse.mod'
+      required_termination_code_string = 'fe_core_infall_limit'
 
-   save_model_when_terminate = .true.
-   save_model_filename = 'final.mod'
-   required_termination_code_string = 'Teff_upper_limit' ! 'xa_central_lower_limit'
-   !required_termination_code_string = 'max_model_number'
-      
-   set_initial_age = .true.
-   initial_age = 0
-   
-   set_initial_model_number = .true.
-   initial_model_number = 0
+      !set_initial_age = .false.
+      set_initial_age = .true.
+      initial_age = 0
 
-   !change_initial_v_flag = .true.
-   !new_v_flag = .true.
-
-   change_D_omega_flag = .true.
-   new_D_omega_flag = .true.
-   
-   set_initial_cumulative_energy_error = .true.
-   new_cumulative_energy_error = 0d0
-
-   pgstar_flag = .true.
+      !set_initial_model_number = .false.
+      !set_initial_number_retries = .false.
 
 / ! end of star_job namelist
 
 &eos
-
-
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
-
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
-
 / ! end of kap namelist
 
-&controls      
-   !save_controls_namelist = .true.
-   !controls_namelist_name = 'namelist_controls_he_flash'
-      
-   max_model_number = 12000
-   max_number_retries = 1000
-      
-   initial_mass = 1.0
-   initial_z = 0.02d0
+&controls
 
-    !Teff_upper_limit = 3300
-!      xa_central_lower_limit_species(1) = 'he4'
-!      xa_central_lower_limit(1) = 0.0001
+      fe_core_infall_limit = 1d7
 
-! wind
-   cool_wind_full_on_T = 9.99d9
-   hot_wind_full_on_T = 1d10 
-   cool_wind_RGB_scheme = 'Reimers'
-   cool_wind_AGB_scheme = 'Blocker'
-   RGB_to_AGB_wind_switch = 1d-4
-   Reimers_scaling_factor = 0.8d0  
-   Blocker_scaling_factor = 0.7d0 ! 0.8d0        
-
-! rotation
-   am_nu_visc_factor = 0
-   am_D_mix_factor = 0.0333333333333333d0
-   D_DSI_factor = 0
-   D_SH_factor = 1
-   D_SSI_factor = 1
-   D_ES_factor = 1
-   D_GSF_factor = 1
-   D_ST_factor = 1
+      ! limit max_model_number as part of test_suite
+      max_model_number = 4000
+      !max_number_retries = 37
       
 ! TDC
    max_X_for_TDC = 1d-8
    max_X_for_conv_timescale = 1d-8
 
-   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
-   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
+   max_dt_div_tau_conv_for_TDC = 10
+   max_dt_years_for_TDC = -1
    
    alpha_TDC_DAMP = 1d0
    alpha_TDC_DAMPR = 0d0
 
-! mix
-   mlt_make_surface_no_mixing = .true.
+! wind
+
+! atmosphere
+
+! rotation
 
 ! mlt
-   MLT_option = 'Henyey'
-   Henyey_MLT_y_param = 0.33333333d0
-   Henyey_MLT_nu_param = 8
+      alpha_semiconvection = 0
+      thermohaline_coeff = 0
+
+! mixing
 
 ! timesteps
-   !delta_lgL_He_limit = 0.003d0
-   delta_lgL_He_limit = 0.006d0
+      limit_for_rel_error_in_energy_conservation = 1d-4
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+
+      delta_lgT_max_hard_limit = -1
+      
+      delta_lgT_cntr_hard_limit = -1
+      
+      delta_lgRho_cntr_hard_limit = -1
+
+      delta_XSi_cntr_limit = 0.01d0
+      delta_XSi_cntr_hard_limit = -1
 
 ! mesh
-   !okay_to_remesh = .false.
-   !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
+      okay_to_remesh = .false.
 
 ! solver
-   use_momentum_outer_BC = .true.
-   set_rho_to_dm_div_dV = .false.
-
-   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
-   max_X_for_gradT_eqn = 1d-8
-
-   use_dedt_form_of_energy_eqn = .true.
-   convergence_ignore_equL_residuals = .true.
+      
+! GYRE output controls
+      !write_pulse_data_with_profile = .true.
+      !x_logical_ctrl(37) = .true. ! if true, then run GYRE
+      x_integer_ctrl(1) = 20 ! output GYRE info at this step interval
+      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      x_logical_ctrl(2) = .false. ! output eigenfunction files
+      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      x_integer_ctrl(4) = 1 ! order
+      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
-   num_trace_history_values = 4
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'dt_div_max_tau_conv'
-   trace_history_value_name(4) = 'using_TDC'
+      terminal_show_age_units = 'secs'
+      terminal_show_timestep_units = 'secs'
+      terminal_show_log_dt = .false.
+      terminal_show_log_age = .false.
 
-   terminal_show_age_units = 'years'
-   terminal_show_timestep_units = 'seconds'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
+      num_trace_history_values = 4
+      trace_history_value_name(1) = 'dt_div_max_tau_conv'
+      trace_history_value_name(2) = 'using_TDC'
+      trace_history_value_name(3) = 'rel_E_err'
+      trace_history_value_name(4) = 'log_rel_run_E_err'
 
       photo_interval = 50
       profile_interval = 100
@@ -140,9 +110,9 @@
       
       !compare_TDC_to_MLT = .true.
       
-      !x_integer_ctrl(19) = 1033 ! k
-      !x_integer_ctrl(20) = 0 ! solver iter
-      !x_integer_ctrl(21) = 1731 ! model_number
+      !x_integer_ctrl(19) = 1038 ! k
+      !x_integer_ctrl(20) = 3 ! solver iter
+      !x_integer_ctrl(21) = 1341 ! model_number
 
 ! FOR DEBUGGING
 
@@ -208,6 +178,7 @@
 / ! end of controls namelist
 
 
+
 &pgstar
 
    !pause = .true.
@@ -219,11 +190,11 @@
    !Profile_Panels1_xaxis_name = 'zone'
    !Profile_Panels1_xaxis_reversed = .true.
    
-   !Profile_Panels1_xmin = 1580
-   !Profile_Panels1_xmax = 1650
+   !Profile_Panels1_xmin = 1550
+   Profile_Panels1_xmax = 10
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
-   Grid2_title = 'TDC He core flash'
+   Grid2_title = 'TDC'
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png'
