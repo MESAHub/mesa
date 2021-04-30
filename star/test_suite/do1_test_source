@@ -1,4 +1,3 @@
-do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
  do_one dev_to_ppisn_100 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
  do_one dev_to_pisn_200 "stop because remnant_mass <= remnant_mass_min_limit" "final.mod" skip
  

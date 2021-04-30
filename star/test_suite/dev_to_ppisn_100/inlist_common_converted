@@ -124,9 +124,7 @@
       op_split_burn_eps = 1d-5
       op_split_burn_odescal = 1d-5
       
-      calculate_Brunt_B = .true.     ! needed for tau_conv
-      max_q_for_conv_timescale = 0.2d0
-      max_X_for_conv_timescale = 1d-6   ! must be > 0
+      calculate_Brunt_B = .false.
 
 ! output
 
@@ -135,15 +133,9 @@
       terminal_show_log_dt = .false.
       terminal_show_log_age = .false.
 
-      num_trace_history_values = 8
-      trace_history_value_name(1) = 'Fe_core'
-      trace_history_value_name(2) = 'remnant_M'
-      trace_history_value_name(3) = 'ejecta_M'
-      trace_history_value_name(4) = 'v_surf_km_s'
-      trace_history_value_name(5) = 'total_energy_foe'
-      trace_history_value_name(6) = 'rel_E_err'
-      trace_history_value_name(7) = 'log_rel_run_E_err'
-      trace_history_value_name(8) = 'dt_div_max_tau_conv'
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
 
 
 / ! end of controls namelist
