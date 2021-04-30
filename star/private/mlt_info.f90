@@ -80,6 +80,7 @@
          end do
 !$OMP END PARALLEL DO
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
+
       end subroutine set_mlt_vars
 
 
@@ -160,7 +161,7 @@
             call set_no_mixing('surface_no_mixing')
             return
          end if
-         
+
          if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
             call set_no_mixing('max_logT')
             return
@@ -181,7 +182,7 @@
             end do
          end if
 
-         if (s% csound_start(k) > 0d0) then
+         if (s% csound_start(k) > 0d0 .and. (s% u_flag .or. s% v_flag)) then
             no_mix = .false.
             if (s% u_flag) then
                vel => s% u_start
@@ -329,6 +330,8 @@
                      
             s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
             s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
+
+            s% L_conv(k) = 0d0
             
          end subroutine set_no_mixing
 

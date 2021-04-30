@@ -302,6 +302,7 @@
          s% time_nonburn_net = 0
          s% time_mlt = 0
          s% time_set_hydro_vars = 0
+         s% time_set_mixing_info = 0
          s% time_total = 0
 
          s% timing_num_get_eos_calls = 0

@@ -598,9 +598,9 @@
          real(dp) :: cs, x00, xp1, ms, photosphere_logxm, xshock
          character (len=strlen) :: str, xname, yname, other_yname
          logical :: found_shock
-         real, pointer, dimension(:) :: xvec, yvec, other_yvec, unshifted_xvec
-         real, pointer, dimension(:) :: yfile_xdata, other_yfile_xdata
-         real, pointer, dimension(:) :: yfile_ydata, other_yfile_ydata
+         real, allocatable, dimension(:) :: xvec, yvec, other_yvec, unshifted_xvec
+         real, allocatable, dimension(:) :: yfile_xdata, other_yfile_xdata
+         real, allocatable, dimension(:) :: yfile_ydata, other_yfile_ydata
          integer :: yfile_data_len, other_yfile_data_len, xaxis_id
 
          include 'formats'
@@ -937,7 +937,6 @@
                   call pgline( &
                      other_yfile_data_len, other_yfile_xdata, other_yfile_ydata)
                   deallocate(other_yfile_xdata, other_yfile_ydata)
-                  nullify(other_yfile_xdata, other_yfile_ydata)
                else
                   call pgline(npts, xvec, other_yvec)
                   if (panels_show_grid) then
@@ -980,7 +979,6 @@
                call pgline(yfile_data_len, yfile_xdata, yfile_ydata)
                call pgsls(1)
                deallocate(yfile_xdata, yfile_ydata)
-               nullify(yfile_xdata, yfile_ydata)
             else
                call pgsls(s% pgstar_profile_line_style)
                call pgline(npts, xvec, yvec)

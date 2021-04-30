@@ -107,6 +107,8 @@
          call set_dm_bar(s, nz, s% dm, s% dm_bar)            
          call reset_epsnuc_vectors(s)
 
+         s% star_mass = s% mstar/msun
+
          if (s% rotation_flag) then
             ! older MESA versions stored only omega in saved models. However, when
             ! using rotation dependent moments of inertia one actually needs to store

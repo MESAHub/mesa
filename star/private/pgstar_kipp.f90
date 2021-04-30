@@ -75,7 +75,7 @@
          integer :: i, ii, n, step_min, step_max
          real :: xmin, xmax, ymin_L_axis, ymax_L_axis, &
             ymin_mass_axis, ymax_mass_axis, dx, burn_type_cutoff
-         real, pointer, dimension(:) :: xvec, &
+         real, allocatable, dimension(:) :: xvec, &
             log_L, &
             log_Lneu, &
             log_LH, &
@@ -355,7 +355,7 @@
 
          logical function get1_yvec(name, vec)
             character (len=*) :: name
-            real, dimension(:), pointer :: vec
+            real, dimension(:), allocatable :: vec
             get1_yvec = get1_hist_yvec(s, step_min, step_max, n, name, vec)
          end function get1_yvec
 
