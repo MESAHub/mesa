@@ -456,6 +456,8 @@
          suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)      
       ! controls for CMS
       rq% use_CMS = use_CMS
+      rq% CMS_use_fixed_composition = CMS_use_fixed_composition
+      rq% CMS_fixed_composition_index = CMS_fixed_composition_index
       rq% max_Z_for_any_CMS = max_Z_for_any_CMS
       rq% max_Z_for_all_CMS = max_Z_for_all_CMS
       rq% logQ_max_for_any_CMS = logQ_max_for_any_CMS
@@ -589,6 +591,8 @@
          rq% suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)      
       ! controls for CMS
       use_CMS = rq% use_CMS
+      CMS_use_fixed_composition = rq% CMS_use_fixed_composition
+      CMS_fixed_composition_index = rq% CMS_fixed_composition_index
       max_Z_for_any_CMS = rq% max_Z_for_any_CMS
       max_Z_for_all_CMS = rq% max_Z_for_all_CMS
       logQ_max_for_any_CMS = rq% logQ_max_for_any_CMS
