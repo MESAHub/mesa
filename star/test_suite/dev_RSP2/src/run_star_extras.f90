@@ -279,8 +279,8 @@
          names(17) = 'Eq_R'
          names(18) = 'xUq'
          names(19) = 'Uq_R'
-         names(20) = 'xPvsc'
-         names(21) = 'Pvsc_R'
+         names(20) = 'Uq_err'
+         names(21) = 'Uq_diff'
          
          if (.false.) then ! debugging
             names(10) = 'xtr1'
@@ -327,9 +327,17 @@
                vals(k,16) = s% Eq(k)
                vals(k,17) = s_other% Eq(k)
                vals(k,18) = s% Uq(k)
-               vals(k,19) = s_other% Uq(k)               
+               vals(k,19) = s_other% Uq(k)    
+               
+                          
                vals(k,20) = s% Pvsc(k)
                vals(k,21) = s_other% Pvsc(k)
+               
+               vals(k,20) = (s% Uq(k) - s_other% Uq(k)) / &
+                  (1d-6 + 1d-6*max(abs(s% Uq(k)),abs(s_other% Uq(k))))
+               vals(k,21) = s% Uq(k) - s_other% Uq(k)
+               
+               
                
                if (.false.) then ! debugging xtra values
                   vals(k,10) = s% xtra1_array(k)

@@ -3437,7 +3437,8 @@
 
 
       ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad with time weighting
-      subroutine calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
+      subroutine calc_Ptot_ad_tw( &
+            s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
          use auto_diff_support
           type (star_info), pointer :: s 
          integer, intent(in) :: k
@@ -3714,7 +3715,7 @@
       end function center_avg_x
       
       
-      subroutine get_area_info(s, k, area, inv_R2, ierr)
+      subroutine get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3731,7 +3732,7 @@
             area = 4d0*pi*r2_00
             inv_R2 = 1d0/r2_00
          end if
-      end subroutine get_area_info
+      end subroutine get_area_info_opt_time_center
       
       
       subroutine set_energy_eqn_scal(s, k, scal, ierr) ! 1/(erg g^-1 s^-1)

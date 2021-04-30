@@ -643,12 +643,10 @@
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
                else if (i_w /= 0) then ! convert Et from RSP to w in RSP2
-                  j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j)))
-                  j=j+1; ! discard
-                  j=j+1; ! discard
+                  j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j))) ! Et_RSP
+                  j=j+1; ! erad_RSP
+                  j=j+1; ! Fr_RSP
                   j=j+1; xh(i_lum,k) = vec(j)
-                  ! attempt to compensate for exp(log(r)) /= r
-                  !xh(i_lnR,k) = log(exp(xh(i_lnR,k)))
                end if
             else if (i_w /= 0) then
                j=j+1; xh(i_w,k) = vec(j)

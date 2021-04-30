@@ -82,7 +82,7 @@
       subroutine do1_dudt_eqn( &
             s, k, P_surf_ad, skip_partials, nvar, ierr)
          use accurate_sum_auto_diff_star_order1
-         use star_utils, only: get_area_info, save_eqn_residual_info
+         use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info
          type (star_info), pointer :: s         
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only for k=1
@@ -119,10 +119,10 @@
          dt = s% dt
          dm = s% dm(k)     
              
-         call get_area_info(s, k, area_00, inv_R2_00, ierr)
+         call get_area_info_opt_time_center(s, k, area_00, inv_R2_00, ierr)
          if (ierr /= 0) return
          if (k < nz) then
-            call get_area_info(s, k+1, area_p1, inv_R2_p1, ierr)
+            call get_area_info_opt_time_center(s, k+1, area_p1, inv_R2_p1, ierr)
             if (ierr /= 0) return
             area_p1 = shift_p1(area_p1)
             inv_R2_p1 = shift_p1(inv_R2_p1)

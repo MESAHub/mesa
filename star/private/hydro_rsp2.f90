@@ -240,7 +240,7 @@
             dlnPeos = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
             Hp_face = -s% dm_bar(k)/(area*rho_face*dlnPeos)
          else
-            r_00 = wrap_opt_time_center_r_00(s, k)
+            r_00 = wrap_r_00(s, k) ! not time-centered in RSP
             d_00 = wrap_d_00(s, k)
             Peos_00 = wrap_Peos_00(s, k)
             if (k == 1) then
@@ -438,10 +438,8 @@
          if (s% RSP2_use_RSP_eqn_for_Y_face) then
       
             dm_bar = s% dm_bar(k)
-            Hp_face = wrap_Hp_00(s,k)
-            if (ierr /= 0) return
-      
-            r_00 = wrap_opt_time_center_r_00(s, k)
+            Hp_face = wrap_Hp_00(s,k)      
+            r_00 = wrap_r_00(s, k)
             d_00 = wrap_d_00(s, k)
             Peos_00 = wrap_Peos_00(s, k)
             Cp_00 = wrap_Cp_00(s, k)
@@ -451,7 +449,7 @@
             QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
             lnT_00 = wrap_lnT_00(s,k)
       
-            r_m1 = wrap_opt_time_center_r_m1(s, k)
+            r_m1 = wrap_r_m1(s, k)
             d_m1 = wrap_d_m1(s, k)
             Peos_m1 = wrap_Peos_m1(s, k)
             Cp_m1 = wrap_Cp_m1(s, k)
@@ -472,7 +470,7 @@
             Y1 = QQ_div_Cp_face*(Peos_m1 - Peos_00) - (lnT_m1 - lnT_00)
             ! Y1 unitless
          
-            Y2 = 4d0*pi*pow2(r_00)*Hp_face*2d0/(1/d_00 + 1/d_m1)/dm_bar
+            Y2 = 4d0*pi*pow2(r_00)*Hp_face*2d0/(1d0/d_00 + 1d0/d_m1)/dm_bar
             ! units = cm^2 cm / (cm^3 g^-1) / g
             !       = cm^2 cm cm^-3 g g^-1 = unitless
          
@@ -553,13 +551,30 @@
          type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
          include 'formats'
          ierr = 0
+         v_00 = wrap_v_00(s,k)
+         v_p1 = wrap_v_p1(s,k)
+         r_00 = wrap_r_00(s,k)
+         r_p1 = wrap_r_p1(s,k)
+         if (r_p1%val == 0d0) r_p1 = 1d0
+         d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
+      end function compute_d_v_div_r
+      
+      
+      function compute_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: d_v_div_r
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
+         include 'formats'
+         ierr = 0
          v_00 = wrap_opt_time_center_v_00(s,k)
          v_p1 = wrap_opt_time_center_v_p1(s,k)
          r_00 = wrap_opt_time_center_r_00(s,k)
          r_p1 = wrap_opt_time_center_r_p1(s,k)
          if (r_p1%val == 0d0) r_p1 = 1d0
          d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
-      end function compute_d_v_div_r
+      end function compute_d_v_div_r_opt_time_center
 
 
       function wrap_Hp_cell(s, k) result(Hp_cell) ! cm
@@ -594,8 +609,8 @@
             d_00 = wrap_d_00(s,k)
             f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
             rho2 = pow2(d_00)
-            r_00 = wrap_opt_time_center_r_00(s,k)
-            r_p1 = wrap_opt_time_center_r_p1(s,k)
+            r_00 = wrap_r_00(s,k)
+            r_p1 = wrap_r_p1(s,k)
             r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
             Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
             ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
@@ -621,7 +636,7 @@
          else
             Chi_cell = compute_Chi_cell(s,k,ierr)
             if (ierr /= 0) return
-            d_v_div_r = compute_d_v_div_r(s, k, ierr)
+            d_v_div_r = compute_d_v_div_r_opt_time_center(s, k, ierr)
             if (ierr /= 0) return
             Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
          end if
@@ -757,7 +772,7 @@
          Cp_00 = wrap_Cp_00(s,k)
          kap_00 = wrap_kap_00(s,k)
          Hp_cell = wrap_Hp_cell(s,k)
-         POM = 4d0*boltz_sigma*(gammar/alpha)**2 ! erg cm^-2 K^-4 s^-1
+         POM = 4d0*boltz_sigma*pow2(gammar/alpha) ! erg cm^-2 K^-4 s^-1
          POM2 = pow3(T_00)/(pow2(d_00)*Cp_00*kap_00) 
             ! K^3 / ((g cm^-3)^2 (erg g^-1 K^-1) (cm^2 g^-1))
             ! K^3 / (cm^-4 erg K^-1) = K^4 cm^4 erg^-1
@@ -917,7 +932,7 @@
             Lc_div_w_face = 1
             return
          end if
-         r_00 = wrap_r_00(s, k) ! not time centered
+         r_00 = wrap_r_00(s, k)
          area = 4d0*pi*pow2(r_00)
          T_m1 = wrap_T_m1(s, k)
          T_00 = wrap_T_00(s, k)         
@@ -968,8 +983,8 @@
             s% Lt(k) = 0d0
             return
          end if
-         r_00 = wrap_r_00(s,k) ! not time centered     
-         area2 = (4d0*pi)**2*pow4(r_00)
+         r_00 = wrap_r_00(s,k)   
+         area2 = pow2(4d0*pi*pow2(r_00))
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)
          call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
@@ -986,7 +1001,6 @@
          ! Lt = area * Ft
          ! Lt = -alpha_alpha_t * (area*rho_face)**2 * Hp_face * w_face * (etrb(k-1) - etrb(k))/dm_bar
          Lt = - alpha_alpha_t * area2 * rho2_face * Hp_face * w_face * (etrb_m1 - etrb_00) / s% dm_bar(k)  
-         ! this is slightly rewritten from the RSP form to use the RSP2 etrb variable
          ! units = (cm^4) (g^2 cm^-6) (cm) (cm s^-1) (ergs g^-1) g^-1 = erg s^-1
          s% Lt(k) = Lt%val      
       end function compute_Lt

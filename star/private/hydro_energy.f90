@@ -182,7 +182,7 @@
             skip_P = eps_grav_form
             if (s% using_velocity_time_centering .and. &
                 s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
-               call eval_Fraley_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
+               call eval_simple_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr) 
                d_dwork_dxam1 = 0
                d_dwork_dxap1 = 0
@@ -743,7 +743,7 @@
       
       
       subroutine eval1_A_times_v_face_ad(s, k, A_times_v_face_ad, ierr)
-         use star_utils, only: get_area_info
+         use star_utils, only: get_area_info_opt_time_center
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: A_times_v_face_ad
@@ -752,7 +752,7 @@
          include 'formats'
 
          ierr = 0
-         call get_area_info(s, k, A_ad, inv_R2, ierr)
+         call get_area_info_opt_time_center(s, k, A_ad, inv_R2, ierr)
          if (ierr /= 0) return
          
          u_face_ad = 0d0
@@ -776,7 +776,7 @@
       end subroutine eval1_A_times_v_face_ad
 
 
-      subroutine eval_Fraley_PdV_work( &
+      subroutine eval_simple_PdV_work( &
             s, k, skip_P, dwork_ad, dwork, d_dwork_dxa00, ierr) 
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
@@ -829,7 +829,7 @@
          dwork_ad = Ptot_ad*dV
          dwork = dwork_ad%val
 
-      end subroutine eval_Fraley_PdV_work
+      end subroutine eval_simple_PdV_work
 
       
       end module hydro_energy

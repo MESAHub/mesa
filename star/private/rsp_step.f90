@@ -2128,7 +2128,8 @@
             POM = - 2.d0/3.d0*ALFA*ALFAT*(P4*(s% r(k)**2))**2
             rho2_face = 0.5d0*(1.d0/s% Vol(k)**2 + 1.d0/s% Vol(k-1)**2)
             POM2 = s% Hp_face(k)*rho2_face
-            Lt_00 = POM*POM2*POM3            
+            Lt_00 = POM*POM2*POM3       
+                 
             TEM1 = Lt_00/s% Hp_face(k)
             TEM2 = Lt_00/POM2*s% Hp_face(k)
             
