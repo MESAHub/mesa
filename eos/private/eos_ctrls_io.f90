@@ -78,7 +78,8 @@
    character (len=30) :: suffix_for_FreeEOS_Z(num_FreeEOS_Zs)
          
    ! controls for CMS
-   logical :: use_CMS
+   logical :: use_CMS, CMS_use_fixed_composition
+   integer :: CMS_fixed_composition_index
    real(dp) :: max_Z_for_any_CMS, max_Z_for_all_CMS ! set to -1 to disable CMS
    real(dp) :: logQ_max_for_any_CMS, logQ_max_for_all_CMS      ! for upper blend zone in logQ = logRho - 2*logT + 12
    real(dp) :: logQ_min_for_any_CMS, logQ_min_for_all_CMS      ! for lower blend zone in logQ
@@ -196,7 +197,8 @@
       suffix_for_FreeEOS_Z, &
       
       ! controls for CMS
-      use_CMS, &
+      use_CMS, CMS_use_fixed_composition, &
+      CMS_fixed_composition_index, &
       max_Z_for_any_CMS, &
       max_Z_for_all_CMS, & ! set to -1 to disable CMS
       logQ_max_for_any_CMS, &
