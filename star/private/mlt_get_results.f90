@@ -436,10 +436,10 @@
             end if            
             
             
-            if (.true.) then ! need this old form for cburn_inward, dev_to_cc_12, and dev_to_cc_20
+            if (.true.) then ! need this old form for a few test cases
                gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
                Y_face = gradT - grada
-            else ! switch to this when resolve the problems with those test cases
+            else ! switch to this when resolve the problems with those cases
                gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
                Y_face = gradT - gradL
             end if
@@ -896,7 +896,7 @@
          if (.true.) then ! one-sided to avoid partials wrt p1
             v_div_r_00 = wrap_v_00(s,k)/wrap_r_00(s,k)
             d_v_div_r_dm_face = (v_div_r_m1 - v_div_r_00)/s% dm(k-1)
-         else
+         else ! this would be better, but introduces partials wrt p1
             v_div_r_p1 = wrap_v_p1(s,k)/wrap_r_p1(s,k)
             d_v_div_r_dm_face = (v_div_r_m1 - v_div_r_p1)/(s% dm(k-1) + s% dm(k))
          end if
