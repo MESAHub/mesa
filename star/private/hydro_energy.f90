@@ -214,7 +214,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
-            use hydro_rsp2, only: compute_Eq_cell
+            !use hydro_rsp2, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad
@@ -257,7 +257,7 @@
             
             Eq_ad = 0d0
             if (s% using_RSP2) then             
-               Eq_ad = compute_Eq_cell(s, k, ierr)
+               Eq_ad = s% Eq_ad(k) ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if   
             

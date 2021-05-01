@@ -54,10 +54,10 @@
       !history_interval = 1
       terminal_interval = 50
 
-      !photo_interval = 10
+      photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
@@ -146,8 +146,8 @@
    
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   !Profile_Panels1_xmin = 59 ! -101D0
-   !Profile_Panels1_xmax = 62 ! -101D0
+   Profile_Panels1_xmin = 108 ! -101D0
+   Profile_Panels1_xmax = 110 ! -101D0
    
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
 

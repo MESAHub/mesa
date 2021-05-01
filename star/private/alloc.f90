@@ -1106,6 +1106,21 @@
             if (failed('mlt_D_ad')) exit
             call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
             if (failed('mlt_Gamma_ad')) exit
+            
+            call do1_ad(s% PII_ad, c% PII_ad)
+            if (failed('PII_ad')) exit
+            call do1_ad(s% Chi_ad, c% Chi_ad)
+            if (failed('Chi_ad')) exit
+            call do1_ad(s% Eq_ad, c% Eq_ad)
+            if (failed('Eq_ad')) exit
+            call do1_ad(s% COUPL_ad, c% COUPL_ad)
+            if (failed('COUPL_ad')) exit
+            call do1_ad(s% Lr_ad, c% Lr_ad)
+            if (failed('Lr_ad')) exit
+            call do1_ad(s% Lc_ad, c% Lc_ad)
+            if (failed('Lc_ad')) exit
+            call do1_ad(s% Lt_ad, c% Lt_ad)
+            if (failed('Lt_ad')) exit
 
             call do1(s% gradT, c% gradT)
             if (failed('gradT')) exit

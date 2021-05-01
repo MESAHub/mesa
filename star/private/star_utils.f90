@@ -3401,7 +3401,9 @@
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0) then
+         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0 .or. &
+               k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+               k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return

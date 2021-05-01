@@ -395,6 +395,8 @@
          
       ! Convective turbulent velocity w -- when RSP2_flag is true
          
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            PII_ad, Chi_ad, Eq_ad, COUPL_ad, Lr_ad, Lc_ad, Lt_ad
          real(dp), pointer, dimension(:) :: &
             Ptrb, Pvsc, Pvsc_start, Hp_face, Y_face, Y_face_start, PII, Chi, Eq, Uq, &
             SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start

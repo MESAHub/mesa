@@ -246,6 +246,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s, s_other
          integer :: k, id_other
+         include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -259,43 +260,28 @@
          end if
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
-         names(1) = 'v_R'
-         names(2) = 'Y_face_R'
-         names(3) = 'w_R'
-         names(4) = 'Lr_div_L_R'
+         
+         names(1) = 'v_drel' ! 'v_R'
+         names(2) = 'Y_drel' ! 'Y_face_R'
+         names(3) = 'w_drel' ! 'w_R'
+         names(4) = 'Chi_drel' ! 'Lr_div_L_R'
          names(5) = 'logR_R'
          names(6) = 'logP_R'
          names(7) = 'logT_R'
          names(8) = 'logRho_R'
          names(9) = 'logL_R'
-         
          names(10) = 'xCOUPL'
-         names(11) = 'COUPL_R'
+         names(11) = 'CPL_drel' ! 'COUPL_R'
          names(12) = 'xSOURCE'
-         names(13) = 'SRC_R'
+         names(13) = 'SRC_drel' ! 'SRC_R'
          names(14) = 'xDAMP'
-         names(15) = 'DAMP_R'
+         names(15) = 'DAMP_drel' ! 'DAMP_R'
          names(16) = 'xEq'
-         names(17) = 'Eq_R'
+         names(17) = 'Eq_drel' ! 'Eq_R'
          names(18) = 'xUq'
-         names(19) = 'Uq_R'
+         names(19) = 'Uq_drel' ! 'Uq_R'
          names(20) = 'Uq_err'
          names(21) = 'Uq_diff'
-         
-         if (.false.) then ! debugging
-            names(10) = 'xtr1'
-            names(11) = 'xtr1_R'
-            names(12) = 'xtr2'
-            names(13) = 'xtr2_R'
-            names(14) = 'xtr3'
-            names(15) = 'xtr3_R'
-            names(16) = 'xtr4'
-            names(17) = 'xtr4_R'
-            names(18) = 'xtr5'
-            names(19) = 'xtr5_R'
-            names(20) = 'xtr6'
-            names(21) = 'xtr6_R'
-         end if
 
          if (.not. associated(s_other% Y_face)) then
             vals(1:nz,:) = 0d0
@@ -303,41 +289,63 @@
             vals(1:nz,:) = 0d0
          else
             do k=1,nz
-               vals(k,1) = s_other% v(k)*1d-5
-               vals(k,2) = s_other% Y_face(k)
+               !vals(k,1) = s_other% v(k)*1d-5
+               vals(k,1) = rel_diff(s_other% v(k), s% v(k)) ! v_drel
+               
+               !vals(k,2) = s_other% Y_face(k)
+               vals(k,2) = rel_diff(s_other% Y_face(k), s% Y_face(k)) ! Y_drel
+               
                if (s_other% RSP2_flag) then
-                  vals(k,3) = pow2(s_other% w(k))
+                  vals(k,3) = s_other% w(k)
                else if (s_other% RSP_flag) then
                   vals(k,3) = s_other% RSP_w(k)
                else
                   vals(k,3) = 0d0
                end if
-               vals(k,4) = s_other% Lr(k)/s_other% L(k)               
+               !if (k == 194) then
+               !   write(*,2) 'w RSP_w w_start RSP_w_start', k, &
+               !      s% w(k), s_other% RSP_w(k), s% w_start(k), s_other% RSP_w_start(k)
+               !end if
+               vals(k,3) = rel_diff(vals(k,3), s% w(k)) ! w_drel    
+                         
+               !vals(k,4) = s_other% Lr(k)/s_other% L(k)
+               vals(k,4) = rel_diff(s_other% Chi(k), s% Chi(k)) ! Chi_drel
+               !if (k==109) then
+               !   write(*,2) 'Chi_rsp Chi_rsp2 reldiff', k, &
+               !      s_other% Chi(k), s% Chi(k), vals(k,4)
+               !end if
+                                
                vals(k,5) = safe_log10(s_other% r(k)/Rsun)
                vals(k,6) = s_other% lnPeos(k)/ln10
                vals(k,7) = s_other% lnT(k)/ln10
                vals(k,8) = s_other% lnd(k)/ln10
                vals(k,9) = safe_log10(s_other% L(k)/Lsun)
                vals(k,10) = s% COUPL(k)
-               vals(k,11) = s_other% COUPL(k)
+               !vals(k,11) = s_other% COUPL(k)
+               vals(k,11) = rel_diff(s_other% COUPL(k), s% COUPL(k)) ! CPL_drel
+
                vals(k,12) = s% SOURCE(k)
-               vals(k,13) = s_other% SOURCE(k)
+               !vals(k,13) = s_other% SOURCE(k)
+               vals(k,13) = rel_diff(s_other% SOURCE(k), s% SOURCE(k)) ! SRC_drel
+               
                vals(k,14) = s% DAMP(k)
-               vals(k,15) = s_other% DAMP(k)
+               !vals(k,15) = s_other% DAMP(k)
+               vals(k,15) = rel_diff(s_other% DAMP(k), s% DAMP(k)) ! DAMP_drel
+               
                vals(k,16) = s% Eq(k)
-               vals(k,17) = s_other% Eq(k)
+               !vals(k,17) = s_other% Eq(k)
+               vals(k,17) = rel_diff(s_other% Eq(k), s% Eq(k)) ! Eq_drel
+               
                vals(k,18) = s% Uq(k)
-               vals(k,19) = s_other% Uq(k)    
+               !vals(k,19) = s_other% Uq(k)
+               vals(k,19) = rel_diff(s_other% Uq(k), s% Uq(k)) ! Uq_drel
                
                           
                vals(k,20) = s% Pvsc(k)
                vals(k,21) = s_other% Pvsc(k)
-               
                vals(k,20) = (s% Uq(k) - s_other% Uq(k)) / &
-                  (1d-6 + 1d-6*max(abs(s% Uq(k)),abs(s_other% Uq(k))))
+                  (1d-6 + 1d-3*max(abs(s% Uq(k)),abs(s_other% Uq(k))))
                vals(k,21) = s% Uq(k) - s_other% Uq(k)
-               
-               
                
                if (.false.) then ! debugging xtra values
                   vals(k,10) = s% xtra1_array(k)
@@ -354,49 +362,27 @@
                   vals(k,21) = s_other% xtra6_array(k)
                end if
                
-               if (.false.) then ! debugging xtra differences
-                  vals(k,10) = 100d0*(s% xtra1_array(k) - s_other% xtra1_array(k))
-                  vals(k,11) = 0
-                  vals(k,12) = 100d0*(s% xtra2_array(k) - s_other% xtra2_array(k))
-                  vals(k,13) = 0
-                  vals(k,14) = 100d0*(s% xtra3_array(k) - s_other% xtra3_array(k))
-                  vals(k,15) = 0
-                  vals(k,16) = 100d0*(s% xtra4_array(k) - s_other% xtra4_array(k))
-                  vals(k,17) = 0
-                  vals(k,18) = 100d0*(s% xtra5_array(k) - s_other% xtra5_array(k))
-                  vals(k,19) = 0
-                  vals(k,20) = 100d0*(s% xtra6_array(k) - s_other% xtra6_array(k))
-                  vals(k,21) = 0
-               end if
-               
-               if (.false.) then ! debugging xtra ratios
-                  vals(k,10) = fix_if_bad(err(s% xtra1_array(k),s_other% xtra1_array(k)))
-                  vals(k,11) = 0
-                  vals(k,12) = fix_if_bad(err(s% xtra2_array(k),s_other% xtra2_array(k)))
-                  vals(k,13) = 0
-                  vals(k,14) = fix_if_bad(err(s% xtra3_array(k),s_other% xtra3_array(k)))
-                  vals(k,15) = 0
-                  vals(k,16) = fix_if_bad(err(s% xtra4_array(k),s_other% xtra4_array(k)))
-                  vals(k,17) = 0
-                  vals(k,18) = fix_if_bad(err(s% xtra5_array(k),s_other% xtra5_array(k)))
-                  vals(k,19) = 0
-                  vals(k,20) = fix_if_bad(err(s% xtra6_array(k),s_other% xtra6_array(k)))
-                  vals(k,21) = 0
-               end if
-               
             end do
          end if
          
          contains
-         
-            real(dp) function err(v1,v2)
-               real(dp), intent(in) :: v1,v2
-               real(dp) :: absdiff, tol
-               real(dp), parameter :: rtol = 1d-10, atol = 0 
-               absdiff = abs(v1 - v2)
-               tol = abs(v2)*rtol + atol
-               err = max(absdiff/tol - 1d0, 0d0) ! positive means err > tol
-            end function err
+               
+            real(dp) function rel_diff(a, b, atol, rtol) result(d)
+               real(dp), intent(in) :: a, b
+               real(dp), intent(in), optional :: atol, rtol
+               real(dp) :: atl, rtl
+               if (present(atol)) then
+                  atl = atol
+               else
+                  atl = 1d-6
+               end if
+               if (present(rtol)) then
+                  rtl = rtol
+               else
+                  rtl = 1d-3
+               end if
+               d = (a - b)/(atl + rtl*max(abs(a),abs(b)))
+            end function rel_diff
          
             real(dp) function fix_if_bad(v)
                use utils_lib, only: is_bad
@@ -409,23 +395,6 @@
             end function fix_if_bad
             
       end subroutine data_for_extra_profile_columns
-
-!   Hp_face
-!   Y_face
-!   PII_face
-!   Chi
-!   COUPL
-!   SOURCE
-!   DAMP
-!   DAMPR
-!   Eq
-!   Uq
-!   Lr_div_L
-!   Lc_div_L
-!   Lr
-!   Lc
-!   w
-
 
       end module run_star_extras
       

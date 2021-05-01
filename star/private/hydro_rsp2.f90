@@ -78,7 +78,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr    
          type(auto_diff_real_star_order1) :: x
-         integer :: k
+         integer :: k, op_err
          include 'formats'
          ierr = 0
          if (s% need_to_reset_w) then
@@ -90,16 +90,56 @@
             end if
             s% need_to_reset_w = .false.
          end if
+         ierr = 0
+         op_err = 0
+         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k=1,s%nz
             ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
             if (s% Hp_face(k) <= 0) s% Hp_face(k) = get_scale_height_face_val(s,k)
-            x = compute_L_face(s, k, ierr) ! sets Lr, Lt, Lc
-            if (ierr /= 0) return
+            x = compute_Y_face(s, k, op_err) ! Y_face
+            if (op_err /= 0) ierr = op_err
+            x = compute_PII_face(s, k, op_err) ! PII_face
+            if (op_err /= 0) ierr = op_err
+            !Pvsc           skip?
          end do
-         s% Y_face(1) = 0d0
-         s% PII(1) = 0d0
-         s% Lc(1) = 0d0
-         s% Lt(1) = 0d0
+         !$OMP END PARALLEL DO
+         if (ierr /= 0) then
+            if (s% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 1', s% model_number
+            return
+         end if
+         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+         do k=1,s% nz
+            !Pturb          skip?
+            x = compute_Chi_cell(s, k, op_err) ! Chi
+            if (op_err /= 0) ierr = op_err
+            x = compute_Eq_cell(s, k, op_err) ! Eq
+            if (op_err /= 0) ierr = op_err
+            x = compute_C(s, k, op_err) ! COUPL
+            if (op_err /= 0) ierr = op_err
+            x = compute_L_face(s, k, op_err) ! Lr, Lt, Lc
+            if (op_err /= 0) ierr = op_err
+         end do
+         !$OMP END PARALLEL DO
+         if (ierr /= 0) then
+            if (s% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 2', s% model_number
+            return
+         end if
+         do k = 1, s% RSP2_num_outermost_cells_forced_nonturbulent
+            s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
+            s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
+            s% COUPL(k) = 0d0; s% COUPL_ad(k) = 0d0
+            !s% Ptrb(k) = 0d0; 
+            s% Lc(k) = 0d0; s% Lc_ad(k) = 0d0
+            s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
+         end do
+         do k = s% nz + 1 - int(s% nz/s% RSP_nz_div_IBOTOM) , s% nz
+            s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
+            s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
+            s% COUPL(k) = 0d0; s% COUPL_ad(k) = 0d0
+            !s% Ptrb(k) = 0d0; 
+            s% Lc(k) = 0d0; s% Lc_ad(k) = 0d0
+            s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
+         end do
       end subroutine set_RSP2_vars
 
 
@@ -124,8 +164,9 @@
          end if
 
          ierr = 0
-         L_expected = compute_L_face(s, k, ierr)
-         if (ierr /= 0) return        
+         !L_expected = compute_L_face(s, k, ierr)
+         !if (ierr /= 0) return        
+         L_expected = s% Lr_ad(k) + s% Lc_ad(k) + s% Lt_ad(k)
          L_actual = wrap_L_00(s, k)  
          L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
@@ -293,7 +334,7 @@
          non_turbulent_cell = &
             s% mixing_length_alpha == 0d0 .or. &
             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-            k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent         
+            k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)         
          if (.not. s% using_RSP2) then           
             resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP2
          else if (non_turbulent_cell) then
@@ -309,6 +350,23 @@
             esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
             resid_ad = esum_ad
             resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
+            
+            if (k == 109) then
+               if (skip_partials) then
+                  write(*,3) 'skip_partials RSP2 dEt PdV dtC dtEq', k, s% solver_iter, &
+                     d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
+               else
+                  write(*,3) 'RSP2 dEt PdV dtC dtEq', k, s% solver_iter, &
+                     d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
+               end if
+               !write(*,2) 'RSP2 w COUPL SOURCE DAMP DAMPR', k, &
+               !   s% w(k), s% COUPL(k), s% SOURCE(k), s% DAMP(k), s% DAMPR(k)
+               !write(*,2) 'RSP SOURCE Hp_cell QQ_div_Cp P T', k, &
+               !   s% RSP_w(k), s% SOURCE(k), &
+               !   0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1)), &
+               !   s% QQ(k)/s% Cp(k), s% Pgas(k) + s% Prad(k), s% T(k)
+            end if
+            
          end if
 
          residual = resid_ad%val
@@ -361,13 +419,14 @@
             time_centering = &
                s% using_velocity_time_centering .and. &
                s% include_L_in_velocity_time_centering
-            Lt_00 = compute_Lt(s, k, ierr)
+            Lt_00 = s% Lt_ad(k) ! compute_Lt(s, k, ierr)
             if (ierr /= 0) return
             if (time_centering) Lt_00 = 0.5d0*(Lt_00 + s% Lt_start(k))
             if (k == s% nz) then
                Lt_p1 = 0d0
             else
-               Lt_p1 = shift_p1(compute_Lt(s, k+1, ierr))
+               !Lt_p1 = shift_p1(compute_Lt(s, k+1, ierr))
+               Lt_p1 = shift_p1(s% Lt_ad(k+1))
                if (ierr /= 0) return
                if (time_centering) Lt_p1 = 0.5d0*(Lt_p1 + s% Lt_start(k+1))
             end if
@@ -377,7 +436,7 @@
          subroutine setup_dt_C_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: C
-            C = compute_C(s, k, ierr) ! erg g^-1 s^-1
+            C = s% COUPL_ad(k) ! compute_C(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
             dt_C_ad = s%dt*C
          end subroutine setup_dt_C_ad
@@ -385,7 +444,7 @@
          subroutine setup_dt_Eq_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: Eq_cell
-            Eq_cell = compute_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
+            Eq_cell = s% Eq_ad(k) ! compute_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
             dt_Eq_ad = s%dt*Eq_cell
          end subroutine setup_dt_Eq_ad
@@ -430,6 +489,7 @@
          if (k == 1 .or. s% mixing_length_alpha == 0d0) then
             Y_face = 0d0
             s% Y_face(k) = 0d0
+            s% Y_face_ad(k) = 0d0
             return
          end if
          
@@ -475,7 +535,7 @@
             !       = cm^2 cm cm^-3 g g^-1 = unitless
          
             Y_face = Y1*Y2 ! unitless
-         
+
          else
          
             grad_ad_00 = wrap_grad_ad_00(s,k)
@@ -496,6 +556,8 @@
             Y_face = alt_Y_face
             
          end if
+
+         s% Y_face_ad(k) = Y_face
          s% Y_face(k) = Y_face%val
 
       end function compute_Y_face
@@ -515,13 +577,13 @@
             return
          end if
          if (k == 1 .or. s% mixing_length_alpha == 0d0 .or. &
-               k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
+               k == s% nz) then ! just skip k == nz to be like RSP
             PII_face = 0d0
             s% PII(k) = 0d0
-            s% Y_face(k) = 0d0
+            s% PII_ad(k) = 0d0
             return
          end if
-         Y_face = compute_Y_face(s, k, ierr)
+         Y_face = s% Y_face_ad(k) ! compute_Y_face(s, k, ierr)
          if (ierr /= 0) return
          Cp_00 = wrap_Cp_00(s, k)
          Cp_m1 = wrap_Cp_m1(s, k)
@@ -530,6 +592,7 @@
          ALFAS_ALFA = x_ALFAS*s% mixing_length_alpha
          PII_face = ALFAS_ALFA*Cp_face*Y_face
          s% PII(k) = PII_face%val
+         s% PII_ad(k) = PII_face
          if (k == -2 .and. s% PII(k) < 0d0) then
             write(*,2) 's% PII(k)', k, s% PII(k)
             write(*,2) 'Cp_face', k, Cp_face%val
@@ -599,8 +662,12 @@
          ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha
          if (ALFAM_ALFA == 0d0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-               k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
+               k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
             Chi_cell = 0d0
+            if (k >= 1 .and. k <= s% nz) then
+               s% Chi(k) = 0d0
+               s% Chi_ad(k) = 0d0
+            end if
          else
             Hp_cell = wrap_Hp_cell(s, k)
             d_v_div_r = compute_d_v_div_r(s, k, ierr)
@@ -618,6 +685,11 @@
             !       = erg            
          end if
          s% Chi(k) = Chi_cell%val
+         s% Chi_ad(k) = Chi_cell
+            
+            !if (k==194) then
+            !   write(*,2) 'RSP2 Chi', k, s% Chi(k)
+            !end if
 
       end function compute_Chi_cell
 
@@ -630,17 +702,20 @@
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
          ierr = 0
-         if (k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
             Eq_cell = 0d0
+            if (k >= 1 .and. k <= s% nz) s% Eq_ad(k) = 0d0
          else
-            Chi_cell = compute_Chi_cell(s,k,ierr)
+            Chi_cell = s% Chi_ad(k) ! compute_Chi_cell(s,k,ierr)
             if (ierr /= 0) return
             d_v_div_r = compute_d_v_div_r_opt_time_center(s, k, ierr)
             if (ierr /= 0) return
             Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
          end if
          s% Eq(k) = Eq_cell%val
+         s% Eq_ad(k) = Eq_cell
       end function compute_Eq_cell
 
 
@@ -652,14 +727,16 @@
          type(auto_diff_real_star_order1) :: Chi_00, Chi_m1, r_00
          include 'formats'
          ierr = 0         
-         if (k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
             Uq_face = 0d0
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
-            Chi_00 = compute_Chi_cell(s,k,ierr)
+            Chi_00 = s% Chi_ad(k) ! compute_Chi_cell(s,k,ierr)
             if (k > 1) then
-               Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
+               !Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
+               Chi_m1 = shift_m1(s% Chi_ad(k-1))
                if (ierr /= 0) return
             else
                Chi_m1 = 0d0
@@ -693,7 +770,7 @@
          QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
             
          Hp_face_00 = wrap_Hp_00(s,k)
-         PII_face_00 = compute_PII_face(s, k, ierr)
+         PII_face_00 = s% PII_ad(k) ! compute_PII_face(s, k, ierr)
          if (ierr /= 0) return
          
          if (k == s% nz) then
@@ -701,7 +778,8 @@
          else
             Hp_face_p1 = wrap_Hp_p1(s,k)
             if (ierr /= 0) return
-            PII_face_p1 = shift_p1(compute_PII_face(s, k+1, ierr))
+            !PII_face_p1 = shift_p1(compute_PII_face(s, k+1, ierr))
+            PII_face_p1 = shift_p1(s% PII_ad(k+1))
             if (ierr /= 0) return
             PII_div_Hp_cell = 0.5d0*(PII_face_00/Hp_face_00 + PII_face_p1/Hp_face_p1)
          end if
@@ -709,6 +787,13 @@
          ! Peos_00*QQ_00/Cp_00 = grad_ad
          grad_ad_00 = wrap_grad_ad_00(s, k)
          Source = (w_00 + s% RSP2_source_seed)*PII_div_Hp_cell*T_00*grad_ad_00
+         if (k==194) then
+            !write(*,2) 'RSP2 w SOURCE PII/Hp P*QQ_div_Cp P T', k, &
+            !   s% w(k), Source%val, PII_div_Hp_cell%val, &
+            !   grad_ad_00%val, Peos_00%val, T_00%val
+            !write(*,2) 'RSP2 PII_00 PII_p1 Hp_00 Hp_p1', k, &
+            !   PII_face_00%val, PII_face_p1%val, Hp_face_00%val, Hp_face_p1%val
+         end if
          
          ! PII units same as Cp = erg g^-1 K^-1
          ! P*QQ/Cp is unitless (see Y_face)
@@ -789,12 +874,16 @@
          type(auto_diff_real_star_order1) :: C
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Source, D, Dr
-         if (k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% RSP2_num_innermost_cells_forced_nonturbulent) then
-            s% SOURCE(k) = 0d0
-            s% DAMP(k) = 0d0
-            s% DAMPR(k) = 0d0
-            s% COUPL(k) = 0d0
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+            if (k >= 1 .and. k <= s% nz) then
+               s% SOURCE(k) = 0d0
+               s% DAMP(k) = 0d0
+               s% DAMPR(k) = 0d0
+               s% COUPL(k) = 0d0
+               s% COUPL_ad(k) = 0d0
+            end if
             C = 0d0
             return
          end if
@@ -806,6 +895,7 @@
          if (ierr /= 0) return
          C = Source - D - Dr
          s% COUPL(k) = C%val
+         s% COUPL_ad(k) = C
       end function compute_C
 
 
@@ -847,6 +937,9 @@
             if (ierr /= 0) return
          end if
          L = Lr + Lc + Lt
+         s% Lr_ad(k) = Lr
+         s% Lc_ad(k) = Lc
+         s% Lt_ad(k) = Lt
       end subroutine compute_L_terms
 
 
@@ -927,7 +1020,9 @@
          real(dp) :: ALFAC, ALFAS, alfa, beta
          include 'formats'
          ierr = 0
-         if (k > s% nz .or. k == 1) then
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
             Lc = 0d0
             Lc_div_w_face = 1
             return
@@ -942,7 +1037,7 @@
          w_00 = wrap_w_00(s, k)
          call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          T_rho_face = alfa*T_00*d_00 + beta*T_m1*d_m1
-         PII_face = compute_PII_face(s, k, ierr)
+         PII_face = s% PII_ad(k) ! compute_PII_face(s, k, ierr)
          w_face = alfa*w_00 + beta*w_m1
          ALFAC = x_ALFAC
          ALFAS = x_ALFAS
@@ -978,7 +1073,9 @@
             return
          end if 
          alpha_alpha_t = s% mixing_length_alpha*s% RSP2_alfat
-         if (k == 1 .or. alpha_alpha_t == 0d0) then
+         if (alpha_alpha_t == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
             Lt = 0d0
             s% Lt(k) = 0d0
             return
