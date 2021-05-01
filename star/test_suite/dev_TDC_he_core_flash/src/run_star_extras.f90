@@ -145,12 +145,12 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         names(1) = 'std_cv'
+         names(1) = 'std_lg_absY'
          names(2) = 'std_gradT'
-         names(3) = 'tdc_cv'
-         names(4) = 'tdc_gradT'
-         names(5) = 'tdc_D0'
-         names(6) = 'tdc_Y_face'
+         names(3) = 'std_vc'
+         names(4) = 'S0'
+         names(5) = 'D0'
+         names(6) = 'DR0'
 
          do k=1,nz            
             vals(k,1) = s% xtra1_array(k)
@@ -175,7 +175,6 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-      
       
 
       end module run_star_extras

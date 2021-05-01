@@ -1606,11 +1606,34 @@
 
             case (p_log_mlt_Gamma)
                val = safe_log10(s% mlt_Gamma(k))
-
             case (p_log_mlt_vc)
                val = safe_log10(s% mlt_vc(k))
             case (p_mlt_vc)
                val = s% mlt_vc(k)
+            case (p_mlt_D)
+               val = s% mlt_D(k)
+            case (p_mlt_gradT)
+               val = s% mlt_gradT(k)
+            case (p_mlt_Y_face)
+               val = s% Y_face(k)
+            case (p_mlt_log_abs_Y)
+               val = safe_log10(abs(s% Y_face(k)))
+            case (p_tdc_num_iters)
+               if (s% using_tdc) then
+                  int_val = s% tdc_num_iters(k); val = dble(int_val)
+               else
+                  int_val = 0; val = 0
+               end if
+               int_flag = .true.
+            case(p_COUPL)
+               val = s% COUPL(k)
+            case(p_SOURCE)
+               val = s% SOURCE(k)
+            case(p_DAMP)
+               val = s% DAMP(k)
+            case(p_DAMPR)
+               val = s% DAMPR(k)
+
             case (p_delta_r)
                val = s% r(k) - s% r_start(k)
             case (p_delta_L)
@@ -1803,14 +1826,6 @@
                if (rsp_or_w) val = s% PII(k)
             case(p_Chi)
                if (rsp_or_w) val = s% Chi(k)
-            case(p_COUPL)
-               if (rsp_or_w) val = s% COUPL(k)
-            case(p_SOURCE)
-               if (rsp_or_w) val = s% SOURCE(k)
-            case(p_DAMP)
-               if (rsp_or_w) val = s% DAMP(k)
-            case(p_DAMPR)
-               if (rsp_or_w) val = s% DAMPR(k)
             case(p_Eq)
                if (rsp_or_w) val = s% Eq(k)
             case(p_Uq)
@@ -1827,7 +1842,8 @@
                if (rsp_or_w) val = s% Lt(k)
             case(p_Lt_div_L)
                if (rsp_or_w) val = s% Lt(k)/s% L(k)
-               
+            
+
             case(p_rsp_Et)
                if (s% rsp_flag) val = s% RSP_Et(k)
             case(p_rsp_logEt)

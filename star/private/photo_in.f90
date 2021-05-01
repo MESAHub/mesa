@@ -96,6 +96,7 @@
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor
          if (failed('initial_y')) return
+         s% nz_old = s% nz ! needed by alloc
          
          if (s% force_tau_factor > 0 .and. s% tau_factor /= s% force_tau_factor .and. &
                s% tau_factor /= s% job% set_to_this_tau_factor) then

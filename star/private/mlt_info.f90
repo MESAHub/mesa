@@ -261,6 +261,7 @@
          
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
+            s% mlt_gradT(k) = s% gradT(k) ! prior to adjustments
          
             s% Y_face_ad(k) = Y_face_ad
             s% Y_face(k) = s% Y_face_ad(k)%val

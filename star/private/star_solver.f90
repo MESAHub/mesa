@@ -276,7 +276,7 @@
             return
          end if
          
-         call eval_equations(s, nvar, ierr)         
+         call eval_equations(s, nvar, ierr)                  
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -341,7 +341,7 @@
                write(*,1) 'tol1 residual tolerances: norm, max', &
                   tol_residual_norm, tol_max_residual
             end if
-
+            
             call setmatrix(s, neq, dxsave, ddxsave, ierr)
             if (ierr /= 0) then
                call write_msg('setmatrix returned ierr /= 0')
@@ -744,6 +744,7 @@
 
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
                call eval_equations(s, nvar, ierr)
+               
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -1032,6 +1033,7 @@
                s% solver_test_partials_k > 0 .and. &
                s% solver_call_number == s% solver_test_partials_call_number .and. &
                s% solver_test_partials_iter_number == iter
+
             need_solver_to_eval_jacobian = do_enter_setmatrix(s, neq, ierr)
             if (ierr /= 0) return
 

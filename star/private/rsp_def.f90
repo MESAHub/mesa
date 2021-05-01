@@ -142,8 +142,6 @@
       real(dp) :: EFL0, CQ, ZSH, kapE_factor, kapP_factor
       integer :: NZN, IBOTOM
       
-      integer :: ITOP ! below non convective region at surface
-      
 
       contains
       

@@ -259,7 +259,7 @@
          if (i_equL == 0) return
          
          if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn .or. &
-               s% X(k) <= s% max_X_for_gradT_eqn) then
+               (s% X(k) <= s% max_X_for_gradT_eqn .and. s% max_X_for_gradT_eqn > 0d0)) then
             call do1_gradT_eqn(s, k, skip_partials, nvar, ierr)            
             return
          end if

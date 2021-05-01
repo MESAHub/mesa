@@ -438,9 +438,14 @@
       integer, parameter :: p_log_mlt_Gamma = p_log_gradT_div_gradr + 1
       integer, parameter :: p_log_mlt_vc = p_log_mlt_Gamma + 1
       integer, parameter :: p_conv_vel_div_mlt_vc = p_log_mlt_vc + 1
-      integer, parameter :: p_mlt_vc = p_conv_vel_div_mlt_vc + 1
+      integer, parameter :: p_mlt_vc = p_conv_vel_div_mlt_vc + 1      
+      integer, parameter :: p_mlt_D = p_mlt_vc + 1
+      integer, parameter :: p_mlt_gradT = p_mlt_D + 1
+      integer, parameter :: p_mlt_log_abs_Y = p_mlt_gradT + 1
+      integer, parameter :: p_tdc_num_iters = p_mlt_log_abs_Y + 1
+      integer, parameter :: p_mlt_Y_face = p_tdc_num_iters + 1
 
-      integer, parameter :: p_delta_r = p_mlt_vc + 1
+      integer, parameter :: p_delta_r = p_mlt_Y_face + 1
       integer, parameter :: p_delta_L = p_delta_r + 1
       integer, parameter :: p_delta_cell_vol = p_delta_L + 1
       integer, parameter :: p_delta_entropy = p_delta_cell_vol + 1
@@ -1139,6 +1144,11 @@
          profile_column_name(p_log_mlt_vc) = 'log_mlt_vc'
          profile_column_name(p_conv_vel_div_mlt_vc) = 'conv_vel_div_mlt_vc'
          profile_column_name(p_mlt_vc) = 'mlt_vc'
+         profile_column_name(p_mlt_D) = 'mlt_D'
+         profile_column_name(p_mlt_gradT) = 'mlt_gradT'
+         profile_column_name(p_mlt_Y_face) = 'mlt_Y_face'
+         profile_column_name(p_mlt_log_abs_Y) = 'mlt_log_abs_Y'
+         profile_column_name(p_tdc_num_iters) = 'tdc_num_iters'
 
          profile_column_name(p_delta_r) = 'delta_r'
          profile_column_name(p_delta_L) = 'delta_L'
