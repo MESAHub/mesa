@@ -1,4 +1,4 @@
-
+ 
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
@@ -34,7 +34,7 @@ do_one dev_to_ppisn_100 "stop because fe_core_infall > fe_core_infall_limit" "fi
 do_one dev_to_pisn_200 "stop because remnant_mass <= remnant_mass_min_limit" "final.mod" skip
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
-#   Pablo needs to fix conv_vel do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
+#    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
 do_one gyre_in_mesa_bcep "matched target" skip skip
 do_one gyre_in_mesa_envelope "matched target" skip skip
 do_one gyre_in_mesa_ms "matched target" skip skip

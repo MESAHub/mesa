@@ -34,8 +34,8 @@
 
 ! RSP2
 
-   x_integer_ctrl(1) = 1 ! which period to check for test_suite
-   x_ctrl(1) = 3.85 ! expected period (in days) 
+   !x_integer_ctrl(1) = 1 ! which period to check for test_suite
+   !x_ctrl(1) = 3.85 ! expected period (in days) 
 
    mixing_length_alpha  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
    RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     

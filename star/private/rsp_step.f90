@@ -270,6 +270,7 @@
             converged = .false.
             call set_1st_iter_R_using_v_start(s)
             s% R_center = s% R_center + s% dt*s% v_center
+            
             iter_loop: do iter = 1, max_iters  
                if (iter == iter_for_dfridr) then
                   s% solver_test_partials_k = test_partials_k
@@ -1611,6 +1612,10 @@
 
             s% Chi(k) = POMT1*POM1
             
+            !if (k==194) then 
+            !   write(*,2) '', k, 
+            !end if
+
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
                   !$OMP critical
@@ -1683,6 +1688,10 @@
             end if
             
          end if
+            
+            !if (k==194) then
+            !   write(*,2) 'RSP Chi', k, s% Chi(k)
+            !end if
          
          !test_partials = (k-1 == s% solver_test_partials_k)
          test_partials = .false.
@@ -2128,7 +2137,8 @@
             POM = - 2.d0/3.d0*ALFA*ALFAT*(P4*(s% r(k)**2))**2
             rho2_face = 0.5d0*(1.d0/s% Vol(k)**2 + 1.d0/s% Vol(k-1)**2)
             POM2 = s% Hp_face(k)*rho2_face
-            Lt_00 = POM*POM2*POM3            
+            Lt_00 = POM*POM2*POM3       
+                 
             TEM1 = Lt_00/s% Hp_face(k)
             TEM2 = Lt_00/POM2*s% Hp_face(k)
             
@@ -3400,6 +3410,20 @@
             + DV*Ptrb_tw &
             - dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k) + s% Eq(k))
          HR(IW) = -residual
+         
+         if (k==-109) then
+            write(*,3) 'RSP dEt PdV dtC dtEq', k, iter, &
+               s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
+               dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k)), dt*s% Eq(k)
+            !write(*,2) 'RSP w COUPL SOURCE DAMP DAMPR', k, &
+            !   s% RSP_w(k), s% COUPL(k), s% SOURCE(k), s% DAMP(k), s% DAMPR(k)
+            !write(*,2) 'RSP w SOURCE PII/Hp P*QQ_div_Cp P T', k, &
+            !   s% RSP_w(k), s% SOURCE(k), &
+            !   0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1)), &
+            !   (s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k), s% Pgas(k) + s% Prad(k), s% T(k)
+            !write(*,2) 'RSP PII_00 PII_p1 Hp_00 Hp_p1', k, &
+            !   s% PII(k), s% PII(k+1), s% Hp_face(k), s% Hp_face(k+1)
+         end if
          
          HD(i_w_dw_in2,IW) = 0.d0          
          HD(i_w_dw_in,IW) = - dt_div_dm*WTT*dLt_in_dw_in  

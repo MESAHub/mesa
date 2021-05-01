@@ -44,8 +44,11 @@
       star_mass ! in Msun units
       !star_mdot ! d(star_mass)/dt (in msolar per year)
       !time_step ! timestep in years since previous model
+      time_step_sec
       log_dt ! log10 time_step
       num_zones ! number of zones in the model
+      max_tau_conv
+      
    
    ! mixing regions
    

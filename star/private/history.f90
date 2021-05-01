@@ -2123,18 +2123,18 @@
                val = s% kh_timescale
             case(h_nuc_timescale)
                val = s% nuc_timescale
-            case(h_dt_div_tau_conv)
+            case(h_dt_div_max_tau_conv)
                val = s% dt/s% max_conv_time_scale
-            case(h_tau_conv_sec)
+            case(h_dt_div_min_tau_conv)
+               val = s% dt/s% min_conv_time_scale
+            case(h_max_tau_conv)
                val = s% max_conv_time_scale
-            case(h_tau_conv_hrs)
-               val = s% max_conv_time_scale/(60*60)
-            case(h_tau_conv_days)
-               val = s% max_conv_time_scale/(24*60*60)
-            case(h_tau_conv)
-               val = s% max_conv_time_scale/secyer
-            case(h_log_tau_conv)
-               val = safe_log10(s% max_conv_time_scale/secyer)
+            case(h_min_tau_conv)
+               val = s% min_conv_time_scale
+            case(h_log_max_tau_conv)
+               val = safe_log10(s% max_conv_time_scale)
+            case(h_log_min_tau_conv)
+               val = safe_log10(s% min_conv_time_scale)
             case(h_tau_QHSE_yrs)
                val = s% max_QHSE_time_scale/secyer
             case(h_eps_grav_integral)

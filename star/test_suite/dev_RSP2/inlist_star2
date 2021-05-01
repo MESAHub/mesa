@@ -24,7 +24,7 @@
 
 ! solver   
    RSP2_assume_HSE = .true.
-   include_w_in_correction_limits = .false.
+   include_w_in_correction_limits = .true.
    include_v_in_correction_limits = .false.
    include_L_in_correction_limits = .false.
    RSP2_alfad = 1d0
@@ -54,12 +54,15 @@
       !history_interval = 1
       terminal_interval = 50
 
-      !photo_interval = 10
+      photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
+      
+      
+      !max_model_number = 2
 
 ! FOR DEBUGGING
       
@@ -132,16 +135,20 @@
 
 &pgstar
 
-   !pause = .true.
+   pause = .true.
    !pause_interval = 100
-   pgstar_interval = 2 ! 10
+   pgstar_interval = 1 ! 10
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
    Grid2_file_prefix = 'RSP2'
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
    
-   Profile_Panels1_xmin = -101D0
-   Profile_Panels1_xmax = -101D0
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
+   Profile_Panels1_xmin = 108 ! -101D0
+   Profile_Panels1_xmax = 110 ! -101D0
+   
+   Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
 / ! end of pgstar namelist

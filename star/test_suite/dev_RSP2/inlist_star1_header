@@ -29,8 +29,4 @@
 / ! end of controls namelist
 
 &pgstar
-   read_extra_pgstar_inlist1 = .true.
-   extra_pgstar_inlist1_name = 'inlist_common'
-   read_extra_pgstar_inlist2 = .true.
-   extra_pgstar_inlist2_name = 'inlist_star1'
 / ! end of pgstar namelist

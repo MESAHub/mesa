@@ -372,7 +372,11 @@
          if (s% using_RSP2 .and. s% include_w_in_correction_limits) then
             skip3 = 0
             do k=1,nz
-               s% correction_weight(s% i_w,k) = 1d0/(frac*s% csound_start(k) + abs(s% w(k)))
+               if (abs(s% w(k)) < 1d0) then
+                  s% correction_weight(s% i_w,k) = 0d0
+               else
+                  s% correction_weight(s% i_w,k) = 1d0/abs(s% w(k)) ! this copies RSP
+               end if
             end do
          else
             skip3 = s% i_w

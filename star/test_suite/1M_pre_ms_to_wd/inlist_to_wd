@@ -39,7 +39,7 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 15000
+      max_model_number = 25000
 
       initial_mass = 1.0
       initial_z = 0.02d0

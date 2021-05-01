@@ -3401,7 +3401,9 @@
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0) then
+         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0 .or. &
+               k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+               k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
@@ -3437,7 +3439,8 @@
 
 
       ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad with time weighting
-      subroutine calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
+      subroutine calc_Ptot_ad_tw( &
+            s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
          use auto_diff_support
           type (star_info), pointer :: s 
          integer, intent(in) :: k
@@ -3714,7 +3717,7 @@
       end function center_avg_x
       
       
-      subroutine get_area_info(s, k, area, inv_R2, ierr)
+      subroutine get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3731,7 +3734,7 @@
             area = 4d0*pi*r2_00
             inv_R2 = 1d0/r2_00
          end if
-      end subroutine get_area_info
+      end subroutine get_area_info_opt_time_center
       
       
       subroutine set_energy_eqn_scal(s, k, scal, ierr) ! 1/(erg g^-1 s^-1)
@@ -3783,19 +3786,27 @@
       end function conv_time_scale
       
       
-      subroutine set_max_conv_time_scale(s)
+      subroutine set_conv_time_scales(s)
          type (star_info), pointer :: s
          integer :: k
          real(dp) :: tau_conv
+         include 'formats'
+         s% min_conv_time_scale = 1d99
          s% max_conv_time_scale = 0d0
          do k=1,s%nz
+            if (s% X(k) > s% max_X_for_conv_timescale) cycle
+            if (s% X(k) < s% min_X_for_conv_timescale) cycle
             if (s% q(k) > s% max_q_for_conv_timescale) cycle
             if (s% q(k) < s% min_q_for_conv_timescale) exit
             tau_conv = conv_time_scale(s,k)
+            if (tau_conv < s% min_conv_time_scale) &
+               s% min_conv_time_scale = tau_conv
             if (tau_conv > s% max_conv_time_scale) &
                s% max_conv_time_scale = tau_conv
          end do
-      end subroutine set_max_conv_time_scale
+         if (s% max_conv_time_scale == 0d0) s% max_conv_time_scale = 1d99
+         if (s% min_conv_time_scale == 1d99) s% min_conv_time_scale = 0d0
+      end subroutine set_conv_time_scales
       
       
       subroutine set_using_TDC(s)

@@ -1063,10 +1063,15 @@
             call do1(s% L_conv, c% L_conv)
             if (failed('L_conv')) exit
 
+            call do1_integer(s% tdc_num_iters, c% tdc_num_iters)
+            if (failed('tdc_num_iters')) exit
+
             call do1(s% gradT_sub_grada, c% gradT_sub_grada)
             if (failed('gradT_sub_grada')) exit
             call do1(s% grada_face, c% grada_face)
             if (failed('grada_face')) exit
+            call do1(s% mlt_gradT, c% mlt_gradT)
+            if (failed('mlt_gradT')) exit
 
             call do1(s% mlt_cdc, c% mlt_cdc)
             if (failed('mlt_cdc')) exit
@@ -1101,6 +1106,21 @@
             if (failed('mlt_D_ad')) exit
             call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
             if (failed('mlt_Gamma_ad')) exit
+            
+            call do1_ad(s% PII_ad, c% PII_ad)
+            if (failed('PII_ad')) exit
+            call do1_ad(s% Chi_ad, c% Chi_ad)
+            if (failed('Chi_ad')) exit
+            call do1_ad(s% Eq_ad, c% Eq_ad)
+            if (failed('Eq_ad')) exit
+            call do1_ad(s% COUPL_ad, c% COUPL_ad)
+            if (failed('COUPL_ad')) exit
+            call do1_ad(s% Lr_ad, c% Lr_ad)
+            if (failed('Lr_ad')) exit
+            call do1_ad(s% Lc_ad, c% Lc_ad)
+            if (failed('Lc_ad')) exit
+            call do1_ad(s% Lt_ad, c% Lt_ad)
+            if (failed('Lt_ad')) exit
 
             call do1(s% gradT, c% gradT)
             if (failed('gradT')) exit

@@ -51,44 +51,43 @@
    !controls_namelist_name = 'namelist_controls_he_flash'
       
    max_model_number = 12000
+   max_number_retries = 1000
       
    initial_mass = 1.0
    initial_z = 0.02d0
-   
-   max_number_retries = 100
-   delta_lgL_He_limit = 0.01d0
 
-    Teff_upper_limit = 3300
+    !Teff_upper_limit = 3300
 !      xa_central_lower_limit_species(1) = 'he4'
 !      xa_central_lower_limit(1) = 0.0001
 
 ! wind
-      cool_wind_full_on_T = 9.99d9
-      hot_wind_full_on_T = 1d10 
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.8d0  
-      Blocker_scaling_factor = 0.7d0 ! 0.8d0        
+   cool_wind_full_on_T = 9.99d9
+   hot_wind_full_on_T = 1d10 
+   cool_wind_RGB_scheme = 'Reimers'
+   cool_wind_AGB_scheme = 'Blocker'
+   RGB_to_AGB_wind_switch = 1d-4
+   Reimers_scaling_factor = 0.8d0  
+   Blocker_scaling_factor = 0.7d0 ! 0.8d0        
 
 ! rotation
-      am_nu_visc_factor = 0
-      am_D_mix_factor = 0.0333333333333333d0
-      D_DSI_factor = 0
-      D_SH_factor = 1
-      D_SSI_factor = 1
-      D_ES_factor = 1
-      D_GSF_factor = 1
-      D_ST_factor = 1
+   am_nu_visc_factor = 0
+   am_D_mix_factor = 0.0333333333333333d0
+   D_DSI_factor = 0
+   D_SH_factor = 1
+   D_SSI_factor = 1
+   D_ES_factor = 1
+   D_GSF_factor = 1
+   D_ST_factor = 1
       
 ! TDC
-   max_dt_div_tau_conv_for_TDC = 1 ! 1d99 ! 1d-2
-   max_dt_years_for_TDC = 1 ! 11d99 ! 1d-1
+   max_X_for_TDC = 1d-8
+   max_X_for_conv_timescale = 1d-8
+
+   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
+   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
    
    alpha_TDC_DAMP = 1d0
    alpha_TDC_DAMPR = 0d0
-   
-   max_X_for_TDC = 0d0
 
 ! mix
    mlt_make_surface_no_mixing = .true.
@@ -98,15 +97,20 @@
    Henyey_MLT_y_param = 0.33333333d0
    Henyey_MLT_nu_param = 8
 
+! timesteps
+   !delta_lgL_He_limit = 0.003d0
+   delta_lgL_He_limit = 0.006d0
+
 ! mesh
-   okay_to_remesh = .false.
+   !okay_to_remesh = .false.
+   !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
 ! solver
    use_momentum_outer_BC = .true.
    set_rho_to_dm_div_dV = .false.
 
-!   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
-   max_X_for_gradT_eqn = 0.01
+   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
+   max_X_for_gradT_eqn = 1d-8
 
    use_dedt_form_of_energy_eqn = .true.
    convergence_ignore_equL_residuals = .true.
@@ -115,11 +119,11 @@
    num_trace_history_values = 4
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'dt_div_tau_conv'
+   trace_history_value_name(3) = 'dt_div_max_tau_conv'
    trace_history_value_name(4) = 'using_TDC'
 
    terminal_show_age_units = 'years'
-   terminal_show_timestep_units = 'years'
+   terminal_show_timestep_units = 'seconds'
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
 
@@ -129,16 +133,16 @@
       terminal_interval = 10
       write_header_frequency = 10
       
-      photo_interval = 1
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
       
-      compare_TDC_to_MLT = .true.
+      !compare_TDC_to_MLT = .true.
       
-      x_integer_ctrl(19) = 1658 ! k
-      x_integer_ctrl(20) = 0 ! solver iter
-      x_integer_ctrl(21) = 65 ! model_number
+      !x_integer_ctrl(19) = 1033 ! k
+      !x_integer_ctrl(20) = 0 ! solver iter
+      !x_integer_ctrl(21) = 1731 ! model_number
 
 ! FOR DEBUGGING
 
@@ -209,9 +213,15 @@
    !pause = .true.
    !pause_interval = 10
    pgstar_interval = 1
-
-   !Profile_Panels1_xmin = 1680 ! -101D0
-   !Profile_Panels1_xmax = 200 ! -101D0
+   
+   Profile_Panels1_xaxis_name = 'mass'
+   Profile_Panels1_xaxis_reversed = .false.
+   !Profile_Panels1_xaxis_name = 'zone'
+   !Profile_Panels1_xaxis_reversed = .true.
+   
+   !Profile_Panels1_xmin = 1580
+   !Profile_Panels1_xmax = 1650
+   Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
    Grid2_title = 'TDC He core flash'
    

@@ -344,7 +344,7 @@
       
       ! returns -G*m/r^2 with possible modifications for rotation.  MESA 2, eqn 22.
       subroutine expected_HSE_grav_term(s, k, grav, area, ierr)
-         use star_utils, only: get_area_info
+         use star_utils, only: get_area_info_opt_time_center
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: area, grav
@@ -356,7 +356,7 @@
          include 'formats'
          ierr = 0
          
-         call get_area_info(s, k, area, inv_R2, ierr)
+         call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          if (ierr /= 0) return
 
          grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
