@@ -687,9 +687,9 @@
             r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
             Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
             
-            if (k==-109) then
-               write(*,3) 'RSP Chi rho2 r6 dvdivr Hp w', k, s% solver_iter, &
-                  Chi_cell%val, rho2%val, r6_cell%val, d_v_div_r%val, Hp_cell%val, w_00%val
+            if (k==-56) then
+               write(*,3) 'RSP2 Chi dvdivr r_00 r_p1 v_00 v_p1', k, s% solver_iter, &
+                  Chi_cell%val, d_v_div_r%val, r_00%val, r_p1%val, s% v(k), s% v(k+1)
             end if
 
             ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
@@ -750,6 +750,12 @@
                Chi_m1 = 0d0
             end if
             Uq_face = 4d0*pi*(Chi_m1 - Chi_00)/(r_00*s% dm_bar(k))
+            
+            if (k==-56) then
+               write(*,3) 'RSP2 Uq chi_m1 chi_00 r', k, s% solver_iter, &
+                  Uq_face%val, Chi_m1%val, Chi_00%val, r_00%val
+            end if
+            
          end if
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
          s% Uq(k) = Uq_face%val

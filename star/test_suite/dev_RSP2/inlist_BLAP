@@ -52,6 +52,9 @@
    RSP_X    = 0.7d0
    RSP_Z    = 0.05d0
 
+   RSP_alfam =     0.15d0         ! eddy viscosity; Chi & Eq ~ RSP_alfam
+   RSP_alfat =     0.01d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
+
 / ! end of controls namelist
 
 

@@ -1065,10 +1065,12 @@
                   s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
             end if
-            s% v(k) = s% v(k) - &
-               (s% v(k) + s% v_start(k)) + &
-                2.d0/s% dt*(EZH*DX(IR) + (s% r(k) - s% r_start(k)))
+            ! time-centered vc = (v + v_start)/2
+            ! r - r_start = dt*vc
+            ! v = (2/dt)*(r - r_start) - v_start
             s% r(k) = s% r(k) + EZH*DX(IR)
+            s% v(k) = 2.d0/s% dt*(s% r(k) - s% r_start(k)) - s% v_start(k)
+                
             s% Fr(k) = s% Fr(k) + EZH*DX(IL)
             s% Lr(k) = s% Fr(k)*4d0*pi*s% r(k)**2
             DXKT = DXXT
@@ -1640,9 +1642,9 @@
 
             s% Chi(k) = POMT1*POM1
             
-            if (k==-109) then 
-               write(*,3) 'RSP Chi rho2 r6 dvdivr Hp w', k, s% solver_iter, &
-                  s% Chi(k), 1d0/Vol**2, POM2, POM3, POM4, s% RSP_w(k)
+            if (k==-56) then 
+               write(*,3) 'RSP Chi dvdivr r_00 r_p1 v_00 v_p1', k, s% solver_iter, &
+                  s% Chi(k), POM3, s% r(k), s% r(k+1), s% v(k), s% v(k+1)
             end if
 
             if (call_is_bad) then
@@ -2812,6 +2814,12 @@
          end if                          
 
          s% Uq(k) = Uq1*(Chi_out - Chi_00)         
+            
+            if (k==-56) then
+               write(*,3) 'RSP Uq chi_m1 chi_00 r', k, s% solver_iter, &
+                  s% Uq(k), Chi_out, Chi_00, R_00
+            end if
+
          d_Uq_dVol_00 = Uq1*(d_Chi_out_dVol_00 - d_Chi_00_dVol_00)
          d_Uq_dT_in = -Uq1*d_Chi_00_dT_in
          d_Uq_dT_00 = Uq1*(d_Chi_out_dT_00 - d_Chi_00_dT_00)
@@ -2873,6 +2881,11 @@
             dvdt_factor*(s% v(k) - s% v_start(k))/dt &
            + area*dXP_dm - grav - s% Uq(k) - Fr_term
          HR(IR) = -residual
+         
+         if (k==-56) then
+            write(*,3) 'RSP resid v dvdt area dXP_dm grav Uq', k, s% solver_iter, &
+               residual, s% v(k), (s% v(k) - s% v_start(k))/dt, area, dXP_dm, grav, s% Uq(k)
+         end if
          
          !s% xtra1_array(k) = s% Pgas(k) + s% Prad(k)
          !s% xtra2_array(k) = s% Vol(k)

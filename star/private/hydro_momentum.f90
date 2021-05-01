@@ -151,7 +151,7 @@
          other_dm_div_A_ad = other_ad*dm_div_A_ad
          grav_dm_div_A_ad = grav_ad*dm_div_A_ad
          RTI_terms_dm_div_A_ad = RTI_terms_ad*dm_div_A_ad
-         
+
          ! sum terms in residual_sum_ad using accurate_auto_diff_real_star_order1
          residual_sum_ad = &
             other_dm_div_A_ad + grav_dm_div_A_ad - dPtot_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
@@ -386,7 +386,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: &
-            other_ad, accel_ad,Uq_ad
+            other_ad, accel_ad, Uq_ad
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: extra_ad, v_00

@@ -92,22 +92,22 @@
                write(*,*) 'and dt_for_smaller_steps_before_age_target'
                call mesa_error(__FILE__,__LINE__)
             end if
-            if (age_target > s% star_age) then
-               remaining_years = age_target - s% star_age
+            if (age_target > s% time/secyer) then
+               remaining_years = age_target - s% time/secyer
                if (s% astero_using_revised_max_yr_dt) &
                   s% max_years_for_timestep = s% astero_revised_max_yr_dt
                n = floor(remaining_years/s% max_years_for_timestep + 1d-6)
                j = num_smaller_steps_before_age_target
                if (remaining_years <= s% max_years_for_timestep) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
-                     s% model_number, (age_target - s% star_age)/age_sigma
+                     s% model_number, (age_target - s% time/secyer)/age_sigma
                   s% max_years_for_timestep = remaining_years
                   s% astero_using_revised_max_yr_dt = .true.
                   s% astero_revised_max_yr_dt = s% max_years_for_timestep
                   astero_max_dt_next = s% max_years_for_timestep*secyer
                else if (n <= j) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
-                     s% model_number, (age_target - s% star_age)/age_sigma
+                     s% model_number, (age_target - s% time/secyer)/age_sigma
                   prev_max_years = s% max_years_for_timestep
                   i = floor(remaining_years/dt_for_smaller_steps_before_age_target + 1d-6)
                   if ((i+1d-9)*dt_for_smaller_steps_before_age_target < remaining_years) then
@@ -139,7 +139,7 @@
                end if
             else if (include_age_in_chi2_spectro) then
                write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
-                  s% model_number, (age_target - s% star_age)/age_sigma
+                  s% model_number, (age_target - s% time/secyer)/age_sigma
                if (abs(s% max_years_for_timestep - dt_for_smaller_steps_before_age_target) > &
                      dt_for_smaller_steps_before_age_target*1d-2) then
                   write(*,1) 'dt_for_smaller_steps_before_age_target', &
@@ -150,12 +150,12 @@
                end if
             end if
          else
-            if (s% star_age < min_age_for_chi2) return
+            if (s% time/secyer < min_age_for_chi2) return
             s% max_years_for_timestep = max_yrs_dt_when_cold
          end if
 
-         if (include_age_in_chi2_spectro .and. s% star_age < min_age_for_chi2) return         
-         if (eval_chi2_at_target_age_only .and. s% star_age < age_target) return
+         if (include_age_in_chi2_spectro .and. s% time/secyer < min_age_for_chi2) return         
+         if (eval_chi2_at_target_age_only .and. s% time/secyer < age_target) return
          
          delta_nu_model = s% delta_nu
          nu_max_model = s% nu_max
@@ -175,15 +175,15 @@
                chi2_seismo_nu_max_fraction)))
          
          if (s% L_nuc_burn_total < s% L_phot*Lnuc_div_L_limit .or. &
-               s% star_age < min_age_limit) then
+               s% time/secyer < min_age_limit) then
             return
          end if
          
          if (.not. checking_age) then
          
             age_limit = avg_age_top_samples + avg_age_sigma_limit*avg_age_sigma
-            if (s% star_age > age_limit) then
-               write(*,1) 'star age > limit from top samples', s% star_age, age_limit
+            if (s% time/secyer > age_limit) then
+               write(*,1) 'star age > limit from top samples', s% time/secyer, age_limit
                write(*,1) 'avg_age_top_samples', avg_age_top_samples
                write(*,1) 'avg_age_sigma_limit', avg_age_sigma_limit
                write(*,1) 'avg_age_sigma', avg_age_sigma
@@ -522,11 +522,11 @@
          
          
          subroutine final_checks
-            if (include_age_in_chi2_spectro .and. s% star_age >= max_age_for_chi2) then
+            if (include_age_in_chi2_spectro .and. s% time/secyer >= max_age_for_chi2) then
                write(*,*) 'have reached max_age_for_chi2'
                do_astero_extras_check_model = terminate
             end if
-            if (eval_chi2_at_target_age_only .and. s% star_age >= age_target) then
+            if (eval_chi2_at_target_age_only .and. s% time/secyer >= age_target) then
                write(*,*) 'have reached age_target'
                do_astero_extras_check_model = terminate
             end if
@@ -861,7 +861,7 @@
          end if
          if (include_age_in_chi2_spectro) then
             cnt = cnt + 1
-            sum = sum + pow2((s% star_age - age_target)/age_sigma)
+            sum = sum + pow2((s% time/secyer - age_target)/age_sigma)
          end if
          if (include_surface_Z_div_X_in_chi2_spectro) then
             cnt = cnt + 1
@@ -910,7 +910,7 @@
          best_chi2_seismo = chi2_seismo
          best_chi2_spectro = chi2_spectro
          
-         best_age = s% star_age
+         best_age = s% time/secyer
          best_model_number = s% model_number
          best_radius = s% photosphere_r
          best_logL = s% log_surface_luminosity
@@ -1423,8 +1423,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if ((eval_chi2_at_target_age_only .and. s% star_age >= age_target) .or. &
-             (include_age_in_chi2_spectro .and. s% star_age >= max_age_for_chi2) .or. &
+         if ((eval_chi2_at_target_age_only .and. s% time/secyer >= age_target) .or. &
+             (include_age_in_chi2_spectro .and. s% time/secyer >= max_age_for_chi2) .or. &
              save_info_for_last_model) then
             !write(*,*) 'call do_astero_extras_check_model before terminate'
             ckm = do_astero_extras_check_model(s, id)

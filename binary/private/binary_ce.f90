@@ -182,7 +182,7 @@
             b% CE_initial_separation = b% separation
             b% CE_initial_Mdonor = b% m(b% d_i)
             b% CE_initial_Maccretor = b% m(b% a_i)
-            b% CE_initial_age = s% star_age
+            b% CE_initial_age = s% time/secyer
             b% CE_initial_model_number = s% model_number
             b% CE_b_initial_age = b% binary_age
             b% CE_b_initial_model_number = b% model_number
@@ -301,7 +301,7 @@
             /(2*(Ebind+b% CE_alpha*initial_Eorb))
 
          b% m(b% d_i) = b% s_donor% mstar
-         b% time_step = b% s_donor% time_step
+         b% dt = b% s_donor% dt
          if (b% point_mass_i == 0) then
             b% m(b% a_i) = b% s_accretor% mstar
          end if
@@ -322,11 +322,11 @@
             min(b% CE_initial_separation, separation), b% eccentricity, ierr)
 
          b% model_number = b% model_number + 1
-         b% time_step = b% s_donor% time_step
-         b% binary_age = b% binary_age + b% time_step
+         b% dt = b% s_donor% dt
+         b% binary_age = b% binary_age + b% dt/secyer
 
          if (b% r(b% d_i)-b% rl(b% d_i) < 0d0) then
-            b% CE_years_detached = b% CE_years_detached + b% time_step
+            b% CE_years_detached = b% CE_years_detached + b% dt/secyer
          else
             b% CE_years_detached = 0d0
          end if

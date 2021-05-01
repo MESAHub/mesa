@@ -126,7 +126,7 @@
 
          if (b% max_timestep < 0) b% max_timestep = b% s_donor% dt
 
-         b% env = s% star_mass - s% he_core_mass 
+         b% env = s% mstar/msun - s% he_core_mass 
          if (b% env_old /= 0) then
             env_change = b% env - b% env_old
          else
@@ -167,7 +167,7 @@
                b% have_to_reduce_timestep_due_to_j = .true.
                return
             end if
-            dtj = s% time_step/(rel_change/b% fj+1d-99)
+            dtj = s% dt/secyer/(rel_change/b% fj+1d-99)
          end if
 
          if (b% fm > 0) then
@@ -179,7 +179,7 @@
                binary_pick_next_timestep = retry
                return
             end if
-            dtm = s% time_step/(rel_change/b% fm+1d-99)
+            dtm = s% dt/secyer/(rel_change/b% fm+1d-99)
          end if
          
          if (b% fr > 0) then
@@ -191,7 +191,7 @@
                binary_pick_next_timestep = retry
                return
             end if
-            dtr = s% time_step/ &
+            dtr = s% dt/secyer/ &
                 (rel_change/b% fr+1d-99)
 
             ! Check for accretor as well
@@ -208,7 +208,7 @@
                binary_pick_next_timestep = retry
                return
             end if
-            dtr = min(dtr, s% time_step/ &
+            dtr = min(dtr, s% dt/secyer/ &
                 (rel_change/b% fr+1d-99))
          end if
          if (dtr < b% fr_dt_limit) dtr = b% fr_dt_limit
@@ -222,7 +222,7 @@
                binary_pick_next_timestep = retry
                return
             end if
-            dta = s% time_step/(rel_change/b% fa+1d-99)
+            dta = s% dt/secyer/(rel_change/b% fa+1d-99)
          end if
 
          if (b% fe > 0) then
@@ -234,7 +234,7 @@
                binary_pick_next_timestep = retry
                return
             end if
-            dte = s% time_step/(rel_change/b% fe+1d-99)
+            dte = s% dt/secyer/(rel_change/b% fe+1d-99)
          end if
 
          if (b% fdm > 0d0) then
@@ -246,7 +246,7 @@
                binary_pick_next_timestep = retry
                return
             end if
-            dtdm = s% time_step/(rel_change/b% fdm+1d-99)
+            dtdm = s% dt/secyer/(rel_change/b% fdm+1d-99)
 
             rel_change = abs(b% m(b% a_i) - b% m_old(b% a_i))/b% m_old(b% a_i)
             if (.not. b% ignore_hard_limits_this_step .and. &
@@ -256,7 +256,7 @@
                binary_pick_next_timestep = retry
                return
             end if
-            dtdm = min(dtdm, s% time_step/(rel_change/b% fdm+1d-99))
+            dtdm = min(dtdm, s% dt/secyer/(rel_change/b% fdm+1d-99))
          end if
 
          set_dt = min(dtm, dtr, dtj, dta, dte, dtdm)

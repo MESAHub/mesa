@@ -48,6 +48,13 @@
          real(dp), intent(in) :: max_timestep
 
          include 'formats'
+         
+         if (s% force_timestep > 0) then
+            timestep_controller = keep_going
+            s% dt_next = s% force_timestep
+            s% why_Tlim = Tlim_max_timestep
+            return
+         end if
 
          timestep_controller = do_timestep_limits(s, s% dt)
          if (timestep_controller /= keep_going) s% result_reason = timestep_limits

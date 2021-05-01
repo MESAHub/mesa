@@ -2121,7 +2121,8 @@
          if (s% RSP_flag) then
             pick_next_timestep = keep_going
             s% dt_next = s% RSP_dt
-            if (s% dt_next /= s% force_timestep) s% dt_next = s% force_timestep
+            if (s% dt_next /= s% force_timestep .and. s% force_timestep > 0) &
+               s% dt_next = s% force_timestep
             s% dt_next_unclipped = s% dt_next
             s% why_Tlim = Tlim_max_timestep
             return
