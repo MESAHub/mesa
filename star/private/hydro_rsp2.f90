@@ -351,13 +351,13 @@
             resid_ad = esum_ad
             resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
             
-            if (k == 109) then
+            if (k == -109) then
                if (skip_partials) then
-                  write(*,3) 'skip_partials RSP2 dEt PdV dtC dtEq', k, s% solver_iter, &
-                     d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
+                  write(*,3) 'skip_partials RSP2 w dEt PdV dtC dtEq', k, s% solver_iter, &
+                     w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
                else
-                  write(*,3) 'RSP2 dEt PdV dtC dtEq', k, s% solver_iter, &
-                     d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
+                  write(*,3) 'RSP2 w dEt PdV dtC dtEq', k, s% solver_iter, &
+                     w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
                end if
                !write(*,2) 'RSP2 w COUPL SOURCE DAMP DAMPR', k, &
                !   s% w(k), s% COUPL(k), s% SOURCE(k), s% DAMP(k), s% DAMPR(k)
@@ -535,6 +535,9 @@
             !       = cm^2 cm cm^-3 g g^-1 = unitless
          
             Y_face = Y1*Y2 ! unitless
+            
+            if (k==-109) write(*,3) 'Y_face Y1 Y2', k, s% solver_iter, &
+               Y_face%val, Y1%val, Y2%val
 
          else
          
@@ -680,16 +683,18 @@
             r_p1 = wrap_r_p1(s,k)
             r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
             Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
+            
+            if (k==-109) then
+               write(*,2) 'RSP2 Chi rho2 r6 dvdivr Hp w', k, &
+                  Chi_cell%val, rho2%val, r6_cell%val, d_v_div_r%val, Hp_cell%val, w_00%val
+            end if
+
             ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
             !       = g cm^2 s^-2
             !       = erg            
          end if
          s% Chi(k) = Chi_cell%val
          s% Chi_ad(k) = Chi_cell
-            
-            !if (k==194) then
-            !   write(*,2) 'RSP2 Chi', k, s% Chi(k)
-            !end if
 
       end function compute_Chi_cell
 
@@ -800,6 +805,9 @@
          ! Source units = (erg g^-1 K^-1) cm^-1 cm s^-1 K
          !     = erg g^-1 s^-1
          
+         if (k==-109) write(*,3) 'w grada PII_00 PII_p1 SOURCE', k, s% solver_iter, &
+            w_00%val, grad_ad_00%val, PII_face_00%val, PII_face_p1%val, Source%val
+            
          if (k == -49) then
             write(*,2) 'Source%val', k, Source%val
             write(*,2) 'w_00%val', k, w_00%val

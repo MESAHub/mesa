@@ -146,8 +146,8 @@
    
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = 108 ! -101D0
-   Profile_Panels1_xmax = 110 ! -101D0
+   Profile_Panels1_xmin = 100 ! -101D0
+   Profile_Panels1_xmax = 107 ! -101D0
    
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
