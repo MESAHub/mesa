@@ -3411,7 +3411,7 @@
             - dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k) + s% Eq(k))
          HR(IW) = -residual
          
-         if (k==109) then
+         if (k==-109) then
             write(*,3) 'RSP dEt PdV dtC dtEq', k, iter, &
                s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
                dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k)), dt*s% Eq(k)
