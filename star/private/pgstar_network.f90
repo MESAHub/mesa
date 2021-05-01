@@ -195,7 +195,7 @@
                Z=chem_isos%Z(s%chem_id(i))
                N=chem_isos%N(s%chem_id(i))
                abun=(dot_product(s%xa(i,1:s%nz),s%dm(1:s%nz))/msun)/&
-                     ((s%star_mass)-(s%m_center/msun))
+                     ((s%mstar/Msun)-(s%m_center/msun))
 
                abun=safe_log10(dble(abun))
 

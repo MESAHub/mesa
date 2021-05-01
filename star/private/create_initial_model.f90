@@ -230,7 +230,6 @@
          s% v_center = 0d0
 
          s% mstar = cs% mass
-         s% star_mass = cs% mass/Msun
          s% xmstar = cs% mass
 
          i_lum = s% i_lum

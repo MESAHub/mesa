@@ -545,7 +545,6 @@
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
          real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
-         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_etrb from solver.
          real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
@@ -748,7 +747,7 @@
       real(dp) :: max_entropy ! in kerg per baryon 
 
       ! total baryonic mass
-      real(dp) :: star_mass ! total stellar baryonic mass (Msun)
+      !real(dp) :: star_mass ! total stellar baryonic mass (Msun) = s% mstar/Msun
       real(dp) :: star_mdot ! d(star_mass)/dt (Msun/year)
       real(dp) :: star_mass_h1
       real(dp) :: star_mass_he3
@@ -842,10 +841,6 @@
          ! kelvin-helmholtz timescale (years) -- proportional to gravitational energy divided by luminosity
       real(dp) :: nuc_timescale 
          ! nuclear timescale (years) -- proportional to mass divided by luminosity
-
-      ! times in other units (just for convenience)
-      real(dp) :: star_age, time_days, time_years ! time is in seconds
-      real(dp) :: time_step, dt_days, dt_years ! dt is in seconds
       
       real(dp) :: dt_start ! dt during first try for step
       

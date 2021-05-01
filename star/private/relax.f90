@@ -122,8 +122,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (abs(new_mass - s% star_mass) < 1d-12*new_mass) then
-            s% star_mass = new_mass
+         if (abs(new_mass - s% mstar/msun) < 1d-12*new_mass) then
             s% mstar = new_mass*Msun
             s% xmstar = s% mstar - s% M_center
             return
@@ -143,7 +142,7 @@
          rpar(2) = lg_max_abs_mdot
          rpar(3) = s% mstar
 
-         adding_mass = (new_mass > s% star_mass)
+         adding_mass = (new_mass > s% mstar/msun)
 
          cool_wind_AGB_scheme = s% cool_wind_AGB_scheme
          s% cool_wind_AGB_scheme = ''
@@ -171,7 +170,6 @@
          s% cool_wind_RGB_scheme = cool_wind_RGB_scheme
          s% varcontrol_target = varcontrol_target
          s% eps_mdot_factor = eps_mdot_factor
-         s% star_mass = new_mass
          s% mstar = new_mass*Msun
          s% xmstar = s% mstar - s% M_center
 
@@ -228,13 +226,13 @@
          new_mass = rpar(1)
          lg_max_abs_mdot = rpar(2)
          if (lg_max_abs_mdot <= -100) then ! use default
-            if (s% star_mass < 0.003d0) then
+            if (s% mstar/msun < 0.003d0) then
                lg_max_abs_mdot = -7d0
-            else if (s% star_mass < 0.006d0) then
+            else if (s% mstar/msun < 0.006d0) then
                lg_max_abs_mdot = -6.3d0
-            else if (s% star_mass < 0.01d0) then
+            else if (s% mstar/msun < 0.01d0) then
                lg_max_abs_mdot = -6d0
-            else if (s% star_mass < 0.1d0) then
+            else if (s% mstar/msun < 0.1d0) then
                lg_max_abs_mdot = -4d0
             else
                lg_max_abs_mdot = -3d0
@@ -258,7 +256,6 @@
 
          if (abs_diff < 1d-4*new_mass .or. abs(mdot) < 1d-50) then
             s% mass_change = 0
-            s% star_mass = new_mass
             s% mstar = new_mass*Msun
             s% xmstar = s% mstar - s% M_center
             s% mass_change = 0
@@ -842,7 +839,7 @@
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_entropy avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if (s% star_age >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
+         if (s% time/secyer >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
             relax_entropy_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
@@ -1095,7 +1092,7 @@
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_angular_momentum avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if (s% star_age >= &
+         if (s% time/secyer >= &
             s% job% timescale_for_relax_angular_momentum*&
                s% job% num_timescales_for_relax_angular_momentum) then
             relax_angular_momentum_check_model = terminate
@@ -1470,7 +1467,7 @@
          if (dbg) write(*,1) 'next', next, log10(next)
 
          s% tau_factor = next
-         s% max_timestep = secyer*s% time_step
+         s% max_timestep = s% dt
 
       end function relax_tau_factor_check_model
 
@@ -1584,7 +1581,7 @@
             write(*,1) 'next opacity_factor', next ! provide terminal feedback to show working.
 
          s% opacity_factor = next
-         s% max_timestep = secyer*s% time_step
+         s% max_timestep = s% dt
 
       end function relax_opacity_factor_check_model
 
@@ -1708,7 +1705,7 @@
          if (dbg) write(*,1) 'next Tsurf_factor', next, log10(next)
 
          s% Tsurf_factor = next
-         s% max_timestep = secyer*s% time_step
+         s% max_timestep = s% dt
 
       end function relax_Tsurf_factor_check_model
 
@@ -2191,15 +2188,14 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (abs(new_mass - s% star_mass) <= 1d-12*new_mass) then
-            s% star_mass = new_mass
+         if (abs(new_mass - s% mstar/msun) <= 1d-12*new_mass) then
             s% mstar = new_mass*Msun
             s% xmstar = s% mstar - s% M_center
             return
          end if
          write(*,*)
          write(*,1) 'relax_mass_scale'
-         write(*,1) 'current star_mass', s% star_mass
+         write(*,1) 'current star_mass', s% mstar/msun
          write(*,1) 'relax to new_mass', new_mass
          write(*,1) 'dlgm_per_step', dlgm_per_step
          write(*,*)
@@ -2209,7 +2205,7 @@
          max_model_number = s% max_model_number
          s% max_model_number = -1111
 
-         adding_mass = (new_mass > s% star_mass)
+         adding_mass = (new_mass > s% mstar/msun)
 
          eps_mdot_factor = s% eps_mdot_factor
          s% eps_mdot_factor = 0
@@ -2222,7 +2218,6 @@
                relax_mass_scale_adjust_model, relax_mass_scale_check_model, null_finish_model, &
                .true., lipar, ipar, lrpar, rpar, ierr)
          s% max_model_number = max_model_number
-         s% star_mass = new_mass
          s% mstar = new_mass*Msun
          s% xmstar = s% mstar - s% M_center
          s% eps_mdot_factor = eps_mdot_factor
@@ -2272,16 +2267,15 @@
          new_mass = rpar(1)
          dlgm_per_step = rpar(2)
          change_mass_years_for_dt = rpar(3)
-         if (s% star_mass < 0.01d0) dlgm_per_step = dlgm_per_step*0.1d0
-         !if (s% star_mass < 0.001d0) dlgm_per_step = dlgm_per_step*0.1d0
+         if (s% mstar/msun < 0.01d0) dlgm_per_step = dlgm_per_step*0.1d0
+         !if (s% mstar/msun < 0.001d0) dlgm_per_step = dlgm_per_step*0.1d0
 
          if (dbg) then
             write(*,1) 'new_mass', new_mass
-            write(*,1) 'current mass', s% star_mass
+            write(*,1) 'current mass', s% mstar/msun
          end if
 
-         if (abs(s% star_mass-new_mass) < 1d-12*new_mass) then
-            s% star_mass = new_mass
+         if (abs(s% mstar/msun-new_mass) < 1d-12*new_mass) then
             s% mstar = new_mass*Msun
             s% xmstar = s% mstar - s% M_center
             s% termination_code = t_relax_finished_okay
@@ -2293,17 +2287,16 @@
 
          if (s% dt < relax_mass_scale_dt*0.9d0) return ! give a chance to stabilize
 
-         if (new_mass < s% star_mass) then
-            next = exp10(safe_log10(s% star_mass) - dlgm_per_step)
+         if (new_mass < s% mstar/msun) then
+            next = exp10(safe_log10(s% mstar/msun) - dlgm_per_step)
             if (next < new_mass) next = new_mass
          else
-            next = exp10(safe_log10(s% star_mass) + dlgm_per_step)
+            next = exp10(safe_log10(s% mstar/msun) + dlgm_per_step)
             if (next > new_mass) next = new_mass
          end if
 
          if (dbg) write(*,1) 'next', next, log10(next)
 
-         s% star_mass = next
          s% mstar = next*Msun
          s% xmstar = s% mstar - s% M_center
 
@@ -2333,14 +2326,13 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (abs(new_mass - s% star_mass) <= 1d-6) then
-            s% star_mass = new_mass
+         if (abs(new_mass - s% mstar/msun) <= 1d-6) then
             s% mstar = new_mass*Msun
             s% xmstar = s% mstar - s% M_center
             return
          end if
          write(*,*)
-         write(*,1) 'current star_mass', s% star_mass
+         write(*,1) 'current star_mass', s% mstar/msun
          write(*,1) 'relax to new_mass', new_mass
          write(*,*)
          write(*,1) 'dlgm_per_step', dlgm_per_step
@@ -2407,28 +2399,28 @@
             write(*,1) 'relax_M_center target/current', new_mass/(s% M_center/Msun)
          
          end_now=.false.
-         if (new_mass < s% star_mass) then
-            next = exp10(safe_log10(s% star_mass) - dlgm_per_step)
+         if (new_mass < s% mstar/msun) then
+            next = exp10(safe_log10(s% mstar/msun) - dlgm_per_step)
             if (next < new_mass) then
                next = new_mass
                end_now=.true.
             end if
          else
-            next = exp10(safe_log10(s% star_mass) + dlgm_per_step)
+            next = exp10(safe_log10(s% mstar/msun) + dlgm_per_step)
             if (next > new_mass) then
                next = new_mass
                end_now=.true.
             end if
          end if
 
-         if (abs(s% star_mass - new_mass) < 1d-15 .or. end_now) then
+         if (abs(s% mstar/msun - new_mass) < 1d-15 .or. end_now) then
             call set_new_mass_for_relax_M_center(s, new_mass, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed to set mass for relax_M_center'
                relax_M_center_check_model = terminate
                return
             end if
-            write(*,1) 'final mass', s% star_mass, s% mstar, s% M_center, s% xmstar
+            write(*,1) 'final mass', s% mstar/msun, s% mstar, s% M_center, s% xmstar
             relax_M_center_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
@@ -2455,7 +2447,6 @@
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
-         s% star_mass = new_mass
          s% mstar = new_mass*Msun
          s% M_center = s% mstar - s% xmstar
       end subroutine set_new_mass_for_relax_M_center
@@ -3419,7 +3410,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (s% star_mass < s% job% pre_ms_check_radiative_core_min_mass) then
+         if (s% mstar/msun < s% job% pre_ms_check_radiative_core_min_mass) then
             write(*,*) 'stop relax to begin radiative core because star_mass < pre_ms_check_radiative_core_min_mass'
             return
          end if
@@ -3676,7 +3667,7 @@
          write(*,1) 'relax Z, z diff, new, current', new_z - current_z, new_z, current_z
 
          if (klo == 1 .and. khi == s% nz) s% initial_z = next_z
-         s% max_timestep = secyer*s% time_step
+         s% max_timestep = s% dt
 
       end function relax_Z_check_model
 
@@ -3852,7 +3843,7 @@
          end if
 
          if (klo == 1 .and. khi == s% nz) s% initial_y = next_y
-         s% max_timestep = secyer*s% time_step
+         s% max_timestep = s% dt
 
       end function relax_Y_check_model
 
@@ -3935,7 +3926,7 @@
             model_number_old, max_number_retries, &
             solver_iters_timestep_limit, iter_for_resid_tol2, iter_for_resid_tol3, &
             steps_before_use_gold_tolerances, steps_before_use_gold2_tolerances
-         real(dp) :: star_age, time, max_age, max_age_in_days, max_age_in_seconds, max_timestep, &
+         real(dp) :: time, max_age, max_age_in_days, max_age_in_seconds, max_timestep, &
             Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, Dutch_scaling_factor, &
             van_Loon_scaling_factor, Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
             dxdt_nuc_factor, tol_correction_norm, tol_max_correction, warning_limit_for_max_residual, &
@@ -4001,7 +3992,6 @@
          if (s% doing_first_model_of_run) then
             s% num_retries = 0
             s% time = 0
-            s% star_age = 0
             s% model_number_for_last_retry = 0
             s% photo_interval = 0
             s% profile_interval = 0
@@ -4156,7 +4146,6 @@
             use_other_wind = s% use_other_wind
 
             num_retries = s% num_retries
-            star_age = s% star_age
             time = s% time
             model_number = s% model_number
             dxdt_nuc_factor = s% dxdt_nuc_factor
@@ -4211,7 +4200,6 @@
             s% Dutch_scaling_factor = Dutch_scaling_factor
             s% use_other_wind = use_other_wind
             s% num_retries = num_retries
-            s% star_age = star_age
             s% time = time
             s% model_number = model_number
             s% dxdt_nuc_factor = dxdt_nuc_factor

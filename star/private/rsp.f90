@@ -700,48 +700,65 @@
       
          !call rsp_dump_for_debug(s)
          !stop 'rsp_dump_for_debug'
-         target_dt = min( &
-            s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
-            s% dt*s% max_timestep_factor)
-         if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
-         s% dt = target_dt
+         if (s% force_timestep > 0) then
+            s% dt = s% force_timestep
+         else
+         
+            target_dt = min( &
+               s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
+               s% dt*s% max_timestep_factor)
+            if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
+            s% dt = target_dt
 
-         if (is_bad(s% dt)) then
-            write(*,1) 'dt', s% dt
-            write(*,1) 'rsp_period', s% rsp_period
-            write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
-            write(*,1) 'max_timestep_factor', s% max_timestep_factor
-            stop 'do1_step 1'
-         end if
+            if (is_bad(s% dt)) then
+               write(*,1) 'dt', s% dt
+               write(*,1) 'rsp_period', s% rsp_period
+               write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
+               write(*,1) 'max_timestep_factor', s% max_timestep_factor
+               stop 'do1_step 1'
+            end if
 
-         max_dt = rsp_min_dr_div_cs*s% RSP_max_dt_times_min_dr_div_cs
-         if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
-            if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
-               max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
-               if (s% dt > max_dt) then
-                  write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
-                     s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
-                  !stop 'rsp'
+            max_dt = rsp_min_dr_div_cs*s% RSP_max_dt_times_min_dr_div_cs
+            if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
+               if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
+                  max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
+                  if (s% dt > max_dt) then
+                     write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
+                        s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
+                     !stop 'rsp'
+                  end if
                end if
             end if
-         end if
-         if (s% dt > max_dt) then
-            if (s% RSP_report_limit_dt) &
-               write(*,4) 'limit dt to max_dt', s% model_number
-            s% dt = max_dt
+            if (s% dt > max_dt) then
+               if (s% RSP_report_limit_dt) &
+                  write(*,4) 'limit dt to max_dt', s% model_number
+               s% dt = max_dt
+            end if
+
+         
+            if (is_bad(s% dt) .or. s% dt <= 0d0) then
+               write(*,1) 'dt', s% dt
+               write(*,1) 'RSP_max_dt_times_min_dr_div_cs', s% RSP_max_dt_times_min_dr_div_cs
+               write(*,1) 'rsp_min_dr_div_cs', rsp_min_dr_div_cs
+               write(*,1) 'rsp_min_rad_diff_time', rsp_min_rad_diff_time
+               stop 'do1_step 2'
+            end if
+         
          end if
          
-         if (is_bad(s% dt) .or. s% dt <= 0d0) then
-            write(*,1) 'dt', s% dt
-            write(*,1) 'RSP_max_dt_times_min_dr_div_cs', s% RSP_max_dt_times_min_dr_div_cs
-            write(*,1) 'rsp_min_dr_div_cs', rsp_min_dr_div_cs
-            write(*,1) 'rsp_min_rad_diff_time', rsp_min_rad_diff_time
-            stop 'do1_step 2'
-         end if
          
          ierr = 0
          call HYD(s,ierr) 
          if (ierr /= 0) return
+         
+         
+         if (s% force_timestep > 0 .and. s% dt > s% force_timestep) then
+            write(*,2) 's% dt > s% force_timestep after HYD', s% model_number, &
+               s% dt, s% force_timestep
+            stop 'rsp do1_step'
+         end if
+         
+         
          ! s% dt might have been reduced by retries in HYD
          s% time = s% time_old + s% dt
          s% rsp_dt = s% dt ! will be used to set dt for next step

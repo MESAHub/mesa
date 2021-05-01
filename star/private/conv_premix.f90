@@ -1460,7 +1460,7 @@ contains
 
     write(unit, *) '1 2'
     write(unit, *) 'star_age model_number'
-    write(unit, *) s%star_age, s%model_number
+    write(unit, *) s% time/secyer, s%model_number
     write(unit, *) ''
     write(unit, *) '1 2 3 4 5 6 7 8'
     write(unit, *) 'k mass gradr grada gradL_composition_term mixing_type x y'

@@ -81,7 +81,6 @@
          end if
          mstar = min(max_mass_to_create*Msun, max(min_mass_to_create*Msun, s% mstar))
          s% mstar = mstar
-         s% star_mass = mstar/Msun
          s% xmstar = mstar
 
          T_c = s% pre_ms_T_c

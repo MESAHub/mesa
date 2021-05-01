@@ -331,7 +331,7 @@
          if (dbg .or. s% show_diffusion_info .or. ierr /= 0) then
             if (ierr == 0) then
                write(*,'(a,f6.3,3x,a,1pe10.3,3x,99(a,i5,3x))') &
-                  'log_dt', log10(s% dt/secyer), 'age', s% star_age, 'model', s% model_number, &
+                  'log_dt', log10(s% dt/secyer), 'age', s% time/secyer, 'model', s% model_number, &
                   'iters', total_num_iters, 'steps', steps_used, 'retries', total_num_retries, &
                   'nzlo', nzlo, 'nzhi', nzhi, 'n', nzhi-nzlo+1, 'nz', nz, &
                   'diffusion_call_number', s% diffusion_call_number

@@ -676,13 +676,13 @@
             if (step_min >= s% model_number) step_min = 1
             if (max_width > 0) step_min = max(step_min, step_max - max_width)
          else if (hist_xaxis_name == 'star_age' .and. automatic_star_age_units) then
-            if (s% star_age > 1d0) then
+            if (s% dt/secyer > 1d0) then
                hist_xaxis_name = 'star_age'
-            else if (s% star_age*secyer > 24*60*60) then
+            else if (s% dt > 24*60*60) then
                hist_xaxis_name = 'star_age_day'
-            else if (s% star_age*secyer > 60*60) then
+            else if (s% dt > 60*60) then
                hist_xaxis_name = 'star_age_hr'
-            else if (s% star_age*secyer > 60) then
+            else if (s% dt > 60) then
                hist_xaxis_name = 'star_age_min'
             else
                hist_xaxis_name = 'star_age_sec'

@@ -107,8 +107,6 @@
          call set_dm_bar(s, nz, s% dm, s% dm_bar)            
          call reset_epsnuc_vectors(s)
 
-         s% star_mass = s% mstar/msun
-
          if (s% rotation_flag) then
             ! older MESA versions stored only omega in saved models. However, when
             ! using rotation dependent moments of inertia one actually needs to store
@@ -230,7 +228,7 @@
          integer :: iounit, n, i, k, t, file_type, &
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
-         real(dp) :: initial_mass, initial_z, initial_y, &
+         real(dp) :: initial_mass, initial_z, initial_y, star_age, &
             tau_factor, Teff, Tsurf_factor, opacity_factor, mixing_length_alpha
          character (len=strlen) :: buffer, string, message
          character (len=net_name_len) :: net_name
@@ -280,7 +278,6 @@
          end if
 
          s% model_number = 0
-         s% star_age = 0
          s% xmstar = -1
          
          Teff = s% Teff
@@ -288,11 +285,12 @@
          Tsurf_factor = s% Tsurf_factor
          mixing_length_alpha = s% mixing_length_alpha
          opacity_factor = s% opacity_factor
-
+         star_age = 0d0
+         
          call read_properties(iounit, &
             net_name, species, nz, year_month_day_when_created, &
             initial_mass, initial_z, initial_y, mixing_length_alpha, &
-            s% model_number, s% star_age, tau_factor, s% Teff, &
+            s% model_number, star_age, tau_factor, s% Teff, &
             s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             Tsurf_factor, opacity_factor, &
             s% xmstar, s% R_center, s% L_center, s% v_center, &
@@ -313,7 +311,7 @@
          end if
          
          s% init_model_number = s% model_number
-         s% time = s% star_age*secyer
+         s% time = star_age*secyer
 
          if (abs(tau_factor - s% tau_factor) > tau_factor*1d-9 .and. &
                s% tau_factor /= s% job% set_to_this_tau_factor) then

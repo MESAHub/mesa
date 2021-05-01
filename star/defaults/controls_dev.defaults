@@ -65,6 +65,7 @@
     RSP2_min_dt_div_tau_conv_switch_to_MLT = -1
     RSP2_min_dt_years_switch_to_MLT = 20d0
 
+     RSP2_w_fix_if_neg = 5d-5
      RSP2_w_min_for_damping = 1d2
      RSP2_source_seed = 0d0
 

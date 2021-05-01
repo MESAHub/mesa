@@ -1589,7 +1589,7 @@
          ierr = 0
          allocate(pg)
          pg% step = s% model_number
-         pg% age = s% star_age
+         pg% age = s% time/secyer
          num = s% number_of_history_columns
          allocate(pg% vals(num))
          call get_hist_values(num,ierr)

@@ -632,7 +632,7 @@
          model_number = get_model_number(id, ierr)
          if (failed('get_model_number',ierr)) return
          
-         if (s% star_age < s% job% set_cumulative_energy_error_each_step_if_age_less_than) then
+         if (s% time/secyer < s% job% set_cumulative_energy_error_each_step_if_age_less_than) then
             if (mod(model_number, s% terminal_interval) == 0) &
                write(*,1) 'cumulative_energy_error reset to', s% job% new_cumulative_energy_error
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
@@ -1363,7 +1363,7 @@
          
          log_Teff = log10(s% Teff)
          log_L = s% log_surface_luminosity
-         mass = s% star_mass
+         mass = s% mstar/Msun
          Fe_H = safe_log10(get_current_z_at_point(id, 1, ierr) / zsol)
          log_g = safe_log10(s% grav(1))
          if (ierr /= 0) then
@@ -2851,7 +2851,7 @@
          end if
 
         if (s% job% set_max_dt_to_frac_lifetime) then
-           log_m = log10(s% star_mass) ! in Msun units
+           log_m = log10(s% mstar/Msun) ! in Msun units
            log_lifetime = 9.921d0 - (3.6648d0 + (1.9697d0 - 0.9369d0*log_m)*log_m)*log_m
            ! Iben & Laughlin (1989) as quoted in H&K (eqn 2.3)
            max_dt = s% job% max_frac_of_lifetime_per_step*secyer*exp10(log_lifetime)

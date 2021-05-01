@@ -460,7 +460,11 @@
 
             if (do_w) then
                s% w(k) = x(i_w)
-               s% dxh_w(k) = s% solver_dx(i_w,k)
+               if (s% w(k) < 0d0) then
+                  !write(*,3) 'RSP2 fix w neg', k, s% solver_iter, &
+                  !   xh_start(j,k), s% w(k), s% RSP2_w_fix_if_neg
+                  s% w(k) = s% RSP2_w_fix_if_neg
+               end if
                if (is_bad_num(s% w(k))) then
                   s% retry_message = 'bad num for w'
                   ierr = -1

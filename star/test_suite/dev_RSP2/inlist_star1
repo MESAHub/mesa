@@ -37,10 +37,10 @@
       !history_interval = 1
       terminal_interval = 100
 
-      photo_interval = 500
+      photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 50
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 

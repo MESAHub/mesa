@@ -276,8 +276,8 @@
          if (dbg) write(*,1) 'wind_mdot 5', wind_mdot
 
          if (wind_mdot >= 0) then
-             H_env_mass = s% star_mass - s% he_core_mass
-             H_He_env_mass = s% star_mass - s% co_core_mass
+             H_env_mass = s% mstar/Msun - s% he_core_mass
+             H_He_env_mass = s% mstar/Msun - s% co_core_mass
              He_layer_mass = s% he_core_mass - s% co_core_mass
              if (s% wind_H_envelope_limit > 0 .and. &
                    H_env_mass < s% wind_H_envelope_limit) then

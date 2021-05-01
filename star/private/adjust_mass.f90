@@ -56,9 +56,9 @@
                s% mstar_dot = -s% super_eddington_wind_mdot
             end if
          else if (delta_m == 0 &
-            .or. (delta_m < 0 .and. s% star_mass <= s% min_star_mass_for_loss) &
+            .or. (delta_m < 0 .and. s% mstar/Msun <= s% min_star_mass_for_loss) &
             .or. (delta_m > 0 .and. s% max_star_mass_for_gain > 0 &
-                  .and. s% star_mass >= s% max_star_mass_for_gain)) then
+                  .and. s% mstar/Msun >= s% max_star_mass_for_gain)) then
             s% mstar_dot = 0d0
          end if
 

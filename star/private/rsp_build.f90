@@ -387,8 +387,7 @@
                   call next_H ! sets HH
                   if (N.eq.0 .and. abs(T(1)-TIN).lt.TIN*TIN_tol) then
                      s% M_center = M_0 - dm_0
-                     s% star_mass = s% RSP_mass
-                     s% mstar = s% star_mass*SUNM
+                     s% mstar = s% RSP_mass*SUNM
                      s% xmstar = s% mstar - s% M_center
                      s% M_center = s% mstar - s% xmstar ! this is how it is set when read file
                      s% L_center = s% RSP_L*SUNL

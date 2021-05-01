@@ -277,7 +277,7 @@
          
          include 'formats'
          
-         age = s% star_age ! in years            
+         age = s% time/secyer ! in years            
          if (trim(s% terminal_show_age_units) == 'seconds' .or. &
              trim(s% terminal_show_age_units) == 'secs') then
             age = age*secyer
@@ -285,7 +285,7 @@
             age = age*secyer/(24*60*60)
          end if
             
-         time_step = s% time_step ! in years
+         time_step = s% dt/secyer ! in years
          if (trim(s% terminal_show_timestep_units) == 'seconds' .or. &
              trim(s% terminal_show_timestep_units) == 'secs') then
             time_step = time_step*secyer
@@ -312,7 +312,7 @@
          end if
          vsurf_div_csound = v / s% csound(1)
 
-         dt = s% time_step*secyer
+         dt = s% dt/secyer*secyer
          
          sum_Lnuc = s% power_nuc_burn
          sum_LH = s% power_h_burn
@@ -334,7 +334,7 @@
             fmt2 = '1pe11.3,0p,'
          end if
          
-         if (s% star_mass >= 1d2) then
+         if (s% mstar/Msun >= 1d2) then
             fmt3 = '2f11.6,2(1pe11.3),0p,'
          else
             fmt3 = '4f11.6,'
@@ -355,8 +355,8 @@
             s% Teff, &   ! fmt2
             safe_log10(sum_LH), & ! fmt3
             safe_log10(sum_Lnuc), &
-            s% star_mass, &            
-            s% star_mass - max(s% he_core_mass, s% co_core_mass), &
+            s% mstar/Msun, &            
+            s% mstar/Msun - max(s% he_core_mass, s% co_core_mass), &
             s% center_h1, & ! fmt4
             s% center_n14, &
             s% surface_he3 + s% surface_he4, &
@@ -667,7 +667,7 @@
                delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
             else
                delta_nu = &
-                  s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
+                  s% delta_nu_sun*sqrt(s% mstar/Msun)*pow3(s% Teff/s% Teff_sun) / &
                      pow(s% L_phot,0.75d0)
             end if
          else
@@ -684,7 +684,7 @@
          
          if (s% initial_mass > s% he_core_mass) then
             envelope_fraction_left = &
-               (s% star_mass - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
+               (s% mstar/Msun - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
          else
             envelope_fraction_left = 1
          end if
@@ -767,8 +767,8 @@
                s% omega(k_omega), &
                sqrt(s% cgrav(k_omega)*s% m(k_omega)/ pow3(s% r_equatorial(k_omega)))
          
-         if (s% star_age >= s% max_age .and. s% max_age > 0) then 
-            call compare_to_target('star_age >= max_age', s% star_age, s% max_age, &
+         if (s% time/secyer >= s% max_age .and. s% max_age > 0) then 
+            call compare_to_target('star_age >= max_age', s% time/secyer, s% max_age, &
                   t_max_age)
                   
          else if (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) then 
@@ -875,13 +875,13 @@
          else if (s% center_he4 < s% HB_limit .and. s% center_h1 < 1d-4) then 
             call compare_to_target('center he4 < HB_limit', s% center_he4, s% HB_limit, t_HB_limit)
             
-         else if (s% star_mass_min_limit > 0 .and. s% star_mass <= s% star_mass_min_limit) then 
+         else if (s% star_mass_min_limit > 0 .and. s% mstar/Msun <= s% star_mass_min_limit) then 
             call compare_to_target('star_mass <= star_mass_min_limit', &
-               s% star_mass, s% star_mass_min_limit, t_star_mass_min_limit)
+               s% mstar/Msun, s% star_mass_min_limit, t_star_mass_min_limit)
             
-         else if (s% star_mass_max_limit > 0 .and. s% star_mass >= s% star_mass_max_limit) then 
+         else if (s% star_mass_max_limit > 0 .and. s% mstar/Msun >= s% star_mass_max_limit) then 
             call compare_to_target('star_mass >= star_mass_max_limit', &
-               s% star_mass, s% star_mass_max_limit, t_star_mass_max_limit)
+               s% mstar/Msun, s% star_mass_max_limit, t_star_mass_max_limit)
             
          else if (s% remnant_mass_min_limit > 0 .and. remnant_mass <= s% remnant_mass_min_limit) then 
             call compare_to_target('remnant_mass <= remnant_mass_min_limit', &
@@ -910,9 +910,9 @@
             call compare_to_target('xmstar >= xmstar_max_limit', &
                s% xmstar, s% xmstar_max_limit, t_xmstar_max_limit)
             
-         else if (s% star_mass - s% he_core_mass < s% envelope_mass_limit) then 
+         else if (s% mstar/Msun - s% he_core_mass < s% envelope_mass_limit) then 
             call compare_to_target('envelope mass < envelope_mass_limit', &
-               s% star_mass - s% he_core_mass, s% envelope_mass_limit, &
+               s% mstar/Msun - s% he_core_mass, s% envelope_mass_limit, &
                t_envelope_mass_limit)
             
          else if (envelope_fraction_left < s% envelope_fraction_left_limit) then 
@@ -1591,7 +1591,7 @@
 !               time_to_profile = .true.
 !               !s% phase_of_evolution = phase_he_ignition_over
 !               s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
-!               s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
+!               s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% time/secyer
 !               if ( s% log_surface_luminosity > s% he_luminosity_limit ) &
 !                  s% he_luminosity_limit = s% log_surface_luminosity
 !            end if
@@ -1602,7 +1602,7 @@
 !               !s% phase_of_evolution = phase_helium_burning
 !            end if      
 !            s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
-!            s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
+!            s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% time/secyer
 !         case ( phase_carbon_burning )
 !         case ( phase_helium_burning )
 !         end select

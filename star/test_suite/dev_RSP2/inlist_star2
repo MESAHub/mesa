@@ -38,6 +38,9 @@
    fixed_Psurf = 0
    
    alt_scale_height_flag = .false.
+
+   tol_max_correction = 1d-8 ! 3d-3
+
    
 ! output
 
@@ -57,7 +60,7 @@
       photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10
+      terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -135,7 +138,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
    !pause_interval = 100
    pgstar_interval = 1 ! 10
    
@@ -146,8 +149,8 @@
    
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = 100 ! -101D0
-   Profile_Panels1_xmax = 107 ! -101D0
+   !Profile_Panels1_xmin = 100 ! -101D0
+   !Profile_Panels1_xmax = 117 ! -101D0
    
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
 

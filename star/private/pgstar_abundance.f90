@@ -257,15 +257,15 @@
                else if (xaxis_name == 'mass') then
                   dx = (s% photosphere_m - xmin)/(xmax - xmin)
                else
-                  if (s% star_mass > s% photosphere_m) then
-                     photosphere_logxm = log10(s% star_mass - s% photosphere_m)
+                  if (s% mstar/Msun > s% photosphere_m) then
+                     photosphere_logxm = log10(s% mstar/Msun - s% photosphere_m)
                   else
                      photosphere_logxm = -99
                   end if
                   !dx = (xmax - photosphere_logxm)/(xmin - xmax)
                   dx = 1 - (photosphere_logxm - xmin)/(xmax - xmin)
                   write(*,2) 'photosphere_xm xmin photo_x xmax dx', s% model_number, &
-                     s% star_mass - s% photosphere_m, &
+                     s% mstar/Msun - s% photosphere_m, &
                      xmin, photosphere_logxm, xmax, dx
                end if
                call pgmove(dx, 0.0)

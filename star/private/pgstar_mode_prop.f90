@@ -170,7 +170,7 @@
                log_lamb_Sl3(k) = safe_log10((1d6/(2*pi))*sqrt(12d0)*s% csound_face(k)/s% r(k))
             end do
 
-            nu_max = nu_max_sun*s% star_mass/(pow2(s% photosphere_r)*sqrt(s% Teff/teff_sun))
+            nu_max = nu_max_sun*s% mstar/Msun/(pow2(s% photosphere_r)*sqrt(s% Teff/teff_sun))
             lg_nu_max = log10(dble(nu_max))
             lg_2pt0_nu_max = log10(dble(2.0*nu_max))
             lg_0pt5_nu_max = log10(dble(0.5*nu_max))

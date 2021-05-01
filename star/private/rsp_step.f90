@@ -272,6 +272,7 @@
             s% R_center = s% R_center + s% dt*s% v_center
             
             iter_loop: do iter = 1, max_iters  
+               s% solver_iter = iter
                if (iter == iter_for_dfridr) then
                   s% solver_test_partials_k = test_partials_k
                end if
@@ -600,6 +601,17 @@
             s% r(k) = s% r_start(k) + EHJT*s% dt*s% v_start(k) ! initial guess for R
             s% v(k) = (2d0*EHJT - 1d0)*s% v_start(k) ! initial guess for v
          end do
+         
+         !return
+         
+         ! FOR TESTING.  
+         do k = 1,NZN
+            s% r(k) = s% r_start(k)
+            s% v(k) = s% v_start(k) 
+         end do
+
+
+         
       end subroutine set_1st_iter_R_using_v_start
 
 
@@ -1044,7 +1056,11 @@
             s% erad(k) = s% erad(k) + EZH*DX(IE)
             if (I > IBOTOM .and. I < NZN)then
                if ((s% RSP_w(k) + EZH*DX(IW)) <= 0d0)then
-                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS to give seed for SOURCE
+                  !s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS to give seed for SOURCE
+                  
+                  !write(*,3) 'RSP fix w neg', k, s% solver_iter, s% RSP_w(k), s% RSP_w(k) + EZH*DX(IW), EFL0*0.5d0*1d-6
+                  ! TESTING WITHOUT RAND
+                  s% RSP_w(k) = EFL0*0.5d0*1d-6 ! RSP NEEDS THIS as seed for SOURCE
                else
                   s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
@@ -1153,17 +1169,26 @@
       subroutine calc_Hp_face(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: I      
-         real(dp) :: POM
+         real(dp) :: POM, POM1
          integer :: k
          logical :: test_partials
          include 'formats'
          k = NZN+1-i
          if (I < NZN) then
          
-            POM = (s% r(k)**2)/(2.d0*s% cgrav(k)*s% m(k))
-            s% Hp_face(k) = POM*( &
-               (s% Pgas(k) + s% Prad(k))*s% Vol(k) &
-             + (s% Pgas(k-1) + s% Prad(k-1))*s% Vol(k-1))
+            POM = (s% r(k)**2)/(s% cgrav(k)*s% m(k))
+            POM1 = 0.5d0*( &
+               (s% Pgas(k) + s% Prad(k))*s% Vol(k) + &
+               (s% Pgas(k-1) + s% Prad(k-1))*s% Vol(k-1))
+            s% Hp_face(k) = POM*POM1
+         
+            if (k==-104) then
+               write(*,3) 'RSP Hp P_div_rho Pdrho_00 Pdrho_m1', k, iter, &
+                  s% Hp_face(k), POM1, (s% Pgas(k) + s% Prad(k))*s% Vol(k), &
+                  (s% Pgas(k-1) + s% Prad(k-1))*s% Vol(k-1)
+               !write(*,3) 'RSP Hp r2_div_Gm r_start r', k, iter, &
+               !   s% Hp_face(k), POM, s% r_start(k), s% r(k)
+            end if
             
             dHp_dVol_00(I) = POM*( &
                + s% Vol(k)*(d_Pg_dVol(i) + d_Pr_dVol(i)) &
@@ -1318,7 +1343,7 @@
 
             s% Y_face(k) = Y1*Y2
             
-            if (k==-109) write(*,3) 'Y_face Y1 Y2', k, s% solver_iter, &
+            if (k==-109) write(*,3) 'Y_face Y1 Y2', k, iter, &
                s% Y_face(k), Y1, Y2
 
             dY_dr_00(I) = Y1*d_Y2_dr_00 + Y2*d_Y1_dr_00 ! 
@@ -1616,7 +1641,7 @@
             s% Chi(k) = POMT1*POM1
             
             if (k==-109) then 
-               write(*,2) 'RSP Chi rho2 r6 dvdivr Hp w', k, &
+               write(*,3) 'RSP Chi rho2 r6 dvdivr Hp w', k, s% solver_iter, &
                   s% Chi(k), 1d0/Vol**2, POM2, POM3, POM4, s% RSP_w(k)
             end if
 
@@ -1815,10 +1840,12 @@
             POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
          
-            ! P*QQ/Cp = grad_ad
-            if (k==-109) write(*,3) 'w grada PII_00 PII_p1 SOURCE', k, s% solver_iter, &
-               s% RSP_w(k), (s% Pgas(k) + s% Prad(k))*QQ_div_Cp, s% PII(k), &
-               s% PII(k+1), s% SOURCE(k)
+            if (k==-109) then
+               write(*,3) 'RSP Source w PII_div_Hp T_P_QQ_div_Cp', k, iter, &
+                  s% SOURCE(k), POM3, POM, POM2
+               !write(*,3) 'RSP PII_00 PII_p1 Hp_00 Hp_p1', k, iter, &
+               !   s% PII(k), s% PII(k+1), s% Hp_face(k), s% Hp_face(k+1)
+            end if
       
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2
@@ -1900,6 +1927,10 @@
             POM = (CEDE/ALFA)*(s% RSP_w(k)**3 - EFL0**3)
             POM2 = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
             s% DAMP(k) = POM/POM2
+            if (k==-109) then
+               write(*,3) 'RSP DAMP w Hp_cell dw3', k, iter, &
+                  s% DAMP(k), s% RSP_w(k), POM2, s% RSP_w(k)**3 - EFL0**3
+            end if
       
             TEM1 = - 0.5d0*POM/POM2**2
             
@@ -3421,8 +3452,8 @@
          HR(IW) = -residual
          
          if (k==-109) then
-            write(*,3) 'RSP w dEt PdV dtC dtEq', k, iter, &
-               s% RSP_w(k), s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
+            write(*,3) 'RSP residual w dEt PdV dtC dtEq', k, iter, &
+               residual, s% RSP_w(k), s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
                dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k)), dt*s% Eq(k)
             !write(*,2) 'RSP w COUPL SOURCE DAMP DAMPR', k, &
             !   s% RSP_w(k), s% COUPL(k), s% SOURCE(k), s% DAMP(k), s% DAMPR(k)

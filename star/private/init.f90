@@ -941,7 +941,6 @@
             s% rotation_flag = .false.
             s% D_omega_flag = .false.
             s% am_nu_rot_flag = .false.
-            s% star_mass = s% initial_mass
             s% mstar = s% initial_mass*Msun
             s% M_center = s% mstar - s% xmstar
             call set_var_info(s, ierr)

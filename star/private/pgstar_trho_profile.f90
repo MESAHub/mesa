@@ -571,11 +571,11 @@
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_flt(cnt, ypos, xpos0, dxpos, dxval, &
-                  'mass', s% star_mass)
+                  'mass', s% mstar/Msun)
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_flt(cnt, ypos, xpos0, dxpos, dxval, &
-                  'H rich', s% star_mass - s% he_core_mass)
+                  'H rich', s% mstar/Msun - s% he_core_mass)
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_flt(cnt, ypos, xpos0, dxpos, dxval, &
@@ -615,10 +615,10 @@
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_exp(cnt, ypos, xpos0, dxpos, dxval, &
-                  'lg dt yr', log10(s% time_step))
+                  'lg dt yr', log10(s% dt/secyer))
 
          cnt = 0; ypos = ypos + dypos
-         age = s% star_age
+         age = s% time/secyer
          if (s% pgstar_show_age_in_seconds) then
             cnt = write_info_line_exp(cnt, ypos, xpos0, dxpos, dxval, &
                   'age sec', age*secyer)

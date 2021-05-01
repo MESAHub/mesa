@@ -186,7 +186,7 @@ contains
     P_c = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
     global_data(11) = r_outer**2*d2P_dr2_c/P_c
     global_data(12) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
-    global_data(13) = s%star_age
+    global_data(13) = s% time/secyer
     global_data(14) = s%Teff
     global_data(15) = standard_cgrav
 
