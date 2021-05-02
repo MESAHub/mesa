@@ -111,9 +111,9 @@
 
        ! Apply mass limits
 
-       if (s%star_mass < s%overshoot_mass_full_on(j)) then
-          if (s%star_mass > s%overshoot_mass_full_off(j)) then
-             w = (s%star_mass - s%overshoot_mass_full_off(j)) / &
+       if (s%mstar/msun < s%overshoot_mass_full_on(j)) then
+          if (s%mstar/msun > s%overshoot_mass_full_off(j)) then
+             w = (s%mstar/msun - s%overshoot_mass_full_off(j)) / &
                  (s%overshoot_mass_full_on(j) - s%overshoot_mass_full_off(j))
              factor = 0.5_dp*(1._dp - cospi(w))
              f = f*factor

@@ -244,7 +244,7 @@
          okay = .true.
          R = Rsun*s% photosphere_r
          G = s% cgrav(1)
-         M = Msun*s% star_mass
+         M = s% mstar
          add_center_point = .true.
          keep_surface_point = .false.
          add_atmosphere = .true.

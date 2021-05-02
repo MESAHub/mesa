@@ -187,7 +187,7 @@
 
          if (b% ignore_rlof_flag .and. &
             abs(log10(abs(b% s1% L_nuc_burn_total * Lsun / b% s1% L(1)))) < 0.005 .and. &
-            b% s1% star_age > 1d2) then
+            b% s1% time/secyer > 1d2) then
             ! if here, primary reached thermal equilibrium (reached ZAMS), so activate RLOF
             ! this is the amount of overflow of a q=1 system at L2, anything more than this
             ! is too much
@@ -213,7 +213,7 @@
             write(*,*) "Engage RLOF!"
          else if (b% ignore_rlof_flag .and. &
             (abs(log10(abs(b% s1% L_nuc_burn_total * Lsun / b% s1% L(1)))) > 0.005 .or. &
-            b% s1% star_age < 1d2)) then
+            b% s1% time/secyer < 1d2)) then
             ! if here, still not in ZAMS, keep period fixed
             call binary_set_period_eccentricity(b% binary_id, &
                b% initial_period_in_days*(24d0*60d0*60d0), 0d0, ierr)

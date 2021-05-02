@@ -116,7 +116,7 @@
          names(1) = "expected_separation"
          beta = 64d0/5d0 * pow3(standard_cgrav) * b% m1 * b% m2 * (b% m1 + b% m2) * pow3(Msun) / pow5(clight)
          vals(1) = pow(pow4(b% initial_separation_in_Rsuns * Rsun) - &
-             4*beta*b% s1% star_age*secyer, 0.25d0)/Rsun
+             4*beta*b% s1% time, 0.25d0)/Rsun
          b% xtra(ix_separation_error) = (vals(1)-b% separation/Rsun)/vals(1)
          write(*,*) "error in separation", b% xtra(ix_separation_error)
       end subroutine data_for_extra_binary_history_columns

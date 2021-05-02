@@ -1018,8 +1018,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if ((eval_chi2_at_target_age_only .and. s% star_age >= age_target) .or. &
-             (include_age_in_chi2 .and. s% star_age >= max_age_for_chi2) .or. &
+         if ((eval_chi2_at_target_age_only .and. s% time/secyer >= age_target) .or. &
+             (include_age_in_chi2 .and. s% time/secyer >= max_age_for_chi2) .or. &
              save_info_for_last_model) then
             !write(*,*) 'call do_simplex_extras_check_model before terminate'
             ckm = do_simplex_extras_check_model(s, id)
@@ -1073,8 +1073,8 @@
                write(*,*) 'and dt_for_smaller_steps_before_age_target'
                stop 1
             end if
-            if (age_target > s% star_age) then
-               remaining_years = age_target - s% star_age
+            if (age_target > s% time/secyer) then
+               remaining_years = age_target - s% time/secyer
                if (simplex_using_revised_max_yr_dt) &
                   s% max_years_for_timestep = simplex_revised_max_yr_dt
                n = floor(remaining_years/s% max_years_for_timestep + 1d-6)
@@ -1082,7 +1082,7 @@
                if (remaining_years <= s% max_years_for_timestep) then
                   if (mod(s% model_number, s% terminal_interval) == 0) &
                      write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
-                        s% model_number, (age_target - s% star_age)/age_sigma
+                        s% model_number, (age_target - s% time/secyer)/age_sigma
                   s% max_years_for_timestep = remaining_years
                   simplex_using_revised_max_yr_dt = .true.
                   simplex_revised_max_yr_dt = s% max_years_for_timestep
@@ -1090,7 +1090,7 @@
                else if (n <= j) then
                   if (mod(s% model_number, s% terminal_interval) == 0) &
                      write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
-                        s% model_number, (age_target - s% star_age)/age_sigma
+                        s% model_number, (age_target - s% time/secyer)/age_sigma
                   prev_max_years = s% max_years_for_timestep
                   i = floor(remaining_years/dt_for_smaller_steps_before_age_target + 1d-6)
                   if ((i+1d-9)*dt_for_smaller_steps_before_age_target < remaining_years) then
@@ -1126,7 +1126,7 @@
                if (abs(s% max_years_for_timestep - dt_for_smaller_steps_before_age_target) > &
                      dt_for_smaller_steps_before_age_target*1d-2) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
-                     s% model_number, (age_target - s% star_age)/age_sigma
+                     s% model_number, (age_target - s% time/secyer)/age_sigma
                   write(*,1) 'dt_for_smaller_steps_before_age_target', &
                      dt_for_smaller_steps_before_age_target
                   write(*,1) 'max_years_for_timestep', &
@@ -1134,26 +1134,26 @@
                   stop 'bad max_years_for_timestep'
                else if (mod(s% model_number, s% terminal_interval) == 0) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
-                     s% model_number, (age_target - s% star_age)/age_sigma
+                     s% model_number, (age_target - s% time/secyer)/age_sigma
                end if
             end if
-         else if (s% star_age < min_age_for_chi2) then
+         else if (s% time/secyer < min_age_for_chi2) then
             return
          end if
 
-         if (include_age_in_chi2 .and. s% star_age < min_age_for_chi2) return         
-         if (eval_chi2_at_target_age_only .and. s% star_age < age_target) return
+         if (include_age_in_chi2 .and. s% time/secyer < min_age_for_chi2) return         
+         if (eval_chi2_at_target_age_only .and. s% time/secyer < age_target) return
 
          if (s% L_nuc_burn_total < s% L_phot*Lnuc_div_L_limit .or. &
-               s% star_age < min_age_limit) then
+               s% time/secyer < min_age_limit) then
             return
          end if
          
          if (.not. checking_age) then
          
             age_limit = avg_age_top_samples + avg_age_sigma_limit*avg_age_sigma
-            if (s% star_age > age_limit) then
-               write(*,1) 'star age > limit from top samples', s% star_age, age_limit
+            if (s% time/secyer > age_limit) then
+               write(*,1) 'star age > limit from top samples', s% time/secyer, age_limit
                write(*,1) 'avg_age_top_samples', avg_age_top_samples
                write(*,1) 'avg_age_sigma_limit', avg_age_sigma_limit
                write(*,1) 'avg_age_sigma', avg_age_sigma
@@ -1296,11 +1296,11 @@
          
          
          subroutine final_checks
-            if (include_age_in_chi2 .and. s% star_age >= max_age_for_chi2) then
+            if (include_age_in_chi2 .and. s% time/secyer >= max_age_for_chi2) then
                write(*,*) 'have reached max_age_for_chi2'
                do_simplex_extras_check_model = terminate
             end if
-            if (eval_chi2_at_target_age_only .and. s% star_age >= age_target) then
+            if (eval_chi2_at_target_age_only .and. s% time/secyer >= age_target) then
                write(*,*) 'have reached age_target'
                do_simplex_extras_check_model = terminate
             end if
@@ -1332,7 +1332,7 @@
             include 'formats'
             nz = s% nz
             
-            if (s% star_age >= max_age_for_chi2) then
+            if (s% time/secyer >= max_age_for_chi2) then
                write(*,*) 'have reached max_age_for_chi2'
                do_simplex_extras_check_model = terminate
                return
@@ -1738,7 +1738,7 @@
          end if
          
          if (age_sigma > 0 .and. include_age_in_chi2) then
-            chi2term = pow2((s% star_age - age_target)/age_sigma)
+            chi2term = pow2((s% time/secyer - age_target)/age_sigma)
             if (trace_okay .and. trace_chi2_info) &
                write(*,2) 'chi2_term age', s% model_number, chi2term
             chi2sum = chi2sum + chi2term
@@ -2405,7 +2405,7 @@
       
          best_chi2 = chi2
          
-         best_age = s% star_age
+         best_age = s% time/secyer
          best_model_number = s% model_number
          best_radius = s% photosphere_r
          best_logL = s% log_surface_luminosity

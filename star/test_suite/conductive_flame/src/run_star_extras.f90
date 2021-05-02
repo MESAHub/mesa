@@ -90,7 +90,6 @@
             s% v_center = 0
 
             s% mstar = s% x_ctrl(1)
-            s% star_mass = s% mstar/Msun
             s% xmstar = s% mstar
 
             Rho_c = s% x_ctrl(2)

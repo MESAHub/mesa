@@ -1,3 +1,19 @@
+do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
+do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
+do_one c13_pocket "all values are within tolerance" "final.mod" auto
+do_one ccsn_IIp "shock has reached target location    1" "shock_part5.mod" auto
+do_one conductive_flame "flame reached halfway point" "final.mod" auto
+do_one gyre_in_mesa_envelope "matched target" skip skip
+do_one irradiated_planet "stop because star_age >= max_age" "final.mod" auto
+do_one make_env "stop because star_age >= max_age" "env.mod" skip 
+do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
+do_one make_planets "stop because star_age >= max_age"  "planet_evolve_1.0_MJ_10.0_ME_2.0_RJ.mod" auto
+do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" skip
+do_one other_physics_hooks "stop because have dropped below central lower limit for h1" "final.mod" auto
+do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
+do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
+do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto
+return
  
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1

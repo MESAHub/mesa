@@ -134,7 +134,7 @@
          write(iounit, 4) 'version_number', "'" // trim(version_number) // "'"
          write(iounit, 1) 'M/Msun', s% mstar/Msun
          write(iounit, 2) 'model_number', s% model_number
-         write(iounit, 1) 'star_age', s% time*secyer
+         write(iounit, 1) 'star_age', s% time/secyer
          write(iounit, 1) 'initial_z', s% initial_z
          write(iounit, 2) 'n_shells', nz
          write(iounit, 4) 'net_name', "'" // trim(s% net_name) // "'"
