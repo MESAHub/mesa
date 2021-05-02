@@ -358,14 +358,9 @@
             esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
             resid_ad = esum_ad
             
-            if (k == -109 .and. s% solver_iter > 0) then
-               if (skip_partials) then
-                  write(*,3) 'skip_partials RSP2 residual w dEt PdV dtC dtEq', k, s% solver_iter, &
+            if (k == -109) then
+                  write(*,3) 'RSP2 residual w dEt PdV dtC dtEq', k, s% solver_iter, &
                      resid_ad%val, w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
-               else
-                  !write(*,3) 'RSP2 residual w dEt PdV dtC dtEq', k, s% solver_iter, &
-                  !   resid_ad%val, w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
-               end if
             end if
 
             resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
@@ -686,12 +681,6 @@
             r_p1 = wrap_r_p1(s,k)
             r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
             Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
-            
-            if (k==-56) then
-               write(*,3) 'RSP2 Chi dvdivr r_00 r_p1 v_00 v_p1', k, s% solver_iter, &
-                  Chi_cell%val, d_v_div_r%val, r_00%val, r_p1%val, s% v(k), s% v(k+1)
-            end if
-
             ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
             !       = g cm^2 s^-2
             !       = erg            

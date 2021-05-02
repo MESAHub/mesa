@@ -311,7 +311,7 @@
                else if (j == i_w) then
                   do k=1,nz
                      s% w(k) = s% xh(i_w, k)
-                     s% dxh_w(k) = 0d0
+                     if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
                   end do
                else if (j == i_Hp) then
                   do k=1,nz
@@ -501,7 +501,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs, set_conv_time_scales, set_using_TDC
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_rsp2, only: set_RSP2_vars, set_using_RSP2
+         use hydro_rsp2, only: set_using_RSP2
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -635,12 +635,6 @@
             if (dbg) write(*,*) 'call do_brunt_N2'
             call do_brunt_N2(s, nzlo, nzhi, ierr)
             if (failed('do_brunt_N2')) return
-         end if
-         
-         if (s% using_RSP2) then
-            call set_RSP2_vars(s,ierr)
-            if (failed('set_RSP2_vars')) return
-            s% previous_step_was_using_RSP2 = .true.
          end if
 
          if (.not. skip_mixing_info) then

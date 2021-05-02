@@ -272,6 +272,7 @@
             s% R_center = s% R_center + s% dt*s% v_center
             
             iter_loop: do iter = 1, max_iters  
+               s% solver_iter = iter
                if (iter == iter_for_dfridr) then
                   s% solver_test_partials_k = test_partials_k
                end if
@@ -1614,11 +1615,6 @@
             POMT4 = POM*POM1*POM2*POM3
 
             s% Chi(k) = POMT1*POM1
-            
-            if (k==-109) then 
-               write(*,2) 'RSP Chi rho2 r6 dvdivr Hp w', k, &
-                  s% Chi(k), 1d0/Vol**2, POM2, POM3, POM4, s% RSP_w(k)
-            end if
 
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
