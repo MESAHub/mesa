@@ -1,0 +1,94 @@
+!  long-period RR Lyrae star: M=0.65Ms, L=60Ls, Teff=6500K, X=0.75, Z=0.0004
+
+! original test case contributed by Radek Smolec.
+
+&star_job
+   saved_model_name = 'RR_Lyrae.mod'
+   
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 90 ! for debugging
+   
+/ ! end of star_job namelist
+
+&eos
+   use_Skye = .true.
+/ ! end of eos namelist
+
+&kap
+   Zbase = 0.0004d0
+   kap_file_prefix = 'a09'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   kap_CO_prefix = 'a09_co'
+/ ! end of kap namelist
+   
+&controls  
+   initial_z = 0.0004d0
+   initial_mass = 0.65d0
+
+   force_timestep = 90 ! for debugging
+   
+
+! RSP2
+
+   mixing_length_alpha  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq ~ RSP2_alfam
+   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
+
+   RSP2_num_outermost_cells_forced_nonturbulent = 1
+   RSP2_num_innermost_cells_forced_nonturbulent = 5
+
+   x_integer_ctrl(1) = 10 ! which period to check
+   x_ctrl(1) = 0.71262d0 ! expected period (in days) 
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+   !pause = .true.
+   !pause_interval = 100
+   pgstar_interval = 1 ! 10
+
+! window 1
+
+   Grid1_win_flag = .true.
+   Grid1_title = 'RR Lyrae Grid Profiles  RSP2'
+
+   !Grid1_file_flag = .true.
+   Grid1_file_dir = 'png1'
+   Grid1_file_prefix = 'grid1'
+   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+   
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
+   !Profile_Panels1_xmin = 50 ! -101D0
+   !Profile_Panels1_xmax = 65 ! -101D0
+   
+! window 2
+      
+   Grid2_win_flag = .true.
+   Grid2_title = 'RR Lyrae  RSP2'
+   
+   History_Panels2_xaxis_name='star_age_day'
+   History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+
+   ! Grid2_file_flag = .true.
+   file_digits = 7
+   Grid2_file_dir = 'png'
+   Grid2_file_prefix = 'grid2'
+   Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+   
+   !Profile_Panels2_show_grid = .true.
+
+   Profile_Panels2_xaxis_name = 'logtau'
+   Profile_Panels2_xaxis_reversed = .true.
+   Profile_Panels2_xmin = -101D0
+   Profile_Panels2_xmax = -101D0
+
+   Profile_Panels2_dymin(4) = 0.02
+   
+/ ! end of pgstar namelist
+   
+

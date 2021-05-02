@@ -86,7 +86,7 @@ SRCS = \
    other_opacity_factor.f90 \
    other_adjust_mlt_gradt_fraction.f90 \
    other_after_set_mixing_info.f90 \
-   other_after_enter_setmatrix.f90 \
+   other_after_solver_setmatrix.f90 \
 	other_mlt_results.f90 \
    other_neu.f90 \
    other_net_get.f90 \

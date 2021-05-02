@@ -735,6 +735,8 @@
             call prepare_solver_matrix(s, nvar, xder, size(A,dim=1), A1, ierr)
             if (ierr /= 0) return
             call eval_equations(s, nvar, ierr)
+            if (ierr /= 0) return
+            call s% other_after_solver_setmatrix(s% id, ierr)
          end subroutine do_equations
 
 

@@ -434,8 +434,8 @@
             default_other_adjust_mlt_gradT_fraction
          use other_after_set_mixing_info, only: &
             default_other_after_set_mixing_info
-         use other_after_enter_setmatrix, only: &
-            default_other_after_enter_setmatrix
+         use other_after_solver_setmatrix, only: &
+            default_other_after_solver_setmatrix
          use other_diffusion, only: null_other_diffusion
          use other_diffusion_factor, only: default_other_diffusion_factor
          use other_neu, only: null_other_neu
@@ -613,7 +613,7 @@
          s% other_brunt_smoothing => null_other_brunt_smoothing
          s% other_adjust_mlt_gradT_fraction => default_other_adjust_mlt_gradT_fraction
          s% other_after_set_mixing_info => default_other_after_set_mixing_info
-         s% other_after_enter_setmatrix => default_other_after_enter_setmatrix
+         s% other_after_solver_setmatrix => default_other_after_solver_setmatrix
          s% other_diffusion => null_other_diffusion
          s% other_diffusion_factor => default_other_diffusion_factor
          s% other_mlt_results => null_other_mlt_results

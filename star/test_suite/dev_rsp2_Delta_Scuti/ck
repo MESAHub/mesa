@@ -1,0 +1,3 @@
+ndiff -relerr 1e-1 l1 l2 > d1; t d1
+
+

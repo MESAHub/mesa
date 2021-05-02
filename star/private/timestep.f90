@@ -51,6 +51,12 @@
 
          timestep_controller = do_timestep_limits(s, s% dt)
          if (timestep_controller /= keep_going) s% result_reason = timestep_limits
+         
+         if (s% force_timestep > 0) then
+            s% dt_next = s% force_timestep
+            s% why_Tlim = Tlim_force_timestep
+            return
+         end if
 
          ! strictly enforce maximum timestep
          max_dt = max_timestep

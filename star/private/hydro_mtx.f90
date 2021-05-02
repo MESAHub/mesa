@@ -853,9 +853,6 @@
          s% ublk(1:nvar,1:nvar,1:nz) => A1(1:i)
          s% dblk(1:nvar,1:nvar,1:nz) => A1(i+1:2*i)
          s% lblk(1:nvar,1:nvar,1:nz) => A1(2*i+1:3*i)
-         
-         ! delete this
-         call s% other_after_enter_setmatrix(s% id,ierr)
 
       end subroutine prepare_solver_matrix
 
