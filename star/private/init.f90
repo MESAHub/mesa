@@ -521,6 +521,7 @@
          s% RSP_flag = .false.
          s% RSP2_flag = .false.
          s% using_RSP2 = .false.
+         s% previous_step_was_using_RSP2 = .false.
          s% using_TDC = .false.
          
          s% have_mixing_info = .false.
