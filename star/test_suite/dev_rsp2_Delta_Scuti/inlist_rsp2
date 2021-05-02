@@ -39,7 +39,7 @@
    
    alt_scale_height_flag = .false.
 
-   tol_max_correction = 1d-8 ! 3d-3
+   tol_max_correction = 5d-7
 
    
 ! output
@@ -52,9 +52,11 @@
       !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      !terminal_interval = 10
 
+      !max_number_retries = 1
       !max_model_number = 6939
+      
 
 ! FOR DEBUGGING
       

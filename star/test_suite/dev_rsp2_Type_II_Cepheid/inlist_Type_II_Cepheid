@@ -46,7 +46,7 @@
    RSP2_num_innermost_cells_forced_nonturbulent = 5
 
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 1.58915d0 ! expected period (in days) 
+   x_ctrl(1) = 1.3171d0 ! expected period (in days) 
 
 / ! end of controls namelist
 

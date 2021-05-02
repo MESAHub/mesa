@@ -372,7 +372,7 @@
                if (abs(s% w(k)) < 1d0) then
                   s% correction_weight(s% i_w,k) = 0d0
                else
-                  s% correction_weight(s% i_w,k) = 1d0/abs(s% w(k)) ! this copies RSP
+                  s% correction_weight(s% i_w,k) = 1d0/(1d3 + abs(s% w(k))) ! don't sweat the small stuff
                end if
             end do
          else
