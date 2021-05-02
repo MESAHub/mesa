@@ -97,9 +97,6 @@
          integer :: cnt, i, j, k, nz
          integer :: id
          real(dp) :: dt, theta_dt
-
-         logical, parameter :: skip_partials = .false.
-
          include 'formats'
 
          ierr = 0
@@ -132,7 +129,7 @@
                end do
             end do
             if (dbg) write(*, *) 'call eval_equ'
-            call eval_equ(s, nvar, skip_partials, ierr)
+            call eval_equ(s, nvar, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*, *) 'eval_equations: eval_equ returned ierr', ierr

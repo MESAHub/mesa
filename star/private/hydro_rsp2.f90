@@ -143,11 +143,10 @@
       end subroutine set_RSP2_vars
 
 
-      subroutine do1_rsp2_L_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_rsp2_L_eqn(s, k, nvar, ierr)
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          type(auto_diff_real_star_order1) ::  &
             L_expected, L_actual,resid
@@ -182,7 +181,6 @@
             s% solver_test_partials_val = residual 
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_rsp2_L_eqn', ierr)
          if (ierr /= 0) return
 
@@ -194,11 +192,10 @@
       end subroutine do1_rsp2_L_eqn
       
 
-      subroutine do1_rsp2_Hp_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_rsp2_Hp_eqn(s, k, nvar, ierr)
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          type(auto_diff_real_star_order1) ::  &
             Hp_expected, Hp_actual,resid
@@ -232,7 +229,6 @@
             s% solver_test_partials_val = residual 
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp2_Hp_eqn', ierr)
          if (ierr /= 0) return
 
@@ -316,11 +312,10 @@
       end function Hp_face_for_rsp2_eqn
 
 
-      subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_turbulent_energy_eqn(s, k, nvar, ierr)
          use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          integer :: j
          ! for OLD WAY
@@ -377,7 +372,6 @@
                write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, s% i_detrb_dt, resid_ad, 'do1_turbulent_energy_eqn', ierr)
          if (ierr /= 0) return
 

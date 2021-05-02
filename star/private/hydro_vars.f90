@@ -384,7 +384,8 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: r_phot, L_surf
-         logical, parameter :: skip_partials = .true., &
+         !logical, parameter :: skip_partials = .true., &      ! TEST
+         logical, parameter :: skip_partials = .false., &
             need_atm_Psurf = .false., need_atm_Tsurf = .false.
          real(dp) :: Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
