@@ -129,8 +129,8 @@
          if (ierr /= 0) return
          
          if (s% x_ctrl(1) > 0d0) then
-            if (s% time/secyer < s% max_age) then
-               write(*,1) 'failed to reach max age', s% time/secyer, s% max_age
+            if (s% star_age < s% max_age) then
+               write(*,1) 'failed to reach max age', s% star_age, s% max_age
             else
                nz = s% nz
                species = s% species

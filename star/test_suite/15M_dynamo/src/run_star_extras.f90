@@ -89,7 +89,7 @@
          if (.not. s% x_logical_ctrl(1)) return
          
          write(*,*)
-         call check('star_mass', s% mstar/msun, 12.5d0, 14.0d0)
+         call check('star_mass', s% star_mass, 12.5d0, 14.0d0)
          call check('log total_angular_momentum', safe_log10(s% total_angular_momentum), 50d0, 52.5d0)
          call check('log center_omega', safe_log10(s% center_omega), -5.0d0, -3.0d0)
          call check('log he_core_omega', safe_log10(s% he_core_omega), -5.0d0, -3.0d0)

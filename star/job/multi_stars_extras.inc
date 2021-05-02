@@ -71,7 +71,7 @@
             call star_ptr(star_ids(i), s, ierr)
             if (failed('star_ptr',ierr)) return
             
-            if (s% time/secyer >= stopping_age) then
+            if (s% star_age >= stopping_age) then
                write(*,*) 'stars have reached stopping age'
                exit
             end if
@@ -118,8 +118,8 @@
                if (star_done(i)) cycle
                call star_ptr(star_ids(i), s, ierr)
                if (failed('star_ptr',ierr)) return
-               if (s% time/secyer < age_min) then
-                  age_min = s% time/secyer
+               if (s% star_age < age_min) then
+                  age_min = s% star_age
                   select_youngest_star = i
                end if
             end do

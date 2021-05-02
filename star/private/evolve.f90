@@ -168,9 +168,11 @@
             call set_to_NaN(s% d_vc_dv)
             call set_to_NaN(s% delta_Pg)
             call set_to_NaN(s% delta_nu)
+            call set_to_NaN(s% dt_days)
             call set_to_NaN(s% dt_limit_ratio_old)
             call set_to_NaN(s% dt_old)
             call set_to_NaN(s% dt_start)
+            call set_to_NaN(s% dt_years)
             call set_to_NaN(s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot)               
             call set_to_NaN(s% error_in_energy_conservation)
             call set_to_NaN(s% explicit_mstar_dot)
@@ -246,6 +248,7 @@
             call set_to_NaN(s% shock_mass_start)
             call set_to_NaN(s% solver_test_partials_dval_dx)
             call set_to_NaN(s% solver_test_partials_val)
+            call set_to_NaN(s% star_age)
             call set_to_NaN(s% starting_T_center)
             call set_to_NaN(s% super_eddington_wind_mdot)
             call set_to_NaN(s% surf_accel_grav_ratio)
@@ -255,7 +258,10 @@
             call set_to_NaN(s% surf_rho)
             call set_to_NaN(s% surface_cell_specific_total_energy_old)
             call set_to_NaN(s% tau_center)  
+            call set_to_NaN(s% time_days)
             call set_to_NaN(s% time_old)
+            call set_to_NaN(s% time_step)
+            call set_to_NaN(s% time_years)
             call set_to_NaN(s% total_WD_sedimentation_heating)
             call set_to_NaN(s% total_abs_angular_momentum)
             call set_to_NaN(s% total_angular_momentum)
@@ -606,6 +612,7 @@
             
             dt = s% dt
             s% time = s% time_old + dt
+            s% star_age = s% time/secyer
             s% okay_to_set_mixing_info = .true.
 
             if (s% v_center /= 0d0) then ! adjust R_center               
@@ -708,7 +715,6 @@
             do_step_part2 = do_struct_burn_mix(s, skip_global_corr_coeff_limit)
             s% doing_struct_burn_mix = .false.
             if (do_step_part2 /= keep_going) return
-
             ! when reach here, have taken the step successfully
             ! but might not satisfy the implicit mdot requirements.
             mdot_action = select_mdot_action(ierr)
@@ -2121,8 +2127,6 @@
          if (s% RSP_flag) then
             pick_next_timestep = keep_going
             s% dt_next = s% RSP_dt
-            if (s% dt_next /= s% force_timestep .and. s% force_timestep > 0) &
-               s% dt_next = s% force_timestep
             s% dt_next_unclipped = s% dt_next
             s% why_Tlim = Tlim_max_timestep
             return
@@ -2160,7 +2164,7 @@
          else if (s% num_adjusted_dt_steps_before_max_age > 0 .and. &
                   s% max_years_for_timestep > 0) then
             if (s% max_age > 0) then
-               remaining_years = s% max_age - s% time/secyer
+               remaining_years = s% max_age - s% star_age
             else if (s% max_age_in_days > 0) then
                remaining_years = (s% max_age_in_days*(60*60*24) - s% time)/secyer
             else if (s% max_age_in_seconds > 0) then
@@ -2471,6 +2475,7 @@
          if (ierr /= 0) return
          write(*,1) 'set_age', age
          s% time = age*secyer
+         s% star_age = age
       end subroutine set_age
 
 

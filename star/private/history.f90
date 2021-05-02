@@ -288,7 +288,7 @@
 
          if (s% initial_mass > s% he_core_mass) then
             envelope_fraction_left = &
-               (s% mstar/Msun - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
+               (s% star_mass - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
          else
             envelope_fraction_left = 1
          end if
@@ -1271,43 +1271,43 @@
                int_val = s% model_number
                
             case(h_log_star_age)
-               val = safe_log10(s% time/secyer)
+               val = safe_log10(s% star_age)
             case(h_star_age)
-               val = s% time/secyer
+               val = s% star_age
             case(h_log_star_age_sec)
-               val = safe_log10(s% time)
+               val = safe_log10(s% star_age*secyer)
             case(h_star_age_sec)
-               val = s% time
+               val = s% star_age*secyer
             case(h_star_age_min)
-               val = s% time/60
+               val = s% star_age*secyer/60
             case(h_star_age_hr)
-               val = s% time/60/60
+               val = s% star_age*secyer/60/60
             case(h_star_age_day)
-               val = s% time/60/60/24
+               val = s% star_age*secyer/60/60/24
             case(h_day)
-               val = s% time/60/60/24
+               val = s% star_age*secyer/60/60/24
 
             case(h_time_step)
-               val = s% dt/secyer
+               val = s% time_step
             case(h_log_dt)
-               val = safe_log10(s% dt/secyer)
+               val = safe_log10(s% time_step)
             case(h_time_step_sec)
-               val = s% dt
+               val = s% time_step*secyer
             case(h_log_dt_sec)
-               val = safe_log10(s% dt)
+               val = safe_log10(s% time_step*secyer)
             case(h_time_step_days)
-               val = s% dt/60/60/24
+               val = s% time_step*secyer/60/60/24
             case(h_log_dt_days)
-               val = safe_log10(s% dt/60/60/24)
+               val = safe_log10(s% time_step*secyer/60/60/24)
 
             case(h_log_star_mass)
-               val = safe_log10(s% mstar/Msun)
+               val = safe_log10(s% star_mass)
             case(h_star_mass)
-               val = s% mstar/Msun
+               val = s% star_mass
             case(h_log_xmstar)
                val = safe_log10(s% xmstar)
             case(h_delta_mass)
-               val = s% mstar/Msun - s% initial_mass
+               val = s% star_mass - s% initial_mass
             case(h_star_mdot)
                val = s% star_mdot
             case(h_log_abs_mdot)
@@ -1337,11 +1337,11 @@
                if (s% v_center < 0d0) val = -s% v_center/s% csound(s% nz)
 
             case(h_mdot_timescale)
-               val = s% mstar/Msun/max(1d-99,abs(s% star_mdot))
+               val = s% star_mass/max(1d-99,abs(s% star_mdot))
 
             case(h_kh_div_mdot_timescales)
                val = s% kh_timescale/ &
-                  (s% mstar/Msun/max(1d-99,abs(s% star_mdot)))
+                  (s% star_mass/max(1d-99,abs(s% star_mdot)))
             case(h_dlnR_dlnM)
                if (abs(s% star_mdot) > 1d-99) &
                   val = (s% lnR(1) - s% lnR_start(1)) / &
@@ -1595,7 +1595,7 @@
             case(h_photosphere_m)
                val = s% photosphere_m
             case(h_photosphere_xm)
-               val = s% mstar/Msun - s% photosphere_m
+               val = s% star_mass - s% photosphere_m
             case(h_photosphere_L)
                val = s% photosphere_L
             case(h_photosphere_r)
@@ -1915,7 +1915,7 @@
 
             case (h_kh_mdot_limit)
                if(s% rotation_flag) then
-                  val = s% rotational_mdot_kh_fac*s% mstar/Msun/s% kh_timescale
+                  val = s% rotational_mdot_kh_fac*s% star_mass/s% kh_timescale
                else
                   val = 0d0
                end if
@@ -2007,7 +2007,7 @@
                   val = 1.0d0
                end if
             case(h_h_rich_layer_mass)
-               val = s% mstar/Msun - s% he_core_mass
+               val = s% star_mass - s% he_core_mass
             case(h_he_rich_layer_mass)
                val = max(0d0, s% he_core_mass - s% co_core_mass)
             case(h_co_rich_layer_mass)
@@ -2114,7 +2114,7 @@
                is_int_val = .true.
 
             case(h_envelope_mass)
-               val = s% mstar/Msun - s% he_core_mass
+               val = s% star_mass - s% he_core_mass
             case(h_envelope_fraction_left)
                val = envelope_fraction_left
             case(h_dynamic_timescale)
@@ -2591,7 +2591,7 @@
                   val = 1d6/(2*s% photosphere_acoustic_r) ! microHz
                else
                   val = &
-                     s% delta_nu_sun*sqrt(s% mstar/Msun)*pow3(s% Teff/s% Teff_sun) / &
+                     s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
                         pow(s% L_phot,0.75d0)
                end if
             case(h_delta_Pg)
@@ -2798,7 +2798,7 @@
                val = safe_log10(s% power_nuc_burn)
                
             case(h_H_rich)
-               val = s% mstar/Msun - max(s% he_core_mass, s% co_core_mass)
+               val = s% star_mass - max(s% he_core_mass, s% co_core_mass)
 
             case(h_N_cntr)
                val = s% center_n14
@@ -2825,7 +2825,7 @@
                val = s% center_ne20
 
             case(h_Mass)
-               val = s% mstar/Msun
+               val = s% star_mass
 
             case(h_H_cntr)
                val = s% center_h1
@@ -3239,7 +3239,7 @@
 
          if (s% initial_mass > s% he_core_mass) then
             envelope_fraction_left = &
-               (s% mstar/Msun - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
+               (s% star_mass - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
          else
             envelope_fraction_left = 1
          end if

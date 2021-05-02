@@ -82,7 +82,8 @@
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% have_mlt_vc, s% species, s% num_reactions, &
-            s% model_number, s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
+            s% model_number, s% star_mass, &
+            s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
             s% time, s% dt, s% have_previous_conv_vel, &
             s% was_in_implicit_wind_limit, &
             s% using_revised_net_name, &

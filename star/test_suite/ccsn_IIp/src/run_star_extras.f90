@@ -478,7 +478,7 @@
             tp_L_eq_Lnuc = 0
             stop_m = 0
             initial_M_center = s% M_center
-            initial_mass = s% mstar/msun
+            initial_mass = s% star_mass
             initial_time = s% time
             initial_he_core_mass = s% he_core_mass
             call alloc_extra_info(s)
@@ -597,16 +597,16 @@
                case (3)
                   do k=1,s% nz
                      if (s% xa(he4,k) > s% xa(h1,k)) then
-                        stop_m = 0.95d0*s% m(k)/Msun + 0.05d0*(s% mstar/msun - 0.1d0)
+                        stop_m = 0.95d0*s% m(k)/Msun + 0.05d0*(s% star_mass - 0.1d0)
                         exit
                      end if
                   end do
                   if (stop_m == 0d0) stop 'failed to find stop_m'
                case (4)
-                  stop_m = s% mstar/msun - s% x_ctrl(16)
+                  stop_m = s% star_mass - s% x_ctrl(16)
                case (5)
                   if (s% x_ctrl(16) > 0d0) &
-                     stop_m = s% mstar/msun - s% x_ctrl(16)
+                     stop_m = s% star_mass - s% x_ctrl(16)
                case (6)
                end select
             end if
@@ -614,14 +614,14 @@
          end if ! not restart
          
          write(*,1) 's% x_ctrl(16)', s% x_ctrl(16)
-         write(*,1) 'star_mass', s% mstar/msun
+         write(*,1) 's% star_mass', s% star_mass
          write(*,1) 'start_m', start_m
          write(*,1) 'stop_m', stop_m
          
          !if (stop_m < start_m) stop 'bad stop_m'
          
          if (s% x_ctrl(16) > 0d0) &
-               stop_m = min(stop_m, s% mstar/msun - s% x_ctrl(16))
+               stop_m = min(stop_m, s% star_mass - s% x_ctrl(16))
          
          if (start_m > stop_m .and. stop_m > 0d0) then
             write(*,1) 'start_m > stop_m', start_m, stop_m
@@ -631,10 +631,10 @@
          if (stop_m > 0d0) then
             s% x_ctrl(2) = stop_m
             write(*,1) 'stop when shock reaches', stop_m
-            write(*,1) 'he_core_mass', s% he_core_mass
-            write(*,1) 'co_core_mass', s% co_core_mass
-            write(*,1) 'M_center/Msun', s% M_center/Msun
-            write(*,1) 'star_mass', s% mstar/msun
+            write(*,1) 's% he_core_mass', s% he_core_mass
+            write(*,1) 's% co_core_mass', s% co_core_mass
+            write(*,1) 's% M_center/Msun', s% M_center/Msun
+            write(*,1) 's% star_mass', s% star_mass
             write(*,*)
             !stop
          end if
@@ -1072,7 +1072,7 @@
          if (s% x_integer_ctrl(1) == 1 .and. s% model_number >= 1000) &
             s% max_timestep = 0 ! turn off limit
             
-         age_days = s% time/(24*60*60)
+         age_days = s% star_age*365.25d0
          
          if (s% x_ctrl(14) > 0 .and. age_days >= s% x_ctrl(14) .and. &
                s% RTI_C > 0d0) then

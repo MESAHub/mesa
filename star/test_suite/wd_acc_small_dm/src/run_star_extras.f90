@@ -123,7 +123,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
 
-         ok =  check_accretion_profile_ok( s%nz, s%species, s%dm, s%xa, s% time/secyer * s% star_mdot)
+         ok =  check_accretion_profile_ok( s%nz, s%species, s%dm, s%xa, s% star_age * s% star_mdot)
          if (.not. ok) write(*,*) 'check_accretion_profile_ok failed'
          all_ok = all_ok .and. ok
 
@@ -229,7 +229,7 @@
          ! default return is terminate
          if (ierr /= 0) return
 
-         ok = check_initial_accretion_ok( s%nz, s%species, s%dm, s%xa, s% time/secyer * s% star_mdot)
+         ok = check_initial_accretion_ok( s%nz, s%species, s%dm, s%xa, s% star_age * s% star_mdot)
          if (.not. ok) write(*,*) 'check_initial_accretion_ok failed for step', s% model_number
          all_ok = all_ok .and. ok
 

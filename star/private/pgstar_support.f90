@@ -1969,7 +1969,7 @@
          real :: ch
          integer :: len, i, j, iE, n
          if (.not. s% pgstar_show_age) return
-         age = s% time/secyer
+         age = s% star_age
          if (s% pgstar_show_age_in_seconds) then
             age = age*secyer
             units_str = 'secs'

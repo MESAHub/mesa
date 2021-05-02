@@ -193,7 +193,7 @@ contains
     global_data(9) = r_outer**2*d2P_dr2_c/P_c
     global_data(10) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
 
-    global_data(11) = s% time/secyer
+    global_data(11) = s%star_age
     if (s%rotation_flag) then
        global_data(12) = s%omega(1)
     else

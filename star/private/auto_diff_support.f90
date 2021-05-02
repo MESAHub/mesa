@@ -342,6 +342,15 @@
             w_p1 % d1Array(i_w_p1) = 1d0
          end if
       end function wrap_w_p1
+
+      function wrap_dxh_w(s, k) result(dxh_w)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: dxh_w
+         integer, intent(in) :: k
+         dxh_w = 0d0 
+         dxh_w % val = s%dxh_w(k)
+         dxh_w % d1Array(i_w_00) = 1d0
+      end function wrap_dxh_w
       
       real(dp) function get_etrb(s,k)
          type (star_info), pointer :: s

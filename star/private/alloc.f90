@@ -629,6 +629,8 @@
             if (failed('dxh_v')) exit
             call do1(s% dxh_u, c% dxh_u)
             if (failed('dxh_u')) exit
+            call do1(s% dxh_w, c% dxh_w)
+            if (failed('dxh_w')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)

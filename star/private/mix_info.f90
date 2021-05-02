@@ -132,7 +132,7 @@
                s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))
-               if (abs(s% Lt(k)) > abs(s% Lc(k)) .and. abs(s% Lt(k)) > &
+               if (abs(s% Lt(k)) > &
                      L_val*s% RSP2_min_Lt_div_L_for_overshooting_mixing_type) then
                   s% mixing_type(k) = overshoot_mixing
                else if (abs(s% Lc(k)) > &

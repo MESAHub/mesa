@@ -901,13 +901,21 @@
          real(dp) :: integral, N2, omega2, kr2, L2, el, &
             dr, r, r2, cs2, sl2, I_integral, I_integral_limit
          integer :: k, k_sl2
+         logical, parameter :: dbg = .false.
          include 'formats'
+         if (dbg) then
+            write(*,2) 'nu_max', s% model_number, nu_max
+            write(*,2) 's% star_mass', s% model_number, s% star_mass
+            write(*,2) 's% photosphere_r', s% model_number, s% photosphere_r
+            write(*,2) 's% Teff', s% model_number, s% Teff
+         end if
          delta_Pg = 0
          if (.not. s% calculate_Brunt_N2) return
          integral = 0
          I_integral = 0
          I_integral_limit = 0.5d0
          omega2 = pow2(2*pi*nu_max/1d6)
+         if (dbg) write(*,1) 'log omega2', log10(omega2)
          el = 1
          L2 = el*(el+1)
          k_sl2 = 0
@@ -923,11 +931,14 @@
             end if
             if (k_sl2 == 0) then
                k_sl2 = k
+               if (dbg) write(*,2) 'k_sl2', k
             end if
             if (N2 > omega2) then ! in g-cavity
+               if (dbg .and. integral == 0) write(*,2) 'enter g-cavity', k
                integral = integral + sqrt(N2)*dr/r
             else ! in decay region
                if (integral == 0) cycle ! ! haven't been in g-cavity yet
+               if (dbg .and. I_integral == 0) write(*,2) 'enter decay', k
                ! in decay region below g-cavity; I_integral estimates decay
                kr2 = (1 - n2/omega2)*(1 - Sl2/omega2)*omega2/cs2
                I_integral = I_integral + sqrt(-kr2)*dr
@@ -935,9 +946,14 @@
             end if
          end do
 
+         if (dbg) write(*,2) 'omega2 nu_max integral I_integral', &
+            s% model_number, omega2, nu_max, integral, I_integral
+
          if (integral == 0) return
          delta_Pg = sqrt(2d0)*pi*pi/integral
          if (is_bad(delta_Pg)) delta_Pg = 0
+
+         if (dbg) write(*,2) 'delta_Pg', s% model_number, delta_Pg
 
       end subroutine get_delta_Pg
 

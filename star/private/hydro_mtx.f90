@@ -823,47 +823,22 @@
       end subroutine edit_dlnR_dt_above_k_below_just_added
 
 
-      subroutine enter_setmatrix(s, &
-            nvar, xder, need_solver_to_eval_jacobian, &
-            ldA, A1, ierr)
-         use mtx_def, only: lapack
-         use rsp_def, only: ABB, LD_ABB, NV, MAX_NZN
+      subroutine prepare_solver_matrix(s, nvar, xder, ldA, A1, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
-         logical, intent(out) :: need_solver_to_eval_jacobian
          integer, intent(in) :: ldA ! leading dimension of A
          real(dp), pointer, dimension(:) :: A1
          integer, intent(out) :: ierr
 
          real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
          integer :: i, j, nz, neqns
-         real(dp) :: dt
-         integer :: id, nvar_hydro
-         logical :: dbg_enter_setmatrix, do_chem
-         real(dp), pointer :: blk3(:, :, :, :)
 
          include 'formats'
-
-         dbg_enter_setmatrix = dbg
 
          ierr = 0
          nz = s% nz
          neqns = nvar*nz
-         
-         if (dbg_enter_setmatrix) write(*, '(/,/,/,/,/,/,a)') 'enter_setmatrix'
-
-         if (s% model_number == 1) then
-            s% num_solver_iterations = s% num_solver_iterations + 1
-            if (s% num_solver_iterations > 60 .and. &
-                  mod(s% num_solver_iterations,10) == 0) &
-               write(*,*) 'first model is slow to converge: num tries', &
-                  s% num_solver_iterations
-         end if
-
-         dt = s% dt
-
-         do_chem = (s% do_burn .or. s% do_mix)
 
          s% jacobian(1:ldA,1:neqns) => A1(1:ldA*neqns)
          A(1:ldA,1:neqns) => A1(1:ldA*neqns)
@@ -875,40 +850,18 @@
          end do
          i = nvar*nvar*nz
          if (size(A1,dim=1) < 3*i) then
-            write(*,*) 'enter_setmatrix: size(A1,dim=1) < 3*i', size(A1,dim=1), 3*i
+            write(*,*) 'prepare_solver_matrix: size(A1,dim=1) < 3*i', size(A1,dim=1), 3*i
             ierr = -1
             return
          end if
          s% ublk(1:nvar,1:nvar,1:nz) => A1(1:i)
          s% dblk(1:nvar,1:nvar,1:nz) => A1(i+1:2*i)
          s% lblk(1:nvar,1:nvar,1:nz) => A1(2*i+1:3*i)
-
-         if (dbg_enter_setmatrix) &
-            write(*, *) 'call eval_partials with doing_check_partials = .false.'
-         call eval_partials(s, nvar, ierr)
-         if (ierr /= 0) return
-
+         
+         ! delete this
          call s% other_after_enter_setmatrix(s% id,ierr)
 
-         if (dbg_enter_setmatrix) write(*, *) 'finished enter_setmatrix'
-         need_solver_to_eval_jacobian = .false.
-
-      end subroutine enter_setmatrix
-
-
-      subroutine eval_partials(s, nvar, ierr)
-         use hydro_eqns, only: eval_equ
-         type (star_info), pointer :: s
-         integer, intent(in) :: nvar
-         integer, intent(out) :: ierr
-         logical, parameter :: skip_partials = .false.
-         ierr = 0
-         call eval_equ(s, nvar, skip_partials, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*, *) 'eval_partials: eval_equ returned ierr', ierr
-            return
-         end if
-      end subroutine eval_partials
+      end subroutine prepare_solver_matrix
 
 
       end module hydro_mtx

@@ -339,13 +339,13 @@
             ! measure MS lifetime
             if (ms_t0 .eq. 0) then
                if (s% power_h_burn .gt. 0.99 * s% L_surf) then
-                  ms_t0 = s% time/secyer
+                  ms_t0 = s% star_age
                   write(*,*) 'started MS', ms_t0
                end if
             else
                if (ms_t1 .eq. 0) then
                   if (s% center_h1 .lt. 1d-4) then
-                     ms_t1 = s% time/secyer
+                     ms_t1 = s% star_age
                      write(*,*) 'finished MS', ms_t1
                   end if
                end if
@@ -354,13 +354,13 @@
             ! measure CHeB lifetime
             if ((ms_t1 .ne. 0) .and. (cheb_t0 .eq. 0)) then
                if (s% power_he_burn .gt. 0.01 * s% L_surf) then
-                  cheb_t0 = s% time/secyer
+                  cheb_t0 = s% star_age
                   write(*,*) 'started CHeB', cheb_t0
                end if
             else
                if (cheb_t1 .eq. 0) then
                   if (s% center_he4 .lt. 1d-4) then
-                     cheb_t1 = s% time/secyer
+                     cheb_t1 = s% star_age
                      write(*,*) 'finished CHeB', cheb_t1
                      mcore_TACHeB = s% he_core_mass
                   end if
@@ -370,7 +370,7 @@
             ! measure extent of 1DUP
             if ((ms_t1 .gt. 0) .and. (cheb_t0 .eq. 0)) then
                if ((s% conv_mx1_top - s% conv_mx1_bot) .gt. 0.1) then
-                  m_1DUP = min(s% conv_mx1_bot * s% mstar/msun, m_1DUP)
+                  m_1DUP = min(s% conv_mx1_bot * s% star_mass, m_1DUP)
                end if
             end if
 
@@ -384,15 +384,15 @@
                   TP_count = TP_count + 1
                   write(*,*) 'starting thermal pulse', TP_count
                   mcore_at_TP = s% he_core_mass
-                  age_at_TP = s% time/secyer
+                  age_at_TP = s% star_age
                   mcore_min_after_TP = mcore_at_TP
                   if (TP_count == 1) then
                      mcore_1TP = s% he_core_mass
-                     age_1TP = s% time/secyer
+                     age_1TP = s% star_age
                   end if
                   if ((TP_with_3DUP > 0) .and. (TP_count - TP_with_3DUP == 1)) then
                      mcore_2TP_with_3DUP = s% he_core_mass
-                     age_2TP_with_3DUP = s% time/secyer
+                     age_2TP_with_3DUP = s% star_age
                   end if
                end if
             else
@@ -529,7 +529,7 @@
                   pocket_mass_c13 = pocket_mass_c13 + s% dq(k)
                end if
             end do
-            pocket_mass_c13 = pocket_mass_c13*s% mstar/msun ! mass in Msun units
+            pocket_mass_c13 = pocket_mass_c13*s% star_mass ! mass in Msun units
 
             delta_surface_c12 = s% surface_c12 - initial_surface_c12
 

@@ -122,7 +122,7 @@ contains
     global_data(1) = m_outer
     global_data(2) = log10(s%L(1)/Lsun)
     global_data(3) = log10(r_outer/Rsun)
-    global_data(4) = s% time/secyer
+    global_data(4) = s%star_age
                
     ! Store point data
 

@@ -68,7 +68,7 @@
          call test_suite_startup(s, restart, ierr)
 
          h_upper_limit = s% x_ctrl(1)
-         h_env_mass = s% mstar/msun - s% he_core_mass
+         h_env_mass = s% star_mass - s% he_core_mass
 
          if(h_env_mass < h_upper_limit) then
             ! Turn off winds because already below specified threshold.
@@ -103,7 +103,7 @@
          h_upper_limit = s% x_ctrl(1)
          h_lower_limit = (1d0 - s% x_ctrl(2))*h_upper_limit
          
-         h_env_mass = s% mstar/msun - s% he_core_mass
+         h_env_mass = s% star_mass - s% he_core_mass
 
          if(h_env_mass > h_upper_limit) then
             extras_check_model = keep_going

@@ -309,8 +309,24 @@
          call set_surf_avg_rotation_info(s)
          
          call set_min_gamma1(s)
+
+         ! s% time is in seconds
+         s% star_age = s% time/secyer
+         s% time_years = s% time/secyer
+         s% time_days = s% time/dble(60*60*24)
+         if ( s% model_number <= 0 ) then
+            s% star_age = 0d0
+            s% time_days = 0d0
+            s% time_years = 0d0
+         end if
+         
+         ! s% dt is in seconds
+         s% time_step = s% dt/secyer         ! timestep in years
+         s% dt_years = s% dt/secyer
+         s% dt_days = s% dt/dble(60*60*24)
          
          mstar = s% mstar
+         s% star_mass = mstar/Msun             ! stellar mass in solar units
 
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)
@@ -325,11 +341,10 @@
          end if
          
          if (luminosity > 0d0) then
-            s% nuc_timescale = 1d10*(mstar/Msun)/(luminosity/Lsun)
+            s% nuc_timescale = 1d10*s% star_mass/(luminosity/Lsun)
          else
             s% nuc_timescale = 1d99
          end if
-         
          ! nuclear timescale in years (e.g., about 10^10 years for sun)
          if (s% cgrav(1) <= 0d0) then
             s% dynamic_timescale = 1d99
@@ -440,14 +455,14 @@
             s% delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
          else
             s% delta_nu = &
-               s% delta_nu_sun*sqrt(s% mstar/Msun)*pow3(s% Teff/s% Teff_sun) / &
+               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
                   pow(s% L_phot,0.75d0)
          end if
          
          call get_mass_info(s, s% dm, ierr)
          if (failed('get_mass_info')) return
          
-         s% nu_max = s% nu_max_sun*s% mstar/Msun/ &
+         s% nu_max = s% nu_max_sun*s% star_mass/ &
             (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
          s% acoustic_cutoff = &
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
@@ -580,7 +595,7 @@
                   return
                end if
             end do
-            s% mass_semiconv_core = s% mstar/Msun
+            s% mass_semiconv_core = s% star_mass
          end subroutine set_mass_semiconv_core
 
 
@@ -1005,7 +1020,7 @@
          real(dp) :: bdy_omega_crit
 
          bdy_time = 0
-         bdy_m = s% mstar/Msun
+         bdy_m = s% star_mass
          bdy_r = s% r(1)/Rsun
          bdy_lgT = s% lnT(1)/ln10
          bdy_lgRho = s% lnd(1)/ln10
@@ -1377,7 +1392,7 @@
             return
          end if
          if (k <= 1) then
-            bdy_m = s% mstar/Msun
+            bdy_m = s% star_mass
             bdy_r = s% r(1)/Rsun
             bdy_lgT = s% lnT(1)/ln10
             bdy_lgRho = s% lnd(1)/ln10

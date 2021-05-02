@@ -98,7 +98,7 @@
          integer :: id
          real(dp) :: dt, theta_dt
 
-         logical, parameter :: skip_partials = .true.
+         logical, parameter :: skip_partials = .false.
 
          include 'formats'
 

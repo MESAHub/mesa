@@ -311,7 +311,7 @@
                else if (j == i_w) then
                   do k=1,nz
                      s% w(k) = s% xh(i_w, k)
-                     if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+                     s% dxh_w(k) = 0d0
                   end do
                else if (j == i_Hp) then
                   do k=1,nz

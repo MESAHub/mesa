@@ -674,14 +674,13 @@
       
       
       subroutine rsp_dump_for_debug(s)
-         use const_def, only: Msun
          type (star_info), pointer :: s
          integer :: k
          include 'formats'
          write(*,*) 'rsp_dump_for_debug'
          write(*,2) 'R_center', s% model_number, s% R_center
          write(*,2) 'xmstar', s% model_number, s% xmstar
-         write(*,2) 'M/Msun', s% model_number, s% mstar/Msun
+         write(*,2) 'M/Msun', s% model_number, s% star_mass
          write(*,2) 's% R_center', s% model_number, s% R_center
          write(*,4) 'species', s% model_number, s% species
          write(*,2) 'm_center', s% model_number, s% M_center

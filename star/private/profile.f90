@@ -483,8 +483,8 @@
                call do_integer(i, 'num_zones', s% nz)
                call do_val(i, 'initial_mass', s% initial_mass)
                call do_val(i, 'initial_z', s% initial_z)
-               call do_val(i, 'star_age', s% time/secyer)
-               call do_val(i, 'time_step', s% dt/secyer)
+               call do_val(i, 'star_age', s% star_age)
+               call do_val(i, 'time_step', s% time_step)
 
                if (s% M_center /= 0d0) &
                   call do_val(i, 'M_center', s% M_center)
@@ -507,7 +507,7 @@
                call do_val(i, 'center_n14', s% center_n14)
                call do_val(i, 'center_o16', s% center_o16)
                call do_val(i, 'center_ne20', s% center_ne20)
-               call do_val(i, 'star_mass', s% mstar/Msun)
+               call do_val(i, 'star_mass', s% star_mass)
                call do_val(i, 'star_mdot', s% star_mdot)
                call do_val(i, 'star_mass_h1', s% star_mass_h1)
                call do_val(i, 'star_mass_he3', s% star_mass_he3)

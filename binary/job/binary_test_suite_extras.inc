@@ -44,7 +44,7 @@ subroutine test_suite_testhub_end(b, ierr)
    ! model information
    ! these quantities can be cumulative as they are stored in saved models
    write(iounit,'(6X, A, I12)') 'model_number: ', b% s1% model_number
-   write(iounit,'(6X, A, ES26.16)') 'star_age: ', b% s1% time/secyer
+   write(iounit,'(6X, A, ES26.16)') 'star_age: ', b% s1% star_age
    write(iounit,'(6X, A, I12)') 'num_retries: ', b% s1% num_retries
    write(iounit,'(6X, A, F26.16)') 'log_rel_run_E_err: ', max(val1, val2)
 

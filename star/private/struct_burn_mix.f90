@@ -258,7 +258,6 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          integer :: ierr
-         include 'formats'
          do_rsp_step = keep_going
          ierr = 0
          call rsp_one_step(s,ierr)

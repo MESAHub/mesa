@@ -30,8 +30,6 @@ module overshoot_step
   use star_private_def
 
   use overshoot_utils
-  
-  use const_def, only: Msun
 
   ! No implicit typing
 
@@ -99,9 +97,9 @@ contains
 
     ! Apply mass limits
 
-    if (s%mstar/Msun < s%overshoot_mass_full_on(j)) then
-       if (s%mstar/Msun > s%overshoot_mass_full_off(j)) then
-          w = (s%mstar/Msun - s%overshoot_mass_full_off(j)) / &
+    if (s%star_mass < s%overshoot_mass_full_on(j)) then
+       if (s%star_mass > s%overshoot_mass_full_off(j)) then
+          w = (s%star_mass - s%overshoot_mass_full_off(j)) / &
               (s%overshoot_mass_full_on(j) - s%overshoot_mass_full_off(j))
           factor = 0.5_dp*(1._dp - cospi(w))
           f = f*factor

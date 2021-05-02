@@ -133,9 +133,9 @@
 
 &pgstar
 
-   !pause = .true.
+   pause = .true.
    !pause_interval = 100
-   pgstar_interval = 5 ! 10
+   pgstar_interval = 1 ! 10
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'

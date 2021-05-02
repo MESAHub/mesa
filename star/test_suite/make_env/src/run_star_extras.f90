@@ -202,6 +202,7 @@
          s% mstar = s% x_ctrl(1)*Msun
          s% xmstar = s% x_ctrl(2)*s% mstar
          s% M_center = s% mstar - s% xmstar
+         s% star_mass = s% mstar/Msun
 
          call star_set_net(id, net_name, ierr)
          if (ierr /= 0) stop 'failed in star_set_net'    
@@ -353,7 +354,7 @@
          end do
          
          s% model_number = 0
-         s% time = 0d0
+         s% star_age = 0
                      
          write(*,2) 'start.mod', nz
          call star_write_model(id, 'start.mod', ierr)

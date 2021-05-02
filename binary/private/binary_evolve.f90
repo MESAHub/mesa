@@ -277,7 +277,7 @@
          end if
 
          b% m(b% d_i) = b% s_donor% mstar
-         b% dt = b% s_donor% dt
+         b% time_step = b% s_donor% time_step
          if (b% point_mass_i == 0) then
             b% m(b% a_i) = b% s_accretor% mstar
          else if (.not. b% model_twins_flag) then

@@ -1572,7 +1572,7 @@
          end if
          
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
-            chi2term = pow2((s% time/secyer - age_target)/age_sigma)
+            chi2term = pow2((s% star_age - age_target)/age_sigma)
             if (trace_okay .and. trace_chi2_spectro_info) &
                write(*,2) 'chi2_spectro_term age', s% model_number, chi2term
             chi2sum2 = chi2sum2 + chi2term
