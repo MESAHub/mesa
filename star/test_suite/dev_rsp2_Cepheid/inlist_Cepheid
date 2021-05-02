@@ -43,8 +43,8 @@
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
 
-   x_integer_ctrl(1) = 1 ! which period to check for test_suite
-   x_ctrl(1) = 3.85 ! expected period (in days) 
+   x_integer_ctrl(1) = 10 ! which period to check
+   x_ctrl(1) = 4.039d0 ! expected period (in days) 
 
 / ! end of controls namelist
 

@@ -10,7 +10,7 @@
    change_initial_v_flag = .true.
    new_v_flag = .true.
 
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -44,20 +44,17 @@
    
 ! output
 
-      photo_interval = 500
+      photo_interval = 1000
+      profile_interval = 1000
+      history_interval = 100
+      terminal_interval = 1000
+
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 50
+      !terminal_interval = 1
 
-      !photo_interval = 50
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 10
-
-      !fill_arrays_with_NaNs = .true.
-      
-      
-      !max_model_number = 2
+      !max_model_number = 6939
 
 ! FOR DEBUGGING
       

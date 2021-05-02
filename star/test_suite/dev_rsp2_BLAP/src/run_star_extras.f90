@@ -125,7 +125,23 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% other_photo_write => photo_write
+         s% other_photo_read => photo_read
       end subroutine extras_controls
+
+
+      subroutine photo_write(id, iounit)
+         integer, intent(in) :: id, iounit
+         write(iounit) RSP2_num_periods, RSP2_period, time_started
+      end subroutine photo_write
+
+
+      subroutine photo_read(id, iounit, ierr)
+         integer, intent(in) :: id, iounit
+         integer, intent(out) :: ierr
+         ierr = 0
+         read(iounit, iostat=ierr) RSP2_num_periods, RSP2_period, time_started
+      end subroutine photo_read
       
       
       subroutine extras_startup(id, restart, ierr)
@@ -136,10 +152,12 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call test_suite_startup(s, restart, ierr)         
-         RSP2_num_periods = 0
-         RSP2_period = 0
-         time_started = 0
+         call test_suite_startup(s, restart, ierr)    
+         if (.not. restart) then     
+            RSP2_num_periods = 0
+            RSP2_period = 0
+            time_started = 0
+         end if
       end subroutine extras_startup
       
       
@@ -213,6 +231,7 @@
          include 'formats'
          ierr = 0            
       end subroutine data_for_extra_profile_columns
+
 
       end module run_star_extras
       
