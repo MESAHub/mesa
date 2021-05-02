@@ -1,9 +1,9 @@
-do_one dev_rsp2_BEP "good match for period" "final.mod" auto   
-do_one dev_rsp2_BLAP "good match for period" "final.mod" auto 
-do_one dev_rsp2_Cepheid "good match for period" "final.mod" auto   
-do_one dev_rsp2_Delta_Scuti "good match for period" "final.mod" auto 
-do_one dev_rsp2_RR_Lyrae "good match for period" "final.mod" auto   
-do_one dev_rsp2_Type_II_Cepheid "good match for period" "final.mod" auto   
+do_one dev_rsp2_BEP "good match for period" "final.mod" skip   
+do_one dev_rsp2_BLAP "good match for period" "final.mod" skip 
+do_one dev_rsp2_Cepheid "good match for period" "final.mod" skip   
+do_one dev_rsp2_Delta_Scuti "good match for period" "final.mod" skip 
+do_one dev_rsp2_RR_Lyrae "good match for period" "final.mod" skip   
+do_one dev_rsp2_Type_II_Cepheid "good match for period" "final.mod" skip   
 
 return
 
