@@ -8,6 +8,9 @@
          real(dp) :: max_X_for_TDC
          real(dp) :: max_X_for_gradT_eqn
          logical :: compare_TDC_to_MLT
+         
+         
+         logical :: RSP2_calls_RSP3
 
 
 
@@ -26,7 +29,7 @@
          real(dp) :: RSP2_min_dt_div_tau_conv_switch_to_MLT
          real(dp) :: RSP2_min_dt_years_switch_to_MLT
          
-         real(dp) :: RSP2_w_min_for_damping, RSP2_source_seed
+         real(dp) :: RSP2_w_fix_if_neg, RSP2_w_min_for_damping, RSP2_source_seed
          
          logical :: RSP2_use_L_eqn_at_surface, RSP2_assume_HSE
          logical :: RSP2_use_RSP_eqn_for_Y_face, include_w_in_correction_limits

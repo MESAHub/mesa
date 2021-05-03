@@ -41,6 +41,7 @@
          integer, intent(in) :: id, iounit
          integer, intent(out) :: ierr
          ierr = 0
+         !read(iounit, iostat=ierr) stuff
       end subroutine default_other_photo_read
 
 

@@ -246,6 +246,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s, s_other
          integer :: k, id_other
+         logical, parameter :: do_drel = .false.
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -261,27 +262,37 @@
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
          
-         names(1) = 'v_drel' ! 'v_R'
-         names(2) = 'Y_drel' ! 'Y_face_R'
-         names(3) = 'w_drel' ! 'w_R'
-         names(4) = 'Chi_drel' ! 'Lr_div_L_R'
+         names(1) = 'v_R'
+         if (do_drel) names(1) = 'v_drel'
+         names(2) = 'Y_face_R'
+         if (do_drel) names(2) = 'Y_drel'
+         names(3) = 'w_R'
+         if (do_drel) names(3) = 'w_drel'
+         names(4) = 'Lr_div_L_R'
+         if (do_drel) names(4) = 'Chi_drel'
          names(5) = 'logR_R'
          names(6) = 'logP_R'
          names(7) = 'logT_R'
          names(8) = 'logRho_R'
          names(9) = 'logL_R'
          names(10) = 'xCOUPL'
-         names(11) = 'CPL_drel' ! 'COUPL_R'
+         names(11) = 'COUPL_R'
+         if (do_drel) names(11) = 'CPL_drel' 
          names(12) = 'xSOURCE'
-         names(13) = 'SRC_drel' ! 'SRC_R'
+         names(13) = 'SRC_R'
+         if (do_drel) names(13) = 'SRC_drel'
          names(14) = 'xDAMP'
-         names(15) = 'DAMP_drel' ! 'DAMP_R'
+         names(15) = 'DAMP_R'
+         if (do_drel) names(15) = 'DAMP_drel'
          names(16) = 'xEq'
-         names(17) = 'Eq_drel' ! 'Eq_R'
+         names(17) = 'Eq_R'
+         if (do_drel) names(17) = 'Eq_drel'
          names(18) = 'xUq'
-         names(19) = 'Uq_drel' ! 'Uq_R'
-         names(20) = 'Uq_err'
-         names(21) = 'Uq_diff'
+         names(19) = 'Uq_R'
+         if (do_drel) names(19) = 'Uq_drel'
+         names(20) = 'xL'
+         names(21) = 'L_r'
+         if (do_drel) names(19) = 'L_drel'
 
          if (.not. associated(s_other% Y_face)) then
             vals(1:nz,:) = 0d0
@@ -289,11 +300,11 @@
             vals(1:nz,:) = 0d0
          else
             do k=1,nz
-               !vals(k,1) = s_other% v(k)*1d-5
-               vals(k,1) = rel_diff(s_other% v(k), s% v(k)) ! v_drel
+               vals(k,1) = s_other% v(k)*1d-5
+               if (do_drel) vals(k,1) = rel_diff(s_other% v(k), s% v(k)) ! v_drel
                
-               !vals(k,2) = s_other% Y_face(k)
-               vals(k,2) = rel_diff(s_other% Y_face(k), s% Y_face(k)) ! Y_drel
+               vals(k,2) = s_other% Y_face(k)
+               if (do_drel) vals(k,2) = rel_diff(s_other% Y_face(k), s% Y_face(k)) ! Y_drel
                
                if (s_other% RSP2_flag) then
                   vals(k,3) = s_other% w(k)
@@ -302,18 +313,10 @@
                else
                   vals(k,3) = 0d0
                end if
-               !if (k == 194) then
-               !   write(*,2) 'w RSP_w w_start RSP_w_start', k, &
-               !      s% w(k), s_other% RSP_w(k), s% w_start(k), s_other% RSP_w_start(k)
-               !end if
-               vals(k,3) = rel_diff(vals(k,3), s% w(k)) ! w_drel    
+               if (do_drel) vals(k,3) = rel_diff(vals(k,3), s% w(k)) ! w_drel    
                          
-               !vals(k,4) = s_other% Lr(k)/s_other% L(k)
-               vals(k,4) = rel_diff(s_other% Chi(k), s% Chi(k)) ! Chi_drel
-               !if (k==109) then
-               !   write(*,2) 'Chi_rsp Chi_rsp2 reldiff', k, &
-               !      s_other% Chi(k), s% Chi(k), vals(k,4)
-               !end if
+               vals(k,4) = s_other% Lr(k)/s_other% L(k)
+               if (do_drel) vals(k,4) = rel_diff(s_other% Chi(k), s% Chi(k)) ! Chi_drel
                                 
                vals(k,5) = safe_log10(s_other% r(k)/Rsun)
                vals(k,6) = s_other% lnPeos(k)/ln10
@@ -321,46 +324,28 @@
                vals(k,8) = s_other% lnd(k)/ln10
                vals(k,9) = safe_log10(s_other% L(k)/Lsun)
                vals(k,10) = s% COUPL(k)
-               !vals(k,11) = s_other% COUPL(k)
-               vals(k,11) = rel_diff(s_other% COUPL(k), s% COUPL(k)) ! CPL_drel
+               vals(k,11) = s_other% COUPL(k)
+               if (do_drel) vals(k,11) = rel_diff(s_other% COUPL(k), s% COUPL(k)) ! CPL_drel
 
                vals(k,12) = s% SOURCE(k)
-               !vals(k,13) = s_other% SOURCE(k)
-               vals(k,13) = rel_diff(s_other% SOURCE(k), s% SOURCE(k)) ! SRC_drel
+               vals(k,13) = s_other% SOURCE(k)
+               if (do_drel) vals(k,13) = rel_diff(s_other% SOURCE(k), s% SOURCE(k)) ! SRC_drel
                
                vals(k,14) = s% DAMP(k)
-               !vals(k,15) = s_other% DAMP(k)
-               vals(k,15) = rel_diff(s_other% DAMP(k), s% DAMP(k)) ! DAMP_drel
+               vals(k,15) = s_other% DAMP(k)
+               if (do_drel) vals(k,15) = rel_diff(s_other% DAMP(k), s% DAMP(k)) ! DAMP_drel
                
                vals(k,16) = s% Eq(k)
-               !vals(k,17) = s_other% Eq(k)
-               vals(k,17) = rel_diff(s_other% Eq(k), s% Eq(k)) ! Eq_drel
+               vals(k,17) = s_other% Eq(k)
+               if (do_drel) vals(k,17) = rel_diff(s_other% Eq(k), s% Eq(k)) ! Eq_drel
                
                vals(k,18) = s% Uq(k)
-               !vals(k,19) = s_other% Uq(k)
-               vals(k,19) = rel_diff(s_other% Uq(k), s% Uq(k)) ! Uq_drel
-               
+               vals(k,19) = s_other% Uq(k)
+               if (do_drel) vals(k,19) = rel_diff(s_other% Uq(k), s% Uq(k)) ! Uq_drel
                           
-               vals(k,20) = s% Pvsc(k)
-               vals(k,21) = s_other% Pvsc(k)
-               vals(k,20) = (s% Uq(k) - s_other% Uq(k)) / &
-                  (1d-6 + 1d-3*max(abs(s% Uq(k)),abs(s_other% Uq(k))))
-               vals(k,21) = s% Uq(k) - s_other% Uq(k)
-               
-               if (.false.) then ! debugging xtra values
-                  vals(k,10) = s% xtra1_array(k)
-                  vals(k,11) = s_other% xtra1_array(k)
-                  vals(k,12) = s% xtra2_array(k)
-                  vals(k,13) = s_other% xtra2_array(k)
-                  vals(k,14) = s% xtra3_array(k)
-                  vals(k,15) = s_other% xtra3_array(k)
-                  vals(k,16) = s% xtra4_array(k)
-                  vals(k,17) = s_other% xtra4_array(k)
-                  vals(k,18) = s% xtra5_array(k)
-                  vals(k,19) = s_other% xtra5_array(k)
-                  vals(k,20) = s% xtra6_array(k)
-                  vals(k,21) = s_other% xtra6_array(k)
-               end if
+               vals(k,20) = s% L(k)
+               vals(k,21) = s_other% L(k)
+               if (do_drel) vals(k,21) = rel_diff(s_other% L(k), s% L(k)) ! L_drel
                
             end do
          end if

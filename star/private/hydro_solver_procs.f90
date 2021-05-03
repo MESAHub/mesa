@@ -97,9 +97,6 @@
          integer :: cnt, i, j, k, nz
          integer :: id
          real(dp) :: dt, theta_dt
-
-         logical, parameter :: skip_partials = .true.
-
          include 'formats'
 
          ierr = 0
@@ -132,7 +129,7 @@
                end do
             end do
             if (dbg) write(*, *) 'call eval_equ'
-            call eval_equ(s, nvar, skip_partials, ierr)
+            call eval_equ(s, nvar, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*, *) 'eval_equations: eval_equ returned ierr', ierr
@@ -375,7 +372,7 @@
                if (abs(s% w(k)) < 1d0) then
                   s% correction_weight(s% i_w,k) = 0d0
                else
-                  s% correction_weight(s% i_w,k) = 1d0/abs(s% w(k)) ! this copies RSP
+                  s% correction_weight(s% i_w,k) = 1d0/(1d3 + abs(s% w(k))) ! don't sweat the small stuff
                end if
             end do
          else

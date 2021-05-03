@@ -57,36 +57,33 @@
       contains
 
 
-      subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, skip_partials, nvar, ierr)
+      subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, nvar, ierr)
          type (star_info), pointer :: s         
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
-         call do1_dudt_eqn(s, 1, P_surf_ad, skip_partials, nvar, ierr)
+         call do1_dudt_eqn(s, 1, P_surf_ad, nvar, ierr)
       end subroutine do_surf_Riemann_dudt_eqn
       
 
-      subroutine do1_Riemann_momentum_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_Riemann_momentum_eqn(s, k, nvar, ierr)
          type (star_info), pointer :: s         
          integer, intent(in) :: k
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: P_surf_ad
          P_surf_ad = 0
-         call do1_dudt_eqn(s, k, P_surf_ad, skip_partials, nvar, ierr)
+         call do1_dudt_eqn(s, k, P_surf_ad, nvar, ierr)
       end subroutine do1_Riemann_momentum_eqn
          
 
       subroutine do1_dudt_eqn( &
-            s, k, P_surf_ad, skip_partials, nvar, ierr)
+            s, k, P_surf_ad, nvar, ierr)
          use accurate_sum_auto_diff_star_order1
          use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info
          type (star_info), pointer :: s         
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only for k=1
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
       
@@ -164,7 +161,6 @@
             s% solver_test_partials_val = residual
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, i_du_dt, resid_ad, 'do1_dudt_eqn', ierr)
 
          if (test_partials) then

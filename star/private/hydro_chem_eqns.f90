@@ -39,11 +39,9 @@
       contains
 
 
-      subroutine do_chem_eqns( &
-            s, nvar, skip_partials, ierr)
+      subroutine do_chem_eqns(s, nvar, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          integer :: k, op_err
          include 'formats'
@@ -51,14 +49,14 @@
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, s% nz
             if (ierr /= 0) cycle
-            call do1_chem_eqns(s, k, nvar, skip_partials, op_err)
+            call do1_chem_eqns(s, k, nvar, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
       end subroutine do_chem_eqns
 
 
-      subroutine do1_chem_eqns(s, k, nvar, skip_partials, ierr)
+      subroutine do1_chem_eqns(s, k, nvar, ierr)
 
          use chem_def
          use net_lib, only: show_net_reactions, show_net_params
@@ -67,7 +65,6 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
@@ -162,8 +159,6 @@
                if (s% stop_for_bad_nums) stop 'do1_chem_eqns'
 !$OMP end critical (star_chem_eqns_bad_num)
             end if
-
-            if (skip_partials) cycle
 
             call e00(s, i, i, k, nvar, -1d0/eqn_scale/s% dt)
 

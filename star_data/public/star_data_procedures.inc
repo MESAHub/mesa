@@ -40,8 +40,8 @@
             other_adjust_mdot => null()
          procedure(other_j_for_adjust_J_lost_interface), pointer, nopass :: &
             other_j_for_adjust_J_lost => null()
-         procedure(other_after_enter_setmatrix_interface), pointer, nopass :: &
-            other_after_enter_setmatrix => null()
+         procedure(other_after_solver_setmatrix_interface), pointer, nopass :: &
+            other_after_solver_setmatrix => null()
          procedure(other_after_struct_burn_mix_interface), pointer, nopass :: &
             other_after_struct_burn_mix => null()
          procedure(other_before_struct_burn_mix_interface), pointer, nopass :: &

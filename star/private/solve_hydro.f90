@@ -57,8 +57,7 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
-         integer :: ierr, nz, k, mljac, mujac, n, nzmax, &
-            solver_lwork, solver_liwork, num_jacobians
+         integer :: ierr, nz, k, n, solver_lwork, solver_liwork
          logical :: report
 
          include 'formats'
@@ -74,10 +73,6 @@
 
          nz = s% nz
          n = nz*nvar
-         mljac = (stencil_neighbors+1)*nvar-1
-         mujac = mljac
-         nzmax = 0
-
          call work_sizes_for_solver(ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*, *) 'do_solver_converge: work_sizes_for_solver failed'
@@ -490,7 +485,7 @@
 
          integer, parameter :: lipar=hydro_lipar, lrpar=hydro_lrpar
 
-         integer :: mljac, mujac, i, k, j, matrix_type, neq
+         integer :: i, k, j, matrix_type, neq
          logical :: failure
          real(dp) :: varscale
          logical, parameter :: dbg = .false.
@@ -504,9 +499,6 @@
          if (dbg) write(*, *) 'enter hydro_solver_step'
 
          s% used_extra_iter_in_solver_for_accretion = .false.
-
-         mljac = 2*nvar-1
-         mujac = mljac
 
          call check_sizes(s, ierr)
          if (ierr /= 0) then

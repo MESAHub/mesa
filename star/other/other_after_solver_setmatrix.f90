@@ -23,21 +23,21 @@
 !
 ! ***********************************************************************
  
-      module other_after_enter_setmatrix
+      module other_after_solver_setmatrix
 
       implicit none
       
             
       contains
          
-      subroutine default_other_after_enter_setmatrix(id, ierr)
+      subroutine default_other_after_solver_setmatrix(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          ierr = 0
-      end subroutine default_other_after_enter_setmatrix
+      end subroutine default_other_after_solver_setmatrix
 
 
-      end module other_after_enter_setmatrix
+      end module other_after_solver_setmatrix
       
       
       

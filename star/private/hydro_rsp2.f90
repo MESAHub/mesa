@@ -32,6 +32,7 @@
       use auto_diff_support
       use accurate_sum_auto_diff_star_order1
       use star_utils
+      use hydro_rsp3
 
       implicit none
 
@@ -80,6 +81,12 @@
          type(auto_diff_real_star_order1) :: x
          integer :: k, op_err
          include 'formats'
+         
+         if (s% RSP2_calls_RSP3) then
+            call set_RSP3_vars(s, ierr)
+            return
+         end if
+         
          ierr = 0
          if (s% need_to_reset_w) then
             write(*,2) 'reset_etrb_using_L', s% model_number
@@ -143,11 +150,10 @@
       end subroutine set_RSP2_vars
 
 
-      subroutine do1_rsp2_L_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_rsp2_L_eqn(s, k, nvar, ierr)
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          type(auto_diff_real_star_order1) ::  &
             L_expected, L_actual,resid
@@ -157,6 +163,11 @@
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
+
+         if (s% RSP2_calls_RSP3) then
+            call do1_rsp3_L_eqn(s, k, nvar, ierr)
+            return
+         end if
          
          if (.not. s% using_RSP2) then
             ierr = -1
@@ -182,7 +193,6 @@
             s% solver_test_partials_val = residual 
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_rsp2_L_eqn', ierr)
          if (ierr /= 0) return
 
@@ -194,17 +204,21 @@
       end subroutine do1_rsp2_L_eqn
       
 
-      subroutine do1_rsp2_Hp_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_rsp2_Hp_eqn(s, k, nvar, ierr)
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          type(auto_diff_real_star_order1) ::  &
             Hp_expected, Hp_actual,resid
          real(dp) :: scale, residual, Hp_start
          logical :: test_partials
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            call do1_rsp3_Hp_eqn(s, k, nvar, ierr)
+            return
+         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -232,7 +246,6 @@
             s% solver_test_partials_val = residual 
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp2_Hp_eqn', ierr)
          if (ierr /= 0) return
 
@@ -250,6 +263,12 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face_ad
+
+         if (s% RSP2_calls_RSP3) then
+            Hp_face = Hp_face_for_rsp3_val(s, k, ierr)
+            return
+         end if
+
          ierr = 0
          Hp_face_ad = Hp_face_for_rsp2_eqn(s, k, ierr)
          if (ierr /= 0) return
@@ -269,6 +288,12 @@
          real(dp) :: alfa, beta
          integer :: j
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            Hp_face = Hp_face_for_rsp3_eqn(s, k, ierr)
+            return
+         end if
+         
          ierr = 0
          if (k > s% nz) then
             Hp_face = 1d0 ! not used
@@ -293,7 +318,15 @@
                call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
                Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
                Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
+               if (k==-104) then
+                  write(*,3) 'RSP2 Hp P_div_rho Pdrho_00 Pdrho_m1', k, s% solver_iter, &
+                     Hp_face%val, Peos_div_rho%val, Peos_00%val/d_00%val, Peos_m1%val/d_m1%val
+                  !write(*,3) 'RSP2 Hp r2_div_Gm r_start r', k, s% solver_iter, &
+                  !   Hp_face%val, pow2(r_00%val)/(s% cgrav(k)*s% m(k)), &
+                  !   s% r_start(k), r_00%val
+               end if
                if (s% alt_scale_height_flag) then
+                  stop 'alt_scale_height_flag'
                   ! consider sound speed*hydro time scale as an alternative scale height
                   d_face = alfa*d_00 + beta*d_m1
                   Peos_face = alfa*Peos_00 + beta*Peos_m1
@@ -308,11 +341,10 @@
       end function Hp_face_for_rsp2_eqn
 
 
-      subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_turbulent_energy_eqn(s, k, nvar, ierr)
          use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          integer :: j
          ! for OLD WAY
@@ -324,6 +356,11 @@
          logical :: non_turbulent_cell, test_partials
          real(dp) :: residual, atol, rtol, scal
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            call do1_rsp3_turbulent_energy_eqn(s, k, nvar, ierr)
+            return
+         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -349,23 +386,13 @@
             ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
             esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
             resid_ad = esum_ad
-            resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
             
-            if (k == 109) then
-               if (skip_partials) then
-                  write(*,3) 'skip_partials RSP2 dEt PdV dtC dtEq', k, s% solver_iter, &
-                     d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
-               else
-                  write(*,3) 'RSP2 dEt PdV dtC dtEq', k, s% solver_iter, &
-                     d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
-               end if
-               !write(*,2) 'RSP2 w COUPL SOURCE DAMP DAMPR', k, &
-               !   s% w(k), s% COUPL(k), s% SOURCE(k), s% DAMP(k), s% DAMPR(k)
-               !write(*,2) 'RSP SOURCE Hp_cell QQ_div_Cp P T', k, &
-               !   s% RSP_w(k), s% SOURCE(k), &
-               !   0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1)), &
-               !   s% QQ(k)/s% Cp(k), s% Pgas(k) + s% Prad(k), s% T(k)
+            if (k == -109) then
+                  write(*,3) 'RSP2 residual w dEt PdV dtC dtEq', k, s% solver_iter, &
+                     resid_ad%val, w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
             end if
+
+            resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
             
          end if
 
@@ -379,7 +406,6 @@
                write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, s% i_detrb_dt, resid_ad, 'do1_turbulent_energy_eqn', ierr)
          if (ierr /= 0) return
 
@@ -535,6 +561,9 @@
             !       = cm^2 cm cm^-3 g g^-1 = unitless
          
             Y_face = Y1*Y2 ! unitless
+            
+            if (k==-109) write(*,3) 'Y_face Y1 Y2', k, s% solver_iter, &
+               Y_face%val, Y1%val, Y2%val
 
          else
          
@@ -686,10 +715,6 @@
          end if
          s% Chi(k) = Chi_cell%val
          s% Chi_ad(k) = Chi_cell
-            
-            !if (k==194) then
-            !   write(*,2) 'RSP2 Chi', k, s% Chi(k)
-            !end if
 
       end function compute_Chi_cell
 
@@ -701,6 +726,12 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            Eq_cell = compute_rsp3_Eq_cell(s, k, ierr)
+            return
+         end if
+
          ierr = 0
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
@@ -726,6 +757,12 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Chi_00, Chi_m1, r_00
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            Uq_face = compute_rsp3_Uq_face(s, k, ierr)
+            return
+         end if
+
          ierr = 0         
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
@@ -742,6 +779,12 @@
                Chi_m1 = 0d0
             end if
             Uq_face = 4d0*pi*(Chi_m1 - Chi_00)/(r_00*s% dm_bar(k))
+            
+            if (k==-56) then
+               write(*,3) 'RSP2 Uq chi_m1 chi_00 r', k, s% solver_iter, &
+                  Uq_face%val, Chi_m1%val, Chi_00%val, r_00%val
+            end if
+            
          end if
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
          s% Uq(k) = Uq_face%val
@@ -757,7 +800,7 @@
          type(auto_diff_real_star_order1) :: &
             w_00, T_00, d_00, Peos_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell, &
-            grad_ad_00
+            grad_ad_00, P_QQ_div_Cp
          include 'formats'
          ierr = 0
          w_00 = wrap_w_00(s, k)
@@ -784,30 +827,21 @@
             PII_div_Hp_cell = 0.5d0*(PII_face_00/Hp_face_00 + PII_face_p1/Hp_face_p1)
          end if
          
-         ! Peos_00*QQ_00/Cp_00 = grad_ad
-         grad_ad_00 = wrap_grad_ad_00(s, k)
-         Source = (w_00 + s% RSP2_source_seed)*PII_div_Hp_cell*T_00*grad_ad_00
-         if (k==194) then
-            !write(*,2) 'RSP2 w SOURCE PII/Hp P*QQ_div_Cp P T', k, &
-            !   s% w(k), Source%val, PII_div_Hp_cell%val, &
-            !   grad_ad_00%val, Peos_00%val, T_00%val
-            !write(*,2) 'RSP2 PII_00 PII_p1 Hp_00 Hp_p1', k, &
-            !   PII_face_00%val, PII_face_p1%val, Hp_face_00%val, Hp_face_p1%val
-         end if
+         ! Peos_00*QQ_00/Cp_00 = grad_ad if all perfect.
+         !grad_ad_00 = wrap_grad_ad_00(s, k)
+         P_QQ_div_Cp = Peos_00*QQ_00/Cp_00 ! use this to be same as RSP
+         Source = (w_00 + s% RSP2_source_seed)*PII_div_Hp_cell*T_00*P_QQ_div_Cp
          
          ! PII units same as Cp = erg g^-1 K^-1
          ! P*QQ/Cp is unitless (see Y_face)
          ! Source units = (erg g^-1 K^-1) cm^-1 cm s^-1 K
          !     = erg g^-1 s^-1
          
-         if (k == -49) then
-            write(*,2) 'Source%val', k, Source%val
-            write(*,2) 'w_00%val', k, w_00%val
-            write(*,2) 'grad_ad_00%val', k, grad_ad_00%val
-            write(*,2) 'PII_face_00%val', k, PII_face_00%val
-            write(*,2) 'PII_face_p1%val', k, PII_face_p1%val
-            write(*,*)
-            !stop 'compute_Source'
+         if (k==-109) then
+            write(*,3) 'RSP2 Source w PII_div_Hp T_P_QQ_div_Cp', k, s% solver_iter, &
+               Source%val, w_00%val, PII_div_Hp_cell%val, T_00%val*P_QQ_div_Cp% val
+            !write(*,3) 'RSP2 PII_00 PII_p1 Hp_00 Hp_p1', k, s% solver_iter, &
+            !   PII_face_00%val, PII_face_p1%val, Hp_face_00%val, Hp_face_p1%val
          end if
          s% SOURCE(k) = Source%val
 
@@ -817,7 +851,8 @@
       function compute_D(s, k, ierr) result(D) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: D, dw3
+         type(auto_diff_real_star_order1) :: D
+         type(auto_diff_real_star_order1) :: dw3, w_00
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
          include 'formats'
@@ -826,9 +861,14 @@
             D = 0d0
          else
             Hp_cell = wrap_Hp_cell(s,k)
-            dw3 = pow3(wrap_w_00(s,k)) - pow3(s% RSP2_w_min_for_damping)
+            w_00 = wrap_w_00(s,k)
+            dw3 = pow3(w_00) - pow3(s% RSP2_w_min_for_damping)
             D = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell*dw3
             ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
+         end if
+         if (k==-109) then
+            write(*,3) 'RSP2 DAMP w Hp_cell dw3', k, s% solver_iter, &
+               D%val, w_00%val, Hp_cell%val, dw3% val
          end if
          s% DAMP(k) = D%val
       end function compute_D
@@ -1109,6 +1149,12 @@
          integer :: k, op_err
          type(auto_diff_real_star_order1) :: Y_face, Lt
          include 'formats'
+         
+         if (s% RSP2_calls_RSP3) then
+            call set_rsp3_etrb_start_vars(s, ierr)
+            return
+         end if
+
          ierr = 0
          do k=1,s%nz
             Y_face = compute_Y_face(s, k, ierr)
@@ -1170,6 +1216,7 @@
                w_00 = w_face(k)
             end if
             s% w(k) = w_00
+            if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
             s% xh(s% i_w,k) = s% w(k)
             !write(*,2) 'w', k, s% w(k)
          end do
