@@ -40,7 +40,7 @@
          do1_rsp3_L_eqn, do1_rsp3_turbulent_energy_eqn, do1_rsp3_Hp_eqn, &
          compute_rsp3_Eq_cell, compute_rsp3_Uq_face, set_RSP3_vars, &
          Hp_face_for_rsp3_val, Hp_face_for_rsp3_eqn, &
-         set_rsp3_etrb_start_vars ! set_using_RSP2
+         set_rsp3_etrb_start_vars ! set_using_RSP3
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
@@ -52,26 +52,26 @@
       contains
       
       
-!      subroutine set_using_RSP2(s)
+!      subroutine set_using_RSP3(s)
 !         type (star_info), pointer :: s      
 !         real(dp) :: switch         
-!         s% using_RSP2 = .false.
-!         if (.not. s% RSP2_flag) return
+!         s% using_RSP3 = .false.
+!         if (.not. s% RSP3_flag) return
 !         if (s% RSP3_min_dt_div_tau_conv_switch_to_MLT > 0) then
 !            switch = s% max_conv_time_scale*s% RSP3_min_dt_div_tau_conv_switch_to_MLT
 !            if (s% dt < switch) then
-!               s% using_RSP2 = .true.
+!               s% using_RSP3 = .true.
 !               return
 !            end if
 !         end if
 !         if (s% RSP3_min_dt_years_switch_to_MLT > 0) then
 !            switch = s% RSP3_min_dt_years_switch_to_MLT*secyer
 !            if (s% dt < switch) then
-!               s% using_RSP2 = .true.
+!               s% using_RSP3 = .true.
 !               return
 !            end if
 !         end if
-!      end subroutine set_using_RSP2
+!      end subroutine set_using_RSP3
       
       
       subroutine set_RSP3_vars(s,ierr)

@@ -32,6 +32,7 @@
       use auto_diff_support
       use accurate_sum_auto_diff_star_order1
       use star_utils
+      use hydro_rsp3
 
       implicit none
 
@@ -80,6 +81,12 @@
          type(auto_diff_real_star_order1) :: x
          integer :: k, op_err
          include 'formats'
+         
+         if (s% RSP2_calls_RSP3) then
+            call set_RSP3_vars(s, ierr)
+            return
+         end if
+         
          ierr = 0
          if (s% need_to_reset_w) then
             write(*,2) 'reset_etrb_using_L', s% model_number
@@ -156,6 +163,11 @@
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
+
+         if (s% RSP2_calls_RSP3) then
+            call do1_rsp3_L_eqn(s, k, nvar, ierr)
+            return
+         end if
          
          if (.not. s% using_RSP2) then
             ierr = -1
@@ -203,6 +215,11 @@
          logical :: test_partials
          include 'formats'
 
+         if (s% RSP2_calls_RSP3) then
+            call do1_rsp3_Hp_eqn(s, k, nvar, ierr)
+            return
+         end if
+
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
@@ -246,6 +263,12 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face_ad
+
+         if (s% RSP2_calls_RSP3) then
+            Hp_face = Hp_face_for_rsp3_val(s, k, ierr)
+            return
+         end if
+
          ierr = 0
          Hp_face_ad = Hp_face_for_rsp2_eqn(s, k, ierr)
          if (ierr /= 0) return
@@ -265,6 +288,12 @@
          real(dp) :: alfa, beta
          integer :: j
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            Hp_face = Hp_face_for_rsp3_eqn(s, k, ierr)
+            return
+         end if
+         
          ierr = 0
          if (k > s% nz) then
             Hp_face = 1d0 ! not used
@@ -327,6 +356,11 @@
          logical :: non_turbulent_cell, test_partials
          real(dp) :: residual, atol, rtol, scal
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            call do1_rsp3_turbulent_energy_eqn(s, k, nvar, ierr)
+            return
+         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -692,6 +726,12 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            Eq_cell = compute_rsp3_Eq_cell(s, k, ierr)
+            return
+         end if
+
          ierr = 0
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
@@ -717,6 +757,12 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Chi_00, Chi_m1, r_00
          include 'formats'
+
+         if (s% RSP2_calls_RSP3) then
+            Uq_face = compute_rsp3_Uq_face(s, k, ierr)
+            return
+         end if
+
          ierr = 0         
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
@@ -1098,17 +1144,18 @@
 
 
       subroutine set_etrb_start_vars(s, ierr)
-         use hydro_rsp3, only: set_rsp3_etrb_start_vars
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
          type(auto_diff_real_star_order1) :: Y_face, Lt
          include 'formats'
-         ierr = 0
+         
          if (s% RSP2_calls_RSP3) then
             call set_rsp3_etrb_start_vars(s, ierr)
             return
          end if
+
+         ierr = 0
          do k=1,s%nz
             Y_face = compute_Y_face(s, k, ierr)
             if (ierr /= 0) return
