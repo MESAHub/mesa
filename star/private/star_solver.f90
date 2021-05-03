@@ -276,7 +276,7 @@
             return
          end if
          
-         call eval_equations(s, nvar, ierr)                  
+         call do_equations(ierr)                 
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -342,13 +342,19 @@
                   tol_residual_norm, tol_max_residual
             end if
             
-            call setmatrix(s, neq, dxsave, ddxsave, ierr)
+            call solver_test_partials(nvar, xder, size(A,dim=1), A1, ierr)
             if (ierr /= 0) then
-               call write_msg('setmatrix returned ierr /= 0')
+               call write_msg('solver_test_partials returned ierr /= 0')
                convergence_failure = .true.
                exit iter_loop
             end if
+            
             s% num_solver_iterations = s% num_solver_iterations + 1
+            if (s% model_number == 1 .and. &
+                s% num_solver_iterations > 60 .and. &
+                mod(s% num_solver_iterations,10) == 0) &
+                  write(*,*) 'first model is slow to converge: num tries', &
+                     s% num_solver_iterations
          
             if (.not. solve_equ()) then ! either singular or horribly ill-conditioned
                write(err_msg, '(a, i5, 3x, a)') 'info', ierr, 'bad_matrix'
@@ -628,6 +634,66 @@
 
 
          contains
+         
+         
+         subroutine solver_test_partials(nvar, xder, ldA, A1, ierr)
+            ! create jacobian by using numerical differences for partial derivatives
+            integer, intent(in) :: nvar
+            real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
+            integer, intent(in) :: ldA ! leading dimension of A
+            real(dp), pointer, dimension(:) :: A1
+            integer, intent(out) :: ierr
+            
+            integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
+            real(dp), dimension(:,:), pointer :: save_equ, save_dx
+            real(dp) :: dvar, dequ, dxtra, &
+               dx_0, dvardx, dvardx_0, xdum, err
+            logical :: testing_partial
+
+            include 'formats'
+
+            ierr = 0
+            testing_partial = & ! check inlist parameters
+               s% solver_test_partials_dx_0 > 0d0 .and. &
+               s% solver_test_partials_k > 0 .and. &
+               s% solver_call_number == s% solver_test_partials_call_number .and. &
+               s% solver_test_partials_iter_number == iter
+            if (.not. testing_partial) return
+
+            call do_equations(ierr)
+            if (ierr /= 0) return
+
+            allocate(save_dx(nvar,nz), save_equ(nvar,nz))
+
+            do k=1,nz
+               do j=1,nvar
+                  save_dx(j,k) = s% solver_dx(j,k)
+                  save_equ(j,k) = equ(j,k)
+               end do
+            end do
+            
+            s% doing_check_partials = .true. ! let set_vars_for_solver know
+            k_lo = s% solver_test_partials_k_low
+            if (k_lo > 0 .and. k_lo <= s% nz) then
+               k_hi = s% solver_test_partials_k_high
+               if (k_hi <= 0) then
+                  k_hi = s% nz
+               else
+                  k_hi = min(k_hi,s% nz)
+               end if
+               do k = k_lo, k_hi
+                  call test_cell_partials(s, k, save_dx, save_equ, ierr)
+                  if (ierr /= 0) stop 'failed solver_test_partials'
+               end do
+            else
+               k = s% solver_test_partials_k
+               call test_cell_partials(s, k, save_dx, save_equ, ierr) 
+               if (ierr /= 0) stop 'failed solver_test_partials'
+            end if
+            deallocate(save_dx, save_equ)
+            stop 'done solver_test_partials'
+
+         end subroutine solver_test_partials
 
 
          subroutine get_message
@@ -662,6 +728,16 @@
             call write_msg(full_msg)
             convergence_failure = .true.
          end subroutine oops
+         
+         
+         subroutine do_equations(ierr)
+            integer, intent(out) :: ierr
+            call prepare_solver_matrix(s, nvar, xder, size(A,dim=1), A1, ierr)
+            if (ierr /= 0) return
+            call eval_equations(s, nvar, ierr)
+            if (ierr /= 0) return
+            call s% other_after_solver_setmatrix(s% id, ierr)
+         end subroutine do_equations
 
 
          subroutine adjust_correction( &
@@ -743,8 +819,8 @@
                s% solver_adjust_iter = iter
 
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
-               call eval_equations(s, nvar, ierr)
                
+               call do_equations(ierr)               
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -991,97 +1067,6 @@
                B1, soln1, row_scale_factors1, col_scale_factors1, equed1, &
                iter, ierr)
          end subroutine solve_mtx
-
-
-         logical function do_enter_setmatrix(s, neq, ierr)
-            ! create jacobian by using numerical differences for partial derivatives
-            implicit none
-            type (star_info), pointer :: s
-            integer, intent(in) :: neq
-            real(dp), pointer, dimension(:,:) :: ddx
-            integer, intent(out) :: ierr
-            logical :: need_solver_to_eval_jacobian
-            integer :: i, j, k
-            include 'formats'
-            need_solver_to_eval_jacobian = .true.
-            call enter_setmatrix(s, &
-                  nvar, xder, need_solver_to_eval_jacobian, &
-                  size(A,dim=1), A1, ierr)
-            do_enter_setmatrix = need_solver_to_eval_jacobian
-         end function do_enter_setmatrix
-
-
-         subroutine setmatrix(s, neq, dxsave, ddxsave, ierr)
-            ! create jacobian by using numerical differences for partial derivatives
-            use star_utils, only: e00, em1, ep1
-            type (star_info), pointer :: s
-            integer, intent(in) :: neq
-            real(dp), pointer, dimension(:,:) :: dxsave, ddxsave
-            integer, intent(out) :: ierr
-
-            integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
-            real(dp), dimension(:,:), pointer :: save_equ, save_dx
-            real(dp) :: dvar, dequ, dxtra, &
-               dx_0, dvardx, dvardx_0, xdum, err
-            logical :: need_solver_to_eval_jacobian, testing_partial
-
-            include 'formats'
-
-            ierr = 0
-            testing_partial = & ! check inlist parameters
-               s% solver_test_partials_dx_0 > 0d0 .and. &
-               s% solver_test_partials_k > 0 .and. &
-               s% solver_call_number == s% solver_test_partials_call_number .and. &
-               s% solver_test_partials_iter_number == iter
-
-            need_solver_to_eval_jacobian = do_enter_setmatrix(s, neq, ierr)
-            if (ierr /= 0) return
-
-            if (.not. testing_partial) return
-
-            if (testing_partial) then 
-               ! get solver_test_partials_var and solver_test_partials_dval_dx
-               call eval_partials(s, nvar, ierr)
-               if (ierr /= 0) return
-            else
-               call eval_equations(s, nvar, ierr)
-               if (ierr /= 0) then
-                  write(*,3) '1st call eval_equations failed'
-                  stop 'setmatrix'
-               end if
-            end if
-
-            allocate(save_dx(nvar,nz), save_equ(nvar,nz))
-
-            do k=1,nz
-               do j=1,nvar
-                  save_dx(j,k) = s% solver_dx(j,k)
-                  save_equ(j,k) = equ(j,k)
-               end do
-            end do
-            
-            s% doing_check_partials = .true. ! let set_vars_for_solver know
-            k_lo = s% solver_test_partials_k_low
-            if (k_lo > 0 .and. k_lo <= s% nz) then
-               k_hi = s% solver_test_partials_k_high
-               if (k_hi <= 0) then
-                  k_hi = s% nz
-               else
-                  k_hi = min(k_hi,s% nz)
-               end if
-               do k = k_lo, k_hi
-                  call test_cell_partials(s, k, save_dx, save_equ, ierr)
-                  if (ierr /= 0) stop 'failed solver_test_partials'
-               end do
-            else
-               k = s% solver_test_partials_k
-               call test_cell_partials(s, k, save_dx, save_equ, ierr) 
-               if (ierr /= 0) stop 'failed solver_test_partials'
-            end if
-            deallocate(save_dx, save_equ)
-            stop 'done solver_test_partials'
-
-         end subroutine setmatrix
 
 
          subroutine test_cell_partials(s, k, save_dx, save_equ, ierr) 
@@ -1577,7 +1562,7 @@
                end if
                s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
-            call eval_equations(s, nvar, ierr)            
+            call do_equations(ierr)
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'

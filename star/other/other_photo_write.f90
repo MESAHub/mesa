@@ -39,6 +39,7 @@
 
       subroutine default_other_photo_write(id, iounit)
          integer, intent(in) :: id, iounit
+         !write(iounit) stuff
       end subroutine default_other_photo_write
 
 

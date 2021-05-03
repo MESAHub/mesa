@@ -42,34 +42,30 @@
       contains
 
       
-      subroutine do_surf_momentum_eqn(s, P_surf_ad, skip_partials, nvar, ierr)
+      subroutine do_surf_momentum_eqn(s, P_surf_ad, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          include 'formats'
          ierr = 0
          call get1_momentum_eqn( &
-            s, 1, P_surf_ad, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+            s, 1, P_surf_ad, nvar, d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for do_surf_momentum_eqn'
             return
          end if         
-         if (skip_partials) return
          call store_partials( &
             s, 1, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1, 'do_surf_momentum_eqn', ierr)
       end subroutine do_surf_momentum_eqn
 
       
-      subroutine do1_momentum_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_momentum_eqn(s, k, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
@@ -77,20 +73,18 @@
          include 'formats'
          P_surf_ad = 0d0
          call get1_momentum_eqn( &
-            s, k, P_surf_ad, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+            s, k, P_surf_ad, nvar, d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_momentum_eqn', k
             return
          end if         
-         if (skip_partials) return
          call store_partials( &
             s, k, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_momentum_eqn', ierr)
       end subroutine do1_momentum_eqn
 
 
       subroutine get1_momentum_eqn( &
-            s, k, P_surf_ad, skip_partials, nvar, &
+            s, k, P_surf_ad, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use chem_def, only: chem_isos
          use accurate_sum_auto_diff_star_order1
@@ -99,7 +93,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only used if k == 1
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          real(dp), intent(out) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          integer, intent(out) :: ierr
@@ -177,7 +170,6 @@
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
-         if (skip_partials) return
          call unpack_res18(s% species, resid_ad)
 
          if (test_partials) then
@@ -539,12 +531,11 @@
       end subroutine get_dPtot_face_info      
 
 
-      subroutine do1_radius_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_radius_eqn(s, k, nvar, ierr)
          use auto_diff_support
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             v00, r_actual, r_expected, dxh_lnR, resid_ad, &
@@ -566,7 +557,6 @@
                v00 = wrap_v_00(s,k)
             end if
             resid_ad = v00/s% csound_start(k)
-            if (skip_partials) return            
             call save_eqn_residual_info( &
                s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)           
             return
@@ -589,7 +579,6 @@
          if (test_partials) then
             s% solver_test_partials_val = 0
          end if
-         if (skip_partials) return            
          call save_eqn_residual_info( &
             s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)           
          if (test_partials) then   

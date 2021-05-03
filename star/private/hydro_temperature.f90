@@ -47,12 +47,11 @@
       ! d_P_rad/dm = (crad/3)*(T(k-1)^4 - T(k)^4)/dm_bar
       ! L_rad = L - L_non_rad, L_non_rad = L_start - L_rad_start
       ! L_rad_start = (-d_P_rad/dm_bar*clight*area^2/<opacity_face>)_start
-      subroutine do1_alt_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_alt_dlnT_dm_eqn(s, k, nvar, ierr)
          use eos_def
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
          real(dp) :: alfa, beta, scale, dm_bar
@@ -131,7 +130,6 @@
             s% solver_test_partials_val = s% gradT(k)
          end if
 
-         if (skip_partials) return
          call save_eqn_residual_info( &
             s, k, nvar, i_equL, resid, 'do1_alt_dlnT_dm_eqn', ierr)
 
@@ -157,12 +155,11 @@
       end subroutine do1_alt_dlnT_dm_eqn
 
 
-      subroutine do1_gradT_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_gradT_eqn(s, k, nvar, ierr)
          use eos_def
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: &
@@ -202,7 +199,6 @@
             s% solver_test_partials_val = s% equ(i_equL,k)
          end if
 
-         if (skip_partials) return
          call save_eqn_residual_info( &
             s, k, nvar, i_equL, resid, 'do1_gradT_eqn', ierr)
          
@@ -235,12 +231,11 @@
       end subroutine do1_gradT_eqn
 
 
-      subroutine do1_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_dlnT_dm_eqn(s, k, nvar, ierr)
          use eos_def
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: resid, &
@@ -260,12 +255,12 @@
          
          if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn .or. &
                (s% X(k) <= s% max_X_for_gradT_eqn .and. s% max_X_for_gradT_eqn > 0d0)) then
-            call do1_gradT_eqn(s, k, skip_partials, nvar, ierr)            
+            call do1_gradT_eqn(s, k, nvar, ierr)            
             return
          end if
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. s% conv_vel_flag) then
-            call do1_alt_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)            
+            call do1_alt_dlnT_dm_eqn(s, k, nvar, ierr)            
             return
          end if
          
@@ -309,7 +304,6 @@
             s% solver_test_partials_val = s% equ(i_equL,k)
          end if
 
-         if (skip_partials) return
          call save_eqn_residual_info( &
             s, k, nvar, i_equL, resid, 'do1_dlnT_dm_eqn', ierr)
 

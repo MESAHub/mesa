@@ -38,26 +38,24 @@
    fixed_Psurf = 0
    
    alt_scale_height_flag = .false.
+
+   tol_max_correction = 1d-8 ! 3d-3
+
    
 ! output
 
    photo_directory = 'photos2'
    log_directory = 'LOGS2'
 
-      photo_interval = 1000
-      !profile_interval = 1
-      !history_interval = 1
-      terminal_interval = 100
-
       photo_interval = 500
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 50
 
-      photo_interval = 50
+      !photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10
+      !terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
@@ -146,8 +144,8 @@
    
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = 108 ! -101D0
-   Profile_Panels1_xmax = 110 ! -101D0
+   !Profile_Panels1_xmin = 50 ! -101D0
+   !Profile_Panels1_xmax = 65 ! -101D0
    
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
 

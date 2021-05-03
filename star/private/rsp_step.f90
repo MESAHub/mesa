@@ -272,6 +272,7 @@
             s% R_center = s% R_center + s% dt*s% v_center
             
             iter_loop: do iter = 1, max_iters  
+               s% solver_iter = iter
                if (iter == iter_for_dfridr) then
                   s% solver_test_partials_k = test_partials_k
                end if
@@ -1317,6 +1318,9 @@
             d_Y2_der_out = Y2/s% Hp_face(k)*dHp_der_out(I)
 
             s% Y_face(k) = Y1*Y2
+            
+            if (k==-109) write(*,3) 'Y_face Y1 Y2', k, s% solver_iter, &
+               s% Y_face(k), Y1, Y2
 
             dY_dr_00(I) = Y1*d_Y2_dr_00 + Y2*d_Y1_dr_00 ! 
             dY_dr_in(I) = Y1*d_Y2_dr_in + Y2*d_Y1_dr_in ! 
@@ -1611,10 +1615,6 @@
             POMT4 = POM*POM1*POM2*POM3
 
             s% Chi(k) = POMT1*POM1
-            
-            !if (k==194) then 
-            !   write(*,2) '', k, 
-            !end if
 
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
@@ -1810,6 +1810,11 @@
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*QQ_div_Cp
             POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
+         
+            ! P*QQ/Cp = grad_ad
+            if (k==-109) write(*,3) 'w grada PII_00 PII_p1 SOURCE', k, s% solver_iter, &
+               s% RSP_w(k), (s% Pgas(k) + s% Prad(k))*QQ_div_Cp, s% PII(k), &
+               s% PII(k+1), s% SOURCE(k)
       
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2
@@ -3412,8 +3417,8 @@
          HR(IW) = -residual
          
          if (k==-109) then
-            write(*,3) 'RSP dEt PdV dtC dtEq', k, iter, &
-               s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
+            write(*,3) 'RSP w dEt PdV dtC dtEq', k, iter, &
+               s% RSP_w(k), s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
                dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k)), dt*s% Eq(k)
             !write(*,2) 'RSP w COUPL SOURCE DAMP DAMPR', k, &
             !   s% RSP_w(k), s% COUPL(k), s% SOURCE(k), s% DAMP(k), s% DAMPR(k)

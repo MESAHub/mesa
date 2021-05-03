@@ -74,7 +74,8 @@
       integer, parameter :: Tlim_dt_div_dt_cell_collapse = Tlim_dmstar + 1
       integer, parameter :: Tlim_dt_div_min_dr_div_cs = Tlim_dt_div_dt_cell_collapse + 1
       integer, parameter :: Tlim_lgL = Tlim_dt_div_min_dr_div_cs + 1
-      integer, parameter :: Tlim_max_timestep = Tlim_lgL + 1
+      integer, parameter :: Tlim_force_timestep = Tlim_lgL + 1
+      integer, parameter :: Tlim_max_timestep = Tlim_force_timestep + 1
       integer, parameter :: Tlim_timestep_hold = Tlim_max_timestep + 1
       integer, parameter :: Tlim_dX_div_X_cntr = Tlim_timestep_hold + 1
       integer, parameter :: Tlim_lg_XHe_cntr = Tlim_dX_div_X_cntr + 1
@@ -652,10 +653,10 @@
          end subroutine other_adjust_mdot_interface
       
       
-         subroutine other_after_enter_setmatrix_interface(id, ierr)
+         subroutine other_after_solver_setmatrix_interface(id, ierr)
             integer, intent(in) :: id
             integer, intent(out) :: ierr
-         end subroutine other_after_enter_setmatrix_interface
+         end subroutine other_after_solver_setmatrix_interface
       
       
          subroutine other_j_for_adjust_J_lost_interface(id, starting_j_rot_surf, j_for_mass_loss, ierr)

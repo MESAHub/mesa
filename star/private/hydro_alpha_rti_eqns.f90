@@ -38,13 +38,12 @@
       contains
 
 
-      subroutine do1_dalpha_RTI_dt_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_dalpha_RTI_dt_eqn(s, k, nvar, ierr)
          use star_utils, only: em1, e00, ep1
          use chem_def, only: ih1, ihe4
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
@@ -207,8 +206,6 @@
             write(*,2) 'equ(i,k)', k, s% equ(i_dalpha_RTI_dt,k)
             s% solver_test_partials_val = s% equ(i_dalpha_RTI_dt,k)
          end if
-
-         if (skip_partials) return
          
          d_dalpha_00 = 0
          d_dalpha_m1 = 0

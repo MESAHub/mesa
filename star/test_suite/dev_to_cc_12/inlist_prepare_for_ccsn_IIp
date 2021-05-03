@@ -26,7 +26,7 @@
       change_rotation_flag = .true.
       new_rotation_flag = .false.
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 

@@ -42,38 +42,35 @@
       
 
       subroutine do1_energy_eqn( & ! energy conservation
-            s, k, skip_partials, do_chem, nvar, ierr)
+            s, k, do_chem, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials, do_chem
+         logical, intent(in) :: do_chem
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
          call get1_energy_eqn( &
-            s, k, skip_partials, do_chem, nvar, &
+            s, k, do_chem, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_energy_eqn', k
             return
          end if         
-         if (skip_partials) return
          call store_partials( &
             s, k, s% i_dlnE_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_energy_eqn', ierr)
       end subroutine do1_energy_eqn
 
 
       subroutine get1_energy_eqn( &
-            s, k, skip_partials, do_chem, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
-
+            s, k, do_chem, nvar, d_dm1, d_d00, d_dp1, ierr)
          use eos_def, only: i_grad_ad, i_lnPgas, i_lnE
          use eps_grav, only: eval_eps_grav_and_partials
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s         
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials, do_chem
+         logical, intent(in) :: do_chem
          real(dp), intent(out), dimension(nvar) :: d_dm1, d_d00, d_dp1
          integer, intent(out) :: ierr
          
@@ -131,7 +128,6 @@
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
-         if (skip_partials) return
          call unpack_res18(s% species, resid_ad)
 
          if (test_partials) then  
