@@ -177,8 +177,6 @@ SRCS = \
    hydro_rsp3.f90 \
    hydro_rsp2.f90 \
    hydro_eqns.f90 \
-   hydro_mtx.f90 \
-   hydro_solver_procs.f90 \
    solve_omega_mix.f90 \
    history_specs.f90 \
    history.f90 \
@@ -198,9 +196,8 @@ SRCS = \
    element_diffusion.f90 \
    evolve_support.f90 \
    star_bcyclic.f90 \
+   solver_support.f90 \
    star_solver.f90 \
-   solve_burn.f90 \
-   solve_hydro.f90 \
    struct_burn_mix.f90 \
    winds.f90 \
    gravity_darkening.f90 \

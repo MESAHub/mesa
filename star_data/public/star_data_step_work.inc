@@ -1059,11 +1059,6 @@
          ! equ(i,k) is residual for equation i of cell k            
          real(dp), dimension(:,:), pointer :: equ ! (nvar,nz);  equ => equ1
          real(dp), dimension(:), pointer :: equ1 ! (nvar*nz); data for equ
-            ! pointer set by star_solver
-
-         real(dp), dimension(:,:), pointer :: jacobian
-            ! pointer set by enter_setmatrix
-         
          real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! (nvar,nvar,nz) 
          ! dblk(i,j,k) = dequ(i,k)/dx(j,k)
          ! lblk(i,j,k) = dequ(i,k)/dx(j,k-1)
