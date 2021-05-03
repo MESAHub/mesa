@@ -18,6 +18,7 @@
       compare_TDC_to_MLT = .false.
    
    
+      RSP2_calls_RSP3 = .false.
       
 
       ! RSP2 parameters

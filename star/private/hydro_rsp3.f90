@@ -23,7 +23,7 @@
 !
 ! ***********************************************************************
 
-      module hydro_rsp2
+      module hydro_rsp3
 
       use star_private_def
       use const_def
@@ -37,10 +37,10 @@
 
       private
       public :: &
-         do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
-         compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
-         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, &
-         set_using_RSP2, set_etrb_start_vars
+         do1_rsp3_L_eqn, do1_rsp3_turbulent_energy_eqn, do1_rsp3_Hp_eqn, &
+         compute_rsp3_Eq_cell, compute_rsp3_Uq_face, set_RSP3_vars, &
+         Hp_face_for_rsp3_val, Hp_face_for_rsp3_eqn, &
+         set_rsp3_etrb_start_vars ! set_using_RSP2
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
@@ -52,29 +52,29 @@
       contains
       
       
-      subroutine set_using_RSP2(s)
-         type (star_info), pointer :: s      
-         real(dp) :: switch         
-         s% using_RSP2 = .false.
-         if (.not. s% RSP2_flag) return
-         if (s% RSP2_min_dt_div_tau_conv_switch_to_MLT > 0) then
-            switch = s% max_conv_time_scale*s% RSP2_min_dt_div_tau_conv_switch_to_MLT
-            if (s% dt < switch) then
-               s% using_RSP2 = .true.
-               return
-            end if
-         end if
-         if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
-            switch = s% RSP2_min_dt_years_switch_to_MLT*secyer
-            if (s% dt < switch) then
-               s% using_RSP2 = .true.
-               return
-            end if
-         end if
-      end subroutine set_using_RSP2
+!      subroutine set_using_RSP2(s)
+!         type (star_info), pointer :: s      
+!         real(dp) :: switch         
+!         s% using_RSP2 = .false.
+!         if (.not. s% RSP2_flag) return
+!         if (s% RSP3_min_dt_div_tau_conv_switch_to_MLT > 0) then
+!            switch = s% max_conv_time_scale*s% RSP3_min_dt_div_tau_conv_switch_to_MLT
+!            if (s% dt < switch) then
+!               s% using_RSP2 = .true.
+!               return
+!            end if
+!         end if
+!         if (s% RSP3_min_dt_years_switch_to_MLT > 0) then
+!            switch = s% RSP3_min_dt_years_switch_to_MLT*secyer
+!            if (s% dt < switch) then
+!               s% using_RSP2 = .true.
+!               return
+!            end if
+!         end if
+!      end subroutine set_using_RSP2
       
       
-      subroutine set_RSP2_vars(s,ierr)
+      subroutine set_RSP3_vars(s,ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr    
          type(auto_diff_real_star_order1) :: x
@@ -104,7 +104,7 @@
          end do
          !$OMP END PARALLEL DO
          if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 1', s% model_number
+            if (s% report_ierr) write(*,2) 'failed in set_RSP3_vars loop 1', s% model_number
             return
          end if
          !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
@@ -112,7 +112,7 @@
             !Pturb          skip?
             x = compute_Chi_cell(s, k, op_err) ! Chi
             if (op_err /= 0) ierr = op_err
-            x = compute_Eq_cell(s, k, op_err) ! Eq
+            x = compute_rsp3_Eq_cell(s, k, op_err) ! Eq
             if (op_err /= 0) ierr = op_err
             x = compute_C(s, k, op_err) ! COUPL
             if (op_err /= 0) ierr = op_err
@@ -121,7 +121,7 @@
          end do
          !$OMP END PARALLEL DO
          if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 2', s% model_number
+            if (s% report_ierr) write(*,2) 'failed in set_RSP3_vars loop 2', s% model_number
             return
          end if
          do k = 1, s% RSP2_num_outermost_cells_forced_nonturbulent
@@ -140,10 +140,10 @@
             s% Lc(k) = 0d0; s% Lc_ad(k) = 0d0
             s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
          end do
-      end subroutine set_RSP2_vars
+      end subroutine set_RSP3_vars
 
 
-      subroutine do1_rsp2_L_eqn(s, k, nvar, ierr)
+      subroutine do1_rsp3_L_eqn(s, k, nvar, ierr)
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -170,8 +170,8 @@
          L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
          if (is_bad(scale)) then
-            write(*,2) 'do1_rsp2_L_eqn scale', k, scale
-            stop 'do1_rsp2_L_eqn'
+            write(*,2) 'do1_rsp3_L_eqn scale', k, scale
+            stop 'do1_rsp3_L_eqn'
          end if
          resid = (L_expected - L_actual)*scale         
       
@@ -181,18 +181,18 @@
             s% solver_test_partials_val = residual 
          end if
          
-         call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_rsp2_L_eqn', ierr)
+         call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_rsp3_L_eqn', ierr)
          if (ierr /= 0) return
 
          if (test_partials) then
             s% solver_test_partials_var = s% i_lnR
             s% solver_test_partials_dval_dx = resid%d1Array(i_lnR_00)
-            write(*,4) 'do1_rsp2_L_eqn', s% solver_test_partials_var
+            write(*,4) 'do1_rsp3_L_eqn', s% solver_test_partials_var
          end if      
-      end subroutine do1_rsp2_L_eqn
+      end subroutine do1_rsp3_L_eqn
       
 
-      subroutine do1_rsp2_Hp_eqn(s, k, nvar, ierr)
+      subroutine do1_rsp3_Hp_eqn(s, k, nvar, ierr)
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -212,14 +212,14 @@
          end if
 
          ierr = 0
-         Hp_expected = Hp_face_for_rsp2_eqn(s, k, ierr)
+         Hp_expected = Hp_face_for_rsp3_eqn(s, k, ierr)
          if (ierr /= 0) return        
          Hp_actual = wrap_Hp_00(s, k)  
          Hp_start = s% Hp_face_start(k)
          scale = 1d0/Hp_start
          if (is_bad(scale)) then
-            write(*,2) 'do1_rsp2_Hp_eqn scale', k, scale
-            stop 'do1_rsp2_Hp_eqn'
+            write(*,2) 'do1_rsp3_Hp_eqn scale', k, scale
+            stop 'do1_rsp3_Hp_eqn'
          end if
          resid = (Hp_expected - Hp_actual)*scale         
       
@@ -229,31 +229,31 @@
             s% solver_test_partials_val = residual 
          end if
          
-         call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp2_Hp_eqn', ierr)
+         call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp3_Hp_eqn', ierr)
          if (ierr /= 0) return
 
          if (test_partials) then
             s% solver_test_partials_var = s% i_lnR
             s% solver_test_partials_dval_dx = resid%d1Array(i_lnR_00)
-            write(*,4) 'do1_rsp2_Hp_eqn', s% solver_test_partials_var
+            write(*,4) 'do1_rsp3_Hp_eqn', s% solver_test_partials_var
          end if      
          
-      end subroutine do1_rsp2_Hp_eqn
+      end subroutine do1_rsp3_Hp_eqn
    
    
-      real(dp) function Hp_face_for_rsp2_val(s, k, ierr) result(Hp_face) ! cm
+      real(dp) function Hp_face_for_rsp3_val(s, k, ierr) result(Hp_face) ! cm
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face_ad
          ierr = 0
-         Hp_face_ad = Hp_face_for_rsp2_eqn(s, k, ierr)
+         Hp_face_ad = Hp_face_for_rsp3_eqn(s, k, ierr)
          if (ierr /= 0) return
          Hp_face = Hp_face_ad%val
-      end function Hp_face_for_rsp2_val
+      end function Hp_face_for_rsp3_val
       
    
-      function Hp_face_for_rsp2_eqn(s, k, ierr) result(Hp_face) ! cm
+      function Hp_face_for_rsp3_eqn(s, k, ierr) result(Hp_face) ! cm
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -290,9 +290,9 @@
                Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
                Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
                if (k==-104) then
-                  write(*,3) 'RSP2 Hp P_div_rho Pdrho_00 Pdrho_m1', k, s% solver_iter, &
+                  write(*,3) 'RSP3 Hp P_div_rho Pdrho_00 Pdrho_m1', k, s% solver_iter, &
                      Hp_face%val, Peos_div_rho%val, Peos_00%val/d_00%val, Peos_m1%val/d_m1%val
-                  !write(*,3) 'RSP2 Hp r2_div_Gm r_start r', k, s% solver_iter, &
+                  !write(*,3) 'RSP3 Hp r2_div_Gm r_start r', k, s% solver_iter, &
                   !   Hp_face%val, pow2(r_00%val)/(s% cgrav(k)*s% m(k)), &
                   !   s% r_start(k), r_00%val
                end if
@@ -309,10 +309,10 @@
                end if
             end if
          end if
-      end function Hp_face_for_rsp2_eqn
+      end function Hp_face_for_rsp3_eqn
 
 
-      subroutine do1_turbulent_energy_eqn(s, k, nvar, ierr)
+      subroutine do1_rsp3_turbulent_energy_eqn(s, k, nvar, ierr)
          use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -339,7 +339,7 @@
             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)         
          if (.not. s% using_RSP2) then           
-            resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP2
+            resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP3
          else if (non_turbulent_cell) then
             resid_ad = w_00/s% csound(k) ! make w = 0         
          else 
@@ -354,7 +354,7 @@
             resid_ad = esum_ad
             
             if (k == -109) then
-                  write(*,3) 'RSP2 residual w dEt PdV dtC dtEq', k, s% solver_iter, &
+                  write(*,3) 'RSP3 residual w dEt PdV dtC dtEq', k, s% solver_iter, &
                      resid_ad%val, w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
             end if
 
@@ -369,16 +369,16 @@
             tst = residual
             s% solver_test_partials_val = tst%val
             if (s% solver_iter == 12) &
-               write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
+               write(*,*) 'do1_rsp3_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
          end if
          
-         call save_eqn_residual_info(s, k, nvar, s% i_detrb_dt, resid_ad, 'do1_turbulent_energy_eqn', ierr)
+         call save_eqn_residual_info(s, k, nvar, s% i_detrb_dt, resid_ad, 'do1_rsp3_turbulent_energy_eqn', ierr)
          if (ierr /= 0) return
 
          if (test_partials) then
             s% solver_test_partials_var = s% i_lnd
             s% solver_test_partials_dval_dx = tst%d1Array(i_lnd_00)     ! xi0 good , xi1 partial 0, xi2 good.  Af horrible.'
-            write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k)/ln10, tst%val
+            write(*,*) 'do1_rsp3_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k)/ln10, tst%val
          end if      
 
          contains
@@ -436,12 +436,12 @@
          subroutine setup_dt_Eq_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: Eq_cell
-            Eq_cell = s% Eq_ad(k) ! compute_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
+            Eq_cell = s% Eq_ad(k) ! compute_rsp3_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
             dt_Eq_ad = s%dt*Eq_cell
          end subroutine setup_dt_Eq_ad
       
-      end subroutine do1_turbulent_energy_eqn
+      end subroutine do1_rsp3_turbulent_energy_eqn
       
       
       subroutine get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
@@ -685,7 +685,7 @@
       end function compute_Chi_cell
 
       
-      function compute_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
+      function compute_rsp3_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Eq_cell
@@ -707,10 +707,10 @@
          end if
          s% Eq(k) = Eq_cell%val
          s% Eq_ad(k) = Eq_cell
-      end function compute_Eq_cell
+      end function compute_rsp3_Eq_cell
 
 
-      function compute_Uq_face(s, k, ierr) result(Uq_face) ! cm s^-2, acceleration
+      function compute_rsp3_Uq_face(s, k, ierr) result(Uq_face) ! cm s^-2, acceleration
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Uq_face
@@ -735,14 +735,14 @@
             Uq_face = 4d0*pi*(Chi_m1 - Chi_00)/(r_00*s% dm_bar(k))
             
             if (k==-56) then
-               write(*,3) 'RSP2 Uq chi_m1 chi_00 r', k, s% solver_iter, &
+               write(*,3) 'RSP3 Uq chi_m1 chi_00 r', k, s% solver_iter, &
                   Uq_face%val, Chi_m1%val, Chi_00%val, r_00%val
             end if
             
          end if
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
          s% Uq(k) = Uq_face%val
-      end function compute_Uq_face
+      end function compute_rsp3_Uq_face
 
 
       function compute_Source(s, k, ierr) result(Source) ! erg g^-1 s^-1
@@ -792,9 +792,9 @@
          !     = erg g^-1 s^-1
          
          if (k==-109) then
-            write(*,3) 'RSP2 Source w PII_div_Hp T_P_QQ_div_Cp', k, s% solver_iter, &
+            write(*,3) 'RSP3 Source w PII_div_Hp T_P_QQ_div_Cp', k, s% solver_iter, &
                Source%val, w_00%val, PII_div_Hp_cell%val, T_00%val*P_QQ_div_Cp% val
-            !write(*,3) 'RSP2 PII_00 PII_p1 Hp_00 Hp_p1', k, s% solver_iter, &
+            !write(*,3) 'RSP3 PII_00 PII_p1 Hp_00 Hp_p1', k, s% solver_iter, &
             !   PII_face_00%val, PII_face_p1%val, Hp_face_00%val, Hp_face_p1%val
          end if
          s% SOURCE(k) = Source%val
@@ -821,7 +821,7 @@
             ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          end if
          if (k==-109) then
-            write(*,3) 'RSP2 DAMP w Hp_cell dw3', k, s% solver_iter, &
+            write(*,3) 'RSP3 DAMP w Hp_cell dw3', k, s% solver_iter, &
                D%val, w_00%val, Hp_cell%val, dw3% val
          end if
          s% DAMP(k) = D%val
@@ -1097,18 +1097,13 @@
       end function compute_Lt
 
 
-      subroutine set_etrb_start_vars(s, ierr)
-         use hydro_rsp3, only: set_rsp3_etrb_start_vars
+      subroutine set_rsp3_etrb_start_vars(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
          type(auto_diff_real_star_order1) :: Y_face, Lt
          include 'formats'
          ierr = 0
-         if (s% RSP2_calls_RSP3) then
-            call set_rsp3_etrb_start_vars(s, ierr)
-            return
-         end if
          do k=1,s%nz
             Y_face = compute_Y_face(s, k, ierr)
             if (ierr /= 0) return
@@ -1119,7 +1114,7 @@
             s% w_start(k) = s% w(k)
             s% Hp_face_start(k) = s% Hp_face(k)
          end do         
-      end subroutine set_etrb_start_vars
+      end subroutine set_rsp3_etrb_start_vars
       
       
       subroutine reset_etrb_using_L(s, ierr)
@@ -1141,8 +1136,8 @@
          allocate(w_face(nz), target_Lc(nz))
 
          do k=1, nz
-            s% Hp_face(k) = Hp_face_for_rsp2_val(s, k, ierr)
-            if (ierr /= 0) stop 'reset_etrb_using_L failed in Hp_face_for_rsp2_val'
+            s% Hp_face(k) = Hp_face_for_rsp3_val(s, k, ierr)
+            if (ierr /= 0) stop 'reset_etrb_using_L failed in Hp_face_for_rsp3_val'
             s% xh(s% i_Hp,k) = s% Hp_face(k)
             Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'reset_etrb_using_L failed in compute_Lr'
@@ -1179,5 +1174,5 @@
       end subroutine reset_etrb_using_L
 
 
-      end module hydro_rsp2
+      end module hydro_rsp3
 
