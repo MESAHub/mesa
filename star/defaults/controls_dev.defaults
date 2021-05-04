@@ -16,9 +16,6 @@
       max_X_for_TDC = -1   ! only used if > 0
       max_X_for_gradT_eqn = -1   ! only used if > 0
       compare_TDC_to_MLT = .false.
-   
-   
-      RSP2_calls_RSP3 = .false.
       
 
       ! RSP2 parameters

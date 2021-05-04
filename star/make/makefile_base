@@ -174,7 +174,6 @@ SRCS = \
    hydro_energy.f90 \
    hydro_momentum.f90 \
    hydro_temperature.f90 \
-   hydro_rsp3.f90 \
    hydro_rsp2.f90 \
    hydro_eqns.f90 \
    solve_omega_mix.f90 \

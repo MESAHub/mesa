@@ -8,14 +8,7 @@
          real(dp) :: max_X_for_TDC
          real(dp) :: max_X_for_gradT_eqn
          logical :: compare_TDC_to_MLT
-         
-         
-         logical :: RSP2_calls_RSP3
-
-
-
-
-
+ 
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap
          real(dp) :: RSP2_alfat
