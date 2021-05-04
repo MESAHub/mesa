@@ -75,8 +75,7 @@
          logical, intent(in) :: init
          integer, intent(out) :: ierr
 
-         type (Screen_Info), target :: scrn_info
-         type (Screen_Info), pointer :: sc
+         type (Screen_Info) :: sc
          integer :: num_reactions, i, ir, j, op_err
          real(dp) :: Tfactor, dTfactordt
          logical :: all_okay
@@ -84,8 +83,7 @@
          include 'formats'
          
          ierr = 0
-         sc => scrn_info
-         
+
          if (.not. init) then
             call screen_set_context( &
                sc, temp, den, logT, logRho, zbar, abar, z2bar,  &
@@ -170,7 +168,7 @@
             use chem_def, only: ih1, ih2, ihe4, ico55, ico57
             logical, intent(in) :: init
             integer, intent(in) :: ir, jscr
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(in) :: cid1, cid2
             real(dp), intent(in) :: a1, z1, a2, z2
             real(dp), intent(out) :: scor, scordt, scordd
@@ -278,7 +276,7 @@
             use rates_def, only: Screen_Info
             logical, intent(in) :: init
             integer, intent(in) :: jscr
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(in) :: i1, i2 ! chem id's for the isotopes
             integer, intent(in) :: i ! rate number
             integer, intent(in) :: ir
@@ -306,7 +304,7 @@
             use rates_def, only: Screen_Info
             logical, intent(in) :: init
             integer, intent(in) :: jscr
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(in) :: i1_in, i2_in, i3_in ! chem id's for the isotopes
             integer, intent(in) :: i ! rate number
             integer, intent(in) :: ir
@@ -374,7 +372,7 @@
             use rates_def, only: Screen_Info
             integer, intent(in) :: num_isos
             real(dp), intent(in) :: y(:)
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(out) :: ierr
 
             integer, pointer :: rtab(:)

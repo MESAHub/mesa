@@ -774,7 +774,7 @@
             import dp, screen_info
             implicit none
       
-            type (Screen_Info), pointer :: sc ! See rates_def
+            type (Screen_Info) :: sc ! See rates_def
             real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
             real(dp),intent(in) ::    a1, a2     !< mass numbers of reactants
             real(dp),intent(out) ::   screen     !< on return, screening factor for this reaction
