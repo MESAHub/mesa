@@ -199,17 +199,13 @@
             n = nreaclib
             read(io,iostat=ios) &
                reaclib% chapter(1:n), &
-               reaclib% species1(1:max_species_per_reaction*n), &
+               reaclib% species(1:max_species_per_reaction,1:n), &
                reaclib% label(1:n), &
                reaclib% reaction_flag(1:n), &
                reaclib% reverse_flag(1:n), &
                reaclib% Qvalue(1:n), &
-               reaclib% coefficients1(1:ncoefficients*n) 
-            if (ios /= 0) return
-            reaclib% species(1:max_species_per_reaction,1:n) => &
-               reaclib% species1(1:max_species_per_reaction*n)
-            reaclib% coefficients(1:ncoefficients,1:n) => &
-               reaclib% coefficients1(1:ncoefficients*n)             
+               reaclib% coefficients(1:ncoefficients,1:n) 
+            if (ios /= 0) return          
          end subroutine read_reaclib_cache
          
          
@@ -220,12 +216,12 @@
             n = nreaclib
             write(io) &
                reaclib% chapter(1:n), &
-               reaclib% species1(1:max_species_per_reaction*n), &
+               reaclib% species(1:max_species_per_reaction,1:n), &
                reaclib% label(1:n), &
                reaclib% reaction_flag(1:n), &
                reaclib% reverse_flag(1:n), &
                reaclib% Qvalue(1:n), &
-               reaclib% coefficients1(1:ncoefficients*n) 
+               reaclib% coefficients(1:ncoefficients,1:n) 
          end subroutine write_reaclib_cache         
          
          
