@@ -10,15 +10,11 @@
    
       alpha_TDC_DAMP = 1d0
       alpha_TDC_DAMPR = 0d0
-      alpha_TDC_eddy_viscosity = 0.25d0
-      alpha_TDC_turbulent_pressure = 0d0
+      alpha_TDC_PtdVdt = 0d0
    
       max_X_for_TDC = -1   ! only used if > 0
       max_X_for_gradT_eqn = -1   ! only used if > 0
       compare_TDC_to_MLT = .false.
-   
-   
-      RSP2_calls_RSP3 = .false.
       
 
       ! RSP2 parameters

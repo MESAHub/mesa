@@ -549,16 +549,14 @@
          use eps_mdot, only: calculate_eps_mdot
          use struct_burn_mix, only: do_struct_burn_mix
          use hydro_vars, only: set_vars_if_needed, set_vars, set_final_vars, set_cgrav
-         use hydro_mtx, only: dump_struct
          use star_utils, only: start_time, update_time, get_phot_info
          use solve_omega_mix, only: do_solve_omega_mix
          use mix_info, only: set_cz_bdy_mass, set_mixing_info
          use hydro_rotation, only: set_rotation_info, set_i_rot
-         use solve_hydro, only: set_luminosity_by_category
          use winds, only: set_mdot
          use star_utils, only: &
             eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals, &
-            set_phase_of_evolution
+            set_phase_of_evolution, set_luminosity_by_category
          use profile
 
          logical, intent(in) :: first_try
@@ -1753,9 +1751,8 @@
          use report, only: do_report
          use hydro_vars, only: set_vars_if_needed
          use mlt_info, only: set_gradT_excess_alpha
-         use solve_hydro, only: set_luminosity_by_category
          use star_utils, only: min_dr_div_cs, get_remnant_mass, &
-            total_angular_momentum, eval_Ledd
+            total_angular_momentum, eval_Ledd, set_luminosity_by_category
 
          type (star_info), pointer :: s
          character (len=*), intent(in) :: str

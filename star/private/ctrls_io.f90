@@ -123,7 +123,7 @@
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     mass_depth_for_L_surf, conv_core_gap_dq_limit, &
     max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC, max_X_for_TDC, max_X_for_gradT_eqn, &
-    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_eddy_viscosity, alpha_TDC_turbulent_pressure, &
+    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
     
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -409,7 +409,7 @@
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
     RSP2_min_dt_div_tau_conv_switch_to_MLT, RSP2_min_dt_years_switch_to_MLT, &
-    RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, RSP2_calls_RSP3, max_X_for_conv_timescale, min_X_for_conv_timescale, &
+    RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, max_X_for_conv_timescale, min_X_for_conv_timescale, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
     
@@ -2060,8 +2060,7 @@
  s% max_dt_years_for_TDC = max_dt_years_for_TDC
  s% alpha_TDC_DAMP = alpha_TDC_DAMP
  s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
- s% alpha_TDC_eddy_viscosity = alpha_TDC_eddy_viscosity
- s% alpha_TDC_turbulent_pressure = alpha_TDC_turbulent_pressure
+ s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
  s% max_X_for_TDC = max_X_for_TDC
  s% max_X_for_gradT_eqn = max_X_for_gradT_eqn
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
@@ -2100,8 +2099,6 @@
  s% RSP2_w_min_for_damping = RSP2_w_min_for_damping
  s% RSP2_source_seed = RSP2_source_seed
  s% RSP2_w_fix_if_neg = RSP2_w_fix_if_neg
- 
- s% RSP2_calls_RSP3 = RSP2_calls_RSP3
  
  s% max_X_for_conv_timescale = max_X_for_conv_timescale
  s% min_X_for_conv_timescale = min_X_for_conv_timescale
@@ -3730,8 +3727,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_dt_years_for_TDC = s% max_dt_years_for_TDC
  alpha_TDC_DAMP = s% alpha_TDC_DAMP
  alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
- alpha_TDC_eddy_viscosity = s% alpha_TDC_eddy_viscosity
- alpha_TDC_turbulent_pressure = s% alpha_TDC_turbulent_pressure
+ alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
  max_X_for_TDC = s% max_X_for_TDC
  max_X_for_gradT_eqn = s% max_X_for_gradT_eqn
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
@@ -3770,8 +3766,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_w_min_for_damping = s% RSP2_w_min_for_damping
  RSP2_source_seed = s% RSP2_source_seed
  RSP2_w_fix_if_neg = s% RSP2_w_fix_if_neg
- 
- RSP2_calls_RSP3 = s% RSP2_calls_RSP3
 
  max_X_for_conv_timescale = s% max_X_for_conv_timescale
  min_X_for_conv_timescale = s% min_X_for_conv_timescale

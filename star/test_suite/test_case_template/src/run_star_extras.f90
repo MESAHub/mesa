@@ -31,6 +31,8 @@
       
       include 'test_suite_extras_def.inc'
       
+      !real(dp) :: example_of_data_to_save_in_photos
+      
       contains
 
       include 'test_suite_extras.inc'
@@ -51,7 +53,23 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% other_photo_read => extras_photo_read
+         s% other_photo_write => extras_photo_write
       end subroutine extras_controls
+
+
+      subroutine extras_photo_read(id, iounit, ierr)
+         integer, intent(in) :: id, iounit
+         integer, intent(out) :: ierr
+         ierr = 0
+         !read(iounit,iostat=ierr) example_of_data_to_save_in_photos
+      end subroutine extras_photo_read
+
+
+      subroutine extras_photo_write(id, iounit)
+         integer, intent(in) :: id, iounit
+         !write(iounit) example_of_data_to_save_in_photos
+      end subroutine extras_photo_write
       
       
       subroutine extras_startup(id, restart, ierr)
