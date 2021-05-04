@@ -609,9 +609,8 @@
             use raw_rates, only: set_raw_rate
             real(dp) :: logT, temp, raw_rate
             integer :: which_rate, i, ierr
-            type (T_Factors), pointer :: tf =>null()
+            type (T_Factors) :: tf 
          
-            allocate(tf)
             logT = 8
             temp = exp10(logT)
             call tfactors(tf, logT, temp)
@@ -626,7 +625,6 @@
                   ierr = 0
                end if
             end do
-            deallocate(tf)
             if (.not. okay) stop 'init_raw_rates_records'
          end subroutine check
          

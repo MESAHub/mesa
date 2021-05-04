@@ -34,7 +34,7 @@
          subroutine rate_fcn(tf, temp, fr, rr)
            use const_def, only: dp
            use ratelib, only: T_factors
-           type (T_Factors), pointer :: tf
+           type (T_Factors) :: tf
            real(dp), intent(in) :: temp
            real(dp), intent(out) :: fr, rr
          end subroutine rate_fcn
@@ -52,7 +52,7 @@
          integer, intent(in) :: irs(:) ! (n) maps 1..n to reaction id
          integer, intent(in) :: which_rates(:) ! (rates_reaction_id_max)
          real(dp), intent(in) :: temp
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(inout) :: rates(:)
          integer, intent(out) :: ierr
          integer :: i, ir, op_err
@@ -79,7 +79,7 @@
          use reaclib_eval, only: do_reaclib_lookup
          integer, intent(in) :: ir, which_rate
          real(dp), intent(in) :: temp
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: raw_rate
          integer, intent(out) :: ierr
          integer :: rir, reaclib_id_ir
@@ -900,7 +900,7 @@
 
       subroutine rate_fcn_null(tf, temp, fr, rr)
          use ratelib, only: T_factors
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          fr = -1; rr = -1
@@ -917,7 +917,7 @@
          use math_lib
          integer, intent(in) :: ir, which_rate
          procedure(rate_fcn) :: rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn4
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer, intent(out) :: ierr
@@ -960,7 +960,7 @@
          use ratelib
          integer, intent(in) :: ir ! reaction id
          procedure(rate_fcn) :: rate_fcn1
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer, intent(out) :: ierr
@@ -983,7 +983,7 @@
          use interp_1d_lib, only: interp_values
          use ratelib
          integer, intent(in) :: ir ! reaction id
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer, intent(out) :: ierr
@@ -1023,7 +1023,7 @@
          use reaclib_eval, only: compute_some_inverse_lambdas,&
                                  do_reaclib_indices_for_reaction
          integer, intent(in) :: ir, rir ! reaction id, reverse reaction id
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer, intent(out) :: ierr
