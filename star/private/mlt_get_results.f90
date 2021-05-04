@@ -55,7 +55,7 @@
          integer, intent(out) :: mixing_type, ierr 
          type(auto_diff_real_star_order1) :: &
             gradr_ad, grada_ad, scale_height_ad, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, &
-            Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, chiRho_ad, chiT_ad, Cp_ad
+            Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad
          ierr = 0
          r_ad = r
          L_ad = L
@@ -63,6 +63,7 @@
          P_ad = P
          opacity_ad = opacity
          rho_ad = rho
+         dV_ad = 0d0
          chiRho_ad = chiRho
          chiT_ad = chiT
          Cp_ad = Cp
@@ -70,7 +71,7 @@
          grada_ad = grada
          scale_height_ad = scale_height
          call Get_results(s, 0, MLT_option, &
-            r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, chiRho_ad, chiT_ad, Cp_ad, &
+            r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad, &
             gradr_ad, grada_ad, scale_height_ad, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
@@ -96,7 +97,7 @@
                  
          real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old, alpha_semiconvection, center_h1
          integer :: iso, old_mix_type, j
-         type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, chiRho, chiT, Cp
+         type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
          include 'formats'
          ierr = 0
          
@@ -108,6 +109,7 @@
          r = wrap_r_00(s,k)
          opacity = get_kap_face(s,k)
          rho = get_Rho_face(s,k)
+         dV = 1d0/rho - 1d0/s% rho_start(k)
          chiRho = get_ChiRho_face(s,k)
          chiT = get_ChiT_face(s,k)
          Cp = get_Cp_face(s,k)
@@ -133,7 +135,7 @@
          end if
 
          call Get_results(s, k, MLT_option, &
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
@@ -142,7 +144,7 @@
 
 
       subroutine Get_results(s, k, MLT_option, &  ! NOTE: k=0 is a valid arg
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             alpha_semiconvection, thermohaline_coeff, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
@@ -151,7 +153,7 @@
          integer, intent(in) :: k
          character (len=*), intent(in) :: MLT_option
          type(auto_diff_real_star_order1), intent(in) :: &
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height
+            r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height
          integer, intent(in) :: iso
          real(dp), intent(in) :: &
             XH1, cgrav, m, gradL_composition_term, &
@@ -340,7 +342,7 @@
             else
                call get_TDC_solution(s, k, &
                   mixing_length_alpha, cgrav, m, Y_guess, report, &
-                  mixing_type, L, r, P, T, rho, Cp, opacity, &
+                  mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, conv_vel, Y_face, ierr)
                if (ierr /= 0) then
                   write(*,2) 'get_TDC_solution failed in set_TDC', k
@@ -540,13 +542,13 @@
       
       subroutine get_TDC_solution(s, k, &
             mixing_length_alpha, cgrav, m, Y_guess, report, &
-            mixing_type, L, r, P, T, rho, Cp, kap, Hp, gradL, cv, Y_face, ierr)
+            mixing_type, L, r, P, T, rho, dV, Cp, kap, Hp, gradL, cv, Y_face, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, cgrav, m
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(in) :: &
-            L, r, P, T, rho, Cp, kap, Hp, gradL, Y_guess
+            L, r, P, T, rho, dV, Cp, kap, Hp, gradL, Y_guess
          logical, intent(in) :: report
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
          integer, intent(out) :: ierr
@@ -596,7 +598,7 @@
          converged = .false.
          Y = 0d0
          call compute_Q(s, k, mixing_length_alpha, &
-            Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, gradL, Q, Af)
+            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
          if (abs(Q / scale) < tolerance) converged = .true.
 
          iter = 0
@@ -619,7 +621,7 @@
             if (Y == 0d0) Y = 1d-30
             do iter=1,10
                call compute_Q(s, k, mixing_length_alpha, &
-                     Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, gradL, Q, Af)
+                     Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
                if (abs(Q / scale) < tolerance) then
                   converged = .true.
                   exit
@@ -661,7 +663,7 @@
             if (report) write(*,2) 'initial Y', 0, Y%val
             do iter = 1, max_iter
                call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, Cp, kap, Hp, gradL, Q, Af)
+                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
                if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
                if (is_bad(Q%val)) exit
                if (abs(Q%val)/scale <= tolerance) then
@@ -740,17 +742,17 @@
             
             
       subroutine compute_Q(s, k, mixing_length_alpha, &
-            Y, c0_in, L_in, L0_in, A0, T, rho, Cp, kap, Hp, gradL_in, Q, Af)
+            Y, c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, Q, Af)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
          type(auto_diff_real_star_order1), intent(in) :: &
-            c0_in, L_in, L0_in, A0, T, rho, Cp, kap, Hp, gradL_in
+            c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: Q, Af
          type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, gradL
          call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, kap, Hp, gradL_in, xi0, xi1, xi2) 
+            Y, T, rho, dV, Cp, kap, Hp, gradL_in, xi0, xi1, xi2) 
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
          L = convert(L_in)
          L0 = convert(L0_in)
@@ -761,19 +763,20 @@
 
 
       subroutine eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, kap, Hp, gradL, xi0, xi1, xi2) 
+            Y, T, rho, Cp, dV, kap, Hp, gradL, xi0, xi1, xi2) 
          ! eval_xis sets up Y with partial wrt Z
          ! so results come back with partials wrt Z
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
-         type(auto_diff_real_star_order1), intent(in) :: T, rho, Cp, kap, Hp, gradL
+         type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp, gradL
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
          type(auto_diff_real_tdc) :: S0, D0, DR0
-         type(auto_diff_real_star_order1) :: gammar_div_alfa
+         type(auto_diff_real_star_order1) :: gammar_div_alfa, Pt0, dVdt
          real(dp), parameter :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
          real(dp), parameter :: x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3
+         real(dp), parameter :: x_ALFAP = 2.d0/3.d0
          real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
          include 'formats'
          S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*gradL/Hp)
@@ -785,9 +788,15 @@
             gammar_div_alfa = s% alpha_TDC_DAMPR*x_GAMMAR/(mixing_length_alpha*Hp)
             DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(T)/(pow2(rho)*Cp*kap))
          end if
+         Pt0 = s% alpha_TDC_PtdVdt*x_ALFAP*rho
+         if (s% dt > 0) then
+            dVdt = dV/s% dt
+         else
+            dVdt = 0d0
+         end if
          xi0 = S0
-         xi1 = -DR0
-         xi2 = -D0      
+         xi1 = -(DR0 + convert(Pt0*dVdt))
+         xi2 = -D0
          if (k > 0) then   
             s% xtra4_array(k) = S0%val
             s% xtra5_array(k) = D0%val
@@ -877,245 +886,6 @@
          K%val = K_in%val
          K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
       end function unconvert
-      
-
-      function get_Eq_0_face(s,k) result(Eq0)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Eq0
-         type(auto_diff_real_star_order1) :: &
-            v_div_r_m1, v_div_r_00, v_div_r_p1, d_v_div_r_dm_face, &
-            rho2_face, r6_face, Hp_face, Chi_div_w_face
-         real(dp) :: f
-         include 'formats'
-         if (k == 1 .or. k == s% nz) then
-            Eq0 = 0d0
-            return
-         end if
-         v_div_r_m1 = wrap_v_m1(s,k)/wrap_r_m1(s,k)
-         if (.true.) then ! one-sided to avoid partials wrt p1
-            v_div_r_00 = wrap_v_00(s,k)/wrap_r_00(s,k)
-            d_v_div_r_dm_face = (v_div_r_m1 - v_div_r_00)/s% dm(k-1)
-         else ! this would be better, but introduces partials wrt p1
-            v_div_r_p1 = wrap_v_p1(s,k)/wrap_r_p1(s,k)
-            d_v_div_r_dm_face = (v_div_r_m1 - v_div_r_p1)/(s% dm(k-1) + s% dm(k))
-         end if
-         f = (16d0/3d0)*pi*s% alpha_TDC_eddy_viscosity*s% mixing_length_alpha
-         rho2_face = pow2(get_rho_face(s,k))
-         r6_face = pow6(wrap_r_00(s,k))
-         Hp_face = get_Hp_face(s,k)
-         Chi_div_w_face = f*rho2_face*r6_face*Hp_face*d_v_div_r_dm_face 
-         Eq0 = 4d0*pi*Chi_div_w_face*d_v_div_r_dm_face
-      end function get_Eq_0_face
-
-
-      function get_Pturb_0_face(s,k) result(Pturb_0)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Pturb_0
-         real(dp), parameter :: x_ALFAP = 2.d0/3.d0
-         Pturb_0 = s% alpha_TDC_turbulent_pressure*x_ALFAP*get_rho_face(s,k)
-      end function get_Pturb_0_face
-
-
-      function get_dVdt_face(s,k) result(dVdt)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: dVdt
-         real(dp) :: alfa, beta
-         type(auto_diff_real_star_order1) :: dV_00, dV_m1
-         if (k == 1) then
-            dVdt = 0
-            return
-         end if
-         call get_face_weights(s, k, alfa, beta)
-         dV_00 = -expm1(wrap_dxh_lnd(s,k))/wrap_d_00(s,k)
-         dV_m1 = -expm1(wrap_dxh_lnd(s,k-1))/wrap_d_m1(s,k)
-         dVdt = (alfa*dV_00 + beta*dV_m1)/s% dt
-      end function get_dVdt_face
-      
-      
-      function get_d_v_div_r_cell(s,k) result(d_v_div_r) ! s^-1
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: d_v_div_r
-         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
-         include 'formats'
-         v_00 = wrap_v_00(s,k)
-         v_p1 = wrap_v_p1(s,k)
-         r_00 = wrap_r_00(s,k)
-         r_p1 = wrap_r_p1(s,k)
-         if (r_p1%val == 0d0) r_p1 = 1d0
-         d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
-      end function get_d_v_div_r_cell
-      
-      
-      function get_Chi_cell(s, k) result(Chi_cell) 
-         ! eddy viscosity energy (Kuhfuss 1986) [erg]
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Chi_cell
-         type(auto_diff_real_star_order1) :: &
-            rho2, r6_cell, d_v_div_r, Hp_cell, w_cell
-         real(dp) :: f, ALFAM_ALFA
-         integer :: j
-         include 'formats'
-         ALFAM_ALFA = s% alpha_TDC_eddy_viscosity*s% mixing_length_alpha
-         if (ALFAM_ALFA == 0d0) then
-            Chi_cell = 0d0
-         else
-            f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
-            rho2 = pow2(wrap_d_00(s,k))
-            r6_cell = 0.5d0*(pow6(wrap_r_00(s,k)) + pow6(wrap_r_p1(s,k)))
-            d_v_div_r = get_d_v_div_r_cell(s, k)
-            Hp_cell = get_Hp_cell(s,k)
-            Chi_cell = wrap_w_00(s,k)*f*rho2*r6_cell*d_v_div_r*Hp_cell
-            ! use solver variable w_cell for consistency of Eq and Uq and 3 point stencil
-         end if
-         s% Chi(k) = Chi_cell%val
-      end function get_Chi_cell
-
-
-      function get_Eq_cell(s,k) result(Eq) ! for energy equation
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Eq
-         type(auto_diff_real_star_order1) :: Chi_cell, d_v_div_r, Eq_div_w
-         integer :: ierr
-         logical :: test_partials
-         include 'formats'
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-         if (k == 1) then
-            Eq = 0d0
-         else
-            Chi_cell = get_Chi_cell(s,k)
-            d_v_div_r = get_d_v_div_r_cell(s,k)
-            Eq = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
-         end if
-         s% Eq(k) = Eq%val
-         if (test_partials) then
-            s% solver_test_partials_val = Eq%val
-            s% solver_test_partials_var = s% i_lnR
-            s% solver_test_partials_dval_dx = Eq%d1Array(i_lnR_00)
-            write(*,4) 'get_Eq_cell', s% solver_test_partials_var
-         end if      
-      end function get_Eq_cell
-
-
-      function get_Uq_face(s,k) result(Uq) ! for momentum equation
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Uq
-         type(auto_diff_real_star_order1) :: dChi_dm_bar, Chi_00, Chi_out
-         integer :: ierr
-         logical :: test_partials
-         include 'formats'
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-         if (k == 1) then
-            Uq = 0d0
-         else
-            Chi_00 = get_Chi_cell(s,k)
-            if (k > 1) then
-               Chi_out = shift_m1(get_Chi_cell(s,k-1)) ! , 'get_Uq_face')
-            else
-               Chi_out = 0d0
-            end if
-            dChi_dm_bar = (Chi_out - Chi_00)/s% dm_bar(k)
-            Uq = 4d0*pi*dChi_dm_bar/wrap_r_00(s,k)
-         end if
-         ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
-         s% Uq(k) = Uq%val      
-         if (test_partials) then
-            s% solver_test_partials_val = s% Uq(k) 
-            s% solver_test_partials_var = s% i_lnd
-            s% solver_test_partials_dval_dx = Uq%d1Array(i_lnd_00)
-            write(*,4) 'get_Uq_face', s% solver_test_partials_var
-         end if      
-      end function get_Uq_face
-
-
-      function get_Hp_face(s, k) result(Hp_face)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Hp_face
-         type(auto_diff_real_star_order1) :: &
-            r_00, r2, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
-            rho_face, area, dlnPeos, Peos_face, alt_Hp_face, A
-         real(dp) :: alfa, beta, cgrav, m
-         include 'formats'
-         if (k > s% nz) then
-            Hp_face = 0d0 ! not used
-            Hp_face%val = 1d0
-            s% Hp_face(k) = Hp_face%val
-            return
-         end if
-         cgrav = s% cgrav(k)
-         m = s% m(k)
-         r_00 = wrap_r_00(s,k)
-         r2 = pow2(r_00)
-         d_00 = wrap_d_00(s,k)
-         Peos_00 = wrap_Peos_00(s,k)
-         if (k == 1) then
-            Peos_div_rho = Peos_00/d_00
-            Hp_face = r2*Peos_div_rho/(cgrav*m)
-         else
-            d_m1 = wrap_d_m1(s,k)
-            Peos_m1 = wrap_Peos_m1(s,k)
-            call get_face_weights(s, k, alfa, beta)
-            Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
-            Hp_face = r2*Peos_div_rho/(cgrav*m)
-            if (s% alt_scale_height_flag) then
-               ! consider sound speed*hydro time scale as an alternative scale height
-               rho_face = alfa*d_00 + beta*d_m1
-               Peos_face = alfa*Peos_00 + beta*Peos_m1
-               alt_Hp_face = sqrt(Peos_face/cgrav)/rho_face
-               if (alt_Hp_face%val < Hp_face%val) then ! blend
-                  A = pow2(alt_Hp_face/Hp_face) ! 0 <= A%val < 1
-                  Hp_face = A*Hp_face + (1d0 - A)*alt_Hp_face
-               end if
-            end if
-         end if
-         s% Hp_face(k) = Hp_face%val
-      end function get_Hp_face
-
-      
-      function get_Hp_cell(s, k) result(Hp_cell) ! cm
-         ! instead of 0.5d0*(Hp_face(k) + Hp_face(k+1)) to keep block tridiagonal
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Hp_cell
-         type(auto_diff_real_star_order1) :: r_mid, r_00, r_p1, &
-            Peos_00, d_00, alt_Hp_cell, alfa
-         real(dp) :: cgrav_00, cgrav_p1, cgrav_mid, m_00, m_p1, m_mid
-         include 'formats'
-         r_00 = wrap_r_00(s,k)
-         cgrav_00 = s% cgrav(k)
-         m_00 = s% m(k)
-         d_00 = wrap_d_00(s,k)
-         Peos_00 = wrap_Peos_00(s,k)
-         r_p1 = wrap_r_p1(s,k)
-         if (k < s% nz) then
-            cgrav_p1 = s% cgrav(k+1)
-            m_p1 = s% m(k+1)
-         else
-            cgrav_p1 = s% cgrav(k)
-            m_p1 = s% m_center
-         end if
-         cgrav_mid = 0.5d0*(cgrav_00 + cgrav_p1)
-         m_mid = 0.5d0*(m_00 + m_p1)
-         r_mid = 0.5d0*(r_00 + r_p1)
-         Hp_cell = pow2(r_mid)*Peos_00 / (d_00*cgrav_mid*m_mid)
-         if (s% alt_scale_height_flag) then
-            ! consider sound speed*hydro time scale as an alternative scale height
-            alt_Hp_cell = sqrt(Peos_00/cgrav_mid)/d_00
-            if (alt_Hp_cell%val < Hp_cell%val) then ! blend
-               alfa = pow2(alt_Hp_cell/Hp_cell) ! 0 <= alfa%val < 1
-               Hp_cell = alfa*Hp_cell + (1d0 - alfa)*alt_Hp_cell
-            end if
-         end if
-      end function get_Hp_cell
 
 
 !------------------------------

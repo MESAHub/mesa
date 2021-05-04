@@ -66,7 +66,7 @@
          integer, intent(in) :: id, iounit
          integer, intent(out) :: ierr
          ierr = 0
-         read(iounit) initial_h1_mass, h1_init_surf_abund
+         read(iounit,iostat=ierr) initial_h1_mass, h1_init_surf_abund
       end subroutine extras_photo_read
 
 

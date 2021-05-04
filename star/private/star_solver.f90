@@ -31,9 +31,7 @@
       use num_def
       use mtx_def
       use mtx_lib, only: block_multiply_xa
-
-      use hydro_solver_procs
-
+      use solver_support
 
       implicit none
 
@@ -732,12 +730,37 @@
          
          subroutine do_equations(ierr)
             integer, intent(out) :: ierr
-            call prepare_solver_matrix(s, nvar, xder, size(A,dim=1), A1, ierr)
+            call prepare_solver_matrix(nvar, xder, size(A,dim=1), A1, ierr)
             if (ierr /= 0) return
             call eval_equations(s, nvar, ierr)
             if (ierr /= 0) return
             call s% other_after_solver_setmatrix(s% id, ierr)
          end subroutine do_equations
+
+
+         subroutine prepare_solver_matrix(nvar, xder, ldA, A1, ierr)
+            integer, intent(in) :: nvar
+            real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
+            integer, intent(in) :: ldA ! leading dimension of A
+            real(dp), pointer, dimension(:) :: A1
+            integer, intent(out) :: ierr
+            real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
+            integer :: i, j, nz, neqns
+            include 'formats'
+            ierr = 0
+            nz = s% nz
+            neqns = nvar*nz
+            A(1:ldA,1:neqns) => A1(1:ldA*neqns)         
+            i = nvar*nvar*nz
+            if (size(A1,dim=1) < 3*i) then
+               write(*,*) 'prepare_solver_matrix: size(A1,dim=1) < 3*i', size(A1,dim=1), 3*i
+               ierr = -1
+               return
+            end if
+            s% ublk(1:nvar,1:nvar,1:nz) => A1(1:i)
+            s% dblk(1:nvar,1:nvar,1:nz) => A1(i+1:2*i)
+            s% lblk(1:nvar,1:nvar,1:nz) => A1(2*i+1:3*i)
+         end subroutine prepare_solver_matrix
 
 
          subroutine adjust_correction( &
