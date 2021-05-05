@@ -74,6 +74,7 @@
          use alloc, only: allocate_star_info_arrays, set_RSP_flag
          use rsp_build, only: do_rsp_build
          use net, only: do_micro_change_net
+         use const_def, only: Lsun, Rsun, Msun
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: i, j, k
@@ -136,7 +137,19 @@
             write(*,1) 'dt', s% dt
             return
          end if
-         call finish_build_rsp_model(s, ierr)                     
+         call finish_build_rsp_model(s, ierr)      
+         write(*,2) 'nz', s%nz
+         write(*,1) 'T(nz)', s% T(s%nz)             
+         write(*,1) 'L_center/Lsun', s% L_center/Lsun           
+         write(*,1) 'R_center/Rsun', s% R_center/Rsun           
+         write(*,1) 'M_center/Msun', s% M_center/Msun           
+         write(*,1) 'L(1)/Lsun', s% L(1)/Lsun           
+         write(*,1) 'R(1)/Rsun', s% r(1)/Rsun           
+         write(*,1) 'M(1)/Msun', s% m(1)/Msun           
+         write(*,1) 'v(1)/1d5', s% v(1)/1d5       
+         write(*,1) 'tau_factor', s% tau_factor   
+         write(*,1) 'tau_base', s% tau_base   
+         write(*,*) 
       end subroutine build_rsp_model
       
 
