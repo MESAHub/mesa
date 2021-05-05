@@ -8,7 +8,7 @@
 ! original test case contributed by Radek Smolec.
 
 &star_job
-   saved_model_name = 'BEP.mod'
+   load_model_filename = 'BEP.mod'
    
    set_initial_dt = .true.
    seconds_for_initial_dt = 50 ! for debugging

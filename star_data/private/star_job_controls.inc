@@ -52,7 +52,7 @@
       character (len=strlen) :: echo_at_start, echo_at_end
 
       logical :: load_saved_model, load_saved_model_for_RSP
-      character (len=strlen) :: saved_model_name
+      character (len=strlen) :: load_model_filename
 
       logical :: create_merger_model
       character (len=strlen) :: saved_model_for_merger_1

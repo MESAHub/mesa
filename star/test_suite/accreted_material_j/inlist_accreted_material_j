@@ -3,7 +3,7 @@
       show_log_description_at_start = .false. 
 
       load_saved_model = .true.
-      saved_model_name = 'zams.mod'
+      load_model_filename = 'zams.mod'
 
       new_rotation_flag = .true.
       change_rotation_flag = .true.

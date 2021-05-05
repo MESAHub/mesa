@@ -1814,9 +1814,9 @@
             call star_load_restart_photo(id, s% job% saved_photo_name, ierr)
             if (failed('star_load_restart_photo',ierr)) return
          else if (s% job% load_saved_model_for_RSP) then
-            write(*,'(a)') 'load saved model for RSP ' // trim(s% job% saved_model_name)
+            write(*,'(a)') 'load saved model for RSP ' // trim(s% job% load_model_filename)
             write(*,*)
-            call star_read_RSP_model(id, s% job% saved_model_name, ierr)
+            call star_read_RSP_model(id, s% job% load_model_filename, ierr)
             if (failed('star_read_RSP_model',ierr)) return
          else if (s% job% load_saved_model) then
             if (s% job% create_merger_model) then
@@ -1835,9 +1835,9 @@
                write(*,*) 'please pick one and try again'
                call mesa_error(__FILE__,__LINE__)
             end if
-            write(*,'(a)') 'load saved model ' // trim(s% job% saved_model_name)
+            write(*,'(a)') 'load saved model ' // trim(s% job% load_model_filename)
             write(*,*)
-            call star_read_model(id, s% job% saved_model_name, ierr)
+            call star_read_model(id, s% job% load_model_filename, ierr)
             if (failed('star_read_model',ierr)) return
          else if (s% job% create_merger_model) then
             call create_merger_model(s, ierr)

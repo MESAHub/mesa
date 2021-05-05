@@ -248,7 +248,7 @@ do this your inlist might look like:
 
      ! start a run from a saved model
      load_saved_model = .true.
-     saved_model_name = '15M_at_TAMS.mod'
+     load_model_filename = '15M_at_TAMS.mod'
    
      ! display on-screen plots
      pgstar_flag = .true.

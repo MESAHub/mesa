@@ -4,7 +4,7 @@
       show_log_description_at_start = .false. 
 
       ! load_saved_model = .true.
-      ! saved_model_name = 'zams.mod'  ! from make_zams
+      ! load_model_filename = 'zams.mod'  ! from make_zams
 
       ! load pre-built ZAMS model
       create_pre_main_sequence_model = .false.

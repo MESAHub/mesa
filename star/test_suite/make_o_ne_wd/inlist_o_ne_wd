@@ -3,7 +3,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'c_burn.mod'
+      load_model_filename = 'c_burn.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'o_ne_wd.mod'

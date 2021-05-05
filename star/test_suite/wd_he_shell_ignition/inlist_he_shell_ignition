@@ -6,7 +6,7 @@
       show_log_description_at_start = .false.
       
       load_saved_model = .true.
-      saved_model_name = 'co_wd_0.96M.mod' ! from make_co_wd, 13738, initial_mass = 6.0d0
+      load_model_filename = 'co_wd_0.96M.mod' ! from make_co_wd, 13738, initial_mass = 6.0d0
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

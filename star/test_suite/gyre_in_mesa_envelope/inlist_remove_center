@@ -3,7 +3,7 @@
   ! load the starting model
 
   load_saved_model = .true.
-  saved_model_name = 'tams.mod'
+  load_model_filename = 'tams.mod'
 
   ! save a model at the end of the run
 

@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'lgT9.5.mod'
+      load_model_filename = 'lgT9.5.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'start_core_collapse.mod'

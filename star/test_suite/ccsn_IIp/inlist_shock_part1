@@ -2,7 +2,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'done_with_edep.mod'
+      load_model_filename = 'done_with_edep.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'shock_part1.mod'

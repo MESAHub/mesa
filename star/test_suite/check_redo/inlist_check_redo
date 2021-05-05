@@ -8,7 +8,7 @@
       show_log_description_at_start = .false. 
 
       load_saved_model = .true.
-      saved_model_name = 'zams.mod' ! from make_zams_high_mass, 13498
+      load_model_filename = 'zams.mod' ! from make_zams_high_mass, 13498
 
       set_initial_model_number = .true.
       initial_model_number = 0

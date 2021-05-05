@@ -5,7 +5,7 @@
    create_RSP_model = .false.
 
    load_saved_model_for_RSP = .true.
-   saved_model_name = 'test_loading.mod'
+   load_model_filename = 'test_loading.mod'
 
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'

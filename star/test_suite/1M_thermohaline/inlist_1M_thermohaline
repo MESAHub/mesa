@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = '1M.mod' ! from make_zams_high_mass, 13491
+      load_model_filename = '1M.mod' ! from make_zams_high_mass, 13491
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

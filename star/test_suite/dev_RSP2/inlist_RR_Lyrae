@@ -3,7 +3,7 @@
 ! original test case contributed by Radek Smolec.
 
 &star_job
-   saved_model_name = 'RR_Lyrae.mod'
+   load_model_filename = 'RR_Lyrae.mod'
    
    set_initial_dt = .true.
    seconds_for_initial_dt = 90 ! for debugging

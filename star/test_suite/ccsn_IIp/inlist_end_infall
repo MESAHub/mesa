@@ -1,7 +1,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'finished_infall.mod'
+      load_model_filename = 'finished_infall.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'ready_for_edep.mod'

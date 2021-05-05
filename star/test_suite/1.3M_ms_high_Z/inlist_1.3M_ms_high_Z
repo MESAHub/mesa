@@ -3,7 +3,7 @@
    show_log_description_at_start = .false. 
 
    load_saved_model = .true.
-   saved_model_name = 'zams_0.040_1.30.mod'
+   load_model_filename = 'zams_0.040_1.30.mod'
    required_termination_code_string = 'log_L_upper_limit'
 
    save_model_when_terminate = .true.

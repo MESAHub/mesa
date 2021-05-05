@@ -11,7 +11,7 @@
       mesa_dir = '../../..'
 
       load_saved_model = .true.
-      saved_model_name = 'M08.8_logRho8.95.mod'
+      load_model_filename = 'M08.8_logRho8.95.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
