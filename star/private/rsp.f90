@@ -1033,17 +1033,21 @@
          TET = s% time
          cycle_complete = .false.
          UN=s% v(1)
-         if(UN.gt.0.d0.and.ULL.le.0.d0) RMIN=s% r(1)/SUNR
+         if(UN.gt.0.d0.and.ULL.le.0.d0) then
+            RMIN=s% r(1)/SUNR
+         end if
          if (s% model_number.eq.1) return
          if (.not. s% RSP_have_set_velocities) return
          if (s% RSP_min_max_R_for_periods > 0d0 .and. &
                s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (UN/s% csound(1) > VMAX) then
+            VMAX = UN/s% csound(1)
+         end if
          if(UN*ULL.gt.0.0d0.or.UN.gt.0.d0) return
          T0=TET
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
          if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
-         if (s% v(1)/s% csound(1) > VMAX) VMAX = s% v(1)/s% csound(1)
          if(FIRST.eq.1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1
@@ -1055,6 +1059,7 @@
                write(*,2) 'TT1', s% model_number, TT1
                stop 'check_cycle_completed'
             end if
+            RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
             write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
                'period', s% rsp_num_periods, s% rsp_period/(24*3600), &
                'delta R', RMAX - RMIN, &
@@ -1072,7 +1077,6 @@
             run_num_retries_prev_period = s% num_retries
             TT1=T0
             INSIDE=1 
-            RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
             VMAX = 0d0
          else
              write(*,*) 'first maximum radius, period calculations start at model, day', &

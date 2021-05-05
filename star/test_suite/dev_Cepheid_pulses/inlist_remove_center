@@ -64,6 +64,9 @@
    non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
+   
+! mesh
+   mesh_delta_coeff = 2
 
 ! GYRE set starting velocities
    x_logical_ctrl(5) = .true. 
