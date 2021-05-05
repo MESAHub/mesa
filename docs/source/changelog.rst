@@ -10,6 +10,8 @@ Backwards-incompatible changes
 
 ``mixing_type`` now reports the mixing process that generates the largest D_mix, rather than prioritizing convection and thermohaline mixing over all others.
 
+``saved_model_name`` has been replaced with ``load_model_filename`` everywhere 
+
 
 Module-level changes
 --------------------
