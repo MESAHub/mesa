@@ -34,7 +34,8 @@
 
       integer :: num_periods, prev_cycle_run_num_steps, &
          run_num_iters_prev_period, run_num_retries_prev_period
-      real(dp) :: period, time_started, period_r_min, period_max_vsurf_div_cs
+      real(dp) :: period, time_started, period_r_min, period_max_vsurf_div_cs, &
+         prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs
             
       ! these routines are called by the standard run_star check_model
       
@@ -69,7 +70,8 @@
          integer, intent(in) :: id, iounit
          write(iounit) num_periods, prev_cycle_run_num_steps, &
             run_num_iters_prev_period, run_num_retries_prev_period, &
-            period, time_started, period_r_min, period_max_vsurf_div_cs
+            period, time_started, period_r_min, period_max_vsurf_div_cs, &
+            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs
       end subroutine photo_write
 
 
@@ -79,7 +81,8 @@
          ierr = 0
          read(iounit, iostat=ierr) num_periods, prev_cycle_run_num_steps, &
             run_num_iters_prev_period, run_num_retries_prev_period, &
-            period, time_started, period_r_min, period_max_vsurf_div_cs
+            period, time_started, period_r_min, period_max_vsurf_div_cs, &
+            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs
       end subroutine photo_read
 
       
@@ -102,6 +105,10 @@
             run_num_retries_prev_period = 0
             period_r_min = 0
             period_max_vsurf_div_cs = 0
+            prev_growth = 0
+            prev_period_delta_r = 0
+            prev_period = 0
+            prev_period_max_vsurf_div_cs = 0
          end if
          if (.not. s% x_logical_ctrl(5)) then
             call gyre_init('gyre.in')
@@ -355,7 +362,7 @@
          integer :: ierr
          type (star_info), pointer :: s
          real(dp) :: rel_run_E_err, target_period, time_ended, period_r_max, &
-            v_surf, v_surf_start
+            v_surf, v_surf_start, growth, period_delta_r
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -404,18 +411,30 @@
          period = time_ended - time_started
          if (period/(24*3600) < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
          num_periods = num_periods + 1
-         write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
-            'period', num_periods, period/(24*3600), &
-            'delta R', (period_r_max - period_r_min)/Rsun, &
+         
+         period_delta_r = period_r_max - period_r_min
+         if (period_delta_r > 0d0 .and. prev_period_delta_r > 0d0) then
+            growth = period/log(period_delta_r/prev_period_delta_r) ! seconds
+         else
+            growth = 0d0
+         end if
+         write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
+            num_periods,'period (d)',  period/(24*3600), &
+            'growth (d)', growth/(24*3600), &
+            'delta R/Rsun', period_delta_r/Rsun, &
             'max vsurf/cs', period_max_vsurf_div_cs, &
             'retries', s% num_retries - run_num_retries_prev_period,     &
             'steps', s% model_number - prev_cycle_run_num_steps, &
             'avg iters/step',  &
                dble(s% total_num_solver_iterations - run_num_iters_prev_period)/ &
                dble(s% model_number - prev_cycle_run_num_steps), &
-            'step', s% model_number, 'days', s% time/(24*3600)
+            'step', s% model_number, 'age (d)', s% time/(24*3600)
          time_started = time_ended
          prev_cycle_run_num_steps = s% model_number
+         prev_period = period
+         prev_growth = growth
+         prev_period_delta_r = period_delta_r
+         prev_period_max_vsurf_div_cs = period_max_vsurf_div_cs
          run_num_iters_prev_period = s% total_num_solver_iterations
          run_num_retries_prev_period = s% num_retries
          period_max_vsurf_div_cs = 0d0
@@ -475,7 +494,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 0
+         how_many_extra_history_columns = 4
       end function how_many_extra_history_columns
       
       
@@ -488,6 +507,15 @@
          integer :: id_other
          ierr = 0
          call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         names(1) = 'num_periods'
+         vals(1) = num_periods
+         names(2) = 'period'
+         vals(2) = prev_period
+         names(3) = 'growth'
+         vals(3) = prev_growth
+         names(4) = 'delta_r'
+         vals(4) = prev_period_delta_r
       end subroutine data_for_extra_history_columns
 
       
@@ -499,7 +527,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 6
+         how_many_extra_profile_columns = 0 ! 6
       end function how_many_extra_profile_columns
       
       
@@ -513,15 +541,18 @@
          type (star_info), pointer :: s
          integer :: k
          ierr = 0
+         return
+         
+         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         names(1) = 'std_lg_absY'
-         names(2) = 'std_gradT'
-         names(3) = 'std_vc'
-         names(4) = 'S0'
-         names(5) = 'D0'
-         names(6) = 'DR0'
+         names(1) = 'xtra1'
+         names(2) = 'xtra2'
+         names(3) = 'xtra3'
+         names(4) = 'xtra4'
+         names(5) = 'xtra5'
+         names(6) = 'xtra6'
 
          do k=1,nz            
             vals(k,1) = s% xtra1_array(k)

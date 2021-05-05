@@ -82,8 +82,8 @@
    set_rho_to_dm_div_dV = .false.
    
    use_Pvsc_art_visc = .true.
-   Pvsc_cq = 10d0 ! 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   Pvsc_zsh = 0.01d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_cq = 500 ! 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.001 ! 0.1d0 ! "turn-on" compression in units of sound speed.
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
