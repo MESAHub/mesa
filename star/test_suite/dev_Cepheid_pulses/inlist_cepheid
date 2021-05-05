@@ -43,7 +43,9 @@
 
 ! timesteps
    max_timestep = 6d3 ! expected period/500 or so
-   dt_div_min_dr_div_cs_limit = 0.7d0
+   dt_div_min_dr_div_cs_limit = 0.9d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.75d0 ! only interested in outer envelope for shocks
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.01d0
 
 ! mlt
    !mlt_Pturb_factor = 1d0
@@ -115,10 +117,10 @@
       terminal_interval = 4000
 
 
-      !photo_interval = 100
+      photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 10
+      terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
@@ -198,7 +200,7 @@
 
 &pgstar
 
-    !pause = .true.
+    pause = .true.
     !pause_interval = 100
     pgstar_interval = 5 ! 10
 
@@ -232,7 +234,7 @@
     Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
    
     !Profile_Panels2_show_grid = .true.
-    Profile_Panels2_num_panels = 4
+    !Profile_Panels2_num_panels = 4
 
     Profile_Panels2_xaxis_name = 'logtau'
     Profile_Panels2_xaxis_reversed = .true.

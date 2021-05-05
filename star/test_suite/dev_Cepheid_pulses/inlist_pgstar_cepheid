@@ -177,9 +177,9 @@
          Profile_Panels2_yaxis_name(5) = 'zone'     
          Profile_Panels2_ymax(5) = -101D0
          Profile_Panels2_ymin(5) = -101D0
-         Profile_Panels2_other_yaxis_name(5) = 'logdq' 
+         Profile_Panels2_other_yaxis_name(5) = 'q' 
          Profile_Panels2_other_ymax(5) = -101D0 ! 
-         Profile_Panels2_other_ymin(5) = -101D0 ! 
+         Profile_Panels2_other_ymin(5) = -1D0 ! 
          
 
          Profile_Panels2_file_flag = .false.

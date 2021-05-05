@@ -1252,7 +1252,22 @@
          include 'formats'
          nz = s% nz
 
-         if (s% u_flag) then
+         if (s% v_flag) then
+            do k=2,nz
+               abs_du = abs(s% v_start(k) - s% v_start(k-1))
+               cs = maxval(s% csound(max(1,k-5):min(nz,k+5)))
+               s% abs_du_plus_cs(k) = abs_du + cs
+               s% abs_du_div_cs(k) = abs_du/cs
+            end do
+            k = 1
+            s% abs_du_plus_cs(k) = s% abs_du_plus_cs(k+1)
+            s% abs_du_div_cs(k) = s% abs_du_div_cs(k+1)
+            do j = 1,3
+               do k=2,nz-1
+                  s% abs_du_div_cs(k) = sum(s% abs_du_div_cs(k-1:k+1))/3d0
+               end do
+            end do
+         else if (s% u_flag) then
             do k=2,nz-1
                abs_du = &
                   max(abs(s% u_start(k) - s% u_start(k+1)), &
@@ -1532,11 +1547,14 @@
          else
             remnant_mass = s% m(1)
          end if
+         min_abs_du_div_cs = &
+            s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          if (s% v_flag) then
             do k = k_min, nz-1
                if (s% m(k) > remnant_mass) cycle
                if (s% q(k) > max_q) cycle
                if (s% q(k) < min_q) exit
+               if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
                r00 = s% r(k)
                rp1 = s% r(k+1)
                dr_div_cs = (r00 - rp1)/s% csound(k)
@@ -1548,8 +1566,6 @@
             return
          end if
          if (.not. s% u_flag) return
-         min_abs_du_div_cs = &
-            s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          do k = k_min, nz-1
             if (s% m(k) > remnant_mass) cycle
             if (s% q(k) > max_q) cycle
