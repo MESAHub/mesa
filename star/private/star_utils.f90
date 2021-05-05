@@ -3450,7 +3450,7 @@
          integer, intent(out) :: ierr
          integer :: j
          real(dp) :: mlt_Pturb_start
-         type(auto_diff_real_star_order1) :: rho_m1, rho_00, &
+         type(auto_diff_real_star_order1) :: &
             Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
          logical :: time_center
          include 'formats'
@@ -3486,11 +3486,8 @@
          end if
 
          mlt_Pturb_ad = 0d0
-         if ((.not. skip_mlt_Pturb) .and. &
-             s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
-            rho_m1 = wrap_d_m1(s,k)
-            rho_00 = wrap_d_00(s,k)
-            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_ad(k))*(rho_m1 + rho_00)/6d0
+         if ((.not. skip_mlt_Pturb) .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
+            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
             if (time_center) then
                mlt_Pturb_start = &
                   s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
@@ -3893,6 +3890,19 @@
          call get_face_weights(s, k, alfa, beta)
          rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
       end function get_rho_face
+      
+      
+      real(dp) function get_rho_face_val(s,k) result(rho_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            rho_face = s% rho(1)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
+      end function get_rho_face_val
       
       
       function get_T_face(s,k) result(T_face)

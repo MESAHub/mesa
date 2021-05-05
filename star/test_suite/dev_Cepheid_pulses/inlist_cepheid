@@ -21,7 +21,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 6.5d3 ! about period/500
+      seconds_for_initial_dt = 5.4d3 ! about period/600 
 
       !pgstar_flag = .true.
 
@@ -38,20 +38,23 @@
 
 &controls
 
-   force_timestep = 6.5d3 ! about period/500 
+   force_timestep = 5.4d3 ! about period/600 
 
 ! limit max_model_number as part of test_suite
    max_model_number = 300000
 
+! mlt
+   !mlt_Pturb_factor = 1d0
+   
 ! mesh
    okay_to_remesh = .false.
-      
+
 ! TDC
    max_X_for_TDC = 1d0
    max_X_for_conv_timescale = 1d0
 
-   max_dt_div_tau_conv_for_TDC = -1 ! < 0 means ignore this 
-   max_dt_years_for_TDC = -1 ! < 0 means ignore this 
+   !max_dt_div_tau_conv_for_TDC = 1 ! -1 ! < 0 means ignore this 
+   !max_dt_years_for_TDC = 1d-6 ! -1 ! < 0 means ignore this 
    
    alpha_TDC_DAMP = 1d0
    alpha_TDC_DAMPR = 0d0
@@ -92,6 +95,7 @@
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
+   trace_history_value_name(3) = 'using_TDC'
 
       photo_interval = 500
       profile_interval = 4000
@@ -99,13 +103,15 @@
       terminal_interval = 4000
 
 
-      !photo_interval = 50
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 50
+      !terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
+      
+      !max_number_retries = 11
       
       !max_model_number = 687
 

@@ -563,7 +563,7 @@
       ! ergs/s at face(k)
       subroutine eval1_work(s, k, skip_Peos, &
             work_ad, work, d_work_dxa00, d_work_dxam1, ierr)
-         use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw
+         use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw, get_rho_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s 
@@ -574,7 +574,7 @@
          real(dp), dimension(s% species), intent(out) :: &
             d_work_dxa00, d_work_dxam1
          integer, intent(out) :: ierr
-         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face, old2
+         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_star_order1) :: &
             P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
@@ -703,12 +703,8 @@
          
             ! set mlt_Pturb_ad
             mlt_Pturb_ad = 0d0
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
-               old2 = pow2(s% mlt_vc_old(k))
-               mlt_Pturb_ad%val = s% mlt_Pturb_factor*old2*(s% rho(k-1) + s% rho(k))/6d0
-               mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*old2*s% rho(k-1)/6d0
-               mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*old2*s% rho(k)/6d0
-            end if            
+            if (s% mlt_Pturb_factor > 0d0 .and. k > 1) &
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
          
             P_face_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad + extra_P
          

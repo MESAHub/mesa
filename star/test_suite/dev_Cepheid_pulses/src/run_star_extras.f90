@@ -364,10 +364,8 @@
             period_r_min = s% r(1)
             return
          end if
-         ! check_cycle_completed when v(1) goes from positive to negative
+         ! at max radius when v(1) goes from positive to negative
          if (s% v(1)*s% v_start(1) > 0d0 .or. s% v(1) > 0d0) return
-         
-         ! at max radius
          period_r_max = s% r(1)
          ! either start of 1st cycle, or end of current
          if (time_started == 0) then
@@ -379,12 +377,12 @@
                s% model_number, s% time/(24*3600)
             return
          end if
-         num_periods = num_periods + 1
          time_ended = s% time
          !if (abs(s% v(1)-s% v_start(1)).gt.1.0d-10) & ! tweak the end time
          !   time_ended = time_started + (s% time - time_started)*s% v_start(1)/(s% v_start(1) - s% v(1))
          period = time_ended - time_started
-         if (period < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
+         if (period/(24*3600) < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
+         num_periods = num_periods + 1
          write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
             'period', num_periods, period/(24*3600), &
             'delta R', (period_r_max - period_r_min)/Rsun, &
