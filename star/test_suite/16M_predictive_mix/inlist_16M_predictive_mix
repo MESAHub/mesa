@@ -15,7 +15,7 @@
    ! Initial model
 
    load_saved_model = .true.
-   saved_model_name = 'start.mod'
+   load_model_filename = 'start.mod'
 
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0

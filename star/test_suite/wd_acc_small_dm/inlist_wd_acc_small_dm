@@ -6,7 +6,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'co_wd_1.00M.mod' ! from make_co_wd, 13738, initial_mass = 6.4d0
+      load_model_filename = 'co_wd_1.00M.mod' ! from make_co_wd, 13738, initial_mass = 6.4d0
 
       set_initial_age = .true.
       initial_age = 0

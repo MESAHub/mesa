@@ -11,7 +11,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'late_pre_zams_1.0M.mod'
+      load_model_filename = 'late_pre_zams_1.0M.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 's1.mod' ! 's1_from_inlist_solar_mod.mod'

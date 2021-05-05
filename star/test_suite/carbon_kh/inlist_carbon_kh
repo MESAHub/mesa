@@ -2,7 +2,7 @@
 
   ! begin with a low density, pure carbon model
   load_saved_model = .true.
-  saved_model_name = 'initial_model/pure_carbon_at_rhoc_10gcc.mod'
+  load_model_filename = 'initial_model/pure_carbon_at_rhoc_10gcc.mod'
 
   set_initial_age = .true.
   initial_age = 0

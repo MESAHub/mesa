@@ -1,7 +1,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'R_CrB_from_He_star.mod'
+      load_model_filename = 'R_CrB_from_He_star.mod'
 
       set_initial_age = .true.
       initial_age = 0

@@ -3,7 +3,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'lgTmax_9.5.mod' ! from pre_ms_to_cc_lo using given inlist_mass_Z_wind_rotation
+      load_model_filename = 'lgTmax_9.5.mod' ! from pre_ms_to_cc_lo using given inlist_mass_Z_wind_rotation
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

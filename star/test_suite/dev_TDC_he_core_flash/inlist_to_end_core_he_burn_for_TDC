@@ -6,8 +6,8 @@
    show_log_description_at_start = .false.
 
    load_saved_model = .true.
-   saved_model_name = 'start_he_core_flash.mod'
-   !saved_model_name = 'test.mod'
+   load_model_filename = 'start_he_core_flash.mod'
+   !load_model_filename = 'test.mod'
 
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'

@@ -7,7 +7,7 @@
       show_log_description_at_start = .false. 
       
       load_saved_model = .true.
-      saved_model_name = 'ns_env.mod'
+      load_model_filename = 'ns_env.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'ns_plus_he_layer.mod'

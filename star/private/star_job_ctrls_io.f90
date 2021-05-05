@@ -91,7 +91,7 @@
          echo_at_end, &
          load_saved_model, &
          load_saved_model_for_RSP, &
-         saved_model_name, &
+         load_model_filename, &
          create_merger_model, &
          saved_model_for_merger_1, &
          saved_model_for_merger_2, &
@@ -734,7 +734,7 @@
          s% job% echo_at_end = echo_at_end
          s% job% load_saved_model = load_saved_model
          s% job% load_saved_model_for_RSP = load_saved_model_for_RSP
-         s% job% saved_model_name = saved_model_name
+         s% job% load_model_filename = load_model_filename
          s% job% create_merger_model = create_merger_model
          s% job% saved_model_for_merger_1 = saved_model_for_merger_1
          s% job% saved_model_for_merger_2 = saved_model_for_merger_2
@@ -1304,7 +1304,7 @@
          echo_at_end = s% job% echo_at_end
          load_saved_model = s% job% load_saved_model
          load_saved_model_for_RSP = s% job% load_saved_model_for_RSP
-         saved_model_name = s% job% saved_model_name
+         load_model_filename = s% job% load_model_filename
          create_merger_model = s% job% create_merger_model
          saved_model_for_merger_1 = s% job% saved_model_for_merger_1
          saved_model_for_merger_2 = s% job% saved_model_for_merger_2
