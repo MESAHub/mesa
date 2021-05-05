@@ -23,7 +23,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 5.4d3 ! about period/600 
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -38,16 +38,28 @@
 
 &controls
 
-   force_timestep = 5.4d3 ! about period/600 
-
 ! limit max_model_number as part of test_suite
    max_model_number = 300000
+
+! timesteps
+   max_timestep = 6d3 ! expected period/500 or so
+   dt_div_min_dr_div_cs_limit = 0.7d0
 
 ! mlt
    !mlt_Pturb_factor = 1d0
    
-! mesh
-   okay_to_remesh = .false.
+! mesh controls
+   okay_to_remesh = .false.   ! seems ok to keep it fixed
+   
+   !okay_to_remesh = .true.
+   use_split_merge_amr = .true.
+   split_merge_amr_flipped_hybrid_zoning = .true.
+   split_merge_amr_nz_r_core_fraction = 0.5d0
+   split_merge_amr_nz_r_core = 300
+   split_merge_amr_nz_baseline = 500
+   split_merge_amr_MaxLong = 1.5d0
+   split_merge_amr_MaxShort = 1.5d0
+   split_merge_amr_max_iters = 1000
 
 ! TDC
    max_X_for_TDC = 1d0
@@ -83,7 +95,7 @@
 ! output controls
 
    x_logical_ctrl(7) = .true. ! output period info to terminal
-   x_integer_ctrl(7) = 999999 ! which period to check (< 0 means don't check any)
+   x_integer_ctrl(7) = 0 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 37.31481 ! expected period (in days) 
 
    
@@ -220,6 +232,7 @@
     Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
    
     !Profile_Panels2_show_grid = .true.
+    Profile_Panels2_num_panels = 4
 
     Profile_Panels2_xaxis_name = 'logtau'
     Profile_Panels2_xaxis_reversed = .true.

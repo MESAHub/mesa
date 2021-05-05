@@ -228,10 +228,13 @@
          subroutine setup_d_mlt_Pturb(ierr)
             use star_utils, only: get_rho_face
             integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: rho_00, rho_m1
             ierr = 0
             ! d_mlt_Pturb = difference in MLT convective pressure across face
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
-               d_mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
+               rho_00 = wrap_d_00(s,k)
+               rho_m1 = wrap_d_m1(s,k)
+               d_mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(rho_m1 - rho_00)/3d0
             else
                d_mlt_Pturb_ad = 0d0
             end if

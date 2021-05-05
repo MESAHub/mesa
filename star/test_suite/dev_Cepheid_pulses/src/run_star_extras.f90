@@ -133,7 +133,8 @@
          real(dp)                  :: rpar(1)
          
          integer, parameter :: modes = 3
-         integer :: npts(modes), nz, i, k
+         integer :: npts(modes), nz, i, k, i_v
+         real(dp), pointer :: vel(:)
          real(dp), allocatable, dimension(:,:) :: r, v
          real(dp) :: v_surf, amix1, amix2, amixF, &
             period(modes)
@@ -233,15 +234,25 @@
          
          v_surf = amixF*v(1,nz-1) + AMIX1*v(2,nz-1) + AMIX2*v(3,nz-1)
          
+         if (s% v_flag) then
+            vel => s% v
+            i_v = s% i_v
+         else if (s% u_flag) then
+            vel => s% u
+            i_v = s% i_u
+         else
+            stop 'set_gyre_linear_analysis vel'
+         end if
+         
          do i=1,nz-1
             k = nz+1-i ! v(1) from gyre => s% v(nz) in star
-            s% v(k)=1.0d5/v_surf*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
+            vel(k)=1.0d5/v_surf*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
          end do
-         s% v(1) = s% v(2)
+         vel(1) = vel(2)
          s% v_center = 0d0
          
          do k=1,nz
-            s% xh(s% i_v,k) = s% v(k)
+            s% xh(i_v,k) = vel(k)
          end do
 
          write(*,2) 'nz', nz
@@ -252,7 +263,7 @@
          write(*,1) 'L(1)/Lsun', s% L(1)/Lsun           
          write(*,1) 'R(1)/Rsun', s% r(1)/Rsun           
          write(*,1) 'M(1)/Msun', s% m(1)/Msun           
-         write(*,1) 'v(1)/1d5', s% v(1)/1d5    
+         write(*,1) 'v(1)/1d5', vel(1)/1d5    
          write(*,1) 'X(1)', s% X(1)      
          write(*,1) 'Y(1)', s% Y(1)      
          write(*,1) 'Z(1)', s% Z(1)      
@@ -344,6 +355,7 @@
          integer :: ierr
          type (star_info), pointer :: s
          real(dp) :: rel_run_E_err, target_period, time_ended, period_r_max
+         real(dp), pointer :: vel(:), vel_start(:)
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -357,15 +369,24 @@
          end if
          if (.not. s% x_logical_ctrl(7)) return
          if (s% x_ctrl(7) <= 0d0) return ! must give expected period > 0
-         if (s% v(1)/s% csound(1) > period_max_vsurf_div_cs) &
-            period_max_vsurf_div_cs = s% v(1)/s% csound(1)
-         ! check_cycle_completed when v(1) goes from positive to negative
-         if (s% v(1)*s% v_start(1) < 0d0 .and. s% v(1) > 0d0) then
+         if (s% v_flag) then
+            vel => s% v
+            vel_start => s% v_start
+         else if (s% u_flag) then
+            vel => s% u_face_val
+            vel_start => s% u_face_start
+         else
+            stop 'extras_finish_step vel'
+         end if
+         if (vel(1)/s% csound(1) > period_max_vsurf_div_cs) &
+            period_max_vsurf_div_cs = vel(1)/s% csound(1)
+         ! check_cycle_completed when vel(1) goes from positive to negative
+         if (vel(1)*vel_start(1) < 0d0 .and. s% v(1) > 0d0) then
             period_r_min = s% r(1)
             return
          end if
-         ! at max radius when v(1) goes from positive to negative
-         if (s% v(1)*s% v_start(1) > 0d0 .or. s% v(1) > 0d0) return
+         ! at max radius when vel(1) goes from positive to negative
+         if (vel(1)*vel_start(1) > 0d0 .or. vel(1) > 0d0) return
          period_r_max = s% r(1)
          ! either start of 1st cycle, or end of current
          if (time_started == 0) then
@@ -378,8 +399,8 @@
             return
          end if
          time_ended = s% time
-         !if (abs(s% v(1)-s% v_start(1)).gt.1.0d-10) & ! tweak the end time
-         !   time_ended = time_started + (s% time - time_started)*s% v_start(1)/(s% v_start(1) - s% v(1))
+         if (abs(vel(1) - vel_start(1)) > 1d-10) & ! tweak the end time to match vel(1) == 0
+            time_ended = time_started + (time_ended - time_started)*vel_start(1)/(vel_start(1) - vel(1))
          period = time_ended - time_started
          if (period/(24*3600) < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
          num_periods = num_periods + 1
@@ -398,7 +419,7 @@
          run_num_iters_prev_period = s% total_num_solver_iterations
          run_num_retries_prev_period = s% num_retries
          period_max_vsurf_div_cs = 0d0
-         if (num_periods < s% x_integer_ctrl(7) .or. s% x_integer_ctrl(7) < 0) return
+         if (num_periods < s% x_integer_ctrl(7) .or. s% x_integer_ctrl(7) <= 0) return
          write(*,*)
          write(*,*)
          write(*,*)

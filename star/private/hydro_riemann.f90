@@ -428,9 +428,11 @@
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
          end if
+         
+         s% u_face_val(k) = s% u_face_ad(k)%val
 
          if (s% P_face_start(k) < 0d0) then
-            s% u_face_start(k) = s% u_face_ad(k)%val
+            s% u_face_start(k) = s% u_face_val(k)
             s% P_face_start(k) = s% P_face_ad(k)%val
          end if
 

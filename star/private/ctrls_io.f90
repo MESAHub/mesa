@@ -261,8 +261,8 @@
     gam_function_weight, gam_function_param1, gam_function_param2, &
     xa_function_species, xa_function_weight, xa_function_param, xa_mesh_delta_coeff, split_merge_amr_mesh_delta_coeff, &
     use_split_merge_amr, split_merge_amr_nz_baseline, split_merge_amr_log_zoning, split_merge_amr_hybrid_zoning, &
-    split_merge_amr_logtau_zoning, split_merge_amr_okay_to_split_nz, split_merge_amr_nz_r_core, &
-    split_merge_amr_okay_to_split_1, merge_amr_inhibit_at_jumps, split_merge_amr_MaxLong,&
+    split_merge_amr_flipped_hybrid_zoning, split_merge_amr_logtau_zoning, split_merge_amr_okay_to_split_nz, split_merge_amr_nz_r_core, &
+    split_merge_amr_okay_to_split_1, merge_amr_inhibit_at_jumps, split_merge_amr_MaxLong, split_merge_amr_nz_r_core_fraction, &
     split_merge_amr_MaxShort, merge_amr_max_abs_du_div_cs, &
     merge_amr_ignore_surface_cells, merge_amr_k_for_ignore_surface_cells, &
     merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
@@ -1573,9 +1573,11 @@
  s% use_split_merge_amr = use_split_merge_amr
  s% split_merge_amr_nz_baseline = split_merge_amr_nz_baseline
  s% split_merge_amr_nz_r_core = split_merge_amr_nz_r_core
+ s% split_merge_amr_nz_r_core_fraction = split_merge_amr_nz_r_core_fraction
  s% split_merge_amr_mesh_delta_coeff = split_merge_amr_mesh_delta_coeff
  s% split_merge_amr_log_zoning = split_merge_amr_log_zoning
  s% split_merge_amr_hybrid_zoning = split_merge_amr_hybrid_zoning
+ s% split_merge_amr_flipped_hybrid_zoning = split_merge_amr_flipped_hybrid_zoning
  s% split_merge_amr_logtau_zoning = split_merge_amr_logtau_zoning
  s% split_merge_amr_okay_to_split_nz = split_merge_amr_okay_to_split_nz
  s% split_merge_amr_okay_to_split_1 = split_merge_amr_okay_to_split_1
@@ -3243,9 +3245,11 @@
  use_split_merge_amr = s% use_split_merge_amr
  split_merge_amr_nz_baseline = s% split_merge_amr_nz_baseline
  split_merge_amr_nz_r_core = s% split_merge_amr_nz_r_core
+ split_merge_amr_nz_r_core_fraction = s% split_merge_amr_nz_r_core_fraction
  split_merge_amr_mesh_delta_coeff = s% split_merge_amr_mesh_delta_coeff
  split_merge_amr_log_zoning = s% split_merge_amr_log_zoning
  split_merge_amr_hybrid_zoning = s% split_merge_amr_hybrid_zoning
+ split_merge_amr_flipped_hybrid_zoning = s% split_merge_amr_flipped_hybrid_zoning
  split_merge_amr_logtau_zoning = s% split_merge_amr_logtau_zoning
  split_merge_amr_okay_to_split_nz = s% split_merge_amr_okay_to_split_nz
  split_merge_amr_okay_to_split_1 = s% split_merge_amr_okay_to_split_1
