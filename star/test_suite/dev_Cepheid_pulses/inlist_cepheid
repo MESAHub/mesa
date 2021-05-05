@@ -23,7 +23,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 5.4d3 ! about period/600 
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -200,7 +200,7 @@
 
 &pgstar
 
-    pause = .true.
+    !pause = .true.
     !pause_interval = 100
     pgstar_interval = 5 ! 10
 
