@@ -110,7 +110,7 @@
       ! these for for rsp.f90 period and work calculations
       real(dp) :: ETOT, EGRV, ETHE, EKIN, EDE_start, ECON, &
          TE, ELSTA, TEFF, E0, TT1, TE_start, T0, UN, ULL, &
-         RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
+         VMAX, RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
          RSTA, RMIN, PERIODL, PERIODLIN, &
          PDVWORK, FASE0
       real(dp), pointer, dimension(:) :: &
@@ -388,7 +388,7 @@
             s% v(1:n), s% M(1:n), s% dm(1:n), s% dm_bar(1:n), &
             ETOT, EGRV, ETHE, EKIN, EDE_start, ECON, &
             TE, ELSTA, TEFF, E0, TT1, TE_start, T0, UN, ULL, &
-            RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
+            VMAX, RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
             RSTA, RMIN, PERIODL, PERIODLIN, &
             PDVWORK, FASE0, INSIDE, IWORK, ID, NSTART, FIRST, &
             s% rsp_LINA_periods(1:3), s% rsp_LINA_growth_rates(1:3), &
@@ -426,7 +426,7 @@
             photo_v(1:n), photo_M(1:n), photo_dm(1:n), photo_dm_bar(1:n), &
             ETOT, EGRV, ETHE, EKIN, EDE_start, ECON, &
             TE, ELSTA, TEFF, E0, TT1, TE_start, T0, UN, ULL, &
-            RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
+            VMAX, RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
             RSTA, RMIN, PERIODL, PERIODLIN, &
             PDVWORK, FASE0, INSIDE, IWORK, ID, NSTART, FIRST, &
             s% rsp_LINA_periods(1:3), s% rsp_LINA_growth_rates(1:3), &

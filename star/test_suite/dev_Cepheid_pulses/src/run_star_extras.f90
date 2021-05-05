@@ -34,7 +34,7 @@
 
       integer :: num_periods, prev_cycle_run_num_steps, &
          run_num_iters_prev_period, run_num_retries_prev_period
-      real(dp) :: period, time_started
+      real(dp) :: period, time_started, period_r_min, period_max_vsurf_div_cs
             
       ! these routines are called by the standard run_star check_model
       
@@ -68,7 +68,8 @@
       subroutine photo_write(id, iounit)
          integer, intent(in) :: id, iounit
          write(iounit) num_periods, prev_cycle_run_num_steps, &
-            run_num_iters_prev_period, run_num_retries_prev_period, period, time_started
+            run_num_iters_prev_period, run_num_retries_prev_period, &
+            period, time_started, period_r_min, period_max_vsurf_div_cs
       end subroutine photo_write
 
 
@@ -77,7 +78,8 @@
          integer, intent(out) :: ierr
          ierr = 0
          read(iounit, iostat=ierr) num_periods, prev_cycle_run_num_steps, &
-            run_num_iters_prev_period, run_num_retries_prev_period, period, time_started
+            run_num_iters_prev_period, run_num_retries_prev_period, &
+            period, time_started, period_r_min, period_max_vsurf_div_cs
       end subroutine photo_read
 
       
@@ -98,6 +100,8 @@
             prev_cycle_run_num_steps = 0
             run_num_iters_prev_period = 0
             run_num_retries_prev_period = 0
+            period_r_min = 0
+            period_max_vsurf_div_cs = 0
          end if
          if (.not. s% x_logical_ctrl(5)) then
             call gyre_init('gyre.in')
@@ -339,7 +343,7 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         real(dp) :: rel_run_E_err, target_period, time_ended
+         real(dp) :: rel_run_E_err, target_period, time_ended, period_r_max
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -352,9 +356,19 @@
             return
          end if
          if (.not. s% x_logical_ctrl(7)) return
+         if (s% x_ctrl(7) <= 0d0) return ! must give expected period > 0
+         if (s% v(1)/s% csound(1) > period_max_vsurf_div_cs) &
+            period_max_vsurf_div_cs = s% v(1)/s% csound(1)
+         ! check_cycle_completed when v(1) goes from positive to negative
+         if (s% v(1)*s% v_start(1) < 0d0 .and. s% v(1) > 0d0) then
+            period_r_min = s% r(1)
+            return
+         end if
          ! check_cycle_completed when v(1) goes from positive to negative
          if (s% v(1)*s% v_start(1) > 0d0 .or. s% v(1) > 0d0) return
+         
          ! at max radius
+         period_r_max = s% r(1)
          ! either start of 1st cycle, or end of current
          if (time_started == 0) then
             time_started = s% time
@@ -370,8 +384,11 @@
          !if (abs(s% v(1)-s% v_start(1)).gt.1.0d-10) & ! tweak the end time
          !   time_ended = time_started + (s% time - time_started)*s% v_start(1)/(s% v_start(1) - s% v(1))
          period = time_ended - time_started
-         write(*,'(a7,i7,f11.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
+         if (period < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
+         write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
             'period', num_periods, period/(24*3600), &
+            'delta R', (period_r_max - period_r_min)/Rsun, &
+            'max vsurf/cs', period_max_vsurf_div_cs, &
             'retries', s% num_retries - run_num_retries_prev_period,     &
             'steps', s% model_number - prev_cycle_run_num_steps, &
             'avg iters/step',  &
@@ -382,7 +399,8 @@
          prev_cycle_run_num_steps = s% model_number
          run_num_iters_prev_period = s% total_num_solver_iterations
          run_num_retries_prev_period = s% num_retries
-         if (num_periods < s% x_integer_ctrl(7)) return
+         period_max_vsurf_div_cs = 0d0
+         if (num_periods < s% x_integer_ctrl(7) .or. s% x_integer_ctrl(7) < 0) return
          write(*,*)
          write(*,*)
          write(*,*)

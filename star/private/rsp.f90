@@ -851,6 +851,7 @@
             s% rsp_DeltaMAG = 2.5d0*log10(LMAX/LMIN)
             LMIN = 10.d10
             LMAX = -LMIN
+            VMAX = 0
          end if
       end subroutine gather_pulse_statistics
 
@@ -900,6 +901,7 @@
          LMAX   =-LMIN
          RMAX   = -SUNR
          RMIN   = -RMAX
+         VMAX   = 0
          s% rsp_GREKM = 0
          s% rsp_GREKM_avg_abs = 0
          s% rsp_GRPDV = 0
@@ -1041,6 +1043,7 @@
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
          if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
+         if (s% v(1)/s% csound(1) > VMAX) VMAX = s% v(1)/s% csound(1)
          if(FIRST.eq.1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1
@@ -1052,8 +1055,10 @@
                write(*,2) 'TT1', s% model_number, TT1
                stop 'check_cycle_completed'
             end if
-            write(*,'(a7,i7,f11.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
+            write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
                'period', s% rsp_num_periods, s% rsp_period/(24*3600), &
+               'delta R', RMAX - RMIN, &
+               'max vsurf/cs', VMAX, &
                'retries',  &
                   s% num_retries - run_num_retries_prev_period,     &
                'steps',  &
@@ -1068,6 +1073,7 @@
             TT1=T0
             INSIDE=1 
             RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
+            VMAX = 0d0
          else
              write(*,*) 'first maximum radius, period calculations start at model, day', &
                 s% model_number, s% time/(24*3600)
