@@ -354,8 +354,8 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         real(dp) :: rel_run_E_err, target_period, time_ended, period_r_max
-         real(dp), pointer :: vel(:), vel_start(:)
+         real(dp) :: rel_run_E_err, target_period, time_ended, period_r_max, &
+            v_surf, v_surf_start
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -370,23 +370,23 @@
          if (.not. s% x_logical_ctrl(7)) return
          if (s% x_ctrl(7) <= 0d0) return ! must give expected period > 0
          if (s% v_flag) then
-            vel => s% v
-            vel_start => s% v_start
+            v_surf = s% v(1)
+            v_surf_start = s% v_start(1)
          else if (s% u_flag) then
-            vel => s% u_face_val
-            vel_start => s% u_face_start
+            v_surf = s% u_face_val(1)
+            v_surf_start = s% u_face_start(1)
          else
             stop 'extras_finish_step vel'
          end if
-         if (vel(1)/s% csound(1) > period_max_vsurf_div_cs) &
-            period_max_vsurf_div_cs = vel(1)/s% csound(1)
-         ! check_cycle_completed when vel(1) goes from positive to negative
-         if (vel(1)*vel_start(1) < 0d0 .and. vel(1) > 0d0) then
+         if (v_surf/s% csound(1) > period_max_vsurf_div_cs) &
+            period_max_vsurf_div_cs = v_surf/s% csound(1)
+         ! check_cycle_completed when v_surf goes from positive to negative
+         if (v_surf*v_surf_start < 0d0 .and. v_surf > 0d0) then
             period_r_min = s% r(1)
             return
          end if
-         ! at max radius when vel(1) goes from positive to negative
-         if (vel(1)*vel_start(1) > 0d0 .or. vel(1) > 0d0) return
+         ! at max radius when v_surf goes from positive to negative
+         if (v_surf*v_surf_start > 0d0 .or. v_surf > 0d0) return
          period_r_max = s% r(1)
          ! either start of 1st cycle, or end of current
          if (time_started == 0) then
@@ -399,8 +399,8 @@
             return
          end if
          time_ended = s% time
-         if (abs(vel(1) - vel_start(1)) > 1d-10) & ! tweak the end time to match vel(1) == 0
-            time_ended = time_started + (time_ended - time_started)*vel_start(1)/(vel_start(1) - vel(1))
+         if (abs(v_surf - v_surf_start) > 1d-10) & ! tweak the end time to match when v_surf == 0
+            time_ended = s% time - v_surf*s% dt/(v_surf - v_surf_start)
          period = time_ended - time_started
          if (period/(24*3600) < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
          num_periods = num_periods + 1

@@ -3529,6 +3529,8 @@
             Peos_div_rho, dv
          real(dp) :: cq, zsh
          Pvsc = 0
+         s% Pvsc(k) = 0
+         if (s% Pvsc_start(k) < 0d0) s% Pvsc_start(k) = 0
          if (.not. (s% v_flag .and. s% use_Pvsc_art_visc)) return
          cq = s% Pvsc_cq
          if (cq == 0d0) return
@@ -3541,6 +3543,8 @@
          dv = (vp1 - v00) - zsh*sqrt(Peos_div_rho)
          if (dv%val <= 0d0) return
          Pvsc = cq*rho*pow2(dv)
+         s% Pvsc(k) = Pvsc%val
+         if (s% Pvsc_start(k) < 0d0) s% Pvsc_start(k) = s% Pvsc(k)
       end subroutine get_Pvsc_ad
       
       

@@ -23,7 +23,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 6d3 ! about period/600 
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -81,6 +81,7 @@
 
    set_rho_to_dm_div_dV = .false.
    
+   use_Pvsc_art_visc = .true.
    Pvsc_cq = 10d0 ! 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
    Pvsc_zsh = 0.01d0 ! "turn-on" compression in units of sound speed.
 
@@ -112,10 +113,10 @@
       terminal_interval = 4000
 
 
-      !photo_interval = 10
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      !terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       

@@ -681,15 +681,15 @@
                   call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
                   PvscR_ad = shift_m1(PvscR_ad)
-                  ! always time center
-                  PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
+                  if (s% include_P_in_velocity_time_centering) &
+                     PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
                   PvscR_ad = 0d0
                end if
                call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               ! always time center
-               PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
+               if (s% include_P_in_velocity_time_centering) &
+                  PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
                Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
          
