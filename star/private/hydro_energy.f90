@@ -182,6 +182,16 @@
                   d_dwork_dxa00, ierr) 
                d_dwork_dxam1 = 0
                d_dwork_dxap1 = 0
+               if (k == s% nz) then
+                  s% work_inward_at_center = pi4*pow2(s% r_center)*s% Peos_start(s% nz)*s% v_center
+                  if (is_bad(s% work_inward_at_center)) then
+                     write(*,2) 'work_inward_at_center', s% model_number, s% work_inward_at_center
+                     write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
+                     write(*,2) 'v_center', s% model_number, s% v_center
+                     write(*,2) 'r_center', s% model_number, s% r_center
+                     stop 'setup_dwork_dm'
+                  end if
+               end if
             else
                call eval_dwork(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr) 
@@ -590,8 +600,15 @@
          if (k > s% nz .or. (s% dt <= 0d0 .and. .not. (s% v_flag .or. s% u_flag))) then
             work_ad = 0d0
             if (k == s% nz+1) then
-               work = pi4*s% r_center*s% r_center*s% Peos_start(s% nz)*s% v_center
+               work = pi4*pow2(s% r_center)*s% Peos_start(s% nz)*s% v_center
                s% work_inward_at_center = work
+               if (is_bad(work)) then
+                  write(*,2) 'work_inward_at_center', s% model_number, work
+                  write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
+                  write(*,2) 'v_center', s% model_number, s% v_center
+                  write(*,2) 'r_center', s% model_number, s% r_center
+                  stop 'eval1_work'
+               end if
             end if
             work_ad%val = work
             return    

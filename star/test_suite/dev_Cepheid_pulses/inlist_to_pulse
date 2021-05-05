@@ -39,7 +39,6 @@
    delta_HR_limit = 0.003
 
 ! solver
-   use_dedt_form_of_energy_eqn = .true.
 
 ! GYRE output controls
 

@@ -34,8 +34,6 @@
    
    ! limit max_model_number as part of test_suite
    max_model_number = 1000
-   
-   use_dedt_form_of_energy_eqn = .true.
 
    delta_HR_limit = 0.01
 

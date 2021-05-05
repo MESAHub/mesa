@@ -381,7 +381,7 @@
          if (vel(1)/s% csound(1) > period_max_vsurf_div_cs) &
             period_max_vsurf_div_cs = vel(1)/s% csound(1)
          ! check_cycle_completed when vel(1) goes from positive to negative
-         if (vel(1)*vel_start(1) < 0d0 .and. s% v(1) > 0d0) then
+         if (vel(1)*vel_start(1) < 0d0 .and. vel(1) > 0d0) then
             period_r_min = s% r(1)
             return
          end if

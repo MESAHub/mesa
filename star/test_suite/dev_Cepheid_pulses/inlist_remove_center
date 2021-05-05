@@ -58,8 +58,6 @@
 !   alpha_TDC_PtdVdt = 0d0
 
 ! solver
-   use_dedt_form_of_energy_eqn = .true.
-
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
