@@ -670,7 +670,7 @@
             else
                Y = -exp(Z)
             end if
-            if (report) write(*,2) 'new Y Z Z_lower Z_upper', iter, Y%val, Z%val, lower_bound_Z, upper_bound_Z
+            if (report) write(*,2) 'new Y Z Z_lower_bnd Z_upper_bnd', iter, Y%val, Z%val, lower_bound_Z%val, upper_bound_Z%val
          end do
          if (.not. converged) then
             if (report .or. s% x_integer_ctrl(19) <= 0) then
