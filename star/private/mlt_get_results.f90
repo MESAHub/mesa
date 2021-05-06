@@ -740,7 +740,27 @@
          end if                   
       end subroutine get_TDC_solution
             
-            
+
+      !> Q is the residual in the TDC equation, namely:
+      !!
+      !! Q = (L - L0 * gradL) - (L0 + c0 * Af) * Y
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param Y superadiabaticity
+      !! @param c0_in A proportionality factor for the convective luminosity
+      !! @param L_in luminosity
+      !! @param L0_in L0 = (Lrad / grad_rad) is the luminosity radiation would carry if dlnT/dlnP = 1.
+      !! @param A0 Initial convection speed
+      !! @param T Temperature
+      !! @param rho Density (g/cm^3)
+      !! @param dV ???
+      !! @param Cp Heat capacity
+      !! @param kap Opacity
+      !! @param Hp Pressure scale height
+      !! @param gradL_in gradL is the neutrally buoyant dlnT/dlnP (= grad_ad + grad_mu),
+      !! @param Q The residual of the above equaiton (an output).
+      !! @param Af The final convection speed (an output).
       subroutine compute_Q(s, k, mixing_length_alpha, &
             Y, c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, Q, Af)
          type (star_info), pointer :: s
