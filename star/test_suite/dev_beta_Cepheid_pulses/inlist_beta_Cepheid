@@ -23,7 +23,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 50 ! about period/600 
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -82,11 +82,11 @@
    set_rho_to_dm_div_dV = .false.
    
    use_Pvsc_art_visc = .true.
-   Pvsc_cq = 500 ! 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
    Pvsc_zsh = 0.001 ! 0.1d0 ! "turn-on" compression in units of sound speed.
 
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
+   !eps_nuc_factor = 0
+   !non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
    

@@ -89,7 +89,7 @@
       character(LEN=strlen) :: filename
       integer               :: ierr, unit, k, model_number, num_written, max_to_write !, order_target
       complex(dp)           :: cfreq
-      real(dp)              :: freq, growth, freq_target, growth_lim
+      real(dp)              :: freq, growth, period, freq_target, growth_lim
       logical               :: write_flag, freq_okay
       type(grid_t)          :: gr
       type (star_info), pointer :: s
