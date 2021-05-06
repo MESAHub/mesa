@@ -754,6 +754,8 @@
                v1 = s% v_center
             end if
             KE = 0.25d0*dm*(v0**2 + v1**2)
+         else
+            KE = 0d0
          end if
          IE = s% energy(k)*dm
          if (s% using_RSP2) then

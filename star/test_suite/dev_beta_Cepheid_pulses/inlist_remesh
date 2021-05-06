@@ -8,10 +8,11 @@
       save_model_filename = 'envelope.mod'
       required_termination_code_string = 'max_model_number'
       
-      remove_initial_center_by_temperature = 2d6
-
-      change_initial_v_flag = .true.
-      new_v_flag = .true.
+      !remove_initial_center_by_temperature = 2d6        ! for envelope only cases
+      ! 0.3113      0.4788E+01    0.1538E+02 off 1082
+      ! 0.3068      0.5455E+01    0.1778E+02 1d7
+      ! 0.3094      0.5014E+01    0.1621E+02 2d7 709
+      ! 0.3107      0.4845E+01    0.1559E+02 4d7 910
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -25,9 +26,9 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d2
+      seconds_for_initial_dt = 50
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -42,7 +43,7 @@
 
 &controls
    
-   max_timestep = 6d3 ! expected period/500 or so
+   max_timestep = 50 ! expected period/500 or so
    
    max_model_number = 100 ! must be large enough to reach max_timestep
       
@@ -58,24 +59,40 @@
 !   alpha_TDC_PtdVdt = 0d0
 
 ! solver
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
+   !eps_nuc_factor = 0
+   !non_nuc_neu_factor = 0
+   !dxdt_nuc_factor = 0
+   !mix_factor = 0
    
 ! mesh controls
    okay_to_remesh = .true.
-   use_split_merge_amr = .true.
-   split_merge_amr_flipped_hybrid_zoning = .true.
-   split_merge_amr_nz_r_core_fraction = 0.5d0
-   split_merge_amr_nz_r_core = 300
-   split_merge_amr_nz_baseline = 500
-   split_merge_amr_MaxLong = 1.5d0
-   split_merge_amr_MaxShort = 1.5d0
-   split_merge_amr_max_iters = 1000
+   !show_mesh_changes = .true.
+   !trace_split_merge_amr = .true.
+   
+   use_split_merge_amr = .true.      
+   split_merge_amr_logtau_zoning = .true.
+   
+   split_merge_amr_r_core_cm = 1d8
+   split_merge_amr_nz_baseline = 1000
+   split_merge_amr_nz_r_core = 100
 
-! GYRE set starting velocities
-   x_logical_ctrl(5) = .true. 
+   split_merge_amr_MaxLong = 2d0
+   split_merge_amr_MaxShort = 2d0
+   split_merge_amr_max_iters = 100
+   
+   split_merge_amr_okay_to_split_nz = .false.
+   split_merge_amr_avoid_repeated_remesh = .false.
+   
+   merge_amr_max_abs_du_div_cs = -1 ! turn it off
+
+! GYRE
+   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
    
 ! output controls
    terminal_show_age_units = 'days'

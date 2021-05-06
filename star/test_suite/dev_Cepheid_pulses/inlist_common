@@ -43,7 +43,7 @@
     overshoot_bdy_loc(2) = 'bottom'
     overshoot_f(2) = 0.022
     overshoot_f0(2) = 0.002
-
+   
 ! solver
    use_dedt_form_of_energy_eqn = .true.
 

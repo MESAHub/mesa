@@ -76,6 +76,8 @@
 
 ! GYRE set starting velocities
    x_logical_ctrl(5) = .true. 
+   x_ctrl(4) = 0d0 ! fraction_1st_overtone
+   x_ctrl(5) = 0d0 ! fraction_2nd_overtone
    
 ! output controls
    terminal_show_age_units = 'days'

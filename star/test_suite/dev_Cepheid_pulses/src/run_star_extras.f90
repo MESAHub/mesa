@@ -33,9 +33,11 @@
       include 'test_suite_extras_def.inc'
 
       integer :: num_periods, prev_cycle_run_num_steps, &
-         run_num_iters_prev_period, run_num_retries_prev_period
-      real(dp) :: period, time_started, period_r_min, period_max_vsurf_div_cs, &
-         prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs
+         run_num_iters_prev_period, run_num_retries_prev_period, best_model_number
+      real(dp) :: period, time_started, period_r_min, period_max_vsurf_div_cs, best_G_div_P, &
+         prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
+         best_growth, best_period
+         
             
       ! these routines are called by the standard run_star check_model
       
@@ -71,7 +73,8 @@
          write(iounit) num_periods, prev_cycle_run_num_steps, &
             run_num_iters_prev_period, run_num_retries_prev_period, &
             period, time_started, period_r_min, period_max_vsurf_div_cs, &
-            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs
+            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
+            best_model_number, best_G_div_P, best_growth, best_period
       end subroutine photo_write
 
 
@@ -82,7 +85,8 @@
          read(iounit, iostat=ierr) num_periods, prev_cycle_run_num_steps, &
             run_num_iters_prev_period, run_num_retries_prev_period, &
             period, time_started, period_r_min, period_max_vsurf_div_cs, &
-            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs
+            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
+            best_model_number, best_G_div_P, best_growth, best_period
       end subroutine photo_read
 
       
@@ -109,6 +113,10 @@
             prev_period_delta_r = 0
             prev_period = 0
             prev_period_max_vsurf_div_cs = 0
+            best_model_number = 0
+            best_G_div_P = 0
+            best_growth = 0
+            best_period = 0
          end if
          if (.not. s% x_logical_ctrl(5)) then
             call gyre_init('gyre.in')
@@ -188,8 +196,8 @@
          call gyre_set_model(global_data, point_data, 101)
 
          write(*, 100) 'order', 'freq (Hz)', 'P (sec)', &
-           'P (min)', 'P (day)', 'growth (day)', 'growth/P', '(4pi*im/re)'
-100      format(A8,A16,A16,A14,A12,A16,2A14)
+           'P (min)', 'P (day)', 'growth (day)', 'growth/P'
+100      format(A8,A16,A16,A14,A12,A16,A14)
 
          rpar(1) = 0.5d-6 ! freq < this (Hz)
          ipar(1) = s% model_number
@@ -311,8 +319,8 @@
             if (AIMAG(cfreq) > 0._dp) then ! unstable
                growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
                write(*, 100)  md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), &
-                  growth, growth*freq*24*3600, 4*pi*AIMAG(cfreq)/freq
-100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,2E14.4)
+                  growth, growth*freq*24*3600
+100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,E14.4)
             else ! stable
                write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
 110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)
@@ -359,14 +367,35 @@
       integer function extras_finish_step(id)
          use chem_def
          integer, intent(in) :: id
-         integer :: ierr
+         integer :: ierr, i
          type (star_info), pointer :: s
          real(dp) :: rel_run_E_err, target_period, time_ended, period_r_max, &
             v_surf, v_surf_start, growth, period_delta_r
+         include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+         extras_finish_step = keep_going
+         if (s% x_integer_ctrl(1) > 0) then
+             if (MOD(s% model_number, s% x_integer_ctrl(1)) == 0) then
+               extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+               if (s% ixtra3_array(1) > 0) then
+                  do i=1,s% ixtra3_array(1)
+                     if (s% xtra1_array(i) == 0d0 .or. s% ixtra1_array(i) /= s% x_integer_ctrl(4)) cycle
+                     if (best_G_div_P == 0d0 .or. s% xtra1_array(i)/s% xtra2_array(i) < best_G_div_P) then
+                        best_G_div_P = s% xtra1_array(i)/s% xtra2_array(i)
+                        best_growth = s% xtra1_array(i)
+                        best_period = s% xtra2_array(i)
+                        best_model_number = s% model_number
+                     end if
+                     write(*,3) 'model order period growth G/P', s% model_number, s% ixtra1_array(i), &
+                        s% xtra2_array(i), s% xtra1_array(i), s% xtra1_array(i)/s% xtra2_array(i)
+                  end do
+                  write(*,*) 'best_model_number best_G_div_P period growth best_max_dt', best_model_number, &
+                     best_G_div_P, best_period, best_growth, best_period*(24*3600)/500d0
+               end if
+            end if
+         end if
          if (extras_finish_step == terminate) then
             s% termination_code = t_extras_finish_step
             return

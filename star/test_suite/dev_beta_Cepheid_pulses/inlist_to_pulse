@@ -6,7 +6,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'pulse.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+      required_termination_code_string = 'max_model_number'
 
       set_initial_number_retries = .false.
 
@@ -28,12 +28,10 @@
 
 &controls
 
-   ! set this so that saves the model for pulsation study
-   xa_central_lower_limit_species(1) = 'he4'
-   xa_central_lower_limit(1) = 0.029d0 
-
-! limit max_model_number as part of test_suite
-   max_model_number = 2500
+   log_Teff_lower_limit = 4.3 ! for 1st pass while looking for best model
+   
+   ! set max_model_number for best growth/period
+   max_model_number = 588 ! 2500
     
 ! timesteps
    delta_HR_limit = 0.001
@@ -41,14 +39,13 @@
 ! solver
 
 ! GYRE output controls
-
    x_integer_ctrl(1) = 4 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-
    x_integer_ctrl(2) = 2 ! max number of modes to output per call
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
-   
    x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
 
 ! output controls
    num_trace_history_values = 3

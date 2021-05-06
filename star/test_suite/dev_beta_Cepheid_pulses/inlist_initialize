@@ -2,18 +2,30 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'start.mod' 
+      saved_model_name = 'envelope.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'pulse.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+      save_model_filename = 'initialized.mod'
+      required_termination_code_string = 'max_model_number'
+
+      change_initial_v_flag = .true.
+      new_v_flag = .true.
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
 
       set_initial_number_retries = .false.
 
+      set_initial_age = .true.
+      initial_age = 0
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
+   
+      set_initial_dt = .true.
+      seconds_for_initial_dt = 50
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -27,39 +39,31 @@
 
 
 &controls
-
-   ! set this so that saves the model for pulsation study
-   xa_central_lower_limit_species(1) = 'he4'
-   xa_central_lower_limit(1) = 0.029d0 
-
-! limit max_model_number as part of test_suite
-   max_model_number = 2500
-    
-! timesteps
-   delta_HR_limit = 0.003
+   
+   max_timestep = 50 ! expected period/500 or so
+   
+   max_model_number = 10
 
 ! solver
-
-! GYRE output controls
-
-   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
-   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-
-   x_integer_ctrl(2) = 1 ! max number of modes to output per call
-   x_logical_ctrl(2) = .false. ! output eigenfunction files
+   !eps_nuc_factor = 0
+   !non_nuc_neu_factor = 0
+   !dxdt_nuc_factor = 0
+   !mix_factor = 0
    
-   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+! mesh controls
+   okay_to_remesh = .false.
+
+! GYRE set starting velocities
+   x_logical_ctrl(5) = .true. 
+   x_ctrl(4) = 1d0 ! fraction_1st_overtone
+   x_ctrl(5) = 0d0 ! fraction_2nd_overtone
    
-   x_integer_ctrl(3) = 0 ! report info for min growth/period for this order
-!      x_integer_ctrl(3) = 1 ! mode l (e.g. 0 for p modes, 1 for g modes)
-         ! should match gyre.in mode l
-!      x_integer_ctrl(4) = 1 ! order
-!      x_ctrl(1) = 0.6d-4 ! freq < this (Hz)
-!      x_ctrl(2) = 0.3d4 ! growth < this (days)
-
-   x_integer_ctrl(4) = 1 ! report info for min growth/period for this order
-
 ! output controls
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
@@ -70,10 +74,10 @@
    terminal_interval = 10
    write_header_frequency = 10
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -158,7 +162,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'Cepheid Grid Profiles  RSP2'
+    Grid1_title = 'Cepheid Grid Profiles  TDC'
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -172,8 +176,8 @@
    
  ! window 2
       
-    !Grid2_win_flag = .true.
-    Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid  RSP2'
+    Grid2_win_flag = .true.
+    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Classical Cepheid  TDC'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
@@ -192,39 +196,5 @@
     Profile_Panels2_xmax = -101D0
 
     Profile_Panels2_dymin(4) = 0.02
- 
- 
-
-  ! HR window -- lg_L vs. lg_Teff
-  
-  pgstar_interval = 1
-
-  HR_win_flag = .true.
-
-  HR_win_width = 8
-  HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
-
-  ! axis limits -- to override system default selections
-  HR_logT_min = 3.6 ! -101 ! only used if > -100
-  HR_logT_max = 3.9 ! only used if > -100
-  HR_logL_min = 3.3 ! -101 ! only used if > -100
-  HR_logL_max = 4.4 ! -101 ! only used if > -100
-
-  show_HR_classical_instability_strip = .true.
-  show_HR_target_box = .false.
-  HR_target_n_sigma = -3
-  HR_target_logL = 0.67d0
-  HR_target_logL_sigma = 0.05d0
-  HR_target_logT = 3.785d0
-  HR_target_logT_sigma = 0.00461d0
-
-  ! file output
-  HR_file_flag = .false.
-  HR_file_dir = 'pgstar_out'
-  HR_file_prefix = 'hr'
-  HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
-  HR_file_width = -1 ! negative means use same value as for window
-  HR_file_aspect_ratio = -1 ! negative means use same value as for window
-        
   
 / ! end of pgstar namelist

@@ -2,7 +2,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'envelope.mod' 
+      saved_model_name = 'initialized.mod' 
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -21,9 +21,9 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 6d3 ! about period/600 
+      seconds_for_initial_dt = 50 ! about period/600 
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -42,7 +42,7 @@
    max_model_number = 300000
 
 ! timesteps
-   max_timestep = 6d3 ! expected period/500 or so
+   max_timestep = 50 ! expected period/500 or so
    dt_div_min_dr_div_cs_limit = 0.5d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0.75d0 ! only interested in outer envelope for shocks
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
@@ -94,7 +94,8 @@
 
    x_logical_ctrl(7) = .true. ! output period info to terminal
    x_integer_ctrl(7) = 0 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 37.31481 ! expected period (in days) 
+   x_ctrl(7) = 0.3113 ! expected period (in days). 
+       ! must set this since it is used to filter out bogus values (periods < 10% expected)
 
    
    terminal_show_age_units = 'days'
