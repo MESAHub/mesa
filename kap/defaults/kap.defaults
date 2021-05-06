@@ -389,7 +389,7 @@
    ! add conduction opacities to radiative opacities
    ! ::
 
-     include_electron_conduction = .true.
+      include_electron_conduction = .true.
 
 
    ! use_blouin_conductive_opacities
@@ -399,7 +399,7 @@
    ! moderate coupling and moderate degeneracy.
    ! ::
 
-     use_blouin_conductive_opacities = .true.
+      use_blouin_conductive_opacities = .true.
 
 
 ! Miscellaneous controls
