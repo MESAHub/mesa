@@ -639,6 +639,7 @@
                ! Q(Y) is monotonic so this means Z is a lower-bound.
                lower_bound_Z = Z
             else
+               ! Q(Y) is monotonic so this means Z is an upper-bound.
                upper_bound_Z = Z
             end if
 
