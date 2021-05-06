@@ -772,7 +772,8 @@
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
          Jt = sqrt(abs(J2)) * s%dt
 
-         if (Jt > 1d2 .or. abs(Af%val - A0%val) / abs(A0%val) < 1d-8) then
+         ! Note the '1d-50' here is in cm/s, and is just there to avoid division by zero.
+         if (Jt > 1d2 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
             using_TDC = .false.
          else
             using_TDC = .true.
