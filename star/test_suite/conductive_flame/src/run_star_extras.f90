@@ -189,7 +189,7 @@
             integer, intent(in) :: id, iounit
             integer, intent(out) :: ierr
             ierr = 0
-            read(iounit) constant_lnP, constant_lnT
+            read(iounit, iostat=ierr) constant_lnP, constant_lnT
          end subroutine extras_photo_read
 
 
