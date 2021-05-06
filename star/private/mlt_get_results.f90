@@ -193,12 +193,13 @@
             s% tdc_num_iters(k) = 0
          end if
          
-         ! check if this particular k can be done with TDC
+         ! check if this particular k needs to be done with TDC
          using_TDC = s% using_TDC
          if (using_TDC .and. k > 0 .and. s% dt > 0d0) then
-            okay_to_use_TDC = (s% X(k) <= s% max_X_for_TDC .or. s% max_X_for_TDC <= 0d0) ! 0 means ignore
-            if (report .and. .not. okay_to_use_TDC) &
-               write(*,3) 's% X(k) > s% max_X_for_TDC', k, s% solver_iter, s% X(k), s% max_X_for_TDC
+            call set_MLT
+            Y_guess = gradT - gradL
+            okay_to_use_TDC = check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
+                                                         T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
          else
             okay_to_use_TDC = .false.
          end if
@@ -670,8 +671,10 @@
             else
                Y = -exp(Z)
             end if
+
             if (report) write(*,2) 'new Y Z Z_lower_bnd Z_upper_bnd', iter, Y%val, Z%val, lower_bound_Z%val, upper_bound_Z%val
          end do
+
          if (.not. converged) then
             if (report .or. s% x_integer_ctrl(19) <= 0) then
             !$OMP critical (tdc_crit0)
@@ -750,6 +753,32 @@
          c0 = convert(c0_in)
          Q = (L - L0*gradL) - (L0 + c0*Af)*Y
       end subroutine compute_Q
+
+      logical function check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, &
+                                                      Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0) result(using_TDC)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: mixing_length_alpha
+         type(auto_diff_real_star_order1), intent(in) :: Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0
+         type(auto_diff_real_tdc) :: Y, Af, xi0, xi1, xi2, J2, Jt
+
+         Y = convert(Y_in)
+
+         call eval_xis(s, k, mixing_length_alpha, &
+            Y, T, rho, Cp, dV, kap, Hp, gradL, xi0, xi1, xi2)
+
+         Af = eval_Af(s, k, A0, xi0, xi1, xi2)
+
+         J2 = pow2(xi1) - 4d0 * xi0 * xi2
+         Jt = sqrt(abs(J2)) * s%dt
+
+         if (Jt > 1d2 .or. abs(Af%val - A0%val) / abs(A0%val) < 1d-8) then
+            using_TDC = .false.
+         else
+            using_TDC = .true.
+         end if
+
+      end function check_if_can_fall_back_to_MLT
 
 
       subroutine eval_xis(s, k, mixing_length_alpha, &
