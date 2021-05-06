@@ -554,7 +554,7 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
-         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction
+         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
@@ -601,125 +601,97 @@
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
          if (abs(Q / scale) < tolerance) converged = .true.
 
-         iter = 0
-
-         if (.not. converged) then
-            if (Q > 0d0) then
-               Y_is_positive = .true.
-            else
-               Y_is_positive = .false.
-            end if
-            ! Now we know the sign of Y, we need an actual guess as to its magnitude.
-            if (Y_is_positive) then
-               Y = convert(abs(Y_guess))
-            else
-               Y = convert(-abs(Y_guess))
-            end if
-            ! Bisection method to find an initial guess, then we hand it off to Newton's method
-            ! to optimize and imbue it with derivatives
-            first_Q_is_positive = .false.
-            if (Y == 0d0) Y = 1d-30
-            do iter=1,10
-               call compute_Q(s, k, mixing_length_alpha, &
-                     Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
-               if (abs(Q / scale) < tolerance) then
-                  converged = .true.
-                  exit
-               end if
-               if (Q > 0d0) then
-                  if (iter == 1) then
-                     first_Q_is_positive = .true.
-                  end if
-                  if (.not. first_Q_is_positive) then
-                     exit
-                  end if
-                  if (Y > 0d0) then
-                     Y = Y * 4d0
-                  else
-                     Y = Y / 4d0
-                  end if
-               else
-                  if (iter == 1) then
-                     first_Q_is_positive = .false.
-                  end if
-                  if (first_Q_is_positive) then
-                     exit
-                  end if
-                  if (Y > 0d0) then
-                     Y = Y / 4d0
-                  else
-                     Y = Y * 4d0
-                  end if
-               end if
-            end do
+         if (Q > 0d0) then
+            Y_is_positive = .true.
+            Y = convert(abs(Y_guess))
+         else
+            Y_is_positive = .false.
+            Y = convert(-abs(Y_guess))
          end if
 
+         iter = 0
+
+         ! Newton's method to find solution Y
+         Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
+         Y_is_positive = (Y > 0d0)
+         Z = log(abs(Y))
+
+         ! We use the fact that Q(Y) is monotonic to produce iteratively refined bounds on Q.
+         ! This prevents the 
+         lower_bound_Z = -100d0
+         upper_bound_Z = 10d0
+         
+         if (report) write(*,2) 'initial Y', 0, Y%val
+         do iter = 1, max_iter
+            call compute_Q(s, k, mixing_length_alpha, &
+               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
+            if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
+            if (is_bad(Q%val)) exit
+            if (abs(Q%val)/scale <= tolerance) then
+               if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
+               converged = .true.
+               exit
+            end if
+
+            if ((Y_is_positive .and. Q > 0d0) .or. (Q < 0d0 .and. .not. Y_is_positive)) then
+               ! Q(Y) is monotonic so this means Z is a lower-bound.
+               lower_bound_Z = Z
+            else
+               upper_bound_Z = Z
+            end if
+
+            dQdZ = differentiate_1(Q)
+            if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
+               if (report) write(*,2) 'dQdZ', iter, dQdZ%val
+               exit
+            end if
+
+            correction = -Q/dQdz
+            Z_new = Z + correction
+
+            ! If the correction pushes the solution out of bounds then we know
+            ! that was a bad step. Bad steps are still in the same direction, they just
+            ! go too far, so we replace that result with one that's halfway to the relevant bound.
+            if (Z_new > upper_bound_Z) then
+               Z_new = (Z + upper_bound_Z) / 2d0
+            else if (Z_new < lower_bound_Z) then
+               Z_new = (Z + lower_bound_Z) / 2d0
+            end if
+
+
+
+            if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
+               Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
+            Z_new%d1val1 = 1d0            
+            Z = Z_new
+
+            if (Y_is_positive) then
+               Y = exp(Z)
+            else
+               Y = -exp(Z)
+            end if
+            if (report) write(*,2) 'new Y Z Z_lower_bnd Z_upper_bnd', iter, Y%val, Z%val, lower_bound_Z%val, upper_bound_Z%val
+         end do
          if (.not. converged) then
-            ! Newton's method to find solution Y
-            Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
-            Y_is_positive = (Y > 0d0)
-            Z = log(abs(Y))
-            
-            if (report) write(*,2) 'initial Y', 0, Y%val
-            do iter = 1, max_iter
-               call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
-               if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
-               if (is_bad(Q%val)) exit
-               if (abs(Q%val)/scale <= tolerance) then
-                  if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
-                  converged = .true.
-                  exit
-               end if
-               dQdZ = differentiate_1(Q)
-               if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
-                  if (report) write(*,2) 'dQdZ', iter, dQdZ%val
-                  exit
-               end if
-
-               correction = -Q/dQdz
-
-               if (correction > 5d0) then
-                  correction = 5d0
-               else if (correction < -5d0) then
-                  correction = -5d0
-               end if
-
-               Z_new = Z + correction
-
-               if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
-                  Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
-               Z_new%d1val1 = 1d0            
-               Z = Z_new
-
-               if (Y_is_positive) then
-                  Y = exp(Z)
-               else
-                  Y = -exp(Z)
-               end if
-               if (report) write(*,2) 'new Y', iter, Y%val
-            end do
-            if (.not. converged) then
-               if (report .or. s% x_integer_ctrl(19) <= 0) then
-               !$OMP critical (tdc_crit0)
-                  write(*,4) 'failed get_TDC_solution k slvr_iter model', &
-                     k, s% solver_iter, s% model_number
-                  write(*,2) 'Q', k, Q%val
-                  write(*,2) 'scale', k, scale
-                  write(*,2) 'Q/scale', k, Q%val/scale
-                  write(*,2) 'tolerance', k, tolerance
-                  write(*,2) 'dQdZ', k, dQdZ%val
-                  write(*,2) 'Y', k, Y%val
-                  write(*,2) 'exp(Z)', k, exp(Z%val)
-                  write(*,2) 'Z', k, Z%val
-                  write(*,2) 'Af', k, Af%val
-                  write(*,2) 'A0', k, A0%val
-                  write(*,2) 'c0', k, c0%val
-                  write(*,2) 'L0', k, L0%val
-                  write(*,*)
-                  stop 'get_TDC_solution failed to converge'
-               !$OMP end critical (tdc_crit0)
-               end if
+            if (report .or. s% x_integer_ctrl(19) <= 0) then
+            !$OMP critical (tdc_crit0)
+               write(*,4) 'failed get_TDC_solution k slvr_iter model', &
+                  k, s% solver_iter, s% model_number
+               write(*,2) 'Q', k, Q%val
+               write(*,2) 'scale', k, scale
+               write(*,2) 'Q/scale', k, Q%val/scale
+               write(*,2) 'tolerance', k, tolerance
+               write(*,2) 'dQdZ', k, dQdZ%val
+               write(*,2) 'Y', k, Y%val
+               write(*,2) 'exp(Z)', k, exp(Z%val)
+               write(*,2) 'Z', k, Z%val
+               write(*,2) 'Af', k, Af%val
+               write(*,2) 'A0', k, A0%val
+               write(*,2) 'c0', k, c0%val
+               write(*,2) 'L0', k, L0%val
+               write(*,*)
+               stop 'get_TDC_solution failed to converge'
+            !$OMP end critical (tdc_crit0)
             end if
          end if
 
@@ -733,14 +705,30 @@
          else
             mixing_type = no_mixing
          end if
-         if (k > 0) s% tdc_num_iters(k) = iter
-         if (.false. .and. Y > 0d0 .and. Y_guess > 0d0 .and. A0 == 0d0) then
-            write(*,4) 'm Y_guess Y A0 Af', k, s% solver_iter, s% model_number, &
-               Y_guess%val, Y%val, A0%val, Af%val
-         end if                   
+         if (k > 0) s% tdc_num_iters(k) = iter          
       end subroutine get_TDC_solution
             
-            
+
+      !> Q is the residual in the TDC equation, namely:
+      !!
+      !! Q = (L - L0 * gradL) - (L0 + c0 * Af) * Y
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param Y superadiabaticity
+      !! @param c0_in A proportionality factor for the convective luminosity
+      !! @param L_in luminosity
+      !! @param L0_in L0 = (Lrad / grad_rad) is the luminosity radiation would carry if dlnT/dlnP = 1.
+      !! @param A0 Initial convection speed
+      !! @param T Temperature
+      !! @param rho Density (g/cm^3)
+      !! @param dV ???
+      !! @param Cp Heat capacity
+      !! @param kap Opacity
+      !! @param Hp Pressure scale height
+      !! @param gradL_in gradL is the neutrally buoyant dlnT/dlnP (= grad_ad + grad_mu),
+      !! @param Q The residual of the above equaiton (an output).
+      !! @param Af The final convection speed (an output).
       subroutine compute_Q(s, k, mixing_length_alpha, &
             Y, c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, Q, Af)
          type (star_info), pointer :: s
