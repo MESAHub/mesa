@@ -57,10 +57,10 @@
        
        if (growth_lim > 0d0) then
           write(*, 100) 'model', 'order', 'freq (Hz)', &
-             'P (sec)', 'P (min)', 'P (day)', 'growth (day)', '(4pi*im/re)'
-100       format(2A8,6A20)
+             'P (sec)', 'P (min)', 'P (day)', 'growth (day)', 'growth/P', '(4pi*im/re)'
+100       format(2A8,7A20)
        else
-          write(*, 100) 'model', 'order', 'freq (Hz)', &
+          write(*, 101) 'model', 'order', 'freq (Hz)', &
              'P (sec)', 'P (min)', 'P (day)', '(4pi*im/re)'
 101       format(2A8,5A20)
        end if
@@ -119,8 +119,8 @@
          if (AIMAG(cfreq) > 0._dp) then ! unstable
             growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
             write(*, 100) ipar(1), md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), growth, &
-               4*pi*AIMAG(cfreq)/freq
-100         format(2I8,E20.4,3F20.4,2E20.4)
+               growth*freq*24*3600, 4*pi*AIMAG(cfreq)/freq
+100         format(2I8,E20.4,3F20.4,3E20.4)
             if (freq_okay .and. growth < growth_lim) & ! .and. md%n_pg == order_target) &
                write(*,*) 'matched target frequency'
          else ! stable

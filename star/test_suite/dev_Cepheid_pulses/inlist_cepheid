@@ -109,7 +109,7 @@
 
       photo_interval = 500
       profile_interval = 4000
-      history_interval = 10
+      history_interval = 20
       terminal_interval = 4000
 
 
