@@ -187,7 +187,7 @@
 
                      call set_ST(s, &
                         rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
-                        N2, N2_mu, opacity, scale_height, op_err)
+                        N2, N2_mu, opacity, kap_cond, scale_height, op_err)
                      if (failed('set_ST', op_err)) then
                         ierr = -1; cycle
                      end if
@@ -403,6 +403,7 @@
 
 
          subroutine setup(ierr)
+            use kap_lib, only: kap_get_elect_cond_opacity
             integer, intent(out) :: ierr
 
             real(dp) :: &
@@ -1109,13 +1110,13 @@
 
       subroutine set_ST(s, &
             rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
-            N2, N2_mu, opacity, scale_height, &
+            N2, N2_mu, opacity, kap_cond, scale_height, &
             ierr)
          ! with modifications by S.-C. Yoon, July 2003
          type (star_info), pointer :: s
          real(dp), dimension(:) :: & ! allocated temporary storage
             rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
-            N2, N2_mu, opacity, scale_height
+            N2, N2_mu, opacity, kap_cond, scale_height
          integer, intent(out) :: ierr
 
          integer :: nz, k, j, kk
