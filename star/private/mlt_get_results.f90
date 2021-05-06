@@ -705,11 +705,7 @@
          else
             mixing_type = no_mixing
          end if
-         if (k > 0) s% tdc_num_iters(k) = iter
-         if (.false. .and. Y > 0d0 .and. Y_guess > 0d0 .and. A0 == 0d0) then
-            write(*,4) 'm Y_guess Y A0 Af', k, s% solver_iter, s% model_number, &
-               Y_guess%val, Y%val, A0%val, Af%val
-         end if                   
+         if (k > 0) s% tdc_num_iters(k) = iter          
       end subroutine get_TDC_solution
             
 
