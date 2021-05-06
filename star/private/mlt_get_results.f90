@@ -604,13 +604,9 @@
 
          if (Q > 0d0) then
             Y_is_positive = .true.
-         else
-            Y_is_positive = .false.
-         end if
-         ! Now we know the sign of Y, we need an actual guess as to its magnitude.
-         if (Y_is_positive) then
             Y = convert(abs(Y_guess))
          else
+            Y_is_positive = .false.
             Y = convert(-abs(Y_guess))
          end if
 
