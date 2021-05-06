@@ -739,8 +739,10 @@
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: Q, Af
          type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, gradL
+         type(auto_diff_real_star_order1) :: dV0
+         dV0 = dV!0d0
          call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, dV, Cp, kap, Hp, gradL_in, xi0, xi1, xi2) 
+            Y, T, rho, Cp, dV0, kap, Hp, gradL_in, xi0, xi1, xi2) 
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
          L = convert(L_in)
          L0 = convert(L0_in)
@@ -803,6 +805,7 @@
          include 'formats'
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
          A0 = convert(A0_in)
+
          if (J2 > 0d0) then ! Hyperbolic branch
             J = sqrt(J2)
             Jt = s%dt * J
