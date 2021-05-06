@@ -554,11 +554,10 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
-         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction
+         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
-         real(dp) :: lower_bound_Z, upper_bound_Z
          real(dp), parameter :: tolerance = 1d-8
          integer, parameter :: max_iter = 100
          include 'formats'
@@ -636,9 +635,9 @@
 
             if ((Y_is_positive .and. Q > 0d0) .or. (Q < 0d0 .and. .not. Y_is_positive)) then
                ! Q(Y) is monotonic so this means Z is a lower-bound.
-               lower_bound_Z = Z%val
+               lower_bound_Z = Z
             else
-               upper_bound_Z = Z%val
+               upper_bound_Z = Z
             end if
 
             dQdZ = differentiate_1(Q)
@@ -648,8 +647,11 @@
             end if
 
             correction = -Q/dQdz
-
             Z_new = Z + correction
+
+            ! If the correction pushes the solution out of bounds then we know
+            ! that was a bad step. Bad steps are still in the same direction, they just
+            ! go too far, so we replace that result with one that's halfway to the relevant bound.
             if (Z_new > upper_bound_Z) then
                Z_new = (Z + upper_bound_Z) / 2d0
             else if (Z_new < lower_bound_Z) then
