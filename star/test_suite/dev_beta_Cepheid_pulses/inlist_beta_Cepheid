@@ -2,21 +2,17 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'pulse.mod' 
+      saved_model_name = 'envelope.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'envelope.mod'
+      save_model_filename = 'final.mod'
       required_termination_code_string = 'max_model_number'
-      
-      remove_initial_center_by_temperature = 2d6
-
-      change_initial_v_flag = .true.
-      new_v_flag = .true.
 
       set_initial_model_number = .true.
       initial_model_number = 0
 
-      set_initial_number_retries = .false.
+      set_initial_number_retries = .true.
+      initial_number_retries = 0
 
       set_initial_age = .true.
       initial_age = 0
@@ -25,7 +21,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d2
+      seconds_for_initial_dt = 6d3 ! about period/600 
 
       !pgstar_flag = .true.
 
@@ -41,30 +37,20 @@
 
 
 &controls
-   
-   max_timestep = 6d3 ! expected period/500 or so
-   
-   max_model_number = 100 ! must be large enough to reach max_timestep
-      
-! TDC    this needs to wait until after remove center and set velocities
-!   max_X_for_TDC = 1d0
-!   max_X_for_conv_timescale = 1d0
-!
-!   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
-!   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
-!   
-!   alpha_TDC_DAMP = 1d0
-!   alpha_TDC_DAMPR = 0d0
-!   alpha_TDC_PtdVdt = 0d0
 
-! solver
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
+! limit max_model_number as part of test_suite
+   max_model_number = 300000
+
+! timesteps
+   max_timestep = 6d3 ! expected period/500 or so
+   dt_div_min_dr_div_cs_limit = 0.5d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.75d0 ! only interested in outer envelope for shocks
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
    
 ! mesh controls
-   okay_to_remesh = .true.
+   okay_to_remesh = .false.   ! seems ok to keep it fixed
+   
+   !okay_to_remesh = .true.
    use_split_merge_amr = .true.
    split_merge_amr_flipped_hybrid_zoning = .true.
    split_merge_amr_nz_r_core_fraction = 0.5d0
@@ -74,10 +60,43 @@
    split_merge_amr_MaxShort = 1.5d0
    split_merge_amr_max_iters = 1000
 
-! GYRE set starting velocities
-   x_logical_ctrl(5) = .true. 
+! TDC
+   max_X_for_TDC = 1d0
+   max_X_for_conv_timescale = 1d0
+
+   !max_dt_div_tau_conv_for_TDC = 1 ! -1 ! < 0 means ignore this 
+   !max_dt_years_for_TDC = 1d-6 ! -1 ! < 0 means ignore this 
+   
+   alpha_TDC_DAMP = 1d0
+   alpha_TDC_DAMPR = 0d0
+   alpha_TDC_PtdVdt = 0d0
+
+! solver
+   steps_before_use_velocity_time_centering = 0
+   include_P_in_velocity_time_centering = .true.
+   include_L_in_velocity_time_centering = .true.
+   use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
+   tol_max_correction = 1d-6 ! 5d-7
+
+   set_rho_to_dm_div_dV = .false.
+   
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 500 ! 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.001 ! 0.1d0 ! "turn-on" compression in units of sound speed.
+
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
+   dxdt_nuc_factor = 0
+   mix_factor = 0
    
 ! output controls
+
+   x_logical_ctrl(7) = .true. ! output period info to terminal
+   x_integer_ctrl(7) = 0 ! which period to check (<= 0 means don't check any)
+   x_ctrl(7) = 37.31481 ! expected period (in days) 
+
+   
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
@@ -86,20 +105,23 @@
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
+   !trace_history_value_name(3) = 'using_TDC'
 
-   photo_interval = 50
-   profile_interval = 100
-   history_interval = 10
-   terminal_interval = 10
-   write_header_frequency = 10
+      photo_interval = 500
+      profile_interval = 4000
+      history_interval = 20
+      terminal_interval = 4000
 
-      !photo_interval = 10
+
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      !terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
+      
+      !max_number_retries = 11
       
       !max_model_number = 687
 
@@ -115,12 +137,12 @@
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
          ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_call_number = 1
-      !solver_test_partials_k = 49
+      !solver_test_partials_call_number = 18
+      !solver_test_partials_k = 17
       !solver_test_partials_iter_number = 1
-      !solver_test_partials_dx_0 = 1d-5
-      !solver_test_partials_var_name = '' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = '' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
+      !solver_test_partials_dx_0 = 1d-7
+      !solver_test_partials_var_name = 'all' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
+      !solver_test_partials_equ_name = 'du_dt' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
       !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
       !solver_test_partials_show_dx_var_name = 'h1'
 
@@ -181,7 +203,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'Cepheid Grid Profiles  TDC'
+    Grid1_title = 'beta Cepheid Grid Profiles'
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -196,7 +218,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Classical Cepheid  TDC'
+    Grid2_title = '18 M\d\(2281)\u  Z=0.02  beta Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
@@ -208,6 +230,7 @@
     Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
    
     !Profile_Panels2_show_grid = .true.
+    !Profile_Panels2_num_panels = 4
 
     Profile_Panels2_xaxis_name = 'logtau'
     Profile_Panels2_xaxis_reversed = .true.

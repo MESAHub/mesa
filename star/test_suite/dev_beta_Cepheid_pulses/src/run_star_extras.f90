@@ -188,8 +188,8 @@
          call gyre_set_model(global_data, point_data, 101)
 
          write(*, 100) 'order', 'freq (Hz)', 'P (sec)', &
-           'P (min)', 'P (day)', 'growth (day)', 'growth/P', '(4pi*im/re)'
-100      format(A8,A16,A16,A14,A12,A16,2A14)
+           'P (min)', 'P (day)', 'growth (day)', 'growth/P'
+100      format(A8,A16,A16,A14,A12,A16,A14)
 
          rpar(1) = 0.5d-6 ! freq < this (Hz)
          ipar(1) = s% model_number
@@ -311,8 +311,8 @@
             if (AIMAG(cfreq) > 0._dp) then ! unstable
                growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
                write(*, 100)  md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), &
-                  growth, growth*freq*24*3600, 4*pi*AIMAG(cfreq)/freq
-100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,2E14.4)
+                  growth, growth*freq*24*3600
+100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,E14.4)
             else ! stable
                write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
 110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)
@@ -366,7 +366,12 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+         extras_finish_step = keep_going
+         if (s% x_integer_ctrl(1) > 0 .and. &
+             MOD(s% model_number, s% x_integer_ctrl(1)) == 0) then
+            extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+            write(*,*)
+         end if
          if (extras_finish_step == terminate) then
             s% termination_code = t_extras_finish_step
             return

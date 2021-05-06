@@ -2,32 +2,18 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'pulse.mod' 
+      saved_model_name = 'start.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'envelope.mod'
-      required_termination_code_string = 'max_model_number'
-      
-      remove_initial_center_by_temperature = 2d6
-
-      change_initial_v_flag = .true.
-      new_v_flag = .true.
-
-      set_initial_model_number = .true.
-      initial_model_number = 0
+      save_model_filename = 'pulse.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
 
       set_initial_number_retries = .false.
 
-      set_initial_age = .true.
-      initial_age = 0
-
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-   
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 1d2
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -41,51 +27,35 @@
 
 
 &controls
-   
-   max_timestep = 6d3 ! expected period/500 or so
-   
-   max_model_number = 100 ! must be large enough to reach max_timestep
-      
-! TDC    this needs to wait until after remove center and set velocities
-!   max_X_for_TDC = 1d0
-!   max_X_for_conv_timescale = 1d0
-!
-!   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
-!   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
-!   
-!   alpha_TDC_DAMP = 1d0
-!   alpha_TDC_DAMPR = 0d0
-!   alpha_TDC_PtdVdt = 0d0
+
+   ! set this so that saves the model for pulsation study
+   xa_central_lower_limit_species(1) = 'he4'
+   xa_central_lower_limit(1) = 0.029d0 
+
+! limit max_model_number as part of test_suite
+   max_model_number = 2500
+    
+! timesteps
+   delta_HR_limit = 0.001
 
 ! solver
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
-   
-! mesh controls
-   okay_to_remesh = .true.
-   use_split_merge_amr = .true.
-   split_merge_amr_flipped_hybrid_zoning = .true.
-   split_merge_amr_nz_r_core_fraction = 0.5d0
-   split_merge_amr_nz_r_core = 300
-   split_merge_amr_nz_baseline = 500
-   split_merge_amr_MaxLong = 1.5d0
-   split_merge_amr_MaxShort = 1.5d0
-   split_merge_amr_max_iters = 1000
 
-! GYRE set starting velocities
-   x_logical_ctrl(5) = .true. 
+! GYRE output controls
+
+   x_integer_ctrl(1) = 4 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
    
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+
 ! output controls
-   terminal_show_age_units = 'days'
-   terminal_show_timestep_units = 'secs'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
-
-   num_trace_history_values = 2
+   num_trace_history_values = 3
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
+   trace_history_value_name(3) = 'log_Teff'
+   
 
    photo_interval = 50
    profile_interval = 100
@@ -93,10 +63,10 @@
    terminal_interval = 10
    write_header_frequency = 10
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -174,46 +144,39 @@
 
 &pgstar
 
-    !pause = .true.
-    !pause_interval = 100
-    pgstar_interval = 5 ! 10
+   !pause = .true.
 
- ! window 1
-
-    !Grid1_win_flag = .true.
-    Grid1_title = 'Cepheid Grid Profiles  TDC'
-
-    !Grid1_file_flag = .true.
-    Grid1_file_dir = 'png1'
-    Grid1_file_prefix = 'grid1'
-    Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+   ! HR window -- lg_L vs. lg_Teff
    
-    Profile_Panels1_xaxis_name = 'zone'
-    Profile_Panels1_xaxis_reversed = .true.
-    !Profile_Panels1_xmin = 50 ! -101D0
-    !Profile_Panels1_xmax = 65 ! -101D0
-   
- ! window 2
-      
-    Grid2_win_flag = .true.
-    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Classical Cepheid  TDC'
-   
-    History_Panels2_xaxis_name='star_age_day'
-    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+   pgstar_interval = 2
 
-    ! Grid2_file_flag = .true.
-    file_digits = 7
-    Grid2_file_dir = 'png'
-    Grid2_file_prefix = 'grid2'
-    Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+   HR_win_flag = .true.
    
-    !Profile_Panels2_show_grid = .true.
+   HR_title = '18 M\d\(2281)\u  Z=0.02  beta Cepheid'
 
-    Profile_Panels2_xaxis_name = 'logtau'
-    Profile_Panels2_xaxis_reversed = .true.
-    Profile_Panels2_xmin = -101D0
-    Profile_Panels2_xmax = -101D0
+   HR_win_width = 8
+   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
-    Profile_Panels2_dymin(4) = 0.02
-  
+   ! axis limits -- to override system default selections
+   HR_logT_min = 4.2 ! -101 ! only used if > -100
+   HR_logT_max = 4.6 ! only used if > -100
+   HR_logL_min = 4.6 ! -101 ! only used if > -100
+   HR_logL_max = 5.2 ! -101 ! only used if > -100
+
+   !show_HR_classical_instability_strip = .true.
+   show_HR_target_box = .true.
+   HR_target_n_sigma = -3
+   HR_target_logL = 4.9d0
+   HR_target_logL_sigma = 0.04d0
+   HR_target_logT = 4.4d0
+   HR_target_logT_sigma = 0.02d0
+
+   ! file output
+   HR_file_flag = .false.
+   HR_file_dir = 'pgstar_out'
+   HR_file_prefix = 'hr'
+   HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_width = -1 ! negative means use same value as for window
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
 / ! end of pgstar namelist
