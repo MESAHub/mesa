@@ -380,8 +380,8 @@
       !! user_num_kap_lowT_Xs_for_this_Z = 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 8
 
 
-! Miscellaneous controls
-! ----------------------
+! Conductive opacity options
+! --------------------------
 
    ! include_electron_conduction
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -389,7 +389,21 @@
    ! add conduction opacities to radiative opacities
    ! ::
 
-      include_electron_conduction = .true.
+     include_electron_conduction = .true.
+
+
+   ! use_blouin_conductive_opacities
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! Use fits from Blouin et al. (2020) for H and He in the regime of
+   ! moderate coupling and moderate degeneracy.
+   ! ::
+
+     use_blouin_conductive_opacities = .true.
+
+
+! Miscellaneous controls
+! ----------------------
 
    ! show_info
    ! ~~~~~~~~~

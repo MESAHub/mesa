@@ -310,7 +310,7 @@
       end subroutine do_electron_conduction_potekhin
 
 
-      subroutine do_electron_conduction( &
+      subroutine do_electron_conduction_blouin( &
          zbar, logRho, logT, &
          kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use const_def, only: dp
@@ -430,6 +430,31 @@
          kap = exp(log(kap) + log_correction% val)
          dlnkap_dlnRho = dlnkap_dlnRho + log_correction% d1val1
          dlnkap_dlnT = dlnkap_dlnT + log_correction% d1val2
+
+      end subroutine do_electron_conduction_blouin
+
+      subroutine do_electron_conduction( &
+         rq, zbar, logRho, logT, &
+         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         use kap_def, only: Kap_General_Info
+         type (Kap_General_Info), pointer, intent(in) :: rq
+         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho ! the density
+         real(dp), intent(in) :: logT ! the temperature
+         real(dp), intent(out) :: kap ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         integer, intent(out) :: ierr ! 0 means AOK.
+
+         if (rq% use_blouin_conductive_opacities) then
+            call do_electron_conduction_blouin( &
+               zbar, logRho, logT, &
+               kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         else
+            call do_electron_conduction_potekhin( &
+               zbar, logRho, logT, &
+               kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         end if
 
       end subroutine do_electron_conduction
 
