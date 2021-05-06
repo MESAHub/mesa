@@ -56,9 +56,9 @@
         case(1)
            read(iounit,iostat=ierr) ms_t0, cheb_t0, ms_t1, cheb_t1, m_1DUP, mcore_TACHeB
         case(2)
-           read(iounit,iostat=ierr) mcore_at_TP, age_at_TP, mcore_min_after_TP
-           read(iounit,iostat=ierr) mcore_1TP, age_1TP, TP_count, in_LHe_peak
-           read(iounit,iostat=ierr) mcore_2TP_with_3DUP, age_2TP_with_3DUP, TP_with_3DUP
+           read(iounit,iostat=ierr) mcore_at_TP, age_at_TP, mcore_min_after_TP, &
+              mcore_1TP, age_1TP, TP_count, in_LHe_peak, &
+              mcore_2TP_with_3DUP, age_2TP_with_3DUP, TP_with_3DUP
         case(3)
         case(4)
            read(iounit,iostat=ierr) TP_count, in_LHe_peak, initial_surface_c12
@@ -79,9 +79,9 @@
         case(1)
            write(iounit) ms_t0, cheb_t0, ms_t1, cheb_t1, m_1DUP, mcore_TACHeB
         case(2)
-           write(iounit) mcore_at_TP, age_at_TP, mcore_min_after_TP
-           write(iounit) mcore_1TP, age_1TP, TP_count, in_LHe_peak
-           write(iounit) mcore_2TP_with_3DUP, age_2TP_with_3DUP, TP_with_3DUP
+           write(iounit) mcore_at_TP, age_at_TP, mcore_min_after_TP,&
+              mcore_1TP, age_1TP, TP_count, in_LHe_peak, &
+              mcore_2TP_with_3DUP, age_2TP_with_3DUP, TP_with_3DUP
         case(3)
         case(4)
            write(iounit) TP_count, in_LHe_peak, initial_surface_c12
