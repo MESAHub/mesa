@@ -869,20 +869,38 @@
          end if
       end function two_var_pos_atan
       
-      
-      function convert(K_in) result(K)
+      !> The TDC newton solver needs higher-order partial derivatives than
+      !! the star newton solver, because the TDC one needs to pass back a result
+      !! which itself contains the derivatives that the star solver needs.
+      !! These additional derivatives are provided by the auto_diff_real_tdc type.
+      !!
+      !! This method converts a auto_diff_real_star_order1 variable into a auto_diff_real_tdc,
+      !! setting the additional partial derivatives to zero. This 'upgrades' variables storing
+      !! stellar structure to a form the TDC solver can use.
+      !!
+      !! @param K_in, input, an auto_diff_real_star_order1 variable
+      !! @param K, output, an auto_diff_real_tdc variable.
+      type(auto_diff_real_tdc) function convert(K_in) result(K)
          type(auto_diff_real_star_order1), intent(in) :: K_in
-         type(auto_diff_real_tdc) :: K
          K%val = K_in%val
          K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
          K%d1val1 = 0d0
          K%d1val1_d1Array(1:auto_diff_star_num_vars) = 0d0
       end function convert
       
-      
-      function unconvert(K_in) result(K)
+      !> The TDC newton solver needs higher-order partial derivatives than
+      !! the star newton solver, because the TDC one needs to pass back a result
+      !! which itself contains the derivatives that the star solver needs.
+      !! These additional derivatives are provided by the auto_diff_real_tdc type.
+      !!
+      !! This method converts a auto_diff_real_tdc variable into a auto_diff_real_star_order1,
+      !! dropping the additional partial derivatives which (after the TDC solver is done) are
+      !! no longer needed. This allows the output of the TDC solver to be passed back to the star solver.
+      !!
+      !! @param K_in, input, an auto_diff_real_tdc variable
+      !! @param K, output, an auto_diff_real_star_order1 variable.      
+      type(auto_diff_real_star_order1) function unconvert(K_in) result(K)
          type(auto_diff_real_tdc), intent(in) :: K_in
-         type(auto_diff_real_star_order1) :: K
          K%val = K_in%val
          K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
       end function unconvert
