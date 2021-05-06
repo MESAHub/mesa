@@ -811,7 +811,7 @@
          type(auto_diff_real_star_order1), intent(in) :: A0_in
          type(auto_diff_real_tdc), intent(in) :: xi0, xi1, xi2
          type(auto_diff_real_tdc) :: Af ! output
-         type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0        
+         type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0, lk        
          include 'formats'
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
          A0 = convert(A0_in)
@@ -832,12 +832,20 @@
             ! they switch onto the 'zero' branch. So we have to calculate the position of
             ! the first root to check it against dt.
             y_for_atan = xi1 + 2d0 * A0 * xi2
-            ! We had a choice above to pick which of +-I to use in switching branches.
-            ! That choice has to be consistent with a decaying solution, which we check now.
-            if (y_for_atan > 0d0) then
-               J = -J
+            root = safe_atan(J, xi1) - safe_atan(J, y_for_atan)
+
+            ! The root enters into a tangent, so we can freely shift it by pi and
+            ! get another root. We care about the first positive root, and the above prescription
+            ! is guaranteed to give an answer between (-2*pi,2*pi) because atan produces an answer in [-pi,pi],
+            ! so we add/subtract a multiple of pi to get the root into [0,pi).
+            if (root > pi) then
+               root = root - pi
+            else if (root < -pi) then
+               root = root + 2d0*pi
+            else if (root < 0d0) then
+               root = root + pi
             end if
-            root = two_var_pos_atan(J, y_for_atan) - two_var_pos_atan(J, xi1)
+
             if (0.25d0 * Jt < root) then
                num = -xi1 + J * tan(0.25d0 * Jt + atan(y_for_atan / J)) 
                den = 2d0 * xi2
@@ -856,33 +864,55 @@
          end if
       end function eval_Af
       
-      
-      !> Returns the smallest positive z such that tan(z) = y/x
-      type(auto_diff_real_tdc) function two_var_pos_atan(x,y) result(z)
+      !> Computes the arctangent of y/x in a way that is numerically safe near x=0.
+      !!
+      !! @param x x coordinate for the arctangent.
+      !! @param y y coordinate for the arctangent.
+      !! @param z Polar angle z such that tan(z) = y / x.
+      type(auto_diff_real_tdc) function safe_atan(x,y) result(z)
          type(auto_diff_real_tdc), intent(in) :: x,y
          type(auto_diff_real_tdc) :: x1, y1
-         x1 = abs(x) + 1d-50
-         y1 = abs(y) + 1d-50
-         z = atan(y1/x1)
-         if (z < 0d0) then
-            z = z + pi
+         if (abs(x) < 1d-50) then
+            ! x is basically zero, so for ~any non-zero y the ratio y/x is ~infinity.
+            ! That means that z = +- pi. We want z to be positive, so we return pi.
+            z = pi
+         else
+            z = atan(y/x)
          end if
-      end function two_var_pos_atan
+      end function safe_atan
       
-      
-      function convert(K_in) result(K)
+      !> The TDC newton solver needs higher-order partial derivatives than
+      !! the star newton solver, because the TDC one needs to pass back a result
+      !! which itself contains the derivatives that the star solver needs.
+      !! These additional derivatives are provided by the auto_diff_real_tdc type.
+      !!
+      !! This method converts a auto_diff_real_star_order1 variable into a auto_diff_real_tdc,
+      !! setting the additional partial derivatives to zero. This 'upgrades' variables storing
+      !! stellar structure to a form the TDC solver can use.
+      !!
+      !! @param K_in, input, an auto_diff_real_star_order1 variable
+      !! @param K, output, an auto_diff_real_tdc variable.
+      type(auto_diff_real_tdc) function convert(K_in) result(K)
          type(auto_diff_real_star_order1), intent(in) :: K_in
-         type(auto_diff_real_tdc) :: K
          K%val = K_in%val
          K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
          K%d1val1 = 0d0
          K%d1val1_d1Array(1:auto_diff_star_num_vars) = 0d0
       end function convert
       
-      
-      function unconvert(K_in) result(K)
+      !> The TDC newton solver needs higher-order partial derivatives than
+      !! the star newton solver, because the TDC one needs to pass back a result
+      !! which itself contains the derivatives that the star solver needs.
+      !! These additional derivatives are provided by the auto_diff_real_tdc type.
+      !!
+      !! This method converts a auto_diff_real_tdc variable into a auto_diff_real_star_order1,
+      !! dropping the additional partial derivatives which (after the TDC solver is done) are
+      !! no longer needed. This allows the output of the TDC solver to be passed back to the star solver.
+      !!
+      !! @param K_in, input, an auto_diff_real_tdc variable
+      !! @param K, output, an auto_diff_real_star_order1 variable.      
+      type(auto_diff_real_star_order1) function unconvert(K_in) result(K)
          type(auto_diff_real_tdc), intent(in) :: K_in
-         type(auto_diff_real_star_order1) :: K
          K%val = K_in%val
          K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
       end function unconvert
