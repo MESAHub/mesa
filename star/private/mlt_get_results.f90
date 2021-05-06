@@ -601,6 +601,7 @@
          call compute_Q(s, k, mixing_length_alpha, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
          if (abs(Q / scale) < tolerance) converged = .true.
+         if (report) write(*,2) 'Q(Y=0)', Q%val
 
          if (Q > 0d0) then
             Y_is_positive = .true.
