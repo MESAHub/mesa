@@ -558,7 +558,7 @@
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
-         real(dp), parameter :: tolerance = 1d-8
+         real(dp), parameter :: tolerance = 1d-10
          integer, parameter :: max_iter = 100
          include 'formats'
 
