@@ -803,7 +803,7 @@
          Jt = sqrt(abs(J2)) * s%dt
 
          ! Note the '1d-50' here is in cm/s, and is just there to avoid division by zero.
-         if (Jt > 1d2 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
+         if (Jt > 5d1 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
             fallback = .true.
          else
             fallback = .false.
@@ -936,8 +936,8 @@
             J = sqrt(J2)
             Jt = s%dt * J
             Jt4 = 0.25d0 * Jt
-            num = tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
-            den = tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
+            num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
+            den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
             Af = num / den
             if (Af < 0d0) then
                Af = -Af
@@ -982,6 +982,22 @@
          end if
       end function eval_Af
       
+      !> Computes the hyperbolic tangent of x in a way that is numerically safe.
+      !!
+      !! @param x Input
+      !! @param z Output
+      type(auto_diff_real_tdc) function safe_tanh(x) result(z)
+         type(auto_diff_real_tdc), intent(in) :: x
+
+         if (x > 50d0) then
+            z = 1d0
+         else if (x < -50d0) then
+            z = -1d0
+         else
+            z = tanh(x)
+         end if
+      end function safe_tanh
+
       !> Computes the arctangent of y/x in a way that is numerically safe near x=0.
       !!
       !! @param x x coordinate for the arctangent.
