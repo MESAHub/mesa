@@ -145,7 +145,7 @@
       end subroutine init_potekhin
       
       
-      subroutine do_electron_conduction( &
+      subroutine do_electron_conduction_potekhin( &
             zbar, logRho_in, logT_in, kap, dlogkap_dlogRho, dlogkap_dlogT, ierr)
 
          use const_def, only: boltz_sigma
@@ -306,6 +306,155 @@
             
          end subroutine get1
 
+
+      end subroutine do_electron_conduction_potekhin
+
+
+      subroutine do_electron_conduction_blouin( &
+         zbar, logRho, logT, &
+         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         use const_def, only: dp
+         use auto_diff
+         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho ! the density
+         real(dp), intent(in) :: logT ! the temperature
+         real(dp), intent(out) :: kap ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         integer, intent(out) :: ierr ! 0 means AOK.
+
+         ! this implements the correction formulae from Blouin et al. (2020)
+         ! https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract
+
+         real(dp), parameter :: alpha_H = -0.52d0, alpha_He = -0.46d0
+         real(dp), parameter :: a_H = 2.0d0, a_He = 1.25d0
+         real(dp), parameter :: b_H = 10.0d0, b_He = 2.5d0
+         real(dp), parameter :: logRho0_H = 5.45d0, logRho0_He = 6.50d0
+         real(dp), parameter :: logT0_H = 8.40d0, logT0_He = 8.57d0
+         real(dp), parameter :: sigRho_H = 5.14d0, sigRho_He = 6.20d0
+         real(dp), parameter :: sigT_H = 0.45d0, sigT_He = 0.55d0
+
+         type(auto_diff_real_2var_order1) :: logRho_auto, logT_auto
+         type(auto_diff_real_2var_order1) :: Rhostar, Tstar
+         type(auto_diff_real_2var_order1) :: g_H, g_He, H_H, H_He
+         type(auto_diff_real_2var_order1) :: log_correction, log_correction_H, log_correction_He
+
+         real(dp) :: alfa, frac_H, frac_He
+
+         ! auto_diff
+         ! var1: lnRho
+         ! var2: lnT
+
+         logRho_auto = logRho
+         logRho_auto% d1val1 = iln10
+         logT_auto = logT
+         logT_auto% d1val2 = iln10
+
+         ! call previous standard routines (Cassisi/Potekhin)
+         call do_electron_conduction_potekhin( &
+            zbar, logRho, logT, &
+            kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+
+         ! combined correction
+         !
+         ! The thermal conductivity is tabulated at Zbar = {1,2,3,4,6,...}
+         ! and linear interpolation in logK vs logZbar is applied.
+         !
+         ! Therefore, we apply the Blouin+ 2020 corrections in a manner
+         ! equivalent to individually correcting the Zbar = {1,2} tables.
+
+         if (Zbar .le. 1d0) then ! all H
+            frac_H = 1d0
+            frac_He = 0d0
+         else if (Zbar .le. 2d0) then ! mix H and He
+            alfa = (log10(Zbar) - log10(1d0)) / (log10(2d0) - log10(1d0))
+            frac_H = 1d0 - alfa
+            frac_He = alfa
+         else if (Zbar .le. 3d0) then ! mix He and no correction
+            alfa = (log10(Zbar) - log10(2d0)) / (log10(3d0) - log10(2d0))
+            frac_H = 0d0
+            frac_He = 1d0 - alfa
+         else ! no correction
+            frac_H = 0d0
+            frac_He = 0d0
+            return
+         end if
+
+
+         if (frac_H .gt. 0) then
+
+            ! correction for H
+            Rhostar = logRho_auto - logRho0_H
+            Tstar = logT_auto - logT0_H
+
+            g_H = a_H * exp(&
+               -pow2(Tstar*cos(alpha_H) + Rhostar*sin(alpha_H))/pow2(sigT_H)  &
+               -pow2(Tstar*sin(alpha_H) - Rhostar*cos(alpha_H))/pow2(sigRho_H))
+
+            H_H = 0.5d0 * tanh(b_H*(g_H-0.5d0)) + 0.5d0
+
+            log_correction_H = -log(1d0 + g_H * H_H)
+
+         else
+
+            log_correction_H = 0d0
+
+         end if
+
+
+         if (frac_He .gt. 0) then
+
+            ! correction for He
+            Rhostar = logRho_auto - logRho0_He
+            Tstar = logT_auto - logT0_He
+
+            g_He = a_He * exp(&
+               -pow2(Tstar*cos(alpha_He) + Rhostar*sin(alpha_He))/pow2(sigT_He)  &
+               -pow2(Tstar*sin(alpha_He) - Rhostar*cos(alpha_He))/pow2(sigRho_He))
+
+            H_He = 0.5d0 * tanh(b_He*(g_He-0.5d0)) + 0.5d0
+
+            log_correction_He = -log(1d0 + g_He * H_He)
+
+         else
+
+            log_correction_He = 0d0
+
+         end if
+
+
+         ! blend H correction, He correction, and other correction (none)
+         log_correction = frac_H * log_correction_H + frac_He * log_correction_He
+
+         ! apply correction factor
+         kap = exp(log(kap) + log_correction% val)
+         dlnkap_dlnRho = dlnkap_dlnRho + log_correction% d1val1
+         dlnkap_dlnT = dlnkap_dlnT + log_correction% d1val2
+
+      end subroutine do_electron_conduction_blouin
+
+      subroutine do_electron_conduction( &
+         rq, zbar, logRho, logT, &
+         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         use kap_def, only: Kap_General_Info
+         type (Kap_General_Info), pointer, intent(in) :: rq
+         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho ! the density
+         real(dp), intent(in) :: logT ! the temperature
+         real(dp), intent(out) :: kap ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         integer, intent(out) :: ierr ! 0 means AOK.
+
+         if (rq% use_blouin_conductive_opacities) then
+            call do_electron_conduction_blouin( &
+               zbar, logRho, logT, &
+               kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         else
+            call do_electron_conduction_potekhin( &
+               zbar, logRho, logT, &
+               kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         end if
 
       end subroutine do_electron_conduction
 
