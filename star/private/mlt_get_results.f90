@@ -727,7 +727,7 @@
       !! @param A0 Initial convection speed
       !! @param T Temperature
       !! @param rho Density (g/cm^3)
-      !! @param dV ???
+      !! @param dV 1/rho_face - 1/rho_start_face (change in specific volume at the face)
       !! @param Cp Heat capacity
       !! @param kap Opacity
       !! @param Hp Pressure scale height
@@ -771,7 +771,7 @@
       !! @param k face index
       !! @param mixing_length_alpha mixing length parameter
       !! @param Y_in guess of superadiabaticity
-      !! @param Y temperature (K)
+      !! @param T temperature (K)
       !! @param rho density (g/cm^3)
       !! @param Cp heat capacity (erg/g/K)
       !! @param kap opacity (cm^2/g)
@@ -806,7 +806,41 @@
 
       end function check_if_can_fall_back_to_MLT
 
-
+      !! Calculates the coefficients of the TDC velocity equation.
+      !! The velocity equation is
+      !!
+      !! 2 dw/dt = xi0 + w * xi1 + w**2 * xi2 - Lambda
+      !!
+      !! where Lambda (currently set to zero) captures coupling between cells.
+      !!
+      !! The coefficients xi0/1/2 are given by
+      !!
+      !! xi0 = (epsilon_q + S * Y) / w
+      !! xi1 = (-D_r + p_turb dV/dt) / w^2    [here V = 1/rho is the volume]
+      !! xi2 = -D / w^3
+      !!
+      !! Note that these terms are evaluated on faces, because the convection speed
+      !! is evaluated on faces. As a result all the inputs must either natively
+      !! live on faces or be interpolated to faces.
+      !!
+      !! This function also has some side effects in terms of storing some of the terms
+      !! it calculates for plotting purposes.
+      !! TODO: These should be removed or changed from xtra arrays to named arrays.
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param mixing_length_alpha mixing length parameter
+      !! @param Y superadiabaticity
+      !! @param T temperature (K)
+      !! @param rho density (g/cm^3)
+      !! @param Cp heat capacity (erg/g/K)
+      !! @param dV 1/rho_face - 1/rho_start_face (change in specific volume at the face)
+      !! @param kap opacity (cm^2/g)
+      !! @param Hp pressure scale height (cm)
+      !! @param gradL gradL = grada + gradMu (Ledoux threshold for convection)
+      !! @param xi0 Output, the constant term in the convective velocity equation.
+      !! @param xi1 Output, the prefactor of the linear term in the convective velocity equation.
+      !! @param xi2 Output, the prefactor of the quadratic term in the convective velocity equation.
       subroutine eval_xis(s, k, mixing_length_alpha, &
             Y, T, rho, Cp, dV, kap, Hp, gradL, xi0, xi1, xi2) 
          ! eval_xis sets up Y with partial wrt Z
