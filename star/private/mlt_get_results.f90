@@ -424,7 +424,7 @@
                end if
             end if
             f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0  
-            if (f1 < 0) return
+            if (f1 <= 0) return
             f1 = pow(f1,one_third)     
             f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
             Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
