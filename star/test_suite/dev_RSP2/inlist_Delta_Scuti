@@ -8,7 +8,7 @@
 ! original test case contributed by Alfred Gautschy.
 
 &star_job
-   saved_model_name = 'Delta_Scuti.mod'
+   load_model_filename = 'Delta_Scuti.mod'
    
    set_initial_dt = .true.
    seconds_for_initial_dt = 15 ! for debugging

@@ -336,7 +336,7 @@
       ! ~~~~~~~~~~~~~~~~
       ! load_saved_model_for_RSP
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! saved_model_name
+      ! load_model_filename
       ! ~~~~~~~~~~~~~~~~
 
       ! If ``load_saved_model`` is true, then use the specified model.
@@ -346,7 +346,7 @@
 
     load_saved_model = .false.
     load_saved_model_for_RSP = .false.
-    saved_model_name = 'undefined'
+    load_model_filename = 'undefined'
 
 
       ! create_pre_main_sequence_model

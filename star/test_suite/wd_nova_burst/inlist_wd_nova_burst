@@ -7,7 +7,7 @@
       show_log_description_at_start = .false.
       
       load_saved_model = .true.
-      saved_model_name = 'ready.mod' ! from running inlist_setup
+      load_model_filename = 'ready.mod' ! from running inlist_setup
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

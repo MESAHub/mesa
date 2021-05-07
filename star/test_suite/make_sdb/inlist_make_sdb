@@ -6,7 +6,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'start_core_he_burn.mod' 
+      load_model_filename = 'start_core_he_burn.mod' 
          ! from 1M_pre_ms_to_wd
          ! inlist_to_end_core_he_burn
          ! modified to stop when he4 drops below xa_central_lower_limit = 0.95

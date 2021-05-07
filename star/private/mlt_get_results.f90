@@ -193,12 +193,13 @@
             s% tdc_num_iters(k) = 0
          end if
          
-         ! check if this particular k can be done with TDC
+         ! check if this particular k needs to be done with TDC
          using_TDC = s% using_TDC
          if (using_TDC .and. k > 0 .and. s% dt > 0d0) then
-            okay_to_use_TDC = (s% X(k) <= s% max_X_for_TDC .or. s% max_X_for_TDC <= 0d0) ! 0 means ignore
-            if (report .and. .not. okay_to_use_TDC) &
-               write(*,3) 's% X(k) > s% max_X_for_TDC', k, s% solver_iter, s% X(k), s% max_X_for_TDC
+            call set_MLT
+            Y_guess = gradT - gradL
+            okay_to_use_TDC = check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
+                                                         T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
          else
             okay_to_use_TDC = .false.
          end if
@@ -554,11 +555,11 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
-         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction
+         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
-         real(dp), parameter :: tolerance = 1d-8
+         real(dp), parameter :: tolerance = 1d-10
          integer, parameter :: max_iter = 100
          include 'formats'
 
@@ -600,126 +601,102 @@
          call compute_Q(s, k, mixing_length_alpha, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
          if (abs(Q / scale) < tolerance) converged = .true.
+         if (report) write(*,2) 'Q(Y=0)', Q%val
+
+         if (Q > 0d0) then
+            Y_is_positive = .true.
+            Y = convert(abs(Y_guess))
+         else
+            Y_is_positive = .false.
+            Y = convert(-abs(Y_guess))
+         end if
 
          iter = 0
 
-         if (.not. converged) then
-            if (Q > 0d0) then
-               Y_is_positive = .true.
-            else
-               Y_is_positive = .false.
+         ! Newton's method to find solution Y
+         Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
+         Y_is_positive = (Y > 0d0)
+         Z = log(abs(Y))
+
+         ! We use the fact that Q(Y) is monotonic to produce iteratively refined bounds on Q.
+         ! This prevents the 
+         lower_bound_Z = -100d0
+         upper_bound_Z = 10d0
+         
+         if (report) write(*,2) 'initial Y', 0, Y%val
+         do iter = 1, max_iter
+            call compute_Q(s, k, mixing_length_alpha, &
+               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
+            if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
+            if (is_bad(Q%val)) exit
+            if (abs(Q%val)/scale <= tolerance) then
+               if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
+               converged = .true.
+               exit
             end if
-            ! Now we know the sign of Y, we need an actual guess as to its magnitude.
+
+            if ((Y_is_positive .and. Q > 0d0) .or. (Q < 0d0 .and. .not. Y_is_positive)) then
+               ! Q(Y) is monotonic so this means Z is a lower-bound.
+               lower_bound_Z = Z
+            else
+               ! Q(Y) is monotonic so this means Z is an upper-bound.
+               upper_bound_Z = Z
+            end if
+
+            dQdZ = differentiate_1(Q)
+            if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
+               if (report) write(*,2) 'dQdZ', iter, dQdZ%val
+               exit
+            end if
+
+            correction = -Q/dQdz
+            Z_new = Z + correction
+
+            ! If the correction pushes the solution out of bounds then we know
+            ! that was a bad step. Bad steps are still in the same direction, they just
+            ! go too far, so we replace that result with one that's halfway to the relevant bound.
+            if (Z_new > upper_bound_Z) then
+               Z_new = (Z + upper_bound_Z) / 2d0
+            else if (Z_new < lower_bound_Z) then
+               Z_new = (Z + lower_bound_Z) / 2d0
+            end if
+
+
+
+            if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
+               Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
+            Z_new%d1val1 = 1d0            
+            Z = Z_new
+
             if (Y_is_positive) then
-               Y = convert(abs(Y_guess))
+               Y = exp(Z)
             else
-               Y = convert(-abs(Y_guess))
+               Y = -exp(Z)
             end if
-            ! Bisection method to find an initial guess, then we hand it off to Newton's method
-            ! to optimize and imbue it with derivatives
-            first_Q_is_positive = .false.
-            if (Y == 0d0) Y = 1d-30
-            do iter=1,10
-               call compute_Q(s, k, mixing_length_alpha, &
-                     Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
-               if (abs(Q / scale) < tolerance) then
-                  converged = .true.
-                  exit
-               end if
-               if (Q > 0d0) then
-                  if (iter == 1) then
-                     first_Q_is_positive = .true.
-                  end if
-                  if (.not. first_Q_is_positive) then
-                     exit
-                  end if
-                  if (Y > 0d0) then
-                     Y = Y * 4d0
-                  else
-                     Y = Y / 4d0
-                  end if
-               else
-                  if (iter == 1) then
-                     first_Q_is_positive = .false.
-                  end if
-                  if (first_Q_is_positive) then
-                     exit
-                  end if
-                  if (Y > 0d0) then
-                     Y = Y / 4d0
-                  else
-                     Y = Y * 4d0
-                  end if
-               end if
-            end do
-         end if
+
+            if (report) write(*,2) 'new Y Z Z_lower_bnd Z_upper_bnd', iter, Y%val, Z%val, lower_bound_Z%val, upper_bound_Z%val
+         end do
 
          if (.not. converged) then
-            ! Newton's method to find solution Y
-            Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
-            Y_is_positive = (Y > 0d0)
-            Z = log(abs(Y))
-            
-            if (report) write(*,2) 'initial Y', 0, Y%val
-            do iter = 1, max_iter
-               call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
-               if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
-               if (is_bad(Q%val)) exit
-               if (abs(Q%val)/scale <= tolerance) then
-                  if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
-                  converged = .true.
-                  exit
-               end if
-               dQdZ = differentiate_1(Q)
-               if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
-                  if (report) write(*,2) 'dQdZ', iter, dQdZ%val
-                  exit
-               end if
-
-               correction = -Q/dQdz
-
-               if (correction > 5d0) then
-                  correction = 5d0
-               else if (correction < -5d0) then
-                  correction = -5d0
-               end if
-
-               Z_new = Z + correction
-
-               if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
-                  Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
-               Z_new%d1val1 = 1d0            
-               Z = Z_new
-
-               if (Y_is_positive) then
-                  Y = exp(Z)
-               else
-                  Y = -exp(Z)
-               end if
-               if (report) write(*,2) 'new Y', iter, Y%val
-            end do
-            if (.not. converged) then
-               if (report .or. s% x_integer_ctrl(19) <= 0) then
-               !$OMP critical (tdc_crit0)
-                  write(*,4) 'failed get_TDC_solution k slvr_iter model', &
-                     k, s% solver_iter, s% model_number
-                  write(*,2) 'Q', k, Q%val
-                  write(*,2) 'scale', k, scale
-                  write(*,2) 'Q/scale', k, Q%val/scale
-                  write(*,2) 'tolerance', k, tolerance
-                  write(*,2) 'dQdZ', k, dQdZ%val
-                  write(*,2) 'Y', k, Y%val
-                  write(*,2) 'exp(Z)', k, exp(Z%val)
-                  write(*,2) 'Z', k, Z%val
-                  write(*,2) 'Af', k, Af%val
-                  write(*,2) 'A0', k, A0%val
-                  write(*,2) 'c0', k, c0%val
-                  write(*,2) 'L0', k, L0%val
-                  write(*,*)
-                  stop 'get_TDC_solution failed to converge'
-               !$OMP end critical (tdc_crit0)
-               end if
+            if (report .or. s% x_integer_ctrl(19) <= 0) then
+            !$OMP critical (tdc_crit0)
+               write(*,4) 'failed get_TDC_solution k slvr_iter model', &
+                  k, s% solver_iter, s% model_number
+               write(*,2) 'Q', k, Q%val
+               write(*,2) 'scale', k, scale
+               write(*,2) 'Q/scale', k, Q%val/scale
+               write(*,2) 'tolerance', k, tolerance
+               write(*,2) 'dQdZ', k, dQdZ%val
+               write(*,2) 'Y', k, Y%val
+               write(*,2) 'exp(Z)', k, exp(Z%val)
+               write(*,2) 'Z', k, Z%val
+               write(*,2) 'Af', k, Af%val
+               write(*,2) 'A0', k, A0%val
+               write(*,2) 'c0', k, c0%val
+               write(*,2) 'L0', k, L0%val
+               write(*,*)
+               stop 'get_TDC_solution failed to converge'
+            !$OMP end critical (tdc_crit0)
             end if
          end if
 
@@ -733,14 +710,30 @@
          else
             mixing_type = no_mixing
          end if
-         if (k > 0) s% tdc_num_iters(k) = iter
-         if (.false. .and. Y > 0d0 .and. Y_guess > 0d0 .and. A0 == 0d0) then
-            write(*,4) 'm Y_guess Y A0 Af', k, s% solver_iter, s% model_number, &
-               Y_guess%val, Y%val, A0%val, Af%val
-         end if                   
+         if (k > 0) s% tdc_num_iters(k) = iter          
       end subroutine get_TDC_solution
             
-            
+
+      !> Q is the residual in the TDC equation, namely:
+      !!
+      !! Q = (L - L0 * gradL) - (L0 + c0 * Af) * Y
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param Y superadiabaticity
+      !! @param c0_in A proportionality factor for the convective luminosity
+      !! @param L_in luminosity
+      !! @param L0_in L0 = (Lrad / grad_rad) is the luminosity radiation would carry if dlnT/dlnP = 1.
+      !! @param A0 Initial convection speed
+      !! @param T Temperature
+      !! @param rho Density (g/cm^3)
+      !! @param dV ???
+      !! @param Cp Heat capacity
+      !! @param kap Opacity
+      !! @param Hp Pressure scale height
+      !! @param gradL_in gradL is the neutrally buoyant dlnT/dlnP (= grad_ad + grad_mu),
+      !! @param Q The residual of the above equaiton (an output).
+      !! @param Af The final convection speed (an output).
       subroutine compute_Q(s, k, mixing_length_alpha, &
             Y, c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, Q, Af)
          type (star_info), pointer :: s
@@ -751,8 +744,10 @@
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: Q, Af
          type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, gradL
+
          call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, dV, Cp, kap, Hp, gradL_in, xi0, xi1, xi2) 
+            Y, T, rho, Cp, dV, kap, Hp, gradL_in, xi0, xi1, xi2) 
+
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
          L = convert(L_in)
          L0 = convert(L0_in)
@@ -760,6 +755,33 @@
          c0 = convert(c0_in)
          Q = (L - L0*gradL) - (L0 + c0*Af)*Y
       end subroutine compute_Q
+
+      logical function check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, &
+                                                      Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0) result(using_TDC)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: mixing_length_alpha
+         type(auto_diff_real_star_order1), intent(in) :: Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0
+         type(auto_diff_real_tdc) :: Y, Af, xi0, xi1, xi2, J2, Jt
+
+         Y = convert(Y_in)
+
+         call eval_xis(s, k, mixing_length_alpha, &
+            Y, T, rho, Cp, dV, kap, Hp, gradL, xi0, xi1, xi2)
+
+         Af = eval_Af(s, k, A0, xi0, xi1, xi2)
+
+         J2 = pow2(xi1) - 4d0 * xi0 * xi2
+         Jt = sqrt(abs(J2)) * s%dt
+
+         ! Note the '1d-50' here is in cm/s, and is just there to avoid division by zero.
+         if (Jt > 1d2 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
+            using_TDC = .false.
+         else
+            using_TDC = .true.
+         end if
+
+      end function check_if_can_fall_back_to_MLT
 
 
       subroutine eval_xis(s, k, mixing_length_alpha, &
@@ -811,10 +833,11 @@
          type(auto_diff_real_star_order1), intent(in) :: A0_in
          type(auto_diff_real_tdc), intent(in) :: xi0, xi1, xi2
          type(auto_diff_real_tdc) :: Af ! output
-         type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0        
+         type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0, lk        
          include 'formats'
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
          A0 = convert(A0_in)
+
          if (J2 > 0d0) then ! Hyperbolic branch
             J = sqrt(J2)
             Jt = s%dt * J
@@ -832,12 +855,20 @@
             ! they switch onto the 'zero' branch. So we have to calculate the position of
             ! the first root to check it against dt.
             y_for_atan = xi1 + 2d0 * A0 * xi2
-            ! We had a choice above to pick which of +-I to use in switching branches.
-            ! That choice has to be consistent with a decaying solution, which we check now.
-            if (y_for_atan > 0d0) then
-               J = -J
+            root = safe_atan(J, xi1) - safe_atan(J, y_for_atan)
+
+            ! The root enters into a tangent, so we can freely shift it by pi and
+            ! get another root. We care about the first positive root, and the above prescription
+            ! is guaranteed to give an answer between (-2*pi,2*pi) because atan produces an answer in [-pi,pi],
+            ! so we add/subtract a multiple of pi to get the root into [0,pi).
+            if (root > pi) then
+               root = root - pi
+            else if (root < -pi) then
+               root = root + 2d0*pi
+            else if (root < 0d0) then
+               root = root + pi
             end if
-            root = two_var_pos_atan(J, y_for_atan) - two_var_pos_atan(J, xi1)
+
             if (0.25d0 * Jt < root) then
                num = -xi1 + J * tan(0.25d0 * Jt + atan(y_for_atan / J)) 
                den = 2d0 * xi2
@@ -856,33 +887,55 @@
          end if
       end function eval_Af
       
-      
-      !> Returns the smallest positive z such that tan(z) = y/x
-      type(auto_diff_real_tdc) function two_var_pos_atan(x,y) result(z)
+      !> Computes the arctangent of y/x in a way that is numerically safe near x=0.
+      !!
+      !! @param x x coordinate for the arctangent.
+      !! @param y y coordinate for the arctangent.
+      !! @param z Polar angle z such that tan(z) = y / x.
+      type(auto_diff_real_tdc) function safe_atan(x,y) result(z)
          type(auto_diff_real_tdc), intent(in) :: x,y
          type(auto_diff_real_tdc) :: x1, y1
-         x1 = abs(x) + 1d-50
-         y1 = abs(y) + 1d-50
-         z = atan(y1/x1)
-         if (z < 0d0) then
-            z = z + pi
+         if (abs(x) < 1d-50) then
+            ! x is basically zero, so for ~any non-zero y the ratio y/x is ~infinity.
+            ! That means that z = +- pi. We want z to be positive, so we return pi.
+            z = pi
+         else
+            z = atan(y/x)
          end if
-      end function two_var_pos_atan
+      end function safe_atan
       
-      
-      function convert(K_in) result(K)
+      !> The TDC newton solver needs higher-order partial derivatives than
+      !! the star newton solver, because the TDC one needs to pass back a result
+      !! which itself contains the derivatives that the star solver needs.
+      !! These additional derivatives are provided by the auto_diff_real_tdc type.
+      !!
+      !! This method converts a auto_diff_real_star_order1 variable into a auto_diff_real_tdc,
+      !! setting the additional partial derivatives to zero. This 'upgrades' variables storing
+      !! stellar structure to a form the TDC solver can use.
+      !!
+      !! @param K_in, input, an auto_diff_real_star_order1 variable
+      !! @param K, output, an auto_diff_real_tdc variable.
+      type(auto_diff_real_tdc) function convert(K_in) result(K)
          type(auto_diff_real_star_order1), intent(in) :: K_in
-         type(auto_diff_real_tdc) :: K
          K%val = K_in%val
          K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
          K%d1val1 = 0d0
          K%d1val1_d1Array(1:auto_diff_star_num_vars) = 0d0
       end function convert
       
-      
-      function unconvert(K_in) result(K)
+      !> The TDC newton solver needs higher-order partial derivatives than
+      !! the star newton solver, because the TDC one needs to pass back a result
+      !! which itself contains the derivatives that the star solver needs.
+      !! These additional derivatives are provided by the auto_diff_real_tdc type.
+      !!
+      !! This method converts a auto_diff_real_tdc variable into a auto_diff_real_star_order1,
+      !! dropping the additional partial derivatives which (after the TDC solver is done) are
+      !! no longer needed. This allows the output of the TDC solver to be passed back to the star solver.
+      !!
+      !! @param K_in, input, an auto_diff_real_tdc variable
+      !! @param K, output, an auto_diff_real_star_order1 variable.      
+      type(auto_diff_real_star_order1) function unconvert(K_in) result(K)
          type(auto_diff_real_tdc), intent(in) :: K_in
-         type(auto_diff_real_star_order1) :: K
          K%val = K_in%val
          K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
       end function unconvert

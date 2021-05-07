@@ -1,7 +1,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'shock_part2.mod'
+      load_model_filename = 'shock_part2.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'shock_part3.mod'

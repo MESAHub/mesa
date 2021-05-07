@@ -7,7 +7,7 @@
       !show_net_reactions_info = .true.
 
       load_saved_model = .true.
-      saved_model_name = 'zams.mod'
+      load_model_filename = 'zams.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

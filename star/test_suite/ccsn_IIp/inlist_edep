@@ -6,7 +6,7 @@
   required_termination_code_string = 'max_age'
 
   load_saved_model = .true.
-  saved_model_name = 'ready_for_edep.mod'
+  load_model_filename = 'ready_for_edep.mod'
 
   set_initial_model_number = .true.
   initial_model_number = 0

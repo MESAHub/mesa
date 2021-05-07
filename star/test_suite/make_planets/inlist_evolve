@@ -7,7 +7,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = "planet_core_1.0_MJ_10.0_ME_2.0_RJ.mod"
+      load_model_filename = "planet_core_1.0_MJ_10.0_ME_2.0_RJ.mod"
 
       save_model_when_terminate = .true.
       save_model_filename = "planet_evolve_1.0_MJ_10.0_ME_2.0_RJ.mod"

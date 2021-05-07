@@ -6,7 +6,7 @@
   required_termination_code_string = 'max_age'
 
   load_saved_model = .true.
-  saved_model_name = 'he_core.mod'
+  load_model_filename = 'he_core.mod'
 
   relax_mass = .true.
   new_mass = 0.301

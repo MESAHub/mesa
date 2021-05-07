@@ -4,7 +4,7 @@
    !star_job_namelist_name = 'namelist_star_job_tdc'
    
       load_saved_model = .true.
-      saved_model_name = 'ppisn_100_test_tdc.mod'
+      load_model_filename = 'ppisn_100_test_tdc.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

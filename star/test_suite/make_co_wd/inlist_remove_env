@@ -2,7 +2,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'co_core.mod'
+      load_model_filename = 'co_core.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'co_wd.mod'

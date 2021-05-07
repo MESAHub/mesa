@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'he_wd_cooled.mod'
+      load_model_filename = 'he_wd_cooled.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'before_flash.mod'
