@@ -49,16 +49,16 @@ else
    cp converted.mod standard_converted.mod
 fi
 
-# the rest is broken into parts for the test_suite.
+# inlist_finish is broken into parts for the test_suite.
 # the splits depend on the specifics of the 100M run.
-# for non-testing runs, can combine the parts into 1 inlist
+# for non-testing runs, just use inlist_finish instead.
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_part1.mod part1.mod
-else
+#if [ -z "$MESA_RUN_OPTIONAL" ]; then
+#   cp standard_part1.mod part1.mod
+#else
    do_one inlist_part1_header part1.mod
    cp part1.mod standard_part1.mod
-fi
+#fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_part2.mod part2.mod

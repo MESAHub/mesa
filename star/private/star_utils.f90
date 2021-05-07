@@ -1252,7 +1252,22 @@
          include 'formats'
          nz = s% nz
 
-         if (s% u_flag) then
+         if (s% v_flag) then
+            do k=2,nz
+               abs_du = abs(s% v_start(k) - s% v_start(k-1))
+               cs = maxval(s% csound(max(1,k-5):min(nz,k+5)))
+               s% abs_du_plus_cs(k) = abs_du + cs
+               s% abs_du_div_cs(k) = abs_du/cs
+            end do
+            k = 1
+            s% abs_du_plus_cs(k) = s% abs_du_plus_cs(k+1)
+            s% abs_du_div_cs(k) = s% abs_du_div_cs(k+1)
+            do j = 1,3
+               do k=2,nz-1
+                  s% abs_du_div_cs(k) = sum(s% abs_du_div_cs(k-1:k+1))/3d0
+               end do
+            end do
+         else if (s% u_flag) then
             do k=2,nz-1
                abs_du = &
                   max(abs(s% u_start(k) - s% u_start(k+1)), &
@@ -1532,11 +1547,14 @@
          else
             remnant_mass = s% m(1)
          end if
+         min_abs_du_div_cs = &
+            s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          if (s% v_flag) then
             do k = k_min, nz-1
                if (s% m(k) > remnant_mass) cycle
                if (s% q(k) > max_q) cycle
                if (s% q(k) < min_q) exit
+               if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
                r00 = s% r(k)
                rp1 = s% r(k+1)
                dr_div_cs = (r00 - rp1)/s% csound(k)
@@ -1548,8 +1566,6 @@
             return
          end if
          if (.not. s% u_flag) return
-         min_abs_du_div_cs = &
-            s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          do k = k_min, nz-1
             if (s% m(k) > remnant_mass) cycle
             if (s% q(k) > max_q) cycle
@@ -3450,7 +3466,7 @@
          integer, intent(out) :: ierr
          integer :: j
          real(dp) :: mlt_Pturb_start
-         type(auto_diff_real_star_order1) :: rho_m1, rho_00, &
+         type(auto_diff_real_star_order1) :: &
             Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
          logical :: time_center
          include 'formats'
@@ -3486,11 +3502,8 @@
          end if
 
          mlt_Pturb_ad = 0d0
-         if ((.not. skip_mlt_Pturb) .and. &
-             s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
-            rho_m1 = wrap_d_m1(s,k)
-            rho_00 = wrap_d_00(s,k)
-            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_ad(k))*(rho_m1 + rho_00)/6d0
+         if ((.not. skip_mlt_Pturb) .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
+            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
             if (time_center) then
                mlt_Pturb_start = &
                   s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
@@ -3516,6 +3529,8 @@
             Peos_div_rho, dv
          real(dp) :: cq, zsh
          Pvsc = 0
+         s% Pvsc(k) = 0
+         if (s% Pvsc_start(k) < 0d0) s% Pvsc_start(k) = 0
          if (.not. (s% v_flag .and. s% use_Pvsc_art_visc)) return
          cq = s% Pvsc_cq
          if (cq == 0d0) return
@@ -3528,6 +3543,8 @@
          dv = (vp1 - v00) - zsh*sqrt(Peos_div_rho)
          if (dv%val <= 0d0) return
          Pvsc = cq*rho*pow2(dv)
+         s% Pvsc(k) = Pvsc%val
+         if (s% Pvsc_start(k) < 0d0) s% Pvsc_start(k) = s% Pvsc(k)
       end subroutine get_Pvsc_ad
       
       
@@ -3893,6 +3910,19 @@
          call get_face_weights(s, k, alfa, beta)
          rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
       end function get_rho_face
+      
+      
+      real(dp) function get_rho_face_val(s,k) result(rho_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            rho_face = s% rho(1)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
+      end function get_rho_face_val
       
       
       function get_T_face(s,k) result(T_face)

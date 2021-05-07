@@ -134,7 +134,7 @@
 
       ! you might want to get a more complete list of mixing regions by using the following
 
-      mixing_regions 16 !<integer> ! note: this includes regions where the mixing type is no_mixing.
+      !mixing_regions 16 !<integer> ! note: this includes regions where the mixing type is no_mixing.
 
          ! the <integer> is the number of regions to report
          ! there will be 2*<integer> columns for this in the log file, 2 for each region.

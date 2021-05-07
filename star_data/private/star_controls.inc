@@ -641,6 +641,7 @@
          logical :: use_split_merge_amr, trace_split_merge_amr, &
             equal_split_density_amr, split_merge_amr_skip_inner_cell, &
             split_merge_amr_hybrid_zoning, &
+            split_merge_amr_flipped_hybrid_zoning, &
             split_merge_amr_log_zoning, &
             split_merge_amr_logtau_zoning, &
             split_merge_amr_okay_to_split_nz, &
@@ -649,6 +650,7 @@
          integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters, &
             split_merge_amr_nz_r_core
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
+            split_merge_amr_nz_r_core_fraction, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
             split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff
 

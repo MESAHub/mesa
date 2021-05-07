@@ -182,6 +182,16 @@
                   d_dwork_dxa00, ierr) 
                d_dwork_dxam1 = 0
                d_dwork_dxap1 = 0
+               if (k == s% nz) then
+                  s% work_inward_at_center = pi4*pow2(s% r_center)*s% Peos_start(s% nz)*s% v_center
+                  if (is_bad(s% work_inward_at_center)) then
+                     write(*,2) 'work_inward_at_center', s% model_number, s% work_inward_at_center
+                     write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
+                     write(*,2) 'v_center', s% model_number, s% v_center
+                     write(*,2) 'r_center', s% model_number, s% r_center
+                     stop 'setup_dwork_dm'
+                  end if
+               end if
             else
                call eval_dwork(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr) 
@@ -563,7 +573,7 @@
       ! ergs/s at face(k)
       subroutine eval1_work(s, k, skip_Peos, &
             work_ad, work, d_work_dxa00, d_work_dxam1, ierr)
-         use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw
+         use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw, get_rho_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s 
@@ -574,7 +584,7 @@
          real(dp), dimension(s% species), intent(out) :: &
             d_work_dxa00, d_work_dxam1
          integer, intent(out) :: ierr
-         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face, old2
+         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_star_order1) :: &
             P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
@@ -590,8 +600,15 @@
          if (k > s% nz .or. (s% dt <= 0d0 .and. .not. (s% v_flag .or. s% u_flag))) then
             work_ad = 0d0
             if (k == s% nz+1) then
-               work = pi4*s% r_center*s% r_center*s% Peos_start(s% nz)*s% v_center
+               work = pi4*pow2(s% r_center)*s% Peos_start(s% nz)*s% v_center
                s% work_inward_at_center = work
+               if (is_bad(work)) then
+                  write(*,2) 'work_inward_at_center', s% model_number, work
+                  write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
+                  write(*,2) 'v_center', s% model_number, s% v_center
+                  write(*,2) 'r_center', s% model_number, s% r_center
+                  stop 'eval1_work'
+               end if
             end if
             work_ad%val = work
             return    
@@ -664,15 +681,15 @@
                   call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
                   PvscR_ad = shift_m1(PvscR_ad)
-                  ! always time center
-                  PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
+                  if (s% include_P_in_velocity_time_centering) &
+                     PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
                   PvscR_ad = 0d0
                end if
                call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               ! always time center
-               PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
+               if (s% include_P_in_velocity_time_centering) &
+                  PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
                Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
          
@@ -703,12 +720,8 @@
          
             ! set mlt_Pturb_ad
             mlt_Pturb_ad = 0d0
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
-               old2 = pow2(s% mlt_vc_old(k))
-               mlt_Pturb_ad%val = s% mlt_Pturb_factor*old2*(s% rho(k-1) + s% rho(k))/6d0
-               mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*old2*s% rho(k-1)/6d0
-               mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*old2*s% rho(k)/6d0
-            end if            
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
          
             P_face_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad + extra_P
          
