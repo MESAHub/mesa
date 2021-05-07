@@ -192,6 +192,16 @@
             s% COUPL(k) = 0d0
             s% tdc_num_iters(k) = 0
          end if
+
+         if (report) then
+            write(*,*)
+            write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
+               k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
+         end if
+
+         call set_no_mixing('') ! to initialize things
+         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
+
          
          ! check if this particular k needs to be done with TDC
          using_TDC = s% using_TDC
@@ -204,15 +214,8 @@
             okay_to_use_TDC = .false.
          end if
          compare_TDC_to_MLT = s% compare_TDC_to_MLT
+
          
-         if (report) then
-            write(*,*)
-            write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
-               k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
-         end if
-         
-         call set_no_mixing('') ! to initialize things
-         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
 
          ! sanity check the args
          if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
