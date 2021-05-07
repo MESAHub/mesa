@@ -905,6 +905,10 @@
       !! want to solve (per Radek Smolec's thesis). We just solve the velocity form
       !! because it's more convenient.
       !!
+      !! This function also has some side effects in terms of storing some of the terms
+      !! it calculates for plotting purposes.
+      !! TODO: These should be removed or changed from xtra arrays to named arrays.
+      !!
       !! @param s star pointer
       !! @param k face index
       !! @param A0_in convection speed from the start of the step (cm/s)
@@ -936,6 +940,7 @@
          else if (J2 < 0d0) then ! Trigonometric branch
             J = sqrt(-J2)
             Jt = s%dt * J
+
             ! This branch contains decaying solutions that reach A = 0, at which point
             ! they switch onto the 'zero' branch. So we have to calculate the position of
             ! the first root to check it against dt.
