@@ -85,7 +85,7 @@
    ! ~~~~~~~~~~
    ! ``Teff`` is the effective temperature, in kelvin. ::
 
-      include_Teff_in_chi2_spectro = .true.
+      include_Teff_in_chi2_spectro = .false.
       Teff_target = -1
       Teff_sigma = -1
 
@@ -97,7 +97,7 @@
    ! ~~~~~~~~~~
    ! ``logg`` is the logarithm (base 10) of the surface gravity, in cgs units. ::
 
-      include_logg_in_chi2_spectro = .true.
+      include_logg_in_chi2_spectro = .false.
       logg_target = -1
       logg_sigma = -1
 
@@ -124,7 +124,7 @@
    ! ``FeH`` is the the model [Fe/H] computed as ``log10((Z/X)/Z_div_X_solar)``
    ! using model surface average values for ``Z`` and ``X``. ::
 
-      include_FeH_in_chi2_spectro = .true. ! [Fe/H]
+      include_FeH_in_chi2_spectro = .false. ! [Fe/H]
       FeH_target = -1
       FeH_sigma = -1
       Z_div_X_solar = 0.02293d0
