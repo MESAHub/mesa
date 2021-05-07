@@ -7553,14 +7553,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! always_use_dedt_form_of_energy_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! steps_before_always_use_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
       ! ::
 
     use_dedt_form_of_energy_eqn = .false.
     always_use_dedt_form_of_energy_eqn = .true.
-    steps_before_always_use_dedt_form_of_energy_eqn = -1
 
 
       ! use_time_centered_eps_grav

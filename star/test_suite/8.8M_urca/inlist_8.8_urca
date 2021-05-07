@@ -41,10 +41,6 @@
 
       include_composition_in_eps_grav = .true.
    
-      ! need to dodge problem with create_pre_main_sequence_model until fix it
-      always_use_dedt_form_of_energy_eqn = .false.
-      steps_before_always_use_dedt_form_of_energy_eqn = 20
-   
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'

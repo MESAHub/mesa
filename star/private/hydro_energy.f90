@@ -345,8 +345,6 @@
          
             if (eps_grav_form) then ! check if want it false         
                if (s% always_use_dedt_form_of_energy_eqn) eps_grav_form = .false.            
-               if (s% steps_before_always_use_dedt_form_of_energy_eqn >= 0 .and. &
-                   s% model_number > s% steps_before_always_use_dedt_form_of_energy_eqn) eps_grav_form = .false.                
             end if
          
             if (.not. eps_grav_form) then ! check if want it true

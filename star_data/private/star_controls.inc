@@ -808,8 +808,7 @@
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
             
-         integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
-            steps_before_use_velocity_time_centering
+         integer :: steps_before_use_velocity_time_centering
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &

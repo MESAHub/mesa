@@ -339,7 +339,7 @@
     ! hydro parameters
     opacity_factor, opacity_max, min_logT_for_opacity_factor_off, min_logT_for_opacity_factor_on, &
     max_logT_for_opacity_factor_on, max_logT_for_opacity_factor_off, &
-    non_nuc_neu_factor, always_use_dedt_form_of_energy_eqn, steps_before_always_use_dedt_form_of_energy_eqn, &
+    non_nuc_neu_factor, always_use_dedt_form_of_energy_eqn, &
     use_dedt_form_of_energy_eqn, use_time_centered_eps_grav, &
     use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, &
     include_composition_in_eps_grav, no_dedt_form_during_relax, &
@@ -1828,7 +1828,6 @@
  s% non_nuc_neu_factor = non_nuc_neu_factor
  s% use_dedt_form_of_energy_eqn = use_dedt_form_of_energy_eqn
  s% always_use_dedt_form_of_energy_eqn = always_use_dedt_form_of_energy_eqn
- s% steps_before_always_use_dedt_form_of_energy_eqn = steps_before_always_use_dedt_form_of_energy_eqn
  s% use_time_centered_eps_grav = use_time_centered_eps_grav
  s% no_dedt_form_during_relax = no_dedt_form_during_relax
  s% always_use_eps_grav_form_of_energy_eqn = always_use_eps_grav_form_of_energy_eqn
@@ -3495,7 +3494,6 @@
  non_nuc_neu_factor = s% non_nuc_neu_factor
  use_dedt_form_of_energy_eqn = s% use_dedt_form_of_energy_eqn
  always_use_dedt_form_of_energy_eqn = s% always_use_dedt_form_of_energy_eqn
- steps_before_always_use_dedt_form_of_energy_eqn = s% steps_before_always_use_dedt_form_of_energy_eqn
  use_time_centered_eps_grav = s% use_time_centered_eps_grav
  no_dedt_form_during_relax = s% no_dedt_form_during_relax
  always_use_eps_grav_form_of_energy_eqn = s% always_use_eps_grav_form_of_energy_eqn
