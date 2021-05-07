@@ -1,3 +1,14 @@
+! M-type Mira variable stars
+! Ireland, Scholz, and Wood, MNRAS 418, 114-128 (2011)
+! C50 5050 L  series
+! M = 1.35 Msun         when reaches AGB.  start with 1.5 at ZAMS
+! at phase = 0
+! L = 6722 Lsun      logL = 3.8
+! T = 3271           logT = 3.5
+! period = 427 days
+! mlt_alpha = 2.0
+! age ~ 3e9 years
+! see Fig 4 for history plots of logL and logTeff and R
 
 &star_job
 
@@ -35,7 +46,7 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 1000
 
-      initial_mass = 1.45
+      initial_mass = 1.5
       initial_z = 0.02d0
       
       

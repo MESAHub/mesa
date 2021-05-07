@@ -7,20 +7,42 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-do_one inlist_start_header start.mod 
-do_one inlist_to_end_core_h_burn_header end_core_h_burn.mod 
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_start.mod start.mod
+else
+   do_one inlist_start_header start.mod
+   cp start.mod standard_start.mod
+fi
 
-# check if can skip the slow climb up the red giant branch
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_end_core_h_burn.mod end_core_h_burn.mod
+else
+   do_one inlist_to_end_core_h_burn_header end_core_h_burn.mod
+   cp end_core_h_burn.mod standard_end_core_h_burn.mod
+fi
+
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_start_he_core_flash.mod start_he_core_flash.mod
 else
-   do_one inlist_to_start_he_core_flash_header start_he_core_flash.mod 
+   do_one inlist_to_start_he_core_flash_header start_he_core_flash.mod
    cp start_he_core_flash.mod standard_start_he_core_flash.mod
 fi
 
-do_one inlist_to_end_core_he_burn_header end_core_he_burn.mod 
-do_one inlist_to_end_agb_header end_agb.mod 
-do_one inlist_to_wd_header final.mod 
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_end_core_he_burn.mod end_core_he_burn.mod
+else
+   do_one inlist_to_end_core_he_burn_header end_core_he_burn.mod
+   cp end_core_he_burn.mod standard_end_core_he_burn.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_agb.mod agb.mod
+else
+   do_one inlist_to_agb_header agb.mod
+   cp agb.mod standard_agb.mod
+fi
+
+do_one inlist_to_pulse_header pulse.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
