@@ -424,18 +424,19 @@
                end if
             end if
             f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0  
-            if (f1 <= 0) return
+            if (f1 <= 0d0) return
             f1 = pow(f1,one_third)     
             f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
             Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
-            if (Gamma < 0) return
+            if (Gamma < 0d0) return
             ! average convection velocity   C&G 14.86b
             conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
             D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
             !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80     
             Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
             ! Zeta must be >= 0 and <= 1
-            if (is_bad(Zeta%val) .or. Zeta < 0d0) then
+            if (is_bad(Zeta%val)) return
+            if (Zeta < 0d0) then
                Zeta = 0d0
             else if (Zeta > 1d0) then
                Zeta = 1d0
