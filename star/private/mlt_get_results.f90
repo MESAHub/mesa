@@ -198,8 +198,8 @@
          if (using_TDC .and. k > 0 .and. s% dt > 0d0) then
             call set_MLT
             Y_guess = gradT - gradL
-            okay_to_use_TDC = check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
-                                                         T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
+            okay_to_use_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
+                                                                  T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
          else
             okay_to_use_TDC = .false.
          end if
@@ -756,8 +756,31 @@
          Q = (L - L0*gradL) - (L0 + c0*Af)*Y
       end subroutine compute_Q
 
+      !> Determines if it is safe (physically) to use MLT instead of TDC.
+      !!
+      !! The TDC velocity solution approaches the MLT solution asymptotically like exp(-Jt),
+      !! so when Jt >> 1 we can fall back to MLT safely.
+      !!
+      !! Likewise in cases where the predicted difference between Af and A0 (i.e. change in convection speed)
+      !! is small we can fall back safely to MLT.
+      !!
+      !! For both tests we need to know Y (the superadiabaticity), because that's what TDC calculates,
+      !! so we use the Y value from MLT as a guess.
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param mixing_length_alpha mixing length parameter
+      !! @param Y_in guess of superadiabaticity
+      !! @param Y temperature (K)
+      !! @param rho density (g/cm^3)
+      !! @param Cp heat capacity (erg/g/K)
+      !! @param kap opacity (cm^2/g)
+      !! @param Hp pressure scale height (cm)
+      !! @param gradL gradL = grada + gradMu (Ledoux threshold for convection)
+      !! @param A0 convection speed from the start of the step (cm/s)
+      !! @param fallback False if we need to use TDC, True if we can fall back to MLT.
       logical function check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, &
-                                                      Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0) result(using_TDC)
+                                                      Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0) result(fallback)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
@@ -776,9 +799,9 @@
 
          ! Note the '1d-50' here is in cm/s, and is just there to avoid division by zero.
          if (Jt > 1d2 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
-            using_TDC = .false.
+            fallback = .true.
          else
-            using_TDC = .true.
+            fallback = .false.
          end if
 
       end function check_if_can_fall_back_to_MLT
