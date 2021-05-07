@@ -56,6 +56,8 @@
       delta_lgTeff_limit = 0.1  
       delta_lgTeff_hard_limit = 0.3
 
+      delta_lgT_cntr_limit = 0.005
+
       relax_hard_limits_after_retry = .false.
       
       net_logTcut_lo = 0
