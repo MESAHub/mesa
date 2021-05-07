@@ -39,8 +39,6 @@
 
 &controls
 
-      max_gamma_for_dedt_form_of_energy_eqn = 5d0
-      max_eta_for_dedt_form_of_energy_eqn = 1d0
       include_composition_in_eps_grav = .true.
    
       ! need to dodge problem with create_pre_main_sequence_model until fix it

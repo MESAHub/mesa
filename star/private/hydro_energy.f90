@@ -351,15 +351,7 @@
          
             if (.not. eps_grav_form) then ! check if want it true
                if (s% always_use_eps_grav_form_of_energy_eqn) eps_grav_form = .true.             
-               if (s% eta_start(k) > s% max_eta_for_dedt_form_of_energy_eqn) eps_grav_form = .true.         
                if (s% doing_relax .and. s% no_dedt_form_during_relax) eps_grav_form = .true.         
-               if (s% max_gamma_for_dedt_form_of_energy_eqn > 0d0 .and. .not. eps_grav_form) then
-                  if (s% gam_start(k) > s% max_gamma_for_dedt_form_of_energy_eqn) then
-                     !write(*,3) 'use eps_grav_form because gamma > max', k, s% model_number, gamma, &
-                     !  s% max_gamma_for_dedt_form_of_energy_eqn
-                     eps_grav_form = .true.
-                  end if
-               end if
             end if
 
             if (eps_grav_form) then
