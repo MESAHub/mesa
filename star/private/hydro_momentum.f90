@@ -226,25 +226,18 @@
          end subroutine setup_dPtot
                   
          subroutine setup_d_mlt_Pturb(ierr)
+            use star_utils, only: get_rho_face
             integer, intent(out) :: ierr
-            real(dp) :: d_mlt_Pturb, d_dmltPturb_dlndm1, d_dmltPturb_dlnd00, old2
+            type(auto_diff_real_star_order1) :: rho_00, rho_m1
             ierr = 0
-
             ! d_mlt_Pturb = difference in MLT convective pressure across face
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0 .and. k > 1) then
-               old2 = pow2(s% mlt_vc_old(k))
-               d_mlt_Pturb = s% mlt_Pturb_factor*old2*(s% rho(k-1) - s% rho(k))/3d0
-               d_dmltPturb_dlndm1 = s% mlt_Pturb_factor*old2*s% rho(k-1)/3d0
-               d_dmltPturb_dlnd00 = -s% mlt_Pturb_factor*old2*s% rho(k)/3d0
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
+               rho_00 = wrap_d_00(s,k)
+               rho_m1 = wrap_d_m1(s,k)
+               d_mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(rho_m1 - rho_00)/3d0
             else
-               d_mlt_Pturb = 0d0
-               d_dmltPturb_dlndm1 = 0d0
-               d_dmltPturb_dlnd00 = 0d0
+               d_mlt_Pturb_ad = 0d0
             end if
-            d_mlt_Pturb_ad = 0d0
-            d_mlt_Pturb_ad%val = d_mlt_Pturb
-            d_mlt_Pturb_ad%d1Array(i_lnd_m1) = d_dmltPturb_dlndm1
-            d_mlt_Pturb_ad%d1Array(i_lnd_00) = d_dmltPturb_dlnd00
          end subroutine setup_d_mlt_Pturb         
                   
          subroutine setup_RTI_terms(ierr)

@@ -1,0 +1,179 @@
+
+&star_job
+
+      load_saved_model = .true.
+      load_model_filename = 'start.mod' 
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'pulse.mod'
+      required_termination_code_string = 'max_model_number'
+
+      set_initial_number_retries = .false.
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ !end of eos namelist
+
+
+&kap
+/ ! end of kap namelist
+
+
+&controls
+
+   log_Teff_lower_limit = 4.3 ! for 1st pass while looking for best model
+   
+   ! set max_model_number for best growth/period
+   max_model_number = 588 ! 2500
+    
+! timesteps
+   delta_HR_limit = 0.001
+
+! solver
+
+! GYRE output controls
+   x_integer_ctrl(1) = 4 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
+
+! output controls
+   num_trace_history_values = 3
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
+   trace_history_value_name(3) = 'log_Teff'
+   
+
+   photo_interval = 50
+   profile_interval = 100
+   history_interval = 10
+   terminal_interval = 10
+   write_header_frequency = 10
+
+      photo_interval = 10
+      !profile_interval = 1
+      !history_interval = 1
+      terminal_interval = 1
+
+      !fill_arrays_with_NaNs = .true.
+      
+      
+      !max_model_number = 687
+
+! FOR DEBUGGING
+      
+      !max_number_retries = 0
+
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !stop_for_bad_nums = .true.
+
+      !solver_save_photo_call_number = 0
+         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+
+      !solver_test_partials_call_number = 1
+      !solver_test_partials_k = 49
+      !solver_test_partials_iter_number = 1
+      !solver_test_partials_dx_0 = 1d-5
+      !solver_test_partials_var_name = '' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
+      !solver_test_partials_equ_name = '' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
+      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
+      !solver_test_partials_show_dx_var_name = 'h1'
+
+         ! equ name can also be one of these
+            ! 'lnE', 'lnP', 'grad_ad' to test eos
+            ! 'eps_nuc' to test net
+            ! 'non_nuc_neu' to test neu
+            ! 'gradT', 'mlt_vc' to test mlt
+            ! 'opacity' to test kap
+
+      !solver_test_partials_write_eos_call_info = .true.
+      
+      !solver_test_partials_k_low = -1
+      !solver_test_partials_k_high = -1
+      
+      !solver_test_eos_partials = .true.
+      !solver_test_kap_partials = .true.
+      !solver_test_nRSP2_partials = .true.
+      !solver_test_atm_partials = .true.
+
+      !report_why_dt_limits = .true.
+      !report_all_dt_limits = .true.
+      !report_solver_dt_info = .true.
+      
+      !show_mesh_changes = .true.
+      !mesh_dump_call_number = 5189
+      !okay_to_remesh = .false.
+      
+      !energy_conservation_dump_model_number = -1
+      
+      !trace_evolve = .true.
+      
+      !use_DGESVX_in_bcyclic = .true.
+      !use_equilibration_in_DGESVX = .true.
+      !report_min_rcond_from_DGESXV = .true.
+
+
+      ! solver debugging
+      !solver_check_everything = .true.
+      
+      !solver_epsder_struct = 1d-6
+      !solver_epsder_chem = 1d-6
+      
+      !report_solver_dt_info = .true.
+      !report_dX_nuc_drop_dt_limits = .true.
+      !report_bad_negative_xa = .true.
+
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+   !pause = .true.
+
+   ! HR window -- lg_L vs. lg_Teff
+   
+   pgstar_interval = 2
+
+   HR_win_flag = .true.
+   
+   HR_title = '18 M\d\(2281)\u  Z=0.02  beta Cepheid'
+
+   HR_win_width = 8
+   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+
+   ! axis limits -- to override system default selections
+   HR_logT_min = 4.2 ! -101 ! only used if > -100
+   HR_logT_max = 4.6 ! only used if > -100
+   HR_logL_min = 4.6 ! -101 ! only used if > -100
+   HR_logL_max = 5.2 ! -101 ! only used if > -100
+
+   !show_HR_classical_instability_strip = .true.
+   show_HR_target_box = .true.
+   HR_target_n_sigma = -3
+   HR_target_logL = 4.9d0
+   HR_target_logL_sigma = 0.04d0
+   HR_target_logT = 4.4d0
+   HR_target_logT_sigma = 0.02d0
+
+   ! file output
+   HR_file_flag = .false.
+   HR_file_dir = 'pgstar_out'
+   HR_file_prefix = 'hr'
+   HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_width = -1 ! negative means use same value as for window
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
+/ ! end of pgstar namelist

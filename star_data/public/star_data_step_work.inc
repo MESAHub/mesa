@@ -496,6 +496,7 @@
       type(auto_diff_real_star_order1), pointer, dimension(:) :: &
          u_face_ad, P_face_ad ! 'ad' for auto_diff
       real(dp), pointer, dimension(:) :: &
+         u_face_val, &
          d_uface_domega, &
          RTI_du_diffusion_kick, &
          u_face_start

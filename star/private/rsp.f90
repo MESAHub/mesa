@@ -74,6 +74,7 @@
          use alloc, only: allocate_star_info_arrays, set_RSP_flag
          use rsp_build, only: do_rsp_build
          use net, only: do_micro_change_net
+         use const_def, only: Lsun, Rsun, Msun
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: i, j, k
@@ -136,7 +137,19 @@
             write(*,1) 'dt', s% dt
             return
          end if
-         call finish_build_rsp_model(s, ierr)                     
+         call finish_build_rsp_model(s, ierr)      
+         write(*,2) 'nz', s%nz
+         write(*,1) 'T(nz)', s% T(s%nz)             
+         write(*,1) 'L_center/Lsun', s% L_center/Lsun           
+         write(*,1) 'R_center/Rsun', s% R_center/Rsun           
+         write(*,1) 'M_center/Msun', s% M_center/Msun           
+         write(*,1) 'L(1)/Lsun', s% L(1)/Lsun           
+         write(*,1) 'R(1)/Rsun', s% r(1)/Rsun           
+         write(*,1) 'M(1)/Msun', s% m(1)/Msun           
+         write(*,1) 'v(1)/1d5', s% v(1)/1d5       
+         write(*,1) 'tau_factor', s% tau_factor   
+         write(*,1) 'tau_base', s% tau_base   
+         write(*,*) 
       end subroutine build_rsp_model
       
 
@@ -838,6 +851,7 @@
             s% rsp_DeltaMAG = 2.5d0*log10(LMAX/LMIN)
             LMIN = 10.d10
             LMAX = -LMIN
+            VMAX = 0
          end if
       end subroutine gather_pulse_statistics
 
@@ -887,6 +901,7 @@
          LMAX   =-LMIN
          RMAX   = -SUNR
          RMIN   = -RMAX
+         VMAX   = 0
          s% rsp_GREKM = 0
          s% rsp_GREKM_avg_abs = 0
          s% rsp_GRPDV = 0
@@ -1018,11 +1033,16 @@
          TET = s% time
          cycle_complete = .false.
          UN=s% v(1)
-         if(UN.gt.0.d0.and.ULL.le.0.d0) RMIN=s% r(1)/SUNR
+         if(UN.gt.0.d0.and.ULL.le.0.d0) then
+            RMIN=s% r(1)/SUNR
+         end if
          if (s% model_number.eq.1) return
          if (.not. s% RSP_have_set_velocities) return
          if (s% RSP_min_max_R_for_periods > 0d0 .and. &
                s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (UN/s% csound(1) > VMAX) then
+            VMAX = UN/s% csound(1)
+         end if
          if(UN*ULL.gt.0.0d0.or.UN.gt.0.d0) return
          T0=TET
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
@@ -1039,8 +1059,11 @@
                write(*,2) 'TT1', s% model_number, TT1
                stop 'check_cycle_completed'
             end if
-            write(*,'(a7,i7,f11.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
+            RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
+            write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
                'period', s% rsp_num_periods, s% rsp_period/(24*3600), &
+               'delta R', RMAX - RMIN, &
+               'max vsurf/cs', VMAX, &
                'retries',  &
                   s% num_retries - run_num_retries_prev_period,     &
                'steps',  &
@@ -1054,7 +1077,7 @@
             run_num_retries_prev_period = s% num_retries
             TT1=T0
             INSIDE=1 
-            RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
+            VMAX = 0d0
          else
              write(*,*) 'first maximum radius, period calculations start at model, day', &
                 s% model_number, s% time/(24*3600)

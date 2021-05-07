@@ -1166,8 +1166,8 @@
             if (failed('u_face_ad')) exit
             call do1(s% u_face_start, c% u_face_start)
             if (failed('u_face_start')) exit
-            !call do1(s% u_face, c% u_face)
-            !if (failed('u_face')) exit
+            call do1(s% u_face_val, c% u_face_val)
+            if (failed('u_face_val')) exit
             !call do1(s% d_uface_dlnR, c% d_uface_dlnR)
             !if (failed('d_uface_dlnR')) exit
             !call do1(s% d_uface_du00, c% d_uface_du00)
