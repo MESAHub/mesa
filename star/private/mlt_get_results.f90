@@ -540,6 +540,8 @@
 
       end subroutine Get_results
       
+!------------------------------ Time-dependent convection (TDC)
+
       
       subroutine get_TDC_solution(s, k, &
             mixing_length_alpha, cgrav, m, Y_guess, report, &
@@ -1031,7 +1033,7 @@
       end function unconvert
 
 
-!------------------------------
+!------------------------------ Thermohaline
 
 
       subroutine get_D_thermohaline(s, &
