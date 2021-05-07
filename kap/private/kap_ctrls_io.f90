@@ -65,6 +65,7 @@
    logical :: cubic_interpolation_in_X
    logical :: cubic_interpolation_in_Z
    logical :: include_electron_conduction
+   logical :: use_blouin_conductive_opacities
 
    logical :: use_Zbase_for_Type1
    logical :: use_Type2_opacities
@@ -119,7 +120,7 @@
 
       cubic_interpolation_in_X, cubic_interpolation_in_Z, &
 
-      include_electron_conduction, &
+      include_electron_conduction, use_blouin_conductive_opacities, &
 
       use_Zbase_for_Type1, use_Type2_opacities, &
 
@@ -282,6 +283,7 @@
       rq% cubic_interpolation_in_X = cubic_interpolation_in_X
       rq% cubic_interpolation_in_Z = cubic_interpolation_in_Z
       rq% include_electron_conduction = include_electron_conduction
+      rq% use_blouin_conductive_opacities = use_blouin_conductive_opacities
       rq% use_Zbase_for_Type1 = use_Zbase_for_Type1
       rq% use_Type2_opacities = use_Type2_opacities
 

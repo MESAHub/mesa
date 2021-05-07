@@ -203,7 +203,10 @@ module kap_def
 
       logical :: cubic_interpolation_in_X
       logical :: cubic_interpolation_in_Z
+
+      ! conductive opacities
       logical :: include_electron_conduction
+      logical :: use_blouin_conductive_opacities
 
       logical :: use_Zbase_for_Type1
       logical :: use_Type2_opacities

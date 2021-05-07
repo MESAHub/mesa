@@ -149,8 +149,12 @@ are tabulated for a set of :math:`1 \le \bar{Z} \le 60`.  Each table
 spans :math:`-6 \le \log(\rho/\rm g\,cm^{-3}) \le 11.50` and :math:`3
 \le \log(T/\rm K) \le 10`.
 
+For H and He in the regime of moderate coupling and moderate
+degeneracy, the additional correction formulae of |B20| are applied.
 
 .. |P17| replace:: `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`__
+
+.. |B20| replace:: `Blouin et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract>`__
 
 .. |Fergusson| replace:: `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`__
 

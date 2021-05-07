@@ -78,24 +78,24 @@
 
 
  test_T_tau_uniform: iterated
-                                 atm_get_grey logP surf    4.7483690740375684D+00
+                                 atm_get_grey logP surf    4.7483690740375692D+00
                                  atm_get_grey logT surf    4.2748967954324364D+00
                                   atm_get_grey tau_phot    1.5000000000000000D+02
 
 
  test_irradiated
 
-                              test_grey_irradiated: kap    4.3649748642306330D-03
+                              test_grey_irradiated: kap    4.3649748642304882D-03
                                             M/M_jupiter    1.4999999999999998D+00
                                             R/R_jupiter    1.5743735095633800D+00
                                                  R/Rsun    1.6178684913857289D-01
                                                   kap_v    4.0000000000000001D-03
                                                       P    1.0000000000000000D+06
 
-                                                    tau    2.9101126947638272D+00
+                                                    tau    2.9101126947637423D+00
                                                    Teff    8.9999999999999932D+02
                                                    T_eq    1.0000000000000000D+03
                                                   T_int    9.0000000000000000D+02
-                                                      T    1.2929349604416138D+03
-                                                   logT    3.1115766787614851D+00
+                                                      T    1.2929349604416070D+03
+                                                   logT    3.1115766787614829D+00
 

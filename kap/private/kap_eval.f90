@@ -724,7 +724,7 @@
                kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT, ierr)
          else
             call do_electron_conduction( &
-               zbar, logRho, logT, &
+               rq, zbar, logRho, logT, &
                kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT, ierr)
          end if
          if (ierr /= 0) return
