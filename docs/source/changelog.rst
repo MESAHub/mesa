@@ -132,9 +132,10 @@ the blended opacity.
 The Compton scattering opacity routine has been updated to use the prescription of
 `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`_.
 
-The conductive opacity routine has been updated to use the corrections from 
+The conductive opacity routine has been updated to include the corrections from 
 `Blouin et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract>`_
 for H and He in the regime of moderate coupling and moderate degeneracy.
+These are on by default, controlled by the kap option ``use_blouin_conductive_opacities``.
 
 
 There are new module-level kap hooks (see ``kap/other``) that allow
