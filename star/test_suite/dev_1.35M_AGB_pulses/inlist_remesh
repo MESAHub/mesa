@@ -8,10 +8,11 @@
       save_model_filename = 'envelope.mod'
       required_termination_code_string = 'max_model_number'
       
+      ! if do not remove center, then must comment out the following
+      ! eps_nuc_factor = 0
+      ! non_nuc_neu_factor = 0
+      
       remove_initial_center_by_temperature = 2d6
-
-      change_initial_v_flag = .true.
-      new_v_flag = .true.
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -25,9 +26,9 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d2
+      seconds_for_initial_dt = 74000
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -42,9 +43,20 @@
 
 &controls
    
-   max_timestep = 6d3 ! expected period/500 or so
+   max_timestep = 74000 ! expected period/500 or so
    
    max_model_number = 100 ! must be large enough to reach max_timestep
+      
+! TDC    this needs to wait until after remove center and set velocities
+!   max_X_for_TDC = 1d0
+!   max_X_for_conv_timescale = 1d0
+!
+!   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
+!   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
+!   
+!   alpha_TDC_DAMP = 1d0
+!   alpha_TDC_DAMPR = 0d0
+!   alpha_TDC_PtdVdt = 0d0
 
 ! solver
    eps_nuc_factor = 0
@@ -53,20 +65,38 @@
    mix_factor = 0
    
 ! mesh controls
+   !okay_to_remesh = .false.
    okay_to_remesh = .true.
-   use_split_merge_amr = .true.
-   split_merge_amr_flipped_hybrid_zoning = .true.
-   split_merge_amr_nz_r_core_fraction = 0.5d0
-   split_merge_amr_nz_r_core = 300
-   split_merge_amr_nz_baseline = 500
-   split_merge_amr_MaxLong = 1.5d0
-   split_merge_amr_MaxShort = 1.5d0
-   split_merge_amr_max_iters = 1000
+   
+   mesh_delta_coeff = 2
+   log_tau_function_weight = 50
+   !show_mesh_changes = .true.
+   !trace_split_merge_amr = .true.
+   
+   !use_split_merge_amr = .true.      
+   split_merge_amr_logtau_zoning = .true.
+   
+   split_merge_amr_r_core_cm = 1d8
+   split_merge_amr_nz_baseline = 1000
+   split_merge_amr_nz_r_core = 100
 
-! GYRE set starting velocities
-   x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 0d0 ! fraction_1st_overtone
-   x_ctrl(5) = 0d0 ! fraction_2nd_overtone
+   split_merge_amr_MaxLong = 2d0
+   split_merge_amr_MaxShort = 2d0
+   split_merge_amr_max_iters = 100
+   
+   split_merge_amr_okay_to_split_nz = .false.
+   split_merge_amr_avoid_repeated_remesh = .false.
+   
+   merge_amr_max_abs_du_div_cs = -1 ! turn it off
+
+! GYRE
+   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
    
 ! output controls
    terminal_show_age_units = 'days'
@@ -172,7 +202,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'Cepheid Grid Profiles  TDC'
+    Grid1_title = 'Mira Profiles'
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -187,7 +217,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Classical Cepheid  TDC'
+    Grid2_title = '1.35 M\d\(2281)\u  Z=0.02  Mira'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

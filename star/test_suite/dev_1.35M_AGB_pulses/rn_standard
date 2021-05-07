@@ -42,7 +42,28 @@ else
    cp agb.mod standard_agb.mod
 fi
 
-do_one inlist_to_pulse_header pulse.mod
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_pulse.mod pulse.mod
+else
+   do_one inlist_to_pulse_header pulse.mod
+   cp pulse.mod standard_pulse.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_envelope.mod envelope.mod
+else
+   do_one inlist_remesh_header envelope.mod
+   cp envelope.mod standard_envelope.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_initialized.mod initialized.mod
+else
+   do_one inlist_initialize_header initialized.mod
+   cp initialized.mod standard_initialized.mod
+fi
+
+do_one inlist_Mira_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

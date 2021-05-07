@@ -56,7 +56,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
 
    ! HR window -- lg_L vs. lg_Teff
    

@@ -12,15 +12,17 @@
 
 &star_job
 
-      create_pre_main_sequence_model = .true.
+      load_saved_model = .true.
+      load_model_filename = 'agb.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'start.mod'
-      required_termination_code_string = 'log_L_lower_limit'
+      save_model_filename = 'pulse.mod'
+      required_termination_code_string = 'max_model_number'
 
-      !pgstar_flag = .true.
-      
+      pgstar_flag = .true.
+
 / ! end of star_job namelist
+
 
 &eos
 / ! end of eos namelist
@@ -30,26 +32,90 @@
 
 &controls
 
-      ! stop when the luminosity has decreased to 10 Lsun
-      ! for a 1 Msun star, this is roughly the on birthline
-      log_L_lower_limit = 1
+      !log_L_upper_limit = 3.8
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 1000
+      max_model_number = 18756 ! 25000
+!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
+!   18755       2          0.2687E-07       37220072.2441         620334.5374            430.7879          0.1195E+04          0.2774E+01
 
-      
-      
+! rotation
+      am_nu_visc_factor = 0
+      am_D_mix_factor = 0.0333333333333333d0
+      D_DSI_factor = 0
+      D_SH_factor = 1
+      D_SSI_factor = 1
+      D_ES_factor = 1
+      D_GSF_factor = 1
+      D_ST_factor = 1
 
-      photo_interval = 100
+! timesteps
+      delta_lgTeff_limit = 0.01d0
+      delta_lgTeff_hard_limit = 0.05d0
+      relax_hard_limits_after_retry = .false.
+
+      delta_lgL_H_limit = 0.05 ! limit for magnitude of change in lgL_H
+      delta_lgL_H_hard_limit = 0.5
+      lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
+
+      delta_lgL_He_limit = 0.025 ! limit for magnitude of change in lgL_He
+      delta_lgL_He_hard_limit = 1
+      lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+
+! wind
+      cool_wind_full_on_T = 9.99d9
+      hot_wind_full_on_T = 1d10 
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0 ! 0.8d0  
+      Blocker_scaling_factor = 0 ! 0.7d0 ! 0.8d0       
+
+
+
+
+! GYRE output controls
+
+   x_integer_ctrl(1) = 5 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files
+   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   
+   x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         ! should match gyre.in mode l
+!      x_integer_ctrl(4) = 1 ! order
+!      x_ctrl(1) = 0.6d-4 ! freq < this (Hz)
+!      x_ctrl(2) = 0.3d4 ! growth < this (days)
+
+   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
+
+
+
+
+! output controls
+      
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      photo_interval = 50
       profile_interval = 100
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
+
       
       !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       !terminal_interval = 1
+      
+      !x_integer_ctrl(19) = 5
+      !x_integer_ctrl(20) = 12
+      !x_integer_ctrl(21) = 12707
 
 ! FOR DEBUGGING
 
@@ -117,6 +183,9 @@
 
 
 &pgstar
+
+         
+
          
       Grid6_win_flag = .true.
       Grid6_win_width = 11

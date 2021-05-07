@@ -1,0 +1,35 @@
+
+&star_job
+      show_log_description_at_start = .false.
+/ ! end of star_job namelist
+
+
+&eos
+/ !end of eos namelist
+
+
+&kap
+   Zbase = 0.02d0
+   kap_file_prefix = 'gs98'
+   use_Type2_opacities = .true.
+/ ! end of kap namelist
+
+
+&controls
+   initial_mass = 1.5
+   initial_z = 0.02d0
+
+! MLT
+
+! mixing
+
+! timing
+   varcontrol_target = 1d-3
+
+! solver
+
+/ ! end of controls namelist
+
+
+&pgstar
+/ ! end of pgstar namelist

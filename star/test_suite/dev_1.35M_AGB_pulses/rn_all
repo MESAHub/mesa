@@ -23,6 +23,15 @@ do_one inlist_to_agb_header agb.mod
 cp agb.mod standard_agb.mod
 
 do_one inlist_to_pulse_header pulse.mod
+cp pulse.mod standard_pulse.mod
+
+do_one inlist_remesh_header envelope.mod
+cp envelope.mod standard_envelope.mod
+
+do_one inlist_initialize_header initialized.mod
+cp initialized.mod standard_initialized.mod
+
+do_one inlist_Mira_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

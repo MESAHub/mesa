@@ -41,14 +41,22 @@
    
       model_number ! counting from the start of the run
       star_age ! elapsed simulated time in years since the start of the run
-      star_mass ! in Msun units
-      log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
-      !star_mdot ! d(star_mass)/dt (in msolar per year)
-      !time_step ! timestep in years since previous model
-      log_dt ! log10 time_step
-      num_zones ! number of zones in the model
-      log_total_angular_momentum
-      log_rotational_mdot_boost
+      !star_age_sec ! elapsed simulated time in seconds since the start of the run
+      !star_age_min ! elapsed simulated time in minutes since the start of the run
+      !star_age_hr ! elapsed simulated time in hours since the start of the run
+      star_age_day ! elapsed simulated time in days since the start of the run
+      log_dt
+      log_dt_sec ! log10 time_step in seconds
+      time_step_sec
+      !num_zones ! number of zones in the model
+      
+      dt_div_max_tau_conv
+      max_tau_conv
+      log_max_tau_conv
+      dt_div_min_tau_conv
+      min_tau_conv
+      log_min_tau_conv
+      using_TDC   
       
       num_solver_iterations ! iterations at this step
 
@@ -59,6 +67,11 @@
       virial_thm_P_avg
       virial_thm_rel_err
       
+      v_surf_km_s
+      radius
+      effective_T
+      luminosity
+      star_age_day
       
    ! mixing regions
    

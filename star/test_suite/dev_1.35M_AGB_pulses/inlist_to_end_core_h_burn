@@ -1,8 +1,6 @@
 
 &star_job
 
-      show_log_description_at_start = .false.
-
       load_saved_model = .true.
       load_model_filename = 'start.mod'
 
@@ -20,16 +18,9 @@
 / ! end of star_job namelist
 
 &eos
-
-
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
-
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
-
 / ! end of kap namelist
 
 &controls
@@ -45,10 +36,6 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 2000
-         
-      initial_mass = 1.0
-      initial_z = 0.02d0
-      
 
       am_nu_visc_factor = 0
       am_D_mix_factor = 0.0333333333333333d0
@@ -59,7 +46,6 @@
       D_GSF_factor = 1
       D_ST_factor = 1
       
-      varcontrol_target = 1d-3
       delta_lgL_He_limit = 0.01d0
      
       cool_wind_full_on_T = 9.99d9
