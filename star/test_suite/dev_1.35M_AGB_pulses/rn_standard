@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+do_one inlist_start_header start.mod 
+do_one inlist_to_end_core_h_burn_header end_core_h_burn.mod 
+
+# check if can skip the slow climb up the red giant branch
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_start_he_core_flash.mod start_he_core_flash.mod
+else
+   do_one inlist_to_start_he_core_flash_header start_he_core_flash.mod 
+   cp start_he_core_flash.mod standard_start_he_core_flash.mod
+fi
+
+do_one inlist_to_end_core_he_burn_header end_core_he_burn.mod 
+do_one inlist_to_end_agb_header end_agb.mod 
+do_one inlist_to_wd_header final.mod 
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'
+
