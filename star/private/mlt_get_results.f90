@@ -883,7 +883,35 @@
          end if
       end subroutine eval_xis
       
-      
+      !! Calculates the solution to the TDC velocity equation.
+      !! The velocity equation is
+      !!
+      !! 2 dw/dt = xi0 + w * xi1 + w**2 * xi2 - Lambda
+      !!
+      !! where Lambda (currently set to zero) captures coupling between cells.
+      !! The xi0/1/2 variables are constants for purposes of solving this equation.
+      !!
+      !! An important related parameter is J:
+      !! 
+      !! J^2 = xi1^2 - 4 * xi0 * xi2
+      !!
+      !! When J^2 > 0 the solution for w is hyperbolic in time.
+      !! When J^2 < 0 the solution is trigonometric, behaving like tan(J * t / 4 + c).
+      !!
+      !! In the trigonometric branch note that once the solution passes through its first
+      !! root the solution for all later times is w(t) = 0. This is not a solution to the
+      !! convective velocity equation as written above, but *is* a solution to the convective
+      !! energy equation (multiply the velocity equation by w), which is the one we actually
+      !! want to solve (per Radek Smolec's thesis). We just solve the velocity form
+      !! because it's more convenient.
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param A0_in convection speed from the start of the step (cm/s)
+      !! @param xi0 The constant term in the convective velocity equation.
+      !! @param xi1 The prefactor of the linear term in the convective velocity equation.
+      !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.            
+      !! @param Af Output, the convection speed at the end of the step (cm/s)
       function eval_Af(s, k, A0_in, xi0, xi1, xi2) result(Af)
          type (star_info), pointer :: s
          integer, intent(in) :: k
