@@ -1,5 +1,3 @@
-do_one dev_to_ppisn_100 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-return
 
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1

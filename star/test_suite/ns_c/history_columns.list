@@ -277,7 +277,7 @@
 
       ! you might want to get a more complete list of mixing regions by using the following
       
-      mixing_regions 40
+      !mixing_regions 40
       
       !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
          ! the <integer> is the number of regions to report
@@ -293,7 +293,7 @@
          
          ! the columns in the log file will have names like 'mix_type_1' and 'mix_qtop_1'
 
-      burning_regions 80
+      !burning_regions 80
 
 
    ! misc

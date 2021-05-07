@@ -197,8 +197,8 @@
     
     
     ! kipp info 
-      mixing_regions 40
-      burning_regions 80
+      !mixing_regions 40
+      !burning_regions 80
 
 
 

@@ -92,7 +92,7 @@
             flux_in_ad, flux_out_ad, diffusion_source_ad, &
             geometry_source_ad, gravity_source_ad, &
             area_00, area_p1, inv_R2_00, inv_R2_p1, &
-            dudt_expected_ad, dudt_actual_ad, resid_ad, tst
+            dudt_expected_ad, dudt_actual_ad, resid_ad
          type(accurate_auto_diff_real_star_order1) :: sum_ad       
          real(dp) :: dt, dm, ie_plus_ke, scal, residual
          logical :: dbg, do_diffusion, test_partials
@@ -109,8 +109,6 @@
             stop 'Riemann dudt does not support use_other_momentum_implicit'
          if (s% use_mass_corrections) &
             stop 'Riemann dudt does not support use_mass_corrections'
-         if (s% using_velocity_time_centering) &
-            stop 'Riemann dudt does not support velocity_time_centering'
             
          ierr = 0
          nz = s% nz
@@ -160,15 +158,14 @@
          end if
 
          if (test_partials) then
-            tst = resid_ad
-            s% solver_test_partials_val = tst%val
+            s% solver_test_partials_val = residual
          end if
          
          call save_eqn_residual_info(s, k, nvar, i_du_dt, resid_ad, 'do1_dudt_eqn', ierr)
 
          if (test_partials) then
-            s% solver_test_partials_var = s% i_lnT
-            s% solver_test_partials_dval_dx = tst%d1Array(i_lnT_00)
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
             write(*,*) 'do1_dudt_eqn', s% solver_test_partials_var
          end if
          
@@ -303,8 +300,8 @@
 
       
       subroutine do1_uface_and_Pface(s, k, ierr)
-         use star_utils, only: &
-            calc_Ptot_ad_tw, get_face_weights, get_area_info_opt_time_center
+         use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
+         use star_utils, only: calc_Ptot_ad_tw, get_face_weights
          use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s 
          integer, intent(in) :: k
@@ -312,7 +309,7 @@
          logical :: test_partials
 
          type(auto_diff_real_star_order1) :: &
-            area_ad, inv_R2_ad, PL_ad, PR_ad, uL_ad, uR_ad, rhoL_ad, rhoR_ad, &
+            r_ad, A_ad, PL_ad, PR_ad, uL_ad, uR_ad, rhoL_ad, rhoR_ad, &
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
@@ -333,21 +330,11 @@
          if (k == 1) then
             s% u_face_ad(k) = wrap_u_00(s,k)
             s% P_face_ad(k) = wrap_Peos_00(s,k)
-            if (s% using_velocity_time_centering) then
-               s% u_face_ad(k) = 0.5d0*(s% u_face_ad(k) + s% u_start(k))
-               if (s% include_P_in_velocity_time_centering) &
-                  s% P_face_ad(k) = 0.5d0*(s% P_face_ad(k) + s% Peos_start(k))
-            end if
-            s% u_face_val(k) = s% u_face_ad(k)%val
-            if (s% P_face_start(k) < 0d0) then
-               s% u_face_start(k) = s% u_face_val(k)
-               s% P_face_start(k) = s% P_face_ad(k)%val
-            end if
             return            
          end if
       
-         call get_area_info_opt_time_center(s, k, area_ad, inv_R2_ad, ierr)
-         if (ierr /= 0) return
+         r_ad = wrap_r_00(s,k)
+         A_ad = 4d0*pi*pow2(r_ad)
          
          call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_Ptot_dxa, ierr)
          if (ierr /= 0) return
@@ -357,10 +344,6 @@
 
          uL_ad = wrap_u_00(s,k)
          uR_ad = wrap_u_m1(s,k)
-         if (s% using_velocity_time_centering) then
-            uL_ad = 0.5d0*(uL_ad + s% u_start(k))
-            uR_ad = 0.5d0*(uR_ad + s% u_start(k-1))
-         end if
       
          rhoL_ad = wrap_d_00(s,k)
          rhoR_ad = wrap_d_m1(s,k)
@@ -375,7 +358,7 @@
          call get_G(s, k, G_ad, dG_dw_div_wc)
          G_ad%d1Array(i_L_00) = dG_dw_div_wc
          
-         dPdm_grav_ad = -G_ad*s% m_grav(k)*inv_R2_ad/area_ad  ! cm^-1 s^-2
+         dPdm_grav_ad = -G_ad*s% m_grav(k)/(pow2(r_ad)*A_ad)  ! cm^-1 s^-2
          
          delta_m = 0.5d0*s% dm(k) ! positive delta_m from left center to edge
          PL_ad = PL_ad + delta_m*dPdm_grav_ad
@@ -434,7 +417,7 @@
              if (s% eta_RTI(k) > 0d0 .and. &
                    s% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
                 f = s% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/s% dm_bar(k)
-                du_ad = f*area_ad*(rhoL_ad - rhoR_ad) ! bump uface in direction of lower density
+                du_ad = f*A_ad*(rhoL_ad - rhoR_ad) ! bump uface in direction of lower density
                 s% RTI_du_diffusion_kick(k) = du_ad%val
                 s% u_face_ad(k) = s% u_face_ad(k) + du_ad
              end if

@@ -4,11 +4,11 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'end_core_he_burn.mod'
+      load_model_filename = 'end_core_he_burn.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'end_agb.mod'
-      required_termination_code_string = 'envelope_mass_limit'
+      save_model_filename = 'agb.mod'
+      required_termination_code_string = 'star_mass_min_limit'
 
 
       change_D_omega_flag = .true.
@@ -33,7 +33,8 @@
 
 &controls
 
-      envelope_mass_limit = 1d-2 ! Msun
+      !envelope_mass_limit = 1d-2 ! Msun
+      star_mass_min_limit = 1.35
 
       use_dedt_form_of_energy_eqn = .true.
 
