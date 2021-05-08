@@ -14,10 +14,8 @@
       ! non_nuc_neu_factor = 0
       
       !remove_initial_center_by_temperature = 2d6        ! for envelope only cases
-      ! 0.3113      0.4788E+01    0.1538E+02 off 1082
-      ! 0.3068      0.5455E+01    0.1778E+02 1d7
-      ! 0.3094      0.5014E+01    0.1621E+02 2d7 709
-      ! 0.3107      0.4845E+01    0.1559E+02 4d7 910
+
+
 
       set_initial_model_number = .true.
       initial_model_number = 0

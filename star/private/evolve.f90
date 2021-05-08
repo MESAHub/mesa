@@ -195,7 +195,6 @@
             call set_to_NaN(s% mesh_adjust_KE_conservation)
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% min_conv_time_scale)
-             call set_to_NaN(s% min_dr_div_cs_start)
             call set_to_NaN(s% mstar_dot_old)
             call set_to_NaN(s% mstar_old)
             call set_to_NaN(s% mx1_bot)
@@ -1779,7 +1778,6 @@
          end if
 
          ! save a few things from start of step that will need later
-         s% min_dr_div_cs_start = min_dr_div_cs(s,k)
          if (s% rotation_flag) then
             s% surf_r_equatorial = s% r_equatorial(1)
          else

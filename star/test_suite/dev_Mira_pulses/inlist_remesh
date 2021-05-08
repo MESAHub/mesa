@@ -64,6 +64,9 @@
    dxdt_nuc_factor = 0
    mix_factor = 0
    
+   
+   
+   
 ! mesh controls
    !okay_to_remesh = .false.
    okay_to_remesh = .true.
@@ -77,7 +80,7 @@
    split_merge_amr_logtau_zoning = .true.
    
    split_merge_amr_r_core_cm = 1d8
-   split_merge_amr_nz_baseline = 1000
+   split_merge_amr_nz_baseline = 2000
    split_merge_amr_nz_r_core = 100
 
    split_merge_amr_MaxLong = 2d0
@@ -88,6 +91,22 @@
    split_merge_amr_avoid_repeated_remesh = .false.
    
    merge_amr_max_abs_du_div_cs = -1 ! turn it off
+
+
+
+! mesh controls
+   okay_to_remesh = .true.
+   use_split_merge_amr = .true.
+   split_merge_amr_flipped_hybrid_zoning = .true.
+   split_merge_amr_nz_r_core_fraction = 0.5d0
+   split_merge_amr_nz_r_core = 300
+   split_merge_amr_nz_baseline = 500
+   split_merge_amr_MaxLong = 1.5d0
+   split_merge_amr_MaxShort = 1.5d0
+   split_merge_amr_max_iters = 1000
+
+
+
 
 ! GYRE
    x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
