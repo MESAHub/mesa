@@ -2,11 +2,11 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'near_pulses.mod' 
+      load_model_filename = 'zams.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'pulse.mod'
-      required_termination_code_string = 'max_model_number'
+      save_model_filename = 'near_pulses.mod'
+      required_termination_code_string = 'log_Teff_lower_limit'
 
       set_initial_number_retries = .false.
 
@@ -26,37 +26,17 @@
 / ! end of kap namelist
 
 
-!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
-!     764       1          0.3380E-04          29586.3527            493.1059              0.3424          0.2723E+02          0.7952E+02
-!     764       2          0.3769E-04          26529.6468            442.1608              0.3071          0.4693E+01          0.1528E+02
-!                    model order period(d) growth(d) G/P         764           2    3.0705609721760946D-01    4.6933423552364291D+00    1.5284967137162157D+01
-! best_model_number best_G_div_P period(d) growth(d) period(s)         764   15.284967137162157       0.30705609721760946        4.6933423552364291       0.30705609721760946     
-
-! after convert
-! best_model_number best_G_div_P period(d) growth(d) period(s)         100   15.248728481339811       0.30667984495126682        4.6764776863612596       0.30667984495126682     
-
-
-
 &controls
 
-   log_Teff_lower_limit = 4.38 ! for 1st pass while looking for best model
+   log_Teff_lower_limit = 4.47
    
    ! set max_model_number for best growth/period
-   max_model_number = 765 ! 2500
+   !max_model_number = 588 ! 2500
     
 ! timesteps
    delta_HR_limit = 0.001
 
 ! solver
-
-! GYRE output controls
-   x_integer_ctrl(1) = 4 ! output GYRE info at this step interval
-   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-   x_integer_ctrl(2) = 2 ! max number of modes to output per call
-   x_logical_ctrl(2) = .false. ! output eigenfunction files   
-   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
-   x_integer_ctrl(3) = 0 ! mode_l
-   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
 
 ! output controls
    num_trace_history_values = 3
@@ -71,10 +51,10 @@
    terminal_interval = 10
    write_header_frequency = 10
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -166,18 +146,18 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 4.35 ! -101 ! only used if > -100
-   HR_logT_max = 4.5 ! only used if > -100
-   HR_logL_min = 4.7 ! -101 ! only used if > -100
+   HR_logT_min = 4.2 ! -101 ! only used if > -100
+   HR_logT_max = 4.6 ! only used if > -100
+   HR_logL_min = 4.5 ! -101 ! only used if > -100
    HR_logL_max = 5.1 ! -101 ! only used if > -100
 
    !show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
    HR_target_n_sigma = -3
-   HR_target_logL = 4.94d0
-   HR_target_logL_sigma = 0.02d0
-   HR_target_logT = 4.44d0
-   HR_target_logT_sigma = 0.005d0
+   HR_target_logL = 4.9d0
+   HR_target_logL_sigma = 0.04d0
+   HR_target_logT = 4.4d0
+   HR_target_logT_sigma = 0.02d0
 
    ! file output
    HR_file_flag = .false.

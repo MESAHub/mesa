@@ -38,8 +38,23 @@
          prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
          best_growth, best_period
          
+
+!alpha_mlt_routine
+         !alpha_H = s% x_ctrl(21)
+         !alpha_other = s% x_ctrl(22)
+         !H_limit = s% x_ctrl(23)
+
+!gyre
+      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
+      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      !x_logical_ctrl(2) = .false. ! output eigenfunction files
+      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      !x_integer_ctrl(4) = 1 ! order
+      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
             
-      ! these routines are called by the standard run_star check_model
       
       contains
 
@@ -63,9 +78,42 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% other_alpha_mlt => alpha_mlt_routine       
          s% other_photo_write => photo_write
          s% other_photo_read => photo_read
       end subroutine extras_controls
+
+
+      subroutine alpha_mlt_routine(id, ierr)
+         use chem_def, only: ih1
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         integer :: k, h1
+         real(dp) :: alpha_H, alpha_other, H_limit
+         include 'formats'
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         alpha_H = s% x_ctrl(21)
+         alpha_other = s% x_ctrl(22)
+         H_limit = s% x_ctrl(23)
+         h1 = s% net_iso(ih1)
+         !write(*,1) 'alpha_H', alpha_H
+         !write(*,1) 'alpha_other', alpha_other
+         !write(*,1) 'H_limit', H_limit
+         !write(*,2) 'h1', h1
+         !write(*,2) 's% nz', s% nz
+         if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
+         do k=1,s% nz
+            if (s% xa(h1,k) >= H_limit) then
+               s% alpha_mlt(k) = alpha_H
+            else
+               s% alpha_mlt(k) = alpha_other
+            end if
+         end do
+         !stop
+      end subroutine alpha_mlt_routine
 
 
       subroutine photo_write(id, iounit)
@@ -393,11 +441,11 @@
                         best_period = s% xtra2_array(i)
                         best_model_number = s% model_number
                      end if
-                     write(*,3) 'model order period growth G/P', s% model_number, s% ixtra1_array(i), &
+                     write(*,3) 'model order period(d) growth(d) G/P', s% model_number, s% ixtra1_array(i), &
                         s% xtra2_array(i), s% xtra1_array(i), s% xtra1_array(i)/s% xtra2_array(i)
                   end do
-                  write(*,*) 'best_model_number best_G_div_P period growth best_max_dt', best_model_number, &
-                     best_G_div_P, best_period, best_growth, best_period*(24*3600)/500d0
+                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d) period(s)', best_model_number, &
+                     best_G_div_P, best_period, best_growth, best_period
                end if
             end if
          end if
@@ -417,7 +465,7 @@
             v_surf = s% u_face_val(1)
             v_surf_start = s% u_face_start(1)
          else
-            stop 'extras_finish_step vel'
+            stop 'extras_finish_step: both v_flag and u_flag are false'
          end if
          if (v_surf/s% csound(1) > period_max_vsurf_div_cs) &
             period_max_vsurf_div_cs = v_surf/s% csound(1)
@@ -528,7 +576,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 4
+         how_many_extra_history_columns = 5
       end function how_many_extra_history_columns
       
       
@@ -545,14 +593,16 @@
          names(1) = 'num_periods'
          vals(1) = num_periods
          names(2) = 'period'
-         vals(2) = prev_period
+         vals(2) = prev_period/(24*3600)
          names(3) = 'growth'
-         vals(3) = prev_growth
+         vals(3) = prev_growth/(24*3600)
          names(4) = 'delta_r'
-         vals(4) = prev_period_delta_r
+         vals(4) = prev_period_delta_r/Rsun
+         names(5) = 'max_vsurf_div_cs'
+         vals(5) = prev_period_max_vsurf_div_cs
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id

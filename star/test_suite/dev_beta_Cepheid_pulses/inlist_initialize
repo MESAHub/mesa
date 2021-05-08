@@ -2,7 +2,7 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'envelope.mod' 
+      load_model_filename = 'converted.mod' 
 
       save_model_when_terminate = .true.
       save_model_filename = 'initialized.mod'
@@ -23,7 +23,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 50
+      seconds_for_initial_dt = 50 ! based on expected period
 
       pgstar_flag = .true.
 
@@ -40,7 +40,7 @@
 
 &controls
    
-   max_timestep = 50 ! expected period/500 or so
+   max_timestep = 50 ! based on expected period
    
    max_model_number = 10
 
@@ -162,7 +162,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'Cepheid Grid Profiles  TDC'
+    Grid1_title = ''
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -177,7 +177,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Classical Cepheid  TDC'
+    HR_title = '18 M\d\(2281)\u  Z=0.02  beta Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
