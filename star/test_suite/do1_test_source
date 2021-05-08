@@ -1,3 +1,8 @@
+do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
+do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
+do_one dev_to_pisn_200 "stop because remnant_mass <= remnant_mass_min_limit" "final.mod" skip
+
+return
 
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
@@ -27,6 +32,7 @@ do_one custom_rates "stop because log_center_temperature >= log_center_temp_limi
 #   Pablo needs to fix   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
 # remove from the list while doing long runs    do_one dev_Cepheid_pulses "good match for period" "final.mod" auto   
+do_one dev_RSG_pulses "stop because v_surf/csound_surf > v_div_csound_surf_limit" "final.mod" auto  
 do_one dev_rsp2_BEP "good match for period" "final.mod" auto   
 do_one dev_rsp2_BLAP "good match for period" "final.mod" auto 
 do_one dev_rsp2_Cepheid "good match for period" "final.mod" auto   

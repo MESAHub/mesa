@@ -8,7 +8,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      required_termination_code_string = 'log_Teff_lower_limit'
+      required_termination_code_string = 'v_div_csound_surf_limit'
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -25,7 +25,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 75000 ! based on expected period
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -43,6 +43,9 @@
    max_timestep = 75000 ! based on expected period
    
    v_div_csound_surf_limit = 5 ! if hit this, probably need to either give up or increase Pvsc_cq
+
+
+   max_model_number = 50000
 
 ! timesteps
    dt_div_min_dr_div_cs_limit = 0.5d0
@@ -201,7 +204,7 @@
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-    Grid2_file_flag = .true.
+    !Grid2_file_flag = .true.
     file_digits = 7
     Grid2_file_dir = 'png'
     Grid2_file_prefix = '21M_rsg'

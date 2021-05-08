@@ -34,6 +34,7 @@
    log_L_upper_limit = 5.12
    ! for 2nd pass, set max_model_number for best growth/period, then do re to save it.
    !max_model_number = 2051 ! 2500
+   max_model_number = 5000
     
 ! timesteps
    delta_HR_limit = 0.001

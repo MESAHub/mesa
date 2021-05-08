@@ -98,13 +98,13 @@
       elemental real(dp) function Radiation_Pressure(T)
          use const_def, only: crad
          real(dp), intent(in) :: T
-         Radiation_Pressure = crad*pow4(T)/3d0
+         Radiation_Pressure = crad*T*T*T*T/3d0
       end function Radiation_Pressure
       
       elemental real(dp) function Radiation_Energy(T)
          use const_def, only: crad
          real(dp), intent(in) :: T
-         Radiation_Energy = crad*pow4(T)
+         Radiation_Energy = crad*T*T*T*T
       end function Radiation_Energy
       
       
