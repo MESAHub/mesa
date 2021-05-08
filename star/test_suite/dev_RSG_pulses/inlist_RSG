@@ -23,7 +23,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 50 ! about period/600 
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -89,6 +89,15 @@
    !non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
+
+! GYRE output controls
+   x_integer_ctrl(1) = 4 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = 1 ! report info for min growth/period for this order
    
 ! output controls
 
@@ -114,10 +123,10 @@
       terminal_interval = 4000
 
 
-      !photo_interval = 100
+      photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 10
+      terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
@@ -204,7 +213,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'beta Cepheid Grid Profiles'
+    Grid1_title = 'RSG Grid Profiles'
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -219,7 +228,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '18 M\d\(2281)\u  Z=0.02  beta Cepheid'
+    Grid2_title = '18 M\d\(2281)\u  Z=0.02  RSG'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

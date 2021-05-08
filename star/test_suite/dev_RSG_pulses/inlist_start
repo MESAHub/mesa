@@ -5,7 +5,7 @@
 
    save_model_when_terminate = .true.
    save_model_filename = 'start.mod'
-   required_termination_code_string = 'log_L_upper_limit'
+   required_termination_code_string = 'xa_central_lower_limit'
 
    save_photo_when_terminate = .true.
 
@@ -25,11 +25,11 @@
 
 &controls
 
-   ! set this so that saves near start of pulsation region 
-   !log_L_upper_limit = 4.7
+    xa_central_lower_limit_species(1) = 'h1'
+    xa_central_lower_limit(1) = 1d-6
    
    ! limit max_model_number as part of test_suite
-   max_model_number = 1000
+   !max_model_number = 1000
 
    delta_HR_limit = 0.01
 
@@ -56,7 +56,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
 
    ! HR window -- lg_L vs. lg_Teff
    
@@ -64,7 +64,7 @@
 
    HR_win_flag = .true.
    
-   HR_title = '18 M\d\(2281)\u  Z=0.02  RSG'
+   HR_title = '21 M\d\(2281)\u  Z=0.04  RSG'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width

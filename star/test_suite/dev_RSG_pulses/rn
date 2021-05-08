@@ -15,6 +15,13 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_rgb.mod rgb.mod
+else
+   do_one inlist_to_rgb_header rgb.mod
+   cp rgb.mod standard_rgb.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_pulse.mod pulse.mod
 else
    do_one inlist_to_pulse_header pulse.mod
@@ -24,7 +31,7 @@ fi
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_envelope.mod envelope.mod
 else
-   do_one inlist_remesh_header envelope.mod
+   do_one inlist_envelope_header envelope.mod
    cp envelope.mod standard_envelope.mod
 fi
 
@@ -35,7 +42,7 @@ else
    cp initialized.mod standard_initialized.mod
 fi
 
-do_one inlist_RSG_header final.mod 
+do_one inlist_rsg_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
