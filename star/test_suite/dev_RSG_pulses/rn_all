@@ -7,22 +7,22 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-do_one inlist_start_header start.mod
-cp start.mod standard_start.mod
+do_one inlist_to_zams_header zams.mod
+cp zams.mod standard_zams.mod
 
-do_one inlist_to_rgb_header rgb.mod
-cp rgb.mod standard_rgb.mod
+do_one inlist_to_near_pulses_header near_pulses.mod
+cp near_pulses.mod standard_near_pulses.mod
 
 do_one inlist_to_pulse_header pulse.mod
 cp pulse.mod standard_pulse.mod
 
-do_one inlist_envelope_header envelope.mod
-cp envelope.mod standard_envelope.mod
+do_one inlist_convert_header converted.mod
+cp converted.mod standard_converted.mod
 
 do_one inlist_initialize_header initialized.mod
 cp initialized.mod standard_initialized.mod
 
-do_one inlist_rsg_header final.mod 
+do_one inlist_pulse_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

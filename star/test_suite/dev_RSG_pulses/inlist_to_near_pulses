@@ -2,13 +2,11 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'near_pulses.mod' 
+      load_model_filename = 'zams.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'pulse.mod'
-      required_termination_code_string(1) = 'Teff_lower_limit'
-      required_termination_code_string(2) = 'log_L_upper_limit'
-      required_termination_code_string(3) = 'max_model_number'
+      save_model_filename = 'near_pulses.mod'
+      required_termination_code_string = 'log_Teff_lower_limit'
 
       set_initial_number_retries = .false.
 
@@ -30,24 +28,15 @@
 
 &controls
 
-   !Teff_lower_limit = 3100 ! for 1st pass while looking for best model
-   log_L_upper_limit = 5.12
-   ! for 2nd pass, set max_model_number for best growth/period, then do re to save it.
-   !max_model_number = 2051 ! 2500
+   log_Teff_lower_limit = 3.55
+   
+   ! set max_model_number for best growth/period
+   !max_model_number = 588 ! 2500
     
 ! timesteps
    delta_HR_limit = 0.001
 
 ! solver
-
-! GYRE output controls
-   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
-   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-   x_integer_ctrl(2) = 2 ! max number of modes to output per call
-   x_logical_ctrl(2) = .false. ! output eigenfunction files   
-   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
-   x_integer_ctrl(3) = 0 ! mode_l
-   x_integer_ctrl(4) = 1 ! report info for min growth/period for this order
 
 ! output controls
    num_trace_history_values = 3
@@ -158,9 +147,9 @@
 
    ! axis limits -- to override system default selections
    HR_logT_min = 3.4 ! -101 ! only used if > -100
-   HR_logT_max = 3.7 ! only used if > -100
-   HR_logL_min = 4.2 ! -101 ! only used if > -100
-   HR_logL_max = 5.3 ! -101 ! only used if > -100
+   HR_logT_max = 4.6 ! only used if > -100
+   HR_logL_min = 4.3 ! -101 ! only used if > -100
+   HR_logL_max = 5.2 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.
@@ -177,6 +166,5 @@
    HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
    HR_file_width = -1 ! negative means use same value as for window
    HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
          
 / ! end of pgstar namelist
