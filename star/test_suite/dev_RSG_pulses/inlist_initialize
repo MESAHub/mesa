@@ -58,6 +58,7 @@
    x_logical_ctrl(5) = .true. 
    x_ctrl(4) = 0d0 ! fraction_1st_overtone
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone
+   x_ctrl(6) = 1d0 ! initial vsurf (kms)
    
 ! output controls
    terminal_show_age_units = 'days'

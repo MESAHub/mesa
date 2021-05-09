@@ -2,108 +2,75 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'envelope.mod' 
+      load_model_filename = 'near_pulses.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'initialized.mod'
-      required_termination_code_string = 'max_model_number'
-
-      change_initial_v_flag = .true.
-      new_v_flag = .true.
-
-      set_initial_model_number = .true.
-      initial_model_number = 0
+      save_model_filename = 'pulse.mod'
+      required_termination_code_string(1) = 'log_Teff_lower_limit'
+      required_termination_code_string(2) = 'max_model_number'
 
       set_initial_number_retries = .false.
 
-      set_initial_age = .true.
-      initial_age = 0
-
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-   
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 74000
 
       pgstar_flag = .true.
 
 / ! end of star_job namelist
 
-
 &eos
 / !end of eos namelist
-
 
 &kap
 / ! end of kap namelist
 
+!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
+
 
 &controls
+
+   log_Teff_lower_limit = 4.345 ! for 1st pass while looking for best model
+   ! set max_model_number for best growth/period
+   max_model_number = 969 ! 2500
+
+! mlt
+   alpha_semiconvection = 0.0
    
-   max_timestep = 74000 ! expected period/500 or so
-   
-   max_model_number = 10
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
+    
+! timesteps
+   delta_HR_limit = 0.001
 
 ! solver
-   !eps_nuc_factor = 0
-   !non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
-   
 
-! mesh controls
-   !okay_to_remesh = .false.
-   okay_to_remesh = .true.
-   
-   mesh_delta_coeff = 2
-   log_tau_function_weight = 50
-   !show_mesh_changes = .true.
-   !trace_split_merge_amr = .true.
-   
-   !use_split_merge_amr = .true.      
-   split_merge_amr_logtau_zoning = .true.
-   
-   split_merge_amr_r_core_cm = 1d8
-   split_merge_amr_nz_baseline = 2000
-   split_merge_amr_nz_r_core = 100
+! GYRE output controls
+   x_integer_ctrl(1) = 4 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
 
-   split_merge_amr_MaxLong = 2d0
-   split_merge_amr_MaxShort = 2d0
-   split_merge_amr_max_iters = 100
-   
-   split_merge_amr_okay_to_split_nz = .false.
-   split_merge_amr_avoid_repeated_remesh = .false.
-   
-   merge_amr_max_abs_du_div_cs = -1 ! turn it off
-
-
-
-! GYRE set starting velocities
-   x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 0d0 ! fraction_1st_overtone
-   x_ctrl(5) = 0d0 ! fraction_2nd_overtone
-   x_ctrl(6) = 1d0 ! initial vsurf (kms)
-   
 ! output controls
-   terminal_show_age_units = 'days'
-   terminal_show_timestep_units = 'secs'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
-
-   num_trace_history_values = 2
+   num_trace_history_values = 3
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
+   trace_history_value_name(3) = 'log_Teff'
+   
 
-   photo_interval = 50
+   photo_interval = 10
    profile_interval = 100
    history_interval = 10
-   terminal_interval = 10
+   terminal_interval = 5
    write_header_frequency = 10
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -181,46 +148,39 @@
 
 &pgstar
 
-    !pause = .true.
-    !pause_interval = 100
-    pgstar_interval = 1 ! 10
+   !pause = .true.
 
- ! window 1
-
-    !Grid1_win_flag = .true.
-    Grid1_title = 'Mira Profiles'
-
-    !Grid1_file_flag = .true.
-    Grid1_file_dir = 'png1'
-    Grid1_file_prefix = 'grid1'
-    Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+   ! HR window -- lg_L vs. lg_Teff
    
-    Profile_Panels1_xaxis_name = 'zone'
-    Profile_Panels1_xaxis_reversed = .true.
-    !Profile_Panels1_xmin = 50 ! -101D0
-    !Profile_Panels1_xmax = 65 ! -101D0
-   
- ! window 2
-      
-    Grid2_win_flag = .true.
-    Grid2_title = '1.35 M\d\(2281)\u  Z=0.02  Mira'
-   
-    History_Panels2_xaxis_name='star_age_day'
-    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+   pgstar_interval = 2
 
-    ! Grid2_file_flag = .true.
-    file_digits = 7
-    Grid2_file_dir = 'png'
-    Grid2_file_prefix = 'grid2'
-    Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+   HR_win_flag = .true.
    
-    !Profile_Panels2_show_grid = .true.
+   HR_title = '11 M\d\(2281)\u  Z=0.03  beta Cepheid ~ BW Vul'
 
-    !Profile_Panels2_xaxis_name =  'zone' ! 'logtau'
-    !Profile_Panels2_xaxis_reversed = .true.
-    !Profile_Panels2_xmin = 800 ! -101D0
-    !Profile_Panels2_xmax = -101D0
+   HR_win_width = 8
+   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
-    !Profile_Panels2_dymin(4) = 0.02
-  
+   ! axis limits -- to override system default selections
+   HR_logT_min = 4.33 ! -101 ! only used if > -100
+   HR_logT_max = 4.382 ! only used if > -100
+   HR_logL_min = 4.12 ! -101 ! only used if > -100
+   HR_logL_max = 4.34 ! -101 ! only used if > -100
+
+   !show_HR_classical_instability_strip = .true.
+   show_HR_target_box = .true.
+   HR_target_n_sigma = -3
+   HR_target_logL = 4.25d0
+   HR_target_logL_sigma = 0.02d0
+   HR_target_logT = 4.35d0
+   HR_target_logT_sigma = 0.003d0
+
+   ! file output
+   HR_file_flag = .false.
+   HR_file_dir = 'pgstar_out'
+   HR_file_prefix = 'hr'
+   HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_width = -1 ! negative means use same value as for window
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
 / ! end of pgstar namelist

@@ -1,12 +1,21 @@
+! optionally remove center; then remesh
+
+! NOTE 1: set seconds_for_initial_dt and max_timestep ~ period/1000 or so.
+
+! NOTE 2: check that conversion doesn't wreck period, growth etc from GYRE.
+!           make sure x_integer_ctrl(4) is the same as in inlist_to_pulse
+! this will determine whether or not can remove center
 
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'envelope.mod' 
+      load_model_filename = 'pulse.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'initialized.mod'
+      save_model_filename = 'converted.mod'
       required_termination_code_string = 'max_model_number'
+      
+      remove_initial_center_by_temperature = 2.2d7        ! for envelope only cases
 
       change_initial_v_flag = .true.
       new_v_flag = .true.
@@ -23,26 +32,37 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 74000
+      seconds_for_initial_dt = 50 ! based on expected period
 
       pgstar_flag = .true.
 
 / ! end of star_job namelist
 
-
 &eos
 / !end of eos namelist
-
 
 &kap
 / ! end of kap namelist
 
 
+! check before vs after convert
+!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
+!     968       2          0.5511E-04          18144.5045            302.4084              0.2100          0.8670E+02          0.4128E+03
+!     100       2          0.5536E-04          18065.1220            301.0854              0.2091          0.8340E+02          0.3989E+03
+
+
 &controls
    
-   max_timestep = 74000 ! expected period/500 or so
+   max_timestep = 50 ! based on expected period
    
-   max_model_number = 10
+   max_model_number = 100 ! must be large enough to reach max_timestep
+
+! mlt
+   alpha_semiconvection = 0.0
+   
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
 
 ! solver
    !eps_nuc_factor = 0
@@ -50,39 +70,18 @@
    dxdt_nuc_factor = 0
    mix_factor = 0
    
-
 ! mesh controls
-   !okay_to_remesh = .false.
    okay_to_remesh = .true.
-   
-   mesh_delta_coeff = 2
    log_tau_function_weight = 50
-   !show_mesh_changes = .true.
-   !trace_split_merge_amr = .true.
-   
-   !use_split_merge_amr = .true.      
-   split_merge_amr_logtau_zoning = .true.
-   
-   split_merge_amr_r_core_cm = 1d8
-   split_merge_amr_nz_baseline = 2000
-   split_merge_amr_nz_r_core = 100
 
-   split_merge_amr_MaxLong = 2d0
-   split_merge_amr_MaxShort = 2d0
-   split_merge_amr_max_iters = 100
-   
-   split_merge_amr_okay_to_split_nz = .false.
-   split_merge_amr_avoid_repeated_remesh = .false.
-   
-   merge_amr_max_abs_du_div_cs = -1 ! turn it off
-
-
-
-! GYRE set starting velocities
-   x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 0d0 ! fraction_1st_overtone
-   x_ctrl(5) = 0d0 ! fraction_2nd_overtone
-   x_ctrl(6) = 1d0 ! initial vsurf (kms)
+! GYRE
+   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
    
 ! output controls
    terminal_show_age_units = 'days'
@@ -183,12 +182,12 @@
 
     !pause = .true.
     !pause_interval = 100
-    pgstar_interval = 1 ! 10
+    pgstar_interval = 5 ! 10
 
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'Mira Profiles'
+    Grid1_title = 'beta Cepheid Grid Profiles'
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -203,7 +202,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '1.35 M\d\(2281)\u  Z=0.02  Mira'
+    Grid2_title = '11 M\d\(2281)\u  Z=0.03  BW Vul'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
@@ -216,11 +215,13 @@
    
     !Profile_Panels2_show_grid = .true.
 
-    !Profile_Panels2_xaxis_name =  'zone' ! 'logtau'
-    !Profile_Panels2_xaxis_reversed = .true.
-    !Profile_Panels2_xmin = 800 ! -101D0
-    !Profile_Panels2_xmax = -101D0
+    Profile_Panels2_xaxis_name = 'logtau'
+    Profile_Panels2_xaxis_reversed = .true.
+    Profile_Panels2_xmin = -101D0
+    Profile_Panels2_xmax = -101D0
 
-    !Profile_Panels2_dymin(4) = 0.02
+    Profile_Panels2_dymin(4) = 0.02
+
+    Profile_Panels2_yaxis_name(2) = 'eps_nuc'         
   
 / ! end of pgstar namelist

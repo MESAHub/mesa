@@ -38,7 +38,7 @@ fi
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_agb.mod agb.mod
 else
-   do_one inlist_to_agb_header agb.mod
+   do_one inlist_agb_header agb.mod
    cp agb.mod standard_agb.mod
 fi
 

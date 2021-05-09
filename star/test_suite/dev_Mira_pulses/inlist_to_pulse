@@ -32,10 +32,10 @@
 
 &controls
 
-      !log_L_upper_limit = 3.8
+      log_L_upper_limit = 3.8
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 18756 ! 25000
+      max_model_number = 14076 ! 25000
 !   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
 !   18755       2          0.2687E-07       37220072.2441         620334.5374            430.7879          0.1195E+04          0.2774E+01
 

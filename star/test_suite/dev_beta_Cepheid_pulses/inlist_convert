@@ -1,3 +1,10 @@
+! optionally remove center; then remesh
+
+! NOTE 1: set seconds_for_initial_dt and max_timestep ~ period/1000 or so.
+
+! NOTE 2: check that conversion doesn't wreck period, growth etc from GYRE.
+!           make sure x_integer_ctrl(4) is the same as in inlist_to_pulse
+! this will determine whether or not can remove center
 
 &star_job
 
@@ -8,14 +15,10 @@
       save_model_filename = 'converted.mod'
       required_termination_code_string = 'max_model_number'
       
-      
-      ! if do not remove center, then must comment out the following
-      ! eps_nuc_factor = 0
-      ! non_nuc_neu_factor = 0
-      
-      !remove_initial_center_by_temperature = 2d6        ! for envelope only cases
+      remove_initial_center_by_temperature = 2d7        ! for envelope only cases
 
-
+      change_initial_v_flag = .true.
+      new_v_flag = .true.
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -29,63 +32,45 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 50
+      seconds_for_initial_dt = 50 ! based on expected period
 
       pgstar_flag = .true.
 
 / ! end of star_job namelist
 
-
 &eos
 / !end of eos namelist
-
 
 &kap
 / ! end of kap namelist
 
 
+! check before vs after convert
+!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
+
+
 &controls
    
-   max_timestep = 50 ! expected period/500 or so
+   max_timestep = 50 ! based on expected period
    
    max_model_number = 100 ! must be large enough to reach max_timestep
-      
-! TDC    this needs to wait until after remove center and set velocities
-!   max_X_for_TDC = 1d0
-!   max_X_for_conv_timescale = 1d0
-!
-!   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
-!   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
-!   
-!   alpha_TDC_DAMP = 1d0
-!   alpha_TDC_DAMPR = 0d0
-!   alpha_TDC_PtdVdt = 0d0
+
+! mlt
+   alpha_semiconvection = 0.0
+   
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
 
 ! solver
    !eps_nuc_factor = 0
    !non_nuc_neu_factor = 0
-   !dxdt_nuc_factor = 0
-   !mix_factor = 0
+   dxdt_nuc_factor = 0
+   mix_factor = 0
    
 ! mesh controls
    okay_to_remesh = .true.
-   !log_tau_function_weight = 50
-   
-   use_split_merge_amr = .true.      
-   split_merge_amr_logtau_zoning = .true.
-   
-   split_merge_amr_r_core_cm = 1d8
-   split_merge_amr_nz_baseline = 1000
-   split_merge_amr_nz_r_core = 100
-
-   split_merge_amr_MaxLong = 2d0
-   split_merge_amr_MaxShort = 2d0
-   split_merge_amr_max_iters = 100
-   
-   split_merge_amr_okay_to_split_nz = .false.
-   split_merge_amr_avoid_repeated_remesh = .false.
-   
-   merge_amr_max_abs_du_div_cs = -1 ! turn it off
+   log_tau_function_weight = 50
 
 ! GYRE
    x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
@@ -234,5 +219,7 @@
     Profile_Panels2_xmax = -101D0
 
     Profile_Panels2_dymin(4) = 0.02
+
+    Profile_Panels2_yaxis_name(2) = 'eps_nuc'         
   
 / ! end of pgstar namelist

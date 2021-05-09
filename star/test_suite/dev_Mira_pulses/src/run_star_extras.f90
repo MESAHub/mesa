@@ -38,8 +38,23 @@
          prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
          best_growth, best_period
          
+
+!alpha_mlt_routine
+         !alpha_H = s% x_ctrl(21)
+         !alpha_other = s% x_ctrl(22)
+         !H_limit = s% x_ctrl(23)
+
+!gyre
+      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
+      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      !x_logical_ctrl(2) = .false. ! output eigenfunction files
+      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      !x_integer_ctrl(4) = 1 ! order
+      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
             
-      ! these routines are called by the standard run_star check_model
       
       contains
 
@@ -63,9 +78,42 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% other_alpha_mlt => alpha_mlt_routine       
          s% other_photo_write => photo_write
          s% other_photo_read => photo_read
       end subroutine extras_controls
+
+
+      subroutine alpha_mlt_routine(id, ierr)
+         use chem_def, only: ih1
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         integer :: k, h1
+         real(dp) :: alpha_H, alpha_other, H_limit
+         include 'formats'
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         alpha_H = s% x_ctrl(21)
+         alpha_other = s% x_ctrl(22)
+         H_limit = s% x_ctrl(23)
+         h1 = s% net_iso(ih1)
+         !write(*,1) 'alpha_H', alpha_H
+         !write(*,1) 'alpha_other', alpha_other
+         !write(*,1) 'H_limit', H_limit
+         !write(*,2) 'h1', h1
+         !write(*,2) 's% nz', s% nz
+         if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
+         do k=1,s% nz
+            if (s% xa(h1,k) >= H_limit) then
+               s% alpha_mlt(k) = alpha_H
+            else
+               s% alpha_mlt(k) = alpha_other
+            end if
+         end do
+         !stop
+      end subroutine alpha_mlt_routine
 
 
       subroutine photo_write(id, iounit)
@@ -151,7 +199,7 @@
          integer :: npts(modes), nz, i, k, i_v
          real(dp), pointer :: vel(:)
          real(dp), allocatable, dimension(:,:) :: r, v
-         real(dp) :: v_surf, amix1, amix2, amixF, &
+         real(dp) :: v_surf, v1, amix1, amix2, amixF, &
             period(modes)
          
          include 'formats'
@@ -218,7 +266,7 @@
          amixF = 1d0 - (amix1 + amix2)
          
          if (amixF > 0d0 .and. npts(1) /= nz-1) then
-            write(*,3) 'amixF > 0d0 .and. npts(1) /= nz-1', npts(1), nz-1
+            write(*,3) 'amixF > 0d0 .and. npts(1) /= nz-1', npts(1)
             write(*,*) 'cannot use fundamental for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
             stop 'set_gyre_linear_analysis'
@@ -227,7 +275,7 @@
          end if
          
          if (AMIX1 > 0d0 .and. npts(2) /= nz-1) then
-            write(*,3) 'AMIX1 > 0d0 .and. npts(2) /= nz-1', npts(2), nz-1
+            write(*,3) 'AMIX1 > 0d0 .and. npts(2) /= nz-1', npts(2)
             write(*,*) 'cannot use 1st overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
             stop 'set_gyre_linear_analysis'
@@ -236,7 +284,7 @@
          end if
          
          if (AMIX2 > 0d0 .and. npts(2) /= nz-1) then
-            write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3), nz-1
+            write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3)
             write(*,*) 'cannot use 2nd overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
             stop 'set_gyre_linear_analysis'
@@ -244,7 +292,9 @@
             return
          end if
          
-         v_surf = amixF*v(1,nz-1) + AMIX1*v(2,nz-1) + AMIX2*v(3,nz-1)
+         v_surf = amixF*v(1,nz-1) + AMIX1*v(2,nz-1) + AMIX2*v(3,nz-1)   
+         v1 = 1d5/v_surf
+         if (s% x_ctrl(6) > 0d0) v1 = v1*s% x_ctrl(6)
          
          if (s% v_flag) then
             vel => s% v
@@ -256,9 +306,10 @@
             stop 'set_gyre_linear_analysis vel'
          end if
          
-         do i=1,nz-1
-            k = nz+1-i ! v(1) from gyre => s% v(nz) in star
-            vel(k)=1.0d5/v_surf*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
+         do i=nz-1,1,-1
+            k = nz+1-i ! v(1) from gyre => vel(nz) in star
+            vel(k) = v1*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
+            write(*,2) 'vel', k, vel(k)
          end do
          vel(1) = vel(2)
          s% v_center = 0d0
@@ -266,8 +317,13 @@
          do k=1,nz
             s% xh(i_v,k) = vel(k)
          end do
-
+         
+         write(*,*)
+         write(*,1) 'v_surf F 1 2', v_surf, v(1,nz-1), v(2,nz-1), v(3,nz-1)
+         write(*,1) 'amixF amix1 amix2', amixF, amix1, amix2
+         write(*,*)
          write(*,2) 'nz', nz
+         write(*,1) 'v(1)/1d5', vel(1)/1d5    
          write(*,1) 'T(nz)', s% T(s%nz)             
          write(*,1) 'L_center/Lsun', s% L_center/Lsun           
          write(*,1) 'R_center/Rsun', s% R_center/Rsun           
@@ -275,7 +331,6 @@
          write(*,1) 'L(1)/Lsun', s% L(1)/Lsun           
          write(*,1) 'R(1)/Rsun', s% r(1)/Rsun           
          write(*,1) 'M(1)/Msun', s% m(1)/Msun           
-         write(*,1) 'v(1)/1d5', vel(1)/1d5    
          write(*,1) 'X(1)', s% X(1)      
          write(*,1) 'Y(1)', s% Y(1)      
          write(*,1) 'Z(1)', s% Z(1)      
@@ -385,11 +440,11 @@
                         best_period = s% xtra2_array(i)
                         best_model_number = s% model_number
                      end if
-                     write(*,3) 'model order period growth G/P', s% model_number, s% ixtra1_array(i), &
+                     write(*,3) 'model order period(d) growth(d) G/P', s% model_number, s% ixtra1_array(i), &
                         s% xtra2_array(i), s% xtra1_array(i), s% xtra1_array(i)/s% xtra2_array(i)
                   end do
-                  write(*,*) 'best_model_number best_G_div_P period growth best_max_dt', best_model_number, &
-                     best_G_div_P, best_period, best_growth, best_period*(24*3600)/500d0
+                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d) period(s)', best_model_number, &
+                     best_G_div_P, best_period, best_growth, best_period
                end if
             end if
          end if
@@ -409,7 +464,7 @@
             v_surf = s% u_face_val(1)
             v_surf_start = s% u_face_start(1)
          else
-            stop 'extras_finish_step vel'
+            stop 'extras_finish_step: both v_flag and u_flag are false'
          end if
          if (v_surf/s% csound(1) > period_max_vsurf_div_cs) &
             period_max_vsurf_div_cs = v_surf/s% csound(1)
@@ -444,9 +499,10 @@
          else
             growth = 0d0
          end if
+         prev_growth = 0.1d0*growth + 0.9d0*prev_growth ! smoothing
          write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
             num_periods,'period (d)',  period/(24*3600), &
-            'growth (d)', growth/(24*3600), &
+            'growth (d)', prev_growth/(24*3600), &
             'delta R/Rsun', period_delta_r/Rsun, &
             'max vsurf/cs', period_max_vsurf_div_cs, &
             'retries', s% num_retries - run_num_retries_prev_period,     &
@@ -458,7 +514,6 @@
          time_started = time_ended
          prev_cycle_run_num_steps = s% model_number
          prev_period = period
-         prev_growth = growth
          prev_period_delta_r = period_delta_r
          prev_period_max_vsurf_div_cs = period_max_vsurf_div_cs
          run_num_iters_prev_period = s% total_num_solver_iterations
@@ -520,7 +575,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 4
+         how_many_extra_history_columns = 5
       end function how_many_extra_history_columns
       
       
@@ -537,14 +592,16 @@
          names(1) = 'num_periods'
          vals(1) = num_periods
          names(2) = 'period'
-         vals(2) = prev_period
+         vals(2) = prev_period/(24*3600)
          names(3) = 'growth'
-         vals(3) = prev_growth
+         vals(3) = prev_growth/(24*3600)
          names(4) = 'delta_r'
-         vals(4) = prev_period_delta_r
+         vals(4) = prev_period_delta_r/Rsun
+         names(5) = 'max_vsurf_div_cs'
+         vals(5) = prev_period_max_vsurf_div_cs
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id

@@ -29,20 +29,16 @@
 &controls
 
    log_Teff_lower_limit = 4.47
-   
-   ! set max_model_number for best growth/period
-   !max_model_number = 588 ! 2500
-    
+       
 ! timesteps
    delta_HR_limit = 0.001
 
 ! solver
 
 ! output controls
-   num_trace_history_values = 3
+   num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'log_Teff'
    
 
    photo_interval = 50
@@ -154,10 +150,10 @@
    !show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
    HR_target_n_sigma = -3
-   HR_target_logL = 4.9d0
-   HR_target_logL_sigma = 0.04d0
-   HR_target_logT = 4.4d0
-   HR_target_logT_sigma = 0.02d0
+   HR_target_logL = 4.86d0
+   HR_target_logL_sigma = 0.02d0
+   HR_target_logT = 4.42d0
+   HR_target_logT_sigma = 0.005d0
 
    ! file output
    HR_file_flag = .false.

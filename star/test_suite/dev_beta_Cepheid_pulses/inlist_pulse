@@ -1,3 +1,5 @@
+! note: set x_ctrl(7) to approximately expected period (in days). 
+
 
 &star_job
 
@@ -6,7 +8,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      required_termination_code_string = 'max_model_number'
+      required_termination_code_string = 'v_div_csound_surf_limit'
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -37,54 +39,43 @@
 
 
 &controls
-
+   
    max_timestep = 50 ! based on expected period
+   
+   v_div_csound_surf_limit = 6 
+   
+   max_number_retries = 4 ! if hit this, probably need to give up
 
-! limit max_model_number as part of test_suite
-   max_model_number = 300000
+   max_model_number = 50000
+
+! mlt
+   alpha_semiconvection = 0.0
+   
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
 
 ! timesteps
    dt_div_min_dr_div_cs_limit = 0.5d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0.75d0 ! only interested in outer envelope for shocks
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
    
-! mesh controls
-   okay_to_remesh = .false.   ! seems ok to keep it fixed
-   
+! mesh controls   
+   okay_to_remesh = .false.
    !okay_to_remesh = .true.
-   use_split_merge_amr = .true.
-   split_merge_amr_flipped_hybrid_zoning = .true.
-   split_merge_amr_nz_r_core_fraction = 0.5d0
-   split_merge_amr_nz_r_core = 300
-   split_merge_amr_nz_baseline = 500
-   split_merge_amr_MaxLong = 1.5d0
-   split_merge_amr_MaxShort = 1.5d0
-   split_merge_amr_max_iters = 1000
-
-! TDC
-   max_X_for_TDC = 1d0
-   max_X_for_conv_timescale = 1d0
-
-   !max_dt_div_tau_conv_for_TDC = 1 ! -1 ! < 0 means ignore this 
-   !max_dt_years_for_TDC = 1d-6 ! -1 ! < 0 means ignore this 
-   
-   alpha_TDC_DAMP = 1d0
-   alpha_TDC_DAMPR = 0d0
-   alpha_TDC_PtdVdt = 0d0
+   log_tau_function_weight = 50
 
 ! solver
    steps_before_use_velocity_time_centering = 0
    include_P_in_velocity_time_centering = .true.
    include_L_in_velocity_time_centering = .true.
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
-   
-   tol_max_correction = 1d-6 ! 5d-7
 
    set_rho_to_dm_div_dV = .false.
    
    use_Pvsc_art_visc = .true.
    Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   Pvsc_zsh = 0.001 ! 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_zsh = 0.01 ! 0.1d0 ! "turn-on" compression in units of sound speed.
 
    !eps_nuc_factor = 0
    !non_nuc_neu_factor = 0
@@ -92,13 +83,11 @@
    mix_factor = 0
    
 ! output controls
-
    x_logical_ctrl(7) = .true. ! output period info to terminal
-   x_integer_ctrl(7) = 4 ! which period to check (<= 0 means don't check any)
+   x_integer_ctrl(7) = 0 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 0.3071 ! expected period (in days). 
        ! must set this since it is used to filter out bogus values (periods < 10% expected)
 
-   
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
@@ -115,10 +104,10 @@
       terminal_interval = 4000
 
 
-      !photo_interval = 100
+      !photo_interval = 1 ! 50
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 10
+      !terminal_interval = 1 ! 5
 
       !fill_arrays_with_NaNs = .true.
       
@@ -205,7 +194,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'beta Cepheid Grid Profiles'
+    Grid1_title = 'Grid Profiles'
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -223,24 +212,19 @@
     Grid2_title = '18 M\d\(2281)\u  Z=0.02  beta Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
-    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+    History_Panels2_max_width = 100 ! 365 ! only used if > 0.  causes xmin to move with xmax.
 
-    ! Grid2_file_flag = .true.
+    !Grid2_file_flag = .true.
     file_digits = 7
     Grid2_file_dir = 'png'
-    Grid2_file_prefix = 'grid2'
-    Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-   
-    !Profile_Panels2_show_grid = .true.
-    !Profile_Panels2_num_panels = 4
+    Grid2_file_prefix = '18M_bcep'
+    Grid2_file_interval = 25 ! output when mod(model_number,Grid2_file_interval)==0
 
-    Profile_Panels2_xaxis_name = 'logtau'
+    Profile_Panels2_xaxis_name = 'logxm'
     Profile_Panels2_xaxis_reversed = .true.
-    Profile_Panels2_xmin = -101D0
-    Profile_Panels2_xmax = -101D0
+    Profile_Panels2_xmin = -9 ! this gets to photosphere
+    Profile_Panels2_xmax = 0 ! -0.1
 
-    Profile_Panels2_dymin(4) = 0.02
-
-  Profile_Panels2_yaxis_name(5) = 'mlt_mixing_type' ! 'zone'     
+    !Profile_Panels2_yaxis_name(2) = 'eps_nuc'         
   
 / ! end of pgstar namelist
