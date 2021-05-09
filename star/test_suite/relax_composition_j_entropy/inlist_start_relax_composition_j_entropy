@@ -56,7 +56,6 @@
     max_timestep = 1d0
     max_model_number = 1
 
-    max_eta_for_dedt_form_of_energy_eqn = 1d0
     read_extra_controls_inlist1 = .true.
     extra_controls_inlist1_name = 'inlist_common'
 

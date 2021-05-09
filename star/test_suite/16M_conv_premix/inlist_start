@@ -39,14 +39,6 @@
    ! values are commented out. Use with caution.
    ! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
    
-   
-   
-   ! need to dodge problem with create_pre_main_sequence_model until fix it
-   always_use_dedt_form_of_energy_eqn = .false.
-   steps_before_always_use_dedt_form_of_energy_eqn = 1
-   
-   
-
    ! Mass & metalicity
 
    initial_mass = 16d0
