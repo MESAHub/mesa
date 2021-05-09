@@ -218,6 +218,13 @@
     Profile_Panels2_xmin = -101D0
     Profile_Panels2_xmax = -101D0
 
+    Profile_Panels2_xaxis_name = 'logxm'
+    Profile_Panels2_xaxis_reversed = .true.
+    Profile_Panels2_xmin = -8
+    Profile_Panels2_xmax = -3
+
     Profile_Panels2_dymin(4) = 0.02
+
+  Profile_Panels2_yaxis_name(5) = 'mlt_mixing_type' ! 'zone'     
   
 / ! end of pgstar namelist

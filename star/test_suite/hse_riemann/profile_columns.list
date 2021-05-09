@@ -35,7 +35,7 @@
    logE ! log10(energy) at center of zone
    logR ! log10(radius/Rsun) at outer boundary of zone
    entropy ! specific entropy divided by (avo*kerg)
-   conv_mixing_type ! mixing types are defined in mesa/const
+   mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    luminosity ! luminosity at outer boundary of zone (in Lsun units)
    logL ! log(max(1d-6,L/Lsun))
