@@ -219,20 +219,11 @@
     Grid2_file_dir = 'png'
     Grid2_file_prefix = '9M_cepheid'
     Grid2_file_interval = 25 ! output when mod(model_number,Grid2_file_interval)==0
-   
-    !Profile_Panels2_show_grid = .true.
-    !Profile_Panels2_num_panels = 4
-
-    Profile_Panels2_xaxis_name = 'logtau'
-    Profile_Panels2_xaxis_reversed = .true.
-    Profile_Panels2_xmin = -101D0
-    Profile_Panels2_xmax = -101D0
 
     Profile_Panels2_xaxis_name = 'logxm'
     Profile_Panels2_xaxis_reversed = .true.
     Profile_Panels2_xmin = -6 ! this gets to photosphere
     Profile_Panels2_xmax = -0.1
 
-    Profile_Panels2_dymin(4) = 0.02
   
 / ! end of pgstar namelist
