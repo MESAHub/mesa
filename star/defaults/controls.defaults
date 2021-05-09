@@ -7553,14 +7553,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! always_use_dedt_form_of_energy_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! steps_before_always_use_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
       ! ::
 
     use_dedt_form_of_energy_eqn = .false.
     always_use_dedt_form_of_energy_eqn = .true.
-    steps_before_always_use_dedt_form_of_energy_eqn = -1
 
 
       ! use_time_centered_eps_grav
@@ -7572,26 +7568,6 @@
       ! ::
 
     use_time_centered_eps_grav = .false.
-
-
-      ! max_eta_for_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if eta(k) > this, use eps_grav form for cell k
-
-      ! ::
-
-    max_eta_for_dedt_form_of_energy_eqn = 1d99
-
-
-      ! max_gamma_for_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if gamma(k) > this, do not use dedt form for cell k
-
-      ! ::
-
-    max_gamma_for_dedt_form_of_energy_eqn = 1d99
 
 
       ! no_dedt_form_during_relax
