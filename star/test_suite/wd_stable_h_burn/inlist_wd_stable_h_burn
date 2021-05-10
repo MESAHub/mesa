@@ -62,8 +62,6 @@
 
       mass_change = 2.5d-7 ! rate of accretion (Msun/year)
 
-      max_eta_for_dedt_form_of_energy_eqn = 1d0
-
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'

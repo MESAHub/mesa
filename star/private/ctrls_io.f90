@@ -116,7 +116,8 @@
     write_pulse_data_with_profile, pulse_data_format, add_atmosphere_to_pulse_data, &
     add_center_point_to_pulse_data, keep_surface_point_for_pulse_data, add_double_points_to_pulse_data, &
     interpolate_rho_for_pulse_data, threshold_grad_mu_for_double_point, max_number_of_double_points,&
-    max_num_gyre_points, format_for_FGONG_data, format_for_OSC_data, &
+    fgong_header, fgong_ivers, &
+    max_num_gyre_points, format_for_OSC_data, &
     fgong_zero_A_inside_r, use_other_export_pulse_data, use_other_get_pulse_data, use_other_edit_pulse_data, &
     write_model_with_profile, model_data_prefix, model_data_suffix, &
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
@@ -340,10 +341,10 @@
     ! hydro parameters
     opacity_factor, opacity_max, min_logT_for_opacity_factor_off, min_logT_for_opacity_factor_on, &
     max_logT_for_opacity_factor_on, max_logT_for_opacity_factor_off, &
-    non_nuc_neu_factor, always_use_dedt_form_of_energy_eqn, steps_before_always_use_dedt_form_of_energy_eqn, &
+    non_nuc_neu_factor, always_use_dedt_form_of_energy_eqn, &
     use_dedt_form_of_energy_eqn, use_time_centered_eps_grav, &
-    use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, max_gamma_for_dedt_form_of_energy_eqn, &
-    include_composition_in_eps_grav, max_eta_for_dedt_form_of_energy_eqn, no_dedt_form_during_relax, &
+    use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, &
+    include_composition_in_eps_grav, no_dedt_form_during_relax, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, dedt_eqn_r_scale, &
@@ -1000,8 +1001,10 @@
  s% threshold_grad_mu_for_double_point = threshold_grad_mu_for_double_point
  s% max_number_of_double_points = max_number_of_double_points
 
+ s% fgong_header = fgong_header
+ s% fgong_ivers = fgong_ivers
+
  s% max_num_gyre_points = max_num_gyre_points
- s% format_for_FGONG_data = format_for_FGONG_data
  s% format_for_OSC_data = format_for_OSC_data
  s% fgong_zero_A_inside_r = fgong_zero_A_inside_r
  s% use_other_export_pulse_data = use_other_export_pulse_data
@@ -1837,10 +1840,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% non_nuc_neu_factor = non_nuc_neu_factor
  s% use_dedt_form_of_energy_eqn = use_dedt_form_of_energy_eqn
  s% always_use_dedt_form_of_energy_eqn = always_use_dedt_form_of_energy_eqn
- s% steps_before_always_use_dedt_form_of_energy_eqn = steps_before_always_use_dedt_form_of_energy_eqn
  s% use_time_centered_eps_grav = use_time_centered_eps_grav
- s% max_eta_for_dedt_form_of_energy_eqn = max_eta_for_dedt_form_of_energy_eqn
- s% max_gamma_for_dedt_form_of_energy_eqn = max_gamma_for_dedt_form_of_energy_eqn
  s% no_dedt_form_during_relax = no_dedt_form_during_relax
  s% always_use_eps_grav_form_of_energy_eqn = always_use_eps_grav_form_of_energy_eqn
  s% dedt_eqn_r_scale = dedt_eqn_r_scale
@@ -2686,9 +2686,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  interpolate_rho_for_pulse_data = s% interpolate_rho_for_pulse_data
  threshold_grad_mu_for_double_point = s% threshold_grad_mu_for_double_point
  max_number_of_double_points = s% max_number_of_double_points
+
+ fgong_header = s% fgong_header
+ fgong_ivers = s% fgong_ivers
  
  max_num_gyre_points = s% max_num_gyre_points
- format_for_FGONG_data = s% format_for_FGONG_data
  format_for_OSC_data = s% format_for_OSC_data
  fgong_zero_A_inside_r = s% fgong_zero_A_inside_r
  use_other_export_pulse_data = s% use_other_export_pulse_data
@@ -3512,10 +3514,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  non_nuc_neu_factor = s% non_nuc_neu_factor
  use_dedt_form_of_energy_eqn = s% use_dedt_form_of_energy_eqn
  always_use_dedt_form_of_energy_eqn = s% always_use_dedt_form_of_energy_eqn
- steps_before_always_use_dedt_form_of_energy_eqn = s% steps_before_always_use_dedt_form_of_energy_eqn
  use_time_centered_eps_grav = s% use_time_centered_eps_grav
- max_eta_for_dedt_form_of_energy_eqn = s% max_eta_for_dedt_form_of_energy_eqn
- max_gamma_for_dedt_form_of_energy_eqn = s% max_gamma_for_dedt_form_of_energy_eqn
  no_dedt_form_during_relax = s% no_dedt_form_during_relax
  always_use_eps_grav_form_of_energy_eqn = s% always_use_eps_grav_form_of_energy_eqn
  dedt_eqn_r_scale = s% dedt_eqn_r_scale

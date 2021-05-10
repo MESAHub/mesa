@@ -231,10 +231,11 @@
 
 
       subroutine kap_get_elect_cond_opacity( &
-            zbar, logRho, logT, &
+            handle, zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use condint, only: do_electron_conduction
-         use kap_def, only : kap_is_initialized
+         use kap_def, only : kap_is_initialized, Kap_General_Info
+         integer, intent(in) :: handle ! from alloc_kap_handle
          real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: logRho ! the density
          real(dp), intent(in) :: logT ! the temperature
@@ -242,13 +243,20 @@
          real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
          integer, intent(out) :: ierr ! 0 means AOK.
+
+         type (Kap_General_Info), pointer :: rq
+
          if (.not. kap_is_initialized) then
             ierr=-1
             return
          endif
          ierr = 0
+
+         call kap_ptr(handle,rq,ierr)
+         if (ierr /= 0) return
+
          call do_electron_conduction( &
-            zbar, logRho, logT, &
+            rq, zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
       end subroutine kap_get_elect_cond_opacity
       

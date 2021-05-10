@@ -547,12 +547,26 @@ contains
     integer                  :: i
     integer                  :: j
     integer                  :: k
+    character(len=strlen)    :: format_for_fgong_data
 
     ! Write FGONG data to file
 
     call get_star_ptr(id, s, ierr)
     if (ierr /= 0) then
        write(*,*) 'bad star id for write_fgong_info'
+       return
+    end if
+
+    ! Set float format from version number (ivers)
+
+    if (s% fgong_ivers == 300) then
+       format_for_fgong_data = '(1P5E16.9,x)'
+    else if (s% fgong_ivers == 1300) then
+       format_for_fgong_data = '(1P,5(X,E26.18E3))'
+    else
+       write(*,*) ''
+       write(*,'(a,i4)') 'bad fgong_ivers: must be 300 or 1300, not ', s% fgong_ivers
+       ierr = 1
        return
     end if
 
@@ -571,17 +585,16 @@ contains
 
     nn = SIZE(point_data, 2)
 
-    write(iounit, *) 'FGONG file'
-    write(iounit, *) 'Created by MESAstar'
-    write(iounit, *)
-    write(iounit, *)
+    do k = 1, 4
+       write(iounit, *) trim(s% fgong_header(k))
+    end do
 
-    write(iounit,'(4I10)') nn, ICONST, IVAR, 1300
-    
-    write(iounit, s%format_for_fgong_data) (global_data(i), i=1,n_global)
+    write(iounit,'(4I10)') nn, ICONST, IVAR, s% fgong_ivers
+
+    write(iounit, format_for_fgong_data) (global_data(i), i=1,n_global)
 
     do k = 1, nn
-       write(iounit, s%format_for_fgong_data) (point_data(j,k), j=1,n_point)
+       write(iounit, format_for_fgong_data) (point_data(j,k), j=1,n_point)
     end do
 
     ! Close the file

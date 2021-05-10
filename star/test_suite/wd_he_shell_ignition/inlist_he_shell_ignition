@@ -43,6 +43,7 @@
 
 &eos
 
+      use_Skye = .true.
 
 / ! end of eos namelist
 
@@ -123,6 +124,11 @@
 
       delta_lgTeff_limit = 0.1  
       delta_lgTeff_hard_limit = 0.3
+
+      delta_lgT_max_limit = 0.005
+      delta_lgT_max_limit_lgT_min = 8d0
+      delta_lgT_cntr_limit = 0.005
+      delta_lg_star_mass_limit = 5d-4
 
       relax_hard_limits_after_retry = .false.
 

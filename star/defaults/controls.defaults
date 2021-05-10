@@ -612,16 +612,27 @@
     max_number_of_double_points = 0
 
 
-      ! format_for_FGONG_data
-      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! fgong_header
+      ! ~~~~~~~~~~~~
+      !
+      ! These are the four lines of arbitrary text that appear at the
+      ! beginning of an FGONG file to describe its contents.
 
-      ! This is the 'wide' FGONG format, as agreed on at the
-      ! 5th Aarhus RGB workshop (University of Birmingham, UK, October 2015)
+    fgong_header(1) = 'FGONG file'
+    fgong_header(2) = 'Created by MESAstar'
+    fgong_header(3) = ''
+    fgong_header(4) = ''
 
-      ! ::
+      ! fgong_ivers
+      ! ~~~~~~~~~~~
+      !
+      ! The version number for the FGONG file, which can only be 300 or 1300.
+      ! 300 gives the old narrow format ``'(1P5E16.9,x)'``, which
+      ! can produce numbers with no space separating them.
+      ! 1300 gives the 'wide' FGONG format, as agreed on at the
+      ! 5th Aarhus RGB workshop (University of Birmingham, UK, October 2015).
 
-    format_for_FGONG_data = '(1P,5(X,E26.18E3))'
-
+    fgong_ivers = 1300
 
       ! format_for_OSC_data
       ! ~~~~~~~~~~~~~~~~~~~
@@ -7615,14 +7626,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! always_use_dedt_form_of_energy_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! steps_before_always_use_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
       ! ::
 
     use_dedt_form_of_energy_eqn = .false.
     always_use_dedt_form_of_energy_eqn = .true.
-    steps_before_always_use_dedt_form_of_energy_eqn = -1
 
 
       ! use_time_centered_eps_grav
@@ -7634,26 +7641,6 @@
       ! ::
 
     use_time_centered_eps_grav = .false.
-
-
-      ! max_eta_for_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if eta(k) > this, use eps_grav form for cell k
-
-      ! ::
-
-    max_eta_for_dedt_form_of_energy_eqn = 1d99
-
-
-      ! max_gamma_for_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if gamma(k) > this, do not use dedt form for cell k
-
-      ! ::
-
-    max_gamma_for_dedt_form_of_energy_eqn = 1d99
 
 
       ! no_dedt_form_during_relax

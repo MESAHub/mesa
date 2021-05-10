@@ -166,9 +166,9 @@
          type(auto_diff_real_star_order1) :: &
             Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess, gradT_actual
          character (len=256) :: message        
-         logical ::  okay_to_use_TDC, test_partials, using_TDC, compare_TDC_to_MLT, report
+         logical ::  test_partials, using_TDC, compare_TDC_to_MLT, report
          include 'formats'
-         
+
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0          
@@ -192,35 +192,39 @@
             s% COUPL(k) = 0d0
             s% tdc_num_iters(k) = 0
          end if
-         
-         ! check if this particular k needs to be done with TDC
-         using_TDC = s% using_TDC
-         if (using_TDC .and. k > 0 .and. s% dt > 0d0) then
-            call set_MLT
-            Y_guess = gradT - gradL
-            okay_to_use_TDC = check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
-                                                         T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
-         else
-            okay_to_use_TDC = .false.
-         end if
-         compare_TDC_to_MLT = s% compare_TDC_to_MLT
-         
+
          if (report) then
             write(*,*)
             write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
                k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
          end if
-         
-         call set_no_mixing('') ! to initialize things
-         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
 
-         ! sanity check the args
-         if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
-               .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) then
-            call set_no_mixing('vals too small')
-            return
-         end if
+         ! Initialize with no mixing
+         call set_no_mixing('')
+
+         ! Bail if we asked for no mixing, or if parameters are bad.
+         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
          
+         ! Bail if more parameters are bad
+         if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
+               .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
+
+         ! At this stage we're either using MLT or TDC.
+         ! TDC requires the MLT answer as a starting point, so
+         ! call MLT.
+         call set_MLT
+
+         ! check if this particular k needs to be done with TDC
+         using_TDC = s% using_TDC
+         if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
+         if (using_TDC) then
+            Y_guess = gradT - gradL
+            using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
+                                                                  T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
+         end if
+
+
+         ! Run through assuming no TDC.         
          if (gradr > gradL) then ! convective
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter
             call set_MLT
@@ -239,8 +243,9 @@
          end if
          
          ! need to make use of gradL instead of grada consistent - at least for TDC
-         if (okay_to_use_TDC) then
+         if (using_TDC) then
             Y_guess = gradT - gradL
+            compare_TDC_to_MLT = s% compare_TDC_to_MLT
             if (compare_TDC_to_MLT) then
                if (report) write(*,3) 'call do_compare_TDC_to_MLT', k, s% solver_iter
                call do_compare_TDC_to_MLT     
@@ -253,10 +258,15 @@
                mixing_type, conv_vel%val
          end if
          
+         ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
          end if
+
+         ! If we made it all that way and are still not mixing, call set_no_mixing.
+         ! This catches places above where we might have thought we'd have mixing but
+         ! ended up falling back on no mixing. It also reports the correct message.
          if (mixing_type == no_mixing) call set_no_mixing('final mixing_type == no_mixing')
          
          contains
@@ -421,18 +431,19 @@
                end if
             end if
             f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0  
-            if (f1 < 0) return
+            if (f1 <= 0d0) return
             f1 = pow(f1,one_third)     
             f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
             Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
-            if (Gamma < 0) return
+            if (Gamma < 0d0) return
             ! average convection velocity   C&G 14.86b
             conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
             D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
             !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80     
             Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
             ! Zeta must be >= 0 and <= 1
-            if (is_bad(Zeta%val) .or. Zeta < 0d0) then
+            if (is_bad(Zeta%val)) return
+            if (Zeta < 0d0) then
                Zeta = 0d0
             else if (Zeta > 1d0) then
                Zeta = 1d0
@@ -540,6 +551,8 @@
 
       end subroutine Get_results
       
+!------------------------------ Time-dependent convection (TDC)
+
       
       subroutine get_TDC_solution(s, k, &
             mixing_length_alpha, cgrav, m, Y_guess, report, &
@@ -727,7 +740,7 @@
       !! @param A0 Initial convection speed
       !! @param T Temperature
       !! @param rho Density (g/cm^3)
-      !! @param dV ???
+      !! @param dV 1/rho_face - 1/rho_start_face (change in specific volume at the face)
       !! @param Cp Heat capacity
       !! @param kap Opacity
       !! @param Hp Pressure scale height
@@ -756,8 +769,31 @@
          Q = (L - L0*gradL) - (L0 + c0*Af)*Y
       end subroutine compute_Q
 
+      !> Determines if it is safe (physically) to use MLT instead of TDC.
+      !!
+      !! The TDC velocity solution approaches the MLT solution asymptotically like exp(-Jt),
+      !! so when Jt >> 1 we can fall back to MLT safely.
+      !!
+      !! Likewise in cases where the predicted difference between Af and A0 (i.e. change in convection speed)
+      !! is small we can fall back safely to MLT.
+      !!
+      !! For both tests we need to know Y (the superadiabaticity), because that's what TDC calculates,
+      !! so we use the Y value from MLT as a guess.
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param mixing_length_alpha mixing length parameter
+      !! @param Y_in guess of superadiabaticity
+      !! @param T temperature (K)
+      !! @param rho density (g/cm^3)
+      !! @param Cp heat capacity (erg/g/K)
+      !! @param kap opacity (cm^2/g)
+      !! @param Hp pressure scale height (cm)
+      !! @param gradL gradL = grada + gradMu (Ledoux threshold for convection)
+      !! @param A0 convection speed from the start of the step (cm/s)
+      !! @param fallback False if we need to use TDC, True if we can fall back to MLT.
       logical function check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, &
-                                                      Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0) result(using_TDC)
+                                                      Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0) result(fallback)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
@@ -775,15 +811,49 @@
          Jt = sqrt(abs(J2)) * s%dt
 
          ! Note the '1d-50' here is in cm/s, and is just there to avoid division by zero.
-         if (Jt > 1d2 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
-            using_TDC = .false.
+         if (Jt > 5d1 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
+            fallback = .true.
          else
-            using_TDC = .true.
+            fallback = .false.
          end if
 
       end function check_if_can_fall_back_to_MLT
 
-
+      !! Calculates the coefficients of the TDC velocity equation.
+      !! The velocity equation is
+      !!
+      !! 2 dw/dt = xi0 + w * xi1 + w**2 * xi2 - Lambda
+      !!
+      !! where Lambda (currently set to zero) captures coupling between cells.
+      !!
+      !! The coefficients xi0/1/2 are given by
+      !!
+      !! xi0 = (epsilon_q + S * Y) / w
+      !! xi1 = (-D_r + p_turb dV/dt) / w^2    [here V = 1/rho is the volume]
+      !! xi2 = -D / w^3
+      !!
+      !! Note that these terms are evaluated on faces, because the convection speed
+      !! is evaluated on faces. As a result all the inputs must either natively
+      !! live on faces or be interpolated to faces.
+      !!
+      !! This function also has some side effects in terms of storing some of the terms
+      !! it calculates for plotting purposes.
+      !! TODO: These should be removed or changed from xtra arrays to named arrays.
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param mixing_length_alpha mixing length parameter
+      !! @param Y superadiabaticity
+      !! @param T temperature (K)
+      !! @param rho density (g/cm^3)
+      !! @param Cp heat capacity (erg/g/K)
+      !! @param dV 1/rho_face - 1/rho_start_face (change in specific volume at the face)
+      !! @param kap opacity (cm^2/g)
+      !! @param Hp pressure scale height (cm)
+      !! @param gradL gradL = grada + gradMu (Ledoux threshold for convection)
+      !! @param xi0 Output, the constant term in the convective velocity equation.
+      !! @param xi1 Output, the prefactor of the linear term in the convective velocity equation.
+      !! @param xi2 Output, the prefactor of the quadratic term in the convective velocity equation.
       subroutine eval_xis(s, k, mixing_length_alpha, &
             Y, T, rho, Cp, dV, kap, Hp, gradL, xi0, xi1, xi2) 
          ! eval_xis sets up Y with partial wrt Z
@@ -826,7 +896,39 @@
          end if
       end subroutine eval_xis
       
-      
+      !! Calculates the solution to the TDC velocity equation.
+      !! The velocity equation is
+      !!
+      !! 2 dw/dt = xi0 + w * xi1 + w**2 * xi2 - Lambda
+      !!
+      !! where Lambda (currently set to zero) captures coupling between cells.
+      !! The xi0/1/2 variables are constants for purposes of solving this equation.
+      !!
+      !! An important related parameter is J:
+      !! 
+      !! J^2 = xi1^2 - 4 * xi0 * xi2
+      !!
+      !! When J^2 > 0 the solution for w is hyperbolic in time.
+      !! When J^2 < 0 the solution is trigonometric, behaving like tan(J * t / 4 + c).
+      !!
+      !! In the trigonometric branch note that once the solution passes through its first
+      !! root the solution for all later times is w(t) = 0. This is not a solution to the
+      !! convective velocity equation as written above, but *is* a solution to the convective
+      !! energy equation (multiply the velocity equation by w), which is the one we actually
+      !! want to solve (per Radek Smolec's thesis). We just solve the velocity form
+      !! because it's more convenient.
+      !!
+      !! This function also has some side effects in terms of storing some of the terms
+      !! it calculates for plotting purposes.
+      !! TODO: These should be removed or changed from xtra arrays to named arrays.
+      !!
+      !! @param s star pointer
+      !! @param k face index
+      !! @param A0_in convection speed from the start of the step (cm/s)
+      !! @param xi0 The constant term in the convective velocity equation.
+      !! @param xi1 The prefactor of the linear term in the convective velocity equation.
+      !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.            
+      !! @param Af Output, the convection speed at the end of the step (cm/s)
       function eval_Af(s, k, A0_in, xi0, xi1, xi2) result(Af)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -842,8 +944,8 @@
             J = sqrt(J2)
             Jt = s%dt * J
             Jt4 = 0.25d0 * Jt
-            num = tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
-            den = tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
+            num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
+            den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
             Af = num / den
             if (Af < 0d0) then
                Af = -Af
@@ -851,6 +953,7 @@
          else if (J2 < 0d0) then ! Trigonometric branch
             J = sqrt(-J2)
             Jt = s%dt * J
+
             ! This branch contains decaying solutions that reach A = 0, at which point
             ! they switch onto the 'zero' branch. So we have to calculate the position of
             ! the first root to check it against dt.
@@ -887,6 +990,22 @@
          end if
       end function eval_Af
       
+      !> Computes the hyperbolic tangent of x in a way that is numerically safe.
+      !!
+      !! @param x Input
+      !! @param z Output
+      type(auto_diff_real_tdc) function safe_tanh(x) result(z)
+         type(auto_diff_real_tdc), intent(in) :: x
+
+         if (x > 50d0) then
+            z = 1d0
+         else if (x < -50d0) then
+            z = -1d0
+         else
+            z = tanh(x)
+         end if
+      end function safe_tanh
+
       !> Computes the arctangent of y/x in a way that is numerically safe near x=0.
       !!
       !! @param x x coordinate for the arctangent.
@@ -941,7 +1060,7 @@
       end function unconvert
 
 
-!------------------------------
+!------------------------------ Thermohaline
 
 
       subroutine get_D_thermohaline(s, &

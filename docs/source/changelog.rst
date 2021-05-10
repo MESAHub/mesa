@@ -132,6 +132,11 @@ the blended opacity.
 The Compton scattering opacity routine has been updated to use the prescription of
 `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`_.
 
+The conductive opacity routine has been updated to include the corrections from 
+`Blouin et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract>`_
+for H and He in the regime of moderate coupling and moderate degeneracy.
+These are on by default, controlled by the kap option ``use_blouin_conductive_opacities``.
+
 
 There are new module-level kap hooks (see ``kap/other``) that allow
 individual components of the opacity module to be replaced with a
@@ -142,8 +147,7 @@ is part of the ``Kap_General_Info`` structure and not the
 procedure pointer statement should look like ``s% kap_rq %
 other_elect_cond_opacity => my_routine``.  The boolean option
 ``use_other_elect_cond_opacity`` controlling whether to use the hook
-is part of the ``kap`` namelist rather than ``controls``.  An example
-can be found in the ``wd_cool_0.6M`` test suite case.
+is part of the ``kap`` namelist rather than ``controls``.
 
 
 neu
@@ -170,6 +174,12 @@ Other changes
 
 * ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``,
   ``eps_he`` or ``eps_z`` as arguments.
+
+* The control ``format_for_FGONG_data`` has been replaced by the
+  integer ``fgong_ivers``, which can be either 300 or 1300.  This
+  enforces adherence to the FGONG standard.  In addition, users can
+  now set the four-line plain-text header of FGONG output using the
+  new controls ``fgong_header(1:4)``.
 
 Changes in r15140
 =================

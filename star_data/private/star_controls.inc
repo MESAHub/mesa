@@ -191,7 +191,7 @@
 
          logical :: write_pulse_data_with_profile
          character (len=strlen) :: pulse_data_format, &
-            format_for_FGONG_data, format_for_OSC_data
+            format_for_OSC_data
          logical :: &
             add_atmosphere_to_pulse_data, &
             add_center_point_to_pulse_data, &
@@ -200,6 +200,8 @@
             interpolate_rho_for_pulse_data
          real(dp) :: threshold_grad_mu_for_double_point
          integer :: max_number_of_double_points
+         character (len=strlen) :: fgong_header(4)
+         integer :: fgong_ivers
 
          integer :: max_num_gyre_points
 
@@ -802,8 +804,7 @@
 
          real(dp) :: eps_nuc_factor, max_abs_eps_nuc, op_split_burn_eps_nuc_infall_limit
          real(dp) :: eps_WD_sedimentation_factor, non_nuc_neu_factor, eps_grav_factor, eps_mdot_factor
-         real(dp) :: dedt_eqn_r_scale, &
-            max_eta_for_dedt_form_of_energy_eqn, max_gamma_for_dedt_form_of_energy_eqn
+         real(dp) :: dedt_eqn_r_scale
 
          logical :: use_mass_corrections, use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
@@ -817,8 +818,7 @@
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
             
-         integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
-            steps_before_use_velocity_time_centering
+         integer :: steps_before_use_velocity_time_centering
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
