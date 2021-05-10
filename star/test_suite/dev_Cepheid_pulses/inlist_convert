@@ -75,7 +75,8 @@
    
 ! mesh controls
    okay_to_remesh = .true.
-   log_tau_function_weight = 50
+   mesh_delta_coeff = 2
+   log_tau_function_weight = 100
 
 ! GYRE
    x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
@@ -222,6 +223,8 @@
     Profile_Panels2_xaxis_reversed = .true.
     Profile_Panels2_xmin = -101D0
     Profile_Panels2_xmax = -101D0
+    
+    Profile_Panels2_yaxis_name(6) = 'zone'     
 
     Profile_Panels2_dymin(4) = 0.02
   

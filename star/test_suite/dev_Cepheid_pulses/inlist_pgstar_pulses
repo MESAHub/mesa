@@ -156,35 +156,34 @@
          Profile_Panels2_other_ymax(1) = -101D0 !  2e6 
          Profile_Panels2_other_ymin(1) = -101D0 ! -2e6
          Profile_Panels2_other_dymin(1) = 0.1
-         
-         Profile_Panels2_yaxis_name(2) = 'logRho'         
-         Profile_Panels2_other_yaxis_name(2) = 'logT' 
                   
-         Profile_Panels2_yaxis_name(3) = 'logtau' ! 'entropy'         
+         Profile_Panels2_yaxis_name(2) = 'lum_div_Ledd'  
+         Profile_Panels2_ymax(2) = -101D0 ! 3.7  
+         Profile_Panels2_ymin(2) = -101D0 ! 3.1 
+         Profile_Panels2_dymin(2) = 0.02
+         Profile_Panels2_other_yaxis_name(2) = 'logL' 
+         Profile_Panels2_other_ymax(2) = -101D0 ! 
+         Profile_Panels2_other_ymin(2) = -101D0 ! 
+                  
+         Profile_Panels2_yaxis_name(3) = 'logtau' 
          Profile_Panels2_other_yaxis_name(3) = 'opacity' 
                   
-         Profile_Panels2_yaxis_name(4) = 'logL'  ! 'zone' !        
-         Profile_Panels2_ymax(4) = -101D0 ! 3.7  
-         Profile_Panels2_ymin(4) = -101D0 ! 3.1 
-         Profile_Panels2_dymin(4) = 0.02
-         Profile_Panels2_other_yaxis_name(4) = 'lum_div_Ledd' 
+         Profile_Panels2_yaxis_name(4) = 'tdc_num_iters'     
+         Profile_Panels2_ymax(4) = -101D0
+         Profile_Panels2_ymin(4) = -101D0
+         Profile_Panels2_other_yaxis_name(4) = 'mixing_type' 
          Profile_Panels2_other_ymax(4) = -101D0 ! 
          Profile_Panels2_other_ymin(4) = -101D0 ! 
-                  
-         Profile_Panels2_yaxis_name(5) = 'mixing_type'     
-         Profile_Panels2_ymax(5) = -101D0
-         Profile_Panels2_ymin(5) = -101D0
+         
+         Profile_Panels2_yaxis_name(5) = 'logT'         
          Profile_Panels2_other_yaxis_name(5) = 'free_e' 
-         Profile_Panels2_other_ymax(5) = -101D0 ! 
-         Profile_Panels2_other_ymin(5) = -101D0 ! 
                   
-         Profile_Panels2_yaxis_name(6) = 'Pvsc'     
-         Profile_Panels2_ymax(6) = -101D0
-         Profile_Panels2_ymin(6) = 0
-         !Profile_Panels2_dymin(6) = 1
-         Profile_Panels2_other_yaxis_name(6) = 'log_dt_div_tau_conv'  ! 'zone'
-         Profile_Panels2_other_ymax(6) = -101D0 ! 
-         Profile_Panels2_other_ymin(6) = -101D0 ! 
+         Profile_Panels2_yaxis_name(6) = 'log_dt_div_tau_conv'     
+         Profile_Panels2_ymax(6) = -101D0 ! 
+         Profile_Panels2_ymin(6) = -101D0 ! 
+         Profile_Panels2_other_yaxis_name(6) = 'Pvsc' 
+         Profile_Panels2_other_ymax(6) = -101D0
+         Profile_Panels2_other_ymin(6) = 0
          
 
          Profile_Panels2_file_flag = .false.

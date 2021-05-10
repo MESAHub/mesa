@@ -7923,6 +7923,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! P_theta_for_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! L_theta_for_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -7931,12 +7935,15 @@
       ! time centering applies to velocities, pressures, and luminosities.
       ! not for u_flag.
       ! steps_before_use_velocity_time_centering < 0 means no time centering.
+      ! P_theta and L_theta = 0.5 for time centered, = 1.0 for fully implicit.
 
       ! ::
 
     steps_before_use_velocity_time_centering = -1
     include_P_in_velocity_time_centering = .false.
+    P_theta_for_velocity_time_centering = 0.5d0
     include_L_in_velocity_time_centering = .false.
+    L_theta_for_velocity_time_centering = 0.5d0
     use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .false.
 
 

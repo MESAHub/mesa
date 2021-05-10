@@ -1136,7 +1136,7 @@
             integer :: nz, k, ierr
             real(dp) :: phase1_sources_and_sinks, phase2_sources_and_sinks, phase2_work, &
                phase1_total_energy_from_mdot, phase2_total_energy_from_mdot, &
-               expected_sum_cell_others, expected_sum_cell_sources, &
+               expected_sum_cell_others, expected_sum_cell_sources, L_theta, &
                diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
                diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
                virial, total_radiation, L_surf, sum_cell_de, sum_cell_detrb, &
@@ -1309,10 +1309,11 @@
             if (.not. s% RSP_flag) then
                if (s% using_velocity_time_centering .and. &
                      s% include_L_in_velocity_time_centering) then
-                  L_surf = 0.5d0*(s% L(1) + s% L_start(1))
+                  L_theta = s% L_theta_for_velocity_time_centering
                else
-                  L_surf = s% L(1)
+                  L_theta = 1d0
                end if
+               L_surf = L_theta*s% L(1) + (1d0 - L_theta)*s% L_start(1)
                total_radiation = dt*(L_surf - s% L_center)
             end if
 

@@ -352,6 +352,7 @@
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
+    P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
     conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, compare_TDC_to_MLT, &
@@ -1860,6 +1861,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
  s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
  s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
+ s% P_theta_for_velocity_time_centering = P_theta_for_velocity_time_centering
+ s% L_theta_for_velocity_time_centering = L_theta_for_velocity_time_centering
 
  s% RTI_A = RTI_A
  s% RTI_B = RTI_B
@@ -3533,6 +3536,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
  include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
+ P_theta_for_velocity_time_centering = s% P_theta_for_velocity_time_centering
+ L_theta_for_velocity_time_centering = s% L_theta_for_velocity_time_centering
  use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
 
  RTI_A = s% RTI_A

@@ -205,17 +205,19 @@
          
          subroutine setup_dL_dm(ierr)  
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: &
-               L00_ad, Lp1_ad, unused
+            type(auto_diff_real_star_order1) :: L00_ad, Lp1_ad
+            real(dp) :: L_theta
             include 'formats'
             ierr = 0         
-            L00_ad = wrap_L_00(s, k)
-            Lp1_ad = wrap_L_p1(s, k)
             if (s% using_velocity_time_centering .and. &
                      s% include_L_in_velocity_time_centering) then
-               L00_ad = 0.5d0*(L00_ad + s% L_start(k))
-               if (k < s% nz) Lp1_ad = 0.5d0*(Lp1_ad + s% L_start(k+1))
+               L_theta = s% L_theta_for_velocity_time_centering
+            else
+               L_theta = 1d0
             end if
+            L00_ad = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
+            Lp1_ad = wrap_L_p1(s, k)
+            if (k < s% nz) Lp1_ad = L_theta*Lp1_ad + (1d0 - L_theta)*s% L_start(k+1)
             dL_dm_ad = (L00_ad - Lp1_ad)/dm
          end subroutine setup_dL_dm
 
@@ -613,12 +615,16 @@
             alfa = 1d0
          end if
          beta = 1d0 - alfa
+         
+         if (s% using_velocity_time_centering .and. &
+                  s% include_P_in_velocity_time_centering) then
+            P_theta = s% P_theta_for_velocity_time_centering
+         else
+            P_theta = 1d0
+         end if
 
          if (s% u_flag) then
-            P_face_ad = s% P_face_ad(k)
-            if (s% using_velocity_time_centering .and. &
-                     s% include_P_in_velocity_time_centering) &
-               P_face_ad = 0.5d0*(P_face_ad + s% P_face_start(k))
+            P_face_ad = P_theta*s% P_face_ad(k) + (1d0-P_theta)*s% P_face_start(k)
             d_Pface_dxa00 = 0d0
             d_Pface_dxam1 = 0d0
          else ! set P_ad
@@ -628,24 +634,12 @@
                Peos_ad = 0d0
             else
                if (k > 1) then 
-                  PR_ad = wrap_Peos_m1(s,k)
-                  if (s% using_velocity_time_centering .and. &
-                           s% include_P_in_velocity_time_centering) &
-                     PR_ad = 0.5d0*(PR_ad + s% Peos_start(k-1))
+                  PR_ad = P_theta*wrap_Peos_m1(s,k) + (1d0-P_theta)*s% Peos_start(k-1)
                else
                   PR_ad = 0d0
                end if
-               PL_ad = wrap_Peos_00(s,k)
-               if (s% using_velocity_time_centering .and. &
-                        s% include_P_in_velocity_time_centering) &
-                  PL_ad = 0.5d0*(PL_ad + s% Peos_start(k))
+               PL_ad = P_theta*wrap_Peos_00(s,k) + (1d0-P_theta)*s% Peos_start(k)
                Peos_ad = alfa*PL_ad + beta*PR_ad
-               if (s% using_velocity_time_centering .and. &
-                        s% include_P_in_velocity_time_centering) then
-                  P_theta = 0.5d0
-               else
-                  P_theta = 1d0
-               end if
                if (k > 1) then         
                   do j=1,s% species
                      d_Pface_dxa00(j) = &
