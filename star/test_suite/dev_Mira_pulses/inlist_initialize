@@ -49,8 +49,6 @@
    alpha_semiconvection = 0.0
    
 ! mixing
-    overshoot_scheme(1) = 'none'
-    overshoot_scheme(2) = 'none'
 
 ! solver
    !eps_nuc_factor = 0

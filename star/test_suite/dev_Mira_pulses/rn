@@ -22,6 +22,13 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_near_pulses2.mod near_pulses2.mod
+else
+   do_one inlist_to_near_pulses2_header near_pulses2.mod
+   cp near_pulses2.mod standard_near_pulses2.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_pulse.mod pulse.mod
 else
    do_one inlist_to_pulse_header pulse.mod

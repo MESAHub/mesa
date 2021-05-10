@@ -440,11 +440,9 @@
                         best_period = s% xtra2_array(i)
                         best_model_number = s% model_number
                      end if
-                     write(*,3) 'model order period(d) growth(d) G/P', s% model_number, s% ixtra1_array(i), &
-                        s% xtra2_array(i), s% xtra1_array(i), s% xtra1_array(i)/s% xtra2_array(i)
                   end do
                   write(*,*) 'best_model_number best_G_div_P period(d) growth(d) period(s)', best_model_number, &
-                     best_G_div_P, best_period, best_growth, best_period
+                     best_G_div_P, best_period, best_growth, best_period*(24*3600)
                end if
             end if
          end if

@@ -25,7 +25,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 6d3 ! based on expected period
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -52,8 +52,6 @@
    alpha_semiconvection = 0.0
    
 ! mixing
-    overshoot_scheme(1) = 'none'
-    overshoot_scheme(2) = 'none'
 
 ! timesteps
    dt_div_min_dr_div_cs_limit = 0.5d0
@@ -84,7 +82,7 @@
    
 ! output controls
    x_logical_ctrl(7) = .true. ! output period info to terminal
-   x_integer_ctrl(7) = 3 ! which period to check (<= 0 means don't check any)
+   x_integer_ctrl(7) = 0 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 34.93 ! expected period (in days) 
        ! must set this since it is used to filter out bogus values (periods < 10% expected)
 
@@ -209,7 +207,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Cepheid'
+    Grid2_title = '2 M\d\(2281)\u  Z=0.02  Mira'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 100 ! 365 ! only used if > 0.  causes xmin to move with xmax.
@@ -222,7 +220,7 @@
 
     Profile_Panels2_xaxis_name = 'logxm'
     Profile_Panels2_xaxis_reversed = .true.
-    Profile_Panels2_xmin = -6 ! this gets to photosphere
+    Profile_Panels2_xmin = -2.5 ! this gets to photosphere
     Profile_Panels2_xmax = -0.1
 
   
