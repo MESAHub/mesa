@@ -191,7 +191,7 @@
 
          logical :: write_pulse_data_with_profile
          character (len=strlen) :: pulse_data_format, &
-            format_for_FGONG_data, format_for_OSC_data
+            format_for_OSC_data
          logical :: &
             add_atmosphere_to_pulse_data, &
             add_center_point_to_pulse_data, &
@@ -200,6 +200,8 @@
             interpolate_rho_for_pulse_data
          real(dp) :: threshold_grad_mu_for_double_point
          integer :: max_number_of_double_points
+         character (len=strlen) :: fgong_header(4)
+         integer :: fgong_ivers
 
          integer :: max_num_gyre_points
 

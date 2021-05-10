@@ -175,6 +175,12 @@ Other changes
 * ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``,
   ``eps_he`` or ``eps_z`` as arguments.
 
+* The control ``format_for_FGONG_data`` has been replaced by the
+  integer ``fgong_ivers``, which can be either 300 or 1300.  This
+  enforces adherence to the FGONG standard.  In addition, users can
+  now set the four-line plain-text header of FGONG output using the
+  new controls ``fgong_header(1:4)``.
+
 Changes in r15140
 =================
 
