@@ -538,14 +538,14 @@
 !..dpepdd at high temperatures and low densities is below the
 !..floating point limit of the subtraction of two large terms.
 !..since dpresdd doesn't enter the maxwell relations at all, use the
-!..bicubic interpolation done above instead of the formally correct expression,
-!..which are commented out below.
+!..bicubic interpolation done above instead of the formally correct expression
+!..when pele is much greater than the ideal ion gas pressure.
 
 !..pressure in erg/vol
         x       = din * din
         pele    = x * df_d
 
-if (logtemp < 9d0) then
+if (pele / (din * kerg * pow(10d0, logtemp) / (abar * mp)) < 1d6) then
         ww = x*df_dd + 2.0d0*din*df_d
         zz = x*df_ddd + 4.0d0*din*df_dd + 2.0d0*df_d
         y = x * df_ddt + 2.0d0*din*df_dt
