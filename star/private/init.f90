@@ -534,7 +534,7 @@
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
          s% mstar_dot = 0
-
+         s% gradT_excess_alpha_old = 0
          s% surf_lnT = 0
          s% surf_lnd = 0
          s% surf_lnR = 0
@@ -703,6 +703,7 @@
          s% P_surf = 0
          
          s% gradT_excess_alpha = 0
+         s% gradT_excess_alpha_old = 0
 
          s% h1_czb_mass = 0
 

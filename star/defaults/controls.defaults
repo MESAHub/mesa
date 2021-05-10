@@ -2381,7 +2381,8 @@
 
       ! Inefficient convection => large gradT excess and steep T gradient to enhance radiative transport.
       ! Reduce gradT excess by making gradT closer to adiabatic gradient.
-      ! If okay_to_reduce_gradT_excess is true, code is allowed to adjust gradT to boost efficiency of energy transport.
+      ! If true, code is allowed to adjust gradT to boost efficiency of energy transport
+      ! See ``gradT_excess_f1``, ``gradT_excess_f2``, and ``gradT_excess_age_fraction`` below.
 
       ! This is the treatment of convection, referred to as MLT++
       ! in Section 7.2 of Paxton et al. (2013), that reduces the
@@ -2403,6 +2404,70 @@
 
     gradT_excess_f1 = 1d-4
     gradT_excess_f2 = 1d-3
+
+
+      ! gradT_excess_age_fraction
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! These are for calculation of efficiency boosted gradT.
+      ! Fraction of old to mix with new to get next.
+
+      ! ::
+
+    gradT_excess_age_fraction = 0.9d0
+
+
+      ! gradT_excess_max_change
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! These are for calculation of efficiency boosted gradT.
+      ! Maximum change allowed in one timestep for ``gradT_excess_alpha``.
+      ! Ignored if negative.
+
+      ! ::
+
+    gradT_excess_max_change = -1d0
+
+
+      ! gradT_excess_lambda1
+      ! ~~~~~~~~~~~~~~~~~~~~
+      ! gradT_excess_beta1
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! In some situations you might want to force alfa = 1.
+      ! You can do that by setting ``gradT_excess_lambda1 < 0``.
+      ! The following are for the normal calculation of ``gradT_excess_alfa``
+
+      ! ::
+
+    gradT_excess_lambda1 = 1.0d0
+    gradT_excess_beta1 = 0.35d0
+
+
+      ! gradT_excess_lambda2
+      ! ~~~~~~~~~~~~~~~~~~~~
+      ! gradT_excess_beta2
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! The following are for the normal calculation of ``gradT_excess_alfa``.
+
+      ! ::
+
+    gradT_excess_lambda2 = 0.5d0
+    gradT_excess_beta2 = 0.25d0
+
+
+      ! gradT_excess_dlambda
+      ! ~~~~~~~~~~~~~~~~~~~~
+      ! gradT_excess_dbeta
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! The following are for the normal calculation of ``gradT_excess_alfa``.
+
+      ! ::
+
+    gradT_excess_dlambda = 0.1d0
+    gradT_excess_dbeta = 0.1d0
 
 
       ! gradT_excess_max_center_h1
@@ -2449,14 +2514,11 @@
     gradT_excess_max_log_tau_full_off = -99
 
 
-      ! max_logT_for_mlt
-      ! ~~~~~~~~~~~~~~~~
+         !### max_logT_for_mlt
 
-      ! No mlt at cell if local logT > this limit.
+         ! No mlt at cell if local logT > this limit.
 
-      ! ::
-
-    max_logT_for_mlt = 99
+      max_logT_for_mlt = 99
 
 
    ! overshooting

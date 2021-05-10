@@ -144,7 +144,7 @@
    ! axis limits -- to override system default selections
    HR_logT_min = 4.33 ! -101 ! only used if > -100
    HR_logT_max = 4.44 ! only used if > -100
-   HR_logL_min = 3.7 ! -101 ! only used if > -100
+   HR_logL_min = 3.8 ! -101 ! only used if > -100
    HR_logL_max = 4.34 ! -101 ! only used if > -100
 
    !show_HR_classical_instability_strip = .true.

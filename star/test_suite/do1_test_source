@@ -26,8 +26,9 @@ do_one custom_colors "stop because have dropped below central lower limit for h1
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-# remove from the list while doing long runs    do_one dev_Cepheid_pulses "good match for period" "final.mod" auto   
 do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
+do_one dev_BW_Vul_pulses "good match for period" "final.mod" skip   
+do_one dev_Cepheid_pulses "good match for period" "final.mod" skip   
 do_one dev_RSG_pulses "stop because v_surf/csound_surf > v_div_csound_surf_limit" "final.mod" auto  
 do_one dev_rsp2_BEP "good match for period" "final.mod" auto   
 do_one dev_rsp2_BLAP "good match for period" "final.mod" auto 

@@ -264,6 +264,14 @@
          real(dp) :: &
             gradT_excess_f1, &
             gradT_excess_f2, &
+            gradT_excess_age_fraction, &
+            gradT_excess_max_change, &
+            gradT_excess_lambda1, &
+            gradT_excess_beta1, &
+            gradT_excess_lambda2, &
+            gradT_excess_beta2, &
+            gradT_excess_dlambda, &
+            gradT_excess_dbeta, &
             gradT_excess_max_center_h1, &
             gradT_excess_min_center_he4, &
             gradT_excess_max_logT, &

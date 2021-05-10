@@ -137,12 +137,13 @@
     min_convective_gap, min_thermohaline_gap, min_semiconvection_gap, min_thermohaline_dropout, &
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
-    redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, &
+    redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, okay_to_reduce_gradT_excess, &
     semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
     num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
-    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, D_mix_zero_region_top_q, gradT_excess_max_center_h1, &
-    gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
-    use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, &
+   gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, gradT_excess_max_change, gradT_excess_lambda1, &
+   gradT_excess_beta1, gradT_excess_lambda2, gradT_excess_beta2, gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
+   gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
+    use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
     fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
@@ -1057,15 +1058,23 @@
  s% clip_D_limit = clip_D_limit
  s% fix_eps_grav_transition_to_grid = fix_eps_grav_transition_to_grid
 
- s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
- s% gradT_excess_f1 = gradT_excess_f1
- s% gradT_excess_f2 = gradT_excess_f2
- s% gradT_excess_max_center_h1 = gradT_excess_max_center_h1
- s% gradT_excess_min_center_he4 = gradT_excess_min_center_he4
- s% gradT_excess_max_logT = gradT_excess_max_logT
- s% gradT_excess_min_log_tau_full_on = gradT_excess_min_log_tau_full_on
- s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
- 
+s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
+s% gradT_excess_f1 = gradT_excess_f1
+s% gradT_excess_f2 = gradT_excess_f2
+s% gradT_excess_age_fraction = gradT_excess_age_fraction
+s% gradT_excess_max_change = gradT_excess_max_change
+s% gradT_excess_lambda1 = gradT_excess_lambda1
+s% gradT_excess_beta1 = gradT_excess_beta1
+s% gradT_excess_lambda2 = gradT_excess_lambda2
+s% gradT_excess_beta2 = gradT_excess_beta2
+s% gradT_excess_dlambda = gradT_excess_dlambda
+s% gradT_excess_dbeta = gradT_excess_dbeta
+s% gradT_excess_max_center_h1 = gradT_excess_max_center_h1
+s% gradT_excess_min_center_he4 = gradT_excess_min_center_he4
+s% gradT_excess_max_logT = gradT_excess_max_logT
+s% gradT_excess_min_log_tau_full_on = gradT_excess_min_log_tau_full_on
+s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
+
  s% D_mix_zero_region_bottom_q = D_mix_zero_region_bottom_q
  s% D_mix_zero_region_top_q = D_mix_zero_region_top_q
  s% dq_D_mix_zero_at_H_He_crossover = dq_D_mix_zero_at_H_He_crossover
@@ -2744,6 +2753,12 @@
  gradT_excess_max_logT = s% gradT_excess_max_logT
  gradT_excess_min_log_tau_full_on = s% gradT_excess_min_log_tau_full_on
  gradT_excess_max_log_tau_full_off = s% gradT_excess_max_log_tau_full_off
+ gradT_excess_lambda1 = s% gradT_excess_lambda1
+ gradT_excess_beta1 = s% gradT_excess_beta1
+ gradT_excess_lambda2 = s% gradT_excess_lambda2
+ gradT_excess_beta2 = s% gradT_excess_beta2
+ gradT_excess_dlambda = s% gradT_excess_dlambda
+ gradT_excess_dbeta = s% gradT_excess_dbeta
  
  D_mix_zero_region_bottom_q = s% D_mix_zero_region_bottom_q
  D_mix_zero_region_top_q = s% D_mix_zero_region_top_q

@@ -25,7 +25,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 6d3 ! based on expected period
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -84,8 +84,8 @@
    
 ! output controls
    x_logical_ctrl(7) = .true. ! output period info to terminal
-   x_integer_ctrl(7) = 0 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 37.31481 ! expected period (in days) 
+   x_integer_ctrl(7) = 3 ! which period to check (<= 0 means don't check any)
+   x_ctrl(7) = 34.93 ! expected period (in days) 
        ! must set this since it is used to filter out bogus values (periods < 10% expected)
 
    terminal_show_age_units = 'days'
