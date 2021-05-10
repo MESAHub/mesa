@@ -431,7 +431,7 @@
          if (s% x_integer_ctrl(1) > 0) then
              if (MOD(s% model_number, s% x_integer_ctrl(1)) == 0) then
                extras_finish_step = gyre_in_mesa_extras_finish_step(id)
-               if (s% ixtra3_array(1) > 0) then
+               if (s% ixtra3_array(1) > 0) then ! get the GYRE results
                   do i=1,s% ixtra3_array(1)
                      if (s% xtra1_array(i) == 0d0 .or. s% ixtra1_array(i) /= s% x_integer_ctrl(4)) cycle
                      if (best_G_div_P == 0d0 .or. s% xtra1_array(i)/s% xtra2_array(i) < best_G_div_P) then
@@ -441,8 +441,9 @@
                         best_model_number = s% model_number
                      end if
                   end do
-                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d) period(s)', best_model_number, &
-                     best_G_div_P, best_period, best_growth, best_period*(24*3600)
+                  if (best_period > 0) &
+                     write(*,*) 'best_model_number best_G_div_P period(d) growth(d)', &
+                        best_model_number, best_G_div_P, best_period, best_growth
                end if
             end if
          end if

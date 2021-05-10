@@ -31,8 +31,6 @@
    ! limit max_model_number as part of test_suite
    max_model_number = 1000
 
-   delta_HR_limit = 0.01
-
 ! output controls
 
    num_trace_history_values = 2

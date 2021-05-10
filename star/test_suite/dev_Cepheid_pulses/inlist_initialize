@@ -24,7 +24,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 6d3 ! based on expected period
+      seconds_for_initial_dt = 3d3 ! based on expected period
 
       pgstar_flag = .true.
 
@@ -41,9 +41,13 @@
 
 &controls
    
-   max_timestep = 6d3 ! based on expected period
+   max_timestep = 3d3 ! based on expected period
    
    max_model_number = 10
+
+! atm
+   ! must set same BCs in inlist_convert, inlist_initialize, and inlist_pulse
+   use_momentum_outer_BC = .true.
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -63,9 +67,11 @@
 
 ! GYRE set starting velocities
    x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 0d0 ! fraction_1st_overtone
+   
+   ! let's try O1 instead of F 
+   x_ctrl(4) = 1d0 ! fraction_1st_overtone
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone
-   x_ctrl(6) = 1d0 ! initial vsurf (kms)
+   x_ctrl(6) = 3d0 ! initial vsurf (kms)
    
 ! output controls
    terminal_show_age_units = 'days'
@@ -171,7 +177,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'RSG'
+    Grid1_title = ''
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -186,7 +192,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '21 M\d\(2281)\u  Z=0.02  RSG'
+    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

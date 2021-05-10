@@ -16,6 +16,7 @@
       required_termination_code_string = 'max_model_number'
       
       remove_initial_center_by_temperature = 2d6        ! for envelope only cases
+         ! check change in GYRE period before/after convert to make sure this cut is ok
 
       change_initial_v_flag = .true.
       new_v_flag = .true.

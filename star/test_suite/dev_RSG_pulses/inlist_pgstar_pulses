@@ -1,17 +1,17 @@
 &pgstar
          pgstar_interval = 10
 
-         pgstar_xaxis_label_scale = 1.0
-         pgstar_left_yaxis_label_scale = 1.0
-         pgstar_right_yaxis_label_scale = 1.0
+         pgstar_xaxis_label_scale = 0.9
+         pgstar_left_yaxis_label_scale = 0.9
+         pgstar_right_yaxis_label_scale = 0.9
 
          pgstar_xaxis_label_disp = 2.5
          pgstar_left_yaxis_label_disp = 4.2 ! 3.4
          pgstar_right_yaxis_label_disp = 4.4
 
 
-         Grid2_win_width = 9
-         Grid2_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+         Grid2_win_width = 8
+         Grid2_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
          Grid2_num_cols = 3 ! divide plotting region into this many equal width cols
          Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
          Grid2_num_plots = 6 ! <= 10
@@ -22,9 +22,9 @@
          Grid2_plot_col(1) =  1 ! number from 1 at left
          Grid2_plot_colspan(1) = 2 ! plot spans this number of columns 
          Grid2_plot_pad_left(1) = -0.02 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(1) = 0.09 ! fraction of full window width for padding on right
+         Grid2_plot_pad_right(1) = 0.12 ! fraction of full window width for padding on right
          Grid2_plot_pad_top(1) = -0.02 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(1) = -0.10 ! fraction of full window height for padding at bottom
+         Grid2_plot_pad_bot(1) = -0.14 ! fraction of full window height for padding at bottom
          Grid2_txt_scale_factor(1) = 0.7 ! multiply txt_scale for subplot by this
          
          Grid2_plot_name(2) = 'History_Panels2'
@@ -33,9 +33,9 @@
          Grid2_plot_col(2) =  1 ! number from 1 at left
          Grid2_plot_colspan(2) = 2 ! plot spans this number of columns 
          Grid2_plot_pad_left(2) = -0.02 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(2) = 0.09 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(2) = 0.18 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(2) = -0.02 ! fraction of full window height for padding at bottom
+         Grid2_plot_pad_right(2) = 0.12 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(2) = 0.19 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(2) = -0.06 ! fraction of full window height for padding at bottom
          Grid2_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
          
          Grid2_plot_name(3) = 'Text_Summary2'
@@ -47,43 +47,43 @@
          Grid2_plot_pad_right(3) = 0.0 ! fraction of full window width for padding on right
          Grid2_plot_pad_top(3) = 0.12 ! fraction of full window height for padding at top
          Grid2_plot_pad_bot(3) = -0.04 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(3) = 0.2 ! multiply txt_scale for subplot by this
-         
-         Grid2_plot_name(4) = 'logL_R'
-         Grid2_plot_row(4) = 5 ! number from 1 at top
-         Grid2_plot_rowspan(4) = 2 ! plot spans this number of rows
-         Grid2_plot_col(4) =  3 ! number from 1 at left
-         Grid2_plot_colspan(4) = 1 ! plot spans this number of columns 
-         Grid2_plot_pad_left(4) = 0.07 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(4) = 0.0 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(4) = 0.06 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(4) = -0.02 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(4) = 0.7 ! multiply txt_scale for subplot by this
-         logL_R_title = ''      
-         
-         Grid2_plot_name(5) = 'logL_v'
-         Grid2_plot_row(5) = 3 ! number from 1 at top
-         Grid2_plot_rowspan(5) = 2 ! plot spans this number of rows
-         Grid2_plot_col(5) = 3 ! number from 1 at left
-         Grid2_plot_colspan(5) = 1 ! plot spans this number of columns 
-         Grid2_plot_pad_left(5) = 0.07 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(5) = 0.0 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(5) = 0.02 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(5) = 0.02 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(5) = 0.7 ! multiply txt_scale for subplot by this
-         logL_v_title = ''      
+         Grid2_txt_scale_factor(3) = 0.17 ! multiply txt_scale for subplot by this
          
          Grid2_plot_name(6) = 'logL_Teff'
          Grid2_plot_row(6) = 1 ! number from 1 at top
          Grid2_plot_rowspan(6) = 2 ! plot spans this number of rows
          Grid2_plot_col(6) = 3 ! number from 1 at left
          Grid2_plot_colspan(6) = 1 ! plot spans this number of columns 
-         Grid2_plot_pad_left(6) = 0.07 ! fraction of full window width for padding on left
+         Grid2_plot_pad_left(6) = 0.04 ! fraction of full window width for padding on left
          Grid2_plot_pad_right(6) = 0.0 ! fraction of full window width for padding on right
          Grid2_plot_pad_top(6) = -0.02 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(6) = 0.06 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(6) = 0.7 ! multiply txt_scale for subplot by this
+         Grid2_plot_pad_bot(6) = 0.02 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(6) = 0.6 ! multiply txt_scale for subplot by this
          logL_Teff_title = ''      
+         
+         Grid2_plot_name(5) = 'logL_v'
+         Grid2_plot_row(5) = 3 ! number from 1 at top
+         Grid2_plot_rowspan(5) = 2 ! plot spans this number of rows
+         Grid2_plot_col(5) = 3 ! number from 1 at left
+         Grid2_plot_colspan(5) = 1 ! plot spans this number of columns 
+         Grid2_plot_pad_left(5) = 0.04 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(5) = 0.0 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(5) = 0.02 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(5) = -0.02 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(5) = 0.6 ! multiply txt_scale for subplot by this
+         logL_v_title = ''      
+         
+         Grid2_plot_name(4) = 'logL_R'
+         Grid2_plot_row(4) = 5 ! number from 1 at top
+         Grid2_plot_rowspan(4) = 2 ! plot spans this number of rows
+         Grid2_plot_col(4) =  3 ! number from 1 at left
+         Grid2_plot_colspan(4) = 1 ! plot spans this number of columns 
+         Grid2_plot_pad_left(4) = 0.04 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(4) = 0.0 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(4) = 0.06 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(4) = -0.06 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(4) = 0.6 ! multiply txt_scale for subplot by this
+         logL_R_title = ''      
 
    !   Grid2_file_flag = .true.
          file_digits = 7
@@ -97,7 +97,7 @@
 
          !History_Panels2_xaxis_name='model_number'
          History_Panels2_xaxis_name='star_age_day'
-         History_Panels2_max_width = 50 ! only used if > 0.  causes xmin to move with xmax.
+         History_Panels2_max_width = 140 !  200 ! only used if > 0.  causes xmin to move with xmax.
          
          History_Panels2_yaxis_name(1) = 'effective_T' 
          History_Panels2_yaxis_reversed(1) = .false.
@@ -146,36 +146,45 @@
          Profile_Panels2_show_mix_regions_on_xaxis = .true.
          !Profile_Panels2_show_grid = .true.
          
-         Profile_Panels2_num_panels = 5 
+         Profile_Panels2_num_panels = 6 
                  
          Profile_Panels2_yaxis_name(1) = 'v_div_cs'         
          Profile_Panels2_ymax(1) = -101D0 ! 1
          Profile_Panels2_ymin(1) = -101D0 ! -1
-         !Profile_Panels2_dymin(1) = 0.1
+         Profile_Panels2_dymin(1) = 0.1
          Profile_Panels2_other_yaxis_name(1) = 'vel_km_per_s'
          Profile_Panels2_other_ymax(1) = -101D0 !  2e6 
          Profile_Panels2_other_ymin(1) = -101D0 ! -2e6
-         !Profile_Panels2_other_dymin(1) = 0.1
+         Profile_Panels2_other_dymin(1) = 0.1
          
          Profile_Panels2_yaxis_name(2) = 'logRho'         
          Profile_Panels2_other_yaxis_name(2) = 'logT' 
                   
-         Profile_Panels2_yaxis_name(3) = 'entropy'         
+         Profile_Panels2_yaxis_name(3) = 'logtau' ! 'entropy'         
          Profile_Panels2_other_yaxis_name(3) = 'opacity' 
                   
          Profile_Panels2_yaxis_name(4) = 'logL'  ! 'zone' !        
          Profile_Panels2_ymax(4) = -101D0 ! 3.7  
          Profile_Panels2_ymin(4) = -101D0 ! 3.1 
+         Profile_Panels2_dymin(4) = 0.02
          Profile_Panels2_other_yaxis_name(4) = 'lum_div_Ledd' 
          Profile_Panels2_other_ymax(4) = -101D0 ! 
          Profile_Panels2_other_ymin(4) = -101D0 ! 
                   
-         Profile_Panels2_yaxis_name(5) = 'zone'     
+         Profile_Panels2_yaxis_name(5) = 'mixing_type'     
          Profile_Panels2_ymax(5) = -101D0
          Profile_Panels2_ymin(5) = -101D0
-         Profile_Panels2_other_yaxis_name(5) = 'Pvsc' 
+         Profile_Panels2_other_yaxis_name(5) = 'free_e' 
          Profile_Panels2_other_ymax(5) = -101D0 ! 
          Profile_Panels2_other_ymin(5) = -101D0 ! 
+                  
+         Profile_Panels2_yaxis_name(6) = 'Pvsc'     
+         Profile_Panels2_ymax(6) = -101D0
+         Profile_Panels2_ymin(6) = 0
+         !Profile_Panels2_dymin(6) = 1
+         Profile_Panels2_other_yaxis_name(6) = 'log_dt_div_tau_conv'  ! 'zone'
+         Profile_Panels2_other_ymax(6) = -101D0 ! 
+         Profile_Panels2_other_ymin(6) = -101D0 ! 
          
 
          Profile_Panels2_file_flag = .false.
@@ -188,9 +197,9 @@
          Text_Summary2_name(:,:) = ''
          
          Text_Summary2_name(1,1) = 'model_number'
-         Text_Summary2_name(2,1) = 'star_age_day'
-         Text_Summary2_name(3,1) = 'time_step_sec'
-         Text_Summary2_name(4,1) = 'dt_div_max_tau_conv'
+         Text_Summary2_name(2,1) = 'time_step_sec'
+         Text_Summary2_name(3,1) = 'star_age_day'
+         Text_Summary2_name(4,1) = 'max_vsurf_div_cs'
          Text_Summary2_name(5,1) = ''
          
          Text_Summary2_name(1,2) = 'v_surf_km_s'
@@ -207,7 +216,7 @@
          
          Text_Summary2_name(1,4) = 'num_zones'
          Text_Summary2_name(2,4) = 'num_retries'
-         Text_Summary2_name(3,4) = 'max_vsurf_div_cs'
+         Text_Summary2_name(3,4) = 'num_periods'
          Text_Summary2_name(4,4) = 'growth'
          Text_Summary2_name(5,4) = ''
 

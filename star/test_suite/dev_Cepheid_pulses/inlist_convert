@@ -16,6 +16,7 @@
       required_termination_code_string = 'max_model_number'
       
       remove_initial_center_by_temperature = 5d6        ! for envelope only cases
+         ! check change in GYRE period before/after convert to make sure this cut is ok
 
       change_initial_v_flag = .true.
       new_v_flag = .true.
@@ -32,7 +33,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 6d3 ! based on expected period
+      seconds_for_initial_dt = 3d3 ! based on expected period
 
       pgstar_flag = .true.
 
@@ -47,15 +48,19 @@
 
 ! check before vs after convert
 !   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
-!    1415       1          0.3310E-06        3021117.4406          50351.9573             34.9666          0.5666E+03          0.1620E+02
-!     100       1          0.3310E-06        3021260.6569          50354.3443             34.9683          0.5642E+03          0.1614E+02
+!     100       1          0.3307E-06        3023915.7172          50398.5953             34.9990          0.5160E+03          0.1474E+02
+!     100       2          0.5131E-06        1948955.3677          32482.5895             22.5574          0.6304E+03          0.2795E+02
 
 
 &controls
    
-   max_timestep = 6d3 ! based on expected period
+   max_timestep = 3d3 ! based on expected period
    
    max_model_number = 100 ! must be large enough to reach max_timestep
+
+! atm
+   ! must set same BCs in inlist_convert, inlist_initialize, and inlist_pulse
+   use_momentum_outer_BC = .true.
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -185,7 +190,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'RSG'
+    Grid1_title = ''
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -200,7 +205,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '21 M\d\(2281)\u  Z=0.02  RSG'
+    Grid2_title = '9 M\d\(2281)\u  Z=0.02  Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

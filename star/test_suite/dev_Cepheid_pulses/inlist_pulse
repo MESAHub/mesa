@@ -23,9 +23,9 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 6d3 ! based on expected period
+      seconds_for_initial_dt = 3d3 ! based on expected period
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -37,28 +37,39 @@
 &kap
 / ! end of kap namelist
 
+!   order       freq (Hz)         P (sec)       P (min)     P (day)    growth (day)      growth/P
+!       1      0.3316E-06    3016002.2029    50266.7034     34.9074      0.5322E+03    0.1525E+02
+!       2      0.5151E-06    1941217.9425    32353.6324     22.4678      0.7137E+03    0.3177E+02
+
 
 &controls
    
-   max_timestep = 6d3 ! based on expected period
+   max_timestep = 3d3 ! based on expected period
    
-   v_div_csound_surf_limit = 6 
+   !v_div_csound_surf_limit = 6 
    
    max_number_retries = 4 ! if hit this, probably need to give up
 
    max_model_number = 50000
 
+! atm
+   ! must set same BCs in inlist_convert, inlist_initialize, and inlist_pulse
+   use_momentum_outer_BC = .true.
+
 ! mlt
    alpha_semiconvection = 0.0
-   
+         
 ! mixing
     overshoot_scheme(1) = 'none'
     overshoot_scheme(2) = 'none'
 
 ! timesteps
-   dt_div_min_dr_div_cs_limit = 0.5d0
-   min_q_for_dt_div_min_dr_div_cs_limit = 0.75d0 ! only interested in outer envelope for shocks
-   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
+   !dt_div_min_dr_div_cs_limit = 0.5d0
+   
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.1d0 ! 0.75d0 ! only interested in outer envelope for shocks
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0 ! 0.001d0
    
 ! mesh controls   
    !okay_to_remesh = .false.
@@ -84,7 +95,7 @@
    
 ! output controls
    x_logical_ctrl(7) = .true. ! output period info to terminal
-   x_integer_ctrl(7) = 3 ! which period to check (<= 0 means don't check any)
+   x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 34.93 ! expected period (in days) 
        ! must set this since it is used to filter out bogus values (periods < 10% expected)
 
@@ -104,10 +115,10 @@
       terminal_interval = 4000
 
 
-      !photo_interval = 1 ! 50
+      !photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1 ! 5
+      !terminal_interval = 5
 
       !fill_arrays_with_NaNs = .true.
       
@@ -189,7 +200,7 @@
 
     !pause = .true.
     !pause_interval = 100
-    pgstar_interval = 5 ! 10
+    pgstar_interval = 25
 
  ! window 1
 
@@ -222,7 +233,7 @@
 
     Profile_Panels2_xaxis_name = 'logxm'
     Profile_Panels2_xaxis_reversed = .true.
-    Profile_Panels2_xmin = -6 ! this gets to photosphere
+    Profile_Panels2_xmin = -5
     Profile_Panels2_xmax = -0.1
 
   
