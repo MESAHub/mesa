@@ -416,55 +416,33 @@
          use alloc
          use star_utils, only: get_Lrad_div_Ledd, after_C_burn
          use chem_def, only: ih1, ihe4
-
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-
-         real(dp) :: beta, lambda, phi, tmp, alpha, alpha2
-         real(dp) :: &
-            beta_limit, &
-            lambda1, &
-            beta1, &
-            lambda2, &
-            beta2, &
-            dlambda, &
-            dbeta
-
+         real(dp) :: beta, lambda, phi, tmp, alpha, alpha2, &
+            beta_limit, lambda1, beta1, lambda2, beta2, dlambda, dbeta
          integer :: k, k_beta, k_lambda, nz, h1, he4
-
-         logical, parameter :: dbg = .false.
-
          include 'formats'
-
-         if (dbg) write(*,*) 'enter set_gradT_excess_alpha'
-
          ierr = 0
          if (.not. s% okay_to_reduce_gradT_excess) then
             s% gradT_excess_alpha = 0
-            if (dbg) write(*,1) 'okay_to_reduce_gradT_excess'
             return
          end if
          nz = s% nz
-
          h1 = s% net_iso(ih1)
          if (h1 /= 0) then
             if (s% xa(h1,nz) > s% gradT_excess_max_center_h1) then
                s% gradT_excess_alpha = 0
-               if (dbg) write(*,1) 'gradT_excess_max_center_h1'
                return
             end if
          end if
-
          he4 = s% net_iso(ihe4)
          if (he4 /= 0) then
             if (s% xa(he4,nz) < s% gradT_excess_min_center_he4) then
                s% gradT_excess_alpha = 0
-               if (dbg) write(*,1) 'gradT_excess_min_center_he4'
                return
             end if
          end if
-
-         beta = 1d0 ! beta = min over k of Pgas(k)/P(k)
+         beta = 1d0 ! beta = min over k of Pgas(k)/Peos(k)
          k_beta = 0
          do k=1,nz
             tmp = s% Pgas(k)/s% Peos(k)
@@ -473,12 +451,8 @@
                beta = tmp
             end if
          end do
-
          beta = beta*(1d0 + s% xa(1,nz))
-
          s% gradT_excess_min_beta = beta
-         if (dbg) write(*,2) 'gradT_excess_min_beta', k_beta, beta
-
          lambda = 0d0 ! lambda = max over k of Lrad(k)/Ledd(k)
          do k=2,k_beta
             tmp = get_Lrad_div_Ledd(s,k)
@@ -489,29 +463,14 @@
          end do
          lambda = min(1d0,lambda)
          s% gradT_excess_max_lambda = lambda
-         if (dbg) write(*,2) 'gradT_excess_max_lambda', k_lambda, lambda
-
          lambda1 = s% gradT_excess_lambda1
          beta1 = s% gradT_excess_beta1
          lambda2 = s% gradT_excess_lambda2
          beta2 = s% gradT_excess_beta2
          dlambda = s% gradT_excess_dlambda
          dbeta = s% gradT_excess_dbeta
-
-         if (dbg) then
-            write(*,1) 'lambda1', lambda1
-            write(*,1) 'lambda2', lambda2
-            write(*,1) 'lambda', lambda
-            write(*,*)
-            write(*,1) 'beta1', beta1
-            write(*,1) 'beta2', beta2
-            write(*,1) 'beta', beta
-            write(*,*)
-         end if
-
          ! alpha is fraction of full boost to apply
          ! depends on location in (beta,lambda) plane
-
          if (lambda1 < 0) then
             alpha = 1
          else if (lambda >= lambda1) then
@@ -543,7 +502,6 @@
          else ! lambda <= lambda2 - dlambda
             alpha = 0
          end if
-
          if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
             s% gradT_excess_alpha = &
                (1d0 - s% gradT_excess_age_fraction)*alpha + &
@@ -560,17 +518,8 @@
          else
             s% gradT_excess_alpha = alpha
          end if
-
          if (s% gradT_excess_alpha < 1d-4) s% gradT_excess_alpha = 0d0
          if (s% gradT_excess_alpha > 0.9999d0) s% gradT_excess_alpha = 1d0
-
-         if (dbg) then
-            write(*,1) 'gradT excess new', alpha
-            write(*,1) 's% gradT_excess_alpha_old', s% gradT_excess_alpha_old
-            write(*,1) 's% gradT_excess_alpha', s% gradT_excess_alpha
-            write(*,*)
-         end if
-
       end subroutine set_gradT_excess_alpha
 
 
