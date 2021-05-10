@@ -166,9 +166,9 @@
          type(auto_diff_real_star_order1) :: &
             Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess, gradT_actual
          character (len=256) :: message        
-         logical ::  okay_to_use_TDC, test_partials, using_TDC, compare_TDC_to_MLT, report
+         logical ::  test_partials, using_TDC, compare_TDC_to_MLT, report
          include 'formats'
-         
+
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0          
@@ -199,31 +199,32 @@
                k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
          end if
 
-         call set_no_mixing('') ! to initialize things
-         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
+         ! Initialize with no mixing
+         call set_no_mixing('')
 
+         ! Bail if we asked for no mixing, or if parameters are bad.
+         if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
          
+         ! Bail if more parameters are bad
+         if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
+               .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
+
+         ! At this stage we're either using MLT or TDC.
+         ! TDC requires the MLT answer as a starting point, so
+         ! call MLT.
+         call set_MLT
+
          ! check if this particular k needs to be done with TDC
          using_TDC = s% using_TDC
-         if (using_TDC .and. k > 0 .and. s% dt > 0d0) then
-            call set_MLT
+         if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
+         if (using_TDC) then
             Y_guess = gradT - gradL
-            okay_to_use_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
+            using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
                                                                   T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
-         else
-            okay_to_use_TDC = .false.
          end if
-         compare_TDC_to_MLT = s% compare_TDC_to_MLT
 
-         
 
-         ! sanity check the args
-         if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
-               .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) then
-            call set_no_mixing('vals too small')
-            return
-         end if
-         
+         ! Run through assuming no TDC.         
          if (gradr > gradL) then ! convective
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter
             call set_MLT
@@ -242,8 +243,9 @@
          end if
          
          ! need to make use of gradL instead of grada consistent - at least for TDC
-         if (okay_to_use_TDC) then
+         if (using_TDC) then
             Y_guess = gradT - gradL
+            compare_TDC_to_MLT = s% compare_TDC_to_MLT
             if (compare_TDC_to_MLT) then
                if (report) write(*,3) 'call do_compare_TDC_to_MLT', k, s% solver_iter
                call do_compare_TDC_to_MLT     
@@ -256,10 +258,15 @@
                mixing_type, conv_vel%val
          end if
          
+         ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
          end if
+
+         ! If we made it all that way and are still not mixing, call set_no_mixing.
+         ! This catches places above where we might have thought we'd have mixing but
+         ! ended up falling back on no mixing. It also reports the correct message.
          if (mixing_type == no_mixing) call set_no_mixing('final mixing_type == no_mixing')
          
          contains
