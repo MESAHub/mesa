@@ -5,8 +5,8 @@
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
-      max_dt_div_tau_conv_for_TDC = 1d99
-      max_dt_years_for_TDC = 1d99
+      max_dt_div_tau_conv_for_TDC = -1d99
+      max_dt_years_for_TDC = -1d99
    
       alpha_TDC_DAMP = 1d0
       alpha_TDC_DAMPR = 0d0
