@@ -104,7 +104,7 @@
    !dq ! mass of zone as a fraction of total star mass
    logxq ! log10(1-q)
    
-   
+   log_mlt_Gamma
    
    log_D_conv
    log_D_semi
