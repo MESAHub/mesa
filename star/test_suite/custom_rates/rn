@@ -10,8 +10,8 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-# set MESA_SKIP_OPTIONAL to run all parts of test
-if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+# set MESA_SKIP_OPTIONAL to run skip parts of the test
+if [ -z "$MESA_SKIP_OPTIONAL" ]; then
     do_one inlist_core_header he_core.mod LOGS_core
     do_one inlist_make_he_wd_header he_wd.mod LOGS_make_he_wd
     do_one inlist_cool_header he_wd_cooled.mod LOGS_cool_he_wd

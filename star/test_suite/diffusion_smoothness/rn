@@ -9,7 +9,7 @@ MESA_DIR=../../..
 source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 # check if can skip building zams model
-if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+if [ -z "$MESA_SKIP_OPTIONAL" ]; then
    do_one inlist_zams_header zams.mod
 fi
 
