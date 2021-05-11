@@ -100,7 +100,7 @@
 
 
 !..declare the pass
-      type (Screen_Info), pointer :: sc
+      type (Screen_Info) :: sc
       real(dp), intent(in) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
       ! zs13 = (z1+z2)**(1./3.)
       ! zhat = combination of z1 and z2 raised to the 5/3 power
