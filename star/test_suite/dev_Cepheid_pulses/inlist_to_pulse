@@ -32,8 +32,8 @@
 
 &controls
 
-   log_Teff_lower_limit = 3.71
-   max_model_number = 1340          ! comment out on 1st pass when searching for best
+   log_Teff_lower_limit = 3.68
+   max_model_number = 708          ! comment out on 1st pass when searching for best
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -150,7 +150,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
 
    ! HR window -- lg_L vs. lg_Teff
    
@@ -164,10 +164,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 3.69 ! -101 ! only used if > -100
+   HR_logT_min = 3.65 ! -101 ! only used if > -100
    HR_logT_max = 3.8 ! only used if > -100
-   HR_logL_min = 2.9 ! -101 ! only used if > -100
-   HR_logL_max = 3.05 ! -101 ! only used if > -100
+   HR_logL_min = 3.38 ! -101 ! only used if > -100
+   HR_logL_max = 3.46 ! -101 ! only used if > -100
 
 ! logL 3.16
 ! Teff 6050, logT  3.78

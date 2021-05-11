@@ -14,10 +14,10 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 5d0 
+   initial_mass = 6d0 
    ! initial_X = 0.73
-   initial_Z = 0.02d0
-   initial_Y = 0.25d0
+   initial_Z = 0.014d0
+   initial_Y = 0.256d0
 
 ! MLT
    max_dt_div_tau_conv_for_TDC = 1d99

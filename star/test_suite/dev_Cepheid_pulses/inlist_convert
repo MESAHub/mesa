@@ -15,7 +15,7 @@
       save_model_filename = 'converted.mod'
       required_termination_code_string = 'max_model_number'
       
-      remove_initial_center_by_temperature = 5d6        ! for envelope only cases
+      remove_initial_center_by_temperature = 2d6        ! for envelope only cases
          ! check change in GYRE period before/after convert to make sure this cut is ok
 
       change_initial_v_flag = .true.
@@ -48,8 +48,8 @@
 
 ! check before vs after convert
 !   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
-!     100       1          0.3307E-06        3023915.7172          50398.5953             34.9990          0.5160E+03          0.1474E+02
-!     100       2          0.5131E-06        1948955.3677          32482.5895             22.5574          0.6304E+03          0.2795E+02
+!     708       1          0.1109E-05         901474.7048          15024.5784             10.4337          0.8454E+03          0.8102E+02
+!     100       1          0.1110E-05         901124.0397          15018.7340             10.4297          0.9679E+03          0.9280E+02
 
 
 &controls

@@ -1,9 +1,3 @@
-do_one dev_to_cc_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
-
-return
-
-
 
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1

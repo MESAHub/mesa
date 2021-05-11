@@ -29,10 +29,10 @@
 &controls
 
    xa_central_lower_limit_species(1) = 'he4'
-   !xa_central_lower_limit(1) = 0.2d0 
+   xa_central_lower_limit(1) = 0.1d0 
        
 ! timesteps
-   delta_HR_limit = 0.003
+   !delta_HR_limit = 0.01
 
 ! solver
 
@@ -144,9 +144,9 @@
 
    ! axis limits -- to override system default selections
    HR_logT_min = 3.5 ! -101 ! only used if > -100
-   HR_logT_max = 4.25 ! only used if > -100
-   HR_logL_min = 2.5 ! -101 ! only used if > -100
-   HR_logL_max = 3.35 ! -101 ! only used if > -100
+   HR_logT_max = 4.35 ! only used if > -100
+   HR_logL_min = 2.9 ! -101 ! only used if > -100
+   HR_logL_max = 3.65 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.
