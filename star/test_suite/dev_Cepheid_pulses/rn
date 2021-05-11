@@ -7,21 +7,21 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_start.mod start.mod
 else
    do_one inlist_start_header start.mod
    cp start.mod standard_start.mod
 fi
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_pulse.mod pulse.mod
 else
    do_one inlist_to_pulse_header pulse.mod
    cp pulse.mod standard_pulse.mod
 fi
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_envelope.mod envelope.mod
 else
    do_one inlist_remove_center_header envelope.mod

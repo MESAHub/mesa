@@ -82,6 +82,13 @@ If set to either ``false`` or ``FALSE`` MESA will act as if the user had set ``p
 If set to anything else (or not set at all) MESA will use the value as set in the inlists.
 
 
+MESA_SKIP_OPTIONAL
+~~~~~~~~~~~~~~~~~~
+
+If set then when running a test_suite case skip certain optional inlists. If not set, then run all inlists.
+
+
+
 Misc
 ----
 
