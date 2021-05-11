@@ -425,7 +425,7 @@
    
          implicit none
    
-         type (Screen_Info), pointer :: sc ! See rates_def
+         type (Screen_Info) :: sc ! See rates_def
          ! This contains lots of useful things like temperature, density etc as well as some precomputed
          ! terms that are useful for screening calculations. The derived type is set in do_screen_set_context (screen.f90)
          real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants

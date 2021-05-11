@@ -369,7 +369,6 @@
          integer :: io_unit, ios, ir, which, j, ierr, rir
          real(dp), parameter :: tiny = 1d-6
          character (len=maxlen_reaction_Name) :: name
-         real(dp), pointer :: rates(:)
          
          logical, parameter :: show_read_cache = .false.
          logical :: reverse_is_table
@@ -586,14 +585,12 @@
          integer, intent(out) :: ierr
       
          integer :: i, ir
-         type (T_Factors), target ::  tfs
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
 
          include 'formats'
          
          ierr = 0
 
-         tf => tfs
          call tfactors(tf, logT, btemp)
          call set_raw_rates( &
                num_reactions, reaction_id, which_rates, btemp, tf, rates, ierr)
