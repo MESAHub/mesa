@@ -19,6 +19,6 @@ fi
 do_one inlist_1.4M_ms_op_mono_header final.mod
 
 # test alt version of OP mono routines
-if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+if [ -z "$MESA_SKIP_OPTIONAL" ]; then
     do_one inlist_1.4M_ms_op_mono_alt_header final.mod
 fi
