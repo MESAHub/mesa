@@ -225,10 +225,10 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     testhub_log "test_case: $1"
     testhub_log "module: :$MESA_TEST_MOD"
     testhub_log "omp_num_threads: $OMP_NUM_THREADS"
-    if [ -z "$MESA_RUN_OPTIONAL" ]; then
-        testhub_log "run_optional: false"
-    else
+    if [ -z "$MESA_SKIP_OPTIONAL" ]; then
         testhub_log "run_optional: true"
+    else
+        testhub_log "run_optional: false"
     fi
     if [ -z "$MESA_FPE_CHECKS_ON" ]; then
         testhub_log "fpe_checks: false"
