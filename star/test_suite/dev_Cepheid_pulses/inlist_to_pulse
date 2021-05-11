@@ -32,7 +32,7 @@
 
 &controls
 
-   log_Teff_lower_limit = 3.68 ! middle of instability strip
+   log_Teff_lower_limit = 3.71
    max_model_number = 1340          ! comment out on 1st pass when searching for best
 
 ! mlt
@@ -48,7 +48,7 @@
 ! solver
 
 ! GYRE output controls
-   x_integer_ctrl(1) = 5 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
    x_integer_ctrl(2) = 2 ! max number of modes to output per call
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
@@ -150,7 +150,7 @@
 
 &pgstar
 
-   !pause = .true.
+   pause = .true.
 
    ! HR window -- lg_L vs. lg_Teff
    
@@ -158,16 +158,19 @@
 
    HR_win_flag = .true.
    
-   HR_title = '9 M\d\(2281)\u  Z=0.02  Cepheid'
+   HR_title = '5 M\d\(2281)\u  Z=0.007  Cepheid'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-  HR_logT_min = 3.62 ! -101 ! only used if > -100
-  HR_logT_max = 3.92 ! only used if > -100
-  HR_logL_min = 3.8 ! -101 ! only used if > -100
-  HR_logL_max = 4.4 ! -101 ! only used if > -100
+   HR_logT_min = 3.69 ! -101 ! only used if > -100
+   HR_logT_max = 3.8 ! only used if > -100
+   HR_logL_min = 2.9 ! -101 ! only used if > -100
+   HR_logL_max = 3.05 ! -101 ! only used if > -100
+
+! logL 3.16
+! Teff 6050, logT  3.78
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.

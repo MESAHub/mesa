@@ -215,7 +215,7 @@
     History_Panels2_max_width = 100 ! 365 ! only used if > 0.  causes xmin to move with xmax.
 
     !Grid2_file_flag = .true.
-    file_digits = 7
+    file_digits = 8
     Grid2_file_dir = 'png'
     Grid2_file_prefix = '18M_bcep'
     Grid2_file_interval = 25 ! output when mod(model_number,Grid2_file_interval)==0
