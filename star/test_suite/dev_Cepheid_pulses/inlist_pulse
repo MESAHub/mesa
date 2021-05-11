@@ -81,7 +81,7 @@
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
 
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 0.75 ! 1 saturates with max vsurf/cs about 2, 0.5 dies from shocks
+   P_theta_for_velocity_time_centering = 1d0
 
    include_L_in_velocity_time_centering = .true.
    L_theta_for_velocity_time_centering = 1d0
@@ -90,7 +90,7 @@
    
    use_Pvsc_art_visc = .true.
    Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   Pvsc_zsh = 0.01 ! 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0

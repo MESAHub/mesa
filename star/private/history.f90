@@ -469,12 +469,20 @@
 
          subroutine do_extra_col(pass, j, col_offset)
             integer, intent(in) :: pass, j, col_offset
+            integer :: int_val
+            include 'formats'
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') j + col_offset
             else if (pass == 2) then
                call do_name(j + col_offset, extra_col_names(j))
             else if (pass == 3) then
-               call do_val(j + col_offset, extra_col_vals(j))
+               int_val = int(extra_col_vals(j))
+               if (abs(extra_col_vals(j) - dble(int_val)) < &
+                     1d-10*max(1d-10,abs(extra_col_vals(j)))) then
+                  call do_int_val(j + col_offset, int_val)
+               else
+                  call do_val(j + col_offset, extra_col_vals(j))
+               end if
             end if
          end subroutine do_extra_col
 

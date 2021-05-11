@@ -35,7 +35,7 @@
       integer :: num_periods, prev_cycle_run_num_steps, &
          run_num_iters_prev_period, run_num_retries_prev_period, best_model_number
       real(dp) :: period, time_started, period_r_min, period_max_vsurf_div_cs, best_G_div_P, &
-         prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
+         prev_period, prev_growth, prev_period_delta_R, prev_period_max_vsurf_div_cs, &
          best_growth, best_period
          
 
@@ -121,7 +121,7 @@
          write(iounit) num_periods, prev_cycle_run_num_steps, &
             run_num_iters_prev_period, run_num_retries_prev_period, &
             period, time_started, period_r_min, period_max_vsurf_div_cs, &
-            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
+            prev_period, prev_growth, prev_period_delta_R, prev_period_max_vsurf_div_cs, &
             best_model_number, best_G_div_P, best_growth, best_period
       end subroutine photo_write
 
@@ -133,7 +133,7 @@
          read(iounit, iostat=ierr) num_periods, prev_cycle_run_num_steps, &
             run_num_iters_prev_period, run_num_retries_prev_period, &
             period, time_started, period_r_min, period_max_vsurf_div_cs, &
-            prev_period, prev_growth, prev_period_delta_r, prev_period_max_vsurf_div_cs, &
+            prev_period, prev_growth, prev_period_delta_R, prev_period_max_vsurf_div_cs, &
             best_model_number, best_G_div_P, best_growth, best_period
       end subroutine photo_read
 
@@ -158,7 +158,7 @@
             period_r_min = 0
             period_max_vsurf_div_cs = 0
             prev_growth = 0
-            prev_period_delta_r = 0
+            prev_period_delta_R = 0
             prev_period = 0
             prev_period_max_vsurf_div_cs = 0
             best_model_number = 0
@@ -413,7 +413,7 @@
 
       
       include 'gyre_in_mesa_extras_finish_step.inc'
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_finish_step(id)
@@ -422,123 +422,190 @@
          integer :: ierr, i
          type (star_info), pointer :: s
          real(dp) :: rel_run_E_err, target_period, time_ended, period_r_max, &
-            v_surf, v_surf_start, growth, period_delta_r
+            v_surf, v_surf_start, growth, period_delta_R
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         
          extras_finish_step = keep_going
          if (s% x_integer_ctrl(1) > 0) then
-             if (MOD(s% model_number, s% x_integer_ctrl(1)) == 0) then
-               extras_finish_step = gyre_in_mesa_extras_finish_step(id)
-               if (s% ixtra3_array(1) > 0) then ! get the GYRE results
-                  do i=1,s% ixtra3_array(1)
-                     if (s% xtra1_array(i) == 0d0 .or. s% ixtra1_array(i) /= s% x_integer_ctrl(4)) cycle
-                     if (best_G_div_P == 0d0 .or. s% xtra1_array(i)/s% xtra2_array(i) < best_G_div_P) then
-                        best_G_div_P = s% xtra1_array(i)/s% xtra2_array(i)
-                        best_growth = s% xtra1_array(i)
-                        best_period = s% xtra2_array(i)
-                        best_model_number = s% model_number
-                     end if
-                  end do
-                  if (best_period > 0) &
-                     write(*,*) 'best_model_number best_G_div_P period(d) growth(d)', &
-                        best_model_number, best_G_div_P, best_period, best_growth
-               end if
+            if (MOD(s% model_number, s% x_integer_ctrl(1)) == 0) &
+               call get_gyre_info_for_this_step
+            if (extras_finish_step == terminate) then
+               s% termination_code = t_extras_finish_step
+               return
+            end if
+            if (extras_finish_step /= keep_going) then
+               return
             end if
          end if
-         if (extras_finish_step == terminate) then
-            s% termination_code = t_extras_finish_step
-            return
-         end if
-         if (extras_finish_step /= keep_going) then
-            return
-         end if
+         
          if (.not. s% x_logical_ctrl(7)) return
-         if (s% x_ctrl(7) <= 0d0) return ! must give expected period > 0
-         if (s% v_flag) then
-            v_surf = s% v(1)
-            v_surf_start = s% v_start(1)
-         else if (s% u_flag) then
-            v_surf = s% u_face_val(1)
-            v_surf_start = s% u_face_start(1)
-         else
-            stop 'extras_finish_step: both v_flag and u_flag are false'
-         end if
-         if (v_surf/s% csound(1) > period_max_vsurf_div_cs) &
-            period_max_vsurf_div_cs = v_surf/s% csound(1)
-         ! check_cycle_completed when v_surf goes from positive to negative
-         if (v_surf*v_surf_start < 0d0 .and. v_surf > 0d0) then
-            period_r_min = s% r(1)
-            return
-         end if
-         ! at max radius when v_surf goes from positive to negative
-         if (v_surf*v_surf_start > 0d0 .or. v_surf > 0d0) return
-         period_r_max = s% r(1)
-         ! either start of 1st cycle, or end of current
-         if (time_started == 0) then
-            time_started = s% time
+         if (s% x_ctrl(7) <= 0d0) return ! must provide expected period > 0
+         if (.not. get_period_info()) return
+
+         if (num_periods < s% x_integer_ctrl(7) .or. s% x_integer_ctrl(7) <= 0) return
+         ! have finished test run
+         call report_test_results
+         extras_finish_step = terminate
+         
+         contains
+      
+         subroutine get_gyre_info_for_this_step
+            extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+            if (s% ixtra3_array(1) > 0) then ! save the GYRE results
+               do i=1,s% ixtra3_array(1)
+                  if (s% xtra1_array(i) == 0d0 .or. s% ixtra1_array(i) /= s% x_integer_ctrl(4)) cycle
+                  if (best_G_div_P == 0d0 .or. s% xtra1_array(i)/s% xtra2_array(i) < best_G_div_P) then
+                     best_G_div_P = s% xtra1_array(i)/s% xtra2_array(i)
+                     best_growth = s% xtra1_array(i)
+                     best_period = s% xtra2_array(i)
+                     best_model_number = s% model_number
+                  end if
+               end do
+               if (best_period > 0) &
+                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d)', &
+                     best_model_number, best_G_div_P, best_period, best_growth
+            end if
+         end subroutine get_gyre_info_for_this_step
+                  
+         logical function get_period_info()
+         
+            get_period_info = .false.
+         
+            if (s% v_flag) then
+               v_surf = s% v(1)
+               v_surf_start = s% v_start(1)
+            else if (s% u_flag) then
+               v_surf = s% u_face_val(1)
+               v_surf_start = s% u_face_start(1)
+            else
+               stop 'extras_finish_step: both v_flag and u_flag are false'
+            end if
+            if (v_surf/s% csound(1) > period_max_vsurf_div_cs) &
+               period_max_vsurf_div_cs = v_surf/s% csound(1)
+         
+         
+            ! period is completed when v_surf goes from positive to negative
+            if (v_surf*v_surf_start > 0d0 .or. v_surf > 0d0) return
+         
+            ! either start of 1st cycle, or end of current
+            if (time_started == 0) then
+            
+               time_started = s% time
+               prev_cycle_run_num_steps = s% model_number
+               run_num_iters_prev_period = s% total_num_solver_iterations
+               run_num_retries_prev_period = s% num_retries
+               
+               call init_min_max_info
+            
+            
+               write(*,*) 'first maximum radius, period calculations starting at model, day', &
+                  s% model_number, s% time/(24*3600)
+               return
+            end if
+         
+            if (s% r(1) < period_R_min) period_R_min = s% r(1)
+            if (s% r(1) > period_R_max) period_R_max = s% r(1)
+            if (s% L(1) < period_L_min) period_L_min = s% L(1)
+            if (s% L(1) > period_L_max) period_L_max = s% L(1)
+            if (s% Teff < period_T_min) period_T_min = s% Teff
+            if (s% Teff > period_T_max) period_T_max = s% Teff
+
+            KE = s% total_radial_kinetic_energy_end
+            if (KE > KE_max) KE_max = KE
+            if (KE < KE_min) KE_min = KE
+
+            if (min_deltaR_for_periods > 0d0 .and. &
+                period_R_max - period_R_min < min_deltaR_for_periods*Rsun) return ! filter out glitches
+         
+            time_ended = s% time
+            if (abs(v_surf - v_surf_start) > 1d-10) & ! tweak the end time to match when v_surf == 0
+               time_ended = s% time - v_surf*s% dt/(v_surf - v_surf_start)
+            min_period = target_period*(24*3600)*min_period_div_target
+            if (min_period > 0d0 .and. &
+                time_ended - time_started < min_period) return ! filter out glitches
+
+            period = time_ended - time_started
+            num_periods = num_periods + 1
+         
+            if (num_periods > 1) then
+               KE_avg = 0.5d0*(KE_max + prev_KE_max)
+               KE_growth = (KE_max - prev_KE_max)/KE_avg
+               KE_growth_avg_abs = KE_growth_avg_abs_frac_new*abs(KE_growth) + &
+                  (1d0 - KE_growth_avg_abs_frac_new)*KE_growth_avg_abs
+            end if
+         
+            period_delta_R = period_R_max - period_R_min
+            period_delta_logL = log10(L_max/L_min)
+            period_delta_Mag = 2.5d0*period_delta_logL
+
+            write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
+               num_periods,'period (d)',  period/(24*3600), &
+               'growth (d)', prev_growth/(24*3600), &
+               'delta R/Rsun', period_delta_R/Rsun, &
+               'max vsurf/cs', period_max_vsurf_div_cs, &
+               'retries', s% num_retries - run_num_retries_prev_period,     &
+               'steps', s% model_number - prev_cycle_run_num_steps, &
+               'avg iters/step',  &
+                  dble(s% total_num_solver_iterations - run_num_iters_prev_period)/ &
+                  dble(s% model_number - prev_cycle_run_num_steps), &
+               'step', s% model_number, 'age (d)', s% time/(24*3600)
+
+            time_started = time_ended
+         
             prev_cycle_run_num_steps = s% model_number
+            prev_period = period
+            prev_period_delta_R = period_delta_R
+            prev_period_max_vsurf_div_cs = period_max_vsurf_div_cs
             run_num_iters_prev_period = s% total_num_solver_iterations
             run_num_retries_prev_period = s% num_retries
-            write(*,*) 'first maximum radius, period calculations start at model, day', &
-               s% model_number, s% time/(24*3600)
-            return
-         end if
-         time_ended = s% time
-         if (abs(v_surf - v_surf_start) > 1d-10) & ! tweak the end time to match when v_surf == 0
-            time_ended = s% time - v_surf*s% dt/(v_surf - v_surf_start)
-         period = time_ended - time_started
-         if (period/(24*3600) < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
-         num_periods = num_periods + 1
+            period_max_vsurf_div_cs = 0d0
+            prev_KE_max = KE_max
+            
          
-         period_delta_r = period_r_max - period_r_min
-         if (period_delta_r > 0d0 .and. prev_period_delta_r > 0d0) then
-            growth = period/log(period_delta_r/prev_period_delta_r) ! seconds
-         else
-            growth = 0d0
-         end if
-         prev_growth = 0.1d0*growth + 0.9d0*prev_growth ! smoothing
-         write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
-            num_periods,'period (d)',  period/(24*3600), &
-            'growth (d)', prev_growth/(24*3600), &
-            'delta R/Rsun', period_delta_r/Rsun, &
-            'max vsurf/cs', period_max_vsurf_div_cs, &
-            'retries', s% num_retries - run_num_retries_prev_period,     &
-            'steps', s% model_number - prev_cycle_run_num_steps, &
-            'avg iters/step',  &
-               dble(s% total_num_solver_iterations - run_num_iters_prev_period)/ &
-               dble(s% model_number - prev_cycle_run_num_steps), &
-            'step', s% model_number, 'age (d)', s% time/(24*3600)
-         time_started = time_ended
-         prev_cycle_run_num_steps = s% model_number
-         prev_period = period
-         prev_period_delta_r = period_delta_r
-         prev_period_max_vsurf_div_cs = period_max_vsurf_div_cs
-         run_num_iters_prev_period = s% total_num_solver_iterations
-         run_num_retries_prev_period = s% num_retries
-         period_max_vsurf_div_cs = 0d0
-         if (num_periods < s% x_integer_ctrl(7) .or. s% x_integer_ctrl(7) <= 0) return
-         write(*,*)
-         write(*,*)
-         write(*,*)
-         target_period = s% x_ctrl(7)
-         rel_run_E_err = s% cumulative_energy_error/s% total_energy
-         write(*,*) 'rel_run_E_err', rel_run_E_err
-         if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
-            write(*,*) '*** BAD rel_run_E_error ***', &
-            s% cumulative_energy_error/s% total_energy
-         else if (abs(period/(24*3600) - target_period) > 1d-2) then
-            write(*,*) '*** BAD period ***', period/(24*3600) - target_period, &
-               period/(24*3600), target_period
-         else
-            write(*,*) 'good match for period', &
-               period/(24*3600), target_period
-         end if
-         write(*,*)
-         write(*,*)
-         write(*,*)
-         extras_finish_step = terminate
+         
+            
+            get_period_info = .true.
+
+         end function get_period_info
+         
+         subroutine init_min_max_info
+            v_div_cs_max = 0d0
+
+            KE_min = 1d99
+            KE_max  = -1d99
+
+            R_min = 1d99
+            R_max = -1d99
+
+            L_min = 1d99
+            L_max = -1d99
+         end subroutine init_min_max_info
+         
+         subroutine report_test_results
+            write(*,*)
+            write(*,*)
+            write(*,*)
+            target_period = s% x_ctrl(7)
+            rel_run_E_err = s% cumulative_energy_error/s% total_energy
+            write(*,*) 'rel_run_E_err', rel_run_E_err
+            if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
+               write(*,*) '*** BAD rel_run_E_error ***', &
+               s% cumulative_energy_error/s% total_energy
+            else if (abs(period/(24*3600) - target_period) > 1d-2) then
+               write(*,*) '*** BAD period ***', period/(24*3600) - target_period, &
+                  period/(24*3600), target_period
+            else
+               write(*,*) 'good match for period', &
+                  period/(24*3600), target_period
+            end if
+            write(*,*)
+            write(*,*)
+            write(*,*)
+         end subroutine report_test_results
+         
       end function extras_finish_step
       
       
@@ -595,7 +662,7 @@
          names(3) = 'growth'
          vals(3) = prev_growth/(24*3600)
          names(4) = 'delta_r'
-         vals(4) = prev_period_delta_r/Rsun
+         vals(4) = prev_period_delta_R/Rsun
          names(5) = 'max_vsurf_div_cs'
          vals(5) = prev_period_max_vsurf_div_cs
       end subroutine data_for_extra_history_columns

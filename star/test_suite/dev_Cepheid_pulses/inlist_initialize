@@ -67,9 +67,7 @@
 
 ! GYRE set starting velocities
    x_logical_ctrl(5) = .true. 
-   
-   ! let's try O1 instead of F 
-   x_ctrl(4) = 1d0 ! fraction_1st_overtone
+   x_ctrl(4) = 0d0 ! fraction_1st_overtone
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone
    x_ctrl(6) = 3d0 ! initial vsurf (kms)
    
