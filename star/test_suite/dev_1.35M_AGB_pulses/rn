@@ -11,7 +11,7 @@ do_one inlist_start_header start.mod
 do_one inlist_to_end_core_h_burn_header end_core_h_burn.mod
 
 # check if can skip the slow climb up the red giant branch
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_start_he_core_flash.mod start_he_core_flash.mod
 else
    do_one inlist_to_start_he_core_flash_header start_he_core_flash.mod
