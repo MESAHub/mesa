@@ -10,7 +10,7 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-# set MESA_SKIP_OPTIONAL to run all parts of test
+# set MESA_SKIP_OPTIONAL to skip parts of the test
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
     cp standard_zams.mod zams.mod
 else
