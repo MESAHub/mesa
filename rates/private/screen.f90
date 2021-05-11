@@ -35,7 +35,7 @@
       subroutine do_screen_set_context( &
             sc, temp, den, logT, logRho, zbar, abar, z2bar, &
             screening_mode, num_isos, y, iso_z158)
-         type (Screen_Info), pointer :: sc
+         type (Screen_Info) :: sc
          integer, intent(in) :: num_isos
          real(dp), intent(in) ::  &
             temp, den, logT, logRho, zbar, abar, z2bar,  &
