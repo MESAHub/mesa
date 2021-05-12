@@ -1059,7 +1059,21 @@
 
 !------------------------------ Thermohaline
 
-
+      !> Computes the diffusivity of thermohaline mixing when the
+      !! thermal gradient is stable and the composition gradient is unstable.
+      !!
+      !! @param grada Adiabatic gradient dlnT/dlnP
+      !! @param gradr Radiative temperature gradient dlnT/dlnP, equals the actual gradient because there's no convection
+      !! @param T Temperature
+      !! @param opacity opacity
+      !! @param rho Density
+      !! @param Cp Heat capacity at constant pressure
+      !! @param gradL_composition_term dlnMu/dlnP where Mu is the mean molecular weight.
+      !! @param iso The index of the species that drives thermohaline mixing.
+      !! @param XH1 Mass fraction of H1.
+      !! @param thermohaline_coeff Free parameter multiplying the thermohaline diffusivity.
+      !! @param D_thrm Output, diffusivity.
+      !! @param ierr Output, error index.
       subroutine get_D_thermohaline(s, &
             grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
             iso, XH1, thermohaline_coeff, D_thrm, ierr)
