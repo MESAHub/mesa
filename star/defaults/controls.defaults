@@ -2243,7 +2243,6 @@
 
       ! + ``'Kippenhahn'`` : use method of Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175.
       ! + ``'Traxler_Garaud_Stellmach_11'`` : use method of Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
-      ! + ``'Brown_Garaud_Stellmach_13'`` : use method of Brown, Garaud, & Stellmach, (2013). Recommends ``thermohaline_coeff = 1``, but it can nevertheless be changed.
 
       ! ::
 

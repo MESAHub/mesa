@@ -12,6 +12,7 @@ Backwards-incompatible changes
 
 ``saved_model_name`` has been replaced with ``load_model_filename`` everywhere 
 
+Thermohaline option ``'Brown_Garaud_Stellmach_13'`` was not correctly implemented in MESA/star and has been removed.
 
 Module-level changes
 --------------------
