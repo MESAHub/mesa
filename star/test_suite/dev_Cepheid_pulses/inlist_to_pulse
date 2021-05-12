@@ -27,7 +27,8 @@
 / ! end of kap namelist
 
 !   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
-!    1340       1          0.3309E-06        3021695.7013          50361.5950             34.9733          0.5660E+03          0.1618E+02
+!     708       1          0.1109E-05         901474.7048          15024.5784             10.4337          0.8454E+03          0.8102E+02          0.7404E-01
+!     708       2          0.1631E-05         612984.0325          10216.4005              7.0947          0.2764E+03          0.3896E+02          0.3561E-01
 
 
 &controls
@@ -158,7 +159,7 @@
 
    HR_win_flag = .true.
    
-   HR_title = '5 M\d\(2281)\u  Z=0.007  Cepheid'
+   HR_title = '6 M\d\(2281)\u  Z=0.014  Cepheid'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width

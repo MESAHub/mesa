@@ -1,62 +1,66 @@
 
 &star_job
+   
+   load_saved_model = .true.
+   !change_initial_RSP2_flag = .true.
+   !new_RSP2_flag = .true.
+   save_model_when_terminate = .true.
+   save_model_filename = 'final.mod'
+   
+   change_initial_v_flag = .true.
+   new_v_flag = .true.
 
-      load_saved_model = .true.
-      load_model_filename = 'zams.mod' 
-
-      save_model_when_terminate = .true.
-      save_model_filename = 'near_pulses.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
-
-      set_initial_number_retries = .false.
-
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
-
-      pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 
-
 &eos
-/ !end of eos namelist
-
+/ ! end of eos namelist
 
 &kap
 / ! end of kap namelist
 
+&controls  
 
-&controls
-
-   xa_central_lower_limit_species(1) = 'he4'
-   xa_central_lower_limit(1) = 0.1d0 
-       
-! timesteps
-   !delta_HR_limit = 0.01
-
-! solver
-
-! output controls
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
+! solver   
+   !RSP2_assume_HSE = .true.
+   include_w_in_correction_limits = .true.
+   include_v_in_correction_limits = .false.
+   include_L_in_correction_limits = .false.
+   !RSP2_alfad = 1d0
    
+   steps_before_use_velocity_time_centering = 0
+   include_P_in_velocity_time_centering = .true.
+   include_L_in_velocity_time_centering = .true.
+   use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
+   !use_fixed_Psurf_outer_BC = .true.
+   !fixed_Psurf = 0
+   
+   alt_scale_height_flag = .false.
 
-   photo_interval = 50
-   profile_interval = 100
-   history_interval = 10
-   terminal_interval = 10
-   write_header_frequency = 10
+   tol_max_correction = 1d-8 ! 3d-3
 
-      !photo_interval = 10
+   
+! output
+
+   photo_directory = 'photos2'
+   log_directory = 'LOGS2'
+
+      photo_interval = 500
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 50
+
+      !photo_interval = 50
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
       
-      !max_model_number = 687
+      !max_model_number = 2
 
 ! FOR DEBUGGING
       
@@ -129,40 +133,20 @@
 
 &pgstar
 
-   !pause = .true.
-
-   ! HR window -- lg_L vs. lg_Teff
+   pause = .true.
+   !pause_interval = 100
+   pgstar_interval = 1 ! 10
    
-   pgstar_interval = 2
-
-   HR_win_flag = .true.
+   !Grid2_file_flag = .true.
+   Grid2_file_dir = 'png2'
+   Grid2_file_prefix = 'RSP2'
+   Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
    
-   HR_title = '6 M\d\(2281)\u  Z=0.014  Cepheid'
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
+   !Profile_Panels1_xmin = 50 ! -101D0
+   !Profile_Panels1_xmax = 65 ! -101D0
+   
+   Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
-   HR_win_width = 8
-   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
-
-   ! axis limits -- to override system default selections
-   HR_logT_min = 3.5 ! -101 ! only used if > -100
-   HR_logT_max = 4.35 ! only used if > -100
-   HR_logL_min = 2.85 ! -101 ! only used if > -100
-   HR_logL_max = 3.65 ! -101 ! only used if > -100
-
-   show_HR_classical_instability_strip = .true.
-   !show_HR_target_box = .true.
-   HR_target_n_sigma = -3
-   HR_target_logL = 4.9d0
-   HR_target_logL_sigma = 0.04d0
-   HR_target_logT = 4.4d0
-   HR_target_logT_sigma = 0.02d0
-
-   ! file output
-   !HR_file_flag = .true.
-   HR_file_dir = 'pgstar_out'
-   HR_file_prefix = 'hr'
-   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
-   HR_file_width = -1 ! negative means use same value as for window
-   HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
-         
 / ! end of pgstar namelist

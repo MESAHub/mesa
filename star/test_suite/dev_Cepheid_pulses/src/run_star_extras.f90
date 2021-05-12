@@ -33,7 +33,7 @@
       include 'test_suite_extras_def.inc'
       
       ! GYRE "best" info
-      real(dp) :: best_G_div_P, best_growth, best_period
+      real(dp) :: best_G_div_P, best_growth, best_period, best_4pi_Re_div_Im
       integer :: best_model_number 
 
       ! summary info at time of recently completely period
@@ -132,7 +132,7 @@
             period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
-            best_G_div_P, best_growth, best_period, best_model_number
+            best_G_div_P, best_growth, best_period, best_model_number, best_4pi_Re_div_Im
       end subroutine photo_write
 
 
@@ -146,7 +146,7 @@
             period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
-            best_G_div_P, best_growth, best_period, best_model_number
+            best_G_div_P, best_growth, best_period, best_model_number, best_4pi_Re_div_Im
       end subroutine photo_read
 
       
@@ -187,7 +187,8 @@
             best_G_div_P = 0
             best_growth = 0
             best_period = 0
-            best_model_number = 0                        
+            best_model_number = 0    
+            best_4pi_Re_div_Im = 0                    
          end if
          if (.not. s% x_logical_ctrl(5)) then
             call gyre_init('gyre.in')
@@ -254,12 +255,13 @@
                      best_G_div_P = s% xtra1_array(i)/s% xtra2_array(i)
                      best_growth = s% xtra1_array(i)
                      best_period = s% xtra2_array(i)
+                     best_4pi_Re_div_Im = s% xtra3_array(i)
                      best_model_number = s% model_number
                   end if
                end do
                if (best_period > 0) &
-                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d)', &
-                     best_model_number, best_G_div_P, best_period, best_growth
+                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d) 4Pi*Re/Im', &
+                     best_model_number, best_G_div_P, best_period, best_growth, best_4pi_Re_div_Im
             end if
          end subroutine get_gyre_info_for_this_step
          
@@ -562,7 +564,7 @@
 
          write(*, 100) 'order', 'freq (Hz)', 'P (day)', 'growth (day)', &
             'growth/P', '4*Pi*Re/Im'
-100      format(A8,A16,A16,A14,A12,A16,A14)
+100      format(A8,A16,A16,A14,A12,A16,2A14)
 
          rpar(1) = 0.5d-6 ! freq < this (Hz)
          ipar(1) = s% model_number
@@ -690,7 +692,7 @@
 !                  'growth/P', '4*Pi*Re/Im'
                write(*, 100)  md%n_pg, freq, 1d0/(freq*24*3600), growth, growth*freq*24*3600, &
                   4d0*pi*REAL(cfreq)/AIMAG(cfreq)
-100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,E14.4)
+100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,2E14.4)
             else ! stable
                write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
 110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)

@@ -24,7 +24,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 3d3 ! based on expected period
+      seconds_for_initial_dt = 1d3 ! based on expected period
 
       pgstar_flag = .true.
 
@@ -41,7 +41,7 @@
 
 &controls
    
-   max_timestep = 3d3 ! based on expected period
+   max_timestep = 1d3 ! based on expected period
    
    max_model_number = 10
 

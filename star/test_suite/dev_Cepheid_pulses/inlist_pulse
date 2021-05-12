@@ -23,7 +23,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 3d3 ! based on expected period
+      seconds_for_initial_dt = 1d3 ! based on expected period
 
       pgstar_flag = .true.
 
@@ -44,7 +44,7 @@
 
 &controls
    
-   max_timestep = 3d3 ! based on expected period
+   max_timestep = 1d3 ! based on expected period
 
    !max_model_number = 500000
 
@@ -77,10 +77,10 @@
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
 
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 0.5d0
+   P_theta_for_velocity_time_centering = 0.66d0
 
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 0.5d0
+   L_theta_for_velocity_time_centering = 0.66d0
 
    set_rho_to_dm_div_dV = .false.
    
@@ -202,7 +202,7 @@
 
     !pause = .true.
     !pause_interval = 100
-    pgstar_interval = 5 ! 25
+    pgstar_interval = 25
 
  ! window 1
 
