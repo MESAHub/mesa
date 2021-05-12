@@ -33,8 +33,8 @@
       include 'test_suite_extras_def.inc'
       
       ! GYRE "best" info
-      real(dp) :: best_G_div_P, best_growth, best_period, best_4pi_Re_div_Im
-      integer :: best_model_number 
+      real(dp) :: best_period, best_cycles_to_double
+      integer :: best_model_number, best_order
 
       ! summary info at time of recently completely period
       integer :: num_periods, run_num_steps_end_prev, &
@@ -132,7 +132,7 @@
             period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
-            best_G_div_P, best_growth, best_period, best_model_number, best_4pi_Re_div_Im
+            best_period, best_model_number, best_order, best_cycles_to_double
       end subroutine photo_write
 
 
@@ -146,7 +146,7 @@
             period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
-            best_G_div_P, best_growth, best_period, best_model_number, best_4pi_Re_div_Im
+            best_period, best_model_number, best_order, best_cycles_to_double
       end subroutine photo_read
 
       
@@ -184,11 +184,10 @@
             L_max = 0
             T_min = 0
             T_max = 0
-            best_G_div_P = 0
-            best_growth = 0
             best_period = 0
             best_model_number = 0    
-            best_4pi_Re_div_Im = 0                    
+            best_order = 0
+            best_cycles_to_double = 0                    
          end if
          if (.not. s% x_logical_ctrl(5)) then
             call gyre_init('gyre.in')
@@ -250,18 +249,23 @@
             extras_finish_step = gyre_in_mesa_extras_finish_step(id)
             if (s% ixtra3_array(1) > 0) then ! unpack the GYRE results
                do i=1,s% ixtra3_array(1)
-                  if (s% xtra1_array(i) == 0d0 .or. s% ixtra1_array(i) /= s% x_integer_ctrl(4)) cycle
-                  if (best_G_div_P == 0d0 .or. s% xtra1_array(i)/s% xtra2_array(i) < best_G_div_P) then
-                     best_G_div_P = s% xtra1_array(i)/s% xtra2_array(i)
-                     best_growth = s% xtra1_array(i)
-                     best_period = s% xtra2_array(i)
-                     best_4pi_Re_div_Im = s% xtra3_array(i)
+                  if (s% xtra1_array(i) == 0d0 .or. &
+                     (s% ixtra1_array(i) /= s% x_integer_ctrl(4) .and. s% x_integer_ctrl(4) > 0)) cycle
+                  if (s% xtra3_array(i) > 0d0 .and. &
+                      (best_cycles_to_double == 0d0 .or. s% xtra3_array(i) < best_cycles_to_double)) then
+                     !best_growth = s% xtra1_array(i)
+                     best_period = 1d0/s% xtra2_array(i) ! xtra2_array = freq (s^-1)
+                     best_period = best_period/(24*3600) ! change to days
+                     best_cycles_to_double = s% xtra3_array(i)
+                     best_order = s% ixtra1_array(i)
                      best_model_number = s% model_number
                   end if
                end do
-               if (best_period > 0) &
-                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d) 4Pi*Re/Im', &
-                     best_model_number, best_G_div_P, best_period, best_growth, best_4pi_Re_div_Im
+               if (best_cycles_to_double > 0) &
+                  write(*,'(a38,i6,a8,i2,a12,f12.0,a12,f7.4,a12,f9.4)') &
+                     'best cycles to double: model_number', best_model_number, &
+                     'order', best_order, 'period(s)', 24*3600*best_period, &
+                     'period(d)', best_period, 'cycles', best_cycles_to_double
             end if
          end subroutine get_gyre_info_for_this_step
          
@@ -343,18 +347,19 @@
             run_num_iters_end_prev = s% total_num_solver_iterations
             run_num_retries_end_prev = s% num_retries
             prev_KE_max = KE_max
-
-            write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
-               num_periods,'period (d)',  period/(24*3600), &
-               'growth', KE_growth_avg_abs, &
+            !              periods   KE         deltaR    d logL   d Teff
+            write(*,'(i4, 99(a14,e13.4))')  &
+               num_periods, &
+               'period (d)', period/(24*3600), &
+               'KE growth', KE_growth_avg_abs, &
                'delta R/Rsun', period_delta_R/Rsun, &
+               'delta logL', period_delta_logL, &
+               'delta Teff', period_delta_Teff, &
                'max vsurf/cs', period_max_vsurf_div_cs, &
-               'retries', s% num_retries - run_num_retries_end_prev,     &
-               'steps', s% model_number - run_num_steps_end_prev, &
-               'avg iters/step',  &
+               'steps/cycle', s% model_number - run_num_steps_end_prev, &
+               'iters/step',  &
                   dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
-                  dble(s% model_number - run_num_steps_end_prev), &
-               'step', s% model_number, 'age (d)', s% time/(24*3600)
+                  dble(s% model_number - run_num_steps_end_prev)
 
             time_started = time_ended
             call init_min_max_info
