@@ -131,14 +131,13 @@
                iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
                alpha_semiconvection, s% thermohaline_coeff, &
                mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
-            return
+         else         
+            call Get_results(s, k, MLT_option, &
+               r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
+               iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+               alpha_semiconvection, s% thermohaline_coeff, &
+               mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
          end if
-
-         call Get_results(s, k, MLT_option, &
-            r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
-            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
 
       end subroutine do1_mlt_eval
 
