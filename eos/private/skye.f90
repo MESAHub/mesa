@@ -32,8 +32,8 @@ module skye
          ! Blend parameters
          real(dp) :: big
          real(dp) :: skye_blend_width
-         integer, parameter :: num_points = 8
-         real(dp) :: bounds(8,2)
+         integer, parameter :: num_points = 6
+         real(dp) :: bounds(6,2)
          type (Helm_Table), pointer :: ht
 
          ierr = 0
@@ -42,29 +42,30 @@ module skye
 
          big = 12d0
          skye_blend_width = 0.1d0
+
+         ! Top-left of (rho,T) plane
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = 7.5d0
+         bounds(1,2) = ht% logthi
 
-         bounds(2,1) = 4d0
-         bounds(2,2) = 7.5d0
+         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~10)
+         bounds(2,1) = ht% logdlo
+         bounds(2,2) = max(5d0,log10(1d4 * pow2(zbar)))
 
-         bounds(3,1) = 0.6d0
-         bounds(3,2) = 6.2d0
+         ! Rough ionization density from Jermyn+2021 Equation 53
+         bounds(3,1) = log10(3d0 * abar * pow3(zbar))
+         bounds(3,2) = log10(1d4 * pow2(zbar))
 
-         bounds(4,1) = 4d0
-         bounds(4,2) = 6.2d0
+         ! HELM low-T bound
+         bounds(4,1) = log10(3d0 * abar * pow3(zbar))
+         bounds(4,2) = ht% logtlo
 
-         bounds(5,1) = 4d0
+         ! Lower-right of (rho,T) plane
+         bounds(5,1) = ht% logdhi
          bounds(5,2) = ht% logtlo
 
+         ! Upper-right of (rho,T) plane
          bounds(6,1) = ht% logdhi
-         bounds(6,2) = ht% logtlo
-
-         bounds(7,1) = ht% logdhi
-         bounds(7,2) = ht% logthi
-
-         bounds(8,1) = ht% logdlo
-         bounds(8,2) = ht% logthi
+         bounds(6,2) = ht% logthi
 
          ! Set up auto_diff point
          p(1) = logRho
