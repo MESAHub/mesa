@@ -268,9 +268,20 @@
          logical function get_period_info()
             real(dp) :: v_surf, v_surf_start, KE, KE_avg, min_period, time_ended, &
                delta_R, min_deltaR_for_periods, KE_growth_avg_abs_frac_new, &
-               min_period_div_target
+               min_period_div_target, cs
             include 'formats'
             get_period_info = .false.
+         
+            if (s% r(1) < R_min) R_min = s% r(1)
+            if (s% r(1) > R_max) R_max = s% r(1)
+            if (s% L(1) < L_min) L_min = s% L(1)
+            if (s% L(1) > L_max) L_max = s% L(1)
+            if (s% Teff < T_min) T_min = s% Teff
+            if (s% Teff > T_max) T_max = s% Teff
+            KE = s% total_radial_kinetic_energy_end
+            if (KE > KE_max) KE_max = KE
+            if (KE < KE_min) KE_min = KE
+            
             if (s% v_flag) then
                v_surf = s% v(1)
                v_surf_start = s% v_start(1)
@@ -280,29 +291,23 @@
             else
                stop 'extras_finish_step: both v_flag and u_flag are false'
             end if
-            if (v_surf/s% csound(1) > period_max_vsurf_div_cs) &
-               period_max_vsurf_div_cs = v_surf/s% csound(1)
+            cs = s% csound(1)
+            if (v_surf > v_div_cs_max*cs) v_div_cs_max = v_surf/cs
+               
             ! period is completed when v_surf goes from positive to negative during step
             if (v_surf > 0d0 .or. v_surf_start < 0d0) return
+            
             if (time_started == 0) then ! start of 1st cycle
                time_started = s% time
-               KE_max = 0d0
+               run_num_steps_end_prev = s% model_number
+               run_num_iters_end_prev = s% total_num_solver_iterations
+               run_num_retries_end_prev = s% num_retries
+               prev_KE_max = 0d0
                call init_min_max_info
                write(*,*) 'first maximum radius, period calculations starting at model, day', &
                   s% model_number, s% time/(24*3600)
                return
             end if
-         
-            if (s% r(1) < R_min) R_min = s% r(1)
-            if (s% r(1) > R_max) R_max = s% r(1)
-            if (s% L(1) < L_min) L_min = s% L(1)
-            if (s% L(1) > L_max) L_max = s% L(1)
-            if (s% Teff < T_min) T_min = s% Teff
-            if (s% Teff > T_max) T_max = s% Teff
-
-            KE = s% total_radial_kinetic_energy_end
-            if (KE > KE_max) KE_max = KE
-            if (KE < KE_min) KE_min = KE
             
             delta_R = R_max - R_min
             min_deltaR_for_periods = s% x_ctrl(8)*Rsun
@@ -333,6 +338,11 @@
             period_delta_R = R_max - R_min
             period_delta_logL = log10(L_max/L_min)
             period_delta_Mag = 2.5d0*period_delta_logL
+            period_max_vsurf_div_cs = v_div_cs_max
+            run_num_steps_end_prev = s% model_number
+            run_num_iters_end_prev = s% total_num_solver_iterations
+            run_num_retries_end_prev = s% num_retries
+            prev_KE_max = KE_max
 
             write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
                num_periods,'period (d)',  period/(24*3600), &
@@ -353,10 +363,6 @@
          end function get_period_info
          
          subroutine init_min_max_info
-            run_num_steps_end_prev = s% model_number
-            run_num_iters_end_prev = s% total_num_solver_iterations
-            run_num_retries_end_prev = s% num_retries
-            prev_KE_max = KE_max
             v_div_cs_max = 0d0
             KE_min = 1d99
             KE_max  = -1d99

@@ -1926,6 +1926,7 @@
          if (force_timestep > 0) s% dt = force_timestep
          
          s% dt_start = s% dt
+         s% time_step = s% dt/secyer
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
@@ -2293,6 +2294,7 @@
 
          retry_factor = s% timestep_factor_for_retries
          s% dt = s% dt*retry_factor
+         s% time_step = s% dt/secyer
          if (len_trim(s% retry_message) > 0) then
             if (s% retry_message_k > 0) then
                write(*,'(a, 2i8)') ' retry: ' // trim(s% retry_message), s% retry_message_k, s% model_number
@@ -2320,7 +2322,10 @@
 
          if (s% max_years_for_timestep > 0) &
             s% max_timestep = secyer*s% max_years_for_timestep
-         if (s% max_timestep > 0) s% dt = min(s% dt, s% max_timestep)
+         if (s% max_timestep > 0 .and. s% dt > s% max_timestep) then
+            s% dt = s% max_timestep
+            s% time_step = s% dt/secyer
+         end if
 
          call set_current_to_old(s)
          

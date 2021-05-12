@@ -1300,7 +1300,7 @@
             case(h_log_dt)
                val = safe_log10(s% time_step)
             case(h_time_step_sec)
-               val = s% time_step*secyer
+               val = s% dt
             case(h_log_dt_sec)
                val = safe_log10(s% time_step*secyer)
             case(h_time_step_days)

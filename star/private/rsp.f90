@@ -711,8 +711,6 @@
          
          ID=ID+1
       
-         !call rsp_dump_for_debug(s)
-         !stop 'rsp_dump_for_debug'
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
@@ -724,6 +722,7 @@
             write(*,1) 'rsp_period', s% rsp_period
             write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
             write(*,1) 'max_timestep_factor', s% max_timestep_factor
+            write(*,1) 'rsp_period/RSP_target_steps_per_cycle/', s% rsp_period/s% RSP_target_steps_per_cycle
             stop 'do1_step 1'
          end if
 
