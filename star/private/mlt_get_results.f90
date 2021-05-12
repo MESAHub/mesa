@@ -115,19 +115,18 @@
          Cp = get_Cp_face(s,k)
          iso = s% dominant_iso_for_thermohaline(k)
          XH1 = s% xa(s% net_iso(ih1),k)
-         alpha_semiconvection = s% alpha_semiconvection
          
          if (s% use_other_mlt_results) then
             call s% other_mlt_results(s% id, k, MLT_option, &
                r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
                iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-               alpha_semiconvection, s% thermohaline_coeff, &
+               s% alpha_semiconvection, s% thermohaline_coeff, &
                mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
          else         
             call Get_results(s, k, MLT_option, &
                r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
                iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-               alpha_semiconvection, s% thermohaline_coeff, &
+               s% alpha_semiconvection, s% thermohaline_coeff, &
                mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
          end if
 
