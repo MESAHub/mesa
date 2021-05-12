@@ -534,13 +534,11 @@
          end subroutine set_semiconvection
         
          subroutine set_thermohaline
-            real(dp), parameter :: min_D_th = 1d-3
             real(dp) :: D_thrm
             call get_D_thermohaline(s, &
                grada%val, gradr%val, T%val, opacity%val, rho%val, &
                Cp%val, gradL_composition_term, &
                iso, XH1, thermohaline_coeff, D_thrm, ierr)
-            if (D_thrm < min_D_th) return
             D = D_thrm
             gradT = gradr
             Y_face = gradT - grada
