@@ -1319,7 +1319,7 @@
          iter = 0
          err = 0d0
          errold = 0d0
-         !Save input guess (probably not necessary here but useful in other routines)
+         !Save input guess
          x1_sav = xrk(1)
          x2_sav = xrk(2)
 
