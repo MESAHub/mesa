@@ -1093,7 +1093,6 @@
                D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
             else ! if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
                D_thrm = K_mu*(Numu(R0,r_th,pr,tau) - 1d0)
-               ! evbauer 07/18: changed from K_mu*Numu(R0,r_th,pr,tau), Pascale signed off
             endif
          else
             D_thrm = 0
@@ -1363,7 +1362,6 @@
             endif
          enddo
          
-         !if(iter.eq.niter) write(*,2) 'Failed to converge'
          return
       end subroutine NR
 
