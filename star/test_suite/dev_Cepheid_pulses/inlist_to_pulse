@@ -26,15 +26,11 @@
 &kap
 / ! end of kap namelist
 
-!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
-!     708       1          0.1109E-05         901474.7048          15024.5784             10.4337          0.8454E+03          0.8102E+02          0.7404E-01
-!     708       2          0.1631E-05         612984.0325          10216.4005              7.0947          0.2764E+03          0.3896E+02          0.3561E-01
-
 
 &controls
 
    log_Teff_lower_limit = 3.68
-   max_model_number = 708          ! comment out on 1st pass when searching for best
+   max_model_number = 702          ! comment out on 1st pass when searching for best
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -55,7 +51,8 @@
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
    x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
    x_integer_ctrl(3) = 0 ! mode_l
-   x_integer_ctrl(4) = 1 ! report info for min growth/period for this order
+   x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
+      ! < 0 means report best over all gyre results for any order
 
 ! output controls
    num_trace_history_values = 3
