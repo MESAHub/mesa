@@ -266,6 +266,14 @@
          real(dp) :: &
             gradT_excess_f1, &
             gradT_excess_f2, &
+            gradT_excess_age_fraction, &
+            gradT_excess_max_change, &
+            gradT_excess_lambda1, &
+            gradT_excess_beta1, &
+            gradT_excess_lambda2, &
+            gradT_excess_beta2, &
+            gradT_excess_dlambda, &
+            gradT_excess_dbeta, &
             gradT_excess_max_center_h1, &
             gradT_excess_min_center_he4, &
             gradT_excess_max_logT, &
@@ -809,7 +817,8 @@
             include_L_in_velocity_time_centering, &
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
-            
+         real(dp) :: P_theta_for_velocity_time_centering, &
+            L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
          real(dp) :: &

@@ -401,23 +401,21 @@
          subroutine setup_dt_dLt_dm_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr            
             type(auto_diff_real_star_order1) :: Lt_00, Lt_p1, dLt_ad
-            real(dp) :: Lt_00_start, Lt_p1_start
-            logical :: time_centering
+            real(dp) :: Lt_00_start, Lt_p1_start, L_theta
             include 'formats'
             ierr = 0
-            time_centering = &
-               s% using_velocity_time_centering .and. &
-               s% include_L_in_velocity_time_centering
-            Lt_00 = s% Lt_ad(k) ! compute_Lt(s, k, ierr)
-            if (ierr /= 0) return
-            if (time_centering) Lt_00 = 0.5d0*(Lt_00 + s% Lt_start(k))
+            if (s% using_velocity_time_centering .and. &
+                     s% include_L_in_velocity_time_centering) then
+               L_theta = s% L_theta_for_velocity_time_centering
+            else
+               L_theta = 1d0
+            end if
+            Lt_00 = L_theta*s% Lt_ad(k) + (1d0 - L_theta)*s% Lt_start(k)
             if (k == s% nz) then
                Lt_p1 = 0d0
             else
-               !Lt_p1 = shift_p1(compute_Lt(s, k+1, ierr))
-               Lt_p1 = shift_p1(s% Lt_ad(k+1))
+               Lt_p1 = L_theta*shift_p1(s% Lt_ad(k+1)) + (1d0 - L_theta)*s% Lt_start(k+1)
                if (ierr /= 0) return
-               if (time_centering) Lt_p1 = 0.5d0*(Lt_p1 + s% Lt_start(k+1))
             end if
             dt_dLt_dm_ad = (Lt_00 - Lt_p1)*s%dt/s%dm(k)
          end subroutine setup_dt_dLt_dm_ad

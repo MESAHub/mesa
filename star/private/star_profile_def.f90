@@ -506,11 +506,10 @@
       integer, parameter :: p_log_conv_vel = p_log_sig_mix + 1
       integer, parameter :: p_conv_vel_div_L_vel = p_log_conv_vel + 1
       integer, parameter :: p_conv_vel_div_csound = p_conv_vel_div_L_vel + 1
-      integer, parameter :: p_log_tau_conv_yrs = p_conv_vel_div_csound + 1
-      integer, parameter :: p_mixing_type = p_log_tau_conv_yrs + 1
-      integer, parameter :: p_conv_mixing_type = p_mixing_type + 1
+      integer, parameter :: p_mix_type = p_conv_vel_div_csound + 1
+      integer, parameter :: p_mixing_type = p_mix_type + 1
 
-      integer, parameter :: p_log_mlt_D_mix = p_conv_mixing_type + 1
+      integer, parameter :: p_log_mlt_D_mix = p_mixing_type + 1
       integer, parameter :: p_log_cp_T_div_t_sound = p_log_mlt_D_mix + 1
       integer, parameter :: p_log_t_thermal = p_log_cp_T_div_t_sound + 1
       integer, parameter :: p_log_t_sound = p_log_t_thermal + 1
@@ -715,7 +714,9 @@
       integer, parameter :: p_mtx_solve = p_num_steps + 1
       integer, parameter :: p_mtx_factor = p_mtx_solve + 1
 
-      integer, parameter :: p_tau_conv = p_mtx_factor + 1
+      integer, parameter :: p_log_dt_div_tau_conv = p_mtx_factor + 1
+      integer, parameter :: p_dt_div_tau_conv = p_log_dt_div_tau_conv + 1
+      integer, parameter :: p_tau_conv = p_dt_div_tau_conv + 1
       integer, parameter :: p_tau_qhse = p_tau_conv + 1
       integer, parameter :: p_tau_epsnuc = p_tau_qhse + 1
       integer, parameter :: p_tau_cool = p_tau_epsnuc + 1
@@ -1210,8 +1211,8 @@
          profile_column_name(p_log_conv_vel) = 'log_conv_vel'
          profile_column_name(p_conv_vel_div_csound) = 'conv_vel_div_csound'
          profile_column_name(p_conv_vel_div_L_vel) = 'conv_vel_div_L_vel'
-         profile_column_name(p_conv_mixing_type) = 'conv_mixing_type'
-         profile_column_name(p_log_tau_conv_yrs) = 'log_tau_conv_yrs'
+
+         profile_column_name(p_mix_type) = 'mix_type'
          profile_column_name(p_mixing_type) = 'mixing_type'
          profile_column_name(p_log_mlt_D_mix) = 'log_mlt_D_mix'
          profile_column_name(p_log_cp_T_div_t_sound) = 'log_cp_T_div_t_sound'
@@ -1428,6 +1429,8 @@
          profile_column_name(p_log_du_kick_div_du) = 'log_du_kick_div_du'
          profile_column_name(p_max_abs_xa_corr) = 'max_abs_xa_corr'
 
+         profile_column_name(p_log_dt_div_tau_conv) = 'log_dt_div_tau_conv'
+         profile_column_name(p_dt_div_tau_conv) = 'dt_div_tau_conv'
          profile_column_name(p_tau_conv) = 'tau_conv'
          profile_column_name(p_tau_qhse) = 'tau_qhse'
          profile_column_name(p_tau_epsnuc) = 'tau_epsnuc'

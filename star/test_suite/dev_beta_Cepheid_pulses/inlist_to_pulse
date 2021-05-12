@@ -2,11 +2,12 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'start.mod' 
+      load_model_filename = 'near_pulses.mod' 
 
       save_model_when_terminate = .true.
       save_model_filename = 'pulse.mod'
-      required_termination_code_string = 'max_model_number'
+      required_termination_code_string(1) = 'log_Teff_lower_limit'
+      required_termination_code_string(2) = 'max_model_number'
 
       set_initial_number_retries = .false.
 
@@ -17,21 +18,34 @@
 
 / ! end of star_job namelist
 
-
 &eos
 / !end of eos namelist
-
 
 &kap
 / ! end of kap namelist
 
+!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
+!     696       2          0.3705E-04          26993.4125            449.8902              0.3124          0.7809E+01          0.2500E+02
+! after convert
+!     100       2          0.3705E-04          26993.9467            449.8991              0.3124          0.7794E+01          0.2495E+02
+!      40       2          0.4328E-04          23106.5815            385.1097              0.2674          0.7432E+02          0.2779E+03    Tcenter 2e6
+!      10       2          0.3765E-04          26559.0263            442.6504              0.3074          0.7769E+01          0.2528E+02    1e7
+!      10       2          0.3733E-04          26786.6720            446.4445              0.3100          0.7673E+01          0.2475E+02    2e7
+!      10       2          0.3720E-04          26879.9563            447.9993              0.3111          0.7701E+01          0.2475E+02    3e7
+
 
 &controls
 
-   log_Teff_lower_limit = 4.3 ! for 1st pass while looking for best model
-   
+   log_Teff_lower_limit = 4.38 ! for 1st pass while looking for best model
    ! set max_model_number for best growth/period
-   max_model_number = 588 ! 2500
+   max_model_number = 696 ! 2500
+
+! mlt
+   alpha_semiconvection = 0.0
+   
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
     
 ! timesteps
    delta_HR_limit = 0.001
@@ -54,10 +68,10 @@
    trace_history_value_name(3) = 'log_Teff'
    
 
-   photo_interval = 50
+   photo_interval = 10
    profile_interval = 100
    history_interval = 10
-   terminal_interval = 10
+   terminal_interval = 5
    write_header_frequency = 10
 
       photo_interval = 10
@@ -155,18 +169,18 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 4.2 ! -101 ! only used if > -100
-   HR_logT_max = 4.6 ! only used if > -100
-   HR_logL_min = 4.6 ! -101 ! only used if > -100
-   HR_logL_max = 5.2 ! -101 ! only used if > -100
+   HR_logT_min = 4.36 ! -101 ! only used if > -100
+   HR_logT_max = 4.48 ! only used if > -100
+   HR_logL_min = 4.7 ! -101 ! only used if > -100
+   HR_logL_max = 5.0 ! -101 ! only used if > -100
 
    !show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
    HR_target_n_sigma = -3
-   HR_target_logL = 4.9d0
-   HR_target_logL_sigma = 0.04d0
-   HR_target_logT = 4.4d0
-   HR_target_logT_sigma = 0.02d0
+   HR_target_logL = 4.86d0
+   HR_target_logL_sigma = 0.02d0
+   HR_target_logT = 4.42d0
+   HR_target_logT_sigma = 0.005d0
 
    ! file output
    HR_file_flag = .false.

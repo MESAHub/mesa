@@ -1,4 +1,4 @@
- 
+
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
@@ -26,13 +26,20 @@ do_one custom_colors "stop because have dropped below central lower limit for h1
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-# remove from the list while doing long runs    do_one dev_Cepheid_pulses "good match for period" "final.mod" auto   
+
+#  off while testing.    do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
+#  off while testing.    do_one dev_BW_Vul_pulses "good match for period" "final.mod" skip   
+#  off while testing.    do_one dev_Cepheid_pulses "good match for period" "final.mod" skip   
+#  off while testing.    do_one dev_Mira_pulses "good match for period" "final.mod" skip   
+#  off while testing.    do_one dev_RSG_pulses "stop because v_surf/csound_surf > v_div_csound_surf_limit" "final.mod" auto  
+
 do_one dev_rsp2_BEP "good match for period" "final.mod" auto   
 do_one dev_rsp2_BLAP "good match for period" "final.mod" auto 
 do_one dev_rsp2_Cepheid "good match for period" "final.mod" auto   
 do_one dev_rsp2_Delta_Scuti "good match for period" "final.mod" auto 
 do_one dev_rsp2_RR_Lyrae "good match for period" "final.mod" auto   
 do_one dev_rsp2_Type_II_Cepheid "good match for period" "final.mod" auto   
+
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one dev_to_cc_12 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_cc_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
@@ -41,12 +48,14 @@ do_one dev_to_ppisn_100 "stop because fe_core_infall > fe_core_infall_limit" "fi
 do_one dev_to_pisn_200 "stop because remnant_mass <= remnant_mass_min_limit" "final.mod" skip
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
 #    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
+
 do_one gyre_in_mesa_bcep "matched target" skip skip
 do_one gyre_in_mesa_envelope "matched target" skip skip
 do_one gyre_in_mesa_ms "matched target" skip skip
 do_one gyre_in_mesa_rsg "matched target" skip skip                                                       
 do_one gyre_in_mesa_spb "matched target" skip skip
 do_one gyre_in_mesa_wd "matched target" skip skip
+
 do_one hb_2M "termination code: xa_central_lower_limit" "final.mod" auto                                 
 do_one high_mass "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one high_z "stop because have dropped below central lower limit for he4" "final.mod" auto             
@@ -73,6 +82,7 @@ do_one other_physics_hooks "stop because have dropped below central lower limit 
 #   Josiah says skip this one for now   do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
 #   Pablo needs to fix   do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
+
 do_one rsp_BEP "good match for period" "final.mod" skip   
 do_one rsp_BLAP "good match for period" "final.mod" skip 
 do_one rsp_Cepheid "good match for period" "final.mod" skip   
@@ -82,6 +92,7 @@ do_one rsp_gyre "good match for period" skip skip
 do_one rsp_RR_Lyrae "good match for period" "final.mod" skip   
 do_one rsp_save_and_load_file "good match for period" "final.mod" skip   
 do_one rsp_Type_II_Cepheid "good match for period" "final.mod" skip   
+
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip

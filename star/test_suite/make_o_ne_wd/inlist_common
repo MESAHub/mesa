@@ -46,8 +46,6 @@
       alpha_semiconvection = 0.01
       thermohaline_coeff = 2
 
-      okay_to_reduce_gradT_excess = .true.
-
 ! mixing
        overshoot_scheme(1) = 'exponential'
        overshoot_zone_type(1) = 'burn_Z'

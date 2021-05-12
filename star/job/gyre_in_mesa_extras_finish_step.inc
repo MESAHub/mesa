@@ -58,8 +58,8 @@
        
        if (growth_lim > 0d0) then
           write(*, 100) 'model', 'order', 'freq (Hz)', &
-             'P (sec)', 'P (min)', 'P (day)', 'growth (day)', 'growth/P'
-100       format(2A8,7A20)
+             'P (sec)', 'P (min)', 'P (day)', 'growth (day)', 'growth/P', '4Pi*Re/Im'
+100       format(2A8,8A20)
        else
           write(*, 101) 'model', 'order', 'freq (Hz)', &
              'P (sec)', 'P (min)', 'P (day)', '(4pi*im/re)'
@@ -121,8 +121,8 @@
             growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
             period = 1d0/(freq*24*3600)
             write(*, 100) model_number, md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), growth, &
-               growth*freq*24*3600
-100         format(2I8,E20.4,3F20.4,2E20.4)
+               growth*freq*24*3600, 4d0*pi*REAL(cfreq)/(24*3600*AIMAG(cfreq))
+100         format(2I8,E20.4,3F20.4,3E20.4)
             if (freq_okay .and. growth < growth_lim) & ! .and. md%n_pg == order_target) &
                write(*,*) 'matched target frequency'
          else ! stable
@@ -137,6 +137,7 @@
       endif
       s% xtra1_array(num_written) = growth
       s% xtra2_array(num_written) = period
+      s% xtra3_array(num_written) = 4d0*pi*REAL(cfreq)/AIMAG(cfreq)
       s% ixtra1_array(num_written) = md%n_pg
 
       if (write_flag) then

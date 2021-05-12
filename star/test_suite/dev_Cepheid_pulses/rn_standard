@@ -8,10 +8,17 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_start.mod start.mod
+   cp standard_zams.mod zams.mod
 else
-   do_one inlist_start_header start.mod
-   cp start.mod standard_start.mod
+   do_one inlist_to_zams_header zams.mod
+   cp zams.mod standard_zams.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_near_pulses.mod near_pulses.mod
+else
+   do_one inlist_to_near_pulses_header near_pulses.mod
+   cp near_pulses.mod standard_near_pulses.mod
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
@@ -22,13 +29,20 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_envelope.mod envelope.mod
+   cp standard_converted.mod converted.mod
 else
-   do_one inlist_remove_center_header envelope.mod
-   cp envelope.mod standard_envelope.mod
+   do_one inlist_convert_header converted.mod
+   cp converted.mod standard_converted.mod
 fi
 
-do_one inlist_cepheid_header final.mod 
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_initialized.mod initialized.mod
+else
+   do_one inlist_initialize_header initialized.mod
+   cp initialized.mod standard_initialized.mod
+fi
+
+do_one inlist_pulse_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

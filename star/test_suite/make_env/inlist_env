@@ -74,6 +74,9 @@
       gold2_tol_residual_norm3 = 0
       gold2_tol_max_residual3 = 0
 
+      
+
+
 / ! end of controls namelist
 
 

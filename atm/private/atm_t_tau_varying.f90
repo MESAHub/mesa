@@ -127,7 +127,7 @@ contains
             lnT, lnP, ierr)
 
        if (ierr /= 0) then
-          write(*,*) 'Call to eval_data failed in atm_t_tau_varying'
+          write(*,*) 'atm: Call to eval_data failed in atm_t_tau_varying'
           return
        endif
 
@@ -350,7 +350,7 @@ contains
   
     call eval_T_tau(T_tau_id, tau_outer, Teff, lnT, ierr)
     if (ierr /= 0) then
-       write(*,*) 'Call to eval_T_tau failed in eval_data_try'
+       write(*,*) 'atm: Call to eval_T_tau failed in eval_data_try'
        return
     end if
     
@@ -391,7 +391,7 @@ contains
     
     call eval_T_tau(T_tau_id, tau_surf, Teff, lnT, ierr)
     if (ierr /= 0) then
-       write(*,*) 'Call to eval_T_tau failed in eval_data_try'
+       write(*,*) 'atm: Call to eval_T_tau failed in eval_data_try'
        return
     end if
 
@@ -439,7 +439,7 @@ contains
 
       call eval_T_tau(T_tau_id, tau, Teff, lnT, ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eval_T_tau failed in eval_fcn'
+         write(*,*) 'atm: Call to eval_T_tau failed in eval_fcn'
          return
       end if
 
@@ -450,7 +450,7 @@ contains
            lnRho, res, dres_dlnRho, dres_dlnT, &
            ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eos_proc failed in eval_fcn'
+         write(*,*) 'atm: Call to eos_proc failed in eval_fcn'
          return
       end if
 
@@ -461,7 +461,7 @@ contains
             kap, dlnkap_dlnRho, dlnkap_dlnT, &
             ierr)
        if (ierr /= 0) then
-          write(*,*) 'Call to kap_proc failed in eval_fcn'
+          write(*,*) 'atm: Call to kap_proc failed in eval_fcn'
           return
        end if
       
@@ -601,7 +601,7 @@ contains
     call dopri5_work_sizes(NUM_VARS, NRDENS, liwork, lwork)
     allocate(work(lwork), iwork(liwork), stat=ierr)
     if (ierr /= 0) then
-       write(*,*) 'allocate failed in build_T_tau_varying'
+       write(*,*) 'atm: allocate failed in build_T_tau_varying'
        deallocate(atm_structure)
        return
     end if
@@ -641,7 +641,7 @@ contains
          LRPAR, rpar, LIPAR, ipar, & 
          LOUT, idid)
     if (idid < 0) then
-       write(*,*) 'Call to dopri5 failed in build_T_tau_varying: idid=', idid
+       write(*,*) 'atm: Call to dopri5 failed in build_T_tau_varying: idid=', idid
        ierr = -1
     end if
 
@@ -798,7 +798,7 @@ contains
 
       call eval_T_tau(T_tau_id, tau, Teff, lnT, ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eval_T_tau failed in build_data'
+         write(*,*) 'atm: Call to eval_T_tau failed in build_data'
          return
       end if
 
@@ -809,7 +809,7 @@ contains
            lnRho, res, dres_dlnRho, dres_dlnT, &
            ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eos_proc failed in build_data'
+         write(*,*) 'atm: Call to eos_proc failed in build_data'
          return
       end if
 
@@ -820,7 +820,7 @@ contains
             kap, dlnkap_dlnRho, dlnkap_dlnT, &
            ierr)
        if (ierr /= 0) then
-          write(*,*) 'Call to kap_proc failed in build_data'
+          write(*,*) 'atm: Call to kap_proc failed in build_data'
           return
        end if
       
