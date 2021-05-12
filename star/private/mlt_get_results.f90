@@ -95,8 +95,8 @@
             gradT, Y_face, mlt_vc, D, Gamma
          integer, intent(out) :: ierr 
                  
-         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old, alpha_semiconvection, center_h1
-         integer :: iso, old_mix_type, j
+         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
+         integer :: iso, old_mix_type
          type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
          include 'formats'
          ierr = 0
@@ -116,14 +116,6 @@
          iso = s% dominant_iso_for_thermohaline(k)
          XH1 = s% xa(s% net_iso(ih1),k)
          alpha_semiconvection = s% alpha_semiconvection
-
-         ! Check if we're using semiconvection
-         j = s% net_iso(ih1)
-         if (j > 0) then
-            center_h1 = center_avg_x(s,j)
-            if (center_h1 > s% semiconvection_upper_limit_center_h1) alpha_semiconvection = 0
-         end if
-
          
          if (s% use_other_mlt_results) then
             call s% other_mlt_results(s% id, k, MLT_option, &
