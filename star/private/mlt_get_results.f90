@@ -116,14 +116,14 @@
          iso = s% dominant_iso_for_thermohaline(k)
          XH1 = s% xa(s% net_iso(ih1),k)
          alpha_semiconvection = s% alpha_semiconvection
+
+         ! Check if we're using semiconvection
          j = s% net_iso(ih1)
          if (j > 0) then
             center_h1 = center_avg_x(s,j)
-         else
-            center_h1 = 1d99
+            if (center_h1 > s% semiconvection_upper_limit_center_h1) alpha_semiconvection = 0
          end if
 
-         if (center_h1 > s% semiconvection_upper_limit_center_h1) alpha_semiconvection = 0
          
          if (s% use_other_mlt_results) then
             call s% other_mlt_results(s% id, k, MLT_option, &
