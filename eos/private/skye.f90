@@ -53,7 +53,7 @@ module skye
 
          ! Rough ionization density from Jermyn+2021 Equation 53
          bounds(3,1) = log10(3d0 * abar * pow3(zbar))
-         bounds(3,2) = log10(1d4 * pow2(zbar))
+         bounds(3,2) = max(5d0,log10(1d4 * pow2(zbar)))
 
          ! HELM low-T bound
          bounds(4,1) = log10(3d0 * abar * pow3(zbar))
