@@ -343,9 +343,6 @@
             period_delta_logL = log10(L_max/L_min)
             period_delta_Mag = 2.5d0*period_delta_logL
             period_max_vsurf_div_cs = v_div_cs_max
-            run_num_steps_end_prev = s% model_number
-            run_num_iters_end_prev = s% total_num_solver_iterations
-            run_num_retries_end_prev = s% num_retries
             prev_KE_max = KE_max
             !              periods   KE         deltaR    d logL   d Teff
             write(*,'(i4, 99(a14,e13.4))')  &
@@ -362,6 +359,9 @@
                   dble(s% model_number - run_num_steps_end_prev)
 
             time_started = time_ended
+            run_num_steps_end_prev = s% model_number
+            run_num_iters_end_prev = s% total_num_solver_iterations
+            run_num_retries_end_prev = s% num_retries
             call init_min_max_info
             get_period_info = .true.
 
@@ -439,7 +439,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 8
+         how_many_extra_history_columns = 9
       end function how_many_extra_history_columns
       
       
@@ -462,6 +462,7 @@
          names(i) = 'delta_Teff'; vals(i) = period_delta_Teff; i=i+1
          names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
          names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
+         names(i) = 'cycles2dbl'; vals(i) = best_cycles_to_double; i=i+1
       end subroutine data_for_extra_history_columns
 
 
@@ -573,9 +574,9 @@
          !write(*,*) 'call gyre_set_model'
          call gyre_set_model(global_data, point_data, 101)
 
-         write(*, 100) 'order', 'freq (Hz)', 'P (day)', 'growth (day)', &
-            'growth/P', '4*Pi*Re/Im'
-100      format(A8,A16,A16,A14,A12,A16,2A14)
+          write(*, 100) 'order', 'freq (Hz)', &
+             'P (sec)', 'P (day)', 'growth (day)', 'cycles to double'
+100       format(A8,8A20)
 
          rpar(1) = 0.5d-6 ! freq < this (Hz)
          ipar(1) = s% model_number
@@ -638,7 +639,7 @@
          do i=nz-1,1,-1
             k = nz+1-i ! v(1) from gyre => vel(nz) in star
             vel(k) = v1*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
-            write(*,2) 'vel', k, vel(k)
+            !write(*,2) 'vel', k, vel(k)
          end do
          vel(1) = vel(2)
          s% v_center = 0d0
@@ -680,7 +681,7 @@
             character(LEN=128) :: filename
             integer               :: unit, k, model_number, order_target, num_written, max_to_write
             complex(dp)           :: cfreq
-            real(dp)              :: freq, growth, freq_lim
+            real(dp)              :: freq, growth, freq_lim, per
             logical               :: write_flag
             type(grid_t)          :: gr
 
@@ -696,17 +697,21 @@
 
             cfreq = md% freq('HZ')
             freq = REAL(cfreq)
+            growth = AIMAG(cfreq)
+            if (freq /= 0d0) then
+               per = 1d0/freq
+            else
+               per = 0d0
+            end if
 
-            if (AIMAG(cfreq) > 0._dp) then ! unstable
-               growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
-!               write(*, 100) 'order', 'freq (Hz)', 'P (day)', 'growth (day)', &
-!                  'growth/P', '4*Pi*Re/Im'
-               write(*, 100)  md%n_pg, freq, 1d0/(freq*24*3600), growth, growth*freq*24*3600, &
-                  4d0*pi*REAL(cfreq)/AIMAG(cfreq)
-100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,2E14.4)
+            if (growth > 0._dp) then ! unstable
+               write(*, 100) md%n_pg, &
+                  freq, per, per/(24*3600), growth*(24*3600), freq/(2d0*pi*growth)
+100            format(I8,E20.4,2F20.4,E20.4,F20.4)
             else ! stable
-               write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
-110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)
+               write(*, 110) md%n_pg, &
+                  freq, per, per/(24*3600), growth*(24*3600), 'stable'
+110            format(I8,E20.4,2F20.4,E20.4,A20)
             end if
             
             if (md%n_pg > modes) return

@@ -29,8 +29,8 @@
 
 &controls
 
-   log_Teff_lower_limit = 3.68
-   max_model_number = 702          ! comment out on 1st pass when searching for best
+   log_Teff_lower_limit = 3.73
+   !max_model_number = 702          ! comment out on 1st pass when searching for best
 
 ! mlt
    alpha_semiconvection = 0.0
