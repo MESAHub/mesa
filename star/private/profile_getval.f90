@@ -1319,17 +1319,12 @@
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
                val = s% conv_vel(k)/s% csound(k)
-            case (p_log_tau_conv_yrs)
-               if (s% conv_vel(k) > 1d-99) then
-                  val = safe_log10(s% mlt_mixing_length(k)/(4*s% conv_vel(k)*secyer))
-               else
-                  val = -99
-               end if
-            case (p_mixing_type)
+
+            case (p_mix_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)
                int_flag = .true.
-            case (p_conv_mixing_type) ! OBSOLETE
+            case (p_mixing_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)
                int_flag = .true.
@@ -2166,6 +2161,10 @@
                      val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_ad(k)%val))
                end if
                
+            case(p_log_dt_div_tau_conv)
+               val = safe_log10(s% dt/max(1d-20,conv_time_scale(s,k)))
+            case(p_dt_div_tau_conv)
+               val = s% dt/max(1d-20,conv_time_scale(s,k))
             case(p_tau_conv)
                val = conv_time_scale(s,k)
             case(p_tau_qhse)

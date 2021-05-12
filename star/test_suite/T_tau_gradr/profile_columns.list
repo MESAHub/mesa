@@ -356,7 +356,6 @@
 
    !conv_vel ! convection velocity (cm/sec)
    !log_conv_vel ! log10 convection velocity (cm/sec)
-   !log_tau_conv_yrs ! timescale for change of conv velocity
 
    !conv_L_div_L
    !log_conv_L_div_L
