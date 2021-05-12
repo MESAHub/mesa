@@ -1322,6 +1322,9 @@
          x1_sav = xrk(1)
          x2_sav = xrk(2)
 
+         call thermohaline_rhs(xrk,f,j,prandtl,diffratio,R0)    
+         err = dsqrt(f(1)*f(1)+f(2)*f(2))
+
          !While error is too large .and. decreasing, iterate.
          do while ((err.gt.acy).and.(ierr.eq.0).and.(iter.lt.niter))
             call thermohaline_rhs(xrk,f,j,prandtl,diffratio,R0)    
