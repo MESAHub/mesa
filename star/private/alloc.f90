@@ -1281,13 +1281,7 @@
             call do1(s% rmid_start, c% rmid_start)
             if (failed('rmid_start')) exit
             call do1(s% omega_start, c% omega_start)
-            if (failed('omega_start')) exit
-            call do1(s% X_start, c% X_start)
-            if (failed('X_start')) exit
-            call do1(s% Y_start, c% Y_start)
-            if (failed('Y_start')) exit
-            call do1(s% Z_start, c% Z_start)
-            if (failed('Z_start')) exit
+            if (failed('omega_start')) exit=
             call do1(s% ye_start, c% ye_start)
             if (failed('ye_start')) exit
             call do1(s% opacity_start, c% opacity_start)
