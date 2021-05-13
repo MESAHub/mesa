@@ -864,8 +864,6 @@
          real(dp), pointer :: grada_start(:) ! (nz)
          real(dp), pointer :: chiT_start(:) ! (nz)
          real(dp), pointer :: chiRho_start(:) ! (nz)
-         real(dp), pointer :: Cp_start(:) ! (nz)
-         real(dp), pointer :: Cv_start(:) ! (nz)
          real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
          real(dp), pointer :: eta_start(:) ! (nz)
@@ -889,7 +887,7 @@
          real(dp) :: shock_mass_start ! Msun units like shock_mass
          
          ! for Lagrangian time derivatives where k < k_below_just_added
-         real(dp) :: surf_lnT, surf_lnd, surf_lnR, surf_v, surf_lnS
+         real(dp) ::  surf_lnS
          integer :: num_surf_revisions
             
          logical :: have_burner_storage

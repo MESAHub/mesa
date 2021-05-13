@@ -1310,10 +1310,6 @@
             if (failed('chiT_start')) exit
             call do1(s% chiRho_start, c% chiRho_start)
             if (failed('chiRho_start')) exit
-            call do1(s% cp_start, c% cp_start)
-            if (failed('cp_start')) exit
-            call do1(s% Cv_start, c% Cv_start)
-            if (failed('Cv_start')) exit
             call do1(s% dE_dRho_start, c% dE_dRho_start)
             if (failed('dE_dRho_start')) exit
             call do1(s% gam_start, c% gam_start)

@@ -844,9 +844,6 @@
                s% num_surf_revisions < s% max_num_surf_revisions .and. &
                abs(s% lnS(1) - s% surf_lnS) > &
                   s% max_abs_rel_change_surf_lnS*max(s% lnS(1),s% surf_lnS)) then
-            s% surf_lnT = s% lnT(1)
-            s% surf_lnR = s% lnR(1)
-            s% surf_lnd = s% lnd(1)
             if (s% i_v /= 0) s% surf_v = s% v(1)
             if (s% i_u /= 0) s% surf_v = s% u_face_ad(1)%val
             s% surf_lnS = s% lnS(1)
