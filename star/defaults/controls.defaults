@@ -8682,10 +8682,10 @@
       ! max_frac_for_negative_surf_lum
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If true, then scales the correction factor in a Newton iteration to prevent the
-      ! surface from reaching a negative luminosity. If an iteration would require s% L(1)
+      ! If ``.true.``, scales the correction factor in a Newton iteration to prevent the
+      ! surface luminosity from becoming negative. If an iteration would require ``s% L(1)``
       ! to become negative, then the correction is scaled such that the change in surface
-      ! luminosity is -max_frac_for_negative_surf_lum*s% L(1)
+      ! luminosity is ``-max_frac_for_negative_surf_lum*s% L(1)``.
 
       ! ::
 
