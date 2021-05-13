@@ -49,14 +49,14 @@ module skye
 
          ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~10)
          bounds(2,1) = ht% logdlo
-         bounds(2,2) = max(5d0,log10(1d4 * pow2(zbar)))
+         bounds(2,2) = max(5d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
          ! Rough ionization density from Jermyn+2021 Equation 53
-         bounds(3,1) = log10(3d0 * abar * pow3(zbar))
-         bounds(3,2) = max(5d0,log10(1d4 * pow2(zbar)))
+         bounds(3,1) = log10(3d0 * abar * pow3(zbar)) + skye_blend_width
+         bounds(3,2) = max(5d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
          ! HELM low-T bound
-         bounds(4,1) = log10(3d0 * abar * pow3(zbar))
+         bounds(4,1) = log10(3d0 * abar * pow3(zbar)) + skye_blend_width
          bounds(4,2) = ht% logtlo
 
          ! Lower-right of (rho,T) plane
