@@ -27,7 +27,7 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -212,7 +212,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 10
+   pgstar_interval = 25
 
 ! window 1
 
@@ -245,10 +245,15 @@
    
    !Profile_Panels2_show_grid = .true.
 
-   Profile_Panels2_xaxis_name = 'logtau'
+   !Profile_Panels2_xaxis_name = 'logtau'
+   !Profile_Panels2_xaxis_reversed = .true.
+   !Profile_Panels2_xmin = -101d0
+   !Profile_Panels2_xmax = -101D0
+
+   Profile_Panels2_xaxis_name = 'logxm'
    Profile_Panels2_xaxis_reversed = .true.
-   Profile_Panels2_xmin = -101d0
-   Profile_Panels2_xmax = -101D0
+   Profile_Panels2_xmin = -6
+   Profile_Panels2_xmax = -0.1
 
    Profile_Panels2_dymin(4) = 0.02
    
