@@ -20,7 +20,7 @@
       log_L ! log10 luminosity in Lsun units
       Teff
       log_Teff ! log10 effective temperature
-   
+      effective_T
       log_rel_run_E_err
       log_tot_KE
 

@@ -89,7 +89,7 @@
          logical, intent(in) :: restart, &
             want_RSP_model, is_RSP_model, want_RSP2_model, is_RSP2_model
          integer, intent(out) :: ierr
-         integer :: k, i, j, i_u, i_du,  nz, i_Hp
+         integer :: k, i, j,  nz
          real(dp) :: u00, um1, xm, total_radiation
 
          logical, parameter :: dbg = .false.
@@ -98,7 +98,7 @@
 
          ierr = 0
          nz = s% nz
-         s% brunt_B(1:nz) = 0 ! temporary brunt_B for set_vars
+         s% brunt_B(1:nz) = 0 ! temporary proxy for brunt_B
          
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (ierr /= 0) then
@@ -178,29 +178,17 @@
          s% doing_finish_load_model = .false.
 
          if (s% rotation_flag) s% total_angular_momentum = total_angular_momentum(s)
-         
-         
-         
-         
-         
 
-         if (is_RSP_model .and. (.not. want_RSP_model) .and. s% i_Hp /= 0) then
-            ! need to set xh(i_Hp,0) after have called eos to get P
-            i_Hp = s% i_Hp
+         if (is_RSP_model .and. (.not. want_RSP_model) .and. want_RSP2_model) then
             do k=1,s%nz
                s% Hp_face(k) = Hp_face_for_RSP2_val(s, k, ierr)
                if (ierr /= 0) then
                   write(*,*) 'finish_load_model: Hp_face_for_RSP2_val returned ierr', ierr
                   return
                end if
-               s% xh(i_Hp,k) = s% Hp_face(k)
+               s% xh(s%i_Hp,k) = s% Hp_face(k)
             end do
          end if
-         
-         
-         
-         
-         
 
          if (s% RSP_flag) then
             call RSP_setup_part2(s, restart, want_RSP_model, is_RSP_model, ierr)
