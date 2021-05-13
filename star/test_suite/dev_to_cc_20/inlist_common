@@ -88,6 +88,7 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
+      gradT_excess_lambda1 = -1d0 ! full on
 
 ! mixing
       D_omega_mixing_rate = 1d0
@@ -167,7 +168,9 @@
 ! solver
       use_gold2_tolerances = .true.
       use_gold_tolerances = .true.
-      gold_tol_max_residual3 = 1d-4
+      gold2_tol_max_residual2 = 5d-7
+      gold2_tol_max_residual3 = 5d-4
+      gold_tol_max_residual2 = 5d-4
 
       always_use_dedt_form_of_energy_eqn = .true.       
       max_tries_for_implicit_wind = 0      

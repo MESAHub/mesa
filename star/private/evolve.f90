@@ -195,7 +195,6 @@
             call set_to_NaN(s% mesh_adjust_KE_conservation)
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% min_conv_time_scale)
-             call set_to_NaN(s% min_dr_div_cs_start)
             call set_to_NaN(s% mstar_dot_old)
             call set_to_NaN(s% mstar_old)
             call set_to_NaN(s% mx1_bot)
@@ -1137,7 +1136,7 @@
             integer :: nz, k, ierr
             real(dp) :: phase1_sources_and_sinks, phase2_sources_and_sinks, phase2_work, &
                phase1_total_energy_from_mdot, phase2_total_energy_from_mdot, &
-               expected_sum_cell_others, expected_sum_cell_sources, &
+               expected_sum_cell_others, expected_sum_cell_sources, L_theta, &
                diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
                diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
                virial, total_radiation, L_surf, sum_cell_de, sum_cell_detrb, &
@@ -1310,10 +1309,11 @@
             if (.not. s% RSP_flag) then
                if (s% using_velocity_time_centering .and. &
                      s% include_L_in_velocity_time_centering) then
-                  L_surf = 0.5d0*(s% L(1) + s% L_start(1))
+                  L_theta = s% L_theta_for_velocity_time_centering
                else
-                  L_surf = s% L(1)
+                  L_theta = 1d0
                end if
+               L_surf = L_theta*s% L(1) + (1d0 - L_theta)*s% L_start(1)
                total_radiation = dt*(L_surf - s% L_center)
             end if
 
@@ -1779,7 +1779,6 @@
          end if
 
          ! save a few things from start of step that will need later
-         s% min_dr_div_cs_start = min_dr_div_cs(s,k)
          if (s% rotation_flag) then
             s% surf_r_equatorial = s% r_equatorial(1)
          else
@@ -1927,6 +1926,7 @@
          if (force_timestep > 0) s% dt = force_timestep
          
          s% dt_start = s% dt
+         s% time_step = s% dt/secyer
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
@@ -2294,6 +2294,7 @@
 
          retry_factor = s% timestep_factor_for_retries
          s% dt = s% dt*retry_factor
+         s% time_step = s% dt/secyer
          if (len_trim(s% retry_message) > 0) then
             if (s% retry_message_k > 0) then
                write(*,'(a, 2i8)') ' retry: ' // trim(s% retry_message), s% retry_message_k, s% model_number
@@ -2321,7 +2322,10 @@
 
          if (s% max_years_for_timestep > 0) &
             s% max_timestep = secyer*s% max_years_for_timestep
-         if (s% max_timestep > 0) s% dt = min(s% dt, s% max_timestep)
+         if (s% max_timestep > 0 .and. s% dt > s% max_timestep) then
+            s% dt = s% max_timestep
+            s% time_step = s% dt/secyer
+         end if
 
          call set_current_to_old(s)
          

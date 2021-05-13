@@ -37,7 +37,7 @@
    logL ! log(max(1d-6,L/Lsun))
    velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    entropy ! specific entropy divided by (avo*kerg)
-   conv_mixing_type ! mixing types are defined in mesa/const
+   mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    v_div_csound ! velocity divided by sound speed
    total_energy ! v^2/2 - G m / r + E (ergs/g).  negative if bound

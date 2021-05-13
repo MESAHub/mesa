@@ -584,13 +584,13 @@
       ! stop_if_this_file_exists
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! At each step, the code will try to open this file.
+      ! Every 100 steps, the code will try to open this file.
       ! If the file exists, it will terminate the run.
       ! If the file doesn't exist, it will keep going.
 
       ! ::
 
-    stop_if_this_file_exists = ''
+    stop_if_this_file_exists = 'stop_if_this_file_exists'
 
 ! modifications to model
 ! ======================

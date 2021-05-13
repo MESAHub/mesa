@@ -3,7 +3,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      load_model_filename = '20M.mod' ! from make_zams_high_mass
+      load_model_filename = '20M.mod' ! from make_zams
 
       change_initial_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'

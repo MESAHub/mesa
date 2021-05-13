@@ -3432,7 +3432,8 @@
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
             Ptrb_start = s% RSP2_alfap*get_etrb_start(s,k)*s% rho_start(k)
-            Ptrb = 0.5d0*(Ptrb + Ptrb_start)
+            Ptrb = s% P_theta_for_velocity_time_centering*Ptrb + &
+               (1d0 - s% P_theta_for_velocity_time_centering)*Ptrb_start
          end if
 
          if (is_bad(Ptrb%val)) then
@@ -3465,7 +3466,7 @@
          real(dp), dimension(s% species), intent(out) :: d_Ptot_dxa
          integer, intent(out) :: ierr
          integer :: j
-         real(dp) :: mlt_Pturb_start
+         real(dp) :: mlt_Pturb_start, alfa, beta
          type(auto_diff_real_star_order1) :: &
             Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
          logical :: time_center
@@ -3476,14 +3477,20 @@
          
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
+         if (time_center) then
+            alfa = s% P_theta_for_velocity_time_centering
+         else
+            alfa = 1d0
+         end if
+         beta = 1d0 - alfa
          
          Peos_ad = 0d0         
          if (.not. skip_Peos) then
             Peos_ad = wrap_peos_00(s, k)
-            if (time_center) Peos_ad = 0.5d0*(Peos_ad + s% Peos_start(k))
+            Peos_ad = alfa*Peos_ad + beta*s% Peos_start(k)
             do j=1,s% species
                d_Ptot_dxa(j) = s% Peos(k)*s% dlnPeos_dxa_for_partials(j,k)
-               if (time_center) d_Ptot_dxa(j) = 0.5d0*d_Ptot_dxa(j)
+               d_Ptot_dxa(j) = alfa*d_Ptot_dxa(j)
             end do
          end if
 
@@ -3491,7 +3498,7 @@
          if (s% use_Pvsc_art_visc) then
             call get_Pvsc_ad(s, k, Pvsc_ad, ierr)
             if (ierr /= 0) return
-            if (time_center) Pvsc_ad = 0.5d0*(Pvsc_ad + s% Pvsc_start(k))
+            Pvsc_ad = alfa*Pvsc_ad + beta*s% Pvsc_start(k)
          end if
          
          Ptrb_ad = 0d0
@@ -3507,7 +3514,7 @@
             if (time_center) then
                mlt_Pturb_start = &
                   s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
-               mlt_Pturb_ad = 0.5d0*(mlt_Pturb_ad + mlt_Pturb_start)
+               mlt_Pturb_ad = alfa*mlt_Pturb_ad + beta*mlt_Pturb_start
             end if
          end if           
          
@@ -3847,7 +3854,7 @@
          end if
          if ((.not. prev_using_TDC) .and. s% using_TDC) then
             write(*,*)
-            write(*,2) 'turn on TDC', s% model_number
+            write(*,2) 'turn on TDC at model number', s% model_number
          end if
       end subroutine set_using_TDC
       

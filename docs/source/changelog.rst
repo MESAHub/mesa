@@ -12,6 +12,9 @@ Backwards-incompatible changes
 
 ``saved_model_name`` has been replaced with ``load_model_filename`` everywhere 
 
+Thermohaline option ``'Brown_Garaud_Stellmach_13'`` was not correctly implemented in MESA/star and has been removed.
+
+Removed option `semiconvection_upper_limit_center_h1`. This can be implemented by setting `s% alpha_semiconvection` in `run_star_extras.f90/extras_start_step`.
 
 Module-level changes
 --------------------

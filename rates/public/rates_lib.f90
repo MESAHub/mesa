@@ -726,7 +726,7 @@
          ! with equations (4-215) and (4-221) of Clayton (1968).
          use rates_def
          use math_lib
-         type (Screen_Info), pointer :: sc ! previously setup 
+         type (Screen_Info) :: sc ! previously setup 
          real(dp), intent(in) :: z1, z2
          real(dp), intent(out) :: scor ! screening factor
          real(dp), intent(out) :: scordt ! partial wrt temperature
@@ -810,7 +810,7 @@
             screening_mode, num_isos, y, iso_z158)
          use rates_def
          use screen, only: do_screen_set_context
-         type (Screen_Info), pointer :: sc
+         type (Screen_Info) :: sc
          integer, intent(in) :: num_isos
          real(dp), intent(in) ::  &
                temp, den, logT, logRho, zbar, abar, z2bar, y(:), iso_z158(:)
@@ -834,7 +834,7 @@
          use screen5, only: fxt_screen5
          use screening_chugunov, only: eval_screen_chugunov
          
-         type (Screen_Info), pointer :: sc ! previously setup 
+         type (Screen_Info) :: sc ! previously setup 
          real(dp), intent(in) :: a1, z1, a2, z2
          integer, intent(in) :: screening_mode ! see screen_def.
          ! cached info
