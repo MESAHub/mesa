@@ -822,6 +822,7 @@
          real(dp), pointer :: xa_start(:,:) ! (species,nz)         
          real(dp), pointer :: xa_sub_xa_start(:,:) ! (species,nz)          
          real(dp), pointer :: lnd_start(:) ! (nz)
+         real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: lnPeos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)
