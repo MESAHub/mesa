@@ -1106,13 +1106,6 @@
             call do1(s% gradr, c% gradr)
             if (failed('gradr')) exit
 
-            call do1(s% d_gradT_dln_cvpv0, c% d_gradT_dln_cvpv0)
-            if (failed('d_gradT_dln_cvpv0')) exit
-            call do1(s% d_gradT_dw_div_wc, c% d_gradT_dw_div_wc)
-            if (failed('d_gradT_dw_div_wc')) exit
-            call do1(s% d_gradr_dw_div_wc, c% d_gradr_dw_div_wc)
-            if (failed('d_gradr_dw_div_wc')) exit
-
             call do1(s% grad_density, c% grad_density)
             if (failed('grad_density')) exit
             call do1(s% grad_temperature, c% grad_temperature)

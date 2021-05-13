@@ -373,10 +373,6 @@
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
          
          
-         real(dp), pointer :: d_gradT_dln_cvpv0(:) ! when conv_vel_flag is true
-         real(dp), pointer :: d_gradT_dw_div_wc(:) ! when w_div_wc_flag is true
-         real(dp), pointer :: d_gradr_dw_div_wc(:) ! when w_div_wc_flag is true
-         
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
       ! Convective turbulent velocity w -- when RSP2_flag is true
@@ -923,8 +919,6 @@
          real(dp) :: super_eddington_wind_mdot
          real(dp) :: min_conv_time_scale, max_conv_time_scale, max_QHSE_time_scale
 
-         integer :: start_H_envelope_base_k
-
          integer :: num_solver_iterations ! for this step
          integer :: num_diffusion_solver_iters
          integer :: num_diffusion_solver_steps
@@ -1157,7 +1151,6 @@
          
          logical :: using_revised_net_name
          character (len=net_name_len) :: revised_net_name
-         character (len=net_name_len) :: revised_net_name_old
                   
          integer :: num_extra_profile_cols
          character (len=80), pointer :: extra_profile_col_names(:)

@@ -343,20 +343,6 @@
                s% xa_start(j,k) = s% xa(j,k)
             end do
          end do
-         
-         s% start_H_envelope_base_k = s% nz+1
-         i_h1 = s% net_iso(ih1)
-         if (i_h1 > 0) then
-            ! start_H_envelope_base_k = outermost cell where H1 is not most abundant species
-            do k=1,s% nz
-               j = maxloc(s% xa(1:s% species,k), dim=1)
-               if (j /= i_h1) then
-                  s% start_H_envelope_base_k = k
-                  exit
-               end if
-            end do
-         end if
-         if (s% start_H_envelope_base_k > s% nz) s% start_H_envelope_base_k = 0
 
          call eval_total_energy_integrals(s, &
             s% total_internal_energy_start, &

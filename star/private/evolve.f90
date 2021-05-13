@@ -103,7 +103,6 @@
             s% n_conv_regions = -999
             s% atm_structure_num_pts = -999
             s% generations = -999
-            s% start_H_envelope_base_k = -999
             s% num_solver_iterations = -999
             s% num_diffusion_solver_iters = -999
             s% num_diffusion_solver_steps = -999
@@ -1744,7 +1743,6 @@
             s% surf_r_equatorial = s% r(1)
          end if
          s% starting_T_center = s% T(nz)
-         s% surf_opacity = s% opacity(1)
          s% surf_csound = s% csound(1)
          s% surf_rho = s% rho(1)
          s% prev_Ledd = eval_Ledd(s,ierr)
