@@ -8,7 +8,7 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-do_one inlist_rsp2_header final.mod
+do_one inlist_rsp2_Cepheid_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
