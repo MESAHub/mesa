@@ -282,7 +282,6 @@
          nullify(s% burn_z_conv_region)
 
          s% have_burner_storage = .false.
-         s% burner_storage_sz_per_thread = 0
          s% burner_num_threads = 0
          nullify(s% burner_storage)
 

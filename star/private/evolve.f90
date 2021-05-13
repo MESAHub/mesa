@@ -109,7 +109,6 @@
             s% num_diffusion_solver_steps = -999
             s% num_rotation_solver_steps = -999
             s% result_reason = -999
-            s% burner_storage_sz_per_thread = -999
             s% burner_num_threads = -999
             s% k_below_const_q = -999
             s% k_const_mass = -999

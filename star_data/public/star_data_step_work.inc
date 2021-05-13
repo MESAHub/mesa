@@ -924,7 +924,7 @@
          integer :: num_surf_revisions
             
          logical :: have_burner_storage
-         integer :: burner_storage_sz_per_thread, burner_num_threads
+         integer :: burner_num_threads
          real(dp), pointer :: burner_storage(:)
             
          real(dp), pointer, dimension(:) :: & ! (nz)
