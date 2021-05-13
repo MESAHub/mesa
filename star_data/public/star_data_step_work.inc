@@ -890,7 +890,6 @@
          real(dp), pointer :: ye_start(:) ! (nz)
          real(dp), pointer :: j_rot_start(:) ! (nz)
          real(dp), pointer :: i_rot_start(:) ! (nz)
-         real(dp), pointer :: P_div_rho_start(:)
          real(dp), pointer :: mass_correction_start(:)
          real(dp), pointer :: dxdt_nuc_start(:,:)
          real(dp), pointer :: luminosity_by_category_start(:,:) ! (num_categories,nz)

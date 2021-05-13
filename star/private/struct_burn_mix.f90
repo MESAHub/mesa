@@ -316,7 +316,6 @@
             s% eps_nuc_start(k) = s% eps_nuc(k)
             s% non_nuc_neu_start(k) = s% non_nuc_neu(k)
             s% mass_correction_start(k) = s% mass_correction(k)
-            s% P_div_rho_start(k) = s% Peos(k)/s% rho(k)
             s% Pvsc_start(k) = -1d99
             s% scale_height_start(k) = s% scale_height(k)
             s% gradT_start(k) = s% gradT(k)

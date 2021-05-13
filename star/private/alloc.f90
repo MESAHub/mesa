@@ -1314,8 +1314,6 @@
             if (failed('j_rot_start')) exit
             call do1(s% i_rot_start, c% i_rot_start)
             if (failed('i_rot_start')) exit
-            call do1(s% P_div_rho_start, c% P_div_rho_start)
-            if (failed('P_div_rho_start')) exit
             call do1(s% mass_correction_start, c% mass_correction_start)
             if (failed('mass_correction_start')) exit
             call do1(s% eta_visc_start, c% eta_visc_start)
