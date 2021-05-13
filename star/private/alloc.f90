@@ -1295,8 +1295,6 @@
             call do1(s% conv_vel_start, c% conv_vel_start)
             if (failed('conv_vel_start')) exit
 
-            call do1(s% mlt_mixing_length_start, c% mlt_mixing_length_start)
-            if (failed('mlt_mixing_length_start')) exit
             call do1_integer(s% mlt_mixing_type_start, c% mlt_mixing_type_start)
             if (failed('mlt_mixing_type_start')) exit
             call do1(s% mlt_D_start, c% mlt_D_start)

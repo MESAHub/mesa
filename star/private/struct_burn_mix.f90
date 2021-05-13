@@ -334,7 +334,6 @@
             s% latent_ddlnRho_start(k) = s% latent_ddlnRho(k)
             s% eps_nuc_start(k) = s% eps_nuc(k)
             s% opacity_start(k) = s% opacity(k)
-            s% mlt_mixing_length_start(k) = s% mlt_mixing_length(k)
             s% mlt_mixing_type_start(k) = s% mlt_mixing_type(k)
             s% mlt_D_start(k) = s% mlt_D(k)
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)

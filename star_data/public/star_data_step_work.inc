@@ -916,7 +916,6 @@
          real(dp), pointer :: csound_start(:) ! (nz)
          real(dp), pointer :: tau_start(:) ! (nz)
          real(dp), pointer :: opacity_start(:) ! (nz)
-         real(dp), pointer :: mlt_mixing_length_start(:)
          integer, pointer :: mlt_mixing_type_start(:)
          real(dp), pointer :: mlt_D_start(:) 
          real(dp), pointer :: mlt_Gamma_start(:) 
