@@ -1309,13 +1309,8 @@
             if (failed('non_nuc_neu_start')) exit
             call do2(s% dxdt_nuc_start, c% dxdt_nuc_start, species, null_str)
             if (failed('dxdt_nuc_start')) exit
-
-            call do1(s% scale_height_start, c% scale_height_start)
-            if (failed('scale_height_start')) exit
             call do1(s% grada_start, c% grada_start)
             if (failed('grada_start')) exit
-            call do1(s% grada_face_start, c% grada_face_start)
-            if (failed('grada_face_start')) exit
             call do1(s% chiT_start, c% chiT_start)
             if (failed('chiT_start')) exit
             call do1(s% chiRho_start, c% chiRho_start)
