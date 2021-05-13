@@ -1040,7 +1040,6 @@
          integer, pointer, dimension(:) :: burn_num_iters
 
          integer :: termination_code
-         integer :: boost_mlt_alfa
          integer :: burn_nstep_max
          integer :: burn_nfcn_total
          integer :: dX_nuc_drop_max_k
@@ -1069,7 +1068,6 @@
          ! surface info
          real(dp) :: L_surf_old ! surface luminosity (Lsun units)
          real(dp) :: L_phot_old ! photosphere luminosity (Lsun units)
-         real(dp) :: Lrad_div_Ledd_avg_surf_old
          
          ! convection regions
          integer :: n_conv_regions_old
@@ -1079,11 +1077,7 @@
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration
 
          real(dp) :: total_angular_momentum_old
-         real(dp) :: h1_czb_mass_old ! baryonic (Msun)
-         real(dp) :: he_core_mass_old
-         real(dp) :: co_core_mass_old
          real(dp) :: Teff_old
-         real(dp) :: center_eps_nuc_old
 
          ! For eps_mdot  (source term only used when mdot /= 0)
          real(dp), pointer, dimension(:) :: eps_mdot

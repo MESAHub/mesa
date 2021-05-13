@@ -356,7 +356,6 @@
          
          s% dt = 0d0
          s% mstar_dot = 0d0
-         s% boost_mlt_alfa = 0
 
          s% power_nuc_burn = -1
          s% power_h_burn = -1

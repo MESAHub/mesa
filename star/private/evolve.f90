@@ -115,7 +115,6 @@
             s% k_for_test_CpT_absMdot_div_L = -999
             s% k_below_just_added = -999
             s% termination_code = -999
-            s% boost_mlt_alfa = -999
             s% burn_nstep_max = -999
             s% burn_nfcn_total = -999
             s% dX_nuc_drop_max_k = -999
@@ -139,7 +138,6 @@
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf)
             call set_to_NaN(s% L_surf_old)
-            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
             call set_to_NaN(s% M_center_old)
             call set_to_NaN(s% R_center_old)
             call set_to_NaN(s% Teff_old)
@@ -177,9 +175,7 @@
             call set_to_NaN(s% explicit_mstar_dot)
             call set_to_NaN(s% gradT_excess_max_lambda)
             call set_to_NaN(s% gradT_excess_min_beta)
-            call set_to_NaN(s% h1_czb_mass)            
-            call set_to_NaN(s% h1_czb_mass_old)
-            call set_to_NaN(s% he_core_mass_old)
+            call set_to_NaN(s% h1_czb_mass)    
             call set_to_NaN(s% initial_L_center)
             call set_to_NaN(s% initial_R_center)
             call set_to_NaN(s% initial_timestep)   
