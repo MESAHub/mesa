@@ -210,7 +210,6 @@
             call set_to_NaN(s% power_nonnuc_neutrinos)
             call set_to_NaN(s% power_nuc_burn_old)
             call set_to_NaN(s% power_nuc_neutrinos)
-            call set_to_NaN(s% power_other)
             call set_to_NaN(s% prev_Ledd)
             call set_to_NaN(s% residual_norm)
             call set_to_NaN(s% revised_max_yr_dt_old)
