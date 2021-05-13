@@ -151,7 +151,7 @@ contains
     if (.not. skip_net) then
 
        if (dbg) write(*,*) 'micro: call do_net'
-       call do_net(s, nzlo, nzhi, .false., ierr)
+       call do_net(s, nzlo, nzhi, ierr)
        if (dbg) write(*,*) 'micro: done do_net'
        if (ierr /= 0) then
           if (s% report_ierr) write(*,*) 'do_net returned ierr', ierr

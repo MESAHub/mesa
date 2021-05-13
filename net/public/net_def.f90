@@ -240,14 +240,13 @@
       integer, parameter :: i_burn_caller_id = 1
       integer, parameter :: i_net_handle = 2
       integer, parameter :: i_screening_mode = 3
-      integer, parameter :: i_reuse_rates = 4
-      integer, parameter :: i_net_lwork = 5
-      integer, parameter :: i_eos_handle = 6
-      integer, parameter :: i_sparse_format = 7
-      integer, parameter :: i_clip = 8
-      integer, parameter :: i_ntimes = 9
+      integer, parameter :: i_net_lwork = 4
+      integer, parameter :: i_eos_handle = 5
+      integer, parameter :: i_sparse_format = 6
+      integer, parameter :: i_clip = 7
+      integer, parameter :: i_ntimes = 8
       
-      integer, parameter :: burn_lipar = 9
+      integer, parameter :: burn_lipar = i_ntimes
 
       integer, parameter :: r_burn_temp = 1
       integer, parameter :: r_burn_lgT = 2
@@ -260,7 +259,7 @@
       integer, parameter :: r_burn_prev_lgRho = 9
       integer, parameter :: r_burn_prev_eta = 10
 
-      integer, parameter :: burn_lrpar = 10
+      integer, parameter :: burn_lrpar = r_burn_prev_eta
 
       integer, parameter :: r_burn_const_P_rho = 1
       integer, parameter :: r_burn_const_P_pressure = 2
@@ -271,7 +270,7 @@
       integer, parameter :: r_burn_const_P_init_lnS = 7
       integer, parameter :: r_burn_const_P_lnS = 8
       
-      integer, parameter :: burn_const_P_lrpar = 8
+      integer, parameter :: burn_const_P_lrpar = r_burn_const_P_lnS
 
       logical :: net_test_partials
       real(dp) :: net_test_partials_val, net_test_partials_dval_dx

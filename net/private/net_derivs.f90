@@ -39,12 +39,11 @@
 
       subroutine get_derivs( &
             n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
-            reuse_rate_screened, num_reactions, rate_factors, &
+            num_reactions, rate_factors, &
             symbolic, just_dydt, ierr)
          type (Net_Info), pointer :: n
          real(qp), pointer, intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
-         logical, intent(in) :: reuse_rate_screened
          integer, intent(in) :: num_reactions
          real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
             rate_factors(:)
@@ -116,7 +115,7 @@
          ! Update special rates that depend on the composition
          do i=1,num_reactions
             call update_special_rates(n, dydt, eps_nuc_MeV, i, eta, ye, temp, den, abar, zbar, &
-                     reuse_rate_screened, num_reactions, rate_factors, rtab, itab, &
+                     num_reactions, rate_factors, rtab, itab, &
                      deriv_flgs, symbolic, just_dydt, &
                      ierr)
          end do
@@ -169,7 +168,7 @@
                case (other_kind)
                   call get1_derivs( &
                      n, dydt, eps_nuc_MeV, i, eta, ye, temp, den, abar, zbar, &
-                     reuse_rate_screened, num_reactions, rate_factors, rtab, itab, &
+                     num_reactions, rate_factors, rtab, itab, &
                      deriv_flgs, symbolic, just_dydt, &
                      ierr)
                   i = i+1
@@ -1014,14 +1013,13 @@
 
       subroutine get1_derivs( &
             n, dydt, eps_nuc_MeV, i, eta, ye, temp, den, abar, zbar, &
-            reuse_rate_screened, num_reactions, rate_factors, rtab, itab, &
+            num_reactions, rate_factors, rtab, itab, &
             deriv_flgs, symbolic, just_dydt, ierr)
          use rates_lib, only: eval_n14_electron_capture_rate
          type (Net_Info), pointer :: n
          integer, intent(in) :: i, num_reactions
          real(qp), pointer, intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
-         logical, intent(in) :: reuse_rate_screened
          real(dp), intent(in) :: eta, ye, temp, den, abar, zbar, rate_factors(:)
          integer, pointer, intent(in) :: rtab(:), itab(:)
          logical, pointer :: deriv_flgs(:)
@@ -1434,11 +1432,9 @@
                end if
                if (g% weaklib_ids(weak_id) > 0) then ! > 0 means included in weaklib
 
-                  if (.not. reuse_rate_screened) then
-                     n% rate_screened(i) = n% lambda(weak_id)
-                     n% rate_screened_dT(i) = n % dlambda_dlnT(weak_id) / temp
-                     n% rate_screened_dRho(i) = n% dlambda_dlnRho(weak_id) / den
-                  end if
+                  n% rate_screened(i) = n% lambda(weak_id)
+                  n% rate_screened_dT(i) = n % dlambda_dlnT(weak_id) / temp
+                  n% rate_screened_dRho(i) = n% dlambda_dlnRho(weak_id) / den
 
                   call do_in_out_neu( &
                        n, dydt, eps_nuc_MeV, i, r, &
@@ -1488,10 +1484,9 @@
 
       subroutine eval_ni56_ec_rate( &
             temp, den, ye, eta, zbar, weak_rate_factor, &
-            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, reuse_rate_screened, ierr)       
+            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, ierr)       
          real(dp), intent(in) :: temp, den, ye, eta, zbar, weak_rate_factor
          real(dp), intent(out) :: rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu
-         logical, intent(in) :: reuse_rate_screened
          integer, intent(out) :: ierr
          real(dp) :: dQneu_dlnT, dQneu_dlnRho
          include 'formats'
@@ -1500,16 +1495,15 @@
             temp, ye, den, eta, zbar, &
             weak_rate_factor, rate, d_rate_dlnT, d_rate_dlnRho, Q, &
             Qneu, dQneu_dlnT, dQneu_dlnRho, &
-            reuse_rate_screened, ierr)
+            ierr)
       end subroutine eval_ni56_ec_rate
 
 
       subroutine eval_co56_ec_rate( &
             temp, den, ye, eta, zbar, weak_rate_factor, &
-            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, reuse_rate_screened, ierr)       
+            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu,  ierr)       
          real(dp), intent(in) :: temp, den, ye, eta, zbar, weak_rate_factor
          real(dp), intent(out) :: rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu
-         logical, intent(in) :: reuse_rate_screened
          integer, intent(out) :: ierr
          real(dp) :: dQneu_dlnT, dQneu_dlnRho
          include 'formats'
@@ -1518,7 +1512,7 @@
             temp, ye, den, eta, zbar, &
             weak_rate_factor, rate, d_rate_dlnT, d_rate_dlnRho, Q, &
             Qneu, dQneu_dlnT, dQneu_dlnRho, &
-            reuse_rate_screened, ierr)
+            ierr)
       end subroutine eval_co56_ec_rate
 
 
@@ -1526,7 +1520,7 @@
             id, ir, temp, ye, rho, eta, zbar, weak_rate_factor, &
             rate_out, d_rate_dlnT, d_rate_dlnRho, Q_out, &
             Qneu_out, dQneu_dlnT_out, dQneu_dlnRho_out, &
-            reuse_rate_screened, ierr)       
+            ierr)       
          use rates_def, only: Coulomb_Info
          use rates_lib, only: eval_weak_reaction_info
          integer, intent(in) :: id, ir
@@ -1534,7 +1528,6 @@
          real(dp), intent(out) :: &
               rate_out, d_rate_dlnT, d_rate_dlnRho, Q_out, &
               Qneu_out, dQneu_dlnT_out, dQneu_dlnRho_out
-         logical, intent(in) :: reuse_rate_screened
          integer, intent(out) :: ierr
          
          integer :: ids(1), reaction_id_for_weak_reactions(1)
@@ -1598,11 +1591,10 @@
             stop 'eval1_weak_rate'
          end if
          
-         if (.not. reuse_rate_screened) then
-            rate_out = lambda(1)*weak_rate_factor
-            d_rate_dlnT = dlambda_dlnT(1)*weak_rate_factor
-            d_rate_dlnRho = dlambda_dlnRho(1)*weak_rate_factor
-         end if
+         rate_out = lambda(1)*weak_rate_factor
+         d_rate_dlnT = dlambda_dlnT(1)*weak_rate_factor
+         d_rate_dlnRho = dlambda_dlnRho(1)*weak_rate_factor
+
          
          Q_out = Q(1) 
          Qneu_out = Qneu(1)
@@ -1614,14 +1606,13 @@
 
       subroutine update_special_rates( &
             n, dydt, eps_nuc_MeV, i, eta, ye, temp, den, abar, zbar, &
-            reuse_rate_screened, num_reactions, rate_factors, rtab, itab, &
+            num_reactions, rate_factors, rtab, itab, &
             deriv_flgs, symbolic, just_dydt, ierr)
          use rates_lib, only: eval_n14_electron_capture_rate
          type (Net_Info), pointer :: n
          integer, intent(in) :: i, num_reactions
          real(qp), pointer, intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
-         logical, intent(in) :: reuse_rate_screened
          real(dp), intent(in) :: eta, ye, temp, den, abar, zbar, rate_factors(:)
          integer, pointer, intent(in) :: rtab(:), itab(:)
          logical, pointer :: deriv_flgs(:)

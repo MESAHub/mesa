@@ -214,7 +214,7 @@
             d_dxdt_dx(species,species)
          real(dp), target :: work_ary(lwork), rate_factors_ary(num_reactions)
          real(dp), pointer, dimension(:) :: work, rate_factors
-         logical :: reuse_rate_raw, reuse_rate_screened, skip_jacobian
+         logical :: skip_jacobian
          type (Net_Info), target :: netinfo_target
          type (Net_Info), pointer :: netinfo
          
@@ -246,8 +246,6 @@
 
          screening_mode = extended_screening
          
-         reuse_rate_raw = .false.
-         reuse_rate_screened = .false.
          skip_jacobian = .false.
          
          call net_get( &
@@ -255,7 +253,7 @@
             xa, T, logT, Rho, logRho, & 
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
             rate_factors, weak_rate_factor, & 
-            std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
+            std_reaction_Qs, std_reaction_neuQs, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, & 
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, & 
             screening_mode, &     
