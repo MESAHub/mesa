@@ -1309,8 +1309,6 @@
             if (failed('mlt_D_start')) exit
             call do1(s% mlt_Gamma_start, c% mlt_Gamma_start)
             if (failed('mlt_Gamma_start')) exit
-            call do1(s% mlt_cdc_start, c% mlt_cdc_start)
-            if (failed('mlt_cdc_start')) exit
 
             call do1(s% j_rot_start, c% j_rot_start)
             if (failed('j_rot_start')) exit

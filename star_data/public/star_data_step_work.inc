@@ -928,8 +928,6 @@
          real(dp), pointer :: mlt_D_start(:) 
          real(dp), pointer :: mlt_Gamma_start(:) 
 
-         real(dp), pointer :: mlt_cdc_start(:) 
-
          real(dp) :: shock_mass_start ! Msun units like shock_mass
          real(dp) :: photosphere_opacity_start
          
