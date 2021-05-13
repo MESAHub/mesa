@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# uncomment the following line to run all parts of the test
-# MESA_RUN_OPTIONAL=t
+# uncomment the following line to skip the optional inlists
+# MESA_SKIP_OPTIONAL=t
 
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
@@ -10,14 +10,14 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_create_input.mod create_input.mod
 else
    do_one inlist_create_input_header create_input.mod
    cp create_input.mod standard_create_input.mod
 fi
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_relaxed.mod relaxed.mod
 else
    do_one inlist_start_relax_composition_j_entropy_header relaxed.mod

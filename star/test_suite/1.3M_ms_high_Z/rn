@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# uncomment the following line to run all parts of the test
-# MESA_RUN_OPTIONAL=t
+# uncomment the following line to skip the optional inlists
+# MESA_SKIP_OPTIONAL=t
 
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
@@ -11,7 +11,7 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 # check if can skip building starting model
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_zams_0.040_1.30.mod zams_0.040_1.30.mod
 else
    do_one inlist_zams_header zams_0.040_1.30.mod

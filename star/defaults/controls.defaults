@@ -2199,20 +2199,6 @@
 
     alpha_semiconvection = 0
 
-
-      ! semiconvection_upper_limit_center_h1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Turn off semiconvection when ``center_h1`` > this limit.
-      ! This let's you delay semiconvection until helium burning.
-      ! E.g., you can do overshooting for core hydrogen burning,
-      ! then switch to semiconvection after core h is gone.
-
-      ! ::
-
-    semiconvection_upper_limit_center_h1 = 1d99
-
-
       ! semiconvection_option
       ! ~~~~~~~~~~~~~~~~~~~~~
 

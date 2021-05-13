@@ -139,7 +139,7 @@
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
     redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, okay_to_reduce_gradT_excess, &
-    semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
+    semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
     num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
    gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, gradT_excess_max_change, gradT_excess_lambda1, &
    gradT_excess_beta1, gradT_excess_lambda2, gradT_excess_beta2, gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
@@ -1054,7 +1054,6 @@
  s% redo_conv_for_dr_lt_mixing_length = redo_conv_for_dr_lt_mixing_length
 
  s% alpha_semiconvection = alpha_semiconvection
- s% semiconvection_upper_limit_center_h1 = semiconvection_upper_limit_center_h1
  s% semiconvection_option = semiconvection_option
  s% use_Ledoux_criterion = use_Ledoux_criterion
  s% num_cells_for_smooth_gradL_composition_term = num_cells_for_smooth_gradL_composition_term
@@ -2742,7 +2741,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  redo_conv_for_dr_lt_mixing_length = s% redo_conv_for_dr_lt_mixing_length
 
  alpha_semiconvection = s% alpha_semiconvection
- semiconvection_upper_limit_center_h1 = s% semiconvection_upper_limit_center_h1
  semiconvection_option = s% semiconvection_option
  use_Ledoux_criterion = s% use_Ledoux_criterion
  num_cells_for_smooth_gradL_composition_term = s% num_cells_for_smooth_gradL_composition_term

@@ -245,7 +245,7 @@
 
       ! mixing parameters
 
-         real(dp) :: alpha_semiconvection, semiconvection_upper_limit_center_h1
+         real(dp) :: alpha_semiconvection
          real(dp) :: thermohaline_coeff
          character (len=32) :: &
             thermohaline_option, MLT_option, semiconvection_option
