@@ -37,8 +37,8 @@
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
 
-   x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 4.039d0 ! expected period (in days) 
+   x_integer_ctrl(1) = -10 ! which period to check
+   x_ctrl(1) = 8.39d0 ! expected period (in days) 
 
 / ! end of controls namelist
 
@@ -47,7 +47,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 1 ! 10
+   pgstar_interval = 25 ! 10
 
 ! window 1
 

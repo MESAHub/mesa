@@ -2,7 +2,12 @@
 &star_job
    show_log_description_at_start = .false.
    
-   load_saved_model_for_RSP2 = .true.
+   load_saved_model = .true.
+   load_saved_model = .true.
+   change_initial_RSP2_flag = .true.
+   new_RSP2_flag = .true.
+   
+   !load_saved_model_for_RSP2 = .true.
    load_model_filename = 'cycle10.mod'
    
    save_model_when_terminate = .true.
@@ -30,7 +35,7 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -79,6 +84,7 @@
 ! solver   
    steps_before_use_velocity_time_centering = 0
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
    include_P_in_velocity_time_centering = .true.
    P_theta_for_velocity_time_centering = 1d0
 
@@ -140,10 +146,10 @@
       history_interval = 40
       terminal_interval = 4000
 
-      !photo_interval = 100
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 10
+      !photo_interval = 1000
+      !profile_interval = 4000
+      !history_interval = 40
+      !terminal_interval = 100
 
       !fill_arrays_with_NaNs = .true.
       
@@ -223,7 +229,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 2
+   pgstar_interval = 25
 
 ! window 1
 
@@ -243,7 +249,7 @@
 ! window 2
       
    Grid2_win_flag = .true.
-   Grid2_title = '6 M\d\(2281)\u  Z=0.018  Cepheid'
+   Grid2_title = '6 M\d\(2281)\u  Z=0.018  Cepheid  RSP2'
    
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

@@ -159,7 +159,7 @@ module run_star_extras
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 0
+         how_many_extra_history_columns = 8
       end function how_many_extra_history_columns
       
       
@@ -169,9 +169,19 @@ module run_star_extras
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         integer :: i
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         i = 1
+         names(i) = 'num_periods'; vals(i) = s% RSP_num_periods; i=i+1
+         names(i) = 'period'; vals(i) = s% RSP_period/(24*3600); i=i+1
+         names(i) = 'growth'; vals(i) = s% rsp_GREKM_avg_abs; i=i+1
+         names(i) = 'max_v_div_cs'; vals(i) = 0; i=i+1
+         names(i) = 'delta_R'; vals(i) = s% rsp_DeltaR; i=i+1
+         names(i) = 'delta_Teff'; vals(i) = 0; i=i+1
+         names(i) = 'delta_logL'; vals(i) = s% rsp_DeltaMag/2.5; i=i+1
+         names(i) = 'delta_Mag'; vals(i) = 0; i=i+1
       end subroutine data_for_extra_history_columns
 
       

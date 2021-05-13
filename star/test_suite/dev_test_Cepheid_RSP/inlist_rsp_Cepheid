@@ -26,7 +26,7 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
       
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
    
 / ! end of star_job namelist
 
@@ -44,7 +44,7 @@
 &controls
 
    ! limit max_model_number as part of test_suite
-   max_model_number = 160000000
+   max_model_number = 25580 ! 160000000
 
 ! RSP controls
 
@@ -82,10 +82,16 @@
          RSP_work_period = 5
          RSP_work_filename = 'work.data'
 
+
       photo_interval = 1000
       profile_interval = 4000
       history_interval = 40
       terminal_interval = 4000
+
+      !photo_interval = 1000
+      !profile_interval = 4000
+      !history_interval = 40
+      !terminal_interval = 100
 
 / ! end of controls namelist
 
@@ -93,30 +99,51 @@
 
 &pgstar
 
-      !pause = .true.
+   pause = .true.
+   !pause_interval = 100
+   pgstar_interval = 25
 
-      !pgstar_interval = 20
-         
-      Grid2_win_flag = .true.
+! window 1
 
-      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
+   !Grid1_win_flag = .true.
+   Grid1_title = 'Cepheid Grid Profiles'
+
+   !Grid1_file_flag = .true.
+   Grid1_file_dir = 'png1'
+   Grid1_file_prefix = 'grid1'
+   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+   
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
+   !Profile_Panels1_xmin = 50 ! -101D0
+   !Profile_Panels1_xmax = 65 ! -101D0
+   
+! window 2
       
-      History_Panels1_xaxis_name='star_age_day'
-      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+   Grid2_win_flag = .true.
+   Grid2_title = '6 M\d\(2281)\u  Z=0.018  Cepheid  RSP'
+   
+   History_Panels2_xaxis_name='day'
+   History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-      ! Grid2_file_flag = .true.
-      file_digits = 7
-      Grid2_file_dir = 'png'
-      Grid2_file_prefix = 'grid'
-      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-      
-      !Profile_Panels1_show_grid = .true.
+   ! Grid2_file_flag = .true.
+   file_digits = 7
+   Grid2_file_dir = 'png'
+   Grid2_file_prefix = 'grid2'
+   Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+   
+   !Profile_Panels2_show_grid = .true.
 
-      Profile_Panels1_xaxis_name = 'logtau'
-      Profile_Panels1_xaxis_reversed = .true.
-      Profile_Panels1_xmin = -101D0
-      Profile_Panels1_xmax = -101D0
+   !Profile_Panels2_xaxis_name = 'logtau'
+   !Profile_Panels2_xaxis_reversed = .true.
+   !Profile_Panels2_xmin = -101d0
+   !Profile_Panels2_xmax = -101D0
 
-      Profile_Panels1_dymin(4) = 0.02
+   Profile_Panels2_xaxis_name = 'logxm'
+   Profile_Panels2_xaxis_reversed = .true.
+   Profile_Panels2_xmin = -6
+   Profile_Panels2_xmax = -0.1
+
+   Profile_Panels2_dymin(4) = 0.02
 
 / ! end of pgstar namelist

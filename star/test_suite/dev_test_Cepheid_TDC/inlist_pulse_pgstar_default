@@ -96,10 +96,10 @@
          History_Panels2_num_panels = 2
 
          !History_Panels2_xaxis_name='model_number'
-         History_Panels2_xaxis_name='star_age_day'
+         History_Panels2_xaxis_name='day'
          History_Panels2_max_width = 140 !  200 ! only used if > 0.  causes xmin to move with xmax.
          
-         History_Panels2_yaxis_name(1) = 'effective_T' 
+         History_Panels2_yaxis_name(1) = 'Teff' 
          History_Panels2_yaxis_reversed(1) = .false.
          History_Panels2_ymin(1) = -101d0 ! only used if /= -101d0
          History_Panels2_ymax(1) = -101d0 ! only used if /= -101d0        
