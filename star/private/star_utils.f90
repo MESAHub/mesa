@@ -982,15 +982,6 @@
                if (dbg) write(*,3) 'set_rmid s% rmid(k)', k, s% model_number, s% rmid(k)
                if (s% rmid_start(k) < 0) s% rmid_start(k) = s% rmid(k)
                rmid2 = rmid*rmid
-               s% drmid_dlnR00(k) = 0.5d0*s% r(k)
-               s% drmid2_dlnR00(k) = 2d0*rmid*s% drmid_dlnR00(k)
-               if (k < nz) then
-                  s% drmid_dlnRp1(k) = 0.5d0*s% r(k+1)
-                  s% drmid2_dlnRp1(k) = 2d0*rmid*s% drmid_dlnRp1(k)
-               else
-                  s% drmid_dlnRp1(k) = 0d0
-                  s% drmid2_dlnRp1(k) = 0d0
-               end if
             end do
             return
          end if
@@ -1006,15 +997,6 @@
             s% rmid(k) = rmid
             if (s% rmid_start(k) < 0) s% rmid_start(k) = s% rmid(k)
             rmid2 = rmid*rmid
-            s% drmid_dlnR00(k) = 0.5d0*r003/rmid2
-            s% drmid2_dlnR00(k) = r003/rmid
-            if (k < nz) then
-               s% drmid_dlnRp1(k) = 0.5d0*rp13/rmid2
-               s% drmid2_dlnRp1(k) = rp13/rmid
-            else
-               s% drmid_dlnRp1(k) = 0d0
-               s% drmid2_dlnRp1(k) = 0d0
-            end if
          end do
       end subroutine set_rmid
 

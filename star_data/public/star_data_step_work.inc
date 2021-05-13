@@ -101,8 +101,6 @@
       real(dp), pointer :: chiRho(:) ! dlnPeos_dlnRho at constant T
       real(dp), pointer :: chiT(:) ! dlnPeos_dlnT at constant Rho
       real(dp), pointer :: QQ(:) ! thermal expansion coefficient
-      real(dp), pointer :: d_QQ_dlnd(:)
-      real(dp), pointer :: d_QQ_dlnT(:)
 
       ! eos blend information
       real(dp), pointer :: eos_frac_OPAL_SCVH(:)
@@ -143,10 +141,6 @@
       real(dp), pointer :: gradr_factor(:)
 
       real(dp), pointer :: rmid(:) ! radius at center by mass (cm)
-      real(dp), pointer :: drmid_dlnR00(:) ! partial of rmid(k) wrt lnR(k)
-      real(dp), pointer :: drmid_dlnRp1(:) ! partial of rmid(k) wrt lnR(k+1)
-      real(dp), pointer :: drmid2_dlnR00(:) ! partial of rmid(k)^2 wrt lnR(k)
-      real(dp), pointer :: drmid2_dlnRp1(:) ! partial of rmid(k)^2 wrt lnR(k+1)
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
@@ -887,7 +881,7 @@
          real(dp) :: shock_mass_start ! Msun units like shock_mass
          
          ! for Lagrangian time derivatives where k < k_below_just_added
-         real(dp) ::  surf_lnS
+         real(dp) :: surf_lnS
          integer :: num_surf_revisions
             
          logical :: have_burner_storage
