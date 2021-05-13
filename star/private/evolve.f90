@@ -314,7 +314,6 @@
             call set_to_NaN(s% total_turbulent_energy_start)
             call set_to_NaN(s% v_center_old)
             call set_to_NaN(s% virial_thm_P_avg)
-            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
             call set_to_NaN(s% work_inward_at_center)
             call set_to_NaN(s% work_outward_at_surface)
             call set_to_NaN(s% xmstar_old)

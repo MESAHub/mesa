@@ -1111,7 +1111,6 @@
          real(dp) :: L_surf_old ! surface luminosity (Lsun units)
          real(dp) :: L_phot_old ! photosphere luminosity (Lsun units)
          real(dp) :: Lrad_div_Ledd_avg_surf_old
-         real(dp) :: w_div_w_crit_avg_surf_old
          
          ! convection regions
          integer :: n_conv_regions_old
