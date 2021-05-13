@@ -78,18 +78,18 @@
 
          ! reactions
 
-         integer, pointer :: which_rates(:) 
+         integer, allocatable :: which_rates(:) 
             ! maps reaction id to small integer indicating choice for rate
                   
          integer, pointer :: net_reaction(:) ! maps reaction id to net reaction number
          ! index from 1 to rates_reaction_id_max (in rates_def)   
          ! value is 0 if the reaction is not in the current net
          ! else is value between 1 and num_reactions in current net
-         integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
+         integer, allocatable :: reaction_id(:) ! maps net reaction number to reaction id
          ! index from 1 to num_reactions in current net
          ! value is between 1 and rates_reaction_id_max (in rates_def)     
 
-         integer, pointer :: reaction_kind(:)
+         integer, allocatable :: reaction_kind(:)
 
          integer, pointer :: reaction_reaclib_kind(:)
          integer, pointer :: reverse_id_for_kind_ne_other(:)
@@ -115,12 +115,12 @@
          ! the following is private info for the implementation
          
          ! tables for screen5
-         real(dp), pointer :: zs13(:) ! (num_reactions) ! zs13 = (z1+z2)**(1./3.)
-         real(dp), pointer :: zhat(:) ! (num_reactions)
-         real(dp), pointer :: zhat2(:) ! (num_reactions)
-         real(dp), pointer :: lzav(:) ! (num_reactions)
-         real(dp), pointer :: aznut(:) ! (num_reactions)
-         real(dp), pointer :: zs13inv(:) ! (num_reactions) ! zs13inv = 1 / zs13
+         real(dp), allocatable :: zs13(:) ! (num_reactions) ! zs13 = (z1+z2)**(1./3.)
+         real(dp), allocatable :: zhat(:) ! (num_reactions)
+         real(dp), allocatable :: zhat2(:) ! (num_reactions)
+         real(dp), allocatable :: lzav(:) ! (num_reactions)
+         real(dp), allocatable :: aznut(:) ! (num_reactions)
+         real(dp), allocatable :: zs13inv(:) ! (num_reactions) ! zs13inv = 1 / zs13
    
          ! info for evaluation of the raw reaction rates
          real(dp), pointer :: rate_table(:,:) ! (nrate_table,num_reactions)
@@ -129,7 +129,7 @@
          real(dp), pointer :: rattab_f1(:) ! =(4,nrattab,num_reactions) ! for interpolation
 
          ! Precomputed powers of Z
-         real(dp), pointer :: & ! (num_isos)
+         real(dp), allocatable :: & ! (num_isos)
                            z158(:), & ! screen z**1.58
                            z52(:) ! columb z**5/2
 
@@ -345,24 +345,12 @@
          integer, intent(in) :: handle
          type (Net_General_Info), pointer :: g
          g => net_handles(handle)
+         call do_free_net(handle)
          g% in_use = .true.
-         nullify(g% which_rates)
-         nullify(g% net_iso)
-         nullify(g% chem_id)
-         nullify(g% net_reaction)
-         nullify(g% reaction_id)
-         nullify(g% reaction_kind)
-         nullify(g% reverse_id_for_kind_ne_other)
-         nullify(g% reaction_reaclib_kind)
-         nullify(g% reaction_max_Z)
-         nullify(g% reaction_max_Z_plus_N_for_max_Z)
-         g% net_has_been_defined = .false.
          g% doing_approx21 = .false.
          g% add_co56_to_approx21 = .false.
          g% approx21_ye_iso = -1
          g% doing_timing = .false.
-         g% num_isos = 0
-         g% num_reactions = 0
          g% logTcut_lo = rattab_tlo
          g% logTcut_lim = rattab_tlo + 0.1d0
          g% logT_lo_eps_nuc_cancel = 9.4d0
@@ -371,18 +359,15 @@
          g% min_T_for_fe56ec_fake_factor = 3d9
          g% cache_suffix = '0'
       end subroutine init_net_handle_data
-      
-      
-      
+
       subroutine do_free_net(handle)
          use rates_def
          integer, intent(in) :: handle
          type (Net_General_Info), pointer :: g
          if (handle >= 1 .and. handle <= max_net_handles) then
             g => net_handles(handle)
-            if (associated(g% which_rates)) then
+            if (allocated(g% which_rates)) then
                deallocate(g% which_rates)
-                  nullify(g% which_rates)
             end if
             if (associated(g% net_iso)) then
                deallocate(g% net_iso)
@@ -396,13 +381,11 @@
                deallocate(g% net_reaction)
                   nullify(g% net_reaction)
             end if
-            if (associated(g% reaction_id)) then
+            if (allocated(g% reaction_id)) then
                deallocate(g% reaction_id)
-                  nullify(g% reaction_id)
             end if
-            if (associated(g% reaction_kind)) then
+            if (allocated(g% reaction_kind)) then
                deallocate(g% reaction_kind)
-                  nullify(g% reaction_kind)
             end if
 
             if (associated(g% reaction_reaclib_kind)) then
@@ -426,37 +409,29 @@
                deallocate(g% reaction_max_Z_plus_N_for_max_Z)
                   nullify(g% reaction_max_Z_plus_N_for_max_Z)
             end if
-            if (associated(g% zs13)) then
+            if (allocated(g% zs13)) then
                deallocate(g% zs13)
-                  nullify(g% zs13)
             end if
-            if (associated(g% zhat)) then
+            if (allocated(g% zhat)) then
                deallocate(g% zhat)
-                  nullify(g% zhat)
             end if
-            if (associated(g% zhat2)) then
+            if (allocated(g% zhat2)) then
                deallocate(g% zhat2)
-                  nullify(g% zhat2)
             end if
-            if (associated(g% lzav)) then
+            if (allocated(g% lzav)) then
                deallocate(g% lzav)
-                  nullify(g% lzav)
             end if
-            if (associated(g% aznut)) then
+            if (allocated(g% aznut)) then
                deallocate(g% aznut)
-                  nullify(g% aznut)
             end if
-            if (associated(g% zs13inv)) then
+            if (allocated(g% zs13inv)) then
                deallocate(g% zs13inv)
-                  nullify(g% zs13inv)
             end if
-            if (associated(g% z158)) then
+            if (allocated(g% z158)) then
                deallocate(g% z158)
-                  nullify(g% z158)
             end if
-            if (associated(g% z52)) then
+            if (allocated(g% z52)) then
                deallocate(g% z52)
-                  nullify(g% z52)
             end if
             if (associated(g% rate_table)) then
                deallocate(g% rate_table)
@@ -550,7 +525,7 @@
             write(*,*) 'invalid handle for net_set_which_rates'
             return
          end if
-         if (.not. associated(g% which_rates)) return
+         if (.not. allocated(g% which_rates)) return
             ! this can happen on coprocessor
          do j=1,rates_reaction_id_max
             g% which_rates(j) = which_rates(j)
