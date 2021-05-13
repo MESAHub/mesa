@@ -67,7 +67,7 @@
             ! then use small_mtx_decsol,
             ! else use large_mtx_decsol.
       small_mtx_decsol = 'lapack'
-      large_mtx_decsol = 'klu'
+      large_mtx_decsol = 'bcyclic_dble'
 
       use_pivoting = .true.
       !use_pivoting = .false.
