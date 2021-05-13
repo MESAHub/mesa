@@ -642,7 +642,6 @@
             if (dbg) write(*,*) 'call set_mixing_info'
             call set_mixing_info(s, skip_set_cz_bdy_mass, ierr)
             if (ierr /= 0) return
-            call set_photosphere_start_info
          end if
 
          if (s% j_rot_flag) then
@@ -671,14 +670,6 @@
             failed = .true.
          end function failed
          
-         subroutine set_photosphere_start_info
-            use star_utils, only: get_phot_kap
-            real(dp) :: kap
-            include 'formats'
-            kap = get_phot_kap(s)
-            s% photosphere_opacity_start = kap
-         end subroutine set_photosphere_start_info
-
       end subroutine set_hydro_vars
 
 

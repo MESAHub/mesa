@@ -929,7 +929,6 @@
          real(dp), pointer :: mlt_Gamma_start(:) 
 
          real(dp) :: shock_mass_start ! Msun units like shock_mass
-         real(dp) :: photosphere_opacity_start
          
          ! for Lagrangian time derivatives where k < k_below_just_added
          real(dp) :: surf_lnT, surf_lnd, surf_lnR, surf_v, surf_lnS

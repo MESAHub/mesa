@@ -207,7 +207,6 @@
             call set_to_NaN(s% mx2_top_r)
             call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
             call set_to_NaN(s% nu_max)
-            call set_to_NaN(s% photosphere_opacity_start)
             call set_to_NaN(s% power_CNO)
             call set_to_NaN(s% power_PP)
             call set_to_NaN(s% power_ar_alpha)
