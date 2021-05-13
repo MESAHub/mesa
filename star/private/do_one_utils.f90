@@ -589,7 +589,7 @@
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
             max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_abs_vel, &
-            species_mass_for_min_limit, species_mass_for_max_limit
+            species_mass_for_min_limit, species_mass_for_max_limit, center_gamma
             
          include 'formats'
          
@@ -656,6 +656,8 @@
          end if
          
          log_surface_gravity = safe_log10(get_surface_gravity(s))
+         center_gamma = center_value(s, s% gam)
+
          power_nuc_burn = s% power_nuc_burn
          power_h_burn = s% power_h_burn
          power_he_burn = s% power_he_burn
@@ -860,9 +862,9 @@
             call compare_to_target('log_center_density >= log_center_density_limit', &
                center_value(s, s% lnd)/ln10, s% log_center_density_limit, t_log_center_density_limit)
             
-         else if (s% center_gamma > s% gamma_center_limit) then 
+         else if (center_gamma > s% gamma_center_limit) then 
             call compare_to_target('center_gamma > gamma_center_limit', &
-               s% center_gamma, s% gamma_center_limit, t_gamma_center_limit)
+               center_gamma, s% gamma_center_limit, t_gamma_center_limit)
             
          else if (s% log_max_temperature >= s% log_max_temp_upper_limit) then 
             call compare_to_target('log_max_temperature >= log_max_temp_upper_limit', &

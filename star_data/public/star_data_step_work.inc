@@ -678,7 +678,6 @@
       real(dp) :: log_center_pressure ! log10(center pressure in dynes/cm^2)
       real(dp) :: center_degeneracy 
          ! the electron chemical potential in units of k*T
-      real(dp) :: center_gamma 
       real(dp) :: center_abar 
       real(dp) :: center_zbar 
       real(dp) :: center_mu 

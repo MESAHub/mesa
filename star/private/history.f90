@@ -1950,7 +1950,7 @@
             case(h_center_non_nuc_neu)
                val = s% center_non_nuc_neu
             case(h_center_gamma)
-               val = s% center_gamma
+               val = center_value(s, s% gam)
             case(h_center_zbar)
                val = s% center_zbar
             case(h_center_abar)
