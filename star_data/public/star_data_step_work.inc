@@ -1124,7 +1124,6 @@
          real(dp) :: dt_limit_ratio_old
       
          ! surface info
-         real(dp) :: v_surf_old ! (cm/second)
          real(dp) :: L_surf_old ! surface luminosity (Lsun units)
          real(dp) :: L_phot_old ! photosphere luminosity (Lsun units)
          real(dp) :: Lrad_div_Ledd_avg_surf_old
