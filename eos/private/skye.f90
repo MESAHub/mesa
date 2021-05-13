@@ -51,12 +51,12 @@ module skye
          bounds(2,1) = ht% logdlo
          bounds(2,2) = max(5d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
-         ! Rough ionization density from Jermyn+2021 Equation 53
-         bounds(3,1) = log10(3d0 * abar * pow3(zbar)) + skye_blend_width
+         ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
+         bounds(3,1) = log10(abar * pow3(zbar)) + skye_blend_width
          bounds(3,2) = max(5d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
          ! HELM low-T bound
-         bounds(4,1) = log10(3d0 * abar * pow3(zbar)) + skye_blend_width
+         bounds(4,1) = log10(abar * pow3(zbar)) + skye_blend_width
          bounds(4,2) = ht% logtlo
 
          ! Lower-right of (rho,T) plane
