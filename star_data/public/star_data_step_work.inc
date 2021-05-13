@@ -880,8 +880,6 @@
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: uface_start(:) ! (nz)
          real(dp), pointer :: L_start(:) ! (nz)
-         real(dp), pointer :: L_non_rad_start(:) ! (nz)
-            ! L_non_rad_start is set only if freeze_non_radiative_luminosity is true.
          real(dp), pointer :: r_start(:) ! (nz)
          real(dp), pointer :: rmid_start(:) ! (nz)
          real(dp), pointer :: rho_start(:) ! (nz)
