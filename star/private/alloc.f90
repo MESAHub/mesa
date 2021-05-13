@@ -648,14 +648,6 @@
 
             call do1(s% rmid, c% rmid)
             if (failed('rmid')) exit
-            call do1(s% drmid_dlnR00, c% drmid_dlnR00)
-            if (failed('drmid_dlnR00')) exit
-            call do1(s% drmid_dlnRp1, c% drmid_dlnRp1)
-            if (failed('drmid_dlnRp1')) exit
-            call do1(s% drmid2_dlnR00, c% drmid2_dlnR00)
-            if (failed('drmid2_dlnR00')) exit
-            call do1(s% drmid2_dlnRp1, c% drmid2_dlnRp1)
-            if (failed('drmid2_dlnRp1')) exit
 
             call do1(s% X, c% X)
             if (failed('X')) exit
@@ -747,10 +739,6 @@
 
             call do1(s% QQ, c% QQ)
             if (failed('QQ')) exit
-            call do1(s% d_QQ_dlnd, c% d_QQ_dlnd)
-            if (failed('d_QQ_dlnd')) exit
-            call do1(s% d_QQ_dlnT, c% d_QQ_dlnT)
-            if (failed('d_QQ_dlnT')) exit
             call do2(s% d_eos_dlnd, c% d_eos_dlnd, num_eos_basic_results, 'd_eos_dlnd')
             if (failed('d_eos_dlnd')) exit
             call do2(s% d_eos_dlnT, c% d_eos_dlnT, num_eos_basic_results, 'd_eos_dlnT')
@@ -1312,6 +1300,8 @@
             if (failed('chiRho_start')) exit
             call do1(s% dE_dRho_start, c% dE_dRho_start)
             if (failed('dE_dRho_start')) exit
+            call do1(s% cp_start, c% cp_start)
+            if (failed('cp_start')) exit
             call do1(s% gam_start, c% gam_start)
             if (failed('gam_start')) exit
             call do1(s% rho_start, c% rho_start)
