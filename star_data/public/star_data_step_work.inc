@@ -640,24 +640,6 @@
       real(dp) :: power_z_burn_old
       real(dp) :: power_photo_old
       
-      ! power for each category
-      real(dp) :: power_PP
-      real(dp) :: power_CNO
-      real(dp) :: power_tri_alpha
-      real(dp) :: power_c_alpha
-      real(dp) :: power_n_alpha
-      real(dp) :: power_o_alpha
-      real(dp) :: power_ne_alpha
-      real(dp) :: power_mg_alpha
-      real(dp) :: power_si_alpha
-      real(dp) :: power_s_alpha
-      real(dp) :: power_ar_alpha
-      real(dp) :: power_ca_alpha
-      real(dp) :: power_ti_alpha
-      real(dp) :: power_cr_alpha
-      real(dp) :: power_fe_co_ni
-      real(dp) :: power_other
-      
       
       ! surface       
       real(dp) :: L_surf ! (Lsun) -- depends on control tau_for_L_surf

@@ -133,13 +133,8 @@
             s% power_si_alpha = 0d0
             s% power_s_alpha = 0d0
             s% power_ar_alpha = 0d0
-            s% power_ca_alpha = 0d0
             s% power_ti_alpha = 0d0
-            s% power_cr_alpha = 0d0
             s% power_fe_co_ni = 0d0
-            s% power_c12_c12 = 0d0
-            s% power_c12_o16 = 0d0
-            s% power_o16_o16 = 0d0
             s% power_photo = 0d0
             s% power_other = 0d0
          else            
@@ -159,20 +154,6 @@
             s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
             s% power_he_burn = s% L_by_category(i3alf)
             s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
-            s% power_PP = s% L_by_category(ipp)
-            s% power_CNO = s% L_by_category(icno)
-            s% power_tri_alpha = s% L_by_category(i3alf)
-            s% power_n_alpha = s% L_by_category(i_burn_n)
-            s% power_o_alpha = s% L_by_category(i_burn_o)
-            s% power_ne_alpha = s% L_by_category(i_burn_ne)
-            s% power_mg_alpha = s% L_by_category(i_burn_mg)
-            s% power_si_alpha = s% L_by_category(i_burn_si)
-            s% power_s_alpha = s% L_by_category(i_burn_s)
-            s% power_ar_alpha = s% L_by_category(i_burn_ar)
-            s% power_ca_alpha = s% L_by_category(i_burn_ca)
-            s% power_ti_alpha = s% L_by_category(i_burn_ti)
-            s% power_cr_alpha = s% L_by_category(i_burn_cr)
-            s% power_fe_co_ni = s% L_by_category(i_burn_fe)
             s% power_photo = s% L_by_category(iphoto)
             s% power_other = s% L_by_category(iother)
          end if
