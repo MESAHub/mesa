@@ -740,9 +740,6 @@
                if (s% alpha_RTI_start(k) < -1d90) &
                   s% alpha_RTI_start(k) = s% alpha_RTI(k)
             end if
-            if (s% conv_vel_flag) then
-               s% conv_vel_start(k) = s% conv_vel(k)
-            end if
             if (s% RSP_flag) then
                s% RSP_w(k) = sqrt(s% RSP_Et(k))
                if (s% RSP_w_start(k) < -1d90) then
