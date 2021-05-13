@@ -747,7 +747,6 @@
          call set_power_info(s)
 
          s% total_angular_momentum = total_angular_momentum(s)
-         ! cannot call do_report yet since many things it needs are not yet set.
          call do_report(s, ierr)
          if (failed('do_report')) return
          call set_phase_of_evolution(s)
