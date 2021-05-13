@@ -1136,12 +1136,10 @@
          integer :: ierr
          logical :: file_exists
          stop_is_requested = .false.
+         if (mod(s% model_number,100) /= 0) return
          if (len_trim(s% job% stop_if_this_file_exists) == 0) return
-
          inquire(file=trim(s% job% stop_if_this_file_exists), exist=file_exists)
-
          if (.not. file_exists) return
-
          write(*,*) 'stopping because found file ' // &
             trim(s% job% stop_if_this_file_exists)
          stop_is_requested = .true.

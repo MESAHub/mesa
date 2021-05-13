@@ -78,7 +78,7 @@
    log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
    rho
    gamma1
-   conv_mixing_type ! mixing types are defined in mesa/const
+   mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    log_csound
    acoustic_depth

@@ -1,12 +1,9 @@
-
 &star_job
-      show_log_description_at_start = .false.
+   show_log_description_at_start = .false.
 / ! end of star_job namelist
-
 
 &eos
 / !end of eos namelist
-
 
 &kap
    kap_file_prefix = 'a09'
@@ -16,39 +13,41 @@
    use_Type2_opacities = .true.
 / ! end of kap namelist
 
-
 &controls
-   initial_mass = 9 ! in Msun units
-   initial_Y = 0.298d0
-   initial_Z = 0.02d0
+   initial_mass = 6d0 
+   ! initial_X = 0.73
+   initial_Z = 0.014d0
+   initial_Y = 0.256d0
 
 ! MLT
-   mixing_length_alpha = 1.5d0   ! matches RSP_alfa for rsp_Cepheid
+   max_dt_div_tau_conv_for_TDC = 1d99
+   max_dt_years_for_TDC = 1d99
+
+   mixing_length_alpha = 1.5d0 
    MLT_option = 'Henyey'
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.1
    
 ! mixing
-    overshoot_scheme(1) = 'exponential'
-    overshoot_zone_type(1) = 'burn_H'
-    overshoot_zone_loc(1) = 'core'
-    overshoot_bdy_loc(1) = 'top'
-    overshoot_f(1) = 0.012
-    overshoot_f0(1) = 0.002
+   overshoot_scheme(1) = 'exponential'
+   overshoot_zone_type(1) = 'burn_H'
+   overshoot_zone_loc(1) = 'core'
+   overshoot_bdy_loc(1) = 'top'
+   overshoot_f(1) = 0.012
+   overshoot_f0(1) = 0.002
 
-    overshoot_scheme(2) = 'exponential'
-    overshoot_zone_type(2) = 'nonburn'
-    overshoot_zone_loc(2) = 'shell'
-    overshoot_bdy_loc(2) = 'bottom'
-    overshoot_f(2) = 0.022
-    overshoot_f0(2) = 0.002
+   overshoot_scheme(2) = 'exponential'
+   overshoot_zone_type(2) = 'nonburn'
+   overshoot_zone_loc(2) = 'shell'
+   overshoot_bdy_loc(2) = 'bottom'
+   overshoot_f(2) = 0.022
+   overshoot_f0(2) = 0.002
    
 ! solver
    use_dedt_form_of_energy_eqn = .true.
 
 / ! end of controls namelist
-
 
 &pgstar
 / ! end of pgstar namelist
