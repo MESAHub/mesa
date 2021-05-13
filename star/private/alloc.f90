@@ -1321,14 +1321,8 @@
 
             call do1(s% scale_height_start, c% scale_height_start)
             if (failed('scale_height_start')) exit
-            call do1(s% gradL_start, c% gradL_start)
-            if (failed('gradL_start')) exit
-            call do1(s% gradT_start, c% gradT_start)
-            if (failed('gradT_start')) exit
             call do1(s% grada_start, c% grada_start)
             if (failed('grada_start')) exit
-            call do1(s% gradr_start, c% gradr_start)
-            if (failed('gradr_start')) exit
             call do1(s% grada_face_start, c% grada_face_start)
             if (failed('grada_face_start')) exit
             call do1(s% chiT_start, c% chiT_start)

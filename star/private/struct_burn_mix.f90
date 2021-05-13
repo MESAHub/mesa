@@ -315,10 +315,7 @@
             s% mass_correction_start(k) = s% mass_correction(k)
             s% Pvsc_start(k) = -1d99
             s% scale_height_start(k) = s% scale_height(k)
-            s% gradT_start(k) = s% gradT(k)
-            s% gradL_start(k) = s% gradL(k)
             s% grada_start(k) = s% grada(k)
-            s% gradr_start(k) = s% gradr(k)
             s% grada_face_start(k) = s% grada_face(k)
             s% chiT_start(k) = s% chiT(k)
             s% chiRho_start(k) = s% chiRho(k)
