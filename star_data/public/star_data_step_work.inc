@@ -851,7 +851,7 @@
       
       ! a few things from start of step that will need later
       real(dp) :: prev_Ledd, starting_T_center, &
-         surf_r_equatorial, surf_opacity, surf_csound, surf_rho, remnant_mass_start
+         surf_r_equatorial, surf_opacity, surf_csound, surf_rho
    
       ! for solvers
       

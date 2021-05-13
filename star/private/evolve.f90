@@ -240,7 +240,6 @@
             call set_to_NaN(s% power_z_burn_old)
             call set_to_NaN(s% prev_Ledd)
             call set_to_NaN(s% prev_create_atm_R0_div_R)
-            call set_to_NaN(s% remnant_mass_start)
             call set_to_NaN(s% residual_norm)
             call set_to_NaN(s% revised_max_yr_dt_old)
             call set_to_NaN(s% rotational_mdot_boost)
@@ -1785,7 +1784,6 @@
          else
             s% surf_r_equatorial = s% r(1)
          end if
-         s% remnant_mass_start = get_remnant_mass(s)
          s% starting_T_center = s% T(nz)
          s% surf_opacity = s% opacity(1)
          s% surf_csound = s% csound(1)
