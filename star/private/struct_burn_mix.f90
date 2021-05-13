@@ -300,7 +300,6 @@
             s% lnPeos_start(k) = s% lnPeos(k)
             s% Peos_start(k) = s% Peos(k)
             s% lnPgas_start(k) = s% lnPgas(k)
-            s% lnE_start(k) = s% lnE(k)
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
