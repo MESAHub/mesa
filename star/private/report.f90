@@ -124,7 +124,6 @@
             s% power_he_burn = 0d0
             s% power_z_burn = 0d0
             s% power_photo = 0d0
-            s% power_other = 0d0
          else            
             ! better if set power_nuc_burn using eps_nuc instead of categories
             ! categories can be subject to numerical jitters at very high temperatures
@@ -143,7 +142,6 @@
             s% power_he_burn = s% L_by_category(i3alf)
             s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
             s% power_photo = s% L_by_category(iphoto)
-            s% power_other = s% L_by_category(iother)
          end if
          
          if (s% non_nuc_neu_factor == 0d0) then
