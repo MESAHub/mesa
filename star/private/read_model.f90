@@ -36,7 +36,7 @@
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
       integer, parameter :: bit_for_mlt_vc = 5
-      integer, parameter :: bit_for_w = 6
+      integer, parameter :: bit_for_RSP2 = 6
       integer, parameter :: bit_for_RTI = 7
       !integer, parameter ::  = 8
       integer, parameter :: bit_for_u = 9
@@ -54,8 +54,8 @@
       integer, parameter :: increment_for_D_omega_flag = 1
       integer, parameter :: increment_for_am_nu_rot_flag = 1
       integer, parameter :: increment_for_RTI_flag = 1
-      integer, parameter :: increment_for_w = 1
       integer, parameter :: increment_for_RSP_flag = 3
+      integer, parameter :: increment_for_RSP2_flag = 1
       
       integer, parameter :: max_increment = increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
@@ -63,8 +63,8 @@
                                           + increment_for_D_omega_flag &
                                           + increment_for_am_nu_rot_flag &
                                           + increment_for_RTI_flag &
-                                          + increment_for_w &
-                                          + increment_for_RSP_flag
+                                          + increment_for_RSP_flag &
+                                          + increment_for_RSP2_flag
 
       integer, parameter :: mesa_zams_file_type = 2**bit_for_zams_file
 
@@ -74,18 +74,20 @@
       contains
 
 
-      subroutine finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
+      subroutine finish_load_model(s, restart, &
+            want_RSP_model, is_RSP_model, want_RSP2_model, is_RSP2_model, ierr)
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, &
             reset_epsnuc_vectors, set_qs
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
             set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
-         use hydro_rsp2, only: Hp_face_for_rsp2_val
-         use rsp, only: rsp_setup_part1, rsp_setup_part2
+         use hydro_RSP2, only: Hp_face_for_RSP2_val
+         use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
          type (star_info), pointer :: s
-         logical, intent(in) :: restart, want_rsp_model, is_rsp_model
+         logical, intent(in) :: restart, &
+            want_RSP_model, is_RSP_model, want_RSP2_model, is_RSP2_model
          integer, intent(out) :: ierr
          integer :: k, i, j, i_u, i_du,  nz, i_Hp
          real(dp) :: u00, um1, xm, total_radiation
@@ -155,9 +157,9 @@
          if (dbg) write(*,2) 'load_model: s% m(1)/msun', 1, s% m(1)/Msun
          
          if (s% RSP_flag) then
-            call rsp_setup_part1(s,restart,ierr)
+            call RSP_setup_part1(s,restart,ierr)
             if (ierr /= 0) then
-               write(*,*) 'finish_load_model: rsp_setup_part1 returned ierr', ierr
+               write(*,*) 'finish_load_model: RSP_setup_part1 returned ierr', ierr
                return
             end if
          end if
@@ -176,24 +178,34 @@
          s% doing_finish_load_model = .false.
 
          if (s% rotation_flag) s% total_angular_momentum = total_angular_momentum(s)
+         
+         
+         
+         
+         
 
          if (is_RSP_model .and. (.not. want_RSP_model) .and. s% i_Hp /= 0) then
             ! need to set xh(i_Hp,0) after have called eos to get P
             i_Hp = s% i_Hp
             do k=1,s%nz
-               s% Hp_face(k) = Hp_face_for_rsp2_val(s, k, ierr)
+               s% Hp_face(k) = Hp_face_for_RSP2_val(s, k, ierr)
                if (ierr /= 0) then
-                  write(*,*) 'finish_load_model: Hp_face_for_rsp2_val returned ierr', ierr
+                  write(*,*) 'finish_load_model: Hp_face_for_RSP2_val returned ierr', ierr
                   return
                end if
                s% xh(i_Hp,k) = s% Hp_face(k)
             end do
          end if
+         
+         
+         
+         
+         
 
          if (s% RSP_flag) then
-            call rsp_setup_part2(s, restart, want_rsp_model, is_rsp_model, ierr)
+            call RSP_setup_part2(s, restart, want_RSP_model, is_RSP_model, ierr)
             if (ierr /= 0) then
-               write(*,*) 'finish_load_model: rsp_setup_part2 returned ierr', ierr
+               write(*,*) 'finish_load_model: RSP_setup_part2 returned ierr', ierr
                return
             end if
          end if
@@ -213,7 +225,8 @@
       end subroutine finish_load_model
 
 
-      subroutine do_read_saved_model(s, filename, want_RSP_model, is_RSP_model, ierr)
+      subroutine do_read_saved_model(s, filename, &
+            want_RSP_model, is_RSP_model, want_RSP2_model, is_RSP2_model, ierr)
          use utils_lib
          use utils_def
          use chem_def
@@ -223,8 +236,8 @@
          use star_utils, only: yrs_for_init_timestep, set_phase_of_evolution
          type (star_info), pointer :: s
          character (len=*), intent(in) :: filename
-         logical, intent(in) :: want_RSP_model
-         logical, intent(out) :: is_RSP_model
+         logical, intent(in) :: want_RSP_model, want_RSP2_model
+         logical, intent(out) :: is_RSP_model, is_RSP2_model
          integer, intent(out) :: ierr
 
          integer :: iounit, n, i, k, t, file_type, &
@@ -354,7 +367,6 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% RSP2_flag = BTEST(file_type, bit_for_w)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -364,6 +376,7 @@
          s% am_nu_rot_flag = BTEST(file_type, bit_for_am_nu_rot)
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          is_RSP_model = BTEST(file_type, bit_for_RSP)
+         is_RSP2_model = BTEST(file_type, bit_for_RSP2)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
          
          if (BTEST(file_type, bit_for_lnPgas)) then
@@ -374,23 +387,34 @@
             return
          end if
          
-         s% RSP_flag = is_RSP_model .and. want_RSP_model
-         
-         if (want_RSP_model .and. .not. is_RSP_model) then
-            write(*,*) 'automatically converting to RSP form'
-            s% RSP_flag = .true.
-            s% RSP2_flag = .false.
+         s% RSP_flag = .false.
+         s% RSP2_flag = .false.
+         if (is_RSP_model) then
+            if (want_RSP_model) then
+               s% RSP_flag = .true.
+            else if (want_RSP2_model) then
+               write(*,*) 'automatically converting from RSP to RSP2 form'
+               s% RSP2_flag = .true.
+               s% using_RSP2 = .true.
+               s% previous_step_was_using_RSP2 = .true.
+               s% need_to_reset_w = .false.
+            else
+               write(*,*) 'automatically converting from RSP to standard form'
+            end if
+         else if (is_RSP2_model) then
+            if (want_RSP2_model) then
+               s% RSP2_flag = .true.
+            else if (want_RSP_model) then
+               write(*,*) 'automatically converting from RSP2 to RSP form'
+            else
+               write(*,*) 'automatically converting from RSP2 to standard form'
+            end if
+         else if (want_RSP_model) then
+            write(*,*) 'automatically converting from standard to RSP form'
+         else if (want_RSP2_model) then
+            write(*,*) 'automatically converting from standard to RSP2 form'
          end if
-         
-         if (is_RSP_model .and. .not. want_RSP_model) then
-            write(*,*) 'automatically converting from RSP to RSP2 form'
-            s% RSP_flag = .false.
-            s% RSP2_flag = .true.
-            s% using_RSP2 = .true.
-            s% previous_step_was_using_RSP2 = .true.
-            s% need_to_reset_w = .false.
-         end if
-         
+
          if (no_L .and. s% i_lum /= 0) then
             write(*,*)
             write(*,*) trim(filename) // ' has no L variables, but need them.'
@@ -459,7 +483,7 @@
          nvar = s% nvar_total
          call read1_model( &
                s, s% species, s% nvar_hydro, nz, iounit, &
-               is_RSP_model, want_RSP_model, &
+               is_RSP_model, want_RSP_model, is_RSP2_model, want_RSP2_model, &
                s% xh, s% xa, s% q, s% dq, s% omega, s% j_rot, &
                perm, ierr)
          deallocate(names, perm)
@@ -562,14 +586,15 @@
 
       subroutine read1_model( &
             s, species, nvar_hydro, nz, iounit, &
-            is_RSP_model, want_RSP_model, &
+            is_RSP_model, want_RSP_model, is_RSP2_model, want_RSP2_model, &
             xh, xa, q, dq, omega, j_rot, &
             perm, ierr)
          use star_utils, only: set_qs
          use chem_def
          type (star_info), pointer :: s
          integer, intent(in) :: species, nvar_hydro, nz, iounit, perm(:)
-         logical, intent(in) :: is_RSP_model, want_RSP_model
+         logical, intent(in) :: &
+            is_RSP_model, want_RSP_model, is_RSP2_model, want_RSP2_model
          real(dp), dimension(:,:), intent(out) :: xh, xa
          real(dp), dimension(:), intent(out) :: &
             q, dq, omega, j_rot
@@ -609,6 +634,7 @@
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
          if (is_RSP_model) n = n+increment_for_RSP_flag ! read RSP_et, erad, Fr
+         if (is_RSP2_model) n = n+increment_for_RSP2_flag ! read RSP_et, erad, Fr
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
@@ -711,7 +737,7 @@
             s% am_nu_rot(1:nz) = 0d0
 
          if (want_RSP_model .and. .not. is_RSP_model) then
-            ! proper values for these will be set in rsp_setup_part2
+            ! proper values for these will be set in RSP_setup_part2
             s% xh(i_Et_RSP,1:nz) = 0d0 
             s% xh(i_erad_RSP,1:nz) = 0d0 
             s% xh(i_Fr_RSP,1:nz) = 0d0 

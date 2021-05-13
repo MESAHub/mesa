@@ -1067,10 +1067,10 @@
                   s% num_retries - run_num_retries_prev_period,     &
                'steps',  &
                   s% model_number - prev_cycle_run_num_steps, &
-               'avg iters/step',  &
+               'iters/step',  &
                   dble(s% total_num_solver_iterations - run_num_iters_prev_period)/ &
                   dble(s% model_number - prev_cycle_run_num_steps), &
-               'step', s% model_number, 'days', s% time/(24*3600)
+               'model', s% model_number, 'days', s% time/(24*3600)
             prev_cycle_run_num_steps = s% model_number
             run_num_iters_prev_period = s% total_num_solver_iterations
             run_num_retries_prev_period = s% num_retries
