@@ -758,7 +758,7 @@
             case (p_tau)
                val = s% tau(k)
             case (p_logtau)
-               val = s% lntau(k)/ln10
+               val = safe_log(s% tau(k))/ln10
             case (p_xtau)
                val = s% tau(nz) - s% tau(k)
             case (p_xlogtau)

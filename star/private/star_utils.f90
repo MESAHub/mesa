@@ -853,13 +853,11 @@
          dtau = get_dtau1(s, ierr)
          if (ierr /= 0) return
          s% tau(1) = s% tau_factor*s% tau_base
-         s% lntau(1) = safe_log(s% tau(1))
          s% tau_start(1) = s% tau(1)
          dm_sum = 0
          L_sum = 0
          do k = 2, s% nz
             s% tau(k) = s% tau(k-1) + dtau
-            s% lntau(k) = log(s% tau(k))
             if (s% tau_start(k) < 0) s% tau_start(k) = s% tau(k)
             kap = s% opacity(k)
             dtau = s% dm(k)*kap/(pi4*s% rmid(k)*s% rmid(k))

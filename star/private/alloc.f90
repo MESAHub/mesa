@@ -782,8 +782,6 @@
             if (failed('grav')) exit
             call do1(s% tau, c% tau)
             if (failed('tau')) exit
-            call do1(s% lntau, c% lntau)
-            if (failed('lntau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
 

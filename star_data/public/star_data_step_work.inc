@@ -133,7 +133,6 @@
       real(dp), pointer :: entropy(:) ! NOTE: kerg/baryon units
       real(dp), pointer :: grav(:) ! uses gravitational mass
       real(dp), pointer :: tau(:) ! optical depth at cell outer boundary
-      real(dp), pointer :: lntau(:) ! log(tau)
       real(dp), pointer :: dr_div_csound(:) ! sound crossing time for cell
 
       real(dp), pointer :: ergs_error(:)
