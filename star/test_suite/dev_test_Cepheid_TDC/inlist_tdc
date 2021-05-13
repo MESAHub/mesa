@@ -2,7 +2,7 @@
 &star_job
    show_log_description_at_start = .false.
    
-   load_saved_model_for_RSP2 = .true.
+   load_saved_model = .true.
    load_model_filename = 'cycle10.mod'
    
    save_model_when_terminate = .true.
@@ -23,6 +23,9 @@
 
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
+
+   set_initial_number_retries = .true.
+   initial_number_retries = 0
    
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
@@ -45,19 +48,28 @@
    initial_z = 0.008d0
    initial_mass = 6d0
 
-   force_timestep = 1200 ! approx period/600
+   max_timestep = 1200 ! approx period/600
 
    max_model_number = 5000000
    max_number_retries = 10000
 
 ! atmosphere
+   
+   !use_fixed_Psurf_outer_BC = .true.
+   !fixed_Psurf = 0
+   use_momentum_outer_BC = .true.
+
    atm_option = 'T_tau'
    atm_T_tau_relation = 'Eddington'
    atm_T_tau_opacity = 'fixed'
    Pextra_factor = 2
 
 ! timesteps
-   varcontrol_target = 1d-3 
+   dt_div_min_dr_div_cs_limit = 0.5d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0 ! 0.75d0 ! only interested in outer envelope for shocks
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
 
 ! mlt
    mixing_length_alpha = 1.5d0
@@ -66,54 +78,54 @@
    okay_to_remesh = .false.
 
 ! solver   
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
-   
    steps_before_use_velocity_time_centering = 0
-   include_P_in_velocity_time_centering = .true.
-   include_L_in_velocity_time_centering = .true.
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   include_P_in_velocity_time_centering = .true.
+   P_theta_for_velocity_time_centering = 1d0
+
+   include_L_in_velocity_time_centering = .true.
+   L_theta_for_velocity_time_centering = 1d0
+
+   set_rho_to_dm_div_dV = .false.
+   
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
 
-   set_rho_to_dm_div_dV = .false.
+   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
    
-   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
-   
-   RSP2_assume_HSE = .true.
-   include_w_in_correction_limits = .true.
-   include_v_in_correction_limits = .false.
-   include_L_in_correction_limits = .false.
-   
-   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
-   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
-   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
-   RSP2_alfad =     1d0
-
-   RSP2_num_outermost_cells_forced_nonturbulent = 1
-   RSP2_num_innermost_cells_forced_nonturbulent = 5
-
-   x_integer_ctrl(1) = -10 ! which period to check
-   x_ctrl(1) = 8.2974 ! expected period (in days) 
-   
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0
-   
-   alt_scale_height_flag = .false.
+!   RSP2_assume_HSE = .true.
+!   include_w_in_correction_limits = .true.
+!   include_v_in_correction_limits = .false.
+!   include_L_in_correction_limits = .false.
+!   
+!   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+!   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+!   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+!   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
+!   RSP2_alfad =     1d0
+!  
+!   RSP2_num_outermost_cells_forced_nonturbulent = 1
+!   RSP2_num_innermost_cells_forced_nonturbulent = 5
+!   alt_scale_height_flag = .false.
 
    tol_max_correction = 5d-7
    
 ! output
+   x_integer_ctrl(1) = -10 ! which period to check
+   x_ctrl(1) = 8.2974 ! expected period (in days) 
+
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 8.3 ! expected period (in days) 
-   x_ctrl(8) = 1d-3 ! min_deltaR_for_periods (Rsun)
+   x_ctrl(8) = 5d-3 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
-   x_ctrl(10) = 0.1 ! min_period_div_target
+   x_ctrl(10) = 0.3 ! min_period_div_target
 
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
@@ -129,10 +141,10 @@
       history_interval = 40
       terminal_interval = 4000
 
-      !photo_interval = 50
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      !terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
       
@@ -212,7 +224,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 25
+   pgstar_interval = 2
 
 ! window 1
 
