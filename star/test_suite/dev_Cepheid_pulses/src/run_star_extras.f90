@@ -344,19 +344,18 @@
             period_delta_Mag = 2.5d0*period_delta_logL
             period_max_vsurf_div_cs = v_div_cs_max
             prev_KE_max = KE_max
-            !              periods   KE         deltaR    d logL   d Teff
-            write(*,'(i4, 99(a14,e13.4))')  &
+            write(*,'(i4,a14,i4,2(a14,f8.3),99(a14,f11.6))')  &
                num_periods, &
+               'steps/cycle', s% model_number - run_num_steps_end_prev, &
+               'iters/step',  &
+                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
+                  dble(s% model_number - run_num_steps_end_prev), &
                'period (d)', period/(24*3600), &
                'KE growth', KE_growth_avg_abs, &
                'delta R/Rsun', period_delta_R/Rsun, &
                'delta logL', period_delta_logL, &
                'delta Teff', period_delta_Teff, &
-               'max vsurf/cs', period_max_vsurf_div_cs, &
-               'steps/cycle', s% model_number - run_num_steps_end_prev, &
-               'iters/step',  &
-                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
-                  dble(s% model_number - run_num_steps_end_prev)
+               'max vsurf/cs', period_max_vsurf_div_cs
 
             time_started = time_ended
             run_num_steps_end_prev = s% model_number
@@ -439,7 +438,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 9
+         how_many_extra_history_columns = 8
       end function how_many_extra_history_columns
       
       
@@ -462,7 +461,6 @@
          names(i) = 'delta_Teff'; vals(i) = period_delta_Teff; i=i+1
          names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
          names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
-         names(i) = 'cycles2dbl'; vals(i) = best_cycles_to_double; i=i+1
       end subroutine data_for_extra_history_columns
 
 

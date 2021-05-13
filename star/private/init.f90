@@ -1080,7 +1080,8 @@
             s% extra_heat(k) = 0
          end do
 
-         call finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
+         call finish_load_model(s, restart, &
+            want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in finish_load_model'
             return
