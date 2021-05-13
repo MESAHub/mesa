@@ -891,8 +891,6 @@
             
          real(dp), pointer, dimension(:) :: & ! (nz)
             max_burn_correction, avg_burn_correction
-         real(dp), pointer :: xa_extra1(:,:) ! (species,nz) -- for use by op split
-         real(dp), pointer :: xa_extra2(:,:) ! (species,nz) -- for use by op split
 
          integer :: k_below_const_q
          integer :: k_const_mass
