@@ -148,8 +148,6 @@
             call set_to_NaN(s% adjust_mass_outer_frac_sub1)
             call set_to_NaN(s% angular_momentum_added)
             call set_to_NaN(s% angular_momentum_removed)
-            call set_to_NaN(s% center_eps_nuc_old)
-            call set_to_NaN(s% co_core_mass_old)
             call set_to_NaN(s% conv_mx1_bot)
             call set_to_NaN(s% conv_mx1_bot_r)
             call set_to_NaN(s% conv_mx1_top)
