@@ -94,8 +94,8 @@
          integer, pointer :: reaction_reaclib_kind(:)
          integer, pointer :: reverse_id_for_kind_ne_other(:)
          
-         integer, pointer :: reaction_max_Z(:)
-         integer, pointer :: reaction_max_Z_plus_N_for_max_Z(:)
+         integer, allocatable :: reaction_max_Z(:)
+         integer, allocatable:: reaction_max_Z_plus_N_for_max_Z(:)
          
          ! extra info
          
@@ -124,9 +124,9 @@
    
          ! info for evaluation of the raw reaction rates
          real(dp), pointer :: rate_table(:,:) ! (nrate_table,num_reactions)
-         real(dp), pointer :: ttab(:) ! (nrate_table)
-         real(dp), pointer :: logttab(:) ! (nrate_table)
          real(dp), pointer :: rattab_f1(:) ! =(4,nrattab,num_reactions) ! for interpolation
+         real(dp), allocatable  :: ttab(:) ! (nrate_table)
+         real(dp), allocatable  :: logttab(:) ! (nrate_table)
 
          ! Precomputed powers of Z
          real(dp), allocatable :: & ! (num_isos)
@@ -401,13 +401,11 @@
                   nullify(g% reverse_id_for_kind_ne_other)
             end if
 
-            if (associated(g% reaction_max_Z)) then
+            if (allocated(g% reaction_max_Z)) then
                deallocate(g% reaction_max_Z)
-                  nullify(g% reaction_max_Z)
             end if
-            if (associated(g% reaction_max_Z_plus_N_for_max_Z)) then
+            if (allocated(g% reaction_max_Z_plus_N_for_max_Z)) then
                deallocate(g% reaction_max_Z_plus_N_for_max_Z)
-                  nullify(g% reaction_max_Z_plus_N_for_max_Z)
             end if
             if (allocated(g% zs13)) then
                deallocate(g% zs13)
@@ -437,13 +435,11 @@
                deallocate(g% rate_table)
                   nullify(g% rate_table)
             end if
-            if (associated(g% ttab)) then
+            if (allocated(g% ttab)) then
                deallocate(g% ttab)
-                  nullify(g% ttab)
             end if
-            if (associated(g% logttab)) then
+            if (allocated(g% logttab)) then
                deallocate(g% logttab)
-                  nullify(g% logttab)
             end if
             if (associated(g% rattab_f1)) then
                deallocate(g% rattab_f1)
