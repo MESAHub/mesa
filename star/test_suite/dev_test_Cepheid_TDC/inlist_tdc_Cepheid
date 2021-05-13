@@ -30,7 +30,7 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -55,9 +55,8 @@
 
 ! atmosphere
    
-   !use_fixed_Psurf_outer_BC = .true.
-   !fixed_Psurf = 0
-   use_momentum_outer_BC = .true.
+   use_fixed_Psurf_outer_BC = .true.
+   fixed_Psurf = 0
 
    atm_option = 'T_tau'
    atm_T_tau_relation = 'Eddington'
@@ -98,21 +97,8 @@
    mix_factor = 0
 
    always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
-   
-!   RSP2_assume_HSE = .true.
-!   include_w_in_correction_limits = .true.
-!   include_v_in_correction_limits = .false.
-!   include_L_in_correction_limits = .false.
-!   
-!   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-!   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
-!   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
-!   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
-!   RSP2_alfad =     1d0
-!  
-!   RSP2_num_outermost_cells_forced_nonturbulent = 1
-!   RSP2_num_innermost_cells_forced_nonturbulent = 5
-!   alt_scale_height_flag = .false.
+
+   alt_scale_height_flag = .false.
 
    tol_max_correction = 5d-7
    

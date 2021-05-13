@@ -57,7 +57,6 @@
    
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0
-   !use_momentum_outer_BC = .true.
 
    atm_option = 'T_tau'
    atm_T_tau_relation = 'Eddington'
