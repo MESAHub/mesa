@@ -33,9 +33,10 @@
       private
       public :: alloc_star_data, set_starting_star_data, do_star_init, &
          do_starlib_shutdown, set_kap_and_eos_handles, load_zams_model, &
-         create_pre_ms_model, create_initial_model, create_RSP_model, &
+         create_pre_ms_model, create_initial_model, &
+         create_RSP_model, create_RSP2_model, &
          doing_restart, load_restart_photo, load_saved_model, &
-         load_saved_RSP_model, do_garbage_collection
+         load_saved_RSP_model, load_saved_RSP2_model, do_garbage_collection
 
       integer, parameter :: do_create_pre_ms_model = 0
       integer, parameter :: do_load_zams_model = 1
@@ -43,6 +44,8 @@
       integer, parameter :: do_create_initial_model = 3
       integer, parameter :: do_create_RSP_model = 4
       integer, parameter :: do_load_saved_RSP_model = 5
+      integer, parameter :: do_create_RSP2_model = 6
+      integer, parameter :: do_load_saved_RSP2_model = 7
       
 
       logical :: have_done_starlib_init = .false.
@@ -806,6 +809,16 @@
       end subroutine create_RSP_model
 
 
+      subroutine create_RSP2_model(id, ierr)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         character (len=0) :: model_dir
+         call model_builder( &
+            id, model_dir, do_create_RSP2_model, &
+            .false., 'restart_photo', ierr)
+      end subroutine create_RSP2_model
+
+
       subroutine load_zams_model(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -825,6 +838,18 @@
             id, model_fname, do_load_saved_RSP_model, &
             .false., 'restart_photo', ierr)
       end subroutine load_saved_RSP_model
+
+
+      subroutine load_saved_RSP2_model(id, model_fname, ierr)
+         integer, intent(in) :: id
+         character (len=*), intent(in) :: model_fname
+         integer, intent(out) :: ierr
+         integer :: l
+         l = len_trim(model_fname)
+         call model_builder( &
+            id, model_fname, do_load_saved_RSP2_model, &
+            .false., 'restart_photo', ierr)
+      end subroutine load_saved_RSP2_model
 
 
       subroutine load_saved_model(id, model_fname, ierr)
@@ -874,7 +899,7 @@
 
          type (star_info), pointer :: s
          real(dp) :: initial_mass, initial_z, dlgm_per_step
-         logical :: want_rsp_model, is_rsp_model
+         logical :: want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model
          real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
@@ -899,6 +924,8 @@
          s% termination_code = -1
          want_rsp_model = .false.
          is_rsp_model = .false.
+         want_rsp2_model = .false.
+         is_rsp2_model = .false.
 
          if (restart) then
             s% doing_first_model_of_run = .false.
@@ -910,7 +937,8 @@
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
             call init_def(s) ! RSP
-            call finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
+            call finish_load_model(s, restart, &
+               want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model, ierr)
             if (s% max_years_for_timestep > 0) &
                s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
             return
@@ -925,10 +953,14 @@
          s% doing_first_model_of_run = .true.
          s% doing_first_model_after_restart = .false.
          
-         if (do_which == do_load_saved_model .or. do_which == do_load_saved_RSP_model) then
+         if (do_which == do_load_saved_model .or. &
+             do_which == do_load_saved_RSP_model .or. &
+             do_which == do_load_saved_RSP2_model) then
             s% dt_next = -1
             want_rsp_model = (do_which == do_load_saved_RSP_model)
-            call do_read_saved_model(s, model_info, want_rsp_model, is_rsp_model, ierr)
+            want_rsp2_model = (do_which == do_load_saved_RSP2_model)
+            call do_read_saved_model(s, model_info, &
+               want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model, ierr)
             if (ierr /= 0) then
                write(*,*) 'load failed in do_read_saved_model'
                return
@@ -1024,6 +1056,15 @@
                   call build_rsp_model(s, ierr) ! like build_pre_ms_model
                   if (ierr /= 0) then
                      write(*,*) 'failed in build_rsp_model'
+                     return
+                  end if
+                  s% generations = 1
+                  s% dt_next = 1d-2*secyer
+               case (do_create_RSP2_model)
+                  !call build_rsp2_model(s, ierr) ! like build_pre_ms_model
+                  stop 'need to add build_rsp2_model'
+                  if (ierr /= 0) then
+                     write(*,*) 'failed in build_rsp2_model'
                      return
                   end if
                   s% generations = 1
