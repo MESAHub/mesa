@@ -328,11 +328,7 @@
       real(dp), pointer, dimension(:,:) :: prev_mesh_xh ! (nvar_hydro,prev_mesh_nz)
       real(dp), pointer, dimension(:,:) :: prev_mesh_xa ! (species,prev_mesh_nz)
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
-         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_nu_ST, &
-         prev_mesh_D_ST, prev_mesh_D_DSI, prev_mesh_D_SH, &
-         prev_mesh_D_SSI, prev_mesh_D_ES, prev_mesh_D_GSF, &
-         prev_mesh_D_mix, prev_mesh_D_omega, prev_mesh_am_nu_rot, &
-         prev_mesh_conv_vel, prev_mesh_cv, prev_mesh_dq, prev_mesh_mlt_vc
+         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
 
@@ -815,7 +811,7 @@
       
       ! a few things from start of step that will need later
       real(dp) :: prev_Ledd, starting_T_center, &
-         surf_r_equatorial, surf_opacity, surf_csound, surf_rho
+         surf_r_equatorial, surf_csound, surf_rho
    
       ! for solvers
       

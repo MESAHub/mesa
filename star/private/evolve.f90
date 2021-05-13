@@ -214,7 +214,6 @@
             call set_to_NaN(s% super_eddington_wind_mdot)
             call set_to_NaN(s% surf_accel_grav_ratio)
             call set_to_NaN(s% surf_csound)
-            call set_to_NaN(s% surf_opacity)
             call set_to_NaN(s% surf_r_equatorial)
             call set_to_NaN(s% surf_rho)
             call set_to_NaN(s% surface_cell_specific_total_energy_old)
