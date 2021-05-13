@@ -1274,8 +1274,6 @@
             if (failed('j_rot_start')) exit
             call do1(s% i_rot_start, c% i_rot_start)
             if (failed('i_rot_start')) exit
-            call do1(s% mass_correction_start, c% mass_correction_start)
-            if (failed('mass_correction_start')) exit
             call do1(s% eps_nuc_start, c% eps_nuc_start)
             if (failed('eps_nuc_start')) exit
             call do1(s% non_nuc_neu_start, c% non_nuc_neu_start)
@@ -1288,8 +1286,6 @@
             if (failed('chiT_start')) exit
             call do1(s% chiRho_start, c% chiRho_start)
             if (failed('chiRho_start')) exit
-            call do1(s% dE_dRho_start, c% dE_dRho_start)
-            if (failed('dE_dRho_start')) exit
             call do1(s% cp_start, c% cp_start)
             if (failed('cp_start')) exit
             call do1(s% gam_start, c% gam_start)

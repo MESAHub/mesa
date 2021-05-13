@@ -823,7 +823,6 @@
          real(dp), pointer :: xa_sub_xa_start(:,:) ! (species,nz)          
          real(dp), pointer :: lnd_start(:) ! (nz)
          real(dp), pointer :: lnPeos_start(:) ! (nz)
-         real(dp), pointer :: r(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)
          real(dp), pointer :: energy_start(:) ! (nz)
@@ -846,14 +845,12 @@
          real(dp), pointer :: ye_start(:) ! (nz)
          real(dp), pointer :: j_rot_start(:) ! (nz)
          real(dp), pointer :: i_rot_start(:) ! (nz)
-         real(dp), pointer :: mass_correction_start(:)
          real(dp), pointer :: dxdt_nuc_start(:,:)
          real(dp), pointer :: luminosity_by_category_start(:,:) ! (num_categories,nz)
          real(dp), pointer :: grada_start(:) ! (nz)
          real(dp), pointer :: chiT_start(:) ! (nz)
          real(dp), pointer :: chiRho_start(:) ! (nz)
          real(dp), pointer :: Cp_start(:) ! (nz)
-         real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
          real(dp), pointer :: eta_start(:) ! (nz)
          real(dp), pointer :: T_start(:) ! (nz)
@@ -918,7 +915,6 @@
          real(dp) :: angular_momentum_added
          real(dp) :: residual_norm
          real(dp) :: max_residual
-         real(dp) :: max_fixup_for_mix         
          real(dp) :: initial_timestep    
          real(dp) :: initial_L_center
          real(dp) :: initial_R_center
@@ -1029,7 +1025,6 @@
          integer, pointer, dimension(:) :: burn_num_iters
 
          integer :: termination_code
-         integer :: burn_nstep_max
          integer :: burn_nfcn_total
          integer :: dX_nuc_drop_max_k
          integer :: dX_nuc_drop_max_j

@@ -115,7 +115,6 @@
             s% k_for_test_CpT_absMdot_div_L = -999
             s% k_below_just_added = -999
             s% termination_code = -999
-            s% burn_nstep_max = -999
             s% burn_nfcn_total = -999
             s% dX_nuc_drop_max_k = -999
             s% dX_nuc_drop_max_j = -999
@@ -179,7 +178,6 @@
             call set_to_NaN(s% initial_v_center)
             call set_to_NaN(s% log_L_surf)
             call set_to_NaN(s% max_conv_time_scale)
-            call set_to_NaN(s% max_fixup_for_mix)
             call set_to_NaN(s% max_residual)
             call set_to_NaN(s% mdot_acoustic_surface)
             call set_to_NaN(s% mdot_adiabatic_surface)

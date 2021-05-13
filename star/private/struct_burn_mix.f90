@@ -312,13 +312,11 @@
             s% j_rot_start(k) = s% j_rot(k)
             s% eps_nuc_start(k) = s% eps_nuc(k)
             s% non_nuc_neu_start(k) = s% non_nuc_neu(k)
-            s% mass_correction_start(k) = s% mass_correction(k)
             s% Pvsc_start(k) = -1d99
             s% grada_start(k) = s% grada(k)
             s% chiT_start(k) = s% chiT(k)
             s% chiRho_start(k) = s% chiRho(k)
             s% cp_start(k) = s% cp(k)
-            s% dE_dRho_start(k) = s% dE_dRho(k)
             s% gam_start(k) = s% gam(k)
             s% lnS_start(k) = s% lnS(k)
             s% eta_start(k) = s% eta(k)
