@@ -648,7 +648,6 @@
       real(dp) :: power_n_alpha
       real(dp) :: power_o_alpha
       real(dp) :: power_ne_alpha
-      real(dp) :: power_na_alpha
       real(dp) :: power_mg_alpha
       real(dp) :: power_si_alpha
       real(dp) :: power_s_alpha
@@ -657,12 +656,6 @@
       real(dp) :: power_ti_alpha
       real(dp) :: power_cr_alpha
       real(dp) :: power_fe_co_ni
-      real(dp) :: power_c12_c12
-      real(dp) :: power_c12_o16
-      real(dp) :: power_o16_o16
-      real(dp) :: power_pnhe4
-      real(dp) :: power_ni56_co56
-      real(dp) :: power_co56_fe56
       real(dp) :: power_other
       
       
