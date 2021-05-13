@@ -1237,8 +1237,6 @@
             if (failed('Peos_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
-            call do1(s% lnE_start, c% lnE_start)
-            if (failed('lnE_start')) exit
             call do1(s% energy_start, c% energy_start)
             if (failed('energy_start')) exit
             call do1(s% egas_start, c% egas_start)
@@ -1269,12 +1267,8 @@
             if (failed('opacity_start')) exit
             call do1(s% csound_start, c% csound_start)
             if (failed('csound_start')) exit
-            call do1(s% tau_start, c% tau_start)
-            if (failed('tau_start')) exit
             call do1(s% alpha_RTI_start, c% alpha_RTI_start)
             if (failed('alpha_RTI_start')) exit
-            call do1(s% conv_vel_start, c% conv_vel_start)
-            if (failed('conv_vel_start')) exit
 
             call do1(s% j_rot_start, c% j_rot_start)
             if (failed('j_rot_start')) exit
@@ -1282,8 +1276,6 @@
             if (failed('i_rot_start')) exit
             call do1(s% mass_correction_start, c% mass_correction_start)
             if (failed('mass_correction_start')) exit
-            call do1(s% eta_visc_start, c% eta_visc_start)
-            if (failed('eta_visc_start')) exit
             call do1(s% eps_nuc_start, c% eps_nuc_start)
             if (failed('eps_nuc_start')) exit
             call do1(s% non_nuc_neu_start, c% non_nuc_neu_start)
@@ -1316,12 +1308,8 @@
             call do1(s% total_energy_integral_center, c% total_energy_integral_center)
             if (failed('total_energy_integral_center')) exit
 
-            call do1(s% abar_start, c% abar_start)
-            if (failed('abar_start')) exit
             call do1(s% zbar_start, c% zbar_start)
             if (failed('zbar_start')) exit
-            call do1(s% z53bar_start, c% z53bar_start)
-            if (failed('z53bar_start')) exit
             call do1(s% mu_start, c% mu_start)
             if (failed('mu_start')) exit
 

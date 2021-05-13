@@ -853,12 +853,10 @@
          dtau = get_dtau1(s, ierr)
          if (ierr /= 0) return
          s% tau(1) = s% tau_factor*s% tau_base
-         s% tau_start(1) = s% tau(1)
          dm_sum = 0
          L_sum = 0
          do k = 2, s% nz
             s% tau(k) = s% tau(k-1) + dtau
-            if (s% tau_start(k) < 0) s% tau_start(k) = s% tau(k)
             kap = s% opacity(k)
             dtau = s% dm(k)*kap/(pi4*s% rmid(k)*s% rmid(k))
             if (is_bad(dtau)) then
@@ -1593,9 +1591,7 @@
             s% lnd_start(k) = -1d99
             s% lnT_start(k) = -1d99
             s% csound_start(k) = -1d99
-            s% eta_visc_start(k) = -1d99
             s% rho_start(k) = -1d99
-            s% tau_start(k) = -1d99
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
             s% opacity_start(k) = -1d99
