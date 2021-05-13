@@ -216,7 +216,7 @@
          Text_Summary2_name(1,4) = 'num_zones'
          Text_Summary2_name(2,4) = 'num_retries'
          Text_Summary2_name(3,4) = 'num_periods'
-         Text_Summary2_name(4,4) = 'cycles2dbl'
+         Text_Summary2_name(4,4) = ''
          Text_Summary2_name(5,4) = ''
 
 / ! end of pgstar namelist

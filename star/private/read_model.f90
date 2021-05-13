@@ -492,6 +492,17 @@
             return
          end if
 
+         if (is_RSP_model) then
+            if (.not. want_RSP_model .and. .not. want_RSP2_model) s% have_mlt_vc = .true.
+         else if (want_RSP_model) then
+            ! proper values for these will be set in RSP_setup_part2
+            s% xh(s% i_Et_RSP,1:nz) = 0d0 
+            s% xh(s% i_erad_RSP,1:nz) = 0d0 
+            s% xh(s% i_Fr_RSP,1:nz) = 0d0 
+         end if
+
+         if (is_RSP2_model .and. .not. want_RSP2_model) s% have_mlt_vc = .true.
+
          do_read_prev = BTEST(file_type, bit_for_2models)
          if (ierr == 0) then
             if (do_read_prev) then
@@ -634,7 +645,7 @@
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
          if (is_RSP_model) n = n+increment_for_RSP_flag ! read RSP_et, erad, Fr
-         if (is_RSP2_model) n = n+increment_for_RSP2_flag ! read RSP_et, erad, Fr
+         if (is_RSP2_model) n = n+increment_for_RSP2_flag ! read w, Hp
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
@@ -664,22 +675,39 @@
             j=j+1; xh(i_lnd,k) = vec(j)
             j=j+1; xh(i_lnT,k) = vec(j)
             j=j+1; xh(i_lnR,k) = vec(j)
+            
+            
             if (is_RSP_model) then
-               if (want_RSP_model) then
+               if (want_RSP_model) then ! assumes i_w and i_Hp are set
                   j=j+1; xh(i_Et_RSP,k) = vec(j)
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
-               else if (i_w /= 0) then ! convert Et from RSP to w in RSP2
-                  j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j))) ! Et_RSP
+               else if (want_RSP2_model) then ! convert Et from RSP to w in RSP2
+                  j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j))); xh(i_Hp,k) = -1
+                  j=j+1; ! erad_RSP
+                  j=j+1; ! Fr_RSP
+                  j=j+1; xh(i_lum,k) = vec(j)
+               else
+                  j=j+1; s% mlt_vc(k) = sqrt_2_div_3*sqrt(max(0d0,vec(j)))
+                     s% conv_vel(k) = s% mlt_vc(k)
                   j=j+1; ! erad_RSP
                   j=j+1; ! Fr_RSP
                   j=j+1; xh(i_lum,k) = vec(j)
                end if
-            else if (i_w /= 0) then
-               j=j+1; xh(i_w,k) = vec(j)
-               j=j+1; xh(i_Hp,k) = vec(j)
-               j=j+1; xh(i_lum,k) = vec(j)
+            else if (is_RSP2_model) then 
+               if (want_RSP2_model) then ! assumes i_w and i_Hp are set
+                  j=j+1; xh(i_w,k) = vec(j)
+                  j=j+1; xh(i_Hp,k) = vec(j)
+                  j=j+1; xh(i_lum,k) = vec(j)
+               else if (want_RSP_model) then
+                  stop 'read_model not able to convert from RSP2 to RSP'
+               else ! cv = sqrt_2_div_3*w
+                  j=j+1; s% mlt_vc(k) = sqrt_2_div_3*vec(j)
+                     s% conv_vel(k) = s% mlt_vc(k)
+                  j=j+1; ! skip Hp
+                  j=j+1; xh(i_lum,k) = vec(j)
+               end if
             else if (.not. no_L) then
                j=j+1; xh(i_lum,k) = vec(j)
             end if            
@@ -735,13 +763,6 @@
          
          if (s% rotation_flag .and. .not. s% am_nu_rot_flag) &
             s% am_nu_rot(1:nz) = 0d0
-
-         if (want_RSP_model .and. .not. is_RSP_model) then
-            ! proper values for these will be set in RSP_setup_part2
-            s% xh(i_Et_RSP,1:nz) = 0d0 
-            s% xh(i_erad_RSP,1:nz) = 0d0 
-            s% xh(i_Fr_RSP,1:nz) = 0d0 
-         end if
 
          call set_qs(s, nz, q, dq, ierr)
          if (ierr /= 0) then
