@@ -2112,6 +2112,11 @@
          Ledd = pi4*clight*s% cgrav(j)*s% m_grav(j)/kap_face
       end function get_Ledd
 
+      real(dp) function get_surface_gravity(s) result(g)
+         type (star_info), pointer :: s
+         g = s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))         
+      end function get_surface_gravity
+
 
       real(dp) function get_Lrad(s,k)
          type (star_info), pointer :: s

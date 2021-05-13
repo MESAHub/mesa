@@ -655,7 +655,7 @@
             v_surf_div_v_esc = 0d0
          end if
          
-         log_surface_gravity = s% log_surface_gravity
+         log_surface_gravity = safe_log10(get_surface_gravity(s))
          power_nuc_burn = s% power_nuc_burn
          power_h_burn = s% power_h_burn
          power_he_burn = s% power_he_burn

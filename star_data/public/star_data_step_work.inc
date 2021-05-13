@@ -304,9 +304,6 @@
       real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
       real(dp) :: d_vc_dv
    
-      ! drag
-      real(dp), pointer :: dvdt_drag(:)
-      real(dp), pointer :: eps_drag(:)
       
       ! gravitational constant (can be set by user and can be vary within model)
       real(dp), pointer :: cgrav(:)      
@@ -663,7 +660,6 @@
       real(dp) :: log_surface_temperature ! log10(temperature)   ---- note: not necessarily Teff
       real(dp) :: log_surface_pressure ! log10(pressure)
       real(dp) :: log_surface_density ! log10(density)
-      real(dp) :: log_surface_gravity ! log10(gravity)
       
       ! fractional abundances by mass near surface
          ! averages over a fraction = 'surface_avg_abundance_dq' of star mass
@@ -1070,8 +1066,7 @@
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          
          real(dp) :: dVARdot_dVAR
-         real(dp) :: surf_accel_grav_ratio
-         real(dp) :: prev_create_atm_R0_div_R
+         real(dp) :: surf_accel_grav_ratio\
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
          real(dp) :: dX_nuc_drop_max_drop

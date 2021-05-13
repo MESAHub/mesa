@@ -542,8 +542,6 @@
 
          s% termination_code = -1
 
-         s% prev_create_atm_R0_div_R = -1
-
          s% screening_mode_value = -1
 
          s% dt = -1
@@ -683,7 +681,6 @@
          s% L_center = 0
          s% time = 0
          s% total_angular_momentum = 0
-         s% prev_create_atm_R0_div_R = 0
 
          s% dt = 0
 

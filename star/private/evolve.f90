@@ -212,7 +212,6 @@
             call set_to_NaN(s% power_nuc_neutrinos)
             call set_to_NaN(s% power_other)
             call set_to_NaN(s% prev_Ledd)
-            call set_to_NaN(s% prev_create_atm_R0_div_R)
             call set_to_NaN(s% residual_norm)
             call set_to_NaN(s% revised_max_yr_dt_old)
             call set_to_NaN(s% rotational_mdot_boost)

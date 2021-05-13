@@ -123,18 +123,6 @@
             s% power_h_burn = 0d0
             s% power_he_burn = 0d0
             s% power_z_burn = 0d0
-            s% power_PP = 0d0
-            s% power_CNO = 0d0
-            s% power_tri_alpha = 0d0
-            s% power_n_alpha = 0d0
-            s% power_o_alpha = 0d0
-            s% power_ne_alpha = 0d0
-            s% power_mg_alpha = 0d0
-            s% power_si_alpha = 0d0
-            s% power_s_alpha = 0d0
-            s% power_ar_alpha = 0d0
-            s% power_ti_alpha = 0d0
-            s% power_fe_co_ni = 0d0
             s% power_photo = 0d0
             s% power_other = 0d0
          else            
@@ -262,7 +250,6 @@
          s% log_surface_temperature = s% lnT(1)/ln10 ! log10(temperature at surface)
          s% log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
          s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
-         s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
          
          luminosity = s% L(1)
 
