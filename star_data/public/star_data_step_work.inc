@@ -1066,7 +1066,7 @@
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          
          real(dp) :: dVARdot_dVAR
-         real(dp) :: surf_accel_grav_ratio\
+         real(dp) :: surf_accel_grav_ratio
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
          real(dp) :: dX_nuc_drop_max_drop
