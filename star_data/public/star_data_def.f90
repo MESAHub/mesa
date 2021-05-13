@@ -112,10 +112,6 @@
             include "star_controls.inc"
             include "star_controls_dev.inc"
             include "pgstar_controls.inc"
-         
-            contains
-
-            include "star_derived_procedures.inc"
 
       end type star_info
 
