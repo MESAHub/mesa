@@ -95,13 +95,8 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
          
-         if (id == 1 .and. .not. s% RSP2_flag) then
-            write(*,*) 'star id==1, but not RSP2_flag'
-            stop 'extras_startup'
-         end if
-         
-         if (id == 2 .and. s% RSP2_flag) then
-            write(*,*) 'star id==2, but RSP2_flag'
+         if (id == 1 .and. .not. s% RSP_flag) then
+            write(*,*) 'star id==1, but not RSP_flag'
             stop 'extras_startup'
          end if
 

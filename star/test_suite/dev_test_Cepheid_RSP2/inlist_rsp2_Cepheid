@@ -3,7 +3,8 @@
    show_log_description_at_start = .false.
    
    load_saved_model_for_RSP2 = .true.
-   load_model_filename = 'cycle10.mod'
+   !load_model_filename = 'cycle10.mod'
+   load_model_filename = 'cycle557.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
@@ -224,7 +225,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 25
+   pgstar_interval = 2
 
 ! window 1
 
@@ -249,7 +250,7 @@
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-   Grid2_file_flag = .true.
+   !Grid2_file_flag = .true.
    file_digits = 7
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid2'
