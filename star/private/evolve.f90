@@ -175,7 +175,6 @@
             call set_to_NaN(s% initial_R_center)
             call set_to_NaN(s% initial_timestep)   
             call set_to_NaN(s% initial_v_center)
-            call set_to_NaN(s% log_L_surf)
             call set_to_NaN(s% max_conv_time_scale)
             call set_to_NaN(s% max_residual)
             call set_to_NaN(s% mdot_acoustic_surface)

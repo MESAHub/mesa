@@ -66,7 +66,6 @@
          s% L_surf = luminosity/Lsun
          s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
             ! log10(stellar luminosity in solar units)
-         s% log_L_surf = s% log_surface_luminosity
          if (is_bad(s% L_surf)) then
             write(*,2) 's% L_surf', s% model_number, s% L_surf
             stop 'set_phot_info'

@@ -626,7 +626,6 @@
       ! surface       
       real(dp) :: L_surf ! (Lsun) -- depends on control tau_for_L_surf
          ! if tau_for_L_surf > 0, then is optical depth to set L_surf; else use L_surf = L(1)
-      real(dp) :: log_L_surf ! log10(L_surf)
       real(dp) :: v_surf ! (cm/second)
       real(dp) :: Lrad_div_Ledd_avg_surf
       real(dp) :: w_div_w_crit_avg_surf
