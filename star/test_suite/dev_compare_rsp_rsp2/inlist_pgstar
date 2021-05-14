@@ -166,54 +166,85 @@
    Profile_Panels1_win_flag = .false.
    Profile_Panels1_title = ''      
    
+   
+   ! standard form for profile panels
+   
    Profile_Panels1_num_panels = 9
            
-   Profile_Panels1_yaxis_name(1) = 'v_kms'         
-   !Profile_Panels1_other_yaxis_name(1) = 'v_drel' 
+   Profile_Panels1_yaxis_name(1) = 'v_kms'     
    Profile_Panels1_other_yaxis_name(1) = 'v_R' 
    Profile_Panels1_same_yaxis_range(1) = .true.
    
-   Profile_Panels1_yaxis_name(2) = 'w'         
-   !Profile_Panels1_other_yaxis_name(2) = 'w_drel' 
+   Profile_Panels1_yaxis_name(2) = 'w'       
    Profile_Panels1_other_yaxis_name(2) = 'w_R'
    Profile_Panels1_same_yaxis_range(2) = .true.
             
    Profile_Panels1_yaxis_name(3) = 'Y_face'
-   !Profile_Panels1_other_yaxis_name(3) = 'Y_drel' 
    Profile_Panels1_other_yaxis_name(3) = 'Y_face_R' 
    Profile_Panels1_same_yaxis_range(3) = .true.
 
    Profile_Panels1_yaxis_name(4) = 'Lr_div_L'
    Profile_Panels1_other_yaxis_name(4) = 'Lr_div_L_R'
-   !Profile_Panels1_yaxis_name(4) = 'Chi' ! 
-   !Profile_Panels1_other_yaxis_name(4) = 'Chi_drel' 
    Profile_Panels1_same_yaxis_range(4) = .true.
          
    Profile_Panels1_yaxis_name(5) = 'SOURCE' 
-   !Profile_Panels1_other_yaxis_name(5) = 'SRC_drel' 
    Profile_Panels1_other_yaxis_name(5) = 'SRC_R'
    Profile_Panels1_same_yaxis_range(5) = .true.
       
    Profile_Panels1_yaxis_name(6) = 'DAMP'
-   !Profile_Panels1_other_yaxis_name(6) = 'DAMP_drel' 
    Profile_Panels1_other_yaxis_name(6) = 'DAMP_R'
    Profile_Panels1_same_yaxis_range(6) = .true.
-      
-   Profile_Panels1_yaxis_name(7) = 'Eq' 
-   !Profile_Panels1_other_yaxis_name(7) = 'Eq_drel' 
-   Profile_Panels1_other_yaxis_name(7) = 'Eq_R'
+
+   Profile_Panels1_yaxis_name(7) = 'COUPL'
+   Profile_Panels1_other_yaxis_name(7) = 'COUPL_R'
    Profile_Panels1_same_yaxis_range(7) = .true.
       
-   Profile_Panels1_yaxis_name(8) = 'Uq' 
-   Profile_Panels1_other_yaxis_name(8) = 'Uq_R'
+   Profile_Panels1_yaxis_name(8) = 'Eq' 
+   Profile_Panels1_other_yaxis_name(8) = 'Eq_R'
    Profile_Panels1_same_yaxis_range(8) = .true.
+      
+   Profile_Panels1_yaxis_name(9) = 'Uq' 
+   Profile_Panels1_other_yaxis_name(9) = 'Uq_R'
+   Profile_Panels1_same_yaxis_range(9) = .true.
+   
 
-   Profile_Panels1_yaxis_name(9) = 'COUPL'
-   !Profile_Panels1_other_yaxis_name(9) = 'CPL_drel' 
-   Profile_Panels1_other_yaxis_name(9) = 'COUPL_R'
-   !Profile_Panels1_same_yaxis_range(9) = .true.
 
    
+   ! drel version of profile panels
+   pgstar_profile_line_style = 1
+   
+   Profile_Panels1_num_panels = 8
+           
+   Profile_Panels1_yaxis_name(1) = 'v_drel'     
+   Profile_Panels1_other_yaxis_name(1) = '' 
+   
+   Profile_Panels1_yaxis_name(2) = 'w_drel'       
+   Profile_Panels1_other_yaxis_name(2) = '' 
+            
+   Profile_Panels1_yaxis_name(3) = 'Y_drel'
+   Profile_Panels1_other_yaxis_name(3) = '' 
+   
+   Profile_Panels1_yaxis_name(4) = 'Chi_drel' ! 
+   Profile_Panels1_other_yaxis_name(4) = '' 
+         
+   Profile_Panels1_yaxis_name(5) = 'SRC_drel' 
+   Profile_Panels1_other_yaxis_name(5) = '' 
+      
+   Profile_Panels1_yaxis_name(6) = 'DAMP_drel'
+   Profile_Panels1_other_yaxis_name(6) = '' 
+
+   Profile_Panels1_yaxis_name(7) = 'CPL_drel'
+   Profile_Panels1_other_yaxis_name(7) = '' 
+      
+   Profile_Panels1_yaxis_name(8) = 'Eq_drel' 
+   Profile_Panels1_other_yaxis_name(8) = '' 
+      
+   Profile_Panels1_yaxis_name(9) = '' 
+   Profile_Panels1_other_yaxis_name(9) = ''
+
+
+
+
 
    Profile_Panels1_file_flag = .false.
    Profile_Panels1_file_dir = 'png'
@@ -225,18 +256,18 @@
    Text_Summary1_name(:,:) = ''
    
    Text_Summary1_name(1,1) = 'model_number'
-   Text_Summary1_name(2,1) = 'star_age_day'
+   Text_Summary1_name(2,1) = 'day'
    Text_Summary1_name(3,1) = 'time_step_sec'
-   Text_Summary1_name(4,1) = ''
+   Text_Summary1_name(4,1) = 'log_rel_run_E_err'
    Text_Summary1_name(5,1) = ''
    
    Text_Summary1_name(1,2) = 'v_surf_km_s'
-   Text_Summary1_name(2,2) = 'radius'
-   Text_Summary1_name(3,2) = 'log_R'
-   Text_Summary1_name(4,2) = ''
+   Text_Summary1_name(2,2) = 'v_div_cs'
+   Text_Summary1_name(3,2) = 'radius'
+   Text_Summary1_name(4,2) = 'log_R'
    Text_Summary1_name(5,2) = ''
    
-   Text_Summary1_name(1,3) = 'effective_T'
+   Text_Summary1_name(1,3) = 'Teff'
    Text_Summary1_name(2,3) = 'log_Teff'
    Text_Summary1_name(3,3) = 'luminosity'
    Text_Summary1_name(4,3) = 'log_L'
@@ -245,7 +276,7 @@
    Text_Summary1_name(1,4) = 'star_mass'
    Text_Summary1_name(2,4) = 'num_zones'
    Text_Summary1_name(3,4) = 'num_retries'
-   Text_Summary1_name(4,4) = 'log_rel_run_E_err'
+   Text_Summary1_name(4,4) = ''
    Text_Summary1_name(5,4) = ''
 
 / ! end of pgstar namelist
