@@ -32,9 +32,6 @@
       
       include 'test_suite_extras_def.inc'
       include 'multi_stars_extras_def.inc'
-
-      integer :: RSP2_num_periods
-      real(dp) :: RSP2_period, time_started
             
       contains
 

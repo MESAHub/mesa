@@ -228,7 +228,7 @@
 
 ! window 1
 
-   !Grid1_win_flag = .true.
+   Grid1_win_flag = .true.
    Grid1_title = 'Cepheid Grid Profiles'
 
    !Grid1_file_flag = .true.
@@ -249,7 +249,7 @@
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-   ! Grid2_file_flag = .true.
+   Grid2_file_flag = .true.
    file_digits = 7
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid2'
