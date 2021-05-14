@@ -1259,12 +1259,6 @@
             if (failed('eta_start')) exit
             call do1(s% T_start, c% T_start)
             if (failed('T_start')) exit
-
-            call do1(s% total_energy_integral_surface, c% total_energy_integral_surface)
-            if (failed('total_energy_integral_surface')) exit
-            call do1(s% total_energy_integral_center, c% total_energy_integral_center)
-            if (failed('total_energy_integral_center')) exit
-
             call do1(s% zbar_start, c% zbar_start)
             if (failed('zbar_start')) exit
             call do1(s% mu_start, c% mu_start)
