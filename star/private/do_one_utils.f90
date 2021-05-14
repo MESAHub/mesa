@@ -656,7 +656,7 @@
             v_surf_div_v_esc = 0d0
          end if
          
-         log_surface_gravity = safe_log10(get_surface_gravity(s))
+         log_surface_gravity = safe_log10(s%grav(1))
          log_surface_temperature = s% lnT(1) / ln10
          log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
          log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
