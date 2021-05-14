@@ -228,7 +228,6 @@
          s% d_center_eps_nuc_dlnd = center_value(s, s% d_epsnuc_dlnd)
          s% center_non_nuc_neu = center_value(s, s% non_nuc_neu)
 
-         s% center_gamma = center_value(s, s% gam)
          s% center_abar = center_value(s, s% abar)
          s% center_zbar = center_value(s, s% zbar)
          s% center_mu = center_value(s, s% mu)
