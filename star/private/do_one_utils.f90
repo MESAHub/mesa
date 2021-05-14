@@ -1118,7 +1118,7 @@
             else
                write(*,2) 'rel_E_err too large for fe_core_infall termination', &
                   s% model_number, s% error_in_energy_conservation/abs(s% total_energy_end)
-            end if
+            end if 
 
          else if (s% non_fe_core_infall > s% non_fe_core_infall_limit) then 
             call compare_to_target('non_fe_core_infall > non_fe_core_infall_limit', &
