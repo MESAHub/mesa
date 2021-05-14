@@ -244,7 +244,6 @@
             s% center_omega_div_omega_crit = center_omega_div_omega_crit()
          end if
 
-         s% log_surface_temperature = s% lnT(1)/ln10 ! log10(temperature at surface)
          s% log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
          s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
          
