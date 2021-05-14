@@ -2,12 +2,7 @@
 &star_job
    show_log_description_at_start = .false.
    
-   load_saved_model = .true.
-   load_saved_model = .true.
-   change_initial_RSP2_flag = .true.
-   new_RSP2_flag = .true.
-   
-   !load_saved_model_for_RSP2 = .true.
+   load_saved_model_for_RSP2 = .true.
    load_model_filename = 'cycle10.mod'
    
    save_model_when_terminate = .true.
@@ -24,7 +19,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1200 ! approx period/600
+   seconds_for_initial_dt = 1200
 
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
@@ -40,6 +35,7 @@
 / ! end of star_job namelist
 
 &eos
+   use_Skye = .true.
 / ! end of eos namelist
 
 &kap
@@ -53,13 +49,12 @@
    initial_z = 0.008d0
    initial_mass = 6d0
 
-   max_timestep = 1200 ! approx period/600
+   max_timestep = 1200
 
    max_model_number = 5000000
    max_number_retries = 10000
 
 ! atmosphere
-   
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0
 
@@ -70,7 +65,7 @@
 
 ! timesteps
    dt_div_min_dr_div_cs_limit = 0.5d0
-   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0 ! 0.75d0 ! only interested in outer envelope for shocks
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
@@ -86,23 +81,23 @@
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 1d0
+   P_theta_for_velocity_time_centering = 0.5d0
 
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 1d0
+   L_theta_for_velocity_time_centering = 0.5d0
 
    set_rho_to_dm_div_dV = .false.
    
    use_Pvsc_art_visc = .true.
-   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_cq = 4.0d0
+   Pvsc_zsh = 0.1d0
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
 
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
+   always_use_dedt_form_of_energy_eqn = .true.
    
    RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
@@ -249,7 +244,7 @@
 ! window 2
       
    Grid2_win_flag = .true.
-   Grid2_title = '6 M\d\(2281)\u  Z=0.018  Cepheid  RSP2'
+   Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP2'
    
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

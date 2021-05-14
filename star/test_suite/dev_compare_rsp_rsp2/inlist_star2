@@ -1,9 +1,9 @@
 
 &star_job
    
-   load_saved_model = .true.
-   change_initial_RSP2_flag = .true.
-   new_RSP2_flag = .true.
+   load_saved_model_for_RSP2 = .true.
+   !change_initial_RSP2_flag = .true.
+   !new_RSP2_flag = .true.
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
    
@@ -133,9 +133,9 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 1 ! 10
+   pgstar_interval = 25
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'

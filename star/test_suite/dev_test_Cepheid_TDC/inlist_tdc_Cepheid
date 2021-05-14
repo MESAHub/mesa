@@ -19,7 +19,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1200 ! approx period/600
+   seconds_for_initial_dt = 1 ! 1200
 
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
@@ -35,6 +35,7 @@
 / ! end of star_job namelist
 
 &eos
+   use_Skye = .true.
 / ! end of eos namelist
 
 &kap
@@ -48,13 +49,20 @@
    initial_z = 0.008d0
    initial_mass = 6d0
 
-   max_timestep = 1200 ! approx period/600
+   max_timestep = 1200
 
    max_model_number = 5000000
    max_number_retries = 10000
+      
+! TDC
+   max_dt_div_tau_conv_for_TDC = 1d99
+   max_dt_years_for_TDC = 1d99
+   
+   alpha_TDC_DAMP = 1d0
+   alpha_TDC_DAMPR = 0d0
+   alpha_TDC_PtdVdt = 0d0
 
 ! atmosphere
-   
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0
 
@@ -65,7 +73,7 @@
 
 ! timesteps
    dt_div_min_dr_div_cs_limit = 0.5d0
-   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0 ! 0.75d0 ! only interested in outer envelope for shocks
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
@@ -79,26 +87,25 @@
 ! solver   
    steps_before_use_velocity_time_centering = 0
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 1d0
+   P_theta_for_velocity_time_centering = 0.5d0
 
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 1d0
+   L_theta_for_velocity_time_centering = 0.5d0
 
    set_rho_to_dm_div_dV = .false.
    
    use_Pvsc_art_visc = .true.
-   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_cq = 4.0d0
+   Pvsc_zsh = 0.1d0
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
 
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
-
-   alt_scale_height_flag = .false.
+   always_use_dedt_form_of_energy_eqn = .true.
 
    tol_max_correction = 5d-7
    
@@ -127,10 +134,10 @@
       history_interval = 40
       terminal_interval = 4000
 
-      !photo_interval = 100
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 10
+      photo_interval = 10
+      !profile_interval = 4000
+      !history_interval = 40
+      terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -208,13 +215,13 @@
 
 &pgstar
 
-   !pause = .true.
-   !pause_interval = 100
-   pgstar_interval = 2
+   pause = .true.
+   pause_interval = 10
+   pgstar_interval = 1 ! 25
 
 ! window 1
 
-   !Grid1_win_flag = .true.
+   Grid1_win_flag = .true.
    Grid1_title = 'Cepheid Grid Profiles'
 
    !Grid1_file_flag = .true.
@@ -230,7 +237,7 @@
 ! window 2
       
    Grid2_win_flag = .true.
-   Grid2_title = '6 M\d\(2281)\u  Z=0.018  Cepheid'
+   Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid TDC'
    
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
