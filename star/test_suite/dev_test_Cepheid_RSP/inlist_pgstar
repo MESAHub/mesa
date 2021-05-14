@@ -47,7 +47,7 @@
    Profile_Panels1_title = ''         
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
    
-   Profile_Panels1_num_panels = 10
+   Profile_Panels1_num_panels = 9
            
    Profile_Panels1_yaxis_name(1) = 'v_kms'         
    Profile_Panels1_other_yaxis_name(1) = '' 
@@ -84,10 +84,6 @@
    Profile_Panels1_yaxis_name(9) = 'COUPL'
    Profile_Panels1_other_yaxis_name(9) = ''
    !Profile_Panels1_same_yaxis_range(9) = .true.
-
-   Profile_Panels1_yaxis_name(10) = 'Pvsc'
-   Profile_Panels1_other_yaxis_name(10) = ''
-   !Profile_Panels1_same_yaxis_range(10) = .true.
 
 
    Profile_Panels1_file_flag = .false.

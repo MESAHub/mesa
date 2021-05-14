@@ -1,141 +1,21 @@
    
-   ! some general info about the model
-   
       model_number ! counting from the start of the run
-      star_age ! elapsed simulated time in years since the start of the run
-      !star_age_sec ! elapsed simulated time in seconds since the start of the run
-      !star_age_min ! elapsed simulated time in minutes since the start of the run
-      !star_age_hr ! elapsed simulated time in hours since the start of the run
-      star_age_day ! elapsed simulated time in days since the start of the run
+      day ! elapsed simulated time in days since the start of the run
       log_dt_sec ! log10 time_step in seconds
-      !num_zones ! number of zones in the model
-   
-   ! conditions near surface
+
       radius
       log_R
       v_surf_km_s ! (km/s)
-      v_surf_div_escape_v
-      !v_surf ! (cm/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
-      v_div_csound_max
-
-      max_abs_v_div_cs
-      dt_div_min_dr_div_cs
-
-
-      !surf_escape_v ! cm/s
       luminosity ! luminosity in Lsun units
-      !gravity 
-      !log_surf_pressure
-      !log_surf_density
-   
       log_L ! log10 luminosity in Lsun units
+      Teff
       effective_T
-      log_g
       log_Teff ! log10 effective temperature
-      
-      photosphere_L
-      photosphere_r
-      photosphere_T
-      photosphere_v_km_s
-      photosphere_v_div_cs
-      !photosphere_logg
-      
-      !log_lum_band B
-      !log_lum_band V
-      !log_lum_band I
-      
-      !log_lum_band bb_U
-      !log_lum_band bb_B
-      !log_lum_band bb_V
-      !log_lum_band bb_R
-      !log_lum_band bb_I
    
-   ! conditions near center
-   
-      !log_center_T ! temperature
-      !log_center_Rho ! density
-      !log_center_P ! pressure
-      !center_degeneracy ! the electron chemical potential in units of k*T
-      !center_gamma ! plasma interaction parameter at the centermost meshpoint.
-      
-      !log_center h1
-      !log_center h2
-      !log_center he3
-      !log_center he4
-      !log_center li7
-      
+      log_rel_run_E_err
+      log_tot_KE
 
-   ! log10 total ergs/sec for reaction categories (Lsun units)
-      
-      !pp
-      !cno
-      !tri_alfa
-      !c12_alfa
-      !n14_alfa
-      !o16_alfa
-
-   ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
-      
-      !rpp
-
-
-      
-      !mixing_regions 40
-      !burning_regions 80
-
-
-
-      ! you might want to get a more complete list of mixing regions by using the following
-      
-      !mixing_regions 40
-      
-      !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
-         ! the <integer> is the number of regions to report
-         ! there will be 2*<integer> columns for this in the log file, 2 for each region.
-         ! the first column for a region gives the mixing type using the values defined in const_def
-         ! the types are no_mixing, convective_mixing, overshoot_mixing, semiconvective_mixing,
-         ! and salt_finger_mixing, numbered from 0 to 4.
-         ! entries for extra columns after the last region in the star will have an invalid mixing_type value of -1.
-         ! the second column for a region gives the m/mstar location of the top of the region
-         ! mstar is the total mass of the star, so these locations range from 0 to 1
-         ! all regions are include starting from the center, so the bottom of one region
-         ! is the top of the previous one.  since we start at the center, the bottom of the 1st region is 0.
-         
-         ! the columns in the log file will have names like 'mix_type_1' and 'mix_qtop_1'
-
-      ! energy information
-      !avg_abs_v_div_cs
-      !log_avg_abs_v_div_cs
-      !max_abs_v_div_cs
-      !log_max_abs_v_div_cs
-      
-      !avg_abs_v
-      !log_avg_abs_v
-      !max_abs_v
-      !log_max_abs_v
-
-
-
-   ! misc
-   
-      !log_rel_run_E_err
-      !rel_E_err
-      
-      !log_total_turbulent_energy
-      
-
-   ! misc
-      
-      !r_center
-      !v_center
-
-      !num_iters
-      
       num_retries ! total during the run
-      !num_backups ! total during the run
-      !total_num_newton_solves
-      !total_num_newton_iterations
-      !avg_num_newton_iters
 
 
