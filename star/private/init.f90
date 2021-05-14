@@ -692,7 +692,6 @@
          s% dt = 0
 
          s% have_previous_conv_vel = .false.
-         s% have_mlt_vc = .false.
 
          s% net_name = ''
 
