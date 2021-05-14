@@ -243,8 +243,6 @@
             s% center_omega = center_value(s, s% omega)
             s% center_omega_div_omega_crit = center_omega_div_omega_crit()
          end if
-
-         s% log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
          
          luminosity = s% L(1)
 
