@@ -1142,20 +1142,6 @@
             if (failed('u_face_start')) exit
             call do1(s% u_face_val, c% u_face_val)
             if (failed('u_face_val')) exit
-            !call do1(s% d_uface_dlnR, c% d_uface_dlnR)
-            !if (failed('d_uface_dlnR')) exit
-            !call do1(s% d_uface_du00, c% d_uface_du00)
-            !if (failed('d_uface_du00')) exit
-            !call do1(s% d_uface_dum1, c% d_uface_dum1)
-            !if (failed('d_uface_dum1')) exit
-            !call do1(s% d_uface_dlnd00, c% d_uface_dlnd00)
-            !if (failed('d_uface_dlnd00')) exit
-            !call do1(s% d_uface_dlndm1, c% d_uface_dlndm1)
-            !if (failed('d_uface_dlndm1')) exit
-            !call do1(s% d_uface_dlnT00, c% d_uface_dlnT00)
-            !if (failed('d_uface_dlnT00')) exit
-            !call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
-            !if (failed('d_uface_dlnTm1')) exit
             call do1(s% d_uface_domega, c% d_uface_domega)
             if (failed('d_uface_domega')) exit
 
@@ -1163,24 +1149,6 @@
             if (failed('P_face_ad')) exit
             call do1(s% P_face_start, c% P_face_start)
             if (failed('P_face_start')) exit
-            !call do1(s% P_face, c% P_face)
-            !if (failed('P_face')) exit
-            !call do1(s% d_Pface_dL, c% d_Pface_dL)
-            !if (failed('d_Pface_dL')) exit
-            !call do1(s% d_Pface_dlnR, c% d_Pface_dlnR)
-            !if (failed('d_Pface_dlnR')) exit
-            !call do1(s% d_Pface_du00, c% d_Pface_du00)
-            !if (failed('d_Pface_du00')) exit
-            !call do1(s% d_Pface_dum1, c% d_Pface_dum1)
-            !if (failed('d_Pface_dum1')) exit
-            !call do1(s% d_Pface_dlnd00, c% d_Pface_dlnd00)
-            !if (failed('d_Pface_dlnd00')) exit
-            !call do1(s% d_Pface_dlndm1, c% d_Pface_dlndm1)
-            !if (failed('d_Pface_dlndm1')) exit
-            !call do1(s% d_Pface_dlnT00, c% d_Pface_dlnT00)
-            !if (failed('d_Pface_dlnT00')) exit
-            !call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
-            !if (failed('d_Pface_dlnTm1')) exit
             call do1(s% d_Pface_domega, c% d_Pface_domega)
             if (failed('d_Pface_domega')) exit
 
