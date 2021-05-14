@@ -695,9 +695,6 @@
             end if
          end if
 
-         call eval_integrated_total_energy_profile(s, s%total_energy_integral_surface, -1, ierr)
-         call eval_integrated_total_energy_profile(s, s%total_energy_integral_center, 1, ierr)
-
          call set_luminosity_by_category(s) ! final values for use in selecting timestep
          call set_power_info(s)
 
