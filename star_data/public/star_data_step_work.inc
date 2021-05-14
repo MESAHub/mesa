@@ -890,8 +890,6 @@
       
       ! misc other stuff        
 
-         real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
-
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, using_TDC, &
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
