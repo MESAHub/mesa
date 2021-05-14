@@ -584,7 +584,7 @@
          type (star_info), pointer :: s
          integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
-         real(dp) :: log_surface_gravity, v_div_csound_max, remnant_mass, ejecta_mass, &
+         real(dp) :: log_surface_gravity, log_surface_temperature, v_div_csound_max, remnant_mass, ejecta_mass, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
@@ -656,6 +656,7 @@
          end if
          
          log_surface_gravity = safe_log10(get_surface_gravity(s))
+         log_surface_temperature = s% lnT(1) / ln10
          center_gamma = center_value(s, s% gam)
 
          power_nuc_burn = s% power_nuc_burn
@@ -1013,13 +1014,13 @@
             call compare_to_target('log_Teff >= log_Teff_upper_limit', &
                log_Teff, s% log_Teff_upper_limit, t_log_Teff_upper_limit)
 
-         else if (s% log_surface_temperature <= s% log_Tsurf_lower_limit) then 
+         else if (log_surface_temperature <= s% log_Tsurf_lower_limit) then 
             call compare_to_target('log_surface_temperature <= log_Tsurf_lower_limit', &
-               s% log_surface_temperature, s% log_Tsurf_lower_limit, t_log_Tsurf_lower_limit)
+               log_surface_temperature, s% log_Tsurf_lower_limit, t_log_Tsurf_lower_limit)
                
-         else if (s% log_surface_temperature >= s% log_Tsurf_upper_limit) then 
+         else if (log_surface_temperature >= s% log_Tsurf_upper_limit) then 
             call compare_to_target('log_surface_temperature >= log_Tsurf_upper_limit', &
-               s% log_surface_temperature, s% log_Tsurf_upper_limit, t_log_Tsurf_upper_limit)
+               log_surface_temperature, s% log_Tsurf_upper_limit, t_log_Tsurf_upper_limit)
 
          else if (s% log_surface_radius <= s% log_Rsurf_lower_limit) then 
             call compare_to_target('log_surface_radius <= log_Rsurf_lower_limit', &
@@ -1496,7 +1497,6 @@
          end if
 
          nz = s% nz
-         must_do_profile = time_to_profile(s) ! also updates phase_of_evolution
          profile_priority = delta_priority
          model = s% model_number
          do_one_check_model = keep_going
@@ -1545,71 +1545,6 @@
       end function do_one_check_model
       
       
-      logical function time_to_profile(s)
-         use chem_def, only: ih1
-         use star_utils
-         type (star_info), pointer :: s
-         ! end-of-run and helium break-even are always done. 
-         ! this function decides on other models to be profiled.
-         real(dp), parameter :: center_he_drop = 1d-2, surface_t_drop = 4d-2
-         logical, parameter :: dbg = .false.
-         
-         include 'formats'
-         
-         time_to_profile = .false.
-         
-!         select case ( s% phase_of_evolution )
-!         case ( phase_starting )
-!            if ( arrived_main_seq(s) ) then
-!               if (dbg) write(*,*) 'arrived_main_seq'
-!               time_to_profile = .true.
-!               s% prev_tsurf = s% log_surface_temperature
-!               if (s% center_h1 > center_h_going) then
-!                  !s% phase_of_evolution = phase_early_main_seq
-!               else if ( s% center_h1 > center_h_gone ) then
-!                  !s% phase_of_evolution = phase_mid_main_seq
-!               else if ( s% center_he4 > center_he_going ) then
-!                  !s% phase_of_evolution = phase_he_ignition_over
-!               else
-!                  !s% phase_of_evolution = phase_helium_burning
-!               end if
-!            end if
-!         case ( phase_early_main_seq )
-!            if ( s% center_h1 < center_h_going ) then
-!               time_to_profile = .true.
-!               s% prev_tsurf = s% log_surface_temperature
-!               !s% phase_of_evolution = phase_mid_main_seq
-!            end if
-!         case ( phase_mid_main_seq )
-!            if ( s% center_h1 < center_h_gone &
-!                  .and. s% log_surface_temperature < s% prev_tsurf-surface_t_drop ) then
-!               time_to_profile = .true.
-!               !s% phase_of_evolution = phase_wait_for_he
-!            end if
-!         case ( phase_wait_for_he )
-!         case ( phase_he_igniting ) ! for non-flash ignition of helium core
-!            if ( s% center_he4 <= s% ignition_center_xhe-center_he_drop &
-!                  .and. s% log_surface_luminosity > s% prev_luminosity ) then
-!               time_to_profile = .true.
-!               !s% phase_of_evolution = phase_he_ignition_over
-!               s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
-!               s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
-!               if ( s% log_surface_luminosity > s% he_luminosity_limit ) &
-!                  s% he_luminosity_limit = s% log_surface_luminosity
-!            end if
-!            s% prev_luminosity = s% log_surface_luminosity
-!         case ( phase_he_ignition_over )
-!            if ( s% center_he4 < center_he_going ) then
-!               time_to_profile = .true.
-!               !s% phase_of_evolution = phase_helium_burning
-!            end if      
-!            s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
-!            s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
-!         case ( phase_carbon_burning )
-!         case ( phase_helium_burning )
-!         end select
-!         
-      end function time_to_profile
       
       
       subroutine dummy_before_evolve(id, ierr)
