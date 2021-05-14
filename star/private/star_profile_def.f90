@@ -1269,6 +1269,7 @@
          profile_column_name(p_dlog_other_dlogP) = 'dlog_other_dlogP'
 
          profile_column_name(p_total_energy_sign) = 'total_energy_sign'
+         profile_column_name(p_total_energy) = 'total_energy'
 
          profile_column_name(p_Ptrb) = 'Ptrb'
          profile_column_name(p_log_Ptrb) = 'log_Ptrb'
