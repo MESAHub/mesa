@@ -246,7 +246,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s, s_other
          integer :: k, id_other
-         logical, parameter :: do_drel = .false.
+         logical, parameter :: do_drel = .true.
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)

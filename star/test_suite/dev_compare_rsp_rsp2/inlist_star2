@@ -52,10 +52,10 @@
       !history_interval = 1
       terminal_interval = 50
 
-      !photo_interval = 50
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 10
+      terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
