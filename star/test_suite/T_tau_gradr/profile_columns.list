@@ -338,8 +338,6 @@
 
 
 !# Energetics
-   !total_energy ! specific total energy of cell (ergs/g). internal+potential+kinetic+rotation.
-   !total_energy_integral ! sum from surface inwards of cell dm * cell total_energy (ergs)
    !cell_specific_IE
    !cell_specific_KE
    !cell_IE_div_IE_plus_KE
