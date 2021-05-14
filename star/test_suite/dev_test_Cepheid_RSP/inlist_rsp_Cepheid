@@ -6,10 +6,11 @@
       !create_RSP_model = .true.
       create_RSP_model = .false.
       load_saved_model_for_RSP = .true.
-      load_model_filename = 'cycle10.mod'
+      !load_model_filename = 'cycle10.mod'
+      load_model_filename = 'cycle557.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
+      !save_model_when_terminate = .true.
+      !save_model_filename = 'cycle557.mod'
 
       initial_zfracs = 6
 
@@ -44,11 +45,11 @@
 &controls
 
    ! limit max_model_number as part of test_suite
-   max_model_number = 25580 ! 160000000
+   max_model_number = 160000000
 
 ! RSP controls
 
-   x_integer_ctrl(1) = -10 ! which period to check
+   x_integer_ctrl(1) = -1 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    RSP_mass = 6d0
