@@ -3,11 +3,13 @@ Just a Module
 
 This docuemnt describes how to use the MESA equation of state, opacity, and nuclear reaction networks outside of MESA.
 
+**Currently out of date, r12778**
+
 
 1. Equation of State
 --------------------
 
-Before starting, study :ref:`Overview of eos module`
+Before starting, explore :ref:`Overview of eos module` and :ref:`eos module controls`.
 
 ::
 
@@ -34,7 +36,7 @@ Now build the executable
 
      make
 
-And finally run the executable, named sample 
+And run the executable, named sample 
 
 .. code-block:: console
 
@@ -98,6 +100,104 @@ and the integer indices in contained $MESA_DIR/eos/public/eos_def.f90
 2. Opacity 
 ----------
 
+Before starting, explore :ref:`Overview of kap module` and :ref:`kap module controls`.
+
+::
+
+   mkdir my_kap
+   cd my_kap
+   cp $MESA_DIR/kap/test/src/sample_kap.f90 .
+
+
+Edit sample_kap.f90 and change
+
+::
+
+  my_mesa_dir = '../..'
+
+to your $MESA_DIR
+
+::
+
+  my_mesa_dir = '/Users/fxt/mesa_work/r12778'
+
+Now build the executable
+
+:: 
+
+     make
+
+And run the executable, named sample 
+
+.. code-block:: console
+
+ ./sample
+  Npts        1331
+ Nspec          31
+
+ Z_init   1.0000000000000000E-002
+
+ write kap_test.data
+
+
+
+
 3. Nuclear Reaction Networks
 ----------------------------
+
+Before starting, explore :ref:`Overview of net module` and :ref:`Reaction Networks`.
+
+::
+
+   mkdir my_net
+   cd my_net
+   cp $MESA_DIR/eos/test/src/sample_net.f .
+
+
+Edit sample_net.f and change
+
+::
+
+  my_mesa_dir = '../..'
+
+to your $MESA_DIR
+
+::
+
+  my_mesa_dir = '/Users/fxt/mesa_work/r12778'
+
+Now build the executable
+
+:: 
+
+     make
+
+And run the executable, named sample 
+
+.. code-block:: console
+
+ ./sample 
+ load basic.net
+                                                   logT    8.0000000000000000D+00
+                                                 logRho    6.0000000000000000D+00
+                                                eps_nuc    7.0567996329361832D+08
+
+ 
+
+For homework, edit sample_net.f to add writing out the initial composition and the net neutrino loss rate.
+
+
+.. code-block:: console
+
+ ./sample 
+ load basic.net
+ initial 1H     7.587664E-01
+ initial 4He    2.395223E-01
+ initial 24Mg   1.711250E-03
+                                                   logT    8.0000000000000000D+00
+                                                 logRho    6.0000000000000000D+00
+                                                eps_nuc    7.0567996329361832D+08
+                                                eps_neu    1.7599408231779337D+08
+
+
 
