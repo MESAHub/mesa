@@ -75,8 +75,15 @@ function check_restart {
 
         # do the restart
         rm -f "$3"
-        command time -q -f '%M' -o mem-re.txt ./re "$photo" >> out.txt 2> err.txt
-        testhub_log "mem_re: $(<mem-re.txt)"
+        if command time -q -f '%M' -o mem-re.txt ./re "$photo" >> out.txt 2> err.txt
+        then
+            testhub_log "mem_re: $(<mem-re.txt)"
+        else
+            testhub_log "mem_re: -1"
+            #failure_msg "$1 failed: non-zero exit code"
+            #testhub_log "failure_type: :exit_code"
+            #return 1
+        fi
         filter_stderr
         if [ -s err.txt ]; then
             failure_msg "$1 failed: wrote to stderr"
@@ -115,8 +122,15 @@ function check_run {
 
     # do the run
     date "+   start %H:%M:%S"
-    command time -q -f '%M' -o mem-rn.txt ./rn > out.txt 2> err.txt
-    testhub_log "mem_rn: $(<mem-rn.txt)"
+    if command time -q -f '%M' -o mem-rn.txt ./rn > out.txt 2> err.txt
+    then
+        testhub_log "mem_rn: $(<mem-rn.txt)"
+    else
+        testhub_log "mem_rn: -1"
+        #failure_msg "$1 failed: non-zero exit code"
+        #testhub_log "failure_type: :exit_code"
+        #return 1
+    fi
     filter_stderr
     if [ -s err.txt ]; then
         failure_msg "$1 failed: wrote to stderr"
