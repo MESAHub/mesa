@@ -228,16 +228,11 @@
          end if
          
          if (num_wk_reactions > 0) then
-            if (T9 > T9_weaklib_full_off_hi_Z .or. &
-                 T9 > T9_weaklib_full_off) then
-               ! at high T, weak rates depend on Ye so need to redo
-               ! even if okay to reuse raw rates for strong reactions.
-               if (dbg) write(*,*) 'call get_weaklib_rates'
-               call get_weaklib_rates(ierr)
-               if (ierr /= 0) then
-                  if (dbg) write(*,*) 'failed in get_weaklib_rates'
-                  return
-               end if
+            if (dbg) write(*,*) 'call get_weaklib_rates'
+            call get_weaklib_rates(ierr)
+            if (ierr /= 0) then
+               if (dbg) write(*,*) 'failed in get_weaklib_rates'
+               return
             end if
          end if
          
