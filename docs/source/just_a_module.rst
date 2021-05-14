@@ -1,19 +1,22 @@
 Just a Module 
 =============
 
-This docuemnt describes how to use the MESA equation of state, opacity, and nuclear reaction networks outside of MESA.
+This document describes how to use the MESA equation of state, opacity, and nuclear reaction networks outside of MESA.
+This document is current as of MESA version r15140.
 
-**Currently out of date, r12778**
+Download from Zenodo this set of directories and makefiles:
+`Just A Module <http://doi.org/10.5281/zenodo.4760707>`_
+Unpack the zip file anywhere you prefer.
 
 
 1. Equation of State
 --------------------
 
 Before starting, explore :ref:`Overview of eos module` and :ref:`eos module controls`.
+From where you unpacked the zip file
 
 ::
 
-   mkdir my_eos
    cd my_eos
    cp $MESA_DIR/eos/test/src/sample_eos.f .
 
@@ -30,13 +33,14 @@ to your $MESA_DIR
 
   my_mesa_dir = '/Users/fxt/mesa_work/r12778'
 
-Now build the executable
+while you are editing the file, explore the source code. Save and exit sample_eos.f.
+Now explore the makefile, and use it to build the executable
 
 :: 
 
      make
 
-And run the executable, named sample 
+Run the executable, named sample 
 
 .. code-block:: console
 
@@ -69,10 +73,10 @@ And run the executable, named sample
 
 
 
-For homework, edit sample_eos.f to add writing out the internal energy, specific entropy, partial derivative of 
+For homework, edit sample_eos.f to write out the internal energy, specific entropy, partial derivative of 
 the specific energy with respect tp temperature, and the free electron degeneracy parameter. For this assignment
 it can be useful to look at the result arrays returned by subroutine eosDT_get in $MESA_DIR/eos/public/eos_lib.f90 
-and the integer indices in contained $MESA_DIR/eos/public/eos_def.f90
+and the integer indices in contained $MESA_DIR/eos/public/eos_def.f90. One should find
 
 .. code-block:: console
 
@@ -101,12 +105,13 @@ and the integer indices in contained $MESA_DIR/eos/public/eos_def.f90
 ----------
 
 Before starting, explore :ref:`Overview of kap module` and :ref:`kap module controls`.
+From where you unpacked the zip file
 
 ::
 
-   mkdir my_kap
    cd my_kap
    cp $MESA_DIR/kap/test/src/sample_kap.f90 .
+   cp $MESA_DIR/kap/test/sample_kap_agb.model .
 
 
 Edit sample_kap.f90 and change
@@ -121,13 +126,14 @@ to your $MESA_DIR
 
   my_mesa_dir = '/Users/fxt/mesa_work/r12778'
 
-Now build the executable
+while you are editing the file, explore the source code. Save and exit sample_kap.f90.
+Now explore the makefile, and use it to build the executable
 
 :: 
 
      make
 
-And run the executable, named sample 
+Run the executable, named sample 
 
 .. code-block:: console
 
@@ -139,6 +145,16 @@ And run the executable, named sample
 
  write kap_test.data
 
+Exlore the output with, for example, 
+
+.. code-block:: console
+
+ head -4 kap_test.data
+                        grid                     log_T                    log_Rho                      kappa                   kappa_CO                dlnK_dlnRho                  dlnK_dlnT
+                           1   3.5585465937700458E+000   -8.4473997504616456E+000    1.7963661540119481E-003    1.7963661540119481E-003    5.9324713626873704E-001    7.7443291473431390E+000
+                           2   3.5585885995787634E+000   -8.4471065383083204E+000    1.7984321714704225E-003    1.7984321714704225E-003    5.9331124051801798E-001    7.7411914141834002E+000
+                           3   3.5586446634268447E+000   -8.4467158120772723E+000    1.8011910725935314E-003    1.8011910725935314E-003    5.9339708647702316E-001    7.7370154334749985E+000
+
 
 
 
@@ -146,12 +162,12 @@ And run the executable, named sample
 ----------------------------
 
 Before starting, explore :ref:`Overview of net module` and :ref:`Reaction Networks`.
+From where you unpacked the zip file
 
 ::
 
-   mkdir my_net
    cd my_net
-   cp $MESA_DIR/eos/test/src/sample_net.f .
+   cp $MESA_DIR/net/test/src/sample_net.f .
 
 
 Edit sample_net.f and change
@@ -166,13 +182,14 @@ to your $MESA_DIR
 
   my_mesa_dir = '/Users/fxt/mesa_work/r12778'
 
-Now build the executable
+while you are editing the file, explore the source code. Save and exit sample_net.f.
+Now explore the makefile, and use it to build the executable
 
 :: 
 
      make
 
-And run the executable, named sample 
+Run the executable, named sample 
 
 .. code-block:: console
 
@@ -180,7 +197,7 @@ And run the executable, named sample
  load basic.net
                                                    logT    8.0000000000000000D+00
                                                  logRho    6.0000000000000000D+00
-                                                eps_nuc    7.0567996329361832D+08
+                                                eps_nuc    7.0567990734355760D+08
 
  
 
@@ -196,8 +213,6 @@ For homework, edit sample_net.f to add writing out the initial composition and t
  initial 24Mg   1.711250E-03
                                                    logT    8.0000000000000000D+00
                                                  logRho    6.0000000000000000D+00
-                                                eps_nuc    7.0567996329361832D+08
-                                                eps_neu    1.7599408231779337D+08
-
-
+                                                eps_nuc    7.0567990734355760D+08
+                                                eps_neu    1.7599406836404651D+08
 
