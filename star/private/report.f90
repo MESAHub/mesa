@@ -245,7 +245,6 @@
          end if
 
          s% log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
-         s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
          
          luminosity = s% L(1)
 

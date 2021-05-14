@@ -584,7 +584,8 @@
          type (star_info), pointer :: s
          integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
-         real(dp) :: log_surface_gravity, log_surface_temperature, v_div_csound_max, remnant_mass, ejecta_mass, &
+         real(dp) :: log_surface_gravity, log_surface_temperature, log_surface_density, &
+            log_surface_pressure, v_div_csound_max, remnant_mass, ejecta_mass, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
@@ -657,6 +658,9 @@
          
          log_surface_gravity = safe_log10(get_surface_gravity(s))
          log_surface_temperature = s% lnT(1) / ln10
+         log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
+         log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
+
          center_gamma = center_value(s, s% gam)
 
          power_nuc_burn = s% power_nuc_burn
@@ -1030,21 +1034,21 @@
             call compare_to_target('log_surface_radius >= log_Rsurf_upper_limit', &
                s% log_surface_radius, s% log_Rsurf_upper_limit, t_log_Rsurf_upper_limit)
 
-         else if (s% log_surface_pressure <= s% log_Psurf_lower_limit) then 
+         else if (log_surface_pressure <= s% log_Psurf_lower_limit) then 
             call compare_to_target('log_surface_pressure <= log_Psurf_lower_limit', &
-               s% log_surface_pressure, s% log_Psurf_lower_limit, t_log_Psurf_lower_limit)
+               log_surface_pressure, s% log_Psurf_lower_limit, t_log_Psurf_lower_limit)
                
-         else if (s% log_surface_pressure >= s% log_Psurf_upper_limit) then 
+         else if (log_surface_pressure >= s% log_Psurf_upper_limit) then 
             call compare_to_target('log_surface_pressure >= log_Psurf_upper_limit', &
-               s% log_surface_pressure, s% log_Psurf_upper_limit, t_log_Psurf_upper_limit)
+               log_surface_pressure, s% log_Psurf_upper_limit, t_log_Psurf_upper_limit)
 
-         else if (s% log_surface_density <= s% log_Dsurf_lower_limit) then 
+         else if (log_surface_density <= s% log_Dsurf_lower_limit) then 
             call compare_to_target('log_surface_density <= log_Dsurf_lower_limit', &
-               s% log_surface_density, s% log_Dsurf_lower_limit, t_log_Dsurf_lower_limit)
+               log_surface_density, s% log_Dsurf_lower_limit, t_log_Dsurf_lower_limit)
                
-         else if (s% log_surface_density >= s% log_Dsurf_upper_limit) then 
+         else if (log_surface_density >= s% log_Dsurf_upper_limit) then 
             call compare_to_target('log_surface_density >= log_Dsurf_upper_limit', &
-               s% log_surface_density, s% log_Dsurf_upper_limit, t_log_Dsurf_upper_limit)
+               log_surface_density, s% log_Dsurf_upper_limit, t_log_Dsurf_upper_limit)
 
          else if (s% log_surface_luminosity <= s% log_L_lower_limit) then 
             call compare_to_target('log_surface_luminosity <= log_L_lower_limit', &

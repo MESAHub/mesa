@@ -642,8 +642,6 @@
       real(dp) :: T_surf, P_surf ! results from atm
       real(dp) :: log_surface_luminosity ! log10(L_surf)
       real(dp) :: log_surface_radius ! log10(total radius in Rsun units)
-      real(dp) :: log_surface_pressure ! log10(pressure)
-      real(dp) :: log_surface_density ! log10(density)
       
       ! fractional abundances by mass near surface
          ! averages over a fraction = 'surface_avg_abundance_dq' of star mass
