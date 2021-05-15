@@ -3,8 +3,8 @@
    show_log_description_at_start = .false.
    
    load_saved_model_for_RSP2 = .true.
-   !load_model_filename = 'cycle10.mod'
-   load_model_filename = 'cycle557.mod'
+   load_model_filename = 'cycle10.mod'
+   !load_model_filename = 'cycle557.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
@@ -107,7 +107,7 @@
    
    RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
    RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
-   RSP2_alfam =  0.5 ! TESTING   0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
    RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
    RSP2_alfad =     1d0
 
@@ -229,7 +229,7 @@
 
 ! window 1
 
-   Grid1_win_flag = .true.
+   !Grid1_win_flag = .true.
    Grid1_title = 'Cepheid Grid Profiles'
 
    !Grid1_file_flag = .true.

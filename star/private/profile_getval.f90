@@ -1791,12 +1791,16 @@
                   val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
+               else
+                  val = s% mlt_vc(k)/sqrt_2_div_3
                end if               
             case(p_log_w)
                if (s% using_RSP2) then
                   val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
+               else
+                  val = s% mlt_vc(k)/sqrt_2_div_3
                end if    
                val = safe_log10(val)           
             case(p_etrb)
@@ -1826,13 +1830,13 @@
             case(p_Uq)
                if (rsp_or_w) val = s% Uq(k)
             case(p_Lr)
-               if (rsp_or_w) val = s% Lr(k)
+               val = get_Lrad(s,k)
             case(p_Lr_div_L)
-               if (rsp_or_w) val = s% Lr(k)/s% L(k)
+               val = get_Lrad(s,k)/s% L(k)
             case(p_Lc)
-               if (rsp_or_w) val = s% Lc(k)
+               val = get_Lconv(s,k)
             case(p_Lc_div_L)
-               if (rsp_or_w) val = s% Lc(k)/s% L(k)
+               val = get_Lconv(s,k)/s% L(k)
             case(p_Lt)
                if (rsp_or_w) val = s% Lt(k)
             case(p_Lt_div_L)
