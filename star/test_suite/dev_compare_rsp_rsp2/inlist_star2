@@ -1,9 +1,9 @@
 
 &star_job
    
-   load_saved_model = .true.
-   change_initial_RSP2_flag = .true.
-   new_RSP2_flag = .true.
+   load_saved_model_for_RSP2 = .true.
+   !change_initial_RSP2_flag = .true.
+   !new_RSP2_flag = .true.
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
    
@@ -30,9 +30,13 @@
    RSP2_alfad = 1d0
    
    steps_before_use_velocity_time_centering = 0
-   include_P_in_velocity_time_centering = .true.
-   include_L_in_velocity_time_centering = .true.
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
+   include_P_in_velocity_time_centering = .true.
+   P_theta_for_velocity_time_centering = 0.5d0
+
+   include_L_in_velocity_time_centering = .true.
+   L_theta_for_velocity_time_centering = 0.5d0
    
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0
@@ -52,10 +56,10 @@
       !history_interval = 1
       terminal_interval = 50
 
-      !photo_interval = 50
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 10
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -130,12 +134,14 @@
 
 / ! end of controls namelist
 
+note: timestep has been reduced so should not get significant changes.
+uncomment writes in hydro_rsp2, set_RSP2_vars and rsp_step, HYD.
 
 &pgstar
 
    pause = .true.
-   !pause_interval = 100
-   pgstar_interval = 1 ! 10
+   pause_interval = 100
+   pgstar_interval = 1
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
@@ -144,8 +150,8 @@
    
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   !Profile_Panels1_xmin = 50 ! -101D0
-   !Profile_Panels1_xmax = 65 ! -101D0
+   !Profile_Panels1_xmin = 17 ! -101D0
+   !Profile_Panels1_xmax = 25 ! -101D0
    
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
 

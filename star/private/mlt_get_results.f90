@@ -212,8 +212,6 @@
             using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
                                                                   T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
          end if
-
-
          ! Run through assuming no TDC.         
          if (gradr > gradL) then ! convective
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter
@@ -712,6 +710,10 @@
             mixing_type = no_mixing
          end if
          if (k > 0) s% tdc_num_iters(k) = iter          
+         if (k==-50) then
+            write(*,3) 'TDC DAMP w Hp w3', k, s% solver_iter, &
+               s% DAMP(k), Af%val, Hp%val, pow3(Af%val)
+         end if
       end subroutine get_TDC_solution
             
 
@@ -972,8 +974,8 @@
          end if         
          if (k > 0) then ! save for plots
             s% SOURCE(k) = xi0%val*Af%val
-            s% DAMP(k) = -xi2%val*pow2(Af%val)
-            s% DAMPR(k) = -xi1%val*Af%val
+            s% DAMPR(k) = -xi1%val*pow2(Af%val)
+            s% DAMP(k) = -xi2%val*pow3(Af%val)
             s% COUPL(k) = s% SOURCE(k) - s% DAMP(k) - s% DAMPR(k)
          end if
       end function eval_Af

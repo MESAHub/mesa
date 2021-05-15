@@ -1,7 +1,7 @@
 
 &star_job
    
-   load_saved_model = .true.
+   load_saved_model_for_RSP2 = .true.
    !change_initial_RSP2_flag = .true.
    !new_RSP2_flag = .true.
    save_model_when_terminate = .true.
@@ -23,36 +23,33 @@
 &controls  
 
 ! solver   
-   !RSP2_assume_HSE = .true.
+   RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
    include_v_in_correction_limits = .false.
    include_L_in_correction_limits = .false.
-   !RSP2_alfad = 1d0
+   RSP2_alfad = 1d0
    
    steps_before_use_velocity_time_centering = 0
    include_P_in_velocity_time_centering = .true.
    include_L_in_velocity_time_centering = .true.
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
-   !use_fixed_Psurf_outer_BC = .true.
-   !fixed_Psurf = 0
+   use_fixed_Psurf_outer_BC = .true.
+   fixed_Psurf = 0
    
    alt_scale_height_flag = .false.
 
-   tol_max_correction = 1d-8 ! 3d-3
+   tol_max_correction = 5d-7
 
    
 ! output
 
-   photo_directory = 'photos2'
-   log_directory = 'LOGS2'
+      photo_interval = 1000
+      profile_interval = 1000
+      history_interval = 40
+      terminal_interval = 100
 
-      photo_interval = 500
-      !profile_interval = 1
-      !history_interval = 1
-      terminal_interval = 50
-
-      !photo_interval = 50
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
       !terminal_interval = 10
@@ -132,21 +129,5 @@
 
 
 &pgstar
-
-   pause = .true.
-   !pause_interval = 100
-   pgstar_interval = 1 ! 10
-   
-   !Grid2_file_flag = .true.
-   Grid2_file_dir = 'png2'
-   Grid2_file_prefix = 'RSP2'
-   Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
-   
-   Profile_Panels1_xaxis_name = 'zone'
-   Profile_Panels1_xaxis_reversed = .true.
-   !Profile_Panels1_xmin = 50 ! -101D0
-   !Profile_Panels1_xmax = 65 ! -101D0
-   
-   Profile_Panels1_show_mix_regions_on_xaxis = .true.
-
+ 
 / ! end of pgstar namelist

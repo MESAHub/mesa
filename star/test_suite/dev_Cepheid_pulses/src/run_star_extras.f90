@@ -33,13 +33,13 @@
       include 'test_suite_extras_def.inc'
       
       ! GYRE "best" info
-      real(dp) :: best_G_div_P, best_growth, best_period, best_4pi_Re_div_Im
-      integer :: best_model_number 
+      real(dp) :: best_period, best_cycles_to_double
+      integer :: best_model_number, best_order
 
       ! summary info at time of recently completely period
       integer :: num_periods, run_num_steps_end_prev, &
          run_num_iters_end_prev, run_num_retries_end_prev
-      real(dp) :: period, KE_growth, KE_growth_avg_abs, prev_KE_max, &
+      real(dp) :: period, KE_growth, KE_growth_avg, prev_KE_max, &
          period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
          period_delta_logL, period_delta_Mag
       ! info for period in progress
@@ -128,11 +128,11 @@
          integer, intent(in) :: id, iounit
          write(iounit) num_periods, run_num_steps_end_prev, &
             run_num_iters_end_prev, run_num_retries_end_prev, &
-            period, KE_growth, KE_growth_avg_abs, prev_KE_max, &
+            period, KE_growth, KE_growth_avg, prev_KE_max, &
             period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
-            best_G_div_P, best_growth, best_period, best_model_number, best_4pi_Re_div_Im
+            best_period, best_model_number, best_order, best_cycles_to_double
       end subroutine photo_write
 
 
@@ -142,11 +142,11 @@
          ierr = 0
          read(iounit, iostat=ierr) num_periods, run_num_steps_end_prev, &
             run_num_iters_end_prev, run_num_retries_end_prev, &
-            period, KE_growth, KE_growth_avg_abs, prev_KE_max, &
+            period, KE_growth, KE_growth_avg, prev_KE_max, &
             period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
-            best_G_div_P, best_growth, best_period, best_model_number, best_4pi_Re_div_Im
+            best_period, best_model_number, best_order, best_cycles_to_double
       end subroutine photo_read
 
       
@@ -167,7 +167,7 @@
             run_num_retries_end_prev = 0
             period = 0
             KE_growth = 0
-            KE_growth_avg_abs = 0
+            KE_growth_avg = 0
             prev_KE_max = 0
             period_max_vsurf_div_cs = 0
             period_delta_R = 0
@@ -184,11 +184,10 @@
             L_max = 0
             T_min = 0
             T_max = 0
-            best_G_div_P = 0
-            best_growth = 0
             best_period = 0
             best_model_number = 0    
-            best_4pi_Re_div_Im = 0                    
+            best_order = 0
+            best_cycles_to_double = 0                    
          end if
          if (.not. s% x_logical_ctrl(5)) then
             call gyre_init('gyre.in')
@@ -250,24 +249,29 @@
             extras_finish_step = gyre_in_mesa_extras_finish_step(id)
             if (s% ixtra3_array(1) > 0) then ! unpack the GYRE results
                do i=1,s% ixtra3_array(1)
-                  if (s% xtra1_array(i) == 0d0 .or. s% ixtra1_array(i) /= s% x_integer_ctrl(4)) cycle
-                  if (best_G_div_P == 0d0 .or. s% xtra1_array(i)/s% xtra2_array(i) < best_G_div_P) then
-                     best_G_div_P = s% xtra1_array(i)/s% xtra2_array(i)
-                     best_growth = s% xtra1_array(i)
-                     best_period = s% xtra2_array(i)
-                     best_4pi_Re_div_Im = s% xtra3_array(i)
+                  if (s% xtra1_array(i) == 0d0 .or. &
+                     (s% ixtra1_array(i) /= s% x_integer_ctrl(4) .and. s% x_integer_ctrl(4) > 0)) cycle
+                  if (s% xtra3_array(i) > 0d0 .and. &
+                      (best_cycles_to_double == 0d0 .or. s% xtra3_array(i) < best_cycles_to_double)) then
+                     !best_growth = s% xtra1_array(i)
+                     best_period = 1d0/s% xtra2_array(i) ! xtra2_array = freq (s^-1)
+                     best_period = best_period/(24*3600) ! change to days
+                     best_cycles_to_double = s% xtra3_array(i)
+                     best_order = s% ixtra1_array(i)
                      best_model_number = s% model_number
                   end if
                end do
-               if (best_period > 0) &
-                  write(*,*) 'best_model_number best_G_div_P period(d) growth(d) 4Pi*Re/Im', &
-                     best_model_number, best_G_div_P, best_period, best_growth, best_4pi_Re_div_Im
+               if (best_cycles_to_double > 0) &
+                  write(*,'(a38,i6,a8,i2,a12,f12.0,a12,f7.4,a12,f9.4)') &
+                     'best cycles to double: model_number', best_model_number, &
+                     'order', best_order, 'period(s)', 24*3600*best_period, &
+                     'period(d)', best_period, 'cycles', best_cycles_to_double
             end if
          end subroutine get_gyre_info_for_this_step
          
          logical function get_period_info()
             real(dp) :: v_surf, v_surf_start, KE, KE_avg, min_period, time_ended, &
-               delta_R, min_deltaR_for_periods, KE_growth_avg_abs_frac_new, &
+               delta_R, min_deltaR_for_periods, KE_growth_avg_frac_new, &
                min_period_div_target, cs
             include 'formats'
             get_period_info = .false.
@@ -329,9 +333,9 @@
             if (num_periods > 1) then
                KE_avg = 0.5d0*(KE_max + prev_KE_max)
                KE_growth = (KE_max - prev_KE_max)/KE_avg
-               KE_growth_avg_abs_frac_new = s% x_ctrl(9)
-               KE_growth_avg_abs = KE_growth_avg_abs_frac_new*abs(KE_growth) + &
-                  (1d0 - KE_growth_avg_abs_frac_new)*KE_growth_avg_abs
+               KE_growth_avg_frac_new = s% x_ctrl(9)
+               KE_growth_avg = KE_growth_avg_frac_new*KE_growth + &
+                  (1d0 - KE_growth_avg_frac_new)*KE_growth_avg
             end if
          
             period_delta_Teff = T_max - T_min
@@ -339,24 +343,24 @@
             period_delta_logL = log10(L_max/L_min)
             period_delta_Mag = 2.5d0*period_delta_logL
             period_max_vsurf_div_cs = v_div_cs_max
+            prev_KE_max = KE_max
+            write(*,'(i4,a14,i4,2(a14,f8.3),99(a14,f12.5))')  &
+               num_periods, &
+               'steps/cycle', s% model_number - run_num_steps_end_prev, &
+               'iters/step',  &
+                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
+                  dble(s% model_number - run_num_steps_end_prev), &
+               'period (d)', period/(24*3600), &
+               'KE growth', KE_growth_avg, &
+               'delta R/Rsun', period_delta_R/Rsun, &
+               'delta logL', period_delta_logL, &
+               'delta Teff', period_delta_Teff, &
+               'max vsurf/cs', period_max_vsurf_div_cs
+
+            time_started = time_ended
             run_num_steps_end_prev = s% model_number
             run_num_iters_end_prev = s% total_num_solver_iterations
             run_num_retries_end_prev = s% num_retries
-            prev_KE_max = KE_max
-
-            write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
-               num_periods,'period (d)',  period/(24*3600), &
-               'growth', KE_growth_avg_abs, &
-               'delta R/Rsun', period_delta_R/Rsun, &
-               'max vsurf/cs', period_max_vsurf_div_cs, &
-               'retries', s% num_retries - run_num_retries_end_prev,     &
-               'steps', s% model_number - run_num_steps_end_prev, &
-               'avg iters/step',  &
-                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
-                  dble(s% model_number - run_num_steps_end_prev), &
-               'step', s% model_number, 'age (d)', s% time/(24*3600)
-
-            time_started = time_ended
             call init_min_max_info
             get_period_info = .true.
 
@@ -451,7 +455,7 @@
          i = 1
          names(i) = 'num_periods'; vals(i) = num_periods; i=i+1
          names(i) = 'period'; vals(i) = period/(24*3600); i=i+1
-         names(i) = 'growth'; vals(i) = KE_growth_avg_abs; i=i+1
+         names(i) = 'growth'; vals(i) = KE_growth_avg; i=i+1
          names(i) = 'max_v_div_cs'; vals(i) = period_max_vsurf_div_cs; i=i+1
          names(i) = 'delta_R'; vals(i) = period_delta_R/Rsun; i=i+1
          names(i) = 'delta_Teff'; vals(i) = period_delta_Teff; i=i+1
@@ -568,9 +572,9 @@
          !write(*,*) 'call gyre_set_model'
          call gyre_set_model(global_data, point_data, 101)
 
-         write(*, 100) 'order', 'freq (Hz)', 'P (day)', 'growth (day)', &
-            'growth/P', '4*Pi*Re/Im'
-100      format(A8,A16,A16,A14,A12,A16,2A14)
+          write(*, 100) 'order', 'freq (Hz)', &
+             'P (sec)', 'P (day)', 'growth (day)', 'cycles to double'
+100       format(A8,8A20)
 
          rpar(1) = 0.5d-6 ! freq < this (Hz)
          ipar(1) = s% model_number
@@ -633,7 +637,7 @@
          do i=nz-1,1,-1
             k = nz+1-i ! v(1) from gyre => vel(nz) in star
             vel(k) = v1*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
-            write(*,2) 'vel', k, vel(k)
+            !write(*,2) 'vel', k, vel(k)
          end do
          vel(1) = vel(2)
          s% v_center = 0d0
@@ -675,7 +679,7 @@
             character(LEN=128) :: filename
             integer               :: unit, k, model_number, order_target, num_written, max_to_write
             complex(dp)           :: cfreq
-            real(dp)              :: freq, growth, freq_lim
+            real(dp)              :: freq, growth, freq_lim, per
             logical               :: write_flag
             type(grid_t)          :: gr
 
@@ -691,17 +695,21 @@
 
             cfreq = md% freq('HZ')
             freq = REAL(cfreq)
+            growth = AIMAG(cfreq)
+            if (freq /= 0d0) then
+               per = 1d0/freq
+            else
+               per = 0d0
+            end if
 
-            if (AIMAG(cfreq) > 0._dp) then ! unstable
-               growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
-!               write(*, 100) 'order', 'freq (Hz)', 'P (day)', 'growth (day)', &
-!                  'growth/P', '4*Pi*Re/Im'
-               write(*, 100)  md%n_pg, freq, 1d0/(freq*24*3600), growth, growth*freq*24*3600, &
-                  4d0*pi*REAL(cfreq)/AIMAG(cfreq)
-100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,2E14.4)
+            if (growth > 0._dp) then ! unstable
+               write(*, 100) md%n_pg, &
+                  freq, per, per/(24*3600), growth*(24*3600), freq/(2d0*pi*growth)
+100            format(I8,E20.4,2F20.4,E20.4,F20.4)
             else ! stable
-               write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
-110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)
+               write(*, 110) md%n_pg, &
+                  freq, per, per/(24*3600), growth*(24*3600), 'stable'
+110            format(I8,E20.4,2F20.4,E20.4,A20)
             end if
             
             if (md%n_pg > modes) return

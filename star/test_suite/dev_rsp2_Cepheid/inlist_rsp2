@@ -1,16 +1,16 @@
 
 &star_job
    
-   load_saved_model = .true.
-   change_initial_RSP2_flag = .true.
-   new_RSP2_flag = .true.
+   load_saved_model_for_RSP2 = .true.
+   !change_initial_RSP2_flag = .true.
+   !new_RSP2_flag = .true.
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
    
    change_initial_v_flag = .true.
    new_v_flag = .true.
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 

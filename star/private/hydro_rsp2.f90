@@ -80,6 +80,7 @@
          type(auto_diff_real_star_order1) :: x
          integer :: k, op_err
          include 'formats'         
+! write(*,3) 'RSP2 w', 22, s% solver_iter, s% w(22)
          ierr = 0
          if (s% need_to_reset_w) then
             write(*,2) 'reset_etrb_using_L', s% model_number
@@ -815,7 +816,7 @@
             D = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell*dw3
             ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          end if
-         if (k==-109) then
+         if (k==-50) then
             write(*,3) 'RSP2 DAMP w Hp_cell dw3', k, s% solver_iter, &
                D%val, w_00%val, Hp_cell%val, dw3% val
          end if
