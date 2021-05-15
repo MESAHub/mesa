@@ -106,7 +106,7 @@
    History_Panels1_title = ''      
    History_Panels1_num_panels = 4
 
-   History_Panels1_xaxis_name='star_age_day'
+   History_Panels1_xaxis_name='day'
    History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
    !History_Panels1_xmin = 0.1
    
@@ -136,7 +136,7 @@
    History_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0        
    History_Panels1_other_dymin(2) = -1 
    
-   History_Panels1_yaxis_name(3) = 'effective_T' 
+   History_Panels1_yaxis_name(3) = 'Teff' 
    History_Panels1_yaxis_reversed(3) = .false.
    History_Panels1_ymin(3) = -101d0 ! only used if /= -101d0
    History_Panels1_ymax(3) = -101d0 ! only used if /= -101d0        
@@ -213,7 +213,7 @@
    ! drel version of profile panels
    pgstar_profile_line_style = 1
    
-   Profile_Panels1_num_panels = 8
+   Profile_Panels1_num_panels = 9
            
    Profile_Panels1_yaxis_name(1) = 'v_drel'     
    Profile_Panels1_other_yaxis_name(1) = '' 
@@ -226,21 +226,22 @@
    
    Profile_Panels1_yaxis_name(4) = 'Chi_drel' ! 
    Profile_Panels1_other_yaxis_name(4) = '' 
-         
-   Profile_Panels1_yaxis_name(5) = 'SRC_drel' 
-   Profile_Panels1_other_yaxis_name(5) = '' 
-      
-   Profile_Panels1_yaxis_name(6) = 'DAMP_drel'
-   Profile_Panels1_other_yaxis_name(6) = '' 
 
-   Profile_Panels1_yaxis_name(7) = 'CPL_drel'
+   Profile_Panels1_yaxis_name(5) = 'CPL_drel'
+   Profile_Panels1_other_yaxis_name(5) = '' 
+         
+   Profile_Panels1_yaxis_name(6) = 'SRC_drel' 
+   Profile_Panels1_other_yaxis_name(6) = '' 
+      
+   Profile_Panels1_yaxis_name(7) = 'DAMP_drel'
    Profile_Panels1_other_yaxis_name(7) = '' 
       
    Profile_Panels1_yaxis_name(8) = 'Eq_drel' 
    Profile_Panels1_other_yaxis_name(8) = '' 
       
-   Profile_Panels1_yaxis_name(9) = '' 
-   Profile_Panels1_other_yaxis_name(9) = ''
+   Profile_Panels1_yaxis_name(9) = 'w' 
+   Profile_Panels1_other_yaxis_name(9) = 'Y_face'
+   Profile_Panels1_same_yaxis_range(9) = .false.
 
 
 

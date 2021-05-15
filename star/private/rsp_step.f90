@@ -270,6 +270,7 @@
             converged = .false.
             call set_1st_iter_R_using_v_start(s)
             s% R_center = s% R_center + s% dt*s% v_center
+! write(*,3) 'RSP HYD w', 22, 0, s% RSP_w(22)
             
             iter_loop: do iter = 1, max_iters  
                s% solver_iter = iter
@@ -291,6 +292,7 @@
                   DXH,DXXT,DXXC,DXXE,DXXL,EZH,kT_max,kW_max,kE_max,kL_max)
                if (s% doing_timing) call update_time(s, time0, total, s% time_solver_matrix)
                if (dbg_msg) call write_msg
+! write(*,3) 'RSP HYD w', 22, iter, s% RSP_w(22)
                if (iter == 1) cycle iter_loop
                converged = (abs(DXXT) < PREC2 .and. abs(DXXC) < PREC2)
             end do iter_loop      

@@ -668,11 +668,13 @@
             if (is_RSP_model) then
                if (want_RSP_model) then ! assumes i_w and i_Hp are set
                   j=j+1; xh(i_Et_RSP,k) = vec(j)
+                  if (k==22) write(*,2) 'RSP read w=sqrt(Et)', k, sqrt(vec(j))
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
                else if (want_RSP2_model) then ! convert Et from RSP to w in RSP2
                   j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j))); xh(i_Hp,k) = -1
+                  if (k==22) write(*,2) 'RSP2 read w=sqrt(Et)', k, sqrt(vec(j))
                   j=j+1; ! erad_RSP
                   j=j+1; ! Fr_RSP
                   j=j+1; xh(i_lum,k) = vec(j)
