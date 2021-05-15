@@ -3,11 +3,15 @@
    show_log_description_at_start = .false.
    
    load_saved_model = .true.
+   
    load_model_filename = '../dev_test_Cepheid_RSP/cycle10.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle140.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle230.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle327.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle557.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
-   !required_termination_code_string(1) = 'max_model_number'
    
    change_initial_v_flag = .true.
    new_v_flag = .true.
