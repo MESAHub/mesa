@@ -97,7 +97,7 @@
 
          !History_Panels2_xaxis_name='model_number'
          History_Panels2_xaxis_name='day'
-         History_Panels2_max_width = 140 !  200 ! only used if > 0.  causes xmin to move with xmax.
+         History_Panels2_max_width = 40 !  200 ! only used if > 0.  causes xmin to move with xmax.
          
          History_Panels2_yaxis_name(1) = 'Teff' 
          History_Panels2_yaxis_reversed(1) = .false.
@@ -146,7 +146,7 @@
          Profile_Panels2_show_mix_regions_on_xaxis = .true.
          !Profile_Panels2_show_grid = .true.
          
-         Profile_Panels2_num_panels = 6 
+         Profile_Panels2_num_panels = 5 
                  
          Profile_Panels2_yaxis_name(1) = 'v_div_cs'         
          Profile_Panels2_ymax(1) = -101D0 ! 1
@@ -168,7 +168,7 @@
          Profile_Panels2_yaxis_name(3) = 'logtau' 
          Profile_Panels2_other_yaxis_name(3) = 'opacity' 
                   
-         Profile_Panels2_yaxis_name(4) = 'tdc_num_iters'     
+         Profile_Panels2_yaxis_name(4) = 'Lc_div_L'     
          Profile_Panels2_ymax(4) = -101D0
          Profile_Panels2_ymin(4) = -101D0
          Profile_Panels2_other_yaxis_name(4) = 'mixing_type' 
@@ -181,9 +181,9 @@
          Profile_Panels2_yaxis_name(6) = 'log_dt_div_tau_conv'     
          Profile_Panels2_ymax(6) = -101D0 ! 
          Profile_Panels2_ymin(6) = -101D0 ! 
-         Profile_Panels2_other_yaxis_name(6) = 'Pvsc' 
-         Profile_Panels2_other_ymax(6) = -101D0
-         Profile_Panels2_other_ymin(6) = 0
+         Profile_Panels2_other_yaxis_name(6) = '' 
+         Profile_Panels2_other_ymax(6) = 1d-3
+         Profile_Panels2_other_ymin(6) = -1d-3
          
 
          Profile_Panels2_file_flag = .false.
@@ -202,13 +202,13 @@
          Text_Summary2_name(5,1) = ''
          
          Text_Summary2_name(1,2) = 'v_surf_km_s'
-         Text_Summary2_name(2,2) = 'max_v_div_cs'
+         Text_Summary2_name(2,2) = 'v_div_cs'
          Text_Summary2_name(3,2) = 'radius'
          Text_Summary2_name(4,2) = 'delta_R'
          Text_Summary2_name(5,2) = ''
          
          Text_Summary2_name(1,3) = 'log_Teff'
-         Text_Summary2_name(2,3) = 'delta_Teff'
+         Text_Summary2_name(2,3) = 'Teff'
          Text_Summary2_name(3,3) = 'log_L'
          Text_Summary2_name(4,3) = 'delta_logL'
          Text_Summary2_name(5,3) = ''

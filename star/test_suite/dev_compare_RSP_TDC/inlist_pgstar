@@ -181,8 +181,8 @@
    Profile_Panels1_other_yaxis_name(3) = 'Y_face_R' 
    Profile_Panels1_same_yaxis_range(3) = .true.
 
-   Profile_Panels1_yaxis_name(4) = 'Lr_div_L'
-   Profile_Panels1_other_yaxis_name(4) = 'Lr_div_L_R'
+   Profile_Panels1_yaxis_name(4) = 'Lc_div_L'
+   Profile_Panels1_other_yaxis_name(4) = 'Lc_div_L_R'
    !Profile_Panels1_yaxis_name(4) = 'Chi' ! 
    !Profile_Panels1_other_yaxis_name(4) = 'Chi_drel' 
    Profile_Panels1_same_yaxis_range(4) = .true.

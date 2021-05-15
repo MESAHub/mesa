@@ -61,8 +61,8 @@
    Profile_Panels1_other_yaxis_name(3) = '' 
    !Profile_Panels1_same_yaxis_range(3) = .true.
 
-   Profile_Panels1_yaxis_name(4) = 'Lr_div_L'
-   Profile_Panels1_other_yaxis_name(4) = ''
+   Profile_Panels1_yaxis_name(4) = 'Lc_div_L'
+   Profile_Panels1_other_yaxis_name(4) = 'sign_Lc'
    !Profile_Panels1_same_yaxis_range(4) = .true.
          
    Profile_Panels1_yaxis_name(5) = 'SOURCE' 
