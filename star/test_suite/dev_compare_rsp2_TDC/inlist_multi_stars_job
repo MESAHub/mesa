@@ -3,8 +3,8 @@
 
    num_stars = 2
    
-   inlist_names(1) = 'inlist_star1_header' 
-   inlist_names(2) = 'inlist_star2_header'
+   inlist_names(1) = 'inlist_rsp2_header' 
+   inlist_names(2) = 'inlist_tdc_header'
    
    ! for restart, set restart_flag true, set restart filenames, then ./rn (not ./re)
    

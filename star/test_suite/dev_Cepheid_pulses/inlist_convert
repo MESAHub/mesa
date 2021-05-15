@@ -47,12 +47,12 @@
 
 
 ! before convert
-!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P           4Pi*Re/Im
-!     708       1          0.1109E-05         901474.7048          15024.5784             10.4337          0.8454E+03          0.8102E+02          0.7404E-01
-!     708       2          0.1631E-05         612984.0325          10216.4005              7.0947          0.2764E+03          0.3896E+02          0.3561E-01
+!   model   order           freq (Hz)             P (sec)             P (day)        growth (day)    cycles to double
+!     702       1          0.1155E-05         865861.5823             10.0215          0.2577E-13             82.5579
+!     702       2          0.1692E-05         590982.0544              6.8401          0.8181E-13             38.0980
 ! after convert
-!     100       1          0.1108E-05         902477.9808          15041.2997             10.4453          0.8605E+03          0.8238E+02          0.7528E-01
-!     100       2          0.1626E-05         614957.7278          10249.2955              7.1176          0.3514E+03          0.4937E+02          0.4512E-01
+!     100       1          0.1154E-05         866828.5786             10.0327          0.2769E-13             76.7387
+!     100       2          0.1687E-05         592820.8268              6.8614          0.7530E-13             41.2657
 
 ! RSP for similar parameters
 !            P(days)         growth
@@ -92,7 +92,8 @@
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
    x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
    x_integer_ctrl(3) = 0 ! mode_l
-   x_integer_ctrl(4) = 1 ! report info for min growth/period for this order
+   x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
+      ! < 0 means report best over all gyre results for any order
    
 ! output controls
    terminal_show_age_units = 'days'

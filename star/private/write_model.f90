@@ -51,7 +51,7 @@
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, &
             RSP2_flag, u_flag, prev_flag, rotation_flag, &
-            write_mlt_vc, rsp_flag, no_L
+            write_mlt_vc, RSP_flag, no_L
 
          1 format(a32, 2x, 1pd26.16)
          11 format(a32, 2x, 1pd26.16, 2x, a, 2x, 99(1pd26.16))
@@ -66,12 +66,12 @@
          chem_id => s% chem_id
          nvar_hydro = s% nvar_hydro
          nz = s% nz
-         RSP2_flag = s% RSP2_flag 
          v_flag = s% v_flag
          u_flag = s% u_flag
          RTI_flag = s% RTI_flag
          rotation_flag = s% rotation_flag
-         rsp_flag = s% rsp_flag
+         RSP_flag = s% RSP_flag
+         RSP2_flag = s% RSP2_flag 
          write_mlt_vc = s% have_mlt_vc
          
          species = s% species
@@ -81,17 +81,17 @@
          write(iounit,'(a)') '!'
          prev_flag = (s% nz_old == s% nz .and. s% generations > 1)
          file_type = 0
-         if (RSP2_flag) file_type = file_type + 2**bit_for_w
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (prev_flag) file_type = file_type + 2**bit_for_2models
          if (v_flag) file_type = file_type + 2**bit_for_velocity
          if (u_flag) file_type = file_type + 2**bit_for_u
          if (rotation_flag) file_type = file_type + 2**bit_for_rotation
          if (rotation_flag) file_type = file_type + 2**bit_for_j_rot
-         if (rsp_flag) file_type = file_type + 2**bit_for_RSP
+         if (RSP_flag) file_type = file_type + 2**bit_for_RSP
+         if (RSP2_flag) file_type = file_type + 2**bit_for_RSP2
          if (write_mlt_vc) file_type = file_type + 2**bit_for_mlt_vc
          
-         no_L = (s% rsp_flag .or. s% RSP2_flag)
+         no_L = (s% RSP_flag .or. s% RSP2_flag)
          if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
          
          write(iounit, '(i14)', advance='no') file_type
@@ -113,9 +113,9 @@
          if (BTEST(file_type, bit_for_mlt_vc)) &
             write(iounit,'(a)',advance='no') ', mlt convection velocity (mlt_vc)'
          if (BTEST(file_type, bit_for_RSP)) &
-            write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
-         if (BTEST(file_type, bit_for_w)) &
-            write(iounit,'(a)',advance='no') ', turbulent velocity (w), pressure scale height (Hp)'
+            write(iounit,'(a)',advance='no') ', RSP luminosity (L), turbulent energy (et_RSP), and radiative flux (erad_RSP)'
+         if (BTEST(file_type, bit_for_RSP2)) &
+            write(iounit,'(a)',advance='no') ', RSP2 turbulent velocity (w) and pressure scale height (Hp)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -190,7 +190,7 @@
             call write1(s% lnd(k),ierr); if (ierr /= 0) exit
             call write1(s% lnT(k),ierr); if (ierr /= 0) exit
             call write1(s% lnR(k),ierr); if (ierr /= 0) exit            
-            if (rsp_flag) then
+            if (RSP_flag) then
                call write1(s% RSP_Et(k),ierr); if (ierr /= 0) exit
                call write1(s% erad(k),ierr); if (ierr /= 0) exit
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
@@ -268,10 +268,10 @@
 
          subroutine header
             write(iounit, fmt='(10x, a9, 1x, 99(a26, 1x))', advance='no') 'lnd', 'lnT', 'lnR'
-            if (rsp_flag) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'et_rsp'
-               write(iounit, fmt='(a26, 1x)', advance='no') 'erad_rsp'
-               write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_rsp'
+            if (RSP_flag) then
+               write(iounit, fmt='(a26, 1x)', advance='no') 'et_RSP'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'erad_RSP'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_RSP'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (RSP2_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'w'

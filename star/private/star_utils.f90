@@ -3534,10 +3534,11 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: v00, vp1, Peos, rho, &
             Peos_div_rho, dv
-         real(dp) :: cq, zsh
+         real(dp) :: Pvsc_start, cq, zsh
          Pvsc = 0
-         s% Pvsc(k) = 0
-         if (s% Pvsc_start(k) < 0d0) s% Pvsc_start(k) = 0
+         s% Pvsc(k) = 0d0
+         Pvsc_start = s% Pvsc_start(k)
+         if (Pvsc_start < 0d0) s% Pvsc_start(k) = 0d0
          if (.not. (s% v_flag .and. s% use_Pvsc_art_visc)) return
          cq = s% Pvsc_cq
          if (cq == 0d0) return
@@ -3551,7 +3552,7 @@
          if (dv%val <= 0d0) return
          Pvsc = cq*rho*pow2(dv)
          s% Pvsc(k) = Pvsc%val
-         if (s% Pvsc_start(k) < 0d0) s% Pvsc_start(k) = s% Pvsc(k)
+         if (Pvsc_start < 0d0) s% Pvsc_start(k) = s% Pvsc(k)
       end subroutine get_Pvsc_ad
       
       
