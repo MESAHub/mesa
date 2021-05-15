@@ -352,32 +352,32 @@
          
          contains
                
-            real(dp) function rel_diff(a, b, atol, rtol) result(d)
-               real(dp), intent(in) :: a, b
-               real(dp), intent(in), optional :: atol, rtol
-               real(dp) :: atl, rtl
-               if (present(atol)) then
-                  atl = atol
-               else
-                  atl = 1d-6
-               end if
-               if (present(rtol)) then
-                  rtl = rtol
-               else
-                  rtl = 1d-3
-               end if
-               d = (a - b)/(atl + rtl*max(abs(a),abs(b)))
-            end function rel_diff
-         
-            real(dp) function fix_if_bad(v)
-               use utils_lib, only: is_bad
-               real(dp), intent(in) :: v
-               if (is_bad(v)) then
-                  fix_if_bad = 100
-               else
-                  fix_if_bad = v
-               end if
-            end function fix_if_bad
+         real(dp) function rel_diff(b, a, atol, rtol) result(d)
+            real(dp), intent(in) :: a, b
+            real(dp), intent(in), optional :: atol, rtol
+            real(dp) :: atl, rtl
+            if (present(atol)) then
+               atl = atol
+            else
+               atl = 1d-6
+            end if
+            if (present(rtol)) then
+               rtl = rtol
+            else
+               rtl = 1d-3
+            end if
+            d = (a - b)/(atl + rtl*max(abs(a),abs(b)))
+         end function rel_diff
+      
+         real(dp) function fix_if_bad(v)
+            use utils_lib, only: is_bad
+            real(dp), intent(in) :: v
+            if (is_bad(v)) then
+               fix_if_bad = 100
+            else
+               fix_if_bad = v
+            end if
+         end function fix_if_bad
             
       end subroutine data_for_extra_profile_columns
 

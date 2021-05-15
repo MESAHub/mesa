@@ -80,6 +80,7 @@
          type(auto_diff_real_star_order1) :: x
          integer :: k, op_err
          include 'formats'         
+! write(*,3) 'RSP2 w', 22, s% solver_iter, s% w(22)
          ierr = 0
          if (s% need_to_reset_w) then
             write(*,2) 'reset_etrb_using_L', s% model_number
