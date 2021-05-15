@@ -25,10 +25,10 @@
    photo_directory = 'photos2'
    log_directory = 'LOGS2'
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 4000
       !history_interval = 40
-      terminal_interval = 1
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -106,7 +106,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
    !pause_interval = 10
    pgstar_interval = 1 ! 25
 
@@ -139,18 +139,23 @@
    Grid2_file_prefix = 'grid2'
    Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
    
-   !Profile_Panels2_show_grid = .true.
+   !Profile_Panels1_show_grid = .true.
 
-   !Profile_Panels2_xaxis_name = 'logtau'
-   !Profile_Panels2_xaxis_reversed = .true.
-   !Profile_Panels2_xmin = -101d0
-   !Profile_Panels2_xmax = -101D0
+   !Profile_Panels1_xaxis_name = 'logtau'
+   !Profile_Panels1_xaxis_reversed = .true.
+   !Profile_Panels1_xmin = -101d0
+   !Profile_Panels1_xmax = -101D0
 
-   Profile_Panels2_xaxis_name = 'logxm'
-   Profile_Panels2_xaxis_reversed = .true.
-   Profile_Panels2_xmin = -6
-   Profile_Panels2_xmax = -0.1
+   Profile_Panels1_xaxis_name = 'logxm'
+   Profile_Panels1_xaxis_reversed = .true.
+   Profile_Panels1_xmin = -6
+   Profile_Panels1_xmax = -0.1
 
-   Profile_Panels2_dymin(4) = 0.02
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
+   Profile_Panels1_xmin = -101d0
+   Profile_Panels1_xmax = -101d0
+
+   Profile_Panels1_dymin(4) = 0.02
    
 / ! end of pgstar namelist

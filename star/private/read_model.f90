@@ -662,19 +662,15 @@
             j = 1
             j=j+1; xh(i_lnd,k) = vec(j)
             j=j+1; xh(i_lnT,k) = vec(j)
-            j=j+1; xh(i_lnR,k) = vec(j)
-            
-            
+            j=j+1; xh(i_lnR,k) = vec(j)            
             if (is_RSP_model) then
                if (want_RSP_model) then ! assumes i_w and i_Hp are set
                   j=j+1; xh(i_Et_RSP,k) = vec(j)
-                  if (k==22) write(*,2) 'RSP read w=sqrt(Et)', k, sqrt(vec(j))
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
                else if (want_RSP2_model) then ! convert Et from RSP to w in RSP2
                   j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j))); xh(i_Hp,k) = -1
-                  if (k==22) write(*,2) 'RSP2 read w=sqrt(Et)', k, sqrt(vec(j))
                   j=j+1; ! erad_RSP
                   j=j+1; ! Fr_RSP
                   j=j+1; xh(i_lum,k) = vec(j)
@@ -725,7 +721,10 @@
                j=j+1; xh(i_alpha_RTI,k) = vec(j)
             end if
             if (s% have_mlt_vc) then
-               j=j+1; s% mlt_vc(k) = vec(j); s% conv_vel(k) = s% mlt_vc(k)
+               j=j+1; 
+               if (.not. is_RSP_model .and. .not. is_RSP2_model) then
+                  s% mlt_vc(k) = vec(j); s% conv_vel(k) = s% mlt_vc(k)
+               end if
             end if
             if (j+species > nvec) then
                ierr = -1
@@ -742,7 +741,6 @@
             end do
          end do
 !$omp end critical (read1_model_loop)
-
          if (ierr /= 0) then
             write(*,*) 'read1_model_loop failed'
             return

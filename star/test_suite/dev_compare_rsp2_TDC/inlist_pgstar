@@ -200,7 +200,7 @@
    Profile_Panels1_yaxis_name(7) = 'COUPL'
    !Profile_Panels1_other_yaxis_name(7) = 'CPL_drel' 
    Profile_Panels1_other_yaxis_name(7) = 'COUPL_R'
-   !Profile_Panels1_same_yaxis_range(9) = .true.
+   Profile_Panels1_same_yaxis_range(7) = .true.
       
    Profile_Panels1_yaxis_name(8) = 'Eq' 
    !Profile_Panels1_other_yaxis_name(8) = 'Eq_drel' 
@@ -209,7 +209,7 @@
       
    Profile_Panels1_yaxis_name(9) = 'tdc_num_iters' 
    Profile_Panels1_other_yaxis_name(9) = ''
-   Profile_Panels1_same_yaxis_range(9) = .true.
+   Profile_Panels1_same_yaxis_range(9) = .false.
 
    Profile_Panels1_file_flag = .false.
    Profile_Panels1_file_dir = 'png'
