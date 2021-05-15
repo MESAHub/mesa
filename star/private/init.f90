@@ -349,8 +349,6 @@
          s% have_initial_energy_integrals = .false.
 
          s% num_solver_iterations = 0         
-         s% bad_max_corr_cnt = 0
-
          s% mesh_call_number = 0
          s% solver_call_number = 0
          s% diffusion_call_number = 0

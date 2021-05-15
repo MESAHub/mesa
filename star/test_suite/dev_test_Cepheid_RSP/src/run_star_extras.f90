@@ -193,7 +193,7 @@ module run_star_extras
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 0
+         how_many_extra_profile_columns = 1
       end function how_many_extra_profile_columns
       
       
@@ -209,6 +209,14 @@ module run_star_extras
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         names(1) = 'sign_Lc'
+         do k=1,nz
+            if (abs(s% Lc(k)) < 1d-6) then
+               vals(k,1) = 0d0
+            else
+               vals(k,1) = sign(1d0,s% Lc(k))
+            end if
+         end do
       end subroutine data_for_extra_profile_columns
       
       
