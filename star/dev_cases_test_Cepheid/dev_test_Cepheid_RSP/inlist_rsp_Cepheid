@@ -6,18 +6,22 @@
       !create_RSP_model = .true.
       create_RSP_model = .false.
       load_saved_model_for_RSP = .true.
-      load_model_filename = 'cycle10.mod'
+      !load_model_filename = 'cycle10.mod'
+      !load_model_filename = 'cycle140.mod'
+      load_model_filename = 'cycle230.mod'
+      !load_model_filename = 'cycle327.mod'
+      !load_model_filename = 'cycle557.mod'
 
       !save_model_when_terminate = .true.
-      !save_model_filename = 'cycle230.mod'
+      !save_model_filename = 'cycle280.mod'
 
       initial_zfracs = 6
 
-      set_initial_age = .true.
-      initial_age = 0
+      !set_initial_age = .true.
+      !initial_age = 0
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+      !set_initial_model_number = .true.
+      !initial_model_number = 0
       
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0

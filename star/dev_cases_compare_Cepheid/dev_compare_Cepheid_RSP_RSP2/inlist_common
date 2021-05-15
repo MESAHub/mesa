@@ -2,7 +2,11 @@
 &star_job
    show_log_description_at_start = .false.
    
-   load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle10.mod'
+   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle10.mod'
+   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle140.mod'
+   load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle230.mod'
+   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle327.mod'
+   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle557.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
@@ -11,11 +15,11 @@
    change_initial_v_flag = .true.
    new_v_flag = .true.
 
-   set_initial_age = .true.
-   initial_age = 0
+   !set_initial_age = .true.
+   !initial_age = 0
    
-   set_initial_model_number = .true.
-   initial_model_number = 0
+   !set_initial_model_number = .true.
+   !initial_model_number = 0
 
    set_initial_dt = .true.
    seconds_for_initial_dt = 1200 ! 1d-6 ! 

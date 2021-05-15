@@ -6,7 +6,7 @@
       radius
       log_R
       v_surf_km_s ! (km/s)
-      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      v_div_cs ! velocity divided by sound speed at outermost grid point
       luminosity ! luminosity in Lsun units
       log_L ! log10 luminosity in Lsun units
       Teff
