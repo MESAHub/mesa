@@ -6,11 +6,11 @@
       !create_RSP_model = .true.
       create_RSP_model = .false.
       load_saved_model_for_RSP = .true.
-      !load_model_filename = 'cycle10.mod'
-      load_model_filename = 'cycle557.mod'
+      load_model_filename = 'cycle10.mod'
+      !load_model_filename = 'cycle557.mod'
 
-      !save_model_when_terminate = .true.
-      !save_model_filename = 'cycle557.mod'
+      save_model_when_terminate = .true.
+      save_model_filename = 'cycle327.mod'
 
       initial_zfracs = 6
 
@@ -47,9 +47,14 @@
    ! limit max_model_number as part of test_suite
    max_model_number = 160000000
 
+
+   !v_div_csound_surf_limit = 0.99 ! save model here
+
+
+
 ! RSP controls
 
-   x_integer_ctrl(1) = -1 ! which period to check
+   x_integer_ctrl(1) = 327 ! -1 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    RSP_mass = 6d0
@@ -107,7 +112,7 @@
 ! window 1
 
    Grid1_win_flag = .true.
-   Grid1_title = 'Cepheid Grid Profiles'
+   Grid1_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP'
 
    !Grid1_file_flag = .true.
    Grid1_file_dir = 'png1'
