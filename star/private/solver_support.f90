@@ -644,11 +644,11 @@
          min_alpha = 1d0
          nz = s% nz
 
-         if (s% using_RSP2) & ! clip change in w to maintain non-negativity.
-            call clip_so_non_negative(s% i_w, 0d0)
+         if (s% using_RSP2) & ! adjust correction_factor to maintain non-negativity for w
+            call adjust_so_non_negative(s% i_w, 0d0)
 
-         if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
-            call clip_so_non_negative(s% i_alpha_RTI, 0d0)
+         if (s% RTI_flag) & ! adjust correction_factor to maintain non-negativity for alpha_RTI
+            call adjust_so_non_negative(s% i_alpha_RTI, 0d0)
 
          if (s% conv_vel_flag) then ! clip change in conv_vel to maintain non-negativity.
             log_conv_vel_v0 = log(s% conv_vel_v0)
@@ -674,19 +674,6 @@
                   -s% max_frac_for_negative_surf_lum*old_lum_surf/dlum_surf)
             end if
          end if
-         
-         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) then
-            call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
-         end if
-         
-         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) then
-            call clip1(s% i_lnT, s% solver_clip_dlogT*ln10)
-         end if
-         
-         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) then
-            call clip1(s% i_lnR, s% solver_clip_dlogR*ln10)
-         end if
-               
 
          !if (s% w_div_wc_flag) then
          !   do k=1,nz
@@ -746,7 +733,7 @@
          
          contains
          
-         subroutine clip_so_non_negative(i,minval)
+         subroutine adjust_so_non_negative(i,minval)
             integer, intent(in) :: i
             real(dp), intent(in) :: minval
             real(dp) :: dval, old_val, new_val
@@ -756,31 +743,13 @@
                new_val = old_val + dval
                if (dval >= 0) cycle
                if (new_val >= 0d0) cycle
-               dval = minval - old_val
-               B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
+               alpha = -old_val/dval
+               if (alpha < min_alpha) then
+                  min_alpha = alpha
+                  bad_k = k
+               end if
             end do
-         end subroutine clip_so_non_negative
-            
-         subroutine clip1(i, clip)
-            integer, intent(in) :: i
-            real(dp), intent(in) :: clip
-            integer :: k
-            real(dp) :: old_x, delta, abs_delta, abs_B
-            include 'formats'
-            if (clip <= 0d0) return
-            do k = 1, s% nz
-               old_x = s% xh_start(i,k) + s% solver_dx(i,k) ! value before this iteration
-               delta = B(i,k)*s% x_scale(i,k)*correction_factor ! change for this iter
-               ! skip if change small enough or if too big to change
-               if (abs(delta) <= clip*abs(old_x) .or. is_bad(delta) .or. &
-                   abs(old_x) < 1d0 .or. abs(delta) > 10d0*clip*abs(old_x)) cycle
-               abs_delta = clip*abs(old_x)
-               abs_B = abs_delta/(s% x_scale(i,k)*correction_factor)
-               B(i,k) = sign(abs_B,B(i,k))
-               write(*,2) 'clip change ' // trim(s% nameofvar(i)), k, delta, old_x
-               !stop 'Bdomain'
-            end do
-         end subroutine clip1
+         end subroutine adjust_so_non_negative
 
       end subroutine Bdomain
 

@@ -345,7 +345,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 25
+   pgstar_interval = 1
 
 ! window 1
 

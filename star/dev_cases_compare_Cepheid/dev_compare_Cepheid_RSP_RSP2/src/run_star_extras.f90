@@ -134,7 +134,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 5
+         how_many_extra_history_columns = 6
       end function how_many_extra_history_columns
       
       
@@ -163,11 +163,13 @@
          names(3) = 'Teff_R'
          names(4) = 'L_R'
          names(5) = 'log_tot_KE_R'
+         names(6) = 'num_periods'
          vals(1) = s_other% r(1)/Rsun
          vals(2) = s_other% v(1)/1d5 ! kms
          vals(3) = s_other% Teff
          vals(4) = s_other% L(1)/Lsun
          vals(5) = safe_log10(s_other% total_radial_kinetic_energy_end)
+         vals(6) = s_other% rsp_num_periods
       end subroutine data_for_extra_history_columns
 
       
@@ -239,8 +241,8 @@
          names(i) = 'Uq_R'; i=i+1
          names(i) = 'Uq_drel'; i=i+1
          
-         names(i) = 'L_r'; i=i+1
-         names(i) = 'L_drel'; i=i+1
+         names(i) = 'Pvsc_R'; i=i+1
+         names(i) = 'Pvsc_drel'; i=i+1
 
          names(i) = 'logR_R'; i=i+1
          names(i) = 'logP_R'; i=i+1
@@ -294,8 +296,8 @@
                vals(k,i) = s_other% Uq(k); i=i+1
                vals(k,i) = rel_diff(s_other% Uq(k), s% Uq(k)); i=i+1
          
-               vals(k,i) = s_other% L(k); i=i+1
-               vals(k,i) = rel_diff(s_other% L(k), s% L(k)); i=i+1
+               vals(k,i) = s_other% Pvsc(k); i=i+1
+               vals(k,i) = rel_diff(s_other% Pvsc(k), s% Pvsc(k)); i=i+1
 
                vals(k,i) = safe_log10(s_other% r(k)/Rsun); i=i+1
                vals(k,i) = s_other% lnPeos(k)/ln10; i=i+1
@@ -315,12 +317,12 @@
             if (present(atol)) then
                atl = atol
             else
-               atl = 1d-6
+               atl = 1d-9
             end if
             if (present(rtol)) then
                rtl = rtol
             else
-               rtl = 1d-3
+               rtl = 1d0
             end if
             d = (a - b)/(atl + rtl*max(abs(a),abs(b)))
          end function rel_diff

@@ -7,6 +7,7 @@
       log_R
       v_surf_km_s ! (km/s)
       v_div_cs ! velocity divided by sound speed at outermost grid point
+      v_div_vesc
       luminosity ! luminosity in Lsun units
       log_L ! log10 luminosity in Lsun units
       Teff
@@ -19,5 +20,6 @@
       log_center_Rho ! density
 
       num_retries ! total during the run
+      rsp_num_periods
       
 

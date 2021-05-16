@@ -386,7 +386,6 @@
     min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
     hydro_mtx_max_allowed_logRho, report_min_rcond_from_DGESXV, &
     hydro_mtx_min_allowed_logT, hydro_mtx_min_allowed_logRho, use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX, &
-    solver_clip_dlogT, solver_clip_dlogRho, solver_clip_dlogR, &
     op_split_burn, op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
     op_split_burn_min_T_for_variable_T_solver, solver_test_partials_show_dx_var_name, &
     tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
@@ -1978,10 +1977,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% hydro_mtx_max_allowed_logRho = hydro_mtx_max_allowed_logRho
  s% hydro_mtx_min_allowed_logT = hydro_mtx_min_allowed_logT
  s% hydro_mtx_min_allowed_logRho = hydro_mtx_min_allowed_logRho
-
- s% solver_clip_dlogT = solver_clip_dlogT
- s% solver_clip_dlogRho = solver_clip_dlogRho
- s% solver_clip_dlogR = solver_clip_dlogR
  
  s% use_DGESVX_in_bcyclic = use_DGESVX_in_bcyclic
  s% use_equilibration_in_DGESVX = use_equilibration_in_DGESVX
@@ -3652,10 +3647,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  hydro_mtx_max_allowed_logRho = s% hydro_mtx_max_allowed_logRho
  hydro_mtx_min_allowed_logT = s% hydro_mtx_min_allowed_logT
  hydro_mtx_min_allowed_logRho = s% hydro_mtx_min_allowed_logRho
-
- solver_clip_dlogT = s% solver_clip_dlogT
- solver_clip_dlogRho = s% solver_clip_dlogRho
- solver_clip_dlogR = s% solver_clip_dlogR
  
  use_DGESVX_in_bcyclic = s% use_DGESVX_in_bcyclic
  use_equilibration_in_DGESVX = s% use_equilibration_in_DGESVX
