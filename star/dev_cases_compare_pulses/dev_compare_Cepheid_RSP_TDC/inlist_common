@@ -12,7 +12,6 @@
    
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
-   !required_termination_code_string(1) = 'max_model_number'
    
    change_initial_v_flag = .true.
    new_v_flag = .true.
@@ -107,9 +106,6 @@
    tol_max_correction = 5d-7
    
 ! output
-
-   photo_directory = 'photos1'
-   log_directory = 'LOGS1'
 
    x_integer_ctrl(1) = -10 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 

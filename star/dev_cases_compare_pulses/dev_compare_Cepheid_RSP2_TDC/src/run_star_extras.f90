@@ -139,7 +139,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 4
+         how_many_extra_history_columns = 6
       end function how_many_extra_history_columns
       
       
@@ -153,10 +153,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (n /= 4) then
-            ierr = -1
-            return
-         end if
          if (id == 1) then
             id_other = 2
          else if (id == 2) then
@@ -171,10 +167,14 @@
          names(2) = 'v_R'
          names(3) = 'Teff_R'
          names(4) = 'L_R'
+         names(5) = 'log_tot_KE_R'
+         names(6) = 'num_periods'
          vals(1) = s_other% r(1)/Rsun
          vals(2) = s_other% v(1)/1d5 ! kms
          vals(3) = s_other% Teff
          vals(4) = s_other% L(1)/Lsun
+         vals(5) = safe_log10(s_other% total_radial_kinetic_energy_end)
+         vals(6) = s_other% rsp_num_periods
       end subroutine data_for_extra_history_columns
 
       
@@ -186,7 +186,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 21
+         how_many_extra_profile_columns = 27
       end function how_many_extra_profile_columns
       
       
@@ -198,8 +198,8 @@
          real(dp) :: vals(nz,n)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s, s_other
-         integer :: k, id_other
-         logical, parameter :: do_drel = .false.
+         real(dp) :: val
+         integer :: i, k, id_other
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -214,37 +214,46 @@
          end if
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
-         names(1) = 'v_R'
-         if (do_drel) names(1) = 'v_drel'
-         names(2) = 'Y_face_R'
-         if (do_drel) names(2) = 'Y_drel'
-         names(3) = 'w_R'
-         if (do_drel) names(3) = 'w_drel'
-         names(4) = 'Lc_div_L_R'
-         if (do_drel) names(4) = 'Chi_drel'
-         names(5) = 'logR_R'
-         names(6) = 'logP_R'
-         names(7) = 'logT_R'
-         names(8) = 'logRho_R'
-         names(9) = 'logL_R'
-         names(10) = 'xCOUPL'
-         names(11) = 'COUPL_R'
-         if (do_drel) names(11) = 'CPL_drel' 
-         names(12) = 'xSOURCE'
-         names(13) = 'SRC_R'
-         if (do_drel) names(13) = 'SRC_drel'
-         names(14) = 'xDAMP'
-         names(15) = 'DAMP_R'
-         if (do_drel) names(15) = 'DAMP_drel'
-         names(16) = 'xEq'
-         names(17) = 'Eq_R'
-         if (do_drel) names(17) = 'Eq_drel'
-         names(18) = 'xUq'
-         names(19) = 'Uq_R'
-         if (do_drel) names(19) = 'Uq_drel'
-         names(20) = 'xL'
-         names(21) = 'L_r'
-         if (do_drel) names(19) = 'L_drel'
+         
+         i=1
+         names(i) = 'v_R'; i=i+1
+         names(i) = 'v_drel'; i=i+1
+         
+         names(i) = 'Y_face_R'; i=i+1
+         names(i) = 'Y_drel'; i=i+1
+         
+         names(i) = 'w_R'; i=i+1
+         names(i) = 'w_drel'; i=i+1
+         
+         names(i) = 'Lc_div_L_R'; i=i+1
+         names(i) = 'Lc_drel'; i=i+1
+         
+         names(i) = 'COUPL_R'; i=i+1
+         names(i) = 'CPL_drel'; i=i+1
+         
+         names(i) = 'SRC_R'; i=i+1
+         names(i) = 'SRC_drel'; i=i+1
+         
+         names(i) = 'DAMP_R'; i=i+1
+         names(i) = 'DAMP_drel'; i=i+1
+         
+         names(i) = 'DAMPR_R'; i=i+1
+         names(i) = 'DAMPR_drel'; i=i+1
+         
+         names(i) = 'Eq_R'; i=i+1
+         names(i) = 'Eq_drel'; i=i+1
+         
+         names(i) = 'Uq_R'; i=i+1
+         names(i) = 'Uq_drel'; i=i+1
+         
+         names(i) = 'Pvsc_R'; i=i+1
+         names(i) = 'Pvsc_drel'; i=i+1
+
+         names(i) = 'logR_R'; i=i+1
+         names(i) = 'logP_R'; i=i+1
+         names(i) = 'logT_R'; i=i+1
+         names(i) = 'logRho_R'; i=i+1
+         names(i) = 'logL_R'; i=i+1
 
          if (.not. associated(s_other% Y_face)) then
             vals(1:nz,:) = 0d0
@@ -252,52 +261,54 @@
             vals(1:nz,:) = 0d0
          else
             do k=1,nz
-               vals(k,1) = s_other% v(k)*1d-5
-               if (do_drel) vals(k,1) = rel_diff(s_other% v(k), s% v(k)) ! v_drel
-               
-               vals(k,2) = s_other% Y_face(k)
-               if (do_drel) vals(k,2) = rel_diff(s_other% Y_face(k), s% Y_face(k)) ! Y_drel
+            
+               i = 1
+               vals(k,i) = s_other% v(k)*1d-5; i=i+1
+               vals(k,i) = rel_diff(s_other% v(k), s% v(k)); i=i+1
+         
+               vals(k,i) = s_other% Y_face(k); i=i+1
+               vals(k,i) = rel_diff(s_other% Y_face(k), s% Y_face(k)); i=i+1
                
                if (s_other% RSP2_flag) then
-                  vals(k,3) = s_other% w(k)
+                  val = s_other% w(k)
                else if (s_other% RSP_flag) then
-                  vals(k,3) = s_other% RSP_w(k)
+                  val = s_other% RSP_w(k)
                else
-                  vals(k,3) = 0d0
+                  val = 0d0
                end if
-               if (do_drel) vals(k,3) = rel_diff(vals(k,3), s% w(k)) ! w_drel    
-                         
-               vals(k,4) = s_other% Lc(k)/s_other% L(k)
-               if (do_drel) vals(k,4) = rel_diff(s_other% Chi(k), s% Chi(k)) ! Chi_drel
-                                
-               vals(k,5) = safe_log10(s_other% r(k)/Rsun)
-               vals(k,6) = s_other% lnPeos(k)/ln10
-               vals(k,7) = s_other% lnT(k)/ln10
-               vals(k,8) = s_other% lnd(k)/ln10
-               vals(k,9) = safe_log10(s_other% L(k)/Lsun)
-               vals(k,10) = s% COUPL(k)
-               vals(k,11) = s_other% COUPL(k)
-               if (do_drel) vals(k,11) = rel_diff(s_other% COUPL(k), s% COUPL(k)) ! CPL_drel
+               vals(k,i) = val; i=i+1
+               vals(k,i) = rel_diff(val, s% w(k)); i=i+1
+               
+               val = s_other% Lc(k)/s_other% L(k)
+               vals(k,i) = val; i=i+1
+               vals(k,i) = rel_diff(val, s% Lc(k)/s% L(k)); i=i+1
+         
+               vals(k,i) = s_other% COUPL(k); i=i+1
+               vals(k,i) = rel_diff(s_other% COUPL(k), s% COUPL(k)); i=i+1
+         
+               vals(k,i) = s_other% SOURCE(k); i=i+1
+               vals(k,i) = rel_diff(s_other% SOURCE(k), s% SOURCE(k)); i=i+1
+         
+               vals(k,i) = s_other% DAMP(k); i=i+1
+               vals(k,i) = rel_diff(s_other% DAMP(k), s% DAMP(k)); i=i+1
+         
+               vals(k,i) = s_other% DAMPR(k); i=i+1
+               vals(k,i) = rel_diff(s_other% DAMPR(k), s% DAMPR(k)); i=i+1
+         
+               vals(k,i) = s_other% Eq(k); i=i+1
+               vals(k,i) = rel_diff(s_other% Eq(k), s% Eq(k)); i=i+1
+         
+               vals(k,i) = s_other% Uq(k); i=i+1
+               vals(k,i) = rel_diff(s_other% Uq(k), s% Uq(k)); i=i+1
+         
+               vals(k,i) = s_other% Pvsc(k); i=i+1
+               vals(k,i) = rel_diff(s_other% Pvsc(k), s% Pvsc(k)); i=i+1
 
-               vals(k,12) = s% SOURCE(k)
-               vals(k,13) = s_other% SOURCE(k)
-               if (do_drel) vals(k,13) = rel_diff(s_other% SOURCE(k), s% SOURCE(k)) ! SRC_drel
-               
-               vals(k,14) = s% DAMP(k)
-               vals(k,15) = s_other% DAMP(k)
-               if (do_drel) vals(k,15) = rel_diff(s_other% DAMP(k), s% DAMP(k)) ! DAMP_drel
-               
-               vals(k,16) = s% Eq(k)
-               vals(k,17) = s_other% Eq(k)
-               if (do_drel) vals(k,17) = rel_diff(s_other% Eq(k), s% Eq(k)) ! Eq_drel
-               
-               vals(k,18) = s% Uq(k)
-               vals(k,19) = s_other% Uq(k)
-               if (do_drel) vals(k,19) = rel_diff(s_other% Uq(k), s% Uq(k)) ! Uq_drel
-                          
-               vals(k,20) = s% L(k)
-               vals(k,21) = s_other% L(k)
-               if (do_drel) vals(k,21) = rel_diff(s_other% L(k), s% L(k)) ! L_drel
+               vals(k,i) = safe_log10(s_other% r(k)/Rsun); i=i+1
+               vals(k,i) = s_other% lnPeos(k)/ln10; i=i+1
+               vals(k,i) = s_other% lnT(k)/ln10; i=i+1
+               vals(k,i) = s_other% lnd(k)/ln10; i=i+1
+               vals(k,i) = safe_log10(s_other% L(k)/Lsun); i=i+1
                
             end do
          end if
@@ -311,12 +322,12 @@
             if (present(atol)) then
                atl = atol
             else
-               atl = 1d-6
+               atl = 1d-9
             end if
             if (present(rtol)) then
                rtl = rtol
             else
-               rtl = 1d-3
+               rtl = 1d0
             end if
             d = (a - b)/(atl + rtl*max(abs(a),abs(b)))
          end function rel_diff
