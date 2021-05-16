@@ -355,6 +355,7 @@
          s% model_number = 0
          s% RSP_have_set_velocities = .false.
          s% RSP_just_set_velocities = .false.
+         s% rsp_period = 0d0
          
          s% dt = 0d0
          s% mstar_dot = 0d0
