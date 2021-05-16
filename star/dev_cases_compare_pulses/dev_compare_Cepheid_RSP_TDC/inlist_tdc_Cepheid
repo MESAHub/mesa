@@ -1,6 +1,6 @@
 
-&star_job   
-   load_saved_model_for_RSP2 = .true.
+&star_job
+   load_saved_model = .true.
    pgstar_flag = .true.
 / ! end of star_job namelist
 
@@ -11,31 +11,30 @@
 / ! end of kap namelist
 
 &controls  
-
-! RSP2
-   RSP2_assume_HSE = .true.
-   include_w_in_correction_limits = .true.
-   include_v_in_correction_limits = .false.
-   include_L_in_correction_limits = .false.
+      
+! TDC
+   max_dt_div_tau_conv_for_TDC = 1d99
+   max_dt_years_for_TDC = 1d99
    
-   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
-   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
-   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
-   RSP2_alfad =     1d0
+   alpha_TDC_DAMP = 1d0
+   alpha_TDC_DAMPR = 0d0
+   alpha_TDC_PtdVdt = 0d0
 
-   RSP2_num_outermost_cells_forced_nonturbulent = 1
-   RSP2_num_innermost_cells_forced_nonturbulent = 5
+! solver
+   use_dPrad_dm_form_of_T_gradient_eqn = .true.
+   !use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
+   max_X_for_gradT_eqn = -1 ! ignore
    
+
 ! output
 
-   photo_directory = 'photos1'
-   log_directory = 'LOGS1'
+   photo_directory = 'photos2'
+   log_directory = 'LOGS2'
 
-      !photo_interval = 1000
+      !photo_interval = 10
       !profile_interval = 4000
       !history_interval = 40
-      !terminal_interval = 100
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -118,7 +117,7 @@
    pgstar_interval = 1
       
    Grid2_win_flag = .true.
-   Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid: RSP2 gold, RSP blue'
+   Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid: TDC gold, RSP blue'
    
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.

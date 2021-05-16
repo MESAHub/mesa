@@ -106,28 +106,21 @@
 
 &pgstar
 
-   !pause = .true.
-   !pause_interval = 10
-   pgstar_interval = 1 ! 25
+   pause = .true.
+   !pause_interval = 100
+   pgstar_interval = 1
       
    Grid2_win_flag = .true.
    Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid: TDC gold, RSP2 blue'
    
    History_Panels2_xaxis_name='day'
-   History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+   History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
 
    ! Grid2_file_flag = .true.
    file_digits = 7
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid2'
    Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-   
-   !Profile_Panels1_show_grid = .true.
-
-   !Profile_Panels1_xaxis_name = 'logtau'
-   !Profile_Panels1_xaxis_reversed = .true.
-   !Profile_Panels1_xmin = -101d0
-   !Profile_Panels1_xmax = -101D0
 
    Profile_Panels1_xaxis_name = 'logxm'
    Profile_Panels1_xaxis_reversed = .true.
@@ -136,9 +129,7 @@
 
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = -101d0
-   Profile_Panels1_xmax = -101d0
-
-   Profile_Panels1_dymin(4) = 0.02
+   Profile_Panels1_xmin = -101 ! 1
+   Profile_Panels1_xmax = -101 ! 30
    
 / ! end of pgstar namelist
