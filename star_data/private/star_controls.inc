@@ -931,10 +931,7 @@
             hydro_mtx_max_allowed_logRho, &
             hydro_mtx_min_allowed_logT, &
             hydro_mtx_min_allowed_logRho, &
-            solver_reduced_min_corr_coeff, &
-            solver_clip_dlogT, &
-            solver_clip_dlogRho, &
-            solver_clip_dlogR
+            solver_reduced_min_corr_coeff
 
          character (len=32) :: hydro_solver_name
 

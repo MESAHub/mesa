@@ -8711,23 +8711,6 @@
     hydro_mtx_min_allowed_logT = 1d0
     hydro_mtx_min_allowed_logRho = -1d2
 
-
-      ! solver_clip_dlogT
-      ! ~~~~~~~~~~~~~~~~~
-      ! solver_clip_dlogRho
-      ! ~~~~~~~~~~~~~~~~~~~
-      ! solver_clip_dlogR
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! Limit magnitude of relative changes per iteration in solver.
-      ! Ignore if limit is <= 0.
-
-      ! ::
-
-    solver_clip_dlogT = -1d0
-    solver_clip_dlogRho = -1d0
-    solver_clip_dlogR = -1d0
-
       ! level 1 of gold tolerances for solver solver
 
 

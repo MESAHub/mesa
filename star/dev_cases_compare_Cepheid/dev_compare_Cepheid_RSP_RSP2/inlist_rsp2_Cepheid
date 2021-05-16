@@ -113,9 +113,9 @@
 
 &pgstar
 
-   !pause = .true.
+   pause = .true.
    !pause_interval = 100
-   pgstar_interval = 10
+   pgstar_interval = 1
       
    Grid2_win_flag = .true.
    Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid: RSP2 gold, RSP blue'
@@ -136,7 +136,7 @@
 
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = 20
-   Profile_Panels1_xmax = 70
+   Profile_Panels1_xmin = -101 ! 1
+   Profile_Panels1_xmax = -101 ! 30
    
 / ! end of pgstar namelist

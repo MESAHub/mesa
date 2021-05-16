@@ -12,20 +12,14 @@
    pgstar_right_yaxis_label_disp = 5.2 !4.4
 
    pgstar_num_scale = 0.85
-    pgstar_age_disp = 2.5
-    pgstar_model_disp = 2.5
-    pgstar_grid_title_scale = 1.0
-    pgstar_grid_title_disp = 2.5
-
-   !pgstar_title_scale = 1.2
-   !pgstar_title_disp = 1.3
-   
-   pgstar_history_line_style = 2
-      ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
+   pgstar_age_disp = 2.2
+   pgstar_model_disp = 2.2
+   pgstar_grid_title_scale = 0.9
+   pgstar_grid_title_disp = 2.8
 
    Grid2_win_flag = .true.
 
-   Grid2_win_width = 8
+   Grid2_win_width = 9
    Grid2_win_aspect_ratio = 0.9 ! 0.667 ! aspect_ratio = height/width
    Grid2_num_cols = 4 ! divide plotting region into this many equal width cols
    Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
@@ -73,6 +67,9 @@
 
    History_Panels1_title = ''      
    History_Panels1_num_panels = 5
+   
+   pgstar_history_line_style = 2
+      ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
 
    History_Panels1_xaxis_name='day'
    History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
@@ -148,51 +145,6 @@
    Profile_Panels1_title = ''      
    
    
-   
-   ! relative differences -- for debugging
-   Profile_Panels1_num_panels = 9
-   pgstar_profile_line_style = 1
-      ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
-
-   Profile_Panels1_yaxis_name(1) = 'v_drel' 
-   Profile_Panels1_other_yaxis_name(1) = '' 
-   Profile_Panels1_same_yaxis_range(1) = .false.
- 
-   Profile_Panels1_yaxis_name(2) = 'w_drel' 
-   Profile_Panels1_other_yaxis_name(2) = '' 
-   Profile_Panels1_same_yaxis_range(2) = .false.
-   
-   Profile_Panels1_yaxis_name(3) = 'Y_drel' 
-   Profile_Panels1_other_yaxis_name(3) = '' 
-   Profile_Panels1_same_yaxis_range(3) = .false.
-   
-   Profile_Panels1_yaxis_name(4) = 'L_drel' 
-   Profile_Panels1_other_yaxis_name(4) = '' 
-   Profile_Panels1_same_yaxis_range(4) = .false.
-   
-   Profile_Panels1_yaxis_name(5) = 'SRC_drel' 
-   Profile_Panels1_other_yaxis_name(5) = '' 
-   Profile_Panels1_same_yaxis_range(5) = .false.
-   
-   Profile_Panels1_yaxis_name(6) = 'DAMP_drel' 
-   Profile_Panels1_other_yaxis_name(6) = '' 
-   Profile_Panels1_same_yaxis_range(6) = .false.
-   
-   Profile_Panels1_yaxis_name(7) = 'CPL_drel' 
-   Profile_Panels1_other_yaxis_name(7) = '' 
-   Profile_Panels1_same_yaxis_range(7) = .false.
-   
-   Profile_Panels1_yaxis_name(8) = 'Eq_drel' 
-   Profile_Panels1_other_yaxis_name(8) = '' 
-   Profile_Panels1_same_yaxis_range(8) = .false.
-   
-   Profile_Panels1_yaxis_name(9) = 'Uq_drel' 
-   Profile_Panels1_other_yaxis_name(9) = '' 
-   Profile_Panels1_same_yaxis_range(9) = .false.
-   
-   !Profile_Panels1_other_yaxis_name() = 'Lc_drel' 
-   !Profile_Panels1_other_yaxis_name() = 'DAMPR_drel' 
-   
 
 
    
@@ -238,6 +190,50 @@
    Profile_Panels1_same_yaxis_range(9) = .true.
 
 
+   
+   
+   ! relative differences -- for debugging
+   Profile_Panels1_num_panels = 9
+   pgstar_profile_line_style = 1
+      ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
+
+   Profile_Panels1_yaxis_name(1) = 'v_drel' 
+   Profile_Panels1_other_yaxis_name(1) = 'v_R' 
+   Profile_Panels1_same_yaxis_range(1) = .false.
+ 
+   Profile_Panels1_yaxis_name(2) = 'w_drel' 
+   Profile_Panels1_other_yaxis_name(2) = 'w_R' 
+   Profile_Panels1_same_yaxis_range(2) = .false.
+   
+   Profile_Panels1_yaxis_name(3) = 'Y_drel' 
+   Profile_Panels1_other_yaxis_name(3) = 'Y_face_R' 
+   Profile_Panels1_same_yaxis_range(3) = .false.
+   
+   Profile_Panels1_yaxis_name(4) = 'Pvsc_drel' 
+   Profile_Panels1_other_yaxis_name(4) = 'Pvsc_R' 
+   Profile_Panels1_same_yaxis_range(4) = .false.
+   
+   Profile_Panels1_yaxis_name(5) = 'SRC_drel' 
+   Profile_Panels1_other_yaxis_name(5) = 'SRC_R' 
+   Profile_Panels1_same_yaxis_range(5) = .false.
+   
+   Profile_Panels1_yaxis_name(6) = 'DAMP_drel' 
+   Profile_Panels1_other_yaxis_name(6) = 'DAMP_R' 
+   Profile_Panels1_same_yaxis_range(6) = .false.
+   
+   Profile_Panels1_yaxis_name(7) = 'CPL_drel' 
+   Profile_Panels1_other_yaxis_name(7) = 'COUPL_R' 
+   Profile_Panels1_same_yaxis_range(7) = .false.
+   
+   Profile_Panels1_yaxis_name(8) = 'Eq_drel' 
+   Profile_Panels1_other_yaxis_name(8) = 'Eq_R' 
+   Profile_Panels1_same_yaxis_range(8) = .false.
+   
+   Profile_Panels1_yaxis_name(9) = 'Uq_drel' 
+   Profile_Panels1_other_yaxis_name(9) = 'Uq_R' 
+   Profile_Panels1_same_yaxis_range(9) = .false.
+
+
 
 
    Profile_Panels1_file_flag = .false.
@@ -253,7 +249,7 @@
    
    
    Text_Summary1_name(1,1) = 'model_number'
-   Text_Summary1_name(2,1) = 'day'
+   Text_Summary1_name(2,1) = 'num_periods'
    Text_Summary1_name(3,1) = 'time_step_sec'
    Text_Summary1_name(4,1) = 'log_rel_run_E_err'
    Text_Summary1_name(5,1) = 'rel_E_err'
@@ -272,8 +268,8 @@
    
    Text_Summary1_name(1,4) = 'log_tot_E'
    Text_Summary1_name(2,4) = 'log_tot_KE'
-   Text_Summary1_name(3,4) = 'num_zones'
-   Text_Summary1_name(4,4) = 'num_retries'
-   Text_Summary1_name(5,4) = 'num_iters'
+   Text_Summary1_name(3,4) = 'day'
+   Text_Summary1_name(4,4) = 'num_zones'
+   Text_Summary1_name(5,4) = 'num_retries'
 
 / ! end of pgstar namelist
