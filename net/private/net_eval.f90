@@ -97,7 +97,6 @@
          real(dp), dimension(:), pointer :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
-         real(dp), target, dimension(num_rvs, num_isos) :: screen_h1, screen_he4
          integer, parameter :: max_z_for_cache = 14
          real(qp), target :: dydt_a(num_rvs*num_isos)
          real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
@@ -153,11 +152,6 @@
             temp = exp10(logtemp)
          end if
          T9 = temp*1d-9
-         
-         n% screen_h1 => screen_h1
-         n% screen_he4 => screen_he4
-         screen_h1(:,:) = 0
-         screen_he4(:,:) = 0
          
          n% reaction_Qs => reaction_Qs
          n% reaction_neuQs => reaction_neuQs
@@ -629,7 +623,7 @@
                rate_raw, rate_raw_dT, rate_raw_dRho, &
                rate_screened, rate_screened_dT, rate_screened_dRho, &
                n% screening_mode, &
-               screen_h1, screen_he4, zbar, abar, z2bar, ye, ierr)
+               zbar, abar, z2bar, ye, ierr)
             if (dbg) write(*,*) 'done screen_net with init=.false.'
             if (ierr /= 0) return
             if (g% doing_approx21) then

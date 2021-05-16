@@ -216,7 +216,6 @@
          type (Net_General_Info), pointer  :: g
 
          integer :: screening_mode
-         real(dp), pointer, dimension(:,:) :: screen_h1, screen_he4 ! (num_rvs, num_isos)
 
          real(dp) :: temp, logT, rho, logRho
 
