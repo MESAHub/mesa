@@ -31,12 +31,9 @@
 
    photo_directory = 'photos2'
    log_directory = 'LOGS2'
-
-      !photo_interval = 1000
-      !profile_interval = 4000
-      !history_interval = 40
-      !terminal_interval = 100
-
+   
+   ! photo_interval set in inlist_common in order to do restarts
+   
       !fill_arrays_with_NaNs = .true.
       
       
@@ -114,7 +111,7 @@
 &pgstar
 
    pause = .true.
-   !pause_interval = 100
+   pause_interval = 1 ! 20
    pgstar_interval = 1
       
    Grid2_win_flag = .true.
@@ -136,7 +133,7 @@
 
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = -101 ! 1
-   Profile_Panels1_xmax = -101 ! 30
+   Profile_Panels1_xmin = 20 ! -101 ! 1
+   Profile_Panels1_xmax = 24 ! -101 ! 30
    
 / ! end of pgstar namelist

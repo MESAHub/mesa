@@ -714,11 +714,12 @@
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
-         if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
+         if (s% rsp_max_dt > 0) target_dt = min(target_dt, s% rsp_max_dt)
+         if (s% max_timestep > 0) target_dt = min(target_dt, s% max_timestep)
          s% dt = target_dt
 
          if (is_bad(s% dt)) then
-            write(*,1) 'dt', s% dt
+            write(*,1) 'do1_step dt', s% dt
             write(*,1) 'rsp_period', s% rsp_period
             write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
             write(*,1) 'max_timestep_factor', s% max_timestep_factor

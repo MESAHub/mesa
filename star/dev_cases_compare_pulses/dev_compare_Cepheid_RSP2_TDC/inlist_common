@@ -2,13 +2,13 @@
 &star_job
    show_log_description_at_start = .false.
    
-   load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle0.mod'
-   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle10.mod'
-   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle140.mod'
-   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle230.mod'
-   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle280.mod'
-   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle327.mod'
-   !load_model_filename = '../../dev_cases_test_Cepheid/dev_test_Cepheid_RSP/cycle557.mod'
+   load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle0.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle10.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle140.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle230.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle280.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle327.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle557.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
@@ -24,7 +24,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1d-6 ! 1200 ! 
+   seconds_for_initial_dt = 1d-6 ! 1.1950895357683798D+03 ! 
 
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
@@ -52,7 +52,7 @@
    initial_z = 0.008d0
    initial_mass = 6d0
 
-   max_timestep = 1d-6 ! 1200 ! 
+   max_timestep = 1d-6 ! 1.1950895357683798D+03 ! 
 
    max_model_number = 5000000
    max_number_retries = 10000

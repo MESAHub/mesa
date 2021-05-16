@@ -644,11 +644,11 @@
          min_alpha = 1d0
          nz = s% nz
 
-         if (s% using_RSP2) & ! adjust correction_factor to maintain non-negativity for w
-            call adjust_so_non_negative(s% i_w, 0d0)
+         if (s% using_RSP2) & ! clip change in w to maintain non-negativity.
+            call clip_so_non_negative(s% i_w, 0d0)
 
-         if (s% RTI_flag) & ! adjust correction_factor to maintain non-negativity for alpha_RTI
-            call adjust_so_non_negative(s% i_alpha_RTI, 0d0)
+         if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
+            call clip_so_non_negative(s% i_alpha_RTI, 0d0)
 
          if (s% conv_vel_flag) then ! clip change in conv_vel to maintain non-negativity.
             log_conv_vel_v0 = log(s% conv_vel_v0)
@@ -733,7 +733,7 @@
          
          contains
          
-         subroutine adjust_so_non_negative(i,minval)
+         subroutine clip_so_non_negative(i,minval)
             integer, intent(in) :: i
             real(dp), intent(in) :: minval
             real(dp) :: dval, old_val, new_val
@@ -743,13 +743,10 @@
                new_val = old_val + dval
                if (dval >= 0) cycle
                if (new_val >= 0d0) cycle
-               alpha = -old_val/dval
-               if (alpha < min_alpha) then
-                  min_alpha = alpha
-                  bad_k = k
-               end if
+               dval = minval - old_val
+               B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
             end do
-         end subroutine adjust_so_non_negative
+         end subroutine clip_so_non_negative
 
       end subroutine Bdomain
 
