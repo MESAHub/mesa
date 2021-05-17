@@ -269,7 +269,8 @@
       integer, parameter :: h_center_ye = h_center_mu + 1
       integer, parameter :: h_max_entropy = h_center_ye + 1
       integer, parameter :: h_center_entropy = h_max_entropy + 1
-      integer, parameter :: h_v_surf_div_escape_v = h_center_entropy + 1
+      integer, parameter :: h_v_div_vesc = h_center_entropy + 1
+      integer, parameter :: h_v_surf_div_escape_v = h_v_div_vesc + 1
       integer, parameter :: h_v_surf_km_s = h_v_surf_div_escape_v + 1
       integer, parameter :: h_v_surf = h_v_surf_km_s + 1
       integer, parameter :: h_v_surf_div_v_kh = h_v_surf + 1
@@ -889,6 +890,7 @@
          history_column_name(h_non_fe_core_rebound) = 'non_fe_core_rebound'
          history_column_name(h_compactness) = 'compactness'
          history_column_name(h_compactness_parameter) = 'compactness_parameter'
+         history_column_name(h_v_div_vesc) = 'v_div_vesc'
          history_column_name(h_v_surf_div_escape_v) = 'v_surf_div_escape_v'
          history_column_name(h_v_surf_km_s) = 'v_surf_km_s'
          history_column_name(h_v_surf) = 'v_surf'

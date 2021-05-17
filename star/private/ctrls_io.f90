@@ -166,7 +166,7 @@
     calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
     threshold_for_smooth_brunt_B, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
     min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
-    RSP_max_num_periods, RSP_min_max_R_for_periods, &
+    RSP_max_num_periods, RSP_min_max_R_for_periods, RSP_min_deltaR_for_periods, &
     RSP_min_PERIOD_div_PERIODLIN, RSP_report_limit_dt, RSP_mode_for_setting_PERIODLIN, RSP_initial_dt_factor, &
     RSP_v_div_cs_threshold_for_dt_limit, RSP_max_dt_times_min_dr_div_cs, RSP_thetae, &
     RSP_alfa, RSP_thetaq, RSP_default_PERIODLIN, &
@@ -184,7 +184,7 @@
    RSP_fraction_1st_overtone,RSP_fraction_2nd_overtone, RSP_testing, RSP_use_Prad_for_Psurf, RSP_map_zone_interval, &
    RSP_write_map, RSP_map_filename, RSP_map_history_filename, RSP_map_first_period, RSP_map_last_period, &
    use_other_RSP_build_model, RSP_Psurf, RSP_work_period, RSP_work_filename, RSP_nmodes, RSP_surface_tau, &
-   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, &
+   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, RSP_do_check_omega, &
     RSP_relax_initial_model, RSP_trace_RSP_build_model, &
    RSP_GREKM_avg_abs_limit, RSP_GREKM_avg_abs_frac_new, RSP_kap_density_factor, RSP_map_columns_filename, &
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
@@ -386,7 +386,6 @@
     min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
     hydro_mtx_max_allowed_logRho, report_min_rcond_from_DGESXV, &
     hydro_mtx_min_allowed_logT, hydro_mtx_min_allowed_logRho, use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX, &
-    solver_clip_dlogT, solver_clip_dlogRho, solver_clip_dlogR, &
     op_split_burn, op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
     op_split_burn_min_T_for_variable_T_solver, solver_test_partials_show_dx_var_name, &
     tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
@@ -1166,6 +1165,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_max_num_periods = RSP_max_num_periods
    s% RSP_target_steps_per_cycle = RSP_target_steps_per_cycle
    s% RSP_min_max_R_for_periods = RSP_min_max_R_for_periods
+   s% RSP_min_deltaR_for_periods = RSP_min_deltaR_for_periods
    s% RSP_default_PERIODLIN = RSP_default_PERIODLIN
    s% RSP_min_PERIOD_div_PERIODLIN = RSP_min_PERIOD_div_PERIODLIN
    s% RSP_GREKM_avg_abs_frac_new = RSP_GREKM_avg_abs_frac_new
@@ -1244,6 +1244,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_relax_dm_tolerance = RSP_relax_dm_tolerance
    s% RSP_dq_1_factor = RSP_dq_1_factor
    s% use_RSP_new_start_scheme = use_RSP_new_start_scheme
+   s% RSP_do_check_omega = RSP_do_check_omega
    s% RSP_nz = RSP_nz
    s% RSP_T_anchor = RSP_T_anchor
    s% RSP_T_inner = RSP_T_inner
@@ -1978,10 +1979,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% hydro_mtx_max_allowed_logRho = hydro_mtx_max_allowed_logRho
  s% hydro_mtx_min_allowed_logT = hydro_mtx_min_allowed_logT
  s% hydro_mtx_min_allowed_logRho = hydro_mtx_min_allowed_logRho
-
- s% solver_clip_dlogT = solver_clip_dlogT
- s% solver_clip_dlogRho = solver_clip_dlogRho
- s% solver_clip_dlogR = solver_clip_dlogR
  
  s% use_DGESVX_in_bcyclic = use_DGESVX_in_bcyclic
  s% use_equilibration_in_DGESVX = use_equilibration_in_DGESVX
@@ -2849,6 +2846,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    RSP_max_num_periods = s% RSP_max_num_periods
    RSP_target_steps_per_cycle = s% RSP_target_steps_per_cycle
    RSP_min_max_R_for_periods = s% RSP_min_max_R_for_periods
+   RSP_min_deltaR_for_periods = s% RSP_min_deltaR_for_periods
    RSP_default_PERIODLIN = s% RSP_default_PERIODLIN
    RSP_min_PERIOD_div_PERIODLIN = s% RSP_min_PERIOD_div_PERIODLIN
    RSP_GREKM_avg_abs_frac_new = s% RSP_GREKM_avg_abs_frac_new
@@ -2927,6 +2925,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    RSP_relax_dm_tolerance = s% RSP_relax_dm_tolerance
    RSP_dq_1_factor = s% RSP_dq_1_factor
    use_RSP_new_start_scheme = s% use_RSP_new_start_scheme
+   RSP_do_check_omega = s% RSP_do_check_omega
    RSP_nz = s% RSP_nz
    RSP_T_anchor = s% RSP_T_anchor
    RSP_T_inner = s% RSP_T_inner
@@ -3652,10 +3651,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  hydro_mtx_max_allowed_logRho = s% hydro_mtx_max_allowed_logRho
  hydro_mtx_min_allowed_logT = s% hydro_mtx_min_allowed_logT
  hydro_mtx_min_allowed_logRho = s% hydro_mtx_min_allowed_logRho
-
- solver_clip_dlogT = s% solver_clip_dlogT
- solver_clip_dlogRho = s% solver_clip_dlogRho
- solver_clip_dlogR = s% solver_clip_dlogR
  
  use_DGESVX_in_bcyclic = s% use_DGESVX_in_bcyclic
  use_equilibration_in_DGESVX = s% use_equilibration_in_DGESVX

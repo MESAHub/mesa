@@ -311,7 +311,11 @@
                else if (j == i_w) then
                   do k=1,nz
                      s% w(k) = s% xh(i_w, k)
-                     if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+                     if (s% w(k) < 0d0) then
+                        !write(*,4) 'unpack: fix w < 0', k, &
+                        !   s% solver_iter, s% model_number, s% w(k)
+                        s% w(k) = s% RSP2_w_fix_if_neg
+                     end if
                   end do
                else if (j == i_Hp) then
                   do k=1,nz
@@ -472,8 +476,6 @@
             end if
             return
          end if
-
-         s% Teff = Teff
          
          ! Calculate and store photosphere (tau=2/3) values; these
          ! aren't actually used to set up surface values
@@ -485,6 +487,12 @@
          s% L_phot = L_phot/Lsun
          s% photosphere_L = s% L_phot
          s% photosphere_r = r_phot/Rsun
+         
+         if (s% tau_factor <= 1d0) then ! photosphere is part of the model
+            s% Teff = T_phot ! T interpolated to photosphere location
+         else ! photosphere is not part of the model
+            s% Teff = Teff ! Teff from atm
+         end if
 
       end subroutine set_Teff_info_for_eqns
 

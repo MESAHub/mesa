@@ -39,8 +39,8 @@
       public :: &
          do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
          compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
-         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, &
-         set_using_RSP2, set_etrb_start_vars
+         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, set_using_RSP2, &
+         set_etrb_start_vars, RSP2_adjust_vars_before_call_solver
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
@@ -74,6 +74,110 @@
       end subroutine set_using_RSP2
       
       
+      subroutine RSP2_adjust_vars_before_call_solver(s, nvar, ierr)
+         ! JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
+         use micro, only: do_eos_for_cell
+         type (star_info), pointer :: s
+         integer, intent(in) :: nvar
+         integer, intent(out) :: ierr    
+         real(dp) :: PII_div_Hp, QQ, SOURCE, Hp_cell, DAMP, POM, POM2, DAMPR, del, soln
+         type(auto_diff_real_star_order1) :: x
+         integer :: k, op_err
+         include 'formats'         
+         ierr = 0
+         
+         
+         return
+         
+         
+         
+         write(*,2) 'RSP2_adjust_vars_before_call_solver', 35, s% w(35), s% RSP2_w_min_for_damping
+
+         if (s% need_to_reset_w) then
+            write(*,*) 'RSP2_adjust_vars_before_call_solver call reset_etrb_using_L', s% model_number
+            call reset_etrb_using_L(s,ierr)
+            if (ierr /= 0) then
+               stop 'failed in reset_etrb_using_L'
+               return
+            end if
+            s% need_to_reset_w = .false.
+         end if
+
+         if (s% mixing_length_alpha == 0d0) return
+         
+         op_err = 0
+         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+         do k=1,s%nz-1
+            s% Vol(k) = (4d0*pi/3d0)*(pow3(s% r(k)) - pow3(s% r(k+1)))/s% dm(k)
+            s% rho(k) = 1d0/s% Vol(k)
+            s% lnd(k) = log(s% rho(k))
+            call do_eos_for_cell(s, k, op_err) ! redo with new lnd
+            if (op_err /= 0) ierr = op_err
+            if (k==35) then
+               write(*,2) 'lgd r00 rp1', k, s% lnd(k)/ln10, s% r(k), s% r(k+1)
+            end if
+         end do
+         !$OMP END PARALLEL DO
+         if (ierr /= 0) return
+         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+         do k=1,s%nz
+            ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
+            if (s% Hp_face(k) <= 0) s% Hp_face(k) = get_scale_height_face_val(s,k)
+            x = compute_Y_face(s, k, op_err)
+            if (op_err /= 0) ierr = op_err
+            x = compute_PII_face(s, k, op_err)
+            if (op_err /= 0) ierr = op_err
+         end do
+         !$OMP END PARALLEL DO
+         if (ierr /= 0) return
+         
+         !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
+         do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
+               s% nz - max(1,int(s% nz/s% RSP_nz_div_IBOTOM))
+               
+            if (s% w(k) > s% RSP2_w_min_for_damping) cycle
+            
+            PII_div_Hp = 0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))
+            QQ = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k))         
+            SOURCE = PII_div_Hp*s% T(k)*s% Peos(k)*QQ/s% Cp(k)
+            
+            Hp_cell = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
+            DAMP = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell            
+            
+            POM = 4d0*boltz_sigma*pow2(s% RSP2_alfar*x_GAMMAR/s% mixing_length_alpha)
+            POM2 = pow3(s% T(k))/(pow2(s% rho(k))*s% Cp(k)*s% opacity(k)) 
+            DAMPR = POM*POM2/pow2(Hp_cell)
+            
+            del = pow2(DAMPR) + 4d0*DAMP*SOURCE
+            
+            if (k==-35) then
+               write(*,2) 'del', k, del
+               write(*,2) 'DAMPR', k, DAMPR
+               write(*,2) 'DAMP', k, DAMP
+               write(*,2) 'SOURCE', k, SOURCE
+               write(*,2) 'POM', k, PII_div_Hp
+               write(*,2) 'POM2', k, s% T(k)*s% Peos(k)*QQ/s% Cp(k)
+               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
+               write(*,2) 's% Hp_face(k+1)', k+1, s% Hp_face(k+1)
+               write(*,2) 's% PII(k)', k, s% PII(k)
+               write(*,2) 's% PII(k+1)', k+1, s% PII(k+1)
+               write(*,2) 's% Y_face(k)', k, s% Y_face(k)
+               write(*,2) 's% Y_face(k+1)', k+1, s% Y_face(k+1)
+            end if
+            
+            if (del < 0d0) cycle
+            soln = (-DAMPR + sqrt(del))/(2d0*DAMP)
+            if (k==-35) write(*,2) 'soln', k, soln
+            if (soln > 0d0) then
+               s% w(k) = soln
+               write(*,2) 'preset w', k, s% w(k)
+            end if
+
+         end do
+         !$OMP END PARALLEL DO
+      end subroutine RSP2_adjust_vars_before_call_solver
+      
+      
       subroutine set_RSP2_vars(s,ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr    
@@ -97,9 +201,9 @@
          do k=1,s%nz
             ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
             if (s% Hp_face(k) <= 0) s% Hp_face(k) = get_scale_height_face_val(s,k)
-            x = compute_Y_face(s, k, op_err) ! Y_face
+            x = compute_Y_face(s, k, op_err)
             if (op_err /= 0) ierr = op_err
-            x = compute_PII_face(s, k, op_err) ! PII_face
+            x = compute_PII_face(s, k, op_err)
             if (op_err /= 0) ierr = op_err
             !Pvsc           skip?
          end do
@@ -111,9 +215,9 @@
          !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k=1,s% nz
             !Pturb          skip?
-            x = compute_Chi_cell(s, k, op_err) ! Chi
+            x = compute_Chi_cell(s, k, op_err)
             if (op_err /= 0) ierr = op_err
-            x = compute_Eq_cell(s, k, op_err) ! Eq
+            x = compute_Eq_cell(s, k, op_err)
             if (op_err /= 0) ierr = op_err
             x = compute_C(s, k, op_err) ! COUPL
             if (op_err /= 0) ierr = op_err
@@ -351,9 +455,9 @@
             esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
             resid_ad = esum_ad
             
-            if (k == -109) then
-                  write(*,3) 'RSP2 residual w dEt PdV dtC dtEq', k, s% solver_iter, &
-                     resid_ad%val, w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
+            if (k==-35 .and. s% solver_iter == 1) then
+                  write(*,3) 'RSP2 w dEt PdV dtC dtEq', k, s% solver_iter, &
+                     w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
             end if
 
             resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
@@ -524,8 +628,20 @@
          
             Y_face = Y1*Y2 ! unitless
             
-            if (k==-109) write(*,3) 'Y_face Y1 Y2', k, s% solver_iter, &
-               Y_face%val, Y1%val, Y2%val
+            if (k==-35) then
+               write(*,3) 'RSP2 Y_face Y1 Y2', k, s% solver_iter, s% Y_face(k), Y1%val, Y2%val
+               write(*,3) 'Peos', k, s% solver_iter, Peos_00%val
+               write(*,3) 'Peos', k-1, s% solver_iter, Peos_m1%val
+               write(*,3) 'QQ', k, s% solver_iter, QQ_00%val
+               write(*,3) 'QQ', k-1, s% solver_iter, QQ_m1%val
+               write(*,3) 'Cp', k, s% solver_iter, Cp_00%val
+               write(*,3) 'Cp', k-1, s% solver_iter, Cp_m1%val
+               write(*,3) 'lgT', k, s% solver_iter, lnT_00%val/ln10
+               write(*,3) 'lgT', k-1, s% solver_iter, lnT_m1%val/ln10
+               write(*,3) 'lgd', k, s% solver_iter, s% lnd(k)/ln10
+               write(*,3) 'lgd', k-1, s% solver_iter, s% lnd(k-1)/ln10
+               !stop 'compute_Y_face'
+            end if
 
          else
          
@@ -813,7 +929,7 @@
             Hp_cell = wrap_Hp_cell(s,k)
             w_00 = wrap_w_00(s,k)
             dw3 = pow3(w_00) - pow3(s% RSP2_w_min_for_damping)
-            D = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell*dw3
+            D = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)*dw3/Hp_cell
             ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          end if
          if (k==-50) then
@@ -1160,7 +1276,11 @@
                w_00 = w_face(k)
             end if
             s% w(k) = w_00
-            if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+            if (s% w(k) < 0d0) then
+               !write(*,4) 'reset_etrb_using_L: fix w < 0', k, &
+               !   s% solver_iter, s% model_number, s% w(k)
+               s% w(k) = s% RSP2_w_fix_if_neg
+            end if
             s% xh(s% i_w,k) = s% w(k)
             !write(*,2) 'w', k, s% w(k)
          end do
