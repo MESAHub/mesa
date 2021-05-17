@@ -189,48 +189,6 @@
    Profile_Panels1_other_yaxis_name(9) = 'Pvsc_R' 
    Profile_Panels1_same_yaxis_range(9) = .false.
 
-   
-   ! differences -- for debugging
-   Profile_Panels1_num_panels = 9
-   pgstar_profile_line_style = 1
-      ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
-
-   Profile_Panels1_yaxis_name(1) = 'v_diff' 
-   Profile_Panels1_other_yaxis_name(1) = 'v_R' 
-   Profile_Panels1_same_yaxis_range(1) = .false.
- 
-   Profile_Panels1_yaxis_name(2) = 'w_diff' 
-   Profile_Panels1_other_yaxis_name(2) = 'w_R' 
-   Profile_Panels1_same_yaxis_range(2) = .false.
-   
-   Profile_Panels1_yaxis_name(3) = 'Y_diff' 
-   Profile_Panels1_other_yaxis_name(3) = 'Y_face_R' 
-   Profile_Panels1_same_yaxis_range(3) = .false.
-   
-   Profile_Panels1_yaxis_name(4) = 'CPL_diff' 
-   Profile_Panels1_other_yaxis_name(4) = 'COUPL_R' 
-   Profile_Panels1_same_yaxis_range(4) = .false.
-   
-   Profile_Panels1_yaxis_name(5) = 'SRC_diff' 
-   Profile_Panels1_other_yaxis_name(5) = 'SRC_R' 
-   Profile_Panels1_same_yaxis_range(5) = .false.
-   
-   Profile_Panels1_yaxis_name(6) = 'DAMP_diff' 
-   Profile_Panels1_other_yaxis_name(6) = 'DAMP_R' 
-   Profile_Panels1_same_yaxis_range(6) = .false.
-   
-   Profile_Panels1_yaxis_name(7) = 'Uq_diff' 
-   Profile_Panels1_other_yaxis_name(7) = 'Uq_R' 
-   Profile_Panels1_same_yaxis_range(7) = .false.
-   
-   Profile_Panels1_yaxis_name(8) = 'Eq_diff' 
-   Profile_Panels1_other_yaxis_name(8) = 'Eq_R' 
-   Profile_Panels1_same_yaxis_range(8) = .false.
-   
-   Profile_Panels1_yaxis_name(9) = 'Pvsc_diff' 
-   Profile_Panels1_other_yaxis_name(9) = 'Pvsc_R' 
-   Profile_Panels1_same_yaxis_range(9) = .false.
-
 
    
    ! show both so can compare values
@@ -277,6 +235,55 @@
    Profile_Panels1_yaxis_name(10) = 'Pvsc' 
    Profile_Panels1_other_yaxis_name(10) = 'Pvsc_R'
    Profile_Panels1_same_yaxis_range(10) = .true.
+
+
+
+   
+   ! differences -- for debugging
+   Profile_Panels1_num_panels = 9
+   pgstar_profile_line_style = 1
+      ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
+
+   Profile_Panels1_yaxis_name(1) = 'v_diff' 
+   Profile_Panels1_other_yaxis_name(1) = 'v_R' 
+   Profile_Panels1_same_yaxis_range(1) = .false.
+ 
+   Profile_Panels1_yaxis_name(2) = 'w_diff' 
+   Profile_Panels1_other_yaxis_name(2) = 'w_R' 
+   Profile_Panels1_same_yaxis_range(2) = .false.
+   
+   Profile_Panels1_yaxis_name(3) = 'Y_diff' 
+   Profile_Panels1_other_yaxis_name(3) = 'Y_face_R' 
+   Profile_Panels1_same_yaxis_range(3) = .false.
+   
+   Profile_Panels1_yaxis_name(4) = 'CPL_diff' 
+   Profile_Panels1_other_yaxis_name(4) = 'COUPL_R' 
+   Profile_Panels1_same_yaxis_range(4) = .false.
+   
+   Profile_Panels1_yaxis_name(5) = 'SRC_diff' 
+   Profile_Panels1_other_yaxis_name(5) = 'SRC_R' 
+   Profile_Panels1_same_yaxis_range(5) = .false.
+   
+   Profile_Panels1_yaxis_name(6) = 'DAMP_diff' 
+   Profile_Panels1_other_yaxis_name(6) = 'DAMP_R' 
+   Profile_Panels1_same_yaxis_range(6) = .false.
+   
+   Profile_Panels1_yaxis_name(7) = 'Uq_diff' 
+   Profile_Panels1_other_yaxis_name(7) = 'Uq_R' 
+   Profile_Panels1_same_yaxis_range(7) = .false.
+   
+   Profile_Panels1_yaxis_name(8) = 'Eq_diff' 
+   Profile_Panels1_other_yaxis_name(8) = 'Eq_R' 
+   Profile_Panels1_same_yaxis_range(8) = .false.
+   
+   Profile_Panels1_yaxis_name(9) = 'Pvsc_diff' 
+   Profile_Panels1_other_yaxis_name(9) = 'Pvsc_R' 
+   Profile_Panels1_same_yaxis_range(9) = .false.
+
+
+
+
+
 
 
 

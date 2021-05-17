@@ -28,6 +28,7 @@
    RSP_initial_dt_factor = 1d0
    
    RSP_report_undercorrections = .true.
+   RSP_report_check_omega_changes = .true.
 
 ! RSP controls   
          
@@ -52,9 +53,9 @@
 
 
 ! TESTING
-   RSP_do_check_omega = .false.
+   !RSP_do_check_omega = .false.
 
-   RSP_min_deltaR_for_periods = 1d0
+   !RSP_min_deltaR_for_periods = 1d0
 
 
    ! time weighting for end-of-step vs start-of-step values in equations.

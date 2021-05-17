@@ -3296,6 +3296,10 @@
 
       ! ::
 
+    RSP_report_check_omega_changes = .false.
+
+      ! ::
+
     RSP_hydro_only = .false.
 
       ! this does not work with the standard build model, so requires use_other_RSP_build_model

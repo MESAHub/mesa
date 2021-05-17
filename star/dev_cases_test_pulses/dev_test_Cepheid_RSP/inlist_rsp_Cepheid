@@ -6,20 +6,20 @@
       !create_RSP_model = .true.
       create_RSP_model = .false.
       load_saved_model_for_RSP = .true.
-      !load_model_filename = 'cycle0.mod'
+      load_model_filename = 'cycle0.mod'
       !load_model_filename = 'cycle100.mod'
       !load_model_filename = 'cycle200.mod'
       !load_model_filename = 'cycle300.mod'
       !load_model_filename = 'cycle400.mod'
       !load_model_filename = 'cycle500.mod'
       !load_model_filename = 'cycle600.mod'
-      load_model_filename = 'cycle700.mod'
+      !load_model_filename = 'cycle700.mod'
 
       !save_model_when_terminate = .true.
       !save_model_filename = 'cycle700.mod'
 
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 1200 ! 1d-6 ! 
+!      set_initial_dt = .true.
+!      seconds_for_initial_dt = 1200 ! 1d-6 ! 
 
       initial_zfracs = 6
 
@@ -49,17 +49,17 @@
 
 &controls
    !max_timestep = 1d-6 ! 1200 ! 
-   force_timestep = 1200 ! 1d-6 !  ! when comparing to RSP, use force_timestep
+   !force_timestep = 1200 ! 1d-6 !  ! when comparing to RSP, use force_timestep
 
    max_model_number = 160000000
    !v_div_csound_surf_limit = 0.1 ! save model here
 
 ! RSP controls
-   RSP_do_check_omega = .false.     ! TESTING
+!   RSP_do_check_omega = .false.     ! TESTING
    
    RSP_min_deltaR_for_periods = 1d0 ! to filter out extras after have grown beyond this deltaR
 
-   x_integer_ctrl(1) = -1 ! which period to check
+   x_integer_ctrl(1) = 700 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    RSP_mass = 6d0
@@ -94,7 +94,7 @@
          !RSP_work_filename = 'work.data'
 
 
-      photo_interval = 1000
+      photo_interval = 4000
       profile_interval = 4000
       history_interval = 40
       terminal_interval = 4000
@@ -110,7 +110,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
    !pause_interval = 100
    pgstar_interval = 25
 
