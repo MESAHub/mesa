@@ -344,7 +344,7 @@
             RSP_min_PERIOD_div_PERIODLIN, RSP_v_div_cs_threshold_for_dt_limit, RSP_initial_dt_factor, &
             RSP_fraction_1st_overtone, RSP_fraction_2nd_overtone, &
             RSP_max_dt_times_min_dr_div_cs, RSP_tau_surf_for_atm_grey_with_kap, &
-            RSP_min_tau_for_turbulent_flux, RSP_max_dt, &
+            RSP_min_tau_for_turbulent_flux, RSP_max_dt, RSP_min_deltaR_for_periods, &
             RSP_kap_density_factor, RSP_T_anchor_tolerance, RSP_T_inner_tolerance, RSP_relax_dm_tolerance, &
             RSP_max_dt_times_min_rad_diff_time, RSP_Qvisc_linear_static, RSP_dq_1_factor, &
             RSP_surface_tau
