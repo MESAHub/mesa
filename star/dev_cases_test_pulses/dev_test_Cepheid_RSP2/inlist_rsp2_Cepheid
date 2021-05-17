@@ -3,10 +3,10 @@
    show_log_description_at_start = .false.
    
    load_saved_model_for_RSP2 = .true.
-   load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle100.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle200.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
+   load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle400.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle500.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle600.mod'
@@ -126,7 +126,7 @@
    tol_max_correction = 5d-7
    
 ! output
-   x_integer_ctrl(1) = 700 ! which period to check
+   x_integer_ctrl(1) = 800 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    x_logical_ctrl(7) = .true. ! doing pulses

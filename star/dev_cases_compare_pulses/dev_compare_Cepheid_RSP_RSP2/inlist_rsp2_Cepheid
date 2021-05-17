@@ -1,7 +1,7 @@
 
 &star_job   
    load_saved_model_for_RSP2 = .true.
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 / ! end of star_job namelist
 
 &eos
@@ -12,7 +12,7 @@
 
 &controls  
 
-!x_logical_ctrl(1) = .true. ! resynchronize
+!x_logical_ctrl(1) = .true. ! resynchronize at each step by star2 = star1
 
 ! RSP2
    RSP2_assume_HSE = .true.
@@ -30,9 +30,6 @@
 
 ! TESTING
 
-
-   !RSP_min_deltaR_for_periods = 1d0
-
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
    
@@ -47,8 +44,7 @@
       fixed_Psurf = 0d0
    
 
-    !tol_correction_norm = 3d-5
-    tol_max_correction = 1d-9 ! 3d-3
+   tol_max_correction = 5d-7
 
 ! output
 
