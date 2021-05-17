@@ -488,7 +488,7 @@
          s% photosphere_L = s% L_phot
          s% photosphere_r = r_phot/Rsun
          
-         if (s% tau_factor <= 1d0) then ! photosphere is part of the model
+         if (s% tau_factor < 1d0 .and. s% tau_base <= 2d0/3d0) then ! photosphere is part of the model
             s% Teff = T_phot ! T interpolated to photosphere location
          else ! photosphere is not part of the model
             s% Teff = Teff ! Teff from atm
