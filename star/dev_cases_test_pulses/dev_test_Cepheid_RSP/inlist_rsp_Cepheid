@@ -6,14 +6,17 @@
       !create_RSP_model = .true.
       create_RSP_model = .false.
       load_saved_model_for_RSP = .true.
-      load_model_filename = 'cycle0.mod'
+      !load_model_filename = 'cycle0.mod'
       !load_model_filename = 'cycle140.mod'
       !load_model_filename = 'cycle230.mod'
       !load_model_filename = 'cycle327.mod'
-      !load_model_filename = 'cycle557.mod'
+      load_model_filename = 'cycle557.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'cycle280.mod'
+      save_model_filename = 'debug.mod'
+
+      set_initial_dt = .true.
+      seconds_for_initial_dt = 1200 ! 1d-6 ! 
 
       initial_zfracs = 6
 
@@ -42,12 +45,16 @@
 
 
 &controls
+   !max_timestep = 1d-6 ! 1200 ! 
+   force_timestep = 1200 ! 1d-6 !  ! when comparing to RSP, use force_timestep
+
    max_model_number = 160000000
    !v_div_csound_surf_limit = 0.1 ! save model here
 
 ! RSP controls
+   RSP_do_check_omega = .false.     ! TESTING
 
-   x_integer_ctrl(1) = 50 ! which period to check
+   x_integer_ctrl(1) = -1 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    RSP_mass = 6d0

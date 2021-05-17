@@ -744,6 +744,8 @@
             s% dt = max_dt
          end if
          
+         if (s% force_timestep > 0d0) s% dt = s% force_timestep ! overrides everything else
+         
          if (is_bad(s% dt) .or. s% dt <= 0d0) then
             write(*,1) 'dt', s% dt
             write(*,1) 'RSP_max_dt_times_min_dr_div_cs', s% RSP_max_dt_times_min_dr_div_cs

@@ -12,6 +12,8 @@
 
 &controls  
 
+!x_logical_ctrl(1) = .true. ! resynchronize
+
 ! RSP2
    RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
@@ -23,10 +25,31 @@
    RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
    RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
    RSP2_alfad =     1d0
+            
+
+
+! TESTING
+
+
+
 
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
    
+   ! P boundary condition
+   use_momentum_outer_BC = .true.  ! required for RSP2
+   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
+      ! this can be a problem with shocks since omits Pvsc
+   ! else if RSP_use_Prad_for_Psurf
+      !use_zero_Pgas_outer_BC = .false.
+   ! else use RSP default of Psurf = 0
+      use_fixed_Psurf_outer_BC = .true.
+      fixed_Psurf = 0d0
+   
+
+    !tol_correction_norm = 3d-5
+    tol_max_correction = 1d-9 ! 3d-3
+
 ! output
 
    photo_directory = 'photos2'
@@ -110,8 +133,8 @@
 
 &pgstar
 
-   pause = .true.
-   pause_interval = 1 ! 20
+   !pause = .true.
+   !pause_interval = 5
    pgstar_interval = 1
       
    Grid2_win_flag = .true.
@@ -133,7 +156,7 @@
 
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = 20 ! -101 ! 1
-   Profile_Panels1_xmax = 24 ! -101 ! 30
+   Profile_Panels1_xmin = -101 ! 40 ! 
+   Profile_Panels1_xmax = -101 ! 50 ! 
    
 / ! end of pgstar namelist

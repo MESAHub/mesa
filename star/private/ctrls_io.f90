@@ -184,7 +184,7 @@
    RSP_fraction_1st_overtone,RSP_fraction_2nd_overtone, RSP_testing, RSP_use_Prad_for_Psurf, RSP_map_zone_interval, &
    RSP_write_map, RSP_map_filename, RSP_map_history_filename, RSP_map_first_period, RSP_map_last_period, &
    use_other_RSP_build_model, RSP_Psurf, RSP_work_period, RSP_work_filename, RSP_nmodes, RSP_surface_tau, &
-   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, &
+   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, RSP_do_check_omega, &
     RSP_relax_initial_model, RSP_trace_RSP_build_model, &
    RSP_GREKM_avg_abs_limit, RSP_GREKM_avg_abs_frac_new, RSP_kap_density_factor, RSP_map_columns_filename, &
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
@@ -1243,6 +1243,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_relax_dm_tolerance = RSP_relax_dm_tolerance
    s% RSP_dq_1_factor = RSP_dq_1_factor
    s% use_RSP_new_start_scheme = use_RSP_new_start_scheme
+   s% RSP_do_check_omega = RSP_do_check_omega
    s% RSP_nz = RSP_nz
    s% RSP_T_anchor = RSP_T_anchor
    s% RSP_T_inner = RSP_T_inner
@@ -2922,6 +2923,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    RSP_relax_dm_tolerance = s% RSP_relax_dm_tolerance
    RSP_dq_1_factor = s% RSP_dq_1_factor
    use_RSP_new_start_scheme = s% use_RSP_new_start_scheme
+   RSP_do_check_omega = s% RSP_do_check_omega
    RSP_nz = s% RSP_nz
    RSP_T_anchor = s% RSP_T_anchor
    RSP_T_inner = s% RSP_T_inner
