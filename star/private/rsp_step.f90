@@ -39,7 +39,7 @@
          set_f_Edd, calc_Prad, calc_Hp_face, calc_Y_face, &
          calc_PII_face, calc_Pvsc, calc_Pturb, calc_Chi, calc_Eq, &
          calc_source_sink, acceleration_eqn, calc_cell_equations, &
-         T_form_of_calc_Fr, calc_Lc, calc_Lt, check_omega, rsp_set_Teff
+         T_form_of_calc_Fr, calc_Lc, calc_Lt, rsp_set_Teff
       
       logical, parameter :: call_is_bad = .false.
       
@@ -270,7 +270,6 @@
             converged = .false.
             call set_1st_iter_R_using_v_start(s)
             s% R_center = s% R_center + s% dt*s% v_center
-! write(*,3) 'RSP HYD w', 22, 0, s% RSP_w(22)
             
             iter_loop: do iter = 1, max_iters  
                s% solver_iter = iter
@@ -292,7 +291,6 @@
                   DXH,DXXT,DXXC,DXXE,DXXL,EZH,kT_max,kW_max,kE_max,kL_max)
                if (s% doing_timing) call update_time(s, time0, total, s% time_solver_matrix)
                if (dbg_msg) call write_msg
-! write(*,3) 'RSP HYD w', 22, iter, s% RSP_w(22)
                if (iter == 1) cycle iter_loop
                converged = (abs(DXXT) < PREC2 .and. abs(DXXC) < PREC2)
             end do iter_loop      
@@ -728,7 +726,7 @@
             call calc_Pvsc(s,i)
          end do
          !$OMP END PARALLEL DO
-         if (iter == 1) then
+         if (iter == 1 .and. s% RSP_do_check_omega) then
             do i = i_min,i_max
                call check_omega(s,i)
             end do
@@ -956,7 +954,7 @@
          integer, intent(out) :: kT_max,kW_max,kE_max,kL_max
          integer :: i, k, IR, IT, IW, IU, IE, IL, kEZH, &
             iTM, kTM, iRM, kRM, iEM, kEM, iCM, kCM, iLM, kLM
-         real(dp) :: XXR, DXXT, DXXC, DXXE, DXXL, DXRM, DXR, &
+         real(dp) :: old_w, XXR, DXXT, DXXC, DXXE, DXXL, DXRM, DXR, &
             EZH1, XXTM, XXCM, XXRM, XXEM, XXLM, DXKT, DXKC, DXKE, DXKL
          include 'formats'
          EZH = 1.0d0; kEZH = 0
@@ -1047,7 +1045,10 @@
             s% erad(k) = s% erad(k) + EZH*DX(IE)
             if (I > IBOTOM .and. I < NZN)then
                if ((s% RSP_w(k) + EZH*DX(IW)) <= 0d0)then
+                  old_w = s% RSP_w(k)
                   s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS to give seed for SOURCE
+                  !write(*,3) 'rand RSP_w', k, iter, s% model_number, &
+                  !   s% RSP_w(k), old_w, EZH*DX(IW), EZH
                else
                   s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
@@ -1321,8 +1322,19 @@
 
             s% Y_face(k) = Y1*Y2
             
-            if (k==-109) write(*,3) 'Y_face Y1 Y2', k, s% solver_iter, &
-               s% Y_face(k), Y1, Y2
+            if (k==-35 .and. iter == 1) then
+               write(*,3) 'RSP Y_face Y1 Y2', k, s% solver_iter, s% Y_face(k), Y1, Y2
+               write(*,3) 'Peos', k, s% solver_iter, s% Pgas(k) + s% Prad(k)
+               write(*,3) 'Peos', k-1, s% solver_iter, s% Pgas(k-1) + s% Prad(k-1)
+               write(*,3) 'QQ', k, s% solver_iter, s% QQ(k)
+               write(*,3) 'QQ', k-1, s% solver_iter, s% QQ(k-1)
+               write(*,3) 'Cp', k, s% solver_iter, s% Cp(k)
+               write(*,3) 'Cp', k-1, s% solver_iter, s% Cp(k-1)
+               write(*,3) 'lgT', k, s% solver_iter, s% lnT(k)/ln10
+               write(*,3) 'lgT', k-1, s% solver_iter, s% lnT(k-1)/ln10
+               write(*,3) 'lgd', k, s% solver_iter, log(1d0/s% Vol(k))/ln10
+               write(*,3) 'lgd', k-1, s% solver_iter, log(1d0/s% Vol(k-1))/ln10
+            end if
 
             dY_dr_00(I) = Y1*d_Y2_dr_00 + Y2*d_Y1_dr_00 ! 
             dY_dr_in(I) = Y1*d_Y2_dr_in + Y2*d_Y1_dr_in ! 
@@ -1519,11 +1531,12 @@
       end subroutine calc_Pvsc
 
       
-      subroutine check_omega(s,i) ! needs cleanup
+      subroutine check_omega(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: i   
-         real(dp) :: SOURS, DAMPS, DAMPRS, DELTA, SOL, POM, POM2, POM3
+         real(dp) :: SOURS, DAMPS, DAMPRS, DELTA, SOL, POM, POM2, POM3, POM4
          integer :: k
+         include 'formats'         
          if (I > IBOTOM .and. I < NZN .and. ALFA /= 0d0) then
          !     JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
             k = NZN+1-i
@@ -1533,9 +1546,23 @@
             SOURS = POM*POM2
             DAMPS = (CEDE/ALFA)/((s% Hp_face(k) + s% Hp_face(k+1))*0.5d0)
             POM3 = (GAMMAR**2)/(ALFA**2)*4.d0*SIG
-            POM2 = (s% T(k)**3)*(s% Vol(k)**2)/(s% Cp(k)*s% opacity(k))       
-            DAMPRS = POM3*POM2/((s% Hp_face(k)**2 + s% Hp_face(k+1)**2)*0.5d0)
+            POM4 = (s% T(k)**3)*(s% Vol(k)**2)/(s% Cp(k)*s% opacity(k))       
+            DAMPRS = POM3*POM4/((s% Hp_face(k)**2 + s% Hp_face(k+1)**2)*0.5d0)
             DELTA = DAMPRS**2 + 4.d0*DAMPS*SOURS
+            if (k==-35) then
+               write(*,2) 'del', k, DELTA
+               write(*,2) 'DAMPR', k, DAMPRS
+               write(*,2) 'DAMP', k, DAMPS
+               write(*,2) 'SOURCE', k, SOURS
+               write(*,2) 'POM', k, POM
+               write(*,2) 'POM2', k, POM2
+               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
+               write(*,2) 's% Hp_face(k+1)', k+1, s% Hp_face(k+1)
+               write(*,2) 's% PII(k)', k, s% PII(k)
+               write(*,2) 's% PII(k+1)', k+1, s% PII(k+1)
+               write(*,2) 's% Y_face(k)', k, s% Y_face(k)
+               write(*,2) 's% Y_face(k+1)', k+1, s% Y_face(k+1)
+            end if
             if (DELTA >= 0.d0) SOL = ( - DAMPRS + sqrt(DELTA))/(2.d0*DAMPS)
             if (DELTA < 0.d0) SOL = - 99.99d0
             if (SOL >= 0.d0) SOL = SOL**2
@@ -3418,7 +3445,7 @@
             - dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k) + s% Eq(k))
          HR(IW) = -residual
          
-         if (k==-109) then
+         if (k==-35) then
             write(*,3) 'RSP w dEt PdV dtC dtEq', k, iter, &
                s% RSP_w(k), s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
                dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k)), dt*s% Eq(k)

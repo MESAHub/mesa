@@ -311,7 +311,11 @@
                else if (j == i_w) then
                   do k=1,nz
                      s% w(k) = s% xh(i_w, k)
-                     if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+                     if (s% w(k) < 0d0) then
+                        !write(*,4) 'unpack: fix w < 0', k, &
+                        !   s% solver_iter, s% model_number, s% w(k)
+                        s% w(k) = s% RSP2_w_fix_if_neg
+                     end if
                   end do
                else if (j == i_Hp) then
                   do k=1,nz

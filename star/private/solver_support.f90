@@ -1233,7 +1233,11 @@
 
             if (do_w) then
                s% w(k) = x(i_w)
-               if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+               if (s% w(k) < 0d0) then
+                  !write(*,4) 'set_vars_for_solver: fix w < 0', k, &
+                  !   s% solver_iter, s% model_number, s% w(k)
+                  s% w(k) = s% RSP2_w_fix_if_neg
+               end if
                if (is_bad_num(s% w(k))) then
                   s% retry_message = 'bad num for w'
                   ierr = -1

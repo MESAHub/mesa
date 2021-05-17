@@ -26,6 +26,8 @@
    RSP_fixed_Psurf = .true.
    RSP_Psurf = 0d0   
    RSP_initial_dt_factor = 1d0
+   
+   RSP_report_undercorrections = .true.
 
 ! RSP controls   
          
@@ -47,6 +49,13 @@
    RSP_alfam =     0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
    RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
             
+
+
+! TESTING
+   RSP_do_check_omega = .false.
+
+
+
    ! time weighting for end-of-step vs start-of-step values in equations.
    ! 1 corresponds to fully implicit scheme - stable, but can have large numerical damping.
    ! 0.5 corresponds to trapezoidal rule integration - gives least numerical damping.

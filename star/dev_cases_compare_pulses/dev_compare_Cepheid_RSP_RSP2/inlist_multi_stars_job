@@ -10,8 +10,8 @@
    
    ! NOTE: there may be problems with RSP restarts
    restart_flag = .true.
-   restart_names(1) = 'x140'
-   restart_names(2) = 'x140'
+   restart_names(1) = 'x184'
+   restart_names(2) = 'x184'
    
    which_for_pgstar = -1 ! do both
    

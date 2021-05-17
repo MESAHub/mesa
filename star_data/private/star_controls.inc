@@ -326,7 +326,7 @@
             use_other_RSP_linear_analysis, RSP_testing, RSP_use_Prad_for_Psurf, RSP_use_atm_grey_with_kap_for_Psurf, &
             RSP_fixed_Psurf, RSP_hydro_only, RSP_report_undercorrections, RSP_relax_initial_model, &
             use_other_RSP_build_model, RSP_relax_adjust_inner_mass_distribution, RSP_trace_RSP_build_model, &
-            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme
+            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme, RSP_do_check_omega
          integer :: RSP_max_num_periods, RSP_max_iters_per_try, RSP_max_retries_per_step, &
             RSP_mode_for_setting_PERIODLIN, RSP_nmodes, &
             RSP_target_steps_per_cycle, RSP_nz_outer, RSP_nz, &

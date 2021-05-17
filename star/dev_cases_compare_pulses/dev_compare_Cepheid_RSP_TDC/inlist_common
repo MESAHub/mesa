@@ -23,7 +23,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1d-6 ! 1.1950895357683798D+03 ! 
+   seconds_for_initial_dt = 1200 ! 1d-6 ! 
 
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
@@ -51,7 +51,8 @@
    initial_z = 0.008d0
    initial_mass = 6d0
 
-   max_timestep = 1d-6 ! 1.1950895357683798D+03 ! 
+   !max_timestep = 1200 ! 1d-6 ! 
+   force_timestep = 1200   ! when comparing to RSP, use force_timestep
 
    max_model_number = 5000000
    max_number_retries = 10000
