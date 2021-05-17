@@ -54,6 +54,7 @@
 ! TESTING
    RSP_do_check_omega = .false.
 
+   RSP_min_deltaR_for_periods = 1d0
 
 
    ! time weighting for end-of-step vs start-of-step values in equations.
