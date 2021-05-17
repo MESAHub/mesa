@@ -37,7 +37,7 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 1000
+      max_model_number = 2000
 
       always_use_eps_grav_form_of_energy_eqn = .true.
 

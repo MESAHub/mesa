@@ -714,11 +714,12 @@
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
-         if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
+         if (s% rsp_max_dt > 0) target_dt = min(target_dt, s% rsp_max_dt)
+         if (s% max_timestep > 0) target_dt = min(target_dt, s% max_timestep)
          s% dt = target_dt
 
          if (is_bad(s% dt)) then
-            write(*,1) 'dt', s% dt
+            write(*,1) 'do1_step dt', s% dt
             write(*,1) 'rsp_period', s% rsp_period
             write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
             write(*,1) 'max_timestep_factor', s% max_timestep_factor
@@ -742,6 +743,8 @@
                write(*,4) 'limit dt to max_dt', s% model_number
             s% dt = max_dt
          end if
+         
+         if (s% force_timestep > 0d0) s% dt = s% force_timestep ! overrides everything else
          
          if (is_bad(s% dt) .or. s% dt <= 0d0) then
             write(*,1) 'dt', s% dt
@@ -1037,8 +1040,7 @@
          end if
          if (s% model_number.eq.1) return
          if (.not. s% RSP_have_set_velocities) return
-         if (s% RSP_min_max_R_for_periods > 0d0 .and. &
-               s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
          if (UN/s% csound(1) > VMAX) then
             VMAX = UN/s% csound(1)
          end if
@@ -1047,6 +1049,7 @@
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
          if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
+         if (s% r(1)/SUNR - RMIN < s% RSP_min_deltaR_for_periods) return
          if(FIRST.eq.1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1

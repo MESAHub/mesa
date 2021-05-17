@@ -3496,9 +3496,9 @@
 
          Pvsc_ad = 0d0
          if (s% use_Pvsc_art_visc) then
-            call get_Pvsc_ad(s, k, Pvsc_ad, ierr)
+            call get_Pvsc_ad(s, k, Pvsc_ad, ierr) ! no time centering for Pvsc
             if (ierr /= 0) return
-            Pvsc_ad = alfa*Pvsc_ad + beta*s% Pvsc_start(k)
+            ! NO TIME CENTERING FOR Pvsc: Pvsc_ad = alfa*Pvsc_ad + beta*s% Pvsc_start(k)
          end if
          
          Ptrb_ad = 0d0
