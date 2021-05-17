@@ -3,15 +3,17 @@
    show_log_description_at_start = .false.
    
    load_saved_model_for_RSP2 = .true.
-   
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle10.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle140.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle230.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle327.mod'
-   load_model_filename = '../dev_test_Cepheid_RSP/cycle557.mod'
+   load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle100.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle200.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle400.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle500.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle600.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle700.mod'
    
    save_model_when_terminate = .true.
-   save_model_filename = 'final.mod'
+   save_model_filename = 'rsp2_cycle700.mod'
    !required_termination_code_string(1) = 'max_model_number'
    
    change_initial_v_flag = .true.
@@ -35,7 +37,7 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -60,13 +62,15 @@
    max_number_retries = 10000
 
 ! atmosphere
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0
-
-   atm_option = 'T_tau'
-   atm_T_tau_relation = 'Eddington'
-   atm_T_tau_opacity = 'fixed'
-   Pextra_factor = 2
+   ! P boundary condition
+   use_momentum_outer_BC = .true.  ! required for RSP2
+   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
+      ! this can be a problem with shocks since omits Pvsc
+   ! else if RSP_use_Prad_for_Psurf
+      !use_zero_Pgas_outer_BC = .false.
+   ! else use RSP default of Psurf = 0
+      use_fixed_Psurf_outer_BC = .true.
+      fixed_Psurf = 0d0
 
 ! timesteps
    dt_div_min_dr_div_cs_limit = 0.5d0
@@ -122,13 +126,13 @@
    tol_max_correction = 5d-7
    
 ! output
-   x_integer_ctrl(1) = -10 ! which period to check
+   x_integer_ctrl(1) = 700 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 8.3 ! expected period (in days) 
-   x_ctrl(8) = 5d-3 ! min_deltaR_for_periods (Rsun)
+   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.3 ! min_period_div_target
 
@@ -227,7 +231,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
    !pause_interval = 100
    pgstar_interval = 25
 

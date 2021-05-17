@@ -166,7 +166,7 @@
     calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
     threshold_for_smooth_brunt_B, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
     min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
-    RSP_max_num_periods, RSP_min_max_R_for_periods, &
+    RSP_max_num_periods, RSP_min_max_R_for_periods, RSP_min_deltaR_for_periods, &
     RSP_min_PERIOD_div_PERIODLIN, RSP_report_limit_dt, RSP_mode_for_setting_PERIODLIN, RSP_initial_dt_factor, &
     RSP_v_div_cs_threshold_for_dt_limit, RSP_max_dt_times_min_dr_div_cs, RSP_thetae, &
     RSP_alfa, RSP_thetaq, RSP_default_PERIODLIN, &
@@ -1165,6 +1165,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_max_num_periods = RSP_max_num_periods
    s% RSP_target_steps_per_cycle = RSP_target_steps_per_cycle
    s% RSP_min_max_R_for_periods = RSP_min_max_R_for_periods
+   s% RSP_min_deltaR_for_periods = RSP_min_deltaR_for_periods
    s% RSP_default_PERIODLIN = RSP_default_PERIODLIN
    s% RSP_min_PERIOD_div_PERIODLIN = RSP_min_PERIOD_div_PERIODLIN
    s% RSP_GREKM_avg_abs_frac_new = RSP_GREKM_avg_abs_frac_new
@@ -2845,6 +2846,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    RSP_max_num_periods = s% RSP_max_num_periods
    RSP_target_steps_per_cycle = s% RSP_target_steps_per_cycle
    RSP_min_max_R_for_periods = s% RSP_min_max_R_for_periods
+   RSP_min_deltaR_for_periods = s% RSP_min_deltaR_for_periods
    RSP_default_PERIODLIN = s% RSP_default_PERIODLIN
    RSP_min_PERIOD_div_PERIODLIN = s% RSP_min_PERIOD_div_PERIODLIN
    RSP_GREKM_avg_abs_frac_new = s% RSP_GREKM_avg_abs_frac_new

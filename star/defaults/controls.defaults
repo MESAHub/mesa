@@ -3131,6 +3131,7 @@
 
     RSP_target_steps_per_cycle = 600
     RSP_min_max_R_for_periods = -1
+    RSP_min_deltaR_for_periods = -1
     RSP_min_PERIOD_div_PERIODLIN = 0.5d0
     RSP_mode_for_setting_PERIODLIN = 1
     RSP_default_PERIODLIN = 34560
@@ -3291,7 +3292,7 @@
 
       ! ::
 
-    RSP_do_check_omega = .true.
+    RSP_do_check_omega = .false.
 
       ! ::
 

@@ -1,7 +1,7 @@
 
 &star_job   
    load_saved_model_for_RSP2 = .true.
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 / ! end of star_job namelist
 
 &eos
@@ -31,7 +31,7 @@
 ! TESTING
 
 
-
+   !RSP_min_deltaR_for_periods = 1d0
 
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5

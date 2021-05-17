@@ -1040,8 +1040,7 @@
          end if
          if (s% model_number.eq.1) return
          if (.not. s% RSP_have_set_velocities) return
-         if (s% RSP_min_max_R_for_periods > 0d0 .and. &
-               s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
          if (UN/s% csound(1) > VMAX) then
             VMAX = UN/s% csound(1)
          end if
@@ -1050,6 +1049,7 @@
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
          if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
+         if (s% r(1)/SUNR - RMIN < s% RSP_min_deltaR_for_periods) return
          if(FIRST.eq.1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1
