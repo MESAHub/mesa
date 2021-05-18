@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013-2019  Bill Paxton, Pablo Marchant & The MESA Team
+!   Copyright (C) 2013-2019  Pablo Marchant & The MESA Team
 !
 !   this file is part of mesa.
 !

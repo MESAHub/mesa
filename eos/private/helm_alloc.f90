@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2006, 2007-2019  Bill Paxton, Frank Timmes & The MESA Team
+!   Copyright (C) 2006, 2007-2019  Frank Timmes & The MESA Team
 !
 !   This file is part of MESA.
 !
