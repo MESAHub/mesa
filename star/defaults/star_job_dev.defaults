@@ -13,6 +13,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! new_RSP2_flag
       ! ~~~~~~~~~~~~~~
+      ! create_RSP2_model
+      ! ~~~~~~~~~~~~~~
+      ! load_saved_model_for_RSP2
+      ! ~~~~~~~~~~~~~~
 
       ! WARNING: These controls are not ready for use.
       ! w is turbulent velocity according to RSP2
@@ -23,6 +27,8 @@
     change_initial_RSP2_flag = .false.
     change_RSP2_flag_at_model_number = -111
     new_RSP2_flag = .false.
+    create_RSP2_model = .false.
+    load_saved_model_for_RSP2 = .false.
     
     
       ! remove_surface_by_relax_to_star_cut

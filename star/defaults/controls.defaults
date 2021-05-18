@@ -3131,6 +3131,7 @@
 
     RSP_target_steps_per_cycle = 600
     RSP_min_max_R_for_periods = -1
+    RSP_min_deltaR_for_periods = -1
     RSP_min_PERIOD_div_PERIODLIN = 0.5d0
     RSP_mode_for_setting_PERIODLIN = 1
     RSP_default_PERIODLIN = 34560
@@ -3288,6 +3289,10 @@
       ! ::
 
     RSP_relax_adjust_inner_mass_distribution = .true.
+
+      ! ::
+
+    RSP_do_check_omega = .false.
 
       ! ::
 
@@ -8710,23 +8715,6 @@
 
     hydro_mtx_min_allowed_logT = 1d0
     hydro_mtx_min_allowed_logRho = -1d2
-
-
-      ! solver_clip_dlogT
-      ! ~~~~~~~~~~~~~~~~~
-      ! solver_clip_dlogRho
-      ! ~~~~~~~~~~~~~~~~~~~
-      ! solver_clip_dlogR
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! Limit magnitude of relative changes per iteration in solver.
-      ! Ignore if limit is <= 0.
-
-      ! ::
-
-    solver_clip_dlogT = -1d0
-    solver_clip_dlogRho = -1d0
-    solver_clip_dlogR = -1d0
 
       ! level 1 of gold tolerances for solver solver
 

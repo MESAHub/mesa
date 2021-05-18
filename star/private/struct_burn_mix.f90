@@ -499,7 +499,6 @@
          integer, intent(in) :: nvar
          integer :: j1, k, nz
          include 'formats'
-         nz = s% nz
          do j1 = 1, min(nvar,s% nvar_hydro)
             if (j1 == s% i_lnd .and. s% i_lnd <= nvar) then
                do k = 1, nz
@@ -656,7 +655,6 @@
             solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
-
          if (ierr /= 0) then
             if (report) then
                write(*, *) 'hydro_solver_step returned ierr', ierr

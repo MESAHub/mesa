@@ -119,7 +119,6 @@
 
          integer :: num_hydro_merges
          integer :: num_hydro_splits
-         integer :: bad_max_corr_cnt
 
       ! past/future model numbers
          integer :: timestep_hold

@@ -747,9 +747,11 @@
          call set_power_info(s)
 
          s% total_angular_momentum = total_angular_momentum(s)
-         ! cannot call do_report yet since many things it needs are not yet set.
-         !call do_report(s, ierr)
-         !if (failed('do_report')) return
+
+         ! do_report needs to be called now because checks for redo and retry rely on
+         ! data stored by do_report.
+         call do_report(s, ierr)
+         if (failed('do_report')) return
          call set_phase_of_evolution(s)
             
          call system_clock(time0,clock_rate)
@@ -2282,7 +2284,6 @@
          
          if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_retry'
          
-         s% bad_max_corr_cnt = 0
          s% retry_cnt = s% retry_cnt + 1
          if (s% retry_limit > 0 .and. s% retry_cnt > s% retry_limit) then
             s% dt_start = sqrt(s% dt*s% dt_start)
