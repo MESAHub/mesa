@@ -1312,11 +1312,6 @@
             if (failed('max_abs_xa_corr')) exit
 
             call do1(s% Hp_face, c% Hp_face); if (failed('Hp_face')) exit
-            call do1(s% d_Hp_face_dlnR, c% d_Hp_face_dlnR); if (failed('d_Hp_face_dlnR')) exit
-            call do1(s% d_Hp_face_dlnd00, c% d_Hp_face_dlnd00); if (failed('d_Hp_face_dlnd00')) exit
-            call do1(s% d_Hp_face_dlnT00, c% d_Hp_face_dlnT00); if (failed('d_Hp_face_dlnT00')) exit
-            call do1(s% d_Hp_face_dlndm1, c% d_Hp_face_dlndm1); if (failed('d_Hp_face_dlndm1')) exit
-            call do1(s% d_Hp_face_dlnTm1, c% d_Hp_face_dlnTm1); if (failed('d_Hp_face_dlnTm1')) exit
 
             call do1(s% Y_face, c% Y_face); if (failed('Y_face')) exit
             call do1(s% Y_face_start, c% Y_face_start); if (failed('Y_face_start')) exit
@@ -1327,11 +1322,6 @@
             call do1(s% d_Y_face_dlnTm1, c% d_Y_face_dlnTm1); if (failed('d_Y_face_dlnTm1')) exit
             
             call do1(s% PII, c% PII); if (failed('PII')) exit
-            call do1(s% d_PII_dlnR, c% d_PII_dlnR); if (failed('d_PII_dlnR')) exit
-            call do1(s% d_PII_dlnd00, c% d_PII_dlnd00); if (failed('d_PII_dlnd00')) exit
-            call do1(s% d_PII_dlnT00, c% d_PII_dlnT00); if (failed('d_PII_dlnT00')) exit
-            call do1(s% d_PII_dlndm1, c% d_PII_dlndm1); if (failed('d_PII_dlndm1')) exit
-            call do1(s% d_PII_dlnTm1, c% d_PII_dlnTm1); if (failed('d_PII_dlnTm1')) exit
 
             call do1(s% Chi, c% Chi); if (failed('Chi')) exit
             call do1(s% Chi_start, c% Chi_start); if (failed('Chi_start')) exit
