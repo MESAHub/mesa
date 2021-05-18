@@ -285,7 +285,6 @@
          nullify(s% burn_z_conv_region)
 
          s% have_burner_storage = .false.
-         s% burner_storage_sz_per_thread = 0
          s% burner_num_threads = 0
          nullify(s% burner_storage)
 
@@ -359,7 +358,6 @@
          
          s% dt = 0d0
          s% mstar_dot = 0d0
-         s% boost_mlt_alfa = 0
 
          s% power_nuc_burn = -1
          s% power_h_burn = -1
@@ -537,15 +535,9 @@
          s% doing_relax = .false.
          s% mstar_dot = 0
          s% gradT_excess_alpha_old = 0
-         s% surf_lnT = 0
-         s% surf_lnd = 0
-         s% surf_lnR = 0
-         s% surf_v = 0
          s% surf_lnS = 0
 
          s% termination_code = -1
-
-         s% prev_create_atm_R0_div_R = -1
 
          s% screening_mode_value = -1
 
@@ -686,7 +678,6 @@
          s% L_center = 0
          s% time = 0
          s% total_angular_momentum = 0
-         s% prev_create_atm_R0_div_R = 0
 
          s% dt = 0
 

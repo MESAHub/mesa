@@ -83,8 +83,6 @@
 
          do_struct_burn_mix = retry
          
-         s% dVARdot_dVAR = 1d0/dt     
-
          s% do_burn = (s% dxdt_nuc_factor > 0d0)
          s% do_mix = (s% mix_factor > 0d0)
          
@@ -300,7 +298,6 @@
             s% lnPeos_start(k) = s% lnPeos(k)
             s% Peos_start(k) = s% Peos(k)
             s% lnPgas_start(k) = s% lnPgas(k)
-            s% lnE_start(k) = s% lnE(k)
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
@@ -309,42 +306,24 @@
             s% L_start(k) = s% L(k)
             s% omega_start(k) = s% omega(k)
             s% ye_start(k) = s% ye(k)
-            s% X_start(k) = s% X(k)
-            s% Y_start(k) = s% Y(k)
-            s% Z_start(k) = s% Z(k)
             s% j_rot_start(k) = s% j_rot(k)
             s% eps_nuc_start(k) = s% eps_nuc(k)
             s% non_nuc_neu_start(k) = s% non_nuc_neu(k)
-            s% mass_correction_start(k) = s% mass_correction(k)
-            s% P_div_rho_start(k) = s% Peos(k)/s% rho(k)
             s% Pvsc_start(k) = -1d99
-            s% scale_height_start(k) = s% scale_height(k)
-            s% gradT_start(k) = s% gradT(k)
-            s% gradL_start(k) = s% gradL(k)
             s% grada_start(k) = s% grada(k)
-            s% gradr_start(k) = s% gradr(k)
-            s% grada_face_start(k) = s% grada_face(k)
             s% chiT_start(k) = s% chiT(k)
             s% chiRho_start(k) = s% chiRho(k)
             s% cp_start(k) = s% cp(k)
-            s% Cv_start(k) = s% Cv(k)
-            s% dE_dRho_start(k) = s% dE_dRho(k)
             s% gam_start(k) = s% gam(k)
             s% lnS_start(k) = s% lnS(k)
             s% eta_start(k) = s% eta(k)
-            s% abar_start(k) = s% abar(k)
             s% zbar_start(k) = s% zbar(k)
-            s% z53bar_start(k) = s% z53bar(k)
             s% mu_start(k) = s% mu(k)
             s% phase_start(k) = s% phase(k)
             s% latent_ddlnT_start(k) = s% latent_ddlnT(k)
             s% latent_ddlnRho_start(k) = s% latent_ddlnRho(k)
             s% eps_nuc_start(k) = s% eps_nuc(k)
             s% opacity_start(k) = s% opacity(k)
-            s% mlt_mixing_length_start(k) = s% mlt_mixing_length(k)
-            s% mlt_mixing_type_start(k) = s% mlt_mixing_type(k)
-            s% mlt_D_start(k) = s% mlt_D(k)
-            s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          
          if (s% using_RSP2) then
@@ -362,20 +341,6 @@
                s% xa_start(j,k) = s% xa(j,k)
             end do
          end do
-         
-         s% start_H_envelope_base_k = s% nz+1
-         i_h1 = s% net_iso(ih1)
-         if (i_h1 > 0) then
-            ! start_H_envelope_base_k = outermost cell where H1 is not most abundant species
-            do k=1,s% nz
-               j = maxloc(s% xa(1:s% species,k), dim=1)
-               if (j /= i_h1) then
-                  s% start_H_envelope_base_k = k
-                  exit
-               end if
-            end do
-         end if
-         if (s% start_H_envelope_base_k > s% nz) s% start_H_envelope_base_k = 0
 
          call eval_total_energy_integrals(s, &
             s% total_internal_energy_start, &
@@ -479,16 +444,6 @@
          use star_utils, only: get_lnd_from_xh, get_lnT_from_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) &
-            s% surf_lnd = get_lnd_from_xh(s, 1)
-         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) &
-            s% surf_lnT = get_lnT_from_xh(s, 1)
-         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) &
-            s% surf_lnR = get_lnR_from_xh(s, 1)
-         if (s% i_v > 0 .and. s% i_v <= nvar) &
-            s% surf_v = s% xh(s% i_v,1)
-         if (s% i_u > 0 .and. s% i_u <= nvar) &
-            s% surf_v = s% xh(s% i_u,1)
          s% surf_lnS = s% lnS(1)
          s% num_surf_revisions = 0
       end subroutine set_surf_info
