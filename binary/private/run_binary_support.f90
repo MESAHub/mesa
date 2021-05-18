@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton and Pablo Marchant
+!   Copyright (C) 2013  and Pablo Marchant
 !
 !   this file is part of mesa.
 !

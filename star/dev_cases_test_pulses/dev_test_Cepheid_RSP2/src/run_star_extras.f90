@@ -247,7 +247,7 @@
             period_delta_Mag = 2.5d0*period_delta_logL
             period_max_vsurf_div_cs = v_div_cs_max
             prev_KE_max = KE_max
-            write(*,'(i4,a14,i4,2(a14,f8.3),99(a14,f12.5))')  &
+            write(*,'(i4,a14,i6,2(a14,f8.3),99(a14,f12.5))')  &
                num_periods, &
                'steps/cycle', s% model_number - run_num_steps_end_prev, &
                'iters/step',  &

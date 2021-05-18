@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2019  Bill Paxton, Radek Smolec
+!   Copyright (C) 2019  Radek Smolec
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO

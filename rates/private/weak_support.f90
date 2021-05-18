@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2017 Josiah Schwab, Bill Paxton
+!   Copyright (C) 2017 Josiah Schwab
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
