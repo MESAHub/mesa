@@ -674,19 +674,6 @@
                   -s% max_frac_for_negative_surf_lum*old_lum_surf/dlum_surf)
             end if
          end if
-         
-         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) then
-            call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
-         end if
-         
-         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) then
-            call clip1(s% i_lnT, s% solver_clip_dlogT*ln10)
-         end if
-         
-         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) then
-            call clip1(s% i_lnR, s% solver_clip_dlogR*ln10)
-         end if
-               
 
          !if (s% w_div_wc_flag) then
          !   do k=1,nz
@@ -760,27 +747,6 @@
                B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
             end do
          end subroutine clip_so_non_negative
-            
-         subroutine clip1(i, clip)
-            integer, intent(in) :: i
-            real(dp), intent(in) :: clip
-            integer :: k
-            real(dp) :: old_x, delta, abs_delta, abs_B
-            include 'formats'
-            if (clip <= 0d0) return
-            do k = 1, s% nz
-               old_x = s% xh_start(i,k) + s% solver_dx(i,k) ! value before this iteration
-               delta = B(i,k)*s% x_scale(i,k)*correction_factor ! change for this iter
-               ! skip if change small enough or if too big to change
-               if (abs(delta) <= clip*abs(old_x) .or. is_bad(delta) .or. &
-                   abs(old_x) < 1d0 .or. abs(delta) > 10d0*clip*abs(old_x)) cycle
-               abs_delta = clip*abs(old_x)
-               abs_B = abs_delta/(s% x_scale(i,k)*correction_factor)
-               B(i,k) = sign(abs_B,B(i,k))
-               write(*,2) 'clip change ' // trim(s% nameofvar(i)), k, delta, old_x
-               !stop 'Bdomain'
-            end do
-         end subroutine clip1
 
       end subroutine Bdomain
 
@@ -1262,7 +1228,11 @@
 
             if (do_w) then
                s% w(k) = x(i_w)
-               if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+               if (s% w(k) < 0d0) then
+                  !write(*,4) 'set_vars_for_solver: fix w < 0', k, &
+                  !   s% solver_iter, s% model_number, s% w(k)
+                  s% w(k) = s% RSP2_w_fix_if_neg
+               end if
                if (is_bad_num(s% w(k))) then
                   s% retry_message = 'bad num for w'
                   ierr = -1

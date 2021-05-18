@@ -46,16 +46,18 @@
 
          real(dp), parameter :: lg_max_abs_mdot = -3.5d0
          real(dp) :: init_mass, init_z
-         logical :: want_RSP_model, is_rsp_model
+         logical :: want_RSP_model, is_rsp_model, want_RSP2_model, is_rsp2_model
 
          init_mass = s% initial_mass
          init_z = s% initial_z
 
          want_RSP_model = .false.
-         call do_read_saved_model(s, fullname, want_RSP_model, is_rsp_model, ierr)
+         want_RSP2_model = .false.
+         call do_read_saved_model(s, fullname, &
+            want_RSP_model, is_rsp_model, want_RSP2_model, is_rsp2_model, ierr)
          if (ierr /= 0) return
 
-         if (abs(s% initial_z - init_z) > 1d-3*init_z) then
+         if (abs(s% initial_z - init_z) > 1d-3*init_z .or. is_rsp_model .or. is_rsp2_model) then
             ierr = -1
             return
          end if
@@ -419,7 +421,8 @@
 
                if (m_read == m1) then
                   call read1_model( &
-                     s, species, nvar_hydro, nz, iounit, .false., .false., &
+                     s, species, nvar_hydro, nz, iounit, &
+                     .false., .false., .false., .false., &
                      xh, xa, q, dq, omega, j_rot, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
@@ -428,7 +431,8 @@
                   nz = nz2
                else
                   call read1_model( &
-                     s, species, nvar_hydro, nz, iounit, .false., .false., &
+                     s, species, nvar_hydro, nz, iounit, &
+                     .false., .false., .false., .false., &
                      xh2, xa2, q2, dq2, omega2, j_rot2, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.

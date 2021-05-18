@@ -1831,6 +1831,8 @@
                val = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             case(h_v_surf_div_escape_v)
                val = v_surf/sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
+            case(h_v_div_vesc)
+               val = v_surf/sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             case(h_v_surf_km_s)
                val = v_surf*1d-5
             case(h_v_surf)

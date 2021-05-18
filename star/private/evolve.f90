@@ -2234,7 +2234,6 @@
          
          if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_retry'
          
-         s% bad_max_corr_cnt = 0
          s% retry_cnt = s% retry_cnt + 1
          if (s% retry_limit > 0 .and. s% retry_cnt > s% retry_limit) then
             s% dt_start = sqrt(s% dt*s% dt_start)
