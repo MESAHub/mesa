@@ -397,7 +397,7 @@
          if (s% why_Tlim < 0) then
             why = ''
          else if (s% why_Tlim == 0) then
-            why = 'initial dt'
+            why = 'initial dt' 
          else
             why = dt_why_str(min(numTlim,s% why_Tlim))
             if (s% why_Tlim == Tlim_dX .and. s% Tlim_dX_species > 0 &
