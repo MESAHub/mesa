@@ -83,8 +83,6 @@
 
          do_struct_burn_mix = retry
          
-         s% dVARdot_dVAR = 1d0/dt     
-
          s% do_burn = (s% dxdt_nuc_factor > 0d0)
          s% do_mix = (s% mix_factor > 0d0)
          

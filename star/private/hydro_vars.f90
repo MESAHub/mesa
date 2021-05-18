@@ -373,9 +373,7 @@
 
             if (dt > 0d0) then
                dt_inv = 1/dt
-               s% dVARdot_dVAR = dt_inv
             else
-               s% dVARdot_dVAR = dt_inv
                dt_inv = 0
             end if
 
