@@ -476,7 +476,10 @@
             end if
             return
          end if
-         
+
+         s% T_surf = exp(lnT_surf)
+         s% Teff = Teff ! Teff from atm
+
          ! Calculate and store photosphere (tau=2/3) values; these
          ! aren't actually used to set up surface values
 
@@ -487,12 +490,6 @@
          s% L_phot = L_phot/Lsun
          s% photosphere_L = s% L_phot
          s% photosphere_r = r_phot/Rsun
-         
-         if (s% tau_factor <= 1d0) then ! photosphere is part of the model
-            s% Teff = T_phot ! T interpolated to photosphere location
-         else ! photosphere is not part of the model
-            s% Teff = Teff ! Teff from atm
-         end if
 
       end subroutine set_Teff_info_for_eqns
 
