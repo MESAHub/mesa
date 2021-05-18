@@ -2219,7 +2219,6 @@
 
          s% dX_nuc_drop_max_j = max_j
          s% dX_nuc_drop_max_k = max_k
-         s% dX_nuc_drop_max_drop = max_dx_nuc_drop
          
          contains
 

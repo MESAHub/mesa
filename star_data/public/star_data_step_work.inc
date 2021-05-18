@@ -1026,10 +1026,8 @@
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          
-         real(dp) :: surf_accel_grav_ratio
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
-         real(dp) :: dX_nuc_drop_max_drop
          real(dp) :: solver_test_partials_val, solver_test_partials_dval_dx
 
          ! variation control value for timestep controller
