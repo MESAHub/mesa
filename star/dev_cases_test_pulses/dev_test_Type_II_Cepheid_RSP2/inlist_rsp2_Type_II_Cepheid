@@ -3,14 +3,7 @@
    show_log_description_at_start = .false.
    
    load_saved_model_for_RSP2 = .true.
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle100.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle200.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle400.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle500.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle600.mod'
-   load_model_filename = '../dev_test_Cepheid_RSP/cycle700.mod'
+   load_model_filename = 'Type_II_Cepheid.mod'
    
    !save_model_when_terminate = .true.
    !save_model_filename = 'rsp2_cycle700.mod'
@@ -26,7 +19,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1200
+   seconds_for_initial_dt = 100
 
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
@@ -46,20 +39,17 @@
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.008d0
+   Zbase = 0.0001d0
    kap_file_prefix = 'a09'
    kap_lowT_prefix = 'lowT_fa05_a09p'
    kap_CO_prefix = 'a09_co'
 / ! end of kap namelist
 
 &controls  
-   initial_z = 0.008d0
-   initial_mass = 6d0
-
-
-   max_age = 12.486184 ! for movie
+   initial_z = 0.0001d0
+   initial_mass = 0.55d0
    
-   max_timestep = 1200
+   max_timestep = 100
 
    max_model_number = 5000000
    max_number_retries = 10000 
@@ -112,6 +102,8 @@
    mix_factor = 0
 
    always_use_dedt_form_of_energy_eqn = .true.
+
+! RSP2
    
    RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
@@ -124,6 +116,8 @@
    RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
    RSP2_alfad =     1d0
 
+   RSP2_alfam =     0.05d0        ! "lots of struggling"
+
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
    alt_scale_height_flag = .false.
@@ -132,7 +126,7 @@
    
 ! output
    x_integer_ctrl(1) = -548 ! which period to check
-   x_ctrl(1) = 8.2974 ! expected period (in days) 
+   x_ctrl(1) = 1.3171d0 ! expected period (in days) 
 
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
@@ -239,10 +233,25 @@
    !pause_interval = 100
    pgstar_interval = 5  ! 25
 
+         pgstar_xaxis_label_scale = 0.9
+         pgstar_left_yaxis_label_scale = 0.9
+         pgstar_right_yaxis_label_scale = 0.9
+
+         pgstar_xaxis_label_disp = 2.5
+         pgstar_left_yaxis_label_disp = 4.2 ! 3.4
+         pgstar_right_yaxis_label_disp = 4.8
+         
+         pgstar_grid_title_scale = 0.95
+         pgstar_grid_title_disp = 3.3
+
+         pgstar_num_scale = 0.85
+
+
+
 ! window 1
 
    Grid1_win_flag = .true.
-   Grid1_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP2'
+   Grid1_title = '0.55 M\d\(2281)\u Z=0.0001 Type II Cepheid rsp2'
 
    !Grid1_file_flag = .true.
    Grid1_file_dir = 'png1'
@@ -257,7 +266,7 @@
 ! window 2
       
    Grid2_win_flag = .true.
-   Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP2'
+   Grid2_title = '0.55 M\d\(2281)\u Z=0.0001 Type II Cepheid rsp2'
    
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
