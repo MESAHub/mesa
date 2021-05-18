@@ -201,7 +201,7 @@
          Text_Summary2_name(4,1) = 'period'
          Text_Summary2_name(5,1) = ''
          
-         Text_Summary2_name(1,2) = 'v_surf_km_s'
+         Text_Summary2_name(1,2) = 'max_v_div_cs'
          Text_Summary2_name(2,2) = 'v_div_cs'
          Text_Summary2_name(3,2) = 'radius'
          Text_Summary2_name(4,2) = 'delta_R'

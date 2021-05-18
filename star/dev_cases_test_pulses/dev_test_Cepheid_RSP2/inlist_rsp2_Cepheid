@@ -3,14 +3,14 @@
    show_log_description_at_start = .false.
    
    load_saved_model_for_RSP2 = .true.
-   load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle100.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle200.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle400.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle500.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle600.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle700.mod'
+   load_model_filename = '../dev_test_Cepheid_RSP/cycle700.mod'
    
    !save_model_when_terminate = .true.
    !save_model_filename = 'rsp2_cycle700.mod'
@@ -81,7 +81,7 @@
    min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
-   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.5d0
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0 ! 0.5d0
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.0d0
 
 ! mlt
@@ -150,18 +150,13 @@
    trace_history_value_name(1) = 'log_rel_run_E_err'
    trace_history_value_name(2) = 'rel_E_err'
 
-      photo_interval = 4000
-      profile_interval = 4000
+      photo_interval = 2000
+      profile_interval = 2000
       history_interval = 40
-      terminal_interval = 4000
+      terminal_interval = 2000
 
-      !photo_interval = 1000
-      !profile_interval = 4000
-      !history_interval = 40
-      !terminal_interval = 100
-
-      !photo_interval = 10
-      !profile_interval = 4000
+      !photo_interval = 100
+      !profile_interval = 400
       !history_interval = 40
       !terminal_interval = 1
 
@@ -246,7 +241,7 @@
 
 ! window 1
 
-   !Grid1_win_flag = .true.
+   Grid1_win_flag = .true.
    Grid1_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP2'
 
    !Grid1_file_flag = .true.
@@ -267,7 +262,7 @@
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
 
-   Grid2_file_flag = .true.
+   !Grid2_file_flag = .true.
    file_digits = 7
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid2'
@@ -284,5 +279,10 @@
    Profile_Panels2_xaxis_reversed = .true.
    Profile_Panels2_xmin = -6
    Profile_Panels2_xmax = -0.1
+
+   Profile_Panels2_xaxis_name = 'zone'
+   Profile_Panels2_xaxis_reversed = .true.
+   Profile_Panels2_xmin = -101
+   Profile_Panels2_xmax = -101
    
 / ! end of pgstar namelist
