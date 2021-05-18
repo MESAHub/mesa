@@ -66,7 +66,6 @@
          s% L_surf = luminosity/Lsun
          s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
             ! log10(stellar luminosity in solar units)
-         s% log_L_surf = s% log_surface_luminosity
          if (is_bad(s% L_surf)) then
             write(*,2) 's% L_surf', s% model_number, s% L_surf
             stop 'set_phot_info'
@@ -123,30 +122,7 @@
             s% power_h_burn = 0d0
             s% power_he_burn = 0d0
             s% power_z_burn = 0d0
-            s% power_PP = 0d0
-            s% power_CNO = 0d0
-            s% power_tri_alpha = 0d0
-            s% power_c_alpha = 0d0
-            s% power_n_alpha = 0d0
-            s% power_o_alpha = 0d0
-            s% power_ne_alpha = 0d0
-            s% power_na_alpha = 0d0
-            s% power_mg_alpha = 0d0
-            s% power_si_alpha = 0d0
-            s% power_s_alpha = 0d0
-            s% power_ar_alpha = 0d0
-            s% power_ca_alpha = 0d0
-            s% power_ti_alpha = 0d0
-            s% power_cr_alpha = 0d0
-            s% power_fe_co_ni = 0d0
-            s% power_c12_c12 = 0d0
-            s% power_c12_o16 = 0d0
-            s% power_o16_o16 = 0d0
             s% power_photo = 0d0
-            s% power_pnhe4 = 0d0
-            s% power_ni56_co56 = 0d0
-            s% power_co56_fe56 = 0d0
-            s% power_other = 0d0
          else            
             ! better if set power_nuc_burn using eps_nuc instead of categories
             ! categories can be subject to numerical jitters at very high temperatures
@@ -164,30 +140,7 @@
             s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
             s% power_he_burn = s% L_by_category(i3alf)
             s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
-            s% power_PP = s% L_by_category(ipp)
-            s% power_CNO = s% L_by_category(icno)
-            s% power_tri_alpha = s% L_by_category(i3alf)
-            s% power_c_alpha = s% L_by_category(i_burn_c)
-            s% power_n_alpha = s% L_by_category(i_burn_n)
-            s% power_o_alpha = s% L_by_category(i_burn_o)
-            s% power_ne_alpha = s% L_by_category(i_burn_ne)
-            s% power_na_alpha = s% L_by_category(i_burn_na)
-            s% power_mg_alpha = s% L_by_category(i_burn_mg)
-            s% power_si_alpha = s% L_by_category(i_burn_si)
-            s% power_s_alpha = s% L_by_category(i_burn_s)
-            s% power_ar_alpha = s% L_by_category(i_burn_ar)
-            s% power_ca_alpha = s% L_by_category(i_burn_ca)
-            s% power_ti_alpha = s% L_by_category(i_burn_ti)
-            s% power_cr_alpha = s% L_by_category(i_burn_cr)
-            s% power_fe_co_ni = s% L_by_category(i_burn_fe)
-            s% power_c12_c12 = s% L_by_category(icc)
-            s% power_c12_o16 = s% L_by_category(ico)
-            s% power_o16_o16 = s% L_by_category(ioo)
             s% power_photo = s% L_by_category(iphoto)
-            s% power_pnhe4 = s% L_by_category(ipnhe4)
-            s% power_ni56_co56 = s% L_by_category(i_ni56_co56)
-            s% power_co56_fe56 = s% L_by_category(i_co56_fe56)
-            s% power_other = s% L_by_category(iother)
          end if
          
          if (s% non_nuc_neu_factor == 0d0) then
@@ -274,7 +227,6 @@
          s% d_center_eps_nuc_dlnd = center_value(s, s% d_epsnuc_dlnd)
          s% center_non_nuc_neu = center_value(s, s% non_nuc_neu)
 
-         s% center_gamma = center_value(s, s% gam)
          s% center_abar = center_value(s, s% abar)
          s% center_zbar = center_value(s, s% zbar)
          s% center_mu = center_value(s, s% mu)
@@ -290,11 +242,6 @@
             s% center_omega = center_value(s, s% omega)
             s% center_omega_div_omega_crit = center_omega_div_omega_crit()
          end if
-
-         s% log_surface_temperature = s% lnT(1)/ln10 ! log10(temperature at surface)
-         s% log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
-         s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
-         s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
          
          luminosity = s% L(1)
 

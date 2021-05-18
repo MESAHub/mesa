@@ -112,7 +112,7 @@
             include "star_controls.inc"
             include "star_controls_dev.inc"
             include "pgstar_controls.inc"
-         
+
       end type star_info
 
       logical :: have_initialized_star_handles = .false.
