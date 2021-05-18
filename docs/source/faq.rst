@@ -545,6 +545,21 @@ experiencing slow download speeds, you may want to change which mirror
 you are using. (After you select a zipfile to download, click the "try
 another mirror" link near the top of the page.)
 
+How do I obtain a non-release MESA version?
+-------------------------------------------
+
+The root of the MESA git repository on GitHub corresponds to SVN
+revision r15140 (from December 2020).  Subsequent non-release MESA
+versions are identified by their git commit id (SHA-1 hash) and can be
+obtained by using standard git operations after cloning the repository.
+
+Previously (2010-2020), MESA was developed using SVN.  An archival
+version of the MESA SVN repository containing the complete development
+history is available at https://zenodo.org/record/4745225.  Follow the
+instructions there and then use standard SVN operations to access any
+desired commit.
+
+
 Why am I getting "wrong module version" errors?
 -----------------------------------------------
 
