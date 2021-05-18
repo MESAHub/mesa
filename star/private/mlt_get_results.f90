@@ -1087,6 +1087,9 @@
             r_th = (R0 - 1d0)/(1d0/tau - 1d0)
             if (r_th >= 1d0) then ! stable if R0 >= 1/tau
                D_thrm = 0d0
+            else if (Pr < 0d0) then
+               ! Bad results from get_diff_coeffs will just result in NaNs from thermohaline options, so skip
+               D_thrm = 0d0
             else if (s% thermohaline_option == 'Traxler_Garaud_Stellmach_11') then 
                ! Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
                ! also see Denissenkov. ApJ 723:563–579, 2010.
@@ -1169,7 +1172,7 @@
          real(dp), intent(in) :: R0,r_th,prandtl,diffratio
          real(dp) :: maxl2,maxl,lambdamax
          real(dp) :: myvars(2)
-         integer :: ierr, iter
+         integer :: ierr, iter, max_iters
 
          ! Initialize guess using estimates from Brown et al. 2013
          call analytical_estimate_th(maxl,lambdamax,r_th,prandtl,diffratio)
@@ -1183,24 +1186,30 @@
         !If the growth rate is negative, then try another set of parameters as first guess.  
         !Repeat as many times as necessary until convergence is obtained.
         iter = 1
-        do while((myvars(2)<0).or.(ierr /= 0)) 
+        max_iters = 200
+        do while(iter<=max_iters .and. ((myvars(2)<0).or.(ierr /= 0))) 
            !write(*,*) 'Alternative', r_th,prandtl,diffratio,iter
-        !Reset guess values
+           !Reset guess values
            myvars(1) = maxl
            myvars(2) = lambdamax
-        !Call relaxation for slightly different Pr, tau, R0.
+           !Call relaxation for slightly different Pr, tau, R0.
            call NR(myvars,prandtl*(1d0+iter*1.d-2),diffratio,R0/(1d0+iter*1.d-2),ierr)
-        !If it converged this time, call NR for the real parameters.
+           !If it converged this time, call NR for the real parameters.
            if(ierr.eq.0) call NR(myvars,prandtl,diffratio,R0,ierr)
            !write(*,*) prandtl,diffratio,R0,myvars(1),myvars(2),ierr
            !Otherwise, increase counter and try again.
            iter = iter + 1            
         enddo
-
-        !Plug solution into "l^2" and lambda.
-        maxl2 = myvars(1)*myvars(1)
-        lambdamax = myvars(2) 
-        !write(*,*) prandtl,diffratio,r_th,maxl2,lambdamax
+        
+        if((myvars(2)<0).or.(ierr /= 0)) then
+           write(*,*) "WARNING: thermohaline Newton relaxation failed to converge, falling back to estimate"
+           maxl2 = maxl*maxl
+        else ! NR succeeded, so use results in myvars
+           !Plug solution into "l^2" and lambda.
+           maxl2 = myvars(1)*myvars(1)
+           lambdamax = myvars(2)
+           !write(*,*) prandtl,diffratio,r_th,maxl2,lambdamax
+        end if
 
         !Calculate Nu_mu using Formula (33) from Brown et al, with C = 7.
         numu = 1.d0 + 49.d0*lambdamax*lambdamax/(diffratio*maxl2*(lambdamax+diffratio*maxl2))
@@ -1316,14 +1325,11 @@
          !Initialize flags and other counters.
          ierr = 0
          iter = 0
-         err = 0d0
-         errold = 0d0
+         err = 1d99
+         errold = 1d99
          !Save input guess
          x1_sav = xrk(1)
          x2_sav = xrk(2)
-
-         call thermohaline_rhs(xrk,f,j,prandtl,diffratio,R0)    
-         err = dsqrt(f(1)*f(1)+f(2)*f(2))
 
          !While error is too large .and. decreasing, iterate.
          do while ((err.gt.acy).and.(ierr.eq.0).and.(iter.lt.niter))
@@ -1365,6 +1371,13 @@
             endif
          enddo
          
+         if(err<=acy) then
+            ierr = 0
+         else
+            ! write(*,2) 'NR failed to converge', err, iter
+            ierr = 1
+         end if
+
          return
       end subroutine NR
 
