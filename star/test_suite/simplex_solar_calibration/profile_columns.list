@@ -62,8 +62,6 @@
    csound ! sound speed
    csound_face ! sound speed
    v_div_csound ! velocity divided by sound speed
-   !total_energy ! v^2/2 - G m / r + E (ergs/g).  negative if bound
-   !total_energy_integral ! sum from surface inwards of dm*(v^2/2 - G m / r + E) (ergs)
    !v_div_r ! velocity divided by radius
    !scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
    eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)

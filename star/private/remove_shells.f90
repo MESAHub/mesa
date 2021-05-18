@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2015-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2015-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -637,7 +637,7 @@
          call prune_star_info_arrays(s, ierr)
          if (ierr /= 0) return
          s% need_to_setvars = .true.
-         call finish_load_model(s, .false., .false., .false., ierr)
+         call finish_load_model(s, .false., .false., .false., .false., .false., ierr)
       end subroutine do_remove_center
 
 
@@ -1082,7 +1082,7 @@
          s% need_to_setvars = .true.
 
          if (dbg) write(*,1) 'call finish_load_model'
-         call finish_load_model(s, .false., .false., .false., ierr)
+         call finish_load_model(s, .false., .false., .false., .false., .false., ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &
                write(*,*) 'finish_load_model failed in do_remove_surface'

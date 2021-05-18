@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2013-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -166,7 +166,9 @@
          integer(8) :: test_time1, time0, time1, clock_rate
          character (len=strlen) :: err_msg
          logical :: first_try, dbg_msg, passed_tol_tests, &
-            doing_extra, okay
+            doing_extra, okay, disabled_resid_tests, pass_resid_tests, &
+            pass_corr_tests_without_coeff, pass_corr_tests_with_coeff
+
          integer, parameter :: num_tol_msgs = 15
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
@@ -500,56 +502,56 @@
             resid_norm_min = min(residual_norm, resid_norm_min)
             max_resid_min = min(max_residual, max_resid_min)
             
-            if (max_abs_correction > tol_max_correction*coeff .or. &
-                  max_residual > tol_max_residual*coeff) then
-               passed_tol_tests = .false.
-            else
-               passed_tol_tests = &
-                     (correction_norm <= tol_correction_norm*coeff .and.  &
-                      residual_norm <= tol_residual_norm*coeff) &
-                   .or.       &
-                     (abs(slope) <= tol_abs_slope_min .and.  &
-                      correction_norm*residual_norm <= tol_corr_resid_product*coeff*coeff)
-            end if
+            disabled_resid_tests = &
+               tol_max_residual > 1d2 .and. tol_residual_norm > 1d2
+            pass_resid_tests = &
+               .not. disabled_resid_tests .and. &
+               max_residual <= tol_max_residual .and. &
+               residual_norm <= tol_residual_norm
+            pass_corr_tests_without_coeff = &
+               max_abs_correction <= tol_max_correction .and. &
+               correction_norm <= tol_correction_norm
+            pass_corr_tests_with_coeff = &
+               max_abs_correction <= tol_max_correction*coeff .and. &
+               correction_norm <= tol_correction_norm*coeff
 
+            passed_tol_tests = &
+               (pass_resid_tests .and. pass_corr_tests_with_coeff) .or. &
+               (disabled_resid_tests .and. pass_corr_tests_without_coeff)
+            
             if (.not. passed_tol_tests) then
 
                if (iter >= max_tries) then
-                  if (max_abs_correction*coeff > tol_max_correction .and. &
-                      max_abs_correction*coeff <= s% tol_bad_max_correction) then
-                     passed_tol_tests = &
-                           (correction_norm <= tol_correction_norm*coeff .and.  &
-                            residual_norm <= tol_residual_norm*coeff) &
-                         .or.       &
-                           (abs(slope) <= tol_abs_slope_min .and.  &
-                            correction_norm*residual_norm <= tol_corr_resid_product*coeff*coeff)
-                     if (passed_tol_tests) then
-                        s% bad_max_corr_cnt = s% bad_max_corr_cnt + 1
-                        exit iter_loop
-                     end if
-                  end if
                   call get_message
                   message = trim(message) // ' -- give up'
                   if (len_trim(s% retry_message) == 0) &
                      s% retry_message = trim(message) // ' in solver'
                   if (dbg_msg) call write_msg(message)
-
-                     if (.true.) then
-                        if (correction_norm > tol_correction_norm*coeff) &
-                           write(*,2) 'correction_norm > tol_correction_norm*coeff', &
-                              s% model_number, correction_norm, tol_correction_norm*coeff, coeff
-                        if (max_abs_correction > tol_max_correction*coeff) &
-                           write(*,2) 'max_abs_correction > tol_max_correction*coeff', &
-                              s% model_number, max_abs_correction, tol_max_correction*coeff, coeff
-                        if (residual_norm > tol_residual_norm*coeff) &
-                           write(*,2) 'residual_norm > tol_residual_norm*coeff', &
-                              s% model_number, residual_norm, tol_residual_norm*coeff, coeff
-                        if (max_residual > tol_max_residual*coeff) &
-                           write(*,2) 'max_residual > tol_max_residual*coeff', &
-                              s% model_number, max_residual, tol_max_residual*coeff, coeff
-                     end if
-
-                  convergence_failure = .true.; exit iter_loop
+                  if (.not. pass_resid_tests .and. .not. disabled_resid_tests) then
+                     if (residual_norm > tol_residual_norm) &
+                        write(*,2) 'residual_norm > tol_residual_norm', &
+                           s% model_number, residual_norm, tol_residual_norm
+                     if (max_residual > tol_max_residual) &
+                        write(*,2) 'max_residual > tol_max_residual', &
+                           s% model_number, max_residual, tol_max_residual
+                  end if
+                  if (disabled_resid_tests) then ! no coeff for corrections
+                     if (correction_norm > tol_correction_norm) &
+                        write(*,2) 'correction_norm > tol_correction_norm', &
+                           s% model_number, correction_norm, tol_correction_norm, coeff
+                     if (max_abs_correction > tol_max_correction) &
+                        write(*,2) 'max_abs_correction > tol_max_correction', &
+                           s% model_number, max_abs_correction, tol_max_correction, coeff
+                  else ! include coeff for corrections
+                     if (correction_norm > tol_correction_norm*coeff) &
+                        write(*,2) 'correction_norm > tol_correction_norm*coeff', &
+                           s% model_number, correction_norm, tol_correction_norm*coeff, coeff
+                     if (max_abs_correction > tol_max_correction*coeff) &
+                        write(*,2) 'max_abs_correction > tol_max_correction*coeff', &
+                           s% model_number, max_abs_correction, tol_max_correction*coeff, coeff
+                  end if
+                  convergence_failure = .true.
+                  exit iter_loop
                else if (.not. first_try .and. .not. s% doing_first_model_of_run) then
                   if (correction_norm > s% corr_norm_jump_limit*corr_norm_min) then
                      call oops('avg correction jumped')
@@ -588,9 +590,6 @@
                   call write_msg('okay!')
                end if
             end if
-
-            if (passed_tol_tests .and. max_abs_correction <= tol_max_correction*coeff) &
-               s% bad_max_corr_cnt = 0
 
             if (passed_tol_tests .and. (iter+1 < max_tries)) then
                ! about to declare victory... but may want to do another iteration

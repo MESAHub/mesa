@@ -493,8 +493,6 @@
                s% lnT_start(k) = s% lnT(k)
                s% csound_face(k) = s% csound(k)
                s% csound_start(k) = s% csound(k)
-               s% tau_start(k) = 1d99
-               if (k > 1) s% tau_start(k-1) = 1d99
                s% mlt_gradT_fraction = -1d0
                s% adjust_mlt_gradT_fraction(k) = -1d0
                

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -1831,6 +1831,8 @@
                val = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             case(h_v_surf_div_escape_v)
                val = v_surf/sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
+            case(h_v_div_vesc)
+               val = v_surf/sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             case(h_v_surf_km_s)
                val = v_surf*1d-5
             case(h_v_surf)
@@ -1950,7 +1952,7 @@
             case(h_center_non_nuc_neu)
                val = s% center_non_nuc_neu
             case(h_center_gamma)
-               val = s% center_gamma
+               val = center_value(s, s% gam)
             case(h_center_zbar)
                val = s% center_zbar
             case(h_center_abar)

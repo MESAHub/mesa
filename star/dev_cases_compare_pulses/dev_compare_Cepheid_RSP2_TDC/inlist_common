@@ -1,0 +1,140 @@
+
+&star_job
+   show_log_description_at_start = .false.
+   
+   load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle0.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle10.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle140.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle230.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle280.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle327.mod'
+   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle557.mod'
+   
+   save_model_when_terminate = .true.
+   save_model_filename = 'final.mod'
+   !required_termination_code_string(1) = 'max_model_number'
+   
+   change_initial_v_flag = .true.
+   new_v_flag = .true.
+
+   set_initial_age = .true.
+   initial_age = 0
+   
+   set_initial_model_number = .true.
+   initial_model_number = 0
+
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 1d-6 ! 1.1950895357683798D+03 ! 
+
+   set_initial_tau_factor = .true.
+   set_to_this_tau_factor = 1.5d-3
+
+   set_initial_number_retries = .true.
+   initial_number_retries = 0
+   
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+
+/ ! end of star_job namelist
+
+&eos
+   use_Skye = .true.
+/ ! end of eos namelist
+
+&kap
+   Zbase = 0.008d0
+   kap_file_prefix = 'a09'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   kap_CO_prefix = 'a09_co'
+/ ! end of kap namelist
+
+&controls  
+   initial_z = 0.008d0
+   initial_mass = 6d0
+
+   max_timestep = 1d-6 ! 1.1950895357683798D+03 ! 
+
+   max_model_number = 5000000
+   max_number_retries = 10000
+
+! atmosphere
+   ! P boundary condition
+   use_momentum_outer_BC = .true.  ! required for RSP2
+   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
+      ! this can be a problem with shocks since omits Pvsc
+   ! else if RSP_use_Prad_for_Psurf
+      !use_zero_Pgas_outer_BC = .false.
+   ! else use RSP default of Psurf = 0
+      use_fixed_Psurf_outer_BC = .true.
+      fixed_Psurf = 0d0
+
+! timesteps -- for dealing with shocks
+   dt_div_min_dr_div_cs_limit = 1.0d0
+   dt_div_min_dr_div_cs_hard_limit = 4.0d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0 ! 0.5d0
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.0d0
+
+! mlt
+   mixing_length_alpha = 1.5d0
+
+! mesh
+   okay_to_remesh = .false.
+
+! solver   
+   steps_before_use_velocity_time_centering = 0
+   use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
+   include_P_in_velocity_time_centering = .true.
+   P_theta_for_velocity_time_centering = 0.5d0
+
+   include_L_in_velocity_time_centering = .true.
+   L_theta_for_velocity_time_centering = 0.5d0
+
+   set_rho_to_dm_div_dV = .false.
+   
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 4.0d0
+   Pvsc_zsh = 0.1d0
+
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
+   dxdt_nuc_factor = 0
+   mix_factor = 0
+
+   always_use_dedt_form_of_energy_eqn = .true.
+   
+   alt_scale_height_flag = .false.
+
+   tol_max_correction = 5d-7
+   
+! output
+
+   x_integer_ctrl(1) = -10 ! which period to check
+   x_ctrl(1) = 8.2974 ! expected period (in days) 
+
+   x_logical_ctrl(7) = .true. ! doing pulses
+   x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
+   x_ctrl(7) = 8.3 ! expected period (in days) 
+   x_ctrl(8) = 5d-3 ! min_deltaR_for_periods (Rsun)
+   x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
+   x_ctrl(10) = 0.3 ! min_period_div_target
+
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
+   num_trace_history_values = 1
+   trace_history_value_name(1) = 'log_rel_run_E_err'
+   trace_history_value_name(2) = 'rel_E_err'
+
+   photo_interval = 1000
+   profile_interval = 4000
+   history_interval = 40
+   terminal_interval = 4000
+
+/ ! end of controls namelist
+

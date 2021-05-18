@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2012-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -674,19 +674,6 @@
                   -s% max_frac_for_negative_surf_lum*old_lum_surf/dlum_surf)
             end if
          end if
-         
-         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) then
-            call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
-         end if
-         
-         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) then
-            call clip1(s% i_lnT, s% solver_clip_dlogT*ln10)
-         end if
-         
-         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) then
-            call clip1(s% i_lnR, s% solver_clip_dlogR*ln10)
-         end if
-               
 
          !if (s% w_div_wc_flag) then
          !   do k=1,nz
@@ -760,27 +747,6 @@
                B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
             end do
          end subroutine clip_so_non_negative
-            
-         subroutine clip1(i, clip)
-            integer, intent(in) :: i
-            real(dp), intent(in) :: clip
-            integer :: k
-            real(dp) :: old_x, delta, abs_delta, abs_B
-            include 'formats'
-            if (clip <= 0d0) return
-            do k = 1, s% nz
-               old_x = s% xh_start(i,k) + s% solver_dx(i,k) ! value before this iteration
-               delta = B(i,k)*s% x_scale(i,k)*correction_factor ! change for this iter
-               ! skip if change small enough or if too big to change
-               if (abs(delta) <= clip*abs(old_x) .or. is_bad(delta) .or. &
-                   abs(old_x) < 1d0 .or. abs(delta) > 10d0*clip*abs(old_x)) cycle
-               abs_delta = clip*abs(old_x)
-               abs_B = abs_delta/(s% x_scale(i,k)*correction_factor)
-               B(i,k) = sign(abs_B,B(i,k))
-               write(*,2) 'clip change ' // trim(s% nameofvar(i)), k, delta, old_x
-               !stop 'Bdomain'
-            end do
-         end subroutine clip1
 
       end subroutine Bdomain
 
@@ -844,11 +810,6 @@
                s% num_surf_revisions < s% max_num_surf_revisions .and. &
                abs(s% lnS(1) - s% surf_lnS) > &
                   s% max_abs_rel_change_surf_lnS*max(s% lnS(1),s% surf_lnS)) then
-            s% surf_lnT = s% lnT(1)
-            s% surf_lnR = s% lnR(1)
-            s% surf_lnd = s% lnd(1)
-            if (s% i_v /= 0) s% surf_v = s% v(1)
-            if (s% i_u /= 0) s% surf_v = s% u_face_ad(1)%val
             s% surf_lnS = s% lnS(1)
             s% num_surf_revisions = s% num_surf_revisions + 1
             force_another_iteration = 1
@@ -1267,7 +1228,11 @@
 
             if (do_w) then
                s% w(k) = x(i_w)
-               if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+               if (s% w(k) < 0d0) then
+                  !write(*,4) 'set_vars_for_solver: fix w < 0', k, &
+                  !   s% solver_iter, s% model_number, s% w(k)
+                  s% w(k) = s% RSP2_w_fix_if_neg
+               end if
                if (is_bad_num(s% w(k))) then
                   s% retry_message = 'bad num for w'
                   ierr = -1

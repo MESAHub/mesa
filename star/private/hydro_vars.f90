@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -311,7 +311,11 @@
                else if (j == i_w) then
                   do k=1,nz
                      s% w(k) = s% xh(i_w, k)
-                     if (s% w(k) < 0d0) s% w(k) = s% RSP2_w_fix_if_neg
+                     if (s% w(k) < 0d0) then
+                        !write(*,4) 'unpack: fix w < 0', k, &
+                        !   s% solver_iter, s% model_number, s% w(k)
+                        s% w(k) = s% RSP2_w_fix_if_neg
+                     end if
                   end do
                else if (j == i_Hp) then
                   do k=1,nz
@@ -369,9 +373,7 @@
 
             if (dt > 0d0) then
                dt_inv = 1/dt
-               s% dVARdot_dVAR = dt_inv
             else
-               s% dVARdot_dVAR = dt_inv
                dt_inv = 0
             end if
 
@@ -473,8 +475,9 @@
             return
          end if
 
-         s% Teff = Teff
-         
+         s% T_surf = exp(lnT_surf)
+         s% Teff = Teff ! Teff from atm
+
          ! Calculate and store photosphere (tau=2/3) values; these
          ! aren't actually used to set up surface values
 
@@ -580,10 +583,8 @@
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
             end if         
-            if (s% u_flag) then
-               if (dbg) write(*,*) 'call set_abs_du_div_cs'
-               call set_abs_du_div_cs(s)
-            end if
+            if (dbg) write(*,*) 'call set_abs_du_div_cs'
+            call set_abs_du_div_cs(s)
          end if
          
          if (.not. skip_mlt .and. .not. s% RSP_flag) then
@@ -642,7 +643,6 @@
             if (dbg) write(*,*) 'call set_mixing_info'
             call set_mixing_info(s, skip_set_cz_bdy_mass, ierr)
             if (ierr /= 0) return
-            call set_photosphere_start_info
          end if
 
          if (s% j_rot_flag) then
@@ -671,14 +671,6 @@
             failed = .true.
          end function failed
          
-         subroutine set_photosphere_start_info
-            use star_utils, only: get_phot_kap
-            real(dp) :: kap
-            include 'formats'
-            kap = get_phot_kap(s)
-            s% photosphere_opacity_start = kap
-         end subroutine set_photosphere_start_info
-
       end subroutine set_hydro_vars
 
 
@@ -748,9 +740,6 @@
             if (s% RTI_flag) then
                if (s% alpha_RTI_start(k) < -1d90) &
                   s% alpha_RTI_start(k) = s% alpha_RTI(k)
-            end if
-            if (s% conv_vel_flag) then
-               s% conv_vel_start(k) = s% conv_vel(k)
             end if
             if (s% RSP_flag) then
                s% RSP_w(k) = sqrt(s% RSP_Et(k))

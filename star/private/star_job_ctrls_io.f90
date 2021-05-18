@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton
+!   Copyright (C) 2013  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -302,6 +302,8 @@
          change_initial_RSP2_flag, &
          change_RSP2_flag_at_model_number, &
          new_RSP2_flag, &
+         create_RSP2_model, &
+         load_saved_model_for_RSP2, &
          
          change_conv_vel_flag, &
          change_initial_conv_vel_flag, &
@@ -949,6 +951,8 @@
          s% job% change_initial_RSP2_flag = change_initial_RSP2_flag
          s% job% change_RSP2_flag_at_model_number = change_RSP2_flag_at_model_number
          s% job% new_RSP2_flag = new_RSP2_flag
+         s% job% create_RSP2_model = create_RSP2_model
+         s% job% load_saved_model_for_RSP2 = load_saved_model_for_RSP2
          s% job% change_conv_vel_flag = change_conv_vel_flag
          s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
          s% job% new_conv_vel_flag = new_conv_vel_flag
@@ -1520,6 +1524,8 @@
          change_initial_RSP2_flag = s% job% change_initial_RSP2_flag
          change_RSP2_flag_at_model_number = s% job% change_RSP2_flag_at_model_number
          new_RSP2_flag = s% job% new_RSP2_flag
+         create_RSP2_model = s% job% create_RSP2_model
+         load_saved_model_for_RSP2 = s% job% load_saved_model_for_RSP2
          change_conv_vel_flag = s% job% change_conv_vel_flag
          change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
          new_conv_vel_flag = s% job% new_conv_vel_flag

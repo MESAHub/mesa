@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -103,21 +103,17 @@
             s% n_conv_regions = -999
             s% atm_structure_num_pts = -999
             s% generations = -999
-            s% start_H_envelope_base_k = -999
             s% num_solver_iterations = -999
             s% num_diffusion_solver_iters = -999
             s% num_diffusion_solver_steps = -999
             s% num_rotation_solver_steps = -999
             s% result_reason = -999
-            s% burner_storage_sz_per_thread = -999
             s% burner_num_threads = -999
             s% k_below_const_q = -999
             s% k_const_mass = -999
             s% k_for_test_CpT_absMdot_div_L = -999
             s% k_below_just_added = -999
             s% termination_code = -999
-            s% boost_mlt_alfa = -999
-            s% burn_nstep_max = -999
             s% burn_nfcn_total = -999
             s% dX_nuc_drop_max_k = -999
             s% dX_nuc_drop_max_j = -999
@@ -140,7 +136,6 @@
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf)
             call set_to_NaN(s% L_surf_old)
-            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
             call set_to_NaN(s% M_center_old)
             call set_to_NaN(s% R_center_old)
             call set_to_NaN(s% Teff_old)
@@ -151,9 +146,6 @@
             call set_to_NaN(s% adjust_mass_outer_frac_sub1)
             call set_to_NaN(s% angular_momentum_added)
             call set_to_NaN(s% angular_momentum_removed)
-            call set_to_NaN(s% astero_revised_max_yr_dt_old)
-            call set_to_NaN(s% center_eps_nuc_old)
-            call set_to_NaN(s% co_core_mass_old)
             call set_to_NaN(s% conv_mx1_bot)
             call set_to_NaN(s% conv_mx1_bot_r)
             call set_to_NaN(s% conv_mx1_top)
@@ -164,7 +156,6 @@
             call set_to_NaN(s% conv_mx2_top_r)
             call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% cumulative_extra_heating_old)
-            call set_to_NaN(s% dX_nuc_drop_max_drop)
             call set_to_NaN(s% d_vc_dv)
             call set_to_NaN(s% delta_Pg)
             call set_to_NaN(s% delta_nu)
@@ -178,16 +169,12 @@
             call set_to_NaN(s% explicit_mstar_dot)
             call set_to_NaN(s% gradT_excess_max_lambda)
             call set_to_NaN(s% gradT_excess_min_beta)
-            call set_to_NaN(s% h1_czb_mass)            
-            call set_to_NaN(s% h1_czb_mass_old)
-            call set_to_NaN(s% he_core_mass_old)
+            call set_to_NaN(s% h1_czb_mass)    
             call set_to_NaN(s% initial_L_center)
             call set_to_NaN(s% initial_R_center)
             call set_to_NaN(s% initial_timestep)   
             call set_to_NaN(s% initial_v_center)
-            call set_to_NaN(s% log_L_surf)
             call set_to_NaN(s% max_conv_time_scale)
-            call set_to_NaN(s% max_fixup_for_mix)
             call set_to_NaN(s% max_residual)
             call set_to_NaN(s% mdot_acoustic_surface)
             call set_to_NaN(s% mdot_adiabatic_surface)
@@ -207,42 +194,12 @@
             call set_to_NaN(s% mx2_top_r)
             call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
             call set_to_NaN(s% nu_max)
-            call set_to_NaN(s% photosphere_opacity_start)
-            call set_to_NaN(s% power_CNO)
-            call set_to_NaN(s% power_PP)
-            call set_to_NaN(s% power_ar_alpha)
-            call set_to_NaN(s% power_c12_c12)
-            call set_to_NaN(s% power_c12_o16)
-            call set_to_NaN(s% power_c_alpha)
-            call set_to_NaN(s% power_ca_alpha)
-            call set_to_NaN(s% power_co56_fe56)
-            call set_to_NaN(s% power_cr_alpha)
-            call set_to_NaN(s% power_fe_co_ni)
-            call set_to_NaN(s% power_h_burn_old)
-            call set_to_NaN(s% power_he_burn_old)
-            call set_to_NaN(s% power_mg_alpha)
-            call set_to_NaN(s% power_n_alpha)
-            call set_to_NaN(s% power_na_alpha)
-            call set_to_NaN(s% power_ne_alpha)
             call set_to_NaN(s% power_neutrinos)
-            call set_to_NaN(s% power_ni56_co56)
             call set_to_NaN(s% power_nonnuc_neutrinos)
             call set_to_NaN(s% power_nuc_burn_old)
             call set_to_NaN(s% power_nuc_neutrinos)
-            call set_to_NaN(s% power_o16_o16)
-            call set_to_NaN(s% power_o_alpha)
-            call set_to_NaN(s% power_other)
-            call set_to_NaN(s% power_pnhe4)
-            call set_to_NaN(s% power_s_alpha)
-            call set_to_NaN(s% power_si_alpha)
-            call set_to_NaN(s% power_ti_alpha)
-            call set_to_NaN(s% power_tri_alpha)
-            call set_to_NaN(s% power_z_burn_old)
             call set_to_NaN(s% prev_Ledd)
-            call set_to_NaN(s% prev_create_atm_R0_div_R)
-            call set_to_NaN(s% remnant_mass_start)
             call set_to_NaN(s% residual_norm)
-            call set_to_NaN(s% revised_max_yr_dt_old)
             call set_to_NaN(s% rotational_mdot_boost)
             call set_to_NaN(s% shock_mass_start)
             call set_to_NaN(s% solver_test_partials_dval_dx)
@@ -250,9 +207,7 @@
             call set_to_NaN(s% star_age)
             call set_to_NaN(s% starting_T_center)
             call set_to_NaN(s% super_eddington_wind_mdot)
-            call set_to_NaN(s% surf_accel_grav_ratio)
             call set_to_NaN(s% surf_csound)
-            call set_to_NaN(s% surf_opacity)
             call set_to_NaN(s% surf_r_equatorial)
             call set_to_NaN(s% surf_rho)
             call set_to_NaN(s% surface_cell_specific_total_energy_old)
@@ -316,9 +271,7 @@
             call set_to_NaN(s% total_turbulent_energy_old)
             call set_to_NaN(s% total_turbulent_energy_start)
             call set_to_NaN(s% v_center_old)
-            call set_to_NaN(s% v_surf_old) ! (cm/second)
             call set_to_NaN(s% virial_thm_P_avg)
-            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
             call set_to_NaN(s% work_inward_at_center)
             call set_to_NaN(s% work_outward_at_surface)
             call set_to_NaN(s% xmstar_old)
@@ -739,9 +692,6 @@
                s% max_timestep = secyer*s% max_years_for_timestep
             end if
          end if
-
-         call eval_integrated_total_energy_profile(s, s%total_energy_integral_surface, -1, ierr)
-         call eval_integrated_total_energy_profile(s, s%total_energy_integral_center, 1, ierr)
 
          call set_luminosity_by_category(s) ! final values for use in selecting timestep
          call set_power_info(s)
@@ -1786,9 +1736,7 @@
          else
             s% surf_r_equatorial = s% r(1)
          end if
-         s% remnant_mass_start = get_remnant_mass(s)
          s% starting_T_center = s% T(nz)
-         s% surf_opacity = s% opacity(1)
          s% surf_csound = s% csound(1)
          s% surf_rho = s% rho(1)
          s% prev_Ledd = eval_Ledd(s,ierr)
@@ -2284,7 +2232,6 @@
          
          if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_retry'
          
-         s% bad_max_corr_cnt = 0
          s% retry_cnt = s% retry_cnt + 1
          if (s% retry_limit > 0 .and. s% retry_cnt > s% retry_limit) then
             s% dt_start = sqrt(s% dt*s% dt_start)

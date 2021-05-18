@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -510,6 +510,15 @@
          integer, intent(out) :: ierr      
          call load_saved_RSP_model(id, model_fname, ierr)     
       end subroutine star_read_RSP_model
+      
+      
+      subroutine star_read_RSP2_model(id, model_fname, ierr)
+         use init, only: load_saved_RSP2_model
+         integer, intent(in) :: id
+         character (len=*), intent(in) :: model_fname
+         integer, intent(out) :: ierr      
+         call load_saved_RSP2_model(id, model_fname, ierr)     
+      end subroutine star_read_RSP2_model
       
       
       subroutine star_read_model(id, model_fname, ierr)
@@ -3153,6 +3162,14 @@
          integer, intent(out) :: ierr
          call create_RSP_model(id, ierr)
       end subroutine star_create_RSP_model
+
+      
+      subroutine star_create_RSP2_model(id, ierr)
+         use init, only: create_RSP2_model
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         call create_RSP2_model(id, ierr)
+      end subroutine star_create_RSP2_model
 
       
       subroutine star_do1_rsp_build(s,ierr)

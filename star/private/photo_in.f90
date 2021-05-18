@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -191,7 +191,6 @@
             s% total_step_redos, s% total_relax_step_redos, &
             s% total_steps_finished, s% total_relax_steps_finished, &
             s% num_hydro_merges, s% num_hydro_splits, s% num_solver_setvars, &
-            s% bad_max_corr_cnt, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
             s% gradT_excess_alpha, s% Teff, s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             s% why_Tlim, s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &

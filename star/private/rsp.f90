@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton, Radek Smolec & The MESA Team
+!   Copyright (C) 2018-2019  Radek Smolec & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -714,11 +714,12 @@
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
-         if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
+         if (s% rsp_max_dt > 0) target_dt = min(target_dt, s% rsp_max_dt)
+         if (s% max_timestep > 0) target_dt = min(target_dt, s% max_timestep)
          s% dt = target_dt
 
          if (is_bad(s% dt)) then
-            write(*,1) 'dt', s% dt
+            write(*,1) 'do1_step dt', s% dt
             write(*,1) 'rsp_period', s% rsp_period
             write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
             write(*,1) 'max_timestep_factor', s% max_timestep_factor
@@ -727,21 +728,25 @@
          end if
 
          max_dt = rsp_min_dr_div_cs*s% RSP_max_dt_times_min_dr_div_cs
-         if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
-            if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
-               max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
-               if (s% dt > max_dt) then
-                  write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
-                     s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
-                  !stop 'rsp'
-               end if
-            end if
-         end if
+         !if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
+         !   if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
+         !      max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
+         !      if (s% dt > max_dt) then
+         !         write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
+         !            s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
+         !         !stop 'rsp'
+         !      end if
+         !   end if
+         !end if
          if (s% dt > max_dt) then
-            if (s% RSP_report_limit_dt) &
-               write(*,4) 'limit dt to max_dt', s% model_number
+            if (s% RSP_report_limit_dt) then
+               write(*,4) 'limit to RSP_max_dt_times_min_dr_div_cs', s% model_number, max_dt, s% dt
+               stop 'do1_step 1'
+            end if
             s% dt = max_dt
          end if
+         
+         if (s% force_timestep > 0d0) s% dt = s% force_timestep ! overrides everything else
          
          if (is_bad(s% dt) .or. s% dt <= 0d0) then
             write(*,1) 'dt', s% dt
@@ -1037,8 +1042,7 @@
          end if
          if (s% model_number.eq.1) return
          if (.not. s% RSP_have_set_velocities) return
-         if (s% RSP_min_max_R_for_periods > 0d0 .and. &
-               s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
          if (UN/s% csound(1) > VMAX) then
             VMAX = UN/s% csound(1)
          end if
@@ -1047,6 +1051,7 @@
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
          if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
+         if (s% r(1)/SUNR - RMIN < s% RSP_min_deltaR_for_periods) return
          if(FIRST.eq.1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1
@@ -1067,10 +1072,10 @@
                   s% num_retries - run_num_retries_prev_period,     &
                'steps',  &
                   s% model_number - prev_cycle_run_num_steps, &
-               'avg iters/step',  &
+               'iters/step',  &
                   dble(s% total_num_solver_iterations - run_num_iters_prev_period)/ &
                   dble(s% model_number - prev_cycle_run_num_steps), &
-               'step', s% model_number, 'days', s% time/(24*3600)
+               'model', s% model_number, 'days', s% time/(24*3600)
             prev_cycle_run_num_steps = s% model_number
             run_num_iters_prev_period = s% total_num_solver_iterations
             run_num_retries_prev_period = s% num_retries

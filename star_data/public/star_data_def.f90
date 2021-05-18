@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2019  Bill Paxton and MESA Team
+!   Copyright (C) 2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -112,7 +112,7 @@
             include "star_controls.inc"
             include "star_controls_dev.inc"
             include "pgstar_controls.inc"
-         
+
       end type star_info
 
       logical :: have_initialized_star_handles = .false.

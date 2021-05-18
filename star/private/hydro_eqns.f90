@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2012-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -727,7 +727,7 @@
          if (s% use_other_surface_PT .or. s% using_RSP2) &
             offset_T_to_cell_center = .false.
 
-         call get_PT_bc_ad(ierr) ! has important side-effect of setting Teff for current model
+         call get_PT_bc_ad(ierr)
          if (ierr /= 0) return
          
          if (need_P_surf) then
