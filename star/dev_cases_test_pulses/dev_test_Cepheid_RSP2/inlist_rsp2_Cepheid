@@ -62,7 +62,7 @@
    max_timestep = 1200
 
    max_model_number = 5000000
-   max_number_retries = 0 ! 10000
+   max_number_retries = 10 ! 10000
 
 ! atmosphere
    ! P boundary condition
@@ -76,11 +76,13 @@
       fixed_Psurf = 0d0
 
 ! timesteps
-   dt_div_min_dr_div_cs_limit = 2d0
+   dt_div_min_dr_div_cs_limit = 1.5d0
+   dt_div_min_dr_div_cs_hard_limit = 3d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
-   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.5d0
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.0d0
 
 ! mlt
    mixing_length_alpha = 1.5d0
@@ -158,13 +160,16 @@
       !history_interval = 40
       !terminal_interval = 100
 
-      photo_interval = 100
+      !photo_interval = 10
       !profile_interval = 4000
       !history_interval = 40
-      terminal_interval = 10
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
+      
+      !report_min_dr_div_cs = .true.
+      !report_dt_hard_limit_retries = .true.
       
       !max_model_number = 2
 
@@ -205,10 +210,6 @@
       !solver_test_kap_partials = .true.
       !solver_test_nRSP2_partials = .true.
       !solver_test_atm_partials = .true.
-
-      !report_why_dt_limits = .true.
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
       
       !show_mesh_changes = .true.
       !mesh_dump_call_number = 5189
@@ -241,7 +242,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 25
+   pgstar_interval = 1  ! 25
 
 ! window 1
 

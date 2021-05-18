@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2015-2019  Evan Bauer, Bill Paxton & The MESA Team
+!   Copyright (C) 2015-2019  Evan Bauer & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO

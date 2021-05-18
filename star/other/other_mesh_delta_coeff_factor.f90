@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2019  Bill Paxton, etc.
+!   Copyright (C) 2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
