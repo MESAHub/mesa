@@ -12,9 +12,6 @@
 
 &controls  
 
-! for RSP, 
-
-
 ! RSP
 
    RSP_mass = 6d0

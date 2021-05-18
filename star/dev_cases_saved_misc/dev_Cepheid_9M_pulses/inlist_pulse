@@ -2,8 +2,6 @@
 
 
 &star_job
-    !save_star_job_namelist = .true.
-    star_job_namelist_name = 'dev_rsg_start_job.txt'
 
       load_saved_model = .true.
       load_model_filename = 'initialized.mod' 
@@ -25,7 +23,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 75000 ! based on expected period
+      seconds_for_initial_dt = 1d3 ! based on expected period
 
       pgstar_flag = .true.
 
@@ -39,37 +37,56 @@
 &kap
 / ! end of kap namelist
 
+!   order       freq (Hz)         P (sec)       P (min)     P (day)    growth (day)      growth/P
+!       1      0.3316E-06    3016002.2029    50266.7034     34.9074      0.5322E+03    0.1525E+02
+!       2      0.5151E-06    1941217.9425    32353.6324     22.4678      0.7137E+03    0.3177E+02
+
 
 &controls
-    !save_controls_namelist = .true.
-    controls_namelist_name = 'dev_rsg_controls.txt'
    
-   max_timestep = 75000 ! based on expected period
-   
-   v_div_csound_surf_limit = 5 ! if hit this, probably need to either give up or increase Pvsc_cq
+   max_timestep = 1d3 ! based on expected period
 
+   !max_model_number = 500000
 
-   max_model_number = 50000
+! atm
+   ! must set same BCs in inlist_convert, inlist_initialize, and inlist_pulse
+   use_momentum_outer_BC = .true.
+
+! mlt
+   alpha_semiconvection = 0.0
+         
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
 
 ! timesteps
    dt_div_min_dr_div_cs_limit = 0.5d0
-   min_q_for_dt_div_min_dr_div_cs_limit = 0.75d0 ! only interested in outer envelope for shocks
+   
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0 ! 0.75d0 ! only interested in outer envelope for shocks
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
    
 ! mesh controls   
    okay_to_remesh = .false.
+   !okay_to_remesh = .true.
+   log_tau_function_weight = 50
 
 ! solver
    steps_before_use_velocity_time_centering = 0
-   include_P_in_velocity_time_centering = .true.
-   include_L_in_velocity_time_centering = .true.
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+
+   include_P_in_velocity_time_centering = .true.
+   P_theta_for_velocity_time_centering = 1d0
+
+   include_L_in_velocity_time_centering = .true.
+   L_theta_for_velocity_time_centering = 1d0
 
    set_rho_to_dm_div_dV = .false.
    
    use_Pvsc_art_visc = .true.
-   Pvsc_cq = 40 ! 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   Pvsc_zsh = 0.001 ! 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
@@ -77,10 +94,12 @@
    mix_factor = 0
    
 ! output controls
-   x_logical_ctrl(7) = .true. ! output period info to terminal
-   x_integer_ctrl(7) = 0 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 800 ! expected period (in days). 
-       ! must set this since it is used to filter out bogus values (periods < 10% expected)
+   x_logical_ctrl(7) = .true. ! doing pulses
+   x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
+   x_ctrl(7) = 34.93 ! expected period (in days) 
+   x_ctrl(8) = 1d-1 ! min_deltaR_for_periods (Rsun)
+   x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
+   x_ctrl(10) = 0.1 ! min_period_div_target
 
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
@@ -92,16 +111,16 @@
    trace_history_value_name(2) = 'log_rel_run_E_err'
    !trace_history_value_name(3) = 'using_TDC'
 
-      photo_interval = 500
+      photo_interval = 1000
       profile_interval = 4000
-      history_interval = 20
+      history_interval = 50
       terminal_interval = 4000
 
 
-      !photo_interval = 1 ! 50
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1 ! 5
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
@@ -183,12 +202,12 @@
 
     !pause = .true.
     !pause_interval = 100
-    pgstar_interval = 5 ! 10
+    pgstar_interval = 25
 
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'RSG Grid Profiles'
+    Grid1_title = 'Grid Profiles'
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'
@@ -203,32 +222,21 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '21 M\d\(2281)\u  Z=0.02  RSG'
+    Grid2_title = '6 M\d\(2281)\u  Z=0.014  Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
-    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+    History_Panels2_max_width = 85 ! only used if > 0.  causes xmin to move with xmax.
 
     !Grid2_file_flag = .true.
-    file_digits = 7
+    file_digits = 8
     Grid2_file_dir = 'png'
-    Grid2_file_prefix = '21M_rsg'
-    Grid2_file_interval = 25 ! output when mod(model_number,Grid2_file_interval)==0
-   
-    !Profile_Panels2_show_grid = .true.
-    !Profile_Panels2_num_panels = 4
-
-    Profile_Panels2_xaxis_name = 'logtau'
-    Profile_Panels2_xaxis_reversed = .true.
-    Profile_Panels2_xmin = -101D0
-    Profile_Panels2_xmax = -101D0
+    Grid2_file_prefix = '9M_cepheid_'
+    Grid2_file_interval = 5 ! 25 ! output when mod(model_number,Grid2_file_interval)==0
 
     Profile_Panels2_xaxis_name = 'logxm'
     Profile_Panels2_xaxis_reversed = .true.
-    Profile_Panels2_xmin = -8
-    Profile_Panels2_xmax = -3
+    Profile_Panels2_xmin = -6
+    Profile_Panels2_xmax = -0.1
 
-    Profile_Panels2_dymin(4) = 0.02
-
-  Profile_Panels2_yaxis_name(5) = 'mlt_mixing_type' ! 'zone'     
   
 / ! end of pgstar namelist
