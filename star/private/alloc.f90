@@ -648,14 +648,6 @@
 
             call do1(s% rmid, c% rmid)
             if (failed('rmid')) exit
-            call do1(s% drmid_dlnR00, c% drmid_dlnR00)
-            if (failed('drmid_dlnR00')) exit
-            call do1(s% drmid_dlnRp1, c% drmid_dlnRp1)
-            if (failed('drmid_dlnRp1')) exit
-            call do1(s% drmid2_dlnR00, c% drmid2_dlnR00)
-            if (failed('drmid2_dlnR00')) exit
-            call do1(s% drmid2_dlnRp1, c% drmid2_dlnRp1)
-            if (failed('drmid2_dlnRp1')) exit
 
             call do1(s% X, c% X)
             if (failed('X')) exit
@@ -747,10 +739,6 @@
 
             call do1(s% QQ, c% QQ)
             if (failed('QQ')) exit
-            call do1(s% d_QQ_dlnd, c% d_QQ_dlnd)
-            if (failed('d_QQ_dlnd')) exit
-            call do1(s% d_QQ_dlnT, c% d_QQ_dlnT)
-            if (failed('d_QQ_dlnT')) exit
             call do2(s% d_eos_dlnd, c% d_eos_dlnd, num_eos_basic_results, 'd_eos_dlnd')
             if (failed('d_eos_dlnd')) exit
             call do2(s% d_eos_dlnT, c% d_eos_dlnT, num_eos_basic_results, 'd_eos_dlnT')
@@ -794,8 +782,6 @@
             if (failed('grav')) exit
             call do1(s% tau, c% tau)
             if (failed('tau')) exit
-            call do1(s% lntau, c% lntau)
-            if (failed('lntau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
 
@@ -998,11 +984,6 @@
                   action == do_copy_pointers_and_resize) &
                s% alpha_mlt(1:nz) = s% mixing_length_alpha
 
-            call do1(s% eps_drag, c% eps_drag)
-            if (failed('eps_drag')) exit
-            call do1(s% dvdt_drag, c% dvdt_drag)
-            if (failed('dvdt_drag')) exit
-
             call do1(s% vc, c% vc)
             if (failed('vc')) exit
             call do1(s% R2, c% R2)
@@ -1125,13 +1106,6 @@
             call do1(s% gradr, c% gradr)
             if (failed('gradr')) exit
 
-            call do1(s% d_gradT_dln_cvpv0, c% d_gradT_dln_cvpv0)
-            if (failed('d_gradT_dln_cvpv0')) exit
-            call do1(s% d_gradT_dw_div_wc, c% d_gradT_dw_div_wc)
-            if (failed('d_gradT_dw_div_wc')) exit
-            call do1(s% d_gradr_dw_div_wc, c% d_gradr_dw_div_wc)
-            if (failed('d_gradr_dw_div_wc')) exit
-
             call do1(s% grad_density, c% grad_density)
             if (failed('grad_density')) exit
             call do1(s% grad_temperature, c% grad_temperature)
@@ -1168,20 +1142,6 @@
             if (failed('u_face_start')) exit
             call do1(s% u_face_val, c% u_face_val)
             if (failed('u_face_val')) exit
-            !call do1(s% d_uface_dlnR, c% d_uface_dlnR)
-            !if (failed('d_uface_dlnR')) exit
-            !call do1(s% d_uface_du00, c% d_uface_du00)
-            !if (failed('d_uface_du00')) exit
-            !call do1(s% d_uface_dum1, c% d_uface_dum1)
-            !if (failed('d_uface_dum1')) exit
-            !call do1(s% d_uface_dlnd00, c% d_uface_dlnd00)
-            !if (failed('d_uface_dlnd00')) exit
-            !call do1(s% d_uface_dlndm1, c% d_uface_dlndm1)
-            !if (failed('d_uface_dlndm1')) exit
-            !call do1(s% d_uface_dlnT00, c% d_uface_dlnT00)
-            !if (failed('d_uface_dlnT00')) exit
-            !call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
-            !if (failed('d_uface_dlnTm1')) exit
             call do1(s% d_uface_domega, c% d_uface_domega)
             if (failed('d_uface_domega')) exit
 
@@ -1189,24 +1149,6 @@
             if (failed('P_face_ad')) exit
             call do1(s% P_face_start, c% P_face_start)
             if (failed('P_face_start')) exit
-            !call do1(s% P_face, c% P_face)
-            !if (failed('P_face')) exit
-            !call do1(s% d_Pface_dL, c% d_Pface_dL)
-            !if (failed('d_Pface_dL')) exit
-            !call do1(s% d_Pface_dlnR, c% d_Pface_dlnR)
-            !if (failed('d_Pface_dlnR')) exit
-            !call do1(s% d_Pface_du00, c% d_Pface_du00)
-            !if (failed('d_Pface_du00')) exit
-            !call do1(s% d_Pface_dum1, c% d_Pface_dum1)
-            !if (failed('d_Pface_dum1')) exit
-            !call do1(s% d_Pface_dlnd00, c% d_Pface_dlnd00)
-            !if (failed('d_Pface_dlnd00')) exit
-            !call do1(s% d_Pface_dlndm1, c% d_Pface_dlndm1)
-            !if (failed('d_Pface_dlndm1')) exit
-            !call do1(s% d_Pface_dlnT00, c% d_Pface_dlnT00)
-            !if (failed('d_Pface_dlnT00')) exit
-            !call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
-            !if (failed('d_Pface_dlnTm1')) exit
             call do1(s% d_Pface_domega, c% d_Pface_domega)
             if (failed('d_Pface_domega')) exit
 
@@ -1256,8 +1198,6 @@
             if (failed('Peos_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
-            call do1(s% lnE_start, c% lnE_start)
-            if (failed('lnE_start')) exit
             call do1(s% energy_start, c% energy_start)
             if (failed('energy_start')) exit
             call do1(s% egas_start, c% egas_start)
@@ -1280,79 +1220,35 @@
             if (failed('r_start')) exit
             call do1(s% rmid_start, c% rmid_start)
             if (failed('rmid_start')) exit
-            call do1(s% L_non_rad_start, c% L_non_rad_start)
-            if (failed('L_non_rad_start')) exit
             call do1(s% omega_start, c% omega_start)
             if (failed('omega_start')) exit
-            call do1(s% X_start, c% X_start)
-            if (failed('X_start')) exit
-            call do1(s% Y_start, c% Y_start)
-            if (failed('Y_start')) exit
-            call do1(s% Z_start, c% Z_start)
-            if (failed('Z_start')) exit
             call do1(s% ye_start, c% ye_start)
             if (failed('ye_start')) exit
             call do1(s% opacity_start, c% opacity_start)
             if (failed('opacity_start')) exit
             call do1(s% csound_start, c% csound_start)
             if (failed('csound_start')) exit
-            call do1(s% tau_start, c% tau_start)
-            if (failed('tau_start')) exit
             call do1(s% alpha_RTI_start, c% alpha_RTI_start)
             if (failed('alpha_RTI_start')) exit
-            call do1(s% conv_vel_start, c% conv_vel_start)
-            if (failed('conv_vel_start')) exit
-
-            call do1(s% mlt_mixing_length_start, c% mlt_mixing_length_start)
-            if (failed('mlt_mixing_length_start')) exit
-            call do1_integer(s% mlt_mixing_type_start, c% mlt_mixing_type_start)
-            if (failed('mlt_mixing_type_start')) exit
-            call do1(s% mlt_D_start, c% mlt_D_start)
-            if (failed('mlt_D_start')) exit
-            call do1(s% mlt_Gamma_start, c% mlt_Gamma_start)
-            if (failed('mlt_Gamma_start')) exit
-            call do1(s% mlt_cdc_start, c% mlt_cdc_start)
-            if (failed('mlt_cdc_start')) exit
 
             call do1(s% j_rot_start, c% j_rot_start)
             if (failed('j_rot_start')) exit
             call do1(s% i_rot_start, c% i_rot_start)
             if (failed('i_rot_start')) exit
-            call do1(s% P_div_rho_start, c% P_div_rho_start)
-            if (failed('P_div_rho_start')) exit
-            call do1(s% mass_correction_start, c% mass_correction_start)
-            if (failed('mass_correction_start')) exit
-            call do1(s% eta_visc_start, c% eta_visc_start)
-            if (failed('eta_visc_start')) exit
             call do1(s% eps_nuc_start, c% eps_nuc_start)
             if (failed('eps_nuc_start')) exit
             call do1(s% non_nuc_neu_start, c% non_nuc_neu_start)
             if (failed('non_nuc_neu_start')) exit
             call do2(s% dxdt_nuc_start, c% dxdt_nuc_start, species, null_str)
             if (failed('dxdt_nuc_start')) exit
-
-            call do1(s% scale_height_start, c% scale_height_start)
-            if (failed('scale_height_start')) exit
-            call do1(s% gradL_start, c% gradL_start)
-            if (failed('gradL_start')) exit
-            call do1(s% gradT_start, c% gradT_start)
-            if (failed('gradT_start')) exit
             call do1(s% grada_start, c% grada_start)
             if (failed('grada_start')) exit
-            call do1(s% gradr_start, c% gradr_start)
-            if (failed('gradr_start')) exit
-            call do1(s% grada_face_start, c% grada_face_start)
-            if (failed('grada_face_start')) exit
             call do1(s% chiT_start, c% chiT_start)
             if (failed('chiT_start')) exit
             call do1(s% chiRho_start, c% chiRho_start)
             if (failed('chiRho_start')) exit
             call do1(s% cp_start, c% cp_start)
             if (failed('cp_start')) exit
-            call do1(s% Cv_start, c% Cv_start)
-            if (failed('Cv_start')) exit
-            call do1(s% dE_dRho_start, c% dE_dRho_start)
-            if (failed('dE_dRho_start')) exit
             call do1(s% gam_start, c% gam_start)
             if (failed('gam_start')) exit
             call do1(s% rho_start, c% rho_start)
@@ -1363,18 +1259,8 @@
             if (failed('eta_start')) exit
             call do1(s% T_start, c% T_start)
             if (failed('T_start')) exit
-
-            call do1(s% total_energy_integral_surface, c% total_energy_integral_surface)
-            if (failed('total_energy_integral_surface')) exit
-            call do1(s% total_energy_integral_center, c% total_energy_integral_center)
-            if (failed('total_energy_integral_center')) exit
-
-            call do1(s% abar_start, c% abar_start)
-            if (failed('abar_start')) exit
             call do1(s% zbar_start, c% zbar_start)
             if (failed('zbar_start')) exit
-            call do1(s% z53bar_start, c% z53bar_start)
-            if (failed('z53bar_start')) exit
             call do1(s% mu_start, c% mu_start)
             if (failed('mu_start')) exit
 
@@ -1426,26 +1312,11 @@
             if (failed('max_abs_xa_corr')) exit
 
             call do1(s% Hp_face, c% Hp_face); if (failed('Hp_face')) exit
-            call do1(s% d_Hp_face_dlnR, c% d_Hp_face_dlnR); if (failed('d_Hp_face_dlnR')) exit
-            call do1(s% d_Hp_face_dlnd00, c% d_Hp_face_dlnd00); if (failed('d_Hp_face_dlnd00')) exit
-            call do1(s% d_Hp_face_dlnT00, c% d_Hp_face_dlnT00); if (failed('d_Hp_face_dlnT00')) exit
-            call do1(s% d_Hp_face_dlndm1, c% d_Hp_face_dlndm1); if (failed('d_Hp_face_dlndm1')) exit
-            call do1(s% d_Hp_face_dlnTm1, c% d_Hp_face_dlnTm1); if (failed('d_Hp_face_dlnTm1')) exit
 
             call do1(s% Y_face, c% Y_face); if (failed('Y_face')) exit
             call do1(s% Y_face_start, c% Y_face_start); if (failed('Y_face_start')) exit
-            call do1(s% d_Y_face_dlnR, c% d_Y_face_dlnR); if (failed('d_Y_face_dlnR')) exit
-            call do1(s% d_Y_face_dlnd00, c% d_Y_face_dlnd00); if (failed('d_Y_face_dlnd00')) exit
-            call do1(s% d_Y_face_dlnT00, c% d_Y_face_dlnT00); if (failed('d_Y_face_dlnT00')) exit
-            call do1(s% d_Y_face_dlndm1, c% d_Y_face_dlndm1); if (failed('d_Y_face_dlndm1')) exit
-            call do1(s% d_Y_face_dlnTm1, c% d_Y_face_dlnTm1); if (failed('d_Y_face_dlnTm1')) exit
             
             call do1(s% PII, c% PII); if (failed('PII')) exit
-            call do1(s% d_PII_dlnR, c% d_PII_dlnR); if (failed('d_PII_dlnR')) exit
-            call do1(s% d_PII_dlnd00, c% d_PII_dlnd00); if (failed('d_PII_dlnd00')) exit
-            call do1(s% d_PII_dlnT00, c% d_PII_dlnT00); if (failed('d_PII_dlnT00')) exit
-            call do1(s% d_PII_dlndm1, c% d_PII_dlndm1); if (failed('d_PII_dlndm1')) exit
-            call do1(s% d_PII_dlnTm1, c% d_PII_dlnTm1); if (failed('d_PII_dlnTm1')) exit
 
             call do1(s% Chi, c% Chi); if (failed('Chi')) exit
             call do1(s% Chi_start, c% Chi_start); if (failed('Chi_start')) exit

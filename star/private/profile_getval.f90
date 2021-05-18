@@ -758,7 +758,7 @@
             case (p_tau)
                val = s% tau(k)
             case (p_logtau)
-               val = s% lntau(k)/ln10
+               val = safe_log(s% tau(k))/ln10
             case (p_xtau)
                val = s% tau(nz) - s% tau(k)
             case (p_xlogtau)
@@ -1968,12 +1968,6 @@
                end if  
                val = dble(int_val)
                int_flag = .true.
-            case (p_total_energy_integral) ! from surface down to k
-               val = s%total_energy_integral_surface(k)
-            case (p_total_energy_integral_outward) ! from center up to k
-               val = s%total_energy_integral_center(k)
-            case (p_binding) ! from center up to k
-               val = s%total_energy_integral_center(k)
                
             case (p_cell_specific_IE)
                val = s% energy(k)
