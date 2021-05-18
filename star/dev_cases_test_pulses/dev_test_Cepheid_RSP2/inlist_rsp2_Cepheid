@@ -62,7 +62,7 @@
    max_timestep = 1200
 
    max_model_number = 5000000
-   max_number_retries = 10 ! 10000
+   max_number_retries = 10000 
 
 ! atmosphere
    ! P boundary condition
@@ -76,8 +76,8 @@
       fixed_Psurf = 0d0
 
 ! timesteps
-   dt_div_min_dr_div_cs_limit = 1.5d0
-   dt_div_min_dr_div_cs_hard_limit = 3d0
+   dt_div_min_dr_div_cs_limit = 1.0d0
+   dt_div_min_dr_div_cs_hard_limit = 4.0d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
@@ -137,7 +137,7 @@
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 8.3 ! expected period (in days) 
-!   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
+   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.3 ! min_period_div_target
 
@@ -242,7 +242,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 1  ! 25
+   pgstar_interval = 5  ! 25
 
 ! window 1
 
@@ -267,7 +267,7 @@
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
 
-   !Grid2_file_flag = .true.
+   Grid2_file_flag = .true.
    file_digits = 7
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid2'
