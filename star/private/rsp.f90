@@ -728,19 +728,21 @@
          end if
 
          max_dt = rsp_min_dr_div_cs*s% RSP_max_dt_times_min_dr_div_cs
-         if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
-            if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
-               max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
-               if (s% dt > max_dt) then
-                  write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
-                     s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
-                  !stop 'rsp'
-               end if
-            end if
-         end if
+         !if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
+         !   if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
+         !      max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
+         !      if (s% dt > max_dt) then
+         !         write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
+         !            s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
+         !         !stop 'rsp'
+         !      end if
+         !   end if
+         !end if
          if (s% dt > max_dt) then
-            if (s% RSP_report_limit_dt) &
-               write(*,4) 'limit dt to max_dt', s% model_number
+            if (s% RSP_report_limit_dt) then
+               write(*,4) 'limit to RSP_max_dt_times_min_dr_div_cs', s% model_number, max_dt, s% dt
+               stop 'do1_step 1'
+            end if
             s% dt = max_dt
          end if
          

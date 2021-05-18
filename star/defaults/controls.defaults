@@ -10378,13 +10378,19 @@
 
       ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! only use ``dt_div_min_dr_div_cs_limit`` at cells where
-      ! ``abs_du_div_cs`` > this limit.
+      ! ``abs_du_div_cs`` > ``min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit`` and
+      ! and
+      ! ``abs_u_div_cs`` > ``min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit``
+      ! 
       ! allow focus on regions near shock face.
 
       ! ::
 
+    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.01d0
 
       ! limits based on changes in location on HR diagram

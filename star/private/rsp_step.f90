@@ -250,6 +250,15 @@
                !write(*,2) 'reduce dt in HYD', s% model_number, s% dt, dt_max
                !write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
                !write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
+               if (s% RSP_report_limit_dt) then
+                  write(*,4) 'limit dt to avoid over-compressing innermost cell', s% model_number
+                  write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
+                  write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
+                  write(*,2) 'old dt', s% model_number, s% dt
+                  write(*,2) 'reduced dt', s% model_number, dt_max
+                  write(*,*)
+                  stop 'HYD compressing innermost cell'
+               end if
                s% dt = dt_max
                if (call_is_bad) then
                   if (is_bad(s% dt)) then
@@ -257,8 +266,6 @@
                      stop 'HYD compressing innermost cell'
                   end if
                end if
-               if (s% RSP_report_limit_dt) &
-                  write(*,4) 'limit dt to max_dt set by compressing innermost cell', s% model_number
             end if
          end if
          if (s% dt < s% force_timestep_min .and. s% force_timestep_min > 0) &

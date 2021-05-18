@@ -29,6 +29,7 @@
    
    RSP_report_undercorrections = .true.
    RSP_report_check_omega_changes = .true.
+   RSP_report_limit_dt = .true.
 
 ! RSP controls   
          

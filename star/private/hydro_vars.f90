@@ -588,10 +588,8 @@
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
             end if         
-            if (s% u_flag) then
-               if (dbg) write(*,*) 'call set_abs_du_div_cs'
-               call set_abs_du_div_cs(s)
-            end if
+            if (dbg) write(*,*) 'call set_abs_du_div_cs'
+            call set_abs_du_div_cs(s)
          end if
          
          if (.not. skip_mlt .and. .not. s% RSP_flag) then

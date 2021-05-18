@@ -50,16 +50,19 @@
 &controls
    !max_timestep = 1d-6 ! 1200 ! 
    !force_timestep = 1200 ! 1d-6 !  ! when comparing to RSP, use force_timestep
+   
+   max_age = 12.569824 ! 12.486184
 
    max_model_number = 160000000
    !v_div_csound_surf_limit = 0.1 ! save model here
 
 ! RSP controls
-!   RSP_do_check_omega = .false.     ! TESTING
+   RSP_do_check_omega = .false.     ! TESTING
+!   RSP_report_check_omega_changes = .true.
    
    RSP_min_deltaR_for_periods = 1d0 ! to filter out extras after have grown beyond this deltaR
 
-   x_integer_ctrl(1) = 700 ! which period to check
+!   x_integer_ctrl(1) = 548 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    RSP_mass = 6d0
@@ -99,10 +102,10 @@
       history_interval = 40
       terminal_interval = 4000
 
-      !photo_interval = 1000
+      photo_interval = 500
       !profile_interval = 4000
       !history_interval = 40
-      !terminal_interval = 100
+      terminal_interval = 100
 
 / ! end of controls namelist
 
@@ -112,7 +115,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 25
+   pgstar_interval = 5
 
 ! window 1
 
@@ -137,7 +140,7 @@
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 34 ! only used if > 0.  causes xmin to move with xmax.
 
-   ! Grid2_file_flag = .true.
+   Grid2_file_flag = .true.
    file_digits = 7
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid2'

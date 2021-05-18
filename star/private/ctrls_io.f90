@@ -423,7 +423,7 @@
     solver_iters_timestep_limit, burn_steps_limit, burn_steps_hard_limit, &
     diffusion_steps_limit, diffusion_steps_hard_limit, diffusion_iters_limit, diffusion_iters_hard_limit, &
     dt_div_dt_cell_collapse_limit, dt_div_dt_cell_collapse_hard_limit, &
-    dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, &
+    dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
     min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, check_remnant_only_for_dt_div_min_dr_div_cs_limit, &
     dX_mix_dist_limit, dH_limit_min_H, dH_limit, dH_hard_limit, dH_div_H_limit_min_H, &
@@ -2162,6 +2162,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% dt_div_min_dr_div_cs_hard_limit = dt_div_min_dr_div_cs_hard_limit
  
  s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+ s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
  s% min_k_for_dt_div_min_dr_div_cs_limit = min_k_for_dt_div_min_dr_div_cs_limit
  s% min_q_for_dt_div_min_dr_div_cs_limit = min_q_for_dt_div_min_dr_div_cs_limit
  s% max_q_for_dt_div_min_dr_div_cs_limit = max_q_for_dt_div_min_dr_div_cs_limit
@@ -3835,6 +3836,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  dt_div_min_dr_div_cs_hard_limit = s% dt_div_min_dr_div_cs_hard_limit
  
  min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+ min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
  min_k_for_dt_div_min_dr_div_cs_limit = s% min_k_for_dt_div_min_dr_div_cs_limit
  min_q_for_dt_div_min_dr_div_cs_limit = s% min_q_for_dt_div_min_dr_div_cs_limit
  max_q_for_dt_div_min_dr_div_cs_limit = s% max_q_for_dt_div_min_dr_div_cs_limit
