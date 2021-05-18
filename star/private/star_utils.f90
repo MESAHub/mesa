@@ -1122,7 +1122,7 @@
             ysum = ysum + s% rho(k)*(s% r(k) - s% r(k+1))
             if (taup1 >= tau_phot .and. dtau > 0d0) then
                if (k == 1) then
-                  Tface_0 = s% T(k)
+                  Tface_0 = s% T_surf
                else
                   Tface_0 = 0.5d0*(s% T(k) + s% T(k-1))
                end if
