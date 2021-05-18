@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -1251,7 +1251,7 @@
          real(dp) :: abs_du, cs
          include 'formats'
          nz = s% nz
-
+         
          if (s% v_flag) then
             do k=2,nz
                abs_du = abs(s% v_start(k) - s% v_start(k-1))
@@ -1534,7 +1534,7 @@
          integer, intent(out) :: min_k
          integer :: k, nz, j, k_min
          real(dp) :: dr, dt, D, abs_du, cs, min_q, max_q, &
-            min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
+            min_abs_u_div_cs, min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
          include 'formats'
          nz = s% nz
          min_k = nz
@@ -1547,6 +1547,8 @@
          else
             remnant_mass = s% m(1)
          end if
+         min_abs_u_div_cs = &
+            s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
          min_abs_du_div_cs = &
             s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          if (s% v_flag) then
@@ -1554,6 +1556,7 @@
                if (s% m(k) > remnant_mass) cycle
                if (s% q(k) > max_q) cycle
                if (s% q(k) < min_q) exit
+               if (abs(s% v_start(k))/s% csound(k) < min_abs_u_div_cs) cycle
                if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
                r00 = s% r(k)
                rp1 = s% r(k+1)
@@ -1563,6 +1566,7 @@
                   min_k = k
                end if
             end do
+            !write(*,3) 'min_dr_div_cs', min_k, s% model_number, min_dr_div_cs
             return
          end if
          if (.not. s% u_flag) return
@@ -1570,6 +1574,7 @@
             if (s% m(k) > remnant_mass) cycle
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit
+            if (abs(s% u_start(k))/s% csound(k) < min_abs_u_div_cs) cycle
             if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
             dr = s% r(k) - s% r(k+1)
             dt = dr/s% abs_du_plus_cs(k)

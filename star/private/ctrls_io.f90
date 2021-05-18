@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-! Copyright (C) 2010 Bill Paxton
+! Copyright (C) 2010 The Mesa Team
 !
 ! MESA is free software; you can use it and/or modify
 ! it under the combined terms and restrictions of the MESA MANIFESTO
@@ -184,7 +184,7 @@
    RSP_fraction_1st_overtone,RSP_fraction_2nd_overtone, RSP_testing, RSP_use_Prad_for_Psurf, RSP_map_zone_interval, &
    RSP_write_map, RSP_map_filename, RSP_map_history_filename, RSP_map_first_period, RSP_map_last_period, &
    use_other_RSP_build_model, RSP_Psurf, RSP_work_period, RSP_work_filename, RSP_nmodes, RSP_surface_tau, &
-   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, RSP_do_check_omega, &
+   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, RSP_do_check_omega, RSP_report_check_omega_changes, &
     RSP_relax_initial_model, RSP_trace_RSP_build_model, &
    RSP_GREKM_avg_abs_limit, RSP_GREKM_avg_abs_frac_new, RSP_kap_density_factor, RSP_map_columns_filename, &
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
@@ -423,7 +423,7 @@
     solver_iters_timestep_limit, burn_steps_limit, burn_steps_hard_limit, &
     diffusion_steps_limit, diffusion_steps_hard_limit, diffusion_iters_limit, diffusion_iters_hard_limit, &
     dt_div_dt_cell_collapse_limit, dt_div_dt_cell_collapse_hard_limit, &
-    dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, &
+    dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
     min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, check_remnant_only_for_dt_div_min_dr_div_cs_limit, &
     dX_mix_dist_limit, dH_limit_min_H, dH_limit, dH_hard_limit, dH_div_H_limit_min_H, &
@@ -1245,6 +1245,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_dq_1_factor = RSP_dq_1_factor
    s% use_RSP_new_start_scheme = use_RSP_new_start_scheme
    s% RSP_do_check_omega = RSP_do_check_omega
+   s% RSP_report_check_omega_changes = RSP_report_check_omega_changes
    s% RSP_nz = RSP_nz
    s% RSP_T_anchor = RSP_T_anchor
    s% RSP_T_inner = RSP_T_inner
@@ -2161,6 +2162,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% dt_div_min_dr_div_cs_hard_limit = dt_div_min_dr_div_cs_hard_limit
  
  s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+ s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
  s% min_k_for_dt_div_min_dr_div_cs_limit = min_k_for_dt_div_min_dr_div_cs_limit
  s% min_q_for_dt_div_min_dr_div_cs_limit = min_q_for_dt_div_min_dr_div_cs_limit
  s% max_q_for_dt_div_min_dr_div_cs_limit = max_q_for_dt_div_min_dr_div_cs_limit
@@ -2926,6 +2928,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    RSP_dq_1_factor = s% RSP_dq_1_factor
    use_RSP_new_start_scheme = s% use_RSP_new_start_scheme
    RSP_do_check_omega = s% RSP_do_check_omega
+   RSP_report_check_omega_changes = s% RSP_report_check_omega_changes
    RSP_nz = s% RSP_nz
    RSP_T_anchor = s% RSP_T_anchor
    RSP_T_inner = s% RSP_T_inner
@@ -3833,6 +3836,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  dt_div_min_dr_div_cs_hard_limit = s% dt_div_min_dr_div_cs_hard_limit
  
  min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+ min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
  min_k_for_dt_div_min_dr_div_cs_limit = s% min_k_for_dt_div_min_dr_div_cs_limit
  min_q_for_dt_div_min_dr_div_cs_limit = s% min_q_for_dt_div_min_dr_div_cs_limit
  max_q_for_dt_div_min_dr_div_cs_limit = s% max_q_for_dt_div_min_dr_div_cs_limit

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -585,10 +585,8 @@
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
             end if         
-            if (s% u_flag) then
-               if (dbg) write(*,*) 'call set_abs_du_div_cs'
-               call set_abs_du_div_cs(s)
-            end if
+            if (dbg) write(*,*) 'call set_abs_du_div_cs'
+            call set_abs_du_div_cs(s)
          end if
          
          if (.not. skip_mlt .and. .not. s% RSP_flag) then

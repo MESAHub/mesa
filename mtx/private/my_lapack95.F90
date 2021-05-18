@@ -1,6 +1,6 @@
    ! ***********************************************************************
 !
-!   copyright (c) 2012  bill paxton
+!   copyright (c) 2012  The MESA Team
 !
 !   mesa is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the mesa manifesto
