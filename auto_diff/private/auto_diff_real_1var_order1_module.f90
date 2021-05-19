@@ -16,7 +16,7 @@ module auto_diff_real_1var_order1_module
       operator(.ge.), &
       make_unop, &
       make_binop, &
-      sign, &
+      sgn, &
       safe_sqrt, &
       operator(-), &
       exp, &
@@ -131,9 +131,9 @@ module auto_diff_real_1var_order1_module
       module procedure make_binary_operator
    end interface make_binop
    
-   interface sign
-      module procedure sign_self
-   end interface sign
+   interface sgn
+      module procedure sgn_self
+   end interface sgn
    
    interface safe_sqrt
       module procedure safe_sqrt_self
@@ -612,12 +612,12 @@ module auto_diff_real_1var_order1_module
       binary%d1val1 = x%d1val1*z_d1x + y%d1val1*z_d1y
    end function make_binary_operator
    
-   function sign_self(x) result(unary)
+   function sgn_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = sgn(x%val)
       unary%d1val1 = 0.0_dp
-   end function sign_self
+   end function sgn_self
    
    function safe_sqrt_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
