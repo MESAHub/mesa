@@ -16,6 +16,7 @@ module auto_diff_real_tdc_module
       operator(.ge.), &
       make_unop, &
       make_binop, &
+      sign, &
       safe_sqrt, &
       operator(-), &
       exp, &
@@ -131,6 +132,10 @@ module auto_diff_real_tdc_module
    interface make_binop
       module procedure make_binary_operator
    end interface make_binop
+   
+   interface sign
+      module procedure sign_self
+   end interface sign
    
    interface safe_sqrt
       module procedure safe_sqrt_self
@@ -622,6 +627,15 @@ module auto_diff_real_tdc_module
       binary%d1Array(1:27) = x%d1Array(1:27)*z_d1x + y%d1Array(1:27)*z_d1y
       binary%d1val1_d1Array(1:27) = x%d1Array(1:27)*x%d1val1*z_d2x + x%d1Array(1:27)*y%d1val1*z_d1x_d1y + x%d1val1*y%d1Array(1:27)*z_d1x_d1y + x%d1val1_d1Array(1:27)*z_d1x + y%d1Array(1:27)*y%d1val1*z_d2y + y%d1val1_d1Array(1:27)*z_d1y
    end function make_binary_operator
+   
+   function sign_self(x) result(unary)
+      type(auto_diff_real_tdc), intent(in) :: x
+      type(auto_diff_real_tdc) :: unary
+      unary%val = sgn(x%val)
+      unary%d1val1 = 0.0_dp
+      unary%d1Array(1:27) = 0.0_dp
+      unary%d1val1_d1Array(1:27) = 0.0_dp
+   end function sign_self
    
    function safe_sqrt_self(x) result(unary)
       type(auto_diff_real_tdc), intent(in) :: x
