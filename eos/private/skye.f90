@@ -38,7 +38,7 @@ module skye
 
          ierr = 0
 
-         ht => eos_ht
+         ht => eos_ht 
 
          big = 12d0
          skye_blend_width = 0.1d0
