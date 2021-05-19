@@ -30,6 +30,9 @@
 
       implicit none
 
+! this program shows how to setup and use the mesa eos in an interactive manner.
+
+
       real(dp) :: X, Z, Y, abar, zbar, z2bar, z53bar, ye
       integer, parameter :: species = 7
       integer, parameter :: h1=1, he4=2, c12=3, n14=4, o16=5, ne20=6, mg24=7
@@ -54,7 +57,7 @@
          character (len=80) :: string
 
 
-! explicitely set my_mesa_dir to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
+! explicitly set my_mesa_dir to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
          my_mesa_dir = '../..'
 !         my_mesa_dir = ''         
@@ -86,7 +89,7 @@
 
       write(6,*)  
       write(6,*) 'give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>'
-      write(6,*) 'hit return for T = 1e9 K, Rho = 1e9 g/cc, x(c12) = 1 ; enter -1 to stop'
+      write(6,*) 'hit return for T = 1e9 K, Rho = 1e4 g/cc, x(c12) = 1 ; enter -1 to stop'
       write(6,*)  
       read(5,'(a)') string
 
@@ -101,6 +104,7 @@
       else
        if (string(1:6) .ne. '      ') then
         read(string,*) T,Rho, xa(h1), xa(he4), xa(c12), xa(n14), xa(o16), xa(ne20), xa(mg24)
+
 ! or set some defaults
        else
         T = 1.0d9 ; Rho = 1.0d4 ; xa(c12) = 1.0d0

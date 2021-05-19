@@ -40,7 +40,7 @@ Now take some time to explore the makefile, and use it to build the executable
 
      make
 
-Run the executable, named sample_eos
+Run the interactive executable, named sample_eos
 
 .. code-block:: console
 
@@ -108,13 +108,13 @@ As mentioned in sample_eos.f90, it can be useful to look at the integer indices 
    cp $MESA_DIR/kap/test/sample_kap_agb.model .
 
 
-Edit sample_kap.f90 and change
+Edit sample_kap.f90 and change the variable 
 
 ::
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR or to a blank string (in which case your $MESA_DIR is automatically picked up)
+to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
 ::
 
@@ -127,7 +127,7 @@ Now take some time to explore the makefile, and use it to build the executable
 
      make
 
-Run the executable, named sample_kap
+Run the executable, named sample_kap, whoech reads a mesa model file and writes out the opacity and its derivatives at each cell
 
 .. code-block:: console
 
@@ -139,7 +139,7 @@ Run the executable, named sample_kap
 
  write kap_test.data
 
-Exlore the output with, for example, 
+Explore the output with, for example, 
 
 .. code-block:: console
 
@@ -164,17 +164,18 @@ Exlore the output with, for example,
    cp $MESA_DIR/net/test/src/sample_net.f90 .
 
 
-Edit sample_net.f90 and change
+Edit sample_net.f90 and change the variable 
 
 ::
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR or to a blank string (in which case your $MESA_DIR is automatically picked up)
+to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
 ::
 
   my_mesa_dir = ''
+
 
 while you are editing sample_net.f90, take some time to explore the source code. Save and exit sample_net.f90.
 Now take some time to explore the makefile, and use it to build the executable
@@ -183,31 +184,33 @@ Now take some time to explore the makefile, and use it to build the executable
 
      make
 
-Run the executable, named sample 
+Run the interactive executable, named sample_net
 
 .. code-block:: console
 
  ./sample_net 
- load basic.net
-                                                   logT    8.0000000000000000D+00
-                                                 logRho    6.0000000000000000D+00
-                                                eps_nuc    7.0567990734355760D+08
 
- 
+ load approx21.net
 
-For homework, edit sample_net.f90 to write out the initial composition and the net neutrino loss rate.
-One should find
+ give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>
+ hit return for T = 1e9 K, Rho = 1e4 g/cc, x(c12) = 1 ; enter -1 to stop
 
 
-.. code-block:: console
+ T     =  1.000000E+09 Rho   =  1.000000E+04 abar  =  1.200000E+01 zbar  =  6.000000E+00
+ h1    =  0.000000E+00 he4   =  0.000000E+00 c12   =  1.000000E+00 n14   =  0.000000E+00
+ o16   =  0.000000E+00 ne20  =  0.000000E+00 mg24  =  0.000000E+00
 
- ./sample_net
- load basic.net
- initial 1H     7.587664E-01
- initial 4He    2.395223E-01
- initial 24Mg   1.711250E-03
-                                                   logT    8.0000000000000000D+00
-                                                 logRho    6.0000000000000000D+00
-                                                eps_nuc    7.0567990734355760D+08
-                                                eps_neu    1.7599406836404651D+08
+ d(h1)/dt   =  0.000000E+00  d(he4)/dt  =  5.582829E-09    d(c12)/dt  = -3.349697E-08    d(n14)/dt  =  0.000000E+00
+ d(o16)/dt  =  0.000000E+00  d(ne20)/dt =  2.791414E-08    d(mg24)/dt =  0.000000E+00
+ 1 - sum    = -6.617445E-24
+ eps_nuc    =  6.217517E+09     erg/g/sec
+
+ give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>
+ hit return for T = 1e9 K, Rho = 1e4 g/cc, x(c12) = 1 ; enter -1 to stop
+
+ -1
+ STOP normal termination
+
+
+For homework, edit sample_net.f90 and change the network and associated write statements.
 
