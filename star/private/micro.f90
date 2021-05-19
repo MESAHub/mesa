@@ -164,7 +164,6 @@ contains
 
     subroutine set_eos(ierr)
       integer, intent(out) :: ierr
-      integer :: k
       real(dp) :: alfa
       include 'formats'
       ierr = 0
@@ -219,7 +218,6 @@ contains
     integer, intent(out) :: ierr
     logical, parameter :: use_omp = .true.
     include 'formats'
-    integer :: k
 
     ierr = 0
 
