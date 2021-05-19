@@ -50,7 +50,7 @@
          real(dp) :: Rho, T, Pgas, log10Rho
          real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, d_dlnRho_const_T, d_dlnT_const_Rho
          real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         real(dp) :: d_dxa(num_eos_basic_results,species) 
+         real(dp) :: d_dxa(num_eos_d_dxa_results,species)
          real(dp) :: xz, frac, dabar_dx(species), dzbar_dx(species), sumx,mass_correction, dmc_dx(species)
          integer :: ierr
          character (len=32) :: my_mesa_dir
