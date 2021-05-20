@@ -200,8 +200,6 @@
          rpar(r_burn_const_P_time_net) = time_doing_net
          rpar(r_burn_const_P_time_eos) = time_doing_eos
 
-         ipar(i_reuse_rates) = 0
-         
          v(1:num_isos) = starting_x(1:num_isos)
          v(nvar) = log(starting_temp)
                      
@@ -333,7 +331,7 @@
             real(dp) :: d_dxdt_dT(nvar-1)
             real(dp) :: d_dxdt_dx(nvar-1, nvar-1)
             real(dp), target :: eps_nuc_categories(num_categories)
-            logical :: reuse_rate_raw, reuse_rate_screened, rates_only, skip_jacobian
+            logical :: rates_only, skip_jacobian
             integer :: screening_mode, lwork, i, num_isos
             integer(8) :: time0, time1, clock_rate
             real(dp), pointer :: work(:) ! (lwork)
@@ -474,8 +472,6 @@
                call system_clock(time0,clock_rate)
             end if
 
-            reuse_rate_raw = .false.
-            reuse_rate_screened = .false.
             rates_only = .false.
             skip_jacobian = .false.
 
@@ -486,7 +482,6 @@
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                   rate_factors, weak_rate_factor, &
                   reaction_Qs, reaction_neuQs, &
-                  reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
                   screening_mode, &
@@ -526,8 +521,6 @@
             
                return
             end if
-         
-            ipar(i_reuse_rates) = 0 ! only okay if constant T and Rho
          
             f(1:num_isos) = dxdt
             dlnT_dt = eps_nuc/(Cp*T)

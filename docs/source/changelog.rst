@@ -164,8 +164,10 @@ The call signature of other_neu has changed. You no longer need to pass in z2bar
 net
 ~~~
 
-The screening mode ``classic_screening`` has been removed. Anyeone using other_net_get needs
+The screening mode ``classic_screening`` has been removed. Anyone using other_net_get needs
 to remove ``theta_e_for_graboske_et_al`` from its argument list.
+
+The options ``reuse_rate_raw`` and  ``reuse_rate_screened`` have been removed from other_net_get (and eval_net)
 
 
 Other changes
