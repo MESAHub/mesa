@@ -1094,7 +1094,9 @@
          if (s% thermohaline_option == 'Kippenhahn') then
             ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
             D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
-         else if (s% thermohaline_option == 'Traxler_Garaud_Stellmach_11' .or. s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then            call get_diff_coeffs(s, &
+         else if (s% thermohaline_option == 'Traxler_Garaud_Stellmach_11' .or. &
+                  s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
+            call get_diff_coeffs(s, &
                K_therm, Cp, rho, T, opacity, iso, XH1, K_T, K_mu, nu)
             R0 = (gradr - grada)/gradL_composition_term
             Pr = nu/K_T
