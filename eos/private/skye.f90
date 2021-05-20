@@ -49,16 +49,16 @@ module skye
 
          ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~10)
          bounds(2,1) = ht% logdlo
-         bounds(2,2) = max(5.1d0,log10(1d4 * pow2(zbar))) + skye_blend_width
+         bounds(2,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
          ! Divert to higher temperature because there's a large offset between SCVH/CMS and Skye
          ! in lnE.
          bounds(3,1) = -2d0
-         bounds(3,2) = max(5.1d0,log10(1d4 * pow2(zbar))) + skye_blend_width
+         bounds(3,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
          ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
          bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
-         bounds(4,2) = max(5.3d0,log10(1d4 * pow2(zbar))) + skye_blend_width
+         bounds(4,2) = max(6d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
          ! HELM low-T bound
          bounds(5,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
