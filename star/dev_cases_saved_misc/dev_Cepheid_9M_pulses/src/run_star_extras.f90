@@ -264,8 +264,8 @@
                if (best_cycles_to_double > 0) &
                   write(*,'(a38,i6,a8,i2,a12,f12.0,a12,f7.4,a12,f9.4)') &
                      'best cycles to double: model_number', best_model_number, &
-                     'order', best_order, 'period(s)', 24*3600*best_period, &
-                     'period(d)', best_period, 'cycles', best_cycles_to_double
+                     'order', best_order, 'P(s)', 24*3600*best_period, &
+                     'P(d)', best_period, 'cycles', best_cycles_to_double
             end if
          end subroutine get_gyre_info_for_this_step
          
@@ -573,7 +573,7 @@
          call gyre_set_model(global_data, point_data, 101)
 
           write(*, 100) 'order', 'freq (Hz)', &
-             'P (sec)', 'P (day)', 'growth (day)', 'cycles to double'
+             'P (sec)', 'P (day)', 'cycles to double'
 100       format(A8,8A20)
 
          rpar(1) = 0.5d-6 ! freq < this (Hz)
@@ -588,7 +588,7 @@
          amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
          amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
-            write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
+            write(*,*) 'AMIX FRACTIONS DO NOT ADD UP RIGHT' 
             stop 'set_gyre_linear_analysis'
          end if
          amixF = 1d0 - (amix1 + amix2)
@@ -611,7 +611,7 @@
             return
          end if
          
-         if (AMIX2 > 0d0 .and. npts(2) /= nz-1) then
+         if (AMIX2 > 0d0 .and. npts(3) /= nz-1) then
             write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3)
             write(*,*) 'cannot use 2nd overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
@@ -704,11 +704,11 @@
 
             if (growth > 0._dp) then ! unstable
                write(*, 100) md%n_pg, &
-                  freq, per, per/(24*3600), growth*(24*3600), freq/(2d0*pi*growth)
+                  freq, per, per/(24*3600), freq/(2d0*pi*growth)
 100            format(I8,E20.4,2F20.4,E20.4,F20.4)
             else ! stable
                write(*, 110) md%n_pg, &
-                  freq, per, per/(24*3600), growth*(24*3600), 'stable'
+                  freq, per, per/(24*3600), 'stable'
 110            format(I8,E20.4,2F20.4,E20.4,A20)
             end if
             

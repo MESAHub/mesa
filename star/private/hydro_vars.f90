@@ -505,7 +505,6 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs, set_conv_time_scales, set_using_TDC
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_rsp2, only: set_using_RSP2
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -572,13 +571,11 @@
             call set_grads(s, ierr)
             if (failed('set_grads')) return
             call set_conv_time_scales(s) ! uses brunt_B
-            call set_using_RSP2(s) ! uses max_conv_time_scale
             call set_using_TDC(s) ! uses max_conv_time_scale
-            s% need_to_reset_w = s% using_RSP2 .and. .not. s% previous_step_was_using_RSP2
          end if
 
          if (.not. skip_mixing_info) then         
-            if (.not. s% using_RSP2) then
+            if (.not. s% RSP2_flag) then
                if (dbg) write(*,*) 'call other_adjust_mlt_gradT_fraction'
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return

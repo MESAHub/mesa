@@ -319,7 +319,6 @@
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% generations = 1
-         s% previous_step_was_using_RSP2 = s% using_RSP2
          s% okay_to_set_mlt_vc = .false. ! don't change mlt_vc until have set mlt_vc_old
          
          if (s% timestep_hold > s% model_number + 10000) then 

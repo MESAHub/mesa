@@ -2,9 +2,6 @@
 
 ! NOTE 1: set seconds_for_initial_dt and max_timestep ~ period/1000 or so.
 
-! NOTE 2: check that conversion doesn't wreck period, growth etc from GYRE.
-!           make sure x_integer_ctrl(4) is the same as in inlist_to_pulse
-! this will determine whether or not can remove center
 
 &star_job
 
@@ -12,14 +9,11 @@
       load_model_filename = 'pulse.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'converted.mod'
+      save_model_filename = 'removed_core.mod'
       required_termination_code_string = 'max_model_number'
       
-      remove_initial_center_by_temperature = 2d6        ! for envelope only cases
+      remove_initial_center_by_temperature = 1d7 ! 2d6        ! for envelope only cases
          ! check change in GYRE period before/after convert to make sure this cut is ok
-
-      change_initial_v_flag = .true.
-      new_v_flag = .true.
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -45,20 +39,6 @@
 &kap
 / ! end of kap namelist
 
-
-! before convert
-!   model   order           freq (Hz)             P (sec)             P (day)        growth (day)    cycles to double
-!     702       1          0.1155E-05         865861.5823             10.0215          0.2577E-13             82.5579
-!     702       2          0.1692E-05         590982.0544              6.8401          0.8181E-13             38.0980
-! after convert
-!     100       1          0.1154E-05         866828.5786             10.0327          0.2769E-13             76.7387
-!     100       2          0.1687E-05         592820.8268              6.8614          0.7530E-13             41.2657
-
-! RSP for similar parameters
-!            P(days)         growth
-!  0       0.10395E+02     0.13930E-01
-
-
 &controls
    
    max_timestep = 1d3 ! based on expected period
@@ -82,8 +62,8 @@
    
 ! mesh controls
    okay_to_remesh = .true.
-   mesh_delta_coeff = 2
-   log_tau_function_weight = 100
+   mesh_delta_coeff = 1
+   !log_tau_function_weight = 100
 
 ! GYRE
    x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
@@ -194,7 +174,7 @@
 
     !pause = .true.
     !pause_interval = 100
-    pgstar_interval = 5 ! 10
+    pgstar_interval = 1
 
  ! window 1
 
@@ -214,7 +194,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Cepheid'
+    Grid2_title = '9 M\d\(2281)\u  Z=0.014  Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

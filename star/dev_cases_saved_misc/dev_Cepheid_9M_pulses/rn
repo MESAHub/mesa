@@ -22,17 +22,24 @@ else
 fi
 
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-   cp standard_pulse.mod pulse.mod
+   cp standard_pulse.mod .mod
 else
    do_one inlist_to_pulse_header pulse.mod
    cp pulse.mod standard_pulse.mod
 fi
 
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-   cp standard_converted.mod converted.mod
+   cp standard_removed_core.mod removed_core.mod
 else
-   do_one inlist_convert_header converted.mod
-   cp converted.mod standard_converted.mod
+   do_one inlist_remove_core_header removed_core.mod
+   cp removed_core.mod standard_removed_core.mod
+fi
+
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+   cp standard_remeshed.mod remeshed.mod
+else
+   do_one inlist_remesh_header remeshed.mod
+   cp remeshed.mod standard_remeshed.mod
 fi
 
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
@@ -42,7 +49,8 @@ else
    cp initialized.mod standard_initialized.mod
 fi
 
-do_one inlist_pulse_header final.mod 
+#do_one inlist_pulse_header final.mod 
+do_one inlist_pulse_RSP2_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

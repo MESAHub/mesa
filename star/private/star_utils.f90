@@ -2108,7 +2108,7 @@
             get_Lconv = 0d0
             return
          end if
-         if (s% using_RSP2 .or. s% RSP_flag) then
+         if (s% RSP2_flag .or. s% RSP_flag) then
             get_Lconv = s% Lc(k)
          else
             get_Lconv = s% L_conv(k) ! L_conv set by last call on mlt
@@ -2407,7 +2407,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% using_RSP2) cell_total = cell_total + pow2(s% w(k))
+         if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2490,7 +2490,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% using_RSP2) then
+            if (s% RSP2_flag) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
@@ -2539,7 +2539,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% using_RSP2) then
+            if (s% RSP2_flag) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
             end if
@@ -3483,7 +3483,7 @@
          end if
          
          Ptrb_ad = 0d0
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr) 
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted

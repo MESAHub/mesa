@@ -196,7 +196,7 @@
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             else if (RSP2_flag) then
-               if (s% using_RSP2) then
+               if (s% RSP2_flag) then
                   call write1(s% w(k),ierr); if (ierr /= 0) exit
                   call write1(s% Hp_face(k),ierr)
                else ! cv = sqrt_2_div_3*w

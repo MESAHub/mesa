@@ -81,7 +81,7 @@
             reset_epsnuc_vectors, set_qs
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
             set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
-         use hydro_RSP2, only: Hp_face_for_RSP2_val
+         use hydro_RSP2, only: remesh_for_RSP2, Hp_face_for_RSP2_val
          use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
@@ -100,13 +100,26 @@
          nz = s% nz
          s% brunt_B(1:nz) = 0 ! temporary proxy for brunt_B
          
-         call set_qs(s, nz, s% q, s% dq, ierr)
+         call set_qs_etc(ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_load_model failed in set_qs'
             return
          end if
-         call set_m_and_dm(s)
-         call set_dm_bar(s, nz, s% dm, s% dm_bar)            
+         
+         if (want_RSP2_model .and. .not. is_RSP2_model .and. .not. is_RSP_model) then
+            write(*,*) 'doing automatic remesh for RSP2'
+            call remesh_for_RSP2(s,ierr)
+            if (ierr /= 0) then
+               write(*,*) 'remesh_for_RSP2 failed in read1_model'
+               return
+            end if
+            call set_qs_etc(ierr)
+            if (ierr /= 0) then
+               write(*,*) 'finish_load_model failed in set_qs'
+               return
+            end if
+         end if
+                  
          call reset_epsnuc_vectors(s)
 
          s% star_mass = s% mstar/msun
@@ -178,7 +191,7 @@
          s% doing_finish_load_model = .false.
 
          if (s% rotation_flag) s% total_angular_momentum = total_angular_momentum(s)
-
+         
          if (is_RSP_model .and. (.not. want_RSP_model) .and. want_RSP2_model) then
             do k=1,s%nz
                s% Hp_face(k) = Hp_face_for_RSP2_val(s, k, ierr)
@@ -209,6 +222,17 @@
             write(*,*) 'finish_load_model: failed in do_report'
             return
          end if
+         
+         contains
+         
+         subroutine set_qs_etc(ierr)
+            integer, intent(out) :: ierr
+            ierr = 0
+            call set_qs(s, nz, s% q, s% dq, ierr)
+            if (ierr /= 0) return
+            call set_m_and_dm(s)
+            call set_dm_bar(s, nz, s% dm, s% dm_bar)   
+         end subroutine set_qs_etc
 
       end subroutine finish_load_model
 
@@ -383,8 +407,6 @@
             else if (want_RSP2_model) then
                write(*,*) 'automatically converting from RSP to RSP2 form'
                s% RSP2_flag = .true.
-               s% using_RSP2 = .true.
-               s% previous_step_was_using_RSP2 = .true.
                s% need_to_reset_w = .false.
             else
                write(*,*) 'automatically converting from RSP to standard form'
@@ -398,9 +420,12 @@
                write(*,*) 'automatically converting from RSP2 to standard form'
             end if
          else if (want_RSP_model) then
+            s% RSP_flag = .true.
             write(*,*) 'automatically converting from standard to RSP form'
          else if (want_RSP2_model) then
             write(*,*) 'automatically converting from standard to RSP2 form'
+            s% RSP2_flag = .true.
+            s% need_to_reset_w = .false.
          end if
 
          if (no_L .and. s% i_lum /= 0) then
@@ -724,6 +749,8 @@
                j=j+1; 
                if (.not. is_RSP_model .and. .not. is_RSP2_model) then
                   s% mlt_vc(k) = vec(j); s% conv_vel(k) = s% mlt_vc(k)
+               else if (want_RSP2_model .and. .not. is_RSP2_model) then
+                  xh(i_w,k) = vec(j)/sqrt_2_div_3
                end if
             end if
             if (j+species > nvec) then

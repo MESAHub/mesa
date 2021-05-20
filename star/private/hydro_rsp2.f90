@@ -38,8 +38,8 @@
       private
       public :: &
          do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
-         compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
-         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, set_using_RSP2, &
+         compute_Eq_cell, compute_Uq_face, set_RSP2_vars, remesh_for_RSP2, &
+         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, &
          set_etrb_start_vars, RSP2_adjust_vars_before_call_solver
       
       real(dp), parameter :: &
@@ -52,30 +52,240 @@
       contains
       
       
-      subroutine set_using_RSP2(s)
+      subroutine remesh_for_RSP2(s,ierr)
+         ! after do remesh_for_RSP2 with standard mesa model
+            ! run to allow model to relax to HSE.
+            ! then continue run to find desired model for pulse (calling GYRE or LINA). 
+            ! then set velocities using eigenfunction for desired mode.
+            ! then convert model to RSP2 variables and set appropriate max_dt.
+         ! assumes have already removed center and dT/dm < 0 everywhere in remaining envelope.
+         ! uses these controls
+         !  RSP2_nz = 150
+         !  RSP2_nz_outer = 40
+         !  RSP2_T_anchor = 11d3
+         !  RSP2_dq_1_factor = 2d0
+         use interp_1d_def, only: pm_work_size
+         use interp_1d_lib, only: interpolate_vector_pm
          type (star_info), pointer :: s      
-         real(dp) :: switch         
-         s% using_RSP2 = .false.
-         if (.not. s% RSP2_flag) return
-         if (s% RSP2_min_dt_div_tau_conv_switch_to_MLT > 0) then
-            switch = s% max_conv_time_scale*s% RSP2_min_dt_div_tau_conv_switch_to_MLT
-            if (s% dt < switch) then
-               s% using_RSP2 = .true.
+         integer, intent(out) :: ierr    
+         integer :: k, j, nz_old, nz
+         real(dp) :: xm_anchor
+         real(dp), allocatable, dimension(:) :: &
+            xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
+         real(dp), pointer :: work1(:) ! =(nz_old+1, pm_work_size)
+         include 'formats'         
+         ierr = 0
+         nz_old = s% nz
+         nz = s% RSP2_nz
+         if (nz == nz_old) return ! assume have already done remesh for RSP2
+         if (nz > nz_old) stop 'remesh_for_RSP2 cannot increase nz'
+         s% nz = nz
+         allocate(&
+            xm_old(nz_old+1), xm_mid_old(nz_old), v_old(nz_old+1), &
+            xm(nz+1), xm_mid(nz), v_new(nz+1), work1((nz_old+1)*pm_work_size))
+         call set_xm_old
+         call find_xm_anchor
+         call set_xm_new
+         call interpolate1_face_val(s% i_lnR, log(max(1d0,s% r_center)))
+         call interpolate1_face_val(s% i_lum, s% L_center)
+         if (s% i_v /= 0) call interpolate1_face_val(s% i_v, s% v_center)
+         call set_new_lnd
+         call interpolate1_cell_val(s% i_lnT)
+         call interpolate1_cell_val(s% i_w)
+         do j=1,s% species
+            call interpolate1_xa(j)
+         end do
+         call rescale_xa
+         call revise_lnT_for_QHSE(ierr)
+         if (ierr /= 0) stop 'remesh_for_RSP2 failed in revise_lnT_for_QHSE'
+         do k=1,nz
+            s% xh(s% i_Hp,k) = Hp_face_for_RSP2_val(s, k, ierr)
+         end do
+         s% need_to_setvars = .true.       
+         deallocate(work1)  
+         
+         contains
+         
+         subroutine set_xm_old
+            xm_old(1) = 0d0
+            do k=2,nz_old
+               xm_old(k) = xm_old(k-1) + s% dm(k-1)
+            end do
+            xm_old(nz_old+1) = s% xmstar
+            do k=1,nz_old
+               xm_mid_old(k) = xm_old(k) + 0.5d0*s% dm(k)
+            end do
+         end subroutine set_xm_old
+         
+         subroutine find_xm_anchor
+            real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
+            include 'formats'
+            lnT_anchor = log(s% RSP_T_anchor)
+            xm_anchor = xm_old(nz_old)
+            do k=2,nz_old
+               if (s% xh(s% i_lnT,k) >= lnT_anchor) then
+                  xmm1 = xm_old(k-1)
+                  xm00 = xm_old(k)
+                  lnTm1 = s% xh(s% i_lnT,k-1)
+                  lnT00 = s% xh(s% i_lnT,k)
+                  xm_anchor = xmm1 + &
+                     (xm00 - xmm1)*(lnT_anchor - lnTm1)/(lnT00 - lnTm1)
+                  return
+               end if
+            end do
+         end subroutine find_xm_anchor
+         
+         subroutine set_xm_new ! sets xm, dm, m, dq, q
+            integer :: nz_outer, k
+            real(dp) :: dq_1_factor, dxm_outer, dlnx, lnx
+            include 'formats'
+            nz_outer = s% RSP_nz_outer
+            dq_1_factor = s% RSP_dq_1_factor
+            dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
+            xm(1) = 0d0
+            xm(2) = dxm_outer*dq_1_factor
+            s% dm(1) = xm(2)
+            do k=3,nz_outer+1
+               xm(k) = xm(k-1) + dxm_outer
+               s% dm(k-1) = dxm_outer
+            end do
+            lnx = log(xm(nz_outer+1))
+            dlnx = (log(s% xmstar) - lnx)/(nz - nz_outer + 1)
+            do k=nz_outer+2,nz
+               lnx = lnx + dlnx
+               xm(k) = exp(lnx)
+               s% dm(k-1) = xm(k) - xm(k-1)
+            end do
+            s% dm(nz) = s% xmstar - xm(nz)
+            do k=1,nz-1
+               xm_mid(k) = 0.5d0*(xm(k) + xm(k+1))
+            end do
+            xm_mid(nz) = 0.5d0*(xm(nz) + s% xmstar)
+            s% m(1) = s% mstar
+            s% q(1) = 1d0
+            s% dq(1) = s% dm(1)/s% xmstar
+            do k=2,nz
+               s% m(k) = s% m(k-1) - s% dm(k-1)
+               s% dq(k) = s% dm(k)/s% xmstar
+               s% q(k) = s% q(k-1) - s% dq(k-1)
+            end do
+            call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
+         end subroutine set_xm_new
+         
+         subroutine interpolate1_face_val(i, cntr_val)
+            integer, intent(in) :: i
+            real(dp), intent(in) :: cntr_val
+            do k=1,nz_old
+               v_old(k) = s% xh(i,k)
+            end do
+            v_old(nz_old+1) = cntr_val
+            call interpolate_vector_pm( &
+               nz_old+1, xm_old, nz+1, xm, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
+            do k=1,nz
+               s% xh(i,k) = v_new(k)
+            end do
+         end subroutine interpolate1_face_val
+         
+         subroutine set_new_lnd
+            real(dp) :: vol
+            do k=1,nz
+               if (k < nz) then
+                  vol = (4d0*pi/3d0)*(exp(3d0*s% xh(s% i_lnR,k)) - exp(3d0*s% xh(s% i_lnR,k+1)))
+               else
+                  vol = (4d0*pi/3d0)*(exp(3d0*s% xh(s% i_lnR,k)) - pow3(s% r_center))
+               end if
+               s% xh(s% i_lnd,k) = log(s% dm(k)/vol)
+            end do
+         end subroutine set_new_lnd
+         
+         subroutine interpolate1_cell_val(i)
+            integer, intent(in) :: i
+            do k=1,nz_old
+               v_old(k) = s% xh(i,k)
+            end do
+            call interpolate_vector_pm( &
+               nz_old, xm_mid_old, nz, xm_mid, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
+            do k=1,nz
+               s% xh(i,k) = v_new(k)
+            end do
+         end subroutine interpolate1_cell_val
+         
+         subroutine interpolate1_xa(j)
+            integer, intent(in) :: j
+            do k=1,nz_old
+               v_old(k) = s% xa(j,k)
+            end do
+            call interpolate_vector_pm( &
+               nz_old, xm_mid_old, nz, xm_mid, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
+            do k=1,nz
+               s% xa(j,k) = v_new(k)
+            end do
+         end subroutine interpolate1_xa
+         
+         subroutine rescale_xa
+            integer :: k, j
+            real(dp) :: sum_xa
+            do k=1,nz
+               sum_xa = sum(s% xa(1:s% species,k))
+               do j=1,s% species
+                  s% xa(j,k) = s% xa(j,k)/sum_xa
+               end do
+            end do
+         end subroutine rescale_xa
+         
+         subroutine revise_lnT_for_QHSE(ierr)
+            use eos_def, only: num_eos_basic_results
+            use hydro_vars, only: set_vars
+            use chem_lib, only: basic_composition_info
+            use eos_support, only: solve_eos_given_DP
+            integer, intent(out) :: ierr
+            real(dp) :: logRho, logP, logT_guess, &
+               logT_tol, logP_tol, logT, P_m1, P_00, dm_face, &
+               x, y, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+            real(dp), dimension(num_eos_basic_results) :: &
+               res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            include 'formats'
+            ierr = 0
+            call set_vars(s, 0d0, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'set_vars failed for remesh_for_RSP2'
                return
-            end if
-         end if
-         if (s% RSP2_min_dt_years_switch_to_MLT > 0) then
-            switch = s% RSP2_min_dt_years_switch_to_MLT*secyer
-            if (s% dt < switch) then
-               s% using_RSP2 = .true.
-               return
-            end if
-         end if
-      end subroutine set_using_RSP2
+            end if            
+            P_m1 = 0d0 ! assuming Psurf = 0 for now
+            do k=1,nz
+               if (k < nz) then
+                  dm_face = s% dm_bar(k)
+               else
+                  dm_face = 0.5d0*(s% dm(k-1) + s% dm(k))
+               end if
+               P_00 = P_m1 + s% cgrav(k)*s% m(k)*dm_face/(4d0*pi*pow4(s% r(k)))
+               logP = log10(P_00) ! value for QHSE
+               logRho = s% lnd(k)/ln10
+               logT_guess = s% lnT(k)/ln10
+               logT_tol = 1d-11
+               logP_tol = 1d-11
+               call basic_composition_info( &
+                  s% species, s% chem_id, s% xa(:,k), x, y, z, abar, zbar, &
+                  z2bar, z53bar, ye, mass_correction, sumx)
+               call solve_eos_given_DP( &
+                  s, k, z, x, abar, zbar, s% xa(:,k), &
+                  logRho, logP, logT_guess, logT_tol, logP_tol, &
+                  logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+               if (ierr /= 0) then
+                  write(*,2) 'solve_eos_given_DP failed', k
+                  stop 'revise_lnT_for_QHSE'
+               end if
+               s% lnT(k) = logT*ln10
+               !write(*,2) 'logRho logP logT logT_guess', k, logRho, logP, logT, logT_guess
+               P_m1 = P_00
+            end do
+         end subroutine revise_lnT_for_QHSE
+
+      end subroutine remesh_for_RSP2
       
       
       subroutine RSP2_adjust_vars_before_call_solver(s, nvar, ierr)
-         ! JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
+         ! check_omega from RSP: JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
          use micro, only: do_eos_for_cell
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
@@ -85,8 +295,6 @@
          integer :: k, op_err
          include 'formats'         
          ierr = 0
-         
-         
          return
          
          
@@ -183,7 +391,7 @@
          integer, intent(out) :: ierr    
          type(auto_diff_real_star_order1) :: x
          integer :: k, op_err
-         include 'formats'         
+         include 'formats'      
 ! write(*,3) 'RSP2 w', 22, s% solver_iter, s% w(22)
          ierr = 0
          if (s% need_to_reset_w) then
@@ -214,7 +422,6 @@
          end if
          !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k=1,s% nz
-            !Pturb          skip?
             x = compute_Chi_cell(s, k, op_err)
             if (op_err /= 0) ierr = op_err
             x = compute_Eq_cell(s, k, op_err)
@@ -261,7 +468,7 @@
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.         
-         if (.not. s% using_RSP2) then
+         if (.not. s% RSP2_flag) then
             ierr = -1
             return
          end if
@@ -309,7 +516,7 @@
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
-         if (.not. s% using_RSP2) then
+         if (.not. s% RSP2_flag) then
             ierr = -1
             return
          end if
@@ -440,7 +647,7 @@
             s% mixing_length_alpha == 0d0 .or. &
             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)         
-         if (.not. s% using_RSP2) then           
+         if (.not. s% RSP2_flag) then           
             resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP2
          else if (non_turbulent_cell) then
             resid_ad = w_00/s% csound(k) ! make w = 0         

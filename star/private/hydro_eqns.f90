@@ -101,14 +101,13 @@
             end if
          end if
          
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             call set_RSP2_vars(s,ierr)
             if (ierr /= 0) then
                if (len_trim(s% retry_message) == 0) s% retry_message = 'set_RSP2_vars failed'
                if (s% report_ierr) write(*,*) 'ierr from set_RSP2_vars'
                return
             end if
-            s% previous_step_was_using_RSP2 = .true.
          end if
 
          dump_for_debug = .false.
@@ -268,7 +267,7 @@
                end if
             end if
             if (do_equL) then
-               if (s% using_RSP2 .and. (k > 1 .or. s% RSP2_use_L_eqn_at_surface)) then
+               if (s% RSP2_flag .and. (k > 1 .or. s% RSP2_use_L_eqn_at_surface)) then
                   call do1_rsp2_L_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_L_eqn', k
@@ -714,7 +713,7 @@
 
          need_T_surf = .false.
          if ((.not. do_equL) .or. &
-               (s% using_RSP2 .and. s% RSP2_use_L_eqn_at_surface)) then 
+               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface)) then 
             ! no Tsurf BC
          else
             need_T_surf = .true.
@@ -724,7 +723,7 @@
          offset_P_to_cell_center = .not. s% use_momentum_outer_BC
          
          offset_T_to_cell_center = .true.
-         if (s% use_other_surface_PT .or. s% using_RSP2) &
+         if (s% use_other_surface_PT .or. s% RSP2_flag) &
             offset_T_to_cell_center = .false.
 
          call get_PT_bc_ad(ierr)
@@ -944,7 +943,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0  
-            if (s% using_RSP2) then ! interpolate lnT by mass
+            if (s% RSP2_flag) then ! interpolate lnT by mass
                T4_p1 = pow4(wrap_T_p1(s,1))
                T4_surf = pow4(T_bc_ad)
                dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))

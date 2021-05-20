@@ -326,7 +326,7 @@
             s% opacity_start(k) = s% opacity(k)
          end do
          
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             call set_etrb_start_vars(s,ierr)
          end if
 

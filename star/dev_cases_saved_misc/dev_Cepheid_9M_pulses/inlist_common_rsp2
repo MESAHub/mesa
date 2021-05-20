@@ -1,0 +1,76 @@
+
+&controls ! for parts using rsp2
+
+
+! atm
+   ! P boundary condition
+   use_momentum_outer_BC = .true.  ! required for RSP2
+   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
+      ! this can be a problem with shocks since omits Pvsc
+   ! else if RSP_use_Prad_for_Psurf
+      !use_zero_Pgas_outer_BC = .false.
+   ! else use RSP default of Psurf = 0
+!      use_fixed_Psurf_outer_BC = .true.
+!      fixed_Psurf = 0d0
+
+! mlt
+   alpha_semiconvection = 0.0
+
+   max_dt_div_tau_conv_for_TDC = -1d99
+   max_dt_years_for_TDC = -1d99
+         
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
+
+! timesteps
+!  RSP_max_dt_times_min_dr_div_cs = 2d0
+   dt_div_min_dr_div_cs_limit = 1d0
+   !dt_div_min_dr_div_cs_hard_limit = 4d0
+
+!  RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.5d0
+   
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.0d0
+   
+! mesh controls   
+   okay_to_remesh = .false.
+
+
+! solver
+
+   set_rho_to_dm_div_dV = .false.
+   
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 4.0d0
+   Pvsc_zsh = 0.1d0
+
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
+   dxdt_nuc_factor = 0
+   mix_factor = 0
+
+   always_use_dedt_form_of_energy_eqn = .true.
+
+   tol_max_correction = 1d-6 ! 5d-7
+
+   RSP2_assume_HSE = .true.
+   include_w_in_correction_limits = .true.
+   include_v_in_correction_limits = .true.
+   include_L_in_correction_limits = .true.
+   
+   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
+   RSP2_alfad =     1d0
+
+   RSP2_num_outermost_cells_forced_nonturbulent = 1
+   RSP2_num_innermost_cells_forced_nonturbulent = 5
+   alt_scale_height_flag = .false.
+
+
+/ ! end of controls namelist

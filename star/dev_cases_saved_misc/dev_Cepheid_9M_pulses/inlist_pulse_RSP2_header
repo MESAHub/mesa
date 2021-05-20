@@ -4,7 +4,7 @@
    read_extra_star_job_inlist1 = .true.
    extra_star_job_inlist1_name = 'inlist_common_post_zams'
    read_extra_star_job_inlist2 = .true.
-   extra_star_job_inlist2_name = 'inlist_initialize'
+   extra_star_job_inlist2_name = 'inlist_pulse_RSP2'
 / ! end of star_job namelist
 
 
@@ -12,7 +12,7 @@
    read_extra_eos_inlist1 = .true.
    extra_eos_inlist1_name = 'inlist_common_post_zams'
    read_extra_eos_inlist2 = .true.
-   extra_eos_inlist2_name = 'inlist_initialize'
+   extra_eos_inlist2_name = 'inlist_pulse_RSP2'
 / ! end of eos namelist
 
 
@@ -20,7 +20,7 @@
    read_extra_kap_inlist1 = .true.
    extra_kap_inlist1_name = 'inlist_common_post_zams'
    read_extra_kap_inlist2 = .true.
-   extra_kap_inlist2_name = 'inlist_initialize'
+   extra_kap_inlist2_name = 'inlist_pulse_RSP2'
 / ! end of kap namelist
 
 
@@ -30,7 +30,7 @@
    read_extra_controls_inlist2 = .true.
    extra_controls_inlist2_name = 'inlist_common_rsp2'
    read_extra_controls_inlist3 = .true.
-   extra_controls_inlist3_name = 'inlist_initialize'
+   extra_controls_inlist3_name = 'inlist_pulse_RSP2'
 / ! end of controls namelist
 
 
@@ -40,5 +40,5 @@
    read_extra_pgstar_inlist2 = .true.
    extra_pgstar_inlist2_name = 'inlist_pgstar_pulses'
    read_extra_pgstar_inlist3 = .true.
-   extra_pgstar_inlist3_name = 'inlist_initialize'
+   extra_pgstar_inlist3_name = 'inlist_pulse_RSP2'
 / ! end of pgstar namelist

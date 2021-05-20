@@ -171,7 +171,6 @@
          logical :: am_nu_rot_flag ! smooth am_nu_rot like D_omega
          logical :: was_in_implicit_wind_limit
          logical :: rsp_have_set_velocities
-         logical :: using_RSP2, previous_step_was_using_RSP2
          
          integer :: total_num_solver_iterations, total_num_solver_relax_iterations
          integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made
