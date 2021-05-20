@@ -33,8 +33,8 @@
       implicit none
 
       private
-      public :: set_vars_if_needed, set_vars, set_final_vars, set_cgrav, &
-         set_hydro_vars, set_Teff_info_for_eqns, set_Teff, get_surf_PT, set_grads
+      public :: set_vars_if_needed, set_vars, set_final_vars, update_vars, set_cgrav, &
+         set_hydro_vars, unpack_xh, set_Teff_info_for_eqns, set_Teff, get_surf_PT, set_grads
 
       logical, parameter :: dbg = .false.
       logical, parameter :: trace_setvars = .false.
@@ -209,7 +209,7 @@
             skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
             skip_mlt, skip_eos, dt, ierr)
-         use star_utils, only: eval_irradiation_heat, set_qs, set_dm_bar, set_m_and_dm
+         use star_utils, only: eval_irradiation_heat
          type (star_info), pointer :: s
          logical, intent(in) :: &
             skip_basic_vars, skip_micro_vars, &
@@ -219,38 +219,21 @@
             skip_mlt, skip_eos
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
-
-         integer :: i_lnd, i_lnT, i_lnR, i_w, i_Hp, &
-            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_Et_RSP, &
-            j, k, species, nvar_chem, nz, k_below_just_added
-         real(dp) :: dt_inv
-
+         integer :: k, nz
          include 'formats'
-
          ierr = 0
          nz = s% nz
-         k_below_just_added = 1
-         species = s% species
-         nvar_chem = s% nvar_chem
-         i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
-         i_lnR = s% i_lnR
-         i_lum = s% i_lum
-         i_w = s% i_w
-         i_Hp = s% i_Hp
-         i_v = s% i_v
-         i_u = s% i_u
-         i_alpha_RTI = s% i_alpha_RTI
-         i_Et_RSP = s% i_Et_RSP
-         i_ln_cvpv0 = s% i_ln_cvpv0
-
          if (s% doing_finish_load_model .or. .not. s% RSP_flag) then
-            call unpack
+            call unpack_xh(s,ierr)
             if (ierr /= 0) then
                if (s% report_ierr .or. dbg) &
                   write(*,*) 'after unpack ierr', ierr
                return
             end if
+            if (.not. skip_mixing_info) then
+               s% mixing_type(1:nz) = no_mixing
+               s% adjust_mlt_gradT_fraction(1:nz) = -1
+            end if            
          end if
          
          call set_hydro_vars( &
@@ -282,104 +265,113 @@
                s% irradiation_heat(1:nz) = 0
             end if
          end if
-         
-         contains
-         
-         subroutine unpack
-            integer :: j, k
-            include 'formats'
-         
-            do j=1,s% nvar_hydro
-               if (j == i_lnd) then
-                  do k=1,nz
-                     s% lnd(k) = s% xh(i_lnd,k)
-                     s% rho(k) = exp(s% lnd(k))
-                  end do
-                  s% dxh_lnd(1:nz) = 0d0
-               else if (j == i_lnT) then
-                  do k=1,nz
-                     s% lnT(k) = s% xh(i_lnT,k)
-                     s% T(k) = exp(s% lnT(k))
-                  end do
-                  s% dxh_lnT(1:nz) = 0d0
-               else if (j == i_lnR) then
-                  do k=1,nz
-                     s% lnR(k) = s% xh(i_lnR,k)
-                     s% r(k) = exp(s% lnR(k))
-                  end do
-                  s% dxh_lnR(1:nz) = 0d0
-               else if (j == i_w) then
-                  do k=1,nz
-                     s% w(k) = s% xh(i_w, k)
-                     if (s% w(k) < 0d0) then
-                        !write(*,4) 'unpack: fix w < 0', k, &
-                        !   s% solver_iter, s% model_number, s% w(k)
-                        s% w(k) = s% RSP2_w_fix_if_neg
-                     end if
-                  end do
-               else if (j == i_Hp) then
-                  do k=1,nz
-                     s% Hp_face(k) = s% xh(i_Hp, k)
-                  end do
-               else if (j == i_lum) then
-                  do k=1,nz
-                     s% L(k) = s% xh(i_lum, k)
-                  end do
-               else if (j == i_v) then
-                  do k=1,nz
-                     s% v(k) = s% xh(i_v,k)
-                     s% dxh_v(k) = 0d0
-                  end do
-               else if (j == i_u) then
-                  do k=1,nz
-                     s% u(k) = s% xh(i_u,k)
-                     s% dxh_u(k) = 0d0
-                  end do
-               else if (j == i_alpha_RTI) then
-                  do k=1,nz
-                     s% alpha_RTI(k) = max(0d0, s% xh(i_alpha_RTI,k))
-                     s% dxh_alpha_RTI(k) = 0d0
-                  end do
-               else if (j == i_Et_RSP) then
-                  do k=1,nz
-                     s% RSP_Et(k) = max(0d0,s% xh(i_Et_RSP,k))
-                  end do
-               else if (j == i_ln_cvpv0) then
-                  do k=1,nz
-                     s% conv_vel(k) = max(0d0, exp(s% xh(i_ln_cvpv0,k))-s% conv_vel_v0)
-                     s% dxh_ln_cvpv0(k) = 0d0
-                  end do
-               end if
-            end do
-
-            if (i_lum == 0 .and. .not. s% RSP_flag) s% L(1:nz) = 0d0
-            if (i_v == 0) s% v(1:nz) = 0d0
-            if (i_u == 0) s% u(1:nz) = 0d0
-            if (i_w == 0) s% w(1:nz) = 0d0
-            if (i_Hp == 0) s% Hp_face(1:nz) = 0d0
-
-            call set_qs(s, nz, s% q, s% dq, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'update_vars failed in set_qs'
-               return
-            end if
-            call set_m_and_dm(s)
-            call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
-
-            if (.not. skip_mixing_info) then
-               s% mixing_type(1:nz) = no_mixing
-               s% adjust_mlt_gradT_fraction(1:nz) = -1
-            end if
-
-            if (dt > 0d0) then
-               dt_inv = 1/dt
-            else
-               dt_inv = 0
-            end if
-
-         end subroutine unpack
 
       end subroutine update_vars
+      
+      
+      subroutine unpack_xh(s,ierr)
+         use star_utils, only: set_qs, set_dm_bar, set_m_and_dm
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         integer :: i_lnd, i_lnT, i_lnR, i_w, i_Hp, &
+            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_Et_RSP, &
+            j, k, species, nvar_chem, nz, k_below_just_added
+         include 'formats'
+         ierr = 0
+         nz = s% nz
+         k_below_just_added = 1
+         species = s% species
+         nvar_chem = s% nvar_chem
+         i_lnd = s% i_lnd
+         i_lnT = s% i_lnT
+         i_lnR = s% i_lnR
+         i_lum = s% i_lum
+         i_w = s% i_w
+         i_Hp = s% i_Hp
+         i_v = s% i_v
+         i_u = s% i_u
+         i_alpha_RTI = s% i_alpha_RTI
+         i_Et_RSP = s% i_Et_RSP
+         i_ln_cvpv0 = s% i_ln_cvpv0
+      
+         do j=1,s% nvar_hydro
+            if (j == i_lnd) then
+               do k=1,nz
+                  s% lnd(k) = s% xh(i_lnd,k)
+                  s% rho(k) = exp(s% lnd(k))
+               end do
+               s% dxh_lnd(1:nz) = 0d0
+            else if (j == i_lnT) then
+               do k=1,nz
+                  s% lnT(k) = s% xh(i_lnT,k)
+                  s% T(k) = exp(s% lnT(k))
+               end do
+               s% dxh_lnT(1:nz) = 0d0
+            else if (j == i_lnR) then
+               do k=1,nz
+                  s% lnR(k) = s% xh(i_lnR,k)
+                  s% r(k) = exp(s% lnR(k))
+               end do
+               s% dxh_lnR(1:nz) = 0d0
+            else if (j == i_w) then
+               do k=1,nz
+                  s% w(k) = s% xh(i_w, k)
+                  if (s% w(k) < 0d0) then
+                     !write(*,4) 'unpack: fix w < 0', k, &
+                     !   s% solver_iter, s% model_number, s% w(k)
+                     s% w(k) = s% RSP2_w_fix_if_neg
+                  end if
+               end do
+            else if (j == i_Hp) then
+               do k=1,nz
+                  s% Hp_face(k) = s% xh(i_Hp, k)
+               end do
+            else if (j == i_lum) then
+               do k=1,nz
+                  s% L(k) = s% xh(i_lum, k)
+               end do
+            else if (j == i_v) then
+               do k=1,nz
+                  s% v(k) = s% xh(i_v,k)
+                  s% dxh_v(k) = 0d0
+               end do
+            else if (j == i_u) then
+               do k=1,nz
+                  s% u(k) = s% xh(i_u,k)
+                  s% dxh_u(k) = 0d0
+               end do
+            else if (j == i_alpha_RTI) then
+               do k=1,nz
+                  s% alpha_RTI(k) = max(0d0, s% xh(i_alpha_RTI,k))
+                  s% dxh_alpha_RTI(k) = 0d0
+               end do
+            else if (j == i_Et_RSP) then
+               do k=1,nz
+                  s% RSP_Et(k) = max(0d0,s% xh(i_Et_RSP,k))
+               end do
+            else if (j == i_ln_cvpv0) then
+               do k=1,nz
+                  s% conv_vel(k) = max(0d0, exp(s% xh(i_ln_cvpv0,k))-s% conv_vel_v0)
+                  s% dxh_ln_cvpv0(k) = 0d0
+               end do
+            end if
+         end do
+
+         if (i_lum == 0 .and. .not. s% RSP_flag) s% L(1:nz) = 0d0
+         if (i_v == 0) s% v(1:nz) = 0d0
+         if (i_u == 0) s% u(1:nz) = 0d0
+         if (i_w == 0) s% w(1:nz) = 0d0
+         if (i_Hp == 0) s% Hp_face(1:nz) = 0d0
+
+         call set_qs(s, nz, s% q, s% dq, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'update_vars failed in set_qs'
+            return
+         end if
+         call set_m_and_dm(s)
+         call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
+
+      end subroutine unpack_xh
 
 
       subroutine set_Teff(s, ierr)

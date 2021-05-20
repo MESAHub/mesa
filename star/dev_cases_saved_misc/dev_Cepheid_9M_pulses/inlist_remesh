@@ -42,8 +42,8 @@
    max_model_number = 10
 
 ! RSP2
-   RSP2_nz = 300 ! 150
-   RSP2_nz_outer = 80 ! 40
+   RSP2_nz = 150
+   RSP2_nz_outer = 40
    RSP2_T_anchor = 11d3
    RSP2_dq_1_factor = 2d0
 
@@ -90,7 +90,7 @@
       !max_number_retries = 0
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0

@@ -738,7 +738,7 @@
             if (ierr /= 0) return
          end if
 
-         if (need_T_surf) then         
+         if (need_T_surf) then       
             call set_Tsurf_BC(ierr)
             if (ierr /= 0) return
          end if

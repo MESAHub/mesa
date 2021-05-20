@@ -25,7 +25,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d3 ! based on expected period
+      seconds_for_initial_dt = 1d-6 ! 1d3 ! based on expected period
 
       pgstar_flag = .true.
 
@@ -44,11 +44,9 @@
    
    max_timestep = 1d3 ! based on expected period
    
-   max_model_number = 10
+   max_model_number = 1
 
 ! atm
-   ! must set same BCs in inlist_convert, inlist_initialize, and inlist_pulse
-   use_momentum_outer_BC = .true.
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -67,10 +65,10 @@
    okay_to_remesh = .false.
 
 ! GYRE set starting velocities         <<< must wait until after restore QHSE
-!   x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 1d0 ! fraction_1st_overtone (order 2)
+   x_logical_ctrl(5) = .true. 
+   x_ctrl(4) = 0d0 ! fraction_1st_overtone (order 2)
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
-   x_ctrl(6) = 0.01d0 ! initial vsurf (kms)
+   x_ctrl(6) = 0.1d0 ! initial vsurf (kms)
    
 ! output controls
    terminal_show_age_units = 'days'

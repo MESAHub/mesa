@@ -69,7 +69,7 @@
          type (star_info), pointer :: s      
          integer, intent(out) :: ierr    
          integer :: k, j, nz_old, nz
-         real(dp) :: xm_anchor
+         real(dp) :: xm_anchor, P_surf, old_logT_cntr, old_logT_1
          real(dp), allocatable, dimension(:) :: &
             xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
          real(dp), pointer :: work1(:) ! =(nz_old+1, pm_work_size)
@@ -79,7 +79,13 @@
          nz = s% RSP2_nz
          if (nz == nz_old) return ! assume have already done remesh for RSP2
          if (nz > nz_old) stop 'remesh_for_RSP2 cannot increase nz'
-         s% nz = nz
+         !write(*,1) 'before get_P_surf: logT cntr m dq', &
+         !   s% xh(s% i_lnT,nz_old)/ln10, s% m(nz_old)/Msun, s% dq(nz_old)
+         P_surf = get_P_surf(ierr)
+         if (ierr /= 0) stop 'remesh_for_RSP2 failed in get_P_surf'
+         !write(*,1) 'after get_P_surf: logT cntr m dq', &
+         !   s% lnT(nz_old)/ln10, s% m(nz_old)/Msun, s% dq(nz_old)
+         !write(*,1) 'remesh_for_RSP2: old logT_1', old_logT_1
          allocate(&
             xm_old(nz_old+1), xm_mid_old(nz_old), v_old(nz_old+1), &
             xm(nz+1), xm_mid(nz), v_new(nz+1), work1((nz_old+1)*pm_work_size))
@@ -91,18 +97,27 @@
          if (s% i_v /= 0) call interpolate1_face_val(s% i_v, s% v_center)
          call set_new_lnd
          call interpolate1_cell_val(s% i_lnT)
+         !write(*,1) 'after interpolate: logT cntr m dq', s% xh(s% i_lnT,nz)/ln10, s% m(nz)/Msun, s% dq(nz)
+         !write(*,1) 'after interpolate: old new logT 1', old_logT_1, s% xh(s% i_lnT,1)/ln10
          call interpolate1_cell_val(s% i_w)
          do j=1,s% species
             call interpolate1_xa(j)
          end do
          call rescale_xa
-         call revise_lnT_for_QHSE(ierr)
+         !write(*,1) 'before revise: logT cntr m dq', s% xh(s% i_lnT,nz)/ln10, s% m(nz)/Msun, s% dq(nz)
+         call revise_lnT_for_QHSE(P_surf, ierr)
          if (ierr /= 0) stop 'remesh_for_RSP2 failed in revise_lnT_for_QHSE'
+         !write(*,1) 'after revise: logT cntr m dq', s% xh(s% i_lnT,nz)/ln10, s% m(nz)/Msun, s% dq(nz)
+         !write(*,1) 'after revise: old new logT 1', old_logT_1, s% xh(s% i_lnT,1)/ln10
          do k=1,nz
             s% xh(s% i_Hp,k) = Hp_face_for_RSP2_val(s, k, ierr)
          end do
          s% need_to_setvars = .true.       
          deallocate(work1)  
+
+         s% nz = nz
+         
+         !stop 'remesh_for_RSP2'
          
          contains
          
@@ -133,11 +148,11 @@
                   return
                end if
             end do
-         end subroutine find_xm_anchor
+         end subroutine find_xm_anchor         
          
          subroutine set_xm_new ! sets xm, dm, m, dq, q
-            integer :: nz_outer, k
-            real(dp) :: dq_1_factor, dxm_outer, dlnx, lnx
+            integer :: nz_outer, n_inner, iter, k, j
+            real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx
             include 'formats'
             nz_outer = s% RSP_nz_outer
             dq_1_factor = s% RSP_dq_1_factor
@@ -150,7 +165,7 @@
                s% dm(k-1) = dxm_outer
             end do
             lnx = log(xm(nz_outer+1))
-            dlnx = (log(s% xmstar) - lnx)/(nz - nz_outer + 1)
+            dlnx = (log(s% xmstar) - lnx)/(nz - nz_outer)
             do k=nz_outer+2,nz
                lnx = lnx + dlnx
                xm(k) = exp(lnx)
@@ -170,6 +185,13 @@
                s% q(k) = s% q(k-1) - s% dq(k-1)
             end do
             call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
+            return
+            
+            do k=2,nz
+               write(*,2) 'dm(k)/dm(k-1) m(k)', k, s%dm(k)/s%dm(k-1), s%m(k)/Msun
+            end do
+            write(*,1) 'm_center', s% m_center/msun
+            stop 'set_xm_new'
          end subroutine set_xm_new
          
          subroutine interpolate1_face_val(i, cntr_val)
@@ -194,7 +216,9 @@
                else
                   vol = (4d0*pi/3d0)*(exp(3d0*s% xh(s% i_lnR,k)) - pow3(s% r_center))
                end if
-               s% xh(s% i_lnd,k) = log(s% dm(k)/vol)
+               s% rho(k) = s% dm(k)/vol
+               s% lnd(k) = log(s% rho(k))
+               s% xh(s% i_lnd,k) = s% lnd(k)
             end do
          end subroutine set_new_lnd
          
@@ -233,25 +257,70 @@
             end do
          end subroutine rescale_xa
          
-         subroutine revise_lnT_for_QHSE(ierr)
+         real(dp) function get_P_surf(ierr)
+            use hydro_vars, only: unpack_xh, set_hydro_vars
+            use atm_support, only: get_atm_PT
+            integer, intent(out) :: ierr
+            logical, parameter :: &
+               skip_partials = .true., &
+               skip_basic_vars = .false., &
+               skip_micro_vars = .false., &
+               skip_m_grav_and_grav = .false., &
+               skip_net = .true., &
+               skip_neu = .true., &
+               skip_kap = .false., &
+               skip_grads = .true., &
+               skip_rotation = .true., &
+               skip_brunt = .true., &
+               skip_other_cgrav = .true., &
+               skip_mixing_info = .true., &
+               skip_set_cz_bdy_mass = .true., &
+               skip_mlt = .true., &
+               skip_eos = .false.
+            real(dp) :: Teff, &
+               lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+               lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
+            include 'formats'
+            ierr = 0
+            !write(*,1) 'before update_vars: old logT cntr', s% xh(s% i_lnT,nz_old)/ln10
+            call unpack_xh(s,ierr)
+            if (ierr /= 0) stop 'get_P_surf failed in unpack_xh'
+            call set_hydro_vars( &
+               s, 1, nz_old, skip_basic_vars, &
+               skip_micro_vars, skip_m_grav_and_grav, skip_eos, skip_net, skip_neu, &
+               skip_kap, skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
+               skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
+            if (ierr /= 0) stop 'get_P_surf failed in set_hydro_vars'
+            !write(*,1) 'after update_vars: old logT cntr', s% lnT(nz_old)/ln10
+            call get_atm_PT( &
+                 s, s% tau_factor*s% tau_base, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
+                 Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
+            if (ierr /= 0) stop 'get_P_surf failed in get_atm_PT'
+            get_P_surf = exp(lnP_surf)
+         end function get_P_surf
+         
+         subroutine revise_lnT_for_QHSE(P_surf, ierr)
             use eos_def, only: num_eos_basic_results
-            use hydro_vars, only: set_vars
             use chem_lib, only: basic_composition_info
             use eos_support, only: solve_eos_given_DP
+            real(dp), intent(in) :: P_surf
             integer, intent(out) :: ierr
             real(dp) :: logRho, logP, logT_guess, &
-               logT_tol, logP_tol, logT, P_m1, P_00, dm_face, &
-               x, y, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+               logT_tol, logP_tol, logT, P_m1, P_00, dm_face, x, y, z, &
+               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
             real(dp), dimension(num_eos_basic_results) :: &
                res, d_dlnd, d_dlnT, d_dabar, d_dzbar
             include 'formats'
             ierr = 0
-            call set_vars(s, 0d0, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'set_vars failed for remesh_for_RSP2'
-               return
-            end if            
-            P_m1 = 0d0 ! assuming Psurf = 0 for now
+            P_m1 = P_surf
+            !write(*,2) 'atm log P_surf', 0, log10(P_surf)
+            do k=1,nz
+               s% lnT(k) = s% xh(s% i_lnT,k)
+               s% lnR(k) = s% xh(s% i_lnR,k)
+               s% r(k) = exp(s% lnR(k))
+            end do
+            !write(*,1) 'before revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
             do k=1,nz
                if (k < nz) then
                   dm_face = s% dm_bar(k)
@@ -276,9 +345,13 @@
                   stop 'revise_lnT_for_QHSE'
                end if
                s% lnT(k) = logT*ln10
-               !write(*,2) 'logRho logP logT logT_guess', k, logRho, logP, logT, logT_guess
+               s% xh(s% i_lnT,k) = s% lnT(k)
+               !write(*,2) 'dlogT logT logT_guess logP logRho', k, &
+               !   logT - logT_guess, logT, logT_guess, logP, logRho
                P_m1 = P_00
             end do
+            !write(*,1) 'after revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
+            !stop
          end subroutine revise_lnT_for_QHSE
 
       end subroutine remesh_for_RSP2

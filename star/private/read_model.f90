@@ -102,7 +102,7 @@
          
          call set_qs_etc(ierr)
          if (ierr /= 0) then
-            write(*,*) 'finish_load_model failed in set_qs'
+            write(*,*) 'set_qs_etc failed in finish_load_model'
             return
          end if
          
@@ -110,12 +110,12 @@
             write(*,*) 'doing automatic remesh for RSP2'
             call remesh_for_RSP2(s,ierr)
             if (ierr /= 0) then
-               write(*,*) 'remesh_for_RSP2 failed in read1_model'
+               write(*,*) 'remesh_for_RSP2 failed in finish_load_model'
                return
             end if
             call set_qs_etc(ierr)
             if (ierr /= 0) then
-               write(*,*) 'finish_load_model failed in set_qs'
+               write(*,*) 'set_qs_etc failed in finish_load_model'
                return
             end if
          end if
@@ -630,7 +630,6 @@
          real(dp), pointer :: vec(:)
          real(dp) :: r00, rm1
          integer :: nvec
-         logical :: no_L
 
          include 'formats'
 
@@ -641,7 +640,6 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         no_L = (i_lum == 0)
          i_w = s% i_w         
          i_Hp = s% i_Hp         
          i_v = s% i_v
@@ -693,35 +691,29 @@
                   j=j+1; xh(i_Et_RSP,k) = vec(j)
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
-                  j=j+1; ! discard
                else if (want_RSP2_model) then ! convert Et from RSP to w in RSP2
                   j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j))); xh(i_Hp,k) = -1
-                  j=j+1; ! erad_RSP
-                  j=j+1; ! Fr_RSP
-                  j=j+1; xh(i_lum,k) = vec(j)
+                  j=j+1; ! discard erad_RSP
+                  j=j+1; ! discard Fr_RSP
                else
                   j=j+1; s% mlt_vc(k) = sqrt_2_div_3*sqrt(max(0d0,vec(j)))
                      s% conv_vel(k) = s% mlt_vc(k)
-                  j=j+1; ! erad_RSP
-                  j=j+1; ! Fr_RSP
-                  j=j+1; xh(i_lum,k) = vec(j)
+                  j=j+1; ! discard erad_RSP
+                  j=j+1; ! discard Fr_RSP
                end if
             else if (is_RSP2_model) then 
                if (want_RSP2_model) then ! assumes i_w and i_Hp are set
                   j=j+1; xh(i_w,k) = vec(j)
                   j=j+1; xh(i_Hp,k) = vec(j)
-                  j=j+1; xh(i_lum,k) = vec(j)
                else if (want_RSP_model) then
-                  stop 'read_model not able to convert from RSP2 to RSP'
+                  stop 'read_model is not able to convert from RSP2 to RSP'
                else ! cv = sqrt_2_div_3*w
                   j=j+1; s% mlt_vc(k) = sqrt_2_div_3*vec(j)
-                     s% conv_vel(k) = s% mlt_vc(k)
-                  j=j+1; ! skip Hp
-                  j=j+1; xh(i_lum,k) = vec(j)
+                     s% conv_vel(k) = s% mlt_vc(k) ! shouldn't need this
+                  j=j+1; ! discard Hp
                end if
-            else if (.not. no_L) then
-               j=j+1; xh(i_lum,k) = vec(j)
-            end if            
+            end if    
+            j=j+1; if (i_lum /= 0) xh(i_lum,k) = vec(j) ! L is always in file.
             j=j+1; dq(k) = vec(j)
             if (i_v /= 0) then
                j=j+1; xh(i_v,k) = vec(j)
@@ -742,15 +734,14 @@
             if (i_u /= 0) then
                j=j+1; xh(i_u,k) = vec(j)
             end if
-            if (s% RTI_flag) then
+            if (i_alpha_RTI /= 0) then
                j=j+1; xh(i_alpha_RTI,k) = vec(j)
             end if
             if (s% have_mlt_vc) then
                j=j+1; 
-               if (.not. is_RSP_model .and. .not. is_RSP2_model) then
-                  s% mlt_vc(k) = vec(j); s% conv_vel(k) = s% mlt_vc(k)
-               else if (want_RSP2_model .and. .not. is_RSP2_model) then
-                  xh(i_w,k) = vec(j)/sqrt_2_div_3
+               s% mlt_vc(k) = vec(j); s% conv_vel(k) = s% mlt_vc(k)
+               if (want_RSP2_model .and. .not. is_RSP2_model .and. .not. is_RSP_model) then
+                  xh(i_w,k) = s% mlt_vc(k)/sqrt_2_div_3
                end if
             end if
             if (j+species > nvec) then

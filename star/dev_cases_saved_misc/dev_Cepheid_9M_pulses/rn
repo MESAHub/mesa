@@ -56,3 +56,25 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 echo 'finished'
 
+return
+
+after to_pulse
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+     802       1          0.3849E-06        2598327.2651             30.0732             22.8442
+     802       2          0.5887E-06        1698553.9560             19.6592             36.1827
+
+after remove_core
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+     100       1          0.3824E-06        2614991.6486             30.2661             22.5777
+     100       2          0.5856E-06        1707538.6565             19.7632             35.9831
+
+after remesh
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+      10       1          0.3800E-06        2631867.1632             30.4614             13.3675
+      10       2          0.5872E-06        1702893.5999             19.7094             27.2634
+
+after initialized
+   order           freq (Hz)             P (sec)             P (day)    cycles to double
+       1          0.3800E-06        2631867.1633             30.4614             13.3675
+       2          0.5872E-06        1702893.5999             19.7094             27.2634
+

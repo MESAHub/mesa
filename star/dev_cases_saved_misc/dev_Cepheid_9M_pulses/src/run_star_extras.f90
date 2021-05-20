@@ -261,11 +261,11 @@
                      best_model_number = s% model_number
                   end if
                end do
-               if (best_cycles_to_double > 0) &
-                  write(*,'(a38,i6,a8,i2,a12,f12.0,a12,f7.4,a12,f9.4)') &
+               if (.false. .and. best_cycles_to_double > 0) &
+                  write(*,'(a,i6,a,i2,a,f12.0,a,f7.4,a,f9.4)') &
                      'best cycles to double: model_number', best_model_number, &
                      'order', best_order, 'P(s)', 24*3600*best_period, &
-                     'P(d)', best_period, 'cycles', best_cycles_to_double
+                     'P(d)', best_period, 'cycles to double', best_cycles_to_double
             end if
          end subroutine get_gyre_info_for_this_step
          
@@ -705,11 +705,11 @@
             if (growth > 0._dp) then ! unstable
                write(*, 100) md%n_pg, &
                   freq, per, per/(24*3600), freq/(2d0*pi*growth)
-100            format(I8,E20.4,2F20.4,E20.4,F20.4)
+100            format(I8,E20.4,3F20.4)
             else ! stable
                write(*, 110) md%n_pg, &
                   freq, per, per/(24*3600), 'stable'
-110            format(I8,E20.4,2F20.4,E20.4,A20)
+110            format(I8,E20.4,2F20.4,A20)
             end if
             
             if (md%n_pg > modes) return

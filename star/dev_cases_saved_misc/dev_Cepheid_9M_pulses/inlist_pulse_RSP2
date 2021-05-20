@@ -23,7 +23,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 0.01
+      seconds_for_initial_dt = 400 ! start at max/10
 
       pgstar_flag = .true.
 
@@ -37,35 +37,29 @@
 &kap
 / ! end of kap namelist
 
-! GYRE
-!   order           freq (Hz)             P (sec)             P (day)        growth (day)    cycles to double
-!       1          0.3841E-06        2603520.3025             30.1333          0.3489E-03             15.1398
-!       2          0.5866E-06        1704620.3555             19.7294          0.4264E-03             18.9204
-!       3          0.8679E-06        1152250.4081             13.3362         -0.4807E-03              stable
-
 
 &controls
    
-   max_timestep = 3000
+   max_timestep = 4000
 
-   !max_model_number = 500000
+   max_model_number = 500000
       
    max_number_retries = 0
 
 ! solver
-!   steps_before_use_velocity_time_centering = 0
+   steps_before_use_velocity_time_centering = 0
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 1 ! 0.5d0
+   P_theta_for_velocity_time_centering = 0.5d0
 
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 1 ! 0.5d0
+   L_theta_for_velocity_time_centering = 0.5d0
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 20 ! expected period (in days) 
+   x_ctrl(7) = 30 ! expected period (in days) 
 !   x_ctrl(8) = 1d-1 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.1 ! min_period_div_target
@@ -78,7 +72,6 @@
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   !trace_history_value_name(3) = 'using_TDC'
 
       photo_interval = 1000
       profile_interval = 4000
@@ -86,10 +79,10 @@
       terminal_interval = 4000
 
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
             
@@ -99,8 +92,8 @@
       !max_number_retries = 0
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
-      stop_for_bad_nums = .true.
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
@@ -165,9 +158,9 @@
 
 &pgstar
 
-    pause = .true.
+    !pause = .true.
     !pause_interval = 100
-    pgstar_interval = 1 ! 25
+    pgstar_interval = 25
 
  ! window 1
 
@@ -206,7 +199,7 @@
     Profile_Panels2_xaxis_name = 'zone'
     Profile_Panels2_xaxis_reversed = .true.
     Profile_Panels2_xmin = 5
-    Profile_Panels2_xmax = 300
+    Profile_Panels2_xmax = -101
 
          Profile_Panels2_yaxis_name(4) = 'Lc_div_L'     
   

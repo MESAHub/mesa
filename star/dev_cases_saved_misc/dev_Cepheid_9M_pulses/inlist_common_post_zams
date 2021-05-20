@@ -17,6 +17,9 @@
    read_extra_controls_inlist1 = .true.
    extra_controls_inlist1_name = 'inlist_common'
 
+! atm
+   use_momentum_outer_BC = .true.
+
 ! mlt
 
    use_other_alpha_mlt = .true. ! implemented in run_star_extras

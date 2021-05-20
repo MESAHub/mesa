@@ -24,11 +24,11 @@
     overshoot_scheme(2) = 'none'
 
 ! timesteps
-!  RSP_max_dt_times_min_dr_div_cs = 2d0
+   RSP_max_dt_times_min_dr_div_cs = 2d0
    dt_div_min_dr_div_cs_limit = 1d0
-   !dt_div_min_dr_div_cs_hard_limit = 4d0
+   dt_div_min_dr_div_cs_hard_limit = 4d0
 
-!  RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
+   RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.5d0
    
    min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
@@ -39,9 +39,7 @@
 ! mesh controls   
    okay_to_remesh = .false.
 
-
 ! solver
-
    set_rho_to_dm_div_dV = .false.
    
    use_Pvsc_art_visc = .true.

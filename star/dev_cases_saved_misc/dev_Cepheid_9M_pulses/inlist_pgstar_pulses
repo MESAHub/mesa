@@ -183,7 +183,7 @@
          Profile_Panels2_ymin(6) = -101D0 ! 
          Profile_Panels2_other_yaxis_name(6) = 'log_dt_cs_div_dr' 
          Profile_Panels2_other_ymax(6) = -101D0
-         Profile_Panels2_other_ymin(6) = 0
+         Profile_Panels2_other_ymin(6) = -1
          
 
          Profile_Panels2_file_flag = .false.
