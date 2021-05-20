@@ -14,7 +14,7 @@
    ! Select whether to use the PC eos.
    ! ::
 
-   use_PC = .true.
+   use_PC = .false.
 
    ! mass_fraction_limit_for_PC
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -175,7 +175,7 @@
    ! Select whether to use the Skye EOS. (EXPERIMENTAL)
    ! ::
 
-   use_Skye = .false.
+   use_Skye = .true.
 
    ! mass_fraction_limit_for_Skye
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
