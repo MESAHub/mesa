@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# uncomment the following line to run all parts of the test
-# MESA_RUN_OPTIONAL=t
+# uncomment the following line to skip the optional inlists
+# MESA_SKIP_OPTIONAL=t
 
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
@@ -10,22 +10,28 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-# set MESA_RUN_OPTIONAL to run all parts of test
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+# set MESA_SKIP_OPTIONAL to skip parts of the test
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
     cp standard_zams.mod zams.mod
 else
     do_one inlist_zams_header zams.mod
     cp zams.mod standard_zams.mod
 fi
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
     cp standard_agb.mod agb.mod
 else
     do_one inlist_to_agb_header agb.mod 
     cp agb.mod standard_agb.mod
 fi
 
-do_one inlist_c_burn_header c_burn.mod
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+    cp standard_c_burn.mod c_burn.mod
+else
+    do_one inlist_c_burn_header c_burn.mod
+    cp c_burn.mod standard_c_burn.mod
+fi
+
 do_one inlist_o_ne_wd_header o_ne_wd.mod
 do_one inlist_settle_envelope_header settled_envelope.mod
 

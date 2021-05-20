@@ -12,6 +12,11 @@ Backwards-incompatible changes
 
 ``saved_model_name`` has been replaced with ``load_model_filename`` everywhere 
 
+Thermohaline option ``'Brown_Garaud_Stellmach_13'`` was not correctly implemented in MESA/star and has been removed.
+
+Removed option `semiconvection_upper_limit_center_h1`. This can be implemented by setting `s% alpha_semiconvection` in `run_star_extras.f90/extras_start_step`.
+
+Removed profile columns `total_energy` and `total_energy_integral`.
 
 Module-level changes
 --------------------
@@ -159,8 +164,10 @@ The call signature of other_neu has changed. You no longer need to pass in z2bar
 net
 ~~~
 
-The screening mode ``classic_screening`` has been removed. Anyeone using other_net_get needs
+The screening mode ``classic_screening`` has been removed. Anyone using other_net_get needs
 to remove ``theta_e_for_graboske_et_al`` from its argument list.
+
+The options ``reuse_rate_raw`` and  ``reuse_rate_screened`` have been removed from other_net_get (and eval_net)
 
 
 Other changes

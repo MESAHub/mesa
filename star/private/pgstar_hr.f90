@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -89,10 +89,10 @@
             ! approximate edges
             
             ! blue edge
-            logT1 = 3.7
+            logT1 = 3.67
             logL1 = 5.5
             
-            logT2 = 3.83
+            logT2 = 3.8
             logL2 = 2.4
             
             call pgsci(clr_Blue)
@@ -100,10 +100,10 @@
             call pgdraw(logT2, logL2)
             
             ! red edge
-            logT1 = 3.6
+            logT1 = 3.57
             logL1 = 5.5
             
-            logT2 = 3.77
+            logT2 = 3.74
             logL2 = 2.4
             
             call pgsci(clr_FireBrick)

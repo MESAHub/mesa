@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012  Bill Paxton
+!   Copyright (C) 2012  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -43,7 +43,7 @@
             x, temp, log10temp, rho, log10rho,  &
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
             rate_factors, weak_rate_factor, &
-            reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
+            reaction_Qs, reaction_neuQs, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode, &
@@ -70,7 +70,6 @@
          real(dp), intent(in) :: weak_rate_factor
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         logical, intent(in) :: reuse_rate_raw, reuse_rate_screened ! if true. use given rate_screened
          real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after subtract reaction neutrinos
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
@@ -90,7 +89,7 @@
             x, temp, log10temp, rho, log10rho,  &
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
             rate_factors, weak_rate_factor, &
-            reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
+            reaction_Qs, reaction_neuQs, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode, &

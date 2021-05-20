@@ -1,0 +1,24 @@
+this test case allows you to simultaneously run RSP2 and TDC starting from same model and comparing step-by-step
+
+inlist_common: specifies the starting (RSP) model and other shared controls such as max_timestep or force_timestep.
+
+inlist_multi_stars_job: star1 = rsp2, star2 = tdc. also has info for restarts. << note: do not do ./re
+
+inlist_rsp2_Cepheid: load_saved_model_for_RSP2, RSP2 parameters, photos1 and LOGS1
+
+inlist_tdc_Cepheid: load_saved_model, TDC parameters, photos2 and LOGS2, controls for tests and pgstar.
+   option to resynchronize at each step
+   option to stop if find large diff in vc
+
+inlist_pgstar: edit to select option for showing profile comparisons, vals, diffs, or rel diffs
+
+run_star_extras: extra_history_columns and extra_profile_columns for comparisons
+   option to debugging checks to flag large differences
+
+for debugging may want to add profiles for special values that are not saved in star_info
+   edit the RSP2 and TDC code to save the values in xtra1_array, ..., xtra6_array
+   then access those in extra_profile_columns so can show them in pgstar.
+   
+
+
+ 

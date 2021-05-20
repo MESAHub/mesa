@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -469,12 +469,20 @@
 
          subroutine do_extra_col(pass, j, col_offset)
             integer, intent(in) :: pass, j, col_offset
+            integer :: int_val
+            include 'formats'
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') j + col_offset
             else if (pass == 2) then
                call do_name(j + col_offset, extra_col_names(j))
             else if (pass == 3) then
-               call do_val(j + col_offset, extra_col_vals(j))
+               int_val = int(extra_col_vals(j))
+               if (abs(extra_col_vals(j) - dble(int_val)) < &
+                     1d-10*max(1d-10,abs(extra_col_vals(j)))) then
+                  call do_int_val(j + col_offset, int_val)
+               else
+                  call do_val(j + col_offset, extra_col_vals(j))
+               end if
             end if
          end subroutine do_extra_col
 
@@ -1184,7 +1192,7 @@
             m_div_h = chem_M_div_h(s% X(k),s% Z(k),s% job% initial_zfracs)
             if (k > 0) then
                i = c - log_lum_band_offset
-               val = get_lum_band_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_lum_band_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, s% photosphere_L, ierr)
                if (ierr /= 0) return
             end if
@@ -1196,7 +1204,7 @@
             if (k > 0) then
                i = c - lum_band_offset
                !val = get_lum_band_by_id(i,safe_log10(s% T(k)),safe_log10(s% grav(k)),m_div_h,s% L(k)/lsun, ierr)
-               val = get_lum_band_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_lum_band_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, s% photosphere_L, ierr)
                val=val*lsun
                if (ierr /= 0) return
@@ -1208,7 +1216,7 @@
             if (k > 0) then
                i = c - abs_mag_offset
                !val = get_abs_mag_by_id(i,safe_log10(s% T(k)),safe_log10(s% grav(k)),m_div_h,s% L(k)/lsun, ierr)
-               val = get_abs_mag_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_abs_mag_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, s% photosphere_L, ierr)
                if (ierr /= 0) return
             end if
@@ -1219,7 +1227,7 @@
             if (k > 0) then
                i = c - bc_offset
                !val = get_bc_by_id(i,safe_log10(s% T(k)),safe_log10(s% grav(k)),m_div_h, ierr)
-               val = get_bc_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_bc_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, ierr)
                if (ierr /= 0) return
             end if
@@ -1292,7 +1300,7 @@
             case(h_log_dt)
                val = safe_log10(s% time_step)
             case(h_time_step_sec)
-               val = s% time_step*secyer
+               val = s% dt
             case(h_log_dt_sec)
                val = safe_log10(s% time_step*secyer)
             case(h_time_step_days)
@@ -1823,6 +1831,8 @@
                val = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             case(h_v_surf_div_escape_v)
                val = v_surf/sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
+            case(h_v_div_vesc)
+               val = v_surf/sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             case(h_v_surf_km_s)
                val = v_surf*1d-5
             case(h_v_surf)
@@ -1942,7 +1952,7 @@
             case(h_center_non_nuc_neu)
                val = s% center_non_nuc_neu
             case(h_center_gamma)
-               val = s% center_gamma
+               val = center_value(s, s% gam)
             case(h_center_zbar)
                val = s% center_zbar
             case(h_center_abar)

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2018-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -49,7 +49,7 @@
       ! L_rad_start = (-d_P_rad/dm_bar*clight*area^2/<opacity_face>)_start
       subroutine do1_alt_dlnT_dm_eqn(s, k, nvar, ierr)
          use eos_def
-         use star_utils, only: save_eqn_residual_info
+         use star_utils, only: save_eqn_residual_info, get_face_weights
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
@@ -78,8 +78,7 @@
 
          dbg = .false.
 
-         alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-         beta = 1d0 - alfa
+         call get_face_weights(s, k, alfa, beta)
 
          scale = s% energy_start(k)*s% rho_start(k)
          dm_bar = s% dm_bar(k)

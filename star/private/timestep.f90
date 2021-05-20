@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -2147,6 +2147,7 @@
          !write(*,2) 'log min_dr_div_cs, q, m', s% Tlim_dt_div_min_dr_div_cs_cell, &
          !   safe_log10(dt_x), s% q(s% Tlim_dt_div_min_dr_div_cs_cell), s% m(s% Tlim_dt_div_min_dr_div_cs_cell)/Msun
          ratio = dt/dt_x
+         !write(*,3) 'dt/dx_x log', s% Tlim_dt_div_min_dr_div_cs_cell, s% model_number, ratio, safe_log10(ratio)
          check_dt_div_min_dr_div_cs = check_change(s, ratio, &
             s% dt_div_min_dr_div_cs_limit, s% dt_div_min_dr_div_cs_hard_limit, &
             s% Tlim_dt_div_min_dr_div_cs_cell, 'dt_div_min_dr_div_cs', &
@@ -2219,7 +2220,6 @@
 
          s% dX_nuc_drop_max_j = max_j
          s% dX_nuc_drop_max_k = max_k
-         s% dX_nuc_drop_max_drop = max_dx_nuc_drop
          
          contains
 

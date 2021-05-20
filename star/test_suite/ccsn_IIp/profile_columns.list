@@ -83,7 +83,7 @@
    log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
    rho
    gamma1
-   conv_mixing_type ! mixing types are defined in mesa/const
+   mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    log_csound
    acoustic_depth
@@ -91,8 +91,6 @@
    log_dr_div_cs
    log_cell_collapse_time
    total_energy
-   total_energy_integral ! total from surface inward. negative if bound. (ergs)
-   total_energy_integral_outward
    
    velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s

@@ -101,8 +101,6 @@
       real(dp), pointer :: chiRho(:) ! dlnPeos_dlnRho at constant T
       real(dp), pointer :: chiT(:) ! dlnPeos_dlnT at constant Rho
       real(dp), pointer :: QQ(:) ! thermal expansion coefficient
-      real(dp), pointer :: d_QQ_dlnd(:)
-      real(dp), pointer :: d_QQ_dlnT(:)
 
       ! eos blend information
       real(dp), pointer :: eos_frac_OPAL_SCVH(:)
@@ -135,7 +133,6 @@
       real(dp), pointer :: entropy(:) ! NOTE: kerg/baryon units
       real(dp), pointer :: grav(:) ! uses gravitational mass
       real(dp), pointer :: tau(:) ! optical depth at cell outer boundary
-      real(dp), pointer :: lntau(:) ! log(tau)
       real(dp), pointer :: dr_div_csound(:) ! sound crossing time for cell
 
       real(dp), pointer :: ergs_error(:)
@@ -143,10 +140,6 @@
       real(dp), pointer :: gradr_factor(:)
 
       real(dp), pointer :: rmid(:) ! radius at center by mass (cm)
-      real(dp), pointer :: drmid_dlnR00(:) ! partial of rmid(k) wrt lnR(k)
-      real(dp), pointer :: drmid_dlnRp1(:) ! partial of rmid(k) wrt lnR(k+1)
-      real(dp), pointer :: drmid2_dlnR00(:) ! partial of rmid(k)^2 wrt lnR(k)
-      real(dp), pointer :: drmid2_dlnRp1(:) ! partial of rmid(k)^2 wrt lnR(k+1)
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
@@ -304,9 +297,6 @@
       real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
       real(dp) :: d_vc_dv
    
-      ! drag
-      real(dp), pointer :: dvdt_drag(:)
-      real(dp), pointer :: eps_drag(:)
       
       ! gravitational constant (can be set by user and can be vary within model)
       real(dp), pointer :: cgrav(:)      
@@ -338,11 +328,7 @@
       real(dp), pointer, dimension(:,:) :: prev_mesh_xh ! (nvar_hydro,prev_mesh_nz)
       real(dp), pointer, dimension(:,:) :: prev_mesh_xa ! (species,prev_mesh_nz)
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
-         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_nu_ST, &
-         prev_mesh_D_ST, prev_mesh_D_DSI, prev_mesh_D_SH, &
-         prev_mesh_D_SSI, prev_mesh_D_ES, prev_mesh_D_GSF, &
-         prev_mesh_D_mix, prev_mesh_D_omega, prev_mesh_am_nu_rot, &
-         prev_mesh_conv_vel, prev_mesh_cv, prev_mesh_dq, prev_mesh_mlt_vc
+         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
 
@@ -387,10 +373,6 @@
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
          
          
-         real(dp), pointer :: d_gradT_dln_cvpv0(:) ! when conv_vel_flag is true
-         real(dp), pointer :: d_gradT_dw_div_wc(:) ! when w_div_wc_flag is true
-         real(dp), pointer :: d_gradr_dw_div_wc(:) ! when w_div_wc_flag is true
-         
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
       ! Convective turbulent velocity w -- when RSP2_flag is true
@@ -408,13 +390,7 @@
 
          real(dp), pointer, dimension(:) :: &
             Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
-            Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &               
-            d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
-               d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
-            d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
-               d_Y_face_dlndm1, d_Y_face_dlnTm1, &
-            d_PII_dlnR, d_PII_dlnd00, d_PII_dlnT00, &
-               d_PII_dlndm1, d_PII_dlnTm1, &
+            Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &           
             Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
                d_Chi_dv00, d_Chi_dvp1, d_Chi_dlnR00, d_Chi_dlnRp1, &
             f_Edd
@@ -640,36 +616,10 @@
       real(dp) :: power_z_burn_old
       real(dp) :: power_photo_old
       
-      ! power for each category
-      real(dp) :: power_PP
-      real(dp) :: power_CNO
-      real(dp) :: power_tri_alpha
-      real(dp) :: power_c_alpha
-      real(dp) :: power_n_alpha
-      real(dp) :: power_o_alpha
-      real(dp) :: power_ne_alpha
-      real(dp) :: power_na_alpha
-      real(dp) :: power_mg_alpha
-      real(dp) :: power_si_alpha
-      real(dp) :: power_s_alpha
-      real(dp) :: power_ar_alpha
-      real(dp) :: power_ca_alpha
-      real(dp) :: power_ti_alpha
-      real(dp) :: power_cr_alpha
-      real(dp) :: power_fe_co_ni
-      real(dp) :: power_c12_c12
-      real(dp) :: power_c12_o16
-      real(dp) :: power_o16_o16
-      real(dp) :: power_pnhe4
-      real(dp) :: power_ni56_co56
-      real(dp) :: power_co56_fe56
-      real(dp) :: power_other
-      
       
       ! surface       
       real(dp) :: L_surf ! (Lsun) -- depends on control tau_for_L_surf
          ! if tau_for_L_surf > 0, then is optical depth to set L_surf; else use L_surf = L(1)
-      real(dp) :: log_L_surf ! log10(L_surf)
       real(dp) :: v_surf ! (cm/second)
       real(dp) :: Lrad_div_Ledd_avg_surf
       real(dp) :: w_div_w_crit_avg_surf
@@ -685,10 +635,6 @@
       real(dp) :: T_surf, P_surf ! results from atm
       real(dp) :: log_surface_luminosity ! log10(L_surf)
       real(dp) :: log_surface_radius ! log10(total radius in Rsun units)
-      real(dp) :: log_surface_temperature ! log10(temperature)   ---- note: not necessarily Teff
-      real(dp) :: log_surface_pressure ! log10(pressure)
-      real(dp) :: log_surface_density ! log10(density)
-      real(dp) :: log_surface_gravity ! log10(gravity)
       
       ! fractional abundances by mass near surface
          ! averages over a fraction = 'surface_avg_abundance_dq' of star mass
@@ -722,7 +668,6 @@
       real(dp) :: log_center_pressure ! log10(center pressure in dynes/cm^2)
       real(dp) :: center_degeneracy 
          ! the electron chemical potential in units of k*T
-      real(dp) :: center_gamma 
       real(dp) :: center_abar 
       real(dp) :: center_zbar 
       real(dp) :: center_mu 
@@ -850,8 +795,8 @@
       real(dp) :: dt_start ! dt during first try for step
       
       ! a few things from start of step that will need later
-      real(dp) :: prev_Ledd, starting_T_center, min_dr_div_cs_start, &
-         surf_r_equatorial, surf_opacity, surf_csound, surf_rho, remnant_mass_start
+      real(dp) :: prev_Ledd, starting_T_center, &
+         surf_r_equatorial, surf_csound, surf_rho
    
       ! for solvers
       
@@ -862,11 +807,10 @@
          real(dp), pointer :: xa_start(:,:) ! (species,nz)         
          real(dp), pointer :: xa_sub_xa_start(:,:) ! (species,nz)          
          real(dp), pointer :: lnd_start(:) ! (nz)
-         real(dp), pointer :: lnPeos_start(:) ! (nz)
          real(dp), pointer :: Peos_start(:) ! (nz)
+         real(dp), pointer :: lnPeos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)
-         real(dp), pointer :: lnE_start(:) ! (nz)
          real(dp), pointer :: energy_start(:) ! (nz)
          real(dp), pointer :: erad_start(:) ! (nz)
          real(dp), pointer :: egas_start(:) ! (nz)
@@ -878,35 +822,20 @@
          real(dp), pointer :: Hp_face_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
-         real(dp), pointer :: uface_start(:) ! (nz)
          real(dp), pointer :: L_start(:) ! (nz)
-         real(dp), pointer :: L_non_rad_start(:) ! (nz)
-            ! L_non_rad_start is set only if freeze_non_radiative_luminosity is true.
          real(dp), pointer :: r_start(:) ! (nz)
          real(dp), pointer :: rmid_start(:) ! (nz)
          real(dp), pointer :: rho_start(:) ! (nz)
          real(dp), pointer :: omega_start(:) ! (nz)
-         real(dp), pointer :: X_start(:) ! (nz)
-         real(dp), pointer :: Y_start(:) ! (nz)
-         real(dp), pointer :: Z_start(:) ! (nz)
          real(dp), pointer :: ye_start(:) ! (nz)
          real(dp), pointer :: j_rot_start(:) ! (nz)
          real(dp), pointer :: i_rot_start(:) ! (nz)
-         real(dp), pointer :: P_div_rho_start(:)
-         real(dp), pointer :: mass_correction_start(:)
          real(dp), pointer :: dxdt_nuc_start(:,:)
          real(dp), pointer :: luminosity_by_category_start(:,:) ! (num_categories,nz)
-         real(dp), pointer :: scale_height_start(:) ! (nz)
-         real(dp), pointer :: gradT_start(:) ! (nz)
-         real(dp), pointer :: gradL_start(:) ! (nz)
          real(dp), pointer :: grada_start(:) ! (nz)
-         real(dp), pointer :: gradr_start(:) ! (nz)
-         real(dp), pointer :: grada_face_start(:) ! (nz)
          real(dp), pointer :: chiT_start(:) ! (nz)
          real(dp), pointer :: chiRho_start(:) ! (nz)
          real(dp), pointer :: Cp_start(:) ! (nz)
-         real(dp), pointer :: Cv_start(:) ! (nz)
-         real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
          real(dp), pointer :: eta_start(:) ! (nz)
          real(dp), pointer :: T_start(:) ! (nz)
@@ -914,39 +843,25 @@
          real(dp), pointer :: phase_start(:) ! (nz)
          real(dp), pointer :: latent_ddlnT_start(:) ! (nz)
          real(dp), pointer :: latent_ddlnRho_start(:) ! (nz)
-         real(dp), pointer :: abar_start(:) ! (nz)
          real(dp), pointer :: zbar_start(:) ! (nz)
-         real(dp), pointer :: z53bar_start(:) ! (nz)
          real(dp), pointer :: eps_nuc_start(:) ! (nz)
          real(dp), pointer :: non_nuc_neu_start(:) ! (nz)
-         real(dp), pointer :: eta_visc_start(:) ! (nz)
          real(dp), pointer :: alpha_RTI_start(:) ! (nz)
-         real(dp), pointer :: conv_vel_start(:) ! (nz)
          real(dp), pointer :: csound_start(:) ! (nz)
-         real(dp), pointer :: tau_start(:) ! (nz)
          real(dp), pointer :: opacity_start(:) ! (nz)
-         real(dp), pointer :: mlt_mixing_length_start(:)
-         integer, pointer :: mlt_mixing_type_start(:)
-         real(dp), pointer :: mlt_D_start(:) 
-         real(dp), pointer :: mlt_Gamma_start(:) 
-
-         real(dp), pointer :: mlt_cdc_start(:) 
 
          real(dp) :: shock_mass_start ! Msun units like shock_mass
-         real(dp) :: photosphere_opacity_start
          
          ! for Lagrangian time derivatives where k < k_below_just_added
-         real(dp) :: surf_lnT, surf_lnd, surf_lnR, surf_v, surf_lnS
+         real(dp) :: surf_lnS
          integer :: num_surf_revisions
             
          logical :: have_burner_storage
-         integer :: burner_storage_sz_per_thread, burner_num_threads
+         integer :: burner_num_threads
          real(dp), pointer :: burner_storage(:)
             
          real(dp), pointer, dimension(:) :: & ! (nz)
             max_burn_correction, avg_burn_correction
-         real(dp), pointer :: xa_extra1(:,:) ! (species,nz) -- for use by op split
-         real(dp), pointer :: xa_extra2(:,:) ! (species,nz) -- for use by op split
 
          integer :: k_below_const_q
          integer :: k_const_mass
@@ -969,8 +884,6 @@
       
       ! misc other stuff        
 
-         real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
-
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, using_TDC, &
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
@@ -985,7 +898,6 @@
          real(dp) :: angular_momentum_added
          real(dp) :: residual_norm
          real(dp) :: max_residual
-         real(dp) :: max_fixup_for_mix         
          real(dp) :: initial_timestep    
          real(dp) :: initial_L_center
          real(dp) :: initial_R_center
@@ -993,8 +905,6 @@
          real(dp) :: tau_center  
          real(dp) :: super_eddington_wind_mdot
          real(dp) :: min_conv_time_scale, max_conv_time_scale, max_QHSE_time_scale
-
-         integer :: start_H_envelope_base_k
 
          integer :: num_solver_iterations ! for this step
          integer :: num_diffusion_solver_iters
@@ -1096,8 +1006,6 @@
          integer, pointer, dimension(:) :: burn_num_iters
 
          integer :: termination_code
-         integer :: boost_mlt_alfa
-         integer :: burn_nstep_max
          integer :: burn_nfcn_total
          integer :: dX_nuc_drop_max_k
          integer :: dX_nuc_drop_max_j
@@ -1112,23 +1020,16 @@
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          
-         real(dp) :: dVARdot_dVAR
-         real(dp) :: surf_accel_grav_ratio
-         real(dp) :: prev_create_atm_R0_div_R
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
-         real(dp) :: dX_nuc_drop_max_drop
          real(dp) :: solver_test_partials_val, solver_test_partials_dval_dx
 
          ! variation control value for timestep controller
          real(dp) :: dt_limit_ratio_old
       
          ! surface info
-         real(dp) :: v_surf_old ! (cm/second)
          real(dp) :: L_surf_old ! surface luminosity (Lsun units)
          real(dp) :: L_phot_old ! photosphere luminosity (Lsun units)
-         real(dp) :: Lrad_div_Ledd_avg_surf_old
-         real(dp) :: w_div_w_crit_avg_surf_old
          
          ! convection regions
          integer :: n_conv_regions_old
@@ -1138,11 +1039,7 @@
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration
 
          real(dp) :: total_angular_momentum_old
-         real(dp) :: h1_czb_mass_old ! baryonic (Msun)
-         real(dp) :: he_core_mass_old
-         real(dp) :: co_core_mass_old
          real(dp) :: Teff_old
-         real(dp) :: center_eps_nuc_old
 
          ! For eps_mdot  (source term only used when mdot /= 0)
          real(dp), pointer, dimension(:) :: eps_mdot
@@ -1238,7 +1135,6 @@
          
          logical :: using_revised_net_name
          character (len=net_name_len) :: revised_net_name
-         character (len=net_name_len) :: revised_net_name_old
                   
          integer :: num_extra_profile_cols
          character (len=80), pointer :: extra_profile_col_names(:)
@@ -1286,7 +1182,5 @@
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
          
          
-         real(dp) :: revised_max_yr_dt_old
-         real(dp) :: astero_revised_max_yr_dt_old
          
            

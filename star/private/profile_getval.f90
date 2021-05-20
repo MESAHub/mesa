@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -758,7 +758,7 @@
             case (p_tau)
                val = s% tau(k)
             case (p_logtau)
-               val = s% lntau(k)/ln10
+               val = safe_log(s% tau(k))/ln10
             case (p_xtau)
                val = s% tau(nz) - s% tau(k)
             case (p_xlogtau)
@@ -1319,17 +1319,12 @@
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
                val = s% conv_vel(k)/s% csound(k)
-            case (p_log_tau_conv_yrs)
-               if (s% conv_vel(k) > 1d-99) then
-                  val = safe_log10(s% mlt_mixing_length(k)/(4*s% conv_vel(k)*secyer))
-               else
-                  val = -99
-               end if
-            case (p_mixing_type)
+
+            case (p_mix_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)
                int_flag = .true.
-            case (p_conv_mixing_type) ! OBSOLETE
+            case (p_mixing_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)
                int_flag = .true.
@@ -1796,12 +1791,16 @@
                   val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
+               else
+                  val = s% mlt_vc(k)/sqrt_2_div_3
                end if               
             case(p_log_w)
                if (s% using_RSP2) then
                   val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
+               else
+                  val = s% mlt_vc(k)/sqrt_2_div_3
                end if    
                val = safe_log10(val)           
             case(p_etrb)
@@ -1831,13 +1830,13 @@
             case(p_Uq)
                if (rsp_or_w) val = s% Uq(k)
             case(p_Lr)
-               if (rsp_or_w) val = s% Lr(k)
+               val = get_Lrad(s,k)
             case(p_Lr_div_L)
-               if (rsp_or_w) val = s% Lr(k)/s% L(k)
+               val = get_Lrad(s,k)/s% L(k)
             case(p_Lc)
-               if (rsp_or_w) val = s% Lc(k)
+               val = get_Lconv(s,k)
             case(p_Lc_div_L)
-               if (rsp_or_w) val = s% Lc(k)/s% L(k)
+               val = get_Lconv(s,k)/s% L(k)
             case(p_Lt)
                if (rsp_or_w) val = s% Lt(k)
             case(p_Lt_div_L)
@@ -1969,12 +1968,6 @@
                end if  
                val = dble(int_val)
                int_flag = .true.
-            case (p_total_energy_integral) ! from surface down to k
-               val = s%total_energy_integral_surface(k)
-            case (p_total_energy_integral_outward) ! from center up to k
-               val = s%total_energy_integral_center(k)
-            case (p_binding) ! from center up to k
-               val = s%total_energy_integral_center(k)
                
             case (p_cell_specific_IE)
                val = s% energy(k)
@@ -2166,6 +2159,10 @@
                      val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_ad(k)%val))
                end if
                
+            case(p_log_dt_div_tau_conv)
+               val = safe_log10(s% dt/max(1d-20,conv_time_scale(s,k)))
+            case(p_dt_div_tau_conv)
+               val = s% dt/max(1d-20,conv_time_scale(s,k))
             case(p_tau_conv)
                val = conv_time_scale(s,k)
             case(p_tau_qhse)

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -95,8 +95,8 @@
             gradT, Y_face, mlt_vc, D, Gamma
          integer, intent(out) :: ierr 
                  
-         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old, alpha_semiconvection, center_h1
-         integer :: iso, old_mix_type, j
+         real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
+         integer :: iso, old_mix_type
          type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
          include 'formats'
          ierr = 0
@@ -115,27 +115,18 @@
          Cp = get_Cp_face(s,k)
          iso = s% dominant_iso_for_thermohaline(k)
          XH1 = s% xa(s% net_iso(ih1),k)
-         alpha_semiconvection = s% alpha_semiconvection
-
-         ! Check if we're using semiconvection
-         j = s% net_iso(ih1)
-         if (j > 0) then
-            center_h1 = center_avg_x(s,j)
-            if (center_h1 > s% semiconvection_upper_limit_center_h1) alpha_semiconvection = 0
-         end if
-
          
          if (s% use_other_mlt_results) then
             call s% other_mlt_results(s% id, k, MLT_option, &
                r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
                iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-               alpha_semiconvection, s% thermohaline_coeff, &
+               s% alpha_semiconvection, s% thermohaline_coeff, &
                mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
          else         
             call Get_results(s, k, MLT_option, &
                r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
                iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-               alpha_semiconvection, s% thermohaline_coeff, &
+               s% alpha_semiconvection, s% thermohaline_coeff, &
                mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
          end if
 
@@ -221,8 +212,6 @@
             using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
                                                                   T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
          end if
-
-
          ! Run through assuming no TDC.         
          if (gradr > gradL) then ! convective
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter
@@ -438,8 +427,18 @@
             ! average convection velocity   C&G 14.86b
             conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
             D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
-            !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80     
-            Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
+            !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80
+            
+            if(Gamma > 0.0_dp .and. Bcubed > 0.0_dp) then
+               Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
+            else if (Gamma < 0.0_dp .and. Bcubed < 0.0_dp) then
+               Zeta = exp(3d0*log(abs(Gamma)) - log(abs(Bcubed))) ! Write this way to avoid log(-1) problems
+                                                                  ! Zeta must be > 0 if both Gamma and Bcubed <0
+                                                                  ! and Gamma^3 < 0 if Gamma < 0
+            else
+               Zeta = 0d0 ! If either Gamma or Bcubed is < 0 then Zeta < 0
+            end if
+
             ! Zeta must be >= 0 and <= 1
             if (is_bad(Zeta%val)) return
             if (Zeta < 0d0) then
@@ -721,6 +720,10 @@
             mixing_type = no_mixing
          end if
          if (k > 0) s% tdc_num_iters(k) = iter          
+         if (k==-50) then
+            write(*,3) 'TDC DAMP w Hp w3', k, s% solver_iter, &
+               s% DAMP(k), Af%val, Hp%val, pow3(Af%val)
+         end if
       end subroutine get_TDC_solution
             
 
@@ -981,8 +984,8 @@
          end if         
          if (k > 0) then ! save for plots
             s% SOURCE(k) = xi0%val*Af%val
-            s% DAMP(k) = -xi2%val*pow2(Af%val)
-            s% DAMPR(k) = -xi1%val*Af%val
+            s% DAMPR(k) = -xi1%val*pow2(Af%val)
+            s% DAMP(k) = -xi2%val*pow3(Af%val)
             s% COUPL(k) = s% SOURCE(k) - s% DAMP(k) - s% DAMPR(k)
          end if
       end function eval_Af
@@ -1091,8 +1094,7 @@
          if (s% thermohaline_option == 'Kippenhahn') then
             ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
             D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
-         else if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13' .or. &
-                  s% thermohaline_option == 'Traxler_Garaud_Stellmach_11') then
+         else if (s% thermohaline_option == 'Traxler_Garaud_Stellmach_11') then
             call get_diff_coeffs(s, &
                K_therm, Cp, rho, T, opacity, iso, XH1, K_T, K_mu, nu)
             R0 = (gradr - grada)/gradL_composition_term

@@ -119,7 +119,6 @@
 
          integer :: num_hydro_merges
          integer :: num_hydro_splits
-         integer :: bad_max_corr_cnt
 
       ! past/future model numbers
          integer :: timestep_hold
@@ -163,6 +162,7 @@
          real(dp) :: total_energy_initial, tau_factor, tau_base
          real(dp) :: force_tau_factor, force_Tsurf_factor, force_opacity_factor
          real(dp) :: revised_max_yr_dt, astero_revised_max_yr_dt
+         real(dp) :: gradT_excess_alpha_old
                 
          logical :: include_binary_history_in_log_file
          logical :: using_revised_max_yr_dt, astero_using_revised_max_yr_dt

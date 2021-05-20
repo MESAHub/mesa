@@ -245,7 +245,7 @@
 
       ! mixing parameters
 
-         real(dp) :: alpha_semiconvection, semiconvection_upper_limit_center_h1
+         real(dp) :: alpha_semiconvection
          real(dp) :: thermohaline_coeff
          character (len=32) :: &
             thermohaline_option, MLT_option, semiconvection_option
@@ -266,6 +266,14 @@
          real(dp) :: &
             gradT_excess_f1, &
             gradT_excess_f2, &
+            gradT_excess_age_fraction, &
+            gradT_excess_max_change, &
+            gradT_excess_lambda1, &
+            gradT_excess_beta1, &
+            gradT_excess_lambda2, &
+            gradT_excess_beta2, &
+            gradT_excess_dlambda, &
+            gradT_excess_dbeta, &
             gradT_excess_max_center_h1, &
             gradT_excess_min_center_he4, &
             gradT_excess_max_logT, &
@@ -318,7 +326,7 @@
             use_other_RSP_linear_analysis, RSP_testing, RSP_use_Prad_for_Psurf, RSP_use_atm_grey_with_kap_for_Psurf, &
             RSP_fixed_Psurf, RSP_hydro_only, RSP_report_undercorrections, RSP_relax_initial_model, &
             use_other_RSP_build_model, RSP_relax_adjust_inner_mass_distribution, RSP_trace_RSP_build_model, &
-            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme
+            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme, RSP_do_check_omega, RSP_report_check_omega_changes
          integer :: RSP_max_num_periods, RSP_max_iters_per_try, RSP_max_retries_per_step, &
             RSP_mode_for_setting_PERIODLIN, RSP_nmodes, &
             RSP_target_steps_per_cycle, RSP_nz_outer, RSP_nz, &
@@ -336,7 +344,7 @@
             RSP_min_PERIOD_div_PERIODLIN, RSP_v_div_cs_threshold_for_dt_limit, RSP_initial_dt_factor, &
             RSP_fraction_1st_overtone, RSP_fraction_2nd_overtone, &
             RSP_max_dt_times_min_dr_div_cs, RSP_tau_surf_for_atm_grey_with_kap, &
-            RSP_min_tau_for_turbulent_flux, RSP_max_dt, &
+            RSP_min_tau_for_turbulent_flux, RSP_max_dt, RSP_min_deltaR_for_periods, &
             RSP_kap_density_factor, RSP_T_anchor_tolerance, RSP_T_inner_tolerance, RSP_relax_dm_tolerance, &
             RSP_max_dt_times_min_rad_diff_time, RSP_Qvisc_linear_static, RSP_dq_1_factor, &
             RSP_surface_tau
@@ -809,7 +817,8 @@
             include_L_in_velocity_time_centering, &
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
-            
+         real(dp) :: P_theta_for_velocity_time_centering, &
+            L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
          real(dp) :: &
@@ -922,10 +931,7 @@
             hydro_mtx_max_allowed_logRho, &
             hydro_mtx_min_allowed_logT, &
             hydro_mtx_min_allowed_logRho, &
-            solver_reduced_min_corr_coeff, &
-            solver_clip_dlogT, &
-            solver_clip_dlogRho, &
-            solver_clip_dlogR
+            solver_reduced_min_corr_coeff
 
          character (len=32) :: hydro_solver_name
 
@@ -1100,6 +1106,7 @@
             dt_div_min_dr_div_cs_limit, &
             dt_div_min_dr_div_cs_hard_limit, &
             min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, &
+            min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit, &
             min_q_for_dt_div_min_dr_div_cs_limit, &
             max_q_for_dt_div_min_dr_div_cs_limit
          integer :: min_k_for_dt_div_min_dr_div_cs_limit

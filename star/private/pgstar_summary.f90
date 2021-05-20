@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -394,7 +394,7 @@
             integer, intent(in) :: col, num_rows
 
             real(dp) :: values(num_rows)
-            integer :: int_values(num_rows), specs(num_rows)
+            integer :: int_values(num_rows), specs(num_rows), int_val
             logical :: is_int_value(num_rows)
             logical :: failed_to_find_value(num_rows)
 
@@ -423,7 +423,14 @@
                            // '. check that it is in your history_columns.list'
                      cycle
                   end if
-                  values(i) = val
+                  int_val = int(val)
+                  if (abs(val - dble(int_val)) < 1d-10*max(1d-10,abs(val))) then
+                     cnt = write_info_line_int(0, ypos, xpos0, dxpos, dxval, &
+                           Text_Summary_name(i,col), int_val)
+                     cycle
+                  else
+                     values(i) = val
+                  end if
                else if (is_int_value(i)) then
                   cnt = write_info_line_int(0, ypos, xpos0, dxpos, dxval, &
                         Text_Summary_name(i,col), int_values(i))

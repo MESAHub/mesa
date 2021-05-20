@@ -73,8 +73,6 @@
    csound ! sound speed
    !csound_at_face ! sound speed
    v_div_csound ! velocity divided by sound speed
-   !total_energy ! v^2/2 - G m / r + E + P / rho (ergs/gm).  negative if bound.
-   !total_energy_integral ! sum from surface inwards of dm*(v^2/2 - G m / r + E + P/rho) (ergs)
    !v_div_r ! velocity divided by radius
    !scale_height ! in Rsun units
    eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
@@ -153,7 +151,6 @@
    !log_extra_L ! log10 integrated from center (Lsun)
    
    !log_irradiation_heat
-   !log_tau_conv_yrs ! timescale for change of conv velocity
    !mlt_mixing_length ! mixing length for mlt (cm)
    mlt_mixing_type ! value returned by mlt
          

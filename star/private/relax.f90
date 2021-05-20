@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -4101,7 +4101,6 @@
 
          if (s% job% pgstar_flag) then
          ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
-         write(*,2) 'after evolve_loop: call update_pgstar_data', s% model_number
             call update_pgstar_data(s, ierr)
             if (ierr /= 0) return
             call do_read_pgstar_controls(s, s% inlist_fname, ierr)

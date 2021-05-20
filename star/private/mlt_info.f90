@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2021  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2021  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -417,15 +417,17 @@
          use star_utils, only: get_Lrad_div_Ledd, after_C_burn
          use chem_def, only: ih1, ihe4
          type (star_info), pointer :: s
-         integer, intent(out) :: ierr         
-         integer :: nz, h1, he4
+         integer, intent(out) :: ierr
+         real(dp) :: beta, lambda, phi, tmp, alpha, alpha2, &
+            beta_limit, lambda1, beta1, lambda2, beta2, dlambda, dbeta
+         integer :: k, k_beta, k_lambda, nz, h1, he4
          include 'formats'
          ierr = 0
-         nz = s% nz
          if (.not. s% okay_to_reduce_gradT_excess) then
             s% gradT_excess_alpha = 0
             return
          end if
+         nz = s% nz
          h1 = s% net_iso(ih1)
          if (h1 /= 0) then
             if (s% xa(h1,nz) > s% gradT_excess_max_center_h1) then
@@ -440,7 +442,84 @@
                return
             end if
          end if
-         s% gradT_excess_alpha = 1d0
+         beta = 1d0 ! beta = min over k of Pgas(k)/Peos(k)
+         k_beta = 0
+         do k=1,nz
+            tmp = s% Pgas(k)/s% Peos(k)
+            if (tmp < beta) then
+               k_beta = k
+               beta = tmp
+            end if
+         end do
+         beta = beta*(1d0 + s% xa(1,nz))
+         s% gradT_excess_min_beta = beta
+         lambda = 0d0 ! lambda = max over k of Lrad(k)/Ledd(k)
+         do k=2,k_beta
+            tmp = get_Lrad_div_Ledd(s,k)
+            if (tmp > lambda) then
+               k_lambda = k
+               lambda = tmp
+            end if
+         end do
+         lambda = min(1d0,lambda)
+         s% gradT_excess_max_lambda = lambda
+         lambda1 = s% gradT_excess_lambda1
+         beta1 = s% gradT_excess_beta1
+         lambda2 = s% gradT_excess_lambda2
+         beta2 = s% gradT_excess_beta2
+         dlambda = s% gradT_excess_dlambda
+         dbeta = s% gradT_excess_dbeta
+         ! alpha is fraction of full boost to apply
+         ! depends on location in (beta,lambda) plane
+         if (lambda1 < 0) then
+            alpha = 1
+         else if (lambda >= lambda1) then
+            if (beta <= beta1) then
+               alpha = 1
+            else if (beta < beta1 + dbeta) then
+               alpha = (beta1 + dbeta - beta)/dbeta
+            else ! beta >= beta1 + dbeta
+               alpha = 0
+            end if
+         else if (lambda >= lambda2) then
+            beta_limit = beta2 + &
+               (lambda - lambda2)*(beta1 - beta2)/(lambda1 - lambda2)
+            if (beta <= beta_limit) then
+               alpha = 1
+            else if (beta < beta_limit + dbeta) then
+               alpha = (beta_limit + dbeta - beta)/dbeta
+            else
+               alpha = 0
+            end if
+         else if (lambda > lambda2 - dlambda) then
+            if (beta <= beta2) then
+               alpha = 1
+            else if (beta < beta2 + dbeta) then
+               alpha = (lambda - (lambda2 - dlambda))/dlambda
+            else ! beta >= beta2 + dbeta
+               alpha = 0
+            end if
+         else ! lambda <= lambda2 - dlambda
+            alpha = 0
+         end if
+         if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
+            s% gradT_excess_alpha = &
+               (1d0 - s% gradT_excess_age_fraction)*alpha + &
+               s% gradT_excess_age_fraction*s% gradT_excess_alpha_old
+            if (s% gradT_excess_max_change > 0d0) then
+               if (s% gradT_excess_alpha > s% gradT_excess_alpha_old) then
+                  s% gradT_excess_alpha = min(s% gradT_excess_alpha, s% gradT_excess_alpha_old + &
+                     s% gradT_excess_max_change)
+               else
+                  s% gradT_excess_alpha = max(s% gradT_excess_alpha, s% gradT_excess_alpha_old - &
+                     s% gradT_excess_max_change)
+               end if
+            end if
+         else
+            s% gradT_excess_alpha = alpha
+         end if
+         if (s% gradT_excess_alpha < 1d-4) s% gradT_excess_alpha = 0d0
+         if (s% gradT_excess_alpha > 0.9999d0) s% gradT_excess_alpha = 1d0
       end subroutine set_gradT_excess_alpha
 
 

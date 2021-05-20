@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011-2019  Bill Paxton, Aaron Dotter, Ed Brown & The MESA Team
+!   Copyright (C) 2011-2019  Aaron Dotter, Ed Brown & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO

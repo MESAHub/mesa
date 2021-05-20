@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-! Copyright (C) 2010 Bill Paxton
+! Copyright (C) 2010 The Mesa Team
 !
 ! MESA is free software; you can use it and/or modify
 ! it under the combined terms and restrictions of the MESA MANIFESTO
@@ -123,7 +123,7 @@
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     mass_depth_for_L_surf, conv_core_gap_dq_limit, &
-    max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC, max_X_for_TDC, max_X_for_gradT_eqn, &
+    max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC, max_X_for_gradT_eqn, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
     
     ! burn zone eps definitions for use in logs and profiles
@@ -138,12 +138,13 @@
     min_convective_gap, min_thermohaline_gap, min_semiconvection_gap, min_thermohaline_dropout, &
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
-    redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, &
-    semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
+    redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, okay_to_reduce_gradT_excess, &
+    semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
     num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
-    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, D_mix_zero_region_top_q, gradT_excess_max_center_h1, &
-    gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
-    use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, &
+   gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, gradT_excess_max_change, gradT_excess_lambda1, &
+   gradT_excess_beta1, gradT_excess_lambda2, gradT_excess_beta2, gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
+   gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
+    use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
     fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
@@ -165,7 +166,7 @@
     calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
     threshold_for_smooth_brunt_B, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
     min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
-    RSP_max_num_periods, RSP_min_max_R_for_periods, &
+    RSP_max_num_periods, RSP_min_max_R_for_periods, RSP_min_deltaR_for_periods, &
     RSP_min_PERIOD_div_PERIODLIN, RSP_report_limit_dt, RSP_mode_for_setting_PERIODLIN, RSP_initial_dt_factor, &
     RSP_v_div_cs_threshold_for_dt_limit, RSP_max_dt_times_min_dr_div_cs, RSP_thetae, &
     RSP_alfa, RSP_thetaq, RSP_default_PERIODLIN, &
@@ -183,7 +184,7 @@
    RSP_fraction_1st_overtone,RSP_fraction_2nd_overtone, RSP_testing, RSP_use_Prad_for_Psurf, RSP_map_zone_interval, &
    RSP_write_map, RSP_map_filename, RSP_map_history_filename, RSP_map_first_period, RSP_map_last_period, &
    use_other_RSP_build_model, RSP_Psurf, RSP_work_period, RSP_work_filename, RSP_nmodes, RSP_surface_tau, &
-   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, &
+   set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, RSP_do_check_omega, RSP_report_check_omega_changes, &
     RSP_relax_initial_model, RSP_trace_RSP_build_model, &
    RSP_GREKM_avg_abs_limit, RSP_GREKM_avg_abs_frac_new, RSP_kap_density_factor, RSP_map_columns_filename, &
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
@@ -351,6 +352,7 @@
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
+    P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
     conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, compare_TDC_to_MLT, &
@@ -384,7 +386,6 @@
     min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
     hydro_mtx_max_allowed_logRho, report_min_rcond_from_DGESXV, &
     hydro_mtx_min_allowed_logT, hydro_mtx_min_allowed_logRho, use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX, &
-    solver_clip_dlogT, solver_clip_dlogRho, solver_clip_dlogR, &
     op_split_burn, op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
     op_split_burn_min_T_for_variable_T_solver, solver_test_partials_show_dx_var_name, &
     tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
@@ -422,7 +423,7 @@
     solver_iters_timestep_limit, burn_steps_limit, burn_steps_hard_limit, &
     diffusion_steps_limit, diffusion_steps_hard_limit, diffusion_iters_limit, diffusion_iters_hard_limit, &
     dt_div_dt_cell_collapse_limit, dt_div_dt_cell_collapse_hard_limit, &
-    dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, &
+    dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
     min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, check_remnant_only_for_dt_div_min_dr_div_cs_limit, &
     dX_mix_dist_limit, dH_limit_min_H, dH_limit, dH_hard_limit, dH_div_H_limit_min_H, &
@@ -1052,7 +1053,6 @@
  s% redo_conv_for_dr_lt_mixing_length = redo_conv_for_dr_lt_mixing_length
 
  s% alpha_semiconvection = alpha_semiconvection
- s% semiconvection_upper_limit_center_h1 = semiconvection_upper_limit_center_h1
  s% semiconvection_option = semiconvection_option
  s% use_Ledoux_criterion = use_Ledoux_criterion
  s% num_cells_for_smooth_gradL_composition_term = num_cells_for_smooth_gradL_composition_term
@@ -1060,15 +1060,23 @@
  s% clip_D_limit = clip_D_limit
  s% fix_eps_grav_transition_to_grid = fix_eps_grav_transition_to_grid
 
- s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
- s% gradT_excess_f1 = gradT_excess_f1
- s% gradT_excess_f2 = gradT_excess_f2
- s% gradT_excess_max_center_h1 = gradT_excess_max_center_h1
- s% gradT_excess_min_center_he4 = gradT_excess_min_center_he4
- s% gradT_excess_max_logT = gradT_excess_max_logT
- s% gradT_excess_min_log_tau_full_on = gradT_excess_min_log_tau_full_on
- s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
- 
+s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
+s% gradT_excess_f1 = gradT_excess_f1
+s% gradT_excess_f2 = gradT_excess_f2
+s% gradT_excess_age_fraction = gradT_excess_age_fraction
+s% gradT_excess_max_change = gradT_excess_max_change
+s% gradT_excess_lambda1 = gradT_excess_lambda1
+s% gradT_excess_beta1 = gradT_excess_beta1
+s% gradT_excess_lambda2 = gradT_excess_lambda2
+s% gradT_excess_beta2 = gradT_excess_beta2
+s% gradT_excess_dlambda = gradT_excess_dlambda
+s% gradT_excess_dbeta = gradT_excess_dbeta
+s% gradT_excess_max_center_h1 = gradT_excess_max_center_h1
+s% gradT_excess_min_center_he4 = gradT_excess_min_center_he4
+s% gradT_excess_max_logT = gradT_excess_max_logT
+s% gradT_excess_min_log_tau_full_on = gradT_excess_min_log_tau_full_on
+s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
+
  s% D_mix_zero_region_bottom_q = D_mix_zero_region_bottom_q
  s% D_mix_zero_region_top_q = D_mix_zero_region_top_q
  s% dq_D_mix_zero_at_H_He_crossover = dq_D_mix_zero_at_H_He_crossover
@@ -1157,6 +1165,7 @@
    s% RSP_max_num_periods = RSP_max_num_periods
    s% RSP_target_steps_per_cycle = RSP_target_steps_per_cycle
    s% RSP_min_max_R_for_periods = RSP_min_max_R_for_periods
+   s% RSP_min_deltaR_for_periods = RSP_min_deltaR_for_periods
    s% RSP_default_PERIODLIN = RSP_default_PERIODLIN
    s% RSP_min_PERIOD_div_PERIODLIN = RSP_min_PERIOD_div_PERIODLIN
    s% RSP_GREKM_avg_abs_frac_new = RSP_GREKM_avg_abs_frac_new
@@ -1235,6 +1244,8 @@
    s% RSP_relax_dm_tolerance = RSP_relax_dm_tolerance
    s% RSP_dq_1_factor = RSP_dq_1_factor
    s% use_RSP_new_start_scheme = use_RSP_new_start_scheme
+   s% RSP_do_check_omega = RSP_do_check_omega
+   s% RSP_report_check_omega_changes = RSP_report_check_omega_changes
    s% RSP_nz = RSP_nz
    s% RSP_T_anchor = RSP_T_anchor
    s% RSP_T_inner = RSP_T_inner
@@ -1851,6 +1862,8 @@
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
  s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
  s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
+ s% P_theta_for_velocity_time_centering = P_theta_for_velocity_time_centering
+ s% L_theta_for_velocity_time_centering = L_theta_for_velocity_time_centering
 
  s% RTI_A = RTI_A
  s% RTI_B = RTI_B
@@ -1967,10 +1980,6 @@
  s% hydro_mtx_max_allowed_logRho = hydro_mtx_max_allowed_logRho
  s% hydro_mtx_min_allowed_logT = hydro_mtx_min_allowed_logT
  s% hydro_mtx_min_allowed_logRho = hydro_mtx_min_allowed_logRho
-
- s% solver_clip_dlogT = solver_clip_dlogT
- s% solver_clip_dlogRho = solver_clip_dlogRho
- s% solver_clip_dlogR = solver_clip_dlogR
  
  s% use_DGESVX_in_bcyclic = use_DGESVX_in_bcyclic
  s% use_equilibration_in_DGESVX = use_equilibration_in_DGESVX
@@ -2063,7 +2072,6 @@
  s% alpha_TDC_DAMP = alpha_TDC_DAMP
  s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
  s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
- s% max_X_for_TDC = max_X_for_TDC
  s% max_X_for_gradT_eqn = max_X_for_gradT_eqn
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
 
@@ -2154,6 +2162,7 @@
  s% dt_div_min_dr_div_cs_hard_limit = dt_div_min_dr_div_cs_hard_limit
  
  s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+ s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
  s% min_k_for_dt_div_min_dr_div_cs_limit = min_k_for_dt_div_min_dr_div_cs_limit
  s% min_q_for_dt_div_min_dr_div_cs_limit = min_q_for_dt_div_min_dr_div_cs_limit
  s% max_q_for_dt_div_min_dr_div_cs_limit = max_q_for_dt_div_min_dr_div_cs_limit
@@ -2730,7 +2739,6 @@
  redo_conv_for_dr_lt_mixing_length = s% redo_conv_for_dr_lt_mixing_length
 
  alpha_semiconvection = s% alpha_semiconvection
- semiconvection_upper_limit_center_h1 = s% semiconvection_upper_limit_center_h1
  semiconvection_option = s% semiconvection_option
  use_Ledoux_criterion = s% use_Ledoux_criterion
  num_cells_for_smooth_gradL_composition_term = s% num_cells_for_smooth_gradL_composition_term
@@ -2746,6 +2754,12 @@
  gradT_excess_max_logT = s% gradT_excess_max_logT
  gradT_excess_min_log_tau_full_on = s% gradT_excess_min_log_tau_full_on
  gradT_excess_max_log_tau_full_off = s% gradT_excess_max_log_tau_full_off
+ gradT_excess_lambda1 = s% gradT_excess_lambda1
+ gradT_excess_beta1 = s% gradT_excess_beta1
+ gradT_excess_lambda2 = s% gradT_excess_lambda2
+ gradT_excess_beta2 = s% gradT_excess_beta2
+ gradT_excess_dlambda = s% gradT_excess_dlambda
+ gradT_excess_dbeta = s% gradT_excess_dbeta
  
  D_mix_zero_region_bottom_q = s% D_mix_zero_region_bottom_q
  D_mix_zero_region_top_q = s% D_mix_zero_region_top_q
@@ -2834,6 +2848,7 @@
    RSP_max_num_periods = s% RSP_max_num_periods
    RSP_target_steps_per_cycle = s% RSP_target_steps_per_cycle
    RSP_min_max_R_for_periods = s% RSP_min_max_R_for_periods
+   RSP_min_deltaR_for_periods = s% RSP_min_deltaR_for_periods
    RSP_default_PERIODLIN = s% RSP_default_PERIODLIN
    RSP_min_PERIOD_div_PERIODLIN = s% RSP_min_PERIOD_div_PERIODLIN
    RSP_GREKM_avg_abs_frac_new = s% RSP_GREKM_avg_abs_frac_new
@@ -2912,6 +2927,8 @@
    RSP_relax_dm_tolerance = s% RSP_relax_dm_tolerance
    RSP_dq_1_factor = s% RSP_dq_1_factor
    use_RSP_new_start_scheme = s% use_RSP_new_start_scheme
+   RSP_do_check_omega = s% RSP_do_check_omega
+   RSP_report_check_omega_changes = s% RSP_report_check_omega_changes
    RSP_nz = s% RSP_nz
    RSP_T_anchor = s% RSP_T_anchor
    RSP_T_inner = s% RSP_T_inner
@@ -3518,6 +3535,8 @@
  steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
  include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
+ P_theta_for_velocity_time_centering = s% P_theta_for_velocity_time_centering
+ L_theta_for_velocity_time_centering = s% L_theta_for_velocity_time_centering
  use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
 
  RTI_A = s% RTI_A
@@ -3635,10 +3654,6 @@
  hydro_mtx_max_allowed_logRho = s% hydro_mtx_max_allowed_logRho
  hydro_mtx_min_allowed_logT = s% hydro_mtx_min_allowed_logT
  hydro_mtx_min_allowed_logRho = s% hydro_mtx_min_allowed_logRho
-
- solver_clip_dlogT = s% solver_clip_dlogT
- solver_clip_dlogRho = s% solver_clip_dlogRho
- solver_clip_dlogR = s% solver_clip_dlogR
  
  use_DGESVX_in_bcyclic = s% use_DGESVX_in_bcyclic
  use_equilibration_in_DGESVX = s% use_equilibration_in_DGESVX
@@ -3731,7 +3746,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  alpha_TDC_DAMP = s% alpha_TDC_DAMP
  alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
  alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
- max_X_for_TDC = s% max_X_for_TDC
  max_X_for_gradT_eqn = s% max_X_for_gradT_eqn
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
 
@@ -3822,6 +3836,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  dt_div_min_dr_div_cs_hard_limit = s% dt_div_min_dr_div_cs_hard_limit
  
  min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+ min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
  min_k_for_dt_div_min_dr_div_cs_limit = s% min_k_for_dt_div_min_dr_div_cs_limit
  min_q_for_dt_div_min_dr_div_cs_limit = s% min_q_for_dt_div_min_dr_div_cs_limit
  max_q_for_dt_div_min_dr_div_cs_limit = s% max_q_for_dt_div_min_dr_div_cs_limit

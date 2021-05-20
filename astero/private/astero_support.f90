@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton & The MESA Team
+!   Copyright (C) 2013  The MESA Team
 !
 !   this file is part of mesa.
 !

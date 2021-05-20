@@ -1,6 +1,6 @@
  ! ***********************************************************************
 !
-!   Copyright (C) 2012-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2012-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -105,6 +105,7 @@
          s% L_phot_old = s% L_phot
          s% L_surf_old = s% L_surf
          s% dt_limit_ratio_old = s% dt_limit_ratio
+         s% gradT_excess_alpha_old = s% gradT_excess_alpha
 
          do i = 1, s% len_extra_work
             s% extra_work_old(i) = s% extra_work(i)
@@ -175,6 +176,7 @@
          s% L_phot = s% L_phot_old
          s% L_surf = s% L_surf_old
          s% dt_limit_ratio = s% dt_limit_ratio_old
+         s% gradT_excess_alpha = s% gradT_excess_alpha_old
 
          do i = 1, s% len_extra_work
             s% extra_work(i) = s% extra_work_old(i)

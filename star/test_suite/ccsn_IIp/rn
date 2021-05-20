@@ -13,7 +13,7 @@ do_one inlist_edep_header done_with_edep.mod LOGS_part_edep
 do_one inlist_shock_part1_header shock_part1.mod LOGS_part1
 
 # check if can skip shock_part2
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_shock_part2.mod shock_part2.mod
 else
    do_one inlist_shock_part2_header shock_part2.mod LOGS_part2
@@ -21,7 +21,7 @@ else
 fi
 
 # check if can skip shock_part3
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_shock_part3.mod shock_part3.mod
 else
    do_one inlist_shock_part3_header shock_part3.mod LOGS_part3

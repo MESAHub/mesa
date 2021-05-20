@@ -10,13 +10,13 @@ Essential
 MESA_DIR
 ~~~~~~~~
 
-Location of the mesa source code.
+Location of the MESA source code.
 
 
 GYRE_DIR
 ~~~~~~~~
 
-Location of the gyre source code (only needed if running gyre).  If
+Location of the GYRE source code (only needed if running GYRE).  If
 you haven't moved it from the MESA_DIR then set as ``GYRE_DIR =
 $MESA_DIR/gyre/gyre``.
 
@@ -51,7 +51,7 @@ See star_job.defaults cache directories for more details.
 MESA_TEMP_CACHES_DIR
 ~~~~~~~~~~~~~~~~~~~~
 
-Location where mesa will write the cache file temporarily before moving to
+Location where MESA will write the cache file temporarily before moving to
 MESA_CACHES_DIR. If set, this folder MUST be unique for each
 MESA run. If not set defaults to ``./.mesa_temp_cache``.
 
@@ -80,6 +80,13 @@ If set, this shell variable will override the inlist variable ``pgstar_flag''.
 If set to either ``true`` or ``TRUE`` MESA will act as if the user had set ``pgstar_flag=.true.`` in their inlist.
 If set to either ``false`` or ``FALSE`` MESA will act as if the user had set ``pgstar_flag=.false.`` in their inlist.
 If set to anything else (or not set at all) MESA will use the value as set in the inlists.
+
+
+MESA_SKIP_OPTIONAL
+~~~~~~~~~~~~~~~~~~
+
+If set then when running a test_suite case skip certain optional inlists. If not set, then run all inlists.
+
 
 
 Misc
@@ -132,7 +139,7 @@ MESA_ERROR_BACKTRACE_DISABLE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If set disables the generation of backtraces when we call mesa_error()
-this is mostly helpful on macs as they don't generate useful backtraces.
+this is mostly helpful on Macs as they don't generate useful backtraces.
 
 
 MESA_FPE_CHECKS_ON

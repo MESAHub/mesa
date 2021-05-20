@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -1136,12 +1136,10 @@
          integer :: ierr
          logical :: file_exists
          stop_is_requested = .false.
+         if (mod(s% model_number,100) /= 0) return
          if (len_trim(s% job% stop_if_this_file_exists) == 0) return
-
          inquire(file=trim(s% job% stop_if_this_file_exists), exist=file_exists)
-
          if (.not. file_exists) return
-
          write(*,*) 'stopping because found file ' // &
             trim(s% job% stop_if_this_file_exists)
          stop_is_requested = .true.
@@ -1818,6 +1816,11 @@
             write(*,*)
             call star_read_RSP_model(id, s% job% load_model_filename, ierr)
             if (failed('star_read_RSP_model',ierr)) return
+         else if (s% job% load_saved_model_for_RSP2) then
+            write(*,'(a)') 'load saved model for RSP2 ' // trim(s% job% load_model_filename)
+            write(*,*)
+            call star_read_RSP2_model(id, s% job% load_model_filename, ierr)
+            if (failed('star_read_RSP2_model',ierr)) return
          else if (s% job% load_saved_model) then
             if (s% job% create_merger_model) then
                write(*,*) 'you have both load_saved_model and create_merger_model set true'
@@ -1861,6 +1864,10 @@
          else if (s% job% create_RSP_model) then
             if (.not. restart) write(*, *) 'create initial RSP model'
             call star_create_RSP_model(id, ierr)
+            if (failed('star_create_RSP_model',ierr)) return
+         else if (s% job% create_RSP2_model) then
+            if (.not. restart) write(*, *) 'create initial RSP2 model'
+            call star_create_RSP2_model(id, ierr)
             if (failed('star_create_RSP_model',ierr)) return
          else if (s% job% create_initial_model) then
             if (.not. restart) write(*, *) 'create initial model'
