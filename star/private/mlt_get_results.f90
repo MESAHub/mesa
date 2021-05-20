@@ -1060,7 +1060,7 @@
       end function unconvert
 
 
-!------------------------------ Thermohaline
+!------------------------------ Thermohaline 
 
       !> Computes the diffusivity of thermohaline mixing when the
       !! thermal gradient is stable and the composition gradient is unstable.
