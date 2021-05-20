@@ -1,11 +1,26 @@
 Coding style
 ============
 
+MESA has been developed over many years, thus there many different styles of code in use. We do not 
+require old code to be ported to the new style. However, new code should be written following thes guidelines.
+
+
+Whitespace
+----------
+
 In free form Fortran files, indentation is 3 spaces.
 
 Indentation/whitespace rules are codified in an `EditorConfig`_ file located in the root of the repository (``.editorconfig``).
 
 .. _EditorConfig: https://editorconfig.org/
+
+
+Fortran
+-------
+
+The prefered Fortran version is at least Fortan 90 this enables things like modules and allocatable arrays.
+
+Common and equivalence blocks are banned. Just put the variables in a module header if needed to be shared.
 
 
 Exponents
@@ -42,7 +57,7 @@ The typical way to handle things is:
 
 .. code-block:: fortran
 
-    integer, intent(inout) :: ierr
+    integer, intent(out) :: ierr
     ierr = 0
 
     call my_subroutine(x,ierr)
@@ -161,6 +176,12 @@ The ``const`` module defines many commonly used mathematical
 used for consistency across the code.  This includes simple fractions
 (e.g. ``one_third``) and simple functions of mathematical constants
 (e.g. ``sqrt2``, ``pi4 = 4*pi``).
+
+Constants should be added to const_def.f90 if they meet any of the following criteria:
+
+* If it is a well known mathmatical or physical constant or derived from other well known constants
+
+* If other code might use the constant
 
 
 Environment variables
