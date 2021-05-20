@@ -44,7 +44,6 @@
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
             rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, &
-            reuse_rate_raw, reuse_rate_screened, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode, &
@@ -77,7 +76,6 @@
          real(dp), intent(in) :: weak_rate_factor
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         logical, intent(in) :: reuse_rate_raw, reuse_rate_screened
          real(dp), intent(out) :: eps_nuc ! ergs/gram/second from burning 
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
@@ -99,7 +97,6 @@
          real(dp), dimension(:), pointer :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
-         real(dp), target, dimension(num_rvs, num_isos) :: screen_h1, screen_he4
          integer, parameter :: max_z_for_cache = 14
          real(qp), target :: dydt_a(num_rvs*num_isos)
          real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
@@ -156,13 +153,6 @@
          end if
          T9 = temp*1d-9
          
-         n% screen_h1 => screen_h1
-         n% screen_he4 => screen_he4
-         if (.not. reuse_rate_screened) then 
-            screen_h1(:,:) = 0
-            screen_he4(:,:) = 0
-         end if
-         
          n% reaction_Qs => reaction_Qs
          n% reaction_neuQs => reaction_neuQs
          n% eps_neu_total = 0
@@ -188,7 +178,6 @@
             screening_mode, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            reuse_rate_raw, reuse_rate_screened, &
             iwork, ierr) ! iwork updated for amount now used in work
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in setup_net_info'
@@ -232,18 +221,12 @@
             return
          end if
          
-         if (num_wk_reactions > 0 .and. (.not. reuse_rate_screened)) then
-            if ((.not. reuse_rate_raw) .or. &
-                 T9 > T9_weaklib_full_off_hi_Z .or. &
-                 T9 > T9_weaklib_full_off) then
-               ! at high T, weak rates depend on Ye so need to redo
-               ! even if okay to reuse raw rates for strong reactions.
-               if (dbg) write(*,*) 'call get_weaklib_rates'
-               call get_weaklib_rates(ierr)
-               if (ierr /= 0) then
-                  if (dbg) write(*,*) 'failed in get_weaklib_rates'
-                  return
-               end if
+         if (num_wk_reactions > 0) then
+            if (dbg) write(*,*) 'call get_weaklib_rates'
+            call get_weaklib_rates(ierr)
+            if (ierr /= 0) then
+               if (dbg) write(*,*) 'failed in get_weaklib_rates'
+               return
             end if
          end if
          
@@ -318,7 +301,7 @@
          call get_derivs(  &
              n, dydt, eps_nuc_MeV, eta, ye, &
              logtemp, btemp, bden, abar, zbar,  &
-             reuse_rate_screened, num_reactions, rate_factors, &
+             num_reactions, rate_factors, &
              symbolic, just_dxdt, ierr)
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in get_derivs'
@@ -611,22 +594,20 @@
                end if
             end do
             
-            if (.not. reuse_rate_raw) then ! get the raw reaction rates
-               if (dbg) write(*,*) 'call eval_using_rate_tables'
-               call eval_using_rate_tables( &
-                  num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
-                  ye, logtemp, btemp, bden, rate_factors, g% logttab, &
-                  rate_raw, rate_raw_dT, rate_raw_dRho, ierr) 
-               if (ierr /= 0) then
-                  if (dbg) write(*,*) 'ierr from eval_using_rate_tables'
-                  return
-               end if
-               
-               if (doing_timing) then
-                  call system_clock(time1)
-                  g% clock_net_rate_tables = g% clock_net_rate_tables + (time1 - time0)
-                  time0 = time1
-               end if
+            if (dbg) write(*,*) 'call eval_using_rate_tables'
+            call eval_using_rate_tables( &
+               num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
+               ye, logtemp, btemp, bden, rate_factors, g% logttab, &
+               rate_raw, rate_raw_dT, rate_raw_dRho, ierr) 
+            if (ierr /= 0) then
+               if (dbg) write(*,*) 'ierr from eval_using_rate_tables'
+               return
+            end if
+            
+            if (doing_timing) then
+               call system_clock(time1)
+               g% clock_net_rate_tables = g% clock_net_rate_tables + (time1 - time0)
+               time0 = time1
             end if
 
             if (g% doing_approx21) then
@@ -634,30 +615,30 @@
                if (ierr /= 0) return            
             end if
             
-            if (.not. reuse_rate_screened) then ! get the screened reaction rates
-               ! get the reaction rates including screening factors
-               if (dbg) write(*,*) 'call screen_net with init=.false.'
-               call screen_net( &
-                  g, num_isos, n% y, btemp, bden, logtemp, logrho, .false.,  &
-                  rate_raw, rate_raw_dT, rate_raw_dRho, &
-                  rate_screened, rate_screened_dT, rate_screened_dRho, &
-                  n% screening_mode, &
-                  screen_h1, screen_he4, zbar, abar, z2bar, ye, ierr)
-               if (dbg) write(*,*) 'done screen_net with init=.false.'
-               if (ierr /= 0) return
-               if (g% doing_approx21) then
-                  num = num_reactions_func(g%add_co56_to_approx21)
-                  do i=num_reactions+1,num
-                     rate_screened(i) = rate_raw(i)
-                     rate_screened_dT(i) = rate_raw_dT(i)
-                     rate_screened_dRho(i) = rate_raw_dRho(i)
-                  end do
-                  do i=1,num
-                     dratdumdy1(i) = 0d0
-                     dratdumdy2(i) = 0d0
-                  end do           
-               end if
+
+            ! get the reaction rates including screening factors
+            if (dbg) write(*,*) 'call screen_net with init=.false.'
+            call screen_net( &
+               g, num_isos, n% y, btemp, bden, logtemp, logrho, .false.,  &
+               rate_raw, rate_raw_dT, rate_raw_dRho, &
+               rate_screened, rate_screened_dT, rate_screened_dRho, &
+               n% screening_mode, &
+               zbar, abar, z2bar, ye, ierr)
+            if (dbg) write(*,*) 'done screen_net with init=.false.'
+            if (ierr /= 0) return
+            if (g% doing_approx21) then
+               num = num_reactions_func(g%add_co56_to_approx21)
+               do i=num_reactions+1,num
+                  rate_screened(i) = rate_raw(i)
+                  rate_screened_dT(i) = rate_raw_dT(i)
+                  rate_screened_dRho(i) = rate_raw_dRho(i)
+               end do
+               do i=1,num
+                  dratdumdy1(i) = 0d0
+                  dratdumdy2(i) = 0d0
+               end do           
             end if
+
             
             if (doing_timing) then
                call system_clock(time1)
@@ -679,7 +660,7 @@
             call approx21_weak_rates( &
                n% y, rate_raw, rate_raw_dT, rate_raw_dRho, &
                btemp, bden, ye, eta, zbar, &
-               weak_rate_factor, reuse_rate_screened, plus_co56, ierr)
+               weak_rate_factor, plus_co56, ierr)
             if (ierr /= 0) return            
          end subroutine approx21_rates
 
@@ -736,18 +717,16 @@
          
       subroutine get_T_limit_factor( &
             temp, lnT, T_lo, T_hi, lnT_lo, lnT_hi, &
-            min_ln_factor, min_factor, reuse_rate_screened, &
+            min_ln_factor, min_factor, &
             factor, d_factor_dT)
          real(dp), intent(in) ::  &
             temp, lnT, T_lo, T_hi, lnT_lo, lnT_hi, &
             min_ln_factor, min_factor
-         logical, intent(in) :: reuse_rate_screened
          real(dp), intent(out) :: &
             factor, d_factor_dT
          real(dp) :: ln_factor, d_ln_factor_dlnT
          factor = 1d0
          d_factor_dT = 0d0
-         if (reuse_rate_screened) return
          if (temp <= T_lo) return
          if (temp >= T_hi) then
             factor = min_factor

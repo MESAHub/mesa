@@ -289,13 +289,13 @@
          subroutine approx21_weak_rates( &
                y, ratraw, dratrawdt, dratrawdd, &
                temp, den, ye, eta, zbar, &
-               weak_rate_factor, reuse_rate_screened, plus_co56, ierr)
+               weak_rate_factor,  plus_co56, ierr)
             use rates_lib, only: eval_ecapnuc_rate
             use net_derivs, only: eval_ni56_ec_rate, eval_co56_ec_rate
             
             real(dp), dimension(:) :: y, ratraw, dratrawdt, dratrawdd
             real(dp), intent(in) :: temp, den, ye, eta, zbar, weak_rate_factor
-            logical, intent(in) :: reuse_rate_screened, plus_co56
+            logical, intent(in) :: plus_co56
             integer, intent(out) :: ierr
             
             real(dp) :: rpen, rnep, spen, snep, &
@@ -327,7 +327,7 @@
             call eval_ni56_ec_rate( &
                temp, den, ye, eta, zbar, weak_rate_factor, &
                rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, &
-               reuse_rate_screened, ierr)
+               ierr)
             if (ierr /= 0) then
                !write(*,*) 'failed in eval_ni56_ec_rate'
                return
@@ -340,7 +340,7 @@
                call eval_co56_ec_rate( &
                   temp, den, ye, eta, zbar, weak_rate_factor, &
                   rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, &
-                  reuse_rate_screened, ierr)
+                  ierr)
                if (ierr /= 0) then
                   !write(*,*) 'failed in eval_co56_ec_rate'
                   return

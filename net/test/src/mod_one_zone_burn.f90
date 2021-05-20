@@ -142,7 +142,7 @@
          set_rate_1212
       
       logical :: show_Qs, quiet, complete_silence_please, &
-         show_ye_stuff, okay_to_reuse_rate_screened
+         show_ye_stuff
       
       real(dp) :: starting_logT
       
@@ -631,7 +631,6 @@
                std_reaction_Qs, std_reaction_neuQs, &
                screening_mode,  & 
                stptry, max_steps, eps, odescal, &
-               okay_to_reuse_rate_screened, & 
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
                burn_lwork, burn_work_array, & 
                net_lwork, net_work_array, & 
@@ -1178,7 +1177,7 @@
                   xin(1:species), T, logT, Rho, logRho, &
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                   rate_factors, weak_rate_factor, &
-                  std_reaction_Qs, std_reaction_neuQs, .false., .false., &
+                  std_reaction_Qs, std_reaction_neuQs, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
                   screening_mode, &
@@ -1509,7 +1508,7 @@
          num_times_for_burn, times_for_burn, log10Ts_for_burn, &
          log10Rhos_for_burn, etas_for_burn, log10Ps_for_burn, &
          set_rate_c12ag, set_rate_n14pg, set_rate_3a, set_rate_1212, &
-         show_Qs, num_reactions_to_track, reaction_to_track, okay_to_reuse_rate_screened, &
+         show_Qs, num_reactions_to_track, reaction_to_track,  &
          num_special_rate_factors, reaction_for_special_factor, special_rate_factor
 
       contains
@@ -1619,7 +1618,6 @@
             ! uses neutron branching from dayras, switkowski, and woosley, 1976.
       
       weak_rate_factor = 1
-      okay_to_reuse_rate_screened = .false.
       
       ! read inlist
       
