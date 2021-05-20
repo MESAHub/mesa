@@ -623,8 +623,6 @@
          s% other_eosDT_get_T => null_other_eosDT_get_T
          s% other_eosDT_get_Rho => null_other_eosDT_get_Rho
 
-         s% other_eosDE_get => null_other_eosDE_get
-
          s% other_kap_get => null_other_kap_get
          s% other_kap_get_op_mono => null_other_kap_get_op_mono
 

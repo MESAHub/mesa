@@ -1012,68 +1012,6 @@
          end subroutine other_eosDT_get_interface
       
       
-         subroutine other_eosDE_get_interface( &
-                  handle, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
-                  energy, log10E, rho, log10Rho, log10T_guess, &
-                  T, log10T, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-                  d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
-
-            use eos_def
-
-            ! INPUT
-         
-            integer, intent(in) :: handle
-
-            real(dp), intent(in) :: Z ! the metals mass fraction
-            real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-            real(dp), intent(in) :: abar
-               ! mean atomic number (nucleons per nucleus; grams per mole)
-            real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
-            integer, intent(in) :: species
-            integer, pointer :: chem_id(:) ! maps species to chem id
-               ! index from 1 to species
-               ! value is between 1 and num_chem_isos         
-            integer, pointer :: net_iso(:) ! maps chem id to species number
-               ! index from 1 to num_chem_isos (defined in chem_def)
-               ! value is 0 if the iso is not in the current net
-               ! else is value between 1 and number of species in current net
-            real(dp), intent(in) :: xa(:) ! mass fractions
-         
-            real(dp), intent(in) :: energy, log10E ! the internal energy
-               ! provide both if you have them.  else pass one and set the other to arg_not_provided
-               ! "arg_not_provided" is defined in mesa const_def
-            
-            real(dp), intent(in) :: Rho, log10Rho ! the density
-               ! provide both if you have them.  else pass one and set the other to arg_not_provided
-            
-            real(dp), intent(in) :: log10T_guess ! guess for logT to use if off table
-                     
-            ! OUTPUT
-         
-            real(dp), intent(out) :: T, log10T
-         
-            real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         
-            ! partial derivatives of the basic results
-         
-            real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
-            ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
-            real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
-            ! d_dlnT(i) = d(res(i))/dlnT|Rho,X where X = composition
-
-            real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-            ! d_dabar(i) = d(res(i))/dabar|TRho,zbar
-            real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
-            ! d_dzbar(i) = d(res(i))/dzbar|TRho,abar
-         
-            integer, intent(out) :: ierr ! 0 means AOK.
-
-         end subroutine other_eosDE_get_interface
-      
-      
          subroutine other_eosDT_get_T_interface( &
                   id, k, handle, &
                   species, chem_id, net_iso, xa, &
