@@ -23,7 +23,7 @@
       real(dp) :: xa(species)
       
       
-      real(dp), dimension(:,:), pointer :: d_dxa ! (num_eos_basic_results,species)
+      real(dp), allocatable :: d_dxa(:,:) ! (num_d_dxa_basic_results,species)
 
       integer :: handle
       type (EoS_General_Info), pointer :: rq
