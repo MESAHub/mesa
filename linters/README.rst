@@ -21,14 +21,14 @@ false positives, especially related to RSP due to case-sensitivity.)
 mesa_linter.py
 --------------
 
-Checks fortrans files for consistency with MESA's style guide.
+Checks fortran files for consistency with MESA's style guide.
 
-Run over files and provide details of failures:
-.. code-block:: shell
-	 python3 mesa-linter.py *.f90
+Run over files and provide details of failures::
+
+  python3 mesa-linter.py *.f90
 	 
-Provides only a count per file of the number of issues found:
-.. code-block:: shell
-	 python3 mesa-linter.py -s *.f90
+Provides only a count per file of the number of issues found::
+
+  python3 mesa-linter.py -s *.f90
 
 

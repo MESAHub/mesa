@@ -5,15 +5,6 @@ Infrastructure
 This summarizes some of the external MESA infrastructure and who
 controls it.
 
-Assembla
---------
-
-Our post-sourceforge SVN hosting was provided by Assembla.  Josiah
-controls this account and negotiated with their sales team.  We will
-not renew this account, so it will become inactive in mid-June 2021.
-It cost $2000/yr, paid by Lars (through grants at KITP).
-
-
 GitHub
 ------
 

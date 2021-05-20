@@ -6,14 +6,14 @@
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle100.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle200.mod'
-   load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
+   !load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle400.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle500.mod'
    !load_model_filename = '../dev_test_Cepheid_RSP/cycle600.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle700.mod'
+   load_model_filename = '../dev_test_Cepheid_RSP/cycle700.mod'
    
-   save_model_when_terminate = .true.
-   save_model_filename = 'rsp2_cycle700.mod'
+   !save_model_when_terminate = .true.
+   !save_model_filename = 'rsp2_cycle700.mod'
    !required_termination_code_string(1) = 'max_model_number'
    
    change_initial_v_flag = .true.
@@ -37,7 +37,7 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -56,10 +56,13 @@
    initial_z = 0.008d0
    initial_mass = 6d0
 
+
+   max_age = 12.486184 ! for movie
+   
    max_timestep = 1200
 
    max_model_number = 5000000
-   max_number_retries = 10000
+   max_number_retries = 10000 
 
 ! atmosphere
    ! P boundary condition
@@ -73,6 +76,20 @@
       fixed_Psurf = 0d0
 
 ! timesteps
+!  RSP_max_dt_times_min_dr_div_cs = 2d0
+   dt_div_min_dr_div_cs_limit = 2d0
+   dt_div_min_dr_div_cs_hard_limit = 4d0
+
+!  RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
+   
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.0d0
+
+
+   ! have used these values to do run to saturation, but may not be necessary
    dt_div_min_dr_div_cs_limit = 0.5d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
@@ -110,8 +127,8 @@
    
    RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
-   include_v_in_correction_limits = .false.
-   include_L_in_correction_limits = .false.
+   include_v_in_correction_limits = .true.
+   include_L_in_correction_limits = .true.
    
    RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
    RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
@@ -126,13 +143,13 @@
    tol_max_correction = 5d-7
    
 ! output
-   x_integer_ctrl(1) = 800 ! which period to check
+   x_integer_ctrl(1) = -548 ! which period to check
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 8.3 ! expected period (in days) 
-   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
+!   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.3 ! min_period_div_target
 
@@ -145,18 +162,21 @@
    trace_history_value_name(1) = 'log_rel_run_E_err'
    trace_history_value_name(2) = 'rel_E_err'
 
-      photo_interval = 1000
-      profile_interval = 4000
+      photo_interval = 2000
+      profile_interval = 2000
       history_interval = 40
-      terminal_interval = 4000
+      terminal_interval = 2000
 
-      !photo_interval = 1000
-      !profile_interval = 4000
+      !photo_interval = 100
+      !profile_interval = 400
       !history_interval = 40
-      !terminal_interval = 100
+      !terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
       
+      
+      !report_min_dr_div_cs = .true.
+      !report_dt_hard_limit_retries = .true.
       
       !max_model_number = 2
 
@@ -197,10 +217,6 @@
       !solver_test_kap_partials = .true.
       !solver_test_nRSP2_partials = .true.
       !solver_test_atm_partials = .true.
-
-      !report_why_dt_limits = .true.
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
       
       !show_mesh_changes = .true.
       !mesh_dump_call_number = 5189
@@ -233,11 +249,11 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 25
+   pgstar_interval = 5  ! 25
 
 ! window 1
 
-   !Grid1_win_flag = .true.
+   Grid1_win_flag = .true.
    Grid1_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP2'
 
    !Grid1_file_flag = .true.
@@ -256,7 +272,7 @@
    Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP2'
    
    History_Panels2_xaxis_name='day'
-   History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+   History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
 
    !Grid2_file_flag = .true.
    file_digits = 7
@@ -276,6 +292,9 @@
    Profile_Panels2_xmin = -6
    Profile_Panels2_xmax = -0.1
 
-   Profile_Panels2_dymin(4) = 0.02
+   Profile_Panels2_xaxis_name = 'zone'
+   Profile_Panels2_xaxis_reversed = .true.
+   Profile_Panels2_xmin = -101
+   Profile_Panels2_xmax = -101
    
 / ! end of pgstar namelist

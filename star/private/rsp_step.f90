@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton, Radek Smolec & The MESA Team
+!   Copyright (C) 2018-2019  Radek Smolec & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -250,6 +250,15 @@
                !write(*,2) 'reduce dt in HYD', s% model_number, s% dt, dt_max
                !write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
                !write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
+               if (s% RSP_report_limit_dt) then
+                  write(*,4) 'limit dt to avoid over-compressing innermost cell', s% model_number
+                  write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
+                  write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
+                  write(*,2) 'old dt', s% model_number, s% dt
+                  write(*,2) 'reduced dt', s% model_number, dt_max
+                  write(*,*)
+                  stop 'HYD compressing innermost cell'
+               end if
                s% dt = dt_max
                if (call_is_bad) then
                   if (is_bad(s% dt)) then
@@ -257,8 +266,6 @@
                      stop 'HYD compressing innermost cell'
                   end if
                end if
-               if (s% RSP_report_limit_dt) &
-                  write(*,4) 'limit dt to max_dt set by compressing innermost cell', s% model_number
             end if
          end if
          if (s% dt < s% force_timestep_min .and. s% force_timestep_min > 0) &
@@ -1536,13 +1543,14 @@
       subroutine check_omega(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: i   
-         real(dp) :: SOURS, DAMPS, DAMPRS, DELTA, SOL, POM, POM2, POM3, POM4
+         real(dp) :: SOURS, DAMPS, DAMPRS, DELTA, SOL, POM, POM2, POM3, POM4, w_start
          integer :: k
          include 'formats'         
          if (I > IBOTOM .and. I < NZN .and. ALFA /= 0d0) then
          !     JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
             k = NZN+1-i
             if (s% RSP_w(k) > EFL0) return
+            w_start = s% RSP_w(k)
             POM = (s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))*0.5d0
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k)
             SOURS = POM*POM2
@@ -1568,7 +1576,12 @@
             if (DELTA >= 0.d0) SOL = ( - DAMPRS + sqrt(DELTA))/(2.d0*DAMPS)
             if (DELTA < 0.d0) SOL = - 99.99d0
             if (SOL >= 0.d0) SOL = SOL**2
-            if (SOL > 0.d0) s% RSP_w(k) = sqrt(SOL)
+            if (SOL > 0.d0) then
+               s% RSP_w(k) = sqrt(SOL)
+               if (s% RSP_report_check_omega_changes) &
+                  write(*,3) 'RSP_w modified initial guess vs initial', k, s% model_number, &
+                     s% RSP_w(k), w_start
+            end if
          end if
       end subroutine check_omega
       

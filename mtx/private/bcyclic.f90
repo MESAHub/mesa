@@ -1,5 +1,5 @@
 ! ***********************************************************************
-! Copyright (C) 2012  Bill Paxton
+! Copyright (C) 2012  The MESA Team
 ! This file is part of MESA.
 ! MESA is free software; you can redistribute it and/or modify
 ! it under the terms of the GNU General Library Public License as published

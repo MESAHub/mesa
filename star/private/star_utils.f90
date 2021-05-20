@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -853,14 +853,10 @@
          dtau = get_dtau1(s, ierr)
          if (ierr /= 0) return
          s% tau(1) = s% tau_factor*s% tau_base
-         s% lntau(1) = safe_log(s% tau(1))
-         s% tau_start(1) = s% tau(1)
          dm_sum = 0
          L_sum = 0
          do k = 2, s% nz
             s% tau(k) = s% tau(k-1) + dtau
-            s% lntau(k) = log(s% tau(k))
-            if (s% tau_start(k) < 0) s% tau_start(k) = s% tau(k)
             kap = s% opacity(k)
             dtau = s% dm(k)*kap/(pi4*s% rmid(k)*s% rmid(k))
             if (is_bad(dtau)) then
@@ -982,15 +978,6 @@
                if (dbg) write(*,3) 'set_rmid s% rmid(k)', k, s% model_number, s% rmid(k)
                if (s% rmid_start(k) < 0) s% rmid_start(k) = s% rmid(k)
                rmid2 = rmid*rmid
-               s% drmid_dlnR00(k) = 0.5d0*s% r(k)
-               s% drmid2_dlnR00(k) = 2d0*rmid*s% drmid_dlnR00(k)
-               if (k < nz) then
-                  s% drmid_dlnRp1(k) = 0.5d0*s% r(k+1)
-                  s% drmid2_dlnRp1(k) = 2d0*rmid*s% drmid_dlnRp1(k)
-               else
-                  s% drmid_dlnRp1(k) = 0d0
-                  s% drmid2_dlnRp1(k) = 0d0
-               end if
             end do
             return
          end if
@@ -1006,15 +993,6 @@
             s% rmid(k) = rmid
             if (s% rmid_start(k) < 0) s% rmid_start(k) = s% rmid(k)
             rmid2 = rmid*rmid
-            s% drmid_dlnR00(k) = 0.5d0*r003/rmid2
-            s% drmid2_dlnR00(k) = r003/rmid
-            if (k < nz) then
-               s% drmid_dlnRp1(k) = 0.5d0*rp13/rmid2
-               s% drmid2_dlnRp1(k) = rp13/rmid
-            else
-               s% drmid_dlnRp1(k) = 0d0
-               s% drmid2_dlnRp1(k) = 0d0
-            end if
          end do
       end subroutine set_rmid
 
@@ -1251,7 +1229,7 @@
          real(dp) :: abs_du, cs
          include 'formats'
          nz = s% nz
-
+         
          if (s% v_flag) then
             do k=2,nz
                abs_du = abs(s% v_start(k) - s% v_start(k-1))
@@ -1534,7 +1512,7 @@
          integer, intent(out) :: min_k
          integer :: k, nz, j, k_min
          real(dp) :: dr, dt, D, abs_du, cs, min_q, max_q, &
-            min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
+            min_abs_u_div_cs, min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
          include 'formats'
          nz = s% nz
          min_k = nz
@@ -1547,6 +1525,8 @@
          else
             remnant_mass = s% m(1)
          end if
+         min_abs_u_div_cs = &
+            s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
          min_abs_du_div_cs = &
             s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          if (s% v_flag) then
@@ -1554,6 +1534,7 @@
                if (s% m(k) > remnant_mass) cycle
                if (s% q(k) > max_q) cycle
                if (s% q(k) < min_q) exit
+               if (abs(s% v_start(k))/s% csound(k) < min_abs_u_div_cs) cycle
                if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
                r00 = s% r(k)
                rp1 = s% r(k+1)
@@ -1563,6 +1544,7 @@
                   min_k = k
                end if
             end do
+            !write(*,3) 'min_dr_div_cs', min_k, s% model_number, min_dr_div_cs
             return
          end if
          if (.not. s% u_flag) return
@@ -1570,6 +1552,7 @@
             if (s% m(k) > remnant_mass) cycle
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit
+            if (abs(s% u_start(k))/s% csound(k) < min_abs_u_div_cs) cycle
             if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
             dr = s% r(k) - s% r(k+1)
             dt = dr/s% abs_du_plus_cs(k)
@@ -1613,9 +1596,7 @@
             s% lnd_start(k) = -1d99
             s% lnT_start(k) = -1d99
             s% csound_start(k) = -1d99
-            s% eta_visc_start(k) = -1d99
             s% rho_start(k) = -1d99
-            s% tau_start(k) = -1d99
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
             s% opacity_start(k) = -1d99

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -1192,7 +1192,7 @@
             m_div_h = chem_M_div_h(s% X(k),s% Z(k),s% job% initial_zfracs)
             if (k > 0) then
                i = c - log_lum_band_offset
-               val = get_lum_band_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_lum_band_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, s% photosphere_L, ierr)
                if (ierr /= 0) return
             end if
@@ -1204,7 +1204,7 @@
             if (k > 0) then
                i = c - lum_band_offset
                !val = get_lum_band_by_id(i,safe_log10(s% T(k)),safe_log10(s% grav(k)),m_div_h,s% L(k)/lsun, ierr)
-               val = get_lum_band_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_lum_band_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, s% photosphere_L, ierr)
                val=val*lsun
                if (ierr /= 0) return
@@ -1216,7 +1216,7 @@
             if (k > 0) then
                i = c - abs_mag_offset
                !val = get_abs_mag_by_id(i,safe_log10(s% T(k)),safe_log10(s% grav(k)),m_div_h,s% L(k)/lsun, ierr)
-               val = get_abs_mag_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_abs_mag_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, s% photosphere_L, ierr)
                if (ierr /= 0) return
             end if
@@ -1227,7 +1227,7 @@
             if (k > 0) then
                i = c - bc_offset
                !val = get_bc_by_id(i,safe_log10(s% T(k)),safe_log10(s% grav(k)),m_div_h, ierr)
-               val = get_bc_by_id(i, safe_log10(s% photosphere_T), &
+               val = get_bc_by_id(i, safe_log10(s% Teff), &
                   s% photosphere_logg, m_div_h, ierr)
                if (ierr /= 0) return
             end if
@@ -1952,7 +1952,7 @@
             case(h_center_non_nuc_neu)
                val = s% center_non_nuc_neu
             case(h_center_gamma)
-               val = s% center_gamma
+               val = center_value(s, s% gam)
             case(h_center_zbar)
                val = s% center_zbar
             case(h_center_abar)

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -469,8 +469,6 @@ contains
     end do
     
     s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
-    s% d_QQ_dlnd(k) = s% QQ(k)*(d_dlnd(i_chiT)/s% chiT(k) - d_dlnd(i_chiRho)/s% chiRho(k) - 1d0)
-    s% d_QQ_dlnT(k) = s% QQ(k)*(d_dlnT(i_chiT)/s% chiT(k) - d_dlnT(i_chiRho)/s% chiRho(k) - 1d0)
     s% csound(k) = eval_csound(s,k,ierr)
 
     ! check some key values

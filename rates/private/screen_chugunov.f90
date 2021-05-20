@@ -1,6 +1,6 @@
    ! ***********************************************************************
    !
-   !   Copyright (C) 2018  Bill Paxton, Sam Jones, Robert Farmer & The MESA Team
+   !   Copyright (C) 2018  Sam Jones, Robert Farmer & The MESA Team
    !
    !   MESA is free software; you can use it and/or modify
    !   it under the combined terms and restrictions of the MESA MANIFESTO

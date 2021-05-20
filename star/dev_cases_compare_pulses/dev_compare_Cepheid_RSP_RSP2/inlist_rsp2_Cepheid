@@ -12,7 +12,7 @@
 
 &controls  
 
-!x_logical_ctrl(1) = .true. ! resynchronize at each step by star2 = star1
+x_logical_ctrl(1) = .true. ! resynchronize at each step by star2 = star1
 
 ! RSP2
    RSP2_assume_HSE = .true.

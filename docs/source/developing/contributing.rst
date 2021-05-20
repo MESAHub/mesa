@@ -44,12 +44,19 @@ Download the MESA repository
 
 Make a git clone of the MESA repository. (This is analogous to ``svn
 checkout``.) This will automatically fetch the files from git LFS.  To
-clone over HTTPS, do::
+clone over SSH, do::
 
-    git clone https://github.com/MESAHub/mesa.git mesa
+    git clone git@github.com:MESAHub/mesa.git mesa
 
 This will create the MESA repository in a directory named ``mesa``.
 
+For this to work you will need to have setup ssh keys and added them to your github account:
+
+#. `Generate a ssh key <https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>`_
+
+#. `Add a ssh key to Github <https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account>`_
+
+#. `Verify it works <https://docs.github.com/en/github/authenticating-to-github/testing-your-ssh-connection>`_
 
 
 Making changes to MESA
@@ -106,6 +113,32 @@ Note that this is different than ``svn commit``, as it only alters
 your local repository.  It does not transmit your changes to the
 remote repository.
 
+Removing or moving files
+------------------------
+
+To remove a file::
+
+  git rm <filename>
+
+Remove a folder::
+
+  git rm -rf <filename>
+
+To move a file (or folder)::
+
+  git mv <filename_old> <filename_new>
+
+After changes you still need to make a commit::
+
+ git commit -m <message>
+
+or::
+
+  git commit -a -m <message>
+
+You should use the git versions or rm/mv whenever possible as git can then track the changes better and it is less likely to cause issues when merging branches.
+
+
 Sharing your changes
 --------------------
 
@@ -150,6 +183,10 @@ If you want to get others' changes, but not immediately update your
 local repository to match that content::
 
   git fetch origin
+
+To prune out branches that may no longer exist in the remote repository::
+
+  git fetch --prune
 
 
 Checking out a revision
@@ -279,7 +316,7 @@ Graphical interfaces
 --------------------
 
 Not everything needs to be done by command line. There are at least two GUI tools that are usually shipped with git,
-git gui and gitk. 
+``git gui`` and ``gitk``. 
 ::
 
   git gui
@@ -290,7 +327,7 @@ files, set the commit message, and make the commit.
 
   gitk
 
-This provides a convenient interface for viewing the history of the repository you can view the commits, files changed, and commit messages.
+This provides a convenient interface for viewing the history of the repository where you can view the commits, files changed, and commit messages.
 ::
 
   gitk --all
@@ -300,7 +337,7 @@ By default ``gitk`` only shows the current branch ``--all`` shows all branches.
 
   gitk path/to/file
 
-Will only show the commits that change the file.
+Will only show the commits that change that file.
 
 Git testing tips
 ----------------
@@ -335,7 +372,10 @@ have occurred on ``main``, it is recommended that you merge ``main`` into your
 branch (or rebase your branch to the tip of ``main``) before issuing the
 PR. This allows you to handle conflicts in advance and ensure that the
 test suite will re``main`` passing after you merge your branch back into
-``main``.
+``main``. 
+
+When you merge ``main`` into your branch is also advisable to add ``[ci optional]`` to the commit message.
+That way the optional inlists will be tested when the commit is tested.
 
      
 

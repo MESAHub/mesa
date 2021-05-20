@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020  Adam Jermyn, Bill Paxton & The MESA Team
+!   Copyright (C) 2020  Adam Jermyn, The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO

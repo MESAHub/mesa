@@ -58,20 +58,24 @@
    max_number_retries = 10000
 
 ! atmosphere
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0
+   ! P boundary condition
+   use_momentum_outer_BC = .true.  ! required for RSP2
+   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
+      ! this can be a problem with shocks since omits Pvsc
+   ! else if RSP_use_Prad_for_Psurf
+      !use_zero_Pgas_outer_BC = .false.
+   ! else use RSP default of Psurf = 0
+      use_fixed_Psurf_outer_BC = .true.
+      fixed_Psurf = 0d0
 
-   atm_option = 'T_tau'
-   atm_T_tau_relation = 'Eddington'
-   atm_T_tau_opacity = 'fixed'
-   Pextra_factor = 2
-
-! timesteps
-   dt_div_min_dr_div_cs_limit = 0.5d0
-   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
+! timesteps -- for dealing with shocks
+   dt_div_min_dr_div_cs_limit = 1.0d0
+   dt_div_min_dr_div_cs_hard_limit = 4.0d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.0d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
-   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0 ! 0.5d0
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.0d0
 
 ! mlt
    mixing_length_alpha = 1.5d0
