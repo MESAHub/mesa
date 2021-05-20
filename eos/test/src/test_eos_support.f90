@@ -16,68 +16,6 @@
       contains
       
       
-      subroutine get_logP20_contour
-         real(dp) :: Z, X, logPgas, logT, logRho, logP, T, Prad, Pgas, P
-         real(dp) :: logT_min, logT_max, dlogT
-         integer :: iounit
-         include 'formats'
-         call Setup_eos
-         Z =  0.02d0
-         X =  0.0d0
-         logT_min = 6d0
-         logT_max = 8.59d0
-         dlogT = 0.01d0
-         
-         write(*,'(99(a20,4x))') 'logRho', 'logT', 'logP'
-         
-         logT = logT_min
-         do while (logT < logT_max)
-            T = exp10(logT)
-            logP = 20d0
-            P = exp10(logP)
-            Prad = crad*T*T*T*T/3
-            Pgas = P - Prad
-            logPgas = log10(Pgas)
-            call test1_eosPT(Z, X, logPgas, logT, .true., .true., logRho, logP)
-            write(*,'(99(f20.10,4x))') logRho, logT, logP
-            logT = logT + dlogT
-         end do
-         
-         write(*,*)
-         
-      end subroutine get_logP20_contour
-      
-      
-      subroutine get_logP23_contour
-         real(dp) :: Z, X, logPgas, logT, logRho, logP, T, Prad, Pgas, P
-         real(dp) :: logT_min, logT_max, dlogT
-         integer :: iounit
-         include 'formats'
-         call Setup_eos
-         Z =  0.02d0
-         X =  0.0d0
-         logT_min = 7d0
-         logT_max = 8.9d0
-         dlogT = 0.01d0
-         
-         write(*,'(99(a20,4x))') 'logRho', 'logT', 'logP'
-         
-         logT = logT_min
-         do while (logT < logT_max)
-            T = exp10(logT)
-            logP = 23d0
-            P = exp10(logP)
-            Prad = crad*T*T*T*T/3
-            Pgas = P - Prad
-            logPgas = log10(Pgas)
-            call test1_eosPT(Z, X, logPgas, logT, .true., .true., logRho, logP)
-            write(*,'(99(f20.10,4x))') logRho, logT, logP
-            logT = logT + dlogT
-         end do
-         
-      end subroutine get_logP23_contour
-      
-      
       subroutine test1_eosPT_for_ck(quietly)
          logical, intent(in) :: quietly
          real(dp) :: Z, X, logPgas, logT, logRho, logP
@@ -1308,6 +1246,8 @@
             integer :: i, which_other, max_iter, eos_calls, ierr
             real(dp), dimension(num_eos_basic_results) :: &
                   d_dlnd, d_dlnT, d_dabar, d_dzbar
+            real(dp), dimension(num_eos_d_dxa_results, species) :: &
+                  d_dxa
             logical, parameter :: use_log10_for_other = .false.
             
             if (.not. quietly) write(*,*)
@@ -1336,14 +1276,14 @@
             logRho_bnd2 = arg_not_provided
             other_at_bnd1 = arg_not_provided
             other_at_bnd2 = arg_not_provided
-            call eosDT_get_Rho_legacy( &
-                  handle, Z, X, abar, zbar, &
+            call eosDT_get_Rho( &
+                  handle, &
                   species, chem_id, net_iso, xa, &
                   log10_T, i_lnS, lnS, &
                   tol, othertol, max_iter, logRho_guess, &
                   logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
                   result_log10, res, d_dlnd, d_dlnT, &
-                  d_dabar, d_dzbar, eos_calls, ierr)
+                  d_dxa, eos_calls, ierr)
             result = exp10(result_log10)
             if (ierr /= 0) then
                write(*,*) 'ierr in test_get_Rho_T'
@@ -1364,14 +1304,14 @@
             logT_guess = result_log10
             logT_bnd1 = 3
             logT_bnd2 = 9
-            call eosDT_get_T_legacy( &
-                  handle, Z, X, abar, zbar, &
+            call eosDT_get_T( &
+                  handle, &
                   species, chem_id, net_iso, xa, &
                   log10_rho, i_lnS, lnS, &
                   tol, othertol, max_iter, logT_guess, &
                   logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                   result_log10, res, d_dlnd, d_dlnT, &
-                  d_dabar, d_dzbar, eos_calls, ierr)
+                  d_dxa, eos_calls, ierr)
             result = exp10(result_log10)
             if (ierr /= 0) then
                write(*,*) 'ierr in test_get_Rho_T'
@@ -1427,181 +1367,6 @@
          end subroutine test_get_Rho_T
 
       end subroutine Do_One
-      
-      
-      
-      
-      
-      subroutine Do_One_Special_FreeEOS_test(quietly)
-         logical, intent(in) :: quietly
-         real(dp) :: T, rho, log10_rho, log10_T
-         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
-         integer :: info, i
-         real(dp) :: XC, XO, Ah, Zh, Yh, Ahe, Zhe, Yhe, Az, Zz, Yz, ddabar, ddzbar, &
-               helm_ddXh, helm_ddXz, opal_ddXh, opal_ddXz, XC0, XO0, &
-               helm_P, helm_PX, helm_PZ, opal_P, opal_PX, opal_PZ, X1, X2, Z1, Z2, &
-               abar1, zbar1, dXC, dlnP_dabar, dlnP_dzbar, dlnP_dXC, &
-               dabar_dZ, dzbar_dZ, dlnP_dZ, P, logRhoguess
-         
-         if (.true.) then
-            ! solar
-            X = 0.70d0
-            Zinit = 0.02d0
-            dXO = 0.00d0
-            dXC = 0.00d0
-            call doit('solar')
-         end if
-         
-         contains
-
-         
-         subroutine doit(str)
-            character (len=*), intent(in) :: str
-                        
-            if (.not. quietly) write(*,*) trim(str)
-
-            
-            T = 1d6; rho = 1d-2
-            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! opal region
-            T = 1d5; rho = 1d-1
-            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! opal-scvh overlap region
-            T = 1d4; rho = 1d-1
-            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! scvh region
-            
-            if (.not. quietly) write(*,*)
-            
-         end subroutine
-
-
-         subroutine test_get_Rho_T ! using most recent values from subroutine Do_One_TRho
-            real(dp) :: tol, othertol, &
-               result, result_log10, log10_T, log10_rho, lnS, Prad, Pgas, logP, &
-               clipped_log10rho, clipped_log10temp, &
-               logRho_guess, logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-               logT_guess, logT_bnd1, logT_bnd2
-            integer :: i, which_other, max_iter, eos_calls, ierr
-            real(dp), dimension(num_eos_basic_results) :: &
-                  d_dlnd, d_dlnT, d_dabar, d_dzbar
-            logical, parameter :: use_log10_for_other = .false.
-            
-            if (.not. quietly) write(*,*)
-                        
-            log10_rho = log10(rho)
-            log10_T = log10(T)
-            lnS = res(i_lnS)
-
-            ierr = 0
-            max_iter = 100
-            tol = 1d-5
-            othertol = 1d-12
-
- 1          format(a30,1pe24.16)
-            
-            if (.not. quietly) then
-               write(*,*)
-               write(*,1) ' tolerance', tol
-            end if
-            if (.not. quietly) write(*,*)
-            result = rho*0.5d0 ! initial guess
-            result_log10 = log10(result)
-            res = 0
-            logRho_guess = result_log10
-            logRho_bnd1 = arg_not_provided
-            logRho_bnd2 = arg_not_provided
-            other_at_bnd1 = arg_not_provided
-            other_at_bnd2 = arg_not_provided
-            call eosDT_get_Rho_legacy( &
-                  handle, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
-                  log10_T, i_lnS, lnS, &
-                  tol, othertol, max_iter, logRho_guess, &
-                  logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-                  result_log10, res, d_dlnd, d_dlnT, &
-                  d_dabar, d_dzbar, eos_calls, ierr)
-            result = exp10(result_log10)
-            if (ierr /= 0) then
-               write(*,*) 'ierr in test_get_Rho_T'
-               stop 2
-            end if
-            if (.not. quietly) then
-               write(*,1) 'actual logRho', log10_rho
-               write(*,1) ' guess logRho', logRho_guess
-               write(*,1) ' found logRho', result_log10
-               write(*,1) '  wanted logS', lnS/ln10
-               write(*,1) '     got logS', res(i_lnS)/ln10
-               write(*,*)
-            end if
-         
-            result = T*2d0 ! initial guess
-            result_log10 = log10(result)
-            res = 0
-            logT_guess = result_log10
-            logT_bnd1 = 3
-            logT_bnd2 = 9
-            call eosDT_get_T_legacy( &
-                  handle, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
-                  log10_rho, i_lnS, lnS, &
-                  tol, othertol, max_iter, logT_guess, &
-                  logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-                  result_log10, res, d_dlnd, d_dlnT, &
-                  d_dabar, d_dzbar, eos_calls, ierr)
-            result = exp10(result_log10)
-            if (ierr /= 0) then
-               write(*,*) 'ierr in test_get_Rho_T'
-               stop 1
-            end if
-            if (.not. quietly) then
-               write(*,*)
-               write(*,1) 'actual logT', log10_T
-               write(*,1) ' guess logT', logT_guess
-               write(*,1) ' found logT', result_log10
-               write(*,1) '  wanted logS', lnS/ln10
-               write(*,1) '     got logS', res(i_lnS)/ln10
-               write(*,*)
-            end if
-
-            T = exp10(log10_T)
-            Prad = crad*T*T*T*T/3
-            Pgas = exp(res(i_lnPgas))
-            logP = log10(Prad + Pgas)
-            result = T*2d0 ! initial guess
-            result_log10 = log10(result)
-            res = 0
-            logT_guess = result_log10
-            logT_bnd1 = 3
-            logT_bnd2 = 9
-            call eosDT_get_T_given_Ptotal( &
-                  handle, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
-                  log10_rho, logP, &
-                  tol, othertol, max_iter, logT_guess, &
-                  logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-                  result_log10, res, d_dlnd, d_dlnT, &
-                  d_dabar, d_dzbar, eos_calls, ierr)
-            result = exp10(result_log10)
-            if (ierr /= 0) then
-               write(*,*) 'ierr in test_get_Rho_T (eosDT_get_T_given_Ptotal)'
-               stop 1
-            end if
-            if (.not. quietly) then
-               write(*,*)
-               write(*,1) 'actual logT', log10_T
-               write(*,1) ' guess logT', logT_guess
-               write(*,1) ' found logT', result_log10
-               write(*,1) '  wanted logP', logP
-               T = exp10(result_log10)
-               Prad = crad*T*T*T*T/3
-               Pgas = exp(res(i_lnPgas))
-               logP = log10(Prad + Pgas)
-               write(*,1) '     got logP', logP
-               write(*,*)
-            end if
-
-         end subroutine test_get_Rho_T
-
-      end subroutine Do_One_Special_FreeEOS_test
-      
       
       
       subroutine test1_eosDT_get_T
@@ -1833,175 +1598,8 @@
          
       end subroutine test1_eosPT_get_T
       
-      
-      subroutine test1_eosPT_get_Pgas
-         
-         real(dp) :: &
-               P, Prad, T, Pgas_guess, abar, zbar, X, Z, energy, logT, logPgas_tol, other_tol, other, &
-               logPgas_guess, logPgas_bnd1, logPgas_bnd2, other_at_bnd1, other_at_bnd2, logPgas_result, &
-               res(num_eos_basic_results), d_dlnd(num_eos_basic_results), Pgas, logPgas, &
-               d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
-               d_dlnT(num_eos_basic_results), &
-               Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-               dlnPgas_dlnPgas_const_T, dlnPgas_dlnT_const_Pgas
-         integer:: ierr, which_other, eos_calls, max_iter
-         logical, parameter :: use_log10_for_other = .false.
-         
- 1       format(a40,1pe26.16)
- 
-         call Setup_eos
- 
-         ierr = 0
-
-         call Init_Composition(X, Z, 0d0, 0d0) ! sets abar and zbar
-         
-         write(*,*) 'test1_eosPT_get_Pgas'
 
 
-                                     Z =    0.02d0
-                                     X =    0.70d0
-                                  abar =    1.2966353559153956d0
-                                  zbar =    1.1021400447995373d0
-                                  logT =    6.9d0
-                                energy = 1.6413485676831915d+15
-                              logPgas_tol =    1d-6
-                             other_tol =    ln10*1d-6
-                            logPgas_guess = 14
-                             logPgas_bnd1 =   arg_not_provided
-                             logPgas_bnd2 =   arg_not_provided
-                         other_at_bnd1 =   arg_not_provided
-                         other_at_bnd2 =   arg_not_provided
-
-
-         which_other = i_lnE
-         other = log(energy)
-         max_iter = 100
-
-
-         write(*,1) 'logT', logT
-         write(*,1) 'logPgas_guess', logPgas_guess
-         write(*,1) 'logPgas_bnd1', logPgas_bnd1
-         write(*,1) 'logPgas_bnd2', logPgas_bnd2
-         write(*,1) 'energy', energy
-         write(*,1) 'other', other
-         write(*,1) 'Z', Z
-         write(*,1) 'X', X
-         write(*,1) 'abar', abar
-         write(*,1) 'zbar', zbar
-         write(*,1) 'logPgas_tol', logPgas_tol
-         write(*,1) 'other_tol', other_tol
-         write(*,*)
-
-         call eosPT_get_Pgas( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, which_other, other, &
-               logPgas_tol, other_tol, max_iter, logPgas_guess, &
-               logPgas_bnd1, logPgas_bnd2, other_at_bnd1, other_at_bnd2, &
-               logPgas_result, Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-               eos_calls, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'ierr in test1_eosPT_get_Pgas'
-            stop 1
-         end if
-         write(*,*)
-         write(*,1) 'guess logPgas', logPgas_guess
-         write(*,1) 'found logPgas', logPgas_result
-         write(*,1) 'wanted logE', other/ln10
-         write(*,1) 'got logE', res(i_lnE)/ln10
-         write(*,1) 'got log10Rho', log10Rho
-         write(*,*)
-         write(*,*) 'eos_calls', eos_calls
-         write(*,*)
-         
-         
-      end subroutine test1_eosPT_get_Pgas
-
-
-      
-      
-      subroutine test1_eosPT_get_Pgas_for_Rho
-         
-         real(dp) :: &
-               P, Prad, T, Pgas_guess, abar, zbar, X, Z, energy, logT, logPgas_tol, logRho_tol, logRho_want, &
-               logPgas_guess, logPgas_bnd1, logPgas_bnd2, logRho_at_bnd1, logRho_at_bnd2, logPgas_result, &
-               res(num_eos_basic_results), d_dlnd(num_eos_basic_results), Pgas, logPgas, &
-               d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
-               d_dlnT(num_eos_basic_results), &
-               Rho, logRho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-               dlnPgas_dlnPgas_const_T, dlnPgas_dlnT_const_Pgas
-         integer:: ierr, which_other, eos_calls, max_iter
-         logical, parameter :: use_log10_for_other = .false.
-         
- 1       format(a40,1pe26.16)
- 
-         call Setup_eos
- 
-         ierr = 0
-
-         call Init_Composition(X, Z, 0d0, 0d0) ! sets abar and zbar
-         
-         write(*,*) 'test1_eosPT_get_Pgas_for_Rho'
-
-
-                                     Z =    1.4331866202912824D-02
-                                     X =    7.4801683389855433D-01
-                                  abar =    1.2372753933790150D+00
-                                  zbar =    1.0813484340002424D+00
-                                  logT =    7.6013756122152900D+00
-                              logPgas_tol =    1d-6
-                              logRho_tol = 1d-6
-                            logPgas_guess = 1.7508981610296928D+01
-                             logPgas_bnd1 =   arg_not_provided
-                             logPgas_bnd2 =   arg_not_provided
-                         logRho_at_bnd1 =   arg_not_provided
-                         logRho_at_bnd2 =   arg_not_provided
-
-         max_iter = 100
-         logRho_want = 1.7645028058855445D+00
-
-         write(*,1) 'logT', logT
-         write(*,1) 'logPgas_guess', logPgas_guess
-         write(*,1) 'logPgas_bnd1', logPgas_bnd1
-         write(*,1) 'logPgas_bnd2', logPgas_bnd2
-         write(*,1) 'logRho_want', logRho_want
-         write(*,1) 'Z', Z
-         write(*,1) 'X', X
-         write(*,1) 'abar', abar
-         write(*,1) 'zbar', zbar
-         write(*,1) 'logPgas_tol', logPgas_tol
-         write(*,1) 'logRho_tol', logRho_tol
-         write(*,*)
-
-         call eosPT_get_Pgas_for_Rho( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, logRho_want, &
-               logPgas_tol, logRho_tol, max_iter, logPgas_guess, &
-               logPgas_bnd1, logPgas_bnd2, logRho_at_bnd1, logRho_at_bnd2, &
-               logPgas_result, Rho, logRho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-               eos_calls, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'ierr in test1_eosPT_get_Pgas_for_Rho'
-            stop 1
-         end if
-         write(*,*)
-         write(*,1) 'guess logPgas', logPgas_guess
-         write(*,1) 'found logPgas', logPgas_result
-         write(*,1) 'wanted logRho', logRho_want
-         write(*,1) 'got logRho', logRho
-         write(*,*)
-         write(*,*) 'eos_calls', eos_calls
-         write(*,*)
-         
-         
-      end subroutine test1_eosPT_get_Pgas_for_Rho
-
-
-      
-      
       subroutine test_components
          real(dp) :: &
             X_test, Z, XC_test, XO_test, &
