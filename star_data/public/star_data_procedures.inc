@@ -129,9 +129,6 @@
          procedure (other_eosDT_get_Rho_interface), pointer, nopass :: &
             other_eosDT_get_Rho => null()
 
-         procedure (other_eosDE_get_interface), pointer, nopass :: &
-            other_eosDE_get => null()
-
          procedure (other_kap_get_interface), pointer, nopass :: &
             other_kap_get => null()
          procedure (other_kap_get_op_mono_interface), pointer, nopass :: &

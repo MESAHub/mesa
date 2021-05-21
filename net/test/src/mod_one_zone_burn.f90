@@ -1076,7 +1076,8 @@
             real(dp) :: d_dlnRho_const_T(num_eos_basic_results) 
             real(dp) :: d_dlnT_const_Rho(num_eos_basic_results) 
             real(dp) :: d_dabar_const_TRho(num_eos_basic_results) 
-            real(dp) :: d_dzbar_const_TRho(num_eos_basic_results) 
+            real(dp) :: d_dzbar_const_TRho(num_eos_basic_results)
+            real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results, species)
 
             real(dp) :: Rho, T, xsum, d_eps_nuc_dx(species), dx, enuc, &
                   dt, energy, entropy, burn_ergs, &
@@ -1152,12 +1153,12 @@
                T = exp10(logT)
                Rho = exp10(logRho)
          
-               call eosDT_get_legacy( &
-                  eos_handle, Z, xh, abar, zbar, &
+               call eosDT_get( &
+                  eos_handle, &
                   species, chem_id, net_iso, x, &
                   Rho, logRho, T, logT, &
                   res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-                  d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
+                  d_dxa_const_TRho, ierr)
                   !Pgas, Prad, energy, entropy, ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
             
