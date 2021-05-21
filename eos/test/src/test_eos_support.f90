@@ -251,7 +251,7 @@
                logT_guess, logT_bnd1, logT_bnd2
             integer :: i, which_other, max_iter, eos_calls, ierr
             real(dp), dimension(num_eos_basic_results) :: &
-                  d_dlnd, d_dlnT, d_dabar, d_dzbar
+                  d_dlnd, d_dlnT
             real(dp), dimension(num_eos_d_dxa_results, species) :: &
                   d_dxa
             
@@ -343,13 +343,13 @@
             logT_bnd1 = 3
             logT_bnd2 = 9
             call eosDT_get_T_given_Ptotal( &
-                  handle, Z, X, abar, zbar, &
+                  handle, &
                   species, chem_id, net_iso, xa, &
                   log10_rho, logP, &
                   tol, othertol, max_iter, logT_guess, &
                   logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                   result_log10, res, d_dlnd, d_dlnT, &
-                  d_dabar, d_dzbar, eos_calls, ierr)
+                  d_dxa, eos_calls, ierr)
             result = exp10(result_log10)
             if (ierr /= 0) then
                write(*,*) 'ierr in test_get_Rho_T (eosDT_get_T_given_Ptotal)'
@@ -532,7 +532,7 @@
                X, Z, abar, zbar, logRho, egas_want, egas_tol, logT_tol, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, logT_result, erad, egas, energy, &
                res(num_eos_basic_results), d_dlnd(num_eos_basic_results), Pgas, logPgas, &
-               d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
+               d_dxa(num_eos_d_dxa_results, species), &
                d_dlnT(num_eos_basic_results)
          integer:: ierr, eos_calls, max_iter
          
@@ -579,12 +579,12 @@
          write(*,*)
 
          call eosDT_get_T_given_egas( &
-               handle, Z, X, abar, zbar, &
+               handle, &
                species, chem_id, net_iso, xa, &
                logRho, egas_want, &
                logT_tol, egas_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logT_result, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+               logT_result, res, d_dlnd, d_dlnT, d_dxa, &
                eos_calls, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosDT_get_T_given_egas'

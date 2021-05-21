@@ -2029,7 +2029,7 @@
                logRho, which_other, other_value, &
                logT_tol, other_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2,  other_at_bnd1, other_at_bnd2, &
-               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          
          integer, intent(in) :: handle
@@ -2060,7 +2060,8 @@
          
          real(dp), intent(out) :: logT_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
+
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
 
@@ -2071,7 +2072,7 @@
                species, chem_id, net_iso, xa, &
                logRho, which_other, other_value, doing_Rho, &
                logT_guess, logT_result, logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-               logT_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
       
       end subroutine get_T
@@ -2083,7 +2084,7 @@
                logT, which_other, other_value, &
                logRho_tol, other_tol, max_iter, logRho_guess, &
                logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
      
          use const_def
@@ -2118,6 +2119,7 @@
             
          real(dp), intent(out) :: logRho_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
 
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
@@ -2130,7 +2132,7 @@
                species, chem_id, net_iso, xa, &
                logT, which_other, other_value, doing_Rho, &
                logRho_guess, logRho_result, logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-               logRho_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
 
       end subroutine get_Rho
@@ -2141,7 +2143,7 @@
                species, chem_id, net_iso, xa, &
                logRho, logP, logT_tol, logP_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          
          integer, intent(in) :: handle
@@ -2164,7 +2166,8 @@
          
          real(dp), intent(out) :: logT_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
+
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr
 
@@ -2175,7 +2178,7 @@
                species, chem_id, net_iso, xa, &
                logRho, 0, logP, doing_Rho, &
                logT_guess, logT_result, logT_bnd1, logT_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logT_tol, logP_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_tol, logP_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
       
       end subroutine get_T_given_Ptotal
@@ -2186,7 +2189,7 @@
                species, chem_id, net_iso, xa, &
                logT, logP, logRho_tol, logP_tol, max_iter, logRho_guess, &
                logRho_bnd1, logRho_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          
          integer, intent(in) :: handle
@@ -2209,7 +2212,8 @@
          
          real(dp), intent(out) :: logRho_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
+
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr
 
@@ -2221,7 +2225,7 @@
                logT, 0, logP, doing_Rho, &
                logRho_guess, logRho_result, &
                logRho_bnd1, logRho_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logRho_tol, logP_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_tol, logP_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
       
       end subroutine get_Rho_given_Ptotal
@@ -2232,7 +2236,7 @@
                species, chem_id, net_iso, xa, &
                logRho, egas, logT_tol, egas_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          
          integer, intent(in) :: handle
@@ -2253,7 +2257,8 @@
          
          real(dp), intent(out) :: logT_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
+
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr
 
@@ -2264,7 +2269,7 @@
                species, chem_id, net_iso, xa, &
                logRho, -1, egas, doing_Rho, &
                logT_guess, logT_result, logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logT_tol, egas_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_tol, egas_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
       
       end subroutine get_T_given_egas
@@ -2275,7 +2280,7 @@
                species, chem_id, net_iso, xa, &
                logT, egas, logRho_tol, egas_tol, max_iter, logRho_guess, &
                logRho_bnd1, logRho_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          
          integer, intent(in) :: handle
@@ -2298,7 +2303,8 @@
          
          real(dp), intent(out) :: logRho_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
+
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr
 
@@ -2310,7 +2316,7 @@
                logT, -1, egas, doing_Rho, &
                logRho_guess, logRho_result, &
                logRho_bnd1, logRho_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logRho_tol, egas_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_tol, egas_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
       
       end subroutine get_Rho_given_egas
@@ -2322,7 +2328,7 @@
                the_other_log, which_other, other_value, doing_Rho, &
                initial_guess, x, xbnd1, xbnd2, other_at_bnd1, other_at_bnd2, &
                xacc, yacc, ntry, &
-               res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          use const_def
          use chem_def, only: num_chem_isos
@@ -2343,7 +2349,7 @@
          real(dp), intent(in) :: xacc, yacc ! tolerances
          integer, intent(in) :: ntry ! max number of iterations        
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         real(dp), dimension(nv, species) :: d_dxa  ! need to make argument
+         real(dp), dimension(:,:) :: d_dxa_c_TRho
          integer, intent(out) :: eos_calls, ierr
          
          integer :: i, j, ix, iz
@@ -2419,7 +2425,7 @@
             call Get_eosDT_Results(rq, Z, XH1, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   rho, logRho, T, logT, &
-                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, ierr)
+                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, ierr)
 
             Pgas = exp(res(i_lnPgas))
             Prad = crad*T*T*T*T/3d0
