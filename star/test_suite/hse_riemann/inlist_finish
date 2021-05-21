@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      load_model_filename = 'removed.mod' ! from gyre_in_mesa_envelope, 13830
+      load_model_filename = 'removed.mod' ! from gyre_in_mesa_envelope, 28d7268
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
