@@ -47,7 +47,7 @@
                d_dlnT(num_eos_basic_results), &
                d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
                res2(num_eos_basic_results), d_dlnd2(num_eos_basic_results), &
-               d_dabar2(num_eos_basic_results), d_dzbar2(num_eos_basic_results), &
+               d_dxa2(num_eos_d_dxa_results, species), &
                d_dlnT2(num_eos_basic_results)
          integer:: ierr, i
          character (len=eos_name_length) :: names(num_eos_basic_results)
@@ -126,11 +126,11 @@
             return
          end if
 
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
+         call eosDT_get( &
+               handle, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, &
-               res2, d_dlnd2, d_dlnT2, d_dabar2, d_dzbar2, ierr)
+               res2, d_dlnd2, d_dlnT2, d_dxa2, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosDT_get for test1_eosPT'
             stop 1
@@ -618,7 +618,9 @@
          real(dp), intent(out), dimension(num_eos_basic_results) :: res
 
          real(dp), dimension(num_eos_basic_results) :: &
-               d_dlnd, d_dlnT, d_dabar, d_dzbar
+               d_dlnd, d_dlnT
+         real(dp), dimension(num_eos_d_dxa_results, species) :: &
+               d_dxa
          integer :: info, i
          real(dp) :: dlnT, dlnRho, lnRho_2, Prad, Pgas, P
 
@@ -645,11 +647,11 @@
             write(*,*)
          end if
          
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
+         call eosDT_get( &
+               handle, &
                species, chem_id, net_iso, xa, &
                Rho, arg_not_provided, T, arg_not_provided, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, info)
+               res, d_dlnd, d_dlnT, d_dxa, info)
          if (info /= 0) then
             write(*,*) 'info', info, 'Rho', Rho, 'T', T
             write(*,*) 'failed in Do_One_TRho'
