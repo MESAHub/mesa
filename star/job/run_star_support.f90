@@ -3101,12 +3101,15 @@
             integer :: num_pts, i, k, iounit
             ! these are needed to call eosPT_get
             real(dp) :: Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
-            ! these are needed to call eosDE_get
-            real(dp) :: T, log10T, dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E
+            real(dp) :: T, log10T
+            ! these are needed to call eosDT_get_T
             real(dp) :: T_guess_gas, T_guess_rad, logT_guess
+            integer :: eos_calls
             ! these are used for all eos calls
             real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
             real(dp), dimension(num_eos_d_dxa_results, s% species) :: d_dxa
+            real(dp), parameter :: logT_tol = 1d-8, logE_tol = 1d-8
+            integer, parameter :: MAX_ITERS = 20
             include 'formats'
             
             write(*,*)
@@ -3174,18 +3177,16 @@
                      T_guess_gas = 2*var2*s% abar(k)*mp/(3*kerg*(1+s% zbar(k))) ! ideal gas (var2=energy)
                      T_guess_rad = pow(var2/crad,0.25d0)
                      logT_guess = log10(max(T_guess_gas,T_guess_rad))
-                     ! note that eosDE_get receives first energy and then density
-                     ! as parameters (var1 and var2 are switched compared to the other eos*_get functions)
-                     call eosDE_get( &
-                        s% eos_handle, 1 - s% X(k) - s% Y(k), s% X(k), s% abar(k), s% zbar(k), &
+                     call eosDT_get_T( &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
-                        var2, log10(var2), var1, log10(var1), logT_guess, &
-                        T, log10T, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-                        dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, &
-                        dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E, &
-                        ierr)
+                        log10(var1), i_lnE, log10(var2)*ln10, &
+                        logT_tol, logE_tol*ln10, MAX_ITERS, logT_guess, &
+                        arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+                        log10T, res, d_dlnd, d_dlnT, d_dxa, &
+                        eos_calls, ierr)
                      if (ierr /= 0) then
-                        write(*,*) "failed in eosDE_get"
+                        write(*,*) "failed in eosDT_get_T (as eosDE)"
                         return
                      end if
                      entropy(i) = exp(res(i_lnS))
