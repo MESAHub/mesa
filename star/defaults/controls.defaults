@@ -7189,36 +7189,6 @@
     report_eos_settings_at_start_of_run = .false.
 
 
-      ! use_fixed_XZ_for_eos
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! for debugging
-
-      ! ::
-
-    use_fixed_XZ_for_eos = .false.
-
-
-      ! fixed_X_for_eos
-      ! ~~~~~~~~~~~~~~~
-
-      ! if ``use_fixed_XZ_for_eos``, then pass this value to eos instead of actual X.
-
-      ! ::
-
-    fixed_X_for_eos = -1
-
-
-      ! fixed_Z_for_eos
-      ! ~~~~~~~~~~~~~~~
-
-      ! if ``use_fixed_XZ_for_eos``, then pass this value to eos instead of actual Z.
-
-      ! ::
-
-    fixed_Z_for_eos = -1
-
-
       ! use_d_eos_dxa
       ! ~~~~~~~~~~~~~
 
