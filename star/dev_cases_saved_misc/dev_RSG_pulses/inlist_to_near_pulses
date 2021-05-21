@@ -29,12 +29,9 @@
 &controls
 
    log_Teff_lower_limit = 3.55
-   
-   ! set max_model_number for best growth/period
-   !max_model_number = 588 ! 2500
-    
+       
 ! timesteps
-   delta_HR_limit = 0.001
+   !delta_HR_limit = 0.01
 
 ! solver
 
@@ -147,9 +144,9 @@
 
    ! axis limits -- to override system default selections
    HR_logT_min = 3.4 ! -101 ! only used if > -100
-   HR_logT_max = 4.6 ! only used if > -100
-   HR_logL_min = 4.3 ! -101 ! only used if > -100
-   HR_logL_max = 5.2 ! -101 ! only used if > -100
+   HR_logT_max = 4.58 ! only used if > -100
+   HR_logL_min = 4.5 ! -101 ! only used if > -100
+   HR_logL_max = 5.1 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.
@@ -166,5 +163,6 @@
    HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
    HR_file_width = -1 ! negative means use same value as for window
    HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
          
 / ! end of pgstar namelist

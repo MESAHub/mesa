@@ -58,7 +58,7 @@
 
    ! HR window -- lg_L vs. lg_Teff
    
-   pgstar_interval = 2
+   pgstar_interval = 1
 
    HR_win_flag = .true.
    
@@ -68,10 +68,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 3.4 ! -101 ! only used if > -100
-   HR_logT_max = 4.6 ! only used if > -100
-   HR_logL_min = 3.5 ! -101 ! only used if > -100
-   HR_logL_max = 5.4 ! -101 ! only used if > -100
+   HR_logT_min = 3.5 ! -101 ! only used if > -100
+   HR_logT_max = 4.65 ! only used if > -100
+   HR_logL_min = 3.8 ! -101 ! only used if > -100
+   HR_logL_max = 4.9 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.
