@@ -324,7 +324,7 @@
     diffusion_maxsteps_for_isolve, diffusion_isolve_solver, &
     
     ! eos controls
-    use_fixed_XZ_for_eos, fixed_X_for_eos, fixed_Z_for_eos, use_d_eos_dxa, &
+    use_d_eos_dxa, &
     report_eos_settings_at_start_of_run, &
 
     ! opacity controls
@@ -1799,10 +1799,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
  ! eos controls
- s% use_fixed_XZ_for_eos = use_fixed_XZ_for_eos
  s% report_eos_settings_at_start_of_run = report_eos_settings_at_start_of_run
- s% fixed_X_for_eos = fixed_X_for_eos
- s% fixed_Z_for_eos = fixed_Z_for_eos
  s% use_d_eos_dxa = use_d_eos_dxa
 
  ! opacity controls
@@ -3477,9 +3474,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_isolve_solver = s% diffusion_isolve_solver
 
  ! eos controls
- use_fixed_XZ_for_eos = s% use_fixed_XZ_for_eos
- fixed_X_for_eos = s% fixed_X_for_eos
- fixed_Z_for_eos = s% fixed_Z_for_eos
  report_eos_settings_at_start_of_run = s% report_eos_settings_at_start_of_run
  use_d_eos_dxa = s% use_d_eos_dxa
  
