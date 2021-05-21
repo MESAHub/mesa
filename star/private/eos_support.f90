@@ -178,9 +178,9 @@ contains
   ! Solve for temperature & eos results data given density & gas energy
 
   subroutine solve_eos_given_DEgas( &
-       s, k, z, xh, abar, zbar, xa, &
+       s, k, xa, &
        logRho, egas, logT_guess, logT_tol, egas_tol, &
-       logT, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+       logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
        ierr)
 
     use eos_def
@@ -189,15 +189,15 @@ contains
     type (star_info), pointer :: s
     integer, intent(in) :: k ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
-         z, xh, abar, zbar, xa(:), logRho, egas, &
+         xa(:), logRho, egas, &
          logT_guess, logT_tol, egas_tol
     real(dp), intent(out) :: logT
     real(dp), dimension(num_eos_basic_results), intent(out) :: &
-         res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar
+         res, dres_dlnRho, dres_dlnT
+    real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
@@ -205,26 +205,18 @@ contains
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + 1
 
-    if (s% use_fixed_XZ_for_eos) then
-       eos_x = s% fixed_X_for_eos
-       eos_z = s% fixed_Z_for_eos
-    else
-       eos_x = xh
-       eos_z = z
-    end if
-
     if (s% use_other_eos) then
        write(*,*) 'cannot call solve_eos_given_DEgas with use_other_eos'
        ierr = -1
        return
     else
       call eosDT_get_T_given_egas( &
-         s% eos_handle, eos_z, eos_x, abar, zbar, &
+         s% eos_handle, &
          s% species, s% chem_id, s% net_iso, xa, &            
          logRho, egas, logT_tol, egas_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
          arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
          logT, res, dres_dlnRho, dres_dlnT, &
-         dres_dabar, dres_dzbar, eos_calls, ierr)
+         dres_dxa, eos_calls, ierr)
     end if
 
   end subroutine solve_eos_given_DEgas
@@ -234,9 +226,9 @@ contains
   ! Solve for temperature & eos results data given density & pressure
 
   subroutine solve_eos_given_DP( &
-       s, k, z, xh, abar, zbar, xa, &
+       s, k, xa, &
        logRho, logP, logT_guess, logT_tol, logP_tol, &
-       logT, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+       logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
        ierr)
 
     use eos_def
@@ -245,11 +237,12 @@ contains
     type (star_info), pointer :: s
     integer, intent(in) :: k ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
-         z, xh, abar, zbar, xa(:), logRho, logP, &
+         xa(:), logRho, logP, &
          logT_guess, logT_tol, logP_tol
     real(dp), intent(out) :: logT
     real(dp), dimension(num_eos_basic_results), intent(out) :: &
-         res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar
+         res, dres_dlnRho, dres_dlnT
+    real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
     integer :: eos_calls
@@ -261,26 +254,18 @@ contains
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + 1
 
-    if (s% use_fixed_XZ_for_eos) then
-       eos_x = s% fixed_X_for_eos
-       eos_z = s% fixed_Z_for_eos
-    else
-       eos_x = xh
-       eos_z = z
-    end if
-
     if (s% use_other_eos) then
        write(*,*) 'cannot call solve_eos_given_DP with use_other_eos set'
        ierr = -1
        return
     else
        call eosDT_get_T_given_Ptotal( &
-            s% eos_handle, eos_z, eos_x, abar, zbar, &
+            s% eos_handle, &
             s% species, s% chem_id, s% net_iso, xa, &
             logRho, logP, logT_tol, logP_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logT, res, dres_dlnRho, dres_dlnT, &
-            dres_dabar, dres_dzbar, eos_calls, ierr)
+            dres_dxa, eos_calls, ierr)
     end if
           
   end subroutine solve_eos_given_DP
@@ -346,9 +331,9 @@ contains
   ! Solve for density & eos results data given pressure & temperature
 
   subroutine solve_eos_given_PT( &
-       s, k, z, xh, abar, zbar, xa, &
+       s, k, xa, &
        logT, logP, logRho_guess, logRho_tol, logP_tol, &
-       logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+       logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
        ierr)
 
     use eos_def
@@ -357,15 +342,15 @@ contains
     type (star_info), pointer :: s
     integer, intent(in) :: k ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
-         z, xh, abar, zbar, xa(:), logT, logP, &
+         xa(:), logT, logP, &
          logRho_guess, logRho_tol, logP_tol
     real(dp), intent(out) :: logRho
     real(dp), dimension(num_eos_basic_results), intent(out) :: &
-         res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar
+         res, dres_dlnRho, dres_dlnT
+    real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
@@ -373,26 +358,18 @@ contains
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + 1
 
-    if (s% use_fixed_XZ_for_eos) then
-       eos_x = s% fixed_X_for_eos
-       eos_z = s% fixed_Z_for_eos
-    else
-       eos_x = xh
-       eos_z = z
-    end if
-
     if (s% use_other_eos) then
        write(*,*) 'cannot call solve_eos_given_PT with use_other_eos set'
        ierr = -1
        return
     else
        call eosDT_get_Rho_given_Ptotal( &
-            s% eos_handle, eos_z, eos_x, abar, zbar, &
+            s% eos_handle, &
             s% species, s% chem_id, s% net_iso, xa, &
             logT, logP, logRho_tol, logP_tol, MAX_ITER_FOR_SOLVE, logRho_guess, &
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logRho, res, dres_dlnRho, dres_dlnT, &
-            dres_dabar, dres_dzbar, eos_calls, ierr)
+            dres_dxa, eos_calls, ierr)
     end if
 
   end subroutine solve_eos_given_PT

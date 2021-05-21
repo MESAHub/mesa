@@ -246,6 +246,8 @@
          real(dp) :: &
             logRho_guess, rho_guess, other, other_tol, logRho_tol, Prad, f, dfdx, &
             logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, logRho_result
+
+         real(dp), allocatable :: d_dxa_c_TRho(:,:) ! (nv, species)
          
          logical, parameter :: dbg = .false.
          
@@ -272,6 +274,8 @@
          
          if (dbg) write(*,1) 'rho_guess', rho_guess
          if (dbg) write(*,1) 'logRho_guess', logRho_guess
+
+         allocate(d_dxa_c_TRho(nv, species))
          
          call get_Rho( &
                rq% handle, Z, X, abar, zbar, &
@@ -279,7 +283,7 @@
                logT, which_other, other, &
                logRho_tol, other_tol, max_iter, logRho_guess, &
                logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          if (ierr /= 0) then
             if (.false.) then
