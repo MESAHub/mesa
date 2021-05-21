@@ -32,8 +32,8 @@ module skye
          ! Blend parameters
          real(dp) :: big
          real(dp) :: skye_blend_width
-         integer, parameter :: num_points = 7
-         real(dp) :: bounds(7,2)
+         integer, parameter :: num_points = 6
+         real(dp) :: bounds(6,2)
          type (Helm_Table), pointer :: ht
 
          ierr = 0
@@ -47,30 +47,25 @@ module skye
          bounds(1,1) = ht% logdlo
          bounds(1,2) = ht% logthi
 
-         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~10)
+         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~1)
          bounds(2,1) = ht% logdlo
-         bounds(2,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
-
-         ! Divert to higher temperature because there's a large offset between SCVH/CMS and Skye
-         ! in lnE.
-         bounds(3,1) = -2d0
-         bounds(3,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
+         bounds(2,2) = max(6d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
-         bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
-         bounds(4,2) = max(6d0,log10(1d4 * pow2(zbar))) + skye_blend_width
+         bounds(3,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(3,2) = max(6d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! HELM low-T bound
-         bounds(5,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
-         bounds(5,2) = ht% logtlo
+         bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(4,2) = ht% logtlo
 
          ! Lower-right of (rho,T) plane
-         bounds(6,1) = ht% logdhi
-         bounds(6,2) = ht% logtlo
+         bounds(5,1) = ht% logdhi
+         bounds(5,2) = ht% logtlo
 
          ! Upper-right of (rho,T) plane
-         bounds(7,1) = ht% logdhi
-         bounds(7,2) = ht% logthi
+         bounds(6,1) = ht% logdhi
+         bounds(6,2) = ht% logthi
 
          ! Set up auto_diff point
          p(1) = logRho
