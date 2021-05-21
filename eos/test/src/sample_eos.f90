@@ -120,14 +120,6 @@
 
 ! call the density-temperature based eos
 
-! composition derivatives in terms or abar and zbar
-!         call eosDT_get_legacy( &
-!               handle, Z, X, abar, zbar, &
-!               species, chem_id, net_iso, xa, &
-!               Rho, log10(Rho), T, log10(T), &
-!               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
-
-
 ! composition derivatives by isotope
 
          call eosDT_get( &
