@@ -1292,6 +1292,8 @@
                val = s% star_age*secyer/60/60
             case(h_star_age_day)
                val = s% star_age*secyer/60/60/24
+            case(h_star_age_yr)
+               val = s% star_age
             case(h_day)
                val = s% star_age*secyer/60/60/24
 

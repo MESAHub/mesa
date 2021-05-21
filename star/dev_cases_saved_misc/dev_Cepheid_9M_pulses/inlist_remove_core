@@ -46,7 +46,6 @@
    max_model_number = 100 ! must be large enough to reach max_timestep
 
 ! atm
-   ! must set same BCs in inlist_convert, inlist_initialize, and inlist_pulse
    use_momentum_outer_BC = .true.
 
 ! mlt

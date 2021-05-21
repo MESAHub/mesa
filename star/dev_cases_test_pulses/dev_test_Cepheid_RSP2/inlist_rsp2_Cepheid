@@ -1,5 +1,8 @@
 
 &star_job
+    save_star_job_namelist = .true.
+    star_job_namelist_name = 'rsp2_job.txt'
+
    show_log_description_at_start = .false.
    
    load_saved_model_for_RSP2 = .true.
@@ -53,6 +56,9 @@
 / ! end of kap namelist
 
 &controls  
+    save_controls_namelist = .true.
+    controls_namelist_name = 'rsp2_controls.txt'
+
    initial_z = 0.008d0
    initial_mass = 6d0
 

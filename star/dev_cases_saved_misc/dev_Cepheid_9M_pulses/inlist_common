@@ -1,8 +1,11 @@
 &star_job
    show_log_description_at_start = .false.
+   history_columns_file = '../../rsp2_utils/history_columns.list'
+   profile_columns_file = '../../rsp2_utils/profile_columns.list'
 / ! end of star_job namelist
 
 &eos
+   use_Skye = .true.
 / !end of eos namelist
 
 &kap

@@ -53,7 +53,8 @@
       integer, parameter :: h_star_age_hr = h_star_age_min + 1
       integer, parameter :: h_day = h_star_age_hr + 1
       integer, parameter :: h_star_age_day = h_day + 1
-      integer, parameter :: h_log_star_age_sec = h_star_age_day + 1
+      integer, parameter :: h_star_age_yr = h_star_age_day + 1
+      integer, parameter :: h_log_star_age_sec = h_star_age_yr + 1
       integer, parameter :: h_time_step_sec = h_log_star_age_sec + 1
       integer, parameter :: h_log_dt_sec = h_time_step_sec + 1
       integer, parameter :: h_time_step_days = h_log_dt_sec + 1
@@ -796,6 +797,7 @@
          history_column_name(h_star_age_min) = 'star_age_min'
          history_column_name(h_star_age_hr) = 'star_age_hr'
          history_column_name(h_star_age_day) = 'star_age_day'
+         history_column_name(h_star_age_yr) = 'star_age_yr'
          history_column_name(h_day) = 'day'
 
          history_column_name(h_star_mass) = 'star_mass'

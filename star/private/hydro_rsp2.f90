@@ -292,11 +292,15 @@
                skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
             if (ierr /= 0) stop 'get_P_surf failed in set_hydro_vars'
             !write(*,1) 'after update_vars: old logT cntr', s% lnT(nz_old)/ln10
+            !write(*,1) 's% tau_factor', s% tau_factor
+            !write(*,1) 's% tau_base', s% tau_base
             call get_atm_PT( &
                  s, s% tau_factor*s% tau_base, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
                  Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                  lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
             if (ierr /= 0) stop 'get_P_surf failed in get_atm_PT'
+            !write(*,1) 'logPsurf', lnP_surf/ln10
+            !stop 'get_P_surf'
             get_P_surf = exp(lnP_surf)
          end function get_P_surf
          
@@ -346,8 +350,8 @@
                end if
                s% lnT(k) = logT*ln10
                s% xh(s% i_lnT,k) = s% lnT(k)
-               !write(*,2) 'dlogT logT logT_guess logP logRho', k, &
-               !   logT - logT_guess, logT, logT_guess, logP, logRho
+               !write(*,2) 'logP dlogT logT logT_guess logRho', k, &
+               !   logP, logT - logT_guess, logT, logT_guess, logRho
                P_m1 = P_00
             end do
             !write(*,1) 'after revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10

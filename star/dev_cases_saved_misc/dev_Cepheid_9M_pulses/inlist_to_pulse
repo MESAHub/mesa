@@ -30,7 +30,10 @@
 &controls
 
    log_Teff_lower_limit = 3.68
-   !max_model_number = 991          ! comment out on 1st pass when searching for best
+   !max_model_number = 991          ! comment out on 1st pass when searching for best model
+
+! atm
+   use_momentum_outer_BC = .true.  ! required for RSP2
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -55,10 +58,11 @@
       ! < 0 means report best over all gyre results for any order
 
 ! output controls
-   num_trace_history_values = 3
+   num_trace_history_values = 4
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'log_Teff'
+   trace_history_value_name(3) = 'Teff'
+   trace_history_value_name(4) = 'log_Teff'
    
 
    photo_interval = 10
@@ -163,7 +167,7 @@
 
    ! axis limits -- to override system default selections
    HR_logT_min = 3.63 ! -101 ! only used if > -100
-   HR_logT_max = 3.77 ! only used if > -100
+   HR_logT_max = 3.81 ! only used if > -100
    HR_logL_min = 3.99 ! -101 ! only used if > -100
    HR_logL_max = 4.065 ! -101 ! only used if > -100
 

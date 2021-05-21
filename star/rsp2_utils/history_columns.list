@@ -1,0 +1,24 @@
+   
+      model_number ! counting from the start of the run
+      num_retries ! total during the run
+      star_age
+      star_age_sec
+      star_age_min
+      star_age_hr
+      star_age_day
+      star_age_yr
+      log_dt_sec
+      time_step_sec
+      log_rel_run_E_err
+      v_surf_km_s
+      v_div_cs
+      radius
+      log_R
+      effective_T
+      Teff
+      log_Teff
+      luminosity
+      log_L
+      
+
+

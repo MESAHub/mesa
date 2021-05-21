@@ -18,9 +18,9 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d1
+      seconds_for_initial_dt = 1d-1
 
-      !pgstar_flag = .true.
+      pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -37,9 +37,9 @@
 
 &controls
    
-   max_timestep = 1d1
+   max_timestep = 1d3
    
-   max_model_number = 10
+   max_model_number = 100
 
 ! RSP2
    RSP2_nz = 150
