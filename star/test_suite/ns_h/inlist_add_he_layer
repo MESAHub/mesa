@@ -31,13 +31,11 @@
       set_initial_age = .true.
       initial_age = 0
 
-      !pgstar_flag = .true.
+!      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-   logRho1_PC_limit = 3.1d0 ! 2.999d0 ! keep < logRho2_OPAL_SCVH_limit (3.48)
-   logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
 / ! end of eos namelist
 
 &kap
@@ -51,7 +49,7 @@
       use_other_cgrav = .true. ! for GR factor with gravity
 
       max_age_in_seconds = 0.5d0 ! use max age to set thickness of he layer
-           
+      scale_max_correction_for_negative_surf_lum = .true.           
       mass_change = 1d-9
       max_years_for_timestep = 1d-3
 
@@ -60,7 +58,7 @@
          
       use_gold2_tolerances = .false.
       use_gold_tolerances = .false.
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
 
       max_number_retries = 250
       max_model_number = 2000
@@ -96,20 +94,20 @@
       mixing_length_alpha = 1.5
       MLT_option = 'Henyey'
 
-      use_Ledoux_criterion = .false.  
+      use_Ledoux_criterion = .true.  
       alpha_semiconvection = 0.1
       thermohaline_coeff = 2
       thermohaline_option = 'Kippenhahn'
    
-      merge_if_dlnR_too_small = .true.
-      mesh_min_dlnR = 1d-9
+!      merge_if_dlnR_too_small = .true.
+!      mesh_min_dlnR = 1d-9
 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
       Pextra_factor = 2
    
-      varcontrol_target = 1d-3 
+      varcontrol_target = 1d-3
 
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
@@ -123,6 +121,8 @@
       terminal_interval = 10
       write_header_frequency = 10
    
+
+report_solver_progress = .true.
 
 / ! end of controls namelist
 
