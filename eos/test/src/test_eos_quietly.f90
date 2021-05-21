@@ -9,7 +9,6 @@
 
       call Do_One(quietly)
       call test1_eosPT_for_ck(quietly)
-      call test1_eosDE_for_ck(quietly)
 
       end   
 
