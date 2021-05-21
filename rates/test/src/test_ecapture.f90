@@ -137,8 +137,8 @@ contains
     logical, intent(in) :: use_special
 
     real(dp) :: Rho, T, Pgas, log10Rho, log10T
-    real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, d_dlnRho_const_T, d_dlnT_const_Rho
-    real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+    real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
+    real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
     integer :: ierr
 
     integer :: i, ir, nr
@@ -188,12 +188,11 @@ contains
     YeRho = Ye*rho
 
     ! get a set of results for given temperature and density
-    call eosDT_get_legacy( &
-         handle, Z, X, abar, zbar, &
+    call eosDT_get( &
+         handle, &
          species, chem_id, net_iso, xa, &
          Rho, logRho, T, logT,   &
-         !res, d_dlnd, d_dlnT, Pgas, Prad, energy, entropy, ierr)
-         res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+         res, d_dlnd, d_dlnT, d_dxa, ierr)
 
     call coulomb_set_context(cc, T, Rho, log10T, log10Rho, &
          zbar, abar, z2bar)
