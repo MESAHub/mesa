@@ -32,39 +32,45 @@ module skye
          ! Blend parameters
          real(dp) :: big
          real(dp) :: skye_blend_width
-         integer, parameter :: num_points = 8
-         real(dp) :: bounds(8,2)
+         integer, parameter :: num_points = 7
+         real(dp) :: bounds(7,2)
          type (Helm_Table), pointer :: ht
 
          ierr = 0
 
-         ht => eos_ht
+         ht => eos_ht 
 
          big = 12d0
          skye_blend_width = 0.1d0
+
+         ! Top-left of (rho,T) plane
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = 7.5d0
+         bounds(1,2) = ht% logthi
 
-         bounds(2,1) = 4d0
-         bounds(2,2) = 7.5d0
+         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~10)
+         bounds(2,1) = ht% logdlo
+         bounds(2,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
-         bounds(3,1) = 0.6d0
-         bounds(3,2) = 6.2d0
+         ! Divert to higher temperature because there's a large offset between SCVH/CMS and Skye
+         ! in lnE.
+         bounds(3,1) = -2d0
+         bounds(3,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
-         bounds(4,1) = 4d0
-         bounds(4,2) = 6.2d0
+         ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
+         bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(4,2) = max(6d0,log10(1d4 * pow2(zbar))) + skye_blend_width
 
-         bounds(5,1) = 4d0
+         ! HELM low-T bound
+         bounds(5,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
          bounds(5,2) = ht% logtlo
 
+         ! Lower-right of (rho,T) plane
          bounds(6,1) = ht% logdhi
          bounds(6,2) = ht% logtlo
 
+         ! Upper-right of (rho,T) plane
          bounds(7,1) = ht% logdhi
          bounds(7,2) = ht% logthi
-
-         bounds(8,1) = ht% logdlo
-         bounds(8,2) = ht% logthi
 
          ! Set up auto_diff point
          p(1) = logRho
