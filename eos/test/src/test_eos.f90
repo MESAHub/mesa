@@ -22,8 +22,6 @@
 
       call test1_eosPT_for_ck(quietly)
       
-      call test1_eosDE_for_ck(quietly)
-
       call do_test_eos_blend()
 
       end   
