@@ -25,9 +25,9 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d4 ! start at max/10
+      seconds_for_initial_dt = 6d3 ! start at max/10
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -44,7 +44,7 @@
    !save_controls_namelist = .true.
    !controls_namelist_name = 'rsp2_test_controls.txt'
    
-   max_timestep = 1d5
+   max_timestep = 6d4
 
    max_model_number = 2500000
       
@@ -52,9 +52,8 @@
 
 ! atm
    !use_zero_Pgas_outer_BC = .true.
-   use_momentum_outer_BC = .true. 
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0d0
+   !use_fixed_Psurf_outer_BC = .true.
+   !fixed_Psurf = 0d0
 
 ! solver
    steps_before_use_velocity_time_centering = 0
@@ -69,7 +68,7 @@
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 690 ! expected period (in days) 
+   x_ctrl(7) = 430 ! expected period (in days) 
 !   x_ctrl(8) = 1d-1 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.1 ! min_period_div_target
@@ -83,16 +82,15 @@
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      photo_interval = 5000
-      profile_interval = 5000
-      history_interval = 50
-      terminal_interval = 5000
-
-
       photo_interval = 4000
       profile_interval = 4000
       history_interval = 50
       terminal_interval = 1000
+
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 50
+      terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
             
@@ -168,7 +166,7 @@
 
     !pause = .true.
     !pause_interval = 100
-    pgstar_interval = 25
+    pgstar_interval = 1 ! 25
 
  ! window 1
 
@@ -191,12 +189,12 @@
     Grid2_title = '2 M\d\(2281)\u  Z=0.02  Mira'
    
     History_Panels2_xaxis_name='star_age_day'
-    History_Panels2_max_width = 50 ! only used if > 0.  causes xmin to move with xmax.
+    History_Panels2_max_width = 2000 ! only used if > 0.  causes xmin to move with xmax.
 
     !Grid2_file_flag = .true.
     file_digits = 8
     Grid2_file_dir = 'png'
-    Grid2_file_prefix = '9M_cepheid_'
+    Grid2_file_prefix = '2M_Mira_'
     Grid2_file_interval = 5 ! 25 ! output when mod(model_number,Grid2_file_interval)==0
 
     Profile_Panels2_xaxis_name = 'logxm'

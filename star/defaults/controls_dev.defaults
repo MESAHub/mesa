@@ -62,6 +62,7 @@
    RSP2_w_min_for_damping = 1d2
    RSP2_source_seed = 0d0
      
+   RSP2_remesh_when_load = .true.
      
    RSP2_nz = 150
    RSP2_nz_outer = 40

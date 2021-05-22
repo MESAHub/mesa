@@ -19,6 +19,8 @@
       log_Teff
       luminosity
       log_L
+      log_LHe
+      log_LH
       
 
 

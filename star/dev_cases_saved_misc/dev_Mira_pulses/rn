@@ -36,15 +36,19 @@ echo 'finished'
 
 return
 
-after to_pulse
+after to_pulse       Teff 2676   logL 3.72    near peak of He shell flash
    model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     610       1          0.1688E-07       59236127.2640            685.6033             10.8349
-     610       2          0.4138E-07       24165261.1913            279.6905             11.7369
-after remove core
+    1985       1          0.2706E-07       36954653.6617            427.7159              1.8403
+    1985       2          0.6113E-07       16359513.7145            189.3462              2.3921
+after remove core    Teff 2676   logL 3.72
+     100       1          0.2706E-07       36951672.5334            427.6814              1.8401
+     100       2          0.6114E-07       16356779.3298            189.3146              2.3916
+after remesh         Teff 2677   logL 3.72 (at step 1)
    model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     100       1          0.1675E-07       59718754.5326            691.1893             10.7372
-     100       2          0.4116E-07       24294067.3288            281.1813             11.7150
-after remesh
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     100       1          0.1686E-07       59297596.0123            686.3148              9.5035
-     100       2          0.4147E-07       24115264.4040            279.1119             12.1100
+      10       1          0.2687E-07       37213959.9325            430.7171              1.5140
+      10       2          0.6040E-07       16556936.1610            191.6312              2.0905
+after initialize
+ set gyre starting velocities
+   order           freq (Hz)             P (sec)             P (day)    cycles to double
+       1          0.2687E-07       37213959.9325            430.7171              1.5140
+       2          0.6040E-07       16556936.1610            191.6312              2.0905

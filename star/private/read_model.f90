@@ -81,7 +81,7 @@
             reset_epsnuc_vectors, set_qs
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
             set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
-         use hydro_RSP2, only: remesh_for_RSP2, Hp_face_for_RSP2_val
+         use hydro_RSP2, only: remesh_for_RSP2, Hp_face_for_RSP2_val, set_RSP2_vars
          use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
@@ -91,11 +91,7 @@
          integer, intent(out) :: ierr
          integer :: k, i, j,  nz
          real(dp) :: u00, um1, xm, total_radiation
-
-         logical, parameter :: dbg = .false.
-
          include 'formats'
-
          ierr = 0
          nz = s% nz
          s% brunt_B(1:nz) = 0 ! temporary proxy for brunt_B
@@ -104,20 +100,6 @@
          if (ierr /= 0) then
             write(*,*) 'set_qs_etc failed in finish_load_model'
             return
-         end if
-         
-         if (want_RSP2_model .and. .not. is_RSP2_model .and. .not. is_RSP_model) then
-            write(*,*) 'doing automatic remesh for RSP2'
-            call remesh_for_RSP2(s,ierr)
-            if (ierr /= 0) then
-               write(*,*) 'remesh_for_RSP2 failed in finish_load_model'
-               return
-            end if
-            call set_qs_etc(ierr)
-            if (ierr /= 0) then
-               write(*,*) 'set_qs_etc failed in finish_load_model'
-               return
-            end if
          end if
                   
          call reset_epsnuc_vectors(s)
@@ -141,7 +123,6 @@
                ! need to recompute irot and jrot
                call use_xh_to_update_i_rot_and_j_rot(s)
             end if
-
             ! this ensures fp, ft, r_equatorial and r_polar are set by the end
             !call set_rotation_info(s, .true., ierr)
             !if (ierr /= 0) then
@@ -149,7 +130,6 @@
             !      'finish_load_model failed in set_rotation_info'
             !   return
             !end if
-
          end if
 
          ! clear some just to avoid getting NaNs at start
@@ -164,10 +144,6 @@
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
             call fill_ad_with_zeros(s% P_face_ad,1,-1)
          end if
-
-         if (dbg) write(*,2) 'load_model: s% dq(1)', 1, s% dq(1)
-         if (dbg) write(*,2) 'load_model: s% dm(1)', 1, s% dm(1)
-         if (dbg) write(*,2) 'load_model: s% m(1)/msun', 1, s% m(1)/Msun
          
          if (s% RSP_flag) then
             call RSP_setup_part1(s,restart,ierr)
@@ -183,16 +159,40 @@
          end if
          
          s% doing_finish_load_model = .true.  
+         
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in set_vars'
             return
          end if
-         s% doing_finish_load_model = .false.
-
-         if (s% rotation_flag) s% total_angular_momentum = total_angular_momentum(s)
          
-         if (is_RSP_model .and. (.not. want_RSP_model) .and. want_RSP2_model) then
+         if (s% RSP2_flag) then
+            call set_RSP2_vars(s,ierr)
+            if (ierr /= 0) then
+               write(*,*) 'set_RSP2_vars failed in finish_load_model'
+               return
+            end if
+         end if
+         
+         if (s% RSP2_remesh_when_load .and. want_RSP2_model .and. &
+             .not. is_RSP2_model .and. .not. is_RSP_model) then
+            write(*,*) 'doing automatic remesh for RSP2'
+            call remesh_for_RSP2(s,ierr)
+            if (ierr /= 0) then
+               write(*,*) 'remesh_for_RSP2 failed in finish_load_model'
+               return
+            end if
+            call set_qs_etc(ierr) ! redo after remesh_for_RSP2
+            if (ierr /= 0) then
+               write(*,*) 'set_qs_etc failed in finish_load_model'
+               return
+            end if
+            call set_vars(s, s% dt, ierr) ! redo after remesh_for_RSP2
+            if (ierr /= 0) then
+               write(*,*) 'set_vars failed in finish_load_model'
+               return
+            end if
+         else if (want_RSP2_model .and. is_RSP_model .and. .not. want_RSP_model) then
             do k=1,s%nz
                s% Hp_face(k) = Hp_face_for_RSP2_val(s, k, ierr)
                if (ierr /= 0) then
@@ -203,6 +203,10 @@
             end do
          end if
 
+         s% doing_finish_load_model = .false.
+
+         if (s% rotation_flag) s% total_angular_momentum = total_angular_momentum(s)
+
          if (s% RSP_flag) then
             call RSP_setup_part2(s, restart, want_RSP_model, is_RSP_model, ierr)
             if (ierr /= 0) then
@@ -210,10 +214,6 @@
                return
             end if
          end if
-         
-         if (dbg) write(*,2) 'load_model: s% dq(1)', 1, s% dq(1)
-         if (dbg) write(*,2) 'load_model: s% dm(1)', 1, s% dm(1)
-         if (dbg) write(*,2) 'load_model: s% m(1)/msun', 1, s% m(1)/Msun
 
          s% doing_finish_load_model = .true.
          call do_report(s, ierr)
@@ -515,6 +515,11 @@
          end if
 
          if (is_RSP2_model .and. .not. want_RSP2_model) s% have_mlt_vc = .true.
+         
+         if (want_RSP2_model .and. .not. is_RSP_model .and. .not. is_RSP2_model) then
+            if (s% i_Hp == 0) stop 'expected to have Hp variable in read model'
+            s% xh(s% i_Hp,1:nz) = -1d0 
+         end if
 
          do_read_prev = BTEST(file_type, bit_for_2models)
          if (ierr == 0) then

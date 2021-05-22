@@ -79,13 +79,10 @@
          nz = s% RSP2_nz
          if (nz == nz_old) return ! assume have already done remesh for RSP2
          if (nz > nz_old) stop 'remesh_for_RSP2 cannot increase nz'
-         !write(*,1) 'before get_P_surf: logT cntr m dq', &
-         !   s% xh(s% i_lnT,nz_old)/ln10, s% m(nz_old)/Msun, s% dq(nz_old)
+         call setvars(ierr)
+         if (ierr /= 0) stop 'remesh_for_RSP2 failed in setvars'
          P_surf = get_P_surf(ierr)
          if (ierr /= 0) stop 'remesh_for_RSP2 failed in get_P_surf'
-         !write(*,1) 'after get_P_surf: logT cntr m dq', &
-         !   s% lnT(nz_old)/ln10, s% m(nz_old)/Msun, s% dq(nz_old)
-         !write(*,1) 'remesh_for_RSP2: old logT_1', old_logT_1
          allocate(&
             xm_old(nz_old+1), xm_mid_old(nz_old), v_old(nz_old+1), &
             xm(nz+1), xm_mid(nz), v_new(nz+1), work1((nz_old+1)*pm_work_size))
@@ -98,29 +95,68 @@
          if (s% i_v /= 0) call interpolate1_face_val(s% i_v, s% v_center)
          call set_new_lnd
          call interpolate1_cell_val(s% i_lnT)
-         !write(*,1) 'after interpolate: logT cntr m dq', s% xh(s% i_lnT,nz)/ln10, s% m(nz)/Msun, s% dq(nz)
-         !write(*,1) 'after interpolate: old new logT 1', old_logT_1, s% xh(s% i_lnT,1)/ln10
          call interpolate1_cell_val(s% i_w)
          do j=1,s% species
             call interpolate1_xa(j)
          end do
          call rescale_xa
-         !write(*,1) 'before revise: logT cntr m dq', s% xh(s% i_lnT,nz)/ln10, s% m(nz)/Msun, s% dq(nz)
          call revise_lnT_for_QHSE(P_surf, ierr)
          if (ierr /= 0) stop 'remesh_for_RSP2 failed in revise_lnT_for_QHSE'
-         !write(*,1) 'after revise: logT cntr m dq', s% xh(s% i_lnT,nz)/ln10, s% m(nz)/Msun, s% dq(nz)
-         !write(*,1) 'after revise: old new logT 1', old_logT_1, s% xh(s% i_lnT,1)/ln10
          do k=1,nz
-            s% xh(s% i_Hp,k) = Hp_face_for_RSP2_val(s, k, ierr)
+            call set_Hp_face(k)
          end do
-         s% need_to_setvars = .true.       
          deallocate(work1)  
-
          s% nz = nz
          
-         !stop 'remesh_for_RSP2'
-         
          contains
+
+         subroutine setvars(ierr)
+            use hydro_vars, only: unpack_xh, set_hydro_vars
+            integer, intent(out) :: ierr
+            logical, parameter :: &
+               skip_basic_vars = .false., &
+               skip_micro_vars = .false., &
+               skip_m_grav_and_grav = .false., &
+               skip_net = .true., &
+               skip_neu = .true., &
+               skip_kap = .false., &
+               skip_grads = .true., &
+               skip_rotation = .true., &
+               skip_brunt = .true., &
+               skip_other_cgrav = .true., &
+               skip_mixing_info = .true., &
+               skip_set_cz_bdy_mass = .true., &
+               skip_mlt = .true., &
+               skip_eos = .false.
+            ierr = 0
+            call unpack_xh(s,ierr)
+            if (ierr /= 0) stop 'remesh_for_RSP2 failed in unpack_xh'
+            call set_hydro_vars( &
+               s, 1, nz_old, skip_basic_vars, &
+               skip_micro_vars, skip_m_grav_and_grav, skip_eos, skip_net, skip_neu, &
+               skip_kap, skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
+               skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
+            if (ierr /= 0) stop 'remesh_for_RSP2 failed in set_hydro_vars'
+         end subroutine setvars
+         
+         real(dp) function get_P_surf(ierr)
+            use atm_support, only: get_atm_PT
+            integer, intent(out) :: ierr
+            real(dp) :: Teff, &
+               lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+               lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
+            logical, parameter :: skip_partials = .true.
+            include 'formats'
+            ierr = 0
+            call get_atm_PT( &
+                 s, s% tau_factor*s% tau_base, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
+                 Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
+            if (ierr /= 0) stop 'get_P_surf failed in get_atm_PT'
+            !write(*,1) 'logPsurf', lnP_surf/ln10
+            !stop 'get_P_surf'
+            get_P_surf = exp(lnP_surf)
+         end function get_P_surf
          
          subroutine set_xm_old
             xm_old(1) = 0d0
@@ -296,53 +332,6 @@
             end do
          end subroutine rescale_xa
          
-         real(dp) function get_P_surf(ierr)
-            use hydro_vars, only: unpack_xh, set_hydro_vars
-            use atm_support, only: get_atm_PT
-            integer, intent(out) :: ierr
-            logical, parameter :: &
-               skip_partials = .true., &
-               skip_basic_vars = .false., &
-               skip_micro_vars = .false., &
-               skip_m_grav_and_grav = .false., &
-               skip_net = .true., &
-               skip_neu = .true., &
-               skip_kap = .false., &
-               skip_grads = .true., &
-               skip_rotation = .true., &
-               skip_brunt = .true., &
-               skip_other_cgrav = .true., &
-               skip_mixing_info = .true., &
-               skip_set_cz_bdy_mass = .true., &
-               skip_mlt = .true., &
-               skip_eos = .false.
-            real(dp) :: Teff, &
-               lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-               lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
-            include 'formats'
-            ierr = 0
-            !write(*,1) 'before update_vars: old logT cntr', s% xh(s% i_lnT,nz_old)/ln10
-            call unpack_xh(s,ierr)
-            if (ierr /= 0) stop 'get_P_surf failed in unpack_xh'
-            call set_hydro_vars( &
-               s, 1, nz_old, skip_basic_vars, &
-               skip_micro_vars, skip_m_grav_and_grav, skip_eos, skip_net, skip_neu, &
-               skip_kap, skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
-               skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
-            if (ierr /= 0) stop 'get_P_surf failed in set_hydro_vars'
-            !write(*,1) 'after update_vars: old logT cntr', s% lnT(nz_old)/ln10
-            !write(*,1) 's% tau_factor', s% tau_factor
-            !write(*,1) 's% tau_base', s% tau_base
-            call get_atm_PT( &
-                 s, s% tau_factor*s% tau_base, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
-                 Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
-            if (ierr /= 0) stop 'get_P_surf failed in get_atm_PT'
-            !write(*,1) 'logPsurf', lnP_surf/ln10
-            !stop 'get_P_surf'
-            get_P_surf = exp(lnP_surf)
-         end function get_P_surf
-         
          subroutine revise_lnT_for_QHSE(P_surf, ierr)
             use eos_def, only: num_eos_basic_results
             use chem_lib, only: basic_composition_info
@@ -372,6 +361,8 @@
                end if
                P_00 = P_m1 + s% cgrav(k)*s% m(k)*dm_face/(4d0*pi*pow4(s% r(k)))
                logP = log10(P_00) ! value for QHSE
+               s% lnPeos(k) = logP/ln10
+               s% Peos(k) = P_00
                logRho = s% lnd(k)/ln10
                logT_guess = s% lnT(k)/ln10
                logT_tol = 1d-11
@@ -397,6 +388,27 @@
             !write(*,1) 'after revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
             !stop
          end subroutine revise_lnT_for_QHSE
+
+         subroutine set_Hp_face(k)
+            integer, intent(in) :: k
+            real(dp) :: r_00, d_00, Peos_00, Peos_div_rho, Hp_face, &
+               d_m1, Peos_m1, alfa, beta
+            r_00 = s% r(k)
+            d_00 = s% rho(k)
+            Peos_00 = s% Peos(k)
+            if (k == 1) then
+               Peos_div_rho = Peos_00/d_00
+               Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
+            else
+               d_m1 = s% rho(k-1)
+               Peos_m1 = s% Peos(k-1)
+               call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+               Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
+               Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
+            end if
+            s% Hp_face(k) = Hp_face
+            s% xh(s% i_Hp, k) = Hp_face
+         end subroutine set_Hp_face
 
       end subroutine remesh_for_RSP2
       
@@ -525,7 +537,10 @@
          !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k=1,s%nz
             ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
-            if (s% Hp_face(k) <= 0) s% Hp_face(k) = get_scale_height_face_val(s,k)
+            if (s% Hp_face(k) <= 0) then
+               s% Hp_face(k) = get_scale_height_face_val(s,k)
+               s% xh(s% i_Hp,k) = s% Hp_face(k)
+            end if
             x = compute_Y_face(s, k, op_err)
             if (op_err /= 0) ierr = op_err
             x = compute_PII_face(s, k, op_err)
@@ -644,7 +659,7 @@
          Hp_actual = wrap_Hp_00(s, k)  
          Hp_start = s% Hp_face_start(k)
          scale = 1d0/Hp_start
-         if (is_bad(scale)) then
+         if (is_bad(scale) .or. scale <= 0d0) then
             write(*,2) 'do1_rsp2_Hp_eqn scale', k, scale
             stop 'do1_rsp2_Hp_eqn'
          end if
@@ -654,6 +669,16 @@
          s% equ(s% i_equ_Hp, k) = residual         
          if (test_partials) then
             s% solver_test_partials_val = residual 
+         end if
+         
+         if (residual > 1d3) then
+         !$OMP critical
+            write(*,2) 'residual', k, residual
+            write(*,2) 'Hp_expected', k, Hp_expected%val
+            write(*,2) 'Hp_actual', k, Hp_actual%val
+            write(*,2) 'scale', k, scale
+            stop 'do1_rsp2_Hp_eqn'
+         !$OMP end critical
          end if
          
          call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp2_Hp_eqn', ierr)
@@ -1549,7 +1574,7 @@
             s% Lt_start(k) = Lt%val  
             s% w_start(k) = s% w(k)
             s% Hp_face_start(k) = s% Hp_face(k)
-         end do         
+         end do    
       end subroutine set_etrb_start_vars
       
       

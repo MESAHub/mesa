@@ -43,7 +43,7 @@
       !log_L_upper_limit = 3.8
 
       ! limit max_model_number as part of test_suite
-      !max_model_number = 14461
+      max_model_number = 1985
 
 ! atm
    use_momentum_outer_BC = .true.
@@ -70,7 +70,7 @@
 ! solver
 
 ! GYRE output controls
-   x_integer_ctrl(1) = -25 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = 5 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
    x_integer_ctrl(2) = 2 ! max number of modes to output per call
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
@@ -213,10 +213,10 @@
    History_Panels2_win_aspect_ratio = 0.75
    
    History_Panels2_title = '2 M\d\(2281)\u  Z=0.02  Mira'      
-   History_Panels2_num_panels = 2
+   History_Panels2_num_panels = 3
 
-   !History_Panels2_xaxis_name='model_number'
-   History_Panels2_xaxis_name='star_age'
+   History_Panels2_xaxis_name='model_number'
+   !History_Panels2_xaxis_name='star_age'
    History_Panels2_automatic_star_age_units = .true.
    History_Panels2_max_width = -1 !  200 ! only used if > 0.  causes xmin to move with xmax.
    
@@ -232,16 +232,28 @@
    History_Panels2_other_ymax(1) = -101d0 ! only used if /= -101d0        
    History_Panels2_other_dymin(1) = -1 
   
-  History_Panels2_yaxis_name(2) = 'log_R' 
+  History_Panels2_yaxis_name(2) = 'log_LH' 
   History_Panels2_yaxis_reversed(2) = .false.
   History_Panels2_ymin(2) = -101d0 ! only used if /= -101d0
   History_Panels2_ymax(2) = -101d0 ! only used if /= -101d0        
   History_Panels2_dymin(2) = -1 
   
-  History_Panels2_other_yaxis_name(2) = 'model_number' 
+  History_Panels2_other_yaxis_name(2) = 'log_LHe' 
   History_Panels2_other_yaxis_reversed(2) = .false.
   History_Panels2_other_ymin(2) = -101d0 ! only used if /= -101d0
   History_Panels2_other_ymax(2) = -101d0 ! only used if /= -101d0        
   History_Panels2_other_dymin(2) = -1 
+  
+  History_Panels2_yaxis_name(3) = 'log_R' 
+  History_Panels2_yaxis_reversed(3) = .false.
+  History_Panels2_ymin(3) = -101d0 ! only used if /= -101d0
+  History_Panels2_ymax(3) = -101d0 ! only used if /= -101d0        
+  History_Panels2_dymin(3) = -1 
+  
+  History_Panels2_other_yaxis_name(3) = 'star_age' 
+  History_Panels2_other_yaxis_reversed(3) = .false.
+  History_Panels2_other_ymin(3) = -101d0 ! only used if /= -101d0
+  History_Panels2_other_ymax(3) = -101d0 ! only used if /= -101d0        
+  History_Panels2_other_dymin(3) = -1 
   
 / ! end of pgstar namelist

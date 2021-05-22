@@ -26,6 +26,7 @@
          integer :: RSP2_num_outermost_cells_forced_nonturbulent, &
             RSP2_num_innermost_cells_forced_nonturbulent
          
+         logical :: RSP2_remesh_when_load
          integer :: RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM
          real(dp) :: RSP2_T_anchor, RSP2_dq_1_factor         
 

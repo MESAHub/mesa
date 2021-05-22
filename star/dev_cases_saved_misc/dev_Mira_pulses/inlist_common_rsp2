@@ -1,17 +1,8 @@
 
 &controls ! for parts using rsp2
 
-
 ! atm
-   ! P boundary condition
-   use_momentum_outer_BC = .true.  ! required for RSP2
-   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
-      ! this can be a problem with shocks since omits Pvsc
-   ! else if RSP_use_Prad_for_Psurf
-!      use_zero_Pgas_outer_BC = .true.
-   ! else use RSP default of Psurf = 0
-!      use_fixed_Psurf_outer_BC = .true.
-!      fixed_Psurf = 0d0
+   use_momentum_outer_BC = .true.
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -42,8 +33,8 @@
    Pvsc_cq = 4.0d0
    Pvsc_zsh = 0.1d0
 
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
+   !eps_nuc_factor = 0
+   !non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
 
