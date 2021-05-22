@@ -101,6 +101,11 @@ a 1.3 Msun, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen 
 The test checks the functionality of OP mono opacities. 
 The test vehicle is a 1.4 Msun solar metallicity model.
 
+:ref:`1.5M_with_diffusion`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of element diffusion.
+The test vehicle is a 1.5 Msun solar metallicity model.
 
 
 :ref:`c13_pocket`
