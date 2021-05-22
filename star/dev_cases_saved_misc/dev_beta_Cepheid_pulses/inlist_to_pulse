@@ -30,12 +30,9 @@
 
 &controls
 
-   log_Teff_lower_limit = 4.4 ! for 1st pass while looking for best model
+   log_Teff_lower_limit = 4.39! for 1st pass while looking for best model
    ! set max_model_number for best growth/period
-   max_model_number = 361 ! 2500
-
-! atm
-!   use_momentum_outer_BC = .true.
+   max_model_number = 372 ! 2500
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -164,7 +161,7 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 4.39 ! -101 ! only used if > -100
+   HR_logT_min = 4.40 ! -101 ! only used if > -100
    HR_logT_max = 4.45 ! only used if > -100
    HR_logL_min = 4.74 ! -101 ! only used if > -100
    HR_logL_max = 4.96 ! -101 ! only used if > -100
@@ -172,10 +169,10 @@
    !show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
    HR_target_n_sigma = -3
-   HR_target_logL = 4.86d0
+   HR_target_logL = 4.864d0
    HR_target_logL_sigma = 0.02d0
-   HR_target_logT = 4.42d0
-   HR_target_logT_sigma = 0.005d0
+   HR_target_logT = 4.435d0
+   HR_target_logT_sigma = 0.004d0
 
    ! file output
    !HR_file_flag = .true.
