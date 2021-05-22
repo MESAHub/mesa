@@ -23,7 +23,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 4 ! expected period/10
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -42,9 +42,15 @@
    
    max_timestep = 40 ! based on expected period
 
-   max_model_number = 2500000
+   max_model_number = 5000000
       
    !max_number_retries = 0
+   
+! atm
+   !use_zero_Pgas_outer_BC = .true.
+   !use_momentum_outer_BC = .true. 
+   use_fixed_Psurf_outer_BC = .true.
+   fixed_Psurf = 0d0
 
 ! solver
    steps_before_use_velocity_time_centering = 0

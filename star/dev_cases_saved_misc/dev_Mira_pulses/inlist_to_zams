@@ -54,16 +54,15 @@
 
 &pgstar
 
-
    !pause = .true.
 
    ! HR window -- lg_L vs. lg_Teff
    
-   pgstar_interval = 2
+   pgstar_interval = 1
 
    HR_win_flag = .true.
    
-   HR_title = '1.5 M\d\(2281)\u  Z=0.02  Mira'
+   HR_title = '2 M\d\(2281)\u  Z=0.02  Mira'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
@@ -89,7 +88,6 @@
    HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
    HR_file_width = -1 ! negative means use same value as for window
    HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
          
 
 / ! end of pgstar namelist

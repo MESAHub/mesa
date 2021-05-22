@@ -2,20 +2,16 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'nearer_pulses.mod' 
+      load_model_filename = 'near_pulses.mod' 
 
       save_model_when_terminate = .true.
-      save_model_filename = 'pulse.mod'
-      required_termination_code_string(1) = 'log_Teff_lower_limit'
-      required_termination_code_string(2) = 'max_model_number'
+      save_model_filename = 'nearer_pulses.mod'
+      required_termination_code_string = 'star_mass_min_limit'
 
       set_initial_number_retries = .false.
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-   
-      !set_initial_dt = .true.
-      !seconds_for_initial_dt = 1d0
 
       pgstar_flag = .true.
 
@@ -32,50 +28,33 @@
 
 &controls
 
-      log_L_upper_limit = 3.8
+   star_mass_min_limit = 1.35
 
-      ! limit max_model_number as part of test_suite
-      !max_model_number = 14461
+! wind
+      cool_wind_full_on_T = 9.99d9
+      hot_wind_full_on_T = 1d10 
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 2d0  
+      Blocker_scaling_factor = 10d0   
 
-! atm
-   use_momentum_outer_BC = .true.
-
-! mlt
-   alpha_semiconvection = 0.0
-    
 ! timesteps
-   delta_lgTeff_limit = 0.01d0
-   delta_lgTeff_hard_limit = 0.05d0
-   relax_hard_limits_after_retry = .false.
+   delta_lgL_He_limit = 0.01d0
 
-   delta_lgL_H_limit = 0.05 ! limit for magnitude of change in lgL_H
-   delta_lgL_H_hard_limit = 0.5
-   lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
-
-   delta_lgL_He_limit = 0.025 ! limit for magnitude of change in lgL_He
-   delta_lgL_He_hard_limit = 1
-   lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+! mesh
+   mesh_delta_coeff = 1.5
 
 ! solver
-
-! GYRE output controls
-   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
-   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-   x_integer_ctrl(2) = 2 ! max number of modes to output per call
-   x_logical_ctrl(2) = .false. ! output eigenfunction files   
-   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
-   x_integer_ctrl(3) = 0 ! mode_l
-   x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
-      ! < 0 means report best over all gyre results for any order
+   convergence_ignore_equL_residuals = .true.
 
 ! output controls
-   num_trace_history_values = 3
+   num_trace_history_values = 1
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'log_Teff'
    
 
-   photo_interval = 100
+   photo_interval = 50
    profile_interval = 100
    history_interval = 10
    terminal_interval = 10
@@ -176,10 +155,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-  HR_logT_min = 3.43 ! -101 ! only used if > -100
-  HR_logT_max = 3.55 ! only used if > -100
-  HR_logL_min = 2.9 ! -101 ! only used if > -100
-  HR_logL_max = 3.87 ! -101 ! only used if > -100
+   HR_logT_min = 3.40 ! -101 ! only used if > -100
+   HR_logT_max = 3.57 ! only used if > -100
+   HR_logL_min = 2.8 ! -101 ! only used if > -100
+   HR_logL_max = 3.82 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.

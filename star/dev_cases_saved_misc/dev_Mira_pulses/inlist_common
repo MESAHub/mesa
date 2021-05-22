@@ -11,12 +11,14 @@
 ! see Fig 4 for history plots of logL and logTeff and R
 
 
-
 &star_job
    show_log_description_at_start = .false.
+   history_columns_file = '../../rsp2_utils/history_columns.list'
+   profile_columns_file = '../../rsp2_utils/profile_columns.list'
 / ! end of star_job namelist
 
 &eos
+   use_Skye = .true.
 / !end of eos namelist
 
 &kap
@@ -29,16 +31,19 @@
 
 &controls
    initial_mass = 2.0
-   initial_z = 0.02d0
+   ! initial_X = 0.72
+   initial_Z = 0.02d0
+   initial_Y = 0.26d0
 
 ! MLT
+   max_dt_div_tau_conv_for_TDC = -1d99  ! No TDC
+   max_dt_years_for_TDC = -1d99
+
    mixing_length_alpha = 1.8d0 
    MLT_option = 'Henyey'
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.1
-   
-! mixing
    
 ! solver
    use_dedt_form_of_energy_eqn = .true.

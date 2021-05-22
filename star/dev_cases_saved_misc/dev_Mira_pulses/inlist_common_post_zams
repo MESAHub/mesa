@@ -1,6 +1,11 @@
 &star_job
    read_extra_star_job_inlist1 = .true.
    extra_star_job_inlist1_name = 'inlist_common'
+   
+   relax_initial_tau_factor = .true.
+   relax_to_this_tau_factor = 1.5d-3
+   dlogtau_factor = 0.1d0
+   
 / ! end of star_job namelist
 
 &eos
@@ -17,7 +22,15 @@
    read_extra_controls_inlist1 = .true.
    extra_controls_inlist1_name = 'inlist_common'
 
+! atm
+   use_momentum_outer_BC = .true.
+
 ! mlt
+   !use_other_alpha_mlt = .true. ! implemented in run_star_extras
+   x_ctrl(21) = 3.0 ! alpha_H
+   x_ctrl(22) = 1.5 ! alpha_other
+   x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
+   x_ctrl(24) = 9d0 ! ! use other_alpha_mlt only if star_mass >= this limit.
    
 ! solver
    use_gold2_tolerances = .true.

@@ -1,9 +1,10 @@
-! set starting velocities including desired overtone fractions
+! set starting velocities
 
 &star_job
 
-      load_saved_model = .true.
-      load_model_filename = 'converted.mod' 
+      !load_saved_model = .true.
+      load_saved_model_for_RSP2 = .true.
+      load_model_filename = 'remeshed.mod' 
 
       save_model_when_terminate = .true.
       save_model_filename = 'initialized.mod'
@@ -24,9 +25,9 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 6d3 ! based on expected period
+      seconds_for_initial_dt = 1d-6
 
-      pgstar_flag = .true.
+      pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -41,29 +42,29 @@
 
 &controls
    
-   max_timestep = 6d3 ! based on expected period
+   max_timestep = 1d3
    
-   max_model_number = 10
+   max_model_number = 1
+
+! atm
 
 ! mlt
    alpha_semiconvection = 0.0
-   
-! mixing
 
 ! solver
-   !eps_nuc_factor = 0
-   !non_nuc_neu_factor = 0
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
    
 ! mesh controls
    okay_to_remesh = .false.
 
-! GYRE set starting velocities
+! GYRE set starting velocities         <<< must wait until after restore QHSE
    x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 0d0 ! fraction_1st_overtone
-   x_ctrl(5) = 1d0 ! fraction_2nd_overtone
-   x_ctrl(6) = 1d0 ! initial vsurf (kms)
+   x_ctrl(4) = 0d0 ! fraction_1st_overtone (order 2)
+   x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
+   x_ctrl(6) = 0.1d0 ! initial vsurf (kms)
    
 ! output controls
    terminal_show_age_units = 'days'
@@ -169,7 +170,7 @@
  ! window 1
 
     !Grid1_win_flag = .true.
-    Grid1_title = 'RSG'
+    Grid1_title = ''
 
     !Grid1_file_flag = .true.
     Grid1_file_dir = 'png1'

@@ -39,3 +39,6 @@ after remesh
    model   order           freq (Hz)             P (sec)             P (day)    cycles to double
      100       1          0.3633E-04          27528.4553              0.3186             85.8920
      100       2          0.4156E-04          24062.0172              0.2785             13.8249
+
+
+pulses die and fail to recover. 
