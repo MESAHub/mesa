@@ -104,6 +104,7 @@
       real(dp) :: remove_center_by_radius_cm, remove_initial_center_by_radius_cm
       real(dp) :: remove_center_by_radius_Rsun, remove_initial_center_by_radius_Rsun
       real(dp) :: remove_center_by_he4, remove_initial_center_by_he4
+      real(dp) :: remove_center_by_c12_o16, remove_initial_center_by_c12_o16
       real(dp) :: remove_center_by_si28, remove_initial_center_by_si28
       real(dp) :: remove_center_to_reduce_co56_ni56, remove_initial_center_to_reduce_co56_ni56
       real(dp) :: remove_center_by_ye, remove_initial_center_by_ye

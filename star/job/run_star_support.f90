@@ -3260,6 +3260,34 @@
             if (failed('star_remove_initial_center_by_he4',ierr)) return
          end if
          
+         if (s% job% remove_center_by_he4 > 0d0 .and. &
+               s% job% remove_center_by_he4 < 1d0) then
+            write(*, 1) 'remove_center_by_he4', &
+               s% job% remove_center_by_he4
+            call star_remove_center_by_he4( &
+               id, s% job% remove_center_by_he4, ierr)
+            if (failed('star_remove_center_by_he4',ierr)) return
+         end if
+         
+         if (s% job% remove_initial_center_by_c12_o16 > 0d0 .and. &
+               s% job% remove_initial_center_by_c12_o16 < 1d0 &
+                  .and. .not. restart) then
+            write(*, 1) 'remove_initial_center_by_c12_o16', &
+               s% job% remove_initial_center_by_c12_o16
+            call star_remove_center_by_c12_o16( &
+               id, s% job% remove_initial_center_by_c12_o16, ierr)
+            if (failed('star_remove_initial_center_by_c12_o16',ierr)) return
+         end if
+         
+         if (s% job% remove_center_by_c12_o16 > 0d0 .and. &
+               s% job% remove_center_by_c12_o16 < 1d0) then
+            write(*, 1) 'remove_center_by_c12_o16', &
+               s% job% remove_center_by_c12_o16
+            call star_remove_center_by_c12_o16( &
+               id, s% job% remove_center_by_c12_o16, ierr)
+            if (failed('star_remove_center_by_c12_o16',ierr)) return
+         end if
+         
          if (s% job% remove_initial_center_by_si28 > 0d0 .and. &
                s% job% remove_initial_center_by_si28 < 1d0 &
                   .and. .not. restart) then

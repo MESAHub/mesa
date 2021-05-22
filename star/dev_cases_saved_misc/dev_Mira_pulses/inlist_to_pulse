@@ -9,6 +9,8 @@
       required_termination_code_string(1) = 'log_Teff_lower_limit'
       required_termination_code_string(2) = 'max_model_number'
 
+      remove_initial_center_by_c12_o16 = 0.5 ! remove the CO core
+
       set_initial_number_retries = .false.
 
       set_initial_cumulative_energy_error = .true.
@@ -59,7 +61,7 @@
 ! solver
 
 ! GYRE output controls
-   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = 20 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
    x_integer_ctrl(2) = 2 ! max number of modes to output per call
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
@@ -69,16 +71,15 @@
       ! < 0 means report best over all gyre results for any order
 
 ! output controls
-   num_trace_history_values = 3
+   num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'log_Teff'
    
 
    photo_interval = 100
    profile_interval = 100
    history_interval = 10
-   terminal_interval = 10
+   terminal_interval = 1 ! 20
    write_header_frequency = 10
 
       !photo_interval = 10
@@ -166,7 +167,7 @@
 
    ! HR window -- lg_L vs. lg_Teff
    
-   pgstar_interval = 2
+   pgstar_interval = 20
 
    HR_win_flag = .true.
    
@@ -176,10 +177,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-  HR_logT_min = 3.43 ! -101 ! only used if > -100
-  HR_logT_max = 3.55 ! only used if > -100
-  HR_logL_min = 2.9 ! -101 ! only used if > -100
-  HR_logL_max = 3.87 ! -101 ! only used if > -100
+  HR_logT_min = 3.4 ! -101 ! only used if > -100
+  HR_logT_max = 3.57 ! only used if > -100
+  HR_logL_min = 2.8 ! -101 ! only used if > -100
+  HR_logL_max = 3.9 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.

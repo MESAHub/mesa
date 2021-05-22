@@ -2016,6 +2016,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_by_he4
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_initial_center_by_c12_o16
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_by_si28
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_to_reduce_co56_ni56
@@ -2045,6 +2047,7 @@
     remove_initial_center_by_radius_cm = 0
     remove_initial_center_by_radius_Rsun = 0
     remove_initial_center_by_he4 = 0
+    remove_initial_center_by_c12_o16 = 0
     remove_initial_center_by_si28 = 0
     remove_initial_center_to_reduce_co56_ni56 = 0
     remove_initial_center_by_ye = 0
@@ -2072,6 +2075,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_center_by_he4
       ! ~~~~~~~~~~~~~~~~~~~~
+      ! remove_center_by_c12_o16
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! remove_center_by_si28
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! remove_center_to_reduce_co56_ni56
@@ -2097,6 +2102,7 @@
     remove_center_by_radius_cm = 0
     remove_center_by_radius_Rsun = 0
     remove_center_by_he4 = 0
+    remove_center_by_c12_o16 = 0
     remove_center_by_si28 = 0
     remove_center_to_reduce_co56_ni56 = 0
     remove_center_by_ye = 0

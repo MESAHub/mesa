@@ -97,6 +97,40 @@
       end subroutine do_remove_center_by_he4
 
 
+      subroutine do_remove_center_by_c12_o16(id, x, ierr)
+         use chem_def, only: ic12, io16
+         integer, intent(in) :: id
+         real(dp), intent(in) :: x
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         integer :: k, c12, o16
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'do_remove_center_by_c12_o16: get_star_ptr ierr', ierr
+            return
+         end if
+         c12 = s% net_iso(ic12)
+         if (c12 <= 0) then
+            ierr = -1
+            write(*,*) 'do_remove_center_by_c12_o16: no c12 in current net'
+            return
+         end if
+         o16 = s% net_iso(io16)
+         if (o16 <= 0) then
+            ierr = -1
+            write(*,*) 'do_remove_center_by_c12_o16: no o16 in current net'
+            return
+         end if
+         do k=1,s% nz
+            if (s% xa(c12,k) + s% xa(o16,k) >= x) then
+               call do_remove_inner_fraction_q(id, s% q(k), ierr)
+               return
+            end if
+         end do
+         ierr = -1
+      end subroutine do_remove_center_by_c12_o16
+
+
       subroutine do_remove_center_by_si28(id, x, ierr)
          use chem_def, only: isi28
          integer, intent(in) :: id

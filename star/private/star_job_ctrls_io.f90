@@ -156,6 +156,7 @@
          remove_center_by_radius_cm, &
          remove_center_by_radius_Rsun, &
          remove_center_by_he4, &
+         remove_center_by_c12_o16, &
          remove_center_by_si28, &
          remove_center_to_reduce_co56_ni56, &
          remove_center_by_ye, &
@@ -182,6 +183,7 @@
          remove_initial_center_by_radius_cm, &
          remove_initial_center_by_radius_Rsun, &
          remove_initial_center_by_he4, &
+         remove_initial_center_by_c12_o16, &
          remove_initial_center_by_si28, &
          remove_initial_center_to_reduce_co56_ni56, &
          remove_initial_center_by_ye, &
@@ -803,6 +805,7 @@
          s% job% remove_initial_center_by_radius_cm = remove_initial_center_by_radius_cm
          s% job% remove_initial_center_by_radius_Rsun = remove_initial_center_by_radius_Rsun
          s% job% remove_initial_center_by_he4 = remove_initial_center_by_he4
+         s% job% remove_initial_center_by_c12_o16 = remove_initial_center_by_c12_o16
          s% job% remove_initial_center_by_si28 = remove_initial_center_by_si28
          s% job% remove_initial_center_to_reduce_co56_ni56 = remove_initial_center_to_reduce_co56_ni56
          s% job% remove_initial_center_by_ye = remove_initial_center_by_ye
@@ -821,6 +824,7 @@
          s% job% remove_center_by_radius_cm = remove_center_by_radius_cm
          s% job% remove_center_by_radius_Rsun = remove_center_by_radius_Rsun
          s% job% remove_center_by_he4 = remove_center_by_he4
+         s% job% remove_center_by_c12_o16 = remove_center_by_c12_o16
          s% job% remove_center_by_si28 = remove_center_by_si28
          s% job% remove_center_to_reduce_co56_ni56 = remove_center_to_reduce_co56_ni56
          s% job% remove_center_by_ye = remove_center_by_ye
@@ -1374,6 +1378,7 @@
          remove_center_by_radius_Rsun = s% job% remove_center_by_radius_Rsun
          remove_center_by_radius_cm = s% job% remove_center_by_radius_cm
          remove_center_by_he4 = s% job% remove_center_by_he4
+         remove_center_by_c12_o16 = s% job% remove_center_by_c12_o16
          remove_center_by_si28 = s% job% remove_center_by_si28
          remove_center_to_reduce_co56_ni56 = s% job% remove_center_to_reduce_co56_ni56
          remove_center_by_ye = s% job% remove_center_by_ye
@@ -1402,6 +1407,7 @@
          remove_initial_center_by_radius_Rsun = s% job% remove_initial_center_by_radius_Rsun
          remove_initial_center_by_radius_cm = s% job% remove_initial_center_by_radius_cm
          remove_initial_center_by_he4 = s% job% remove_initial_center_by_he4
+         remove_initial_center_by_c12_o16 = s% job% remove_initial_center_by_c12_o16
          remove_initial_center_by_si28 = s% job% remove_initial_center_by_si28
          remove_initial_center_to_reduce_co56_ni56 = s% job% remove_initial_center_to_reduce_co56_ni56
          remove_initial_center_by_ye = s% job% remove_initial_center_by_ye

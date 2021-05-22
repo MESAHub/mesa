@@ -2472,6 +2472,15 @@
       end subroutine star_remove_center_by_he4
       
       
+      subroutine star_remove_center_by_c12_o16(id, x, ierr)
+         use remove_shells, only: do_remove_center_by_c12_o16
+         integer, intent(in) :: id
+         real(dp), intent(in) :: x ! mass fraction
+         integer, intent(out) :: ierr
+         call do_remove_center_by_c12_o16(id, x, ierr)      
+      end subroutine star_remove_center_by_c12_o16
+      
+      
       subroutine star_remove_center_by_si28(id, x, ierr)
          use remove_shells, only: do_remove_center_by_si28
          integer, intent(in) :: id
