@@ -929,10 +929,10 @@
          egas_at_bnd2 = arg_not_provided
          logT_guess = log10(s% T(kk))
          
-         call eosDT_get_T_given_egas( &
+         call eosDT_get_T( &
             eos_handle, &
             species, chem_id, net_iso, xa, &
-            s% lnd(kk)/ln10, egas_want, &
+            s% lnd(kk)/ln10, i_egas, egas_want, &
             logT_tol, egas_tol, max_iter, logT_guess, &
             logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
             logT_result, res, d_dlnd, d_dlnT, &

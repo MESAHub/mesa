@@ -184,7 +184,7 @@ contains
        ierr)
 
     use eos_def
-    use eos_lib, only: eosDT_get_T_given_egas
+    use eos_lib, only: eosDT_get_T
 
     type (star_info), pointer :: s
     integer, intent(in) :: k ! 0 indicates not for a particular cell.
@@ -210,10 +210,10 @@ contains
        ierr = -1
        return
     else
-      call eosDT_get_T_given_egas( &
+      call eosDT_get_T( &
          s% eos_handle, &
          s% species, s% chem_id, s% net_iso, xa, &            
-         logRho, egas, logT_tol, egas_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
+         logRho, i_egas, egas, logT_tol, egas_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
          arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
          logT, res, dres_dlnRho, dres_dlnT, &
          dres_dxa, eos_calls, ierr)
@@ -232,7 +232,7 @@ contains
        ierr)
 
     use eos_def
-    use eos_lib, only: eosDT_get_T_given_Ptotal
+    use eos_lib, only: eosDT_get_T
 
     type (star_info), pointer :: s
     integer, intent(in) :: k ! 0 indicates not for a particular cell.
@@ -259,10 +259,10 @@ contains
        ierr = -1
        return
     else
-       call eosDT_get_T_given_Ptotal( &
+       call eosDT_get_T( &
             s% eos_handle, &
             s% species, s% chem_id, s% net_iso, xa, &
-            logRho, logP, logT_tol, logP_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
+            logRho, i_logPtot, logP, logT_tol, logP_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logT, res, dres_dlnRho, dres_dlnT, &
             dres_dxa, eos_calls, ierr)
@@ -337,7 +337,7 @@ contains
        ierr)
 
     use eos_def
-    use eos_lib, only: eosDT_get_Rho_given_Ptotal
+    use eos_lib, only: eosDT_get_Rho
 
     type (star_info), pointer :: s
     integer, intent(in) :: k ! 0 indicates not for a particular cell.
@@ -363,10 +363,10 @@ contains
        ierr = -1
        return
     else
-       call eosDT_get_Rho_given_Ptotal( &
+       call eosDT_get_Rho( &
             s% eos_handle, &
             s% species, s% chem_id, s% net_iso, xa, &
-            logT, logP, logRho_tol, logP_tol, MAX_ITER_FOR_SOLVE, logRho_guess, &
+            logT, i_logPtot, logP, logRho_tol, logP_tol, MAX_ITER_FOR_SOLVE, logRho_guess, &
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logRho, res, dres_dlnRho, dres_dlnT, &
             dres_dxa, eos_calls, ierr)
