@@ -342,10 +342,10 @@
             logT_guess = result_log10
             logT_bnd1 = 3
             logT_bnd2 = 9
-            call eosDT_get_T_given_Ptotal( &
+            call eosDT_get_T( &
                   handle, &
                   species, chem_id, net_iso, xa, &
-                  log10_rho, logP, &
+                  log10_rho, i_logPtot, logP, &
                   tol, othertol, max_iter, logT_guess, &
                   logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                   result_log10, res, d_dlnd, d_dlnT, &
@@ -578,10 +578,10 @@
          write(*,1) 'egas_tol', egas_tol
          write(*,*)
 
-         call eosDT_get_T_given_egas( &
+         call eosDT_get_T( &
                handle, &
                species, chem_id, net_iso, xa, &
-               logRho, egas_want, &
+               logRho, i_egas, egas_want, &
                logT_tol, egas_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
                logT_result, res, d_dlnd, d_dlnT, d_dxa, &
