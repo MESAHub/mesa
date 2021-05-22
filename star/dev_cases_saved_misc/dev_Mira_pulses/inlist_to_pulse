@@ -9,12 +9,18 @@
       required_termination_code_string(1) = 'log_Teff_lower_limit'
       required_termination_code_string(2) = 'max_model_number'
 
-      remove_initial_center_by_c12_o16 = 0.5 ! remove the CO core
+      remove_initial_center_by_c12_o16 = 0.975 ! remove the CO core
 
       set_initial_number_retries = .false.
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
    
       !set_initial_dt = .true.
       !seconds_for_initial_dt = 1d0
@@ -34,7 +40,7 @@
 
 &controls
 
-      log_L_upper_limit = 3.8
+      !log_L_upper_limit = 3.8
 
       ! limit max_model_number as part of test_suite
       !max_model_number = 14461
@@ -44,7 +50,10 @@
 
 ! mlt
    alpha_semiconvection = 0.0
-    
+
+! mesh
+   mesh_delta_coeff = 1.25
+   
 ! timesteps
    delta_lgTeff_limit = 0.01d0
    delta_lgTeff_hard_limit = 0.05d0
@@ -61,7 +70,7 @@
 ! solver
 
 ! GYRE output controls
-   x_integer_ctrl(1) = 20 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = -25 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
    x_integer_ctrl(2) = 2 ! max number of modes to output per call
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
@@ -78,9 +87,8 @@
 
    photo_interval = 100
    profile_interval = 100
-   history_interval = 10
-   terminal_interval = 1 ! 20
-   write_header_frequency = 10
+   history_interval = 25
+   terminal_interval = 25
 
       !photo_interval = 10
       !profile_interval = 1
@@ -167,7 +175,7 @@
 
    ! HR window -- lg_L vs. lg_Teff
    
-   pgstar_interval = 20
+   pgstar_interval = 25
 
    HR_win_flag = .true.
    
@@ -177,10 +185,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-  HR_logT_min = 3.4 ! -101 ! only used if > -100
+  HR_logT_min = 3.35 ! -101 ! only used if > -100
   HR_logT_max = 3.57 ! only used if > -100
-  HR_logL_min = 2.8 ! -101 ! only used if > -100
-  HR_logL_max = 3.9 ! -101 ! only used if > -100
+  HR_logL_min = 2.9 ! -101 ! only used if > -100
+  HR_logL_max = 4.0 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.
@@ -198,5 +206,42 @@
    HR_file_width = -1 ! negative means use same value as for window
    HR_file_aspect_ratio = -1 ! negative means use same value as for window
          
-         
+   ! window 2
+   
+   History_Panels2_win_flag = .true.
+   History_Panels2_win_width = 7
+   History_Panels2_win_aspect_ratio = 0.75
+   
+   History_Panels2_title = '2 M\d\(2281)\u  Z=0.02  Mira'      
+   History_Panels2_num_panels = 2
+
+   !History_Panels2_xaxis_name='model_number'
+   History_Panels2_xaxis_name='star_age'
+   History_Panels2_automatic_star_age_units = .true.
+   History_Panels2_max_width = -1 !  200 ! only used if > 0.  causes xmin to move with xmax.
+   
+   History_Panels2_yaxis_name(1) = 'log_L' 
+   History_Panels2_yaxis_reversed(1) = .false.
+   History_Panels2_ymin(1) = -101d0 ! only used if /= -101d0
+   History_Panels2_ymax(1) = -101d0 ! only used if /= -101d0        
+   History_Panels2_dymin(1) = -1 
+   
+   History_Panels2_other_yaxis_name(1) = 'Teff' 
+   History_Panels2_other_yaxis_reversed(1) = .false.
+   History_Panels2_other_ymin(1) = -101d0 ! only used if /= -101d0
+   History_Panels2_other_ymax(1) = -101d0 ! only used if /= -101d0        
+   History_Panels2_other_dymin(1) = -1 
+  
+  History_Panels2_yaxis_name(2) = 'log_R' 
+  History_Panels2_yaxis_reversed(2) = .false.
+  History_Panels2_ymin(2) = -101d0 ! only used if /= -101d0
+  History_Panels2_ymax(2) = -101d0 ! only used if /= -101d0        
+  History_Panels2_dymin(2) = -1 
+  
+  History_Panels2_other_yaxis_name(2) = 'model_number' 
+  History_Panels2_other_yaxis_reversed(2) = .false.
+  History_Panels2_other_ymin(2) = -101d0 ! only used if /= -101d0
+  History_Panels2_other_ymax(2) = -101d0 ! only used if /= -101d0        
+  History_Panels2_other_dymin(2) = -1 
+  
 / ! end of pgstar namelist

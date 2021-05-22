@@ -105,10 +105,6 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-         write (*,2) 'History_Panels2_plot total_energy_end', s% model_number, s% total_energy_end
-         
-         
          call pgslct(device_id)
          call pgbbuf()
          call pgeras()
