@@ -27,7 +27,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 1d4 ! start at max/10
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -61,15 +61,15 @@
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 0.5d0
+   P_theta_for_velocity_time_centering = 1 ! 0.5d0
 
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 0.5d0
+   L_theta_for_velocity_time_centering = 1 ! 0.5d0
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 10 ! expected period (in days) 
+   x_ctrl(7) = 690 ! expected period (in days) 
 !   x_ctrl(8) = 1d-1 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.1 ! min_period_div_target

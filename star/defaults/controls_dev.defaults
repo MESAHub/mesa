@@ -68,7 +68,7 @@
    RSP2_T_anchor = 11d3
    RSP2_dq_1_factor = 2d0
      
-     
+   RSP2_nz_div_IBOTOM = 30d0
      
 
       ! period controls

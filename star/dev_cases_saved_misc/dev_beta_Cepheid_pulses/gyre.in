@@ -30,5 +30,4 @@
 &grid
    w_osc = 10
    w_exp = 2
-   w_ctr = 10
 /

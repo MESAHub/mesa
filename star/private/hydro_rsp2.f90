@@ -93,6 +93,7 @@
          call find_xm_anchor
          call set_xm_new
          call interpolate1_face_val(s% i_lnR, log(max(1d0,s% r_center)))
+         call check_new_lnR
          call interpolate1_face_val(s% i_lum, s% L_center)
          if (s% i_v /= 0) call interpolate1_face_val(s% i_v, s% v_center)
          call set_new_lnd
@@ -135,7 +136,11 @@
          subroutine find_xm_anchor
             real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
             include 'formats'
-            lnT_anchor = log(s% RSP_T_anchor)
+            lnT_anchor = log(s% RSP2_T_anchor)
+            if (lnT_anchor <= s% xh(s% i_lnT,1)) then
+               write(*,1) 'T_anchor < T_surf', s% RSP2_T_anchor, exp(s% xh(s% i_lnT,1))
+               stop 'find_xm_anchor'
+            end if
             xm_anchor = xm_old(nz_old)
             do k=2,nz_old
                if (s% xh(s% i_lnT,k) >= lnT_anchor) then
@@ -145,6 +150,10 @@
                   lnT00 = s% xh(s% i_lnT,k)
                   xm_anchor = xmm1 + &
                      (xm00 - xmm1)*(lnT_anchor - lnTm1)/(lnT00 - lnTm1)
+                  if (is_bad(xm_anchor) .or. xm_anchor <= 0d0) then
+                     write(*,2) 'bad xm_anchor', k, xm_anchor, xmm1, xm00, lnTm1, lnT00, lnT_anchor, s% lnT(1)
+                     stop 'find_xm_anchor'
+                  end if
                   return
                end if
             end do
@@ -154,9 +163,10 @@
             integer :: nz_outer, n_inner, iter, k, j
             real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx
             include 'formats'
-            nz_outer = s% RSP_nz_outer
-            dq_1_factor = s% RSP_dq_1_factor
+            nz_outer = s% RSP2_nz_outer
+            dq_1_factor = s% RSP2_dq_1_factor
             dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
+            write(*,2) 'dxm_outer', nz_outer, dxm_outer, xm_anchor
             xm(1) = 0d0
             xm(2) = dxm_outer*dq_1_factor
             s% dm(1) = xm(2)
@@ -165,6 +175,10 @@
                s% dm(k-1) = dxm_outer
             end do
             lnx = log(xm(nz_outer+1))
+            if (is_bad(lnx)) then
+               write(*,2) 'bad lnx', nz_outer+1, lnx, xm(nz_outer+1)
+               stop 'set_xm_new'
+            end if
             dlnx = (log(s% xmstar) - lnx)/(nz - nz_outer)
             do k=nz_outer+2,nz
                lnx = lnx + dlnx
@@ -208,17 +222,42 @@
             end do
          end subroutine interpolate1_face_val
          
-         subroutine set_new_lnd
-            real(dp) :: vol
+         subroutine check_new_lnR
+            include 'formats'
             do k=1,nz
-               if (k < nz) then
-                  vol = (4d0*pi/3d0)*(exp(3d0*s% xh(s% i_lnR,k)) - exp(3d0*s% xh(s% i_lnR,k+1)))
-               else
-                  vol = (4d0*pi/3d0)*(exp(3d0*s% xh(s% i_lnR,k)) - pow3(s% r_center))
+               s% lnR(k) = s% xh(s% i_lnR,k)
+               s% r(k) = exp(s% lnR(k))
+            end do
+            do k=1,nz-1
+               if (s% r(k) <= s% r(k+1)) then
+                  write(*,2) 'bad r', k, s% r(k), s% r(k+1)
+                  stop 'check_new_lnR remesh rsp2'
                end if
+            end do
+            if (s% r(nz) <= s% r_center) then
+               write(*,2) 'bad r center', nz, s% r(nz), s% r_center
+               stop 'check_new_lnR remesh rsp2'
+            end if
+         end subroutine check_new_lnR
+         
+         subroutine set_new_lnd
+            real(dp) :: vol, r300, r3p1
+            include 'formats'
+            do k=1,nz
+               r300 = pow3(s% r(k))
+               if (k < nz) then
+                  r3p1 = pow3(s% r(k+1))
+               else
+                  r3p1 = pow3(s% r_center)
+               end if
+               vol = (4d0*pi/3d0)*(r300 - r3p1)
                s% rho(k) = s% dm(k)/vol
                s% lnd(k) = log(s% rho(k))
                s% xh(s% i_lnd,k) = s% lnd(k)
+               if (is_bad(s% lnd(k))) then
+                  write(*,2) 'bad lnd vol dm r300 r3p1', k, s% lnd(k), vol, s% dm(k), r300, r3p1
+                  stop 'remesh for rsp2'
+               end if
             end do
          end subroutine set_new_lnd
          
@@ -345,7 +384,8 @@
                   logRho, logP, logT_guess, logT_tol, logP_tol, &
                   logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
                if (ierr /= 0) then
-                  write(*,2) 'solve_eos_given_DP failed', k
+                  write(*,2) 'solve_eos_given_DP failed logRho logT_guess logP', k, &
+                     logRho, logT_guess, logP
                   stop 'revise_lnT_for_QHSE'
                end if
                s% lnT(k) = logT*ln10
@@ -418,7 +458,7 @@
          
          !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
          do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
-               s% nz - max(1,int(s% nz/s% RSP_nz_div_IBOTOM))
+               s% nz - max(1,int(s% nz/s% RSP2_nz_div_IBOTOM))
                
             if (s% w(k) > s% RSP2_w_min_for_damping) cycle
             
@@ -521,7 +561,7 @@
             s% Lc(k) = 0d0; s% Lc_ad(k) = 0d0
             s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
          end do
-         do k = s% nz + 1 - int(s% nz/s% RSP_nz_div_IBOTOM) , s% nz
+         do k = s% nz + 1 - int(s% nz/s% RSP2_nz_div_IBOTOM) , s% nz
             s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
             s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
             s% COUPL(k) = 0d0; s% COUPL_ad(k) = 0d0
@@ -684,7 +724,7 @@
                   !   s% r_start(k), r_00%val
                end if
                if (s% alt_scale_height_flag) then
-                  stop 'alt_scale_height_flag'
+                  stop 'Hp_face_for_rsp2_eqn: cannot use alt_scale_height_flag'
                   ! consider sound speed*hydro time scale as an alternative scale height
                   d_face = alfa*d_00 + beta*d_m1
                   Peos_face = alfa*Peos_00 + beta*Peos_m1
@@ -723,7 +763,7 @@
          non_turbulent_cell = &
             s% mixing_length_alpha == 0d0 .or. &
             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-            k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)         
+            k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)         
          if (.not. s% RSP2_flag) then           
             resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP2
          else if (non_turbulent_cell) then
@@ -1053,7 +1093,7 @@
          ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha
          if (ALFAM_ALFA == 0d0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-               k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+               k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Chi_cell = 0d0
             if (k >= 1 .and. k <= s% nz) then
                s% Chi(k) = 0d0
@@ -1091,7 +1131,7 @@
          ierr = 0
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Eq_cell = 0d0
             if (k >= 1 .and. k <= s% nz) s% Eq_ad(k) = 0d0
          else
@@ -1116,7 +1156,7 @@
          ierr = 0         
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Uq_face = 0d0
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
@@ -1266,7 +1306,7 @@
          type(auto_diff_real_star_order1) :: Source, D, Dr
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             if (k >= 1 .and. k <= s% nz) then
                s% SOURCE(k) = 0d0
                s% DAMP(k) = 0d0
@@ -1412,7 +1452,7 @@
          ierr = 0
          if (s% mixing_length_alpha == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Lc = 0d0
             Lc_div_w_face = 1
             return
@@ -1465,7 +1505,7 @@
          alpha_alpha_t = s% mixing_length_alpha*s% RSP2_alfat
          if (alpha_alpha_t == 0d0 .or. &
              k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Lt = 0d0
             s% Lt(k) = 0d0
             return

@@ -26,8 +26,8 @@
          integer :: RSP2_num_outermost_cells_forced_nonturbulent, &
             RSP2_num_innermost_cells_forced_nonturbulent
          
-         integer :: RSP2_nz, RSP2_nz_outer
-         real(dp) :: RSP2_T_anchor, RSP2_dq_1_factor
+         integer :: RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM
+         real(dp) :: RSP2_T_anchor, RSP2_dq_1_factor         
 
          integer :: RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, &
             RSP2_map_first_period, RSP2_map_last_period, RSP2_map_zone_interval

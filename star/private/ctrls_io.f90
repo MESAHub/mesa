@@ -410,7 +410,7 @@
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
-    RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, &
+    RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM, &
     RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, max_X_for_conv_timescale, min_X_for_conv_timescale, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
@@ -2094,6 +2094,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_dq_1_factor = RSP2_dq_1_factor
  s% RSP2_nz = RSP2_nz
  s% RSP2_nz_outer = RSP2_nz_outer
+ s% RSP2_nz_div_IBOTOM = RSP2_nz_div_IBOTOM
  s% RSP2_target_steps_per_cycle = RSP2_target_steps_per_cycle
  s% RSP2_max_num_periods = RSP2_max_num_periods
  s% RSP2_work_period = RSP2_work_period
@@ -3770,6 +3771,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_dq_1_factor = s% RSP2_dq_1_factor
  RSP2_nz = s% RSP2_nz
  RSP2_nz_outer = s% RSP2_nz_outer
+ RSP2_nz_div_IBOTOM = s% RSP2_nz_div_IBOTOM
  RSP2_target_steps_per_cycle = s% RSP2_target_steps_per_cycle
  RSP2_max_num_periods = s% RSP2_max_num_periods
  RSP2_work_period = s% RSP2_work_period

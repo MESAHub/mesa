@@ -58,7 +58,7 @@
 
    ! HR window -- lg_L vs. lg_Teff
    
-   pgstar_interval = 2
+   pgstar_interval = 1
 
    HR_win_flag = .true.
    
@@ -73,7 +73,7 @@
    HR_logL_min = 3.5 ! -101 ! only used if > -100
    HR_logL_max = 5.2 ! -101 ! only used if > -100
 
-   !show_HR_classical_instability_strip = .true.
+   show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
    HR_target_n_sigma = -3
    HR_target_logL = 4.86d0
@@ -82,12 +82,13 @@
    HR_target_logT_sigma = 0.005d0
 
    ! file output
-   HR_file_flag = .false.
+   !HR_file_flag = .true.
    HR_file_dir = 'pgstar_out'
    HR_file_prefix = 'hr'
-   HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
    HR_file_width = -1 ! negative means use same value as for window
-   HR_file_aspect_ratio = -1 ! negative means use same value as for window         
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
 
 / ! end of pgstar namelist
 

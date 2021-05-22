@@ -6,8 +6,9 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'pulse.mod'
-      required_termination_code_string(1) = 'log_Teff_lower_limit'
-      required_termination_code_string(2) = 'max_model_number'
+      required_termination_code_string(1) = 'Teff_lower_limit'
+      required_termination_code_string(2) = 'log_L_upper_limit'
+      required_termination_code_string(3) = 'max_model_number'
 
       set_initial_number_retries = .false.
 
@@ -18,27 +19,23 @@
 
 / ! end of star_job namelist
 
+
 &eos
 / !end of eos namelist
+
 
 &kap
 / ! end of kap namelist
 
-!   model   order           freq (Hz)             P (sec)             P (min)             P (day)        growth (day)            growth/P
-!     696       2          0.3705E-04          26993.4125            449.8902              0.3124          0.7809E+01          0.2500E+02
-! after convert
-!     100       2          0.3705E-04          26993.9467            449.8991              0.3124          0.7794E+01          0.2495E+02
-!      40       2          0.4328E-04          23106.5815            385.1097              0.2674          0.7432E+02          0.2779E+03    Tcenter 2e6
-!      10       2          0.3765E-04          26559.0263            442.6504              0.3074          0.7769E+01          0.2528E+02    1e7
-!      10       2          0.3733E-04          26786.6720            446.4445              0.3100          0.7673E+01          0.2475E+02    2e7
-!      10       2          0.3720E-04          26879.9563            447.9993              0.3111          0.7701E+01          0.2475E+02    3e7
-
 
 &controls
 
-   log_Teff_lower_limit = 4.38 ! for 1st pass while looking for best model
+   log_Teff_lower_limit = 4.4 ! for 1st pass while looking for best model
    ! set max_model_number for best growth/period
-   max_model_number = 696 ! 2500
+   max_model_number = 361 ! 2500
+
+! atm
+!   use_momentum_outer_BC = .true.
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -62,11 +59,9 @@
    x_integer_ctrl(4) = 2 ! report info for min growth/period for this order
 
 ! output controls
-   num_trace_history_values = 3
+   num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'log_Teff'
-   
 
    photo_interval = 10
    profile_interval = 100
@@ -169,10 +164,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 4.36 ! -101 ! only used if > -100
-   HR_logT_max = 4.48 ! only used if > -100
-   HR_logL_min = 4.7 ! -101 ! only used if > -100
-   HR_logL_max = 5.0 ! -101 ! only used if > -100
+   HR_logT_min = 4.39 ! -101 ! only used if > -100
+   HR_logT_max = 4.45 ! only used if > -100
+   HR_logL_min = 4.74 ! -101 ! only used if > -100
+   HR_logL_max = 4.96 ! -101 ! only used if > -100
 
    !show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
@@ -183,11 +178,12 @@
    HR_target_logT_sigma = 0.005d0
 
    ! file output
-   HR_file_flag = .false.
+   !HR_file_flag = .true.
    HR_file_dir = 'pgstar_out'
    HR_file_prefix = 'hr'
-   HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
    HR_file_width = -1 ! negative means use same value as for window
    HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
          
 / ! end of pgstar namelist
