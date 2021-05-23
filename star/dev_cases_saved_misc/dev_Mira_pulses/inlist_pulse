@@ -25,7 +25,7 @@
       new_cumulative_energy_error = 0d0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 6d3 ! start at max/10
+      seconds_for_initial_dt = 1d0 ! 6d3 ! start at max/10
 
       pgstar_flag = .true.
 
@@ -50,20 +50,17 @@
       
    !max_number_retries = 0
 
-! atm
-   !use_zero_Pgas_outer_BC = .true.
-   !use_fixed_Psurf_outer_BC = .true.
-   !fixed_Psurf = 0d0
+! atm  &  RSP2 mesh -- set by inlist_common_rsp2
 
 ! solver
    steps_before_use_velocity_time_centering = 0
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 1 ! 0.5d0
+   P_theta_for_velocity_time_centering = 0.5d0
 
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 1 ! 0.5d0
+   L_theta_for_velocity_time_centering = 0.5d0
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses
@@ -90,7 +87,7 @@
       photo_interval = 100
       profile_interval = 100
       history_interval = 50
-      terminal_interval = 10
+      terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
             

@@ -371,6 +371,8 @@
          use const_def
          use math_lib
          use gyre_lib
+         use interp_1d_def, only: pm_work_size
+         use interp_1d_lib, only: interpolate_vector_pm
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
@@ -381,10 +383,13 @@
          real(dp)                  :: rpar(1)
          
          integer, parameter :: modes = 3
-         integer :: npts(modes), nz, i, k, i_v
+         integer :: npts(modes), nz, nz_max, i, k, i_v, j, nz_gyre, mode
          real(dp), pointer :: vel(:)
          real(dp), allocatable, dimension(:,:) :: r, v
-         real(dp) :: v_surf, v1, amix1, amix2, amixF, period(modes)
+         real(dp) :: v_surf, v1, period(modes)
+         real(dp), allocatable, dimension(:) :: &
+            r_old, r_new, v_old, v_new
+         real(dp), pointer :: work1(:) ! =(nz_max, pm_work_size)
          
          include 'formats'
          
@@ -393,9 +398,12 @@
          write(*,*) 'set gyre starting velocities'
          
          nz = s% nz
-         allocate(r(modes,nz+10), v(modes,nz+10))
-         npts = 0
-
+         nz_max = nz+100
+         allocate( &
+            r(modes,nz_max), v(modes,nz_max), &
+            r_old(nz_max), r_new(nz_max), v_old(nz_max), v_new(nz_max))
+         npts(:) = 0
+         
          call gyre_init('gyre.in')
 
          call gyre_set_constant('G_GRAVITY', standard_cgrav)
@@ -415,14 +423,17 @@
          call star_get_pulse_data(s%id, 'GYRE', &
             .FALSE., .FALSE., .FALSE., global_data, point_data, ierr)
          if (ierr /= 0) then
-            print *,'Failed when calling get_pulse_data'
+            write(*,*) 'Failed when calling star_get_pulse_data'
             return
          end if
          
          !write(*,*) 'call star_write_pulse_data'
          call star_write_pulse_data(s%id, &
             'GYRE', 'gyre.data', global_data, point_data, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            write(*,*) 'Failed when calling star_write_pulse_data'
+            return
+         end if
 
          !write(*,*) 'call gyre_set_model'
          call gyre_set_model(global_data, point_data, 101)
@@ -440,87 +451,63 @@
 
          call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
          
-         amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
-         amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
-         if((amix1+amix2) > 1d0) then
-            write(*,*) 'AMIX FRACTIONS DO NOT ADD UP RIGHT' 
-            stop 'set_gyre_linear_analysis'
-         end if
-         amixF = 1d0 - (amix1 + amix2)
-         
-         if (amixF > 0d0 .and. npts(1) /= nz-1) then
-            write(*,3) 'amixF > 0d0 .and. npts(1) /= nz-1', npts(1)
-            write(*,*) 'cannot use fundamental for setting starting velocities'
-            write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
-            ierr = -1
-            return
-         end if
-         
-         if (AMIX1 > 0d0 .and. npts(2) /= nz-1) then
-            write(*,3) 'AMIX1 > 0d0 .and. npts(2) /= nz-1', npts(2)
-            write(*,*) 'cannot use 1st overtone for setting starting velocities'
-            write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
-            ierr = -1
-            return
-         end if
-         
-         if (AMIX2 > 0d0 .and. npts(3) /= nz-1) then
-            write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3)
-            write(*,*) 'cannot use 2nd overtone for setting starting velocities'
-            write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
-            ierr = -1
-            return
-         end if
-         
-         v_surf = amixF*v(1,nz-1) + AMIX1*v(2,nz-1) + AMIX2*v(3,nz-1)   
-         v1 = 1d5/v_surf
-         if (s% x_ctrl(6) > 0d0) v1 = v1*s% x_ctrl(6)
-         
-         if (s% v_flag) then
-            vel => s% v
-            i_v = s% i_v
-         else if (s% u_flag) then
-            vel => s% u
-            i_v = s% i_u
+         if (s% x_ctrl(4) == 1d0) then
+            mode = 2
+         else if (s% x_ctrl(5) == 1d0) then
+            mode = 3
          else
-            stop 'set_gyre_linear_analysis vel'
+            mode = 1
          end if
+         nz_gyre = npts(mode)
          
-         do i=nz-1,1,-1
-            k = nz+1-i ! v(1) from gyre => vel(nz) in star
-            vel(k) = v1*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
-            !write(*,2) 'vel', k, vel(k)
+         v_surf = v(mode,nz_gyre)
+         v1 = 1d5/v_surf ! rescale v's
+         if (s% x_ctrl(6) > 0d0) v1 = v1*s% x_ctrl(6)
+
+         do i=1,nz_gyre ! change to star index order
+            k = nz_gyre-i+1
+            v_old(k) = v1*v(mode,i)
+            r_old(k) = r(mode,i)*s% r(1)
          end do
-         vel(1) = vel(2)
-         s% v_center = 0d0
          
          do k=1,nz
-            s% xh(i_v,k) = vel(k)
+            r_new(k) = s% r(k)
          end do
          
-         write(*,*)
-         write(*,1) 'v_surf F 1 2', v_surf, v(1,nz-1), v(2,nz-1), v(3,nz-1)
-         write(*,1) 'amixF amix1 amix2', amixF, amix1, amix2
-         write(*,*)
-         write(*,2) 'nz', nz
-         write(*,1) 'v(1)/1d5', vel(1)/1d5    
-         write(*,1) 'T(nz)', s% T(s%nz)             
-         write(*,1) 'L_center/Lsun', s% L_center/Lsun           
-         write(*,1) 'R_center/Rsun', s% R_center/Rsun           
-         write(*,1) 'M_center/Msun', s% M_center/Msun           
-         write(*,1) 'L(1)/Lsun', s% L(1)/Lsun           
-         write(*,1) 'R(1)/Rsun', s% r(1)/Rsun           
-         write(*,1) 'M(1)/Msun', s% m(1)/Msun           
-         write(*,1) 'X(1)', s% X(1)      
-         write(*,1) 'Y(1)', s% Y(1)      
-         write(*,1) 'Z(1)', s% Z(1)      
-         write(*,1) 'tau_factor', s% tau_factor   
-         write(*,1) 'tau_base', s% tau_base   
-         write(*,1) 'Teff', s% Teff
-         write(*,*) 
+         allocate(work1(nz_max*pm_work_size))
+         call interpolate_vector_pm( &
+            nz_gyre, r_old, nz, r_new, v_old, v_new, work1, 'get_pulse_data', ierr)
+         deallocate(work1)
+         if (ierr /= 0) then
+            write(*,*) 'Failed when calling interpolate_vector_pm for pulse data'
+            return
+         end if
+                  
+         if (s% v_flag) then
+            do k=1,nz
+               s% xh(s% i_v,k) = v_new(k)
+            end do
+         else if (s% u_flag) then
+            do k=1,nz
+               s% xh(s% i_u,k) = v_new(k)
+            end do
+         else
+            stop 'set_gyre_linear_analysis failed to set velocities'
+         end if
+         
+         return
+         
+         do k=1,nz_gyre
+            write(*,2) 'gyre r v', k, r_old(k)/Rsun, v_old(k)
+            if (k <= nz) write(*,2) 'star r v', k, r_new(k)/Rsun, v_new(k)
+            write(*,*)
+         end do
+         
+         do k=nz_gyre+1,nz
+            write(*,2) 'star r v', k, r_new(k), v_new(k)
+         end do
+         
+         stop 'gyre_linear_analysis_and_set_velocities'
 
          contains
 

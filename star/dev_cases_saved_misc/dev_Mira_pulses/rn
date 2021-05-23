@@ -7,6 +7,13 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
+
+
+mira is too hard for now.  cannot get model for pulse with Psurf = 0.  and cannot pulse with anything else.
+
+
+
+
 do_one inlist_to_zams_header zams.mod
 cp zams.mod standard_zams.mod
 
@@ -36,19 +43,18 @@ echo 'finished'
 
 return
 
-after to_pulse       Teff 2676   logL 3.72    near peak of He shell flash
+after to_pulse       Teff 2498   logL 3.72    near peak of He shell flash   use_zero_Pgas_outer_BC
    model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-    1985       1          0.2706E-07       36954653.6617            427.7159              1.8403
-    1985       2          0.6113E-07       16359513.7145            189.3462              2.3921
-after remove core    Teff 2676   logL 3.72
-     100       1          0.2706E-07       36951672.5334            427.6814              1.8401
-     100       2          0.6114E-07       16356779.3298            189.3146              2.3916
-after remesh         Teff 2677   logL 3.72 (at step 1)
+    1997       2          0.2639E-07       37900318.9424            438.6611              1.7838
+    1997       2          0.5978E-07       16727275.8488            193.6027              2.3534
+after remove core    Teff 2423  logL 3.72    use_zero_Pgas_outer_BC
+      10       1          0.2639E-07       37896484.9077            438.6167              1.7855
+      10       2          0.5975E-07       16736635.0567            193.7111              2.3747
+after remesh         Teff    logL         pick T_anchor to get good match for P
    model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-      10       1          0.2687E-07       37213959.9325            430.7171              1.5140
-      10       2          0.6040E-07       16556936.1610            191.6312              2.0905
+      10       1          0.2696E-07       37092893.7460            429.3159             19.7797
+      10       2          0.6464E-07              0.0000              0.0000              stable
 after initialize
  set gyre starting velocities
    order           freq (Hz)             P (sec)             P (day)    cycles to double
-       1          0.2687E-07       37213959.9325            430.7171              1.5140
-       2          0.6040E-07       16556936.1610            191.6312              2.0905
+       1          0.2696E-07       37092893.7460            429.3159             19.7797

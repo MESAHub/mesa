@@ -1,14 +1,23 @@
 
-&controls ! for parts using rsp2
-
-! atm
-   use_momentum_outer_BC = .true.
+&controls ! for parts using rsp2 - remesh, initialize, pulse
 
 ! mlt
    alpha_semiconvection = 0.0
 
    max_dt_div_tau_conv_for_TDC = -1d99
    max_dt_years_for_TDC = -1d99
+
+
+! atm
+   use_momentum_outer_BC = .false.
+   use_zero_Pgas_outer_BC = .true.
+
+! RSP2 
+   RSP2_nz = 150
+   RSP2_nz_outer = 40
+   RSP2_T_anchor = 11d3
+   RSP2_dq_1_factor = 2d0
+   
 
 ! timesteps
    ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0

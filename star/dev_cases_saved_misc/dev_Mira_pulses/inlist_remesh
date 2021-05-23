@@ -41,13 +41,9 @@
    
    max_model_number = 10
 
-! RSP2
-   RSP2_remesh_when_load = .false.
-   
-   RSP2_nz = 150
-   RSP2_nz_outer = 40
-   RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 2d0
+! atm  &  RSP2 mesh -- set by inlist_common_rsp2
+
+RSP2_remesh_when_load = .false.
 
 ! GYRE
    x_integer_ctrl(1) = 10 ! output GYRE info at this step interval

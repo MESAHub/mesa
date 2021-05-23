@@ -43,10 +43,11 @@
    
    max_timestep = 1500 ! based on expected period
    
-   max_model_number = 100 ! must be large enough to reach max_timestep
+   max_model_number = 10 ! must be large enough to reach max_timestep
 
 ! atm
-   use_momentum_outer_BC = .true.
+   use_momentum_outer_BC = .false.
+   use_zero_Pgas_outer_BC = .true.
 
 ! mlt
    alpha_semiconvection = 0.0

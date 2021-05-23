@@ -46,7 +46,7 @@
    
    max_model_number = 1
 
-! atm
+! atm  &  RSP2 mesh -- set by inlist_common_rsp2
 
 ! mlt
    alpha_semiconvection = 0.0
