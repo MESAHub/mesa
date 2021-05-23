@@ -32,11 +32,14 @@
 
 &controls
 
-   log_Teff_lower_limit = 3.68
-   max_model_number = 851          ! comment out on 1st pass when searching for best
+   log_Teff_lower_limit = 3.66
+   max_model_number = 766          ! comment out on 1st pass when searching for best
 
 ! atm
-   use_momentum_outer_BC = .true.
+   use_momentum_outer_BC = .false. 
+   use_zero_Pgas_outer_BC = .true.
+   use_fixed_Psurf_outer_BC = .false.
+   fixed_Psurf = 0d0
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -162,16 +165,16 @@
 
    HR_win_flag = .true.
    
-   HR_title = '5 M\d\(2281)\u  Z=0.002  Cepheid'
+   HR_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 3.63 ! -101 ! only used if > -100
-   HR_logT_max = 3.82 ! only used if > -100
-   HR_logL_min = 3.4 ! -101 ! only used if > -100
-   HR_logL_max = 3.6 ! -101 ! only used if > -100
+   HR_logT_min = 3.65 ! -101 ! only used if > -100
+   HR_logT_max = 3.78 ! only used if > -100
+   HR_logL_min = 3.62 ! -101 ! only used if > -100
+   HR_logL_max = 3.69 ! -101 ! only used if > -100
 
 
    show_HR_classical_instability_strip = .true.

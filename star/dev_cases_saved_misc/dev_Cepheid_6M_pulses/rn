@@ -30,3 +30,17 @@ do_one inlist_pulse_header final.mod
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 echo 'finished'
+
+use_zero_Pgas_outer_BC
+after to pulse       Teff 5350   logL 3.66      
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+     766       1          0.9305E-06        1074707.0101             12.4387             17.6887
+     766       2          0.1345E-05         743315.2332              8.6032             11.7026
+after remove core    Teff 320   logL 3.68
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+      10       1          0.9317E-06        1073330.2891             12.4228             15.9098
+      10       2          0.1349E-05         741521.3401              8.5824              9.9612
+after remesh         Teff    logL 
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+after initialize     Teff    logL 
+   order           freq (Hz)             P (sec)             P (day)    cycles to double

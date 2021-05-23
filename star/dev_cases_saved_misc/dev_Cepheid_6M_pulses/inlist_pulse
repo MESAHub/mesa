@@ -51,10 +51,12 @@
    !max_number_retries = 0
 
 ! atm
-   !use_zero_Pgas_outer_BC = .true.
-   use_momentum_outer_BC = .true. 
-   use_fixed_Psurf_outer_BC = .true.
+   use_momentum_outer_BC = .false. 
+   use_zero_Pgas_outer_BC = .true.
+   use_fixed_Psurf_outer_BC = .false.
    fixed_Psurf = 0d0
+
+   !RSP2_use_L_eqn_at_surface = .false.
 
 ! solver
    steps_before_use_velocity_time_centering = 0
@@ -188,7 +190,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '5 M\d\(2281)\u  Z=0.002  Cepheid'
+    Grid2_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 50 ! only used if > 0.  causes xmin to move with xmax.

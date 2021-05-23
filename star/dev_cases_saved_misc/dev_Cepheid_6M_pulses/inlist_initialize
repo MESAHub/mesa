@@ -47,6 +47,10 @@
    max_model_number = 1
 
 ! atm
+   use_momentum_outer_BC = .false. 
+   use_zero_Pgas_outer_BC = .true.
+   use_fixed_Psurf_outer_BC = .false.
+   fixed_Psurf = 0d0
 
 ! mlt
    alpha_semiconvection = 0.0

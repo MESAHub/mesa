@@ -30,16 +30,16 @@
 &kap
 / ! end of kap namelist
 
-
-! before convert
-! after convert
-
-
 &controls
    
    max_timestep = 1d3
-   
-   max_model_number = 100
+   max_model_number = 2
+
+! atm
+   use_momentum_outer_BC = .false. 
+   use_zero_Pgas_outer_BC = .false.
+   use_fixed_Psurf_outer_BC = .true.
+   fixed_Psurf = 0d0
 
 ! RSP2
    RSP2_nz = 150
@@ -48,7 +48,7 @@
    RSP2_dq_1_factor = 2d0
 
 ! GYRE
-   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
    x_integer_ctrl(2) = 2 ! max number of modes to output per call
    x_logical_ctrl(2) = .false. ! output eigenfunction files   

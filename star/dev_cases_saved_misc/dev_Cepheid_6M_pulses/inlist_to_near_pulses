@@ -29,7 +29,13 @@
 &controls
 
    xa_central_lower_limit_species(1) = 'he4'
-   xa_central_lower_limit(1) = 0.05d0 
+   xa_central_lower_limit(1) = 0.10d0 
+
+! atm
+   use_momentum_outer_BC = .false. 
+   use_zero_Pgas_outer_BC = .true.
+   use_fixed_Psurf_outer_BC = .false.
+   fixed_Psurf = 0d0
        
 ! timesteps
    !delta_HR_limit = 0.01
@@ -137,7 +143,7 @@
 
    HR_win_flag = .true.
    
-   HR_title = '5 M\d\(2281)\u  Z=0.002  Cepheid'
+   HR_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
@@ -145,8 +151,9 @@
    ! axis limits -- to override system default selections
    HR_logT_min = 3.5 ! -101 ! only used if > -100
    HR_logT_max = 4.4 ! only used if > -100
-   HR_logL_min = 2.5 ! -101 ! only used if > -100
-   HR_logL_max = 3.65
+   HR_logL_min = 3.05 ! -101 ! only used if > -100
+   HR_logL_max = 3.79
+   
    show_HR_classical_instability_strip = .true.
    !show_HR_target_box = .true.
    HR_target_n_sigma = -3
