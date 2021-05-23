@@ -1,0 +1,1 @@
+../../../star/test_suite/15M_dynamo/README.rst
