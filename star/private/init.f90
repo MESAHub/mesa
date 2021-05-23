@@ -525,7 +525,6 @@
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
          s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
-         s% need_to_reset_w = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.

@@ -39,8 +39,7 @@
       public :: &
          do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
          compute_Eq_cell, compute_Uq_face, set_RSP2_vars, remesh_for_RSP2, &
-         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, &
-         set_etrb_start_vars, RSP2_adjust_vars_before_call_solver
+         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, set_etrb_start_vars
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
@@ -53,12 +52,6 @@
       
       
       subroutine remesh_for_RSP2(s,ierr)
-         ! after do remesh_for_RSP2 with standard mesa model
-            ! run to allow model to relax to HSE.
-            ! then continue run to find desired model for pulse (calling GYRE or LINA). 
-            ! then set velocities using eigenfunction for desired mode.
-            ! then convert model to RSP2 variables and set appropriate max_dt.
-         ! assumes have already removed center and dT/dm < 0 everywhere in remaining envelope.
          ! uses these controls
          !  RSP2_nz = 150
          !  RSP2_nz_outer = 40
@@ -413,125 +406,12 @@
       end subroutine remesh_for_RSP2
       
       
-      subroutine RSP2_adjust_vars_before_call_solver(s, nvar, ierr)
-         ! check_omega from RSP: JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
-         use micro, only: do_eos_for_cell
-         type (star_info), pointer :: s
-         integer, intent(in) :: nvar
-         integer, intent(out) :: ierr    
-         real(dp) :: PII_div_Hp, QQ, SOURCE, Hp_cell, DAMP, POM, POM2, DAMPR, del, soln
-         type(auto_diff_real_star_order1) :: x
-         integer :: k, op_err
-         include 'formats'         
-         ierr = 0
-         return
-         
-         
-         
-         write(*,2) 'RSP2_adjust_vars_before_call_solver', 35, s% w(35), s% RSP2_w_min_for_damping
-
-         if (s% need_to_reset_w) then
-            write(*,*) 'RSP2_adjust_vars_before_call_solver call reset_etrb_using_L', s% model_number
-            call reset_etrb_using_L(s,ierr)
-            if (ierr /= 0) then
-               stop 'failed in reset_etrb_using_L'
-               return
-            end if
-            s% need_to_reset_w = .false.
-         end if
-
-         if (s% mixing_length_alpha == 0d0) return
-         
-         op_err = 0
-         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-         do k=1,s%nz-1
-            s% Vol(k) = (4d0*pi/3d0)*(pow3(s% r(k)) - pow3(s% r(k+1)))/s% dm(k)
-            s% rho(k) = 1d0/s% Vol(k)
-            s% lnd(k) = log(s% rho(k))
-            call do_eos_for_cell(s, k, op_err) ! redo with new lnd
-            if (op_err /= 0) ierr = op_err
-            if (k==35) then
-               write(*,2) 'lgd r00 rp1', k, s% lnd(k)/ln10, s% r(k), s% r(k+1)
-            end if
-         end do
-         !$OMP END PARALLEL DO
-         if (ierr /= 0) return
-         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-         do k=1,s%nz
-            ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
-            if (s% Hp_face(k) <= 0) s% Hp_face(k) = get_scale_height_face_val(s,k)
-            x = compute_Y_face(s, k, op_err)
-            if (op_err /= 0) ierr = op_err
-            x = compute_PII_face(s, k, op_err)
-            if (op_err /= 0) ierr = op_err
-         end do
-         !$OMP END PARALLEL DO
-         if (ierr /= 0) return
-         
-         !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
-         do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
-               s% nz - max(1,int(s% nz/s% RSP2_nz_div_IBOTOM))
-               
-            if (s% w(k) > s% RSP2_w_min_for_damping) cycle
-            
-            PII_div_Hp = 0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))
-            QQ = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k))         
-            SOURCE = PII_div_Hp*s% T(k)*s% Peos(k)*QQ/s% Cp(k)
-            
-            Hp_cell = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
-            DAMP = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell            
-            
-            POM = 4d0*boltz_sigma*pow2(s% RSP2_alfar*x_GAMMAR/s% mixing_length_alpha)
-            POM2 = pow3(s% T(k))/(pow2(s% rho(k))*s% Cp(k)*s% opacity(k)) 
-            DAMPR = POM*POM2/pow2(Hp_cell)
-            
-            del = pow2(DAMPR) + 4d0*DAMP*SOURCE
-            
-            if (k==-35) then
-               write(*,2) 'del', k, del
-               write(*,2) 'DAMPR', k, DAMPR
-               write(*,2) 'DAMP', k, DAMP
-               write(*,2) 'SOURCE', k, SOURCE
-               write(*,2) 'POM', k, PII_div_Hp
-               write(*,2) 'POM2', k, s% T(k)*s% Peos(k)*QQ/s% Cp(k)
-               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
-               write(*,2) 's% Hp_face(k+1)', k+1, s% Hp_face(k+1)
-               write(*,2) 's% PII(k)', k, s% PII(k)
-               write(*,2) 's% PII(k+1)', k+1, s% PII(k+1)
-               write(*,2) 's% Y_face(k)', k, s% Y_face(k)
-               write(*,2) 's% Y_face(k+1)', k+1, s% Y_face(k+1)
-            end if
-            
-            if (del < 0d0) cycle
-            soln = (-DAMPR + sqrt(del))/(2d0*DAMP)
-            if (k==-35) write(*,2) 'soln', k, soln
-            if (soln > 0d0) then
-               s% w(k) = soln
-               write(*,2) 'preset w', k, s% w(k)
-            end if
-
-         end do
-         !$OMP END PARALLEL DO
-      end subroutine RSP2_adjust_vars_before_call_solver
-      
-      
       subroutine set_RSP2_vars(s,ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr    
          type(auto_diff_real_star_order1) :: x
          integer :: k, op_err
          include 'formats'      
-! write(*,3) 'RSP2 w', 22, s% solver_iter, s% w(22)
-         ierr = 0
-         if (s% need_to_reset_w) then
-            write(*,2) 'reset_etrb_using_L', s% model_number
-            call reset_etrb_using_L(s,ierr)
-            if (ierr /= 0) then
-               stop 'failed in reset_etrb_using_L'
-               return
-            end if
-            s% need_to_reset_w = .false.
-         end if
          ierr = 0
          op_err = 0
          !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
@@ -1576,67 +1456,6 @@
             s% Hp_face_start(k) = s% Hp_face(k)
          end do    
       end subroutine set_etrb_start_vars
-      
-      
-      subroutine reset_etrb_using_L(s, ierr)
-         use star_utils, only: get_scale_height_face, store_etrb_in_xh
-         type (star_info), pointer :: s
-         integer, intent(out) :: ierr   
-         integer :: k, nz, j, k_maxerr
-         real(dp) :: Lc_val, w_00, maxerr, dlnP, dlnT, gradT_actual, &
-            super_ad_actual, super_ad_expected
-         type(auto_diff_real_star_order1) :: &
-            Lc_div_w_face, L, Lr, Lc, Lt, Y_face
-         real(dp), allocatable :: w_face(:), target_Lc(:)
-         real(dp) :: alfa, beta
-         real(dp), parameter :: atol = 1-6d0, rtol = 1d-9
-         include 'formats'
-         ierr = 0
-         if (s% mixing_length_alpha == 0d0) return ! no convection         
-         nz = s% nz
-         allocate(w_face(nz), target_Lc(nz))
-
-         do k=1, nz
-            s% Hp_face(k) = Hp_face_for_rsp2_val(s, k, ierr)
-            if (ierr /= 0) stop 'reset_etrb_using_L failed in Hp_face_for_rsp2_val'
-            s% xh(s% i_Hp,k) = s% Hp_face(k)
-            Lr = compute_Lr(s, k, ierr)
-            if (ierr /= 0) stop 'reset_etrb_using_L failed in compute_Lr'
-            Lc = compute_Lc_terms(s, k, Lc_div_w_face, ierr)
-            if (ierr /= 0) stop 'reset_etrb_using_L failed in compute_Lc_terms'
-            target_Lc(k) = s% L(k) - Lr%val
-            Lc_val = target_Lc(k) ! assume Lt = 0 for this
-            if (abs(Lc_div_w_face%val) < 1d-20) then
-               w_face(k) = 0d0
-            else
-               w_face(k) = max(0d0, Lc_val/Lc_div_w_face%val)
-            end if
-            if (is_bad(w_face(k))) then
-               write(*,2) 'bad w_face', k, w_face(k)
-               stop 'reset_etrb_using_L'
-               w_face(k) = 0d0
-            end if
-         end do
-         
-         do k=1, nz
-            if (k < nz) then
-               w_00 = 0.5d0*(w_face(k) + w_face(k+1))
-            else
-               w_00 = w_face(k)
-            end if
-            s% w(k) = w_00
-            if (s% w(k) < 0d0) then
-               !write(*,4) 'reset_etrb_using_L: fix w < 0', k, &
-               !   s% solver_iter, s% model_number, s% w(k)
-               s% w(k) = s% RSP2_w_fix_if_neg
-            end if
-            s% xh(s% i_w,k) = s% w(k)
-            !write(*,2) 'w', k, s% w(k)
-         end do
-         
-         !stop 'reset_etrb_using_L'
-         
-      end subroutine reset_etrb_using_L
 
 
       end module hydro_rsp2

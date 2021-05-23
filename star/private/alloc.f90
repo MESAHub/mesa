@@ -2571,6 +2571,10 @@
          end if
 
          call set_chem_names(s)
+         
+         if (v_flag .and. s% u_flag) then ! turn off u_flag when turn on v_flag
+            call set_u_flag(id, .false., ierr)
+         end if
 
          contains
 
@@ -2660,6 +2664,10 @@
          end if
 
          call set_chem_names(s)
+         
+         if (u_flag .and. s% v_flag) then ! turn off v_flag when turn on u_flag
+            call set_v_flag(id, .false., ierr)
+         end if
 
          contains
 
@@ -2780,6 +2788,7 @@
 
 
       subroutine set_RSP2_flag(id, RSP2_flag, ierr)
+         use const_def, only: sqrt_2_div_3
          integer, intent(in) :: id
          logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
@@ -2793,16 +2802,11 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_RSP2_flag previous s% RSP2_flag', s% RSP2_flag
-         write(*,*) 'set_RSP2_flag new RSP2_flag', RSP2_flag
+         !write(*,*) 'set_RSP2_flag previous s% RSP2_flag', s% RSP2_flag
+         !write(*,*) 'set_RSP2_flag new RSP2_flag', RSP2_flag
          if (s% RSP2_flag .eqv. RSP2_flag) return
 
          nz = s% nz
-         
-         if (RSP2_flag .and. s% RSP_flag) then ! turn RSP off before turn RSP2 on
-            call set_RSP_flag(id, .false., ierr)
-            if (ierr /= 0) return
-         end if
          
          s% RSP2_flag = RSP2_flag
          nvar_hydro_old = s% nvar_hydro
@@ -2830,11 +2834,31 @@
 
          if (RSP2_flag) then
             call insert1(s% i_w) 
-            call insert1(s% i_Hp) 
-            s% need_to_reset_w = .true.
+            if (s% RSP_flag) then
+               do k=1,nz
+                  s% xh(s% i_w,k) = sqrt(max(0d0,s% xh(s% i_Et_RSP,k)))
+               end do
+            else if (s% have_mlt_vc) then
+               do k=1,nz-1
+                  s% xh(s% i_w,k) = 0.5d0*(s% mlt_vc(k) + s% mlt_vc(k+1))/sqrt_2_div_3
+               end do
+               s% xh(s% i_w,nz) = 0.5d0*s% mlt_vc(nz)/sqrt_2_div_3
+            else
+               write(*,*) 'set_rsp2_flag true requires mlt_vc'
+               ierr = -1
+               return
+            end if
+            call insert1(s% i_Hp) ! will be initialized by set_RSP2_vars
          end if
 
          call set_chem_names(s)
+         
+         if (RSP2_flag .and. s% RSP_flag) then ! turn off RSP_flag when turn on RSP2_flag
+            call set_RSP_flag(id, .false., ierr)
+            if (ierr /= 0) return
+         end if
+         
+         if (RSP2_flag) call set_v_flag(s% id, .true., ierr)
          
          contains     
 
