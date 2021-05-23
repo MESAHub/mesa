@@ -503,24 +503,6 @@
       end subroutine star_write_photo
       
       
-      subroutine star_read_RSP_model(id, model_fname, ierr)
-         use init, only: load_saved_RSP_model
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr      
-         call load_saved_RSP_model(id, model_fname, ierr)     
-      end subroutine star_read_RSP_model
-      
-      
-      subroutine star_read_RSP2_model(id, model_fname, ierr)
-         use init, only: load_saved_RSP2_model
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr      
-         call load_saved_RSP2_model(id, model_fname, ierr)     
-      end subroutine star_read_RSP2_model
-      
-      
       subroutine star_read_model(id, model_fname, ierr)
          use init, only: load_saved_model
          integer, intent(in) :: id

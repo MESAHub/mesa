@@ -257,43 +257,39 @@
             run_num_iters_prev_period = 0
             run_num_retries_prev_period = 0
             NSTART = 1
-            if (s% job% load_saved_model_for_RSP .and. &
-                  .not. s% job% create_RSP_model) then
-               call init_def(s)
-               call init_allocate(s,s% nz)
-               call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)               
-               call init_for_rsp_eos_and_kap(s)
-               IWORK=0
-               NZN = s% nz
-               ELSTA = s% L(1)
-               RSTA = s% r(1)  
-               s% rsp_dt = s% dt_next
-               if (s% max_timestep > 0d0 .and. s% rsp_dt > s% max_timestep) &
-                  s% rsp_dt = s% max_timestep
-               rsp_tau_factor = s% tau_factor
-               s% rsp_period = s% rsp_dt*dble(s% RSP_target_steps_per_cycle)               
-               s% RSP_have_set_velocities = .true.
-               call copy_from_xh_to_rsp(s,-1)
-               do k=1,NZN
-                  s% L_start(k) = 0d0
-               end do
-               if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
-                  tau_surf = s% RSP_tau_surf_for_atm_grey_with_kap
-                  kap_guess = 1d-2
-                  call get_surf_P_T_kap(s, &
-                     s% m(1), s% r(1), s% L(1), tau_surf, kap_guess, &
-                     T_surf, Psurf, kap_surf, Teff_atm, ierr)
-                  if (ierr /= 0) stop 'failed in get_surf_P_T_kap'
-               else if (s% RSP_use_Prad_for_Psurf) then
-                  Psurf = crad*s% T(1)**4/3d0
-               else
-                  Psurf = 0d0
-               end if
-               Psurf_from_atm = Psurf
+            call init_def(s)
+            call init_allocate(s,s% nz)
+            call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)               
+            call init_for_rsp_eos_and_kap(s)
+            IWORK=0
+            NZN = s% nz
+            ELSTA = s% L(1)
+            RSTA = s% r(1)  
+            s% rsp_dt = s% dt_next
+            if (s% max_timestep > 0d0 .and. s% rsp_dt > s% max_timestep) &
+               s% rsp_dt = s% max_timestep
+            rsp_tau_factor = s% tau_factor
+            s% rsp_period = s% rsp_dt*dble(s% RSP_target_steps_per_cycle)               
+            s% RSP_have_set_velocities = .true.
+            call copy_from_xh_to_rsp(s,-1)
+            do k=1,NZN
+               s% L_start(k) = 0d0
+            end do
+            if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
+               tau_surf = s% RSP_tau_surf_for_atm_grey_with_kap
+               kap_guess = 1d-2
+               call get_surf_P_T_kap(s, &
+                  s% m(1), s% r(1), s% L(1), tau_surf, kap_guess, &
+                  T_surf, Psurf, kap_surf, Teff_atm, ierr)
+               if (ierr /= 0) stop 'failed in get_surf_P_T_kap'
+            else if (s% RSP_use_Prad_for_Psurf) then
+               Psurf = crad*s% T(1)**4/3d0
             else
-               s% dt_next = s% rsp_dt
-               s% dt = s% rsp_dt
+               Psurf = 0d0
             end if
+            Psurf_from_atm = Psurf
+            s% dt_next = s% rsp_dt
+            s% dt = s% rsp_dt
             rsp_min_dr_div_cs = 1d99
             rsp_min_rad_diff_time = 1d99
             call begin_calculation(s,restart,ierr)  
@@ -302,12 +298,12 @@
       end subroutine rsp_setup_part1
          
 
-      subroutine rsp_setup_part2(s, restart, want_rsp_model, is_rsp_model, ierr)
+      subroutine rsp_setup_part2(s, restart, ierr)
          use hydro_vars, only: set_Teff
          use rsp_step
          ! called by finish_load_model after set_vars
          type (star_info), pointer :: s
-         logical, intent(in) :: restart, want_rsp_model, is_rsp_model
+         logical, intent(in) :: restart
          integer, intent(out) :: ierr
          integer :: i, j, k, species, nz, op_err
          real(dp), allocatable :: w_avg(:)
@@ -323,59 +319,6 @@
          end if
          ierr = 0
          nz = s% nz
-         if (want_rsp_model .and. .not. is_rsp_model) then
-            ! have loaded a file that is not an rsp model and now must convert model
-            do k=1,nz
-               s% erad(k) = crad*s% T(k)**4/s% rho(k)
-               s% xh(s% i_erad_RSP,k) = s% erad(k)
-            end do
-            !$OMP PARALLEL DO PRIVATE(I,op_err) SCHEDULE(dynamic,2)
-            do i = 1,nz
-               call do1_specific_volume(s,i)
-               call do1_eos_and_kap(s,i,op_err)
-               if (op_err /= 0) ierr = op_err
-               call calc_Prad(s,i)
-            end do
-            !$OMP END PARALLEL DO
-            if (ierr /= 0) return
-            !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
-            do k=1,nz ! set Fr using updated eos and kap vars
-               call T_form_of_calc_Fr(s, nz+1-k, s% Fr(k), &
-                  dFr_dr_out, dFr_dr_in, dFr_dr_00, &
-                  dFr_dT_out, dFr_dT_00, dFr_dVol_00)
-               s% xh(s% i_Fr_RSP,k) = s% Fr(k)
-            end do
-            !$OMP END PARALLEL DO
-            if (ALFAC == 0d0 .or. ALFAS == 0d0) then
-               s% RSP_w(1:nz) = 0d0
-               s% RSP_Et(1:nz) = 0d0
-               s% xh(s% i_Et_RSP,1:nz) = 0d0
-            else
-               !$OMP PARALLEL DO PRIVATE(I) SCHEDULE(dynamic,2)
-               do i = 1,nz
-                  call calc_Hp_face(s,i)
-                  call calc_Y_face(s,i)
-                  call calc_PII_face(s,i)
-               end do
-               !$OMP END PARALLEL DO
-               allocate(w_avg(nz))
-               do k=1,nz
-                  Lr = 4d0*pi*s% r(k)**2*s% Fr(k)
-                  Lc = s% L(k) - Lr
-                  POM = P4*(s% r(k)**2)*(ALFAC/ALFAS)*s% T(k)/s% Vol(k)
-                  w_avg(k) = Lc/(POM*s% PII(k))
-               end do
-               s% RSP_w(1) = 0d0
-               s% RSP_w(nz) = 0d0
-               do k=2,nz-1
-                  s% RSP_w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
-                  if (s% RSP_w(k) < 0d0) s% RSP_w(k) = 0d0
-                  s% RSP_Et(k) = s% RSP_w(k)**2
-                  s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)               
-                  s% RSP_w(k) = sqrt(s% xh(s% i_Et_RSP,k))
-               end do   
-            end if         
-         end if
          call finish_after_build_model(s)
          call copy_results(s)  
          call set_Teff(s, ierr)

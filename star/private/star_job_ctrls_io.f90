@@ -90,7 +90,6 @@
          echo_at_start, &
          echo_at_end, &
          load_saved_model, &
-         load_saved_model_for_RSP, &
          load_model_filename, &
          create_merger_model, &
          saved_model_for_merger_1, &
@@ -305,7 +304,6 @@
          change_RSP2_flag_at_model_number, &
          new_RSP2_flag, &
          create_RSP2_model, &
-         load_saved_model_for_RSP2, &
          
          change_conv_vel_flag, &
          change_initial_conv_vel_flag, &
@@ -737,7 +735,6 @@
          s% job% echo_at_start = echo_at_start
          s% job% echo_at_end = echo_at_end
          s% job% load_saved_model = load_saved_model
-         s% job% load_saved_model_for_RSP = load_saved_model_for_RSP
          s% job% load_model_filename = load_model_filename
          s% job% create_merger_model = create_merger_model
          s% job% saved_model_for_merger_1 = saved_model_for_merger_1
@@ -956,7 +953,6 @@
          s% job% change_RSP2_flag_at_model_number = change_RSP2_flag_at_model_number
          s% job% new_RSP2_flag = new_RSP2_flag
          s% job% create_RSP2_model = create_RSP2_model
-         s% job% load_saved_model_for_RSP2 = load_saved_model_for_RSP2
          s% job% change_conv_vel_flag = change_conv_vel_flag
          s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
          s% job% new_conv_vel_flag = new_conv_vel_flag
@@ -1311,7 +1307,6 @@
          echo_at_start = s% job% echo_at_start
          echo_at_end = s% job% echo_at_end
          load_saved_model = s% job% load_saved_model
-         load_saved_model_for_RSP = s% job% load_saved_model_for_RSP
          load_model_filename = s% job% load_model_filename
          create_merger_model = s% job% create_merger_model
          saved_model_for_merger_1 = s% job% saved_model_for_merger_1
@@ -1531,7 +1526,6 @@
          change_RSP2_flag_at_model_number = s% job% change_RSP2_flag_at_model_number
          new_RSP2_flag = s% job% new_RSP2_flag
          create_RSP2_model = s% job% create_RSP2_model
-         load_saved_model_for_RSP2 = s% job% load_saved_model_for_RSP2
          change_conv_vel_flag = s% job% change_conv_vel_flag
          change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
          new_conv_vel_flag = s% job% new_conv_vel_flag

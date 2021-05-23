@@ -620,6 +620,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: old_xmstar, new_xmstar
+         logical :: restart
          integer :: kk
          include 'formats'
          call get_star_ptr(id, s, ierr)
@@ -633,8 +634,6 @@
          new_xmstar = s% m(1) - s% M_center
          s% xmstar = new_xmstar
          s% R_center = s% r(k)
-         
-         
          if (s% job% remove_center_adjust_L_center) s% L_center = s% L(k)
          if (s% u_flag) then
             kk = minloc(s% u(1:s% nz),dim=1)
@@ -671,7 +670,8 @@
          call prune_star_info_arrays(s, ierr)
          if (ierr /= 0) return
          s% need_to_setvars = .true.
-         call finish_load_model(s, .false., .false., .false., .false., .false., ierr)
+         restart = .false.
+         call finish_load_model(s, restart, ierr)
       end subroutine do_remove_center
 
 
@@ -984,7 +984,7 @@
          real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P, T_black_body
          integer :: k, k_old, nz, nz_old, skip
 
-         logical, parameter :: dbg = .false.
+         logical, parameter :: dbg = .false., restart = .false.
 
          include 'formats'
 
@@ -1114,9 +1114,8 @@
          end if
 
          s% need_to_setvars = .true.
-
          if (dbg) write(*,1) 'call finish_load_model'
-         call finish_load_model(s, .false., .false., .false., .false., .false., ierr)
+         call finish_load_model(s, restart, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &
                write(*,*) 'finish_load_model failed in do_remove_surface'
