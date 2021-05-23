@@ -460,6 +460,12 @@
          end if
          nz_gyre = npts(mode)
          
+         if (nz_gyre == 0) then
+            ierr = -1
+            write(*,*) 'Failed to find requested mode for setting velocities'
+            return
+         end if
+         
          v_surf = v(mode,nz_gyre)
          v1 = 1d5/v_surf ! rescale v's
          if (s% x_ctrl(6) > 0d0) v1 = v1*s% x_ctrl(6)
