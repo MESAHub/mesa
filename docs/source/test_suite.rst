@@ -94,7 +94,6 @@ Star tests
 The test checks the evolution of metal-rich low-mass stars by evolving 
 a 1.3 Msun, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
 
-
 :ref:`1.4M_ms_op_mono`
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -106,6 +105,11 @@ The test vehicle is a 1.4 Msun solar metallicity model.
 
 The test checks the functionality of element diffusion.
 The test vehicle is a 1.5 Msun solar metallicity model.
+
+:ref:`15M_dynamo`
+^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of element rotation in a 15 Msun solar metallicity model.
 
 
 :ref:`c13_pocket`
