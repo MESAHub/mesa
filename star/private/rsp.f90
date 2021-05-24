@@ -257,39 +257,42 @@
             run_num_iters_prev_period = 0
             run_num_retries_prev_period = 0
             NSTART = 1
-            call init_def(s)
-            call init_allocate(s,s% nz)
-            call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)               
-            call init_for_rsp_eos_and_kap(s)
-            IWORK=0
-            NZN = s% nz
-            ELSTA = s% L(1)
-            RSTA = s% r(1)  
-            s% rsp_dt = s% dt_next
-            if (s% max_timestep > 0d0 .and. s% rsp_dt > s% max_timestep) &
-               s% rsp_dt = s% max_timestep
-            rsp_tau_factor = s% tau_factor
-            s% rsp_period = s% rsp_dt*dble(s% RSP_target_steps_per_cycle)               
-            s% RSP_have_set_velocities = .true.
-            call copy_from_xh_to_rsp(s,-1)
-            do k=1,NZN
-               s% L_start(k) = 0d0
-            end do
-            if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
-               tau_surf = s% RSP_tau_surf_for_atm_grey_with_kap
-               kap_guess = 1d-2
-               call get_surf_P_T_kap(s, &
-                  s% m(1), s% r(1), s% L(1), tau_surf, kap_guess, &
-                  T_surf, Psurf, kap_surf, Teff_atm, ierr)
-               if (ierr /= 0) stop 'failed in get_surf_P_T_kap'
-            else if (s% RSP_use_Prad_for_Psurf) then
-               Psurf = crad*s% T(1)**4/3d0
+            if (.not. s% job% create_RSP_model) then
+               call init_def(s)
+               call init_allocate(s,s% nz)
+               call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)               
+               call init_for_rsp_eos_and_kap(s)
+               IWORK=0
+               NZN = s% nz
+               ELSTA = s% L(1)
+               RSTA = s% r(1)  
+               s% rsp_dt = s% dt_next
+               if (s% max_timestep > 0d0 .and. s% rsp_dt > s% max_timestep) &
+                  s% rsp_dt = s% max_timestep
+               rsp_tau_factor = s% tau_factor
+               s% rsp_period = s% rsp_dt*dble(s% RSP_target_steps_per_cycle)               
+               s% RSP_have_set_velocities = .true.
+               call copy_from_xh_to_rsp(s,-1)
+               do k=1,NZN
+                  s% L_start(k) = 0d0
+               end do
+               if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
+                  tau_surf = s% RSP_tau_surf_for_atm_grey_with_kap
+                  kap_guess = 1d-2
+                  call get_surf_P_T_kap(s, &
+                     s% m(1), s% r(1), s% L(1), tau_surf, kap_guess, &
+                     T_surf, Psurf, kap_surf, Teff_atm, ierr)
+                  if (ierr /= 0) stop 'failed in get_surf_P_T_kap'
+               else if (s% RSP_use_Prad_for_Psurf) then
+                  Psurf = crad*s% T(1)**4/3d0
+               else
+                  Psurf = 0d0
+               end if
+               Psurf_from_atm = Psurf
             else
-               Psurf = 0d0
+               s% dt_next = s% rsp_dt
+               s% dt = s% rsp_dt
             end if
-            Psurf_from_atm = Psurf
-            s% dt_next = s% rsp_dt
-            s% dt = s% rsp_dt
             rsp_min_dr_div_cs = 1d99
             rsp_min_rad_diff_time = 1d99
             call begin_calculation(s,restart,ierr)  
