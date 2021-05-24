@@ -1138,7 +1138,7 @@
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interp_pm, interp_values, interp_value
          use adjust_xyz, only: change_net
-         use alloc, only: set_conv_vel_flag, set_v_flag, set_u_flag, set_rotation_flag
+         use set_flags, only: set_conv_vel_flag, set_v_flag, set_u_flag, set_rotation_flag
          use rotation_mix_info, only: set_rotation_mixing_info
          use hydro_rotation, only: set_i_rot, set_rotation_info
          use relax, only: do_relax_composition, do_relax_angular_momentum, do_relax_entropy

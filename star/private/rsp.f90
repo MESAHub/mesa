@@ -71,7 +71,8 @@
 
       subroutine build_rsp_model(s,ierr)
          ! called by model_builder in place of loading a model
-         use alloc, only: allocate_star_info_arrays, set_RSP_flag
+         use alloc, only: allocate_star_info_arrays
+         use set_flags, only: set_RSP_flag
          use rsp_build, only: do_rsp_build
          use net, only: do_micro_change_net
          use const_def, only: Lsun, Rsun, Msun

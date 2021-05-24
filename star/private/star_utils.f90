@@ -4204,6 +4204,21 @@
             end do
          end do
       end subroutine set_luminosity_by_category
+
+
+      subroutine set_zero_alpha_RTI(id, ierr)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         include 'formats'
+         ierr = 0
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         if (.not. s% u_flag) return
+         s% xh(s% i_alpha_RTI,1:s% nz) = 0d0
+         s% alpha_RTI(1:s% nz) = 0d0
+         s% need_to_setvars = .true.
+      end subroutine set_zero_alpha_RTI
       
 
       end module star_utils
