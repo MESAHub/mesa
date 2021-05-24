@@ -19,6 +19,7 @@ SRCS = \
    create_EXCOR7_table.f90 \
    pc_support.f90 \
    pc_eos.f90 \
+   ion_offset.f90 \
    helm_polynomials.f90 \
    skye_thermodynamics.f90 \
    skye_ideal.f90 \

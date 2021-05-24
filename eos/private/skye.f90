@@ -258,6 +258,7 @@ module skye
          use const_def, only: dp
          use utils_lib, only: is_bad
          use chem_def, only: chem_isos
+         use ion_offset, only: compute_ion_offset
          use skye_ideal
          use skye_coulomb
          use skye_thermodynamics
@@ -341,6 +342,8 @@ module skye
 
          ! Ideal ion free energy, only depends on abar
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
+
+         F_ideal_ion = F_ideal_ion + compute_ion_offset(relevant_species, select_xa, chem_id) ! Offset so ion ground state energy is zero.
 
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
