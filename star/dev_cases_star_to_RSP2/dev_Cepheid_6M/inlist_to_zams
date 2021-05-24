@@ -62,7 +62,7 @@
 
    HR_win_flag = .true.
    
-   HR_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
+   HR_title = '6 M\d\(2281)\u  Z=0.001  Cepheid'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
