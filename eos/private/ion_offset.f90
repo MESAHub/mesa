@@ -56,7 +56,6 @@ module ion_offset
          do k=1,species
             if (Z(k) <= 28) then
                offset = offset + ionization_table(Z(k)) * ya(k)
-               write(*,*) ionization_table(Z(k)), ya(k)
             end if
          end do
 
