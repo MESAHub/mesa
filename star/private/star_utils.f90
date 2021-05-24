@@ -1060,6 +1060,40 @@
          call get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
          get_r_phot = r
       end function get_r_phot
+      
+      
+      subroutine set_phot_info(s)
+         use atm_lib, only: atm_black_body_T
+         type (star_info), pointer :: s
+         real(dp) :: luminosity
+         include 'formats'
+         call get_phot_info(s, &
+            s% photosphere_r, s% photosphere_m, s% photosphere_v, &
+            s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
+            s% photosphere_opacity, s% photosphere_logg, &
+            s% photosphere_column_density, s% photosphere_cell_k)
+         s% photosphere_black_body_T = &
+            atm_black_body_T(s% photosphere_L, s% photosphere_r)
+         s% Teff = s% photosphere_black_body_T
+         s% photosphere_r = s% photosphere_r/Rsun
+         s% photosphere_m = s% photosphere_m/Msun
+         s% photosphere_L = s% photosphere_L/Lsun
+         s% L_phot = s% photosphere_L
+         luminosity = s% L(1)
+         if (is_bad(luminosity)) then
+            write(*,2) 's% L(1)', s% model_number, s% L(1)
+            write(*,2) 's% xh(s% i_lum,1)', s% model_number, s% xh(s% i_lum,1)
+            stop 'set_phot_info'
+            luminosity = 0d0
+         end if
+         s% L_surf = luminosity/Lsun
+         s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
+            ! log10(stellar luminosity in solar units)
+         if (is_bad(s% L_surf)) then
+            write(*,2) 's% L_surf', s% model_number, s% L_surf
+            stop 'set_phot_info'
+         end if
+      end subroutine set_phot_info
 
 
       subroutine get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
@@ -1072,10 +1106,8 @@
             Tface_0, Tface_1
 
          include 'formats'
-
-         tau00 = 0
-         taup1 = 0
-         ysum = 0
+         
+         ! set values for surface as defaults in case phot not in model
          r = s% r(1)
          m = s% m(1)
          if (s% u_flag) then
@@ -1091,11 +1123,13 @@
          kap = s% opacity(1)
          logg = safe_log10(s% cgrav(1)*m/(r*r))
          k_phot = 1
-         tau_phot = s% tau_base
-         tau00 = s% tau_factor*s% tau_base
-         if (tau00 >= tau_phot) then ! phot not inside model
-            return ! just return surface values
+         if (s% tau_factor >= 1) then
+            return ! just use surface values
          end if
+         tau_phot = s% tau_base ! this holds for case of tau_factor < 1
+         tau00 = s% tau_factor*s% tau_base ! start at tau_surf > tau_phot and go inward
+         taup1 = 0
+         ysum = 0
          do k = 1, s% nz-1
             dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
@@ -1120,10 +1154,11 @@
                   v = s% v(k) + (s% v(k+1) - s% v(k))*(tau_phot - tau00)/dtau
                end if
                L = s% L(k) + (s% L(k+1) - s% L(k))*(tau_phot - tau00)/dtau
+               logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
                k_phot = k
+               ! don't bother interpolating these.
                cs = s% csound(k_phot)
                kap = s% opacity(k_phot)
-               logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
                return
             end if
             tau00 = taup1

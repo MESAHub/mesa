@@ -1765,8 +1765,7 @@
       integer function prepare_for_new_step(s)
          use evolve_support, only: new_generation
          use chem_def
-         use star_utils, only: use_xh_to_set_rho_to_dm_div_dV
-         use report, only: set_phot_info
+         use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
 
          type (star_info), pointer :: s

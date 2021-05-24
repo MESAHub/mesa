@@ -398,7 +398,7 @@
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
-         use star_utils, only: get_phot_info
+         use star_utils, only: set_phot_info
          use atm_lib, only: atm_Teff
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
@@ -408,26 +408,13 @@
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
 
-         integer :: k_phot, k
-         real(dp) :: Tm1, T00, T4_m1, T4_00, P_rad_m1, P_rad_00, y_phot, &
-            alfa, beta, A, opacity_face, r_phot, m_phot, v_phot, &
-            L_phot, T_phot, cs_phot, kap_phot, logg_phot, dL_dlnR, dL_dlnT
-         real(qp) :: q1
-
          include 'formats'
 
          ierr = 0
          
-         ! Set surface values
+         call set_phot_info(s) ! sets Teff using L_phot and R_phot
 
-         L_surf = s% L(1)
-         r_surf = s% r(1)
-
-         if (s% RSP_flag .or. s% RSP2_flag) then
-            call get_phot_info( &
-                 s, r_phot, m_phot, v_phot, L_phot, T_phot, &
-                 cs_phot, kap_phot, logg_phot, y_phot, k_phot)
-            Teff = atm_Teff(L_phot, r_phot)
+         if (s% RSP_flag) then
             lnT_surf = s% lnT(1)
             dlnT_dL = 0d0
             dlnT_dlnR = 0d0
@@ -438,47 +425,32 @@
             dlnP_dlnR = 0d0
             dlnP_dlnM = 0d0
             dlnP_dlnkap = 0d0
-            s% Teff = Teff
-            s% L_phot = L_phot
-            s% photosphere_L = s% L_phot
-            s% photosphere_r = r_phot/Rsun
             return
          end if
-
+         
+         Teff = s% Teff ! in case atm wants to use this as an input 
+         ! we do not use Teff returned as result from atm
          if (s% use_other_surface_PT) then
             call s% other_surface_PT( &
-               s% id, skip_partials, &
-               Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+               s% id, skip_partials, Teff, &
+               lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
          else
             call get_surf_PT( &
-               s, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
-               Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+               s, skip_partials, need_atm_Psurf, need_atm_Tsurf, Teff, &
+               lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
          end if
-
          if (ierr /= 0) then
             if (s% report_ierr) then
                write(*,*) 'error in get_surf_PT'
             end if
             return
          end if
-
          s% T_surf = exp(lnT_surf)
-         s% Teff = Teff ! Teff from atm
-
-         ! Calculate and store photosphere (tau=2/3) values; these
-         ! aren't actually used to set up surface values
-
-         call get_phot_info( &
-              s, r_phot, m_phot, v_phot, L_phot, T_phot, &
-              cs_phot, kap_phot, logg_phot, y_phot, k_phot)
-
-         s% L_phot = L_phot/Lsun
-         s% photosphere_L = s% L_phot
-         s% photosphere_r = r_phot/Rsun
+         s% P_surf = exp(lnT_surf)
 
       end subroutine set_Teff_info_for_eqns
 
