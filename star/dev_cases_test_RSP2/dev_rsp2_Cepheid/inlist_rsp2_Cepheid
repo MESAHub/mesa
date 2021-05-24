@@ -6,14 +6,7 @@
    show_log_description_at_start = .false.
    
    load_saved_model = .true.
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle0.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle100.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle200.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle300.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle400.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle500.mod'
-   !load_model_filename = '../dev_test_Cepheid_RSP/cycle600.mod'
-   load_model_filename = '../dev_test_Cepheid_RSP/cycle700.mod'
+   load_model_filename = '../../dev_cases_test_RSP/dev_test_Cepheid_RSP/cycle0.mod'
    
    change_initial_RSP2_flag = .true.
    new_RSP2_flag = .true.

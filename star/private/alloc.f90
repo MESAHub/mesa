@@ -2789,6 +2789,9 @@
 
       subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          use const_def, only: sqrt_2_div_3
+         use hydro_vars, only: set_vars
+         use hydro_rsp2, only: set_RSP2_vars, remesh_for_RSP2
+         use star_utils, only: set_m_and_dm, set_dm_bar, set_qs
          integer, intent(in) :: id
          logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
@@ -2853,12 +2856,35 @@
 
          call set_chem_names(s)
          
-         if (RSP2_flag .and. s% RSP_flag) then ! turn off RSP_flag when turn on RSP2_flag
+         if (.not. RSP2_flag) return
+         
+         if (s% RSP_flag) then ! turn off RSP_flag when turn on RSP2_flag
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
          
-         if (RSP2_flag) call set_v_flag(s% id, .true., ierr)
+         call set_v_flag(s% id, .true., ierr)
+         if (ierr /= 0) return
+         
+         call set_vars(s, s% dt, ierr)
+         if (ierr /= 0) return
+
+         call set_RSP2_vars(s,ierr)
+         if (ierr /= 0) return
+         
+         if (s% RSP2_remesh_when_load) then
+            write(*,*) 'doing automatic remesh for RSP2'
+            call remesh_for_RSP2(s,ierr)
+            if (ierr /= 0) return
+            call set_qs(s, nz, s% q, s% dq, ierr)
+            if (ierr /= 0) return
+            call set_m_and_dm(s)
+            call set_dm_bar(s, nz, s% dm, s% dm_bar)   
+            call set_vars(s, s% dt, ierr) ! redo after remesh_for_RSP2
+            if (ierr /= 0) return
+         end if
+         
+         
          
          contains     
 
@@ -2954,6 +2980,9 @@
             call insert1(s% i_Fr_RSP)
          else
             call insert1(s% i_lum)
+            do k=1,nz
+               s% xh(s% i_lum,k) = s% L(k)
+            end do
          end if
 
          call set_chem_names(s)

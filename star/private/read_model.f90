@@ -201,7 +201,7 @@
 
          integer :: iounit, n, i, k, t, file_type, &
             year_month_day_when_created, nz, species, nvar, count
-         logical :: do_read_prev
+         logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
             tau_factor, Teff, Tsurf_factor, opacity_factor, mixing_length_alpha
          character (len=strlen) :: buffer, string, message
@@ -335,18 +335,11 @@
          s% RSP_flag = BTEST(file_type, bit_for_RSP)
          s% RSP2_flag = BTEST(file_type, bit_for_RSP2)
          s% have_mlt_vc = BTEST(file_type, bit_for_mlt_vc)
+         no_L = BTEST(file_type, bit_for_no_L_basic_variable)
          
          if (BTEST(file_type, bit_for_lnPgas)) then
             write(*,*)
             write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
-            write(*,*)
-            ierr = -1
-            return
-         end if
-         
-         if (BTEST(file_type, bit_for_no_L_basic_variable)) then
-            write(*,*)
-            write(*,*) 'MESA no longer supports models that do not include luminosities'
             write(*,*)
             ierr = -1
             return
@@ -596,8 +589,12 @@
             else if (s% RSP2_flag) then 
                j=j+1; xh(i_w,k) = vec(j)
                j=j+1; xh(i_Hp,k) = vec(j)
-            end if    
-            j=j+1; if (i_lum /= 0) xh(i_lum,k) = vec(j) ! L is always in file.
+            end if   
+            if (i_lum /= 0) then
+               j=j+1; xh(i_lum,k) = vec(j)
+            else
+               j=j+1; s% L(k) = vec(j)
+            end if
             j=j+1; dq(k) = vec(j)
             if (s% v_flag) then
                j=j+1; xh(i_v,k) = vec(j)

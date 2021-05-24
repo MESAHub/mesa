@@ -1093,7 +1093,9 @@
          k_phot = 1
          tau_phot = s% tau_base
          tau00 = s% tau_factor*s% tau_base
-         if (tau00 >= tau_phot) return
+         if (tau00 >= tau_phot) then ! phot not inside model
+            return ! just return surface values
+         end if
          do k = 1, s% nz-1
             dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau

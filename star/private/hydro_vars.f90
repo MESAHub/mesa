@@ -399,6 +399,7 @@
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
          use star_utils, only: get_phot_info
+         use atm_lib, only: atm_Teff
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
             need_atm_Psurf, need_atm_Tsurf
@@ -422,13 +423,11 @@
          L_surf = s% L(1)
          r_surf = s% r(1)
 
-         if (s% RSP_flag .and. .not. s% RSP_use_atm_grey_with_kap_for_Psurf) then
-
+         if (s% RSP_flag .or. s% RSP2_flag) then
             call get_phot_info( &
                  s, r_phot, m_phot, v_phot, L_phot, T_phot, &
                  cs_phot, kap_phot, logg_phot, y_phot, k_phot)
-
-            Teff = T_phot
+            Teff = atm_Teff(L_phot, r_phot)
             lnT_surf = s% lnT(1)
             dlnT_dL = 0d0
             dlnT_dlnR = 0d0
