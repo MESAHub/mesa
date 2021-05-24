@@ -145,9 +145,7 @@
          end if
          
          if (s% RSP_flag) then
-            write(*,*) 'call RSP_setup_part1'
             call RSP_setup_part1(s, restart, ierr)
-            write(*,*) 'done RSP_setup_part1'
             if (ierr /= 0) then
                write(*,*) 'finish_load_model: RSP_setup_part1 returned ierr', ierr
                return
@@ -171,9 +169,7 @@
          if (s% rotation_flag) s% total_angular_momentum = total_angular_momentum(s)
 
          if (s% RSP_flag) then
-            write(*,*) 'call RSP_setup_part2'
             call RSP_setup_part2(s, restart, ierr)
-            write(*,*) 'done RSP_setup_part2'
             if (ierr /= 0) then
                write(*,*) 'finish_load_model: RSP_setup_part2 returned ierr', ierr
                return
