@@ -2,7 +2,7 @@
 &star_job
    show_log_description_at_start = .false.
    
-   load_model_filename = 'cycle0.mod'
+   load_model_filename = 'cycle700.mod'
    !load_model_filename = 'cycle100.mod'
    !load_model_filename = 'cycle200.mod'
    !load_model_filename = 'cycle300.mod'
@@ -140,12 +140,12 @@
    !history_interval = 40
    !terminal_interval = 100
 
-   photo_interval = 10
+   !photo_interval = 10
    !profile_interval = 4000
    !history_interval = 40
-   terminal_interval = 1
+   !terminal_interval = 1
    
-   report_solver_progress = .true.
+   !report_solver_progress = .true.
 
 / ! end of controls namelist
 
