@@ -85,9 +85,7 @@
 
          s% extra_jdot(:) = 0d0
          s% extra_omegadot(:) = 0d0
-         i_tot = 0d0
          j_dot = 0d0
-         t_spindown = 1d100
          residual_jdot = 0d0
          check_delta_j = 0d0
          torque = 0d0
