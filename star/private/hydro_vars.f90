@@ -413,9 +413,15 @@
          ierr = 0
          
          call set_phot_info(s) ! sets Teff using L_phot and R_phot
+         
+         r_surf = s% r(1)
+         L_surf = s% L(1)
+         Teff = s% Teff
 
          if (s% RSP_flag) then
             lnT_surf = s% lnT(1)
+            s% T_surf = s% T(1)
+            s% P_surf = s% Peos(1)
             dlnT_dL = 0d0
             dlnT_dlnR = 0d0
             dlnT_dlnM = 0d0
@@ -428,8 +434,6 @@
             return
          end if
          
-         Teff = s% Teff ! in case atm wants to use this as an input 
-         ! we do not use Teff returned as result from atm
          if (s% use_other_surface_PT) then
             call s% other_surface_PT( &
                s% id, skip_partials, Teff, &

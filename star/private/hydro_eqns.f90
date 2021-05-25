@@ -816,7 +816,8 @@
                write(*,1) 'P_surf', P_surf
                write(*,1) 'dP0', dP0
                write(*,1) 'lnP_surf', lnP_surf
-               stop 'bc'
+               write(*,1) 'r', r
+               stop 'P bc'
             end if
          
             if (is_bad(T_bc)) then
@@ -825,7 +826,7 @@
                write(*,1) 'T_surf', T_surf
                write(*,1) 'dP0', dP0
                write(*,1) 'lnT_surf', lnT_surf
-               stop 'bc'
+               stop 'T bc'
             end if
             
             dP0_dlnR = 0
