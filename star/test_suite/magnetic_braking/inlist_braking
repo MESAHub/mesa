@@ -49,6 +49,8 @@
     use_other_torque = .true.
     x_ctrl(1) = 500.0     ! Surface Magnetic Field (Gauss). Try e.g. 5, 50, 500, 5000
     x_logical_ctrl(1) = .false. ! true gives lots of trace output to terminal from run_star_extras
+    x_ctrl(2) = 3d1 ! Timestep control. Pushes the timestep down to ensure that dt < (spindown time / x_ctrl(2)).
+    use_other_timestep_limit = .true.
 
   ! Winds
     hot_wind_scheme = 'Dutch'
