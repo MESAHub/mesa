@@ -6,7 +6,8 @@
             run_num_iters_end_prev, run_num_retries_end_prev, &
             period, KE_growth, KE_growth_avg, prev_KE_max, &
             delta_R_growth, delta_R_growth_avg, prev_delta_R, &
-            period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
+            period_max_vsurf_div_cs, period_delta_R, &
+            period_delta_Teff, period_delta_logTeff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
             best_period, best_model_number, best_order, best_cycles_to_double
@@ -21,7 +22,8 @@
             run_num_iters_end_prev, run_num_retries_end_prev, &
             period, KE_growth, KE_growth_avg, prev_KE_max, &
             delta_R_growth, delta_R_growth_avg, prev_delta_R, &
-            period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
+            period_max_vsurf_div_cs, period_delta_R, &
+            period_delta_Teff, period_delta_logTeff, &
             period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max, &
             best_period, best_model_number, best_order, best_cycles_to_double
@@ -51,6 +53,7 @@
             period_max_vsurf_div_cs = 0
             period_delta_R = 0
             period_delta_Teff = 0
+            period_delta_logTeff = 0
             period_delta_logL = 0
             period_delta_Mag = 0
             time_started = 0
@@ -221,13 +224,14 @@
             end if
          
             period_delta_Teff = T_max - T_min
+            period_delta_logTeff = log10(T_max/T_min)
             period_delta_R = R_max - R_min
             period_delta_logL = log10(L_max/L_min)
             period_delta_Mag = 2.5d0*period_delta_logL
             period_max_vsurf_div_cs = v_div_cs_max
             prev_KE_max = KE_max
             prev_delta_R = period_delta_R
-            write(*,'(i4,a14,i6,a14,f8.3,a14,f10.3,99(a14,f10.5))')  &
+            write(*,'(i4,a14,i6,a14,f8.3,a14,f10.3,99(a15,f10.4))')  &
                num_periods, &
                'steps/cycle', s% model_number - run_num_steps_end_prev, &
                'iters/step',  &
@@ -237,7 +241,7 @@
                'dR growth', delta_R_growth_avg, &
                'delta R/Rsun', period_delta_R/Rsun, &
                'delta logL', period_delta_logL, &
-               'delta Teff', period_delta_Teff, &
+               'delta logTeff', period_delta_logTeff, &
                'max vsurf/cs', period_max_vsurf_div_cs
 
             time_started = time_ended
@@ -304,7 +308,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         rsp2_how_many_extra_history_columns = 8
+         rsp2_how_many_extra_history_columns = 9
       end function rsp2_how_many_extra_history_columns
       
       
@@ -323,10 +327,11 @@
          names(i) = 'period'; vals(i) = period/(24*3600); i=i+1
          names(i) = 'growth'; vals(i) = delta_R_growth_avg; i=i+1
          names(i) = 'max_v_div_cs'; vals(i) = period_max_vsurf_div_cs; i=i+1
-         names(i) = 'delta_R'; vals(i) = period_delta_R/Rsun; i=i+1
-         names(i) = 'delta_Teff'; vals(i) = period_delta_Teff; i=i+1
-         names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
-         names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
+         names(i) = 'del_R'; vals(i) = period_delta_R/Rsun; i=i+1
+         names(i) = 'del_Teff'; vals(i) = period_delta_Teff; i=i+1
+         names(i) = 'del_lgTeff'; vals(i) = period_delta_logTeff; i=i+1
+         names(i) = 'del_lgL'; vals(i) = period_delta_logL; i=i+1
+         names(i) = 'del_Mag'; vals(i) = period_delta_Mag; i=i+1
       end subroutine rsp2_data_for_extra_history_columns
 
 

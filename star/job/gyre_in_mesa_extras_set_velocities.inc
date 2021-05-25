@@ -77,8 +77,8 @@
          call gyre_set_model(global_data, point_data, 101)
 
           write(*, 100) 'order', 'freq (Hz)', &
-             'P (sec)', 'P (day)', 'cycles to double'
-100       format(A8,8A20)
+             'P (sec)', 'P (day)', 'growth', 'cycles to double'
+100       format(A8,9A20)
 
          rpar(1) = 0.5d-6 ! freq < this (Hz)
          ipar(1) = s% model_number
@@ -197,8 +197,8 @@
 
             if (growth > 0._dp) then ! unstable
                write(*, 100) md%n_pg, &
-                  freq, per, per/(24*3600), freq/(2d0*pi*growth)
-100            format(I8,E20.4,3F20.4)
+                  freq, per, per/(24*3600), (2d0*pi*growth)/freq, freq/(2d0*pi*growth)
+100            format(I8,E20.4,4F20.4)
             else ! stable
                write(*, 110) md%n_pg, &
                   freq, per, per/(24*3600), 'stable'
