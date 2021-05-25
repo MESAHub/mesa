@@ -89,7 +89,7 @@ star/test_suite/high_rot_darkening/ @aarondotter
 star/test_suite/hse_riemann/ @fxt @jschwab
 #star/test_suite/irradiated_planet/ 
 star/test_suite/low_z/ @aarondotter
-#star/test_suite/magnetic_braking/ 
+star/test_suite/magnetic_braking/  @adamjermyn
 #star/test_suite/make_brown_dwarf/
 star/test_suite/make_co_wd/ @wmwolf @evbauer @fxt
 #star/test_suite/make_env/ 

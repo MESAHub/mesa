@@ -10,14 +10,7 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-# check if can skip building zams model
-if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-   cp standard_zams.mod zams.mod
-else
-   do_one inlist_zams_header zams.mod
-   cp zams.mod standard_zams.mod
-fi
-
+do_one inlist_zams_header zams.mod
 do_one inlist_braking_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
