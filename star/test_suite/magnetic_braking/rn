@@ -11,7 +11,6 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 do_one inlist_zams_header zams.mod
-cp zams.mod standard_zams.mod
 do_one inlist_braking_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
