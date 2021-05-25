@@ -95,7 +95,7 @@
     D_ST_factor = 1
 
   ! Stopping condition
-    max_model_number = 250   ! Limit max_model_number as part of test_suite
+    max_model_number = 300   ! Limit max_model_number as part of test_suite
 
     xa_central_lower_limit_species(1) = 'h1'
     xa_central_lower_limit(1) = 1d-2
