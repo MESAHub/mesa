@@ -62,8 +62,8 @@
     use_dedt_form_of_energy_eqn = .true. ! Energy conservation
     use_gold_tolerances = .true.         ! Tight tolerances
     use_gold2_tolerances = .true.        ! Tighter tolerances
-    delta_lgL_nuc_limit = 1d-2           ! Evolve burning carefully
-    delta_lgRho_cntr_limit = 1d-2        ! Evolve burning carefully
+    delta_lgRho_cntr_limit = 1d-3        ! Evolve burning carefully
+    delta_lgT_cntr_limit = 1d-3          ! Evolve burning carefully
 
     dX_nuc_drop_max_A_limit = 52
     dX_nuc_drop_min_X_limit = 1d-4
@@ -71,6 +71,7 @@
     dX_nuc_drop_limit = 1d-4
 
   ! Convective and Thermohaline Mixing
+    do_conv_premix = .true.
     mixing_length_alpha = 1.5
     MLT_option = 'Henyey'
 
