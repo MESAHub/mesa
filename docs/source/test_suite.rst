@@ -112,6 +112,16 @@ The test vehicle is a 1.5 Msun solar metallicity model.
 The test checks the functionality of element rotation in a 15 Msun solar metallicity model.
 
 
+:ref:`16M_conv_premix`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example re-creates the 16-solar mass main-sequence
+evolution with the inclusion of convective premixing (using the Ledoux
+criterion), as detailed in Section 5.3 of the MESA V instrument paper
+(Paxton et al 2019).
+
+
+
 :ref:`16M_predictive_mix`
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
