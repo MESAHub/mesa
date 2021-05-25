@@ -2,8 +2,6 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
-
       create_pre_main_sequence_model = .true.
 
       save_model_when_terminate = .true.
@@ -36,7 +34,7 @@
   ! Stopping conditions
     stop_near_zams = .true.
     Lnuc_div_L_zams_limit = 0.9d0
-    max_model_number = 500     ! limit max_model_number as part of test_suite
+    max_model_number = 700     ! limit max_model_number as part of test_suite
 
   ! Solver controls
     use_dedt_form_of_energy_eqn = .true. ! Energy conservation
