@@ -42,8 +42,24 @@
     use_dedt_form_of_energy_eqn = .true. ! Energy conservation
     use_gold_tolerances = .true.         ! Tight tolerances
     use_gold2_tolerances = .true.        ! Tighter tolerances
-    delta_lgRho_limit = 1d-3             ! Evolve carefully
-    delta_lgT_limit = 1d-3               ! Evolve carefully
+    delta_lgRho_cntr_limit = 1d-2        ! Evolve carefully
+
+
+  ! Convective and Thermohaline Mixing
+    do_conv_premix = .true.
+    mixing_length_alpha = 1.5
+    MLT_option = 'Henyey'
+
+    use_Ledoux_criterion = .true.
+    thermohaline_coeff = 2
+    thermohaline_option = 'Kippenhahn'
+
+    overshoot_scheme(1) = 'exponential'
+    overshoot_zone_type(1) = 'any'
+    overshoot_zone_loc(1) = 'any'
+    overshoot_bdy_loc(1) = 'any'
+    overshoot_f(1) = 0.001
+    overshoot_f0(1) = 0.0005
 
   ! Output
     num_trace_history_values = 2
