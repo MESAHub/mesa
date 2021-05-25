@@ -64,10 +64,11 @@
          s% use_other_kap = .true.
          s% other_kap_get => my_kap_get
          
-         s% use_other_eos = .true.
-         s% other_eosDT_get => my_eosDT_get
-         s% other_eosDT_get_T => my_eosDT_get_T
-         s% other_eosDT_get_Rho => my_eosDT_get_Rho
+         s% eos_rq% use_other_eos_results = .true.
+         s% eos_rq% other_eos_results => my_other_eos_results
+         s% eos_rq% use_other_eos_component = .false.
+         s% eos_rq% other_eos_frac => my_other_eos_frac
+         s% eos_rq% other_eos_component => my_other_eos_component
 
          s% use_other_screening = .true.
          s% other_screening => my_screening
@@ -188,23 +189,62 @@
       end function extras_finish_step
       
 
-      ! eosDT routine.
+      ! eos hook routines
 
-      subroutine my_eosDT_get( &
-              id, k, handle, &
+      subroutine my_other_eos_frac( &
+              handle, &
               species, chem_id, net_iso, xa, &
-              Rho, log10Rho, T, log10T, & 
+              Rho, log10Rho, T, log10T, &
+              frac, dfrac_dlogRho, dfrac_dlogT, ierr)
+
+         ! INPUT
+         use chem_def, only: num_chem_isos
+
+         integer, intent(in) :: handle ! eos handle
+
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:) ! maps species to chem id
+            ! index from 1 to species
+            ! value is between 1 and num_chem_isos
+         integer, pointer :: net_iso(:) ! maps chem id to species number
+            ! index from 1 to num_chem_isos (defined in chem_def)
+            ! value is 0 if the iso is not in the current net
+            ! else is value between 1 and number of species in current net
+         real(dp), intent(in) :: xa(:) ! mass fractions
+
+         real(dp), intent(in) :: Rho, log10Rho ! the density
+         real(dp), intent(in) :: T, log10T ! the temperature
+
+         ! OUTPUT
+         ! this routine must provide a fraction (in [0,1]) of the 'other' eos to use
+         ! the remaining fraction (1-frac) will be provided by the standard MESA eos
+         real(dp), intent(out) :: frac ! fraction of other_eos to use
+         real(dp), intent(out) :: dfrac_dlogRho ! its partial derivative at constant T
+         real(dp), intent(out) :: dfrac_dlogT   ! its partial derivative at constant Rho
+
+         integer, intent(out) :: ierr ! 0 means AOK.
+
+         ! this would use other_eos_component everywhere
+         frac = 1d0
+         dfrac_dlogRho = 0d0
+         dfrac_dlogT = 0d0
+
+      end subroutine my_other_eos_frac
+
+
+      subroutine my_other_eos_component( &
+              handle, &
+              species, chem_id, net_iso, xa, &
+              Rho, log10Rho, T, log10T, &
               res, d_dlnRho_c_T, d_dlnT_c_Rho, &
               d_dxa_c_TRho, ierr)
 
          use chem_def, only: num_chem_isos
          use eos_def
          use eos_lib
-         
+
          ! INPUT
-         
-         integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
+
          integer, intent(in) :: handle ! eos handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
@@ -213,164 +253,49 @@
          real(dp), intent(in) :: Rho, log10Rho ! the density
          real(dp), intent(in) :: T, log10T ! the temperature
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
-         
-         integer, intent(out) :: ierr ! 0 means AOK.
-         
-         call eosDT_get( &
-              handle, &
-              species, chem_id, net_iso, xa, &
-              Rho, log10Rho, T, log10T, & 
-              res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-              d_dxa_c_TRho, ierr)
-         
-      end subroutine my_eosDT_get
-      
-      
-      ! eosDT search routines.
-      
-      subroutine my_eosDT_get_T( &
-               id, k, handle, &
-               species, chem_id, net_iso, xa, &
-               logRho, which_other, other_value, &
-               logT_tol, other_tol, max_iter, logT_guess, & 
-               logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               d_dxa_c_TRho, &
-               eos_calls, ierr)
-     
-         ! finds log10 T given values for density and 'other', and initial guess for temperature.
-         ! does up to max_iter attempts until logT changes by less than tol.
-         
-         ! 'other' can be any of the basic result variables for the eos
-         ! specify 'which_other' by means of the definitions in eos_def (e.g., i_lnE)
-         
-         use eos_def
-         use eos_lib
-
-         integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
-         integer, intent(in) :: handle
-
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-            ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-            ! index from 1 to num_chem_isos (defined in chem_def)
-            ! value is 0 if the iso is not in the current net
-            ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         
-         real(dp), intent(in) :: logRho ! log10 of density
-         integer, intent(in) :: which_other ! from eos_def.  e.g., i_lnE
-         real(dp), intent(in) :: other_value ! desired value for the other variable
-         real(dp), intent(in) :: other_tol
-         
-         real(dp), intent(in) :: logT_tol
-         integer, intent(in) :: max_iter ! max number of iterations        
-
-         real(dp), intent(in) :: logT_guess ! log10 of temperature
-         real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
-            ! if don't know bounds, just set to arg_not_provided (defined in const_def)
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
-            ! if don't know these values, just set to arg_not_provided (defined in const_def)
-
-         real(dp), intent(out) :: logT_result ! log10 of temperature
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
-         
-         integer, intent(out) :: eos_calls
+
          integer, intent(out) :: ierr ! 0 means AOK.
-         
-         call eosDT_get_T( &
-            handle, &
-            species, chem_id, net_iso, xa, &
-            logRho, which_other, other_value, &
-            logT_tol, other_tol, max_iter, logT_guess, & 
-            logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-            logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-            d_dxa_c_TRho, &
-            eos_calls, ierr)
-         
 
-      end subroutine my_eosDT_get_T
-      
+         ! one must provide a complete set of EOS results
+         ierr = -1
 
-      subroutine my_eosDT_get_Rho( &
-               id, k, handle, &
-               species, chem_id, net_iso, xa, &
-               logT, which_other, other_value, &
-               logRho_tol, other_tol, max_iter, logRho_guess,  &
-               logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               d_dxa_c_TRho, eos_calls, ierr)
-     
-         ! finds log10 Rho given values for temperature and 'other', and initial guess for density.
-         ! does up to max_iter attempts until logRho changes by less than tol.
-         
-         ! 'other' can be any of the basic result variables for the eos
-         ! specify 'which_other' by means of the definitions in eos_def (e.g., i_lnE)
-         
+      end subroutine my_other_eos_component
+
+
+      subroutine my_other_eos_results( &
+              handle, &
+              species, chem_id, net_iso, xa, &
+              Rho, log10Rho, T, log10T, &
+              res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+              d_dxa_c_TRho, ierr)
+
          use chem_def, only: num_chem_isos
          use eos_def
          use eos_lib
-         
-         integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
-         integer, intent(in) :: handle
-         
+
+         ! INPUT
+
+         integer, intent(in) :: handle ! eos handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
-            ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
          integer, pointer :: net_iso(:) ! maps chem id to species number
-            ! index from 1 to num_chem_isos (defined in chem_def)
-            ! value is 0 if the iso is not in the current net
-            ! else is value between 1 and number of species in current net
          real(dp), intent(in) :: xa(:) ! mass fractions
-         
-         real(dp), intent(in) :: logT ! log10 of temperature
-
-         integer, intent(in) :: which_other ! from eos_def.  e.g., i_lnE
-         real(dp), intent(in) :: other_value ! desired value for the other variable
-         real(dp), intent(in) :: other_tol
-         
-         real(dp), intent(in) :: logRho_tol
-
-         integer, intent(in) :: max_iter ! max number of Newton iterations        
-
-         real(dp), intent(in) :: logRho_guess ! log10 of density
-         real(dp), intent(in) :: logRho_bnd1, logRho_bnd2 ! bounds for logRho
-            ! if don't know bounds, just set to arg_not_provided (defined in const_def)
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
-            ! if don't know these values, just set to arg_not_provided (defined in const_def)
-
-         real(dp), intent(out) :: logRho_result ! log10 of density
-
+         real(dp), intent(in) :: Rho, log10Rho ! the density
+         real(dp), intent(in) :: T, log10T ! the temperature
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
 
-         integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
-         
-         call eosDT_get_Rho( &
-            handle, &
-            species, chem_id, net_iso, xa, &
-            logT, which_other, other_value, &
-            logRho_tol, other_tol, max_iter, logRho_guess,  &
-            logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-            logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-            d_dxa_c_TRho, eos_calls, ierr)
-         
 
-      end subroutine my_eosDT_get_Rho
+         ! one can modify the existing eos results
+         res(i_lnPgas) = res(i_lnPgas) + 0
+
+      end subroutine my_other_eos_results
       
       
       subroutine my_kap_get( &

@@ -1330,7 +1330,6 @@
          
          logical :: use_d_eos_dxa
 
-         logical :: use_other_eos
          logical :: use_other_surface_PT
          logical :: use_other_kap
          logical :: use_other_diffusion

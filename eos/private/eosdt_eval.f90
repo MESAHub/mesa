@@ -258,7 +258,7 @@
             X >= rq% X_lo .and. X <= rq% X_hi .and. &
             Z >= rq% Z_lo .and. Z <= rq% Z_hi
          
-         call get_level1_for_eosdt( &
+         call get_level0_for_eosdt( &
             rq% handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, 1d0, &
@@ -266,6 +266,15 @@
             skip, ierr)
          if (skip) ierr = -1
          if (ierr /= 0) return
+
+         ! opportunity for the user to modify the eos results
+         if (rq% use_other_eos_results) then
+            call rq% other_eos_results( &
+               rq% handle, &
+               species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, & 
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
+         end if
          
          if (eos_test_partials) then   
             eos_test_partials_val = abar
@@ -276,6 +285,115 @@
       end subroutine Get_eosDT_Results
       
       
+      subroutine get_other_for_eosdt( &
+            handle, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, remaining_fraction, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         integer, intent(in) :: handle
+         logical, intent(in) :: dbg
+         real(dp), intent(in) :: &
+            Z, X, abar, zbar, remaining_fraction
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:), net_iso(:)
+         real(dp), intent(in) :: xa(:)
+         real(dp), intent(in) :: rho, logRho, T, logT
+         real(dp), intent(inout), dimension(nv) :: &
+            res, d_dlnd, d_dlnT
+         real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(out) :: skip
+         integer, intent(out) :: ierr
+
+         type (EoS_General_Info), pointer :: rq
+
+         rq => eos_handles(handle)
+
+         ierr = 0
+         
+         call rq% other_eos_component( &
+            handle, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            ierr)
+
+         ! zero all frac components
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+
+         skip = .false.
+
+      end subroutine get_other_for_eosdt
+
+
+      subroutine get_level0_for_eosdt( & ! other
+            handle, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, remaining_fraction, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         integer, intent(in) :: handle
+         logical, intent(in) :: dbg
+         real(dp), intent(in) :: Z, X, abar, zbar, remaining_fraction
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:), net_iso(:)
+         real(dp), intent(in) :: xa(:)
+         real(dp), intent(in) :: rho, logRho, T, logT
+         real(dp), intent(inout), dimension(nv) :: &
+            res, d_dlnd, d_dlnT
+         real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(out) :: skip
+         integer, intent(out) :: ierr
+
+         real(dp) :: frac, d_frac_dlogT, d_frac_dlogRho         
+         real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         type (EoS_General_Info), pointer :: rq
+         procedure (get_values_for_eosdt_interface), pointer :: get_1st, get_2nd
+
+         include 'formats'
+         
+         ierr = 0
+         rq => eos_handles(handle)
+
+         if (rq% use_other_eos_component) then
+            call rq% other_eos_frac( &
+               handle, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, &
+               frac, d_frac_dlogRho, d_frac_dlogT, &
+               ierr)
+            if (ierr /= 0) return
+            alfa = 1d0 - frac
+            d_alfa_dlogT = -d_frac_dlogT
+            d_alfa_dlogRho = -d_frac_dlogRho
+         else
+            alfa = 1d0 ! no other
+            d_alfa_dlogT = 0d0
+            d_alfa_dlogRho = 0d0
+         end if
+         
+         if (dbg) write(*,1) 'other', (1d0 - alfa)*remaining_fraction
+         
+         get_1st => get_other_for_eosdt
+         get_2nd => get_level1_for_eosdt
+         call combine_for_eosdt( &
+            get_1st, get_2nd, alfa*remaining_fraction, &
+            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+            rq, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
+            skip = .true.
+            ierr = 0
+         end if
+            
+      end subroutine get_level0_for_eosdt
+
+
       subroutine get_level1_for_eosdt( & ! CMS
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
