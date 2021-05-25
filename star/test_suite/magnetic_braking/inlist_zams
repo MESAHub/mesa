@@ -19,8 +19,7 @@
 / ! end of eos namelist
 
 &kap
-  Zbase = 1d-2
-
+      Zbase = 1d-2
       kap_file_prefix = 'gs98'
 
 / ! end of kap namelist
