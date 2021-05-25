@@ -94,8 +94,6 @@
          factor = 0d0
          j_average = 0d0
 
-         write(*,*) t_spindown
-
          ! Calculate total specific moment of inertia and angular momentum
 
          i_tot = sum(s% i_rot(1:s% nz))
@@ -124,7 +122,6 @@
           ! Check if spindown timescale is shorter than timestep. Print a warning in case.
           ! In other_timestep_limit we enforce timestep controls such that dt << t_spindown.
           t_spindown = abs(j_tot / j_dot) ! Estimate spindown timescale
-          write(*,*) j_tot, j_dot, 'hi'
           if (s% x_logical_ctrl(1)) then
              write(*,1) 'Spindown Timescale (Myr): ', t_spindown / (1d6*secyer)
              write(*,1) 'Spindown Timescale / dt: ', t_spindown / s% dt
