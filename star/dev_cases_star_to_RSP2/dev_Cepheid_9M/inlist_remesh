@@ -1,8 +1,11 @@
 
 &star_job
 
-      load_saved_model_for_RSP2 = .true.
+      load_saved_model = .true.
       load_model_filename = 'removed_core.mod' 
+   
+      change_initial_RSP2_flag = .true.
+      new_RSP2_flag = .true.
 
       save_model_when_terminate = .true.
       save_model_filename = 'remeshed.mod'
@@ -29,10 +32,6 @@
 
 &kap
 / ! end of kap namelist
-
-
-! before convert
-! after convert
 
 
 &controls

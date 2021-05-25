@@ -49,43 +49,17 @@
    
    max_model_number = 1
 
-! atm
-   use_momentum_outer_BC = .false. 
-   use_zero_Pgas_outer_BC = .true.
-   use_fixed_Psurf_outer_BC = .false.
-   fixed_Psurf = 0d0
-
-! mlt
-   alpha_semiconvection = 0.0
-   
-! mixing
-    overshoot_scheme(1) = 'none'
-    overshoot_scheme(2) = 'none'
-
-! solver
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
-   
-! mesh controls
-   okay_to_remesh = .false.
-
-! GYRE set starting velocities         <<< must wait until after restore QHSE
+! GYRE set starting velocities 
    x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 0.5 ! 0d0 ! fraction_1st_overtone (order 2)
+   x_ctrl(4) = 0d0 ! fraction_1st_overtone (order 2)
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
-   x_ctrl(6) = 1 ! 0.1d0 ! initial vsurf (kms)
+   x_ctrl(6) = 0.1d0 ! initial vsurf (kms)
    
 ! output controls
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
-
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
 
    photo_interval = 50
    profile_interval = 100
@@ -196,7 +170,7 @@
  ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '5 M\d\(2281)\u  Z=0.001  Cepheid'
+    Grid2_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

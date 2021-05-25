@@ -35,8 +35,6 @@
          
          if (restart) return
          
-         write(*,*) 'set gyre starting velocities'
-         
          nz = s% nz
          nz_max = nz+100
          allocate( &
@@ -93,10 +91,17 @@
          
          if (s% x_ctrl(4) == 1d0) then
             mode = 2
+            write(*,*) 'set gyre starting velocities for order 2'
          else if (s% x_ctrl(5) == 1d0) then
             mode = 3
-         else
+            write(*,*) 'set gyre starting velocities for order 3'
+         else if (s% x_ctrl(4) + s% x_ctrl(5) == 0d0) then
             mode = 1
+            write(*,*) 'set gyre starting velocities for order 1'
+         else
+            write(*,*) 'sorry: cannot merge modes for starting velocities. pick 1.'
+            ierr = -1
+            return
          end if
          nz_gyre = npts(mode)
          

@@ -33,13 +33,7 @@
 &controls
 
    log_Teff_lower_limit = 3.66
-   max_model_number = 820          ! comment out on 1st pass when searching for best
-
-! atm
-   use_momentum_outer_BC = .false. 
-   use_zero_Pgas_outer_BC = .true.
-   use_fixed_Psurf_outer_BC = .false.
-   fixed_Psurf = 0d0
+   max_model_number = 740          ! comment out on 1st pass when searching for best
 
 ! mlt
    alpha_semiconvection = 0.0
@@ -63,14 +57,7 @@
    x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
       ! < 0 means report best over all gyre results for any order
 
-! output controls
-   num_trace_history_values = 4
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'log_Teff'
-   trace_history_value_name(4) = 'luminosity'
-   
-
+! output controls   
    photo_interval = 10
    profile_interval = 100
    history_interval = 10
@@ -166,7 +153,7 @@
 
    HR_win_flag = .true.
    
-   HR_title = '6 M\d\(2281)\u  Z=0.001  Cepheid'
+   HR_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
@@ -174,8 +161,8 @@
    ! axis limits -- to override system default selections
    HR_logT_min = 3.65 ! -101 ! only used if > -100
    HR_logT_max = 3.78 ! only used if > -100
-   HR_logL_min = 3.62 ! -101 ! only used if > -100
-   HR_logL_max = 3.89 ! -101 ! only used if > -100
+   HR_logL_min = 3.4 ! -101 ! only used if > -100
+   HR_logL_max = 3.9 ! -101 ! only used if > -100
 
 
    show_HR_classical_instability_strip = .true.

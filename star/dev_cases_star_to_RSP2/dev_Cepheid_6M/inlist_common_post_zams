@@ -2,9 +2,9 @@
    read_extra_star_job_inlist1 = .true.
    extra_star_job_inlist1_name = 'inlist_common'
    
-   relax_initial_tau_factor = .true.
-   relax_to_this_tau_factor = 1.5d-3
-   dlogtau_factor = 0.1d0
+!   relax_initial_tau_factor = .true.
+!   relax_to_this_tau_factor = 1.5d-3
+!   dlogtau_factor = 0.1d0
    
 / ! end of star_job namelist
 
@@ -23,10 +23,12 @@
    extra_controls_inlist1_name = 'inlist_common'
 
 ! atm
+   atm_option = 'T_tau'
+   atm_T_tau_relation = 'Eddington'
+   atm_T_tau_opacity = 'fixed'
    use_momentum_outer_BC = .true.
 
 ! mlt
-
    !use_other_alpha_mlt = .true. ! implemented in run_star_extras
    x_ctrl(21) = 3.0 ! alpha_H
    x_ctrl(22) = 1.5 ! alpha_other
@@ -46,6 +48,13 @@
    xa_scale = 1d-5
    iter_for_resid_tol2 = 10
    min_timestep_limit = 1d-12 ! (seconds)
+
+! output
+   num_trace_history_values = 4
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
+   trace_history_value_name(3) = 'log_Teff'
+   trace_history_value_name(4) = 'luminosity'
 
 / ! end of controls namelist
 

@@ -62,7 +62,8 @@
          type (star_info), pointer :: s      
          integer, intent(out) :: ierr    
          integer :: k, j, nz_old, nz
-         real(dp) :: xm_anchor, P_surf, old_logT_cntr, old_logT_1
+         real(dp) :: xm_anchor, P_surf, T_surf, &
+            old_logT_cntr, old_logT_1, old_L1, old_r1
          real(dp), allocatable, dimension(:) :: &
             xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
          real(dp), pointer :: work1(:) ! =(nz_old+1, pm_work_size)
@@ -74,8 +75,11 @@
          if (nz > nz_old) stop 'remesh_for_RSP2 cannot increase nz'
          call setvars(ierr)
          if (ierr /= 0) stop 'remesh_for_RSP2 failed in setvars'
-         P_surf = get_P_surf(ierr)
-         if (ierr /= 0) stop 'remesh_for_RSP2 failed in get_P_surf'
+         old_L1 = s% L(1)
+         old_r1 = s% r(1)
+         call set_phot_info(s) ! sets Teff
+         call get_PT_surf(P_surf, T_surf, ierr)
+         if (ierr /= 0) stop 'remesh_for_RSP2 failed in get_PT_surf'
          allocate(&
             xm_old(nz_old+1), xm_mid_old(nz_old), v_old(nz_old+1), &
             xm(nz+1), xm_mid(nz), v_new(nz+1), work1((nz_old+1)*pm_work_size))
@@ -100,6 +104,10 @@
          end do
          deallocate(work1)  
          s% nz = nz
+         write(*,1) 'new old L_surf/Lsun', s% xh(s% i_lum,1)/Lsun, old_L1/Lsun
+         write(*,1) 'new old R_surf/Rsun', exp(s% xh(s% i_lnR,1))/Rsun, old_r1/Rsun
+         write(*,*)
+         !stop 'remesh_for_RSP2'
          
          contains
 
@@ -132,24 +140,34 @@
             if (ierr /= 0) stop 'remesh_for_RSP2 failed in set_hydro_vars'
          end subroutine setvars
          
-         real(dp) function get_P_surf(ierr)
+         subroutine get_PT_surf(P_surf, T_surf, ierr)
             use atm_support, only: get_atm_PT
+            real(dp), intent(out) :: P_surf, T_surf
             integer, intent(out) :: ierr
-            real(dp) :: Teff, &
-               lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+            real(dp) :: &
+               Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
             logical, parameter :: skip_partials = .true.
             include 'formats'
             ierr = 0
-            call get_atm_PT( &
+            call set_phot_info(s) ! sets s% Teff
+            Teff = s% Teff
+            call get_atm_PT( & ! this uses s% opacity(1)
                  s, s% tau_factor*s% tau_base, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
                  Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                  lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
             if (ierr /= 0) stop 'get_P_surf failed in get_atm_PT'
-            !write(*,1) 'logPsurf', lnP_surf/ln10
-            !stop 'get_P_surf'
-            get_P_surf = exp(lnP_surf)
-         end function get_P_surf
+            P_surf = exp(lnP_surf)
+            T_surf = exp(lnT_surf)
+            return
+            
+            write(*,1) 'get_PT_surf P_surf', P_surf
+            write(*,1) 'get_PT_surf T_surf', T_surf
+            write(*,1) 'get_PT_surf Teff', Teff
+            write(*,1) 'get_PT_surf opacity(1)', s% opacity(1)
+            write(*,1)
+            !stop 'get_PT_surf'
+         end subroutine get_PT_surf
          
          subroutine set_xm_old
             xm_old(1) = 0d0
@@ -195,7 +213,7 @@
             nz_outer = s% RSP2_nz_outer
             dq_1_factor = s% RSP2_dq_1_factor
             dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
-            write(*,2) 'dxm_outer', nz_outer, dxm_outer, xm_anchor
+            !write(*,2) 'dxm_outer', nz_outer, dxm_outer, xm_anchor
             xm(1) = 0d0
             xm(2) = dxm_outer*dq_1_factor
             s% dm(1) = xm(2)
@@ -327,19 +345,24 @@
          
          subroutine revise_lnT_for_QHSE(P_surf, ierr)
             use eos_def, only: num_eos_basic_results
-            use chem_lib, only: basic_composition_info
+            use chem_lib
+            use chem_def
             use eos_support, only: solve_eos_given_DP
+            use eos_def
+            use kap_def, only: num_kap_fracs
+            use kap_support, only: get_kap
             real(dp), intent(in) :: P_surf
             integer, intent(out) :: ierr
             real(dp) :: logRho, logP, logT_guess, &
                logT_tol, logP_tol, logT, P_m1, P_00, dm_face, x, y, z, &
-               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+               kap_fracs(num_kap_fracs), kap, dlnkap_dlnRho, dlnkap_dlnT, &
+               old_kap, new_P_surf, new_T_surf
             real(dp), dimension(num_eos_basic_results) :: &
                res, d_dlnd, d_dlnT, d_dabar, d_dzbar
             include 'formats'
             ierr = 0
             P_m1 = P_surf
-            !write(*,2) 'atm log P_surf', 0, log10(P_surf)
             do k=1,nz
                s% lnT(k) = s% xh(s% i_lnT,k)
                s% lnR(k) = s% xh(s% i_lnR,k)
@@ -368,8 +391,22 @@
                   logRho, logP, logT_guess, logT_tol, logP_tol, &
                   logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
                if (ierr /= 0) then
-                  write(*,2) 'solve_eos_given_DP failed logRho logT_guess logP', k, &
-                     logRho, logT_guess, logP
+                  write(*,2) 'solve_eos_given_DP failed', k
+                  write(*,*)
+                  write(*,1) 'sum(xa)', sum(s% xa(:,k))
+                  do j=1,s% species
+                     write(*,4) 'xa(j,k) ' // trim(chem_isos% name(s% chem_id(j))), j, j+s% nvar_hydro, k, s% xa(j,k)
+                  end do
+                  write(*,1) 'z', z
+                  write(*,1) 'x', x
+                  write(*,1) 'abar', abar
+                  write(*,1) 'zbar', zbar
+                  write(*,1) 'logRho', logRho
+                  write(*,1) 'logP', logP
+                  write(*,1) 'logT_guess', logT_guess
+                  write(*,1) 'logT_tol', logT_tol
+                  write(*,1) 'logP_tol', logP_tol
+                  write(*,*)
                   stop 'revise_lnT_for_QHSE'
                end if
                s% lnT(k) = logT*ln10
@@ -377,6 +414,31 @@
                !write(*,2) 'logP dlogT logT logT_guess logRho', k, &
                !   logP, logT - logT_guess, logT, logT_guess, logRho
                P_m1 = P_00
+               
+               if (k == 1) then ! get opacity and recheck surf BCs
+                 call get_kap( &
+                     s, k, zbar, s% xa(:,k), logRho, logT, &
+                     res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
+                     res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
+                     kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, &
+                     ierr)
+                  if (ierr /= 0) then
+                     write(*,2) 'get_kap failed', k
+                     stop 'revise_lnT_for_QHSE'
+                  end if
+                  old_kap = s% opacity(1)
+                  s% opacity(1) = kap ! for use by atm surf PT
+                  call get_PT_surf(new_P_surf, new_T_surf, ierr)
+                  if (ierr /= 0) then
+                     write(*,2) 'get_PT_surf failed', k
+                     stop 'revise_lnT_for_QHSE'
+                  end if
+                  write(*,1) 'new old T_surf', new_T_surf, T_surf
+                  write(*,1) 'new old P_surf', new_P_surf, P_surf
+                  write(*,1) 'new old kap(1)', kap, old_kap
+                  !stop 'revise_lnT_for_QHSE'
+               end if
+               
             end do
             !write(*,1) 'after revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
             !stop
