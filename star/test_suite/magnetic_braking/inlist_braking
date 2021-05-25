@@ -62,8 +62,6 @@
     use_dedt_form_of_energy_eqn = .true. ! Energy conservation
     use_gold_tolerances = .true.         ! Tight tolerances
     use_gold2_tolerances = .true.        ! Tighter tolerances
-    delta_lgRho_cntr_limit = 1d-3        ! Evolve burning carefully
-    delta_lgT_cntr_limit = 1d-3          ! Evolve burning carefully
 
     dX_nuc_drop_max_A_limit = 52
     dX_nuc_drop_min_X_limit = 1d-4
