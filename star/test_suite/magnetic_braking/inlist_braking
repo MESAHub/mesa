@@ -45,33 +45,36 @@
 
 &controls
 
-  use_dedt_form_of_energy_eqn = .true.
-  
-  use_other_torque = .true.
-  x_ctrl(1) = 500.0     ! Surface Magnetic Field (Gauss). Try e.g. 5, 50, 500, 5000
-  x_logical_ctrl(1) = .false. ! true gives lots of trace output to terminal from run_star_extras
+  ! Braking settings
+    use_other_torque = .true.
+    x_ctrl(1) = 500.0     ! Surface Magnetic Field (Gauss). Try e.g. 5, 50, 500, 5000
+    x_logical_ctrl(1) = .false. ! true gives lots of trace output to terminal from run_star_extras
 
-  hot_wind_scheme = 'Dutch'
-  hot_wind_full_on_T = 1d0
-  cool_wind_full_on_T = 0d0
-  Dutch_scaling_factor = 0.8
+  ! Winds
+    hot_wind_scheme = 'Dutch'
+    hot_wind_full_on_T = 1d0
+    cool_wind_full_on_T = 0d0
+    Dutch_scaling_factor = 0.8
 
+  ! Solver controls
+    use_dedt_form_of_energy_eqn = .true. ! Energy conservation
+    use_gold_tolerances = .true.         ! Tight tolerances
+    use_gold2_tolerances = .true.        ! Tighter tolerances
+    delta_lgL_nuc_limit = 1d-2           ! Evolve burning carefully
+    delta_lgRho_cntr_limit = 1d-2        ! Evolve burning carefully
 
-         delta_lgL_He_limit = 0.1 ! limit for magnitude of change in lgL_He
+    dX_nuc_drop_max_A_limit = 52
+    dX_nuc_drop_min_X_limit = 1d-4
+    dX_nuc_drop_hard_limit = 1d99
+    dX_nuc_drop_limit = 1d-4
 
-         dX_nuc_drop_max_A_limit = 52
-         dX_nuc_drop_min_X_limit = 1d-4
-         dX_nuc_drop_hard_limit = 1d99
+  ! Convective and Thermohaline Mixing
+    mixing_length_alpha = 1.5
+    MLT_option = 'Henyey'
 
-         delta_lgRho_cntr_limit = 0.02
-
-         mixing_length_alpha = 1.5
-         MLT_option = 'Henyey'
-
-         use_Ledoux_criterion = .true.
-         alpha_semiconvection = 0.01
-         thermohaline_coeff = 2
-         thermohaline_option = 'Kippenhahn'
+    use_Ledoux_criterion = .true.
+    thermohaline_coeff = 2
+    thermohaline_option = 'Kippenhahn'
 
     overshoot_scheme(1) = 'exponential'
     overshoot_zone_type(1) = 'any'
@@ -80,38 +83,37 @@
     overshoot_f(1) = 0.001
     overshoot_f0(1) = 0.0005
 
-      ! limit max_model_number as part of test_suite
-         max_model_number = 250
+  ! Rotational mixing
+    am_nu_visc_factor = 0
+    am_D_mix_factor = 0.0333333333333333d00
+    D_DSI_factor = 0
+    D_SH_factor = 1
+    D_SSI_factor = 1
+    D_ES_factor = 1
+    D_GSF_factor = 1
+    D_ST_factor = 1
 
-         xa_central_lower_limit_species(1) = 'h1'
-         xa_central_lower_limit(1) = 1d-2
+  ! Stopping condition
+    max_model_number = 250   ! Limit max_model_number as part of test_suite
 
-         varcontrol_target = 1d-3
-         dX_nuc_drop_limit = 1d-4
+    xa_central_lower_limit_species(1) = 'h1'
+    xa_central_lower_limit(1) = 1d-2
 
-         am_nu_visc_factor = 0
-         am_D_mix_factor = 0.0333333333333333d00
-         D_DSI_factor = 0
-         D_SH_factor = 1
-         D_SSI_factor = 1
-         D_ES_factor = 1
-         D_GSF_factor = 1
-         D_ST_factor = 1
+  ! Output
+    num_trace_history_values = 4
+    trace_history_value_name(1) = 'rel_E_err'
+    trace_history_value_name(2) = 'log_rel_run_E_err'
+    trace_history_value_name(3) = 'surf_avg_v_div_v_crit'
+    trace_history_value_name(4) = 'surf_avg_v_rot'
+    trace_history_value_name(5) = 'avg_skipped_setvars_per_step'
+    trace_history_value_name(6) = 'avg_setvars_per_step'
+    trace_history_value_name(7) = 'avg_solver_setvars_per_step'
 
-         num_trace_history_values = 4
-         trace_history_value_name(1) = 'rel_E_err'
-         trace_history_value_name(2) = 'log_rel_run_E_err'
-         trace_history_value_name(3) = 'surf_avg_v_div_v_crit'
-         trace_history_value_name(4) = 'surf_avg_v_rot'
-         trace_history_value_name(5) = 'avg_skipped_setvars_per_step'
-         trace_history_value_name(6) = 'avg_setvars_per_step'
-         trace_history_value_name(7) = 'avg_solver_setvars_per_step'
-
-         photo_interval = 50
-         profile_interval = 50
-         history_interval = 10
-         terminal_interval = 10
-         write_header_frequency = 10
+    photo_interval = 50
+    profile_interval = 50
+    history_interval = 10
+    terminal_interval = 10
+    write_header_frequency = 10
          
 
 / ! end of controls namelist
@@ -121,13 +123,13 @@
 &pgstar
 
         Grid4_win_flag = .true.
-      !  Grid5_win_flag = .true.
+        Grid5_win_flag = .true.
 
 
          !Summary_Burn_xmax = 2 ! only used if /= -101d0
          !Abundance_xmax = 2 ! only used if /= -101d0
 
-         !Grid6_file_flag = .true.
+         Grid6_file_flag = .true.
          !Grid6_file_dir = 'png'
          !Grid6_file_prefix = 'grid6_'
          !Grid6_file_interval = 1 ! output when mod(model_number,Grid6_file_interval)==0
