@@ -2,7 +2,6 @@
 &star_job
 
       show_log_description_at_start = .false.
-      !show_net_species_info = .true.
 
       load_saved_model = .true.
       load_model_filename = 'zams.mod' ! from make_zams_high_mass, 13498
