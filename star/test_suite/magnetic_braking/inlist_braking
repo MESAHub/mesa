@@ -10,7 +10,6 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'xa_central_lower_limit'
 
-
       change_v_flag = .true.
       new_v_flag = .true.
 
@@ -40,7 +39,7 @@
 &kap
 
    use_type2_opacities = .true
-   Zbase = 2d-2
+   Zbase = 1d-2
 
 / ! end of kap namelist
 
@@ -48,13 +47,9 @@
 
   use_dedt_form_of_energy_eqn = .true.
   
-
   use_other_torque = .true.
   x_ctrl(1) = 500.0     ! Surface Magnetic Field (Gauss). Try e.g. 5, 50, 500, 5000
   x_logical_ctrl(1) = .false. ! true gives lots of trace output to terminal from run_star_extras
-
-  initial_mass = 15
-  initial_z = 2d-2
 
   hot_wind_scheme = 'Dutch'
   hot_wind_full_on_T = 1d0
