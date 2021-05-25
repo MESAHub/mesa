@@ -37,6 +37,8 @@
 
       implicit none
 
+      logical, parameter :: return_ierr_beyond_table_bounds = .true.
+
       integer, parameter :: i_doing_Rho = 1
       integer, parameter :: i_which_other = 2
       integer, parameter :: i_handle = 3
@@ -1821,11 +1823,13 @@
                logQ0 = ep% logQ_min
                logQ1 = logQ0 + ep% del_logQ
                logQ = logQ0
+               if (return_ierr_beyond_table_bounds) ierr = -1
             else
                iQ = ep% num_logQs-1
                logQ0 = ep% logQ_min + (iQ-1)*ep% del_logQ
                logQ1 = logQ0 + ep% del_logQ
                logQ = logQ1
+               if (return_ierr_beyond_table_bounds) ierr = -1
             end if            
          else         
             logQ0 = ep% logQ_min + (iQ-1)*ep% del_logQ
@@ -1849,11 +1853,13 @@
                logT0 = ep% logT_min
                logT1 = logT0 + ep% del_logT
                logT = logT0
+               if (return_ierr_beyond_table_bounds) ierr = -1
             else
                iT = ep% num_logTs-1
                logT0 = ep% logT_min + (iT-1)*ep% del_logT
                logT1 = logT0 + ep% del_logT
                logT = logT1
+               if (return_ierr_beyond_table_bounds) ierr = -1
             end if            
          else         
             logT0 = ep% logT_min + (iT-1)*ep% del_logT
