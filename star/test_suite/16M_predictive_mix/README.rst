@@ -16,7 +16,7 @@ This test case has two parts.
 * Part 2 (``inlist_16M_predictive_mix``) continues the evolution until core hydrogen depletion (mass fraction h1_center < 1e-6).
 
 A Kippenhahn diagram shows the evolution of a retreating convective core on the main sequence, the blue region between model numbers 240 and 385.
-This can be compared to Figure 3 in the MESA IV instrument paper.
+This can be compared to Figure 3 in the MESA IV instrument paper, and the convective pre-mixing Kippenhahn diagram in :ref:`16M_conv_premix`.
 
 .. image:: ../../../star/test_suite/16M_predictive_mix/docs/kipp_00000385.svg
 
