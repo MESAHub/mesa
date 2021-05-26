@@ -6263,7 +6263,7 @@
       ! split_merge_amr_hybrid_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_flipped_hybrid_zoning
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if split_merge_amr_logtau_zoning, target is even grid spacing in logtau
       ! else if split_merge_amr_log_zoning, target is even grid spacing in logr
@@ -6284,7 +6284,7 @@
       ! split_merge_amr_nz_r_core
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_nz_r_core_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_mesh_delta_coeff
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -7890,9 +7890,9 @@
       ! use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! P_theta_for_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! L_theta_for_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -10338,7 +10338,7 @@
       ! max_q_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! check_remnant_only_for_dt_div_min_dr_div_cs_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -10351,7 +10351,7 @@
       ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! only use ``dt_div_min_dr_div_cs_limit`` at cells where
       ! ``abs_du_div_cs`` > ``min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit`` and
