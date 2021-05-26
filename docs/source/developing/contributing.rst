@@ -227,6 +227,7 @@ directory (``.``) or a list of files (``*.f90``).
   git restore --source=37cbee26 path/to/file
   
 
+.. _branching:
 
 Branching
 ---------

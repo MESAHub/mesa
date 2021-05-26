@@ -1,3 +1,5 @@
+.. highlight:: console
+
 Just a Module 
 =============
 
@@ -11,7 +13,7 @@ This document describes how to use the MESA equation of state, opacity, and nucl
 1. Equation of State
 --------------------
 
-| Before starting, explore :ref:`Overview of eos module` and :ref:`eos module controls`.
+| Before starting, explore :ref:`eos/overview:Overview of eos module` and :ref:`eos/defaults:eos module controls`.
 | From where you unpacked the zip file
 
 ::
@@ -98,7 +100,7 @@ As mentioned in sample_eos.f90, it can be useful to look at the integer indices 
 2. Opacity 
 ----------
 
-| Before starting, explore :ref:`Overview of kap module` and :ref:`kap module controls`.
+| Before starting, explore :ref:`kap/overview:Overview of kap module` and :ref:`kap/defaults:kap module controls`.
 | From where you unpacked the zip file
 
 ::
@@ -155,7 +157,7 @@ Explore the output with, for example,
 3. Nuclear Reaction Networks
 ----------------------------
 
-| Before starting, explore :ref:`Overview of net module` and :ref:`Reaction Networks`.
+| Before starting, explore :ref:`net/overview:Overview of net module` and :ref:`net/nets:Reaction Networks`.
 | From where you unpacked the zip file
 
 ::

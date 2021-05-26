@@ -5,7 +5,7 @@ Running MESA
 ============
 
 This page has information about how to use MESA to evolve a single
-star.  It assumes you have already installed MESA (see :ref:`Installing MESA`).
+star.  It assumes you have already installed MESA (see :ref:`installation:Installing MESA`).
 
 The ``$MESA_DIR`` directory has lots of subdirectories.  Most of these
 subdirectories are modules (the "M" in MESA) that provides some
@@ -95,7 +95,7 @@ inlist_pgstar
 ~~~~~~~~~~~~~
 
 This houses the options for on-screen plotting. Feel free to ignore
-these for now, but to learn more, have look at the :ref:`Using PGSTAR`
+these for now, but to learn more, have look at the :ref:`using_mesa/using_pgstar:Using PGSTAR`
 section of this website.
 
 .. literalinclude:: ../../../star/work/inlist_pgstar
