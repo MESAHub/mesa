@@ -1332,8 +1332,6 @@
       ! envelope_mass_limit
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! ::
-
       !     envelope_mass = star_mass - he_core_mass
 
       ! Stop when ``envelope_mass`` drops below this limit, in Msun units.
@@ -1346,9 +1344,8 @@
       ! envelope_fraction_left_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! ::
-
       !     envelope_fraction_left = (star_mass - he_core_mass)/(initial_mass - he_core_mass)
+      
       ! Stop when ``envelope_fraction_left`` < this limit.
 
       ! ::
@@ -1359,7 +1356,8 @@
       ! xmstar_min_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! ! xmstar = mstar - M_center
+      !     xmstar = mstar - M_center
+      
       ! stop when xmstar in grams is < this.  <= 0 means no limit.
 
       ! ::
@@ -1370,7 +1368,8 @@
       ! xmstar_max_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! xmstar = mstar - M_center
+      !     xmstar = mstar - M_center
+      
       ! stop when xmstar in grams is > this.  <= 0 means no limit.
 
       ! ::
@@ -2912,7 +2911,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Flag to write out snapshots of the intermediate stages during the convective premixing iterations.
-      ! Refer to the dump_snapshot_ routine in star/private/conv_premix.f90 to see what's written out. Note
+      ! Refer to the ``dump_snapshot_`` routine in star/private/conv_premix.f90 to see what's written out. Note
       ! that this can quickly fill up your disk!
 
       ! ::
@@ -3777,8 +3776,6 @@
       ! am_nu_omega_non_rot_factor
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! ::
-
       !     dj/dt = d/dm((4 pi r^2 rho)^2*(am_nu_omega*i_rot*domega/dm + am_nu_j*dj/dm))
       !     am_nu_omega = am_nu_omega_non_rot_factor*am_nu_non_rot + am_nu_omega_rot_factor*am_nu_rot
 
@@ -3792,8 +3789,6 @@
       ! ~~~~~~~~~~~~~~~~~~
       ! am_nu_j_non_rot_factor
       ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
 
       !     dj/dt = d/dm((4 pi r^2 rho)^2*(am_nu_omega*i_rot*domega/dm + am_nu_j*dj/dm))
       !     am_nu_j = am_nu_j_non_rot_factor*am_nu_non_rot + am_nu_j_rot_factor*am_nu_rot
@@ -4132,22 +4127,22 @@
       ! Controls how the surface temperature Tsurf and pressure Psurf are evaluated when
       ! setting up outer boundary conditions
 
-      ! + ``'T_tau'``
-      ! set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
-      ! The choice of relation is set by the ``atm_T_tau_relation`` control. See also
-      ! the ``atm_T_tau_opacity``, ``atm_T_tau_errtol``, ``atm_T_tau_max_tries`` and
-      ! ``atm_T_tau_max_steps`` controls.
+      ! + ``'T_tau'``: 
+      !   set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
+      !   The choice of relation is set by the ``atm_T_tau_relation`` control. See also
+      !   the ``atm_T_tau_opacity``, ``atm_T_tau_errtol``, ``atm_T_tau_max_tries`` and
+      !   ``atm_T_tau_max_steps`` controls.
       !
-      ! + ``'table``
-      ! set Tsurf and Psurf by interpolating in pre-calculated tables based on model
-      ! atmospheres. The choice of table is set by the ``atm_table`` control.
+      ! + ``'table'``: 
+      !   set Tsurf and Psurf by interpolating in pre-calculated tables based on model
+      !   atmospheres. The choice of table is set by the ``atm_table`` control.
       !
-      ! + ``'irradiated_grey'``
-      ! set Tsurf by solving for the atmosphere structure given the irradiated-grey
-      ! T(tau) relation of Guillot, T, and Havel, M., A&A 527, A20 (2011).
-      ! See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
-      ! ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
-      ! ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
+      ! + ``'irradiated_grey'``: 
+      !   set Tsurf by solving for the atmosphere structure given the irradiated-grey
+      !   T(tau) relation of Guillot, T, and Havel, M., A&A 527, A20 (2011).
+      !   See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
+      !   ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
+      !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
 
       ! ::
 
@@ -4226,22 +4221,22 @@
 
       ! The T(tau) relation to use when ``atm_option`` = ``'T_tau'``
 
-      ! + ``'Eddington'``
-      ! use the grey Eddington T(tau) relation.
+      ! + ``'Eddington'``:
+      !   use the grey Eddington T(tau) relation.
 
-      ! + ``'solar_Hopf'``
-      ! use a grey T(tau) relation with an approximate Hopf function tuned to
-      ! solar data. See Paper II, Sec. A.5. Equivalent to the fit given by Sonoi
-      ! et al. (2019, A&A, 621, 84) to the Vernazza et al. (1981) VAL-C model.
+      ! + ``'solar_Hopf'``:
+      !   use a grey T(tau) relation with an approximate Hopf function tuned to
+      !   solar data. See Paper II, Sec. A.5. Equivalent to the fit given by Sonoi
+      !   et al. (2019, A&A, 621, 84) to the Vernazza et al. (1981) VAL-C model.
 
-      ! + ``'Krishna_Swamy'``
-      ! use the grey T(tau) relation described by K.S. Krishna-Swamy, ApJ 145,
-      ! 174–194 (1966).
+      ! + ``'Krishna_Swamy'``:
+      !   use the grey T(tau) relation described by K.S. Krishna-Swamy, ApJ 145,
+      !   174–194 (1966).
 
-      ! + ``'Trampedach_solar'``
-      ! use the analytic fit by Ball (2021, RNAAS 5, 7) to the Hopf
-      ! function for the solar simulation by Trampedach et al. (2014,
-      ! MNRAS 442, 805–820)
+      ! + ``'Trampedach_solar'``:
+      !   use the analytic fit by Ball (2021, RNAAS 5, 7) to the Hopf
+      !   function for the solar simulation by Trampedach et al. (2014,
+      !   MNRAS 442, 805–820)
 
       ! ::
 
@@ -4254,18 +4249,18 @@
       ! Controls how opacities are calculated throughout the atmosphere when
       ! ``atm_option`` = ``'T_tau'``
 
-      ! + ``'fixed'``
-      ! use a uniform opacity, fixed to the opacity of the outermost cell of the
-      ! interior model
+      ! + ``'fixed'``:
+      !   use a uniform opacity, fixed to the opacity of the outermost cell of the
+      !   interior model
       
-      ! + ``'iterated'``
-      ! use a uniform opacity, iterated to be consistent with the final Tsurf and
-      ! Psurf at the base of the atmosphere.
+      ! + ``'iterated'``:
+      !   use a uniform opacity, iterated to be consistent with the final Tsurf and
+      !   Psurf at the base of the atmosphere.
       
-      ! + ``'varying'``
-      ! use a varying opacity consistent with the local T and P throughout the
-      ! atmosphere. Involves numerical integration of the hydrostatic equilibrium
-      ! equation.
+      ! + ``'varying'``:
+      !   use a varying opacity consistent with the local T and P throughout the
+      !   atmosphere. Involves numerical integration of the hydrostatic equilibrium
+      !   equation.
 
       ! ::
 
@@ -4311,43 +4306,43 @@
 
       ! Determines which table Tsurf and Psurf are interpolated in
 
-      ! + ``'tau_100'``, ``'tau_10'``, ``'tau_1'``, ``'tau_1m1'``
-      ! use model atmosphere tables for Pgas and T at tau=100, 10, 1
-      ! or 0.1, respectively; solar Z only, as described in MESA Paper
-      ! I (Paxton et al. 2011), Sec. 5.3.
-      ! these tables are primarily for the evolution of low-mass
-      ! stars, brown dwarfs, and giant planets.  They are constructed
-      ! from Castelli & Kurucz (2003) for Teff > 3000 K and the COND
-      ! model atmospheres (Allard et al. 2001) for Teff < 3000 K.
-      ! where no published results are available, the table has been
-      ! filled in using integration of the Eddington T(tau) relation
+      ! + ``'tau_100'``, ``'tau_10'``, ``'tau_1'``, ``'tau_1m1'``:
+      !   use model atmosphere tables for Pgas and T at tau=100, 10, 1
+      !   or 0.1, respectively; solar Z only, as described in MESA Paper
+      !   I (Paxton et al. 2011), Sec. 5.3.
+      !   these tables are primarily for the evolution of low-mass
+      !   stars, brown dwarfs, and giant planets.  They are constructed
+      !   from Castelli & Kurucz (2003) for Teff > 3000 K and the COND
+      !   model atmospheres (Allard et al. 2001) for Teff < 3000 K.
+      !   where no published results are available, the table has been
+      !   filled in using integration of the Eddington T(tau) relation
       
-      ! + ``'photosphere'``
-      ! use model atmosphere tables for photosphere; range of Z's,
-      ! as described in MESA Paper I (Paxton et al. 2011), Sec. 5.3.
-      ! the tables cover log(Z/Zsun) from -4 to 0.5 for a GN93
-      ! solar mixture, and span logg = -0.5 to 5.5 in steps of
-      ! 0.5 dex and Teff = 2000 to 50 000 K in steps of 250 K.
-      ! they are constructed, in order of precedence, using the
-      ! PHOENIX model atmospheres (Hauschildt et al. 1999a,b)
-      ! and the models by Castelli & Kurucz (2003).  where
-      ! neither is available, an entry is generated by
-      ! integrating the Eddington T(tau) relation
+      ! + ``'photosphere'``:
+      !   use model atmosphere tables for photosphere; range of Z's,
+      !   as described in MESA Paper I (Paxton et al. 2011), Sec. 5.3.
+      !   the tables cover log(Z/Zsun) from -4 to 0.5 for a GN93
+      !   solar mixture, and span logg = -0.5 to 5.5 in steps of
+      !   0.5 dex and Teff = 2000 to 50 000 K in steps of 250 K.
+      !   they are constructed, in order of precedence, using the
+      !   PHOENIX model atmospheres (Hauschildt et al. 1999a,b)
+      !   and the models by Castelli & Kurucz (2003).  where
+      !   neither is available, an entry is generated by
+      !   integrating the Eddington T(tau) relation
       
-      ! + ``'WD_tau_25'``
-      ! hydrogen atmosphere tables for cool white dwarfs
-      ! giving Pgas and T at log10(tau) = 1.4 (tau = 25.11886)
-      ! Teff goes from 40,000 K down to 2,000K with step of 100 K
-      ! Log10(g) goes from 9.5 down to 5.5 with step of 0.1.
-      ! R.D. Rohrmann, L.G. Althaus, and S.O. Kepler,
-      ! Lyman α wing absorption in cool white dwarf stars,
-      ! Mon. Not. R. Astron. Soc. 411, 781–791 (2011)
+      ! + ``'WD_tau_25'``:
+      !   hydrogen atmosphere tables for cool white dwarfs
+      !   giving Pgas and T at log10(tau) = 1.4 (tau = 25.11886)
+      !   Teff goes from 40,000 K down to 2,000K with step of 100 K
+      !   Log10(g) goes from 9.5 down to 5.5 with step of 0.1.
+      !   R.D. Rohrmann, L.G. Althaus, and S.O. Kepler,
+      !   Lyman α wing absorption in cool white dwarf stars,
+      !   Mon. Not. R. Astron. Soc. 411, 781–791 (2011)
       
-      ! + ``'DB_WD_tau_25'``
-      ! EXPERIMENTAL
-      ! helium dominated (log(H/He)=-5.0) atmosphere tables for DB
-      ! white dwarfs, provided by Odette Toloza and Detlev Koester.
-      ! 5000K < Teff < 40000K
+      ! + ``'DB_WD_tau_25'``:
+      !   EXPERIMENTAL
+      !   helium dominated (log(H/He)=-5.0) atmosphere tables for DB
+      !   white dwarfs, provided by Odette Toloza and Detlev Koester.
+      !   5000K < Teff < 40000K
 
       ! ::
 
@@ -4360,14 +4355,13 @@
       ! Controls how thermal opacities are calculated throughout the atmosphere when
       ! ``atm_option`` = ``'irradiated_grey'``
 
-      ! + ``'fixed'``
-      !
-      ! use a uniform opacity, fixed to the opacity of the outermost cell of the
-      ! interior model.
+      ! + ``'fixed'``:
+      !   use a uniform opacity, fixed to the opacity of the outermost cell of the
+      !   interior model.
 
-      ! + ``'iterated'``
-      ! use a uniform opacity, iterated to be consistent with the final Tsurf and
-      ! Psurf at the base of the atmosphere.
+      ! + ``'iterated'``:
+      !   use a uniform opacity, iterated to be consistent with the final Tsurf and
+      !   Psurf at the base of the atmosphere.
 
       ! ::
 
@@ -4423,9 +4417,11 @@
       ! ratio ``kap_v/kap_th`` where ``kap_v`` is the planet atmosphere opacity for stellar
       ! irradiation, and ``kap_th`` is the thermal opacity for the internally produced
       ! radiation. There are two ways to calculate the ratio:
+      !
       ! + if ``atm_irradiated_kap_v_div_kap_th`` > 0, then use it for ``kap_v/kap_th``
-      ! + if ``atm_irradiated_kap_v_div_kap_th`` == 0, then use ``atm_irradiated_kap_v`` to
-      !   set ``kap_v``, and then evaluate the ratio using ``kap_th``
+      !
+      ! + if ``atm_irradiated_kap_v_div_kap_th`` == 0, then use ``atm_irradiated_kap_v``
+      !   to set ``kap_v``, and then evaluate the ratio using ``kap_th``
 
       ! ::
 
@@ -4448,8 +4444,6 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! gradient of compression vanishes at surface
-
-      ! ::
 
       !     see Grott, Chernigovski, Glatzel, 2005.
       !     d_dm(d_dm(r^2*v)) = 0 at surface
@@ -4586,26 +4580,23 @@
 
     mass_change = 0d0
 
+
+
+      ! mdot_omega_power
+      ! ~~~~~~~~~~~~~~~~
+      
       ! Enhanced mass loss due to rotation
       ! as in Heger, Langer, and Woosley, 2000, ApJ, 528:368-396.
-
-      ! ::
 
       !      Mdot = Mdot_no_rotation/(1 - Osurf/Osurf_crit)^mdot_omega_power
 
       ! where
-
-      ! ::
 
       !     Osurf = angular velocity at surface
       !     Osurf_crit^2 = (1 - Gamma_edd)*G*M/R^3
       !     Gamma_edd = kappa*L/(4 pi c G M), Eddington factor
 
       ! Typical value for ``mdot_omega_power = 0.43``.
-
-
-      ! mdot_omega_power
-      ! ~~~~~~~~~~~~~~~~
 
       ! Set to 0 to disable this feature.
 
@@ -4710,8 +4701,6 @@
 
       ! Here is an example of how to translate an existing inlist from the
       ! old style to the new:
-
-      ! ::
 
       !     |        Before                    |             After                 |
       !     |----------------------------------|-----------------------------------|
@@ -6439,15 +6428,15 @@
 
       ! + empty string means no screening
       ! + ``' extended'`` :
-      ! extends the Graboske (1973) method using results from Alastuey and Jancovici (1978),
-      ! along with plasma parameters from Itoh et al (1979) for strong screening.
+      !   extends the Graboske (1973) method using results from Alastuey and Jancovici (1978),
+      !   along with plasma parameters from Itoh et al (1979) for strong screening.
       ! + ``'salpeter'`` :
-      ! weak screening only.  following Salpeter (1954),
-      ! with equations (4-215) and (4-221) of Clayton (1968).
+      !   weak screening only.  following Salpeter (1954),
+      !   with equations (4-215) and (4-221) of Clayton (1968).
       ! + ``'chugunov'`` :
-      ! based on code from Sam Jones
-      ! Implements screening from Chugunov et al (2007) for weak and strong screening
-      ! MESA versions <=11435 used extended as the default value
+      !   based on code from Sam Jones
+      !   Implements screening from Chugunov et al (2007) for weak and strong screening
+      !   MESA versions <=11435 used extended as the default value
 
       ! ::
 
@@ -7367,7 +7356,7 @@
       !     log10T <= low_logT_op_mono_full_off
 
       ! partially on for other cases
-      ! Note: OP mono ignored if either high_logT_ control < 0
+      ! Note: OP mono ignored if either high_logT control < 0
 
       ! ::
 
@@ -7948,8 +7937,6 @@
       !            use L_rad = L
 
       ! With the resulting ``L_rad``, determine the expected dT/dm by
-
-      ! ::
 
       !     d_Prad/dm = -kap*L_rad/(clight*area^2) -- see, e.g., K&W (5.12)
 
@@ -8963,13 +8950,15 @@
       ! ~~~~~~~~~~~~~~~~
 
       ! time_delta_coeff - smaller forces smaller timesteps giving better time resolution.
-      !    multiplier for all real number timestep limits and hard limits.
-      !    does not apply to integer valued limits such as
-      !       solver_iters_timestep_limit
-      !       burn_steps_limit
-      !       diffusion_steps_limit
-      !       diffusion_iters_limit
-      !    does not apply to varcontrol_target
+      ! multiplier for all real number timestep limits and hard limits.
+      ! does not apply to integer valued limits such as
+      
+      ! + solver_iters_timestep_limit
+      ! + burn_steps_limit
+      ! + diffusion_steps_limit
+      ! + diffusion_iters_limit
+      
+      ! does not apply to varcontrol_target.
       ! analogous to mesh_delta_coeff for better spatial resolution.
 
       ! ::
@@ -9587,7 +9576,7 @@
 
       ! Limit on magnitude of relative decrease in any cell nonH, nonHe abundance.
       ! ``dX_div_X`` here is abs(xa(j,k) - xa_old(j,k))/xa(j,k)
-      !    for any cell k and any species j other except hydrogen or helium.
+      ! for any cell k and any species j other except hydrogen or helium.
       ! Considers all cells except where have convective mixing.
 
 
@@ -11022,8 +11011,6 @@
       ! ~~~~~~~~~~~~~~~~
       ! adjust_J_q_hard_limit
       ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
 
       ! limit for mass coordinate down to which angular momentum is adjusted when
       ! using do_adjust_J_lost
