@@ -151,8 +151,8 @@
          end subroutine get_gyre_info_for_this_step
          
          logical function get_period_info()
-            real(dp) :: v_surf, v_surf_start, KE, KE_avg, min_period, time_ended, &
-               delta_R, min_deltaR_for_periods, delta_R_avg, growth_avg_frac_new, &
+            real(dp) :: v_surf, v_surf_start, KE, min_period, time_ended, &
+               delta_R, min_deltaR_for_periods, growth_avg_frac_new, &
                min_period_div_target, cs
             include 'formats'
             get_period_info = .false.
@@ -213,12 +213,10 @@
          
             if (num_periods > 1) then
                growth_avg_frac_new = s% x_ctrl(9)
-               KE_avg = 0.5d0*(KE_max + prev_KE_max)
-               KE_growth = (KE_max - prev_KE_max)/KE_avg
+               KE_growth = (KE_max - prev_KE_max)/prev_KE_max
                KE_growth_avg = growth_avg_frac_new*KE_growth + &
                   (1d0 - growth_avg_frac_new)*KE_growth_avg
-               delta_R_avg = 0.5d0*(delta_R + prev_delta_R)
-               delta_R_growth = (delta_R - prev_delta_R)/delta_R_avg
+               delta_R_growth = (delta_R - prev_delta_R)/prev_delta_R
                delta_R_growth_avg = growth_avg_frac_new*delta_R_growth + &
                   (1d0 - growth_avg_frac_new)*delta_R_growth_avg
             end if

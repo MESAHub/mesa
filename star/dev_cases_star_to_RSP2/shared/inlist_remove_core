@@ -22,7 +22,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 1
 
-      pgstar_flag = .true.
+      pgstar_flag = .false.
 
 / ! end of star_job namelist
 
