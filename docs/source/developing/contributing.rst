@@ -29,7 +29,7 @@ Follow `this GitHub guide <https://help.github.com/en/github/getting-started-wit
 When instructed to install git, it is likely simplest to do so using your system package manager on Linux (e.g., apt, yum) or a macOS package manager (e.g., Homebrew, MacPorts).
 
 .. note::
-   This documentation will mainly describe command line use of git.  However, there are many graphical git clients available.  For example, GitHub has its own `desktop app <https://desktop.github.com/>`__.  (See also :ref:`Graphical interfaces`).
+   This documentation will mainly describe command line use of git.  However, there are many graphical git clients available.  For example, GitHub has its own `desktop app <https://desktop.github.com/>`__.  (See also :ref:`git-guis`).
 
    
 Install Git LFS
@@ -314,6 +314,7 @@ You may have multiple stashes at once, in which case they are indexed by::
 
 where ``X`` is a number starting at 0 for the most recent ``stash``.
 
+.. _git-guis:
 
 Graphical interfaces
 --------------------

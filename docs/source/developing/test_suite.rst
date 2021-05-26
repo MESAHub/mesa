@@ -95,7 +95,7 @@ output model (i.e., set ``required_termination_code_string``).
 
 A good test should use ``run_star_extras`` to perform more detailed
 physical and/or numerical checks or report longitudinally interesting
-values to the TestHub (see :ref:`MESA Test Hub`).
+values to the TestHub (see :ref:`developing/test_suite:MESA Test Hub`).
 
 A good test should be numerically converged.  This is particularly
 important in order to ensure that the test is robust.  Unconverged

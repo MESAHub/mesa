@@ -141,25 +141,26 @@
       ! disp, coord, fjust are args for PGMTXT
 
       ! + DISP :
-      ! the displacement of the character string from the
-      ! specified edge of the viewport, measured outwards
-      ! from the viewport in units of the character
-      ! height. Use a negative value to write inside the
-      ! viewport, a positive value to write outside.
+      !   the displacement of the character string from the
+      !   specified edge of the viewport, measured outwards
+      !   from the viewport in units of the character
+      !   height. Use a negative value to write inside the
+      !   viewport, a positive value to write outside.
       ! + COORD :
-      ! the location of the character string along the
-      ! specified edge of the viewport, as a fraction of
-      ! the length of the edge.
+      !   the location of the character string along the
+      !   specified edge of the viewport, as a fraction of
+      !   the length of the edge.
       ! + FJUST :
-      ! controls justification of the string parallel to
-      ! the specified edge of the viewport. If
-      ! FJUST = 0.0, the left-hand end of the string will
-      ! be placed at COORD; if JUST = 0.5, the center of
-      ! the string will be placed at COORD; if JUST = 1.0,
-      ! the right-hand end of the string will be placed at
-      ! at COORD.
+      !   controls justification of the string parallel to
+      !   the specified edge of the viewport. If
+      !   FJUST = 0.0, the left-hand end of the string will
+      !   be placed at COORD; if JUST = 0.5, the center of
+      !   the string will be placed at COORD; if JUST = 1.0,
+      !   the right-hand end of the string will be placed at
+      !   at COORD.
 
-      ! ### model_number
+      ! model_number
+      ! ~~~~~~~~~~~~
 
       ! ::
 
@@ -1458,7 +1459,7 @@
     TRho_file_aspect_ratio = -1
 
 ! TmaxRho window
-! ===========
+! ==============
 
       ! history of central temperature vs. density
 

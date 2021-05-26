@@ -17,7 +17,7 @@ The minimum system requirements for MESA are:
 -  64-bit processor
 -  8 GB RAM
 -  20 GB free disk space
--  Windows users should :ref:`follow the instructions here <Installing MESA on Windows>`.
+-  Windows users should :ref:`follow the instructions here <windows-install:Installing MESA on Windows>`.
 
 Most laptop or desktop computers built in the last three years will 
 satisfy these requirements.

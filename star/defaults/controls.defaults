@@ -7910,8 +7910,6 @@
       ! These are for alternatives ways to determine the T gradient.
       ! The standard form of the equation is
 
-      ! ::
-
       !     dT/dm = dP/dm * T/P * grad_T, grad_T = dlnT/dlnP from MLT.
 
       ! use hydrostatic value for dP/dm in this.
@@ -7923,12 +7921,9 @@
       ! the use of hydrostatic dP/dm is inappropriate.
       ! In order of priority,
       
-      ! ::
       !     if (use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn)
       !        equation is gradT(k)*(lnPeos(k-1) - lnPeos(k)) = lnT(k-1) - lnT(k)
       !     recall that gradT(k) is expected dlnT/dlnPeos at face k from MLT.
-
-      ! ::
 
       !     if (use_dPrad_dm_form_of_T_gradient_eqn)
       !         if (gradT < gradr) then

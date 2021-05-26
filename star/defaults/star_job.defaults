@@ -880,7 +880,9 @@
       ! If timescale_for_relax_composition is negative, then the model will be adjusted
       ! such that in num_steps_to_relax_composition the desired composition is obtained.
       ! Otherwise, the abundance of each element will be updated each step as
+
       !     new_xa = lambda*target_xa + (1-lambda)*current_xa
+
       ! where lambda = dt/timescale_for_relax_composition. In this way, the target composition
       ! is reached when dt>=timescale_for_relax_composition.
 

@@ -101,8 +101,8 @@ section of this website.
 .. literalinclude:: ../../../star/work/inlist_pgstar
 
 
-Running MESA
-------------
+Run MESA
+--------
 
 Running the code is now as simple as typing
 
