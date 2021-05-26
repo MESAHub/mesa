@@ -42,8 +42,8 @@
    alpha_semiconvection = 0.0
    
 ! mixing
-    overshoot_scheme(1) = 'none'
-    overshoot_scheme(2) = 'none'
+    overshoot_scheme(1) = ''
+    overshoot_scheme(2) = ''
 
 ! solver
    dxdt_nuc_factor = 0

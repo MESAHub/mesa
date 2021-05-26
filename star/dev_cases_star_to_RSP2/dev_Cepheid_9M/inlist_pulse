@@ -1,9 +1,9 @@
 ! note: set x_ctrl(7) to approximately expected period (in days). 
 
 &star_job   
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 400 ! start at ~ max/10
-      pgstar_flag = .true.
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 470 ! start at ~ max/10
+   !pgstar_flag = .true.
 / ! end of star_job namelist
 
 &eos
@@ -13,12 +13,32 @@
 / ! end of kap namelist
 
 &controls   
-   max_timestep = 4000
+   max_timestep = 4700
+
+! timesteps
+   ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0
+   !      ccsn uses dt_div_min_dr_div_cs_limit = 0.7d0, no hard limit
+   
+   
+   dt_div_min_dr_div_cs_limit = 1.0d0
+   dt_div_min_dr_div_cs_hard_limit = 2.0d0
+   
+! TESTING FOR LATE FAILURE CAUSE
+   ! this dies at 2869455..  photo 2868000 
+   !dt_div_min_dr_div_cs_limit = 0.5d0 ! 1.0d0
+   !dt_div_min_dr_div_cs_hard_limit = 1.0d0 ! 2.0d0
+   ! this still fails too
+!   P_theta_for_velocity_time_centering = 1d0
+!   L_theta_for_velocity_time_centering = 1d0
+
+   
+   
+   
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 30 ! expected period (in days) 
+   x_ctrl(7) = 33 ! expected period (in days) 
 !   x_ctrl(8) = 1d-1 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.1 ! min_period_div_target
@@ -59,7 +79,7 @@
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 70 ! only used if > 0.  causes xmin to move with xmax.
 
-    Grid2_file_flag = .true.
+    !Grid2_file_flag = .true.
     file_digits = 8
     Grid2_file_dir = 'png'
     Grid2_file_prefix = '9M_cepheid_'

@@ -7,6 +7,7 @@
       save_model_filename = 'pulse.mod'
       required_termination_code_string(1) = 'log_Teff_lower_limit'
       required_termination_code_string(2) = 'max_model_number'
+      required_termination_code_string(3) = 'log_L_upper_limit'
 
       set_initial_number_retries = .false.
 
@@ -32,8 +33,8 @@
    alpha_semiconvection = 0.0
    
 ! mixing
-    overshoot_scheme(1) = 'none'
-    overshoot_scheme(2) = 'none'
+    overshoot_scheme(1) = ''
+    overshoot_scheme(2) = ''
     
 ! timesteps
    delta_HR_limit = 0.001

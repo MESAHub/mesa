@@ -584,7 +584,7 @@
          integer, intent(out) :: ierr         
          type(auto_diff_real_star_order1) ::  &
             Hp_expected, Hp_actual,resid
-         real(dp) :: scale, residual, Hp_start
+         real(dp) :: residual, Hp_start
          logical :: test_partials
          include 'formats'
          !test_partials = (k == s% solver_test_partials_k)
@@ -600,12 +600,7 @@
          if (ierr /= 0) return        
          Hp_actual = wrap_Hp_00(s, k)  
          Hp_start = s% Hp_face_start(k)
-         scale = 1d0/Hp_start
-         if (is_bad(scale) .or. scale <= 0d0) then
-            write(*,2) 'do1_rsp2_Hp_eqn scale', k, scale
-            stop 'do1_rsp2_Hp_eqn'
-         end if
-         resid = (Hp_expected - Hp_actual)*scale         
+         resid = (Hp_expected - Hp_actual)/max(Hp_expected,Hp_actual)    
       
          residual = resid%val
          s% equ(s% i_equ_Hp, k) = residual         
@@ -618,7 +613,6 @@
             write(*,2) 'residual', k, residual
             write(*,2) 'Hp_expected', k, Hp_expected%val
             write(*,2) 'Hp_actual', k, Hp_actual%val
-            write(*,2) 'scale', k, scale
             stop 'do1_rsp2_Hp_eqn'
          !$OMP end critical
          end if

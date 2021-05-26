@@ -9,33 +9,47 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 do_one inlist_to_zams_header zams.mod
 cp zams.mod standard_zams.mod
+
 do_one inlist_to_near_pulses_header near_pulses.mod
 cp near_pulses.mod standard_near_pulses.mod
+
 do_one inlist_to_pulse_header pulse.mod
 cp pulse.mod standard_pulse.mod
+
 do_one inlist_remove_core_header removed_core.mod
 cp removed_core.mod standard_removed_core.mod
+
 do_one inlist_remesh_header remeshed.mod
 cp remeshed.mod standard_remeshed.mod
+
 do_one inlist_initialize_header initialized.mod
 cp initialized.mod standard_initialized.mod
+
 do_one inlist_pulse_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 echo 'finished'
 
-return
 
-after to_pulse
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     610       1          0.1688E-07       59236127.2640            685.6033             10.8349
-     610       2          0.4138E-07       24165261.1913            279.6905             11.7369
-after remove core
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     100       1          0.1675E-07       59718754.5326            691.1893             10.7372
-     100       2          0.4116E-07       24294067.3288            281.1813             11.7150
-after remesh
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     100       1          0.1686E-07       59297596.0123            686.3148              9.5035
-     100       2          0.4147E-07       24115264.4040            279.1119             12.1100
+after to pulse          Teff 3220   L 1.1d5
+   model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+     508       1          0.1644E-07       60845566.2649            704.2311              0.0439             22.7735
+     508       2          0.4072E-07       24559310.8698            284.2513              0.0289             34.6427
+
+after remove core  5d6  Teff 3220  L 1.1d5 
+   model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1       1          0.1637E-07       61082947.4883            706.9786              0.0442             22.6448
+       1       2          0.4060E-07       24627540.8648            285.0410              0.0289             34.5483
+
+after remesh            Teff 3273  L 1.17d5
+   model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1       1          0.1635E-07       61163981.0189            707.9164              0.0511             19.5557
+       1       2          0.4079E-07       24517504.1241            283.7674              0.0298             33.5226
+
+after initialize        Teff    L 
+   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1          0.1635E-07       61163967.9601            707.9163              0.0511             19.5557
+       2          0.4079E-07       24517501.0335            283.7674              0.0298             33.5226
+       3          0.6614E-07       15119235.3332            174.9911              0.0402             24.8882
+ set gyre starting velocities for order 1

@@ -13,14 +13,13 @@
    !profile_interval = 1
    !history_interval = 1
    !terminal_interval = 1
-   !report_solver_progress = .true.
 / ! end of controls namelist
 
 &pgstar
-   HR_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
-   HR_logT_min = 3.6 ! -101 ! only used if > -100
-   HR_logT_max = 4.5 ! only used if > -100
-   HR_logL_min = 2.4 ! -101 ! only used if > -100
-   HR_logL_max = 3.4 ! -101 ! only used if > -100
+   HR_title = '21 M\d\(2281)\u  Z=0.02  RSG'
+   HR_logT_min = 3.5 ! -101 ! only used if > -100
+   HR_logT_max = 4.65 ! only used if > -100
+   HR_logL_min = 3.8 ! -101 ! only used if > -100
+   HR_logL_max = 4.9 ! -101 ! only used if > -100
    show_HR_classical_instability_strip = .true.
 / ! end of pgstar namelist

@@ -24,8 +24,8 @@
    max_dt_years_for_TDC = -1d99
          
 ! mixing
-    overshoot_scheme(1) = 'none'
-    overshoot_scheme(2) = 'none'
+    overshoot_scheme(1) = ''
+    overshoot_scheme(2) = ''
 
 ! timesteps
    ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0

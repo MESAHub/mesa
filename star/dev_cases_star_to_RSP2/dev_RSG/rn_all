@@ -9,18 +9,47 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 do_one inlist_to_zams_header zams.mod
 cp zams.mod standard_zams.mod
+
 do_one inlist_to_near_pulses_header near_pulses.mod
 cp near_pulses.mod standard_near_pulses.mod
+
 do_one inlist_to_pulse_header pulse.mod
 cp pulse.mod standard_pulse.mod
+
 do_one inlist_remove_core_header removed_core.mod
 cp removed_core.mod standard_removed_core.mod
+
 do_one inlist_remesh_header remeshed.mod
 cp remeshed.mod standard_remeshed.mod
+
 do_one inlist_initialize_header initialized.mod
 cp initialized.mod standard_initialized.mod
+
 do_one inlist_pulse_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 echo 'finished'
+
+
+after to pulse          Teff 4601   L 9661
+   model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+     764       1          0.3537E-06        2827501.7706             32.7257              0.0465             21.5107
+     764       2          0.5494E-06        1820020.1281             21.0650              0.0326             30.6354
+
+after remove core  5d6  Teff 4601   L 9661
+   model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1       1          0.3537E-06        2827447.0145             32.7251              0.0465             21.5089
+       1       2          0.5495E-06        1819946.6674             21.0642              0.0326             30.6391
+
+after remesh            Teff 4607   L 9720 
+   model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1       1          0.3478E-06        2874952.3392             33.2749              0.0732             13.6524
+       1       2          0.5480E-06        1824797.8217             21.1203              0.0330             30.3073
+
+after initialize        Teff 4892   L 4660
+   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1          0.3478E-06        2874952.3392             33.2749              0.0732             13.6524
+       2          0.5480E-06        1824797.8217             21.1203              0.0330             30.3073
+       3          0.8204E-06        1218946.9345             14.1082              stable
+ set gyre starting velocities for order 1
