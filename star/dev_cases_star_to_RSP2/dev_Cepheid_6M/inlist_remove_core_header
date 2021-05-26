@@ -1,6 +1,5 @@
 
 &star_job
-   mesa_dir = '../../..'
    read_extra_star_job_inlist1 = .true.
    extra_star_job_inlist1_name = '../shared/inlist_remove_core_header'
    read_extra_star_job_inlist2 = .true.

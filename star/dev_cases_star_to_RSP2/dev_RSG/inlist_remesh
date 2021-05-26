@@ -1,27 +1,5 @@
 
 &star_job
-
-      load_saved_model_for_RSP2 = .true.
-      load_model_filename = 'removed_core.mod' 
-
-      save_model_when_terminate = .true.
-      save_model_filename = 'remeshed.mod'
-      required_termination_code_string = 'max_model_number'
-
-      set_initial_model_number = .true.
-      initial_model_number = 0
-
-      set_initial_age = .true.
-      initial_age = 0
-
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
-   
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-1
-
-      pgstar_flag = .false.
-
 / ! end of star_job namelist
 
 &eos
@@ -30,25 +8,10 @@
 &kap
 / ! end of kap namelist
 
-
-! before convert
-! after convert
-
-
 &controls
-   
-   max_timestep = 1d3
-   
-   max_model_number = 100
-
-! RSP2
-   RSP2_nz = 150
-   RSP2_nz_outer = 40
-   RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 2d0
 
 ! GYRE
-   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
    x_integer_ctrl(2) = 2 ! max number of modes to output per call
    x_logical_ctrl(2) = .false. ! output eigenfunction files   
@@ -58,28 +21,14 @@
       ! < 0 means report best over all gyre results for any order
    
 ! output controls
-   terminal_show_age_units = 'days'
-   terminal_show_timestep_units = 'secs'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
 
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
-
-   photo_interval = 50
-   profile_interval = 100
-   history_interval = 10
-   terminal_interval = 10
-   write_header_frequency = 10
-
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
       
       !max_model_number = 1
-      max_number_retries = 0
+      !max_number_retries = 0
 
       !fill_arrays_with_NaNs = .true.
       
@@ -159,26 +108,9 @@
     !pause = .true.
     !pause_interval = 100
     pgstar_interval = 1 ! 10
-
- ! window 1
-
-    !Grid1_win_flag = .true.
-    Grid1_title = ''
-
-    !Grid1_file_flag = .true.
-    Grid1_file_dir = 'png1'
-    Grid1_file_prefix = 'grid1'
-    Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
-   
-    Profile_Panels1_xaxis_name = 'zone'
-    Profile_Panels1_xaxis_reversed = .true.
-    !Profile_Panels1_xmin = 50 ! -101D0
-    !Profile_Panels1_xmax = 65 ! -101D0
-   
- ! window 2
       
     Grid2_win_flag = .true.
-    Grid2_title = '9 M\d\(2281)\u  Z=0.014  Cepheid'
+    Grid2_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

@@ -1,96 +1,26 @@
-
 &star_job
-   
-   create_pre_main_sequence_model = .true.
-
-   save_model_when_terminate = .true.
-   save_model_filename = 'zams.mod'
-   required_termination_code_string = 'Lnuc_div_L_zams_limit'
-
-   save_photo_when_terminate = .true.
-
-   initial_zfracs = 6
-   
    pgstar_flag = .true.
-
 / !end of star_job namelist
 
 &eos
 / ! end of eos namelist
 
-
 &kap
 / !end of kap namelist
 
-
 &controls
-
-    Lnuc_div_L_zams_limit = 0.9d0
-    stop_near_zams = .true.
-   
-   ! limit max_model_number as part of test_suite
-   max_model_number = 1000
-
-! output controls
-
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
-
-   photo_interval = 50
-   profile_interval = 100
-   history_interval = 10
-   terminal_interval = 10
-
    !photo_interval = 10
    !profile_interval = 1
    !history_interval = 1
    !terminal_interval = 1
-
-   !report_solver_progress = .true. ! set true to see info about solver iterations
-
-
+   !report_solver_progress = .true.
 / ! end of controls namelist
 
 &pgstar
-
-   !pause = .true.
-
-   ! HR window -- lg_L vs. lg_Teff
-   
-   pgstar_interval = 1
-
-   HR_win_flag = .true.
-   
-   HR_title = '21 M\d\(2281)\u  Z=0.02  RSG'
-
-   HR_win_width = 8
-   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
-
-   ! axis limits -- to override system default selections
-   HR_logT_min = 3.5 ! -101 ! only used if > -100
-   HR_logT_max = 4.65 ! only used if > -100
-   HR_logL_min = 3.8 ! -101 ! only used if > -100
-   HR_logL_max = 4.9 ! -101 ! only used if > -100
-
+   HR_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
+   HR_logT_min = 3.6 ! -101 ! only used if > -100
+   HR_logT_max = 4.5 ! only used if > -100
+   HR_logL_min = 2.4 ! -101 ! only used if > -100
+   HR_logL_max = 3.4 ! -101 ! only used if > -100
    show_HR_classical_instability_strip = .true.
-   !show_HR_target_box = .true.
-   HR_target_n_sigma = -3
-   HR_target_logL = 4.9d0
-   HR_target_logL_sigma = 0.04d0
-   HR_target_logT = 4.4d0
-   HR_target_logT_sigma = 0.02d0
-
-   ! file output
-   !HR_file_flag = .true.
-   HR_file_dir = 'pgstar_out'
-   HR_file_prefix = 'hr'
-   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
-   HR_file_width = -1 ! negative means use same value as for window
-   HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
-
 / ! end of pgstar namelist
-
-
-

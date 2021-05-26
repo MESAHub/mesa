@@ -29,9 +29,7 @@
 
 ! timesteps
    ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0
-   !dt_div_min_dr_div_cs_limit = 1d0 
-   !dt_div_min_dr_div_cs_hard_limit = 4d0
-   dt_div_min_dr_div_cs_limit = 0.8d0
+   dt_div_min_dr_div_cs_limit = 1.0d0
    dt_div_min_dr_div_cs_hard_limit = 2.0d0
 
    ! fyi: RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
@@ -75,6 +73,5 @@
    include_L_in_correction_limits = .true.
 
    alt_scale_height_flag = .false.
-
 
 / ! end of controls namelist
