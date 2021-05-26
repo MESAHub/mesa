@@ -25,7 +25,7 @@ WSL2 enables installing Linux inside your Windows operating system.
 
     We recommend you choose to install Ubuntu as your Linux distribution.
 
-Once this is set up, follow the instructions for :ref:`Installing MESA` on Linux.
+Once this is set up, follow the instructions for :ref:`installation:Installing MESA` on Linux.
 
 
 Enabling pgplot

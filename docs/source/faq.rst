@@ -860,7 +860,7 @@ lots of points:
 .. code-block:: fortran
 
   do k = 1, num_zones
-    call eos(T(k), rho(k), ….)
+    call eos(T(k), rho(k), ...)
   end do
 
 Most fortran compilers (ifort and gfortran and others) support OpenMP,
@@ -870,7 +870,7 @@ so the loop can be made to run in parallel by adding 2 lines of magic:
 
   !$OMP PARALLEL DO PRIVATE (k)
   do k = 1, num_zones
-    call eos(T(k), rho(k), ....)
+    call eos(T(k), rho(k), ...)
   end do
   !$OMP END PARALLEL DO
 
