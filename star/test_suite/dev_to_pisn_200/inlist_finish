@@ -9,6 +9,7 @@
       required_termination_code_string(1) = 'fe_core_infall_limit'
       required_termination_code_string(2) = 'log_Rsurf_upper_limit'
       required_termination_code_string(3) = 'remnant_mass_min_limit'
+      required_termination_code_string(4) = 'Star is unbound'
       
       set_initial_model_number = .false.
       set_initial_age = .false.
