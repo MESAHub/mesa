@@ -1344,8 +1344,8 @@
     CE_begin_at_max_implicit_abs_mdot = .false.
 
 
-! CE_years_detached_to_terminate
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! CE_xa_diff_to_terminate
+! ~~~~~~~~~~~~~~~~~~~~~~~
 
 ! If the absolute difference between central and surface mass fractions of H and He
 ! is below this, terminate the simulation. This is to stop the simulation once the entire

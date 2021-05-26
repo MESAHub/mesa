@@ -1,4 +1,5 @@
 .. _running:
+.. highlight:: console
 
 Running MESA
 ============

@@ -864,8 +864,6 @@
       ! ``relax_composition_filename`` holds the desired composition profile information
       ! file format for relax composition
 
-      ! ::
-
       !     1st line: num_points num_species
       !     then 1 line for for each point where define desired composition
       !     xq xa(1) ... xa(num_species)
@@ -1060,8 +1058,6 @@
 
       ! ``relax_angular_momentum_filename`` holds the desired angular momentum profile information
       ! file format for relax angular momentum
-
-      ! ::
 
       !     1st line: num_points
       !     then 1 line for for each point where define desired angular momentum
@@ -2555,8 +2551,6 @@
       ! If ``enable_adaptive_network`` is true, then
       ! at each step, the system calculates a new set of isos according to the following rules:
 
-      ! ::
-
       !     for each iso in the current net:
       !       let Z = number of protons in the iso and N = number of neutrons.
       !       let x = max mass fraction for the iso in any cell in the model.
@@ -2740,8 +2734,6 @@
 
       ! If this is true, use the A=17-28 weak reaction rates from
 
-      ! ::
-
       !     Suzuki, Toki, and Nomoto (2016)
       !     Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
       !     http://adsabs.harvard.edu/abs/2016ApJ...817..163S
@@ -2915,8 +2907,6 @@
       ! ~~~~~~~~~~~~~~~~
       ! color_num_colors
       ! ~~~~~~~~~~~~~~~~
-
-      ! ::
 
       !     Filenames for each bolometric correction (BC) table to load
       !     Must set the number of files to load
