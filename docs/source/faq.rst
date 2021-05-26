@@ -1,4 +1,5 @@
 .. highlight:: console
+.. _FAQ:
 
 ***
 FAQ
