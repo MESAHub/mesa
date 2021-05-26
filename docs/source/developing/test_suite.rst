@@ -53,13 +53,15 @@ start of each part, this will be copied to ``inlist``, and will be the
 file that MESA reads as its primary inlist.
 
 
-A good test should be able to regenerate its starting model.  When
-then environment variable ``MESA_RUN_OPTIONAL`` is set, test cases
-should regenerate their initial model.  The ``rn`` script should look
-something like
+A good test should be able to regenerate its starting model.
+The ``rn`` script should look something like
 
 .. literalinclude:: ../../../star/test_suite/test_case_template/rn
    :language: bash
+
+When the environment variable ``MESA_SKIP_OPTIONAL`` is set, some
+parts of the test run may be skipped by copying standard versions
+of saved models (which must be included in the test case).
 
 It is essential to make use of ``test_suite_helpers`` as this ensures
 that important information is produced in a TestHub-friendly format.
@@ -70,8 +72,7 @@ restriction catches ``stop`` statements, calls to ``mesa_error``, or
 other error conditions.
 
 A good test should run relatively quickly.  Costly parts can be
-skipped over using a saved model and only run when
-``MESA_RUN_OPTIONAL`` is set.
+skipped over using a saved model when ``MESA_SKIP_OPTIONAL`` is set.
 
 A good test should check its stopping condition before producing an
 output model (i.e., set ``required_termination_code_string``).
@@ -322,7 +323,7 @@ Splits the running of the test suite between machines. Current, if set, cannon w
 [ci optional]
 ^^^^^^^^^^^^^
 
-Runs ``MESA`` with the environment variable ``MESA_RUN_OPTIONAL=t`` set. This requests that the slower optional parts of each test case be ran.
+Runs ``MESA`` with the environment variable ``MESA_SKIP_OPTIONAL`` unset.  This requests that all parts of each test case be run (i.e., including optional parts).
 
 [ci optional n]
 ^^^^^^^^^^^^^^^
@@ -332,4 +333,4 @@ Where ``n`` is an integer. Same as ``[ci optional]`` but only run the first ``n`
 [ci fpe]
 ^^^^^^^^
 
-Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`` set. This requests that we turn on addtional debugging checks.
+Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`` set. This requests that we turn on additional debugging checks.
