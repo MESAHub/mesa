@@ -1,0 +1,48 @@
+
+&star_job
+
+      load_saved_model = .true.
+      load_model_filename = 'zams.mod' 
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'near_pulses.mod'
+      required_termination_code_string(1) = 'log_Teff_lower_limit'
+      required_termination_code_string(2) = 'max_model_number'
+      required_termination_code_string(3) = 'xa_central_lower_limit'
+
+      set_initial_number_retries = .false.
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+/ !end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+! atm
+       
+! timesteps
+
+! solver
+
+! output controls
+   photo_interval = 50
+   profile_interval = 100
+   history_interval = 10
+   terminal_interval = 10
+   write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+&pgstar
+         
+/ ! end of pgstar namelist

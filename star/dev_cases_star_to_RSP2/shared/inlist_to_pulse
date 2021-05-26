@@ -1,0 +1,63 @@
+&star_job
+
+      load_saved_model = .true.
+      load_model_filename = 'near_pulses.mod' 
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'pulse.mod'
+      required_termination_code_string(1) = 'log_Teff_lower_limit'
+      required_termination_code_string(2) = 'max_model_number'
+
+      set_initial_number_retries = .false.
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+   
+      !set_initial_dt = .true.
+      !seconds_for_initial_dt = 1d0
+
+      pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+/ !end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+! mlt
+   alpha_semiconvection = 0.0
+   
+! mixing
+    overshoot_scheme(1) = 'none'
+    overshoot_scheme(2) = 'none'
+    
+! timesteps
+   delta_HR_limit = 0.001
+
+! solver
+
+! GYRE output controls
+   x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
+      ! < 0 means report best over all gyre results for any order
+
+! output controls   
+   photo_interval = 10
+   profile_interval = 100
+   history_interval = 10
+   terminal_interval = 5
+   write_header_frequency = 10
+
+/ ! end of controls namelist
+
+&pgstar
+/ ! end of pgstar namelist

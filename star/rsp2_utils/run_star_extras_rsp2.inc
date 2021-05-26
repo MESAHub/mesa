@@ -238,10 +238,10 @@
                   dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
                   dble(s% model_number - run_num_steps_end_prev), &
                'period (d)', period/(24*3600), &
-               'dR growth', delta_R_growth_avg, &
+               'growth', delta_R_growth_avg, &
                'delta R/Rsun', period_delta_R/Rsun, &
                'delta logL', period_delta_logL, &
-               'delta logTeff', period_delta_logTeff, &
+               'delta Teff', period_delta_Teff, &
                'max vsurf/cs', period_max_vsurf_div_cs
 
             time_started = time_ended
@@ -329,8 +329,8 @@
          names(i) = 'max_v_div_cs'; vals(i) = period_max_vsurf_div_cs; i=i+1
          names(i) = 'del_R'; vals(i) = period_delta_R/Rsun; i=i+1
          names(i) = 'del_Teff'; vals(i) = period_delta_Teff; i=i+1
-         names(i) = 'del_lgTeff'; vals(i) = period_delta_logTeff; i=i+1
-         names(i) = 'del_lgL'; vals(i) = period_delta_logL; i=i+1
+         names(i) = 'del_logTeff'; vals(i) = period_delta_logTeff; i=i+1
+         names(i) = 'del_logL'; vals(i) = period_delta_logL; i=i+1
          names(i) = 'del_Mag'; vals(i) = period_delta_Mag; i=i+1
       end subroutine rsp2_data_for_extra_history_columns
 
