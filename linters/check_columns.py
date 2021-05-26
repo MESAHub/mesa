@@ -2,10 +2,12 @@
 
 import os
 import re
+import glob
 from collections.abc import MutableSet
 
 MESA_DIR = '../'
-
+ENABLE_TEST_SUITE_HIST_CHECKS=True
+ENABLE_TEST_SUITE_PROF_CHECKS=True
 
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):
@@ -68,6 +70,14 @@ def print_options(options):
     for o in sorted(options):
         print(f"   {o}")
 
+def delete_command(options, filename):
+    print('for i in',' '.join(options),end=';')
+    print('do ', end='')
+    print('sed -i "/^\s*\!$i/d" */'+filename,end=';')
+    print('sed -i "/^\s*\!\s*$i/d" */'+filename,end=';')
+    print('sed -i "/^\s*$i/d" */'+filename,end=';')
+    print('done')
+
 
 def check_history():
     """Run checks on history columns"""
@@ -116,7 +126,7 @@ def check_history():
 
 
     # Values that are in star_history_def.f90 but not in history.f90
-    print_section("Values that are in star_history_def.f90 but not in history.f90n")
+    print_section("Values that are in star_history_def.f90 but not in history.f90")
 
     # define false positives
     known_false_positives = {'burn_relr_regions', 'burning_regions',
@@ -167,9 +177,27 @@ def check_history():
         'photo',
         'pnhe4',
         'pp',
-        'tri_alfa'}
+        'tri_alfa'
+    }
 
     print_options(vals_history_list - vals_history - known_false_positives)
+
+
+    if ENABLE_TEST_SUITE_HIST_CHECKS:
+        known_false_positives = {
+            'misc',
+            'timescales'
+        }
+        # Value in each test case's history_columns.list but not in star/default/history_columns.list
+        for i in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','history_columns.list')):
+            test_case = get_columns(i.removeprefix(MESA_DIR), regexp)
+            result = test_case - vals_history_list - known_false_positives
+            if len(result):
+                print_section("Values that are in are in " + i + " but not in history_columns.list")
+                print_options(result)
+                delete_command(result,'history_columns.list')
+
+
 
 
 def check_profile():
@@ -306,6 +334,19 @@ def check_profile():
     # Values that are in are in profile_getval.f90 but not in profile_columns.list
     print_section("Values that are in are in profile_getval.f90 but not in profile_columns.list")
     print_options(vals_profile - vals_profile_list)
+
+
+    if ENABLE_TEST_SUITE_PROF_CHECKS:
+        known_false_positives = {
+        }
+        # Value in each test case's profile_columns.list but not in star/default/profile_columns.list
+        for i in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','profile_columns.list')):
+            test_case = get_columns(i.removeprefix(MESA_DIR), regexp)
+            result = test_case - vals_profile_list - known_false_positives - general_info
+            if len(result):
+                print_section("Values that are in are in " + i + " but not in profile_columns.list")
+                print_options(result)
+                delete_command(result,'profile_columns.list')
 
 
 if __name__ == "__main__":
