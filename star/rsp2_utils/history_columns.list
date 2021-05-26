@@ -12,6 +12,7 @@
       log_rel_run_E_err
       v_surf_km_s
       v_div_cs
+      v_div_vesc
       radius
       log_R
       effective_T

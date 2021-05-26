@@ -8,9 +8,9 @@
          run_num_iters_end_prev, run_num_retries_end_prev
       real(dp) :: period, KE_growth, KE_growth_avg, prev_KE_max, &
          delta_R_growth, delta_R_growth_avg, prev_delta_R, &
-         period_max_vsurf_div_cs, period_delta_R, &
+         period_max_v_div_vesc, period_max_v_div_cs, period_delta_R, &
          period_delta_Teff, period_delta_logTeff, &
          period_delta_logL, period_delta_Mag
       ! info for period in progress
-      real(dp) :: time_started, v_div_cs_max, &
+      real(dp) :: time_started, v_div_cs_max, v_div_vesc_max, &
          KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max
