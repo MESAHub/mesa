@@ -325,7 +325,6 @@
     
     ! eos controls
     use_d_eos_dxa, &
-    report_eos_settings_at_start_of_run, &
 
     ! opacity controls
     use_simple_es_for_kap, use_starting_composition_for_kap, &
@@ -1798,7 +1797,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
  ! eos controls
- s% report_eos_settings_at_start_of_run = report_eos_settings_at_start_of_run
  s% use_d_eos_dxa = use_d_eos_dxa
 
  ! opacity controls
@@ -3475,7 +3473,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_isolve_solver = s% diffusion_isolve_solver
 
  ! eos controls
- report_eos_settings_at_start_of_run = s% report_eos_settings_at_start_of_run
  use_d_eos_dxa = s% use_d_eos_dxa
  
  ! opacity controls
