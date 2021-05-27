@@ -412,13 +412,12 @@
 
          ierr = 0
          
-         call set_phot_info(s) ! sets Teff using L_phot and R_phot
-         
          r_surf = s% r(1)
          L_surf = s% L(1)
-         Teff = s% Teff
 
          if (s% RSP_flag) then
+            call set_phot_info(s) ! sets Teff using L_phot and R_phot
+            Teff = s% Teff
             lnT_surf = s% lnT(1)
             s% T_surf = s% T(1)
             s% P_surf = s% Peos(1)
@@ -455,6 +454,8 @@
          end if
          s% T_surf = exp(lnT_surf)
          s% P_surf = exp(lnT_surf)
+         call set_phot_info(s) ! sets Teff using L_phot and R_phot
+         Teff = s% Teff
 
       end subroutine set_Teff_info_for_eqns
 

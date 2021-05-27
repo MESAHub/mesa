@@ -427,9 +427,12 @@
    !## conditions at the photosphere
       !effective_T
       log_Teff ! log10 effective temperature
+         ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
+         ! where L and R are evaluated at the photosphere (tau_factor < 1)
+         ! or surface of the model (tau_factor >= 1) when photosphere is not inside the model.
 
       !photosphere_black_body_T
-      !photosphere_cell_T
+      !photosphere_cell_T ! temperature at model location closest to the photosphere, not necessarily Teff
       !photosphere_cell_log_T
       !photosphere_cell_density
       !photosphere_cell_log_density

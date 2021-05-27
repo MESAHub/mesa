@@ -1124,10 +1124,11 @@
          logg = safe_log10(s% cgrav(1)*m/(r*r))
          k_phot = 1
          if (s% tau_factor >= 1) then
+            ! This is always true for tables, regardless of tau_base.
             return ! just use surface values
          end if
          tau_phot = s% tau_base ! this holds for case of tau_factor < 1
-         tau00 = s% tau_factor*s% tau_base ! start at tau_surf > tau_phot and go inward
+         tau00 = s% tau_factor*s% tau_base ! start at tau_surf < tau_phot and go inward
          taup1 = 0
          ysum = 0
          do k = 1, s% nz-1
