@@ -1,0 +1,64 @@
+&star_job
+      required_termination_code_string(5) = 'star_mass_min_limit'
+      
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d2
+      
+/ ! end of star_job namelist
+
+&eos
+/ !end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+   !xa_central_upper_limit_species(1) = 'c12'
+   !xa_central_upper_limit(1) = 0.01d0
+   log_Teff_upper_limit = 3.75
+   when_to_stop_rtol = 1d-4
+   when_to_stop_atol = 1d-4
+
+! wind
+   cool_wind_RGB_scheme = ''
+   cool_wind_AGB_scheme = ''
+
+! output controls
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   !terminal_interval = 1
+
+/ ! end of controls namelist
+
+&pgstar
+
+   !pause = .true.
+   
+   pgstar_interval = 1 ! 25
+
+   HR_win_flag = .true.
+   
+   HR_title = '1 M\d\(2281)\u  Z=0.0001  Type II Cepheid'
+
+   HR_win_width = 8
+   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+
+   ! axis limits -- to override system default selections
+   HR_logT_min = 3.58 ! -101 ! only used if > -100
+   HR_logT_max = 3.9 ! only used if > -100
+   HR_logL_min = 0 ! -101 ! only used if > -100
+   HR_logL_max = 3.7 ! -101 ! only used if > -100
+   
+   show_HR_classical_instability_strip = .true.
+
+   ! file output
+   !HR_file_flag = .true.
+   HR_file_dir = 'pgstar_out'
+   HR_file_prefix = 'hr'
+   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_width = -1 ! negative means use same value as for window
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
+         
+/ ! end of pgstar namelist

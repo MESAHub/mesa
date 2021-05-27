@@ -35,24 +35,24 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 echo 'finished'
 
 
-after to pulse          Teff 6310   L 57
+after to pulse          Teff 4601   L 9661
    model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-    6576       1          0.1574E-04          63518.9206              0.7352             65.8743              0.0112             89.6039
-    6576       2          0.2142E-04          46675.7891              0.5402             24.9131              0.0217             46.1159
+     764       1          0.3537E-06        2827501.7706             32.7257              0.0465             21.5107
+     764       2          0.5494E-06        1820020.1281             21.0650              0.0326             30.6354
 
-after remove core  2d6  Teff 6310  L 57
+after remove core  5d6  Teff 4601   L 9661
    model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-       1       1          0.1575E-04          63510.0422              0.7351             65.7710              0.0112             89.4759
-       1       2          0.2143E-04          46657.1417              0.5400             24.8922              0.0217             46.0955
+       1       1          0.3537E-06        2827447.0145             32.7251              0.0465             21.5089
+       1       2          0.5495E-06        1819946.6674             21.0642              0.0326             30.6391
 
-after remesh            Teff 6308  L 57
+after remesh            Teff 4607   L 9720 
    model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-       1       1          0.1568E-04          63780.6739              0.7382             53.7419              0.0137             72.8010
-       1       2          0.2126E-04          47042.0297              0.5445             19.8127              0.0275             36.3890
+       1       1          0.3478E-06        2874952.3392             33.2749              0.0732             13.6524
+       1       2          0.5480E-06        1824797.8217             21.1203              0.0330             30.3073
 
-after initialize        Teff 6308   L 57
+after initialize        Teff 4892   L 4660
    order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-       1          0.1568E-04          63780.6739              0.7382              0.0137             72.8010
-       2          0.2126E-04          47042.0297              0.5445              0.0275             36.3890
-       3          0.2764E-04          36178.5958              0.4187              stable
+       1          0.3478E-06        2874952.3392             33.2749              0.0732             13.6524
+       2          0.5480E-06        1824797.8217             21.1203              0.0330             30.3073
+       3          0.8204E-06        1218946.9345             14.1082              stable
  set gyre starting velocities for order 1
