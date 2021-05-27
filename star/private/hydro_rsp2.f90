@@ -1039,9 +1039,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
          type(auto_diff_real_star_order1) :: &
-            rho_face, area, dlnPeos, &
-            r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
-            d_face, Peos_face, alt_Hp_cell, A
+            d_00, Peos_00, rmid, mmid, cgrav_mid
          real(dp) :: alfa, beta
          integer :: j
          include 'formats'         
@@ -1053,15 +1051,15 @@
          d_00 = wrap_d_00(s, k)
          Peos_00 = wrap_Peos_00(s, k)
          if (k <= s% nz) then
-            rmid = 
-            mmid = 
-            cgrav_mid = 
+            !rmid = 
+            !mmid = 
+            !cgrav_mid = 
          else
-            rmid = 
-            mmid = 
-            cgrav_mid = 
+            !rmid = 
+            !mmid = 
+            !cgrav_mid = 
          end if
-         Hp_cell = pow2(rmid*Peos_00/(rho_00*cgrav_mid*mmid)
+         Hp_cell = pow2(rmid)*Peos_00/(d_00*cgrav_mid*mmid)
          if (s% alt_scale_height_flag) then
             stop 'Hp_cell_for_Chi: cannot use alt_scale_height_flag'
          end if
