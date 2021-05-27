@@ -1,6 +1,6 @@
 
 
-&star_job
+&star_job 
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
