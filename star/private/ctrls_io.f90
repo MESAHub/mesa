@@ -324,7 +324,7 @@
     diffusion_maxsteps_for_isolve, diffusion_isolve_solver, &
     
     ! eos controls
-    use_d_eos_dxa, &
+    fix_d_eos_dxa_partials, &
 
     ! opacity controls
     use_simple_es_for_kap, use_starting_composition_for_kap, &
@@ -1797,7 +1797,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
  ! eos controls
- s% use_d_eos_dxa = use_d_eos_dxa
+ s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
 
  ! opacity controls
  s% use_simple_es_for_kap = use_simple_es_for_kap
@@ -3473,7 +3473,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_isolve_solver = s% diffusion_isolve_solver
 
  ! eos controls
- use_d_eos_dxa = s% use_d_eos_dxa
+ fix_d_eos_dxa_partials = s% fix_d_eos_dxa_partials
  
  ! opacity controls
  use_simple_es_for_kap = s% use_simple_es_for_kap
