@@ -7171,15 +7171,6 @@
 ! eos controls
 ! ============
 
-
-      ! report_eos_settings_at_start_of_run
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    report_eos_settings_at_start_of_run = .false.
-
-
       ! use_d_eos_dxa
       ! ~~~~~~~~~~~~~
 

@@ -771,10 +771,6 @@
          character(len=64) :: diffusion_isolve_solver
 
 
-      ! eos controls
-         logical :: &
-            report_eos_settings_at_start_of_run
-
       ! opacity controls
 
          logical :: use_simple_es_for_kap, use_starting_composition_for_kap
