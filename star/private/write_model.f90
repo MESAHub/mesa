@@ -51,7 +51,7 @@
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, &
             RSP2_flag, u_flag, prev_flag, rotation_flag, &
-            write_mlt_vc, RSP_flag, no_L
+            write_mlt_vc, RSP_flag
 
          1 format(a32, 2x, 1pd26.16)
          11 format(a32, 2x, 1pd26.16, 2x, a, 2x, 99(1pd26.16))
@@ -90,10 +90,7 @@
          if (RSP_flag) file_type = file_type + 2**bit_for_RSP
          if (RSP2_flag) file_type = file_type + 2**bit_for_RSP2
          if (write_mlt_vc) file_type = file_type + 2**bit_for_mlt_vc
-         
-         no_L = (s% RSP_flag .or. s% RSP2_flag)
-         if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
-         
+                  
          write(iounit, '(i14)', advance='no') file_type
          write(iounit,'(a)',advance='no') ' -- model for mesa/star'
          if (BTEST(file_type, bit_for_velocity)) &
@@ -115,10 +112,10 @@
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP luminosity (L), turbulent energy (et_RSP), and radiative flux (erad_RSP)'
          if (BTEST(file_type, bit_for_RSP2)) &
-            write(iounit,'(a)',advance='no') ', RSP2 turbulent velocity (w) and pressure scale height (Hp)'
+            write(iounit,'(a)',advance='no') ', RSP2 turbulent energy (w^2) and pressure scale height (Hp)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
-         if (.not. no_L) then
+         if (s% i_lum /= 0) then
             write(iounit,'(a)',advance='no') ', L=luminosity'
          end if
          if (s% M_center /= 0) then
@@ -194,20 +191,12 @@
                call write1(s% RSP_Et(k),ierr); if (ierr /= 0) exit
                call write1(s% erad(k),ierr); if (ierr /= 0) exit
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
-               call write1(s% L(k),ierr); if (ierr /= 0) exit
             else if (RSP2_flag) then
-               if (s% using_RSP2) then
-                  call write1(s% w(k),ierr); if (ierr /= 0) exit
-                  call write1(s% Hp_face(k),ierr)
-               else ! cv = sqrt_2_div_3*w
-                  call write1(s% mlt_vc(k)/sqrt_2_div_3,ierr); if (ierr /= 0) exit
-                  call write1(get_scale_height_face_val(s,k),ierr)
-               end if
+               call write1(s% w(k),ierr); if (ierr /= 0) exit
+               call write1(s% Hp_face(k),ierr)
                if (ierr /= 0) exit
             end if            
-            if (.not. no_L) then
-               call write1(s% L(k),ierr); if (ierr /= 0) exit
-            end if            
+            call write1(s% L(k),ierr); if (ierr /= 0) exit
             call write1(s% dq(k),ierr); if (ierr /= 0) exit
             if (v_flag) then
                call write1(s% v(k),ierr); if (ierr /= 0) exit
@@ -272,14 +261,11 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'et_RSP'
                write(iounit, fmt='(a26, 1x)', advance='no') 'erad_RSP'
                write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_RSP'
-               write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (RSP2_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'w'
                write(iounit, fmt='(a26, 1x)', advance='no') 'Hp'
-               write(iounit, fmt='(a26, 1x)', advance='no') 'L'
-            else if (.not. no_L) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             end if
+            write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             write(iounit, fmt='(a26, 1x)', advance='no') 'dq'
             if (v_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'v'
             if (rotation_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'omega'

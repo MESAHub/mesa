@@ -105,10 +105,6 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-         write (*,2) 'History_Panels2_plot total_energy_end', s% model_number, s% total_energy_end
-         
-         
          call pgslct(device_id)
          call pgbbuf()
          call pgeras()
@@ -677,7 +673,7 @@
             if (max_width > 0) step_min = max(step_min, step_max - max_width)
          else if (hist_xaxis_name == 'star_age' .and. automatic_star_age_units) then
             if (s% star_age > 1d0) then
-               hist_xaxis_name = 'star_age'
+               hist_xaxis_name = 'star_age_yr'
             else if (s% star_age*secyer > 24*60*60) then
                hist_xaxis_name = 'star_age_day'
             else if (s% star_age*secyer > 60*60) then

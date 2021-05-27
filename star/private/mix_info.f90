@@ -73,7 +73,7 @@
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
-         RSP2_or_RSP = s% RSP_flag .or. s% using_RSP2
+         RSP2_or_RSP = s% RSP_flag .or. s% RSP2_flag
 
          if (s% doing_timing) call start_time(s, time0, total)
          
@@ -126,7 +126,7 @@
                s% cdc(k) = 0d0
                s% conv_vel(k) = 0d0
             end do
-         else if (s% using_RSP2) then
+         else if (s% RSP2_flag) then
             do k = 1, nz
                s% conv_vel(k) = get_RSP2_conv_velocity(s,k)
                s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0

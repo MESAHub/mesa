@@ -15,6 +15,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
+      !save_model_filename = 'rsp_cepheid_cycle0.mod'
 
       initial_zfracs = 6
 
@@ -52,6 +53,7 @@
 
    ! limit max_model_number as part of test_suite
    max_model_number = 16000
+   !max_model_number = 1029
 
 ! RSP controls
 

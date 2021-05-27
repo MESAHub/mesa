@@ -17,9 +17,6 @@
          real(dp) :: RSP2_min_Lt_div_L_for_overshooting_mixing_type
          real(dp) :: RSP2_min_Lc_div_L_for_convective_mixing_type
          
-         real(dp) :: RSP2_min_dt_div_tau_conv_switch_to_MLT
-         real(dp) :: RSP2_min_dt_years_switch_to_MLT
-         
          real(dp) :: RSP2_w_fix_if_neg, RSP2_w_min_for_damping, RSP2_source_seed
          
          logical :: RSP2_use_L_eqn_at_surface, RSP2_assume_HSE
@@ -28,6 +25,10 @@
          logical :: RSP2_use_Stellingwerf_Lr
          integer :: RSP2_num_outermost_cells_forced_nonturbulent, &
             RSP2_num_innermost_cells_forced_nonturbulent
+         
+         logical :: RSP2_remesh_when_load
+         integer :: RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM
+         real(dp) :: RSP2_T_anchor, RSP2_dq_1_factor         
 
          integer :: RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, &
             RSP2_map_first_period, RSP2_map_last_period, RSP2_map_zone_interval

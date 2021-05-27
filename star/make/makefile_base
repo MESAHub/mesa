@@ -204,6 +204,7 @@ SRCS = \
    eps_mdot.f90 \
    evolve.f90 \
    relax.f90 \
+   set_flags.f90 \
    create_initial_model.f90 \
    pre_ms_model.f90 \
    init_model.f90 \

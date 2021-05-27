@@ -1,6 +1,8 @@
 
 &star_job
 
+   create_RSP_model = .true.
+
    save_model_when_terminate = .true.
    save_model_filename = 'test_loading.mod'
 

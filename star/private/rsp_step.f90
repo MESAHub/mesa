@@ -614,28 +614,14 @@
 
 
       subroutine rsp_set_Teff(s)
+         use star_utils, only: get_phot_info
+         use atm_lib, only: atm_Teff
          type (star_info), pointer :: s
-         integer :: k
-         real(dp) :: tau00, taup1, dtau, tau_phot, Tface_0, Tface_1
-         include 'formats'
-         tau_phot = 2d0/3d0
-         tau00 = s% tau_factor*s% tau_base
-         s% Teff = s% T(1)
-         do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(2*pi*(s% r(k)**2 + s% r(k+1)**2))
-            taup1 = tau00 + dtau
-            if (taup1 >= tau_phot .and. dtau > 0d0) then
-               if (k == 1) then
-                  Tface_0 = s% T(k)
-               else
-                  Tface_0 = 0.5d0*(s% T(k) + s% T(k-1))
-               end if
-               Tface_1 = 0.5d0*(s% T(k) + s% T(k+1))
-               s% Teff = Tface_0 + (Tface_1 - Tface_0)*(tau_phot - tau00)/dtau
-               exit
-            end if
-            tau00 = taup1
-         end do
+         real(dp) :: r, m, v, L, T_phot, cs, kap, logg, ysum
+         integer :: k_phot
+         include 'formats'         
+         call get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
+         s% Teff = atm_Teff(L,r)
       end subroutine rsp_set_Teff
       
       
