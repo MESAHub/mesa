@@ -52,7 +52,6 @@
 &controls
 
       use_dedt_form_of_energy_eqn = .true.
-      use_d_eos_dxa = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

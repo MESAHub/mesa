@@ -97,7 +97,6 @@
 
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
-      use_d_eos_dxa = .true.
       
       use_compression_outer_BC = .true.
       

@@ -7171,12 +7171,16 @@
 ! eos controls
 ! ============
 
-      ! use_d_eos_dxa
-      ! ~~~~~~~~~~~~~
+      ! fix_d_eos_dxa_partials
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! The star solver uses the partial derivatives of lnPgas and lnE
+      ! with respect to composition.  When the EOS fails to provide
+      ! these, replace them with a finite-difference approximation.
 
       ! ::
 
-    use_d_eos_dxa = .true.
+    fix_d_eos_dxa_partials = .true.
 
 ! opacity controls
 ! ================

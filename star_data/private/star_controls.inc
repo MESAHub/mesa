@@ -1324,7 +1324,7 @@
          character (len=strlen) :: zams_filename
          logical :: set_rho_to_dm_div_dV
          
-         logical :: use_d_eos_dxa
+         logical :: fix_d_eos_dxa_partials
 
          logical :: use_other_eos
          logical :: use_other_surface_PT
