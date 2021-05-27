@@ -134,6 +134,11 @@ criterion), as detailed in Section 2 of the MESA IV instrument paper
 
 This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre-main sequence to a white dwarf.
 
+:ref:`1M_thermohaline`
+^^^^^^^^^^^^^^^^^^^^^^
+
+The test checks thermohaline mixing in a rotating, 1 Msun, Z=0.02 metallicity model.
+
 
 
 :ref:`c13_pocket`
