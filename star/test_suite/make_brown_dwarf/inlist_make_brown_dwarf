@@ -36,8 +36,6 @@
 
    max_age = 2.0d10
    
-   report_eos_settings_at_start_of_run = .true.
-
    always_use_dedt_form_of_energy_eqn = .true.
 
    warning_limit_for_max_residual = 1d99   
