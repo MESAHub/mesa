@@ -49,7 +49,6 @@
       use_other_cgrav = .true. ! for GR factor with gravity
 
       max_age_in_seconds = 0.5d0 ! use max age to set thickness of he layer
-      scale_max_correction_for_negative_surf_lum = .true.           
       mass_change = 1d-9
       max_years_for_timestep = 1d-3
 
