@@ -416,11 +416,11 @@
          L_surf = s% L(1)
 
          if (s% RSP_flag) then
-            call set_phot_info(s) ! sets Teff using L_phot and R_phot
-            Teff = s% Teff
             lnT_surf = s% lnT(1)
             s% T_surf = s% T(1)
             s% P_surf = s% Peos(1)
+            call set_phot_info(s) ! sets Teff using L_phot and R_phot
+            Teff = s% Teff
             dlnT_dL = 0d0
             dlnT_dlnR = 0d0
             dlnT_dlnM = 0d0
