@@ -32,7 +32,7 @@ ax.set_xlim(Xran.min(), Xran.max())
 ax.set_ylim(Yran.min(), Yran.max())
 
 # set up color map
-cmap = mpl.cm.get_cmap("Greens")
+cmap = mpl.cm.get_cmap("Set2")
 bounds = [-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5]
 norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
