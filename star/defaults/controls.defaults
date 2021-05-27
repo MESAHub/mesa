@@ -11323,7 +11323,6 @@
 
       ! ::
 
-    use_other_eos = .false.
     use_other_kap = .false.
     use_other_diffusion = .false.
     use_other_mlt_results = .false.

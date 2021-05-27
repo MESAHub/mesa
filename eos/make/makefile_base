@@ -39,7 +39,8 @@ SRCS = \
    eosde_eval.f90 \
    eos_ctrls_io.f90 \
    eos_initialize.f90 \
-   eos_lib.f90
+   eos_lib.f90 \
+   other_eos.f90
 
 #################################################################
 #
@@ -84,7 +85,10 @@ nodeps : $(.DEFAULT_GOAL)
 MOD_DEFAULTS_DIR = $(MODULE_DIR)/defaults
 INCLUDE_DEFAULTS = -I$(MOD_DEFAULTS_DIR)
 
-MOD_INCLUDES = $(INCLUDE_DEFAULTS)
+MOD_OTHER_DIR = $(MODULE_DIR)/other
+INCLUDE_OTHER = -I$(MOD_OTHER_DIR)
+
+MOD_INCLUDES = $(INCLUDE_DEFAULTS) $(INCLUDE_OTHER)
 
 COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(MOD_INCLUDES)
 #COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(MOD_INCLUDES)
@@ -121,7 +125,7 @@ endif
 #
 # DEPENDENCIES
 
-SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):$(MOD_OTHER_DIR)
 
 vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)

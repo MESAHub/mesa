@@ -284,6 +284,32 @@
    tiny_fuzz = 1d-6
 
 
+! Other EOS controls
+! ------------------
+
+   ! use_other_eos_component
+   ! ~~~~~~~~~~~~~~~~~~~~~~~
+   ! Select whether to use the other (i.e., user-provided) EOS component.
+   ! If true, the user must provide the routines
+   ! ``other_eos_component`` and ``other_eos_frac``.
+   ! See ``eos/other/other_eos.f90`` for more details.
+   ! ::
+
+   use_other_eos_component = .false.
+
+
+   ! use_other_eos_results
+   ! ~~~~~~~~~~~~~~~~~~~~~
+   ! Select whether to call the other_eos_results hook.  This provides
+   ! an opportunity for the user to modify the results from the EOS right
+   ! before they are returned. If true, the user must provide the routine
+   ! ``other_eos_results``.
+   ! See ``eos/other/other_eos.f90`` for more details.
+   ! ::
+
+   use_other_eos_results = .false.
+
+
 ! Debugging controls
 ! ------------------
 ! ::

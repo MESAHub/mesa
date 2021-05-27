@@ -1,10 +1,25 @@
 .. _list-otherhooks:
 
-Other hooks
-===========
+eos hooks
+=========
 
-There are many hooks in star.  Code location indicates the file in
-``star/private`` where the hook is called.
+For details of the eos hooks, see ``eos/other``.    Code location
+indicates the file in ``eos/private`` where the hook is called.
+
+===============================  =============
+Hook name                        Code Location
+===============================  =============
+other_eos_frac                   eosdt_eval
+other_eos_component              eosdt_eval
+other_eos_results                eosdt_eval
+===============================  =============
+
+
+star hooks
+==========
+
+There are many hooks in star (see ``star/other``).  Code location
+indicates the file in ``star/private`` where the hook is called.
 
 Equations
 ---------
@@ -27,16 +42,6 @@ atm
 Hook name                        Code Location
 ===============================  =============
 other_surface_pt                 hydro_vars
-===============================  =============
-
-eos
----
-===============================  =============
-Hook name                        Code Location
-===============================  =============
-other_eosDT_get                  eos_support
-other_eosDT_get_T
-other_eosDT_get_Rho
 ===============================  =============
 
 kap
