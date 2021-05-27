@@ -93,7 +93,6 @@ SRCS = \
    other_diffusion_coefficients.f90 \
    other_diffusion.f90 \
    other_diffusion_factor.f90 \
-   other_eos.f90 \
    other_kap.f90 \
    other_eps_grav.f90 \
    other_overshooting_scheme.f90 \

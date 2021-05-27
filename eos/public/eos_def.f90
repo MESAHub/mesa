@@ -31,7 +31,64 @@
       
       implicit none
   
-  
+      ! interfaces for procedure pointers
+      abstract interface
+
+         subroutine other_eos_frac_interface( &
+            handle, &
+            species, chem_id, net_iso, xa, &
+            Rho, logRho, T, logT, &
+            frac, dfrac_dlogRho, dfrac_dlogT, &
+            ierr)
+            use const_def, only: dp
+            integer, intent(in) :: handle ! eos handle
+            integer, intent(in) :: species
+            integer, pointer :: chem_id(:) ! maps species to chem id
+            ! index from 1 to species
+            ! value is between 1 and num_chem_isos
+            integer, pointer :: net_iso(:) ! maps chem id to species number
+            ! index from 1 to num_chem_isos (defined in chem_def)
+            ! value is 0 if the iso is not in the current net
+            ! else is value between 1 and number of species in current net
+            real(dp), intent(in) :: xa(:) ! mass fractions
+
+            real(dp), intent(in) :: Rho, logRho ! the density
+            real(dp), intent(in) :: T, logT ! the temperature
+
+            real(dp), intent(out) :: frac ! fraction of other_eos to use
+            real(dp), intent(out) :: dfrac_dlogRho ! its partial derivative at constant T
+            real(dp), intent(out) :: dfrac_dlogT   ! its partial derivative at constant Rho
+
+            integer, intent(out) :: ierr ! 0 means AOK.
+         end subroutine other_eos_frac_interface
+
+         subroutine other_eos_interface( &
+            handle, &
+            species, chem_id, net_iso, xa, &
+            Rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: handle
+
+            integer, intent(in) :: species
+            integer, pointer :: chem_id(:) ! maps species to chem id
+            integer, pointer :: net_iso(:) ! maps chem id to species number
+            real(dp), intent(in) :: xa(:) ! mass fractions
+
+            real(dp), intent(in) :: Rho, logRho ! the density
+            real(dp), intent(in) :: T, logT ! the temperature
+
+            real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_basic_results,species)
+
+            integer, intent(out) :: ierr ! 0 means AOK.
+         end subroutine other_eos_interface
+
+      end interface
+
+
       logical, parameter :: show_allocations = .false.  ! for debugging memory usage
       integer, parameter :: eos_name_length = 20 ! String length for storing EOS variable names
  
@@ -252,6 +309,16 @@
 
          logical :: okay_to_convert_ierr_to_skip
          
+         ! other eos
+         logical :: use_other_eos_component
+         procedure (other_eos_frac_interface), pointer, nopass :: &
+         other_eos_frac => null()
+         procedure (other_eos_interface), pointer, nopass :: &
+            other_eos_component => null()
+         logical :: use_other_eos_results
+         procedure (other_eos_interface), pointer, nopass :: &
+            other_eos_results => null()
+         
          ! debugging
          logical :: dbg
          real(dp) :: logT_lo, logT_hi
@@ -454,6 +521,7 @@
 
 
       subroutine init_eos_handle_data(handle)
+         use other_eos
          use math_lib
          integer, intent(in) :: handle
          type (EoS_General_Info), pointer :: rq
@@ -461,6 +529,11 @@
          rq => eos_handles(handle)
          rq% in_use = .true.
          rq% handle = handle
+
+         rq% other_eos_frac => null_other_eos_frac
+         rq% other_eos_component => null_other_eos_component
+         rq% other_eos_results => null_other_eos_results
+         
       end subroutine init_eos_handle_data
             
       

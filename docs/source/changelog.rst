@@ -20,6 +20,8 @@ Removed option `semiconvection_upper_limit_center_h1`. This can be implemented b
 
 Removed profile columns `total_energy` and `total_energy_integral`.
 
+The ``other_eos`` hooks have been removed from star.  See the ``eos`` section for information about their replacements.
+
 
 .. _Module-level changes dev:
 
@@ -95,6 +97,36 @@ to
 
     subroutine get_some_freq_corr(...,
           nl, obs, sigma, freq, freq_corr, inertia)
+
+
+eos
+~~~
+
+There are new module-level eos hooks (see ``eos/other``) that replace
+the star-level eos hooks (previously in ``star/other``).  Usage of
+these hooks is similar to hooks in star.  However, the relevant
+procedure pointer is part of the ``EOS_General_Info`` structure and
+not the ``star_info`` structure.  Therefore, in ``extras_controls``,
+the procedure pointer statement should look like ``s% eos_rq %
+other_eos_results => my_other_eos_results``.  The boolean option
+``use_other_eos_results`` controlling whether to use the hook is part
+of the ``eos`` namelist rather than ``controls``.
+
+The hook ``other_eos_component`` allows the user to replace all or
+part of the MESA EOS by providing a new component EOS and to control
+the location of the blends between this and the other component EOSes.
+It is controlled by the option ``use_other_eos_component``.  The
+user-provided routine must return a complete set of EOS results.  This
+EOS component has the highest priority in the blend.  This hook
+should be used along with the hook ``other_eos_frac``, which defines
+the region over to use ``other_eos_component``.
+
+The hook ``other_eos_results`` allows the user to modify the results
+returned by the EOS.  The user-provided routine receives the results
+from the EOS right before they are returned, after all components have
+been evaluated.  This allows the user make minor modifications to the
+results fro the existing EOS without having to provide a full replacement.
+
 
 kap
 ~~~

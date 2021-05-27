@@ -455,7 +455,6 @@
          use other_photo_write, only: default_other_photo_write
          use other_photo_read, only: default_other_photo_read
          use other_set_pgstar_controls, only: default_other_set_pgstar_controls
-         use other_eos
          use other_kap
          use pgstar_decorator
          use star_utils, only: init_random
@@ -613,10 +612,6 @@
          s% other_rsp_build_model => null_other_rsp_build_model
          s% other_rsp_linear_analysis => null_other_rsp_linear_analysis
          s% other_gradr_factor => null_other_gradr_factor
-
-         s% other_eosDT_get => null_other_eosDT_get
-         s% other_eosDT_get_T => null_other_eosDT_get_T
-         s% other_eosDT_get_Rho => null_other_eosDT_get_Rho
 
          s% other_kap_get => null_other_kap_get
          s% other_kap_get_op_mono => null_other_kap_get_op_mono
