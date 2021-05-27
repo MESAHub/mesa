@@ -4,14 +4,10 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      load_model_filename = '5M_cepheid_blue_loop.mod' ! final.mod from 5M_cepheid_blue_loop test case
+      load_model_filename = 'rsg_21M.mod'  ! from RSP2 test case
 
       save_model_when_terminate = .true.
       save_model_filename = 'to_instability.mod'
-
-      
-      set_to_this_tau_factor = 1d-1 ! 1d-3
-      set_tau_factor = .true.
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -24,35 +20,23 @@
 
       !pgstar_flag = .true.
 
-
 / ! end of star_job namelist
 
-
 &eos
-   !dbg = .true.
-   logT_lo = 8.30088
-   logT_hi = 8.30089
+   use_Skye = .true.
 / !end of eos namelist
 
-
 &kap
-      Zbase = 0.004
-
+      Zbase = 0.02
       kap_file_prefix = 'gs98'
       use_Type2_opacities = .true.
-
 / ! end of kap namelist
 
 &controls
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 2500
-
-      calculate_Brunt_N2 = .true.
-
-      limit_for_rel_error_in_energy_conservation = 1d-5
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
-  
+      max_model_number = 20
+      
       ! GYRE output controls
 
       x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
@@ -64,51 +48,20 @@
       x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
          ! should match gyre.in mode l
       x_integer_ctrl(4) = 1 ! order
-      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      x_ctrl(2) = 0.33d+03 ! growth < this (days)
+      x_ctrl(1) = 0.2323E-07 ! freq ~ this (Hz)
+      x_ctrl(2) = 15d+03 ! growth < this (days)
 
       use_dedt_form_of_energy_eqn = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
-         
-
-      Teff_lower_limit = 5100 
-      when_to_stop_rtol = 1d-2
-      when_to_stop_atol = 1d-99
-
-! mixing controls
-      mixing_length_alpha = 1.73
-
-      overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'any'
-      overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'any'
-      overshoot_f(1) = 0.014
-      overshoot_f0(1) = 0.004
-
-     
-! mass loss       
-      cool_wind_full_on_T = 9.99d9
-      hot_wind_full_on_T = 1d10
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5d0  
-      Blocker_scaling_factor = 0.0003d0  
-
-! mesh controls
-
-! timestep controls   
-      varcontrol_target = 1d-4
 
 ! output controls
-
-      photo_interval = 50
+      photo_interval = 10
       profile_interval = 100
       history_interval = 10
-      terminal_interval = 10
+      terminal_interval = 2
       write_header_frequency = 10
 
 / ! end of controls namelist

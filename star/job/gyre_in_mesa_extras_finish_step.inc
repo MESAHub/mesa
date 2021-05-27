@@ -58,8 +58,8 @@
        
        if (growth_lim > 0d0) then
           write(*, 100) 'model', 'order', 'freq (Hz)', &
-             'P (sec)', 'P (day)', 'growth', 'cycles to double'
-100       format(2A8,9A20)
+             'P (sec)', 'P (day)', 'growth (day)', 'growth', 'cycles to double'
+100       format(2A8,99A20)
        else
           write(*, 101) 'model', 'order', 'freq (Hz)', &
              'P (sec)', 'P (day)'
@@ -118,11 +118,10 @@
       if (growth_lim > 0d0) then ! report growth
          if (growth > 0d0) then ! unstable
             period = 1d0/freq ! in seconds
-            !write(*, 100) 'model', 'order', 'freq (Hz)', &
-            !   'P (sec)', 'P (day)', 'growth (day)', 'cycles to double'
             write(*, 100) model_number, md%n_pg, &
-               freq, period, period/(24*3600), (2d0*pi*growth)/freq, freq/(2d0*pi*growth)
-100         format(2I8,E20.4,4F20.4)
+               freq, period, period/(24*3600), 1d0/(2*pi*24*3600*AIMAG(cfreq)), &
+               (2d0*pi*growth)/freq, freq/(2d0*pi*growth)
+100         format(2I8,E20.4,5F20.4)
             if (freq_okay .and. growth < growth_lim) & ! .and. md%n_pg == order_target) &
                write(*,*) 'matched target frequency'
          else ! stable
