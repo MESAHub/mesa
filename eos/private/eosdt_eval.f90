@@ -39,23 +39,6 @@
 
       logical, parameter :: return_ierr_beyond_table_bounds = .true.
 
-      integer, parameter :: i_doing_Rho = 1
-      integer, parameter :: i_which_other = 2
-      integer, parameter :: i_handle = 3
-      integer, parameter :: i_count = 4
-      integer, parameter :: i_species = 5
-      integer, parameter :: eos_lipar = 5
-
-      integer, parameter :: r_other_value = 1
-      integer, parameter :: r_Z = 2
-      integer, parameter :: r_X = 3
-      integer, parameter :: r_abar = 4
-      integer, parameter :: r_zbar = 5
-      integer, parameter :: r_rho = 6
-      integer, parameter :: r_T = 7
-      integer, parameter :: r_the_other_log = 8
-      integer, parameter :: eos_lrpar = 8      
-
       integer, parameter :: use_none = 1
       integer, parameter :: use_all = 2
       integer, parameter :: blend_in_x = 3
