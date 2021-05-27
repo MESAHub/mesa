@@ -3,7 +3,7 @@
 &star_job   
    set_initial_dt = .true.
    seconds_for_initial_dt = 1d4 ! start at ~ max/10
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 / ! end of star_job namelist
 
 &eos

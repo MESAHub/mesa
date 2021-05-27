@@ -237,7 +237,7 @@
             prev_KE_max = KE_max
             prev_delta_R = period_delta_R
             !                 1       2       3         4       5        6       7          8        9   
-            write(*,'(i4,a14,i6,a13,f8.3,a13,f9.3,a9,f9.4,a15,f9.4,a13,f9.4,a13,f10.4,a11,f9.4,a13,f9.4)')  &
+            write(*,'(i4,a14,i6,a13,f8.3,a13,f9.3,a9,f9.4,a15,f10.4,a13,f9.4,a13,f10.4,a11,f9.4,a13,f9.4)')  &
                num_periods, &
                'steps/cycle', s% model_number - run_num_steps_end_prev, &              ! 1   a14,i6
                'iters/step',  &
@@ -245,7 +245,7 @@
                   dble(s% model_number - run_num_steps_end_prev), &                    ! 2   a13,f8.3
                'period (d)', period/(24*3600), &                                       ! 3   a13,f9.3
                'growth', delta_R_growth_avg, &                                         ! 4   a9,f9.4
-               'delta R/Rsun', period_delta_R/Rsun, &                                  ! 5   a15,f9.4
+               'delta R/Rsun', period_delta_R/Rsun, &                                  ! 5   a15,f10.4
                'delta logL', period_delta_logL, &                                      ! 6   a13,f9.4
                'delta Teff', period_delta_Teff, &                                      ! 7   a13,f10.4
                'max v/cs', period_max_v_div_cs, &                                      ! 8   a11,f9.4
