@@ -47,13 +47,16 @@ module skye
          bounds(1,1) = ht% logdlo
          bounds(1,2) = ht% logthi
 
-         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~1)
+         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~1).
+         ! We put a lower bound of logT=7.3 to ensure that solar models never use Skye.
+         ! This is because the blend even in regions that are 99+% ionized produces noticeable
+         ! kinks in the sound speed profile on a scale testable by the observations.
          bounds(2,1) = ht% logdlo
-         bounds(2,2) = max(6d0,log10(1d5 * pow2(zbar))) + skye_blend_width
+         bounds(2,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
          bounds(3,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
-         bounds(3,2) = max(6d0,log10(1d5 * pow2(zbar))) + skye_blend_width
+         bounds(3,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! HELM low-T bound
          bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
