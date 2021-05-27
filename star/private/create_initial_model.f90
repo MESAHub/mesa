@@ -475,7 +475,8 @@
 
          real(dp) :: logT_result,log10Rho,dlnRho_dlnPgas_const_T,dlnRho_dlnT_const_Pgas
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dabar_const_TRho, d_dzbar_const_TRho
+            res, d_dlnRho_const_T, d_dlnT_const_Rho
+         real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa_const_TRho
          integer, parameter :: max_iter = 100
          integer :: eos_calls,ierr
          real(dp), parameter :: logT_tol = 1.d-6, other_tol = 1.d-6, logT_guess = 4.d0, &
@@ -483,14 +484,14 @@
             other_at_bnd1= arg_not_provided, other_at_bnd2= arg_not_provided
 
          call eosPT_get_T( &
-            eos_handle, Z, X, abar, zbar, &
+            eos_handle, &
             species, chem_id, net_iso, xa, &
             log10(P), i_lnS, log(S), &
             logT_tol, other_tol, max_iter, logT_guess, &
             logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
             logT_result, rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
             res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-            d_dabar_const_TRho, d_dzbar_const_TRho, &
+            d_dxa_const_TRho, &
             eos_calls, ierr)
          if (ierr /=0) then
             print *,"failure in eosPT_get_T"

@@ -259,83 +259,85 @@
       
       ! the following routine uses gas pressure and temperature as input variables
       subroutine eosPT_get( &
-               handle, Z, X, abar, zbar, &
+               handle, &
                species, chem_id, net_iso, xa, &
                Pgas, log10Pgas, T, log10T, &
                Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
                res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-               !ierr)
-               d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
+               d_dxa_const_TRho, ierr)
 
+         use chem_lib, only: basic_composition_info
          use eos_def
          use eosPT_eval, only: Get_eosPT_Results
 
          ! INPUT
-         
+
          integer, intent(in) :: handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar
-            ! mean atomic number (nucleons per nucleus; grams per mole)
-         real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
+            ! value is between 1 and num_chem_isos
          integer, pointer :: net_iso(:) ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
          real(dp), intent(in) :: xa(:) ! mass fractions
-         
+
          real(dp), intent(in) :: Pgas, log10Pgas ! the gas pressure
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
             ! "arg_not_provided" is defined in mesa const_def
-            
+
          real(dp), intent(in) :: T, log10T ! the temperature
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
-                     
+
          ! OUTPUT
-         
+
          real(dp), intent(out) :: Rho, log10Rho ! density
          real(dp), intent(out) :: dlnRho_dlnPgas_const_T
          real(dp), intent(out) :: dlnRho_dlnT_const_Pgas
-         
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         
-         ! partial derivatives of the basic results
-         
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
-         ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
-         ! d_dlnT(i) = d(res(i))/dlnT|Rho,X where X = composition
 
-         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-         ! d_dabar(i) = d(res(i))/dabar|TRho,zbar
-         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
-         ! d_dzbar(i) = d(res(i))/dzbar|TRho,abar
-         
+         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+
+         ! partial derivatives of the basic results
+
+         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
+         ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
+         ! d_dlnT_const_Rho(i) = d(res(i))/dlnT|Rho,X where X = composition
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
+         ! d_dxa_const_TRho(i) = d(res(i))/X|T,Rho,X where X = composition
+
+         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+
          integer, intent(out) :: ierr ! 0 means AOK.
-         
+
          type (EoS_General_Info), pointer :: rq
+
+         real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+
          call get_eos_ptr(handle,rq,ierr)
          if (ierr /= 0) then
             write(*,*) 'invalid handle for eos -- did you call alloc_eos_handle?'
             return
          end if
+
+         call basic_composition_info( &
+            species, chem_id, xa, X, Y, Z, &
+            abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
+
+         allocate(d_dxa_eos(num_eos_basic_results, species))
+
          call Get_eosPT_Results( &
                   rq, Z, X, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   Pgas, log10Pgas, T, log10T, &
                   Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-                  res, d_dlnRho_const_T, d_dlnT_const_Rho, &
+                  res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_eos, &
                   ierr)
-         d_dzbar_const_TRho = 0
-         d_dabar_const_TRho = 0
-         
+         ! only return 1st two d_dxa results (lnE and lnPgas) to star
+         d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
+
       end subroutine eosPT_get
       
       
@@ -794,9 +796,9 @@
 
 
       ! eosPT search routines.  these use num_lib safe_root to find T or Pgas.
-      
+
       subroutine eosPT_get_T( &
-               handle, Z, X, abar, zbar, &
+               handle, &
                species, chem_id, net_iso, xa, &
                logPgas, which_other, other_value, &
                logT_tol, other_tol, max_iter, logT_guess, &
@@ -804,45 +806,39 @@
                logT_result, Rho, log10Rho, &
                dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
                res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-               d_dabar_const_TRho, d_dzbar_const_TRho, &
+               d_dxa_const_TRho, &
                eos_calls, ierr)
-     
+
          ! finds log10 T given values for gas pressure and 'other',
          ! and initial guess for temperature.
          ! does up to max_iter attempts until logT changes by less than tol.
-         
+
          ! 'other' can be any of the basic result variables for the eos
          ! specify 'which_other' by means of the definitions in eos_def (e.g., i_lnE)
 
+         use chem_lib, only: basic_composition_info
          use eos_def
          use eosPT_eval, only : get_T
-         
+
          integer, intent(in) :: handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar
-            ! mean atomic number (nucleons per nucleus; grams per mole)
-         real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
+            ! value is between 1 and num_chem_isos
          integer, pointer :: net_iso(:) ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
          real(dp), intent(in) :: xa(:) ! mass fractions
-         
+
          real(dp), intent(in) :: logPgas ! log10 of gas pressure
          integer, intent(in) :: which_other ! from eos_def.  e.g., i_lnE
          real(dp), intent(in) :: other_value ! desired value for the other variable
          real(dp), intent(in) :: other_tol
-         
+
          real(dp), intent(in) :: logT_tol
-         integer, intent(in) :: max_iter ! max number of iterations        
+         integer, intent(in) :: max_iter ! max number of iterations
 
          real(dp), intent(in) :: logT_guess ! log10 of temperature
          real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
@@ -858,12 +854,21 @@
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
-         
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
+         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
-         
+
+         ! compute composition info
+         real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+
+         call basic_composition_info( &
+            species, chem_id, xa, X, Y, Z, &
+            abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
+
+         allocate(d_dxa_eos(num_eos_basic_results, species))
+
          call get_T( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
@@ -871,10 +876,12 @@
                logT_tol, other_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2,  other_at_bnd1, other_at_bnd2, &
                logT_result, Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, &
+               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, &
                eos_calls, ierr)
-         d_dzbar_const_TRho = 0
-         d_dabar_const_TRho = 0
+         ! only return 1st two d_dxa results (lnE and lnPgas) to star
+         d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
+
+         deallocate(d_dxa_eos)
 
       end subroutine eosPT_get_T
       
