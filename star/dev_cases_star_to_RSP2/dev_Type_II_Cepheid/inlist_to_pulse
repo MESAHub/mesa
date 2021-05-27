@@ -15,7 +15,7 @@
 
    !log_L_upper_limit = 5.04
    !max_model_number = 851          ! comment out on 1st pass when searching for best
-   log_Teff_upper_limit = 3.80
+   log_Teff_upper_limit = 3.78
    when_to_stop_rtol = 1d-4
    when_to_stop_atol = 1d-4
    

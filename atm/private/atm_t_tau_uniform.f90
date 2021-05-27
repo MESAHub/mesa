@@ -59,7 +59,7 @@ contains
        ierr)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface
-    use atm_utils, only: eval_Teff_g
+    use atm_utils, only: eval_g
     use eos_def, only: num_eos_basic_results, i_chiRho, i_chiT
 
     real(dp), intent(in)       :: tau_surf
@@ -75,7 +75,7 @@ contains
     real(dp), intent(in)       :: errtol
     integer, intent(in)        :: max_iters
     logical, intent(in)        :: skip_partials
-    real(dp), intent(out)      :: Teff
+    real(dp), intent(in)       :: Teff
     real(dp), intent(out)      :: kap
     real(dp), intent(out)      :: lnT
     real(dp), intent(out)      :: dlnT_dL
@@ -124,7 +124,7 @@ contains
 
     ! Evaluate the effective temperature & gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    call eval_g(L, R, M, cgrav, g)
 
     ! Evaluate atmosphere data at optical depth tau_surf,
     ! using kap_guess as the opacity
@@ -268,7 +268,7 @@ contains
        ierr)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface, num_results_for_build_atm
-    use atm_utils, only: eval_Teff_g
+    use atm_utils, only: eval_g
     use num_lib, only: dopri5_work_sizes, dopri5
 
     real(dp), intent(in)      :: tau_surf
@@ -328,7 +328,7 @@ contains
 
     ! Evaluate the effective temperature & gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    call eval_g(L, R, M, cgrav, g)
 
     ! Allocte atm_structure at its initial size
 

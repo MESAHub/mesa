@@ -73,29 +73,29 @@
 
  test_T_tau_uniform: fixed
                                  atm_get_grey logP surf    6.7470155156147209D+00
-                                 atm_get_grey logT surf    3.9498247208431012D+00
+                                 atm_get_grey logT surf    4.2311139224688787D+00
                                   atm_get_grey tau_phot    1.0000000000000000D+02
 
 
  test_T_tau_uniform: iterated
-                                 atm_get_grey logP surf    4.7483690740375692D+00
-                                 atm_get_grey logT surf    4.2748967954324364D+00
+                                 atm_get_grey logP surf    4.7483690740375719D+00
+                                 atm_get_grey logT surf    4.2748967954324373D+00
                                   atm_get_grey tau_phot    1.5000000000000000D+02
 
 
  test_irradiated
 
-                              test_grey_irradiated: kap    4.3649748642304882D-03
+                              test_grey_irradiated: kap    2.2020573493478370D+01
                                             M/M_jupiter    1.4999999999999998D+00
                                             R/R_jupiter    1.5743735095633800D+00
                                                  R/Rsun    1.6178684913857289D-01
                                                   kap_v    4.0000000000000001D-03
                                                       P    1.0000000000000000D+06
 
-                                                    tau    2.9101126947637423D+00
-                                                   Teff    8.9999999999999932D+02
+                                                    tau    1.4680368036578231D+04
+                                                   Teff    5.7759999999999891D+03
                                                    T_eq    1.0000000000000000D+03
                                                   T_int    9.0000000000000000D+02
-                                                      T    1.2929349604416070D+03
-                                                   logT    3.1115766787614829D+00
+                                                      T    5.9170498205895266D+04
+                                                   logT    4.7721052259807522D+00
 

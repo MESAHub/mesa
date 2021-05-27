@@ -1032,6 +1032,41 @@
          Hp_cell = 0.5d0*(wrap_Hp_00(s,k) + wrap_Hp_p1(s,k))
       end function wrap_Hp_cell
       
+   
+      function Hp_cell_for_Chi(s, k, ierr) result(Hp_cell) ! cm
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Hp_cell
+         type(auto_diff_real_star_order1) :: &
+            rho_face, area, dlnPeos, &
+            r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
+            d_face, Peos_face, alt_Hp_cell, A
+         real(dp) :: alfa, beta
+         integer :: j
+         include 'formats'         
+         ierr = 0
+         
+         Hp_cell = wrap_Hp_cell(s, k)
+         return
+         
+         d_00 = wrap_d_00(s, k)
+         Peos_00 = wrap_Peos_00(s, k)
+         if (k <= s% nz) then
+            rmid = 
+            mmid = 
+            cgrav_mid = 
+         else
+            rmid = 
+            mmid = 
+            cgrav_mid = 
+         end if
+         Hp_cell = pow2(rmid*Peos_00/(rho_00*cgrav_mid*mmid)
+         if (s% alt_scale_height_flag) then
+            stop 'Hp_cell_for_Chi: cannot use alt_scale_height_flag'
+         end if
+      end function Hp_cell_for_Chi
+      
       
       function compute_Chi_cell(s, k, ierr) result(Chi_cell) 
          ! eddy viscosity energy (Kuhfuss 1986) [erg]
@@ -1054,7 +1089,8 @@
                s% Chi_ad(k) = 0d0
             end if
          else
-            Hp_cell = wrap_Hp_cell(s, k)
+            Hp_cell = Hp_cell_for_Chi(s, k, ierr)
+            if (ierr /= 0) return
             d_v_div_r = compute_d_v_div_r(s, k, ierr)
             if (ierr /= 0) return
             w_00 = wrap_w_00(s,k)

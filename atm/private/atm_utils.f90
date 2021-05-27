@@ -53,7 +53,7 @@ module atm_utils
 
   public :: init
   public :: shutdown
-  public :: eval_Teff_g
+  public :: eval_g
   public :: eval_Paczynski_gradr
   public :: eval_E2
 
@@ -91,22 +91,17 @@ contains
 
   !****
 
-  subroutine eval_Teff_g(L, R, M, cgrav, Teff, g)
+  subroutine eval_g(L, R, M, cgrav, g)
 
     real(dp), intent(in)  :: L
     real(dp), intent(in)  :: R
     real(dp), intent(in)  :: M
     real(dp), intent(in)  :: cgrav
-    real(dp), intent(out) :: Teff
     real(dp), intent(out) :: g
-
-    ! Evaluate the effective temperature and surface gravity
-
-    Teff = pow(L/(4._dp*pi*R*R*boltz_sigma), 0.25_dp)
    
     g = cgrav * M / (R*R)
 
-  end subroutine eval_Teff_g
+  end subroutine eval_g
 
   !****
 

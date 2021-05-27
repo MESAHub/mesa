@@ -59,7 +59,7 @@ contains
        ierr)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface
-    use atm_utils, only: eval_Teff_g
+    use atm_utils, only: eval_g
 
     real(dp), intent(in)       :: tau_surf
     real(dp), intent(in)       :: L
@@ -72,7 +72,7 @@ contains
     real(dp), intent(in)       :: errtol
     integer, intent(in)        :: max_steps
     logical, intent(in)        :: skip_partials
-    real(dp), intent(out)      :: Teff
+    real(dp), intent(in)       :: Teff
     real(dp), intent(out)      :: lnT
     real(dp), intent(out)      :: dlnT_dL
     real(dp), intent(out)      :: dlnT_dlnR
@@ -113,7 +113,7 @@ contains
 
     ! Evaluate the effective temperature & gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    call eval_g(L, R, M, cgrav, g)
 
     ! Perform the necessary evaluations
 
@@ -522,7 +522,7 @@ contains
        ierr)
 
     use atm_def
-    use atm_utils, only: eval_Teff_g
+    use atm_utils, only: eval_g
     use num_lib, only: dopri5_work_sizes, dopri5
 
     real(dp), intent(in)      :: tau_surf
@@ -586,7 +586,7 @@ contains
 
     ! Evaluate the effective temperature & gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    call eval_g(L, R, M, cgrav, g)
 
     ! Allocte atm_structure at its initial size
 

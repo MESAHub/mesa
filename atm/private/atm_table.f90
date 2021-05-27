@@ -56,7 +56,7 @@ contains
        ierr)
 
     use atm_def
-    use atm_utils, only: eval_Teff_g
+    use atm_utils, only: eval_g
     use eos_lib, only: radiation_pressure
     use table_atm, only: get_table_values
     use utils_lib, only: is_bad
@@ -68,7 +68,7 @@ contains
     integer, intent(in)   :: id
     real(dp), intent(in)  :: Z
     logical, intent(in)   :: skip_partials
-    real(dp), intent(out) :: Teff
+    real(dp), intent(in)  :: Teff
     real(dp), intent(out) :: lnT
     real(dp), intent(out) :: dlnT_dL
     real(dp), intent(out) :: dlnT_dlnR
@@ -122,7 +122,7 @@ contains
 
     ! Evaluate the effective temperature & gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    call eval_g(L, R, M, cgrav, g)
 
     logg = log10(g)
 
@@ -218,7 +218,7 @@ contains
        L, R, M, cgrav, id, alfa, beta, ierr)
 
     use atm_def
-    use atm_utils, only: eval_Teff_g
+    use atm_utils, only: eval_g
     use table_atm, only: &
          ai_two_thirds, ai_100, ai_10, ai_1, ai_1m1, ai_wd_25, ai_db_wd_25
 
@@ -282,7 +282,7 @@ contains
 
     ! Evaluate the effective temperature & gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    call eval_g(L, R, M, cgrav, g)
 
     logTeff = log10(Teff)
     logg = log10(g)
