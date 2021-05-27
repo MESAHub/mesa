@@ -13,10 +13,15 @@
 / ! end of kap namelist
 
 &controls
-   star_mass_min_limit = 0.65
+   !xa_central_upper_limit_species(1) = 'c12'
+   !xa_central_upper_limit(1) = 0.01d0
+   log_Teff_upper_limit = 3.75
+   when_to_stop_rtol = 1d-4
+   when_to_stop_atol = 1d-4
 
 ! wind
-   mass_change = -2d-6
+   cool_wind_RGB_scheme = ''
+   cool_wind_AGB_scheme = ''
 
 ! output controls
    !photo_interval = 10
@@ -40,10 +45,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 3.6 ! -101 ! only used if > -100
-   HR_logT_max = 3.92 ! only used if > -100
+   HR_logT_min = 3.58 ! -101 ! only used if > -100
+   HR_logT_max = 3.9 ! only used if > -100
    HR_logL_min = 0 ! -101 ! only used if > -100
-   HR_logL_max = 4 ! -101 ! only used if > -100
+   HR_logL_max = 3.7 ! -101 ! only used if > -100
    
    show_HR_classical_instability_strip = .true.
 
