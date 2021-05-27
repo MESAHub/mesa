@@ -222,6 +222,13 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
          call store_extra_info(s)         
+
+         if (s% total_energy > 0) then
+            extras_finish_step = terminate
+            termination_code_str(t_xtra1) = 'Star is unbound'
+            s% termination_code = t_xtra1
+         end if
+
          if (.not. s% x_logical_ctrl(37)) return
          extras_finish_step = gyre_in_mesa_extras_finish_step(id)
          if (extras_finish_step == terminate) &

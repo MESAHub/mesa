@@ -1,3 +1,5 @@
+.. highlight:: console
+
 Just a Module 
 =============
 
@@ -11,7 +13,7 @@ This document describes how to use the MESA equation of state, opacity, and nucl
 1. Equation of State
 --------------------
 
-| Before starting, explore :ref:`Overview of eos module` and :ref:`eos module controls`.
+| Before starting, explore :ref:`eos/overview:Overview of eos module` and :ref:`eos/defaults:eos module controls`.
 | From where you unpacked the zip file
 
 ::
@@ -20,13 +22,14 @@ This document describes how to use the MESA equation of state, opacity, and nucl
    cp $MESA_DIR/eos/test/src/sample_eos.f90 .
 
 
-Edit sample_eos.f90 and change
+Edit sample_eos.f90 and change the variable 
+
 
 ::
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR or to a blank string (in which case your $MESA_DIR is automatically picked up)
+to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
 ::
 
@@ -39,71 +42,65 @@ Now take some time to explore the makefile, and use it to build the executable
 
      make
 
-Run the executable, named sample_eos
+Run the interactive executable, named sample_eos
 
 .. code-block:: console
 
  ./sample_eos
  loading eos tables
- call eosDT_get
 
-         temperature     0.200000000000E+09
-             density     0.100000000000E+03
-                   Z     0.200000000000E-01
-                   X     0.700000000000E+00
-                abar     0.129663534103E+01
-                zbar     0.110214003987E+01
-
-             logPgas     0.184308195086E+02
-             grad_ad     0.255246371899E+00
-                 c_P     0.920814743376E+10
+ give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>
+ hit return for T = 1e9 K, Rho = 1e9 g/cc, x(c12) = 1 ; enter -1 to stop
 
 
-         temperature     0.200000000000E+09
-             density     0.100000000856E+03
-                   Z     0.200000000000E-01
-                   X     0.700000000000E+00
-                abar     0.129663534103E+01
-                zbar     0.110214003987E+01
+ T     =  1.000000E+09 Rho   =  1.000000E+04 abar  =  1.200000E+01 zbar  =  6.000000E+00
+ h1    =  0.000000E+00 he4   =  0.000000E+00 c12   =  1.000000E+00 n14   =  0.000000E+00
+ o16   =  0.000000E+00 ne20  =  0.000000E+00 mg24  =  0.000000E+00
+  
+ quantity      value          d/d(Rho)       d/d(T)       d^2/d(Rho)^2   d^2/d(Rho)d(T) d^2/d(T)^2
+ p tot   =   3.033664E+21   4.616282E+16   1.098950E+13   7.389591E+11  -2.632100E+07   3.148155E+04
+ p gas   =   5.117530E+20   4.616282E+16   9.018528E+11   7.389591E+11  -2.632100E+07   1.218618E+03
+ p rad   =   2.521911E+21   0.000000E+00   1.008764E+13   0.000000E+00   0.000000E+00   3.026293E+04
 
-             logPgas     0.184308195123E+02
-             grad_ad     0.255246371971E+00
-                 c_P     0.920814731691E+10
+ e tot   =   8.606704E+17  -7.955833E+13   3.425527E+09   1.626134E+10  -3.604408E+05   1.309327E+01
+ e gas   =   1.040971E+17  -3.900997E+12   3.992340E+08   1.129877E+09  -5.781150E+04   4.014391E+00
+ e rad   =   7.565733E+17  -7.565733E+13   3.026293E+09   1.513147E+10  -3.026293E+05   9.078880E+00
+
+ s tot   =   1.476688E+09  -1.098950E+05   3.425527E+00   2.186704E+01  -3.604408E-04   9.667743E-09
+ s gas   =   4.679233E+08  -9.018528E+03   3.992340E-01   1.691755E+00  -5.781150E-05   3.615157E-09
+ s rad   =   1.008764E+09  -1.008764E+05   3.026293E+00   2.017529E+01  -3.026293E-04   6.052587E-09
+
+ n_ion   =   5.018451E+26   5.018451E+22   0.000000E+00
+ n_ele   =   3.200158E+27   2.870797E+23   1.414171E+18
+ eta_e   =  -4.182056E+00   9.451310E-05  -1.319764E-09
+ cv      =   3.425527E+09  -3.604408E+05   1.309327E+01
+ cp      =   2.958707E+10  -5.803942E+06   2.045230E+02
+ gamma_1 =   1.314315E+00   5.192048E-06  -3.807384E-10
+ gamma_2 =   1.322910E+00   9.783797E-07  -1.079536E-10
+ gamma_3 =   1.320812E+00   2.002091E-06  -1.740076E-10
+ grad_ad =   2.440906E-01   5.590452E-07  -6.168458E-11
+ chi_t   =   3.622516E+00  -5.143301E-05   2.381262E-09
+ chi_d   =   1.521685E-01   1.443976E-05  -5.143301E-10
+ c_sound =   6.310334E+08  -2.640054E+04   1.141379E+00
+
+ dsp   =  2.220446E-16 dpe   =  7.993606E-15 dsp   = -2.331468E-15
+
+ give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>
+ hit return for T = 1e9 K, Rho = 1e9 g/cc, x(c12) = 1 ; enter -1 to stop
+
+ -1
+ STOP normal termination
 
 
-For homework, edit sample_eos.f90 to write out the internal specific energy, specific entropy, partial derivative of 
-the specific energy with respect tp temperature, and the free electron degeneracy parameter. 
-It can be useful to look at the integer indices contained in $MESA_DIR/eos/public/eos_def.f90. One should find
-
-.. code-block:: console
-
- ./sample_eos
- loading eos tables
- call eosDT_get
-
-
-         temperature     0.200000000000E+09
-             density     0.100000000000E+03
-                   Z     0.200000000000E-01
-                   X     0.700000000000E+00
-                abar     0.129663534103E+01
-                zbar     0.110214003987E+01
-
-             logPgas     0.184308195086E+02
-             grad_ad     0.255246371899E+00
-                 c_P     0.920814743376E+10
-
-               log E     0.172104888232E+02
-               log S     0.941743030071E+01
-               dS/dT     0.131585149852E+02
-              etaele    -0.564766321638E+01
+For homework, edit sample_eos.f90 to write out :math:`\partial{T}/\partial{\rho}|_{S}`.
+As mentioned in sample_eos.f90, it can be useful to look at the integer indices contained in $MESA_DIR/eos/public/eos_def.f90. 
 
 
  
 2. Opacity 
 ----------
 
-| Before starting, explore :ref:`Overview of kap module` and :ref:`kap module controls`.
+| Before starting, explore :ref:`kap/overview:Overview of kap module` and :ref:`kap/defaults:kap module controls`.
 | From where you unpacked the zip file
 
 ::
@@ -113,13 +110,13 @@ It can be useful to look at the integer indices contained in $MESA_DIR/eos/publi
    cp $MESA_DIR/kap/test/sample_kap_agb.model .
 
 
-Edit sample_kap.f90 and change
+Edit sample_kap.f90 and change the variable 
 
 ::
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR or to a blank string (in which case your $MESA_DIR is automatically picked up)
+to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
 ::
 
@@ -132,7 +129,7 @@ Now take some time to explore the makefile, and use it to build the executable
 
      make
 
-Run the executable, named sample_kap
+Run the executable, named sample_kap, whoech reads a mesa model file and writes out the opacity and its derivatives at each cell
 
 .. code-block:: console
 
@@ -144,7 +141,7 @@ Run the executable, named sample_kap
 
  write kap_test.data
 
-Exlore the output with, for example, 
+Explore the output with, for example, 
 
 .. code-block:: console
 
@@ -160,7 +157,7 @@ Exlore the output with, for example,
 3. Nuclear Reaction Networks
 ----------------------------
 
-| Before starting, explore :ref:`Overview of net module` and :ref:`Reaction Networks`.
+| Before starting, explore :ref:`net/overview:Overview of net module` and :ref:`net/nets:Reaction Networks`.
 | From where you unpacked the zip file
 
 ::
@@ -169,17 +166,18 @@ Exlore the output with, for example,
    cp $MESA_DIR/net/test/src/sample_net.f90 .
 
 
-Edit sample_net.f90 and change
+Edit sample_net.f90 and change the variable 
 
 ::
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR or to a blank string (in which case your $MESA_DIR is automatically picked up)
+to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
 ::
 
   my_mesa_dir = ''
+
 
 while you are editing sample_net.f90, take some time to explore the source code. Save and exit sample_net.f90.
 Now take some time to explore the makefile, and use it to build the executable
@@ -188,31 +186,33 @@ Now take some time to explore the makefile, and use it to build the executable
 
      make
 
-Run the executable, named sample 
+Run the interactive executable, named sample_net
 
 .. code-block:: console
 
  ./sample_net 
- load basic.net
-                                                   logT    8.0000000000000000D+00
-                                                 logRho    6.0000000000000000D+00
-                                                eps_nuc    7.0567990734355760D+08
 
- 
+ load approx21.net
 
-For homework, edit sample_net.f90 to write out the initial composition and the net neutrino loss rate.
-One should find
+ give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>
+ hit return for T = 1e9 K, Rho = 1e4 g/cc, x(c12) = 1 ; enter -1 to stop
 
 
-.. code-block:: console
+ T     =  1.000000E+09 Rho   =  1.000000E+04 abar  =  1.200000E+01 zbar  =  6.000000E+00
+ h1    =  0.000000E+00 he4   =  0.000000E+00 c12   =  1.000000E+00 n14   =  0.000000E+00
+ o16   =  0.000000E+00 ne20  =  0.000000E+00 mg24  =  0.000000E+00
 
- ./sample_net
- load basic.net
- initial 1H     7.587664E-01
- initial 4He    2.395223E-01
- initial 24Mg   1.711250E-03
-                                                   logT    8.0000000000000000D+00
-                                                 logRho    6.0000000000000000D+00
-                                                eps_nuc    7.0567990734355760D+08
-                                                eps_neu    1.7599406836404651D+08
+ d(h1)/dt   =  0.000000E+00  d(he4)/dt  =  5.582829E-09    d(c12)/dt  = -3.349697E-08    d(n14)/dt  =  0.000000E+00
+ d(o16)/dt  =  0.000000E+00  d(ne20)/dt =  2.791414E-08    d(mg24)/dt =  0.000000E+00
+ 1 - sum    = -6.617445E-24
+ eps_nuc    =  6.217517E+09     erg/g/sec
+
+ give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>
+ hit return for T = 1e9 K, Rho = 1e4 g/cc, x(c12) = 1 ; enter -1 to stop
+
+ -1
+ STOP normal termination
+
+
+For homework, edit sample_net.f90 and change the network and associated write statements.
 

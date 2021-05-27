@@ -25,7 +25,13 @@ else
     cp agb.mod standard_agb.mod
 fi
 
-do_one inlist_c_burn_header c_burn.mod
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+    cp standard_c_burn.mod c_burn.mod
+else
+    do_one inlist_c_burn_header c_burn.mod
+    cp c_burn.mod standard_c_burn.mod
+fi
+
 do_one inlist_o_ne_wd_header o_ne_wd.mod
 do_one inlist_settle_envelope_header settled_envelope.mod
 

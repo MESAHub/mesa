@@ -57,6 +57,10 @@ html_static_path = ['_static']
 
 # -- Additional configuration ------------------------------------------------
 
+# Ensure that autosectionlabel will produce unique names
+autosectionlabel_prefix_document = True
+autosectionlabel_maxdepth = 3
+
 # sphinx_rtd options
 html_theme_options = {
     'collapse_navigation': True,

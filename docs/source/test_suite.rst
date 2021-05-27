@@ -1,3 +1,5 @@
+.. highlight:: console
+
 **********
 Test suite
 **********
@@ -87,6 +89,52 @@ these steps.
 
 Star tests
 ----------
+
+:ref:`1.3M_ms_high_Z`
+^^^^^^^^^^^^^^^^^^^^^
+
+The test checks the evolution of metal-rich low-mass stars by evolving 
+a 1.3 Msun, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
+
+:ref:`1.4M_ms_op_mono`
+^^^^^^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of OP mono opacities. 
+The test vehicle is a 1.4 Msun solar metallicity model.
+
+:ref:`1.5M_with_diffusion`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of element diffusion.
+The test vehicle is a 1.5 Msun solar metallicity model.
+
+:ref:`15M_dynamo`
+^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of element rotation in a 15 Msun solar metallicity model.
+
+:ref:`16M_conv_premix`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example re-creates the 16-solar mass main-sequence
+evolution with the inclusion of convective premixing (using the Ledoux
+criterion), as detailed in Section 5.3 of the MESA V instrument paper
+(Paxton et al 2019).
+
+:ref:`16M_predictive_mix`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example re-creates the 16-solar mass main-sequence
+evolution with the inclusion of predictive mixing (using the Ledoux
+criterion), as detailed in Section 2 of the MESA IV instrument paper
+(Paxton et al 2018).
+
+:ref:`1M_pre_ms_to_wd`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre-main sequence to a white dwarf.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^

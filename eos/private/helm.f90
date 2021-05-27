@@ -389,30 +389,28 @@
          
          skip_elec_pos = must_skip_elec_pos
          if (.not. skip_elec_pos) then ! see if need to set it true
-         
             if (temp < ht% templo) then
-               if (log10(din) > -5d0) then ! clip T so can keep elec_pos
-                  temp = ht% templo
-                  logtemp = log10(temp)
-               else
-                  skip_elec_pos = .true.
-               end if
+               ierr = 1
+               return
             end if
          
             if (din < ht% denlo) then
-               skip_elec_pos = .true.
+               ierr = 1
+               return
             end if
 
+            if (temp > ht% temphi) then            
+               ierr = 1
+               return
+            end if
+            
+            if (din > ht% denhi) then
+               ierr = 1
+               return
+            end if
          end if
 
-         if (temp > ht% temphi) then            
-            temp = ht% temphi
-            logtemp = ht% logthi
-         end if
-         
-         if (din > ht% denhi) then
-            din = ht% denhi
-         end if
+
          
          if (skip_elec_pos) then
             abar = 1d0 / (1/abar - Xfrac/2)

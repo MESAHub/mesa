@@ -14,7 +14,7 @@ assist you.
 
 Before modifying any source code in the main MESA directory, check if
 these changes cannot be applied locally in your work folder using the
-:ref:`hooks provided by MESA <Extending MESA>`. If you have a use
+:ref:`hooks provided by MESA <using_mesa/extending_mesa:Extending MESA>`. If you have a use
 case that cannot be completed with the provided set of hooks, you can
 always contact us to request a new one.
 
@@ -22,7 +22,7 @@ The MESA test suite (``star/test_suite`` and ``binary/test_suite``) is a
 valuable source of examples and a good first stop when setting up a new
 problem with MESA. Looking at the test suite inlists is a quick way to
 familiarize yourself with the set of options relevant to your problem.
-More information is available on :ref:`how to use a test suite case as a starting point for your own work directory <Test suite>`.
+More information is available on :ref:`how to use a test suite case as a starting point for your own work directory <test_suite:Test suite>`.
 
 You should always perform some sort of convergence study to ensure that
 your results are not sensitive to the time or mass resolution of your

@@ -569,6 +569,13 @@ contains
                   res, d_dlnd, d_dlnT, d_dxa, ierr)
          end if
 
+         if (ierr /= 0) then
+            call set_nan(res)
+            call set_nan(d_dlnd)
+            call set_nan(d_dlnT)
+            call set_nan(d_dxa)
+         end if
+
    end subroutine eos_call
 
 

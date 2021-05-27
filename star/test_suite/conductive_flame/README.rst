@@ -36,7 +36,7 @@ isobaric, propagates into the upstream fuel with a unique speed and
 width.  The test succeeds if the flame successfully propagates through
 half of the domain.
 
-.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000399.png
+.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000427.png
 
 .. |Timmes1992| replace:: `Timmes & Woosley (1992) <https://ui.adsabs.harvard.edu/abs/1992ApJ...396..649T/abstract>`__
 
@@ -45,5 +45,5 @@ half of the domain.
 .. |Schwab2020| replace:: `Schwab et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...891....5S/abstract>`__
 
 
-Last-Updated: 2019-11-16 (mesa r12307) by Josiah Schwab
+Last-Updated: 2021-05-25 (mesa 3ac9bd7d) by Josiah Schwab
 

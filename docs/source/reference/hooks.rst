@@ -35,11 +35,8 @@ eos
 Hook name                        Code Location
 ===============================  =============
 other_eosDT_get                  eos_support
-other_eosPT_get
-other_eosDT_get_T
 other_eosDT_get_T
 other_eosDT_get_Rho
-other_eosPT_get_Pgas_for_Rho
 ===============================  =============
 
 kap

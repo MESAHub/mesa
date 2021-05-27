@@ -16,6 +16,7 @@ module auto_diff_real_2var_order3_module
       operator(.ge.), &
       make_unop, &
       make_binop, &
+      sign, &
       safe_sqrt, &
       operator(-), &
       exp, &
@@ -138,6 +139,10 @@ module auto_diff_real_2var_order3_module
    interface make_binop
       module procedure make_binary_operator
    end interface make_binop
+   
+   interface sign
+      module procedure sign_self
+   end interface sign
    
    interface safe_sqrt
       module procedure safe_sqrt_self
@@ -732,6 +737,21 @@ module auto_diff_real_2var_order3_module
       binary%d1val1_d2val2 = 2.0_dp*q21*x%d1val1*y%d1val2 + 2.0_dp*q22*x%d1val2*y%d1val1 + q10*x%d1val1_d1val2 + q11*x%d2val2 + q14*x%d2val2 + q15*y%d2val2 + q18*q4 + q19*q6 + q19*q7 + q2*y%d2val2 + q23*x%d1val1 + q24*y%d1val1 + q8*x%d1val1*z_d3x + q9*y%d1val1*z_d3y + x%d1val1_d2val2*z_d1x + y%d1val1_d2val2*z_d1y
       binary%d3val2 = 3.0_dp*q23*x%d1val2 + 3.0_dp*q24*y%d1val2 + q25*q4 + q25*q5 + q26*q6 + q26*q7 + x%d3val2*z_d1x + y%d3val2*z_d1y + z_d3x*pow3(x%d1val2) + z_d3y*pow3(y%d1val2)
    end function make_binary_operator
+   
+   function sign_self(x) result(unary)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      type(auto_diff_real_2var_order3) :: unary
+      unary%val = sgn(x%val)
+      unary%d1val1 = 0.0_dp
+      unary%d1val2 = 0.0_dp
+      unary%d2val1 = 0.0_dp
+      unary%d1val1_d1val2 = 0.0_dp
+      unary%d2val2 = 0.0_dp
+      unary%d3val1 = 0.0_dp
+      unary%d2val1_d1val2 = 0.0_dp
+      unary%d1val1_d2val2 = 0.0_dp
+      unary%d3val2 = 0.0_dp
+   end function sign_self
    
    function safe_sqrt_self(x) result(unary)
       type(auto_diff_real_2var_order3), intent(in) :: x

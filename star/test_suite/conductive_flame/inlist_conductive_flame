@@ -29,17 +29,20 @@
 
 
 &eos
-   use_PC = .false.
-   !dbg = .true.
-   logT_lo = 8.30088
-   logT_hi = 8.30089
+
+    ! use HELM EOS
+      use_Skye = .false.
+      use_PC = .false.
+
 / !end of eos namelist
 
 
-
-
 &kap
+
+    ! specify base metallicity for Type2 opacities
+    ! unimportant since radiative opacities are irrelevant
       Zbase = 0.02
+
 / ! end of kap namelist
 
 &controls
@@ -75,14 +78,13 @@
       delta_lgTeff_limit = 1d99
       
 
-    ! specify base metallicity for opacities
-    ! unimportant since radiative opacities are irrelevant
-
     ! don't let convection operate
       mlt_option = 'none'
 
     ! meshing/timestep controls
       varcontrol_target = 1d-3
+      delta_lgT_limit = 0.1d0
+      delta_lgT_limit_min_lgT = 8d0
       T_function1_weight = 50
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3

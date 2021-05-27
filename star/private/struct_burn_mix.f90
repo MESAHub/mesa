@@ -1057,7 +1057,7 @@
          real(dp), target, dimension(4*num_times) :: log10Ts_ary, log10Rhos_ary, etas_ary
          real(dp), pointer, dimension(:) :: log10Ts_f1, log10Rhos_f1, etas_f1, &
             dxdt_source_term, times
-         logical :: okay_to_reuse_rate_screened, use_pivoting, trace, burn_dbg
+         logical :: use_pivoting, trace, burn_dbg
          
          include 'formats'
 
@@ -1096,7 +1096,6 @@
          use_pivoting = .false. ! .true.
          trace = .false.
          burn_dbg = .false.
-         okay_to_reuse_rate_screened = .false.
          starting_log10T = s% lnT(k)/ln10
          
          do i=1,species
@@ -1144,7 +1143,6 @@
                std_reaction_Qs, std_reaction_neuQs, &
                screening_mode,  &
                stptry, max_steps, eps, odescal, &
-               okay_to_reuse_rate_screened, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
                burn_lwork, burn_work, net_lwork, net_work, s% xa(1:species,k), &
                s% eps_nuc_categories(:,k), &
@@ -1160,7 +1158,7 @@
          num_iters_out = naccpt
          
          ! make extra call to get eps_nuc_categories
-         call do1_net(s, k, s% species, .false., s% num_reactions, &
+         call do1_net(s, k, s% species, s% num_reactions, &
             net_lwork, .false., ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &

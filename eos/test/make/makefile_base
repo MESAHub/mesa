@@ -71,7 +71,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-COMPILE = $(FCbasic) $(FCopenmp) $(FCopt) 
+COMPILE = $(FCbasic) $(FCopenmp) $(FCopt) $(FCfree)
 
 %.o: %.f90
 ifneq ($(QUIET),)

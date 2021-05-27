@@ -70,8 +70,11 @@
          use_Ledoux_criterion = .true.
          alpha_semiconvection = 4d-2
                   
-         thermohaline_coeff = 2  
-         thermohaline_option = 'Kippenhahn'
+         ! thermohaline_coeff = 2  
+         ! thermohaline_option = 'Kippenhahn'
+
+         thermohaline_coeff = 1
+         thermohaline_option = 'Brown_Garaud_Stellmach_13'
 
          varcontrol_target = 1d-4
 

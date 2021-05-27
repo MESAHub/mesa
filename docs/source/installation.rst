@@ -1,3 +1,5 @@
+.. highlight:: console
+
 Installing MESA
 ===============
 
@@ -15,7 +17,7 @@ The minimum system requirements for MESA are:
 -  64-bit processor
 -  8 GB RAM
 -  20 GB free disk space
--  Windows users should :ref:`follow the instructions here <Installing MESA on Windows>`.
+-  Windows users should :ref:`follow the instructions here <windows-install:Installing MESA on Windows>`.
 
 Most laptop or desktop computers built in the last three years will 
 satisfy these requirements.
@@ -73,22 +75,6 @@ You can also download zip files of `older MESA
 releases <http://sourceforge.net/projects/mesa/files/releases/>`__. If
 you plan to do so, please read `this FAQ
 entry <faq.html#old-version>`__.
-
-If you'd prefer, you can instead checkout a copy of MESA from its
-subversion repository, using the command:
-
-.. parsed-literal::
-
-   svn co -r |version| https://subversion.assembla.com/svn/mesa^mesa/trunk mesa
-
-.. warning::
-
-   There may be newer versions out there in the svn repository, but
-   they are untested, unstable, and unsupported.  To
-   repeat: always use "-r", and to make sure that you get an
-   officially released version always follow "-r" with the version
-   number of an `official MESA release <faq.html#releases>`__.
-
 
 .. _environment:
 

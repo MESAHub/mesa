@@ -1,6 +1,9 @@
-****
+.. highlight:: console
+.. _FAQ:
+
+***
 FAQ
-****
+***
 
 General Questions
 =================
@@ -92,447 +95,447 @@ Which SVN revisions were MESA release versions?
 
    * - 15140
      - 07 Dec 2020
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r15140.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/4311514>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r15140.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/4311514>`__
 
    * - 12778
      - 05 Mar 2020
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r12778.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/3698354>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r12778.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/3698354>`__
 
    * - 12115
      - 10 Sep 2019
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r12115.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/3473377>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r12115.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/3473377>`__
 
    * - 11701
      - 03 May 2019
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r11701.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2665077>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r11701.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2665077>`__
 
    * - 11554
      - 15 Mar 2019
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r11554.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630923>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r11554.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630923>`__
 
    * - 11532
      - 04 Mar 2019
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r11532.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630918>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r11532.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630918>`__
 
    * - 10398
      - 21 Mar 2018
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r10398.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630891>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r10398.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630891>`__
 
    * - 10108
      - 23 Oct 2017
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r10108.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630888>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r10108.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630888>`__
 
    * - 10000
      - 12 Sep 2017
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r10000.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630883>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r10000.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630883>`__
 
    * - 9793
      - 31 May 2017
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r9793.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630818>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r9793.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630818>`__
 
    * - 9575
      - 17 Feb 2017
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r9575.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630814>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r9575.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630814>`__
 
    * - 8845
      - 19 Jun 2016
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r8845.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630807>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r8845.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630807>`__
 
    * - 8118
      - 03 Feb 2016
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r8118.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630805>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r8118.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630805>`__
 
    * - 7624
      - 03 Jun 2015
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7624.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630796>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7624.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630796>`__
 
    * - 7503
      - 27 Mar 2015
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7503.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630756>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7503.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630756>`__
 
    * - 7499
      - 20 Mar 2015
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7499.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630747>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7499.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630747>`__
 
    * - 7385
      - 13 Jan 2015
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7385.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630724>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7385.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630724>`__
 
    * - 7184
      - 22 Oct 2014
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7184.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630712>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r7184.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630712>`__
 
    * - 6794
      - 20 Jul 2014
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6794.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630708>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6794.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630708>`__
 
    * - 6596
      - 08 Jun 2014
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6596.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630700>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6596.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630700>`__
 
    * - 6208
      - 24 Mar 2014
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6208.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630645>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6208.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630645>`__
 
    * - 6188
      - 21 Mar 2014
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6188.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630632>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6188.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630632>`__
 
    * - 6022
      - 28 Feb 2014
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6022.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630624>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r6022.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630624>`__
 
    * - 5819
      - 05 Jan 2014
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5819.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630620>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5819.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630620>`__
 
    * - 5596
      - 15 Nov 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5596.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2630612>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5596.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2630612>`__
 
    * - 5527
      - 10 Oct 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5527.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2614013>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5527.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2614013>`__
 
    * - 5456
      - 20 Sep 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5456.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2614012>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5456.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2614012>`__
 
    * - 5329
      - 19 Aug 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5329.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2613746>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5329.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2613746>`__
 
    * - 5271
      - 27 Jul 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5271.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2613709>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5271.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2613709>`__
 
    * - 5232
      - 18 Jul 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5232.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2613702>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5232.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2613702>`__
 
    * - 5118
      - 16 Jun 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5118.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2613697>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r5118.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2613697>`__
 
    * - 4942
      - 30 Apr 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4942.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603481>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4942.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603481>`__
 
    * - 4906
      - 11 Apr 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4906.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603470>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4906.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603470>`__
 
    * - 4849
      - 20 Mar 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4849.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603467>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4849.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603467>`__
 
    * - 4798
      - 06 Feb 2013
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4798.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603466>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4798.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603466>`__
 
    * - 4740
      - 29 Dec 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4740.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603390>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4740.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603390>`__
 
    * - 4723
      - 19 Dec 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4723.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603387>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4723.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603387>`__
 
    * - 4631
      - 26 Oct 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4631.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603380>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4631.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603380>`__
 
    * - 4442
      - 29 Aug 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4442.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603370>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4442.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603370>`__
 
    * - 4411
      - 25 Aug 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4411.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603361>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4411.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603361>`__
 
    * - 4298
      - 01 Aug 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4298.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603356>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4298.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603356>`__
 
    * - 4219
      - 18 Jul 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4219.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603353>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4219.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603353>`__
 
    * - 4088
      - 09 Jun 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4088.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603348>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4088.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603348>`__
 
    * - 4028
      - 28 Apr 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4028.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603343>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r4028.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603343>`__
 
    * - 3918
      - 27 Feb 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3918.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603338>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3918.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603338>`__
 
    * - 3851
      - 10 Jan 2012
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3851.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603335>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3851.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603335>`__
 
    * - 3794
      - 14 Dec 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3794.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603334>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3794.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603334>`__
 
    * - 3723
      - 06 Nov 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3723.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603329>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3723.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603329>`__
 
    * - 3709
      - 31 Oct 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3709.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603312>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3709.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603312>`__
 
    * - 3635
      - 22 Sep 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3635.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603305>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3635.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603305>`__
 
    * - 3372
      - 14 Jun 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3372.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603297>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3372.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603297>`__
 
    * - 3290
      - 20 May 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3290.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603292>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3290.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603292>`__
 
    * - 3251
      - 29 Apr 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3251.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603287>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3251.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603287>`__
 
    * - 3107
      - 20 Mar 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3107.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603282>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3107.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603282>`__
 
    * - 3075
      - 03 Mar 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3075.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603279>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r3075.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603279>`__
 
    * - 2987
      - 05 Feb 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2987.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603274>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2987.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603274>`__
 
    * - 2941
      - 20 Jan 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2941.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603269>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2941.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603269>`__
 
    * - 2891
      - 01 Jan 2011
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2891.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603266>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2891.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603266>`__
 
    * - 2871
      - 23 Dec 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2871.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603264>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2871.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603264>`__
 
    * - 2808
      - 19 Nov 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2808.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603258>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2808.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603258>`__
 
    * - 2790
      - 09 Nov 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2790.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603257>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2790.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603257>`__
 
    * - 2745
      - 23 Oct 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2745.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603252>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2745.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603252>`__
 
    * - 2699
      - 03 Oct 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2699.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603246>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2699.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603246>`__
 
    * - 2664
      - 16 Sep 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2664.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603238>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2664.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603238>`__
 
    * - 2637
      - 26 Aug 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2637.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603229>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2637.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603229>`__
 
    * - 2618
      - 19 Aug 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2618.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603224>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2618.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603224>`__
 
    * - 2602
      - 06 Aug 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2602.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603213>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2602.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603213>`__
 
    * - 2578
      - 31 Jul 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2578.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603208>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2578.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603208>`__
 
    * - 2557
      - 26 Jul 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2557.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603204>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2557.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603204>`__
 
    * - 2533
      - 19 Jul 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2533.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603024>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2533.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603024>`__
 
    * - 2404
      - 05 Jun 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2404.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603023>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2404.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603023>`__
 
    * - 2341
      - 15 May 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2341.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603022>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2341.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603022>`__
 
    * - 2258
      - 13 Apr 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2258.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603021>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2258.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603021>`__
 
    * - 2208
      - 13 Mar 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2208.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603017>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2208.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603017>`__
 
    * - 2078
      - 26 Jan 2010
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2078.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603014>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r2078.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603014>`__
 
    * - 1943
      - 26 Nov 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1943.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603013>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1943.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603013>`__
 
    * - 1822
      - 06 Oct 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1822.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603010>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1822.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603010>`__
 
    * - 1728
      - 21 Sep 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1728.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603009>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1728.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603009>`__
 
    * - 1691
      - 11 Sep 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1691.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2603004>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1691.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2603004>`__
 
    * - 1585
      - 09 Aug 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1585.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602998>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1585.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602998>`__
 
    * - 1489
      - 18 Jul 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1489.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602994>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1489.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602994>`__
 
    * - 1396
      - 28 Jun 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1396.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602988>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1396.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602988>`__
 
    * - 1296
      - 07 Jun 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1296.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602983>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1296.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602983>`__
 
    * - 1249
      - 12 May 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1249.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602970>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1249.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602970>`__
 
    * - 1145
      - 16 Mar 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1145.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602965>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1145.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602965>`__
 
    * - 1118
      - 27 Feb 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1118.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602961>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r1118.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602961>`__
 
    * - 0971
      - 25 Jan 2009
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r0971.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602954>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r0971.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602954>`__
 
    * - 0776
      - 11 Nov 2008
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r0776.zip/download>`_,
-       `Zenodo <https://zenodo.org/record/2602942>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r0776.zip/download>`__,
+       `Zenodo <https://zenodo.org/record/2602942>`__
 
    * - 0001
      - 23 Jan 2007
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r0001.zip/download>`_
+     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r0001.zip/download>`__
 
 
 Why is my MESA zipfile download taking forever?
@@ -544,6 +547,21 @@ variations in download speed from the sourceforge site. If you are
 experiencing slow download speeds, you may want to change which mirror
 you are using. (After you select a zipfile to download, click the "try
 another mirror" link near the top of the page.)
+
+How do I obtain a non-release MESA version?
+-------------------------------------------
+
+The root of the MESA git repository on GitHub corresponds to SVN
+revision r15140 (from December 2020).  Subsequent non-release MESA
+versions are identified by their git commit id (SHA-1 hash) and can be
+obtained by using standard git operations after cloning the repository.
+
+Previously (2010-2020), MESA was developed using SVN.  An archival
+version of the MESA SVN repository containing the complete development
+history is available at https://zenodo.org/record/4745225.  Follow the
+instructions there and then use standard SVN operations to access any
+desired commit.
+
 
 Why am I getting "wrong module version" errors?
 -----------------------------------------------
@@ -842,7 +860,7 @@ lots of points:
 .. code-block:: fortran
 
   do k = 1, num_zones
-    call eos(T(k), rho(k), ….)
+    call eos(T(k), rho(k), ...)
   end do
 
 Most fortran compilers (ifort and gfortran and others) support OpenMP,
@@ -852,7 +870,7 @@ so the loop can be made to run in parallel by adding 2 lines of magic:
 
   !$OMP PARALLEL DO PRIVATE (k)
   do k = 1, num_zones
-    call eos(T(k), rho(k), ....)
+    call eos(T(k), rho(k), ...)
   end do
   !$OMP END PARALLEL DO
 

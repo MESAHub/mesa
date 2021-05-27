@@ -429,7 +429,7 @@
       subroutine extras_startup(id, restart, ierr)
          use chem_def, only: ini56, ico56, ih1, ihe4, io16
          use interp_2d_lib_db, only: interp_mkbicub_db
-         use eos_lib, only: eosDT_get_T_given_Ptotal
+         use eos_lib, only: eosDT_get_T
          use eos_def
          use atm_lib, only: atm_L
          integer, intent(in) :: id
@@ -445,12 +445,15 @@
          integer :: i, j, k, kk, k1, k_max_v, ni56, co56, o16, he4, h1, &
             max_iter, eos_calls
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp), allocatable :: d_dxa(:,:)
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
+
+         allocate(d_dxa(num_eos_d_dxa_results, s% species))
 
          xni56 = 0d0
          ni56 = s% net_iso(ini56)
@@ -756,14 +759,14 @@
                         s% cgrav(k+1)*s% m(k+1)*(s% dm(k+1)+s% dm(k))/(8*pi*r*r*r*r)
                      Z = max(0d0, min(1d0, 1d0 - (s% X(k) + s% Y(k))))
                      logT_guess = s% lnT(k+1)/ln10
-                     call eosDT_get_T_given_Ptotal( &
-                        s% eos_handle, Z, s% X(k), s% abar(k), s% zbar(k), &
+                     call eosDT_get_T( &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
-                        s% lnd(k)/ln10, log10(P_hse), &
+                        s% lnd(k)/ln10, i_logPtot, log10(P_hse), &
                         logT_tol, logP_tol, max_iter, logT_guess, &
                         logT_bnd1, logT_bnd2, logP_at_bnd1, logP_at_bnd2, &
                         logT_result, res, d_dlnd, d_dlnT, &
-                        d_dabar, d_dzbar, eos_calls, ierr)
+                        d_dxa, eos_calls, ierr)
                      if (ierr /= 0) return
                      s% lnT(k) = logT_result*ln10
                      s% T(k) = exp(s% lnT(k))
