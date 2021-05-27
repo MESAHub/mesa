@@ -27,6 +27,7 @@
 / ! end of kap namelist
 
 &controls
+   log_Teff_lower_limit = 3.55
 
 ! output controls
    photo_interval = 50
@@ -39,5 +40,33 @@
 
 
 &pgstar
+
+   !pause = .true.
+   
+   pgstar_interval = 25
+
+   HR_win_flag = .true.
+   
+   HR_title = '21 M\d\(2281)\u  Z=0.02  RSG'
+
+   HR_win_width = 8
+   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+
+   ! axis limits -- to override system default selections
+   HR_logT_min = 3.4 ! -101 ! only used if > -100
+   HR_logT_max = 4.58 ! only used if > -100
+   HR_logL_min = 4.5 ! -101 ! only used if > -100
+   HR_logL_max = 5.1 ! -101 ! only used if > -100
+   
+   show_HR_classical_instability_strip = .true.
+
+   ! file output
+   !HR_file_flag = .true.
+   HR_file_dir = 'pgstar_out'
+   HR_file_prefix = 'hr'
+   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_width = -1 ! negative means use same value as for window
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
+         
          
 / ! end of pgstar namelist

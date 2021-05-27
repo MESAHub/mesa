@@ -1,5 +1,9 @@
 &star_job
       required_termination_code_string(5) = 'star_mass_min_limit'
+      
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d2
+      
 / ! end of star_job namelist
 
 &eos
@@ -12,7 +16,7 @@
    star_mass_min_limit = 0.65
 
 ! wind
-   mass_change = -1d-7
+   mass_change = -2d-6
 
 ! output controls
    !photo_interval = 10
@@ -26,7 +30,7 @@
 
    !pause = .true.
    
-   pgstar_interval = 25
+   pgstar_interval = 1 ! 25
 
    HR_win_flag = .true.
    
