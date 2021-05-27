@@ -207,8 +207,10 @@
    Skye_solid_mixing_rule = "PC"
 
    ! Skye Blending
-   ! ::
+   ! ~~~~~~~~~~~~~
    ! replace the polygon blend with simple Rho/T blends
+   ! ::
+
    use_simple_Skye_blends = .false.
    logRho_min_for_any_Skye = 1.8
    logRho_min_for_all_Skye = 2.0
@@ -236,7 +238,7 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Integer with valid values from 0 to 10 inclusive corresponding to the table
    ! to use in the fixed composition case. A value of 0 corresponds to the pure Helium
-   ! table while a value of 10 corresponds the the pure Hydrogren table.
+   ! table while a value of 10 corresponds the the pure Hydrogen table.
    ! to use table
    !                set index 
    ! mesa-CMS_000x.data ->  0

@@ -9,11 +9,13 @@ thermal runaway in the core (see |Schwab2015|).
 
 It exercises the special weak rate implementation detailed in that
 paper and in Section 8 of |MESA III|.  These capabilities are
-activated via the options
+activated via the options::
 
-.. literalinclude:: ../../../star/test_suite/wd_aic/inlist_wd_aic
-   :start-after: new_cumulative_energy_error
-   :end-before: change_conv_vel_flag
+    use_special_weak_rates = .true.
+    special_weak_states_file = 'aic.states'
+    special_weak_transitions_file = 'aic.transitions'
+    ion_coulomb_corrections = 'PCR2009'
+    electron_coulomb_corrections = 'Itoh2002'
 
 This computes the key reaction rates (electron capture on 24Mg and
 20Ne) on-the-fly from nuclear data specified in the indicated input

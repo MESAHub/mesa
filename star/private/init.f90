@@ -893,8 +893,7 @@
          logical :: restore_at_end
          real(dp) :: xm, total_radiation, warning_limit_for_max_residual
          integer :: k, num_trace_history_values
-         real(dp) :: save_Pextra_factor, save_max_frac_for_negative_surf_lum
-         logical :: save_scale_max_correction_for_negative_surf_lum
+         real(dp) :: save_Pextra_factor
          character (len=256):: save_atm_option, &
             save_atm_T_tau_relation, save_atm_T_tau_opacity
          real(dp), allocatable, dimension(:) :: total_energy_profile
@@ -1154,14 +1153,10 @@
             save_atm_T_tau_relation = s% atm_T_tau_relation
             save_atm_T_tau_opacity = s% atm_T_tau_opacity
             save_Pextra_factor = s% Pextra_factor
-            save_scale_max_correction_for_negative_surf_lum = s% scale_max_correction_for_negative_surf_lum
-            save_max_frac_for_negative_surf_lum = s% max_frac_for_negative_surf_lum
             s% atm_option = 'T_tau'
             s% atm_T_tau_relation = 'Eddington'
             s% atm_T_tau_opacity = 'fixed'
             s% Pextra_factor = 2
-            s% scale_max_correction_for_negative_surf_lum = .true.
-            s% max_frac_for_negative_surf_lum = 0.8
          end subroutine setup_for_relax_after_create_pre_ms_model
 
          subroutine done_relax_after_create_pre_ms_model
@@ -1169,8 +1164,6 @@
             s% atm_T_tau_relation = save_atm_T_tau_relation
             s% atm_T_tau_opacity = save_atm_T_tau_opacity
             s% Pextra_factor = save_Pextra_factor
-            s% scale_max_correction_for_negative_surf_lum = save_scale_max_correction_for_negative_surf_lum
-            s% max_frac_for_negative_surf_lum = save_max_frac_for_negative_surf_lum
          end subroutine done_relax_after_create_pre_ms_model
 
          subroutine check_initials

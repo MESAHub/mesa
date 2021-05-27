@@ -5,6 +5,8 @@ Changelog
 Changes in dev
 ==============
 
+.. _Backwards-incompatible changes dev:
+
 Backwards-incompatible changes
 ------------------------------
 
@@ -17,6 +19,9 @@ Thermohaline option ``'Brown_Garaud_Stellmach_13'`` was not correctly implemente
 Removed option `semiconvection_upper_limit_center_h1`. This can be implemented by setting `s% alpha_semiconvection` in `run_star_extras.f90/extras_start_step`.
 
 Removed profile columns `total_energy` and `total_energy_integral`.
+
+
+.. _Module-level changes dev:
 
 Module-level changes
 --------------------
@@ -169,6 +174,7 @@ to remove ``theta_e_for_graboske_et_al`` from its argument list.
 
 The options ``reuse_rate_raw`` and  ``reuse_rate_screened`` have been removed from other_net_get (and eval_net)
 
+.. _Other changes dev:
 
 Other changes
 -------------
@@ -191,6 +197,8 @@ Other changes
 Changes in r15140
 =================
 
+.. _Backwards-incompatible changes r15140:
+
 Backwards-incompatible changes
 ------------------------------
 
@@ -200,7 +208,7 @@ Addition of eos and kap namelists
 The options associated with the ``eos`` and ``kap`` modules have been
 moved into their own namelists.  (That is, there now exist ``&eos``
 and ``&kap`` at the same level as ``&star_job`` and ``&controls``.)
-User inlists will need to be updated.  See :ref:`Module-level changes`
+User inlists will need to be updated.  See :ref:`Module-level changes r15140`
 for more specific information.
 
 If you previously accessed the values of eos/kap related options from
@@ -275,7 +283,7 @@ Second, the word "hydro" was removed or replaced with the word
 For example, the control ``report_hydro_solver_progress`` is now
 ``report_solver_progress`` and ``report_hydro_dt_info`` is now
 ``report_solver_dt_info``.  The use of these and other related
-controls is described :ref:`in the developer documentation <Diagnosing Solver Struggles>`.
+controls is described :ref:`in the developer documentation <developing/debugging:Diagnosing Solver Struggles>`.
 
 
 
@@ -346,7 +354,7 @@ have been removed.
 The removal of these controls does not indicate that the EOS is
 reliable at all values of logQ.  Users should consult :ref:`the
 description of the component EOSes and the regions in which they are
-applied <Overview of eos module>` to understand if MESA provides
+applied <eos/overview:Overview of eos module>` to understand if MESA provides
 a suitable EOS for the conditions of interest.
 
 
@@ -463,6 +471,7 @@ Finally, repeat the calculation with a smaller value of
 ``time_delta_coeff`` (e.g., 0.5) and compare the results to gain
 confidence that they are numerically converged.
 
+.. _Module-level changes r15140:
 
 Module-level changes
 --------------------
@@ -564,7 +573,7 @@ eos
 ~~~
 
 EOS-related options have been moved into their own ``eos`` namelist.
-The :ref:`module controls <eos module controls>` and their default
+The :ref:`module controls <eos/defaults:eos module controls>` and their default
 values are contained in the file ``eos/defaults/eos.defaults``.
 
 The PTEH EOS has been removed.  Tables from the FreeEOS project now
@@ -579,7 +588,7 @@ previous approach.
 
 For more information about the component EOSes and the regions in
 which they are applied, see the :ref:`new overview of the EOS module
-<Overview of eos module>`.
+<eos/overview:Overview of eos module>`.
 
 
 gyre
@@ -593,7 +602,7 @@ kap
 ~~~
 
 Opacity-related options have been moved into their own ``kap`` namelist.
-The :ref:`module controls <kap module controls>` and their default
+The :ref:`module controls <kap/defaults:kap module controls>` and their default
 values are contained in the file ``kap/defaults/kap.defaults``.
 
 
@@ -609,7 +618,7 @@ corresponds to the initial metallicity of the star.
 
 
 For more information about the opacity tables and how they are
-combined, see the :ref:`new overview of the kap module <Overview of
+combined, see the :ref:`new overview of the kap module <kap/overview:Overview of
 kap module>`.
 
 rates & net
@@ -638,7 +647,7 @@ A lot of work has been done getting operator split burning (op_split_burn = .tru
 This option can provide a large speed up during advanced nuclear burning stages. See the various split_burn
 test cases for examples.
 
-
+.. _Other changes r15140:
 
 Other changes
 -------------
@@ -683,6 +692,7 @@ Other changes
   ``pre_ms_relax_to_start_radiative_core``, which can be set to .false. to
   restore the old behavior.
 
+.. _Acknowledgments r15140:
 
 Acknowledgments
 ---------------
@@ -715,6 +725,7 @@ you'll need to upgrade to version 20.3.1 of the SDK or later. MESA
 checks the SDK version during compilation, and will stop with an error
 message if the SDK is too old.
 
+.. _Backwards-incompatible changes r12278:
 
 Backwards-incompatible changes
 ------------------------------
@@ -1117,7 +1128,7 @@ Copies of the inlist can now be found in the following test cases:
   * split_burn_big_net_30M
   * split_burn_big_net_30M_logT_9.8
 
-
+.. _Other changes r12278:
 
 Other changes
 -------------

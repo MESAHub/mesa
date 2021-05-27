@@ -324,7 +324,7 @@
     diffusion_maxsteps_for_isolve, diffusion_isolve_solver, &
     
     ! eos controls
-    use_fixed_XZ_for_eos, fixed_X_for_eos, fixed_Z_for_eos, use_d_eos_dxa, &
+    use_d_eos_dxa, &
     report_eos_settings_at_start_of_run, &
 
     ! opacity controls
@@ -382,7 +382,6 @@
     iter_for_resid_tol2, iter_for_resid_tol3, &
     solver_itermin, solver_itermin_until_reduce_min_corr_coeff, &
     solver_reduced_min_corr_coeff, do_solver_damping_for_neg_xa, &
-    scale_max_correction_for_negative_surf_lum, max_frac_for_negative_surf_lum, &
     hydro_mtx_max_allowed_abs_dlogT, hydro_mtx_max_allowed_abs_dlogRho, &
     min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
     hydro_mtx_max_allowed_logRho, report_min_rcond_from_DGESXV, &
@@ -1799,10 +1798,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
  ! eos controls
- s% use_fixed_XZ_for_eos = use_fixed_XZ_for_eos
  s% report_eos_settings_at_start_of_run = report_eos_settings_at_start_of_run
- s% fixed_X_for_eos = fixed_X_for_eos
- s% fixed_Z_for_eos = fixed_Z_for_eos
  s% use_d_eos_dxa = use_d_eos_dxa
 
  ! opacity controls
@@ -1974,8 +1970,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% solver_itermin_until_reduce_min_corr_coeff = solver_itermin_until_reduce_min_corr_coeff
  s% solver_reduced_min_corr_coeff = solver_reduced_min_corr_coeff
  s% do_solver_damping_for_neg_xa = do_solver_damping_for_neg_xa
- s% scale_max_correction_for_negative_surf_lum = scale_max_correction_for_negative_surf_lum
- s% max_frac_for_negative_surf_lum = max_frac_for_negative_surf_lum
  s% hydro_mtx_max_allowed_abs_dlogT = hydro_mtx_max_allowed_abs_dlogT
  s% hydro_mtx_max_allowed_abs_dlogRho = hydro_mtx_max_allowed_abs_dlogRho
  s% min_logT_for_hydro_mtx_max_allowed = min_logT_for_hydro_mtx_max_allowed
@@ -3477,9 +3471,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_isolve_solver = s% diffusion_isolve_solver
 
  ! eos controls
- use_fixed_XZ_for_eos = s% use_fixed_XZ_for_eos
- fixed_X_for_eos = s% fixed_X_for_eos
- fixed_Z_for_eos = s% fixed_Z_for_eos
  report_eos_settings_at_start_of_run = s% report_eos_settings_at_start_of_run
  use_d_eos_dxa = s% use_d_eos_dxa
  
@@ -3650,8 +3641,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  solver_itermin_until_reduce_min_corr_coeff = s% solver_itermin_until_reduce_min_corr_coeff
  solver_reduced_min_corr_coeff = s% solver_reduced_min_corr_coeff
  do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
- scale_max_correction_for_negative_surf_lum = s% scale_max_correction_for_negative_surf_lum
- max_frac_for_negative_surf_lum = s% max_frac_for_negative_surf_lum
  hydro_mtx_max_allowed_abs_dlogT = s% hydro_mtx_max_allowed_abs_dlogT
  hydro_mtx_max_allowed_abs_dlogRho = s% hydro_mtx_max_allowed_abs_dlogRho
  min_logT_for_hydro_mtx_max_allowed = s% min_logT_for_hydro_mtx_max_allowed

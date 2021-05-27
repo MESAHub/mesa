@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2021  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -37,7 +37,7 @@
  
         
       ! cgs units
-      
+
       ! the basic eos results
       
       integer, parameter :: i_lnPgas = 1
@@ -113,6 +113,13 @@
       integer, parameter :: num_eos_d_dxa_results = 2
 
       character (len=eos_name_length) :: eosDT_result_names(nv)
+
+      ! non-positive indices for special EOS quantities
+      ! these are supported in the root-finds (eosDT_get_{Rho,T})
+      ! even though their values are not basic EOS results
+
+      integer, parameter :: i_logPtot = 0  ! log10 total pressure (gas + radiation)
+      integer, parameter :: i_egas = -1 ! gas specific energy density (no radiation)
 
       
       ! NOTE: the calculation of eta is based on the following equation for ne, 

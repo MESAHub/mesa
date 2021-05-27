@@ -6,7 +6,7 @@ MESA was primarily developed through the concerted efforts of Bill
 Paxton over a 10 year period with the engagement and deep involvement
 of many theoretical and computational astrophysicists.  MESA is
 currently developed and supported by a :ref:`globally distributed team
-<The MESA Team>`.
+<about:The MESA Team>`.
 
 Over the past decade, MESA has grown into an international community
 resource.  The public availability of MESA has, and will continue,

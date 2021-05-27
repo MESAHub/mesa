@@ -1,3 +1,5 @@
+.. highlight:: console
+
 **********
 Test suite
 **********
@@ -93,6 +95,46 @@ Star tests
 
 The test checks the evolution of metal-rich low-mass stars by evolving 
 a 1.3 Msun, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
+
+:ref:`1.4M_ms_op_mono`
+^^^^^^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of OP mono opacities. 
+The test vehicle is a 1.4 Msun solar metallicity model.
+
+:ref:`1.5M_with_diffusion`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of element diffusion.
+The test vehicle is a 1.5 Msun solar metallicity model.
+
+:ref:`15M_dynamo`
+^^^^^^^^^^^^^^^^^
+
+The test checks the functionality of element rotation in a 15 Msun solar metallicity model.
+
+:ref:`16M_conv_premix`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example re-creates the 16-solar mass main-sequence
+evolution with the inclusion of convective premixing (using the Ledoux
+criterion), as detailed in Section 5.3 of the MESA V instrument paper
+(Paxton et al 2019).
+
+:ref:`16M_predictive_mix`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example re-creates the 16-solar mass main-sequence
+evolution with the inclusion of predictive mixing (using the Ledoux
+criterion), as detailed in Section 2 of the MESA IV instrument paper
+(Paxton et al 2018).
+
+:ref:`1M_pre_ms_to_wd`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre-main sequence to a white dwarf.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
@@ -221,15 +263,28 @@ that the accretion luminosity is computed correctly.
 Astero tests
 ------------
 
-astero_adipls
-^^^^^^^^^^^^^
+astero_adipls and astero_gyre
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Demonstrates how to call ADIPLS using the ``astero`` module.
+Demonstrate how to use the ``astero`` module to call ADIPLS or GYRE, respectively.
 
-astero_gyre
-^^^^^^^^^^^
+Both tests use the same main-sequence evolution of a 1.2 |Msun| star,
+so the evolutionary outputs (e.g. ``final.mod``, ``LOGS/history.data``)
+should be identical for both tests.  Tables of
+mode frequencies are displayed in the terminal every 50 models and
+should be the same to within about 0.1 μHz.  These can be compared by
+``diff``\ ing the terminal output.
 
-Demonstrates how to call GYRE using the ``astero`` module.  Note that
+The tests compare one mode frequency (currently for (*ℓ*, *n*)=(0,4))
+with a target value set by ``x_ctrl(1)`` with a tolerance of 3%.  Over time, cumulative
+changes to microphysics might mean the targets are missed, causing
+failure.  In this case, both targets can be updated to the same value.
+Failure should be investigated if, e.g.,
+
+* something is changed that shouldn't affect the main-sequence evolution of a 1.2 |Msun| star or
+* one of the tests passes and the other fails.
+
+Note that
 GYRE can also be called directly, without using the ``astero`` module.
 See the ``gyre_in_mesa_*`` test cases in ``star``'s test suite.
 

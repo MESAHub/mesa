@@ -47,7 +47,7 @@
                d_dlnT(num_eos_basic_results), &
                d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
                res2(num_eos_basic_results), d_dlnd2(num_eos_basic_results), &
-               d_dabar2(num_eos_basic_results), d_dzbar2(num_eos_basic_results), &
+               d_dxa2(num_eos_d_dxa_results, species), &
                d_dlnT2(num_eos_basic_results)
          integer:: ierr, i
          character (len=eos_name_length) :: names(num_eos_basic_results)
@@ -126,11 +126,11 @@
             return
          end if
 
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
+         call eosDT_get( &
+               handle, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, &
-               res2, d_dlnd2, d_dlnT2, d_dabar2, d_dzbar2, ierr)
+               res2, d_dlnd2, d_dlnT2, d_dxa2, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosDT_get for test1_eosPT'
             stop 1
@@ -159,516 +159,6 @@
          write(*,*)
          
       end subroutine test1_eosPT
-      
-      
-      subroutine test_eosDT(which)
-         integer, intent(in) :: which
-         logical :: save_use_FreeEOS
-
-         include 'formats'
-         
-         save_use_FreeEOS = rq% use_FreeEOS
-         rq% use_FreeEOS = .false.
-         if (which == 1 .or. which == 2) then
-            rq% use_FreeEOS = .true.
-         end if
-         
-         write(*,*) 'test_eosDT rq% use_FreeEOS', rq% use_FreeEOS
-         if (which == 2) then
-            call do_test_eosDT_new
-            stop
-         end if
-         call do_test_eosDT
-         rq% use_FreeEOS = save_use_FreeEOS
-         
-      end subroutine test_eosDT
-      
-      
-      subroutine do_test_eosDT
-         real(dp) :: logT, logRho, T, Rho, X, Z, logPgas, Pgas, Prad, P, logP, XC, XO, &
-               logRho1_OPAL_SCVH_limit, logRho2_OPAL_SCVH_limit, Z_all_HELM, Z_all_OPAL
-         real(dp), dimension(num_eos_basic_results) :: &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         integer :: info, i_var, i
-         real(dp) :: dx_0, var_0, dvardx_0, dvardx, xdum, err, lnd, lnT, energy, entropy, &
-            var, dvar_dlnd, dvar_dlnT, dse, dpe, dsp, dS_dT, dE_dT, dP_dT, dPrad_dT, &
-            dE_dRho, dS_dRho, dlnE_dlnd, dlnE_dlnT, dlnPgas_dlnT, dlnS_dlnd, dlnS_dlnT
-         logical :: doing_d_dlnd
-
-         include 'formats'
-         
-         
-         if (.false.) then
-                                                rho = 952987205766.07312d0
-                                                T =  3162.2778229206556d0
-                                              logRho = log10(rho)
-                                                logT = log10(T)
-         else
-                                              logRho = -3.7440634305717460D+00
-                                                logT = 3.9830887848306653D+00
-                                                rho = exp10(logRho)
-                                                T = exp10(logT)
-         end if
-                                                   
-                 
-         XC = 0
-         XO = 0
-                                                   z =  2.0745049657628911D-02
-                                                   x =  1.5302086314738124D-30
-         call Init_Composition(X, Z, XC, XO)
-         
-         write(*,*) 'change abar and zbar for test'
-         abar = 1.2198718692960793d0
-         zbar = 1.0733094612841689d0
-         
-         write(*,1) 'abar = ', abar
-         write(*,1) 'zbar = ', zbar
-         
-         if (.true.) then
-            rq% Z_all_HELM = 0.04d0
-            rq% Z_all_OPAL = 0.039d0
-            write(*,1) 'Z_all_HELM Z_all_OPAL', Z_all_HELM, Z_all_OPAL
-         end if
-
-         write(*,*) 'use_PC', rq% use_PC
-         write(*,1) 'log_Gamma_e_all_HELM', rq% log_Gamma_e_all_HELM
-         write(*,1) 'log_Gamma_e_all_PC', rq% log_Gamma_e_all_PC
-         write(*,1) 'logRho2_PC_limit', rq% logRho2_PC_limit
-         write(*,1) 'logRho1_PC_limit', rq% logRho1_PC_limit
-
-         write(*,*) 'call eosDT_get'
-         info = 0
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Rho, logRho, T, logT, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, info)
-         if (info /= 0) then
-            write(*,*) 'failed in test1_eos'
-            stop 1
-         end if
-         
-         write(*,1) 'T', T
-         write(*,1) 'logT', logT
-         write(*,1) 'Rho', Rho
-         write(*,1) 'logRho', logRho
-         write(*,1) 'abar', abar
-         write(*,1) 'zbar', zbar
-         write(*,1) 'X', X
-         write(*,1) 'Z', Z
-         write(*,1) 'rq% logRho_min_OPAL_SCVH_limit', rq% logRho_min_OPAL_SCVH_limit
-         write(*,1) 'logQ', logRho - 2d0*logT + 12d0
-         write(*,*)
-         
-         if (.false.) then ! dfridr
-         
-            !stop
-
-            i_var = i_gamma1
-         
-            !doing_d_dlnd = .true.
-            doing_d_dlnd = .false.
-         
-            lnd = logRho*ln10
-            lnT = logT*ln10
-
-            if (doing_d_dlnd) then
-               dx_0 = max(1d-6, abs(lnd*1d-6))
-               dvardx_0 = d_dlnd(i_var)
-            else
-               dx_0 = max(1d-6, abs(lnT*1d-6))
-               dvardx_0 = d_dlnT(i_var)
-            end if
-            err = 0d0
-            dvardx = dfridr(dx_0,err)
-            xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),1d-4)
-            if (doing_d_dlnd) then
-               write(*,1) 'd_dlnRho analytic, numeric, diff, rel diff', &
-                     dvardx_0, dvardx, err, xdum
-            else ! doing d_dlnT
-               write(*,1) 'd_dlnT analytic, numeric, diff, rel diff', &
-                     dvardx_0, dvardx, err, xdum
-            end if
-            write(*,*)
-            
-            return
-         
-         end if
-         
-         energy = exp(res(i_lnE))
-         entropy = exp(res(i_lnS))
-         Pgas = exp(res(i_lnPgas))
-         Prad = Radiation_Pressure(T)
-         P = Pgas + Prad
-         dPrad_dT = 4d0*Prad/T
-         
-         
-         if (.true.) then ! simple form of output
-            write(*,*)
-            write(*,1) 'rho', rho
-            write(*,1) 'logRho', logRho
-            write(*,1) 'logT', logT
-            write(*,1) 'logPgas', res(i_lnPgas)/ln10
-            write(*,*)
-            write(*,1) 'P', P
-            write(*,1) 'E', exp(res(i_lnE))
-            write(*,1) 'S', exp(res(i_lnS))
-            write(*,*)
-            do i=4, num_eos_basic_results
-               write(*,1) trim(eos_names(i)), res(i)
-            end do
-            write(*,*)
-            return
-         end if
-
-         
-         
-         
-         dlnS_dlnT = d_dlnT(i_lnS)
-         dlnS_dlnd = d_dlnd(i_lnS)
-         dlnE_dlnT = d_dlnT(i_lnE)
-         dlnE_dlnd = d_dlnd(i_lnE)
-         dlnPgas_dlnT = d_dlnT(i_lnPgas)
-         
-         dS_dT = dlnS_dlnT*entropy/T
-         dS_dRho = dlnS_dlnd*entropy/rho
-         dE_dT = dlnE_dlnT*energy/T
-         dE_dRho = dlnE_dlnd*energy/rho
-         dP_dT = dlnPgas_dlnT*Pgas/T + dPrad_dT
-         
-         write(*,1) 'chiRho', res(i_chiRho)
-         write(*,1) 'd_dlnd(i_chiRho)', d_dlnd(i_chiRho)
-         write(*,1) 'd_dlnT(i_chiRho)', d_dlnT(i_chiRho)
-         !stop
-         
-         write(*,1) 'grad_ad', res(i_grad_ad)
-         write(*,1) 'd_dlnd(i_grad_ad)', d_dlnd(i_grad_ad)
-         write(*,1) 'd_dlnT(i_grad_ad)', d_dlnT(i_grad_ad)
-         write(*,1) 'chiT', res(i_chiT)
-         write(*,1) 'd_dlnd(i_chiT)', d_dlnd(i_chiT)
-         write(*,1) 'd_dlnT(i_chiT)', d_dlnT(i_chiT)
-         write(*,1) 'Pgas', Pgas
-         write(*,1) 'logPgas', res(i_lnPgas)/ln10
-         !return
-         
-         write(*,1) 'P', P
-         write(*,1) 'logP', log10(P)
-         write(*,1) 'Pgas', Pgas
-         write(*,1) 'logPgas', res(i_lnPgas)/ln10
-         write(*,1) 'chiRho', res(i_chiRho)
-         write(*,1) 'Cp', res(i_Cp)
-         write(*,1) 'Cv', res(i_Cv)
-         write(*,1) 'dE_dRho', res(i_dE_dRho)
-         write(*,1) 'dS_dT', res(i_dS_dT)
-         write(*,1) 'dS_dRho', res(i_dS_dRho)
-         write(*,1) 'mu', res(i_mu)
-         write(*,1) 'gamma1', res(i_gamma1)
-         write(*,1) 'gamma3', res(i_gamma3)
-         write(*,1) 'eta', res(i_eta)
-         write(*,1) 'lnfree_e', res(i_lnfree_e)
-         write(*,*)
-         
-         ! dse = T ∂S/∂T|_⍴ / ∂E/∂T|_⍴  - 1.0d0
-         ! dpe = (⍴^2 ∂E/∂⍴|_T + T ∂P/∂T_⍴) / P - 1.0d0
-         ! dsp = -(∂S/∂⍴|_T * ⍴^2) / ∂P/∂T|_⍴ - 1.0d0
-         dse = T*dS_dT/dE_dT - 1d0
-         dpe = (rho*rho*dE_dRho + T*dP_dT)/P - 1d0
-         dsp = -rho*rho*dS_dRho/dP_dT - 1d0
-
-         write(*,1) 'dS_dT', dS_dT
-         write(*,1) 'dE_dT', dE_dT
-         write(*,1) 'dP_dT', dP_dT
-         write(*,1) 'dE_dRho', dE_dRho
-         write(*,1) 'dS_dRho', dS_dRho
-         write(*,*)
-         
-         write(*,1) 'T', T, 1.00000000000000D+08
-         write(*,1) 'rho', rho, 1.00000000000000D+02
-         write(*,1) 'Pgas', Pgas, 1.23652998034023D+18
-         write(*,1) 'logT', logT, 8.00000000000000D+00
-         write(*,1) 'logRho', logRho, 2.00000000000000D+00
-         write(*,1) 'logPgas', res(i_lnPgas)/ln10, 1.80922046505303D+01
-         write(*,1) 'logE', res(i_lnE)/ln10, 1.64204279937121D+01
-         write(*,1) 'logS', res(i_lnS)/ln10, 9.21518793962630D+00
-         write(*,1) 'dlnPgas_dlnT', d_dlnd(i_chiT), 9.99407523743355E-01
-         write(*,1) 'dlnPgas_dlnd', d_dlnT(i_chiT), 1.00063526337044D+00
-         write(*,1) 'd2lnPgas_dlnd_dlnT', 0d0, -1.00356261967249E-03
-         write(*,1) 'dlnE_dlnT', d_dlnd(i_lnE), 1.86915994288048D+00
-         write(*,1) 'dlnE_dlnd', d_dlnT(i_lnE), -2.87077214678670E-01
-         write(*,1) 'd2lnE_dlnd_dlnT', 0d0, -1.43403816995508E-01
-         write(*,1) 'dlnS_dlnT', d_dlnd(i_lnS), 2.99837896996580E-01
-         write(*,1) 'dlnS_dlnd', d_dlnT(i_lnS), -1.36754620123785E-01
-         write(*,1) 'd2lnS_dlnd_dlnT', 0d0, -1.43403816995508E-01
-         write(*,1) 'dse', dse, 8.73492878028514E-09
-         write(*,1) 'dpe', dpe, -6.04495641759601E-01
-         write(*,1) 'dsp', dsp, 8.01573628057714E-01
-         write(*,*)
-         
-         stop
-         
-         contains
-         
-         
-         real(dp) function dfridr_func(delta_x) result(val)
-            real(dp), intent(in) :: delta_x
-            integer :: ierr
-            real(dp) :: log_var
-            include 'formats'
-            ierr = 0
-            if (doing_d_dlnd) then
-               log_var = (lnd + delta_x)/ln10
-               var = exp10(log_var)
-               call eosDT_get_legacy( &
-                  handle, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
-                  var, log_var, T, logT, &
-                  res, d_dlnd, d_dlnT, d_dabar, d_dzbar, info)
-            else
-               log_var = (lnT + delta_x)/ln10
-               var = exp10(log_var)
-               call eosDT_get_legacy( &
-                  handle, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
-                  Rho, logRho, var, log_var, &
-                  res, d_dlnd, d_dlnT, d_dabar, d_dzbar, info)
-            end if
-            val = res(i_var)
-         end function dfridr_func
-
-         real(dp) function dfridr(hx,err) ! from Frank
-            real(dp), intent(in) :: hx
-            real(dp), intent(out) :: err
-            !  this routine returns the first derivative of a function func(x)
-            !  at the point x, by ridders method of polynomial extrapolation.
-            !  value hx is the initial step size;
-            !  it should be an increment for which func changes substantially.
-            !  an estimate of the error in the first derivative is returned in err.
-            integer, parameter :: ntab = 20
-            integer :: i,j
-            real(dp) :: x,errt,fac,hh,a(ntab,ntab),xdum,ydum
-            real(dp), parameter :: con2=2d0, con=sqrt(con2), big=1d50, safe=2d0
-            include 'formats'
-            dfridr = 0d0
-            hh = hx
-            ! 2nd order central difference
-            a(1,1) = (dfridr_func(hh) - dfridr_func(-hh))/(2d0*hh)
-            write(*,2) 'dfdx hh', 1, a(1,1), hh
-            err = big
-            ! succesive columns in the neville tableu will go to smaller stepsizes
-            ! and higher orders of extrapolation
-            do i=2,ntab
-               hh = hh/con
-               a(1,i) = (dfridr_func(hh) - dfridr_func(-hh))/(2d0*hh)
-               !write(*,2) 'dfdx hh', i, a(1,i), hh
-               ! compute extrapolations of various orders; the error stratagy is to compare
-               ! each new extrapolation to one order lower but both at the same stepsize
-               ! and at the previous stepsize
-               fac = con2
-               do j=2,i
-                  a(j,i) = (a(j-1,i)*fac - a(j-1,i-1))/(fac-1d0)
-                  fac = con2*fac
-                  errt = max(abs(a(j,i)-a(j-1,i)),abs(a(j,i)-a(j-1,i-1)))
-                  if (errt <= err) then
-                     err = errt
-                     dfridr = a(j,i)
-                     write(*,3) 'dfridr err', i, j, dfridr, err
-                  end if
-               end do
-               ! if higher order is worse by a significant factor safe, then bail
-               if (abs(a(i,i) - a(i-1,i-1)) >= safe*err) then
-                  write(*,1) 'higher order is worse', err, a(i,i), a(i-1,i-1)
-                  return
-               end if
-            end do
-         end function dfridr
-
-      end subroutine do_test_eosDT
-      
-         
-      
-      subroutine do_test_eosDT_new
-         use num_lib, only : dfridr
-         real(dp) :: logT, logRho, T, Rho, X, Z, logPgas, Pgas, Prad, P, logP, XC, XO
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         real(dp), dimension(num_eos_d_dxa_results,species) :: d_dxa
-         integer :: info, i_var, i
-         real(dp) :: dx_0, var_0, dvardx_0, dvardx, xdum, err, lnd, lnT
-         logical :: doing_d_dlnd
-
-         real(dp) :: xh, xhe, zz, abar_ci, zbar_ci, z2bar_ci, z53bar_ci, ye_ci, mass_correction, sumx
-         real(dp), dimension(species) :: dabar_dx, dzbar_dx, dmc_dx
-
-
-         include 'formats'
-
-
-         logRho = -1.23d0
-         logT = 8.1d0
-         rho = exp10(logRho)
-         T = exp10(logT)
-
-         XC = 0
-         XO = 0
-         z =  0.014
-         x =  0.314
-         call Init_Composition(X, Z, XC, XO)
-
-         ! need this call to get dabar_dx, dzbar_dx
-         ! might want to pass these in eventually
-         call composition_info( &
-            species, chem_id, xa, xh, xhe, zz, &
-            abar_ci, zbar_ci, z2bar_ci, z53bar_ci, ye_ci, mass_correction, &
-            sumx, dabar_dx, dzbar_dx, dmc_dx)
-
-         write(*,*) 'call eosDT_get'
-         info = 0
-         call eosDT_get( &
-            handle, species, chem_id, net_iso, xa, &
-            Rho, logRho, T, logT, &
-            res, d_dlnd, d_dlnT, d_dxa, info)
-         if (info /= 0) then
-            write(*,*) 'failed in test1_eos'
-            stop 1
-         end if
-
-         write(*,1) 'T', T
-         write(*,1) 'logT', logT
-         write(*,1) 'Rho', Rho
-         write(*,1) 'logRho', logRho
-         write(*,1) 'abar', abar
-         write(*,1) 'zbar', zbar
-         write(*,1) 'X', X
-         write(*,1) 'Z', Z
-         write(*,1) 'rq% logRho_min_OPAL_SCVH_limit', rq% logRho_min_OPAL_SCVH_limit
-         write(*,1) 'logQ', logRho - 2d0*logT + 12d0
-         write(*,*)
-         write(*,1) 'frac_OPAL_SCVH', res(i_frac_OPAL_SCVH)
-         write(*,1) 'frac_HELM', res(i_frac_HELM)
-         write(*,1) 'frac_Skye', res(i_frac_Skye)
-         write(*,1) 'frac_PC', res(i_frac_PC)
-         write(*,1) 'frac_FreeEOS', res(i_frac_FreeEOS)
-         write(*,1) 'frac_CMS', res(i_frac_CMS)
-         write(*,*)
-
-         if (.true.) then ! dfridr
-
-            i_var = i_lnPgas
-
-            dx_0 = 1d-4
-            !dvardx_0 = dzbar_dx(1) !d_dxa(i_var, 1)
-            dvardx_0 = d_dxa(i_var, 1)
-
-            err = 0d0
-            dvardx = dfridr(dx_0,dfridr_func,err)
-            xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),1d-4)
-            write(*,1) 'd_dxa analytic, numeric, diff, rel diff', &
-               dvardx_0, dvardx, err, xdum
-            write(*,*)
-
-         end if
-
-
-         contains
-
-
-         real(dp) function dfridr_func(delta_x) result(val)
-            real(dp), intent(in) :: delta_x
-            integer :: ierr
-            real(dp) :: log_var
-            real(dp) ::  xa_var(species)
-            include 'formats'
-            ierr = 0
-            xa_var = xa
-            xa_var(1) = xa_var(1) + delta_x ! h1
-            !xa_var(2) = xa_var(2) - delta_x ! he4
-
-            ! need this call to get dabar_dx, dzbar_dx
-            ! might want to pass these in eventually
-            call composition_info( &
-               species, chem_id, xa_var, xh, xhe, zz, &
-               abar_ci, zbar_ci, z2bar_ci, z53bar_ci, ye_ci, mass_correction, &
-               sumx, dabar_dx, dzbar_dx, dmc_dx)
-            !val = zbar_ci
-            !write(*,*) abar_ci, sumx
-
-            call eosDT_get( &
-               handle, species, chem_id, net_iso, xa_var, &
-               Rho, logRho, T, logT, &
-               res, d_dlnd, d_dlnT, d_dxa, info)
-            val = res(i_var)
-         end function dfridr_func
-
-      end subroutine do_test_eosDT_new
-
-      
-      subroutine test_eosDT_partials
-         real(dp) :: logT, logRho, T, Rho, X, Z, logPgas, &
-               Pgas, Prad, P, lnd, dlnd, Rho2, logRho2, &
-               dlnd_analytic, dlnd_numerical
-         real(dp), dimension(num_eos_basic_results) :: &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-               res2, d_dlnd2, d_dlnT2, d_dabar2, d_dzbar2
-         integer :: info, i
-      
-         include 'formats'
-
-         info = 0
-
-         call Setup_eos
-         X =    0.8d0
-         Z =    0.02d0
-         abar = 1.1817162154266392d0
-         zbar = 1.0635445938839752d0
-
-         logT = 6.5d0
-         T = exp10(logT)
-         logRho = -1d0
-         Rho = exp10(logRho)
-         
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Rho, logRho, T, logT, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, info)
-         if (info /= 0) then
-            write(*,*) 'failed in test1_eos'
-            stop 1
-         end if
-         
-         lnd = logRho*ln10
-         dlnd = lnd*1d-4
-         logRho2 = (lnd + dlnd)/ln10
-         Rho2 = exp10(logRho2)
-
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Rho2, logRho2, T, logT, &
-               res2, d_dlnd2, d_dlnT2, d_dabar2, d_dzbar2, info)
-         if (info /= 0) then
-            write(*,*) 'failed in test1_eos'
-            stop 1
-         end if
-         
-         d_dlnd2(:) = (res2(:) - res(:)) / dlnd
-         
-         do i=1,num_eos_basic_results
-            dlnd_analytic = d_dlnd(i)
-            dlnd_numerical = d_dlnd2(i)
-            write(*,2) 'dlnd_analytic, dlnd_numerical, diff, rel diff', i, &
-               dlnd_analytic, dlnd_numerical, dlnd_analytic - dlnd_numerical, &
-               (dlnd_analytic - dlnd_numerical) / max(1d-99, abs(dlnd_analytic), abs(dlnd_numerical))
-            write(*,*)
-         end do
-         
-         write(*,1) 'logRho', logRho
-         write(*,1) 'logRho2', logRho2
-         write(*,1) 'logT', logT
-         write(*,*)
-         stop
-
-      end subroutine test_eosDT_partials
       
       
       subroutine Do_One(quietly)
@@ -761,7 +251,7 @@
                logT_guess, logT_bnd1, logT_bnd2
             integer :: i, which_other, max_iter, eos_calls, ierr
             real(dp), dimension(num_eos_basic_results) :: &
-                  d_dlnd, d_dlnT, d_dabar, d_dzbar
+                  d_dlnd, d_dlnT
             real(dp), dimension(num_eos_d_dxa_results, species) :: &
                   d_dxa
             
@@ -852,14 +342,14 @@
             logT_guess = result_log10
             logT_bnd1 = 3
             logT_bnd2 = 9
-            call eosDT_get_T_given_Ptotal( &
-                  handle, Z, X, abar, zbar, &
+            call eosDT_get_T( &
+                  handle, &
                   species, chem_id, net_iso, xa, &
-                  log10_rho, logP, &
+                  log10_rho, i_logPtot, logP, &
                   tol, othertol, max_iter, logT_guess, &
                   logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                   result_log10, res, d_dlnd, d_dlnT, &
-                  d_dabar, d_dzbar, eos_calls, ierr)
+                  d_dxa, eos_calls, ierr)
             result = exp10(result_log10)
             if (ierr /= 0) then
                write(*,*) 'ierr in test_get_Rho_T (eosDT_get_T_given_Ptotal)'
@@ -1042,7 +532,7 @@
                X, Z, abar, zbar, logRho, egas_want, egas_tol, logT_tol, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, logT_result, erad, egas, energy, &
                res(num_eos_basic_results), d_dlnd(num_eos_basic_results), Pgas, logPgas, &
-               d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
+               d_dxa(num_eos_d_dxa_results, species), &
                d_dlnT(num_eos_basic_results)
          integer:: ierr, eos_calls, max_iter
          
@@ -1088,13 +578,13 @@
          write(*,1) 'egas_tol', egas_tol
          write(*,*)
 
-         call eosDT_get_T_given_egas( &
-               handle, Z, X, abar, zbar, &
+         call eosDT_get_T( &
+               handle, &
                species, chem_id, net_iso, xa, &
-               logRho, egas_want, &
+               logRho, i_egas, egas_want, &
                logT_tol, egas_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logT_result, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+               logT_result, res, d_dlnd, d_dlnT, d_dxa, &
                eos_calls, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosDT_get_T_given_egas'
@@ -1128,7 +618,9 @@
          real(dp), intent(out), dimension(num_eos_basic_results) :: res
 
          real(dp), dimension(num_eos_basic_results) :: &
-               d_dlnd, d_dlnT, d_dabar, d_dzbar
+               d_dlnd, d_dlnT
+         real(dp), dimension(num_eos_d_dxa_results, species) :: &
+               d_dxa
          integer :: info, i
          real(dp) :: dlnT, dlnRho, lnRho_2, Prad, Pgas, P
 
@@ -1155,11 +647,11 @@
             write(*,*)
          end if
          
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
+         call eosDT_get( &
+               handle, &
                species, chem_id, net_iso, xa, &
                Rho, arg_not_provided, T, arg_not_provided, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, info)
+               res, d_dlnd, d_dlnT, d_dxa, info)
          if (info /= 0) then
             write(*,*) 'info', info, 'Rho', Rho, 'T', T
             write(*,*) 'failed in Do_One_TRho'

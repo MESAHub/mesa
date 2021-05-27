@@ -23,7 +23,7 @@ That documentation can then be incorporated into the main docs either by symlink
 
 Examples of documentation that lives elsewhere include:
 
-* The defaults files live in ``<module>/defaults/`` are symlinked into ``docs`` and also pre-processed  (see :ref:`Format for MESA defaults files`).
+* The defaults files live in ``<module>/defaults/`` are symlinked into ``docs`` and also pre-processed  (see :ref:`reference/format:Format for MESA defaults files`).
 * The ``README.rst`` file in each test suite case (which is included in ``docs/test_suite``).
 
 
@@ -38,7 +38,7 @@ Here is a link to a `reStructured Text primer`_.
 
 Click "View page source" in the upper right to see the rst file corresponding to this page.
 
-The :ref:`Format for MESA defaults files` page has additional
+The :ref:`reference/format:Format for MESA defaults files` page has additional
 information on ReST formatting from the perspective of writing
 defaults files.
 
