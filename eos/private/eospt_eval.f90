@@ -35,7 +35,6 @@
          
       integer, parameter :: doing_get_T = 1
       integer, parameter :: doing_get_Pgas = 2
-      integer, parameter :: doing_get_Pgas_for_Rho = 3
       
       contains
 
@@ -106,57 +105,21 @@
             return
          end if
          
-         call Get1_eosPT_Results(rq, &
-            Z, X, abar, zbar, &
+         call Get_PT_Results_using_DT( &
+            rq, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             Pgas, logPgas, T, logT, &
             Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
             res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, ierr)
 
+         if (ierr /= 0) then
+            if (dbg) write(*,*) 'error from Get_PT_Results_using_DT'
+            return
+         end if
+
       end subroutine Get_eosPT_Results
 
 
-      subroutine Get1_eosPT_Results(rq, &
-               Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Pgas, logPgas, T, logT, &
-               Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
-               res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, ierr)
-
-         use utils_lib, only: is_bad
-                  
-         type (EoS_General_Info), pointer :: rq
-         real(dp), intent(in) :: Z, X, abar, zbar
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:), net_iso(:)
-         real(dp), intent(in) :: xa(:)
-         real(dp), intent(in) :: Pgas, logPgas, T, logT
-         real(dp), intent(out) :: Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas
-         real(dp), intent(inout) :: res(:), d_dlnRho_c_T(:), d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (nv, species)
-         integer, intent(out) :: ierr
-         logical, parameter :: dbg = .false.
-
-         real(dp) :: Pg, logPg, temp, logtemp
-         
-         include 'formats'
-         
-         ierr = 0
-         
-         Pg = Pgas
-         logPg = logPgas
-         temp = T
-         logtemp = logT
-         call Get_PT_Results_using_DT( &
-            rq, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            Pg, logPg, temp, logtemp, &
-            Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
-            res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, ierr)
-         
-      end subroutine Get1_eosPT_Results
-      
-      
       subroutine get_PT_args( &
             aPg, alogPg, atemp, alogtemp, Pgas, logPgas, T, logT, ierr)       
          real(dp), intent(in) :: aPg, alogPg
@@ -251,7 +214,7 @@
                logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          if (ierr /= 0) then
-            if (.false.) then
+            if (dbg) then
                write(*,*) 'failed in get_Rho for Get_PT_Results_using_DT'
                write(*,1) 'Z = ', Z
                write(*,1) 'X = ', X
@@ -435,80 +398,8 @@
                eos_calls, ierr)
 
       end subroutine get_Pgas
-      
 
-      subroutine get_Pgas_for_Rho( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, logRho_want, &
-               logPgas_tol, logRho_tol, max_iter, logPgas_guess_in, &
-               logPgas_bnd1, logPgas_bnd2, logRho_at_bnd1, logRho_at_bnd2, &
-               logPgas_result, Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
-               res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
-               eos_calls, ierr)
 
-         integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar, zbar
-         
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:)    
-         integer, pointer :: net_iso(:)
-         real(dp), intent(in) :: xa(:)
-         
-         real(dp), intent(in) :: logT ! log10 of temperature
-
-         real(dp), intent(in) :: logRho_want ! log10 of desired density
-         real(dp), intent(in) :: logRho_tol
-         
-         real(dp), intent(in) :: logPgas_tol
-
-         integer, intent(in) :: max_iter ! max number of Newton iterations        
-
-         real(dp), intent(in) :: logPgas_guess_in ! log10 of gas pressure
-            ! if = arg_not_provided, then will use ideal gas for guess
-         real(dp), intent(in) :: logPgas_bnd1, logPgas_bnd2 ! bounds for logPgas
-            ! if don't know bounds, just set to arg_not_provided (defined in const_def)
-         real(dp), intent(in) :: logRho_at_bnd1, logRho_at_bnd2 ! values at bounds
-            ! if don't know these values, just set to arg_not_provided (defined in const_def)
-
-         real(dp), intent(out) :: logPgas_result ! log10 of gas pressure
-         real(dp), intent(out) :: Rho, logRho ! density corresponding to logPgas_result
-         real(dp), intent(out) :: dlnRho_dlnPgas_c_T
-         real(dp), intent(out) :: dlnRho_dlnT_c_Pgas
-
-         real(dp), intent(inout) :: res(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (nv, species)
-
-         integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
-
-         real(dp) :: logPgas_guess
-         
-         logPgas_guess = logPgas_guess_in
-         if (logPgas_guess == arg_not_provided) then
-            ! Pgas = rho*kerg*T*(1+zbar)/(abar*mp)
-            logPgas_guess = logRho_want + logT + log10(kerg*(1+zbar)/(abar*mp))
-         end if
-
-         call do_safe_get_Pgas_T( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, 0, logRho_want, doing_get_Pgas_for_Rho, &
-               logPgas_guess, logPgas_result, logPgas_bnd1, logPgas_bnd2, &
-               logRho_at_bnd1, logRho_at_bnd2, logPgas_tol, logRho_tol, max_iter, &
-               Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
-               res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
-               eos_calls, ierr)
-      
-      end subroutine get_Pgas_for_Rho
-
-      
       subroutine do_safe_get_Pgas_T( &
                handle, Z, XH1, abar, zbar, &
                species, chem_id, net_iso, xa, &
@@ -576,9 +467,8 @@
             Pgas = exp10(the_other_log)
          end if
 
-         ipar = 0
-         rpar = 0
-         nullify(ipar, rpar)
+         lipar = 0; nullify(ipar)
+         lrpar = 0; nullify(rpar)
 
          xb1 = xbnd1; xb3 = xbnd2
          if (xb1 == arg_not_provided .or. xb3 == arg_not_provided .or. xb1 == xb3) then
@@ -653,8 +543,6 @@
          contains
 
             real(dp) function get_f_df(x, dfdx, lrpar, rpar, lipar, ipar, ierr)
-               use eos_def, only:EoS_General_Info, get_eos_ptr
-               use chem_def, only: num_chem_isos
                integer, intent(in) :: lrpar, lipar
                real(dp), intent(in) :: x
                real(dp), intent(out) :: dfdx
@@ -662,19 +550,13 @@
                real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
                integer, intent(out) :: ierr
 
-               real(dp) :: new, other
-               type (EoS_General_Info), pointer :: rq
+               real(dp) :: new, logT, logPgas
 
                include 'formats'
 
                ierr = 0
                get_f_df = 0
 
-               call get_eos_ptr(handle, rq, ierr)
-               if (ierr /= 0) then
-                  write(*, *) 'get_eos_ptr returned ierr', ierr
-                  return
-               end if
                dfdx = 0
 
                if (doing_which /= doing_get_T) then
@@ -699,7 +581,7 @@
                   ierr)
                if (ierr /= 0) then
 22                format(a30, e26.16)
-                  if (.true.) then
+                  if (dbg) then
                      write(*, *) 'Get_eosPT_Results returned ierr', ierr
                      write(*, 22) 'Z', Z
                      write(*, 22) 'XH1', XH1
@@ -716,12 +598,8 @@
 
                eos_calls = eos_calls+1 ! count eos calls
 
-               if (doing_which == doing_get_Pgas_for_Rho) then
-                  new = logRho
-               else
-                  new = res(which_other)
-               end if
-               get_f_df = new - other
+               new = res(which_other)
+               get_f_df = new - other_value
 
                ! f = f(lnRho(lnPgas,lnT),lnT)
                if (doing_which == doing_get_T) then
@@ -729,8 +607,6 @@
                      + dlnRho_dlnT_c_Pgas*d_dlnRho_c_T(which_other))*ln10
                else if (doing_which == doing_get_Pgas) then
                   dfdx = dlnRho_dlnPgas_c_T*d_dlnRho_c_T(which_other)*ln10
-               else if (doing_which == doing_get_Pgas_for_Rho) then
-                  dfdx = dlnRho_dlnPgas_c_T
                else
                   stop 'bad value for doing_which in eosPT_eval'
                end if

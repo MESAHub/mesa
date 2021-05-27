@@ -876,7 +876,7 @@
                logT_tol, other_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2,  other_at_bnd1, other_at_bnd2, &
                logT_result, Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, &
+               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_eos, &
                eos_calls, ierr)
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
