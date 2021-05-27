@@ -1,7 +1,7 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'near_pulses.mod' 
+      load_model_filename = 'nearer_pulses.mod' 
 
       save_model_when_terminate = .true.
       save_model_filename = 'pulse.mod'

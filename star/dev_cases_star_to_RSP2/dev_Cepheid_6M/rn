@@ -13,6 +13,9 @@ cp zams.mod standard_zams.mod
 do_one inlist_to_near_pulses_header near_pulses.mod
 cp near_pulses.mod standard_near_pulses.mod
 
+do_one inlist_to_nearer_pulses_header nearer_pulses.mod
+cp nearer_pulses.mod standard_nearer_pulses.mod
+
 do_one inlist_to_pulse_header pulse.mod
 cp pulse.mod standard_pulse.mod
 
@@ -32,31 +35,24 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 echo 'finished'
 
 
-after to pulse          Teff 4892   L 4659
+after to pulse          Teff 3220   L 1.1d5
    model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-     740       1          0.6490E-06        1540869.3168             17.8341              0.0385             25.9494
-     740       2          0.9823E-06        1018064.9306             11.7832              0.0331             30.1896
+     508       1          0.1644E-07       60845566.2649            704.2311              0.0439             22.7735
+     508       2          0.4072E-07       24559310.8698            284.2513              0.0289             34.6427
 
-after remove core  5d6  Teff 4892   L 4659
+after remove core  5d6  Teff 3220  L 1.1d5 
    model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-       1       1          0.6490E-06        1540852.4354             17.8339              0.0385             25.9478
-       1       2          0.9823E-06        1018033.7929             11.7828              0.0331             30.1903
+       1       1          0.1637E-07       61082947.4883            706.9786              0.0442             22.6448
+       1       2          0.4060E-07       24627540.8648            285.0410              0.0289             34.5483
 
-after remesh            Teff 4891   L 4658    with dt = 1 sec for 1 step.   RSP2_use_L_eqn_at_surface = .false.
+after remesh            Teff 3273  L 1.17d5
    model   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-       1       1          0.6309E-06        1585060.9856             18.3456              0.0580             17.2547
-       1       2          0.9567E-06        1045300.1455             12.0984              0.0394             25.3910
+       1       1          0.1635E-07       61163981.0189            707.9164              0.0511             19.5557
+       1       2          0.4079E-07       24517504.1241            283.7674              0.0298             33.5226
 
-after initialize        Teff 4892   L 4660
- set gyre starting velocities
+after initialize        Teff    L 
    order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
-       1          0.6309E-06        1585057.8321             18.3456              0.0580             17.2548
-       2          0.9567E-06        1045298.0074             12.0984              0.0394             25.3906
-       3          0.1399E-05         714569.8871              8.2705              stable
-
-
-LINA for M 6.0, Teff 4892, L 4660, X = 0.730, Z = 0.003
-            P(days)         growth
-  0       0.19502E+02    -0.32400E-01
-  1       0.11857E+02    -0.19372E+00
-  2       0.83149E+01    -0.29212E+00
+       1          0.1635E-07       61163967.9601            707.9163              0.0511             19.5557
+       2          0.4079E-07       24517501.0335            283.7674              0.0298             33.5226
+       3          0.6614E-07       15119235.3332            174.9911              0.0402             24.8882
+ set gyre starting velocities for order 1

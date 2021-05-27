@@ -344,7 +344,7 @@
          end subroutine rescale_xa
          
          subroutine revise_lnT_for_QHSE(P_surf, ierr)
-            use eos_def, only: num_eos_basic_results
+            use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
             use chem_lib
             use chem_def
             use eos_support, only: solve_eos_given_DP
@@ -354,12 +354,12 @@
             real(dp), intent(in) :: P_surf
             integer, intent(out) :: ierr
             real(dp) :: logRho, logP, logT_guess, &
-               logT_tol, logP_tol, logT, P_m1, P_00, dm_face, x, y, z, &
-               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+               logT_tol, logP_tol, logT, P_m1, P_00, dm_face, &
                kap_fracs(num_kap_fracs), kap, dlnkap_dlnRho, dlnkap_dlnT, &
                old_kap, new_P_surf, new_T_surf
             real(dp), dimension(num_eos_basic_results) :: &
                res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            real(dp) :: dres_dxa(num_eos_d_dxa_results,s% species)
             include 'formats'
             ierr = 0
             P_m1 = P_surf
@@ -383,13 +383,10 @@
                logT_guess = s% lnT(k)/ln10
                logT_tol = 1d-11
                logP_tol = 1d-11
-               call basic_composition_info( &
-                  s% species, s% chem_id, s% xa(:,k), x, y, z, abar, zbar, &
-                  z2bar, z53bar, ye, mass_correction, sumx)
                call solve_eos_given_DP( &
-                  s, k, z, x, abar, zbar, s% xa(:,k), &
+                  s, k, s% xa(:,k), &
                   logRho, logP, logT_guess, logT_tol, logP_tol, &
-                  logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+                  logT, res, d_dlnd, d_dlnT, dres_dxa, ierr)
                if (ierr /= 0) then
                   write(*,2) 'solve_eos_given_DP failed', k
                   write(*,*)
@@ -397,10 +394,6 @@
                   do j=1,s% species
                      write(*,4) 'xa(j,k) ' // trim(chem_isos% name(s% chem_id(j))), j, j+s% nvar_hydro, k, s% xa(j,k)
                   end do
-                  write(*,1) 'z', z
-                  write(*,1) 'x', x
-                  write(*,1) 'abar', abar
-                  write(*,1) 'zbar', zbar
                   write(*,1) 'logRho', logRho
                   write(*,1) 'logP', logP
                   write(*,1) 'logT_guess', logT_guess
@@ -416,8 +409,8 @@
                P_m1 = P_00
                
                if (k == 1) then ! get opacity and recheck surf BCs
-                 call get_kap( &
-                     s, k, zbar, s% xa(:,k), logRho, logT, &
+                 call get_kap( & ! assume zbar is set
+                     s, k, s% zbar(k), s% xa(:,k), logRho, logT, &
                      res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
                      res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
                      kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, &

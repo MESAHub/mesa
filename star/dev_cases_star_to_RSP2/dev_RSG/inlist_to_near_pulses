@@ -26,7 +26,7 @@
 
    !pause = .true.
    
-   pgstar_interval = 2
+   pgstar_interval = 25
 
    HR_win_flag = .true.
    

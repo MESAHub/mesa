@@ -13,6 +13,9 @@ cp zams.mod standard_zams.mod
 do_one inlist_to_near_pulses_header near_pulses.mod
 cp near_pulses.mod standard_near_pulses.mod
 
+do_one inlist_to_nearer_pulses_header nearer_pulses.mod
+cp nearer_pulses.mod standard_nearer_pulses.mod
+
 do_one inlist_to_pulse_header pulse.mod
 cp pulse.mod standard_pulse.mod
 
