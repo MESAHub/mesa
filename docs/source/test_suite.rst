@@ -263,15 +263,28 @@ that the accretion luminosity is computed correctly.
 Astero tests
 ------------
 
-astero_adipls
-^^^^^^^^^^^^^
+astero_adipls and astero_gyre
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Demonstrates how to call ADIPLS using the ``astero`` module.
+Demonstrate how to use the ``astero`` module to call ADIPLS or GYRE, respectively.
 
-astero_gyre
-^^^^^^^^^^^
+Both tests use the same main-sequence evolution of a 1.2 |Msun| star,
+so the evolutionary outputs (e.g. ``final.mod``, ``LOGS/history.data``)
+should be identical for both tests.  Tables of
+mode frequencies are displayed in the terminal every 50 models and
+should be the same to within about 0.1 μHz.  These can be compared by
+``diff``\ ing the terminal output.
 
-Demonstrates how to call GYRE using the ``astero`` module.  Note that
+The tests compare one mode frequency (currently for (*ℓ*, *n*)=(0,4))
+with a target value set by ``x_ctrl(1)`` with a tolerance of 3%.  Over time, cumulative
+changes to microphysics might mean the targets are missed, causing
+failure.  In this case, both targets can be updated to the same value.
+Failure should be investigated if, e.g.,
+
+* something is changed that shouldn't affect the main-sequence evolution of a 1.2 |Msun| star or
+* one of the tests passes and the other fails.
+
+Note that
 GYRE can also be called directly, without using the ``astero`` module.
 See the ``gyre_in_mesa_*`` test cases in ``star``'s test suite.
 
