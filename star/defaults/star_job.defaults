@@ -1261,6 +1261,11 @@
       ! relax_tau_factor_after_core_C_burn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+      ! Must have tau_factor = 1 when atm_option = 'table', as surface of the model must
+      ! always attach at the base of the table. However, these tau_factor settings can
+      ! be used to place the surface of the model inside or outside the photosphere
+      ! when atm_option = 'T_tau'.
+
       ! ``relax_to_this_tau_factor = 1`` puts outer cell at photosphere;
       ! can go much larger or much smaller to move surface in or out from photosphere.
 

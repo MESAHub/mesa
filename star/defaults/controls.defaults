@@ -4136,6 +4136,13 @@
       ! + ``'table'``: 
       !   set Tsurf and Psurf by interpolating in pre-calculated tables based on model
       !   atmospheres. The choice of table is set by the ``atm_table`` control.
+      !   Requires tau_factor = 1, as surface of the model must always attach at the base
+      !   of the tables, so there is no flexibility to move model surface inward or outward.
+      !   Note that tau_base = tau_surf is the location at which the model attaches to the
+      !   table BCs, and there is no particular location identified as the photosphere, so
+      !   we fall back to the surface values of L, R, and m to calculate quantities such as
+      !   Teff and log_g. This is consistent with the assumptions used for table construction:
+      !   geometrically thin atmospheres with constant flux.
       !
       ! + ``'irradiated_grey'``: 
       !   set Tsurf by solving for the atmosphere structure given the irradiated-grey
