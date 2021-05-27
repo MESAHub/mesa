@@ -82,7 +82,7 @@ module atm_lib
 
 contains
 
-  ! Crufty utility routines
+  ! utility routines
 
   real(dp) function atm_Teff(L, R)
     use const_def, only: pi, boltz_sigma

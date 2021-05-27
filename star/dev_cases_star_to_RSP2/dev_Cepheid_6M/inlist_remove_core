@@ -1,0 +1,57 @@
+&star_job
+   remove_initial_center_by_temperature = 5d6        ! for envelope only cases
+/ ! end of star_job namelist
+
+&eos
+/ !end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+! GYRE
+   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+   x_integer_ctrl(2) = 2 ! max number of modes to output per call
+   x_logical_ctrl(2) = .false. ! output eigenfunction files   
+   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+   x_integer_ctrl(3) = 0 ! mode_l
+   x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
+      ! < 0 means report best over all gyre results for any order
+! output controls
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   !terminal_interval = 1
+/ ! end of controls namelist
+
+&pgstar
+
+    !pause = .true.
+    !pause_interval = 100
+    pgstar_interval = 1
+      
+    Grid2_win_flag = .true.
+    Grid2_title = '6 M\d\(2281)\u  Z=0.003  Cepheid'
+   
+    History_Panels2_xaxis_name='star_age_day'
+    History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+
+    ! Grid2_file_flag = .true.
+    file_digits = 7
+    Grid2_file_dir = 'png'
+    Grid2_file_prefix = 'grid2'
+    Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+   
+    !Profile_Panels2_show_grid = .true.
+
+    Profile_Panels2_xaxis_name = 'logtau'
+    Profile_Panels2_xaxis_reversed = .true.
+    Profile_Panels2_xmin = -101D0
+    Profile_Panels2_xmax = -101D0
+    
+    Profile_Panels2_yaxis_name(6) = 'zone'     
+
+    Profile_Panels2_dymin(4) = 0.02
+  
+/ ! end of pgstar namelist

@@ -5,5 +5,25 @@
 MESA_DIR=../../..
 source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
-do_one inlist_gyre_in_mesa_rsg_header to_instability.mod
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+   cp standard_zams.mod zams.mod
+else
+   do_one inlist_to_zams_header zams.mod
+   cp zams.mod standard_zams.mod
+fi
 
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+   cp standard_near_pulses.mod near_pulses.mod
+else
+   do_one inlist_to_near_pulses_header near_pulses.mod
+   cp near_pulses.mod standard_near_pulses.mod
+fi
+
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+   cp standard_rsg_21M.mod rsg_21M.mod
+else
+   do_one inlist_to_pulse_header rsg_21M.mod
+   cp rsg_21M.mod standard_rsg_21M.mod
+fi
+
+do_one inlist_gyre_in_mesa_rsg_header to_instability.mod

@@ -63,7 +63,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% id == 2 .and. s% using_RSP2 .and. s% x_logical_ctrl(1)) then
+         if (s% id == 2 .and. s% RSP2_flag .and. s% x_logical_ctrl(1)) then
             !write(*,2) 'set star2 xh = star1 xh to resynchronize', s% model_number
             id_other = 1
             call star_ptr(id_other, s_other, ierr)

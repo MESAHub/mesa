@@ -319,7 +319,6 @@
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% generations = 1
-         s% previous_step_was_using_RSP2 = s% using_RSP2
          s% okay_to_set_mlt_vc = .false. ! don't change mlt_vc until have set mlt_vc_old
          
          if (s% timestep_hold > s% model_number + 10000) then 
@@ -1766,8 +1765,7 @@
       integer function prepare_for_new_step(s)
          use evolve_support, only: new_generation
          use chem_def
-         use star_utils, only: use_xh_to_set_rho_to_dm_div_dV
-         use report, only: set_phot_info
+         use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
 
          type (star_info), pointer :: s

@@ -54,7 +54,7 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 1800
+      max_model_number = 3000 ! 1800
 
     ! use our own routine to build the model
       use_other_build_initial_model = .true.
@@ -73,8 +73,10 @@
     ! set up constant pressure/temperature boundary conditions
       use_other_surface_PT = .true.
 
-    ! there's no surface here; ignore change in lgL_surf
+    ! there's no surface here; ignore change in lgL_surf and lgTeff
       delta_lgL_limit_L_min = 1d99
+      delta_lgTeff_limit = 1d99
+      
 
     ! don't let convection operate
       mlt_option = 'none'

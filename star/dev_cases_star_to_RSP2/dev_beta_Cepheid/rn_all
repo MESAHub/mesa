@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+do_one inlist_to_zams_header zams.mod
+cp zams.mod standard_zams.mod
+do_one inlist_to_near_pulses_header near_pulses.mod
+cp near_pulses.mod standard_near_pulses.mod
+do_one inlist_to_pulse_header pulse.mod
+cp pulse.mod standard_pulse.mod
+do_one inlist_remove_core_header removed_core.mod
+cp removed_core.mod standard_removed_core.mod
+do_one inlist_remesh_header remeshed.mod
+cp remeshed.mod standard_remeshed.mod
+do_one inlist_initialize_header initialized.mod
+cp initialized.mod standard_initialized.mod
+do_one inlist_pulse_header final.mod 
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'

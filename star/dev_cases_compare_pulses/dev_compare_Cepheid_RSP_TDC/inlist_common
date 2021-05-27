@@ -2,13 +2,13 @@
 &star_job
    show_log_description_at_start = .false.
    
-   load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle0.mod'
-   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle10.mod'
-   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle140.mod'
-   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle230.mod'
-   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle280.mod'
-   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle327.mod'
-   !load_model_filename = '../../dev_cases_test_pulses/dev_test_Cepheid_RSP/cycle557.mod'
+   load_model_filename = '../dev_compare_Cepheid_RSP_RSP2/cycle0.mod'
+   !load_model_filename = '../dev_compare_Cepheid_RSP_RSP2/cycle10.mod'
+   !load_model_filename = '../dev_compare_Cepheid_RSP_RSP2/cycle140.mod'
+   !load_model_filename = '../dev_compare_Cepheid_RSP_RSP2/cycle230.mod'
+   !load_model_filename = '../dev_compare_Cepheid_RSP_RSP2/cycle280.mod'
+   !load_model_filename = '../dev_compare_Cepheid_RSP_RSP2/cycle327.mod'
+   !load_model_filename = '../dev_compare_Cepheid_RSP_RSP2/cycle557.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
