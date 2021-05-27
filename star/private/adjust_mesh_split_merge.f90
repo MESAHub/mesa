@@ -48,7 +48,7 @@
 
          include 'formats'
          
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             stop 'need to add mlt_vc and Hp_face to remesh_split_merge'
          end if
 
@@ -612,7 +612,7 @@
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
          
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             cell_etrb = Etrb_i + Etrb_ip
             s% w(i) = sqrt(cell_etrb/dm)
          end if
@@ -645,7 +645,7 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
-            if (s% using_RSP2) then
+            if (s% RSP2_flag) then
                s% w(im) = s% w(i0)
                s% Hp_face(im) = s% Hp_face(i0)
             end if
@@ -676,7 +676,7 @@
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
          
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             s% xh(s% i_w,i) = s% w(i)
             s% xh(s% i_Hp,i) = s% Hp_face(i)
          end if
@@ -758,7 +758,7 @@
             KE = 0d0
          end if
          IE = s% energy(k)*dm
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             Etrb = pow2(s% w(k))*dm
          else
             Etrb = 0d0
@@ -914,7 +914,7 @@
          end if
          
          energy = s% energy(i)
-         if (s% using_RSP2) etrb = pow2(s% w(i))
+         if (s% RSP2_flag) etrb = pow2(s% w(i))
 
          ! use iR, iC, and iL for getting values to determine slopes
          if (i > 1 .and. i < nz_old) then
@@ -969,7 +969,7 @@
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
          
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             etrb_R = pow2(s% w(iR))
             etrb_C = pow2(s% w(iC))
             etrb_L = pow2(s% w(iL))
@@ -1135,7 +1135,7 @@
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
          
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             etrb_R = etrb + grad_etrb*dr/4
             etrb_L = (dm*etrb - dmR*etrb_R)/dmL
             if (etrb_R < 0d0 .or. etrb_L < 0d0) then

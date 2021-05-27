@@ -1,6 +1,6 @@
 
 &star_job   
-   load_saved_model_for_RSP = .true.
+   load_saved_model = .true.
    pgstar_flag = .false.
 / ! end of star_job namelist
 

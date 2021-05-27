@@ -73,7 +73,6 @@
             s% revised_max_yr_dt, &
             s% astero_using_revised_max_yr_dt, &
             s% astero_revised_max_yr_dt, &
-            s% using_RSP2, s% previous_step_was_using_RSP2, &
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor

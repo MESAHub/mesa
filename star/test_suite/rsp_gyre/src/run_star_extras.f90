@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Rich Townsend, Bill Paxton & The MESA Team
+!   Copyright (C) 2018-2019  Rich Townsend, The MESA Team
 !
 !   this file is part of mesa.
 !

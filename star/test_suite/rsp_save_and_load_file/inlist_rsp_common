@@ -3,8 +3,6 @@
 
       show_log_description_at_start = .false.
 
-      create_RSP_model = .true.
-
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
 

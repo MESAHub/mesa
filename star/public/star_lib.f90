@@ -503,24 +503,6 @@
       end subroutine star_write_photo
       
       
-      subroutine star_read_RSP_model(id, model_fname, ierr)
-         use init, only: load_saved_RSP_model
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr      
-         call load_saved_RSP_model(id, model_fname, ierr)     
-      end subroutine star_read_RSP_model
-      
-      
-      subroutine star_read_RSP2_model(id, model_fname, ierr)
-         use init, only: load_saved_RSP2_model
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr      
-         call load_saved_RSP2_model(id, model_fname, ierr)     
-      end subroutine star_read_RSP2_model
-      
-      
       subroutine star_read_model(id, model_fname, ierr)
          use init, only: load_saved_model
          integer, intent(in) :: id
@@ -826,7 +808,7 @@
       ! this routine is for changing use of Rayleigh-Taylor instabilities.
       ! simply changes variables; doesn't reconverge the model.
       subroutine star_set_RTI_flag(id, RTI_flag, ierr)
-         use alloc, only: set_RTI_flag
+         use set_flags, only: set_RTI_flag
          integer, intent(in) :: id
          logical, intent(in) :: RTI_flag
          integer, intent(out) :: ierr
@@ -834,7 +816,7 @@
       end subroutine star_set_RTI_flag
 
       subroutine star_set_conv_vel_flag(id, conv_vel_flag, ierr)
-         use alloc, only: set_conv_vel_flag
+         use set_flags, only: set_conv_vel_flag
          integer, intent(in) :: id
          logical, intent(in) :: conv_vel_flag
          integer, intent(out) :: ierr
@@ -842,7 +824,7 @@
       end subroutine star_set_conv_vel_flag
 
       subroutine star_set_w_div_wc_flag(id, w_div_wc_flag, ierr)
-         use alloc, only: set_w_div_wc_flag
+         use set_flags, only: set_w_div_wc_flag
          integer, intent(in) :: id
          logical, intent(in) :: w_div_wc_flag
          integer, intent(out) :: ierr
@@ -851,7 +833,7 @@
       end subroutine star_set_w_div_wc_flag
 
       subroutine star_set_j_rot_flag(id, j_rot_flag, ierr)
-         use alloc, only: set_j_rot_flag
+         use set_flags, only: set_j_rot_flag
          integer, intent(in) :: id
          logical, intent(in) :: j_rot_flag
          integer, intent(out) :: ierr
@@ -861,7 +843,7 @@
 
 
       subroutine star_set_RSP2_flag(id, et_flag, ierr)
-         use alloc, only: set_RSP2_flag
+         use set_flags, only: set_RSP2_flag
          integer, intent(in) :: id
          logical, intent(in) :: et_flag
          integer, intent(out) :: ierr
@@ -873,7 +855,7 @@
 
 
       subroutine star_set_RSP_flag(id, RSP_flag, ierr)
-         use alloc, only: set_RSP_flag
+         use set_flags, only: set_RSP_flag
          integer, intent(in) :: id
          logical, intent(in) :: RSP_flag
          integer, intent(out) :: ierr
@@ -882,7 +864,7 @@
 
       
       subroutine star_set_D_omega_flag(id, D_omega_flag, ierr)
-         use alloc, only: set_D_omega_flag
+         use set_flags, only: set_D_omega_flag
          integer, intent(in) :: id
          logical, intent(in) :: D_omega_flag
          integer, intent(out) :: ierr
@@ -891,7 +873,7 @@
       
       
       subroutine star_set_am_nu_rot_flag(id, am_nu_rot_flag, ierr)
-         use alloc, only: set_am_nu_rot_flag
+         use set_flags, only: set_am_nu_rot_flag
          integer, intent(in) :: id
          logical, intent(in) :: am_nu_rot_flag
          integer, intent(out) :: ierr
@@ -902,7 +884,7 @@
       ! this routine is for adding or removing velocity variables.
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_v_flag(id, v_flag, ierr)
-         use alloc, only: set_v_flag
+         use set_flags, only: set_v_flag
          integer, intent(in) :: id
          logical, intent(in) :: v_flag
          integer, intent(out) :: ierr
@@ -913,7 +895,7 @@
       ! this routine is for adding or removing velocity variables.
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_u_flag(id, u_flag, ierr)
-         use alloc, only: set_u_flag
+         use set_flags, only: set_u_flag
          integer, intent(in) :: id
          logical, intent(in) :: u_flag
          integer, intent(out) :: ierr
@@ -924,7 +906,7 @@
       ! this routine is for adding or removing rotation variables.
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_rotation_flag(id, rotation_flag, ierr)
-         use alloc, only: set_rotation_flag
+         use set_flags, only: set_rotation_flag
          use hydro_rotation, only: set_rotation_info, set_i_rot
          integer, intent(in) :: id
          logical, intent(in) :: rotation_flag
@@ -1101,7 +1083,7 @@
       
       
       subroutine star_zero_alpha_RTI(id, ierr)
-         use alloc, only: set_zero_alpha_RTI
+         use star_utils, only: set_zero_alpha_RTI
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          call set_zero_alpha_RTI(id, ierr)
@@ -2470,6 +2452,15 @@
          integer, intent(out) :: ierr
          call do_remove_center_by_he4(id, x, ierr)      
       end subroutine star_remove_center_by_he4
+      
+      
+      subroutine star_remove_center_by_c12_o16(id, x, ierr)
+         use remove_shells, only: do_remove_center_by_c12_o16
+         integer, intent(in) :: id
+         real(dp), intent(in) :: x ! mass fraction
+         integer, intent(out) :: ierr
+         call do_remove_center_by_c12_o16(id, x, ierr)      
+      end subroutine star_remove_center_by_c12_o16
       
       
       subroutine star_remove_center_by_si28(id, x, ierr)
