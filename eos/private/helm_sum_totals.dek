@@ -1,4 +1,4 @@
-       pgas    = max(pion + pele + ppos + pcoul, 1d-99)
+       pgas    = max(pion + pele + ppos + pcoul, 1d-20)
 
        dpgasdd  = dpiondd  + dpepdd  + dpcouldd 
        dpgasdt  = dpiondt  + dpepdt  + dpcouldt
@@ -15,7 +15,7 @@
        dpgasdaz = dpiondaz + dpepdaz + dpcouldaz 
        dpgasdzz = dpiondzz + dpepdzz + dpcouldzz 
 
-       egas    = max(eion + eele + epos + ecoul, 1d-99)
+       egas    = max(eion + eele + epos + ecoul, 1d-20)
        
        if (.false.) then
        write(*,'(a6,e15.5)') 'egas', egas
@@ -41,7 +41,7 @@
        degasdaz = deiondaz + deepdaz + decouldaz 
        degasdzz = deiondzz + deepdzz + decouldzz 
 
-       sgas    = max(sion + sele + spos + scoul, 1d-99)
+       sgas    = max(sion + sele + spos + scoul, 1d-20)
 
        dsgasdd  = dsiondd  + dsepdd  + dscouldd
        dsgasdt  = dsiondt  + dsepdt  + dscouldt
