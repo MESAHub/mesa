@@ -49,21 +49,26 @@
 
 &controls
 
-      use_dedt_form_of_energy_eqn = .true.
+      ! energy equation options
+      always_use_eps_grav_form_of_energy_eqn = .true.
+      use_dedt_form_of_energy_eqn = .false.
+      use_time_centered_eps_grav = .true.
+
+      limit_for_rel_error_in_energy_conservation = 1d99
+      hard_limit_for_rel_error_in_energy_conservation = 1d99
+      max_abs_rel_run_E_err = 1d99
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 600
+      max_model_number = 1000
 
-      initial_mass =  0.45
-      initial_z = 0.02d0
-      
-      
       power_nuc_burn_upper_limit = 1d8 
       
       varcontrol_target = 1d-3
-      mesh_delta_coeff = 0.5
-      
+
       min_timestep_limit = 1d-4 ! seconds
+
+      delta_lgRho_cntr_limit = 0.01
+      delta_lgRho_cntr_hard_limit = 0.02
 
       delta_lgL_nuc_limit = 0.01
       delta_lgL_nuc_hard_limit = 0.05
@@ -113,5 +118,13 @@
 
          Abundance_win_flag = .true.
          Abundance_xaxis_name = 'zone'
+
+         Profile_Panels1_win_flag = .true.
+
+         Profile_Panels1_num_panels = 2
+         Profile_Panels1_yaxis_name(1) = 'logT'
+         Profile_Panels1_other_yaxis_name(1) = 'entropy'
+         Profile_Panels1_yaxis_name(2) = 'logRho'
+         Profile_Panels1_other_yaxis_name(2) = 'log_D_mix'
 
 / ! end of pgstar namelist
