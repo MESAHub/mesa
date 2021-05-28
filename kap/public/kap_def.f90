@@ -63,6 +63,22 @@ module kap_def
         integer, intent(out) :: ierr ! 0 means AOK.
      end subroutine other_compton_opacity_interface
 
+     subroutine other_radiative_opacity_interface( &
+        handle, &
+        X, Z, XC, XN, XO, XNe, logRho, logT, &
+        frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+        use const_def, only: dp
+        integer, intent(in) :: handle ! kap handle
+        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
+        real(dp), intent(in) :: logRho ! density
+        real(dp), intent(in) :: logT ! temperature
+        real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
+        real(dp), intent(out) :: kap ! opacity
+        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+        integer, intent(out) :: ierr ! 0 means AOK.
+     end subroutine other_radiative_opacity_interface
+
   end interface
 
   
@@ -248,6 +264,10 @@ module kap_def
       procedure (other_compton_opacity_interface), pointer, nopass :: &
          other_compton_opacity => null()
 
+      logical :: use_other_radiative_opacity
+      procedure (other_radiative_opacity_interface), pointer, nopass :: &
+         other_radiative_opacity => null()
+      
   end type Kap_General_Info
 
   ! kap_options

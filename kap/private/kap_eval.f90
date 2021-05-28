@@ -174,10 +174,17 @@
 
          if (blend .lt. 1) then ! at least some tables
 
-            call Get_kap_Results_blend_T( &
-                 rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
-                 frac_lowT, frac_highT, frac_Type2, &
-                 kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+            if (rq% use_other_radiative_opacity) then
+               call rq% other_radiative_opacity( &
+                  rq% handle, X, Z, XC, XN, XO, XNe, logRho, logT, &
+                  frac_lowT, frac_highT, frac_Type2, &
+                  kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+            else
+               call Get_kap_Results_blend_T( &
+                  rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
+                  frac_lowT, frac_highT, frac_Type2, &
+                  kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+            end if
             if (ierr /= 0) return
 
             ! revise reported fractions based on Compton blend
