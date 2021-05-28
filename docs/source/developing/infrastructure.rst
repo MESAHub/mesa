@@ -82,7 +82,13 @@ TestHub
 -------
 
 The MESA TestHub runs on Heroku and the account is controlled by Bill
-Wolf.  Frank pays for this (through grants at ASU).  This costs ???/yr.
+Wolf.  It is funded by Frank and Bill W.  The Heroku account costs
+around $600/yr, though its cost has been higher during the GitHub
+transition.
+
+The testing `log archive <https://logs.mesastar.org/>`__ lives on a
+server controlled by Josiah.  The marginal cost is $1/month, which he
+covers.
 
 
 Zenodo
