@@ -104,6 +104,7 @@ contains
        M = Msun
        R = Rsun
        L = Lsun
+       Teff = atm_Teff(L, R)
     end if
 
     Z = 0.02d0
@@ -243,6 +244,7 @@ contains
        M = 1.9892000000000002D+32
        R = 6.3556231577545586D+10
        L = 2.4015399190199118D+32
+       Teff = atm_Teff(L, R)
 
        kap_guess = 5.8850802481174469D-02
 

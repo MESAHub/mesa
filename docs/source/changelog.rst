@@ -22,6 +22,8 @@ Removed profile columns `total_energy` and `total_energy_integral`.
 
 The ``other_eos`` hooks have been removed from star.  See the ``eos`` section for information about their replacements.
 
+The intent of the ``Teff`` argument in the ``other_surface_PT`` hook has changed from ``out`` to ``in``.
+
 
 .. _Module-level changes dev:
 
