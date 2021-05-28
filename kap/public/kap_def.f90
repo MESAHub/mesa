@@ -32,9 +32,11 @@ module kap_def
   abstract interface
 
      subroutine other_elect_cond_opacity_interface( &
+        handle, &
         zbar, logRho, logT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
+        integer, intent(in) :: handle ! kap handle
         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
         real(dp), intent(in) :: logRho ! the density
         real(dp), intent(in) :: logT ! the temperature
@@ -45,10 +47,12 @@ module kap_def
      end subroutine other_elect_cond_opacity_interface
 
      subroutine other_compton_opacity_interface( &
+        handle, &
         Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
         eta, d_eta_dlnRho, d_eta_dlnT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
+        integer, intent(in) :: handle ! kap handle
         real(dp), intent(in) :: Rho, T
         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
         ! free_e := total combined number per nucleon of free electrons and positrons
