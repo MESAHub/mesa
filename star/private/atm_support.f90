@@ -59,7 +59,7 @@ contains
     type (star_info), pointer :: s
     real(dp), intent(in)      :: tau_surf, L, R, M, cgrav
     logical, intent(in)       :: skip_partials
-    real(dp), intent(out)     :: Teff
+    real(dp), intent(in)      :: Teff
     real(dp), intent(out)     :: lnT_surf
     real(dp), intent(out)     :: dlnT_dL
     real(dp), intent(out)     :: dlnT_dlnR
@@ -139,7 +139,7 @@ contains
     type(star_info), pointer :: s
     real(dp), intent(in)     :: tau_surf, L, R, M, cgrav
     logical, intent(in)      :: skip_partials
-    real(dp), intent(out)    :: Teff
+    real(dp), intent(in)     :: Teff
     real(dp), intent(out)    :: kap
     real(dp), intent(out)    :: lnT_surf
     real(dp), intent(out)    :: dlnT_dL
@@ -259,7 +259,7 @@ contains
     character(*), intent(in)  :: T_tau_relation
     character(*), intent(in)  :: T_tau_opacity
     logical, intent(in)       :: skip_partials
-    real(dp), intent(out)     :: Teff
+    real(dp), intent(in)      :: Teff
     real(dp), intent(out)     :: kap
     real(dp), intent(out)     :: lnT_surf
     real(dp), intent(out)     :: dlnT_dL
@@ -477,7 +477,7 @@ contains
     type (star_info), pointer :: s
     logical, intent(in)       :: skip_partials
     real(dp), intent(in)      :: L, R, M, cgrav
-    real(dp), intent(out)     :: Teff
+    real(dp), intent(in)      :: Teff
     real(dp), intent(out)     :: lnT
     real(dp), intent(out)     :: dlnT_dL
     real(dp), intent(out)     :: dlnT_dlnR
@@ -516,8 +516,6 @@ contains
     real(dp) :: dlnP_dlnR_b
     real(dp) :: dlnP_dlnM_b
     real(dp) :: dlnP_dlnkap_b
-    real(dp) :: Teff_a
-    real(dp) :: Teff_b
     real(dp) :: kap_a
     real(dp) :: tau_b
 
@@ -557,7 +555,7 @@ contains
     ! option
 
     call atm_get_table_alfa_beta( &
-         L, R, M, cgrav, table_id, alfa, beta, ierr)
+         L, Teff, R, M, cgrav, table_id, alfa, beta, ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to atm_get_table_alfa_beta failed in get_table'
        if (s% report_ierr) write(*, *) s% retry_message
@@ -610,7 +608,7 @@ contains
 
        call atm_eval_table( &
             L, R, M, cgrav, table_id, Z, skip_partials, &
-            Teff_b, &
+            Teff, &
             lnT_b, dlnT_dL_b, dlnT_dlnR_b, dlnT_dlnM_b, dlnT_dlnkap_b, &
             lnP_b, dlnP_dL_b, dlnP_dlnR_b, dlnP_dlnM_b, dlnP_dlnkap_b, &
             ierr)
@@ -648,7 +646,7 @@ contains
           call get_T_tau( &
                s, s% tau_base, L, R, M, cgrav, &
                s% atm_T_tau_relation, s% atm_T_tau_opacity, skip_partials, &
-               Teff_a, kap_a, &
+               Teff, kap_a, &
                lnT_a, dlnT_dL_a, dlnT_dlnR_a, dlnT_dlnM_a, dlnT_dlnkap_a, &
                lnP_a, dlnP_dL_a, dlnP_dlnR_a, dlnP_dlnM_a, dlnP_dlnkap_a, &
                ierr)
@@ -708,19 +706,19 @@ contains
 
     ! Set the effective temperature
 
-    if (alfa /= 0._dp) then
-       if (beta /= 0._dp) then
-          if (Teff_a /= Teff_b) then
-             ierr = -1
-             s% retry_message = 'Mismatch between Teff values in get_tables'
-             write(*,*) 'Mismatch between Teff values in get_tables: ', Teff_a, Teff_b
-             !call mesa_error(__FILE__,__LINE__)
-          end if
-       endif
-       Teff = Teff_a
-    else
-       Teff = Teff_b
-    endif
+    ! if (alfa /= 0._dp) then
+    !    if (beta /= 0._dp) then
+    !       if (Teff_a /= Teff_b) then
+    !          ierr = -1
+    !          s% retry_message = 'Mismatch between Teff values in get_tables'
+    !          write(*,*) 'Mismatch between Teff values in get_tables: ', Teff_a, Teff_b
+    !          !call mesa_error(__FILE__,__LINE__)
+    !       end if
+    !    endif
+    !    Teff = Teff_a
+    ! else
+    !    Teff = Teff_b
+    ! endif
 
     ! Finish
 
@@ -791,7 +789,7 @@ contains
     character(*), intent(in)  :: irradiated_opacity
     logical, intent(in)       :: skip_partials
     real(dp), intent(in)      :: L, R, M, cgrav
-    real(dp), intent(out)     :: Teff
+    real(dp), intent(in)      :: Teff
     real(dp), intent(out)     :: lnT_surf
     real(dp), intent(out)     :: dlnT_dL
     real(dp), intent(out)     :: dlnT_dlnR

@@ -2210,6 +2210,7 @@
          if (ierr /= 0) return
          call do_eos_for_cell(s, k, ierr)
        end subroutine star_do_eos_for_cell
+
        
        subroutine star_do_kap_for_cell(id, k, ierr)
           use micro, only: do_kap_for_cell
@@ -2222,6 +2223,7 @@
          if (ierr /= 0) return
          call do_kap_for_cell(s, k, ierr)
        end subroutine star_do_kap_for_cell
+
        
        subroutine star_get_atm_PT( &
              id, tau_surf, L, R, M, cgrav, skip_partials, Teff, &
@@ -2232,8 +2234,9 @@
          integer, intent(in) :: id
          real(dp), intent(in) :: tau_surf, L, R, M, cgrav
          logical, intent(in) :: skip_partials
+         real(dp), intent(in) :: Teff
          real(dp), intent(out) :: &
-            Teff, lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
+            lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -2247,6 +2250,7 @@
              lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
              ierr)
        end subroutine star_get_atm_PT
+
        
        subroutine star_get_surf_PT( &
             id, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
