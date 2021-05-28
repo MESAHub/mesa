@@ -1,5 +1,5 @@
 &star_job
-   remove_initial_center_by_temperature = 1d7  
+   remove_initial_center_by_temperature = 2d7  
 / ! end of star_job namelist
 
 &eos

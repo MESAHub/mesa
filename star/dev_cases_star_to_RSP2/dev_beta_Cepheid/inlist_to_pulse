@@ -2,6 +2,7 @@
       
       !set_initial_dt = .true.
       !years_for_initial_dt = 0.1d0
+      required_termination_code_string(5) = 'xa_central_lower_limit'
 
 / ! end of star_job namelist
 
@@ -13,13 +14,17 @@
 
 &controls
    
-   max_model_number = 364
-   !log_Teff_lower_limit = 4.45
+   !max_model_number = 364
+   xa_central_lower_limit_species(1) = 'h1'
+   xa_central_lower_limit(1) = 1d-6
    when_to_stop_rtol = 1d-4
    when_to_stop_atol = 1d-4
    
    
-   x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+   
+   delta_HR_limit = 0.001
+   delta_HR_hard_limit = 0.002
 
 ! output
    !photo_interval = 10
@@ -45,17 +50,17 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 4.395 ! -101 ! only used if > -100
-   HR_logT_max = 4.45 ! only used if > -100
-   HR_logL_min = 4.75 ! -101 ! only used if > -100
-   HR_logL_max = 4.95 ! -101 ! only used if > -100
+   HR_logT_min = 4.30 ! -101 ! only used if > -100
+   HR_logT_max = 4.37 ! only used if > -100
+   HR_logL_min = 4.35 ! -101 ! only used if > -100
+   HR_logL_max = 4.52 ! -101 ! only used if > -100
 
    !show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
    HR_target_n_sigma = -3
-   HR_target_logL = 4.86d0
+   HR_target_logL = 4.47d0
    HR_target_logL_sigma = 0.02d0
-   HR_target_logT = 4.43d0
+   HR_target_logT = 4.35d0
    HR_target_logT_sigma = 0.005d0
 
    ! file output

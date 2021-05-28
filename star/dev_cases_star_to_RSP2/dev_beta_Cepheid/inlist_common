@@ -18,7 +18,7 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 18 
+   initial_mass = 12 
  ! initial_X = 0.7000
    initial_Y = 0.28d0
    initial_Z = 0.02d0
@@ -30,16 +30,16 @@
    mixing_length_alpha = 1.5d0 
    MLT_option = 'Henyey'
 
-   use_Ledoux_criterion = .true.
-   alpha_semiconvection = 0.1
+   use_Ledoux_criterion = .false.
+   alpha_semiconvection = 0
    
 ! mixing
     overshoot_scheme(1) = 'exponential'
     overshoot_zone_type(1) = 'burn_H'
     overshoot_zone_loc(1) = 'core'
     overshoot_bdy_loc(1) = 'top'
-    overshoot_f(1) = 0.012
-    overshoot_f0(1) = 0.002
+    overshoot_f(1) = 0.024
+    overshoot_f0(1) = 0.004
 
     overshoot_scheme(2) = 'exponential'
     overshoot_zone_type(2) = 'nonburn'
