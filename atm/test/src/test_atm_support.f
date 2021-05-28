@@ -104,7 +104,6 @@ contains
        M = Msun
        R = Rsun
        L = Lsun
-       Teff = atm_Teff(L, R)
     end if
 
     Z = 0.02d0

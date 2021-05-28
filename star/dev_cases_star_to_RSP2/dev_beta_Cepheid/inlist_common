@@ -1,4 +1,5 @@
 &star_job
+   mesa_dir = '../../..'
    show_log_description_at_start = .false.
    history_columns_file = '../../rsp2_utils/history_columns.list'
    profile_columns_file = '../../rsp2_utils/profile_columns.list'
@@ -12,12 +13,13 @@
    kap_file_prefix = 'a09'
    kap_lowT_prefix = 'lowT_fa05_a09p'
    kap_CO_prefix = 'a09_co'
-   Zbase = 0.02
+   Zbase = 0.02d0
    use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
-   initial_mass = 18 ! in Msun units
+   initial_mass = 18 
+ ! initial_X = 0.7000
    initial_Y = 0.28d0
    initial_Z = 0.02d0
 
@@ -30,21 +32,6 @@
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.1
-   
-! mixing
-    overshoot_scheme(1) = 'exponential'
-    overshoot_zone_type(1) = 'burn_H'
-    overshoot_zone_loc(1) = 'core'
-    overshoot_bdy_loc(1) = 'top'
-    overshoot_f(1) = 0.012
-    overshoot_f0(1) = 0.002
-
-    overshoot_scheme(2) = 'exponential'
-    overshoot_zone_type(2) = 'nonburn'
-    overshoot_zone_loc(2) = 'shell'
-    overshoot_bdy_loc(2) = 'bottom'
-    overshoot_f(2) = 0.022
-    overshoot_f0(2) = 0.002
    
 ! solver
    use_dedt_form_of_energy_eqn = .true.

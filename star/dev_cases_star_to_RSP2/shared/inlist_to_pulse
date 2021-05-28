@@ -14,9 +14,6 @@
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-   
-      !set_initial_dt = .true.
-      !seconds_for_initial_dt = 1d0
 
       pgstar_flag = .true.
 

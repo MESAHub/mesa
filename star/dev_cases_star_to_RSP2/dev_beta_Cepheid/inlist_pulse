@@ -1,164 +1,41 @@
 ! note: set x_ctrl(7) to approximately expected period (in days). 
 
-
-&star_job
-    !save_star_job_namelist = .true.
-    !star_job_namelist_name = 'rsp2_test_job.txt'
-
-      load_saved_model_for_RSP2 = .true.
-      load_model_filename = 'initialized.mod' 
-
-      set_initial_model_number = .true.
-      initial_model_number = 0
-
-      set_initial_number_retries = .true.
-      initial_number_retries = 0
-
-      set_initial_age = .true.
-      initial_age = 0
-
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
-   
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 4 ! expected period/10
-
-      !pgstar_flag = .true.
-
+&star_job   
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 36 ! start at ~ max/10
+   !pgstar_flag = .true.
 / ! end of star_job namelist
-
 
 &eos
 / !end of eos namelist
 
-
 &kap
 / ! end of kap namelist
 
+&controls   
+   max_timestep = 360
 
-&controls
-   !save_controls_namelist = .true.
-   !controls_namelist_name = 'rsp2_test_controls.txt'
+! timesteps
+   ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0
+   !      ccsn uses dt_div_min_dr_div_cs_limit = 0.7d0, no hard limit
+   dt_div_min_dr_div_cs_limit = 0.7d0 ! 1.0d0
+   dt_div_min_dr_div_cs_hard_limit = 2.0d0
    
-   max_timestep = 40 ! based on expected period
-
-   max_model_number = 5000000
-      
-   !max_number_retries = 0
-   
-! atm
-   !use_zero_Pgas_outer_BC = .true.
-   !use_momentum_outer_BC = .true. 
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0d0
-
-! solver
-   steps_before_use_velocity_time_centering = 0
-   use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
-   
-   include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 0.5d0
-
-   include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 0.5d0
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 0.3 ! expected period (in days) 
+   x_ctrl(7) = 2.5 ! expected period (in days) 
 !   x_ctrl(8) = 1d-1 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.1 ! min_period_div_target
 
-   terminal_show_age_units = 'days'
-   terminal_show_timestep_units = 'secs'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
-
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
-
-      photo_interval = 5000
-      profile_interval = 5000
-      history_interval = 50
-      terminal_interval = 5000
-
-
-      photo_interval = 4000
-      profile_interval = 4000
-      history_interval = 50
-      terminal_interval = 1000
-
-      !fill_arrays_with_NaNs = .true.
-            
-
-! FOR DEBUGGING
-
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
-
-      !solver_save_photo_call_number = 0
-         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
-         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
-
-      !solver_test_partials_call_number = 18
-      !solver_test_partials_k = 17
-      !solver_test_partials_iter_number = 1
-      !solver_test_partials_dx_0 = 1d-7
-      !solver_test_partials_var_name = 'all' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = 'du_dt' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
-      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
-      !solver_test_partials_show_dx_var_name = 'h1'
-
-         ! equ name can also be one of these
-            ! 'lnE', 'lnP', 'grad_ad' to test eos
-            ! 'eps_nuc' to test net
-            ! 'non_nuc_neu' to test neu
-            ! 'gradT', 'mlt_vc' to test mlt
-            ! 'opacity' to test kap
-
-      !solver_test_partials_write_eos_call_info = .true.
-      
-      !solver_test_partials_k_low = -1
-      !solver_test_partials_k_high = -1
-      
-      !solver_test_eos_partials = .true.
-      !solver_test_kap_partials = .true.
-      !solver_test_nRSP2_partials = .true.
-      !solver_test_atm_partials = .true.
-
-      !report_why_dt_limits = .true.
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 5189
-      !okay_to_remesh = .false.
-      
-      !energy_conservation_dump_model_number = -1
-      
-      !trace_evolve = .true.
-      
-      !use_DGESVX_in_bcyclic = .true.
-      !use_equilibration_in_DGESVX = .true.
-      !report_min_rcond_from_DGESXV = .true.
-
-
-      ! solver debugging
-      !solver_check_everything = .true.
-      
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
-      
-      !report_solver_dt_info = .true.
-      !report_dX_nuc_drop_dt_limits = .true.
-      !report_bad_negative_xa = .true.
-
+   !photo_interval = 100
+   !profile_interval = 100
+   !history_interval = 10
+   !terminal_interval = 10
 
 / ! end of controls namelist
-
 
 &pgstar
 
@@ -187,13 +64,13 @@
     Grid2_title = '18 M\d\(2281)\u  Z=0.02  beta Cepheid'
    
     History_Panels2_xaxis_name='star_age_day'
-    History_Panels2_max_width = 160 ! only used if > 0.  causes xmin to move with xmax.
+    History_Panels2_max_width = 70 ! only used if > 0.  causes xmin to move with xmax.
 
     !Grid2_file_flag = .true.
     file_digits = 8
     Grid2_file_dir = 'png'
-    Grid2_file_prefix = '9M_cepheid_'
-    Grid2_file_interval = 5 ! 25 ! output when mod(model_number,Grid2_file_interval)==0
+    Grid2_file_prefix = '18M_bcep_'
+    Grid2_file_interval = 25 ! output when mod(model_number,Grid2_file_interval)==0
 
     Profile_Panels2_xaxis_name = 'logxm'
     Profile_Panels2_xaxis_reversed = .true.
@@ -205,4 +82,6 @@
     Profile_Panels2_xmin = 5
     Profile_Panels2_xmax = -101
 
+         Profile_Panels2_yaxis_name(4) = 'Lc_div_L'     
+  
 / ! end of pgstar namelist

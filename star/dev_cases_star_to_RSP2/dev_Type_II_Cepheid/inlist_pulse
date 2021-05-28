@@ -15,9 +15,6 @@
 &controls   
    max_timestep = 360
 
-   RSP2_use_L_eqn_at_surface = .true.
-
-
 ! timesteps
    ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0
    !      ccsn uses dt_div_min_dr_div_cs_limit = 0.7d0, no hard limit

@@ -1039,8 +1039,8 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
          type(auto_diff_real_star_order1) :: &
-            d_00, Peos_00, rmid, mmid, cgrav_mid
-         real(dp) :: alfa, beta
+            d_00, Peos_00, rmid
+         real(dp) :: mmid, cgrav_mid
          integer :: j
          include 'formats'         
          ierr = 0
@@ -1050,14 +1050,14 @@
          
          d_00 = wrap_d_00(s, k)
          Peos_00 = wrap_Peos_00(s, k)
-         if (k <= s% nz) then
-            !rmid = 
-            !mmid = 
-            !cgrav_mid = 
+         if (k < s% nz) then
+            rmid = 0.5d0*(wrap_r_00(s,k) + wrap_r_p1(s,k))
+            mmid = 0.5d0*(s% m(k) + s% m(k+1))
+            cgrav_mid = 0.5d0*(s% cgrav(k) + s% cgrav(k+1))
          else
-            !rmid = 
-            !mmid = 
-            !cgrav_mid = 
+            rmid = 0.5d0*(wrap_r_00(s,k) + s% r_center)
+            mmid = 0.5d0*(s% m(k) + s% m_center)
+            cgrav_mid = s% cgrav(k)
          end if
          Hp_cell = pow2(rmid)*Peos_00/(d_00*cgrav_mid*mmid)
          if (s% alt_scale_height_flag) then
