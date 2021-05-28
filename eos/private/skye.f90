@@ -32,8 +32,8 @@ module skye
          ! Blend parameters
          real(dp) :: big
          real(dp) :: skye_blend_width
-         integer, parameter :: num_points = 6
-         real(dp) :: bounds(6,2)
+         integer, parameter :: num_points = 8
+         real(dp) :: bounds(8,2)
          type (Helm_Table), pointer :: ht
 
          ierr = 0
@@ -43,9 +43,9 @@ module skye
          big = 12d0
          skye_blend_width = 0.1d0
 
-         ! Top-left of (rho,T) plane
+         ! Avoid catastrophic loss of precision in HELM tables
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = ht% logthi
+         bounds(1,2) = 8.3d0 
 
          ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~1).
          ! We put a lower bound of logT=7.3 to ensure that solar models never use Skye.
@@ -69,6 +69,14 @@ module skye
          ! Upper-right of (rho,T) plane
          bounds(6,1) = ht% logdhi
          bounds(6,2) = ht% logthi
+
+         ! Avoid catastrophic loss of precision in HELM tables
+         bounds(7,1) = 3d0 * ht% logthi + log10(abar * mp * crad / (3d0 * kerg * (zbar + 1d0))) - 6d0
+         bounds(7,2) =  ht% logthi
+
+         ! Avoid catastrophic loss of precision in HELM tables
+         bounds(8,1) = 3d0 * 8.3d0 + log10(abar * mp * crad / (3d0 * kerg * (zbar + 1d0))) - 6d0
+         bounds(8,2) = 8.3d0
 
          ! Set up auto_diff point
          p(1) = logRho
