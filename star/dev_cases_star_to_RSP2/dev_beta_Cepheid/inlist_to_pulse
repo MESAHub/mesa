@@ -12,10 +12,9 @@
 / ! end of kap namelist
 
 &controls
-
-   !log_L_upper_limit = 5.04
-   max_model_number = 490          ! comment out on 1st pass when searching for best
-   !log_Teff_upper_limit = 3.78
+   
+   max_model_number = 364
+   !log_Teff_lower_limit = 4.45
    when_to_stop_rtol = 1d-4
    when_to_stop_atol = 1d-4
    
@@ -36,7 +35,7 @@
 
    ! HR window -- lg_L vs. lg_Teff
    
-   pgstar_interval = 1
+   pgstar_interval = 2
 
    HR_win_flag = .true.
    
@@ -46,17 +45,24 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 4.32 ! -101 ! only used if > -100
+   HR_logT_min = 4.395 ! -101 ! only used if > -100
    HR_logT_max = 4.45 ! only used if > -100
-   HR_logL_min = 4.74 ! -101 ! only used if > -100
+   HR_logL_min = 4.75 ! -101 ! only used if > -100
    HR_logL_max = 4.95 ! -101 ! only used if > -100
 
    !show_HR_classical_instability_strip = .true.
    show_HR_target_box = .true.
    HR_target_n_sigma = -3
-   HR_target_logL = 4.85d0
+   HR_target_logL = 4.86d0
    HR_target_logL_sigma = 0.02d0
-   HR_target_logT = 4.35d0
+   HR_target_logT = 4.43d0
    HR_target_logT_sigma = 0.005d0
-         
+
+   ! file output
+   !HR_file_flag = .true.
+   HR_file_dir = 'pgstar_out'
+   HR_file_prefix = 'hr'
+   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_width = -1 ! negative means use same value as for window
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
 / ! end of pgstar namelist

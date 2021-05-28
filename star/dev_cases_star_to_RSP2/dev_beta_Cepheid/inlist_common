@@ -33,6 +33,21 @@
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.1
    
+! mixing
+    overshoot_scheme(1) = 'exponential'
+    overshoot_zone_type(1) = 'burn_H'
+    overshoot_zone_loc(1) = 'core'
+    overshoot_bdy_loc(1) = 'top'
+    overshoot_f(1) = 0.012
+    overshoot_f0(1) = 0.002
+
+    overshoot_scheme(2) = 'exponential'
+    overshoot_zone_type(2) = 'nonburn'
+    overshoot_zone_loc(2) = 'shell'
+    overshoot_bdy_loc(2) = 'bottom'
+    overshoot_f(2) = 0.022
+    overshoot_f0(2) = 0.002
+   
 ! solver
    use_dedt_form_of_energy_eqn = .true.
 

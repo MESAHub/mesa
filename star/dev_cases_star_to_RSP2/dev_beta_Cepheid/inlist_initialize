@@ -10,7 +10,7 @@
 &controls
 ! GYRE set starting velocities 
    x_logical_ctrl(5) = .true. 
-   x_ctrl(4) = 0d0 ! fraction_1st_overtone (order 2)
+   x_ctrl(4) = 1d0 ! fraction_1st_overtone (order 2)
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
    x_ctrl(6) = 0.1d0 ! initial vsurf (kms)
 ! output controls

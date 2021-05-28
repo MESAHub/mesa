@@ -35,19 +35,24 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 echo 'finished'
 
 
-after to pulse          Teff 2.26e4   L 7.05e4
+after to pulse          Teff 2.7e4   L 7.2e4
    model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
-     490       1          0.2069E-04          48343.5125              0.5595             50.0283              0.0112             89.4112
-     490       2          0.2313E-04          43240.4905              0.5005            484.3540              0.0010            967.8009
+     364       1          0.3477E-04          28757.2557              0.3328            133.6411              0.0025            401.5191
+     364       2          0.4145E-04          24126.8871              0.2792              6.9260              0.0403             24.8023
 
-after remove core  2d6  Teff 2.26e4   L 7.05e4
+after remove core  2d6  Teff 2.7e4   L 7.2e4
    model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
-       1       1          0.2151E-04          46498.0664              0.5382             31.7253              0.0170             58.9501
-       1       2          0.2723E-04              0.0000              0.0000              stable
+       1       1          0.3589E-04          27861.7463              0.3225             69.1884              0.0047            214.5551
+       1       2          0.4209E-04          23760.1242              0.2750              6.5962              0.0417             23.9862
 
-after remesh            Teff   L 
+after remesh            Teff 2.7e4   L 7.2e4
    model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
+       1       1          0.3570E-04          28007.3344              0.3242             37.7780              0.0086            116.5415
+       1       2          0.4099E-04          24396.2950              0.2824              5.3131              0.0531             18.8164
 
-after initialize        Teff 2.26e4   L 7.05e4
+after initialize        Teff 2.7e4   L 7.2e4
    order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
- set gyre starting velocities for order 1
+       1          0.3570E-04          28007.3344              0.3242              0.0086            116.5415
+       2          0.4099E-04          24396.2950              0.2824              0.0531             18.8164
+       3          0.5203E-04          19219.4414              0.2224              stable
+ set gyre starting velocities for order 2

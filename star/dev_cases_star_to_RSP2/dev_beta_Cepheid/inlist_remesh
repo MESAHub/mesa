@@ -9,6 +9,8 @@
 
 &controls
 
+   RSP2_T_anchor = 2.8e4
+
 ! GYRE
    x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
    x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
