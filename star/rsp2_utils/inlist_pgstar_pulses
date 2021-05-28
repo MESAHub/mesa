@@ -178,7 +178,7 @@
          Profile_Panels2_other_ymax(4) = -101D0 ! 
          Profile_Panels2_other_ymin(4) = -101D0 ! 
          
-         Profile_Panels2_yaxis_name(5) = 'logT'         
+         Profile_Panels2_yaxis_name(5) = 'Pvsc' ! 'logT'         
          Profile_Panels2_other_yaxis_name(5) = 'free_e' 
                   
          Profile_Panels2_yaxis_name(6) = 'log_dt_div_tau_conv'     

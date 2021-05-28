@@ -3,7 +3,7 @@
 &star_job   
    set_initial_dt = .true.
    seconds_for_initial_dt = 36 ! start at ~ max/10
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 / ! end of star_job namelist
 
 &eos
@@ -14,6 +14,15 @@
 
 &controls   
    max_timestep = 360
+
+
+   !min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.7d0
+   
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 10 ! 4.0d0
+   Pvsc_zsh = 1d-2 ! 0.1d0
+
+   scale_max_correction_for_negative_surf_lum = .true.
 
 ! timesteps
    ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0
