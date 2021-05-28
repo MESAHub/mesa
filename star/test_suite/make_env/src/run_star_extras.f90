@@ -163,6 +163,7 @@
          use eos_def, only: i_lnfree_e, num_eos_basic_results, num_eos_d_dxa_results
          use chem_lib, only: basic_composition_info
          use utils_lib, only: is_bad
+         use atm_lib, only: atm_Teff
          
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -297,6 +298,7 @@
          s% atm_T_tau_relation = 'Eddington'
          s% atm_T_tau_opacity = 'iterated'
          s% Pextra_factor = 2
+         s% Teff = atm_Teff(s% L(1), s% r(1))
          call get_initial_guess_for_atm(ierr)
          if (ierr /= 0) then
             write(*, *) 'Call get_initial_guess_for_atm failed', k

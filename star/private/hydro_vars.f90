@@ -414,12 +414,13 @@
          r_surf = s% r(1)
          L_surf = s% L(1)
 
+         call set_phot_info(s) ! sets Teff using L_phot and R_phot
+         Teff = s% Teff
+
          if (s% RSP_flag) then
             lnT_surf = s% lnT(1)
             s% T_surf = s% T(1)
             s% P_surf = s% Peos(1)
-            call set_phot_info(s) ! sets Teff using L_phot and R_phot
-            Teff = s% Teff
             dlnT_dL = 0d0
             dlnT_dlnR = 0d0
             dlnT_dlnM = 0d0
@@ -792,10 +793,11 @@
          
          L_surf = s% L(1)
          R_surf = s% r(1)
+         Teff = s% Teff
          
          ! Initialize partials
-          dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
-          dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
+         dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
+         dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
 
          ! Evaluate the surface optical depth
 
@@ -844,6 +846,7 @@
                   write(*,1) 'tau_surf', tau_surf
                   write(*,1) 'L_surf', L_surf
                   write(*,1) 'R_surf', R_surf
+                  write(*,1) 'Teff', Teff
                   write(*,1) 's% m(1)', s% m(1)
                   write(*,1) 's% cgrav(1)', s% cgrav(1)
                   write(*,*) 'failed in get_atm_PT'
