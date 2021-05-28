@@ -37,40 +37,6 @@
       implicit none
 
       contains
-      
-      
-      subroutine set_phot_info(s)
-         use atm_lib, only: atm_black_body_T
-         type (star_info), pointer :: s
-         real(dp) :: luminosity
-         include 'formats'
-         call get_phot_info(s, &
-            s% photosphere_r, s% photosphere_m, s% photosphere_v, &
-            s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
-            s% photosphere_opacity, s% photosphere_logg, &
-            s% photosphere_column_density, s% photosphere_cell_k)
-         s% photosphere_black_body_T = &
-            atm_black_body_T(s% photosphere_L, s% photosphere_r)
-         s% photosphere_r = s% photosphere_r/Rsun
-         s% photosphere_m = s% photosphere_m/Msun
-         s% photosphere_L = s% photosphere_L/Lsun
-         s% L_phot = s% photosphere_L
-         luminosity = s% L(1)
-         if (is_bad(luminosity)) then
-            write(*,2) 's% L(1)', s% model_number, s% L(1)
-            write(*,2) 's% xh(s% i_lum,1)', s% model_number, s% xh(s% i_lum,1)
-            stop 'set_phot_info'
-            luminosity = 0d0
-         end if
-         if (s% Teff < 0 .or. is_bad(s% Teff)) s% Teff = s% photosphere_black_body_T
-         s% L_surf = luminosity/Lsun
-         s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
-            ! log10(stellar luminosity in solar units)
-         if (is_bad(s% L_surf)) then
-            write(*,2) 's% L_surf', s% model_number, s% L_surf
-            stop 'set_phot_info'
-         end if
-      end subroutine set_phot_info
 
 
       subroutine set_min_gamma1(s)

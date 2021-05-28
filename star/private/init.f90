@@ -36,16 +36,14 @@
          create_pre_ms_model, create_initial_model, &
          create_RSP_model, create_RSP2_model, &
          doing_restart, load_restart_photo, load_saved_model, &
-         load_saved_RSP_model, load_saved_RSP2_model, do_garbage_collection
+         do_garbage_collection
 
       integer, parameter :: do_create_pre_ms_model = 0
       integer, parameter :: do_load_zams_model = 1
       integer, parameter :: do_load_saved_model = 2
       integer, parameter :: do_create_initial_model = 3
       integer, parameter :: do_create_RSP_model = 4
-      integer, parameter :: do_load_saved_RSP_model = 5
-      integer, parameter :: do_create_RSP2_model = 6
-      integer, parameter :: do_load_saved_RSP2_model = 7
+      integer, parameter :: do_create_RSP2_model = 5
       
 
       logical :: have_done_starlib_init = .false.
@@ -457,7 +455,6 @@
          use other_photo_write, only: default_other_photo_write
          use other_photo_read, only: default_other_photo_read
          use other_set_pgstar_controls, only: default_other_set_pgstar_controls
-         use other_eos
          use other_kap
          use pgstar_decorator
          use star_utils, only: init_random
@@ -520,8 +517,6 @@
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
          s% RSP2_flag = .false.
-         s% using_RSP2 = .false.
-         s% previous_step_was_using_RSP2 = .false.
          s% using_TDC = .false.
          
          s% have_mixing_info = .false.
@@ -529,7 +524,6 @@
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
          s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
-         s% need_to_reset_w = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
@@ -618,10 +612,6 @@
          s% other_rsp_build_model => null_other_rsp_build_model
          s% other_rsp_linear_analysis => null_other_rsp_linear_analysis
          s% other_gradr_factor => null_other_gradr_factor
-
-         s% other_eosDT_get => null_other_eosDT_get
-         s% other_eosDT_get_T => null_other_eosDT_get_T
-         s% other_eosDT_get_Rho => null_other_eosDT_get_Rho
 
          s% other_kap_get => null_other_kap_get
          s% other_kap_get_op_mono => null_other_kap_get_op_mono
@@ -815,30 +805,6 @@
       end subroutine load_zams_model
 
 
-      subroutine load_saved_RSP_model(id, model_fname, ierr)
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr
-         integer :: l
-         l = len_trim(model_fname)
-         call model_builder( &
-            id, model_fname, do_load_saved_RSP_model, &
-            .false., 'restart_photo', ierr)
-      end subroutine load_saved_RSP_model
-
-
-      subroutine load_saved_RSP2_model(id, model_fname, ierr)
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr
-         integer :: l
-         l = len_trim(model_fname)
-         call model_builder( &
-            id, model_fname, do_load_saved_RSP2_model, &
-            .false., 'restart_photo', ierr)
-      end subroutine load_saved_RSP2_model
-
-
       subroutine load_saved_model(id, model_fname, ierr)
          integer, intent(in) :: id
          character (len=*), intent(in) :: model_fname
@@ -886,15 +852,13 @@
 
          type (star_info), pointer :: s
          real(dp) :: initial_mass, initial_z, dlgm_per_step
-         logical :: want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model
          real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
          logical :: restore_at_end
          real(dp) :: xm, total_radiation, warning_limit_for_max_residual
          integer :: k, num_trace_history_values
-         real(dp) :: save_Pextra_factor, save_max_frac_for_negative_surf_lum
-         logical :: save_scale_max_correction_for_negative_surf_lum
+         real(dp) :: save_Pextra_factor
          character (len=256):: save_atm_option, &
             save_atm_T_tau_relation, save_atm_T_tau_opacity
          real(dp), allocatable, dimension(:) :: total_energy_profile
@@ -910,10 +874,6 @@
          initial_z = s% initial_z
          s% dt = 0
          s% termination_code = -1
-         want_rsp_model = .false.
-         is_rsp_model = .false.
-         want_rsp2_model = .false.
-         is_rsp2_model = .false.
 
          if (restart) then
             s% doing_first_model_of_run = .false.
@@ -925,8 +885,7 @@
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
             call init_def(s) ! RSP
-            call finish_load_model(s, restart, &
-               want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model, ierr)
+            call finish_load_model(s, restart, ierr)
             if (s% max_years_for_timestep > 0) &
                s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
             return
@@ -941,14 +900,9 @@
          s% doing_first_model_of_run = .true.
          s% doing_first_model_after_restart = .false.
          
-         if (do_which == do_load_saved_model .or. &
-             do_which == do_load_saved_RSP_model .or. &
-             do_which == do_load_saved_RSP2_model) then
+         if (do_which == do_load_saved_model) then
             s% dt_next = -1
-            want_rsp_model = (do_which == do_load_saved_RSP_model)
-            want_rsp2_model = (do_which == do_load_saved_RSP2_model)
-            call do_read_saved_model(s, model_info, &
-               want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model, ierr)
+            call do_read_saved_model(s, model_info, ierr)
             if (ierr /= 0) then
                write(*,*) 'load failed in do_read_saved_model'
                return
@@ -1068,8 +1022,7 @@
             s% extra_heat(k) = 0
          end do
 
-         call finish_load_model(s, restart, &
-            want_rsp_model, is_rsp_model, want_rsp2_model, is_rsp2_model, ierr)
+         call finish_load_model(s, restart, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in finish_load_model'
             return
@@ -1154,14 +1107,10 @@
             save_atm_T_tau_relation = s% atm_T_tau_relation
             save_atm_T_tau_opacity = s% atm_T_tau_opacity
             save_Pextra_factor = s% Pextra_factor
-            save_scale_max_correction_for_negative_surf_lum = s% scale_max_correction_for_negative_surf_lum
-            save_max_frac_for_negative_surf_lum = s% max_frac_for_negative_surf_lum
             s% atm_option = 'T_tau'
             s% atm_T_tau_relation = 'Eddington'
             s% atm_T_tau_opacity = 'fixed'
             s% Pextra_factor = 2
-            s% scale_max_correction_for_negative_surf_lum = .true.
-            s% max_frac_for_negative_surf_lum = 0.8
          end subroutine setup_for_relax_after_create_pre_ms_model
 
          subroutine done_relax_after_create_pre_ms_model
@@ -1169,8 +1118,6 @@
             s% atm_T_tau_relation = save_atm_T_tau_relation
             s% atm_T_tau_opacity = save_atm_T_tau_opacity
             s% Pextra_factor = save_Pextra_factor
-            s% scale_max_correction_for_negative_surf_lum = save_scale_max_correction_for_negative_surf_lum
-            s% max_frac_for_negative_surf_lum = save_max_frac_for_negative_surf_lum
          end subroutine done_relax_after_create_pre_ms_model
 
          subroutine check_initials

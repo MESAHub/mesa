@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+
+
+mira is too hard for now.  cannot get model for pulse with Psurf = 0.  and cannot pulse with anything else.
+
+
+
+
+do_one inlist_to_zams_header zams.mod
+cp zams.mod standard_zams.mod
+
+do_one inlist_to_near_pulses_header near_pulses.mod
+cp near_pulses.mod standard_near_pulses.mod
+
+do_one inlist_to_nearer_pulses_header nearer_pulses.mod
+cp nearer_pulses.mod standard_nearer_pulses.mod
+
+do_one inlist_to_pulse_header pulse.mod
+cp pulse.mod standard_pulse.mod
+
+do_one inlist_remove_core_header removed_core.mod
+cp removed_core.mod standard_removed_core.mod
+
+do_one inlist_remesh_header remeshed.mod
+cp remeshed.mod standard_remeshed.mod
+
+do_one inlist_initialize_header initialized.mod
+cp initialized.mod standard_initialized.mod
+
+do_one inlist_pulse_header final.mod 
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'
+
+return
+
+after to_pulse       Teff 2498   logL 3.72    near peak of He shell flash   use_zero_Pgas_outer_BC
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+    1997       2          0.2639E-07       37900318.9424            438.6611              1.7838
+    1997       2          0.5978E-07       16727275.8488            193.6027              2.3534
+after remove core    Teff 2423  logL 3.72    use_zero_Pgas_outer_BC
+      10       1          0.2639E-07       37896484.9077            438.6167              1.7855
+      10       2          0.5975E-07       16736635.0567            193.7111              2.3747
+after remesh         Teff    logL         pick T_anchor to get good match for P
+   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
+      10       1          0.2696E-07       37092893.7460            429.3159             19.7797
+      10       2          0.6464E-07              0.0000              0.0000              stable
+after initialize
+ set gyre starting velocities
+   order           freq (Hz)             P (sec)             P (day)    cycles to double
+       1          0.2696E-07       37092893.7460            429.3159             19.7797

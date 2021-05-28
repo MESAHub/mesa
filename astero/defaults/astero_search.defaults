@@ -1065,6 +1065,7 @@
    ! + |chi^2| is greater than ``chi2_relative_increase_limit`` times the best |chi^2| for the run.
    ! + ``chi2_spectro``, ``chi2_delta_nu`` or ``chi2_radial`` is greater than its corresponding ``_limit``.
    ! + MESA fails to evaluate |chi^2| (because e.g. it can't match all the modes of a particular degree).
+
    ! ::
 
       limit_num_chi2_too_big = 20
@@ -1166,18 +1167,6 @@
    ! radial modes (``l0_n_obs``) if they are provided. ::
 
       correction_b = 4.90d0
-
-   ! save_next_best_at_higher_frequency
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! ::
-
-      save_next_best_at_higher_frequency = .true.
-
-   ! save_next_best_at_lower_frequency
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! ::
-
-      save_next_best_at_lower_frequency = .true.
 
    ! note: to set nu_max_sun or delta_nu_sun, see star/defaults/controls.defaults
 

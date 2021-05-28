@@ -571,7 +571,7 @@ contains
          lnRho, res, dres_dlnRho, dres_dlnT, &
          ierr)
 
-      use eos_def, only: num_eos_basic_results
+      use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
       use eos_lib, only: eosPT_get, radiation_pressure
 
       real(dp), intent(in)  :: lnP
@@ -584,8 +584,8 @@ contains
 
       real(dp) :: T, P, Prad, Pgas, logPgas, rho
       real(dp) :: logRho, dlnRho_dlnPgas, dlnRho_dlnT
-      real(dp), dimension(num_eos_basic_results) :: &
-           dres_dabar, dres_dzbar
+      real(dp), dimension(num_eos_d_dxa_results, num_isos) :: &
+           dres_dxa
 
       T = exp(lnT)
       P = exp(lnP)
@@ -595,11 +595,11 @@ contains
       logPgas = log10(Pgas)
 
       call eosPT_get( &
-           eos_handle, Z, X, abar, zbar, &
+           eos_handle, &
            num_isos, chem_id, net_iso, xa, &
            Pgas, logPgas, T, lnT/ln10, &
            Rho, logRho, dlnRho_dlnPgas, dlnRho_dlnT, &
-           res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, ierr)
+           res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
 
       lnRho = logRho*ln10
 

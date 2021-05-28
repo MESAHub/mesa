@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -110,26 +110,30 @@
          integer :: ierr
          type (star_info), pointer :: s
 
-         integer :: k
-         real(dp) :: T_check, T_face, chi2
+         integer :: k, n
+         real(dp) :: T_check, T_face, T_rms
 
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_check_model = keep_going         
 
-         chi2 = 0.0_dp
+         T_rms = 0.0_dp
+         n = 0
          do k = 2, s% nz
             T_face = exp((s% dq(k-1)*s% lnT(k) + &
                   s% dq(k)*s% lnT(k-1))/(s% dq(k-1) + s% dq(k)))
             T_check = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% atm_T_tau_relation, s% tau(k))), 0.25_dp)
-            chi2 = chi2 + (T_face - T_check)**2
+            T_rms = T_rms + (T_face - T_check)**2
+            n = n + 1
             ! write(*,*) 'k, T_face, T_check:', k, T_face, T_check
             if (s% tau(k) > 0.1_dp) exit
          end do
 
-         if (chi2 > 1d2) then
-            write(*,*) 'chi2 too large (> 1d2): ', trim(s% atm_T_tau_relation), chi2
+         T_rms = sqrt(T_rms/n)
+
+         if (T_rms > s% x_ctrl(1)) then
+            write(*,*) 'T_rms larger than target: ', trim(s% atm_T_tau_relation), T_rms, s% x_ctrl(1)
             failed = .true.
          end if
 

@@ -1,0 +1,40 @@
+&star_job
+   mesa_dir = '../../..'
+   show_log_description_at_start = .false.
+/ ! end of star_job namelist
+
+&eos
+   use_Skye = .true.
+/ !end of eos namelist
+
+&kap
+   kap_file_prefix = 'a09'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   kap_CO_prefix = 'a09_co'
+   Zbase = 0.02d0
+   use_Type2_opacities = .true.
+/ ! end of kap namelist
+
+&controls
+   initial_mass = 21d0 
+   ! initial_X = 0.72
+   initial_Z = 0.02d0
+   initial_Y = 0.26d0
+
+! MLT
+   max_dt_div_tau_conv_for_TDC = -1d99  ! No TDC
+   max_dt_years_for_TDC = -1d99
+
+   mixing_length_alpha = 1.5d0 
+   MLT_option = 'Henyey'
+
+   use_Ledoux_criterion = .true.
+   alpha_semiconvection = 0.1
+   
+! solver
+   use_dedt_form_of_energy_eqn = .true.
+
+/ ! end of controls namelist
+
+&pgstar
+/ ! end of pgstar namelist

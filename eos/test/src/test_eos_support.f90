@@ -86,11 +86,11 @@
          end if
 
          call eosPT_get( &
-               handle, Z, X, abar, zbar, &
+               handle, &
                species, chem_id, net_iso, xa, &
                Pgas, logPgas, T, logT, &
                Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosPT_get for test1_eosPT'
             stop 1
@@ -382,7 +382,7 @@
                logT_guess, logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                logT_result, new_energy, &
                res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
-               d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
+               d_dxa(num_eos_d_dxa_results, species), &
                d_dlnT(num_eos_basic_results), &
                Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas         
          integer:: ierr, which_other, eos_calls, max_iter
@@ -430,13 +430,13 @@
          write(*,*)
 
          call eosPT_get_T( &
-               handle, Z, X, abar, zbar, &
+               handle, &
                species, chem_id, net_iso, xa, &
                logPgas, which_other, other, &
                logT_tol, other_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                logT_result, Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+               res, d_dlnd, d_dlnT, d_dxa, &
                eos_calls, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in test1_eosPT_get_T'

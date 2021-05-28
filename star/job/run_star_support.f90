@@ -1811,16 +1811,6 @@
             write(*,*)
             call star_load_restart_photo(id, s% job% saved_photo_name, ierr)
             if (failed('star_load_restart_photo',ierr)) return
-         else if (s% job% load_saved_model_for_RSP) then
-            write(*,'(a)') 'load saved model for RSP ' // trim(s% job% load_model_filename)
-            write(*,*)
-            call star_read_RSP_model(id, s% job% load_model_filename, ierr)
-            if (failed('star_read_RSP_model',ierr)) return
-         else if (s% job% load_saved_model_for_RSP2) then
-            write(*,'(a)') 'load saved model for RSP2 ' // trim(s% job% load_model_filename)
-            write(*,*)
-            call star_read_RSP2_model(id, s% job% load_model_filename, ierr)
-            if (failed('star_read_RSP2_model',ierr)) return
          else if (s% job% load_saved_model) then
             if (s% job% create_merger_model) then
                write(*,*) 'you have both load_saved_model and create_merger_model set true'
@@ -3106,7 +3096,7 @@
             real(dp) :: T_guess_gas, T_guess_rad, logT_guess
             integer :: eos_calls
             ! these are used for all eos calls
-            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
             real(dp), dimension(num_eos_d_dxa_results, s% species) :: d_dxa
             real(dp), parameter :: logT_tol = 1d-8, logE_tol = 1d-8
             integer, parameter :: MAX_ITERS = 20
@@ -3163,11 +3153,11 @@
                      entropy(i) = exp(res(i_lnS))
                   else if (s% job% get_entropy_for_relax_from_eos == 'eosPT') then
                      call eosPT_get( &
-                        s% eos_handle, 1 - s% X(k) - s% Y(k), s% X(k), s% abar(k), s% zbar(k), &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
                         var1, log10(var1), var2, log10(var2), &
                         Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-                        res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+                        res, d_dlnd, d_dlnT, d_dxa, ierr)
                      if (ierr /= 0) then
                         write(*,*) "failed in eosPT_get"
                         return
@@ -3259,6 +3249,34 @@
             call star_remove_center_by_he4( &
                id, s% job% remove_initial_center_by_he4, ierr)
             if (failed('star_remove_initial_center_by_he4',ierr)) return
+         end if
+         
+         if (s% job% remove_center_by_he4 > 0d0 .and. &
+               s% job% remove_center_by_he4 < 1d0) then
+            write(*, 1) 'remove_center_by_he4', &
+               s% job% remove_center_by_he4
+            call star_remove_center_by_he4( &
+               id, s% job% remove_center_by_he4, ierr)
+            if (failed('star_remove_center_by_he4',ierr)) return
+         end if
+         
+         if (s% job% remove_initial_center_by_c12_o16 > 0d0 .and. &
+               s% job% remove_initial_center_by_c12_o16 < 1d0 &
+                  .and. .not. restart) then
+            write(*, 1) 'remove_initial_center_by_c12_o16', &
+               s% job% remove_initial_center_by_c12_o16
+            call star_remove_center_by_c12_o16( &
+               id, s% job% remove_initial_center_by_c12_o16, ierr)
+            if (failed('star_remove_initial_center_by_c12_o16',ierr)) return
+         end if
+         
+         if (s% job% remove_center_by_c12_o16 > 0d0 .and. &
+               s% job% remove_center_by_c12_o16 < 1d0) then
+            write(*, 1) 'remove_center_by_c12_o16', &
+               s% job% remove_center_by_c12_o16
+            call star_remove_center_by_c12_o16( &
+               id, s% job% remove_center_by_c12_o16, ierr)
+            if (failed('star_remove_center_by_c12_o16',ierr)) return
          end if
          
          if (s% job% remove_initial_center_by_si28 > 0d0 .and. &

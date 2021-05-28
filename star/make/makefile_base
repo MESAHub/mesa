@@ -93,7 +93,6 @@ SRCS = \
    other_diffusion_coefficients.f90 \
    other_diffusion.f90 \
    other_diffusion_factor.f90 \
-   other_eos.f90 \
    other_kap.f90 \
    other_eps_grav.f90 \
    other_overshooting_scheme.f90 \
@@ -204,6 +203,7 @@ SRCS = \
    eps_mdot.f90 \
    evolve.f90 \
    relax.f90 \
+   set_flags.f90 \
    create_initial_model.f90 \
    pre_ms_model.f90 \
    init_model.f90 \

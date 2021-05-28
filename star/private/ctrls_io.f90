@@ -324,8 +324,7 @@
     diffusion_maxsteps_for_isolve, diffusion_isolve_solver, &
     
     ! eos controls
-    use_d_eos_dxa, &
-    report_eos_settings_at_start_of_run, &
+    fix_d_eos_dxa_partials, &
 
     ! opacity controls
     use_simple_es_for_kap, use_starting_composition_for_kap, &
@@ -382,7 +381,6 @@
     iter_for_resid_tol2, iter_for_resid_tol3, &
     solver_itermin, solver_itermin_until_reduce_min_corr_coeff, &
     solver_reduced_min_corr_coeff, do_solver_damping_for_neg_xa, &
-    scale_max_correction_for_negative_surf_lum, max_frac_for_negative_surf_lum, &
     hydro_mtx_max_allowed_abs_dlogT, hydro_mtx_max_allowed_abs_dlogRho, &
     min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
     hydro_mtx_max_allowed_logRho, report_min_rcond_from_DGESXV, &
@@ -406,12 +404,12 @@
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
-    RSP2_alfap, RSP2_alfat, RSP2_alfam, RSP2_alfar, RSP2_Lsurf_factor, RSP2_use_Stellingwerf_Lr, &
+    RSP2_alfap, RSP2_alfat, RSP2_alfam, RSP2_alfar, RSP2_Lsurf_factor, RSP2_use_Stellingwerf_Lr, RSP2_remesh_when_load, &
     RSP2_alfad, RSP2_num_outermost_cells_forced_nonturbulent, RSP2_num_innermost_cells_forced_nonturbulent, &
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
-    RSP2_min_dt_div_tau_conv_switch_to_MLT, RSP2_min_dt_years_switch_to_MLT, &
+    RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM, &
     RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, max_X_for_conv_timescale, min_X_for_conv_timescale, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
@@ -522,7 +520,7 @@
 
     ! misc
     min_chem_eqn_scale, zams_filename, set_rho_to_dm_div_dV, use_other_momentum_implicit, &
-    use_other_eos, use_other_surface_PT, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
+    use_other_surface_PT, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
     use_other_adjust_mdot, use_other_j_for_adjust_J_lost, use_other_alpha_mlt, use_other_remove_surface, &
     use_other_am_mixing, use_other_brunt, use_other_brunt_smoothing, use_other_solver_monitor, &
     use_other_build_initial_model, use_other_cgrav, use_other_energy_implicit, use_other_momentum, &
@@ -1799,8 +1797,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
  ! eos controls
- s% report_eos_settings_at_start_of_run = report_eos_settings_at_start_of_run
- s% use_d_eos_dxa = use_d_eos_dxa
+ s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
 
  ! opacity controls
  s% use_simple_es_for_kap = use_simple_es_for_kap
@@ -1971,8 +1968,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% solver_itermin_until_reduce_min_corr_coeff = solver_itermin_until_reduce_min_corr_coeff
  s% solver_reduced_min_corr_coeff = solver_reduced_min_corr_coeff
  s% do_solver_damping_for_neg_xa = do_solver_damping_for_neg_xa
- s% scale_max_correction_for_negative_surf_lum = scale_max_correction_for_negative_surf_lum
- s% max_frac_for_negative_surf_lum = max_frac_for_negative_surf_lum
  s% hydro_mtx_max_allowed_abs_dlogT = hydro_mtx_max_allowed_abs_dlogT
  s% hydro_mtx_max_allowed_abs_dlogRho = hydro_mtx_max_allowed_abs_dlogRho
  s% min_logT_for_hydro_mtx_max_allowed = min_logT_for_hydro_mtx_max_allowed
@@ -2084,14 +2079,18 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_min_Lc_div_L_for_convective_mixing_type = RSP2_min_Lc_div_L_for_convective_mixing_type
  s% RSP2_Lsurf_factor = RSP2_Lsurf_factor
  s% RSP2_use_Stellingwerf_Lr = RSP2_use_Stellingwerf_Lr
+ s% RSP2_remesh_when_load = RSP2_remesh_when_load
  s% RSP2_use_L_eqn_at_surface = RSP2_use_L_eqn_at_surface
  s% RSP2_assume_HSE = RSP2_assume_HSE
  s% RSP2_use_RSP_eqn_for_Y_face = RSP2_use_RSP_eqn_for_Y_face
  s% RSP2_use_mass_interp_face_values = RSP2_use_mass_interp_face_values
  s% RSP2_num_outermost_cells_forced_nonturbulent = RSP2_num_outermost_cells_forced_nonturbulent
  s% RSP2_num_innermost_cells_forced_nonturbulent = RSP2_num_innermost_cells_forced_nonturbulent
- s% RSP2_min_dt_div_tau_conv_switch_to_MLT = RSP2_min_dt_div_tau_conv_switch_to_MLT
- s% RSP2_min_dt_years_switch_to_MLT = RSP2_min_dt_years_switch_to_MLT
+ s% RSP2_T_anchor = RSP2_T_anchor
+ s% RSP2_dq_1_factor = RSP2_dq_1_factor
+ s% RSP2_nz = RSP2_nz
+ s% RSP2_nz_outer = RSP2_nz_outer
+ s% RSP2_nz_div_IBOTOM = RSP2_nz_div_IBOTOM
  s% RSP2_target_steps_per_cycle = RSP2_target_steps_per_cycle
  s% RSP2_max_num_periods = RSP2_max_num_periods
  s% RSP2_work_period = RSP2_work_period
@@ -2404,7 +2403,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% zams_filename = zams_filename
  s% set_rho_to_dm_div_dV = set_rho_to_dm_div_dV
 
- s% use_other_eos = use_other_eos
  s% use_other_surface_PT = use_other_surface_PT
  s% use_other_kap = use_other_kap
  s% use_other_diffusion = use_other_diffusion
@@ -3474,8 +3472,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_isolve_solver = s% diffusion_isolve_solver
 
  ! eos controls
- report_eos_settings_at_start_of_run = s% report_eos_settings_at_start_of_run
- use_d_eos_dxa = s% use_d_eos_dxa
+ fix_d_eos_dxa_partials = s% fix_d_eos_dxa_partials
  
  ! opacity controls
  use_simple_es_for_kap = s% use_simple_es_for_kap
@@ -3644,8 +3641,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  solver_itermin_until_reduce_min_corr_coeff = s% solver_itermin_until_reduce_min_corr_coeff
  solver_reduced_min_corr_coeff = s% solver_reduced_min_corr_coeff
  do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
- scale_max_correction_for_negative_surf_lum = s% scale_max_correction_for_negative_surf_lum
- max_frac_for_negative_surf_lum = s% max_frac_for_negative_surf_lum
  hydro_mtx_max_allowed_abs_dlogT = s% hydro_mtx_max_allowed_abs_dlogT
  hydro_mtx_max_allowed_abs_dlogRho = s% hydro_mtx_max_allowed_abs_dlogRho
  min_logT_for_hydro_mtx_max_allowed = s% min_logT_for_hydro_mtx_max_allowed
@@ -3757,14 +3752,18 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_min_Lc_div_L_for_convective_mixing_type = s% RSP2_min_Lc_div_L_for_convective_mixing_type
  RSP2_Lsurf_factor= s% RSP2_Lsurf_factor
  RSP2_use_Stellingwerf_Lr = s% RSP2_use_Stellingwerf_Lr
+ RSP2_remesh_when_load = s% RSP2_remesh_when_load
  RSP2_use_L_eqn_at_surface = s% RSP2_use_L_eqn_at_surface
  RSP2_assume_HSE = s% RSP2_assume_HSE
  RSP2_use_RSP_eqn_for_Y_face = s% RSP2_use_RSP_eqn_for_Y_face
  RSP2_use_mass_interp_face_values = s% RSP2_use_mass_interp_face_values
  RSP2_num_outermost_cells_forced_nonturbulent = s% RSP2_num_outermost_cells_forced_nonturbulent
  RSP2_num_innermost_cells_forced_nonturbulent = s% RSP2_num_innermost_cells_forced_nonturbulent
- RSP2_min_dt_div_tau_conv_switch_to_MLT = s% RSP2_min_dt_div_tau_conv_switch_to_MLT
- RSP2_min_dt_years_switch_to_MLT = s% RSP2_min_dt_years_switch_to_MLT
+ RSP2_T_anchor = s% RSP2_T_anchor
+ RSP2_dq_1_factor = s% RSP2_dq_1_factor
+ RSP2_nz = s% RSP2_nz
+ RSP2_nz_outer = s% RSP2_nz_outer
+ RSP2_nz_div_IBOTOM = s% RSP2_nz_div_IBOTOM
  RSP2_target_steps_per_cycle = s% RSP2_target_steps_per_cycle
  RSP2_max_num_periods = s% RSP2_max_num_periods
  RSP2_work_period = s% RSP2_work_period
@@ -4077,7 +4076,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  zams_filename = s% zams_filename
  set_rho_to_dm_div_dV = s% set_rho_to_dm_div_dV
 
- use_other_eos = s% use_other_eos
  use_other_surface_PT = s% use_other_surface_PT
  use_other_kap = s% use_other_kap
  use_other_diffusion = s% use_other_diffusion

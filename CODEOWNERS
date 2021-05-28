@@ -1,9 +1,6 @@
 # Lines starting with '#' are comments.
 # Each line is a file pattern followed by one or more owners.
 
-# By default, Bill owns all code.
-# * @bill-paxton 
-
 ### Modules ###
 
 adipls/ @rhdtownsend @warrickball
@@ -40,7 +37,6 @@ star/private/pgstar_*.f90 @rjfarmer
 star/private/rsp_*.f90 @rsmolec
 star/private/mlt_info.f90 @adamjermyn
 star/private/mlt_get_results.f90 @adamjermyn
-
 
 ### Test suite cases ###
 

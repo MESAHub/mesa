@@ -97,6 +97,40 @@
       end subroutine do_remove_center_by_he4
 
 
+      subroutine do_remove_center_by_c12_o16(id, x, ierr)
+         use chem_def, only: ic12, io16
+         integer, intent(in) :: id
+         real(dp), intent(in) :: x
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         integer :: k, c12, o16
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'do_remove_center_by_c12_o16: get_star_ptr ierr', ierr
+            return
+         end if
+         c12 = s% net_iso(ic12)
+         if (c12 <= 0) then
+            ierr = -1
+            write(*,*) 'do_remove_center_by_c12_o16: no c12 in current net'
+            return
+         end if
+         o16 = s% net_iso(io16)
+         if (o16 <= 0) then
+            ierr = -1
+            write(*,*) 'do_remove_center_by_c12_o16: no o16 in current net'
+            return
+         end if
+         do k=1,s% nz
+            if (s% xa(c12,k) + s% xa(o16,k) >= x) then
+               call do_remove_inner_fraction_q(id, s% q(k), ierr)
+               return
+            end if
+         end do
+         ierr = -1
+      end subroutine do_remove_center_by_c12_o16
+
+
       subroutine do_remove_center_by_si28(id, x, ierr)
          use chem_def, only: isi28
          integer, intent(in) :: id
@@ -586,6 +620,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: old_xmstar, new_xmstar
+         logical :: restart
          integer :: kk
          include 'formats'
          call get_star_ptr(id, s, ierr)
@@ -599,8 +634,6 @@
          new_xmstar = s% m(1) - s% M_center
          s% xmstar = new_xmstar
          s% R_center = s% r(k)
-         
-         
          if (s% job% remove_center_adjust_L_center) s% L_center = s% L(k)
          if (s% u_flag) then
             kk = minloc(s% u(1:s% nz),dim=1)
@@ -637,7 +670,8 @@
          call prune_star_info_arrays(s, ierr)
          if (ierr /= 0) return
          s% need_to_setvars = .true.
-         call finish_load_model(s, .false., .false., .false., .false., .false., ierr)
+         restart = .false.
+         call finish_load_model(s, restart, ierr)
       end subroutine do_remove_center
 
 
@@ -950,7 +984,7 @@
          real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P, T_black_body
          integer :: k, k_old, nz, nz_old, skip
 
-         logical, parameter :: dbg = .false.
+         logical, parameter :: dbg = .false., restart = .false.
 
          include 'formats'
 
@@ -1080,9 +1114,8 @@
          end if
 
          s% need_to_setvars = .true.
-
          if (dbg) write(*,1) 'call finish_load_model'
-         call finish_load_model(s, .false., .false., .false., .false., .false., ierr)
+         call finish_load_model(s, restart, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &
                write(*,*) 'finish_load_model failed in do_remove_surface'
@@ -1105,7 +1138,7 @@
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interp_pm, interp_values, interp_value
          use adjust_xyz, only: change_net
-         use alloc, only: set_conv_vel_flag, set_v_flag, set_u_flag, set_rotation_flag
+         use set_flags, only: set_conv_vel_flag, set_v_flag, set_u_flag, set_rotation_flag
          use rotation_mix_info, only: set_rotation_mixing_info
          use hydro_rotation, only: set_i_rot, set_rotation_info
          use relax, only: do_relax_composition, do_relax_angular_momentum, do_relax_entropy

@@ -15,10 +15,11 @@ if you'd like to include regions of small optical depth as if they're
 part of the interior model.
 
 The test changes ``atm_T_tau_relation`` every 10 steps to cycle through
-all the available options.  At each step, it computes the sum of
-squared differences (stored as ``chi2``) between the stellar model's
+all the available options.  At each step, it computes the root-mean-squared
+differences (rms, stored as ``T_rms``) between the stellar model's
 temperature profile and the target |Ttau| relation in layers with |tau|
-< 0.1.  If new ``atm_T_tau_relation`` options are added to MESA, they
+< 0.1, and compares this to a target value set by ``x_ctrl(1)``.
+If new ``atm_T_tau_relation`` options are added to MESA, they
 must be added to this test case by hand.  That is, the implementation
 does not automatically track all the available options.
 
@@ -26,7 +27,7 @@ The target |Ttau| relation is stored in the extra profile column
 ``T_check``, which can be compared to ``T_face`` and *not* ``T``, because
 the optical depth ``tau`` is evaluated at the cell faces.
 
-If the test fails because ``chi2`` is slightly larger than the tolerance,
+If the test fails because ``T_rms`` is slightly larger than the tolerance,
 there are two possibly benign explanations.
 
 1. The interpolation error in ``T_face`` contributes too much to ``chi2``.
@@ -36,11 +37,11 @@ there are two possibly benign explanations.
    |Ttau| relation.  The sum can be restricted to smaller optical
    depths.
    
-If the test fails because ``chi2`` is much larger (orders of magnitude
+If the test fails because ``T_rms`` is much larger (orders of magnitude
 larger) than the tolerance, then there might be a bug
 in the implementation of the ``T_tau_gradr_factor``.
 
 Most options are deliberately left at their default values because
 they shouldn't influence the test's result.
 
-Last-Updated: 2020-10-27 (mesa r14711) by Warrick Ball
+Last-Updated: 2021-05-27 (commit 6086259) by Warrick Ball

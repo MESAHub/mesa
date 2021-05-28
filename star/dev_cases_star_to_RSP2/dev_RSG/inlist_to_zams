@@ -1,0 +1,25 @@
+&star_job
+   pgstar_flag = .true.
+/ !end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ !end of kap namelist
+
+&controls
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   !terminal_interval = 1
+/ ! end of controls namelist
+
+&pgstar
+   HR_title = '21 M\d\(2281)\u  Z=0.02  RSG'
+   HR_logT_min = 3.5 ! -101 ! only used if > -100
+   HR_logT_max = 4.65 ! only used if > -100
+   HR_logL_min = 3.8 ! -101 ! only used if > -100
+   HR_logL_max = 4.9 ! -101 ! only used if > -100
+   show_HR_classical_instability_strip = .true.
+/ ! end of pgstar namelist

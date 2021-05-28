@@ -1501,6 +1501,7 @@
          end if
 
          nz = s% nz
+         must_do_profile = .false.
          profile_priority = delta_priority
          model = s% model_number
          do_one_check_model = keep_going
@@ -1534,7 +1535,7 @@
                      (s% doing_first_model_of_run .or. &
                      mod(s% model_number,s% profile_interval) == 0))) then
                if (s% write_profiles_flag) must_do_profile = .true.
-               if (s% model_number == s% profile_model .or.&
+               if (s% model_number == s% profile_model .or. &
                    s% doing_first_model_of_run .or. &
                    (mod(s% model_number, s% priority_profile_interval) == 0)) then
                   profile_priority = phase_priority

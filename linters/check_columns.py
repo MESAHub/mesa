@@ -2,8 +2,39 @@
 
 import os
 import re
+from collections.abc import MutableSet
 
 MESA_DIR = '../'
+
+
+# inspiration from https://stackoverflow.com/a/27531275
+class CaseInsensitiveSet(MutableSet):
+
+    def __init__(self, iterable):
+        self._values = {}
+        self._fold = str.casefold
+        for v in iterable:
+            self.add(v)
+
+    def __repr__(self):
+        return repr(self._values.values())
+
+    def __contains__(self, value):
+        return self._fold(value) in self._values
+
+    def __iter__(self):
+        return iter(self._values.values())
+
+    def __len__(self):
+        return len(self._values)
+
+    def add(self, value):
+        self._values[self._fold(value)] = value
+
+    def discard(self, value):
+        v = self._fold(value)
+        if v in self._values:
+            del self._values[v]
 
 
 def get_options(filename, regexp):
@@ -11,7 +42,7 @@ def get_options(filename, regexp):
     r = re.compile(regexp)
     with open(os.path.join(MESA_DIR, filename)) as f:
         matches = r.finditer(f.read())
-    return set(m.group(1) for m in matches)
+    return CaseInsensitiveSet(m.group(1) for m in matches)
 
 
 def get_columns(filename, regexp):
@@ -24,7 +55,7 @@ def get_columns(filename, regexp):
         m = r.match(line)
         if m is not None:
             matches.append(m.group(1))
-    return set(matches)
+    return CaseInsensitiveSet(matches)
 
 
 def print_section(header):
@@ -36,18 +67,6 @@ def print_options(options):
     """Print a set of options"""
     for o in sorted(options):
         print(f"   {o}")
-
-
-# def take_difference(set1, set2):
-#     """Case-insensitive set difference"""
-#     ud1 = {e.upper():e for e in set1}
-#     ud2 = {e.upper():e for e in set2}
-#     us1 = set(ud1.keys())
-#     us2 = set(ud2.keys())
-#     usdiff = us1 - us2
-#     uddiff = {ud1[e] for e in usdiff}
-#     for e in uddiff:
-#         print(e)
 
 
 def check_history():
@@ -284,8 +303,8 @@ def check_profile():
 
     print_options(vals_profile_list - vals_profile - known_false_positives)
 
-    # Values that are in are in profile_getval.f90 but not in profile_controls.list
-    print_section("Values that are in are in profile_getval.f90 but not in profile_controls.list")
+    # Values that are in are in profile_getval.f90 but not in profile_columns.list
+    print_section("Values that are in are in profile_getval.f90 but not in profile_columns.list")
     print_options(vals_profile - vals_profile_list)
 
 

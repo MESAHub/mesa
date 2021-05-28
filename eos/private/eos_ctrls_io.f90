@@ -123,6 +123,8 @@
    logical :: okay_to_convert_ierr_to_skip
    real(dp) :: tiny_fuzz
 
+   ! other eos
+   logical :: use_other_eos_component, use_other_eos_results
    
    ! debugging
    logical :: dbg
@@ -253,6 +255,9 @@
       
       okay_to_convert_ierr_to_skip, &
       tiny_fuzz, &
+
+      ! other eos
+      use_other_eos_component, use_other_eos_results, &
 
       ! debugging
       dbg, &
@@ -507,6 +512,11 @@
       rq% eosDT_file_prefix = eosDT_file_prefix      
       rq% okay_to_convert_ierr_to_skip = okay_to_convert_ierr_to_skip
       rq% tiny_fuzz = tiny_fuzz
+
+      ! other eos
+      rq% use_other_eos_component = use_other_eos_component
+      rq% use_other_eos_results = use_other_eos_results
+
       ! debugging
       rq% dbg = dbg
       rq% logT_lo = logT_lo
@@ -642,6 +652,11 @@
       eosDT_file_prefix = rq% eosDT_file_prefix      
       okay_to_convert_ierr_to_skip = rq% okay_to_convert_ierr_to_skip
       tiny_fuzz = rq% tiny_fuzz
+
+      ! other eos
+      use_other_eos_component = rq% use_other_eos_component
+      use_other_eos_results = rq% use_other_eos_results
+
       ! debugging
       dbg = rq% dbg
       logT_lo = rq% logT_lo

@@ -207,8 +207,10 @@
    Skye_solid_mixing_rule = "PC"
 
    ! Skye Blending
-   ! ::
+   ! ~~~~~~~~~~~~~
    ! replace the polygon blend with simple Rho/T blends
+   ! ::
+
    use_simple_Skye_blends = .false.
    logRho_min_for_any_Skye = 1.8
    logRho_min_for_all_Skye = 2.0
@@ -236,7 +238,7 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Integer with valid values from 0 to 10 inclusive corresponding to the table
    ! to use in the fixed composition case. A value of 0 corresponds to the pure Helium
-   ! table while a value of 10 corresponds the the pure Hydrogren table.
+   ! table while a value of 10 corresponds the the pure Hydrogen table.
    ! to use table
    !                set index 
    ! mesa-CMS_000x.data ->  0
@@ -280,6 +282,32 @@
    eosDT_file_prefix = 'mesa'
    okay_to_convert_ierr_to_skip = .true.
    tiny_fuzz = 1d-6
+
+
+! Other EOS controls
+! ------------------
+
+   ! use_other_eos_component
+   ! ~~~~~~~~~~~~~~~~~~~~~~~
+   ! Select whether to use the other (i.e., user-provided) EOS component.
+   ! If true, the user must provide the routines
+   ! ``other_eos_component`` and ``other_eos_frac``.
+   ! See ``eos/other/other_eos.f90`` for more details.
+   ! ::
+
+   use_other_eos_component = .false.
+
+
+   ! use_other_eos_results
+   ! ~~~~~~~~~~~~~~~~~~~~~
+   ! Select whether to call the other_eos_results hook.  This provides
+   ! an opportunity for the user to modify the results from the EOS right
+   ! before they are returned. If true, the user must provide the routine
+   ! ``other_eos_results``.
+   ! See ``eos/other/other_eos.f90`` for more details.
+   ! ::
+
+   use_other_eos_results = .false.
 
 
 ! Debugging controls

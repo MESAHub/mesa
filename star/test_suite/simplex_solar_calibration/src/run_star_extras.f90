@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020 Bill Paxton
+!   Copyright (C) 2020 The MESA Team
 !
 !   this file is part of mesa.
 !

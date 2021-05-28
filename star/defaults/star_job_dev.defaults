@@ -6,17 +6,15 @@
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
 
       ! change_RSP2_flag
-      ! ~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~
       ! change_initial_RSP2_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! change_RSP2_flag_at_model_number
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! new_RSP2_flag
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~
       ! create_RSP2_model
-      ! ~~~~~~~~~~~~~~
-      ! load_saved_model_for_RSP2
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~
 
       ! WARNING: These controls are not ready for use.
       ! w is turbulent velocity according to RSP2
@@ -28,17 +26,16 @@
     change_RSP2_flag_at_model_number = -111
     new_RSP2_flag = .false.
     create_RSP2_model = .false.
-    load_saved_model_for_RSP2 = .false.
     
     
       ! remove_surface_by_relax_to_star_cut
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_do_jrot
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_do_entropy
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_turn_off_energy_sources_and_sinks
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
       
@@ -137,11 +134,11 @@
     saved_photo_name = 'undefined'
 
       ! save_photo_number
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~
       ! save_photo_filename
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~
       ! save_photo_when_terminate
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 

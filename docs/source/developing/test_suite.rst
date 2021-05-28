@@ -32,6 +32,22 @@ After a test runs, the files ``out.txt`` and ``err.txt`` will contain
 the output from stdout and stderr respectively.
 
 
+Philosophy of the tests
+-----------------------
+
+The MESA test suite serves multiple roles.  For developers, it
+provides day-to-day checks that code changes did not cause regressions
+and provides longer term opportunities to monitor the evolving
+performance of the code.  For users, the test suite primarily serves
+as a source of examples.
+
+The coverage and quality of the test suite must be sufficient to
+ensure that as MESA is developed, it retains its key capabilities
+(e.g., the ability to evolve through the He flash or to robustly
+evolve massive stars).  To this end, a number of test suite cases
+descend from examples presented in MESA instrument papers.
+
+
 Anatomy of a test
 -----------------
 
@@ -53,13 +69,15 @@ start of each part, this will be copied to ``inlist``, and will be the
 file that MESA reads as its primary inlist.
 
 
-A good test should be able to regenerate its starting model.  When
-then environment variable ``MESA_RUN_OPTIONAL`` is set, test cases
-should regenerate their initial model.  The ``rn`` script should look
-something like
+A good test should be able to regenerate its starting model.
+The ``rn`` script should look something like
 
 .. literalinclude:: ../../../star/test_suite/test_case_template/rn
    :language: bash
+
+When the environment variable ``MESA_SKIP_OPTIONAL`` is set, some
+parts of the test run may be skipped by copying standard versions
+of saved models (which must be included in the test case).
 
 It is essential to make use of ``test_suite_helpers`` as this ensures
 that important information is produced in a TestHub-friendly format.
@@ -70,15 +88,37 @@ restriction catches ``stop`` statements, calls to ``mesa_error``, or
 other error conditions.
 
 A good test should run relatively quickly.  Costly parts can be
-skipped over using a saved model and only run when
-``MESA_RUN_OPTIONAL`` is set.
+skipped over using a saved model when ``MESA_SKIP_OPTIONAL`` is set.
 
 A good test should check its stopping condition before producing an
 output model (i.e., set ``required_termination_code_string``).
 
 A good test should use ``run_star_extras`` to perform more detailed
 physical and/or numerical checks or report longitudinally interesting
-values to the TestHub (see :ref:`MESA Test Hub`).
+values to the TestHub (see :ref:`developing/test_suite:MESA Test Hub`).
+
+A good test should be numerically converged.  This is particularly
+important in order to ensure that the test is robust.  Unconverged
+tests can often fail in response to innocuous changes.  Models should
+always be sufficiently converged that they run reliably and that any
+quantities checked by the test are converged to better than the
+tolerances of those checks.
+
+.. note::
+
+   In some instances, performing good science with a given test case
+   may require even tighter convergence criteria that are practically
+   excluded by test suite run time considerations.  In such a case,
+   note this fact in the test case documentation.
+
+A good test should have physically-motivated time step limits.  (This
+often also an important part of ensuring convergence.)  The test
+should trigger few retries and have few time steps limited by solver
+convergence or by catch-all quantities like varcontrol.  The
+``star_job`` options ``show_retry_counts_when_terminate = .true.`` and
+``show_timestep_limit_counts_when_terminate = .true.`` will summarize
+the retries and timestep limits encountered during the run.
+
 
 Some tests should only be run in certain circumstances (e.g., if GYRE
 is installed, if OP MONO opacities are present).  Such a test should
@@ -322,7 +362,7 @@ Splits the running of the test suite between machines. Current, if set, cannon w
 [ci optional]
 ^^^^^^^^^^^^^
 
-Runs ``MESA`` with the environment variable ``MESA_RUN_OPTIONAL=t`` set. This requests that the slower optional parts of each test case be ran.
+Runs ``MESA`` with the environment variable ``MESA_SKIP_OPTIONAL`` unset.  This requests that all parts of each test case be run (i.e., including optional parts).
 
 [ci optional n]
 ^^^^^^^^^^^^^^^
@@ -332,4 +372,4 @@ Where ``n`` is an integer. Same as ``[ci optional]`` but only run the first ``n`
 [ci fpe]
 ^^^^^^^^
 
-Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`` set. This requests that we turn on addtional debugging checks.
+Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`` set. This requests that we turn on additional debugging checks.

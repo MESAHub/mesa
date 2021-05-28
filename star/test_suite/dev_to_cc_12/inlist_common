@@ -163,7 +163,6 @@
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .true.
-      use_d_eos_dxa = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
       min_timestep_limit = 1d-12 ! (seconds)

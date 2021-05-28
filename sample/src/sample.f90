@@ -113,13 +113,11 @@
          write(*,*)
 
          call eosPT_get(  &
-               handle, Z, X, abar, zbar, &
+               handle, &
                species, chem_id, net_iso, xa, &
                Pgas, log10(Pgas), T, log10(T),  &
                Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas,  &
-               res, d_dlnd, d_dlnT, &
-               d_dabar, d_dzbar, ierr)
-               !ierr)
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
       
          ! the indices for the results are defined in eos_def.f
          write(*,*)

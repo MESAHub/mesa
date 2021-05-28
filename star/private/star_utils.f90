@@ -1060,6 +1060,40 @@
          call get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
          get_r_phot = r
       end function get_r_phot
+      
+      
+      subroutine set_phot_info(s)
+         use atm_lib, only: atm_black_body_T
+         type (star_info), pointer :: s
+         real(dp) :: luminosity
+         include 'formats'
+         call get_phot_info(s, &
+            s% photosphere_r, s% photosphere_m, s% photosphere_v, &
+            s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
+            s% photosphere_opacity, s% photosphere_logg, &
+            s% photosphere_column_density, s% photosphere_cell_k)
+         s% photosphere_black_body_T = &
+            atm_black_body_T(s% photosphere_L, s% photosphere_r)
+         s% Teff = s% photosphere_black_body_T
+         s% photosphere_r = s% photosphere_r/Rsun
+         s% photosphere_m = s% photosphere_m/Msun
+         s% photosphere_L = s% photosphere_L/Lsun
+         s% L_phot = s% photosphere_L
+         luminosity = s% L(1)
+         if (is_bad(luminosity)) then
+            write(*,2) 's% L(1)', s% model_number, s% L(1)
+            write(*,2) 's% xh(s% i_lum,1)', s% model_number, s% xh(s% i_lum,1)
+            stop 'set_phot_info'
+            luminosity = 0d0
+         end if
+         s% L_surf = luminosity/Lsun
+         s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
+            ! log10(stellar luminosity in solar units)
+         if (is_bad(s% L_surf)) then
+            write(*,2) 's% L_surf', s% model_number, s% L_surf
+            stop 'set_phot_info'
+         end if
+      end subroutine set_phot_info
 
 
       subroutine get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
@@ -1072,10 +1106,8 @@
             Tface_0, Tface_1
 
          include 'formats'
-
-         tau00 = 0
-         taup1 = 0
-         ysum = 0
+         
+         ! set values for surface as defaults in case phot not in model
          r = s% r(1)
          m = s% m(1)
          if (s% u_flag) then
@@ -1091,9 +1123,14 @@
          kap = s% opacity(1)
          logg = safe_log10(s% cgrav(1)*m/(r*r))
          k_phot = 1
-         tau_phot = s% tau_base
-         tau00 = s% tau_factor*s% tau_base
-         if (tau00 >= tau_phot) return
+         if (s% tau_factor >= 1) then
+            ! This is always true for tables, regardless of tau_base.
+            return ! just use surface values
+         end if
+         tau_phot = s% tau_base ! this holds for case of tau_factor < 1
+         tau00 = s% tau_factor*s% tau_base ! start at tau_surf < tau_phot and go inward
+         taup1 = 0
+         ysum = 0
          do k = 1, s% nz-1
             dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
@@ -1118,10 +1155,11 @@
                   v = s% v(k) + (s% v(k+1) - s% v(k))*(tau_phot - tau00)/dtau
                end if
                L = s% L(k) + (s% L(k+1) - s% L(k))*(tau_phot - tau00)/dtau
+               logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
                k_phot = k
+               ! don't bother interpolating these.
                cs = s% csound(k_phot)
                kap = s% opacity(k_phot)
-               logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
                return
             end if
             tau00 = taup1
@@ -2108,7 +2146,7 @@
             get_Lconv = 0d0
             return
          end if
-         if (s% using_RSP2 .or. s% RSP_flag) then
+         if (s% RSP2_flag .or. s% RSP_flag) then
             get_Lconv = s% Lc(k)
          else
             get_Lconv = s% L_conv(k) ! L_conv set by last call on mlt
@@ -2407,7 +2445,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% using_RSP2) cell_total = cell_total + pow2(s% w(k))
+         if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2490,7 +2528,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% using_RSP2) then
+            if (s% RSP2_flag) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
@@ -2539,7 +2577,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% using_RSP2) then
+            if (s% RSP2_flag) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
             end if
@@ -3483,7 +3521,7 @@
          end if
          
          Ptrb_ad = 0d0
-         if (s% using_RSP2) then
+         if (s% RSP2_flag) then
             call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr) 
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted
@@ -4202,6 +4240,21 @@
             end do
          end do
       end subroutine set_luminosity_by_category
+
+
+      subroutine set_zero_alpha_RTI(id, ierr)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         include 'formats'
+         ierr = 0
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         if (.not. s% u_flag) return
+         s% xh(s% i_alpha_RTI,1:s% nz) = 0d0
+         s% alpha_RTI(1:s% nz) = 0d0
+         s% need_to_setvars = .true.
+      end subroutine set_zero_alpha_RTI
       
 
       end module star_utils

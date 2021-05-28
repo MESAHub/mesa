@@ -1,6 +1,9 @@
 
 &star_job   
-   load_saved_model_for_RSP2 = .true.
+   load_saved_model = .true.
+   change_initial_RSP2_flag = .true.
+   new_RSP2_flag = .true.
+
    pgstar_flag = .true.
 / ! end of star_job namelist
 
@@ -139,7 +142,7 @@ x_logical_ctrl(1) = .true. ! resynchronize at each step by star2 = star1
    History_Panels2_xaxis_name='day'
    History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
 
-   ! Grid2_file_flag = .true.
+   !Grid2_file_flag = .true.
    file_digits = 7
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid2'

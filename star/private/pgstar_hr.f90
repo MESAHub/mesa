@@ -89,22 +89,22 @@
             ! approximate edges
             
             ! blue edge
-            logT1 = 3.67
+            logT1 = 3.70
             logL1 = 5.5
             
-            logT2 = 3.8
-            logL2 = 2.4
+            logT2 = 3.93
+            logL2 = 1.0
             
             call pgsci(clr_Blue)
             call pgmove(logT1, logL1)
             call pgdraw(logT2, logL2)
             
             ! red edge
-            logT1 = 3.57
+            logT1 = 3.60
             logL1 = 5.5
             
-            logT2 = 3.74
-            logL2 = 2.4
+            logT2 = 3.83
+            logL2 = 1.0
             
             call pgsci(clr_FireBrick)
             call pgmove(logT1, logL1)

@@ -771,10 +771,6 @@
          character(len=64) :: diffusion_isolve_solver
 
 
-      ! eos controls
-         logical :: &
-            report_eos_settings_at_start_of_run
-
       ! opacity controls
 
          logical :: use_simple_es_for_kap, use_starting_composition_for_kap
@@ -1328,9 +1324,8 @@
          character (len=strlen) :: zams_filename
          logical :: set_rho_to_dm_div_dV
          
-         logical :: use_d_eos_dxa
+         logical :: fix_d_eos_dxa_partials
 
-         logical :: use_other_eos
          logical :: use_other_surface_PT
          logical :: use_other_kap
          logical :: use_other_diffusion

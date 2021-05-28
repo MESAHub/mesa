@@ -27,7 +27,7 @@
 
 &controls
 
-      x_ctrl(1) = 383d0 ! target frequency
+      x_ctrl(1) = 375d0 ! target frequency
 
       use_dedt_form_of_energy_eqn = .true.
 
