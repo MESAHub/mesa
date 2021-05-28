@@ -17,7 +17,7 @@
       
 
       ! RSP2 parameters
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~
          
       !   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad    
       !   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     

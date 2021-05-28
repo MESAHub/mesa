@@ -4136,6 +4136,13 @@
       ! + ``'table'``: 
       !   set Tsurf and Psurf by interpolating in pre-calculated tables based on model
       !   atmospheres. The choice of table is set by the ``atm_table`` control.
+      !   Requires tau_factor = 1, as surface of the model must always attach at the base
+      !   of the tables, so there is no flexibility to move model surface inward or outward.
+      !   Note that tau_base = tau_surf is the location at which the model attaches to the
+      !   table BCs, and there is no particular location identified as the photosphere, so
+      !   we fall back to the surface values of L, R, and m to calculate quantities such as
+      !   Teff and log_g. This is consistent with the assumptions used for table construction:
+      !   geometrically thin atmospheres with constant flux.
       !
       ! + ``'irradiated_grey'``: 
       !   set Tsurf by solving for the atmosphere structure given the irradiated-grey
@@ -7171,21 +7178,16 @@
 ! eos controls
 ! ============
 
+      ! fix_d_eos_dxa_partials
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
-      ! report_eos_settings_at_start_of_run
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    report_eos_settings_at_start_of_run = .false.
-
-
-      ! use_d_eos_dxa
-      ! ~~~~~~~~~~~~~
+      ! The star solver uses the partial derivatives of lnPgas and lnE
+      ! with respect to composition.  When the EOS fails to provide
+      ! these, replace them with a finite-difference approximation.
 
       ! ::
 
-    use_d_eos_dxa = .true.
+    fix_d_eos_dxa_partials = .true.
 
 ! opacity controls
 ! ================
@@ -11321,7 +11323,6 @@
 
       ! ::
 
-    use_other_eos = .false.
     use_other_kap = .false.
     use_other_diffusion = .false.
     use_other_mlt_results = .false.

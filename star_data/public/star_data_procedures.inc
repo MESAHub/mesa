@@ -122,13 +122,6 @@
          procedure (other_surface_PT_interface), pointer, nopass :: &
             other_surface_PT => null()
 
-         procedure (other_eosDT_get_interface), pointer, nopass :: &
-            other_eosDT_get => null()
-         procedure (other_eosDT_get_T_interface), pointer, nopass :: &
-            other_eosDT_get_T => null()
-         procedure (other_eosDT_get_Rho_interface), pointer, nopass :: &
-            other_eosDT_get_Rho => null()
-
          procedure (other_kap_get_interface), pointer, nopass :: &
             other_kap_get => null()
          procedure (other_kap_get_op_mono_interface), pointer, nopass :: &

@@ -14,7 +14,7 @@ FCstandard =
 #
 # SOURCES
 
-SRCS = eos_def.f90 gauss_fermi.f90 azbar.f helm_alloc.f90 \
+SRCS = eos_def.f90 other_eos.f90 gauss_fermi.f90 azbar.f helm_alloc.f90 \
    helm_polynomials.f90 helm.f90 \
    eos5_xtrin_h-he.f opal_core.f scvh_core.f \
    opal_scvh_driver.f helm_opal_scvh_driver.f \
@@ -85,7 +85,7 @@ endif
 #
 # DEPENDENCIES
 
-SRC_PATH = $(CEOS_DIR)/src:$(PACKAGE_DIR)/public:$(PACKAGE_DIR)/private
+SRC_PATH = $(CEOS_DIR)/src:$(PACKAGE_DIR)/public:$(PACKAGE_DIR)/private:$(PACKAGE_DIR)/other
 
 vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)

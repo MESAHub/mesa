@@ -86,18 +86,10 @@ contains
     if (s% doing_timing) &
        s% timing_num_get_eos_calls = s% timing_num_get_eos_calls + 1
 
-    if (s% use_other_eos) then
-       call s% other_eosDT_get( &
-            s% id, k, &
-            s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
-            Rho, logRho, T, logT, &
-            res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
-    else
-       call eosDT_get( &
-            s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
-            Rho, logRho, T, logT, &
-            res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
-    end if
+    call eosDT_get( &
+       s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
+       Rho, logRho, T, logT, &
+       res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
 
     if (ierr /= 0) then
        s% retry_message = 'get_eos failed'
@@ -149,25 +141,14 @@ contains
 
     ierr = 0
 
-    if (s% use_other_eos) then
-       call s% other_eosDT_get_T( &
-            s% id, k, s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logRho, i_lnE, logE*ln10, &
-            logT_tol, logE_tol*ln10, MAX_ITER_FOR_SOLVE, logT_guess, &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
-            eos_calls, ierr)
-    else
-       call eosDT_get_T( &
-            s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logRho, i_lnE, logE*ln10, &
-            logT_tol, logE_tol*ln10, MAX_ITER_FOR_SOLVE, logT_guess,  &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
-            eos_calls, ierr)
-    end if
+    call eosDT_get_T( &
+       s% eos_handle, &
+       s% species, s% chem_id, s% net_iso, xa, &
+       logRho, i_lnE, logE*ln10, &
+       logT_tol, logE_tol*ln10, MAX_ITER_FOR_SOLVE, logT_guess,  &
+       arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+       logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
+       eos_calls, ierr)
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + eos_calls
 
@@ -205,19 +186,13 @@ contains
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + 1
 
-    if (s% use_other_eos) then
-       write(*,*) 'cannot call solve_eos_given_DEgas with use_other_eos'
-       ierr = -1
-       return
-    else
-      call eosDT_get_T( &
-         s% eos_handle, &
-         s% species, s% chem_id, s% net_iso, xa, &            
-         logRho, i_egas, egas, logT_tol, egas_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
-         arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-         logT, res, dres_dlnRho, dres_dlnT, &
-         dres_dxa, eos_calls, ierr)
-    end if
+    call eosDT_get_T( &
+       s% eos_handle, &
+       s% species, s% chem_id, s% net_iso, xa, &            
+       logRho, i_egas, egas, logT_tol, egas_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
+       arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+       logT, res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, eos_calls, ierr)
 
   end subroutine solve_eos_given_DEgas
 
@@ -254,19 +229,13 @@ contains
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + 1
 
-    if (s% use_other_eos) then
-       write(*,*) 'cannot call solve_eos_given_DP with use_other_eos set'
-       ierr = -1
-       return
-    else
-       call eosDT_get_T( &
-            s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logRho, i_logPtot, logP, logT_tol, logP_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logT, res, dres_dlnRho, dres_dlnT, &
-            dres_dxa, eos_calls, ierr)
-    end if
+    call eosDT_get_T( &
+       s% eos_handle, &
+       s% species, s% chem_id, s% net_iso, xa, &
+       logRho, i_logPtot, logP, logT_tol, logP_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
+       arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+       logT, res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, eos_calls, ierr)
           
   end subroutine solve_eos_given_DP
 
@@ -302,25 +271,14 @@ contains
 
     ierr = 0
     
-    if (s% use_other_eos) then
-       call s% other_eosDT_get_T( &
-            s% id, k, s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logRho, i_lnS, logS*ln10, &
-            logT_tol, logS_tol*ln10, MAX_ITER_FOR_SOLVE, logT_guess, &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
-            eos_calls, ierr)
-    else
-       call eosDT_get_T( &
-            s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logRho, i_lnS, logS*ln10, &
-            logT_tol, logS_tol*ln10, MAX_ITER_FOR_SOLVE, logT_guess,  &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
-            eos_calls, ierr)
-    end if
+    call eosDT_get_T( &
+       s% eos_handle, &
+       s% species, s% chem_id, s% net_iso, xa, &
+       logRho, i_lnS, logS*ln10, &
+       logT_tol, logS_tol*ln10, MAX_ITER_FOR_SOLVE, logT_guess,  &
+       arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+       logT, res, dres_dlnRho, dres_dlnT, dres_dxa, &
+       eos_calls, ierr)
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + eos_calls
 
@@ -358,19 +316,13 @@ contains
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + 1
 
-    if (s% use_other_eos) then
-       write(*,*) 'cannot call solve_eos_given_PT with use_other_eos set'
-       ierr = -1
-       return
-    else
-       call eosDT_get_Rho( &
-            s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logT, i_logPtot, logP, logRho_tol, logP_tol, MAX_ITER_FOR_SOLVE, logRho_guess, &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logRho, res, dres_dlnRho, dres_dlnT, &
-            dres_dxa, eos_calls, ierr)
-    end if
+    call eosDT_get_Rho( &
+       s% eos_handle, &
+       s% species, s% chem_id, s% net_iso, xa, &
+       logT, i_logPtot, logP, logRho_tol, logP_tol, MAX_ITER_FOR_SOLVE, logRho_guess, &
+       arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+       logRho, res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, eos_calls, ierr)
 
   end subroutine solve_eos_given_PT
 
@@ -405,34 +357,19 @@ contains
 
     ierr = 0
 
-    if (s% use_other_eos) then
-       call s% other_eosDT_get_Rho( &
-            s% id, k, s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logT, i_lnPgas, logPgas*ln10, &
-            logRho_tol, logPgas_tol*ln10, MAX_ITER_FOR_SOLVE, logRho_guess, &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logRho, res, dres_dlnRho, dres_dlnT, &
-            dres_dxa, eos_calls, ierr)
-    else if (is_bad(logPgas)) then
-       write(*,*) 'bad logPgas for solve_eos_given_PgasT', logPgas
-       ierr = -1
-       return
-    else
-       call eosDT_get_Rho( &
-            s% eos_handle, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            logT, i_lnPgas, logPgas*ln10, &
-            logRho_tol, logPgas_tol*ln10, MAX_ITER_FOR_SOLVE, logRho_guess, &
-            arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
-            logRho, res, dres_dlnRho, dres_dlnT, &
-            dres_dxa, eos_calls, ierr)
-       if (ierr /= 0 .and. s% report_ierr) then
-          write(*,*) 'Call to eosDT_get_Rho failed in solve_eos_given_PgasT'
-          write(*,2) 'logPgas', k, logPgas
-          write(*,2) 'logT', k, logT
-          write(*,2) 'logRho_guess', k, logRho_guess
-       end if
+    call eosDT_get_Rho( &
+       s% eos_handle, &
+       s% species, s% chem_id, s% net_iso, xa, &
+       logT, i_lnPgas, logPgas*ln10, &
+       logRho_tol, logPgas_tol*ln10, MAX_ITER_FOR_SOLVE, logRho_guess, &
+       arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+       logRho, res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, eos_calls, ierr)
+    if (ierr /= 0 .and. s% report_ierr) then
+       write(*,*) 'Call to eosDT_get_Rho failed in solve_eos_given_PgasT'
+       write(*,2) 'logPgas', k, logPgas
+       write(*,2) 'logT', k, logT
+       write(*,2) 'logRho_guess', k, logRho_guess
     end if
 
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + eos_calls
