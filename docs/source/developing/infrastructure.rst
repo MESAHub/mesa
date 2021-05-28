@@ -75,7 +75,7 @@ Slack
 -----
 
 Rich controls the Slack and pays for it (through grants at UW
-Madison).  This costs ???/yr.
+Madison).  This costs around $130 per year (about $10/user/yr).
 
 
 TestHub
