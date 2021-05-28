@@ -1045,8 +1045,8 @@
          include 'formats'         
          ierr = 0
          
-         !Hp_cell = wrap_Hp_cell(s, k)
-         !return
+         Hp_cell = wrap_Hp_cell(s, k)
+         return
          
          d_00 = wrap_d_00(s, k)
          Peos_00 = wrap_Peos_00(s, k)

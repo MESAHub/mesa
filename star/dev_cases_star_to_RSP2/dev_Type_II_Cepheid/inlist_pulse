@@ -15,19 +15,10 @@
 &controls   
    max_timestep = 360
 
-
-   !min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.7d0
-   
-   use_Pvsc_art_visc = .true.
-   Pvsc_cq = 10 ! 4.0d0
-   Pvsc_zsh = 1d-2 ! 0.1d0
-
-   scale_max_correction_for_negative_surf_lum = .true.
-
 ! timesteps
    ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0
    !      ccsn uses dt_div_min_dr_div_cs_limit = 0.7d0, no hard limit
-   dt_div_min_dr_div_cs_limit = 0.7d0 ! 1.0d0
+   dt_div_min_dr_div_cs_limit = 1.0d0
    dt_div_min_dr_div_cs_hard_limit = 2.0d0
    
    
@@ -36,7 +27,7 @@
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
    x_ctrl(7) = 2.5 ! expected period (in days) 
 !   x_ctrl(8) = 1d-1 ! min_deltaR_for_periods (Rsun)
-   x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
+   x_ctrl(9) = 0.1 ! growth_avg_abs_frac_new
    x_ctrl(10) = 0.1 ! min_period_div_target
 
    !photo_interval = 100
