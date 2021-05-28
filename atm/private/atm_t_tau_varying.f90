@@ -59,7 +59,6 @@ contains
        ierr)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface
-    use atm_utils, only: eval_Teff_g
 
     real(dp), intent(in)       :: tau_surf
     real(dp), intent(in)       :: L
@@ -72,7 +71,7 @@ contains
     real(dp), intent(in)       :: errtol
     integer, intent(in)        :: max_steps
     logical, intent(in)        :: skip_partials
-    real(dp), intent(out)      :: Teff
+    real(dp), intent(in)       :: Teff
     real(dp), intent(out)      :: lnT
     real(dp), intent(out)      :: dlnT_dL
     real(dp), intent(out)      :: dlnT_dlnR
@@ -111,9 +110,9 @@ contains
        return
     end if
 
-    ! Evaluate the effective temperature & gravity
+    ! Evaluate the gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    g = cgrav*M/(R*R)
 
     ! Perform the necessary evaluations
 
