@@ -57,7 +57,7 @@
        dsgasdaa = dsiondaa + dsepdaa + dscouldaa 
        dsgasdaz = dsiondaz + dsepdaz + dscouldaz 
        dsgasdzz = dsiondzz + dsepdzz + dscouldzz 
-
+ 
 
 
        if (include_radiation) then
