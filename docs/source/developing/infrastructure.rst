@@ -8,9 +8,9 @@ controls it.
 GitHub
 ------
 
-We have the `MESAHub <https://github.com/MESAHub>`_ GitHub
+We have the `MESAHub <https://github.com/MESAHub>`__ GitHub
 organization.  The members of the MTC/MAC all have owner-level
-privileges.  MESAHub is classified an educational organization and
+privileges.  MESAHub is classified as an educational organization and
 this currently grants us a 100% discount, meaning this costs $0/yr.
 Unsubsidized, it would cost about $1200/yr.
 
@@ -36,7 +36,7 @@ Mailing lists
 
 The mesa-users@lists.mesastar.org and
 mesa-developers@lists.mesastar.org lists are hosted by `MailmanLists
-<https://www.mailmanlists.net/>`_.  The account is controlled by
+<https://www.mailmanlists.net/>`__.  The account is controlled by
 Josiah.  Frank has paid the hosting fees (through grants at ASU).
 This costs about $100/year.
 
@@ -44,7 +44,7 @@ Marketplace
 ^^^^^^^^^^^
 
 The address mesastar.org redirects to the `MESA marketplace
-<http://cococubed.asu.edu/mesa_market/>`_, which is controlled and
+<http://cococubed.asu.edu/mesa_market/>`__, which is controlled and
 hosted by Frank at ASU.
 
 
@@ -52,7 +52,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`_.  Rich controls the account.  This is
+<https://readthedocs.org/>`__.  Rich controls the account.  This is
 currently free for open source software.
 
 
@@ -99,12 +99,12 @@ We have multiple resources archived on Zenodo.  This is a free service.
 Community
 ^^^^^^^^^
 
-The `MESA community <https://zenodo.org/communities/mesa/>`_ on Zenodo
-is controled by Pablo.
+The `MESA community <https://zenodo.org/communities/mesa/>`__ on Zenodo
+is controlled by Pablo.
 
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/record/4311514>`_ is controlled by Josiah.
-* The `record for OP Mono data <https://zenodo.org/record/4390522>`_ is controlled by Josiah.
-* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`_, `linux <https://zenodo.org/record/4638535>`_) are controlled by Pablo.
+* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Josiah.
+* The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
+* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Pablo.
