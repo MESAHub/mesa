@@ -3096,7 +3096,7 @@
             real(dp) :: T_guess_gas, T_guess_rad, logT_guess
             integer :: eos_calls
             ! these are used for all eos calls
-            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
             real(dp), dimension(num_eos_d_dxa_results, s% species) :: d_dxa
             real(dp), parameter :: logT_tol = 1d-8, logE_tol = 1d-8
             integer, parameter :: MAX_ITERS = 20
@@ -3153,11 +3153,11 @@
                      entropy(i) = exp(res(i_lnS))
                   else if (s% job% get_entropy_for_relax_from_eos == 'eosPT') then
                      call eosPT_get( &
-                        s% eos_handle, 1 - s% X(k) - s% Y(k), s% X(k), s% abar(k), s% zbar(k), &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
                         var1, log10(var1), var2, log10(var2), &
                         Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-                        res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+                        res, d_dlnd, d_dlnT, d_dxa, ierr)
                      if (ierr /= 0) then
                         write(*,*) "failed in eosPT_get"
                         return
