@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020 The MESA Team
+!   Copyright (C) 2020-2021 The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -37,10 +37,12 @@
       contains
 
          subroutine null_other_compton_opacity( &
+            handle, &
             Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             use const_def, only: dp
+            integer, intent(in) :: handle ! kap handle
             real(dp), intent(in) :: Rho, T
             real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
@@ -50,9 +52,16 @@
             real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
             integer, intent(out) :: ierr ! 0 means AOK.
 
-
             write(*,*) 'no implementation for other_compton_opacity'
             ierr = -1
+
+            ! can first call kap_lib routine to get standard results, if desired
+
+            ! subroutine kap_get_compton_opacity( &
+            !    handle, &
+            !    Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            !    eta, d_eta_dlnRho, d_eta_dlnT, &
+            !    kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
          end subroutine null_other_compton_opacity
 
