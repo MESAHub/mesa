@@ -437,6 +437,16 @@
       use_other_compton_opacity = .false.
 
 
+   ! use_other_radiative_opacity
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! Replace radiative opacity routine.
+   ! The standard routine evaluates the opacity using the low-T and high-T tables.
+   ! ::
+
+      use_other_radiative_opacity = .false.
+
+
 ! Debugging controls
 ! ------------------
 

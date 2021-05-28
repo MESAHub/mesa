@@ -33,7 +33,8 @@ SRCS = \
    kapcn.f90 \
    kap_aesopus.f90 \
    other_elect_cond_opacity.f90 \
-   other_compton_opacity.f90
+   other_compton_opacity.f90 \
+   other_radiative_opacity.f90
 
 #################################################################
 #
