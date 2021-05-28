@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020 The MESA Team
+!   Copyright (C) 2020-2021 The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -37,9 +37,11 @@
       contains
 
          subroutine null_other_elect_cond_opacity( &
+            handle, &
             zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             use const_def, only: dp
+            integer, intent(in) :: handle ! kap handle
             real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
             real(dp), intent(in) :: logRho ! the density
             real(dp), intent(in) :: logT ! the temperature
@@ -50,6 +52,13 @@
 
             write(*,*) 'no implementation for other_elect_cond_opacity'
             ierr = -1
+
+            ! can first call kap_lib routine to get standard results, if desired
+
+            ! call kap_get_elect_cond_opacity( &
+            !    handle, &
+            !    zbar, logRho, logT, &
+            !    kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
          end subroutine null_other_elect_cond_opacity
 
