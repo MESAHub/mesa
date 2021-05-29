@@ -60,14 +60,18 @@
    max_model_number = 5000000
    max_number_retries = 10000 
 
+   max_age_in_days = 107
+   
+   
 ! atmosphere
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0d0
 
 ! timesteps
 !  RSP_max_dt_times_min_dr_div_cs = 2d0
-   dt_div_min_dr_div_cs_limit = 2d0
-   dt_div_min_dr_div_cs_hard_limit = 4d0
+   dt_div_min_dr_div_cs_limit = 1d0 ! 2d0
+   dt_div_min_dr_div_cs_hard_limit = 2d0 ! 4d0
+   ! 2,4 gives > 250 retries for 107 days
 
 !  RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0

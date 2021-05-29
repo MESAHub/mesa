@@ -475,7 +475,6 @@
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
-         use hydro_riemann, only: do_uface_and_Pface
          use hydro_rsp2, only: set_RSP2_vars
 
          type (star_info), pointer :: s
@@ -616,15 +615,6 @@
             call compute_j_fluxes_and_extra_jdot(s% id, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in compute_j_fluxes'
-            end if
-         end if
-
-         if (s% u_flag) then
-            call do_uface_and_Pface(s,ierr)
-            if (ierr /= 0) then
-               if (len_trim(s% retry_message) == 0) s% retry_message = 'do_uface_and_Pface failed'
-               if (s% report_ierr) write(*,*) 'ierr from do_uface_and_Pface'
-               return
             end if
          end if
          

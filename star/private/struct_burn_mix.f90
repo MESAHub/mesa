@@ -49,7 +49,7 @@
          integer :: nz, nvar, species, ierr, j, k, k_bad
          integer(8) :: time0
          logical :: do_chem
-         real(dp) :: dt, tol_correction_norm, tol_max_correction, total
+         real(dp) :: dt, total
 
          include 'formats'
 
@@ -150,8 +150,13 @@
             nvar = s% nvar_hydro
          end if
 
-         call set_tol_correction(s, maxval(s% T(1:s% nz)), &
-            tol_correction_norm, tol_max_correction)
+
+
+         call set_tol_correction(s, maxval(s% T(1:s% nz)))
+            
+            
+            
+            
          call set_surf_info(s, nvar)
 
          if (s% w_div_wc_flag) then
@@ -173,8 +178,7 @@
                      
          if (s% trace_evolve) write(*,*) 'call solver'
          do_struct_burn_mix = do_solver_converge( &
-            s, nvar, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction)
+            s, nvar, skip_global_corr_coeff_limit)
          if (s% trace_evolve) write(*,*) 'done solver'
 
          s% total_num_solver_iterations = &
@@ -354,8 +358,7 @@
 
 
       integer function do_solver_converge( &
-            s, nvar, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction)
+            s, nvar, skip_global_corr_coeff_limit)
          ! return keep_going, retry, or terminate
          use mtx_lib
          use mtx_def
@@ -365,7 +368,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
          integer :: ierr, nz, k, n, solver_lwork, solver_liwork
          logical :: report
@@ -405,7 +407,6 @@
 
          do_solver_converge = do_solver( &
             s, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction, &
             report, nz, nvar, s% solver_work, solver_lwork, &
             s% solver_iwork, solver_liwork)
 
@@ -503,7 +504,7 @@
                   s% xh(j1,k) = s% alpha_RTI(k)
                end do
             else if (j1 == s% i_ln_cvpv0 .and. s% i_ln_cvpv0 <= nvar) then
-                  stop 'pablo needs to revise this'
+                  stop 'pablo needs to revise this' 
 !               do k = 1, nz
 !                  ! create a rough first guess using mlt_vc_start and conv_vel when
 !                  ! mlt_vc is larger than the starting conv_vel
@@ -519,17 +520,18 @@
       end subroutine set_xh
 
 
-      subroutine set_tol_correction( &
-            s, T_max, tol_correction_norm, tol_max_correction)
+      subroutine set_tol_correction(s, T_max)
          type (star_info), pointer :: s
          real(dp), intent(in) :: T_max
-         real(dp), intent(out) :: tol_correction_norm, tol_max_correction
+         real(dp) :: tol_correction_norm, tol_max_correction
          include 'formats'
          if (T_max >= s% tol_correction_extreme_T_limit) then
+            stop 'no support for tol_correction_extreme_T_limit'
             tol_correction_norm = s% tol_correction_norm_extreme_T
             tol_max_correction = s% tol_max_correction_extreme_T
          else if (T_max >= s% tol_correction_high_T_limit) then
-            tol_correction_norm = s% tol_correction_norm_high_T
+            stop 'no support for tol_correction_extreme_T_limit'
+            tol_correction_norm = s% tol_correction_high_T_limit
             tol_max_correction = s% tol_max_correction_high_T
          else
             tol_correction_norm = s% tol_correction_norm
@@ -540,7 +542,6 @@
 
       integer function do_solver( &
             s, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction, &
             report, nz, nvar, solver_work, solver_lwork, &
             solver_iwork, solver_liwork)
          ! return keep_going, retry, or terminate
@@ -557,7 +558,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nvar
          logical, intent(in) :: skip_global_corr_coeff_limit, report
-         real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
          integer, intent(in) :: solver_lwork, solver_liwork
          real(dp), pointer :: solver_work(:) ! (solver_lwork)
@@ -631,8 +631,7 @@
          converged = .false.
          call hydro_solver_step( &
             s, nz, s% nvar_hydro, nvar, skip_global_corr_coeff_limit, &
-            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            solver_work, solver_lwork, &
+            gold_tolerances_level, solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
          if (ierr /= 0) then
@@ -784,8 +783,7 @@
 
       subroutine hydro_solver_step( &
             s, nz, nvar_hydro, nvar, skip_global_corr_coeff_limit, &
-            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            solver_work, solver_lwork, &
+            gold_tolerances_level, solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
          use num_def
@@ -797,7 +795,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nvar_hydro, nvar
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), intent(in) :: tol_max_correction, tol_correction_norm
          integer, intent(in) :: gold_tolerances_level
          integer, intent(in) :: solver_lwork, solver_liwork
          real(dp), intent(inout), pointer :: solver_work(:) ! (solver_lwork)
@@ -858,7 +855,7 @@
             warn_rates_for_high_temp = .false.        
             call solver( &
                s, nvar, skip_global_corr_coeff_limit, &
-               gold_tolerances_level, tol_max_correction, tol_correction_norm, &
+               gold_tolerances_level, &
                solver_work, solver_lwork, &
                solver_iwork, solver_liwork, &
                failure, ierr)

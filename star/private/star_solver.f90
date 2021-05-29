@@ -44,8 +44,7 @@
 
       subroutine solver( &
             s, nvar, skip_global_corr_coeff_limit, &
-            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            work, lwork, iwork, liwork, &
+            gold_tolerances_level, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
          use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
          use utils_lib, only: realloc_if_needed_1, quad_realloc_if_needed_1, fill_with_NaNs
@@ -62,24 +61,8 @@
          integer, intent(in) :: lwork, liwork
          real(dp), intent(inout), target :: work(:) ! (lwork)
          integer, intent(inout), target :: iwork(:) ! (liwork)
-
-         ! convergence criteria
          integer, intent(in) :: gold_tolerances_level ! 0, 1, or 2
-         real(dp), intent(in) :: tol_max_correction, tol_correction_norm
-            ! a trial solution is considered to have converged if
-            ! max_correction <= tol_max_correction and
-            !
-            ! either
-            !          (correction_norm <= tol_correction_norm)
-            !    .and. (residual_norm <= tol_residual_norm)
-            ! or
-            !          (correction_norm*residual_norm <= tol_corr_resid_product)
-            !    .and. (abs(slope) <= tol_abs_slope_min)
-            !
-            ! where "slope" is slope of the line for line search in the solver,
-            ! and is analogous to the slope of df/ddx in a 1D solver root finder.
 
-         ! output
          logical, intent(out) :: convergence_failure
          integer, intent(out) :: ierr ! 0 means okay.
 
@@ -99,8 +82,7 @@
 
          call do_solver( &
             s, nvar, s% AF1, ldAF, neqns, skip_global_corr_coeff_limit, &
-            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            work, lwork, iwork, liwork, &
+            gold_tolerances_level, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
       end subroutine solver
@@ -108,8 +90,7 @@
 
       subroutine do_solver( &
             s, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
-            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            work, lwork, iwork, liwork, &
+            gold_tolerances_level, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          type (star_info), pointer :: s
@@ -121,7 +102,6 @@
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
-         real(dp), intent(in) :: tol_max_correction, tol_correction_norm
 
          ! work arrays
          integer, intent(in) :: lwork, liwork
@@ -155,6 +135,9 @@
             coeff, f, slope, residual_norm, max_residual, &
             corr_norm_min, resid_norm_min, correction_factor, temp_correction_factor, &
             correction_norm, corr_norm_initial, max_correction, slope_extra, &
+            tol_correction_norm, tol_max_correction, &
+            tol_correction_norm2, tol_max_correction2, &
+            tol_correction_norm3, tol_max_correction3, &
             tol_residual_norm, tol_max_residual, &
             tol_residual_norm2, tol_max_residual2, &
             tol_residual_norm3, tol_max_residual3, &
@@ -162,6 +145,7 @@
             min_corr_coeff, max_corr_min, max_resid_min, max_abs_correction
          integer :: nz, iter, max_tries, zone, tiny_corr_cnt, i, j, k, &
             force_iter_value, iter_for_resid_tol2, iter_for_resid_tol3, &
+            iter_for_correction_tol2, iter_for_correction_tol3, &
             max_corr_k, max_corr_j, max_resid_k, max_resid_j
          integer(8) :: test_time1, time0, time1, clock_rate
          character (len=strlen) :: err_msg
@@ -230,6 +214,15 @@
             tol_residual_norm3 = s% tol_residual_norm3
             tol_max_residual3 = s% tol_max_residual3
          end if
+         
+         tol_correction_norm = s% tol_correction_norm
+         tol_max_correction = s% tol_max_correction
+         tol_correction_norm2 = s% tol_correction_norm2
+         tol_max_correction2 = s% tol_max_correction2
+         tol_correction_norm3 = s% tol_correction_norm3
+         tol_max_correction3 = s% tol_max_correction3
+         iter_for_correction_tol2 = s% iter_for_correction_tol2
+         iter_for_correction_tol3 = s% iter_for_correction_tol3
 
          tol_abs_slope_min = -1 ! unused
          tol_corr_resid_product = -1 ! unused
@@ -340,6 +333,29 @@
                   tol_correction_norm, tol_max_correction
                write(*,1) 'tol1 residual tolerances: norm, max', &
                   tol_residual_norm, tol_max_residual
+            end if
+
+            if (iter >= iter_for_correction_tol2) then
+               if (iter < iter_for_correction_tol3) then
+                  tol_correction_norm = tol_correction_norm2
+                  tol_max_correction = tol_max_correction2
+                  if (dbg_msg .and. iter == iter_for_correction_tol2) &
+                     write(*,1) 'tol2 correction tolerances: norm, max', &
+                        tol_correction_norm, tol_max_correction
+               else
+                  tol_correction_norm = tol_correction_norm3
+                  tol_max_correction = tol_max_correction3
+                  if (dbg_msg .and. iter == iter_for_correction_tol3) &
+                     write(*,1) 'tol3 correction tolerances: norm, max', &
+                        tol_correction_norm, tol_max_correction
+               end if
+            else if (dbg_msg .and. iter == 1) then
+               write(*,2) 'solver_call_number', s% solver_call_number
+               write(*,2) 'gold tolerances level', gold_tolerances_level
+               write(*,1) 'correction tolerances: norm, max', &
+                  tol_correction_norm, tol_max_correction
+               write(*,1) 'tol1 correction tolerances: norm, max', &
+                  tol_correction_norm, tol_max_correction
             end if
             
             call solver_test_partials(nvar, xder, size(A,dim=1), A1, ierr)

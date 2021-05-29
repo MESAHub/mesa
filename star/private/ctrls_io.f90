@@ -1896,6 +1896,13 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% tol_correction_norm = tol_correction_norm
  s% tol_max_correction = tol_max_correction
+ s% tol_correction_norm2 = tol_correction_norm2
+ s% tol_max_correction2 = tol_max_correction2
+ s% tol_correction_norm3 = tol_correction_norm3
+ s% tol_max_correction3 = tol_max_correction3
+ s% iter_for_correction_tol2 = iter_for_correction_tol2
+ s% iter_for_correction_tol3 = iter_for_correction_tol3
+ 
  s% correction_xa_limit = correction_xa_limit
 
  s% tol_correction_high_T_limit = tol_correction_high_T_limit
@@ -3572,6 +3579,13 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  tol_correction_norm = s% tol_correction_norm
  tol_max_correction = s% tol_max_correction
+ tol_correction_norm2 = s% tol_correction_norm2
+ tol_max_correction2 = s% tol_max_correction2
+ tol_correction_norm3 = s% tol_correction_norm3
+ tol_max_correction3 = s% tol_max_correction3
+ iter_for_correction_tol2 = s% iter_for_correction_tol2
+ iter_for_correction_tol3 = s% iter_for_correction_tol3
+
  correction_xa_limit = s% correction_xa_limit
 
  tol_correction_high_T_limit = s% tol_correction_high_T_limit
