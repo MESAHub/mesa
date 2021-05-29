@@ -55,12 +55,12 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 3.40 ! -101 ! only used if > -100
-   HR_logT_max = 3.57 ! only used if > -100
-   HR_logL_min = 2.8 ! -101 ! only used if > -100
+   HR_logT_min = 3.47 ! -101 ! only used if > -100
+   HR_logT_max = 3.68 ! only used if > -100
+   HR_logL_min = 1.5 ! -101 ! only used if > -100
    HR_logL_max = 3.82 ! -101 ! only used if > -100
    
-   show_HR_classical_instability_strip = .true.
+   !show_HR_classical_instability_strip = .true.
 
    ! file output
    !HR_file_flag = .true.

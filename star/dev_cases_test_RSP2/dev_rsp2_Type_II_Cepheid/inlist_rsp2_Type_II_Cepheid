@@ -22,7 +22,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 100
+   seconds_for_initial_dt = 24
 
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
@@ -33,7 +33,7 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -48,11 +48,15 @@
    kap_CO_prefix = 'a09_co'
 / ! end of kap namelist
 
+
+!             P(days)         growth
+!  0       0.16449E+01     0.16484E+00
+
 &controls  
    initial_z = 0.0001d0
    initial_mass = 0.55d0
    
-   max_timestep = 100
+   max_timestep = 240
 
    max_model_number = 5000000
    max_number_retries = 10000 

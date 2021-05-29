@@ -4,6 +4,8 @@
       required_termination_code_string(2) = 'max_model_number'
 
       remove_initial_center_by_c12_o16 = 0.975 ! remove the CO core
+
+      set_initial_number_retries = .true.
       
       set_initial_dt = .true.
       years_for_initial_dt = 1d0
@@ -21,16 +23,26 @@
       log_L_upper_limit = 3.8
 
       ! limit max_model_number as part of test_suite
-      !max_model_number = 1997
+      max_model_number = 12990
    
    
-   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+   x_integer_ctrl(1) = 10 ! output GYRE info at this step interval
+
+! timesteps
+   delta_lgL_He_limit = 0.01d0
+
+! mesh
+   mesh_delta_coeff = 1.2
+
+! solver
+   use_gold2_tolerances = .false.
+   convergence_ignore_equL_residuals = .true.
 
 ! output
    !photo_interval = 10
    !profile_interval = 1
    !history_interval = 1
-   terminal_interval = 1
+   terminal_interval = 10
 
 / ! end of controls namelist
 
@@ -51,9 +63,9 @@
 
    ! axis limits -- to override system default selections
   HR_logT_min = 3.35 ! -101 ! only used if > -100
-  HR_logT_max = 3.57 ! only used if > -100
-  HR_logL_min = 2.9 ! -101 ! only used if > -100
-  HR_logL_max = 4.0 ! -101 ! only used if > -100
+  HR_logT_max = 3.55 ! only used if > -100
+  HR_logL_min = 3.0 ! -101 ! only used if > -100
+  HR_logL_max = 3.9 ! -101 ! only used if > -100
 
    show_HR_classical_instability_strip = .true.
          
