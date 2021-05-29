@@ -41,6 +41,7 @@ the number in the second column is the allowed lower bound, and
 the number in the second column is the allowed upper bound.
 
 At this ending point the abundances, power, and dynamo profiles as a function of pressure are shown below.
+Click to see a larger view of a plot.
 Helium has begun to deplete in the core (top panel), where the triple-alpha reaction is dominating the energy generation rate (second panel).
 Hydrogen burning by the CNO cycles dominates the energy generation in the hydrogen shell (second panel).
 Convection is occuring in two regions: in the core and in the hydrogen-rich envelope (blue curves in the third panel).
@@ -49,8 +50,42 @@ two convective regions (third panel).
 The radial and azimuthal components of the magnetic field
 are only being generated in the radiative region between convection zone (bottom panel).
 
-.. image:: ../../../star/test_suite/15M_dynamo/docs/profile_Panels4_00000734.png
+.. image:: ../../../star/test_suite/15M_dynamo/docs/profile_Panels4_00000521.svg
+   :scale: 100%
 
 
-Last-Updated: 23May2021 (MESA ebecc10) by fxt
+pgstar commands used for the plots above:
+
+.. code-block:: console
+
+ &pgstar
+
+   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
+   !file_device = 'png'            ! png
+   !file_extension = 'png'
+
+   file_device = 'vcps'          ! postscript
+   file_extension = 'ps'
+
+    pgstar_interval = 10
+    file_digits = 8
+
+    Dynamo_legend_txt_scale_factor = 0.7
+    Mixing_legend_txt_scale_factor = 0.55
+    Profile_Panels4_txt_scale = 0.8
+
+    Profile_Panels4_win_flag = .true.
+    Profile_Panels4_win_width = 10
+
+    Profile_Panels4_file_flag = .true.
+    Profile_Panels4_file_dir = 'png'
+    Profile_Panels4_file_prefix = 'profile_Panels4_'
+    Profile_Panels4_file_interval = 10
+    Profile_Panels4_file_width = 10
+
+ / ! end of pgstar namelist
+
+
+
+Last-Updated: 27May2021 (MESA ebecc10) by fxt
 
