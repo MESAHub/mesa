@@ -1,0 +1,1 @@
+../../../star/test_suite/20M_z2m2_high_rotation/README.rst

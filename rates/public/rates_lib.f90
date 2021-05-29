@@ -133,6 +133,7 @@
          use rates_def
          use rates_initialize, only: free_reaction_arrays, free_raw_rates_records
          use reaclib_input, only: reaclib
+         use screening_chugunov, only: free_chugunov
          use utils_lib
 
          call integer_dict_free(skip_warnings_dict)
@@ -144,6 +145,8 @@
          call free_reaction_data(reaclib_rates)
          call free_reaction_arrays()
          call free_raw_rates_records()
+
+         call free_chugunov()
          
       end subroutine rates_shutdown
          

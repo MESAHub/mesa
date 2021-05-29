@@ -1137,13 +1137,13 @@
                lgPgas = log10(Pgas)
          
                call eosPT_get( &
-                  eos_handle, Z, xh, abar, zbar, &
+                  eos_handle, &
                   species, chem_id, net_iso, x, &
                   Pgas, lgPgas, T, logT, &
                   Rho, logRho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
                   res, d_dlnRho_const_T, d_dlnT_const_Rho,  &
-                  d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
-                  !ierr)
+                  d_dxa_const_TRho, ierr)
+
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
             else ! this is okay for burn_at_constant_density as well as constant T and Rho
