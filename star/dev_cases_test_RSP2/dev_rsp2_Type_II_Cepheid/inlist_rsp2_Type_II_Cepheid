@@ -107,6 +107,8 @@
    always_use_dedt_form_of_energy_eqn = .true.
 
 ! RSP2
+
+   !RSP2_report_adjust_w = .true.
    
    RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
@@ -126,7 +128,7 @@
    RSP2_num_innermost_cells_forced_nonturbulent = 5
    alt_scale_height_flag = .false.
 
-   tol_max_correction = 5d-7
+   tol_max_correction = 1d99 ! 5d-7
    
 ! output
    x_integer_ctrl(1) = -548 ! which period to check

@@ -449,12 +449,22 @@
       end subroutine set_surf_info
 
 
-      subroutine set_xh(s,nvar) ! set xh using current structure info
+      subroutine set_xh(s,nvar,ierr) ! set xh using current structure info
+         use hydro_rsp2, only: RSP2_adjust_vars_before_call_solver
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
+         integer, intent(out) :: ierr
          integer :: j1, k, nz
          include 'formats'
+         ierr = 0
          nz = s%nz
+         if (s% RSP2_flag) then
+            call RSP2_adjust_vars_before_call_solver(s, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'failed in RSP2_adjust_vars_before_call_solver'
+               return
+            end if
+         end if
          do j1 = 1, min(nvar,s% nvar_hydro)
             if (j1 == s% i_lnd .and. s% i_lnd <= nvar) then
                do k = 1, nz
@@ -585,7 +595,21 @@
             end if
          end if
 
-         call set_xh(s, nvar) ! set xh using current structure info
+         call set_xh(s, nvar, ierr) ! set xh using current structure info
+         if (ierr /= 0) then
+            if (report) then
+               write(*, *) 'set_xh returned ierr in struct_burn_mix', ierr
+               write(*, *) 's% model_number', s% model_number
+               write(*, *) 'nz', nz
+               write(*, *) 's% num_retries', s% num_retries
+               write(*, *)
+            end if
+            do_solver = retry
+            s% result_reason = nonzero_ierr
+            s% dt_why_retry_count(Tlim_solver) = &
+               s% dt_why_retry_count(Tlim_solver) + 1
+            return
+         end if
 
          do k = 1, nz
             do j1 = 1, min(nvar, s% nvar_hydro)

@@ -1132,11 +1132,10 @@
       end subroutine set_etrb_start_vars
 
       
-      subroutine RSP2_adjust_vars_before_call_solver(s, nvar, ierr)
+      subroutine RSP2_adjust_vars_before_call_solver(s, ierr) ! replaces check_omega in RSP
          ! JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
          use micro, only: do_eos_for_cell
          type (star_info), pointer :: s
-         integer, intent(in) :: nvar
          integer, intent(out) :: ierr    
          real(dp) :: PII_div_Hp, QQ, SOURCE, Hp_cell, DAMP, POM, POM2, DAMPR, del, soln
          type(auto_diff_real_star_order1) :: x
@@ -1145,31 +1144,7 @@
          ierr = 0
          if (s% mixing_length_alpha == 0d0) return
          
-         op_err = 0
-         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-         do k=1,s%nz-1
-            s% Vol(k) = (4d0*pi/3d0)*(pow3(s% r(k)) - pow3(s% r(k+1)))/s% dm(k)
-            s% rho(k) = 1d0/s% Vol(k)
-            s% lnd(k) = log(s% rho(k))
-            call do_eos_for_cell(s, k, op_err) ! redo with new lnd
-            if (op_err /= 0) ierr = op_err
-            if (k==35) then
-               write(*,2) 'lgd r00 rp1', k, s% lnd(k)/ln10, s% r(k), s% r(k+1)
-            end if
-         end do
-         !$OMP END PARALLEL DO
-         if (ierr /= 0) return
-         !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-         do k=1,s%nz
-            ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
-            if (s% Hp_face(k) <= 0) s% Hp_face(k) = get_scale_height_face_val(s,k)
-            x = compute_Y_face(s, k, op_err)
-            if (op_err /= 0) ierr = op_err
-            x = compute_PII_face(s, k, op_err)
-            if (op_err /= 0) ierr = op_err
-         end do
-         !$OMP END PARALLEL DO
-         if (ierr /= 0) return
+         !return ! as it is below, this doesn't work.  e.g., try dev_cases_test_RSP2/dev_rsp2_Type_II_Cepheid
          
          !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
          do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
@@ -1209,8 +1184,9 @@
             soln = (-DAMPR + sqrt(del))/(2d0*DAMP)
             if (k==-35) write(*,2) 'soln', k, soln
             if (soln > 0d0) then
+               if (s% RSP2_report_adjust_w) &
+                  write(*,3) 'RSP2_adjust_vars_before_call_solver w', k, s% model_number, s% w(k), soln
                s% w(k) = soln
-               write(*,2) 'preset w', k, s% w(k)
             end if
 
          end do
