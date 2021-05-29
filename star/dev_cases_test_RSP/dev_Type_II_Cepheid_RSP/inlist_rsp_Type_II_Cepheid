@@ -1,14 +1,25 @@
+! type-II Cepheid of BL Her type  0.55Ms, 136Ls, 6410K, X=0.76, Z=0.0001
+! convective parameters are such, that it should show deterministic chaos
+! - lots of struggling between low and high amplitudes. 
+! Growth rates are high, so only after ~20-40 cycles the attractor is approached. 
+! A model motivated by: http://adsabs.harvard.edu/abs/2014MNRAS.441..101S.
+! You can increase the alfa_m (eddy viscosity) to e.g. 0.25. Then it should pulsate regularly.
+
+! original test case contributed by Radek Smolec.
 
 &star_job
 
       show_log_description_at_start = .false.
 
-      !create_RSP_model = .true.
       create_RSP_model = .false.
       load_saved_model = .true.
-      load_model_filename = 'Type_II_Cepheid.mod'
+      load_model_filename = 'type_II_ceph_cycle0.mod'
 
       initial_zfracs = 6
+
+      color_num_files=2
+      color_file_names(2)='blackbody_johnson.dat'
+      color_num_colors(2)=5
 
       set_initial_age = .true.
       initial_age = 0
@@ -18,9 +29,10 @@
       
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-      
-      pgstar_flag = .true.
    
+      !pgstar_flag = .true.
+
+
 / ! end of star_job namelist
 
 &eos
@@ -28,29 +40,27 @@
 
 &kap
    Zbase = 0.0001d0
-   kap_file_prefix = 'a09'
-   kap_lowT_prefix = 'lowT_fa05_a09p'
-   kap_CO_prefix = 'a09_co'
+
+      kap_file_prefix = 'a09'
+      kap_lowT_prefix = 'lowT_fa05_a09p'
+      kap_CO_prefix = 'a09_co'
+
 / ! end of kap namelist
 
 
 &controls
-   !max_timestep = 1d-6 ! 1200 ! 
-   !force_timestep = 1200 ! 1d-6 !  ! when comparing to RSP, use force_timestep
-   
-   max_age = 12.569824 ! 12.486184
 
-   max_model_number = 160000000
-   !v_div_csound_surf_limit = 0.1 ! save model here
+   ! limit max_model_number as part of test_suite
+   !max_model_number = 1882 ! 18000
 
 ! RSP controls
-   RSP_do_check_omega = .false.     ! TESTING
-!   RSP_report_check_omega_changes = .true.
-   
-   RSP_min_deltaR_for_periods = 1d0 ! to filter out extras after have grown beyond this deltaR
 
-!   x_integer_ctrl(1) = 548 ! which period to check
-   x_ctrl(1) = 1.6 ! expected period (in days) 
+   RSP_do_check_omega = .false.
+   x_integer_ctrl(1) = 100000 ! which period to check
+   !x_ctrl(1) = 1.58915d0 ! expected period (in days) ! with RSP_do_check_omega = .true.
+   x_ctrl(1) = 1.73724d0 ! expected period (in days) ! with RSP_do_check_omega = .false.
+   
+   
 
    RSP_mass = 0.55d0
    RSP_Teff = 6410d0
@@ -58,10 +68,21 @@
    RSP_X = 0.76d0
    RSP_Z = 0.0001d0
    
-   ! standard parameters for equations
-      
-   
-! solver
+   ! parameters for equations
+   RSP_alfap  = 0.0d0
+   RSP_alfat  = 0.0d0
+   RSP_alfam  = 0.25d0
+   RSP_gammar = 0d0
+
+   RSP_target_steps_per_cycle = 1200
+   RSP_kick_vsurf_km_per_sec = 4.5d0
+   RSP_fraction_1st_overtone = 0d0
+   RSP_fraction_2nd_overtone = 0d0
+   RSP_nz = 200 ! total number of zones in static model
+   RSP_nz_outer = 60 ! number of zones in outer region of static model
+   RSP_T_anchor = 11d3 ! approx temperature at base of outer region
+   RSP_max_num_periods = 2000
+
 
 ! output controls
    
@@ -81,19 +102,11 @@
    ! creation of a new one when restart.  edit the inlist to set
    ! history_interval to 1 to get maximum time resolution.  
    ! restart the run and let it go for as many periods as desired.   
-         !RSP_work_period = 5
-         !RSP_work_filename = 'work.data'
 
-
-      photo_interval = 4000
+      photo_interval = 1000
       profile_interval = 4000
-      history_interval = 40
-      terminal_interval = 4000
-
-      photo_interval = 500
-      !profile_interval = 4000
-      !history_interval = 40
-      terminal_interval = 100
+      history_interval = 10
+      terminal_interval = 1000
 
 / ! end of controls namelist
 
@@ -101,69 +114,32 @@
 
 &pgstar
 
-   !pause = .true.
-   !pause_interval = 100
-   pgstar_interval = 25
+      !pause = .true.
 
-         pgstar_xaxis_label_scale = 0.9
-         pgstar_left_yaxis_label_scale = 0.9
-         pgstar_right_yaxis_label_scale = 0.9
-
-         pgstar_xaxis_label_disp = 2.5
-         pgstar_left_yaxis_label_disp = 4.2 ! 3.4
-         pgstar_right_yaxis_label_disp = 4.8
+      pgstar_interval = 6
          
-         pgstar_grid_title_scale = 0.95
-         pgstar_grid_title_disp = 3.3
-
-         pgstar_num_scale = 0.85
+      Grid2_win_flag = .true.
 
 
+      Grid2_title = '0.55 M\d\(2281)\u  Z=0.0001  Type II Cepheid'
 
-! window 1
-
-   !Grid1_win_flag = .true.
-   Grid1_title = '0.55 M\d\(2281)\u Z=0.0001 Type II Cepheid rsp'
-
-   !Grid1_file_flag = .true.
-   Grid1_file_dir = 'png1'
-   Grid1_file_prefix = 'grid1'
-   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
-   
-   Profile_Panels1_xaxis_name = 'zone'
-   Profile_Panels1_xaxis_reversed = .true.
-   !Profile_Panels1_xmin = 50 ! -101D0
-   !Profile_Panels1_xmax = 65 ! -101D0
-   
-! window 2
       
-   Grid2_win_flag = .true.
-   Grid2_title = '0.55 M\d\(2281)\u Z=0.0001 Type II Cepheid rsp'
-   
-   History_Panels2_xaxis_name='day'
-   History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
+      History_Panels1_xaxis_name='star_age_day'
+      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-   !Grid2_file_flag = .true.
-   file_digits = 7
-   Grid2_file_dir = 'png'
-   Grid2_file_prefix = 'grid2'
-   Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-   
-   !Profile_Panels2_show_grid = .true.
+      !  Grid2_file_flag = .true.
+      file_digits = 7
+      Grid2_file_dir = 'png'
+      Grid2_file_prefix = 'grid'
+      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+      
+      !Profile_Panels1_show_grid = .true.
 
-   !Profile_Panels2_xaxis_name = 'logtau'
-   !Profile_Panels2_xaxis_reversed = .true.
-   !Profile_Panels2_xmin = -101d0
-   !Profile_Panels2_xmax = -101D0
+      Profile_Panels1_xaxis_name = 'logtau'
+      Profile_Panels1_xaxis_reversed = .true.
+      Profile_Panels1_xmin = -101D0
+      Profile_Panels1_xmax = -101D0
 
-   Profile_Panels2_xaxis_name = 'logxm'
-   Profile_Panels2_xaxis_reversed = .true.
-   Profile_Panels2_xmin = -6
-   Profile_Panels2_xmax = -0.1
-
-   Profile_Panels2_xaxis_name = 'zone'
-   Profile_Panels2_xaxis_reversed = .true.
-   Profile_Panels2_xmin = -101
-   Profile_Panels2_xmax = -101
+      Profile_Panels1_dymin(4) = 0.02
 
 / ! end of pgstar namelist

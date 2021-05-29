@@ -1,16 +1,19 @@
 &pgstar
          pgstar_interval = 10
 
+
          pgstar_xaxis_label_scale = 0.9
          pgstar_left_yaxis_label_scale = 0.9
          pgstar_right_yaxis_label_scale = 0.9
 
          pgstar_xaxis_label_disp = 2.5
          pgstar_left_yaxis_label_disp = 4.2 ! 3.4
-         pgstar_right_yaxis_label_disp = 4.4
+         pgstar_right_yaxis_label_disp = 4.8
+         
+         pgstar_grid_title_scale = 0.95
+         pgstar_grid_title_disp = 3.3
 
-         pgstar_grid_title_scale = 1
-         pgstar_grid_title_disp = 3
+         pgstar_num_scale = 0.85
 
          Grid2_win_width = 8
          Grid2_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
