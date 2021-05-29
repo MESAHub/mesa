@@ -140,6 +140,13 @@ This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre
 The test checks thermohaline mixing in a rotating, 1 Msun, Z=0.02 metallicity model.
 
 
+:ref:`20M_z2m2_high_rotation`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of a strongly rotating,
+Omega/Omega_crit = 0.75, 20 Msun, Z=0.02 metallicity model from the
+pre-main sequence to the end of core helium burning.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
