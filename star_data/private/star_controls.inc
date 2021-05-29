@@ -847,6 +847,8 @@
 
          logical :: trace_solver_damping
 
+         real(dp) :: tol_correction_norm
+         real(dp) :: tol_max_correction
          real(dp) :: correction_xa_limit
          real(dp) :: tol_correction_high_T_limit, &
             tol_correction_norm_high_T, tol_max_correction_high_T
@@ -854,10 +856,6 @@
             tol_correction_norm_extreme_T, tol_max_correction_extreme_T
          real(dp) :: tol_bad_max_correction
          integer :: bad_max_correction_series_limit
-
-         real(dp) :: tol_correction_norm, tol_max_correction
-         real(dp) :: tol_correction_norm2, tol_max_correction2
-         real(dp) :: tol_correction_norm3, tol_max_correction3
 
          real(dp) :: tol_residual_norm1, tol_max_residual1
          real(dp) :: tol_residual_norm2, tol_max_residual2
@@ -912,7 +910,6 @@
             include_rotation_in_total_energy
 
          integer :: iter_for_resid_tol2, iter_for_resid_tol3
-         integer :: iter_for_correction_tol2, iter_for_correction_tol3
 
          integer :: solver_itermin, solver_itermin_until_reduce_min_corr_coeff
          logical :: do_solver_damping_for_neg_xa

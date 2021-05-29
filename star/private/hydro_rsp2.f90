@@ -1184,6 +1184,7 @@
             soln = (-DAMPR + sqrt(del))/(2d0*DAMP)
             if (k==-35) write(*,2) 'soln', k, soln
             if (soln > 0d0) then
+               soln = sqrt(soln) ! this helps the solver converge the correction
                if (s% RSP2_report_adjust_w) &
                   write(*,3) 'RSP2_adjust_vars_before_call_solver w', k, s% model_number, s% w(k), soln
                s% w(k) = soln

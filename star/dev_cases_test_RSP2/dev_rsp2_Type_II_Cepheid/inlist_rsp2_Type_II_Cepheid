@@ -132,7 +132,7 @@
    RSP2_num_innermost_cells_forced_nonturbulent = 5
    alt_scale_height_flag = .false.
 
-   tol_max_correction = 1d99 ! 5d-7
+   tol_max_correction = 5d-7
    
 ! output
    x_integer_ctrl(1) = -548 ! which period to check
@@ -159,7 +159,7 @@
       history_interval = 10
       terminal_interval = 1000
 
-      !photo_interval = 100
+      !photo_interval = 1
       !profile_interval = 400
       !history_interval = 40
       !terminal_interval = 1
@@ -174,7 +174,7 @@
 
 ! FOR DEBUGGING
       
-      !max_number_retries = 0
+      !max_number_retries = 1
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error

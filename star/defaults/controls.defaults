@@ -8056,32 +8056,14 @@
       ! ~~~~~~~~~~~~~~~~~~~
       ! tol_max_correction
       ! ~~~~~~~~~~~~~~~~~~
-      ! tol_correction_norm2
-      ! ~~~~~~~~~~~~~~~~~~~
-      ! tol_max_correction2
-      ! ~~~~~~~~~~~~~~~~~~
-      ! tol_correction_norm3
-      ! ~~~~~~~~~~~~~~~~~~~
-      ! tol_max_correction3
-      ! ~~~~~~~~~~~~~~~~~~
-      ! iter_for_correction_tol2
-      ! ~~~~~~~~~~~~~~~~~~~
-      ! iter_for_correction_tol3
-      ! ~~~~~~~~~~~~~~~~~~
 
       ! "Correction" for variable x(i,k) is scaled change, dx(i,k)/xscale(i,k).
       ! these tolerances are for the magnitude of the scaled corrections.
 
       ! ::
 
-    tol_correction_norm = 1d99
-    tol_max_correction = 1d99
-    iter_for_correction_tol2 = 1
-    tol_correction_norm2 = 3d-5
-    tol_max_correction2 = 3d-5
-    iter_for_correction_tol3 = 99
-    tol_correction_norm3 = 3d-5
-    tol_max_correction3 = 3d-5
+    tol_correction_norm = 3d-5
+    tol_max_correction = 3d-3
 
 
       ! tol_correction_high_T_limit
@@ -8092,7 +8074,7 @@
 
       ! ::
 
-    tol_correction_high_T_limit = 1d99
+    tol_correction_high_T_limit = 1d9
 
 
       ! tol_correction_norm_high_T
@@ -8116,7 +8098,7 @@
 
       ! ::
 
-    tol_correction_extreme_T_limit = 6d99
+    tol_correction_extreme_T_limit = 6d9
 
 
       ! tol_correction_norm_extreme_T
