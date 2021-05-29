@@ -8,10 +8,6 @@
    change_initial_RSP2_flag = .true.
    new_RSP2_flag = .true.
    
-   !save_model_when_terminate = .true.
-   !save_model_filename = 'rsp2_cycle700.mod'
-   !required_termination_code_string(1) = 'max_model_number'
-   
    change_initial_v_flag = .true.
    new_v_flag = .true.
 
@@ -21,9 +17,6 @@
    set_initial_model_number = .true.
    initial_model_number = 0
 
-   set_initial_dt = .true.
-   seconds_for_initial_dt = 24
-
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
 
@@ -32,6 +25,9 @@
    
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
+
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 24
 
    !pgstar_flag = .true.
 
@@ -62,15 +58,8 @@
    max_number_retries = 10000 
 
 ! atmosphere
-   ! P boundary condition
-   use_momentum_outer_BC = .true.  ! required for RSP2
-   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
-      ! this can be a problem with shocks since omits Pvsc
-   ! else if RSP_use_Prad_for_Psurf
-      !use_zero_Pgas_outer_BC = .false.
-   ! else use RSP default of Psurf = 0
-      use_fixed_Psurf_outer_BC = .true.
-      fixed_Psurf = 0d0
+   use_fixed_Psurf_outer_BC = .true.
+   fixed_Psurf = 0d0
 
 ! timesteps
 !  RSP_max_dt_times_min_dr_div_cs = 2d0
@@ -126,8 +115,9 @@
    RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
    RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
    RSP2_alfad =     1d0
-
-   RSP2_alfam =     0.05d0        ! "lots of struggling"
+   
+   ! for initial tests, don't need to add "lots of struggling"
+   !RSP2_alfam =     0.05d0        ! "lots of struggling"
 
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
@@ -141,7 +131,7 @@
 
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 1.3 ! expected period (in days) 
+   x_ctrl(7) = 1.6 ! expected period (in days) 
 !   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.3 ! min_period_div_target
