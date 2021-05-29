@@ -300,7 +300,8 @@
       subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          use const_def, only: sqrt_2_div_3
          use hydro_vars, only: set_vars
-         use hydro_rsp2, only: set_RSP2_vars, remesh_for_RSP2
+         use hydro_rsp2, only: set_RSP2_vars
+         use hydro_rsp2_support, only: remesh_for_RSP2
          use star_utils, only: set_m_and_dm, set_dm_bar, set_qs
          integer, intent(in) :: id
          logical, intent(in) :: RSP2_flag

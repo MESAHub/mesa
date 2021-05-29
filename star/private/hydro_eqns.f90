@@ -54,7 +54,7 @@
          use chem_def
          use utils_lib, only: set_nan
          use mesh_functions
-         use hydro_riemann, only: do_uface_and_Pface, do1_Riemann_momentum_eqn
+         use hydro_riemann, only: do1_Riemann_momentum_eqn
          use hydro_momentum, only: do1_momentum_eqn, do1_radius_eqn
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
@@ -63,7 +63,6 @@
          use hydro_alpha_rti_eqns, only: do1_dalpha_RTI_dt_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
-         use hydro_rsp2, only: set_RSP2_vars
          use star_utils, only: show_matrix, &
             no_extra_profile_columns, no_data_for_extra_profile_columns
 
@@ -91,24 +90,6 @@
 
          if (s% u_flag .and. s% use_mass_corrections) &
             stop 'use_mass_corrections dP not supported with u_flag true'
-
-         if (s% u_flag) then
-            call do_uface_and_Pface(s,ierr)
-            if (ierr /= 0) then
-               if (len_trim(s% retry_message) == 0) s% retry_message = 'do_uface_and_Pface failed'
-               if (s% report_ierr) write(*,*) 'ierr from do_uface_and_Pface'
-               return
-            end if
-         end if
-         
-         if (s% RSP2_flag) then
-            call set_RSP2_vars(s,ierr)
-            if (ierr /= 0) then
-               if (len_trim(s% retry_message) == 0) s% retry_message = 'set_RSP2_vars failed'
-               if (s% report_ierr) write(*,*) 'ierr from set_RSP2_vars'
-               return
-            end if
-         end if
 
          dump_for_debug = .false.
          !dump_for_debug = .true.

@@ -45,8 +45,11 @@
 / ! end of kap namelist
 
 
-!             P(days)         growth
+! create initial RSP model
+!            P(days)         growth
 !  0       0.16449E+01     0.16484E+00
+!  1       0.11483E+01     0.57045E-04
+!  2       0.83165E+00    -0.53670E+00
 
 &controls  
    initial_z = 0.0001d0
