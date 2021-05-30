@@ -30,7 +30,7 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
    
 / ! end of star_job namelist
 

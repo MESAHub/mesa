@@ -3,7 +3,7 @@
    show_log_description_at_start = .false.
    
    load_saved_model = .true.
-   load_model_filename = 'BEP.mod'
+   load_model_filename = '../../test_suite/rsp_BEP/rsp_BEP_cycle0.mod'
    
    change_initial_RSP2_flag = .true.
    new_RSP2_flag = .true.

@@ -3,7 +3,7 @@
    show_log_description_at_start = .false.
    
    load_saved_model = .true.
-   load_model_filename = 'BLAP.mod'
+   load_model_filename = '../../test_suite/rsp_BLAP/rsp_BLAP_cycle0.mod'
    
    change_initial_RSP2_flag = .true.
    new_RSP2_flag = .true.

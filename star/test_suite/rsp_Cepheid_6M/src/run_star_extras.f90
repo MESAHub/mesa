@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  The MESA Team
+!   Copyright (C) 2018-2019  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -20,43 +20,22 @@
 !
 ! ***********************************************************************
  
-      module run_star_extras
+module run_star_extras
 
       use star_lib
       use star_def
       use const_def
       use math_lib
-      use gyre_lib
-      
+
       implicit none
-
-      include 'test_suite_extras_def.inc'
-      include '../../../rsp2_utils/run_star_extras_rsp2_defs.inc'
-
-
-!alpha_mlt_routine
-         !alpha_H = s% x_ctrl(21)
-         !alpha_other = s% x_ctrl(22)
-         !H_limit = s% x_ctrl(23)
-
-!gyre
-      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
-      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      !x_logical_ctrl(2) = .false. ! output eigenfunction files
-      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-      !x_integer_ctrl(4) = 1 ! order
-      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
-            
       
+      include "test_suite_extras_def.inc"
+      logical :: need_to_write_LINA_data
+
       contains
 
+      include "test_suite_extras.inc"
 
-      include 'test_suite_extras.inc'
-      include '../../../rsp2_utils/run_star_extras_rsp2.inc'
-      
       
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -65,64 +44,16 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (ierr /= 0) return                  
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
+         s% extras_start_step => extras_start_step
          s% extras_finish_step => extras_finish_step
          s% extras_after_evolve => extras_after_evolve
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
-         s% other_alpha_mlt => alpha_mlt_routine       
-         s% other_photo_write => photo_write
-         s% other_photo_read => photo_read
       end subroutine extras_controls
-
-
-      subroutine alpha_mlt_routine(id, ierr)
-         use chem_def, only: ih1
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k, h1
-         real(dp) :: alpha_H, alpha_other, H_limit
-         include 'formats'
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         alpha_H = s% x_ctrl(21)
-         alpha_other = s% x_ctrl(22)
-         H_limit = s% x_ctrl(23)
-         h1 = s% net_iso(ih1)
-         !write(*,1) 'alpha_H', alpha_H
-         !write(*,1) 'alpha_other', alpha_other
-         !write(*,1) 'H_limit', H_limit
-         !write(*,2) 'h1', h1
-         !write(*,2) 's% nz', s% nz
-         if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
-         do k=1,s% nz
-            if (s% xa(h1,k) >= H_limit) then
-               s% alpha_mlt(k) = alpha_H
-            else
-               s% alpha_mlt(k) = alpha_other
-            end if
-         end do
-         !stop
-      end subroutine alpha_mlt_routine
-
-
-      subroutine photo_write(id, iounit)
-         integer, intent(in) :: id, iounit
-         call rsp2_photo_write(id, iounit)
-      end subroutine photo_write
-
-
-      subroutine photo_read(id, iounit, ierr)
-         integer, intent(in) :: id, iounit
-         integer, intent(out) :: ierr
-         call rsp2_photo_read(id, iounit, ierr)
-      end subroutine photo_read
 
       
       subroutine extras_startup(id, restart, ierr)
@@ -134,17 +65,67 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
-         if (ierr /= 0) return
-         call rsp2_extras_startup(id, restart, ierr)
+         if (.not. restart) then
+            need_to_write_LINA_data = len_trim(s% x_character_ctrl(10)) > 0
+         else ! it is a restart
+            need_to_write_LINA_data = .false.
+         end if
       end subroutine extras_startup
+      
 
+      integer function extras_start_step(id)
+         integer, intent(in) :: id
+         integer :: ierr, io, i
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         extras_start_step = keep_going
+         if (need_to_write_LINA_data) then
+            io = 61
+            open(io,file=trim(s% x_character_ctrl(10)),status='unknown')
+            write(io, '(99d16.5)') s% RSP_mass, s% RSP_L, s% RSP_Teff, &
+               (s% rsp_LINA_periods(i), s% rsp_LINA_growth_rates(i), i=1, s% RSP_nmodes)
+            close(io)
+            write(*,*) 'write ' // trim(s% x_character_ctrl(10))
+            need_to_write_LINA_data = .false.
+         end if
+      end function extras_start_step
+      
 
-      ! returns either keep_going, retry, or terminate.
+      ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
-         extras_finish_step = rsp2_extras_finish_step(id)
+         integer :: ierr
+         real(dp) :: target_period, rel_run_E_err
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         extras_finish_step = keep_going
+         if (s% x_integer_ctrl(1) <= 0) return
+         if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
+         write(*,*)
+         write(*,*)
+         write(*,*)
+         target_period = s% x_ctrl(1)
+         rel_run_E_err = s% cumulative_energy_error/s% total_energy
+         write(*,*) 'rel_run_E_err', rel_run_E_err
+         if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
+            write(*,*) '*** BAD rel_run_E_error ***', &
+            s% cumulative_energy_error/s% total_energy
+         else if (abs(s% rsp_period/(24*3600) - target_period) > 1d-2) then
+            write(*,*) '*** BAD ***', s% rsp_period/(24*3600) - target_period, &
+               s% rsp_period/(24*3600), target_period
+         else
+            write(*,*) 'good match for period', &
+               s% rsp_period/(24*3600), target_period
+         end if
+         write(*,*)
+         write(*,*)
+         write(*,*)
+         extras_finish_step = terminate
       end function extras_finish_step
-
       
       
       subroutine extras_after_evolve(id, ierr)
@@ -156,7 +137,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
-         call rsp2_extras_after_evolve(id, ierr)
       end subroutine extras_after_evolve
       
 
@@ -170,11 +150,16 @@
          if (ierr /= 0) return
          extras_check_model = keep_going         
       end function extras_check_model
-      
-      
+
+
       integer function how_many_extra_history_columns(id)
          integer, intent(in) :: id
-         how_many_extra_history_columns = rsp2_how_many_extra_history_columns(id)
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         how_many_extra_history_columns = 8
       end function how_many_extra_history_columns
       
       
@@ -183,16 +168,35 @@
          character (len=maxlen_history_column_name) :: names(n)
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
-         call rsp2_data_for_extra_history_columns(id, n, names, vals, ierr)
+         type (star_info), pointer :: s
+         integer :: i
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         i = 1
+         names(i) = 'num_periods'; vals(i) = s% RSP_num_periods; i=i+1
+         names(i) = 'period'; vals(i) = s% RSP_period/(24*3600); i=i+1
+         names(i) = 'growth'; vals(i) = s% rsp_GREKM_avg_abs; i=i+1
+         names(i) = 'max_v_div_cs'; vals(i) = 0; i=i+1
+         names(i) = 'delta_R'; vals(i) = s% rsp_DeltaR; i=i+1
+         names(i) = 'delta_Teff'; vals(i) = 0; i=i+1
+         names(i) = 'delta_logL'; vals(i) = s% rsp_DeltaMag/2.5; i=i+1
+         names(i) = 'delta_Mag'; vals(i) = 0; i=i+1
       end subroutine data_for_extra_history_columns
-      
+
       
       integer function how_many_extra_profile_columns(id)
+         use star_def, only: star_info
          integer, intent(in) :: id
-         how_many_extra_profile_columns = rsp2_how_many_extra_profile_columns(id)
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         how_many_extra_profile_columns = 1
       end function how_many_extra_profile_columns
-
-
+      
+      
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -200,8 +204,22 @@
          character (len=maxlen_profile_column_name) :: names(n)
          real(dp) :: vals(nz,n)
          integer, intent(out) :: ierr
-         call rsp2_data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
+         type (star_info), pointer :: s
+         integer :: k
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         names(1) = 'sign_Lc'
+         do k=1,nz
+            if (abs(s% Lc(k)) < 1d-6) then
+               vals(k,1) = 0d0
+            else
+               vals(k,1) = sign(1d0,s% Lc(k))
+            end if
+         end do
       end subroutine data_for_extra_profile_columns
+      
+      
 
 
       end module run_star_extras

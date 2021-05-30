@@ -11,10 +11,9 @@
 
       show_log_description_at_start = .false.
 
-      create_RSP_model = .true.
-
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
+      create_RSP_model = .false.
+      load_saved_model = .true.
+      load_model_filename = 'rsp_BEP_cycle0.mod'
 
       initial_zfracs = 6
 
@@ -31,7 +30,7 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
    
 / ! end of star_job namelist
 
