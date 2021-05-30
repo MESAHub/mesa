@@ -63,9 +63,9 @@
    max_age_in_days = 107
    
    
-! atmosphere
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0d0
+! surf BCs
+   use_zero_Pgas_outer_BC = .true.
+   RSP2_use_L_eqn_at_surface = .true.
 
 ! timesteps
 !  RSP_max_dt_times_min_dr_div_cs = 2d0
