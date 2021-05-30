@@ -1,4 +1,9 @@
 &star_job
+
+   !relax_initial_tau_factor = .true.
+   !relax_to_this_tau_factor = 1d-3
+   !dlogtau_factor = 0.02d0
+
 / ! end of star_job namelist
 
 &eos

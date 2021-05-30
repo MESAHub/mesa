@@ -102,7 +102,7 @@
 
       !pause = .true.
 
-      pgstar_interval = 10
+      pgstar_interval = 25
          
       Grid2_win_flag = .true.
 
