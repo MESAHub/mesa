@@ -31,6 +31,10 @@
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
 
+! solver
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
+
 ! output
 
    photo_directory = 'photos1'

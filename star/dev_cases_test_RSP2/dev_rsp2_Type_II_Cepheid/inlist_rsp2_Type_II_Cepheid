@@ -130,9 +130,11 @@
 
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
+   
    alt_scale_height_flag = .false.
 
-   tol_max_correction = 5d-7
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
    
 ! output
    x_integer_ctrl(1) = -548 ! which period to check
