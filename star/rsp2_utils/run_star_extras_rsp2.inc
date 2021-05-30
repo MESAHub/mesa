@@ -146,11 +146,6 @@
                      best_model_number = s% model_number
                   end if
                end do
-               if (.false. .and. best_cycles_to_double > 0) &
-                  write(*,'(a,i6,a,i2,a,f12.0,a,f7.4,a,f9.4)') &
-                     'best cycles to double: model_number', best_model_number, &
-                     'order', best_order, 'P(s)', 24*3600*best_period, &
-                     'P(d)', best_period, 'cycles to double', best_cycles_to_double
             end if
          end subroutine get_gyre_info_for_this_step
          

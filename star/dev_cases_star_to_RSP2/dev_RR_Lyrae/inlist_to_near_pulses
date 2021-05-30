@@ -8,8 +8,8 @@
 / ! end of kap namelist
 
 &controls
-   xa_central_upper_limit_species(1) = 'c12'
-   xa_central_upper_limit(1) = 0.001d0 
+
+   star_mass_min_limit = 0.65
 
    !log_Teff_lower_limit = 3.55
    !max_model_number = 820
@@ -20,8 +20,8 @@
    cool_wind_RGB_scheme = 'Reimers'
    cool_wind_AGB_scheme = 'Blocker'
    RGB_to_AGB_wind_switch = 1d-4
-   Reimers_scaling_factor = 0.4d0  
-   Blocker_scaling_factor = 0.8d0        
+   Reimers_scaling_factor = 1d0  
+   Blocker_scaling_factor = 1d0        
 
 ! output controls
    !photo_interval = 10
@@ -45,10 +45,10 @@
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
    ! axis limits -- to override system default selections
-   HR_logT_min = 3.6 ! -101 ! only used if > -100
-   HR_logT_max = 3.92 ! only used if > -100
+   HR_logT_min = 3.58 ! -101 ! only used if > -100
+   HR_logT_max = 3.9 ! only used if > -100
    HR_logL_min = 0 ! -101 ! only used if > -100
-   HR_logL_max = 4 ! -101 ! only used if > -100
+   HR_logL_max = 3.7 ! -101 ! only used if > -100
    
    show_HR_classical_instability_strip = .true.
 

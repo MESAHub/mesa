@@ -104,7 +104,11 @@
 ! mesh
    okay_to_remesh = .false.
 
-! solver   
+
+! solver
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
+
    steps_before_use_velocity_time_centering = 0
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    

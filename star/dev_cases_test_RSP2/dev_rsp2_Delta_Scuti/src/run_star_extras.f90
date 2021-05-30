@@ -36,10 +36,12 @@
       integer :: num_periods, run_num_steps_end_prev, &
          run_num_iters_end_prev, run_num_retries_end_prev
       real(dp) :: period, KE_growth, KE_growth_avg, prev_KE_max, &
-         period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
+         delta_R_growth, delta_R_growth_avg, prev_delta_R, &
+         period_max_v_div_vesc, period_max_v_div_cs, period_delta_R, &
+         period_delta_Teff, period_delta_logTeff, &
          period_delta_logL, period_delta_Mag
       ! info for period in progress
-      real(dp) :: time_started, v_div_cs_max, &
+      real(dp) :: time_started, v_div_cs_max, v_div_vesc_max, &
          KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max
             
       contains
@@ -73,8 +75,11 @@
          write(iounit) num_periods, run_num_steps_end_prev, &
             run_num_iters_end_prev, run_num_retries_end_prev, &
             period, KE_growth, KE_growth_avg, prev_KE_max, &
-            period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
-            period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
+            delta_R_growth, delta_R_growth_avg, prev_delta_R, &
+            period_max_v_div_vesc, period_max_v_div_cs, period_delta_R, &
+            period_delta_Teff, period_delta_logTeff, &
+            period_delta_logL, period_delta_Mag, &
+            time_started, v_div_cs_max, v_div_vesc_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max
       end subroutine photo_write
 
@@ -86,8 +91,11 @@
          read(iounit, iostat=ierr) num_periods, run_num_steps_end_prev, &
             run_num_iters_end_prev, run_num_retries_end_prev, &
             period, KE_growth, KE_growth_avg, prev_KE_max, &
-            period_max_vsurf_div_cs, period_delta_R, period_delta_Teff, &
-            period_delta_logL, period_delta_Mag, time_started, v_div_cs_max, &
+            delta_R_growth, delta_R_growth_avg, prev_delta_R, &
+            period_max_v_div_vesc, period_max_v_div_cs, period_delta_R, &
+            period_delta_Teff, period_delta_logTeff, &
+            period_delta_logL, period_delta_Mag, &
+            time_started, v_div_cs_max, v_div_vesc_max, &
             KE_min, KE_max, R_min, R_max, L_min, L_max, T_min, T_max
       end subroutine photo_read
       
@@ -110,13 +118,19 @@
             KE_growth = 0
             KE_growth_avg = 0
             prev_KE_max = 0
-            period_max_vsurf_div_cs = 0
+            delta_R_growth = 0
+            delta_R_growth_avg = 0
+            prev_delta_R = 0
+            period_max_v_div_cs = 0
+            period_max_v_div_vesc = 0
             period_delta_R = 0
             period_delta_Teff = 0
+            period_delta_logTeff = 0
             period_delta_logL = 0
             period_delta_Mag = 0
             time_started = 0
             v_div_cs_max = 0
+            v_div_vesc_max = 0
             KE_min = 0
             KE_max = 0
             R_min = 0
@@ -173,9 +187,9 @@
          contains
          
          logical function get_period_info()
-            real(dp) :: v_surf, v_surf_start, KE, KE_avg, min_period, time_ended, &
-               delta_R, min_deltaR_for_periods, KE_growth_avg_frac_new, &
-               min_period_div_target, cs
+            real(dp) :: v_surf, v_surf_start, KE, min_period, time_ended, &
+               delta_R, min_deltaR_for_periods, growth_avg_frac_new, &
+               min_period_div_target, cs, vesc
             include 'formats'
             get_period_info = .false.
          
@@ -196,10 +210,12 @@
                v_surf = s% u_face_val(1)
                v_surf_start = s% u_face_start(1)
             else
-               stop 'extras_finish_step: both v_flag and u_flag are false'
+               stop 'rsp2_extras_finish_step: both v_flag and u_flag are false'
             end if
             cs = s% csound(1)
             if (v_surf > v_div_cs_max*cs) v_div_cs_max = v_surf/cs
+            vesc = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
+            if (v_surf > v_div_vesc_max*vesc) v_div_vesc_max = v_surf/vesc
                
             ! period is completed when v_surf goes from positive to negative during step
             if (v_surf > 0d0 .or. v_surf_start < 0d0) return
@@ -234,31 +250,38 @@
             num_periods = num_periods + 1
          
             if (num_periods > 1) then
-               KE_avg = 0.5d0*(KE_max + prev_KE_max)
-               KE_growth = (KE_max - prev_KE_max)/KE_avg
-               KE_growth_avg_frac_new = s% x_ctrl(9)
-               KE_growth_avg = KE_growth_avg_frac_new*KE_growth + &
-                  (1d0 - KE_growth_avg_frac_new)*KE_growth_avg
+               growth_avg_frac_new = s% x_ctrl(9)
+               KE_growth = (KE_max - prev_KE_max)/prev_KE_max
+               KE_growth_avg = growth_avg_frac_new*KE_growth + &
+                  (1d0 - growth_avg_frac_new)*KE_growth_avg
+               delta_R_growth = (delta_R - prev_delta_R)/prev_delta_R
+               delta_R_growth_avg = growth_avg_frac_new*delta_R_growth + &
+                  (1d0 - growth_avg_frac_new)*delta_R_growth_avg
             end if
          
             period_delta_Teff = T_max - T_min
+            period_delta_logTeff = log10(T_max/T_min)
             period_delta_R = R_max - R_min
             period_delta_logL = log10(L_max/L_min)
             period_delta_Mag = 2.5d0*period_delta_logL
-            period_max_vsurf_div_cs = v_div_cs_max
+            period_max_v_div_cs = v_div_cs_max
+            period_max_v_div_vesc = v_div_vesc_max
             prev_KE_max = KE_max
-            write(*,'(i4,a14,i6,2(a14,f8.3),99(a14,f12.5))')  &
+            prev_delta_R = period_delta_R
+            !                 1       2       3         4       5        6       7          8        9   
+            write(*,'(i4,a14,i6,a13,f8.3,a13,f9.3,a9,f9.4,a15,f10.4,a13,f9.4,a13,f10.4,a11,f9.4,a13,f9.4)')  &
                num_periods, &
-               'steps/cycle', s% model_number - run_num_steps_end_prev, &
+               'steps/cycle', s% model_number - run_num_steps_end_prev, &              ! 1   a14,i6
                'iters/step',  &
-                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
-                  dble(s% model_number - run_num_steps_end_prev), &
-               'period (d)', period/(24*3600), &
-               'KE growth', KE_growth_avg, &
-               'delta R/Rsun', period_delta_R/Rsun, &
-               'delta logL', period_delta_logL, &
-               'delta Teff', period_delta_Teff, &
-               'max vsurf/cs', period_max_vsurf_div_cs
+                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &     
+                  dble(s% model_number - run_num_steps_end_prev), &                    ! 2   a13,f8.3
+               'period (d)', period/(24*3600), &                                       ! 3   a13,f9.3
+               'growth', delta_R_growth_avg, &                                         ! 4   a9,f9.4
+               'delta R/Rsun', period_delta_R/Rsun, &                                  ! 5   a15,f10.4
+               'delta logL', period_delta_logL, &                                      ! 6   a13,f9.4
+               'delta Teff', period_delta_Teff, &                                      ! 7   a13,f10.4
+               'max v/cs', period_max_v_div_cs, &                                      ! 8   a11,f9.4
+               'max v/vesc', period_max_v_div_vesc                                     ! 9   a13,f9.4
 
             time_started = time_ended
             run_num_steps_end_prev = s% model_number
@@ -271,6 +294,7 @@
          
          subroutine init_min_max_info
             v_div_cs_max = 0d0
+            v_div_vesc_max = 0d0
             KE_min = 1d99
             KE_max  = -1d99
             R_min = 1d99
@@ -337,7 +361,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 8
+         how_many_extra_history_columns = 10
       end function how_many_extra_history_columns
       
       
@@ -354,12 +378,14 @@
          i = 1
          names(i) = 'num_periods'; vals(i) = num_periods; i=i+1
          names(i) = 'period'; vals(i) = period/(24*3600); i=i+1
-         names(i) = 'growth'; vals(i) = KE_growth_avg; i=i+1
-         names(i) = 'max_v_div_cs'; vals(i) = period_max_vsurf_div_cs; i=i+1
-         names(i) = 'delta_R'; vals(i) = period_delta_R/Rsun; i=i+1
-         names(i) = 'delta_Teff'; vals(i) = period_delta_Teff; i=i+1
-         names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
-         names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
+         names(i) = 'growth'; vals(i) = delta_R_growth_avg; i=i+1
+         names(i) = 'max_v_div_cs'; vals(i) = period_max_v_div_cs; i=i+1
+         names(i) = 'max_v_div_vesc'; vals(i) = period_max_v_div_vesc; i=i+1
+         names(i) = 'del_R'; vals(i) = period_delta_R/Rsun; i=i+1
+         names(i) = 'del_Teff'; vals(i) = period_delta_Teff; i=i+1
+         names(i) = 'del_logTeff'; vals(i) = period_delta_logTeff; i=i+1
+         names(i) = 'del_logL'; vals(i) = period_delta_logL; i=i+1
+         names(i) = 'del_Mag'; vals(i) = period_delta_Mag; i=i+1
       end subroutine data_for_extra_history_columns
 
 

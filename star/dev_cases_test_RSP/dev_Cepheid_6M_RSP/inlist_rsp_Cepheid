@@ -57,8 +57,7 @@
    !v_div_csound_surf_limit = 0.1 ! save model here
 
 ! RSP controls
-   RSP_do_check_omega = .false.     ! TESTING
-!   RSP_report_check_omega_changes = .true.
+   RSP_do_check_omega = .false.
    
    RSP_min_deltaR_for_periods = 1d0 ! to filter out extras after have grown beyond this deltaR
 
