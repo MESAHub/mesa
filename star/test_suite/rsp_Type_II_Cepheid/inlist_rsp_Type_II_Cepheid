@@ -57,9 +57,8 @@
 ! RSP controls
 
    RSP_do_check_omega = .false.
-   x_integer_ctrl(1) = 10 ! which period to check
-   !x_ctrl(1) = 1.58915d0 ! expected period (in days) ! with RSP_do_check_omega = .true.
-   x_ctrl(1) = 1.73724d0 ! expected period (in days) ! with RSP_do_check_omega = .false.
+   x_integer_ctrl(1) = 5 ! which period to check
+   x_ctrl(1) = 1.58339d0 ! expected period (in days)
    
    
 
@@ -83,6 +82,7 @@
    RSP_nz_outer = 60 ! number of zones in outer region of static model
    RSP_T_anchor = 11d3 ! approx temperature at base of outer region
    RSP_max_num_periods = 2000
+   RSP_min_deltaR_for_periods = 0.3
 
 
 ! output controls

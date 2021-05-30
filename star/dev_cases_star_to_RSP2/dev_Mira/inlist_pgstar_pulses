@@ -1,4 +1,0 @@
-&pgstar
-   read_extra_pgstar_inlist1 = .true.
-   extra_pgstar_inlist1_name = '../../rsp2_utils/inlist_pgstar_pulses'
-/ ! end of pgstar namelist

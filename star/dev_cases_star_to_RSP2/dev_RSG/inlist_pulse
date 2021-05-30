@@ -21,6 +21,10 @@
    dt_div_min_dr_div_cs_limit = 0.7d0 ! 1.0d0
    dt_div_min_dr_div_cs_hard_limit = 2.0d0
    
+
+! solver
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses

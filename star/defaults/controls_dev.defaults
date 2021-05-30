@@ -49,6 +49,7 @@
 
     RSP2_Lsurf_factor = 0.5d0
     
+    RSP2_report_adjust_w = .false.
     RSP2_use_L_eqn_at_surface = .true.
     RSP2_assume_HSE = .true.
     RSP2_use_RSP_eqn_for_Y_face = .true.

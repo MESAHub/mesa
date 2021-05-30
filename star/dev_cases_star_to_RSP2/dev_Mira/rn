@@ -7,13 +7,6 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-
-
-mira is too hard for now.  cannot get model for pulse with Psurf = 0.  and cannot pulse with anything else.
-
-
-
-
 do_one inlist_to_zams_header zams.mod
 cp zams.mod standard_zams.mod
 
@@ -41,20 +34,25 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 echo 'finished'
 
-return
 
-after to_pulse       Teff 2498   logL 3.72    near peak of He shell flash   use_zero_Pgas_outer_BC
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-    1997       2          0.2639E-07       37900318.9424            438.6611              1.7838
-    1997       2          0.5978E-07       16727275.8488            193.6027              2.3534
-after remove core    Teff 2423  logL 3.72    use_zero_Pgas_outer_BC
-      10       1          0.2639E-07       37896484.9077            438.6167              1.7855
-      10       2          0.5975E-07       16736635.0567            193.7111              2.3747
-after remesh         Teff    logL         pick T_anchor to get good match for P
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-      10       1          0.2696E-07       37092893.7460            429.3159             19.7797
-      10       2          0.6464E-07              0.0000              0.0000              stable
-after initialize
- set gyre starting velocities
-   order           freq (Hz)             P (sec)             P (day)    cycles to double
-       1          0.2696E-07       37092893.7460            429.3159             19.7797
+after to pulse          Teff 2980   L 3682
+   model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
+   12990       1          0.5077E-07       19695057.3370            227.9521           1683.0491              0.1354              7.3833
+   12990       2          0.1007E-06        9933423.3090            114.9702            926.5560              0.1241              8.0591
+
+after remove core       
+   model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
+       1       1          0.5077E-07       19694731.7498            227.9483           1683.0153              0.1354              7.3833
+       1       2          0.1007E-06        9933267.8102            114.9684            926.5437              0.1241              8.0591
+
+after remesh            
+   model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
+       1       1          0.5172E-07       19333153.7254            223.7634           2099.1460              0.1066              9.3811
+       1       2          0.1030E-06        9708823.0538            112.3706           1270.8995              0.0884             11.3099
+
+after initialize        
+   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1          0.5172E-07       19333153.7254            223.7634              0.1066              9.3811
+       2          0.1030E-06        9708823.0538            112.3706              0.0884             11.3099
+       3          0.1624E-06        6156274.9723             71.2532              0.0734             13.6240
+ set gyre starting velocities for order 1
