@@ -1,19 +1,18 @@
-.. _5M_cepheid_blue_loop:
+.. _7M_prems_to_AGB:
 
-********************
-5M_cepheid_blue_loop
-********************
+***************
+7M_prems_to_AGB
+***************
 
-This test case checks that the evolution of a 5 Msun, metal-poor Z=0.008, helium-enriched Y=0.256 model
-executes a blue-loop in the HR diagram and crosses the classical Cepheid instability strip boundaries three times.
+This test case checks that the evolution of a 7 Msun, metal-poor Z = 0.001, model reaches the AGB.
 
 This test case has two parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_start``) creates a pre-main sequence model and evolves it to the onset of core helium burning, just past the tip of the Red Giant branch.
+* Part 1 (``inlist_start``) creates a pre-main sequence model.
 
-* Part 2 (``inlist_cepheid_blue_loop``) continues the evolution as core helium burning proceeds. The model executes a blue loop, with the red edge and blue edge of the classical Cepheid instability strip boundaries shown in the HR diagram:
+* Part 2 (``inlist_7M_prems_to_AGB``) continues the evolution as core hydrogen and helium burning proceed, terminating when log10(L/Lsun)=4.3 is reached. The model executes a blue loop as helium depletes, with the red edge and blue edge of the classical Cepheid instability strip boundaries shown in the HR diagram:
 
-.. image:: ../../../star/test_suite/5M_cepheid_blue_loop/docs/hr002086.svg
+.. image:: ../../../star/test_suite/7M_prems_to_AGB/docs/hr000794.svg
    :scale: 100%
 
 pgstar commands used:
@@ -35,10 +34,10 @@ pgstar commands used:
    HR_win_width = 12
    HR_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
 
-   HR_logT_min = 3.6 
-   HR_logT_max = 4.3 
-   HR_logL_min = 2.0 
-   HR_logL_max = 3.4 
+   HR_logT_min = 3.5 
+   HR_logT_max = 4.5 
+   HR_logL_min = 2.7 
+   HR_logL_max = 4.4 
 
    ! file output
    HR_file_flag = .true.
