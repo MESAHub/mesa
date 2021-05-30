@@ -14,6 +14,10 @@
 
 &controls   
    max_timestep = 2642
+
+! solver
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses

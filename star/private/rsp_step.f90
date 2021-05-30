@@ -2736,9 +2736,9 @@
          HD(1:LD_HD,IR) = 0.d0   
          
          dt = s% dt
-         if (s% use_compression_outer_BC .and. I == NZN) then
-            stop 'no rsp support for use_compression_outer_BC'
-         end if
+         !if (s% use_compression_outer_BC .and. I == NZN) then
+         !   stop 'no rsp support for use_compression_outer_BC'
+         !end if
          
          ! XP doesn't include Prad for acceleration equation
          ! instead introduce term using Fr

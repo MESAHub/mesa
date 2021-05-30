@@ -3,14 +3,10 @@
    show_log_description_at_start = .false.
    
    load_saved_model = .true.
-   load_model_filename = 'Type_II_Cepheid.mod'
+   load_model_filename = 'type_II_ceph_cycle0.mod'
    
    change_initial_RSP2_flag = .true.
    new_RSP2_flag = .true.
-   
-   !save_model_when_terminate = .true.
-   !save_model_filename = 'rsp2_cycle700.mod'
-   !required_termination_code_string(1) = 'max_model_number'
    
    change_initial_v_flag = .true.
    new_v_flag = .true.
@@ -21,9 +17,6 @@
    set_initial_model_number = .true.
    initial_model_number = 0
 
-   set_initial_dt = .true.
-   seconds_for_initial_dt = 100
-
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1.5d-3
 
@@ -33,7 +26,10 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
-   pgstar_flag = .true.
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 24
+
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -48,30 +44,34 @@
    kap_CO_prefix = 'a09_co'
 / ! end of kap namelist
 
+
+! create initial RSP model
+!            P(days)         growth
+!  0       0.16449E+01     0.16484E+00
+!  1       0.11483E+01     0.57045E-04
+!  2       0.83165E+00    -0.53670E+00
+
 &controls  
    initial_z = 0.0001d0
    initial_mass = 0.55d0
    
-   max_timestep = 100
+   max_timestep = 240
 
    max_model_number = 5000000
    max_number_retries = 10000 
 
-! atmosphere
-   ! P boundary condition
-   use_momentum_outer_BC = .true.  ! required for RSP2
-   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
-      ! this can be a problem with shocks since omits Pvsc
-   ! else if RSP_use_Prad_for_Psurf
-      !use_zero_Pgas_outer_BC = .false.
-   ! else use RSP default of Psurf = 0
-      use_fixed_Psurf_outer_BC = .true.
-      fixed_Psurf = 0d0
+   max_age_in_days = 107
+   
+   
+! surf BCs
+   use_zero_Pgas_outer_BC = .true.
+   RSP2_use_L_eqn_at_surface = .true.
 
 ! timesteps
 !  RSP_max_dt_times_min_dr_div_cs = 2d0
-   dt_div_min_dr_div_cs_limit = 2d0
-   dt_div_min_dr_div_cs_hard_limit = 4d0
+   dt_div_min_dr_div_cs_limit = 1d0 ! 2d0
+   dt_div_min_dr_div_cs_hard_limit = 2d0 ! 4d0
+   ! 2,4 gives > 250 retries for 107 days
 
 !  RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
@@ -111,6 +111,8 @@
    always_use_dedt_form_of_energy_eqn = .true.
 
 ! RSP2
+
+   !RSP2_report_adjust_w = .true.
    
    RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
@@ -122,14 +124,17 @@
    RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
    RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar   
    RSP2_alfad =     1d0
-
-   RSP2_alfam =     0.05d0        ! "lots of struggling"
+   
+   ! for initial tests, don't need to add "lots of struggling"
+   !RSP2_alfam =     0.05d0        ! "lots of struggling"
 
    RSP2_num_outermost_cells_forced_nonturbulent = 1
    RSP2_num_innermost_cells_forced_nonturbulent = 5
+   
    alt_scale_height_flag = .false.
 
-   tol_max_correction = 5d-7
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
    
 ! output
    x_integer_ctrl(1) = -548 ! which period to check
@@ -137,7 +142,7 @@
 
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = 0 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 1.3 ! expected period (in days) 
+   x_ctrl(7) = 1.6 ! expected period (in days) 
 !   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 0.1 ! KE_growth_avg_abs_frac_new
    x_ctrl(10) = 0.3 ! min_period_div_target
@@ -151,12 +156,12 @@
    trace_history_value_name(1) = 'log_rel_run_E_err'
    trace_history_value_name(2) = 'rel_E_err'
 
-      photo_interval = 2000
-      profile_interval = 2000
-      history_interval = 40
-      terminal_interval = 2000
+      photo_interval = 1000
+      profile_interval = 4000
+      history_interval = 10
+      terminal_interval = 1000
 
-      !photo_interval = 100
+      !photo_interval = 1
       !profile_interval = 400
       !history_interval = 40
       !terminal_interval = 1
@@ -171,7 +176,7 @@
 
 ! FOR DEBUGGING
       
-      !max_number_retries = 0
+      !max_number_retries = 1
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error

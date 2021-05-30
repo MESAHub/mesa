@@ -88,6 +88,7 @@
    log_dr_div_cs
    !log_cell_collapse_time
    !total_energy
+   !total_energy_integral ! total from surface inward. negative if bound. (ergs)
    
    !velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s

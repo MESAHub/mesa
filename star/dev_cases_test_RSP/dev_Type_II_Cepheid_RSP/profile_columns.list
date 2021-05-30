@@ -1,0 +1,100 @@
+   zone
+   k ! numbers start with 1 at the surface
+   
+   logT ! log10(temperature) at center of zone
+   logRho ! log10(rho) at center of zone
+   logP ! log10(pressure) at center of zone
+   logE ! log10(specific internal energy) at center of zone
+   logR_cm
+   entropy ! specific entropy divided by (avo*kerg)
+   logR ! log10(radius/Rsun) at outer boundary of zone
+   luminosity ! luminosity at outer boundary of zone (in Lsun units)
+   
+   logL ! log(max(1d-6,L/Lsun))
+   log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
+   rho
+   gamma1
+   csound ! sound speed
+   !log_csound
+   log_dr_div_cs
+   
+   vel_km_per_s
+   v
+   
+   v_div_r
+   d_v_div_r_dm
+
+   v_div_csound ! velocity divided by sound speed
+   
+   logdq ! log10(dq)
+   dq_ratio ! dq(k-1)/dq(k)
+   q ! fraction of star mass interior to outer boundary of this zone
+   radius ! radius at outer boundary of zone (in Rsun units)
+   !radius_cm
+   temperature ! temperature at center of zone
+      
+
+   tau ! optical depth
+   logtau ! log10(optical depth) at center of zone
+   pressure ! total pressure at center of zone (pgas + prad)
+   !pgas ! gas pressure at center of zone (electrons and ions)
+   pgas_div_ptotal ! pgas/pressure
+   logPgas ! log10(pgas)
+   !logPrad
+   !log_erad
+   !log_egas
+   energy ! internal energy (ergs/g)
+   grada ! dlnT_dlnP at constant S
+   !cv ! specific heat at constant volume
+   !cp ! specific heat at constant total pressure
+   !logS ! log10(specific entropy)
+   !gamma1 ! dlnP_dlnRho at constant S
+   free_e ! free_e is mean number of free electrons per nucleon
+   logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
+   !chiRho ! dlnP_dlnRho at constant T
+   !chiT ! dlnP_dlnT at constant Rho
+   opacity ! opacity measured at center of zone
+   log_opacity ! log10(opacity)
+   
+   mass ! m/Msun. mass coordinate of outer boundary of cell.
+   log_mass
+   !mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
+   !logM ! log10(m/Msun)
+   !xm ! mass exterior to point (Msun units)
+   !dq ! mass of zone as a fraction of total star mass
+   logxq ! log10(1-q)
+   dq
+   log_dq
+   
+      rsp_logEt
+      rsp_Et
+      rsp_Pt
+      rsp_Lr
+      rsp_Lc
+      rsp_Lt
+      rsp_Eq
+      rsp_Uq
+      rsp_PII_face
+      rsp_src_snk
+      rsp_src
+      rsp_sink
+      rsp_damp
+      rsp_dampR
+      rsp_Hp_face
+      rsp_Y_face
+      rsp_Pvsc
+      rsp_Chi
+      rsp_Lr_div_L
+      rsp_Lc_div_L
+      rsp_Lt_div_L
+      rsp_log_erad
+
+
+      dt_cs_div_dr
+      log_dt_cs_div_dr
+
+   pressure
+   temperature
+   
+   xq
+   xm

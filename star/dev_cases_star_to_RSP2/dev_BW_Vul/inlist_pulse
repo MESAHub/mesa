@@ -43,6 +43,10 @@
    max_timestep = 50 ! based on expected period
    
    v_div_csound_surf_limit = 6 
+
+! solver
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
    
    max_number_retries = 4 ! if hit this, probably need to give up
 

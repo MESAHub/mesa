@@ -15,25 +15,12 @@
 &controls   
    max_timestep = 4700
 
-! timesteps
-   ! fyi: RSP_max_dt_times_min_dr_div_cs = 2d0
-   !      ccsn uses dt_div_min_dr_div_cs_limit = 0.7d0, no hard limit
-   
+! solver
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
    
    dt_div_min_dr_div_cs_limit = 1.0d0
    dt_div_min_dr_div_cs_hard_limit = 2.0d0
-   
-! TESTING FOR LATE FAILURE CAUSE
-   ! this dies at 2869455..  photo 2868000 
-   !dt_div_min_dr_div_cs_limit = 0.5d0 ! 1.0d0
-   !dt_div_min_dr_div_cs_hard_limit = 1.0d0 ! 2.0d0
-   ! this still fails too
-!   P_theta_for_velocity_time_centering = 1d0
-!   L_theta_for_velocity_time_centering = 1d0
-
-   
-   
-   
    
 ! output controls
    x_logical_ctrl(7) = .true. ! doing pulses
