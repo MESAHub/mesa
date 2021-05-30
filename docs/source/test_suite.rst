@@ -149,10 +149,15 @@ pre-main sequence to the end of core helium burning.
 
 
 :ref:`5M_cepheid_blue_loop`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This test case checks that the evolution of a 5 Msun, metal-poor Z = 0.008, helium-enriched Y=0.256 model
 executes a blue-loop in the HR diagram and crosses the classical Cepheid instability strip boundaries three times.
+
+:ref:`inlist_7M_prems_to_AGB`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks that the evolution of a 7 Msun, metal-poor Z = 0.001, model reaches the AGB.
 
 
 :ref:`c13_pocket`
