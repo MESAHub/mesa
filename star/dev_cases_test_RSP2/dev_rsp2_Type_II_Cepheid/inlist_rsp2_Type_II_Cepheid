@@ -62,7 +62,6 @@
 
    max_age_in_days = 107
    
-   
 ! surf BCs
    use_zero_Pgas_outer_BC = .true.
    RSP2_use_L_eqn_at_surface = .true.

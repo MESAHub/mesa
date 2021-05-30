@@ -57,8 +57,9 @@
 ! RSP controls
 
    RSP_do_check_omega = .false.
-   x_integer_ctrl(1) = 5 ! which period to check
-   x_ctrl(1) = 1.58339d0 ! expected period (in days)
+   x_integer_ctrl(1) = 10 ! which period to check
+   !x_ctrl(1) = 1.58915d0 ! expected period (in days) ! with RSP_do_check_omega = .true.
+   x_ctrl(1) = 1.73724d0 ! expected period (in days) ! with RSP_do_check_omega = .false.
    
    
 

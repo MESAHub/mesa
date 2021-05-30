@@ -378,7 +378,6 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: r_phot, L_surf
-         !logical, parameter :: skip_partials = .true., &      ! TEST
          logical, parameter :: skip_partials = .false., &
             need_atm_Psurf = .false., need_atm_Tsurf = .false.
          real(dp) :: Teff, &
@@ -453,7 +452,7 @@
             return
          end if
          s% T_surf = exp(lnT_surf)
-         s% P_surf = exp(lnT_surf)
+         s% P_surf = exp(lnP_surf)
          call set_phot_info(s) ! sets Teff using L_phot and R_phot
          Teff = s% Teff
 

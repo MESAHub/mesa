@@ -13,7 +13,7 @@
 
       create_RSP_model = .false.
       load_saved_model = .true.
-      load_model_filename = 'type_II_ceph_cycle0.mod'
+      load_model_filename = 'type_II_ceph_cycle0_600.mod'
 
       initial_zfracs = 6
 
@@ -47,11 +47,17 @@
 
 / ! end of kap namelist
 
-! create initial RSP model
+! create initial RSP model    
 !            P(days)         growth
 !  0       0.16449E+01     0.16484E+00
 !  1       0.11483E+01     0.57045E-04
 !  2       0.83165E+00    -0.53670E+00
+
+! create initial RSP model       nz = 600
+!            P(days)         growth
+!  0       0.16785E+01     0.16622E+00
+!  1       0.11693E+01    -0.34409E-01
+!  2       0.84526E+00    -0.44934E+00
 
 
 &controls
@@ -61,10 +67,12 @@
 
 ! RSP controls
 
-   !RSP_do_check_omega = .false.
-   RSP_do_check_omega = .true.
+   RSP_do_check_omega = .false.
+   !RSP_do_check_omega = .true.
    
    
+   RSP_max_dt_times_min_dr_div_cs = 0.7d0 ! 2d0
+   RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
    
    
    
@@ -86,15 +94,6 @@
    RSP_alfam  = 0.25d0
    RSP_gammar = 0d0
 
-   RSP_target_steps_per_cycle = 1200
-   RSP_kick_vsurf_km_per_sec = 4.5d0
-   RSP_fraction_1st_overtone = 0d0
-   RSP_fraction_2nd_overtone = 0d0
-   RSP_nz = 200 ! total number of zones in static model
-   RSP_nz_outer = 60 ! number of zones in outer region of static model
-   RSP_T_anchor = 11d3 ! approx temperature at base of outer region
-   RSP_max_num_periods = 2000
-   
    RSP_min_deltaR_for_periods = 0.3
 
 
