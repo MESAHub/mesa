@@ -154,10 +154,16 @@ pre-main sequence to the end of core helium burning.
 This test case checks that the evolution of a 5 Msun, metal-poor Z = 0.008, helium-enriched Y=0.256 model
 executes a blue-loop in the HR diagram and crosses the classical Cepheid instability strip boundaries three times.
 
-:ref:`inlist_7M_prems_to_AGB`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:ref:`7M_prems_to_AGB`
+^^^^^^^^^^^^^^^^^^^^^^
 
 This test case checks that the evolution of a 7 Msun, metal-poor Z = 0.001, model reaches the AGB.
+
+:ref:`8.8M_urca`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of an 8.8 Msun ZAMS, Z=0.014 metallicity, model through a A=23 and A=25 Urca process cooling,
+using the weak rate tables from Suzuki et al. (2016).
 
 
 :ref:`c13_pocket`
