@@ -1,0 +1,148 @@
+! Candidate for a double-mode delta Scuti variable:
+! 2 Msol star leaving the main-sequence phase through
+! the upper part of the S-bend on its HR track.
+! Both F (0.171 d) and O1 (0.127 d) modes are linearly overstable  
+! with very small growth rates (of the order of 10**-5).
+! It takes more than 10**4 star-days for the pulsations to saturate. 
+! 
+! original test case contributed by Alfred Gautschy.
+
+&star_job
+
+      show_log_description_at_start = .false.
+
+      create_RSP_model = .false.
+      load_saved_model = .true.
+      load_model_filename = 'rsp_Delta_Scuti_cycle0.mod'
+
+      initial_zfracs = 6
+
+      color_num_files=2
+      color_file_names(2)='blackbody_johnson.dat'
+      color_num_colors(2)=5
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+      
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
+   
+/ ! end of star_job namelist
+
+&kap
+
+      Zbase    =   0.02d0
+
+      kap_file_prefix = 'a09'
+      kap_lowT_prefix = 'lowT_fa05_a09p'
+      kap_CO_prefix = 'a09_co'
+
+/ ! end of kap namelist
+
+&eos
+/ ! end of eos namelist
+
+
+&controls
+
+   ! limit max_model_number as part of test_suite
+   max_model_number = 16000
+
+! RSP controls
+
+   x_integer_ctrl(1) = 10 ! which period to check
+   x_ctrl(1) = 0.14715d0 ! expected period (in days) 
+
+   RSP_mass =    2.0d0
+   RSP_Teff =   6900d0
+   RSP_L    =     30d0   
+   RSP_X    =    0.7d0
+   RSP_Z    =   0.02d0
+      
+   ! parameters for equations
+   RSP_alfam = 0.25d0 ! eddy viscosity; Chi & Eq ~ RSP_alfam
+   RSP_alfa  = 1.2d0  ! mixing length; alfa = 0: purely radiative model.
+
+   ! initial kick velocity-amplitude
+   RSP_kick_vsurf_km_per_sec = 3.0d0 ! can be negative
+   ! arbitrarily give weigth also to the overstable O1 mode
+   RSP_fraction_1st_overtone = 0.5d0
+   RSP_fraction_2nd_overtone = 0d0
+
+   ! output data for 3d map.  format same as for gnuplot pm3d 
+   RSP_write_map = .true.
+   RSP_map_columns_filename = 'map_columns.list' ! subset of profile columns list
+      ! items listed in your map columns must also appear in your profile columns
+   RSP_map_filename = 'map.data'
+   RSP_map_first_period = 8
+   RSP_map_last_period = 8
+   RSP_map_zone_interval = 2
+   RSP_map_history_filename = 'map_history.data'
+
+   
+! solver
+
+! output controls
+   
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
+      !num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+   ! for cases in which you have a run that has reached steady pulses
+   ! and you want to look at plots of just a few periods to see the details,
+   ! i suggest the following method. interrupt the run soon after
+   ! it makes a photo.  remove or delete LOGS/history.data to force
+   ! creation of a new one when restart.  edit the inlist to set
+   ! history_interval to 1 to get maximum time resolution.  
+   ! restart the run and let it go for as many periods as desired.   
+
+      photo_interval = 1000
+      profile_interval = 4000
+      history_interval = 10
+      terminal_interval = 4000
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+      !pause = .true.
+
+      pgstar_interval = 25
+         
+      Grid2_win_flag = .true.
+
+
+      Grid2_title = '2.0 M\d\(2281)\u  Z=0.02  delta Scuti'
+
+      
+      History_Panels1_xaxis_name='star_age_day'
+      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+
+      !  Grid2_file_flag = .true.
+      file_digits = 7
+      Grid2_file_dir = 'png'
+      Grid2_file_prefix = 'grid'
+      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+      
+      !Profile_Panels1_show_grid = .true.
+
+      Profile_Panels1_xaxis_name = 'logtau'
+      Profile_Panels1_xaxis_reversed = .true.
+      Profile_Panels1_xmin = -101D0
+      Profile_Panels1_xmax = -101D0
+
+      Profile_Panels1_dymin(4) = 0.02
+
+/ ! end of pgstar namelist

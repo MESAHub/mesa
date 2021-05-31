@@ -331,11 +331,11 @@
          names(i) = 'growth'; vals(i) = delta_R_growth_avg; i=i+1
          names(i) = 'max_v_div_cs'; vals(i) = period_max_v_div_cs; i=i+1
          names(i) = 'max_v_div_vesc'; vals(i) = period_max_v_div_vesc; i=i+1
-         names(i) = 'del_R'; vals(i) = period_delta_R/Rsun; i=i+1
-         names(i) = 'del_Teff'; vals(i) = period_delta_Teff; i=i+1
-         names(i) = 'del_logTeff'; vals(i) = period_delta_logTeff; i=i+1
-         names(i) = 'del_logL'; vals(i) = period_delta_logL; i=i+1
-         names(i) = 'del_Mag'; vals(i) = period_delta_Mag; i=i+1
+         names(i) = 'delta_R'; vals(i) = period_delta_R/Rsun; i=i+1
+         names(i) = 'delta_Teff'; vals(i) = period_delta_Teff; i=i+1
+         names(i) = 'delta_logTeff'; vals(i) = period_delta_logTeff; i=i+1
+         names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
+         names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
       end subroutine rsp2_data_for_extra_history_columns
 
 
