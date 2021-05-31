@@ -1,0 +1,1 @@
+../../../star/test_suite/adjust_net/README.rst
