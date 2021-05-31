@@ -3,7 +3,7 @@
    show_log_description_at_start = .false.
    
    load_saved_model = .true.
-   load_model_filename = 'RR_Lyrae.mod'
+   load_model_filename = '../../test_suite/rsp_RR_Lyrae/rsp_RR_Lyrae_cycle0.mod'
    
    change_initial_RSP2_flag = .true.
    new_RSP2_flag = .true.
@@ -56,17 +56,10 @@
 
    max_model_number = 5000000
    max_number_retries = 10000 
-
-! atmosphere
-   ! P boundary condition
-   use_momentum_outer_BC = .true.  ! required for RSP2
-   ! if RSP_use_atm_grey_with_kap_for_Psurf then 
-      ! this can be a problem with shocks since omits Pvsc
-   ! else if RSP_use_Prad_for_Psurf
-      !use_zero_Pgas_outer_BC = .false.
-   ! else use RSP default of Psurf = 0
-      use_fixed_Psurf_outer_BC = .true.
-      fixed_Psurf = 0d0
+   
+! surf BCs
+   use_zero_Pgas_outer_BC = .true.
+   RSP2_use_L_eqn_at_surface = .true.
 
 ! timesteps
 !  RSP_max_dt_times_min_dr_div_cs = 2d0
