@@ -165,6 +165,11 @@ This test case checks that the evolution of a 7 Msun, metal-poor Z = 0.001, mode
 This test case checks the evolution of an 8.8 Msun ZAMS, Z=0.014 metallicity, model through a A=23 and A=25 Urca process cooling,
 using the weak rate tables from Suzuki et al. (2016).
 
+:ref:`accreted_material_j`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example checks the accretion of material and angular momentum onto a 20 Msun model.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
