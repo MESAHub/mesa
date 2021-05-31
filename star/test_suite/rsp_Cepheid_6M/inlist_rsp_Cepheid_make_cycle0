@@ -51,8 +51,8 @@
    x_ctrl(1) = 8.2974 ! expected period (in days) 
 
    RSP_mass = 6d0
-   RSP_Teff = 4892
-   RSP_L = 4660
+   RSP_Teff = 5200 ! 4892
+   RSP_L = 4435 ! 4660
    RSP_X = 0.730d0
    RSP_Z = 0.003d0
    !   Y = 0.267d0

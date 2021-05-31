@@ -14,7 +14,7 @@
 
 &controls
    xa_central_lower_limit_species(1) = 'he4'
-   xa_central_lower_limit(1) = 0.08d0 
+   xa_central_lower_limit(1) = 0.15d0 
 
    !log_Teff_lower_limit = 3.78
    !max_model_number = 820

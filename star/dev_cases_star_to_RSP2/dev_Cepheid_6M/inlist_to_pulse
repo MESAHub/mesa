@@ -10,7 +10,7 @@
 &controls
 
    log_Teff_lower_limit = 3.66
-   !max_model_number = 740          ! comment out on 1st pass when searching for best
+   max_model_number = 746          ! comment out on 1st pass when searching for best
 
 ! output
    !photo_interval = 10
@@ -37,7 +37,7 @@
 
    ! axis limits -- to override system default selections
    HR_logT_min = 3.65 ! -101 ! only used if > -100
-   HR_logT_max = 3.78 ! only used if > -100
+   HR_logT_max = 3.8 ! only used if > -100
    HR_logL_min = 3.4 ! -101 ! only used if > -100
    HR_logL_max = 3.9 ! -101 ! only used if > -100
 

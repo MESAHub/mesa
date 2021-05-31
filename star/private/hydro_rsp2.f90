@@ -1144,8 +1144,6 @@
          ierr = 0
          if (s% mixing_length_alpha == 0d0) return
          
-         !return ! as it is below, this doesn't work.  e.g., try dev_cases_test_RSP2/dev_rsp2_Type_II_Cepheid
-         
          !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
          do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
                s% nz - max(1,int(s% nz/s% RSP_nz_div_IBOTOM))
