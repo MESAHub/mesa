@@ -170,6 +170,11 @@ using the weak rate tables from Suzuki et al. (2016).
 
 This test suite example checks the accretion of material and angular momentum onto a 20 Msun model.
 
+:ref:`adjust_net`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example checks the functionality of the adaptive nuclear reaction network.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
