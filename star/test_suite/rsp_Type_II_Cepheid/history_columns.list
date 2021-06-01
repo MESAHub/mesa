@@ -38,8 +38,6 @@
       luminosity ! luminosity in Lsun units
       L_center
       !gravity 
-      !log_surf_pressure
-      !log_surf_density
    
       log_L ! log10 luminosity in Lsun units
       effective_T
