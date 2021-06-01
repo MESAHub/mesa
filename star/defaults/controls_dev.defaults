@@ -2,8 +2,16 @@
 ! controls_dev
 ! ============
 
-! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
-! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
+! .. warning::
+!
+!  CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
+!  IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
+
+
+      ! TDC options
+      ! ~~~~~~~~~~~
+      ! Things related to TDC
+      ! ::
 
       max_dt_div_tau_conv_for_TDC = -1d99
       max_dt_years_for_TDC = -1d99

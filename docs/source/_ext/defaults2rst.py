@@ -15,7 +15,10 @@ DEFAULTS_FILES = (
     'reference/controls',
     'reference/pgstar',
     'reference/format',
+    'reference/star_job_dev',
+    'reference/controls_dev',
 )
+
 
 def defaults2rst(app, docname, source):
     """
@@ -27,6 +30,7 @@ def defaults2rst(app, docname, source):
         rst_lines = [STRIP.sub('', line) for line in lines]
         source[0] = '\n'.join(rst_lines)
     return
+
 
 def setup(app):
     app.connect("source-read", defaults2rst)
