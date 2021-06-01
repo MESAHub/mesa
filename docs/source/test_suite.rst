@@ -176,6 +176,12 @@ This test suite example checks the accretion of material and angular momentum on
 This test suite example checks the functionality of the adaptive nuclear reaction network.
 
 
+:ref:`carbon_acc`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example checks the acceration of carbon onto a pure carbon white dwarf.
+
+
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
 
