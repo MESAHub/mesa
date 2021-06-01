@@ -225,6 +225,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
+         ! composition derivatives not implemented
          dlnkap_dxa = 0
 
       end subroutine kap_get
