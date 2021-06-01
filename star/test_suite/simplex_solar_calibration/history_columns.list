@@ -191,8 +191,6 @@
       !log_Ledd
       !log_L_div_Ledd ! log10(L/Leddington)
       !log_surf_opacity
-      !log_surf_pressure
-      !log_surf_density
       !log_surf_temperature
       !surface_temperature
       !log_surf_optical_depth
@@ -267,15 +265,6 @@
       !log_average he4
       ! etc.
    
-   ! info at a specified mass coordinate (given by trace_mass_location)
-      !trace_mass_location (Msun)
-      !trace_mass_radius (Rsun)
-      !trace_mass_lgT
-      !trace_mass_lgRho
-      !trace_mass_L (Lsun)
-      !trace_mass_v
-      !trace_mass_omega
-      !trace_mass_omega_div_omega_crit
 
    
    ! info at location of max temperature
@@ -317,7 +306,6 @@
    ! misc
    
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
-      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
       
       !e_thermal ! sum over all zones of Cp*T*dm
       
