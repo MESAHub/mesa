@@ -159,11 +159,6 @@ executes a blue-loop in the HR diagram and crosses the classical Cepheid instabi
 
 This test case checks that the evolution of a 7 Msun, metal-poor Z = 0.001, model reaches the AGB.
 
-:ref:`8.8M_urca`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This test case checks the evolution of an 8.8 Msun ZAMS, Z=0.014 metallicity, model through a A=23 and A=25 Urca process cooling,
-using the weak rate tables from Suzuki et al. (2016).
 
 :ref:`accreted_material_j`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
