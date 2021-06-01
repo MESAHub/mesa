@@ -74,8 +74,24 @@ contains
     write(*,*)
     write(*,*) 'do_test_special_weak'
 
+    use_suzuki_tables = .false.
+    ! this checks the weaklib tables
+    ! they are extremely sparsely sampled
+    ! so these are bad esimates of the rates
+    ! they are shown for comparison purposes
     call do_test_special_weak(.false.)
+
+    ! this shows the results using the
+    ! on-the-fly weak rates discussed in MESA III (Section 8)
     call do_test_special_weak(.true.)
+
+    write(*,*)
+    write(*,*) 'do_test_suzuki'
+    use_suzuki_tables = .true.
+    ! this shows results from a set of denser tables
+    ! compiled by Suzuki et al. (2016)
+    ! and mentioned in MESA V (Appendix A.2.1)
+    call do_test_special_weak(.false.)
 
     write(*,*) 'done'
     write(*,*)
@@ -229,7 +245,11 @@ contains
             Qneu, dQneu_dlnT, dQneu_dlnRho, &
             ierr)
 
-       write(*,*) "weaklib weak rates"
+       if (use_suzuki_tables) then
+          write(*,*) "suzuki weak rates"
+       else
+          write(*,*) "weaklib weak rates"
+       end if
 
     end if
 
