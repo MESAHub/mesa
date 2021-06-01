@@ -31,13 +31,34 @@ Astero defaults
    reference/astero_search
    reference/astero_pgstar
 
+Hooks
+=====
+
+.. toctree::
+   :maxdepth: 1
+
+   reference/hooks
+
 Other Information
 =================
 
 .. toctree::
    :maxdepth: 1
 
-   reference/hooks
    reference/env_vars
    reference/format
 
+Experimental Options
+====================
+
+.. warning::
+
+   Experimental options should not be used without consulting the MESA
+   developers.  The corresponding features are unfinished, untested,
+   and may give erroneous results.
+
+.. toctree::
+   :maxdepth: 1
+
+   reference/star_job_dev
+   reference/controls_dev
