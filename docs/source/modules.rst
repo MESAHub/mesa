@@ -95,6 +95,7 @@ The ``eos`` module provides the equation of state.
 
    eos/overview
    eos/defaults
+   eos/interface
 
 
 .. _kap:
@@ -110,6 +111,7 @@ conductive opacities.
 
    kap/overview
    kap/defaults
+   kap/interface
 
 .. _net:
 
