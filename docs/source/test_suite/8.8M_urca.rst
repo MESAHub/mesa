@@ -1,1 +1,0 @@
-../../../star/test_suite/8.8M_urca/README.rst
