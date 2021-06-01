@@ -40,9 +40,6 @@
    !pgas ! gas pressure at center of zone (electrons and ions)
    pgas_div_ptotal ! pgas/pressure
    logPgas ! log10(pgas)
-   !logPrad
-   !log_erad
-   !log_egas
    energy ! internal energy (ergs/g)
    grada ! dlnT_dlnP at constant S
    !cv ! specific heat at constant volume

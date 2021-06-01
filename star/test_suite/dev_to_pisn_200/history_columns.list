@@ -148,19 +148,7 @@
    
    ! info about locations where optical depth is 10 or 100
 
-      !tau10_mass ! mass in solar units where optical depth = 10
-      !tau10_radius ! radius in solar units where optical depth = 10
-      !tau10_lgP ! estimate for log10(P) at tau = 10
-      !tau10_lgT ! estimate for log10(T) at tau = 10
-      !tau10_lgRho ! estimate for log10(density) at tau = 10
-      !tau10_L ! estimate for L/Lsun at tau = 10
       
-      !tau100_mass ! location in solar units where optical depth = 100
-      !tau100_radius ! location in solar units where optical depth = 100
-      !tau100_lgP ! estimates for values at tau = 100
-      !tau100_lgT
-      !tau100_lgRho
-      !tau100_L
 
    ! timescales
       
@@ -198,7 +186,6 @@
       v_div_cs
       v_surf_km_s
       !v_div_csound_surf ! velocity divided by sound speed at outermost grid point
-      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
    
    ! conditions near center
       log_center_T
