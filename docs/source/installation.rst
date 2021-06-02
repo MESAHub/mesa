@@ -5,7 +5,7 @@ Installing MESA
 
 This page describes how to install MESA.
 
-Preqrequistes
+Prerequisites
 -------------
 
 Ensure your system meets the minimum hardware requirements
@@ -71,10 +71,8 @@ mesa-r\ |version|. This will be your main MESA directory. You are
 free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
-You can also download zip files of `older MESA
-releases <http://sourceforge.net/projects/mesa/files/releases/>`__. If
-you plan to do so, please read `this FAQ
-entry <faq.html#old-version>`__.
+You can also download zip files of `older MESA releases <http://sourceforge.net/projects/mesa/files/releases/>`__.
+If you plan to do so, please read `this FAQ entry <faq:Installing Older Versions of MESA>`__.
 
 .. _environment:
 
@@ -199,8 +197,8 @@ Pay particular attention to the prerequisites for your system.
 Consult the FAQ
 ^^^^^^^^^^^^^^^
 
-Check to see if there is any information about your problem in the `MESA
-FAQ <faq.html>`__.
+Check to see if there is any information about your problem in the
+`MESA FAQ <faq:FAQ>`__.
 
 If you are using the MESA SDK and are having a problem with
 installation, you should also consult the `MESA SDK
@@ -238,7 +236,7 @@ Please provide the following information:
    echo $PATH
    echo $MESA_DIR
 
--  What is the error message you recieved? In addition, please attach
+-  What is the error message you received? In addition, please attach
    the full ``$MESA_DIR/build.log`` file.
 
 If the error message you received was ``./build_and_test FAILED`` also

@@ -12,7 +12,7 @@ you can generate the docs by doing
     cd $MESA_DIR/docs
     make html
 
-You can then view the docs in your browser by visiting the URL file://<MESA_DIR>/docs/build/html/index.html (replace <MESA_DIR> with the appropriate path).
+You can then view the docs in your browser by visiting the URL ``file://<MESA_DIR>/docs/build/html/index.html`` (replace <MESA_DIR> with the appropriate path).
 
 File Locations
 ==============
