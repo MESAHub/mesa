@@ -226,18 +226,16 @@ Please provide the following information:
 -  Describe your computer (machine type, operating system, operating
    system version).
 
--  What is the output of each of the following commands?
+-  What is the error message you received?
 
-::
+-  Attach the ``$MESA_DIR/build.log`` file.  This includes the output of the build process along with the output of each of the following commands ::
 
-   uname -a
-   gfortran -v
-   echo $MESASDK_ROOT
-   echo $PATH
-   echo $MESA_DIR
+    uname -a
+    gfortran -v
+    echo $MESASDK_ROOT
+    echo $PATH
+    echo $MESA_DIR
 
--  What is the error message you received? In addition, please attach
-   the full ``$MESA_DIR/build.log`` file.
 
 If the error message you received was ``./build_and_test FAILED`` also
 attach the file ``$MESA_DIR/MODULE/test/tmp.txt``, where ``MODULE`` is
@@ -246,11 +244,9 @@ that failed should be printed on the line before the ./build_and_test
 message was printed.
 
 If the file tmp.txt file does not exist in the folder then run the
-tester program
-
-::
+tester program::
 
    ./tester 2>&1 | tee tester.log
 
-and also attach tester.log file to your mesa-users message. If the
+and also attach the tester.log file to your mesa-users message. If the
 tester program does not exist, state that in your message.
