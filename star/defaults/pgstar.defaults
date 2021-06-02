@@ -8,7 +8,7 @@
 
 
    ! window updates
-   ! ______________
+   ! --------------
 
 
       ! pgstar_interval
@@ -65,7 +65,7 @@
 
 
    ! white_on_black flags
-   ! ____________________
+   ! --------------------
 
       ! true means white foreground color on black background
 
@@ -82,7 +82,7 @@
 
 
    ! file output
-   ! ___________
+   ! -----------
 
 
       ! file_device
@@ -134,7 +134,7 @@
 
 
    ! title, age, and model number
-   ! ____________________________
+   ! ----------------------------
 
       ! placement details
       ! scale is for character size
@@ -401,30 +401,28 @@
 
       ! mass location markers
 
-      ! ::
-
-      !     profile_mass_point_color_index
-      !     1 = foreground color
-      !     2 = red
-      !     3 = green
-      !     4 = blue
-      !     etc. the full range is defined in Set_Colours in pgstar_support.f
-      !     profile_mass_point_symbol
-      !     code number of the symbol to be drawn:
-      !           -1, -2  : a single dot (diameter = current
-      !                     line width).
-      !           -3..-31 : a regular polygon with ABS(SYMBOL)
-      !                     edges (style set by current fill style).
-      !           0..31   : standard marker symbols.
-      !           32..127 : ASCII characters (in current font).
-      !                     e.g. to use letter F as a marker, let
-      !                     SYMBOL = ICHAR('F').
-      !           > 127  :  a Hershey symbol number.
-      !     for info about codes, http://www.astro.caltech.edu/~tjp/pgplot/hershey.html
-      !     profile_mass_point_str
-      !     text to show with the marker
-      !     profile_mass_point_str_clr
-      !     color index for the string
+      !|     profile_mass_point_color_index
+      !|     1 = foreground color
+      !|     2 = red
+      !|     3 = green
+      !|     4 = blue
+      !|     etc. the full range is defined in Set_Colours in pgstar_support.f
+      !|     profile_mass_point_symbol
+      !|     code number of the symbol to be drawn:
+      !|           -1, -2  : a single dot (diameter = current
+      !|                     line width).
+      !|           -3..-31 : a regular polygon with ABS(SYMBOL)
+      !|                     edges (style set by current fill style).
+      !|           0..31   : standard marker symbols.
+      !|           32..127 : ASCII characters (in current font).
+      !|                     e.g. to use letter F as a marker, let
+      !|                     SYMBOL = ICHAR('F').
+      !|           > 127  :  a Hershey symbol number.
+      !|     for info about codes, http://www.astro.caltech.edu/~tjp/pgplot/hershey.html
+      !|     profile_mass_point_str
+      !|     text to show with the marker
+      !|     profile_mass_point_str_clr
+      !|     color index for the string
 
       ! set all the entries
 
@@ -2669,7 +2667,7 @@
 
 
       ! Profile_Panels1
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -2758,7 +2756,7 @@
 
 
       ! Profile_Panels2
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -2862,7 +2860,7 @@
 
 
       ! Profile_Panels3
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -2967,7 +2965,7 @@
 
 
       ! Profile_Panels4
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -3069,7 +3067,7 @@
 
 
       ! Profile_Panels5
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -3174,7 +3172,7 @@
 
 
       ! Profile_Panels6
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -3257,7 +3255,7 @@
 
 
       ! Profile_Panels7
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -3340,7 +3338,7 @@
 
 
       ! Profile_Panels8
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -3423,7 +3421,7 @@
 
 
       ! Profile_Panels9
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -3509,7 +3507,7 @@
 
 
       ! History_Track1
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -3597,7 +3595,7 @@
 
 
       ! History_Track2
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -3683,7 +3681,7 @@
 
 
       ! History_Track3
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -3769,7 +3767,7 @@
 
 
       ! History_Track4
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -3855,7 +3853,7 @@
 
 
       ! History_Track5
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -3941,7 +3939,7 @@
 
 
       ! History_Track6
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -4027,7 +4025,7 @@
 
 
       ! History_Track7
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -4113,7 +4111,7 @@
 
 
       ! History_Track8
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -4199,7 +4197,7 @@
 
 
       ! History_Track9
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -4288,7 +4286,7 @@
 
 
       ! History_Panels1
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -4422,7 +4420,7 @@
 
 
       ! History_Panels2
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -4506,7 +4504,7 @@
 
 
       ! History_Panels3
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -4590,7 +4588,7 @@
 
 
       ! History_Panels4
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -4674,7 +4672,7 @@
 
 
       ! History_Panels5
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -4848,7 +4846,7 @@
 
 
       ! History_Panels7
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -4932,7 +4930,7 @@
 
 
       ! History_Panels8
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -5016,7 +5014,7 @@
 
 
       ! History_Panels9
-      ! ~~~~~~~~~~~~~~~
+      ! ---------------
 
       ! ::
 
@@ -5136,7 +5134,7 @@
 
 
       ! Color_magnitude1
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -5260,7 +5258,7 @@
 
 
       ! Color_magnitude2
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -5384,7 +5382,7 @@
 
 
       ! Color_magnitude3
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -5508,7 +5506,7 @@
 
 
       ! Color_magnitude4
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -5632,7 +5630,7 @@
 
 
       ! Color_magnitude5
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -5756,7 +5754,7 @@
 
 
       ! Color_magnitude6
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -5880,7 +5878,7 @@
 
 
       ! Color_magnitude7
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -6004,7 +6002,7 @@
 
 
       ! Color_magnitude8
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -6128,7 +6126,7 @@
 
 
       ! Color_magnitude9
-      ! ~~~~~~~~~~~~~~~~
+      ! ----------------
 
       ! ::
 
@@ -6255,7 +6253,7 @@
 
 
       ! Text_Summary 1
-      ! ~~~~~~~~~~~~~~
+      ! --------------
 
       ! ::
 
@@ -6338,7 +6336,7 @@
 
 
       ! Text_Summary2
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6375,7 +6373,7 @@
 
 
       ! Text_Summary3
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6412,7 +6410,7 @@
 
 
       ! Text_Summary4
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6449,7 +6447,7 @@
 
 
       ! Text_Summary5
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6486,7 +6484,7 @@
 
 
       ! Text_Summary6
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6523,7 +6521,7 @@
 
 
       ! Text_Summary7
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6560,7 +6558,7 @@
 
 
       ! Text_Summary8
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6597,7 +6595,7 @@
 
 
       ! Text_Summary9
-      ! ~~~~~~~~~~~~~
+      ! -------------
 
       ! ::
 
@@ -6637,7 +6635,7 @@
 
 
       ! Grid1
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -6742,7 +6740,7 @@
 
 
       ! Grid2
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -6865,7 +6863,7 @@
 
 
       ! Grid3
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -6963,7 +6961,7 @@
 
 
       ! Grid4
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -7094,7 +7092,7 @@
 
 
       ! Grid5
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -7212,7 +7210,7 @@
 
 
       ! Grid6
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -7336,7 +7334,7 @@
 
 
       ! Grid7
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -7434,7 +7432,7 @@
 
 
       ! Grid8
-      ! ~~~~~
+      ! -----
 
       ! ::
 
@@ -7571,7 +7569,7 @@
 
 
       ! Grid9
-      ! ~~~~~
+      ! -----
 
       ! ::
 
