@@ -201,7 +201,7 @@
    ! Ogata+1993 or Potekhin & Chabrier 2013. The former provides better agreement with calculations done at
    ! typical white dwarf charge ratios (R = Z2 / Z1 ~ 4/3 for C/O), see e.g. Blouin+2020. The latter gives better
    ! agreement with analytic expectations at large charge ratios R > 2.
-   ! Select between these choices by specifying either `"Ogata" or "PC".
+   ! Select between these choices by specifying either ``"Ogata"`` or ``"PC"``.
    ! :: 
 
    Skye_solid_mixing_rule = "PC"
@@ -239,19 +239,20 @@
    ! Integer with valid values from 0 to 10 inclusive corresponding to the table
    ! to use in the fixed composition case. A value of 0 corresponds to the pure Helium
    ! table while a value of 10 corresponds the the pure Hydrogen table.
-   ! to use table
-   !                set index 
-   ! mesa-CMS_000x.data ->  0
-   ! mesa-CMS_010x.data ->  1
-   ! mesa-CMS_020x.data ->  2
-   ! mesa-CMS_030x.data ->  3
-   ! mesa-CMS_040x.data ->  4
-   ! mesa-CMS_050x.data ->  5
-   ! mesa-CMS_060x.data ->  6
-   ! mesa-CMS_070x.data ->  7
-   ! mesa-CMS_080x.data ->  8
-   ! mesa-CMS_090x.data ->  9
-   ! mesa-CMS_100x.data -> 10
+
+   !| to use table
+   !|                set index 
+   !| mesa-CMS_000x.data ->  0
+   !| mesa-CMS_010x.data ->  1
+   !| mesa-CMS_020x.data ->  2
+   !| mesa-CMS_030x.data ->  3
+   !| mesa-CMS_040x.data ->  4
+   !| mesa-CMS_050x.data ->  5
+   !| mesa-CMS_060x.data ->  6
+   !| mesa-CMS_070x.data ->  7
+   !| mesa-CMS_080x.data ->  8
+   !| mesa-CMS_090x.data ->  9
+   !| mesa-CMS_100x.data -> 10
 
    CMS_fixed_composition_index = -1
 

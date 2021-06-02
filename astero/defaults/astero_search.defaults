@@ -152,7 +152,7 @@
 
       include_surface_Z_div_X_in_chi2_spectro = .false.
       surface_Z_div_X_target = 2.292d-2 ! GS98 value
-      !!surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
+!      !surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
       surface_Z_div_X_sigma = 1d-3
 
    ! include_surface_He_in_chi2_spectro
@@ -1135,14 +1135,13 @@
    ! ``surf_coef1_name`` and ``surf_coef2_name``.
    ! In the various schemes, the surface corrections added to a mode with
    ! frequency :math:`\nu`, normalized inertia :math:`\mathcal{I}`
-   ! and relative inertia :math:`Q` are ::
+   ! and relative inertia :math:`Q` are
 
-   !     kjeldsen         surf_coef1*(ν/νmax)**correction_b / Q
-   !                                        (surf_coef2 = correction_r, eq. 6 of K08)
-   !     power_law        surf_coef1*(ν/νmax)**surf_coef2 / Q
-   !     cubic            surf_coef1*(ν/νac)**3 / I             (surf_coef2 is meaningless)
-   !     combined         (surf_coef1*(ν/νac)**3 + surf_coef2/(ν/νac)) / I
-   !     sonoi            surf_coef1*νmax*[1 - 1/(1 + (ν/νmax)**surf_coef2)] / Q
+   !|     kjeldsen         surf_coef1*(ν/νmax)**correction_b / Q (surf_coef2 = correction_r, eq. 6 of K08)
+   !|     power_law        surf_coef1*(ν/νmax)**surf_coef2 / Q
+   !|     cubic            surf_coef1*(ν/νac)**3 / I             (surf_coef2 is meaningless)
+   !|     combined         (surf_coef1*(ν/νac)**3 + surf_coef2/(ν/νac)) / I
+   !|     sonoi            surf_coef1*νmax*[1 - 1/(1 + (ν/νmax)**surf_coef2)] / Q
 
    ! where ``νac`` is the acoustic cutoff frequency, computed by
    ! scaling the solar value of 5mHz in the same way as ``νmax``
