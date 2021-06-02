@@ -416,7 +416,7 @@
             s% opacity_start(1) = s% opacity(1)
             call star_get_surf_PT( &
                s% id, skip_partials, &
-               need_atm_Psurf, need_atm_Tsurf, s% Teff, &
+               need_atm_Psurf, need_atm_Tsurf, &
                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
