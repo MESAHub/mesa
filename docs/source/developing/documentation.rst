@@ -42,6 +42,25 @@ The :ref:`reference/format:Format for MESA defaults files` page has additional
 information on ReST formatting from the perspective of writing
 defaults files.
 
+
+Cross-references
+----------------
+
+These docs use the `autosectionlabel
+<https://www.sphinx-doc.org/en/master/usage/extensions/autosectionlabel.html>`__
+Sphinx extension along with the settings (see ``conf.py``):
+
+.. code:: python
+
+    autosectionlabel_prefix_document = True
+    autosectionlabel_maxdepth = 3
+
+This means that you can refer to sections by their title.  However,
+sections are disambiguated by their location in the docs.  For
+example, :ref:`this section <developing/documentation:Cross-references>`
+has the label ``developing/documentation:Cross-references``.
+
+
 Names
 -----
 
