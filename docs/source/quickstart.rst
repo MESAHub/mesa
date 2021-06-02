@@ -8,12 +8,12 @@ Many questions that appear on the mesa-users list have answers already available
 
 The first thing to do is to follow exactly the installation steps explained in :ref:`installation:Installing MESA`.
  
-In case of problem installing MESA, look at the section on troubleshooting and consult the :ref:`MESA FAQ <FAQ>`.
+In case of problems installing MESA, look at the section on troubleshooting and consult the :ref:`MESA FAQ <FAQ>`.
 
 If you cannot find the answer to your problems in these pages, search the `mesa-users list archive <https://lists.mesastar.org/pipermail/mesa-users/>`_ to see if someone has had a similar problem in the past.
 
 If you still cannot find the answer to your installation problem, post your question to mesa-users@lists.mesastar.org describing the problem.
-When you do that, **it is important to follow the clear procedure detailed in the troubleshooting section of** :ref:`installation:Installing MESA`. This tells you which information you need to provide for people to be able to help you.
+When you do that, **it is important to follow the clear procedure detailed in** :ref:`the troubleshooting guide <installation:Troubleshooting>`. This tells you which information you need to provide for people to be able to help you.
 
 2. Using MESA
 -------------
@@ -30,7 +30,7 @@ Please beware that the examples in the test suite are not necessarily at the cor
 
 There is a section in the documentation about `building inlists <using_mesa/building_inlists.html>`__.  
 
-Another source of examples is the `MESA Marketplace <http://cococubed.asu.edu/mesa_market/>`_.
+Another source of examples is the `MESA Marketplace <http://cococubed.asu.edu/mesa_market/>`__ and the `MESA Zenodo community <https://zenodo.org/communities/mesa/>`__.
 There you will find inlists used in published papers and MESA Summer School material. You will also find MESA community written guidance on using MESA.
 
 3. YouTube videos

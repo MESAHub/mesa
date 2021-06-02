@@ -174,7 +174,7 @@ This test suite example checks the functionality of the adaptive nuclear reactio
 :ref:`carbon_acc`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test suite example checks the acceration of carbon onto a pure carbon white dwarf.
+This test suite example checks the accretion of carbon onto a pure carbon white dwarf.
 
 :ref:`cburn_inward`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
