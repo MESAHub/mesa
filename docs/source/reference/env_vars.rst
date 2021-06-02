@@ -75,7 +75,7 @@ and can point to a file somewhere else.
 MESA_FORCE_PGSTAR_FLAG
 ~~~~~~~~~~~~~~~~~~~~~~
 
-If set, this shell variable will override the inlist variable ``pgstar_flag''.
+If set, this shell variable will override the inlist variable ``pgstar_flag``.
 
 If set to either ``true`` or ``TRUE`` MESA will act as if the user had set ``pgstar_flag=.true.`` in their inlist.
 If set to either ``false`` or ``FALSE`` MESA will act as if the user had set ``pgstar_flag=.false.`` in their inlist.

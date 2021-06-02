@@ -27,22 +27,22 @@
       ! RSP2 parameters
       ! ~~~~~~~~~~~~~~~
          
-      !   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad    
-      !   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
-      !   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
-      !   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar    
+      !|   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad    
+      !|   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !|   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+      !|   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+      !|   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar    
       !      
       ! RSP2 time weighting is determined by the velocity_time_centering controls.
-      !     for Pt and Lt in turbulent energy equation
-      !     for P and grav in momentum equation
-      !     for P and L in energy equation
-      !     for area when multiplied by P
+      !
+      !     + for Pt and Lt in turbulent energy equation
+      !     + for P and grav in momentum equation
+      !     + for P and L in energy equation
+      !     + for area when multiplied by P
+      !
       ! RSP2_Lsurf_factor: Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4
       ! RSP2_use_Stellingwerf_Lr as in RSP
       !   
-
-
 
       ! ::
 

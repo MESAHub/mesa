@@ -2470,8 +2470,8 @@
 
       ! + ``'CF88_basic_1212'`` : the single rate approximation from CF88.
       ! + ``'CF88_multi_1212'`` : combines the rates for the n, p, and a channels.
-      ! c12(c12,n)mg23, c12(c12,p)na23, and c12(c12,a)ne20 and
-      ! uses neutron branching from dayras, switkowski, and woosley, 1976.
+      !   c12(c12,n)mg23, c12(c12,p)na23, and c12(c12,a)ne20 and
+      !   uses neutron branching from dayras, switkowski, and woosley, 1976.
 
       ! ::
 
@@ -2561,19 +2561,19 @@
       ! If ``enable_adaptive_network`` is true, then
       ! at each step, the system calculates a new set of isos according to the following rules:
 
-      !     for each iso in the current net:
-      !       let Z = number of protons in the iso and N = number of neutrons.
-      !       let x = max mass fraction for the iso in any cell in the model.
-      !       if x >= ``min_x_for_keep`` then include the iso in new net.
-      !       if x >= ``min_x_for_n`` then include following related isos:
-      !         (Z,N+1)   (Z,N-1)     -- add or remove neutron
-      !       if x >= min_x_for_add then include following related isos:
-      !         (Z+1,N)   (Z-1,N)     -- add or remove proton
-      !         (Z+2,N+2) (Z-2,N-2)   -- add or remove alpha
-      !         (Z+2,N+1) (Z-2,N-1)   -- exchange neutron/alpha
-      !         (Z+1,N+2) (Z-1,N-2)   -- exchange proton/alpha
-      !         (Z+1,N-1) (Z-1,N+1)   -- exchange proton/neutron
-      !         (Z+4,N+4) (Z+3,N+4)   -- extend alpha chain
+      !|     for each iso in the current net:
+      !|       let Z = number of protons in the iso and N = number of neutrons.
+      !|       let x = max mass fraction for the iso in any cell in the model.
+      !|       if x >= ``min_x_for_keep`` then include the iso in new net.
+      !|       if x >= ``min_x_for_n`` then include following related isos:
+      !|         (Z,N+1)   (Z,N-1)     -- add or remove neutron
+      !|       if x >= min_x_for_add then include following related isos:
+      !|         (Z+1,N)   (Z-1,N)     -- add or remove proton
+      !|         (Z+2,N+2) (Z-2,N-2)   -- add or remove alpha
+      !|         (Z+2,N+1) (Z-2,N-1)   -- exchange neutron/alpha
+      !|         (Z+1,N+2) (Z-1,N-2)   -- exchange proton/alpha
+      !|         (Z+1,N-1) (Z-1,N+1)   -- exchange proton/neutron
+      !|         (Z+4,N+4) (Z+3,N+4)   -- extend alpha chain
 
       ! Isos in the previous net can be dropped if they have x < ``min_x_for_keep`` and
       ! no other iso in the previous net causes them to be included in the new net.

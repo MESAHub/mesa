@@ -599,15 +599,11 @@
 
 ! Tolerance for which a solution is considered valid. For the Ritter and Kolb
 ! schemes if we call mdot the mass transfer rate used for the step, and mdot_end
-! the one computed at the end of it, a solution is valid if
+! the one computed at the end of it, a solution is valid if :: 
 
-! ::
-
-!     |(mdot-mdot_end)/mdot_end| < b% implicit_scheme_tolerance
+!     abs((mdot-mdot_end)/mdot_end) < b% implicit_scheme_tolerance
 
 ! For the roche_lobe scheme, a solution will be considered valid if
-
-! ::
 
 !     -implicit_scheme_tolerance < (r-rl)/rl < 0
 
@@ -770,8 +766,6 @@
 
 ! Use the Tout & Eggleton mechanism to tidally enhance the wind mass
 ! loss from one or both components according to:
-
-! ::
 
 !     Mdot_w = Mdot_w * ( 1 + B_wind * min( (R/RL)^6, 0.5^6 ) )
 
