@@ -1172,7 +1172,7 @@ Other changes
   continue to function.  However, in new ``run_star_extras`` code, the
   recommended way to store/retrieve data is using the
   ``other_photo_read`` and ``other_photo_write`` hooks.  Examples can
-  be found in the :ref:`conductive_flame` and :ref:`brown_dwarf` test
+  be found in the :ref:`conductive_flame` and `brown_dwarf` test
   suite cases.
 
 * The controls ``xtra_coef_os_*`` and ``xtra_dist_os_*`` which could

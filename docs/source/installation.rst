@@ -155,7 +155,7 @@ Once it is done, you should receive the message
 
 If so, you can learn more about MESA by looking at other pages.
 
-Read the linked page that summarizes some :ref:`best practices <Best practices>`
+Read the linked page that summarizes some :ref:`best practices <using_mesa/best_practices:Best practices>`
 to keep in mind throughout the lifecycle of your project.
 
 Troubleshooting

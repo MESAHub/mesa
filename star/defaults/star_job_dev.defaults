@@ -146,4 +146,4 @@
 
     save_photo_number = -1
     save_photo_filename = ''
-    !save_photo_when_terminate = .true.
+!   !save_photo_when_terminate = .true.
