@@ -535,7 +535,7 @@ Which SVN revisions were MESA release versions?
 
    * - 0001
      - 23 Jan 2007
-     - `Sourceforge <http://sourceforge.net/projects/mesa/files/releases/mesa-r0001.zip/download>`__
+     - First SVN revision
 
 
 Why is my MESA zipfile download taking forever?
@@ -701,8 +701,8 @@ First check that you have git lfs installed and then try running:
 
    git lfs pull
 
-If you are checking out MESA on a network file system you may find setting a short delay duirng the
-install step to give time for the files transfered by git lfs to properly sync.
+If you are checking out MESA on a network file system you may find setting a short delay during the
+install step to give time for the files transferred by git lfs to properly sync.
 
 ::
 
