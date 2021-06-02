@@ -2254,7 +2254,6 @@
        
        subroutine star_get_surf_PT( &
             id, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
-            Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -2262,7 +2261,7 @@
          integer, intent(in) :: id
          logical, intent(in) :: skip_partials, need_atm_Psurf, need_atm_Tsurf
          real(dp), intent(out) :: &
-            Teff, lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
+            lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -2271,7 +2270,6 @@
          if (ierr /= 0) return
          call get_surf_PT( &
             s, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
-            Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
