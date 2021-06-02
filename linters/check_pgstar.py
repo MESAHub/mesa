@@ -167,6 +167,9 @@ profile_defaults = cc.get_profile_columns()
 history_defaults = cc.get_history_columns()
 
 def check_pgstar(filename, options, defaults, false_positives):
+    if not os.path.isfile(filename):
+        return
+
     with open(filename,'r') as f:
         lines = f.readlines()
 
@@ -178,7 +181,9 @@ def check_pgstar(filename, options, defaults, false_positives):
     
         line = line.split('!')[0]
 
-        column, value = line.split('=') # Things like x = 'mass'
+        column, *value = line.split('=') # Things like x = 'mass'
+        value = ''.join(value) # Handles things with several = signs i.e semiconvection_option = 'Langer_85 mixing; gradT = gradr'
+
         column_check = column.split('(')[0] # Things like x(1) = 'mass'
 
         value = value.strip().replace("'","").replace('"','')
@@ -197,8 +202,10 @@ def check_pgstar(filename, options, defaults, false_positives):
 
 
 def check_all_history_pgstars():
-    for filename in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','inlist_pgstar')):
+    for filename in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','inlist*')):
         values = check_pgstar(filename, history_options, history_defaults, history_false_positives)
+        if values is None:
+            continue
         if len(values):
             print(f"\n\n*** {filename} ***\n")
             for i in values:
@@ -208,8 +215,10 @@ def check_all_history_pgstars():
 
 
 def check_all_profile_pgstars():
-    for filename in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','inlist_pgstar')):
+    for filename in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','inlist*')):
         values = check_pgstar(filename, profile_options, profile_defaults, profile_false_positives)
+        if values is None:
+            continue
         if len(values):
             print(f"\n\n*** {filename} ***\n")
             for i in values:
