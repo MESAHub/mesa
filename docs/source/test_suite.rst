@@ -176,6 +176,13 @@ This test suite example checks the functionality of the adaptive nuclear reactio
 
 This test suite example checks the acceration of carbon onto a pure carbon white dwarf.
 
+:ref:`cburn_inward`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example checks the inward propagation of a carbon burning front in a 7.5 Msun model.
+
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
