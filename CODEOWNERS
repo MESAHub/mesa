@@ -19,6 +19,7 @@ hdfio5 @richtownsend
 interp_1d/ @rhdtownsend @adamjermyn
 interp_2d/ @rhdtownsend @adamjermyn
 kap/ @fxt @aarondotter @jschwab
+linters/ @rjfarmer @jschwab
 math/ @rhdtownsend
 mtx/ @adamjermyn @rjfarmer @mjoyceGR
 net/ @rjfarmer @fxt @jschwab
@@ -29,6 +30,7 @@ rates/ @rjfarmer @fxt @jschwab
 #star_data/
 #stella/ 
 utils/ @rhdtownsend @warrickball @rjfarmer
+
 
 ### Star ###
 
