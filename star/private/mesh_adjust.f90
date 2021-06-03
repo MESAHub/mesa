@@ -58,8 +58,10 @@
             mlt_vc_old, lnT_old, w_old, specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
             cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
+         use chem_lib, only: basic_composition_info
          use interp_1d_def
          use interp_1d_lib
+         use star_utils, only: set_m_grav_and_grav
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          integer, dimension(:) :: cell_type, comes_from
@@ -324,6 +326,31 @@
                write(message,*) 'do_xa for k', k
                ierr = op_err
             end if
+
+         end do
+
+         ! ensure the things we need to calculate m_grav and grav are up to date
+         do k = 1, nz
+
+            op_err = 0
+
+            ! ensure that mass corrections are up to date
+            call basic_composition_info( &
+                 species, s% chem_id, xa(1:species,k), s% X(k), s% Y(k), s% Z(k), &
+                 s% abar(k), s% zbar(k), s% z2bar(k), s% z53bar(k), &
+                 s% ye(k), s% mass_correction(k), sumx)
+
+            ! ensure that r is up to date
+            s% r(k) = exp(s% xh(s% i_lnr,k))
+
+         end do
+
+         ! needed because do1_lnT evaluates PE
+         call set_m_grav_and_grav(s)
+
+         do k = 1, nz
+
+            op_err = 0
 
             ! calculate new temperatures to conserve energy
             call do1_lnT( &
@@ -1499,10 +1526,7 @@
                avg_KE = sum_energy/cell_dq
             end if
          
-            s% r(k) = get_r_from_xh(s,k)
-            if (k < s% nz) s% r(k+1) = get_r_from_xh(s,k+1)
             if (ierr /= 0) return
-            
             new_PE = cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
             if (s% u_flag) then
                s% u(k) = s% xh(s% i_u,k)

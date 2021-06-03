@@ -1092,7 +1092,8 @@
                diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
                virial, total_radiation, L_surf, sum_cell_de, sum_cell_detrb, &
                sum_cell_dke, sum_cell_dpe, sum_cell_dL, sum_cell_ergs_error, sum_cell_others, &
-               sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing
+               sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing,&
+               total_energy_from_fixed_m_grav
                
             include 'formats'
 
@@ -1273,7 +1274,21 @@
             !   + s% total_energy_change_from_mdot &
             !   + s% mdot_adiabatic_surface &
             !   - phase2_total_energy_from_mdot
-               
+
+            ! during the newton iterations, m_grav remains fixed,
+            ! even though the mass_corrections respond to the change in composition.
+            ! This means there is a term
+            !    -sum dm G Delta(m_grav) / r
+            ! being neglected.
+            ! after the iterations, we update m_grav before doing the energy accounting.
+            ! this changes the potential energy so we need to correct by that amount.
+            if (s% use_mass_corrections) then
+               total_energy_from_fixed_m_grav = &
+                    -dot_product(s% cgrav(1:nz)/s%r(1:nz)*(s%m_grav(1:nz)-s%m_grav_start(1:nz)), s% dm(1:nz))
+            else
+               total_energy_from_fixed_m_grav = 0
+            end if
+
             phase1_total_energy_from_mdot = &
                  s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
                + s% mdot_adiabatic_surface ! ??
@@ -1330,7 +1345,12 @@
             s% total_rotational_kinetic_energy = s% total_rotational_kinetic_energy_end
             s% total_turbulent_energy = s% total_turbulent_energy_end
             s% total_energy = s% total_energy_end
-         
+
+            ! provide info about non-conservation due to mass corrections
+            if (s% use_mass_corrections) then
+               write(*,2) 'INFO: use_mass_corrections incurred rel_E_err', s% model_number, -total_energy_from_fixed_m_grav/s% total_energy
+            end if
+
             if (s% model_number == s% energy_conservation_dump_model_number &
                   .and. .not. s% doing_relax) then
 
