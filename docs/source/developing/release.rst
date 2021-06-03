@@ -23,6 +23,12 @@ release, this file should be created and commited.  Because this file
 is normally ignored (via ``.gitignore``), it must be explicitly added
 via ``git add -f``.
 
+- Update version number in :file:`docs/source/conf.py`
+
+The variables ``release`` and ``version`` in the ``Project
+information`` section should be set.
+
+
 Documentation
 -------------
 
