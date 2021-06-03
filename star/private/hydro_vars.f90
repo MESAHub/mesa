@@ -456,6 +456,8 @@
          s% T_surf = exp(lnT_surf)
          s% P_surf = exp(lnP_surf)
 
+         call set_phot_info(s) ! s% T_surf might have changed so call again
+
       end subroutine set_Teff_info_for_eqns
 
 
