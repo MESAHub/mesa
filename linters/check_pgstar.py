@@ -200,10 +200,9 @@ def check_pgstar(filename, options, defaults, false_positives):
 
     return result
 
-
-def check_all_history_pgstars():
+def check_all_pgstars(options,defualts,false_postives):
     for filename in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','inlist*')):
-        values = check_pgstar(filename, history_options, history_defaults, history_false_positives)
+        values = check_pgstar(filename, options,defualts,false_postives)
         if values is None:
             continue
         if len(values):
@@ -212,19 +211,15 @@ def check_all_history_pgstars():
                 print(*i)
             print()
             print()
+
+
+def check_all_history_pgstars():
+    check_all_pgstars(history_options, history_defaults, history_false_positives)
 
 
 def check_all_profile_pgstars():
-    for filename in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','inlist*')):
-        values = check_pgstar(filename, profile_options, profile_defaults, profile_false_positives)
-        if values is None:
-            continue
-        if len(values):
-            print(f"\n\n*** {filename} ***\n")
-            for i in values:
-                print(*i)
-            print()
-            print()
+    check_all_pgstars(profile_options, profile_defaults, profile_false_positives)
+
 
 
 
