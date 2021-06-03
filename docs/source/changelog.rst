@@ -2,10 +2,12 @@
 Changelog
 *********
 
-Changes in dev
-==============
+Changes in main
+===============
 
-.. _Backwards-incompatible changes dev:
+.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
+
+.. _Backwards-incompatible changes main:
 
 Backwards-incompatible changes
 ------------------------------
@@ -26,7 +28,7 @@ The ``Teff`` argument has been removed from the ``other_surface_PT`` hook.
 ``Teff`` is instead available in the ``star_info`` pointer.
 
 
-.. _Module-level changes dev:
+.. _Module-level changes main:
 
 Module-level changes
 --------------------
@@ -209,7 +211,7 @@ to remove ``theta_e_for_graboske_et_al`` from its argument list.
 
 The options ``reuse_rate_raw`` and  ``reuse_rate_screened`` have been removed from other_net_get (and eval_net)
 
-.. _Other changes dev:
+.. _Other changes main:
 
 Other changes
 -------------
