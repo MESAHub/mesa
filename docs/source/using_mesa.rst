@@ -19,3 +19,4 @@ lifecycle of your project.
    using_mesa/extending_mesa
    using_mesa/troubleshooting
    using_mesa/best_practices
+   using_mesa/just_a_module
