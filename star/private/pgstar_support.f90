@@ -56,7 +56,7 @@
 
       integer :: clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
          clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
-         clr_anonymous, clr_D_smooth, colormap_offset, colormap_last, colormap_size
+         clr_anonymous, colormap_offset, colormap_last, colormap_size
       real :: colormap(3,101)
 
       ! Tioga line types
@@ -456,7 +456,6 @@
          clr_rayleigh_taylor = clr_IndianRed
          clr_minimum = clr_Coral
          clr_anonymous = clr_Tan
-         clr_D_smooth = clr_BrightBlue
 
          colormap(1:3,1) = (/ 0.0, 0.0, 1.0 /)
          colormap(1:3,2) = (/ 0.0196078431372549, 0.0196078431372549, 1.0 /)
