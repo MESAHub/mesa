@@ -12,20 +12,69 @@ Changes in main
 Backwards-incompatible changes
 ------------------------------
 
-``mixing_type`` now reports the mixing process that generates the largest D_mix, rather than prioritizing convection and thermohaline mixing over all others.
+.. note::
 
-``saved_model_name`` has been replaced with ``load_model_filename`` everywhere 
+   A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
 
-Thermohaline option ``'Brown_Garaud_Stellmach_13'`` was not correctly implemented in MESA/star and has been removed.
 
-Removed option `semiconvection_upper_limit_center_h1`. This can be implemented by setting `s% alpha_semiconvection` in `run_star_extras.f90/extras_start_step`.
+Name changes
+~~~~~~~~~~~~
 
-Removed profile columns `total_energy` and `total_energy_integral`.
+* The ``star_job`` option ``saved_model_name`` has been replaced with ``load_model_filename`` everywhere.
+
+* The ``controls`` options ``power_c_burn_{lower,upper}_limit`` were replaced with the more generic ``power_z_burn_{lower,upper}_limit``.
+
+* The ``controls`` option ``delta_lgL_phot_limit`` was renamed to ``delta_lgL_power_photo_limit`` ("phot" was easily confused with photosphere instead of photodisintegration).
+
+* The core/layer mass values ``c_core_*``, ``c_rich_layer``, and
+  ``o_core_*`` have been renamed to ``co_core_*``,
+  ``co_rich_layer_*``, and ``one_core_*``.  This better reflects the
+  typical carbon/oxygen and oxygen/neon compositions of these regions.
+  This affects the names of both the relevant controls and history
+  columns.
+
+* The ``controls`` option ``use_d_eos_dxa`` was renamed to
+  ``fix_d_eos_dxa_partials``.  This control originally had a broader
+  function during the implementation of eos composition derivatives,
+  but is now restricted to selecting whether we do a
+  finite-difference-based fix up when on a component EOS that doesn't
+  provide composition derivatives.
+
+
+Removed options
+~~~~~~~~~~~~~~~
+
+* The time-smoothing scheme for mixing diffusion coefficients was removed.  All associated options (e.g., ``new_D_smooth_flag`` and ``D_smooth_replacement_fraction``) were removed.
+
+* Removed option ``semiconvection_upper_limit_center_h1``. This can be implemented by setting ``s% alpha_semiconvection`` in ``run_star_extras.f90/extras_start_step``.
+
+* Removed the option ``use_brunt_gradmuX_form``.  Alternative forms of the Brunt can be calculated using the ``other_brunt`` hook.
+
+* Simplifications to the energy equation code resulted in the removal of the per-cell energy equation controls ``max_eta_for_dedt_form_of_energy_eqn`` and ``max_gamma_for_dedt_form_of_energy_eqn`` as well as ``steps_before_always_use_dedt_form_of_energy_eqn``.
+
+
+Removed history and profile columns
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A major clean up of the history and profile columns was undertaken.  Some of the removed values include:
+
+* Removed profile columns ``total_energy`` and ``total_energy_integral``.
+
+
+Relocation of eos hooks
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``other_eos`` hooks have been removed from star.  See the ``eos`` section for information about their replacements.
 
-The ``Teff`` argument has been removed from the ``other_surface_PT`` hook.
-``Teff`` is instead available in the ``star_info`` pointer.
+
+Hook interface changes
+~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``Teff`` argument has been removed from the ``other_surface_PT`` hook. (``Teff`` is instead available in the ``star_info`` pointer.)
+
+* ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``, ``eps_he`` or ``eps_z`` as arguments.
+
+
 
 
 .. _Module-level changes main:
@@ -133,7 +182,20 @@ The hook ``other_eos_results`` allows the user to modify the results
 returned by the EOS.  The user-provided routine receives the results
 from the EOS right before they are returned, after all components have
 been evaluated.  This allows the user make minor modifications to the
-results fro the existing EOS without having to provide a full replacement.
+results from the existing EOS without having to provide a full replacement.
+
+
+Two alternative eos module entry points (``eosDT_HELMEOS_get`` and
+``eosDT_ideal_gas_get``) and the star options that replaced the
+standard eosDT calls to be with these routines
+(``use_eosDT_ideal_gas`` and ``use_eosDT_HELMEOS``).  This enables
+significant simplifications of eos_support.  Restriction to a single
+component EOS can be achieved through the eos namelist options and
+replacement of the EOS should be performed through the other hook.
+
+
+The HELM table was updated to a new, larger 100 points per decade
+version.
 
 
 kap
@@ -209,6 +271,9 @@ neu
 The call signature of other_neu has changed. You no longer need to pass in z2bar
 
 
+The value of the Weinberg angle was updated to be be consistent with CODATA 2018.
+
+
 net
 ~~~
 
@@ -228,14 +293,43 @@ Other changes
   star_info arrays and profile columns with the names
   ``kap_frac_lowT``, ``kap_frac_highT``, ``kap_frac_Compton``.
 
-* ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``,
-  ``eps_he`` or ``eps_z`` as arguments.
-
 * The control ``format_for_FGONG_data`` has been replaced by the
   integer ``fgong_ivers``, which can be either 300 or 1300.  This
   enforces adherence to the FGONG standard.  In addition, users can
   now set the four-line plain-text header of FGONG output using the
   new controls ``fgong_header(1:4)``.
+
+* ``mixing_type`` now reports the mixing process that generates the
+  largest D_mix, rather than prioritizing convection and thermohaline
+  mixing over all others.
+
+* Added profile panel and history panel controls in pgstar to specify
+  same yaxis range for both left and right axes (e.g.,
+  Profile_Panels1_same_yaxis_range(1) = .true.)
+
+* Experimental options have been moved into ``*_dev.defaults`` files
+  and experimental test cases are now prefixed with ``dev_``.  These
+  options and test cases are not ready for general use.
+
+* The ``ionization`` module has been removed.
+
+* A new module ``hdf5io`` for working with HDF5 files has been added.
+
+* The controls ``diffusion_gamma_full_{on,off}`` are no longer used by
+  default.  The EOS now returns phase information and by default that
+  EOS phase will automatically turn off diffusion for crystallized
+  material.
+
+* The `issue with the value of free_e when using FreeEOS <https://lists.mesastar.org/pipermail/mesa-users/2021-February/012394.html>`__ has been corrected.  Thanks to Jason Wright for the report.
+
+* An ``other_screening`` hook was added.
+
+* All parts of test suite cases are now run by default.  To only run
+  the optional inlists, set the environment variable
+  ``MESA_SKIP_OPTIONAL`` (to any value).  Previously, optional parts
+  were skipped by default, and running all parts required setting
+  ``MESA_RUN_OPTIONAL``.
+
 
 Changes in r15140
 =================
