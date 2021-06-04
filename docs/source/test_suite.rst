@@ -220,6 +220,13 @@ dominated core and a stratified atmosphere dominated by hydrogen at
 its surface. The final model produced by this test case also serves as
 the starting model for :ref:`wd_diffusion` and :ref:`wd_cool_0.6M`.
 
+:ref:`magnetic_braking`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case involves the calculation of the spin down caused by a
+large-scale magnetic field in a massive star model.
+
+
 :ref:`ppisn`
 ^^^^^^^^^^^^
 

@@ -1,0 +1,1 @@
+../../../star/test_suite/magnetic_braking/README.rst
