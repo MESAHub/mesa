@@ -188,6 +188,12 @@ This test suite example checks the inward propagation of a carbon burning front 
 This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
 
 
+:ref:`conserve_angular_momentum`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 Msun, Z=0.02 metallicity, model.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
