@@ -426,8 +426,6 @@
 
       !log_surf_cell_opacity ! old name was log_surf_opacity
       !log_surf_cell_P ! old name was log_surf_P
-      !log_surf_cell_pressure ! old name was log_surf_pressure
-      !log_surf_cell_density ! old name was log_surf_density
       !log_surf_cell_temperature ! old name was log_surf_temperature
       !surface_cell_temperature ! old name was surface_temperature
       !log_surf_cell_z ! old name was log_surf_z
@@ -440,7 +438,6 @@
       !v_div_csound_max ! max value of velocity divided by sound speed at face
 
       !v_surf_div_v_kh ! v_surf/(photosphere_r/kh_timescale)
-      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
 
       !surf_avg_j_rot
       !surf_avg_omega
@@ -482,23 +479,9 @@
 
    !## info about location where optical depth is 10
 
-      !tau10_mass ! mass in solar units where optical depth = 10
-      !tau10_radius ! radius in solar units where optical depth = 10
-      !tau10_lgP ! estimate for log10(P) at tau = 10
-      !tau10_T ! estimate for T at tau = 10
-      !tau10_lgT ! estimate for log10(T) at tau = 10
-      !tau10_lgRho ! estimate for log10(density) at tau = 10
-      !tau10_L ! estimate for L/Lsun at tau = 10
 
    !## info about location where optical depth is 100
 
-      !tau100_mass ! location in solar units where optical depth = 100
-      !tau100_radius ! location in solar units where optical depth = 100
-      !tau100_lgP ! estimates for values at tau = 100
-      !tau100_T
-      !tau100_lgT
-      !tau100_lgRho
-      !tau100_L
 
 !----------------------------------------------------------------------------------------------
 
@@ -628,27 +611,8 @@
 
 !# info at specific locations
 
-   !## info at a specified mass coordinate (given by trace_mass_location)
-      !trace_mass_location ! (Msun)
-      !trace_mass_radius ! (Rsun)
-      !trace_mass_lgT
-      !trace_mass_lgRho
-      !trace_mass_L ! (Lsun)
-      !trace_mass_v
 
-      !trace_mass_lgP
-      !trace_mass_g
-      !trace_mass_X
-      !trace_mass_Y
-      !trace_mass_edv_H
-      !trace_mass_edv_He
-      !trace_mass_scale_height
-      !trace_mass_dlnX_dr
-      !trace_mass_dlnY_dr
-      !trace_mass_dlnRho_dr
 
-      !trace_mass_omega
-      !trace_mass_omega_div_omega_crit
 
 
    !## info at location of max temperature
@@ -670,72 +634,17 @@
 
 
    !## info about location where have max rate of hydrogen burning (PP and CNO)
-      !max_eps_h ! erg/g/s
-      !max_eps_h_lgT ! log10 temperature at location of max burn
-      !max_eps_h_lgRho ! log10 density at location of max burn
-      !max_eps_h_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_h_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_h_lgP ! log10 pressure at location of max burn
-      !max_eps_h_lgR ! log10 radius at location of max burn
-      !max_eps_h_opacity ! opacity at location of max burn
 
    !## info about location where have max rate of helium burning
          ! triple-alpha plus alpha capture on C12, N14, O16, and Ne20.
-      !max_eps_he ! erg/g/s
-      !max_eps_he_lgT ! log10 temperature at location of max_eps_he
-      !max_eps_he_lgRho ! log10 density at location of max burn
-      !max_eps_he_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_he_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_he_lgP ! log10 pressure at location of max burn
-      !max_eps_he_lgR ! log10 radius at location of max burn
-      !max_eps_he_opacity ! opacity at location of max burn
 
    !## info about location where have max rate of burning of metals
          ! alpha capture on heavy elements plus C+C, C+O, O+O, etc.
-      !max_eps_z ! erg/g/s
-      !max_eps_z_lgT ! log10 temperature at location of max burn
-      !max_eps_z_lgRho ! log10 density at location of max burn
-      !max_eps_z_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_z_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_z_lgP ! log10 pressure at location of max burn
-      !max_eps_z_lgR ! log10 radius at location of max burn
-      !max_eps_z_opacity ! opacity at location of max burn
 
    !## info about location where have max rate of burning of all types
-      !max_eps_nuc ! erg/g/s
-      !max_eps_nuc_lgT ! log10 temperature at location of max burn
-      !max_eps_nuc_lgRho ! log10 density at location of max burn
-      !max_eps_nuc_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_nuc_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_nuc_lgP ! log10 pressure at location of max burn
-      !max_eps_nuc_lgR ! log10 radius at location of max burn
-      !max_eps_nuc_opacity ! opacity at location of max burn
-      !max_eps_nuc_cp ! Cp at location of max burn
-      !max_eps_nuc_t_heat ! Cp*T/eps_nuc at location of max burn
-      !max_eps_nuc_csound
-      !max_eps_nuc_pi_r_div_cs
-      !max_eps_nuc_H ! pressure scale height
-      !max_eps_nuc_H_div_cs
-      !max_eps_nuc_log_xa he4 ! any species
 
    !## info at location of max abs velocity
       ! note: can use control "min_tau_for_max_abs_v_location" to exclude surface
-      !max_abs_v_velocity
-      !max_abs_v_csound
-      !max_abs_v_v_div_cs
-      !max_abs_v_lgT
-      !max_abs_v_lgRho
-      !max_abs_v_lgP
-      !max_abs_v_gamma1
-      !max_abs_v_mass
-      !max_abs_v_radius
-      !max_abs_v_radius_cm
-      !max_abs_v_lgR ! Rsun
-      !max_abs_v_lgR_cm
-      !max_abs_v_L ! Lsun
-      !max_abs_v_entropy
-      !max_abs_v_eps_nuc
-      !max_abs_v_E0 ! 4/3 pi R^3 crad T^4 at max_abs_v_location
 
 !----------------------------------------------------------------------------------------------
 
@@ -763,35 +672,9 @@
 
    !## info at innermost mach 1 location
       ! excluding locations with q < min_q_for_inner_mach1_location
-      !inner_mach1_mass ! baryonic (Msun)
-      !inner_mach1_q
-      !inner_mach1_radius ! (Rsun)
-      !inner_mach1_velocity
-      !inner_mach1_csound
-      !inner_mach1_v_div_cs
-      !inner_mach1_lgT
-      !inner_mach1_lgRho
-      !inner_mach1_lgP
-      !inner_mach1_gamma1
-      !inner_mach1_entropy
-      !inner_mach1_tau
-      !inner_mach1_k
 
    !## info at outermost mach 1 location
       ! excluding locations with q > max_q_for_outer_mach1_location
-      !outer_mach1_mass ! baryonic (Msun)
-      !outer_mach1_q
-      !outer_mach1_radius ! (Rsun)
-      !outer_mach1_velocity
-      !outer_mach1_csound
-      !outer_mach1_v_div_cs
-      !outer_mach1_lgT
-      !outer_mach1_lgRho
-      !outer_mach1_lgP
-      !outer_mach1_gamma1
-      !outer_mach1_entropy
-      !outer_mach1_tau
-      !outer_mach1_k
 
 !----------------------------------------------------------------------------------------------
 
@@ -941,12 +824,10 @@
 
       !avg_abs_v_div_cs
       !log_avg_abs_v_div_cs
-      !max_abs_v_div_cs
       !log_max_abs_v_div_cs
 
       !avg_abs_v
       !log_avg_abs_v
-      !max_abs_v
       !log_max_abs_v
 
       !u_surf
@@ -1121,7 +1002,6 @@
       !log_avg_v_residual
 
       !max_abs_lgE_residual
-      !max_abs_v_residual
 
    !## conservation during mesh adjust
       !log_mesh_adjust_IE_conservation

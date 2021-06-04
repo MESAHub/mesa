@@ -2,10 +2,12 @@
 Changelog
 *********
 
-Changes in dev
-==============
+Changes in main
+===============
 
-.. _Backwards-incompatible changes dev:
+.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
+
+.. _Backwards-incompatible changes main:
 
 Backwards-incompatible changes
 ------------------------------
@@ -22,8 +24,11 @@ Removed profile columns `total_energy` and `total_energy_integral`.
 
 The ``other_eos`` hooks have been removed from star.  See the ``eos`` section for information about their replacements.
 
+The ``Teff`` argument has been removed from the ``other_surface_PT`` hook.
+``Teff`` is instead available in the ``star_info`` pointer.
 
-.. _Module-level changes dev:
+
+.. _Module-level changes main:
 
 Module-level changes
 --------------------
@@ -110,7 +115,10 @@ not the ``star_info`` structure.  Therefore, in ``extras_controls``,
 the procedure pointer statement should look like ``s% eos_rq %
 other_eos_results => my_other_eos_results``.  The boolean option
 ``use_other_eos_results`` controlling whether to use the hook is part
-of the ``eos`` namelist rather than ``controls``.
+of the ``eos`` namelist rather than ``controls``.  For the first
+required argument ``handle``, pass ``s% eos_handle``.  This ensures
+that the routine uses the same configuration options as other calls
+from star to the eos module.
 
 The hook ``other_eos_component`` allows the user to replace all or
 part of the MESA EOS by providing a new component EOS and to control
@@ -150,7 +158,7 @@ the blended opacity.
          kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
 
          ! INPUT
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
@@ -189,7 +197,10 @@ is part of the ``Kap_General_Info`` structure and not the
 procedure pointer statement should look like ``s% kap_rq %
 other_elect_cond_opacity => my_routine``.  The boolean option
 ``use_other_elect_cond_opacity`` controlling whether to use the hook
-is part of the ``kap`` namelist rather than ``controls``.
+is part of the ``kap`` namelist rather than ``controls``.  For the
+first required argument ``handle``, pass ``s% kap_handle``.  This
+ensures that the routine uses the same configuration options as other
+calls from star to the kap module.
 
 
 neu
@@ -206,7 +217,7 @@ to remove ``theta_e_for_graboske_et_al`` from its argument list.
 
 The options ``reuse_rate_raw`` and  ``reuse_rate_screened`` have been removed from other_net_get (and eval_net)
 
-.. _Other changes dev:
+.. _Other changes main:
 
 Other changes
 -------------
@@ -1172,7 +1183,7 @@ Other changes
   continue to function.  However, in new ``run_star_extras`` code, the
   recommended way to store/retrieve data is using the
   ``other_photo_read`` and ``other_photo_write`` hooks.  Examples can
-  be found in the :ref:`conductive_flame` and :ref:`brown_dwarf` test
+  be found in the :ref:`conductive_flame` and `brown_dwarf` test
   suite cases.
 
 * The controls ``xtra_coef_os_*`` and ``xtra_dist_os_*`` which could

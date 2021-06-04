@@ -145,12 +145,12 @@
          if (blend .gt. 0) then ! at least some compton
 
             if (rq % use_other_compton_opacity) then
-               call rq% other_compton_opacity(Rho, T, &
+               call rq% other_compton_opacity(rq% handle, Rho, T, &
                   lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
                   eta, d_eta_dlnRho, d_eta_dlnT, &
                   kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
             else
-               call Compton_Opacity(Rho, T, &
+               call Compton_Opacity(rq, Rho, T, &
                   lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
                   eta, d_eta_dlnRho, d_eta_dlnT, &
                   kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
@@ -174,10 +174,17 @@
 
          if (blend .lt. 1) then ! at least some tables
 
-            call Get_kap_Results_blend_T( &
-                 rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
-                 frac_lowT, frac_highT, frac_Type2, &
-                 kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+            if (rq% use_other_radiative_opacity) then
+               call rq% other_radiative_opacity( &
+                  rq% handle, X, Z, XC, XN, XO, XNe, logRho, logT, &
+                  frac_lowT, frac_highT, frac_Type2, &
+                  kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+            else
+               call Get_kap_Results_blend_T( &
+                  rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
+                  frac_lowT, frac_highT, frac_Type2, &
+                  kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+            end if
             if (ierr /= 0) return
 
             ! revise reported fractions based on Compton blend
@@ -720,7 +727,7 @@
 
          if (rq% use_other_elect_cond_opacity) then
             call rq% other_elect_cond_opacity( &
-               zbar, logRho, logT, &
+               rq% handle, zbar, logRho, logT, &
                kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT, ierr)
          else
             call do_electron_conduction( &
@@ -785,7 +792,7 @@
       end subroutine combine_rad_with_conduction
 
 
-      subroutine Compton_Opacity( &
+      subroutine Compton_Opacity(rq, &
             Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta_in, d_eta_dlnRho, d_eta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -793,6 +800,8 @@
          use eos_def
          use const_def
          use auto_diff
+
+         type (Kap_General_Info), pointer :: rq
 
          ! evaluates the poutanen 2017, apj 835, 119 fitting formula for the compton opacity.
          ! coefficients from table 1 between 2 and 300 kev

@@ -605,7 +605,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! maximum number of double points to be written (0 = no limit); when this limit
-      ! is set, double points are chosen in order of decreasing |grad_mu|
+      ! is set, double points are chosen in order of decreasing :math:`|\nabla_\mu|`
 
       ! ::
 
@@ -2179,7 +2179,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Threshold for weighted smoothing of ``gradL_composition_term``. Only apply smoothing (controlled
-      ! by ``num_cells_for_smooth_gradL_composition_term``) for contiguous regions where |gradL| exceeds
+      ! by ``num_cells_for_smooth_gradL_composition_term``) for contiguous regions where :math:`|\nabla_L|` exceeds
       ! this threshold. Might be useful for preventing narrow composition jumps from being excessively
       ! broadened by smoothing
 
@@ -4709,8 +4709,9 @@
       ! Here is an example of how to translate an existing inlist from the
       ! old style to the new:
 
+      !     +----------------------------------+-----------------------------------+
       !     |        Before                    |             After                 |
-      !     |----------------------------------|-----------------------------------|
+      !     +==================================+===================================+
       !     | RGB_wind_scheme = 'Reimers'      |  cool_wind_RGB_scheme = 'Reimers' |
       !     | Reimers_wind_eta = 0.1           |  Reimers_scaling_factor = 0.1     |
       !     | AGB_wind_scheme = 'Blocker'      |  cool_wind_AGB_scheme = 'Blocker' |
@@ -4721,6 +4722,7 @@
       !     |                                  |  cool_wind_full_on_T = 1d10  !K   |
       !     |                                  |  hot_wind_full_on_T = 1.1d10 !K   |
       !     |                                  |  hot_wind_scheme = ''             |
+      !     +----------------------------------+-----------------------------------+
 
       ! suggested hot and cool wind schemes follow but any valid wind option
       ! will work for either hot or cool.
@@ -7494,7 +7496,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Threshold for weighted smoothing of ``brunt_B``. Only apply smoothing (controlled
-      ! by ``num_cells_for_smooth_bruntB``) for contiguous regions where |bruntB| exceeds
+      ! by ``num_cells_for_smooth_brunt_B``) for contiguous regions where :math:`|B|` exceeds
       ! this threshold. Might be useful for preventing narrow peaks from being excessively
       ! broadened by smoothing
 
@@ -7922,16 +7924,16 @@
       ! The alternatives forms are for dynamic situations where
       ! the use of hydrostatic dP/dm is inappropriate.
       ! In order of priority,
-      
-      !     if (use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn)
-      !        equation is gradT(k)*(lnPeos(k-1) - lnPeos(k)) = lnT(k-1) - lnT(k)
-      !     recall that gradT(k) is expected dlnT/dlnPeos at face k from MLT.
 
-      !     if (use_dPrad_dm_form_of_T_gradient_eqn)
-      !         if (gradT < gradr) then
-      !            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
-      !         else
-      !            use L_rad = L
+      !|     if (use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn)
+      !|        equation is gradT(k)*(lnPeos(k-1) - lnPeos(k)) = lnT(k-1) - lnT(k)
+      !|     recall that gradT(k) is expected dlnT/dlnPeos at face k from MLT.
+      !|
+      !|     if (use_dPrad_dm_form_of_T_gradient_eqn)
+      !|         if (gradT < gradr) then
+      !|            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
+      !|         else
+      !|            use L_rad = L
 
       ! With the resulting ``L_rad``, determine the expected dT/dm by
 

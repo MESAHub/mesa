@@ -9,36 +9,48 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 do_one inlist_to_zams_header zams.mod
 cp zams.mod standard_zams.mod
+
 do_one inlist_to_near_pulses_header near_pulses.mod
 cp near_pulses.mod standard_near_pulses.mod
+
+do_one inlist_to_nearer_pulses_header nearer_pulses.mod
+cp nearer_pulses.mod standard_nearer_pulses.mod
+
 do_one inlist_to_pulse_header pulse.mod
 cp pulse.mod standard_pulse.mod
+
 do_one inlist_remove_core_header removed_core.mod
 cp removed_core.mod standard_removed_core.mod
+
 do_one inlist_remesh_header remeshed.mod
 cp remeshed.mod standard_remeshed.mod
+
 do_one inlist_initialize_header initialized.mod
 cp initialized.mod standard_initialized.mod
+
 do_one inlist_pulse_header final.mod 
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 echo 'finished'
 
-return
 
-after to_pulse
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     372       1          0.3534E-04          28299.3529              0.3275            414.0242
-     372       2          0.4216E-04          23720.6750              0.2745             24.0119
-after remove core
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     100       1          0.3650E-04          27394.4859              0.3171            216.9102
-     100       2          0.4282E-04          23355.0863              0.2703             23.0462
-after remesh
-   model   order           freq (Hz)             P (sec)             P (day)    cycles to double
-     100       1          0.3633E-04          27528.4553              0.3186             85.8920
-     100       2          0.4156E-04          24062.0172              0.2785             13.8249
+after to pulse          Teff 2.23e4   L 2957
+   model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
+     388       1          0.3123E-04          32018.8931              0.3706            145.4509              0.0025            392.4857
+     388       2          0.3695E-04          27062.3151              0.3132            100.2962              0.0031            320.2089
 
+after remove core 
+   model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
+       1       1          0.3133E-04          31913.6949              0.3694            137.3380              0.0027            371.8154
+       1       2          0.3707E-04          26973.1177              0.3122            112.6215              0.0028            360.7481
 
-pulses die and fail to recover. 
+after remesh   
+   model   order           freq (Hz)             P (sec)             P (day)        growth (day)              growth    cycles to double
+       1       1          0.3115E-04          32105.7200              0.3716             96.3445              0.0039            259.2735
+       1       2          0.3656E-04          27352.2085              0.3166             54.6816              0.0058            172.7279
+
+after initialize        Teff    L 
+   order           freq (Hz)             P (sec)             P (day)              growth    cycles to double
+       1          0.3115E-04          32105.7200              0.3716              0.0039            259.2735
+       2          0.3656E-04          27352.2085              0.3166              0.0058            172.7279

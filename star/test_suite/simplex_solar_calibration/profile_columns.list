@@ -37,9 +37,7 @@
    !log_column_depth ! log10 column depth, exterior mass / area (g cm^-2)
    !log_radial_depth ! log10 radial distance to surface (cm)
    luminosity ! luminosity at outer boundary of zone (in Lsun units)
-   !luminosity_rad ! radiative luminosity at outer boundary of zone (in Lsun units)
       ! -(4 pi r^2)^2 a c / (3 kap) d(T^4)/dm
-   !lum_minus_lum_rad ! at outer boundary of zone (in Lsun units)
    !grav ! gravitational acceleration (cm sec^2)
    !g_div_r ! grav/radius (sec^2)
    !r_div_g ! radius/grav (sec^-2)
@@ -104,7 +102,6 @@
    !dkap_dlnt_face ! partial derivative of opacity wrt. ln T (at rho=const) at outer edge of cell
    log_opacity ! log10(opacity)
    eps_nuc ! ergs/g/sec from nuclear reactions (reaction neutrinos subtracted)
-   !deps_dlnrho_face ! partial derivative of eps_nuc wrt. ln rho (at T=const) at outer edge of cell
    !deps_dlnt_face ! partial derivative of eps_nuc wrt. ln T (at rho=const) at outer edge of cell
    !eps_nuc_neu_total ! erg/gm/sec as neutrinos from nuclear reactions
    non_nuc_neu ! non-nuclear-reaction neutrino losses
@@ -127,12 +124,10 @@
    mlt_mixing_length ! mixing length for mlt (cm)
    mlt_mixing_type ! value returned by mlt
    gradT_sub_grada ! gradT-grada at cell boundary 
-   !super_ad ! max(0,gradT-grada) at cell boundary 
    log_D_mix ! log10 diffusion coefficient for mixing in units of cm^2/second (Eulerian)
    !log_D_mix_non_rotation
    !log_sig_mix ! sig(k) is mixing flow across face k in (gm sec^1)
          ! sig(k) = D_mix*(4*pi*r(k)**2*rho_face)**2/dmavg
-   !log_sig_div_siglim
          ! this is raw_sig(k)/siglimit(k)
          ! where siglimit(k) = sig_term_limit*min(dm(k),dm(k-1))/dt
          ! and raw_sig(k) is sig(k) before it is set to min(siglimit(k),raw_sig(k))
@@ -158,13 +153,7 @@
    ! the "for_mixing" values are the ones used to calculate the mixing diffusion coeffs,
    ! i.e., from the start of the step.  
    ! the names without "for_mixing" are the values at the end of the step.
-   !gradr_for_mixing
-   !gradT_for_mixing
-   !grada_for_mixing
-   !gradL_for_mixing
    
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    !mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
    
@@ -188,8 +177,6 @@
    !log_dr_div_cs_yr ! log10 cell sound crossing time (years)
    
    
-   !grav_gr_factor ! (1/sqrt(1 - 2Gm/(rc^2))  -- only important for neutron stars
-   !log_grav_gr_factor ! log10(grav_gr_factor)
    
    x ! hydrogen mass fraction
    !log_x
@@ -230,18 +217,11 @@
       
    ! equation residuals
       
-      !equP ! momentum conservation
-      !equT ! energy transport
-      !equR ! mass-volume-density relation
-      !equL ! energy conservation
-      !equv ! velocity definition
-      !equJ ! angular momentum
       !equ_chem h1
       !equ_chem he4
       ! any other isotopes you want
       
       
-   ! rotation
       !omega ! angular velocity = j_rot/i_rot
       !log_omega
       !log_j_rot
@@ -249,8 +229,6 @@
       !log_J_inside ! J_inside is j_rot integrated from center
       !shear ! -dlnomega/dlnR
       !log_abs_shear ! log10(abs(dlnomega/dlnR))
-      !domega_dt ! time derivative of omega at fixed mass coordinate (Lagrangian)
-      !delta_omega ! omega minus omega_pre_hydro
       !i_rot ! specific moment of interia at cell boundary
       !j_rot ! specific angular momentum at cell boundary
       !v_rot ! rotation velocity at cell boundary (km/sec)
@@ -261,8 +239,6 @@
       
       !r_polar ! (Rsun)
       !log_r_polar ! log10 (Rsun)
-      !r_equitorial ! (Rsun)
-      !log_r_equitorial ! log10 (Rsun)
       !r_e_div_r_p ! r_equitorial/r_polar
       !omega_crit ! breakup angular velocity = sqrt(G M / r_equitorial^3)
       !omega_div_omega_crit
@@ -280,21 +256,13 @@
       !dynamo_log_B_r ! (Gauss)
       !dynamo_log_B_phi ! (Gauss)
       
-      !am_coeff_D_SSI ! strength coeff for D_SSI in [0..1]
 
 
-   ! misc
 
       !gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
-      !dlnP_dm ! for structure equation
-      !dlnT_dm ! for structure equation
-      !dL_dm ! for structure equation
 
-      !dlnP_dlnm ! for structure equation
-      !dlnT_dlnm ! for structure equation
       
       !delta_r ! r(outer edge) - r(inner edge); radial extent of cell in cm.
-      !delta_v ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
       !dt_dv_div_dr ! dt*delta_v/delta_r; need to have this << 1 for every cell
       
       ! element diffusion velocity for species
@@ -344,7 +312,6 @@
       !dlog_burn_ar_dlogP
       !dlog_burn_ca_dlogP
       !dlog_burn_ti_dlogP
-      !dlog_burn_cr_dlog
       !dlog_burn_fe_dlogP
       
       !dlog_pnhe4_dlogP
@@ -416,9 +383,6 @@
       ! star_mass_o16
       ! star_mass_ne20
    ! locations of abundance transitions
-      ! h1_boundary_mass
-      ! he4_boundary_mass
-      ! c12_boundary_mass
    ! location of optical depths 10 and 100
       ! tau10_mass
       ! tau10_radius

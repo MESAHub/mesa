@@ -141,17 +141,6 @@
    
    ! info at location of max abs velocity
       ! note: can use control "min_tau_for_max_abs_v_location" to exclude surface
-      !max_abs_v_velocity
-      !max_abs_v_csound
-      !max_abs_v_v_div_cs
-      !max_abs_v_lgT
-      !max_abs_v_lgRho
-      !max_abs_v_lgP
-      !max_abs_v_mass
-      !max_abs_v_radius
-      !max_abs_v_L
-      !max_abs_v_entropy
-      !max_abs_v_eps_nuc
 
    ! timescales
       
@@ -182,8 +171,6 @@
       !surf_escape_v ! cm/s
       luminosity ! luminosity in Lsun units
       !gravity 
-      !log_surf_pressure
-      !log_surf_density
    
       log_L ! log10 luminosity in Lsun units
       effective_T
@@ -227,13 +214,9 @@
       !pp
       !cno
       !tri_alfa
-      !c12_alfa
-      !n14_alfa
-      !o16_alfa
 
    ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
       
-      !rpp
 
 
       
@@ -263,12 +246,10 @@
       ! energy information
       !avg_abs_v_div_cs
       !log_avg_abs_v_div_cs
-      !max_abs_v_div_cs
       !log_max_abs_v_div_cs
       
       !avg_abs_v
       !log_avg_abs_v
-      !max_abs_v
       !log_max_abs_v
 
 
@@ -289,7 +270,6 @@
       !num_iters
       
       num_retries ! total during the run
-      !num_backups ! total during the run
       !total_num_newton_solves
       !total_num_newton_iterations
       !avg_num_newton_iters

@@ -836,6 +836,8 @@
          real(dp), pointer :: chiT_start(:) ! (nz)
          real(dp), pointer :: chiRho_start(:) ! (nz)
          real(dp), pointer :: Cp_start(:) ! (nz)
+         real(dp), pointer :: Cv_start(:) ! (nz)
+         real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
          real(dp), pointer :: eta_start(:) ! (nz)
          real(dp), pointer :: T_start(:) ! (nz)

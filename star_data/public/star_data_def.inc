@@ -1093,12 +1093,12 @@
       
          subroutine other_surface_PT_interface(id, &
                skip_partials, &
-               Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+               lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
             use const_def, only: dp
             integer, intent(in) :: id
             logical, intent(in) :: skip_partials
-            real(dp), intent(out) :: Teff, &
+            real(dp), intent(out) :: &
                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
             integer, intent(out) :: ierr

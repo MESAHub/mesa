@@ -19,7 +19,7 @@
          
          real(dp) :: RSP2_w_fix_if_neg, RSP2_w_min_for_damping, RSP2_source_seed
          
-         logical :: RSP2_use_L_eqn_at_surface, RSP2_assume_HSE
+         logical :: RSP2_use_L_eqn_at_surface, RSP2_assume_HSE, RSP2_report_adjust_w
          logical :: RSP2_use_RSP_eqn_for_Y_face, include_w_in_correction_limits
          logical :: RSP2_use_mass_interp_face_values
          logical :: RSP2_use_Stellingwerf_Lr

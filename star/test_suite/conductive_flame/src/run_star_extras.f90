@@ -152,12 +152,12 @@
 
          subroutine constant_surface_PT(id, &
                 skip_partials, &
-                Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
             use const_def, only: dp
             integer, intent(in) :: id
             logical, intent(in) :: skip_partials
-            real(dp), intent(out) :: Teff, &
+            real(dp), intent(out) :: &
                    lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                    lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
             integer, intent(out) :: ierr
@@ -179,8 +179,6 @@
             dlnP_dlnR = 0
             dlnP_dlnM = 0
             dlnP_dlnkap = 0
-
-            Teff = 1 ! Lots of code assumes Teff>0
 
          end subroutine constant_surface_PT
 

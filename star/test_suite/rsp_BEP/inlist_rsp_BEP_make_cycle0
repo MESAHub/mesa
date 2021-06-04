@@ -1,0 +1,128 @@
+! binary evolution pulsator, a model from: http://adsabs.harvard.edu/abs/2013MNRAS.428.3034S; 
+! M=0.26Ms,
+! L=33Ls, 
+! Teff=6968K,
+! X=0.70, Z=0.01.
+! This model needs ~1000 cycles to converge.
+
+! original test case contributed by Radek Smolec.
+
+&star_job
+
+      show_log_description_at_start = .false.
+
+      create_RSP_model = .true.
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'rsp_BEP_cycle0.mod'
+
+      initial_zfracs = 6
+
+      color_num_files=2
+      color_file_names(2)='blackbody_johnson.dat'
+      color_num_colors(2)=5
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+      
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
+   
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+
+      Zbase = 0.01d0
+
+      kap_file_prefix = 'a09'
+      kap_lowT_prefix = 'lowT_fa05_a09p'
+      kap_CO_prefix = 'a09_co'
+
+/ ! end of kap namelist
+
+&controls
+
+   ! limit max_model_number as part of test_suite
+   max_model_number = 1030 ! 18000
+
+! RSP controls
+
+   x_integer_ctrl(1) = 10 ! which period to check
+   x_ctrl(1) = 0.620728d0 ! expected period (in days) 
+
+   RSP_mass = 0.26d0
+   RSP_Teff = 6968d0
+   RSP_L = 33d0
+   RSP_X = 0.70d0
+   RSP_Z = 0.01d0
+
+   RSP_max_num_periods = 3000
+   
+! solver
+   
+! output controls
+   
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
+      !num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+   ! for cases in which you have a run that has reached steady pulses
+   ! and you want to look at plots of just a few periods to see the details,
+   ! i suggest the following method. interrupt the run soon after
+   ! it makes a photo.  remove or delete LOGS/history.data to force
+   ! creation of a new one when restart.  edit the inlist to set
+   ! history_interval to 1 to get maximum time resolution.  
+   ! restart the run and let it go for as many periods as desired.   
+
+      photo_interval = 1000
+      profile_interval = 4000
+      history_interval = 10
+      terminal_interval = 4000
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+      !pause = .true.
+
+      pgstar_interval = 6
+         
+      Grid2_win_flag = .true.
+
+      Grid2_title = '0.26 M\d\(2281)\u Z=0.01 BEP'
+
+      
+      History_Panels1_xaxis_name='star_age_day'
+      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+
+      !  Grid2_file_flag = .true.
+      file_digits = 7
+      Grid2_file_dir = 'png'
+      Grid2_file_prefix = 'grid'
+      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+      
+      !Profile_Panels1_show_grid = .true.
+
+      Profile_Panels1_xaxis_name = 'logtau'
+      Profile_Panels1_xaxis_reversed = .true.
+      Profile_Panels1_xmin = -101D0
+      Profile_Panels1_xmax = -101D0
+
+      Profile_Panels1_dymin(4) = 0.02
+
+/ ! end of pgstar namelist

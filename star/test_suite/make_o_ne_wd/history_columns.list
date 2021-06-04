@@ -102,19 +102,7 @@
    
    ! info about locations where optical depth is 10 or 100
 
-      !tau10_mass ! mass in solar units where optical depth = 10
-      !tau10_radius ! radius in solar units where optical depth = 10
-      !tau10_lgP ! estimate for log10(P) at tau = 10
-      !tau10_lgT ! estimate for log10(T) at tau = 10
-      !tau10_lgRho ! estimate for log10(density) at tau = 10
-      !tau10_L ! estimate for L/Lsun at tau = 10
       
-      !tau100_mass ! location in solar units where optical depth = 100
-      !tau100_radius ! location in solar units where optical depth = 100
-      !tau100_lgP ! estimates for values at tau = 100
-      !tau100_lgT
-      !tau100_lgRho
-      !tau100_L
 
    ! timescales
       
@@ -234,44 +222,19 @@
       !pp
       !cno
       !tri_alfa
-      !c12_alfa
-      !n14_alfa
-      !o16_alfa
 
    ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
       
-      !rpp
 
    ! info about the max burning locations for hydrogen, helium, and metals
       
       ! info about location where have max rate of hydrogen burning (PP and CNO)
-      !eps_h_max ! erg/g/s
-      !eps_h_max_lgT ! log10 temperature at location of max burn
-      !eps_h_max_lgRho ! log10 density at location of max burn
-      !eps_h_max_m ! mass coordinate at location of max burn (Msun units)
-      !eps_h_max_lgP ! log10 pressure at location of max burn
-      !eps_h_max_lgR ! log10 radius at location of max burn
-      !eps_h_max_opacity ! opacity at location of max burn
       
       ! info about location where have max rate of helium burning
          ! triple-alpha plus alpha capture on C12, N14, O16, and Ne20.
-      !eps_he_max ! erg/g/s
-      !eps_he_max_lgT ! log10 temperature at location of max burn
-      !eps_he_max_lgRho ! log10 density at location of max burn
-      !eps_he_max_m ! mass coordinate at location of max burn (Msun units)
-      !eps_he_max_lgP ! log10 pressure at location of max burn
-      !eps_he_max_lgR ! log10 radius at location of max burn
-      !eps_he_max_opacity ! opacity at location of max burn
       
       ! info about location where have max rate of burning of metals
          ! alpha capture on heavy elements plus C+C, C+O, O+O, etc.
-      !eps_z_max ! erg/g/s
-      !eps_z_max_lgT ! log10 temperature at location of max burn
-      !eps_z_max_lgRho ! log10 density at location of max burn
-      !eps_z_max_m ! mass coordinate at location of max burn (Msun units)      
-      !eps_z_max_lgP ! log10 pressure at location of max burn
-      !eps_z_max_lgR ! log10 radius at location of max burn
-      !eps_z_max_opacity ! opacity at location of max burn
 
    
 

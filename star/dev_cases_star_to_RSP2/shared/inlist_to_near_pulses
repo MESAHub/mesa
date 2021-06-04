@@ -10,6 +10,7 @@
       required_termination_code_string(2) = 'max_model_number'
       required_termination_code_string(3) = 'xa_central_lower_limit'
       required_termination_code_string(4) = 'xa_central_upper_limit'
+      required_termination_code_string(5) = 'star_mass_min_limit'
 
       set_initial_number_retries = .false.
 
