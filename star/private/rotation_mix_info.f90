@@ -1390,7 +1390,6 @@
          ! writen by S.-C. YOON Oct. 10, 2003
          ! electrical conductivity using conductive opacity
          ! see Wendell et al. 1987 ApJ 313:284
-         use kap_lib, only: kap_get_elect_cond_opacity
          real(dp), intent(in) :: t,rho,kap_cond
          integer, intent(out) :: ierr
          sige2 = 1.11d9*T*T/(rho*kap_cond)
