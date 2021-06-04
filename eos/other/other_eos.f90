@@ -62,9 +62,9 @@
          ! INPUT
          use chem_def, only: num_chem_isos
 
-         integer, intent(in) :: handle ! eos handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
@@ -103,9 +103,9 @@
          ! INPUT
          use chem_def, only: num_chem_isos
 
-         integer, intent(in) :: handle ! eos handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
@@ -151,9 +151,9 @@
          ! INPUT
          use chem_def, only: num_chem_isos
 
-         integer, intent(in) :: handle ! eos handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos

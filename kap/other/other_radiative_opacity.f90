@@ -44,7 +44,7 @@
             use const_def, only: dp
 
             ! INPUT
-            integer, intent(in) :: handle ! kap handle
+            integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
             real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
             real(dp), intent(in) :: logRho ! density
             real(dp), intent(in) :: logT ! temperature
