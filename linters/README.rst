@@ -15,7 +15,16 @@ check_columns.py
 ----------------
 
 This script checks that the history and profile code and the
-*_columns.list files are in sync.
+``*_columns.list`` files are in sync. It can also check the column files
+in the test_suite if enabled in the source code.
+
+check_pgstar.py
+----------------
+
+This script checks that the inlist_pgstar files in the test_suite
+have valid history/profile columns. Note it will have false postives for things only
+defined in a run_star_extras.f90 and does not check non inlist_pgstar files
+pgstar sections.
 
 
 fix_underlines.py

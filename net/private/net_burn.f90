@@ -469,7 +469,7 @@
                Rho, lgRho, T, lgT, &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
             if (ierr /= 0) then
-               if (report_ierr) write(*,*) 'failed in eos_get_helm_results'
+               if (report_ierr) write(*,*) 'failed in eosDT_get'
                return
             end if
             eta = res(i_eta)

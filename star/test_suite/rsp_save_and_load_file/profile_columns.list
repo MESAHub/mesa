@@ -90,9 +90,6 @@
    !velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s
    
-   !dr_dt ! time derivative of radius at fixed mass coordinate (Langranian)
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Langranian)
-   !dlnR_dt ! time derivative of log(radius) at fixed mass coordinate (Langranian)
    !log_sig_RTI
 
    v_div_csound ! velocity divided by sound speed
@@ -118,9 +115,6 @@
    !pgas ! gas pressure at center of zone (electrons and ions)
    pgas_div_ptotal ! pgas/pressure
    logPgas ! log10(pgas)
-   !logPrad
-   !log_erad
-   !log_egas
    energy ! internal energy (ergs/g)
    !grada ! dlnT_dlnP at constant S
    !dE_dRho ! at constant T
@@ -129,7 +123,6 @@
    !logS ! log10(specific entropy)
    !gamma1 ! dlnP_dlnRho at constant S
    !gamma3 ! gamma3 - 1 = dlnT_dlnRho at constant S
-   !theta_e ! electron degeneracy factor for graboske screening
    !gam ! plasma interaction parameter (> 160 or so means starting crystallization)
    free_e ! free_e is mean number of free electrons per nucleon
    logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
@@ -151,21 +144,16 @@
    !log_conv_vel ! log10 convection velocity (cm/sec)
    !conv_vel_div_csound ! convection velocity divided by sound speed
    !log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
-   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
    !pressure_scale_height ! in Rsun units
    !gradT ! mlt value for required temperature gradient dlnT/dlnP
    !gradr ! dlnT/dlnP required for purely radiative transport
    
-   !grad_superad
-   !grad_superad_actual
    !gradT_sub_grada ! gradT-grada at cell boundary 
    !gradT_rel_err
    !gradT_sub_gradr
    
    !dRstar_div_dr
    
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Langranian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    log_mass
    !mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
@@ -176,8 +164,6 @@
    dq
    log_dq
    
-      !rsp_vt_div_cs
-      !rsp_vt
       rsp_logEt
       rsp_Et
       rsp_Pt
@@ -195,12 +181,7 @@
       rsp_Hp_face
       rsp_Y_face
       rsp_Pvsc
-      !rsp_gvisc
-      !rsp_gvisc_div_g
       rsp_Chi
-      !Trsp_Trad
-      !Trsp_Trad_div_T
-      !Trsp_Trad_div_T_sub1
       rsp_Lr_div_L
       rsp_Lc_div_L
       rsp_Lt_div_L
@@ -209,8 +190,6 @@
       !rsp_log_dt_div_heat_exchange_timescale
       !rsp_erad
       !rsp_log_erad
-      !rsp_f_Edd
-      !rsp_mesh_function
 
 
       ergs_error
@@ -249,7 +228,6 @@
 
    ! ergs/g/sec for specific reactions (names from rates_def)
       
-      !rpp
 
    
    pressure

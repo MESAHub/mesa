@@ -381,6 +381,7 @@
     iter_for_resid_tol2, iter_for_resid_tol3, &
     solver_itermin, solver_itermin_until_reduce_min_corr_coeff, &
     solver_reduced_min_corr_coeff, do_solver_damping_for_neg_xa, &
+    scale_max_correction_for_negative_surf_lum, max_frac_for_negative_surf_lum, &
     hydro_mtx_max_allowed_abs_dlogT, hydro_mtx_max_allowed_abs_dlogRho, &
     min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
     hydro_mtx_max_allowed_logRho, report_min_rcond_from_DGESXV, &
@@ -409,7 +410,7 @@
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
-    RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM, &
+    RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, &
     RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, max_X_for_conv_timescale, min_X_for_conv_timescale, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
@@ -1968,6 +1969,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% solver_itermin_until_reduce_min_corr_coeff = solver_itermin_until_reduce_min_corr_coeff
  s% solver_reduced_min_corr_coeff = solver_reduced_min_corr_coeff
  s% do_solver_damping_for_neg_xa = do_solver_damping_for_neg_xa
+ s% scale_max_correction_for_negative_surf_lum = scale_max_correction_for_negative_surf_lum
+ s% max_frac_for_negative_surf_lum = max_frac_for_negative_surf_lum
  s% hydro_mtx_max_allowed_abs_dlogT = hydro_mtx_max_allowed_abs_dlogT
  s% hydro_mtx_max_allowed_abs_dlogRho = hydro_mtx_max_allowed_abs_dlogRho
  s% min_logT_for_hydro_mtx_max_allowed = min_logT_for_hydro_mtx_max_allowed
@@ -2081,6 +2084,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_use_Stellingwerf_Lr = RSP2_use_Stellingwerf_Lr
  s% RSP2_remesh_when_load = RSP2_remesh_when_load
  s% RSP2_use_L_eqn_at_surface = RSP2_use_L_eqn_at_surface
+ s% RSP2_report_adjust_w = RSP2_report_adjust_w
  s% RSP2_assume_HSE = RSP2_assume_HSE
  s% RSP2_use_RSP_eqn_for_Y_face = RSP2_use_RSP_eqn_for_Y_face
  s% RSP2_use_mass_interp_face_values = RSP2_use_mass_interp_face_values
@@ -3640,6 +3644,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  solver_itermin = s% solver_itermin
  solver_itermin_until_reduce_min_corr_coeff = s% solver_itermin_until_reduce_min_corr_coeff
  solver_reduced_min_corr_coeff = s% solver_reduced_min_corr_coeff
+ scale_max_correction_for_negative_surf_lum = s% scale_max_correction_for_negative_surf_lum
+ max_frac_for_negative_surf_lum = s% max_frac_for_negative_surf_lum
  do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
  hydro_mtx_max_allowed_abs_dlogT = s% hydro_mtx_max_allowed_abs_dlogT
  hydro_mtx_max_allowed_abs_dlogRho = s% hydro_mtx_max_allowed_abs_dlogRho
@@ -3754,6 +3760,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_use_Stellingwerf_Lr = s% RSP2_use_Stellingwerf_Lr
  RSP2_remesh_when_load = s% RSP2_remesh_when_load
  RSP2_use_L_eqn_at_surface = s% RSP2_use_L_eqn_at_surface
+ RSP2_report_adjust_w = s% RSP2_report_adjust_w
  RSP2_assume_HSE = s% RSP2_assume_HSE
  RSP2_use_RSP_eqn_for_Y_face = s% RSP2_use_RSP_eqn_for_Y_face
  RSP2_use_mass_interp_face_values = s% RSP2_use_mass_interp_face_values

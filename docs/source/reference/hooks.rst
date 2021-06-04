@@ -15,6 +15,21 @@ other_eos_results                eosdt_eval
 ===============================  =============
 
 
+kap hooks
+=========
+
+For details of the kap hooks, see ``kap/other``.    Code location
+indicates the file in ``kap/private`` where the hook is called.
+
+===============================  =============
+Hook name                        Code Location
+===============================  =============
+other_elect_cond_opacity         kap_eval
+other_compton_opacity            kap_eval
+other_radiative_opacity          kap_eval
+===============================  =============
+
+
 star hooks
 ==========
 

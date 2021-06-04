@@ -30,16 +30,15 @@
          show_echelle_annotation2 = .false.
          show_echelle_annotation3 = .false.
          
-         ! file output
-         ! ~~~~~~~~~~~
-         ! ::
+!          ! file output
 
          echelle_file_flag = .false.
          echelle_file_dir = 'png'
          echelle_file_prefix = 'echelle'
-         echelle_best_model_file_prefix = '' ! if non-empty save best chi^2 model file
-          ! e.g. 'best_model_echelle'
-          ! note: this is enabled even if echelle_file_flag = .false.
+         echelle_best_model_file_prefix = ''
+!          ! if non-empty save best chi^2 model file
+!          ! e.g. 'best_model_echelle'
+!          ! note: this is enabled even if echelle_file_flag = .false.
          echelle_file_interval = 5 ! output when mod(model_number,echelle_file_interval)==0
          echelle_file_width = -1 ! negative means use same value as for window
          echelle_file_aspect_ratio = -1 ! negative means use same value as for window
@@ -66,17 +65,16 @@
          show_ratios_annotation1 = .false.
          show_ratios_annotation2 = .false.
          show_ratios_annotation3 = .false.
-         
-         ! file output
-         ! ~~~~~~~~~~~
-         ! ::
-         
+
+!          ! file output
+
          ratios_file_flag = .false.
          ratios_file_dir = 'png'
          ratios_file_prefix = 'ratios'
-         ratios_best_model_file_prefix = '' ! if non-empty save best chi^2 model file
-           ! e.g., 'best_model_ratios'
-           ! note: this is enabled even if ratios_file_flag = .false.
+         ratios_best_model_file_prefix = ''
+!          ! if non-empty save best chi^2 model file
+!          ! e.g., 'best_model_ratios'
+!          ! note: this is enabled even if ratios_file_flag = .false.
          ratios_file_interval = 5 ! output when mod(model_number,ratios_file_interval)==0
          ratios_file_width = -1 ! negative means use same value as for window
          ratios_file_aspect_ratio = -1 ! negative means use same value as for window

@@ -375,7 +375,7 @@ If the changes in your branch conflict or interact with changes that
 have occurred on ``main``, it is recommended that you merge ``main`` into your
 branch (or rebase your branch to the tip of ``main``) before issuing the
 PR. This allows you to handle conflicts in advance and ensure that the
-test suite will re``main`` passing after you merge your branch back into
+test suite will remain passing after you merge your branch back into
 ``main``. 
 
 When you merge ``main`` into your branch is also advisable to add ``[ci optional]`` to the commit message.
@@ -405,7 +405,7 @@ GitHub offers several strategies for merging pull requests.  Each one may be app
 * If the PR is a small set of simple, well-contained changes, the 'Rebase and merge' strategy is recommended.  This will take the commits and add them to the tip of ``main``, ensuring that the commit history of ``main`` remains linear.
 
 
-* If the PR is a set of changes whose detailed history is not relevant, the 'Squash and merge' strategy is recommended.  This will take the commits, combine them into a single commit, and then add it to the tip of ``main``. This stragegy is most useful when the series of individual commits simply reflects the (possibly wandering) path to achieving the final cumulative change.
+* If the PR is a set of changes whose detailed history is not relevant, the 'Squash and merge' strategy is recommended.  This will take the commits, combine them into a single commit, and then add it to the tip of ``main``. This strategy is most useful when the series of individual commits simply reflects the (possibly wandering) path to achieving the final cumulative change.
 
 
 * If the PR is a set of changes where each commit is a meaningful, self-contained change, but the cumulative change is not simple enough for the 'Rebase and merge' strategy, then the 'Create a merge commit' strategy is appropriate.  This will preserve the full history of your branch when it is joined with ``main``.  If a change has this level of complexity, it is also recommended that its interaction with ``main`` should be tested by merging ``main`` into the branch.

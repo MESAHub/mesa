@@ -5,7 +5,7 @@ Installing MESA
 
 This page describes how to install MESA.
 
-Preqrequistes
+Prerequisites
 -------------
 
 Ensure your system meets the minimum hardware requirements
@@ -71,10 +71,8 @@ mesa-r\ |version|. This will be your main MESA directory. You are
 free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
-You can also download zip files of `older MESA
-releases <http://sourceforge.net/projects/mesa/files/releases/>`__. If
-you plan to do so, please read `this FAQ
-entry <faq.html#old-version>`__.
+You can also download zip files of `older MESA releases <http://sourceforge.net/projects/mesa/files/releases/>`__.
+If you plan to do so, please read `this FAQ entry <faq:Installing Older Versions of MESA>`__.
 
 .. _environment:
 
@@ -155,7 +153,7 @@ Once it is done, you should receive the message
 
 If so, you can learn more about MESA by looking at other pages.
 
-Read the linked page that summarizes some :ref:`best practices <Best practices>`
+Read the linked page that summarizes some :ref:`best practices <using_mesa/best_practices:Best practices>`
 to keep in mind throughout the lifecycle of your project.
 
 Troubleshooting
@@ -199,8 +197,8 @@ Pay particular attention to the prerequisites for your system.
 Consult the FAQ
 ^^^^^^^^^^^^^^^
 
-Check to see if there is any information about your problem in the `MESA
-FAQ <faq.html>`__.
+Check to see if there is any information about your problem in the
+`MESA FAQ <faq:FAQ>`__.
 
 If you are using the MESA SDK and are having a problem with
 installation, you should also consult the `MESA SDK
@@ -228,18 +226,16 @@ Please provide the following information:
 -  Describe your computer (machine type, operating system, operating
    system version).
 
--  What is the output of each of the following commands?
+-  What is the error message you received?
 
-::
+-  Attach the ``$MESA_DIR/build.log`` file.  This includes the output of the build process along with the output of each of the following commands ::
 
-   uname -a
-   gfortran -v
-   echo $MESASDK_ROOT
-   echo $PATH
-   echo $MESA_DIR
+    uname -a
+    gfortran -v
+    echo $MESASDK_ROOT
+    echo $PATH
+    echo $MESA_DIR
 
--  What is the error message you recieved? In addition, please attach
-   the full ``$MESA_DIR/build.log`` file.
 
 If the error message you received was ``./build_and_test FAILED`` also
 attach the file ``$MESA_DIR/MODULE/test/tmp.txt``, where ``MODULE`` is
@@ -248,11 +244,9 @@ that failed should be printed on the line before the ./build_and_test
 message was printed.
 
 If the file tmp.txt file does not exist in the folder then run the
-tester program
-
-::
+tester program::
 
    ./tester 2>&1 | tee tester.log
 
-and also attach tester.log file to your mesa-users message. If the
+and also attach the tester.log file to your mesa-users message. If the
 tester program does not exist, state that in your message.

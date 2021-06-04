@@ -18,10 +18,10 @@ sys.path.insert(0, os.path.abspath('./_ext/'))
 # -- Project information -----------------------------------------------------
 
 project = 'MESA'
-copyright = '2020, Bill Paxton & The MESA Team'
+copyright = '2021, Bill Paxton & The MESA Team'
 author = 'Bill Paxton & The MESA Team'
-release = '15140'
-version = '15140'
+release = 'main'
+version = 'main'
 
 
 # -- General configuration ---------------------------------------------------
@@ -59,6 +59,7 @@ html_static_path = ['_static']
 
 # Ensure that autosectionlabel will produce unique names
 autosectionlabel_prefix_document = True
+# Go to depth 3 so options in defaults files get labels
 autosectionlabel_maxdepth = 3
 
 # sphinx_rtd options

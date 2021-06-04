@@ -342,8 +342,7 @@
             real(dp) :: res(num_eos_basic_results)
             real(dp) :: d_dlnRho_const_T(num_eos_basic_results) 
             real(dp) :: d_dlnT_const_Rho(num_eos_basic_results) 
-            real(dp) :: d_dabar_burn_const_P_const_TRho(num_eos_basic_results) 
-            real(dp) :: d_dzbar_burn_const_P_const_TRho(num_eos_basic_results) 
+            real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results, nvar-1) 
             integer, pointer :: net_iso(:), chem_id(:)
 
             type (Net_General_Info), pointer :: g
@@ -422,13 +421,13 @@
             endif
          
             call eosPT_get( &
-               eos_handle, z, xh, abar, zbar, &
+               eos_handle, &
                num_isos, chem_id, net_iso, x, &
                Pgas, lgPgas, T, logT, &
                Rho, logRho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
                res, d_dlnRho_const_T, d_dlnT_const_Rho,  &
-               d_dabar_burn_const_P_const_TRho, d_dzbar_burn_const_P_const_TRho, ierr)
-               !ierr)
+               d_dxa_const_TRho, ierr)
+
             Cp = res(i_Cp)
             eta = res(i_eta)
             d_eta_dlnRho = d_dlnRho_const_T(i_eta)

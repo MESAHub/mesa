@@ -140,6 +140,54 @@ This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre
 The test checks thermohaline mixing in a rotating, 1 Msun, Z=0.02 metallicity model.
 
 
+:ref:`20M_z2m2_high_rotation`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of a strongly rotating,
+Omega/Omega_crit = 0.75, 20 Msun, Z=0.02 metallicity model from the
+pre-main sequence to the end of core helium burning.
+
+
+:ref:`5M_cepheid_blue_loop`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks that the evolution of a 5 Msun, metal-poor Z = 0.008, helium-enriched Y=0.256 model
+executes a blue-loop in the HR diagram and crosses the classical Cepheid instability strip boundaries three times.
+
+:ref:`7M_prems_to_AGB`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks that the evolution of a 7 Msun, metal-poor Z = 0.001, model reaches the AGB.
+
+
+:ref:`accreted_material_j`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite example checks the accretion of material and angular momentum onto a 20 Msun model.
+
+:ref:`adjust_net`
+^^^^^^^^^^^^^^^^^
+
+This test suite example checks the functionality of the adaptive nuclear reaction network.
+
+
+:ref:`carbon_acc`
+^^^^^^^^^^^^^^^^^
+
+This test suite example checks the accretion of carbon onto a pure carbon white dwarf.
+
+:ref:`cburn_inward`
+^^^^^^^^^^^^^^^^^^^
+
+This test suite example checks the inward propagation of a carbon burning front in a 7.5 Msun model.
+
+
+:ref:`ccsn_IIp`
+^^^^^^^^^^^^^^^
+
+This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^

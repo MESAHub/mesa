@@ -30,6 +30,10 @@ x_logical_ctrl(1) = .true. ! resynchronize at each step by star2 = star1
    RSP2_alfad =     1d0
             
 
+! solver
+   ! adjust_w causes large max correction
+   tol_max_correction = 1d99
+
 
 ! TESTING
 

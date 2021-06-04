@@ -65,7 +65,7 @@ briefly summarize these, including appropriate citations.
 
   The MESA EOS is a blend of the OPAL \citep{Rogers2002}, SCVH
   \citep{Saumon1995}, FreeEOS \citep{Irwin2004}, HELM \citep{Timmes2000},
-  and PC \citep{Potekhin2010} EOSes.
+  PC \citep{Potekhin2010}, and Skye \citep{Jermyn2021} EOSes.
   
   Radiative opacities are primarily from OPAL \citep{Iglesias1993,
   Iglesias1996}, with low-temperature data from \citet{Ferguson2005}

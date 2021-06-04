@@ -146,11 +146,6 @@
                      best_model_number = s% model_number
                   end if
                end do
-               if (.false. .and. best_cycles_to_double > 0) &
-                  write(*,'(a,i6,a,i2,a,f12.0,a,f7.4,a,f9.4)') &
-                     'best cycles to double: model_number', best_model_number, &
-                     'order', best_order, 'P(s)', 24*3600*best_period, &
-                     'P(d)', best_period, 'cycles to double', best_cycles_to_double
             end if
          end subroutine get_gyre_info_for_this_step
          
@@ -336,11 +331,11 @@
          names(i) = 'growth'; vals(i) = delta_R_growth_avg; i=i+1
          names(i) = 'max_v_div_cs'; vals(i) = period_max_v_div_cs; i=i+1
          names(i) = 'max_v_div_vesc'; vals(i) = period_max_v_div_vesc; i=i+1
-         names(i) = 'del_R'; vals(i) = period_delta_R/Rsun; i=i+1
-         names(i) = 'del_Teff'; vals(i) = period_delta_Teff; i=i+1
-         names(i) = 'del_logTeff'; vals(i) = period_delta_logTeff; i=i+1
-         names(i) = 'del_logL'; vals(i) = period_delta_logL; i=i+1
-         names(i) = 'del_Mag'; vals(i) = period_delta_Mag; i=i+1
+         names(i) = 'delta_R'; vals(i) = period_delta_R/Rsun; i=i+1
+         names(i) = 'delta_Teff'; vals(i) = period_delta_Teff; i=i+1
+         names(i) = 'delta_logTeff'; vals(i) = period_delta_logTeff; i=i+1
+         names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
+         names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
       end subroutine rsp2_data_for_extra_history_columns
 
 

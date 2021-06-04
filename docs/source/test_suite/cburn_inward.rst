@@ -1,0 +1,1 @@
+../../../star/test_suite/cburn_inward/README.rst

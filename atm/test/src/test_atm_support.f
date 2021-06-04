@@ -104,6 +104,7 @@ contains
        M = Msun
        R = Rsun
        L = Lsun
+       Teff = atm_Teff(L, R)
     end if
 
     Z = 0.02d0
@@ -243,6 +244,7 @@ contains
        M = 1.9892000000000002D+32
        R = 6.3556231577545586D+10
        L = 2.4015399190199118D+32
+       Teff = atm_Teff(L, R)
 
        kap_guess = 5.8850802481174469D-02
 
@@ -425,8 +427,7 @@ contains
 
     real(dp) :: T, P, Prad, Pgas, logPgas, rho
     real(dp) :: logRho, dlnRho_dlnPgas, dlnRho_dlnT
-    real(dp), dimension(num_eos_basic_results) :: &
-         dres_dabar, dres_dzbar
+    real(dp), dimension(num_eos_d_dxa_results, species) :: dres_dxa
 
     T = exp(lnT)
     P = exp(lnP)
@@ -436,11 +437,11 @@ contains
     logPgas = log10(Pgas)
 
     call eosPT_get( &
-         eos_handle, Z, X, abar, zbar, &
+         eos_handle, &
          species, chem_id, net_iso, xa, &
          Pgas, logPgas, T, lnT/ln10, &
          Rho, logRho, dlnRho_dlnPgas, dlnRho_dlnT, &
-         res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, ierr)
+         res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
 
     lnRho = logRho*ln10
 

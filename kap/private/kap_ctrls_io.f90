@@ -76,7 +76,8 @@
    logical :: show_info
 
    ! hooks
-   logical :: use_other_elect_cond_opacity, use_other_compton_opacity
+   logical :: use_other_elect_cond_opacity, &
+      use_other_compton_opacity, use_other_radiative_opacity
 
    ! debugging
    logical :: dbg
@@ -129,7 +130,9 @@
 
       show_info, &
 
-      use_other_elect_cond_opacity, use_other_compton_opacity, &
+      use_other_elect_cond_opacity, &
+      use_other_compton_opacity, &
+      use_other_radiative_opacity, &
 
       read_extra_kap_inlist1, extra_kap_inlist1_name, &
       read_extra_kap_inlist2, extra_kap_inlist2_name, &
@@ -430,6 +433,7 @@
 
       rq% use_other_elect_cond_opacity = use_other_elect_cond_opacity
       rq% use_other_compton_opacity = use_other_compton_opacity
+      rq% use_other_radiative_opacity = use_other_radiative_opacity
 
    end subroutine store_controls
 

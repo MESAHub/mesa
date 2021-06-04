@@ -36,20 +36,21 @@
       
       contains
       
+      ! star_utils:set_phot_info sets s% Teff before this is called
+      ! see hydro_vars:set_Teff_info_for_eqns
       
       subroutine null_other_surface_PT(id, &
             skip_partials, &
-            Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+            lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
          use const_def, only: dp
          !use star_lib, only: star_get_surf_PT
          integer, intent(in) :: id
          logical, intent(in) :: skip_partials
-         real(dp), intent(out) :: Teff, &
+         real(dp), intent(out) :: &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
-         Teff = 0
          lnT_surf = 0
          dlnT_dL = 0
          dlnT_dlnR = 0

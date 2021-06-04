@@ -163,13 +163,9 @@
       !pp
       !cno
       !tri_alfa
-      !c12_alfa
-      !n14_alfa
-      !o16_alfa
 
    ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
       
-      !rpp
 
 
       
