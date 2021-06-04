@@ -115,7 +115,10 @@ not the ``star_info`` structure.  Therefore, in ``extras_controls``,
 the procedure pointer statement should look like ``s% eos_rq %
 other_eos_results => my_other_eos_results``.  The boolean option
 ``use_other_eos_results`` controlling whether to use the hook is part
-of the ``eos`` namelist rather than ``controls``.
+of the ``eos`` namelist rather than ``controls``.  For the first
+required argument ``handle``, pass ``s% eos_handle``.  This ensures
+that the routine uses the same configuration options as other calls
+from star to the eos module.
 
 The hook ``other_eos_component`` allows the user to replace all or
 part of the MESA EOS by providing a new component EOS and to control
@@ -155,7 +158,7 @@ the blended opacity.
          kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
 
          ! INPUT
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
@@ -194,7 +197,10 @@ is part of the ``Kap_General_Info`` structure and not the
 procedure pointer statement should look like ``s% kap_rq %
 other_elect_cond_opacity => my_routine``.  The boolean option
 ``use_other_elect_cond_opacity`` controlling whether to use the hook
-is part of the ``kap`` namelist rather than ``controls``.
+is part of the ``kap`` namelist rather than ``controls``.  For the
+first required argument ``handle``, pass ``s% kap_handle``.  This
+ensures that the routine uses the same configuration options as other
+calls from star to the kap module.
 
 
 neu

@@ -36,7 +36,7 @@ module kap_def
         zbar, logRho, logT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
-        integer, intent(in) :: handle ! kap handle
+        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
         real(dp), intent(in) :: logRho ! the density
         real(dp), intent(in) :: logT ! the temperature
@@ -52,7 +52,7 @@ module kap_def
         eta, d_eta_dlnRho, d_eta_dlnT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
-        integer, intent(in) :: handle ! kap handle
+        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: Rho, T
         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
         ! free_e := total combined number per nucleon of free electrons and positrons
@@ -68,7 +68,7 @@ module kap_def
         X, Z, XC, XN, XO, XNe, logRho, logT, &
         frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
-        integer, intent(in) :: handle ! kap handle
+        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
         real(dp), intent(in) :: logRho ! density
         real(dp), intent(in) :: logT ! temperature

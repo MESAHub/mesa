@@ -123,8 +123,8 @@
          use eos_def
          use eosDT_eval, only: Get_eosDT_Results
          use chem_lib, only: basic_composition_info
-         integer, intent(in) :: handle         
-         integer, intent(in) :: species
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
          real(dp), intent(in) :: xa(:) ! mass fractions         
@@ -170,11 +170,11 @@
 
          ! INPUT
          
-         integer, intent(in) :: handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
          
          integer, intent(in) :: which_eos ! see eos_def: i_eos_<component>
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos         
@@ -272,9 +272,9 @@
 
          ! INPUT
 
-         integer, intent(in) :: handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
@@ -651,9 +651,9 @@
          use eos_def
          use eosDT_eval, only : get_T
 
-         integer, intent(in) :: handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
@@ -731,9 +731,9 @@
          use eos_def
          use eosDT_eval, only : get_Rho
 
-         integer, intent(in) :: handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
@@ -820,9 +820,9 @@
          use eos_def
          use eosPT_eval, only : get_T
 
-         integer, intent(in) :: handle
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species
+         integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
