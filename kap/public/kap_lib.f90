@@ -165,7 +165,7 @@
          use kap_def, only : kap_is_initialized, Kap_General_Info, num_kap_fracs, i_frac_Type2
          use kap_eval, only : Get_kap_Results
          ! INPUT
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
@@ -236,7 +236,7 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use condint, only: do_electron_conduction
          use kap_def, only : kap_is_initialized, Kap_General_Info
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: logRho ! the density
          real(dp), intent(in) :: logT ! the temperature
@@ -270,7 +270,7 @@
          kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_eval, only: Compton_Opacity
          use kap_def, only : kap_is_initialized, Kap_General_Info
-         integer, intent(in) :: handle ! kap handle
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
          real(dp), intent(in) :: Rho, T
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
@@ -308,7 +308,7 @@
          use kap_def, only : kap_is_initialized, Kap_General_Info
 
          ! INPUT
-         integer, intent(in) :: handle ! kap handle
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
          real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
          real(dp), intent(in) :: logRho ! density
          real(dp), intent(in) :: logT ! temperature
@@ -347,7 +347,7 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
          use kap_eval, only: combine_rad_with_conduction
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: logRho ! the density
          real(dp), intent(in) :: logT ! the temperature

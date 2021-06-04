@@ -41,7 +41,7 @@
             zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             use const_def, only: dp
-            integer, intent(in) :: handle ! kap handle
+            integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
             real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
             real(dp), intent(in) :: logRho ! the density
             real(dp), intent(in) :: logT ! the temperature

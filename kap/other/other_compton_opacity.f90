@@ -42,7 +42,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             use const_def, only: dp
-            integer, intent(in) :: handle ! kap handle
+            integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
             real(dp), intent(in) :: Rho, T
             real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
