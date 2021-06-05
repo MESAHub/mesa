@@ -194,6 +194,12 @@ This test suite example builds a Type IIp supernova model, including Rayleigh-Ta
 This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 Msun, Z=0.02 metallicity, model.
 
 
+:ref:`custom_colors`
+^^^^^^^^^^^^^^^^^^^^
+
+This test suite example shows how to use user-defined color filter and extinction files.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
