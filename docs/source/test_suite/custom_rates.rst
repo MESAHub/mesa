@@ -1,0 +1,1 @@
+../../../star/test_suite/custom_rates/README.rst

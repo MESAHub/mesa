@@ -199,6 +199,10 @@ This test suite example checks angular momentum conservation from the zero age m
 
 This test suite example shows how to use user-defined color filter and extinction files.
 
+:ref:`custom_rates`
+^^^^^^^^^^^^^^^^^^^
+
+This test suite case checks the use of custom nuclear reaction rates in an accreting 0.3 Msun helium white dwarf model.
 
 
 :ref:`c13_pocket`
