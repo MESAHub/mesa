@@ -210,6 +210,11 @@ This test suite case checks the use of custom nuclear reaction rates in an accre
 
 This test suite case checks that element diffusion produces a sufficiently smooth Brunt profile.
 
+:ref:`extended_convective_penetration`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the implementation of the extended convective penetration prescription for core boundary mixing.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
