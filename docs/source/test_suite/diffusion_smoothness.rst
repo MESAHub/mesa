@@ -1,0 +1,1 @@
+../../../star/test_suite/diffusion_smoothness/README.rst

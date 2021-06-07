@@ -205,6 +205,12 @@ This test suite example shows how to use user-defined color filter and extinctio
 This test suite case checks the use of custom nuclear reaction rates in an accreting 0.3 Msun helium white dwarf model.
 
 
+:ref:`diffusion_smoothness`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite case checks that element diffusion produces a sufficiently smooth Brunt profile.
+
+
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
 
