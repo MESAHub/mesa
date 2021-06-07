@@ -39,6 +39,8 @@ Documentation
 
 - A release notes document should be written
 
+- The release branch or tag should be added to the `list of active versions on ReadTheDocs <https://readthedocs.org/projects/mesa-doc/versions/>`__.
+
 
 Testing
 -------
