@@ -6,3 +6,7 @@
 *.txz filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
 *.mod filter=lfs diff=lfs merge=lfs -text
+
+*.inc linguist-langauge=Fortran
+*inlist* linguist-langauge=Fortran
+*.mod linguist-generated
