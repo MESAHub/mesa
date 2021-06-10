@@ -216,6 +216,12 @@ This test suite case checks that element diffusion produces a sufficiently smoot
 This test case checks the implementation of the extended convective penetration prescription for core boundary mixing.
 
 
+:ref:`gyre_in_mesa_bcep`
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the implementation of GYRE in MESA for a beta Cephei model.
+
+
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
 
