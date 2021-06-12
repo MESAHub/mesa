@@ -249,6 +249,11 @@ a slowly pulsating B-type star (SPB) stellar model.
 
 This test case checks the implementation of GYRE in MESA for a cooling 0.85 Msun white dwarf model.
 
+:ref:`high_mass`
+^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of a 300 Msun, Z = 1e-4 metallicity, model through core hydrogen depletion.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
