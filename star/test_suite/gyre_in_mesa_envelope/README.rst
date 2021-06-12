@@ -4,7 +4,7 @@
 gyre_in_mesa_envelope
 *********************
 
-This test case checks the implementation of GYRE in MESA for the envelope of beta Cephei model.
+This test case checks the implementation of GYRE in MESA for the envelope of a 12 Msun, Z=0.02 metallicity, model.
 
 This test case has 4 parts.
 
@@ -14,7 +14,7 @@ This test case has 4 parts.
 
 * Part 3 (``inlist_remove_center``) removes cells with a temperature greater than 2e6 K and setting new inner boundary conditions for mass, radius, velocity, and luminosity. This step excises about 11.96 Msun from the model and then run terminates (i.e., no evolution is done).
 
-* Part 4 (``inlist_pulse``) continues the evolution for 5 timesteps. During this evolution the ``run_star_extras.f90`` calls GYRE, processes the GYRE output, and searches for a frequency of 6.2e-5 Hz (62 microHz). Close matches to this target frequency are reported in the terminal:
+* Part 4 (``inlist_pulse``) continues the evolution for 5 timesteps. During this evolution the ``run_star_extras.f90`` calls GYRE, processes the GYRE output, and searches for a p-mode frequency of 6.2e-5 Hz (62 microHz). Close matches to this target frequency are reported in the terminal:
 
 .. code-block:: console
 
