@@ -1,0 +1,1 @@
+../../../star/test_suite/high_mass/README.rst
