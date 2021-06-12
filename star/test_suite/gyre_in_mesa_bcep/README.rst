@@ -4,13 +4,15 @@
 gyre_in_mesa_bcep
 *****************
 
-This test case checks the implementation of GYRE in MESA for a beta Cephei model.
+This test case checks the implementation of GYRE in MESA for a 12 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; 
+a beta Cephei stellar model.
+
 
 This test case has 2 parts.
 
-* Part 1 (``inlist_zams``) builds a 12.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
+* Part 1 (``inlist_zams``) builds a 12 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
 
-* Part 2 (``inlist_gyre_in_mesa_bcep``) continues the evolution until the central hydrogen mass fraction drops below 1e-3. During the evolution the ``run_star_extras.f90`` calls GYRE, processes the GYRE output, and searches for a frequency of 6e-5 Hz (60 microHz). Close matches to this target frequency are reported in the terminal:
+* Part 2 (``inlist_gyre_in_mesa_bcep``) continues the evolution until the central hydrogen mass fraction drops below 1e-3. During the evolution the ``run_star_extras.f90`` calls GYRE, processes the GYRE output, and searches for a p-mode frequency of 6e-5 Hz (60 microHz). Close matches to this target frequency are reported in the terminal:
 
 .. code-block:: console
 

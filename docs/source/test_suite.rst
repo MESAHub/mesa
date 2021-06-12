@@ -219,14 +219,35 @@ This test case checks the implementation of the extended convective penetration 
 :ref:`gyre_in_mesa_bcep`
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case checks the implementation of GYRE in MESA for a beta Cephei model.
+This test case checks the implementation of GYRE in MESA for a 12 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion;
+a beta Cephei stellar model.
 
 
 :ref:`gyre_in_mesa_envelope`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case checks the implementation of GYRE in MESA for the envelope of beta Cephei model.
+This test case checks the implementation of GYRE in MESA for the envelope of a 12 Msun, Z=0.02 metallicity, model.
 
+:ref:`gyre_in_mesa_ms`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the implementation of GYRE in MESA for a 1 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion.
+
+:ref:`gyre_in_mesa_rsg`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the implementation of GYRE in MESA for a 21 Msun, Z=0.02 metallicity, model in the red supergiant regime.
+
+:ref:`gyre_in_mesa_spb`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the implementation of GYRE in MESA for a 5 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; 
+a slowly pulsating B-type star (SPB) stellar model.
+
+:ref:`gyre_in_mesa_wd`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the implementation of GYRE in MESA for a cooling 0.85 Msun white dwarf model.
 
 
 :ref:`c13_pocket`
