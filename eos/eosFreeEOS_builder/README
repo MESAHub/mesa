@@ -13,6 +13,11 @@ following the instructions at freeeos.sourceforge.net. The
 FreeEOS build process has been tested and found to work with the 
 MESA SDK.
 
+You will need to update the file mesa/eos/eosFreeEOS_builder/make/makefile
+
+to point the environment variable FREE_EOS_DIR to your installation
+of the FreeEOS code.  Then run the ./mk script to build the executable.
+
 The controls for the program, free_eos_table, are set mostly in
 the inlist file.  The X and Z values and filenames for different
 tables are given as command line arguments. Run the program
