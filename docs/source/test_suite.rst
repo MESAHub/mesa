@@ -254,6 +254,11 @@ This test case checks the implementation of GYRE in MESA for a cooling 0.85 Msun
 
 This test case checks the evolution of a 300 Msun, Z = 1e-4 metallicity, model through core hydrogen depletion.
 
+:ref:`high_z`
+^^^^^^^^^^^^^
+
+This test case checks the capability of evolving high metallicity models through core helium depletion with a 7 Msun, Z=0.07 metallicity model.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
