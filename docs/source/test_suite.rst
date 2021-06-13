@@ -259,6 +259,11 @@ This test case checks the evolution of a 300 Msun, Z = 1e-4 metallicity, model t
 
 This test case checks the capability of evolving high metallicity models through core helium depletion with a 7 Msun, Z=0.07 metallicity model.
 
+:ref:`hot_cool_wind`
+^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the cool wind, hot wind capability by evolving a 7 Msun, Z=0.02 metallicity model from the zero-age main sequence to core helium depletion.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
