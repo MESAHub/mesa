@@ -264,6 +264,11 @@ This test case checks the capability of evolving high metallicity models through
 
 This test case checks the cool wind, hot wind capability by evolving a 7 Msun, Z=0.02 metallicity model from the zero-age main sequence to core helium depletion.
 
+:ref:`hse_riemann`
+^^^^^^^^^^^^^^^^^^
+
+This test case checks Riemann HLLC solver can hold an envelope model in hydrostatic equilibrium.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
