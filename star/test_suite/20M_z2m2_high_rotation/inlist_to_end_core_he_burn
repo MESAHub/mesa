@@ -117,8 +117,6 @@
 
       use_Ledoux_criterion = .true.
 
-      !okay_to_reduce_gradT_excess = .true.
-      
       alpha_semiconvection = 0d0
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
       
@@ -131,18 +129,6 @@
       overshoot_bdy_loc(1) = 'bottom'
       overshoot_f(1) = 0.01
       overshoot_f0(1) = 0.005
-
-!      overshoot_scheme(2) = 'none'
-!      overshoot_zone_type(2) = 'burn_Z'
-!      overshoot_zone_loc(2) = 'any'
-!      overshoot_bdy_loc(2) = 'top'
-!      
-!      overshoot_scheme(3) = 'exponential'
-!      overshoot_zone_type(3) = 'any'
-!      overshoot_zone_loc(3) = 'any'
-!      overshoot_bdy_loc(3) = 'any'
-!      overshoot_f(3) = 0.01
-!      overshoot_f0(3) = 0.005
 
       min_overshoot_q = 0d0
       overshoot_D_min = 100.0
@@ -164,7 +150,7 @@
       delta_lgT_limit = 0.05d0
 
       delta_lgT_max_limit_only_after_near_zams = .true.
-      !delta_lgT_max_limit_lgT_min = 7 ! 6.5d0
+      delta_lgT_max_limit_lgT_min = 6.5d0
       delta_lgT_max_limit = 0.001     
       delta_lgT_max_hard_limit = 0.01
 
@@ -194,7 +180,7 @@
       delta_dX_div_X_cntr_hard_limit = 0.02d0
       
 ! RELAXED VALUE FOR TEST SUITE
-      dX_nuc_drop_limit = 8.0d-3 ! 2.0d-3
+      dX_nuc_drop_limit = 2.0d-3
 
       dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
       dX_nuc_drop_min_X_limit = 1.0d-3  ! 1.0d-3  default = 1.0d-4
@@ -211,7 +197,7 @@
 ! mesh
       
 ! RELAXED VALUE FOR TEST SUITE
-      mesh_delta_coeff = 1.8 ! 1.0
+      mesh_delta_coeff = 1.0
 
       max_allowed_nz = 400000
       min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
@@ -228,22 +214,13 @@
       scale_max_correction = 0.1d0
       ignore_species_in_max_correction = .true.
       
-      
-      use_dedt_form_of_energy_eqn = .true.
-      
-      !always_use_eps_grav_form_of_energy_eqn = .true.
-      !always_use_dedt_form_of_energy_eqn = .true.
-      
-      
-      
+      use_dedt_form_of_energy_eqn = .true.      
       include_composition_in_eps_grav = .true.
-      convergence_ignore_equL_residuals = .true. 
-      ignore_too_large_correction = .true.
+      convergence_ignore_equL_residuals = .false. 
+      ignore_too_large_correction = .false.
       warn_rates_for_high_temp = .true.
       max_safe_logT_for_rates = 10.5d0
       
-      make_gradr_sticky_in_solver_iters = .true.
-
 
       !Pextra_factor = 1 ! for atm
       Pextra_factor = 1d2 ! for atm
