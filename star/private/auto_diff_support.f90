@@ -109,6 +109,15 @@
          dxtra2_p1 = var%d1Array(i_xtra2_p1)
       end subroutine unwrap
 
+      subroutine unwrap_composition(var, species, d_dxa)
+         type(auto_diff_real_star_order1), intent(in) :: var
+         integer, intent(in) :: species
+         real(dp), intent(out) :: d_dxa(species)
+
+         !!! DO STUFF !!!
+
+      end subroutine unwrap_composition
+
       subroutine wrap(var, val, &
             dlnd_m1, dlnd_00, dlnd_p1, &
             dlnT_m1, dlnT_00, dlnT_p1, &
