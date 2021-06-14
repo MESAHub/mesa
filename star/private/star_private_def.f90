@@ -82,6 +82,12 @@
          auto_diff_star_d1_names(i_xtra2_m1) = 'i_xtra2_m1'
          auto_diff_star_d1_names(i_xtra2_00) = 'i_xtra2_00'
          auto_diff_star_d1_names(i_xtra2_p1) = 'i_xtra2_p1'
+         auto_diff_star_d1_names(i_xtra3_m1) = 'i_xtra3_m1'
+         auto_diff_star_d1_names(i_xtra3_00) = 'i_xtra3_00'
+         auto_diff_star_d1_names(i_xtra3_p1) = 'i_xtra3_p1'
+         auto_diff_star_d1_names(i_xtra4_m1) = 'i_xtra4_m1'
+         auto_diff_star_d1_names(i_xtra4_00) = 'i_xtra4_00'
+         auto_diff_star_d1_names(i_xtra4_p1) = 'i_xtra4_p1'
 
          termination_code_str(1:num_termination_codes) = ''
 

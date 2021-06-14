@@ -285,7 +285,13 @@
       integer, parameter :: i_xtra2_m1 = 25
       integer, parameter :: i_xtra2_00 = 26
       integer, parameter :: i_xtra2_p1 = 27
-      integer, parameter :: auto_diff_star_num_vars = i_xtra2_p1
+      integer, parameter :: i_xtra3_m1 = 28
+      integer, parameter :: i_xtra3_00 = 29
+      integer, parameter :: i_xtra3_p1 = 30
+      integer, parameter :: i_xtra4_m1 = 31
+      integer, parameter :: i_xtra4_00 = 32
+      integer, parameter :: i_xtra4_p1 = 33
+      integer, parameter :: auto_diff_star_num_vars = i_xtra4_p1
       character (len=128) :: auto_diff_star_d1_names(auto_diff_star_num_vars)
       
 
