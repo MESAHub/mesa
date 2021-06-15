@@ -49,7 +49,7 @@
 
          type(auto_diff_real_4var_order1) :: a_m1, a_00, a_p1
          type(auto_diff_real_4var_order1) :: da00, flux00, dap1, fluxp1, RTI_D, A_plus_B_div_rho
-         type(auto_diff_real_4var_order1) :: source_minus, source_plus, dadt_source
+         type(auto_diff_real_4var_order1) :: source_minus, source_plus, dadt_source, dadt_actual
          type(auto_diff_real_4var_order1) :: dadt_mix, dadt_expected, resid
 
          integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk
@@ -57,7 +57,7 @@
          logical :: okay
          real(dp) :: &
             dq, dm, dr, d_dadt_mix_dap1, sig00, sigp1, &
-            eqn_scale, dPdr_drhodr, instability2, instability, RTI_B, ds, dadt_actual, &
+            eqn_scale, dPdr_drhodr, instability2, instability, RTI_B, ds, &
             r00, rp1, ravg_start, dP, drho, rho, rmid, cs, fac
          logical :: test_partials
 
@@ -156,7 +156,12 @@
          dadt_source = source_plus - source_minus
 
          dadt_expected = dadt_mix + dadt_source
+
+         ! We use dxh to avoid subtraction errors.
+         ! At least that's what I assume. I just preserved this
+         ! choice when re-writing it... - Adam S. Jermyn 6/15/2021
          dadt_actual = s% dxh_alpha_RTI(k)/s% dt
+         dadt_actual%d1val1 = 1d0 / s% dt
 
          eqn_scale = max(1d0, s% x_scale(i_dalpha_RTI_dt,k)/s% dt)
          resid = (dadt_expected - dadt_actual)/eqn_scale
