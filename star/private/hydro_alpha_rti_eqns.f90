@@ -161,7 +161,7 @@
          ! At least that's what I assume. I just preserved this
          ! choice when re-writing it... - Adam S. Jermyn 6/15/2021
          dadt_actual = s% dxh_alpha_RTI(k)/s% dt
-         dadt_actual%d1val1 = 1d0 / s% dt
+         dadt_actual%d1val2 = 1d0 / s% dt
 
          eqn_scale = max(1d0, s% x_scale(i_dalpha_RTI_dt,k)/s% dt)
          resid = (dadt_expected - dadt_actual)/eqn_scale
