@@ -1,0 +1,1 @@
+../../../star/test_suite/irradiated_planet/README.rst
