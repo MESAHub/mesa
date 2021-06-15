@@ -51,6 +51,17 @@ descend from examples presented in MESA instrument papers.
 Anatomy of a test
 -----------------
 
+.. note::
+
+   If you want to add a new test case, the first step is to understand
+   the layout and motivation of the standard tests, as described in
+   this section.  As a starting point, a simple template exists at
+   ``star/test_suite/test_case_template`` (and the example files
+   rendered below are contained therein).  For more complex
+   situations, you may want to take inspiration from existing test
+   cases.
+
+
 In the test case directory 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -81,6 +92,28 @@ of saved models (which must be included in the test case).
 
 It is essential to make use of ``test_suite_helpers`` as this ensures
 that important information is produced in a TestHub-friendly format.
+
+Similarly, it is essential that the ``run_star_extras`` in the test
+suite case use the ``test_suite_extras`` (see
+``star/job/test_suite_extras_def.inc`` and
+``star/job/test_suite_extras.inc``).  The calls to these hooks (see below)
+generate the necessary information for the :ref:`developing/test_suite:MESA Test Hub`.
+
+.. literalinclude:: ../../../star/test_suite/test_case_template/src/run_star_extras.f90
+   :language: fortran
+   :start-at: subroutine extras_startup
+   :end-at: end subroutine extras_startup
+   :emphasize-lines: 9
+
+.. literalinclude:: ../../../star/test_suite/test_case_template/src/run_star_extras.f90
+   :language: fortran
+   :start-at: subroutine extras_after_evolve
+   :end-at: end subroutine extras_after_evolve
+   :emphasize-lines: 9
+
+
+Properties of a good test
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A test case must not write to stderr.  The presence of output on
 stderr will cause the test to be classified as a failure.  This
@@ -128,12 +161,20 @@ this string is present in the test output, the test scripts will
 consider the test a success and no further checks will be performed.
 
 
+README
+~~~~~~
+
+.. include:: ../../../star/test_suite/test_case_template/README.rst
+    :start-line: 6
+
+
+
 In the test suite directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The existence of a sub-directory in ``test_suite`` is not sufficient
-to tell MESA to perform a given test.  The master list of tests lives
-in the file ``test_suite/do1_test_source``.  This has an a series of
+to tell MESA to perform a given test.  The list of tests associated with each module
+lives in the file ``test_suite/do1_test_source``.  This has an a series of
 entries like::
 
   do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" x300
@@ -151,24 +192,11 @@ The photo filename argument permits the special value ``skip`` which causes this
 Once an entry in ``do1_test_source`` has been added, the test can be
 run as described in `Running Tests`_.
 
-Documenting a test
-------------------
-
-Files documenting the test suite exist in two places.  Look to
-existing test cases for detailed examples.  (Currently
-:ref:`conductive_flame` is set up this way.)
-
-In the test case directory
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. include:: ../../../star/test_suite/test_case_template/README.rst
-    :start-line: 6
-
 
 In the docs directory
 ^^^^^^^^^^^^^^^^^^^^^
 
-Once the ``README.rst`` file is created, a link in ``docs/source/test_suite`` should be created.
+Once the ``README.rst`` file is created, a link in ``docs/source/test_suite`` should be created so that it will be rendered as part of the documentation.
 
 .. code-block:: sh
 
