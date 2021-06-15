@@ -269,6 +269,11 @@ This test case checks the cool wind, hot wind capability by evolving a 7 Msun, Z
 
 This test case checks Riemann HLLC solver can hold an envelope model in hydrostatic equilibrium.
 
+:ref:`irradiated_planet`
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of an ~1 Mjup model after the surface has been irradiated.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
