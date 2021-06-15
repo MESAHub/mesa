@@ -46,9 +46,9 @@
 / ! end of star_job namelist
 
 &eos
-/ ! end of eos namelist
 use_Skye = .false.
-use_PC = .true.
+/ ! end of eos namelist
+
 &kap
       kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
       kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
