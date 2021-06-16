@@ -47,11 +47,16 @@
          !first_f_ov = 3.2224814914682473D-02
          
          ! with FreeEOS and mlt_Pturb_factor = 1 (as of 14074)
-         first_FeH = 1.0007243045561423D-01
-         first_Y = 2.7667462644664598D-01
-         first_alpha = 1.9346881828483404D+00
-         first_f_ov = 3.2322561125087565D-02
-      
+         ! first_FeH = 1.0007243045561423D-01
+         ! first_Y = 2.7667462644664598D-01
+         ! first_alpha = 1.9346881828483404D+00
+         ! first_f_ov = 3.2322561125087565D-02
+
+         first_FeH = 0.0971914841d0
+         first_Y = 0.2766011029d0
+         first_alpha = 1.9328813396d0
+         first_f_ov = 0.0319201826d0
+
          vary_FeH = .true. ! FeH = [Fe/H] = log10((Z/X)/Z_div_X_solar)
          min_FeH = 0.09
          max_FeH = 0.11

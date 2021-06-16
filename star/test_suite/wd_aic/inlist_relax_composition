@@ -18,6 +18,12 @@
 
 / !end of star_job namelist
 
+&kap
+    use_Type2_opacities = .true.
+    Zbase = 0.00
+/ ! end of kap namelist
+
+
 &controls
 
   ! new composition
@@ -35,9 +41,6 @@
     use_gold_tolerances = .false.
     max_abs_rel_run_E_err = 1d99
     
-  ! opacities
-    use_simple_es_for_kap = .true.
-
   ! relax timestep
     varcontrol_target = 1e-3
 

@@ -15,8 +15,8 @@
 / !end of star_job namelist
 
 &kap
+    use_Type2_opacities = .true.
     Zbase = 0.02
-      use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
@@ -28,8 +28,6 @@
   ! use eps_grav form
     use_dedt_form_of_energy_eqn = .false.
     use_gold_tolerances = .true.
-
-  ! opacities
 
   ! when to stop
     log_center_density_limit = 9.45

@@ -32,8 +32,8 @@ module skye
          ! Blend parameters
          real(dp) :: big
          real(dp) :: skye_blend_width
-         integer, parameter :: num_points = 7
-         real(dp) :: bounds(7,2)
+         integer, parameter :: num_points = 8
+         real(dp) :: bounds(8,2)
          type (Helm_Table), pointer :: ht
 
          ierr = 0
@@ -43,34 +43,40 @@ module skye
          big = 12d0
          skye_blend_width = 0.1d0
 
-         ! Top-left of (rho,T) plane
+         ! Avoid catastrophic loss of precision in HELM tables
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = ht% logthi
+         bounds(1,2) = 8.3d0 
 
-         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~10)
+         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~1).
+         ! We put a lower bound of logT=7.3 to ensure that solar models never use Skye.
+         ! This is because the blend even in regions that are 99+% ionized produces noticeable
+         ! kinks in the sound speed profile on a scale testable by the observations.
          bounds(2,1) = ht% logdlo
-         bounds(2,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
-
-         ! Divert to higher temperature because there's a large offset between SCVH/CMS and Skye
-         ! in lnE.
-         bounds(3,1) = -2d0
-         bounds(3,2) = max(5.7d0,log10(1d4 * pow2(zbar))) + skye_blend_width
+         bounds(2,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
-         bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
-         bounds(4,2) = max(6d0,log10(1d4 * pow2(zbar))) + skye_blend_width
+         bounds(3,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(3,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! HELM low-T bound
-         bounds(5,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
-         bounds(5,2) = ht% logtlo
+         bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(4,2) = ht% logtlo
 
          ! Lower-right of (rho,T) plane
-         bounds(6,1) = ht% logdhi
-         bounds(6,2) = ht% logtlo
+         bounds(5,1) = ht% logdhi
+         bounds(5,2) = ht% logtlo
 
          ! Upper-right of (rho,T) plane
-         bounds(7,1) = ht% logdhi
-         bounds(7,2) = ht% logthi
+         bounds(6,1) = ht% logdhi
+         bounds(6,2) = ht% logthi
+
+         ! Avoid catastrophic loss of precision in HELM tables
+         bounds(7,1) = 3d0 * ht% logthi + log10(abar * mp * crad / (3d0 * kerg * (zbar + 1d0))) - 6d0
+         bounds(7,2) =  ht% logthi
+
+         ! Avoid catastrophic loss of precision in HELM tables
+         bounds(8,1) = 3d0 * 8.3d0 + log10(abar * mp * crad / (3d0 * kerg * (zbar + 1d0))) - 6d0
+         bounds(8,2) = 8.3d0
 
          ! Set up auto_diff point
          p(1) = logRho
@@ -263,6 +269,7 @@ module skye
          use const_def, only: dp
          use utils_lib, only: is_bad
          use chem_def, only: chem_isos
+         use ion_offset, only: compute_ion_offset
          use skye_ideal
          use skye_coulomb
          use skye_thermodynamics
@@ -346,6 +353,8 @@ module skye
 
          ! Ideal ion free energy, only depends on abar
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
+
+         F_ideal_ion = F_ideal_ion + compute_ion_offset(relevant_species, select_xa, chem_id) ! Offset so ion ground state energy is zero.
 
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
