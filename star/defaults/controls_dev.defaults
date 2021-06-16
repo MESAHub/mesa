@@ -13,8 +13,8 @@
       ! Things related to TDC
       ! ::
 
-      max_dt_div_tau_conv_for_TDC = -1d99
-      max_dt_years_for_TDC = -1d99
+      max_dt_div_tau_conv_for_TDC = 1d99
+      max_dt_years_for_TDC = 1d99
    
       alpha_TDC_DAMP = 1d0
       alpha_TDC_DAMPR = 0d0
