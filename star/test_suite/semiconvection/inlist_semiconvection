@@ -6,7 +6,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      load_model_filename = '1.5_zams_a09.mod'     ! from make_zams_high_mass 14618
+      load_model_filename = '1.5_zams_a09.mod'     ! from make_zams_high_mass 14618. New initial model generation should use inlist_to_ZAMS.
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -84,7 +84,7 @@
       threshold_for_smooth_brunt_B = 0.1
           
       xa_central_lower_limit_species(1) = 'h1' ! isotope name as defined in chem_def
-      xa_central_lower_limit(1) = 0.4                   
+      xa_central_lower_limit(1) = 0.38                   
       
       mesh_delta_coeff = 0.5
       max_years_for_timestep = 5d6
@@ -102,9 +102,7 @@
 
 &pgstar
 
-      Grid4_win_flag = .true.
+!      Grid4_win_flag = .true.
       Kipp_mass_max = 0.2 ! (Msun units) negative means use default
-      
-      !Grid4_file_flag = .true.
-
+!      Grid4_file_flag = .true.
 / ! end of pgstar namelist

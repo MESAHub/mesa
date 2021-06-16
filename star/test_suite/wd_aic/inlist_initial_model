@@ -34,9 +34,6 @@
     use_dedt_form_of_energy_eqn = .false.
     use_gold_tolerances = .false.
 
-  ! electron scattering
-    use_simple_es_for_kap = .true.
-
   ! relax timestep
     varcontrol_target = 1e-3
 

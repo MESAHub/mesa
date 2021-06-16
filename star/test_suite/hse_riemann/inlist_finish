@@ -1,10 +1,10 @@
 
 
-&star_job
+&star_job 
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      load_model_filename = 'removed.mod' ! from gyre_in_mesa_envelope, 13830
+      load_model_filename = 'removed.mod' ! from gyre_in_mesa_envelope, 28e905f2
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -59,13 +59,11 @@
       dxdt_nuc_factor = 0d0      
       non_nuc_neu_factor = 0d0
       eps_nuc_factor = 0d0
-
       
       x_logical_ctrl(1) = .false.
 
 ! equation controls
-      use_dPrad_dm_form_of_T_gradient_eqn = .true.
-      
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.      
       use_compression_outer_BC = .true.
 
 ! mixing controls
@@ -85,9 +83,11 @@
       !trace_split_merge_amr = .true.
       
 ! timestep controls
-
+ 
+      use_gold_tolerances = .true.
+      use_gold2_tolerances = .true.
       dt_div_min_dr_div_cs_limit = 5d3
-      varcontrol_target = 1d-3
+      delta_lgL_limit = 1d-2
       
       limit_for_rel_error_in_energy_conservation = 3d-10
       hard_limit_for_rel_error_in_energy_conservation = 3d-7
