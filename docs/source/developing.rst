@@ -14,6 +14,7 @@ Developing MESA
    developing/documentation
    developing/code_style
    developing/tour
+   developing/common_tasks
    developing/debugging
    developing/linters
    developing/plotters
