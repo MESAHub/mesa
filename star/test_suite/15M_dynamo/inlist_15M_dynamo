@@ -36,7 +36,7 @@
          max_model_number = 1000
 
          xa_central_lower_limit_species(1) = 'he4'
-         xa_central_lower_limit(1) = 0.6                       
+         xa_central_lower_limit(1) = 0.7                       
       
          dX_mix_dist_limit = 1d-4 
 
