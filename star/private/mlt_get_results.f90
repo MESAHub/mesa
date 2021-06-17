@@ -404,7 +404,7 @@
             ! 'B' param  C&G 14.81
             Bcubed = (pow2(A)/a0)*(gradr - gradL)   
 
-            if (Bcubed < 0d0) then
+            if (Bcubed <= 0d0) then
                ! Radiative zone, because this means that gradr < gradL
                Zeta = 0d0
             else
@@ -430,7 +430,7 @@
                f1 = pow(f1,one_third)     
                f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
                Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
-               if (Gamma < 0d0) return
+               if (Gamma <= 0d0) return
 
                ! average convection velocity   C&G 14.86b
                conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
