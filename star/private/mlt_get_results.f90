@@ -402,43 +402,46 @@
                A = A_numerator/A_denom   
             end if  
             ! 'B' param  C&G 14.81
-            Bcubed = (pow2(A)/a0)*(gradr - gradL)         
-            ! now solve cubic equation for convective efficiency, Gamma
-            ! a0*Gamma^3 + Gamma^2 + Gamma - a0*Bcubed == 0   C&G 14.82, 
-            ! leave it to Mathematica to find an expression for the root we want      
-            delta = a0*Bcubed               
-            f = -2d0 + 9d0*a0 + 27d0*a0*a0*delta
-            if (f > 1d100) then
-               f0 = f
+            Bcubed = (pow2(A)/a0)*(gradr - gradL)   
+
+            if (Bcubed < 0d0) then
+               ! Radiative zone, because this means that gradr < gradL
+               Zeta = 0d0
             else
-               f0 = pow2(f) + 4d0*(-1d0 + 3d0*a0)*(-1d0 + 3d0*a0)*(-1d0 + 3d0*a0)
-               if (f0 <= 0d0) then
+               ! Convection zone
+
+               ! now solve cubic equation for convective efficiency, Gamma
+               ! a0*Gamma^3 + Gamma^2 + Gamma - a0*Bcubed == 0   C&G 14.82, 
+               ! leave it to Mathematica to find an expression for the root we want      
+               delta = a0*Bcubed               
+               f = -2d0 + 9d0*a0 + 27d0*a0*a0*delta
+               if (f > 1d100) then
                   f0 = f
                else
-                  f0 = sqrt(f0)         
+                  f0 = pow2(f) + 4d0*(-1d0 + 3d0*a0)*(-1d0 + 3d0*a0)*(-1d0 + 3d0*a0)
+                  if (f0 <= 0d0) then
+                     f0 = f
+                  else
+                     f0 = sqrt(f0)         
+                  end if
+               end if
+               f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0  
+               if (f1 <= 0d0) return
+               f1 = pow(f1,one_third)     
+               f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
+               Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
+               if (Gamma < 0d0) return
+               ! average convection velocity   C&G 14.86b
+               conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
+               D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
+               if(Gamma > 0.0_dp) then
+                  !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80
+                  Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
+               else
+                  Zeta = 0d0 ! If Gamma is < 0 then Zeta < 0
                end if
             end if
-            f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0  
-            if (f1 <= 0d0) return
-            f1 = pow(f1,one_third)     
-            f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
-            Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
-            if (Gamma < 0d0) return
-            ! average convection velocity   C&G 14.86b
-            conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
-            D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
-            !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80
             
-            if(Gamma > 0.0_dp .and. Bcubed > 0.0_dp) then
-               Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
-            else if (Gamma < 0.0_dp .and. Bcubed < 0.0_dp) then
-               Zeta = exp(3d0*log(abs(Gamma)) - log(abs(Bcubed))) ! Write this way to avoid log(-1) problems
-                                                                  ! Zeta must be > 0 if both Gamma and Bcubed <0
-                                                                  ! and Gamma^3 < 0 if Gamma < 0
-            else
-               Zeta = 0d0 ! If either Gamma or Bcubed is < 0 then Zeta < 0
-            end if
-
             ! Zeta must be >= 0 and <= 1
             if (is_bad(Zeta%val)) return
             if (Zeta < 0d0) then
