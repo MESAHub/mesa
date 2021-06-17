@@ -73,6 +73,7 @@
             rq, Z, X, abar, zbar, Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
             helm_res, skip, ierr)
+         if (ierr /= 0) return
 
          ! need this call to get dabar_dx, dzbar_dx
          ! might want to pass these in eventually
