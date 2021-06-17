@@ -288,16 +288,6 @@
          d_dlnT_c_Rho(i_gamma3) = helm_res(h_dgam3dt)*T
          d_dlnT_c_Rho(i_eta) = helm_res(h_detat)*T
 
-         if (.false.) then ! testing using mu
-            ! pion ok.  pele ok for logRho large.  pcoul ok.
-            ! egas = eion + eele + epos + ecoul
-               ! ecoul ok. eion ok. eele bad.
-            ! check sele
-            res(i_mu) = helm_res(h_sele)
-            d_dlnRho_c_T(i_mu) = helm_res(h_dsepd)*Rho
-            d_dlnT_c_Rho(i_mu) = helm_res(h_dsept)*T
-         end if
-         
          d_dlnRho_c_T(i_lnE) = helm_res(h_ded)*Rho/energy
          d_dlnT_c_Rho(i_lnE) = helm_res(h_det)*T/energy         
          
