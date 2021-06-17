@@ -187,8 +187,6 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
 
-         t_spindown = 0d0
-
       end subroutine extras_startup
 
       subroutine extras_after_evolve(id, ierr)
