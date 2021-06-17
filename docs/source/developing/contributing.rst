@@ -180,6 +180,16 @@ a merge commit), or ``--ff-only`` (refuse to pull if there are other
 changes) on the command line to override the configured default per
 invocation.
 
+.. note::
+
+   Alternatively, one can select this behavior on a per-branch basis.
+   For example, the following setting will only rebase by default when pulling into ``main``::
+
+       git config branch.main.rebase true
+
+   With this setting alone, doing ``git pull origin main`` on a
+   feature branch would result in a merge commit and not a rebase.
+
 
 If you want to get others' changes, but not immediately update your
 local repository to match that content::
