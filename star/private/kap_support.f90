@@ -427,7 +427,7 @@ contains
           return
        end if
 
-       if (kap_op < 0d0) then
+       if (kap_op <= 0d0) then
          ierr = 1
          return
       end if
