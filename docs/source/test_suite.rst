@@ -285,6 +285,12 @@ This test case checks the evolutions of a 0.8 Msun, Z=1e-4 metallicity model fro
 This test case checks the creation of a 1.05 Mjup, Z=1e-4 metallicity model and its subsequent evolution for 20 billion years.
 
 
+:ref:`make_env`
+^^^^^^^^^^^^^^^
+
+This test case checks the creation and stability of a pure iron neutron star envelope.
+
+
 
 
 :ref:`c13_pocket`
