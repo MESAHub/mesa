@@ -1155,6 +1155,7 @@
                   v = s% v(k) + (s% v(k+1) - s% v(k))*(tau_phot - tau00)/dtau
                end if
                L = s% L(k) + (s% L(k+1) - s% L(k))*(tau_phot - tau00)/dtau
+               L = max(1d0, s% L(1)) ! don't use negative L(1)
                logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
                k_phot = k
                ! don't bother interpolating these.
