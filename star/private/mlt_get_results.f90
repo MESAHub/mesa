@@ -644,12 +644,14 @@
                exit
             end if
 
-            if ((Y_is_positive .and. Q > 0d0) .or. (Q < 0d0 .and. .not. Y_is_positive)) then
-               ! Q(Y) is monotonic so this means Z is a lower-bound.
-               lower_bound_Z = Z
-            else
-               ! Q(Y) is monotonic so this means Z is an upper-bound.
-               upper_bound_Z = Z
+            if (Y_is_positive) then ! Take advantage of monotonicity when we can...
+               if (Q > 0d0) then
+                  ! Q(Y) is monotonic so this means Z is a lower-bound.
+                  lower_bound_Z = Z
+               else
+                  ! Q(Y) is monotonic so this means Z is an upper-bound.
+                  upper_bound_Z = Z
+               end if
             end if
 
             dQdZ = differentiate_1(Q)
