@@ -121,19 +121,9 @@
          logical, intent(out) :: off_table
          integer, intent(out) :: ierr
 
-         real(dp) :: dx_0, err, dvardx
-         logical :: doing_d_dlnd
-         integer :: i_var         
-         
          logical, parameter :: clip_to_table_boundaries = .true.
          
-         real(dp), dimension(nv) :: &
-            res_1, d_dlnd_1, d_dlnT_1, d_dabar_1, d_dzbar_1, &
-            res_2, d_dlnd_2, d_dlnT_2, d_dabar_2, d_dzbar_2 
-         real(dp), dimension(num_helm_results) :: helm_res_1, helm_res_2
-         real(dp) :: logT_ion, logT_neutral, alfa, beta, d_alfa_dlogT, &
-            alfa0, d_alfa0_dlnT, A, d_alfa_dlnT, d_beta_dlnT, AA, dA_dlnT
-         integer :: j
+         real(dp) :: logT_ion, logT_neutral
          logical :: always_skip_elec_pos, always_include_elec_pos, &
             include_radiation
          
