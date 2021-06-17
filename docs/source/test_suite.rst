@@ -279,6 +279,13 @@ This test case checks the evolution of an ~1 Mjup model after the surface has be
 
 This test case checks the evolutions of a 0.8 Msun, Z=1e-4 metallicity model from the pre-main sequence to core hydrogen depletion.
 
+:ref:`make_brown_dwarf`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the creation of a 1.05 Mjup, Z=1e-4 metallicity model and its subsequent evolution for 20 billion years.
+
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
