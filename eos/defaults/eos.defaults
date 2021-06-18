@@ -156,14 +156,10 @@
    ! Therefore, there is no option that completely deactivates HELM.
    ! ::
 
-   max_logRho_neutral_HELM = -1.5d0
-   logT_ion_HELM = 5.0d0
-   logT_neutral_HELM = 4.5d0
    coulomb_temp_cut_HELM = -1d99
    coulomb_den_cut_HELM = -1d99
    include_radiation = .true.
-   always_skip_elec_pos = .false.
-   always_include_elec_pos = .false.
+   include_elec_pos = .true.
 
 
 
