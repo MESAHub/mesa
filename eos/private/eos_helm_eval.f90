@@ -121,19 +121,9 @@
          logical, intent(out) :: off_table
          integer, intent(out) :: ierr
 
-         real(dp) :: dx_0, err, dvardx
-         logical :: doing_d_dlnd
-         integer :: i_var         
-         
          logical, parameter :: clip_to_table_boundaries = .true.
          
-         real(dp), dimension(nv) :: &
-            res_1, d_dlnd_1, d_dlnT_1, d_dabar_1, d_dzbar_1, &
-            res_2, d_dlnd_2, d_dlnT_2, d_dabar_2, d_dzbar_2 
-         real(dp), dimension(num_helm_results) :: helm_res_1, helm_res_2
-         real(dp) :: logT_ion, logT_neutral, alfa, beta, d_alfa_dlogT, &
-            alfa0, d_alfa0_dlnT, A, d_alfa_dlnT, d_beta_dlnT, AA, dA_dlnT
-         integer :: j
+         real(dp) :: logT_ion, logT_neutral
          logical :: always_skip_elec_pos, always_include_elec_pos, &
             include_radiation
          
@@ -288,16 +278,6 @@
          d_dlnT_c_Rho(i_gamma3) = helm_res(h_dgam3dt)*T
          d_dlnT_c_Rho(i_eta) = helm_res(h_detat)*T
 
-         if (.false.) then ! testing using mu
-            ! pion ok.  pele ok for logRho large.  pcoul ok.
-            ! egas = eion + eele + epos + ecoul
-               ! ecoul ok. eion ok. eele bad.
-            ! check sele
-            res(i_mu) = helm_res(h_sele)
-            d_dlnRho_c_T(i_mu) = helm_res(h_dsepd)*Rho
-            d_dlnT_c_Rho(i_mu) = helm_res(h_dsept)*T
-         end if
-         
          d_dlnRho_c_T(i_lnE) = helm_res(h_ded)*Rho/energy
          d_dlnT_c_Rho(i_lnE) = helm_res(h_det)*T/energy         
          

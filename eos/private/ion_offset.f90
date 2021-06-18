@@ -54,7 +54,7 @@ module ion_offset
          ! Compute offset in eV/baryon
          offset = 0d0
          do k=1,species
-            if (Z(k) <= 28) then
+            if (Z(k) <= 28 .and. Z(k) >= 1) then
                offset = offset + ionization_table(Z(k)) * ya(k)
             end if
          end do

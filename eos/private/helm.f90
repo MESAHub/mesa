@@ -411,12 +411,16 @@
          end if
 
 
-         
          if (skip_elec_pos) then
             abar = 1d0 / (1/abar - Xfrac/2)
             zbar = 1d-10 ! don't set it to 0
             ytot1 = 1.0d0/abar
             ye    = ytot1 * zbar
+         end if
+
+         if (abar < 0d0) then
+            ierr = 1
+            return
          end if
 
 !..very neutron rich compositions may need to be bounded, 

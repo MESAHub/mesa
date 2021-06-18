@@ -187,8 +187,6 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
 
-         t_spindown = 0d0
-
       end subroutine extras_startup
 
       subroutine extras_after_evolve(id, ierr)
@@ -293,7 +291,7 @@
 
          other_timestep_limit = keep_going
 
-         if ((j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5)) then
+         if ((j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5) .and. t_spindown > 0d0) then
             ! Only limit the timestep when the star is actually spinning fast.
             dt_limit_ratio = s% x_ctrl(2) * s%dt / t_spindown
          end if
