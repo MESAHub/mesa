@@ -291,6 +291,11 @@ This test case checks the creation of a 1.05 Mjup, Z=1e-4 metallicity model and 
 This test case checks the creation and stability of a pure iron neutron star envelope.
 
 
+:ref:`make_he_wd`
+^^^^^^^^^^^^^^^^^
+
+This test case checks the creation and evolution of a 0.15 Msun helium white dwarf.
+
 
 
 :ref:`c13_pocket`
