@@ -38,7 +38,6 @@
    real(dp) :: Z_all_HELM ! all HELM for Z >= this unless use_FreeEOS
    real(dp) :: logT_all_HELM ! all HELM for lgT >= this
    real(dp) :: logT_low_all_HELM ! all HELM for lgT <= this
-   real(dp) :: logT_ion_HELM, logT_neutral_HELM, max_logRho_neutral_HELM
    real(dp) :: coulomb_temp_cut_HELM, coulomb_den_cut_HELM
 
    ! controls for OPAL_SCVH
@@ -116,7 +115,7 @@
    real(dp) :: logT_min_for_any_Skye, logT_min_for_all_Skye
 
    ! misc
-   logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
+   logical :: include_radiation, include_elec_pos
    logical :: eosDT_use_linear_interp_for_X
    logical :: eosDT_use_linear_interp_to_HELM
    character(len=128) :: eosDT_file_prefix
@@ -156,9 +155,6 @@
       Z_all_HELM, & ! all HELM for Z >= this unless use_FreeEOS
       logT_all_HELM, & ! all HELM for lgT >= this
       logT_low_all_HELM, & ! all HELM for lgT <= this
-      logT_ion_HELM, &
-      logT_neutral_HELM, &
-      max_logRho_neutral_HELM, &
       coulomb_temp_cut_HELM, &
       coulomb_den_cut_HELM, &
       
@@ -247,8 +243,7 @@
 
       ! misc
       include_radiation, &
-      always_skip_elec_pos, &
-      always_include_elec_pos, &
+      include_elec_pos, &
       eosDT_use_linear_interp_for_X, &
       eosDT_use_linear_interp_to_HELM, &
       eosDT_file_prefix, &
@@ -419,9 +414,6 @@
       rq% Z_all_HELM = Z_all_HELM
       rq% logT_all_HELM = logT_all_HELM
       rq% logT_low_all_HELM = logT_low_all_HELM
-      rq% logT_ion_HELM = logT_ion_HELM
-      rq% logT_neutral_HELM = logT_neutral_HELM
-      rq% max_logRho_neutral_HELM = max_logRho_neutral_HELM
       rq% coulomb_temp_cut_HELM = coulomb_temp_cut_HELM
       rq% coulomb_den_cut_HELM = coulomb_den_cut_HELM      
       ! controls for OPAL_SCVH
@@ -505,8 +497,7 @@
 
       ! misc
       rq% include_radiation = include_radiation
-      rq% always_skip_elec_pos = always_skip_elec_pos
-      rq% always_include_elec_pos = always_include_elec_pos
+      rq% include_elec_pos = include_elec_pos
       rq% eosDT_use_linear_interp_for_X = eosDT_use_linear_interp_for_X
       rq% eosDT_use_linear_interp_to_HELM = eosDT_use_linear_interp_to_HELM      
       rq% eosDT_file_prefix = eosDT_file_prefix      
@@ -559,9 +550,6 @@
       Z_all_HELM = rq% Z_all_HELM
       logT_all_HELM = rq% logT_all_HELM
       logT_low_all_HELM = rq% logT_low_all_HELM
-      logT_ion_HELM = rq% logT_ion_HELM
-      logT_neutral_HELM = rq% logT_neutral_HELM
-      max_logRho_neutral_HELM = rq% max_logRho_neutral_HELM
       coulomb_temp_cut_HELM = rq% coulomb_temp_cut_HELM
       coulomb_den_cut_HELM = rq% coulomb_den_cut_HELM      
       ! controls for OPAL_SCVH
@@ -645,8 +633,7 @@
 
       ! misc
       include_radiation = rq% include_radiation
-      always_skip_elec_pos = rq% always_skip_elec_pos
-      always_include_elec_pos = rq% always_include_elec_pos
+      include_elec_pos = rq% include_elec_pos
       eosDT_use_linear_interp_for_X = rq% eosDT_use_linear_interp_for_X
       eosDT_use_linear_interp_to_HELM = rq% eosDT_use_linear_interp_to_HELM      
       eosDT_file_prefix = rq% eosDT_file_prefix      

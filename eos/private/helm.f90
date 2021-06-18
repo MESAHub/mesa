@@ -22,244 +22,34 @@
          T, logT, Rho, logRho, Xfrac, abar_in, zbar_in, &
          coulomb_temp_cut, coulomb_den_cut, helm_res, &
          clip_to_table_boundaries, include_radiation,  &
-         always_skip_elec_pos, always_include_elec_pos, &
-         logT_ion, logT_neutral, off_table, ierr)
+         include_elec_pos, off_table, ierr)
       use eos_def
       use const_def, only: pi, avo
       use utils_lib, only: is_bad
       implicit none
       real(dp), intent(in) :: T, logT, Rho, logRho
-      real(dp), intent(in) :: Xfrac, abar_in, zbar_in, logT_ion, logT_neutral
+      real(dp), intent(in) :: Xfrac, abar_in, zbar_in
       real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
       real(dp), intent(inout) :: helm_res(num_helm_results)
       logical, intent(in) ::  &
          clip_to_table_boundaries, include_radiation,  &
-         always_skip_elec_pos, always_include_elec_pos
+         include_elec_pos
       logical, intent(out) :: off_table
       integer, intent(out) :: ierr
       
       logical :: skip_elec_pos
 
-      real(dp), parameter :: logQ1 = 4d0
-      real(dp), parameter :: logQ2 = 3d0
-      
-      real(dp) :: dx, dy, dlogT, dlogQ, dist, alfa, beta, logQ, P, x, logRho1, logRho2
-      real(dp), dimension(num_helm_results) :: helm_res_alfa, helm_res_beta
-      integer :: i
-      
       include 'formats'
       
       ierr = 0
       off_table = .false.
       
-      logRho1 = logQ1 + 2*logT_neutral - 12
-      logRho2 = logQ2 + 2*logT_neutral - 12
-      
-      ! alfa = 0 for with ele_pos,
-      ! alfa = 1 for without ele_pos,
-      ! otherwise, blend.
-      
-      logQ = logRho - 2*logT + 12
-      
-      if (always_skip_elec_pos) then
-         alfa = 1 ! full off
-      else if (always_include_elec_pos) then
-         alfa = 0 ! full on
-      else if (logT >= logT_ion) then ! above transition
-         alfa = 0 ! full on
-      else if (logT >= logT_neutral) then ! in temperature transition region
-         if (dbg) then
-            write(*,*) 'logT >= logT_neutral'
-            write(*,1) 'logRho1', logRho1
-            write(*,1) 'logRho2', logRho2
-            write(*,1) 'logRho', logRho
-            write(*,1) 'logQ', logQ
-         end if
-         if (logQ >= logQ1) then
-            alfa = 0 ! full on
-         else if (logQ < logQ2) then ! upper edge of region
-            alfa = (logT - logT_ion) / (logT_neutral - logT_ion)
-         else ! corner
-            dlogT = (logT - logT_neutral) / (logT_ion - logT_neutral)
-            dlogQ = (logQ - logQ2) / (logQ1 - logQ2)
-            dist = sqrt(dlogT*dlogT + dlogQ*dlogQ) ! dist from (Q2,T2) corner
-            alfa = max(0d0, 1d0 - dist)
-         end if
-      else ! logT < logT_neutral
-         if (dbg) write(*,*) 'logT < logT_neutral'
-         if (logRho >= logRho1) then
-            alfa = 0 ! full on
-         else if (logRho > logRho2) then
-            alfa = (logRho - logRho1) / (logRho2 - logRho1)
-         else
-            alfa = 1 ! full off
-         end if
-      end if
-      if (dbg) then
-         if (is_bad(alfa)) then
-            write(*,1) 'T', T
-            write(*,1) 'logT', logT
-            write(*,1) 'Rho', Rho
-            write(*,1) 'logRho', logRho
-            write(*,1) 'abar', abar_in
-            write(*,1) 'zbar', zbar_in
-            write(*,*)
-            write(*,1) 'alfa', alfa
-            write(*,*)
-            stop 'debug helm eos'
-         end if
-      end if
-      alfa = max(0d0, min(1d0, alfa))
-      beta = 1d0 - alfa
-      
-      if (beta > 0d0) then ! eval with ele_pos
-         skip_elec_pos = .false.
-         call helmeos2aux( &
-               T, logT, Rho, logRho, Xfrac, abar_in, zbar_in,   &
-               coulomb_temp_cut, coulomb_den_cut, helm_res_beta,  &
-               clip_to_table_boundaries, include_radiation, skip_elec_pos, off_table, ierr)
-         if (off_table) return
-         if (ierr /= 0) then
-         
-            if (.false. .and. T > 3d7 .and. Rho > 1d2)  &
-                  write(*,*) 'retry helmeos2aux without elec_pos: logT logRho', logT, logRho
-         
-            ierr = 0
-            beta = 0d0
-            alfa = 1d0
-            if (.false. .and. T > 1d7 .and. Rho > 1d7) then
-               write(*,*)
-               !write(*,*) 'turn off elec_pos'
-               write(*,1) 'T', T
-               write(*,1) 'logT', logT
-               write(*,1) 'Rho', Rho
-               write(*,1) 'logRho', logRho
-               write(*,1) 'abar', abar_in
-               write(*,1) 'zbar', zbar_in
-               stop
-            end if
-            
-            
-         else if (helm_res_beta(h_stot) <= 0) then
-            if (.not. include_radiation) then
-               helm_res_alfa(h_stot) = 1d-20
-            else
-               ierr = -1
-               if (dbg) then
-                  write(*,1) 'without ele_pos, helm_res_alfa(h_stot)', helm_res_alfa(h_stot)
-                  write(*,1) 'T', T
-                  write(*,1) 'logT', logT
-                  write(*,1) 'Rho', Rho
-                  write(*,1) 'logRho', logRho
-                  write(*,1) 'abar', abar_in
-                  write(*,1) 'zbar', zbar_in
-                  write(*,*) 'skip_elec_pos', skip_elec_pos
-                  write(*,*)
-                  write(*,1) 'stot', helm_res_beta(h_stot)
-                  write(*,1) 'sgas', helm_res_beta(h_sgas)
-                  write(*,1) 'srad', helm_res_beta(h_srad)
-                  write(*,1) 'sion', helm_res_beta(h_sion)
-                  write(*,1) 'sele', helm_res_beta(h_sele)
-                  write(*,1) 'scoul', helm_res_beta(h_scou)
-                  write(*,*)
-                  stop 'debug helm eos'
-               end if
-               return
-            end if
-         end if
-      end if
-      
-      if (alfa > 0d0) then ! eval without ele_pos
-         skip_elec_pos = .true.
-         call helmeos2aux( &
-               T, logT, Rho, logRho, Xfrac, abar_in, zbar_in,   &
-               coulomb_temp_cut, coulomb_den_cut, helm_res_alfa,  &
-               clip_to_table_boundaries, include_radiation, skip_elec_pos, off_table, ierr)
-         if (off_table) return
-         if (ierr /= 0) then
-            if (dbg) then
-               write(*,1) 'failed in helmeos2aux with skip_elec_pos true'
-               stop
-            end if
-            return
-         end if
-         if (helm_res_alfa(h_stot) <= 0) then
-            if (.not. include_radiation) then
-               helm_res_alfa(h_stot) = 1d-20
-            else
-               ierr = -1
-               if (dbg) write(*,1) 'without ele_pos, helm_res_alfa(h_stot)', helm_res_alfa(h_stot)
-               return
-            end if
-         end if
-      end if
-      
-      if (alfa == 1d0) then
-         helm_res = helm_res_alfa
-         return
-      end if
-      
-      if (beta == 1d0) then
-         helm_res = helm_res_beta
-         return
-      end if
-
-      if (dbg) then
-         do i=1,num_helm_results
-            if (is_bad(helm_res_alfa(i))) then
-               write(*,2) 'helm_res_alfa(i)', i, helm_res_alfa(i)
-               write(*,2) 'h_pip', h_pip
-               write(*,2) 'h_pip', h_pip
-               write(*,*)
-               write(*,1) 'T', T
-               write(*,1) 'logT', logT
-               write(*,1) 'Rho', Rho
-               write(*,1) 'logRho', logRho
-               write(*,1) 'abar', abar_in
-               write(*,1) 'zbar', zbar_in
-               write(*,*)
-               write(*,1) 'alfa', alfa
-               write(*,1) 'beta', beta
-               write(*,*)
-               stop 'debug helm eos'
-            end if
-         end do
-         do i=1,num_helm_results
-            if (is_bad(helm_res_beta(i))) then
-               write(*,2) 'helm_res_beta(i)', i, helm_res_beta(i)
-               write(*,2) 'h_pip', h_pip
-               write(*,*)
-               write(*,1) 'T', T
-               write(*,1) 'logT', logT
-               write(*,1) 'Rho', Rho
-               write(*,1) 'logRho', logRho
-               write(*,1) 'abar', abar_in
-               write(*,1) 'zbar', zbar_in
-               write(*,*)
-               write(*,1) 'alfa', alfa
-               write(*,1) 'beta', beta
-               write(*,*)
-               stop 'debug helm eos'
-            end if
-         end do
-      end if
-
-      helm_res = alfa*helm_res_alfa + beta*helm_res_beta
-      ! redo the gammas, etc. to preserve consistency
-      P = helm_res(h_ptot)
-      if (dbg) then
-         write(*,1) 'lgP blend', log10(P)
-         write(*,1) 'lgP with', log10(helm_res_beta(h_ptot))
-         write(*,1) 'lgP skip', log10(helm_res_alfa(h_ptot))
-         write(*,*)
-      end if
-      helm_res(h_chit) = helm_res(h_dpt)*T/P
-      helm_res(h_chid) = helm_res(h_dpd)*rho/P
-      x = helm_res(h_dpt)/(helm_res(h_det)*rho)
-      helm_res(h_gam3) = 1d0 + x
-      helm_res(h_gam1) = helm_res(h_chit)*x + helm_res(h_chid)
-      helm_res(h_nabad) = x/helm_res(h_gam1)
-      helm_res(h_cp) = helm_res(h_cv)*helm_res(h_gam1)/helm_res(h_chid)
+      skip_elec_pos = .not. include_elec_pos
+      call helmeos2aux( &
+         T, logT, Rho, logRho, Xfrac, abar_in, zbar_in,   &
+         coulomb_temp_cut, coulomb_den_cut, helm_res,  &
+         clip_to_table_boundaries, include_radiation, (.not. include_elec_pos), off_table, ierr)
+      if (off_table) return
      
       end subroutine helmeos2
 
@@ -410,13 +200,6 @@
             end if
          end if
 
-
-         if (skip_elec_pos) then
-            abar = 1d0 / (1/abar - Xfrac/2)
-            zbar = 1d-10 ! don't set it to 0
-            ytot1 = 1.0d0/abar
-            ye    = ytot1 * zbar
-         end if
 
          if (abar < 0d0) then
             ierr = 1
