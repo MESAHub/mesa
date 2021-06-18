@@ -569,7 +569,7 @@
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
-         real(dp), parameter :: tolerance = 1d-10
+         real(dp), parameter :: tolerance = 1d-8
          integer, parameter :: max_iter = 100
          include 'formats'
 
@@ -625,11 +625,9 @@
 
          ! Newton's method to find solution Y
          Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
-         Y_is_positive = (Y > 0d0)
          Z = log(abs(Y))
 
-         ! We use the fact that Q(Y) is monotonic to produce iteratively refined bounds on Q.
-         ! This prevents the 
+         ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
          lower_bound_Z = -100d0
          upper_bound_Z = 10d0
          
@@ -656,12 +654,19 @@
             end if
 
             dQdZ = differentiate_1(Q)
+
             if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
                if (report) write(*,2) 'dQdZ', iter, dQdZ%val
                exit
             end if
 
             correction = -Q/dQdz
+            if (abs(correction) < 1d-15) then
+               ! Can't get much more precision than this.
+               converged = .true.
+               exit
+            end if
+
             Z_new = Z + correction
 
             ! If the correction pushes the solution out of bounds then we know
@@ -692,8 +697,8 @@
          if (.not. converged) then
             if (report .or. s% x_integer_ctrl(19) <= 0) then
             !$OMP critical (tdc_crit0)
-               write(*,4) 'failed get_TDC_solution k slvr_iter model', &
-                  k, s% solver_iter, s% model_number
+               write(*,5) 'failed get_TDC_solution k slvr_iter model TDC_iter', &
+                  k, s% solver_iter, s% model_number, iter
                write(*,2) 'Q', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
@@ -723,10 +728,6 @@
             mixing_type = no_mixing
          end if
          if (k > 0) s% tdc_num_iters(k) = iter          
-         if (k==-50) then
-            write(*,3) 'TDC DAMP w Hp w3', k, s% solver_iter, &
-               s% DAMP(k), Af%val, Hp%val, pow3(Af%val)
-         end if
       end subroutine get_TDC_solution
             
 
