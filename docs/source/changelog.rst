@@ -197,6 +197,15 @@ replacement of the EOS should be performed through the other hook.
 The HELM table was updated to a new, larger 100 points per decade
 version.
 
+The HELM-related controls ``logT_ion_HELM``, ``logT_neutral_HELM``, and
+``max_logRho_neutral_HELM`` were removed.  These were used in an
+now-unsupported variant of HELM that blended the normal, fully-ionized
+HELM and a neutral version (which dropped the electron-positron terms).
+
+The HELM-related controls ``always_skip_elec_pos`` and
+``always_include_elec_pos`` were combined in the
+simplified control ``include_elec_pos`` which defaults to ``.true.``.
+
 
 kap
 ~~~

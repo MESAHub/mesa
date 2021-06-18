@@ -222,7 +222,6 @@
          real(dp) :: Z_all_HELM ! all HELM for Z >= this unless eos_use_FreeEOS
          real(dp) :: logT_all_HELM ! all HELM for lgT >= this
          real(dp) :: logT_low_all_HELM ! all HELM for lgT <= this
-         real(dp) :: logT_ion_HELM, logT_neutral_HELM, max_logRho_neutral_HELM
          real(dp) :: coulomb_temp_cut_HELM, coulomb_den_cut_HELM
          
          ! limits for OPAL_SCVH
@@ -301,7 +300,7 @@
          real(dp) :: logT_min_for_any_Skye, logT_min_for_all_Skye
 
          ! misc
-         logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
+         logical :: include_radiation, include_elec_pos
          logical :: eosDT_use_linear_interp_for_X
          logical :: eosDT_use_linear_interp_to_HELM
       
