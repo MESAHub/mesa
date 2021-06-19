@@ -238,22 +238,20 @@
             T, logT, Rho, logRho, X, abar, zbar, &
             coulomb_temp_cut, coulomb_den_cut, helm_res, &
             clip_to_table_boundaries, include_radiation, &
-            always_skip_elec_pos, always_include_elec_pos, &
-            logT_ion, logT_neutral, &
+            include_elec_pos, &
             off_table, ierr)         
          use helm
          real(dp), intent(in) :: T, logT, Rho, logRho, X, abar, zbar, &
-            coulomb_temp_cut, coulomb_den_cut, logT_ion, logT_neutral
+            coulomb_temp_cut, coulomb_den_cut
          real(dp), intent(inout) :: helm_res(:) ! (num_helm_results)
          logical, intent(in) :: clip_to_table_boundaries, include_radiation, &
-            always_skip_elec_pos, always_include_elec_pos
+            include_elec_pos
          logical, intent(out) :: off_table
          integer, intent(out) :: ierr ! 0 means AOK.
          call helmeos2( &
             T, logT, Rho, logRho, X, abar, zbar, coulomb_temp_cut, coulomb_den_cut, &
-            helm_res, clip_to_table_boundaries, include_radiation, &
-            always_skip_elec_pos, always_include_elec_pos, &
-            logT_ion, logT_neutral, off_table, ierr)
+            helm_res, clip_to_table_boundaries, include_radiation, include_elec_pos, &
+            off_table, ierr)
       end subroutine helmeos2_eval
       
       
@@ -554,8 +552,8 @@
       subroutine eos_get_helm_results( &
                X, abar, zbar, Rho, log10Rho, T, log10T, &
                coulomb_temp_cut, coulomb_den_cut, &
-               include_radiation, always_skip_elec_pos, always_include_elec_pos, &
-               logT_ion, logT_neutral, res, ierr)
+               include_radiation, include_elec_pos, &
+               res, ierr)
          ! direct call to the helm eos.  
          ! returns much more info than the standard
 
@@ -578,11 +576,9 @@
             ! provide both if you have them.  
             ! else pass one and set the other to arg_not_provided
 
-         real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut, &
-            logT_ion, logT_neutral
+         real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
 
-         logical, intent(in) :: include_radiation, &
-            always_skip_elec_pos, always_include_elec_pos
+         logical, intent(in) :: include_radiation, include_elec_pos
          
          ! OUTPUT
          
@@ -595,8 +591,8 @@
          call Get_HELM_Results( &
             X, abar, zbar, Rho, log10Rho, T, log10T, &
             coulomb_temp_cut, coulomb_den_cut, &
-            include_radiation, always_skip_elec_pos, always_include_elec_pos, &
-            logT_ion, logT_neutral, res, off_table, ierr)
+            include_radiation, include_elec_pos, &
+            res, off_table, ierr)
               
       end subroutine eos_get_helm_results
       

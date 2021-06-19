@@ -580,7 +580,7 @@
       type Helm_Table
       
          ! controls
-         logical :: with_coulomb_corrections, for_pteh
+         logical :: with_coulomb_corrections
       
          ! sizes of the arrays
          integer :: imax
