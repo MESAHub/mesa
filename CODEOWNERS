@@ -55,18 +55,18 @@ star/test_suite/7M_prems_to_AGB/ @annethoul
 #star/test_suite/accreted_material_j/ 
 star/test_suite/adjust_net/ @rjfarmer
 star/test_suite/black_hole/ @rjfarmer
-#star/test_suite/c13_pocket/ @jschwab
+star/test_suite/c13_pocket/ @jschwab @fxt
 #star/test_suite/carbon_acc/ @jschwab
 #star/test_suite/carbon_kh/ @jschwab
 star/test_suite/cburn_inward/ @rjfarmer @fxt
 star/test_suite/ccsn_IIp/ @rjfarmer @fxt
 #star/test_suite/check_redo/ 
-star/test_suite/conductive_flame/ @jschwab @fxt @rjfarmer
+star/test_suite/conductive_flame/ @fxt @rjfarmer
 star/test_suite/conserve_angular_momentum/ 
 #star/test_suite/create_zahb/
 #star/test_suite/create_zams/
 star/test_suite/custom_colors/ @rjfarmer
-star/test_suite/custom_rates/ @jschwab @evbauer @adamjermyn
+star/test_suite/custom_rates/ @jschwab @evbauer @adamjermyn @fxt
 star/test_suite/dev_high_rot_darkening/ @orlox
 star/test_suite/dev_ppisn/ @orlox @rjfarmer
 star/test_suite/dev_to_cc_12/ @rjfarmer
@@ -83,7 +83,7 @@ star/test_suite/high_mass/ @fxt @rjfarmer
 star/test_suite/high_rot_darkening/ @aarondotter
 #star/test_suite/high_z/ 
 #star/test_suite/hot_cool_wind/
-star/test_suite/hse_riemann/ @fxt @jschwab
+star/test_suite/hse_riemann/ @fxt
 #star/test_suite/irradiated_planet/ 
 star/test_suite/low_z/ @aarondotter
 star/test_suite/magnetic_braking/  @adamjermyn
