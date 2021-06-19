@@ -427,10 +427,15 @@ contains
           return
        end if
 
+       if (is_bad(kap_op)) then
+         ierr = 1
+         return
+       end if
+
        if (kap_op <= 0d0) then
          ierr = 1
          return
-      end if
+       end if
 
        lnkap_op = log(kap_op)
        lnkap_op% d1val1 = dlnkap_op_dlnRho
