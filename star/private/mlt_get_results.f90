@@ -802,7 +802,7 @@
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
          type(auto_diff_real_star_order1), intent(in) :: Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0
-         type(auto_diff_real_tdc) :: Y, Af, xi0, xi1, xi2, J2, Jt
+         type(auto_diff_real_tdc) :: Y, Af, xi0, xi1, xi2, J2, Jt2
 
          Y = convert(Y_in)
 
@@ -812,10 +812,10 @@
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
 
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
-         Jt = sqrt(abs(J2)) * s%dt
+         Jt2 = abs(J2) * pow2(s%dt)
 
          ! Note the '1d-50' here is in cm/s, and is just there to avoid division by zero.
-         if (Jt > 5d1 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
+         if (Jt2 > 3d3 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
             fallback = .true.
          else
             fallback = .false.
