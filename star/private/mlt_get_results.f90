@@ -629,7 +629,7 @@
 
          ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
          lower_bound_Z = -100d0
-         upper_bound_Z = 20d0
+         upper_bound_Z = 20d0 
          
          if (report) write(*,2) 'initial Y', 0, Y%val
          do iter = 1, max_iter
