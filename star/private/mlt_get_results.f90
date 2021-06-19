@@ -950,7 +950,7 @@
             Jt4 = 0.25d0 * Jt
             num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
             den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
-            Af = num / den
+            Af = num / den 
             if (Af < 0d0) then
                Af = -Af
             end if
