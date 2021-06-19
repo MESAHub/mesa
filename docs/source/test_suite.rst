@@ -302,6 +302,12 @@ This test case checks the creation and evolution of a 0.15 Msun helium white dwa
 This test case demonstrates the creation and evolution of 3 Msun model whose initial metallicity is Z = 0.
 
 
+:ref:`make_o_ne_wd`
+^^^^^^^^^^^^^^^^^^^
+
+This test case produces a 1.05 Msun oxygen-neon-magnesium white dwarf using stellar engineering.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
