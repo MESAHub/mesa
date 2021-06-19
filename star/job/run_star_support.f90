@@ -690,6 +690,11 @@
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
          
+         if (is_bad(total_energy_end)) then
+            ierr = 1
+            return
+         end if
+
          if(s% total_energy_end .ne. 0d0) then
             if (abs(s% cumulative_energy_error/s% total_energy_end) > &
                   s% warn_when_large_rel_run_E_err) then
