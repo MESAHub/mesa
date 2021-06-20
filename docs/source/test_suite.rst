@@ -307,6 +307,12 @@ This test case demonstrates the creation and evolution of 3 Msun model whose ini
 
 This test case produces a 1.05 Msun oxygen-neon-magnesium white dwarf using stellar engineering.
 
+:ref:`make_planets`
+^^^^^^^^^^^^^^^^^^^
+
+This test case shows an example of a 1 Mjup model with a 10 Mearth core that is irradiated and evolved for 10Gyr.
+
+
 
 
 :ref:`c13_pocket`
