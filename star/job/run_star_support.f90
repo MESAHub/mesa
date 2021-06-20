@@ -690,7 +690,7 @@
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
          
-         if (is_bad(total_energy_end)) then
+         if (is_bad(s% total_energy_end)) then
             ierr = 1
             return
          end if
