@@ -312,6 +312,11 @@ This test case produces a 1.05 Msun oxygen-neon-magnesium white dwarf using stel
 
 This test case shows an example of a 1 Mjup model with a 10 Mearth core that is irradiated and evolved for 10Gyr.
 
+:ref:`make_sdb`
+^^^^^^^^^^^^^^^
+
+This test case shows an example of making a 0.4 Msun, Z=0.02 metallicity, helium model - a B-type subdwarf (sdB) star.
+
 
 
 
