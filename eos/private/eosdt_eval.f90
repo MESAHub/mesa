@@ -202,6 +202,7 @@
          
          real(dp) :: rho, logRho, T, logT
          logical :: skip, dbg
+         integer :: k
 
          include 'formats'
          
@@ -233,6 +234,19 @@
             ierr = -1
             return
          end if
+
+         if (Z < 0d0 .or. X < 0d0 .or. abar < 0d0 .or. zbar < 0d0) then
+            ierr = 1
+            return
+         end if
+
+         do k=1,species
+            if (xa(k) < 0d0) then
+               ierr = 1
+               return
+            end if
+         end do
+
 
          dbg = rq% dbg
          if (dbg) dbg = & ! check limits
