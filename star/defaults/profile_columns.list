@@ -258,13 +258,28 @@
 
    ! ergs/g/sec for reaction categories
    !add_reaction_categories ! this adds all the reaction categories
-      ! NOTE: you can list specific categories by giving their names (from net_def)
-      ! This will generate columns labeled burn_ELEMENT
-      ! i.e. burn_ar, burn_c, burn_fe etc and also c12_c12, c12_o16 etc
-   !pp
-   !cno
-   !tri_alfa
-
+      ! NOTE: you can list specific categories by giving their names (from chem_def)
+      pp
+      cno
+      tri_alfa
+      !c_alpha
+      !n_alpha
+      !o_alpha
+      !ne_alpha
+      !na_alpha
+      !mg_alpha
+      !si_alpha
+      !s_alpha
+      !ar_alpha
+      !ca_alpha
+      !ti_alpha
+      !fe_co_ni
+      !c12_c12
+      !c12_o16
+      !o16_o16
+      !photo
+      !pnhe4
+      !other    
 
    !burn_num_iters ! Number of split_burn iterations taken
    !burn_avg_epsnuc
