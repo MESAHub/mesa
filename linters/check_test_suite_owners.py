@@ -67,7 +67,7 @@ def not_listed(cases, code):
 # Check number of owners
 def check_owners(code, num=0):
     result=[]
-    for key,value in code:
+    for key,value in code.items():
         if len(value)==num:
             result.append(key)
 
@@ -76,25 +76,23 @@ def check_owners(code, num=0):
         print_options(result)
 
 
+if __name__ == "__main__":
+    star_cases = get_test_cases(STAR)
+    binary_cases = get_test_cases(BINARY)
+    astero_cases = get_test_cases(ASTERO)
 
-star_cases = get_test_cases(STAR)
-binary_cases = get_test_cases(BINARY)
-astero_cases = get_test_cases(ASTERO)
+    codeowner = parse_codeowners(CODEOWNERS)
 
-codeowner = parse_codeowners(CODEOWNERS)
-
-
-
-not_listed(star_cases,codeowner['star'])
-not_listed(binary_cases,codeowner['binary'])
-not_listed(astero_cases,codeowner['astero'])
+    not_listed(star_cases,codeowner['star'])
+    not_listed(binary_cases,codeowner['binary'])
+    not_listed(astero_cases,codeowner['astero'])
 
 
-check_owners(star_cases,codeowner['star'],0)
-check_owners(binary_cases,codeowner['binary'],0)
-check_owners(astero_cases,codeowner['astero'],0)
+    check_owners(codeowner['star'],0)
+    check_owners(codeowner['binary'],0)
+    check_owners(codeowner['astero'],0)
 
 
-check_owners(star_cases,codeowner['star'],1)
-check_owners(binary_cases,codeowner['binary'],1)
-check_owners(astero_cases,codeowner['astero'],1)
+    check_owners(codeowner['star'],1)
+    check_owners(codeowner['binary'],1)
+    check_owners(codeowner['astero'],1)

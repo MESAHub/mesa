@@ -53,3 +53,8 @@ chek_test_suite_onwers.py
 This script checks that each test suite case is listed in CODEOWNERS and
 checks whether each test case has 0 owners (very bad) or just 1 owner
 (less bad but should be fixed).
+
+list_test_owner.py
+------------------
+
+Parses CODEOWNERS and prints the test cases owned by each person.
