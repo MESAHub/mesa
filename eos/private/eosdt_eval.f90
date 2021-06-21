@@ -202,7 +202,7 @@
          
          real(dp) :: rho, logRho, T, logT
          logical :: skip, dbg
-         integer :: k
+         integer :: k,l
 
          include 'formats'
          
@@ -274,6 +274,27 @@
                res, d_dlnd, d_dlnT, d_dxa, ierr)
          end if
          
+         do k=1,num_eos_basic_results
+            if (is_bad(res(k) .or. is_bad(d_dlnd(k)) .or. is_bad(d_dlnT(k))) then
+               ierr = 1
+               return
+            end if
+            do l=1,species
+               if (is_bad(d_dxa(k,l))) then
+                  ierr = 1
+                  return
+               end if
+            end do
+         end do
+
+         if (res(i_grad_ad) < 0d0 .or. res(i_chiRho) < 0d0 .or. res(i_chiT) < 0d0 &
+            .or. res(i_Cp) < 0d0 .or. res(i_Cv) < 0d0 .or. res(i_gamma1) < 0d0 &
+            .or. res(i_gamma2) < 0d0 .or. res(i_gamma3) < 0d0) then
+            ierr = 1
+            return
+         end if
+
+
          if (eos_test_partials) then   
             eos_test_partials_val = abar
             eos_test_partials_dval_dx = 0
