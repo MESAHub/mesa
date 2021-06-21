@@ -248,6 +248,12 @@
             end if
          end do
 
+         if (logT < rq% logT_lo .or. logT > rq% logT_hi .or. &
+               logRho < rq% logRho_lo .or. logRho > rq% logRho_hi) then
+            ierr = 1
+            return
+         end if
+
 
          dbg = rq% dbg
          if (dbg) dbg = & ! check limits
