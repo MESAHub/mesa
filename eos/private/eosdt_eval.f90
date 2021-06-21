@@ -235,13 +235,14 @@
             return
          end if
 
-         if (Z < 0d0 .or. X < 0d0 .or. abar < 0d0 .or. zbar < 0d0) then
+         if (Z < 0d0 .or. X < 0d0 .or. abar < 0d0 .or. zbar < 0d0 &
+            .or. is_bad(Z) .or. is_bad(X) .or. is_bad(abar) .or. is_bad(zbar)) then
             ierr = 1
             return
          end if
 
          do k=1,species
-            if (xa(k) < 0d0) then
+            if (xa(k) < 0d0 .or. is_bad(xa(k))) then
                ierr = 1
                return
             end if
