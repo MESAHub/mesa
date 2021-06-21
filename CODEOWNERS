@@ -123,14 +123,14 @@ star/test_suite/test_memory @rjfarmer
 star/test_suite/timing @rjfarmer
 star/test_suite/T_tau_gradr @warrickball
 star/test_suite/twin_studies
-star/test_suite/wd_acc_small_dm
+star/test_suite/wd_acc_small_dm @wmwolf
 star/test_suite/wd_aic @jschwab
-star/test_suite/wd_c_core_ignition
+star/test_suite/wd_c_core_ignition @wmwolf
 star/test_suite/wd_cool_0.6M @evbauer @fxt
 star/test_suite/wd_diffusion @evbauer
-star/test_suite/wd_he_shell_ignition
-star/test_suite/wd_nova_burst
-star/test_suite/wd_stable_h_burn
+star/test_suite/wd_he_shell_ignition @wmwolf
+star/test_suite/wd_nova_burst @wmwolf
+star/test_suite/wd_stable_h_burn @wmwolf
 
 
 binary/test_suite/double_bh @orlox
