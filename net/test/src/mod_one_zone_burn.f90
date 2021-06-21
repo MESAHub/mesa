@@ -1160,8 +1160,12 @@
                   res, d_dlnRho_const_T, d_dlnT_const_Rho, &
                   d_dxa_const_TRho, ierr)
                   !Pgas, Prad, energy, entropy, ierr)
-               if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-            
+               if (ierr /= 0) then
+                  write(*,*) 'logT=',logT
+                  write(*,*) 'logRho=',logRho
+                  write(*,*) 'x=',x
+                  call mesa_error(__FILE__,__LINE__)
+               end if
             end if
          
             lgPgas = res(i_lnPgas)/ln10
