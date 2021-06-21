@@ -24,7 +24,7 @@ def list_by_author(codeowner):
 
         
     for key,value in result.items():
-        cc.print_section(f'Test cases owned by {key} number {len(value)}')
+        cc.print_section(f'Number of test cases owned by {key} = {len(value)}')
         cc.print_options(value)
 
 
