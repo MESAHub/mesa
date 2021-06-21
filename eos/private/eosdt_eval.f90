@@ -275,7 +275,7 @@
          end if
          
          do k=1,num_eos_basic_results
-            if (is_bad(res(k) .or. is_bad(d_dlnd(k)) .or. is_bad(d_dlnT(k))) then
+            if (is_bad(res(k)) .or. is_bad(d_dlnd(k)) .or. is_bad(d_dlnT(k))) then
                ierr = 1
                return
             end if
