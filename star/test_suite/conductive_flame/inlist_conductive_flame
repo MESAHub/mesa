@@ -47,6 +47,10 @@
 
 &controls
 
+      ! test targets; 10% tolerance
+      x_ctrl(9) = 1.6e7 ! flame speed [cm/s]
+      x_ctrl(10) = 3.5e-5 ! flame width [cm]
+
       warn_when_large_virial_thm_rel_err = 1d99 ! doesn't apply
 
       num_trace_history_values = 2
