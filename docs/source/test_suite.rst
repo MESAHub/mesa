@@ -317,6 +317,20 @@ This test case shows an example of a 1 Mjup model with a 10 Mearth core that is 
 
 This test case shows an example of making a 0.4 Msun, Z=0.02 metallicity, helium model - a B-type subdwarf (sdB) star.
 
+:ref:`make_zams`
+^^^^^^^^^^^^^^^^
+
+This test case shows an example of creating a 4 Msun, Z = 0.01 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
+
+:ref:`make_zams_low_mass`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case shows an example of creating a 0.085 Msun, Z = 0.014 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
+
+:ref:`make_zams_ultra_high_mass`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case shows an example of creating a 250 Msun, Z = 1e-4 metallicity, model close to the main sequence.
 
 
 
