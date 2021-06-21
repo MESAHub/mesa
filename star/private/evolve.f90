@@ -666,6 +666,7 @@
             if (do_step_part2 /= keep_going) return
             ! when reach here, have taken the step successfully
             ! but might not satisfy the implicit mdot requirements.
+
             mdot_action = select_mdot_action(ierr)
             if (failed('select_mdot_action')) return
             if (do_step_part2 /= keep_going) return
@@ -675,7 +676,8 @@
          end do implicit_mdot_loop
 
          s% solver_iter = 0 ! to indicate that no longer doing solver iterations
-         
+         s% okay_to_set_mlt_vc = .false.
+
          if (.not. s% RSP_flag) then
             call set_final_vars(s, dt, ierr)
             if (failed('set_final_vars')) return
