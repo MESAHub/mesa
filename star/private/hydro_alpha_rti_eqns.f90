@@ -88,26 +88,29 @@
             sigp1 = 0
          end if
 
-         ! alpha's
-         a_m1 = s% alpha_RTI(k-1)
-         a_m1%d1val1 = 1d0
          a_00 = s% alpha_RTI(k)
          a_00%d1val2 = 1d0
-         a_p1 = s% alpha_RTI(k+1)
-         a_p1%d1val3 = 1d0
 
-         ! Compute fluxes
+         ! alpha's and fluxes
          if (k > 1) then
+            a_m1 = s% alpha_RTI(k-1)
+            a_m1%d1val1 = 1d0
+
             da00 = a_m1 - a_00
             flux00 = -sig00*da00
          else
+            a_m1 = 0d0
             flux00 = 0d0
          end if
 
          if (k < nz) then
+            a_p1 = s% alpha_RTI(k+1)
+            a_p1%d1val3 = 1d0
+
             dap1 = a_00 - a_p1
             fluxp1 = -sigp1*dap1
          else
+            a_p1 = 0d0
             fluxp1 = 0d0
          end if
 
