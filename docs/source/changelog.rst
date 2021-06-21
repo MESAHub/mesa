@@ -40,6 +40,7 @@ Name changes
   finite-difference-based fix up when on a component EOS that doesn't
   provide composition derivatives.
 
+* The history and profile columns ``burn_*`` where replace with ``*_alpha``.
 
 Removed options
 ~~~~~~~~~~~~~~~

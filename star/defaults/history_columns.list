@@ -265,6 +265,27 @@
       pp
       cno
       tri_alfa
+      !c_alpha
+      !n_alpha
+      !o_alpha
+      !ne_alpha
+      !na_alpha
+      !mg_alpha
+      !si_alpha
+      !s_alpha
+      !ar_alpha
+      !ca_alpha
+      !ti_alpha
+      !fe_co_ni
+      !c12_c12
+      !c12_o16
+      !o16_o16
+      !photo
+      !pnhe4
+      !other
+
+
+
 
    !## nuclear reactions at center
 
