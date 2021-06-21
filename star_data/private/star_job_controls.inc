@@ -19,7 +19,8 @@
       logical :: show_eqns_and_vars_names
 
       logical :: pgstar_flag, save_pgstar_files_when_terminate, &
-         clear_initial_pgstar_history, clear_pgstar_history
+         clear_initial_pgstar_history, clear_pgstar_history, &
+         disable_pgstar_during_relax_flag
 
       logical :: save_photo_when_terminate
       logical :: write_profile_when_terminate
