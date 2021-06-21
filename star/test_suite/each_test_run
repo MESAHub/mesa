@@ -80,9 +80,9 @@ function check_restart {
             testhub_log "mem_re: $(<mem-re.txt)"
         else
             testhub_log "mem_re: -1"
-            #failure_msg "$1 failed: non-zero exit code"
-            #testhub_log "failure_type: :exit_code"
-            #return 1
+            failure_msg "$1 failed: non-zero exit code"
+            testhub_log "failure_type: :exit_code"
+            return 1
         fi
         filter_stderr
         if [ -s err.txt ]; then
@@ -127,9 +127,9 @@ function check_run {
         testhub_log "mem_rn: $(<mem-rn.txt)"
     else
         testhub_log "mem_rn: -1"
-        #failure_msg "$1 failed: non-zero exit code"
-        #testhub_log "failure_type: :exit_code"
-        #return 1
+        failure_msg "$1 failed: non-zero exit code"
+        testhub_log "failure_type: :exit_code"
+        return 1
     fi
     filter_stderr
     if [ -s err.txt ]; then
