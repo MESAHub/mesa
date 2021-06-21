@@ -289,7 +289,7 @@
 
          if (res(i_grad_ad) < 0d0 .or. res(i_chiRho) < 0d0 .or. res(i_chiT) < 0d0 &
             .or. res(i_Cp) < 0d0 .or. res(i_Cv) < 0d0 .or. res(i_gamma1) < 0d0 &
-            .or. res(i_gamma2) < 0d0 .or. res(i_gamma3) < 0d0) then
+            .or. res(i_gamma3) < 0d0) then
             ierr = 1
             return
          end if
