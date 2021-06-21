@@ -34,7 +34,17 @@ material.  This is achieved via the ``use_other_surface_PT`` hook.
 After an initial transient, the entire flame structure, approximately
 isobaric, propagates into the upstream fuel with a unique speed and
 width.  The test succeeds if the flame successfully propagates through
-half of the domain.
+half of the domain and reports values for the flame width and speed
+that are within 10% of the specified reference values (see inlist).
+The flame width and speed are reported to the TestHub.
+
+The flame speed is measured using the time/position when the flame is
+30% of the way through the domain and time/position at the end of the
+test.  The flame width is measured at the end of the test as the width
+over which ``eps_nuc`` is greater than 10% of its peak value.  See
+routine ``flame_properties`` in the ``run_star_extras.f90``.
+
+
 
 .. image:: ../../../star/test_suite/conductive_flame/docs/grid1000427.png
 
@@ -45,5 +55,5 @@ half of the domain.
 .. |Schwab2020| replace:: `Schwab et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...891....5S/abstract>`__
 
 
-Last-Updated: 2021-05-25 (mesa 3ac9bd7d) by Josiah Schwab
+Last-Updated: 2021-06-21 (mesa b2364463) by Josiah Schwab
 
