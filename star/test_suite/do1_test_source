@@ -41,7 +41,7 @@ do_one gyre_in_mesa_rsg "matched target" skip skip
 do_one gyre_in_mesa_spb "matched target" skip skip
 do_one gyre_in_mesa_wd "matched target" skip skip
 
-do_one hb_2M "termination code: xa_central_lower_limit" "final.mod" auto                                 
+do_one hb_2M "all values are within tolerance" "final.mod" auto
 do_one high_mass "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one high_z "stop because have dropped below central lower limit for he4" "final.mod" auto             
 do_one hot_cool_wind "all values are within tolerance" "final.mod" auto                                
