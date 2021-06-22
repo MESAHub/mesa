@@ -622,8 +622,6 @@
                Y = convert(-abs(Y_guess))
             end if
 
-            iter = 0
-
             ! Newton's method to find solution Y
             Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
             Z = log(abs(Y))
@@ -632,10 +630,9 @@
             Q_start = Q
             Y_start = Y
 
-
             ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
             lower_bound_Z = -100d0
-            upper_bound_Z = 25d0 
+            upper_bound_Z = 50d0 
             
             if (report) write(*,2) 'initial Y', 0, Y%val
             do iter = 1, max_iter
@@ -667,7 +664,7 @@
                end if
 
                correction = -Q/dQdz
-               if (abs(correction) < 1d-15) then
+               if (abs(correction) < 1d-13) then
                   ! Can't get much more precision than this.
                   converged = .true.
                   exit
