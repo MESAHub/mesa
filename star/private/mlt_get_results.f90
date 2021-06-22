@@ -571,7 +571,7 @@
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
          real(dp), parameter :: tolerance = 1d-8
-         integer, parameter :: max_iter = 100
+         integer, parameter :: max_iter = 200
          include 'formats'
 
          ierr = 0
