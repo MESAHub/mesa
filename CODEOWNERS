@@ -56,7 +56,7 @@ star/test_suite/accreted_material_j
 star/test_suite/adjust_net @rjfarmer
 star/test_suite/c13_pocket @jschwab @fxt
 star/test_suite/carbon_acc @jschwab
-star/test_suite/carbon_kh @jschwab
+star/test_suite/carbon_kh @jschwab @evbauer
 star/test_suite/cburn_inward @rjfarmer
 star/test_suite/ccsn_IIp @rjfarmer @fxt
 star/test_suite/check_redo 
@@ -93,7 +93,7 @@ star/test_suite/make_co_wd @wmwolf @evbauer @fxt
 star/test_suite/make_env @rjfarmer
 star/test_suite/make_he_wd @evbauer @fxt
 star/test_suite/make_metals @fxt
-star/test_suite/make_o_ne_wd @fxt
+star/test_suite/make_o_ne_wd @fxt @evbauer
 star/test_suite/make_planets @fxt
 star/test_suite/make_sdb @evbauer
 star/test_suite/make_zams @fxt
