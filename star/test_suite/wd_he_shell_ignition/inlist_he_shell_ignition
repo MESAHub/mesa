@@ -135,7 +135,7 @@
 
 		mesh_delta_coeff = 0.8 ! 0.4 !1.2
 
-      varcontrol_target = 1d-2
+      varcontrol_target = 1d-3
       
       super_eddington_scaling_factor = 1
       super_eddington_wind_Ledd_factor = 5
@@ -161,15 +161,15 @@
          ! if true, the code waits for user to enter a RETURN on the command line
 
       Grid8_win_flag = .true.
-      Grid8_win_width = 7
+      Grid8_win_width = 11.5
       Summary_Burn_xaxis_name = 'logxq' 
       Summary_Burn_xaxis_reversed = .true.
       Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
-      Summary_Burn_xmax = -3 ! -101d0 ! only used if /= -101d0
+      Summary_Burn_xmax = 0 ! -101d0 ! only used if /= -101d0
       Abundance_xaxis_name = 'logxq' 
       Abundance_xaxis_reversed = .true.
       Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
-      Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
+      Abundance_xmax = 0 ! -101d0 ! only used if /= -101d0
 
     Text_Summary1_name(5,2) = 'time_step_sec'
     Text_Summary1_name(6,2) = 'max_tau_conv'
