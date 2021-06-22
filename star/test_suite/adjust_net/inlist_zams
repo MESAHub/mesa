@@ -46,6 +46,7 @@
       history_interval = 5
       terminal_interval = 50
    
+      x_integer_ctrl(1) = 1 ! Part number
 
 / ! end of controls namelist
 

@@ -83,6 +83,8 @@
       !photo_interval = 1
       !terminal_interval = 1
 
+      x_integer_ctrl(1) = 2 ! Part number
+
 / ! end of controls namelist
 
 

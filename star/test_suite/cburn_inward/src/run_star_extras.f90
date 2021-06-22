@@ -28,7 +28,10 @@
       use math_lib
       
       implicit none
-      
+
+      ! Tracks quanties when the flame ignited
+      real(dp) :: ign_mass, ign_density, ign_co_core_mass
+
       include "test_suite_extras_def.inc"
 
       
@@ -53,6 +56,10 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+
+         s% other_photo_read => extras_photo_read
+         s% other_photo_write => extras_photo_write
+
       end subroutine extras_controls
       
       
@@ -66,8 +73,9 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
          if (.not. restart) then
-           ! Used to track flame location
-            s% xtra(1) = -1d0
+            ign_mass = -1
+            ign_density = -1
+            ign_co_core_mass = -1
          end if
       end subroutine extras_startup
       
@@ -80,6 +88,25 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+
+         select case (s% x_integer_ctrl(1)) 
+
+         case(2) ! inlist_cburn_inward
+
+            ! Information for testhub
+            testhub_extras_names(1) = 'ign_mass'
+            testhub_extras_names(2) = 'ign_log_density'
+            testhub_extras_names(3) = 'ign_co_core_mass'
+
+            testhub_extras_vals(1) = ign_mass/msun
+            testhub_extras_vals(2) = log10(ign_density)
+            testhub_extras_vals(3) = ign_co_core_mass
+
+         end select
+
+
+
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
       
@@ -151,35 +178,48 @@
          integer, intent(in) :: id
          integer :: ierr, k
          type (star_info), pointer :: s
-         real(dp) :: flame_loc_mass
+         integer :: flame_cell
 
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
+      
          
-        flame_loc_mass = -1
-        ! Check to see if carbon has ignited:
-         do k=1, s% nz
-            if (has_ignited(s, k)) then 
-			   flame_loc_mass = s% m(k) ! Track where the flame is
-            end if
-        end do
-         
-	   ! Store initial flame location 
-        if( s% xtra(1) < 0) s%xtra(1) = flame_loc_mass
+	      ! Store initial flame location 
+         select case (s% x_integer_ctrl(1)) 
 
-        if(flame_loc_mass > 0d0 .and. flame_loc_mass < 0.5d0*s%xtra(1)) then
-           extras_finish_step = terminate
-           write(*,*) "Terminate as flame reached half way" 
-           s% termination_code = t_extras_finish_step
-        end if
+         case(2) ! inlist_cburn_inward
+            flame_cell = -1
+            ! Check to see if carbon has ignited
+             do k=s%nz, 1, -1
+                if (has_ignited(s, k)) then 
+                   flame_cell = k 
+                   exit
+                end if
+            end do
+
+            if(flame_cell>0) then
+               ! Initial flame location
+               if(ign_mass < 0) then
+                  ign_mass = s% m(flame_cell)
+                  ign_density = s% rho(flame_cell)
+                  ign_co_core_mass = s% co_core_mass
+               end if
+
+               ! Final flame location
+               if(ign_mass > 0d0 .and. s% m(flame_cell) < 0.5d0*ign_mass) then
+                  extras_finish_step = terminate
+                  write(*,'(a)') "Terminate as flame reached half way" 
+                  s% termination_code = t_extras_finish_step
+               end if
+            end if
+
+         end select
 
       end function extras_finish_step
       
       
-
-
       logical function has_ignited(s, k)
          use net_def
          use chem_def
@@ -208,6 +248,39 @@
             end if
          end if
       end function has_ignited
+
+      subroutine extras_photo_read(id, iounit, ierr)
+         integer, intent(in) :: id, iounit
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+ 
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+ 
+         select case (s% x_integer_ctrl(1))
+         case(2)
+            read(iounit,iostat=ierr) ign_mass, ign_density, ign_co_core_mass
+         end select
+ 
+       end subroutine extras_photo_read
+ 
+       subroutine extras_photo_write(id, iounit)
+         integer, intent(in) :: id, iounit
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+ 
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+ 
+         select case (s% x_integer_ctrl(1))
+         case(2)
+            write(iounit) ign_mass, ign_density, ign_co_core_mass
+         end select
+ 
+       end subroutine extras_photo_write
+
 
 
 
