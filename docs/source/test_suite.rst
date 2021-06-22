@@ -333,6 +333,12 @@ This test case shows an example of creating a 0.085 Msun, Z = 0.014 metallicity,
 This test case shows an example of creating a 250 Msun, Z = 1e-4 metallicity, model close to the main sequence.
 
 
+:ref:`ns_h`
+^^^^^^^^^^^
+
+This test case shows an example of steady hydrogen burning within within a neutron star envelope.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
