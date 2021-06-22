@@ -6,6 +6,16 @@ adjust_net
 
 This test suite example checks the functionality of the adaptive nuclear reaction network.
 
+***************
+Physical checks
+***************
+
+This test case tracks the number of isotopes it has at the end of the run.
+
+*******
+Inlists
+*******
+
 This test case has two parts. Click to see a larger view of a plot.
 
 * Part 1 (``inlist_zams``) creates a 15 Msun, Z=0.02 metallicity, main-sequence model using the default 8 isotope ``basic.net``.
