@@ -11,12 +11,14 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 # set MESA_SKIP_OPTIONAL to skip parts of the test
-#if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-#    echo "Skipping R CrB creation using saved model"
-#else
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+    echo "Skipping R CrB creation using saved model"
+    cp standard_R_CrB_from_He_star.mod R_CrB_from_He_star.mod
+else
     do_one inlist_He_star_header He_star.mod LOGS_He_star
     do_one inlist_change_abundances_header R_CrB_from_He_star.mod LOGS_change_abundances
-#fi
+    cp R_CrB_from_He_star.mod standard_R_CrB_from_He_star.mod
+fi
 
 do_one inlist_R_CrB_star_header final.mod LOGS_R_CrB_star
 
