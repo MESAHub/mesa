@@ -575,7 +575,7 @@
          include 'formats'
 
          ierr = 0
-         if (mixing_length_alpha == 0d0 .or. k <= 1 .or. s% dt <= 0d0) then
+         if (mixing_length_alpha == 0d0 .or. k < 1 .or. s% dt <= 0d0) then
             stop 'bad call to TDC get_TDC_solution'
          end if         
 
