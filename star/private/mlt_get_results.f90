@@ -566,6 +566,7 @@
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
+         type(auto_diff_real_tdc) :: Q_start, Y_start
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
@@ -610,95 +611,102 @@
          Y = 0d0
          call compute_Q(s, k, mixing_length_alpha, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
-         if (abs(Q / scale) < tolerance) converged = .true.
-         if (report) write(*,2) 'Q(Y=0)', Q%val
-
-         if (Q > 0d0) then
-            Y_is_positive = .true.
-            Y = convert(abs(Y_guess))
+         if (abs(Q / scale) < tolerance) then
+            converged = .true.
          else
-            Y_is_positive = .false.
-            Y = convert(-abs(Y_guess))
-         end if
-
-         iter = 0
-
-         ! Newton's method to find solution Y
-         Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
-         Z = log(abs(Y))
-
-         ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
-         lower_bound_Z = -100d0
-         upper_bound_Z = 25d0 
-         
-         if (report) write(*,2) 'initial Y', 0, Y%val
-         do iter = 1, max_iter
-            call compute_Q(s, k, mixing_length_alpha, &
-               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
-            if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
-            if (is_bad(Q%val)) exit
-            if (abs(Q%val)/scale <= tolerance) then
-               if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
-               converged = .true.
-               exit
-            end if
-
-            if (Y_is_positive) then ! Take advantage of monotonicity when we can...
-               if (Q > 0d0) then
-                  ! Q(Y) is monotonic so this means Z is a lower-bound.
-                  lower_bound_Z = Z
-               else
-                  ! Q(Y) is monotonic so this means Z is an upper-bound.
-                  upper_bound_Z = Z
-               end if
-            end if
-
-            dQdZ = differentiate_1(Q)
-
-            if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
-               if (report) write(*,2) 'dQdZ', iter, dQdZ%val
-               exit
-            end if
-
-            correction = -Q/dQdz
-            if (abs(correction) < 1d-15) then
-               ! Can't get much more precision than this.
-               converged = .true.
-               exit
-            end if
-
-            Z_new = Z + correction
-
-            ! If the correction pushes the solution out of bounds then we know
-            ! that was a bad step. Bad steps are still in the same direction, they just
-            ! go too far, so we replace that result with one that's halfway to the relevant bound.
-            if (Z_new > upper_bound_Z) then
-               Z_new = (Z + upper_bound_Z) / 2d0
-            else if (Z_new < lower_bound_Z) then
-               Z_new = (Z + lower_bound_Z) / 2d0
-            end if
-
-
-
-            if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
-               Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
-            Z_new%d1val1 = 1d0            
-            Z = Z_new
-
-            if (Y_is_positive) then
-               Y = exp(Z)
+            if (Q > 0d0) then
+               Y_is_positive = .true.
+               Y = convert(abs(Y_guess))
             else
-               Y = -exp(Z)
+               Y_is_positive = .false.
+               Y = convert(-abs(Y_guess))
             end if
 
-            if (report) write(*,2) 'new Y Z Z_lower_bnd Z_upper_bnd', iter, Y%val, Z%val, lower_bound_Z%val, upper_bound_Z%val
-         end do
+            Q_start = Q
+            Y_start = Y
+
+
+            iter = 0
+
+            ! Newton's method to find solution Y
+            Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
+            Z = log(abs(Y))
+
+            ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
+            lower_bound_Z = -100d0
+            upper_bound_Z = 25d0 
+            
+            if (report) write(*,2) 'initial Y', 0, Y%val
+            do iter = 1, max_iter
+               call compute_Q(s, k, mixing_length_alpha, &
+                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
+               if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
+               if (is_bad(Q%val)) exit
+               if (abs(Q%val)/scale <= tolerance) then
+                  if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
+                  converged = .true.
+                  exit
+               end if
+
+               if (Y_is_positive) then ! Take advantage of monotonicity when we can...
+                  if (Q > 0d0) then
+                     ! Q(Y) is monotonic so this means Z is a lower-bound.
+                     lower_bound_Z = Z
+                  else
+                     ! Q(Y) is monotonic so this means Z is an upper-bound.
+                     upper_bound_Z = Z
+                  end if
+               end if
+
+               dQdZ = differentiate_1(Q)
+
+               if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
+                  if (report) write(*,2) 'dQdZ', iter, dQdZ%val
+                  exit
+               end if
+
+               correction = -Q/dQdz
+               if (abs(correction) < 1d-15) then
+                  ! Can't get much more precision than this.
+                  converged = .true.
+                  exit
+               end if
+
+               Z_new = Z + correction
+
+               ! If the correction pushes the solution out of bounds then we know
+               ! that was a bad step. Bad steps are still in the same direction, they just
+               ! go too far, so we replace that result with one that's halfway to the relevant bound.
+               if (Z_new > upper_bound_Z) then
+                  Z_new = (Z + upper_bound_Z) / 2d0
+               else if (Z_new < lower_bound_Z) then
+                  Z_new = (Z + lower_bound_Z) / 2d0
+               end if
+
+
+
+               if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
+                  Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
+               Z_new%d1val1 = 1d0            
+               Z = Z_new
+
+               if (Y_is_positive) then
+                  Y = exp(Z)
+               else
+                  Y = -exp(Z)
+               end if
+
+               if (report) write(*,2) 'new Y Z Z_lower_bnd Z_upper_bnd', iter, Y%val, Z%val, lower_bound_Z%val, upper_bound_Z%val
+            end do
+         end if
 
          if (.not. converged) then
             if (report .or. s% x_integer_ctrl(19) <= 0) then
             !$OMP critical (tdc_crit0)
                write(*,5) 'failed get_TDC_solution k slvr_iter model TDC_iter', &
                   k, s% solver_iter, s% model_number, iter
+               write(*,2) 'Q_start', Q_start%val
+               write(*,2) 'Y_start', Y_start%val
                write(*,2) 'Q', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
