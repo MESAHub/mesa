@@ -31,10 +31,11 @@
 
 
 &eos
+  ! use only HELM by turning everything else off
+  use_CMS = .false.
+  use_OPAL_SCVH = .false.
   use_skye = .false.
   use_PC = .false.
-  logT_ion_HELM = 2.0d0
-  logT_neutral_HELM = 1.5d0
   use_FreeEOS = .false. ! FreeEOS / HELM blend is major entropy source
 / ! end of eos namelist
 
