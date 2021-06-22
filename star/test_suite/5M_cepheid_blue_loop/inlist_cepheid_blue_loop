@@ -9,7 +9,6 @@
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
    required_termination_code_string = 'star_species_mass_min_limit'
-   pre_ms_relax_to_start_radiative_core = .false.
 
    initial_zfracs = 6
    

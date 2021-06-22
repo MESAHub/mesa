@@ -8,6 +8,7 @@
    save_model_when_terminate = .true.
    save_model_filename = 'start.mod'
    required_termination_code_string = 'xa_central_upper_limit'
+   pre_ms_relax_to_start_radiative_core = .false.
 
    change_initial_net = .true.      
    new_net_name = 'pp_cno_extras_o18_ne22.net'
