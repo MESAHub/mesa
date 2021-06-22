@@ -3946,6 +3946,7 @@
             time_old, maxT_for_gold_tolerances
          logical :: do_history_file, write_profiles_flag, first_try, use_other_wind, &
             use_gold_tolerances, use_gold2_tolerances
+         real(dp) :: max_dt_years_for_TDC, max_dt_div_tau_conv_for_TDC
 
          procedure(integer), pointer :: tmp_ptr1 => null(), tmp_ptr3 => null()
          procedure(), pointer :: tmp_ptr2 => null(), tmp_ptr4 => null()
@@ -3968,7 +3969,9 @@
          s% steps_before_use_gold_tolerances = -1
          s% use_gold2_tolerances = .false.
          s% steps_before_use_gold2_tolerances = -1
-                  
+         s% max_dt_years_for_TDC = -1d99
+         s% max_dt_div_tau_conv_for_TDC = -1d99
+
          if (s% relax_solver_iters_timestep_limit /= 0) &
             s% solver_iters_timestep_limit = s% relax_solver_iters_timestep_limit
 
@@ -4172,6 +4175,8 @@
             priority_profile_interval = s% priority_profile_interval
             dt_next = s% dt_next
             max_number_retries = s% max_number_retries
+            max_dt_years_for_TDC = s% max_dt_years_for_TDC
+            max_dt_div_tau_conv_for_TDC = s% max_dt_div_tau_conv_for_TDC
             
             use_gold2_tolerances = s% use_gold2_tolerances
             steps_before_use_gold2_tolerances = s% steps_before_use_gold2_tolerances
@@ -4227,6 +4232,8 @@
             s% priority_profile_interval = priority_profile_interval
             s% dt_next = dt_next
             s% max_number_retries = max_number_retries
+            s% max_dt_years_for_TDC = max_dt_years_for_TDC
+            s% max_dt_div_tau_conv_for_TDC = max_dt_div_tau_conv_for_TDC
             
             s% use_gold2_tolerances = use_gold2_tolerances
             s% steps_before_use_gold2_tolerances = steps_before_use_gold2_tolerances
