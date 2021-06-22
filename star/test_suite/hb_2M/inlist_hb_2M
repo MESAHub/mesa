@@ -39,7 +39,13 @@
 / ! end of kap namelist
 
 &controls
-      
+
+      ! test criteria
+      ! check that when Yc = 0.5, the value of mass_conv_core
+      ! is within the range specified by the following values
+      x_ctrl(1) = 0.0 ! min (Msun)
+      x_ctrl(2) = 2.0 ! max (Msun)
+
       use_dedt_form_of_energy_eqn = .true.
       
       initial_mass = 2

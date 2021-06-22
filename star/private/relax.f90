@@ -3949,6 +3949,7 @@
 
          procedure(integer), pointer :: tmp_ptr1 => null(), tmp_ptr3 => null()
          procedure(), pointer :: tmp_ptr2 => null(), tmp_ptr4 => null()
+         logical, parameter :: dbg = .false.
          
          include 'formats'
 
@@ -4059,9 +4060,9 @@
 
             end do step_loop
 
-            if (.false. .and. s% job% pgstar_flag) then
+            if (.not. s% job% disable_pgstar_during_relax_flag .and. s% job% pgstar_flag) then
                ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
-               write(*,2) 'after step_loop: call update_pgstar_data', s% model_number
+               if(dbg) write(*,2) 'after step_loop: call update_pgstar_data', s% model_number
                call update_pgstar_data(s, ierr)
                if (failed()) return
                call do_read_pgstar_controls(s, s% inlist_fname, ierr) 
@@ -4099,7 +4100,7 @@
 
          end do evolve_loop
 
-         if (s% job% pgstar_flag) then
+         if (.not. s% job% disable_pgstar_during_relax_flag .and. s% job% pgstar_flag) then
          ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
             call update_pgstar_data(s, ierr)
             if (ierr /= 0) return

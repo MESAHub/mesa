@@ -1,0 +1,1 @@
+../../../star/test_suite/make_zams/README.rst

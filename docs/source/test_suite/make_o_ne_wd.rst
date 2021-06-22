@@ -1,0 +1,1 @@
+../../../star/test_suite/make_o_ne_wd/README.rst

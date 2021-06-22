@@ -41,91 +41,108 @@ star/private/mlt_get_results.f90 @adamjermyn
 
 ### Test suite cases ###
 
-#star/test_suite/1.3M_ms_high_Z/
-#star/test_suite/1.4M_ms_op_mono/
-#star/test_suite/15M_dynamo/
-star/test_suite/1.5M_with_diffusion/ @annethoul
-#star/test_suite/16M_conv_premix/ 
-star/test_suite/16M_predictive_mix/ @annethoul
-star/test_suite/1M_pre_ms_to_wd/ @annethoul @mjoyceGR
-star/test_suite/1M_thermohaline/ @mjoyceGR
-star/test_suite/20M_z2m2_high_rotation/ 
-star/test_suite/5M_cepheid_blue_loop/ @annethoul @rsmolec
-star/test_suite/7M_prems_to_AGB/ @annethoul
-#star/test_suite/accreted_material_j/ 
-star/test_suite/adjust_net/ @rjfarmer
-star/test_suite/black_hole/ @rjfarmer
-star/test_suite/c13_pocket/ @jschwab @fxt
-#star/test_suite/carbon_acc/ @jschwab
-#star/test_suite/carbon_kh/ @jschwab
-star/test_suite/cburn_inward/ @rjfarmer @fxt
-star/test_suite/ccsn_IIp/ @rjfarmer @fxt
-#star/test_suite/check_redo/ 
-star/test_suite/conductive_flame/ @fxt @rjfarmer
-star/test_suite/conserve_angular_momentum/ 
-#star/test_suite/create_zahb/
-#star/test_suite/create_zams/
-star/test_suite/custom_colors/ @rjfarmer
-star/test_suite/custom_rates/ @jschwab @evbauer @adamjermyn @fxt
-star/test_suite/dev_high_rot_darkening/ @orlox
-star/test_suite/dev_ppisn/ @orlox @rjfarmer
-star/test_suite/dev_to_cc_12/ @rjfarmer
-star/test_suite/dev_to_cc_20/ @rjfarmer
-star/test_suite/dev_to_cc_80/ @rjfarmer
-star/test_suite/dev_to_ppisn_100/ @rjfarmer
-star/test_suite/dev_to_pisn_200/ @rjfarmer
-star/test_suite/dev_split_burn_big_net/ @rjfarmer
-#star/test_suite/diffusion_smoothness/ 
-#star/test_suite/extended_convective_penetration/ 
-star/test_suite/gyre_* @rhdtownsend @annethoul
-star/test_suite/hb_2M/ @annethoul
-star/test_suite/high_mass/ @fxt @rjfarmer
-star/test_suite/high_rot_darkening/ @aarondotter
-#star/test_suite/high_z/ 
-#star/test_suite/hot_cool_wind/
-star/test_suite/hse_riemann/ @fxt
-#star/test_suite/irradiated_planet/ 
-star/test_suite/low_z/ @aarondotter
-star/test_suite/magnetic_braking/  @adamjermyn
-#star/test_suite/make_brown_dwarf/
-star/test_suite/make_co_wd/ @wmwolf @evbauer @fxt
-#star/test_suite/make_env/ 
-star/test_suite/make_he_wd/ @evbauer @fxt
-#star/test_suite/make_metals/
-star/test_suite/make_o_ne_wd/ @wmwolf @fxt
-#star/test_suite/make_planets/ 
-star/test_suite/make_pre_ccsn_IIp/ @rjfarmer @fxt
-star/test_suite/make_sdb/ @evbauer
-#star/test_suite/make_zams/ 
-#star/test_suite/make_zams_low_mass/ 
-#star/test_suite/make_zams_ultra_high_mass/
-star/test_suite/multiple_stars/ @mjoyceGR
-star/test_suite/ns_c/ @rjfarmer
-star/test_suite/ns_h/ @rjfarmer
-star/test_suite/ns_he/ @rjfarmer
-#star/test_suite/other_physics_hooks/ 
-star/test_suite/radiative_levitation/ @evbauer
-star/test_suite/R_CrB_star/ @jschwab
-#star/test_suite/relax_composition_j_entropy/ 
-star/test_suite/rsp_* @rsmolec
-#star/test_suite/sample_pre_ms/ 
-star/test_suite/semiconvection/ @annethoul
-star/test_suite/simplex_solar_calibration/ @mjoyceGR
-star/test_suite/split_burn_* @rjfarmer
-star/test_suite/test_case_template/ @jschwab
-star/test_suite/test_memory/ @rjfarmer
-star/test_suite/timing/ @rjfarmer
-star/test_suite/T_tau_gradr/ @warrickball
-star/test_suite/wd_acc_small_dm/ @jschwab
-star/test_suite/wd_aic/ @jschwab
-#star/test_suite/wd_c_core_ignition/
-star/test_suite/wd_cool_0.6M/ @evbauer @fxt
-star/test_suite/wd_diffusion/ @evbauer
-#star/test_suite/wd_he_shell_ignition/ 
-#star/test_suite/wd_nova_burst/
-#star/test_suite/wd_stable_h_burn/
+star/test_suite/1.3M_ms_high_Z @fxt 
+star/test_suite/1.4M_ms_op_mono @fxt
+star/test_suite/15M_dynamo @fxt
+star/test_suite/1.5M_with_diffusion @annethoul
+star/test_suite/16M_conv_premix @annethoul
+star/test_suite/16M_predictive_mix @annethoul
+star/test_suite/1M_pre_ms_to_wd @annethoul @mjoyceGR
+star/test_suite/1M_thermohaline @mjoyceGR
+star/test_suite/20M_z2m2_high_rotation
+star/test_suite/5M_cepheid_blue_loop @annethoul @rsmolec
+star/test_suite/7M_prems_to_AGB @annethoul
+star/test_suite/accreted_material_j
+star/test_suite/adjust_net @rjfarmer
+star/test_suite/c13_pocket @jschwab @fxt
+star/test_suite/carbon_acc @jschwab
+star/test_suite/carbon_kh @jschwab
+star/test_suite/cburn_inward @rjfarmer
+star/test_suite/ccsn_IIp @rjfarmer @fxt
+star/test_suite/check_redo 
+star/test_suite/conductive_flame @fxt @rjfarmer
+star/test_suite/conserve_angular_momentum
+star/test_suite/custom_colors @rjfarmer
+star/test_suite/custom_rates @jschwab @evbauer @adamjermyn @fxt
+star/test_suite/dev_high_rot_darkening
+star/test_suite/dev_ppisn @rjfarmer
+star/test_suite/dev_split_burn_big_net @rjfarmer
+star/test_suite/dev_to_cc_12 @rjfarmer
+star/test_suite/dev_to_cc_20 @rjfarmer
+star/test_suite/dev_to_cc_80 @rjfarmer
+star/test_suite/dev_to_pisn_200 @rjfarmer
+star/test_suite/dev_to_ppisn_100 @rjfarmer
+star/test_suite/diffusion_smoothness @fxt
+star/test_suite/extended_convective_penetration @fxt
+star/test_suite/gyre_in_mesa_bcep @rhdtownsend @annethoul
+star/test_suite/gyre_in_mesa_envelope @rhdtownsend @annethoul
+star/test_suite/gyre_in_mesa_ms @rhdtownsend @annethoul
+star/test_suite/gyre_in_mesa_rsg @rhdtownsend @annethoul
+star/test_suite/gyre_in_mesa_spb @rhdtownsend @annethoul
+star/test_suite/gyre_in_mesa_wd @rhdtownsend @annethoul
+star/test_suite/hb_2M @annethoul
+star/test_suite/high_mass @fxt @rjfarmer
+star/test_suite/high_z
+star/test_suite/hot_cool_wind @fxt
+star/test_suite/hse_riemann @fxt
+star/test_suite/irradiated_planet
+star/test_suite/low_z @aarondotter
+star/test_suite/magnetic_braking @adamjermyn
+star/test_suite/make_brown_dwarf @fxt
+star/test_suite/make_co_wd @wmwolf @evbauer @fxt
+star/test_suite/make_env @rjfarmer
+star/test_suite/make_he_wd @evbauer @fxt
+star/test_suite/make_metals @fxt
+star/test_suite/make_o_ne_wd @fxt
+star/test_suite/make_planets @fxt
+star/test_suite/make_sdb @evbauer
+star/test_suite/make_zams @fxt
+star/test_suite/make_zams_low_mass @fxt
+star/test_suite/make_zams_ultra_high_mass @fxt @rjfarmer
+star/test_suite/ns_c @rjfarmer @fxt
+star/test_suite/ns_h @rjfarmer @fxt
+star/test_suite/ns_he @rjfarmer @fxt
+star/test_suite/other_physics_hooks
+star/test_suite/radiative_levitation @evbauer
+star/test_suite/R_CrB_star @jschwab
+star/test_suite/relax_composition_j_entropy
+star/test_suite/rsp_BEP @rsmolec
+star/test_suite/rsp_BLAP @rsmolec
+star/test_suite/rsp_Cepheid @rsmolec
+star/test_suite/rsp_Cepheid_6M @rsmolec
+star/test_suite/rsp_check_2nd_crossing @rsmolec
+star/test_suite/rsp_Delta_Scuti @rsmolec
+star/test_suite/rsp_gyre @rsmolec
+star/test_suite/rsp_RR_Lyrae @rsmolec
+star/test_suite/rsp_save_and_load_file @rsmolec
+star/test_suite/rsp_Type_II_Cepheid @rsmolec
+star/test_suite/semiconvection  @annethoul
+star/test_suite/simplex_solar_calibration @mjoyceGR
+star/test_suite/test_case_template @jschwab
+star/test_suite/test_memory @rjfarmer
+star/test_suite/timing @rjfarmer
+star/test_suite/T_tau_gradr @warrickball
+star/test_suite/twin_studies
+star/test_suite/wd_acc_small_dm @wmwolf
+star/test_suite/wd_aic @jschwab
+star/test_suite/wd_c_core_ignition @wmwolf
+star/test_suite/wd_cool_0.6M @evbauer @fxt
+star/test_suite/wd_diffusion @evbauer
+star/test_suite/wd_he_shell_ignition @wmwolf
+star/test_suite/wd_nova_burst @wmwolf
+star/test_suite/wd_stable_h_burn @wmwolf
 
-binary/test_suite/ @orlox
-binary/test_suite/evolve_both_stars/ @orlox @mjoyceGR
 
-astero/test_suite/ @warrickball
+binary/test_suite/double_bh @orlox @rjfarmer
+binary/test_suite/evolve_both_stars @orlox @mjoyceGR
+binary/test_suite/jdot_gr_check @orlox
+binary/test_suite/jdot_ls_check @orlox
+binary/test_suite/jdot_ml_check @orlox
+binary/test_suite/star_plus_point_mass @orlox @rjfarmer
+binary/test_suite/star_plus_point_mass_explicit_mdot @orlox
+binary/test_suite/wind_fed_bhhmxb @orlox @rjfarmer
+
+astero/test_suite/astero_adipls @warrickball
+astero/test_suite/astero_gyre @warrickball
+astero/test_suite/example_astero @warrickball
+astero/test_suite/surface_effects @warrickball

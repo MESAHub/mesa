@@ -302,6 +302,43 @@ This test case checks the creation and evolution of a 0.15 Msun helium white dwa
 This test case demonstrates the creation and evolution of 3 Msun model whose initial metallicity is Z = 0.
 
 
+:ref:`make_o_ne_wd`
+^^^^^^^^^^^^^^^^^^^
+
+This test case produces a 1.05 Msun oxygen-neon-magnesium white dwarf using stellar engineering.
+
+:ref:`make_planets`
+^^^^^^^^^^^^^^^^^^^
+
+This test case shows an example of a 1 Mjup model with a 10 Mearth core that is irradiated and evolved for 10Gyr.
+
+:ref:`make_sdb`
+^^^^^^^^^^^^^^^
+
+This test case shows an example of making a 0.4 Msun, Z=0.02 metallicity, helium model - a B-type subdwarf (sdB) star.
+
+:ref:`make_zams`
+^^^^^^^^^^^^^^^^
+
+This test case shows an example of creating a 4 Msun, Z = 0.01 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
+
+:ref:`make_zams_low_mass`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case shows an example of creating a 0.085 Msun, Z = 0.014 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
+
+:ref:`make_zams_ultra_high_mass`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case shows an example of creating a 250 Msun, Z = 1e-4 metallicity, model close to the main sequence.
+
+
+:ref:`ns_h`
+^^^^^^^^^^^
+
+This test case shows an example of steady hydrogen burning within within a neutron star envelope.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^

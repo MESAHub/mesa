@@ -3,7 +3,7 @@ from utils import tab, indent_list, indent_list_of_str
 def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, comparison_operators, intrinsics):
 	# Starting boilerplate
 	header = ['module ' + auto_diff_type.name + '_module']
-	begin = [tab + 'use const_def', tab + 'use utils_lib', tab + 'use support_functions', tab + 'use math_lib']
+	begin = [tab + 'use const_def, only: dp, ln10, pi', tab + 'use utils_lib', tab + 'use support_functions', tab + 'use math_lib']
 	begin = begin + ['', tab + 'implicit none', '', tab + 'private', '']
 	contains = [tab + 'contains', '']
 

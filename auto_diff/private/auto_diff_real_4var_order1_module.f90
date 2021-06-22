@@ -1,5 +1,5 @@
 module auto_diff_real_4var_order1_module
-      use const_def
+      use const_def, only: dp, ln10, pi
       use utils_lib
       use support_functions
       use math_lib
