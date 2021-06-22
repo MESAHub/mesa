@@ -2207,11 +2207,16 @@
          ! for consistency with dual cells at faces, use <v**2> instead of <v>**2
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(qp) :: qhalf, v0, v1, v2
+         real(qp) :: qhalf, v0, v1, v2, Mbar
          qhalf = 0.5d0
+         if (s% use_mass_corrections) then
+            Mbar = s% mass_correction(k)
+         else
+            Mbar = 1.0_qp
+         end if
          if (s% u_flag) then
             v0 = s% u_start(k)
-            cell_start_specific_KE_qp = qhalf*v0**2
+            cell_start_specific_KE_qp = qhalf*Mbar*v0**2
          else if (s% v_flag) then
             v0 = s% v_start(k)
             if (k < s% nz) then
@@ -2220,7 +2225,7 @@
                v1 = s% v_center
             end if
             v2 = qhalf*(v0**2 + v1**2)
-            cell_start_specific_KE_qp = qhalf*v2
+            cell_start_specific_KE_qp = qhalf*Mbar*v2
          else ! ignore kinetic energy if no velocity variables
             cell_start_specific_KE_qp = 0d0
          end if
@@ -2242,11 +2247,16 @@
          integer, intent(in) :: k
          real(dp), intent(out) :: d_dv00, d_dvp1
          real(dp) :: dv2_dv00, dv2_dvp1
-         real(qp) :: qhalf, v0, v1, v2
+         real(qp) :: qhalf, v0, v1, v2, Mbar
          qhalf = 0.5d0
+         if (s% use_mass_corrections) then
+            Mbar = s% mass_correction(k)
+         else
+            Mbar = 1.0_qp
+         end if
          if (s% u_flag) then
             v0 = s% u(k)
-            cell_specific_KE_qp = qhalf*v0**2
+            cell_specific_KE_qp = qhalf*Mbar*v0**2
             d_dv00 = s% u(k)
             d_dvp1 = 0d0
          else if (s% v_flag) then
@@ -2260,9 +2270,9 @@
             end if
             v2 = qhalf*(v0**2 + v1**2)
             dv2_dv00 = s% v(k)
-            cell_specific_KE_qp = qhalf*v2
-            d_dv00 = 0.5d0*dv2_dv00
-            d_dvp1 = 0.5d0*dv2_dvp1
+            cell_specific_KE_qp = qhalf*Mbar*v2
+            d_dv00 = qhalf*Mbar*dv2_dv00
+            d_dvp1 = qhalf*Mbar*dv2_dvp1
          else ! ignore kinetic energy if no velocity variables
             cell_specific_KE_qp = 0d0
             d_dv00 = 0d0
@@ -2285,17 +2295,22 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: d_dlnR00,d_dlnRp1
-         real(qp) :: qhalf, rp1, r00, mp1, m00, Gp1, G00, gravp1, grav00
+         real(qp) :: qhalf, rp1, r00, mp1, m00, Gp1, G00, gravp1, grav00, Mbar
          real(dp) :: d_grav00_dlnR00, d_gravp1_dlnRp1
          include 'formats'
          qhalf = 0.5d0
+         if (s% use_mass_corrections) then
+            Mbar = s% mass_correction(k)
+         else
+            Mbar = 1.0_qp
+         end if
          if (k == s% nz) then
             rp1 = s% R_center
             mp1 = s% m_center
             Gp1 = s% cgrav(s% nz)
          else
             rp1 = s% r(k+1)
-            mp1 = s% m(k+1)
+            mp1 = s% m_grav(k+1)
             Gp1 = s% cgrav(k+1)
          end if
          if (rp1 <= 0d0) then
@@ -2306,13 +2321,13 @@
             d_gravp1_dlnRp1 = -gravp1
          end if
          r00 = s% r(k)
-         m00 = s% m(k)
+         m00 = s% m_grav(k)
          G00 = s% cgrav(k)
          grav00 = -G00*m00/r00
          d_grav00_dlnR00 = -grav00
-         cell_specific_PE_qp = qhalf*(gravp1 + grav00)
-         d_dlnR00 = 0.5d0*d_grav00_dlnR00
-         d_dlnRp1 = 0.5d0*d_gravp1_dlnRp1
+         cell_specific_PE_qp = qhalf*Mbar*(gravp1 + grav00)
+         d_dlnR00 = qhalf*Mbar*d_grav00_dlnR00
+         d_dlnRp1 = qhalf*Mbar*d_gravp1_dlnRp1
          if (is_bad(cell_specific_PE_qp)) then
             write(*,2) 'cell_specific_PE_qp', k, cell_specific_PE_qp
             write(*,2) 'gravp1', k, gravp1
@@ -2334,16 +2349,21 @@
          ! i.e., use avg of m/r at faces of cell rather than ratio of cell center mass over cell center r.
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(qp) :: qhalf, rp1, r00, mp1, m00, Gp1, G00, gravp1, grav00
+         real(qp) :: qhalf, rp1, r00, mp1, m00, Gp1, G00, gravp1, grav00, Mbar
          include 'formats'
          qhalf = 0.5d0
+         if (s% use_mass_corrections) then
+            Mbar = s% mass_correction_start(k)
+         else
+            Mbar = 1.0_qp
+         end if
          if (k == s% nz) then
             rp1 = s% R_center
             mp1 = s% m_center
             Gp1 = s% cgrav(s% nz)
          else
             rp1 = s% r_start(k+1)
-            mp1 = s% m(k+1)
+            mp1 = s% m_grav_start(k+1)
             Gp1 = s% cgrav(k+1)
          end if
          if (rp1 <= 0d0) then
@@ -2352,10 +2372,10 @@
             gravp1 = -Gp1*mp1/rp1
          end if
          r00 = s% r_start(k)
-         m00 = s% m(k)
+         m00 = s% m_grav_start(k)
          G00 = s% cgrav(k)
          grav00 = -G00*m00/r00
-         cell_start_specific_PE_qp = qhalf*(gravp1 + grav00)
+         cell_start_specific_PE_qp = qhalf*Mbar*(gravp1 + grav00)
          if (is_bad(cell_start_specific_PE_qp)) then
             write(*,2) 'cell_start_specific_PE_qp', k, cell_start_specific_PE_qp
             write(*,2) 'gravp1', k, gravp1

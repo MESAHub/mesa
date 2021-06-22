@@ -7566,21 +7566,6 @@
     use_gravity_rotation_correction = .true.
 
 
-      ! use_mass_corrections
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      !   UNTESTED.   EXPERIMENTAL FEATURE.   NOT FOR GENERAL USE.
-
-      ! Gravitational vs baryonic mass corrections.
-      ! If false, then no distinction between gravitational and baryonic mass.
-      ! If true, then gravitational mass is calculated using mass corrections.
-      ! Note: may need to wait for pre-ms model to converged before turning this on.
-
-      ! ::
-
-    use_mass_corrections = .false.
-
-
       ! use_dedt_form_of_energy_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! always_use_dedt_form_of_energy_eqn
