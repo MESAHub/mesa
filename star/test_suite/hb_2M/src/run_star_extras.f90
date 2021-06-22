@@ -28,6 +28,8 @@
       use math_lib
       
       implicit none
+
+      real(dp) :: mass_conv_core_y050
       
       include "test_suite_extras_def.inc"
       
@@ -36,6 +38,39 @@
       include "test_suite_extras.inc"
       
       
+      subroutine extras_photo_read(id, iounit, ierr)
+        integer, intent(in) :: id, iounit
+        integer, intent(out) :: ierr
+        type (star_info), pointer :: s
+        ierr = 0
+
+        call star_ptr(id, s, ierr)
+        if (ierr /= 0) return
+
+        select case (s% x_integer_ctrl(1))
+        case(3)
+           read(iounit,iostat=ierr) mass_conv_core_y050
+        end select
+
+      end subroutine extras_photo_read
+
+      subroutine extras_photo_write(id, iounit)
+        integer, intent(in) :: id, iounit
+        integer :: ierr
+        type (star_info), pointer :: s
+        ierr = 0
+
+        call star_ptr(id, s, ierr)
+        if (ierr /= 0) return
+
+        select case (s% x_integer_ctrl(1))
+        case(3)
+           write(iounit) mass_conv_core_y050
+        end select
+
+      end subroutine extras_photo_write
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -43,6 +78,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         s% other_photo_read => extras_photo_read
+         s% other_photo_write => extras_photo_write
          
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
@@ -63,6 +101,12 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         ! initialize mass_conv_core_y050 to "unset" value
+         if (.not. restart) then
+            mass_conv_core_y050 = -1
+         end if
+
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
       
@@ -71,10 +115,39 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         real(dp) :: dt
+         real(dp) :: min_mass_conv_core, max_mass_conv_core
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         include 'formats'
+
+         select case (s% x_integer_ctrl(1))
+         case (3) ! inlist_hb_2M
+
+            ! put target info in TestHub output
+            testhub_extras_names(1) = 'mass_conv_core_y050'; testhub_extras_vals(1) = mass_conv_core_y050
+
+            ! display value to user
+            write(*,*)
+            write(*,'(A70, F8.3)') '[TestHub] Convective core mass at Yc = 0.5 (Msun): ', mass_conv_core_y050
+            write(*,*)
+
+            ! get target range from inlist
+            min_mass_conv_core = s% x_ctrl(1)
+            max_mass_conv_core = s% x_ctrl(2)
+
+            ! check if value is outside of the target range
+            if ((mass_conv_core_y050 .lt. min_mass_conv_core) .or. (mass_conv_core_y050 .gt. max_mass_conv_core)) then
+               write(*,*) 'bad value for mass_conv_core_y050'
+               write(*,1) 'min allowed value', min_mass_conv_core
+               write(*,1) 'mass_conv_core_y050', mass_conv_core_y050
+               write(*,1) 'max allowed value', max_mass_conv_core
+            else
+               write(*,'(a)') 'all values are within tolerance'
+            end if
+         end select
+
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
       
@@ -154,6 +227,15 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
+
+         ! during part 3: CHeB
+         if (s% x_integer_ctrl(1) == 3) then
+            ! save core mass the first time Yc < 0.5
+            if (s% center_he4 .lt. 0.5d0 .and. mass_conv_core_y050 .lt. 0) then
+               mass_conv_core_y050 = s% mass_conv_core
+            end if
+         end if
+
       end function extras_finish_step
       
       
