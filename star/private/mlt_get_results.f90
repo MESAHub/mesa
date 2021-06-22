@@ -622,15 +622,16 @@
                Y = convert(-abs(Y_guess))
             end if
 
-            Q_start = Q
-            Y_start = Y
-
-
             iter = 0
 
             ! Newton's method to find solution Y
             Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
             Z = log(abs(Y))
+
+            ! Save starting values
+            Q_start = Q
+            Y_start = Y
+
 
             ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
             lower_bound_Z = -100d0
@@ -705,8 +706,8 @@
             !$OMP critical (tdc_crit0)
                write(*,5) 'failed get_TDC_solution k slvr_iter model TDC_iter', &
                   k, s% solver_iter, s% model_number, iter
-               write(*,2) 'Q_start', Q_start%val
-               write(*,2) 'Y_start', Y_start%val
+               write(*,*) 'Q_start', Q_start%val
+               write(*,*) 'Y_start', Y_start%val
                write(*,2) 'Q', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
