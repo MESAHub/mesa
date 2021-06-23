@@ -336,7 +336,17 @@ This test case shows an example of creating a 250 Msun, Z = 1e-4 metallicity, mo
 :ref:`ns_h`
 ^^^^^^^^^^^
 
-This test case shows an example of steady hydrogen burning within within a neutron star envelope.
+This test case shows an example of steady hydrogen burning within a neutron star envelope.
+
+:ref:`ns_he`
+^^^^^^^^^^^^
+
+This test case shows an example of a helium flash within a neutron star envelope.
+
+:ref:`ns_c`
+^^^^^^^^^^^
+
+This test case shows an example of a carbon flash within a neutron star envelope.
 
 
 
