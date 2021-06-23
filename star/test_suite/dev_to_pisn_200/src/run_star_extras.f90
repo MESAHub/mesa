@@ -29,19 +29,11 @@
       use gyre_lib
       
       implicit none
-      
-      include "test_suite_extras_def.inc"
 
-!gyre
-      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
-      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      !x_logical_ctrl(2) = .false. ! output eigenfunction files
-      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-      !x_integer_ctrl(4) = 1 ! order
-      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
+      ! (Gamma1 - 4/3) at the center when integral_gamma1-4/3 first drops below 0
+      real(dp) :: gamma1_cntr_pulse_start 
+
+      include "test_suite_extras_def.inc"
 
       contains
 
@@ -66,6 +58,10 @@
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
          s% other_remove_surface => remove_ejecta_one_cell_per_step
          !s% use_other_remove_surface = .true.
+
+         s% other_photo_read => extras_photo_read
+         s% other_photo_write => extras_photo_write
+
       end subroutine extras_controls
       
       
@@ -93,29 +89,10 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return         
          call test_suite_startup(s, restart, ierr)         
-         if (.not. restart) then
-            call alloc_extra_info(s)
-         else ! it is a restart
-            call unpack_extra_info(s)
-         end if 
          
-         if (.not. s% x_logical_ctrl(37)) return
-         
-         ! Initialize GYRE
-
-         call gyre_init('gyre.in')
-
-         ! Set constants
-
-         call gyre_set_constant('G_GRAVITY', standard_cgrav)
-         call gyre_set_constant('C_LIGHT', clight)
-         call gyre_set_constant('A_RADIATION', crad)
-
-         call gyre_set_constant('M_SUN', Msun)
-         call gyre_set_constant('R_SUN', Rsun)
-         call gyre_set_constant('L_SUN', Lsun)
-
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+         if(.not.restart) then
+            gamma1_cntr_pulse_start = HUGE(gamma1_cntr_pulse_start)
+         end if
 
       end subroutine extras_startup
       
@@ -131,10 +108,15 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         select case (s% x_integer_ctrl(1))
+         case(7)
+            testhub_extras_names(1) = 'gamma1_cntr_pulse_start'
+            testhub_extras_vals(1) = gamma1_cntr_pulse_start
+         end select
+
          call test_suite_after_evolve(s, ierr)
          if (ierr /= 0) return         
-         if (.not. s% x_logical_ctrl(37)) return
-         call gyre_final()
       end subroutine extras_after_evolve
       
 
@@ -157,7 +139,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 0
+
+         how_many_extra_history_columns = 1
+
       end function how_many_extra_history_columns
       
       
@@ -170,7 +154,30 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         names(1) = 'integral_gamma1'
+         vals(1) = gamma1_integral(s)
+
       end subroutine data_for_extra_history_columns
+
+
+      real(dp) function gamma1_integral(s)
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp) :: integral_norm
+         ! Pressure weighted average of Gamma1-4/3
+         ! See https://ui.adsabs.harvard.edu/abs/2020A%26A...640A..56R/abstract
+
+         integral_norm = 0d0
+         gamma1_integral = 0d0
+         do k=1,s% nz
+            integral_norm = integral_norm + s% Peos(k)*s% dm(k)/s% rho(k)
+            gamma1_integral = gamma1_integral + &
+               (s% gamma1(k)-4.d0/3.d0)*s% Peos(k)*s% dm(k)/s% rho(k)
+         end do
+         gamma1_integral = gamma1_integral/max(1d-99,integral_norm)
+
+      end function gamma1_integral
 
       
       integer function how_many_extra_profile_columns(id)
@@ -205,11 +212,7 @@
          extras_start_step = keep_going    
       end function extras_start_step
 
-  
-      include 'gyre_in_mesa_extras_finish_step.inc'
-   
-
-      ! returns either keep_going or terminate.
+        ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
          integer :: ierr
@@ -221,7 +224,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         call store_extra_info(s)         
 
          if (s% total_energy > 0) then
             extras_finish_step = terminate
@@ -229,115 +231,49 @@
             s% termination_code = t_xtra1
          end if
 
-         if (.not. s% x_logical_ctrl(37)) return
-         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
-         if (extras_finish_step == terminate) &
-             s% termination_code = t_extras_finish_step
+         select case (s% x_integer_ctrl(1))
+         case(7)
+            if(gamma1_cntr_pulse_start > 1d50 .and. gamma1_integral(s) < 0.0) then
+               gamma1_cntr_pulse_start = s% gamma1(s% nz)-4.d0/3.d0
+            end if
+         end select
+
       end function extras_finish_step
 
-      
-      ! routines for saving and restoring extra data so can do restarts
-         
-         ! put these defs at the top and delete from the following routines
-         !integer, parameter :: extra_info_alloc = 1
-         !integer, parameter :: extra_info_get = 2
-         !integer, parameter :: extra_info_put = 3
-      
-      
-      subroutine alloc_extra_info(s)
-         integer, parameter :: extra_info_alloc = 1
+
+      subroutine extras_photo_read(id, iounit, ierr)
+         integer, intent(in) :: id, iounit
+         integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_alloc)
-      end subroutine alloc_extra_info
-      
-      
-      subroutine unpack_extra_info(s)
-         integer, parameter :: extra_info_get = 2
-         type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_get)
-      end subroutine unpack_extra_info
-      
-      
-      subroutine store_extra_info(s)
-         integer, parameter :: extra_info_put = 3
-         type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_put)
-      end subroutine store_extra_info
-      
-      
-      subroutine move_extra_info(s,op)
-         integer, parameter :: extra_info_alloc = 1
-         integer, parameter :: extra_info_get = 2
-         integer, parameter :: extra_info_put = 3
-         type (star_info), pointer :: s
-         integer, intent(in) :: op
-         
-         integer :: i, j, num_ints, num_dbls, ierr
-         
-         i = 0
-         ! call move_int or move_flg
-         !call move_int(vsurf_gt_cs_count)   
-         !call move_flg(using_fixed_outer_BCs)
-         num_ints = i
-         
-         i = 0
-         !call move_dbl(vsurf)   
-         !call move_dbl(Lsurf)   
-         num_dbls = i
-         
-         if (op /= extra_info_alloc) return
-         if (num_ints == 0 .and. num_dbls == 0) return
-         
          ierr = 0
-         call star_alloc_extras(s% id, num_ints, num_dbls, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in star_alloc_extras'
-            write(*,*) 'alloc_extras num_ints', num_ints
-            write(*,*) 'alloc_extras num_dbls', num_dbls
-            stop 1
-         end if
-         
-         contains
-         
-         subroutine move_dbl(dbl)
-            double precision :: dbl
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               dbl = s% extra_work(i)
-            case (extra_info_put)
-               s% extra_work(i) = dbl
-            end select
-         end subroutine move_dbl
-         
-         subroutine move_int(int)
-            integer :: int
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               int = s% extra_iwork(i)
-            case (extra_info_put)
-               s% extra_iwork(i) = int
-            end select
-         end subroutine move_int
-         
-         subroutine move_flg(flg)
-            logical :: flg
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               flg = (s% extra_iwork(i) /= 0)
-            case (extra_info_put)
-               if (flg) then
-                  s% extra_iwork(i) = 1
-               else
-                  s% extra_iwork(i) = 0
-               end if
-            end select
-         end subroutine move_flg
-      
-      end subroutine move_extra_info
+ 
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+ 
+         select case (s% x_integer_ctrl(1))
+         case(7)
+            read(iounit,iostat=ierr) gamma1_cntr_pulse_start
+         end select
+ 
+       end subroutine extras_photo_read
+ 
+       subroutine extras_photo_write(id, iounit)
+         integer, intent(in) :: id, iounit
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+ 
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+ 
+         select case (s% x_integer_ctrl(1))
+         case(7)
+            write(iounit) gamma1_cntr_pulse_start
+         end select
+ 
+       end subroutine extras_photo_write
 
 
-      end module run_star_extras
+
+   end module run_star_extras
       

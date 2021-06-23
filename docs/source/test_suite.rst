@@ -204,6 +204,11 @@ This test suite example shows how to use user-defined color filter and extinctio
 
 This test suite case checks the use of custom nuclear reaction rates in an accreting 0.3 Msun helium white dwarf model.
 
+:ref:`dev_to_pisn_200`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN).
+
 
 :ref:`diffusion_smoothness`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
