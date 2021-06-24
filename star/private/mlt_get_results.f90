@@ -154,7 +154,7 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: &
-            Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess, gradT_actual
+            Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess
          character (len=256) :: message        
          logical ::  test_partials, using_TDC, compare_TDC_to_MLT, report
          include 'formats'
@@ -571,6 +571,7 @@
          integer :: iter
          logical :: converged, Y_is_positive, first_Q_is_positive
          real(dp), parameter :: tolerance = 1d-8
+         real(dp), parameter :: alpha_c  = (1d0/2d0)*sqrt_2_div_3
          integer, parameter :: max_iter = 200
          include 'formats'
 
@@ -580,7 +581,7 @@
          end if         
 
          ! Set up for solve
-         c0 = mixing_length_alpha*rho*T*Cp*4d0*pi*pow2(r)
+         c0 = mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r)
          L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap) ! assumes QHSE for dP/dm
          if (s% okay_to_set_mlt_vc) then
             A0 = s% mlt_vc_old(k)/sqrt_2_div_3
