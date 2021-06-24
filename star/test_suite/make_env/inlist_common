@@ -44,9 +44,9 @@
       mesh_delta_coeff = 0.6
       
       mixing_length_alpha = 1.5
-      MLT_option = 'Henyey'
+      MLT_option = 'Cox'
 
-      use_Ledoux_criterion = .false.  
+      use_Ledoux_criterion = .true.  
       alpha_semiconvection = 0.1
       thermohaline_coeff = 2
       thermohaline_option = 'Kippenhahn'
