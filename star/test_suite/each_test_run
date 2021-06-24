@@ -238,7 +238,11 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     echo "---" > testhub.yml
     testhub_log "test_case: $1"
     testhub_log "module: :$MESA_TEST_MOD"
-    testhub_log "omp_num_threads: $OMP_NUM_THREADS"
+    if [ -z "$OMP_NUM_THREADS" ]; then
+        testhub_log "omp_num_threads: 0"
+    else
+        testhub_log "omp_num_threads: $OMP_NUM_THREADS"
+    fi
     if [ -z "$MESA_SKIP_OPTIONAL" ]; then
         testhub_log "run_optional: true"
     else
