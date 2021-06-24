@@ -1,0 +1,1 @@
+../../../star/test_suite/other_physics_hooks/README.rst
