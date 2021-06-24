@@ -61,9 +61,9 @@
          ! ye is mean number free electrons per nucleon, assuming complete ionization
          
       ! gravitational vs baryonic mass
-      real(dp), pointer :: mass_correction(:) ! = dm_gravitational/dm_baryonic
+      real(dp), pointer :: mass_correction(:), mass_correction_start(:) ! = dm_gravitational/dm_baryonic
          ! calculated by chem module
-      real(dp), pointer :: m_grav(:) 
+      real(dp), pointer :: m_grav(:), m_grav_start(:)
          ! enclosed gravitational mass at cell outer edge
          ! the variable called "m" is the enclosed baryonic mass
             ! = number of enclosed baryons * atomic mass unit

@@ -264,16 +264,14 @@
          real(dp) :: Rho, logRho, &
             e, e_start, de, d_de_dlnd, d_de_dlnT, &
             e_with_xa_start, d_e_with_xa_start_dlnd, d_e_with_xa_start_dlnT, &
-            e_with_DT_start, d_e_with_DT_start_dlnd, d_e_with_DT_start_dlnT
+            e_with_DT_start, Pgas_with_DT_start
          real(dp), dimension(num_eos_basic_results) :: &
             res, dres_dlnd, dres_dlnT
          real(dp) :: dres_dxa(num_eos_d_dxa_results,s% species)
          integer :: j
          logical :: test_partials
 
-         real(dp) :: Pgas_with_DT_start
-
-         real(dp) :: theta, dxh_lnd
+         real(dp) :: theta
 
          include 'formats'
          ierr = 0
@@ -298,9 +296,8 @@
          ! we only have lnE and lnP derivs, so use
          ! eps_grav = -de/dt + (P/rho) * dlnd/dt
          do j=1, s% species
-            dxh_lnd = s% dxh_lnd(k)
             s% d_eps_grav_dx(j,k) = -s% energy(k) * s% dlnE_dxa_for_partials(j,k)/s% dt + &
-               (s% Peos(k) / s% Rho(k)) * s% dlnPeos_dxa_for_partials(j,k) *  dxh_lnd/s% dt
+               (s% Peos(k) / s% Rho(k)) * s% dlnPeos_dxa_for_partials(j,k) * s% dxh_lnd(k)/s% dt
          end do
 
          e = s% energy(k)
@@ -337,9 +334,6 @@
             end if
 
             e_with_DT_start = exp(res(i_lnE))
-            d_e_with_DT_start_dlnd = dres_dlnd(i_lnE)*e_with_DT_start
-            d_e_with_DT_start_dlnT = dres_dlnT(i_lnE)*e_with_DT_start
-
             de = theta * de + (1d0 - theta) * (e_with_DT_start - e_start)
             d_de_dlnd = theta * d_de_dlnd
             d_de_dlnT = theta * d_de_dlnT
@@ -347,8 +341,15 @@
             Pgas_with_DT_start = exp(res(i_lnPgas))
 
             ! combine with end-of-step composition derivatives
+
             ! until EOSes always provide composition derivatives, ignore this
-            ! the end-of-step term should generally be similar enough
+            ! the end-of-step term should generally be similar enough to be OK
+
+            ! do j=1, s% species
+            !    s% d_eps_grav_dx(j,k) = theta * s% d_eps_grav_dx(j,k) + (1d0 - theta) * &
+            !       (-e_with_DT_start*d_dxa(i_lnE,j)/s% dt + &
+            !       Pgas_with_DT_start*d_dxa(i_lnPgas,j)/s% rho_start(k)*s% dxh_lnd(k)/s% dt)
+            ! end do
 
          end if
 

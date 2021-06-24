@@ -668,8 +668,12 @@
 
             call do1(s% mass_correction, c% mass_correction)
             if (failed('mass_correction')) exit
+            call do1(s% mass_correction_start, c% mass_correction_start)
+            if (failed('mass_correction_start')) exit
             call do1(s% m_grav, c% m_grav)
             if (failed('m_grav')) exit
+            call do1(s% m_grav_start, c% m_grav_start)
+            if (failed('m_grav_start')) exit
 
             call do1(s% Peos, c% Peos)
             if (failed('Peos')) exit

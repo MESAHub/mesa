@@ -43,8 +43,8 @@
       ! test criteria
       ! check that when Yc = 0.5, the value of mass_conv_core
       ! is within the range specified by the following values
-      x_ctrl(1) = 0.0 ! min (Msun)
-      x_ctrl(2) = 2.0 ! max (Msun)
+      x_ctrl(1) = 0.15d0 ! min (Msun)
+      x_ctrl(2) = 0.25d0 ! max (Msun)
 
       use_dedt_form_of_energy_eqn = .true.
       
@@ -99,3 +99,54 @@
       max_model_number = 300
 
 / ! end of controls namelist
+
+&pgstar
+History_Panels1_num_panels = 3
+History_Panels1_yaxis_name(1) = 'log_center_T'
+History_Panels1_yaxis_reversed(1) = .false.
+History_Panels1_dymin(1) = -1
+History_Panels1_other_yaxis_name(1) = 'log_center_Rho'
+History_Panels1_other_yaxis_reversed(1) = .false.
+History_Panels1_other_ymin(1) = -101d0
+History_Panels1_other_ymax(1) = -101d0
+
+History_Panels1_yaxis_name(2) = 'log_L'
+History_Panels1_yaxis_reversed(2) = .false.
+History_Panels1_ymin(2) = -101d0
+History_Panels1_ymax(2) = -101d0
+History_Panels1_other_yaxis_name(2) = 'log_Teff'
+History_Panels1_other_yaxis_reversed(2) = .false.
+History_Panels1_other_ymin(2) = -101d0
+History_Panels1_other_ymax(2) = -101d0
+
+History_Panels1_yaxis_name(3) = 'mass_conv_core_y050'
+History_Panels1_yaxis_reversed(3) = .false.
+History_Panels1_ymin(3) = 0
+History_Panels1_ymax(3) = 0.3
+History_Panels1_other_yaxis_name(3) = ''
+History_Panels1_other_yaxis_reversed(3) = .false.
+History_Panels1_other_ymin(3) = -101d0
+History_Panels1_other_ymax(3) = -101d0
+
+History_Panels1_win_flag = .true.
+History_Panels1_win_width = 12
+History_Panels1_win_aspect_ratio = 0.75
+History_Panels1_xleft = 0.15
+History_Panels1_xright = 0.85
+History_Panels1_ybot = 0.15
+History_Panels1_ytop = 0.85
+History_Panels1_txt_scale = 1.0
+History_Panels1_title = 'History_Panels1'
+History_Panels1_xaxis_name = 'model_number'
+History_Panels1_xmin = -101d0
+History_Panels1_xmax = -101d0
+History_Panels1_max_width = 1000
+History_Panels1_dxmin = -1
+History_Panels1_xaxis_reversed = .false.
+History_Panels1_xaxis_log = .false.
+History_Panels1_xmargin = 0.0
+
+Grid6_win_flag = .true.
+Grid6_win_width = 12
+
+/

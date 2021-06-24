@@ -237,3 +237,44 @@
 
     conv_vel_use_mlt_vc_start = .true.
 
+
+! mass corrections
+! ================
+
+
+      ! use_mass_corrections
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Gravitational vs baryonic mass corrections.
+
+      ! The Lagrangian coordinate (:math:`m`) in MESA is the baryonic
+      ! mass and the density (:math:`\rho`) is the baryonic mass
+      ! density.
+
+      ! If false, then no distinction between gravitational and baryonic mass.
+      ! If true, then the gravitational mass is calculated using mass corrections
+      ! and the momentum equation, total energy equation, and Brunt are modified.
+
+      ! The variable ``mass_correction`` is the quantity you multiply
+      ! the baryonic mass density by to get the gravitational mass
+      ! density:
+
+      !     (mass density) = (baryon density) * amu * mass_correction
+
+      ! Given the mass fractions in a cell, the value of
+      ! mass_correction is provided by the ``chem`` module.
+
+      ! MESA holds m_grav fixed during the newton iterations.  This results
+      ! in an energy conservation error, because the specific potential energy
+      ! changes when m_grav is updated afterwards.  A message showing
+      ! the relative energy error incurred due to this assumption
+      ! will be printed to the terminal.
+
+      ! Not compatible with RSP.
+
+      ! ::
+
+    use_mass_corrections = .false.
+
+
+

@@ -18,7 +18,7 @@ If the mass is smaller, then either decrease the initial mass of the star or dec
 during core helium burning. If the ignition mass is higher then increase the initial mass or 
 increase overshoot during core helium burning.
 
-The ignition density should be about |logRho| ~ 6.2 `Farmer et al (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..184F/abstract>`.
+The ignition density should be about |logRho| ~ 6.2 (`Farmer et al (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..184F/abstract>`__).
 If its signficantly different (0.1 dex) then we have a microphysics problem (or more likely an issue tracking the flame location).
 
 The C/O core mass should be between 1.0 and 1.4 |Msun|, if different then tune the initial mass/overshot, otherwise

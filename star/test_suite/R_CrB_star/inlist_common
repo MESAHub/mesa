@@ -17,7 +17,7 @@
       kap_lowT_prefix = 'AESOPUS'
       AESOPUS_filename = 'AESOPUS_GS98_RCrB.h5'
       
-      show_info = .true.
+      !show_info = .true.
 
 / ! end of kap namelist
 

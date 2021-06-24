@@ -76,8 +76,8 @@
 
       subroutine finish_load_model(s, restart, ierr)
          use hydro_vars, only: set_vars
-         use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, &
-            reset_epsnuc_vectors, set_qs
+         use star_utils, only: set_m_and_dm, set_m_grav_and_grav, set_dm_bar, &
+            total_angular_momentum, reset_epsnuc_vectors, set_qs
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
             set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
          use hydro_RSP2, only: set_RSP2_vars
@@ -99,6 +99,7 @@
             return
          end if
          call set_m_and_dm(s)
+         call set_m_grav_and_grav(s)
          call set_dm_bar(s, nz, s% dm, s% dm_bar)   
                   
          call reset_epsnuc_vectors(s)

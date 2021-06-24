@@ -1,21 +1,16 @@
-.. _ns_h:
+.. _ns_c:
 
 ****
-ns_h
+ns_c
 ****
 
-This test case shows an example of steady hydrogen burning within a neutron star envelope.
+This test case shows an example of a carbon flash within a neutron star envelope.
 
-This test case has 2 parts. Click to see a larger version of a plot.
+This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_add_he_layer``) first loads a prebuilt neutron star envelope model ``ns_env.mod``, see the :ref:`make_env` test case. Helium is then accreted at a rate of 1e-9 Msun/year for 0.5 seconds to create a thin helium layer:
+* Part 1 (``inlist_to_c_flash``) first loads a prebuilt neutron star envelope model ``ns_c_env.mod``, see the :ref:`make_env` test case. Carbon is then accreted at a rate of 1.7e-9 Msun/year until a carbon runaway at the base of the neutron star envelope reaches an integrated power of 1e6 Lsun:
 
-.. image:: ../../../star/test_suite/ns_h/docs/grid_000108.png
-   :width: 100%
-
-* Part 2 (``inlist_to_steady_h_burn``) continues the evolution by accreting a hydrogen-rich solar mixture at a rate of 1e-11 Msun/year. Hydrogen burning eventually reaches a steady location, ``logxm`` = log10((Mstar - m) / Msun) = -12.8, within the neutron star envelope after 2e5 seconds of evolution:
-
-.. image:: ../../../star/test_suite/ns_h/docs/grid_000381.png
+.. image:: ../../../star/test_suite/ns_c/docs/grid_000234.svg
    :width: 100%
 
 
@@ -33,18 +28,17 @@ pgstar commands used for the plot above:
   file_extension = 'ps'
 
   pgstar_interval = 10
-
   pgstar_grid_title_disp = 1.8
 
   Abundance_xaxis_name = 'logxm' 
   Abundance_xaxis_reversed = .true.
-  Abundance_xmin = -16.0
-  Abundance_xmax = -12.0
+  Abundance_xmin = -10.0
+  Abundance_xmax = -6.0
 
   Power_xaxis_name = 'logxm'
   Power_xaxis_reversed = .true
-  Power_xmin = -16.0
-  Power_xmax = -12.0
+  Power_xmin = -10.0
+  Power_xmax = -6.0
 
   Profile_Panels1_title = ''
   Profile_Panels1_num_panels = 2
@@ -89,7 +83,7 @@ pgstar commands used for the plot above:
   Text_Summary1_name(3, 1) = 'time_step_sec'
   Text_Summary1_name(4, 1) = 'log_rel_run_E_err'
   Text_Summary1_name(5, 1) = 'total_energy'
-  Text_Summary1_name(1, 2) = 'envelope_mass'
+  Text_Summary1_name(1, 2) = 'log_power_nuc_burn'
   Text_Summary1_name(2, 2) = 'log_abs_mdot'
   Text_Summary1_name(3, 2) = 'log_xmstar'
   Text_Summary1_name(4, 2) = 'm_center'
@@ -100,7 +94,7 @@ pgstar commands used for the plot above:
   Text_Summary1_name(4, 3) = ' '
   Text_Summary1_name(5, 3) = ' '
 
-  Grid2_title = 'ns_h'
+  Grid2_title = 'ns_c'
   Grid2_plot_name(1) = 'Profile_Panels1'
   Grid2_plot_name(2) = 'Text_Summary1'
   Grid2_plot_name(3) = 'Abundance'
@@ -170,4 +164,4 @@ pgstar commands used for the plot above:
  / ! end of pgstar namelist
 
 
-Last-Updated: 21Jun2021 (MESA e2acbc2) by fxt.
+Last-Updated: 22Jun2021 (MESA e2acbc2) by fxt.
