@@ -946,14 +946,16 @@
          type(auto_diff_real_star_order1), intent(in) :: A0_in
          type(auto_diff_real_tdc), intent(in) :: xi0, xi1, xi2
          type(auto_diff_real_tdc) :: Af ! output
-         type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0, lk        
+         type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0, lk 
+         real(dp) :: dt       
          include 'formats'
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
+         dt = s%dt
          A0 = convert(A0_in)
 
          if (J2 > 0d0) then ! Hyperbolic branch
             J = sqrt(J2)
-            Jt = s%dt * J
+            Jt = dt * J
             Jt4 = 0.25d0 * Jt
             num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
             den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
@@ -963,7 +965,7 @@
             end if
          else if (J2 < 0d0) then ! Trigonometric branch
             J = sqrt(-J2)
-            Jt = s%dt * J
+            Jt = dt * J
 
             ! This branch contains decaying solutions that reach A = 0, at which point
             ! they switch onto the 'zero' branch. So we have to calculate the position of
