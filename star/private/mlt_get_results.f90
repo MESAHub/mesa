@@ -812,7 +812,6 @@
          type(auto_diff_real_tdc) :: Y, Af, xi0, xi1, xi2, J2, Jt2
 
          if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
-            write(*,*) k, s%k_const_mass
             fallback = .true.
             return
          end if
