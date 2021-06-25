@@ -383,6 +383,10 @@
          if(dbg) write(*,*) 'call add_fpe_checks'
          call add_fpe_checks(id, s, ierr)
          if (failed('add_fpe_checks',ierr)) return
+         
+         if(dbg) write(*,*) 'call multiply_tolerances'
+         call multiply_tolerances(id, s, ierr)
+         if (failed('multiply_tolerances',ierr)) return
 
          if(dbg) write(*,*) 'call pgstar_env_check'
          call pgstar_env_check(id, s, ierr)
@@ -3822,7 +3826,69 @@
          end if
 
       end subroutine add_fpe_checks
-
+      
+      
+      
+      subroutine multiply_tolerances(id, s, ierr)
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         integer :: status
+         
+         real(dp) :: mesh_delta_coeff_factor = 1
+         real(dp) :: time_delta_coeff_factor = 1
+         real(dp) :: max_model_number_factor = 1
+         character(len=20) :: mesh_delta_coeff_factor_str
+         character(len=20) :: time_delta_coeff_factor_str
+         character(len=20) :: max_model_number_factor_str
+         
+         include 'formats'
+         
+         ierr = 0
+         call GET_ENVIRONMENT_VARIABLE('MESA_MESH_DELTA_COEFF_FACTOR', mesh_delta_coeff_factor_str, STATUS=status)
+         call GET_ENVIRONMENT_VARIABLE('MESA_TIME_DELTA_COEFF_FACTOR', time_delta_coeff_factor_str, STATUS=status)
+         call GET_ENVIRONMENT_VARIABLE('MESA_MAX_MODEL_NUMBER_FACTOR', max_model_number_factor_str, STATUS=status)
+         
+         if (mesh_delta_coeff_factor_str .ne. "" .or. &
+             time_delta_coeff_factor_str .ne. "" .or. &
+             max_model_number_factor_str .ne. "") then
+            
+            if (mesh_delta_coeff_factor_str .ne. "") then 
+                read(mesh_delta_coeff_factor_str, *) mesh_delta_coeff_factor
+            end if
+            if (time_delta_coeff_factor_str .ne. "") then 
+                read(time_delta_coeff_factor_str, *) time_delta_coeff_factor
+            end if
+            if (max_model_number_factor_str .ne. "") then 
+                read(max_model_number_factor_str, *) max_model_number_factor
+            end if
+            
+            write(*,*) ""
+            write(*,*) "Convergence testing:"
+            write(*,*) "   mesh_delta_coeff_factor = ", mesh_delta_coeff_factor
+            write(*,*) "   time_delta_coeff_factor = ", time_delta_coeff_factor
+            write(*,*) "   max_model_number_factor = ", max_model_number_factor
+            
+            write(*,*)    ""
+            write(*,*)    "   old mesh_delta_coeff = ",     s% mesh_delta_coeff
+            s% mesh_delta_coeff = mesh_delta_coeff_factor * s% mesh_delta_coeff
+            write(*,*)    "   new mesh_delta_coeff = ",     s% mesh_delta_coeff
+            
+            write(*,*)    ""
+            write(*,*)    "   old time_delta_coeff = ",     s% time_delta_coeff
+            s% mesh_delta_coeff = time_delta_coeff_factor * s% time_delta_coeff
+            write(*,*)    "   new time_delta_coeff = ",     s% time_delta_coeff
+            
+            write(*,*)    ""
+            write(*,*)    "   old max_model_number = ",     s% max_model_number
+            s% mesh_delta_coeff = max_model_number_factor * s% max_model_number
+            write(*,*)    "   new max_model_number = ",     s% max_model_number
+            write(*,*)    ""
+         end if
+      
+      end subroutine multiply_tolerances
+      
+      
       subroutine pgstar_env_check(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
