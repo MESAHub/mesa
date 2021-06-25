@@ -345,6 +345,11 @@
                   scale_height, gradL, conv_vel, Y_face, ierr)
                if (ierr /= 0) then
                   write(*,2) 'get_TDC_solution failed in set_TDC', k
+                  write(*,*) 'Repeating call with reporting on.'
+                  call get_TDC_solution(s, k, &
+                     mixing_length_alpha, cgrav, m, Y_guess, .true., &
+                     mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
+                     scale_height, gradL, conv_vel, Y_face, ierr)
                   stop 'get_TDC_solution failed in set_TDC'
                end if
             end if
@@ -665,6 +670,7 @@
                end if
 
                correction = -Q/dQdz
+
                if (abs(correction) < 1d-13) then
                   ! Can't get much more precision than this.
                   converged = .true.
@@ -685,7 +691,7 @@
 
 
                if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
-                  Z_new%val, Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val
+                  Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val, correction%val
                Z_new%d1val1 = 1d0            
                Z = Z_new
 
@@ -700,6 +706,7 @@
          end if
 
          if (.not. converged) then
+            ierr = 1
             if (report .or. s% x_integer_ctrl(19) <= 0) then
             !$OMP critical (tdc_crit0)
                write(*,5) 'failed get_TDC_solution k slvr_iter model TDC_iter', &
@@ -719,9 +726,10 @@
                write(*,2) 'c0', k, c0%val
                write(*,2) 'L0', k, L0%val
                write(*,*)
-               stop 'get_TDC_solution failed to converge'
+               call get_T_face
             !$OMP end critical (tdc_crit0)
             end if
+            return
          end if
 
          cv = sqrt_2_div_3*unconvert(Af)   
