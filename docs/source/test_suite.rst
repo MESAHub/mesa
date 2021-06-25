@@ -353,6 +353,18 @@ This test case shows an example of a helium flash within a neutron star envelope
 
 This test case shows an example of a carbon flash within a neutron star envelope.
 
+:ref:`other_physics_hooks`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises several of the ``other_*`` physics hooks simultaneously in a 1 Msun, Z=0.02 metallicity, model.
+It provides an example of how to include your own physics code into a MESA run.
+
+
+:ref:`radiative_levitation`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises radiative levitation and the OP mono opacities in the outer layers of a 0.466 Msun, Z=0.02 metallicity, B-type subdwarf (sdB) model.
+
 
 
 :ref:`c13_pocket`

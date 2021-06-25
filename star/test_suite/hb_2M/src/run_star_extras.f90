@@ -171,7 +171,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 0
+         how_many_extra_history_columns = 1
       end function how_many_extra_history_columns
       
       
@@ -184,6 +184,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         vals(1) = mass_conv_core_y050
+         names(1) = 'mass_conv_core_y050'
       end subroutine data_for_extra_history_columns
 
       
