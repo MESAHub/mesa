@@ -360,6 +360,12 @@ This test case exercises several of the ``other_*`` physics hooks simultaneously
 It provides an example of how to include your own physics code into a MESA run.
 
 
+:ref:`radiative_levitation`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises radiative levitation and the OP mono opacities in the outer layers of a 0.466 Msun, Z=0.02 metallicity, B-type subdwarf (sdB) model.
+
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
