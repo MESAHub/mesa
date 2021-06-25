@@ -3876,12 +3876,12 @@
             
             write(*,*)    ""
             write(*,*)    "   old time_delta_coeff = ",     s% time_delta_coeff
-            s% mesh_delta_coeff = time_delta_coeff_factor * s% time_delta_coeff
+            s% time_delta_coeff = time_delta_coeff_factor * s% time_delta_coeff
             write(*,*)    "   new time_delta_coeff = ",     s% time_delta_coeff
             
             write(*,*)    ""
             write(*,*)    "   old max_model_number = ",     s% max_model_number
-            s% mesh_delta_coeff = max_model_number_factor * s% max_model_number
+            s% max_model_number = max_model_number_factor * s% max_model_number
             write(*,*)    "   new max_model_number = ",     s% max_model_number
             write(*,*)    ""
          end if
