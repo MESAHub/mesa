@@ -3846,28 +3846,30 @@
          
          ierr = 0
          call GET_ENVIRONMENT_VARIABLE('MESA_MESH_DELTA_COEFF_FACTOR', mesh_delta_coeff_factor_str, STATUS=status)
+         if (status /= 0) return
          call GET_ENVIRONMENT_VARIABLE('MESA_TIME_DELTA_COEFF_FACTOR', time_delta_coeff_factor_str, STATUS=status)
+         if (status /= 0) return
          call GET_ENVIRONMENT_VARIABLE('MESA_MAX_MODEL_NUMBER_FACTOR', max_model_number_factor_str, STATUS=status)
+         if (status /= 0) return
          
-         if (mesh_delta_coeff_factor_str .ne. "" .or. &
-             time_delta_coeff_factor_str .ne. "" .or. &
-             max_model_number_factor_str .ne. "") then
-            
-            if (mesh_delta_coeff_factor_str .ne. "") then 
-                read(mesh_delta_coeff_factor_str, *) mesh_delta_coeff_factor
-            end if
-            if (time_delta_coeff_factor_str .ne. "") then 
-                read(time_delta_coeff_factor_str, *) time_delta_coeff_factor
-            end if
-            if (max_model_number_factor_str .ne. "") then 
-                read(max_model_number_factor_str, *) max_model_number_factor
-            end if
-            
+         if (mesh_delta_coeff_factor_str .ne. "") then 
+            read(mesh_delta_coeff_factor_str, *) mesh_delta_coeff_factor
+         end if
+         if (time_delta_coeff_factor_str .ne. "") then 
+            read(time_delta_coeff_factor_str, *) time_delta_coeff_factor
+         end if
+         if (max_model_number_factor_str .ne. "") then 
+            read(max_model_number_factor_str, *) max_model_number_factor
+         end if
+        
+         if (mesh_delta_coeff_factor .ne. 1 .or. &
+             time_delta_coeff_factor .ne. 1 .or. &
+             max_model_number_factor .ne. 1) then
             write(*,*) ""
             write(*,*) "Convergence testing:"
-            write(*,*) "   mesh_delta_coeff_factor = ", mesh_delta_coeff_factor
-            write(*,*) "   time_delta_coeff_factor = ", time_delta_coeff_factor
-            write(*,*) "   max_model_number_factor = ", max_model_number_factor
+            write(*,*) "   MESA_MESH_DELTA_COEFF_FACTOR = ", mesh_delta_coeff_factor
+            write(*,*) "   MESA_TIME_DELTA_COEFF_FACTOR = ", time_delta_coeff_factor
+            write(*,*) "   MESA_MAX_MODEL_NUMBER_FACTOR = ", max_model_number_factor
             
             write(*,*)    ""
             write(*,*)    "   old mesh_delta_coeff = ",     s% mesh_delta_coeff
