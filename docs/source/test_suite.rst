@@ -365,10 +365,23 @@ It provides an example of how to include your own physics code into a MESA run.
 
 This test case exercises radiative levitation and the OP mono opacities in the outer layers of a 0.466 Msun, Z=0.02 metallicity, B-type subdwarf (sdB) model.
 
+
+:ref:`rsp_BEP`
+^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 0.26 Msun, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model - a binary evolution pulsator similar
+the one shown in Smolec et al 2013, MNRAS.
+
+:ref:`rsp_BLAP`
+^^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model -
+a blue large-amplitude pulsator model originally contributed by Alfred Gautschy.
+
 :ref:`rsp_Cepheid`
 ^^^^^^^^^^^^^^^^^^
 
-This test case checks the non-linear pulsation evolution of a 4.165 Msun, Teff = 6050 K, L = 1438.8, Z = 0.007d0 model - 
+This test case checks the non-linear pulsation evolution of a 4.165 Msun, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model - 
 a classical Cepheid variable similar to CEP-227 shown in Pilecki et al. 2013, MNRAS.
 
 

@@ -1,0 +1,1 @@
+../../../star/test_suite/rsp_BLAP/README.rst
