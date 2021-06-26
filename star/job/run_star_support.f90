@@ -3835,56 +3835,39 @@
          integer, intent(out) :: ierr
          integer :: status
          
-         real(dp) :: mesh_delta_coeff_factor = 1
-         real(dp) :: time_delta_coeff_factor = 1
-         real(dp) :: max_model_number_factor = 1
-         character(len=20) :: mesh_delta_coeff_factor_str
-         character(len=20) :: time_delta_coeff_factor_str
-         character(len=20) :: max_model_number_factor_str
+         real(dp) :: test_suite_res_factor = 1
+         character(len=20) :: test_suite_resolution_factor_str
          
          include 'formats'
          
          ierr = 0
-         call GET_ENVIRONMENT_VARIABLE('MESA_MESH_DELTA_COEFF_FACTOR', mesh_delta_coeff_factor_str, STATUS=status)
-         if (status /= 0) return
-         call GET_ENVIRONMENT_VARIABLE('MESA_TIME_DELTA_COEFF_FACTOR', time_delta_coeff_factor_str, STATUS=status)
-         if (status /= 0) return
-         call GET_ENVIRONMENT_VARIABLE('MESA_MAX_MODEL_NUMBER_FACTOR', max_model_number_factor_str, STATUS=status)
+         call GET_ENVIRONMENT_VARIABLE('MESA_TEST_SUITE_RESOLUTION_FACTOR', &
+            test_suite_resolution_factor_str, STATUS=status)
          if (status /= 0) return
          
-         if (mesh_delta_coeff_factor_str .ne. "") then 
-            read(mesh_delta_coeff_factor_str, *) mesh_delta_coeff_factor
-         end if
-         if (time_delta_coeff_factor_str .ne. "") then 
-            read(time_delta_coeff_factor_str, *) time_delta_coeff_factor
-         end if
-         if (max_model_number_factor_str .ne. "") then 
-            read(max_model_number_factor_str, *) max_model_number_factor
-         end if
-        
-         if (mesh_delta_coeff_factor .ne. 1 .or. &
-             time_delta_coeff_factor .ne. 1 .or. &
-             max_model_number_factor .ne. 1) then
+         if (test_suite_resolution_factor_str .ne. "") then 
+            read(test_suite_resolution_factor_str, *) test_suite_res_factor
             write(*,*) ""
-            write(*,*) "Convergence testing:"
-            write(*,*) "   MESA_MESH_DELTA_COEFF_FACTOR = ", mesh_delta_coeff_factor
-            write(*,*) "   MESA_TIME_DELTA_COEFF_FACTOR = ", time_delta_coeff_factor
-            write(*,*) "   MESA_MAX_MODEL_NUMBER_FACTOR = ", max_model_number_factor
-            
+            write(*,*) "***"
+            write(*,*) "MESA_TEST_SUITE_RESOLUTION_FACTOR set to", test_suite_res_factor
+            write(*,*) "***"
+            write(*,*) "Warning: This environment variable is for testing purposes"
+            write(*,*) "          and should be set to 1 during normal MESA use."
+            write(*,*) "***"
+            write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
+            write(*,*) "and max_model_number by its inverse:"
+            write(*,*) ""
+            write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
+            s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
+            write(*,*)    "   new mesh_delta_coeff = ",   s% mesh_delta_coeff
             write(*,*)    ""
-            write(*,*)    "   old mesh_delta_coeff = ",     s% mesh_delta_coeff
-            s% mesh_delta_coeff = mesh_delta_coeff_factor * s% mesh_delta_coeff
-            write(*,*)    "   new mesh_delta_coeff = ",     s% mesh_delta_coeff
-            
+            write(*,*)    "   old time_delta_coeff = ",   s% time_delta_coeff
+            s% time_delta_coeff = test_suite_res_factor * s% time_delta_coeff
+            write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
             write(*,*)    ""
-            write(*,*)    "   old time_delta_coeff = ",     s% time_delta_coeff
-            s% time_delta_coeff = time_delta_coeff_factor * s% time_delta_coeff
-            write(*,*)    "   new time_delta_coeff = ",     s% time_delta_coeff
-            
-            write(*,*)    ""
-            write(*,*)    "   old max_model_number = ",     s% max_model_number
-            s% max_model_number = max_model_number_factor * s% max_model_number
-            write(*,*)    "   new max_model_number = ",     s% max_model_number
+            write(*,*)    "   old max_model_number = ",   s% max_model_number
+            s% max_model_number = s% max_model_number / test_suite_res_factor
+            write(*,*)    "   new max_model_number = ",   s% max_model_number
             write(*,*)    ""
          end if
       
