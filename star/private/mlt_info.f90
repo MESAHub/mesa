@@ -70,6 +70,9 @@
             end if            
          end do
 !$OMP END PARALLEL DO
+         if (s% okay_to_set_mlt_vc .and. s% have_mlt_vc) then
+            s% have_mlt_vc = .true.
+         end if
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
 
       end subroutine set_mlt_vars

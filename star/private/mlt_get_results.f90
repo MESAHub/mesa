@@ -44,14 +44,14 @@
       subroutine get_gradT(s, MLT_option, & ! used to create models
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            gradT, mixing_type, ierr)
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          type (star_info), pointer :: s
          character (len=*), intent(in) :: MLT_option
          real(dp), intent(in) :: &
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             XH1, cgrav, m, gradL_composition_term, mixing_length_alpha
          integer, intent(in) :: iso
-         real(dp), intent(out) :: gradT
+         real(dp), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
          integer, intent(out) :: mixing_type, ierr 
          type(auto_diff_real_star_order1) :: &
             gradr_ad, grada_ad, scale_height_ad, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, &
@@ -77,6 +77,10 @@
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          gradT = gradT_ad%val
+         Y_face = Y_face_ad%val
+         conv_vel = mlt_vc_ad%val
+         D = D_ad%val
+         Gamma = Gamma_ad%val
       end subroutine get_gradT
       
          
@@ -206,6 +210,10 @@
 
          ! check if this particular k needs to be done with TDC
          using_TDC = s% using_TDC
+         if (.not. s% have_mlt_vc) using_TDC = .false.
+         if (s% have_mlt_vc) then
+            write(*,*) k, s% mlt_vc(k)
+         end if
          if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
          if (using_TDC) then
             Y_guess = gradT - gradL

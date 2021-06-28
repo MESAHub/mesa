@@ -153,11 +153,6 @@
             end if
          end if
          
-         if (.not. s% have_mlt_vc) then
-            s% mlt_vc(1:nz) = 0
-            s% have_mlt_vc = .true.
-         end if
-         
          s% doing_finish_load_model = .true.  
          call set_vars(s, s% dt, ierr)
          if (ierr == 0 .and. s% RSP2_flag) call set_RSP2_vars(s,ierr)

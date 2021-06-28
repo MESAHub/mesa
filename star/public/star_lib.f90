@@ -3070,7 +3070,7 @@
       subroutine star_mlt_gradT(id, MLT_option, & ! can be useful when creating models
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            gradT, mixing_type, ierr)
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
          use mlt_get_results, only: get_gradT
          integer, intent(in) :: id
@@ -3079,7 +3079,7 @@
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             XH1, cgrav, m, gradL_composition_term, mixing_length_alpha
          integer, intent(in) :: iso
-         real(dp), intent(out) :: gradT
+         real(dp), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
          integer, intent(out) :: mixing_type, ierr 
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
@@ -3087,7 +3087,7 @@
          call get_gradT(s, MLT_option, &
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            gradT, mixing_type, ierr)         
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)         
       end subroutine star_mlt_gradT
 
 
