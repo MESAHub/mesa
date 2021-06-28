@@ -29,14 +29,14 @@
       ! used in updating envelope composition
       x_logical_ctrl(1) = .true.
       
-      photo_interval = 1
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
       !trace_evolve = .true.

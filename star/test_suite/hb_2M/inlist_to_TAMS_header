@@ -27,6 +27,8 @@
 
 &controls
 
+      x_integer_ctrl(1) = 1 ! part number
+
       read_extra_controls_inlist1 = .true.
       extra_controls_inlist1_name = 'inlist_to_TAMS'
 

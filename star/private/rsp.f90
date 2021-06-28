@@ -156,7 +156,7 @@
 
       subroutine finish_build_rsp_model(s,ierr)
          use star_utils, only: &
-            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
+            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, set_m_grav_and_grav, &
             store_rho_in_xh, store_T_in_xh, store_r_in_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
@@ -199,6 +199,7 @@
             stop 'build_rsp_model'
          end if
          call set_m_and_dm(s)
+         call set_m_grav_and_grav(s)
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
       end subroutine finish_build_rsp_model
 

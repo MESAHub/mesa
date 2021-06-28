@@ -323,7 +323,7 @@ Text_Summary1_name(5,3) = 'lg_Lneu'
 Text_Summary1_name(5,4) = 'Ne_cntr'
 Text_Summary1_name(5,5) = 'zones'
 
-Text_Summary1_name(6,1) = 'non_fe_core_infall' 
+Text_Summary1_name(6,1) = 'integral_gamma1' 
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'Si_cntr'
@@ -369,11 +369,10 @@ Text_Summary1_name(6,5) = 'retries'
  History_Panels2_ymax(2) = -101d0
  History_Panels2_dymin(2) = 0.01
 
- History_Panels2_other_yaxis_name(2) = 'log_cntr_Rho'
+ History_Panels2_other_yaxis_name(2) = 'integral_gamma1'
  History_Panels2_other_yaxis_reversed(2) = .false.
  History_Panels2_other_ymin(2) = -101d0
  History_Panels2_other_ymax(2) = -101d0
- History_Panels2_other_dymin(2) = 0.1
 
 History_Panels2_yaxis_name(3) = 'non_fe_core_infall'
 History_Panels2_yaxis_reversed(3) = .false.

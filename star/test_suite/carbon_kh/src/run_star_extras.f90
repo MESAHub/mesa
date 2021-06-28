@@ -39,6 +39,24 @@
       include 'test_suite_extras.inc'
 
 
+      subroutine extras_photo_read(id, iounit, ierr)
+         integer, intent(in) :: id, iounit
+         integer, intent(out) :: ierr
+         ierr = 0
+         read(iounit, iostat=ierr) e_res_err_step, e_res_err_run, &
+            e_eos_err_step, e_eos_err_run, &
+            e_eos_err_step_blend, e_eos_err_run_blend
+      end subroutine extras_photo_read
+
+
+      subroutine extras_photo_write(id, iounit)
+         integer, intent(in) :: id, iounit
+         write(iounit) e_res_err_step, e_res_err_run, &
+            e_eos_err_step, e_eos_err_run, &
+            e_eos_err_step_blend, e_eos_err_run_blend
+      end subroutine extras_photo_write
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -46,6 +64,10 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         s% other_photo_read => extras_photo_read
+         s% other_photo_write => extras_photo_write
+
          s% extras_startup => extras_startup
          s% extras_start_step => extras_start_step
          s% extras_check_model => extras_check_model
@@ -67,14 +89,17 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call test_suite_startup(s, restart, ierr)
 
-         e_res_err_step = 0
-         e_res_err_run = 0
-         e_eos_err_step = 0
-         e_eos_err_run = 0
-         e_eos_err_step_blend = 0
-         e_eos_err_run_blend = 0
+         if (.not. restart) then
+            e_res_err_step = 0
+            e_res_err_run = 0
+            e_eos_err_step = 0
+            e_eos_err_run = 0
+            e_eos_err_step_blend = 0
+            e_eos_err_run_blend = 0
+         end if
+
+         call test_suite_startup(s, restart, ierr)
 
       end subroutine extras_startup
 
@@ -245,6 +270,7 @@
             ((s% eos_frac_HELM(k) .gt. 0) .and. (s% eos_frac_HELM(k) .lt. 1)) .or. &
             ((s% eos_frac_Skye(k) .gt. 0) .and. (s% eos_frac_Skye(k) .lt. 1)) .or. &
             ((s% eos_frac_PC(k) .gt. 0) .and. (s% eos_frac_PC(k) .lt. 1)) .or. &
+            ((s% eos_frac_CMS(k) .gt. 0) .and. (s% eos_frac_CMS(k) .lt. 1)) .or. &
             ((s% eos_frac_FreeEOS(k) .gt. 0) .and. (s% eos_frac_FreeEOS(k) .lt. 1))
          
       end function in_eos_blend

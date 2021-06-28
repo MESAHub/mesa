@@ -204,6 +204,11 @@ This test suite example shows how to use user-defined color filter and extinctio
 
 This test suite case checks the use of custom nuclear reaction rates in an accreting 0.3 Msun helium white dwarf model.
 
+:ref:`dev_to_pisn_200`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN).
+
 
 :ref:`diffusion_smoothness`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -331,6 +336,65 @@ This test case shows an example of creating a 0.085 Msun, Z = 0.014 metallicity,
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This test case shows an example of creating a 250 Msun, Z = 1e-4 metallicity, model close to the main sequence.
+
+
+:ref:`ns_h`
+^^^^^^^^^^^
+
+This test case shows an example of steady hydrogen burning within a neutron star envelope.
+
+:ref:`ns_he`
+^^^^^^^^^^^^
+
+This test case shows an example of a helium flash within a neutron star envelope.
+
+:ref:`ns_c`
+^^^^^^^^^^^
+
+This test case shows an example of a carbon flash within a neutron star envelope.
+
+:ref:`other_physics_hooks`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises several of the ``other_*`` physics hooks simultaneously in a 1 Msun, Z=0.02 metallicity, model.
+It provides an example of how to include your own physics code into a MESA run.
+
+
+:ref:`radiative_levitation`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises radiative levitation and the OP mono opacities in the outer layers of a 0.466 Msun, Z=0.02 metallicity, B-type subdwarf (sdB) model.
+
+
+:ref:`rsp_BEP`
+^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 0.26 Msun, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model - a binary evolution pulsator similar
+the one shown in Smolec et al 2013, MNRAS.
+
+:ref:`rsp_BLAP`
+^^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model -
+a blue large-amplitude pulsator model originally contributed by Alfred Gautschy.
+
+:ref:`rsp_Cepheid`
+^^^^^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 4.165 Msun, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model - 
+a classical Cepheid variable similar to CEP-227 shown in Pilecki et al. 2013, MNRAS.
+
+:ref:`rsp_Delta_Scuti`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 2 Msun, Teff = 6900 K, L = 30 Lsun, Z = 0.02 metallicity -
+a double-mode delta Scuti variable leaving the main-sequence phase originally contributed by Alfred Gautschy.
+
+:ref:`rsp_RR_Lyrae`
+^^^^^^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 0.65 Msun, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity -
+a long-period RR Lyrae model contributed by Radek Smolec.
 
 
 

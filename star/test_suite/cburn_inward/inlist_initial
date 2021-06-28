@@ -119,6 +119,7 @@
       terminal_interval = 5
       write_header_frequency = 10
       
+      x_integer_ctrl(1) = 1 ! Part number
 
 / ! end of controls namelist
 

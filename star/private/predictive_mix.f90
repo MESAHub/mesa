@@ -816,7 +816,9 @@ contains
        s%rho_face(k) = w*exp(s%lnd(k)) + (1._dp-w)*exp(s%lnd(k-1))
 
        ! Evaluate mixing coefficients etc.
-       call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err)
+       ! Explicitly set gradL_composition_term to 0 in this call.
+       call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err, &
+            s% alpha_mlt(k), 0._dp)
        if (op_err /= 0) stop 'non-zero op_err'
 
        D(k) = s%mlt_D(k)

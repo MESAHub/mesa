@@ -28,7 +28,7 @@ do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
 do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
-do_one conductive_flame "flame reached halfway point" "final.mod" auto
+do_one conductive_flame "all values are within tolerance" "final.mod" auto
 do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
@@ -41,7 +41,7 @@ do_one gyre_in_mesa_rsg "matched target" skip skip
 do_one gyre_in_mesa_spb "matched target" skip skip
 do_one gyre_in_mesa_wd "matched target" skip skip
 
-do_one hb_2M "termination code: xa_central_lower_limit" "final.mod" auto                                 
+do_one hb_2M "all values are within tolerance" "final.mod" auto
 do_one high_mass "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one high_z "stop because have dropped below central lower limit for he4" "final.mod" auto             
 do_one hot_cool_wind "all values are within tolerance" "final.mod" auto                                
@@ -63,6 +63,7 @@ do_one ns_c "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.m
 do_one ns_h "stop because time >= max_age_in_seconds" "final.mod" auto   
 do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
 do_one other_physics_hooks "stop because have dropped below central lower limit for h1" "final.mod" auto
+do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
 
 do_one rsp_BEP "good match for period" "final.mod" skip   
@@ -98,7 +99,6 @@ return
 #    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
 
 
-#   Josiah says skip this one for now   do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 
 #   needs fix   do_one make_co_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
 

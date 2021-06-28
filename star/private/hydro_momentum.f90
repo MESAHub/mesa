@@ -185,10 +185,22 @@
             i_lum = s% i_lum
             i_v = s% i_v
             nz = s% nz
-            if (k > 1) then
-               dm_face = (s% dm(k) + s% dm(k-1))/2d0
-            else ! k == 1
-               dm_face = s% dm(k)/2d0
+            ! in the momentum equation, e.g., dP/dr = -g * rho (for HSE),
+            ! rho represents the inertial (gravitational) mass density.
+            ! since dm is baryonic mass, correct dm_face when using mass corrections
+            ! this will be used in the calculation of dm_div_A
+            if (s% use_mass_corrections) then
+               if (k > 1) then
+                  dm_face = (s% dm(k)*s% mass_correction(k) + s% dm(k-1)*s% mass_correction(k-1))/2d0
+               else ! k == 1
+                  dm_face = s% dm(k)*s% mass_correction(k)/2d0
+               end if
+            else
+               if (k > 1) then
+                  dm_face = (s% dm(k) + s% dm(k-1))/2d0
+               else ! k == 1
+                  dm_face = s% dm(k)/2d0
+               end if
             end if
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
          end subroutine init

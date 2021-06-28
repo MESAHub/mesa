@@ -60,7 +60,7 @@ html_static_path = ['_static']
 # Ensure that autosectionlabel will produce unique names
 autosectionlabel_prefix_document = True
 # Go to depth 3 so options in defaults files get labels
-autosectionlabel_maxdepth = 3
+autosectionlabel_maxdepth = 5
 
 # sphinx_rtd options
 html_theme_options = {
@@ -98,6 +98,7 @@ rst_prolog = r"""
 .. |logRho| replace:: :math:`\log(\rho/\rm g\,cm^{-3})`
 .. |logT| replace:: :math:`\log(T/\rm K)`
 .. |chi^2| replace:: :math:`\chi^2`
+.. |gpercm3| replace:: :math`g\,cm^{-3}`
 """
 
 # set default highlighting language
