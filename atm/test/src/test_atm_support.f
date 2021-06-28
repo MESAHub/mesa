@@ -358,6 +358,7 @@ contains
        ierr)
     if (ierr /= 0) then
        if (test_verbosely) write(*,*) 'bad return from atm_eval_irradiated'
+       write(*,*) 'ierr',ierr
        call mesa_error(__FILE__,__LINE__)
     end if
 
@@ -388,6 +389,7 @@ contains
     real(dp) :: xz, z2bar, ye, mass_correction, sumx, &
          dabar_dx(species), dzbar_dx(species), dmc_dx(species)
     integer :: i
+    real(dp) :: norm
     type (Kap_General_Info), pointer :: rq
     call kap_ptr(kap_handle,rq,ierr)
     rq% Zbase = Z
@@ -402,6 +404,16 @@ contains
     forall (i=1:species) net_iso(chem_id(i)) = i
     xa(:) = (/ X, Y, xc, xn, xo, 0d0, 0d0 /)
     xa(species) = 1 - sum(xa(:))
+ 
+    norm = 0d0
+    do i=1,species
+      xa(i) = max(0d0, xa(i))
+      norm = norm + xa(i)
+    end do
+    do i=1,species
+      xa(i) = xa(i) / norm
+    end do
+
     call composition_info( &
          species, chem_id, xa, X, Y, xz, abar, zbar, z2bar, z53bar, ye, &
          mass_correction, sumx, dabar_dx, dzbar_dx, dmc_dx)
