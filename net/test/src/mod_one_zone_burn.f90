@@ -813,6 +813,8 @@
             real(dp), intent(in) :: time, y(:)
             real(dp), dimension(size(y)) :: x
             integer, intent(out) :: ierr 
+            integer :: j
+            real(dp) :: norm
             include 'formats'
             ierr = 0            
             !if (burn_at_constant_density) then
@@ -830,6 +832,16 @@
                 x(species+1) = y(species+1)
                 logT = x(species+1)/ln10
             end if
+         
+            ! Re-normalize and clip negative values
+            do j=1,species
+               x(j) = max(0d0, x(j))
+            end do
+            norm = sum(x(1:species))
+            do j=1,species
+               x(j) = x(j) / norm
+            end do
+
             call burn_solout1( &
                step, told, time, logT, logRho, species, x, ierr)
             told = time
@@ -1042,10 +1054,21 @@
             integer, intent(inout), pointer :: ipar(:) ! (lipar)
             real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
             integer :: i, cid
+            real(dp) :: norm
             interface
                include 'num_interp_y.dek'
             end interface
             integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+
+         
+            ! Re-normalize and clip negative values
+            do j=1,species
+               x(j) = max(0d0, x(j))
+            end do
+            norm = sum(x(1:species))
+            do j=1,species
+               x(j) = x(j) / norm
+            end do
             
             call burn_solout1( &
                step, told, time, rpar(r_burn_prev_lgT), rpar(r_burn_prev_lgRho), n, x, irtrn)
@@ -1120,7 +1143,7 @@
                   from_weaklib(num_reactions), &
                   stat=ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
             xin(1:species) = x(1:species)
 
             call composition_info( &

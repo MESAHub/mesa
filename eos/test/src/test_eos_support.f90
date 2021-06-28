@@ -654,6 +654,7 @@
                res, d_dlnd, d_dlnT, d_dxa, info)
          if (info /= 0) then
             write(*,*) 'info', info, 'Rho', Rho, 'T', T
+            write(*,*) 'xa', xa
             write(*,*) 'failed in Do_One_TRho'
             stop 1
          end if
