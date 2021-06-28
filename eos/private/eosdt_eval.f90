@@ -209,48 +209,49 @@
 
          T = atemp; logT = alogtemp
          if (atemp == arg_not_provided .and. alogtemp == arg_not_provided) then
-            ierr = -1; return
+            ierr = 1; return
          end if
          if (alogtemp == arg_not_provided) logT = log10(T)
          if (atemp == arg_not_provided) T = exp10(logT)
          
          if (T <= 0) then
-            ierr = -1
+            ierr = 2
             return
          end if
          
          Rho = arho; logrho = alogrho
          if (arho == arg_not_provided .and. alogrho == arg_not_provided) then
-            ierr = -1; return
+            ierr = 3; return
          end if
          if (alogrho == arg_not_provided) logRho = log10(Rho)
          if (arho == arg_not_provided) Rho = exp10(logRho)
          
          if (Rho <= 0) then
-            ierr = -1
+            ierr = 4
             return
          end if
+
          if (is_bad(Rho) .or. is_bad(T)) then
-            ierr = -1
+            ierr = 5
             return
          end if
 
          if (Z < 0d0 .or. X < 0d0 .or. abar < 0d0 .or. zbar < 0d0 &
             .or. is_bad(Z) .or. is_bad(X) .or. is_bad(abar) .or. is_bad(zbar)) then
-            ierr = 1
+            ierr = 6
             return
          end if
 
          do k=1,species
             if (xa(k) < 0d0 .or. is_bad(xa(k))) then
-               ierr = 1
+               ierr = 7
                return
             end if
          end do
 
          if (logT < rq% logT_lo .or. logT > rq% logT_hi .or. &
                logRho < rq% logRho_lo .or. logRho > rq% logRho_hi) then
-            ierr = 1
+            ierr = 8
             return
          end if
 
@@ -282,12 +283,12 @@
          
          do k=1,num_eos_basic_results
             if (is_bad(res(k)) .or. is_bad(d_dlnd(k)) .or. is_bad(d_dlnT(k))) then
-               ierr = 1
+               ierr = 9
                return
             end if
             do l=1,species
                if (is_bad(d_dxa(k,l))) then
-                  ierr = 1
+                  ierr = 10
                   return
                end if
             end do
@@ -296,7 +297,7 @@
          if (res(i_grad_ad) < 0d0 .or. res(i_chiRho) < 0d0 .or. res(i_chiT) < 0d0 &
             .or. res(i_Cp) < 0d0 .or. res(i_Cv) < 0d0 .or. res(i_gamma1) < 0d0 &
             .or. res(i_gamma3) < 0d0) then
-            ierr = 1
+            ierr = 11
             return
          end if
 
