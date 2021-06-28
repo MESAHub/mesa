@@ -644,7 +644,6 @@
             do iter = 1, max_iter
                call compute_Q(s, k, mixing_length_alpha, &
                   Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
-               if (report) write(*,2) 'iter Q/scale Q scale', iter, Q%val/scale, Q%val, scale
                if (is_bad(Q%val)) exit
                if (abs(Q%val)/scale <= tolerance) then
                   if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
@@ -652,7 +651,7 @@
                   exit
                end if
 
-               if (Y_is_positive) then ! Take advantage of monotonicity when we can...
+               if (.false. .and. Y_is_positive) then ! Take advantage of monotonicity when we can...
                   if (Q > 0d0) then
                      ! Q(Y) is monotonic so this means Z is a lower-bound.
                      lower_bound_Z = Z
@@ -690,7 +689,7 @@
 
 
 
-               if (report) write(*,2) 'Z_new Z Q/dQdZ Q dQdZ', iter, &
+               if (report) write(*,2) 'iter Z_new, Z, low_bnd, upr_bnc, Q/dQdZ, Q, dQdZ, corr', iter, &
                   Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val, correction%val
                Z_new%d1val1 = 1d0            
                Z = Z_new
@@ -701,7 +700,6 @@
                   Y = -exp(Z)
                end if
 
-               if (report) write(*,2) 'new Y Z Z_lower_bnd Z_upper_bnd', iter, Y%val, Z%val, lower_bound_Z%val, upper_bound_Z%val
             end do
          end if
 
@@ -719,14 +717,15 @@
                write(*,2) 'tolerance', k, tolerance
                write(*,2) 'dQdZ', k, dQdZ%val
                write(*,2) 'Y', k, Y%val
+               write(*,2) 'dYdZ', k, Y%d1val1
                write(*,2) 'exp(Z)', k, exp(Z%val)
                write(*,2) 'Z', k, Z%val
                write(*,2) 'Af', k, Af%val
+               write(*,2) 'dAfdZ', k, Af%d1val1
                write(*,2) 'A0', k, A0%val
                write(*,2) 'c0', k, c0%val
                write(*,2) 'L0', k, L0%val
                write(*,*)
-               call get_T_face
             !$OMP end critical (tdc_crit0)
             end if
             return
@@ -778,7 +777,7 @@
          type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, gradL
 
          call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, dV, kap, Hp, gradL_in, xi0, xi1, xi2) 
+            Y, T, rho, Cp, dV, kap, Hp, gradL_in, xi0, xi1, xi2)          
 
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
          L = convert(L_in)
@@ -786,6 +785,7 @@
          gradL = convert(gradL_in)
          c0 = convert(c0_in)
          Q = (L - L0*gradL) - (L0 + c0*Af)*Y
+
       end subroutine compute_Q
 
       !> Determines if it is safe (physically) to use MLT instead of TDC.
@@ -895,6 +895,7 @@
          real(dp), parameter :: x_ALFAP = 2.d0/3.d0
          real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
          include 'formats'
+
          S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*gradL/Hp)
          S0 = S0*Y
          D0 = convert(s% alpha_TDC_DAMP*x_CEDE/(mixing_length_alpha*Hp))
@@ -960,8 +961,14 @@
          type(auto_diff_real_tdc), intent(in) :: xi0, xi1, xi2
          type(auto_diff_real_tdc) :: Af ! output
          type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0, lk 
-         real(dp) :: dt       
+         real(dp) :: dt    
+
+         ! Debugging
+         logical :: dbg = .false.
+         integer :: dbg_k = 1448  
+
          include 'formats'
+
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
          dt = s%dt
          A0 = convert(A0_in)
@@ -1014,6 +1021,21 @@
             s% DAMP(k) = -xi2%val*pow3(Af%val)
             s% COUPL(k) = s% SOURCE(k) - s% DAMP(k) - s% DAMPR(k)
          end if
+
+
+         if (k == dbg_k .and. dbg) then
+            write(*,*) J2%val,J2%d1val1
+            write(*,*) Jt%val,Jt%d1val1
+            write(*,*) xi0%val,xi0%d1val1
+            write(*,*) xi1%val,xi1%d1val1
+            write(*,*) xi2%val,xi2%d1val1
+            write(*,*) num%val
+            write(*,*) den%val
+            write(*,*) Af%val,Af%d1val1
+            write(*,*) ''
+         end if
+
+
       end function eval_Af
       
       !> Computes the hyperbolic tangent of x in a way that is numerically safe.
