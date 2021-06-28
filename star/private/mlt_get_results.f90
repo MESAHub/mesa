@@ -653,7 +653,7 @@
                   exit
                end if
 
-               if (.false. .and. Y_is_positive) then ! Take advantage of monotonicity when we can...
+               if (gradL > 0d0 .and. Y_is_positive) then ! Take advantage of monotonicity when we can...
                   if (Q > 0d0) then
                      ! Q(Y) is monotonic so this means Z is a lower-bound.
                      lower_bound_Z = Z
