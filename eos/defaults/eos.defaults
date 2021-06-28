@@ -312,10 +312,10 @@
 ! ::
 
    dbg = .false.
-   logT_lo = -1d99
-   logT_hi = 1d99
-   logRho_lo = -1d99
-   logRho_hi = 1d99
+   logT_lo = 3
+   logT_hi = 13
+   logRho_lo = -12
+   logRho_hi = 15
    X_lo = -1d99
    X_hi = 1d99
    Z_lo = -1d99
