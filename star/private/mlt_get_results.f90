@@ -369,7 +369,7 @@
                f, f0, f1, f2, radiative_conductivity, convective_conductivity
             include 'formats' 
             Q = chiT/chiRho ! 'Q' param  C&G 14.24
-            if (MLT_option == 'Cox') then ! this assumes optically thick
+            if (MLT_option == 'Cox' .or. MLT_option == 'TDC') then ! this assumes optically thick
                a0 = 9d0/4d0
                convective_conductivity = &
                   Cp*grav*pow2(Lambda)*rho*(sqrt(Q*rho/(2d0*P)))/9d0 ! erg / (K cm sec)

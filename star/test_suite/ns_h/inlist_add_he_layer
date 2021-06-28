@@ -91,7 +91,7 @@
       initial_z = 0.02d0
 
       mixing_length_alpha = 1.5
-      MLT_option = 'Cox'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.  
       alpha_semiconvection = 0.1

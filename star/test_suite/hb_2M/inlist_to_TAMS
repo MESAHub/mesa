@@ -39,7 +39,7 @@
 ! mixing controls
 
       mixing_length_alpha = 1.8d0
-      MLT_option = 'Henyey'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.
      

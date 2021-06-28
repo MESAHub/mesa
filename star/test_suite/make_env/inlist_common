@@ -44,7 +44,7 @@
       mesh_delta_coeff = 0.6
       
       mixing_length_alpha = 1.5
-      MLT_option = 'Cox'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.  
       alpha_semiconvection = 0.1
