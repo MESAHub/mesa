@@ -454,7 +454,7 @@
             end if            
             
             
-            if (.true.) then ! need this old form for a few test cases
+            if (.false.) then ! need this old form for a few test cases
                gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
                Y_face = gradT - grada
             else ! switch to this when resolve the problems with those cases
@@ -479,6 +479,8 @@
             end if
 
          end subroutine set_MLT   
+
+!------------------------------ Semiconvection
 
          subroutine set_semiconvection ! Langer 1983 & 1985
             type(auto_diff_real_star_order1) :: bc, LG, &
