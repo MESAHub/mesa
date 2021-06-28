@@ -211,9 +211,6 @@
          ! check if this particular k needs to be done with TDC
          using_TDC = s% using_TDC
          if (.not. s% have_mlt_vc) using_TDC = .false.
-         if (s% have_mlt_vc) then
-            write(*,*) k, s% mlt_vc(k)
-         end if
          if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
          if (using_TDC) then
             Y_guess = gradT - gradL
