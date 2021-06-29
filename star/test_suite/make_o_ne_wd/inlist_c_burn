@@ -9,7 +9,7 @@
       save_model_filename = 'c_burn.mod'
       required_termination_code_string = 'star_species_mass_max_limit'
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -26,7 +26,7 @@
       max_model_number = 3000
 
 ! when to stop
-      star_species_mass_max_limit = 0.35d0 ! Msun
+      star_species_mass_max_limit = 0.3d0 ! Msun
       star_species_mass_max_limit_iso = 'ne20'
 
 ! wind
@@ -101,15 +101,15 @@
       trace_history_value_name(6) = 'log_rel_run_E_err'
 
       
-      !photo_interval = 1
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       !terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
       !trace_evolve = .true.
       !fill_arrays_with_NaNs = .true.
