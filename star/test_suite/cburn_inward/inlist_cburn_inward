@@ -185,7 +185,7 @@
          Text_Summary1_name(2,3) = 'log_cntr_T'
          Text_Summary1_name(3,3) = 'c12_c12'
          Text_Summary1_name(4,3) = 'c_alpha'
-         Text_Summary1_name(5,3) = ''
+         Text_Summary1_name(5,3) = 'dt_div_max_tau_conv'
 
          !Text_Summary1_name(6,3) = 'center_ye'
          
@@ -241,8 +241,8 @@
          Profile_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
          Profile_Panels1_other_ymargin(1) = 1
             
-      Profile_Panels1_yaxis_name(2) = 'logRho'
-      Profile_Panels1_other_yaxis_name(2) = 'logR_cm' 
+      Profile_Panels1_yaxis_name(2) = 'brunt_N2'
+      Profile_Panels1_other_yaxis_name(2) = 'brunt_N2_composition_term' 
          Profile_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
          Profile_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0
          Profile_Panels1_other_ymargin(2) = 0
