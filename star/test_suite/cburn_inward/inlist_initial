@@ -80,7 +80,7 @@
       overshoot_f(3) = 0.01
       overshoot_f0(3) = 0.005
 
-      mesh_delta_coeff = 2.0
+      mesh_delta_coeff = 1.0
       varcontrol_target = 1d-3
 
 
@@ -90,28 +90,16 @@
       Dutch_scaling_factor = 0.8d0
 
       
-      mixing_length_alpha = 1.89d0
-      MLT_option = 'Henyey'
+      mixing_length_alpha = 1.6d0
+      MLT_option = 'TDC'
       
       max_age = 10d9
       max_years_for_timestep = 1d9
 
       report_solver_progress = .false. ! set true to see info about solver iterations
       report_ierr = .false. ! if true, produce terminal output when have some internal error
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 8242
-      !okay_to_remesh = .false.
 
       !trace_evolve = .true.
-      
-      ! hydro debugging
-      !hydro_numerical_jacobian = .true.
-      !hydro_check_everything = .true.
-      !hydro_show_rcond = .true.
-      !hydro_inspectB_flag = .true.
-      !hydro_save_numjac_plot_data = .true.
-      !hydro_dump_call_number = 24765
 
       photo_interval = 50
       profile_interval = 100
