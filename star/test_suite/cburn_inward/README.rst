@@ -29,7 +29,7 @@ we may not get a carbon flame.
 Inlists
 *******
 
-This test case has two part. Click to see a larger view of a plot.
+This test case has two parts. Click to see a larger view of a plot.
 
 * Part 1 (``inlist_initial``) creates a 7.5 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to core helium depletion (mass fraction helium < 1e-5.)
 
