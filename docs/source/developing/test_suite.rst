@@ -361,6 +361,32 @@ which results in the additional output
             -     3.3303926652486070E-05
             -     7.2015481753889745E-05
 
+
+Setting up new machine with MESA TestHub
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Make an account on `the TestHub <https://testhub.mesastar.org/>`_ by messaging one of the admins (Bill Wolf). Remember the email and password you use; you'll need them later in the terminal.
+
+2. Make sure ruby is installed, for example using the `Ruby version manager <https://rvm.io/>`_ (rvm).
+
+  * If using the rvm, follow the instructions on that page to install the gpg keys. If this does not work, then execute the next line (``\curl -sSL https://get.rvm.io | bash -s stable``) instead, and follow the instructions printed in the terminal.
+  
+  * That line only installs the rvm; you also need Ruby itself. One can execute ``\curl -sSL https://get.rvm.io | bash -s stable --ruby`` as per the rvm installation page, but that requires sudo access. For a local installation, one can follow `this StackOverflow answer <https://stackoverflow.com/a/17219765>`_. 
+
+3. Download and set up `mesa_test <https://github.com/MESAHub/mesa_test>`_, by doing the following:
+
+  * ``gem install mesa_test``
+  
+  * ``mesa_test setup`` (this will create a settings file in ``~/.mesa_test/config.yml``)
+  
+  * ``mesa_test install_and_test main`` will check out the main branch, test it, and submit the results to the testhub. 
+
+4. If you want to set up ``mesa_test`` to run automatically on a cluster, Rob Farmer has created `a set of scripts <https://github.com/rjfarmer/mesa-helios-test>`_ that work with the Slurm workload manager. These scripts pull all commits and submit a job to the cluster queue for each new commit. You must edit the paths in all of the scripts to point to your own directories.
+
+  * You can set up ``mesa_test`` or Rob's cluster script to run recurrently as a cronjob by doing ``crontab -e`` to edit the cronjob table. 
+  
+  * Add for example: ``10 * * * * ~/mesa/mesa-helios-test/runMesaTest.sh >/dev/null 2>&1`` to make it run every 10 minutes (or swap out ``runMesaTest`` with a ``mesa_test`` command). The parts at the end of that line prevent it from emailing you each time it runs.
+
+
 Continuous integration testing
 ------------------------------
 
