@@ -403,6 +403,12 @@ a long-period RR Lyrae model contributed by Radek Smolec.
 This test case checks the non-linear pulsation evolution of a 0.55 Msun, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model -
 type-II Cepheid of BL Her type based on |Smolec14|.
 
+:ref:`rsp_check_2nd_crossing`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises the RSP model building and linear nonadiabatic stability analysis
+to find the instability strip edges, and effective temperatures offset from the blue edge of the instability strip.
+
 
 
 :ref:`c13_pocket`
