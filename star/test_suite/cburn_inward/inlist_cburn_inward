@@ -57,8 +57,9 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1000
+      ! limit max_model_number and max_age as part of test_suite
+      max_model_number = 2000
+      max_age = 1d6
 
       initial_mass = 8.5
       initial_z = 0.02d0
@@ -67,48 +68,48 @@
 
       varcontrol_target = 1d-3
       
-      mixing_length_alpha = 1.89d0
-      MLT_option = 'Henyey'
+      mixing_length_alpha = 1.6d0
+      MLT_option = 'TDC'
 
       use_ledoux_criterion = .true.
-      make_gradr_sticky_in_solver_iters = .true.
+      make_gradr_sticky_in_solver_iters = .false.
 
+      ! We need to only use 'top' overshooting because 'bottom'
+      ! overshooting generates unphysical dilution of C12 below
+      ! the flame, ultimately killing the flame in a way that depends
+      ! on the precise convection treatment.
       overshoot_scheme(1) = 'exponential'
       overshoot_zone_type(1) = 'nonburn'
       overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'any'
+      overshoot_bdy_loc(1) = 'top'
       overshoot_f(1) = 0.01
       overshoot_f0(1) = 0.005
 
       overshoot_scheme(2) = 'exponential'
       overshoot_zone_type(2) = 'burn_H'
       overshoot_zone_loc(2) = 'any'
-      overshoot_bdy_loc(2) = 'any'
+      overshoot_bdy_loc(2) = 'top'
       overshoot_f(2) = 0.01
       overshoot_f0(2) = 0.005
 
       overshoot_scheme(3) = 'exponential'
       overshoot_zone_type(3) = 'burn_He'
       overshoot_zone_loc(3) = 'any'
-      overshoot_bdy_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'top'
       overshoot_f(3) = 0.01
       overshoot_f0(3) = 0.005
 
       overshoot_scheme(3) = 'exponential'
       overshoot_zone_type(3) = 'burn_Z'
       overshoot_zone_loc(3) = 'shell'
-      overshoot_bdy_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'top'
       overshoot_f(3) = 0.01
       overshoot_f0(3) = 0.005
-
 
       hot_wind_scheme = 'Dutch'
       cool_wind_RGB_scheme = 'Dutch'
       cool_wind_AGB_scheme = 'Dutch'
       Dutch_scaling_factor = 0.8d0
-
-      
-      max_age = 10d9
 
       ! Solver
       op_split_burn = .true.
@@ -120,8 +121,8 @@
 
       photo_interval = 10
       profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
+      history_interval = 1
+      terminal_interval = 1
       write_header_frequency = 10
 
       x_integer_ctrl(1) = 2 ! Part number ! Set this to 0 to turn of test suite checks
@@ -186,25 +187,11 @@
          Text_Summary1_name(3,3) = 'c12_c12'
          Text_Summary1_name(4,3) = 'c_alpha'
          Text_Summary1_name(5,3) = 'dt_div_max_tau_conv'
-
-         !Text_Summary1_name(6,3) = 'center_ye'
-         
-         !Text_Summary1_name(7,3) = 'iron_core_infall'
-         !Text_Summary1_name(8,3) = 'non_iron_core_infall'
-         
-         !Text_Summary1_name(8,1) = 'center o16'
          Text_Summary1_name(8,1) = 'species'
       
       !Abundance_win_flag = .true.
       Abundance_win_width = 6
       Abundance_win_aspect_ratio = 1 ! aspect_ratio = height/width
-      
-      
-
-!      Abundance_xaxis_name = 'logR' 
-!      Abundance_xaxis_reversed = .false.
-!      Abundance_xmin = -4 ! only used if /= -101d0
-!      Abundance_xmax = -2 ! -101 ! only used if /= -101d0
 
       Abundance_xaxis_name = 'mass' 
       Abundance_xaxis_reversed = .false.
