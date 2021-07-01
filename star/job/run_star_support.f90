@@ -383,6 +383,10 @@
          if(dbg) write(*,*) 'call add_fpe_checks'
          call add_fpe_checks(id, s, ierr)
          if (failed('add_fpe_checks',ierr)) return
+         
+         if(dbg) write(*,*) 'call multiply_tolerances'
+         call multiply_tolerances(id, s, ierr)
+         if (failed('multiply_tolerances',ierr)) return
 
          if(dbg) write(*,*) 'call pgstar_env_check'
          call pgstar_env_check(id, s, ierr)
@@ -3822,7 +3826,54 @@
          end if
 
       end subroutine add_fpe_checks
-
+      
+      
+      
+      subroutine multiply_tolerances(id, s, ierr)
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         integer :: status
+         
+         real(dp) :: test_suite_res_factor = 1
+         character(len=20) :: test_suite_resolution_factor_str
+         
+         include 'formats'
+         
+         ierr = 0
+         call GET_ENVIRONMENT_VARIABLE('MESA_TEST_SUITE_RESOLUTION_FACTOR', &
+            test_suite_resolution_factor_str, STATUS=status)
+         if (status /= 0) return
+         
+         if (test_suite_resolution_factor_str .ne. "") then 
+            read(test_suite_resolution_factor_str, *) test_suite_res_factor
+            write(*,*) ""
+            write(*,*) "***"
+            write(*,*) "MESA_TEST_SUITE_RESOLUTION_FACTOR set to", test_suite_res_factor
+            write(*,*) "***"
+            write(*,*) "Warning: This environment variable is for testing purposes"
+            write(*,*) "          and should be set to 1 during normal MESA use."
+            write(*,*) "***"
+            write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
+            write(*,*) "and max_model_number by its inverse:"
+            write(*,*) ""
+            write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
+            s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
+            write(*,*)    "   new mesh_delta_coeff = ",   s% mesh_delta_coeff
+            write(*,*)    ""
+            write(*,*)    "   old time_delta_coeff = ",   s% time_delta_coeff
+            s% time_delta_coeff = test_suite_res_factor * s% time_delta_coeff
+            write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
+            write(*,*)    ""
+            write(*,*)    "   old max_model_number = ",   s% max_model_number
+            s% max_model_number = s% max_model_number / test_suite_res_factor
+            write(*,*)    "   new max_model_number = ",   s% max_model_number
+            write(*,*)    ""
+         end if
+      
+      end subroutine multiply_tolerances
+      
+      
       subroutine pgstar_env_check(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
