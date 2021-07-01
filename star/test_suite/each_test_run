@@ -253,8 +253,7 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     else
         testhub_log "fpe_checks: true"
     fi
-    if [ -z "$MESA_TEST_SUITE_RESOLUTION_FACTOR" ] || 
-       (( $(echo "$MESA_TEST_SUITE_RESOLUTION_FACTOR == 1" | bc -l) )); then
+    if [ -z "$MESA_TEST_SUITE_RESOLUTION_FACTOR" ]; then
         testhub_log "resolution_factor: 1"
     else
         testhub_log "resolution_factor: $MESA_TEST_SUITE_RESOLUTION_FACTOR"
