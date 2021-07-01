@@ -26,7 +26,7 @@
       set_initial_model_number = .true.
       initial_model_number = 0
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 
 / ! end of star_job namelist
@@ -34,11 +34,7 @@
 
 &eos
    use_PC = .false.
-   logRho_cut_FreeEOS_hi = -6.1
-   logRho_cut_FreeEOS_lo = -6.2
-   !dbg = .true.
-   logT_lo = 8.8598
-   logT_hi = 8.85989
+   use_Skye = .true.
 / !end of eos namelist
 
 
@@ -64,13 +60,16 @@
       initial_mass = 8.5
       initial_z = 0.02d0
 
-      mesh_delta_coeff = 1.5
+      mesh_delta_coeff = 1.0
 
-      varcontrol_target = 1d-3
+      varcontrol_target = 1d-4
       
-      mixing_length_alpha = 1.6d0
+      mixing_length_alpha = 1.8d0
       MLT_option = 'TDC'
 
+      thermohaline_option = 'Kippenhahn'
+      thermohaline_coeff = 100
+ 
       use_ledoux_criterion = .true.
       make_gradr_sticky_in_solver_iters = .false.
 

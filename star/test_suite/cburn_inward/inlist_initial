@@ -57,30 +57,33 @@
       xa_central_lower_limit(1) = 1d-5
 
 
+      thermohaline_option = 'Kippenhahn'
+      thermohaline_coeff = 100
+
       use_ledoux_criterion = .true.
 
       overshoot_scheme(1) = 'exponential'
       overshoot_zone_type(1) = 'nonburn'
       overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'any'
+      overshoot_bdy_loc(1) = 'top'
       overshoot_f(1) = 0.01
       overshoot_f0(1) = 0.005
 
       overshoot_scheme(2) = 'exponential'
       overshoot_zone_type(2) = 'burn_H'
       overshoot_zone_loc(2) = 'any'
-      overshoot_bdy_loc(2) = 'any'
+      overshoot_bdy_loc(2) = 'top'
       overshoot_f(2) = 0.01
       overshoot_f0(2) = 0.005
 
       overshoot_scheme(3) = 'exponential'
       overshoot_zone_type(3) = 'burn_He'
       overshoot_zone_loc(3) = 'any'
-      overshoot_bdy_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'top'
       overshoot_f(3) = 0.01
       overshoot_f0(3) = 0.005
 
-      mesh_delta_coeff = 1.0
+      mesh_delta_coeff = 1.5
       varcontrol_target = 1d-3
 
 
@@ -90,7 +93,7 @@
       Dutch_scaling_factor = 0.8d0
 
       
-      mixing_length_alpha = 1.6d0
+      mixing_length_alpha = 1.8d0
       MLT_option = 'TDC'
       
       max_age = 10d9
