@@ -409,6 +409,17 @@ type-II Cepheid of BL Her type based on |Smolec14|.
 This test case exercises the RSP model building and linear nonadiabatic stability analysis
 to find the instability strip edges, and effective temperatures offset from the blue edge of the instability strip.
 
+:ref:`rsp_save_and_load_file`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks that RSP models can be saved and loaded to produce the same results as test case :ref:`rsp_Cepheid`.
+
+:ref:`semiconvection`
+^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks placement of the convective and semiconvective boundaries when using the Ledoux criterion and predictive mixing,
+see |MESA V|.The test vehicle is with a 1.5 Msun, Z=0.02 metallicity, model.
+
 
 
 :ref:`c13_pocket`

@@ -1,0 +1,1 @@
+../../../star/test_suite/semiconvection/README.rst
