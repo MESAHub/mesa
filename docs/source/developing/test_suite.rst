@@ -364,7 +364,7 @@ which results in the additional output
 
 Setting up new machine with MESA TestHub
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1. Make an account on `the TestHub <https://testhub.mesastar.org/>`_ by messaging one of the admins (Bill Wolf). Remember the email and password you use; you'll need them later in the terminal.
+1. Make an account on `the TestHub <https://testhub.mesastar.org/>`_ by messaging one of the admins (Bill Wolf). You will receive a token that you will need later in order to submit logs to the logs server. Remember also the email and password you use; you'll need these later in the terminal. 
 
 2. Make sure ruby is installed, for example using the `Ruby version manager <https://rvm.io/>`_ (rvm).
 
@@ -376,7 +376,7 @@ Setting up new machine with MESA TestHub
 
   * ``gem install mesa_test``
   
-  * ``mesa_test setup`` (this will create a settings file in ``~/.mesa_test/config.yml``)
+  * ``mesa_test setup`` (here you will supply your email, password, and token from earlier; this will create a settings file in ``~/.mesa_test/config.yml``)
   
   * ``mesa_test install_and_test main`` will check out the main branch, test it, and submit the results to the testhub. 
 
