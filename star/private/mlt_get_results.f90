@@ -647,7 +647,7 @@
             lower_bound_Z = -100d0
             upper_bound_Z = 50d0 
             
-            if (report) write(*,2) 'initial Y', 0, Y%val
+            if (report) write(*,2) 'initial Z', 0, Z%val
             do iter = 1, max_iter
                call compute_Q(s, k, mixing_length_alpha, &
                   Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
@@ -676,6 +676,11 @@
                end if
 
                correction = -Q/dQdz
+               if (correction > 2d0) then
+                  correction = 2d0
+               else if (correction < -2d0) then
+                  correction = -2d0
+               end if
 
                if (abs(correction) < 1d-13) then
                   ! Can't get much more precision than this.
