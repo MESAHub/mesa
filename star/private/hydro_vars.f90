@@ -153,6 +153,10 @@
             return
          end if
          
+         if (.not. skip_mlt .and. s% okay_to_set_mlt_vc .and. .not. s% have_mlt_vc) then
+            s% have_mlt_vc = .true.
+         end if
+
          if (s% op_split_burn) then
             do k = 1, nz
                if (s% T_start(k) >= s% op_split_burn_min_T) &
