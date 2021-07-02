@@ -60,7 +60,7 @@ html_static_path = ['_static']
 # Ensure that autosectionlabel will produce unique names
 autosectionlabel_prefix_document = True
 # Go to depth 3 so options in defaults files get labels
-autosectionlabel_maxdepth = 5
+autosectionlabel_maxdepth = 6
 
 # sphinx_rtd options
 html_theme_options = {
