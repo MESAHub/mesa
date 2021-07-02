@@ -737,6 +737,7 @@
                write(*,2) 'A0', k, A0%val
                write(*,2) 'c0', k, c0%val
                write(*,2) 'L0', k, L0%val
+               write(*,2) 'gradL', k, gradL%val
                write(*,*)
             !$OMP end critical (tdc_crit0)
             end if
