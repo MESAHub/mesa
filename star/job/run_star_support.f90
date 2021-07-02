@@ -3855,7 +3855,7 @@
             write(*,*) "          and should be set to 1 during normal MESA use."
             write(*,*) "***"
             write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
-            write(*,*) "and max_model_number by its inverse:"
+            write(*,*) "and max_model_number by its inverse twice:"
             write(*,*) ""
             write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
             s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
@@ -3866,7 +3866,7 @@
             write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
             write(*,*)    ""
             write(*,*)    "   old max_model_number = ",   s% max_model_number
-            s% max_model_number = s% max_model_number / test_suite_res_factor
+            s% max_model_number = s% max_model_number / test_suite_res_factor / test_suite_res_factor
             write(*,*)    "   new max_model_number = ",   s% max_model_number
             write(*,*)    ""
          end if
