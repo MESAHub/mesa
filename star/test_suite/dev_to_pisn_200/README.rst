@@ -6,17 +6,17 @@ dev_to_pisn_200
 
 This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN)
 
-***************
+
 Physical checks
-***************
+===============
 
 This tracks the central value of (Gamma1 - 4/3) and the point when the pressure weighted integral of Gamma1-4/3 (integral_gamma1) first drops below 0.
 This value should be 0 or negative otherwise we do not have a PISN but instead PPISN (`Renzo et al (2020) <https://ui.adsabs.harvard.edu/abs/2020A%26A...640A..56R/abstract>`__)
 
 
-*******
+
 Inlists
-*******
+=======
 
 
 This test case has seven parts.
