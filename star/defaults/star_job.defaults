@@ -168,7 +168,7 @@
     pgstar_flag = .false.
 
       ! disable_pgstar_during_relax_flag
-      ! ~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, disables pgplot output during relaxation operations
 
