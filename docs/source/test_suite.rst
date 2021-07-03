@@ -420,6 +420,11 @@ This test case checks that RSP models can be saved and loaded to produce the sam
 This test case checks placement of the convective and semiconvective boundaries when using the Ledoux criterion and predictive mixing,
 see |MESA V|.The test vehicle is with a 1.5 Msun, Z=0.02 metallicity, model.
 
+:ref:`simplex_solar_calibration`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises the simplex framework with a check of the chi^2 value for 1.0 Msun, Z=0.02 metallicity, solar model.
+
 
 
 :ref:`c13_pocket`
