@@ -425,6 +425,23 @@ see |MESA V|.The test vehicle is with a 1.5 Msun, Z=0.02 metallicity, model.
 
 This test case exercises the simplex framework with a check of the chi^2 value for 1.0 Msun, Z=0.02 metallicity, solar model.
 
+:ref:`test_memory`
+^^^^^^^^^^^^^^^^^^
+
+This test case program checks MESA's memory management.
+It is designed primarily to be run inside the valgrind leak-checking tool,
+and is based on code provided originally by Warrick Ball.
+
+:ref:`timing`
+^^^^^^^^^^^^^
+
+This test checks the counter and timing routines with a 1.5 Msun, Z=0.02 metallicity model.
+
+:ref:`twin_studies`
+^^^^^^^^^^^^^^^^^^^
+
+This test case exercise the capability to simultaneously evolve two model stars.
+The test vehicle is a pair of 15 Msun, Z=0.02 metallicity, models one with overshooting and one without overshooting.
 
 
 :ref:`c13_pocket`
