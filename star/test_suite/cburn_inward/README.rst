@@ -6,7 +6,6 @@ cburn_inward
 
 This test suite example checks the inward propagation of a carbon burning front in a 7.5 Msun model.
 
-
 Physical checks
 ===============
 
@@ -23,7 +22,6 @@ If its signficantly different (0.1 dex) then we have a microphysics problem (or 
 
 The C/O core mass should be between 1.0 and 1.4 |Msun|, if different then tune the initial mass/overshot, otherwise
 we may not get a carbon flame.
-
 
 
 Inlists
