@@ -443,6 +443,11 @@ This test checks the counter and timing routines with a 1.5 Msun, Z=0.02 metalli
 This test case exercise the capability to simultaneously evolve two model stars.
 The test vehicle is a pair of 15 Msun, Z=0.02 metallicity, models one with overshooting and one without overshooting.
 
+:ref:`wd_c_core_ignition`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case the checks the onset of a thermonuclear runaway in an accreting Chandrasekhar mass carobon-oxygen white dwarf.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
