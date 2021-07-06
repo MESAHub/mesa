@@ -448,6 +448,11 @@ The test vehicle is a pair of 15 Msun, Z=0.02 metallicity, models one with overs
 
 This test case the checks the onset of a thermonuclear runaway in an accreting Chandrasekhar mass carobon-oxygen white dwarf.
 
+:ref:`wd_cool_0.6M`
+^^^^^^^^^^^^^^^^^^^
+
+This test case the checks the evolution of a cooling, element diffusing 0.6 Msun white dwarf.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
