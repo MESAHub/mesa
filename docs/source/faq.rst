@@ -73,6 +73,20 @@ Consult the release notes for these versions for more information.
 Prereqs & Installation
 ======================
 
+Why does MESA fail to build when testing the EOS module?
+--------------------------------------------------------
+
+Errors like::
+
+    ../utils/build_and_test_parallel: line 56: 151170 Killed                  ./test_quietly &> test_quietly.txt
+
+typically arise because the build environment doesn't have enough RAM.
+We've found that this usually happens because you're building MESA on
+a virtual machine (VM) that hasn't been allocated enough virtual
+memory, in which case the solution is to allocate more memory to
+the VM.  If you aren't using a VM, then MESA might somehow not be able
+to access the amount of RAM that it needs.
+
 Can MESA be run on 32-bit machines?
 -----------------------------------
 
