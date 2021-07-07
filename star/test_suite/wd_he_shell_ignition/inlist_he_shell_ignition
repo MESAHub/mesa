@@ -72,19 +72,6 @@
       max_model_number = 4000
       mlt_option = 'TDC'      
          
-      okay_to_reduce_gradT_excess = .false.
-      gradT_excess_f1 = 1d-4
-      gradT_excess_f2 = 1d-2
-      gradT_excess_age_fraction = 0.9d0
-      
-      ! turn on full all the time
-      gradT_excess_lambda1 = 1.0
-      gradT_excess_beta1 = 0.5
-      gradT_excess_lambda2 = 1.0
-      gradT_excess_beta2 = 0.5
-      gradT_excess_dlambda = 1
-      gradT_excess_dbeta = 1
-
       gamma_center_limit = 1000 ! FOR THIS TEST
 
       max_center_cell_dq = 1d-6
