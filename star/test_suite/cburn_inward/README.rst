@@ -6,9 +6,8 @@ cburn_inward
 
 This test suite example checks the inward propagation of a carbon burning front in a 7.5 Msun model.
 
-***************
 Physical checks
-***************
+===============
 
 This test case tracks the mass co-orindate when carbon ignites, the density at that point, and 
 the C/O core mass at that instance.
@@ -25,9 +24,8 @@ The C/O core mass should be between 1.0 and 1.4 |Msun|, if different then tune t
 we may not get a carbon flame.
 
 
-*******
 Inlists
-*******
+=======
 
 This test case has two parts. Click to see a larger view of a plot.
 

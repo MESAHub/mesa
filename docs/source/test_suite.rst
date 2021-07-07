@@ -420,6 +420,43 @@ This test case checks that RSP models can be saved and loaded to produce the sam
 This test case checks placement of the convective and semiconvective boundaries when using the Ledoux criterion and predictive mixing,
 see |MESA V|.The test vehicle is with a 1.5 Msun, Z=0.02 metallicity, model.
 
+:ref:`simplex_solar_calibration`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises the simplex framework with a check of the chi^2 value for 1.0 Msun, Z=0.02 metallicity, solar model.
+
+:ref:`test_memory`
+^^^^^^^^^^^^^^^^^^
+
+This test case program checks MESA's memory management.
+It is designed primarily to be run inside the valgrind leak-checking tool,
+and is based on code provided originally by Warrick Ball.
+
+:ref:`timing`
+^^^^^^^^^^^^^
+
+This test checks the counter and timing routines with a 1.5 Msun, Z=0.02 metallicity model.
+
+:ref:`twin_studies`
+^^^^^^^^^^^^^^^^^^^
+
+This test case exercise the capability to simultaneously evolve two model stars.
+The test vehicle is a pair of 15 Msun, Z=0.02 metallicity, models one with overshooting and one without overshooting.
+
+:ref:`wd_c_core_ignition`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case the checks the onset of a thermonuclear runaway in an accreting Chandrasekhar mass carobon-oxygen white dwarf.
+
+:ref:`wd_cool_0.6M`
+^^^^^^^^^^^^^^^^^^^
+
+This test case the checks the evolution of a cooling, element diffusing 0.6 Msun white dwarf.
+
+:ref:`wd_diffusion`
+^^^^^^^^^^^^^^^^^^^
+
+This test case the checks element diffusion in a 0.6 Msun carbon-oxygen white dwarf.
 
 
 :ref:`c13_pocket`

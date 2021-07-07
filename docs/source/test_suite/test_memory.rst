@@ -1,0 +1,1 @@
+../../../star/test_suite/test_memory/README.rst

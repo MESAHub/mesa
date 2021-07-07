@@ -153,7 +153,7 @@ This should not be set during a normal run.
 
 
 MESA_TEST_SUITE_RESOLUTION_FACTOR
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If set to a value other than 1, then ``mesh_delta_coeff`` and 
 ``time_delta_coeff`` will be multiplied by its value, and 
