@@ -63,7 +63,7 @@
 ! mixing controls
 
       mixing_length_alpha = 3 ! 1.5
-      mlt_option = 'Henyey'
+      MLT_option = 'Henyey'
       use_Ledoux_criterion = .true.
 
       okay_to_reduce_gradT_excess = .true.
