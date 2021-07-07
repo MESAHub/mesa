@@ -57,7 +57,7 @@
 
 &controls
       
-      power_he_burn_upper_limit = 1d13
+      power_he_burn_upper_limit = 1d12
 
       always_use_eps_grav_form_of_energy_eqn = .true.
       ! can't make it through the flash at the end with this true
@@ -92,12 +92,12 @@
       xa_function_weight(2) = 20
       xa_function_param(2) = 1d-2
 
-      delta_lgL_H_limit = 0.05 ! limit for magnitude of change in lgL_H
+      delta_lgL_H_limit = 0.02 ! limit for magnitude of change in lgL_H
       delta_lgL_H_hard_limit = 0.5
       lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
 
-      delta_lgL_He_limit = 0.01 ! limit for magnitude of change in lgL_He
-      delta_lgL_He_hard_limit = 1
+      delta_lgL_He_limit = 0.02 ! limit for magnitude of change in lgL_He
+      delta_lgL_He_hard_limit = 0.5
       lgL_He_burn_min = -6 ! ignore changes in lgL_He if value is less than this
    
       delta_lgL_limit = 0.02
@@ -118,8 +118,8 @@
  
       relax_hard_limits_after_retry = .false.
 
-      mesh_delta_coeff = 0.8 ! 0.4 !1.2
-      varcontrol_target = 3d-3
+      mesh_delta_coeff = 1.0
+      varcontrol_target = 1d-3
       
       super_eddington_scaling_factor = 1
       super_eddington_wind_Ledd_factor = 5
