@@ -96,9 +96,9 @@
       delta_lgL_H_hard_limit = 0.5
       lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
 
-      delta_lgL_He_limit = 0.025 ! limit for magnitude of change in lgL_He
+      delta_lgL_He_limit = 0.01 ! limit for magnitude of change in lgL_He
       delta_lgL_He_hard_limit = 1
-      lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+      lgL_He_burn_min = -6 ! ignore changes in lgL_He if value is less than this
    
       delta_lgL_limit = 0.02
       delta_lgL_hard_limit = 0.15
@@ -114,7 +114,6 @@
 
       delta_lgT_max_limit = 0.003
       delta_lgT_max_limit_lgT_min = 8d0
-      delta_lgT_cntr_limit = 0.002
       delta_lg_star_mass_limit = 5d-4
  
       relax_hard_limits_after_retry = .false.
