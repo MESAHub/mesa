@@ -63,7 +63,7 @@
 
 ! mlt
       mixing_length_alpha = 1.5
-      MLT_option = 'TDC'
+      MLT_option = 'Henyey'!'TDC'
 
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
