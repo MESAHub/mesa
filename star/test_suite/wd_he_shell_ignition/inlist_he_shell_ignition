@@ -57,7 +57,7 @@
 
 &controls
       
-      power_he_burn_upper_limit = 1d15
+      power_he_burn_upper_limit = 1d14
 
       always_use_eps_grav_form_of_energy_eqn = .true.
       ! can't make it through the flash at the end with this true
@@ -72,7 +72,7 @@
       max_model_number = 4000
       mlt_option = 'TDC'      
          
-      okay_to_reduce_gradT_excess = .true.
+      okay_to_reduce_gradT_excess = .false.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
       gradT_excess_age_fraction = 0.9d0
@@ -113,10 +113,10 @@
       delta_lgL_He_hard_limit = 1
       lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
    
-      delta_lgL_limit = 0.05
+      delta_lgL_limit = 0.02
       delta_lgL_hard_limit = 0.15
 
-      delta_lgT_limit = 0.5
+      delta_lgT_limit = 0.2
       delta_lgT_hard_limit = 1
       
       delta_lgRho_limit = 1
@@ -125,17 +125,17 @@
       delta_lgTeff_limit = 0.1  
       delta_lgTeff_hard_limit = 0.3
 
-      delta_lgT_max_limit = 0.005
+      delta_lgT_max_limit = 0.003
       delta_lgT_max_limit_lgT_min = 8d0
-      delta_lgT_cntr_limit = 0.005
+      delta_lgT_cntr_limit = 0.002
       delta_lg_star_mass_limit = 5d-4
-
+ 
       relax_hard_limits_after_retry = .false.
 
 
 		mesh_delta_coeff = 0.8 ! 0.4 !1.2
 
-      varcontrol_target = 3d-3
+      varcontrol_target = 1d-3
       
       super_eddington_scaling_factor = 1
       super_eddington_wind_Ledd_factor = 5
