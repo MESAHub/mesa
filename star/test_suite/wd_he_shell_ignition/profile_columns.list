@@ -2,7 +2,7 @@
 ! you can use a non-standard version by setting profile_columns_file in your inlist
 
 ! units are cgs unless otherwise noted.
-
+tdc_num_iters
 ! reorder the following names as desired to reorder columns.
 ! comment out the name to omit a column (fewer columns => less IO => faster running).
 ! remove '!' to restore a column.
