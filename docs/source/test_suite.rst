@@ -453,6 +453,11 @@ This test case the checks the onset of a thermonuclear runaway in an accreting C
 
 This test case the checks the evolution of a cooling, element diffusing 0.6 Msun white dwarf.
 
+:ref:`wd_diffusion`
+^^^^^^^^^^^^^^^^^^^
+
+This test case the checks element diffusion in a 0.6 Msun carbon-oxygen white dwarf.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
