@@ -51,7 +51,7 @@
 ! equation controls
 
       use_gold2_tolerances = .false.
-      
+      mlt_option = 'Henyey'    
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
       use_dedt_form_of_energy_eqn = .true.
       
