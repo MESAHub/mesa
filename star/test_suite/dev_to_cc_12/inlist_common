@@ -96,7 +96,7 @@
 ! timesteps
       varcontrol_target   = 1d-3
       min_timestep_factor = 0.8d0
-      max_timestep_factor = 1.05d0
+      max_timestep_factor = 1.5d0
       timestep_factor_for_retries = 0.75
       
       never_skip_hard_limits = .true
