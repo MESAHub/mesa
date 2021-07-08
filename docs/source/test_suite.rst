@@ -458,6 +458,11 @@ This test case the checks the evolution of a cooling, element diffusing 0.6 Msun
 
 This test case the checks element diffusion in a 0.6 Msun carbon-oxygen white dwarf.
 
+:ref:`wd_he_shell_ignition`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case the ignition of a helium layer in an accreting in a 0.96 Msun carbon-oxygen white dwarf model.
+
 
 :ref:`c13_pocket`
 ^^^^^^^^^^^^^^^^^
