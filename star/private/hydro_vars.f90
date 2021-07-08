@@ -131,7 +131,11 @@
          skip_neu = .not. s% need_to_setvars
          skip_net = .not. s% need_to_setvars
          skip_eos = .not. s% need_to_setvars
-         skip_mlt = .not. s% need_to_setvars
+         if (.not. s% have_mlt_vc) then
+            skip_mlt = .false.
+         else
+            skip_mlt = .not. s% need_to_setvars
+         end if
          
          if (s% need_to_setvars) then
             s% num_setvars = s% num_setvars + 1
