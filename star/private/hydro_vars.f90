@@ -131,11 +131,7 @@
          skip_neu = .not. s% need_to_setvars
          skip_net = .not. s% need_to_setvars
          skip_eos = .not. s% need_to_setvars
-         if (.not. s% have_mlt_vc) then
-            skip_mlt = .false.
-         else
-            skip_mlt = .not. s% need_to_setvars
-         end if
+         skip_mlt = .not. s% need_to_setvars
          
          if (s% need_to_setvars) then
             s% num_setvars = s% num_setvars + 1
@@ -155,10 +151,6 @@
             if (s% report_ierr .or. dbg) &
                write(*,*) 'update_vars: set_hydro_vars returned ierr', ierr
             return
-         end if
-         
-         if (.not. skip_mlt .and. s% okay_to_set_mlt_vc .and. .not. s% have_mlt_vc) then
-            s% have_mlt_vc = .true.
          end if
 
          if (s% op_split_burn) then

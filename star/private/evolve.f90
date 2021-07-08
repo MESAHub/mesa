@@ -680,7 +680,10 @@
          if (.not. s% RSP_flag) then
             call set_final_vars(s, dt, ierr)
             if (failed('set_final_vars')) return
-            s% okay_to_set_mlt_vc = .false.
+            if (s% okay_to_set_mlt_vc .and. .not. s% have_mlt_vc) then
+               s% have_mlt_vc = .true.
+            end if
+            s% okay_to_set_mlt_vc = .false.         
          end if
 
          if (.not. okay_energy_conservation()) return
