@@ -676,11 +676,11 @@
          end do implicit_mdot_loop
 
          s% solver_iter = 0 ! to indicate that no longer doing solver iterations
-         s% okay_to_set_mlt_vc = .false.
 
          if (.not. s% RSP_flag) then
             call set_final_vars(s, dt, ierr)
             if (failed('set_final_vars')) return
+            s% okay_to_set_mlt_vc = .false.
          end if
 
          if (.not. okay_energy_conservation()) return
