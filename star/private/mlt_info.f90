@@ -166,6 +166,11 @@
             call set_no_mixing('max_logT')
             return
          end if
+
+         if (s% phase(k) > 0.5d0) then
+            call set_no_mixing('solid_no_mixing')
+            return
+         end if
          
          if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then ! check for outward shock above k
             if (s% u_flag) then

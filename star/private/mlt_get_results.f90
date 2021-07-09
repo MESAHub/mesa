@@ -212,6 +212,12 @@
             using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
                                                                   T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
          end if
+         
+         if (s% phase(k) > 0.5d0) then
+            call set_no_mixing('solid_no_mixing')
+            return
+         end if
+         
          ! Run through assuming no TDC.         
          if (gradr > gradL) then ! convective
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter

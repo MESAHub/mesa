@@ -495,6 +495,7 @@
          use report, only: do_report, set_power_info
          use adjust_mass, only: do_adjust_mass
          use element_diffusion, only: do_element_diffusion, finish_element_diffusion
+         use phase_separation, only: do_phase_separation
          use conv_premix, only: do_conv_premix
          use evolve_support, only: set_current_to_old
          use eps_mdot, only: calculate_eps_mdot
@@ -613,6 +614,13 @@
                   do k=1,s% nz ! for use by energy equation
                      s% eps_pre_mix(k) = (s% eps_pre_mix(k) - s% energy(k)) / dt
                   end do
+               end if
+
+               if(.true.) then ! s% do_phase_separation eventually
+                  call do_phase_separation(s, ierr)
+                  if (failed('do_phase_separation')) return
+                  call set_vars_if_needed(s, dt, 'after phase separation', ierr)
+                  if (failed('set_vars_if_needed after phase separation')) return
                end if
 
                s% okay_to_set_mixing_info = .false. ! no mixing changes in set_vars after this point
