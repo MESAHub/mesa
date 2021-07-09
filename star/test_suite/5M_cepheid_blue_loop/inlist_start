@@ -14,7 +14,7 @@
 
    initial_zfracs = 6
    
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / !end of star_job namelist
 
@@ -50,7 +50,7 @@
    use_dedt_form_of_energy_eqn = .true.
 
    mixing_length_alpha = 1.8d0
-   MLT_option = 'TDC'
+   MLT_option = 'Cox'
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.1
