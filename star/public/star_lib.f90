@@ -659,17 +659,6 @@
          integer, intent(in) :: id
          star_prepare_to_retry = prepare_to_retry(id)
       end function star_prepare_to_retry
-      
-      
-      ! at the end of the evolution run, call this to do things such as
-      ! closing log files.
-      subroutine star_after_evolve(id, ierr)
-         use do_one_utils, only: do_one_finish
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         call do_one_finish(id, ierr)
-      end subroutine star_after_evolve
-
 
       ! typically, after the namelist controls file has been read by the star setup routine, 
       ! you won't need to do anything else with it.   But in case you want

@@ -883,9 +883,6 @@
          call s% extras_after_evolve(id, ierr)
          if (failed('after_evolve_extras',ierr)) return
 
-         call star_after_evolve(id, ierr)
-         if (failed('star_after_evolve',ierr)) return
-         
          if (s% result_reason == result_reason_normal) then
          
             if (s% job% pgstar_flag) &
