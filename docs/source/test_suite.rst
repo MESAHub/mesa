@@ -464,9 +464,14 @@ This test case the checks element diffusion in a 0.6 Msun carbon-oxygen white dw
 This test case the ignition of a helium layer in an accreting in a 0.96 Msun carbon-oxygen white dwarf model.
 
 :ref:`wd_nova_burst`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 This test case checks the evolution of a nova outburst for one cycle.
+
+:ref:`wd_stable_h_burn`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution stable hydrogen burning on a white dwarf.
 
 
 :ref:`c13_pocket`
