@@ -2,6 +2,10 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
+do_one wd_cool_0.6M "stop because log_center_temperature <= log_center_temp_lower_limit" "final.mod" auto
+
+return
+
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one dev_to_cc_12 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_cc_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
