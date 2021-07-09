@@ -4,7 +4,7 @@
 wd_he_shell_ignition
 ********************
 
-This test case the ignition of a helium layer in an accreting in a 0.96 Msun carbon-oxygen white dwarf model.
+This test case checks the ignition of a helium layer in an accreting in a 0.96 Msun carbon-oxygen white dwarf model.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
