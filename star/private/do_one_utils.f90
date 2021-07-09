@@ -1548,17 +1548,6 @@
          end if
          
       end function do_one_check_model
-      
-      
-      
-      
-      subroutine dummy_before_evolve(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = id ! so that we use that arg
-         ierr = 0
-      end subroutine dummy_before_evolve
-
 
       
       end module do_one_utils
