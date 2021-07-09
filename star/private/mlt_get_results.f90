@@ -215,7 +215,7 @@
          if (using_TDC) then
             Y_guess = gradT - gradL
             using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
-                                                                  T, rho, Cp, dV, opacity, scale_height, gradL, conv_vel)
+                                                                  T, rho, Cp, dV, opacity, scale_height, grada, conv_vel)
          end if
          ! Run through assuming no TDC.         
          if (gradr > gradL) then ! convective
@@ -347,14 +347,14 @@
                call get_TDC_solution(s, k, &
                   mixing_length_alpha, cgrav, m, Y_guess, report, &
                   mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, conv_vel, Y_face, ierr)
+                  scale_height, gradL, grada, conv_vel, Y_face, ierr)
                if (ierr /= 0) then
                   write(*,2) 'get_TDC_solution failed in set_TDC', k
                   write(*,*) 'Repeating call with reporting on.'
                   call get_TDC_solution(s, k, &
                      mixing_length_alpha, cgrav, m, Y_guess, .true., &
                      mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-                     scale_height, gradL, conv_vel, Y_face, ierr)
+                     scale_height, gradL, grada, conv_vel, Y_face, ierr)
                   stop 'get_TDC_solution failed in set_TDC'
                end if
             end if
@@ -565,13 +565,13 @@
       
       subroutine get_TDC_solution(s, k, &
             mixing_length_alpha, cgrav, m, Y_guess, report, &
-            mixing_type, L, r, P, T, rho, dV, Cp, kap, Hp, gradL, cv, Y_face, ierr)
+            mixing_type, L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada, cv, Y_face, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, cgrav, m
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(in) :: &
-            L, r, P, T, rho, dV, Cp, kap, Hp, gradL, Y_guess
+            L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada, Y_guess
          logical, intent(in) :: report
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
          integer, intent(out) :: ierr
@@ -623,7 +623,7 @@
          converged = .false.
          Y = 0d0
          call compute_Q(s, k, mixing_length_alpha, &
-            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
+            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
          if (abs(Q / scale) < tolerance) then
             converged = .true.
          else
@@ -650,7 +650,7 @@
             if (report) write(*,2) 'initial Z', 0, Z%val
             do iter = 1, max_iter
                call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, Q, Af)
+                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
                if (is_bad(Q%val)) exit
                if (abs(Q%val)/scale <= tolerance) then
                   if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
@@ -736,7 +736,9 @@
                write(*,2) 'dAfdZ', k, Af%d1val1
                write(*,2) 'A0', k, A0%val
                write(*,2) 'c0', k, c0%val
+               write(*,2) 'L', k, L%val
                write(*,2) 'L0', k, L0%val
+               write(*,2) 'grada', k, grada%val
                write(*,2) 'gradL', k, gradL%val
                write(*,*)
             !$OMP end critical (tdc_crit0)
@@ -776,21 +778,22 @@
       !! @param kap Opacity
       !! @param Hp Pressure scale height
       !! @param gradL_in gradL is the neutrally buoyant dlnT/dlnP (= grad_ad + grad_mu),
+      !! @param grada_in grada is the adiabatic dlnT/dlnP,
       !! @param Q The residual of the above equaiton (an output).
       !! @param Af The final convection speed (an output).
       subroutine compute_Q(s, k, mixing_length_alpha, &
-            Y, c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, Q, Af)
+            Y, c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, Q, Af)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
          type(auto_diff_real_star_order1), intent(in) :: &
-            c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in
+            c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: Q, Af
          type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, gradL
 
          call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, dV, kap, Hp, gradL_in, xi0, xi1, xi2)          
+            Y, T, rho, Cp, dV, kap, Hp, grada_in, xi0, xi1, xi2)          
 
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
          L = convert(L_in)
@@ -821,15 +824,15 @@
       !! @param Cp heat capacity (erg/g/K)
       !! @param kap opacity (cm^2/g)
       !! @param Hp pressure scale height (cm)
-      !! @param gradL gradL = grada + gradMu (Ledoux threshold for convection)
+      !! @param grada is the adiabatic dlnT/dlnP.
       !! @param A0 convection speed from the start of the step (cm/s)
       !! @param fallback False if we need to use TDC, True if we can fall back to MLT.
       logical function check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, &
-                                                      Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0) result(fallback)
+                                                      Y_in, T, rho, Cp, dV, kap, Hp, grada, A0) result(fallback)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
-         type(auto_diff_real_star_order1), intent(in) :: Y_in, T, rho, Cp, dV, kap, Hp, gradL, A0
+         type(auto_diff_real_star_order1), intent(in) :: Y_in, T, rho, Cp, dV, kap, Hp, grada, A0
          type(auto_diff_real_tdc) :: Y, Af, xi0, xi1, xi2, J2, Jt2
 
          if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
@@ -840,7 +843,7 @@
          Y = convert(Y_in)
 
          call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, dV, kap, Hp, gradL, xi0, xi1, xi2)
+            Y, T, rho, Cp, dV, kap, Hp, grada, xi0, xi1, xi2)
 
          Af = eval_Af(s, k, A0, xi0, xi1, xi2)
 
@@ -887,18 +890,18 @@
       !! @param dV 1/rho_face - 1/rho_start_face (change in specific volume at the face)
       !! @param kap opacity (cm^2/g)
       !! @param Hp pressure scale height (cm)
-      !! @param gradL gradL = grada + gradMu (Ledoux threshold for convection)
+      !! @param grada is the adiabatic dlnT/dlnP.
       !! @param xi0 Output, the constant term in the convective velocity equation.
       !! @param xi1 Output, the prefactor of the linear term in the convective velocity equation.
       !! @param xi2 Output, the prefactor of the quadratic term in the convective velocity equation.
       subroutine eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, dV, kap, Hp, gradL, xi0, xi1, xi2) 
+            Y, T, rho, Cp, dV, kap, Hp, grada, xi0, xi1, xi2) 
          ! eval_xis sets up Y with partial wrt Z
          ! so results come back with partials wrt Z
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha
-         type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp, gradL
+         type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp, grada
          type(auto_diff_real_tdc), intent(in) :: Y
          type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
          type(auto_diff_real_tdc) :: S0, D0, DR0
@@ -909,7 +912,7 @@
          real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
          include 'formats'
 
-         S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*gradL/Hp)
+         S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*grada/Hp)
          S0 = S0*Y
          D0 = convert(s% alpha_TDC_DAMP*x_CEDE/(mixing_length_alpha*Hp))
          if (s% alpha_TDC_DAMPR == 0d0) then
@@ -927,6 +930,7 @@
          xi0 = S0
          xi1 = -(DR0 + convert(Pt0*dVdt))
          xi2 = -D0
+
          if (k > 0) then   
             s% xtra4_array(k) = S0%val
             s% xtra5_array(k) = D0%val
