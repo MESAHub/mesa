@@ -8,9 +8,9 @@ This test case checks the evolution of a nova outburst for one cycle.
 
 This test case has 2 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_setup``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt carbon ocygen white dwarf from the :ref:`make_o_ne_wd` test suite, sets the topical depth to 30, evolves for a few steps to an age of 1e7 year and terminates.
+* Part 1 (``inlist_setup``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt carbon-oxygen white dwarf from the :ref:`make_o_ne_wd` test suite, sets the topical depth to 30, evolves for a few steps to an age of 1e7 year and terminates.
 
-* Part 2 (``inlist_wd_nova_burst``) continues the evolution with the accretion of a hydrogen-helium mixture at a rate of 1e-9 Msun/yr. Eventually hydrogen burning in the accerted envelope cause sthe luminosity to exceed 1e4 Lsun and an alert is written to the terminat via the ``run_star_extras.f90``:
+* Part 2 (``inlist_wd_nova_burst``) continues the evolution with the accretion of a hydrogen-helium mixture at a rate of 1e-9 Msun/yr. Eventually hydrogen burning in the accerted envelope causes the luminosity to exceed 1e4 Lsun and an alert is written to the terminat via the ``run_star_extras.f90``:
 
 
 .. code-block:: console
