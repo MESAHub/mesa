@@ -1,0 +1,1 @@
+../../../binary/test_suite/star_plus_point_mass/README.rst
