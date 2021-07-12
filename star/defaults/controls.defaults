@@ -2276,18 +2276,19 @@
       ! Options are:
 
       ! + 'none'       : just give radiative values with no mixing.
+      ! + 'TDC'        : Time-dependent convection based on the Khufuss 1986 model. Reduces to Cox at long times.
       ! + 'Cox'        : MLT as developed in Cox & Giuli 1968, Chapter 14.
       ! + 'ML1'        : Bohm-Vitense 1958
       ! + 'ML2'        : Bohm and Cassinelli 1971
       ! + 'Mihalas'    : Mihalas 1978, Kurucz 1979
       ! + 'Henyey'     : Henyey, Vardya, and Bodenheimer 1965
 
-      ! 'Cox' option assumes optically thick material.
+      ! The 'Cox' and 'TDC' options assumes optically thick material.
       ! The other options are various ways of extending to include optically thin material.
 
       ! ::
 
-    MLT_option = 'Cox'
+    MLT_option = 'TDC'
 
 
       ! Henyey_MLT_y_param

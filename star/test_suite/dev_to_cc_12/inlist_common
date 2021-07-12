@@ -63,7 +63,7 @@
 
 ! mlt
       mixing_length_alpha = 1.5
-      MLT_option = 'Henyey'
+      MLT_option = 'TDC'!'Henyey'
 
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
@@ -96,7 +96,7 @@
 ! timesteps
       varcontrol_target   = 1d-3
       min_timestep_factor = 0.8d0
-      max_timestep_factor = 1.05d0
+      max_timestep_factor = 1.5d0
       timestep_factor_for_retries = 0.75
       
       never_skip_hard_limits = .true
@@ -205,6 +205,7 @@
 ! output
       terminal_show_log_dt = .false.
 
+      photo_digits = 4
       photo_interval = 50
       profile_interval = 50
       history_interval = 10

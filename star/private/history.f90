@@ -2879,6 +2879,15 @@
                   int_val = 0
                end if
                is_int_val = .true.
+
+            case (h_TDC_num_cells)
+               val = 0
+               do k=1,nz
+                  if (s% tdc_num_iters(k) > 0) then
+                     val = val + 1
+                  end if
+               end do
+               is_int_val = .true.
                
             case default
                ierr = -1

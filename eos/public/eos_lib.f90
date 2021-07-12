@@ -235,13 +235,13 @@
 
 
       subroutine helmeos2_eval( &
-            T, logT, Rho, logRho, X, abar, zbar, &
+            T, logT, Rho, logRho, abar, zbar, &
             coulomb_temp_cut, coulomb_den_cut, helm_res, &
             clip_to_table_boundaries, include_radiation, &
             include_elec_pos, &
             off_table, ierr)         
          use helm
-         real(dp), intent(in) :: T, logT, Rho, logRho, X, abar, zbar, &
+         real(dp), intent(in) :: T, logT, Rho, logRho, abar, zbar, &
             coulomb_temp_cut, coulomb_den_cut
          real(dp), intent(inout) :: helm_res(:) ! (num_helm_results)
          logical, intent(in) :: clip_to_table_boundaries, include_radiation, &
@@ -249,7 +249,7 @@
          logical, intent(out) :: off_table
          integer, intent(out) :: ierr ! 0 means AOK.
          call helmeos2( &
-            T, logT, Rho, logRho, X, abar, zbar, coulomb_temp_cut, coulomb_den_cut, &
+            T, logT, Rho, logRho, abar, zbar, coulomb_temp_cut, coulomb_den_cut, &
             helm_res, clip_to_table_boundaries, include_radiation, include_elec_pos, &
             off_table, ierr)
       end subroutine helmeos2_eval
@@ -589,7 +589,7 @@
          logical :: off_table
 
          call Get_HELM_Results( &
-            X, abar, zbar, Rho, log10Rho, T, log10T, &
+            abar, zbar, Rho, log10Rho, T, log10T, &
             coulomb_temp_cut, coulomb_den_cut, &
             include_radiation, include_elec_pos, &
             res, off_table, ierr)
@@ -619,7 +619,7 @@
          d_dabar_const_TRho = 0
          d_dzbar_const_TRho = 0
          call do_convert_helm_results( &
-                  helm_res, Z, X, abar, zbar, Rho, T, &
+                  helm_res, Z, abar, zbar, Rho, T, &
                   res, d_dlnRho_const_T, d_dlnT_const_Rho, &
                   d_dabar_const_TRho, d_dzbar_const_TRho, &
                   ierr)      

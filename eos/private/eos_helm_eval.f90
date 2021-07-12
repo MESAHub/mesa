@@ -70,7 +70,7 @@
 
          rq => eos_handles(handle)
          call Get_HELMEOS_Results( &
-            rq, Z, X, abar, zbar, Rho, logRho, T, logT, &
+            rq, Z, abar, zbar, Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
             helm_res, skip, ierr)
          if (ierr /= 0) return
@@ -109,11 +109,11 @@
 
          
       subroutine Get_HELMEOS_Results( &
-               rq, Z, X, abar, zbar, Rho, logRho, T, logT, &
+               rq, Z, abar, zbar, Rho, logRho, T, logT, &
                res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
                helm_res, off_table, ierr)   
          type (EoS_General_Info), pointer :: rq
-         real(dp), intent(in) :: Z, X, abar, zbar
+         real(dp), intent(in) :: Z, abar, zbar
          real(dp), intent(in) :: Rho, logRho, T, logT
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT, d_dabar, d_dzbar
@@ -134,7 +134,7 @@
          include_radiation = rq% include_radiation
          
          call helmeos2( &
-            T, logT, Rho, logRho, X, abar, zbar, &
+            T, logT, Rho, logRho, abar, zbar, &
             rq% coulomb_temp_cut_HELM, rq% coulomb_den_cut_HELM, &
             helm_res, clip_to_table_boundaries, include_radiation, &
             include_elec_pos, &
@@ -149,7 +149,6 @@
                write(*,1) 'logRho', logRho
                write(*,1) 'abar', abar
                write(*,1) 'zbar', zbar
-               write(*,1) 'X', X
                write(*,*) 'clip_to_table_boundaries', clip_to_table_boundaries
                write(*,*) 'include_radiation', include_radiation
                write(*,*) 'include_elec_pos', include_elec_pos
@@ -159,7 +158,7 @@
             return
          end if
          call do_convert_helm_results( &
-               helm_res, Z, X, abar, zbar, Rho, T, &
+               helm_res, Z, abar, zbar, Rho, T, &
                res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in do_convert_helm_results'
@@ -170,12 +169,12 @@
 
 
       subroutine do_convert_helm_results( &
-               helm_res, Z, X, abar, zbar, Rho, T, &
+               helm_res, Z, abar, zbar, Rho, T, &
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dabar_c_TRho, d_dzbar_c_TRho, ierr)
          use helm
          use chem_def
          real(dp), intent(in) :: helm_res(num_helm_results)
-         real(dp), intent(in) :: Z, X, abar, zbar, Rho, T
+         real(dp), intent(in) :: Z, abar, zbar, Rho, T
          real(dp), intent(inout) :: res(nv)
          real(dp), intent(inout) :: d_dlnRho_c_T(nv)
          real(dp), intent(inout) :: d_dlnT_c_Rho(nv)
@@ -197,7 +196,6 @@
             write(*,1) 'logT', log10(T)
             write(*,1) 'Rho', Rho
             write(*,1) 'T', T
-            write(*,1) 'X', X
             write(*,1) 'Z', Z
             write(*,1) 'abar', abar
             write(*,1) 'zbar', zbar
@@ -321,7 +319,7 @@
 
       
       subroutine Get_HELM_Results( &
-               X, abar, zbar, arho, alogrho, atemp, alogtemp, &
+               abar, zbar, arho, alogrho, atemp, alogtemp, &
                coulomb_temp_cut, coulomb_den_cut, &
                include_radiation, include_elec_pos, &
                res, off_table, ierr)
@@ -329,7 +327,7 @@
          use helm
 
          type (EoS_General_Info), pointer :: rq
-         real(dp), intent(in) :: X, abar, zbar
+         real(dp), intent(in) :: abar, zbar
          real(dp), intent(in) :: arho, alogrho
          real(dp), intent(in) :: atemp, alogtemp 
          real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
@@ -360,7 +358,7 @@
          end if
          if (arho == arg_not_provided) Rho = exp10(logRho)
          
-         call helmeos2(T, logT, Rho, logRho, X, abar, zbar, &
+         call helmeos2(T, logT, Rho, logRho, abar, zbar, &
                   coulomb_temp_cut, coulomb_den_cut, &
                   res, clip_to_table_boundaries, include_radiation, &
                   include_elec_pos, off_table, ierr)

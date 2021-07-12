@@ -15,7 +15,7 @@ This test case has 5 parts. Click to see a larger version of a plot.
 .. image:: ../../../star/test_suite/make_o_ne_wd/docs/inlist_to_agb_000557.png
    :width: 100%
 
-* Part 3 (``inlist_c_burn``) continues the evolution, removing all but 1.05 Msun of material with a ``Blocker_scaling_factor = 50`` wind. Meanwhile, carbon ignites off-center twice, the second time producing a convectively bounded flame front that propagates toward the center that turns the carbon-oxygen rich material into a neon-oxygen rich material. A little overshooting aids the propgation speed of the carbon burning front. A lot of well-timed mass loss is necessary such that the interior conditions reach carbon ignition, and enough of the envelope is removed so that the model doesn't get in trouble with trying to have a high mdot at the same time as strong carbon burning.  If the wind is too strong from too early, then just get a massive carbon-oxygen white dwarf. If the wind is too weak or starts too late, then errors can occur with surface ejection velocities greater than the speed of light. This part terminates when the mass of neon exceeds 0.35 Msun:
+* Part 3 (``inlist_c_burn``) continues the evolution, removing all but 1.05 Msun of material with a ``Blocker_scaling_factor = 50`` wind. Meanwhile, carbon ignites off-center twice, the second time producing a convectively bounded flame front that propagates toward the center that turns the carbon-oxygen rich material into a neon-oxygen rich material. A little overshooting aids the propgation speed of the carbon burning front. A lot of well-timed mass loss is necessary such that the interior conditions reach carbon ignition, and enough of the envelope is removed so that the model doesn't get in trouble with trying to have a high mdot at the same time as strong carbon burning.  If the wind is too strong from too early, then just get a massive carbon-oxygen white dwarf. If the wind is too weak or starts too late, then errors can occur with surface ejection velocities greater than the speed of light. This part terminates when the mass of neon exceeds 0.3 Msun:
 
 .. image:: ../../../star/test_suite/make_o_ne_wd/docs/inlist_c_burn.png
    :width: 100%
@@ -33,4 +33,4 @@ This test case has 5 parts. Click to see a larger version of a plot.
 
 The plots above were made with the provided ``inist_pgstar`` by setting ``Grid1_win_flag = .true.`` and ``Grid1_file_flag = .true.``.
 
-Last-Updated: 19Jun2021 (MESA e2acbc2) by fxt.
+Last-Updated: 29Jun2021 (MESA 7f132f41) by adamjermyn.

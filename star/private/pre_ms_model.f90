@@ -700,6 +700,7 @@
          real(dp) :: dlnkap_dlnd, dlnkap_dlnT, gradL_composition_term, &
             opacity, grav, scale_height, scale_height2, gradr, cgrav
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
+         real(dp) :: Y_face, conv_vel, D, Gamma ! Not used
          integer :: mixing_type
          logical :: make_gradr_sticky_in_solver_iters
          
@@ -737,7 +738,7 @@
          call get_gradT(s, s% MLT_option, & ! used to create models
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             s% net_iso(ih1), x, standard_cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
-            gradT, mixing_type, ierr)
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
   
       end subroutine eval_gradT
 
