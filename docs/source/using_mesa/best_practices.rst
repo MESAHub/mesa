@@ -36,6 +36,74 @@ This will usually require appropriate testing and critical analysis of the model
 Throughout your project, the best way to solicit community help and
 input is via a message to the ``mesa-users@lists.mesastar.org`` mailing list.
 
+
+Starting with a test suite case
+-------------------------------
+
+mini-lab 1
+
+semiconvection
+
+convert to regulatr mesa work directory outside of ``$MESA_DIR``
+
+run
+
+
+Explore Numerical Convergence 
+-----------------------------
+
+maxi-lab 1
+
+mass resolution
+
+temporal resolution
+
+
+Explore Physics Variations
+--------------------------
+
+max-lab 2
+
+reaction network
+
+alpha-overshoot
+
+
+
+Checklist For Publishing Results
+--------------------------------
+
+Describe your MESA setup 
+
+Include ‘standard’ References 
+
+Check naming conventions 
+
+Share your inlists
+
+Share your extensions
+
+point to youtube video and zenodo repo 
+
+
+Draft Research Notes Abstract
+-----------------------------
+
+post-maxi labs
+
+submit an actual rnaas?!
+
+
+Share your Results
+------------------
+
+post maxi-labs
+
+zenodo sandbox upload
+
+
+
+
 In the paper
 ------------
 
