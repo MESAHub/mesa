@@ -152,7 +152,7 @@
                write(*,*) 'update_vars: set_hydro_vars returned ierr', ierr
             return
          end if
-         
+
          if (s% op_split_burn) then
             do k = 1, nz
                if (s% T_start(k) >= s% op_split_burn_min_T) &

@@ -32,7 +32,7 @@
       implicit none
       
       private
-      public :: do_one_check_model, do_one_finish, &
+      public :: do_one_check_model, &
          write_terminal_header, do_bare_bones_check_model, do_check_limits, &
          do_show_log_description, do_show_terminal_header, do_terminal_summary
       
@@ -52,14 +52,6 @@
                         .and. ((s% dynamic_timescale + 1d0) > 1d0)
       end function model_is_okay
 
-      
-      subroutine do_one_finish(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine do_one_finish
-      
-      
       subroutine set_save_profiles_info(s, model_priority)
          type (star_info), pointer :: s
          integer, intent(in) :: model_priority
@@ -1548,17 +1540,6 @@
          end if
          
       end function do_one_check_model
-      
-      
-      
-      
-      subroutine dummy_before_evolve(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = id ! so that we use that arg
-         ierr = 0
-      end subroutine dummy_before_evolve
-
 
       
       end module do_one_utils

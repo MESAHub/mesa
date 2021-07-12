@@ -22,9 +22,6 @@
    initial_Y = 0.26d0
 
 ! MLT
-   max_dt_div_tau_conv_for_TDC = -1d99  ! No TDC
-   max_dt_years_for_TDC = -1d99
-
    mixing_length_alpha = 1.5d0 
    MLT_option = 'Henyey'
 

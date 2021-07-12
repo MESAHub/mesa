@@ -670,7 +670,8 @@
       integer, parameter :: h_lg_Dsurf = h_zones + 1
       integer, parameter :: h_C_cntr = h_lg_Dsurf + 1
       integer, parameter :: h_using_TDC = h_C_cntr + 1
-      integer, parameter :: h_retries = h_using_TDC + 1
+      integer, parameter :: h_TDC_num_cells = h_using_TDC + 1
+      integer, parameter :: h_retries = h_TDC_num_cells + 1
 
       integer, parameter :: h_col_id_max = h_retries
 
@@ -1347,7 +1348,8 @@
          history_column_name(h_C_cntr) = 'C_cntr'
          history_column_name(h_retries) = 'retries'
          history_column_name(h_using_TDC) = 'using_TDC'
-
+         history_column_name(h_TDC_num_cells) = 'TDC_num_cells'
+         
          cnt = 0
          do i=1,h_col_id_max
             if (len_trim(history_column_name(i)) == 0) then

@@ -1,5 +1,4 @@
 
-         real(dp) :: max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC
          real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad
          real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
          real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap

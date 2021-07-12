@@ -81,7 +81,7 @@
          ! e.g., if this is 2, then only get wind when L > 2*Ledd
 
       mixing_length_alpha = 1.9
-      MLT_option = 'Henyey'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 1d-3

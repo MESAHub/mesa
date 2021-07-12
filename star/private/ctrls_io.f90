@@ -122,8 +122,7 @@
     write_model_with_profile, model_data_prefix, model_data_suffix, &
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
-    mass_depth_for_L_surf, conv_core_gap_dq_limit, &
-    max_dt_div_tau_conv_for_TDC, max_dt_years_for_TDC, max_X_for_gradT_eqn, &
+    mass_depth_for_L_surf, conv_core_gap_dq_limit, max_X_for_gradT_eqn, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
     
     ! burn zone eps definitions for use in logs and profiles
@@ -2065,8 +2064,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
- s% max_dt_div_tau_conv_for_TDC = max_dt_div_tau_conv_for_TDC
- s% max_dt_years_for_TDC = max_dt_years_for_TDC
  s% alpha_TDC_DAMP = alpha_TDC_DAMP
  s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
  s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
@@ -3741,8 +3738,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
 
- max_dt_div_tau_conv_for_TDC = s% max_dt_div_tau_conv_for_TDC
- max_dt_years_for_TDC = s% max_dt_years_for_TDC
  alpha_TDC_DAMP = s% alpha_TDC_DAMP
  alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
  alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
