@@ -88,8 +88,8 @@
       op_split_burn_eps = 1d-7
       op_split_burn_odescal = 1d-8
 
-      convergence_ignore_equL_residuals = .true.
-      make_gradr_sticky_in_solver_iters = .true.
+      convergence_ignore_equL_residuals = .false.
+      make_gradr_sticky_in_solver_iters = .false.
 
 ! output
       num_trace_history_values = 6
