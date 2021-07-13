@@ -48,11 +48,17 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          
-         real(dp) :: dq_crystal, XO, XC
+         real(dp) :: dq_crystal, XO, XC, pad
          integer :: k, k_bound, k_new, kstart, net_ic12, net_io16
          logical :: do_premix
 
          do_premix = .true.
+
+         if(s% phase(s% nz) < 0.5d0) then
+            s% crystal_core_boundary_mass = 0d0
+            s% crystal_core_boundary_mass_old = 0d0
+            return
+         end if
 
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
@@ -75,14 +81,18 @@
          if(k_bound > 0) then
             dq_crystal = 0d0
 
-            ! Starts at center if we haven't set x_integer_ctrl yet, otherwise picks up where we left off in previous step
-            if(s% x_integer_ctrl(1) > 0) then
-               kstart = s% x_integer_ctrl(1)
-            else
-               kstart = s% nz
-            end if
-
-            print *, "kstart, k_bound, phase(k_bound), phase(k_bound - 1)", kstart, k_bound, s%phase(k_bound), s%phase(k_bound - 1)
+            ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
+            ! to account for loss of precision during remeshing.
+            pad = s% min_dq * s% m(1) * 0.5d0
+            do k = s%nz,1,-1
+               if(s% m(k) > s% crystal_core_boundary_mass_old + pad) then
+                  kstart = k
+                  exit
+               end if
+            end do
+            
+            ! print *, "kstart, k_bound, phase(k_bound), phase(k_bound - 1)", kstart, k_bound, s%phase(k_bound), s%phase(k_bound - 1)
+            ! print *, "mass(kstart), crystal_core_boundary_mass", s% m(kstart)/msun, s% crystal_core_boundary_mass_old/msun
          
             k_new = k_bound
             !! Need to have this loop run over only NEWLY crystallizing material now that we have a real phase diagram.
@@ -90,9 +100,7 @@
                ! Start by checking if this material should be crystallizing
                if(s% phase(k) <= 0.5d0) then
                   k_new = k+1 ! one zone inward from where material becomes liquid
-
-                  ! Cheat by using x_integer_ctrl for now to tell next step where to pick up crystallization front
-                  s% x_integer_ctrl(1) = k
+                  s% crystal_core_boundary_mass_old = s% m(k+1)
                   exit
                end if
 
@@ -103,8 +111,8 @@
                end if
                
             end do
-            print *, "new k after starting phase sep", k_new
-            print *, "phase(k+1), phase(k), phase(k-1)", s% phase(k_new+1), s% phase(k_new), s% phase(k_new-1)
+            ! print *, "new k after starting phase sep", k_new
+            ! print *, "phase(k+1), phase(k), phase(k-1)", s% phase(k_new+1), s% phase(k_new), s% phase(k_new-1)
 
             s% need_to_setvars = .true.
          end if
@@ -152,8 +160,6 @@
         s% xa(net_ic12,k-1) = XC1 + Xfac*dXO * s% dq(k) / s% dq(k-1)
         s% xa(net_io16,k-1) = XO1 - Xfac*dXO * s% dq(k) / s% dq(k-1)
 
-        ! print *, "xa(k) = ", s% xa(:,k)
-        ! print *, "xa(k-1) = ", s% xa(:,k-1)
         call update_model_(s,update_mode,k-1,s%nz)
         
       end subroutine move_one_zone
@@ -200,7 +206,7 @@
 
         end do
 
-        print *, "kbot, ktop, avg XO, outside XO", kbot, ktop, avg_XO, XO_out
+        ! print *, "kbot, ktop, avg XO, outside XO", kbot, ktop, avg_XO, XO_out
        
         call update_model_(s, update_mode, ktop, kbot)
 

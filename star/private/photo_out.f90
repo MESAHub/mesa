@@ -75,7 +75,8 @@
             s% astero_revised_max_yr_dt, &
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
-            s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor
+            s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor, &
+            s% crystal_core_boundary_mass_old
 
          write(iounit) s% net_name
 
