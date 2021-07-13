@@ -19,7 +19,7 @@
 
 
       subroutine helmeos2( &
-         T, logT, Rho, logRho, Xfrac, abar_in, zbar_in, &
+         T, logT, Rho, logRho, abar_in, zbar_in, &
          coulomb_temp_cut, coulomb_den_cut, helm_res, &
          clip_to_table_boundaries, include_radiation,  &
          include_elec_pos, off_table, ierr)
@@ -28,7 +28,7 @@
       use utils_lib, only: is_bad
       implicit none
       real(dp), intent(in) :: T, logT, Rho, logRho
-      real(dp), intent(in) :: Xfrac, abar_in, zbar_in
+      real(dp), intent(in) :: abar_in, zbar_in
       real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
       real(dp), intent(inout) :: helm_res(num_helm_results)
       logical, intent(in) ::  &
@@ -46,7 +46,7 @@
       
       skip_elec_pos = .not. include_elec_pos
       call helmeos2aux( &
-         T, logT, Rho, logRho, Xfrac, abar_in, zbar_in,   &
+         T, logT, Rho, logRho, abar_in, zbar_in,   &
          coulomb_temp_cut, coulomb_den_cut, helm_res,  &
          clip_to_table_boundaries, include_radiation, (.not. include_elec_pos), off_table, ierr)
       if (off_table) return
@@ -55,7 +55,7 @@
 
 
       subroutine helmeos2aux( &
-            temp_in, logtemp_in, den_in, logden_in, Xfrac, abar_in, zbar_in,  &
+            temp_in, logtemp_in, den_in, logden_in, abar_in, zbar_in,  &
             coulomb_temp_cut, coulomb_den_cut, helm_res,  &
             clip_to_table_boundaries, include_radiation, must_skip_elec_pos, off_table, ierr)
 
@@ -67,14 +67,12 @@
       implicit none
 
       real(dp), intent(in) :: temp_in, logtemp_in, den_in, logden_in
-      real(dp), intent(in) :: Xfrac, abar_in, zbar_in, coulomb_temp_cut, coulomb_den_cut
+      real(dp), intent(in) :: abar_in, zbar_in, coulomb_temp_cut, coulomb_den_cut
       real(dp), intent(inout) :: helm_res(num_helm_results)
       logical, intent(in) :: clip_to_table_boundaries, include_radiation, must_skip_elec_pos
       logical, intent(out) :: off_table
       integer, intent(out) :: ierr
-      
-      real(dp) :: Am, Zm, Yfrac, dabar_dlnY, dzbar_dlnY
-      real(dp) :: dabar_dlnY_X, dzbar_dlnY_X, dabar_dlnY_Z, dzbar_dlnY_Z
+
       real(dp) :: h ! = planck_h
       type (Helm_Table), pointer :: ht
       

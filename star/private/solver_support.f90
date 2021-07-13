@@ -226,6 +226,10 @@
             do k = 1, nz
                do j = 1, nvar
                   if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
+                  if (is_bad(s% equ(j,k)) .or. is_bad(s% residual_weight(j,k))) then
+                     ierr = 1
+                     return
+                  end if
                   absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                   sumequ = sumequ + absq
                   if (absq > equ_max) then

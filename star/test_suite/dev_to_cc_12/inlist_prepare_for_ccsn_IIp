@@ -51,7 +51,7 @@
 ! equation controls
 
       use_gold2_tolerances = .false.
-      
+
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
       use_dedt_form_of_energy_eqn = .true.
       
@@ -64,7 +64,6 @@
 
       mixing_length_alpha = 3 ! 1.5
       MLT_option = 'Henyey'
-
       use_Ledoux_criterion = .true.
 
       okay_to_reduce_gradT_excess = .true.

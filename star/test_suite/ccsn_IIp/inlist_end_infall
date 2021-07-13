@@ -76,7 +76,7 @@
 
 ! mixing controls
       mixing_length_alpha = 1.9
-      MLT_option = 'Henyey'
+      MLT_option = 'TDC'
       thermohaline_coeff = 0
       okay_to_reduce_gradT_excess = .false.
 

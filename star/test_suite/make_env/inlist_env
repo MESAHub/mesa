@@ -64,7 +64,7 @@
       min_allowed_varcontrol_target = 5d-4
       never_skip_hard_limits = .true.
       relax_hard_limits_after_retry = .false.
-      mlt_make_surface_no_mixing = .true. 
+      !mlt_make_surface_no_mixing = .true. 
 
 
 

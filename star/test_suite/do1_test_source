@@ -24,7 +24,6 @@ do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip
 do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
-do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
 do_one 16M_conv_premix "termination code: xa_central_lower_limit" "tams.mod" auto
 do_one 16M_predictive_mix "termination code: xa_central_lower_limit" "tams.mod" auto
 do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
@@ -57,6 +56,7 @@ do_one make_brown_dwarf "stop because star_age >= max_age" "final.mod" auto
 do_one make_env "stop because star_age >= max_age" "env.mod" skip 
 do_one make_he_wd "stop because star_age >= max_age" "final.mod" auto
 do_one make_metals "stop because have dropped below central lower limit for he4" "final.mod" auto        
+do_one make_co_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
 do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
 do_one make_planets "stop because star_age >= max_age"  "planet_evolve_1.0_MJ_10.0_ME_2.0_RJ.mod" auto
 do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" skip
@@ -102,12 +102,6 @@ return
 #   Pablo needs to fix   do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
 #    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
 
-
-
-#   needs fix   do_one make_co_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
-
-
-
 #  off while testing.    do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
 #  off while testing.    do_one dev_BW_Vul_pulses "good match for period" "final.mod" skip   
 #  off while testing.    do_one dev_Cepheid_pulses "good match for period" "final.mod" skip   
@@ -123,3 +117,7 @@ return
 #  off while testing.    do_one dev_rsp2_RR_Lyrae "good match for period" "final.mod" auto   
 #  off while testing.    do_one dev_rsp2_Type_II_Cepheid "good match for period" "final.mod" auto   
 
+#  Adam says to skip this one for now. If someone decides to care about the physics it tests (rotation & magnetism) they should reenable it.
+#  The issue is that this one can easily fall outside the test tolerances but we have no idea where those tolerances come from or what that
+#  failure means physically.
+# do_one 15M_dynamo "all values are within tolerances" "final.mod" auto

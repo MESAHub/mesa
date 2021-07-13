@@ -694,6 +694,11 @@
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
          
+         if (is_bad(s% total_energy_end)) then
+            ierr = 1
+            return
+         end if
+
          if(s% total_energy_end .ne. 0d0) then
             if (abs(s% cumulative_energy_error/s% total_energy_end) > &
                   s% warn_when_large_rel_run_E_err) then
@@ -878,9 +883,6 @@
          call s% extras_after_evolve(id, ierr)
          if (failed('after_evolve_extras',ierr)) return
 
-         call star_after_evolve(id, ierr)
-         if (failed('star_after_evolve',ierr)) return
-         
          if (s% result_reason == result_reason_normal) then
          
             if (s% job% pgstar_flag) &

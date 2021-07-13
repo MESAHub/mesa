@@ -392,6 +392,9 @@
             cs% Lg(k)=cs% luminosity*cs% intdmTg(k)/cs% intdmTg(nz)
          end do
          write(*,"(a20,2x,es15.8)") "log10(L/Lsun)=", log10(cs%luminosity/Lsun)
+         write(*,"(a20,2x,es15.8)") "Mass=", cs% mass
+         write(*,"(a20,2x,es15.8)") "Radius=", cs% radius
+         write(*,*) ''
 
          errvec(1)=(cs% mass-M)/M
          errvec(2)=(cs% radius-R)/R

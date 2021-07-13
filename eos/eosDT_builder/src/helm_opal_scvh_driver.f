@@ -455,7 +455,7 @@ c ***********************************************************************
          ! HELM supported a fake ionization mode that no longer exists
          ! it blended between neutral and ionized over logT = [4.5,5.0]
 
-         call helmeos2(temp, logT, den, logRho, X, abar, zbar,
+         call helmeos2(temp, logT, den, logRho, abar, zbar,
      >            1d6, 1d3, helm_res, clip_to_table_boundaries, .true., 
      >            include_elec_pos, off_table, ierr)
          if (ierr /= 0) then

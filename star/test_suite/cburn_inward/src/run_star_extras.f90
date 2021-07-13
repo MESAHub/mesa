@@ -30,7 +30,7 @@
       implicit none
 
       ! Tracks quanties when the flame ignited
-      real(dp) :: ign_mass, ign_density, ign_co_core_mass
+      real(dp) :: ign_mass, ign_density, ign_co_core_mass, flame_mass
 
       include "test_suite_extras_def.inc"
 
@@ -76,6 +76,7 @@
             ign_mass = -1
             ign_density = -1
             ign_co_core_mass = -1
+            flame_mass = -1
          end if
       end subroutine extras_startup
       
@@ -130,7 +131,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 0
+         how_many_extra_history_columns = 4
       end function how_many_extra_history_columns
       
       
@@ -143,6 +144,14 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         names(1) = 'ign_mass'
+         names(2) = 'log(ign_den)'
+         names(3) = 'ign_co_core_mass'
+         names(4) = 'flame_mass'
+         vals(1) = ign_mass/msun
+         vals(2) = log10(ign_density)
+         vals(3) = ign_co_core_mass
+         vals(4) = flame_mass/msun
       end subroutine data_for_extra_history_columns
 
       
@@ -186,7 +195,7 @@
          extras_finish_step = keep_going
       
          
-	      ! Store initial flame location 
+         ! Store initial flame location 
          select case (s% x_integer_ctrl(1)) 
 
          case(2) ! inlist_cburn_inward
@@ -206,6 +215,8 @@
                   ign_density = s% rho(flame_cell)
                   ign_co_core_mass = s% co_core_mass
                end if
+
+               flame_mass = s%m(flame_cell)
 
                ! Final flame location
                if(ign_mass > 0d0 .and. s% m(flame_cell) < 0.5d0*ign_mass) then

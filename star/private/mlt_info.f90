@@ -53,19 +53,10 @@
          integer, intent(out) :: ierr
          integer :: k, op_err
          integer(8) :: time0
-         real(dp) :: total, opacity, gamma1, Cv, chiRho, chiT, Cp, &
-            grada, P, xh, gradL_composition_term
+         real(dp) :: total
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
          ierr = 0
-         gradL_composition_term = -1d0
-         opacity = -1d0
-         chiRho = -1d0
-         chiT = -1d0
-         Cp = -1d0
-         grada = -1d0
-         P = -1d0
-         xh = -1d0 
          if (s% doing_timing) call start_time(s, time0, total)
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
