@@ -32,6 +32,7 @@ do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limi
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
+do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
 
 do_one gyre_in_mesa_bcep "matched target" skip skip
 do_one gyre_in_mesa_envelope "matched target" skip skip
@@ -65,6 +66,7 @@ do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.
 do_one other_physics_hooks "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
+do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
 
 do_one rsp_BEP "good match for period" "final.mod" skip   
 do_one rsp_BLAP "good match for period" "final.mod" skip 
@@ -95,8 +97,6 @@ return
 
 #   Pablo needs to fix   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-#   Pablo needs to fix   do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
-#    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
 
 #  off while testing.    do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
 #  off while testing.    do_one dev_BW_Vul_pulses "good match for period" "final.mod" skip   
