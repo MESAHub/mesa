@@ -95,7 +95,7 @@
             ! print *, "mass(kstart), crystal_core_boundary_mass", s% m(kstart)/msun, s% crystal_core_boundary_mass_old/msun
          
             k_new = k_bound
-            !! Need to have this loop run over only NEWLY crystallizing material now that we have a real phase diagram.
+            ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
                if(s% phase(k) <= 0.5d0) then
@@ -105,6 +105,7 @@
                end if
 
                call move_one_zone(s,k,dq_crystal)
+               ! crystallized out to k now, liquid starts at k-1.
                ! now mix the liquid material outward until stably stratified
                if(do_premix .and. dq_crystal > 0d0) then
                   call mix_outward(s, k-1)
@@ -164,8 +165,8 @@
         
       end subroutine move_one_zone
       
-      ! mix composition outward until no more negative C gradient
-      ! (maybe should be gneralized to no negative molecular weight gradient?)
+      ! mix composition outward until no more positive O gradient
+      ! (maybe should be generalized to no negative molecular weight gradient?)
       subroutine mix_outward(s,kbot)
         use chem_def, only: chem_isos, ic12, io16
 

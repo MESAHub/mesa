@@ -38,6 +38,7 @@ star/private/pgstar_*.f90 @rjfarmer
 star/private/rsp_*.f90 @rsmolec
 star/private/mlt_info.f90 @adamjermyn
 star/private/mlt_get_results.f90 @adamjermyn
+star/private/phase_separation.f90 @evbauer
 
 ### Test suite cases ###
 
