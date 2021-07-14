@@ -1,0 +1,1 @@
+../../../star/test_suite/wd_cool_0.6M/README.rst

@@ -62,7 +62,7 @@
 
   thermohaline_coeff = 0
 
-  MLT_option = 'Henyey'
+  MLT_option = 'TDC'
 
   okay_to_reduce_gradT_excess = .false.
 
@@ -107,9 +107,6 @@
   max_abs_rel_run_E_err = 1d99
 
   split_merge_amr_MaxShort = 2
-  
-  max_logT_for_mlt = 9.0d0
-
 
   ! TESTING -- NEED A WORKAROUND
   use_gold2_tolerances = .false.

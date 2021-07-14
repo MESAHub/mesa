@@ -3876,22 +3876,12 @@
       
       subroutine set_using_TDC(s)
          type (star_info), pointer :: s      
-         real(dp) :: switch
          logical :: prev_using_TDC
          include 'formats'
          prev_using_TDC = s% using_TDC
          s% using_TDC = .false.
-         if (s% max_dt_div_tau_conv_for_TDC > 0) then
-            switch = s% max_conv_time_scale*s% max_dt_div_tau_conv_for_TDC
-            if (s% dt < switch) then
-               s% using_TDC = .true.
-            end if
-         end if
-         if (s% max_dt_years_for_TDC > 0) then
-            switch = s% max_dt_years_for_TDC*secyer
-            if (s% dt < switch) then
-               s% using_TDC = .true.
-            end if
+         if (s% MLT_option == 'TDC') then
+            s% using_TDC = .true.
          end if
          if ((.not. prev_using_TDC) .and. s% using_TDC) then
             write(*,*)

@@ -86,7 +86,7 @@ use_Skye = .false.
    solver_itermin = 2
 
    mixing_length_alpha = 1.5
-   MLT_option = 'Henyey'
+   MLT_option = 'TDC'
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.01

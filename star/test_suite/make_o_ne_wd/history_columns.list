@@ -49,7 +49,8 @@
       log_dt ! log10 time_step
       num_zones ! number of zones in the model
       log_total_angular_momentum
-      
+      dt_div_max_tau_conv
+
       num_solver_iterations ! iterations at this step
       rel_E_err
       log_rel_E_err

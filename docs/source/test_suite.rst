@@ -381,8 +381,9 @@ a blue large-amplitude pulsator model originally contributed by Alfred Gautschy.
 :ref:`rsp_Cepheid`
 ^^^^^^^^^^^^^^^^^^
 
-This test case checks the non-linear pulsation evolution of a 4.165 Msun, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model - 
-a classical Cepheid variable similar to CEP-227 shown in Pilecki et al. 2013, MNRAS.
+This test case checks the non-linear pulsation evolution of a 4.165 Msun, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model -
+a classical Cepheid variable similar to CEP-227 shown in |Pilecki2013|.
+
 
 :ref:`rsp_Delta_Scuti`
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -396,6 +397,81 @@ a double-mode delta Scuti variable leaving the main-sequence phase originally co
 This test case checks the non-linear pulsation evolution of a 0.65 Msun, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity -
 a long-period RR Lyrae model contributed by Radek Smolec.
 
+:ref:`rsp_Type_II_Cepheid`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the non-linear pulsation evolution of a 0.55 Msun, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model -
+type-II Cepheid of BL Her type based on |Smolec14|.
+
+:ref:`rsp_check_2nd_crossing`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises the RSP model building and linear nonadiabatic stability analysis
+to find the instability strip edges, and effective temperatures offset from the blue edge of the instability strip.
+
+:ref:`rsp_save_and_load_file`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks that RSP models can be saved and loaded to produce the same results as test case :ref:`rsp_Cepheid`.
+
+:ref:`semiconvection`
+^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks placement of the convective and semiconvective boundaries when using the Ledoux criterion and predictive mixing,
+see |MESA V|.The test vehicle is with a 1.5 Msun, Z=0.02 metallicity, model.
+
+:ref:`simplex_solar_calibration`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case exercises the simplex framework with a check of the chi^2 value for 1.0 Msun, Z=0.02 metallicity, solar model.
+
+:ref:`test_memory`
+^^^^^^^^^^^^^^^^^^
+
+This test case program checks MESA's memory management.
+It is designed primarily to be run inside the valgrind leak-checking tool,
+and is based on code provided originally by Warrick Ball.
+
+:ref:`timing`
+^^^^^^^^^^^^^
+
+This test checks the counter and timing routines with a 1.5 Msun, Z=0.02 metallicity model.
+
+:ref:`twin_studies`
+^^^^^^^^^^^^^^^^^^^
+
+This test case exercise the capability to simultaneously evolve two model stars.
+The test vehicle is a pair of 15 Msun, Z=0.02 metallicity, models one with overshooting and one without overshooting.
+
+:ref:`wd_c_core_ignition`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case the checks the onset of a thermonuclear runaway in an accreting Chandrasekhar mass carobon-oxygen white dwarf.
+
+:ref:`wd_cool_0.6M`
+^^^^^^^^^^^^^^^^^^^
+
+This test case the checks the evolution of a cooling, element diffusing 0.6 Msun white dwarf.
+
+:ref:`wd_diffusion`
+^^^^^^^^^^^^^^^^^^^
+
+This test case the checks element diffusion in a 0.6 Msun carbon-oxygen white dwarf.
+
+:ref:`wd_he_shell_ignition`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case the ignition of a helium layer in an accreting in a 0.96 Msun carbon-oxygen white dwarf model.
+
+:ref:`wd_nova_burst`
+^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution of a nova outburst for one cycle.
+
+:ref:`wd_stable_h_burn`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case checks the evolution stable hydrogen burning on a white dwarf.
 
 
 :ref:`c13_pocket`
@@ -569,6 +645,10 @@ surface_effects
 
 Tests the implementation of the various surface effect corrections
 available in MESA.
+
+
+.. |Smolec14| replace:: `Smolec and Moskalik (2014) <https://ui.adsabs.harvard.edu/abs/2014MNRAS.441..101S/abstract>`__
+.. |Pilecki2013| replace:: `Pilecki et al (2013) <https://ui.adsabs.harvard.edu/abs/2013MNRAS.436..953P/abstract>`__
 
 
 Test Index

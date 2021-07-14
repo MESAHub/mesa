@@ -1661,7 +1661,7 @@
             write(*, '(a)') &
                'The following runtime error message might help you find the problem'
             write(*, *) 
-            open(unit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
+            open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
             read(unit, nml=one_zone)
             call mesa_error(__FILE__,__LINE__)
          end if  
