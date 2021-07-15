@@ -2953,15 +2953,12 @@
       end subroutine star_history_values
 
 
-      integer function star_get_profile_id(s,name)
+      integer function star_get_profile_id(s, name)
+         ! If star_get_profile_id <0  then it failed to find the column
          use profile_getval, only: get_profile_id
          type (star_info), pointer :: s
          character(len=*),intent(in) :: name
          star_get_profile_id = get_profile_id(s,name)
-         if (star_get_profile_id < 0) THEN
-            write(*,*) "FATAL ERROR Bad value for profile name ",trim(name)
-            stop 'star_get_profile_id'
-         end if
       end function star_get_profile_id
 
 
@@ -2978,7 +2975,11 @@
          type (star_info), pointer :: s
          character(len=*),intent(in) :: name
          integer,intent(in) :: k
-         star_get_profile_output = get_profile_val(s,star_get_profile_id(s,name),k)
+         integer :: id
+         star_get_profile_output = -HUGE(star_get_profile_output)
+         id = star_get_profile_id(s,name)
+         if(id<0) return
+         star_get_profile_output = get_profile_val(s,id,k)
       end function star_get_profile_output
 
       real(dp) function star_get_profile_output_by_id(id, name, k)
@@ -3006,6 +3007,7 @@
       
 
       real(dp) function star_get_history_output(s,name)
+         ! If error return -huge(double)
          use history, only: get_history_specs, get_history_values, get1_hist_value
          type (star_info), pointer :: s   
          character(len=*),intent(in) :: name
@@ -3020,8 +3022,8 @@
             is_int_value, int_values, values, failed_to_find_value)
          if (failed_to_find_value(num_rows)) then
             if (.not. get1_hist_value(s, name, values(num_rows))) then
-               write(*,*) "FATAL ERROR Bad value for history name ",trim(name)
-               stop 'star_get_history_output'
+               star_get_history_output = -HUGE(star_get_history_output)
+               return
             end if
          end if
          if (is_int_value(1)) then 
