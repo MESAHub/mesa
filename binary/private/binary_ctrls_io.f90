@@ -779,5 +779,71 @@
       end subroutine write_binary_controls
 
 
+      subroutine get_binary_control(b, name, val, ierr)
+         use utils_lib, only: StrUpCase
+         type (binary_info), pointer :: b
+         character(len=*),intent(in) :: name
+         character(len=*), intent(out) :: val
+         integer, intent(out) :: ierr
+   
+         character(len(name)) :: upper_name
+         character(len=512) :: str
+         integer :: iounit,iostat,ind,i
+   
+   
+         ! First save current controls
+         call set_binary_controls_for_writing(b, ierr)
+         if(ierr/=0) return
+   
+         ! Write namelist to temporay file
+         open(newunit=iounit,status='scratch')
+         write(iounit,nml=binary_controls)
+         rewind(iounit)
+   
+         ! Namelists get written in captials
+         upper_name = StrUpCase(name)
+         val = ''
+         ! Search for name inside namelist
+         do 
+            read(iounit,'(A)',iostat=iostat) str
+            ind = index(str,trim(upper_name))
+            if( ind /= 0 ) then
+               val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+               do i=1,len(val)
+                  if(val(i:i)=='"') val(i:i) = ' '
+               end do
+               exit
+            end if
+            if(is_iostat_end(iostat)) exit
+         end do   
+   
+         if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
+   
+         close(iounit)
+   
+      end subroutine get_binary_control
+   
+      subroutine set_binary_control(b, name, val, ierr)
+         type (binary_info), pointer :: b
+         character(len=*), intent(in) :: name, val
+         character(len=len(name)+len(val)+19) :: tmp
+         integer, intent(out) :: ierr
+   
+         ! First save current controls
+         call set_binary_controls_for_writing(b, ierr)
+         if(ierr/=0) return
+   
+         tmp=''
+         tmp = '&binary_controls '//trim(name)//'='//trim(val)//' /'
+   
+         ! Load into namelist
+         read(tmp, nml=binary_controls)
+   
+         ! Add to star
+         call store_binary_controls(b, ierr)
+         if(ierr/=0) return
+   
+      end subroutine set_binary_control
+
       end module binary_ctrls_io
 
