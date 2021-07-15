@@ -161,7 +161,7 @@
         s% xa(net_ic12,k-1) = XC1 + Xfac*dXO * s% dq(k) / s% dq(k-1)
         s% xa(net_io16,k-1) = XO1 - Xfac*dXO * s% dq(k) / s% dq(k-1)
 
-        call update_model_(s,update_mode,k-1,s%nz)
+        call update_model_(s,update_mode,k-1,s%nz,.false.)
         
       end subroutine move_one_zone
       
@@ -174,7 +174,7 @@
         integer, intent(in)      :: kbot
         
         real(dp) :: avg_xa(s%species)
-        real(dp) :: mass, avg_XO, XO_out
+        real(dp) :: mass
         integer :: k, l, ktop, net_io16
         integer :: update_mode(s%nz)
         
@@ -193,24 +193,26 @@
            ! avg_xa = MAX(MIN(avg_xa, 1._dp), 0._dp)
            ! avg_xa = avg_xa/SUM(avg_xa)
 
-           avg_XO = avg_xa(net_io16)
-           XO_out = s% xa(net_io16,ktop-1)
-           ! print *, "ktop, avg XO, outside XO", ktop, avg_XO, XO_out
+           do l = 1, s%species
+              s%xa(l,ktop:kbot) = avg_xa(l)
+           end do
 
-           if( avg_XO >= XO_out ) then ! should be stable against further mixing
-              ! Update abundances using the average
-              do l = 1, s%species
-                 s%xa(l,ktop:kbot) = avg_xa(l)
-              end do
+           ! updates, eos, opacities, mu, etc now that abundances have changed,
+           ! but only in the cells near the boundary where we need to check here.
+           ! Will call full update over mixed region after exiting loop.
+           call update_model_(s, update_mode, ktop-1, ktop+1, .false.)
+
+           if(s% mu(ktop) >= s% mu(ktop-1)) then
+              ! stable against further mixing, so exit loop
               exit
            end if
 
         end do
 
-        ! print *, "kbot, ktop, avg XO, outside XO", kbot, ktop, avg_XO, XO_out
+        ! Call a final update over all mixed cells now.
+        call update_model_(s, update_mode, ktop, kbot, .true.)
+        ! print *, "kbot, ktop, m(ktop), mu_in, mu_out", kbot, ktop, s% m(ktop)/msun, s% mu(ktop), s% mu(ktop-1)
        
-        call update_model_(s, update_mode, ktop, kbot)
-
       end subroutine mix_outward
 
       real(dp) function blouin_delta_xo(Xin)
@@ -245,15 +247,17 @@
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
       
-      subroutine update_model_ (s, update_mode, kc_t, kc_b)
+      subroutine update_model_ (s, update_mode, kc_t, kc_b, do_brunt)
 
         use mlt_info, only: set_mlt_vars
+        use brunt, only: do_brunt_B
         use micro
         
         type(star_info), pointer :: s
         integer, intent(in)      :: update_mode(:)
         integer, intent(in)      :: kc_t
         integer, intent(in)      :: kc_b
+        logical, intent(in)      :: do_brunt
         
         integer  :: ierr
         integer  :: kf_t
@@ -276,7 +280,22 @@
            write(*,*) 'phase_separation: error from call to set_micro_vars'
            stop
         end if
-        
+
+        ! This is expensive, so only do it if we really need to.
+        if(do_brunt) then
+           ! Need to make sure we can set brunt for mix_outward calculation.
+           if(.not. s% calculate_Brunt_B) then
+              stop "phase separation requires s% calculate_Brunt_B = .true."
+           end if
+           ! Note that kc_t and kc_b don't actually matter here.
+           ! Brunt profile gets caclulated over whole model regardless.
+           call do_brunt_B(s, kc_t, kc_b, ierr) ! for unsmoothed_brunt_B
+           if (ierr /= 0) then
+              write(*,*) 'phase_separation: error from call to do_brunt_B'
+              stop
+           end if
+        end if
+
         ! Finally update MLT for interior faces
         
         kf_t = kc_t
