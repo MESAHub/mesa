@@ -1,41 +1,35 @@
-.. _jdot_ml_check:
+.. _jdot_gr_check:
 
 *************
-jdot_ml_check
+jdot_gr_check
 *************
 
-This test case checks the evolution of one star plus a point mass, including mass transfer to the point mass.
-Using pre-specified efficiency options, verifies that the binary evolution, including mass transfer to the point mass,
-follows the analytical result of `Tauris & van den Heuvel (2006)
-<https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_. 
+This test case verifies that the orbital evolution due to GW emission follows the 
+analytical result of `Peters (1964) <https://ui.adsabs.harvard.edu/abs/1964PhRv..136.1224P>`_.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_project``) loads a 1 Msun zero-age main sequence model and a 1.4 Msun point mass. The binary system is given an initial seperation of 2.75 Rsun, and is evolved for 14 billion years. Along the way, the ``run_binary_extras.f90`` calculates the deviation from the  analytical result of `Tauris & van den Heuvel (2006) <https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_:
+* Part 1 (``inlist_project``) loads a 0.5 Msun zero-age main sequence model and a 0.8 Msun point mass. The binary system is given an initial seperation of 2.0 Rsun, and is evolved until the onset of Roche Lobe overflow.  Along the way, the ``run_binary_extras.f90`` calculates the deviation from the analytical result of `Peters (1964) <https://ui.adsabs.harvard.edu/abs/1964PhRv..136.1224P>`_.
 
 .. code-block:: console
 
+ bin     231   1.300000   1.338152   0.157264  0.000E+00   1.600000          2          1  0.000E+00   1.000000  2.452E+51 -1.045E+34  0.000E+00
+    6.570598   0.500000   0.453686   0.000000  0.000E+00 264.917399   0.453691 -9.939E-06  0.000E+00  1.000E+99  0.000E+00 -1.045E+34  0.000E+00
+  3.7082E+09   0.800000   0.000000   0.000000 -5.669E+47 165.573375   0.562250 -1.000E+00  0.000E+00  0.000E+00  0.000E+00  0.000E+00          1
 
-   error in separation    7.0519985646485173D-05
+  error in separation  -3.4603578910942755E-003
+  terminate due to beginning of RLO
 
 
 |br|
 Binary period and seperation history:
 
-.. image:: ../../../binary/test_suite/jdot_ml_check/docs/grid_000891.svg
+.. image:: ../../../binary/test_suite/jdot_gr_check/docs/grid_000232.svg
    :width: 100%
 
 
 |br|
-Abundance and power profiles of star 1 at termination:
-
-.. image:: ../../../binary/test_suite/jdot_ml_check/docs/profile_s1_000891.svg
-   :width: 100%
-
-
-
-|br|
-pgstar commands used for the binary and star1 plots above:
+pgstar commands used for the plot above:
 
 .. code-block:: console
 
@@ -162,7 +156,7 @@ pgstar commands used for the binary and star1 plots above:
   Grid1_win_width = 16
   Grid1_win_aspect_ratio = 0.6
 
-  Grid1_title = 'jdot_ml_check'
+  Grid1_title = 'jdot_gr_check'
   Grid1_txt_scale_factor(1) = 1.0
 
   Grid1_num_cols = 2 ! divide plotting region into this many equal width cols
@@ -211,35 +205,6 @@ pgstar commands used for the binary and star1 plots above:
  Grid1_file_interval = 10000
  Grid1_file_width = -1
  Grid1_file_aspect_ratio = -1         
-
-
-  Profile_Panels2_win_flag = .true.
-  Profile_Panels2_win_width = 10
-  Profile_Panels2_title = 'jdot_ml_check: star 1'
-
-  Profile_Panels2_xaxis_name = 'mass'
-  Profile_Panels2_xaxis_reversed = .false.
-  Profile_Panels2_xmin = 0.0
-  Profile_Panels2_xmax = 1.0
-  Profile_Panels2_show_mix_regions_on_xaxis = .false.
-
-  Profile_Panels2_xright = 0.92
-  Profile_Panels2_ytop = 0.92
-
-  num_abundance_line_labels = 5
-  Abundance_legend_max_cnt = 0
-
-  Profile_Panels2_yaxis_name(2) = 'Power'
-  Profile_Panels2_ymin(2) = -10.0
-  Profile_Panels2_ymax(2) = 5.0
-
-  Profile_Panels2_file_flag = .true.
-  Profile_Panels2_file_dir = 'pgstar_out'
-  Profile_Panels2_file_prefix = 'profile_s1_'
-  Profile_Panels2_file_interval = 10000
-  Profile_Panels2_file_width = -1
-  Profile_Panels2_file_aspect_ratio = -1
-
  / ! end of pgstar namelist
 
 Last-Updated: 12Jul2021 (MESA 094ff71) by fxt.
