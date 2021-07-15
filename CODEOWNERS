@@ -70,7 +70,6 @@ star/test_suite/dev_split_burn_big_net @rjfarmer
 star/test_suite/dev_to_cc_12 @rjfarmer
 star/test_suite/dev_to_cc_20 @rjfarmer
 star/test_suite/dev_to_cc_80 @rjfarmer
-star/test_suite/dev_to_pisn_200 @rjfarmer
 star/test_suite/dev_to_ppisn_100 @rjfarmer
 star/test_suite/diffusion_smoothness @fxt
 star/test_suite/extended_convective_penetration @fxt
@@ -103,6 +102,7 @@ star/test_suite/ns_c @rjfarmer @fxt
 star/test_suite/ns_h @rjfarmer @fxt
 star/test_suite/ns_he @rjfarmer @fxt
 star/test_suite/other_physics_hooks
+star/test_suite/pisn @rjfarmer
 star/test_suite/radiative_levitation @evbauer
 star/test_suite/R_CrB_star @jschwab
 star/test_suite/relax_composition_j_entropy

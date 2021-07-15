@@ -1,8 +1,8 @@
-.. _dev_to_pisn_200:
+.. _pisn:
 
-***************
-dev_to_pisn_200
-***************
+****
+pisn
+****
 
 This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN)
 
@@ -21,7 +21,7 @@ Inlists
 
 This test case has seven parts.
 
-* Part 1 (``inlist_make_late_pre_zams``) This creates a 200 |Msun| Z=1.6*10:sup:-3 model
+* Part 1 (``inlist_make_late_pre_zams``) This creates a 200 |Msun| Z=1.6*10\ :sup:`-3` model
 
 * Part 2 (``inlist_to_zams_header``) This evolves the model to just before the MS starts
 
@@ -31,7 +31,7 @@ This test case has seven parts.
 
 * Part 5 (``inlist_to_end_core_c_burn``) This takes the model up to the end of carbon burning
 
-* Part 6 (``inlist_convert``) This prepars the model for a PISN, by swithcing from cell-faced to cell-centered hydrodynamics, turning off rotation, and turning on the AMR mesh controls.
+* Part 6 (``inlist_convert``) This prepares the model for a PISN, by switching from cell-faced to cell-centered hydrodynamics, turning off rotation, and turning on the AMR mesh controls.
 
 * Part 7 (``inlist_finish``) This evoles the model through the PISN by taking it through carbon burning, explosive oxygen ignition, and stops once the star reaches a positive total energy.
 
