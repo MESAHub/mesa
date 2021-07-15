@@ -204,11 +204,6 @@ This test suite example shows how to use user-defined color filter and extinctio
 
 This test suite case checks the use of custom nuclear reaction rates in an accreting 0.3 Msun helium white dwarf model.
 
-:ref:`dev_to_pisn_200`
-^^^^^^^^^^^^^^^^^^^^^^
-
-This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN).
-
 
 :ref:`diffusion_smoothness`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -359,6 +354,10 @@ This test case shows an example of a carbon flash within a neutron star envelope
 This test case exercises several of the ``other_*`` physics hooks simultaneously in a 1 Msun, Z=0.02 metallicity, model.
 It provides an example of how to include your own physics code into a MESA run.
 
+:ref:`pisn`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN).
 
 :ref:`radiative_levitation`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

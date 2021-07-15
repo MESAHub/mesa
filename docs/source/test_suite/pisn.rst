@@ -1,0 +1,1 @@
+../../../star/test_suite/pisn/README.rst
