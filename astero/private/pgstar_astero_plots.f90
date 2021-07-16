@@ -139,10 +139,7 @@
          real :: xmin, xmax, ymin, ymax, dx, dy, plot_delta_nu, freq, marker_scale, &
             x_obs, y_obs, x_model, y_model, y_txt, xpt_min, xpt_max, xmargin
          character (len=256) :: str
-         integer :: i, &
-            l0_color, l0_shape, l1_color, l1_shape, &
-            l2_color, l2_shape, l3_color, l3_shape, &
-            model_color, model_shape
+         integer :: i, l, freq_color(0:3), freq_shape(0:3), model_color, model_shape
                      
          include 'formats'
          ierr = 0
@@ -222,51 +219,51 @@
             dx = (xmax-xmin)/3d0
          end if
          
-         l0_color = clr_Teal
-         l0_shape = 0840 ! circle
+         freq_color(0) = clr_Teal
+         freq_shape(0) = 0840 ! circle
          
-         l1_color = clr_Crimson
-         l1_shape = 0842 ! triangle
+         freq_color(1) = clr_Crimson
+         freq_shape(1) = 0842 ! triangle
          
-         l2_color = clr_BrightBlue
-         l2_shape = 0841 ! square
+         freq_color(2) = clr_BrightBlue
+         freq_shape(2) = 0841 ! square
          
-         l3_color = clr_Coral
-         l3_shape = 0843 ! diamond
+         freq_color(3) = clr_Coral
+         freq_shape(3) = 0843 ! diamond
             
          model_color = clr_Silver
          model_shape = 0828 ! bullet
          
          
          x_obs = xmin + dx/2
-         call pgsci(l0_color)
+         call pgsci(freq_color(0))
          call pgsch(1.6*txt_scale)
-         call pgpt1(x_obs, y_obs, l0_shape)
+         call pgpt1(x_obs, y_obs, freq_shape(0))
          call pgsci(1)
          call pgsch(txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=0')
          
          x_obs = x_obs+dx
-         call pgsci(l1_color)
+         call pgsci(freq_color(1))
          call pgsch(1.6*txt_scale)
-         call pgpt1(x_obs, y_obs, l1_shape)
+         call pgpt1(x_obs, y_obs, freq_shape(1))
          call pgsci(1)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=1')
          
          x_obs = x_obs+dx
-         call pgsci(l2_color)
+         call pgsci(freq_color(2))
          call pgsch(1.6*txt_scale)
-         call pgpt1(x_obs, y_obs, l2_shape)
+         call pgpt1(x_obs, y_obs, freq_shape(2))
          call pgsci(1)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=2')
          
          if (nl(3) > 0) then
             x_obs = x_obs+dx
-            call pgsci(l3_color)
+            call pgsci(freq_color(3))
             call pgsch(1.6*txt_scale)
-            call pgpt1(x_obs, y_obs, l3_shape)
+            call pgpt1(x_obs, y_obs, freq_shape(3))
             call pgsci(1)
             call pgsch(1.0*txt_scale)
             call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=3')
@@ -274,54 +271,28 @@
          
          marker_scale = 2.4*txt_scale
          call pgsch(marker_scale)
-         if (nl(0) > 0) then
-            do i=1,nl(0)
-               call show_obs(freq_target(0,i), l0_color, l0_shape)
-               !if (have_radial) call show_model( &
-               if (model_freq_corr(0,i) > 0) call show_model( &
-                  freq_target(0,i), model_freq_corr(0,i), 0d0, 0d0, &
-                  0d0, 0d0, 0d0, l0_color)
-            end do
-         end if
+
+         do l = 0, 3
+            if (nl(l) > 0) then
+               do i = 1, nl(l)
+                  call show_obs(freq_target(l,i), freq_color(l), freq_shape(l))
+                  if (l == 0) then
+                     if (model_freq_corr(0,i) > 0) call show_model( &
+                          freq_target(0,i), model_freq_corr(0,i), 0d0, 0d0, &
+                          0d0, 0d0, 0d0, freq_color(0))
+                  else
+                     if (have_nonradial) then
+                        call show_model( &
+                           freq_target(l,i), model_freq_corr(l,i), model_freq_corr_alt_up(l,i), &
+                           model_freq_corr_alt_down(l,i), &
+                           model_inertia(l,i), model_inertia_alt_up(l,i), model_inertia_alt_down(l,i), &
+                           freq_color(l))
+                     end if
+                  end if
+               end do
+            end if
+         end do
          
-         if (nl(1) > 0) then
-            do i=1,nl(1)
-               call show_obs(freq_target(1,i), l1_color, l1_shape)
-               if (have_nonradial) then
-                  call show_model( &
-                     freq_target(1,i), model_freq_corr(1,i), model_freq_corr_alt_up(1,i), &
-                     model_freq_corr_alt_down(1,i), &
-                     model_inertia(1,i), model_inertia_alt_up(1,i), model_inertia_alt_down(1,i), &
-                     l1_color)
-               end if
-            end do
-         end if
-         
-         if (nl(2) > 0) then
-            do i=1,nl(2)
-               call show_obs(freq_target(2,i), l2_color, l2_shape)
-               if (have_nonradial) then
-                  call show_model( &
-                     freq_target(2,i), model_freq_corr(2,i), model_freq_corr_alt_up(2,i), &
-                     model_freq_corr_alt_down(2,i), &
-                     model_inertia(2,i), model_inertia_alt_up(2,i), model_inertia_alt_down(2,i), &
-                     l2_color)
-               end if
-            end do
-         end if
-         
-         if (nl(3) > 0) then
-            do i=1,nl(3)
-               call show_obs(freq_target(3,i), l3_color, l3_shape)
-               if (have_nonradial) then
-                  call show_model( &
-                     freq_target(3,i), model_freq_corr(3,i), model_freq_corr_alt_up(3,i), &
-                     model_freq_corr_alt_down(3,i), &
-                     model_inertia(3,i), model_inertia_alt_up(3,i), model_inertia_alt_down(3,i), &
-                     l3_color)
-               end if
-            end do
-         end if
          
          call pgsci(clr_SlateGray)
          call pgsls(1)
