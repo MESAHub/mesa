@@ -2881,10 +2881,10 @@
                is_int_val = .true.
 
             case (h_TDC_num_cells)
-               val = 0
+               int_val = 0
                do k=1,nz
                   if (s% tdc_num_iters(k) > 0) then
-                     val = val + 1
+                     int_val = int_val + 1
                   end if
                end do
                is_int_val = .true.
