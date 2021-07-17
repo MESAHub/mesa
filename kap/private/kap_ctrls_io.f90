@@ -31,7 +31,7 @@
 
    implicit none
 
-   public :: read_namelist, write_namelist
+   public :: read_namelist, write_namelist, get_kap_controls, set_kap_controls
    private
 
    real(dp) :: Zbase
@@ -463,7 +463,105 @@
 
    subroutine set_controls_for_writing(rq)
       type (Kap_General_Info), pointer :: rq
+
+      Zbase = rq% Zbase
+
+      kap_blend_logT_upper_bdy = rq% kap_blend_logT_upper_bdy
+      kap_blend_logT_lower_bdy = rq% kap_blend_logT_lower_bdy
+
+      cubic_interpolation_in_X = rq% cubic_interpolation_in_X
+      cubic_interpolation_in_Z = rq% cubic_interpolation_in_Z
+
+      include_electron_conduction = rq% include_electron_conduction
+      use_blouin_conductive_opacities = rq% use_blouin_conductive_opacities
+
+      use_Zbase_for_Type1 = rq% use_Zbase_for_Type1
+      use_Type2_opacities = rq% use_Type2_opacities
+
+      kap_Type2_full_off_X = rq% kap_Type2_full_off_X
+      kap_Type2_full_on_X = rq% kap_Type2_full_on_X
+      kap_Type2_full_off_dZ = rq% kap_Type2_full_off_dZ
+      kap_Type2_full_on_dZ = rq% kap_Type2_full_on_dZ
+
+      show_info = rq% show_info
+
+      use_other_elect_cond_opacity = rq% use_other_elect_cond_opacity
+      use_other_compton_opacity = rq% use_other_compton_opacity
+      use_other_radiative_opacity = rq% use_other_radiative_opacity
+
+
    end subroutine set_controls_for_writing
+
+
+
+   subroutine get_kap_controls(rq, name, val, ierr)
+      use utils_lib, only: StrUpCase
+      type (kap_General_Info), pointer :: rq
+      character(len=*),intent(in) :: name
+      character(len=*), intent(out) :: val
+      integer, intent(out) :: ierr
+
+      character(len(name)) :: upper_name
+      character(len=512) :: str
+      integer :: iounit,iostat,ind,i
+
+      ierr = 0
+
+
+      ! First save current controls
+      call set_controls_for_writing(rq)
+
+      ! Write namelist to temporay file
+      open(newunit=iounit,status='scratch')
+      write(iounit,nml=kap)
+      rewind(iounit)
+
+      ! Namelists get written in captials
+      upper_name = StrUpCase(name)
+      val = ''
+      ! Search for name inside namelist
+      do 
+         read(iounit,'(A)',iostat=iostat) str
+         ind = index(str,trim(upper_name))
+         if( ind /= 0 ) then
+            val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+            do i=1,len(val)
+               if(val(i:i)=='"') val(i:i) = ' '
+            end do
+            exit
+         end if
+         if(is_iostat_end(iostat)) exit
+      end do   
+
+      if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
+
+      close(iounit)
+
+   end subroutine get_kap_controls
+
+   subroutine set_kap_controls(rq, name, val, ierr)
+      type (kap_General_Info), pointer :: rq
+      character(len=*), intent(in) :: name, val
+      character(len=len(name)+len(val)+8) :: tmp
+      integer, intent(out) :: ierr
+
+      ierr = 0
+
+      ! First save current kap_controls
+      call set_controls_for_writing(rq)
+
+      tmp=''
+      tmp = '&kap '//trim(name)//'='//trim(val)//' /'
+
+      ! Load into namelist
+      read(tmp, nml=kap)
+
+      ! Add to kap
+      call store_controls(rq,ierr)
+      if(ierr/=0) return
+
+   end subroutine set_kap_controls
+
 
 
    end module kap_ctrls_io

@@ -1803,5 +1803,75 @@
       end subroutine do_write_star_job
 
 
+      subroutine get_star_job(s, name, val, ierr)
+         use utils_lib, only: StrUpCase
+         type (star_info), pointer :: s
+         character(len=*),intent(in) :: name
+         character(len=*), intent(out) :: val
+         integer, intent(out) :: ierr
+   
+         character(len(name)) :: upper_name
+         character(len=512) :: str
+         integer :: iounit,iostat,ind,i
+   
+         ierr = 0
+
+         ! First save current controls
+         call set_star_job_controls_for_writing(s, ierr)
+         if(ierr/=0) return
+   
+         ! Write namelist to temporay file
+         open(newunit=iounit,status='scratch')
+         write(iounit,nml=star_job)
+         rewind(iounit)
+   
+         ! Namelists get written in captials
+         upper_name = StrUpCase(name)
+         val = ''
+         ! Search for name inside namelist
+         do 
+            read(iounit,'(A)',iostat=iostat) str
+            ind = index(str,trim(upper_name))
+            if( ind /= 0 ) then
+               val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+               do i=1,len(val)
+                  if(val(i:i)=='"') val(i:i) = ' '
+               end do
+               exit
+            end if
+            if(is_iostat_end(iostat)) exit
+         end do   
+   
+         if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
+   
+         close(iounit)
+   
+      end subroutine get_star_job
+   
+      subroutine set_star_job(s, name, val, ierr)
+         type (star_info), pointer :: s
+         character(len=*), intent(in) :: name, val
+         character(len=len(name)+len(val)+12) :: tmp
+         integer, intent(out) :: ierr
+   
+         ierr = 0
+
+         ! First save current star_job
+         call set_star_job_controls_for_writing(s, ierr)
+         if(ierr/=0) return
+   
+         tmp=''
+         tmp = '&star_job '//trim(name)//'='//trim(val)//'/'
+   
+         ! Load into namelist
+         read(tmp, nml=star_job)
+   
+         ! Add to star
+         call store_star_job_controls(s, ierr)
+         if(ierr/=0) return
+   
+      end subroutine set_star_job
+
+
       end module star_job_ctrls_io
 

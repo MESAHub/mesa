@@ -892,4 +892,35 @@
       end subroutine num_eos_files_loaded
 
 
+      subroutine eos_get_control_namelist(handle, name, val, ierr)
+         use eos_def
+         use eos_ctrls_io, only: get_eos_controls
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (EoS_General_Info), pointer :: rq
+         ierr = 0
+         call get_eos_ptr(handle,rq,ierr)
+         if(ierr/=0) return
+         call get_eos_controls(rq, name, val, ierr)
+
+      end subroutine eos_get_control_namelist
+
+      subroutine eos_set_control_namelist(handle, name, val, ierr)
+         use eos_def
+         use eos_ctrls_io, only: set_eos_controls
+         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (EoS_General_Info), pointer :: rq
+         ierr = 0
+         call get_eos_ptr(handle,rq,ierr)
+         if(ierr/=0) return
+         call set_eos_controls(rq, name, val, ierr)
+
+      end subroutine eos_set_control_namelist
+
+
       end module eos_lib

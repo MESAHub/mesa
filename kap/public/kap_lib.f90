@@ -664,6 +664,36 @@
       end subroutine get_op_mono_args
 
 
+      subroutine kap_get_control_namelist(handle, name, val, ierr)
+         use kap_def
+         use kap_ctrls_io, only: get_kap_controls
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (kap_General_Info), pointer :: rq
+         ierr = 0
+         call kap_ptr(handle,rq,ierr)
+         if(ierr/=0) return
+         call get_kap_controls(rq, name, val, ierr)
+
+      end subroutine kap_get_control_namelist
+
+      subroutine kap_set_control_namelist(handle, name, val, ierr)
+         use kap_def
+         use kap_ctrls_io, only: set_kap_controls
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (kap_General_Info), pointer :: rq
+         ierr = 0
+         call kap_ptr(handle,rq,ierr)
+         if(ierr/=0) return
+         call set_kap_controls(rq, name, val, ierr)
+
+      end subroutine kap_set_control_namelist
+
 
       end module kap_lib
 
