@@ -3262,4 +3262,66 @@
       end subroutine star_init_star_handles
       
       
+      subroutine star_get_control_namelist(id, name, val, ierr)
+         use ctrls_io, only: get_control
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call get_control(s, name, val, ierr)
+
+      end subroutine star_get_control_namelist
+
+      subroutine star_set_control_namelist(id, name, val, ierr)
+         use ctrls_io, only: set_control
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call set_control(s, name, val, ierr)
+
+      end subroutine star_set_control_namelist
+
+
+      subroutine star_get_star_job_namelist(id, name, val, ierr)
+         use star_job_ctrls_io, only: get_star_job
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call get_star_job(s, name, val, ierr)
+
+      end subroutine star_get_star_job_namelist
+
+      subroutine star_set_star_job_namelist(id, name, val, ierr)
+         use star_job_ctrls_io, only: set_star_job
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call set_star_job(s, name, val, ierr)
+
+      end subroutine star_set_star_job_namelist
+
+
       end module star_lib
