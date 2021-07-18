@@ -37,22 +37,195 @@ Throughout your project, the best way to solicit community help and
 input is via a message to the ``mesa-users@lists.mesastar.org`` mailing list.
 
 
-Starting with a test suite case
--------------------------------
+An example
+----------
 
-mini-lab 1
+We will use the test_suite case :ref:`semiconvection`.
+Begin in the directory where you do your MESA work.
 
-semiconvection
+.. code-block:: console
 
-convert to regulatr mesa work directory outside of ``$MESA_DIR``
+  cp -r $MESA_DIR/star/test_suite/semiconvection .
 
-run
+There are four file edits to make. First, modify ``make/makefile``:
+
+.. code-block:: console
+
+   cd make
+
+   Edit makefile, changing
+
+       MESA_DIR = ../../../..
+
+   to 
+
+       ! MESA_DIR = ../../../..
+  
+   Save the file change in your editor, and
+
+   cd ../
+
+Second, modify ``rn``:
+
+.. code-block:: console
+
+   Edit rn, changing
+
+       MESA_DIR=../../.. 
+
+   to
+
+       # MESA_DIR=../../.. 
+
+   and save the file change.
+
+Third, modify ``ck``:
+
+.. code-block:: console
+
+   Edit ck, changing
+
+       MESA_DIR=../../..
+
+   to
+
+       # MESA_DIR=../../..
+
+   and save the file change.
+
+Fourth, modify ``inlist_semiconvection_header``:
+
+.. code-block:: console
+
+   Edit inlist_semiconvection_header, changing
+
+       mesa_dir = '../../..'
+
+   to 
+
+      !mesa_dir = '../../..'
+
+   and save the file change.
+
+Now build the executable 
+
+.. code-block:: console
+
+   ./mk
+
+and run the executable
+
+.. code-block:: console
+
+   ./rn
+
+After a few minutes the run will terminate and you should see 
+
+.. code-block:: console
+
+ stop because have dropped below central lower limit for h1
+     0.3994694345E+00    0.4000000000E+00
+
+         322   7.308040   6658.804   0.741142   0.741142   1.500000   1.500000   0.399469   0.007663   0.280000  -2.316624   1653      0
+    6.698970   7.308040   0.246241 -37.781812  -0.571349 -99.000000   0.000000   0.580264   0.004769   0.020000   0.076565      5
+  1.2920E+09   2.005522   0.740760  -5.854865 -41.276481  -7.412372   0.000000   0.000042   0.002098   0.020266  0.000E+00        max_dt
+                                rel_E_err    1.0067953870393901D-12
+                        log_rel_run_E_err      -10.0905601615909450
+
+ save LOGS/profile8.data for model 322
+ save photos/x322 for model 322
+  saved to final.mod
+ termination code: xa_central_lower_limit
+
+                  runtime (minutes), retries, steps        4.92         0       322
+
+
+                               mixing type at 0.125 Msun    1.0000000000000000D+00    1.0000000000000000D+00    1.0000000000000000D+00
+                               mixing type at 0.135 Msun    3.0000000000000000D+00    3.0000000000000000D+00    3.0000000000000000D+00
+                               mixing type at 0.145 Msun    0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00
+                                                    logT    7.2062697504202102D+00    7.1500000000000004D+00    7.3099999999999996D+00
+                                                  logRho    1.7886843044807488D+00    1.7500000000000000D+00    1.8000000000000000D+00
+
+ all values are within tolerances
+
+Let's add some pgstar plots to better see what is happening. 
+There are two files to edit.
+First, copy the default ``history_columns.list``
+
+.. code-block:: console
+
+   cp $MESA_DIR/star/defaults/history_columns.list .
+
+and modify your local ``history_columns.list``
+
+.. code-block:: console
+
+  add
+
+      mixing_regions 20 
+      burning_regions 20
+
+ change
+
+      !log_center_T ! temperature
+      !log_center_Rho ! density
+
+ to
+
+      log_center_T ! temperature
+      log_center_Rho ! density
+
+   and save the file changes.
+
+
+Second, modify ``inlist_semiconvection``
+
+.. code-block:: console
+
+  add to the star_job namelist:
+
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+  and change
+
+      !read_extra_pgstar_inlist1 = .true.
+      !extra_pgstar_inlist1_name = 'inlist_semiconvection'
+
+  to
+      read_extra_pgstar_inlist1 = .true.
+      extra_pgstar_inlist1_name = 'inlist_semiconvection'  
+
+  and change the pgstar namelist to 
+
+  &pgstar
+
+      pgstar_interval = 1
+
+      Grid4_win_flag = .true.
+      Grid4_win_width = 8
+      Kipp_mass_max = 0.2 ! (Msun units) negative means use default
+      Kipp_show_mixing = .true.
+      Kipp_show_burn = .false.
+      Kipp_show_luminosities = .true.
+      Kipp_show_mass_boundaries = .false.
+
+      Grid4_file_flag = .true.
+      Grid4_file_dir = 'pgstar_out'
+      Grid4_file_prefix = 'grid4_'
+      Grid4_file_interval = -1
+      Grid4_file_width = -1
+      Grid4_file_aspect_ratio = -1
+
+  / ! end of pgstar namelist
+
+   and save the file changes.
+
+
 
 
 Explore Numerical Convergence 
 -----------------------------
-
-maxi-lab 1
 
 mass resolution
 
@@ -61,8 +234,6 @@ temporal resolution
 
 Explore Physics Variations
 --------------------------
-
-max-lab 2
 
 reaction network
 
@@ -89,7 +260,7 @@ point to youtube video and zenodo repo
 Draft Research Notes Abstract
 -----------------------------
 
-post-maxi labs
+post maxi-lab
 
 submit an actual rnaas?!
 
@@ -97,7 +268,7 @@ submit an actual rnaas?!
 Share your Results
 ------------------
 
-post maxi-labs
+post maxi-lab
 
 zenodo sandbox upload
 
