@@ -25,8 +25,7 @@ familiarize yourself with the set of options relevant to your problem.
 More information is available on :ref:`how to use a test suite case as a starting point for your own work directory <test_suite:Test suite>`.
 
 You should always perform some sort of convergence study to ensure that
-your results are not sensitive to the time or mass resolution of your
-models.
+your results are not sensitive to the time or mass resolution of your models.
 Please note, and this is very important, that MESA defaults will
 generally NOT be optimal or even acceptable for your particular science cases.
 It is the user’s responsibility to ensure that the MESA options and controls
@@ -40,7 +39,7 @@ input is via a message to the ``mesa-users@lists.mesastar.org`` mailing list.
 An example
 ----------
 
-We will use the test_suite case :ref:`semiconvection`.
+We will use the test suite case :ref:`semiconvection`.
 Begin in the directory where you do your MESA work.
 
 .. code-block:: console
@@ -222,57 +221,72 @@ Second, modify ``inlist_semiconvection``
    and save the file changes.
 
 
+Explore Physics Variations
+--------------------------
+
+Make the following changes to your ``inlist_semiconvection``:
+
+.. code-block:: console
+
+    change 
+
+      max_model_number = 1000
+
+    to 
+
+      max_model_number = 40000
+
+    and change
+
+      history_interval = 10
+
+    to
+
+      history_interval = 1
+
+
+Experiment with the chosen reaction network ``new_net_name = ``pp_and_cno_extras.net``, ``basic`` (default), ``mesa_49.net``.
+
+Are the results for the mass of the convective core and HR diagram the same? 
+If they are not the same, why are they different?
+Are all values reported at the end of a run still within acceptable tolerances?
+
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment01 for analysis by the TAs (Anne Thoul and Andrew Nine)
+
+
+Experiment with the 
+mixing length parameterization of convection ``mixing_length_alpha`` = 3.0, 2.5, 2.0, 1.8 (default), 1.5, 1.2, 1.0, and
+the scale of semiconvective mixing ``alpha_semiconvection`` = 0.0 0.02 0.05 0.1 (test suite), 0.15 0.20, 0.25, 0.30.
+Repeat answering the questions above.
+
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment02.
 
 
 Explore Numerical Convergence 
 -----------------------------
 
-mass resolution
+Experiment with the mass resolution settings:
+``max_dq`` = 5.0e-2, 2.0e-2, 1.0e-2 (default), 5.0e-3, 2.0e-3, 1.0e-3
+and ``mesh_delta_coeff`` = 2.0, 1.5, 1.0 (default), 0.8, 0.5, 0.2, 0.1.
+Repeat answering the questions above.
 
-temporal resolution
-
-
-Explore Physics Variations
---------------------------
-
-reaction network
-
-alpha-overshoot
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment03.
 
 
+Experiment with the temporal resolution settings:
+``max_years_for_timestep`` = 1.0e8, 5.0e7, 1.0e7, 5.0e6, 1.0e6 , 5.0e5 and 
+``delta_lgT_cntr_limit``   = 0.01 (default), 5.0e-3, 2.0e-3, 1.0e-3, 5.0e-4
+``delta_lgRho_cntr_limit`` = 0.05 (default), 2.0e-2, 1.0e-2, 5.0e-3, 2.0e-3, 1.0e-3.
+Repeat answering the questions above.
 
-Checklist For Publishing Results
---------------------------------
-
-Describe your MESA setup 
-
-Include ‘standard’ References 
-
-Check naming conventions 
-
-Share your inlists
-
-Share your extensions
-
-point to youtube video and zenodo repo 
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment04.
 
 
-Draft Research Notes Abstract
------------------------------
+Draft A Research Notes Abstract
+-------------------------------
 
-post maxi-lab
-
-submit an actual rnaas?!
-
-
-Share your Results
-------------------
-
-post maxi-lab
-
-zenodo sandbox upload
-
-
+For the 2021 MESA Summer School, each table should team-craft a Research Notes abstract in plain text 
+and upload their abstract, named Table_X_abstract.txt to the shared Dropbox directory Research Notes Abstracts.
 
 
 In the paper
@@ -405,3 +419,11 @@ associate your Zenodo uploads. The `MESA
 Marketplace <http://mesastar.org>`__ will remain in use as an aggregator
 portal, and we request users to inform us of new uploads so that they
 are highlighted there as well.
+
+For the 2021 MESA Summer School, each table should upload their abstract to a Zenodo sandbox.
+
+
+.. # define a hard line break for HTML
+.. |br| raw:: html
+
+      <br>
