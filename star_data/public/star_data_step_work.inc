@@ -1024,7 +1024,7 @@
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
 
-         real(dp) :: crystal_core_boundary_mass
+         real(dp) :: crystal_core_boundary_mass_old
          
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC

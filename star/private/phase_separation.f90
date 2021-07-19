@@ -56,7 +56,6 @@
 
          if(s% phase(s% nz) < 0.5d0) then
             s% crystal_core_boundary_mass = 0d0
-            s% crystal_core_boundary_mass_old = 0d0
             return
          end if
 
@@ -85,14 +84,14 @@
             ! to account for loss of precision during remeshing.
             pad = s% min_dq * s% m(1) * 0.5d0
             do k = s%nz,1,-1
-               if(s% m(k) > s% crystal_core_boundary_mass_old + pad) then
+               if(s% m(k) > s% crystal_core_boundary_mass + pad) then
                   kstart = k
                   exit
                end if
             end do
             
             ! print *, "kstart, k_bound, phase(k_bound), phase(k_bound - 1)", kstart, k_bound, s%phase(k_bound), s%phase(k_bound - 1)
-            ! print *, "mass(kstart), crystal_core_boundary_mass", s% m(kstart)/msun, s% crystal_core_boundary_mass_old/msun
+            ! print *, "mass(kstart), crystal_core_boundary_mass, mass(kstart+1)", s% m(kstart)/msun, s% crystal_core_boundary_mass/msun, s% m(kstart+1)/msun
          
             k_new = k_bound
             ! loop runs outward starting at previous crystallization boundary
@@ -100,7 +99,7 @@
                ! Start by checking if this material should be crystallizing
                if(s% phase(k) <= 0.5d0) then
                   k_new = k+1 ! one zone inward from where material becomes liquid
-                  s% crystal_core_boundary_mass_old = s% m(k+1)
+                  s% crystal_core_boundary_mass = s% m(k+1)
                   exit
                end if
 

@@ -106,6 +106,7 @@
          s% L_surf_old = s% L_surf
          s% dt_limit_ratio_old = s% dt_limit_ratio
          s% gradT_excess_alpha_old = s% gradT_excess_alpha
+         s% crystal_core_boundary_mass_old = s% crystal_core_boundary_mass
 
          do i = 1, s% len_extra_work
             s% extra_work_old(i) = s% extra_work(i)
@@ -177,6 +178,7 @@
          s% L_surf = s% L_surf_old
          s% dt_limit_ratio = s% dt_limit_ratio_old
          s% gradT_excess_alpha = s% gradT_excess_alpha_old
+         s% crystal_core_boundary_mass = s% crystal_core_boundary_mass_old
 
          do i = 1, s% len_extra_work
             s% extra_work(i) = s% extra_work_old(i)

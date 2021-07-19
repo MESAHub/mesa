@@ -95,7 +95,7 @@
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor, &
-            s% crystal_core_boundary_mass_old
+            s% crystal_core_boundary_mass
          
          if (failed('initial_y')) return
          s% nz_old = s% nz ! needed by alloc
