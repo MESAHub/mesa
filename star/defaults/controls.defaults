@@ -7192,6 +7192,17 @@
 
     do_phase_separation = .false.
 
+      ! do_phase_separation_heating
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, calculate heating term associated with changes in
+      ! internal energy due to any abundance changes from phase
+      ! separation, and include this term in the energy equation.
+
+      ! ::
+
+    do_phase_separation_heating = .true.
+
 
 ! eos controls
 ! ============

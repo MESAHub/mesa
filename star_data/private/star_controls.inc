@@ -773,6 +773,7 @@
       ! WD phase separation
          
          logical :: do_phase_separation
+         logical :: do_phase_separation_heating
 
       ! opacity controls
 

@@ -262,7 +262,7 @@
             end if
             if (s% do_conv_premix .and. s% do_premix_heating) &
                others_ad%val = others_ad%val + s% eps_pre_mix(k)
-            if (s% do_phase_separation) &
+            if (s% do_phase_separation .and. s% do_phase_separation_heating) &
                others_ad%val = others_ad%val + s% eps_phase_separation(k)
             
             Eq_ad = 0d0

@@ -324,6 +324,7 @@
 
     ! WD phase separation
     do_phase_separation, &
+    do_phase_separation_heating, &
     
     ! eos controls
     fix_d_eos_dxa_partials, &
@@ -1801,6 +1802,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  ! WD phase separation
  s% do_phase_separation = do_phase_separation
+ s% do_phase_separation_heating = do_phase_separation_heating
 
  ! eos controls
  s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
@@ -3425,6 +3427,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_dt_limit = s% diffusion_dt_limit
 
  do_phase_separation = s% do_phase_separation
+ do_phase_separation_heating = s% do_phase_separation_heating
 
  diffusion_min_X_hard_limit = s% diffusion_min_X_hard_limit
  diffusion_X_total_atol = s% diffusion_X_total_atol

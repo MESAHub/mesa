@@ -70,6 +70,7 @@
 
       ! C/O phase separation
       do_phase_separation = .true.
+      do_phase_separation_heating = .true.
 
       ! Diffusion controls
       do_element_diffusion = .true.
