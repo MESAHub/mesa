@@ -226,6 +226,7 @@
             call set_to_NaN(s% total_energy_change_from_mdot) 
             call set_to_NaN(s% total_energy_end)                  
             call set_to_NaN(s% total_energy_from_diffusion)
+            call set_to_NaN(s% total_energy_from_phase_separation)
             call set_to_NaN(s% total_energy_old)
             call set_to_NaN(s% total_energy_sources_and_sinks)
             call set_to_NaN(s% total_energy_start)           
@@ -616,11 +617,17 @@
                   end do
                end if
 
-               if(.true.) then ! s% do_phase_separation eventually
+               if(s% do_phase_separation) then
+                  do k=1,s% nz
+                     s% eps_phase_separation(k) = s% energy(k)
+                  end do
                   call do_phase_separation(s, ierr)
                   if (failed('do_phase_separation')) return
                   call set_vars_if_needed(s, dt, 'after phase separation', ierr)
                   if (failed('set_vars_if_needed after phase separation')) return
+                  do k=1,s% nz ! for use by energy equation
+                     s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+                  end do
                end if
 
                s% okay_to_set_mixing_info = .false. ! no mixing changes in set_vars after this point
@@ -1263,7 +1270,13 @@
                total_energy_from_pre_mixing = &
                   dt*dot_product(s% dm(1:nz), s% eps_pre_mix(1:nz))
             end if
-            
+
+            s% total_energy_from_phase_separation = 0d0
+            if (s% do_phase_separation) then
+               s% total_energy_from_phase_separation = &
+                  dt*dot_product(s% dm(1:nz), s% eps_phase_separation(1:nz))
+            end if
+
             phase2_total_energy_from_mdot = &
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             
@@ -1309,12 +1322,14 @@
             phase1_sources_and_sinks = &
                  phase1_total_energy_from_mdot &
                + total_energy_from_pre_mixing &
+               + s% total_energy_from_phase_separation &
                + s% total_WD_sedimentation_heating &
                + s% total_energy_from_diffusion &
                + s% non_epsnuc_energy_change_from_split_burn
 
             phase2_sources_and_sinks = &
                - total_energy_from_pre_mixing &
+               - s% total_energy_from_phase_separation &
                - s% total_WD_sedimentation_heating &
                - s% total_energy_from_diffusion &
                + phase2_total_energy_from_mdot &
@@ -1460,6 +1475,7 @@
                   
                   expected_sum_cell_others = &
                      - total_energy_from_pre_mixing &
+                     - s% total_energy_from_phase_separation &
                      - s% total_WD_sedimentation_heating &
                      - s% total_energy_from_diffusion
                   expected_sum_cell_sources = &

@@ -770,6 +770,9 @@
          integer :: diffusion_maxsteps_for_isolve
          character(len=64) :: diffusion_isolve_solver
 
+      ! WD phase separation
+         
+         logical :: do_phase_separation
 
       ! opacity controls
 

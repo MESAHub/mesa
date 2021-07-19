@@ -7178,6 +7178,21 @@
 
     diffusion_dump_call_number = -1
 
+
+! WD phase separation
+! ===================
+
+      ! do_phase_separation
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Phase separation upon crystallization in WD cores
+      ! (currently only for C/O white dwarf cores)
+
+      ! ::
+
+    do_phase_separation = .false.
+
+
 ! eos controls
 ! ============
 

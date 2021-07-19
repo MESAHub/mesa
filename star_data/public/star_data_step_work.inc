@@ -467,6 +467,8 @@
       real(dp), pointer :: eps_diffusion(:) ! (nz)
       real(dp), pointer :: g_field_element_diffusion(:) ! (nz)
       
+      ! WD phase separation
+      real(dp), pointer :: eps_phase_separation(:) ! (nz)
       
       ! for Riemann solver      
       type(auto_diff_real_star_order1), pointer, dimension(:) :: &
@@ -1114,6 +1116,7 @@
             total_nuclear_heating, &
             total_non_nuc_neu_cooling, &
             total_irradiation_heating, &
+            total_energy_from_phase_separation, &
             total_WD_sedimentation_heating, &
             total_energy_from_diffusion, &
             total_extra_heating, &
