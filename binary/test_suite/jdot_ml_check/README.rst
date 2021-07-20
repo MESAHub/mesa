@@ -5,14 +5,13 @@ jdot_ml_check
 *************
 
 This test case checks the evolution of one star plus a point mass, including mass transfer to the point mass.
-Using pre-specified efficiency options, verifies that the evolution
-follows the analytical result from `Tauris & van den Heuvel (2006)
-<https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_. Shuts off
-all other ``jdot`` sources.
+Using pre-specified efficiency options, verifies that the binary evolution, including mass transfer to the point mass,
+follows the analytical result of `Tauris & van den Heuvel (2006)
+<https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_. 
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_project``) loads a 1 Msun zero-age main sequence model and a 1.4 Msun point mass. The binary system is given an initial seperation of 2.75 Rsun, and is evolved for 14 billion years. Along the way, the ``run_binary_extras.f90`` calculates the deviation from the  `Tauris & van den Heuvel (2006) <https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_:
+* Part 1 (``inlist_project``) loads a 1 Msun zero-age main sequence model and a 1.4 Msun point mass. The binary system is given an initial seperation of 2.75 Rsun, and is evolved for 14 billion years. Along the way, the ``run_binary_extras.f90`` calculates the deviation from the  analytical result of `Tauris & van den Heuvel (2006) <https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_:
 
 .. code-block:: console
 

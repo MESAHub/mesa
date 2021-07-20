@@ -25,8 +25,7 @@ familiarize yourself with the set of options relevant to your problem.
 More information is available on :ref:`how to use a test suite case as a starting point for your own work directory <test_suite:Test suite>`.
 
 You should always perform some sort of convergence study to ensure that
-your results are not sensitive to the time or mass resolution of your
-models.
+your results are not sensitive to the time or mass resolution of your models.
 Please note, and this is very important, that MESA defaults will
 generally NOT be optimal or even acceptable for your particular science cases.
 It is the user’s responsibility to ensure that the MESA options and controls
@@ -37,71 +36,257 @@ Throughout your project, the best way to solicit community help and
 input is via a message to the ``mesa-users@lists.mesastar.org`` mailing list.
 
 
-Starting with a test suite case
--------------------------------
+An example
+----------
 
-mini-lab 1
+We will use the test suite case :ref:`semiconvection`.
+Begin in the directory where you do your MESA work.
 
-semiconvection
+.. code-block:: console
 
-convert to regulatr mesa work directory outside of ``$MESA_DIR``
+  cp -r $MESA_DIR/star/test_suite/semiconvection .
 
-run
+There are four file edits to make. First, modify ``make/makefile``:
+
+.. code-block:: console
+
+   cd make
+
+   Edit makefile, changing
+
+       MESA_DIR = ../../../..
+
+   to 
+
+       ! MESA_DIR = ../../../..
+  
+   Save the file change in your editor, and
+
+   cd ../
+
+Second, modify ``rn``:
+
+.. code-block:: console
+
+   Edit rn, changing
+
+       MESA_DIR=../../.. 
+
+   to
+
+       # MESA_DIR=../../.. 
+
+   and save the file change.
+
+Third, modify ``ck``:
+
+.. code-block:: console
+
+   Edit ck, changing
+
+       MESA_DIR=../../..
+
+   to
+
+       # MESA_DIR=../../..
+
+   and save the file change.
+
+Fourth, modify ``inlist_semiconvection_header``:
+
+.. code-block:: console
+
+   Edit inlist_semiconvection_header, changing
+
+       mesa_dir = '../../..'
+
+   to 
+
+      !mesa_dir = '../../..'
+
+   and save the file change.
+
+Now build the executable 
+
+.. code-block:: console
+
+   ./mk
+
+and run the executable
+
+.. code-block:: console
+
+   ./rn
+
+After a few minutes the run will terminate and you should see 
+
+.. code-block:: console
+
+ stop because have dropped below central lower limit for h1
+     0.3994694345E+00    0.4000000000E+00
+
+         322   7.308040   6658.804   0.741142   0.741142   1.500000   1.500000   0.399469   0.007663   0.280000  -2.316624   1653      0
+    6.698970   7.308040   0.246241 -37.781812  -0.571349 -99.000000   0.000000   0.580264   0.004769   0.020000   0.076565      5
+  1.2920E+09   2.005522   0.740760  -5.854865 -41.276481  -7.412372   0.000000   0.000042   0.002098   0.020266  0.000E+00        max_dt
+                                rel_E_err    1.0067953870393901D-12
+                        log_rel_run_E_err      -10.0905601615909450
+
+ save LOGS/profile8.data for model 322
+ save photos/x322 for model 322
+  saved to final.mod
+ termination code: xa_central_lower_limit
+
+                  runtime (minutes), retries, steps        4.92         0       322
 
 
-Explore Numerical Convergence 
------------------------------
+                               mixing type at 0.125 Msun    1.0000000000000000D+00    1.0000000000000000D+00    1.0000000000000000D+00
+                               mixing type at 0.135 Msun    3.0000000000000000D+00    3.0000000000000000D+00    3.0000000000000000D+00
+                               mixing type at 0.145 Msun    0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00
+                                                    logT    7.2062697504202102D+00    7.1500000000000004D+00    7.3099999999999996D+00
+                                                  logRho    1.7886843044807488D+00    1.7500000000000000D+00    1.8000000000000000D+00
 
-maxi-lab 1
+ all values are within tolerances
 
-mass resolution
+Let's add some pgstar plots to better see what is happening. 
+There are two files to edit.
+First, copy the default ``history_columns.list``
 
-temporal resolution
+.. code-block:: console
+
+   cp $MESA_DIR/star/defaults/history_columns.list .
+
+and modify your local ``history_columns.list``
+
+.. code-block:: console
+
+  add
+
+      mixing_regions 20 
+      burning_regions 20
+
+ change
+
+      !log_center_T ! temperature
+      !log_center_Rho ! density
+
+ to
+
+      log_center_T ! temperature
+      log_center_Rho ! density
+
+   and save the file changes.
+
+
+Second, modify ``inlist_semiconvection``
+
+.. code-block:: console
+
+  add to the star_job namelist:
+
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+  and change
+
+      !read_extra_pgstar_inlist1 = .true.
+      !extra_pgstar_inlist1_name = 'inlist_semiconvection'
+
+  to
+      read_extra_pgstar_inlist1 = .true.
+      extra_pgstar_inlist1_name = 'inlist_semiconvection'  
+
+  and change the pgstar namelist to 
+
+  &pgstar
+
+      pgstar_interval = 1
+
+      Grid4_win_flag = .true.
+      Grid4_win_width = 8
+      Kipp_mass_max = 0.2 ! (Msun units) negative means use default
+      Kipp_show_mixing = .true.
+      Kipp_show_burn = .false.
+      Kipp_show_luminosities = .true.
+      Kipp_show_mass_boundaries = .false.
+
+      Grid4_file_flag = .true.
+      Grid4_file_dir = 'pgstar_out'
+      Grid4_file_prefix = 'grid4_'
+      Grid4_file_interval = -1
+      Grid4_file_width = -1
+      Grid4_file_aspect_ratio = -1
+
+  / ! end of pgstar namelist
+
+   and save the file changes.
 
 
 Explore Physics Variations
 --------------------------
 
-max-lab 2
+Make the following changes to your ``inlist_semiconvection``:
 
-reaction network
+.. code-block:: console
 
-alpha-overshoot
+    change 
 
+      max_model_number = 1000
 
+    to 
 
-Checklist For Publishing Results
---------------------------------
+      max_model_number = 40000
 
-Describe your MESA setup 
+    and change
 
-Include ‘standard’ References 
+      history_interval = 10
 
-Check naming conventions 
+    to
 
-Share your inlists
-
-Share your extensions
-
-point to youtube video and zenodo repo 
+      history_interval = 1
 
 
-Draft Research Notes Abstract
+Experiment with the chosen reaction network ``new_net_name = ``pp_and_cno_extras.net``, ``basic`` (default), ``mesa_49.net``.
+
+Are the results for the mass of the convective core and HR diagram the same? 
+If they are not the same, why are they different?
+Are all values reported at the end of a run still within acceptable tolerances?
+
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment01 for analysis by the TAs (Anne Thoul and Andrew Nine)
+
+
+Experiment with the 
+mixing length parameterization of convection ``mixing_length_alpha`` = 3.0, 2.5, 2.0, 1.8 (default), 1.5, 1.2, 1.0, and
+the scale of semiconvective mixing ``alpha_semiconvection`` = 0.0 0.02 0.05 0.1 (test suite), 0.15 0.20, 0.25, 0.30.
+Repeat answering the questions above.
+
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment02.
+
+
+Explore Numerical Convergence 
 -----------------------------
 
-post-maxi labs
+Experiment with the mass resolution settings:
+``max_dq`` = 5.0e-2, 2.0e-2, 1.0e-2 (default), 5.0e-3, 2.0e-3, 1.0e-3
+and ``mesh_delta_coeff`` = 2.0, 1.5, 1.0 (default), 0.8, 0.5, 0.2, 0.1.
+Repeat answering the questions above.
 
-submit an actual rnaas?!
-
-
-Share your Results
-------------------
-
-post maxi-labs
-
-zenodo sandbox upload
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment03.
 
 
+Experiment with the temporal resolution settings:
+``max_years_for_timestep`` = 1.0e8, 5.0e7, 1.0e7, 5.0e6, 1.0e6 , 5.0e5 and 
+``delta_lgT_cntr_limit``   = 0.01 (default), 5.0e-3, 2.0e-3, 1.0e-3, 5.0e-4
+``delta_lgRho_cntr_limit`` = 0.05 (default), 2.0e-2, 1.0e-2, 5.0e-3, 2.0e-3, 1.0e-3.
+Repeat answering the questions above.
+
+For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment04.
+
+
+Draft A Research Notes Abstract
+-------------------------------
+
+For the 2021 MESA Summer School, each table should team-craft a Research Notes abstract in plain text 
+and upload their abstract, named Table_X_abstract.txt to the shared Dropbox directory Research Notes Abstracts.
 
 
 In the paper
@@ -234,3 +419,11 @@ associate your Zenodo uploads. The `MESA
 Marketplace <http://mesastar.org>`__ will remain in use as an aggregator
 portal, and we request users to inform us of new uploads so that they
 are highlighted there as well.
+
+For the 2021 MESA Summer School, each table should upload their abstract to a Zenodo sandbox.
+
+
+.. # define a hard line break for HTML
+.. |br| raw:: html
+
+      <br>

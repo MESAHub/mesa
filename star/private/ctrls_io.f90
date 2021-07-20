@@ -4146,5 +4146,72 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
 
  end subroutine set_controls_for_writing
 
+   subroutine get_control(s, name, val, ierr)
+      use utils_lib, only: StrUpCase
+      type (star_info), pointer :: s
+      character(len=*),intent(in) :: name
+      character(len=*), intent(out) :: val
+      integer, intent(out) :: ierr
+
+      character(len(name)) :: upper_name
+      character(len=512) :: str
+      integer :: iounit,iostat,ind,i
+
+
+      ! First save current controls
+      call set_controls_for_writing(s, ierr)
+      if(ierr/=0) return
+
+      ! Write namelist to temporay file
+      open(newunit=iounit,status='scratch')
+      write(iounit,nml=controls)
+      rewind(iounit)
+
+      ! Namelists get written in captials
+      upper_name = StrUpCase(name)
+      val = ''
+      ! Search for name inside namelist
+      do 
+         read(iounit,'(A)',iostat=iostat) str
+         ind = index(str,trim(upper_name))
+         if( ind /= 0 ) then
+            val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+            do i=1,len(val)
+               if(val(i:i)=='"') val(i:i) = ' '
+            end do
+            exit
+         end if
+         if(is_iostat_end(iostat)) exit
+      end do   
+
+      if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
+
+      close(iounit)
+
+   end subroutine get_control
+
+   subroutine set_control(s, name, val, ierr)
+      type (star_info), pointer :: s
+      character(len=*), intent(in) :: name, val
+      character(len=len(name)+len(val)+13) :: tmp
+      integer, intent(out) :: ierr
+
+      ! First save current controls
+      call set_controls_for_writing(s, ierr)
+      if(ierr/=0) return
+
+      tmp=''
+      tmp = '&controls '//trim(name)//'='//trim(val)//' /'
+
+      ! Load into namelist
+      read(tmp, nml=controls)
+
+      ! Add to star
+      call store_controls(s, ierr)
+      if(ierr/=0) return
+
+   end subroutine set_control
+
+
  end module ctrls_io
 

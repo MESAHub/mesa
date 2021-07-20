@@ -1,0 +1,1 @@
+../../../binary/test_suite/jdot_ls_check/README.rst

@@ -289,19 +289,23 @@ program cms_mixing
    read(arg,*) X
    Y = 1.0_dp - X
 
-   call get_command_argument(2, K% filename)
+   call get_command_argument(2, H% filename)
 
+   call get_command_argument(3, J% filename)
+   
+   call get_command_argument(4, K% filename)
+
+   write(*,*) 'H  input:  ', trim(H% filename)
+   write(*,*) 'He input:  ', trim(J% filename)
    write(*,*) 'output to: ', trim(K% filename)
    write(*,*) ' X = ', X
    write(*,*) ' Y = ', Y
    write(*,*) ' X+Y=', X + Y
 
-   H% filename     = 'DirEOS2019/TABLE_H_TP_v1'
    H% H_mass_frac  = X
    H% He_mass_frac = 0.0_dp
    call read_one(H)
 
-   J% filename     = 'DirEOS2019/TABLE_HE_TP_v1'
    J% H_mass_frac  = 0.0_dp
    J% He_mass_frac = Y   
    call read_one(J)
