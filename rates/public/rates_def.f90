@@ -201,11 +201,7 @@
             real(dp), allocatable :: T9s(:)
             real(dp), allocatable :: lYeRhos(:)
 
-            logical :: has_cc ! are there tabulated coulomb corrections?
-            real(dp), allocatable :: data(:,:,:,:)
-               ! (4, num_T9, num_lYeRho, ?)
-               ! ? = 3 without coulomb corrections
-               ! ? = 5 with coulomb corrections
+            real(dp), allocatable :: data(:,:,:,:) ! (4, num_T9, num_lYeRho, 3)
             contains
             
               procedure(setup_weak_table), deferred :: setup
@@ -224,15 +220,13 @@
          abstract interface
             subroutine interpolate_weak_table(table, T9, lYeRho, &
                  lambda, dlambda_dlnT, dlambda_dlnRho, &
-                 Qneu, dQneu_dlnT, dQneu_dlnRho, &
-                 delta_Q, Vs, ierr)
+                 Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
               use const_def, only : dp
               import weak_rate_table
               class(weak_rate_table), intent(inout) :: table
               real(dp), intent(in) :: T9, lYeRho
               real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
               real(dp), intent(out) :: Qneu, dQneu_dlnT, dQneu_dlnRho
-              real(dp), intent(out) :: delta_Q, Vs
               integer, intent(out) :: ierr
             end subroutine interpolate_weak_table
          end interface
