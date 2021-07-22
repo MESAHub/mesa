@@ -10,8 +10,3 @@
 ! lcapture       Dataset {N, M}      log10 of electron or positron capture rate (s^-1)
 ! ldecay         Dataset {N, M}      log10 of positron or electron emission rate (s^-1)
 ! lneutrino      Dataset {N, M}      log10 of the neutrino energy loss rate (MeV * s^-1)
-!
-! optionally, you may provide the following Coulomb correction datasets
-!
-! delta_Q        Dataset {N, M}      shift in Q-value (MeV)
-! Vs             Dataset {N, M}      shift in electron chemical potential (MeV)
