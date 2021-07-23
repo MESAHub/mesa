@@ -2290,6 +2290,18 @@
 
     MLT_option = 'TDC'
 
+      ! TDC options
+      ! ~~~~~~~~~~~
+      ! + alpha_TDC_DAMP : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
+      ! + alpha_TDC_DAMPR : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
+      ! + alpha_TDC_PtdVdt : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity.
+      ! ::
+
+      alpha_TDC_DAMP = 1d0
+      alpha_TDC_DAMPR = 0d0
+      alpha_TDC_PtdVdt = 0d0
+   
+
 
       ! Henyey_MLT_y_param
       ! ~~~~~~~~~~~~~~~~~~

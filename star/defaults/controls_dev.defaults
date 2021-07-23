@@ -5,21 +5,14 @@
 ! .. warning::
 !
 !  CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
-!  IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
-
+!  IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.      
 
       ! TDC options
       ! ~~~~~~~~~~~
-      ! Things related to TDC
       ! ::
 
-      alpha_TDC_DAMP = 1d0
-      alpha_TDC_DAMPR = 0d0
-      alpha_TDC_PtdVdt = 0d0
-   
       max_X_for_gradT_eqn = -1   ! only used if > 0
       compare_TDC_to_MLT = .false.
-      
 
       ! RSP2 parameters
       ! ~~~~~~~~~~~~~~~
