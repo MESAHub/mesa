@@ -7854,23 +7854,13 @@
 
       ! (units: ergs) target for model total energy
       ! usually want to set ``duration_for_inject_extra_ergs_sec = -1`` for this option.
-      ! see also: ``inject_until_reach_delta_total_energy``
       ! continue injecting until total energy of model reaches min of
       ! ``inject_until_reach_model_with_total_energy``, and
-      ! ``inject_until_reach_delta_total_energy + initial total energy``
+      ! ``initial total energy``
 
       ! ::
 
     inject_until_reach_model_with_total_energy = 1d99
-
-
-      ! inject_until_reach_delta_total_energy
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! no longer supported
-
-      ! inject_until_reach_delta_total_energy = 1d99
-
 
       ! steps_before_use_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
