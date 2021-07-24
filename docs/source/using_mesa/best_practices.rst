@@ -50,6 +50,7 @@ There are four files to edit. First, modify ``make/makefile``:
 
 .. code-block:: console
 
+   cd semiconvection
    cd make
 
    Edit makefile, changing
@@ -181,12 +182,7 @@ Second, modify ``inlist_semiconvection_header``
 
 .. code-block:: console
 
-  add to the star_job namelist:
-
-      pgstar_flag = .true.
-      save_pgstar_files_when_terminate = .true.
-
-  and change
+  change
 
       !read_extra_pgstar_inlist1 = .true.
       !extra_pgstar_inlist1_name = 'inlist_semiconvection'
@@ -201,6 +197,14 @@ Second, modify ``inlist_semiconvection_header``
 Third, modify ``inlist_semiconvection`` to change the pgstar namelist to 
 
 .. code-block:: console
+
+  add to the star_job namelist:
+
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+
+  replace the pgstar namelist with
 
   &pgstar
 
@@ -232,9 +236,13 @@ Now run the executable egain
 
    ./rn
 
-and you should see a pgstar window appear on your screen.
+and you should see a pgstar window appear on your screen:
 
 
+.. image:: grid4_000322.svg
+   :width: 100%
+
+|br| |br|
 
 Explore Physics Variations
 --------------------------
@@ -264,7 +272,7 @@ Experiment with the reaction network
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Change the nuclear reaction network 
-``new_net_name`` = ``pp_and_cno_extras.net`` (this test suite case), ``basic.net`` (default), ``aprox21``, and ``mesa_49.net``.
+``new_net_name`` = ``pp_and_cno_extras.net`` (this test suite case), ``basic.net`` (default), ``approx21.net``, and ``mesa_49.net``.
 
 1) Are all the reported values at the end of a run still within their tolerances?
 |br|
@@ -278,10 +286,10 @@ Change the nuclear reaction network
 .. note::
 
  For the 2021 MESA Summer School, each table should do all 4 reaction networks. Participants with the fastest machines should to the larger networks.
- Change the default control namelist parameter ``star_history_name`` = ```history.data``` to the more descriptive
- ``star_history_name`` =  ```TableNN_network_name.data``` where NN is your table number and network_name is one of the choices above,
- for example, ``star_history_name`` =  ```Table08_aprox21.data```.
- After  the runs, each table should upload a ``star_history_name`` file to our shared Dropbox directory Experiment01.
+ Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
+ ``star_history_name = `TableNN_network_name.data``` where NN is your table number and network_name is one of the choices above,
+ for example, ``star_history_name = `Table08_approx21.data```.
+ After  the runs, each table should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment01.
  When finished, return the chosen reaction network to the testcase value of ``pp_and_cno_extras.net``.
 
 
@@ -296,10 +304,10 @@ Repeat answering the four questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- Change the default control namelist parameter ``star_history_name`` = ```history.data``` to the more descriptive
- ``star_history_name`` =  ```TableNN_NpN.data``` where NN is your table number and NpN is your value,
- for example, ``star_history_name`` =  ```Table03_1p8.data```.
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory Experiment02.
+ Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
+ ``star_history_name = `TableNN_NpN.data``` where NN is your table number and NpN is your value,
+ for example, ``star_history_name = `Table03_1p8.data```. 
+ After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment02.
  When finished, return ``mixing_length_alpha`` to the test case value of 1.8.
 
 
@@ -315,10 +323,10 @@ Repeat answering the four questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- Change the default control namelist parameter ``star_history_name`` = ```history.data``` to the more descriptive
- ``star_history_name`` =  ```TableNN_NpNN.data``` where NN is your table number and NpNN is your value,
- for example, ``star_history_name`` =  ```Table11_0p02.data```.
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory Experiment03.
+ Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
+ ``star_history_name = `TableNN_NpNN.data``` where NN is your table number and NpNN is your value,
+ for example, ``star_history_name = `Table11_0p02.data```.
+ After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment03.
  When finished, return ``alpha_semiconvection`` to the test case value of 0.1.
 
 
@@ -338,10 +346,10 @@ Repeat answering the four questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- Change the default control namelist parameter ``star_history_name`` = ```history.data``` to the more descriptive
- ``star_history_name`` =  ```TableNN_NpNNN.data``` where NN is your table number and NpNNN is your value,
- for example, ``star_history_name`` =  ```Table7_0p004.data```.
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory Experiment04.
+ Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
+ ``star_history_name = `TableNN_NpNNN.data``` where NN is your table number and NpNNN is your value,
+ for example, ``star_history_name = `Table7_0p004.data```.
+ After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment04.
  When finished, return ``max_dq`` to its default value.
 
 Experiment with the mass resolution II
@@ -355,11 +363,11 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- Change the default control namelist parameter ``star_history_name`` = ```history.data``` to the more descriptive
- ``star_history_name`` =  ```TableNN_NpN.data``` where NN is your table number and NpN is your value,
- for example, ``star_history_name`` =  ```Table11_1p2.data```.
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory Experiment05.
- When finished, return ``max_dq`` to its default value.
+ Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
+ ``star_history_name = `TableNN_NpN.data``` where NN is your table number and NpN is your value,
+ for example, ``star_history_name = `Table11_1p2.data```.
+ After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment05.
+ When finished, return ``mesh_delta_coeff`` to its default value of 1.0.
 
 
 Experiment with the temporal resolution
@@ -373,11 +381,11 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- Change the default control namelist parameter ``star_history_name`` = ```history.data``` to the more descriptive
- ``star_history_name`` =  ```TableNN_NeN.data``` where NN is your table number and NeN is your value,
- for example, ``star_history_name`` =  ```Table01_2e7.data```.
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory Experiment06.
- When finished, return ``max_dq`` to its default value.
+ Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
+ ``star_history_name = `TableNN_NeN.data``` where NN is your table number and NeN is your value,
+ for example, ``star_history_name = `Table01_2e7.data```.
+ After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment06.
+ When finished, return ``max_years_for_timestep`` to its default value of 0.0.
 
 
 Create An Article for Publication
@@ -389,7 +397,7 @@ Gather your science and write it up for publication.
 
  For the 2021 MESA Summer School, each table should team-craft a 250 word maximum Research Notes abstract,
  and then upload their abstract, named ``TableNN_abstract.txt`` where NN is your table number, for example,
- ``Table10_abstract.txt``, to our shared Dropbox directory Abstracts.
+ ``Table10_abstract.txt``, to our shared Dropbox directory timmes/Abstracts.
 
  Submit an actual Research notes with entire Summer school as co-authors?
 
@@ -530,7 +538,7 @@ are highlighted there as well.
 .. note::
 
  For the 2021 MESA Summer School, each participant should upload their table's abstract and 
- their latest ``star_history_name`` file to a Zenodo sandbox.
+ their latest ``star_history_name`` file to a MESA Zenodo sandbox.
 
 
 
