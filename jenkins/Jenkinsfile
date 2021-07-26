@@ -9,26 +9,41 @@ pipeline {
     stage('main') {
       agent {
         dockerfile {
-	  dir 'jenkins'
+          dir 'jenkins'
         }
       }
       environment {
         HOME = pwd(tmp:true)
-	MESA_DIR = pwd()
-	OMP_NUM_THREADS = 4
+        MESA_DIR = pwd()
+        OMP_NUM_THREADS = 4
+        MESA_TEST = credentials('mesa_test')
+        MESA_LOGS_TOKEN = credentials('mesa_test_logs_token')
       }
       steps {
-	sh '''#!/bin/bash -ex
-	  source $MESASDK_ROOT/bin/mesasdk_init.sh
-	  ./install
-	'''
+        dir("${env.HOME}/.mesa_test") {
+          writeYaml file: "config.yml", overwrite: true, data: [
+            'computer_name': 'Jenkins',
+            'email': env.MESA_TEST_USR,
+            'password': env.MESA_TEST_PSW,
+            'logs_token': env.MESA_LOGS_TOKEN,
+            'github_protocol': ':ssh',
+            'mesa_mirror': "${env.HOME}/mirror",
+            'mesa_work': env.MESA_DIR,
+            'platform': 'Linux',
+            'platform_version': 'Ubuntu'
+          ]
+        }
+        sh '''#!/bin/bash -ex
+          source $MESASDK_ROOT/bin/mesasdk_init.sh
+          mesa_test install_and_test --no-checkout
+        '''
       }
     }
   }
   post {
     failure {
       emailext subject: '$PROJECT_NAME - Build #$BUILD_NUMBER - $BUILD_STATUS',
-	       body: '''$PROJECT_NAME - Build #$BUILD_NUMBER - $BUILD_STATUS
+               body: '''$PROJECT_NAME - Build #$BUILD_NUMBER - $BUILD_STATUS
 
 Check console output at $BUILD_URL to view full results.
 
@@ -41,10 +56,10 @@ $CHANGES
 End of build log:
 ${BUILD_LOG,maxLines=200}
 ''',
-	       recipientProviders: [
-		 [$class: 'DevelopersRecipientProvider'],
-	       ],
-	       replyTo: '$DEFAULT_REPLYTO'
+               recipientProviders: [
+                 [$class: 'DevelopersRecipientProvider'],
+               ],
+               replyTo: '$DEFAULT_REPLYTO'
     }
   }
 }
