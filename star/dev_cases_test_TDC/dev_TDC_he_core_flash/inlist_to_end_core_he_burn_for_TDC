@@ -80,7 +80,6 @@
    D_ST_factor = 1
       
 ! TDC
-   max_X_for_TDC = 1d-8
    max_X_for_conv_timescale = 1d-8
 
    max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
@@ -110,7 +109,6 @@
    set_rho_to_dm_div_dV = .false.
 
    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
-   max_X_for_gradT_eqn = 1d-8
 
    use_dedt_form_of_energy_eqn = .true.
    convergence_ignore_equL_residuals = .true.
