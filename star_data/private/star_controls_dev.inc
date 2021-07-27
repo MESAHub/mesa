@@ -3,7 +3,6 @@
          real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
          real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap
          
-         real(dp) :: max_X_for_gradT_eqn
          logical :: compare_TDC_to_MLT
  
          real(dp) :: RSP2_Lsurf_factor
