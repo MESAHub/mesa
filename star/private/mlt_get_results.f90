@@ -160,18 +160,14 @@
          type(auto_diff_real_star_order1) :: &
             Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess
          character (len=256) :: message        
-         logical ::  test_partials, using_TDC, compare_TDC_to_MLT, report
+         logical ::  test_partials, using_TDC, compare_TDC_to_MLT
+         logical, parameter :: report = .false.
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0          
-         
-         report = & ! only output report for specific k and solver_iter. 
-            (k == s% x_integer_ctrl(19) .and. s% x_integer_ctrl(19) > 0) .and. & ! only report specific k > 0
-            (s% x_integer_ctrl(20) == s% solver_iter .or. s% x_integer_ctrl(20) < 0) .and. & ! < 0 means any iter
-            (s% model_number == s% x_integer_ctrl(21) .or. s% x_integer_ctrl(21) == 0) ! 0 means any model
-         
+                  
          Pr = crad*pow4(T)/3d0
          Pg = P - Pr
          beta = Pg / P
