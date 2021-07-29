@@ -409,7 +409,9 @@
       integer, parameter :: h_log_Ledd = h_gradT_excess_alpha + 1
       integer, parameter :: h_compactness = h_log_Ledd + 1
       integer, parameter :: h_compactness_parameter = h_compactness + 1
-      integer, parameter :: h_max_infall_speed = h_compactness_parameter + 1
+      integer, parameter :: h_mu4 = h_compactness_parameter + 1
+      integer, parameter :: h_m4 = h_mu4 + 1
+      integer, parameter :: h_max_infall_speed = h_m4 + 1
       integer, parameter :: h_non_fe_core_rebound = h_max_infall_speed + 1
       integer, parameter :: h_non_fe_core_infall = h_non_fe_core_rebound + 1
       integer, parameter :: h_fe_core_infall = h_non_fe_core_infall + 1
@@ -794,6 +796,8 @@
          history_column_name(h_non_fe_core_rebound) = 'non_fe_core_rebound'
          history_column_name(h_compactness) = 'compactness'
          history_column_name(h_compactness_parameter) = 'compactness_parameter'
+         history_column_name(h_m4) = 'm4'
+         history_column_name(h_mu4) = 'mu4'
          history_column_name(h_v_div_vesc) = 'v_div_vesc'
          history_column_name(h_v_surf_div_escape_v) = 'v_surf_div_escape_v'
          history_column_name(h_v_surf_km_s) = 'v_surf_km_s'

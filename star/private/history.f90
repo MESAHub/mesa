@@ -1983,6 +1983,20 @@
                   r = s% r(k+1) + (s% r(k)-s% r(k+1))*(2.5d0*Msun - s% m(k+1))/s% dm(k)
                   val = 2.5d0/(r/1d8)
                end if
+            case(h_mu4)
+               if (s% entropy(1) > 4.0) then
+                  do k=nz-1, 1, -1
+                     if (s% entropy(k) > 4.d0) exit
+                  end do
+                  val = (s% dm(k)/msun) / ((s% r(k)-s% r(k+1))/1d8)
+               end if
+            case(h_m4)
+               if (s% entropy(1) > 4.0) then
+                  do k=nz-1, 1, -1
+                     if (s% entropy(k) > 4.d0) exit
+                  end do
+                  val = s%m(k)/msun
+               end if
             case(h_max_infall_speed)
                if (s% u_flag) then
                   val = -minval(s% u(1:s% nz))*1d-5 ! convert to km/sec

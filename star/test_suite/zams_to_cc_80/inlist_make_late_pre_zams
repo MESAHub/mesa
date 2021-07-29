@@ -42,5 +42,10 @@
       history_interval = 5
       terminal_interval = 10
 
+      x_integer_ctrl(2) = 1 ! Part number
+
 / ! end of controls namelist
 
+&pgstar
+
+/ ! end of pgstar namelist
