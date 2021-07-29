@@ -673,11 +673,13 @@
             stop 1
          end if
 
-         if (k > 0 .and. k <= s% nz) then
+         if (k > 0 .and. k <= s% nz .and. s% use_other_opacity_factor) then
             opacity_factor = s% extra_opacity_factor(k)
          else
             opacity_factor = s% opacity_factor
          end if
+
+
          if (opacity_factor /= 1d0) then
             if (s% min_logT_for_opacity_factor_off > 0) then
                if (logT >= s% max_logT_for_opacity_factor_off .or. &
