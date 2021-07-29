@@ -920,9 +920,9 @@
             integral_norm = 0d0
             gamma1_integral = 0d0
             do k0=k,s% nz
-               integral_norm = integral_norm + s% P(k0)*s% dm(k0)/s% rho(k0)
+               integral_norm = integral_norm + (s% Pgas(k0)+s% Prad(k0))*s% dm(k0)/s% rho(k0)
                gamma1_integral = gamma1_integral + &
-                  (s% gamma1(k0)-4.d0/3.d0)*s% P(k0)*s% dm(k0)/s% rho(k0)
+                  (s% gamma1(k0)-4.d0/3.d0)*(s% Pgas(k0)+s% Prad(k0))*s% dm(k0)/s% rho(k0)
             end do
             gamma1_integral = gamma1_integral/max(1d-99,integral_norm)
             s% xtra(x_gamma_int_bound) = gamma1_integral
@@ -1086,9 +1086,9 @@
          integral_norm = 0d0
          gamma1_integral = 0d0
          do k=1,s% nz
-            integral_norm = integral_norm + s% P(k)*s% dm(k)/s% rho(k)
+            integral_norm = integral_norm + (s% Pgas(k)+s% Prad(k))*s% dm(k)/s% rho(k)
             gamma1_integral = gamma1_integral + &
-               (s% gamma1(k)-4.d0/3.d0)*s% P(k)*s% dm(k)/s% rho(k)
+               (s% gamma1(k)-4.d0/3.d0)*(s% Pgas(k)+s% Prad(k))*s% dm(k)/s% rho(k)
          end do
          gamma1_integral = gamma1_integral/max(1d-99,integral_norm)
          if (s% xtra(x_gamma_int_bound) == -1d0) then
@@ -1167,10 +1167,11 @@
          if (s% lxtra(lx_hydro_on) .and. s% xtra(x_time_start_pulse) < 0d0) then
             if ((maxval(abs(s% xh(s% i_u, k0:s% nz)))/1d5 > max_v_for_pulse .or. gamma1_integral < 1d-3)) then
                core_mass = s% m(1)
-               if(s% o_core_mass > 0d0) then
-                  core_mass = s% o_core_mass*Msun
-               else if(s% c_core_mass > 0d0) then
-                  core_mass = s% c_core_mass*Msun
+               !if(s% o_core_mass > 0d0) then
+               !   core_mass = s% o_core_mass*Msun
+               !else if(s% c_core_mass > 0d0) then
+               if(s% co_core_mass > 0d0) then
+                  core_mass = s% co_core_mass*Msun
                else if (s% he_core_mass > 0d0) then
                   core_mass = s% he_core_mass*Msun
                end if
@@ -1276,14 +1277,14 @@
 
          !ensure we are using the proper BCs and options every time before struct_burn_mix
          if (s% lxtra(lx_using_bb_bcs)) then
-            s% use_atm_PT_at_center_of_surface_cell = .true.
+            !s% use_atm_PT_at_center_of_surface_cell = .true.
             s% atm_option = "fixed_Tsurf"
             s% atm_fixed_Tsurf = s% xtra(x_Tsurf_for_atm)
             s% tau_factor = s% xtra(x_tau_factor)
             s% force_tau_factor = s% xtra(x_tau_factor)
             s% delta_lgL_limit_L_min = 1d99
          else
-            s% use_atm_PT_at_center_of_surface_cell = .false.
+            !s% use_atm_PT_at_center_of_surface_cell = .false.
             s% atm_option = 'T_tau'
             s% atm_T_tau_relation = 'Eddington'
             s% atm_T_tau_opacity = 'fixed'
@@ -1336,7 +1337,7 @@
             s% use_other_wind = .true.
          end if
 
-         if (s% max_T_lgT > 9.8) then
+         if (maxval(s% T(1:s% nz)) > 9.8) then
             s% delta_lgRho_cntr_hard_limit = -1d0
          else
             s% delta_lgRho_cntr_hard_limit = delta_lgRho_cntr_hard_limit
@@ -1374,14 +1375,14 @@
                s% xtra(x_time_since_first_gamma_zero) + s% dt 
          end if
 
-         if (s% conv_vel_flag) then
-            do k=1, s% nz
-               if (s% conv_vel(k) < 1d-5 .and. s% mlt_vc(k) <= 0d0) then
-                  s% xh(s% i_ln_cvpv0, k) = 0d0
-                  s% conv_vel(k) = 0d0
-               end if
-            end do
-         end if
+         !if (s% conv_vel_flag) then
+         !   do k=1, s% nz
+         !      if (s% conv_vel(k) < 1d-5 .and. s% mlt_vc(k) <= 0d0) then
+         !         s% xh(s% i_ln_cvpv0, k) = 0d0
+         !         s% conv_vel(k) = 0d0
+         !      end if
+         !   end do
+         !end if
 
          if (remove_extended_layers .and. s% u_flag &
             .and. s% log_surface_radius > 3.7d0) then
@@ -1390,7 +1391,7 @@
                   exit
                end if
             end do
-            s% use_atm_PT_at_center_of_surface_cell = .true.
+            !s% use_atm_PT_at_center_of_surface_cell = .true.
             s% atm_option = "fixed_Tsurf"
             s% atm_fixed_Tsurf = s% T(k)
             s% xtra(x_Tsurf_for_atm) = s% T(k)

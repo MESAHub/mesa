@@ -1,10 +1,10 @@
 #return
 
+do_one double_bh "Terminate due to helium depletion" "final.mod" x700
+do_one wind_fed_bhhmxb "Properly tested sub and super Eddington phases" "final.mod" auto
 do_one star_plus_point_mass "termination code: xa_central_lower_limit" "final.mod" x100
 do_one star_plus_point_mass_explicit_mdot "termination code: xa_central_lower_limit" "final.mod" x400
 do_one evolve_both_stars "Terminate because accretor (r-rl)/rl > accretor_overflow_terminate" "final.mod" x100
 do_one jdot_ml_check "stop because star_age >= max_age" "final.mod" x800
 do_one jdot_gr_check "terminate due to beginning of RLO" "final.mod" auto
 do_one jdot_ls_check "stop because star_age >= max_age" "final.mod" x100
-do_one wind_fed_bhhmxb "Properly tested sub and super Eddington phases" "final.mod" x200
-#   needs work, on in stale_tests branch   do_one double_bh "Terminate due to helium depletion" "final.mod" x700

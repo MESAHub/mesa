@@ -683,7 +683,7 @@
                end do
 
                ! conductive opacities for ST
-               if (s% D_ST_factor > 0) then
+               if (s% D_ST_factor > 0d0 .or. s% am_nu_factor > 0d0) then
                   do i = 1, nz
                      call kap_get_elect_cond_opacity( &
                         s% kap_handle, zbar(i), log10(rho(i)), log10(T(i)),  &
