@@ -67,8 +67,8 @@ Website
 ^^^^^^^
 
 We still use the mesa.sourceforge.net website.  The source code for
-this site lives at https://github.com/MESAHub/mesa-website and the
-update process is managed by Josiah.
+this site lives at https://github.com/MESAHub/mesa-website.  It must
+be manually updated by someone with SourceForge permissions.
 
 
 Slack
