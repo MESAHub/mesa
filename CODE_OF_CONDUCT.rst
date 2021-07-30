@@ -42,7 +42,6 @@ Instances of Code-of-Conduct violations should be reported by contacting
 one or more of the following MESA Responsible Persons (MRPs):
 
 -  Lars Bildsten (bildsten@kitp.ucsb.edu)
--  Josiah Schwab (jwschwab@ucsc.edu)
 -  Frank Timmes (fxt44@mac.com)
 -  Anne Thoul (anne.thoul@uliege.be)
 -  Rich Townsend (rhtownsend@wisc.edu)
