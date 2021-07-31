@@ -221,7 +221,7 @@ Third, modify ``inlist_semiconvection`` to change the pgstar namelist to
       Grid4_file_flag = .true.
       Grid4_file_dir = 'pgstar_out'
       Grid4_file_prefix = 'grid4_'
-      Grid4_file_interval = -1
+      Grid4_file_interval = 10
       Grid4_file_width = -1
       Grid4_file_aspect_ratio = -1
 
@@ -274,22 +274,32 @@ Experiment with the reaction network
 Change the nuclear reaction network 
 ``new_net_name`` = ``pp_and_cno_extras.net`` (this test suite case), ``basic.net`` (default), ``approx21.net``, and ``mesa_49.net``.
 
-1) Are all the reported values at the end of a run still within their tolerances?
+1) Are all the reported values still within their tolerances at the end of a run?
 |br|
-2) Are the results for the mass of the convective core and HR diagram the same? 
+2) Are the results for the growth of the convective core mass, HR diagram, and final hydrogen profile the same? 
 |br|
-3) Are all values reported at the end of a run still within acceptable tolerances?
-|br|
-4) Why are the results the same or different?
+3) Why are the results the same or different?
 
 
 .. note::
 
  For the 2021 MESA Summer School, each table should do all 4 reaction networks. Participants with the fastest machines should to the larger networks.
+ 
+ It is usually useful to examine history and profile quantities.
+
  Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
  ``star_history_name = `TableNN_network_name.data``` where NN is your table number and network_name is one of the choices above,
  for example, ``star_history_name = `Table08_approx21.data```.
- After  the runs, each table should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment01.
+
+ Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
+ ``profile_data_prefix = `TableNN_network_name_profile``` where NN is your table number and network_name is one of the choices above,
+ for example, ``profile_data_prefix = `Table07_basic_profile```.
+
+ After the runs, each table should upload a ``star_history_name`` file and their final ``profile_data_prefix`` file
+ to our shared Dropbox directory timmes/Experiment01.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+
  When finished, return the chosen reaction network to the testcase value of ``pp_and_cno_extras.net``.
 
 
@@ -298,16 +308,25 @@ Experiment with the convective mixing length
 
 Change the mixing length of convection 
 ``mixing_length_alpha`` = 1.0 to 3.0 in steps of 0.1, which will include 2.0 (default) and 1.8 (this test suite case).
-Repeat answering the four questions above.
+Repeat answering the questions above.
 
 .. note::
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
+ 
  Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
  ``star_history_name = `TableNN_NpN.data``` where NN is your table number and NpN is your value,
  for example, ``star_history_name = `Table03_1p8.data```. 
+
+ Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
+ ``profile_data_prefix = `TableNN_NpN_profile``` where NN is your table number and NpN is your value,
+ for example, ``profile_data_prefix = `Table02_2p0_profile```.
+ 
  After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment02.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
  When finished, return ``mixing_length_alpha`` to the test case value of 1.8.
 
 
@@ -316,17 +335,26 @@ Experiment with the semiconvective mixing length
 
 Change the scale of semiconvection mixing 
 ``alpha_semiconvection`` = 0.0 to 0.5 in steps of 0.02, which will include 0.0 (default) and 0.1 (this test suite case).
-Repeat answering the four questions above.
+Repeat answering the questions above.
 
 
 .. note::
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
+ 
  Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
  ``star_history_name = `TableNN_NpNN.data``` where NN is your table number and NpNN is your value,
  for example, ``star_history_name = `Table11_0p02.data```.
+
+ Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
+ ``profile_data_prefix = `TableNN_NpNN_profile``` where NN is your table number and NpNN is your value,
+ for example, ``profile_data_prefix = `Table10_0p42_profile```.
+ 
  After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment03.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
  When finished, return ``alpha_semiconvection`` to the test case value of 0.1.
 
 
@@ -340,16 +368,25 @@ Experiment with the mass resolution I
 
 Change the mass resolution setting
 ``max_dq`` = 5.0e-2, 2.0e-2, 1.0e-2 (default), 5.0e-3, 2.0e-3, and 1.0e-3.
-Repeat answering the four questions above.
+Repeat answering the questions above.
 
 .. note::
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
+ 
  Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
  ``star_history_name = `TableNN_NpNNN.data``` where NN is your table number and NpNNN is your value,
  for example, ``star_history_name = `Table7_0p004.data```.
+
+ Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
+ ``profile_data_prefix = `TableNN_NpNNN_profile``` where NN is your table number and NpNNN is your value,
+ for example, ``profile_data_prefix = `Table06_0p001_profile```.
+ 
  After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment04.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
  When finished, return ``max_dq`` to its default value.
 
 Experiment with the mass resolution II
@@ -363,10 +400,19 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
+ 
  Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
  ``star_history_name = `TableNN_NpN.data``` where NN is your table number and NpN is your value,
  for example, ``star_history_name = `Table11_1p2.data```.
+
+ Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
+ ``profile_data_prefix = `TableNN_NpN_profile``` where NN is your table number and NpN is your value,
+ for example, ``profile_data_prefix = `Table03_1p8_profile```.
+ 
  After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment05.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
  When finished, return ``mesh_delta_coeff`` to its default value of 1.0.
 
 
@@ -381,10 +427,19 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
+ 
  Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
  ``star_history_name = `TableNN_NeN.data``` where NN is your table number and NeN is your value,
  for example, ``star_history_name = `Table01_2e7.data```.
+
+ Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
+ ``profile_data_prefix = `TableNN_NeN_profile``` where NN is your table number and NeN is your value,
+ for example, ``profile_data_prefix = `Table09_5e6_profile```.
+ 
  After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment06.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
  When finished, return ``max_years_for_timestep`` to its default value of 0.0.
 
 
@@ -398,9 +453,6 @@ Gather your science and write it up for publication.
  For the 2021 MESA Summer School, each table should team-craft a 250 word maximum Research Notes abstract,
  and then upload their abstract, named ``TableNN_abstract.txt`` where NN is your table number, for example,
  ``Table10_abstract.txt``, to our shared Dropbox directory timmes/Abstracts.
-
- Submit an actual Research notes with entire Summer school as co-authors?
-
 
 
 
