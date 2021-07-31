@@ -419,7 +419,7 @@ Repeat answering the questions above.
 Experiment with the temporal resolution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Change the temporal resolutin steeting
+Change the temporal resolution setting
 ``max_years_for_timestep`` = 1.0e8, 5.0e7, 2.0e7, 1.0e7, 5.0e6, 2.0e6, and 1.0e6.
 Repeat answering the questions above.
 
