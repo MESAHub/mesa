@@ -120,12 +120,12 @@ USE_SHARED = NO
 # you shouldn't need to change any of the following stuff.
 # It simply defines things for use by the module makefiles.
 
-#SKIP_NAN_TRAPS = YES
-SKIP_NAN_TRAPS = NO
+SKIP_NAN_TRAPS = YES
+#SKIP_NAN_TRAPS = NO
 # if not SKIP_NAN_TRAPS, then also add $(FCtrapNANs) to FCbasic2
 
 FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=7 $(SPECIAL_FC_FLAGS) $(FCbasic2)
-FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan $(FCtrapNANs)
+FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan
 
 # Set the fortran standard to compile against, files that can't be compiled to the standard and are 
 # unfixable should add a statement like:  $(filter-out -std=f2008, $(COMPILE))

@@ -55,10 +55,12 @@
 
 
 &controls
-   max_dt_div_tau_conv_for_TDC = 1d99
-   max_dt_years_for_TDC = 1d99
 
    fill_arrays_with_nans = .true.
+   report_solver_progress = .true.
+   max_resid_jump_limit = 1d99
+   report_ierr = .true.
+   !MLT_option = "Cox"
 
    okay_to_remove_mixing_singleton = .false.
 
@@ -70,13 +72,14 @@
 
    energy_eqn_option = 'dedt'
 
+
    ! adjustments to the newton solver
    solver_max_tries_before_reject = 30
    max_tries_for_retry = 30
    max_tries_after_5_retries = 40
    max_tries_after_10_retries = 40
    max_tries_after_20_retries = 40
-   corr_coeff_limit = 1d-10
+   corr_coeff_limit = 1d-2
    !conv_vel_D = 0d0
    relax_use_gold_tolerances = .false.
    use_gold_tolerances = .true.
@@ -249,7 +252,7 @@
    
    ! or just turn it on if neutrino luminosity is above this limit
    ! independent of the other two (max_L_neu_for_hydro)
-   x_ctrl(3) = 9d0 ! RECOMMENDED 9d0
+   x_ctrl(3) = 10.8d0 ! RECOMMENDED 9d0
 
    ! parameters controlling swtich between hydrostatic and Riemann hydro
    ! after the pulse starts, we estimate the dynamical timescale of the star

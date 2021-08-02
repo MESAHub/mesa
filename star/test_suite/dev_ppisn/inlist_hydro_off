@@ -20,6 +20,8 @@
 
    max_surface_cell_dq = 1d-12
 
+   max_q_for_convection_with_hydro_on = 0.99d0
+
    !angsmt_D_ST = 0.2d0
    !angsmt_nu_ST = 0.2d0
 
