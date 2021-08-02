@@ -72,6 +72,7 @@
 
    energy_eqn_option = 'dedt'
 
+
    ! adjustments to the newton solver
    solver_max_tries_before_reject = 30
    max_tries_for_retry = 30
