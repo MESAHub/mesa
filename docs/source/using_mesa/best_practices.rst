@@ -204,7 +204,7 @@ Third, modify ``inlist_semiconvection`` to change the pgstar namelist to
       save_pgstar_files_when_terminate = .true.
 
 
-  and add to the controls namelist:
+  and to make the stopping condition more precise, add to the controls namelist:
 
       when_to_stop_rtol = 1e-4
       when_to_stop_atol = 1e-4
