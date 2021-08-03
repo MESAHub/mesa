@@ -204,7 +204,12 @@ Third, modify ``inlist_semiconvection`` to change the pgstar namelist to
       save_pgstar_files_when_terminate = .true.
 
 
-  replace the pgstar namelist with
+  and add to the controls namelist:
+
+      when_to_stop_rtol = 1e-4
+      when_to_stop_atol = 1e-4
+
+  and finally replace the pgstar namelist with
 
   &pgstar
 
@@ -287,15 +292,11 @@ Change the nuclear reaction network
  
  It is usually useful to examine history and profile quantities.
 
- Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
- ``star_history_name = `TableNN_network_name.data``` where NN is your table number and network_name is one of the choices above,
- for example, ``star_history_name = `Table08_approx21.data```.
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_network_name``` where NN is your table number and network_name is one of the choices above,
+ for example, ``log_directory = `Table08_approx21```.
 
- Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
- ``profile_data_prefix = `TableNN_network_name_profile``` where NN is your table number and network_name is one of the choices above,
- for example, ``profile_data_prefix = `Table07_basic_profile```.
-
- After the runs, each table should upload a ``star_history_name`` file and their final ``profile_data_prefix`` file
+ After the runs, each table should upload their ``log_directory`` 
  to our shared Dropbox directory timmes/Experiment01.
 
  The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
@@ -314,16 +315,12 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- 
- Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
- ``star_history_name = `TableNN_NpN.data``` where NN is your table number and NpN is your value,
- for example, ``star_history_name = `Table03_1p8.data```. 
 
- Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
- ``profile_data_prefix = `TableNN_NpN_profile``` where NN is your table number and NpN is your value,
- for example, ``profile_data_prefix = `Table02_2p0_profile```.
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpN``` where NN is your table number and NpN is your value,
+ for example, ``log_directory = `Table03_1p8```.
  
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment02.
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment02.
 
  The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
  
@@ -342,16 +339,12 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- 
- Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
- ``star_history_name = `TableNN_NpNN.data``` where NN is your table number and NpNN is your value,
- for example, ``star_history_name = `Table11_0p02.data```.
 
- Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
- ``profile_data_prefix = `TableNN_NpNN_profile``` where NN is your table number and NpNN is your value,
- for example, ``profile_data_prefix = `Table10_0p42_profile```.
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpNN``` where NN is your table number and NpNN is your value,
+ for example, ``log_directory = `Table11_1p80```.
  
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment03.
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment03.
 
  The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
  
@@ -374,20 +367,17 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- 
- Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
- ``star_history_name = `TableNN_NpNNN.data``` where NN is your table number and NpNNN is your value,
- for example, ``star_history_name = `Table7_0p004.data```.
 
- Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
- ``profile_data_prefix = `TableNN_NpNNN_profile``` where NN is your table number and NpNNN is your value,
- for example, ``profile_data_prefix = `Table06_0p001_profile```.
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpNNN is your value,
+ for example, ``log_directory = `Table05_0p002```.
  
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment04.
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment04.
 
  The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
  
  When finished, return ``max_dq`` to its default value.
+
 
 Experiment with the mass resolution II
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -400,16 +390,12 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- 
- Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
- ``star_history_name = `TableNN_NpN.data``` where NN is your table number and NpN is your value,
- for example, ``star_history_name = `Table11_1p2.data```.
 
- Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
- ``profile_data_prefix = `TableNN_NpN_profile``` where NN is your table number and NpN is your value,
- for example, ``profile_data_prefix = `Table03_1p8_profile```.
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpN is your value,
+ for example, ``log_directory = `Table08_1p2```.
  
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment05.
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment05.
 
  The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
  
@@ -427,16 +413,12 @@ Repeat answering the questions above.
 
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team. 
- 
- Change the default control namelist parameter ``star_history_name = `history.data``` to the more descriptive
- ``star_history_name = `TableNN_NeN.data``` where NN is your table number and NeN is your value,
- for example, ``star_history_name = `Table01_2e7.data```.
 
- Change the default control namelist parameter ``profile_data_prefix = `profile``` to the more descriptive
- ``profile_data_prefix = `TableNN_NeN_profile``` where NN is your table number and NeN is your value,
- for example, ``profile_data_prefix = `Table09_5e6_profile```.
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NeN``` where NN is your table number and NeN is your value,
+ for example, ``log_directory = `Table01_2e7```.
  
- After a run is complete, each participant should upload a ``star_history_name`` file to our shared Dropbox directory timmes/Experiment06.
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment06.
 
  The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
  
