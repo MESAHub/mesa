@@ -1,65 +1,67 @@
-pipeline {
-  agent none
-  options {
-    disableConcurrentBuilds()
-    buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
-    timeout(time: 1, unit: 'HOURS')
-  }
-  stages {
-    stage('main') {
-      agent {
-        dockerfile {
-          dir 'jenkins'
+properties([
+  disableConcurrentBuilds(),
+  buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
+])
+
+node('linux && docker && mesa') {
+  /* use HOME=MESA_DIR=customWorkspace=dir for build */
+  def dir = "${env.JENKINS_HOME}/mesa/${env.BRANCH_NAME}"
+  def image
+  withEnv([
+    "OMP_NUM_THREADS=4",
+    "HOME=${dir}",
+    "MESA_DIR=${dir}",
+  ]) {
+    stage('build') {
+      ws(env.HOME) {
+        timeout(time: 1, unit: 'HOURS') {
+          checkout scm
+          withCredentials([
+              usernamePassword(credentialsId: 'mesa_test', passwordVariable: 'MESA_TEST_PSW', usernameVariable: 'MESA_TEST_USR'),
+              string(credentialsId: 'mesa_test_logs_token', variable: 'MESA_LOGS_TOKEN')]) {
+            writeYaml(file: "${env.HOME}/.mesa_test/config.yml", overwrite: true, data: [
+              'computer_name': 'Jenkins',
+              'email': env.MESA_TEST_USR,
+              'password': env.MESA_TEST_PSW,
+              'logs_token': env.MESA_LOGS_TOKEN,
+              'github_protocol': ':ssh',
+              'mesa_mirror': "${env.HOME}/mirror", /* not used */
+              'mesa_work': env.MESA_DIR,
+              'platform': 'Linux',
+              'platform_version': 'Ubuntu'
+            ])
+          }
+          image = docker.build("flatironinstitute/mesa:${env.BRANCH_NAME}", "jenkins")
+          image.inside() {
+            sh '''#!/bin/bash -ex
+              source $MESASDK_ROOT/bin/mesasdk_init.sh
+              mesa_test install --no-checkout
+              mesa_test submit --empty
+            '''
+          }
         }
       }
-      environment {
-        HOME = pwd(tmp:true)
-        MESA_DIR = pwd()
-        OMP_NUM_THREADS = 4
-        MESA_TEST = credentials('mesa_test')
-        MESA_LOGS_TOKEN = credentials('mesa_test_logs_token')
-      }
-      steps {
-        dir("${env.HOME}/.mesa_test") {
-          writeYaml file: "config.yml", overwrite: true, data: [
-            'computer_name': 'Jenkins',
-            'email': env.MESA_TEST_USR,
-            'password': env.MESA_TEST_PSW,
-            'logs_token': env.MESA_LOGS_TOKEN,
-            'github_protocol': ':ssh',
-            'mesa_mirror': "${env.HOME}/mirror",
-            'mesa_work': env.MESA_DIR,
-            'platform': 'Linux',
-            'platform_version': 'Ubuntu'
-          ]
+    }
+
+    def tests = ["binary", "astero"]
+    def testStages = [:]
+    for (int i = 0; i < tests.size(); i++) {
+      def test = tests[i]
+      testStages[test] = { ->
+        stage(test) {
+          timeout(time: 2, unit: 'HOURS') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+              image.inside("-v ${dir}:${dir}:rw") {
+                sh '''#!/bin/bash -ex
+                  source $MESASDK_ROOT/bin/mesasdk_init.sh
+                  mesa_test test --module=$STAGE_NAME
+                '''
+              }
+            }
+          }
         }
-        sh '''#!/bin/bash -ex
-          source $MESASDK_ROOT/bin/mesasdk_init.sh
-          mesa_test install_and_test --no-checkout
-        '''
       }
     }
-  }
-  post {
-    failure {
-      emailext subject: '$PROJECT_NAME - Build #$BUILD_NUMBER - $BUILD_STATUS',
-               body: '''$PROJECT_NAME - Build #$BUILD_NUMBER - $BUILD_STATUS
-
-Check console output at $BUILD_URL to view full results.
-
-Building $BRANCH_NAME for $CAUSE
-$JOB_DESCRIPTION
-
-Chages:
-$CHANGES
-
-End of build log:
-${BUILD_LOG,maxLines=200}
-''',
-               recipientProviders: [
-                 [$class: 'DevelopersRecipientProvider'],
-               ],
-               replyTo: '$DEFAULT_REPLYTO'
-    }
+    parallel testStages
   }
 }
