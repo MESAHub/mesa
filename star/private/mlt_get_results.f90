@@ -573,14 +573,15 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
-         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
+         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Qc, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
          type(auto_diff_real_tdc) :: Q_start, Y_start
          real(dp) ::  gradT, Lr, Lc, scale
-         integer :: iter
+         integer :: iter, line_iter
          logical :: converged, Y_is_positive, first_Q_is_positive
          real(dp), parameter :: tolerance = 1d-8
          real(dp), parameter :: alpha_c  = (1d0/2d0)*sqrt_2_div_3
          integer, parameter :: max_iter = 200
+         integer, parameter :: max_line_search_iter = 5
          include 'formats'
 
          ierr = 0
@@ -672,34 +673,46 @@
                end if
 
                correction = -Q/dQdz
-               if (correction > 2d0) then
-                  correction = 2d0
-               else if (correction < -2d0) then
-                  correction = -2d0
-               end if
 
-               if (abs(correction) < 1d-13) then
-                  ! Can't get much more precision than this.
-                  converged = .true.
-                  exit
-               end if
+               do line_iter=1,max_line_search_iter
 
-               Z_new = Z + correction
+                  if (abs(correction) < 1d-13) then
+                     ! Can't get much more precision than this.
+                     converged = .true.
+                     exit
+                  end if
 
-               ! If the correction pushes the solution out of bounds then we know
-               ! that was a bad step. Bad steps are still in the same direction, they just
-               ! go too far, so we replace that result with one that's halfway to the relevant bound.
-               if (Z_new > upper_bound_Z) then
-                  Z_new = (Z + upper_bound_Z) / 2d0
-               else if (Z_new < lower_bound_Z) then
-                  Z_new = (Z + lower_bound_Z) / 2d0
-               end if
+                  Z_new = Z + correction
 
+                  ! If the correction pushes the solution out of bounds then we know
+                  ! that was a bad step. Bad steps are still in the same direction, they just
+                  ! go too far, so we replace that result with one that's halfway to the relevant bound.
+                  if (Z_new > upper_bound_Z) then
+                     Z_new = (Z + upper_bound_Z) / 2d0
+                  else if (Z_new < lower_bound_Z) then
+                     Z_new = (Z + lower_bound_Z) / 2d0
+                  end if
 
+                  if (Y_is_positive) then
+                     Y = exp(Z_new)
+                  else
+                     Y = -exp(Z_new)
+                  end if
+
+                  call compute_Q(s, k, mixing_length_alpha, &
+                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
+
+                  if (abs(Qc) < abs(Q)) then
+                     exit
+                  else
+                     correction = 0.5d0 * correction
+                  end if
+               end do
 
                if (report) write(*,2) 'iter Z_new, Z, low_bnd, upr_bnc, Q/dQdZ, Q, dQdZ, corr', iter, &
                   Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val, correction%val
                Z_new%d1val1 = 1d0            
+
                Z = Z_new
 
                if (Y_is_positive) then
