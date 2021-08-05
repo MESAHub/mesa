@@ -34,6 +34,15 @@ Astero defaults
    reference/astero_search
    reference/astero_pgstar
 
+Module defaults
+===============
+
+.. toctree::
+   :maxdepth: 1
+
+   reference/eos
+   reference/kap
+
 Hooks
 =====
 

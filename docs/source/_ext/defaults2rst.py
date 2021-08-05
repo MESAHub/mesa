@@ -17,6 +17,8 @@ DEFAULTS_FILES = (
     'reference/format',
     'reference/star_job_dev',
     'reference/controls_dev',
+    'reference/eos',
+    'reference/kap'
 )
 
 
