@@ -599,6 +599,8 @@
 
       !compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
       !compactness
+      !m4 ! Mass co-ordinate where entropy=4
+      !mu4 ! dM(Msun)/dr(1000km) where entropy=4
 
       !center_omega
       !center_omega_div_omega_crit

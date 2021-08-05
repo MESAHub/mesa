@@ -46,10 +46,11 @@ Begin in the directory where you do your MESA work.
 
   cp -r $MESA_DIR/star/test_suite/semiconvection .
 
-There are four file edits to make. First, modify ``make/makefile``:
+There are four files to edit. First, modify ``make/makefile``:
 
 .. code-block:: console
 
+   cd semiconvection
    cd make
 
    Edit makefile, changing
@@ -64,7 +65,7 @@ There are four file edits to make. First, modify ``make/makefile``:
 
    cd ../
 
-Second, modify ``rn``:
+Second, modify the ``rn`` script:
 
 .. code-block:: console
 
@@ -78,7 +79,7 @@ Second, modify ``rn``:
 
    and save the file change.
 
-Third, modify ``ck``:
+Third, modify the ``ck`` script:
 
 .. code-block:: console
 
@@ -147,9 +148,9 @@ After a few minutes the run will terminate and you should see
 
  all values are within tolerances
 
-Let's add some pgstar plots to better see what is happening. 
-There are two files to edit.
-First, copy the default ``history_columns.list``
+Let's add some pgstar plots to visualize what is happening. 
+There are three files to edit.
+First, copy the default ``history_columns.list`` to your work directory
 
 .. code-block:: console
 
@@ -177,16 +178,11 @@ and modify your local ``history_columns.list``
    and save the file changes.
 
 
-Second, modify ``inlist_semiconvection``
+Second, modify ``inlist_semiconvection_header``
 
 .. code-block:: console
 
-  add to the star_job namelist:
-
-      pgstar_flag = .true.
-      save_pgstar_files_when_terminate = .true.
-
-  and change
+  change
 
       !read_extra_pgstar_inlist1 = .true.
       !extra_pgstar_inlist1_name = 'inlist_semiconvection'
@@ -195,7 +191,25 @@ Second, modify ``inlist_semiconvection``
       read_extra_pgstar_inlist1 = .true.
       extra_pgstar_inlist1_name = 'inlist_semiconvection'  
 
-  and change the pgstar namelist to 
+   and save the file changes.
+
+
+Third, modify ``inlist_semiconvection`` to change the pgstar namelist to 
+
+.. code-block:: console
+
+  add to the star_job namelist:
+
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+
+  and to make the stopping condition more precise, add to the controls namelist:
+
+      when_to_stop_rtol = 1e-4
+      when_to_stop_atol = 1e-4
+
+  and finally replace the pgstar namelist with
 
   &pgstar
 
@@ -212,7 +226,7 @@ Second, modify ``inlist_semiconvection``
       Grid4_file_flag = .true.
       Grid4_file_dir = 'pgstar_out'
       Grid4_file_prefix = 'grid4_'
-      Grid4_file_interval = -1
+      Grid4_file_interval = 10
       Grid4_file_width = -1
       Grid4_file_aspect_ratio = -1
 
@@ -220,6 +234,20 @@ Second, modify ``inlist_semiconvection``
 
    and save the file changes.
 
+
+Now run the executable egain
+
+.. code-block:: console
+
+   ./rn
+
+and you should see a pgstar window appear on your screen:
+
+
+.. image:: grid4_000322.svg
+   :width: 100%
+
+|br| |br|
 
 Explore Physics Variations
 --------------------------
@@ -245,52 +273,173 @@ Make the following changes to your ``inlist_semiconvection``:
       history_interval = 1
 
 
-Experiment with the chosen reaction network ``new_net_name = ``pp_and_cno_extras.net``, ``basic`` (default), ``mesa_49.net``.
+Experiment with the reaction network 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Are the results for the mass of the convective core and HR diagram the same? 
-If they are not the same, why are they different?
-Are all values reported at the end of a run still within acceptable tolerances?
+Change the nuclear reaction network 
+``new_net_name`` = ``pp_and_cno_extras.net`` (this test suite case), ``basic.net`` (default), ``approx21.net``, and ``mesa_49.net``.
 
-For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment01 for analysis by the TAs (Anne Thoul and Andrew Nine)
+1) Are all the reported values still within their tolerances at the end of a run?
+|br|
+2) Are the results for the growth of the convective core mass, HR diagram, and final hydrogen profile the same? 
+|br|
+3) Why are the results the same or different?
 
 
-Experiment with the 
-mixing length parameterization of convection ``mixing_length_alpha`` = 3.0, 2.5, 2.0, 1.8 (default), 1.5, 1.2, 1.0, and
-the scale of semiconvective mixing ``alpha_semiconvection`` = 0.0 0.02 0.05 0.1 (test suite), 0.15 0.20, 0.25, 0.30.
+.. note::
+
+ For the 2021 MESA Summer School, each table should do all 4 reaction networks. Participants with the fastest machines should to the larger networks.
+ 
+ It is usually useful to examine history and profile quantities.
+
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_network_name``` where NN is your table number and network_name is one of the choices above,
+ for example, ``log_directory = `Table08_approx21```.
+
+ After the runs, each table should upload their ``log_directory`` 
+ to our shared Dropbox directory timmes/Experiment01.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+
+ When finished, return the chosen reaction network to the testcase value of ``pp_and_cno_extras.net``.
+
+
+Experiment with the convective mixing length 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Change the mixing length of convection 
+``mixing_length_alpha`` = 1.0 to 3.0 in steps of 0.1, which will include 2.0 (default) and 1.8 (this test suite case).
 Repeat answering the questions above.
 
-For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment02.
+.. note::
+
+ For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
+ The TA will then distribute the values to the team. 
+
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpN``` where NN is your table number and NpN is your value,
+ for example, ``log_directory = `Table03_1p8```.
+ 
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment02.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
+ When finished, return ``mixing_length_alpha`` to the test case value of 1.8.
+
+
+Experiment with the semiconvective mixing length 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Change the scale of semiconvection mixing 
+``alpha_semiconvection`` = 0.0 to 0.5 in steps of 0.02, which will include 0.0 (default) and 0.1 (this test suite case).
+Repeat answering the questions above.
+
+
+.. note::
+
+ For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
+ The TA will then distribute the values to the team. 
+
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpNN``` where NN is your table number and NpNN is your value,
+ for example, ``log_directory = `Table11_1p80```.
+ 
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment03.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
+ When finished, return ``alpha_semiconvection`` to the test case value of 0.1.
+
+
 
 
 Explore Numerical Convergence 
 -----------------------------
 
-Experiment with the mass resolution settings:
-``max_dq`` = 5.0e-2, 2.0e-2, 1.0e-2 (default), 5.0e-3, 2.0e-3, 1.0e-3
-and ``mesh_delta_coeff`` = 2.0, 1.5, 1.0 (default), 0.8, 0.5, 0.2, 0.1.
+Experiment with the mass resolution I
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Change the mass resolution setting
+``max_dq`` = 5.0e-2, 2.0e-2, 1.0e-2 (default), 5.0e-3, 2.0e-3, and 1.0e-3.
 Repeat answering the questions above.
 
-For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment03.
+.. note::
+
+ For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
+ The TA will then distribute the values to the team. 
+
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpNNN is your value,
+ for example, ``log_directory = `Table05_0p002```.
+ 
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment04.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
+ When finished, return ``max_dq`` to its default value.
 
 
-Experiment with the temporal resolution settings:
-``max_years_for_timestep`` = 1.0e8, 5.0e7, 1.0e7, 5.0e6, 1.0e6 , 5.0e5 and 
-``delta_lgT_cntr_limit``   = 0.01 (default), 5.0e-3, 2.0e-3, 1.0e-3, 5.0e-4
-``delta_lgRho_cntr_limit`` = 0.05 (default), 2.0e-2, 1.0e-2, 5.0e-3, 2.0e-3, 1.0e-3.
+Experiment with the mass resolution II
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Change the mass resolution setting
+``mesh_delta_coeff`` = 0.2 to 2.0 in steps of 0.2, which will include the default value of 1.0.
 Repeat answering the questions above.
 
-For the 2021 MESA Summer School, each table should upload a LOGS/history.data to our shared Dropbox directory Experiment04.
+.. note::
+
+ For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
+ The TA will then distribute the values to the team. 
+
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpN is your value,
+ for example, ``log_directory = `Table08_1p2```.
+ 
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment05.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
+ When finished, return ``mesh_delta_coeff`` to its default value of 1.0.
 
 
-Draft A Research Notes Abstract
--------------------------------
+Experiment with the temporal resolution
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For the 2021 MESA Summer School, each table should team-craft a Research Notes abstract in plain text 
-and upload their abstract, named Table_X_abstract.txt to the shared Dropbox directory Research Notes Abstracts.
+Change the temporal resolution setting
+``max_years_for_timestep`` = 1.0e8, 5.0e7, 2.0e7, 1.0e7, 5.0e6, 2.0e6, and 1.0e6.
+Repeat answering the questions above.
+
+.. note::
+
+ For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
+ The TA will then distribute the values to the team. 
+
+ Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
+ ``log_directory = `TableNN_NeN``` where NN is your table number and NeN is your value,
+ for example, ``log_directory = `Table01_2e7```.
+ 
+ After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment06.
+
+ The TAs will plot our crowd-sourced growth of the convective core mass, HR diagram, and final hydrogen profile.
+ 
+ When finished, return ``max_years_for_timestep`` to its default value of 0.0.
 
 
-In the paper
-------------
+Create An Article for Publication
+---------------------------------
+
+Gather your science and write it up for publication.
+
+.. note::
+
+ For the 2021 MESA Summer School, each table should team-craft a 250 word maximum Research Notes abstract,
+ and then upload their abstract, named ``TableNN_abstract.txt`` where NN is your table number, for example,
+ ``Table10_abstract.txt``, to our shared Dropbox directory timmes/Abstracts.
+
+
+
+In the article
+--------------
 
 You should provide a clear statement of which version of MESA was used
 in the calculation. We also recommend noting which version of the MESA
@@ -420,7 +569,11 @@ Marketplace <http://mesastar.org>`__ will remain in use as an aggregator
 portal, and we request users to inform us of new uploads so that they
 are highlighted there as well.
 
-For the 2021 MESA Summer School, each table should upload their abstract to a Zenodo sandbox.
+.. note::
+
+ For the 2021 MESA Summer School, each participant should upload their table's abstract and 
+ their latest ``star_history_name`` file to a MESA Zenodo sandbox.
+
 
 
 .. # define a hard line break for HTML

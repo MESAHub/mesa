@@ -49,6 +49,9 @@
          !alpha_H = s% x_ctrl(21)
          !alpha_other = s% x_ctrl(22)
          !H_limit = s% x_ctrl(23)
+
+! inlists
+      ! x_integer_ctrl(2) = X ! part number of inlist
       
       contains
 
@@ -149,8 +152,20 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         nz = s% nz
-         write(*,*)
+
+         select case (s% x_integer_ctrl(2))
+         case(7)
+            testhub_extras_names(1) = 'fe_core_mass'
+            testhub_extras_vals(1) = s% fe_core_mass
+            testhub_extras_names(2) = 'compactness'
+            testhub_extras_vals(2) = star_get_history_output(s,'compactness_parameter')
+            testhub_extras_names(3) = 'mu4'
+            testhub_extras_vals(3) = star_get_history_output(s,'mu4')
+            testhub_extras_names(4) = 'm4'
+            testhub_extras_vals(4) = star_get_history_output(s,'m4')
+         end select
+
+
          call test_suite_after_evolve(s, ierr)
          if (ierr /= 0) return         
          if (.not. s% x_logical_ctrl(37)) return

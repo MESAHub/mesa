@@ -526,9 +526,7 @@
             w_div_w_crit, w_div_w_crit_prev, mstar_dot, mstar_dot_prev, abs_mstar_delta, &
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, total, &
-            surf_omega_div_omega_crit_limit, dt, time, max_dt, total_energy, &
-            new_R_center, amplitude, flash_max, &
-            dm_nz, dm_m1, r_m1, v_m1, A_nz, A_m1, A_center, new_v_center, min_v_center
+            surf_omega_div_omega_crit_limit, dt, time, max_dt, total_energy
             
          integer :: ph_k, mdot_action
          real(dp) :: r, m, xm, v, L, cs, kap, ysum, &

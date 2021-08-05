@@ -292,6 +292,26 @@ to remove ``theta_e_for_graboske_et_al`` from its argument list.
 
 The options ``reuse_rate_raw`` and  ``reuse_rate_screened`` have been removed from other_net_get (and eval_net)
 
+
+rates
+~~~~~
+
+The format for custom weak rate tables (see e.g., ``data/rates_data/rate_tables/weak_rate_list.txt`` and test suite case ``custom_rates``) no longer supports the (previously optional) Coulomb correction datasets ``delta_Q`` and ``Vs``.
+
+When this capability was first added, the energetics associated with
+the change in the composition were calculated in ``rates`` and
+included in ``eps_nuc``.  This meant the ``rates`` module needed to
+have access to information about the Coulomb-induced shifts in the
+electron and ion chemical potentials.
+
+After the changes in the definition of ``eps_nuc`` and the energy
+equation described in |MESA V|, the energetics associated with the
+changing composition are self-consistently accounted for in the energy
+equation using information provided by the MESA EOS.  Therefore, the
+ability to provide these unneeded and unused quantities has been
+removed.
+
+
 .. _Other changes main:
 
 Other changes

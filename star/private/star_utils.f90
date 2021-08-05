@@ -258,6 +258,7 @@
 
       subroutine set_m_grav_and_grav(s) ! using mass_corrections
          type (star_info), pointer :: s
+         real(dp) :: r, lnR
          integer :: k, nz
          include 'formats'
          nz = s% nz
@@ -274,7 +275,9 @@
             end do
          end if
          do k=1,nz
-            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k))
+            ! We need to call set_m_grav_and_grav during model loading before we have set all vars
+            call get_r_and_lnR_from_xh(s, k, r, lnR)
+            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(r*r)
          end do
       end subroutine set_m_grav_and_grav
       

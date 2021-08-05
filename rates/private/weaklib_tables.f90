@@ -37,8 +37,6 @@ module weaklib_tables
      integer :: i_ldecay = 1
      integer :: i_lcapture = 2
      integer :: i_lneutrino = 3
-     integer :: i_delta_Q = 4
-     integer :: i_Vs = 5
 
    contains
 
@@ -55,13 +53,10 @@ module weaklib_tables
 contains
 
 
-  function new_weaklib_rate_table(T9s, lYeRhos, has_cc)
+  function new_weaklib_rate_table(T9s, lYeRhos)
     real(dp), intent(in), dimension(:) :: T9s, lYeRhos
-    logical, intent(in) :: has_cc ! are there tabulated coulomb corrections?
     type(weaklib_rate_table) :: new_weaklib_rate_table
     integer :: N
-
-    new_weaklib_rate_table % has_cc = has_cc
 
     new_weaklib_rate_table% num_T9 = size(T9s)
     allocate(new_weaklib_rate_table% T9s(new_weaklib_rate_table% num_T9))
@@ -71,15 +66,9 @@ contains
     allocate(new_weaklib_rate_table% lYeRhos(new_weaklib_rate_table% num_lYeRho))
     new_weaklib_rate_table% lYeRhos = lYeRhos
 
-    if (has_cc) then
-       N = 5
-    else
-       N = 3
-    end if
-
     allocate(new_weaklib_rate_table% data(4, &
          new_weaklib_rate_table% num_T9, &
-         new_weaklib_rate_table% num_lYeRho, N))
+         new_weaklib_rate_table% num_lYeRho, 3))
   end function new_weaklib_rate_table
 
 
@@ -202,14 +191,12 @@ contains
 
   subroutine interpolate_weaklib_table(table, T9, lYeRho, &
        lambda, dlambda_dlnT, dlambda_dlnRho, &
-       Qneu, dQneu_dlnT, dQneu_dlnRho, &
-       delta_Q, Vs, ierr)
+       Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
     use const_def, only : dp
     class(weaklib_rate_table), intent(inout) :: table
     real(dp), intent(in) :: T9, lYeRho
     real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
     real(dp), intent(out) :: Qneu, dQneu_dlnT, dQneu_dlnRho
-    real(dp), intent(out) :: delta_Q, Vs
     integer, intent(out) :: ierr
 
     integer :: ix, jy          ! target cell in the spline data
@@ -223,16 +210,11 @@ contains
 
     real(dp) :: ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
          lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
-         lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, &
-         d_delta_Q_dT9, d_delta_Q_dlYeRho, &
-         d_Vs_dT9, d_Vs_dlYeRho
+         lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho
 
     real(dp) :: decay, capture
 
     logical :: dbg = .false.
-
-    delta_Q = 0
-    Vs = 0
 
     xget = T9
     yget = lYeRho
@@ -257,17 +239,6 @@ contains
             table % data(1:4,1:table%num_T9,1:table%num_lYeRho,table%i_lneutrino), &
             lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, ierr)
 
-       if (table% has_cc) then
-          call do_bicubic_interpolations( &
-               table % data(1:4,1:table%num_T9,1:table%num_lYeRho,table%i_delta_Q), &
-               delta_Q, d_delta_Q_dT9, d_delta_Q_dlYeRho, ierr)
-
-          call do_bicubic_interpolations( &
-               table % data(1:4,1:table%num_T9,1:table%num_lYeRho,table%i_Vs), &
-               Vs, d_Vs_dT9, d_Vs_dlYeRho, ierr)
-       end if
-
-
     else
 
        call do_linear_interp( &
@@ -281,17 +252,6 @@ contains
        call do_linear_interp( &
             table % data(1:4,1:table%num_T9,1:table%num_lYeRho,table%i_lneutrino), &
             lneutrino, d_lneutrino_dT9, d_lneutrino_dlYeRho, ierr)
-
-       if (table% has_cc) then
-          call do_linear_interp( &
-               table % data(1:4,1:table%num_T9,1:table%num_lYeRho,table%i_delta_Q), &
-               delta_Q, d_delta_Q_dT9, d_delta_Q_dlYeRho, ierr)
-
-          call do_linear_interp( &
-               table % data(1:4,1:table%num_T9,1:table%num_lYeRho,table%i_Vs), &
-               Vs, d_Vs_dT9, d_Vs_dlYeRho, ierr)
-       end if
-
 
     end if
 

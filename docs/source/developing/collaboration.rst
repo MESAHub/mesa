@@ -102,7 +102,7 @@ MTC.
 Initially, the MTC has 4 members appointed by Bill Paxton. These are
 Josiah, Rich, Pablo, and Rob.
 
-Initially, the MAC will be Lars, Josiah, Rich, and Frank.
+Currently, the MAC is Lars, Rich, and Frank.
 
 
 Instrument Paper Principles
