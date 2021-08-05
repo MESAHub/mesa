@@ -849,22 +849,7 @@
             return
          end if
 
-         Y = convert(Y_in)
-
-         call eval_xis(s, k, mixing_length_alpha, &
-            Y, T, rho, Cp, dV, kap, Hp, grada, xi0, xi1, xi2)
-
-         Af = eval_Af(s, k, A0, xi0, xi1, xi2)
-
-         J2 = pow2(xi1) - 4d0 * xi0 * xi2
-         Jt2 = abs(J2) * pow2(s%dt)
-
-         ! Note the '1d-50' here is in cm/s, and is just there to avoid division by zero.
-         if (Jt2 > 3d3 .or. abs(Af%val - A0%val) / (1d-50 + abs(A0%val)) < 1d-8) then
-            fallback = .true.
-         else
-            fallback = .false.
-         end if
+         fallback = .false.
 
       end function check_if_can_fall_back_to_MLT
 
