@@ -8,7 +8,9 @@ node('linux && docker && mesa') {
   def dir = "${env.JENKINS_HOME}/mesa/${env.BRANCH_NAME}"
   def image
   withEnv([
+    /* 4*4=16 isn't quite right as we're limited to 4, but in practice it seems work out */
     "OMP_NUM_THREADS=4",
+    "NPROCS=4",
     "HOME=${dir}",
     "MESA_DIR=${dir}",
   ]) {
