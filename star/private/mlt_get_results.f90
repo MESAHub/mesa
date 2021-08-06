@@ -674,6 +674,12 @@
 
                correction = -Q/dQdz
 
+               if (correction > 2d0) then
+                  correction = 2d0
+               else if (correction < -2d0) then
+                  correction = -2d0
+               end if
+
                do line_iter=1,max_line_search_iter
 
                   if (abs(correction) < 1d-13) then
@@ -701,6 +707,7 @@
 
                   call compute_Q(s, k, mixing_length_alpha, &
                   Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
+
 
                   if (abs(Qc) < abs(Q)) then
                      exit
