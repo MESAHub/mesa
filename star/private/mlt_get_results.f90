@@ -572,9 +572,9 @@
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
          integer, intent(out) :: ierr
          
-         type(auto_diff_real_star_order1) :: A0, c0, L0
+         type(auto_diff_real_star_order1) :: A0, c0, L0, Y_guess_2
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Qc, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
-         type(auto_diff_real_tdc) :: Q_start, Y_start
+         type(auto_diff_real_tdc) :: Q_start, Y_start, prev_dQdZ
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter, line_iter
          logical :: converged, Y_is_positive, first_Q_is_positive
@@ -639,6 +639,7 @@
             ! Save starting values
             Q_start = Q
             Y_start = Y
+            dQdz = 0d0
 
             ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
             lower_bound_Z = -100d0
@@ -665,6 +666,7 @@
                   end if
                end if
 
+               prev_dQdZ = dQdZ
                dQdZ = differentiate_1(Q)
 
                if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
@@ -674,12 +676,11 @@
 
                correction = -Q/dQdz
 
-               if (correction > 2d0) then
-                  correction = 2d0
-               else if (correction < -2d0) then
-                  correction = -2d0
-               end if
+               ! Clip steps.
+               correction = max(correction, -2d0)
+               correction = min(correction, 2d0)
 
+               ! Do a line search to avoid steps that are too big.
                do line_iter=1,max_line_search_iter
 
                   if (abs(correction) < 1d-13) then
@@ -716,7 +717,19 @@
                   end if
                end do
 
-               if (report) write(*,2) 'iter Z_new, Z, low_bnd, upr_bnc, Q/dQdZ, Q, dQdZ, corr', iter, &
+               if (dQdZ * prev_dQdZ < 0d0) then
+                  ! Means we passed a stationary point.
+                  ! This can only happen when Y < 0.
+
+                  ! To get around this we reset at a new guess.
+                  ! We aim for the adiabatic side of the stationary point
+                  ! based on some vague intuition.
+                  Z_new = -10d0
+                  dQdZ = 0d0
+                  prev_dQdZ = 0d0
+               end if
+
+               if (report) write(*,3) 'iter liter Z_new, Z, low_bnd, upr_bnc, Q/dQdZ, Q, dQdZ, corr', iter, line_iter, &
                   Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val, correction%val
                Z_new%d1val1 = 1d0            
 
