@@ -412,58 +412,31 @@
       subroutine set_weak_lowT_rate(ir, ierr)
          use chem_def
          use utils_lib, only: integer_dict_define
-         use reaclib_eval, only: do_reaclib_indices_for_reaction
-         use ratelib, only: reaclib_rate_and_dlnT
          use load_weak, only: do_get_weak_rate_id
 
          integer, intent(in) :: ir
          integer, intent(out) :: ierr
-         integer :: i, lo, hi, weak_reaclib_id_i
-         real(dp) :: half_life, lambda, dlambda_dlnT, rlambda, drlambda_dlnT
+         integer :: i, lo, hi
+         real(dp) :: half_life
          
          include 'formats'
          
-         weak_reaclib_id_i = 0
-         
          if (weak_reaction_info(1,ir) == 0 .or. weak_reaction_info(2,ir) == 0) return
 
-         call do_reaclib_indices_for_reaction( &
-            reaction_Name(ir), reaclib_rates, lo, hi, ierr)
-         if (ierr /= 0) then ! not in reaclib
-            ierr = 0
-            i = do_get_weak_info_list_id( &
-               chem_isos% name(weak_reaction_info(1,ir)), &
-               chem_isos% name(weak_reaction_info(2,ir)))
-            if (i > 0) then 
-               half_life = weak_info_list_halflife(i)
-               if (half_life > 0d0) then
-                  weak_lowT_rate(ir) = ln2/half_life
-                  return
-               end if
+         ierr = 0
+         i = do_get_weak_info_list_id( &
+            chem_isos% name(weak_reaction_info(1,ir)), &
+            chem_isos% name(weak_reaction_info(2,ir)))
+         if (i > 0) then 
+            half_life = weak_info_list_halflife(i)
+            if (half_life > 0d0) then
+               weak_lowT_rate(ir) = ln2/half_life
+               return
             end if
+         else
             weak_lowT_rate(ir) = -1d-99
             return
          end if
-
-         ! evaluate rates at T= 10^7 K (i.e. T9 = 0.01)
-         call reaclib_rate_and_dlnT( &
-            lo, hi, reaction_Name(ir), 0.01_dp, &
-            lambda, dlambda_dlnT, rlambda, drlambda_dlnT, ierr)
-         if (ierr /= 0) then
-            write(*,2) 'set_reaction_info failed in reaclib_rate_and_dlnT ' // &
-               trim(reaction_Name(ir)), ir
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         if (lo <= reaclib_rates% num_from_weaklib) then
-            if (.not. reaclib_rates% also_in_reaclib(lo)) lambda = -1
-         end if
-         weak_lowT_rate(ir) = lambda
-
-         weak_reaclib_id_i = do_get_weak_rate_id( &
-            chem_isos% name(weak_reaction_info(1,ir)), &
-            chem_isos% name(weak_reaction_info(2,ir)))
-         if (weak_reaclib_id_i == 0) return
-         weak_reaclib_id(weak_reaclib_id_i) = ir
              
       end subroutine set_weak_lowT_rate
       
