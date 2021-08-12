@@ -144,4 +144,9 @@ Nuclear reaction rates (``rates``)
 The ``rates`` module collects thermonuclear reaction rates and weak
 reaction rates from a range of sources.
 
+.. toctree::
+   :maxdepth: 1
+
+   rates/overview
+
 
