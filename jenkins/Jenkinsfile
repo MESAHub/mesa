@@ -45,19 +45,32 @@ node('linux && docker && mesa') {
       }
     }
 
-    def tests = ["binary", "astero"]
+    def nstages = 10
     def testStages = [:]
-    for (int i = 0; i < tests.size(); i++) {
-      def test = tests[i]
+    for (int i = 1; i <= nstages; i++) {
+      def test = "Stage ${i}"
       testStages[test] = { ->
-        stage(test) {
-          timeout(time: 2, unit: 'HOURS') {
-            catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-              image.inside("-v ${dir}:${dir}:rw") {
-                sh '''#!/bin/bash -ex
-                  source $MESASDK_ROOT/bin/mesasdk_init.sh
-                  mesa_test test --module=$STAGE_NAME
-                '''
+        withEnv(["STAGE=${i}", "NSTAGES=${nstages}"]) {
+          stage(test) {
+            timeout(time: 2, unit: 'HOURS') {
+              catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                image.inside("-v ${dir}:${dir}:rw") {
+                  sh '''#!/bin/bash -ex
+                    source $MESASDK_ROOT/bin/mesasdk_init.sh
+
+                    # count total number of tests
+                    NS=$(cd "$MESA_DIR/star/test_suite" && ./count_tests)
+                    NB=$(cd "$MESA_DIR/astero/test_suite" && ./count_tests)
+                    NA=$(cd "$MESA_DIR/binary/test_suite" && ./count_tests)
+                    NTESTS=$((NS+NB+NA))
+
+                    # trigger one stage of tests
+                    for ((i=STAGE; i<=NTESTS; i+=NSTAGES))
+                    do
+                        mesa_test test $i
+                    done
+                  '''
+                }
               }
             }
           }
