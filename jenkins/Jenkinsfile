@@ -50,7 +50,7 @@ node('linux && docker && mesa') {
     for (int i = 1; i <= nstages; i++) {
       def test = "Stage ${i}"
       testStages[test] = { ->
-        withEnv(["STAGE=${i}", "NSTAGES=${nstages}"]) {
+        withEnv(["NSTAGES=${nstages}"]) {
           stage(test) {
             timeout(time: 2, unit: 'HOURS') {
               catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
@@ -63,6 +63,9 @@ node('linux && docker && mesa') {
                     NB=$(cd "$MESA_DIR/astero/test_suite" && ./count_tests)
                     NA=$(cd "$MESA_DIR/binary/test_suite" && ./count_tests)
                     NTESTS=$((NS+NB+NA))
+
+                    # hack to get starting stage
+                    STAGE=$(echo $STAGE_NAME | grep -Eo "[0-9]+")
 
                     # trigger one stage of tests
                     for ((i=STAGE; i<=NTESTS; i+=NSTAGES))
