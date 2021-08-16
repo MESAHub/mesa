@@ -52,7 +52,7 @@ node('linux && docker && mesa') {
       testStages[test] = { ->
         withEnv(["NSTAGES=${nstages}"]) {
           stage(test) {
-            timeout(time: 2, unit: 'HOURS') {
+            timeout(time: 24, unit: 'HOURS') {
               catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                 image.inside("-v ${dir}:${dir}:rw") {
                   sh '''#!/bin/bash -ex
