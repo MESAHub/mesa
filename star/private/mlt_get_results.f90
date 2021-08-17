@@ -574,7 +574,7 @@
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Qc, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
-         type(auto_diff_real_tdc) :: Q_start, Y_start
+         type(auto_diff_real_tdc) :: Q_start, Y_start, prev_dQdZ
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter, line_iter
          logical :: converged, Y_is_positive, first_Q_is_positive
