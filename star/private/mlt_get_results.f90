@@ -572,9 +572,9 @@
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
          integer, intent(out) :: ierr
          
-         type(auto_diff_real_star_order1) :: A0, c0, L0, Y_guess_2
+         type(auto_diff_real_star_order1) :: A0, c0, L0
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Qc, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
-         type(auto_diff_real_tdc) :: Q_start, Y_start, prev_dQdZ
+         type(auto_diff_real_tdc) :: Q_start, Y_start
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter, line_iter
          logical :: converged, Y_is_positive, first_Q_is_positive
@@ -709,7 +709,6 @@
                   call compute_Q(s, k, mixing_length_alpha, &
                   Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
 
-
                   if (abs(Qc) < abs(Q)) then
                      exit
                   else
@@ -732,7 +731,6 @@
                if (report) write(*,3) 'iter liter Z_new, Z, low_bnd, upr_bnc, Q/dQdZ, Q, dQdZ, corr', iter, line_iter, &
                   Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val, correction%val
                Z_new%d1val1 = 1d0            
-
                Z = Z_new
 
                if (Y_is_positive) then
