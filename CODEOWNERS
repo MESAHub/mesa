@@ -55,7 +55,6 @@ star/test_suite/7M_prems_to_AGB @annethoul
 star/test_suite/accreted_material_j
 star/test_suite/adjust_net @rjfarmer
 star/test_suite/c13_pocket @jschwab @fxt
-star/test_suite/carbon_acc @jschwab
 star/test_suite/carbon_kh @jschwab @evbauer
 star/test_suite/cburn_inward @rjfarmer
 star/test_suite/ccsn_IIp @rjfarmer @fxt
