@@ -558,6 +558,16 @@
       
 !------------------------------ Time-dependent convection (TDC)
 
+      type(auto_diff_real_tdc) function set_Y(Y_is_positive, Z) result(Y)
+         logical, intent(in) :: Y_is_positive
+         type(auto_diff_real_tdc), intent(in) :: Z
+         if (Y_is_positive) then
+            Y = exp(Z)
+         else
+            Y = -exp(Z)
+         end if
+      end function set_Y
+
       
       subroutine get_TDC_solution(s, k, &
             mixing_length_alpha, cgrav, m, Y_guess, report, &
@@ -573,11 +583,12 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
-         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Qc, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
-         type(auto_diff_real_tdc) :: Q_start, Y_start, prev_dQdZ
+         type(auto_diff_real_tdc) :: Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
+         type(auto_diff_real_tdc) :: Q_start, Y_start, dQdZ, prev_dQdZ
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter, line_iter, i
          logical :: converged, Y_is_positive, first_Q_is_positive
+         real(dp), parameter :: bracket_tolerance = 1d0
          real(dp), parameter :: tolerance = 1d-8
          real(dp), parameter :: alpha_c  = (1d0/2d0)*sqrt_2_div_3
          integer, parameter :: max_iter = 200
@@ -641,22 +652,67 @@
             Y_start = Y
             dQdz = 0d0
 
-            ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
+            ! We start by bisecting to find a narrow interval around the root.
             lower_bound_Z = -100d0
             upper_bound_Z = 50d0 
-            
-            if (report) write(*,2) 'initial Z', 0, Z%val
+
+            Y = set_Y(Y_is_positive, lower_bound_Z)
+            call compute_Q(s, k, mixing_length_alpha, &
+               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_lb, Af)
+
+            Y = set_Y(Y_is_positive, upper_bound_Z)
+            call compute_Q(s, k, mixing_length_alpha, &
+               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
+
+            if (Q_lb * Q_ub > 0d0) then
+               write(*,*) 'Error. Initial Z window does not bracket a solution.'
+               ierr = -1
+               return
+            end if
+
             do iter = 1, max_iter
+               Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
+               Y = set_Y(Y_is_positive, Z_new)
+
                call compute_Q(s, k, mixing_length_alpha, &
                   Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
                if (is_bad(Q%val)) exit
+
+               if (Q > 0d0 .and. Q_ub > 0d0) then
+                  upper_bound_Z = Z_new
+               else if (Q > 0d0 .and. Q_lb > 0d0) then
+                  lower_bound_Z = Z_new
+               else if (Q < 0d0 .and. Q_ub < 0d0) then
+                  upper_bound_Z = Z_new
+               else if (Q < 0d0 .and. Q_lb < 0d0) then
+                  lower_bound_Z = Z_new
+               end if
+
+               if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
+                  exit
+               end if
+            end do
+
+            Z = (upper_bound_Z + lower_bound_Z) / 2d0
+            Z%d1val1 = 1d0
+            if (report) write(*,2) 'initial Z from bracket search', 0, Z%val
+
+            ! Now we refine the solution with a Newton solve.
+            ! This also let's us pick up the derivative of the solution with respect
+            ! to input parameters.
+            do iter = 1, max_iter
+               Y = set_Y(Y_is_positive, Z)
+               call compute_Q(s, k, mixing_length_alpha, &
+                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+
                if (abs(Q%val)/scale <= tolerance) then
                   if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
                   converged = .true.
                   exit
                end if
 
-               if (gradL > 0d0 .and. Y_is_positive) then ! Take advantage of monotonicity when we can...
+               if (gradL > 0d0 .and. Y_is_positive) then
+                  ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
                   if (Q > 0d0) then
                      ! Q(Y) is monotonic so this means Z is a lower-bound.
                      lower_bound_Z = Z
@@ -715,23 +771,6 @@
                      correction = 0.5d0 * correction
                   end if
                end do
-
-               if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
-                  Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
-
-               if (dQdZ * prev_dQdZ < 0d0) then
-                  ! Means we passed a stationary point.
-                  ! This can only happen when Y < 0.
-
-                  ! To get around this we reset at a new guess.
-                  ! We aim for the adiabatic side of the stationary point
-                  ! based on some vague intuition.
-
-                  upper_bound_Z = Z_new
-                  Z_new = -10d0
-                  dQdZ = 0d0
-                  prev_dQdZ = 0d0
-               end if
 
                if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
                   Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
