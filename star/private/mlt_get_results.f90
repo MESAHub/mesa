@@ -576,7 +576,7 @@
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Qc, Z_new, dQdZ, correction, lower_bound_Z, upper_bound_Z
          type(auto_diff_real_tdc) :: Q_start, Y_start, prev_dQdZ
          real(dp) ::  gradT, Lr, Lc, scale
-         integer :: iter, line_iter
+         integer :: iter, line_iter, i
          logical :: converged, Y_is_positive, first_Q_is_positive
          real(dp), parameter :: tolerance = 1d-8
          real(dp), parameter :: alpha_c  = (1d0/2d0)*sqrt_2_div_3
@@ -716,6 +716,9 @@
                   end if
                end do
 
+               if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
+                  Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
+
                if (dQdZ * prev_dQdZ < 0d0) then
                   ! Means we passed a stationary point.
                   ! This can only happen when Y < 0.
@@ -723,13 +726,15 @@
                   ! To get around this we reset at a new guess.
                   ! We aim for the adiabatic side of the stationary point
                   ! based on some vague intuition.
+
+                  upper_bound_Z = Z_new
                   Z_new = -10d0
                   dQdZ = 0d0
                   prev_dQdZ = 0d0
                end if
 
-               if (report) write(*,3) 'iter liter Z_new, Z, low_bnd, upr_bnc, Q/dQdZ, Q, dQdZ, corr', iter, line_iter, &
-                  Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val/dQdZ%val, Q%val, dQdZ%val, correction%val
+               if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
+                  Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
                Z_new%d1val1 = 1d0            
                Z = Z_new
 
