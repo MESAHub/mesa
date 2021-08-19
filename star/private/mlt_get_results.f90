@@ -632,159 +632,157 @@
          Y = 0d0
          call compute_Q(s, k, mixing_length_alpha, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
-         if (abs(Q / scale) < tolerance) then
-            converged = .true.
+         if (Q > 0d0) then
+            Y_is_positive = .true.
+            Y = convert(abs(Y_guess))
          else
-            if (Q > 0d0) then
-               Y_is_positive = .true.
-               Y = convert(abs(Y_guess))
-            else
-               Y_is_positive = .false.
-               Y = convert(-abs(Y_guess))
+            Y_is_positive = .false.
+            Y = convert(-abs(Y_guess))
+         end if
+
+         ! Newton's method to find solution Y
+         Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
+         Z = log(abs(Y))
+
+         ! Save starting values
+         Q_start = Q
+         Y_start = Y
+         dQdz = 0d0
+
+         ! We start by bisecting to find a narrow interval around the root.
+         lower_bound_Z = -100d0
+         upper_bound_Z = 50d0 
+
+         Y = set_Y(Y_is_positive, lower_bound_Z)
+         call compute_Q(s, k, mixing_length_alpha, &
+            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_lb, Af)
+
+         Y = set_Y(Y_is_positive, upper_bound_Z)
+         call compute_Q(s, k, mixing_length_alpha, &
+            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
+
+         if (Q_lb * Q_ub > 0d0) then
+            write(*,*) 'Error. Initial Z window does not bracket a solution.'
+            ierr = -1
+            return
+         end if
+
+         do iter = 1, max_iter
+            Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
+            Y = set_Y(Y_is_positive, Z_new)
+
+            call compute_Q(s, k, mixing_length_alpha, &
+               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+            if (is_bad(Q%val)) exit
+
+            if (Q > 0d0 .and. Q_ub > 0d0) then
+               upper_bound_Z = Z_new
+            else if (Q > 0d0 .and. Q_lb > 0d0) then
+               lower_bound_Z = Z_new
+            else if (Q < 0d0 .and. Q_ub < 0d0) then
+               upper_bound_Z = Z_new
+            else if (Q < 0d0 .and. Q_lb < 0d0) then
+               lower_bound_Z = Z_new
             end if
 
-            ! Newton's method to find solution Y
-            Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
-            Z = log(abs(Y))
+            if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
+               exit
+            end if
+         end do
 
-            ! Save starting values
-            Q_start = Q
-            Y_start = Y
-            dQdz = 0d0
+!         write(*,*) k, Q%val, upper_bound_Z%val, lower_bound_Z%val
 
-            ! We start by bisecting to find a narrow interval around the root.
-            lower_bound_Z = -100d0
-            upper_bound_Z = 50d0 
+         Z = (upper_bound_Z + lower_bound_Z) / 2d0
+         Z%d1val1 = 1d0
+         if (report) write(*,2) 'initial Z from bracket search', 0, Z%val
 
-            Y = set_Y(Y_is_positive, lower_bound_Z)
+         ! Now we refine the solution with a Newton solve.
+         ! This also let's us pick up the derivative of the solution with respect
+         ! to input parameters.
+         do iter = 1, max_iter
+            Y = set_Y(Y_is_positive, Z)
             call compute_Q(s, k, mixing_length_alpha, &
-               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_lb, Af)
+               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
 
-            Y = set_Y(Y_is_positive, upper_bound_Z)
-            call compute_Q(s, k, mixing_length_alpha, &
-               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
-
-            if (Q_lb * Q_ub > 0d0) then
-               write(*,*) 'Error. Initial Z window does not bracket a solution.'
-               ierr = -1
-               return
+            if (abs(Q%val)/scale <= tolerance) then
+               if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
+               converged = .true.
+               exit
             end if
 
-            do iter = 1, max_iter
-               Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
-               Y = set_Y(Y_is_positive, Z_new)
-
-               call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
-               if (is_bad(Q%val)) exit
-
-               if (Q > 0d0 .and. Q_ub > 0d0) then
-                  upper_bound_Z = Z_new
-               else if (Q > 0d0 .and. Q_lb > 0d0) then
-                  lower_bound_Z = Z_new
-               else if (Q < 0d0 .and. Q_ub < 0d0) then
-                  upper_bound_Z = Z_new
-               else if (Q < 0d0 .and. Q_lb < 0d0) then
-                  lower_bound_Z = Z_new
+            if (gradL > 0d0 .and. Y_is_positive) then
+               ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
+               if (Q > 0d0) then
+                  ! Q(Y) is monotonic so this means Z is a lower-bound.
+                  lower_bound_Z = Z
+               else
+                  ! Q(Y) is monotonic so this means Z is an upper-bound.
+                  upper_bound_Z = Z
                end if
+            end if
 
-               if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
-                  exit
-               end if
-            end do
+            prev_dQdZ = dQdZ
+            dQdZ = differentiate_1(Q)
 
-            Z = (upper_bound_Z + lower_bound_Z) / 2d0
-            Z%d1val1 = 1d0
-            if (report) write(*,2) 'initial Z from bracket search', 0, Z%val
+            if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
+               if (report) write(*,2) 'dQdZ', iter, dQdZ%val
+               exit
+            end if
 
-            ! Now we refine the solution with a Newton solve.
-            ! This also let's us pick up the derivative of the solution with respect
-            ! to input parameters.
-            do iter = 1, max_iter
-               Y = set_Y(Y_is_positive, Z)
-               call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+            correction = -Q/dQdz
 
-               if (abs(Q%val)/scale <= tolerance) then
-                  if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
+            ! Clip steps.
+            correction = max(correction, -2d0)
+            correction = min(correction, 2d0)
+
+            ! Do a line search to avoid steps that are too big.
+            do line_iter=1,max_line_search_iter
+
+               if (abs(correction) < 1d-13) then
+                  ! Can't get much more precision than this.
                   converged = .true.
                   exit
                end if
 
-               if (gradL > 0d0 .and. Y_is_positive) then
-                  ! We use the fact that Q(Y) is monotonic for Y > 0 to produce iteratively refined bounds on Q.
-                  if (Q > 0d0) then
-                     ! Q(Y) is monotonic so this means Z is a lower-bound.
-                     lower_bound_Z = Z
-                  else
-                     ! Q(Y) is monotonic so this means Z is an upper-bound.
-                     upper_bound_Z = Z
-                  end if
+               Z_new = Z + correction
+
+               ! If the correction pushes the solution out of bounds then we know
+               ! that was a bad step. Bad steps are still in the same direction, they just
+               ! go too far, so we replace that result with one that's halfway to the relevant bound.
+               if (Z_new > upper_bound_Z) then
+                  Z_new = (Z + upper_bound_Z) / 2d0
+               else if (Z_new < lower_bound_Z) then
+                  Z_new = (Z + lower_bound_Z) / 2d0
                end if
-
-               prev_dQdZ = dQdZ
-               dQdZ = differentiate_1(Q)
-
-               if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
-                  if (report) write(*,2) 'dQdZ', iter, dQdZ%val
-                  exit
-               end if
-
-               correction = -Q/dQdz
-
-               ! Clip steps.
-               correction = max(correction, -2d0)
-               correction = min(correction, 2d0)
-
-               ! Do a line search to avoid steps that are too big.
-               do line_iter=1,max_line_search_iter
-
-                  if (abs(correction) < 1d-13) then
-                     ! Can't get much more precision than this.
-                     converged = .true.
-                     exit
-                  end if
-
-                  Z_new = Z + correction
-
-                  ! If the correction pushes the solution out of bounds then we know
-                  ! that was a bad step. Bad steps are still in the same direction, they just
-                  ! go too far, so we replace that result with one that's halfway to the relevant bound.
-                  if (Z_new > upper_bound_Z) then
-                     Z_new = (Z + upper_bound_Z) / 2d0
-                  else if (Z_new < lower_bound_Z) then
-                     Z_new = (Z + lower_bound_Z) / 2d0
-                  end if
-
-                  if (Y_is_positive) then
-                     Y = exp(Z_new)
-                  else
-                     Y = -exp(Z_new)
-                  end if
-
-                  call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
-
-                  if (abs(Qc) < abs(Q)) then
-                     exit
-                  else
-                     correction = 0.5d0 * correction
-                  end if
-               end do
-
-               if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
-                  Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
-               Z_new%d1val1 = 1d0            
-               Z = Z_new
 
                if (Y_is_positive) then
-                  Y = exp(Z)
+                  Y = exp(Z_new)
                else
-                  Y = -exp(Z)
+                  Y = -exp(Z_new)
                end if
 
+               call compute_Q(s, k, mixing_length_alpha, &
+               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
+
+               if (abs(Qc) < abs(Q)) then
+                  exit
+               else
+                  correction = 0.5d0 * correction
+               end if
             end do
-         end if
+
+            if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
+               Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
+            Z_new%d1val1 = 1d0            
+            Z = Z_new
+
+            if (Y_is_positive) then
+               Y = exp(Z)
+            else
+               Y = -exp(Z)
+            end if
+
+         end do
 
          if (.not. converged) then
             ierr = 1
