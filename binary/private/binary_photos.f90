@@ -139,6 +139,8 @@
                b% CE_m(:), b% CE_entropy(:), b% CE_U_in(:), b% CE_U_out(:), b% CE_Omega_in(:), b% CE_Omega_out(:)
          end if
 
+         call b% other_binary_photo_write(binary_id, iounit)
+
          if (ierr /= 0) stop "error in binary_photo_write"
 
       end subroutine binary_photo_write
@@ -243,6 +245,8 @@
             read(iounit, iostat=ierr) &
                b% CE_m(:), b% CE_entropy(:), b% CE_U_in(:), b% CE_U_out(:), b% CE_Omega_in(:), b% CE_Omega_out(:)
          end if
+
+         call b% other_binary_photo_read(binary_id, iounit, ierr)
 
          if (ierr /= 0) stop "error in binary_photo_read"
       end subroutine binary_photo_read
