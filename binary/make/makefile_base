@@ -44,7 +44,9 @@ SRCS = \
    mod_other_binary_edot.f90 \
    mod_other_binary_ce.f90 \
    mod_other_implicit_rlo.f90 \
-   mod_other_binary_extras.f90
+   mod_other_binary_extras.f90 \
+   mod_other_binary_photo_read.f90 \
+   mod_other_binary_photo_write.f90
 
 #################################################################
 #
