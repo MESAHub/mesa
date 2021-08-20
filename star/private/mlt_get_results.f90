@@ -591,7 +591,7 @@
          real(dp), parameter :: bracket_tolerance = 1d0
          real(dp), parameter :: correction_tolerance = 1d-13
          real(dp), parameter :: residual_tolerance = 1d-8
-         real(dp), parameter :: alpha_c  = (1d0/2d0)*sqrt_2_div_3
+         real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
          integer, parameter :: max_iter = 200
          integer, parameter :: max_line_search_iter = 5
          include 'formats'
@@ -669,7 +669,11 @@
                write(*,2) 'L0', k, L0%val
                write(*,2) 'grada', k, grada%val
                write(*,2) 'gradL', k, gradL%val
-               write(*,*) 'k',k
+
+               call compute_Q(s, k, mixing_length_alpha, &
+                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+               write(*,2) 'Q(Y=0)', k, Q%val
+
                write(*,*)
             ierr = 1
             return
