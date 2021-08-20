@@ -651,7 +651,7 @@
 
          ! We start by bisecting to find a narrow interval around the root.
          lower_bound_Z = -100d0
-         upper_bound_Z = 50d0 
+         upper_bound_Z = 100d0 
 
          Y = set_Y(Y_is_positive, lower_bound_Z)
          call compute_Q(s, k, mixing_length_alpha, &
@@ -662,10 +662,31 @@
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
 
          if (Q_lb * Q_ub > 0d0) then
-            write(*,*) 'Error. Initial Z window does not bracket a solution.'
-            write(*,*) 'Q(Lower Z)',Q_lb%val
-            write(*,*) 'Q(Upper Z)',Q_ub%val
-            ierr = -1
+               write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
+               write(*,*) 'Q(Lower Z)',Q_lb%val
+               write(*,*) 'Q(Upper Z)',Q_ub%val
+               write(*,*) 'Q_start', Q_start%val
+               write(*,*) 'Y_start', Y_start%val
+               write(*,2) 'Q', k, Q%val
+               write(*,2) 'scale', k, scale
+               write(*,2) 'Q/scale', k, Q%val/scale
+               write(*,2) 'tolerance', k, tolerance
+               write(*,2) 'dQdZ', k, dQdZ%val
+               write(*,2) 'Y', k, Y%val
+               write(*,2) 'dYdZ', k, Y%d1val1
+               write(*,2) 'exp(Z)', k, exp(Z%val)
+               write(*,2) 'Z', k, Z%val
+               write(*,2) 'Af', k, Af%val
+               write(*,2) 'dAfdZ', k, Af%d1val1
+               write(*,2) 'A0', k, A0%val
+               write(*,2) 'c0', k, c0%val
+               write(*,2) 'L', k, L%val
+               write(*,2) 'L0', k, L0%val
+               write(*,2) 'grada', k, grada%val
+               write(*,2) 'gradL', k, gradL%val
+               write(*,*) 'k',k
+               write(*,*)
+            ierr = 1
             return
          end if
 
