@@ -663,6 +663,8 @@
 
          if (Q_lb * Q_ub > 0d0) then
             write(*,*) 'Error. Initial Z window does not bracket a solution.'
+            write(*,*) 'Q(Lower Z)',Q_lb%val
+            write(*,*) 'Q(Upper Z)',Q_ub%val
             ierr = -1
             return
          end if
@@ -689,8 +691,6 @@
                exit
             end if
          end do
-
-!         write(*,*) k, Q%val, upper_bound_Z%val, lower_bound_Z%val
 
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Z%d1val1 = 1d0
@@ -755,11 +755,7 @@
                   Z_new = (Z + lower_bound_Z) / 2d0
                end if
 
-               if (Y_is_positive) then
-                  Y = exp(Z_new)
-               else
-                  Y = -exp(Z_new)
-               end if
+               Y = set_Y(Y_is_positive,Z_new)
 
                call compute_Q(s, k, mixing_length_alpha, &
                Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
