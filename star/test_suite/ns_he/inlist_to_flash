@@ -36,8 +36,6 @@
 / ! end of star_job namelist
 
 &eos
-   logRho1_PC_limit = 3.1d0 ! 2.999d0 ! keep < logRho2_OPAL_SCVH_limit (3.48)
-   logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
 / ! end of eos namelist
 
 &kap
@@ -52,9 +50,9 @@
       
       power_nuc_burn_upper_limit = 1d6
 
-      use_gold2_tolerances = .false.
-      use_gold_tolerances = .false.
-      convergence_ignore_equL_residuals = .true.
+      use_gold2_tolerances = .true.
+      use_gold_tolerances = .true.
+      convergence_ignore_equL_residuals = .false.
 
       max_number_retries = 250
       max_model_number = 2000
@@ -91,9 +89,8 @@
       mixing_length_alpha = 1.5
       MLT_option = 'TDC'
 
-      use_Ledoux_criterion = .false.  
-      alpha_semiconvection = 0.1
-      thermohaline_coeff = 2
+      use_Ledoux_criterion = .true.  
+      thermohaline_coeff = 100
       thermohaline_option = 'Kippenhahn'
    
       merge_if_dlnR_too_small = .true.
