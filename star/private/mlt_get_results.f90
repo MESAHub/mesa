@@ -589,7 +589,8 @@
          integer :: iter, line_iter, i
          logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
          real(dp), parameter :: bracket_tolerance = 1d0
-         real(dp), parameter :: tolerance = 1d-8
+         real(dp), parameter :: correction_tolerance = 1d-13
+         real(dp), parameter :: residual_tolerance = 1d-8
          real(dp), parameter :: alpha_c  = (1d0/2d0)*sqrt_2_div_3
          integer, parameter :: max_iter = 200
          integer, parameter :: max_line_search_iter = 5
@@ -726,7 +727,7 @@
             call compute_Q(s, k, mixing_length_alpha, &
                Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
 
-            if (abs(Q%val)/scale <= tolerance .and. have_derivatives) then
+            if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
                ! Can't exit on the first iteration, otherwise we have no derivative information.
                if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
                converged = .true.
@@ -756,7 +757,12 @@
             corr_has_derivatives = .true.
 
             ! Clip steps.
+            ! Because Z = log|Y|, large steps in Z
+            ! correspond to enormous steps in Y, and
+            ! usually indicate that something went wrong.
             if (abs(correction) > 2d0) then
+               ! If we end up clipping the correction it loses derivative
+               ! information.
                corr_has_derivatives = .false.
             end if
             correction = max(correction, -2d0)
@@ -765,7 +771,7 @@
             ! Do a line search to avoid steps that are too big.
             do line_iter=1,max_line_search_iter
 
-               if (abs(correction) < 1d-13 .and. have_derivatives) then
+               if (abs(correction) < correction_tolerance .and. have_derivatives) then
                   ! Can't get much more precision than this.
                   converged = .true.
                   exit
@@ -817,7 +823,7 @@
                write(*,2) 'Q', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
-               write(*,2) 'tolerance', k, tolerance
+               write(*,2) 'tolerance', k, residual_tolerance
                write(*,2) 'dQdZ', k, dQdZ%val
                write(*,2) 'Y', k, Y%val
                write(*,2) 'dYdZ', k, Y%d1val1
