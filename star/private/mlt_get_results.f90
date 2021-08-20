@@ -661,7 +661,7 @@
                write(*,2) 'Q', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
-               write(*,2) 'tolerance', k, tolerance
+               write(*,2) 'tolerance', k, residual_tolerance
                write(*,2) 'dQdZ', k, dQdZ%val
                write(*,2) 'Y', k, Y%val
                write(*,2) 'dYdZ', k, Y%d1val1
@@ -725,7 +725,7 @@
 
             if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
                ! Can't exit on the first iteration, otherwise we have no derivative information.
-               if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
+               if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
                converged = .true.
                exit
             end if
