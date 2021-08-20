@@ -584,7 +584,7 @@
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
-         type(auto_diff_real_tdc) :: Q_start, Y_start, dQdZ, prev_dQdZ
+         type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter, line_iter, i
          logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
@@ -601,7 +601,7 @@
             stop 'bad call to TDC get_TDC_solution'
          end if         
 
-         ! Set up for solve
+         ! Set up.
          c0 = mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r)
          L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap) ! assumes QHSE for dP/dm
          if (s% okay_to_set_mlt_vc) then
@@ -610,7 +610,7 @@
             A0 = s% mlt_vc(k)/sqrt_2_div_3
          end if
 
-         ! Set scale for judging the solution.
+         ! Set scale for judging the solution to Q(Y)=0.
          ! Q has units of a luminosity, so the scale should be a luminosity.
          if (s% solver_iter == 0) then
             scale = max(abs(s% L(k)), 1d-3*maxval(s% L(1:s% nz)))
@@ -618,6 +618,8 @@
             scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
          end if
 
+         ! Determine the sign of the solution.
+         !
          ! If Q(Y=0) is positive then the luminosity is too great to be carried radiatively, so
          ! we'll necessarily have Y > 0.
          !
@@ -638,15 +640,6 @@
             Y = convert(-abs(Y_guess))
          end if
 
-         ! Newton's method to find solution Y
-         Y%d1val1 = Y%val ! Fill in starting dY/dZ. Using Y = \pm exp(Z) we find dY/dZ = Y.
-         Z = log(abs(Y))
-
-         ! Save starting values
-         Q_start = Q
-         Y_start = Y
-         dQdz = 0d0
-
          ! We start by bisecting to find a narrow interval around the root.
          lower_bound_Z = -100d0
          upper_bound_Z = 100d0 
@@ -659,12 +652,12 @@
          call compute_Q(s, k, mixing_length_alpha, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
 
+         ! Check to make sure that the lower and upper bounds on Z actually bracket
+         ! a solution to Q(Y(Z)) = 0.
          if (Q_lb * Q_ub > 0d0) then
                write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
                write(*,*) 'Q(Lower Z)',Q_lb%val
                write(*,*) 'Q(Upper Z)',Q_ub%val
-               write(*,*) 'Q_start', Q_start%val
-               write(*,*) 'Y_start', Y_start%val
                write(*,2) 'Q', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
@@ -688,6 +681,7 @@
             return
          end if
 
+         ! Perform bisection search.
          do iter = 1, max_iter
             Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
             Y = set_Y(Y_is_positive, Z_new)
@@ -711,9 +705,11 @@
             end if
          end do
 
+         ! Save starting values
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Z%d1val1 = 1d0
-         if (report) write(*,2) 'initial Z from bracket search', 0, Z%val
+         dQdz = 0d0
+         if (report) write(*,2) 'initial Z from bracket search', k, Z%val
 
          ! Now we refine the solution with a Newton solve.
          ! This also let's us pick up the derivative of the solution with respect
@@ -818,8 +814,6 @@
             !$OMP critical (tdc_crit0)
                write(*,5) 'failed get_TDC_solution k slvr_iter model TDC_iter', &
                   k, s% solver_iter, s% model_number, iter
-               write(*,*) 'Q_start', Q_start%val
-               write(*,*) 'Y_start', Y_start%val
                write(*,2) 'Q', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
