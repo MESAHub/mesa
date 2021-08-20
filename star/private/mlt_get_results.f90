@@ -587,7 +587,7 @@
          type(auto_diff_real_tdc) :: Q_start, Y_start, dQdZ, prev_dQdZ
          real(dp) ::  gradT, Lr, Lc, scale
          integer :: iter, line_iter, i
-         logical :: converged, Y_is_positive, first_Q_is_positive
+         logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
          real(dp), parameter :: bracket_tolerance = 1d0
          real(dp), parameter :: tolerance = 1d-8
          real(dp), parameter :: alpha_c  = (1d0/2d0)*sqrt_2_div_3
@@ -617,8 +617,6 @@
             scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
          end if
 
-         ! First, find a guess for Y.
-         !
          ! If Q(Y=0) is positive then the luminosity is too great to be carried radiatively, so
          ! we'll necessarily have Y > 0.
          !
@@ -628,7 +626,6 @@
          ! This isn't just a physics argument: if unconvinced examine the mathematical form of Q and notice that it's
          ! monotonically decreasing in Y, so if Q > 0 when Y=0 the solution to Q=0 has Y > 0. Likewise if Q < 0 when Y=0
          ! the solution to Q=0 has Y < 0.
-         converged = .false.
          Y = 0d0
          call compute_Q(s, k, mixing_length_alpha, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
@@ -720,12 +717,17 @@
          ! Now we refine the solution with a Newton solve.
          ! This also let's us pick up the derivative of the solution with respect
          ! to input parameters.
+         converged = .false.
+         have_derivatives = .false. ! Tracks if we've done at least one un-clipped Newton iteration.
+                                    ! Need to do this before returning to endow Y with partials
+                                    ! with respect to the structure variables.
          do iter = 1, max_iter
             Y = set_Y(Y_is_positive, Z)
             call compute_Q(s, k, mixing_length_alpha, &
                Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
 
-            if (abs(Q%val)/scale <= tolerance) then
+            if (abs(Q%val)/scale <= tolerance .and. have_derivatives) then
+               ! Can't exit on the first iteration, otherwise we have no derivative information.
                if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, tolerance
                converged = .true.
                exit
@@ -751,21 +753,28 @@
             end if
 
             correction = -Q/dQdz
+            corr_has_derivatives = .true.
 
             ! Clip steps.
+            if (abs(correction) > 2d0) then
+               corr_has_derivatives = .false.
+            end if
             correction = max(correction, -2d0)
             correction = min(correction, 2d0)
 
             ! Do a line search to avoid steps that are too big.
             do line_iter=1,max_line_search_iter
 
-               if (abs(correction) < 1d-13) then
+               if (abs(correction) < 1d-13 .and. have_derivatives) then
                   ! Can't get much more precision than this.
                   converged = .true.
                   exit
                end if
 
                Z_new = Z + correction
+               if (corr_has_derivatives) then
+                  have_derivatives = .true.
+               end if
 
                ! If the correction pushes the solution out of bounds then we know
                ! that was a bad step. Bad steps are still in the same direction, they just
