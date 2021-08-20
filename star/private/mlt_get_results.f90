@@ -568,7 +568,41 @@
          end if
       end function set_Y
 
-      
+      subroutine TDC_bracket_search(s, k, mixing_length_alpha, Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
+            c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: mixing_length_alpha
+         logical, intent(in) :: Y_is_positive
+         type(auto_diff_real_star_order1), intent(in) :: &
+            c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada
+         type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
+         type(auto_diff_real_tdc), intent(inout) :: Q_ub, Q_lb
+         type(auto_diff_real_tdc) :: Z_new, Y, Af
+
+         Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
+         Y = set_Y(Y_is_positive, Z_new)
+
+         call compute_Q(s, k, mixing_length_alpha, &
+            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+
+         if (Q > 0d0 .and. Q_ub > 0d0) then
+            upper_bound_Z = Z_new
+            Q_ub = Q
+         else if (Q > 0d0 .and. Q_lb > 0d0) then
+            lower_bound_Z = Z_new
+            Q_lb = Q
+         else if (Q < 0d0 .and. Q_ub < 0d0) then
+            upper_bound_Z = Z_new
+            Q_ub = Q
+         else if (Q < 0d0 .and. Q_lb < 0d0) then
+            lower_bound_Z = Z_new
+            Q_lb = Q
+         end if
+
+      end subroutine TDC_bracket_search
+
+
       subroutine get_TDC_solution(s, k, &
             mixing_length_alpha, cgrav, m, report, &
             mixing_type, L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada, cv, Y_face, ierr)
@@ -676,26 +710,9 @@
 
          ! Perform bisection search.
          do iter = 1, max_iter
-            Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
-            Y = set_Y(Y_is_positive, Z_new)
-
-            call compute_Q(s, k, mixing_length_alpha, &
-               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
-            if (is_bad(Q%val)) exit
-
-            if (Q > 0d0 .and. Q_ub > 0d0) then
-               upper_bound_Z = Z_new
-            else if (Q > 0d0 .and. Q_lb > 0d0) then
-               lower_bound_Z = Z_new
-            else if (Q < 0d0 .and. Q_ub < 0d0) then
-               upper_bound_Z = Z_new
-            else if (Q < 0d0 .and. Q_lb < 0d0) then
-               lower_bound_Z = Z_new
-            end if
-
-            if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
-               exit
-            end if
+            call TDC_bracket_search(s, k, mixing_length_alpha, Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
+                                    c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada)
+            if (upper_bound_Z - lower_bound_Z < bracket_tolerance) exit
          end do
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
@@ -736,61 +753,67 @@
 
             prev_dQdZ = dQdZ
             dQdZ = differentiate_1(Q)
-
             if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
                ierr = 1
                exit
             end if
 
-            correction = -Q/dQdz
-            corr_has_derivatives = .true.
+            if (prev_dQdZ * dQdZ < 0d0) then ! Means we're sitting around a stationary point.
+               call TDC_bracket_search(s, k, mixing_length_alpha, Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
+                                       c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada)
+               Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
+               have_derivatives = .false. ! Bracket search eliminates derivative information.
+            else
+               correction = -Q/dQdz
+               corr_has_derivatives = .true.
 
-            ! Clip steps.
-            ! Because Z = log|Y|, large steps in Z
-            ! correspond to enormous steps in Y, and
-            ! usually indicate that something went wrong.
-            if (abs(correction) > 2d0) then
-               ! If we end up clipping the correction it loses derivative
-               ! information.
-               corr_has_derivatives = .false.
+               ! Clip steps.
+               ! Because Z = log|Y|, large steps in Z
+               ! correspond to enormous steps in Y, and
+               ! usually indicate that something went wrong.
+               if (abs(correction) > 2d0) then
+                  ! If we end up clipping the correction it loses derivative
+                  ! information.
+                  corr_has_derivatives = .false.
+               end if
+               correction = max(correction, -2d0)
+               correction = min(correction, 2d0)
+
+               ! Do a line search to avoid steps that are too big.
+               do line_iter=1,max_line_search_iter
+
+                  if (abs(correction) < correction_tolerance .and. have_derivatives) then
+                     ! Can't get much more precision than this.
+                     converged = .true.
+                     exit
+                  end if
+
+                  Z_new = Z + correction
+                  if (corr_has_derivatives) then
+                     have_derivatives = .true.
+                  end if
+
+                  ! If the correction pushes the solution out of bounds then we know
+                  ! that was a bad step. Bad steps are still in the same direction, they just
+                  ! go too far, so we replace that result with one that's halfway to the relevant bound.
+                  if (Z_new > upper_bound_Z) then
+                     Z_new = (Z + upper_bound_Z) / 2d0
+                  else if (Z_new < lower_bound_Z) then
+                     Z_new = (Z + lower_bound_Z) / 2d0
+                  end if
+
+                  Y = set_Y(Y_is_positive,Z_new)
+
+                  call compute_Q(s, k, mixing_length_alpha, &
+                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
+
+                  if (abs(Qc) < abs(Q)) then
+                     exit
+                  else
+                     correction = 0.5d0 * correction
+                  end if
+               end do
             end if
-            correction = max(correction, -2d0)
-            correction = min(correction, 2d0)
-
-            ! Do a line search to avoid steps that are too big.
-            do line_iter=1,max_line_search_iter
-
-               if (abs(correction) < correction_tolerance .and. have_derivatives) then
-                  ! Can't get much more precision than this.
-                  converged = .true.
-                  exit
-               end if
-
-               Z_new = Z + correction
-               if (corr_has_derivatives) then
-                  have_derivatives = .true.
-               end if
-
-               ! If the correction pushes the solution out of bounds then we know
-               ! that was a bad step. Bad steps are still in the same direction, they just
-               ! go too far, so we replace that result with one that's halfway to the relevant bound.
-               if (Z_new > upper_bound_Z) then
-                  Z_new = (Z + upper_bound_Z) / 2d0
-               else if (Z_new < lower_bound_Z) then
-                  Z_new = (Z + lower_bound_Z) / 2d0
-               end if
-
-               Y = set_Y(Y_is_positive,Z_new)
-
-               call compute_Q(s, k, mixing_length_alpha, &
-               Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
-
-               if (abs(Qc) < abs(Q)) then
-                  exit
-               else
-                  correction = 0.5d0 * correction
-               end if
-            end do
 
             if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
                Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
