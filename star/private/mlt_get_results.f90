@@ -794,7 +794,7 @@
 
             if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
                Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
-            Z_new%d1val1 = 1d0            
+            Z_new%d1val1 = 1d0 ! Ensures that dZ/dZ = 1.
             Z = Z_new
 
             Y = set_Y(Y_is_positive,Z)
