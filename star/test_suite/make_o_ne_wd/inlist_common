@@ -43,7 +43,7 @@
 ! mlt
       mixing_length_alpha = 2
       use_Ledoux_criterion = .true.
-      alpha_semiconvection = 0.01
+      thermohaline_option = 'Kippenhahn'
       thermohaline_coeff = 100
 
 ! mixing
