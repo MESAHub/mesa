@@ -341,14 +341,14 @@
                call set_no_mixing('set_TDC')
             else
                call get_TDC_solution(s, k, &
-                  mixing_length_alpha, cgrav, m, Y_guess, report, &
+                  mixing_length_alpha, cgrav, m, report, &
                   mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, Y_face, ierr)
                if (ierr /= 0) then
                   write(*,2) 'get_TDC_solution failed in set_TDC', k
                   write(*,*) 'Repeating call with reporting on.'
                   call get_TDC_solution(s, k, &
-                     mixing_length_alpha, cgrav, m, Y_guess, .true., &
+                     mixing_length_alpha, cgrav, m, .true., &
                      mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
                      scale_height, gradL, grada, conv_vel, Y_face, ierr)
                   stop 'get_TDC_solution failed in set_TDC'
@@ -570,14 +570,14 @@
 
       
       subroutine get_TDC_solution(s, k, &
-            mixing_length_alpha, cgrav, m, Y_guess, report, &
+            mixing_length_alpha, cgrav, m, report, &
             mixing_type, L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada, cv, Y_face, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, cgrav, m
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(in) :: &
-            L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada, Y_guess
+            L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada
          logical, intent(in) :: report
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
          integer, intent(out) :: ierr
@@ -630,10 +630,8 @@
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
          if (Q > 0d0) then
             Y_is_positive = .true.
-            Y = convert(abs(Y_guess))
          else
             Y_is_positive = .false.
-            Y = convert(-abs(Y_guess))
          end if
 
          ! We start by bisecting to find a narrow interval around the root.
