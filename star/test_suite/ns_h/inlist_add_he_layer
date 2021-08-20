@@ -94,12 +94,11 @@
       MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.  
-      alpha_semiconvection = 0.1
-      thermohaline_coeff = 2
+      thermohaline_coeff = 100
       thermohaline_option = 'Kippenhahn'
    
-!      merge_if_dlnR_too_small = .true.
-!      mesh_min_dlnR = 1d-9
+      merge_if_dlnR_too_small = .true.
+      mesh_min_dlnR = 1d-9
 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
