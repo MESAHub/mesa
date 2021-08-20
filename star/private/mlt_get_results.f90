@@ -635,7 +635,7 @@
          end if
 
          ! We start by bisecting to find a narrow interval around the root.
-         lower_bound_Z = -100d0
+         lower_bound_Z = -200d0
          upper_bound_Z = 100d0 
 
          Y = set_Y(Y_is_positive, lower_bound_Z)
@@ -652,7 +652,7 @@
                write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
                write(*,*) 'Q(Lower Z)',Q_lb%val
                write(*,*) 'Q(Upper Z)',Q_ub%val
-               write(*,2) 'Q', k, Q%val
+               write(*,2) 'Q(Y=0)', k, Q%val
                write(*,2) 'scale', k, scale
                write(*,2) 'Q/scale', k, Q%val/scale
                write(*,2) 'tolerance', k, residual_tolerance
@@ -669,11 +669,6 @@
                write(*,2) 'L0', k, L0%val
                write(*,2) 'grada', k, grada%val
                write(*,2) 'gradL', k, gradL%val
-
-               call compute_Q(s, k, mixing_length_alpha, &
-                  Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
-               write(*,2) 'Q(Y=0)', k, Q%val
-
                write(*,*)
             ierr = 1
             return
