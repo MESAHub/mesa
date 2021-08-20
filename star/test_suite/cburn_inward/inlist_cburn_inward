@@ -126,6 +126,8 @@
 
       x_integer_ctrl(1) = 2 ! Part number ! Set this to 0 to turn of test suite checks
 
+report_solver_progress = .true.
+
 / ! end of controls namelist
 
 
