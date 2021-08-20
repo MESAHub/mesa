@@ -601,7 +601,7 @@
             stop 'bad call to TDC get_TDC_solution'
          end if         
 
-         ! Set up.
+         ! Set up inputs.
          c0 = mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r)
          L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap) ! assumes QHSE for dP/dm
          if (s% okay_to_set_mlt_vc) then
@@ -625,10 +625,6 @@
          !
          ! If Q(Y=0) is negative then the luminosity can be carried by radiation alone, so we'll
          ! necessarily have Y < 0.
-         !
-         ! This isn't just a physics argument: if unconvinced examine the mathematical form of Q and notice that it's
-         ! monotonically decreasing in Y, so if Q > 0 when Y=0 the solution to Q=0 has Y > 0. Likewise if Q < 0 when Y=0
-         ! the solution to Q=0 has Y < 0.
          Y = 0d0
          call compute_Q(s, k, mixing_length_alpha, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
@@ -837,6 +833,7 @@
             return
          end if
 
+         ! Process Y into the various outputs.
          cv = sqrt_2_div_3*unconvert(Af)   
          Y_face = unconvert(Y)
          gradT = Y_face%val + gradL%val
