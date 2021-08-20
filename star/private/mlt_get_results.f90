@@ -772,11 +772,7 @@
             Z_new%d1val1 = 1d0            
             Z = Z_new
 
-            if (Y_is_positive) then
-               Y = exp(Z)
-            else
-               Y = -exp(Z)
-            end if
+            Y = set_Y(Y_is_positive,Z)
 
          end do
 
