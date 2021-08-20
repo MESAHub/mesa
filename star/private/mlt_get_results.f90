@@ -702,16 +702,16 @@
                exit
             end if
          end do
-
-         ! Save starting values
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
-         Z%d1val1 = 1d0
-         dQdz = 0d0
-         if (report) write(*,2) 'initial Z from bracket search', k, Z%val
+         Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
+         if (report) write(*,2) 'Z from bracket search', k, Z%val
 
          ! Now we refine the solution with a Newton solve.
          ! This also let's us pick up the derivative of the solution with respect
          ! to input parameters.
+
+         ! Initialize starting values for TDC Newton iterations.
+         dQdz = 0d0
          converged = .false.
          have_derivatives = .false. ! Tracks if we've done at least one un-clipped Newton iteration.
                                     ! Need to do this before returning to endow Y with partials
@@ -743,7 +743,7 @@
             dQdZ = differentiate_1(Q)
 
             if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
-               if (report) write(*,2) 'dQdZ', iter, dQdZ%val
+               ierr = 1
                exit
             end if
 
