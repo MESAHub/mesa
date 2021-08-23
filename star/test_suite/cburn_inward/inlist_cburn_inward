@@ -98,13 +98,6 @@
       overshoot_f(3) = 0.01
       overshoot_f0(3) = 0.005
 
-      overshoot_scheme(3) = 'exponential'
-      overshoot_zone_type(3) = 'burn_Z'
-      overshoot_zone_loc(3) = 'shell'
-      overshoot_bdy_loc(3) = 'top'
-      overshoot_f(3) = 0.01
-      overshoot_f0(3) = 0.005
-
       hot_wind_scheme = 'Dutch'
       cool_wind_RGB_scheme = 'Dutch'
       cool_wind_AGB_scheme = 'Dutch'
