@@ -204,13 +204,11 @@
          ! call MLT.
          call set_MLT
 
-         ! check if this particular k needs to be done with TDC
+         ! check if this particular k can be done with TDC
          using_TDC = s% using_TDC
          if (.not. s% have_mlt_vc) using_TDC = .false.
          if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
-         if (using_TDC) then
-            using_TDC = .not. check_if_can_fall_back_to_MLT(s, k)
-         end if
+         if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
 
          ! need to make use of gradL instead of grada consistent - at least for TDC
          if (using_TDC) then
@@ -848,32 +846,24 @@
 
       end subroutine compute_Q
 
-      !> Determines if it is safe (physically) to use MLT instead of TDC.
+      !> Determines if it is safe (physically) to use TDC instead of MLT.
       !!
-      !! The TDC velocity solution approaches the MLT solution asymptotically like exp(-Jt),
-      !! so when Jt >> 1 we can fall back to MLT safely.
-      !!
-      !! Likewise in cases where the predicted difference between Af and A0 (i.e. change in convection speed)
-      !! is small we can fall back safely to MLT.
-      !!
-      !! For both tests we need to know Y (the superadiabaticity), because that's what TDC calculates,
-      !! so we use the Y value from MLT as a guess.
+      !! Currently we only know we have to fall back to MLT in cells that get touched
+      !! by adjust_mass, because there the convection speeds at the start of the
+      !! step can be badly out of whack.
       !!
       !! @param s star pointer
       !! @param k face index
-      !! @param fallback False if we need to use TDC, True if we can fall back to MLT.
-      logical function check_if_can_fall_back_to_MLT(s, k) result(fallback)
+      !! @param fallback False if we can use TDC, True if we can fall back to MLT.
+      logical function check_if_must_fall_back_to_MLT(s, k) result(fallback)
          type (star_info), pointer :: s
          integer, intent(in) :: k
 
+         fallback = .false.
          if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
             fallback = .true.
-            return
          end if
-
-         fallback = .false.
-
-      end function check_if_can_fall_back_to_MLT
+      end function check_if_must_fall_back_to_MLT
 
       !! Calculates the coefficients of the TDC velocity equation.
       !! The velocity equation is
