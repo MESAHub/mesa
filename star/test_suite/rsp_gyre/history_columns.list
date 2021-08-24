@@ -56,7 +56,6 @@
       dt_div_min_tau_conv
       min_tau_conv
       log_min_tau_conv
-      using_TDC   
       
       num_solver_iterations ! iterations at this step
 
