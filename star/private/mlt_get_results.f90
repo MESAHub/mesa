@@ -165,6 +165,22 @@ contains
       logical, parameter :: report = .false.
       include 'formats'
 
+      ! Initialize with no mixing
+      mixing_type = no_mixing
+      gradT = gradr
+      Y_face = gradT - gradL
+      conv_vel = 0d0
+      D = 0d0
+      Gamma = 0d0  
+
+      ! Pre-calculate some things. 
+      Pr = crad*pow4(T)/3d0
+      Pg = P - Pr
+      beta = Pg / P
+      gradL = grada + gradL_composition_term ! Ledoux temperature gradient
+      Lambda = mixing_length_alpha*scale_height
+      grav = cgrav*m/pow2(r)   
+
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
             opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
@@ -187,21 +203,7 @@ contains
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if
 
-      ! Pre-calculate some things. 
-      Pr = crad*pow4(T)/3d0
-      Pg = P - Pr
-      beta = Pg / P
-      gradL = grada + gradL_composition_term ! Ledoux temperature gradient
-      Lambda = mixing_length_alpha*scale_height
-      grav = cgrav*m/pow2(r)
 
-      ! Initialize with no mixing
-      mixing_type = no_mixing
-      gradT = gradr
-      Y_face = gradT - gradL
-      conv_vel = 0d0
-      D = 0d0
-      Gamma = 0d0     
 
       ! check if this particular k can be done with TDC
       using_TDC = .false.
