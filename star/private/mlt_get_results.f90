@@ -160,7 +160,7 @@
          type(auto_diff_real_star_order1) :: &
             Pr, Pg, grav, scale_height2, Lambda, gradL, beta
          character (len=256) :: message        
-         logical ::  test_partials, using_TDC, compare_TDC_to_MLT
+         logical ::  test_partials, using_TDC
          logical, parameter :: report = .false.
          include 'formats'
 
@@ -207,7 +207,6 @@
 
          ! need to make use of gradL instead of grada consistent - at least for TDC
          if (using_TDC) then
-            compare_TDC_to_MLT = s% compare_TDC_to_MLT
             if (report) write(*,3) 'call set_TDC', k, s% solver_iter
             call set_TDC
          else if (gradr > gradL) then
