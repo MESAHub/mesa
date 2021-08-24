@@ -3,20 +3,24 @@ properties([
   buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
 ])
 
-node('linux && docker && mesa') {
-  /* use HOME=MESA_DIR=customWorkspace=dir for build */
-  def dir = "${env.JENKINS_HOME}/mesa/${env.BRANCH_NAME}"
-  def image
-  withEnv([
+def labels = 'linux && docker && mesa'
+/* use HOME=MESA_DIR=customWorkspace=dir for build */
+def dir = "${env.JENKINS_HOME}/mesa/${env.BRANCH_NAME}"
+def image
+def vars = [
     /* 4*4=16 isn't quite right as we're limited to 4, but in practice it seems work out */
     "OMP_NUM_THREADS=4",
     "NPROCS=4",
     "HOME=${dir}",
     "MESA_DIR=${dir}",
-  ]) {
-    stage('build') {
-      ws(env.HOME) {
-        timeout(time: 1, unit: 'HOURS') {
+  ]
+def ntests = 0
+
+node(labels) {
+  stage('build') {
+    timeout(time: 1, unit: 'HOURS') {
+      withEnv(vars) {
+	ws(env.HOME) {
           checkout scm
           withCredentials([
               usernamePassword(credentialsId: 'mesa_test', passwordVariable: 'MESA_TEST_PSW', usernameVariable: 'MESA_TEST_USR'),
@@ -40,46 +44,46 @@ node('linux && docker && mesa') {
               mesa_test install --no-checkout
               mesa_test submit --empty
             '''
+	    def nt = sh returnStdout: true, script: '''#!/bin/bash
+	      source $MESASDK_ROOT/bin/mesasdk_init.sh
+	      ntests=0
+	      for f in $MESA_DIR/*/test_suite ; do
+		nt=$(cd $f && ./count_tests)
+		(( ntests+=nt ))
+	      done
+	      echo $ntests
+	    '''
+	    ntests = nt.toInteger()
           }
         }
       }
     }
-
-    def nstages = 10
-    def testStages = [:]
-    for (int i = 1; i <= nstages; i++) {
-      def test = "Stage ${i}"
-      testStages[test] = { ->
-        withEnv(["NSTAGES=${nstages}"]) {
-          stage(test) {
-            timeout(time: 24, unit: 'HOURS') {
-              catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                image.inside("-v ${dir}:${dir}:rw") {
-                  sh '''#!/bin/bash -ex
-                    source $MESASDK_ROOT/bin/mesasdk_init.sh
-
-                    # count total number of tests
-                    NS=$(cd "$MESA_DIR/star/test_suite" && ./count_tests)
-                    NB=$(cd "$MESA_DIR/astero/test_suite" && ./count_tests)
-                    NA=$(cd "$MESA_DIR/binary/test_suite" && ./count_tests)
-                    NTESTS=$((NS+NB+NA))
-
-                    # hack to get starting stage
-                    STAGE=$(echo $STAGE_NAME | grep -Eo "[0-9]+")
-
-                    # trigger one stage of tests
-                    for ((i=STAGE; i<=NTESTS; i+=NSTAGES))
-                    do
-                        mesa_test test $i
-                    done
-                  '''
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    parallel testStages
   }
 }
+
+def testStages = [:]
+for (int i = 1; i <= ntests; i++) {
+  def test = i
+  def name = "test ${test}"
+  testStages[name] = { ->
+    node(labels) {
+      stage(name) {
+	timeout(time: 12, unit: 'HOURS') {
+	  withEnv(vars) {
+	    catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+	      image.inside("-v ${dir}:${dir}:rw") {
+		sh """#!/bin/bash -e
+		  source \$MESASDK_ROOT/bin/mesasdk_init.sh
+
+		  mesa_test test $test
+		"""
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
+
+parallel testStages
