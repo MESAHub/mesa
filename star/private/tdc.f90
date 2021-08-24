@@ -66,7 +66,7 @@ contains
             scale_height, gradL, grada, conv_vel, Y_face, ierr)
          stop 'get_TDC_solution failed in set_TDC'
       end if
-      gradT = Y_face + grada
+      gradT = Y_face + gradL
    end subroutine set_TDC       
 
    !> Determines if it is safe (physically) to use TDC instead of MLT.
