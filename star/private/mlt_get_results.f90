@@ -213,24 +213,7 @@
             using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
                                                                   T, rho, Cp, dV, opacity, scale_height, grada, conv_vel)
          end if
-         ! Run through assuming no TDC.         
-         if (gradr > gradL) then ! convective
-            if (report) write(*,3) 'call set_MLT', k, s% solver_iter
-            call set_MLT
-         else if (gradL_composition_term < 0) then
-            if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-            call set_thermohaline
-         else if (gradr > grada) then
-            if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
-            call set_semiconvection
-         end if         
 
-         if (k > 0) then ! save non-TDC values for debugging
-            s% xtra1_array(k) = safe_log10(abs(gradT%val - grada%val))
-            s% xtra2_array(k) = gradT%val
-            s% xtra3_array(k) = conv_vel%val
-         end if
-         
          ! need to make use of gradL instead of grada consistent - at least for TDC
          if (using_TDC) then
             Y_guess = gradT - gradL
@@ -242,10 +225,29 @@
                if (report) write(*,3) 'call set_TDC', k, s% solver_iter
                call set_TDC
             end if
-         else if (report) then
-            write(*,4) 'not okay_to_use_TDC mxtyp conv_vel', k, s% solver_iter, &
-               mixing_type, conv_vel%val
+         else if (gradr > gradL) then
+            if (report) write(*,3) 'call set_MLT', k, s% solver_iter
+            call set_MLT
          end if
+
+         ! If we're not convecting, try thermohaline and semiconvection.
+         if (mixing_type == no_mixing) then
+            if (gradL_composition_term < 0) then
+               if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
+               call set_thermohaline
+            else if (gradr > grada) then
+               if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
+               call set_semiconvection
+            end if         
+         end if
+
+         if (k > 0) then ! save non-TDC values for debugging
+            s% xtra1_array(k) = safe_log10(abs(gradT%val - grada%val))
+            s% xtra2_array(k) = gradT%val
+            s% xtra3_array(k) = conv_vel%val
+         end if
+         
+
          
          ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
