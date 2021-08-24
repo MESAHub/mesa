@@ -578,7 +578,7 @@
             c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada
          type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
          type(auto_diff_real_tdc), intent(inout) :: Q_ub, Q_lb
-         type(auto_diff_real_tdc) :: Z_new, Y, Af
+         type(auto_diff_real_tdc) :: Z_new, Y, Af, Q
 
          Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
          Y = set_Y(Y_is_positive, Z_new)
