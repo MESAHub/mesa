@@ -199,7 +199,10 @@
          if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
                .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
 
-         call set_MLT
+         call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
+                           chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                           gradr, grada, gradL, k, &
+                           Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
 
          ! check if this particular k can be done with TDC
          using_TDC = .false.
@@ -214,7 +217,10 @@
             call set_TDC
          else if (gradr > gradL) then
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter
-            call set_MLT
+            call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
+                           chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                           gradr, grada, gradL, k, &
+                           Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
          end if
 
          ! If we're not convecting, try thermohaline and semiconvection.
@@ -283,7 +289,37 @@
             gradT = Y_face + grada
          end subroutine set_TDC        
          
-         subroutine set_MLT
+
+        
+         subroutine set_thermohaline
+            real(dp) :: D_thrm
+            call get_D_thermohaline(s, &
+               grada%val, gradr%val, T%val, opacity%val, rho%val, &
+               Cp%val, gradL_composition_term, &
+               iso, XH1, thermohaline_coeff, D_thrm, ierr)
+            D = D_thrm
+            gradT = gradr
+            Y_face = gradT - grada
+            conv_vel = 3d0*D/Lambda
+            mixing_type = thermohaline_mixing 
+         end subroutine set_thermohaline
+
+      end subroutine Get_results
+
+!------------------------------ MLT
+
+         subroutine set_MLT(MLT_option, mixing_length_alpha, report, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
+                           chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                           gradr, grada, gradL, k, &
+                           Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+            type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
+            character(len=*), intent(in) :: MLT_option
+            real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
+            integer, intent(in) :: k
+            logical, intent(in) :: report
+            type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
+            integer, intent(out) :: mixing_type, ierr
+
             real(dp) :: ff1, ff2, ff3, ff4
             type(auto_diff_real_star_order1) :: &
                Q, omega, a0, ff4_omega2_plus_1, A_1, A_2, &
@@ -301,10 +337,10 @@
             else
                select case(trim(MLT_option))
                case ('Henyey')
-                  ff1=1.0d0/s% Henyey_MLT_nu_param
+                  ff1=1.0d0/Henyey_MLT_nu_param
                   ff2=0.5d0 
-                  ff3=8.0d0/s% Henyey_MLT_y_param
-                  ff4=1.0d0/s% Henyey_MLT_y_param
+                  ff3=8.0d0/Henyey_MLT_y_param
+                  ff4=1.0d0/Henyey_MLT_y_param
                case ('ML1')
                   ff1=0.125d0 
                   ff2=0.5d0 
@@ -403,21 +439,6 @@
             end if
 
          end subroutine set_MLT   
-        
-         subroutine set_thermohaline
-            real(dp) :: D_thrm
-            call get_D_thermohaline(s, &
-               grada%val, gradr%val, T%val, opacity%val, rho%val, &
-               Cp%val, gradL_composition_term, &
-               iso, XH1, thermohaline_coeff, D_thrm, ierr)
-            D = D_thrm
-            gradT = gradr
-            Y_face = gradT - grada
-            conv_vel = 3d0*D/Lambda
-            mixing_type = thermohaline_mixing 
-         end subroutine set_thermohaline
-
-      end subroutine Get_results
 
 !------------------------------ Semiconvection
 
