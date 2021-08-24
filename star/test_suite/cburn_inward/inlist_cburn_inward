@@ -117,7 +117,7 @@
       terminal_interval = 1
       write_header_frequency = 10
 
-      x_integer_ctrl(1) = 2 ! Part number ! Set this to 0 to turn of test suite checks
+      x_integer_ctrl(1) = 2 ! Part number ! Set this to 0 to turn off test suite checks
 
 report_solver_progress = .true.
 
