@@ -177,13 +177,12 @@ contains
       end if
 
       ! Bail early if it's trivially radiative
-!      if (A0 == 0 .and. L < L0) then
-!         cv = 0d0
-!         Y_face = unconvert(grada * (L / L0) - gradL)
-!         write(*,*) Y_face
-!         mixing_type = no_mixing
-!         return
-!      end if
+      if (A0 == 0 .and. L < L0) then
+         cv = 0d0
+         Y_face = unconvert(grada * (L / L0) - gradL)
+         mixing_type = no_mixing
+         return
+      end if
 
       ! Set scale for judging the solution to Q(Y)=0.
       ! Q has units of a luminosity, so the scale should be a luminosity.
