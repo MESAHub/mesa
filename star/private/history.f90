@@ -2886,14 +2886,6 @@
                int_val = s% num_retries
                is_int_val = .true.
 
-            case(h_using_TDC)
-               if (s% using_TDC) then
-                  int_val = 1
-               else
-                  int_val = 0
-               end if
-               is_int_val = .true.
-
             case (h_TDC_num_cells)
                int_val = 0
                do k=1,nz

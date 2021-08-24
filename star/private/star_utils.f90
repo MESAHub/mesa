@@ -3874,23 +3874,7 @@
          end do
          if (s% max_conv_time_scale == 0d0) s% max_conv_time_scale = 1d99
          if (s% min_conv_time_scale == 1d99) s% min_conv_time_scale = 0d0
-      end subroutine set_conv_time_scales
-      
-      
-      subroutine set_using_TDC(s)
-         type (star_info), pointer :: s      
-         logical :: prev_using_TDC
-         include 'formats'
-         prev_using_TDC = s% using_TDC
-         s% using_TDC = .false.
-         if (s% MLT_option == 'TDC') then
-            s% using_TDC = .true.
-         end if
-         if ((.not. prev_using_TDC) .and. s% using_TDC) then
-            write(*,*)
-            write(*,2) 'turn on TDC at model number', s% model_number
-         end if
-      end subroutine set_using_TDC
+      end subroutine set_conv_time_scales      
       
       
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)

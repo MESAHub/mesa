@@ -202,7 +202,8 @@
          call set_MLT
 
          ! check if this particular k can be done with TDC
-         using_TDC = s% using_TDC
+         using_TDC = .false.
+         if (s% MLT_option == 'TDC') using_TDC = .true.
          if (.not. s% have_mlt_vc) using_TDC = .false.
          if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
          if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
@@ -227,15 +228,15 @@
             end if         
          end if 
 
-         if (s%m(k) / Msun < 0.5d0) then
-            write(*,*) s%m(k)/Msun, mixing_type, gradr%val, gradL_composition_term
-         end if
-
          ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
          end if
+
+               if (s%m(k)/Msun < 0.5d0 .and. mixing_type == thermohaline_mixing) then
+                  write(*,*) mixing_type, s%m(k)/Msun, D%val, gradL_composition_term
+               end if
 
          ! If we made it all that way and are still not mixing, call set_no_mixing.
          ! This catches places above where we might have thought we'd have mixing but
