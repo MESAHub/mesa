@@ -559,12 +559,11 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: mixing_length_alpha, cgrav, m
-         integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(in) :: &
             L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada
          logical, intent(in) :: report
          type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
-         integer, intent(out) :: ierr
+         integer, intent(out) :: mixing_type, ierr
          
          type(auto_diff_real_star_order1) :: A0, c0, L0
          type(auto_diff_real_tdc) :: Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
