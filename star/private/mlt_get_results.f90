@@ -199,6 +199,8 @@
          if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
                .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
 
+         call set_MLT
+
          ! check if this particular k can be done with TDC
          using_TDC = s% using_TDC
          if (.not. s% have_mlt_vc) using_TDC = .false.
@@ -385,10 +387,7 @@
             
             
             mixing_type = convective_mixing
-            if (k > 0) then
-               s% xtra1_array(k) = conv_vel%val
-               s% xtra2_array(k) = gradT%val
-            end if
+
 
             if (report) then
                write(*,2) 'set_MLT val for Zeta gradr grada gradT Y_face', k, &
@@ -870,7 +869,6 @@
       !!
       !! This function also has some side effects in terms of storing some of the terms
       !! it calculates for plotting purposes.
-      !! TODO: These should be removed or changed from xtra arrays to named arrays.
       !!
       !! @param s star pointer
       !! @param k face index
@@ -922,12 +920,6 @@
          xi0 = S0
          xi1 = -(DR0 + convert(Pt0*dVdt))
          xi2 = -D0
-
-         if (k > 0) then   
-            s% xtra4_array(k) = S0%val
-            s% xtra5_array(k) = D0%val
-            s% xtra6_array(k) = DR0%val
-         end if
       end subroutine eval_xis
       
       !! Calculates the solution to the TDC velocity equation.
@@ -954,7 +946,6 @@
       !!
       !! This function also has some side effects in terms of storing some of the terms
       !! it calculates for plotting purposes.
-      !! TODO: These should be removed or changed from xtra arrays to named arrays.
       !!
       !! @param s star pointer
       !! @param k face index
