@@ -7527,8 +7527,112 @@
 
     min_magnitude_brunt_B = -1d99
 
+
+
+
+
 ! structure equations
 ! ===================
+
+      ! use_dedt_form_of_energy_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! always_use_dedt_form_of_energy_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ::
+
+    use_dedt_form_of_energy_eqn = .false.
+    always_use_dedt_form_of_energy_eqn = .true.
+
+
+      ! no_dedt_form_during_relax
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! dedt_eqn_r_scale
+      ! ~~~~~~~~~~~~~~~~
+      ! ::
+
+    no_dedt_form_during_relax = .true.
+    dedt_eqn_r_scale = 1d8
+
+
+      ! always_use_eps_grav_form_of_energy_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, use the ``eps_grav`` form of the energy equation.
+
+      ! The quantity ``eps_grav`` is defined as
+      ! :math:`\epsilon_{\rm grav} = -\frac{De}{Dt} - P \frac{DV_\rho}{Dt}`,
+      ! where :math:`e` is the specific internal energy, :math:`P` is
+      ! the pressure, :math:`V_\rho \equiv 1/\rho` is the specific
+      ! volume, and :math:`D/Dt` is the Lagrangian time derivative.
+      ! See |MESA IV|, Section 8 for more discussion.
+
+      ! This quantity is then re-written into the convenient to evaluate form
+
+      ! :math:`\epsilon_{\rm grav} = -T c_P \left[(1 - \nabla_{\rm ad} \chi_T)\frac{D\ln T}{Dt} - \nabla_{\rm ad} \chi_\rho \frac{D\ln \rho}{Dt}\right] + \epsilon_{\rm grav, X}`.
+
+      ! The final term reflects the change in internal energy due to changes in composition (at fixed density and temperature) and is referred to in MESA as ``eps_grav_composition_term``.  It is defined as
+
+      ! :math:`\epsilon_{\rm grav, X} \equiv -\sum_i \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T, \{X\ne X_i\}} \frac{DX_i}{Dt}`,
+
+      ! and MESA evaluates this term using the finite difference
+
+      ! :math:`\epsilon_{\rm grav, X} = -\frac{1}{\delta t}\left[e(\rho, T, X) - e(\rho, T, X_{\rm start})\right]`,
+
+      ! where :math:`\delta t` is the timestep and :math:`X_{\rm start}` is the start-of-step mass fractions.
+      ! (Other quantities take their end-of-step values.)
+
+      ! Note: In a phase transition, ``eps_grav`` includes the latent heat.
+
+      ! ::
+
+    always_use_eps_grav_form_of_energy_eqn = .false.
+
+
+      ! include_composition_in_eps_grav
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, evalute ``eps_grav_composition_term`` and include this quantity in ``eps_grav``.
+      ! When this flag is true, the composition derivatives of ``eps_grav`` are also included in the Jacobian.
+
+      ! ::
+
+    include_composition_in_eps_grav = .true.
+
+
+      ! use_time_centered_eps_grav
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, use a time-centered version of ``eps_grav`` and ``eps_grav_composition_term``.
+
+      ! ::
+
+    use_time_centered_eps_grav = .false.
+
+
+      ! Gamma_lnS_eps_grav_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Gamma_lnS_eps_grav_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Automatic switch to lnS form for eps_grav (:math:`\epsilon_{\rm grav} = -T\frac{Ds}{Dt}`) in regions with high Gamma (plasma interaction parameter).
+      ! This is necessary to get the latent heat associated with the crystallization phase transition.
+      ! These controls only apply when using the PC EOS.
+      ! The composition term :math:`-\sum_i (\partial e/\partial Y_i)_{s,\rho} dY_i` is never included, independent of the setting of the control ``include_composition_in_eps_grav``.
+
+      ! ::
+
+    Gamma_lnS_eps_grav_full_on = 150d0
+    Gamma_lnS_eps_grav_full_off = 120d0
+
+
+      ! eps_grav_factor
+      ! ~~~~~~~~~~~~~~~
+
+      ! multiply eps_grav by this factor
+
+      ! ::
+
+    eps_grav_factor = 1d0
 
 
       ! velocity_q_upper_bound
@@ -7577,41 +7681,6 @@
       ! ::
 
     use_gravity_rotation_correction = .true.
-
-
-      ! use_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! always_use_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! ::
-
-    use_dedt_form_of_energy_eqn = .false.
-    always_use_dedt_form_of_energy_eqn = .true.
-
-
-      ! use_time_centered_eps_grav
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! EXPERIMENTAL
-      ! use time-centered version of eps_grav term
-
-      ! ::
-
-    use_time_centered_eps_grav = .false.
-
-
-      ! no_dedt_form_during_relax
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! always_use_eps_grav_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! dedt_eqn_r_scale
-      ! ~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    no_dedt_form_during_relax = .true.
-    always_use_eps_grav_form_of_energy_eqn = .false.
-    dedt_eqn_r_scale = 1d8
 
 
       ! non_nuc_neu_factor
@@ -7669,57 +7738,6 @@
 
     fe56ec_fake_factor = 1d-7
     min_T_for_fe56ec_fake_factor = 3d9
-
-
-   ! eps_grav
-   ! ________
-
-      ! In mesa, "``eps_grav``" means ``-T*dS/dt`` which is equivalent to ``-(dE/dt + P*dV/dt)``
-      ! where S is specific entropy, E is specific internal energy, and ``V = 1/rho``.
-      ! There are several options for how ``eps_grav`` is calculated.
-      ! These alternatives are equivalently from the "ideal" physics viewpoint,
-      ! but they can be very different numerically depending on the situation.
-
-      ! The standard default forms are used if you don't set any of the following flags.
-      ! ::
-
-      !     eps_grav = -T*cp*((1-grada)*chiT*dlnT_dt - grada*chiRho*dlnd_dt)
-
-      ! include_composition_in_eps_grav
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! in forms of eps_grav that do not include a total energy
-      ! derivative one must explicitly include contributions
-      ! associated with changes in composition.
-
-      ! ::
-
-    include_composition_in_eps_grav = .true.
-
-
-      ! Gamma_lnS_eps_grav_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! Gamma_lnS_eps_grav_full_on
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Automatic switch to lnS form for eps_grav in regions with high Gamma (plasma interaction parameter).
-      ! This is necessary to get the latent heat associated with the crystallization phase transition.
-      ! These controls only apply when using the PC EOS
-
-      ! ::
-
-    Gamma_lnS_eps_grav_full_on = 150d0
-    Gamma_lnS_eps_grav_full_off = 120d0
-
-
-      ! eps_grav_factor
-      ! ~~~~~~~~~~~~~~~
-
-      ! multiply eps_grav by this factor
-
-      ! ::
-
-    eps_grav_factor = 1d0
 
 
       ! eps_mdot_factor
