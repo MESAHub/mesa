@@ -202,12 +202,13 @@ contains
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
             opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
             .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
-      
-      ! Set MLT answer
-      call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
-                        chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                        gradr, grada, gradL, k, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+
+      mixing_type = no_mixing
+      gradT = gradr
+      Y_face = gradT - gradL
+      conv_vel = 0d0
+      D = 0d0
+      Gamma = 0d0   
 
       ! check if this particular k can be done with TDC
       using_TDC = .false.
@@ -222,7 +223,7 @@ contains
          call set_TDC(s, k, &
             mixing_length_alpha, cgrav, m, report, &
             mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, Y_face, gradT, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, ierr)
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
          call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
