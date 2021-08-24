@@ -494,7 +494,6 @@ contains
       real(dp), parameter :: x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3
       real(dp), parameter :: x_ALFAP = 2.d0/3.d0
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
-      include 'formats'
 
       S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*grada/Hp)
       S0 = S0*Y
