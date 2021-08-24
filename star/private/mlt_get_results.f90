@@ -233,16 +233,8 @@
                if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
                call set_semiconvection
             end if         
-         end if
-
-         if (k > 0) then ! save non-TDC values for debugging
-            s% xtra1_array(k) = safe_log10(abs(gradT%val - grada%val))
-            s% xtra2_array(k) = gradT%val
-            s% xtra3_array(k) = conv_vel%val
-         end if
-         
-
-         
+         end if 
+                 
          ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
