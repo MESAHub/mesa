@@ -214,7 +214,10 @@
          ! need to make use of gradL instead of grada consistent - at least for TDC
          if (using_TDC) then
             if (report) write(*,3) 'call set_TDC', k, s% solver_iter
-            call set_TDC
+            call set_TDC(s, k, &
+               mixing_length_alpha, cgrav, m, report, &
+               mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
+               scale_height, gradL, grada, conv_vel, Y_face, gradT, ierr)
          else if (gradr > gradL) then
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter
             call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
@@ -268,32 +271,6 @@
             D = 0d0
             Gamma = 0d0
          end subroutine set_no_mixing
-
-         subroutine set_TDC
-            include 'formats'
-            if (k == 1) then
-               call set_no_mixing('set_TDC')
-            else
-               call get_TDC_solution(s, k, &
-                  mixing_length_alpha, cgrav, m, report, &
-                  mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, Y_face, ierr)
-               if (ierr /= 0) then
-                  write(*,2) 'get_TDC_solution failed in set_TDC', k
-                  write(*,*) 'Repeating call with reporting on.'
-                  call get_TDC_solution(s, k, &
-                     mixing_length_alpha, cgrav, m, .true., &
-                     mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-                     scale_height, gradL, grada, conv_vel, Y_face, ierr)
-                  stop 'get_TDC_solution failed in set_TDC'
-               end if
-            end if
-            gradT = Y_face + grada
-         end subroutine set_TDC        
-         
-
-        
-
 
       end subroutine Get_results
 
@@ -502,6 +479,35 @@
       end subroutine set_semiconvection
 
 !------------------------------ Time-dependent convection (TDC)
+
+      subroutine set_TDC(s, k, &
+               mixing_length_alpha, cgrav, m, report, &
+               mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
+               scale_height, gradL, grada, conv_vel, Y_face, gradT, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: mixing_length_alpha, cgrav, m
+         type(auto_diff_real_star_order1), intent(in) :: &
+            L, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
+         logical, intent(in) :: report
+         type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT
+         integer, intent(out) :: mixing_type, ierr
+         include 'formats'
+         call get_TDC_solution(s, k, &
+            mixing_length_alpha, cgrav, m, report, &
+            mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, Y_face, ierr)
+         if (ierr /= 0) then
+            write(*,2) 'get_TDC_solution failed in set_TDC', k
+            write(*,*) 'Repeating call with reporting on.'
+            call get_TDC_solution(s, k, &
+               mixing_length_alpha, cgrav, m, .true., &
+               mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
+               scale_height, gradL, grada, conv_vel, Y_face, ierr)
+            stop 'get_TDC_solution failed in set_TDC'
+         end if
+         gradT = Y_face + grada
+      end subroutine set_TDC       
 
       type(auto_diff_real_tdc) function set_Y(Y_is_positive, Z) result(Y)
          logical, intent(in) :: Y_is_positive
