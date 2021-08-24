@@ -157,9 +157,9 @@ contains
          Y_face = gradT - gradL
       end if
       
-      
-      mixing_type = convective_mixing
-
+      if (Y_face > 0d0) then
+         mixing_type = convective_mixing
+      end if
 
       if (report) then
          write(*,2) 'set_MLT val for Zeta gradr grada gradT Y_face', k, &
