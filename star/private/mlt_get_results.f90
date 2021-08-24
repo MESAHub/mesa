@@ -156,12 +156,10 @@ contains
          XH1, cgrav, m, gradL_composition_term, &
          mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
       integer, intent(out) :: mixing_type
-      type(auto_diff_real_star_order1), intent(out) :: &
-         gradT, Y_face, conv_vel, D, Gamma
+      type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       
-      type(auto_diff_real_star_order1) :: &
-         Pr, Pg, grav, scale_height2, Lambda, gradL, beta
+      type(auto_diff_real_star_order1) :: Pr, Pg, grav, scale_height2, Lambda, gradL, beta
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
@@ -201,12 +199,11 @@ contains
       Gamma = 0d0     
 
       ! Bail if we asked for no mixing, or if parameters are bad.
-      if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
-      
-      ! Bail if more parameters are bad
-      if (opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
+      if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
+            opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
             .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
-
+      
+      ! Set MLT answer
       call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, k, &
