@@ -227,7 +227,9 @@
          if (mixing_type == no_mixing) then
             if (gradL_composition_term < 0) then
                if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-               call set_thermohaline
+               call set_thermohaline(s, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+                                 iso, XH1, thermohaline_coeff, &
+                                 D, gradT, Y_face, conv_vel, mixing_type, ierr)
             else if (gradr > grada) then
                if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
                call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
@@ -242,6 +244,10 @@
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
          end if
+
+               if (s%m(k)/Msun < 0.5d0 .and. mixing_type == thermohaline_mixing) then
+                  write(*,*) mixing_type, s%m(k)/Msun, D%val, gradL_composition_term
+               end if
 
          ! If we made it all that way and are still not mixing, call set_no_mixing.
          ! This catches places above where we might have thought we'd have mixing but
@@ -287,18 +293,7 @@
          
 
         
-         subroutine set_thermohaline
-            real(dp) :: D_thrm
-            call get_D_thermohaline(s, &
-               grada%val, gradr%val, T%val, opacity%val, rho%val, &
-               Cp%val, gradL_composition_term, &
-               iso, XH1, thermohaline_coeff, D_thrm, ierr)
-            D = D_thrm
-            gradT = gradr
-            Y_face = gradT - grada
-            conv_vel = 3d0*D/Lambda
-            mixing_type = thermohaline_mixing 
-         end subroutine set_thermohaline
+
 
       end subroutine Get_results
 
@@ -1139,6 +1134,31 @@
 
 
 !------------------------------ Thermohaline 
+
+      subroutine set_thermohaline(s, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+                                 iso, XH1, thermohaline_coeff, &
+                                 D, gradT, Y_face, conv_vel, mixing_type, ierr)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1), intent(in) :: Lambda, grada, gradr, T, opacity, rho, Cp
+         real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff
+         integer, intent(in) :: iso
+
+         type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D
+         integer, intent(out) :: mixing_type, ierr
+
+         real(dp) :: D_thrm
+
+         call get_D_thermohaline(s, &
+            grada%val, gradr%val, T%val, opacity%val, rho%val, &
+            Cp%val, gradL_composition_term, &
+            iso, XH1, thermohaline_coeff, D_thrm, ierr)
+
+         D = D_thrm
+         gradT = gradr
+         Y_face = gradT - grada
+         conv_vel = 3d0*D/Lambda
+         mixing_type = thermohaline_mixing 
+      end subroutine set_thermohaline
 
       !> Computes the diffusivity of thermohaline mixing when the
       !! thermal gradient is stable and the composition gradient is unstable.
