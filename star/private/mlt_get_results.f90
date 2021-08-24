@@ -158,7 +158,7 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: &
-            Pr, Pg, grav, scale_height2, Lambda, gradL, beta, Y_guess
+            Pr, Pg, grav, scale_height2, Lambda, gradL, beta
          character (len=256) :: message        
          logical ::  test_partials, using_TDC, compare_TDC_to_MLT
          logical, parameter :: report = .false.
@@ -209,25 +209,21 @@
          if (.not. s% have_mlt_vc) using_TDC = .false.
          if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
          if (using_TDC) then
-            Y_guess = gradT - gradL
-            using_TDC = .not. check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, Y_guess, &
-                                                                  T, rho, Cp, dV, opacity, scale_height, grada, conv_vel)
+            using_TDC = .not. check_if_can_fall_back_to_MLT(s, k)
          end if
 
          ! need to make use of gradL instead of grada consistent - at least for TDC
          if (using_TDC) then
-            Y_guess = gradT - gradL
             compare_TDC_to_MLT = s% compare_TDC_to_MLT
-            if (compare_TDC_to_MLT) then
-               if (report) write(*,3) 'call do_compare_TDC_to_MLT', k, s% solver_iter
-               call do_compare_TDC_to_MLT     
-            else
-               if (report) write(*,3) 'call set_TDC', k, s% solver_iter
-               call set_TDC
-            end if
+            if (report) write(*,3) 'call set_TDC', k, s% solver_iter
+            call set_TDC
          else if (gradr > gradL) then
             if (report) write(*,3) 'call set_MLT', k, s% solver_iter
             call set_MLT
+         end if
+
+         if (s%m(k) / Msun < 0.5d0) then
+            write(*,*) s%m(k)/Msun, mixing_type, gradr%val, gradL%val
          end if
 
          ! If we're not convecting, try thermohaline and semiconvection.
@@ -274,68 +270,6 @@
             D = 0d0
             Gamma = 0d0
          end subroutine set_no_mixing
-
-         subroutine do_compare_TDC_to_MLT
-            ! for compare_TDC_to_MLT
-            integer :: std_mixing_type
-            type(auto_diff_real_star_order1) :: std_Y_face, c0, L0, A0, &
-               std_gradT, std_gradr, std_conv_vel, std_D, std_Gamma, std_scale_height
-            include 'formats'         
-            std_mixing_type = mixing_type
-            std_Y_face = gradT - gradL
-            std_gradT = gradT
-            std_gradr = gradr
-            std_conv_vel = conv_vel
-            std_D = D
-            std_Gamma = Gamma
-            std_scale_height = scale_height
-            if (report) then
-               write(*,*)
-               write(*,1) 'do_compare_TDC_to_MLT'
-            end if            
-            call set_TDC
-            if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
-               if (report) write(*,2) 'TDC D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
-               mixing_type = no_mixing
-            end if
-            if (report .or. s% x_integer_ctrl(19) <= 0) then
-               if (std_mixing_type /= mixing_type .or. &
-                   abs(std_gradT%val - gradT%val) > 1d-2) then
-                  write(*,6) 'k solvr_iter model std_mxtyp tdc_mtyp', &
-                     k, s% solver_iter, s% model_number, std_mixing_type, mixing_type
-                  write(*,4) 'std_gradT tdc_gradT', k, s% solver_iter, s% model_number, std_gradT%val, gradT%val
-                  write(*,4) 'std_vc tdc_vc', k, s% solver_iter, s% model_number, std_conv_vel%val, conv_vel%val
-                  write(*,4) 'gradL', k, s% solver_iter, s% model_number, gradL%val
-                  write(*,4) 'gradr', k, s% solver_iter, s% model_number, gradr%val
-                  write(*,4) 'Y_guess', k, s% solver_iter, s% model_number, Y_guess%val
-                  write(*,4) 'std Y', k, s% solver_iter, s% model_number, std_Y_face%val
-                  write(*,4) 'tdc Y', k, s% solver_iter, s% model_number, Y_face%val
-                  write(*,4) 'std gradT-gradr', k, s% solver_iter, s% model_number, std_gradT%val - std_gradr%val
-                  write(*,4) 'tdc gradT-gradr', k, s% solver_iter, s% model_number, gradT%val - gradr%val
-                  write(*,4) 'L', k, s% solver_iter, s% model_number, L%val
-                  c0 = mixing_length_alpha*rho*T*Cp*4d0*pi*pow2(r)
-                  L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity) ! assumes QHSE for dP/dm
-                  if (s% okay_to_set_mlt_vc) then ! is also ok to use mlt_vc_old   
-                     A0 = s% mlt_vc_old(k)/sqrt_2_div_3
-                  else
-                     A0 = s% mlt_vc(k)/sqrt_2_div_3
-                  end if
-                  write(*,4) 'c0', k, s% solver_iter, s% model_number, c0%val
-                  write(*,4) 'L0', k, s% solver_iter, s% model_number, L0%val
-                  write(*,4) 'A0', k, s% solver_iter, s% model_number, A0%val
-                  write(*,4) 'Q(Y_tdc) for vc=0', k, s% solver_iter, s% model_number, &
-                     (L%val - L0%val*grada%val) - L0%val*Y_face%val
-                  write(*,4) 'Q(Y_guess) for vc=0', k, s% solver_iter, s% model_number, &
-                     (L%val - L0%val*grada%val) - L0%val*Y_guess%val
-                  write(*,4) 'gradL_composition_term', k, s% solver_iter, s% model_number, gradL_composition_term
-                  write(*,4) 'COUPL', k, s% solver_iter, s% model_number, s% COUPL(k)
-                  write(*,4) 'SOURCE', k, s% solver_iter, s% model_number, s% SOURCE(k)
-                  write(*,4) 'DAMP', k, s% solver_iter, s% model_number, s% DAMP(k)
-                  write(*,*)
-                  stop 'do_compare_TDC_to_MLT'
-               end if
-            end if
-         end subroutine do_compare_TDC_to_MLT
 
          subroutine set_TDC
             include 'formats'
@@ -927,23 +861,10 @@
       !!
       !! @param s star pointer
       !! @param k face index
-      !! @param mixing_length_alpha mixing length parameter
-      !! @param Y_in guess of superadiabaticity
-      !! @param T temperature (K)
-      !! @param rho density (g/cm^3)
-      !! @param Cp heat capacity (erg/g/K)
-      !! @param kap opacity (cm^2/g)
-      !! @param Hp pressure scale height (cm)
-      !! @param grada is the adiabatic dlnT/dlnP.
-      !! @param A0 convection speed from the start of the step (cm/s)
       !! @param fallback False if we need to use TDC, True if we can fall back to MLT.
-      logical function check_if_can_fall_back_to_MLT(s, k, mixing_length_alpha, &
-                                                      Y_in, T, rho, Cp, dV, kap, Hp, grada, A0) result(fallback)
+      logical function check_if_can_fall_back_to_MLT(s, k) result(fallback)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: mixing_length_alpha
-         type(auto_diff_real_star_order1), intent(in) :: Y_in, T, rho, Cp, dV, kap, Hp, grada, A0
-         type(auto_diff_real_tdc) :: Y, Af, xi0, xi1, xi2, J2, Jt2
 
          if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
             fallback = .true.
