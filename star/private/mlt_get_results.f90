@@ -190,7 +190,12 @@
          end if
 
          ! Initialize with no mixing
-         call set_no_mixing('')
+         mixing_type = no_mixing
+         gradT = gradr
+         Y_face = gradT - gradL
+         conv_vel = 0d0
+         D = 0d0
+         Gamma = 0d0     
 
          ! Bail if we asked for no mixing, or if parameters are bad.
          if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0) return
@@ -246,32 +251,12 @@
          if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
             if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
             mixing_type = no_mixing
-         end if
-
-               if (s%m(k)/Msun < 0.5d0 .and. mixing_type == thermohaline_mixing) then
-                  write(*,*) mixing_type, s%m(k)/Msun, D%val, gradL_composition_term
-               end if
-
-         ! If we made it all that way and are still not mixing, call set_no_mixing.
-         ! This catches places above where we might have thought we'd have mixing but
-         ! ended up falling back on no mixing. It also reports the correct message.
-         if (mixing_type == no_mixing) call set_no_mixing('final mixing_type == no_mixing')
-         
-         contains
-
-         subroutine set_no_mixing(str)
-            character (len=*) :: str
-            include 'formats'            
-            if (report .and. len_trim(str) > 0) &
-               write(*,2) 'Get_results set_no_mixing ' // trim(str), k
-            mixing_type = no_mixing
             gradT = gradr
             Y_face = gradT - gradL
             conv_vel = 0d0
             D = 0d0
-            Gamma = 0d0
-         end subroutine set_no_mixing
-
+            Gamma = 0d0            
+         end if
       end subroutine Get_results
 
 !------------------------------ MLT
