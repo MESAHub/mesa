@@ -105,8 +105,8 @@ contains
       integer, intent(in) :: k
       real(dp), intent(in) :: mixing_length_alpha
       logical, intent(in) :: Y_is_positive
-      type(auto_diff_real_star_order1), intent(in) :: &
-         c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada
+      type(auto_diff_real_tdc), intent(in) :: A0, c0, L, L0, gradL, grada
+      type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp
       type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc), intent(inout) :: Q_ub, Q_lb
       type(auto_diff_real_tdc) :: Z_new, Y, Af, Q
@@ -136,19 +136,18 @@ contains
 
    subroutine get_TDC_solution(s, k, &
          mixing_length_alpha, cgrav, m, report, &
-         mixing_type, L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada, cv, Y_face, ierr)
+         mixing_type, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, cv, Y_face, ierr)
       type (star_info), pointer :: s
       integer, intent(in) :: k
       real(dp), intent(in) :: mixing_length_alpha, cgrav, m
       type(auto_diff_real_star_order1), intent(in) :: &
-         L, r, P, T, rho, dV, Cp, kap, Hp, gradL, grada
+         L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in
       logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
       integer, intent(out) :: mixing_type, ierr
       
-      type(auto_diff_real_star_order1) :: A0, c0, L0
-      type(auto_diff_real_tdc) :: Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
-      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ
+      type(auto_diff_real_tdc) :: L, A0, c0, L0, Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
+      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, gradL, grada
       real(dp) ::  gradT, Lr, Lc, scale
       integer :: iter, line_iter, i
       logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
@@ -166,8 +165,11 @@ contains
       end if         
 
       ! Set up inputs.
-      c0 = mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r)
-      L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap) ! assumes QHSE for dP/dm
+      L = convert(L_in)
+      gradL = convert(gradL_in)
+      grada = convert(grada_in)
+      c0 = convert(mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r))
+      L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap)) ! assumes QHSE for dP/dm
       if (s% okay_to_set_mlt_vc) then
          A0 = s% mlt_vc_old(k)/sqrt_2_div_3
       else
@@ -420,24 +422,20 @@ contains
    !! @param Q The residual of the above equaiton (an output).
    !! @param Af The final convection speed (an output).
    subroutine compute_Q(s, k, mixing_length_alpha, &
-         Y, c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, Q, Af)
+         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
       type (star_info), pointer :: s
       integer, intent(in) :: k
       real(dp), intent(in) :: mixing_length_alpha
       type(auto_diff_real_star_order1), intent(in) :: &
-         c0_in, L_in, L0_in, A0, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in
-      type(auto_diff_real_tdc), intent(in) :: Y
+         T, rho, dV, Cp, kap, Hp
+      type(auto_diff_real_tdc), intent(in) :: A0, Y, c0, L, L0, gradL, grada
       type(auto_diff_real_tdc), intent(out) :: Q, Af
-      type(auto_diff_real_tdc) :: xi0, xi1, xi2, c0, L0, L, gradL
+      type(auto_diff_real_tdc) :: xi0, xi1, xi2
 
       call eval_xis(s, k, mixing_length_alpha, &
-         Y, T, rho, Cp, dV, kap, Hp, grada_in, xi0, xi1, xi2)          
+         Y, T, rho, Cp, dV, kap, Hp, grada, xi0, xi1, xi2)          
 
       Af = eval_Af(s, k, A0, xi0, xi1, xi2)
-      L = convert(L_in)
-      L0 = convert(L0_in)
-      gradL = convert(gradL_in)
-      c0 = convert(c0_in)
       Q = (L - L0*gradL) - (L0 + c0*Af)*Y
 
    end subroutine compute_Q
@@ -485,8 +483,8 @@ contains
       type (star_info), pointer :: s
       integer, intent(in) :: k
       real(dp), intent(in) :: mixing_length_alpha
-      type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp, grada
-      type(auto_diff_real_tdc), intent(in) :: Y
+      type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp
+      type(auto_diff_real_tdc), intent(in) :: Y, grada
       type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
       type(auto_diff_real_tdc) :: S0, D0, DR0
       type(auto_diff_real_star_order1) :: gammar_div_alfa, Pt0, dVdt
@@ -495,7 +493,7 @@ contains
       real(dp), parameter :: x_ALFAP = 2.d0/3.d0
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
 
-      S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T*grada/Hp)
+      S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T/Hp)*grada
       S0 = S0*Y
       D0 = convert(s% alpha_TDC_DAMP*x_CEDE/(mixing_length_alpha*Hp))
       if (s% alpha_TDC_DAMPR == 0d0) then
@@ -542,23 +540,21 @@ contains
    !!
    !! @param s star pointer
    !! @param k face index
-   !! @param A0_in convection speed from the start of the step (cm/s)
+   !! @param A0 convection speed from the start of the step (cm/s)
    !! @param xi0 The constant term in the convective velocity equation.
    !! @param xi1 The prefactor of the linear term in the convective velocity equation.
    !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.            
    !! @param Af Output, the convection speed at the end of the step (cm/s)
-   function eval_Af(s, k, A0_in, xi0, xi1, xi2) result(Af)
+   function eval_Af(s, k, A0, xi0, xi1, xi2) result(Af)
       type (star_info), pointer :: s
       integer, intent(in) :: k
-      type(auto_diff_real_star_order1), intent(in) :: A0_in
-      type(auto_diff_real_tdc), intent(in) :: xi0, xi1, xi2
+      type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0, lk 
+      type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, lk 
       real(dp) :: dt    
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
       dt = s%dt
-      A0 = convert(A0_in)
 
       if (J2 > 0d0) then ! Hyperbolic branch
          J = sqrt(J2)
