@@ -136,7 +136,7 @@
       
 ! solver
       use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      use_eps_grav_form_of_energy_eqn = .true.
       
       use_gold2_tolerances = .false.
 

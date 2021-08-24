@@ -54,7 +54,7 @@
    okay_to_remesh = .false.
 
 ! solver
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
+   use_dedt_form_of_energy_eqn = .true. ! no eps_grav
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0

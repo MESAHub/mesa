@@ -43,7 +43,7 @@
       max_years_for_timestep = 1d9
       
       use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      use_eps_grav_form_of_energy_eqn = .true.
 
       limit_for_rel_error_in_energy_conservation = 1d-5
       hard_limit_for_rel_error_in_energy_conservation = 1d-3

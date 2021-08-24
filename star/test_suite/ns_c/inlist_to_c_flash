@@ -105,7 +105,7 @@
       mesh_min_dlnR = 1d-9
 
 ! solver    
-      always_use_dedt_form_of_energy_eqn = .true.
+      use_dedt_form_of_energy_eqn = .true.
 
       steps_before_use_gold2_tolerances = 1
 

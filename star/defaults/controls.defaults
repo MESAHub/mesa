@@ -7536,12 +7536,9 @@
 
       ! use_dedt_form_of_energy_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! always_use_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! ::
 
-    use_dedt_form_of_energy_eqn = .false.
-    always_use_dedt_form_of_energy_eqn = .true.
+    use_dedt_form_of_energy_eqn = .true.
 
 
       ! no_dedt_form_during_relax
@@ -7554,7 +7551,7 @@
     dedt_eqn_r_scale = 1d8
 
 
-      ! always_use_eps_grav_form_of_energy_eqn
+      ! use_eps_grav_form_of_energy_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, use the ``eps_grav`` form of the energy equation.
@@ -7585,7 +7582,7 @@
 
       ! ::
 
-    always_use_eps_grav_form_of_energy_eqn = .false.
+    use_eps_grav_form_of_energy_eqn = .false.
 
 
       ! include_composition_in_eps_grav

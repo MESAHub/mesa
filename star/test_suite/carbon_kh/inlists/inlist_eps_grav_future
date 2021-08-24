@@ -1,6 +1,6 @@
 &controls
 
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      use_eps_grav_form_of_energy_eqn = .true.
       use_time_centered_eps_grav = .true.
 
 ! turn off energy error related things

@@ -155,7 +155,7 @@
       gold2_tol_max_residual3 = 5d-4
       gold_tol_max_residual2 = 5d-4
 
-      always_use_dedt_form_of_energy_eqn = .true.       
+      use_dedt_form_of_energy_eqn = .true.       
       max_tries_for_implicit_wind = 0      
 
       convergence_ignore_equL_residuals = .true. 

@@ -44,8 +44,9 @@
 &controls
 
       he_core_mass_limit = 0.15
-   
-      always_use_eps_grav_form_of_energy_eqn = .true.
+
+      use_dedt_form_of_energy_eqn = .false.
+      use_eps_grav_form_of_energy_eqn = .true.
       use_time_centered_eps_grav = .true.
       include_composition_in_eps_grav = .true.
 

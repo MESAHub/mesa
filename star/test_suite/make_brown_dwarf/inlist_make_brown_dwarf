@@ -36,7 +36,7 @@
 
    max_age = 2.0d10
    
-   always_use_dedt_form_of_energy_eqn = .true.
+   use_dedt_form_of_energy_eqn = .true.
 
    warning_limit_for_max_residual = 1d99   
    use_dedt_form_of_energy_eqn = .true.

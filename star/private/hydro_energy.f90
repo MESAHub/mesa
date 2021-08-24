@@ -343,14 +343,9 @@
                return
             end if
 
-            eps_grav_form = .not. s% use_dedt_form_of_energy_eqn
-         
-            if (eps_grav_form) then ! check if want it false         
-               if (s% always_use_dedt_form_of_energy_eqn) eps_grav_form = .false.            
-            end if
+            eps_grav_form = s% use_eps_grav_form_of_energy_eqn
          
             if (.not. eps_grav_form) then ! check if want it true
-               if (s% always_use_eps_grav_form_of_energy_eqn) eps_grav_form = .true.             
                if (s% doing_relax .and. s% no_dedt_form_during_relax) eps_grav_form = .true.         
             end if
 

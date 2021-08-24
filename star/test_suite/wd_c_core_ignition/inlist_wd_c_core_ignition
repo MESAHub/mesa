@@ -50,7 +50,7 @@
 &controls
 
       ! energy equation options
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      use_eps_grav_form_of_energy_eqn = .true.
       use_dedt_form_of_energy_eqn = .false.
       use_time_centered_eps_grav = .true.
 
