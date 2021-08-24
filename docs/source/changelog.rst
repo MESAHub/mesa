@@ -154,6 +154,14 @@ to
           nl, obs, sigma, freq, freq_corr, inertia)
 
 
+binary
+~~~~~~
+
+There are new hooks ``other_binary_photo_read`` and
+``other_binary_photo_write``.  These allow the user to save/restore
+values in ``run_binary_extras``.
+
+
 eos
 ~~~
 

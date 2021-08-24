@@ -24,7 +24,6 @@
       use star_lib
       use star_def
       use const_def
-      use const_def
       use chem_def
       use num_lib
       use binary_def

@@ -178,6 +178,14 @@
             integer, intent(out) :: ierr
          end subroutine extras_binary_after_evolve_interface
 
+         subroutine other_binary_photo_write_interface(binary_id, iounit)
+            integer, intent(in) :: binary_id, iounit
+         end subroutine other_binary_photo_write_interface
+
+         subroutine other_binary_photo_read_interface(binary_id, iounit, ierr)
+            integer, intent(in) :: binary_id, iounit
+            integer, intent(out) :: ierr
+         end subroutine other_binary_photo_read_interface
                
       end interface
 
