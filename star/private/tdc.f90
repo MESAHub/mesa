@@ -148,7 +148,7 @@ contains
       
       type(auto_diff_real_tdc) :: L, A0, c0, L0, Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, gradL, grada
-      real(dp) ::  gradT, Lr, Lc, scale
+      real(dp) :: scale
       integer :: iter, line_iter, i
       logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
       real(dp), parameter :: bracket_tolerance = 1d0
@@ -388,9 +388,6 @@ contains
       ! Process Y into the various outputs.
       cv = sqrt_2_div_3*unconvert(Af)   
       Y_face = unconvert(Y)
-      gradT = Y_face%val + gradL%val
-      Lr = L0%val*gradT
-      Lc = L%val - Lr
       if (cv > 0d0) then
          mixing_type = convective_mixing
       else
