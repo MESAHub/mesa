@@ -165,17 +165,14 @@ contains
       logical, parameter :: report = .false.
       include 'formats'
 
+      ! Bail if we asked for no mixing, or if parameters are bad.
+      if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
+            opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
+            .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
+
       !test_partials = (k == s% solver_test_partials_k)
       test_partials = .false.
       ierr = 0          
-               
-      Pr = crad*pow4(T)/3d0
-      Pg = P - Pr
-      beta = Pg / P
-      gradL = grada + gradL_composition_term ! Ledoux temperature gradient
-      Lambda = mixing_length_alpha*scale_height
-      grav = cgrav*m/pow2(r)
-      conv_vel = 0d0
       if (k > 0) then
          s% SOURCE(k) = 0d0
          s% DAMP(k) = 0d0
@@ -190,6 +187,14 @@ contains
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if
 
+      ! Pre-calculate some things. 
+      Pr = crad*pow4(T)/3d0
+      Pg = P - Pr
+      beta = Pg / P
+      gradL = grada + gradL_composition_term ! Ledoux temperature gradient
+      Lambda = mixing_length_alpha*scale_height
+      grav = cgrav*m/pow2(r)
+
       ! Initialize with no mixing
       mixing_type = no_mixing
       gradT = gradr
@@ -197,11 +202,6 @@ contains
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0     
-
-      ! Bail if we asked for no mixing, or if parameters are bad.
-      if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
-            opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
-            .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
 
       ! check if this particular k can be done with TDC
       using_TDC = .false.
