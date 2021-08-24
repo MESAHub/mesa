@@ -176,6 +176,15 @@ contains
          A0 = s% mlt_vc(k)/sqrt_2_div_3
       end if
 
+      ! Bail early if it's trivially radiative
+!      if (A0 == 0 .and. L < L0) then
+!         cv = 0d0
+!         Y_face = unconvert(grada * (L / L0) - gradL)
+!         write(*,*) Y_face
+!         mixing_type = no_mixing
+!         return
+!      end if
+
       ! Set scale for judging the solution to Q(Y)=0.
       ! Q has units of a luminosity, so the scale should be a luminosity.
       if (s% solver_iter == 0) then
