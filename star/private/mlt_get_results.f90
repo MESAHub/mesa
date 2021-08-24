@@ -224,7 +224,10 @@
                call set_thermohaline
             else if (gradr > grada) then
                if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
-               call set_semiconvection
+               call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
+                                       s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
+                                       gradL_composition_term, &
+                                       gradT, Y_face, conv_vel, D, mixing_type, ierr)
             end if         
          end if 
 
@@ -400,10 +403,35 @@
             end if
 
          end subroutine set_MLT   
+        
+         subroutine set_thermohaline
+            real(dp) :: D_thrm
+            call get_D_thermohaline(s, &
+               grada%val, gradr%val, T%val, opacity%val, rho%val, &
+               Cp%val, gradL_composition_term, &
+               iso, XH1, thermohaline_coeff, D_thrm, ierr)
+            D = D_thrm
+            gradT = gradr
+            Y_face = gradT - grada
+            conv_vel = 3d0*D/Lambda
+            mixing_type = thermohaline_mixing 
+         end subroutine set_thermohaline
+
+      end subroutine Get_results
 
 !------------------------------ Semiconvection
 
-         subroutine set_semiconvection ! Langer 1983 & 1985
+         subroutine set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
+                                       semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
+                                       gradL_composition_term, &
+                                       gradT, Y_face, conv_vel, D, mixing_type, ierr) ! Langer 1983 & 1985
+            type(auto_diff_real_star_order1), intent(in) :: L, Lambda, T, P, Pr, beta, opacity, rho
+            type(auto_diff_real_star_order1), intent(in) :: Cp, gradr, grada, gradL
+            character(len=*), intent(in) :: semiconvection_option
+            real(dp), intent(in) :: alpha_semiconvection, cgrav, gradL_composition_term, m
+            type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D
+            integer, intent(out) :: mixing_type, ierr
+
             type(auto_diff_real_star_order1) :: bc, LG, &
                radiative_conductivity, a0, a1, a2, a3, a4, a5, a6, a, &
                b1, b2, b3, b4, b5, b6, b7, b, div, bsq    
@@ -414,16 +442,16 @@
             D = alpha_semiconvection*radiative_conductivity/(6d0*Cp*rho) &
                   *(gradr - grada)/(gradL - gradr)
             if (D%val <= 0) return         
-            if (s% semiconvection_option == 'Langer_85 mixing; gradT = gradr') then
+            if (semiconvection_option == 'Langer_85 mixing; gradT = gradr') then
                gradT = gradr
                Y_face = gradT - grada
                conv_vel = 3d0*D/Lambda             
                mixing_type = semiconvective_mixing
                return
             end if            
-            if (s% semiconvection_option /= 'Langer_85') then
+            if (semiconvection_option /= 'Langer_85') then
                write(*,*) 'MLT: unknown values for semiconvection_option ' // &
-                  trim(s% semiconvection_option)
+                  trim(semiconvection_option)
                ierr = -1
                return
             end if            
@@ -460,22 +488,7 @@
             conv_vel = 3d0*D/Lambda             
             mixing_type = semiconvective_mixing
          end subroutine set_semiconvection
-        
-         subroutine set_thermohaline
-            real(dp) :: D_thrm
-            call get_D_thermohaline(s, &
-               grada%val, gradr%val, T%val, opacity%val, rho%val, &
-               Cp%val, gradL_composition_term, &
-               iso, XH1, thermohaline_coeff, D_thrm, ierr)
-            D = D_thrm
-            gradT = gradr
-            Y_face = gradT - grada
-            conv_vel = 3d0*D/Lambda
-            mixing_type = thermohaline_mixing 
-         end subroutine set_thermohaline
 
-      end subroutine Get_results
-      
 !------------------------------ Time-dependent convection (TDC)
 
       type(auto_diff_real_tdc) function set_Y(Y_is_positive, Z) result(Y)
