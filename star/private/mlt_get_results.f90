@@ -243,10 +243,6 @@
             mixing_type = no_mixing
          end if
 
-               if (s%m(k)/Msun < 0.5d0 .and. mixing_type == thermohaline_mixing) then
-                  write(*,*) mixing_type, s%m(k)/Msun, D%val, gradL_composition_term
-               end if
-
          ! If we made it all that way and are still not mixing, call set_no_mixing.
          ! This catches places above where we might have thought we'd have mixing but
          ! ended up falling back on no mixing. It also reports the correct message.
