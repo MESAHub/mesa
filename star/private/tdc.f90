@@ -557,12 +557,6 @@ contains
       type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, A0, lk 
       real(dp) :: dt    
 
-      ! Debugging
-      logical :: dbg = .false.
-      integer :: dbg_k = 1448  
-
-      include 'formats'
-
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
       dt = s%dt
       A0 = convert(A0_in)
@@ -615,20 +609,6 @@ contains
          s% DAMP(k) = -xi2%val*pow3(Af%val)
          s% COUPL(k) = s% SOURCE(k) - s% DAMP(k) - s% DAMPR(k)
       end if
-
-
-      if (k == dbg_k .and. dbg) then
-         write(*,*) J2%val,J2%d1val1
-         write(*,*) Jt%val,Jt%d1val1
-         write(*,*) xi0%val,xi0%d1val1
-         write(*,*) xi1%val,xi1%d1val1
-         write(*,*) xi2%val,xi2%d1val1
-         write(*,*) num%val
-         write(*,*) den%val
-         write(*,*) Af%val,Af%d1val1
-         write(*,*) ''
-      end if
-
 
    end function eval_Af
 
