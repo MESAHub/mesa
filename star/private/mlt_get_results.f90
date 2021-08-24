@@ -203,13 +203,6 @@ contains
             opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
             .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
 
-      mixing_type = no_mixing
-      gradT = gradr
-      Y_face = gradT - gradL
-      conv_vel = 0d0
-      D = 0d0
-      Gamma = 0d0   
-
       ! check if this particular k can be done with TDC
       using_TDC = .false.
       if (s% MLT_option == 'TDC') using_TDC = .true.
