@@ -7538,7 +7538,8 @@
 
       ! energy_eqn_option
       ! ~~~~~~~~~~~~~~~~~
-      ! Available options are 'dedt' or 'eps_grav'
+      ! Available options are ``'dedt'`` or ``'eps_grav'``.
+      ! See below for descriptions of each form and form-specific options.
       ! ::
 
     energy_eqn_option = 'dedt'
@@ -7549,8 +7550,27 @@
 
       ! This form of the energy equation is used when ``energy_eqn_option = 'dedt'``.
 
-      ! It is a conservative equation for the local specific total energy.
-      ! See |MESA V|, Eq. (8) and surrounding discussion.
+      ! It is a conservative equation for the local specific total energy
+      ! introduced in |MESA V|, Section 3.  See in particular Eq. (8) and surrounding discussion.
+
+      ! Because this equation is written in a conservative form, it
+      ! should always do an excellent job of numerical energy
+      ! conservation.  The error in numerical energy conservation
+      ! (quantified by ``rel_run_E_err``) reflects the cumulative
+      ! energy equation residuals (i.e., the extent to which the
+      ! energy equation was not satisfied).  When using this form of
+      ! the equation, models should generally have a small
+      ! (:math:`\lesssim 10^{-8}`) value of ``rel_run_E_err``.
+      ! roughly independent of space and time resolution.
+      ! A small value of ``rel_run_E_err`` only demonstrates that the
+      ! equation residuals are small and is not evidence that a model
+      ! is converged or reliable.  Convergence studies targeting the
+      ! physical quantities of interest remain essential.
+      ! A large value of ``rel_run_E_err`` (:math:`\gtrsim 10^{-2}`)
+      ! should be a cause for concern (see also
+      ! :ref:`reference/controls:warn_when_large_rel_run_E_err` and
+      ! :ref:`reference/controls:max_abs_rel_run_E_err` ).
+
 
       ! no_dedt_form_during_relax
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -7591,11 +7611,35 @@
 
       ! Note: In a phase transition, ``eps_grav`` includes the latent heat.
 
+      ! As with the ``dedt`` form, the error in numerical energy
+      ! conservation (quantified by ``rel_run_E_err``) reflects the
+      ! cumulative energy equation residuals (i.e., the extent to
+      ! which the energy equation was not satisfied).  However,
+      ! because this version of the equation is not written in a
+      ! conservative form, it also includes error associated with the
+      ! time discretization of the energy equation.  An additional
+      ! source of error enters because the equation of state provided
+      ! by the ``eos`` module does not precisely satisfy the
+      ! mathematical and thermodynamic identities that are used in
+      ! rewriting the energy equation.
+
+      ! In practice, the error sources usually exhibit the ordering
+      ! (time discretization) > (eos inconsistency) >> (equation residuals).
+      ! With increasing time resolution, the time discretization error can
+      ! be driven down to the floor imposed by the eos inconsistency error.
+      ! The value of this floor depends on the physical conditions, but
+      ! may be :math:`\sim 10^{-4}`, well above the level of the residuals.
+      ! The control :ref:`reference/controls:use_time_centered_eps_grav`
+      ! provides a time-centered implementation of ``eps_grav`` that can
+      ! often reach this floor at larger timesteps.
+      ! Convergence studies targeting the physical quantities of interest
+      ! remain essential.
+
 
       ! include_composition_in_eps_grav
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If true, evalute ``eps_grav_composition_term`` and include this quantity in ``eps_grav``.
+      ! If true, evaluate ``eps_grav_composition_term`` and include this quantity in ``eps_grav``.
       ! When this flag is true, the composition derivatives of ``eps_grav`` are also included in the Jacobian.
 
       ! ::
@@ -11034,7 +11078,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! hard_limit_for_rel_error_in_energy_conservation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    
       ! ::
 
       !     rel_error_in_energy_conservation = abs(error_in_energy_conservation/total_energy)
