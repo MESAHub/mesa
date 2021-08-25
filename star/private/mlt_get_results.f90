@@ -159,19 +159,11 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       
-      type(auto_diff_real_star_order1) :: Pr, Pg, grav, scale_height2, Lambda, gradL, beta
+      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
-
-      ! Initialize with no mixing
-      mixing_type = no_mixing
-      gradT = gradr
-      Y_face = gradT - gradL
-      conv_vel = 0d0
-      D = 0d0
-      Gamma = 0d0  
 
       ! Pre-calculate some things. 
       Pr = crad*pow4(T)/3d0
@@ -184,6 +176,14 @@ contains
       else
          gradL = grada
       end if
+
+      ! Initialize with no mixing
+      mixing_type = no_mixing
+      gradT = gradr
+      Y_face = gradT - gradL
+      conv_vel = 0d0
+      D = 0d0
+      Gamma = 0d0  
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
