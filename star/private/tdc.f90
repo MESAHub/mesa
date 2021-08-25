@@ -66,8 +66,10 @@ contains
             scale_height, gradL, grada, conv_vel, Y_face, ierr)
          stop 'get_TDC_solution failed in set_TDC'
       end if
+
       gradT = Y_face + gradL
       D = conv_vel*scale_height*mixing_length_alpha/3d0     ! diffusion coefficient [cm^2/sec]
+
    end subroutine set_TDC       
 
    !> Determines if it is safe (physically) to use TDC instead of MLT.
@@ -136,14 +138,14 @@ contains
 
    subroutine get_TDC_solution(s, k, &
          mixing_length_alpha, cgrav, m, report, &
-         mixing_type, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, cv, Y_face, ierr)
+         mixing_type, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, conv_vel, Y_face, ierr)
       type (star_info), pointer :: s
       integer, intent(in) :: k
       real(dp), intent(in) :: mixing_length_alpha, cgrav, m
       type(auto_diff_real_star_order1), intent(in) :: &
          L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in
       logical, intent(in) :: report
-      type(auto_diff_real_star_order1),intent(out) :: cv, Y_face
+      type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: mixing_type, ierr
       
       type(auto_diff_real_tdc) :: L, A0, c0, L0, Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
@@ -394,9 +396,9 @@ contains
       end if
 
       ! Process Y into the various outputs.
-      cv = sqrt_2_div_3*unconvert(Af)   
+      conv_vel = sqrt_2_div_3*unconvert(Af)   
       Y_face = unconvert(Y)
-      if (cv > 0d0) then
+      if (conv_vel > 0d0) then
          mixing_type = convective_mixing
       else
          mixing_type = no_mixing
