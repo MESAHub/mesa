@@ -46,6 +46,8 @@
 
     read_extra_controls_inlist1 = .true.
     extra_controls_inlist1_name = 'inlist_common'
+    
+    use_gold_tolerances = .true.
 
 / ! end of controls namelist
 

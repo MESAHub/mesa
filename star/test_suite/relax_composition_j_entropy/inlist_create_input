@@ -29,7 +29,7 @@
     extra_controls_inlist1_name = 'inlist_common'
 
     initial_mass = 10d0
-
+    MLT_option='Cox'
 / ! end of controls namelist
 
 
