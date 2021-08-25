@@ -107,6 +107,8 @@ contains
       if (Bcubed <= 0d0) then
          ! Radiative zone, because this means that gradr < gradL
          Zeta = 0d0
+         conv_vel = 0d0
+         D = 0d0
       else
          ! Convection zone
 
