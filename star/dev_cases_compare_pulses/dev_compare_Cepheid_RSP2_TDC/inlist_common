@@ -104,7 +104,7 @@
    dxdt_nuc_factor = 0
    mix_factor = 0
 
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
    
    alt_scale_height_flag = .false.
 

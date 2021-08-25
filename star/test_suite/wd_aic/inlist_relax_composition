@@ -37,7 +37,6 @@
     accretion_species_xa(3) = 0.05
 
   ! don't need
-    use_dedt_form_of_energy_eqn = .false.
     use_gold_tolerances = .false.
     max_abs_rel_run_E_err = 1d99
     

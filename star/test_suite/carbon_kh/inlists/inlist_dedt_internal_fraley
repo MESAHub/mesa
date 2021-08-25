@@ -1,8 +1,0 @@
-&controls
-
-      use_dedt_form_of_energy_eqn = .true.
-      use_dedt_form_with_total_energy_conservation = .false.
-      use_Fraley_time_centering = .true.
-      steps_before_use_Fraley_time_centering = 1
-
-/

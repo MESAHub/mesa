@@ -60,10 +60,9 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 1500
 
-      use_dedt_form_of_energy_eqn = .false.
-      use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
       use_time_centered_eps_grav = .true.
-         ! since have use_eps_grav_form_of_energy_eqn = .true.
+         ! since have energy_eqn_option = 'eps_grav'
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
 

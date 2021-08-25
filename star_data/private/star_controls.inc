@@ -796,6 +796,8 @@
 
       ! hydro parameters
 
+         character(len=32) :: energy_eqn_option
+
          real(dp) :: eps_nuc_factor, max_abs_eps_nuc, op_split_burn_eps_nuc_infall_limit
          real(dp) :: eps_WD_sedimentation_factor, non_nuc_neu_factor, eps_grav_factor, eps_mdot_factor
          real(dp) :: dedt_eqn_r_scale
@@ -803,9 +805,7 @@
          logical :: use_mass_corrections, use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
             use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
-            use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
-            use_eps_grav_form_of_energy_eqn, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &

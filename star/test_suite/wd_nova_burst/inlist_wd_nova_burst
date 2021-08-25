@@ -57,8 +57,7 @@
       
 ! solver
 
-      use_dedt_form_of_energy_eqn = .false.
-      use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
       
       use_gold2_tolerances = .false.
 

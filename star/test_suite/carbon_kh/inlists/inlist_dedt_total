@@ -1,6 +1,5 @@
 &controls
 
-      use_dedt_form_of_energy_eqn = .true.
-      use_dedt_form_with_total_energy_conservation = .true.
+      energy_eqn_option = 'dedt'
 
 /

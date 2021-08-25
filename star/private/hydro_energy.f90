@@ -343,7 +343,13 @@
                return
             end if
 
-            eps_grav_form = s% use_eps_grav_form_of_energy_eqn
+            if (trim(s% energy_eqn_option) == 'eps_grav') then 
+               eps_grav_form = .true.
+            else if (trim(s% energy_eqn_option) == 'dedt') then
+               eps_grav_form = .false.
+            else
+               stop 'Invalid choice for energy_eqn_option'
+            end if
          
             if (.not. eps_grav_form) then ! check if want it true
                if (s% doing_relax .and. s% no_dedt_form_during_relax) eps_grav_form = .true.         

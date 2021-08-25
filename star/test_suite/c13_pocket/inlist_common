@@ -43,8 +43,7 @@
 ! opacities
 
 ! options for energy conservation (see MESA V, Section 3)
-      use_eps_grav_form_of_energy_eqn = .true.
-      use_dedt_form_of_energy_eqn = .false.
+      energy_eqn_option = 'eps_grav'
       use_time_centered_eps_grav = .true.
       include_composition_in_eps_grav = .true.
       limit_for_rel_error_in_energy_conservation = 1d99

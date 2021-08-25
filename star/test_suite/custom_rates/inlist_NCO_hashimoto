@@ -47,7 +47,7 @@
 
 &controls
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
       max_age = 44d7
 

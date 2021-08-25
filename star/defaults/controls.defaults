@@ -7534,12 +7534,23 @@
 ! structure equations
 ! ===================
 
-      ! use_dedt_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+      ! energy_eqn_option
+      ! ~~~~~~~~~~~~~~~~~
+      ! Available options are 'dedt' or 'eps_grav'
       ! ::
 
-    use_dedt_form_of_energy_eqn = .true.
+    energy_eqn_option = 'dedt'
 
+
+      ! dedt form
+      ! ~~~~~~~~~
+
+      ! This form of the energy equation is used when ``energy_eqn_option = 'dedt'``.
+
+      ! It is a conservative equation for the local specific total energy.
+      ! See |MESA V|, Eq. (8) and surrounding discussion.
 
       ! no_dedt_form_during_relax
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -7551,10 +7562,10 @@
     dedt_eqn_r_scale = 1d8
 
 
-      ! use_eps_grav_form_of_energy_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! eps_grav form
+      ! ~~~~~~~~~~~~~
 
-      ! If true, use the ``eps_grav`` form of the energy equation.
+      ! This form of the energy equation is used when ``energy_eqn_option = 'eps_grav'``.
 
       ! The quantity ``eps_grav`` is defined as
       ! :math:`\epsilon_{\rm grav} = -\frac{De}{Dt} - P \frac{DV_\rho}{Dt}`,
@@ -7563,7 +7574,7 @@
       ! volume, and :math:`D/Dt` is the Lagrangian time derivative.
       ! See |MESA IV|, Section 8 for more discussion.
 
-      ! This quantity is then re-written into the convenient to evaluate form
+      ! This quantity is then re-written into the following convenient-to-evaluate form (see |MESA IV|, eq. 63):
 
       ! :math:`\epsilon_{\rm grav} = -T c_P \left[(1 - \nabla_{\rm ad} \chi_T)\frac{D\ln T}{Dt} - \nabla_{\rm ad} \chi_\rho \frac{D\ln \rho}{Dt}\right] + \epsilon_{\rm grav, X}`.
 
@@ -7579,10 +7590,6 @@
       ! (Other quantities take their end-of-step values.)
 
       ! Note: In a phase transition, ``eps_grav`` includes the latent heat.
-
-      ! ::
-
-    use_eps_grav_form_of_energy_eqn = .false.
 
 
       ! include_composition_in_eps_grav

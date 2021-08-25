@@ -42,8 +42,7 @@
       max_age = 10d9
       max_years_for_timestep = 1d9
       
-      use_dedt_form_of_energy_eqn = .false.
-      use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
 
       limit_for_rel_error_in_energy_conservation = 1d-5
       hard_limit_for_rel_error_in_energy_conservation = 1d-3

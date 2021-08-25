@@ -27,7 +27,7 @@
       Teff_lower_limit = 6000
       delta_lgTeff_limit = 0.003d0
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
       photo_interval = 50
       profile_interval = 100

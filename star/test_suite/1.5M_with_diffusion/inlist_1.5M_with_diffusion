@@ -51,7 +51,7 @@
    ! values are commented out. Use with caution.
    ! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       convergence_ignore_equL_residuals = .true.
             
       limit_for_rel_error_in_energy_conservation = -1
