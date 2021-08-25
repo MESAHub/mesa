@@ -38,7 +38,7 @@
 
 
       integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
-         use mix_info, only: set_mixing_info, get_convection_sigmas
+         use mix_info, only: get_convection_sigmas
          use rates_def, only: num_rvs
          use hydro_vars, only: set_vars_if_needed
          use star_utils, only: start_time, update_time
