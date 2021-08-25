@@ -177,9 +177,13 @@ contains
       Pr = crad*pow4(T)/3d0
       Pg = P - Pr
       beta = Pg / P
-      gradL = grada + gradL_composition_term ! Ledoux temperature gradient
       Lambda = mixing_length_alpha*scale_height
       grav = cgrav*m/pow2(r)   
+      if (s% use_Ledoux_criterion) then
+         gradL = grada + gradL_composition_term ! Ledoux temperature gradient
+      else
+         gradL = grada
+      end if
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &

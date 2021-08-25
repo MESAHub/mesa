@@ -148,14 +148,8 @@ contains
          Zeta = 1d0
       end if            
       
-      
-      if (.false.) then ! need this old form for a few test cases
-         gradT = (1d0 - Zeta)*gradr + Zeta*grada ! C&G 14.79      
-         Y_face = gradT - grada
-      else ! switch to this when resolve the problems with those cases
-         gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
-         Y_face = gradT - gradL
-      end if
+      gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
+      Y_face = gradT - gradL
       
       if (Y_face > 0d0) then
          mixing_type = convective_mixing
