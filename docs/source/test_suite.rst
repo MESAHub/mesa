@@ -171,6 +171,14 @@ This test suite example checks the accretion of material and angular momentum on
 This test suite example checks the functionality of the adaptive nuclear reaction network.
 
 
+:ref:`carbon_kh`
+^^^^^^^^^^^^^^^^
+
+This test suite case evolves a stellar model with a pure carbon
+composition as it Kelvin-Helmholtz contracts.  It provides a
+convergence example for the different forms of the energy equation.
+
+
 :ref:`cburn_inward`
 ^^^^^^^^^^^^^^^^^^^
 
