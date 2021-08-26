@@ -17,7 +17,6 @@ do_set(){
 }
 
 do_set dedt_total
-do_set dedt_internal
 do_set eps_grav
 do_set eps_grav_future
 

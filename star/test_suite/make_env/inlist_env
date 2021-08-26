@@ -51,7 +51,7 @@
       max_years_for_timestep = 1d6
       max_age = 1d7
 
-      always_use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
       max_abar_for_burning = 55
    

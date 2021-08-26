@@ -55,7 +55,7 @@
 
 !OPTIONS
     do_conv_premix = .true.
-    use_dedt_form_of_energy_eqn = .true.    
+    energy_eqn_option = 'dedt'
     use_Ledoux_criterion = .true.    
     
   ! starting specifications

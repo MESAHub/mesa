@@ -135,8 +135,7 @@
          ! e.g., if this is 2, then only get wind when L > 2*Ledd
       
 ! solver
-      use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
       
       use_gold2_tolerances = .false.
 

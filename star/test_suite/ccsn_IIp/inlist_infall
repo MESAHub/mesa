@@ -56,7 +56,7 @@
 
 ! equation controls
   use_dPrad_dm_form_of_T_gradient_eqn = .true.
-  use_dedt_form_of_energy_eqn = .true.
+    energy_eqn_option = 'dedt'
   use_fixed_vsurf_outer_BC = .true.
   fixed_vsurf = 0d0
   dxdt_nuc_factor = 0
@@ -72,6 +72,7 @@
   okay_to_remesh = .false.
 
 ! timestep controls
+
   max_timestep = 0.05
   varcontrol_target = 3d-4
 

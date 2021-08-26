@@ -122,7 +122,7 @@
    dxdt_nuc_factor = 0
    mix_factor = 0
 
-   always_use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
    
    RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.

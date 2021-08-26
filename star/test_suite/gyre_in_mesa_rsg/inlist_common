@@ -29,7 +29,7 @@
    alpha_semiconvection = 0.1
    
 ! solver
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
 
 / ! end of controls namelist
 

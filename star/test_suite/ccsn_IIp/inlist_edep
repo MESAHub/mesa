@@ -80,7 +80,7 @@
 
   dxdt_nuc_factor = 0
 
-  use_dedt_form_of_energy_eqn = .true.
+  energy_eqn_option = 'dedt'
 
   non_nuc_neu_factor = 0
   eps_nuc_factor = 0

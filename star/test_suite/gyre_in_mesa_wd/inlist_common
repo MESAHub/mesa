@@ -36,7 +36,7 @@
       max_age = 14d9
 
 ! solver
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
 ! eos
 

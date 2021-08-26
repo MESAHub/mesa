@@ -16,6 +16,20 @@ Backwards-incompatible changes
 
    A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
 
+Simplification of energy equation options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The desired form of the MESA energy equation is now selected via the control ``energy_eqn_option``.  The available options are
+``'dedt'`` (default) and ``'eps_grav'``.  See the documentation at :ref:`reference/controls:energy_eqn_option` for more information about these forms.
+
+The controls ``use_dedt_form_of_energy_eqn``, ``always_use_dedt_form_of_energy_eqn``, and ``use_eps_grav_form_of_energy_eqn`` were removed and replaced by the functionality of ``energy_eqn_option``.
+
+Simplifications to the energy equation code mean that this selection applies globally (i.e., to all cells in the model and at all timesteps).
+
+* The per-cell energy equation controls ``max_eta_for_dedt_form_of_energy_eqn`` and ``max_gamma_for_dedt_form_of_energy_eqn`` were removed.
+
+* The form-switching control ``steps_before_always_use_dedt_form_of_energy_eqn`` was removed.
+
 
 Name changes
 ~~~~~~~~~~~~
@@ -50,9 +64,6 @@ Removed options
 * Removed option ``semiconvection_upper_limit_center_h1``. This can be implemented by setting ``s% alpha_semiconvection`` in ``run_star_extras.f90/extras_start_step``.
 
 * Removed the option ``use_brunt_gradmuX_form``.  Alternative forms of the Brunt can be calculated using the ``other_brunt`` hook.
-
-* Simplifications to the energy equation code resulted in the removal of the per-cell energy equation controls ``max_eta_for_dedt_form_of_energy_eqn`` and ``max_gamma_for_dedt_form_of_energy_eqn`` as well as ``steps_before_always_use_dedt_form_of_energy_eqn``.
-
 
 Removed history and profile columns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,6 +163,14 @@ to
 
     subroutine get_some_freq_corr(...,
           nl, obs, sigma, freq, freq_corr, inertia)
+
+
+binary
+~~~~~~
+
+There are new hooks ``other_binary_photo_read`` and
+``other_binary_photo_write``.  These allow the user to save/restore
+values in ``run_binary_extras``.
 
 
 eos

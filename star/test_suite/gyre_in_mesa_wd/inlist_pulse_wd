@@ -63,7 +63,7 @@
       net_logTcut_lo = 0
       net_logTcut_lim = 0
       
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
        
       ! limit timestep based on E_err
       limit_for_rel_error_in_energy_conservation = 1d-5

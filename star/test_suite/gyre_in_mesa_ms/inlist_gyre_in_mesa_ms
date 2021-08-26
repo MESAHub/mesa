@@ -61,7 +61,7 @@
     xa_central_lower_limit_species(1) = 'h1'
     xa_central_lower_limit(1) = 1d-3
 
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
    
     
   ! output
