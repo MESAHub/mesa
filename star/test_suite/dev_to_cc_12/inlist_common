@@ -63,7 +63,7 @@
 
 ! mlt
       mixing_length_alpha = 1.5
-      MLT_option = 'TDC'!'Henyey'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
@@ -112,7 +112,7 @@
       delta_lgRho_limit = 0.1 
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.003  
+      delta_lgT_cntr_limit = 0.001  
       delta_lgT_cntr_hard_limit = 0.01
 
       delta_lgT_max_limit_only_after_near_zams = .true.
