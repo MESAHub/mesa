@@ -84,8 +84,6 @@
       convergence_ignore_equL_residuals = .false.
       make_gradr_sticky_in_solver_iters = .false.
 
-      dX_nuc_drop_limit = 1d-3
-
 ! output
       num_trace_history_values = 6
       trace_history_value_name(1) = 'total_mass he4'
