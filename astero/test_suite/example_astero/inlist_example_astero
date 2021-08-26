@@ -2,8 +2,8 @@
 
       show_log_description_at_start = .false.
       
-      load_saved_model = .true.
-      load_model_filename = 'astero_test.mod'
+      create_pre_main_sequence_model = .true.
+      pre_ms_T_c = 9d5
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
