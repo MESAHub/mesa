@@ -234,11 +234,24 @@
 
          eps_grav = -T*(entropy - entropy_start)/s% dt
 
-         if (s% include_composition_in_eps_grav) then
-            call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
-            if (ierr /= 0) return
-            eps_grav = eps_grav + eps_grav_composition_term
-         end if
+         ! NOTE: the correct version of the composition term to go with TdS is
+         !     -sum_i (\partial e/\partial Y_i)_{s,\rho} dY_i
+         ! see for example, MESA IV, equation (59)
+         !
+         ! When on PC near crystallization (the only place the lnS form is used)
+         ! there are typically no composition changes, so we drop this term
+         !
+         ! The term we normally use comes from expanding in the (rho,T,X) basis
+         !     -sum_ (\partial e/\partial X_i)_{T,\rho} dX_i
+         ! and in practice can be a reasonable approximation to the above.
+         !
+         ! If an such approximation is desired, one could use the following code:
+
+         ! if (s% include_composition_in_eps_grav) then
+         !    call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
+         !    if (ierr /= 0) return
+         !    eps_grav = eps_grav + eps_grav_composition_term
+         ! end if
 
          if (is_bad(eps_grav% val)) then
             ierr = -1

@@ -26,7 +26,6 @@
     mass_change = 1d-6
 
   ! use eps_grav form
-    use_dedt_form_of_energy_eqn = .false.
     use_gold_tolerances = .true.
 
   ! when to stop

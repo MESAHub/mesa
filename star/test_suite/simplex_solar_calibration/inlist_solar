@@ -107,7 +107,7 @@
       diffusion_isolve_solver = 'ros2_solver'
 
       ! solver
-      use_dedt_form_of_energy_eqn = .true. 
+      energy_eqn_option = 'dedt'
       mlt_Pturb_factor = 1
       
       ! controls for output      

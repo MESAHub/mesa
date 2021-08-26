@@ -35,7 +35,6 @@
     initial_z = 0d0
 
   ! don't need
-    use_dedt_form_of_energy_eqn = .false.
     use_gold_tolerances = .false.
 
   ! electron scattering

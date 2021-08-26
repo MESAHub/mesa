@@ -62,7 +62,7 @@
       mesh_delta_coeff = 1.5     
 
 ! solver
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
 ! output
       num_trace_history_values = 2
