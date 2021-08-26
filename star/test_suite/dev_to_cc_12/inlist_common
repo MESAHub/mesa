@@ -18,7 +18,7 @@
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -112,7 +112,7 @@
       delta_lgRho_limit = 0.1 
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.001  
+      delta_lgT_cntr_limit = 0.003 
       delta_lgT_cntr_hard_limit = 0.01
 
       delta_lgT_max_limit_only_after_near_zams = .true.
