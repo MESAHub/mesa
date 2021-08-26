@@ -16,8 +16,8 @@
       change_initial_net = .true.      
       new_net_name = 'approx21_cr60_plus_co56.net'
 
-      change_initial_u_flag = .true.
       change_initial_v_flag = .true.
+      change_initial_u_flag = .true.
       new_v_flag = .false.
       new_u_flag = .true.
 
@@ -41,6 +41,7 @@
 / ! end of eos namelist
 
 &kap
+      kap_file_prefix = 'gs98'
       Zbase = 0.006d0
       use_Type2_opacities = .false.
 / ! end of kap namelist
@@ -69,8 +70,6 @@
 ! equation controls
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
       use_dedt_form_of_energy_eqn = .true.
-      
-      !use_momentum_outer_BC = .true.
       use_fixed_vsurf_outer_BC = .true.
       fixed_vsurf = 0d0
 
@@ -119,7 +118,7 @@
 
 ! solver controls
       
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
 
 
 ! output controls
@@ -145,6 +144,8 @@
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
+
+report_solver_progress = .true.
 
 / ! end of controls namelist
 
