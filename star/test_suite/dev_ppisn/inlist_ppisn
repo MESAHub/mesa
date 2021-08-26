@@ -66,7 +66,7 @@
 
    warn_when_large_rel_run_E_err = 1d-2
 
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
 
    ! adjustments to the newton solver
    solver_max_tries_before_reject = 30

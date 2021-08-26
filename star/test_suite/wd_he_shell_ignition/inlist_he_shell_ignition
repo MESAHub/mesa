@@ -59,7 +59,7 @@
       
       power_he_burn_upper_limit = 1d12
 
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
       ! can't make it through the flash at the end with this true
       ! check again after composition derivatives exist
       include_composition_in_eps_grav = .false.

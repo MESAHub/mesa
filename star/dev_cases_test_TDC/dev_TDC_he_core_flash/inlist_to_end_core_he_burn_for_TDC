@@ -110,7 +110,7 @@
 
    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
 
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
    convergence_ignore_equL_residuals = .true.
 
 ! output

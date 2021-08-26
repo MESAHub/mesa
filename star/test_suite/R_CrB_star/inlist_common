@@ -27,7 +27,7 @@
       initial_y = 0.994 ! H-free
       initial_z = 0.006
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       varcontrol_target = 1d-3
 
       photo_interval = 100

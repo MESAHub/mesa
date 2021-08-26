@@ -337,13 +337,14 @@
     get_delta_nu_from_scaled_solar, nu_max_sun, delta_nu_sun, Teff_sun, delta_Pg_mode_freq, &
     
     ! hydro parameters
+    energy_eqn_option, &
     opacity_factor, opacity_max, min_logT_for_opacity_factor_off, min_logT_for_opacity_factor_on, &
     max_logT_for_opacity_factor_on, max_logT_for_opacity_factor_off, &
-    non_nuc_neu_factor, always_use_dedt_form_of_energy_eqn, &
-    use_dedt_form_of_energy_eqn, use_time_centered_eps_grav, &
+    non_nuc_neu_factor, &
+    use_time_centered_eps_grav, &
     use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, &
     include_composition_in_eps_grav, no_dedt_form_during_relax, &
-    max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
+    max_abs_rel_change_surf_lnS, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, dedt_eqn_r_scale, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
@@ -614,10 +615,29 @@
  if (ierr /= 0) return
 
  call read_controls_file(s, filename, 1, ierr)
+ call check_controls(s, ierr)
  call mkdir(s% photo_directory)
  call mkdir(s% log_directory)
 
  end subroutine read_controls
+
+
+ subroutine check_controls(s, ierr)
+    type (star_info), pointer :: s
+    integer, intent(out) :: ierr
+
+    ierr = 0
+
+    if (.not. (trim(s% energy_eqn_option) == 'dedt' .or. trim(s% energy_eqn_option) == 'eps_grav')) then
+       write(*,*)
+       write(*,*) "Invalid choice for energy_eqn_option"
+       write(*,*) "Available options are 'dedt' or 'eps_grav'"
+       write(*,*)
+       ierr = -1
+       return
+    end if
+
+ end subroutine check_controls
 
 
  recursive subroutine read_controls_file(s, filename, level, ierr)
@@ -1826,6 +1846,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
 
  ! hydro parameters
+ s% energy_eqn_option = energy_eqn_option
  s% opacity_factor = opacity_factor
  s% opacity_max = opacity_max
  s% min_logT_for_opacity_factor_off = min_logT_for_opacity_factor_off
@@ -1835,11 +1856,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% dxdt_nuc_factor = dxdt_nuc_factor
  s% non_nuc_neu_factor = non_nuc_neu_factor
- s% use_dedt_form_of_energy_eqn = use_dedt_form_of_energy_eqn
- s% always_use_dedt_form_of_energy_eqn = always_use_dedt_form_of_energy_eqn
  s% use_time_centered_eps_grav = use_time_centered_eps_grav
  s% no_dedt_form_during_relax = no_dedt_form_during_relax
- s% always_use_eps_grav_form_of_energy_eqn = always_use_eps_grav_form_of_energy_eqn
  s% dedt_eqn_r_scale = dedt_eqn_r_scale
  s% use_mass_corrections = use_mass_corrections
  s% use_gravity_rotation_correction = use_gravity_rotation_correction
@@ -3500,6 +3518,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  delta_Pg_mode_freq = s% delta_Pg_mode_freq
 
  ! hydro parameters
+ energy_eqn_option = s% energy_eqn_option
  opacity_max = s% opacity_max
  opacity_factor = s% opacity_factor
  min_logT_for_opacity_factor_off = s% min_logT_for_opacity_factor_off
@@ -3508,11 +3527,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  max_logT_for_opacity_factor_off = s% max_logT_for_opacity_factor_off
 
  non_nuc_neu_factor = s% non_nuc_neu_factor
- use_dedt_form_of_energy_eqn = s% use_dedt_form_of_energy_eqn
- always_use_dedt_form_of_energy_eqn = s% always_use_dedt_form_of_energy_eqn
  use_time_centered_eps_grav = s% use_time_centered_eps_grav
  no_dedt_form_during_relax = s% no_dedt_form_during_relax
- always_use_eps_grav_form_of_energy_eqn = s% always_use_eps_grav_form_of_energy_eqn
  dedt_eqn_r_scale = s% dedt_eqn_r_scale
  use_mass_corrections = s% use_mass_corrections
  use_gravity_rotation_correction = s% use_gravity_rotation_correction

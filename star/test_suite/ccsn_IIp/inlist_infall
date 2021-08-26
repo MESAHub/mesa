@@ -83,7 +83,7 @@
 
   calculate_Brunt_N2 = .false.
 
-  use_dedt_form_of_energy_eqn = .true.
+  energy_eqn_option = 'dedt'
 
   eps_nuc_factor = 0
 
