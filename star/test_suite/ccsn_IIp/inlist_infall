@@ -73,7 +73,7 @@
 
 ! timestep controls
   max_timestep = 0.05
-  varcontrol_target = 0.001
+  varcontrol_target = 3d-4
 
   dX_nuc_drop_limit_at_high_T = 0.01
   delta_lgL_He_limit = 0.5
@@ -97,7 +97,7 @@
   hard_limit_for_rel_error_in_energy_conservation = 1d99
 
 ! solver controls    
-  convergence_ignore_equL_residuals = .false.
+  convergence_ignore_equL_residuals = .true.
 
 ! output controls
   terminal_interval = 5
