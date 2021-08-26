@@ -11,22 +11,32 @@
   ! make it pure carbon
     num_steps_to_relax_composition = 100
     relax_initial_to_xaccrete = .true.
-      
-  ! use all HELM
-    use_PC = .false.
-    use_FreeEOS = .false.
-
-    set_HELM_ion_neutral_blends = .true.
-    logT_ion_HELM = 2.0d0
-    logT_neutral_HELM = 1.5d0
 
   ! display on-screen plots
-    pgstar_flag = .true.
+    pgstar_flag = .false.
 
 / !end of star_job namelist
 
 
+&eos
+  ! use all HELM
+    use_FreeEOS = .false.
+    use_OPAL_SCVH = .false.
+    use_PC = .false.
+    use_Skye = .false.
+
+/ ! end of eos namelist
+
+
+&kap
+    Zbase = 0d0
+/ ! end of kap namelist
+
+
 &controls
+
+  ! limit timestep
+    max_years_for_timestep = 30
 
   ! starting specifications
     initial_mass = 1.3 ! in Msun units
@@ -51,3 +61,8 @@
     dxdt_nuc_factor = 0
 
 / ! end of controls namelist
+
+
+&pgstar
+
+/ ! end of pgstar namelist
