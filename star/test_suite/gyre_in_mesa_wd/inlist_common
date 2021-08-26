@@ -73,16 +73,12 @@
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 0.01
       thermohaline_coeff = 2
-
-      okay_to_reduce_gradT_excess = .true.
-      gradT_excess_lambda1 = -1 ! turn on full all the time
       
 ! timesteps
       max_years_for_timestep = 1d9
-      
       varcontrol_target = 1d-3
       dX_nuc_drop_limit = 1d-2
-      delta_HR_limit = 0.05
+      delta_HR_limit = 0.03
 
 ! Atm
       atm_option = 'T_tau'
