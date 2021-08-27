@@ -68,7 +68,7 @@ for (int i = 1; i <= ntests; i++) {
   testStages[name] = { ->
     node(labels) {
       stage(name) {
-	timeout(time: 12, unit: 'HOURS') {
+	timeout(time: 24, unit: 'HOURS') {
 	  withEnv(vars) {
 	    catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
 	      image.inside("-v ${dir}:${dir}:rw") {
