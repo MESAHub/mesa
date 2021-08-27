@@ -291,9 +291,6 @@
 
          eps_grav_composition_term = 0
 
-         ! for now, bail if in new material
-         if (k < s% k_below_just_added) return
-
          if (s% use_time_centered_eps_grav) then
             theta = 0.5_dp
          else
