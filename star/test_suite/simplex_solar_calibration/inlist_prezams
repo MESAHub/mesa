@@ -44,7 +44,8 @@
       
       ! solver
       mlt_Pturb_factor = 1
-      MLT_option = 'Cox'      
+      MLT_option = 'TDC'
+      steps_before_use_TDC = 10      
 
       photo_interval = 50
       profile_interval = 50

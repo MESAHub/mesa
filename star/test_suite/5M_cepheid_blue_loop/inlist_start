@@ -50,7 +50,8 @@
    energy_eqn_option = 'dedt'
 
    mixing_length_alpha = 1.8d0
-   MLT_option = 'Cox'
+!   MLT_option = 'Cox'
+steps_before_use_TDC = 10
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.1
