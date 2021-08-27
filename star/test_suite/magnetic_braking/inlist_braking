@@ -59,7 +59,7 @@
     Dutch_scaling_factor = 0.8
 
   ! Solver controls
-    use_dedt_form_of_energy_eqn = .true. ! Energy conservation
+    energy_eqn_option = 'dedt'
     use_gold_tolerances = .true.         ! Tight tolerances
     use_gold2_tolerances = .true.        ! Tighter tolerances
 

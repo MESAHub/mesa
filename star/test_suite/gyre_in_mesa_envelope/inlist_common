@@ -21,7 +21,7 @@
   
   x_integer_ctrl(1) = 0 ! output GYRE info at this step interval (zero disables)
 
-  use_dedt_form_of_energy_eqn = .true.
+  energy_eqn_option = 'dedt'
   
   calculate_Brunt_N2 = .true.
 

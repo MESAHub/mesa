@@ -152,7 +152,7 @@
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 1d-4
 
-      always_use_dedt_form_of_energy_eqn = .true.       
+      energy_eqn_option = 'dedt'
       max_tries_for_implicit_wind = 0      
 
       convergence_ignore_equL_residuals = .true. 

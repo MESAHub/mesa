@@ -80,8 +80,7 @@
       
       mesh_delta_coeff = 0.5
 
-      always_use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
       max_abs_rel_run_E_err = 1d99
 
       max_abar_for_burning = 55

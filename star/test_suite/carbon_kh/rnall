@@ -3,7 +3,7 @@
 do_one(){
     ln -sf inlists/inlist_$1 inlist_equations
     ln -sf inlists/inlist_$2 inlist_resolution
-    ./rn
+    MESA_SKIP_OPTIONAL=t ./rn
     mv LOGS/history.data LOGS/$1-$2.data
     mv final_profile.data LOGS/$1-$2.profile
 }
@@ -13,11 +13,10 @@ do_set(){
     do_one $1 lr
     do_one $1 mr
     do_one $1 hr
-#    do_one $1 ur
+    do_one $1 ur
 }
 
 do_set dedt_total
-do_set dedt_internal
 do_set eps_grav
 do_set eps_grav_future
 

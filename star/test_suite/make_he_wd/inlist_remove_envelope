@@ -46,8 +46,8 @@
 &controls
       
       max_age = 1d8
-   
-      always_use_eps_grav_form_of_energy_eqn = .true.
+
+      energy_eqn_option = 'eps_grav'
 
       warn_when_large_rel_run_E_err = 1d99
       max_abs_rel_run_E_err = 1d99
