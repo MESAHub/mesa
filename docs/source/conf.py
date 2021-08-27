@@ -98,7 +98,7 @@ rst_prolog = r"""
 .. |logRho| replace:: :math:`\log(\rho/\rm g\,cm^{-3})`
 .. |logT| replace:: :math:`\log(T/\rm K)`
 .. |chi^2| replace:: :math:`\chi^2`
-.. |gpercm3| replace:: :math`g\,cm^{-3}`
+.. |gpercm3| replace:: :math:`\rm g\,cm^{-3}`
 """
 
 # set default highlighting language
