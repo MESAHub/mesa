@@ -64,7 +64,6 @@ contains
             mixing_length_alpha, cgrav, m, .true., &
             mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, Y_face, ierr)
-         stop 'get_TDC_solution failed in set_TDC'
       end if
 
       gradT = Y_face + gradL
@@ -177,14 +176,6 @@ contains
       else
          A0 = s% mlt_vc(k)/sqrt_2_div_3
       end if
-
-      ! Bail early if it's trivially radiative
-      !if (A0 == 0 .and. L < L0) then
-      !   cv = 0d0
-      !   Y_face = unconvert(grada * (L / L0) - gradL)
-      !   mixing_type = no_mixing
-      !   return
-      !end if
 
       ! Set scale for judging the solution to Q(Y)=0.
       ! Q has units of a luminosity, so the scale should be a luminosity.
