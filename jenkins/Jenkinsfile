@@ -1,0 +1,89 @@
+properties([
+  disableConcurrentBuilds(),
+  buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
+])
+
+def labels = 'linux && docker && mesa'
+/* use HOME=MESA_DIR=customWorkspace=dir for build */
+def dir = "${env.JENKINS_HOME}/mesa/${env.BRANCH_NAME}"
+def image
+def vars = [
+    /* 4*4=16 isn't quite right as we're limited to 4, but in practice it seems work out */
+    "OMP_NUM_THREADS=4",
+    "NPROCS=4",
+    "HOME=${dir}",
+    "MESA_DIR=${dir}",
+  ]
+def ntests = 0
+
+node(labels) {
+  stage('build') {
+    timeout(time: 1, unit: 'HOURS') {
+      withEnv(vars) {
+	ws(env.HOME) {
+          checkout scm
+          withCredentials([
+              usernamePassword(credentialsId: 'mesa_test', passwordVariable: 'MESA_TEST_PSW', usernameVariable: 'MESA_TEST_USR'),
+              string(credentialsId: 'mesa_test_logs_token', variable: 'MESA_LOGS_TOKEN')]) {
+            writeYaml(file: "${env.HOME}/.mesa_test/config.yml", overwrite: true, data: [
+              'computer_name': 'Jenkins',
+              'email': env.MESA_TEST_USR,
+              'password': env.MESA_TEST_PSW,
+              'logs_token': env.MESA_LOGS_TOKEN,
+              'github_protocol': ':ssh',
+              'mesa_mirror': "${env.HOME}/mirror", /* not used */
+              'mesa_work': env.MESA_DIR,
+              'platform': 'Linux',
+              'platform_version': 'Ubuntu'
+            ])
+          }
+          image = docker.build("flatironinstitute/mesa:${env.BRANCH_NAME}", "jenkins")
+          image.inside() {
+            sh '''#!/bin/bash -ex
+              source $MESASDK_ROOT/bin/mesasdk_init.sh
+              mesa_test install --no-checkout
+              mesa_test submit --empty
+            '''
+	    def nt = sh returnStdout: true, script: '''#!/bin/bash
+	      source $MESASDK_ROOT/bin/mesasdk_init.sh
+	      ntests=0
+	      for f in $MESA_DIR/*/test_suite ; do
+		nt=$(cd $f && ./count_tests)
+		(( ntests+=nt ))
+	      done
+	      echo $ntests
+	    '''
+	    ntests = nt.toInteger()
+          }
+        }
+      }
+    }
+  }
+}
+
+def testStages = [:]
+for (int i = 1; i <= ntests; i++) {
+  def test = i
+  def name = "test ${test}"
+  testStages[name] = { ->
+    node(labels) {
+      stage(name) {
+	timeout(time: 24, unit: 'HOURS') {
+	  withEnv(vars) {
+	    catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+	      image.inside("-v ${dir}:${dir}:rw") {
+		sh """#!/bin/bash -e
+		  source \$MESASDK_ROOT/bin/mesasdk_init.sh
+
+		  mesa_test test $test
+		"""
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
+
+parallel testStages
