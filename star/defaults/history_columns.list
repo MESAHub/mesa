@@ -985,20 +985,20 @@
 
 !# RSP
 
-   !rsp_deltamag
-   !rsp_deltar
-   !rsp_grekm
-   !rsp_grekm_avg_abs
-   !rsp_grpdv
-   !rsp_lina_growth_rate_f
-   !rsp_lina_growth_rate_o1
-   !rsp_lina_growth_rate_o2
-   !rsp_lina_period_f_days
-   !rsp_lina_period_o1_days
-   !rsp_lina_period_o2_days
-   !rsp_num_periods
-   !rsp_period_in_days
-   !rsp_phase
+   !rsp_deltamag ! 2.5*log(L_max/L_min) ratio of max to min luminosity (Lsun)
+   !rsp_deltar ! R_max - R_min difference in the max and min radius (Rsun)
+   !rsp_grekm !
+   !rsp_grekm_avg_abs !
+   !rsp_grpdv !
+   !rsp_lina_growth_rate_f ! LINA growth rate for fundemental mode
+   !rsp_lina_growth_rate_o1 ! LINA growth rate for 1st overtone
+   !rsp_lina_growth_rate_o2 ! LINA growth rate for 2nd overtone
+   !rsp_lina_period_f_days ! Fundemental mode period (days)
+   !rsp_lina_period_o1_days ! 1st overtone period (days)
+   !rsp_lina_period_o2_days ! 2nd overtone period (days)
+   !rsp_num_periods ! Count of the number of pulsation cycles completed
+   !rsp_period_in_days ! Pulsation period of the mode given by ``RSP_mode_for_setting_PERIODLIN'' (days) 
+   !rsp_phase ! 0-1 value of phase of the mode given by ``RSP_mode_for_setting_PERIODLIN''
 
 !----------------------------------------------------------------------------------------------
 !# debugging
