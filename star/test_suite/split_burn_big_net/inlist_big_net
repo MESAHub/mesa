@@ -74,6 +74,9 @@
       !history_interval = 1
       terminal_interval = 1
 
+      x_integer_ctrl(1) = 1 ! Part number ! Set this to 0 to turn of test suite checks
+
+
 / ! end of controls namelist
 
 
