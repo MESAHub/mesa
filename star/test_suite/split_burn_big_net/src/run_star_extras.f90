@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  The MESA Team
+!   Copyright (C) 2021  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -26,7 +26,6 @@
       use star_def
       use const_def
       use math_lib
-      use gyre_lib
       
       implicit none
       
@@ -38,19 +37,11 @@
          !alpha_H = s% x_ctrl(21)
          !alpha_other = s% x_ctrl(22)
          !H_limit = s% x_ctrl(23)
-
-!gyre
-      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
-      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      !x_logical_ctrl(2) = .false. ! output eigenfunction files
-      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-      !x_integer_ctrl(4) = 1 ! order
-      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
-
       
+! test suite
+      ! s% x_integer_ctrl(1)  part number (set to 0 to disable test suite checks)
+
+
       contains
 
       include "test_suite_extras.inc"
@@ -118,24 +109,6 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
          
-         if (.not. s% x_logical_ctrl(37)) return
-         
-         ! Initialize GYRE
-
-         call gyre_init('gyre.in')
-
-         ! Set constants
-
-         call gyre_set_constant('G_GRAVITY', standard_cgrav)
-         call gyre_set_constant('C_LIGHT', clight)
-         call gyre_set_constant('A_RADIATION', crad)
-
-         call gyre_set_constant('M_SUN', Msun)
-         call gyre_set_constant('R_SUN', Rsun)
-         call gyre_set_constant('L_SUN', Lsun)
-
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
-         
       end subroutine extras_startup
       
       
@@ -150,11 +123,20 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         nz = s% nz
-         write(*,*)
+
+         select case (s% x_integer_ctrl(1)) 
+
+         case(1) ! inlist_big_net
+
+            ! Information for testhub
+            testhub_extras_names(1) = 'total_burn_solver_steps'
+
+            testhub_extras_vals(1) = sum(s% burn_num_iters(1:s% nz))
+
+         end select
+
+
          call test_suite_after_evolve(s, ierr)
-         if (.not. s% x_logical_ctrl(37)) return
-         call gyre_final()
       end subroutine extras_after_evolve
       
 
@@ -223,8 +205,6 @@
          end do
       end subroutine data_for_extra_profile_columns
   
-      include 'gyre_in_mesa_extras_finish_step.inc'
-
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
@@ -234,8 +214,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (.not. s% x_logical_ctrl(37)) return
-         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+
          if (extras_finish_step == terminate) &
              s% termination_code = t_extras_finish_step
       end function extras_finish_step
