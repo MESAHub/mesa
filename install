@@ -112,7 +112,7 @@ then
 		echo "*                                                              *"
 		echo "****************************************************************"
 		echo
-		#exit 1
+		exit 1
 	fi
 
         # empirically on lustre filesystems the LFS files don't immediately appear
