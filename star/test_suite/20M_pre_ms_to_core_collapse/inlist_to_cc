@@ -10,12 +10,6 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
-      !set_initial_age = .false.
-      set_initial_age = .true.
-      initial_age = 0
-
-      set_initial_model_number = .false.
-      set_initial_number_retries = .false.
 
 / ! end of star_job namelist
 

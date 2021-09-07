@@ -4,23 +4,11 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      load_model_filename = 'after_core_he_burn.mod'
+      load_model_filename = 'removed_envelope.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'removed_envelope.mod'
-      required_termination_code_string = 'max_model_number'
-
-      set_initial_age = .true.
-      initial_age = 0
-
-      set_initial_model_number = .true.
-      set_initial_number_retries = .true.
-
-      ! uncomment the following to remove H env
-      !relax_initial_mass_to_remove_H_env = .true.
-      !lg_max_abs_mdot = -2
-
-      pgstar_flag = .false.
+      save_model_filename = 'after_core_c_burn.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
 
 / ! end of star_job namelist
 
@@ -31,9 +19,12 @@
 / ! end of kap namelist
 
 &controls
-      
-      ! just run for a relatively small number of steps to adjust to removing envelope
-      max_model_number = 100
+
+      xa_central_lower_limit_species(1) = 'c12'
+      xa_central_lower_limit(1) = 1d-3
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 10000
       !max_number_retries = 37
 
 ! wind
@@ -55,6 +46,11 @@
 ! solver
 
 ! output
+      terminal_show_age_units = 'years'
+      terminal_show_timestep_units = 'days'
+      terminal_show_log_dt = .false.
+      terminal_show_log_age = .false.
+
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
@@ -70,14 +66,12 @@
 
 &pgstar
 
-
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
 Profile_Panels3_xmax = -101d0 ! 
-Profile_Panels3_yaxis_name(4) = 'gamma1'
 
-TRho_Profile_xmin = 2.0
+TRho_Profile_xmin = 2.5
 TRho_Profile_xmax = 7.5
-TRho_Profile_ymin = 8.3
+TRho_Profile_ymin = 8.4
 TRho_Profile_ymax = 9.2
 
 / ! end of pgstar namelist

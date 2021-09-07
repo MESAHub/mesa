@@ -3,7 +3,7 @@
 
 !pause = .true.
 
-pgstar_interval = 2
+pgstar_interval = 1
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.
 pgstar_sleep = 0.0
@@ -20,9 +20,9 @@ Grid1_win_width = 12
 Grid1_win_aspect_ratio = 0.666
 
 ! file output
-!Grid1_file_flag = .true.
+Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
-Grid1_file_prefix = 'black_hole_'
+Grid1_file_prefix = 'Grid1_'
 Grid1_file_interval = 25     ! output when mod(model_number,Grid1_file_interval)==0
 Grid1_file_width = -1        ! (inches) negative means use same value as for window
 Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
@@ -674,6 +674,9 @@ file_extension = 'png'           ! common names are 'png' and 'ps'
 !file_device = 'vcps'            ! options 'png' and 'vcps' for png and postscript respectively
 !file_extension = 'ps'           ! common names are 'png' and 'ps'
 
+
+kipp_win_flag=.true.
+kipp_file_flag=.true.
 
 
 / ! end of pgstar namelist
