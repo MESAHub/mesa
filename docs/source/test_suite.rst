@@ -139,6 +139,11 @@ This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre
 
 The test checks thermohaline mixing in a rotating, 1 Msun, Z=0.02 metallicity model.
 
+:ref:`20M_pre_ms_to_core_collapse`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite evolves a low metalicity 20 |MSun| model from the pre-ms to core collapse.
+
 
 :ref:`20M_z2m2_high_rotation`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

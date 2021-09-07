@@ -26,6 +26,7 @@
       show_timestep_limit_counts_when_terminate = .true.
 
       !pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
 
@@ -94,10 +95,14 @@
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
 
-      overshoot_scheme(1) = 'none'
+      overshoot_scheme(1) = 'exponential'
       overshoot_zone_type(1) = 'any'
       overshoot_zone_loc(1) = 'any'
       overshoot_bdy_loc(1) = 'any'
+
+      overshoot_f(1) = 0.005d0
+      overshoot_f0(1) = 0.001d0
+
 
 ! timesteps
       time_delta_coeff = 1.0

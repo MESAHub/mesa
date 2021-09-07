@@ -10,9 +10,6 @@
       save_model_filename = 'lgTmax.mod'
       required_termination_code_string = 'log_max_temp_upper_limit'
 
-      set_initial_model_number = .false.
-      set_initial_number_retries = .false.
-
 / ! end of star_job namelist
 
 &eos
