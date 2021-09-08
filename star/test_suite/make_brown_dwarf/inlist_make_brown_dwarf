@@ -36,10 +36,9 @@
 
    max_age = 2.0d10
    
-   always_use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
 
    warning_limit_for_max_residual = 1d99   
-   use_dedt_form_of_energy_eqn = .true.
 
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'

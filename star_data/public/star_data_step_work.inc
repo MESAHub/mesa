@@ -1054,7 +1054,7 @@
          real(dp), pointer, dimension(:)  :: total_energy_profile_after_adjust_mass
          ! End of eps_mdot
 
-         logical, pointer :: eps_grav_form_for_energy_eqn(:)
+         logical :: eps_grav_form_for_energy_eqn
          real(dp), pointer, dimension(:)  :: &
             dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, detrbdt
             

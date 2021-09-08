@@ -37,7 +37,7 @@
     max_model_number = 700     ! limit max_model_number as part of test_suite
 
   ! Solver controls
-    use_dedt_form_of_energy_eqn = .true. ! Energy conservation
+    energy_eqn_option = 'dedt'
     use_gold_tolerances = .true.         ! Tight tolerances
     use_gold2_tolerances = .true.        ! Tighter tolerances
     delta_lgRho_cntr_limit = 1d-2        ! Evolve carefully

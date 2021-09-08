@@ -22,7 +22,7 @@ kap/ @fxt @aarondotter @jschwab
 linters/ @rjfarmer @jschwab
 math/ @rhdtownsend
 mtx/ @adamjermyn @rjfarmer @mjoyceGR
-net/ @rjfarmer @fxt @jschwab
+net/ @rjfarmer @fxt
 neu/ @rjfarmer @fxt
 num/ @adamjermyn
 rates/ @rjfarmer @fxt @jschwab
@@ -55,16 +55,15 @@ star/test_suite/5M_cepheid_blue_loop @annethoul @rsmolec
 star/test_suite/7M_prems_to_AGB @annethoul
 star/test_suite/accreted_material_j
 star/test_suite/adjust_net @rjfarmer
-star/test_suite/c13_pocket @jschwab @fxt
-star/test_suite/carbon_acc @jschwab
-star/test_suite/carbon_kh @jschwab @evbauer
+star/test_suite/c13_pocket @fxt
+star/test_suite/carbon_kh @evbauer
 star/test_suite/cburn_inward @rjfarmer
 star/test_suite/ccsn_IIp @rjfarmer @fxt
 star/test_suite/check_redo 
 star/test_suite/conductive_flame @fxt @rjfarmer
 star/test_suite/conserve_angular_momentum
 star/test_suite/custom_colors @rjfarmer
-star/test_suite/custom_rates @jschwab @evbauer @adamjermyn @fxt
+star/test_suite/custom_rates @evbauer @adamjermyn @fxt
 star/test_suite/dev_high_rot_darkening
 star/test_suite/dev_ppisn @rjfarmer
 star/test_suite/dev_split_burn_big_net @rjfarmer
@@ -105,7 +104,7 @@ star/test_suite/ns_he @rjfarmer @fxt
 star/test_suite/other_physics_hooks
 star/test_suite/pisn @rjfarmer
 star/test_suite/radiative_levitation @evbauer
-star/test_suite/R_CrB_star @jschwab
+star/test_suite/R_CrB_star @fxt
 star/test_suite/relax_composition_j_entropy
 star/test_suite/rsp_BEP @rsmolec
 star/test_suite/rsp_BLAP @rsmolec
@@ -119,13 +118,13 @@ star/test_suite/rsp_save_and_load_file @rsmolec
 star/test_suite/rsp_Type_II_Cepheid @rsmolec
 star/test_suite/semiconvection  @annethoul
 star/test_suite/simplex_solar_calibration @mjoyceGR
-star/test_suite/test_case_template @jschwab
+star/test_suite/test_case_template
 star/test_suite/test_memory @rjfarmer
 star/test_suite/timing @rjfarmer
 star/test_suite/T_tau_gradr @warrickball
 star/test_suite/twin_studies
 star/test_suite/wd_acc_small_dm @wmwolf
-star/test_suite/wd_aic @jschwab
+star/test_suite/wd_aic @fxt
 star/test_suite/wd_c_core_ignition @wmwolf
 star/test_suite/wd_cool_0.6M @evbauer @fxt
 star/test_suite/wd_diffusion @evbauer

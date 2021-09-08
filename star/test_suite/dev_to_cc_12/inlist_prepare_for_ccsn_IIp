@@ -53,7 +53,7 @@
       use_gold2_tolerances = .false.
 
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       
       use_momentum_outer_BC = .true.
       

@@ -100,7 +100,6 @@
          call setup_d_turbulent_energy_dt(ierr); if (ierr /= 0) return         
          call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return
          
-         s% eps_grav_form_for_energy_eqn(k) = eps_grav_form
          s% dL_dm(k) = dL_dm_ad%val
          s% dwork_dm(k) = dwork_dm_ad%val
          s% energy_sources(k) = sources_ad%val 
@@ -345,14 +344,10 @@
                return
             end if
 
-            eps_grav_form = .not. s% use_dedt_form_of_energy_eqn
-         
-            if (eps_grav_form) then ! check if want it false         
-               if (s% always_use_dedt_form_of_energy_eqn) eps_grav_form = .false.            
-            end if
+            ! value from checking s% energy_eqn_option in hydro_eqns.f90
+            eps_grav_form = s% eps_grav_form_for_energy_eqn
          
             if (.not. eps_grav_form) then ! check if want it true
-               if (s% always_use_eps_grav_form_of_energy_eqn) eps_grav_form = .true.             
                if (s% doing_relax .and. s% no_dedt_form_during_relax) eps_grav_form = .true.         
             end if
 

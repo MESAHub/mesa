@@ -59,7 +59,7 @@ There are four files to edit. First, modify ``make/makefile``:
 
    to 
 
-       ! MESA_DIR = ../../../..
+       # MESA_DIR = ../../../..
   
    Save the file change in your editor, and
 

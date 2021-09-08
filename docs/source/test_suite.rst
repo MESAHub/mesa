@@ -139,6 +139,11 @@ This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre
 
 The test checks thermohaline mixing in a rotating, 1 Msun, Z=0.02 metallicity model.
 
+:ref:`20M_pre_ms_to_core_collapse`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test suite evolves a low metalicity 20 |MSun| model from the pre-ms to core collapse.
+
 
 :ref:`20M_z2m2_high_rotation`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -171,10 +176,13 @@ This test suite example checks the accretion of material and angular momentum on
 This test suite example checks the functionality of the adaptive nuclear reaction network.
 
 
-:ref:`carbon_acc`
-^^^^^^^^^^^^^^^^^
+:ref:`carbon_kh`
+^^^^^^^^^^^^^^^^
 
-This test suite example checks the accretion of carbon onto a pure carbon white dwarf.
+This test suite case evolves a stellar model with a pure carbon
+composition as it Kelvin-Helmholtz contracts.  It provides a
+convergence example for the different forms of the energy equation.
+
 
 :ref:`cburn_inward`
 ^^^^^^^^^^^^^^^^^^^
@@ -423,6 +431,11 @@ see |MESA V|.The test vehicle is with a 1.5 Msun, Z=0.02 metallicity, model.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This test case exercises the simplex framework with a check of the chi^2 value for 1.0 Msun, Z=0.02 metallicity, solar model.
+
+:ref:`split_burn_big_net`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case tests MESA's ability to perfom a split-burn calculation in a 25 |Msun| star during silicon burning.
 
 :ref:`test_memory`
 ^^^^^^^^^^^^^^^^^^

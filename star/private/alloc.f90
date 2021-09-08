@@ -1015,8 +1015,6 @@
             call do1(s% total_energy_profile_after_adjust_mass, c% total_energy_profile_after_adjust_mass)
             if (failed('total_energy_profile_after_adjust_mass')) exit
 
-            call do1_logical(s% eps_grav_form_for_energy_eqn, c% eps_grav_form_for_energy_eqn)
-            if (failed('eps_grav_form_for_energy_eqn')) exit
             call do1(s% dL_dm, c% dL_dm)
             if (failed('dL_dm')) exit
             call do1(s% energy_sources, c% energy_sources)

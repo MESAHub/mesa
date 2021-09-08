@@ -1180,7 +1180,7 @@
 
             s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav_ad(1:nz)% val)
 
-            if (s% u_flag .and. s% total_eps_grav /= 0d0) then ! .or. s% use_dedt_form_of_energy_eqn) then
+            if (s% u_flag .and. s% total_eps_grav /= 0d0) then
                write(*,2) 'u_flag energy accounting ignores total_eps_grav', s% model_number, s% total_eps_grav
                s% total_eps_grav = 0
             end if
@@ -1395,7 +1395,7 @@
                write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
                write(*,*)
                
-               if (s% always_use_dedt_form_of_energy_eqn) then
+               if (trim(s% energy_eqn_option) == 'dedt') then
                   
                   write(*,*)
                   write(*,*) 'for debugging phase1_sources_and_sinks'
