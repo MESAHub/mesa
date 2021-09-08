@@ -58,62 +58,59 @@ contains
          A_numerator, A_denom, A, Bcubed, delta, Zeta, &
          f, f0, f1, f2, radiative_conductivity, convective_conductivity
       include 'formats' 
-      Q = chiT/chiRho ! 'Q' param  C&G 14.24
-      if (MLT_option == 'Cox' .or. MLT_option == 'TDC') then ! this assumes optically thick
-         a0 = 9d0/4d0
-         convective_conductivity = &
-            Cp*grav*pow2(Lambda)*rho*(sqrt(Q*rho/(2d0*P)))/9d0 ! erg / (K cm sec)
-         radiative_conductivity = &
-            (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho) ! erg / (K cm sec)
-         A = convective_conductivity / radiative_conductivity !  unitless.
-      else
-         select case(trim(MLT_option))
-         case ('Henyey')
-            ff1=1.0d0/Henyey_MLT_nu_param
-            ff2=0.5d0 
-            ff3=8.0d0/Henyey_MLT_y_param
-            ff4=1.0d0/Henyey_MLT_y_param
-         case ('ML1')
-            ff1=0.125d0 
-            ff2=0.5d0 
-            ff3=24.0d0
-            ff4=0.0d0
-         case ('ML2')
-            ff1=1.0d0
-            ff2=2.0d0
-            ff3=16.0d0
-            ff4=0.0d0
-         case ('Mihalas')
-            ff1=0.125d0 
-            ff2=0.5d0 
-            ff3=16.0d0
-            ff4=2.0d0
-         case default
-            write(*,'(3a)') 'Error: ', trim(MLT_option), ' is not an allowed MLT option'
-            call mesa_error(__FILE__,__LINE__)
-         end select
-         omega = Lambda*rho*opacity
-         ff4_omega2_plus_1 = ff4/pow2(omega) + 1d0
-         a0 = (3d0/16d0)*ff2*ff3/ff4_omega2_plus_1
-         A_1 = 4d0*Cp*sqrt(ff1*P*Q*rho)
-         A_2 = mixing_length_alpha*omega*ff4_omega2_plus_1
-         A_numerator = A_1*A_2
-         A_denom = ff3*crad*clight*pow3(T)
-         A = A_numerator/A_denom   
-      end if  
-      ! 'B' param  C&G 14.81
-      Bcubed = (pow2(A)/a0)*(gradr - gradL)   
-
-      if (Bcubed <= 0d0) then
-         ! Radiative zone, because this means that gradr < gradL
-         Zeta = 0d0
-         conv_vel = 0d0
-         D = 0d0
-      else
+      if (gradr > gradL) then
          ! Convection zone
 
+         Q = chiT/chiRho ! 'Q' param  C&G 14.24
+         if (MLT_option == 'Cox' .or. MLT_option == 'TDC') then ! this assumes optically thick
+            a0 = 9d0/4d0
+            convective_conductivity = &
+               Cp*grav*pow2(Lambda)*rho*(sqrt(Q*rho/(2d0*P)))/9d0 ! erg / (K cm sec)
+            radiative_conductivity = &
+               (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho) ! erg / (K cm sec)
+            A = convective_conductivity / radiative_conductivity !  unitless.
+         else
+            select case(trim(MLT_option))
+            case ('Henyey')
+               ff1=1.0d0/Henyey_MLT_nu_param
+               ff2=0.5d0 
+               ff3=8.0d0/Henyey_MLT_y_param
+               ff4=1.0d0/Henyey_MLT_y_param
+            case ('ML1')
+               ff1=0.125d0 
+               ff2=0.5d0 
+               ff3=24.0d0
+               ff4=0.0d0
+            case ('ML2')
+               ff1=1.0d0
+               ff2=2.0d0
+               ff3=16.0d0
+               ff4=0.0d0
+            case ('Mihalas')
+               ff1=0.125d0 
+               ff2=0.5d0 
+               ff3=16.0d0
+               ff4=2.0d0
+            case default
+               write(*,'(3a)') 'Error: ', trim(MLT_option), ' is not an allowed MLT option'
+               call mesa_error(__FILE__,__LINE__)
+            end select
+
+            omega = Lambda*rho*opacity
+            ff4_omega2_plus_1 = ff4/pow2(omega) + 1d0
+            a0 = (3d0/16d0)*ff2*ff3/ff4_omega2_plus_1
+            A_1 = 4d0*Cp*sqrt(ff1*P*Q*rho)
+            A_2 = mixing_length_alpha*omega*ff4_omega2_plus_1
+            A_numerator = A_1*A_2
+            A_denom = ff3*crad*clight*pow3(T)
+            A = A_numerator/A_denom   
+         end if 
+
+         ! 'B' param  C&G 14.81
+         Bcubed = (pow2(A)/a0)*(gradr - gradL)   
+
          ! now solve cubic equation for convective efficiency, Gamma
-         ! a0*Gamma^3 + Gamma^2 + Gamma - a0*Bcubed == 0   C&G 14.82, 
+         ! a0*Gamma^3 + Gamma^2 + Gamma - a0*Bcubed == 0   C&G 14.82,
          ! leave it to Mathematica to find an expression for the root we want      
          delta = a0*Bcubed               
          f = -2d0 + 9d0*a0 + 27d0*a0*a0*delta
@@ -132,6 +129,7 @@ contains
          f1 = pow(f1,one_third)     
          f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
          Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
+
          if (Gamma <= 0d0) return
 
          ! average convection velocity   C&G 14.86b
@@ -140,13 +138,19 @@ contains
 
          !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80
          Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
-      end if
-      
-      ! Zeta must be >= 0 and <= 1
-      if (is_bad(Zeta%val)) return
-      if (Zeta < 0d0) then
+      else
+         ! Radiative zone, because this means that gradr < gradL
          Zeta = 0d0
-      else if (Zeta > 1d0) then
+         conv_vel = 0d0
+         D = 0d0
+      end if
+
+      ! Zeta must be >= 0 and <= 1.
+      ! By construction (above) it cannot be less than zero,
+      ! so we just check that it is a valid number and is not greater
+      ! than one.
+      if (is_bad(Zeta%val)) return
+      if (Zeta > 1d0) then
          Zeta = 1d0
       end if            
       
