@@ -90,6 +90,13 @@ The testing `log archive <https://logs.mesastar.org/>`__ lives on a
 server controlled by Josiah.  The marginal cost is $1/month, which he
 covers.
 
+Jenkins
+^^^^^^^
+
+The Flatiron `Scientific Computing Core <https://www.simonsfoundation.org/flatiron/scientific-computing-core>`__
+provides continuous integration testing for MESA via jenkins.
+This was set up in 2021 by Dylan Simon (Flatiron) and Josiah.  The configuration lives in the ``jenkins`` directory.
+Matteo serves as the point of contact at Flatiron.
 
 Zenodo
 ------
