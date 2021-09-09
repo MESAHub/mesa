@@ -123,6 +123,15 @@
 
          if (s% fill_arrays_with_NaNs) call set_nan(s% equ1)
 
+         ! select form of energy equation
+         if (trim(s% energy_eqn_option) == 'eps_grav') then
+            s% eps_grav_form_for_energy_eqn = .true.
+         else if (trim(s% energy_eqn_option) == 'dedt') then
+            s% eps_grav_form_for_energy_eqn = .false.
+         else
+            stop 'Invalid choice for energy_eqn_option'
+         end if
+
       ! solving structure equations
 
 !$OMP PARALLEL DO PRIVATE(op_err,k) SCHEDULE(dynamic,2)

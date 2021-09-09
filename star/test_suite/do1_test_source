@@ -2,9 +2,9 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
-do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
+do_one split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one dev_to_cc_12 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-do_one dev_to_cc_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+do_one 20M_pre_ms_to_core_collapse "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one zams_to_cc_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_to_ppisn_100 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one pisn "termination code: Star is unbound" "final.mod" skip
