@@ -49,30 +49,23 @@
 
 ! mixing (from cburn_inward test case)
       overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'nonburn'
+      overshoot_zone_type(1) = 'burn_H'
       overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'any'
+      overshoot_bdy_loc(1) = 'top'
       overshoot_f(1) = 0.01
       overshoot_f0(1) = 0.005
 
       overshoot_scheme(2) = 'exponential'
-      overshoot_zone_type(2) = 'burn_H'
+      overshoot_zone_type(2) = 'burn_He'
       overshoot_zone_loc(2) = 'any'
-      overshoot_bdy_loc(2) = 'any'
+      overshoot_bdy_loc(2) = 'top'
       overshoot_f(2) = 0.01
       overshoot_f0(2) = 0.005
 
       overshoot_scheme(3) = 'exponential'
-      overshoot_zone_type(3) = 'burn_He'
-      overshoot_zone_loc(3) = 'any'
-      overshoot_bdy_loc(3) = 'any'
-      overshoot_f(3) = 0.01
-      overshoot_f0(3) = 0.005
-
-      overshoot_scheme(3) = 'exponential'
       overshoot_zone_type(3) = 'burn_Z'
       overshoot_zone_loc(3) = 'shell'
-      overshoot_bdy_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'top'
       overshoot_f(3) = 0.01
       overshoot_f0(3) = 0.005
 

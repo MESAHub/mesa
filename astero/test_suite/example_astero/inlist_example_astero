@@ -57,6 +57,9 @@
       atm_option = 'table'
       atm_table = 'photosphere'
 
+      MLT_option = 'TDC'
+      steps_before_use_TDC = 10      
+
       ! timesteps
       max_years_for_timestep = 1d8
 

@@ -472,7 +472,7 @@
          use mlt_info, only: set_mlt_vars, check_for_redo_MLT
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
-            set_abs_du_div_cs, set_conv_time_scales, set_using_TDC
+            set_abs_du_div_cs, set_conv_time_scales
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
@@ -541,7 +541,6 @@
             call set_grads(s, ierr)
             if (failed('set_grads')) return
             call set_conv_time_scales(s) ! uses brunt_B
-            call set_using_TDC(s) ! uses max_conv_time_scale
          end if
 
          if (.not. skip_mixing_info) then         

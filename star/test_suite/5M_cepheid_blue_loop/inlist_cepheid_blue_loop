@@ -88,6 +88,7 @@
    predictive_zone_type(2) = 'any'
    predictive_zone_loc(2) = 'surf' 
    predictive_bdy_loc(2) = 'any'
+make_gradr_sticky_in_solver_iters = .true.
 
 	 
 ! for core He-burning, to prevent splitting of the core convection zone and/or core breathing pulses

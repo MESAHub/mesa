@@ -10,9 +10,11 @@
       save_model_filename = 'start_core_collapse.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
-      !set_initial_age = .false.
       set_initial_age = .true.
       initial_age = 0
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-6
 
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
@@ -30,7 +32,7 @@
       fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 4000
+      max_model_number = 8000
       !max_number_retries = 37
 
 ! wind
@@ -47,9 +49,19 @@
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
+      delta_lgRho_cntr_limit = 0.01
+      delta_lgRho_cntr_hard_limit = 0.1
+      delta_lgRho_limit = 0.1 
+      
+      delta_lgT_cntr_limit_only_after_near_zams = .true.
+      delta_lgT_cntr_limit = 0.003
+      delta_lgT_cntr_hard_limit = 0.1
+
+      delta_lgT_max_limit_only_after_near_zams = .true.
+      delta_lgT_max_limit = 0.003     
       delta_lgT_max_hard_limit = 0.1
 
-      delta_XSi_cntr_limit = 0.01d0
+      delta_XSi_cntr_limit = 0.0003d0
       delta_XSi_cntr_hard_limit = 0.03d0
 
 ! mesh

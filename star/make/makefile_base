@@ -125,6 +125,10 @@ SRCS = \
    overshoot_utils.f90 \
    overshoot_exp.f90 \
    overshoot_step.f90 \
+   thermohaline.f90 \
+   semiconvection.f90 \
+   mlt.f90 \
+   tdc.f90 \
    mlt_get_results.f90 \
    mlt_info.f90 \
    rotation_mix_info.f90 \
