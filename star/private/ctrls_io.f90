@@ -352,7 +352,7 @@
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
-    min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
+    min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, steps_before_use_TDC, &
     conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
@@ -1123,6 +1123,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% min_logT_for_make_gradr_sticky_in_solver_iters = min_logT_for_make_gradr_sticky_in_solver_iters
  s% no_MLT_below_shock = no_MLT_below_shock
  s% MLT_option = MLT_option
+ s% steps_before_use_TDC = steps_before_use_TDC
  s% mlt_use_rotation_correction = mlt_use_rotation_correction
  s% mlt_Pturb_factor = mlt_Pturb_factor
 
@@ -2804,6 +2805,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  min_logT_for_make_gradr_sticky_in_solver_iters = s% min_logT_for_make_gradr_sticky_in_solver_iters
  no_MLT_below_shock = s% no_MLT_below_shock
  MLT_option = s% MLT_option
+ steps_before_use_TDC = s% steps_before_use_TDC
  mlt_use_rotation_correction = s% mlt_use_rotation_correction
  mlt_Pturb_factor = s% mlt_Pturb_factor
 

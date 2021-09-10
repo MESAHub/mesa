@@ -252,6 +252,7 @@
          real(dp) :: mixing_length_alpha, remove_small_D_limit
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
+         integer :: steps_before_use_TDC
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid

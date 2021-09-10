@@ -109,7 +109,8 @@
       ! solver
       energy_eqn_option = 'dedt'
       mlt_Pturb_factor = 1
-      
+      MLT_option = 'TDC'
+
       ! controls for output      
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

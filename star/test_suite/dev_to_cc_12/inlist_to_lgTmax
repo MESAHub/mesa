@@ -43,6 +43,17 @@
 
 ! timesteps
       dX_nuc_drop_limit = -1
+      delta_lgRho_cntr_limit = 0.01
+      delta_lgRho_cntr_hard_limit = 0.1
+      delta_lgRho_limit = 0.1 
+      
+      delta_lgT_cntr_limit_only_after_near_zams = .true.
+      delta_lgT_cntr_limit = 0.001
+      delta_lgT_cntr_hard_limit = 0.01
+
+      delta_lgT_max_limit_only_after_near_zams = .true.
+      delta_lgT_max_limit = 0.001     
+      delta_lgT_max_hard_limit = 0.01
 
 ! mesh
 

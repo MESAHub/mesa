@@ -388,6 +388,13 @@
                 (s% steps_before_use_velocity_time_centering > 0 .and. &
                    s% model_number >= s% steps_before_use_velocity_time_centering)) &
                s% using_velocity_time_centering = .true.
+            if (.not. s% doing_relax .and. s% steps_before_use_TDC > 0) then
+               if (s% model_number >= s% steps_before_use_TDC) then
+                  s% MLT_option = 'TDC'
+               else
+                  s% MLT_option = 'Cox'
+               end if
+            end if
          end if
          
          call reset_epsnuc_vectors(s)

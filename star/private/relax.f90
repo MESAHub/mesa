@@ -3971,9 +3971,6 @@
          s% steps_before_use_gold2_tolerances = -1
          if (s% MLT_option == 'TDC') then
             s% MLT_option = 'Cox'
-            MLT_option = 'TDC'
-         else
-            MLT_option = s% MLT_option
          end if
 
          if (s% relax_solver_iters_timestep_limit /= 0) &
