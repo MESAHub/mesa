@@ -14,9 +14,18 @@ sgn = Function('sgn')
 powN = list(Function('pow' + str(i)) for i in range(9))
 
 def zero_function(*args):
+	'''
+	This function returns zero, and is used in various places to simplify expressions
+	by replacing the Dirac Delta and its derivatives with zero.
+	'''
 	return 0
 
 def fortran_substitutions(deriv):
+	'''
+	Makes various substitutions to an expression to ensure compatibility with
+	CRLIBM and to improve performance.
+	'''
+
 	# Replace calls to half-integer powers with calls to sqrt**n
 	deriv = substitute_pow(deriv)
 
@@ -33,8 +42,10 @@ def fortran_substitutions(deriv):
 	return deriv
 
 def substitute_rational(expr):
-	# Substitutes i/j for float(i)/float(j) for all integers i,j.
-	# This avoids Fortran integer division from ruining our expressions through rounding.
+	'''
+	Substitutes i/j for float(i)/float(j) for all integers i,j.
+	This avoids Fortran integer division from ruining our expressions through rounding.	
+	'''
 
 	# Search for Rational
 	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Rational) and p != 1 and p != -1]
@@ -51,7 +62,10 @@ def substitute_rational(expr):
 	return expr
 
 def substitute_dp(expr):
-	# Substitutes x_dp for x whenever x is a type Float.
+	'''
+	Substitutes x_dp for x whenever x is a type Float.
+	This makes all constant declarations type-unambiguous and ensures bit-for-bit compatibility.
+	'''
 
 	# Search for Float
 	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Float)]
@@ -65,10 +79,17 @@ def substitute_dp(expr):
 	# (wildcard matching).
 	expr = expr.xreplace(dict({old:new for old,new in zip(*(to_sub,new_ex))}))
 
-
 	return expr
 
 def substitute_pow(expr): 
+	'''
+	Replaces instances of x**N with powN(x) for integer N.
+	Only does this for N small enough for math_lib to provide a powN function.
+
+	Also replaces instances of pow(x, N/2) with powN(sqrt(x)) because this gives better performance.
+	(pow(x,y) gets evaluated roughly as exp(y*log(x)), which is costly because both log and exp are expensive,
+	whereas powN(sqrt(x)) gets evaluated with a faster sqrt routine followed by a fast powN)
+	'''
 	expr_prev = None
 	while expr_prev != expr:
 		# Replacements can interfere with each other.
@@ -154,9 +175,20 @@ def substitute_pow(expr):
 	return expr
 
 def py_to_fort(expr):
+	'''
+	Turns a sympy expression into valid fortran.
 
-	# Replace all instances of a**b with pow(a,b)
-	# We made the sympy output use PPow, so now we just replace PPow -> pow
+	In various places we have used a non-standard expression to ensure that sympy gets
+	the right behaviour. E.g. we called pow -> PPow and sqrt -> ssqrt. This gives us
+	more control over the result by preventing sympy from trying to simplify things too far.
+
+	At this stage we're generating a string, so we have to undo those substitutions
+	to get valid fortran code.
+
+	We also take the opportunity to use the fact that MESA has pre-computed ln(10)
+	and so make that substitution too.
+	'''
+
 	expr = expr.replace('PPow', 'pow')
 
 	# We made the sympy output use ssqrt, so now we just replace ssqrt -> pow
