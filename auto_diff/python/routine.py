@@ -9,6 +9,8 @@ class FortranRoutine:
 	def __str__(self):
 		'''
 		Returns a string representing a valid fortran implementation of this routine.
+		This involves constructing some boilerplate (the routine declaration and ending), as well as all
+		variable declarations, and putting it together in the right order.
 		'''
 
 		# Construct the header
@@ -38,6 +40,9 @@ class FortranFunction:
 	def __str__(self):
 		'''
 		Returns a string representing a valid fortran implementation of this routine.
+		This involves constructing some boilerplate (the routine declaration and ending), as well as all
+		variable declarations, and putting it together in the right order.
+		Note that because this is a function there is an explicitly listed return argument, which forms part of the beginning boilerplate.
 		'''
 
 		# Construct the header
