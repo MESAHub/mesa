@@ -28,7 +28,6 @@
 
       use star_private_def
       use const_def
-      use chem_def, only: ih1, ihe4, ic12, in14, io16
       use utils_lib
 
       implicit none
