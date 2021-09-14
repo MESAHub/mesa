@@ -213,9 +213,15 @@ def wrap_element(x):
 		return [x]
 
 def indent_list(lines):
+	'''
+	Indent every string in a list of strings.
+	'''
 	return [tab + l for l in lines]
 
 def indent_list_of_str(strings):
+	'''
+	Indents every line in a multi-line string.
+	'''
 	ret = []
 	for s in strings:
 		s = s.split('\n')
