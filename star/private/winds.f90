@@ -413,9 +413,8 @@
             ! where Osurf = angular velocity at surface
             !       Osurf_crit^2 = (1 - Gamma_edd)*G*M/R_equatorial^3
             !       Gamma_edd = kappa*L/(4 pi c G M), Eddington factor
-            real(dp) :: enhancement, wind_mdot, &
-               kh_timescale, mdot_lim, wind_mdot_prev, dmsfac, dmskhf, &
-               wind_mdot_lim, v_div_v_crit_full_on, v_div_v_crit_full_off
+            real(dp) :: enhancement, wind_mdot, wind_mdot_lim, &
+               kh_timescale, mdot_lim, wind_mdot_prev, dmsfac, dmskhf
 
             include 'formats'
 
@@ -643,7 +642,7 @@
          real(dp), intent(inout) :: xfer_ratio
          integer, intent(out) :: ierr
          real(dp) :: roche_lobe_radius ! Rsun
-         real(dp) :: ratio, rho, p, grav, hp, scale_height, h, rho_exponent, rho_rl, rho_rl0, mdot
+         real(dp) :: ratio, scale_height, mdot
          include 'formats'
          ierr = 0
          eval_rlo_wind = 0
