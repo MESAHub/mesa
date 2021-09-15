@@ -13,9 +13,6 @@
       set_initial_age = .true.
       initial_age = 0
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
-      
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
