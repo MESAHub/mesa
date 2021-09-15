@@ -131,6 +131,12 @@ star/test_suite/wd_he_shell_ignition @wmwolf
 star/test_suite/wd_nova_burst @wmwolf
 star/test_suite/wd_stable_h_burn @wmwolf
 
+star/test_suite/12M_pre_ms_to_core_collapse @rjfarmer
+star/test_suite/20M_pre_ms_to_core_collapse @rjfarmer
+star/test_suite/split_burn_big_net @rjfarmer
+star/test_suite/zams_to_cc_80 @rjfarmer
+star/test_suite/20M_z2m2_high_rotation @rjfarmer
+
 
 binary/test_suite/double_bh @orlox @rjfarmer
 binary/test_suite/evolve_both_stars @orlox @mjoyceGR
