@@ -22,9 +22,7 @@ cp after_core_c_burn.mod standard_after_core_c_burn.mod
 do_one inlist_to_lgTmax_header lgTmax.mod
 cp lgTmax.mod standard_lgTmax.mod
 
-do_one inlist_to_cc_header start_core_collapse.mod
-
-do_one inlist_prepare_for_ccsn_IIp_header final.mod
+do_one inlist_to_cc_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
