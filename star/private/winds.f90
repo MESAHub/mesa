@@ -627,8 +627,8 @@
          Ledd = s% prev_Ledd
          Leff = L/s% super_eddington_wind_Ledd_factor
          if (Leff <= Ledd) return
-         vesc2 = s% cgrav(1)*M/R  ! GM/R vs. 2GM/R ?
-         s% super_eddington_wind_mdot = s% super_eddington_scaling_factor*(Leff - Ledd)/vesc2
+         vesc2 = 2d0 * s% cgrav(1)*M/R
+         s% super_eddington_wind_mdot = s% super_eddington_scaling_factor*(Leff - Ledd)/(0.5d0 * vesc2)
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,'(a60,i12,1p2e12.4)') 'super eddington wind: lg_Mdot, L/Ledd', &
                s% model_number, log10(s% super_eddington_wind_mdot/(Msun/secyer)), L/Ledd
