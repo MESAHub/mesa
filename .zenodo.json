@@ -1,0 +1,96 @@
+{
+    "creators": [
+        {
+            "affiliation": "Kavli Institute for Theoretical Physics",
+            "name": "Paxton, Bill"
+        },
+        {
+            "affiliation": "University of Birmingham",
+            "name": "Ball, Warwick"
+        },
+        {
+            "affiliation": "Center for Computational Astrophysics",
+            "name": "Bauer, Evan"
+        },
+        {
+            "affiliation": "Max Planck Institute for Astrophysics",
+            "name": "Bellinger, Earl"
+        },
+        {
+            "affiliation": "Kavli Institute for Theoretical Physics",
+            "name": "Bildsten, Lars"
+        },
+        {
+            "affiliation": "Center for Computational Astrophysics",
+            "name": "Cantiello, Matteo",
+            "orcid": "0000-0002-8171-8596"
+        },
+        {
+            "affiliation": "Harvard-Smithsonian Center for Astrophysics",
+            "name": "Dotter, Aaron",
+            "orcid": "0000-0002-4442-5700"
+        },
+        {
+            "affiliation": "Max Planck Institute for Astrophysics",
+            "name": "Farmer, Robert",
+            "orcid": "0000-0003-3441-7624"
+        },
+        {
+            "affiliation": "Center for Computational Astrophysics",
+            "name": "Jermyn, Adam",
+            "orcid": "0000-0001-5048-9973"
+        },
+        {
+            "affiliation": "",
+            "name": "Meridith, Joyce",
+            "orcid": ""
+        },
+        {
+            "affiliation": "KU Leuven",
+            "name": "Marchant, Pablo",
+            "orcid": "0000-0002-0338-8181"
+        },
+        {
+            "name": "Schwab, Josiah",
+            "orcid": "0000-0002-4870-8855"
+        },
+        {
+            "affiliation": "Nicolaus Copernicus Astronomical Center of the Polish Academy of Sciences",
+            "name": "Smolec, Radek",
+            "orcid": "0000-0001-7217-4884"
+        },
+        {
+            "affiliation": "Space Sciences, Technologies and Astrophysics Research Institute",
+            "name": "Thoul, Anne",
+            "orcid": "0000-0002-8107-118X"
+        },
+        {
+            "affiliation": "Arizona State University",
+            "name": "Timmes, Frank",
+            "orcid": "0000-0002-0474-159X"
+        },
+        {
+            "affiliation": "University of Wisconsin–Madison",
+            "name": "Townsend, Rich",
+            "orcid": "0000-0002-2522-8605"
+        },
+        {
+            "affiliation" : "University of Wisconsin-Eau Claire",
+            "name": "Wolf, Bill",
+            "orcid": "0000-0002-6828-0630"
+        },
+      
+    ],
+    "description": "MESA is built to allow users to run experiments in stellar evolution.",
+    "keywords": [
+        "astronomy",
+        "stellar evolution",
+        "binary evolution",
+        "physics"
+    ],
+    "license": {
+        "id": "LGPL-2.0"
+    },
+    "title" : "MESA: Modules ofr experiments in stellar astrophysics"
+}
+
