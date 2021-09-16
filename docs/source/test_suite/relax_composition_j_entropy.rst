@@ -1,0 +1,1 @@
+../../../star/test_suite/relax_composition_j_entropy/README.rst
