@@ -1,0 +1,26 @@
+#!/bin/bash
+
+VERSION="$1"
+
+cd ${MESA_DIR}
+
+# Add version_number file
+echo ${VERSION} > data/version_number
+git add -f data/version_number
+
+# Update dox
+sed -i "s/PROJECT_NUMBER\ \ \ .*/PROJECT_NUMBER\ \ \ \ \ \ \ \ \ =\ ${VERSION}/" Doxyfile
+git add Doxyfile
+
+# Update docs/source/conf.py
+sed -i 's/release\ =.*/release\ =\ '"'${VERSION}'"'/' docs/source/conf.py
+sed -i 's/version\ =.*/version\ =\ '"'${VERSION}'"'/' docs/source/conf.py
+
+git add docs/source/conf.py
+
+git commit -a -m "Release: ${VERSION}"
+git tag ${VERSION}
+
+git archive --format=zip ${VERSION} > mesa-${VERSION}.zip
+
+echo "Now check the archive builds before pushing the changes"
