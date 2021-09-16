@@ -378,6 +378,12 @@ This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes
 This test case exercises radiative levitation and the OP mono opacities in the outer layers of a 0.466 Msun, Z=0.02 metallicity, B-type subdwarf (sdB) model.
 
 
+:ref:`relax_composition_j_entropy`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This test calls the routines that relax the composition, angular
+momentum and energy of a model to given target values.
+
 :ref:`rsp_BEP`
 ^^^^^^^^^^^^^^
 

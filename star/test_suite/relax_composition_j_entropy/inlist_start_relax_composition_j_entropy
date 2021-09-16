@@ -24,8 +24,10 @@
     relax_initial_composition = .true.
     relax_composition_filename = "composition.dat"
     timescale_for_relax_composition = 1d-2
+
     relax_initial_angular_momentum = .true.
     relax_angular_momentum_filename = "angular_momentum.dat"
+
     relax_initial_entropy = .true.
     relax_entropy_filename = "entropy.dat"
       
