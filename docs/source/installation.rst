@@ -236,17 +236,3 @@ Please provide the following information:
     echo $PATH
     echo $MESA_DIR
 
-
-If the error message you received was ``./build_and_test FAILED`` also
-attach the file ``$MESA_DIR/MODULE/test/tmp.txt``, where ``MODULE`` is
-replaced with the name of the module that failed. The name of the module
-that failed should be printed on the line before the ./build_and_test
-message was printed.
-
-If the file tmp.txt file does not exist in the folder then run the
-tester program::
-
-   ./tester 2>&1 | tee tester.log
-
-and also attach the tester.log file to your mesa-users message. If the
-tester program does not exist, state that in your message.
