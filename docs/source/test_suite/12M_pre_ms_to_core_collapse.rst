@@ -1,1 +1,0 @@
-../../../star/test_suite/12M_pre_ms_to_core_collapse/READ.rst
