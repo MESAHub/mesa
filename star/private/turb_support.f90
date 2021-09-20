@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 
-module mlt_get_results
+module turb_support
 
 use star_private_def
 use const_def
@@ -32,10 +32,7 @@ use num_lib
 use utils_lib
 use auto_diff_support
 use star_utils
-use tdc
-use mlt
-use thermohaline
-use semiconvection
+use turb
 
 implicit none
 
@@ -43,6 +40,25 @@ private
 public :: get_gradT, do1_mlt_eval, Get_results
 
 contains
+
+   !> Determines if it is safe (physically) to use TDC instead of MLT.
+   !!
+   !! Currently we only know we have to fall back to MLT in cells that get touched
+   !! by adjust_mass, because there the convection speeds at the start of the
+   !! step can be badly out of whack.
+   !!
+   !! @param s star pointer
+   !! @param k face index
+   !! @param fallback False if we can use TDC, True if we can fall back to MLT.
+   logical function check_if_must_fall_back_to_MLT(s, k) result(fallback)
+      type (star_info), pointer :: s
+      integer, intent(in) :: k
+
+      fallback = .false.
+      if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
+         fallback = .true.
+      end if
+   end function check_if_must_fall_back_to_MLT
 
    subroutine get_gradT(s, MLT_option, & ! used to create models
          r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
@@ -218,10 +234,24 @@ contains
 
       if (using_TDC) then
          if (report) write(*,3) 'call set_TDC', k, s% solver_iter
-         call set_TDC(s, k, &
-            mixing_length_alpha, cgrav, m, report, &
-            mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, ierr)
+         if (s% okay_to_set_mlt_vc) then
+            conv_vel_start = s% mlt_vc_old(k)
+         else
+            conv_vel_start = s% mlt_vc(k)
+         end if
+
+         ! Set scale for judging the TDC luminosity equation Q(Y)=0.
+         ! Q has units of a luminosity, so the scale should be a luminosity.
+         if (s% solver_iter == 0) then
+            scale = max(abs(s% L(k)), 1d-3*maxval(s% L(1:s% nz)))
+         else
+            scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
+         end if
+
+         call set_TDC(&
+            conv_vel_start, mixing_length_alpha, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
          call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
@@ -259,4 +289,4 @@ contains
    end subroutine Get_results
 
 
-end module mlt_get_results
+end module turb_support

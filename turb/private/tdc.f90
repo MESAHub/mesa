@@ -26,69 +26,47 @@
 
 module tdc
 
-use star_private_def
 use const_def
 use num_lib
 use utils_lib
-use auto_diff_support
-use star_utils
+use auto_diff
+use star_data_def
 
 implicit none
 
 private
-public :: set_TDC, check_if_must_fall_back_to_MLT
+public :: set_TDC
 
 contains
 
-   subroutine set_TDC(s, k, &
-            mixing_length_alpha, cgrav, m, report, &
-            mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, ierr)
-      type (star_info), pointer :: s
-      integer, intent(in) :: k
-      real(dp), intent(in) :: mixing_length_alpha, cgrav, m
+   subroutine set_TDC( &
+            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
+            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1), intent(in) :: &
          L, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
       logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
-      integer, intent(out) :: mixing_type, ierr
+      integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       include 'formats'
-      call get_TDC_solution(s, k, &
-         mixing_length_alpha, cgrav, m, report, &
-         mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, Y_face, ierr)
+      call get_TDC_solution( &
+         conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
+         mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+         scale_height, gradL, grada, conv_vel, Y_face, tdc_num_iters, ierr)
       if (ierr /= 0) then
-         write(*,2) 'get_TDC_solution failed in set_TDC', k
+         write(*,*) 'get_TDC_solution failed in set_TDC'
          write(*,*) 'Repeating call with reporting on.'
-         call get_TDC_solution(s, k, &
-            mixing_length_alpha, cgrav, m, .true., &
-            mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, Y_face, ierr)
+         call get_TDC_solution( &
+            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .true., &
+            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, Y_face, tdc_num_iters, ierr)
       end if
 
       gradT = Y_face + gradL
       D = conv_vel*scale_height*mixing_length_alpha/3d0     ! diffusion coefficient [cm^2/sec]
 
-   end subroutine set_TDC       
-
-   !> Determines if it is safe (physically) to use TDC instead of MLT.
-   !!
-   !! Currently we only know we have to fall back to MLT in cells that get touched
-   !! by adjust_mass, because there the convection speeds at the start of the
-   !! step can be badly out of whack.
-   !!
-   !! @param s star pointer
-   !! @param k face index
-   !! @param fallback False if we can use TDC, True if we can fall back to MLT.
-   logical function check_if_must_fall_back_to_MLT(s, k) result(fallback)
-      type (star_info), pointer :: s
-      integer, intent(in) :: k
-
-      fallback = .false.
-      if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
-         fallback = .true.
-      end if
-   end function check_if_must_fall_back_to_MLT
+   end subroutine set_TDC
 
    type(auto_diff_real_tdc) function set_Y(Y_is_positive, Z) result(Y)
       logical, intent(in) :: Y_is_positive
@@ -100,11 +78,11 @@ contains
       end if
    end function set_Y
 
-   subroutine TDC_bracket_search(s, k, mixing_length_alpha, Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
+   subroutine TDC_bracket_search(&
+         mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
+         Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
          c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada)
-      type (star_info), pointer :: s
-      integer, intent(in) :: k
-      real(dp), intent(in) :: mixing_length_alpha
+      real(dp), intent(in) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       logical, intent(in) :: Y_is_positive
       type(auto_diff_real_tdc), intent(in) :: A0, c0, L, L0, gradL, grada
       type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp
@@ -115,7 +93,7 @@ contains
       Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
       Y = set_Y(Y_is_positive, Z_new)
 
-      call compute_Q(s, k, mixing_length_alpha, &
+      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
          Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
 
       if (Q > 0d0 .and. Q_ub > 0d0) then
@@ -135,21 +113,18 @@ contains
    end subroutine TDC_bracket_search
 
 
-   subroutine get_TDC_solution(s, k, &
-         mixing_length_alpha, cgrav, m, report, &
-         mixing_type, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, conv_vel, Y_face, ierr)
-      type (star_info), pointer :: s
-      integer, intent(in) :: k
-      real(dp), intent(in) :: mixing_length_alpha, cgrav, m
+   subroutine get_TDC_solution( &
+         conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
+         mixing_type, scale, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, conv_vel, Y_face, tdc_num_iters, ierr)
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1), intent(in) :: &
          L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in
       logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
-      integer, intent(out) :: mixing_type, ierr
+      integer, intent(out) :: mixing_type, tdc_num_iters, ierr
       
       type(auto_diff_real_tdc) :: L, A0, c0, L0, Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, gradL, grada
-      real(dp) :: scale
       integer :: iter, line_iter, i
       logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
       real(dp), parameter :: bracket_tolerance = 1d0
@@ -161,7 +136,7 @@ contains
       include 'formats'
 
       ierr = 0
-      if (mixing_length_alpha == 0d0 .or. k < 1 .or. s% dt <= 0d0) then
+      if (mixing_length_alpha == 0d0 .or. dt <= 0d0) then
          stop 'bad call to TDC get_TDC_solution'
       end if         
 
@@ -171,19 +146,8 @@ contains
       grada = convert(grada_in)
       c0 = convert(mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r))
       L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap)) ! assumes QHSE for dP/dm
-      if (s% okay_to_set_mlt_vc) then
-         A0 = s% mlt_vc_old(k)/sqrt_2_div_3
-      else
-         A0 = s% mlt_vc(k)/sqrt_2_div_3
-      end if
+      A0 = conv_vel_start/sqrt_2_div_3
 
-      ! Set scale for judging the solution to Q(Y)=0.
-      ! Q has units of a luminosity, so the scale should be a luminosity.
-      if (s% solver_iter == 0) then
-         scale = max(abs(s% L(k)), 1d-3*maxval(s% L(1:s% nz)))
-      else
-         scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
-      end if
 
       ! Determine the sign of the solution.
       !
@@ -193,7 +157,7 @@ contains
       ! If Q(Y=0) is negative then the luminosity can be carried by radiation alone, so we'll
       ! necessarily have Y < 0.
       Y = 0d0
-      call compute_Q(s, k, mixing_length_alpha, &
+      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
          Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
       if (Q > 0d0) then
          Y_is_positive = .true.
@@ -206,11 +170,11 @@ contains
       upper_bound_Z = 100d0 
 
       Y = set_Y(Y_is_positive, lower_bound_Z)
-      call compute_Q(s, k, mixing_length_alpha, &
+      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
          Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_lb, Af)
 
       Y = set_Y(Y_is_positive, upper_bound_Z)
-      call compute_Q(s, k, mixing_length_alpha, &
+      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
          Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
 
       ! Check to make sure that the lower and upper bounds on Z actually bracket
@@ -219,23 +183,23 @@ contains
             write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
-            write(*,2) 'Q(Y=0)', k, Q%val
-            write(*,2) 'scale', k, scale
-            write(*,2) 'Q/scale', k, Q%val/scale
-            write(*,2) 'tolerance', k, residual_tolerance
-            write(*,2) 'dQdZ', k, dQdZ%val
-            write(*,2) 'Y', k, Y%val
-            write(*,2) 'dYdZ', k, Y%d1val1
-            write(*,2) 'exp(Z)', k, exp(Z%val)
-            write(*,2) 'Z', k, Z%val
-            write(*,2) 'Af', k, Af%val
-            write(*,2) 'dAfdZ', k, Af%d1val1
-            write(*,2) 'A0', k, A0%val
-            write(*,2) 'c0', k, c0%val
-            write(*,2) 'L', k, L%val
-            write(*,2) 'L0', k, L0%val
-            write(*,2) 'grada', k, grada%val
-            write(*,2) 'gradL', k, gradL%val
+            write(*,*) 'Q(Y=0)', Q%val
+            write(*,*) 'scale', scale
+            write(*,*) 'Q/scale', Q%val/scale
+            write(*,*) 'tolerance', residual_tolerance
+            write(*,*) 'dQdZ', dQdZ%val
+            write(*,*) 'Y', Y%val
+            write(*,*) 'dYdZ', Y%d1val1
+            write(*,*) 'exp(Z)', exp(Z%val)
+            write(*,*) 'Z', Z%val
+            write(*,*) 'Af', Af%val
+            write(*,*) 'dAfdZ', Af%d1val1
+            write(*,*) 'A0', A0%val
+            write(*,*) 'c0', c0%val
+            write(*,*) 'L', L%val
+            write(*,*) 'L0', L0%val
+            write(*,*) 'grada', grada%val
+            write(*,*) 'gradL', gradL%val
             write(*,*)
          ierr = 1
          return
@@ -243,13 +207,14 @@ contains
 
       ! Perform bisection search.
       do iter = 1, max_iter
-         call TDC_bracket_search(s, k, mixing_length_alpha, Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
+         call TDC_bracket_search(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
+                                 Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
                                  c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada)
          if (upper_bound_Z - lower_bound_Z < bracket_tolerance) exit
       end do
       Z = (upper_bound_Z + lower_bound_Z) / 2d0
       Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
-      if (report) write(*,2) 'Z from bracket search', k, Z%val
+      if (report) write(*,*) 'Z from bracket search', Z%val
 
       ! Now we refine the solution with a Newton solve.
       ! This also let's us pick up the derivative of the solution with respect
@@ -263,7 +228,7 @@ contains
                                  ! with respect to the structure variables.
       do iter = 1, max_iter
          Y = set_Y(Y_is_positive, Z)
-         call compute_Q(s, k, mixing_length_alpha, &
+            call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
 
          if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
@@ -292,8 +257,9 @@ contains
          end if
 
          if (prev_dQdZ * dQdZ < 0d0) then ! Means we're sitting around a stationary point.
-            call TDC_bracket_search(s, k, mixing_length_alpha, Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
-                                    c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada)
+            call TDC_bracket_search(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
+                        Y_is_positive, lower_bound_Z, upper_bound_Z, Q_ub, Q_lb, &
+                        c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada)
             Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
             have_derivatives = .false. ! Bracket search eliminates derivative information.
          else
@@ -337,7 +303,7 @@ contains
 
                Y = set_Y(Y_is_positive,Z_new)
 
-               call compute_Q(s, k, mixing_length_alpha, &
+               call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
                Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Qc, Af)
 
                if (abs(Qc) < abs(Q)) then
@@ -359,27 +325,27 @@ contains
 
       if (.not. converged) then
          ierr = 1
-         if (report .or. s% x_integer_ctrl(19) <= 0) then
+         if (report) then
          !$OMP critical (tdc_crit0)
-            write(*,5) 'failed get_TDC_solution k slvr_iter model TDC_iter', &
-               k, s% solver_iter, s% model_number, iter
-            write(*,2) 'Q', k, Q%val
-            write(*,2) 'scale', k, scale
-            write(*,2) 'Q/scale', k, Q%val/scale
-            write(*,2) 'tolerance', k, residual_tolerance
-            write(*,2) 'dQdZ', k, dQdZ%val
-            write(*,2) 'Y', k, Y%val
-            write(*,2) 'dYdZ', k, Y%d1val1
-            write(*,2) 'exp(Z)', k, exp(Z%val)
-            write(*,2) 'Z', k, Z%val
-            write(*,2) 'Af', k, Af%val
-            write(*,2) 'dAfdZ', k, Af%d1val1
-            write(*,2) 'A0', k, A0%val
-            write(*,2) 'c0', k, c0%val
-            write(*,2) 'L', k, L%val
-            write(*,2) 'L0', k, L0%val
-            write(*,2) 'grada', k, grada%val
-            write(*,2) 'gradL', k, gradL%val
+            write(*,*) 'failed get_TDC_solution TDC_iter', &
+               iter
+            write(*,*) 'Q(Y=0)', Q%val
+            write(*,*) 'scale', scale
+            write(*,*) 'Q/scale', Q%val/scale
+            write(*,*) 'tolerance', residual_tolerance
+            write(*,*) 'dQdZ', dQdZ%val
+            write(*,*) 'Y', Y%val
+            write(*,*) 'dYdZ', Y%d1val1
+            write(*,*) 'exp(Z)', exp(Z%val)
+            write(*,*) 'Z', Z%val
+            write(*,*) 'Af', Af%val
+            write(*,*) 'dAfdZ', Af%d1val1
+            write(*,*) 'A0', A0%val
+            write(*,*) 'c0', c0%val
+            write(*,*) 'L', L%val
+            write(*,*) 'L0', L0%val
+            write(*,*) 'grada', grada%val
+            write(*,*) 'gradL', gradL%val
             write(*,*)
          !$OMP end critical (tdc_crit0)
          end if
@@ -394,7 +360,7 @@ contains
       else
          mixing_type = no_mixing
       end if
-      if (k > 0) s% tdc_num_iters(k) = iter          
+      tdc_num_iters = iter          
    end subroutine get_TDC_solution
          
 
@@ -402,8 +368,6 @@ contains
    !!
    !! Q = (L - L0 * gradL) - (L0 + c0 * Af) * Y
    !!
-   !! @param s star pointer
-   !! @param k face index
    !! @param Y superadiabaticity
    !! @param c0_in A proportionality factor for the convective luminosity
    !! @param L_in luminosity
@@ -419,21 +383,19 @@ contains
    !! @param grada_in grada is the adiabatic dlnT/dlnP,
    !! @param Q The residual of the above equaiton (an output).
    !! @param Af The final convection speed (an output).
-   subroutine compute_Q(s, k, mixing_length_alpha, &
+   subroutine compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
          Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
-      type (star_info), pointer :: s
-      integer, intent(in) :: k
-      real(dp), intent(in) :: mixing_length_alpha
+      real(dp), intent(in) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       type(auto_diff_real_star_order1), intent(in) :: &
          T, rho, dV, Cp, kap, Hp
       type(auto_diff_real_tdc), intent(in) :: A0, Y, c0, L, L0, gradL, grada
       type(auto_diff_real_tdc), intent(out) :: Q, Af
       type(auto_diff_real_tdc) :: xi0, xi1, xi2
 
-      call eval_xis(s, k, mixing_length_alpha, &
+      call eval_xis(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
          Y, T, rho, Cp, dV, kap, Hp, grada, xi0, xi1, xi2)          
 
-      Af = eval_Af(s, k, A0, xi0, xi1, xi2)
+      Af = eval_Af(dt, A0, xi0, xi1, xi2)
       Q = (L - L0*gradL) - (L0 + c0*Af)*Y
 
    end subroutine compute_Q
@@ -460,8 +422,6 @@ contains
    !! This function also has some side effects in terms of storing some of the terms
    !! it calculates for plotting purposes.
    !!
-   !! @param s star pointer
-   !! @param k face index
    !! @param mixing_length_alpha mixing length parameter
    !! @param Y superadiabaticity
    !! @param T temperature (K)
@@ -474,13 +434,11 @@ contains
    !! @param xi0 Output, the constant term in the convective velocity equation.
    !! @param xi1 Output, the prefactor of the linear term in the convective velocity equation.
    !! @param xi2 Output, the prefactor of the quadratic term in the convective velocity equation.
-   subroutine eval_xis(s, k, mixing_length_alpha, &
+   subroutine eval_xis(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
          Y, T, rho, Cp, dV, kap, Hp, grada, xi0, xi1, xi2) 
       ! eval_xis sets up Y with partial wrt Z
       ! so results come back with partials wrt Z
-      type (star_info), pointer :: s
-      integer, intent(in) :: k
-      real(dp), intent(in) :: mixing_length_alpha
+      real(dp), intent(in) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp
       type(auto_diff_real_tdc), intent(in) :: Y, grada
       type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
@@ -493,16 +451,12 @@ contains
 
       S0 = convert(x_ALFAS*mixing_length_alpha*Cp*T/Hp)*grada
       S0 = S0*Y
-      D0 = convert(s% alpha_TDC_DAMP*x_CEDE/(mixing_length_alpha*Hp))
-      if (s% alpha_TDC_DAMPR == 0d0) then
-         DR0 = 0d0
-      else
-         gammar_div_alfa = s% alpha_TDC_DAMPR*x_GAMMAR/(mixing_length_alpha*Hp)
-         DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(T)/(pow2(rho)*Cp*kap))
-      end if
-      Pt0 = s% alpha_TDC_PtdVdt*x_ALFAP*rho
-      if (s% dt > 0) then
-         dVdt = dV/s% dt
+      D0 = convert(alpha_TDC_DAMP*x_CEDE/(mixing_length_alpha*Hp))
+      gammar_div_alfa = alpha_TDC_DAMPR*x_GAMMAR/(mixing_length_alpha*Hp)
+      DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(T)/(pow2(rho)*Cp*kap))
+      Pt0 = alpha_TDC_PtdVdt*x_ALFAP*rho
+      if (dt > 0) then
+         dVdt = dV/dt
       else
          dVdt = 0d0
       end if
@@ -533,9 +487,6 @@ contains
    !! want to solve (per Radek Smolec's thesis). We just solve the velocity form
    !! because it's more convenient.
    !!
-   !! This function also has some side effects in terms of storing some of the terms
-   !! it calculates for plotting purposes.
-   !!
    !! @param s star pointer
    !! @param k face index
    !! @param A0 convection speed from the start of the step (cm/s)
@@ -543,16 +494,13 @@ contains
    !! @param xi1 The prefactor of the linear term in the convective velocity equation.
    !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.            
    !! @param Af Output, the convection speed at the end of the step (cm/s)
-   function eval_Af(s, k, A0, xi0, xi1, xi2) result(Af)
-      type (star_info), pointer :: s
-      integer, intent(in) :: k
+   function eval_Af(dt, A0, xi0, xi1, xi2) result(Af)
+      real(dp), intent(in) :: dt    
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af ! output
       type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, lk 
-      real(dp) :: dt    
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
-      dt = s%dt
 
       if (J2 > 0d0) then ! Hyperbolic branch
          J = sqrt(J2)
@@ -595,12 +543,6 @@ contains
          end if
       else ! if (J2 == 0d0) then         
          Af = A0            
-      end if         
-      if (k > 0) then ! save for plots
-         s% SOURCE(k) = xi0%val*Af%val
-         s% DAMPR(k) = -xi1%val*pow2(Af%val)
-         s% DAMP(k) = -xi2%val*pow3(Af%val)
-         s% COUPL(k) = s% SOURCE(k) - s% DAMP(k) - s% DAMPR(k)
       end if
 
    end function eval_Af

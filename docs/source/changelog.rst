@@ -696,6 +696,16 @@ to ``outputs/sample_#.{profile,fgong}``.
          
       end subroutine extras_after_evolve
 
+turb
+~~~~
+
+This new module implements local theories of turbulence, including
+MLT, TDC, semiconvection, and thermohaline turbulence. These used to be
+a part of ``star``.
+
+Users will not generally
+need to interact with this module, but it can be used within
+run_star_extras by writing ``use turb``.
 
 auto_diff
 ~~~~~~~~~

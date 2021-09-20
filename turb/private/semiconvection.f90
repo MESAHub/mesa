@@ -26,12 +26,10 @@
 
 module semiconvection
 
-use star_private_def
 use const_def
 use num_lib
 use utils_lib
-use auto_diff_support
-use star_utils
+use auto_diff
 
 implicit none
 

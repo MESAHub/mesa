@@ -469,7 +469,7 @@
          use atm_lib, only: atm_eval_T_tau_dq_dtau
          use atm_support, only: get_T_tau_id
          use micro, only: set_micro_vars
-         use mlt_info, only: set_mlt_vars, check_for_redo_MLT
+         use turb_info, only: set_mlt_vars, check_for_redo_MLT
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs, set_conv_time_scales

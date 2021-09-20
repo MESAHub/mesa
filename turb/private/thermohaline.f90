@@ -26,12 +26,10 @@
 
 module thermohaline
 
-use star_private_def
 use const_def
 use num_lib
 use utils_lib
-use auto_diff_support
-use star_utils
+use auto_diff
 
 implicit none
 
@@ -40,10 +38,10 @@ public :: set_thermohaline
 
 contains
 
-   subroutine set_thermohaline(s, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+   subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
-      type (star_info), pointer :: s
+      character(len=*), intent(in) :: thermohaline_option
       type(auto_diff_real_star_order1), intent(in) :: Lambda, grada, gradr, T, opacity, rho, Cp
       real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff
       integer, intent(in) :: iso
@@ -53,8 +51,8 @@ contains
 
       real(dp) :: D_thrm
 
-      call get_D_thermohaline(s, &
-         grada%val, gradr%val, T%val, opacity%val, rho%val, &
+      call get_D_thermohaline(&
+         thermohaline_option, grada%val, gradr%val, T%val, opacity%val, rho%val, &
          Cp%val, gradL_composition_term, &
          iso, XH1, thermohaline_coeff, D_thrm, ierr)
 
@@ -80,10 +78,10 @@ contains
    !! @param thermohaline_coeff Free parameter multiplying the thermohaline diffusivity.
    !! @param D_thrm Output, diffusivity.
    !! @param ierr Output, error index.
-   subroutine get_D_thermohaline(s, &
+   subroutine get_D_thermohaline(thermohaline_option, &
          grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
          iso, XH1, thermohaline_coeff, D_thrm, ierr)
-      type (star_info), pointer :: s
+      character(len=*) :: thermohaline_option
       real(dp), intent(in) :: &
          grada, gradr, T, opacity, rho, Cp, gradL_composition_term, XH1, &
          thermohaline_coeff
@@ -94,13 +92,12 @@ contains
       include 'formats'     
       dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable               
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
-      if (s% thermohaline_option == 'Kippenhahn') then
+      if (thermohaline_option == 'Kippenhahn') then
          ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
          D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
-      else if (s% thermohaline_option == 'Traxler_Garaud_Stellmach_11' .or. &
-               s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
-         call get_diff_coeffs(s, &
-            K_therm, Cp, rho, T, opacity, iso, XH1, K_T, K_mu, nu)
+      else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11' .or. &
+               thermohaline_option == 'Brown_Garaud_Stellmach_13') then
+         call get_diff_coeffs(K_therm, Cp, rho, T, opacity, iso, XH1, K_T, K_mu, nu)
          R0 = (gradr - grada)/gradL_composition_term
          Pr = nu/K_T
          tau = K_mu/K_T
@@ -110,7 +107,7 @@ contains
          else if (Pr < 0d0) then
             ! Bad results from get_diff_coeffs will just result in NaNs from thermohaline options, so skip
             D_thrm = 0d0
-         else if (s% thermohaline_option == 'Traxler_Garaud_Stellmach_11') then 
+         else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11') then 
             ! Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
             ! also see Denissenkov. ApJ 723:563–579, 2010.
             D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
@@ -120,16 +117,14 @@ contains
       else
          D_thrm = 0
          ierr = -1
-         write(*,*) 'unknown for MLT thermohaline_option' // trim(s% thermohaline_option)
+         write(*,*) 'unknown for MLT thermohaline_option' // trim(thermohaline_option)
       end if
       D_thrm = thermohaline_coeff*D_thrm
    end subroutine get_D_thermohaline
 
 
-   subroutine get_diff_coeffs(s, &
-         K_therm, Cp, rho, T, opacity, iso, XH1, kt, kmu, vis)
+   subroutine get_diff_coeffs(K_therm, Cp, rho, T, opacity, iso, XH1, kt, kmu, vis)
       use chem_def, only: chem_isos
-      type (star_info), pointer :: s
       real(dp), intent(in) :: K_therm, Cp, rho, T, opacity, XH1
       integer, intent(in) :: iso      
       real(dp), intent(out) :: kt, kmu, vis
