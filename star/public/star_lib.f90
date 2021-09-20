@@ -3089,7 +3089,7 @@
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
          use auto_diff
-         use turb_info, only: Get_results
+         use turb_support, only: Get_results
          integer, intent(in) :: id
          integer, intent(in) :: k
          character (len=*), intent(in) :: MLT_option
