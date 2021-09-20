@@ -211,10 +211,6 @@ contains
       test_partials = .false.
       ierr = 0          
       if (k > 0) then
-         s% SOURCE(k) = 0d0
-         s% DAMP(k) = 0d0
-         s% DAMPR(k) = 0d0
-         s% COUPL(k) = 0d0
          s% tdc_num_iters(k) = 0
       end if
 
