@@ -176,6 +176,7 @@ contains
       integer, intent(out) :: ierr
       
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
+      real(dp) :: conv_vel_start, scale
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
@@ -249,7 +250,7 @@ contains
          end if
 
          call set_TDC(&
-            conv_vel_start, mixing_length_alpha, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+            conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
       else if (gradr > gradL) then
@@ -264,7 +265,7 @@ contains
       if (mixing_type == no_mixing) then
          if (gradL_composition_term < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-            call set_thermohaline(s, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
          else if (gradr > grada) then
