@@ -66,6 +66,7 @@ contains
    !> Computes the diffusivity of thermohaline mixing when the
    !! thermal gradient is stable and the composition gradient is unstable.
    !!
+   !! @param thermohaline_option A string specifying which thermohaline prescription to use.
    !! @param grada Adiabatic gradient dlnT/dlnP
    !! @param gradr Radiative temperature gradient dlnT/dlnP, equals the actual gradient because there's no convection
    !! @param T Temperature
