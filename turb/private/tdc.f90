@@ -148,7 +148,6 @@ contains
       L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap)) ! assumes QHSE for dP/dm
       A0 = conv_vel_start/sqrt_2_div_3
 
-
       ! Determine the sign of the solution.
       !
       ! If Q(Y=0) is positive then the luminosity is too great to be carried radiatively, so
@@ -368,6 +367,11 @@ contains
    !!
    !! Q = (L - L0 * gradL) - (L0 + c0 * Af) * Y
    !!
+   !! @param mixing_length_alpha Mixing length parameter
+   !! @param alpha_TDC_DAMP TDC turbulent damping parameter
+   !! @param alpha_TDC_DAMPR TDC radiative damping parameter
+   !! @param alpha_TDC_PtdVdt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
+   !! @param dt Time-step
    !! @param Y superadiabaticity
    !! @param c0_in A proportionality factor for the convective luminosity
    !! @param L_in luminosity
@@ -422,7 +426,11 @@ contains
    !! This function also has some side effects in terms of storing some of the terms
    !! it calculates for plotting purposes.
    !!
-   !! @param mixing_length_alpha mixing length parameter
+   !! @param mixing_length_alpha Mixing length parameter
+   !! @param alpha_TDC_DAMP TDC turbulent damping parameter
+   !! @param alpha_TDC_DAMPR TDC radiative damping parameter
+   !! @param alpha_TDC_PtdVdt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
+   !! @param dt Time-step
    !! @param Y superadiabaticity
    !! @param T temperature (K)
    !! @param rho density (g/cm^3)
@@ -487,8 +495,7 @@ contains
    !! want to solve (per Radek Smolec's thesis). We just solve the velocity form
    !! because it's more convenient.
    !!
-   !! @param s star pointer
-   !! @param k face index
+   !! @param dt Time-step
    !! @param A0 convection speed from the start of the step (cm/s)
    !! @param xi0 The constant term in the convective velocity equation.
    !! @param xi1 The prefactor of the linear term in the convective velocity equation.
