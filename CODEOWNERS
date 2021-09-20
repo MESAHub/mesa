@@ -52,7 +52,7 @@ star/test_suite/1M_thermohaline @mjoyceGR
 star/test_suite/20M_z2m2_high_rotation
 star/test_suite/5M_cepheid_blue_loop @annethoul @rsmolec
 star/test_suite/7M_prems_to_AGB @annethoul
-star/test_suite/accreted_material_j
+star/test_suite/accreted_material_j @orlox
 star/test_suite/adjust_net @rjfarmer
 star/test_suite/c13_pocket @fxt
 star/test_suite/carbon_kh @evbauer
@@ -60,10 +60,10 @@ star/test_suite/cburn_inward @rjfarmer
 star/test_suite/ccsn_IIp @rjfarmer @fxt
 star/test_suite/check_redo @fxt
 star/test_suite/conductive_flame @fxt @rjfarmer
-star/test_suite/conserve_angular_momentum
+star/test_suite/conserve_angular_momentum @orlox
 star/test_suite/custom_colors @rjfarmer
 star/test_suite/custom_rates @evbauer @adamjermyn @fxt
-star/test_suite/dev_high_rot_darkening
+star/test_suite/dev_high_rot_darkening @orlox
 star/test_suite/dev_ppisn @rjfarmer
 star/test_suite/dev_split_burn_big_net @rjfarmer
 star/test_suite/dev_to_cc_12 @rjfarmer
