@@ -27,6 +27,8 @@ program test_turb
       type(auto_diff_real_star_order1) :: Gamma, gradT, Y_face, conv_vel, conv_vel2, D, r, L
       integer :: mixing_type, ierr
 
+      include 'formats'
+
       call header('Test MLT')
 
       MLT_option = 'Cox'
@@ -56,7 +58,7 @@ program test_turb
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
 
-      write(*,*) 'vc at 1d5 Lsun',conv_vel%val
+      write(*,1) 'vc at 1d5 Lsun',conv_vel%val
 
       L = 1d8*Lsun
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
@@ -66,10 +68,10 @@ program test_turb
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel2, D, mixing_type, ierr)
 
-      write(*,*) 'vc at 1d8 Lsun',conv_vel2%val
+      write(*,1) 'vc at 1d8 Lsun',conv_vel2%val
 
-      write(*,*) 'Ratio:',conv_vel2%val/conv_vel%val
-      write(*,*) 'Expected ~10 because in the efficient limit vc ~ L^{1/3}'
+      write(*,1) 'Ratio:',conv_vel2%val/conv_vel%val
+      write(*,'(a)') 'Expected ~10 because in the efficient limit vc ~ L^{1/3}'
    end subroutine check_efficient_MLT_scaling
 
 end program test_turb
