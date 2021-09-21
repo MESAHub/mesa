@@ -4,7 +4,6 @@
 
       character (len=1000) :: mesa_dir, &
          eosDT_cache_dir, &
-         ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir
 
@@ -20,7 +19,8 @@
       logical :: show_eqns_and_vars_names
 
       logical :: pgstar_flag, save_pgstar_files_when_terminate, &
-         clear_initial_pgstar_history, clear_pgstar_history
+         clear_initial_pgstar_history, clear_pgstar_history, &
+         disable_pgstar_during_relax_flag
 
       logical :: save_photo_when_terminate
       logical :: write_profile_when_terminate
@@ -52,8 +52,8 @@
       
       character (len=strlen) :: echo_at_start, echo_at_end
 
-      logical :: load_saved_model, load_saved_model_for_RSP
-      character (len=strlen) :: saved_model_name
+      logical :: load_saved_model
+      character (len=strlen) :: load_model_filename
 
       logical :: create_merger_model
       character (len=strlen) :: saved_model_for_merger_1
@@ -105,6 +105,7 @@
       real(dp) :: remove_center_by_radius_cm, remove_initial_center_by_radius_cm
       real(dp) :: remove_center_by_radius_Rsun, remove_initial_center_by_radius_Rsun
       real(dp) :: remove_center_by_he4, remove_initial_center_by_he4
+      real(dp) :: remove_center_by_c12_o16, remove_initial_center_by_c12_o16
       real(dp) :: remove_center_by_si28, remove_initial_center_by_si28
       real(dp) :: remove_center_to_reduce_co56_ni56, remove_initial_center_to_reduce_co56_ni56
       real(dp) :: remove_center_by_ye, remove_initial_center_by_ye
@@ -368,7 +369,6 @@
       character (len=strlen) :: chem_isotopes_filename
 
       character(len=strlen) :: eos_file_prefix
-      character(len=strlen) :: ionization_file_prefix, ionization_Z1_suffix
 
       integer :: extras_lipar, extras_lrpar, extras_lcpar, extras_llpar
       integer :: extras_ipar(max_extras_params)

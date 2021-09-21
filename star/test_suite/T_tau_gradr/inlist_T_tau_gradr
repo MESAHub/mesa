@@ -24,6 +24,8 @@
 
 &controls
 
+      x_ctrl(1) = 1d0  ! target rms temperature difference, in kelvin
+
       initial_mass = 1.0d0
       initial_y = 0.28d0
       initial_z = 0.02d0

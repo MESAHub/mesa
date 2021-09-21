@@ -2,7 +2,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'co_core.mod'
+      load_model_filename = 'co_core.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'co_wd.mod'
@@ -72,7 +72,7 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       
-      photo_interval = 1
+      !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1

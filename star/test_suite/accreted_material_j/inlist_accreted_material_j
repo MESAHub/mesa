@@ -3,7 +3,7 @@
       show_log_description_at_start = .false. 
 
       load_saved_model = .true.
-      saved_model_name = 'zams.mod'
+      load_model_filename = 'zams.mod'
 
       new_rotation_flag = .true.
       change_rotation_flag = .true.
@@ -46,8 +46,7 @@
       scale_max_correction = 0.1d0
       ignore_species_in_max_correction = .true.
 
-      use_dedt_form_of_energy_eqn = .true.
-      report_solver_progress = .true.
+      energy_eqn_option = 'dedt'
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -105,6 +104,8 @@
       terminal_interval = 10
       
       write_header_frequency = 10
+      
+      !report_solver_progress = .true.
 
 /
 

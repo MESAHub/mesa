@@ -23,3 +23,5 @@ Stellar Astrophysics (MESA), an open-source 1D stellar evolution code.
    developing
    changelog
    about
+   code_of_conduct
+   contributing

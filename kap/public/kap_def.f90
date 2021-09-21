@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -32,9 +32,11 @@ module kap_def
   abstract interface
 
      subroutine other_elect_cond_opacity_interface( &
+        handle, &
         zbar, logRho, logT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
+        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
         real(dp), intent(in) :: logRho ! the density
         real(dp), intent(in) :: logT ! the temperature
@@ -45,10 +47,12 @@ module kap_def
      end subroutine other_elect_cond_opacity_interface
 
      subroutine other_compton_opacity_interface( &
+        handle, &
         Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
         eta, d_eta_dlnRho, d_eta_dlnT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
+        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: Rho, T
         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
         ! free_e := total combined number per nucleon of free electrons and positrons
@@ -58,6 +62,22 @@ module kap_def
         real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
         integer, intent(out) :: ierr ! 0 means AOK.
      end subroutine other_compton_opacity_interface
+
+     subroutine other_radiative_opacity_interface( &
+        handle, &
+        X, Z, XC, XN, XO, XNe, logRho, logT, &
+        frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+        use const_def, only: dp
+        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
+        real(dp), intent(in) :: logRho ! density
+        real(dp), intent(in) :: logT ! temperature
+        real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
+        real(dp), intent(out) :: kap ! opacity
+        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+        integer, intent(out) :: ierr ! 0 means AOK.
+     end subroutine other_radiative_opacity_interface
 
   end interface
 
@@ -203,7 +223,10 @@ module kap_def
 
       logical :: cubic_interpolation_in_X
       logical :: cubic_interpolation_in_Z
+
+      ! conductive opacities
       logical :: include_electron_conduction
+      logical :: use_blouin_conductive_opacities
 
       logical :: use_Zbase_for_Type1
       logical :: use_Type2_opacities
@@ -216,12 +239,6 @@ module kap_def
       real(dp) :: kap_Type2_full_off_dZ ! Type2 is full off for dZ <= this
       real(dp) :: kap_Type2_full_on_dZ ! Type2 can be full on for dZ >= this
 
-      ! for logR > 1, we extrapolate the radiative opacities.
-      ! for low T, this can run into problems, so we need to clip logT when logR > 1.
-      real(dp) :: min_logT_for_logR_gt_1
-      ! this clipping doesn't apply to special low T tables
-      ! i.e. skip it if min logT in table is < 2.5
-      
       real(dp) :: logT_Compton_blend_hi, logR_Compton_blend_lo
 
       logical :: show_info
@@ -247,6 +264,10 @@ module kap_def
       procedure (other_compton_opacity_interface), pointer, nopass :: &
          other_compton_opacity => null()
 
+      logical :: use_other_radiative_opacity
+      procedure (other_radiative_opacity_interface), pointer, nopass :: &
+         other_radiative_opacity => null()
+      
   end type Kap_General_Info
 
   ! kap_options

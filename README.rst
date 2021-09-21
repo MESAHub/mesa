@@ -12,6 +12,10 @@ Modules for Experiments in Stellar Astrophysics (MESA)
     :alt: GitHub issues
     :target: https://github.com/MESAHub/mesa/issues
 
+**WARNING**: The default ``main`` branch is the development version of
+MESA and is not guaranteed to function correctly.  If you are using
+MESA, you should use an official release version.
+
 Overview
 ========
 

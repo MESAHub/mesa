@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2021  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -31,13 +31,70 @@
       
       implicit none
   
-  
+      ! interfaces for procedure pointers
+      abstract interface
+
+         subroutine other_eos_frac_interface( &
+            handle, &
+            species, chem_id, net_iso, xa, &
+            Rho, logRho, T, logT, &
+            frac, dfrac_dlogRho, dfrac_dlogT, &
+            ierr)
+            use const_def, only: dp
+            integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+            integer, intent(in) :: species
+            integer, pointer :: chem_id(:) ! maps species to chem id
+            ! index from 1 to species
+            ! value is between 1 and num_chem_isos
+            integer, pointer :: net_iso(:) ! maps chem id to species number
+            ! index from 1 to num_chem_isos (defined in chem_def)
+            ! value is 0 if the iso is not in the current net
+            ! else is value between 1 and number of species in current net
+            real(dp), intent(in) :: xa(:) ! mass fractions
+
+            real(dp), intent(in) :: Rho, logRho ! the density
+            real(dp), intent(in) :: T, logT ! the temperature
+
+            real(dp), intent(out) :: frac ! fraction of other_eos to use
+            real(dp), intent(out) :: dfrac_dlogRho ! its partial derivative at constant T
+            real(dp), intent(out) :: dfrac_dlogT   ! its partial derivative at constant Rho
+
+            integer, intent(out) :: ierr ! 0 means AOK.
+         end subroutine other_eos_frac_interface
+
+         subroutine other_eos_interface( &
+            handle, &
+            species, chem_id, net_iso, xa, &
+            Rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+
+            integer, intent(in) :: species
+            integer, pointer :: chem_id(:) ! maps species to chem id
+            integer, pointer :: net_iso(:) ! maps chem id to species number
+            real(dp), intent(in) :: xa(:) ! mass fractions
+
+            real(dp), intent(in) :: Rho, logRho ! the density
+            real(dp), intent(in) :: T, logT ! the temperature
+
+            real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_basic_results,species)
+
+            integer, intent(out) :: ierr ! 0 means AOK.
+         end subroutine other_eos_interface
+
+      end interface
+
+
       logical, parameter :: show_allocations = .false.  ! for debugging memory usage
       integer, parameter :: eos_name_length = 20 ! String length for storing EOS variable names
  
         
       ! cgs units
-      
+
       ! the basic eos results
       
       integer, parameter :: i_lnPgas = 1
@@ -114,6 +171,13 @@
 
       character (len=eos_name_length) :: eosDT_result_names(nv)
 
+      ! non-positive indices for special EOS quantities
+      ! these are supported in the root-finds (eosDT_get_{Rho,T})
+      ! even though their values are not basic EOS results
+
+      integer, parameter :: i_logPtot = 0  ! log10 total pressure (gas + radiation)
+      integer, parameter :: i_egas = -1 ! gas specific energy density (no radiation)
+
       
       ! NOTE: the calculation of eta is based on the following equation for ne, 
       ! the mean number of free electrons per cm^3,
@@ -158,7 +222,6 @@
          real(dp) :: Z_all_HELM ! all HELM for Z >= this unless eos_use_FreeEOS
          real(dp) :: logT_all_HELM ! all HELM for lgT >= this
          real(dp) :: logT_low_all_HELM ! all HELM for lgT <= this
-         real(dp) :: logT_ion_HELM, logT_neutral_HELM, max_logRho_neutral_HELM
          real(dp) :: coulomb_temp_cut_HELM, coulomb_den_cut_HELM
          
          ! limits for OPAL_SCVH
@@ -198,7 +261,8 @@
          character (len=30) :: suffix_for_FreeEOS_Z(num_FreeEOS_Zs)
          
          ! limits for CMS
-         logical :: use_CMS
+         logical :: use_CMS, CMS_use_fixed_composition
+         integer :: CMS_fixed_composition_index ! in [0,10]
          real(dp) :: max_Z_for_any_CMS, max_Z_for_all_CMS ! set to -1 to disable CMS
          real(dp) :: logQ_max_for_any_CMS, logQ_max_for_all_CMS      ! for upper blend zone in logQ = logRho - 2*logT + 12
          real(dp) :: logQ_min_for_any_CMS, logQ_min_for_all_CMS      ! for lower blend zone in logQ
@@ -231,14 +295,28 @@
          real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
          character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
 
+         logical :: use_simple_Skye_blends
+         real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
+         real(dp) :: logT_min_for_any_Skye, logT_min_for_all_Skye
+
          ! misc
-         logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
+         logical :: include_radiation, include_elec_pos
          logical :: eosDT_use_linear_interp_for_X
          logical :: eosDT_use_linear_interp_to_HELM
       
          character(len=128) :: eosDT_file_prefix
 
          logical :: okay_to_convert_ierr_to_skip
+         
+         ! other eos
+         logical :: use_other_eos_component
+         procedure (other_eos_frac_interface), pointer, nopass :: &
+         other_eos_frac => null()
+         procedure (other_eos_interface), pointer, nopass :: &
+            other_eos_component => null()
+         logical :: use_other_eos_results
+         procedure (other_eos_interface), pointer, nopass :: &
+            other_eos_results => null()
          
          ! debugging
          logical :: dbg
@@ -441,37 +519,8 @@
       end function do_alloc_eos
 
 
-      subroutine get_result_names(names)
-         character (len=eos_name_length) :: names(nv)
-         names(i_lnPgas) = 'lnPgas'  
-         names(i_lnE) = 'lnE' ! internal energy per gram
-         names(i_lnS) = 'lnS' ! entropy per gram
-         names(i_mu) = 'mu'  
-         names(i_lnfree_e) = 'lnfree_e'   
-         names(i_eta) = 'eta'    
-         names(i_grad_ad) = 'grad_ad' ! dlnT_dlnP at constant S
-         names(i_chiRho) = 'chiRho' ! dlnP_dlnRho at constant T      
-         names(i_chiT) = 'chiT' ! dlnP_dlnT at constant Rho      
-         names(i_Cp) = 'Cp' ! dE_dT at constant P, specific heat at constant pressure     
-         names(i_Cv) = 'Cv' ! dE_dT at constant Rho, specific heat at constant volume
-         names(i_dE_dRho) = 'dE_dRho' ! at constant T      
-         names(i_dS_dT) = 'dS_dT' ! at constant Rho      
-         names(i_dS_dRho) = 'dS_dRho'  ! at constant T            
-         names(i_gamma1) = 'gamma1'  ! dlnP_dlnRho at constant S      
-         names(i_gamma3) = 'gamma3'  ! gamma3 - 1) = '' dlnT_dlnRho at constant S   
-         names(i_phase) = 'phase'
-         names(i_latent_ddlnT) = 'latdlnT'
-         names(i_latent_ddlnRho) = 'latdlnRh'        
-         names(i_frac_OPAL_SCVH) = 'OPAL/SCVH'
-         names(i_frac_HELM) = 'HELM'
-         names(i_frac_Skye) = 'Skye'
-         names(i_frac_PC) = 'PC'
-         names(i_frac_FreeEOS) = 'FreeEOS'
-         names(i_frac_CMS) = 'CMS'
-      end subroutine get_result_names
-      
-      
       subroutine init_eos_handle_data(handle)
+         use other_eos
          use math_lib
          integer, intent(in) :: handle
          type (EoS_General_Info), pointer :: rq
@@ -479,6 +528,11 @@
          rq => eos_handles(handle)
          rq% in_use = .true.
          rq% handle = handle
+
+         rq% other_eos_frac => null_other_eos_frac
+         rq% other_eos_component => null_other_eos_component
+         rq% other_eos_results => null_other_eos_results
+         
       end subroutine init_eos_handle_data
             
       

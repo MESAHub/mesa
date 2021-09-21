@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2011-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -51,7 +51,7 @@
          use star_utils, only: start_time, update_time
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
-         use auto_diff_support, only: get_TDC_conv_velocity
+         use auto_diff_support, only: get_RSP2_conv_velocity
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
@@ -61,7 +61,7 @@
             region_bottom_q, region_top_q, L_val
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
-         logical :: TDC_or_RSP
+         logical :: RSP2_or_RSP
 
          integer(8) :: time0
          real(dp) :: total
@@ -73,7 +73,7 @@
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
-         TDC_or_RSP = s% RSP_flag .or. s% using_TDC
+         RSP2_or_RSP = s% RSP_flag .or. s% RSP2_flag
 
          if (s% doing_timing) call start_time(s, time0, total)
          
@@ -105,7 +105,7 @@
 
          allocate(eps_h(nz), eps_he(nz), eps_z(nz), cdc_factor(nz))
          
-         if (.not. TDC_or_RSP) then
+         if (.not. RSP2_or_RSP) then
             do k = 1, nz
                s% mixing_type(k) = s% mlt_mixing_type(k)
             end do
@@ -126,17 +126,17 @@
                s% cdc(k) = 0d0
                s% conv_vel(k) = 0d0
             end do
-         else if (s% using_TDC) then
+         else if (s% RSP2_flag) then
             do k = 1, nz
-               s% conv_vel(k) = get_TDC_conv_velocity(s,k)
+               s% conv_vel(k) = get_RSP2_conv_velocity(s,k)
                s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))
                if (abs(s% Lt(k)) > &
-                     L_val*s% TDC_min_Lt_div_L_for_overshooting_mixing_type) then
+                     L_val*s% RSP2_min_Lt_div_L_for_overshooting_mixing_type) then
                   s% mixing_type(k) = overshoot_mixing
                else if (abs(s% Lc(k)) > &
-                     L_val*s% TDC_min_Lc_div_L_for_convective_mixing_type) then
+                     L_val*s% RSP2_min_Lc_div_L_for_convective_mixing_type) then
                   s% mixing_type(k) = convective_mixing
                else
                   s% mixing_type(k) = no_mixing
@@ -145,12 +145,6 @@
          else if (s% conv_vel_flag) then
             do k = 1, nz
                s% D_mix(k) = s% conv_vel(k)*s% mlt_mixing_length(k)/3d0
-               if (s% conv_vel_ignore_thermohaline) then
-                  s% D_mix(k) = s% D_mix(k) + s% mlt_D_thrm(k)
-               end if
-               if (s% conv_vel_ignore_semiconvection) then
-                  s% D_mix(k) = s% D_mix(k) + s% mlt_D_semi(k)
-               end if
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
             end do
          else
@@ -163,7 +157,7 @@
          
          call check('after get mlt_D')
          
-         if (s% remove_mixing_glitches .and. .not. TDC_or_RSP) then
+         if (s% remove_mixing_glitches .and. .not. RSP2_or_RSP) then
 
             call remove_tiny_mixing(s, ierr)
             if (failed('remove_tiny_mixing')) return
@@ -242,7 +236,7 @@
          call s% other_after_set_mixing_info(s% id, ierr)
          if (failed('other_after_set_mixing_info')) return
 
-         if (.not. (skip_set_cz_bdy_mass .or. TDC_or_RSP)) then
+         if (.not. (skip_set_cz_bdy_mass .or. RSP2_or_RSP)) then
             call set_cz_bdy_mass(s, ierr)
             if (failed('set_cz_bdy_mass')) return
          end if
@@ -301,7 +295,7 @@
             do k = 2, nz
                if (s% D_mix(k) < 1d-10) s% D_mix(k) = 0d0
                s% cdc(k) = s% D_mix(k)*cdc_factor(k)
-               if (s% D_mix(k) /= 0 .and. s% mixing_type(k) == no_mixing) then
+               if (s% D_mix(k) /= 0 .and. s% D_mix_non_rotation(k) < s% D_mix_rotation(k)) then
                   s% mixing_type(k) = rotation_mixing
                end if
             end do
@@ -601,8 +595,8 @@
             if (in_convective_region) then
                if (s% mixing_type(k) /= convective_mixing) then
                   call end_of_convective_region
-               else
-                  if(s% conv_vel(k).ne. 0d0) turnover_time = turnover_time + (s% rmid(k-1) - s% rmid(k))/s% conv_vel(k)
+               else if(s% conv_vel(k) .ne. 0d0) then
+                  turnover_time = turnover_time + (s% rmid(k-1) - s% rmid(k))/s% conv_vel(k)
                end if
             else ! in non-convective region
                if (s% mixing_type(k) == convective_mixing) then ! start of a convective region
@@ -804,10 +798,9 @@
 
 
       subroutine set_use_gradr(s,k)
-         use mlt_info
+         use mlt_info, only: switch_to_radiative
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         call switch_to_no_mixing(s,k)
          call switch_to_radiative(s,k)
       end subroutine set_use_gradr
 

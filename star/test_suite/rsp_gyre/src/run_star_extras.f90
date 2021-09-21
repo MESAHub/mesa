@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Rich Townsend, Bill Paxton & The MESA Team
+!   Copyright (C) 2018-2019  Rich Townsend, The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -190,6 +190,8 @@ module run_star_extras
          end do
          
          s% rsp_period = period(s% RSP_mode_for_setting_PERIODLIN + 1)
+         
+         !write(*,*) 'amix1 amix2 amixF velkm v_surf period', amix1, amix2, amixF, velkm, v_surf, s% rsp_period
 
          contains
 

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -200,8 +200,6 @@
          rpar(r_burn_const_P_time_net) = time_doing_net
          rpar(r_burn_const_P_time_eos) = time_doing_eos
 
-         ipar(i_reuse_rates) = 0
-         
          v(1:num_isos) = starting_x(1:num_isos)
          v(nvar) = log(starting_temp)
                      
@@ -333,7 +331,7 @@
             real(dp) :: d_dxdt_dT(nvar-1)
             real(dp) :: d_dxdt_dx(nvar-1, nvar-1)
             real(dp), target :: eps_nuc_categories(num_categories)
-            logical :: reuse_rate_raw, reuse_rate_screened, rates_only, skip_jacobian
+            logical :: rates_only, skip_jacobian
             integer :: screening_mode, lwork, i, num_isos
             integer(8) :: time0, time1, clock_rate
             real(dp), pointer :: work(:) ! (lwork)
@@ -344,8 +342,7 @@
             real(dp) :: res(num_eos_basic_results)
             real(dp) :: d_dlnRho_const_T(num_eos_basic_results) 
             real(dp) :: d_dlnT_const_Rho(num_eos_basic_results) 
-            real(dp) :: d_dabar_burn_const_P_const_TRho(num_eos_basic_results) 
-            real(dp) :: d_dzbar_burn_const_P_const_TRho(num_eos_basic_results) 
+            real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results, nvar-1) 
             integer, pointer :: net_iso(:), chem_id(:)
 
             type (Net_General_Info), pointer :: g
@@ -424,13 +421,13 @@
             endif
          
             call eosPT_get( &
-               eos_handle, z, xh, abar, zbar, &
+               eos_handle, &
                num_isos, chem_id, net_iso, x, &
                Pgas, lgPgas, T, logT, &
                Rho, logRho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
                res, d_dlnRho_const_T, d_dlnT_const_Rho,  &
-               d_dabar_burn_const_P_const_TRho, d_dzbar_burn_const_P_const_TRho, ierr)
-               !ierr)
+               d_dxa_const_TRho, ierr)
+
             Cp = res(i_Cp)
             eta = res(i_eta)
             d_eta_dlnRho = d_dlnRho_const_T(i_eta)
@@ -474,8 +471,6 @@
                call system_clock(time0,clock_rate)
             end if
 
-            reuse_rate_raw = .false.
-            reuse_rate_screened = .false.
             rates_only = .false.
             skip_jacobian = .false.
 
@@ -486,7 +481,6 @@
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                   rate_factors, weak_rate_factor, &
                   reaction_Qs, reaction_neuQs, &
-                  reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
                   screening_mode, &
@@ -526,8 +520,6 @@
             
                return
             end if
-         
-            ipar(i_reuse_rates) = 0 ! only okay if constant T and Rho
          
             f(1:num_isos) = dxdt
             dlnT_dt = eps_nuc/(Cp*T)

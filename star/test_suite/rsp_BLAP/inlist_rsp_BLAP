@@ -30,6 +30,8 @@
 / ! end of star_job namelist
 
 &eos
+use_PC = .true.
+use_Skye = .false.
 /
 
 &kap

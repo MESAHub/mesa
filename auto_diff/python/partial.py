@@ -1,13 +1,11 @@
-
-
-
 class Partial:
 	def __init__(self, orders, array):
 		'''
 		A partial is a list of the orders of derivatives with respect to the independent variables.
 		For instance, orders=(0,1,0,2) corresponds to d^3/(dx_1 dx_3^2).
 
-		If array is true, the last independent variable is actually an array of independent variables.
+		If array is true, the last independent variable is actually an array of independent variables
+		(i.e. a vector-valued independent variable).
 		The variables the array contains are restricted to first-order derivatives.
 		'''
 		self.array = array

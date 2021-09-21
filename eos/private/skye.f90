@@ -11,7 +11,7 @@ module skye
       
       
       private
-      public :: Get_Skye_EOS_Results, Get_Skye_alfa, get_Skye_for_eosdt
+      public :: Get_Skye_EOS_Results, Get_Skye_alfa, Get_Skye_alfa_simple, get_Skye_for_eosdt
 
       contains
 
@@ -38,33 +38,45 @@ module skye
 
          ierr = 0
 
-         ht => eos_ht
+         ht => eos_ht 
 
          big = 12d0
          skye_blend_width = 0.1d0
+
+         ! Avoid catastrophic loss of precision in HELM tables
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = 7.5d0
+         bounds(1,2) = 8.3d0 
 
-         bounds(2,1) = 4d0
-         bounds(2,2) = 7.5d0
+         ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~1).
+         ! We put a lower bound of logT=7.3 to ensure that solar models never use Skye.
+         ! This is because the blend even in regions that are 99+% ionized produces noticeable
+         ! kinks in the sound speed profile on a scale testable by the observations.
+         bounds(2,1) = ht% logdlo
+         bounds(2,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
-         bounds(3,1) = 0.6d0
-         bounds(3,2) = 6.2d0
+         ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
+         bounds(3,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(3,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
-         bounds(4,1) = 4d0
-         bounds(4,2) = 6.2d0
+         ! HELM low-T bound
+         bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(4,2) = ht% logtlo
 
-         bounds(5,1) = 4d0
+         ! Lower-right of (rho,T) plane
+         bounds(5,1) = ht% logdhi
          bounds(5,2) = ht% logtlo
 
+         ! Upper-right of (rho,T) plane
          bounds(6,1) = ht% logdhi
-         bounds(6,2) = ht% logtlo
+         bounds(6,2) = ht% logthi
 
-         bounds(7,1) = ht% logdhi
-         bounds(7,2) = ht% logthi
+         ! Avoid catastrophic loss of precision in HELM tables
+         bounds(7,1) = 3d0 * ht% logthi + log10(abar * mp * crad / (3d0 * kerg * (zbar + 1d0))) - 6d0
+         bounds(7,2) =  ht% logthi
 
-         bounds(8,1) = ht% logdlo
-         bounds(8,2) = ht% logthi
+         ! Avoid catastrophic loss of precision in HELM tables
+         bounds(8,1) = 3d0 * 8.3d0 + log10(abar * mp * crad / (3d0 * kerg * (zbar + 1d0))) - 6d0
+         bounds(8,2) = 8.3d0
 
          ! Set up auto_diff point
          p(1) = logRho
@@ -88,6 +100,63 @@ module skye
          d_alfa_dlogT = blend%d1val2
 
       end subroutine Get_Skye_alfa
+
+
+      subroutine Get_Skye_alfa_simple( &
+            rq, logRho, logT, Z, abar, zbar, &
+            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+            ierr)
+         use const_def
+         use eos_blend
+         type (EoS_General_Info), pointer :: rq
+         real(dp), intent(in) :: logRho, logT, Z, abar, zbar
+         real(dp), intent(out) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_2var_order1) :: logT_auto, logRho_auto
+         type(auto_diff_real_2var_order1) :: blend, blend_logT, blend_logRho
+
+         include 'formats'
+
+         ierr = 0
+
+         ! logRho is val1
+         logRho_auto% val = logRho
+         logRho_auto% d1val1 = 1d0
+         logRho_auto% d1val2 = 0d0
+
+         ! logT is val2
+         logT_auto% val = logT
+         logT_auto% d1val1 = 0d0
+         logT_auto% d1val2 = 1d0
+
+         ! logT blend
+         if (logT_auto < rq% logT_min_for_any_Skye) then
+            blend_logT = 0d0
+         else if (logT_auto <= rq% logT_min_for_all_Skye) then
+            blend_logT = (logT_auto - rQ% logT_min_for_any_Skye) / (rq% logT_min_for_all_Skye - rq% logT_min_for_any_Skye)
+         else if (logT_auto > rq% logT_min_for_all_Skye) then
+            blend_logT = 1d0
+         end if
+
+
+         ! logRho blend
+         if (logRho_auto < rq% logRho_min_for_any_Skye) then
+            blend_logRho = 0d0
+         else if (logRho_auto <= rq% logRho_min_for_all_Skye) then
+            blend_logRho = (logRho_auto - rQ% logRho_min_for_any_Skye) / (rq% logRho_min_for_all_Skye - rq% logRho_min_for_any_Skye)
+         else if (logRho_auto > rq% logRho_min_for_all_Skye) then
+            blend_logRho = 1d0
+         end if
+
+         ! combine blends
+         blend = (1d0 - blend_logRho) * (1d0 - blend_logT)
+
+         alfa = blend% val
+         d_alfa_dlogRho = blend% d1val1
+         d_alfa_dlogT = blend% d1val2
+
+      end subroutine get_Skye_alfa_simple
 
 
       subroutine get_Skye_for_eosdt(handle, dbg, Z, X, abar, zbar, species, chem_id, net_iso, xa, &
@@ -200,6 +269,7 @@ module skye
          use const_def, only: dp
          use utils_lib, only: is_bad
          use chem_def, only: chem_isos
+         use ion_offset, only: compute_ion_offset
          use skye_ideal
          use skye_coulomb
          use skye_thermodynamics
@@ -283,6 +353,8 @@ module skye
 
          ! Ideal ion free energy, only depends on abar
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
+
+         F_ideal_ion = F_ideal_ion + compute_ion_offset(relevant_species, select_xa, chem_id) ! Offset so ion ground state energy is zero.
 
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).

@@ -1895,7 +1895,7 @@
          THETA2=THETA*THETA
          THETA3=THETA2*THETA
          THETA4=THETA3*THETA
-         if (THETA.gt..007d0) then
+         if (THETA.gt..04d0) then
             CHT1=cosh(1.d0/THETA)
             SHT1=sinh(1.d0/THETA)
             CHT2=cosh(1.d0/SQTH)

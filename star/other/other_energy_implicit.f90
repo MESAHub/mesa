@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -45,18 +45,10 @@
          type (star_info), pointer :: s
          integer :: k, nz
          ierr = 0
-
-         ! nz = s% nz
-         ! s% extra_heat(1:nz) = 1 ! erg/g/sec
-         ! s% d_extra_heat_dlndm1(1:nz) = 0
-         ! s% d_extra_heat_dlnd00(1:nz) = 0
-         ! s% d_extra_heat_dlndp1(1:nz) = 0
-         ! s% d_extra_heat_dlnTm1(1:nz) = 0
-         ! s% d_extra_heat_dlnT00(1:nz) = 0
-         ! s% d_extra_heat_dlnTp1(1:nz) = 0
-         ! s% d_extra_heat_dlnR00(1:nz) = 0
-         ! s% d_extra_heat_dlnRp1(1:nz) = 0
-
+         ! call star_ptr(id, s, ierr)
+         ! if (ierr /= 0) return
+         ! s% extra_heat(1:s%nz) = 1d0 ! erg/g/sec
+         ! note that extra_heat is type(auto_diff_real_star_order1) so includes partials.
       end subroutine default_other_energy_implicit
 
 

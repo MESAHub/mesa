@@ -29,20 +29,27 @@
 
 
 &eos
-   use_PC = .false.
-   !dbg = .true.
-   logT_lo = 8.30088
-   logT_hi = 8.30089
+
+    ! use HELM EOS
+      use_Skye = .false.
+      use_PC = .false.
+
 / !end of eos namelist
 
 
-
-
 &kap
+
+    ! specify base metallicity for Type2 opacities
+    ! unimportant since radiative opacities are irrelevant
       Zbase = 0.02
+
 / ! end of kap namelist
 
 &controls
+
+      ! test targets; 10% tolerance
+      x_ctrl(9) = 1.6e7 ! flame speed [cm/s]
+      x_ctrl(10) = 3.5e-5 ! flame width [cm]
 
       warn_when_large_virial_thm_rel_err = 1d99 ! doesn't apply
 
@@ -51,7 +58,7 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 1800
+      max_model_number = 3000 ! 1800
 
     ! use our own routine to build the model
       use_other_build_initial_model = .true.
@@ -70,17 +77,18 @@
     ! set up constant pressure/temperature boundary conditions
       use_other_surface_PT = .true.
 
-    ! there's no surface here; ignore change in lgL_surf
+    ! there's no surface here; ignore change in lgL_surf and lgTeff
       delta_lgL_limit_L_min = 1d99
-
-    ! specify base metallicity for opacities
-    ! unimportant since radiative opacities are irrelevant
+      delta_lgTeff_limit = 1d99
+      
 
     ! don't let convection operate
       mlt_option = 'none'
 
     ! meshing/timestep controls
       varcontrol_target = 1d-3
+      delta_lgT_limit = 0.1d0
+      delta_lgT_limit_min_lgT = 8d0
       T_function1_weight = 50
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3

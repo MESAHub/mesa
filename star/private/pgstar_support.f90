@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -43,20 +43,20 @@
 
 
       ! lines for TRho profile
-      real, dimension(:), pointer :: hydrogen_burn_logT => null(), hydrogen_burn_logRho => null()
-      real, dimension(:), pointer :: helium_burn_logT => null(), helium_burn_logRho => null()
-      real, dimension(:), pointer :: carbon_burn_logT => null(), carbon_burn_logRho => null()
-      real, dimension(:), pointer :: oxygen_burn_logT => null(), oxygen_burn_logRho => null()
-      real, dimension(:), pointer :: psi4_logT => null(), psi4_logRho => null()
-      real, dimension(:), pointer :: elect_data_logT => null(), elect_data_logRho => null()
-      real, dimension(:), pointer :: gamma_4_thirds_logT => null(), gamma_4_thirds_logRho => null()
-      real, dimension(:), pointer :: kap_rad_cond_eq_logT => null(), kap_rad_cond_eq_logRho => null()
-      real, dimension(:), pointer :: opal_clip_logT => null(), opal_clip_logRho => null()
-      real, dimension(:), pointer :: scvh_clip_logT => null(), scvh_clip_logRho => null()
+      real, dimension(:), allocatable :: hydrogen_burn_logT, hydrogen_burn_logRho
+      real, dimension(:), allocatable :: helium_burn_logT, helium_burn_logRho
+      real, dimension(:), allocatable :: carbon_burn_logT, carbon_burn_logRho
+      real, dimension(:), allocatable :: oxygen_burn_logT, oxygen_burn_logRho
+      real, dimension(:), allocatable :: psi4_logT, psi4_logRho
+      real, dimension(:), allocatable :: elect_data_logT, elect_data_logRho
+      real, dimension(:), allocatable :: gamma_4_thirds_logT, gamma_4_thirds_logRho
+      real, dimension(:), allocatable :: kap_rad_cond_eq_logT, kap_rad_cond_eq_logRho
+      real, dimension(:), allocatable :: opal_clip_logT, opal_clip_logRho
+      real, dimension(:), allocatable :: scvh_clip_logT, scvh_clip_logRho
 
       integer :: clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
          clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
-         clr_anonymous, clr_D_smooth, colormap_offset, colormap_last, colormap_size
+         clr_anonymous, colormap_offset, colormap_last, colormap_size
       real :: colormap(3,101)
 
       ! Tioga line types
@@ -456,7 +456,6 @@
          clr_rayleigh_taylor = clr_IndianRed
          clr_minimum = clr_Coral
          clr_anonymous = clr_Tan
-         clr_D_smooth = clr_BrightBlue
 
          colormap(1:3,1) = (/ 0.0, 0.0, 1.0 /)
          colormap(1:3,2) = (/ 0.0196078431372549, 0.0196078431372549, 1.0 /)
@@ -705,7 +704,7 @@
          use utils_lib
          use const_def, only: mesa_data_dir
          character (len=*), intent(in) :: fname
-         real, dimension(:), pointer :: logTs, logRhos ! will allocate
+         real, dimension(:), allocatable :: logTs, logRhos ! will allocate
          integer, intent(out) :: ierr
 
          character (len=strlen) :: filename
@@ -721,36 +720,28 @@
             return
          end if
 
-         sz = 100
+
+         sz=0
+         do
+            read(iounit,*,iostat=ierr) 
+            if(ierr/=0) exit
+            sz = sz + 1
+         end do
+
+         rewind(iounit)
+
          allocate(logTs(sz), logRhos(sz))
 
          cnt = 0
-         do i = 1, 10000
+         do i = 1, sz
             read(iounit,*,iostat=ierr) logRho, logT
             if (ierr /= 0) then
                ierr = 0; exit
-            end if
-            if (i > sz) then
-               sz = 3*sz/2 + 10
-               call realloc(ierr)
-               if (ierr /= 0) then
-                  call done
-                  return
-               end if
             end if
             logRhos(i) = logRho
             logTs(i) = logT
             cnt = i
          end do
-
-         if (cnt < sz) then
-            sz = cnt
-            call realloc(ierr)
-            if (ierr /= 0) then
-               call done
-               return
-            end if
-         end if
 
          call done
 
@@ -761,23 +752,6 @@
          subroutine done
             close(iounit)
          end subroutine done
-
-
-         subroutine realloc(ierr)
-            integer, intent(out) :: ierr
-            ierr = 0
-            call realloc_real(logTs, sz, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'failed in realloc_double'
-               return
-            end if
-            call realloc_real(logRhos, sz, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'failed in realloc_double'
-               return
-            end if
-         end subroutine realloc
-
 
       end subroutine read_TRho_data
 
@@ -918,7 +892,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: step_min, step_max, n ! n = count_hist_points
          character (len=*) :: name
-         real, dimension(:), pointer :: vec
+         real, dimension(:), allocatable :: vec
          integer :: i, cnt, ierr
          character (len=64) :: key_name
          include 'formats'
@@ -1048,7 +1022,7 @@
          real(dp), intent(out) :: xshock
          integer :: k, nz
          real(dp) :: cs, x00, xp1, ms
-         real(dp), pointer :: v(:)
+         real(dp), pointer :: v(:) =>null()
          include 'formats'
          nz = s% nz
          if (s% u_flag) then
@@ -1089,9 +1063,11 @@
                write(*,1) 'ms', ms
                write(*,1) 'x00', x00
                write(*,1) 'xp1', xp1
+               nullify(v)
                stop 'find_shock'
             end if
          end if
+         nullify(v)
       end function find_shock
 
 
@@ -1334,7 +1310,7 @@
          character (len=*), intent(in) :: xaxis_by
          real, intent(in) :: win_xmin_in, win_xmax_in, xmargin
          logical, intent(in) :: xaxis_reversed
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          real, intent(out) :: xmin, xmax, xleft, xright, dx
          integer, intent(out) :: grid_min, grid_max, npts
          integer, intent(out) :: ierr
@@ -1427,7 +1403,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot_in, ytop
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          real :: ybot
          ybot = ybot_in + 0.001*(ytop-ybot_in)
          call show_no_mixing_section(s,ybot,grid_min,grid_max,xvec)
@@ -1444,7 +1420,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          call show_mixing_section(s,ybot,grid_min,grid_max,xvec,no_mixing,clr_no_mixing)
       end subroutine show_no_mixing_section
 
@@ -1453,7 +1429,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          call show_mixing_section( &
             s,ybot,grid_min,grid_max,xvec,convective_mixing,clr_convection)
       end subroutine show_convective_section
@@ -1463,7 +1439,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          call show_mixing_section( &
             s,ybot,grid_min,grid_max,xvec,leftover_convective_mixing,clr_leftover_convection)
       end subroutine show_leftover_convective_section
@@ -1473,7 +1449,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          call show_mixing_section( &
             s,ybot,grid_min,grid_max,xvec,semiconvective_mixing,clr_semiconvection)
       end subroutine show_semiconvective_section
@@ -1483,7 +1459,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          call show_mixing_section( &
             s,ybot,grid_min,grid_max,xvec,thermohaline_mixing,clr_thermohaline)
       end subroutine show_thermohaline_section
@@ -1493,7 +1469,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          call show_mixing_section( &
             s,ybot,grid_min,grid_max,xvec,rotation_mixing,clr_rotation)
       end subroutine show_rotation_section
@@ -1503,7 +1479,7 @@
          type (star_info), pointer :: s
          real, intent(in) :: ybot
          integer, intent(in) :: grid_min,grid_max
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          call show_mixing_section( &
             s,ybot,grid_min,grid_max,xvec,overshoot_mixing,clr_overshoot)
       end subroutine show_overshoot_section
@@ -1512,7 +1488,7 @@
       subroutine show_mixing_section(s,ybot,grid_min,grid_max,xvec,mixing_type,clr)
          type (star_info), pointer :: s
          real, intent(in) :: ybot
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          integer, intent(in) :: mixing_type,clr,grid_min,grid_max
 
          integer :: k, first, last
@@ -2072,7 +2048,7 @@
 
       logical function read_values_from_file(fname, x_data, y_data, data_len)
          character(len=*), intent(in) :: fname
-         real, pointer, dimension(:) :: x_data, y_data
+         real, allocatable, dimension(:) :: x_data, y_data
          integer, intent(out) :: data_len
          integer :: iounit, ierr, i
          include 'formats'

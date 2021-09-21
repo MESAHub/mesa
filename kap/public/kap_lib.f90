@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -165,7 +165,7 @@
          use kap_def, only : kap_is_initialized, Kap_General_Info, num_kap_fracs, i_frac_Type2
          use kap_eval, only : Get_kap_Results
          ! INPUT
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
@@ -225,16 +225,18 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
+         ! composition derivatives not implemented
          dlnkap_dxa = 0
 
       end subroutine kap_get
 
 
       subroutine kap_get_elect_cond_opacity( &
-            zbar, logRho, logT, &
+            handle, zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use condint, only: do_electron_conduction
-         use kap_def, only : kap_is_initialized
+         use kap_def, only : kap_is_initialized, Kap_General_Info
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: logRho ! the density
          real(dp), intent(in) :: logT ! the temperature
@@ -242,23 +244,33 @@
          real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
          integer, intent(out) :: ierr ! 0 means AOK.
+
+         type (Kap_General_Info), pointer :: rq
+
          if (.not. kap_is_initialized) then
             ierr=-1
             return
          endif
          ierr = 0
+
+         call kap_ptr(handle,rq,ierr)
+         if (ierr /= 0) return
+
          call do_electron_conduction( &
-            zbar, logRho, logT, &
+            rq, zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+
       end subroutine kap_get_elect_cond_opacity
       
       
       subroutine kap_get_compton_opacity( &
+         handle, &
          Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
          eta, d_eta_dlnRho, d_eta_dlnT, &
          kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_eval, only: Compton_Opacity
-         use kap_def, only : kap_is_initialized
+         use kap_def, only : kap_is_initialized, Kap_General_Info
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
          real(dp), intent(in) :: Rho, T
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
@@ -267,20 +279,63 @@
          real(dp), intent(out) :: kap ! electron conduction opacity
          real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr ! 0 means AOK.
+
+         type (Kap_General_Info), pointer :: rq
+
          if (.not. kap_is_initialized) then
             ierr=-1
             return
          endif
          ierr = 0
-         call Compton_Opacity(Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+
+         call kap_ptr(handle,rq,ierr)
+         if (ierr /= 0) return
+
+         call Compton_Opacity(rq, &
+            Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+
       end subroutine kap_get_compton_opacity
 
 
+      subroutine kap_get_radiative_opacity( &
+         handle, &
+         X, Z, XC, XN, XO, XNe, logRho, logT, &
+         frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
+         use kap_eval, only: Get_kap_Results_blend_T
+         use kap_def, only : kap_is_initialized, Kap_General_Info
 
+         ! INPUT
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
+         real(dp), intent(in) :: logRho ! density
+         real(dp), intent(in) :: logT ! temperature
 
+         ! OUTPUT
+         real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
+         real(dp), intent(out) :: kap ! opacity
+         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         integer, intent(out) :: ierr ! 0 means AOK.
+
+         type (Kap_General_Info), pointer :: rq
+
+         if (.not. kap_is_initialized) then
+            ierr=-1
+            return
+         endif
+         ierr = 0
+
+         call kap_ptr(handle,rq,ierr)
+         if (ierr /= 0) return
+
+         call Get_kap_Results_blend_T( &
+            rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
+            frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+
+      end subroutine kap_get_radiative_opacity
 
       
       subroutine kap_get_op_mono( &
@@ -292,7 +347,7 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
          use kap_eval, only: combine_rad_with_conduction
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: logRho ! the density
          real(dp), intent(in) :: logT ! the temperature
@@ -608,6 +663,36 @@
          
       end subroutine get_op_mono_args
 
+
+      subroutine kap_get_control_namelist(handle, name, val, ierr)
+         use kap_def
+         use kap_ctrls_io, only: get_kap_controls
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (kap_General_Info), pointer :: rq
+         ierr = 0
+         call kap_ptr(handle,rq,ierr)
+         if(ierr/=0) return
+         call get_kap_controls(rq, name, val, ierr)
+
+      end subroutine kap_get_control_namelist
+
+      subroutine kap_set_control_namelist(handle, name, val, ierr)
+         use kap_def
+         use kap_ctrls_io, only: set_kap_controls
+         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (kap_General_Info), pointer :: rq
+         ierr = 0
+         call kap_ptr(handle,rq,ierr)
+         if(ierr/=0) return
+         call set_kap_controls(rq, name, val, ierr)
+
+      end subroutine kap_set_control_namelist
 
 
       end module kap_lib

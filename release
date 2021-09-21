@@ -1,48 +1,26 @@
 #!/bin/bash
 
-# set this to the directory where you want the work to be done
-# you should have ~4GB free space here; this does it in RAM
-TMPDIR=/dev/shm
+VERSION="$1"
 
-function check_okay {
-    if [ $? -ne 0 ]
-    then
-        echo $1
-	return 1
-    fi
-}
+cd ${MESA_DIR}
 
-do_one() {
+# Add version_number file
+echo ${VERSION} > data/version_number
+git add -f data/version_number
 
-    MESA_SVN=https://subversion.assembla.com/svn/mesa^mesa/trunk
-    MESA_FILENAME=mesa-r$1
+# Update dox
+sed -i "s/PROJECT_NUMBER\ \ \ .*/PROJECT_NUMBER\ \ \ \ \ \ \ \ \ =\ ${VERSION}/" Doxyfile
+git add Doxyfile
 
-    svn export -r $1 ${MESA_SVN} ${MESA_FILENAME}
-    check_okay "failed to export SVN"
+# Update docs/source/conf.py
+sed -i 's/release\ =.*/release\ =\ '"'${VERSION}'"'/' docs/source/conf.py
+sed -i 's/version\ =.*/version\ =\ '"'${VERSION}'"'/' docs/source/conf.py
 
-    zip -r ${MESA_FILENAME}.zip ${MESA_FILENAME}
-    check_okay "failed to make zip file "
+git add docs/source/conf.py
 
-    # you need to make sure you are part of the sourceforge project
-    # and that you have associated an ssh key with your account
-    echo "uploading to sourceforge..."
-    rsync --progress -e ssh ${MESA_FILENAME}.zip frs.sourceforge.net:/home/frs/project/mesa/releases
-    check_okay "failed to upload to sourceforge"
-    echo "upload finished"
-}
+git commit -a -m "Release: ${VERSION}"
+git tag ${VERSION}
 
+git archive --format=zip ${VERSION} > mesa-${VERSION}.zip
 
-(
-
-    VERSION=$(cat data/version_number)
-
-    cd ${TMPDIR}
-    do_one ${VERSION}
-
-    # cleanup
-    rm -f ${MESA_FILENAME}.zip
-    rm -rf ${MESA_FILENAME}
-
-)
-
-
+echo "Now check the archive builds before pushing the changes"

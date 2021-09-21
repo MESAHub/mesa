@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton, Radek Smolec & The MESA Team
+!   Copyright (C) 2018-2019  Radek Smolec & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -71,9 +71,11 @@
 
       subroutine build_rsp_model(s,ierr)
          ! called by model_builder in place of loading a model
-         use alloc, only: allocate_star_info_arrays, set_RSP_flag
+         use alloc, only: allocate_star_info_arrays
+         use set_flags, only: set_RSP_flag
          use rsp_build, only: do_rsp_build
          use net, only: do_micro_change_net
+         use const_def, only: Lsun, Rsun, Msun
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: i, j, k
@@ -136,13 +138,25 @@
             write(*,1) 'dt', s% dt
             return
          end if
-         call finish_build_rsp_model(s, ierr)                     
+         call finish_build_rsp_model(s, ierr)      
+         write(*,2) 'nz', s%nz
+         write(*,1) 'T(nz)', s% T(s%nz)             
+         write(*,1) 'L_center/Lsun', s% L_center/Lsun           
+         write(*,1) 'R_center/Rsun', s% R_center/Rsun           
+         write(*,1) 'M_center/Msun', s% M_center/Msun           
+         write(*,1) 'L(1)/Lsun', s% L(1)/Lsun           
+         write(*,1) 'R(1)/Rsun', s% r(1)/Rsun           
+         write(*,1) 'M(1)/Msun', s% m(1)/Msun           
+         write(*,1) 'v(1)/1d5', s% v(1)/1d5       
+         write(*,1) 'tau_factor', s% tau_factor   
+         write(*,1) 'tau_base', s% tau_base   
+         write(*,*) 
       end subroutine build_rsp_model
       
 
       subroutine finish_build_rsp_model(s,ierr)
          use star_utils, only: &
-            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
+            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, set_m_grav_and_grav, &
             store_rho_in_xh, store_T_in_xh, store_r_in_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
@@ -185,6 +199,7 @@
             stop 'build_rsp_model'
          end if
          call set_m_and_dm(s)
+         call set_m_grav_and_grav(s)
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
       end subroutine finish_build_rsp_model
 
@@ -244,8 +259,7 @@
             run_num_iters_prev_period = 0
             run_num_retries_prev_period = 0
             NSTART = 1
-            if (s% job% load_saved_model_for_RSP .and. &
-                  .not. s% job% create_RSP_model) then
+            if (.not. s% job% create_RSP_model) then
                call init_def(s)
                call init_allocate(s,s% nz)
                call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)               
@@ -289,12 +303,12 @@
       end subroutine rsp_setup_part1
          
 
-      subroutine rsp_setup_part2(s, restart, want_rsp_model, is_rsp_model, ierr)
+      subroutine rsp_setup_part2(s, restart, ierr)
          use hydro_vars, only: set_Teff
          use rsp_step
          ! called by finish_load_model after set_vars
          type (star_info), pointer :: s
-         logical, intent(in) :: restart, want_rsp_model, is_rsp_model
+         logical, intent(in) :: restart
          integer, intent(out) :: ierr
          integer :: i, j, k, species, nz, op_err
          real(dp), allocatable :: w_avg(:)
@@ -310,59 +324,6 @@
          end if
          ierr = 0
          nz = s% nz
-         if (want_rsp_model .and. .not. is_rsp_model) then
-            ! have loaded a file that is not an rsp model and now must convert model
-            do k=1,nz
-               s% erad(k) = crad*s% T(k)**4/s% rho(k)
-               s% xh(s% i_erad_RSP,k) = s% erad(k)
-            end do
-            !$OMP PARALLEL DO PRIVATE(I,op_err) SCHEDULE(dynamic,2)
-            do i = 1,nz
-               call do1_specific_volume(s,i)
-               call do1_eos_and_kap(s,i,op_err)
-               if (op_err /= 0) ierr = op_err
-               call calc_Prad(s,i)
-            end do
-            !$OMP END PARALLEL DO
-            if (ierr /= 0) return
-            !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
-            do k=1,nz ! set Fr using updated eos and kap vars
-               call T_form_of_calc_Fr(s, nz+1-k, s% Fr(k), &
-                  dFr_dr_out, dFr_dr_in, dFr_dr_00, &
-                  dFr_dT_out, dFr_dT_00, dFr_dVol_00)
-               s% xh(s% i_Fr_RSP,k) = s% Fr(k)
-            end do
-            !$OMP END PARALLEL DO
-            if (ALFAC == 0d0 .or. ALFAS == 0d0) then
-               s% RSP_w(1:nz) = 0d0
-               s% RSP_Et(1:nz) = 0d0
-               s% xh(s% i_Et_RSP,1:nz) = 0d0
-            else
-               !$OMP PARALLEL DO PRIVATE(I) SCHEDULE(dynamic,2)
-               do i = 1,nz
-                  call calc_Hp_face(s,i)
-                  call calc_Y_face(s,i)
-                  call calc_PII_face(s,i)
-               end do
-               !$OMP END PARALLEL DO
-               allocate(w_avg(nz))
-               do k=1,nz
-                  Lr = 4d0*pi*s% r(k)**2*s% Fr(k)
-                  Lc = s% L(k) - Lr
-                  POM = P4*(s% r(k)**2)*(ALFAC/ALFAS)*s% T(k)/s% Vol(k)
-                  w_avg(k) = Lc/(POM*s% PII(k))
-               end do
-               s% RSP_w(1) = 0d0
-               s% RSP_w(nz) = 0d0
-               do k=2,nz-1
-                  s% RSP_w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
-                  if (s% RSP_w(k) < 0d0) s% RSP_w(k) = 0d0
-                  s% RSP_Et(k) = s% RSP_w(k)**2
-                  s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)               
-                  s% RSP_w(k) = sqrt(s% xh(s% i_Et_RSP,k))
-               end do   
-            end if         
-         end if
          call finish_after_build_model(s)
          call copy_results(s)  
          call set_Teff(s, ierr)
@@ -698,38 +659,42 @@
          
          ID=ID+1
       
-         !call rsp_dump_for_debug(s)
-         !stop 'rsp_dump_for_debug'
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
-         if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
+         if (s% rsp_max_dt > 0) target_dt = min(target_dt, s% rsp_max_dt)
+         if (s% max_timestep > 0) target_dt = min(target_dt, s% max_timestep)
          s% dt = target_dt
 
          if (is_bad(s% dt)) then
-            write(*,1) 'dt', s% dt
+            write(*,1) 'do1_step dt', s% dt
             write(*,1) 'rsp_period', s% rsp_period
             write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
             write(*,1) 'max_timestep_factor', s% max_timestep_factor
+            write(*,1) 'rsp_period/RSP_target_steps_per_cycle/', s% rsp_period/s% RSP_target_steps_per_cycle
             stop 'do1_step 1'
          end if
 
          max_dt = rsp_min_dr_div_cs*s% RSP_max_dt_times_min_dr_div_cs
-         if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
-            if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
-               max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
-               if (s% dt > max_dt) then
-                  write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
-                     s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
-                  !stop 'rsp'
-               end if
-            end if
-         end if
+         !if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
+         !   if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
+         !      max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
+         !      if (s% dt > max_dt) then
+         !         write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
+         !            s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
+         !         !stop 'rsp'
+         !      end if
+         !   end if
+         !end if
          if (s% dt > max_dt) then
-            if (s% RSP_report_limit_dt) &
-               write(*,4) 'limit dt to max_dt', s% model_number
+            if (s% RSP_report_limit_dt) then
+               write(*,4) 'limit to RSP_max_dt_times_min_dr_div_cs', s% model_number, max_dt, s% dt
+               stop 'do1_step 1'
+            end if
             s% dt = max_dt
          end if
+         
+         if (s% force_timestep > 0d0) s% dt = s% force_timestep ! overrides everything else
          
          if (is_bad(s% dt) .or. s% dt <= 0d0) then
             write(*,1) 'dt', s% dt
@@ -838,6 +803,7 @@
             s% rsp_DeltaMAG = 2.5d0*log10(LMAX/LMIN)
             LMIN = 10.d10
             LMAX = -LMIN
+            VMAX = 0
          end if
       end subroutine gather_pulse_statistics
 
@@ -887,6 +853,7 @@
          LMAX   =-LMIN
          RMAX   = -SUNR
          RMIN   = -RMAX
+         VMAX   = 0
          s% rsp_GREKM = 0
          s% rsp_GREKM_avg_abs = 0
          s% rsp_GRPDV = 0
@@ -1018,16 +985,21 @@
          TET = s% time
          cycle_complete = .false.
          UN=s% v(1)
-         if(UN.gt.0.d0.and.ULL.le.0.d0) RMIN=s% r(1)/SUNR
+         if(UN.gt.0.d0.and.ULL.le.0.d0) then
+            RMIN=s% r(1)/SUNR
+         end if
          if (s% model_number.eq.1) return
          if (.not. s% RSP_have_set_velocities) return
-         if (s% RSP_min_max_R_for_periods > 0d0 .and. &
-               s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (UN/s% csound(1) > VMAX) then
+            VMAX = UN/s% csound(1)
+         end if
          if(UN*ULL.gt.0.0d0.or.UN.gt.0.d0) return
          T0=TET
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
          if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
+         if (s% r(1)/SUNR - RMIN < s% RSP_min_deltaR_for_periods) return
          if(FIRST.eq.1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1
@@ -1039,22 +1011,25 @@
                write(*,2) 'TT1', s% model_number, TT1
                stop 'check_cycle_completed'
             end if
-            write(*,'(a7,i7,f11.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
+            RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
+            write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
                'period', s% rsp_num_periods, s% rsp_period/(24*3600), &
+               'delta R', RMAX - RMIN, &
+               'max vsurf/cs', VMAX, &
                'retries',  &
                   s% num_retries - run_num_retries_prev_period,     &
                'steps',  &
                   s% model_number - prev_cycle_run_num_steps, &
-               'avg iters/step',  &
+               'iters/step',  &
                   dble(s% total_num_solver_iterations - run_num_iters_prev_period)/ &
                   dble(s% model_number - prev_cycle_run_num_steps), &
-               'step', s% model_number, 'days', s% time/(24*3600)
+               'model', s% model_number, 'days', s% time/(24*3600)
             prev_cycle_run_num_steps = s% model_number
             run_num_iters_prev_period = s% total_num_solver_iterations
             run_num_retries_prev_period = s% num_retries
             TT1=T0
             INSIDE=1 
-            RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
+            VMAX = 0d0
          else
              write(*,*) 'first maximum radius, period calculations start at model, day', &
                 s% model_number, s% time/(24*3600)

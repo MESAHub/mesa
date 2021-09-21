@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -47,7 +47,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          do k = 1, s% nz
-            s% extra_grav(k) = 0 ! this is added to -G*m/r^2
+            !s% extra_grav(k) = 0d0 ! this is added to -G*m/r^2
          end do
       end subroutine default_other_momentum
 

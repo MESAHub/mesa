@@ -84,16 +84,15 @@ SRCS = \
    other_energy_implicit.f90 \
    other_cgrav.f90 \
    other_opacity_factor.f90 \
-   other_mlt.f90 \
    other_adjust_mlt_gradt_fraction.f90 \
    other_after_set_mixing_info.f90 \
-   other_after_enter_setmatrix.f90 \
+   other_after_solver_setmatrix.f90 \
+	other_mlt_results.f90 \
    other_neu.f90 \
    other_net_get.f90 \
    other_diffusion_coefficients.f90 \
    other_diffusion.f90 \
    other_diffusion_factor.f90 \
-   other_eos.f90 \
    other_kap.f90 \
    other_eps_grav.f90 \
    other_overshooting_scheme.f90 \
@@ -126,6 +125,10 @@ SRCS = \
    overshoot_utils.f90 \
    overshoot_exp.f90 \
    overshoot_step.f90 \
+   thermohaline.f90 \
+   semiconvection.f90 \
+   mlt.f90 \
+   tdc.f90 \
    mlt_get_results.f90 \
    mlt_info.f90 \
    rotation_mix_info.f90 \
@@ -161,6 +164,8 @@ SRCS = \
    pulse_saio.f90 \
    pulse_gr1d.f90 \
    pulse_utils.f90 \
+   ionization_potentials.f90 \
+   mod_typical_charge.f90 \
    profile_getval.f90 \
    profile.f90 \
    mesh_functions.f90 \
@@ -172,10 +177,9 @@ SRCS = \
    hydro_energy.f90 \
    hydro_momentum.f90 \
    hydro_temperature.f90 \
-   hydro_tdc.f90 \
+   hydro_rsp2.f90 \
+   hydro_rsp2_support.f90 \
    hydro_eqns.f90 \
-   hydro_mtx.f90 \
-   hydro_solver_procs.f90 \
    solve_omega_mix.f90 \
    history_specs.f90 \
    history.f90 \
@@ -195,9 +199,8 @@ SRCS = \
    element_diffusion.f90 \
    evolve_support.f90 \
    star_bcyclic.f90 \
+   solver_support.f90 \
    star_solver.f90 \
-   solve_burn.f90 \
-   solve_hydro.f90 \
    struct_burn_mix.f90 \
    winds.f90 \
    gravity_darkening.f90 \
@@ -205,6 +208,7 @@ SRCS = \
    eps_mdot.f90 \
    evolve.f90 \
    relax.f90 \
+   set_flags.f90 \
    create_initial_model.f90 \
    pre_ms_model.f90 \
    init_model.f90 \
@@ -255,7 +259,7 @@ install:
 	@$(CP_IF_NEWER) other_extras.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) pulse.mod $(MESA_DIR)/include
 
-ifeq ($(FC),ifort)
+ifneq (,$(findstring ifort,$(FC)))
 	@$(CP_IF_NEWER) overshoot_utils.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) auto_diff_support.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) star_private_def.mod $(MESA_DIR)/include

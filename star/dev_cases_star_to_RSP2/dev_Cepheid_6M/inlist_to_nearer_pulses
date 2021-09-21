@@ -1,0 +1,24 @@
+&star_job
+/ ! end of star_job namelist
+
+&eos
+/ !end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+   max_model_number = 1
+
+! output controls
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   !terminal_interval = 1
+
+/ ! end of controls namelist
+
+&pgstar
+         
+/ ! end of pgstar namelist

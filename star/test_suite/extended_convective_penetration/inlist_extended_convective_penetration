@@ -4,7 +4,7 @@
       show_log_description_at_start = .false. 
 
       load_saved_model = .true.
-      saved_model_name = 'zams.mod'
+      load_model_filename = 'zams.mod'
 
     save_model_when_terminate = .true.
     save_model_filename = 'final.mod'
@@ -55,7 +55,7 @@
 
 !OPTIONS
     do_conv_premix = .true.
-    use_dedt_form_of_energy_eqn = .true.    
+    energy_eqn_option = 'dedt'
     use_Ledoux_criterion = .true.    
     
   ! starting specifications

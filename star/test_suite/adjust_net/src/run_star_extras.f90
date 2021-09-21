@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2011-2019  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -77,11 +77,18 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          include 'formats'
-         if (s% species == 62) then
-            write(*,'(a,i3)') 'finished with expected number of species', s% species
-         else
-            write(*,'(a,i3)') 'finished with unexpected number of species', s% species
-         end if
+
+         select case (s% x_integer_ctrl(1)) 
+         case(2) ! inlist_adjust_net
+            if (s% species == 62) then
+               write(*,'(a,i3)') 'finished with expected number of species', s% species
+            else
+               write(*,'(a,i3)') 'finished with unexpected number of species', s% species
+            end if
+            testhub_extras_names(1) = 'num_isos'
+            testhub_extras_vals(1) = s% species
+         end select
+
          ierr = 0
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
@@ -162,19 +169,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         
-         return
-         
-         
-         include 'formats'
-         if (s% net_iso(in18) == 0) then
-            write(*,*) 'n18 not in net'
-            return
-         end if
-         xn18 = s% xa(s% net_iso(in18), s% nz)
-         call double_to_str(xn18, xn18_str)
-         write(*,2,advance='no') 'n18 at center', s% model_number
-         write(*,'(a)') trim(xn18_str)            
+                   
       end function extras_finish_step
       
       

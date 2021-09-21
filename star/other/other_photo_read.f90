@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -41,6 +41,7 @@
          integer, intent(in) :: id, iounit
          integer, intent(out) :: ierr
          ierr = 0
+         !read(iounit,iostat=ierr) stuff
       end subroutine default_other_photo_read
 
 

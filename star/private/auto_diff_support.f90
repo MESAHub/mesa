@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020  Adam Jermyn, Bill Paxton & The MESA Team
+!   Copyright (C) 2020  Adam Jermyn, The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -30,13 +30,10 @@
       use auto_diff
 
       implicit none
- 
-      integer, parameter :: auto_diff_star_num_vars = 27 ! for 9 solver vars at 3 cells each
-      public :: auto_diff_star_num_vars
      
       ! current use of xtra's
-      ! xtra1 is ln_cvpv0
-      ! xtra2 is w_div_wc
+      ! Hp is ln_cvpv0
+      ! xtra1 is w_div_wc
 
       public
 
@@ -71,17 +68,17 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1)
+            dxtra2_m1, dxtra2_00, dxtra2_p1)
          type(auto_diff_real_star_order1), intent(in) :: var
          real(dp), intent(out) :: &
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1
+            dxtra2_m1, dxtra2_00, dxtra2_p1
          val = var%val
          dlnd_m1 = var%d1Array(i_lnd_m1)
          dlnd_00 = var%d1Array(i_lnd_00)
@@ -101,15 +98,15 @@
          dL_m1 = var%d1Array(i_L_m1)
          dL_00 = var%d1Array(i_L_00)
          dL_p1 = var%d1Array(i_L_p1)
+         dHp_m1 = var%d1Array(i_Hp_m1)
+         dHp_00 = var%d1Array(i_Hp_00)
+         dHp_p1 = var%d1Array(i_Hp_p1)
          dxtra1_m1 = var%d1Array(i_xtra1_m1)
          dxtra1_00 = var%d1Array(i_xtra1_00)
          dxtra1_p1 = var%d1Array(i_xtra1_p1)
          dxtra2_m1 = var%d1Array(i_xtra2_m1)
          dxtra2_00 = var%d1Array(i_xtra2_00)
          dxtra2_p1 = var%d1Array(i_xtra2_p1)
-         dxtra3_m1 = var%d1Array(i_xtra3_m1)
-         dxtra3_00 = var%d1Array(i_xtra3_00)
-         dxtra3_p1 = var%d1Array(i_xtra3_p1)
       end subroutine unwrap
 
       subroutine wrap(var, val, &
@@ -119,17 +116,17 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1)
+            dxtra2_m1, dxtra2_00, dxtra2_p1)
          type(auto_diff_real_star_order1), intent(out) :: var
          real(dp), intent(in) :: &
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dHp_m1, dHp_00, dHp_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1, &
-            dxtra3_m1, dxtra3_00, dxtra3_p1
+            dxtra2_m1, dxtra2_00, dxtra2_p1
          var%val = val
          var%d1Array(i_lnd_m1) = dlnd_m1
          var%d1Array(i_lnd_00) = dlnd_00
@@ -149,15 +146,15 @@
          var%d1Array(i_L_m1) = dL_m1
          var%d1Array(i_L_00) = dL_00
          var%d1Array(i_L_p1) = dL_p1
+         var%d1Array(i_Hp_m1) = dHp_m1
+         var%d1Array(i_Hp_00) = dHp_00
+         var%d1Array(i_Hp_p1) = dHp_p1
          var%d1Array(i_xtra1_m1) = dxtra1_m1
          var%d1Array(i_xtra1_00) = dxtra1_00
          var%d1Array(i_xtra1_p1) = dxtra1_p1
          var%d1Array(i_xtra2_m1) = dxtra2_m1
          var%d1Array(i_xtra2_00) = dxtra2_00
          var%d1Array(i_xtra2_p1) = dxtra2_p1
-         var%d1Array(i_xtra3_m1) = dxtra3_m1
-         var%d1Array(i_xtra3_00) = dxtra3_00
-         var%d1Array(i_xtra3_p1) = dxtra3_p1
       end subroutine wrap
 
 
@@ -345,15 +342,6 @@
             w_p1 % d1Array(i_w_p1) = 1d0
          end if
       end function wrap_w_p1
-
-      function wrap_dxh_w(s, k) result(dxh_w)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: dxh_w
-         integer, intent(in) :: k
-         dxh_w = 0d0 
-         dxh_w % val = s%dxh_w(k)
-         dxh_w % d1Array(i_w_00) = 1d0
-      end function wrap_dxh_w
       
       real(dp) function get_etrb(s,k)
          type (star_info), pointer :: s
@@ -367,7 +355,7 @@
          get_etrb_start = pow2(s% w_start(k))
       end function get_etrb_start
       
-      real(dp) function get_TDC_conv_velocity(s,k) result (cv) ! at face k
+      real(dp) function get_RSP2_conv_velocity(s,k) result (cv) ! at face k
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp) :: alfa, beta
@@ -378,7 +366,7 @@
             beta = 1d0 - alfa
             cv = sqrt_2_div_3*(alfa*s% w(k) + beta*s% w(k-1))
          end if
-      end function get_TDC_conv_velocity
+      end function get_RSP2_conv_velocity
       
       real(dp) function get_w(s,k)
          type (star_info), pointer :: s
@@ -768,6 +756,80 @@
          end if   
       end function wrap_gamma1_p1
 
+      function wrap_latent_ddlnT_m1(s, k) result(latent_ddlnT_m1)
+         use eos_def, only: i_latent_ddlnT
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnT_m1
+         integer, intent(in) :: k
+         latent_ddlnT_m1 = 0d0
+         if (k > 1) then
+            latent_ddlnT_m1%val = s% latent_ddlnT(k-1)
+            latent_ddlnT_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_latent_ddlnT,k-1)
+            latent_ddlnT_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_latent_ddlnT,k-1)
+         end if
+      end function wrap_latent_ddlnT_m1
+
+      function wrap_latent_ddlnT_00(s, k) result(latent_ddlnT_00)
+         use eos_def, only: i_latent_ddlnT
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnT_00
+         integer, intent(in) :: k
+         latent_ddlnT_00 = 0d0
+         latent_ddlnT_00%val = s% latent_ddlnT(k)
+         latent_ddlnT_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_latent_ddlnT,k)
+         latent_ddlnT_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_latent_ddlnT,k)
+      end function wrap_latent_ddlnT_00
+
+      function wrap_latent_ddlnT_p1(s, k) result(latent_ddlnT_p1)
+         use eos_def, only: i_latent_ddlnT
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnT_p1
+         integer, intent(in) :: k
+         latent_ddlnT_p1 = 0d0
+         if (k < s% nz) then
+            latent_ddlnT_p1%val = s% latent_ddlnT(k+1)
+            latent_ddlnT_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_latent_ddlnT,k+1)
+            latent_ddlnT_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_latent_ddlnT,k+1)
+         end if
+      end function wrap_latent_ddlnT_p1
+
+      function wrap_latent_ddlnRho_m1(s, k) result(latent_ddlnRho_m1)
+         use eos_def, only: i_latent_ddlnRho
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnRho_m1
+         integer, intent(in) :: k
+         latent_ddlnRho_m1 = 0d0
+         if (k > 1) then
+            latent_ddlnRho_m1%val = s% latent_ddlnRho(k-1)
+            latent_ddlnRho_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_latent_ddlnRho,k-1)
+            latent_ddlnRho_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_latent_ddlnRho,k-1)
+         end if
+      end function wrap_latent_ddlnRho_m1
+
+      function wrap_latent_ddlnRho_00(s, k) result(latent_ddlnRho_00)
+         use eos_def, only: i_latent_ddlnRho
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnRho_00
+         integer, intent(in) :: k
+         latent_ddlnRho_00 = 0d0
+         latent_ddlnRho_00%val = s% latent_ddlnRho(k)
+         latent_ddlnRho_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_latent_ddlnRho,k)
+         latent_ddlnRho_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_latent_ddlnRho,k)
+      end function wrap_latent_ddlnRho_00
+
+      function wrap_latent_ddlnRho_p1(s, k) result(latent_ddlnRho_p1)
+         use eos_def, only: i_latent_ddlnRho
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: latent_ddlnRho_p1
+         integer, intent(in) :: k
+         latent_ddlnRho_p1 = 0d0
+         if (k < s% nz) then
+            latent_ddlnRho_p1%val = s% latent_ddlnRho(k+1)
+            latent_ddlnRho_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_latent_ddlnRho,k+1)
+            latent_ddlnRho_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_latent_ddlnRho,k+1)
+         end if
+      end function wrap_latent_ddlnRho_p1
+
       function wrap_L_m1(s, k) result(L_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: L_m1
@@ -1063,14 +1125,45 @@
          end if
       end function wrap_u_p1
 
+      function wrap_Hp_m1(s, k) result(Hp_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_m1
+         integer, intent(in) :: k
+         Hp_m1 = 0d0 
+         if (k > 1) then
+            Hp_m1 % val = s%Hp_face(k-1)
+            Hp_m1 % d1Array(i_Hp_m1) = 1d0
+         end if
+      end function wrap_Hp_m1
+
+      function wrap_Hp_00(s, k) result(Hp_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_00
+         integer, intent(in) :: k
+         Hp_00 = 0d0 
+         Hp_00 % val = s%Hp_face(k)
+         Hp_00 % d1Array(i_Hp_00) = 1d0
+      end function wrap_Hp_00
+
+      function wrap_Hp_p1(s, k) result(Hp_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_p1
+         integer, intent(in) :: k
+         Hp_p1 = 0d0 
+         if (k < s%nz) then
+            Hp_p1 % val = s%Hp_face(k+1)
+            Hp_p1 % d1Array(i_Hp_p1) = 1d0
+         end if
+      end function wrap_Hp_p1
+
 
       function wrap_xtra1_m1(s, k) result(xtra1_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: xtra1_m1
          integer, intent(in) :: k
          xtra1_m1 = 0d0 
-         if (k > 1) then 
-            xtra1_m1% val = s% xtra1_array(k)
+         if (k > 1) then
+            xtra1_m1 % val = 0d0
             xtra1_m1 % d1Array(i_xtra1_m1) = 1d0
          end if            
       end function wrap_xtra1_m1
@@ -1080,7 +1173,7 @@
          type(auto_diff_real_star_order1) :: xtra1_00
          integer, intent(in) :: k
          xtra1_00 = 0d0 
-         xtra1_00 % val = 0d0
+         xtra1_00 % val = 0d0 
          xtra1_00 % d1Array(i_xtra1_00) = 1d0
       end function wrap_xtra1_00
 
@@ -1112,7 +1205,7 @@
          type(auto_diff_real_star_order1) :: xtra2_00
          integer, intent(in) :: k
          xtra2_00 = 0d0 
-         xtra2_00 % val = 0d0 
+         xtra2_00 % val = 0d0
          xtra2_00 % d1Array(i_xtra2_00) = 1d0
       end function wrap_xtra2_00
 
@@ -1122,42 +1215,10 @@
          integer, intent(in) :: k
          xtra2_p1 = 0d0 
          if (k < s%nz) then
-            xtra2_p1 % val = 0d0 
+            xtra2_p1 % val = 0d0
             xtra2_p1 % d1Array(i_xtra2_p1) = 1d0
          end if
       end function wrap_xtra2_p1
-
-
-      function wrap_xtra3_m1(s, k) result(xtra3_m1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: xtra3_m1
-         integer, intent(in) :: k
-         xtra3_m1 = 0d0 
-         if (k > 1) then
-            xtra3_m1 % val = 0d0
-            xtra3_m1 % d1Array(i_xtra3_m1) = 1d0
-         end if            
-      end function wrap_xtra3_m1
-
-      function wrap_xtra3_00(s, k) result(xtra3_00)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: xtra3_00
-         integer, intent(in) :: k
-         xtra3_00 = 0d0 
-         xtra3_00 % val = 0d0
-         xtra3_00 % d1Array(i_xtra3_00) = 1d0
-      end function wrap_xtra3_00
-
-      function wrap_xtra3_p1(s, k) result(xtra3_p1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: xtra3_p1
-         integer, intent(in) :: k
-         xtra3_p1 = 0d0 
-         if (k < s%nz) then
-            xtra3_p1 % val = 0d0
-            xtra3_p1 % d1Array(i_xtra3_p1) = 1d0
-         end if
-      end function wrap_xtra3_p1
 
 
 end module auto_diff_support

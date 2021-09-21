@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -386,6 +386,8 @@
          if (failed('xa_old')) return
          call do1D(s, s% dq_old, nz, action, ierr)
          if (failed('dq_old')) return
+         call do1D(s, s% mlt_vc_old, nz, action, ierr)
+         if (failed('mlt_vc_old')) return
          call do1D(s, s% omega_old, nz, action, ierr)
          if (failed('omega_old')) return
          call do1D(s, s% j_rot_old, nz, action, ierr)
@@ -524,6 +526,10 @@
                if (failed('omega')) exit
                call do1(s% j_rot, c% j_rot)
                if (failed('j_rot')) exit               
+               call do1(s% mlt_vc, c% mlt_vc)
+               if (failed('mlt_vc')) exit
+               call do1(s% conv_vel, c% conv_vel)
+               if (failed('conv_vel')) exit
             end if
             
             call do1(s% q, c% q)
@@ -534,9 +540,6 @@
             if (failed('dm')) exit
             call do1(s% dm_bar, c% dm_bar)
             if (failed('dm_bar')) exit   
-            
-            call do1(s% conv_vel, c% conv_vel)
-            if (failed('conv_vel')) exit
             
             call do1(s% am_nu_rot, c% am_nu_rot)
             if (failed('am_nu_rot')) exit
@@ -613,6 +616,8 @@
             if (failed('w')) exit
             call do1(s% w_start, c% w_start)
             if (failed('w_start')) exit
+            call do1(s% Hp_face_start, c% Hp_face_start)
+            if (failed('Hp_face_start')) exit
             
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
@@ -624,8 +629,6 @@
             if (failed('dxh_v')) exit
             call do1(s% dxh_u, c% dxh_u)
             if (failed('dxh_u')) exit
-            call do1(s% dxh_w, c% dxh_w)
-            if (failed('dxh_w')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
@@ -645,14 +648,6 @@
 
             call do1(s% rmid, c% rmid)
             if (failed('rmid')) exit
-            call do1(s% drmid_dlnR00, c% drmid_dlnR00)
-            if (failed('drmid_dlnR00')) exit
-            call do1(s% drmid_dlnRp1, c% drmid_dlnRp1)
-            if (failed('drmid_dlnRp1')) exit
-            call do1(s% drmid2_dlnR00, c% drmid2_dlnR00)
-            if (failed('drmid2_dlnR00')) exit
-            call do1(s% drmid2_dlnRp1, c% drmid2_dlnRp1)
-            if (failed('drmid2_dlnRp1')) exit
 
             call do1(s% X, c% X)
             if (failed('X')) exit
@@ -673,8 +668,12 @@
 
             call do1(s% mass_correction, c% mass_correction)
             if (failed('mass_correction')) exit
+            call do1(s% mass_correction_start, c% mass_correction_start)
+            if (failed('mass_correction_start')) exit
             call do1(s% m_grav, c% m_grav)
             if (failed('m_grav')) exit
+            call do1(s% m_grav_start, c% m_grav_start)
+            if (failed('m_grav_start')) exit
 
             call do1(s% Peos, c% Peos)
             if (failed('Peos')) exit
@@ -744,10 +743,6 @@
 
             call do1(s% QQ, c% QQ)
             if (failed('QQ')) exit
-            call do1(s% d_QQ_dlnd, c% d_QQ_dlnd)
-            if (failed('d_QQ_dlnd')) exit
-            call do1(s% d_QQ_dlnT, c% d_QQ_dlnT)
-            if (failed('d_QQ_dlnT')) exit
             call do2(s% d_eos_dlnd, c% d_eos_dlnd, num_eos_basic_results, 'd_eos_dlnd')
             if (failed('d_eos_dlnd')) exit
             call do2(s% d_eos_dlnT, c% d_eos_dlnT, num_eos_basic_results, 'd_eos_dlnT')
@@ -791,8 +786,6 @@
             if (failed('grav')) exit
             call do1(s% tau, c% tau)
             if (failed('tau')) exit
-            call do1(s% lntau, c% lntau)
-            if (failed('lntau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
 
@@ -950,39 +943,11 @@
             if (failed('eps_heat')) exit
             call do1(s% irradiation_heat, c% irradiation_heat)
             if (failed('irradiation_heat')) exit
-            call do1(s% extra_heat, c% extra_heat)
+            
+            call do1_ad(s% extra_heat, c% extra_heat)
             if (failed('extra_heat')) exit
-            call do1(s% d_extra_heat_dlndm1, c% d_extra_heat_dlndm1)
-            if (failed('d_extra_heat_dlndm1')) exit
-            call do1(s% d_extra_heat_dlnd00, c% d_extra_heat_dlnd00)
-            if (failed('d_extra_heat_dlnd00')) exit
-            call do1(s% d_extra_heat_dlndp1, c% d_extra_heat_dlndp1)
-            if (failed('d_extra_heat_dlndp1')) exit
-            call do1(s% d_extra_heat_dlnTm1, c% d_extra_heat_dlnTm1)
-            if (failed('d_extra_heat_dlnTm1')) exit
-            call do1(s% d_extra_heat_dlnT00, c% d_extra_heat_dlnT00)
-            if (failed('d_extra_heat_dlnT00')) exit
-            call do1(s% d_extra_heat_dlnTp1, c% d_extra_heat_dlnTp1)
-            if (failed('d_extra_heat_dlnTp1')) exit
-            call do1(s% d_extra_heat_dlnR00, c% d_extra_heat_dlnR00)
-            if (failed('d_extra_heat_dlnR00')) exit
-            call do1(s% d_extra_heat_dlnRp1, c% d_extra_heat_dlnRp1)
-            if (failed('d_extra_heat_dlnRp1')) exit
-
-            call do1(s% extra_grav, c% extra_grav)
+            call do1_ad(s% extra_grav, c% extra_grav)
             if (failed('extra_grav')) exit
-            call do1(s% d_extra_grav_dlndm1, c% d_extra_grav_dlndm1)
-            if (failed('d_extra_grav_dlndm1')) exit
-            call do1(s% d_extra_grav_dlnd00, c% d_extra_grav_dlnd00)
-            if (failed('d_extra_grav_dlnd00')) exit
-            call do1(s% d_extra_grav_dlnTm1, c% d_extra_grav_dlnTm1)
-            if (failed('d_extra_grav_dlnTm1')) exit
-            call do1(s% d_extra_grav_dlnT00, c% d_extra_grav_dlnT00)
-            if (failed('d_extra_grav_dlnT00')) exit
-            call do1(s% d_extra_grav_dlnR, c% d_extra_grav_dlnR)
-            if (failed('d_extra_grav_dlnR')) exit
-            call do1(s% d_extra_grav_dL, c% d_extra_grav_dL)
-            if (failed('d_extra_grav_dL')) exit
 
             call do1(s% extra_jdot, c% extra_jdot)
             if (failed('extra_jdot')) exit
@@ -1023,11 +988,6 @@
                   action == do_copy_pointers_and_resize) &
                s% alpha_mlt(1:nz) = s% mixing_length_alpha
 
-            call do1(s% eps_drag, c% eps_drag)
-            if (failed('eps_drag')) exit
-            call do1(s% dvdt_drag, c% dvdt_drag)
-            if (failed('dvdt_drag')) exit
-
             call do1(s% vc, c% vc)
             if (failed('vc')) exit
             call do1(s% R2, c% R2)
@@ -1037,34 +997,6 @@
 
             call do1_ad(s% eps_grav_ad, c% eps_grav_ad)
             if (failed('eps_grav_ad')) exit
-            call do1(s% eps_grav, c% eps_grav)
-            if (failed('eps_grav')) exit
-            call do1(s% d_eps_grav_dlndm1, c% d_eps_grav_dlndm1)
-            if (failed('d_eps_grav_dlndm1')) exit
-            call do1(s% d_eps_grav_dlnd00, c% d_eps_grav_dlnd00)
-            if (failed('d_eps_grav_dlnd00')) exit
-            call do1(s% d_eps_grav_dlndp1, c% d_eps_grav_dlndp1)
-            if (failed('d_eps_grav_dlndp1')) exit
-            call do1(s% d_eps_grav_dlnTm1, c% d_eps_grav_dlnTm1)
-            if (failed('d_eps_grav_dlnTm1')) exit
-            call do1(s% d_eps_grav_dlnT00, c% d_eps_grav_dlnT00)
-            if (failed('d_eps_grav_dlnT00')) exit
-            call do1(s% d_eps_grav_dlnTp1, c% d_eps_grav_dlnTp1)
-            if (failed('d_eps_grav_dlnTp1')) exit
-
-            call do1(s% d_eps_grav_dlnR00, c% d_eps_grav_dlnR00)
-            if (failed('d_eps_grav_dlnR00')) exit
-            call do1(s% d_eps_grav_dlnRp1, c% d_eps_grav_dlnRp1)
-            if (failed('d_eps_grav_dlnRp1')) exit
-            call do1(s% d_eps_grav_dL00, c% d_eps_grav_dL00)
-            if (failed('d_eps_grav_dL00')) exit
-            call do1(s% d_eps_grav_dLp1, c% d_eps_grav_dLp1)
-            if (failed('d_eps_grav_dLp1')) exit
-            call do1(s% d_eps_grav_dv00, c% d_eps_grav_dv00)
-            if (failed('d_eps_grav_dv00')) exit
-            call do1(s% d_eps_grav_dvp1, c% d_eps_grav_dvp1)
-            if (failed('d_eps_grav_dvp1')) exit
-
             call do2(s% d_eps_grav_dx, c% d_eps_grav_dx, species, null_str)
             if (failed('d_eps_grav_dx')) exit
 
@@ -1080,8 +1012,6 @@
             call do1(s% total_energy_profile_after_adjust_mass, c% total_energy_profile_after_adjust_mass)
             if (failed('total_energy_profile_after_adjust_mass')) exit
 
-            call do1_logical(s% eps_grav_form_for_energy_eqn, c% eps_grav_form_for_energy_eqn)
-            if (failed('eps_grav_form_for_energy_eqn')) exit
             call do1(s% dL_dm, c% dL_dm)
             if (failed('dL_dm')) exit
             call do1(s% energy_sources, c% energy_sources)
@@ -1105,25 +1035,6 @@
             if (failed('mlt_mixing_length')) exit
             call do1(s% mlt_D, c% mlt_D)
             if (failed('mlt_D')) exit
-            call do1(s% mlt_D_semi, c% mlt_D_semi)
-            if (failed('mlt_D_semi')) exit
-            call do1(s% mlt_D_thrm, c% mlt_D_thrm)
-            if (failed('mlt_D_thrm')) exit
-
-            call do1(s% mlt_vc, c% mlt_vc)
-            if (failed('mlt_vc')) exit
-            call do1(s% d_mlt_vc_dlnd00, c% d_mlt_vc_dlnd00)
-            if (failed('d_mlt_vc_dlnd00')) exit
-            call do1(s% d_mlt_vc_dlnT00, c% d_mlt_vc_dlnT00)
-            if (failed('d_mlt_vc_dlnT00')) exit
-            call do1(s% d_mlt_vc_dlndm1, c% d_mlt_vc_dlndm1)
-            if (failed('d_mlt_vc_dlndm1')) exit
-            call do1(s% d_mlt_vc_dlnTm1, c% d_mlt_vc_dlnTm1)
-            if (failed('d_mlt_vc_dlnTm1')) exit
-            call do1(s% d_mlt_vc_dlnR, c% d_mlt_vc_dlnR)
-            if (failed('d_mlt_vc_dlnR')) exit
-            call do1(s% d_mlt_vc_dL, c% d_mlt_vc_dL)
-            if (failed('d_mlt_vc_dL')) exit
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
@@ -1133,14 +1044,15 @@
             call do1(s% L_conv, c% L_conv)
             if (failed('L_conv')) exit
 
-            call do1(s% grad_superad, c% grad_superad)
-            if (failed('grad_superad')) exit
-            call do1(s% grad_superad_actual, c% grad_superad_actual)
-            if (failed('grad_superad_actual')) exit
+            call do1_integer(s% tdc_num_iters, c% tdc_num_iters)
+            if (failed('tdc_num_iters')) exit
+
             call do1(s% gradT_sub_grada, c% gradT_sub_grada)
             if (failed('gradT_sub_grada')) exit
             call do1(s% grada_face, c% grada_face)
             if (failed('grada_face')) exit
+            call do1(s% mlt_gradT, c% mlt_gradT)
+            if (failed('mlt_gradT')) exit
 
             call do1(s% mlt_cdc, c% mlt_cdc)
             if (failed('mlt_cdc')) exit
@@ -1154,51 +1066,47 @@
             if (failed('mixing_type')) exit
             call do1(s% cz_bdy_dq, c% cz_bdy_dq)
             if (failed('cz_bdy_dq')) exit
-
+            
             call do1_ad(s% gradT_ad, c% gradT_ad)
             if (failed('gradT_ad')) exit
             call do1_ad(s% gradr_ad, c% gradr_ad)
             if (failed('gradr_ad')) exit
+            call do1_ad(s% Y_face_ad, c% Y_face_ad)
+            if (failed('Y_face_ad')) exit
+            call do1_ad(s% grada_face_ad, c% grada_face_ad)
+            if (failed('grada_face_ad')) exit
             call do1_ad(s% mlt_vc_ad, c% mlt_vc_ad)
             if (failed('mlt_vc_ad')) exit
+            call do1_ad(s% gradL_ad, c% gradL_ad)
+            if (failed('gradL_ad')) exit
+            call do1_ad(s% scale_height_ad, c% scale_height_ad)
+            if (failed('scale_height_ad')) exit
+            call do1_ad(s% Lambda_ad, c% Lambda_ad)
+            if (failed('Lambda_ad')) exit
+            call do1_ad(s% mlt_D_ad, c% mlt_D_ad)
+            if (failed('mlt_D_ad')) exit
+            call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
+            if (failed('mlt_Gamma_ad')) exit
+            
+            call do1_ad(s% PII_ad, c% PII_ad)
+            if (failed('PII_ad')) exit
+            call do1_ad(s% Chi_ad, c% Chi_ad)
+            if (failed('Chi_ad')) exit
+            call do1_ad(s% Eq_ad, c% Eq_ad)
+            if (failed('Eq_ad')) exit
+            call do1_ad(s% COUPL_ad, c% COUPL_ad)
+            if (failed('COUPL_ad')) exit
+            call do1_ad(s% Lr_ad, c% Lr_ad)
+            if (failed('Lr_ad')) exit
+            call do1_ad(s% Lc_ad, c% Lc_ad)
+            if (failed('Lc_ad')) exit
+            call do1_ad(s% Lt_ad, c% Lt_ad)
+            if (failed('Lt_ad')) exit
 
-            call do1(s% actual_gradT, c% actual_gradT)
-            if (failed('actual_gradT')) exit
             call do1(s% gradT, c% gradT)
             if (failed('gradT')) exit
-            call do1(s% d_gradT_dlnd00, c% d_gradT_dlnd00)
-            if (failed('d_gradT_dlnd00')) exit
-            call do1(s% d_gradT_dlnT00, c% d_gradT_dlnT00)
-            if (failed('d_gradT_dlnT00')) exit
-            call do1(s% d_gradT_dlndm1, c% d_gradT_dlndm1)
-            if (failed('d_gradT_dlndm1')) exit
-            call do1(s% d_gradT_dlnTm1, c% d_gradT_dlnTm1)
-            if (failed('d_gradT_dlnTm1')) exit
-            call do1(s% d_gradT_dlnR, c% d_gradT_dlnR)
-            if (failed('d_gradT_dlnR')) exit
-            call do1(s% d_gradT_dL, c% d_gradT_dL)
-            if (failed('d_gradT_dL')) exit
-            call do1(s% d_gradT_dln_cvpv0, c% d_gradT_dln_cvpv0)
-            if (failed('d_gradT_dln_cvpv0')) exit
-            call do1(s% d_gradT_dw_div_wc, c% d_gradT_dw_div_wc)
-            if (failed('d_gradT_dw_div_wc')) exit
-
             call do1(s% gradr, c% gradr)
             if (failed('gradr')) exit
-            call do1(s% d_gradr_dlnd00, c% d_gradr_dlnd00)
-            if (failed('d_gradr_dlnd00')) exit
-            call do1(s% d_gradr_dlnT00, c% d_gradr_dlnT00)
-            if (failed('d_gradr_dlnT00')) exit
-            call do1(s% d_gradr_dlndm1, c% d_gradr_dlndm1)
-            if (failed('d_gradr_dlndm1')) exit
-            call do1(s% d_gradr_dlnTm1, c% d_gradr_dlnTm1)
-            if (failed('d_gradr_dlnTm1')) exit
-            call do1(s% d_gradr_dlnR, c% d_gradr_dlnR)
-            if (failed('d_gradr_dlnR')) exit
-            call do1(s% d_gradr_dL, c% d_gradr_dL)
-            if (failed('d_gradr_dL')) exit
-            call do1(s% d_gradr_dw_div_wc, c% d_gradr_dw_div_wc)
-            if (failed('d_gradr_dw_div_wc')) exit
 
             call do1(s% grad_density, c% grad_density)
             if (failed('grad_density')) exit
@@ -1234,22 +1142,8 @@
             if (failed('u_face_ad')) exit
             call do1(s% u_face_start, c% u_face_start)
             if (failed('u_face_start')) exit
-            !call do1(s% u_face, c% u_face)
-            !if (failed('u_face')) exit
-            !call do1(s% d_uface_dlnR, c% d_uface_dlnR)
-            !if (failed('d_uface_dlnR')) exit
-            !call do1(s% d_uface_du00, c% d_uface_du00)
-            !if (failed('d_uface_du00')) exit
-            !call do1(s% d_uface_dum1, c% d_uface_dum1)
-            !if (failed('d_uface_dum1')) exit
-            !call do1(s% d_uface_dlnd00, c% d_uface_dlnd00)
-            !if (failed('d_uface_dlnd00')) exit
-            !call do1(s% d_uface_dlndm1, c% d_uface_dlndm1)
-            !if (failed('d_uface_dlndm1')) exit
-            !call do1(s% d_uface_dlnT00, c% d_uface_dlnT00)
-            !if (failed('d_uface_dlnT00')) exit
-            !call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
-            !if (failed('d_uface_dlnTm1')) exit
+            call do1(s% u_face_val, c% u_face_val)
+            if (failed('u_face_val')) exit
             call do1(s% d_uface_domega, c% d_uface_domega)
             if (failed('d_uface_domega')) exit
 
@@ -1257,24 +1151,6 @@
             if (failed('P_face_ad')) exit
             call do1(s% P_face_start, c% P_face_start)
             if (failed('P_face_start')) exit
-            !call do1(s% P_face, c% P_face)
-            !if (failed('P_face')) exit
-            !call do1(s% d_Pface_dL, c% d_Pface_dL)
-            !if (failed('d_Pface_dL')) exit
-            !call do1(s% d_Pface_dlnR, c% d_Pface_dlnR)
-            !if (failed('d_Pface_dlnR')) exit
-            !call do1(s% d_Pface_du00, c% d_Pface_du00)
-            !if (failed('d_Pface_du00')) exit
-            !call do1(s% d_Pface_dum1, c% d_Pface_dum1)
-            !if (failed('d_Pface_dum1')) exit
-            !call do1(s% d_Pface_dlnd00, c% d_Pface_dlnd00)
-            !if (failed('d_Pface_dlnd00')) exit
-            !call do1(s% d_Pface_dlndm1, c% d_Pface_dlndm1)
-            !if (failed('d_Pface_dlndm1')) exit
-            !call do1(s% d_Pface_dlnT00, c% d_Pface_dlnT00)
-            !if (failed('d_Pface_dlnT00')) exit
-            !call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
-            !if (failed('d_Pface_dlnTm1')) exit
             call do1(s% d_Pface_domega, c% d_Pface_domega)
             if (failed('d_Pface_domega')) exit
 
@@ -1324,8 +1200,6 @@
             if (failed('Peos_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
-            call do1(s% lnE_start, c% lnE_start)
-            if (failed('lnE_start')) exit
             call do1(s% energy_start, c% energy_start)
             if (failed('energy_start')) exit
             call do1(s% egas_start, c% egas_start)
@@ -1348,71 +1222,29 @@
             if (failed('r_start')) exit
             call do1(s% rmid_start, c% rmid_start)
             if (failed('rmid_start')) exit
-            call do1(s% L_non_rad_start, c% L_non_rad_start)
-            if (failed('L_non_rad_start')) exit
             call do1(s% omega_start, c% omega_start)
             if (failed('omega_start')) exit
-            call do1(s% X_start, c% X_start)
-            if (failed('X_start')) exit
-            call do1(s% Y_start, c% Y_start)
-            if (failed('Y_start')) exit
-            call do1(s% Z_start, c% Z_start)
-            if (failed('Z_start')) exit
             call do1(s% ye_start, c% ye_start)
             if (failed('ye_start')) exit
             call do1(s% opacity_start, c% opacity_start)
             if (failed('opacity_start')) exit
             call do1(s% csound_start, c% csound_start)
             if (failed('csound_start')) exit
-            call do1(s% tau_start, c% tau_start)
-            if (failed('tau_start')) exit
             call do1(s% alpha_RTI_start, c% alpha_RTI_start)
             if (failed('alpha_RTI_start')) exit
-            call do1(s% conv_vel_start, c% conv_vel_start)
-            if (failed('conv_vel_start')) exit
-
-            call do1(s% mlt_mixing_length_start, c% mlt_mixing_length_start)
-            if (failed('mlt_mixing_length_start')) exit
-            call do1_integer(s% mlt_mixing_type_start, c% mlt_mixing_type_start)
-            if (failed('mlt_mixing_type_start')) exit
-            call do1(s% mlt_D_start, c% mlt_D_start)
-            if (failed('mlt_D_start')) exit
-            call do1(s% mlt_vc_start, c% mlt_vc_start)
-            if (failed('mlt_vc_start')) exit
-            call do1(s% mlt_Gamma_start, c% mlt_Gamma_start)
-            if (failed('mlt_Gamma_start')) exit
-            call do1(s% mlt_cdc_start, c% mlt_cdc_start)
-            if (failed('mlt_cdc_start')) exit
 
             call do1(s% j_rot_start, c% j_rot_start)
             if (failed('j_rot_start')) exit
             call do1(s% i_rot_start, c% i_rot_start)
             if (failed('i_rot_start')) exit
-            call do1(s% P_div_rho_start, c% P_div_rho_start)
-            if (failed('P_div_rho_start')) exit
-            call do1(s% mass_correction_start, c% mass_correction_start)
-            if (failed('mass_correction_start')) exit
-            call do1(s% eta_visc_start, c% eta_visc_start)
-            if (failed('eta_visc_start')) exit
             call do1(s% eps_nuc_start, c% eps_nuc_start)
             if (failed('eps_nuc_start')) exit
             call do1(s% non_nuc_neu_start, c% non_nuc_neu_start)
             if (failed('non_nuc_neu_start')) exit
             call do2(s% dxdt_nuc_start, c% dxdt_nuc_start, species, null_str)
             if (failed('dxdt_nuc_start')) exit
-
-            call do1(s% scale_height_start, c% scale_height_start)
-            if (failed('scale_height_start')) exit
-            call do1(s% gradL_start, c% gradL_start)
-            if (failed('gradL_start')) exit
-            call do1(s% gradT_start, c% gradT_start)
-            if (failed('gradT_start')) exit
             call do1(s% grada_start, c% grada_start)
             if (failed('grada_start')) exit
-            call do1(s% gradr_start, c% gradr_start)
-            if (failed('gradr_start')) exit
-            call do1(s% grada_face_start, c% grada_face_start)
-            if (failed('grada_face_start')) exit
             call do1(s% chiT_start, c% chiT_start)
             if (failed('chiT_start')) exit
             call do1(s% chiRho_start, c% chiRho_start)
@@ -1433,20 +1265,17 @@
             if (failed('eta_start')) exit
             call do1(s% T_start, c% T_start)
             if (failed('T_start')) exit
-
-            call do1(s% total_energy_integral_surface, c% total_energy_integral_surface)
-            if (failed('total_energy_integral_surface')) exit
-            call do1(s% total_energy_integral_center, c% total_energy_integral_center)
-            if (failed('total_energy_integral_center')) exit
-
-            call do1(s% abar_start, c% abar_start)
-            if (failed('abar_start')) exit
             call do1(s% zbar_start, c% zbar_start)
             if (failed('zbar_start')) exit
-            call do1(s% z53bar_start, c% z53bar_start)
-            if (failed('z53bar_start')) exit
             call do1(s% mu_start, c% mu_start)
             if (failed('mu_start')) exit
+
+            call do1(s% phase_start, c% phase_start)
+            if (failed('phase_start')) exit
+            call do1(s% latent_ddlnT_start, c% latent_ddlnT_start)
+            if (failed('latent_ddlnT_start')) exit
+            call do1(s% latent_ddlnRho_start, c% latent_ddlnRho_start)
+            if (failed('latent_ddlnRho_start')) exit
 
             call do1(s% max_burn_correction, c% max_burn_correction)
             if (failed('max_burn_correction')) exit
@@ -1489,26 +1318,11 @@
             if (failed('max_abs_xa_corr')) exit
 
             call do1(s% Hp_face, c% Hp_face); if (failed('Hp_face')) exit
-            call do1(s% d_Hp_face_dlnR, c% d_Hp_face_dlnR); if (failed('d_Hp_face_dlnR')) exit
-            call do1(s% d_Hp_face_dlnd00, c% d_Hp_face_dlnd00); if (failed('d_Hp_face_dlnd00')) exit
-            call do1(s% d_Hp_face_dlnT00, c% d_Hp_face_dlnT00); if (failed('d_Hp_face_dlnT00')) exit
-            call do1(s% d_Hp_face_dlndm1, c% d_Hp_face_dlndm1); if (failed('d_Hp_face_dlndm1')) exit
-            call do1(s% d_Hp_face_dlnTm1, c% d_Hp_face_dlnTm1); if (failed('d_Hp_face_dlnTm1')) exit
 
             call do1(s% Y_face, c% Y_face); if (failed('Y_face')) exit
             call do1(s% Y_face_start, c% Y_face_start); if (failed('Y_face_start')) exit
-            call do1(s% d_Y_face_dlnR, c% d_Y_face_dlnR); if (failed('d_Y_face_dlnR')) exit
-            call do1(s% d_Y_face_dlnd00, c% d_Y_face_dlnd00); if (failed('d_Y_face_dlnd00')) exit
-            call do1(s% d_Y_face_dlnT00, c% d_Y_face_dlnT00); if (failed('d_Y_face_dlnT00')) exit
-            call do1(s% d_Y_face_dlndm1, c% d_Y_face_dlndm1); if (failed('d_Y_face_dlndm1')) exit
-            call do1(s% d_Y_face_dlnTm1, c% d_Y_face_dlnTm1); if (failed('d_Y_face_dlnTm1')) exit
             
             call do1(s% PII, c% PII); if (failed('PII')) exit
-            call do1(s% d_PII_dlnR, c% d_PII_dlnR); if (failed('d_PII_dlnR')) exit
-            call do1(s% d_PII_dlnd00, c% d_PII_dlnd00); if (failed('d_PII_dlnd00')) exit
-            call do1(s% d_PII_dlnT00, c% d_PII_dlnT00); if (failed('d_PII_dlnT00')) exit
-            call do1(s% d_PII_dlndm1, c% d_PII_dlndm1); if (failed('d_PII_dlndm1')) exit
-            call do1(s% d_PII_dlnTm1, c% d_PII_dlnTm1); if (failed('d_PII_dlnTm1')) exit
 
             call do1(s% Chi, c% Chi); if (failed('Chi')) exit
             call do1(s% Chi_start, c% Chi_start); if (failed('Chi_start')) exit
@@ -1592,6 +1406,8 @@
             if (failed('prev_mesh_j_rot')) exit
             call do1(s% prev_mesh_omega, c% prev_mesh_omega)
             if (failed('prev_mesh_omega')) exit
+            call do1(s% prev_mesh_mlt_vc, c% prev_mesh_mlt_vc)
+            if (failed('prev_mesh_mlt_vc')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
 
@@ -1921,9 +1737,9 @@
                   ptr2(j) = ptr(j)
                end do
                if (s% fill_arrays_with_NaNs) then
-                  call fill_ad_with_NaNs(ptr,old_sz+1,sz)                  
+                  call fill_ad_with_NaNs(ptr2,old_sz+1,sz)
                else if (s% zero_when_allocate) then
-                  call fill_ad_with_zeros(ptr,old_sz+1,sz)                  
+                  call fill_ad_with_zeros(ptr2,old_sz+1,sz)
                end if
                deallocate(ptr)
                if (ierr /= 0) return
@@ -2548,10 +2364,12 @@
             s% i_Fr_RSP = 0
          end if
          
-         if (s% TDC_flag) then
+         if (s% RSP2_flag) then
             i = i+1; s% i_w = i
+            i = i+1; s% i_Hp = i
          else 
             s% i_w = 0
+            s% i_Hp = 0
          end if
 
          if (s% conv_vel_flag) then
@@ -2590,6 +2408,7 @@
          end if
       
          s% i_detrb_dt = s% i_w
+         s% i_equ_Hp = s% i_Hp
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
@@ -2599,10 +2418,6 @@
          s% i_dj_rot_dt = s% i_j_rot
 
          s% nvar_hydro = i
-
-         s% i_chem1 = s% nvar_hydro + 1
-         s% equchem1 = s% i_chem1
-
          s% nvar_total = s% nvar_hydro + s% nvar_chem
 
          ! Names of the variables
@@ -2612,6 +2427,7 @@
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
          if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
+         if (s% i_Hp/= 0) s% nameofvar(s% i_Hp) = 'Hp'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -2628,6 +2444,7 @@
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
          if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
+         if (s% i_equ_Hp /= 0) s% nameofequ(s% i_equ_Hp) = 'equ_Hp'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
          if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
@@ -2697,791 +2514,6 @@
          end subroutine realloc_logical
 
       end subroutine set_chem_names
-
-
-      subroutine set_v_flag(id, v_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: v_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz, i_v, i_u
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% v_flag .eqv. v_flag) return
-
-         nz = s% nz
-         s% v_flag = v_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. v_flag) then ! remove i_v's
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (v_flag) then ! insert i_v's
-            i_v = s% i_v
-            s% v_center = 0d0
-            call insert(s% xh)
-            call insert(s% xh_start)
-            if (s% u_flag) then
-               i_u = s% i_u
-               do k=2,nz
-                  s% xh(i_v,k) = 0.5d0*(s% xh(i_u,k-1) + s% xh(i_u,k))
-               end do
-               s% xh(i_v,1) = s% xh(i_u,1)
-            else if (s% RSP_flag) then
-               s% xh(i_v,1:nz) = 0d0
-               s% v(1:nz) = 0d0
-            else
-               do k=1,nz
-                  s% xh(i_v,k) = 0d0
-                  if (is_bad(s% xh(i_v,k))) s% xh(i_v,k) = 0d0
-                  s% v(k) = s% xh(i_v,k)
-               end do
-            end if
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_v
-            if (size(xs,dim=2) < nz) return
-            i_v = s% i_v
-            do j = i_v+1, nvar_hydro_old
-               xs(j-1,1:nz) = xs(j,1:nz)
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_v
-            if (size(xs,dim=2) < nz) return
-            i_v = s% i_v
-            do j = s% nvar_hydro, i_v+1, -1
-               xs(j,1:nz) = xs(j-1,1:nz)
-            end do
-            xs(i_v,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_v_flag
-
-
-      subroutine set_u_flag(id, u_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: u_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz, i_u, i_v
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         integer :: num_u_vars
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-
-         if (s% u_flag .eqv. u_flag) return
-
-         nz = s% nz
-         s% u_flag = u_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         num_u_vars = 1
-
-         if (.not. u_flag) then ! remove
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (u_flag) then ! insert
-            i_u = s% i_u
-            call insert(s% xh)
-            call insert(s% xh_start)
-            if (s% v_flag) then ! use v to initialize u
-               i_v = s% i_v
-               do k=1,nz-1
-                  s% xh(i_u,k) = 0.5d0*(s% xh(i_v,k) + s% xh(i_v,k+1))
-               end do
-               k = nz
-               s% xh(i_u,k) = 0.5d0*(s% xh(i_v,k) + s% v_center)
-            else
-               do k=1,nz
-                  s% xh(i_u,k) = 0d0
-               end do
-            end if
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-            call fill_ad_with_zeros(s% u_face_ad,1,-1)
-            call fill_ad_with_zeros(s% P_face_ad,1,-1)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: k, j, i_u
-            if (size(xs,dim=2) < nz) return
-            i_u = s% i_u
-            do k = 1, nz
-               do j = i_u + num_u_vars, nvar_hydro_old
-                  xs(j-num_u_vars,k) = xs(j,k)
-               end do
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: k, j, i_u
-            if (size(xs,dim=2) < nz) return
-            i_u = s% i_u
-            do k = 1, nz
-               do j = s% nvar_hydro, i_u + num_u_vars, -1
-                  xs(j,k) = xs(j-num_u_vars,k)
-               end do
-               do j = i_u, i_u + num_u_vars - 1
-                  xs(j,k) = 0
-               end do
-            end do
-
-         end subroutine insert
-
-      end subroutine set_u_flag
-
-
-      subroutine set_zero_alpha_RTI(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         include 'formats'
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (.not. s% u_flag) return
-         s% xh(s% i_alpha_RTI,1:s% nz) = 0d0
-         s% alpha_RTI(1:s% nz) = 0d0
-         s% need_to_setvars = .true.
-      end subroutine set_zero_alpha_RTI
-
-
-      subroutine set_RTI_flag(id, RTI_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: RTI_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% RTI_flag .eqv. RTI_flag) return
-
-         nz = s% nz
-         s% RTI_flag = RTI_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. RTI_flag) then ! remove i_alpha_RTI's
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (RTI_flag) then ! insert i_alpha_RTI's
-            call insert(s% xh)
-            call insert(s% xh_start)
-            s% xh(s% i_alpha_RTI,1:nz) = 0d0
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_alpha_RTI
-            if (size(xs,dim=2) < nz) return
-            i_alpha_RTI = s% i_alpha_RTI
-            do j = i_alpha_RTI+1, nvar_hydro_old
-               xs(j-1,1:nz) = xs(j,1:nz)
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_alpha_RTI
-            if (size(xs,dim=2) < nz) return
-            i_alpha_RTI = s% i_alpha_RTI
-            do j = s% nvar_hydro, i_alpha_RTI+1, -1
-               xs(j,1:nz) = xs(j-1,1:nz)
-            end do
-            xs(i_alpha_RTI,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_RTI_flag
-
-
-      subroutine set_TDC_flag(id, TDC_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: TDC_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, i, k, j, nz, iounit
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         write(*,*) 'set_TDC_flag previous s% TDC_flag', s% TDC_flag
-         write(*,*) 'set_TDC_flag new TDC_flag', TDC_flag
-         if (s% TDC_flag .eqv. TDC_flag) return
-
-         nz = s% nz
-         
-         if (TDC_flag .and. s% RSP_flag) then ! turn RSP off before turn TDC on
-            call set_RSP_flag(id, .false., ierr)
-            if (ierr /= 0) return
-         end if
-         
-         s% TDC_flag = TDC_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. TDC_flag) then
-            call remove1(s% i_w)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-         
-         write(*,*) 'set_TDC variables and equations'
-         if (.true.) then
-            do i=1,s% nvar_hydro
-               write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
-            end do
-         end if
-         
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (TDC_flag) then
-            call insert1(s% i_w) 
-            s% need_to_reset_w = .true.
-         end if
-
-         call set_chem_names(s)
-         
-         contains     
-
-         subroutine insert1(i_var)
-            integer, intent(in) :: i_var
-            include 'formats'
-            call insert(s% xh,i_var)
-            call insert(s% xh_start,i_var)
-            do k=1,nz
-               s% xh(i_var,k) = 0d0
-            end do
-            if (associated(s% xh_old) .and. s% generations > 1) then
-               call insert(s% xh_old,i_var)
-            end if
-         end subroutine insert1
-             
-         subroutine remove1(i_remove)
-            integer, intent(in) :: i_remove
-            call del(s% xh,i_remove)
-            call del(s% xh_start,i_remove)
-            if (associated(s% xh_old) .and. s% generations > 1) then
-               call del(s% xh_old,i_remove)
-            end if
-         end subroutine remove1
-
-         subroutine del(xs,i_var)
-            real(dp) :: xs(:,:)
-            integer, intent(in) :: i_var
-            integer :: j, k
-            if (size(xs,dim=2) < nz) return
-            do j = i_var+1, nvar_hydro_old
-               do k=1,nz
-                  xs(j-1,k) = xs(j,k)
-               end do
-            end do
-         end subroutine del
-
-         subroutine insert(xs,i_var)
-            real(dp) :: xs(:,:)
-            integer, intent(in) :: i_var
-            integer :: j, k
-            if (size(xs,dim=2) < nz) return
-            do j = s% nvar_hydro, i_var+1, -1
-               do k=1,nz
-                  xs(j,k) = xs(j-1,k)
-               end do
-            end do
-            xs(i_var,1:nz) = 0d0
-         end subroutine insert
-
-      end subroutine set_TDC_flag
-
-
-      subroutine set_RSP_flag(id, RSP_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: RSP_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% RSP_flag .eqv. RSP_flag) return
-
-         nz = s% nz
-         s% RSP_flag = RSP_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. RSP_flag) then
-            call remove1(s% i_Fr_RSP)
-            call remove1(s% i_erad_RSP)
-            call remove1(s% i_Et_RSP)
-         else if (s% i_lum /= 0) then
-            call remove1(s% i_lum)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (RSP_flag) then
-            call insert1(s% i_Et_RSP)
-            call insert1(s% i_erad_RSP)
-            call insert1(s% i_Fr_RSP)
-         else
-            call insert1(s% i_lum)
-         end if
-
-         call set_chem_names(s)
-         
-         if (RSP_flag) call set_v_flag(s% id, .true., ierr)
-
-         contains     
-
-         subroutine insert1(i_var)
-            integer, intent(in) :: i_var
-            call insert(s% xh,i_var)
-            call insert(s% xh_start,i_var)
-            do k=1,nz
-               s% xh(i_var,k) = 0d0
-            end do
-            if (associated(s% xh_old) .and. s% generations > 1) then
-               call insert(s% xh_old,i_var)
-            end if
-         end subroutine insert1
-             
-         subroutine remove1(i_remove)
-            integer, intent(in) :: i_remove
-            call del(s% xh,i_remove)
-            call del(s% xh_start,i_remove)
-            if (associated(s% xh_old) .and. s% generations > 1) then
-               call del(s% xh_old,i_remove)
-            end if
-         end subroutine remove1
-
-         subroutine del(xs,i_var)
-            real(dp) :: xs(:,:)
-            integer, intent(in) :: i_var
-            integer :: j, k
-            if (size(xs,dim=2) < nz) return
-            do j = i_var+1, nvar_hydro_old
-               do k=1,nz
-                  xs(j-1,k) = xs(j,k)
-               end do
-            end do
-         end subroutine del
-
-         subroutine insert(xs,i_var)
-            real(dp) :: xs(:,:)
-            integer, intent(in) :: i_var
-            integer :: j, k
-            if (size(xs,dim=2) < nz) return
-            do j = s% nvar_hydro, i_var+1, -1
-               do k=1,nz
-                  xs(j,k) = xs(j-1,k)
-               end do
-            end do
-            xs(i_var,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_RSP_flag
-
-
-      subroutine set_conv_vel_flag(id, conv_vel_flag, ierr)
-         use const_def, only: no_mixing, convective_mixing
-         integer, intent(in) :: id
-         logical, intent(in) :: conv_vel_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% conv_vel_flag .eqv. conv_vel_flag) return
-
-         nz = s% nz
-         s% conv_vel_flag = conv_vel_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. conv_vel_flag) then ! remove i_ln_cvpv0's
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (conv_vel_flag) then ! insert i_ln_cvpv0's
-            call insert(s% xh)
-            call insert(s% xh_start)
-            if (s% have_previous_conv_vel) then
-               do k=1,nz
-                  s% xh(s% i_ln_cvpv0,k) = log(s% conv_vel(k)+s% conv_vel_v0)
-               end do
-            else
-               s% xh(s% i_ln_cvpv0,1:nz) = 0d0
-            end if
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_ln_cvpv0
-            if (size(xs,dim=2) < nz) return
-            i_ln_cvpv0 = s% i_ln_cvpv0
-            do j = i_ln_cvpv0+1, nvar_hydro_old
-               xs(j-1,1:nz) = xs(j,1:nz)
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_ln_cvpv0
-            if (size(xs,dim=2) < nz) return
-            i_ln_cvpv0 = s% i_ln_cvpv0
-            do j = s% nvar_hydro, i_ln_cvpv0+1, -1
-               xs(j,1:nz) = xs(j-1,1:nz)
-            end do
-            xs(i_ln_cvpv0,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_conv_vel_flag
-
-
-      subroutine set_w_div_wc_flag(id, w_div_wc_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: w_div_wc_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% w_div_wc_flag .eqv. w_div_wc_flag) return
-
-         nz = s% nz
-         s% w_div_wc_flag = w_div_wc_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. w_div_wc_flag) then ! remove i_w_div_wc's
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (w_div_wc_flag) then ! insert i_ln_cvpv0's
-            call insert(s% xh)
-            call insert(s% xh_start)
-            s% xh(s% i_w_div_wc,1:nz) = 0d0
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_w_div_wc
-            if (size(xs,dim=2) < nz) return
-            i_w_div_wc = s% i_w_div_wc
-            do j = i_w_div_wc+1, nvar_hydro_old
-               xs(j-1,1:nz) = xs(j,1:nz)
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_w_div_wc
-            if (size(xs,dim=2) < nz) return
-            i_w_div_wc = s% i_w_div_wc
-            do j = s% nvar_hydro, i_w_div_wc+1, -1
-               xs(j,1:nz) = xs(j-1,1:nz)
-            end do
-            xs(i_w_div_wc,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_w_div_wc_flag
-
-
-      subroutine set_j_rot_flag(id, j_rot_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: j_rot_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% j_rot_flag .eqv. j_rot_flag) return
-
-         nz = s% nz
-         s% j_rot_flag = j_rot_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. j_rot_flag) then ! remove i_j_rot's
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (j_rot_flag) then ! insert i_ln_cvpv0's
-            call insert(s% xh)
-            call insert(s% xh_start)
-            s% xh(s% i_j_rot,1:nz) = 0d0
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_j_rot
-            if (size(xs,dim=2) < nz) return
-            i_j_rot = s% i_j_rot
-            do j = i_j_rot+1, nvar_hydro_old
-               xs(j-1,1:nz) = xs(j,1:nz)
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_j_rot
-            if (size(xs,dim=2) < nz) return
-            i_j_rot = s% i_j_rot
-            do j = s% nvar_hydro, i_j_rot+1, -1
-               xs(j,1:nz) = xs(j-1,1:nz)
-            end do
-            xs(i_j_rot,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_j_rot_flag
-
-
-      subroutine set_D_omega_flag(id, D_omega_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: D_omega_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         include 'formats'
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% D_omega_flag .eqv. D_omega_flag) return
-         s% D_omega_flag = D_omega_flag
-         s% D_omega(1:s% nz) = 0
-      end subroutine set_D_omega_flag
-
-
-      subroutine set_am_nu_rot_flag(id, am_nu_rot_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: am_nu_rot_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         include 'formats'
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% am_nu_rot_flag .eqv. am_nu_rot_flag) return
-         s% am_nu_rot_flag = am_nu_rot_flag
-         s% am_nu_rot(1:s% nz) = 0
-      end subroutine set_am_nu_rot_flag
-      
-
-      subroutine set_rotation_flag(id, rotation_flag, ierr)
-         integer, intent(in) :: id
-         logical, intent(in) :: rotation_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% rotation_flag .eqv. rotation_flag) return
-
-         s% rotation_flag = rotation_flag
-         s% omega(1:s% nz) = 0
-         s% j_rot(1:s% nz) = 0
-         s% D_omega(1:s% nz) = 0
-         s% am_nu_rot(1:s% nz) = 0
-
-         if (.not. rotation_flag) then
-            call set_w_div_wc_flag(id, .false., ierr)
-            if (ierr /= 0) return
-            call set_j_rot_flag(id, .false., ierr)
-            if (ierr /= 0) return
-            return
-         end if
-
-         if (s% job% use_w_div_wc_flag_with_rotation) then
-            call set_w_div_wc_flag(id, .true., ierr)
-            if (ierr /= 0) return
-            if (s% job% use_j_rot_flag_with_rotation) then
-               call set_j_rot_flag(id, .true., ierr)
-               if (ierr /= 0) return
-            end if
-         end if
-
-         call zero_array(s% nu_ST)
-         call zero_array(s% D_ST)
-         call zero_array(s% D_DSI)
-         call zero_array(s% D_SH)
-         call zero_array(s% D_SSI)
-         call zero_array(s% D_ES)
-         call zero_array(s% D_GSF)
-
-         call zero_array(s% prev_mesh_omega)
-         call zero_array(s% prev_mesh_j_rot)
-
-
-         contains
-
-         subroutine zero_array(d)
-            real(dp), pointer :: d(:)
-            if (.not. associated(d)) return
-            d(:) = 0
-         end subroutine zero_array
-
-
-      end subroutine set_rotation_flag
 
 
       subroutine realloc_work_array(s, crit, ptr, oldsz, newsz, extra, str, ierr)

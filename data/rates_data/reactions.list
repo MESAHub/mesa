@@ -163,9 +163,9 @@ r_n15_pa_c12                        1 n15     + 1 h1                  =>  1 he4 
 r_n14_ag_f18                        1 n14     + 1 he4                 =>  1 f18                                                                       2    he4   n14                         n_alpha                       n14(a,g)f18
 
 
-r_c12_c12_to_h1_na23                2 c12                             =>  1 h1      + 1 na23                                                          2    c12   c12                         other                        2 c12 => h1 + na23
+r_c12_c12_to_h1_na23                2 c12                             =>  1 h1      + 1 na23                                                          2    c12   c12                         c12_c12                        2 c12 => h1 + na23
 r_he4_ne20_to_c12_c12               1 he4     + 1 ne20                =>  2 c12                                                                       2    he4   ne20                        other                        ne20 + he4 => 2 c12
-r_c12_c12_to_he4_ne20               2 c12                             =>  1 he4     + 1 ne20                                                          2    c12   c12                         other                        2 c12 => he4 + ne20
+r_c12_c12_to_he4_ne20               2 c12                             =>  1 he4     + 1 ne20                                                          2    c12   c12                         c12_c12                        2 c12 => he4 + ne20
 r_he4_mg24_to_c12_o16               1 he4     + 1 mg24                =>  1 c12     + 1 o16                                                           2    he4   mg24                        other                        he4 + mg24 => c12 + o16
 
 

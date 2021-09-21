@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -66,7 +66,7 @@
          integer, intent(in) :: id, iounit
          integer, intent(out) :: ierr
          ierr = 0
-         read(iounit) initial_h1_mass, h1_init_surf_abund
+         read(iounit,iostat=ierr) initial_h1_mass, h1_init_surf_abund
       end subroutine extras_photo_read
 
 

@@ -1,0 +1,34 @@
+&star_job
+   pgstar_flag = .true.
+/ !end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ !end of kap namelist
+
+&controls
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   !terminal_interval = 1
+/ ! end of controls namelist
+
+&pgstar
+
+   !pause = .true.
+
+   HR_title = '2 M\d\(2281)\u  Z=0.02  Mira'
+
+   HR_win_width = 8
+   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+
+   ! axis limits -- to override system default selections
+   HR_logT_min = 3.4 ! -101 ! only used if > -100
+   HR_logT_max = 4.6 ! only used if > -100
+   HR_logL_min = 0.4 ! -101 ! only used if > -100
+   HR_logL_max = 2 ! -101 ! only used if > -100
+
+   show_HR_classical_instability_strip = .true.
+/ ! end of pgstar namelist

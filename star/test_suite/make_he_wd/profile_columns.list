@@ -37,7 +37,7 @@
    logL ! log(max(1d-6,L/Lsun))
    velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    entropy ! specific entropy divided by (avo*kerg)
-   conv_mixing_type ! mixing types are defined in mesa/const
+   mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    v_div_csound ! velocity divided by sound speed
    total_energy ! v^2/2 - G m / r + E (ergs/g).  negative if bound
@@ -89,12 +89,9 @@
    log_conv_vel ! log10 convection velocity (cm/sec)
    conv_vel_div_csound ! convection velocity divided by sound speed
    log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
-   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
    pressure_scale_height ! in Rsun units
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP required for purely radiative transport
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
    !logM ! log10(m/Msun)
@@ -135,20 +132,13 @@
 
    ! ergs/g/sec for specific reactions (names from rates_def)
       
-      !rpp
 
       
-   ! misc
 
       gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
-      !dlnR_dm ! for structure equation
-      !dlnP_dm ! for structure equation
-      !dlnT_dm ! for structure equation
-      !dL_dm ! for structure equation
       
       
       !delta_r ! r(outer edge) - r(inner edge); radial extent of cell in cm.
-      !delta_v ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
       !dt_dv_div_dr ! dt*delta_v/delta_r; need to have this << 1 for every cell
          
          
@@ -186,7 +176,6 @@
       !dlog_burn_ar_dlogP
       !dlog_burn_ca_dlogP
       !dlog_burn_ti_dlogP
-      !dlog_burn_cr_dlogP
       !dlog_burn_fe_dlogP
       
       !dlog_pnhe4_dlogP
@@ -196,17 +185,12 @@
       
       
       !brunt_N2 ! brunt-vaisala frequence squared.  only positive values shown.
-      !brunt_Astar ! Astar := r N^2 / g.  only positive values shown.
       !brunt_B ! the composition gradient term in the brunt N^2 calculation
-      !chiY ! dlnP/dlnY used in calculate of brunt_B term
-      !dlnY_dlnP ! the actual dlnY/dlnP in the model as used in brunt_B
       
       logQ ! logQ = logRho - 2*logT + 12
       
       !cs_at_cell_bdy ! sound speed at cell boundary (csound is at cell center)
       
-      !dlnmu_dr ! for salt-finger mixing
-      !semiconvection_criterion ! positive means stable
          ! 1/chiRho - dlnT_dlnP*chiT/chiRho - dlnRho_dlnP
       
 
@@ -253,9 +237,6 @@
       ! star_mass_o16
       ! star_mass_ne20
    ! locations of abundance transitions
-      ! h1_boundary_mass
-      ! he4_boundary_mass
-      ! c12_boundary_mass
    ! location of optical depths 10 and 100
       ! tau10_mass
       ! tau10_radius

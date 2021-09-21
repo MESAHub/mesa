@@ -36,7 +36,7 @@
 
 &pgstar
 
-      !read_extra_pgstar_inlist1 = .true.
-      !extra_pgstar_inlist1_name = 'inlist_semiconvection'
+      read_extra_pgstar_inlist1 = .true.
+      extra_pgstar_inlist1_name = 'inlist_semiconvection'
 
 / ! end of pgstar namelist

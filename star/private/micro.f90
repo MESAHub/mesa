@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -151,7 +151,7 @@ contains
     if (.not. skip_net) then
 
        if (dbg) write(*,*) 'micro: call do_net'
-       call do_net(s, nzlo, nzhi, .false., ierr)
+       call do_net(s, nzlo, nzhi, ierr)
        if (dbg) write(*,*) 'micro: done do_net'
        if (ierr /= 0) then
           if (s% report_ierr) write(*,*) 'do_net returned ierr', ierr
@@ -164,7 +164,6 @@ contains
 
     subroutine set_eos(ierr)
       integer, intent(out) :: ierr
-      integer :: k
       real(dp) :: alfa
       include 'formats'
       ierr = 0
@@ -219,7 +218,6 @@ contains
     integer, intent(out) :: ierr
     logical, parameter :: use_omp = .true.
     include 'formats'
-    integer :: k
 
     ierr = 0
 
@@ -469,8 +467,6 @@ contains
     end do
     
     s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
-    s% d_QQ_dlnd(k) = s% QQ(k)*(d_dlnd(i_chiT)/s% chiT(k) - d_dlnd(i_chiRho)/s% chiRho(k) - 1d0)
-    s% d_QQ_dlnT(k) = s% QQ(k)*(d_dlnT(i_chiT)/s% chiT(k) - d_dlnT(i_chiRho)/s% chiRho(k) - 1d0)
     s% csound(k) = eval_csound(s,k,ierr)
 
     ! check some key values

@@ -2,10 +2,8 @@
 
 &star_job
 
-   create_RSP_model = .false.
-
-   load_saved_model_for_RSP = .true.
-   saved_model_name = 'test_loading.mod'
+   load_saved_model = .true.
+   load_model_filename = 'test_loading.mod'
 
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
@@ -22,7 +20,7 @@
 ! RSP controls
 
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 4.0353d0 ! expected period (in days) 
+   x_ctrl(1) = 3.92396d0 ! expected period (in days) 
    
    RSP_mass = 4.165d0
    RSP_Teff = 6050

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -893,6 +893,7 @@
 
       subroutine entropy_relax_other_energy(id, ierr)
          use interp_1d_lib, only: interp_values
+         use auto_diff_support
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -910,13 +911,10 @@
          do k = 2, nz
             xq(k) = xq(k-1) + (s% dq(k) + s% dq(k-1))/2
          end do
-         call interp_values(x, num_pts, f, nz, xq, vals(:), op_err)
-         if (op_err /= 0) ierr = op_err
-
+         call interp_values(x, num_pts, f, nz, xq, vals(:), ierr)
          if (ierr /= 0) return
-         s% extra_heat(:) = 0d0
          do k = 1, s% nz
-            s% extra_heat(k) =  ( 1d0 - exp(s%lnS(k))/vals(k) ) * exp(s%lnE(k))
+            s% extra_heat(k) = ( 1d0 - exp(s%lnS(k))/vals(k) ) * exp(s%lnE(k))
             s% extra_heat(k) = s% extra_heat(k) / (s% job% timescale_for_relax_entropy * secyer)
          end do
       end subroutine entropy_relax_other_energy
@@ -3931,6 +3929,7 @@
          end interface
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         character (len=10) MLT_option
          integer :: result, model_number, model_number_for_last_retry, &
             recent_log_header, num_retries, &
             photo_interval, profile_interval, priority_profile_interval, &
@@ -3951,6 +3950,7 @@
 
          procedure(integer), pointer :: tmp_ptr1 => null(), tmp_ptr3 => null()
          procedure(), pointer :: tmp_ptr2 => null(), tmp_ptr4 => null()
+         logical, parameter :: dbg = .false.
          
          include 'formats'
 
@@ -3969,7 +3969,10 @@
          s% steps_before_use_gold_tolerances = -1
          s% use_gold2_tolerances = .false.
          s% steps_before_use_gold2_tolerances = -1
-                  
+         if (s% MLT_option == 'TDC') then
+            s% MLT_option = 'Cox'
+         end if
+
          if (s% relax_solver_iters_timestep_limit /= 0) &
             s% solver_iters_timestep_limit = s% relax_solver_iters_timestep_limit
 
@@ -4061,9 +4064,9 @@
 
             end do step_loop
 
-            if (.false. .and. s% job% pgstar_flag) then
+            if (.not. s% job% disable_pgstar_during_relax_flag .and. s% job% pgstar_flag) then
                ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
-               write(*,2) 'after step_loop: call update_pgstar_data', s% model_number
+               if(dbg) write(*,2) 'after step_loop: call update_pgstar_data', s% model_number
                call update_pgstar_data(s, ierr)
                if (failed()) return
                call do_read_pgstar_controls(s, s% inlist_fname, ierr) 
@@ -4085,7 +4088,7 @@
             s% how_many_extra_history_columns => no_extra_history_columns
             s% data_for_extra_history_columns => none_for_extra_history_columns
 
-            result = finish_step(id, .false., ierr)
+            result = finish_step(id, ierr)
             s% how_many_extra_history_columns => tmp_ptr1
             s% data_for_extra_history_columns => tmp_ptr2
             s% how_many_extra_profile_columns => tmp_ptr3
@@ -4101,9 +4104,8 @@
 
          end do evolve_loop
 
-         if (s% job% pgstar_flag) then
+         if (.not. s% job% disable_pgstar_during_relax_flag .and. s% job% pgstar_flag) then
          ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
-         write(*,2) 'after evolve_loop: call update_pgstar_data', s% model_number
             call update_pgstar_data(s, ierr)
             if (ierr /= 0) return
             call do_read_pgstar_controls(s, s% inlist_fname, ierr)
@@ -4174,6 +4176,7 @@
             priority_profile_interval = s% priority_profile_interval
             dt_next = s% dt_next
             max_number_retries = s% max_number_retries
+            MLT_option = s% MLT_option
             
             use_gold2_tolerances = s% use_gold2_tolerances
             steps_before_use_gold2_tolerances = s% steps_before_use_gold2_tolerances
@@ -4229,6 +4232,7 @@
             s% priority_profile_interval = priority_profile_interval
             s% dt_next = dt_next
             s% max_number_retries = max_number_retries
+            s% MLT_option = MLT_option
             
             s% use_gold2_tolerances = use_gold2_tolerances
             s% steps_before_use_gold2_tolerances = steps_before_use_gold2_tolerances

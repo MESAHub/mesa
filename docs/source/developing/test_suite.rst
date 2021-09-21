@@ -28,12 +28,39 @@ You can run an individual test by specifying a single integer, corresponding to 
 
   ./each_test_run <N>
 
-After a test runs, the file ``out.txt`` will contain the concatenated
-output from stdout and stderr.
+After a test runs, the files ``out.txt`` and ``err.txt`` will contain
+the output from stdout and stderr respectively.
+
+
+Philosophy of the tests
+-----------------------
+
+The MESA test suite serves multiple roles.  For developers, it
+provides day-to-day checks that code changes did not cause regressions
+and provides longer term opportunities to monitor the evolving
+performance of the code.  For users, the test suite primarily serves
+as a source of examples.
+
+The coverage and quality of the test suite must be sufficient to
+ensure that as MESA is developed, it retains its key capabilities
+(e.g., the ability to evolve through the He flash or to robustly
+evolve massive stars).  To this end, a number of test suite cases
+descend from examples presented in MESA instrument papers.
 
 
 Anatomy of a test
 -----------------
+
+.. note::
+
+   If you want to add a new test case, the first step is to understand
+   the layout and motivation of the standard tests, as described in
+   this section.  As a starting point, a simple template exists at
+   ``star/test_suite/test_case_template`` (and the example files
+   rendered below are contained therein).  For more complex
+   situations, you may want to take inspiration from existing test
+   cases.
+
 
 In the test case directory 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -53,16 +80,40 @@ start of each part, this will be copied to ``inlist``, and will be the
 file that MESA reads as its primary inlist.
 
 
-A good test should be able to regenerate its starting model.  When
-then environment variable ``MESA_RUN_OPTIONAL`` is set, test cases
-should regenerate their initial model.  The ``rn`` script should look
-something like
+A good test should be able to regenerate its starting model.
+The ``rn`` script should look something like
 
 .. literalinclude:: ../../../star/test_suite/test_case_template/rn
    :language: bash
 
+When the environment variable ``MESA_SKIP_OPTIONAL`` is set, some
+parts of the test run may be skipped by copying standard versions
+of saved models (which must be included in the test case).
+
 It is essential to make use of ``test_suite_helpers`` as this ensures
 that important information is produced in a TestHub-friendly format.
+
+Similarly, it is essential that the ``run_star_extras`` in the test
+suite case use the ``test_suite_extras`` (see
+``star/job/test_suite_extras_def.inc`` and
+``star/job/test_suite_extras.inc``).  The calls to these hooks (see below)
+generate the necessary information for the :ref:`developing/test_suite:MESA Test Hub`.
+
+.. literalinclude:: ../../../star/test_suite/test_case_template/src/run_star_extras.f90
+   :language: fortran
+   :start-at: subroutine extras_startup
+   :end-at: end subroutine extras_startup
+   :emphasize-lines: 9
+
+.. literalinclude:: ../../../star/test_suite/test_case_template/src/run_star_extras.f90
+   :language: fortran
+   :start-at: subroutine extras_after_evolve
+   :end-at: end subroutine extras_after_evolve
+   :emphasize-lines: 9
+
+
+Properties of a good test
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A test case must not write to stderr.  The presence of output on
 stderr will cause the test to be classified as a failure.  This
@@ -70,15 +121,37 @@ restriction catches ``stop`` statements, calls to ``mesa_error``, or
 other error conditions.
 
 A good test should run relatively quickly.  Costly parts can be
-skipped over using a saved model and only run when
-``MESA_RUN_OPTIONAL`` is set.
+skipped over using a saved model when ``MESA_SKIP_OPTIONAL`` is set.
 
 A good test should check its stopping condition before producing an
 output model (i.e., set ``required_termination_code_string``).
 
 A good test should use ``run_star_extras`` to perform more detailed
 physical and/or numerical checks or report longitudinally interesting
-values to the TestHub (see :ref:`MESA Test Hub`).
+values to the TestHub (see :ref:`developing/test_suite:MESA Test Hub`).
+
+A good test should be numerically converged.  This is particularly
+important in order to ensure that the test is robust.  Unconverged
+tests can often fail in response to innocuous changes.  Models should
+always be sufficiently converged that they run reliably and that any
+quantities checked by the test are converged to better than the
+tolerances of those checks.
+
+.. note::
+
+   In some instances, performing good science with a given test case
+   may require even tighter convergence criteria that are practically
+   excluded by test suite run time considerations.  In such a case,
+   note this fact in the test case documentation.
+
+A good test should have physically-motivated time step limits.  (This
+often also an important part of ensuring convergence.)  The test
+should trigger few retries and have few time steps limited by solver
+convergence or by catch-all quantities like varcontrol.  The
+``star_job`` options ``show_retry_counts_when_terminate = .true.`` and
+``show_timestep_limit_counts_when_terminate = .true.`` will summarize
+the retries and timestep limits encountered during the run.
+
 
 Some tests should only be run in certain circumstances (e.g., if GYRE
 is installed, if OP MONO opacities are present).  Such a test should
@@ -88,12 +161,20 @@ this string is present in the test output, the test scripts will
 consider the test a success and no further checks will be performed.
 
 
+README
+~~~~~~
+
+.. include:: ../../../star/test_suite/test_case_template/README.rst
+    :start-line: 6
+
+
+
 In the test suite directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The existence of a sub-directory in ``test_suite`` is not sufficient
-to tell MESA to perform a given test.  The master list of tests lives
-in the file ``test_suite/do1_test_source``.  This has an a series of
+to tell MESA to perform a given test.  The list of tests associated with each module
+lives in the file ``test_suite/do1_test_source``.  This has an a series of
 entries like::
 
   do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" x300
@@ -111,23 +192,11 @@ The photo filename argument permits the special value ``skip`` which causes this
 Once an entry in ``do1_test_source`` has been added, the test can be
 run as described in `Running Tests`_.
 
-Documenting a test
-------------------
-
-Files documenting the test suite exist in two places.  Look to
-existing test cases for detailed examples.  (Currently
-:ref:`conductive_flame` is set up this way.)
-
-In the test case directory
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. include:: ../../../star/test_suite/test_case_template/README.rst
-
 
 In the docs directory
 ^^^^^^^^^^^^^^^^^^^^^
 
-Once the ``README.rst`` file is created, a link in ``docs/source/test_suite`` should be created.
+Once the ``README.rst`` file is created, a link in ``docs/source/test_suite`` should be created so that it will be rendered as part of the documentation.
 
 .. code-block:: sh
 
@@ -292,6 +361,32 @@ which results in the additional output
             -     3.3303926652486070E-05
             -     7.2015481753889745E-05
 
+
+Setting up new machine with MESA TestHub
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Make an account on `the TestHub <https://testhub.mesastar.org/>`_ by messaging one of the admins (Bill Wolf). You will receive a token that you will need later in order to submit logs to the logs server. Remember also the email and password you use; you'll need these later in the terminal. 
+
+2. Make sure ruby is installed, for example using the `Ruby version manager <https://rvm.io/>`_ (rvm).
+
+  * If using the rvm, follow the instructions on that page to install the gpg keys. If this does not work, then execute the next line (``\curl -sSL https://get.rvm.io | bash -s stable``) instead, and follow the instructions printed in the terminal.
+  
+  * That line only installs the rvm; you also need Ruby itself. One can execute ``\curl -sSL https://get.rvm.io | bash -s stable --ruby`` as per the rvm installation page, but that requires sudo access. For a local installation, one can follow `this StackOverflow answer <https://stackoverflow.com/a/17219765>`_. 
+
+3. Download and set up `mesa_test <https://github.com/MESAHub/mesa_test>`_, by doing the following:
+
+  * ``gem install mesa_test``
+  
+  * ``mesa_test setup`` (here you will supply your email, password, and token from earlier; this will create a settings file in ``~/.mesa_test/config.yml``)
+  
+  * ``mesa_test install_and_test main`` will check out the main branch, test it, and submit the results to the testhub. 
+
+4. If you want to set up ``mesa_test`` to run automatically on a cluster, Rob Farmer has created `a set of scripts <https://github.com/rjfarmer/mesa-helios-test>`_ that work with the Slurm workload manager. These scripts pull all commits and submit a job to the cluster queue for each new commit. You must edit the paths in all of the scripts to point to your own directories.
+
+  * You can set up ``mesa_test`` or Rob's cluster script to run recurrently as a cronjob by doing ``crontab -e`` to edit the cronjob table. 
+  
+  * Add for example: ``10 * * * * ~/mesa/mesa-helios-test/runMesaTest.sh >/dev/null 2>&1`` to make it run every 10 minutes (or swap out ``runMesaTest`` with a ``mesa_test`` command). The parts at the end of that line prevent it from emailing you each time it runs.
+
+
 Continuous integration testing
 ------------------------------
 
@@ -321,9 +416,14 @@ Splits the running of the test suite between machines. Current, if set, cannon w
 [ci optional]
 ^^^^^^^^^^^^^
 
-Runs ``MESA`` with the environment variable ``MESA_RUN_OPTIONAL=t`` set. This requests that the slower optional parts of each test case be ran.
+Runs ``MESA`` with the environment variable ``MESA_SKIP_OPTIONAL`` unset.  This requests that all parts of each test case be run (i.e., including optional parts).
 
 [ci optional n]
 ^^^^^^^^^^^^^^^
 
 Where ``n`` is an integer. Same as ``[ci optional]`` but only run the first ``n`` test cases.
+
+[ci fpe]
+^^^^^^^^
+
+Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`` set. This requests that we turn on additional debugging checks.

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -153,7 +153,7 @@
          real :: xmin, xmax, xleft, xright, dx, tmp, ymin, ymax, ymin2, ymax2, dy, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax
          integer :: grid_min, grid_max, npts, nz, number_of_legend_lines
-         real, pointer, dimension(:) :: &
+         real, allocatable, dimension(:) :: &
             xvec, yvec, y_conv, y_left, y_sc, y_ovr, y_th, y_min_mix, y_RTI_mix
 
          include 'formats'
@@ -519,10 +519,6 @@
             if (s% RTI_flag) then
                cnt = mixing_line_legend(cnt, clr_rayleigh_taylor, &
                   lw, lw_sav, txt_scale, 'RTI')
-            end if
-            if (s% conv_vel_flag) then
-               cnt = mixing_line_legend(cnt, clr_leftover_convection, &
-                  lw, lw_sav, txt_scale, 'leftover')
             end if
             if (rotation .and. s% Mixing_show_rotation_details) then
                cnt = mixing_line_legend(cnt, clr_IndianRed, &

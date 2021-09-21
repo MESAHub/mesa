@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -59,7 +59,6 @@ contains
        ierr)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface
-    use atm_utils, only: eval_Teff_g
 
     real(dp), intent(in)       :: tau_surf
     real(dp), intent(in)       :: L
@@ -72,7 +71,7 @@ contains
     real(dp), intent(in)       :: errtol
     integer, intent(in)        :: max_steps
     logical, intent(in)        :: skip_partials
-    real(dp), intent(out)      :: Teff
+    real(dp), intent(in)       :: Teff
     real(dp), intent(out)      :: lnT
     real(dp), intent(out)      :: dlnT_dL
     real(dp), intent(out)      :: dlnT_dlnR
@@ -111,9 +110,9 @@ contains
        return
     end if
 
-    ! Evaluate the effective temperature & gravity
+    ! Evaluate the gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    g = cgrav*M/(R*R)
 
     ! Perform the necessary evaluations
 
@@ -127,7 +126,7 @@ contains
             lnT, lnP, ierr)
 
        if (ierr /= 0) then
-          write(*,*) 'Call to eval_data failed in atm_t_tau_varying'
+          write(*,*) 'atm: Call to eval_data failed in atm_t_tau_varying'
           return
        endif
 
@@ -350,7 +349,7 @@ contains
   
     call eval_T_tau(T_tau_id, tau_outer, Teff, lnT, ierr)
     if (ierr /= 0) then
-       write(*,*) 'Call to eval_T_tau failed in eval_data_try'
+       write(*,*) 'atm: Call to eval_T_tau failed in eval_data_try'
        return
     end if
     
@@ -391,7 +390,7 @@ contains
     
     call eval_T_tau(T_tau_id, tau_surf, Teff, lnT, ierr)
     if (ierr /= 0) then
-       write(*,*) 'Call to eval_T_tau failed in eval_data_try'
+       write(*,*) 'atm: Call to eval_T_tau failed in eval_data_try'
        return
     end if
 
@@ -439,7 +438,7 @@ contains
 
       call eval_T_tau(T_tau_id, tau, Teff, lnT, ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eval_T_tau failed in eval_fcn'
+         write(*,*) 'atm: Call to eval_T_tau failed in eval_fcn'
          return
       end if
 
@@ -450,7 +449,7 @@ contains
            lnRho, res, dres_dlnRho, dres_dlnT, &
            ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eos_proc failed in eval_fcn'
+         write(*,*) 'atm: Call to eos_proc failed in eval_fcn'
          return
       end if
 
@@ -461,7 +460,7 @@ contains
             kap, dlnkap_dlnRho, dlnkap_dlnT, &
             ierr)
        if (ierr /= 0) then
-          write(*,*) 'Call to kap_proc failed in eval_fcn'
+          write(*,*) 'atm: Call to kap_proc failed in eval_fcn'
           return
        end if
       
@@ -601,7 +600,7 @@ contains
     call dopri5_work_sizes(NUM_VARS, NRDENS, liwork, lwork)
     allocate(work(lwork), iwork(liwork), stat=ierr)
     if (ierr /= 0) then
-       write(*,*) 'allocate failed in build_T_tau_varying'
+       write(*,*) 'atm: allocate failed in build_T_tau_varying'
        deallocate(atm_structure)
        return
     end if
@@ -641,7 +640,7 @@ contains
          LRPAR, rpar, LIPAR, ipar, & 
          LOUT, idid)
     if (idid < 0) then
-       write(*,*) 'Call to dopri5 failed in build_T_tau_varying: idid=', idid
+       write(*,*) 'atm: Call to dopri5 failed in build_T_tau_varying: idid=', idid
        ierr = -1
     end if
 
@@ -798,7 +797,7 @@ contains
 
       call eval_T_tau(T_tau_id, tau, Teff, lnT, ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eval_T_tau failed in build_data'
+         write(*,*) 'atm: Call to eval_T_tau failed in build_data'
          return
       end if
 
@@ -809,7 +808,7 @@ contains
            lnRho, res, dres_dlnRho, dres_dlnT, &
            ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eos_proc failed in build_data'
+         write(*,*) 'atm: Call to eos_proc failed in build_data'
          return
       end if
 
@@ -820,7 +819,7 @@ contains
             kap, dlnkap_dlnRho, dlnkap_dlnT, &
            ierr)
        if (ierr /= 0) then
-          write(*,*) 'Call to kap_proc failed in build_data'
+          write(*,*) 'atm: Call to kap_proc failed in build_data'
           return
        end if
       

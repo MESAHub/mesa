@@ -1,7 +1,7 @@
 # This is the makefile for creating the program that builds the FreeEOS tables
 
 MESA_DIR = ../../..
-FREE_EOS_DIR = $(MESA_DIR)/eos/eosFreeEOS_builder/free_eos-2.2.1
+FREE_EOS_DIR = #set this to your FreeEOS installation directory
 
 #################################################################
 

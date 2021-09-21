@@ -45,6 +45,22 @@ vgcore.*
 **/png/
 
 
+## Bill
+star_data/public_*
+star_data/private_*
+star/defaults_*
+star/job_*
+star/other_*
+star/private_*
+star/public_*
+*.notes
+inlist
+lst*
+d1*
+*diff
+fort.*
+
+
 ## Restarts
 .restart
 restart_photo

@@ -1,10 +1,12 @@
 
 &star_job
+   !save_star_job_namelist = .true.
+   !star_job_namelist_name = 'namelist_star_job_he_flash_1M_pre_ms_to_wd'
 
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'start_he_core_flash.mod'
+      load_model_filename = 'start_he_core_flash.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'end_core_he_burn.mod'
@@ -32,11 +34,13 @@
 / ! end of kap namelist
 
 &controls      
+   !save_controls_namelist = .true.
+   !controls_namelist_name = 'namelist_controls_he_flash_1M_pre_ms_to_wd'
 
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 0.0001
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       
       convergence_ignore_equL_residuals = .true.
 
@@ -45,11 +49,10 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 12000
+      max_model_number = 14000
          
       initial_mass = 1.0
       initial_z = 0.02d0
-      
 
       am_nu_visc_factor = 0
       am_D_mix_factor = 0.0333333333333333d0

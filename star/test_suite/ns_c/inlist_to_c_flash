@@ -7,7 +7,7 @@
       show_log_description_at_start = .false. 
       
       load_saved_model = .true.
-      saved_model_name = 'ns_c_env.mod' ! with L_center = 1d35 
+      load_model_filename = 'ns_c_env.mod' ! with L_center = 1d35 
       
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -81,7 +81,7 @@
 
 ! mlt
       mixing_length_alpha = 1.5
-      MLT_option = 'Henyey'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .false.  
 
@@ -105,7 +105,7 @@
       mesh_min_dlnR = 1d-9
 
 ! solver    
-      always_use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
       steps_before_use_gold2_tolerances = 1
 

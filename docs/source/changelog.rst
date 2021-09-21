@@ -2,14 +2,94 @@
 Changelog
 *********
 
-Changes in dev
-==============
+Changes in main
+===============
+
+.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
+
+.. _Backwards-incompatible changes main:
 
 Backwards-incompatible changes
 ------------------------------
 
+.. note::
+
+   A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
+
+Simplification of energy equation options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The desired form of the MESA energy equation is now selected via the control ``energy_eqn_option``.  The available options are
+``'dedt'`` (default) and ``'eps_grav'``.  See the documentation at :ref:`reference/controls:energy_eqn_option` for more information about these forms.
+
+The controls ``use_dedt_form_of_energy_eqn``, ``always_use_dedt_form_of_energy_eqn``, and ``use_eps_grav_form_of_energy_eqn`` were removed and replaced by the functionality of ``energy_eqn_option``.
+
+Simplifications to the energy equation code mean that this selection applies globally (i.e., to all cells in the model and at all timesteps).
+
+* The per-cell energy equation controls ``max_eta_for_dedt_form_of_energy_eqn`` and ``max_gamma_for_dedt_form_of_energy_eqn`` were removed.
+
+* The form-switching control ``steps_before_always_use_dedt_form_of_energy_eqn`` was removed.
 
 
+Name changes
+~~~~~~~~~~~~
+
+* The ``star_job`` option ``saved_model_name`` has been replaced with ``load_model_filename`` everywhere.
+
+* The ``controls`` options ``power_c_burn_{lower,upper}_limit`` were replaced with the more generic ``power_z_burn_{lower,upper}_limit``.
+
+* The ``controls`` option ``delta_lgL_phot_limit`` was renamed to ``delta_lgL_power_photo_limit`` ("phot" was easily confused with photosphere instead of photodisintegration).
+
+* The core/layer mass values ``c_core_*``, ``c_rich_layer``, and
+  ``o_core_*`` have been renamed to ``co_core_*``,
+  ``co_rich_layer_*``, and ``one_core_*``.  This better reflects the
+  typical carbon/oxygen and oxygen/neon compositions of these regions.
+  This affects the names of both the relevant controls and history
+  columns.
+
+* The ``controls`` option ``use_d_eos_dxa`` was renamed to
+  ``fix_d_eos_dxa_partials``.  This control originally had a broader
+  function during the implementation of eos composition derivatives,
+  but is now restricted to selecting whether we do a
+  finite-difference-based fix up when on a component EOS that doesn't
+  provide composition derivatives.
+
+* The history and profile columns ``burn_*`` where replace with ``*_alpha``.
+
+Removed options
+~~~~~~~~~~~~~~~
+
+* The time-smoothing scheme for mixing diffusion coefficients was removed.  All associated options (e.g., ``new_D_smooth_flag`` and ``D_smooth_replacement_fraction``) were removed.
+
+* Removed option ``semiconvection_upper_limit_center_h1``. This can be implemented by setting ``s% alpha_semiconvection`` in ``run_star_extras.f90/extras_start_step``.
+
+* Removed the option ``use_brunt_gradmuX_form``.  Alternative forms of the Brunt can be calculated using the ``other_brunt`` hook.
+
+Removed history and profile columns
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A major clean up of the history and profile columns was undertaken.  Some of the removed values include:
+
+* Removed profile columns ``total_energy`` and ``total_energy_integral``.
+
+
+Relocation of eos hooks
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``other_eos`` hooks have been removed from star.  See the ``eos`` section for information about their replacements.
+
+
+Hook interface changes
+~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``Teff`` argument has been removed from the ``other_surface_PT`` hook. (``Teff`` is instead available in the ``star_info`` pointer.)
+
+* ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``, ``eps_he`` or ``eps_z`` as arguments.
+
+
+
+
+.. _Module-level changes main:
 
 Module-level changes
 --------------------
@@ -84,6 +164,69 @@ to
     subroutine get_some_freq_corr(...,
           nl, obs, sigma, freq, freq_corr, inertia)
 
+
+binary
+~~~~~~
+
+There are new hooks ``other_binary_photo_read`` and
+``other_binary_photo_write``.  These allow the user to save/restore
+values in ``run_binary_extras``.
+
+
+eos
+~~~
+
+There are new module-level eos hooks (see ``eos/other``) that replace
+the star-level eos hooks (previously in ``star/other``).  Usage of
+these hooks is similar to hooks in star.  However, the relevant
+procedure pointer is part of the ``EOS_General_Info`` structure and
+not the ``star_info`` structure.  Therefore, in ``extras_controls``,
+the procedure pointer statement should look like ``s% eos_rq %
+other_eos_results => my_other_eos_results``.  The boolean option
+``use_other_eos_results`` controlling whether to use the hook is part
+of the ``eos`` namelist rather than ``controls``.  For the first
+required argument ``handle``, pass ``s% eos_handle``.  This ensures
+that the routine uses the same configuration options as other calls
+from star to the eos module.
+
+The hook ``other_eos_component`` allows the user to replace all or
+part of the MESA EOS by providing a new component EOS and to control
+the location of the blends between this and the other component EOSes.
+It is controlled by the option ``use_other_eos_component``.  The
+user-provided routine must return a complete set of EOS results.  This
+EOS component has the highest priority in the blend.  This hook
+should be used along with the hook ``other_eos_frac``, which defines
+the region over to use ``other_eos_component``.
+
+The hook ``other_eos_results`` allows the user to modify the results
+returned by the EOS.  The user-provided routine receives the results
+from the EOS right before they are returned, after all components have
+been evaluated.  This allows the user make minor modifications to the
+results from the existing EOS without having to provide a full replacement.
+
+
+Two alternative eos module entry points (``eosDT_HELMEOS_get`` and
+``eosDT_ideal_gas_get``) and the star options that replaced the
+standard eosDT calls to be with these routines
+(``use_eosDT_ideal_gas`` and ``use_eosDT_HELMEOS``).  This enables
+significant simplifications of eos_support.  Restriction to a single
+component EOS can be achieved through the eos namelist options and
+replacement of the EOS should be performed through the other hook.
+
+
+The HELM table was updated to a new, larger 100 points per decade
+version.
+
+The HELM-related controls ``logT_ion_HELM``, ``logT_neutral_HELM``, and
+``max_logRho_neutral_HELM`` were removed.  These were used in an
+now-unsupported variant of HELM that blended the normal, fully-ionized
+HELM and a neutral version (which dropped the electron-positron terms).
+
+The HELM-related controls ``always_skip_elec_pos`` and
+``always_include_elec_pos`` were combined in the
+simplified control ``include_elec_pos`` which defaults to ``.true.``.
+
+
 kap
 ~~~
 
@@ -106,7 +249,7 @@ the blended opacity.
          kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
 
          ! INPUT
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
@@ -130,6 +273,11 @@ the blended opacity.
 The Compton scattering opacity routine has been updated to use the prescription of
 `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`_.
 
+The conductive opacity routine has been updated to include the corrections from 
+`Blouin et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract>`_
+for H and He in the regime of moderate coupling and moderate degeneracy.
+These are on by default, controlled by the kap option ``use_blouin_conductive_opacities``.
+
 
 There are new module-level kap hooks (see ``kap/other``) that allow
 individual components of the opacity module to be replaced with a
@@ -140,8 +288,10 @@ is part of the ``Kap_General_Info`` structure and not the
 procedure pointer statement should look like ``s% kap_rq %
 other_elect_cond_opacity => my_routine``.  The boolean option
 ``use_other_elect_cond_opacity`` controlling whether to use the hook
-is part of the ``kap`` namelist rather than ``controls``.  An example
-can be found in the ``wd_cool_0.6M`` test suite case.
+is part of the ``kap`` namelist rather than ``controls``.  For the
+first required argument ``handle``, pass ``s% kap_handle``.  This
+ensures that the routine uses the same configuration options as other
+calls from star to the kap module.
 
 
 neu
@@ -150,12 +300,38 @@ neu
 The call signature of other_neu has changed. You no longer need to pass in z2bar
 
 
+The value of the Weinberg angle was updated to be be consistent with CODATA 2018.
+
+
 net
 ~~~
 
-The screening mode ``classic_screening`` has been removed. Anyeone using other_net_get needs
+The screening mode ``classic_screening`` has been removed. Anyone using other_net_get needs
 to remove ``theta_e_for_graboske_et_al`` from its argument list.
 
+The options ``reuse_rate_raw`` and  ``reuse_rate_screened`` have been removed from other_net_get (and eval_net)
+
+
+rates
+~~~~~
+
+The format for custom weak rate tables (see e.g., ``data/rates_data/rate_tables/weak_rate_list.txt`` and test suite case ``custom_rates``) no longer supports the (previously optional) Coulomb correction datasets ``delta_Q`` and ``Vs``.
+
+When this capability was first added, the energetics associated with
+the change in the composition were calculated in ``rates`` and
+included in ``eps_nuc``.  This meant the ``rates`` module needed to
+have access to information about the Coulomb-induced shifts in the
+electron and ion chemical potentials.
+
+After the changes in the definition of ``eps_nuc`` and the energy
+equation described in |MESA V|, the energetics associated with the
+changing composition are self-consistently accounted for in the energy
+equation using information provided by the MESA EOS.  Therefore, the
+ability to provide these unneeded and unused quantities has been
+removed.
+
+
+.. _Other changes main:
 
 Other changes
 -------------
@@ -166,11 +342,48 @@ Other changes
   star_info arrays and profile columns with the names
   ``kap_frac_lowT``, ``kap_frac_highT``, ``kap_frac_Compton``.
 
-* ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``,
-  ``eps_he`` or ``eps_z`` as arguments.
+* The control ``format_for_FGONG_data`` has been replaced by the
+  integer ``fgong_ivers``, which can be either 300 or 1300.  This
+  enforces adherence to the FGONG standard.  In addition, users can
+  now set the four-line plain-text header of FGONG output using the
+  new controls ``fgong_header(1:4)``.
+
+* ``mixing_type`` now reports the mixing process that generates the
+  largest D_mix, rather than prioritizing convection and thermohaline
+  mixing over all others.
+
+* Added profile panel and history panel controls in pgstar to specify
+  same yaxis range for both left and right axes (e.g.,
+  Profile_Panels1_same_yaxis_range(1) = .true.)
+
+* Experimental options have been moved into ``*_dev.defaults`` files
+  and experimental test cases are now prefixed with ``dev_``.  These
+  options and test cases are not ready for general use.
+
+* The ``ionization`` module has been removed.
+
+* A new module ``hdf5io`` for working with HDF5 files has been added.
+
+* The controls ``diffusion_gamma_full_{on,off}`` are no longer used by
+  default.  The EOS now returns phase information and by default that
+  EOS phase will automatically turn off diffusion for crystallized
+  material.
+
+* The `issue with the value of free_e when using FreeEOS <https://lists.mesastar.org/pipermail/mesa-users/2021-February/012394.html>`__ has been corrected.  Thanks to Jason Wright for the report.
+
+* An ``other_screening`` hook was added.
+
+* All parts of test suite cases are now run by default.  To only run
+  the optional inlists, set the environment variable
+  ``MESA_SKIP_OPTIONAL`` (to any value).  Previously, optional parts
+  were skipped by default, and running all parts required setting
+  ``MESA_RUN_OPTIONAL``.
+
 
 Changes in r15140
 =================
+
+.. _Backwards-incompatible changes r15140:
 
 Backwards-incompatible changes
 ------------------------------
@@ -181,7 +394,7 @@ Addition of eos and kap namelists
 The options associated with the ``eos`` and ``kap`` modules have been
 moved into their own namelists.  (That is, there now exist ``&eos``
 and ``&kap`` at the same level as ``&star_job`` and ``&controls``.)
-User inlists will need to be updated.  See :ref:`Module-level changes`
+User inlists will need to be updated.  See :ref:`Module-level changes r15140`
 for more specific information.
 
 If you previously accessed the values of eos/kap related options from
@@ -256,7 +469,7 @@ Second, the word "hydro" was removed or replaced with the word
 For example, the control ``report_hydro_solver_progress`` is now
 ``report_solver_progress`` and ``report_hydro_dt_info`` is now
 ``report_solver_dt_info``.  The use of these and other related
-controls is described :ref:`in the developer documentation <Diagnosing Solver Struggles>`.
+controls is described :ref:`in the developer documentation <developing/debugging:Diagnosing Solver Struggles>`.
 
 
 
@@ -327,7 +540,7 @@ have been removed.
 The removal of these controls does not indicate that the EOS is
 reliable at all values of logQ.  Users should consult :ref:`the
 description of the component EOSes and the regions in which they are
-applied <Overview of eos module>` to understand if MESA provides
+applied <eos/overview:Overview of eos module>` to understand if MESA provides
 a suitable EOS for the conditions of interest.
 
 
@@ -444,6 +657,7 @@ Finally, repeat the calculation with a smaller value of
 ``time_delta_coeff`` (e.g., 0.5) and compare the results to gain
 confidence that they are numerically converged.
 
+.. _Module-level changes r15140:
 
 Module-level changes
 --------------------
@@ -545,7 +759,7 @@ eos
 ~~~
 
 EOS-related options have been moved into their own ``eos`` namelist.
-The :ref:`module controls <eos module controls>` and their default
+The :ref:`module controls <eos/defaults:eos module controls>` and their default
 values are contained in the file ``eos/defaults/eos.defaults``.
 
 The PTEH EOS has been removed.  Tables from the FreeEOS project now
@@ -560,7 +774,7 @@ previous approach.
 
 For more information about the component EOSes and the regions in
 which they are applied, see the :ref:`new overview of the EOS module
-<Overview of eos module>`.
+<eos/overview:Overview of eos module>`.
 
 
 gyre
@@ -574,7 +788,7 @@ kap
 ~~~
 
 Opacity-related options have been moved into their own ``kap`` namelist.
-The :ref:`module controls <kap module controls>` and their default
+The :ref:`module controls <kap/defaults:kap module controls>` and their default
 values are contained in the file ``kap/defaults/kap.defaults``.
 
 
@@ -590,7 +804,7 @@ corresponds to the initial metallicity of the star.
 
 
 For more information about the opacity tables and how they are
-combined, see the :ref:`new overview of the kap module <Overview of
+combined, see the :ref:`new overview of the kap module <kap/overview:Overview of
 kap module>`.
 
 rates & net
@@ -619,7 +833,7 @@ A lot of work has been done getting operator split burning (op_split_burn = .tru
 This option can provide a large speed up during advanced nuclear burning stages. See the various split_burn
 test cases for examples.
 
-
+.. _Other changes r15140:
 
 Other changes
 -------------
@@ -664,6 +878,7 @@ Other changes
   ``pre_ms_relax_to_start_radiative_core``, which can be set to .false. to
   restore the old behavior.
 
+.. _Acknowledgments r15140:
 
 Acknowledgments
 ---------------
@@ -696,6 +911,7 @@ you'll need to upgrade to version 20.3.1 of the SDK or later. MESA
 checks the SDK version during compilation, and will stop with an error
 message if the SDK is too old.
 
+.. _Backwards-incompatible changes r12278:
 
 Backwards-incompatible changes
 ------------------------------
@@ -1098,7 +1314,7 @@ Copies of the inlist can now be found in the following test cases:
   * split_burn_big_net_30M
   * split_burn_big_net_30M_logT_9.8
 
-
+.. _Other changes r12278:
 
 Other changes
 -------------
@@ -1110,7 +1326,7 @@ Other changes
   continue to function.  However, in new ``run_star_extras`` code, the
   recommended way to store/retrieve data is using the
   ``other_photo_read`` and ``other_photo_write`` hooks.  Examples can
-  be found in the :ref:`conductive_flame` and :ref:`brown_dwarf` test
+  be found in the :ref:`conductive_flame` and `brown_dwarf` test
   suite cases.
 
 * The controls ``xtra_coef_os_*`` and ``xtra_dist_os_*`` which could

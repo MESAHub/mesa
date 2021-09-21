@@ -1,9 +1,11 @@
+.. highlight:: console
+
 Installing MESA
 ===============
 
 This page describes how to install MESA.
 
-Preqrequistes
+Prerequisites
 -------------
 
 Ensure your system meets the minimum hardware requirements
@@ -15,7 +17,7 @@ The minimum system requirements for MESA are:
 -  64-bit processor
 -  8 GB RAM
 -  20 GB free disk space
--  Windows users should :ref:`follow the instructions here <Installing MESA on Windows>`.
+-  Windows users should :ref:`follow the instructions here <windows-install:Installing MESA on Windows>`.
 
 Most laptop or desktop computers built in the last three years will 
 satisfy these requirements.
@@ -69,26 +71,8 @@ mesa-r\ |version|. This will be your main MESA directory. You are
 free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
-You can also download zip files of `older MESA
-releases <http://sourceforge.net/projects/mesa/files/releases/>`__. If
-you plan to do so, please read `this FAQ
-entry <faq.html#old-version>`__.
-
-If you'd prefer, you can instead checkout a copy of MESA from its
-subversion repository, using the command:
-
-.. parsed-literal::
-
-   svn co -r |version| https://subversion.assembla.com/svn/mesa^mesa/trunk mesa
-
-.. warning::
-
-   There may be newer versions out there in the svn repository, but
-   they are untested, unstable, and unsupported.  To
-   repeat: always use "-r", and to make sure that you get an
-   officially released version always follow "-r" with the version
-   number of an `official MESA release <faq.html#releases>`__.
-
+You can also download zip files of `older MESA releases <http://sourceforge.net/projects/mesa/files/releases/>`__.
+If you plan to do so, please read `this FAQ entry <faq:Installing Older Versions of MESA>`__.
 
 .. _environment:
 
@@ -169,7 +153,7 @@ Once it is done, you should receive the message
 
 If so, you can learn more about MESA by looking at other pages.
 
-Read the linked page that summarizes some :ref:`best practices <Best practices>`
+Read the linked page that summarizes some :ref:`best practices <using_mesa/best_practices:Best practices>`
 to keep in mind throughout the lifecycle of your project.
 
 Troubleshooting
@@ -213,8 +197,8 @@ Pay particular attention to the prerequisites for your system.
 Consult the FAQ
 ^^^^^^^^^^^^^^^
 
-Check to see if there is any information about your problem in the `MESA
-FAQ <faq.html>`__.
+Check to see if there is any information about your problem in the
+`MESA FAQ <faq:FAQ>`__.
 
 If you are using the MESA SDK and are having a problem with
 installation, you should also consult the `MESA SDK
@@ -242,31 +226,13 @@ Please provide the following information:
 -  Describe your computer (machine type, operating system, operating
    system version).
 
--  What is the output of each of the following commands?
+-  What is the error message you received?
 
-::
+-  Attach the ``$MESA_DIR/build.log`` file.  This includes the output of the build process along with the output of each of the following commands ::
 
-   uname -a
-   gfortran -v
-   echo $MESASDK_ROOT
-   echo $PATH
-   echo $MESA_DIR
+    uname -a
+    gfortran -v
+    echo $MESASDK_ROOT
+    echo $PATH
+    echo $MESA_DIR
 
--  What is the error message you recieved? In addition, please attach
-   the full ``$MESA_DIR/build.log`` file.
-
-If the error message you received was ``./build_and_test FAILED`` also
-attach the file ``$MESA_DIR/MODULE/test/tmp.txt``, where ``MODULE`` is
-replaced with the name of the module that failed. The name of the module
-that failed should be printed on the line before the ./build_and_test
-message was printed.
-
-If the file tmp.txt file does not exist in the folder then run the
-tester program
-
-::
-
-   ./tester 2>&1 | tee tester.log
-
-and also attach tester.log file to your mesa-users message. If the
-tester program does not exist, state that in your message.

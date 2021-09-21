@@ -7,7 +7,7 @@
       !show_net_reactions_info = .true.
 
       load_saved_model = .true.
-      saved_model_name = 'zams.mod'
+      load_model_filename = 'zams.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -41,7 +41,7 @@
 
 &controls
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       calculate_Brunt_N2 = .true.
 
       num_trace_history_values = 2

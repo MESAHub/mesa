@@ -47,7 +47,7 @@ module test_screen
       real(dp) :: xin(num_isos), y(num_isos), iso_z(num_isos), xz, abar, zbar, z2bar, z53bar, ye, sumx, &
             dabar_dx(num_isos), dzbar_dx(num_isos), temp, den, logT, logRho, &
             sc1a, sc1adt, sc1add, xh, xhe, dmc_dx(num_isos), iso_z158(num_isos)
-      type (Screen_Info), pointer :: sc
+      type (Screen_Info) :: sc
       real(dp) :: zg1, zg2, zg3, zg4
       real(dp) :: zs13, zhat, zhat2, lzav, aznut, zs13inv, mass_correction!approx_abar, approx_zbar
       integer :: screening_mode, i
@@ -136,8 +136,6 @@ module test_screen
          iso_z158(i) = pow(real(chem_isos% Z(chem_id(i)),kind=dp),1.58d0)
       end do
       y(:) = xin(:)/chem_isos% Z_plus_N(chem_id(:))
-   
-      allocate(sc)
       
       call do1(salpeter_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
@@ -151,7 +149,7 @@ module test_screen
       call do1(no_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
       
-      deallocate(sc, net_iso)
+      deallocate(net_iso)
 
       write(*,*) 'done'
       

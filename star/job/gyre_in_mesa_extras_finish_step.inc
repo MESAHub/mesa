@@ -8,7 +8,6 @@
 
 !      x_integer_ctrl(3) = 1 ! mode l (e.g. 0 for p modes, 1 for g modes)
          ! should match gyre.in mode l
-!      x_integer_ctrl(4) = 1 ! order
 !      x_ctrl(1) = 0.6d-4 ! freq < this (Hz)
 !      x_ctrl(2) = 0.3d4 ! growth < this (days)
 
@@ -20,8 +19,8 @@
     type (star_info), pointer :: s
     real(dp), allocatable     :: global_data(:)
     real(dp), allocatable     :: point_data(:,:)
-    integer                   :: ipar(5), step_interval, mode_l
-    real(dp)                  :: rpar(2), growth_lim
+    integer                   :: ipar(2), step_interval, mode_l
+    real(dp)                  :: rpar(1), growth_lim
     
     ierr = 0
     call star_ptr(id, s, ierr)
@@ -42,6 +41,8 @@
     else
        call_gyre = .FALSE.
     endif
+    
+    s% ixtra3_array(1) = 0 ! number of results
 
     ! If necessary, call GYRE
 
@@ -57,28 +58,20 @@
        
        if (growth_lim > 0d0) then
           write(*, 100) 'model', 'order', 'freq (Hz)', &
-             'P (sec)', 'P (min)', 'P (day)', 'growth (day)', '(4pi*im/re)'
-100       format(2A8,6A20)
+             'P (sec)', 'P (day)', 'growth (day)', 'growth', 'cycles to double'
+100       format(2A8,99A20)
        else
-          write(*, 100) 'model', 'order', 'freq (Hz)', &
-             'P (sec)', 'P (min)', 'P (day)', '(4pi*im/re)'
+          write(*, 101) 'model', 'order', 'freq (Hz)', &
+             'P (sec)', 'P (day)'
 101       format(2A8,5A20)
        end if
 
-       ipar(1) = s% model_number
-       ipar(2) = s% x_integer_ctrl(4) ! order_target
-       rpar(1) = s% x_ctrl(1)         ! freq_target
-       rpar(2) = growth_lim
-       ! write_flag
-       if (s% x_logical_ctrl(2)) then
-          ipar(3) = 1
-       else
-          ipar(3) = 0
-       endif
-       ipar(4) = s% x_integer_ctrl(2) ! max_to_write
-       ipar(5) = 0 ! num_written
+       ipar(1) = s% id
+       ipar(2) = 0 ! num_written
 
        call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
+       
+       s% ixtra3_array(1) = ipar(2)
 
     end if
 
@@ -94,45 +87,63 @@
       integer, intent(out)     :: retcode
 
       character(LEN=strlen) :: filename
-      integer               :: unit, k, model_number, num_written, max_to_write !, order_target
+      integer               :: ierr, unit, k, model_number, num_written, max_to_write !, order_target
       complex(dp)           :: cfreq
-      real(dp)              :: freq, growth, freq_target, growth_lim
+      real(dp)              :: freq, growth, period, freq_target, growth_lim
       logical               :: write_flag, freq_okay
       type(grid_t)          :: gr
+      type (star_info), pointer :: s
       
-      max_to_write = ipar(4)
-      num_written = ipar(5)
+
+      ierr = 0
+      call star_ptr(ipar(1), s, ierr)
+      if (ierr /= 0) return
+
+      num_written = ipar(2)
+      max_to_write = s% x_integer_ctrl(2)
       if (num_written >= max_to_write) return
-      ipar(5) = num_written + 1
-      
-      model_number = ipar(1)
-      !order_target = ipar(2)
-      freq_target = rpar(1)
-      growth_lim = rpar(2)
-      write_flag = (ipar(3) == 1)
+      num_written = num_written + 1
+      ipar(2) = num_written
+
+      model_number = s% model_number
+      freq_target = s% x_ctrl(1)
+      growth_lim = s% x_ctrl(2)
+      write_flag = s% x_logical_ctrl(2)
 
       cfreq = md% freq('HZ')
-      freq = REAL(cfreq)
+      growth = AIMAG(cfreq) ! in seconds
+      freq = REAL(cfreq) ! in seconds
       freq_okay = (abs(freq - freq_target) < freq_target*3d-2)
-
+      period = 0 ! days
       if (growth_lim > 0d0) then ! report growth
-         if (AIMAG(cfreq) > 0._dp) then ! unstable
-            growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
-            write(*, 100) ipar(1), md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), growth, &
-               4*pi*AIMAG(cfreq)/freq
-100         format(2I8,E20.4,3F20.4,2E20.4)
+         if (growth > 0d0) then ! unstable
+            period = 1d0/freq ! in seconds
+            write(*, 100) model_number, md%n_pg, &
+               freq, period, period/(24*3600), 1d0/(2*pi*24*3600*AIMAG(cfreq)), &
+               (2d0*pi*growth)/freq, freq/(2d0*pi*growth)
+100         format(2I8,E20.4,5F20.4)
             if (freq_okay .and. growth < growth_lim) & ! .and. md%n_pg == order_target) &
                write(*,*) 'matched target frequency'
          else ! stable
-            write(*, 110) ipar(1), md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
-110         format(2I8,E20.4,3F20.4,A20)
+            write(*, 110) model_number, md%n_pg, &
+               freq, period, period/(24*3600), 'stable'
+110         format(2I8,E20.4,2F20.4,A20)
          end if
       else ! growth_lim <= 0 means ignore it
-         write(*, 111) ipar(1), md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600)
-111      format(2I8,E20.4,3F20.4)
+         write(*, 111) model_number, md%n_pg, freq, period, period/(24*3600)
+111      format(2I8,E20.4,2F20.4)
          if (freq_okay) & ! .and. md%n_pg == order_target) &
             write(*,*) 'matched target frequency'
       endif
+
+      s% ixtra1_array(num_written) = md%n_pg
+      s% xtra1_array(num_written) = growth
+      s% xtra2_array(num_written) = freq
+      if (growth > 0d0) then
+         s% xtra3_array(num_written) = freq/(2d0*pi*growth)
+      else
+         s% xtra3_array(num_written) = -1d0
+      end if
 
       if (write_flag) then
 

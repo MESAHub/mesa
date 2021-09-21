@@ -1021,7 +1021,7 @@ contains
 
     end if
 
-    if (zi%vp_b == 0._dp) print *,'Bottom bdy has zero vp', zi%vp_b, zi%vc_b, z_s
+    if (zi%vp_b == 0._dp) print *,'Bottom bdy has zero vp', zi%kc_b, zi%vp_b, zi%vc_b, z_s
 
     ! Top boundary
 
@@ -1046,7 +1046,7 @@ contains
 
     end if
 
-    if (zi%vp_t == 0._dp) print *,'Top bdy has zero vp', zi%vp_t, zi%vc_t, z_s
+    if (zi%vp_t == 0._dp) print *,'Top bdy has zero vp', zi%kc_t, zi%vp_t, zi%vc_t, z_s
 
     ! Finish
 
@@ -1334,7 +1334,7 @@ contains
 
   subroutine update_model_ (s, update_mode, kc_t, kc_b)
 
-    use mlt_info
+    use mlt_info, only: set_mlt_vars
     use micro
 
     type(star_info), pointer :: s
@@ -1414,7 +1414,7 @@ contains
   subroutine dump_snapshot_ (s, filename)
 
     use brunt
-    use mlt_info
+    use hydro_vars, only: set_grads
 
     type(star_info), pointer :: s
     character(*), intent(in) :: filename

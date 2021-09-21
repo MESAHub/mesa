@@ -11,7 +11,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'late_pre_zams_1.0M.mod'
+      load_model_filename = 'late_pre_zams_1.0M.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 's1.mod' ! 's1_from_inlist_solar_mod.mod'
@@ -107,9 +107,10 @@
       diffusion_isolve_solver = 'ros2_solver'
 
       ! solver
-      use_dedt_form_of_energy_eqn = .true. 
+      energy_eqn_option = 'dedt'
       mlt_Pturb_factor = 1
-      
+      MLT_option = 'TDC'
+
       ! controls for output      
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

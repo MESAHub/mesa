@@ -45,15 +45,13 @@
       ! where val = net nuclear energy plus eps_grav minus all neutrino losses.
    !logL ! log10(max(1d-6,L/Lsun))
    signed_log_power ! sign(L)*log10(max(1,abs(L)))
-   !signed_log_energy_balance ! (net_energy + eps_grav - dL/dm)  (ergs/gm/sec)
       ! should = 0 for perfect energy balance
    velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    entropy ! specific entropy divided by (avo*kerg)
-   conv_mixing_type ! mixing types are defined in mesa/mlt/public/mlt_def
+   mix_type ! mixing types are defined in mesa/mlt/public/mlt_def
    csound ! sound speed
    v_div_csound ! velocity divided by sound speed
    !total_energy ! v^2/2 - G m / r + E (ergs/g).  negative if bound
-   !burn_times_ratio ! (scale_height/conv_vel)/(cp*T/eps_nuc) if both conv_vel and eps_nuc > 0
    !v_div_r ! velocity divided by radius
    !scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
    eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
@@ -93,11 +91,7 @@
    !opacity ! opacity measured at center of zone
    log_opacity ! log10(opacity)
    eps_nuc ! ergs/g/sec from nuclear reactions (neutrinos subtracted)
-   !eps_binding ! ergs/g/sec from change in binding energy
    !eps_nuc_neu_total ! erg/gm/sec as neutrinos from nuclear reactions
-   !eps_nuc_from_bindings ! = eps_binding - eps_nuc_neu_total
-   !eps_nuc_vs_binding ! compare eps_nuc to eps_nuc_from_bindings
-      ! eps_nuc_vs_binding = (eps_nuc - eps_nuc_from_bindings) / max(1,abs(eps_nuc),abs(eps_nuc_from_bindings))
    non_nuc_neu ! non-nuclear-reaction neutrino losses
    !nonnucneu_plas ! plasmon neutrinos (for collective reactions like gamma_plasmon => nu_e + nubar_e)
    !nonnucneu_brem ! bremsstrahlung (for reactions like e- + (z,a) => e- + (z,a) + nu + nubar)
@@ -105,24 +99,16 @@
    !nonnucneu_pair ! pair production (for reactions like e+ + e- => nu_e + nubar_e)
    mlt_mixing_length ! mixing length for mlt (cm)
    mlt_mixing_type ! value returned by mlt
-   !mlt_dlnmu_dr ! smoothed for use by mlt
    gradT_sub_grada ! gradT-grada at cell boundary 
-   !super_ad ! max(0,gradT-grada) at cell boundary 
    log_D_mix ! log10 diffusion coefficient in units of cm^2/second (Eulerian)
    log_conv_vel ! log10 convection velocity (cm/sec)
    conv_vel_div_csound ! convection velocity divided by sound speed
    log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
-   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
-   !lconv ! convective luminosity (Lsun units)
    !log_Lconv ! log10 convective luminosity (Lsun units)
-   !lrad ! radiative diffusion luminosity (Lsun units)
    !log_Lconv ! log10 radiative diffusion luminosity (Lsun units)
-   !lconv_plus_lrad ! (Lsun units)
    pressure_scale_height ! in Rsun units
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP required for purely radiative transport
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
    !logM ! log10(m/Msun)
@@ -140,13 +126,7 @@
    !log_dr_div_cs_yr ! log10 cell sound crossing time (years)
    
    
-   !grav_gr_factor ! (1/sqrt(1 - 2Gm/(rc^2))
-   !log_grav_gr_factor ! log10(grav_gr_factor)
    
-   !gr_mass_excess ! gravitational mass excess
-   !gr_time_excess ! time distortion
-   !gr_space_excess ! space distortion
-   !gr_enthalpy_excess ! gr specific enthalpy - 1
    
    !z ! metallicity
    !log_z ! metallicity
@@ -187,23 +167,14 @@
       !cno
       !tri_alfa
 
-   ! misc
 
       !gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
-      !dlnP_dm ! for structure equation
-      !dlnT_dm ! for structure equation
-      !dL_dm ! for structure equation
 
-      !dlnP_dlnm ! for structure equation
-      !dlnT_dlnm ! for structure equation
       
-      !eps_nuc_avg ! (eps_nuc_start + eps_nuc_end)/2
          ! where eps_nuc_start is eps_nuc at start of step
          ! eps_nuc_end is eps_nuc at end of step
-      !eps_nuc_shift ! eps_nuc - eps_nuc_avg
       
       !delta_r ! r(outer edge) - r(inner edge); radial extent of cell in cm.
-      !delta_v ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
       !dt_dv_div_dr ! dt*delta_v/delta_r; need to have this << 1 for every cell
       
       ! element diffusion velocity for species
@@ -251,7 +222,6 @@
       !dlog_burn_ar_dlogP
       !dlog_burn_ca_dlogP
       !dlog_burn_ti_dlogP
-      !dlog_burn_cr_dlogP
       !dlog_burn_fe_dlogP
       
       !dlog_pnhe4_dlogP
@@ -267,8 +237,6 @@
       !log_brunt_N ! log10(brunt_N)
       !log_brunt_N2 ! log10(brunt_N2)
       !sign_brunt_N2 ! sign of brunt_N2 (+1 for Ledoux stable; -1 for Ledoux unstable)
-      !dlnmu_dr ! for thermohaline mixing
-      !dlnRho_dlnR ! numerical estimate
 
       
       !logQ ! logQ = logRho - 2*logT + 12
@@ -320,9 +288,6 @@
       ! star_mass_o16
       ! star_mass_ne20
    ! locations of abundance transitions
-      ! h1_boundary_mass
-      ! he4_boundary_mass
-      ! c12_boundary_mass
    ! location of optical depths 10 and 100
       ! tau10_mass
       ! tau10_radius

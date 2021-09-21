@@ -347,12 +347,18 @@
 
  do_test_special_weak
  weaklib weak rates
-      mg24  na24      4.4797491275210752E-03
-      na24  mg24      3.7018793325371620E-40
+      mg24  na24      1.4421177069786498E-20
+      na24  mg24      2.3600389877416182E-58
 
  special weak rates
-      mg24  na24      3.8699849471477109E-03
-      na24  mg24      5.1451546670900355E-40
+      mg24  na24      3.8507552351991037E-03
+      na24  mg24      5.3938055004878743E-40
+
+
+ do_test_suzuki
+ suzuki weak rates
+      mg24  na24      4.4797491275210752E-03
+      na24  mg24      3.7018793325371620E-40
 
  done
 

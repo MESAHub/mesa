@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!  Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!  Copyright (C) 2010-2019  The MESA Team
 !
 !  MESA is free software; you can use it and/or modify
 !  it under the combined terms and restrictions of the MESA MANIFESTO
@@ -78,16 +78,13 @@
 
 
       type reaclib_data
-         integer, dimension(:), pointer :: chapter=>NULL()
-         character(len=iso_name_length), dimension(:,:), pointer :: species=>NULL()
-         character(len=iso_name_length), dimension(:), pointer :: label=>NULL()
-         character, dimension(:), pointer :: reaction_flag=>NULL()
-         character, dimension(:), pointer :: reverse_flag=>NULL()
-         real(dp), dimension(:), pointer :: Qvalue=>NULL()
-         real(dp), dimension(:,:), pointer :: coefficients=>NULL()
-         ! following are for 1D allocation of 2D arrays
-         character(len=iso_name_length), dimension(:), pointer :: species1=>NULL()
-         real(dp), dimension(:), pointer :: coefficients1=>NULL()
+         integer, dimension(:), allocatable :: chapter
+         character(len=iso_name_length), dimension(:,:), allocatable :: species
+         character(len=iso_name_length), dimension(:), allocatable :: label
+         character, dimension(:), allocatable :: reaction_flag
+         character, dimension(:), allocatable :: reverse_flag
+         real(dp), dimension(:), allocatable :: Qvalue
+         real(dp), dimension(:,:), allocatable :: coefficients
       end type reaclib_data
 
 
@@ -204,11 +201,7 @@
             real(dp), allocatable :: T9s(:)
             real(dp), allocatable :: lYeRhos(:)
 
-            logical :: has_cc ! are there tabulated coulomb corrections?
-            real(dp), allocatable :: data(:,:,:,:)
-               ! (4, num_T9, num_lYeRho, ?)
-               ! ? = 3 without coulomb corrections
-               ! ? = 5 with coulomb corrections
+            real(dp), allocatable :: data(:,:,:,:) ! (4, num_T9, num_lYeRho, 3)
             contains
             
               procedure(setup_weak_table), deferred :: setup
@@ -227,15 +220,13 @@
          abstract interface
             subroutine interpolate_weak_table(table, T9, lYeRho, &
                  lambda, dlambda_dlnT, dlambda_dlnRho, &
-                 Qneu, dQneu_dlnT, dQneu_dlnRho, &
-                 delta_Q, Vs, ierr)
+                 Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
               use const_def, only : dp
               import weak_rate_table
               class(weak_rate_table), intent(inout) :: table
               real(dp), intent(in) :: T9, lYeRho
               real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
               real(dp), intent(out) :: Qneu, dQneu_dlnT, dQneu_dlnRho
-              real(dp), intent(out) :: delta_Q, Vs
               integer, intent(out) :: ierr
             end subroutine interpolate_weak_table
          end interface
@@ -774,7 +765,7 @@
             import dp, screen_info
             implicit none
       
-            type (Screen_Info), pointer :: sc ! See rates_def
+            type (Screen_Info) :: sc ! See rates_def
             real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
             real(dp),intent(in) ::    a1, a2     !< mass numbers of reactants
             real(dp),intent(out) ::   screen     !< on return, screening factor for this reaction
@@ -1131,20 +1122,18 @@
          integer, intent(out) :: ierr
          ierr = 0
          allocate( &
-            r% chapter(n), r% species1(max_species_per_reaction*n), &
+            r% chapter(n), r% species(max_species_per_reaction,1:n), &
             r% label(n), r% reaction_flag(n), r% reverse_flag(n), &
-            r% Qvalue(n), r% coefficients1(ncoefficients*n), stat=ierr)
-         r% species(1:max_species_per_reaction,1:n) => r% species1(1:max_species_per_reaction*n)
-         r% coefficients(1:ncoefficients,1:n) => r% coefficients1(1:ncoefficients*n)
+            r% Qvalue(n), r% coefficients(ncoefficients,1:n), stat=ierr)
       end subroutine allocate_reaclib_data
       
 
       subroutine free_reaclib_data(reaclib)
          type(reaclib_data), intent(inout) :: reaclib
-         if (associated(reaclib% chapter)) & 
+         if (allocated(reaclib% chapter)) & 
             deallocate( &
-               reaclib% chapter, reaclib% species1, reaclib% label, reaclib% reaction_flag, &
-               reaclib% reverse_flag, reaclib% Qvalue, reaclib% coefficients1)
+               reaclib% chapter, reaclib% species, reaclib% label, reaclib% reaction_flag, &
+               reaclib% reverse_flag, reaclib% Qvalue, reaclib% coefficients)
       end subroutine free_reaclib_data
       
 

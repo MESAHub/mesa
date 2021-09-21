@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2018-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -110,7 +110,7 @@
       ! these for for rsp.f90 period and work calculations
       real(dp) :: ETOT, EGRV, ETHE, EKIN, EDE_start, ECON, &
          TE, ELSTA, TEFF, E0, TT1, TE_start, T0, UN, ULL, &
-         RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
+         VMAX, RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
          RSTA, RMIN, PERIODL, PERIODLIN, &
          PDVWORK, FASE0
       real(dp), pointer, dimension(:) :: &
@@ -141,8 +141,6 @@
       real(dp) :: THETA1, THETAT1, THETAQ1, THETAU1, THETAE1, WTR1, WTC1, WTT1, GAM1
       real(dp) :: EFL0, CQ, ZSH, kapE_factor, kapP_factor
       integer :: NZN, IBOTOM
-      
-      integer :: ITOP ! below non convective region at surface
       
 
       contains
@@ -390,7 +388,7 @@
             s% v(1:n), s% M(1:n), s% dm(1:n), s% dm_bar(1:n), &
             ETOT, EGRV, ETHE, EKIN, EDE_start, ECON, &
             TE, ELSTA, TEFF, E0, TT1, TE_start, T0, UN, ULL, &
-            RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
+            VMAX, RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
             RSTA, RMIN, PERIODL, PERIODLIN, &
             PDVWORK, FASE0, INSIDE, IWORK, ID, NSTART, FIRST, &
             s% rsp_LINA_periods(1:3), s% rsp_LINA_growth_rates(1:3), &
@@ -428,7 +426,7 @@
             photo_v(1:n), photo_M(1:n), photo_dm(1:n), photo_dm_bar(1:n), &
             ETOT, EGRV, ETHE, EKIN, EDE_start, ECON, &
             TE, ELSTA, TEFF, E0, TT1, TE_start, T0, UN, ULL, &
-            RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
+            VMAX, RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &
             RSTA, RMIN, PERIODL, PERIODLIN, &
             PDVWORK, FASE0, INSIDE, IWORK, ID, NSTART, FIRST, &
             s% rsp_LINA_periods(1:3), s% rsp_LINA_growth_rates(1:3), &

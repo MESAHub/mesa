@@ -35,7 +35,7 @@ processes.
 
 .. note::
    
-   The value of the option :ref:`Zbase` provides the reference
+   The value of the option :ref:`kap/defaults:Zbase` provides the reference
    metallicity necessary to calculate element variations (e.g., carbon
    and oxygen enhancement) from the composition of a cell.  The
    default opacity configuration requires this value to be specified.
@@ -46,8 +46,8 @@ processes.
 In MESA, separate opacity table sets are used for high and low
 temperature.  In the intermediate region, both opacities are evaluated
 and blended.  The location of this blend is controlled with the
-options :ref:`kap_blend_logT_upper_bdy` and
-:ref:`kap_blend_logT_lower_bdy`.
+options :ref:`kap/defaults:kap_blend_logT_upper_bdy` and
+:ref:`kap/defaults:kap_blend_logT_lower_bdy`.
 
 
 
@@ -59,19 +59,19 @@ The OPAL tables (|OPAL|) with fixed metal distributions are called
 Type 1 and cover the region :math:`0.0 \leq X \leq 1-Z` and
 :math:`0.0\leq Z \leq 0.1`. Type 1 tables from the Opacity Project
 (OP; |OP|) are also available.  The set of tables to be used are
-selected by the option :ref:`kap_file_prefix`.
+selected by the option :ref:`kap/defaults:kap_file_prefix`.
 
 Additionally, there is support for the OPAL Type 2 tables that allow
 for varying amounts of C and O beyond that accounted for by :math:`Z`;
 these are needed during helium burning and beyond. These have a range
 :math:`0.0 \leq X \leq 0.7`, :math:`0.0\leq Z\leq0.1`.  The set of
-tables to be used are selected by the option :ref:`kap_CO_prefix`.
+tables to be used are selected by the option :ref:`kap/defaults:kap_CO_prefix`.
 
-Type 2 tables on by default (see :ref:`use_Type2_opacities`) and The
+Type 2 tables on by default (see :ref:`kap/defaults:use_Type2_opacities`) and The
 blends between these table sets occur based on hydrogen fraction
-(see :ref:`kap_Type2_full_off_X` and :ref:`kap_Type2_full_on_X` and )
-and metal enhancement (controlled by :ref:`kap_Type2_full_off_dZ` and
-:ref:`kap_Type2_full_on_dZ`).
+(see :ref:`kap/defaults:kap_Type2_full_off_X` and :ref:`kap/defaults:kap_Type2_full_on_X` and )
+and metal enhancement (controlled by :ref:`kap/defaults:kap_Type2_full_off_dZ` and
+:ref:`kap/defaults:kap_Type2_full_on_dZ`).
 
 
 -------------------------------------------------
@@ -79,7 +79,7 @@ Low temperature  :math:`(T \lesssim 10^4\,\rm K)`
 -------------------------------------------------
 
 Low temperature opacities are selected with the option
-:ref:`kap_lowT_prefix`.
+:ref:`kap/defaults:kap_lowT_prefix`.
 
 Tables based on the work of |Fergusson| include the effects of
 molecules and grains and cover the range
@@ -149,8 +149,12 @@ are tabulated for a set of :math:`1 \le \bar{Z} \le 60`.  Each table
 spans :math:`-6 \le \log(\rho/\rm g\,cm^{-3}) \le 11.50` and :math:`3
 \le \log(T/\rm K) \le 10`.
 
+For H and He in the regime of moderate coupling and moderate
+degeneracy, the additional correction formulae of |B20| are applied.
 
 .. |P17| replace:: `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`__
+
+.. |B20| replace:: `Blouin et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract>`__
 
 .. |Fergusson| replace:: `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`__
 

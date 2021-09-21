@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -41,16 +41,13 @@
          type (Net_Info), pointer :: n
          integer, intent(out) :: ierr
          real(dp) :: y(num_chem_isos)
-         real(dp), dimension(3,0), target :: screen_h1, screen_he4
          y = 0
-         screen_h1 = 0
-         screen_he4 = 0
          call screen_net( &
             n% g, num_chem_isos, y, 1d0, 1d0, 0d0, 0d0, .true., &
             n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
             n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
             n% screening_mode,  &
-            screen_h1, screen_he4, 0d0, 0d0, 0d0, 1d0, ierr)
+             0d0, 0d0, 0d0, 1d0, ierr)
       end subroutine make_screening_tables
       
 
@@ -59,7 +56,7 @@
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             screening_mode, &
-            screen_h1, screen_he4, zbar, abar, z2bar, ye, ierr)
+            zbar, abar, z2bar, ye, ierr)
 
          use rates_def, only: Screen_Info, reaction_name
          use rates_lib, only: screen_set_context
@@ -71,12 +68,10 @@
          real(dp), intent(inout), dimension(:) :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
-         real(dp), intent(inout), dimension(:,:) :: screen_h1, screen_he4
          logical, intent(in) :: init
          integer, intent(out) :: ierr
 
-         type (Screen_Info), target :: scrn_info
-         type (Screen_Info), pointer :: sc
+         type (Screen_Info) :: sc
          integer :: num_reactions, i, ir, j, op_err
          real(dp) :: Tfactor, dTfactordt
          logical :: all_okay
@@ -84,8 +79,7 @@
          include 'formats'
          
          ierr = 0
-         sc => scrn_info
-         
+
          if (.not. init) then
             call screen_set_context( &
                sc, temp, den, logT, logRho, zbar, abar, z2bar,  &
@@ -170,7 +164,7 @@
             use chem_def, only: ih1, ih2, ihe4, ico55, ico57
             logical, intent(in) :: init
             integer, intent(in) :: ir, jscr
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(in) :: cid1, cid2
             real(dp), intent(in) :: a1, z1, a2, z2
             real(dp), intent(out) :: scor, scordt, scordd
@@ -202,28 +196,6 @@
                         scordd = 0d0
                         return
                      end if
-                  else
-                     if (cid1 == ih1 .and. screen_h1(1,i2) > 0) then
-                        scor = screen_h1(1,i2)
-                        scordt = screen_h1(2,i2)
-                        scordd = screen_h1(3,i2)
-                        return
-                     else if (cid1 == ihe4 .and. screen_he4(1,i2) > 0) then
-                        scor = screen_he4(1,i2)
-                        scordt = screen_he4(2,i2)
-                        scordd = screen_he4(3,i2)
-                        return
-                     else if (cid2 == ih1 .and. screen_h1(1,i1) > 0) then
-                        scor = screen_h1(1,i1)
-                        scordt = screen_h1(2,i1)
-                        scordd = screen_h1(3,i1)
-                        return
-                     else if (cid2 == ihe4 .and. screen_he4(1,i1) > 0) then
-                        scor = screen_he4(1,i1)
-                        scordt = screen_he4(2,i1)
-                        scordd = screen_he4(3,i1)
-                        return
-                     end if
                   end if
                end if 
                call screen_pair( &
@@ -233,34 +205,6 @@
                   scor, scordt, scordd, ierr) 
                if (ierr /= 0) write(*,*) 'screen_pair failed in screening_pair ' // &
                      trim(reaction_name(ir)) 
-               
-               if (cid1 > 0 .and. cid2 > 0) then
-                  i1 = g% net_iso(cid1) 
-                  i2 = g% net_iso(cid2) 
-                  if (i1 /= 0 .and. i2 /= 0) then
-                     if (cid1 == ih1) then
-                        screen_h1(1,i2) = scor
-                        screen_h1(2,i2) = scordt
-                        screen_h1(3,i2) = scordd
-                        return
-                     else if (cid1 == ihe4) then
-                        screen_he4(1,i2) = scor
-                        screen_he4(2,i2) = scordt
-                        screen_he4(3,i2) = scordd
-                        return
-                     else if (cid2 == ih1) then
-                        screen_h1(1,i1) = scor
-                        screen_h1(2,i1) = scordt
-                        screen_h1(3,i1) = scordd
-                        return
-                     else if (cid2 == ihe4) then
-                        screen_he4(1,i1) = scor
-                        screen_he4(2,i1) = scordt
-                        screen_he4(3,i1) = scordd
-                        return
-                     end if
-                  end if
-               end if 
             end if         
          end subroutine screening_pair
      
@@ -278,7 +222,7 @@
             use rates_def, only: Screen_Info
             logical, intent(in) :: init
             integer, intent(in) :: jscr
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(in) :: i1, i2 ! chem id's for the isotopes
             integer, intent(in) :: i ! rate number
             integer, intent(in) :: ir
@@ -306,7 +250,7 @@
             use rates_def, only: Screen_Info
             logical, intent(in) :: init
             integer, intent(in) :: jscr
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(in) :: i1_in, i2_in, i3_in ! chem id's for the isotopes
             integer, intent(in) :: i ! rate number
             integer, intent(in) :: ir
@@ -374,7 +318,7 @@
             use rates_def, only: Screen_Info
             integer, intent(in) :: num_isos
             real(dp), intent(in) :: y(:)
-            type (Screen_Info), pointer :: sc
+            type (Screen_Info) :: sc
             integer, intent(out) :: ierr
 
             integer, pointer :: rtab(:)

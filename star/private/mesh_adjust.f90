@@ -1,6 +1,6 @@
  ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -55,17 +55,19 @@
             s, nz, nz_old, xh_old, xa_old, &
             energy_old, eta_old, lnd_old, lnPgas_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, &
-            conv_vel_old, lnT_old, w_old, specific_PE_old, specific_KE_old, &
+            mlt_vc_old, lnT_old, w_old, specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
             cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
+         use chem_lib, only: basic_composition_info
          use interp_1d_def
          use interp_1d_lib
+         use star_utils, only: set_m_grav_and_grav
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, conv_vel_old, lnT_old, w_old, &
+            lnd_old, lnPgas_old, mlt_vc_old, lnT_old, w_old, Hp_face_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, D_mix_old
@@ -220,13 +222,19 @@
             if (failed('do_u')) return
          end if
 
-         if (s% using_TDC) then ! calculate new etrb to conserve turbulent energy
+         if (s% RSP2_flag) then ! calculate new etrb to conserve turbulent energy
             if (dbg) write(*,*) 'call do_etrb'
             call do_etrb( &
                s, nz, nz_old, cell_type, comes_from, &
                xq_old, xq, dq_old, dq, xh, xh_old, &
                xout_old, xout_new, tmp1, ierr)
             if (failed('do_etrb')) return
+            if (dbg) write(*,*) 'call do_Hp_face'
+            call do_Hp_face( &
+               s, nz, nz_old, nzlo, nzhi, comes_from, &
+               xh, xh_old, xq, xq_old_plus1, xq_new, &
+               work, tmp1, tmp2, ierr)
+            if (failed('do_Hp_face')) return
          end if
 
          if (s% conv_vel_flag) then
@@ -250,6 +258,11 @@
                if (failed('D_omega')) return
             end if
          end if
+         
+         call do_interp_pt_val( &
+            s, nz, nz_old, nzlo, nzhi, s% mlt_vc, mlt_vc_old, &
+            0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
+         if (failed('mlt_cv')) return
          
          call do_interp_pt_val( &
             s, nz, nz_old, nzlo, nzhi, s% D_mix, D_mix_old, &
@@ -313,6 +326,31 @@
                write(message,*) 'do_xa for k', k
                ierr = op_err
             end if
+
+         end do
+
+         ! ensure the things we need to calculate m_grav and grav are up to date
+         do k = 1, nz
+
+            op_err = 0
+
+            ! ensure that mass corrections are up to date
+            call basic_composition_info( &
+                 species, s% chem_id, xa(1:species,k), s% X(k), s% Y(k), s% Z(k), &
+                 s% abar(k), s% zbar(k), s% z2bar(k), s% z53bar(k), &
+                 s% ye(k), s% mass_correction(k), sumx)
+
+            ! ensure that r is up to date
+            s% r(k) = exp(s% xh(s% i_lnr,k))
+
+         end do
+
+         ! needed because do1_lnT evaluates PE
+         call set_m_grav_and_grav(s)
+
+         do k = 1, nz
+
+            op_err = 0
 
             ! calculate new temperatures to conserve energy
             call do1_lnT( &
@@ -532,7 +570,7 @@
       subroutine do_prune_mesh_surface( &
             s, nz, nz_old, xh_old, xa_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
-            conv_vel_old, lnT_old, &
+            mlt_vc_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
             xh, xa, ierr)
@@ -540,7 +578,7 @@
          integer, intent(in) :: nz, nz_old
          real(dp), dimension(:), pointer :: &
             j_rot_old, i_rot_old, omega_old, &
-            D_omega_old, am_nu_rot_old, conv_vel_old, lnT_old, &
+            D_omega_old, am_nu_rot_old, mlt_vc_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
@@ -1488,10 +1526,7 @@
                avg_KE = sum_energy/cell_dq
             end if
          
-            s% r(k) = get_r_from_xh(s,k)
-            if (k < s% nz) s% r(k+1) = get_r_from_xh(s,k+1)
             if (ierr /= 0) return
-            
             new_PE = cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
             if (s% u_flag) then
                s% u(k) = s% xh(s% i_u,k)
@@ -2637,6 +2672,64 @@
          end if
 
       end subroutine adjust1_u
+
+
+      subroutine do_Hp_face( &
+            s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
+            xq, xq_old_plus1, xq_new, work, Hp_face_old_plus1, Hp_face_new, ierr)
+         use interp_1d_def
+         use interp_1d_lib
+         type (star_info), pointer :: s
+         integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
+         real(dp), dimension(:,:), pointer :: xh, xh_old
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, Hp_face_old_plus1, Hp_face_new, xq_new
+         integer, intent(out) :: ierr
+
+         integer :: n, i_Hp, k
+
+         include 'formats'
+
+         ierr = 0
+         i_Hp = s% i_Hp
+         if (i_Hp == 0) return
+         n = nzhi - nzlo + 1
+
+         do k=1,nz_old
+            Hp_face_old_plus1(k) = xh_old(i_Hp,k)
+         end do
+         Hp_face_old_plus1(nz_old+1) = Hp_face_old_plus1(nz_old)
+
+         call interpolate_vector( &
+               nz_old+1, xq_old_plus1, n, xq_new, &
+               Hp_face_old_plus1, Hp_face_new, interp_pm, nwork, work, &
+               'mesh_adjust do_Hp_face', ierr)
+         if (ierr /= 0) then
+            return
+            write(*,*) 'interpolate_vector failed in do_Hp_face for remesh'
+            stop 'debug: mesh adjust: do_Hp_face'
+         end if
+
+         do k=nzlo,nzhi
+            xh(i_Hp,k) = Hp_face_new(k+1-nzlo)
+         end do
+
+         n = nzlo - 1
+         if (n > 0) then
+            do k=1,n
+               xh(i_Hp,k) = xh_old(i_Hp,k)
+            end do
+         end if
+
+         if (nzhi < nz) then
+            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            do k=0,n
+               xh(i_Hp,nz-k) = xh_old(i_Hp,nz_old-k)
+            end do
+         end if
+
+      end subroutine do_Hp_face
 
       
       subroutine do_etrb( & ! same logic as do_u

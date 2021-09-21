@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton
+!   Copyright (C) 2013  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -37,7 +37,6 @@
       namelist /star_job/ &
          mesa_dir, &
          eosDT_cache_dir, &
-         ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir, &
          pause_before_terminate, &
@@ -51,6 +50,7 @@
          steps_before_start_timing, &
          show_eqns_and_vars_names, &
          pgstar_flag, &
+         disable_pgstar_during_relax_flag, &
          clear_initial_pgstar_history, &
          clear_pgstar_history, &
          save_pgstar_files_when_terminate, &
@@ -91,8 +91,7 @@
          echo_at_start, &
          echo_at_end, &
          load_saved_model, &
-         load_saved_model_for_RSP, &
-         saved_model_name, &
+         load_model_filename, &
          create_merger_model, &
          saved_model_for_merger_1, &
          saved_model_for_merger_2, &
@@ -157,6 +156,7 @@
          remove_center_by_radius_cm, &
          remove_center_by_radius_Rsun, &
          remove_center_by_he4, &
+         remove_center_by_c12_o16, &
          remove_center_by_si28, &
          remove_center_to_reduce_co56_ni56, &
          remove_center_by_ye, &
@@ -183,6 +183,7 @@
          remove_initial_center_by_radius_cm, &
          remove_initial_center_by_radius_Rsun, &
          remove_initial_center_by_he4, &
+         remove_initial_center_by_c12_o16, &
          remove_initial_center_by_si28, &
          remove_initial_center_to_reduce_co56_ni56, &
          remove_initial_center_by_ye, &
@@ -299,10 +300,11 @@
          change_initial_RSP_flag, &
          new_RSP_flag, &
          
-         change_TDC_flag, &
-         change_initial_TDC_flag, &
-         change_TDC_flag_at_model_number, &
-         new_TDC_flag, &
+         change_RSP2_flag, &
+         change_initial_RSP2_flag, &
+         change_RSP2_flag_at_model_number, &
+         new_RSP2_flag, &
+         create_RSP2_model, &
          
          change_conv_vel_flag, &
          change_initial_conv_vel_flag, &
@@ -532,8 +534,6 @@
          save_pulse_data_filename, &
          
          chem_isotopes_filename, &
-         ionization_file_prefix, &
-         ionization_Z1_suffix, &
          extras_lipar, &
          extras_lrpar, &
          extras_lcpar, &
@@ -683,7 +683,6 @@
 
          s% job% mesa_dir = mesa_dir
          s% job% eosDT_cache_dir = eosDT_cache_dir
-         s% job% ionization_cache_dir = ionization_cache_dir
          s% job% kap_cache_dir = kap_cache_dir
          s% job% rates_cache_dir = rates_cache_dir
          s% job% pause_before_terminate = pause_before_terminate
@@ -697,6 +696,7 @@
          s% job% steps_before_start_timing = steps_before_start_timing
          s% job% show_eqns_and_vars_names = show_eqns_and_vars_names
          s% job% pgstar_flag = pgstar_flag
+         s% job% disable_pgstar_during_relax_flag = disable_pgstar_during_relax_flag
          s% job% clear_initial_pgstar_history = clear_initial_pgstar_history
          s% job% clear_pgstar_history = clear_pgstar_history
          s% job% save_pgstar_files_when_terminate = save_pgstar_files_when_terminate
@@ -739,8 +739,7 @@
          s% job% echo_at_start = echo_at_start
          s% job% echo_at_end = echo_at_end
          s% job% load_saved_model = load_saved_model
-         s% job% load_saved_model_for_RSP = load_saved_model_for_RSP
-         s% job% saved_model_name = saved_model_name
+         s% job% load_model_filename = load_model_filename
          s% job% create_merger_model = create_merger_model
          s% job% saved_model_for_merger_1 = saved_model_for_merger_1
          s% job% saved_model_for_merger_2 = saved_model_for_merger_2
@@ -807,6 +806,7 @@
          s% job% remove_initial_center_by_radius_cm = remove_initial_center_by_radius_cm
          s% job% remove_initial_center_by_radius_Rsun = remove_initial_center_by_radius_Rsun
          s% job% remove_initial_center_by_he4 = remove_initial_center_by_he4
+         s% job% remove_initial_center_by_c12_o16 = remove_initial_center_by_c12_o16
          s% job% remove_initial_center_by_si28 = remove_initial_center_by_si28
          s% job% remove_initial_center_to_reduce_co56_ni56 = remove_initial_center_to_reduce_co56_ni56
          s% job% remove_initial_center_by_ye = remove_initial_center_by_ye
@@ -825,6 +825,7 @@
          s% job% remove_center_by_radius_cm = remove_center_by_radius_cm
          s% job% remove_center_by_radius_Rsun = remove_center_by_radius_Rsun
          s% job% remove_center_by_he4 = remove_center_by_he4
+         s% job% remove_center_by_c12_o16 = remove_center_by_c12_o16
          s% job% remove_center_by_si28 = remove_center_by_si28
          s% job% remove_center_to_reduce_co56_ni56 = remove_center_to_reduce_co56_ni56
          s% job% remove_center_by_ye = remove_center_by_ye
@@ -951,10 +952,11 @@
          s% job% change_RSP_flag = change_RSP_flag
          s% job% change_initial_RSP_flag = change_initial_RSP_flag
          s% job% new_RSP_flag = new_RSP_flag
-         s% job% change_TDC_flag = change_TDC_flag
-         s% job% change_initial_TDC_flag = change_initial_TDC_flag
-         s% job% change_TDC_flag_at_model_number = change_TDC_flag_at_model_number
-         s% job% new_TDC_flag = new_TDC_flag
+         s% job% change_RSP2_flag = change_RSP2_flag
+         s% job% change_initial_RSP2_flag = change_initial_RSP2_flag
+         s% job% change_RSP2_flag_at_model_number = change_RSP2_flag_at_model_number
+         s% job% new_RSP2_flag = new_RSP2_flag
+         s% job% create_RSP2_model = create_RSP2_model
          s% job% change_conv_vel_flag = change_conv_vel_flag
          s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
          s% job% new_conv_vel_flag = new_conv_vel_flag
@@ -1182,8 +1184,6 @@
          s% job% save_pulse_data_filename = save_pulse_data_filename
          
          s% job% chem_isotopes_filename = chem_isotopes_filename
-         s% job% ionization_file_prefix = ionization_file_prefix
-         s% job% ionization_Z1_suffix = ionization_Z1_suffix
          s% job% extras_lipar = extras_lipar
          s% job% extras_lrpar = extras_lrpar
          s% job% extras_lcpar = extras_lcpar
@@ -1258,7 +1258,6 @@
 
          mesa_dir = s% job% mesa_dir
          eosDT_cache_dir = s% job% eosDT_cache_dir
-         ionization_cache_dir = s% job% ionization_cache_dir
          kap_cache_dir = s% job% kap_cache_dir
          rates_cache_dir = s% job% rates_cache_dir
          pause_before_terminate = s% job% pause_before_terminate
@@ -1272,6 +1271,7 @@
          steps_before_start_timing = s% job% steps_before_start_timing
          show_eqns_and_vars_names = s% job% show_eqns_and_vars_names
          pgstar_flag = s% job% pgstar_flag
+         disable_pgstar_during_relax_flag = s% job% disable_pgstar_during_relax_flag
          clear_initial_pgstar_history = s% job% clear_initial_pgstar_history
          clear_pgstar_history = s% job% clear_pgstar_history
          save_pgstar_files_when_terminate = s% job% save_pgstar_files_when_terminate
@@ -1314,8 +1314,7 @@
          echo_at_start = s% job% echo_at_start
          echo_at_end = s% job% echo_at_end
          load_saved_model = s% job% load_saved_model
-         load_saved_model_for_RSP = s% job% load_saved_model_for_RSP
-         saved_model_name = s% job% saved_model_name
+         load_model_filename = s% job% load_model_filename
          create_merger_model = s% job% create_merger_model
          saved_model_for_merger_1 = s% job% saved_model_for_merger_1
          saved_model_for_merger_2 = s% job% saved_model_for_merger_2
@@ -1381,6 +1380,7 @@
          remove_center_by_radius_Rsun = s% job% remove_center_by_radius_Rsun
          remove_center_by_radius_cm = s% job% remove_center_by_radius_cm
          remove_center_by_he4 = s% job% remove_center_by_he4
+         remove_center_by_c12_o16 = s% job% remove_center_by_c12_o16
          remove_center_by_si28 = s% job% remove_center_by_si28
          remove_center_to_reduce_co56_ni56 = s% job% remove_center_to_reduce_co56_ni56
          remove_center_by_ye = s% job% remove_center_by_ye
@@ -1409,6 +1409,7 @@
          remove_initial_center_by_radius_Rsun = s% job% remove_initial_center_by_radius_Rsun
          remove_initial_center_by_radius_cm = s% job% remove_initial_center_by_radius_cm
          remove_initial_center_by_he4 = s% job% remove_initial_center_by_he4
+         remove_initial_center_by_c12_o16 = s% job% remove_initial_center_by_c12_o16
          remove_initial_center_by_si28 = s% job% remove_initial_center_by_si28
          remove_initial_center_to_reduce_co56_ni56 = s% job% remove_initial_center_to_reduce_co56_ni56
          remove_initial_center_by_ye = s% job% remove_initial_center_by_ye
@@ -1527,10 +1528,11 @@
          change_RSP_flag = s% job% change_RSP_flag
          change_initial_RSP_flag = s% job% change_initial_RSP_flag
          new_RSP_flag = s% job% new_RSP_flag
-         change_TDC_flag = s% job% change_TDC_flag
-         change_initial_TDC_flag = s% job% change_initial_TDC_flag
-         change_TDC_flag_at_model_number = s% job% change_TDC_flag_at_model_number
-         new_TDC_flag = s% job% new_TDC_flag
+         change_RSP2_flag = s% job% change_RSP2_flag
+         change_initial_RSP2_flag = s% job% change_initial_RSP2_flag
+         change_RSP2_flag_at_model_number = s% job% change_RSP2_flag_at_model_number
+         new_RSP2_flag = s% job% new_RSP2_flag
+         create_RSP2_model = s% job% create_RSP2_model
          change_conv_vel_flag = s% job% change_conv_vel_flag
          change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
          new_conv_vel_flag = s% job% new_conv_vel_flag
@@ -1757,8 +1759,6 @@
          save_pulse_data_filename = s% job% save_pulse_data_filename
          
          chem_isotopes_filename = s% job% chem_isotopes_filename
-         ionization_file_prefix = s% job% ionization_file_prefix
-         ionization_Z1_suffix = s% job% ionization_Z1_suffix
          extras_lipar = s% job% extras_lipar
          extras_lrpar = s% job% extras_lrpar
          extras_lcpar = s% job% extras_lcpar
@@ -1807,6 +1807,76 @@
          write(*,*) 'write star_job namelist values to "' // trim(filename)//'"'
          close(io)
       end subroutine do_write_star_job
+
+
+      subroutine get_star_job(s, name, val, ierr)
+         use utils_lib, only: StrUpCase
+         type (star_info), pointer :: s
+         character(len=*),intent(in) :: name
+         character(len=*), intent(out) :: val
+         integer, intent(out) :: ierr
+   
+         character(len(name)) :: upper_name
+         character(len=512) :: str
+         integer :: iounit,iostat,ind,i
+   
+         ierr = 0
+
+         ! First save current controls
+         call set_star_job_controls_for_writing(s, ierr)
+         if(ierr/=0) return
+   
+         ! Write namelist to temporay file
+         open(newunit=iounit,status='scratch')
+         write(iounit,nml=star_job)
+         rewind(iounit)
+   
+         ! Namelists get written in captials
+         upper_name = StrUpCase(name)
+         val = ''
+         ! Search for name inside namelist
+         do 
+            read(iounit,'(A)',iostat=iostat) str
+            ind = index(str,trim(upper_name))
+            if( ind /= 0 ) then
+               val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+               do i=1,len(val)
+                  if(val(i:i)=='"') val(i:i) = ' '
+               end do
+               exit
+            end if
+            if(is_iostat_end(iostat)) exit
+         end do   
+   
+         if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
+   
+         close(iounit)
+   
+      end subroutine get_star_job
+   
+      subroutine set_star_job(s, name, val, ierr)
+         type (star_info), pointer :: s
+         character(len=*), intent(in) :: name, val
+         character(len=len(name)+len(val)+12) :: tmp
+         integer, intent(out) :: ierr
+   
+         ierr = 0
+
+         ! First save current star_job
+         call set_star_job_controls_for_writing(s, ierr)
+         if(ierr/=0) return
+   
+         tmp=''
+         tmp = '&star_job '//trim(name)//'='//trim(val)//'/'
+   
+         ! Load into namelist
+         read(tmp, nml=star_job)
+   
+         ! Add to star
+         call store_star_job_controls(s, ierr)
+         if(ierr/=0) return
+   
+      end subroutine set_star_job
 
 
       end module star_job_ctrls_io

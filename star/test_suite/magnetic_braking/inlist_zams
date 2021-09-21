@@ -2,8 +2,6 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
-
       create_pre_main_sequence_model = .true.
 
       save_model_when_terminate = .true.
@@ -19,8 +17,7 @@
 / ! end of eos namelist
 
 &kap
-  Zbase = 2d-2
-
+      Zbase = 1d-2
       kap_file_prefix = 'gs98'
 
 / ! end of kap namelist
@@ -30,23 +27,38 @@
 
       use_other_torque = .false.
 
-      initial_mass = 15
-      initial_z = 0.01
+  ! Initial conditions
+    initial_mass = 15
+    initial_z = 0.01
       
-      stop_near_zams = .true.
-      Lnuc_div_L_zams_limit = 0.9d0
-      
-      ! limit max_model_number as part of test_suite
-      max_model_number = 10000
-      
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+  ! Stopping conditions
+    stop_near_zams = .true.
+    Lnuc_div_L_zams_limit = 0.9d0
+    max_model_number = 700     ! limit max_model_number as part of test_suite
 
-      photo_interval = 100
-      profile_interval = 100
-      history_interval = 5
-      terminal_interval = 50
+  ! Solver controls
+    energy_eqn_option = 'dedt'
+    use_gold_tolerances = .true.         ! Tight tolerances
+    use_gold2_tolerances = .true.        ! Tighter tolerances
+    delta_lgRho_cntr_limit = 1d-2        ! Evolve carefully
+
+
+  ! Convective and Thermohaline Mixing
+    do_conv_premix = .true.
+    mixing_length_alpha = 1.5
+    MLT_option = 'Henyey'
+
+    use_Ledoux_criterion = .true.
+
+  ! Output
+    num_trace_history_values = 2
+    trace_history_value_name(1) = 'rel_E_err'
+    trace_history_value_name(2) = 'log_rel_run_E_err'
+
+    photo_interval = 100
+    profile_interval = 100
+    history_interval = 5
+    terminal_interval = 50
 
 / ! end of controls namelist
 

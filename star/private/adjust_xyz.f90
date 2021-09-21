@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -284,7 +284,7 @@
          old_total_ca = 0
          old_total_fe = 0
          old_total_co = 0
-         old_total_fe = 0
+         old_total_ni = 0
          old_other = 0
          do j=1, old_num_isos
             Z = chem_isos% Z(old_chem_id(j))

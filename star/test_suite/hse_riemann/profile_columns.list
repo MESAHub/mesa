@@ -35,7 +35,7 @@
    logE ! log10(energy) at center of zone
    logR ! log10(radius/Rsun) at outer boundary of zone
    entropy ! specific entropy divided by (avo*kerg)
-   conv_mixing_type ! mixing types are defined in mesa/const
+   mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    luminosity ! luminosity at outer boundary of zone (in Lsun units)
    logL ! log(max(1d-6,L/Lsun))
@@ -78,13 +78,9 @@
    !nonnucneu_brem ! bremsstrahlung (for reactions like e- + (z,a) => e- + (z,a) + nu + nubar)
    !nonnucneu_phot ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
    !nonnucneu_pair ! pair production (for reactions like e+ + e- => nu_e + nubar_e)
-   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
    !pressure_scale_height ! in Rsun units
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP required for purely radiative transport
-   !dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
    !logM ! log10(m/Msun)
@@ -103,8 +99,6 @@
    !velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    !vel_km_per_s ! velocity at outer boundary of zone (km/s) -- 0 if no velocity variable
    !v_div_csound ! velocity divided by sound speed
-   !v_residual
-   !log_v_residual
    
    add_abundances ! this adds all of the isos that are in the current net
    ! NOTE: you can list specific isotopes by giving their names (from chem_def)
@@ -134,10 +128,8 @@
 
    ! ergs/g/sec for specific reactions (names from rates_def)
       
-      !rpp
 
       
-   ! misc
 
       gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
       

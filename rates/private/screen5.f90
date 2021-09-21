@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -100,7 +100,7 @@
 
 
 !..declare the pass
-      type (Screen_Info), pointer :: sc
+      type (Screen_Info) :: sc
       real(dp), intent(in) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
       ! zs13 = (z1+z2)**(1./3.)
       ! zhat = combination of z1 and z2 raised to the 5/3 power

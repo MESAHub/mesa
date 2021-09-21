@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton
+!   Copyright (C) 2013  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -105,10 +105,6 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-         write (*,2) 'History_Panels2_plot total_energy_end', s% model_number, s% total_energy_end
-         
-         
          call pgslct(device_id)
          call pgbbuf()
          call pgeras()
@@ -642,9 +638,9 @@
          procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
          character (len=strlen) :: yname, other_yname, hist_xaxis_name
-         real, pointer, dimension(:) :: xvec, yvec, other_yvec
-         real, pointer, dimension(:) :: yfile_xdata, other_yfile_xdata
-         real, pointer, dimension(:) :: yfile_ydata, other_yfile_ydata
+         real, allocatable, dimension(:) :: xvec, yvec, other_yvec
+         real, allocatable, dimension(:) :: yfile_xdata, other_yfile_xdata
+         real, allocatable, dimension(:) :: yfile_ydata, other_yfile_ydata
          integer :: i, ii, n, j, k, max_width, step_min, step_max, &
             y_color, other_y_color, yaxis_id, other_yaxis_id, &
             clr_sav, npts, yfile_data_len, other_yfile_data_len
@@ -677,7 +673,7 @@
             if (max_width > 0) step_min = max(step_min, step_max - max_width)
          else if (hist_xaxis_name == 'star_age' .and. automatic_star_age_units) then
             if (s% star_age > 1d0) then
-               hist_xaxis_name = 'star_age'
+               hist_xaxis_name = 'star_age_yr'
             else if (s% star_age*secyer > 24*60*60) then
                hist_xaxis_name = 'star_age_day'
             else if (s% star_age*secyer > 60*60) then
@@ -872,7 +868,6 @@
                   call pgline( &
                      other_yfile_data_len, other_yfile_xdata, other_yfile_ydata)
                   deallocate(other_yfile_xdata, other_yfile_ydata)
-                  nullify(other_yfile_xdata, other_yfile_ydata)
                else
                   call pgline(n, xvec, other_yvec)
                end if
@@ -943,7 +938,6 @@
                   call pgline(yfile_data_len, yfile_xdata, yfile_ydata)
                   call pgsls(1)
                   deallocate(yfile_xdata, yfile_ydata)
-                  nullify(yfile_xdata, yfile_ydata)
                else
                   call pgsls(s% pgstar_history_line_style)
                   call pgline(n, xvec, yvec)
@@ -971,7 +965,7 @@
 
          logical function get1_yvec(name, vec)
             character (len=*) :: name
-            real, dimension(:), pointer :: vec
+            real, dimension(:), allocatable :: vec
             get1_yvec = get1_hist_yvec(s, step_min, step_max, n, name, vec)
          end function get1_yvec
 

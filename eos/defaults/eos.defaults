@@ -14,7 +14,7 @@
    ! Select whether to use the PC eos.
    ! ::
 
-   use_PC = .true.
+   use_PC = .false.
 
    ! mass_fraction_limit_for_PC
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,14 +156,10 @@
    ! Therefore, there is no option that completely deactivates HELM.
    ! ::
 
-   max_logRho_neutral_HELM = -1.5d0
-   logT_ion_HELM = 5.0d0
-   logT_neutral_HELM = 4.5d0
    coulomb_temp_cut_HELM = -1d99
    coulomb_den_cut_HELM = -1d99
    include_radiation = .true.
-   always_skip_elec_pos = .false.
-   always_include_elec_pos = .false.
+   include_elec_pos = .true.
 
 
 
@@ -175,7 +171,7 @@
    ! Select whether to use the Skye EOS. (EXPERIMENTAL)
    ! ::
 
-   use_Skye = .false.
+   use_Skye = .true.
 
    ! mass_fraction_limit_for_Skye
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -201,11 +197,21 @@
    ! Ogata+1993 or Potekhin & Chabrier 2013. The former provides better agreement with calculations done at
    ! typical white dwarf charge ratios (R = Z2 / Z1 ~ 4/3 for C/O), see e.g. Blouin+2020. The latter gives better
    ! agreement with analytic expectations at large charge ratios R > 2.
-   ! Select between these choices by specifying either `"Ogata" or "PC".
+   ! Select between these choices by specifying either ``"Ogata"`` or ``"PC"``.
    ! :: 
 
    Skye_solid_mixing_rule = "PC"
 
+   ! Skye Blending
+   ! ~~~~~~~~~~~~~
+   ! replace the polygon blend with simple Rho/T blends
+   ! ::
+
+   use_simple_Skye_blends = .false.
+   logRho_min_for_any_Skye = 1.8
+   logRho_min_for_all_Skye = 2.0
+   logT_min_for_any_Skye = 6.8
+   logT_min_for_all_Skye = 7.0
 
 
 ! CMS controls
@@ -217,6 +223,34 @@
    ! ::
 
    use_CMS = .false.
+
+   ! CMS_use_fixed_composition
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! Use a single table for a fixed composition. Don't interpolate in H mass fraction.
+
+   CMS_use_fixed_composition = .false.
+
+   ! CMS_fixed_composition_index
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! Integer with valid values from 0 to 10 inclusive corresponding to the table
+   ! to use in the fixed composition case. A value of 0 corresponds to the pure Helium
+   ! table while a value of 10 corresponds the the pure Hydrogen table.
+
+   !| to use table
+   !|                set index 
+   !| mesa-CMS_000x.data ->  0
+   !| mesa-CMS_010x.data ->  1
+   !| mesa-CMS_020x.data ->  2
+   !| mesa-CMS_030x.data ->  3
+   !| mesa-CMS_040x.data ->  4
+   !| mesa-CMS_050x.data ->  5
+   !| mesa-CMS_060x.data ->  6
+   !| mesa-CMS_070x.data ->  7
+   !| mesa-CMS_080x.data ->  8
+   !| mesa-CMS_090x.data ->  9
+   !| mesa-CMS_100x.data -> 10
+
+   CMS_fixed_composition_index = -1
 
    max_Z_for_any_CMS = -1
    max_Z_for_all_CMS = -1
@@ -245,6 +279,32 @@
    eosDT_file_prefix = 'mesa'
    okay_to_convert_ierr_to_skip = .true.
    tiny_fuzz = 1d-6
+
+
+! Other EOS controls
+! ------------------
+
+   ! use_other_eos_component
+   ! ~~~~~~~~~~~~~~~~~~~~~~~
+   ! Select whether to use the other (i.e., user-provided) EOS component.
+   ! If true, the user must provide the routines
+   ! ``other_eos_component`` and ``other_eos_frac``.
+   ! See ``eos/other/other_eos.f90`` for more details.
+   ! ::
+
+   use_other_eos_component = .false.
+
+
+   ! use_other_eos_results
+   ! ~~~~~~~~~~~~~~~~~~~~~
+   ! Select whether to call the other_eos_results hook.  This provides
+   ! an opportunity for the user to modify the results from the EOS right
+   ! before they are returned. If true, the user must provide the routine
+   ! ``other_eos_results``.
+   ! See ``eos/other/other_eos.f90`` for more details.
+   ! ::
+
+   use_other_eos_results = .false.
 
 
 ! Debugging controls

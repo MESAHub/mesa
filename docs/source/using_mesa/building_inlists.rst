@@ -2,7 +2,7 @@
 Building inlists
 ****************
 
-Inlists for MESA are composed of five main sections labelled ``&star_job``, ``&controls``.
+Inlists for MESA are composed of five main sections labeled ``&star_job``, ``&controls``.
 ``&eos``,  ``&skap`` and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified. The ``&kap`` and ``&eos`` sections are where you specify controls for the opacity and the equation of state respectively.
 The ``&pgstar`` section contains the commands for creating pgstar plots. 
 
@@ -12,7 +12,7 @@ The ``&pgstar`` section contains the commands for creating pgstar plots.
 The main modules of MESA (other than **star**) are the :ref:`eos`, the :ref:`kap`, the :ref:`atm`, the nuclear reactions.
 In this section of the inlist, you'll have to make choices for which atmosphere and nuclear reactions network you want to use, as well as which nuclear reactions rates you want to use. 
 You will also specify here some information about your starting model, and about the output of the evolution.
-Here we describe only some of the most commonly used controls. For a complete list of available controls see :ref:`list-starjob`. 
+Here we describe only some of the most commonly used controls. For a complete list of available controls see :ref:`reference/star_job:star_job`. 
 
 starting model
 --------------
@@ -76,9 +76,6 @@ For example when evolving a stellar model on the horizontal branch (helium burni
    :start-after: ! Nuclear reactions
    :end-before: ! eos
 
-
-ionization controls
--------------------
 
 &controls
 =========

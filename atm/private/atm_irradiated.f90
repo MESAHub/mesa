@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -72,7 +72,7 @@ contains
     real(dp), intent(in)     :: errtol
     integer, intent(in)      :: max_iters
     logical, intent(in)      :: skip_partials
-    real(dp), intent(out)    :: Teff
+    real(dp), intent(in)     :: Teff
     real(dp), intent(out)    :: kap
     real(dp), intent(out)    :: tau
     real(dp), intent(out)    :: lnT
@@ -197,7 +197,7 @@ contains
     ! irradiation has no effect on the *net* flux emerging from the
     ! atmosphere
 
-    Teff = T_int
+    ! Teff = T_int
 
     ! Finish
 

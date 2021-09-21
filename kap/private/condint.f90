@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2011-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -116,11 +116,12 @@
             write(*,*)
             call mesa_error(__FILE__,__LINE__)
          end if
-         ! just use "not a knot" bc's at edges of tables
-         ibcxmin = 0; bcxmin(1:num_logTs) = 0d0
-         ibcxmax = 0; bcxmax(1:num_logTs) = 0d0
-         ibcymin = 0; bcymin(1:num_logRhos) = 0d0
-         ibcymax = 0; bcymax(1:num_logRhos) = 0d0
+         ! boundary condition is slope=0 at edges of tables
+         ! this ensures continuous derivatives when we clip
+         ibcxmin = 3; bcxmin(1:num_logTs) = 0d0
+         ibcxmax = 3; bcxmax(1:num_logTs) = 0d0
+         ibcymin = 3; bcymin(1:num_logRhos) = 0d0
+         ibcymax = 3; bcymax(1:num_logRhos) = 0d0
          do iz = 1, num_logzs
             f1(1:shift) => f_ary(1+(iz-1)*shift:iz*shift) 
             call interp_mkbicub_db( &
@@ -144,26 +145,51 @@
       end subroutine init_potekhin
       
       
-      subroutine do_electron_conduction( &
-            zbar, logRho_in, logT_in, kap, dlogK_dlogRho, dlogK_dlogT, ierr)
+      subroutine do_electron_conduction_potekhin( &
+            zbar, logRho_in, logT_in, kap, dlogkap_dlogRho, dlogkap_dlogT, ierr)
+
+         use const_def, only: boltz_sigma
          real(dp), intent(in) :: zbar, logRho_in, logT_in
-         real(dp), intent(out) :: kap, dlogK_dlogRho, dlogK_dlogT
+         real(dp), intent(out) :: kap, dlogkap_dlogRho, dlogkap_dlogT
          integer, intent(out) :: ierr
          
          integer :: iz, iz1, iz2, shift
          real(dp) :: zlog, logRho, logT
-         real(dp) :: alfa, beta, logK, &
+         real(dp) :: alfa, beta, &
             logK1, kap1, dlogK1_dlogRho, dlogK1_dlogT, &
-            logK2, kap2, dlogK2_dlogRho, dlogK2_dlogT
+            logK2, kap2, dlogK2_dlogRho, dlogK2_dlogT, &
+            logK, logkap, dlogK_dlogRho, dlogK_dlogT
          real(dp), pointer :: f1(:)
-            
+
+         logical :: clipped_logRho, clipped_logT
+
          include 'formats'
          
          ierr = 0
          shift = 4*num_logRhos*num_logTs
 
-         logRho = max(logRhos(1),min(logRhos(num_logRhos),logRho_in))
-         logT = max(logTs(1),min(logTs(num_logTs),logT_in))
+         if (logRho_in .lt. logRhos(1)) then
+            logRho = logRhos(1)
+            clipped_logRho = .true.
+         else if (logRho_in .gt. logRhos(num_logRhos)) then
+            logRho = logRhos(num_logRhos)
+            clipped_logRho = .true.
+         else
+            logRho = logRho_in
+            clipped_logRho = .false.
+         end if
+
+         if (logT_in .lt. logTs(1)) then
+            logT = logTs(1)
+            clipped_logT = .true.
+         else if (logT_in .gt. logTs(num_logTs)) then
+            logT = logTs(num_logTs)
+            clipped_logT = .true.
+         else
+            logT = logT_in
+            clipped_logT = .false.
+         end if
+
          zlog = max(logzs(1),min(logzs(num_logzs),log10(max(1d-30,zbar))))
          
          if (zlog <= logzs(1)) then ! use 1st
@@ -210,18 +236,32 @@
          alfa = (zlog - logzs(iz1)) / (logzs(iz2) - logzs(iz1))
          beta = 1d0-alfa
          logK = alfa*logK2 + beta*logK1
-         dlogK_dlogRho = alfa*dlogK2_dlogRho + beta*dlogK1_dlogRho
-         dlogK_dlogT = alfa*dlogK2_dlogT + beta*dlogK1_dlogT
+         if (clipped_logRho) then
+            dlogK_dlogRho = 0
+         else
+            dlogK_dlogRho = alfa*dlogK2_dlogRho + beta*dlogK1_dlogRho
+         end if
+         if (clipped_logT) then
+            dlogK_dlogT = 0
+         else
+            dlogK_dlogT = alfa*dlogK2_dlogT + beta*dlogK1_dlogT
+         end if
 
-         kap = exp10(logK)
+         ! chi = thermal conductivity, = 10**logK (cgs units)
+         ! conduction opacity kappa = 16*boltz_sigma*T^3 / (3*rho*chi)
+         ! logkap = 3*logT - logRho - logK + log10(16*boltz_sigma/3)
+
+         logkap = 3d0*logT_in - logRho_in - logK + log10(16d0 * boltz_sigma / 3d0)
          
-         
+         kap = exp10(logkap)
+         dlogkap_dlogRho = -1d0 - dlogK_dlogRho
+         dlogkap_dlogT = 3d0 - dlogK_dlogT
+
          contains
          
          
          subroutine get1(iz, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             use kap_eval_support, only: Do_Kap_Interpolations
-            use const_def
             integer, intent(in) :: iz
             real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
             integer, intent(out) :: ierr
@@ -261,20 +301,160 @@
             
             call Do_Kap_Interpolations( &
                f1, num_logRhos, num_logTs, i_logRho, j_logT, logRho0, &
-               logRho, logRho1, logT0, logT, logT1, fval, df_dx, df_dy)
+               logRho, logRho1, logT0, logT, logT1, logK, dlogK_dlogRho, dlogK_dlogT)
             if (ierr /= 0) return
-            
-            ! fval(1) = CK; fval(2) = DRK = dCK/dlogRho; fval(3) = DTK = dCK/dlogT
-            ! chi = thermal conductivity, = 10**CK (cgs units)
-            ! conduction opacity kappa = 16*boltz_sigma*T^3 / (3*rho*chi)
-            ! logK = 3*logT - logRho - CK + log10(16*boltz_sigma/3)
-            logK = 3d0*logT - logRho - fval + log10(16d0 * boltz_sigma / 3d0)
-            if (dbg) write(*,2) 'do_electron_conduction', iz, logK
-            dlogK_dlogRho = -1d0 - df_dx
-            dlogK_dlogT = 3d0 - df_dy   
             
          end subroutine get1
 
+
+      end subroutine do_electron_conduction_potekhin
+
+
+      subroutine do_electron_conduction_blouin( &
+         zbar, logRho, logT, &
+         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         use const_def, only: dp
+         use auto_diff
+         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho ! the density
+         real(dp), intent(in) :: logT ! the temperature
+         real(dp), intent(out) :: kap ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         integer, intent(out) :: ierr ! 0 means AOK.
+
+         ! this implements the correction formulae from Blouin et al. (2020)
+         ! https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract
+
+         real(dp), parameter :: alpha_H = -0.52d0, alpha_He = -0.46d0
+         real(dp), parameter :: a_H = 2.0d0, a_He = 1.25d0
+         real(dp), parameter :: b_H = 10.0d0, b_He = 2.5d0
+         real(dp), parameter :: logRho0_H = 5.45d0, logRho0_He = 6.50d0
+         real(dp), parameter :: logT0_H = 8.40d0, logT0_He = 8.57d0
+         real(dp), parameter :: sigRho_H = 5.14d0, sigRho_He = 6.20d0
+         real(dp), parameter :: sigT_H = 0.45d0, sigT_He = 0.55d0
+
+         type(auto_diff_real_2var_order1) :: logRho_auto, logT_auto
+         type(auto_diff_real_2var_order1) :: Rhostar, Tstar
+         type(auto_diff_real_2var_order1) :: g_H, g_He, H_H, H_He
+         type(auto_diff_real_2var_order1) :: log_correction, log_correction_H, log_correction_He
+
+         real(dp) :: alfa, frac_H, frac_He
+
+         ! auto_diff
+         ! var1: lnRho
+         ! var2: lnT
+
+         logRho_auto = logRho
+         logRho_auto% d1val1 = iln10
+         logT_auto = logT
+         logT_auto% d1val2 = iln10
+
+         ! call previous standard routines (Cassisi/Potekhin)
+         call do_electron_conduction_potekhin( &
+            zbar, logRho, logT, &
+            kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+
+         ! combined correction
+         !
+         ! The thermal conductivity is tabulated at Zbar = {1,2,3,4,6,...}
+         ! and linear interpolation in logK vs logZbar is applied.
+         !
+         ! Therefore, we apply the Blouin+ 2020 corrections in a manner
+         ! equivalent to individually correcting the Zbar = {1,2} tables.
+
+         if (Zbar .le. 1d0) then ! all H
+            frac_H = 1d0
+            frac_He = 0d0
+         else if (Zbar .le. 2d0) then ! mix H and He
+            alfa = (log10(Zbar) - log10(1d0)) / (log10(2d0) - log10(1d0))
+            frac_H = 1d0 - alfa
+            frac_He = alfa
+         else if (Zbar .le. 3d0) then ! mix He and no correction
+            alfa = (log10(Zbar) - log10(2d0)) / (log10(3d0) - log10(2d0))
+            frac_H = 0d0
+            frac_He = 1d0 - alfa
+         else ! no correction
+            frac_H = 0d0
+            frac_He = 0d0
+            return
+         end if
+
+
+         if (frac_H .gt. 0) then
+
+            ! correction for H
+            Rhostar = logRho_auto - logRho0_H
+            Tstar = logT_auto - logT0_H
+
+            g_H = a_H * exp(&
+               -pow2(Tstar*cos(alpha_H) + Rhostar*sin(alpha_H))/pow2(sigT_H)  &
+               -pow2(Tstar*sin(alpha_H) - Rhostar*cos(alpha_H))/pow2(sigRho_H))
+
+            H_H = 0.5d0 * tanh(b_H*(g_H-0.5d0)) + 0.5d0
+
+            log_correction_H = -log(1d0 + g_H * H_H)
+
+         else
+
+            log_correction_H = 0d0
+
+         end if
+
+
+         if (frac_He .gt. 0) then
+
+            ! correction for He
+            Rhostar = logRho_auto - logRho0_He
+            Tstar = logT_auto - logT0_He
+
+            g_He = a_He * exp(&
+               -pow2(Tstar*cos(alpha_He) + Rhostar*sin(alpha_He))/pow2(sigT_He)  &
+               -pow2(Tstar*sin(alpha_He) - Rhostar*cos(alpha_He))/pow2(sigRho_He))
+
+            H_He = 0.5d0 * tanh(b_He*(g_He-0.5d0)) + 0.5d0
+
+            log_correction_He = -log(1d0 + g_He * H_He)
+
+         else
+
+            log_correction_He = 0d0
+
+         end if
+
+
+         ! blend H correction, He correction, and other correction (none)
+         log_correction = frac_H * log_correction_H + frac_He * log_correction_He
+
+         ! apply correction factor
+         kap = exp(log(kap) + log_correction% val)
+         dlnkap_dlnRho = dlnkap_dlnRho + log_correction% d1val1
+         dlnkap_dlnT = dlnkap_dlnT + log_correction% d1val2
+
+      end subroutine do_electron_conduction_blouin
+
+      subroutine do_electron_conduction( &
+         rq, zbar, logRho, logT, &
+         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         use kap_def, only: Kap_General_Info
+         type (Kap_General_Info), pointer, intent(in) :: rq
+         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho ! the density
+         real(dp), intent(in) :: logT ! the temperature
+         real(dp), intent(out) :: kap ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         integer, intent(out) :: ierr ! 0 means AOK.
+
+         if (rq% use_blouin_conductive_opacities) then
+            call do_electron_conduction_blouin( &
+               zbar, logRho, logT, &
+               kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         else
+            call do_electron_conduction_potekhin( &
+               zbar, logRho, logT, &
+               kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         end if
 
       end subroutine do_electron_conduction
 

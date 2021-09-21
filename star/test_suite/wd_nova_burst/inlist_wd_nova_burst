@@ -7,11 +7,15 @@
       show_log_description_at_start = .false.
       
       load_saved_model = .true.
-      saved_model_name = 'ready.mod' ! from running inlist_setup
+      load_model_filename = 'ready.mod' ! from running inlist_setup
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
       required_termination_code_string = 'extras_check_model'
+
+!      save_model_when_terminate = .true.
+!      save_model_filename = 'start_of_wd_nova_burst.mod'
+!      required_termination_code_string = 'max_model_number'
 
       set_initial_age = .true.
       initial_age = 0
@@ -48,12 +52,12 @@
 &controls
 
       ! limit max_model_number as part of test_suite
+      !max_model_number = 223
       max_model_number = 2250
       
 ! solver
 
-      use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
       
       use_gold2_tolerances = .false.
 
@@ -76,7 +80,7 @@
          ! e.g., if this is 2, then only get wind when L > 2*Ledd
 
       mixing_length_alpha = 1.9
-      MLT_option = 'Henyey'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 1d-3
@@ -122,6 +126,8 @@
       Pextra_factor = 120 ! 4 * tau_factor
 
       !varcontrol_target = 3d-4
+      
+      max_q_for_conv_timescale = 0.999999999d0
 
       mesh_delta_coeff = 1.0
       max_allowed_nz = 20000
@@ -141,6 +147,7 @@
 
 
 &pgstar
+
          Grid8_win_flag = .true.
          Grid8_win_width = 7
          Summary_Burn_xaxis_name = 'logxq' 
@@ -151,5 +158,11 @@
          Abundance_xaxis_reversed = .true.
          Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
          Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
+
+    Text_Summary1_name(5,2) = 'time_step_sec'
+    Text_Summary1_name(6,2) = 'max_tau_conv'
+    !Text_Summary1_name(7,2) = 'cz_bot_radius'
+    !Text_Summary1_name(8,2) = 'cz_top_radius'
+
 / ! end of pgstar namelist
 

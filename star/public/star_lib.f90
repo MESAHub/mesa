@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -170,9 +170,8 @@
             s% job% special_weak_transitions_file, &
             s% job% jina_reaclib_min_T9, &
             s% job% rate_tables_dir, s% job% rate_cache_suffix, &
-            s% job% ionization_file_prefix, s% job% ionization_Z1_suffix, &
             s% job% eosDT_cache_dir, &
-            s% job% ionization_cache_dir, s% job% kap_cache_dir, s% job% rates_cache_dir, &
+            s% job% kap_cache_dir, s% job% rates_cache_dir, &
             s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
             ierr)
       end subroutine starlib_init
@@ -186,9 +185,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use init, only: do_star_init
@@ -197,9 +195,8 @@
             jina_reaclib_filename, rate_tables_dir, &
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir
+            kap_cache_dir, rates_cache_dir
          real(dp), intent(in) :: &
             reaclib_min_T9
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
@@ -215,9 +212,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
       end subroutine do_starlib_init
@@ -507,15 +503,6 @@
       end subroutine star_write_photo
       
       
-      subroutine star_read_RSP_model(id, model_fname, ierr)
-         use init, only: load_saved_RSP_model
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr      
-         call load_saved_RSP_model(id, model_fname, ierr)     
-      end subroutine star_read_RSP_model
-      
-      
       subroutine star_read_model(id, model_fname, ierr)
          use init, only: load_saved_model
          integer, intent(in) :: id
@@ -648,7 +635,7 @@
          use evolve, only: finish_step
          integer, intent(in) :: id
          integer, intent(out) :: ierr
-         star_finish_step = finish_step(id, .false., ierr)
+         star_finish_step = finish_step(id, ierr)
       end function star_finish_step
 
       
@@ -672,17 +659,6 @@
          integer, intent(in) :: id
          star_prepare_to_retry = prepare_to_retry(id)
       end function star_prepare_to_retry
-      
-      
-      ! at the end of the evolution run, call this to do things such as
-      ! closing log files.
-      subroutine star_after_evolve(id, ierr)
-         use do_one_utils, only: do_one_finish
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         call do_one_finish(id, ierr)
-      end subroutine star_after_evolve
-
 
       ! typically, after the namelist controls file has been read by the star setup routine, 
       ! you won't need to do anything else with it.   But in case you want
@@ -821,7 +797,7 @@
       ! this routine is for changing use of Rayleigh-Taylor instabilities.
       ! simply changes variables; doesn't reconverge the model.
       subroutine star_set_RTI_flag(id, RTI_flag, ierr)
-         use alloc, only: set_RTI_flag
+         use set_flags, only: set_RTI_flag
          integer, intent(in) :: id
          logical, intent(in) :: RTI_flag
          integer, intent(out) :: ierr
@@ -829,7 +805,7 @@
       end subroutine star_set_RTI_flag
 
       subroutine star_set_conv_vel_flag(id, conv_vel_flag, ierr)
-         use alloc, only: set_conv_vel_flag
+         use set_flags, only: set_conv_vel_flag
          integer, intent(in) :: id
          logical, intent(in) :: conv_vel_flag
          integer, intent(out) :: ierr
@@ -837,7 +813,7 @@
       end subroutine star_set_conv_vel_flag
 
       subroutine star_set_w_div_wc_flag(id, w_div_wc_flag, ierr)
-         use alloc, only: set_w_div_wc_flag
+         use set_flags, only: set_w_div_wc_flag
          integer, intent(in) :: id
          logical, intent(in) :: w_div_wc_flag
          integer, intent(out) :: ierr
@@ -846,7 +822,7 @@
       end subroutine star_set_w_div_wc_flag
 
       subroutine star_set_j_rot_flag(id, j_rot_flag, ierr)
-         use alloc, only: set_j_rot_flag
+         use set_flags, only: set_j_rot_flag
          integer, intent(in) :: id
          logical, intent(in) :: j_rot_flag
          integer, intent(out) :: ierr
@@ -855,20 +831,20 @@
       end subroutine star_set_j_rot_flag
 
 
-      subroutine star_set_TDC_flag(id, et_flag, ierr)
-         use alloc, only: set_TDC_flag
+      subroutine star_set_RSP2_flag(id, et_flag, ierr)
+         use set_flags, only: set_RSP2_flag
          integer, intent(in) :: id
          logical, intent(in) :: et_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call set_TDC_flag(id, et_flag, ierr)
-      end subroutine star_set_TDC_flag
+         call set_RSP2_flag(id, et_flag, ierr)
+      end subroutine star_set_RSP2_flag
 
 
       subroutine star_set_RSP_flag(id, RSP_flag, ierr)
-         use alloc, only: set_RSP_flag
+         use set_flags, only: set_RSP_flag
          integer, intent(in) :: id
          logical, intent(in) :: RSP_flag
          integer, intent(out) :: ierr
@@ -877,7 +853,7 @@
 
       
       subroutine star_set_D_omega_flag(id, D_omega_flag, ierr)
-         use alloc, only: set_D_omega_flag
+         use set_flags, only: set_D_omega_flag
          integer, intent(in) :: id
          logical, intent(in) :: D_omega_flag
          integer, intent(out) :: ierr
@@ -886,7 +862,7 @@
       
       
       subroutine star_set_am_nu_rot_flag(id, am_nu_rot_flag, ierr)
-         use alloc, only: set_am_nu_rot_flag
+         use set_flags, only: set_am_nu_rot_flag
          integer, intent(in) :: id
          logical, intent(in) :: am_nu_rot_flag
          integer, intent(out) :: ierr
@@ -897,7 +873,7 @@
       ! this routine is for adding or removing velocity variables.
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_v_flag(id, v_flag, ierr)
-         use alloc, only: set_v_flag
+         use set_flags, only: set_v_flag
          integer, intent(in) :: id
          logical, intent(in) :: v_flag
          integer, intent(out) :: ierr
@@ -908,7 +884,7 @@
       ! this routine is for adding or removing velocity variables.
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_u_flag(id, u_flag, ierr)
-         use alloc, only: set_u_flag
+         use set_flags, only: set_u_flag
          integer, intent(in) :: id
          logical, intent(in) :: u_flag
          integer, intent(out) :: ierr
@@ -919,7 +895,7 @@
       ! this routine is for adding or removing rotation variables.
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_rotation_flag(id, rotation_flag, ierr)
-         use alloc, only: set_rotation_flag
+         use set_flags, only: set_rotation_flag
          use hydro_rotation, only: set_rotation_info, set_i_rot
          integer, intent(in) :: id
          logical, intent(in) :: rotation_flag
@@ -1096,7 +1072,7 @@
       
       
       subroutine star_zero_alpha_RTI(id, ierr)
-         use alloc, only: set_zero_alpha_RTI
+         use star_utils, only: set_zero_alpha_RTI
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          call set_zero_alpha_RTI(id, ierr)
@@ -1995,8 +1971,7 @@
       
       subroutine star_info_at_q(s, q, &
             kbdy, m, r, lgT, lgRho, L, v, &
-            lgP, g, X, Y, edv_H, edv_He, &
-            scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
+            lgP, g, X, Y, scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
             omega, omega_div_omega_crit)
          use report, only: get_info_at_q
          type (star_info), pointer :: s
@@ -2004,13 +1979,11 @@
          integer, intent(out) :: kbdy
          real(dp), intent(out) :: &
             m, r, lgT, lgRho, L, v, &
-            lgP, g, X, Y, edv_H, edv_He, &
-            scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
+            lgP, g, X, Y, scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
             omega, omega_div_omega_crit
          call get_info_at_q(s, q, &
             kbdy, m, r, lgT, lgRho, L, v, &
-            lgP, g, X, Y, edv_H, edv_He, &
-            scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
+            lgP, g, X, Y, scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
             omega, omega_div_omega_crit)
       end subroutine star_info_at_q
       
@@ -2226,6 +2199,7 @@
          if (ierr /= 0) return
          call do_eos_for_cell(s, k, ierr)
        end subroutine star_do_eos_for_cell
+
        
        subroutine star_do_kap_for_cell(id, k, ierr)
           use micro, only: do_kap_for_cell
@@ -2238,6 +2212,7 @@
          if (ierr /= 0) return
          call do_kap_for_cell(s, k, ierr)
        end subroutine star_do_kap_for_cell
+
        
        subroutine star_get_atm_PT( &
              id, tau_surf, L, R, M, cgrav, skip_partials, Teff, &
@@ -2248,8 +2223,9 @@
          integer, intent(in) :: id
          real(dp), intent(in) :: tau_surf, L, R, M, cgrav
          logical, intent(in) :: skip_partials
+         real(dp), intent(in) :: Teff
          real(dp), intent(out) :: &
-            Teff, lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
+            lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -2263,10 +2239,10 @@
              lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
              ierr)
        end subroutine star_get_atm_PT
+
        
        subroutine star_get_surf_PT( &
             id, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
-            Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -2274,7 +2250,7 @@
          integer, intent(in) :: id
          logical, intent(in) :: skip_partials, need_atm_Psurf, need_atm_Tsurf
          real(dp), intent(out) :: &
-            Teff, lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
+            lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -2283,7 +2259,6 @@
          if (ierr /= 0) return
          call get_surf_PT( &
             s, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
-            Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -2426,40 +2401,6 @@
       end subroutine star_set_dm_bar
       
       
-      subroutine star_adjust_gradT_fraction(id, k, f)
-         ! replace gradT by combo of grada_at_face and gradr
-         ! s% gradT(k) = f*s% grada_at_face(k) + (1-f)*s% gradr(k)
-         ! and fixup other info that depends on this (e.g. partials)
-         use mlt_info, only: adjust_gradT_fraction
-         integer, intent(in) :: id, k        
-         real(dp), intent(in) :: f
-         integer :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) then
-            return
-         end if
-         call adjust_gradT_fraction(s, k, f)
-      end subroutine star_adjust_gradT_fraction
-
-      
-      ! call this if you change gradT
-      subroutine star_adjust_gradT_excess(id, k)
-         ! adjust efficiency of energy transport
-         use mlt_info, only: adjust_gradT_excess
-         integer, intent(in) :: id, k        
-         integer :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) then
-            return
-         end if
-         call adjust_gradT_excess(s, k)
-      end subroutine star_adjust_gradT_excess
-      
-      
       subroutine star_remove_center_at_cell_k(id, k, ierr)
          use remove_shells, only: do_remove_center_at_cell_k
          integer, intent(in) :: id, k
@@ -2502,6 +2443,15 @@
          integer, intent(out) :: ierr
          call do_remove_center_by_he4(id, x, ierr)      
       end subroutine star_remove_center_by_he4
+      
+      
+      subroutine star_remove_center_by_c12_o16(id, x, ierr)
+         use remove_shells, only: do_remove_center_by_c12_o16
+         integer, intent(in) :: id
+         real(dp), intent(in) :: x ! mass fraction
+         integer, intent(out) :: ierr
+         call do_remove_center_by_c12_o16(id, x, ierr)      
+      end subroutine star_remove_center_by_c12_o16
       
       
       subroutine star_remove_center_by_si28(id, x, ierr)
@@ -2842,7 +2792,7 @@
          type (star_info), pointer :: s
          character (len=*), intent(in) :: xaxis_by
          real, intent(in) :: win_xmin_in, win_xmax_in, xmargin
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          real, intent(out) :: xmin, xmax, xleft, xright, dx
          integer, intent(out) :: grid_min, grid_max, npts
          integer, intent(out) :: ierr
@@ -3003,15 +2953,12 @@
       end subroutine star_history_values
 
 
-      integer function star_get_profile_id(s,name)
+      integer function star_get_profile_id(s, name)
+         ! If star_get_profile_id <0  then it failed to find the column
          use profile_getval, only: get_profile_id
          type (star_info), pointer :: s
          character(len=*),intent(in) :: name
          star_get_profile_id = get_profile_id(s,name)
-         if (star_get_profile_id < 0) THEN
-            write(*,*) "FATAL ERROR Bad value for profile name ",trim(name)
-            stop 'star_get_profile_id'
-         end if
       end function star_get_profile_id
 
 
@@ -3028,7 +2975,11 @@
          type (star_info), pointer :: s
          character(len=*),intent(in) :: name
          integer,intent(in) :: k
-         star_get_profile_output = get_profile_val(s,star_get_profile_id(s,name),k)
+         integer :: id
+         star_get_profile_output = -HUGE(star_get_profile_output)
+         id = star_get_profile_id(s,name)
+         if(id<0) return
+         star_get_profile_output = get_profile_val(s,id,k)
       end function star_get_profile_output
 
       real(dp) function star_get_profile_output_by_id(id, name, k)
@@ -3056,6 +3007,7 @@
       
 
       real(dp) function star_get_history_output(s,name)
+         ! If error return -huge(double)
          use history, only: get_history_specs, get_history_values, get1_hist_value
          type (star_info), pointer :: s   
          character(len=*),intent(in) :: name
@@ -3070,8 +3022,8 @@
             is_int_value, int_values, values, failed_to_find_value)
          if (failed_to_find_value(num_rows)) then
             if (.not. get1_hist_value(s, name, values(num_rows))) then
-               write(*,*) "FATAL ERROR Bad value for history name ",trim(name)
-               stop 'star_get_history_output'
+               star_get_history_output = -HUGE(star_get_history_output)
+               return
             end if
          end if
          if (is_int_value(1)) then 
@@ -3092,120 +3044,6 @@
          star_get_history_output_by_id = star_get_history_output(s, name)
       end function star_get_history_output_by_id
       
-      subroutine star_mlt_eval( &
-            id, k, cgrav, m, mstar, r, L, X, &            
-            T_face, rho_face, P_face, &
-            chiRho_face, chiT_face, &
-            Cp_face, opacity_face, grada_face, &            
-            alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
-            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-            chiRho_for_partials_00, chiT_for_partials_00, &
-            chiRho_for_partials_m1, chiT_for_partials_m1, &
-            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
-            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-            alpha_semiconvection, semiconvection_option, &
-            thermohaline_coeff, thermohaline_option, &
-            dominant_iso_for_thermohaline, &
-            mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
-            MLT_option, Henyey_y_param, Henyey_nu_param, &
-            normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, just_gradr, &
-            mixing_type, mlt_basics, mlt_partials1, ierr)
-         use mlt_get_results, only: Get_results
-         use star_def
-         integer, intent(in) :: id ! id for star         
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
-         real(dp), intent(in) :: &
-            cgrav, m, mstar, r, L, X, &            
-            T_face, rho_face, P_face, &
-            chiRho_face, chiT_face, &
-            Cp_face, opacity_face, grada_face, &            
-            alfa, beta, &
-            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-            chiRho_for_partials_00, chiT_for_partials_00, &
-            chiRho_for_partials_m1, chiT_for_partials_m1, &
-            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &
-            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-            alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
-            Henyey_y_param, Henyey_nu_param, &
-            max_conv_vel, dt, tau, remove_small_D_limit, &
-            normal_mlt_gradT_factor
-         logical, intent(in) :: alt_scale_height
-         character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
-         integer, intent(in) :: dominant_iso_for_thermohaline
-         logical, intent(in) :: just_gradr
-         integer, intent(out) :: mixing_type
-         real(dp), intent(inout) :: mlt_basics(:) ! (num_mlt_results)
-         real(dp), intent(inout), pointer :: mlt_partials1(:) ! =(num_mlt_partials, num_mlt_results)
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         real(dp), pointer :: mlt_partials(:,:)
-         mlt_partials(1:num_mlt_partials,1:num_mlt_results) => &
-            mlt_partials1(1:num_mlt_partials*num_mlt_results)
-         ierr = 0
-         mlt_basics = 0
-         mlt_partials = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call Get_results(s, k, &
-            cgrav, m, mstar, r, L, X, &            
-            T_face, rho_face, P_face, &
-            chiRho_face, chiT_face, &
-            Cp_face, opacity_face, grada_face, &            
-            alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
-            T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-            chiRho_for_partials_00, chiT_for_partials_00, &
-            chiRho_for_partials_m1, chiT_for_partials_m1, &
-            chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-            chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-            chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-            chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-            Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-            Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-            opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-            opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-            grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-            grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
-            gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-            alpha_semiconvection, semiconvection_option, &
-            thermohaline_coeff, thermohaline_option, &
-            dominant_iso_for_thermohaline, &
-            mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
-            MLT_option, Henyey_y_param, Henyey_nu_param, &
-            normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, just_gradr, &
-            mixing_type, &
-            mlt_basics(mlt_gradT), mlt_partials(:,mlt_gradT), &
-            mlt_basics(mlt_gradr), mlt_partials(:,mlt_gradr), &
-            mlt_basics(mlt_gradL), mlt_partials(:,mlt_gradL), &
-            mlt_basics(mlt_scale_height), mlt_partials(:,mlt_scale_height), &
-            mlt_basics(mlt_Lambda), mlt_partials(:,mlt_Lambda), &
-            mlt_basics(mlt_convection_velocity), mlt_partials(:,mlt_convection_velocity), &
-            mlt_basics(mlt_D), mlt_partials(:,mlt_D), &
-            mlt_basics(mlt_D_semi), mlt_partials(:,mlt_D_semi), &
-            mlt_basics(mlt_D_thrm), mlt_partials(:,mlt_D_thrm), &
-            mlt_basics(mlt_gamma), mlt_partials(:,mlt_gamma), &
-            ierr)
-      end subroutine star_mlt_eval
-      
       
       subroutine star_set_mlt_vars(id, nzlo, nzhi, ierr)
          use mlt_info, only: set_mlt_vars
@@ -3218,6 +3056,64 @@
          if (ierr /= 0) return                  
          call set_mlt_vars(s, nzlo, nzhi, ierr)
       end subroutine star_set_mlt_vars
+
+      
+      subroutine star_mlt_gradT(id, MLT_option, & ! can be useful when creating models
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+         use const_def, only: dp
+         use mlt_get_results, only: get_gradT
+         integer, intent(in) :: id
+         character (len=*), intent(in) :: MLT_option
+         real(dp), intent(in) :: &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            XH1, cgrav, m, gradL_composition_term, mixing_length_alpha
+         integer, intent(in) :: iso
+         real(dp), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
+         integer, intent(out) :: mixing_type, ierr 
+         type (star_info), pointer :: s         
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return  
+         call get_gradT(s, MLT_option, &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)         
+      end subroutine star_mlt_gradT
+
+
+      subroutine star_mlt_results(id, k, MLT_option, &  ! NOTE: k=0 is a valid arg
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            alpha_semiconvection, thermohaline_coeff, &
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+         use const_def, only: dp
+         use auto_diff
+         use mlt_get_results, only: Get_results
+         integer, intent(in) :: id
+         integer, intent(in) :: k
+         character (len=*), intent(in) :: MLT_option
+         type(auto_diff_real_star_order1), intent(in) :: &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height
+         integer, intent(in) :: iso
+         real(dp), intent(in) :: &
+            XH1, cgrav, m, gradL_composition_term, &
+            mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
+         integer, intent(out) :: mixing_type
+         type(auto_diff_real_star_order1), intent(out) :: &
+            gradT, Y_face, conv_vel, D, Gamma
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: dV
+         type (star_info), pointer :: s         
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return  
+         dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
+         call Get_results(s, k, MLT_option, &
+            r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            alpha_semiconvection, thermohaline_coeff, &
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+      end subroutine star_mlt_results
 
 
       subroutine star_do_garbage_collection(id, ierr)
@@ -3250,6 +3146,14 @@
          integer, intent(out) :: ierr
          call create_RSP_model(id, ierr)
       end subroutine star_create_RSP_model
+
+      
+      subroutine star_create_RSP2_model(id, ierr)
+         use init, only: create_RSP2_model
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         call create_RSP2_model(id, ierr)
+      end subroutine star_create_RSP2_model
 
       
       subroutine star_do1_rsp_build(s,ierr)
@@ -3322,6 +3226,28 @@
             s, limit, hard_limit, value, msg, skip_hard_limit, dt, dt_limit_ratio)
       end function check_change_integer_timestep_limit
       
+      
+      real(dp) function star_remnant_mass(id)
+         use star_utils, only: get_remnant_mass
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer ::  ierr
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         star_remnant_mass = get_remnant_mass(s)
+      end function star_remnant_mass
+      
+      
+      real(dp) function star_ejecta_mass(id)
+         use star_utils, only: get_ejecta_mass
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer ::  ierr
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         star_ejecta_mass = get_ejecta_mass(s)
+      end function star_ejecta_mass
+      
 
       ! Returns the next available star id
       integer function star_find_next_star_id()
@@ -3336,4 +3262,66 @@
       end subroutine star_init_star_handles
       
       
+      subroutine star_get_control_namelist(id, name, val, ierr)
+         use ctrls_io, only: get_control
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call get_control(s, name, val, ierr)
+
+      end subroutine star_get_control_namelist
+
+      subroutine star_set_control_namelist(id, name, val, ierr)
+         use ctrls_io, only: set_control
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call set_control(s, name, val, ierr)
+
+      end subroutine star_set_control_namelist
+
+
+      subroutine star_get_star_job_namelist(id, name, val, ierr)
+         use star_job_ctrls_io, only: get_star_job
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call get_star_job(s, name, val, ierr)
+
+      end subroutine star_get_star_job_namelist
+
+      subroutine star_set_star_job_namelist(id, name, val, ierr)
+         use star_job_ctrls_io, only: set_star_job
+         integer, intent(in) :: id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if(ierr/=0) return
+         call set_star_job(s, name, val, ierr)
+
+      end subroutine star_set_star_job_namelist
+
+
       end module star_lib

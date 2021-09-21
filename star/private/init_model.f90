@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -46,13 +46,11 @@
 
          real(dp), parameter :: lg_max_abs_mdot = -3.5d0
          real(dp) :: init_mass, init_z
-         logical :: want_RSP_model, is_rsp_model
 
          init_mass = s% initial_mass
          init_z = s% initial_z
 
-         want_RSP_model = .false.
-         call do_read_saved_model(s, fullname, want_RSP_model, is_rsp_model, ierr)
+         call do_read_saved_model(s, fullname, ierr)
          if (ierr /= 0) return
 
          if (abs(s% initial_z - init_z) > 1d-3*init_z) then
@@ -419,7 +417,7 @@
 
                if (m_read == m1) then
                   call read1_model( &
-                     s, species, nvar_hydro, nz, iounit, .false., .false., &
+                     s, species, nvar_hydro, nz, iounit, &
                      xh, xa, q, dq, omega, j_rot, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
@@ -428,7 +426,7 @@
                   nz = nz2
                else
                   call read1_model( &
-                     s, species, nvar_hydro, nz, iounit, .false., .false., &
+                     s, species, nvar_hydro, nz, iounit, &
                      xh2, xa2, q2, dq2, omega2, j_rot2, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.

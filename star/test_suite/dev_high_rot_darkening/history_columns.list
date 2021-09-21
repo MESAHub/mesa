@@ -244,21 +244,7 @@
 
    ! info about locations where optical depth is 10 or 100
 
-      !tau10_mass ! mass in solar units where optical depth = 10
-      !tau10_radius ! radius in solar units where optical depth = 10
-      !tau10_lgP ! estimate for log10(P) at tau = 10
-      !tau10_T ! estimate for T at tau = 10
-      !tau10_lgT ! estimate for log10(T) at tau = 10
-      !tau10_lgRho ! estimate for log10(density) at tau = 10
-      !tau10_L ! estimate for L/Lsun at tau = 10
       
-      !tau100_mass ! location in solar units where optical depth = 100
-      !tau100_radius ! location in solar units where optical depth = 100
-      !tau100_lgP ! estimates for values at tau = 100
-      !tau100_T
-      !tau100_lgT
-      !tau100_lgRho
-      !tau100_L
 
    ! timescales
       
@@ -314,8 +300,6 @@
       !lum_div_Ledd
       !log_surf_opacity
       !log_surf_P
-      !log_surf_pressure
-      !log_surf_density
       !log_surf_temperature
       !surface_temperature
       !log_surf_optical_depth
@@ -460,76 +444,18 @@
    ! info about the max burning locations for hydrogen, helium, and metals
       
       ! info about location where have max rate of hydrogen burning (PP and CNO)
-      !max_eps_h ! erg/g/s
-      !max_eps_h_lgT ! log10 temperature at location of max burn
-      !max_eps_h_lgRho ! log10 density at location of max burn
-      !max_eps_h_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_h_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_h_lgP ! log10 pressure at location of max burn
-      !max_eps_h_lgR ! log10 radius at location of max burn
-      !max_eps_h_opacity ! opacity at location of max burn
       
       ! info about location where have max rate of helium burning
          ! triple-alpha plus alpha capture on C12, N14, O16, and Ne20.
-      !max_eps_he ! erg/g/s
-      !max_eps_he_lgT ! log10 temperature at location of max_eps_he
-      !max_eps_he_lgRho ! log10 density at location of max burn
-      !max_eps_he_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_he_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_he_lgP ! log10 pressure at location of max burn
-      !max_eps_he_lgR ! log10 radius at location of max burn
-      !max_eps_he_opacity ! opacity at location of max burn
       
       ! info about location where have max rate of burning of metals
          ! alpha capture on heavy elements plus C+C, C+O, O+O, etc.
-      !max_eps_z ! erg/g/s
-      !max_eps_z_lgT ! log10 temperature at location of max burn
-      !max_eps_z_lgRho ! log10 density at location of max burn
-      !max_eps_z_m ! mass coordinate at location of max burn (Msun units)      
-      !max_eps_z_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_z_lgP ! log10 pressure at location of max burn
-      !max_eps_z_lgR ! log10 radius at location of max burn
-      !max_eps_z_opacity ! opacity at location of max burn
       
       ! info about location where have max rate of burning of all types
-      !max_eps_nuc ! erg/g/s
-      !max_eps_nuc_lgT ! log10 temperature at location of max burn
-      !max_eps_nuc_lgRho ! log10 density at location of max burn
-      !max_eps_nuc_m ! mass coordinate at location of max burn (Msun units)      
-      !max_eps_nuc_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_nuc_lgP ! log10 pressure at location of max burn
-      !max_eps_nuc_lgR ! log10 radius at location of max burn
-      !max_eps_nuc_opacity ! opacity at location of max burn
-      !max_eps_nuc_cp ! Cp at location of max burn
-      !max_eps_nuc_t_heat ! Cp*T/eps_nuc at location of max burn
-      !max_eps_nuc_csound
-      !max_eps_nuc_pi_r_div_cs
-      !max_eps_nuc_H ! pressure scale height
-      !max_eps_nuc_H_div_cs
-      !max_eps_nuc_log_xa he4 ! any species
    
    
-   ! info at a specified mass coordinate (given by trace_mass_location)
-      !trace_mass_location ! (Msun)
-      !trace_mass_radius ! (Rsun)
-      !trace_mass_lgT
-      !trace_mass_lgRho
-      !trace_mass_L ! (Lsun)
-      !trace_mass_v
 
-      !trace_mass_lgP
-      !trace_mass_g
-      !trace_mass_X
-      !trace_mass_Y
-      !trace_mass_edv_H
-      !trace_mass_edv_He
-      !trace_mass_scale_height
-      !trace_mass_dlnX_dr
-      !trace_mass_dlnY_dr
-      !trace_mass_dlnRho_dr
 
-      !trace_mass_omega
-      !trace_mass_omega_div_omega_crit
 
    
    ! info at location of max temperature
@@ -574,7 +500,6 @@
       !v_surf ! (cm/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       !v_surf_div_v_kh ! v_surf/(photosphere_r/kh_timescale)
-      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
       
       !e_thermal ! sum over all zones of Cp*T*dm
       

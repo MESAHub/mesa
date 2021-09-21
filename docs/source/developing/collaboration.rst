@@ -102,4 +102,52 @@ MTC.
 Initially, the MTC has 4 members appointed by Bill Paxton. These are
 Josiah, Rich, Pablo, and Rob.
 
-Initially, the MAC will be Lars, Josiah, Rich, and Frank.
+Currently, the MAC is Lars, Rich, and Frank.
+
+
+Instrument Paper Principles
+===========================
+
+.. note::
+
+   These guidelines are principles, not laws. They are not intended to provide an exact or complete definition of the principles in all circumstances and should be understood in that context.
+
+How do authorship invitations arise?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+During the completion of the first five MESA Instrument Papers, there have been multiple channels for co-author invitations.
+
+- Running a non-MESA code in a controlled and engaged manner that enables verification of a NEW MESA capability (e.g., Dessart for shocks).
+
+- Developing a substantial new MESA capability by working with the MESA developers to incorporate existing techniques or codes into MESA (e.g., RSP with Smolec, STELLA with Blinnikov, Sorokina, RTI with Duffell).
+
+- Undertaking a substantial development effort that leads to a new MESA or MESA-related capability (e.g., Marchant on binary, Townsend on GYRE in MESA, Wolf on TestHub).
+
+- Working closely with the MESA developers over a prolonged period to assist in the science or code verification of a new capability (e.g., Brown on massive stars, Arras on planets).
+
+- Making significant and ongoing contributions to the vitality of the MESA project such as by time spent testing and documenting, time spent working on the software to make it more flexible, robust, and reliable, or time spent responding to MESA-Users.
+
+The MAC monitors the evolution of MESA, decides when it is time for an instrument paper, and sets the schedule from initiation to submission. The MAC works to identify individuals it feels are positioned to be invited. It will also query MESA developers about imminent completion of items that might lead to co-author invitations.
+
+
+What does it mean, once invited, to be a co-author?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Prospective co-authors should be prepared to participate by:
+
+1. Completing any sections for which they are a prime author in a timely manner.
+
+2. Reading and commenting on all sections of the paper.
+
+3. Assisting others where needed in items 1 and 2.
+
+4. Fully participating in the 3-4 day close-out session of the paper.
+
+The MAC can relax any of these four items when there is value in doing so.
+
+
+How is it decided who the authors are and their order?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Final authorship and order is decided by the MAC only near the completion time of the paper.
+

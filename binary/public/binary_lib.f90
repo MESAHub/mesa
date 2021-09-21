@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton and Pablo Marchant
+!   Copyright (C) 2013  Pablo Marchant
 !
 !   this file is part of mesa.
 !
@@ -162,6 +162,72 @@
          integer, intent(out) :: ierr
          call eval_wind_xfer_fractions(binary_id, ierr)
       end subroutine binary_eval_wind_xfer_fractions
+
+
+      subroutine binary_get_control_namelist(binary_id, name, val, ierr)
+         use binary_ctrls_io, only: get_binary_control
+         use binary_def, only: binary_info, binary_ptr
+         integer, intent(in) :: binary_id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (binary_info), pointer :: b
+
+         ierr = 0
+         call binary_ptr(binary_id, b, ierr)
+         if(ierr/=0) return
+         call get_binary_control(b, name, val, ierr)
+
+      end subroutine binary_get_control_namelist
+
+      subroutine binary_set_control_namelist(binary_id, name, val, ierr)
+         use binary_ctrls_io, only: set_binary_control
+         use binary_def, only: binary_info, binary_ptr
+         integer, intent(in) :: binary_id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (binary_info), pointer :: b
+
+         ierr = 0
+         call binary_ptr(binary_id, b, ierr)
+         if(ierr/=0) return
+         call set_binary_control(b, name, val, ierr)
+
+      end subroutine binary_set_control_namelist
+
+
+      subroutine binary_get_star_job_namelist(binary_id, name, val, ierr)
+         use binary_job_ctrls_io, only: get_binary_job
+         use binary_def, only: binary_info, binary_ptr
+         integer, intent(in) :: binary_id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(out) :: val
+         integer, intent(out) :: ierr
+         type (binary_info), pointer :: b
+
+         ierr = 0
+         call binary_ptr(binary_id, b, ierr)
+         if(ierr/=0) return
+         call get_binary_job(b, name, val, ierr)
+
+      end subroutine binary_get_star_job_namelist
+
+      subroutine binary_set_star_job_namelist(binary_id, name, val, ierr)
+         use binary_job_ctrls_io, only: set_binary_job
+         use binary_def, only: binary_info, binary_ptr
+         integer, intent(in) :: binary_id
+         character(len=*),intent(in) :: name
+         character(len=*),intent(in) :: val
+         integer, intent(out) :: ierr
+         type (binary_info), pointer :: b
+
+         ierr = 0
+         call binary_ptr(binary_id, b, ierr)
+         if(ierr/=0) return
+         call set_binary_job(b, name, val, ierr)
+
+      end subroutine binary_set_star_job_namelist
 
       end module binary_lib
 

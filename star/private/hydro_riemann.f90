@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2015-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2015-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -57,36 +57,33 @@
       contains
 
 
-      subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, skip_partials, nvar, ierr)
+      subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, nvar, ierr)
          type (star_info), pointer :: s         
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
-         call do1_dudt_eqn(s, 1, P_surf_ad, skip_partials, nvar, ierr)
+         call do1_dudt_eqn(s, 1, P_surf_ad, nvar, ierr)
       end subroutine do_surf_Riemann_dudt_eqn
       
 
-      subroutine do1_Riemann_momentum_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_Riemann_momentum_eqn(s, k, nvar, ierr)
          type (star_info), pointer :: s         
          integer, intent(in) :: k
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: P_surf_ad
          P_surf_ad = 0
-         call do1_dudt_eqn(s, k, P_surf_ad, skip_partials, nvar, ierr)
+         call do1_dudt_eqn(s, k, P_surf_ad, nvar, ierr)
       end subroutine do1_Riemann_momentum_eqn
          
 
       subroutine do1_dudt_eqn( &
-            s, k, P_surf_ad, skip_partials, nvar, ierr)
+            s, k, P_surf_ad, nvar, ierr)
          use accurate_sum_auto_diff_star_order1
-         use star_utils, only: get_area_info, save_eqn_residual_info
+         use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info
          type (star_info), pointer :: s         
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only for k=1
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
       
@@ -119,10 +116,10 @@
          dt = s% dt
          dm = s% dm(k)     
              
-         call get_area_info(s, k, area_00, inv_R2_00, ierr)
+         call get_area_info_opt_time_center(s, k, area_00, inv_R2_00, ierr)
          if (ierr /= 0) return
          if (k < nz) then
-            call get_area_info(s, k+1, area_p1, inv_R2_p1, ierr)
+            call get_area_info_opt_time_center(s, k+1, area_p1, inv_R2_p1, ierr)
             if (ierr /= 0) return
             area_p1 = shift_p1(area_p1)
             inv_R2_p1 = shift_p1(inv_R2_p1)
@@ -164,7 +161,6 @@
             s% solver_test_partials_val = residual
          end if
          
-         if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, i_du_dt, resid_ad, 'do1_dudt_eqn', ierr)
 
          if (test_partials) then
@@ -305,8 +301,8 @@
       
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
-         use star_utils, only: calc_Ptot_ad_tw
-         use hydro_tdc, only: compute_Uq_face
+         use star_utils, only: calc_Ptot_ad_tw, get_face_weights
+         use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -427,14 +423,16 @@
              end if
          end if
          
-         if (s% using_TDC) then ! include Uq in u_face
+         if (s% RSP2_flag) then ! include Uq in u_face
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
          end if
+         
+         s% u_face_val(k) = s% u_face_ad(k)%val
 
          if (s% P_face_start(k) < 0d0) then
-            s% u_face_start(k) = s% u_face_ad(k)%val
+            s% u_face_start(k) = s% u_face_val(k)
             s% P_face_start(k) = s% P_face_ad(k)%val
          end if
 

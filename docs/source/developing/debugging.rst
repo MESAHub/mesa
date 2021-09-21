@@ -743,7 +743,7 @@ must pick the various ``test_partials`` values in the source code.
 This can be tricky in that in some places the abundance is given as an
 index in xa and in others as a variable number for the solver.  This
 offset is ``s% nvar_hydro``, that is the index of the first chem
-equation is ``s% equchem1 == nvar_hydro + 1``.
+equation is ``s% nvar_hydro + 1``.
 
 If you set ``solver_test_partials_write_eos_call_info = .true.``, the
 output includes also includes composition information like the
@@ -813,43 +813,28 @@ Floating point exceptions (fpe) occur when the code attempts to perform an illeg
 
 To test MESA for floating point exceptions we can turn on the compiler checks that will flag when an issue occurs:
 
-If using MESA > 14503 then set the environment variable:
+Set the environment variable
 
 .. code-block:: sh
 
     MESA_FPE_CHECKS_ON=1
 
-Then run ./clean and ./mk in MESA_DIR
+Then run ./clean and ./install in MESA_DIR.
 
-If using MESA <= 14503
+This setting adds the following options in ``utils/makefile_header``
 
-In utils/makefile_header we switch:
+.. literalinclude:: ../../../utils/makefile_header
+   :language: makefile
+   :start-after: ifeq ($(MESA_FPE_CHECKS_ON),1)
+   :end-before: endif
 
-.. code-block:: makefile
-
-    SKIP_TRAPS = YES
-
-to
-
-.. code-block:: makefile
-
-    SKIP_TRAPS = NO
-
-and insert the variable $(FCtrapNANs) into the FCbasic line
-
-.. code-block:: makefile
-
-    FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=7 $(SPECIAL_FC_FLAGS) $(FCbasic2) $(FCtrapNANs)
-
-Then run clean and mk to rebuild MESA and fix any issues found in the compilation step. If they are all fixed then run a model or a test case.
-
-You should also add to your controls inlist:
+and acts as if you set the controls inlist option
 
 .. code-block:: fortran
 
       fill_arrays_with_nans = .true.
 
-To make sure you catch any uninitialized array accesses.
+to make sure you catch any uninitialized array accesses.
 
 
 Step -1: Introduce a bug (again)

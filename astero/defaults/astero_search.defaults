@@ -85,7 +85,7 @@
    ! ~~~~~~~~~~
    ! ``Teff`` is the effective temperature, in kelvin. ::
 
-      include_Teff_in_chi2_spectro = .true.
+      include_Teff_in_chi2_spectro = .false.
       Teff_target = -1
       Teff_sigma = -1
 
@@ -97,7 +97,7 @@
    ! ~~~~~~~~~~
    ! ``logg`` is the logarithm (base 10) of the surface gravity, in cgs units. ::
 
-      include_logg_in_chi2_spectro = .true.
+      include_logg_in_chi2_spectro = .false.
       logg_target = -1
       logg_sigma = -1
 
@@ -124,7 +124,7 @@
    ! ``FeH`` is the the model [Fe/H] computed as ``log10((Z/X)/Z_div_X_solar)``
    ! using model surface average values for ``Z`` and ``X``. ::
 
-      include_FeH_in_chi2_spectro = .true. ! [Fe/H]
+      include_FeH_in_chi2_spectro = .false. ! [Fe/H]
       FeH_target = -1
       FeH_sigma = -1
       Z_div_X_solar = 0.02293d0
@@ -152,7 +152,7 @@
 
       include_surface_Z_div_X_in_chi2_spectro = .false.
       surface_Z_div_X_target = 2.292d-2 ! GS98 value
-      !!surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
+!      !surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
       surface_Z_div_X_sigma = 1d-3
 
    ! include_surface_He_in_chi2_spectro
@@ -1065,6 +1065,7 @@
    ! + |chi^2| is greater than ``chi2_relative_increase_limit`` times the best |chi^2| for the run.
    ! + ``chi2_spectro``, ``chi2_delta_nu`` or ``chi2_radial`` is greater than its corresponding ``_limit``.
    ! + MESA fails to evaluate |chi^2| (because e.g. it can't match all the modes of a particular degree).
+
    ! ::
 
       limit_num_chi2_too_big = 20
@@ -1134,14 +1135,13 @@
    ! ``surf_coef1_name`` and ``surf_coef2_name``.
    ! In the various schemes, the surface corrections added to a mode with
    ! frequency :math:`\nu`, normalized inertia :math:`\mathcal{I}`
-   ! and relative inertia :math:`Q` are ::
+   ! and relative inertia :math:`Q` are
 
-   !     kjeldsen         surf_coef1*(ν/νmax)**correction_b / Q
-   !                                        (surf_coef2 = correction_r, eq. 6 of K08)
-   !     power_law        surf_coef1*(ν/νmax)**surf_coef2 / Q
-   !     cubic            surf_coef1*(ν/νac)**3 / I             (surf_coef2 is meaningless)
-   !     combined         (surf_coef1*(ν/νac)**3 + surf_coef2/(ν/νac)) / I
-   !     sonoi            surf_coef1*νmax*[1 - 1/(1 + (ν/νmax)**surf_coef2)] / Q
+   !|     kjeldsen         surf_coef1*(ν/νmax)**correction_b / Q (surf_coef2 = correction_r, eq. 6 of K08)
+   !|     power_law        surf_coef1*(ν/νmax)**surf_coef2 / Q
+   !|     cubic            surf_coef1*(ν/νac)**3 / I             (surf_coef2 is meaningless)
+   !|     combined         (surf_coef1*(ν/νac)**3 + surf_coef2/(ν/νac)) / I
+   !|     sonoi            surf_coef1*νmax*[1 - 1/(1 + (ν/νmax)**surf_coef2)] / Q
 
    ! where ``νac`` is the acoustic cutoff frequency, computed by
    ! scaling the solar value of 5mHz in the same way as ``νmax``
@@ -1166,18 +1166,6 @@
    ! radial modes (``l0_n_obs``) if they are provided. ::
 
       correction_b = 4.90d0
-
-   ! save_next_best_at_higher_frequency
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! ::
-
-      save_next_best_at_higher_frequency = .true.
-
-   ! save_next_best_at_lower_frequency
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! ::
-
-      save_next_best_at_lower_frequency = .true.
 
    ! note: to set nu_max_sun or delta_nu_sun, see star/defaults/controls.defaults
 

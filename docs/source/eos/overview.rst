@@ -179,11 +179,16 @@ fractions above a specified minimum.
 Skye
 ----
 
-.. warning::
-
-   This EOS is experimental.
-
-Skye is a free-energy-based EOS that can be used to cover the same conditions as HELM and PC.
+The Skye EOS |Skye| is a free-energy-based EOS for fully ionized
+matter.  Roughly, Skye is designed to cover conditions that were
+previously covered by the combination of HELM and PC.  Skye includes
+the effects of positrons, relativity, electron degeneracy, Coulomb
+interactions, nonlinear mixing effects, and quantum corrections. Skye
+determines the point of Coulomb crystallization in a self-consistent
+manner, accounting for mixing and composition effects automatically. A
+defining feature of this equation of state is that it uses analytic
+free energy terms and provides thermodynamic quantities using
+automatic differentiation machinery.
 
 
 CMS
@@ -209,3 +214,4 @@ CMS is the EOS for dense H/He mixtures of |CMS|.
 
 .. |FreeEOS| replace:: `(Alan W. Irwin) <http://freeeos.sourceforge.net/>`__
 
+.. |Skye| replace:: `(Jermyn et al. 2021) <https://ui.adsabs.harvard.edu/abs/2021ApJ...913...72J/abstract/>`__

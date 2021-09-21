@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2021  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -40,82 +40,50 @@
 
 
       subroutine eval_eps_grav_and_partials(s, k, ierr)
-         use auto_diff_support, only: wrap
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         real(dp) :: f, d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &
-            d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1, &
-            d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1
+         type(auto_diff_real_star_order1) :: eps_grav
          include 'formats'
          ierr = 0
 
          if (s% dt <= 0) then
-            call zero_eps_grav_and_partials(s, k)
+            ierr = -1
             return
          end if
 
-         call eval1_eps_grav_and_partials(s, k, ierr)
+         call zero_eps_grav_and_partials(s, k)
+
+         ! zero composition derivatives
+         ! if include_composition_in_eps_grav is true
+         ! then these are set in the call to eval_eps_grav_composition
+         s% d_eps_grav_dx(:,k) = 0
+
+         call eval1_eps_grav_and_partials(s, k, eps_grav, ierr)
          if (ierr /= 0) return
+
+         s% eps_grav_ad(k) = eps_grav
 
          if (s% use_other_eps_grav) then
             ! note: call this after 1st doing the standard calculation
-            
-            stop 'need to change other_eps_grav to auto_diff'
-            
             call s% other_eps_grav(s% id, k, s% dt, ierr)
             if (ierr /= 0) return
          end if
 
-         f = s% eps_grav_factor
-         if (abs(f - 1d0) > 1d-12) then
-            s% eps_grav(k) = f*s% eps_grav(k)
-            s% d_eps_grav_dlndm1(k) = f*s% d_eps_grav_dlndm1(k)
-            s% d_eps_grav_dlnd00(k) = f*s% d_eps_grav_dlnd00(k)
-            s% d_eps_grav_dlndp1(k) = f*s% d_eps_grav_dlndp1(k)
-            s% d_eps_grav_dlnTm1(k) = f*s% d_eps_grav_dlnTm1(k)
-            s% d_eps_grav_dlnT00(k) = f*s% d_eps_grav_dlnT00(k)
-            s% d_eps_grav_dlnTp1(k) = f*s% d_eps_grav_dlnTp1(k)
-            s% d_eps_grav_dlnR00(k) = f*s% d_eps_grav_dlnR00(k)
-            s% d_eps_grav_dL00(k) = f*s% d_eps_grav_dL00(k)
-            s% d_eps_grav_dLp1(k) = f*s% d_eps_grav_dLp1(k)
-            s% d_eps_grav_dlnRp1(k) = f*s% d_eps_grav_dlnRp1(k)
-            s% d_eps_grav_dv00(k) = f*s% d_eps_grav_dv00(k)
-            s% d_eps_grav_dvp1(k) = f*s% d_eps_grav_dvp1(k)
-         end if
-         
-         ! this is an interim solution so that users of eps_grav can convert to the auto_diff form 
-         ! when change eps_grav to use auto_diff, can delete the s% d_eps_grav_d... 
-         
-         d_eps_grav_dlnR00 = s% d_eps_grav_dlnR00(k)
-         d_eps_grav_dlnRp1 = s% d_eps_grav_dlnRp1(k)
-         
-         d_eps_grav_dlnTm1 = s% d_eps_grav_dlnTm1(k)
-         d_eps_grav_dlnT00 = s% d_eps_grav_dlnT00(k)
-         d_eps_grav_dlnTp1 = s% d_eps_grav_dlnTp1(k)
-         
-         d_eps_grav_dlndm1 = s% d_eps_grav_dlndm1(k)
-         d_eps_grav_dlnd00 = s% d_eps_grav_dlnd00(k)
-         d_eps_grav_dlndp1 = s% d_eps_grav_dlndp1(k)
-          
-         call wrap(s% eps_grav_ad(k), s% eps_grav(k), &
-            d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1, &
-            d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1, &
-            0d0, 0d0, 0d0, &
-            0d0, d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &
-            0d0, s% d_eps_grav_dv00(k), s% d_eps_grav_dvp1(k), &
-            0d0, s% d_eps_grav_dL00(k), s% d_eps_grav_dLp1(k), &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0)
+         ! apply user-specified scaling factor after hook
+         s% eps_grav_ad(k) = s% eps_grav_factor * s% eps_grav_ad(k)
 
       end subroutine eval_eps_grav_and_partials
 
 
-      subroutine eval1_eps_grav_and_partials(s, k, ierr)
+      subroutine eval1_eps_grav_and_partials(s, k, eps_grav, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: eps_grav
          integer, intent(out) :: ierr
+
+         type(auto_diff_real_star_order1) :: eps_grav_lnS, eps_grav_std
+         real(dp) :: alfa, Gamma
          logical :: using_PC
 
          include 'formats'
@@ -124,19 +92,30 @@
          using_PC = (s% eos_frac_PC(k) .gt. 0)
 
          if (using_PC .and. s% gam_start(k) >= s% Gamma_lnS_eps_grav_full_on) then
-            call do_eps_grav_with_lnS(s, k, ierr)
+            call do_lnS_eps_grav(s, k, eps_grav, ierr)
          else if (using_PC .and. s% gam_start(k) > s% Gamma_lnS_eps_grav_full_off) then
-            call blend_with_lnS_form(s, k, ierr)
+            Gamma = s% gam_start(k)
+            alfa = (Gamma - s% Gamma_lnS_eps_grav_full_off) / &
+               (s% Gamma_lnS_eps_grav_full_on - s% Gamma_lnS_eps_grav_full_off)
+            call do_lnS_eps_grav(s, k, eps_grav_lnS, ierr)
+            if (ierr .ne. 0) return
+            call do_std_eps_grav(s, k, eps_grav_std, ierr)
+            if (ierr .ne. 0) return
+            ! the derivative of the blending function is missing
+            ! but historically we've been able to get away with that
+            ! because the two forms should match in the blend region
+            eps_grav = alfa * eps_grav_lnS + (1d0 - alfa) * eps_grav_std
          else
-            call do_eps_grav_with_lnd(s, k, ierr)
+            call do_std_eps_grav(s, k, eps_grav, ierr)
          end if
 
-         if (ierr /= 0 .or. is_bad(s% eps_grav(k))) then
+
+         if (ierr /= 0 .or. is_bad(eps_grav% val)) then
             ierr = -1
             s% retry_message = 'failed in eval_eps_grav_and_partials'
             if (s% report_ierr) then
                write(*,2) &
-                  'failed in eval_eps_grav_and_partials', k, s% eps_grav(k)
+                  'failed in eval_eps_grav_and_partials', k, eps_grav% val
             end if
             if (s% stop_for_bad_nums) then
                stop 'eval1_eps_grav_and_partials'
@@ -147,37 +126,18 @@
       end subroutine eval1_eps_grav_and_partials
 
 
-      subroutine do_eps_grav_with_lnd(s, k, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         real(dp) :: dlnd_dt, dlnT_dt
-         include 'formats'
-
-         dlnd_dt = s% dxh_lnd(k)/s% dt
-         dlnT_dt = s% dxh_lnT(k)/s% dt
-         call do_lnd_eps_grav(s, k, dlnd_dt, dlnT_dt, ierr)
-         if (ierr /= 0) return
-
-         if (s% include_composition_in_eps_grav) call include_composition_in_eps_grav(s, k)
-         
-      end subroutine do_eps_grav_with_lnd
-
-
       ! this uses the given args to calculate -T*ds/dt
-      subroutine do_lnd_eps_grav(s, k, dlnd_dt, dlnT_dt, ierr)
-         use eos_def, only: i_Cp, i_grad_ad, i_chiRho, i_chiT, i_latent_ddlnT, i_latent_ddlnRho
+      subroutine do_std_eps_grav(s, k, eps_grav, ierr)
+         use auto_diff_support
+         use eos_def, only: i_latent_ddlnT, i_latent_ddlnRho
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: dlnd_dt, dlnT_dt
+         type(auto_diff_real_star_order1), intent(out) :: eps_grav
          integer, intent(out) :: ierr
 
-         real(dp) :: dT1_dlnTdot, a1, da1_dlnd, da1_dlnT, &
-            T1, dT1_dlnd, dT1_dlnT00, dT1_dlnd_dt, dT1_d_dlnTdt, &
-            a2, da2_dlnd, da2_dlnT, &
-            T2, dT2_dlnT, dT2_dlnd00, &
-            T3, dT3_dlnd, dT3_dlnT, &
-            latent_heat, d_latent_heat_dlnT, d_latent_heat_dlnRho
+         type(auto_diff_real_star_order1) :: T, cp, grada, chiT, chiRho, dlnd_dt, dlnT_dt, &
+            latent_ddlnT, latent_ddlnRho, eps_grav_start, eps_grav_composition_term
+
          logical :: test_partials
 
          real(dp) :: theta
@@ -188,108 +148,59 @@
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
+         ! select time-centering
          if (s% use_time_centered_eps_grav) then
             theta = 0.5_dp
          else
             theta = 1.0_dp
          end if
 
-         call zero_eps_grav_and_partials(s, k)
-         
-         !s% eps_grav(k) = -s% T(k)*s% cp(k)* &
-         !      ((1-s% grada(k)*s% chiT(k))*dlnT_dt &
-         !        - s% grada(k)*s% chiRho(k)*dlnd_dt)
+         ! total time derivatives of (Rho, T) basis
+         dlnd_dt = wrap_dxh_lnd(s,k)/s% dt
+         dlnT_dt = wrap_dxh_lnT(s,k)/s% dt
 
-         a1 = 1 - s% grada(k)*s% chiT(k)
-         da1_dlnd = -(s% d_eos_dlnd(i_grad_ad,k)*s% chiT(k) + s% grada(k)*s% d_eos_dlnd(i_chiT,k))
-         da1_dlnT = -(s% d_eos_dlnT(i_grad_ad,k)*s% chiT(k) + s% grada(k)*s% d_eos_dlnT(i_chiT,k))
+         ! thermo quantities
+         T = wrap_T_00(s, k)
+         Cp = wrap_Cp_00(s, k)
+         grada = wrap_grad_ad_00(s, k)
+         chiT = wrap_chiT_00(s, k)
+         chiRho = wrap_chiRho_00(s, k)
 
-         T1 = dlnT_dt*a1
-         dT1_dlnd = dlnT_dt*da1_dlnd
+         ! MESA I, Equation (12)
+         eps_grav = -T*Cp * ((1d0 - grada*chiT)*dlnT_dt - grada*chiRho*dlnd_dt)
 
-         dT1_d_dlnTdt = a1
-         dT1_dlnT00 = a1/s% dt + dlnT_dt*da1_dlnT
-
-         a2 = s% grada(k)*s% chiRho(k)
-         da2_dlnd = s% d_eos_dlnd(i_grad_ad,k)*s% chiRho(k) + s% grada(k)*s% d_eos_dlnd(i_chiRho,k)
-         da2_dlnT = s% d_eos_dlnT(i_grad_ad,k)*s% chiRho(k) + s% grada(k)*s% d_eos_dlnT(i_chiRho,k)
-
-         T2 = dlnd_dt*a2
-         dT2_dlnT = dlnd_dt*da2_dlnT
-
-         dT2_dlnd00 = a2/s% dt + dlnd_dt*da2_dlnd
-
-         T3 = -s% T(k)*s% cp(k)
-         dT3_dlnd = -s% T(k)*s% d_eos_dlnd(i_Cp,k)
-         dT3_dlnT = -s% T(k)*(s% cp(k) + s% d_eos_dlnT(i_Cp,k))
-
-         ! eps_grav = T3*(T1-T2)
-         s% eps_grav(k) = T3*(T1-T2)
-
-         s% d_eps_grav_dlndm1(k) = 0
-         s% d_eps_grav_dlndp1(k) = 0
-         s% d_eps_grav_dlnd00(k) = (T3*(dT1_dlnd - dT2_dlnd00) + dT3_dlnd*(T1-T2))
-
-         s% d_eps_grav_dlnTm1(k) = 0
-         s% d_eps_grav_dlnTp1(k) = 0
-         s% d_eps_grav_dlnT00(k) = (T3*(dT1_dlnT00 - dT2_dlnT) + dT3_dlnT*(T1-T2))
+         ! phase transition latent heat
+         ! Jermyn et al. (2021), Equation (47)
+         latent_ddlnRho = wrap_latent_ddlnRho_00(s,k)
+         latent_ddlnT = wrap_latent_ddlnT_00(s,k)
+         eps_grav = eps_grav - (dlnd_dt * latent_ddlnRho + dlnT_dt * latent_ddlnT)
 
 
          ! for time centered version
          if (s% use_time_centered_eps_grav) then
 
-            a1 = 1 - s% grada_start(k)*s% chiT_start(k)
-            da1_dlnd = 0d0
-            da1_dlnT = 0d0
+            ! start values are constants during Newton iters
+            eps_grav_start = -s% T_start(k)*s% cp_start(k) * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
 
-            T1 = dlnT_dt*a1
-            dT1_dlnd = dlnT_dt*da1_dlnd
+            ! phase transition latent heat
+            eps_grav_start = eps_grav_start - (dlnd_dt * s% latent_ddlnRho_start(k) + dlnT_dt * s% latent_ddlnT_start(k))
 
-            dT1_d_dlnTdt = a1
-            dT1_dlnT00 = a1/s% dt + dlnT_dt*da1_dlnT
-
-            a2 = s% grada_start(k)*s% chiRho_start(k)
-            da2_dlnd = 0d0
-            da2_dlnT = 0d0
-
-            T2 = dlnd_dt*a2
-            dT2_dlnT = dlnd_dt*da2_dlnT
-
-            dT2_dlnd00 = a2/s% dt + dlnd_dt*da2_dlnd
-
-            T3 = -s% T_start(k)*s% cp_start(k)
-            dT3_dlnd = 0d0
-            dT3_dlnT = 0d0
-
-            ! eps_grav = T3*(T1-T2)
-            s% eps_grav(k) = theta * s% eps_grav(k) + (1d0-theta) * T3*(T1-T2)
-
-            s% d_eps_grav_dlndm1(k) = 0
-            s% d_eps_grav_dlndp1(k) = 0
-            s% d_eps_grav_dlnd00(k) = theta * s% d_eps_grav_dlnd00(k) + (1d0-theta) * (T3*(dT1_dlnd - dT2_dlnd00) + dT3_dlnd*(T1-T2))
-
-            s% d_eps_grav_dlnTm1(k) = 0
-            s% d_eps_grav_dlnTp1(k) = 0
-            s% d_eps_grav_dlnT00(k) = theta * s% d_eps_grav_dlnT00(k) + (1d0-theta) * (T3*(dT1_dlnT00 - dT2_dlnT) + dT3_dlnT*(T1-T2))
+            eps_grav = theta * eps_grav + (1d0-theta) * eps_grav_start
 
          end if
 
-         ! phase transition latent heat
-         latent_heat = dlnd_dt * s%latent_ddlnRho(k) + dlnT_dt * s%latent_ddlnT(k)
-         d_latent_heat_dlnT = s%latent_ddlnT(k)/s% dt + &
-                        dlnT_dt * s% d_eos_dlnT(i_latent_ddlnT, k) + dlnd_dt * s% d_eos_dlnT(i_latent_ddlnRho, k)
-         d_latent_heat_dlnRho = s%latent_ddlnRho(k)/s% dt + &
-                        dlnT_dt * s% d_eos_dlnd(i_latent_ddlnT, k) + dlnd_dt * s% d_eos_dlnd(i_latent_ddlnRho, k)
 
-         s% eps_grav(k) = s%eps_grav(k) - latent_heat
-         s% d_eps_grav_dlnT00(k) = s% d_eps_grav_dlnT00(k) - d_latent_heat_dlnT
-         s% d_eps_grav_dlnd00(k) = s% d_eps_grav_dlnd00(k) - d_latent_heat_dlnRho
+         if (s% include_composition_in_eps_grav) then
+            call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
+            if (ierr /= 0) return
+            eps_grav = eps_grav + eps_grav_composition_term
+         end if
 
-         if (is_bad(s% eps_grav(k))) then
+         if (is_bad(eps_grav% val)) then
             ierr = -1
             s% retry_message = 'do_lnd_eps_grav -- bad value for eps_grav'
             if (s% report_ierr) &
-               write(*,2) 'do_lnd_eps_grav -- bad value for eps_grav', k, s% eps_grav(k)
+               write(*,2) 'do_lnd_eps_grav -- bad value for eps_grav', k, eps_grav% val
             if (s% stop_for_bad_nums) stop 'do_lnd_eps_grav'
             return
          end if
@@ -298,216 +209,87 @@
             s% solver_test_partials_val = 0
             s% solver_test_partials_var = 0
             s% solver_test_partials_dval_dx = 0
-            write(*,*) 'do_lnd_eps_grav chiT', s% solver_test_partials_var
+            write(*,*) 'do_std_eps_grav chiT', s% solver_test_partials_var
          end if
 
-      end subroutine do_lnd_eps_grav
+      end subroutine do_std_eps_grav
 
 
-      subroutine do_eps_grav_with_lnS(s, k, ierr)
+      subroutine do_lnS_eps_grav(s, k, eps_grav, ierr)
+         use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         include 'formats'
-
-         call do_lnS_eps_grav(s, k, s% lnS_start(k), ierr)
-         if (ierr /= 0) return
-
-         if (s% include_composition_in_eps_grav) call include_composition_in_eps_grav(s, k)
-
-      end subroutine do_eps_grav_with_lnS
-
-
-      subroutine do_lnS_eps_grav(s, k, lnS_start, ierr)
-         use eos_def, only: i_lnS
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: lnS_start
+         type(auto_diff_real_star_order1), intent(out) :: eps_grav
          integer, intent(out) :: ierr
 
-         real(dp) :: entropy, entropy_start, T, dS_dlnT, dS_dlnd
+         real(dp) :: entropy_start
+         type(auto_diff_real_star_order1) :: entropy, T, eps_grav_composition_term
 
          include 'formats'
          ierr = 0
-         call zero_eps_grav_and_partials(s, k)
 
-         entropy = exp(s% lnS(k))
-         T = s% T(k)
-         entropy_start = exp(lnS_start)
+         T = wrap_T_00(s,k)
+         entropy = wrap_s_00(s,k)
+         entropy_start = exp(s% lnS_start(k))
 
-         s% eps_grav(k) = -T*(entropy - entropy_start)/s% dt
+         eps_grav = -T*(entropy - entropy_start)/s% dt
 
-         if (is_bad(s% eps_grav(k))) then
+         ! NOTE: the correct version of the composition term to go with TdS is
+         !     -sum_i (\partial e/\partial Y_i)_{s,\rho} dY_i
+         ! see for example, MESA IV, equation (59)
+         !
+         ! When on PC near crystallization (the only place the lnS form is used)
+         ! there are typically no composition changes, so we drop this term
+         !
+         ! The term we normally use comes from expanding in the (rho,T,X) basis
+         !     -sum_ (\partial e/\partial X_i)_{T,\rho} dX_i
+         ! and in practice can be a reasonable approximation to the above.
+         !
+         ! If an such approximation is desired, one could use the following code:
+
+         ! if (s% include_composition_in_eps_grav) then
+         !    call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
+         !    if (ierr /= 0) return
+         !    eps_grav = eps_grav + eps_grav_composition_term
+         ! end if
+
+         if (is_bad(eps_grav% val)) then
             ierr = -1
             s% retry_message = 'do_lnS_eps_grav -- bad value for eps_grav'
             if (s% report_ierr) &
-               write(*,2) 'do_lnS_eps_grav -- bad value for eps_grav', k, s% eps_grav(k)
+               write(*,2) 'do_lnS_eps_grav -- bad value for eps_grav', k, eps_grav% val
             if (s% stop_for_bad_nums) stop 'do_lnS_eps_grav'
             return
          end if
 
-         dS_dlnT = s% dS_dT_for_partials(k)*s% T(k) ! instead of   entropy*s% d_eos_dlnT(i_lnS,k)
-         dS_dlnd = s% dS_drho_for_partials(k)*s% rho(k) ! instead of   entropy*s% d_eos_dlnd(i_lnS,k)
-         s% d_eps_grav_dlnT00(k) = -T*dS_dlnT/s% dt + s% eps_grav(k)
-         s% d_eps_grav_dlnd00(k) = -T*dS_dlnd/s% dt
-
       end subroutine do_lnS_eps_grav
 
 
-      subroutine blend_with_lnS_form(s, k, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         real(dp) :: alfa, Gamma
-         include 'formats'
-         ierr = 0
-         Gamma = s% gam_start(k)
-         alfa = (Gamma - s% Gamma_lnS_eps_grav_full_off) / &
-            (s% Gamma_lnS_eps_grav_full_on - s% Gamma_lnS_eps_grav_full_off)
-         ! alfa is fraction of lnS form in result
-         if (alfa >= 1 .or. alfa <= 0) then
-            ierr = -1
-            s% retry_message = 'eval_eps_grav_and_partials -- error in blend_with_lnS_form'
-          if (s% report_ierr) write(*, *) s% retry_message
-            return
-         end if
-         call combine_two_eps_gravs( &
-            s, k, alfa, 1d0 - alfa, do_eps_grav_with_lnS, do_eps_grav_with_lnd, ierr)
-      end subroutine blend_with_lnS_form
-
-
-      recursive subroutine combine_two_eps_gravs( &
-            s, k, alfa, beta, eps_grav_proc1, eps_grav_proc2, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: alfa, beta
-         interface
-            subroutine eps_grav_proc1(s, k, ierr)
-               use star_def, only: star_info
-               use const_def, only: dp
-               type (star_info), pointer :: s
-               integer, intent(in) :: k
-                     integer, intent(out) :: ierr
-            end subroutine eps_grav_proc1
-            subroutine eps_grav_proc2(s, k, ierr)
-               use star_def, only: star_info
-               use const_def, only: dp
-               type (star_info), pointer :: s
-               integer, intent(in) :: k
-                     integer, intent(out) :: ierr
-            end subroutine eps_grav_proc2
-         end interface
-         integer, intent(out) :: ierr
-
-         real(dp) :: &
-            eps_grav, d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1, &
-            d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1, &
-            d_eps_grav_dlnR00, d_eps_grav_dlnRp1, d_eps_grav_dL00, d_eps_grav_dLp1, &
-            d_eps_grav_dv00, d_eps_grav_dvp1
-
-         include 'formats'
-         ierr = 0
-
-         ! alfa is multiplier of result from calling eps_grav_proc1
-         ! beta is multiplier of result from calling eps_grav_proc2
-         ! i.e., eps_grav = alfa*eps_grav1 + beta*eps_grav2
-
-         if (alfa > 1d0 .or. alfa < 0d0 .or. beta > 1d0 .or. beta < 0d0) then
-            s% retry_message = 'failed in combine_two_eps_gravs'
-            if (s% report_ierr) write(*, *) s% retry_message
-            ierr = -1
-            return
-         end if
-
-         ! result is alfa*eps_grav_proc1 + beta*eps_grav_proc2
-
-         if (alfa > 0d0) then
-            call eps_grav_proc1(s, k, ierr)
-            if (ierr /= 0) return
-            if (beta == 0d0) return
-            ! save results
-            eps_grav = s% eps_grav(k)
-            d_eps_grav_dlndm1 = s% d_eps_grav_dlndm1(k)
-            d_eps_grav_dlnd00 = s% d_eps_grav_dlnd00(k)
-            d_eps_grav_dlndp1 = s% d_eps_grav_dlndp1(k)
-            d_eps_grav_dlnTm1 = s% d_eps_grav_dlnTm1(k)
-            d_eps_grav_dlnT00 = s% d_eps_grav_dlnT00(k)
-            d_eps_grav_dlnTp1 = s% d_eps_grav_dlnTp1(k)
-            d_eps_grav_dlnR00 = s% d_eps_grav_dlnR00(k)
-            d_eps_grav_dlnRp1 = s% d_eps_grav_dlnRp1(k)
-            d_eps_grav_dL00 = s% d_eps_grav_dL00(k)
-            d_eps_grav_dLp1 = s% d_eps_grav_dLp1(k)
-            d_eps_grav_dv00 = s% d_eps_grav_dv00(k)
-            d_eps_grav_dvp1 = s% d_eps_grav_dvp1(k)
-         else ! not needed, but to keep the compiler happy we set these to 0
-            eps_grav = 0
-            d_eps_grav_dlndm1 = 0
-            d_eps_grav_dlnd00 = 0
-            d_eps_grav_dlndp1 = 0
-            d_eps_grav_dlnTm1 = 0
-            d_eps_grav_dlnT00 = 0
-            d_eps_grav_dlnTp1 = 0
-            d_eps_grav_dlnR00 = 0
-            d_eps_grav_dlnRp1 = 0
-            d_eps_grav_dL00 = 0
-            d_eps_grav_dLp1 = 0
-            d_eps_grav_dv00 = 0
-            d_eps_grav_dvp1 = 0
-         end if
-
-         call eps_grav_proc2(s, k, ierr)
-         if (ierr /= 0) return
-         if (alfa == 0d0) return
-         
-         ! combine results
-         s% eps_grav(k) = alfa*eps_grav + beta*s% eps_grav(k)
-
-         s% d_eps_grav_dlndm1(k) = alfa*d_eps_grav_dlndm1 + beta*s% d_eps_grav_dlndm1(k)
-         s% d_eps_grav_dlnd00(k) = alfa*d_eps_grav_dlnd00 + beta*s% d_eps_grav_dlnd00(k)
-         s% d_eps_grav_dlndp1(k) = alfa*d_eps_grav_dlndp1 + beta*s% d_eps_grav_dlndp1(k)
-
-         s% d_eps_grav_dlnTm1(k) = alfa*d_eps_grav_dlnTm1 + beta*s% d_eps_grav_dlnTm1(k)
-         s% d_eps_grav_dlnT00(k) = alfa*d_eps_grav_dlnT00 + beta*s% d_eps_grav_dlnT00(k)
-         s% d_eps_grav_dlnTp1(k) = alfa*d_eps_grav_dlnTp1 + beta*s% d_eps_grav_dlnTp1(k)
-
-         s% d_eps_grav_dlnR00(k) = alfa*d_eps_grav_dlnR00 + beta*s% d_eps_grav_dlnR00(k)
-         s% d_eps_grav_dlnRp1(k) = alfa*d_eps_grav_dlnRp1 + beta*s% d_eps_grav_dlnRp1(k)
-
-         s% d_eps_grav_dL00(k) = alfa*d_eps_grav_dL00 + beta*s% d_eps_grav_dL00(k)
-         s% d_eps_grav_dLp1(k) = alfa*d_eps_grav_dLp1 + beta*s% d_eps_grav_dLp1(k)
-
-         s% d_eps_grav_dv00(k) = alfa*d_eps_grav_dv00 + beta*s% d_eps_grav_dv00(k)
-         s% d_eps_grav_dvp1(k) = alfa*d_eps_grav_dvp1 + beta*s% d_eps_grav_dvp1(k)
-
-      end subroutine combine_two_eps_gravs
-
-
-      subroutine include_composition_in_eps_grav(s, k)
-
-         use eos_support, only: get_eos !, get_peos
+      subroutine eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
+         use auto_diff_support, only: wrap
+         use eos_support, only: get_eos
          use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnE, i_lnPgas
 
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: eps_grav_composition_term
+         integer, intent(out) :: ierr
          real(dp) :: Rho, logRho, &
             e, e_start, de, d_de_dlnd, d_de_dlnT, &
             e_with_xa_start, d_e_with_xa_start_dlnd, d_e_with_xa_start_dlnT, &
-            e_with_DT_start, d_e_with_DT_start_dlnd, d_e_with_DT_start_dlnT
+            e_with_DT_start, Pgas_with_DT_start
          real(dp), dimension(num_eos_basic_results) :: &
             res, dres_dlnd, dres_dlnT
          real(dp) :: dres_dxa(num_eos_d_dxa_results,s% species)
-         integer :: j, ierr
+         integer :: j
          logical :: test_partials
 
-         real(dp) :: Pgas_with_DT_start
-
-         real(dp) :: theta, dxh_lnd
+         real(dp) :: theta
 
          include 'formats'
          ierr = 0
 
-         ! for now, bail if in new material
-         if (k < s% k_below_just_added) return
+         eps_grav_composition_term = 0
 
          if (s% use_time_centered_eps_grav) then
             theta = 0.5_dp
@@ -524,9 +306,8 @@
          ! we only have lnE and lnP derivs, so use
          ! eps_grav = -de/dt + (P/rho) * dlnd/dt
          do j=1, s% species
-            dxh_lnd = s% dxh_lnd(k)
             s% d_eps_grav_dx(j,k) = -s% energy(k) * s% dlnE_dxa_for_partials(j,k)/s% dt + &
-               (s% Peos(k) / s% Rho(k)) * s% dlnPeos_dxa_for_partials(j,k) *  dxh_lnd/s% dt
+               (s% Peos(k) / s% Rho(k)) * s% dlnPeos_dxa_for_partials(j,k) * s% dxh_lnd(k)/s% dt
          end do
 
          e = s% energy(k)
@@ -563,9 +344,6 @@
             end if
 
             e_with_DT_start = exp(res(i_lnE))
-            d_e_with_DT_start_dlnd = dres_dlnd(i_lnE)*e_with_DT_start
-            d_e_with_DT_start_dlnT = dres_dlnT(i_lnE)*e_with_DT_start
-
             de = theta * de + (1d0 - theta) * (e_with_DT_start - e_start)
             d_de_dlnd = theta * d_de_dlnd
             d_de_dlnT = theta * d_de_dlnT
@@ -573,17 +351,31 @@
             Pgas_with_DT_start = exp(res(i_lnPgas))
 
             ! combine with end-of-step composition derivatives
+
             ! until EOSes always provide composition derivatives, ignore this
-            ! the end-of-step term should generally be similar enough
+            ! the end-of-step term should generally be similar enough to be OK
+
+            ! do j=1, s% species
+            !    s% d_eps_grav_dx(j,k) = theta * s% d_eps_grav_dx(j,k) + (1d0 - theta) * &
+            !       (-e_with_DT_start*d_dxa(i_lnE,j)/s% dt + &
+            !       Pgas_with_DT_start*d_dxa(i_lnPgas,j)/s% rho_start(k)*s% dxh_lnd(k)/s% dt)
+            ! end do
 
          end if
 
-         s% eps_grav_composition_term(k) = -de/s% dt
-         s% eps_grav(k) = s% eps_grav(k) + s% eps_grav_composition_term(k)
+         call wrap(eps_grav_composition_term, -de/s% dt, &
+            0d0, -d_de_dlnd/s% dt, 0d0, &
+            0d0, -d_de_dlnT/s% dt, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0)
 
-         s% d_eps_grav_dlnd00(k) = s% d_eps_grav_dlnd00(k) - d_de_dlnd/s% dt
-         s% d_eps_grav_dlnT00(k) = s% d_eps_grav_dlnT00(k) - d_de_dlnT/s% dt
-
+         ! add easy access to this quantity in star
+         s% eps_grav_composition_term(k) = eps_grav_composition_term% val
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -595,44 +387,27 @@
             write(*,*) 'get_dedt', s% solver_test_partials_var
          end if
 
-         if (is_bad(s% eps_grav(k))) then
+         if (is_bad(eps_grav_composition_term% val)) then
           if (s% report_ierr) write(*, *) s% retry_message
             if (s% report_ierr) then
-               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav', k, s% eps_grav(k)
-               write(*,2) 'eps_grav_composition_term', k, s% eps_grav_composition_term(k)
-               !stop 'include_composition_in_eps_grav'
+               write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
+               !stop 'eval_eps_grav_composition'
             end if
             if (s% stop_for_bad_nums) then
-               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav', k, s% eps_grav(k)
-               stop 'include_composition_in_eps_grav'
+               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val
+               stop 'eval_eps_grav_composition'
             end if
             return
          end if
 
-      end subroutine include_composition_in_eps_grav
+      end subroutine eval_eps_grav_composition
 
 
       subroutine zero_eps_grav_and_partials(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          s% eps_grav_ad(k) = 0
-         s% eps_grav(k) = 0
-         s% d_eps_grav_dlndm1(k) = 0
-         s% d_eps_grav_dlnd00(k) = 0
-         s% d_eps_grav_dlndp1(k) = 0
-         s% d_eps_grav_dlnTm1(k) = 0
-         s% d_eps_grav_dlnT00(k) = 0
-         s% d_eps_grav_dlnTp1(k) = 0
-         s% d_eps_grav_dlnR00(k) = 0
-         s% d_eps_grav_dlnRp1(k) = 0
-         s% d_eps_grav_dL00(k) = 0
-         s% d_eps_grav_dLp1(k) = 0
-         s% d_eps_grav_dv00(k) = 0
-         s% d_eps_grav_dvp1(k) = 0
-         s% d_eps_grav_dx(:,k) = 0
-         s% eps_grav_composition_term(k) = 0
       end subroutine zero_eps_grav_and_partials
-
 
       end module eps_grav
 

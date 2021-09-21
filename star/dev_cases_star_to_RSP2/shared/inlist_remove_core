@@ -1,0 +1,74 @@
+
+&star_job
+
+      load_saved_model = .true.
+      load_model_filename = 'pulse.mod' 
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'removed_core.mod'
+      required_termination_code_string = 'max_model_number'
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_number_retries = .false.
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+   
+      set_initial_dt = .true.
+      seconds_for_initial_dt = 1
+
+      pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&eos
+/ !end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+   
+   max_timestep = 1
+   
+   max_model_number = 1 !10
+
+! mlt
+   alpha_semiconvection = 0.0
+   
+! mixing
+    overshoot_scheme(1) = ''
+    overshoot_scheme(2) = ''
+
+! solver
+   dxdt_nuc_factor = 0
+   mix_factor = 0
+   
+! mesh controls
+   okay_to_remesh = .true.
+   mesh_delta_coeff = 1
+   !log_tau_function_weight = 100
+   
+! output controls
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
+   photo_interval = 50
+   profile_interval = 100
+   history_interval = 10
+   terminal_interval = 10
+   write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+&pgstar
+  
+/ ! end of pgstar namelist

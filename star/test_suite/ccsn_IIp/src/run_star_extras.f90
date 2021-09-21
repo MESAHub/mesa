@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -103,38 +103,10 @@
          s% data_for_extra_profile_columns => data_for_extra_profile_columns
          s% other_wind => low_density_wind_routine
          s% other_alpha_mlt => alpha_mlt_routine
-         s% other_energy => other_energy
-         s% use_other_energy = (s% RTI_energy_floor > 0d0)
       end subroutine extras_controls
 
 
       include 'stella/stella.inc'
-      
-      
-      subroutine other_energy(id, ierr)
-         integer, intent(in)  :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nz, k
-         real(dp) :: dt
-         include 'formats'
-         ierr = 0
-         return
-         
-         
-         
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         dt = s% dt
-         if (dt <= 0d0) return
-         nz = s% nz
-         do k=1,nz
-            s% extra_heat(k) = 0
-            if (k < nz .and. s% alpha_RTI(k) < 1d-10) cycle
-            if (s% energy(k) >= s% RTI_energy_floor) cycle
-            s% extra_heat(k) = (s% RTI_energy_floor - s% energy(k))/dt
-         end do
-      end subroutine other_energy
 
 
       subroutine alpha_mlt_routine(id, ierr)
@@ -152,11 +124,6 @@
          alpha_other = s% x_ctrl(22)
          H_limit = s% x_ctrl(23)
          h1 = s% net_iso(ih1)
-         !write(*,1) 'alpha_H', alpha_H
-         !write(*,1) 'alpha_other', alpha_other
-         !write(*,1) 'H_limit', H_limit
-         !write(*,2) 'h1', h1
-         !write(*,2) 's% nz', s% nz
          if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
          do k=1,s% nz
             if (s% xa(h1,k) >= H_limit) then
@@ -164,9 +131,7 @@
             else
                s% alpha_mlt(k) = alpha_other
             end if
-            !write(*,2) 'alpha_mlt', k, s% alpha_mlt(k), 
          end do
-         !stop
       end subroutine alpha_mlt_routine
 
 
@@ -191,13 +156,11 @@
          msum = 0d0
          do k=1, s% nz
             if (s% xh(i_lnd,k) >= lnd_limit) exit
-            !write(*,2) 'lgRho', k, s% xh(i_lnd,k)/ln10
             msum = msum + s% dm(k)
          end do
          if (msum == 0d0) return
          w = (msum/Msun)/(s% dt/secyer)
          write(*,1) 'low_density_wind_routine lg(Mdot) msum/Msun', safe_log10(w), msum/Msun
-         !stop 'low_density_wind_routine'
       end subroutine low_density_wind_routine
       
       
@@ -466,7 +429,7 @@
       subroutine extras_startup(id, restart, ierr)
          use chem_def, only: ini56, ico56, ih1, ihe4, io16
          use interp_2d_lib_db, only: interp_mkbicub_db
-         use eos_lib, only: eosDT_get_T_given_Ptotal
+         use eos_lib, only: eosDT_get_T
          use eos_def
          use atm_lib, only: atm_L
          integer, intent(in) :: id
@@ -482,12 +445,15 @@
          integer :: i, j, k, kk, k1, k_max_v, ni56, co56, o16, he4, h1, &
             max_iter, eos_calls
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp), allocatable :: d_dxa(:,:)
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
+
+         allocate(d_dxa(num_eos_d_dxa_results, s% species))
 
          xni56 = 0d0
          ni56 = s% net_iso(ini56)
@@ -793,14 +759,14 @@
                         s% cgrav(k+1)*s% m(k+1)*(s% dm(k+1)+s% dm(k))/(8*pi*r*r*r*r)
                      Z = max(0d0, min(1d0, 1d0 - (s% X(k) + s% Y(k))))
                      logT_guess = s% lnT(k+1)/ln10
-                     call eosDT_get_T_given_Ptotal( &
-                        s% eos_handle, Z, s% X(k), s% abar(k), s% zbar(k), &
+                     call eosDT_get_T( &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
-                        s% lnd(k)/ln10, log10(P_hse), &
+                        s% lnd(k)/ln10, i_logPtot, log10(P_hse), &
                         logT_tol, logP_tol, max_iter, logT_guess, &
                         logT_bnd1, logT_bnd2, logP_at_bnd1, logP_at_bnd2, &
                         logT_result, res, d_dlnd, d_dlnT, &
-                        d_dabar, d_dzbar, eos_calls, ierr)
+                        d_dxa, eos_calls, ierr)
                      if (ierr /= 0) return
                      s% lnT(k) = logT_result*ln10
                      s% T(k) = exp(s% lnT(k))
@@ -1214,7 +1180,7 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         real(dp) :: age_days, log_L, mach1_mass, log_Lnuc_burn, xmax, xni56
+         real(dp) :: age_days, log_L, shock_mass, log_Lnuc_burn, xmax, xni56
          integer :: k
          include 'formats'
          extras_finish_step = keep_going
@@ -1224,12 +1190,10 @@
          call store_extra_info(s)
          
          if (s% x_ctrl(2) <= 0) return
-         mach1_mass = s% outer_mach1_mass
-         if (mach1_mass >= s% x_ctrl(2)) then
-            !write(*,1) 'mach1 has reached target location', &
-            !   s% x_ctrl(2), mach1_mass
-            write(*,'(a,2f12.5)') 'mach1 has reached target location', &
-               mach1_mass, s% x_ctrl(2)
+         shock_mass = s% shock_mass
+         if (shock_mass >= s% x_ctrl(2)) then
+            write(*,'(a,2f12.5)') 'shock has reached target location', &
+               shock_mass, s% x_ctrl(2)
             extras_finish_step = terminate
             s% termination_code = t_extras_finish_step
             ! restore Ni+Co mass
@@ -1240,9 +1204,9 @@
                   if (ierr /= 0) return
                end if
             end if
-         else if (mach1_mass >= 0.9995d0*s% x_ctrl(2)) then
-               write(*,1) 'mach1 has reached this fraction of target', &
-                  mach1_mass/s% x_ctrl(2)
+         else if (shock_mass >= 0.9995d0*s% x_ctrl(2)) then
+               write(*,1) 'shock has reached this fraction of target', &
+                  shock_mass/s% x_ctrl(2)
          end if
          
          if (s% x_integer_ctrl(1) == 5 .and. &

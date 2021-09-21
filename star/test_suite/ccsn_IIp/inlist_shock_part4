@@ -1,7 +1,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'shock_part3.mod'
+      load_model_filename = 'shock_part3.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'shock_part4.mod'
@@ -45,12 +45,11 @@
       terminal_interval = 10
 
       
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
-      
-      max_number_retries = 0
+      !terminal_interval = 1
+      !max_number_retries = 0
 
 ! FOR DEBUGGING
 

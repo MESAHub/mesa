@@ -1,0 +1,55 @@
+&star_job
+      
+      !set_initial_dt = .true.
+      !years_for_initial_dt = 0.1d0
+
+/ ! end of star_job namelist
+
+&eos
+/ !end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+   !log_L_upper_limit = 5.04
+   !max_model_number = 851          ! comment out on 1st pass when searching for best
+   log_Teff_upper_limit = 3.80
+   when_to_stop_rtol = 1d-4
+   when_to_stop_atol = 1d-4
+   
+   
+   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+
+! output
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   terminal_interval = 1
+
+/ ! end of controls namelist
+
+&pgstar
+
+   !pause = .true.
+
+   ! HR window -- lg_L vs. lg_Teff
+   
+   pgstar_interval = 1
+
+   HR_win_flag = .true.
+   
+   HR_title = '1 M\d\(2281)\u  Z=0.0004  RR Lyrae'
+
+   HR_win_width = 8
+   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+
+   HR_logT_min = 3.75 ! -101 ! only used if > -100
+   HR_logT_max = 3.9 ! only used if > -100
+   HR_logL_min = 0 ! -101 ! only used if > -100
+   HR_logL_max = 3.7 ! -101 ! only used if > -100
+
+   show_HR_classical_instability_strip = .true.
+         
+/ ! end of pgstar namelist

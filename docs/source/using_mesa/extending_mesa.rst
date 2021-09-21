@@ -474,7 +474,7 @@ Let's rename the subroutine and add the functionality that we want.
 .. code-block:: fortran
 
   subroutine tutorial_other_neu(  &
-       id, k, T, log10_T, Rho, log10_Rho, abar, zbar, z2bar, log10_Tlim, flags, &
+       id, k, T, log10_T, Rho, log10_Rho, abar, zbar, log10_Tlim, flags, &
        loss, sources, ierr)
      use neu_lib, only: neu_get
      use neu_def
@@ -486,7 +486,6 @@ Let's rename the subroutine and add the functionality that we want.
      real(dp), intent(in) :: log10_Rho ! log10 of density
      real(dp), intent(in) :: abar ! mean atomic weight
      real(dp), intent(in) :: zbar ! mean charge
-     real(dp), intent(in) :: z2bar ! mean charge squared
      real(dp), intent(in) :: log10_Tlim
      logical, intent(inout) :: flags(num_neu_types) ! true if should include the type of loss
      real(dp), intent(inout) :: loss(num_neu_rvs) ! total from all sources
@@ -509,7 +508,7 @@ Let's rename the subroutine and add the functionality that we want.
   
      ! the is the normal routine that MESA provides
      call neu_get(  &
-         T, log10_T, Rho, log10_Rho, abar, zbar, z2bar, log10_Tlim, flags, &
+         T, log10_T, Rho, log10_Rho, abar, zbar, log10_Tlim, flags, &
          loss, sources, ierr)
   
   end subroutine tutorial_other_neu

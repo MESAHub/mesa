@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2019  Bill Paxton, Radek Smolec
+!   Copyright (C) 2019  Radek Smolec
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -968,11 +968,11 @@
       !write(15,'(a)') '     I                R              PERIOD'
       do I=1,NZN3
 !         if(WIx(I).lt.MINI.and.WIx(I).gt.1d-9)then
-         if((WIx(I).lt.MINI) &
-               .and.(P4*WRx(I)/WIx(I).gt.-.3d+1) &
-               .and.(WIx(I).gt.1.d-9))then
-            MINI=WIx(I)
-            IMI=I
+         if((WIx(I).lt.MINI) .and.(WIx(I).gt.1.d-9))then
+            if(P4*WRx(I)/WIx(I).gt.-.3d+1)then
+               MINI=WIx(I)
+               IMI=I
+            end if
          endif
          if (abs(WIx(I)) > 1d-50) then
             !write(15,'(2(d14.8,tr2),f11.6)') &

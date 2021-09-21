@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -101,7 +101,7 @@
          integer, intent(out) :: ierr
 
          character (len=strlen) :: str
-         real, pointer, dimension(:) :: xvec, yvec
+         real, allocatable, dimension(:) :: xvec, yvec
          real :: xmin, xmax, xleft, xright, dx, chScale, windy, &
             ymin, ymax, exp10_ymin, xmargin, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax
@@ -245,7 +245,7 @@
             power_line = cnt
             ymx = maxval(s% eps_nuc_categories(icat,grid_min:grid_max))
             if (ymx < exp10_ymin) return
-            iclr = cnt - num_colors*(cnt/num_colors) + 1
+            iclr = modulo(icat,num_colors) +1
             power_line = cnt + 1
             call pgsci(colors(iclr))
             do k=1,nz
@@ -264,7 +264,7 @@
             if (cnt >= num_max) return
             ymx = maxval(s% eps_nuc_categories(icat,grid_min:grid_max))
             if (ymx < exp10_ymin) return
-            iclr = cnt - num_colors*(cnt/num_colors) + 1
+            iclr = modulo(icat,num_colors) +1
             power_line_legend = cnt + 1
             call pgsci(colors(iclr))
             dx = 0.1

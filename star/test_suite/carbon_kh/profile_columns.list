@@ -71,7 +71,6 @@
    !scale_height ! in Rsun units
    !pressure_scale_height ! in Rsun units
 
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    !m_div_r ! gm/cm
    !dmbar_m_div_r
    !log_dmbar_m_div_r
@@ -120,8 +119,6 @@
       ! 0 if distance between inner and outer is increasing
    !log_cell_collapse_time ! log of cell_collapse_time
    
-   !grav_gr_factor ! (1/sqrt(1 - 2Gm/(rc^2))  -- only important for neutron stars
-   !log_grav_gr_factor ! log10(grav_gr_factor)
 
 
 
@@ -141,14 +138,12 @@
    entropy ! specific entropy divided by (avo*kerg)
    !logS ! log10(specific entropy)
    !logS_per_baryon ! log10(specific entropy per baryon / kerg)
-   !del_entropy ! entropy - entropy_start (includes change in entropy due to diffusion at beginning of step)
 
    !pressure ! total pressure at center of zone (pgas + prad)
    !prad ! radiation pressure at center of zone
    !pgas ! gas pressure at center of zone (electrons and ions)
    !logPgas ! log10(pgas)
    !pgas_div_ptotal ! pgas/pressure
-   !pturb_div_pgas_plus_prad
 
    !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
    !mu ! mean molecular weight per gas particle (ions + free electrons)
@@ -166,8 +161,6 @@
    !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
    !chiRho ! dlnP_dlnRho at constant T
    !chiT ! dlnP_dlnT at constant Rho
-   !dlnRho_dlnT_const_Pgas
-   !dlnRho_dlnPgas_const_T
 
    !csound ! sound speed
    !csound_face ! sound speed (was previously called csound_at_face)
@@ -183,33 +176,13 @@
 
 !# Mass accretion
    !eps_grav ! -T*ds/dt (negative for expansion)
-   !eps_grav_dm_term_const_q ! advection term, T*(ds/dm)*(dm/dt)_q
-   !eps_grav_dt_term_const_q ! fixed relative mass time derivative term, -T*(ds/dt)_q
    !log_abs_eps_grav_dm_div_L
    !log_abs_v ! log10(abs(velocity)) (cm/s)
-   !log_abs_dvdt_div_v
 
-   !dlnd ! change of log(density) at fixed mass coordinate (Lagrangian)
-   !dlnPgas ! change of log(Pgas) at fixed mass coordinate (Lagrangian)
-   !dlnT ! change of log(temperature) at fixed mass coordinate (Lagrangian)
-   !dlnR ! change of log(radius) at fixed mass coordinate (Lagrangian)
    
-   !dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Lagrangian)
-   !dlnPgas_dt ! time derivative of log(Pgas) at fixed mass coordinate (Lagrangian)
-   !dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
-   !dlnR_dt ! time derivative of log(radius) at fixed mass coordinate (Lagrangian)
-   !dr_dt ! time derivative of radius at fixed mass coordinate (Lagrangian)
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
 
-   !ds_from_eps_grav ! -eps_grav/T/(avo*kerg)
    
-   !dlnd_dt_const_q ! time derivative of log(density) at fixed q (for Eulerian eps_grav)
-   !dlnPgas_dt_const_q ! time derivative of log(Pgas) at fixed q (for Eulerian eps_grav)
-   !dlnT_dt_const_q ! time derivative of log(temperature) at fixed q (for Eulerian eps_grav)
    
-   !signed_dlnd ! sign(dlnd)*log10(max(1,abs(1d6*dlnd)))
-   !signed_dlnT ! sign(dlnT)*log10(max(1,abs(1d6*dlnT)))
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
 
 
 
@@ -334,8 +307,6 @@
 
 
 !# Energetics
-   !total_energy ! specific total energy of cell (ergs/g). internal+potential+kinetic+rotation.
-   !total_energy_integral ! sum from surface inwards of cell dm * cell total_energy (ergs)
    !cell_specific_IE
    !cell_specific_KE
    !cell_IE_div_IE_plus_KE
@@ -347,11 +318,9 @@
 !# Convection
    !mlt_mixing_length ! mixing length for mlt (cm)
    !mlt_mixing_type ! value returned by mlt
-   !conv_dP_term ! P is increased by factor (1 + conv_dP_term) by inclusion of convective turbulence
 
    !conv_vel ! convection velocity (cm/sec)
    !log_conv_vel ! log10 convection velocity (cm/sec)
-   !log_tau_conv_yrs ! timescale for change of conv velocity
 
    !conv_L_div_L
    !log_conv_L_div_L
@@ -363,20 +332,10 @@
    !lum_rad_div_L_Edd_sub_fourPrad_div_PchiT ! density increases outward if this is > 0
       ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973. 
 
-   !fourPrad_div_PchiT ! = phi, where 1/phi = 1 + (dPgas/dPrad)|rho 
       ! if phi < Lrad/Ledd, then will get density inversion
       ! see Joss, Salpeter, Ostriker, "Critical Luminosity", ApJ 181: 429-438, 1973.
 
    !gradT ! mlt value for required temperature gradient dlnT/dlnP
-   !d_gradT_dlnd00
-   !d_gradT_dlnT00
-   !d_gradT_dlndm1
-   !d_gradT_dlnTm1
-   !d_gradT_dlnR
-   !d_gradT_dL
-   
-   !actual_gradT ! actual temperature gradient dlnT/dlnP in model
-   !gradT_sub_actual_gradT
 
    !gradr ! dlnT/dlnP required for purely radiative transport
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary
@@ -396,8 +355,6 @@
 
    !log_gradT_div_gradr ! log10 gradT/gradr at cell boundary 
    !log_mlt_Gamma ! convective efficiency
-   !super_ad ! max(0,gradT-grada) at cell boundary 
-   !newly_nonconvective
    !conv_vel_div_csound ! convection velocity divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
    !log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
@@ -579,7 +536,6 @@
 
 !# Extras
    !extra_heat
-   !extra_dPdm
    !extra_L ! extra_heat integrated from center (Lsun)
    !log_extra_L ! log10 integrated from center (Lsun)
    !log_irradiation_heat
@@ -597,12 +553,6 @@
 
 
 !# Miscellaneous
-   !v_residual
-   !lnd_residual
-   !lnR_residual
-   !log_v_residual
-   !log_lnd_residual
-   !log_lnR_residual
 
    !dlog_h1_dlogP ! (log(h1(k)) - log(h1(k-1)))/(log(P(k)) - log(P(k-1)))
    !dlog_he3_dlogP
@@ -636,7 +586,6 @@
    !dlog_burn_ar_dlogP
    !dlog_burn_ca_dlogP
    !dlog_burn_ti_dlogP
-   !dlog_burn_cr_dlogP
    !dlog_burn_fe_dlogP
       
    !dlog_pnhe4_dlogP
@@ -659,14 +608,9 @@
    
    !zFe ! mass fraction of "Fe" = Fe+Co+Ni
    !log_zFe
-   !u_residual
-   !log_u_residual
    !u
    !u_face
    !dPdr_dRhodr_info
-   !flux_limit_lambda
-   !flux_limit_R
-   !signed_log_ergs_err
       
 
 

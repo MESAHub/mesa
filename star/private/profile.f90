@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -520,10 +520,6 @@
                call do_val(i, 'co_core_mass', s% co_core_mass)
                call do_val(i, 'fe_core_mass', s% fe_core_mass)
                call do_val(i, 'neutron_rich_core_mass', s% neutron_rich_core_mass)
-               call do_val(i, 'tau10_mass', s% tau10_mass)
-               call do_val(i, 'tau10_radius', s% tau10_radius)
-               call do_val(i, 'tau100_mass', s% tau100_mass)
-               call do_val(i, 'tau100_radius', s% tau100_radius)
                call do_val(i, 'dynamic_time', s% dynamic_timescale)
                call do_val(i, 'kh_timescale', s% kh_timescale)
                call do_val(i, 'nuc_timescale', s% nuc_timescale)

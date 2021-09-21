@@ -1,9 +1,0 @@
-#!/bin/bash
-
-do_one(){
-    cp $1 inlist_project
-    ./rn1
-}
-
-do_one inlist_pms
-do_one inlist_carbon

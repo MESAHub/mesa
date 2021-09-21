@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -391,6 +391,10 @@
          if(dbg) write(*,*) 'call add_fpe_checks'
          call add_fpe_checks(id, s, ierr)
          if (failed('add_fpe_checks',ierr)) return
+         
+         if(dbg) write(*,*) 'call multiply_tolerances'
+         call multiply_tolerances(id, s, ierr)
+         if (failed('multiply_tolerances',ierr)) return
 
          if(dbg) write(*,*) 'call pgstar_env_check'
          call pgstar_env_check(id, s, ierr)
@@ -650,11 +654,11 @@
             if (ierr /= 0) return
          end if
          
-         if (s% job% change_TDC_flag_at_model_number == s% model_number) then
-            write(*,*) 'have reached model number for new_TDC_flag', &
-               s% model_number, s% job% new_TDC_flag
-            call star_set_TDC_flag(id, s% job% new_TDC_flag, ierr)
-            if (failed('star_set_TDC_flag',ierr)) return
+         if (s% job% change_RSP2_flag_at_model_number == s% model_number) then
+            write(*,*) 'have reached model number for new_RSP2_flag', &
+               s% model_number, s% job% new_RSP2_flag
+            call star_set_RSP2_flag(id, s% job% new_RSP2_flag, ierr)
+            if (failed('star_set_RSP2_flag',ierr)) return
          end if
          
          if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
@@ -721,6 +725,11 @@
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
          
+         if (is_bad(s% total_energy_end)) then
+            ierr = 1
+            return
+         end if
+
          if(s% total_energy_end .ne. 0d0) then
             if (abs(s% cumulative_energy_error/s% total_energy_end) > &
                   s% warn_when_large_rel_run_E_err) then
@@ -905,9 +914,6 @@
          call s% extras_after_evolve(id, ierr)
          if (failed('after_evolve_extras',ierr)) return
 
-         call star_after_evolve(id, ierr)
-         if (failed('star_after_evolve',ierr)) return
-         
          if (s% result_reason == result_reason_normal) then
          
             if (s% job% pgstar_flag) &
@@ -1167,12 +1173,10 @@
          integer :: ierr
          logical :: file_exists
          stop_is_requested = .false.
+         if (mod(s% model_number,100) /= 0) return
          if (len_trim(s% job% stop_if_this_file_exists) == 0) return
-
          inquire(file=trim(s% job% stop_if_this_file_exists), exist=file_exists)
-
          if (.not. file_exists) return
-
          write(*,*) 'stopping because found file ' // &
             trim(s% job% stop_if_this_file_exists)
          stop_is_requested = .true.
@@ -1705,10 +1709,12 @@
          type (star_info), pointer :: s
          integer :: j, i, ir
          integer, pointer :: net_reaction_ptr(:) 
+         logical :: error
          
          include 'formats'
          
          ierr = 0
+         error = .false.
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
@@ -1723,12 +1729,20 @@
             ir = rates_reaction_id(s% job% reaction_for_special_factor(i))
             j = 0
             if (ir > 0) j = net_reaction_ptr(ir)
-            if (j <= 0) cycle
+            if (j <= 0) then
+               write(*,2) 'Failed to find reaction_for_special_factor ' // &
+               trim(s% job% reaction_for_special_factor(i)), &
+               j, s% job% special_rate_factor(i)
+               error = .true.
+               cycle
+            end if
             s% rate_factors(j) = s% job% special_rate_factor(i)
             write(*,2) 'set special rate factor for ' // &
                   trim(s% job% reaction_for_special_factor(i)), &
                   j, s% job% special_rate_factor(i)
          end do
+
+         if(error) call mesa_error(__FILE__,__LINE__)
          
       end subroutine set_rate_factors
 
@@ -1834,11 +1848,6 @@
             write(*,*)
             call star_load_restart_photo(id, s% job% saved_photo_name, ierr)
             if (failed('star_load_restart_photo',ierr)) return
-         else if (s% job% load_saved_model_for_RSP) then
-            write(*,'(a)') 'load saved model for RSP ' // trim(s% job% saved_model_name)
-            write(*,*)
-            call star_read_RSP_model(id, s% job% saved_model_name, ierr)
-            if (failed('star_read_RSP_model',ierr)) return
          else if (s% job% load_saved_model) then
             if (s% job% create_merger_model) then
                write(*,*) 'you have both load_saved_model and create_merger_model set true'
@@ -1856,9 +1865,9 @@
                write(*,*) 'please pick one and try again'
                call mesa_error(__FILE__,__LINE__)
             end if
-            write(*,'(a)') 'load saved model ' // trim(s% job% saved_model_name)
+            write(*,'(a)') 'load saved model ' // trim(s% job% load_model_filename)
             write(*,*)
-            call star_read_model(id, s% job% saved_model_name, ierr)
+            call star_read_model(id, s% job% load_model_filename, ierr)
             if (failed('star_read_model',ierr)) return
          else if (s% job% create_merger_model) then
             call create_merger_model(s, ierr)
@@ -1882,6 +1891,10 @@
          else if (s% job% create_RSP_model) then
             if (.not. restart) write(*, *) 'create initial RSP model'
             call star_create_RSP_model(id, ierr)
+            if (failed('star_create_RSP_model',ierr)) return
+         else if (s% job% create_RSP2_model) then
+            if (.not. restart) write(*, *) 'create initial RSP2 model'
+            call star_create_RSP2_model(id, ierr)
             if (failed('star_create_RSP_model',ierr)) return
          else if (s% job% create_initial_model) then
             if (.not. restart) write(*, *) 'create initial model'
@@ -2299,11 +2312,11 @@
             if (failed('star_set_RTI_flag',ierr)) return
          end if
          
-         if (s% job% change_TDC_flag .or. &
-               (s% job% change_initial_TDC_flag .and. .not. restart)) then
-            write(*,*) 'new_TDC_flag', s% job% new_TDC_flag
-            call star_set_TDC_flag(id, s% job% new_TDC_flag, ierr)
-            if (failed('star_set_TDC_flag',ierr)) return
+         if (s% job% change_RSP2_flag .or. &
+               (s% job% change_initial_RSP2_flag .and. .not. restart)) then
+            write(*,*) 'new_RSP2_flag', s% job% new_RSP2_flag
+            call star_set_RSP2_flag(id, s% job% new_RSP2_flag, ierr)
+            if (failed('star_set_RSP2_flag',ierr)) return
          end if
 
          if (s% job% change_RSP_flag .or. &
@@ -3115,12 +3128,15 @@
             integer :: num_pts, i, k, iounit
             ! these are needed to call eosPT_get
             real(dp) :: Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
-            ! these are needed to call eosDE_get
-            real(dp) :: T, log10T, dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E
+            real(dp) :: T, log10T
+            ! these are needed to call eosDT_get_T
             real(dp) :: T_guess_gas, T_guess_rad, logT_guess
+            integer :: eos_calls
             ! these are used for all eos calls
-            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
             real(dp), dimension(num_eos_d_dxa_results, s% species) :: d_dxa
+            real(dp), parameter :: logT_tol = 1d-8, logE_tol = 1d-8
+            integer, parameter :: MAX_ITERS = 20
             include 'formats'
             
             write(*,*)
@@ -3174,11 +3190,11 @@
                      entropy(i) = exp(res(i_lnS))
                   else if (s% job% get_entropy_for_relax_from_eos == 'eosPT') then
                      call eosPT_get( &
-                        s% eos_handle, 1 - s% X(k) - s% Y(k), s% X(k), s% abar(k), s% zbar(k), &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
                         var1, log10(var1), var2, log10(var2), &
                         Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-                        res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+                        res, d_dlnd, d_dlnT, d_dxa, ierr)
                      if (ierr /= 0) then
                         write(*,*) "failed in eosPT_get"
                         return
@@ -3188,18 +3204,16 @@
                      T_guess_gas = 2*var2*s% abar(k)*mp/(3*kerg*(1+s% zbar(k))) ! ideal gas (var2=energy)
                      T_guess_rad = pow(var2/crad,0.25d0)
                      logT_guess = log10(max(T_guess_gas,T_guess_rad))
-                     ! note that eosDE_get receives first energy and then density
-                     ! as parameters (var1 and var2 are switched compared to the other eos*_get functions)
-                     call eosDE_get( &
-                        s% eos_handle, 1 - s% X(k) - s% Y(k), s% X(k), s% abar(k), s% zbar(k), &
+                     call eosDT_get_T( &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
-                        var2, log10(var2), var1, log10(var1), logT_guess, &
-                        T, log10T, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-                        dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, &
-                        dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E, &
-                        ierr)
+                        log10(var1), i_lnE, log10(var2)*ln10, &
+                        logT_tol, logE_tol*ln10, MAX_ITERS, logT_guess, &
+                        arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
+                        log10T, res, d_dlnd, d_dlnT, d_dxa, &
+                        eos_calls, ierr)
                      if (ierr /= 0) then
-                        write(*,*) "failed in eosDE_get"
+                        write(*,*) "failed in eosDT_get_T (as eosDE)"
                         return
                      end if
                      entropy(i) = exp(res(i_lnS))
@@ -3272,6 +3286,34 @@
             call star_remove_center_by_he4( &
                id, s% job% remove_initial_center_by_he4, ierr)
             if (failed('star_remove_initial_center_by_he4',ierr)) return
+         end if
+         
+         if (s% job% remove_center_by_he4 > 0d0 .and. &
+               s% job% remove_center_by_he4 < 1d0) then
+            write(*, 1) 'remove_center_by_he4', &
+               s% job% remove_center_by_he4
+            call star_remove_center_by_he4( &
+               id, s% job% remove_center_by_he4, ierr)
+            if (failed('star_remove_center_by_he4',ierr)) return
+         end if
+         
+         if (s% job% remove_initial_center_by_c12_o16 > 0d0 .and. &
+               s% job% remove_initial_center_by_c12_o16 < 1d0 &
+                  .and. .not. restart) then
+            write(*, 1) 'remove_initial_center_by_c12_o16', &
+               s% job% remove_initial_center_by_c12_o16
+            call star_remove_center_by_c12_o16( &
+               id, s% job% remove_initial_center_by_c12_o16, ierr)
+            if (failed('star_remove_initial_center_by_c12_o16',ierr)) return
+         end if
+         
+         if (s% job% remove_center_by_c12_o16 > 0d0 .and. &
+               s% job% remove_center_by_c12_o16 < 1d0) then
+            write(*, 1) 'remove_center_by_c12_o16', &
+               s% job% remove_center_by_c12_o16
+            call star_remove_center_by_c12_o16( &
+               id, s% job% remove_center_by_c12_o16, ierr)
+            if (failed('star_remove_center_by_c12_o16',ierr)) return
          end if
          
          if (s% job% remove_initial_center_by_si28 > 0d0 .and. &
@@ -3817,7 +3859,54 @@
          end if
 
       end subroutine add_fpe_checks
-
+      
+      
+      
+      subroutine multiply_tolerances(id, s, ierr)
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         integer :: status
+         
+         real(dp) :: test_suite_res_factor = 1
+         character(len=20) :: test_suite_resolution_factor_str
+         
+         include 'formats'
+         
+         ierr = 0
+         call GET_ENVIRONMENT_VARIABLE('MESA_TEST_SUITE_RESOLUTION_FACTOR', &
+            test_suite_resolution_factor_str, STATUS=status)
+         if (status /= 0) return
+         
+         if (test_suite_resolution_factor_str .ne. "") then 
+            read(test_suite_resolution_factor_str, *) test_suite_res_factor
+            write(*,*) ""
+            write(*,*) "***"
+            write(*,*) "MESA_TEST_SUITE_RESOLUTION_FACTOR set to", test_suite_res_factor
+            write(*,*) "***"
+            write(*,*) "Warning: This environment variable is for testing purposes"
+            write(*,*) "          and should be set to 1 during normal MESA use."
+            write(*,*) "***"
+            write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
+            write(*,*) "and max_model_number by its inverse:"
+            write(*,*) ""
+            write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
+            s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
+            write(*,*)    "   new mesh_delta_coeff = ",   s% mesh_delta_coeff
+            write(*,*)    ""
+            write(*,*)    "   old time_delta_coeff = ",   s% time_delta_coeff
+            s% time_delta_coeff = test_suite_res_factor * s% time_delta_coeff
+            write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
+            write(*,*)    ""
+            write(*,*)    "   old max_model_number = ",   s% max_model_number
+            s% max_model_number = s% max_model_number / test_suite_res_factor
+            write(*,*)    "   new max_model_number = ",   s% max_model_number
+            write(*,*)    ""
+         end if
+      
+      end subroutine multiply_tolerances
+      
+      
       subroutine pgstar_env_check(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s

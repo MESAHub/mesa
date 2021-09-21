@@ -1,6 +1,6 @@
    ! ***********************************************************************
    !
-   !   Copyright (C) 2011-2019  Bill Paxton & The MESA Team
+   !   Copyright (C) 2011-2019  The MESA Team
    !
    !   This file is part of MESA.
    !
@@ -98,8 +98,9 @@
          implicit none
          real(dp), intent(in) :: X, Z
          real(dp), dimension(num_lgTs, num_lgRhos) :: Ecorr,Ytab,Etab
-         real(dp) :: Rho, T, log10Rho, log10T, Pgas, Prad, energy, entropy
-         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+         real(dp) :: Rho, T, log10Rho, log10T
+         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
+         real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          real(dp) :: Yplus, Yfree, Eoc2
          integer :: i,j,ierr
    
@@ -112,12 +113,11 @@
                log10T = lg_Ts(j)
                T = exp10(log10T)
    
-               call eosDT_get_legacy( &
+               call eosDT_get( &
                      handle, &
-                     X, Z, abar, zbar, species, chem_id, net_iso, xa, &
+                     species, chem_id, net_iso, xa, &
                      Rho, log10Rho, T, log10T, res, d_dlnd, d_dlnT, &
-                     d_dabar, d_dzbar, ierr)
-                     !Pgas, Prad, energy, entropy, ierr)
+                     d_dxa, ierr)
    
                Yfree = exp(res(i_lnfree_e))
                Yplus = max(Yfree-ye,0.0_dp)

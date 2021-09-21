@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2011-2019  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -30,7 +30,8 @@
       implicit none
 
       include "test_suite_extras_def.inc"
-      real(dp) :: t_spindown
+      real(dp) :: t_spindown = 1d100
+      real(dp) :: j_tot = 0d0
 
 
       contains
@@ -55,6 +56,8 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns
+
+         s% other_timestep_limit => other_timestep_limit
       end subroutine extras_controls
 
 
@@ -64,7 +67,7 @@
          integer, intent(out) :: ierr
 
          real(dp) :: bfield, vinf, eta, factor
-         real(dp) :: j_dot, check_delta_j, i_tot, j_tot, delta_j
+         real(dp) :: j_dot, check_delta_j, i_tot, delta_j
          real(dp) :: residual_jdot, torque, j_average
 
          type (star_info), pointer :: s
@@ -82,9 +85,7 @@
 
          s% extra_jdot(:) = 0d0
          s% extra_omegadot(:) = 0d0
-         i_tot = 0d0
          j_dot = 0d0
-         t_spindown = 0d0
          residual_jdot = 0d0
          check_delta_j = 0d0
          torque = 0d0
@@ -96,7 +97,9 @@
          i_tot = sum(s% i_rot(1:s% nz))
          j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz)) ! g cm^2/s Total Stellar Angular Momentum Content
 
-         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d49)) then ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
+        
+         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5)) then ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
+           write(*,*) 'j_tot: ', j_tot, s% omega_avg_surf, s% v_rot_avg_surf/1d5 
           !Calculate V_inf of stellar wind (e.g. Vinf = 1.92 Vesc, see Lamers & Cassinelli 2000)
           !N.B. This is good for line-driven winds in hot stars. For different types of Vinf = Vesc might be a better choice?
           vinf = 1.92d0 * sqrt(2.0d0 * standard_cgrav * s% mstar / (s% photosphere_r * Rsun))
@@ -117,7 +120,7 @@
           delta_j = j_dot * s% dt / j_tot
 
           ! Check if spindown timescale is shorter than timestep. Print a warning in case.
-          ! In extras_finish_step check that dt < t_spindown. If not, decrease timestep
+          ! In other_timestep_limit we enforce timestep controls such that dt << t_spindown.
           t_spindown = abs(j_tot / j_dot) ! Estimate spindown timescale
           if (s% x_logical_ctrl(1)) then
              write(*,1) 'Spindown Timescale (Myr): ', t_spindown / (1d6*secyer)
@@ -166,9 +169,6 @@
              write(*,1) 'Fraction of total angular momentum to remove', (j_dot * s% dt) / j_tot
              write(*,1) 'Torque/J_dot (if = 1.0 angular momentum is conserved): ', (torque / j_dot)
           end if
-
-        else
-          t_spindown = 100 * s% dt ! To avoid decreasing the timestep in extras_finish_step when j_tot < 1d49
         endif
 
 
@@ -186,8 +186,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
-
-         t_spindown = 0d0
 
       end subroutine extras_startup
 
@@ -276,6 +274,30 @@
       end subroutine data_for_extra_profile_columns
 
 
+      integer function other_timestep_limit( &
+         id, skip_hard_limit, dt, dt_limit_ratio)
+         use const_def, only: dp
+         integer, intent(in) :: id
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+
+         integer :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         other_timestep_limit = keep_going
+
+         if ((j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5) .and. t_spindown > 0d0) then
+            ! Only limit the timestep when the star is actually spinning fast.
+            dt_limit_ratio = s% x_ctrl(2) * s%dt / t_spindown
+         end if
+
+      end function other_timestep_limit
+
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
@@ -286,15 +308,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         !write(*,1) 't_spindown/s% dt', t_spindown/s% dt
-         if (s% use_other_torque .and. s% dt > 0) then
-            if ((t_spindown / s% dt) .lt. 10) then
-               s% dt_next = s% dt * 0.5d0
-               write(*,1) "Warning: Torque too large. Decreasing timestep to ", s% dt_next
-            end if
-         end if
-
-
       end function extras_finish_step
 
 

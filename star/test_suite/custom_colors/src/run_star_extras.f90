@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2017-2019  Bill Paxton, Rob Farmer & The MESA Team
+!   Copyright (C) 2017-2019  Rob Farmer & The MESA Team
 !
 !   this file is part of mesa.
 !

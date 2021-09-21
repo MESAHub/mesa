@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -130,7 +130,7 @@
          real :: windy, xmargin
          real :: xmin, xmax, xleft, xright, dx, tmp, ymin, ymax, ymin2, ymax2, dy
          integer :: grid_min, grid_max, npts, nz
-         real, pointer, dimension(:) :: xvec, yvec, yvec2, yvec3
+         real, allocatable, dimension(:) :: xvec, yvec, yvec2, yvec3
 
          include 'formats'
          ierr = 0

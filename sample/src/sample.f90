@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2011-2019  The MESA Team
 !
 !   This file is part of MESA.
 !
@@ -48,6 +48,7 @@
          real(dp) :: Rho, T, Pgas, log10Rho, log10T, Prad, energy, entropy
          real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, d_dlnRho_const_T, d_dlnT_const_Rho
          real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+         real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          integer :: ierr
          
          ierr = 0
@@ -81,13 +82,12 @@
          T = exp10(log10T)
          
          ! get a set of results for given temperature and density
-         call eosDT_get_legacy( &
-               handle, Z, X, abar, zbar, &
+         call eosDT_get( &
+               handle, &
                species, chem_id, net_iso, xa, &
                Rho, log10(Rho), T, log10T,  &
                res, d_dlnd, d_dlnT, &
-               d_dabar, d_dzbar, ierr)
-               !Pgas, Prad, energy, entropy, ierr)
+               d_dxa, ierr)
          
         
  1       format(a20,3x,e20.12)
@@ -113,13 +113,11 @@
          write(*,*)
 
          call eosPT_get(  &
-               handle, Z, X, abar, zbar, &
+               handle, &
                species, chem_id, net_iso, xa, &
                Pgas, log10(Pgas), T, log10(T),  &
                Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas,  &
-               res, d_dlnd, d_dlnT, &
-               d_dabar, d_dzbar, ierr)
-               !ierr)
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
       
          ! the indices for the results are defined in eos_def.f
          write(*,*)

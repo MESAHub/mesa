@@ -5,7 +5,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'he_burn.mod'
+      load_model_filename = 'he_burn.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -36,7 +36,7 @@
          max_model_number = 1000
 
          xa_central_lower_limit_species(1) = 'he4'
-         xa_central_lower_limit(1) = 0.6                       
+         xa_central_lower_limit(1) = 0.7                       
       
          dX_mix_dist_limit = 1d-4 
 

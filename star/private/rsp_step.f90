@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton, Radek Smolec & The MESA Team
+!   Copyright (C) 2018-2019  Radek Smolec & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -39,7 +39,7 @@
          set_f_Edd, calc_Prad, calc_Hp_face, calc_Y_face, &
          calc_PII_face, calc_Pvsc, calc_Pturb, calc_Chi, calc_Eq, &
          calc_source_sink, acceleration_eqn, calc_cell_equations, &
-         T_form_of_calc_Fr, calc_Lc, calc_Lt, check_omega, rsp_set_Teff
+         T_form_of_calc_Fr, calc_Lc, calc_Lt, rsp_set_Teff
       
       logical, parameter :: call_is_bad = .false.
       
@@ -250,6 +250,15 @@
                !write(*,2) 'reduce dt in HYD', s% model_number, s% dt, dt_max
                !write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
                !write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
+               if (s% RSP_report_limit_dt) then
+                  write(*,4) 'limit dt to avoid over-compressing innermost cell', s% model_number
+                  write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
+                  write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
+                  write(*,2) 'old dt', s% model_number, s% dt
+                  write(*,2) 'reduced dt', s% model_number, dt_max
+                  write(*,*)
+                  stop 'HYD compressing innermost cell'
+               end if
                s% dt = dt_max
                if (call_is_bad) then
                   if (is_bad(s% dt)) then
@@ -257,8 +266,6 @@
                      stop 'HYD compressing innermost cell'
                   end if
                end if
-               if (s% RSP_report_limit_dt) &
-                  write(*,4) 'limit dt to max_dt set by compressing innermost cell', s% model_number
             end if
          end if
          if (s% dt < s% force_timestep_min .and. s% force_timestep_min > 0) &
@@ -270,7 +277,10 @@
             converged = .false.
             call set_1st_iter_R_using_v_start(s)
             s% R_center = s% R_center + s% dt*s% v_center
+! write(*,3) 'RSP HYD w', 22, 0, s% RSP_w(22)
+            
             iter_loop: do iter = 1, max_iters  
+               s% solver_iter = iter
                if (iter == iter_for_dfridr) then
                   s% solver_test_partials_k = test_partials_k
                end if
@@ -289,6 +299,7 @@
                   DXH,DXXT,DXXC,DXXE,DXXL,EZH,kT_max,kW_max,kE_max,kL_max)
                if (s% doing_timing) call update_time(s, time0, total, s% time_solver_matrix)
                if (dbg_msg) call write_msg
+! write(*,3) 'RSP HYD w', 22, iter, s% RSP_w(22)
                if (iter == 1) cycle iter_loop
                converged = (abs(DXXT) < PREC2 .and. abs(DXXC) < PREC2)
             end do iter_loop      
@@ -603,28 +614,14 @@
 
 
       subroutine rsp_set_Teff(s)
+         use star_utils, only: get_phot_info
+         use atm_lib, only: atm_Teff
          type (star_info), pointer :: s
-         integer :: k
-         real(dp) :: tau00, taup1, dtau, tau_phot, Tface_0, Tface_1
-         include 'formats'
-         tau_phot = 2d0/3d0
-         tau00 = s% tau_factor*s% tau_base
-         s% Teff = s% T(1)
-         do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(2*pi*(s% r(k)**2 + s% r(k+1)**2))
-            taup1 = tau00 + dtau
-            if (taup1 >= tau_phot .and. dtau > 0d0) then
-               if (k == 1) then
-                  Tface_0 = s% T(k)
-               else
-                  Tface_0 = 0.5d0*(s% T(k) + s% T(k-1))
-               end if
-               Tface_1 = 0.5d0*(s% T(k) + s% T(k+1))
-               s% Teff = Tface_0 + (Tface_1 - Tface_0)*(tau_phot - tau00)/dtau
-               exit
-            end if
-            tau00 = taup1
-         end do
+         real(dp) :: r, m, v, L, T_phot, cs, kap, logg, ysum
+         integer :: k_phot
+         include 'formats'         
+         call get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
+         s% Teff = atm_Teff(L,r)
       end subroutine rsp_set_Teff
       
       
@@ -724,7 +721,7 @@
             call calc_Pvsc(s,i)
          end do
          !$OMP END PARALLEL DO
-         if (iter == 1) then
+         if (iter == 1 .and. s% RSP_do_check_omega) then
             do i = i_min,i_max
                call check_omega(s,i)
             end do
@@ -952,7 +949,7 @@
          integer, intent(out) :: kT_max,kW_max,kE_max,kL_max
          integer :: i, k, IR, IT, IW, IU, IE, IL, kEZH, &
             iTM, kTM, iRM, kRM, iEM, kEM, iCM, kCM, iLM, kLM
-         real(dp) :: XXR, DXXT, DXXC, DXXE, DXXL, DXRM, DXR, &
+         real(dp) :: old_w, XXR, DXXT, DXXC, DXXE, DXXL, DXRM, DXR, &
             EZH1, XXTM, XXCM, XXRM, XXEM, XXLM, DXKT, DXKC, DXKE, DXKL
          include 'formats'
          EZH = 1.0d0; kEZH = 0
@@ -1043,7 +1040,10 @@
             s% erad(k) = s% erad(k) + EZH*DX(IE)
             if (I > IBOTOM .and. I < NZN)then
                if ((s% RSP_w(k) + EZH*DX(IW)) <= 0d0)then
+                  old_w = s% RSP_w(k)
                   s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS to give seed for SOURCE
+                  !write(*,3) 'rand RSP_w', k, iter, s% model_number, &
+                  !   s% RSP_w(k), old_w, EZH*DX(IW), EZH
                else
                   s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
@@ -1316,6 +1316,20 @@
             d_Y2_der_out = Y2/s% Hp_face(k)*dHp_der_out(I)
 
             s% Y_face(k) = Y1*Y2
+            
+            if (k==-35 .and. iter == 1) then
+               write(*,3) 'RSP Y_face Y1 Y2', k, s% solver_iter, s% Y_face(k), Y1, Y2
+               write(*,3) 'Peos', k, s% solver_iter, s% Pgas(k) + s% Prad(k)
+               write(*,3) 'Peos', k-1, s% solver_iter, s% Pgas(k-1) + s% Prad(k-1)
+               write(*,3) 'QQ', k, s% solver_iter, s% QQ(k)
+               write(*,3) 'QQ', k-1, s% solver_iter, s% QQ(k-1)
+               write(*,3) 'Cp', k, s% solver_iter, s% Cp(k)
+               write(*,3) 'Cp', k-1, s% solver_iter, s% Cp(k-1)
+               write(*,3) 'lgT', k, s% solver_iter, s% lnT(k)/ln10
+               write(*,3) 'lgT', k-1, s% solver_iter, s% lnT(k-1)/ln10
+               write(*,3) 'lgd', k, s% solver_iter, log(1d0/s% Vol(k))/ln10
+               write(*,3) 'lgd', k-1, s% solver_iter, log(1d0/s% Vol(k-1))/ln10
+            end if
 
             dY_dr_00(I) = Y1*d_Y2_dr_00 + Y2*d_Y1_dr_00 ! 
             dY_dr_in(I) = Y1*d_Y2_dr_in + Y2*d_Y1_dr_in ! 
@@ -1500,7 +1514,7 @@
          d_Pvsc_der(i) = CQ/V*2d0*dv*d_dv_der
          d_Pvsc_dr_in(i) = CQ/V*2d0*dv*d_dv_dr_in - CQ*dv**2*dVol_dr_in(I)/V**2
          d_Pvsc_dr_00(i) = CQ/V*2d0*dv*d_dv_dr_00 - CQ*dv**2*dVol_dr_00(I)/V**2
-
+         
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
@@ -1512,27 +1526,48 @@
       end subroutine calc_Pvsc
 
       
-      subroutine check_omega(s,i) ! needs cleanup
+      subroutine check_omega(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: i   
-         real(dp) :: SOURS, DAMPS, DAMPRS, DELTA, SOL, POM, POM2, POM3
+         real(dp) :: SOURS, DAMPS, DAMPRS, DELTA, SOL, POM, POM2, POM3, POM4, w_start
          integer :: k
+         include 'formats'         
          if (I > IBOTOM .and. I < NZN .and. ALFA /= 0d0) then
          !     JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
             k = NZN+1-i
             if (s% RSP_w(k) > EFL0) return
+            w_start = s% RSP_w(k)
             POM = (s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))*0.5d0
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k)
             SOURS = POM*POM2
             DAMPS = (CEDE/ALFA)/((s% Hp_face(k) + s% Hp_face(k+1))*0.5d0)
             POM3 = (GAMMAR**2)/(ALFA**2)*4.d0*SIG
-            POM2 = (s% T(k)**3)*(s% Vol(k)**2)/(s% Cp(k)*s% opacity(k))       
-            DAMPRS = POM3*POM2/((s% Hp_face(k)**2 + s% Hp_face(k+1)**2)*0.5d0)
+            POM4 = (s% T(k)**3)*(s% Vol(k)**2)/(s% Cp(k)*s% opacity(k))       
+            DAMPRS = POM3*POM4/((s% Hp_face(k)**2 + s% Hp_face(k+1)**2)*0.5d0)
             DELTA = DAMPRS**2 + 4.d0*DAMPS*SOURS
+            if (k==-35) then
+               write(*,2) 'del', k, DELTA
+               write(*,2) 'DAMPR', k, DAMPRS
+               write(*,2) 'DAMP', k, DAMPS
+               write(*,2) 'SOURCE', k, SOURS
+               write(*,2) 'POM', k, POM
+               write(*,2) 'POM2', k, POM2
+               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
+               write(*,2) 's% Hp_face(k+1)', k+1, s% Hp_face(k+1)
+               write(*,2) 's% PII(k)', k, s% PII(k)
+               write(*,2) 's% PII(k+1)', k+1, s% PII(k+1)
+               write(*,2) 's% Y_face(k)', k, s% Y_face(k)
+               write(*,2) 's% Y_face(k+1)', k+1, s% Y_face(k+1)
+            end if
             if (DELTA >= 0.d0) SOL = ( - DAMPRS + sqrt(DELTA))/(2.d0*DAMPS)
             if (DELTA < 0.d0) SOL = - 99.99d0
             if (SOL >= 0.d0) SOL = SOL**2
-            if (SOL > 0.d0) s% RSP_w(k) = sqrt(SOL)
+            if (SOL > 0.d0) then
+               s% RSP_w(k) = sqrt(SOL)
+               if (s% RSP_report_check_omega_changes) &
+                  write(*,3) 'RSP_w modified initial guess vs initial', k, s% model_number, &
+                     s% RSP_w(k), w_start
+            end if
          end if
       end subroutine check_omega
       
@@ -1610,7 +1645,7 @@
             POMT4 = POM*POM1*POM2*POM3
 
             s% Chi(k) = POMT1*POM1
-            
+
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
                   !$OMP critical
@@ -1683,6 +1718,10 @@
             end if
             
          end if
+            
+            !if (k==194) then
+            !   write(*,2) 'RSP Chi', k, s% Chi(k)
+            !end if
          
          !test_partials = (k-1 == s% solver_test_partials_k)
          test_partials = .false.
@@ -1801,6 +1840,11 @@
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*QQ_div_Cp
             POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
+         
+            ! P*QQ/Cp = grad_ad
+            if (k==-109) write(*,3) 'w grada PII_00 PII_p1 SOURCE', k, s% solver_iter, &
+               s% RSP_w(k), (s% Pgas(k) + s% Prad(k))*QQ_div_Cp, s% PII(k), &
+               s% PII(k+1), s% SOURCE(k)
       
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2
@@ -2128,7 +2172,8 @@
             POM = - 2.d0/3.d0*ALFA*ALFAT*(P4*(s% r(k)**2))**2
             rho2_face = 0.5d0*(1.d0/s% Vol(k)**2 + 1.d0/s% Vol(k-1)**2)
             POM2 = s% Hp_face(k)*rho2_face
-            Lt_00 = POM*POM2*POM3            
+            Lt_00 = POM*POM2*POM3       
+                 
             TEM1 = Lt_00/s% Hp_face(k)
             TEM2 = Lt_00/POM2*s% Hp_face(k)
             
@@ -2691,9 +2736,9 @@
          HD(1:LD_HD,IR) = 0.d0   
          
          dt = s% dt
-         if (s% use_compression_outer_BC .and. I == NZN) then
-            stop 'no rsp support for use_compression_outer_BC'
-         end if
+         !if (s% use_compression_outer_BC .and. I == NZN) then
+         !   stop 'no rsp support for use_compression_outer_BC'
+         !end if
          
          ! XP doesn't include Prad for acceleration equation
          ! instead introduce term using Fr
@@ -3400,6 +3445,20 @@
             + DV*Ptrb_tw &
             - dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k) + s% Eq(k))
          HR(IW) = -residual
+         
+         if (k==-35) then
+            write(*,3) 'RSP w dEt PdV dtC dtEq', k, iter, &
+               s% RSP_w(k), s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
+               dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k)), dt*s% Eq(k)
+            !write(*,2) 'RSP w COUPL SOURCE DAMP DAMPR', k, &
+            !   s% RSP_w(k), s% COUPL(k), s% SOURCE(k), s% DAMP(k), s% DAMPR(k)
+            !write(*,2) 'RSP w SOURCE PII/Hp P*QQ_div_Cp P T', k, &
+            !   s% RSP_w(k), s% SOURCE(k), &
+            !   0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1)), &
+            !   (s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k), s% Pgas(k) + s% Prad(k), s% T(k)
+            !write(*,2) 'RSP PII_00 PII_p1 Hp_00 Hp_p1', k, &
+            !   s% PII(k), s% PII(k+1), s% Hp_face(k), s% Hp_face(k+1)
+         end if
          
          HD(i_w_dw_in2,IW) = 0.d0          
          HD(i_w_dw_in,IW) = - dt_div_dm*WTT*dLt_in_dw_in  

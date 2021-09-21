@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -97,7 +97,7 @@
          integer, intent(out) :: ierr
 
          character (len=strlen) :: str
-         real, pointer, dimension(:) :: xvec, log_brunt_nu, &
+         real, allocatable, dimension(:) :: xvec, log_brunt_nu, &
             log_lamb_Sl1, log_lamb_Sl2, log_lamb_Sl3, temp_vec
          real :: xmin, xmax, xleft, xright, dx, chScale, windy, &
             ymin, ymax, exp10_ymin, xmargin, &

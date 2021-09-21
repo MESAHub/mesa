@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'zams.mod'
+      load_model_filename = 'zams.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -166,7 +166,6 @@
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .true.
-      use_d_eos_dxa = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
       min_timestep_limit = 1d-12 ! (seconds)

@@ -35,9 +35,7 @@
    !log_column_depth ! log10 column depth, exterior mass / area (g cm^-2)
    !log_radial_depth ! log10 radial distance to surface (cm)
    luminosity ! luminosity at outer boundary of zone (in Lsun units)
-   !luminosity_rad ! radiative luminosity at outer boundary of zone (in Lsun units)
       ! -(4 pi r^2)^2 a c / (3 kap) d(T^4)/dm
-   !luminosity_conv ! luminosity - luminosity_rad (in Lsun units)
    !lum_conv_div_lum_rad
    !lum_rad_div_L_Edd
    !lum_conv_div_lum_Edd
@@ -71,10 +69,7 @@
    entropy ! specific entropy divided by (avo*kerg)
    mixing_type ! mixing types are defined in mesa/mlt/public/mlt_def
    csound ! sound speed
-   !csound_at_face ! sound speed
    v_div_csound ! velocity divided by sound speed
-   !binding_energy ! v^2/2 - G m / r + E + P / rho (ergs/gm).  negative if bound.
-   !binding_energy_integral ! sum from surface inwards of dm*(v^2/2 - G m / r + E + P/rho) (ergs)
    !v_div_r ! velocity divided by radius
    !scale_height ! in Rsun units
    eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
@@ -92,8 +87,6 @@
    pressure ! total pressure at center of zone (pgas + prad)
    !pgas ! gas pressure at center of zone (electrons and ions)
    pgas_div_ptotal ! pgas/pressure
-   !conv_dP_term ! value returned by MLT
-   !fourPrad_div_PchiT ! = phi, where 1/phi = 1 + (dPgas/dPrad)|rho 
       ! if phi < Lrad/Ledd, then will get density inversion
       ! see Joss, Salpeter, Ostriker, "Critical Luminosity", ApJ 181: 429-438, 1973.
    logPgas ! log10(pgas)
@@ -105,7 +98,6 @@
    !cv ! specific heat at constant volume
    !cp ! specific heat at constant total pressure
    !log_CpT
-   !log_CpTabsMdot_div_L
    !logS ! log10(specific entropy)
    !logS_per_baryon ! log10(specific entropy per baryon / kerg)
    !gamma1 ! dlnP_dlnRho at constant S
@@ -115,8 +107,6 @@
    !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
    !chiRho ! dlnP_dlnRho at constant T
    !chiT ! dlnP_dlnT at constant Rho
-   !dlnRho_dlnT_const_Pgas
-   !dlnRho_dlnPgas_const_T
    x_mass_fraction_H
    y_mass_fraction_He
    z_mass_fraction_metals
@@ -125,17 +115,13 @@
    !z2bar ! average charge^2
    ye ! average charge per baryon = proton fraction
    !opacity ! opacity measured at center of zone
-   !dkap_dlnrho_at_face ! partial derivative of opacity wrt. ln rho (at T=const) at outer edge of cell
-   !dkap_dlnt_at_face ! partial derivative of opacity wrt. ln T (at rho=const) at outer edge of cell
    log_opacity ! log10(opacity)
    eps_nuc ! ergs/g/sec from nuclear reactions (reaction neutrinos subtracted)
    log_abs_eps_nuc
    d_lnepsnuc_dlnd
    !d_epsnuc_dlnd
-   !deps_dlnd_at_face
    d_lnepsnuc_dlnT
    !d_epsnuc_dlnT
-   !deps_dlnT_at_face
    !eps_nuc_neu_total ! erg/gm/sec as neutrinos from nuclear reactions
    non_nuc_neu ! non-nuclear-reaction neutrino losses
    !nonnucneu_plas ! plasmon neutrinos (for collective reactions like gamma_plasmon => nu_e + nubar_e)
@@ -148,29 +134,22 @@
    !log_extra_L ! log10 integrated from center (Lsun)
    
    !log_irradiation_heat
-   !log_tau_conv_yrs ! timescale for change of conv velocity
    mlt_mixing_length ! mixing length for mlt (cm)
    mlt_mixing_type ! value returned by mlt
-   !conv_dP_term
          ! P is increased by factor (1 + conv_dP_term) by inclusion of convective turbulence
          
    gradT_sub_grada ! gradT-grada at cell boundary 
    gradT_div_grada ! gradT/grada at cell boundary 
    log_mlt_Gamma ! convective efficiency
    
-   !super_ad ! max(0,gradT-grada) at cell boundary 
    log_D_mix ! log10 diffusion coefficient for mixing in units of cm^2/second (Eulerian)
    log_D_mix_non_rotation
    !log_sig_mix ! sig(k) is mixing flow across face k in (gm sec^1)
          ! sig(k) = D_mix*(4*pi*r(k)**2*rho_face)**2/dmavg
-   !log_sig_div_siglim
          ! this is raw_sig(k)/siglimit(k)
          ! where siglimit(k) = sig_term_limit*min(dm(k),dm(k-1))/dt
          ! and raw_sig(k) is sig(k) before it is set to min(siglimit(k),raw_sig(k))
-   !log_am_sig_div_siglim
    log_conv_vel ! log10 convection velocity (cm/sec)
-   !log_conv_vel_old ! log10 previous convection velocity (cm/sec)
-   !newly_nonconvective
    conv_vel_div_csound ! convection velocity divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
    log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
@@ -184,9 +163,6 @@
    !log_D_anon ! D_mix for regions where mix_type = anonymous_mixing
    
    gradT ! mlt value for required temperature gradient dlnT/dlnP
-   !actual_gradT ! actual temperature gradient dlnT/dlnP in model
-   !gradT_sub_actual_gradT
-   !grada_at_face_sub_actual_gradT
 
    gradr ! dlnT/dlnP required for purely radiative transport
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary
@@ -195,27 +171,15 @@
    gradL ! gradient for Ledoux criterion for convection
    !sch_stable ! 1 if grada > gradr, 0 otherwise
    !ledoux_stable ! 1 if gradL > gradr, 0 otherwise
-   !stability_type ! values same as defined in mlt_def for mixing types
    
    ! the "for_mixing" values are the ones used to calculate the mixing diffusion coeffs,
    ! i.e., from the start of the step.  
    ! the names without "for_mixing" are the values at the end of the step.
-   !gradr_for_mixing
-   !gradT_for_mixing
-   !grada_for_mixing
-   !gradL_for_mixing
    
    !dominant_isoA_for_thermohaline
    !dominant_isoZ_for_thermohaline
    !gradL_composition_term
    
-   !dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Langranian)
-   !dlnPgas_dt ! time derivative of log(Pgas) at fixed mass coordinate (Langranian)
-   !dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Langranian)
-   !signed_dlnd ! sign(dlnd)*log10(max(1,abs(1d6*dlnd)))
-   !signed_dlnT ! sign(dlnT)*log10(max(1,abs(1d6*dlnT)))
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Langranian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    !logM ! log10(m/Msun)
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    !mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
@@ -240,8 +204,6 @@
    !log_dr_div_cs_yr ! log10 cell sound crossing time (years)
    
    
-   !grav_gr_factor ! (1/sqrt(1 - 2Gm/(rc^2))  -- only important for neutron stars
-   !log_grav_gr_factor ! log10(grav_gr_factor)
    
    x ! hydrogen mass fraction
    !log_x
@@ -288,7 +250,6 @@
       !cno
       !tri_alfa
       
-   ! rotation
       omega ! angular velocity = j_rot/i_rot
       !log_omega
       log_j_rot
@@ -331,39 +292,20 @@
       !dynamo_log_B_phi ! (Gauss)
 
 
-   ! misc
    
-      !nse_fraction ! 0 -> net; 1 -> nse
 
       !gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
       
-      !dlnP_dm ! for pressure equation
-      !dlnT_dm ! for temperature equation
-      !dL_dm ! for energy equation
       
-      !equP ! residual for pressure equation
-      !log_equP ! log10(abs(equP))
-      !equT ! residual for temperature equation
-      !log_equT 
-      !equR 
-      !log_equR
-      !equL 
-      !log_equL
-      !equv 
-      !log_equv 
 
-      !dlnP_dlnm
-      !dlnT_dlnm
       
       !delta_r ! r(outer edge) - r(inner edge); radial extent of cell in cm.
-      !delta_v ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
       !dt_dv_div_dr ! dt*delta_v/delta_r; need to have this << 1 for every cell
       
       ! electric field from element diffusion calculation
       !e_field
       !log_e_field
       
-      !sum_x_advection
       
       ! element diffusion velocity for species
       !edv h1
@@ -439,7 +381,6 @@
       !dlog_burn_ar_dlogP
       !dlog_burn_ca_dlogP
       !dlog_burn_ti_dlogP
-      !dlog_burn_cr_dlogP
       !dlog_burn_fe_dlogP
       
       !dlog_pnhe4_dlogP
@@ -466,7 +407,6 @@
       !lamb_S ! for l=1: S = sqrt(2)*csound/r
 
       !brunt_nu ! brunt_frequency in microHz
-      !dlnX_dr_Rsun_inv
       
       
       !lamb_Sl1 ! for l=1; = sqrt(2)*csound/r   (microHz)
@@ -541,9 +481,6 @@
       ! star_mass_o16
       ! star_mass_ne20
    ! locations of abundance transitions
-      ! h1_boundary_mass
-      ! he4_boundary_mass
-      ! c12_boundary_mass
    ! location of optical depths 10 and 100
       ! tau10_mass
       ! tau10_radius

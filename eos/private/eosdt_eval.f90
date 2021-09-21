@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -32,27 +32,12 @@
       use eosDT_load_tables, only: load_single_eosDT_table_by_id
       use eos_HELM_eval
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
-      use skye, only: get_Skye_for_eosdt, get_Skye_alfa
+      use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
 
 
       implicit none
 
-      integer, parameter :: i_doing_Rho = 1
-      integer, parameter :: i_which_other = 2
-      integer, parameter :: i_handle = 3
-      integer, parameter :: i_count = 4
-      integer, parameter :: i_species = 5
-      integer, parameter :: eos_lipar = 5
-
-      integer, parameter :: r_other_value = 1
-      integer, parameter :: r_Z = 2
-      integer, parameter :: r_X = 3
-      integer, parameter :: r_abar = 4
-      integer, parameter :: r_zbar = 5
-      integer, parameter :: r_rho = 6
-      integer, parameter :: r_T = 7
-      integer, parameter :: r_the_other_log = 8
-      integer, parameter :: eos_lrpar = 8      
+      logical, parameter :: return_ierr_beyond_table_bounds = .true.
 
       integer, parameter :: use_none = 1
       integer, parameter :: use_all = 2
@@ -256,7 +241,7 @@
             X >= rq% X_lo .and. X <= rq% X_hi .and. &
             Z >= rq% Z_lo .and. Z <= rq% Z_hi
          
-         call get_level1_for_eosdt( &
+         call get_level0_for_eosdt( &
             rq% handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, 1d0, &
@@ -264,6 +249,15 @@
             skip, ierr)
          if (skip) ierr = -1
          if (ierr /= 0) return
+
+         ! opportunity for the user to modify the eos results
+         if (rq% use_other_eos_results) then
+            call rq% other_eos_results( &
+               rq% handle, &
+               species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, & 
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
+         end if
          
          if (eos_test_partials) then   
             eos_test_partials_val = abar
@@ -274,6 +268,115 @@
       end subroutine Get_eosDT_Results
       
       
+      subroutine get_other_for_eosdt( &
+            handle, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, remaining_fraction, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         integer, intent(in) :: handle
+         logical, intent(in) :: dbg
+         real(dp), intent(in) :: &
+            Z, X, abar, zbar, remaining_fraction
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:), net_iso(:)
+         real(dp), intent(in) :: xa(:)
+         real(dp), intent(in) :: rho, logRho, T, logT
+         real(dp), intent(inout), dimension(nv) :: &
+            res, d_dlnd, d_dlnT
+         real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(out) :: skip
+         integer, intent(out) :: ierr
+
+         type (EoS_General_Info), pointer :: rq
+
+         rq => eos_handles(handle)
+
+         ierr = 0
+         
+         call rq% other_eos_component( &
+            handle, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            ierr)
+
+         ! zero all frac components
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+
+         skip = .false.
+
+      end subroutine get_other_for_eosdt
+
+
+      subroutine get_level0_for_eosdt( & ! other
+            handle, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, remaining_fraction, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         integer, intent(in) :: handle
+         logical, intent(in) :: dbg
+         real(dp), intent(in) :: Z, X, abar, zbar, remaining_fraction
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:), net_iso(:)
+         real(dp), intent(in) :: xa(:)
+         real(dp), intent(in) :: rho, logRho, T, logT
+         real(dp), intent(inout), dimension(nv) :: &
+            res, d_dlnd, d_dlnT
+         real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(out) :: skip
+         integer, intent(out) :: ierr
+
+         real(dp) :: frac, d_frac_dlogT, d_frac_dlogRho         
+         real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         type (EoS_General_Info), pointer :: rq
+         procedure (get_values_for_eosdt_interface), pointer :: get_1st, get_2nd
+
+         include 'formats'
+         
+         ierr = 0
+         rq => eos_handles(handle)
+
+         if (rq% use_other_eos_component) then
+            call rq% other_eos_frac( &
+               handle, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, &
+               frac, d_frac_dlogRho, d_frac_dlogT, &
+               ierr)
+            if (ierr /= 0) return
+            alfa = 1d0 - frac
+            d_alfa_dlogT = -d_frac_dlogT
+            d_alfa_dlogRho = -d_frac_dlogRho
+         else
+            alfa = 1d0 ! no other
+            d_alfa_dlogT = 0d0
+            d_alfa_dlogRho = 0d0
+         end if
+         
+         if (dbg) write(*,1) 'other', (1d0 - alfa)*remaining_fraction
+         
+         get_1st => get_other_for_eosdt
+         get_2nd => get_level1_for_eosdt
+         call combine_for_eosdt( &
+            get_1st, get_2nd, alfa*remaining_fraction, &
+            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+            rq, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
+            skip = .true.
+            ierr = 0
+         end if
+            
+      end subroutine get_level0_for_eosdt
+
+
       subroutine get_level1_for_eosdt( & ! CMS
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
@@ -303,11 +406,17 @@
          ierr = 0
          rq => eos_handles(handle)
 
-         call Get_CMS_alfa( & 
-            rq, logRho, logT, Z, abar, zbar, &
-            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-            ierr)
-         if (ierr /= 0) return
+         if (rq% use_CMS) then
+            call Get_CMS_alfa( &
+               rq, logRho, logT, Z, abar, zbar, &
+               alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+               ierr)
+            if (ierr /= 0) return
+         else
+            alfa = 1d0 ! no CMS
+            d_alfa_dlogT = 0d0
+            d_alfa_dlogRho = 0d0
+         end if
          
          if (dbg) write(*,1) 'CMS', (1d0 - alfa)*remaining_fraction
          
@@ -358,10 +467,17 @@
          rq => eos_handles(handle)
 
          if (rq% use_Skye) then
-            call Get_Skye_alfa( & 
-               rq, logRho, logT, Z, abar, zbar, &
-               alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-               ierr)
+            if (rq% use_simple_Skye_blends) then
+               call Get_Skye_alfa_simple( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                  ierr)
+            else
+               call Get_Skye_alfa( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                  ierr)
+            end if
             if (ierr /= 0) return               
          else
             alfa = 1d0 ! no Skye
@@ -1259,7 +1375,7 @@
          
          real(dp), dimension(nv) :: &
             res_1, d_dlnd_1, d_dlnT_1, res_2, d_dlnd_2, d_dlnT_2
-         real(dp), dimension(nv, species) :: d_dxa_1, d_dxa_2
+         real(dp), dimension(:,:), allocatable :: d_dxa_1, d_dxa_2
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
          logical :: skip_1st, skip_2nd
          logical, parameter :: linear_blend = .false.
@@ -1269,6 +1385,8 @@
          ierr = 0
          skip = .false.
          
+         allocate(d_dxa_1(nv, species), d_dxa_2(nv, species))
+
          alfa = alfa_in
          d_alfa_dlogT = d_alfa_dlogT_in
          d_alfa_dlogRho = d_alfa_dlogRho_in
@@ -1806,11 +1924,13 @@
                logQ0 = ep% logQ_min
                logQ1 = logQ0 + ep% del_logQ
                logQ = logQ0
+               if (return_ierr_beyond_table_bounds) ierr = -1
             else
                iQ = ep% num_logQs-1
                logQ0 = ep% logQ_min + (iQ-1)*ep% del_logQ
                logQ1 = logQ0 + ep% del_logQ
                logQ = logQ1
+               if (return_ierr_beyond_table_bounds) ierr = -1
             end if            
          else         
             logQ0 = ep% logQ_min + (iQ-1)*ep% del_logQ
@@ -1834,11 +1954,13 @@
                logT0 = ep% logT_min
                logT1 = logT0 + ep% del_logT
                logT = logT0
+               if (return_ierr_beyond_table_bounds) ierr = -1
             else
                iT = ep% num_logTs-1
                logT0 = ep% logT_min + (iT-1)*ep% del_logT
                logT1 = logT0 + ep% del_logT
                logT = logT1
+               if (return_ierr_beyond_table_bounds) ierr = -1
             end if            
          else         
             logT0 = ep% logT_min + (iT-1)*ep% del_logT
@@ -2014,7 +2136,7 @@
                logRho, which_other, other_value, &
                logT_tol, other_tol, max_iter, logT_guess, &
                logT_bnd1, logT_bnd2,  other_at_bnd1, other_at_bnd2, &
-               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          
          integer, intent(in) :: handle
@@ -2045,7 +2167,8 @@
          
          real(dp), intent(out) :: logT_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
+
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
 
@@ -2056,7 +2179,7 @@
                species, chem_id, net_iso, xa, &
                logRho, which_other, other_value, doing_Rho, &
                logT_guess, logT_result, logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-               logT_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logT_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
       
       end subroutine get_T
@@ -2068,7 +2191,7 @@
                logT, which_other, other_value, &
                logRho_tol, other_tol, max_iter, logRho_guess, &
                logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
      
          use const_def
@@ -2103,6 +2226,7 @@
             
          real(dp), intent(out) :: logRho_result
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
+         real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
 
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
@@ -2115,199 +2239,19 @@
                species, chem_id, net_iso, xa, &
                logT, which_other, other_value, doing_Rho, &
                logRho_guess, logRho_result, logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-               logRho_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               logRho_tol, other_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
 
       end subroutine get_Rho
       
 
-      subroutine get_T_given_Ptotal( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logRho, logP, logT_tol, logP_tol, max_iter, logT_guess, &
-               logT_bnd1, logT_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-         
-         integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z, X, abar, zbar
-         
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:)    
-         integer, pointer :: net_iso(:)
-         real(dp), intent(in) :: xa(:)
-         
-         real(dp), intent(in) :: logRho ! log10 of density
-         real(dp), intent(in) :: logP ! desired value for total pressure (gas + radiation)
-         real(dp), intent(in) :: logP_tol, logT_tol
-         integer, intent(in) :: max_iter ! max number of iterations        
-
-         real(dp), intent(in) :: logT_guess
-         real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
-         real(dp), intent(in) :: logP_at_bnd1, logP_at_bnd2 ! values at bounds
-         
-         real(dp), intent(out) :: logT_result
-         real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
-         integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr
-
-         logical, parameter :: doing_Rho = .false.
-         
-         call do_safe_get_Rho_T( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logRho, 0, logP, doing_Rho, &
-               logT_guess, logT_result, logT_bnd1, logT_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logT_tol, logP_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-      
-      end subroutine get_T_given_Ptotal
-      
-
-      subroutine get_Rho_given_Ptotal( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, logP, logRho_tol, logP_tol, max_iter, logRho_guess, &
-               logRho_bnd1, logRho_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-         
-         integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z, X, abar, zbar
-         
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:)    
-         integer, pointer :: net_iso(:)
-         real(dp), intent(in) :: xa(:)
-         
-         real(dp), intent(in) :: logT ! log10 of temperature
-         real(dp), intent(in) :: logP ! desired value for log10 total pressure (gas + radiation)
-         real(dp), intent(in) :: logP_tol, logRho_tol
-         integer, intent(in) :: max_iter ! max number of iterations        
-
-         real(dp), intent(in) :: logRho_guess
-         real(dp), intent(in) :: logRho_bnd1, logRho_bnd2 ! bounds for logRho
-         real(dp), intent(in) :: logP_at_bnd1, logP_at_bnd2 ! values at bounds
-         
-         real(dp), intent(out) :: logRho_result
-         real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
-         integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr
-
-         logical, parameter :: doing_Rho = .true.
-         
-         call do_safe_get_Rho_T( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, 0, logP, doing_Rho, &
-               logRho_guess, logRho_result, &
-               logRho_bnd1, logRho_bnd2, logP_at_bnd1, logP_at_bnd2, &
-               logRho_tol, logP_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-      
-      end subroutine get_Rho_given_Ptotal
-      
-
-      subroutine get_T_given_egas( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logRho, egas, logT_tol, egas_tol, max_iter, logT_guess, &
-               logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-         
-         integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z, X, abar, zbar
-         
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:)    
-         integer, pointer :: net_iso(:)
-         real(dp), intent(in) :: xa(:)
-         
-         real(dp), intent(in) :: logRho, egas, logT_tol, egas_tol
-         integer, intent(in) :: max_iter ! max number of iterations        
-
-         real(dp), intent(in) :: logT_guess
-         real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
-         real(dp), intent(in) :: egas_at_bnd1, egas_at_bnd2 ! values at bounds
-         
-         real(dp), intent(out) :: logT_result
-         real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
-         integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr
-
-         logical, parameter :: doing_Rho = .false.
-         
-         call do_safe_get_Rho_T( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logRho, -1, egas, doing_Rho, &
-               logT_guess, logT_result, logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logT_tol, egas_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-      
-      end subroutine get_T_given_egas
-      
-
-      subroutine get_Rho_given_egas( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, egas, logRho_tol, egas_tol, max_iter, logRho_guess, &
-               logRho_bnd1, logRho_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-         
-         integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z, X, abar, zbar
-         
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:)    
-         integer, pointer :: net_iso(:)
-         real(dp), intent(in) :: xa(:)
-         
-         real(dp), intent(in) :: logT ! log10 of temperature
-         real(dp), intent(in) :: egas ! desired value
-         real(dp), intent(in) :: egas_tol, logRho_tol
-         integer, intent(in) :: max_iter ! max number of iterations        
-
-         real(dp), intent(in) :: logRho_guess
-         real(dp), intent(in) :: logRho_bnd1, logRho_bnd2 ! bounds for logRho
-         real(dp), intent(in) :: egas_at_bnd1, egas_at_bnd2 ! values at bounds
-         
-         real(dp), intent(out) :: logRho_result
-         real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         
-         integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr
-
-         logical, parameter :: doing_Rho = .true.
-         
-         call do_safe_get_Rho_T( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               logT, -1, egas, doing_Rho, &
-               logRho_guess, logRho_result, &
-               logRho_bnd1, logRho_bnd2, egas_at_bnd1, egas_at_bnd2, &
-               logRho_tol, egas_tol, max_iter, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               eos_calls, ierr)
-      
-      end subroutine get_Rho_given_egas
-      
-      
       subroutine do_safe_get_Rho_T( &
                handle, Z, XH1, abar, zbar, &
                species, chem_id, net_iso, xa, &
                the_other_log, which_other, other_value, doing_Rho, &
                initial_guess, x, xbnd1, xbnd2, other_at_bnd1, other_at_bnd2, &
                xacc, yacc, ntry, &
-               res, d_dlnRho_c_T, d_dlnT_c_Rho, &
+               res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
          use const_def
          use chem_def, only: num_chem_isos
@@ -2328,7 +2272,7 @@
          real(dp), intent(in) :: xacc, yacc ! tolerances
          integer, intent(in) :: ntry ! max number of iterations        
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
-         real(dp), dimension(nv, species) :: d_dxa  ! need to make argument
+         real(dp), dimension(:,:) :: d_dxa_c_TRho
          integer, intent(out) :: eos_calls, ierr
          
          integer :: i, j, ix, iz
@@ -2404,7 +2348,7 @@
             call Get_eosDT_Results(rq, Z, XH1, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   rho, logRho, T, logT, &
-                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, ierr)
+                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, ierr)
 
             Pgas = exp(res(i_lnPgas))
             Prad = crad*T*T*T*T/3d0

@@ -166,7 +166,7 @@ odescal = 1d-5
             ! then use small_mtx_decsol,
             ! else use large_mtx_decsol.
       small_mtx_decsol = 'lapack'
-      large_mtx_decsol = 'klu'
+      large_mtx_decsol = 'bcyclic_dble'
       
       cache_suffix = '' ! use this only for reactions from rate_tables
       

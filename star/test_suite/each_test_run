@@ -75,8 +75,15 @@ function check_restart {
 
         # do the restart
         rm -f "$3"
-        command time -q -f '%M' -o mem-re.txt ./re "$photo" >> out.txt 2> err.txt
-        testhub_log "mem_re: $(<mem-re.txt)"
+        if command time -q -f '%M' -o mem-re.txt ./re "$photo" >> out.txt 2> err.txt
+        then
+            testhub_log "mem_re: $(<mem-re.txt)"
+        else
+            testhub_log "mem_re: -1"
+            failure_msg "$1 failed: non-zero exit code"
+            testhub_log "failure_type: :exit_code"
+            return 1
+        fi
         filter_stderr
         if [ -s err.txt ]; then
             failure_msg "$1 failed: wrote to stderr"
@@ -115,8 +122,15 @@ function check_run {
 
     # do the run
     date "+   start %H:%M:%S"
-    command time -q -f '%M' -o mem-rn.txt ./rn > out.txt 2> err.txt
-    testhub_log "mem_rn: $(<mem-rn.txt)"
+    if command time -q -f '%M' -o mem-rn.txt ./rn > out.txt 2> err.txt
+    then
+        testhub_log "mem_rn: $(<mem-rn.txt)"
+    else
+        testhub_log "mem_rn: -1"
+        failure_msg "$1 failed: non-zero exit code"
+        testhub_log "failure_type: :exit_code"
+        return 1
+    fi
     filter_stderr
     if [ -s err.txt ]; then
         failure_msg "$1 failed: wrote to stderr"
@@ -224,16 +238,25 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     echo "---" > testhub.yml
     testhub_log "test_case: $1"
     testhub_log "module: :$MESA_TEST_MOD"
-    testhub_log "omp_num_threads: $OMP_NUM_THREADS"
-    if [ -z "$MESA_RUN_OPTIONAL" ]; then
-        testhub_log "run_optional: false"
+    if [ -z "$OMP_NUM_THREADS" ]; then
+        testhub_log "omp_num_threads: 0"
     else
+        testhub_log "omp_num_threads: $OMP_NUM_THREADS"
+    fi
+    if [ -z "$MESA_SKIP_OPTIONAL" ]; then
         testhub_log "run_optional: true"
+    else
+        testhub_log "run_optional: false"
     fi
     if [ -z "$MESA_FPE_CHECKS_ON" ]; then
         testhub_log "fpe_checks: false"
     else
         testhub_log "fpe_checks: true"
+    fi
+    if [ -z "$MESA_TEST_SUITE_RESOLUTION_FACTOR" ]; then
+        testhub_log "resolution_factor: 1"
+    else
+        testhub_log "resolution_factor: $MESA_TEST_SUITE_RESOLUTION_FACTOR"
     fi
     testhub_log "inlists:"
     echo "build_and_run $1"

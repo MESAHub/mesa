@@ -1,0 +1,1 @@
+../../../star/test_suite/simplex_solar_calibration/README.rst

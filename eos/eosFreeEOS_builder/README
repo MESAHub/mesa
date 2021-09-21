@@ -7,9 +7,16 @@ code in the MESA/eos format.  If FreeEOS fails to provide
 sane values, then the code takes values from MESA's eosDT_get.
 If eosDT_get fails, then the code reverts to HELM.
 
-FreeEOS is written by Alan Irwin and distributed under the GPL,
-see ./free_eos-2.2.1/docs/COPYING. The version included here is
-based on FreeEOS v2.2.1.
+FreeEOS is written by Alan Irwin and distributed under the GPL.
+You need to install your own copy of FreeEOS from the source and
+following the instructions at freeeos.sourceforge.net. The
+FreeEOS build process has been tested and found to work with the 
+MESA SDK.
+
+You will need to update the file mesa/eos/eosFreeEOS_builder/make/makefile
+
+to point the environment variable FREE_EOS_DIR to your installation
+of the FreeEOS code.  Then run the ./mk script to build the executable.
 
 The controls for the program, free_eos_table, are set mostly in
 the inlist file.  The X and Z values and filenames for different

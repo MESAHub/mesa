@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019 Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019 The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -155,14 +155,11 @@
          logical :: neg
          real(dp) :: decay, capture, Qx, Qn, conv, mue, d_mue_dlnRho, d_mue_dlnT
          character(len=iso_name_length) :: weak_lhs, weak_rhs
-         real(dp) :: delta_Q, Vs
          integer, parameter :: nwork = pm_work_size
 
          real(dp) :: &
               s_lambda, s_dlambda_dlnT, s_dlambda_dlnRho, &
-              s_Qneu, s_dQneu_dlnT, s_dQneu_dlnRho,&
-              s_delta_Q, s_Vs
-
+              s_Qneu, s_dQneu_dlnT, s_dQneu_dlnRho
 
          character(len=2*iso_name_length+1) :: key
 
@@ -245,8 +242,7 @@
 
             call table% interpolate(T9, lYeRho, &
                lambda(i), dlambda_dlnT(i), dlambda_dlnRho(i), & 
-               Qneu(i), dQneu_dlnT(i), dQneu_dlnRho(i), &
-               delta_Q, Vs, ierr)
+               Qneu(i), dQneu_dlnT(i), dQneu_dlnRho(i), ierr)
 
             in = weak_lhs_nuclide_id(ir)
             out = weak_rhs_nuclide_id(ir)
@@ -264,8 +260,7 @@
                   table => suzuki_reactions_tables(rxn_idx) %t
                   call table % interpolate(T9, lYeRho, &
                        s_lambda, s_dlambda_dlnT, s_dlambda_dlnRho, &
-                       s_Qneu, s_dQneu_dlnT, s_dQneu_dlnRho, &
-                       s_delta_Q, s_Vs, ierr)
+                       s_Qneu, s_dQneu_dlnT, s_dQneu_dlnRho, ierr)
                   if (ierr == 0) then
                      lambda(i) = s_lambda
                      dlambda_dlnT(i) = s_dlambda_dlnT
@@ -273,8 +268,6 @@
                      Qneu(i) = s_Qneu
                      dQneu_dlnT(i) = s_dQneu_dlnT
                      dQneu_dlnRho(i) = s_dQneu_dlnRho
-                     delta_Q = s_delta_Q
-                     Vs = s_Vs
                      !write(*,*) lYeRho, T9, s_lambda, s_Qneu
                   end if
                   ierr = 0
@@ -326,6 +319,7 @@
          contains
          
          subroutine show_stuff
+            integer :: i
             include 'formats'
             write(*,1) 'T9', T9
             write(*,1) 'lYeRho', lYeRho

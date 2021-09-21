@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -28,7 +28,6 @@
 
       use star_private_def
       use const_def
-      use chem_def, only: ih1, ihe4, ic12, in14, io16
       use utils_lib
 
       implicit none
@@ -151,12 +150,8 @@
          ! Intermediates
          integer j, nz
          real(dp) r_new, vol00, volp1, cell_vol         
-         real(qp), dimension(:), allocatable :: prev_mesh_dm, dm, change_in_dm
 
          nz = s%nz
-         allocate(prev_mesh_dm(nz), dm(nz), change_in_dm(nz))
-         call compute_prev_mesh_dm(s, prev_mesh_dm, dm, change_in_dm)
-
 
          vol00 = four_thirds_pi*s% R_center*s% R_center*s% R_center
          do j=nz,1,-1
@@ -1657,57 +1652,6 @@
          end do
 
       end subroutine set_D_omega
-
-
-      subroutine set_D_smooth( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
-            D_smooth, oldloc, newloc, oldval, newval, work, ierr)
-         use interp_1d_lib
-         use interp_1d_def
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
-         real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), dimension(:) :: &
-            D_smooth, oldloc, newloc, oldval, newval
-
-         real(dp), pointer :: work(:)
-
-         integer, intent(out) :: ierr
-
-         integer :: n, nwork, k
-         logical :: dbg
-
-         include 'formats'
-
-         ierr = 0
-
-         dbg = .false.
-         n = nz! k_const_mass
-         nwork = pm_work_size
-
-         oldloc(1) = 0
-         do k=2,n
-            oldloc(k) = rxm_old(k)
-         end do
-         do k=1,n
-            newloc(k) = rxm_new(k)
-            oldval(k) = D_smooth(k)
-         end do
-         
-         call interpolate_vector( &
-            n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-            'adjust_mass set_D_smooth', ierr)
-         if (ierr /= 0) return
-         do k=1,k_newval-1
-            D_smooth(k) = 0d0
-         end do
-         do k=k_newval,n
-            D_smooth(k) = newval(k)
-         end do
-
-      end subroutine set_D_smooth
 
 
       end module adjust_mass

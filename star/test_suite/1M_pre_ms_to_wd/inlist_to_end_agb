@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'end_core_he_burn.mod'
+      load_model_filename = 'end_core_he_burn.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'end_agb.mod'
@@ -35,14 +35,14 @@
 
       envelope_mass_limit = 1d-2 ! Msun
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 17000
+      max_model_number = 20000
          
       initial_mass = 1.0
       initial_z = 0.02d0

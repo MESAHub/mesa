@@ -1,0 +1,85 @@
+June 2021 ('v1' version)
+Requests should be sent to chabrier@ens-lyon.fr
+-----------------------------------------------------------------------------------------------------------------
+
+These EOS tables for H/He interacting mixtures correspond to the following paper:
+  "A new equation of state for dense hydrogen-helium mixtures:
+    II: taking into account hydrogen-helium interactions"
+          Chabrier & Debras, 2021, ApJ
+  This paper is the extension of the previous one (Chabrier et al., 2019, ApJ, 872, 51)
+  which is based on the Ideal (Additive) Volume Law (IVL) for the H/He mixture.
+ The Tables for the IVL approximation can be found in: http://perso.ens-lyon.fr/gilles.chabrier/DirEOS/DirEOS2019
+-----------------------------------------------------------------------------------------------------------------
+
+Units for the tables are:
+ T[K], P[GPa=0.1 Mbar], rho [g/cm3], U[MJ/kg], S[MJ/kg/K]
+
+Tables for the H/He mixture:
+ TABLEEOS_2021_TP_Y****_v1
+ TABLEEOS_2021_Trho_Y***_v1
+
+Also included is an 'effective' pure H EOS to be used to compute H/HE mixtures beyond the IVL with different values of Y (see Chabrier & Debras 2021,CD21):
+ TABLE_H_TP_effective
+This can be done by following the procedure listed through eqns.(8)-(11) of Chabrier et al. (2019).
+>>>CAUTION: this 'effective' H EOS must be used *only* for this purpose. It must NOT be used as a pure H EOS by itself (see details in CD21).
+
+- The (log T, log P) tables include NT=121 isotherms
+  between logT=2.0 and logT=8.0 with a step dlogT=0.05.
+  Each isotherm includes NP=441 pressures from
+  logP=-9.0 to log P=+13.0 with a step dlogP=0.05.
+- The (log T, log rho) tables include NT=121 isotherms
+  between logT=2.0 and logT=8.0 with a step dlogT=0.05.
+  *CAUTION*: Each isotherm includes now Nrho=241 densities (instead of 281 for the H/HE IVL tables) from
+  log rho=-6.0 to log rho=+6.0 with a step dlog rho=0.05.
+---------------------------------------
+
+The tables for the H/He mixture have been calculated for 3 different values of Y:
+- TABLEEOS_HHE_Y0275: Y=0.275 (Z=0)
+- TABLEEOS_HHE_Y0292: this corresponds to an 'effective' helium
+  abundance Y'=0.275+Z_sol with Z_sol=0.017 the mean solar heavy element mass fraction
+  This value is the one used in the DUSTY (Chabrier et al. 2000),
+  COND (Baraffe et al. 2003) and Phillips et al. (2020) brown dwarf evolution models.
+- TABLEEOS_HHE_Y0297: this corresponds to an 'effective' helium
+  abundance Y'=0.280+Z_sol with Z_sol=0.017. 
+  This value is the one used in the BHAC2015 (Baraffe et al. 2015) low-mass star models.
+  Indeed, Y=0.28 is the helium abundance needed to recover the correct radius and luminosity
+  for the Sun today with these models, with a mixing length l/H_p=1.6.
+  It must be kept in mind that the exact helium abundance in the Sun remains undetermined:
+  (i) it can not be determined observationnally, (ii) the helium abundance has evolved during
+  the lifetime of the Sun because of the gravitational settling.
+---------------------------------------
+
+                 *** Warning ! ***
+For practical purposes, the tables are rectangular.
+Therefore, some values at very low densities in the (log T, log P) table
+or at very low pressure in the (log T, log rho) table might be unphysical.
+
+Similarly, values in the solid phase or beyond the limit of
+the first order quantum correction for the ions are unphysical
+(see details and Figs. 1 and 16 in Chabrier et al. 2019).
+                 *****************
+
+A word of caution:
+Due to the spline interpolation procedure, numerical
+oscillations or flaws in the calculations of the various
+thermodynamic quantities are expected. As these problems
+will be revealed, the tables will be corrected accordingly. 
+For a clear identification of the most recent
+version of the tables, these latter will be labeled with
+a '_vx' extension, as a reference to "version x". The date
+corresponding to the version will be given at the top of the present
+README file.
+                ******************
+
+          >>> FINAL WORD OF CAUTION <<<
+
+- In the (low mass) *stellar* range, users should use the IVL (Chabrier et al. 2019) EOS tables.
+  Indeed, non ideal H/He contributions are basically inconsequential in this domain. Therefore, in order
+  to avoid unnecessary numerical oscillations due to interpolation procedures, it is strongly advised
+  to use the IVL tables in this domain.
+- In contrast, H/He interactions start to play a role in the *brown dwarf* domain (see Fig. 1 of Chabrier et al. 2021).
+  The 2021 tables, which incorporate QMD simulations of Militzer & Hubbard (2013, ApJ, 774, 148), should thus be used in this domain. 
+  However, given the limited temperature-density domain covered by these simulations, it must be kept in mind that
+  uncertainties remain in these EOS calculations. Users must be aware of this issue.
+  The situation will improve once further simulations will be conducted over a larger domain. See Chabrier et al., 2021, A&A for details.
+        

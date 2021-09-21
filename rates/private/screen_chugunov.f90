@@ -1,6 +1,6 @@
    ! ***********************************************************************
    !
-   !   Copyright (C) 2018  Bill Paxton, Sam Jones, Robert Farmer & The MESA Team
+   !   Copyright (C) 2018  Sam Jones, Robert Farmer & The MESA Team
    !
    !   MESA is free software; you can use it and/or modify
    !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -69,7 +69,7 @@
       logical :: have_initialization = .false.
    
    
-      public  eval_screen_chugunov, screen_chugunov_init
+      public  eval_screen_chugunov, screen_chugunov_init, free_chugunov
    
    contains
    
@@ -90,11 +90,21 @@
       
       end subroutine  screen_chugunov_init
    
+
+      subroutine free_chugunov()
+
+!$omp critical  (omp_critical_screen_free_chugunov)
+         if(allocated(z13)) deallocate(z13)
+         have_initialization = .false.
+!$omp end critical  (omp_critical_screen_free_chugunov)
+
+      end subroutine free_chugunov
+
    
       subroutine eval_screen_chugunov(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
          implicit none
    
-         type (Screen_Info), pointer :: sc
+         type (Screen_Info)  :: sc
          real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
          real(dp),intent(in) ::    a1, a2     !< mass numbers of reactants
          real(dp),intent(out) ::   screen     !< on return, screening factor for this reaction

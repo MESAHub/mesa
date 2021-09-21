@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -133,6 +133,7 @@
          use rates_def
          use rates_initialize, only: free_reaction_arrays, free_raw_rates_records
          use reaclib_input, only: reaclib
+         use screening_chugunov, only: free_chugunov
          use utils_lib
 
          call integer_dict_free(skip_warnings_dict)
@@ -144,6 +145,8 @@
          call free_reaction_data(reaclib_rates)
          call free_reaction_arrays()
          call free_raw_rates_records()
+
+         call free_chugunov()
          
       end subroutine rates_shutdown
          
@@ -726,7 +729,7 @@
          ! with equations (4-215) and (4-221) of Clayton (1968).
          use rates_def
          use math_lib
-         type (Screen_Info), pointer :: sc ! previously setup 
+         type (Screen_Info) :: sc ! previously setup 
          real(dp), intent(in) :: z1, z2
          real(dp), intent(out) :: scor ! screening factor
          real(dp), intent(out) :: scordt ! partial wrt temperature
@@ -810,7 +813,7 @@
             screening_mode, num_isos, y, iso_z158)
          use rates_def
          use screen, only: do_screen_set_context
-         type (Screen_Info), pointer :: sc
+         type (Screen_Info) :: sc
          integer, intent(in) :: num_isos
          real(dp), intent(in) ::  &
                temp, den, logT, logRho, zbar, abar, z2bar, y(:), iso_z158(:)
@@ -834,7 +837,7 @@
          use screen5, only: fxt_screen5
          use screening_chugunov, only: eval_screen_chugunov
          
-         type (Screen_Info), pointer :: sc ! previously setup 
+         type (Screen_Info) :: sc ! previously setup 
          real(dp), intent(in) :: a1, z1, a2, z2
          integer, intent(in) :: screening_mode ! see screen_def.
          ! cached info

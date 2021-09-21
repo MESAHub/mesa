@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -44,15 +44,13 @@
          integer, intent(in) :: id, iounit
          integer, intent(out) :: ierr
          ierr = 0
-         read(iounit) num_bursts
-         read(iounit) waiting_for_burst
+         read(iounit,iostat=ierr) num_bursts, waiting_for_burst
       end subroutine extras_photo_read
 
 
       subroutine extras_photo_write(id, iounit)
          integer, intent(in) :: id, iounit
-         write(iounit) num_bursts
-         write(iounit) waiting_for_burst
+         write(iounit) num_bursts, waiting_for_burst
       end subroutine extras_photo_write
 
 

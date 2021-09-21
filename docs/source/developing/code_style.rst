@@ -1,11 +1,26 @@
 Coding style
 ============
 
+MESA has been developed over many years, thus there many different styles of code in use. We do not 
+require old code to be ported to the new style. However, new code should be written following these guidelines.
+
+
+Whitespace
+----------
+
 In free form Fortran files, indentation is 3 spaces.
 
 Indentation/whitespace rules are codified in an `EditorConfig`_ file located in the root of the repository (``.editorconfig``).
 
 .. _EditorConfig: https://editorconfig.org/
+
+
+Fortran
+-------
+
+The preferred Fortran version is at least Fortran 90 this enables things like modules and allocatable arrays.
+
+Common and equivalence blocks are banned. Just put the variables in a module header if needed to be shared.
 
 
 Exponents
@@ -42,7 +57,7 @@ The typical way to handle things is:
 
 .. code-block:: fortran
 
-    integer, intent(inout) :: ierr
+    integer, intent(out) :: ierr
     ierr = 0
 
     call my_subroutine(x,ierr)
@@ -54,7 +69,7 @@ for non-critical errors.
 Stop
 ----
 
-When signalling a critical error which can not be recovered from you should use:
+When signaling a critical error which can not be recovered from you should use:
 
 .. code-block:: fortran
 
@@ -162,8 +177,14 @@ used for consistency across the code.  This includes simple fractions
 (e.g. ``one_third``) and simple functions of mathematical constants
 (e.g. ``sqrt2``, ``pi4 = 4*pi``).
 
+Constants should be added to const_def.f90 if they meet any of the following criteria:
+
+* If it is a well known mathematical or physical constant or derived from other well known constants
+
+* If other code might use the constant
+
 
 Environment variables
 ---------------------
 
-If making a new environment variable then the variable should be prefixed with ``MESA_`` to ensure we don’t collide with other variables.
+If making a new environment variable then the variable should be prefixed with ``MESA_`` to ensure we don't collide with other variables.

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -59,7 +59,6 @@ contains
        ierr)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface
-    use atm_utils, only: eval_Teff_g
     use eos_def, only: num_eos_basic_results, i_chiRho, i_chiT
 
     real(dp), intent(in)       :: tau_surf
@@ -75,7 +74,7 @@ contains
     real(dp), intent(in)       :: errtol
     integer, intent(in)        :: max_iters
     logical, intent(in)        :: skip_partials
-    real(dp), intent(out)      :: Teff
+    real(dp), intent(in)       :: Teff
     real(dp), intent(out)      :: kap
     real(dp), intent(out)      :: lnT
     real(dp), intent(out)      :: dlnT_dL
@@ -118,13 +117,13 @@ contains
 
     if (L <= 0._dp .OR. R <= 0._dp .OR. M <= 0._dp) then
        ierr = -1
-       write(*,*) 'eval_T_tau_uniform: L, R, or M bad', L, R, M
+       write(*,*) 'atm: eval_T_tau_uniform: L, R, or M bad', L, R, M
        return
     end if
 
-    ! Evaluate the effective temperature & gravity
+    ! Evaluate the gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    g = cgrav*M/(R*R)
 
     ! Evaluate atmosphere data at optical depth tau_surf,
     ! using kap_guess as the opacity
@@ -138,17 +137,17 @@ contains
          lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
          ierr)
     if (ierr /= 0) then
-       write(*,*) 'Call to eval_data failed in eval_T_tau_uniform'
+       write(*,*) 'atm: Call to eval_data failed in eval_T_tau_uniform'
        return
     end if
     if (is_bad(lnT)) then
        ierr = -1
-       write(*,*) 'eval_T_tau_uniform logT from eval_data', lnT/ln10
+       write(*,*) 'atm: eval_T_tau_uniform logT from eval_data', lnT/ln10
        return
     end if
     if (is_bad(lnP)) then
        ierr = -1
-       write(*,*) 'eval_T_tau_uniform logP from eval_data', lnP/ln10
+       write(*,*) 'atm: eval_T_tau_uniform logP from eval_data', lnP/ln10
        return
     end if
 
@@ -163,7 +162,8 @@ contains
             lnRho, res, dres_dlnRho, dres_dlnT, &
             ierr)
        if (ierr /= 0) then
-          write(*,*) 'Call to eos_proc failed in eval_T_tau_uniform'
+          write(*,*) 'atm: call to eos_proc failed in eval_T_tau_uniform logP logT logPrad', &
+             lnP/ln10, lnT/ln10, log10(crad*exp(4d0*lnT)/3d0)
           return
        end if
 
@@ -176,7 +176,7 @@ contains
             kap, dlnkap_dlnRho, dlnkap_dlnT, &
             ierr)
        if (ierr /= 0) then
-          write(*,*) 'Call to kap_proc failed in eval_T_tau_uniform'
+          write(*,*) 'atm: Call to kap_proc failed in eval_T_tau_uniform logRho logT', lnRho/ln10, lnT/ln10
           return
        end if
 
@@ -204,7 +204,7 @@ contains
     end do iterate_loop
 
     if (max_iters > 0 .AND. iters > max_iters) then
-       write(*,*) 'Exceeded max_iters iterations in eval_T_tau_uniform'
+       write(*,*) 'atm: Exceeded max_iters iterations in eval_T_tau_uniform'
        ierr = -1
        return
     end if
@@ -321,7 +321,7 @@ contains
     ! Sanity check
 
     if (dlogtau <= 0.) then
-       write(*,*) 'Invalid dlogtau in build_T_tau_uniform:', dlogtau
+       write(*,*) 'atm: Invalid dlogtau in build_T_tau_uniform:', dlogtau
        call mesa_error(__FILE__,__LINE__)
     end if
 
@@ -342,7 +342,7 @@ contains
     call dopri5_work_sizes(NUM_VARS, NRDENS, liwork, lwork)
     allocate(work(lwork), iwork(liwork), stat=ierr)
     if (ierr /= 0) then
-       write(*,*) 'allocate failed in build_T_tau_uniform'
+       write(*,*) 'atm: allocate failed in build_T_tau_uniform'
        deallocate(atm_structure)
        return
     end if
@@ -381,7 +381,7 @@ contains
          LRPAR, rpar, LIPAR, ipar, & 
          LOUT, idid)
     if (idid < 0) then
-       write(*,*) 'Call to dopri5 failed in build_T_tau_uniform: idid=', idid
+       write(*,*) 'atm: Call to dopri5 failed in build_T_tau_uniform: idid=', idid
        ierr = -1
     end if
 
@@ -541,7 +541,7 @@ contains
            lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
            ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eval_data failed in build_data'
+         write(*,*) 'atm: Call to eval_data failed in build_data'
          return
       end if
 
@@ -552,7 +552,7 @@ contains
            lnRho, res, dres_dlnRho, dres_dlnT, &
            ierr)
       if (ierr /= 0) then
-         write(*,*) 'Call to eos_proc failed in build_data'
+         write(*,*) 'atm: Call to eos_proc failed in build_data'
          return
       end if
 
@@ -670,7 +670,7 @@ contains
 
     call eval_T_tau(T_tau_id, tau, Teff, lnT, ierr)
     if (ierr /= 0) then
-       write(*,*) 'Call to eval_T_tau failed in eval_data' 
+       write(*,*) 'atm: Call to eval_T_tau failed in eval_data' 
        return
     end if
 

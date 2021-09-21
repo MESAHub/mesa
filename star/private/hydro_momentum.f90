@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2012-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -42,34 +42,30 @@
       contains
 
       
-      subroutine do_surf_momentum_eqn(s, P_surf_ad, skip_partials, nvar, ierr)
+      subroutine do_surf_momentum_eqn(s, P_surf_ad, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          include 'formats'
          ierr = 0
          call get1_momentum_eqn( &
-            s, 1, P_surf_ad, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+            s, 1, P_surf_ad, nvar, d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for do_surf_momentum_eqn'
             return
          end if         
-         if (skip_partials) return
          call store_partials( &
             s, 1, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1, 'do_surf_momentum_eqn', ierr)
       end subroutine do_surf_momentum_eqn
 
       
-      subroutine do1_momentum_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_momentum_eqn(s, k, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
@@ -77,20 +73,18 @@
          include 'formats'
          P_surf_ad = 0d0
          call get1_momentum_eqn( &
-            s, k, P_surf_ad, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+            s, k, P_surf_ad, nvar, d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_momentum_eqn', k
             return
          end if         
-         if (skip_partials) return
          call store_partials( &
             s, k, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_momentum_eqn', ierr)
       end subroutine do1_momentum_eqn
 
 
       subroutine get1_momentum_eqn( &
-            s, k, P_surf_ad, skip_partials, nvar, &
+            s, k, P_surf_ad, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use chem_def, only: chem_isos
          use accurate_sum_auto_diff_star_order1
@@ -99,7 +93,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only used if k == 1
-         logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          real(dp), intent(out) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          integer, intent(out) :: ierr
@@ -177,7 +170,6 @@
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
-         if (skip_partials) return
          call unpack_res18(s% species, resid_ad)
 
          if (test_partials) then
@@ -193,10 +185,22 @@
             i_lum = s% i_lum
             i_v = s% i_v
             nz = s% nz
-            if (k > 1) then
-               dm_face = (s% dm(k) + s% dm(k-1))/2d0
-            else ! k == 1
-               dm_face = s% dm(k)/2d0
+            ! in the momentum equation, e.g., dP/dr = -g * rho (for HSE),
+            ! rho represents the inertial (gravitational) mass density.
+            ! since dm is baryonic mass, correct dm_face when using mass corrections
+            ! this will be used in the calculation of dm_div_A
+            if (s% use_mass_corrections) then
+               if (k > 1) then
+                  dm_face = (s% dm(k)*s% mass_correction(k) + s% dm(k-1)*s% mass_correction(k-1))/2d0
+               else ! k == 1
+                  dm_face = s% dm(k)*s% mass_correction(k)/2d0
+               end if
+            else
+               if (k > 1) then
+                  dm_face = (s% dm(k) + s% dm(k-1))/2d0
+               else ! k == 1
+                  dm_face = s% dm(k)/2d0
+               end if
             end if
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
          end subroutine init
@@ -234,24 +238,18 @@
          end subroutine setup_dPtot
                   
          subroutine setup_d_mlt_Pturb(ierr)
+            use star_utils, only: get_rho_face
             integer, intent(out) :: ierr
-            real(dp) :: d_mlt_Pturb, d_dmltPturb_dlndm1, d_dmltPturb_dlnd00
+            type(auto_diff_real_star_order1) :: rho_00, rho_m1
             ierr = 0
-
             ! d_mlt_Pturb = difference in MLT convective pressure across face
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
-               d_mlt_Pturb = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) - s% rho(k))/3d0
-               d_dmltPturb_dlndm1 = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/3d0
-               d_dmltPturb_dlnd00 = -s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/3d0
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
+               rho_00 = wrap_d_00(s,k)
+               rho_m1 = wrap_d_m1(s,k)
+               d_mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(rho_m1 - rho_00)/3d0
             else
-               d_mlt_Pturb = 0d0
-               d_dmltPturb_dlndm1 = 0d0
-               d_dmltPturb_dlnd00 = 0d0
+               d_mlt_Pturb_ad = 0d0
             end if
-            d_mlt_Pturb_ad = 0d0
-            d_mlt_Pturb_ad%val = d_mlt_Pturb
-            d_mlt_Pturb_ad%d1Array(i_lnd_m1) = d_dmltPturb_dlndm1
-            d_mlt_Pturb_ad%d1Array(i_lnd_00) = d_dmltPturb_dlnd00
          end subroutine setup_d_mlt_Pturb         
                   
          subroutine setup_RTI_terms(ierr)
@@ -343,7 +341,7 @@
       
       ! returns -G*m/r^2 with possible modifications for rotation.  MESA 2, eqn 22.
       subroutine expected_HSE_grav_term(s, k, grav, area, ierr)
-         use star_utils, only: get_area_info
+         use star_utils, only: get_area_info_opt_time_center
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: area, grav
@@ -355,7 +353,7 @@
          include 'formats'
          ierr = 0
          
-         call get_area_info(s, k, area, inv_R2, ierr)
+         call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          if (ierr /= 0) return
 
          grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
@@ -379,7 +377,7 @@
       ! other = s% extra_grav(k) - s% dv_dt(k)
       subroutine expected_non_HSE_term( &
             s, k, other_ad, other, accel_ad, Uq_ad, ierr)
-         use hydro_tdc, only: compute_Uq_face
+         use hydro_rsp2, only: compute_Uq_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
@@ -389,8 +387,7 @@
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: extra_ad, v_00
-         real(dp) :: accel, d_accel_dv, fraction_on, dlnR00, &
-            dlnTm1, dlnT00, dlndm1, dlnd00
+         real(dp) :: accel, d_accel_dv, fraction_on
          logical :: test_partials, local_v_flag
 
          include 'formats'
@@ -399,25 +396,7 @@
          
          extra_ad = 0d0
          if (s% use_other_momentum .or. s% use_other_momentum_implicit) then
-            if (s% use_other_momentum_implicit) then
-               dlnR00 = s% d_extra_grav_dlnR(k)
-               dlnTm1 = s% d_extra_grav_dlnTm1(k)
-               dlnT00 = s% d_extra_grav_dlnT00(k)
-               dlndm1 = s% d_extra_grav_dlndm1(k)
-               dlnd00 = s% d_extra_grav_dlnd00(k)
-               call wrap(extra_ad, s% extra_grav(k), &
-                  dlndm1, dlnd00, 0d0, &
-                  dlnTm1, dlnT00, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, dlnR00, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, s% d_extra_grav_dL(k), 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, 0d0, 0d0)
-            else
-               extra_ad%val = s% extra_grav(k)
-            end if
+            extra_ad = s% extra_grav(k)
          end if
          
          accel_ad = 0d0
@@ -447,7 +426,7 @@
          end if ! v_flag
 
          Uq_ad = 0d0
-         if (s% using_TDC) then ! Uq(k) is turbulent viscosity drag at face k
+         if (s% RSP2_flag) then ! Uq(k) is turbulent viscosity drag at face k
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
          end if
@@ -557,12 +536,11 @@
       end subroutine get_dPtot_face_info      
 
 
-      subroutine do1_radius_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_radius_eqn(s, k, nvar, ierr)
          use auto_diff_support
          use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             v00, r_actual, r_expected, dxh_lnR, resid_ad, &
@@ -584,7 +562,6 @@
                v00 = wrap_v_00(s,k)
             end if
             resid_ad = v00/s% csound_start(k)
-            if (skip_partials) return            
             call save_eqn_residual_info( &
                s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)           
             return
@@ -607,7 +584,6 @@
          if (test_partials) then
             s% solver_test_partials_val = 0
          end if
-         if (skip_partials) return            
          call save_eqn_residual_info( &
             s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)           
          if (test_partials) then   

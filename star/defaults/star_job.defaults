@@ -46,8 +46,6 @@
 
       ! eosDT_cache_dir
       ! ~~~~~~~~~~~~~~~
-      ! ionization_cache_dir
-      ! ~~~~~~~~~~~~~~~~~~~~
       ! kap_cache_dir
       ! ~~~~~~~~~~~~~
       ! rates_cache_dir
@@ -73,14 +71,13 @@
       ! ::
 
       !     eosDT_cache_dir = '/Users/bpaxton/mesa_caches/eosDT_cache'
-      !     ionization_cache_dir = '/Users/bpaxton/mesa_caches/ionization_cache'
       !     kap_cache_dir = '/Users/bpaxton/mesa_caches/kap_cache'
       !     rates_cache_dir = '/Users/bpaxton/mesa_caches/rates_cache'
 
       ! If you give an empty string for the ``cache_dir``, then
       ! if you have set the environment variable ``MESA_CACHES_DIR``, then
       ! the cache is a subdirectory of that with one of the following names:
-      ! ``eosDT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
+      ! ``eosDT_cache``, ``kap_cache``, ``rates_cache``
       ! if ``MESA_CACHES_DIR`` is not set or is the empty string, then
       ! the cache is a subdirectory of the corresponding data subdirectory,
       ! such as ``data/rates_data/cache`` for the rates cache.
@@ -88,7 +85,6 @@
       ! ::
 
     eosDT_cache_dir = ''
-    ionization_cache_dir = ''
     kap_cache_dir = ''
     rates_cache_dir = ''
 
@@ -170,6 +166,15 @@
       ! ::
 
     pgstar_flag = .false.
+
+      ! disable_pgstar_during_relax_flag
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, disables pgplot output during relaxation operations
+
+      ! ::
+
+    disable_pgstar_during_relax_flag = .true.
 
 
       ! clear_initial_pgstar_history
@@ -338,10 +343,8 @@
 
       ! load_saved_model
       ! ~~~~~~~~~~~~~~~~
-      ! load_saved_model_for_RSP
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! saved_model_name
-      ! ~~~~~~~~~~~~~~~~
+      ! load_model_filename
+      ! ~~~~~~~~~~~~~~~~~~~
 
       ! If ``load_saved_model`` is true, then use the specified model.
       ! If ``load_saved_model_for_RSP`` is true, then load the specified model and run it with RSP.
@@ -349,8 +352,7 @@
       ! ::
 
     load_saved_model = .false.
-    load_saved_model_for_RSP = .false.
-    saved_model_name = 'undefined'
+    load_model_filename = 'undefined'
 
 
       ! create_pre_main_sequence_model
@@ -588,13 +590,13 @@
       ! stop_if_this_file_exists
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! At each step, the code will try to open this file.
+      ! Every 100 steps, the code will try to open this file.
       ! If the file exists, it will terminate the run.
       ! If the file doesn't exist, it will keep going.
 
       ! ::
 
-    stop_if_this_file_exists = ''
+    stop_if_this_file_exists = 'stop_if_this_file_exists'
 
 ! modifications to model
 ! ======================
@@ -868,8 +870,6 @@
       ! ``relax_composition_filename`` holds the desired composition profile information
       ! file format for relax composition
 
-      ! ::
-
       !     1st line: num_points num_species
       !     then 1 line for for each point where define desired composition
       !     xq xa(1) ... xa(num_species)
@@ -886,7 +886,9 @@
       ! If timescale_for_relax_composition is negative, then the model will be adjusted
       ! such that in num_steps_to_relax_composition the desired composition is obtained.
       ! Otherwise, the abundance of each element will be updated each step as
+
       !     new_xa = lambda*target_xa + (1-lambda)*current_xa
+
       ! where lambda = dt/timescale_for_relax_composition. In this way, the target composition
       ! is reached when dt>=timescale_for_relax_composition.
 
@@ -1064,8 +1066,6 @@
 
       ! ``relax_angular_momentum_filename`` holds the desired angular momentum profile information
       ! file format for relax angular momentum
-
-      ! ::
 
       !     1st line: num_points
       !     then 1 line for for each point where define desired angular momentum
@@ -1269,6 +1269,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tau_factor_after_core_C_burn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Must have tau_factor = 1 when atm_option = 'table', as surface of the model must
+      ! always attach at the base of the table. However, these tau_factor settings can
+      ! be used to place the surface of the model inside or outside the photosphere
+      ! when atm_option = 'T_tau'.
 
       ! ``relax_to_this_tau_factor = 1`` puts outer cell at photosphere;
       ! can go much larger or much smaller to move surface in or out from photosphere.
@@ -2020,6 +2025,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_by_he4
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_initial_center_by_c12_o16
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_by_si28
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_to_reduce_co56_ni56
@@ -2049,6 +2056,7 @@
     remove_initial_center_by_radius_cm = 0
     remove_initial_center_by_radius_Rsun = 0
     remove_initial_center_by_he4 = 0
+    remove_initial_center_by_c12_o16 = 0
     remove_initial_center_by_si28 = 0
     remove_initial_center_to_reduce_co56_ni56 = 0
     remove_initial_center_by_ye = 0
@@ -2076,6 +2084,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_center_by_he4
       ! ~~~~~~~~~~~~~~~~~~~~
+      ! remove_center_by_c12_o16
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_center_by_si28
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! remove_center_to_reduce_co56_ni56
@@ -2101,6 +2111,7 @@
     remove_center_by_radius_cm = 0
     remove_center_by_radius_Rsun = 0
     remove_center_by_he4 = 0
+    remove_center_by_c12_o16 = 0
     remove_center_by_si28 = 0
     remove_center_to_reduce_co56_ni56 = 0
     remove_center_by_ye = 0
@@ -2468,8 +2479,8 @@
 
       ! + ``'CF88_basic_1212'`` : the single rate approximation from CF88.
       ! + ``'CF88_multi_1212'`` : combines the rates for the n, p, and a channels.
-      ! c12(c12,n)mg23, c12(c12,p)na23, and c12(c12,a)ne20 and
-      ! uses neutron branching from dayras, switkowski, and woosley, 1976.
+      !   c12(c12,n)mg23, c12(c12,p)na23, and c12(c12,a)ne20 and
+      !   uses neutron branching from dayras, switkowski, and woosley, 1976.
 
       ! ::
 
@@ -2559,21 +2570,19 @@
       ! If ``enable_adaptive_network`` is true, then
       ! at each step, the system calculates a new set of isos according to the following rules:
 
-      ! ::
-
-      !     for each iso in the current net:
-      !       let Z = number of protons in the iso and N = number of neutrons.
-      !       let x = max mass fraction for the iso in any cell in the model.
-      !       if x >= ``min_x_for_keep`` then include the iso in new net.
-      !       if x >= ``min_x_for_n`` then include following related isos:
-      !         (Z,N+1)   (Z,N-1)     -- add or remove neutron
-      !       if x >= min_x_for_add then include following related isos:
-      !         (Z+1,N)   (Z-1,N)     -- add or remove proton
-      !         (Z+2,N+2) (Z-2,N-2)   -- add or remove alpha
-      !         (Z+2,N+1) (Z-2,N-1)   -- exchange neutron/alpha
-      !         (Z+1,N+2) (Z-1,N-2)   -- exchange proton/alpha
-      !         (Z+1,N-1) (Z-1,N+1)   -- exchange proton/neutron
-      !         (Z+4,N+4) (Z+3,N+4)   -- extend alpha chain
+      !|     for each iso in the current net:
+      !|       let Z = number of protons in the iso and N = number of neutrons.
+      !|       let x = max mass fraction for the iso in any cell in the model.
+      !|       if x >= ``min_x_for_keep`` then include the iso in new net.
+      !|       if x >= ``min_x_for_n`` then include following related isos:
+      !|         (Z,N+1)   (Z,N-1)     -- add or remove neutron
+      !|       if x >= min_x_for_add then include following related isos:
+      !|         (Z+1,N)   (Z-1,N)     -- add or remove proton
+      !|         (Z+2,N+2) (Z-2,N-2)   -- add or remove alpha
+      !|         (Z+2,N+1) (Z-2,N-1)   -- exchange neutron/alpha
+      !|         (Z+1,N+2) (Z-1,N-2)   -- exchange proton/alpha
+      !|         (Z+1,N-1) (Z-1,N+1)   -- exchange proton/neutron
+      !|         (Z+4,N+4) (Z+3,N+4)   -- extend alpha chain
 
       ! Isos in the previous net can be dropped if they have x < ``min_x_for_keep`` and
       ! no other iso in the previous net causes them to be included in the new net.
@@ -2744,8 +2753,6 @@
 
       ! If this is true, use the A=17-28 weak reaction rates from
 
-      ! ::
-
       !     Suzuki, Toki, and Nomoto (2016)
       !     Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
       !     http://adsabs.harvard.edu/abs/2016ApJ...817..163S
@@ -2848,22 +2855,6 @@
 
     electron_coulomb_corrections = 'none'
 
-! ionization controls
-! ===================
-
-
-      ! ionization_file_prefix
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-      ! ionization_Z1_suffix
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! Prefix and suffix of ionization files.
-
-      ! ::
-
-    ionization_file_prefix = 'ion'
-    ionization_Z1_suffix = ''
-
 ! "extra" parameters
 ! ==================
 
@@ -2935,8 +2926,6 @@
       ! ~~~~~~~~~~~~~~~~
       ! color_num_colors
       ! ~~~~~~~~~~~~~~~~
-
-      ! ::
 
       !     Filenames for each bolometric correction (BC) table to load
       !     Must set the number of files to load

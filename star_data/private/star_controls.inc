@@ -191,7 +191,7 @@
 
          logical :: write_pulse_data_with_profile
          character (len=strlen) :: pulse_data_format, &
-            format_for_FGONG_data, format_for_OSC_data
+            format_for_OSC_data
          logical :: &
             add_atmosphere_to_pulse_data, &
             add_center_point_to_pulse_data, &
@@ -200,6 +200,8 @@
             interpolate_rho_for_pulse_data
          real(dp) :: threshold_grad_mu_for_double_point
          integer :: max_number_of_double_points
+         character (len=strlen) :: fgong_header(4)
+         integer :: fgong_ivers
 
          integer :: max_num_gyre_points
 
@@ -243,21 +245,21 @@
 
       ! mixing parameters
 
-         real(dp) :: alpha_semiconvection, semiconvection_upper_limit_center_h1
+         real(dp) :: alpha_semiconvection
          real(dp) :: thermohaline_coeff
          character (len=32) :: &
             thermohaline_option, MLT_option, semiconvection_option
          real(dp) :: mixing_length_alpha, remove_small_D_limit
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
+         integer :: steps_before_use_TDC
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid
          real(dp) :: Henyey_MLT_y_param, Henyey_MLT_nu_param, mlt_Pturb_factor, &
             min_logT_for_make_gradr_sticky_in_solver_iters
          logical :: mlt_use_rotation_correction, make_gradr_sticky_in_solver_iters, &
-            no_MLT_below_shock, no_MLT_below_T_max
-         logical :: mlt_make_surface_no_mixing
+            no_MLT_below_shock, mlt_make_surface_no_mixing
 
          real(dp) :: T_mix_limit
 
@@ -265,6 +267,14 @@
          real(dp) :: &
             gradT_excess_f1, &
             gradT_excess_f2, &
+            gradT_excess_age_fraction, &
+            gradT_excess_max_change, &
+            gradT_excess_lambda1, &
+            gradT_excess_beta1, &
+            gradT_excess_lambda2, &
+            gradT_excess_beta2, &
+            gradT_excess_dlambda, &
+            gradT_excess_dbeta, &
             gradT_excess_max_center_h1, &
             gradT_excess_min_center_he4, &
             gradT_excess_max_logT, &
@@ -317,7 +327,7 @@
             use_other_RSP_linear_analysis, RSP_testing, RSP_use_Prad_for_Psurf, RSP_use_atm_grey_with_kap_for_Psurf, &
             RSP_fixed_Psurf, RSP_hydro_only, RSP_report_undercorrections, RSP_relax_initial_model, &
             use_other_RSP_build_model, RSP_relax_adjust_inner_mass_distribution, RSP_trace_RSP_build_model, &
-            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme
+            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme, RSP_do_check_omega, RSP_report_check_omega_changes
          integer :: RSP_max_num_periods, RSP_max_iters_per_try, RSP_max_retries_per_step, &
             RSP_mode_for_setting_PERIODLIN, RSP_nmodes, &
             RSP_target_steps_per_cycle, RSP_nz_outer, RSP_nz, &
@@ -335,7 +345,7 @@
             RSP_min_PERIOD_div_PERIODLIN, RSP_v_div_cs_threshold_for_dt_limit, RSP_initial_dt_factor, &
             RSP_fraction_1st_overtone, RSP_fraction_2nd_overtone, &
             RSP_max_dt_times_min_dr_div_cs, RSP_tau_surf_for_atm_grey_with_kap, &
-            RSP_min_tau_for_turbulent_flux, RSP_max_dt, &
+            RSP_min_tau_for_turbulent_flux, RSP_max_dt, RSP_min_deltaR_for_periods, &
             RSP_kap_density_factor, RSP_T_anchor_tolerance, RSP_T_inner_tolerance, RSP_relax_dm_tolerance, &
             RSP_max_dt_times_min_rad_diff_time, RSP_Qvisc_linear_static, RSP_dq_1_factor, &
             RSP_surface_tau
@@ -348,7 +358,6 @@
             RSP_alpha_P_factor, RSP_alpha_s_factor, RSP_alpha_c_factor, &
             RSP_alpha_d_factor, RSP_gamma_r_factor, &
             RSP_min_tau, RSP_min_q, max_conv_vel_div_csound, &
-            min_dt_for_increases_in_convection_velocity, &
             max_v_for_convection, max_q_for_convection_with_hydro_on, &
             max_v_div_cs_for_convection, &
             max_abs_du_div_cs_for_convection, &
@@ -643,6 +652,7 @@
          logical :: use_split_merge_amr, trace_split_merge_amr, &
             equal_split_density_amr, split_merge_amr_skip_inner_cell, &
             split_merge_amr_hybrid_zoning, &
+            split_merge_amr_flipped_hybrid_zoning, &
             split_merge_amr_log_zoning, &
             split_merge_amr_logtau_zoning, &
             split_merge_amr_okay_to_split_nz, &
@@ -651,6 +661,7 @@
          integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters, &
             split_merge_amr_nz_r_core
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
+            split_merge_amr_nz_r_core_fraction, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
             split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff
 
@@ -761,12 +772,6 @@
          character(len=64) :: diffusion_isolve_solver
 
 
-      ! eos controls
-         logical :: &
-            report_eos_settings_at_start_of_run, &
-            use_fixed_XZ_for_eos
-         real(dp) :: fixed_X_for_eos, fixed_Z_for_eos
-
       ! opacity controls
 
          logical :: use_simple_es_for_kap, use_starting_composition_for_kap
@@ -792,25 +797,23 @@
 
       ! hydro parameters
 
+         character(len=32) :: energy_eqn_option
+
          real(dp) :: eps_nuc_factor, max_abs_eps_nuc, op_split_burn_eps_nuc_infall_limit
          real(dp) :: eps_WD_sedimentation_factor, non_nuc_neu_factor, eps_grav_factor, eps_mdot_factor
-         real(dp) :: dedt_eqn_r_scale, &
-            max_eta_for_dedt_form_of_energy_eqn, max_gamma_for_dedt_form_of_energy_eqn
+         real(dp) :: dedt_eqn_r_scale
 
          logical :: use_mass_corrections, use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
             use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
-            use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
-            always_use_dedt_form_of_energy_eqn, &
-            always_use_eps_grav_form_of_energy_eqn, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
-            
-         integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
-            steps_before_use_velocity_time_centering
+         real(dp) :: P_theta_for_velocity_time_centering, &
+            L_theta_for_velocity_time_centering
+         integer :: steps_before_use_velocity_time_centering
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
@@ -833,6 +836,7 @@
          logical :: include_L_in_correction_limits, &
             include_v_in_correction_limits, include_u_in_correction_limits
          
+         real(dp) :: max_X_for_conv_timescale, min_X_for_conv_timescale
          real(dp) :: max_q_for_conv_timescale, min_q_for_conv_timescale
          real(dp) :: max_q_for_QHSE_timescale, min_q_for_QHSE_timescale
 
@@ -921,10 +925,7 @@
             hydro_mtx_max_allowed_logRho, &
             hydro_mtx_min_allowed_logT, &
             hydro_mtx_min_allowed_logRho, &
-            solver_reduced_min_corr_coeff, &
-            solver_clip_dlogT, &
-            solver_clip_dlogRho, &
-            solver_clip_dlogR
+            solver_reduced_min_corr_coeff
 
          character (len=32) :: hydro_solver_name
 
@@ -1099,9 +1100,11 @@
             dt_div_min_dr_div_cs_limit, &
             dt_div_min_dr_div_cs_hard_limit, &
             min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, &
+            min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit, &
             min_q_for_dt_div_min_dr_div_cs_limit, &
             max_q_for_dt_div_min_dr_div_cs_limit
          integer :: min_k_for_dt_div_min_dr_div_cs_limit
+         logical :: check_remnant_only_for_dt_div_min_dr_div_cs_limit
 
          real(dp) :: dX_mix_dist_limit
 
@@ -1321,17 +1324,16 @@
          character (len=strlen) :: zams_filename
          logical :: set_rho_to_dm_div_dV
          
-         logical :: use_d_eos_dxa
+         logical :: fix_d_eos_dxa_partials
 
-         logical :: use_other_eos
          logical :: use_other_surface_PT
          logical :: use_other_kap
          logical :: use_other_diffusion
          logical :: use_other_diffusion_factor
-         logical :: use_other_mlt
          logical :: use_other_adjust_mdot
          logical :: use_other_j_for_adjust_J_lost
          logical :: use_other_alpha_mlt
+         logical :: use_other_mlt_results
          logical :: use_other_am_mixing
          logical :: use_other_brunt, use_other_brunt_smoothing
          logical :: use_other_solver_monitor

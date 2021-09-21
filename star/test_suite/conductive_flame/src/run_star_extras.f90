@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -32,6 +32,7 @@
          include "test_suite_extras_def.inc"
          
          real(dp) :: constant_lnP, constant_lnT
+         real(dp) :: flame_position, flame_width, flame_r0, flame_t0
 
       contains
 
@@ -152,12 +153,12 @@
 
          subroutine constant_surface_PT(id, &
                 skip_partials, &
-                Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
             use const_def, only: dp
             integer, intent(in) :: id
             logical, intent(in) :: skip_partials
-            real(dp), intent(out) :: Teff, &
+            real(dp), intent(out) :: &
                    lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                    lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
             integer, intent(out) :: ierr
@@ -180,8 +181,6 @@
             dlnP_dlnM = 0
             dlnP_dlnkap = 0
 
-            Teff = 1 ! Lots of code assumes Teff>0
-
          end subroutine constant_surface_PT
 
 
@@ -189,13 +188,15 @@
             integer, intent(in) :: id, iounit
             integer, intent(out) :: ierr
             ierr = 0
-            read(iounit) constant_lnP, constant_lnT
+            read(iounit, iostat=ierr) constant_lnP, constant_lnT, &
+               flame_r0, flame_t0
          end subroutine extras_photo_read
 
 
          subroutine extras_photo_write(id, iounit)
             integer, intent(in) :: id, iounit
-            write(iounit) constant_lnP, constant_lnT
+            write(iounit) constant_lnP, constant_lnT, &
+               flame_r0, flame_t0
          end subroutine extras_photo_write
 
 
@@ -250,8 +251,42 @@
             ierr = 0
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
+            if (.not. restart) then
+               flame_r0 = -1
+               flame_t0 = -1
+            end if
             call test_suite_startup(s, restart, ierr)
          end subroutine extras_startup
+
+
+         subroutine flame_properties(s, position, width)
+            type (star_info), pointer :: s
+            real(dp), intent(out) :: position, width
+            integer :: k, k_burn, kmax
+            real(dp) :: rtop, rbot
+
+            kmax = maxloc(s% eps_nuc(1:s% nz), dim=1)
+
+            rtop = 0d0
+            do k = kmax, 1, -1
+               if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
+                  rtop = s% r(k)
+                  exit
+               end if
+            end do
+
+            rbot = 0d0
+            do k = kmax, s% nz
+               if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
+                  rbot = s% r(k)
+                  exit
+               end if
+            end do
+
+            position = s% r(kmax)
+            width = max(0d0, rtop-rbot)
+
+         end subroutine flame_properties
 
 
          ! returns either keep_going, retry, or terminate.
@@ -263,13 +298,6 @@
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
             extras_check_model = keep_going
-            if (.false. .and. s% star_mass_h1 < 0.35d0) then
-                ! stop when star hydrogen mass drops to specified level
-                extras_check_model = terminate
-                write(*, *) 'have reached desired hydrogen mass'
-                return
-            end if
-
 
             ! if you want to check multiple conditions, it can be useful
             ! to set a different termination code depending on which
@@ -278,15 +306,6 @@
             ! customize the messages that will be printed upon exit by
             ! setting the corresponding termination_code_str value.
             ! termination_code_str(t_xtra1) = 'my termination condition'
-
-            ! stop once flame is halfway through domain
-            kmax = maxloc(s% eps_nuc(1:s% nz), dim=1)
-            if (s%r (kmax) .gt. 0.5d0 * s%r (1)) then
-               extras_check_model = terminate
-               s% termination_code = t_xtra1
-               termination_code_str(t_xtra1) = 'flame reached halfway point'
-               return
-            end if
 
             ! by default, indicate where (in the code) MESA terminated
             if (extras_check_model == terminate) s% termination_code = t_extras_check_model
@@ -311,41 +330,21 @@
             integer, intent(out) :: ierr
             type (star_info), pointer :: s
 
-            integer :: k, k_burn, kmax
-            real(dp) :: rtop, rbot, max_eps_nuc_k
-
             ierr = 0
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
 
-            kmax = maxloc(s% eps_nuc(1:s% nz), dim=1)
-
-            !note: do NOT add the extras names to history_columns.list
+            ! note: do NOT add the extras names to history_columns.list
             ! the history_columns.list is only for the built-in log column options.
             ! it must not include the new column names you are adding here.
 
+            call flame_properties(s, flame_position, flame_width)
+
             names(1) = 'r_flame'
-            vals(1) = s% r(kmax)
+            vals(1) = flame_position
 
-            
             names(2) = 'l_flame'
-            rtop = 0d0
-            do k = kmax, 1, -1
-                if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
-                     rtop = s% r(k)
-                     exit
-                end if
-            end do
-
-            rbot = 0d0
-            do k = kmax, s% nz
-                if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
-                     rbot = s% r(k)
-                     exit
-                end if
-            end do
-
-            vals(2) = max(0d0, rtop-rbot)
+            vals(2) = flame_width
 
          end subroutine data_for_extra_history_columns
 
@@ -473,6 +472,26 @@
             ! to update the star log,
             ! s% need_to_update_history_now = .true.
 
+            ! get flame properties
+            call flame_properties(s, flame_position, flame_width)
+
+            ! when flame first is 30% through domain, record properties
+            ! will be used to calculate flame speed
+            if (flame_r0 .lt. 0) then
+               if (flame_position .gt. 0.3d0 * s%r (1)) then
+                  flame_r0 = flame_position
+                  flame_t0 = s% star_age
+               end if
+            end if
+
+            ! stop once flame is halfway through domain
+            if (flame_position .gt. 0.5d0 * s%r (1)) then
+               extras_finish_step = terminate
+               s% termination_code = t_xtra1
+               termination_code_str(t_xtra1) = 'flame reached halfway point'
+               return
+            end if
+
             ! see extras_check_model for information about custom termination codes
             ! by default, indicate where (in the code) MESA terminated
             if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
@@ -483,10 +502,44 @@
             integer, intent(in) :: id
             integer, intent(out) :: ierr
             type (star_info), pointer :: s
-            real(dp) :: dt
+            real(dp) :: flame_speed, flame_speed_expected, flame_width_expected
             ierr = 0
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
+
+            include 'formats'
+
+            call flame_properties(s, flame_position, flame_width)
+
+            flame_speed = (flame_position - flame_r0)/((s% star_age - flame_t0)*secyer)
+
+            ! put target info in TestHub output
+            testhub_extras_names(1) = 'flame_speed'; testhub_extras_vals(1) = flame_speed
+            testhub_extras_names(2) = 'flame_width'; testhub_extras_vals(2) = flame_width
+
+            write(*,*)
+            write(*,1) testhub_extras_names(1), testhub_extras_vals(1)
+            write(*,1) testhub_extras_names(2), testhub_extras_vals(2)
+            write(*,*)
+
+            ! get targets from inlist
+            flame_speed_expected = s% x_ctrl(9)
+            flame_width_expected = s% x_ctrl(10)
+
+            if (abs(flame_speed - flame_speed_expected) > 0.1 * flame_speed_expected) then
+               write(*,*) 'bad value for flame_speed'
+               write(*,1) 'flame_speed', flame_speed
+               write(*,1) 'expected', flame_speed_expected
+               write(*,1) 'flame_speed-expected', flame_speed-flame_speed_expected
+            else if (abs(flame_width - flame_width_expected) > 0.1 * flame_width_expected) then
+               write(*,*) 'bad value for flame_width'
+               write(*,1) 'flame_width', flame_width
+               write(*,1) 'expected', flame_width_expected
+               write(*,1) 'flame_width-expected', flame_width-flame_width_expected
+            else
+               write(*,'(a)') 'all values are within tolerance'
+            end if
+
             call test_suite_after_evolve(s, ierr)
          end subroutine extras_after_evolve
 

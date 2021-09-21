@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -56,7 +56,6 @@ contains
        ierr)
 
     use atm_def
-    use atm_utils, only: eval_Teff_g
     use eos_lib, only: radiation_pressure
     use table_atm, only: get_table_values
     use utils_lib, only: is_bad
@@ -68,7 +67,7 @@ contains
     integer, intent(in)   :: id
     real(dp), intent(in)  :: Z
     logical, intent(in)   :: skip_partials
-    real(dp), intent(out) :: Teff
+    real(dp), intent(in)  :: Teff
     real(dp), intent(out) :: lnT
     real(dp), intent(out) :: dlnT_dL
     real(dp), intent(out) :: dlnT_dlnR
@@ -120,10 +119,9 @@ contains
        return
     end if
 
-    ! Evaluate the effective temperature & gravity
+    ! Evaluate the gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
-
+    g = cgrav*M/(R*R)
     logg = log10(g)
 
     ! Perform the table lookup
@@ -215,14 +213,14 @@ contains
   !****
   
   subroutine get_table_alfa_beta( &
-       L, R, M, cgrav, id, alfa, beta, ierr)
+       L, Teff, R, M, cgrav, id, alfa, beta, ierr)
 
     use atm_def
-    use atm_utils, only: eval_Teff_g
     use table_atm, only: &
          ai_two_thirds, ai_100, ai_10, ai_1, ai_1m1, ai_wd_25, ai_db_wd_25
 
     real(dp), intent(in)  :: L
+    real(dp), intent(in)  :: Teff
     real(dp), intent(in)  :: R
     real(dp), intent(in)  :: M
     real(dp), intent(in)  :: cgrav
@@ -239,7 +237,6 @@ contains
 
     logical, parameter :: DBG = .FALSE.
 
-    real(dp)                :: Teff
     real(dp)                :: g
     real(dp)                :: logTeff
     real(dp)                :: logg
@@ -280,10 +277,9 @@ contains
        return
     end if
 
-    ! Evaluate the effective temperature & gravity
+    ! Evaluate the gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
-
+    g = cgrav*M/(R*R)
     logTeff = log10(Teff)
     logg = log10(g)
 

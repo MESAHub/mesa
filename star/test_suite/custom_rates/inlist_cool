@@ -2,7 +2,7 @@
   ! pgstar_flag = .true.
 
   load_saved_model = .true.
-  saved_model_name = 'he_wd.mod'
+  load_model_filename = 'he_wd.mod'
   required_termination_code_string = 'log_center_temp_lower_limit'
 
   save_model_when_terminate = .true.

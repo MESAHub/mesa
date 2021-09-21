@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -399,7 +399,7 @@ contains
         X = eval_face(s%dq, s%X, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
         L = s%L(k)
         kap = eval_face(s%dq, s%opacity, k, k_a, k_b)
-        eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav, k, k_a, k_b)
+        eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         Gamma_1 = eval_face(s%dq, s%gamma1, k, k_a, k_b)
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         delta = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
@@ -415,7 +415,7 @@ contains
              eval_face(s%dq, s%X, k, k_a, k_b) - &
              eval_face(s%dq, s%Y, k, k_a, k_b)))
         R_r = r_outer - s%r(k)
-        eps_grav = eval_face(s%dq, s%eps_grav, k, k_a, k_b)
+        eps_grav = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         X_He3 = eval_face_X(s, he3, k, k_a, k_b)
         X_C12 = eval_face_X(s, c12, k, k_a, k_b)
         X_C13 = eval_face_X(s, c13, k, k_a, k_b)
@@ -492,7 +492,7 @@ contains
         X = eval_center(s%rmid, s%X, k_a, k_b, v_lo=0d0, v_hi=1d0)
         L = 0d0
         kap = eval_center(s%rmid, s%opacity, k_a, k_b)
-        eps = eval_center(s%rmid, s%eps_nuc, k_a, k_b) + eval_center(s%rmid, s%eps_grav, k_a, k_b)
+        eps = eval_center(s%rmid, s%eps_nuc, k_a, k_b) + eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         Gamma_1 = eval_center(s%rmid, s%gamma1, k_a, k_b)
         nabla_ad = eval_center(s%rmid, s%grada, k_a, k_b)
         delta = eval_center(s%rmid, s%chiT, k_a, k_b)/eval_center(s%rmid, s%chiRho, k_a, k_b)
@@ -504,7 +504,7 @@ contains
              eval_center(s%rmid, s%X, k_a, k_b) - &
              eval_center(s%rmid, s%Y, k_a, k_b)))
         R_r = r_outer
-        eps_grav = eval_center(s%rmid, s%eps_grav, k_a, k_b)
+        eps_grav = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         X_He3 = eval_center_X(s, he3, k_a, k_b)
         X_C12 = eval_center_X(s, c12, k_a, k_b)
         X_C13 = eval_center_X(s, c13, k_a, k_b)
@@ -547,12 +547,26 @@ contains
     integer                  :: i
     integer                  :: j
     integer                  :: k
+    character(len=strlen)    :: format_for_fgong_data
 
     ! Write FGONG data to file
 
     call get_star_ptr(id, s, ierr)
     if (ierr /= 0) then
        write(*,*) 'bad star id for write_fgong_info'
+       return
+    end if
+
+    ! Set float format from version number (ivers)
+
+    if (s% fgong_ivers == 300) then
+       format_for_fgong_data = '(1P5E16.9,x)'
+    else if (s% fgong_ivers == 1300) then
+       format_for_fgong_data = '(1P,5(X,E26.18E3))'
+    else
+       write(*,*) ''
+       write(*,'(a,i4)') 'bad fgong_ivers: must be 300 or 1300, not ', s% fgong_ivers
+       ierr = 1
        return
     end if
 
@@ -571,17 +585,16 @@ contains
 
     nn = SIZE(point_data, 2)
 
-    write(iounit, *) 'FGONG file'
-    write(iounit, *) 'Created by MESAstar'
-    write(iounit, *)
-    write(iounit, *)
+    do k = 1, 4
+       write(iounit, *) trim(s% fgong_header(k))
+    end do
 
-    write(iounit,'(4I10)') nn, ICONST, IVAR, 1300
-    
-    write(iounit, s%format_for_fgong_data) (global_data(i), i=1,n_global)
+    write(iounit,'(4I10)') nn, ICONST, IVAR, s% fgong_ivers
+
+    write(iounit, format_for_fgong_data) (global_data(i), i=1,n_global)
 
     do k = 1, nn
-       write(iounit, s%format_for_fgong_data) (point_data(j,k), j=1,n_point)
+       write(iounit, format_for_fgong_data) (point_data(j,k), j=1,n_point)
     end do
 
     ! Close the file

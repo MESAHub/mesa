@@ -24,8 +24,10 @@
     relax_initial_composition = .true.
     relax_composition_filename = "composition.dat"
     timescale_for_relax_composition = 1d-2
+
     relax_initial_angular_momentum = .true.
     relax_angular_momentum_filename = "angular_momentum.dat"
+
     relax_initial_entropy = .true.
     relax_entropy_filename = "entropy.dat"
       
@@ -56,7 +58,6 @@
     max_timestep = 1d0
     max_model_number = 1
 
-    max_eta_for_dedt_form_of_energy_eqn = 1d0
     read_extra_controls_inlist1 = .true.
     extra_controls_inlist1_name = 'inlist_common'
 

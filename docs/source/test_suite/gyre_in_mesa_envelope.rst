@@ -1,0 +1,1 @@
+../../../star/test_suite/gyre_in_mesa_envelope/README.rst

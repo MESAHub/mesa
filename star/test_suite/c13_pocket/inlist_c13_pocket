@@ -2,7 +2,7 @@
 
 ! begin with saved model
       load_saved_model = .true.
-      saved_model_name = 'lgL_3.79.mod'
+      load_model_filename = 'lgL_3.79.mod'
 
 ! save a model and profile at the end of the run
       save_model_when_terminate = .true.
@@ -53,6 +53,6 @@
       x_ctrl(1) = 0.075d0 ! max_c13_expected (tol 1d-2)
       x_ctrl(2) = 0.580d0 ! mass_max_c13_expected (tol 1d-2)
       x_ctrl(3) = 4.0d-5  ! pocket_mass_c13_expected (tol 1d-5)
-      x_ctrl(4) = 3.0d-4  ! delta_surface_c12_expected (tol 2d-4)
+      x_ctrl(4) = 2.7d-4  ! delta_surface_c12_expected (tol 2d-4)
 
 / ! end of controls namelist

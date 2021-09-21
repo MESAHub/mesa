@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# uncomment the following line to run all parts of the test
-# MESA_RUN_OPTIONAL=t
+# uncomment the following line to skip the optional inlists
+# MESA_SKIP_OPTIONAL=t
 
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
@@ -10,15 +10,9 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
+do_one inlist_initial_header end_core_he_burn.mod
 
-# check if can skip the slow climb up the red giant branch
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
-    cp standard_end_core_he_burn.mod end_core_he_burn.mod
-else
-   do_one inlist_initial_header end_core_he_burn.mod
-   cp end_core_he_burn.mod standard_end_core_he_burn.mod
-fi
-
+cp end_core_he_burn.mod standard_end_core_he_burn.mod
 do_one inlist_cburn_inward_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

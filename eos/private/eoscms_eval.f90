@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020  Bill Paxton & The MESA Team
+!   Copyright (C) 2020  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -184,80 +184,104 @@ contains
       real(dp) :: alfa, beta, dbeta_dX, dalfa_dX, xx(4), y(4), a(3), dw, dX
       rq => eos_handles(handle)
 
-      !locate X values in the tables such that Xvals(iX) <= X < Xvals(iX+1)
-      if (X <= CMS_Xvals(1)) then
-         iX = 1
-         if (X < 0) write(*,*) 'warning: X < 0 in eosCMS'
-      else if (X >= CMS_Xvals(CMS_num_Xs-1)) then
-         iX = CMS_num_Xs-1
-         if (X > 1) write(*,*) 'warning: X > 1 in eosCMS'
-      else
-         do i = 2, CMS_num_Xs-1
-            if (X < CMS_Xvals(i) )then
-               iX = i-1; exit
+      if(rq% CMS_use_fixed_composition)then !do fixed composition (one table only)
+
+         if(rq% CMS_fixed_composition_index < 0 .or. rq% CMS_fixed_composition_index > 10)then
+            write(*,*) 'invalid value for CMS_fixed_composition_index.  See eos.defaults.'
+            ierr=-1
+            return
+         endif
+         
+         iX = rq% CMS_fixed_composition_index + 1
+
+         call eval_eosCMS_fixed_X(iX,logRho,logT,res,d_dlnT,d_dlnd,ierr)
+
+         if(ierr/=0) then
+            write(*,*) 'failed in get_CMS_for_eosdt'
+            return
+         endif
+
+         ! composition derivatives; here composition is constant so no change
+         d_dxa = 0
+
+         
+      else !do full composition
+         !locate X values in the tables such that Xvals(iX) <= X < Xvals(iX+1)
+         if (X <= CMS_Xvals(1)) then
+            iX = 1
+            if (X < 0) write(*,*) 'warning: X < 0 in eosCMS'
+         else if (X >= CMS_Xvals(CMS_num_Xs-1)) then
+            iX = CMS_num_Xs-1
+            if (X > 1) write(*,*) 'warning: X > 1 in eosCMS'
+         else
+            do i = 2, CMS_num_Xs-1
+               if (X < CMS_Xvals(i) )then
+                  iX = i-1; exit
+               endif
+            enddo
+         endif
+
+         !interpolation always bicubic in logRho and logT
+         if(CMS_cubic_in_X .and. iX > 2 .and. iX < CMS_num_Xs - 2)then
+            !do cubic interpolation in X
+            call eval_eosCMS_fixed_X(iX-1,logRho,logT,res1,dres1_dlnT,dres1_dlnRho,ierr)
+            call eval_eosCMS_fixed_X(iX  ,logRho,logT,res2,dres2_dlnT,dres2_dlnRho,ierr)
+            call eval_eosCMS_fixed_X(iX+1,logRho,logT,res3,dres3_dlnT,dres3_dlnRho,ierr)
+            call eval_eosCMS_fixed_X(iX+2,logRho,logT,res4,dres4_dlnT,dres4_dlnRho,ierr)
+            if(ierr/=0) then
+               write(*,*) 'failed in get_CMS_for_eosdt'
+               return
             endif
-         enddo
+            XX(1:4) = CMS_Xvals(iX-1:iX+2)
+            dX=X-CMS_Xvals(iX) ! assumes fixed dX spacing
+            do i=1,nv
+               !result
+               y(1:4) = [res1(i), res2(i), res3(i), res4(i)]
+               call interp_4pt_pm(XX,y,a)
+               res(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
+               !dres/dX
+               d_dX(i) = a(1) + dX*(2*a(2) + 3*dX*a(3))
+               !dres/dlnT
+               y(1:4) = [dres1_dlnT(i), dres2_dlnT(i), dres3_dlnT(i), dres4_dlnT(i)]
+               call interp_4pt_pm(XX,y,a)
+               d_dlnT(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
+               !dres/dlnRho
+               y(1:4) = [dres1_dlnRho(i), dres2_dlnRho(i), dres3_dlnRho(i), dres4_dlnRho(i)]
+               call interp_4pt_pm(XX,y,a)
+               d_dlnd(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
+            enddo
+         else !linear interpolation in X
+            call eval_eosCMS_fixed_X(iX  ,logRho,logT,res1,dres1_dlnT,dres1_dlnRho,ierr)
+            call eval_eosCMS_fixed_X(iX+1,logRho,logT,res2,dres2_dlnT,dres2_dlnRho,ierr)
+            if(ierr/=0) then
+               write(*,*) 'failed in get_CMS_for_eosdt'
+               return
+            endif
+            beta = (X-CMS_Xvals(iX))/(CMS_Xvals(iX+1)-CMS_Xvals(iX))
+            alfa = 1._dp - beta
+            dbeta_dX = 1d0/(CMS_Xvals(iX+1)-CMS_Xvals(iX))
+            dalfa_dX = -dbeta_dX
+            res = alfa*res1 + beta*res2
+            d_dX = dalfa_dX*res1 + dbeta_dX*res2
+            d_dlnT = alfa*dres1_dlnT + beta*dres2_dlnT
+            d_dlnd = alfa*dres1_dlnRho + beta*dres2_dlnRho
+         endif
+
+         ! composition derivatives
+         do i=1,species
+            select case(chem_isos% Z(chem_id(i))) ! charge
+            case (1) ! X
+               d_dxa(:,i) = d_dX
+            case (2) ! Y
+               d_dxa(:,i) = 0
+            case default ! Z
+               d_dxa(:,i) = 0
+            end select
+         end do
+
       endif
 
-
-      !interpolation always bicubic in logRho and logT
-      if(CMS_cubic_in_X .and. iX > 2 .and. iX < CMS_num_Xs - 2)then
-         !do cubic interpolation in X
-         call eval_eosCMS_fixed_X(iX-1,logRho,logT,res1,dres1_dlnT,dres1_dlnRho,ierr)
-         call eval_eosCMS_fixed_X(iX  ,logRho,logT,res2,dres2_dlnT,dres2_dlnRho,ierr)
-         call eval_eosCMS_fixed_X(iX+1,logRho,logT,res3,dres3_dlnT,dres3_dlnRho,ierr)
-         call eval_eosCMS_fixed_X(iX+2,logRho,logT,res4,dres4_dlnT,dres4_dlnRho,ierr)
-         if(ierr/=0) then
-            write(*,*) 'failed in get_CMS_for_eosdt'
-            return
-         endif
-         XX(1:4) = CMS_Xvals(iX-1:iX+2)
-         dX=X-CMS_Xvals(iX) ! assumes fixed dX spacing
-         do i=1,nv
-            !result
-            y(1:4) = [res1(i), res2(i), res3(i), res4(i)]
-            call interp_4pt_pm(XX,y,a)
-            res(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
-            !dres/dX
-            d_dX(i) = a(1) + dX*(2*a(2) + 3*dX*a(3))
-            !dres/dlnT
-            y(1:4) = [dres1_dlnT(i), dres2_dlnT(i), dres3_dlnT(i), dres4_dlnT(i)]
-            call interp_4pt_pm(XX,y,a)
-            d_dlnT(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
-            !dres/dlnRho
-            y(1:4) = [dres1_dlnRho(i), dres2_dlnRho(i), dres3_dlnRho(i), dres4_dlnRho(i)]
-            call interp_4pt_pm(XX,y,a)
-            d_dlnd(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
-         enddo
-      else !linear interpolation in X
-         call eval_eosCMS_fixed_X(iX  ,logRho,logT,res1,dres1_dlnT,dres1_dlnRho,ierr)
-         call eval_eosCMS_fixed_X(iX+1,logRho,logT,res2,dres2_dlnT,dres2_dlnRho,ierr)
-         if(ierr/=0) then
-            write(*,*) 'failed in get_CMS_for_eosdt'
-            return
-         endif
-         beta = (X-CMS_Xvals(iX))/(CMS_Xvals(iX+1)-CMS_Xvals(iX))
-         alfa = 1._dp - beta
-         dbeta_dX = 1d0/(CMS_Xvals(iX+1)-CMS_Xvals(iX))
-         dalfa_dX = -dbeta_dX
-         res = alfa*res1 + beta*res2
-         d_dX = dalfa_dX*res1 + dbeta_dX*res2
-         d_dlnT = alfa*dres1_dlnT + beta*dres2_dlnT
-         d_dlnd = alfa*dres1_dlnRho + beta*dres2_dlnRho
-      endif
       skip = .false.
-
-      ! composition derivatives
-      do i=1,species
-         select case(chem_isos% Z(chem_id(i))) ! charge
-         case (1) ! X
-            d_dxa(:,i) = d_dX
-         case (2) ! Y
-            d_dxa(:,i) = 0
-         case default ! Z
-            d_dxa(:,i) = 0
-         end select
-      end do
 
       ! CMS tables do not include radiation.  Add it.
       if (rq% include_radiation) call include_radiation(Z, X, abar, zbar, &

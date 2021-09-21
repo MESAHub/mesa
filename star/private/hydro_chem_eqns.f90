@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012  Bill Paxton
+!   Copyright (C) 2012  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -39,11 +39,9 @@
       contains
 
 
-      subroutine do_chem_eqns( &
-            s, nvar, skip_partials, ierr)
+      subroutine do_chem_eqns(s, nvar, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          integer :: k, op_err
          include 'formats'
@@ -51,14 +49,14 @@
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, s% nz
             if (ierr /= 0) cycle
-            call do1_chem_eqns(s, k, nvar, skip_partials, op_err)
+            call do1_chem_eqns(s, k, nvar, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
       end subroutine do_chem_eqns
 
 
-      subroutine do1_chem_eqns(s, k, nvar, skip_partials, ierr)
+      subroutine do1_chem_eqns(s, k, nvar, ierr)
 
          use chem_def
          use net_lib, only: show_net_reactions, show_net_params
@@ -67,11 +65,10 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, j, i, jj, ii, equchem1, species
+         integer :: nz, j, i, jj, ii, species
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, &
             dxdt_expected_dlnd, dxdt_expected_dlnT, &
@@ -88,7 +85,6 @@
 
          ierr = 0
 
-         equchem1 = s% equchem1
          species = s% species
          nz = s% nz
 
@@ -120,7 +116,7 @@
             !test_partials = (k == s% solver_test_partials_k .and. s% net_iso(ihe4) == j)
             test_partials = .false.
 
-            i = equchem1+j-1
+            i = s%nvar_hydro+j
 
             dxdt_actual = s% xa_sub_xa_start(j,k)/s% dt
             
@@ -164,8 +160,6 @@
 !$OMP end critical (star_chem_eqns_bad_num)
             end if
 
-            if (skip_partials) cycle
-
             call e00(s, i, i, k, nvar, -1d0/eqn_scale/s% dt)
 
             ! all the rest are jacobian terms for dxdt_expected/eqn_scale
@@ -173,7 +167,7 @@
             if (s% do_burn) then
 
                do jj=1,species
-                  ii = equchem1+jj-1
+                  ii = s% nvar_hydro+jj
                   dxdt_expected_dxa = s% d_dxdt_nuc_dx(j,jj,k)
                   dequ = dxdt_expected_dxa/eqn_scale
                   if (checking) call check_dequ(dequ,'d_dxdt_nuc_dx')

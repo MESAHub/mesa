@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton and Pablo Marchant
+!   Copyright (C) 2013  and Pablo Marchant
 !
 !   this file is part of mesa.
 !
@@ -62,6 +62,8 @@
          use mod_other_binary_edot
          use mod_other_binary_ce
          use mod_other_binary_extras
+         use mod_other_binary_photo_read
+         use mod_other_binary_photo_write
          use binary_timestep
          use binary_history
          use binary_history_specs
@@ -198,6 +200,9 @@
          b% data_for_extra_binary_history_columns => null_data_for_extra_binary_history_columns
          b% how_many_extra_binary_history_header_items => null_how_many_extra_binary_history_header_items
          b% data_for_extra_binary_history_header_items => null_data_for_extra_binary_history_header_items
+
+         b% other_binary_photo_read => default_other_binary_photo_read
+         b% other_binary_photo_write => default_other_binary_photo_write
          
          b% ignore_hard_limits_this_step = .false.
          

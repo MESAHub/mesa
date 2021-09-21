@@ -1,3 +1,5 @@
+.. highlight:: console
+
 =================
 How to contribute
 =================
@@ -13,8 +15,8 @@ Obtaining MESA
 Join the MESA team on GitHub
 ----------------------------
 
-You must create an account on `GitHub <https://github.com/>`_.  The
-MESA organization is called `MESAHub <https://github.com/MESAHub/>`_.
+You must create an account on `GitHub <https://github.com/>`__.  The
+MESA organization is called `MESAHub <https://github.com/MESAHub/>`__.
 After you are registered on GitHub, you can be invited to the
 organization.
 
@@ -22,12 +24,12 @@ organization.
 Set up Git
 ----------
 
-Follow `this GitHub guide <https://help.github.com/en/github/getting-started-with-github/set-up-git>`_ to set up git.
+Follow `this GitHub guide <https://help.github.com/en/github/getting-started-with-github/set-up-git>`__ to set up git.
 
 When instructed to install git, it is likely simplest to do so using your system package manager on Linux (e.g., apt, yum) or a macOS package manager (e.g., Homebrew, MacPorts).
 
 .. note::
-   This documentation will mainly describe command line use of git.  However, there are many graphical git clients available.  For example, GitHub has its own `desktop app <https://desktop.github.com/>`_.  (See also :ref:`Graphical interfaces`).
+   This documentation will mainly describe command line use of git.  However, there are many graphical git clients available.  For example, GitHub has its own `desktop app <https://desktop.github.com/>`__.  (See also :ref:`git-guis`).
 
    
 Install Git LFS
@@ -36,7 +38,7 @@ Install Git LFS
 MESA uses Large File Storage (LFS), a git extension that allows us to
 easily store and version the large microphysics data files.
 
-Obtain and install Git LFS from `its website <https://git-lfs.github.com/>`_.  You only need to do Step 1 in the Getting Started section.  Step 2 has already been done for MESA.
+Obtain and install Git LFS from `its website <https://git-lfs.github.com/>`__.  You only need to do Step 1 in the Getting Started section.  Step 2 has already been done for MESA.
 
 
 Download the MESA repository
@@ -44,12 +46,19 @@ Download the MESA repository
 
 Make a git clone of the MESA repository. (This is analogous to ``svn
 checkout``.) This will automatically fetch the files from git LFS.  To
-clone over HTTPS, do::
+clone over SSH, do::
 
-    git clone https://github.com/MESAHub/mesa.git mesa
+    git clone git@github.com:MESAHub/mesa.git mesa
 
 This will create the MESA repository in a directory named ``mesa``.
 
+For this to work you will need to have setup ssh keys and added them to your github account:
+
+#. `Generate a ssh key <https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>`__
+
+#. `Add a ssh key to Github <https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account>`__
+
+#. `Verify it works <https://docs.github.com/en/github/authenticating-to-github/testing-your-ssh-connection>`__
 
 
 Making changes to MESA
@@ -60,9 +69,9 @@ Making changes to MESA
    Git is a powerful and complex tool.  This section is an extremely
    incomplete introduction to git on the command line.  There are many
    online resources at the tutorial level (e.g., `git
-   <https://git-scm.com/docs/gittutorial>`_, from `GitHub
-   <https://guides.github.com/introduction/git-handbook/>`_, from
-   `Bitbucket <https://www.atlassian.com/git/tutorials>`_) and beyond.
+   <https://git-scm.com/docs/gittutorial>`__, from `GitHub
+   <https://guides.github.com/introduction/git-handbook/>`__, from
+   `Bitbucket <https://www.atlassian.com/git/tutorials>`__) and beyond.
 
 The conventional name of the remote repository is ``origin``.  The
 ``main`` branch is the development version of MESA.
@@ -106,6 +115,32 @@ Note that this is different than ``svn commit``, as it only alters
 your local repository.  It does not transmit your changes to the
 remote repository.
 
+Removing or moving files
+------------------------
+
+To remove a file::
+
+  git rm <filename>
+
+Remove a folder::
+
+  git rm -rf <filename>
+
+To move a file (or folder)::
+
+  git mv <filename_old> <filename_new>
+
+After changes you still need to make a commit::
+
+ git commit -m <message>
+
+or::
+
+  git commit -a -m <message>
+
+You should use the git versions or rm/mv whenever possible as git can then track the changes better and it is less likely to cause issues when merging branches.
+
+
 Sharing your changes
 --------------------
 
@@ -145,11 +180,25 @@ a merge commit), or ``--ff-only`` (refuse to pull if there are other
 changes) on the command line to override the configured default per
 invocation.
 
+.. note::
+
+   Alternatively, one can select this behavior on a per-branch basis.
+   For example, the following setting will only rebase by default when pulling into ``main``::
+
+       git config branch.main.rebase true
+
+   With this setting alone, doing ``git pull origin main`` on a
+   feature branch would result in a merge commit and not a rebase.
+
 
 If you want to get others' changes, but not immediately update your
 local repository to match that content::
 
   git fetch origin
+
+To prune out branches that may no longer exist in the remote repository::
+
+  git fetch --prune
 
 
 Checking out a revision
@@ -188,6 +237,7 @@ directory (``.``) or a list of files (``*.f90``).
   git restore --source=37cbee26 path/to/file
   
 
+.. _branching:
 
 Branching
 ---------
@@ -207,7 +257,7 @@ If you decided to make a new branch this can be done with::
 
 or::
 
-  git switch -b mynewbranch
+  git switch -c mynewbranch
 
 Any changes you now make will not apply to ``main`` but instead to ``mynewbranch``.
 
@@ -239,11 +289,13 @@ or pull additional changes from others on this branch::
 When you are ready to merge the changes from ``mynewbranch`` into ``main`` then push ``mynewbranch`` to GitHub and make a pull request.
 
 
-If someone else has created a new branch, you can switch to it with::
-  
-    git switch -c theirnewbranch origin/theirnewbranch
+If someone else has created a new branch and pushed it to GitHub, you can switch to it with::
 
-This will check out the branch ``theirnewbranch`` and associate it with the remote branch.
+    git checkout theirnewbranch
+
+That shortcut command works when ``theirnewbranch`` does not exist locally, but there does exist a tracking branch with that name in exactly one remote (i.e., in `origin`).  This will check out the branch ``theirnewbranch`` and associate it with the remote branch.  This is equivalent to::
+
+    git switch -c theirnewbranch --track origin/theirnewbranch
 
 
 Stashing changes
@@ -272,12 +324,13 @@ You may have multiple stashes at once, in which case they are indexed by::
 
 where ``X`` is a number starting at 0 for the most recent ``stash``.
 
+.. _git-guis:
 
 Graphical interfaces
 --------------------
 
 Not everything needs to be done by command line. There are at least two GUI tools that are usually shipped with git,
-git gui and gitk. 
+``git gui`` and ``gitk``. 
 ::
 
   git gui
@@ -288,7 +341,7 @@ files, set the commit message, and make the commit.
 
   gitk
 
-This provides a convenient interface for viewing the history of the repository you can view the commits, files changed, and commit messages.
+This provides a convenient interface for viewing the history of the repository where you can view the commits, files changed, and commit messages.
 ::
 
   gitk --all
@@ -298,7 +351,7 @@ By default ``gitk`` only shows the current branch ``--all`` shows all branches.
 
   gitk path/to/file
 
-Will only show the commits that change the file.
+Will only show the commits that change that file.
 
 Git testing tips
 ----------------
@@ -332,8 +385,11 @@ If the changes in your branch conflict or interact with changes that
 have occurred on ``main``, it is recommended that you merge ``main`` into your
 branch (or rebase your branch to the tip of ``main``) before issuing the
 PR. This allows you to handle conflicts in advance and ensure that the
-test suite will re``main`` passing after you merge your branch back into
-``main``.
+test suite will remain passing after you merge your branch back into
+``main``. 
+
+When you merge ``main`` into your branch is also advisable to add ``[ci optional]`` to the commit message.
+That way the optional inlists will be tested when the commit is tested.
 
      
 
@@ -344,7 +400,7 @@ After you have made a branch and pushed it to GitHub (see
 :ref:`Branching`), you can issue a pull request for the code on your
 branch to be merged into ``main``.
 
-If you have recently pushed a branch, GitHub will offer you the option to make a PR on the `main page <https://github.com/MESAHub/mesa>`_.  Otherwise, the most general approach is to visit the `new pull request page <https://github.com/MESAHub/mesa/compare>`_, select the code you want to merge from the 'compare' dropdown, and then click the green 'Create pull request' button.  You will be asked to provide a title and description for the PR as well as other optional information (like selecting a reviewer).  Then click 'Create pull request'.  Once you have made the PR, it will show up in the `list of pull requests <https://github.com/MESAHub/mesa/pulls>`_.
+If you have recently pushed a branch, GitHub will offer you the option to make a PR on the `main page <https://github.com/MESAHub/mesa>`__.  Otherwise, the most general approach is to visit the `new pull request page <https://github.com/MESAHub/mesa/compare>`__, select the code you want to merge from the 'compare' dropdown, and then click the green 'Create pull request' button.  You will be asked to provide a title and description for the PR as well as other optional information (like selecting a reviewer).  Then click 'Create pull request'.  Once you have made the PR, it will show up in the `list of pull requests <https://github.com/MESAHub/mesa/pulls>`__.
 
 A set of code reviewers is automatically selected for each PR based on the contents of the ``CODEOWNERS`` file.  For now, this request for review can be treated as a heads up that there are changes in a part of the code you may be interested in.  Reviewers are not required to complete requested reviews and reviews are not required before a PR is merged from a MESA developer.  However, please exercise good judgment and solicit feedback before merging, especially for significant changes or changes that you feel uncertain about.  You may want to ping relevant individuals or channels in Slack.
 
@@ -352,14 +408,14 @@ A set of code reviewers is automatically selected for each PR based on the conte
 Merging a pull request
 ----------------------
 
-Once the code is ready, it can be merged by visiting the page associated with the PR (e.g., `<https://github.com/MESAHub/mesa/pull/161>`_).
+Once the code is ready, it can be merged by visiting the page associated with the PR (e.g., `<https://github.com/MESAHub/mesa/pull/161>`__).
 
 GitHub offers several strategies for merging pull requests.  Each one may be appropriate in different circumstances.  The merge strategy is selected by using the dropdown arrow on the big green button at the bottom of the PR.
 
 * If the PR is a small set of simple, well-contained changes, the 'Rebase and merge' strategy is recommended.  This will take the commits and add them to the tip of ``main``, ensuring that the commit history of ``main`` remains linear.
 
 
-* If the PR is a set of changes whose detailed history is not relevant, the 'Squash and merge' strategy is recommended.  This will take the commits, combine them into a single commit, and then add it to the tip of ``main``. This stragegy is most useful when the series of individual commits simply reflects the (possibly wandering) path to achieving the final cumulative change.
+* If the PR is a set of changes whose detailed history is not relevant, the 'Squash and merge' strategy is recommended.  This will take the commits, combine them into a single commit, and then add it to the tip of ``main``. This strategy is most useful when the series of individual commits simply reflects the (possibly wandering) path to achieving the final cumulative change.
 
 
 * If the PR is a set of changes where each commit is a meaningful, self-contained change, but the cumulative change is not simple enough for the 'Rebase and merge' strategy, then the 'Create a merge commit' strategy is appropriate.  This will preserve the full history of your branch when it is joined with ``main``.  If a change has this level of complexity, it is also recommended that its interaction with ``main`` should be tested by merging ``main`` into the branch.

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -153,7 +153,6 @@
             screening_mode,  &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            reuse_rate_raw, reuse_rate_screened, &
             i, ierr)
          use chem_def
          type (Net_General_Info), pointer  :: g
@@ -165,7 +164,6 @@
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
          real(dp), pointer :: work(:) ! (lwork)
-         logical, intent(in) :: reuse_rate_raw, reuse_rate_screened
          integer, intent(inout) :: i
          integer, intent(out) :: ierr
          
@@ -189,20 +187,19 @@
  
          n% eps_nuc_categories => eps_nuc_categories
          
-         if (.not. reuse_rate_screened) then
-            rate_screened(:) = 0
-            rate_screened_dT(:) = 0
-            rate_screened_dRho(:) = 0
-         end if
+
+         rate_screened(:) = 0
+         rate_screened_dT(:) = 0
+         rate_screened_dRho(:) = 0
+
          n% rate_screened => rate_screened
          n% rate_screened_dT => rate_screened_dT
          n% rate_screened_dRho => rate_screened_dRho
          
-         if (.not. reuse_rate_raw) then
-            rate_raw(:) = 0
-            rate_raw_dT(:) = 0
-            rate_raw_dRho(:) = 0
-         end if
+         rate_raw(:) = 0
+         rate_raw_dT(:) = 0
+         rate_raw_dRho(:) = 0
+
          
          n% rate_raw => rate_raw
          n% rate_raw_dT => rate_raw_dT
@@ -261,8 +258,6 @@
          type (Net_General_Info), pointer  :: g
          
          ! the following not used during initialization, but need as args.
-         logical, parameter :: reuse_rate_raw = .false.
-         logical, parameter :: reuse_rate_screened = .false.
          integer, parameter :: screening_mode = extended_screening
          
          include 'formats'
@@ -305,7 +300,6 @@
             screening_mode, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            reuse_rate_raw, reuse_rate_screened, &
             iwork, ierr) ! iwork updated for amount now used in work
          if (ierr /= 0) then
             write(*,*) 'alloc_net_general_info failed in setup_net_info'

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2016-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2016-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -47,6 +47,10 @@
          integer :: ierr
 
          include 'formats'
+         
+         if (s% RSP2_flag) then
+            stop 'need to add mlt_vc and Hp_face to remesh_split_merge'
+         end if
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 
@@ -255,8 +259,9 @@
             oversize_ratio, undersize_ratio, abs_du_div_cs, outer_fraction, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
-            target_dr_core, target_dlnR_envelope
-         logical :: hydrid_zoning, log_zoning, logtau_zoning, du_div_cs_limit_flag
+            target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope
+         logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
+            du_div_cs_limit_flag
          integer :: nz, nz_baseline, k, kmin, nz_r_core
          real(dp), pointer :: v(:), r_for_v(:)
 
@@ -264,6 +269,7 @@
          
          nz = s% nz
          hydrid_zoning = s% split_merge_amr_hybrid_zoning
+         flipped_hydrid_zoning = s% split_merge_amr_flipped_hybrid_zoning
          log_zoning = s% split_merge_amr_log_zoning
          logtau_zoning = s% split_merge_amr_logtau_zoning
          nz_baseline = s% split_merge_amr_nz_baseline         
@@ -272,7 +278,14 @@
             nz_baseline = int(dble(nz_baseline)/s% split_merge_amr_mesh_delta_coeff)
             nz_r_core = int(dble(nz_r_core)/s% split_merge_amr_mesh_delta_coeff)
          end if
-         r_core_cm = s% split_merge_amr_r_core_cm
+         if (s% split_merge_amr_r_core_cm > 0d0) then
+            r_core_cm = s% split_merge_amr_r_core_cm
+         else if (s% split_merge_amr_nz_r_core_fraction > 0d0) then
+            r_core_cm = s% R_center + &
+               s% split_merge_amr_nz_r_core_fraction*(s% r(1) - s% R_center)
+         else
+            r_core_cm = s% R_center
+         end if
          dq_min = s% split_merge_amr_dq_min
          dq_max = s% split_merge_amr_dq_max
          inner_outer_q = 0d0
@@ -290,6 +303,9 @@
             target_dr_core = (r_core_cm - s% R_center)/nz_r_core
             target_dlnR_envelope = &
                (s% lnR(1) - log(max(1d0,r_core_cm)))/(nz_baseline - nz_r_core)
+         else if (flipped_hydrid_zoning) then
+            target_dlnR_core = (log(max(1d0,r_core_cm)) - s% R_center)/(nz_baseline - nz_r_core)
+            target_dr_envelope = (s% r(1) - r_core_cm)/nz_r_core
          else if (logtau_zoning) then
             k = nz
             xmin = log(tau_center)
@@ -335,6 +351,24 @@
                      xL = log(s% r(k+1))
                   end if
                   dx_baseline = target_dlnR_envelope
+               end if
+            else if (flipped_hydrid_zoning) then
+               if (s% r(k) <= r_core_cm) then
+                  xR = log(s% r(k))
+                  if (k == nz) then
+                     xL = log(max(1d0,s% R_center))
+                  else
+                     xL = log(s% r(k+1))
+                  end if
+                  dx_baseline = target_dlnR_core
+               else
+                  xR = s% r(k)
+                  if (k == nz) then
+                     xL = s% R_center
+                  else
+                     xL = s% r(k+1)
+                  end if
+                  dx_baseline = target_dr_core
                end if
             else if (logtau_zoning) then
                xR = log(s% tau(k))
@@ -491,9 +525,7 @@
             end if
          end if
 
-         merge_center = (i == nz)
-
-         
+         merge_center = (i == nz)         
          if (merge_center) i = i-1
          ip = i+1
          if (s% split_merge_amr_avoid_repeated_remesh .and. &
@@ -580,7 +612,7 @@
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
          
-         if (s% using_TDC) then
+         if (s% RSP2_flag) then
             cell_etrb = Etrb_i + Etrb_ip
             s% w(i) = sqrt(cell_etrb/dm)
          end if
@@ -613,14 +645,17 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
-            if (s% using_TDC) s% w(im) = s% w(i0)
+            if (s% RSP2_flag) then
+               s% w(im) = s% w(i0)
+               s% Hp_face(im) = s% Hp_face(i0)
+            end if
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
             s% alpha_mlt(im) = s% alpha_mlt(i0)
             s% lnT(im) = s% lnT(i0)
             s% D_mix(im) = s% D_mix(i0)
-            s% conv_vel(im) = s% conv_vel(i0)
+            s% mlt_vc(im) = s% mlt_vc(i0)
             s% csound(im) = s% csound(i0)
             s% tau(im) = s% tau(i0)
             s% opacity(im) = s% opacity(i0)
@@ -641,9 +676,10 @@
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
          
-         if (s% using_TDC) s% xh(s% i_w,i) = s% w(i)
-         
-         if (s% conv_vel_flag) s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
+         if (s% RSP2_flag) then
+            s% xh(s% i_w,i) = s% w(i)
+            s% xh(s% i_Hp,i) = s% Hp_face(i)
+         end if
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
@@ -718,9 +754,11 @@
                v1 = s% v_center
             end if
             KE = 0.25d0*dm*(v0**2 + v1**2)
+         else
+            KE = 0d0
          end if
          IE = s% energy(k)*dm
-         if (s% using_TDC) then
+         if (s% RSP2_flag) then
             Etrb = pow2(s% w(k))*dm
          else
             Etrb = 0d0
@@ -793,7 +831,7 @@
             got_cell_Esum_R, got_cell_KE_R, got_cell_PE_R, got_cell_IE_R, &
             got_cell_Esum_L, got_cell_KE_L, got_cell_PE_L, got_cell_IE_L, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
-            conv_velL, conv_velR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
+            mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
          logical :: okay, done, use_new_grad_rho
          include 'formats'
@@ -830,14 +868,14 @@
          end if
 
          rR = s% r(i)
-         conv_velR = s% conv_vel(i)
+         mlt_vcR = s% mlt_vc(i)
          if (i == nz) then
             rL = s% R_center
-            conv_velL = 0d0
+            mlt_vcL = 0d0
             tauL = tau_center
          else
             rL = s% r(ip)
-            conv_velL = s% conv_vel(ip)
+            mlt_vcL = s% mlt_vc(ip)
             tauL = s% tau(ip)
          end if
          
@@ -867,13 +905,16 @@
          dm = s% dm(i)
          rho = dm/dV
          
-         v = s% u(i)
-         v2 = v*v
+         if (s% u_flag) then
+            v = s% u(i)
+            v2 = v*v
+         else ! not used
+            v = 0
+            v2 = 0
+         end if
          
          energy = s% energy(i)
-         if (s% using_TDC) etrb = get_etrb(s,i)
-            
-         ! estimate values of energy and velocity^2 at cell boundaries
+         if (s% RSP2_flag) etrb = pow2(s% w(i))
 
          ! use iR, iC, and iL for getting values to determine slopes
          if (i > 1 .and. i < nz_old) then
@@ -928,10 +969,10 @@
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
          
-         if (s% using_TDC) then
-            etrb_R = get_etrb(s,iR)
-            etrb_C = get_etrb(s,iC)
-            etrb_L = get_etrb(s,iL)
+         if (s% RSP2_flag) then
+            etrb_R = pow2(s% w(iR))
+            etrb_C = pow2(s% w(iC))
+            etrb_L = pow2(s% w(iL))
             grad_etrb = get1_grad(etrb_L, etrb_C, etrb_R, dLeft, dCntr, dRght)
          end if
          
@@ -997,7 +1038,7 @@
                s% alpha_mlt(jp) = s% alpha_mlt(j)
                s% lnT(jp) = s% lnT(j)
                s% D_mix(jp) = s% D_mix(j)
-               s% conv_vel(jp) = s% conv_vel(j)
+               s% mlt_vc(jp) = s% mlt_vc(j)
                s% csound(jp) = s% csound(j)
                s% tau(jp) = s% tau(j)
                s% opacity(jp) = s% opacity(j)
@@ -1094,7 +1135,7 @@
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
          
-         if (s% using_TDC) then
+         if (s% RSP2_flag) then
             etrb_R = etrb + grad_etrb*dr/4
             etrb_L = (dm*etrb - dmR*etrb_R)/dmL
             if (etrb_R < 0d0 .or. etrb_L < 0d0) then
@@ -1135,12 +1176,10 @@
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
          end if
          
-         if (s% conv_vel_flag) then ! set new conv_vel
-            if (i == 1) then
-               s% conv_vel(ip) = s% conv_vel(i)
-            else
-               s% conv_vel(ip) = (conv_velL*dML + conv_velR*dMR)/dM
-            end if
+         if (i == 1) then
+            s% mlt_vc(ip) = s% mlt_vc(i)
+         else
+            s% mlt_vc(ip) = (mlt_vcL*dML + mlt_vcR*dMR)/dM
          end if
          
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
@@ -1204,7 +1243,7 @@
          s% lnT(ip) = s% lnT(i)
          s% T(ip) = s% T(i)
          s% D_mix(ip) = s% D_mix(i)
-         s% conv_vel(ip) = s% conv_vel(i)
+         s% mlt_vc(ip) = s% mlt_vc(i)
          s% csound(ip) = s% csound(i)
          s% opacity(ip) = s% opacity(i)
          if (s% RTI_flag) s% alpha_RTI(ip) = s% alpha_RTI(i)
@@ -1263,10 +1302,6 @@
          if (s% RTI_flag) then
             s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
             s% xh(s% i_alpha_RTI,ip) = s% alpha_RTI(ip)
-         end if
-         if (s% conv_vel_flag) then
-            s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
-            s% xh(s% i_ln_cvpv0,ip) = log(s% conv_vel(ip)+s% conv_vel_v0)
          end if
 
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)

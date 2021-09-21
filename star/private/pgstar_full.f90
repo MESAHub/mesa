@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -1630,7 +1630,7 @@
          type (star_info), pointer :: s
          character (len=*), intent(in) :: xaxis_by
          real, intent(in) :: win_xmin_in, win_xmax_in, xmargin
-         real, pointer, dimension(:) :: xvec
+         real, allocatable, dimension(:) :: xvec
          real, intent(out) :: xmin, xmax, xleft, xright, dx
          integer, intent(out) :: grid_min, grid_max, npts
          integer, intent(out) :: ierr
@@ -1683,11 +1683,10 @@
          contains 
          
          subroutine dealloc(x)
-            real, dimension(:), pointer :: x
+            real, dimension(:), allocatable :: x
             
-            if(associated(x))then
+            if(allocated(x))then
                deallocate(x)
-               nullify(x)
             end if
          
          end subroutine dealloc

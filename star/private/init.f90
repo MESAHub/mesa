@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -33,16 +33,17 @@
       private
       public :: alloc_star_data, set_starting_star_data, do_star_init, &
          do_starlib_shutdown, set_kap_and_eos_handles, load_zams_model, &
-         create_pre_ms_model, create_initial_model, create_RSP_model, &
+         create_pre_ms_model, create_initial_model, &
+         create_RSP_model, create_RSP2_model, &
          doing_restart, load_restart_photo, load_saved_model, &
-         load_saved_RSP_model, do_garbage_collection
+         do_garbage_collection
 
       integer, parameter :: do_create_pre_ms_model = 0
       integer, parameter :: do_load_zams_model = 1
       integer, parameter :: do_load_saved_model = 2
       integer, parameter :: do_create_initial_model = 3
       integer, parameter :: do_create_RSP_model = 4
-      integer, parameter :: do_load_saved_RSP_model = 5
+      integer, parameter :: do_create_RSP2_model = 5
       
 
       logical :: have_done_starlib_init = .false.
@@ -95,9 +96,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use paquette_coeffs, only: initialise_collision_integrals
@@ -108,9 +108,8 @@
             jina_reaclib_filename, rate_tables_dir, &
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir
+            kap_cache_dir, rates_cache_dir
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          real(dp), intent(in) :: reaclib_min_T9
          integer, intent(in) :: color_num_files
@@ -131,9 +130,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          if (ierr /= 0) then
@@ -285,7 +283,6 @@
          nullify(s% burn_z_conv_region)
 
          s% have_burner_storage = .false.
-         s% burner_storage_sz_per_thread = 0
          s% burner_num_threads = 0
          nullify(s% burner_storage)
 
@@ -305,6 +302,7 @@
          s% time_nonburn_net = 0
          s% time_mlt = 0
          s% time_set_hydro_vars = 0
+         s% time_set_mixing_info = 0
          s% time_total = 0
 
          s% timing_num_get_eos_calls = 0
@@ -348,18 +346,16 @@
          s% have_initial_energy_integrals = .false.
 
          s% num_solver_iterations = 0         
-         s% bad_max_corr_cnt = 0
-
          s% mesh_call_number = 0
          s% solver_call_number = 0
          s% diffusion_call_number = 0
          s% model_number = 0
          s% RSP_have_set_velocities = .false.
          s% RSP_just_set_velocities = .false.
+         s% rsp_period = 0d0
          
          s% dt = 0d0
          s% mstar_dot = 0d0
-         s% boost_mlt_alfa = 0
 
          s% power_nuc_burn = -1
          s% power_h_burn = -1
@@ -436,16 +432,16 @@
             default_other_adjust_mlt_gradT_fraction
          use other_after_set_mixing_info, only: &
             default_other_after_set_mixing_info
-         use other_after_enter_setmatrix, only: &
-            default_other_after_enter_setmatrix
+         use other_after_solver_setmatrix, only: &
+            default_other_after_solver_setmatrix
          use other_diffusion, only: null_other_diffusion
          use other_diffusion_factor, only: default_other_diffusion_factor
-         use other_mlt, only: null_other_mlt
          use other_neu, only: null_other_neu
          use other_net_get, only: null_other_net_get
          use other_cgrav, only: default_other_cgrav
          use other_mesh_delta_coeff_factor, only: default_other_mesh_delta_coeff_factor
          use other_alpha_mlt, only: default_other_alpha_mlt
+         use other_mlt_results, only: null_other_mlt_results
          use other_opacity_factor, only: default_other_opacity_factor
          use other_pgstar_plots, only: null_other_pgstar_plots_info
          use other_mesh_functions
@@ -459,7 +455,6 @@
          use other_photo_write, only: default_other_photo_write
          use other_photo_read, only: default_other_photo_read
          use other_set_pgstar_controls, only: default_other_set_pgstar_controls
-         use other_eos
          use other_kap
          use pgstar_decorator
          use star_utils, only: init_random
@@ -521,28 +516,22 @@
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
-         s% TDC_flag = .false.
-         s% using_TDC = .false.
-
+         s% RSP2_flag = .false.
+         
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% need_to_reset_w = .false.
+         s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
+         s% have_mlt_vc = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
          s% mstar_dot = 0
-
-         s% surf_lnT = 0
-         s% surf_lnd = 0
-         s% surf_lnR = 0
-         s% surf_v = 0
+         s% gradT_excess_alpha_old = 0
          s% surf_lnS = 0
 
          s% termination_code = -1
-
-         s% prev_create_atm_R0_div_R = -1
 
          s% screening_mode_value = -1
 
@@ -557,7 +546,6 @@
          s% i_v = 0
          s% i_u = 0
          s% i_alpha_RTI = 0
-         s% i_chem1 = 0
 
          s% i_dv_dt = 0
          s% i_du_dt = 0
@@ -566,7 +554,6 @@
          s% i_dlnE_dt = 0
          s% i_dlnR_dt = 0
          s% i_dalpha_RTI_dt = 0
-         s% equchem1 = 0
 
          s% op_mono_nptot = 0
          s% op_mono_ipe = 0
@@ -615,22 +602,16 @@
          s% other_brunt_smoothing => null_other_brunt_smoothing
          s% other_adjust_mlt_gradT_fraction => default_other_adjust_mlt_gradT_fraction
          s% other_after_set_mixing_info => default_other_after_set_mixing_info
-         s% other_after_enter_setmatrix => default_other_after_enter_setmatrix
+         s% other_after_solver_setmatrix => default_other_after_solver_setmatrix
          s% other_diffusion => null_other_diffusion
          s% other_diffusion_factor => default_other_diffusion_factor
-         s% other_mlt => null_other_mlt
+         s% other_mlt_results => null_other_mlt_results
          s% other_neu => null_other_neu
          s% other_net_get => null_other_net_get
          s% other_eps_grav => null_other_eps_grav
          s% other_rsp_build_model => null_other_rsp_build_model
          s% other_rsp_linear_analysis => null_other_rsp_linear_analysis
          s% other_gradr_factor => null_other_gradr_factor
-
-         s% other_eosDT_get => null_other_eosDT_get
-         s% other_eosDT_get_T => null_other_eosDT_get_T
-         s% other_eosDT_get_Rho => null_other_eosDT_get_Rho
-
-         s% other_eosDE_get => null_other_eosDE_get
 
          s% other_kap_get => null_other_kap_get
          s% other_kap_get_op_mono => null_other_kap_get_op_mono
@@ -685,7 +666,6 @@
          s% L_center = 0
          s% time = 0
          s% total_angular_momentum = 0
-         s% prev_create_atm_R0_div_R = 0
 
          s% dt = 0
 
@@ -703,6 +683,7 @@
          s% P_surf = 0
          
          s% gradT_excess_alpha = 0
+         s% gradT_excess_alpha_old = 0
 
          s% h1_czb_mass = 0
 
@@ -805,6 +786,16 @@
       end subroutine create_RSP_model
 
 
+      subroutine create_RSP2_model(id, ierr)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         character (len=0) :: model_dir
+         call model_builder( &
+            id, model_dir, do_create_RSP2_model, &
+            .false., 'restart_photo', ierr)
+      end subroutine create_RSP2_model
+
+
       subroutine load_zams_model(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -812,18 +803,6 @@
             id, '', do_load_zams_model, &
             .false., 'restart_photo', ierr)
       end subroutine load_zams_model
-
-
-      subroutine load_saved_RSP_model(id, model_fname, ierr)
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: model_fname
-         integer, intent(out) :: ierr
-         integer :: l
-         l = len_trim(model_fname)
-         call model_builder( &
-            id, model_fname, do_load_saved_RSP_model, &
-            .false., 'restart_photo', ierr)
-      end subroutine load_saved_RSP_model
 
 
       subroutine load_saved_model(id, model_fname, ierr)
@@ -865,6 +844,7 @@
             finish_load_model
          use relax, only: do_relax_to_limit, do_relax_mass, &
             do_relax_mass_scale, do_relax_num_steps, do_relax_to_radiative_core
+         use auto_diff_support
          integer, intent(in) :: id, do_which
          character (len=*), intent(in) :: model_info, restart_filename
          logical, intent(in) :: restart
@@ -872,7 +852,6 @@
 
          type (star_info), pointer :: s
          real(dp) :: initial_mass, initial_z, dlgm_per_step
-         logical :: want_rsp_model, is_rsp_model
          real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
@@ -895,8 +874,6 @@
          initial_z = s% initial_z
          s% dt = 0
          s% termination_code = -1
-         want_rsp_model = .false.
-         is_rsp_model = .false.
 
          if (restart) then
             s% doing_first_model_of_run = .false.
@@ -908,7 +885,7 @@
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
             call init_def(s) ! RSP
-            call finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
+            call finish_load_model(s, restart, ierr)
             if (s% max_years_for_timestep > 0) &
                s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
             return
@@ -923,10 +900,9 @@
          s% doing_first_model_of_run = .true.
          s% doing_first_model_after_restart = .false.
          
-         if (do_which == do_load_saved_model .or. do_which == do_load_saved_RSP_model) then
+         if (do_which == do_load_saved_model) then
             s% dt_next = -1
-            want_rsp_model = (do_which == do_load_saved_RSP_model)
-            call do_read_saved_model(s, model_info, want_rsp_model, is_rsp_model, ierr)
+            call do_read_saved_model(s, model_info, ierr)
             if (ierr /= 0) then
                write(*,*) 'load failed in do_read_saved_model'
                return
@@ -1026,16 +1002,27 @@
                   end if
                   s% generations = 1
                   s% dt_next = 1d-2*secyer
+               case (do_create_RSP2_model)
+                  !call build_rsp2_model(s, ierr) ! like build_pre_ms_model
+                  stop 'need to add build_rsp2_model'
+                  if (ierr /= 0) then
+                     write(*,*) 'failed in build_rsp2_model'
+                     return
+                  end if
+                  s% generations = 1
+                  s% dt_next = 1d-2*secyer
                case default
                   write(*,*) 'bad value for do_which in build_model'
                   ierr = -1
                   return
             end select
          end if
+         
+         do k=1,s% nz
+            s% extra_heat(k) = 0
+         end do
 
-         s% extra_heat(1:s% nz) = 0
-
-         call finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
+         call finish_load_model(s, restart, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in finish_load_model'
             return

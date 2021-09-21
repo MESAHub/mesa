@@ -443,21 +443,21 @@ c ***********************************************************************
          logical, intent(in) :: include_radiation
 
          logical, parameter :: clip_to_table_boundaries = .false.
-         logical, parameter :: always_skip_elec_pos = .false.
-         logical, parameter :: always_include_elec_pos = .false.
-         double precision, parameter :: logT_ion = 5d0
-         double precision, parameter :: logT_neutral = 4.5d0
+         logical, parameter :: include_elec_pos = .true.
          logical :: off_table
 
          include 'formats'
 
          if (have_called_helm) return
          have_called_helm = .true.
-     
-         call helmeos2(temp, logT, den, logRho, X, abar, zbar,
+
+         ! NOTE: when the original OPAL/SCVH tables were generated
+         ! HELM supported a fake ionization mode that no longer exists
+         ! it blended between neutral and ionized over logT = [4.5,5.0]
+
+         call helmeos2(temp, logT, den, logRho, abar, zbar,
      >            1d6, 1d3, helm_res, clip_to_table_boundaries, .true., 
-     >            always_skip_elec_pos, always_include_elec_pos, 
-     >            logT_ion, logT_neutral, off_table, ierr)
+     >            include_elec_pos, off_table, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in helmeos2'
             write(*,1) 'temp', temp
@@ -470,15 +470,6 @@ c ***********************************************************************
             write(*,1) 'zbar', zbar
             write(*,*) 'clip_to_table_boundaries', clip_to_table_boundaries
             write(*,*) 'include_radiation', include_radiation
-            if (.not. include_radiation) then
-               write(*,*) 'try it with radiation included'
-               ierr = 0
-               call helmeos2(temp, logT, den, logRho, X, abar, zbar,
-     >            1d6, 1d3, helm_res, clip_to_table_boundaries, .true., 
-     >            always_skip_elec_pos, always_include_elec_pos, 
-     >            logT_ion, logT_neutral, off_table, ierr)
-               write(*,2) 'ierr with radiation', ierr
-            end if
             write(*,*) 'stop in get_helmeos'
             stop 1
          end if

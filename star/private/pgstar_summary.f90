@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -48,22 +48,22 @@
          call do_Text_Summary1_plot(s, id, device_id, &
             s% Text_Summary1_xleft, s% Text_Summary1_xright, &
             s% Text_Summary1_ybot, s% Text_Summary1_ytop, .false., &
-            s% Text_Summary1_title, s% Text_Summary1_txt_scale, ierr)
+            s% Text_Summary1_title, s% Text_Summary1_txt_scale, s% Text_Summary1_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary1_plot
 
 
       subroutine do_Text_Summary1_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary1_num_rows, s% Text_Summary1_num_cols, &
             s% Text_Summary1_name, ierr)
       end subroutine do_Text_Summary1_plot
@@ -82,22 +82,22 @@
          call do_Text_Summary2_plot(s, id, device_id, &
             s% Text_Summary2_xleft, s% Text_Summary2_xright, &
             s% Text_Summary2_ybot, s% Text_Summary2_ytop, .false., &
-            s% Text_Summary2_title, s% Text_Summary2_txt_scale, ierr)
+            s% Text_Summary2_title, s% Text_Summary2_txt_scale, s% Text_Summary2_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary2_plot
 
 
       subroutine do_Text_Summary2_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary2_num_rows, s% Text_Summary2_num_cols, &
             s% Text_Summary2_name, ierr)
       end subroutine do_Text_Summary2_plot
@@ -116,22 +116,22 @@
          call do_Text_Summary3_plot(s, id, device_id, &
             s% Text_Summary3_xleft, s% Text_Summary3_xright, &
             s% Text_Summary3_ybot, s% Text_Summary3_ytop, .false., &
-            s% Text_Summary3_title, s% Text_Summary3_txt_scale, ierr)
+            s% Text_Summary3_title, s% Text_Summary3_txt_scale, s% Text_Summary3_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary3_plot
 
 
       subroutine do_Text_Summary3_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary3_num_rows, s% Text_Summary3_num_cols, &
             s% Text_Summary3_name, ierr)
       end subroutine do_Text_Summary3_plot
@@ -150,22 +150,22 @@
          call do_Text_Summary4_plot(s, id, device_id, &
             s% Text_Summary4_xleft, s% Text_Summary4_xright, &
             s% Text_Summary4_ybot, s% Text_Summary4_ytop, .false., &
-            s% Text_Summary4_title, s% Text_Summary4_txt_scale, ierr)
+            s% Text_Summary4_title, s% Text_Summary4_txt_scale, s% Text_Summary4_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary4_plot
 
 
       subroutine do_Text_Summary4_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary4_num_rows, s% Text_Summary4_num_cols, &
             s% Text_Summary4_name, ierr)
       end subroutine do_Text_Summary4_plot
@@ -184,22 +184,22 @@
          call do_Text_Summary5_plot(s, id, device_id, &
             s% Text_Summary5_xleft, s% Text_Summary5_xright, &
             s% Text_Summary5_ybot, s% Text_Summary5_ytop, .false., &
-            s% Text_Summary5_title, s% Text_Summary5_txt_scale, ierr)
+            s% Text_Summary5_title, s% Text_Summary5_txt_scale, s% Text_Summary5_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary5_plot
 
 
       subroutine do_Text_Summary5_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary5_num_rows, s% Text_Summary5_num_cols, &
             s% Text_Summary5_name, ierr)
       end subroutine do_Text_Summary5_plot
@@ -218,22 +218,22 @@
          call do_Text_Summary6_plot(s, id, device_id, &
             s% Text_Summary6_xleft, s% Text_Summary6_xright, &
             s% Text_Summary6_ybot, s% Text_Summary6_ytop, .false., &
-            s% Text_Summary6_title, s% Text_Summary6_txt_scale, ierr)
+            s% Text_Summary6_title, s% Text_Summary6_txt_scale, s% Text_Summary6_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary6_plot
 
 
       subroutine do_Text_Summary6_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary6_num_rows, s% Text_Summary6_num_cols, &
             s% Text_Summary6_name, ierr)
       end subroutine do_Text_Summary6_plot
@@ -252,22 +252,22 @@
          call do_Text_Summary7_plot(s, id, device_id, &
             s% Text_Summary7_xleft, s% Text_Summary7_xright, &
             s% Text_Summary7_ybot, s% Text_Summary7_ytop, .false., &
-            s% Text_Summary7_title, s% Text_Summary7_txt_scale, ierr)
+            s% Text_Summary7_title, s% Text_Summary7_txt_scale, s% Text_Summary7_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary7_plot
 
 
       subroutine do_Text_Summary7_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary7_num_rows, s% Text_Summary7_num_cols, &
             s% Text_Summary7_name, ierr)
       end subroutine do_Text_Summary7_plot
@@ -286,22 +286,22 @@
          call do_Text_Summary8_plot(s, id, device_id, &
             s% Text_Summary8_xleft, s% Text_Summary8_xright, &
             s% Text_Summary8_ybot, s% Text_Summary8_ytop, .false., &
-            s% Text_Summary8_title, s% Text_Summary8_txt_scale, ierr)
+            s% Text_Summary8_title, s% Text_Summary8_txt_scale, s% Text_Summary8_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary8_plot
 
 
       subroutine do_Text_Summary8_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary8_num_rows, s% Text_Summary8_num_cols, &
             s% Text_Summary8_name, ierr)
       end subroutine do_Text_Summary8_plot
@@ -320,29 +320,29 @@
          call do_Text_Summary9_plot(s, id, device_id, &
             s% Text_Summary9_xleft, s% Text_Summary9_xright, &
             s% Text_Summary9_ybot, s% Text_Summary9_ytop, .false., &
-            s% Text_Summary9_title, s% Text_Summary9_txt_scale, ierr)
+            s% Text_Summary9_title, s% Text_Summary9_txt_scale, s% Text_Summary9_dxval, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Text_Summary9_plot
 
 
       subroutine do_Text_Summary9_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
          call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% Text_Summary9_num_rows, s% Text_Summary9_num_cols, &
             s% Text_Summary9_name, ierr)
       end subroutine do_Text_Summary9_plot
 
 
       subroutine Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
+            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             Text_Summary_num_rows, Text_Summary_num_cols, &
             Text_Summary_name, ierr)
 
@@ -352,7 +352,7 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
+         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(in) :: Text_Summary_num_rows, Text_Summary_num_cols
@@ -394,12 +394,12 @@
             integer, intent(in) :: col, num_rows
 
             real(dp) :: values(num_rows)
-            integer :: int_values(num_rows), specs(num_rows)
+            integer :: int_values(num_rows), specs(num_rows), int_val
             logical :: is_int_value(num_rows)
             logical :: failed_to_find_value(num_rows)
 
             integer :: i, cnt
-            real :: xpos0, dxpos, dxval, ypos, dypos
+            real :: xpos0, dxpos, ypos, dypos
             real(dp) :: val
 
             call get_history_specs(s, num_rows, Text_Summary_name(:,col), specs, .false.)
@@ -410,7 +410,6 @@
             xpos0 = (real(col) - 0.5)/real(num_cols)
 
             dxpos = 0.00
-            dxval = 0.02
 
             ypos = 0.90
             dypos = -0.95/num_rows
@@ -424,7 +423,14 @@
                            // '. check that it is in your history_columns.list'
                      cycle
                   end if
-                  values(i) = val
+                  int_val = int(val)
+                  if (abs(val - dble(int_val)) < 1d-10*max(1d-10,abs(val))) then
+                     cnt = write_info_line_int(0, ypos, xpos0, dxpos, dxval, &
+                           Text_Summary_name(i,col), int_val)
+                     cycle
+                  else
+                     values(i) = val
+                  end if
                else if (is_int_value(i)) then
                   cnt = write_info_line_int(0, ypos, xpos0, dxpos, dxval, &
                         Text_Summary_name(i,col), int_values(i))

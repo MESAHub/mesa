@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = '1M.mod' ! from make_zams_high_mass, 13491
+      load_model_filename = '1M.mod' ! from make_zams_high_mass, 13491
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -34,7 +34,7 @@
       new_cumulative_energy_error = 0d0
 
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 
 / ! end of star_job namelist
@@ -70,13 +70,15 @@
          use_Ledoux_criterion = .true.
          alpha_semiconvection = 4d-2
                   
-         thermohaline_coeff = 2  
-         thermohaline_option = 'Kippenhahn'
+         thermohaline_coeff = 1
+         thermohaline_option = 'Brown_Garaud_Stellmach_13'
 
          varcontrol_target = 1d-4
 
-         dX_mix_dist_limit = 1d-4 
-         
+         ! Tighten the following controls to reduce the number of retries.
+         dX_div_X_limit_min_X = 3d-4
+         dX_div_X_limit = 3d-2
+        
          omega_function_weight = 20
 
          am_nu_visc_factor = 0
@@ -97,26 +99,27 @@
          
          xa_scale = 1d-5
          
-         !use_gold2_tolerances = .false.
-         !use_gold_tolerances = .false.
+         use_gold2_tolerances = .true.
+         use_gold_tolerances = .true.
 
          mass_change_full_on_dt = 1d7 ! (seconds)
          mass_change_full_off_dt = 1d6 ! (seconds)
 
          mixing_length_alpha = 1.6
-
          T_mix_limit = 1d4
+         mesh_delta_coeff = 1.5 ! Can afford low resolution given how much mixing/smoothing happens.
 
+         photo_digits = 4
          photo_interval = 50
          profile_interval = 100
          history_interval = 10
          terminal_interval = 10
          write_header_frequency = 10
-      
-      !photo_interval = 1
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
+
+!      photo_interval = 1
+!      profile_interval = 1
+!      history_interval = 1
+!      terminal_interval = 1
 
 ! FOR DEBUGGING
 
@@ -247,8 +250,8 @@
          History_Panels1_title = 'History'      
 
          History_Panels1_num_panels = 2
-         History_Panels1_yaxis_name(1) = 'log_center_T' 
-         History_Panels1_other_yaxis_name(1) = 'log_L' 
+         History_Panels1_yaxis_name(1) = 'log_dt'!'log_center_T' 
+         History_Panels1_other_yaxis_name(1) = 'num_retries'!'log_L' 
          History_Panels1_yaxis_name(2) = 'log_center_Rho' 
          History_Panels1_other_yaxis_name(2) = 'log_Teff' 
          
@@ -298,6 +301,55 @@
          Grid3_file_dir = 'png'
          Grid3_file_prefix = 'Mixing_'
          Grid3_file_interval = 2 ! output when mod(model_number,Grid3_file_interval)==0
+
+
+
+ ! Abundance profile plot
+
+  Abundance_win_flag = .true.
+
+ ! window properties
+ Abundance_win_width = 14
+ Abundance_win_aspect_ratio = 0.75
+ Abundance_title = ''
+
+ Abundance_num_isos_to_show = 8
+
+ Abundance_which_isos_to_show(1)  = 'h1'
+ Abundance_which_isos_to_show(2)  = 'he3'
+ Abundance_which_isos_to_show(3)  = 'he4'
+ Abundance_which_isos_to_show(4)  = 'c12'
+ Abundance_which_isos_to_show(5)  = 'n14'
+ Abundance_which_isos_to_show(6)  = 'o16'
+ Abundance_which_isos_to_show(7)  = 'ne20'
+ Abundance_which_isos_to_show(8)  = 'mg24'
+
+ ! number and size of isotope labels along curves
+ num_abundance_line_labels = 4
+ Abundance_line_txt_scale_factor = 0.8
+
+ ! number and size of isotopes on legend
+ Abundance_legend_max_cnt = 0
+
+ ! xaxis name and orientation
+ Abundance_xaxis_name = 'mass'
+ Abundance_xaxis_reversed = .false.
+
+ ! xaxis limits
+ Abundance_xmin = 0.0
+ Abundance_xmax = 0.3
+
+ ! yaxis limits
+ Abundance_log_mass_frac_min = -4.0
+ Abundance_log_mass_frac_max =  0.3
+
+ ! file output
+ Abundance_file_flag = .true.
+ Abundance_file_dir = 'abund_png'
+ Abundance_file_prefix = 'abund_'
+ Abundance_file_interval = 100     ! output when mod(model_number,file_interval)==0
+ Abundance_file_width = 14        ! (inches) negative means use same value as for window
+ Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
 
       
 / ! end of pgstar namelist

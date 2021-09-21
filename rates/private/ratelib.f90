@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -80,7 +80,7 @@
 ! rpp, p(p,e+nu)h2
       
       subroutine rate_pp_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: term,aa,bb
@@ -102,7 +102,7 @@
       
       
       subroutine rate_pp_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: term
@@ -129,7 +129,7 @@
       
 
       subroutine rate_pp_jina(tf, temp, fr, rr) ! cf88
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer :: ierr
@@ -147,7 +147,7 @@
 ! rpep, p(e-p, nu)h2
    
       subroutine rate_pep_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, aa, bb
@@ -169,7 +169,7 @@
       
 
       subroutine rate_pep_jina(tf, temp, fr, rr) ! cf88
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer :: ierr
@@ -187,7 +187,7 @@
 
 
       subroutine rate_dpg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: term, rev, aa, bb
@@ -208,7 +208,7 @@
       
 
       subroutine rate_dpg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, rev, drevdt, aa, daa, bb, dbb
@@ -253,7 +253,7 @@
       
 
       subroutine rate_dpg_jina(tf, temp, fr, rr) ! cf88
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p    d  he3                       de04      5.49300d+00          
@@ -262,7 +262,7 @@
 
 
       subroutine rate_png_fxt(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) term, rev, aa
@@ -299,7 +299,7 @@
       
 
       subroutine rate_ddg_jina(tf, temp, fr, rr) ! cf88
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         d    d  he4                       cf88n     2.38470d+01          
@@ -313,7 +313,7 @@
       
 
       subroutine rate_hep_jina(tf, temp, fr, rr) ! cf88
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer :: ierr
@@ -328,7 +328,7 @@
 
 
       subroutine rate_hep_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, aa
@@ -351,7 +351,7 @@
 ! rhe3d     he3(d,p)he4    de04
 
       subroutine rate_he3d_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         d  he3    p  he4                  de04      1.83530d+01          
@@ -363,7 +363,7 @@
 ! r33, he3(he3, 2p)he4       
 
       subroutine rate_he3he3_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -392,7 +392,7 @@
       end subroutine rate_he3he3_nacre
 
       subroutine rate_he3he3_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -405,7 +405,7 @@
 
 
       subroutine rate_he3he4_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  he3  be7                       de04      1.58700d+00          
@@ -414,7 +414,7 @@
       
 
       subroutine rate_he3he4_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -448,7 +448,7 @@
 
 
       subroutine rate_tripalf_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
       real(dp) :: fr1, rr1
@@ -472,7 +472,7 @@
 
       subroutine rate_tripalf_reaclib(tf, temp, fr, rr)
       !      HE4(2A,G)C12    reaclib JINA - Fynbo et al. 2005 Nature 433, 136-139
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1, fr2, fr3, rev
@@ -501,7 +501,7 @@
       
 
       subroutine rate_tripalf_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: r2abe, rbeac, bb, term, rev
@@ -554,7 +554,7 @@
 
 
       subroutine rate_tripalf_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 
@@ -625,7 +625,7 @@
 
       subroutine rate_he3ng_fxt(tf, temp, fr, rr)
 
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 
@@ -652,7 +652,7 @@
 ! rli7pa, li7(p,a)he4
 
       subroutine rate_li7pa_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -684,7 +684,7 @@
       
       
       subroutine rate_li7pa_jina(tf, temp, fr, rr) ! jina reaclib
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_2(ih1, ili7, ihe4, ihe4, tf, fr, rr, 'rate_li7pa_jina')
@@ -699,7 +699,7 @@
 ! rbe7ec, be7(e-, nu)li7
 
       subroutine rate_be7em_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, bb, dbb
@@ -721,7 +721,7 @@
 
 
       subroutine rate_be7em_jina(tf, temp, fr, rr)        
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer :: ierr
@@ -737,7 +737,7 @@
 ! rbe7pg, be7(p,g)b8
 
       subroutine rate_be7pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc
@@ -770,7 +770,7 @@
 
       subroutine rate_be7pg_jina(tf, temp, fr, rr) ! jina reaclib   cf88
 !         p  be7   b8                       cf88n     1.37000d-01          
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_1(ih1, ibe7, ib8, tf, fr, rr, 'rate_be7pg_jina')
@@ -781,7 +781,7 @@
 
       subroutine rate_be7dp_jina(tf, temp, fr, rr)
 !         d  be7    p  he4  he4             cf88n     1.67660d+01          
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !
@@ -795,7 +795,7 @@
 
       subroutine rate_be7he3_jina(tf, temp, fr, rr)
 !       he3  be7    p    p  he4  he4        mafon     1.12721d+01          
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !
@@ -814,7 +814,7 @@
 ! rb8ep, b8(e+, nu)be8 => 2a    
 
       subroutine rate_b8ep(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp), parameter :: halflife = 0.77d0 ! 770 ms
@@ -824,7 +824,7 @@
       end subroutine rate_b8ep
 
       subroutine rate_b8_wk_he4_he4_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer :: ierr
@@ -847,7 +847,7 @@
 
 
       subroutine rate_c12pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -877,7 +877,7 @@
 
 
       subroutine rate_c12pg_jina(tf, temp, fr, rr) ! jina reaclib   nacre
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  c12  n13                       nacrn     1.94300d+00
@@ -887,7 +887,7 @@
 ! rc12ap, c12(a,p)n15
 
       subroutine rate_n15pa_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  n15  he4  c12                  nacrr     4.96600d+00          
@@ -897,7 +897,7 @@
 
 ! rc12ag, c12(a,g)o16          
       subroutine rate_c12ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 
@@ -934,7 +934,7 @@
 
 
       subroutine rate_c12ag_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, termE1, termE2, termRes, aa, bb, cc
@@ -963,7 +963,7 @@
 
       subroutine rate_c12ag_kunz(tf, temp, fr, rr)
          ! kunz et al (2002)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: term, rev, aa, bb, cc, dd, ee
@@ -989,7 +989,7 @@
       
 
       subroutine rate_c12ag_jina(tf, temp, fr, rr) 
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  c12  o16                       bu96n     7.16192d+00          
@@ -1000,7 +1000,7 @@
 ! r1212p, c12(c12,p)na23
 
       subroutine rate_c12c12p_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       c12  c12    p na23                  cf88r     2.24200d+00          
@@ -1010,7 +1010,7 @@
 ! r1212a, c12(c12,a)ne20
 
       subroutine rate_c12c12_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: term, T9a, dt9a, T9a13, T9a56, aa, zz
@@ -1032,7 +1032,7 @@
 
 
          subroutine rate_c12c12_fxt_basic(tf, temp, fr, rr)
-            type (T_Factors), pointer :: tf
+            type (T_Factors) :: tf
             real(dp), intent(in) :: temp
             real(dp), intent(out) :: fr, rr
             real(dp) :: term,t9a,t9a13,t9a56,aa,zz
@@ -1056,7 +1056,7 @@
 
 
          subroutine rate_c12c12_fxt_multi(tf, temp, fr, rr)
-            type (T_Factors), pointer :: tf
+            type (T_Factors) :: tf
             real(dp), intent(in) :: temp
             real(dp), intent(out) :: fr, rr
             real(dp) :: fr1, rr1, fr2, rr2
@@ -1066,7 +1066,7 @@
          end subroutine rate_c12c12_fxt_multi
 
          subroutine rate_c12c12a_fxt(tf, temp, fr, rr)
-            type (T_Factors), pointer :: tf
+            type (T_Factors) :: tf
             real(dp), intent(in) :: temp
             real(dp), intent(out) :: fr, rr
             real(dp) :: fr1, rr1, fr2, rr2
@@ -1074,7 +1074,7 @@
          end subroutine rate_c12c12a_fxt
 
       subroutine rate_c12c12a_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       c12  c12  he4 ne20                  cf88r     4.62100d+00          
@@ -1086,7 +1086,7 @@
          fr2, rr2, & ! c12(c12,p)na23
          fr3, rr3) ! c12(c12,a)ne20
 
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp) temp, fr1, rr1, fr2, rr2, fr3, rr3
 
          real(dp) term, rev, T9a, T9a13,  &
@@ -1185,7 +1185,7 @@
 
       subroutine rate_c12o16_to_mg24_fxt(tf, temp, fr, rr)
       ! this is a combined rate for reactions to mg24 and si28
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       call rate_c12o16_fxt(tf, temp, fr, rr)
@@ -1195,7 +1195,7 @@
 
       subroutine rate_c12o16_to_si28_fxt(tf, temp, fr, rr)
       ! this is a combined rate for reactions to mg24 and si28
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       call rate_c12o16_fxt(tf, temp, fr, rr)
@@ -1205,7 +1205,7 @@
 
       subroutine rate_c12o16_fxt(tf, temp, fr, rr)
       ! this is a combined rate for reactions to mg24 and si28
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) term, T9a, T9a13, T9a23, T9a56, aa, bb, cc
@@ -1234,7 +1234,7 @@
       end subroutine rate_c12o16_fxt
 
       subroutine rate_c12o16_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: fr1, rr1
@@ -1246,7 +1246,7 @@
 
 
       subroutine rate_c12o16p_fxt(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       call rate_c12o16_fxt(tf, temp, fr, rr)
@@ -1256,7 +1256,7 @@
 
 ! r1216n, c12(o16,n)si27
       subroutine rate_c12o16n(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: fr2, rr2, fr3, rr3
@@ -1265,7 +1265,7 @@
 
 ! r1216p, c12(o16,p)al27
       subroutine rate_c12o16p(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: fr1, rr1, fr3, rr3
@@ -1273,7 +1273,7 @@
       end subroutine rate_c12o16p
 
       subroutine rate_c12o16p_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       c12  o16    p al27                  cf88r     5.17100d+00          
@@ -1281,7 +1281,7 @@
       end subroutine rate_c12o16p_jina
 
       subroutine rate_c12o16a_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       c12  o16  he4 mg24                  cf88r     6.77100d+00          
@@ -1298,7 +1298,7 @@
          fr2, rr2, & ! c12(o16,p)al27 
          fr3, rr3) ! c12(o16,a)mg24
 
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp) temp, fr1, rr1, fr2, rr2, fr3, rr3
 
          real(dp) term, rev, T9a, T9a13,  &
@@ -1367,7 +1367,7 @@
 ! rc13pg, c13(p,g)n14 
 
       subroutine rate_c13pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, bb, gs
@@ -1402,7 +1402,7 @@
 
 
       subroutine rate_c13pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  c13  n14                       nacrr     7.55100d+00          
@@ -1411,7 +1411,7 @@
 
 ! rc13an, c13(a,n)o16
       subroutine rate_c13an_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  c13    n  o16                  nacrn     2.21600d+00          
@@ -1419,7 +1419,7 @@
       end subroutine rate_c13an_jina
 
       subroutine rate_c13an_fxt(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) term, rev, aa, bb, cc, dd, ee, ff, gg, q1
@@ -1449,7 +1449,7 @@
 ! rn13pg, n13(p,g)o14       
 
       subroutine rate_n13pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -1478,7 +1478,7 @@
       end subroutine rate_n13pg_nacre
 
       subroutine rate_n13pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  n13  o14                       lg06n     4.62797d+00          
@@ -1488,7 +1488,7 @@
 
 ! rn13ap n13(a,p)o16     cf88
       subroutine rate_n13ap_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  n13    p  o16                  cf88n     5.21800d+00          
@@ -1501,7 +1501,7 @@
 ! n14(p,g)o15          
 
       subroutine rate_n14pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  n14  o15                       im05n     7.29680d+00          
@@ -1512,7 +1512,7 @@
       subroutine rate_n14pg_fxt(tf, temp, fr, rr)
 ! rn14pg ro15gp
 ! n14(p, g)o15
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) term, rev, aa, bb, cc, dd, ee, q1
@@ -1536,7 +1536,7 @@
       
 
       subroutine rate_n14pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -1574,7 +1574,7 @@
  
 ! n14(a,g)f18      
       subroutine rate_n14ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4  n14  f18                       ga00r     4.41500d+00          
@@ -1585,7 +1585,7 @@
 ! rn15pg, n15(p,g)o16           
 
       subroutine rate_n15pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_1(ih1, in15, io16, tf, fr, rr, 'rate_n15pg_jina')
@@ -1605,7 +1605,7 @@
 ! ro14ap, o14(a,p)f17          
 
       subroutine rate_o14ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc, dd, ee, ff, q1
@@ -1630,7 +1630,7 @@
 
 
       subroutine rate_o14ap_jina(tf, temp, fr, rr) !  Hahn 1996    PhRvC 54, 4, p1999-2013
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  o14    p  f17                  Ha96r     1.19200d+00          
@@ -1640,7 +1640,7 @@
       
 ! ro14ag, o14(a,g)ne18  
       subroutine rate_o14ag_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  o14 ne18                       wh87n     5.11400d+00          
@@ -1660,7 +1660,7 @@
 ! ro15ag, o15(a,g)ne19          
 
       subroutine rate_o15ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc, dd, ee, ff, gg, hh, q1, q2, q3
@@ -1689,7 +1689,7 @@
 
 
       subroutine rate_o15ag_jina(tf, temp, fr, rr) 
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  o15 ne19                       Ha96n     3.52900d+00          
@@ -1702,7 +1702,7 @@
 
 ! ro16pg, o16(p,g)f17          
       subroutine rate_o16pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bbm1, bb
@@ -1724,7 +1724,7 @@
          
 
       subroutine rate_o16pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  o16  f17                       nacrn     6.00000d-01          
@@ -1737,7 +1737,7 @@
 ! ro16ag, o16(a,g)ne20                  
 
       subroutine rate_o16ag_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev
@@ -1766,7 +1766,7 @@
       end subroutine rate_o16ag_nacre
 
       subroutine rate_o16ag_jina(tf, temp, fr, rr) ! jina reaclib -- nacre
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  o16 ne20                       nacrr     4.73000d+00          
@@ -1784,7 +1784,7 @@
 ! r1616 cf88 fxt
 
       subroutine rate_o16o16_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term
@@ -1801,7 +1801,7 @@
       end subroutine rate_o16o16_fxt
 
       subroutine rate_o16o16g_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !
@@ -1814,7 +1814,7 @@
 
 ! r1616p, o16(o16, p)p31
       subroutine rate_o16o16p_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       o16  o16    p  p31                  cf88r     7.67800d+00          
@@ -1824,7 +1824,7 @@
 
 ! r1616a, o16(o16, a)si28
       subroutine rate_o16o16a_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       o16  o16  he4 si28                  cf88r     9.59300d+00          
@@ -1832,7 +1832,7 @@
       end subroutine rate_o16o16a_jina
 
       subroutine rate_o16o16a(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: fr1, rr1, fr2, rr2, fr4, rr4
@@ -1840,7 +1840,7 @@
       end subroutine rate_o16o16a
 
       subroutine rate_o16o16a_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !
@@ -1849,7 +1849,7 @@
       end subroutine rate_o16o16a_fxt
 
       subroutine rate_o16o16p_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !
@@ -1858,7 +1858,7 @@
       end subroutine rate_o16o16p_fxt
 
       subroutine rate_o16o16_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: fr1, rr1, fr2, rr2
@@ -1874,7 +1874,7 @@
          fr3, rr3, &       ! o16(o16, a)si28 &
          fr4, rr4)       ! o16(o16, d)p30
 
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp) temp, fr1, rr1, fr2, rr2, fr3, rr3, fr4, rr4
 
          real(dp) term, rev, aa, daa,  &
@@ -1978,7 +1978,7 @@
 ! ro17pa, o17(p,a)n14                    
 
       subroutine rate_o17pa_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  o17  he4  n14                  ct07r     1.19164d+00          
@@ -1989,7 +1989,7 @@
 ! ro17pg, o17(p,g)f18                           
       
       subroutine rate_o17pg_jina(tf, temp, fr, rr) ! jina reaclib   Chafa et al. (2007)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  o17  f18                       ct07n     5.60650d+00          
@@ -1999,7 +1999,7 @@
 ! ro18pa, o18(p,a)n15          
 
       subroutine rate_o18pa_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, bb, gs
@@ -2034,7 +2034,7 @@
 
 
       subroutine rate_o18pa_jina(tf, temp, fr, rr) ! jina reaclib    nacre
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  o18  he4  n15                  nacrn     3.98100d+00          
@@ -2045,7 +2045,7 @@
 ! ro18pg, o18(p,g)f19                     
 
       subroutine rate_o18pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  o18  f19                       nacrr     7.99400d+00          
@@ -2056,7 +2056,7 @@
 ! ro18ag, o18(a,g)ne22                       
 
       subroutine rate_o18ag_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  o18 ne22                       dh03r     9.66900d+00          
@@ -2078,7 +2078,7 @@
    
 ! rf17ap    f17(a,p)ne20     
       subroutine rate_f17ap_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  f17    p ne20                  nacr      4.13000d+00          
@@ -2088,7 +2088,7 @@
 ! rf18pa, f18(p,a)o15              
 
       subroutine rate_f18pa_wk82(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc, dd, ee, ff
@@ -2111,7 +2111,7 @@
 
 
       subroutine rate_f18pa_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  f18  he4  o15                  sh03r     2.88215d+00          
@@ -2125,7 +2125,7 @@
 ! rf19pg, f19(p,g)ne20                      
 
       subroutine rate_f19pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  f19 ne20                       cf88r     1.28480d+01          
@@ -2136,7 +2136,7 @@
 ! rf19pa, f19(p,a)o16                         
 
       subroutine rate_f19pa_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, bb, dd, gs
@@ -2170,7 +2170,7 @@
 
 
       subroutine rate_f19pa_jina(tf, temp, fr, rr) ! jina reaclib    
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_2(ih1, if19, ihe4, io16, tf, fr, rr, 'rate_f19pa_jina')
@@ -2183,7 +2183,7 @@
    
 ! rf19ap, f19(a,p)ne22 
       subroutine rate_f19ap_cf88(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: term
@@ -2197,7 +2197,7 @@
       end subroutine rate_f19ap_cf88
 
       subroutine rate_f19ap_jina(tf, temp, fr, rr) ! jina reaclib    
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4  f19    p ne22                  cf88r     1.67500d+00          
@@ -2211,7 +2211,7 @@
 ! rne18ap, ne18(a,p)na21
 
       subroutine rate_ne18ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc, dd, ee, zz
@@ -2251,7 +2251,7 @@
       end subroutine rate_ne18ap_fxt
 
       subroutine rate_ne18ap_jina(tf, temp, fr, rr) ! jina reaclib    
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4 ne18    p na21                  GW95r     2.62700d+00          
@@ -2261,7 +2261,7 @@
 
 ! rne18ag   ne18(a,g)mg22  rath
       subroutine rate_ne18ag_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4 ne18 mg22                       rath      8.14100d+00          
@@ -2277,7 +2277,7 @@
 ! rne19pg, ne19(p,g)na20
 
       subroutine rate_ne19pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc, dd, ee, ff, gg, q1
@@ -2304,7 +2304,7 @@
       
       
       subroutine rate_ne19pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p ne19 na20                       cf88r     2.19900d+00          
@@ -2321,7 +2321,7 @@
 ! rne20pg, ne20(p,g)na21 
 
       subroutine rate_ne20pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc, dd, ff, gg, zz, gs
@@ -2350,7 +2350,7 @@
       
       
       subroutine rate_ne20pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p ne20 na21                       nacrr     2.43100d+00          
@@ -2360,7 +2360,7 @@
       
 ! ne20(a,p)na23      
       subroutine rate_ne20ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1, rr1
@@ -2372,7 +2372,7 @@
 ! rne20ag, ne20(a,g)mg24                    
 
       subroutine rate_ne20ag_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !       he4 ne20 mg24                       nacrr     9.31600d+00          
@@ -2390,7 +2390,7 @@
 ! rne22pg, ne22(p,g)na23
 
       subroutine rate_ne22pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p ne22 na23                       ha01r     8.79400d+00          
@@ -2400,7 +2400,7 @@
 ! ne22(n,g)ne23      
 
       subroutine rate_ne22ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 ne22 mg26                       nacr      1.06150d+01          
@@ -2408,7 +2408,7 @@
       end subroutine rate_ne22ag_jina
       
       subroutine rate_na23pa_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         p na23  he4 ne20                  ha04n     2.37900d+00          
@@ -2416,7 +2416,7 @@
       end subroutine rate_na23pa_jina
 
       subroutine rate_na23pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1
@@ -2430,7 +2430,7 @@
 ! rmg24ag, mg24(a,g)si28
 
       subroutine rate_mg24ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, bb, dbb, cc, dcc, dd, ddd, ee, dee,  &
@@ -2458,7 +2458,7 @@
 
 
       subroutine rate_mg24ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 mg24 si28                       cf88r     9.98400d+00          
@@ -2472,7 +2472,7 @@
 ! rmg24ap, mg24(a,p)al27
 
       subroutine rate_mg24ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, bb, dbb, cc, dcc, dd, ddd, ee, dee,  &
@@ -2505,7 +2505,7 @@
 
 
       subroutine rate_mg24ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1
@@ -2519,7 +2519,7 @@
 ! ral27pg, al27(p,g)si28   
 
       subroutine rate_al27pg_c96(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, rev, aa, bb, cc, dd, ee, ff, gg
@@ -2542,7 +2542,7 @@
       end subroutine rate_al27pg_c96
       
       subroutine rate_al27pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1
@@ -2554,7 +2554,7 @@
  
 ! rsi28ag, si28(a,g)s32      
       subroutine rate_si28ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 si28  s32                       rath      6.94800d+00          
@@ -2566,7 +2566,7 @@
       end subroutine rate_si28ag_jina
 
       subroutine rate_si28ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2599,7 +2599,7 @@
 ! rsi28ap, si28(a,p)p31   
 
       subroutine rate_si28ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2620,7 +2620,7 @@
 
 
       subroutine rate_si28ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1
@@ -2637,7 +2637,7 @@
 ! rp31pg, p31(p,g)s32  
 
       subroutine rate_p31pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2659,7 +2659,7 @@
 
 
       subroutine rate_p31pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         p  p31  s32                       il01n     8.86400d+00          
@@ -2676,7 +2676,7 @@
       
 ! rs32ag, s32(a,g)ar36      
       subroutine rate_s32ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4  s32 ar36                       rath      6.63900d+00          
@@ -2686,7 +2686,7 @@
 ! rs32ag, s32(a,g)ar36  
 
       subroutine rate_s32ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2712,7 +2712,7 @@
 ! rs32ap, s32(a,p)cl35    
 
       subroutine rate_s32ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2733,7 +2733,7 @@
 
 
       subroutine rate_s32ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4  s32    p cl35                  il01rv   -1.86700d+00          
@@ -2749,7 +2749,7 @@
 ! rcl35pg, cl35(p,g)ar36
 
       subroutine rate_cl35pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt
@@ -2767,7 +2767,7 @@
 
 
       subroutine rate_cl35pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         p cl35 ar36                       il01r     8.50600d+00          
@@ -2782,7 +2782,7 @@
       
 ! rar36ag, ar36(a,g)ca40      
       subroutine rate_ar36ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr      
 !       he4 ar36 ca40                       rath      7.04000d+00          
@@ -2792,7 +2792,7 @@
 ! rar36ag, ar36(a,g)ca40   
 
       subroutine rate_ar36ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2817,7 +2817,7 @@
 ! rar36ap, ar36(a,p)k39  
 
       subroutine rate_ar36ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2838,7 +2838,7 @@
 
 
       subroutine rate_ar36ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 ar36    p  k39                  rath v   -1.28800d+00          
@@ -2853,7 +2853,7 @@
 ! rk39pg, k39(p,g)ca40
 
       subroutine rate_k39pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2874,7 +2874,7 @@
 
 
       subroutine rate_k39pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         p  k39 ca40                       rath      8.32800d+00          
@@ -2889,7 +2889,7 @@
       
 ! rca40ag, ca40(a,g)ti44      
       subroutine rate_ca40ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       include 'formats'
@@ -2900,7 +2900,7 @@
 ! rca40ag, ca40(a,g)ti44    
 
       subroutine rate_ca40ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2926,7 +2926,7 @@
 ! rca40ap, ca40(a,p)sc43(p,g)ti44        
 
       subroutine rate_ca40ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2947,7 +2947,7 @@
 
 
       subroutine rate_ca40ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 ca40    p sc43                  rath v   -3.52300d+00          
@@ -2966,7 +2966,7 @@
 ! rsc43pg, sc43(p,g)ti44     
 
       subroutine rate_sc43pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -2987,7 +2987,7 @@
 
 
       subroutine rate_sc43pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         p sc43 ti44                       rath      8.65000d+00          
@@ -3004,7 +3004,7 @@
       
 ! rti44ag, ti44(a,g)cr48      
       subroutine rate_ti44ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 ti44 cr48                       rath      7.69200d+00          
@@ -3014,7 +3014,7 @@
 ! rti44ag, ti44(a,g)cr48   
 
       subroutine rate_ti44ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3040,7 +3040,7 @@
 ! rti44ap, ti44(a,p)v47
 
       subroutine rate_ti44ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3061,7 +3061,7 @@
 
 
       subroutine rate_ti44ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 ti44    p  v47                  chw0r    -4.10500d-01          
@@ -3078,7 +3078,7 @@
 ! rv47pg, v47(p,g)cr48     
 
       subroutine rate_v47pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3099,7 +3099,7 @@
 
 
       subroutine rate_v47pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         p  v47 cr48                       nfisn     8.10607d+00          
@@ -3116,7 +3116,7 @@
       
 ! rcr48ag, cr48(a,g)fe52      
       subroutine rate_cr48ag_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 cr48 fe52                       rath      7.93900d+00          
@@ -3126,7 +3126,7 @@
 ! rcr48ag, cr48(a,g)fe52    
 
       subroutine rate_cr48ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3152,7 +3152,7 @@
 ! rcr48ap, cr48(a,p)mn51 
 
       subroutine rate_cr48ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3173,7 +3173,7 @@
 
 
       subroutine rate_cr48ap_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !       he4 cr48    p mn51                  rath      5.58000d-01          
@@ -3190,7 +3190,7 @@
 ! rmn51pg, mn51(p,g)fe52     
 
       subroutine rate_mn51pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3211,7 +3211,7 @@
 
 
       subroutine rate_mn51pg_jina(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         p mn51 fe52                       rath      7.38100d+00          
@@ -3226,7 +3226,7 @@
 ! rfe52ag, fe52(a,g)ni56   
 
       subroutine rate_fe52ag_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3252,7 +3252,7 @@
 ! rfe52ap, fe52(a,p)co55 
 
       subroutine rate_fe52ap_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3278,7 +3278,7 @@
 
 
       subroutine rate_fe52ng_jina(tf, temp, fr,  rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         n fe52 fe53                       rath      1.06840d+01          
@@ -3287,7 +3287,7 @@
 
 
       subroutine rate_fe52ng_fxt(tf, temp, fr,  rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) term, dtermdt, rev, drevdt, tq2
@@ -3306,7 +3306,7 @@
 
 
       subroutine rate_fe53ng_fxt(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) term, dtermdt, rev, drevdt, tq1, tq10, dtq10, tq2
@@ -3327,7 +3327,7 @@
 
 
       subroutine rate_fe53ng_jina(tf, temp, fr,  rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
 !         n fe53 fe54                       rath      1.33780d+01          
@@ -3336,7 +3336,7 @@
 
 
       subroutine rate_fe54pg_fxt(tf, temp, fr, rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) term, dtermdt, rev, drevdt, aa, daa, z, z2, z3
@@ -3358,7 +3358,7 @@
 
 
       subroutine rate_fe54a_jina(tf, temp, fr,  rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
       real(dp) :: fr1, fr2, fr3
@@ -3370,7 +3370,7 @@
       end subroutine rate_fe54a_jina
 
       subroutine rate_fe54an_jina(tf, temp, fr,  rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
             call jina_reaclib_2_2(ineut, ini57, ihe4, ife54, tf, rr, fr, 'rate_fe54an_jina')
@@ -3378,7 +3378,7 @@
 
 
       subroutine rate_fe54ng_jina(tf, temp, fr,  rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_1(ineut, ife54, ife55, tf, fr, rr, 'rate_fe54ng_jina')
@@ -3387,7 +3387,7 @@
 
 
       subroutine rate_fe55ng_jina(tf, temp, fr,  rr)
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_1(ineut, ife55, ife56, tf, fr, rr, 'rate_fe55ng_jina')
@@ -3399,7 +3399,7 @@
 ! rco55pg, co55(p,g)ni56     
 
       subroutine rate_co55pg_fxt(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
@@ -3431,7 +3431,7 @@
    ! see rco55pg
    
       subroutine rate_v44pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          real(dp) :: fr1
@@ -3441,7 +3441,7 @@
 
 
       subroutine rate_v45pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p  v45 cr46                       rath      4.88600d+00          
@@ -3449,7 +3449,7 @@
       end subroutine rate_v45pg_jina
 
       subroutine rate_co53pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p co53 ni54                       rath      3.85600d+00          
@@ -3458,7 +3458,7 @@
 
 
       subroutine rate_co54pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p co54 ni55                       rath      4.61400d+00          
@@ -3466,7 +3466,7 @@
       end subroutine rate_co54pg_jina
 
       subroutine rate_ga62pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p ga62 ge63                       nfisn     2.23867d+00          
@@ -3475,7 +3475,7 @@
 
 
       subroutine rate_ga63pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 !         p ga63 ge64                       rath      5.02500d+00          
@@ -3485,7 +3485,7 @@
       ! ni56
       
       subroutine rate_fe52ag_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
             call jina_reaclib_2_1(ihe4, ife52, ini56, tf, fr, rr, 'rate_fe52ag_jina')
@@ -3493,7 +3493,7 @@
 
 
       subroutine rate_fe52ap_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_2(ihe4, ife52, ih1, ico55, tf, fr, rr, 'rate_fe52ap_jina')
@@ -3501,7 +3501,7 @@
 
 
       subroutine rate_co55pg_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_1(ih1, ico55, ini56, tf, fr, rr, 'rate_co55pg_jina')
@@ -3509,7 +3509,7 @@
 
 
       subroutine rate_fe54pg_jina(tf, temp, fr,  rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
             call jina_reaclib_2_1(ih1, ife54, ico55, tf, fr, rr, 'rate_fe54pg_jina')
@@ -3518,7 +3518,7 @@
       ! ni58
       
       subroutine rate_fe54ag_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
             call jina_reaclib_2_1(ihe4, ife54, ini58, tf, fr, rr, 'rate_fe54ag_jina')
@@ -3526,14 +3526,14 @@
 
 
       subroutine rate_fe54ap_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_2(ihe4, ife54, ih1, ico57, tf, fr, rr, 'rate_fe54ap_jina')
       end subroutine rate_fe54ap_jina
 
       subroutine rate_fe56pg_jina(tf, temp, fr,  rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
             call jina_reaclib_2_1(ih1, ife56, ico57, tf, fr, rr, 'rate_fe56pg_jina')
@@ -3541,7 +3541,7 @@
 
  
       subroutine rate_c12_c12_to_h1_na23_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_2( &
@@ -3550,7 +3550,7 @@
       
 
       subroutine rate_he4_ne20_to_c12_c12_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_2( &
@@ -3559,7 +3559,7 @@
       
 
       subroutine rate_he4_mg24_to_c12_o16_jina(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_2( &
@@ -3573,7 +3573,7 @@
 ! sets various popular temperature factors
 ! this routine must be called before any of the rates are called
 
-      type (T_Factors), pointer :: tf
+      type (T_Factors) :: tf
       real(dp), intent(in) :: logT_in, temp_in
 
       real(dp) :: logT, temp
@@ -3659,7 +3659,7 @@
       
       subroutine show_nacre_terms( &
                tf, a0, a1, a2, b0, b1, b2, b3, b4, c0, c1, d0, d1, e0, e1, e2)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: a0, a1, a2, b0, b1, b2, b3, b4,  &
                c0, c1, d0, d1, e0, e1, e2
          
@@ -3688,7 +3688,7 @@
          ! + d0 T9i32 exp(-d1/T9)
          ! + e0 T9^e1 exp(-e2/T9) &
                tf, a0, a1, a2, b0, b1, b2, b3, b4, c0, c1, d0, d1, e0, e1, e2, term)
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: a0, a1, a2, b0, b1, b2, b3, b4,  &
                c0, c1, d0, d1, e0, e1, e2
          real(dp), intent(out) :: term         
@@ -3708,14 +3708,14 @@
       subroutine rnacre_rev(tf, a0, a1, rev) ! a0 T932 exp(-a1/T9)
          real(dp), intent(in) :: a0, a1
          real(dp), intent(out) :: rev
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          rev    = a0 * (tf% T932) * exp(-a1*(tf% T9i))
       end subroutine rnacre_rev      
       
       
       subroutine jina_reaclib_1_1(i1, o1, tf, fr, rr, str)
          integer, intent(in) :: i1, o1
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3732,7 +3732,7 @@
       
       subroutine jina_reaclib_1_2(i1, o1, o2, tf, fr, rr, str)
          integer, intent(in) :: i1, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3749,7 +3749,7 @@
       
       subroutine jina_reaclib_1_3(i1, o1, o2, o3, tf, fr, rr, str)
          integer, intent(in) :: i1, o1, o2, o3
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3766,7 +3766,7 @@
       
       subroutine jina_reaclib_1_4(i1, o1, o2, o3, o4, tf, fr, rr, str)
          integer, intent(in) :: i1, o1, o2, o3, o4
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3783,7 +3783,7 @@
       
       subroutine jina_reaclib_2_1(i1, i2, o1, tf, fr, rr, str)
          integer, intent(in) :: i1, i2, o1
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3800,7 +3800,7 @@
       
       subroutine jina_reaclib_2_2(i1, i2, o1, o2, tf, fr, rr, str)
          integer, intent(in) :: i1, i2, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3817,7 +3817,7 @@
       
       subroutine jina_reaclib_2_3(i1, i2, o1, o2, o3, tf, fr, rr, str)
          integer, intent(in) :: i1, i2, o1, o2, o3
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3834,7 +3834,7 @@
       
       subroutine jina_reaclib_2_4(i1, i2, o1, o2, o3, o4, tf, fr, rr, str)
          integer, intent(in) :: i1, i2, o1, o2, o3, o4
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3851,7 +3851,7 @@
       
       subroutine jina_reaclib_3_1(i1, i2, i3, o1, tf, fr, rr, str)
          integer, intent(in) :: i1, i2, i3, o1
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3868,7 +3868,7 @@
       
       subroutine jina_reaclib_3_2(i1, i2, i3, o1, o2, tf, fr, rr, str)
          integer, intent(in) :: i1, i2, i3, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3885,7 +3885,7 @@
       
       subroutine jina_reaclib_4_2(i1, i2, i3, i4, o1, o2, tf, fr, rr, str)
          integer, intent(in) :: i1, i2, i3, i4, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer :: ierr
@@ -3902,7 +3902,7 @@
       
       subroutine try1_reaclib_1_1(i1, o1, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, o1
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -3923,7 +3923,7 @@
       
       subroutine try1_reaclib_1_2(i1, o1, o2, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -3945,7 +3945,7 @@
       
       subroutine try1_reaclib_1_3(i1, o1, o2, o3, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, o1, o2, o3
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -3968,7 +3968,7 @@
       
       subroutine try1_reaclib_1_4(i1, o1, o2, o3, o4, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, o1, o2, o3, o4
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -3992,7 +3992,7 @@
       
       subroutine try1_reaclib_2_1(i1, i2, o1, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, i2, o1
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -4014,7 +4014,7 @@
       
       subroutine try1_reaclib_2_2(i1, i2, o1, o2, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, i2, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -4037,7 +4037,7 @@
       
       subroutine try1_reaclib_2_3(i1, i2, o1, o2, o3, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, i2, o1, o2, o3
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -4061,7 +4061,7 @@
       
       subroutine try1_reaclib_2_4(i1, i2, o1, o2, o3, o4, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, i2, o1, o2, o3, o4
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -4086,7 +4086,7 @@
       
       subroutine try1_reaclib_3_1(i1, i2, i3, o1, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, i2, i3, o1
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -4109,7 +4109,7 @@
       
       subroutine try1_reaclib_3_2(i1, i2, i3, o1, o2, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, i2, i3, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -4133,7 +4133,7 @@
       
       subroutine try1_reaclib_4_2(i1, i2, i3, i4, o1, o2, tf, fr, rr, str, ierr)
          integer, intent(in) :: i1, i2, i3, i4, o1, o2
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(out) :: fr, rr
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
@@ -4279,7 +4279,7 @@
 
       subroutine do_reaclib(tf, a1, a2, a3, a4, a5, a6, a7, term)
          use const_def
-         type (T_Factors), pointer :: tf
+         type (T_Factors) :: tf
          real(dp), intent(in) :: a1, a2, a3, a4, a5, a6, a7
          real(dp), intent(out) :: term
          real(dp) :: exponent

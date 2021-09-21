@@ -50,6 +50,18 @@ subsidiary controls.
    atm/mapping
    atm/structure
 
+.. _auto_diff:
+
+Automatic Differentiation (``auto_diff``)
+=========================================
+
+The ``auto_diff`` module provides Fortran derived types that support
+automatic calculation of analytic derivatives using the chain rule.
+
+.. toctree::
+
+   auto_diff/overview
+
 
 .. _chem:
 
@@ -83,6 +95,7 @@ The ``eos`` module provides the equation of state.
 
    eos/overview
    eos/defaults
+   eos/interface
 
 
 .. _kap:
@@ -98,6 +111,7 @@ conductive opacities.
 
    kap/overview
    kap/defaults
+   kap/interface
 
 .. _net:
 
@@ -106,6 +120,11 @@ Nuclear reaction networks (``net``)
 
 The ``net`` module implements nuclear reaction networks.  
 
+.. toctree::
+   :maxdepth: 1
+
+   net/overview
+   net/nets
 
 .. _neu:
 
@@ -124,5 +143,10 @@ Nuclear reaction rates (``rates``)
 
 The ``rates`` module collects thermonuclear reaction rates and weak
 reaction rates from a range of sources.
+
+.. toctree::
+   :maxdepth: 1
+
+   rates/overview
 
 

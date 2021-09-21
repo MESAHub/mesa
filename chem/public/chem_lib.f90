@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton, Ed Brown & The MESA Team
+!   Copyright (C) 2010-2019  Ed Brown & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -604,6 +604,10 @@
       ! return the abundances of the stable isotopes where the unstable ones
       ! have decayed to the stable versions.
       ! Code from Frank Timmes "decay.zip" 
+      ! Note this makes some asumptions, firstly that isotopes can only decay to one
+      ! output (thus there are no branches), also we assume an inifinite timescale
+      ! for decay. If you need a high precision output I suggest you use a one zone
+      ! burn model rather than this.
       subroutine get_stable_mass_frac(chem_id,num_species,abun_in,abun_out) 
          use chem_def
          integer,intent(in),dimension(:) :: chem_id
@@ -611,12 +615,22 @@
          real(dp),dimension(:),intent(in) :: abun_in
          real(dp),dimension(:),intent(out) :: abun_out
          integer :: i,j,a,z,n
+         logical :: found
 
          abun_out(1:solsiz)=0.d0
 
          outer: do i=1,num_species
             Z=chem_isos%Z(chem_id(i))
             a=z+chem_isos%n(chem_id(i))
+            found =.false.
+
+            ! special case of b8 to he4
+            if (Z == 5 .and. A==8) then ! b8
+               j = 2 ! he4
+               abun_out(j) = abun_out(j) + 2*abun_in(i)
+               found = .true.
+            end if
+
             inner: do j=1,solsiz
                if (a .ne. iasol(j)) then
                   cycle inner
@@ -624,10 +638,30 @@
                if ((jcode(j) .eq. 0) .or. &
                    (z.ge.izsol(j) .and. jcode(j).eq.1) .or. &
                    (z.le.izsol(j) .and. jcode(j).eq.2) .or. &
-                   (z.eq.izsol(j) .and. jcode(j).eq.3) ) then
+                   (z.eq.izsol(j) .and. jcode(j).eq.3) .or. &
+                   (Z==17 .and. A==36 .and. izsol(j) == 18 .and. iasol(j) == 36)  .or. & ! cl36 -> ar36 special case
+                   (Z==21 .and. A==46 .and. izsol(j) == 22 .and. iasol(j) == 46)  .or. & ! sc46 -> ti46 special case 
+                   (Z==21 .and. A==48 .and. izsol(j) == 22 .and. iasol(j) == 48)  .or. & ! sc48 -> ti48 special case
+                   (Z==25 .and. A==54 .and. izsol(j) == 24 .and. iasol(j) == 54)  .or. & ! mn54 -> cr54 special case
+                   (Z==27 .and. A==58 .and. izsol(j) == 26 .and. iasol(j) == 58)  .or. & ! co58-> fe58 special case
+                   (Z==29 .and. A==64 .and. izsol(j) == 28 .and. iasol(j) == 64)  .or. & ! cu64 -> ni64 special case
+                   (Z==31 .and. A==70 .and. izsol(j) == 32 .and. iasol(j) == 70)  .or. & ! ga70 -> ge70 special case
+                   (Z==33 .and. A==74 .and. izsol(j) == 32 .and. iasol(j) == 74)  .or. & ! as74 -> ge74 special case
+                   (Z==33 .and. A==76 .and. izsol(j) == 34 .and. iasol(j) == 76)  .or. & ! as76 -> se76 special case
+                   (Z==35 .and. A==78 .and. izsol(j) == 34 .and. iasol(j) == 78)  .or. & ! br78 -> se78 special case
+                   (Z==35 .and. A==80 .and. izsol(j) == 36 .and. iasol(j) == 80)  .or. & ! br80 -> kr80 special case    
+                   (Z==35 .and. A==82 .and. izsol(j) == 36 .and. iasol(j) == 82)  .or. & ! br82 -> kr82 special case
+                   (Z==37 .and. A==84 .and. izsol(j) == 36 .and. iasol(j) == 84)   & ! rb84 -> kr84 special case
+                   ) then
                      abun_out(j) = abun_out(j) + abun_in(i)
+                     found = .true.
                end if
             end do inner
+
+            if(found .eqv. .false.) then
+               write(*,*) "Failed to match isotope ",trim(chem_isos%name(chem_id(i)))
+            end if
+
          end do outer
 
          !Normalise results

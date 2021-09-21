@@ -83,7 +83,7 @@
    log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
    rho
    gamma1
-   conv_mixing_type ! mixing types are defined in mesa/const
+   mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    log_csound
    acoustic_depth
@@ -91,8 +91,6 @@
    log_dr_div_cs
    log_cell_collapse_time
    total_energy
-   total_energy_integral ! total from surface inward. negative if bound. (ergs)
-   total_energy_integral_outward
    
    velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s
@@ -162,15 +160,12 @@
    log_conv_vel ! log10 convection velocity (cm/sec)
    conv_vel_div_csound ! convection velocity divided by sound speed
    log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
-   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
    pressure_scale_height ! in Rsun units
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP required for purely radiative transport
    
    gradT_sub_grada ! gradT-grada at cell boundary 
    
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
    dm
@@ -203,10 +198,8 @@
 
    ! ergs/g/sec for specific reactions (names from rates_def)
       
-      !rpp
 
       
-   ! misc
    log_D_mix ! log10 diffusion coefficient in units of cm^2/second (Eulerian)
    log_D_conv ! D_mix for regions where mix_type = convective_mixing
    log_D_semi ! D_mix for regions where mix_type = semiconvective_mixing
@@ -218,9 +211,6 @@
 
       log_sig_mix
       !gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
-      !dlnR_dm ! for structure equation
-      !dlnT_dm ! for structure equation
-      !dL_dm ! for structure equation
       
    
    alpha_RTI
@@ -237,7 +227,6 @@
    log_dr
    dlogR
    
-   dlnRho_dlnR
    gradP_div_rho
    
    RTI_du_diffusion_kick
@@ -300,9 +289,6 @@
       ! star_mass_o16
       ! star_mass_ne20
    ! locations of abundance transitions
-      ! h1_boundary_mass
-      ! he4_boundary_mass
-      ! c12_boundary_mass
    ! location of optical depths 10 and 100
       ! tau10_mass
       ! tau10_radius

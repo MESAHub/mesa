@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# uncomment the following line to run all parts of the test
+# MESA_RUN_OPTIONAL=t
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+do_one inlist_zams_header zams.mod
+cp zams.mod standard_zams.mod
+do_one inlist_to_agb_header agb.mod 
+cp agb.mod standard_agb.mod
+
+do_one inlist_c_burn_header c_burn.mod
+do_one inlist_o_ne_wd_header o_ne_wd.mod
+do_one inlist_settle_envelope_header settled_envelope.mod
+
+# for producing ns test case starting models:
+#do_one inlist_remove_envelope_header final.mod
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished all inlists'
+

@@ -7,7 +7,7 @@
       show_log_description_at_start = .false. 
       
       load_saved_model = .true.
-      saved_model_name = 'ns_plus_he_layer.mod'
+      load_model_filename = 'ns_plus_he_layer.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -77,15 +77,14 @@
       accretion_he4 = 0.26
       accretion_zfracs = 3
       
-      always_use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
 
       max_abar_for_burning = 55
       
       initial_z = 0.02d0
 
       mixing_length_alpha = 1.5
-      MLT_option = 'Henyey'
+      MLT_option = 'TDC'
 
       use_Ledoux_criterion = .false.  
       alpha_semiconvection = 0.1

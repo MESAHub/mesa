@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton
+!   Copyright (C) 2013  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -637,9 +637,9 @@
          character (len=strlen) :: yname, other_yname
          character (len=strlen) :: yname1,yname2, &
             other_yname1,other_yname2
-         real, pointer, dimension(:) :: xvec1,xvec2, yvec1,yvec2,&
+         real, allocatable, dimension(:) :: xvec1,xvec2, yvec1,yvec2,&
             other_yvec1,other_yvec2
-         real, pointer, dimension(:) :: xvec, yvec, other_yvec
+         real, allocatable, dimension(:) :: xvec, yvec, other_yvec
 
          integer :: i, ii, n, j, k, max_width, step_min, step_max, &
             y_color, other_y_color, yaxis_id, other_yaxis_id, &
@@ -782,8 +782,21 @@
             yvec=yvec1
             if(have_yaxis2) yvec=yvec-yvec2
 
+         ! Make sure limits are sensible for plotting
+            do i=lbound(yvec,dim=1),ubound(yvec,dim=1)
+               if (yvec(i)>100) yvec(i)=100
+               if (yvec(i)<-100) yvec(i)=-100
+            end do
+
             other_yvec=other_yvec1
             if(have_other_yaxis2) other_yvec=other_yvec-other_yvec2
+
+         ! Make sure limits are sensible for plotting
+            do i=lbound(other_yvec,dim=1),ubound(other_yvec,dim=1)
+               if (other_yvec(i)>100) other_yvec(i)=100
+               if (other_yvec(i)<-100) other_yvec(i)=-100
+            end do
+
 
             panel_ytop = vp_ytop - real(j-1)*panel_dy
             panel_ybot = panel_ytop - panel_dy
@@ -876,7 +889,7 @@
 
          logical function get1_yvec(name, vec)
             character (len=*) :: name
-            real, dimension(:), pointer :: vec
+            real, dimension(:), allocatable :: vec
             get1_yvec = get1_hist_yvec(s, step_min, step_max, n, name, vec)
          end function get1_yvec
 

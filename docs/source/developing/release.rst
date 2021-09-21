@@ -15,7 +15,23 @@ General steps
 Source code updates
 -------------------
 
-- Update :file:`data/version_number`
+- Create :file:`data/version_number`
+
+MESA release versions will have a human-readable version number
+instead of the auto-generated git commit id.  Immediately before
+release, this file should be created and commited.  Because this file
+is normally ignored (via ``.gitignore``), it must be explicitly added
+via ``git add -f``.
+
+- Update version number in :file:`docs/source/conf.py`
+
+The variables ``release`` and ``version`` in the ``Project
+information`` section should be set.
+
+- Remove files that shouldn't be shipped
+
+Any files that should not be part of the final release should be added to the .gitattributes file.
+This will prevent the file(s) or folders from appearing in the zip archive.
 
 
 Documentation
@@ -27,6 +43,8 @@ Documentation
     At a minimum this should mention options that are removed/replaced and how to convert from a previous version to the newest version.
 
 - A release notes document should be written
+
+- The release branch or tag should be added to the `list of active versions on ReadTheDocs <https://readthedocs.org/projects/mesa-doc/versions/>`__.
 
 
 Testing
@@ -60,14 +78,10 @@ Additional checks that are not essential but should be done if there is time.
 Release steps
 -------------
 
-- Run the release script inside ``$MESA_DIR``
-
-.. note::
-    This checks out a version of MESA, builds a zip file, and uploads it to SourceForge
-
 - Upload release to Zenodo
 - Send email to mesa-users
 
-
+Archiving
+---------
 
 

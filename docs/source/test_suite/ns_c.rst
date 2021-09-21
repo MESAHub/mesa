@@ -1,0 +1,1 @@
+../../../star/test_suite/ns_c/README.rst

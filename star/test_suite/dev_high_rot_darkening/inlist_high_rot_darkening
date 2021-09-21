@@ -8,7 +8,7 @@
     show_log_description_at_start = .false.
 
 !    load_saved_model = .true.
-!    saved_model_name = 'zams.mod'
+!    load_model_filename = 'zams.mod'
 
     save_model_when_terminate = .true.
     save_model_filename = 'final.mod'
@@ -77,7 +77,7 @@
     
     varcontrol_target = 1d-4
 
-    use_dedt_form_of_energy_eqn = .true.
+    energy_eqn_option = 'dedt'
      
     ! limit timestep based on E_err
     limit_for_rel_error_in_energy_conservation = 1d-5

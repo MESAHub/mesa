@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2018-2019  The MESA Team
 !
 !   This file is part of MESA.
 !
@@ -352,8 +352,8 @@
          real(dp) :: rho, logRho, dlnd_dV, egas_tol, logT, &
             logT_guess, logT_tol, new_erad, new_egas, OPV, OPT
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         real(dp) :: d_dxa(num_eos_d_dxa_results,s% species)
+            res, d_dlnd, d_dlnT
+         real(dp) :: d_dxa(num_eos_d_dxa_results, species)
          
          include 'formats'
          ierr = 0
@@ -382,9 +382,9 @@
             logT_guess = s% lnT(k)/ln10
             logT_tol = 1d-11
             call solve_eos_given_DEgas( &
-               s, k, Z, X, abar, zbar, xa, &
+               s, k, xa, &
                logRho, egas, logT_guess, logT_tol, egas_tol, &
-               logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+               logT, res, d_dlnd, d_dlnT, d_dxa, &
                ierr)
             if (ierr == 0) then
                call store_lnT_in_xh(s, k, logT*ln10)
@@ -491,7 +491,7 @@
             logT_guess, logT_tol, new_erad, new_egas, OPV, OPT
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
-         real(dp) :: d_dxa(num_eos_d_dxa_results,s% species)
+         real(dp) :: d_dxa(num_eos_d_dxa_results, species)
          
          include 'formats'
          ierr = 0
@@ -673,11 +673,13 @@
             stop 1
          end if
 
-         if (k > 0 .and. k <= s% nz) then
+         if (k > 0 .and. k <= s% nz .and. s% use_other_opacity_factor) then
             opacity_factor = s% extra_opacity_factor(k)
          else
             opacity_factor = s% opacity_factor
          end if
+
+
          if (opacity_factor /= 1d0) then
             if (s% min_logT_for_opacity_factor_off > 0) then
                if (logT >= s% max_logT_for_opacity_factor_off .or. &
@@ -715,7 +717,8 @@
          real(dp) :: rho, logRho, logP, logT_guess, &
             logT_tol, logP_tol, logT
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp) :: d_dxa(num_eos_d_dxa_results, species)
          include 'formats'
          ierr = 0
          rho = 1d0/Vol
@@ -725,9 +728,9 @@
          logT_tol = 1d-11
          logP_tol = 1d-11
          call solve_eos_given_DP( &
-            s, k, Z, X, abar, zbar, xa, &
+            s, k, xa, &
             logRho, logP, logT_guess, logT_tol, logP_tol, &
-            logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+            logT, res, d_dlnd, d_dlnT, d_dxa, &
             ierr)
          T = exp10(logT)
       end subroutine eval1_mesa_T_given_DP
@@ -744,7 +747,8 @@
          real(dp) :: logT, logP, logRho_guess, logRho, &
               logRho_tol, logP_tol
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp) :: d_dxa(num_eos_d_dxa_results, species)
          integer :: iter
             
          include 'formats'
@@ -762,9 +766,9 @@
          ! so be prepared to relax them.
          do iter = 1, 9
             call solve_eos_given_PT( &
-                 s, k, Z, X, abar, zbar, xa, &
+                 s, k, xa, &
                  logT, logP, logRho_guess, logRho_tol, logP_tol, &
-                 logRho, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+                 logRho, res, d_dlnd, d_dlnT, d_dxa, &
                  ierr)            
             if (ierr == 0) exit
             logRho_tol = logRho_tol*3d0
@@ -866,7 +870,7 @@
             logRho_bnd2, other_at_bnd2, logRho_guess, logRho_result, logRho_tol
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
-         real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
+         real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          integer :: max_iter, which_other, eos_calls, iter
             
          include 'formats'
@@ -911,7 +915,8 @@
             egas_tol, logT_bnd1, egas_at_bnd1, new_egas, egas_want, &
             logT_bnd2, egas_at_bnd2, logT_guess, logT_result, logT_tol
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp) :: d_dxa(num_eos_d_dxa_results, species)
          integer :: max_iter, which_other, eos_calls, iter
             
          include 'formats'
@@ -926,14 +931,14 @@
          egas_at_bnd2 = arg_not_provided
          logT_guess = log10(s% T(kk))
          
-         call eosDT_get_T_given_egas( &
-            eos_handle, Z, X, abar, zbar, &
+         call eosDT_get_T( &
+            eos_handle, &
             species, chem_id, net_iso, xa, &
-            s% lnd(kk)/ln10, egas_want, &
+            s% lnd(kk)/ln10, i_egas, egas_want, &
             logT_tol, egas_tol, max_iter, logT_guess, &
             logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
             logT_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
+            d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
                
          call store_lnT_in_xh(s, kk, logT_result*ln10)
@@ -983,7 +988,7 @@
             logT_bnd2, other_at_bnd2, logT_guess, logT_result, logT_tol
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
-         real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
+         real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          integer :: max_iter, which_other, eos_calls, iter
             
          include 'formats'
@@ -1026,7 +1031,7 @@
             logT_bnd2, other_at_bnd2, logT_guess, logT_result
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
-         real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
+         real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          integer :: max_iter, which_other, eos_calls, iter
          ierr = 0         
          max_iter = 100

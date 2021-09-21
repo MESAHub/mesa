@@ -7,7 +7,7 @@
       show_log_description_at_start = .false. 
 
       load_saved_model = .true.
-      saved_model_name = 'has_he_core.mod'
+      load_model_filename = 'has_he_core.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'bare_he_core.mod'
@@ -46,8 +46,8 @@
 &controls
       
       max_age = 1d8
-   
-      always_use_eps_grav_form_of_energy_eqn = .true.
+
+      energy_eqn_option = 'eps_grav'
 
       warn_when_large_rel_run_E_err = 1d99
       max_abs_rel_run_E_err = 1d99

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2012-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -40,14 +40,13 @@
       contains
 
 
-      subroutine do_net(s, nzlo, nzhi, reuse_given_rates, ierr)
+      subroutine do_net(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
          use net_lib, only: net_work_size
          use rates_def, only: rates_other_screening
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
-         logical, intent(in) :: reuse_given_rates
          integer, intent(out) :: ierr
 
          logical, parameter :: use_omp = .true.
@@ -94,7 +93,7 @@
          
          if (nzlo == nzhi) then
             call do1_net(s, nzlo, s% species, &
-               reuse_given_rates, s% num_reactions, &
+               s% num_reactions, &
                net_lwork, check_op_split_burn, ierr)
             return
          end if
@@ -107,7 +106,7 @@
                if (.not. okay) cycle
                op_err = 0
                call do1_net(s, k, s% species, &
-                  reuse_given_rates, s% num_reactions, &
+                  s% num_reactions, &
                   net_lwork, check_op_split_burn, op_err)
                if (op_err /= 0) okay = .false.
             end do
@@ -116,7 +115,7 @@
          else
             do k = nzlo, nzhi
                call do1_net(s, k, s% species, &
-                  reuse_given_rates, s% num_reactions, &
+                  s% num_reactions, &
                   net_lwork, check_op_split_burn, ierr)
                if (ierr /= 0) exit
             end do
@@ -127,7 +126,7 @@
 
 
       subroutine do1_net(s, k, species, &
-            reuse_given_rates, num_reactions, net_lwork, check_op_split_burn, ierr)
+            num_reactions, net_lwork, check_op_split_burn, ierr)
          use rates_def, only: std_reaction_Qs, std_reaction_neuQs, i_rate, &
             star_debugging_rates_flag, rates_test_partials_val, rates_test_partials_dval_dx
          use net_def, only: Net_Info, net_test_partials, &
@@ -141,7 +140,7 @@
          use utils_lib,only: realloc_double, realloc_double3
          type (star_info), pointer :: s
          integer, intent(in) :: k, species, num_reactions, net_lwork
-         logical, intent(in) :: reuse_given_rates, check_op_split_burn
+         logical, intent(in) :: check_op_split_burn
          integer, intent(out) :: ierr
 
          integer :: i, j, kk, screening_mode, sz, i_var, i_var_sink
@@ -240,7 +239,7 @@
                s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
                s% eta(k), s% d_eos_dlnT(i_eta,k), s% d_eos_dlnd(i_eta,k), &
                s% rate_factors, s% weak_rate_factor, &
-               std_reaction_Qs, reaction_neuQs, reuse_given_rates, .false., &
+               std_reaction_Qs, reaction_neuQs, &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
                screening_mode, s% eps_nuc_categories(:,k), &
@@ -252,7 +251,7 @@
                s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
                s% eta(k), s% d_eos_dlnT(i_eta,k), s% d_eos_dlnd(i_eta,k), &
                s% rate_factors, s% weak_rate_factor, &
-               std_reaction_Qs, reaction_neuQs, reuse_given_rates, .false., &
+               std_reaction_Qs, reaction_neuQs, &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
                screening_mode, s% eps_nuc_categories(:,k), &

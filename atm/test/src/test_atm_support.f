@@ -104,6 +104,7 @@ contains
        M = Msun
        R = Rsun
        L = Lsun
+       Teff = atm_Teff(L, R)
     end if
 
     Z = 0.02d0
@@ -243,6 +244,7 @@ contains
        M = 1.9892000000000002D+32
        R = 6.3556231577545586D+10
        L = 2.4015399190199118D+32
+       Teff = atm_Teff(L, R)
 
        kap_guess = 5.8850802481174469D-02
 
@@ -306,6 +308,7 @@ contains
   subroutine test_irradiated()
 
     real(dp) :: errtol
+    type (Kap_General_Info), pointer :: rq
 
     include 'formats'
 
@@ -323,6 +326,15 @@ contains
     XO = 8.8218000000000601d-03
 
     call set_composition()
+
+    ! at these conditions, the appropriate lowT opacity table is Freedman11
+    ! this is around logR = 3.5, way off the default tables (max logR = 1)
+    call kap_ptr(kap_handle,rq,ierr)
+    if (ierr /= 0) return
+    rq% kap_lowT_option = kap_lowT_Freedman11
+
+    ! must set up tables again after changing options
+    call kap_setup_tables(kap_handle, ierr)
 
     errtol = 1.E-6_dp
     max_iters = 30
@@ -415,8 +427,7 @@ contains
 
     real(dp) :: T, P, Prad, Pgas, logPgas, rho
     real(dp) :: logRho, dlnRho_dlnPgas, dlnRho_dlnT
-    real(dp), dimension(num_eos_basic_results) :: &
-         dres_dabar, dres_dzbar
+    real(dp), dimension(num_eos_d_dxa_results, species) :: dres_dxa
 
     T = exp(lnT)
     P = exp(lnP)
@@ -426,11 +437,11 @@ contains
     logPgas = log10(Pgas)
 
     call eosPT_get( &
-         eos_handle, Z, X, abar, zbar, &
+         eos_handle, &
          species, chem_id, net_iso, xa, &
          Pgas, logPgas, T, lnT/ln10, &
          Rho, logRho, dlnRho_dlnPgas, dlnRho_dlnT, &
-         res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, ierr)
+         res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
 
     lnRho = logRho*ln10
 

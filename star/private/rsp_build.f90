@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2018-2019  Bill Paxton, Radek Smolec & The MESA Team
+!   Copyright (C) 2018-2019  Radek Smolec & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -251,6 +251,7 @@
          end if
          FILENAME=trim(s% log_directory) // '/' // 'LINA_period_growth.data'
          open(15,file=trim(FILENAME),status='unknown')
+         write(*,'(a)') '            P(days)         growth'
          do I=1,NMODES
             s% rsp_LINA_periods(i) = PERS(I)
             s% rsp_LINA_growth_rates(i) = ETO(I)

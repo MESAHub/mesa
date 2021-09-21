@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -63,7 +63,7 @@
             r, m, L, j_rot, gradT, grada, grav, visc, Ri
          real(dp), dimension(:), allocatable :: & ! allocated temporary storage
             csound, rho, T, P, cp, cv, chiRho, abar, zbar, gradT_sub_grada, &
-            opacity, gamma1, mu_alt, eps_nuc, enu, L_neu, delta, &
+            opacity, kap_cond, gamma1, mu_alt, eps_nuc, enu, L_neu, delta, &
             scale_height, omega, cell_dr, &
             dRho, dr, dPressure, domega, d_mu, d_j_rot, &
             dRho_dr, dRho_dr_ad, dr2omega, H_T, &
@@ -187,7 +187,7 @@
 
                      call set_ST(s, &
                         rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
-                        N2, N2_mu, opacity, scale_height, op_err)
+                        N2, N2_mu, opacity, kap_cond, scale_height, op_err)
                      if (failed('set_ST', op_err)) then
                         ierr = -1; cycle
                      end if
@@ -403,12 +403,15 @@
 
 
          subroutine setup(ierr)
+            use kap_lib, only: kap_get_elect_cond_opacity
             integer, intent(out) :: ierr
 
             real(dp) :: &
                bracket_term, ri0, alfa, beta, enum1, enu00, &
                rho6, gamma, mu_e, rm23, ctmp, xi2, dynvisc, denom, &
-               eps_nucm1, eps_nuc00, scale_height2, dlnRho_dlnP, dlnT_dlnP
+               eps_nucm1, eps_nuc00, scale_height2, dlnRho_dlnP, dlnT_dlnP, &
+               kap, dlnkap_dlnRho, dlnkap_dlnT
+
             integer :: i, k, j
 
             include 'formats'
@@ -431,7 +434,7 @@
             
             allocate( &
                csound(nz), rho(nz), T(nz), P(nz), cp(nz), cv(nz), chiRho(nz), abar(nz), zbar(nz), &
-               opacity(nz), gamma1(nz), mu_alt(nz), omega(nz), cell_dr(nz), eps_nuc(nz), enu(nz), L_neu(nz), &
+               opacity(nz), kap_cond(nz), gamma1(nz), mu_alt(nz), omega(nz), cell_dr(nz), eps_nuc(nz), enu(nz), L_neu(nz), &
                gradT_sub_grada(nz), delta(nz), scale_height(nz), &
                dRho(nz), dr(nz), dPressure(nz), domega(nz), d_mu(nz), d_j_rot(nz), &
                dRho_dr(nz), dRho_dr_ad(nz), dr2omega(nz), H_T(nz), &
@@ -678,6 +681,17 @@
                   end if
 
                end do
+
+               ! conductive opacities for ST
+               if (s% D_ST_factor > 0) then
+                  do i = 1, nz
+                     call kap_get_elect_cond_opacity( &
+                        s% kap_handle, zbar(i), log10(rho(i)), log10(T(i)),  &
+                        kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+                     if (ierr /= 0) return
+                     kap_cond(i) = kap
+                  end do
+               end if
 
             end if
 
@@ -1096,13 +1110,13 @@
 
       subroutine set_ST(s, &
             rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
-            N2, N2_mu, opacity, scale_height, &
+            N2, N2_mu, opacity, kap_cond, scale_height, &
             ierr)
          ! with modifications by S.-C. Yoon, July 2003
          type (star_info), pointer :: s
          real(dp), dimension(:) :: & ! allocated temporary storage
             rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
-            N2, N2_mu, opacity, scale_height
+            N2, N2_mu, opacity, kap_cond, scale_height
          integer, intent(out) :: ierr
 
          integer :: nz, k, j, kk
@@ -1147,17 +1161,17 @@
                xxx = (xlg + 0.75d0)*4d0/3d0
                ffff = 0.25d0*(2d0-3d0*xxx + xxx*xxx*xxx)
                xsig1 = sige1(zbar(k),T(k),xgamma)
-               xsig2 = sige2(T(k),rho(k),zbar(k),ierr)
+               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
                if (ierr /= 0) return
                xsig = (1d0-ffff)*xsig2 + ffff*xsig1
             else if (xlg > 0d0 .and. xlg < 0.5d0) then
-               xsig2 = sige2(T(k),rho(k),zbar(k),ierr)
+               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
                if (ierr /= 0) return
                xsig = xsig2
             else if (xlg >= 0.5d0 .and. xlg < 1d0) then
                xxx = (xlg-0.75d0)*4d0
                ffff = 0.25d0*(2d0-3d0*xxx + xxx*xxx*xxx)
-               xsig2 = sige2(T(k),rho(k),zbar(k),ierr)
+               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
                if (ierr /= 0) return
                xsig3 = sige3(zbar(k),T(k),xgamma)
                xsig = (1d0-ffff)*xsig3 + ffff*xsig2
@@ -1372,18 +1386,13 @@
       end function sige1
 
 
-      real(dp) function sige2(T,rho,zbar,ierr)
+      real(dp) function sige2(T,rho,kap_cond,ierr)
          ! writen by S.-C. YOON Oct. 10, 2003
          ! electrical conductivity using conductive opacity
          ! see Wendell et al. 1987 ApJ 313:284
-         use kap_lib, only: kap_get_elect_cond_opacity
-         real(dp), intent(in) :: t,rho,zbar
+         real(dp), intent(in) :: t,rho,kap_cond
          integer, intent(out) :: ierr
-         real(dp) :: kap, dlnkap_dlnRho, dlnkap_dlnT
-         call kap_get_elect_cond_opacity( &
-            zbar, log10(rho), log10(T),  &
-            kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-         sige2 = 1.11d9*T*T/(rho*kap)
+         sige2 = 1.11d9*T*T/(rho*kap_cond)
       end function sige2
 
 

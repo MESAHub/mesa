@@ -78,22 +78,17 @@
    log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
    rho
    gamma1
-   !conv_mixing_type ! mixing types are defined in mesa/const
+   !mix_type ! mixing types are defined in mesa/const
    csound ! sound speed
    !log_csound
    !acoustic_depth
    !dr_div_cs
    log_dr_div_cs
    !log_cell_collapse_time
-   !total_energy
-   !total_energy_integral ! total from surface inward. negative if bound. (ergs)
    
    !velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s
    
-   !dr_dt ! time derivative of radius at fixed mass coordinate (Langranian)
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Langranian)
-   !dlnR_dt ! time derivative of log(radius) at fixed mass coordinate (Langranian)
    !log_sig_RTI
 
    v_div_csound ! velocity divided by sound speed
@@ -119,9 +114,6 @@
    !pgas ! gas pressure at center of zone (electrons and ions)
    pgas_div_ptotal ! pgas/pressure
    logPgas ! log10(pgas)
-   !logPrad
-   !log_erad
-   !log_egas
    energy ! internal energy (ergs/g)
    grada ! dlnT_dlnP at constant S
    !dE_dRho ! at constant T
@@ -151,19 +143,14 @@
    !log_conv_vel ! log10 convection velocity (cm/sec)
    !conv_vel_div_csound ! convection velocity divided by sound speed
    !log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
-   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
    !pressure_scale_height ! in Rsun units
    !gradT ! mlt value for required temperature gradient dlnT/dlnP
    !gradr ! dlnT/dlnP required for purely radiative transport
    
-   !grad_superad
-   !grad_superad_actual
    !gradT_sub_grada ! gradT-grada at cell boundary 
    !gradT_rel_err
    !gradT_sub_gradr
    
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Langranian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    log_mass
    !mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
@@ -210,7 +197,6 @@
 
    ! ergs/g/sec for specific reactions (names from rates_def)
       
-      !rpp
 
    
    pressure

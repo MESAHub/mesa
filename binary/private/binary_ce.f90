@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton, Pablo Marchant & The MESA Team
+!   Copyright (C) 2010-2019  Pablo Marchant & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -42,7 +42,6 @@
          use chem_def, only: chem_isos
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interp_pm
-         use ionization_def
          type (binary_info), pointer :: b
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
@@ -111,13 +110,13 @@
                ! the following lines compute the fractions of HI, HII, HeI, HeII and HeIII
                ! things like ion_ifneut_H are defined in $MESA_DIR/ionization/public/ionization.def
                ! this file can be checked for additional ionization output available
-               frac_HI = get_ion_info(s,ion_ifneut_H,k)
+               frac_HI = 0d0!get_ion_info(s,ion_ifneut_H,k)
                frac_HII = 1 - frac_HI
 
                ! ionization module provides neutral fraction and average charge of He.
                ! use these two to compute the mass fractions of HeI and HeII
-               frac_HeI = get_ion_info(s,ion_ifneut_He,k)
-               avg_charge_He = get_ion_info(s,ion_iZ_He,k)
+               frac_HeI = 0d0!get_ion_info(s,ion_ifneut_He,k)
+               avg_charge_He = 2d0!get_ion_info(s,ion_iZ_He,k)
                ! the following is the solution to the equations
                !   avg_charge_He = 2*fracHeIII + 1*fracHeII
                !               1 = fracHeI + fracHeII + fracHeIII
@@ -204,21 +203,6 @@
          end if
           
       end subroutine
-
-      real(dp) function get_ion_info(s,id,k)
-        use ionization_def, only: num_ion_vals
-        use ionization_lib, only: eval_ionization
-        integer, intent(in) :: id, k
-        integer :: ierr
-        real(dp) :: ionization_res(num_ion_vals)
-        type (star_info), pointer :: s
-        ierr = 0
-        call eval_ionization( &
-             1d0 - (s% X(k) + s% Y(k)), s% X(k), s% Rho(k), s% lnd(k)/ln10, &
-             s% T(k), s% lnT(k)/ln10, ionization_res, ierr)
-        if (ierr /= 0) ionization_res = 0
-        get_ion_info = ionization_res(id)
-      end function get_ion_info
 
       subroutine CE_rlo_mdot(binary_id, rlo_mdot, ierr)
          use const_def, only: dp

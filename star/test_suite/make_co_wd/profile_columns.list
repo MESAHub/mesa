@@ -46,7 +46,6 @@
    v_div_vesc
    vel_km_per_s
    total_energy ! v^2/2 - G m / r + E (ergs/g).  negative if bound
-   total_energy_integral ! sum from surface inwards of dm*(v^2/2 - G m / r + E) (ergs)
    v_div_r ! velocity divided by radius
    scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
    eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
@@ -99,7 +98,6 @@
    !nonnucneu_phot ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
    !nonnucneu_pair ! pair production (for reactions like e+ + e- => nu_e + nubar_e)
    eps_grav ! heat from gravitational contraction (negative for expansion)
-   log_tau_conv_yrs ! timescale for change of conv velocity
    mlt_mixing_length ! mixing length for mlt (cm)
    mlt_mixing_type ! value returned by mlt
    
@@ -118,7 +116,6 @@
    log_conv_vel ! log10 convection velocity (cm/sec)
    conv_vel_div_csound ! convection velocity divided by sound speed
    log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
-   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
    pressure_scale_height ! in Rsun units
    gradT ! mlt value for requared temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP requared for purely radiative transport
@@ -128,8 +125,6 @@
    sch_stable ! 1 if grada > gradr, 0 otherwise
    ledoux_stable ! 1 if gradL > gradr, 0 otherwise
    
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
-   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
    !logM ! log10(m/Msun)
@@ -165,23 +160,16 @@
 
    ! ergs/g/sec for specific reactions (names from rates_def)
       
-      !rpp
 
       
    ! equation residuals
       
-      !equP ! momentum conservation
-      !equT ! energy transport
-      !equR ! mass-volume-density relation
-      !equL ! energy conservation
-      !equv ! velocity definition
       !equ_chem h1
       !equ_chem he4
       ! any other isotopes you want
       
       
       
-   ! rotation
       omega ! angular velocity = j_rot/i_rot
       log_omega
       log_j_rot
@@ -189,7 +177,6 @@
       log_J_inside ! J_inside is j_rot integrated from center
       !shear ! abs(dlnomega/dlnR)
       log_abs_shear ! log10(abs(dlnomega/dlnR))
-      !delta_omega ! omega minus omega_pre_hydro
       v_rot ! rotation velocity at cell boundary (km/sec)
       i_rot ! specific moment of interia at cell boundary
       j_rot ! specific angular momentum at cell boundary
@@ -221,17 +208,11 @@
       dynamo_log_B_phi ! (Gauss)
 
       
-   ! misc
 
       gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
-      !dlnR_dm ! for structure equation
-      !dlnP_dm ! for structure equation
-      !dlnT_dm ! for structure equation
-      !dL_dm ! for structure equation
       
       
       !delta_r ! r(outer edge) - r(inner edge); radial extent of cell in cm.
-      !delta_v ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
       !dt_dv_div_dr ! dt*delta_v/delta_r; need to have this << 1 for every cell
          
          
@@ -269,7 +250,6 @@
       !dlog_burn_ar_dlogP
       !dlog_burn_ca_dlogP
       !dlog_burn_ti_dlogP
-      !dlog_burn_cr_dlogP
       !dlog_burn_fe_dlogP
       
       !dlog_pnhe4_dlogP
@@ -290,7 +270,6 @@
       !log_brunt_N2 ! log10(brunt_N2)
       !sign_brunt_N2 ! sign of brunt_N2 (+1 for Ledoux stable; -1 for Ledoux unstable)
       !lamb_S ! for l=1: S = sqrt(2)*csound/r
-      !brunt_dlnRho_dlnR ! smoothed numerical difference for use with brunt
       brunt_B ! smoothed numerical difference
       
 
@@ -337,9 +316,6 @@
       ! star_mass_o16
       ! star_mass_ne20
    ! locations of abundance transitions
-      ! h1_boundary_mass
-      ! he4_boundary_mass
-      ! c12_boundary_mass
    ! location of optical depths 10 and 100
       ! tau10_mass
       ! tau10_radius

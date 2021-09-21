@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Bill Paxton
+!   Copyright (C) 2013  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -650,12 +650,12 @@
          real :: xmin, xmax, ymin, ymax, xleft, xright, ybot, ytop
          integer :: i, j, j_min, j_max, step_min, step_max
          real :: dx, dy, xplus, xminus, yplus, yminus
-         real, dimension(:), pointer :: xvec, yvec
+         real, dimension(:), allocatable :: xvec, yvec
          character (len=strlen) :: str
          integer :: k, n
          integer :: ix, iy
          integer :: file_data_len
-         real, pointer, dimension(:) :: file_data_xvec, file_data_yvec
+         real, allocatable, dimension(:) :: file_data_xvec, file_data_yvec
 
          logical, parameter :: dbg = .false.
 

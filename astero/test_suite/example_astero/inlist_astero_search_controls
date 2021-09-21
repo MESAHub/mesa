@@ -486,10 +486,11 @@
       ! use the following as the first values in searches
 
          ! version 15054
-         first_FeH = 0.0857981988d0
-         first_Y = 0.2719307736d0
-         first_mass = 1.2826638840d0
-         first_alpha = 1.7064587501
+         first_FeH = 0.0854769266d0
+         first_Y = 0.2726812580d0
+         first_mass = 1.2824010961d0
+         ! first_alpha = 1.7050575946d0 ! Cox
+         first_alpha = 1.6248254d0 ! TDC
          first_f_ov = 0.015d0
 
          first_my_param1 = 0

@@ -28,7 +28,7 @@
    ! ~~~~~~~~~~~~~~~
    ! Select the set of opacity tables for higher temperature, hydrogen-rich conditions.
    ! Also referred to as Type1 tables.
-   ! See :ref:`blend controls` to understand precisely when these tables are used.
+   ! See :ref:`kap/defaults:blend controls` to understand precisely when these tables are used.
 
    ! These tables use the value of ``Zbase`` for Z, unless ``use_Zbase_for_Type1 = .false.``.
 
@@ -57,7 +57,7 @@
    ! Select the set of opacity tables for higher temperature, hydrogen-poor/metal-rich conditions.
    ! Also referred to as Type2 tables.
    ! Critically, Type2 tables account for C and O enhancement during and after He burning.
-   ! See :ref:`blend controls` to understand precisely when these tables are used.
+   ! See :ref:`kap/defaults:blend controls` to understand precisely when these tables are used.
    ! abundances previous to any CO enhancement.
    ! Ignored if ``use_Type2_opacities = .false.``.
 
@@ -142,7 +142,7 @@
    ! use_Type2_opacities
    ! ~~~~~~~~~~~~~~~~~~~
 
-   ! Select whether to use Type2 opacity tables (see :ref:`kap_CO_prefix`).
+   ! Select whether to use Type2 opacity tables (see :ref:`kap/defaults:kap_CO_prefix`).
    ! Even when true, in regions where hydrogen is
    ! above a given threshold, or the metallicity is not significantly higher than
    ! ``Zbase``, Type1 tables are used instead, with blending regions to smoothly
@@ -196,8 +196,8 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! Region to blend between higher temperature tables
-   ! (see :ref:`kap_file_prefix` and :ref:`kap_CO_prefix`) and lower
-   ! temperature tables (see :ref:`kap_lowT_prefix`).
+   ! (see :ref:`kap/defaults:kap_file_prefix` and :ref:`kap/defaults:kap_CO_prefix`) and lower
+   ! temperature tables (see :ref:`kap/defaults:kap_lowT_prefix`).
 
    ! The upper/lower blend boundary will be clipped to the true extent
    ! of the opacity tables.  The upper boundary will be min of
@@ -243,7 +243,7 @@
 ! Custom tables
 ! -------------
 
-   ! If the prefix options in :ref:`Table selection` above do not match one of the available options,
+   ! If the prefix options in :ref:`kap/defaults:Table selection` above do not match one of the available options,
    ! MESA still searches for files in ``data/kap_data`` with the given prefix.
    ! This allows for custom tables.  However, the user must also indicate
    ! the X and Z values for which the tables are provided.
@@ -380,8 +380,8 @@
       !! user_num_kap_lowT_Xs_for_this_Z = 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 8
 
 
-! Miscellaneous controls
-! ----------------------
+! Conductive opacity options
+! --------------------------
 
    ! include_electron_conduction
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -390,6 +390,20 @@
    ! ::
 
       include_electron_conduction = .true.
+
+
+   ! use_blouin_conductive_opacities
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! Use fits from Blouin et al. (2020) for H and He in the regime of
+   ! moderate coupling and moderate degeneracy.
+   ! ::
+
+      use_blouin_conductive_opacities = .true.
+
+
+! Miscellaneous controls
+! ----------------------
 
    ! show_info
    ! ~~~~~~~~~
@@ -421,6 +435,16 @@
    ! ::
 
       use_other_compton_opacity = .false.
+
+
+   ! use_other_radiative_opacity
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! Replace radiative opacity routine.
+   ! The standard routine evaluates the opacity using the low-T and high-T tables.
+   ! ::
+
+      use_other_radiative_opacity = .false.
 
 
 ! Debugging controls
