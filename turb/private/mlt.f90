@@ -26,10 +26,6 @@
 
 module MLT
 
-use const_def
-use num_lib
-use utils_lib
-use auto_diff
 
 implicit none
 
@@ -40,12 +36,15 @@ contains
 
    subroutine set_MLT(MLT_option, mixing_length_alpha, report, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, k, &
+                     gradr, grada, gradL, &
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+      use const_def
+      use num_lib
+      use utils_lib
+      use auto_diff
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
       real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
-      integer, intent(in) :: k
       logical, intent(in) :: report
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
