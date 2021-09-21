@@ -2264,6 +2264,17 @@
             ierr)
        end subroutine star_get_surf_PT       
       
+      integer function get_result_reason(id, ierr)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            get_result_reason = -1
+            return
+         end if
+         get_result_reason = s% result_reason
+      end function get_result_reason
       
       real(dp) function eval_tau_at_r(id, r, ierr)
          ! optical depth tau at radius r (cm)
