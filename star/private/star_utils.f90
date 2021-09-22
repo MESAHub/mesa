@@ -399,21 +399,6 @@
       end function get_lnT_from_xh
       
       
-      subroutine store_T_or_lnT_in_xh(s, k, T, lnT, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: T, lnT
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnT,k) = lnT
-      end subroutine store_T_or_lnT_in_xh
-      
-      
       subroutine store_T_in_xh(s, k, T, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -486,21 +471,7 @@
          end if
          lnd = xh(s% i_lnd,k)
       end function get_lnd_from_xh
-      
-      
-      subroutine store_rho_or_lnd_in_xh(s, k, rho, lnd, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: rho, lnd
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnd,k) = lnd
-      end subroutine store_rho_or_lnd_in_xh
+
       
       
       subroutine store_rho_in_xh(s, k, rho, xh_in)
