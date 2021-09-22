@@ -33,7 +33,31 @@ public :: calc_MLT
 
 contains
 
-   subroutine calc_MLT(MLT_option, mixing_length_alpha, report, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
+   !> Calculates the outputs of convective mixing length theory.
+   !!
+   !! @param MLT_option A string specifying which MLT option to use. Currently supported are Cox, Henyey, ML1, ML2, Mihalas. Note that 'TDC' is also a valid input and will return the Cox result. This is for use when falling back from TDC -> MLT, as Cox is the most-similar prescription to TDC.
+   !! @param mixing_length_alpha The mixing length parameter.
+   !! @param Henyey_MLT_nu_param The nu parameter in Henyey's MLT prescription.
+   !! @param Henyey_MLT_y_param The y parameter in Henyey's MLT prescription.
+   !! @param chiT dlnP/dlnT|rho
+   !! @param chiRho dlnP/dlnRho|T
+   !! @param Cp Specific heat at constant pressure (erg/g/K).
+   !! @param grav The acceleration due to gravity (cm/s^2).
+   !! @param Lambda The mixing length (cm).
+   !! @param rho density (g/cm^3).
+   !! @param T temperature (K).
+   !! @param opacity opacity (cm^2/g)
+   !! @param gradr The radiative temperature gradient dlnT/dlnP_{rad}
+   !! @param grada The adiabatic temperature gradient dlnT/dlnP|s
+   !! @param gradL The Ledoux temperature gradient dlnT/dlnP
+   !! @param Gamma The convective efficiency parameter (output).
+   !! @param gradT The temperature gradient dlnT/dlnP (output).
+   !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
+   !! @param conv_vel The convection speed (cm/s).
+   !! @param D The chemical diffusion coefficient (cm^2/s).
+   !! @param mixing_type Set to convective if convection operates (output).
+   !! @param ierr Tracks errors (output).
+   subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
@@ -44,7 +68,6 @@ contains
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
       real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
-      logical, intent(in) :: report
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
