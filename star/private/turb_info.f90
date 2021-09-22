@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 
-      module mlt_info
+      module turb_info
 
       use star_private_def
       use const_def
@@ -80,7 +80,7 @@
             mixing_length_alpha_in, gradL_composition_term_in)
          ! get convection info for point k
          use star_utils
-         use mlt_get_results, only: do1_mlt_eval
+         use turb_support, only: do1_mlt_eval
          use eos_def
          use chem_def, only: ih1
          use auto_diff_support
@@ -600,4 +600,4 @@
       end subroutine check_for_redo_MLT
 
 
-      end module mlt_info
+      end module turb_info
