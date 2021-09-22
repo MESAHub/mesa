@@ -33,6 +33,31 @@ public :: calc_semiconvection
 
 contains
 
+   !> Calculates the outputs of semiconvective mixing theory.
+   !!
+   !! @param L Luminosity across a face (erg/s).
+   !! @param Lambda The mixing length (cm).
+   !! @param m Mass inside the face (g).
+   !! @param T temperature (K).
+   !! @param P pressure (erg/cm^3).
+   !! @param Pr radiation pressure (erg/cm^3).
+   !! @param beta ratio of gas pressure to radiation pressure.
+   !! @param opacity opacity (cm^2/g).
+   !! @param rho density (g/cm^3).
+   !! @param alpha_semiconvection The semiconvective alpha parameter.
+   !! @param semiconvection_option A string specifying which semiconvection theory to use. Currently supported are 'Langer_85 mixing; gradT = gradr' and 'Langer_85'.
+   !! @param cgrav gravitational constant (erg*cm/g^2).
+   !! @param Cp Specific heat at constant pressure (erg/g/K).
+   !! @param gradr The radiative temperature gradient dlnT/dlnP_{rad}
+   !! @param grada The adiabatic temperature gradient dlnT/dlnP|s
+   !! @param gradL The Ledoux temperature gradient dlnT/dlnP
+   !! @param gradL_composition_term The contribution of composition gradients to the Ledoux temperature gradient.
+   !! @param gradT The temperature gradient dlnT/dlnP (output).
+   !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
+   !! @param conv_vel The convection speed (cm/s).
+   !! @param D The chemical diffusion coefficient (cm^2/s).
+   !! @param mixing_type Set to semiconvective if convection operates (output).
+   !! @param ierr Tracks errors (output).
    subroutine calc_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
                                  semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                  gradL_composition_term, &
