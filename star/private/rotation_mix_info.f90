@@ -52,7 +52,7 @@
 
 
       subroutine set_rotation_mixing_info(s, ierr)
-         use star_utils, only: weighed_smoothing, median_smoothing
+         use star_utils, only: weighed_smoothing
 
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
