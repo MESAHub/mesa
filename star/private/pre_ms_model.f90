@@ -702,7 +702,6 @@
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
          real(dp) :: Y_face, conv_vel, D, Gamma ! Not used
          integer :: mixing_type
-         logical :: make_gradr_sticky_in_solver_iters
          
          ierr = 0
 
