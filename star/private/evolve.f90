@@ -1731,7 +1731,7 @@
       subroutine set_start_of_step_info(s, str, ierr)
          use report, only: do_report
          use hydro_vars, only: set_vars_if_needed
-         use mlt_info, only: set_gradT_excess_alpha
+         use turb_info, only: set_gradT_excess_alpha
          use star_utils, only: min_dr_div_cs, get_remnant_mass, &
             total_angular_momentum, eval_Ledd, set_luminosity_by_category
 

@@ -20,6 +20,7 @@ interp_1d/ @rhdtownsend @adamjermyn
 interp_2d/ @rhdtownsend @adamjermyn
 kap/ @fxt @aarondotter @jschwab
 linters/ @rjfarmer @jschwab
+turb/ @adamjermyn
 math/ @rhdtownsend
 mtx/ @adamjermyn @rjfarmer @mjoyceGR
 net/ @rjfarmer @fxt
@@ -36,8 +37,6 @@ utils/ @rhdtownsend @warrickball @rjfarmer
 star/private/auto_diff_support.f90 @adamjermyn
 star/private/pgstar_*.f90 @rjfarmer
 star/private/rsp_*.f90 @rsmolec
-star/private/mlt_info.f90 @adamjermyn
-star/private/mlt_get_results.f90 @adamjermyn
 
 ### Test suite cases ###
 

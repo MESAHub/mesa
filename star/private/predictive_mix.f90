@@ -690,7 +690,7 @@ contains
 
     use eos_def
     use micro
-    use mlt_info, only: do1_mlt_2
+    use turb_info, only: do1_mlt_2
 
     type(star_info), pointer :: s
     integer, intent(in)      :: k_bot_mz

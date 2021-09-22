@@ -350,6 +350,7 @@ do_one_parallel neu
 do_one_parallel net
 
 do_one star_data
+do_one turb
 
 if [ ! -r data/atm_data ]
 then

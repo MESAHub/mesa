@@ -1,0 +1,99 @@
+# This is the makefile for the mesa const package
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = support_functions.f90 diff_operators_base.f90 $(wildcard ../private/*.f90) auto_diff.f90
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = 
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR_SUPPORT)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libauto_diff.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS)
+else	   
+	$(LIB_TOOL) $(LIB) $(OBJS)
+endif
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) auto_diff.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
+
+COMPILE_CMD = $(COMPILE)
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f90 $(SRC_PATH)
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif
