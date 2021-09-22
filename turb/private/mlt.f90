@@ -26,15 +26,14 @@
 
 module MLT
 
-
 implicit none
 
 private
-public :: set_MLT
+public :: calc_MLT
 
 contains
 
-   subroutine set_MLT(MLT_option, mixing_length_alpha, report, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
+   subroutine calc_MLT(MLT_option, mixing_length_alpha, report, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
@@ -158,6 +157,6 @@ contains
          mixing_type = convective_mixing
       end if
 
-   end subroutine set_MLT   
+   end subroutine calc_MLT   
 
 end module MLT

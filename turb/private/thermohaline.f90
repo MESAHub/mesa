@@ -34,34 +34,9 @@ use auto_diff
 implicit none
 
 private
-public :: set_thermohaline
+public :: get_D_thermohaline
 
 contains
-
-   subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
-                              iso, XH1, thermohaline_coeff, &
-                              D, gradT, Y_face, conv_vel, mixing_type, ierr)
-      character(len=*), intent(in) :: thermohaline_option
-      type(auto_diff_real_star_order1), intent(in) :: Lambda, grada, gradr, T, opacity, rho, Cp
-      real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff
-      integer, intent(in) :: iso
-
-      type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D
-      integer, intent(out) :: mixing_type, ierr
-
-      real(dp) :: D_thrm
-
-      call get_D_thermohaline(&
-         thermohaline_option, grada%val, gradr%val, T%val, opacity%val, rho%val, &
-         Cp%val, gradL_composition_term, &
-         iso, XH1, thermohaline_coeff, D_thrm, ierr)
-
-      D = D_thrm
-      gradT = gradr
-      Y_face = gradT - grada
-      conv_vel = 3d0*D/Lambda
-      mixing_type = thermohaline_mixing 
-   end subroutine set_thermohaline
 
    !> Computes the diffusivity of thermohaline mixing when the
    !! thermal gradient is stable and the composition gradient is unstable.
