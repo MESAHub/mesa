@@ -53,6 +53,40 @@ module turb
       mixing_type = thermohaline_mixing 
    end subroutine set_thermohaline
 
+   !> Computes the outputs of time-dependent convection theory following the model specified in
+   !! Radek Smolec's thesis [https://users.camk.edu.pl/smolec/phd_smolec.pdf], which in turn
+   !! follows the model of Kuhfuss 1986.
+   !!
+   !! Internally this solves the equation L = L_conv + L_rad.
+   !!
+   !! @param conv_vel_start The convection speed at the start of the step.
+   !! @param mixing_length_alpha The mixing length parameter.
+   !! @param alpha_TDC_DAMP TDC turbulent damping parameter
+   !! @param alpha_TDC_DAMPR TDC radiative damping parameter
+   !! @param alpha_TDC_PtdVdt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
+   !! @param The time-step (s).
+   !! @param cgrav gravitational constant (erg*cm/g^2).
+   !! @param m Mass inside the face (g).
+   !! @param report Write debug output if true, not if false.
+   !! @param mixing_type Set to semiconvective if convection operates (output).
+   !! @param scale The scale for computing residuals to the luminosity equation (erg/s).
+   !! @param L Luminosity across a face (erg/s).
+   !! @param r radial coordinate of the face (cm).
+   !! @param P pressure (erg/cm^3).
+   !! @param T temperature (K).
+   !! @param rho density (g/cm^3).
+   !! @param dV The change in specific volume of the face (cm^3/g) since the start of the step.
+   !! @param Cp Specific heat at constant pressure (erg/g/K).
+   !! @param opacity opacity (cm^2/g).
+   !! @param scale_height The pressure scale-height (cm).
+   !! @param gradL The Ledoux temperature gradient dlnT/dlnP
+   !! @param grada The adiabatic temperature gradient dlnT/dlnP|s
+   !! @param conv_vel The convection speed (cm/s).
+   !! @param D The chemical diffusion coefficient (cm^2/s).
+   !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
+   !! @param gradT The temperature gradient dlnT/dlnP (output).
+   !! @param tdc_num_iters Number of iterations taken in the TDC solver.
+   !! @param ierr Tracks errors (output).
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
