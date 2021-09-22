@@ -22,9 +22,9 @@ LIBS_LOCAL = turb
 DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
 LOAD_LOCAL = -L$(LOCAL_LIB_DIR) -lturb
 
-LIBS_OTHER = $(LIBS_MESA_NUMERICS)
+LIBS_OTHER = $(LIBS_MESA_NUMERICS) $(LIBS_MESA_MICRO)
 DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_NUMERICS)
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_NUMERICS) $(LOAD_MESA_MICRO)
 
 #################################################################
 #

@@ -35,38 +35,10 @@ use star_data_def
 implicit none
 
 private
-public :: set_TDC
+public :: get_TDC_solution
 
 contains
 
-   subroutine set_TDC( &
-            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
-      type(auto_diff_real_star_order1), intent(in) :: &
-         L, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
-      logical, intent(in) :: report
-      type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
-      integer, intent(out) :: tdc_num_iters, mixing_type, ierr
-      include 'formats'
-      call get_TDC_solution( &
-         conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-         mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, Y_face, tdc_num_iters, ierr)
-      if (ierr /= 0) then
-         write(*,*) 'get_TDC_solution failed in set_TDC'
-         write(*,*) 'Repeating call with reporting on.'
-         call get_TDC_solution( &
-            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .true., &
-            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, Y_face, tdc_num_iters, ierr)
-      end if
-
-      gradT = Y_face + gradL
-      D = conv_vel*scale_height*mixing_length_alpha/3d0     ! diffusion coefficient [cm^2/sec]
-
-   end subroutine set_TDC
 
    type(auto_diff_real_tdc) function set_Y(Y_is_positive, Z) result(Y)
       logical, intent(in) :: Y_is_positive
