@@ -26,16 +26,14 @@
 
 module semiconvection
 
-
-
 implicit none
 
 private
-public :: set_semiconvection
+public :: calc_semiconvection
 
 contains
 
-   subroutine set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
+   subroutine calc_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
                                  semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                  gradL_composition_term, &
                                  gradT, Y_face, conv_vel, D, mixing_type, ierr) ! Langer 1983 & 1985
@@ -103,12 +101,12 @@ contains
          conv_vel = 3d0*D/Lambda             
          mixing_type = semiconvective_mixing
       else
-         write(*,*) 'MLT: unknown values for semiconvection_option ' // &
+         write(*,*) 'turb: unknown values for semiconvection_option ' // &
             trim(semiconvection_option)
          ierr = -1
          return
       end if
 
-   end subroutine set_semiconvection
+   end subroutine calc_semiconvection
 
 end module semiconvection
