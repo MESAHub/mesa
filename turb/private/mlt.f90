@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2021  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -26,12 +26,6 @@
 
 module MLT
 
-use star_private_def
-use const_def
-use num_lib
-use utils_lib
-use auto_diff_support
-use star_utils
 
 implicit none
 
@@ -42,12 +36,15 @@ contains
 
    subroutine set_MLT(MLT_option, mixing_length_alpha, report, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, k, &
+                     gradr, grada, gradL, &
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+      use const_def
+      use num_lib
+      use utils_lib
+      use auto_diff
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
       real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
-      integer, intent(in) :: k
       logical, intent(in) :: report
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
@@ -159,15 +156,6 @@ contains
       
       if (Y_face > 0d0) then
          mixing_type = convective_mixing
-      end if
-
-      if (report) then
-         write(*,2) 'set_MLT val for Zeta gradr grada gradT Y_face', k, &
-            Zeta%val, gradr%val, grada%val, gradT%val, Y_face%val
-         write(*,2) 'set_MLT d_dlnd_00 for Zeta gradr grada gradT Y_face', k, &
-            Zeta%d1Array(i_lnd_00), gradr%d1Array(i_lnd_00), &
-            grada%d1Array(i_lnd_00), gradT%d1Array(i_lnd_00), &
-            Y_face%d1Array(i_lnd_00)
       end if
 
    end subroutine set_MLT   

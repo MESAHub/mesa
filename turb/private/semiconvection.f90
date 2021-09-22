@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2021  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -26,12 +26,7 @@
 
 module semiconvection
 
-use star_private_def
-use const_def
-use num_lib
-use utils_lib
-use auto_diff_support
-use star_utils
+
 
 implicit none
 
@@ -44,6 +39,10 @@ contains
                                  semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                  gradL_composition_term, &
                                  gradT, Y_face, conv_vel, D, mixing_type, ierr) ! Langer 1983 & 1985
+      use const_def
+      use num_lib
+      use utils_lib
+      use auto_diff
       type(auto_diff_real_star_order1), intent(in) :: L, Lambda, T, P, Pr, beta, opacity, rho
       type(auto_diff_real_star_order1), intent(in) :: Cp, gradr, grada, gradL
       character(len=*), intent(in) :: semiconvection_option

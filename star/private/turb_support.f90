@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2021  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 
-module mlt_get_results
+module turb_support
 
 use star_private_def
 use const_def
@@ -32,10 +32,7 @@ use num_lib
 use utils_lib
 use auto_diff_support
 use star_utils
-use tdc
-use mlt
-use thermohaline
-use semiconvection
+use turb
 
 implicit none
 
@@ -43,6 +40,25 @@ private
 public :: get_gradT, do1_mlt_eval, Get_results
 
 contains
+
+   !> Determines if it is safe (physically) to use TDC instead of MLT.
+   !!
+   !! Currently we only know we have to fall back to MLT in cells that get touched
+   !! by adjust_mass, because there the convection speeds at the start of the
+   !! step can be badly out of whack.
+   !!
+   !! @param s star pointer
+   !! @param k face index
+   !! @param fallback False if we can use TDC, True if we can fall back to MLT.
+   logical function check_if_must_fall_back_to_MLT(s, k) result(fallback)
+      type (star_info), pointer :: s
+      integer, intent(in) :: k
+
+      fallback = .false.
+      if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
+         fallback = .true.
+      end if
+   end function check_if_must_fall_back_to_MLT
 
    subroutine get_gradT(s, MLT_option, & ! used to create models
          r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
@@ -160,6 +176,7 @@ contains
       integer, intent(out) :: ierr
       
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
+      real(dp) :: conv_vel_start, scale
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
@@ -194,10 +211,6 @@ contains
       test_partials = .false.
       ierr = 0          
       if (k > 0) then
-         s% SOURCE(k) = 0d0
-         s% DAMP(k) = 0d0
-         s% DAMPR(k) = 0d0
-         s% COUPL(k) = 0d0
          s% tdc_num_iters(k) = 0
       end if
 
@@ -218,15 +231,29 @@ contains
 
       if (using_TDC) then
          if (report) write(*,3) 'call set_TDC', k, s% solver_iter
-         call set_TDC(s, k, &
-            mixing_length_alpha, cgrav, m, report, &
-            mixing_type, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, ierr)
+         if (s% okay_to_set_mlt_vc) then
+            conv_vel_start = s% mlt_vc_old(k)
+         else
+            conv_vel_start = s% mlt_vc(k)
+         end if
+
+         ! Set scale for judging the TDC luminosity equation Q(Y)=0.
+         ! Q has units of a luminosity, so the scale should be a luminosity.
+         if (s% solver_iter == 0) then
+            scale = max(abs(s% L(k)), 1d-3*maxval(s% L(1:s% nz)))
+         else
+            scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
+         end if
+
+         call set_TDC(&
+            conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
          call set_MLT(MLT_option, mixing_length_alpha, report, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                        gradr, grada, gradL, k, &
+                        gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
       end if
 
@@ -234,7 +261,7 @@ contains
       if (mixing_type == no_mixing) then
          if (gradL_composition_term < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-            call set_thermohaline(s, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
          else if (gradr > grada) then
@@ -259,4 +286,4 @@ contains
    end subroutine Get_results
 
 
-end module mlt_get_results
+end module turb_support

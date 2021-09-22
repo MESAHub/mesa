@@ -2263,7 +2263,6 @@
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
        end subroutine star_get_surf_PT       
-
       
       integer function get_result_reason(id, ierr)
          integer, intent(in) :: id
@@ -2276,7 +2275,6 @@
          end if
          get_result_reason = s% result_reason
       end function get_result_reason
-      
       
       real(dp) function eval_tau_at_r(id, r, ierr)
          ! optical depth tau at radius r (cm)
@@ -3046,7 +3044,7 @@
       
       
       subroutine star_set_mlt_vars(id, nzlo, nzhi, ierr)
-         use mlt_info, only: set_mlt_vars
+         use turb_info, only: set_mlt_vars
          use star_def
          integer, intent(in) :: id ! id for star         
          integer, intent(in) :: nzlo, nzhi ! range of cell numbers   
@@ -3063,7 +3061,7 @@
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
-         use mlt_get_results, only: get_gradT
+         use turb_support, only: get_gradT
          integer, intent(in) :: id
          character (len=*), intent(in) :: MLT_option
          real(dp), intent(in) :: &
@@ -3089,7 +3087,7 @@
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
          use auto_diff
-         use mlt_get_results, only: Get_results
+         use turb_support, only: Get_results
          integer, intent(in) :: id
          integer, intent(in) :: k
          character (len=*), intent(in) :: MLT_option
