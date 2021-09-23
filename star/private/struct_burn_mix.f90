@@ -1260,6 +1260,13 @@
             integer :: j, i
             include 'formats'
             ierr = 0
+            ! This routine does nothing other than set ierr = 0,
+            ! but we need an empty routine here because
+            ! net_1_zone_burn_const_density
+            ! expects to be passed a routine burn_finish_substep,
+            ! and often that will be a routine that actually does something,
+            ! but here we don't want to do anything.
+
             !step_time = time - substep_start_time
             !if (step_time <= 0d0) return
             !frac = step_time/dt
