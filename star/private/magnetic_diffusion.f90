@@ -44,7 +44,7 @@
       real(dp) function calc_eta(sig) result(eta)
          real(dp), intent(in) :: sig
 
-         eta = 7.1520663d19/sig
+         eta = (clight * clight / (4d0 * pi)) /sig
       end function calc_eta
 
       !> Computes the electrical conductivity following
