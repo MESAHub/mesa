@@ -127,6 +127,7 @@ SRCS = \
    overshoot_step.f90 \
    turb_support.f90 \
    turb_info.f90 \
+   magnetic_diffusion.f90 \
    rotation_mix_info.f90 \
    mix_info.f90 \
    kap_support.f90 \
