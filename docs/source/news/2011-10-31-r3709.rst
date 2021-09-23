@@ -1,0 +1,11 @@
+============
+Release 3709
+============
+
+:Date:   2011-10-31
+
+Revision 3709 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3709.zip/download>`__
+is available for download.

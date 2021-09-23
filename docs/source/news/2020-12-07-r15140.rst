@@ -1,0 +1,21 @@
+=============
+Release 15140
+=============
+
+Revision 15140 has been designated a MESA release version. This release
+contains a number of backwards-incompatible changes, including a
+significant reorganization of the eos & kap options.
+
+Users migrating to the new version should carefully read the
+`Changelog <https://docs.mesastar.org/en/latest/changelog.html#changes-in-r15140>`__.
+
+The new MESA documentation site,
+`docs.mesastar.org <https://docs.mesastar.org/>`__, should now be
+considered the primary source for MESA reference information. The
+defaults files documentation for previous versions remains available in
+the `documentation archive <http://mesa.sourceforge.net/docs.html>`__ on
+the SourceForge site.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r15140.zip/download>`__
+is available for download.

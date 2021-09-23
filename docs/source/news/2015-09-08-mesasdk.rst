@@ -1,0 +1,15 @@
+====================
+New MESA SDK Version
+====================
+
+Version 20150908 is now available for 64-bit Linux and OS X from the
+`SDK
+website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+For the official announcement, see `this mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/34441002/>`__.
+
+Rich says:
+
+   These releases are mainly to fix some compilation issues encountered
+   by a few people. Most folks won’t need to upgrade (but if you do,
+   you’ll get a shiny new gcc/gfortran 4.9.4 compiler).

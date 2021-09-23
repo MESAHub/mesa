@@ -1,0 +1,11 @@
+============
+Release 4028
+============
+
+:Date:   2012-04-28
+
+Revision 4028 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r4028.zip/download>`__
+is available for download.

@@ -1,0 +1,11 @@
+============
+Release 1943
+============
+
+:Date:   2009-11-26
+
+Revision 1943 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r1943.zip/download>`__
+is available for download.

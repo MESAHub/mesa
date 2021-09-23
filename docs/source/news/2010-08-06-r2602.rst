@@ -1,0 +1,11 @@
+============
+Release 2602
+============
+
+:Date:   2010-08-06
+
+Revision 2602 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2602.zip/download>`__
+is available for download.

@@ -1,0 +1,10 @@
+=====================
+Documentation Archive
+=====================
+
+:Date:   2016-08-10
+
+The documentation for the defaults files from previous MESA versions has
+now been made accessible online. At this time, this includes only
+releases within (approximately) the past year. A list of available
+documentation versions will be maintained at `this page </docs.html>`__.
