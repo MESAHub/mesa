@@ -62,7 +62,7 @@
 
     solver_iters_timestep_limit = 10
 
-    max_model_number = 10000
+    max_model_number = 2000
 
     ! extra controls for timestep
     ! these are for changes in mdot, to avoid violent increase in mass transfer rate
@@ -90,6 +90,7 @@
     mixing_length_alpha = 1.5d0
     alpha_semiconvection = 1d0
     thermohaline_coeff = 1d0
+    MLT_option = "Cox"
 
   ! rotational mixing coeffs
     am_nu_ST_factor = 1.0
