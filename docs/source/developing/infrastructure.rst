@@ -66,10 +66,11 @@ service.
 Website
 ^^^^^^^
 
-We still use the mesa.sourceforge.net website.  The source code for
-this site lives at https://github.com/MESAHub/mesa-website.  It must
-be manually updated by someone with SourceForge permissions.
+We still use the mesa.sourceforge.net website domian name.  
+The source code for this site lives at https://github.com/MESAHub/mesa-website. 
+It must be manually updated by someone with SourceForge permissions.
 
+This site will be made redundant soon and replaced with a redirect to the ReadTheDocs website.
 
 Slack
 -----

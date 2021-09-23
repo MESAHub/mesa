@@ -11,6 +11,9 @@ This page contains links to all the news posted on mesa.sourceforge.net
 
 .. The TOC can be regenerated with: cd $MESA_DIR/docs/source/news;for i in *;do echo "    news/$(basename ${i%%.rst})" ;done | tac
 
+Note that while the links reference http://sourceforge.net to download the release versions of MESA, we now recommend you use the
+`Zenodo version <https://zenodo.org/record/4311514>`__.
+
 .. toctree::
 
     news/2021-02-18-tinsley-prize
