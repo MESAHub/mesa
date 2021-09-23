@@ -52,8 +52,7 @@
          logical, parameter :: use_omp = .true.
          integer :: k, op_err, net_lwork, j, jj, cnt, kmax
          integer(8) :: time0, clock_rate
-         real(dp) :: abs_e, abs_e_dm, abs_e_limit, &
-            max_abs_e_dm, dm_limit, e_limit, total
+         real(dp) :: total
          integer, pointer :: ks(:)
          logical, parameter :: only_dlnT = .false.
          logical :: okay, check_op_split_burn
