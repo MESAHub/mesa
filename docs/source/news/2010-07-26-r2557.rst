@@ -1,0 +1,11 @@
+============
+Release 2557
+============
+
+:Date:   2010-07-26
+
+Revision 2557 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2557.zip/download>`__
+is available for download.

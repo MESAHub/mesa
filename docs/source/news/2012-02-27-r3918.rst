@@ -1,0 +1,11 @@
+============
+Release 3918
+============
+
+:Date:   2012-02-27
+
+Revision 3918 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3918.zip/download>`__
+is available for download.

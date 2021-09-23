@@ -1,0 +1,11 @@
+============
+Release 3723
+============
+
+:Date:   2011-11-06
+
+Revision 3723 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3723.zip/download>`__
+is available for download.

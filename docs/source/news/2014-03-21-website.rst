@@ -1,0 +1,18 @@
+================
+New MESA Website
+================
+
+:Date:   2014-03-21
+
+The main MESA website has been updated, with the goal of making it
+easier for new users to get started.
+
+The new site also has somewhat less total content, with the aim of
+making it easier for the developers to keep things up-to-date.
+
+If you see errors or have suggestions for improvements, you can email
+Josiah Schwab. Also feel free to open an issue or send a pull request on
+`GitHub <https://github.com/jschwab/mesa-website>`__.
+
+For the full annoucement, see `this mailing list
+post <https://sourceforge.net/p/mesa/mailman/message/32133212/>`__.

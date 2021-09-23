@@ -1,0 +1,11 @@
+============
+Release 0971
+============
+
+:Date:   2009-01-25
+
+Revision 0971 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r0971.zip/download>`__
+is available for download.
