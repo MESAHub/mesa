@@ -39,7 +39,6 @@ module micro
   ! Parameters
 
   logical, parameter :: dbg = .false.
-  real(dp), parameter :: fmax_fit = 3.47189d0
 
   ! Access specifiers
 
@@ -163,7 +162,6 @@ contains
 
     subroutine set_eos(ierr)
       integer, intent(out) :: ierr
-      real(dp) :: alfa
       include 'formats'
       ierr = 0
       if (dbg) write(*,*) 'call do_eos'
