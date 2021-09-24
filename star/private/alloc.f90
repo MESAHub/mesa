@@ -992,8 +992,6 @@
             if (failed('vc')) exit
             call do1(s% R2, c% R2)
             if (failed('R2')) exit
-            call do1(s% d_R2_dlnR, c% d_R2_dlnR)
-            if (failed('d_R2_dlnR')) exit
 
             call do1_ad(s% eps_grav_ad, c% eps_grav_ad)
             if (failed('eps_grav_ad')) exit

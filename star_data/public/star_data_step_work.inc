@@ -294,7 +294,7 @@
          d_extra_jdot_domega_p1, d_extra_omegadot_domega_p1
 
       ! velocity time centering
-      real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
+      real(dp), pointer, dimension(:) :: vc
       real(dp) :: d_vc_dv
    
       

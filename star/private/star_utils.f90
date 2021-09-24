@@ -2829,17 +2829,7 @@
       subroutine set_rv_info(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: r2
          include 'formats'
-         r2 = s% r(k)*s% r(k)
-         if (s% using_velocity_time_centering) then
-            s% R2(k) = &
-               (r2 + s% r_start(k)*s% r(k) + s% r_start(k)*s% r_start(k))/3d0
-            s% d_R2_dlnR(k) = (2d0*r2 + s% r_start(k)*s% r(k))/3d0            
-         else
-            s% R2(k) = r2
-            s% d_R2_dlnR(k) = 2d0*r2
-         end if
          if (s% v_flag) then
             if (s% using_velocity_time_centering) then
                s% vc(k) = 0.5d0*(s% v_start(k) + s% v(k))
