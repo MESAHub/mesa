@@ -190,16 +190,9 @@
       gravity 
       !log_Ledd
       !log_L_div_Ledd ! log10(L/Leddington)
-      !log_surf_opacity
-      !log_surf_temperature
-      !surface_temperature
       !log_surf_optical_depth
       !surface_optical_depth
-      !log_surf_z
       
-      !surf_omega
-      !surf_omega_div_omega_crit
-      !surf_v_rot ! km/sec rotational velocity at equator
       !rotational_mdot_boost ! factor for increase in mass loss mdot due to rotation
       
    
@@ -268,12 +261,6 @@
 
    
    ! info at location of max temperature
-      !max_T_lgT
-      !max_T_mass (Msun)
-      !max_T_radius (Rsun)
-      !max_T_lgRho
-      !max_T_L (Lsun)
-      !max_T_eps_nuc (erg/g/s)
    
    ! asteroseismology
       !delta_nu ! large frequency separation for p-modes (microHz)
@@ -310,17 +297,9 @@
       !e_thermal ! sum over all zones of Cp*T*dm
       
       num_retries ! total during the run
-      !total_num_jacobians ! during the run
-      !num_jacobians ! per step
       
       !max_conv_vel_div_csound
       
-      !dt_Courant ! min dr_div_csound (sec) -- min cell sound crossing time
-      !log_dt_Courant ! log10 min dr_div_csound (sec)
-      !dt_Courant_yr ! min dr_div_csound (years)
-      !log_dt_Courant_yr ! log10 min dr_div_csound (years)
-      !dt_div_dt_Courant
-      !log_dt_div_dt_Courant
       
       !h1_czb_mass ! location (in Msun units) of base of 1st convection zone above h1_boundary_mass
       

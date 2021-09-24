@@ -79,7 +79,6 @@
       !Tsurf_factor
       !tau_factor
       !tau_surface
-      !surface_extra_Pgas
 
    !## imposed center conditions
       !m_center
@@ -228,11 +227,9 @@
 
       !power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
       !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
-      !power_c_burn ! total thermal power from carbon burning, excluding neutrinos (in Lsun units)
       !log_power_nuc_burn ! total thermal power from all burning, excluding photodisintegrations
       log_LH ! log10 power_h_burn
       log_LHe ! log10 power_he_burn
-      !log_LC ! log10 power_c_burn
       log_LZ ! log10 total burning power including LC, but excluding LH and LHe and photodisintegrations
       log_Lnuc ! log(LH + LHe + LZ)
       !log_Lnuc_ergs_s
@@ -353,9 +350,6 @@
 
       !h_rich_layer_mass ! = star_mass - he_core_mass
       !he_rich_layer_mass ! = he_core_mass - c_core_mass
-      !c_rich_layer_mass ! = c_core_mass - o_core_mass
-      !o_rich_layer_mass ! = o_core_mass - si_core_mass
-      !si_rich_layer_mass ! = si_core_mass - fe_core_mass
 
 
 !----------------------------------------------------------------------------------------------
@@ -367,10 +361,7 @@
       !mdot_timescale ! star_mass/abs(star_mdot) (years)
       !kh_div_mdot_timescales ! kh_timescale/mdot_timescale
       !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
-      !log_chem_timescale ! burn+mix timescale (years)
          ! approximately min over all cells k and species i of x(i,k)/abs(dxdt_mix + dxdt_burn)
-      !log_chem_timescale_div_time_step
-      !log_cell_collapse_timescale
 
       !dt_cell_collapse ! min time for any cell to collapse at current velocities
       !dt_div_dt_cell_collapse
@@ -518,11 +509,6 @@
       !center_zbar
 
       !center_eps_grav
-      !center_dL_dm
-      !center_dlnT_dt
-      !center_dlnd_dt
-      !center_dlogRho
-      !center_dlogT
 
       !center_non_nuc_neu
       !center_eps_nuc
@@ -534,7 +520,6 @@
       !max_entropy ! in units of kerg per baryon
       !fe_core_infall
       !non_fe_core_infall
-      !max_infall_speed_mass
 
       !compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
 
@@ -628,19 +613,9 @@
    !## info at location of max temperature
       !max_T
       !log_max_T
-      !max_T_lgT ! equivalent to above
-      !max_T_mass ! (Msun)
-      !max_T_radius ! (Rsun)
-      !max_T_lgRho
-      !max_T_lgP
-      !max_T_entropy
-      !max_T_L ! (Lsun)
-      !max_T_eps_nuc ! (erg/g/s)
-      !max_T_lgP_thin_shell ! log10(G*Mcore*Menv/(4*pi*Rcore^4))
          ! Mcore = Msun*max_T_mass,
          ! Menv = Msun*(star_mass - max_T_mass),
          ! Rcore = Rsun*max_T_radius
-      !max_T_shell_binding_energy ! integral from max_T out
 
 
    !## info about location where have max rate of hydrogen burning (PP and CNO)
@@ -677,7 +652,6 @@
       !shock_gamma1
       !shock_entropy
       !shock_tau
-      !shock_E0 ! 4/3 pi R^3 crad T^4 at shock location
       !shock_k
 
    !## info at innermost mach 1 location
@@ -722,63 +696,41 @@
 
       !total_energy ! at end of step
       !log_total_energy ! log(abs(total_energy))
-      !total_energy_start ! at start of step
-      !total_energy_change ! end - start
 
       ! shorter versions of above
       !tot_E
       !log_tot_E
-      !tot_E_change
-      !tot_E_start
 
 
       !total_gravitational_energy
       !log_total_gravitational_energy ! log(abs(total_gravitational_energy))
-      !total_gravitational_energy_start
-      !total_gravitational_energy_change
 
       ! shorter versions of above
       !tot_PE
       !log_tot_PE
-      !tot_PE_start
-      !tot_PE_change
 
 
       !total_internal_energy
       !log_total_internal_energy
-      !total_internal_energy_start
-      !total_internal_energy_change
 
       ! shorter versions of above
       !tot_IE
       !log_tot_IE
-      !tot_IE_start
-      !tot_IE_change
 
 
       !total_radial_kinetic_energy
       !log_total_radial_kinetic_energy
-      !total_radial_kinetic_energy_start
-      !total_radial_kinetic_energy_change
 
       ! shorter versions of above (does not include rot KE)
       !tot_KE
       !log_tot_KE
-      !tot_KE_start
-      !tot_KE_change
 
 
       !tot_IE_div_IE_plus_KE
       !total_IE_div_IE_plus_KE
 
-      !total_IE_plus_KE
-      !log_total_IE_plus_KE
-      !total_IE_plus_KE_change
-      !total_IE_plus_KE_start
 
 
-      !total_energy_minus_sources_and_sinks
-      !total_energy_plus_L_surf
       !total_entropy
       !total_eps_grav
 
@@ -790,11 +742,8 @@
       !total_WD_sedimentation_heating
 
 
-      !run_deltaE
       !rel_run_E_err
 
-      !rel_run_deltaE
-      !log_rel_run_deltaE
 
       !rel_E_err
       !abs_rel_E_err
@@ -809,8 +758,6 @@
 
       !total_rotational_kinetic_energy
       !log_total_rotational_kinetic_energy
-      !total_rotational_kinetic_energy_start
-      !total_rotational_kinetic_energy_change
 
 !----------------------------------------------------------------------------------------------
 
@@ -853,8 +800,6 @@
       !one_div_yphot
       !log_one_div_yphot
 
-      !min_kap_floor
-      !log_min_kap_floor
 
       !log_min_opacity
       !min_opacity
@@ -869,12 +814,7 @@
       !h1_czb_mass ! location (in Msun units) of base of 1st convection zone above he core
       !kh_mdot_limit
       !log_cntr_dr_cm
-      !min_L
       !min_Pgas_div_P
-      !min_dL_dm
-      !min_dL_dm_m
-      !rms_dvdt_div_v
-      !split_mixing_choice
       !surf_c12_minus_o16 ! this is useful for seeing effects of dredge up on AGB
       !surf_num_c12_div_num_o16
 
@@ -891,7 +831,6 @@
 
    !## RTI
       !rti_regions <num>
-      !alpha_RTI_avg_by_mass
 
    !## Ni & Co
       !total_ni_co_56
@@ -909,13 +848,7 @@
 
 !# accretion
 
-      !k_below_Eulerian_eps_grav
-      !q_below_Eulerian_eps_grav
-      !logxq_below_Eulerian_eps_grav
 
-      !k_Lagrangian_eps_grav
-      !q_Lagrangian_eps_grav
-      !logxq_Lagrangian_eps_grav
 
       !k_below_const_q
       !q_below_const_q
@@ -933,9 +866,6 @@
       !q_for_test_CpT_absMdot_div_L
       !logxq_for_test_CpT_absMdot_div_L
 
-      !k_CpTMdot_lt_L
-      !q_CpTMdot_lt_L
-      !logxq_CpTMdot_lt_L
 
 
 !----------------------------------------------------------------------------------------------
@@ -986,20 +916,9 @@
 
 
    !## maximum solver residuals
-      !log_max_abs_lgE_residual
-      !log_max_abs_v_residual
-      !log_max_dlnEdt_residual
-      !log_max_drdt_residual
-      !log_max_dvdt_residual
-      !log_max_lnd_residual
 
-      !avg_lgE_residual
-      !avg_v_residual
 
-      !log_avg_lgE_residual
-      !log_avg_v_residual
 
-      !max_abs_lgE_residual
 
    !## conservation during mesh adjust
       !log_mesh_adjust_IE_conservation
