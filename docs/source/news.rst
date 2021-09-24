@@ -1,5 +1,4 @@
 .. highlight:: console
-.. _FAQ:
 
 ************
 News archive

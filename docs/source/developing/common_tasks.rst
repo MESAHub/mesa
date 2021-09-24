@@ -74,7 +74,7 @@ name it will be given via an assignment like
 
 Next, update ``star/private/history.f90`` to add a new case in the
 switch statement, ``case(h_my_new_column)``.  The code in this case
-should set the variable ``val`` to the desired output value.g
+should set the variable ``val`` to the desired output value.
 
 Finally, add the new column to ``star/defaults/history_columns.list``
 along with a short comment about what this column means.  It should
