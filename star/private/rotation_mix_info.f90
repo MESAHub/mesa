@@ -1151,8 +1151,11 @@
 
          do k = 2, nz-1
 
+            xkap = 16d0*boltz_sigma*T(k)*T(k)*T(k)/ &
+               (3d0*opacity(k)*rho(k)*rho(k)*Cp(k)) ! thermal diffusivity
+
             xsig = calc_sige(abar(k), zbar(k), rho(k), T(k), Cp(k), kap_cond(k), opacity(k))
-            xeta = calc_eta(sige)  ! magnetic diffusivity
+            xeta = calc_eta(xsig)  ! magnetic diffusivity
 
             xmagn = N2(k)
             xmagnmu = N2_mu(k)
