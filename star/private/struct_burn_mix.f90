@@ -318,7 +318,6 @@
             s% dE_dRho_start(k) = s% dE_dRho(k)
             s% gam_start(k) = s% gam(k)
             s% lnS_start(k) = s% lnS(k)
-            s% eta_start(k) = s% eta(k)
             s% zbar_start(k) = s% zbar(k)
             s% mu_start(k) = s% mu(k)
             s% phase_start(k) = s% phase(k)
