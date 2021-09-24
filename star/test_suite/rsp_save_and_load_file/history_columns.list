@@ -52,19 +52,12 @@
       rsp_GREKM_avg_abs
       rsp_DeltaR
       rsp_DeltaMag
-      !rsp_g_Edd
-      !rsp_max_f_Edd
-      !rsp_min_f_Edd
-      !rsp_max_f_Edd_k
-      !rsp_min_f_Edd_k
       rsp_period_in_days
       rsp_num_periods
       
       
       
       
-      !num_rsp_merges
-      !num_rsp_splits
       
       !star_mass ! in Msun units
       !star_mdot ! d(star_mass)/dt (in msolar per year)
@@ -86,10 +79,6 @@
       !log_tot_PE
       !log_tot_IE
 
-      !tot_E_change
-      !tot_KE_change
-      !tot_PE_change
-      !tot_IE_change
    
    ! mixing regions
    
@@ -133,9 +122,6 @@
    ! information about abundance transitions
    
       !he_core_mass
-      !c_core_mass
-      !o_core_mass   
-      !si_core_mass
       !fe_core_mass
    
    
@@ -270,8 +256,5 @@
       !num_iters
       
       num_retries ! total during the run
-      !total_num_newton_solves
-      !total_num_newton_iterations
-      !avg_num_newton_iters
 
 

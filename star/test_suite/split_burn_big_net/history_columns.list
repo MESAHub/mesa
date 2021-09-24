@@ -264,7 +264,6 @@
    
       num_retries ! total during the run
       
-      burn_solver_maxsteps
       
 
 
