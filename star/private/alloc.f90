@@ -1322,13 +1322,6 @@
 
             call do1(s% Chi, c% Chi); if (failed('Chi')) exit
             call do1(s% Chi_start, c% Chi_start); if (failed('Chi_start')) exit
-            call do1(s% d_Chi_dwturb, c% d_Chi_dwturb); if (failed('d_Chi_dwturb')) exit
-            call do1(s% d_Chi_dv00, c% d_Chi_dv00); if (failed('d_Chi_dv00')) exit
-            call do1(s% d_Chi_dvp1, c% d_Chi_dvp1); if (failed('d_Chi_dvp1')) exit
-            call do1(s% d_Chi_dlnR00, c% d_Chi_dlnR00); if (failed('d_Chi_dlnR00')) exit
-            call do1(s% d_Chi_dlnRp1, c% d_Chi_dlnRp1); if (failed('d_Chi_dlnRp1')) exit
-            call do1(s% d_Chi_dlnd, c% d_Chi_dlnd); if (failed('d_Chi_dlnd')) exit
-            call do1(s% d_Chi_dlnT, c% d_Chi_dlnT); if (failed('d_Chi_dlnT')) exit
 
             call do1(s% Lr, c% Lr); if (failed('Lr')) exit
             call do1(s% Lc, c% Lc); if (failed('Lc')) exit
