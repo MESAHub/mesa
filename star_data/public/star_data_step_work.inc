@@ -297,7 +297,6 @@
       real(dp), pointer, dimension(:) :: vc
       real(dp) :: d_vc_dv
    
-      
       ! gravitational constant (can be set by user and can be vary within model)
       real(dp), pointer :: cgrav(:)      
       
