@@ -17,6 +17,16 @@ def get_test_cases(folder):
     x = list(glob.glob(os.path.join(folder,'*/')))
     return set([i.removeprefix(MESA_DIR).removesuffix('/').removeprefix('/') for i in x])
 
+def get_do1(folder):
+    test_cases = []
+    with open(os.path.join(folder,'do1_test_source'),'r') as f:
+        for line in f.readlines():
+            line=line.strip()
+            if line.startswith('#') or not len(line) or line=='return':
+                continue
+            test_cases.append(line.split()[1])
+
+    return set(test_cases)
 
 def parse_codeowners(filename):
     with open(filename) as f:
@@ -64,6 +74,13 @@ def not_listed(cases, code):
         print_section('Test cases not in CODEOWNERS')
         print_options(result)
 
+def no_longer_exists(cases, code):
+    listed = set(code.keys())
+    result = listed - cases
+    if len(result):
+        print_section('Test cases in CODEOWNERS but not do1_test_source')
+        print_options(result)
+
 # Check number of owners
 def check_owners(code, num=0):
     result=[]
@@ -81,11 +98,19 @@ if __name__ == "__main__":
     binary_cases = get_test_cases(BINARY)
     astero_cases = get_test_cases(ASTERO)
 
+    star_do1 = get_test_cases(STAR)
+    binary_do1 = get_test_cases(BINARY)
+    astero_do1 = get_test_cases(ASTERO)    
+
     codeowner = parse_codeowners(CODEOWNERS)
 
     not_listed(star_cases,codeowner['star'])
     not_listed(binary_cases,codeowner['binary'])
     not_listed(astero_cases,codeowner['astero'])
+
+    no_longer_exists(star_do1,codeowner['star'])
+    no_longer_exists(binary_do1,codeowner['binary'])
+    no_longer_exists(astero_do1,codeowner['astero'])
 
 
     check_owners(codeowner['star'],0)

@@ -64,10 +64,6 @@ star/test_suite/custom_colors @rjfarmer
 star/test_suite/custom_rates @evbauer @adamjermyn @fxt
 star/test_suite/dev_high_rot_darkening @orlox
 star/test_suite/dev_ppisn @rjfarmer
-star/test_suite/dev_split_burn_big_net @rjfarmer
-star/test_suite/dev_to_cc_12 @rjfarmer
-star/test_suite/dev_to_cc_20 @rjfarmer
-star/test_suite/dev_to_cc_80 @rjfarmer
 star/test_suite/dev_to_ppisn_100 @rjfarmer
 star/test_suite/diffusion_smoothness @fxt
 star/test_suite/extended_convective_penetration @fxt
