@@ -835,7 +835,6 @@
          real(dp), pointer :: Cv_start(:) ! (nz)
          real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
-         real(dp), pointer :: eta_start(:) ! (nz)
          real(dp), pointer :: T_start(:) ! (nz)
          real(dp), pointer :: mu_start(:) ! (nz)
          real(dp), pointer :: phase_start(:) ! (nz)

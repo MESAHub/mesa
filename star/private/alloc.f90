@@ -1257,8 +1257,6 @@
             if (failed('rho_start')) exit
             call do1(s% lnS_start, c% lnS_start)
             if (failed('lnS_start')) exit
-            call do1(s% eta_start, c% eta_start)
-            if (failed('eta_start')) exit
             call do1(s% T_start, c% T_start)
             if (failed('T_start')) exit
             call do1(s% zbar_start, c% zbar_start)
