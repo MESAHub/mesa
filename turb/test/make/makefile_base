@@ -1,0 +1,86 @@
+# This is the makefile for testing the mesa turb package 
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = test_turb.f90
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = turb
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) -lturb
+
+LIBS_OTHER = $(LIBS_MESA_NUMERICS) $(LIBS_MESA_MICRO)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_NUMERICS) $(LOAD_MESA_MICRO)
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+
+OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(TEST) : $(OBJS) $(DEPS_LOCAL)
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -ggdb -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -ggdb -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod .depend $(TEST)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+%.o: %.f90
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfree) $<
+else
+	$(TEST_COMPILE) $(FCfree) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f90 $(TEST_SRC_DIR)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

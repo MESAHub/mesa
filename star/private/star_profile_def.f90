@@ -711,8 +711,10 @@
       integer, parameter :: p_dPdr_dRhodr_info = p_u_face + 1
       integer, parameter :: p_RTI_du_diffusion_kick = p_dPdr_dRhodr_info + 1
       integer, parameter :: p_log_du_kick_div_du = p_RTI_du_diffusion_kick + 1
+
+      integer, parameter :: p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT = p_log_du_kick_div_du + 1
       
-      integer, parameter :: p_col_id_max = p_log_du_kick_div_du
+      integer, parameter :: p_col_id_max = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
       type (integer_dict), pointer :: profile_column_names_dict
@@ -1401,6 +1403,8 @@
          profile_column_name(p_tau_qhse) = 'tau_qhse'
          profile_column_name(p_tau_epsnuc) = 'tau_epsnuc'
          profile_column_name(p_tau_cool) = 'tau_cool'
+
+         profile_column_name(p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT) = 'lum_rad_div_L_Edd_sub_fourPrad_div_PchiT'
 
          cnt = 0
          do i=1,p_col_id_max

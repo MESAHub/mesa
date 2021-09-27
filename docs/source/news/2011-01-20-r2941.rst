@@ -1,0 +1,11 @@
+============
+Release 2941
+============
+
+:Date:   2011-01-20
+
+Revision 2941 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2941.zip/download>`__
+is available for download.

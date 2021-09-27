@@ -1,0 +1,13 @@
+===================
+Release of MESA-Web
+===================
+
+:Date:   2015-06-01
+
+Carl Fields and collaborators announced the release of
+`MESA-Web <http://mesa-web.asu.edu>`__ in `this mailing list
+post <https://sourceforge.net/p/mesa/mailman/message/34163721/>`__.
+
+`MESA-Web <http://mesa-web.asu.edu>`__ is an online web interface for
+MESA, which can be used for education and research purposes to calculate
+stellar models.

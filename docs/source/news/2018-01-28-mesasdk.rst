@@ -1,0 +1,10 @@
+====================
+New MESA SDK Version
+====================
+
+Version 20180127 `has been
+announced <https://lists.mesastar.org/pipermail/mesa-users/2018-January/008594.html>`__
+and is now available for 64-bit Linux and OS X from the `SDK
+website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+
+Rich recommends all users upgrade to this newest release.

@@ -1,0 +1,14 @@
+============
+Release 4411
+============
+
+:Date:   2012-08-25
+
+Revision 4411 has been designated a MESA release version.
+
+The full release notes are available in `this mailing list
+post <https://sourceforge.net/p/mesa/mailman/message/29724876/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r4411.zip/download>`__
+is available for download.

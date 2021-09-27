@@ -1,0 +1,13 @@
+============
+Release 6188
+============
+
+:Date:   2014-03-21
+
+Revision 6188 has been designated a MESA release version. For the full
+release notes, see `this mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/32131389/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r6188.zip/download>`__
+is available for download.

@@ -1,0 +1,11 @@
+====================
+New MESA SDK Version
+====================
+
+:Date:   2014-12-12
+
+Version 20141212 is now available for 64-bit Linux and OS X from the
+`SDK
+website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+The makedepf90 package is now bundled with the SDK, allowing for
+parallel compilation during makes.

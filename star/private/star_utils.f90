@@ -323,23 +323,7 @@
             xh => s% xh
          end if
          lnR = xh(s% i_lnR,k)
-      end function get_lnR_from_xh
-      
-      
-      subroutine store_r_or_lnR_in_xh(s, k, r, lnR, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: r, lnR
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnR,k) = lnR
-      end subroutine store_r_or_lnR_in_xh
-      
+      end function get_lnR_from_xh      
       
       subroutine store_r_in_xh(s, k, r, xh_in)
          type (star_info), pointer :: s
@@ -415,21 +399,6 @@
       end function get_lnT_from_xh
       
       
-      subroutine store_T_or_lnT_in_xh(s, k, T, lnT, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: T, lnT
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnT,k) = lnT
-      end subroutine store_T_or_lnT_in_xh
-      
-      
       subroutine store_T_in_xh(s, k, T, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -502,21 +471,7 @@
          end if
          lnd = xh(s% i_lnd,k)
       end function get_lnd_from_xh
-      
-      
-      subroutine store_rho_or_lnd_in_xh(s, k, rho, lnd, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: rho, lnd
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnd,k) = lnd
-      end subroutine store_rho_or_lnd_in_xh
+
       
       
       subroutine store_rho_in_xh(s, k, rho, xh_in)
@@ -547,36 +502,6 @@
          end if
          xh(s% i_lnd,k) = lnd
       end subroutine store_lnd_in_xh
-
-
-      subroutine store_w_in_xh(s, k, w, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: w
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_w,k) = w
-      end subroutine store_w_in_xh
-      
-      
-      subroutine store_etrb_in_xh(s, k, etrb, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: etrb
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_w,k) = sqrt(max(0d0,etrb))
-      end subroutine store_etrb_in_xh
 
 
       subroutine use_xh_to_set_rho_to_dm_div_dV(s, ierr)
@@ -1025,44 +950,6 @@
             dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          end do
       end function get_tau_at_r
-
-
-      integer function find_tau_phot(s, tau00, taup1, ierr)
-         ! return k for the cell containing optical depth = tau_base
-         type (star_info), pointer :: s
-         real(dp), intent(out) :: tau00, taup1
-         integer, intent(out) :: ierr
-         integer :: k
-         real(dp) :: dtau, tau_phot
-
-         include 'formats'
-         ierr = 0
-         tau00 = 0
-         taup1 = 0
-         find_tau_phot = 1
-         if (s% tau_factor >= 1 .and. .not. s% RSP_flag) return
-         tau_phot = s% tau_base
-         tau00 = s% tau_factor*s% tau_base
-         do k = 1, s% nz
-            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
-            taup1 = tau00 + dtau
-            if (taup1 >= tau_phot) then
-               find_tau_phot = k
-               return
-            end if
-            tau00 = taup1
-         end do
-         ierr = -1
-      end function find_tau_phot
-
-      
-      real(dp) function get_r_phot(s)
-         type (star_info), pointer :: s  
-         real(dp) :: r, m, v, L, T_phot, cs, kap, logg, ysum
-         integer :: k_phot
-         call get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
-         get_r_phot = r
-      end function get_r_phot
       
       
       subroutine set_phot_info(s)
@@ -1179,31 +1066,6 @@
          kap = s% opacity(k_phot)
          logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
       end subroutine get_phot_info
-
-
-      real(dp) function get_phot_kap(s)
-         type (star_info), pointer :: s
-
-         integer :: k
-         real(dp) :: tau00, taup1, dtau, tau_phot
-
-         include 'formats'
-
-         get_phot_kap = s% opacity(1)
-         tau_phot = s% tau_base
-         tau00 = s% tau_factor*s% tau_base
-         if (tau00 >= tau_phot) return
-         do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
-            taup1 = tau00 + dtau
-            if (taup1 >= tau_phot .and. dtau > 0d0) then
-               get_phot_kap = s% opacity(k)
-               return
-            end if
-            tau00 = taup1
-         end do
-         get_phot_kap = s% opacity(s% nz)
-      end function get_phot_kap
 
 
       real(dp) function center_value(s, p)
@@ -1323,70 +1185,6 @@
       
       end subroutine set_abs_du_div_cs
 
-
-      real(dp) function rsi_div_rsimelt(s,k,species) 
-         ! rsi = ion density parameter for cell k
-         ! rsimelt = ion density parameter of quantum melting
-         ! rsi < rsimelt => liquid, independent of T
-         use chem_def, only: chem_isos
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, species
-         
-         integer :: IX, j
-         real(dp), dimension(species) :: AZion, ACMI, AY
-         real(dp) :: Y, CMImean, Z73, RS, RSI
-         real(dp), parameter :: RSIMELT=140d0, TINY=1d-7, &
-            AUM=1822.888d0 ! a.m.u./m_e
-         
-         include 'formats'
-         
-         ! details from eos/private/pc_eos.f
-         
-         AZion(1:species) = chem_isos% Z(s% chem_id(1:species))
-         ACMI(1:species) = chem_isos% W(s% chem_id(1:species))
-         do j=1,species
-            if (s% xa(j,k) < s% eos_rq% mass_fraction_limit_for_PC) then
-               AY(j) = 0
-            else
-               AY(j) = s% xa(j,k)/ACMI(j)
-            end if
-         end do
-         
-         Y=0.d0
-         do IX=1,species
-            Y=Y+AY(IX)
-         end do
-         if (dabs(Y-1.d0).gt.TINY) then
-           do IX=1,species
-              AY(IX)=AY(IX)/Y
-           end do
-         end if
-
-         CMImean=0.d0
-         Z73=0.d0
-         do IX=1,species
-            if (AY(IX) < TINY) cycle
-            Z73 = Z73 + AY(IX)*pow(AZion(IX),7d0/3d0)
-            CMImean = CMImean + AY(IX)*ACMI(IX)
-         end do
-
-         RS=pow(0.75d0/PI/s% rho(k),one_third)
-         RSI=RS*CMImean*Z73*AUM
-         
-         if (is_bad(RSI)) then
-            write(*,2) 'RSI', k, RSI
-            write(*,2) 'Z73', k, Z73
-            write(*,2) 'CMImean', k, CMImean
-            write(*,2) 'RS', k, RS
-            write(*,2) 's% rho(k)', k, s% rho(k)
-            !write(*,2) '', k, 
-            !write(*,2) '', k, 
-            stop 'rsi_div_rsimelt'
-         end if
-         
-         rsi_div_rsimelt = RSI/RSIMELT
-         
-      end function rsi_div_rsimelt
 
 
       subroutine get_shock_info(s)
@@ -2829,38 +2627,6 @@
       end function omega_crit
 
 
-      subroutine median_smoothing(dd, n, ns, dmed)
-         use num_lib, only: qsort
-         real(dp), intent(inout) :: dd(:) ! (n)
-         integer, intent(in) :: n, ns
-         real(dp), intent(inout) :: dmed(:) ! (n) work array
-
-         real(dp) :: x(2*ns+1)
-         integer :: i, j, k, nmed, index(2*ns+1)
-
-         nmed = 2*ns+1
-
-         do i=1,n
-            if ((i > 1+ns) .and. (i < n-ns)) then
-               k = 1
-               do j = i-ns, i+ns
-                  x(k) = dd(j)
-                  k = k+1
-               end do
-               call qsort(index,nmed,x)
-               dmed(i) = x(index(ns+1))
-            else
-               dmed(i) = dd(i)
-            end if
-         end do
-
-         do i=1,n
-            if (dmed(i) /= 0) dd(i) = dmed(i)
-         end do
-
-      end subroutine median_smoothing
-
-
       subroutine weighed_smoothing(dd, n, ns, preserve_sign, ddold)
       !     based on routine written by S.-C. Yoon, 18 Sept. 2002
       !     for smoothing  any variable (dd) with size n over 2*ns+1 cells.
@@ -3058,36 +2824,12 @@
          
       end subroutine set_phase_of_evolution
 
-
-      logical function arrived_main_seq(s)
-         type (star_info), pointer :: s
-         include 'formats'
-         arrived_main_seq = &
-            (s% L_nuc_burn_total >= s% L_phot) .and. &
-            (s% power_h_burn >= s% L_nuc_burn_total/2)
-         return
-         write(*,1) 's% L_nuc_burn_total', s% L_nuc_burn_total
-         write(*,1) 's% L_phot', s% L_phot
-         write(*,1) 's% power_h_burn', s% L_phot
-         write(*,*) 'arrived_main_seq',  arrived_main_seq
-         write(*,*)
-      end function arrived_main_seq
       
       
       subroutine set_rv_info(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: r2
          include 'formats'
-         r2 = s% r(k)*s% r(k)
-         if (s% using_velocity_time_centering) then
-            s% R2(k) = &
-               (r2 + s% r_start(k)*s% r(k) + s% r_start(k)*s% r_start(k))/3d0
-            s% d_R2_dlnR(k) = (2d0*r2 + s% r_start(k)*s% r(k))/3d0            
-         else
-            s% R2(k) = r2
-            s% d_R2_dlnR(k) = 2d0*r2
-         end if
          if (s% v_flag) then
             if (s% using_velocity_time_centering) then
                s% vc(k) = 0.5d0*(s% v_start(k) + s% v(k))
@@ -3892,19 +3634,6 @@
       end function QHSE_time_scale
       
       
-      subroutine set_max_QHSE_time_scale(s)
-         type (star_info), pointer :: s
-         integer :: k
-         real(dp) :: tau_QHSE
-         s% max_QHSE_time_scale = 0d0
-         do k=1,s%nz
-            if (s% q(k) > s% max_q_for_QHSE_timescale) cycle
-            if (s% q(k) < s% min_q_for_QHSE_timescale) exit
-            tau_QHSE = QHSE_time_scale(s,k)
-            if (tau_QHSE > s% max_QHSE_time_scale) &
-               s% max_QHSE_time_scale = tau_QHSE
-         end do
-      end subroutine set_max_QHSE_time_scale
       
       
       real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)
@@ -4056,19 +3785,6 @@
       end function get_grada_face
       
       
-      real(dp) function get_grada_face_val(s,k) result(grada_face)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp) :: alfa, beta, grada_00, grada_m1
-         if (k == 1) then
-            grada_face = s% grada(k)
-            return
-         end if
-         call get_face_weights(s, k, alfa, beta)
-         grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
-      end function get_grada_face_val
-      
-      
       function get_gradr_face(s,k) result(gradr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -4127,14 +3843,6 @@
             end if
          end if
       end function get_scale_height_face_val
-      
-      
-      function get_grav_face(s,k) result(grav)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: grav
-         grav = s% cgrav(k)*s% m_grav(k)/pow2(wrap_r_00(s,k))
-      end function get_grav_face
 
       
       function get_QQ_cell(s,k) result(QQ_cell)
@@ -4149,23 +3857,6 @@
          chiRho_00 = wrap_chiRho_00(s,k)
          QQ_cell = chiT_00/(d_00*T_00*chiRho_00)
       end function get_QQ_cell
-      
-      
-      function get_QQ_face(s,k) result(QQ_face)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: QQ_face
-         type(auto_diff_real_star_order1) :: QQ_00, QQ_m1
-         real(dp) :: alfa, beta
-         if (k == 1) then
-            QQ_face = get_QQ_cell(s,k)
-            return
-         end if
-         call get_face_weights(s, k, alfa, beta)
-         QQ_00 = get_QQ_cell(s,k)
-         QQ_m1 = shift_m1(get_QQ_cell(s,k-1)) !, 'get_QQ_face')
-         QQ_face = alfa*QQ_00 + beta*QQ_m1
-      end function get_QQ_face
       
       
       subroutine get_face_weights(s, k, alfa, beta)

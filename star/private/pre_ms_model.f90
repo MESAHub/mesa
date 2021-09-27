@@ -683,7 +683,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             gradT, ierr )
          use chem_def, only: ih1
-         use mlt_get_results, only: get_gradT
+         use turb_support, only: get_gradT
          use kap_def, only : num_kap_fracs
          use kap_lib, only : kap_get
 
@@ -702,7 +702,6 @@
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
          real(dp) :: Y_face, conv_vel, D, Gamma ! Not used
          integer :: mixing_type
-         logical :: make_gradr_sticky_in_solver_iters
          
          ierr = 0
 

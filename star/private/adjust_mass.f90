@@ -163,7 +163,6 @@
             r_new = exp(log(vol00/four_thirds_pi)*one_third)
 
             s%r(j) = r_new
-            s%R2(j) = pow2(r_new)
             s%r_start(j) = s%r(j)
             s%rmid(j) = r_new
             s%rmid_start(j) = r_new

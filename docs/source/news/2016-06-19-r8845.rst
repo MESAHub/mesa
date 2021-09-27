@@ -1,0 +1,26 @@
+============
+Release 8845
+============
+
+:Date:   2016-06-19
+
+Revision 8845 has been designated a MESA release version.
+
+The full release notes are available in `this mailing list
+post <https://lists.mesastar.org/pipermail/mesa-users/2016-June/006691.html>`__.
+
+-  In order to improve the clarity and uniformity of MESA inlist
+   options, names using “cnt” were changed to use “interval” (e.g.,
+   ``terminal_cnt`` was renamed to ``terminal_interval``). For the same
+   reasons, the option ``photostep`` was renamed to ``photo_interval``.
+   A simple find-and-replace will bring your inlists up-to-date. If one
+   needs to make the changes in a more automated fashion, a sample
+   migration script is included in the release annoucement to
+   mesa-users.
+
+-  In the binary module, adjustments were made to the Eddington mass
+   accretion rate to take into account black hole spins.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r8845.zip/download>`__
+is available for download.

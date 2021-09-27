@@ -182,16 +182,37 @@ def check_history():
         'photo',
         'pnhe4',
         'other',
+        'C_cntr',
+        'Fe_core',
+        'H_cntr',
+        'H_rich',
+        'He_cntr',
+        'He_core',
+        'Mass',
+        'N_cntr',
+        'Ne_cntr',
+        'O_cntr',
+        'Si_cntr',
+        'ejecta_M',
+        'lg_Dsurf',
+        'lg_Lneu',
+        'lg_Lnuc',
+        'lg_Lphoto',
+        'lg_Mdot',
+        'remnant_M',
+        'retries',
+        'shock',
+        'v_div_cs',
+        'zones',
+        'misc',
+        'timescales',
+        'asteroseismology',
     }
 
     print_options(vals_history_list - vals_history - known_false_positives)
 
 
     if ENABLE_TEST_SUITE_HIST_CHECKS:
-        known_false_positives = {
-            'misc',
-            'timescales'
-        }
         # Value in each test case's history_columns.list but not in star/default/history_columns.list
         for i in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','history_columns.list')):
             test_case = get_history_columns(i.removeprefix(MESA_DIR))
@@ -302,6 +323,24 @@ def check_profile():
         'c12_boundary_limit',
         'burn_min1',
         'burn_min2',
+        'ar_alpha',
+        'c12_c12',
+        'c12_o16',
+        'c_alpha',
+        'ca_alpha',
+        'fe_co_ni',
+        'mg_alpha',
+        'n_alpha',
+        'na_alpha',
+        'ne_alpha',
+        'o16_o16',
+        'o_alpha',
+        'other',
+        'photo',
+        'pnhe4',
+        's_alpha',
+        'si_alpha',
+        'ti_alpha',
     }
 
 
@@ -347,8 +386,6 @@ def check_profile():
 
 
     if ENABLE_TEST_SUITE_PROF_CHECKS:
-        known_false_positives = {
-        }
         # Value in each test case's profile_columns.list but not in star/default/profile_columns.list
         for i in glob.glob(os.path.join(MESA_DIR,'star','test_suite','*','profile_columns.list')):
             test_case = get_profile_columns(i.removeprefix(MESA_DIR))
