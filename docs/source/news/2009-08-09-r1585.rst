@@ -1,0 +1,11 @@
+============
+Release 1585
+============
+
+:Date:   2009-08-09
+
+Revision 1585 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r1585.zip/download>`__
+is available for download.

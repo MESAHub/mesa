@@ -1,0 +1,16 @@
+=============
+Release 11532
+=============
+
+*There is a significant memory leak in this version of MESA. There are
+problems in the default EOS in this version of MESA. Users should
+strongly prefer revision 11701 over this version.*
+
+Revision 11532 has been designated a MESA release version.
+
+The full release notes are available in `this mailing list
+post <https://lists.mesastar.org/pipermail/mesa-users/2019-March/009842.html>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r11532.zip/download>`__
+is available for download.

@@ -1,0 +1,11 @@
+============
+Release 1396
+============
+
+:Date:   2009-06-28
+
+Revision 1396 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r1396.zip/download>`__
+is available for download.

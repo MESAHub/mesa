@@ -1,0 +1,11 @@
+============
+Release 3107
+============
+
+:Date:   2011-03-20
+
+Revision 3107 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3107.zip/download>`__
+is available for download.

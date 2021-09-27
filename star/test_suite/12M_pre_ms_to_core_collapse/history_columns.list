@@ -85,7 +85,6 @@
       log_total_energy
       
       total_mass ni56
-      TDC_num_cells      
       
       num_solver_iterations ! iterations this step
       rel_E_err
@@ -282,7 +281,6 @@
    
       num_retries ! total during the run
       
-      burn_solver_maxsteps
       
 
 

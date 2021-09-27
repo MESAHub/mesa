@@ -1,0 +1,11 @@
+============
+Release 3851
+============
+
+:Date:   2012-01-10
+
+Revision 3851 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3851.zip/download>`__
+is available for download.

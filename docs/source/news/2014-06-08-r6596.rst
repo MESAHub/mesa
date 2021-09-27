@@ -1,0 +1,15 @@
+============
+Release 6596
+============
+
+:Date:   2014-06-08
+
+Revision 6596 has been designated a MESA release version. This release
+includes substantial changes to rates and nets, fixes to binaries and
+ecapture, and a new version of GYRE. For the full release notes, see
+`this mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/32434215/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r6596.zip/download>`__
+is available for download.

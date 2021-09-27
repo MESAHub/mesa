@@ -241,10 +241,6 @@
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       num_retries ! total during the run
       
-      !burn_nfcn_total ! only non-zero for burn_split
-      !burn_nstep_max ! only non-zero for burn_split
-      !lg_nfcn_per_sec ! log10(burn_nfcn_total/dt)
-      
       !max_conv_vel_div_csound
       
       h1_czb_mass ! location (in Msun units) of base of 1st convection zone above h1_boundary_mass

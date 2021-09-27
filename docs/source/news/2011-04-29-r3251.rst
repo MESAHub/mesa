@@ -1,0 +1,11 @@
+============
+Release 3251
+============
+
+:Date:   2011-04-29
+
+Revision 3251 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3251.zip/download>`__
+is available for download.

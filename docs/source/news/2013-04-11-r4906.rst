@@ -1,0 +1,11 @@
+============
+Release 4906
+============
+
+:Date:   2013-04-11
+
+Revision 4906 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r4906.zip/download>`__
+is available for download.

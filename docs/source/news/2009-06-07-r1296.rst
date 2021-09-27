@@ -1,0 +1,11 @@
+============
+Release 1296
+============
+
+:Date:   2009-06-07
+
+Revision 1296 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r1296.zip/download>`__
+is available for download.

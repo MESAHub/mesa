@@ -57,8 +57,8 @@
          logical :: okay
          real(dp) :: &
             dq, dm, dr, d_dadt_mix_dap1, sig00, sigp1, &
-            eqn_scale, dPdr_drhodr, instability2, instability, RTI_B, ds, &
-            r00, rp1, ravg_start, dP, drho, rho, rmid, cs, fac
+            eqn_scale, dPdr_drhodr, instability2, instability, RTI_B, &
+            r00, rp1, drho, rho, rmid, cs, fac
          logical :: test_partials
 
          include 'formats'

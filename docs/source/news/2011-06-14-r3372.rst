@@ -1,0 +1,11 @@
+============
+Release 3372
+============
+
+:Date:   2011-06-14
+
+Revision 3372 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3372.zip/download>`__
+is available for download.

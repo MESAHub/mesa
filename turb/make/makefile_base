@@ -19,7 +19,7 @@ SRCS = mlt.f90 tdc.f90 thermohaline.f90 semiconvection.f90 turb.f90
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-    LIBS_OTHER = $(LIBS_MATRIX) -lauto_diff -lstar_data_def
+    LIBS_OTHER = $(LIBS_MATRIX)
     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX)
 endif

@@ -1,0 +1,13 @@
+======================
+MESA Release Zip files
+======================
+
+:Date:   2014-07-01
+
+All current and past MESA releases are now available for `download from
+sourceforge <http://sourceforge.net/projects/mesa/files/releases/>`__ as
+zip archives. A working Subversion installation is therefore no longer a
+pre-requisite for MESA installation.
+
+Future releases will also be offered as zip files (or in another
+similiar archive format).
