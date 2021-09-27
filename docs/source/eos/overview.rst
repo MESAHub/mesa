@@ -36,11 +36,11 @@ fractions.
 This approach means that that EOS components have an order of
 precedence:
 
-    (CMS) > (Skye) > PC > FreeEOS > OPAL/SCVH > HELM.
+    (CMS) > Skye > PC > FreeEOS > OPAL/SCVH > HELM.
 
 EOS components in parentheses are experimental and off by default.
 
-.. figure:: eos_regions_x072_z002.png
+.. figure:: eos_regions_x070_z002.png
    :alt: EOS blends in solar-like compositions
 
    The :math:`\rho-T` coverage of the EOS for a solar-like composition.
