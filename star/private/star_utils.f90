@@ -2806,7 +2806,7 @@
             s% phase_of_evolution = phase_TP_AGB
          else if (center_he4 <= 1d-4) then
             s% phase_of_evolution = phase_TACHeB          
-         else if (s% center_eps_burn(i3alf) > Lsun) then
+         else if (s% center_eps_burn(i3alf) > 1d2) then
             s% phase_of_evolution = phase_ZACHeB
          else if (s% L_by_category(i3alf) > 1d2) then
             s% phase_of_evolution = phase_He_Burn
