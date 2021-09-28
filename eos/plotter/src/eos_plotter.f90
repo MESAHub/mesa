@@ -366,7 +366,7 @@ program eos_plotter
             else
                res1 = i_max - i_frac + 1
             end if
-
+            write(*,*) rho, T, i_max, res(i_frac:i_frac+num_eos_frac_results-1)
          end if
 
          if (doing_dfridr) then
@@ -590,7 +590,7 @@ contains
       else
          ! check for all blends
          in_eos_blend = .false.
-         do i = i_frac, i_frac+num_eos_frac_results
+         do i = i_frac, i_frac+num_eos_frac_results-1
             in_eos_blend = in_eos_blend .or. &
                ((res(i) .gt. 0) .and. (res(i) .lt. 1))
          end do
