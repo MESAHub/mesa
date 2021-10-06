@@ -4003,19 +4003,6 @@
 
     recalc_mixing_info_each_substep = .false.
 
-
-      ! fitted_fp_ft_i_rot
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Use analytical fits to the rotational corrections fp and ft, as well as the moments of inertia,
-      ! computed using the Roche potential for a point mass.
-      ! see Paxton et al. (2019), ApJs, 243, 10 for details
-
-      ! ::
-
-    fitted_fp_ft_i_rot = .true.
-
-
       ! w_div_wcrit_max
       ! ~~~~~~~~~~~~~~~
 

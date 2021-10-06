@@ -366,7 +366,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         if (s% fitted_fp_ft_i_rot) then
 !$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
             do j=1, s% nz
                !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
@@ -400,7 +399,6 @@
                end if
             end do
 !$OMP END PARALLEL DO
-         end if
 
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
