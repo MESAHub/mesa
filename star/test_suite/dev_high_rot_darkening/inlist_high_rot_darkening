@@ -33,8 +33,6 @@
     ! until central hydrogen abundance is 0.69 (from the starting value of 0.7). This is
     ! to have an unambiguously defined starting point for the definition of the initial
     ! rotation rate
-
-    !warning, turn off pgstar if you also turn off fitted_fp_ft_i_rot
     pgstar_flag = .false.
 
     change_initial_w_div_wc_flag = .true.
@@ -58,7 +56,6 @@
     gold_solver_iters_timestep_limit = 20
     gold2_solver_iters_timestep_limit = 20
 
-    fitted_fp_ft_i_rot = .true.
 
     scale_max_correction = 0.05d0
     ignore_species_in_max_correction = .true.

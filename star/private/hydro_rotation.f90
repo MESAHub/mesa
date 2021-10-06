@@ -195,8 +195,12 @@
          include 'formats'
          if (s% use_other_eval_i_rot) then
             call s% other_eval_i_rot(s% id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
-         else if (s% fitted_fp_ft_i_rot) then
-            !If fitted_fp_ft_i_rot is true, then compute i_rot following Paxton et al. 2019 (ApJs, 243, 10)
+         else if (s% simple_i_rot_flag) then
+            i_rot = (2d0/3d0)*r00*r00
+            di_rot_dlnr = 2*i_rot
+            di_rot_dw_div_wc = 0d0
+         else
+            ! Compute i_rot following Paxton et al. 2019 (ApJs, 243, 10)
             w = w_div_w_crit_roche
             w2 = pow2(w_div_w_crit_roche)
             w3 = pow3(w_div_w_crit_roche)
@@ -214,19 +218,6 @@
             i_rot =  two_thirds*pow2(re)*B/A
             di_rot_dw_div_wc = i_rot*(2d0*dre_dw_div_wc/re + dB_dw_div_wc/B - dA_dw_div_wc/A)
             di_rot_dlnr = 2*i_rot
-         else if (s% simple_i_rot_flag) then
-            i_rot = (2d0/3d0)*r00*r00
-            di_rot_dlnr = 2*i_rot
-            di_rot_dw_div_wc = 0d0
-         else
-            ! expression for evaluation without subtraction from Langer code
-            rai=ra*ri
-            ra2=ra*ra
-            ri2=ri*ri
-            rm2=ri2+rai+ra2
-            i_rot=0.4D0*(ri2*ri2+rai*rm2+ra2*ra2)/rm2
-            di_rot_dlnr = 0d0 ! not supperted for implicit solver
-            di_rot_dw_div_wc = 0d0 ! not supperted for implicit solver
          end if
 
       end subroutine eval_i_rot
@@ -240,7 +231,7 @@
 
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
          do k=1,s% nz
-            if (s% fitted_fp_ft_i_rot .and. .not. skip_w_div_w_crit_roche) then
+            if (.not. skip_w_div_w_crit_roche) then
                s% w_div_w_crit_roche(k) = &
                   w_div_w_roche_jrot(s% r(k),s% m(k),s% j_rot(k),s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
@@ -320,52 +311,22 @@
 
          r00 = get_r_from_xh(s,k)
 
-         if (s% fitted_fp_ft_i_rot .or. s% simple_i_rot_flag) then
-            call eval_i_rot(s, k, r00, r00, r00, s% w_div_w_crit_roche(k), &
-               s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
-            return
-         end if
-
-         ! Compute the moment of inertia of a thin shell, ignoring rotational deformation
-         ! need to compute rmid at k+1 and k-1. These are respectively r_in and r_out
-         r00 = get_r_from_xh(s,k)
-         r003 = r00*r00*r00
-
-         if (k == s% nz) then
-            rp1 = s% R_center
-         else
-            rp1 = get_r_from_xh(s,k+1)
-         end if
-         rp13 = rp1*rp1*rp1
-         r_in = pow(0.5*(r003 + rp13),one_third)
-
-         if (k == 1) then
-            r_out = r00
-         else
-            rm1 = get_r_from_xh(s,k-1)
-            rm13 = rm1*rm1*rm1
-            r_out = pow(0.5*(r003 + rm13),one_third)
-         end if
-
-         call eval_i_rot(s,k,r_in,r00,r_out,0d0,&
+         call eval_i_rot(s, k, r00, r00, r00, s% w_div_w_crit_roche(k), &
             s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
-
       end subroutine update1_i_rot_from_xh
 
       subroutine use_xh_to_update_i_rot(s)
          type (star_info), pointer :: s
          integer :: k
-         if (s% fitted_fp_ft_i_rot) then
-            do k=1,s% nz
-               if (s% j_rot(k) /= 0d0) then
-                  s% w_div_w_crit_roche(k) = &
-                     w_div_w_roche_jrot(get_r_from_xh(s,k),s% m(k),s% j_rot(k),s% cgrav(k), &
-                        s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-               else
-                  s% w_div_w_crit_roche(k) = 0d0
-               end if
-            end do
-         end if
+         do k=1,s% nz
+            if (s% j_rot(k) /= 0d0) then
+               s% w_div_w_crit_roche(k) = &
+                  w_div_w_roche_jrot(get_r_from_xh(s,k),s% m(k),s% j_rot(k),s% cgrav(k), &
+                     s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
+            else
+               s% w_div_w_crit_roche(k) = 0d0
+            end if
+         end do
          do k=1,s% nz
             call update1_i_rot_from_xh(s,k)
          end do
@@ -374,13 +335,11 @@
       subroutine use_xh_to_update_i_rot_and_j_rot(s)
          type (star_info), pointer :: s
          integer :: k
-         if (s% fitted_fp_ft_i_rot) then
-            do k=1,s% nz
-               s% w_div_w_crit_roche(k) = &
-                  w_div_w_roche_omega(get_r_from_xh(s,k),s% m(k),s% omega(k),s% cgrav(k), &
-                     s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-            end do
-         end if
+         do k=1,s% nz
+            s% w_div_w_crit_roche(k) = &
+               w_div_w_roche_omega(get_r_from_xh(s,k),s% m(k),s% omega(k),s% cgrav(k), &
+                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
+         end do
          do k=1,s% nz
             call update1_i_rot_from_xh(s,k)
          end do
@@ -647,13 +606,9 @@
          do k = 1, s% nz - 1
 
             kap = s% opacity(k)
-            if (s% fitted_fp_ft_i_rot) then
-               ! TODO: better explain
-               ! Use equatorial radius
-               rmid = 0.5d0*(s% r_equatorial(k) + s% r_equatorial(k+1))
-            else
-              rmid = s% rmid(k)
-            end if
+            ! TODO: better explain
+            ! Use equatorial radius
+            rmid = 0.5d0*(s% r_equatorial(k) + s% r_equatorial(k+1))
             dm = s% dm(k)
             dtau = dm*kap/(pi4*rmid*rmid)
 
@@ -782,7 +737,6 @@
 
          dbg = .false. ! (s% model_number >= 5)
 
-         if (s% fitted_fp_ft_i_rot) then
 !$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
             do j=1, s% nz
                !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
@@ -821,279 +775,6 @@
                !end if
             end do
 !$OMP END PARALLEL DO
-            return
-         end if
-
-         s% dfp_rot_dw_div_wc(:s% nz) = 0d0
-         s% dft_rot_dw_div_wc(:s% nz) = 0d0
-
-         veta => veta_ary
-         if (.not. have_initialized) then
-            write(*,*) 'must call init_rotation prior to getting rotation info'
-            ierr = -1; return
-         end if
-
-         kmax = 0
-
-         ft_min=1.0d0
-         fp_min=1.0d0
-         ift_in=0
-         ift_out=0
-         ifp_in=0
-         ifp_out=0
-
-         call cash_karp_work_sizes(1,liwork,lwork)
-         allocate(work(lwork),iwork(liwork))
-
-         ! main loop
-         etanu = -1.00d-20
-         tegra=0.d0
-         rnull_out=0d0
-         rho_out = rho(nz)
-         r_out = 0
-         lnr_out = 1d-10
-
-         rnorm=1.d0
-         do i_in=nz+1,2,-1
-            i_out = i_in-1
-
-            ! for each shell, compute the distortion (in terms of r0) of the shell. The
-            ! inner edge of the shell is at r(i_in), the outer edge at r(i_out). The density is
-            ! defined in the interior of each shell and needs to be interpolated when
-            ! it is needed at the edge.
-
-
-            rho_in = rho_out
-            rho_out = rho(i_out)
-            ! Compute mean density at this point
-            r_in = r_out
-            lnr_in = lnr_out
-            r_out = r(i_out)
-            lnr_out = log(r_out)
-            rom1 = xm(i_out)*0.75d0/(pi*r_out*r_out*r_out)
-            rov = rho_in/rom1
-            veta(1) = etanu
-            kanz = 1
-            dat = 1.d-04
-            dot = (lnr_out-lnr_in)/8.d0
-            dut = (lnr_out-lnr_in)/300.d0
-
-            ! E&S, A6 by integration of A7
-            rtol = 1d-6
-            atol = 1d-6
-            h = lnr_out - lnr_in
-            max_step_size = 0d0
-            rpar(1) = rov
-            call cash_karp( &
-               1, rad_fcn, lnr_in, veta, lnr_out, &
-               h, max_step_size, max_steps, &
-               rtol, atol, itol, &
-               null_solout, out_io, &
-               work, lwork, iwork, liwork, &
-               lrpar, rpar, lipar, ipar, &
-               lout, idid)
-            if (idid < 0) then
-               if (report_ierr .or. dbg) write(*,2) 'eval_fp_ft failed in integration', i_out
-               ierr = -1
-               if (dbg) stop 'eval_fp_ft'
-               exit
-            end if
-
-            eta(i_out)=veta(1)
-            xm_out=xm(i_out)
-            wr=aw(i_out)
-            etanu=veta(1)
-            r1=4.00d0*r_out
-            r2=0.01d0*r_out
-            do j = 1, 400 ! exit when have bracketed root
-               ! needs etanu,wr,r_out,xm_out; sets a
-               rpar(1) = etanu
-               rpar(2) = wr
-               rpar(3) = r_out
-               rpar(4) = xm_out
-               ipar(1) = i_out
-               ipar(2) = 0
-               ierr = 0
-               apot1 = apot_fcn(r1, dfdx, lrpar, rpar, lipar, ipar, ierr)
-               if (ierr /= 0) then
-                  if (report_ierr .or. dbg) write(*,2) 'eval_fp_ft failed in calculation of apot1', i_out
-                  if (dbg) stop 'eval_fp_ft'
-                  exit
-               end if
-               apot2 = apot_fcn(r2, dfdx, lrpar, rpar, lipar, ipar, ierr)
-               if (ierr /= 0) then
-                  if (report_ierr .or. dbg) write(*,2) 'eval_fp_ft failed in calculation of apot2', i_out
-                  if (dbg) stop 'eval_fp_ft'
-                  exit
-               end if
-               if (apot1*apot2 <= 0) exit
-               r1=4.00d0*r1
-               r2=0.01d0*r2
-            end do
-
-            if (apot1*apot2 > 0) then
-               ierr = -1
-               if (report_ierr .or. dbg) &
-                  write(*,2) 'eval_fp_ft failed in calculation of apot1, apot2', i_out, apot1, apot2
-
-
-               !exit
-               write(*,2) 'i_out', i_out
-               write(*,1) 'r_out', r_out
-               write(*,1) 'r1', r1
-               write(*,1) 'r2', r2
-               write(*,1) 'apot1', apot1
-               write(*,1) 'apot2', apot2
-               write(*,1) 'epsx', epsx
-               write(*,1) 'epsy', epsy
-               write(*,2) 'imax', imax
-               stop 'hydro_rotation: eval_fp_ft'
-
-
-               exit
-            end if
-
-            rnuv1 = safe_root_with_initial_guess( &
-               apot_fcn, r_out, r1, r2, apot1, apot2, &
-               imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
-            if (ierr /= 0) then
-               if (report_ierr .or. dbg) write(*,2) 'eval_fp_ft failed in calculation of apot', i_out
-               if (.not. dbg) exit
-               write(*,2) 'i_out', i_out
-               write(*,1) 'r_out', r_out
-               write(*,1) 'r1', r1
-               write(*,1) 'r2', r2
-               write(*,1) 'apot1', apot1
-               write(*,1) 'apot2', apot2
-               write(*,1) 'epsx', epsx
-               write(*,1) 'epsy', epsy
-               write(*,2) 'imax', imax
-               stop 'hydro_rotation: eval_fp_ft'
-            end if
-
-            a = rpar(5)
-            rnuv2=rnuv1
-            rnull(i_out) =  rnuv2
-            rnull_in = rnull_out
-            rnull_out = rnuv2
-
-            ! compute integral for the potential calculation. See Endal&Sofia for details
-
-            tegra = psiint(0.5d0*(rho_out+rho_in),xm_out,wr,etanu,rnull_in,rnull_out) + tegra
-
-            ! calculate g and 1/g on a quarter circle.
-            gur(i_out)=0.0d0
-            do k=1,intmax,1
-               gp(k)=gpsi(cgrav,rnull(i_out), tegra, k, a, wr, xm_out, rae)
-               gmh(k)=1.d0 / gp(k)
-               gur(i_out)=gur(i_out)+gp(k)
-            end do
-            gur(i_out)=gur(i_out)*dtheta/pi*2.d0
-            r_polar(i_out) = max(rae(1),r2)
-            r_equatorial(i_out) = min(rae(intmax),r1)
-
-            ! find spsi*<g> and spsi*<1/g>. spsi is the surface area of the equipotential
-            rrs=rae(1)*rae(1)*sint(1)
-            rrs1=rae(intmax)*rae(intmax)*sint(intmax)
-            spgp(i_out)=(gp(1)*rrs+gp (intmax)*rrs1)*dtheta2
-            spgm(i_out)=(gmh(1)*rrs+gmh(intmax)*rrs1)*dtheta2
-
-            do k=2,intmax-1
-               rrs=rae(k)*rae(k)*sint(k)
-               spgp(i_out)=spgp(i_out)+gp(k)*rrs*dtheta
-               spgm(i_out)=spgm(i_out)+gmh(k)*rrs*dtheta
-            enddo
-            spgp(i_out)=spgp(i_out)*pi4
-            spgm(i_out)=spgm(i_out)*pi4
-
-            !  Find fp and ft
-
-            fp(i_out) =  pi4 * r_out*r_out*r_out*r_out     / (cgrav(i_out)*xm_out*spgm(i_out))
-            ft(i_out) = pow2(pi4 * r_out*r_out) / (spgp(i_out)*spgm(i_out))
-
-            if (ft(i_out) < s% ft_error_limit) then
-               ierr = -1
-               if (report_ierr .or. dbg) then
-                  write(*,2) 'FT too small', i_out, ft(i_out), s% ft_error_limit
-                  stop 'eval_fp_ft'
-               end if
-               exit
-               if (ift_in == 0) ift_in=i_out
-               ift_out=i_out
-               ft_min=min(ft_min,ft(i_out))
-            elseif (ift_in /= 0) then
-               ift_in=0
-               ift_out=0
-               ft_min=1.0d0
-            endif
-
-            if (fp(i_out) < s% fp_error_limit) then
-               ierr = -1
-               if (report_ierr .or. dbg) then
-                  write(*,2) 'FP too small', i_out, fp(i_out), s% fp_error_limit
-                  stop 'eval_fp_ft'
-               end if
-               exit
-               if (ifp_in == 0) ifp_in=i_out
-               ifp_out=i_out
-               fp_min=min(fp_min,fp(i_out))
-            elseif (ifp_in /= 0) then
-               ifp_in=0
-               ifp_out=0
-               fp_min=1.0d0
-            endif
-
-            ft(i_out)=max(s% ft_min, min(ft(i_out),1.d0))
-            fp(i_out)=max(s% fp_min, min(fp(i_out),1.d0))
-
-         end do
-
-         deallocate(work, iwork)
-
-         ft(1)=ft(2)
-         fp(1)=fp(2)
-         ft(nz)=ft(nz-1)
-         fp(nz)=fp(nz-1)
-
-         contains
-
-         real(dp) function apot_fcn(rnu, df, lrpar, rpar, lipar, ipar, ierr) result(f)
-            ! returns with ierr = 0 if was able to evaluate f and df/dx at x
-            ! if df/dx not available, it is okay to set it to 0
-            integer, intent(in) :: lrpar, lipar
-            real(dp), intent(in) :: rnu
-            real(dp), intent(out) :: df
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-            integer, intent(out) :: ierr
-            real(dp) :: wrnu2, a2, a3, dadrn, c1, rfk, drfk
-            real(dp) :: etanu,wr,r,xm,a,r_psi
-            real(dp), parameter :: c0=1.0d0/3.0d0
-            real(dp), parameter :: c2=2.0d0/35.0d0
-            real(dp), parameter :: c3=3.0d0*c2
-            include 'formats'
-            ierr = 0
-            c1 = 0.6d0*cgrav(1)
-            etanu = rpar(1)
-            wr = rpar(2)
-            r = rpar(3)
-            xm = rpar(4)
-            wrnu2=wr*wr*rnu*rnu/(c1*xm*(2.d0+etanu)) ! (1/3)*da/dr0
-            a=rnu*wrnu2 ! E&S, A10  NOTE: typo in paper where it gives r0^2 instead of r0^3.
-            a2=a*a
-            a3=a2*a
-            drfk= pow(max(1.0d-20,1.d0+0.6d0*a2-c2*a3),c0) ! dr_psi/dr0|A, E&S A13
-            r_psi=rnu*drfk ! r_psi(r0)
-            rfk=r_psi - r ! r_psi(r0) - true_r_psi
-            dadrn=wrnu2*a ! (1/3)*a*da/dr0
-            drfk=drfk+rnu/(drfk*drfk)*(1.2d0*dadrn-c3*a*dadrn) ! dr_psi/dr0
-            ! divide by r to normalize
-            f = rfk / r
-            df = drfk / r
-            if (rfk > 1.d30) f=1.d30
-            if (df > 1.d30) df=1.d30
-            rpar(5) = a
-         end function apot_fcn
 
       end subroutine eval_fp_ft
 

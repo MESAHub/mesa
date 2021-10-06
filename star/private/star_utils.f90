@@ -2607,7 +2607,7 @@
          integer, intent(in) :: k
          real(dp) :: Ledd, gamma_factor, Lrad_div_Ledd, rmid, r003, rp13
          include 'formats'
-         if (s% fitted_fp_ft_i_rot .and. s% rotation_flag) then
+         if (s% rotation_flag) then
             ! Use equatorial radius (at center of cell by volume)
             r003 = s% r_equatorial(k)*s% r_equatorial(k)*s% r_equatorial(k)
             if (k < s% nz) then
