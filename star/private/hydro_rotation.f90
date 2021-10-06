@@ -195,6 +195,10 @@
          include 'formats'
          if (s% use_other_eval_i_rot) then
             call s% other_eval_i_rot(s% id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+         else if (s% simple_i_rot_flag) then
+            i_rot = (2d0/3d0)*r00*r00
+            di_rot_dlnr = 2*i_rot
+            di_rot_dw_div_wc = 0d0
          else
             ! Compute i_rot following Paxton et al. 2019 (ApJs, 243, 10)
             w = w_div_w_crit_roche
