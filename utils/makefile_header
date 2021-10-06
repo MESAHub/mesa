@@ -64,7 +64,7 @@ CC = gcc
 
 # step 2) specify whether to use crmath for math library
 
-USE_CRMATH = YES
+USE_CRMATH = NO
 
 ifeq ($(USE_CRMATH),YES)
 LOAD_CRMATH = `mesasdk_crmath_link`
