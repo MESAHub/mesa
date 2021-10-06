@@ -1001,7 +1001,6 @@
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
             mdot_revise_factor, implicit_mdot_boost
          real(dp) :: surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol
-         logical :: fitted_fp_ft_i_rot
          real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 
