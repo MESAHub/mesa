@@ -185,13 +185,15 @@
       ! inner radius of shell ri
       ! outer radius of shell ra
       subroutine eval_i_rot(s,k,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+         use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k ! just for debugging
          real(dp), intent(in) :: ri,r00,ra,w_div_w_crit_roche
          real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
-         real(dp) :: re, w, w2, w3, w4, w5, w6, lg_one_sub_w4, B, A
-         real(dp) :: rai,ra2,ri2,rm2
-         real(dp) :: dre_dw_div_wc, dB_dw_div_wc, dA_dw_div_wc
+
+         type(auto_diff_real_2var_order1) :: ir, r, re, w, w2, w4, w6, lg_one_sub_w4, B, A
+         type(auto_diff_real_2var_order1) :: rai,ra2,ri2,rm2
+
          include 'formats'
          if (s% use_other_eval_i_rot) then
             call s% other_eval_i_rot(s% id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
@@ -202,22 +204,24 @@
          else
             ! Compute i_rot following Paxton et al. 2019 (ApJs, 243, 10)
             w = w_div_w_crit_roche
+            w%d1val1 = 1d0
+
+            r = r00
+            r%d1val2 = r00 ! Makes the independent variable lnR
+
             w2 = pow2(w_div_w_crit_roche)
-            w3 = pow3(w_div_w_crit_roche)
             w4 = pow4(w_div_w_crit_roche)
-            w5 = pow5(w_div_w_crit_roche)
             w6 = pow6(w_div_w_crit_roche)
             lg_one_sub_w4 = log(1d0-w4)
-            re = r00*(1d0+w2/6d0-0.0002507d0*w4+0.06075d0*w6)
-            dre_dw_div_wc = r00*(w/3d0-4d0*0.0002507d0*w3+6d0*0.06075d0*w5)
+            re = r*(1d0+w2/6d0-0.0002507d0*w4+0.06075d0*w6)
             B = (1d0+w2/5d0-0.2735d0*w4-0.4327d0*w6-3d0/2d0*0.5583d0*lg_one_sub_w4)
-            dB_dw_div_wc = 2d0*w/5d0-4d0*0.2735d0*w3-6d0*0.4327d0*w5+3d0/2d0*0.5583d0/(1d0-w4)*4d0*w3
             A = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
-            dA_dw_div_wc = -4d0*0.1076d0*w3-6d0*0.2336d0*w5+0.5583d0/(1d0-w4)*4d0*w3
+            
+            ir =  two_thirds*pow2(re)*B/A
 
-            i_rot =  two_thirds*pow2(re)*B/A
-            di_rot_dw_div_wc = i_rot*(2d0*dre_dw_div_wc/re + dB_dw_div_wc/B - dA_dw_div_wc/A)
-            di_rot_dlnr = 2*i_rot
+            i_rot = ir%val
+            di_rot_dw_div_wc = ir%d1val1
+            di_rot_dlnr = ir%d1val2
          end if
 
       end subroutine eval_i_rot
