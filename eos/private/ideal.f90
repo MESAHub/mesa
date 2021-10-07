@@ -74,15 +74,11 @@ module ideal
    real(dp), intent(out), dimension(nv, species) :: d_dxa
    
    real(dp) :: logT_ion, logT_neutral
-   
-   include 'formats'
 
    ierr = 0
 
    call ideal_eos( &
       T, Rho, X, abar, zbar, &
-      rq%Skye_min_gamma_for_solid, rq%Skye_max_gamma_for_liquid, &
-      rq%Skye_solid_mixing_rule, rq%mass_fraction_limit_for_Skye, &
       species, chem_id, xa, &
       res, d_dlnd, d_dlnT, d_dxa, ierr)
 
@@ -93,9 +89,7 @@ module ideal
 
    subroutine ideal_eos( &
          temp_in, den_in, Xfrac, abar, zbar,  &
-         Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
-         Skye_solid_mixing_rule, &
-         mass_fraction_limit, species, chem_id, xa, &
+         species, chem_id, xa, &
          res, d_dlnd, d_dlnT, d_dxa, ierr)
 
       use eos_def
@@ -112,15 +106,16 @@ module ideal
       integer, intent(in) :: species
       integer, pointer :: chem_id(:)
       real(dp), intent(in) :: xa(:)
-      real(dp), intent(in) :: temp_in, den_in, mass_fraction_limit, Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid
+      real(dp), intent(in) :: temp_in, den_in
       real(dp), intent(in) :: Xfrac, abar, zbar
-      character(len=128), intent(in) :: Skye_solid_mixing_rule
       integer, intent(out) :: ierr
       real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
       real(dp), intent(out), dimension(nv, species) :: d_dxa
+      real(dp), parameter :: mass_fraction_limit = 1d-10
       
+      integer :: relevant_species
       type(auto_diff_real_2var_order3) :: temp, den
-      real(dp) :: ACMI(species), A(species), ya(species), norm
+      real(dp) :: ACMI(species), A(species), ya(species), select_xa(species), norm
       type(auto_diff_real_2var_order3) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
       type(auto_diff_real_2var_order3) :: F_rad, F_ideal_ion, F_ele, F_coul
 
@@ -136,27 +131,37 @@ module ideal
       den = den_in
       den%d1val2 = 1d0      
 
-      ! Count and pack species for ion energy offsets.
+      ! Count and pack relevant species for Coulomb corrections. Relevant means mass fraction above limit.
+      relevant_species = 0
       norm = 0d0
       do j=1,species
-         ACMI(j) = chem_isos% W(chem_id(j))
-         A(j) = chem_isos% Z_plus_N(chem_id(j))
-         norm = norm + xa(j)
+         if (xa(j) > mass_fraction_limit) then
+            relevant_species = relevant_species + 1
+            ACMI(relevant_species) = chem_isos% W(chem_id(j))
+            A(relevant_species) = chem_isos% Z_plus_N(chem_id(j))
+            select_xa(relevant_species) = xa(j)
+            norm = norm + xa(j)
+         end if
+      end do
+
+      ! Normalize
+      do j=1,relevant_species
+         select_xa(j) = select_xa(j) / norm
       end do
 
       ! Compute number fractions
       norm = 0d0
-      do j=1,species
-         ya(j) = xa(j) / A(j)
+      do j=1,relevant_species
+         ya(j) = select_xa(j) / A(j)
          norm = norm + ya(j)
       end do
-      do j=1,species
+      do j=1,relevant_species
          ya(j) = ya(j) / norm
       end do
 
       ! Ideal ion free energy, only depends on abar
-      F_ideal_ion = compute_F_ideal_ion(temp, den, abar, species, ACMI, ya)
-      F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id) ! Offset so ion ground state energy is zero.
+      F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
+      F_ideal_ion = F_ideal_ion + compute_ion_offset(relevant_species, select_xa, chem_id) ! Offset so ion ground state energy is zero.
 
       ! Radiation free energy, independent of composition
       F_rad = compute_F_rad(temp, den)

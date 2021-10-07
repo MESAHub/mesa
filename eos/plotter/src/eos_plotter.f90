@@ -371,7 +371,6 @@ program eos_plotter
             else
                res1 = i_max - i_frac + 1
             end if
-            write(*,*) rho, T, i_max, res(i_frac:i_frac+num_eos_frac_results-1)
          end if
 
          if (doing_dfridr) then
