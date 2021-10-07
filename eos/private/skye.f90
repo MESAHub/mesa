@@ -95,8 +95,6 @@ module skye
          d_alfa_dlogRho = blend%d1val1
          d_alfa_dlogT = blend%d1val2
 
-         write(*,*) 'in Skye alfa', alfa, logRho, logT
-
       end subroutine Get_Skye_alfa
 
 
