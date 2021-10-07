@@ -443,36 +443,7 @@
          lnd = xh(s% i_lnd,k)
          rho =  exp(lnd)
       end subroutine get_rho_and_lnd_from_xh
-      
-      
-      real(dp) function get_rho_from_xh(s, k, xh_in) result(rho)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         rho =  exp(xh(s% i_lnd,k))
-      end function get_rho_from_xh
-      
-      
-      real(dp) function get_lnd_from_xh(s, k, xh_in) result(lnd)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         lnd = xh(s% i_lnd,k)
-      end function get_lnd_from_xh
-
-      
+            
       
       subroutine store_rho_in_xh(s, k, rho, xh_in)
          type (star_info), pointer :: s
