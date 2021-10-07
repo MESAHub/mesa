@@ -88,7 +88,6 @@
       call test_root3
       
       ! explicit solvers
-      call test_cash_karp(show_all)
       call test_dopri(.false.,show_all)
       call test_dopri(.true.,show_all)
 

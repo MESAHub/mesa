@@ -241,14 +241,6 @@ g_05(x) = exp( x ) - 2x + 1/(100x) - 1/(1000000x^2)
 
 
  vdpol
- cash_karp
-                                             calculated           1    1.7633919298826672D+00
-                                             calculated           2   -8.3553976467637270D-01
-                                              reference           1    1.7632345401889102D+00
-                                              reference           2   -8.3568868191466206D-01
-
-
- vdpol
  dopri5
                                              calculated           1    1.7635369595715233D+00
                                              calculated           2   -8.3538846559057456D-01
