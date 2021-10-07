@@ -110,14 +110,14 @@ use_simple_Skye_blends = .false.
   X_center = 0.70
   Z_center = 0.02
 
-  ! delta_X = 0.1
-  ! delta_Z = 0.1
+  delta_X = 0.1
+  delta_Z = 0.1
 
-  ! X_min = 0
-  ! X_max = 1
+  X_min = 0
+  X_max = 1
 
-  ! Z_min = 0
-  ! Z_max = 0.1
+  Z_min = 0
+  Z_max = 0.1
 
   ! logT_center = 7.3d0
   ! logRho_center = 0d0

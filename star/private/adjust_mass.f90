@@ -1253,40 +1253,20 @@
          real(dp) :: w_div_wcrit_roche
 
          r00 = get_r_from_xh(s,k)
-         ! when using the fitted i_rot, the moment of inertia depends
+         ! The moment of inertia depends
          ! on the ratio of rotational frequency to its critical value.
          ! This ratio is computed in two different ways depending on whether
          ! omega or j_rot is known.
-         if (s% fitted_fp_ft_i_rot) then
-            if (jrot_known) then
-               w_div_wcrit_roche = w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
-                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-            else
-               w_div_wcrit_roche = w_div_w_roche_omega(r00,s% m(k),s% omega(k),s% cgrav(k), &
-                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-            end if
+         if (jrot_known) then
+            w_div_wcrit_roche = w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
+         else
+            w_div_wcrit_roche = w_div_w_roche_omega(r00,s% m(k),s% omega(k),s% cgrav(k), &
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          end if
 
-         if (s% simple_i_rot_flag .or. s% fitted_fp_ft_i_rot .or. k < k_below_just_added) then
-            call eval_i_rot(s, k, r00, r00, r00, w_div_wcrit_roche,&
-               s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
-         else
-            r003 = r00*r00*r00
-            if (k == s% nz) then
-               rp13 = pow3(s% R_center)
-            else
-               rp13 = pow3(get_r_from_xh(s,k+1))
-            end if
-            if (k == 1) then
-               rm13 = r003
-            else
-               rm13 = pow3(get_r_from_xh(s,k-1))
-            end if
-            ri = pow((r003 + rp13)/2,one_third)
-            ro = pow((r003 + rm13)/2,one_third)
-            call eval_i_rot(s, k, ri, r00, ro, 0d0,&
-               s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
-         end if
+         call eval_i_rot(s, k, r00, r00, r00, w_div_wcrit_roche,&
+            s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
 
       end subroutine set1_irot
 

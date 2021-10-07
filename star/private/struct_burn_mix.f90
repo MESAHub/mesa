@@ -443,7 +443,6 @@
 
 
       subroutine set_surf_info(s, nvar) ! set to values at start of step
-         use star_utils, only: get_lnd_from_xh, get_lnT_from_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          s% surf_lnS = s% lnS(1)

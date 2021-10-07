@@ -141,21 +141,6 @@
          if (ierr /= 0) then ! failure in  binary_ptr
             return
          end if
-         if (b% point_mass_i /= 2) then
-            if (b% s2% X(b% s2% nz) > 1d-4) then
-               b% s2% burn_he_mix_region_logT = 1d10
-            else
-               b% s2% burn_he_mix_region_logT = 7.7d0
-            end if
-         end if
-         if (b% point_mass_i /= 1) then
-            if (b% s1% X(b% s1% nz) > 1d-4) then
-               b% s1% burn_he_mix_region_logT = 1d10
-            else
-               b% s1% burn_he_mix_region_logT = 7.7d0
-            end if
-         end if
-
       
       end function  extras_binary_start_step
       

@@ -33,14 +33,14 @@ ax.set_ylim(Yran.min(), Yran.max())
 
 # set up color map
 cmap = mpl.cm.get_cmap("Accent")
-bounds = [-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5]
+bounds = [-1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5]
 norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
 pcol = ax.pcolormesh(Xran, Yran, eosDT[...,2], shading='nearest', cmap=cmap, norm=norm)
 pcol.set_edgecolor('face')
-cax = fig.colorbar(pcol, ticks=[0, 1, 2, 3, 4, 5, 6, 7])
+cax = fig.colorbar(pcol, ticks=[-1, 0, 1, 2, 3, 4, 5, 6])
 cax.set_label('')
-cax.ax.set_yticklabels(['blend', 'HELM', 'OPAL/SCVH', 'FreeEOS', 'PC', 'Skye', 'CMS', 'ideal'])
+cax.ax.set_yticklabels(['none','blend', 'HELM', 'OPAL/SCVH', 'FreeEOS', 'PC', 'Skye', 'CMS'])
 
 # save figure
 fig.savefig('eos_regions.png', dpi=300)
