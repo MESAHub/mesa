@@ -5,7 +5,7 @@
       change_initial_net = .true.      
       new_net_name = 'co_burn_plus.net'
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
