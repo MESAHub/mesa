@@ -166,6 +166,10 @@ module ideal
       ! Radiation free energy, independent of composition
       F_rad = compute_F_rad(temp, den)
 
+      ! No electrons, so extreme negative chemical potential
+      etaele = -1d99
+      xnefer = 1d-99
+
       call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
                         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
 
