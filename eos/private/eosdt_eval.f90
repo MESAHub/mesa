@@ -773,7 +773,7 @@
 
          ierr = 0
          ht => eos_ht 
-         helm_blend_width = 0.2d0
+         helm_blend_width = 0.1d0
 
          bounds(1,1) = ht% logdlo
          bounds(1,2) = ht% logthi
