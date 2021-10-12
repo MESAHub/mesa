@@ -138,7 +138,11 @@
          
          real(dp) function get_red_logT(log_L)
             real(dp), intent(in) :: log_L
-            get_red_logT = logT4 + (log_L - logL4)*(logT3 - logT4)/(logL3 - logL4)
+            if (logL3 - logL4 > 0d0) then
+               get_red_logT = logT4 + (log_L - logL4)*(logT3 - logT4)/(logL3 - logL4)
+            else
+               get_red_logT = -1d99
+            end if
          end function get_red_logT
 
       end function extras_check_model
