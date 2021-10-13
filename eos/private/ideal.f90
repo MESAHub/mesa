@@ -173,6 +173,7 @@ module ideal
       ! Radiation free energy, independent of composition
       F_rad = compute_F_rad(temp, den)
 
+
       call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
                         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
 
