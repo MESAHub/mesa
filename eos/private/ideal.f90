@@ -123,7 +123,14 @@ module ideal
       ierr = 0
       F_ele = 0d0
       F_coul = 0d0
-      xnefer = 0d0
+      
+      ! No electrons, so extreme negative chemical potential
+      etaele = -1d99
+      xnefer = 1d-99
+
+      ! no latent heat
+      latent_ddlnT = 0d0
+      latent_ddlnRho = 0d0
 
       ! Construct rho,T and partials
       temp = temp_in
@@ -166,14 +173,6 @@ module ideal
       ! Radiation free energy, independent of composition
       F_rad = compute_F_rad(temp, den)
 
-      ! No electrons, so extreme negative chemical potential
-      etaele = -1d99
-      xnefer = 1d-99
-
-      ! no latent heat
-      latent_ddlnT = 0d0
-      latent_ddlnRho = 0d0
-      
       call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
                         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
 
