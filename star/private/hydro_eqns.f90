@@ -426,12 +426,13 @@
             ierr = 0
 
             ! some EOSes have composition partials and some do not
-            ! those currently without dx partials are PC & Skye
-            frac_without_dxa = s% eos_frac_PC(k) + s% eos_frac_Skye(k)
+            ! those currently without dx partials are PC & Skye & ideal
+            frac_without_dxa = s% eos_frac_PC(k) + s% eos_frac_Skye(k) + s% eos_frac_ideal(k)
             
             if (debug .and. k == s% solver_test_partials_k) then
               write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
               write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
+              write(*,2) 's% eos_frac_ideal(k)', k, s% eos_frac_ideal(k)
               write(*,2) 'frac_without_dxa', k, frac_without_dxa
             end if
 

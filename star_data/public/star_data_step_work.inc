@@ -109,7 +109,8 @@
       real(dp), pointer :: eos_frac_PC(:)
       real(dp), pointer :: eos_frac_FreeEOS(:)
       real(dp), pointer :: eos_frac_CMS(:)
-      
+      real(dp), pointer :: eos_frac_ideal(:)
+
       real(dp), pointer :: d_eos_dlnd(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dlnT(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dxa(:,:,:) ! (num_eos_d_dxa_results,species,nz)
