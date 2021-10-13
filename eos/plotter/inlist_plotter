@@ -97,8 +97,8 @@ use_simple_Skye_blends = .false.
   !### pick number of points
   ! values for non-xname, non-yname variables are ignored
 
-  nT = 50
-  nRho = 50
+  nT = 100
+  nRho = 100
   nX = 100
   nZ = 100
 
