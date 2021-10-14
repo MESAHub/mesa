@@ -4534,7 +4534,8 @@
                        facv2,facv3,facv4,rjv1,rjv2,spenc,snepc, &
                        exeta,zetan2,f0,etael5, &
                        qn1,ft,qn2, &
-                       qndeca,tmean
+                       qndeca,tmean, &
+                       rho_low_cutoff
       parameter        (qn1    = -2.0716446d-06, &
                         ft     = 1083.9269d0, &
                         qn2    = 2.0716446d-06, &
