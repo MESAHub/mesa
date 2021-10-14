@@ -4539,7 +4539,8 @@
                         ft     = 1083.9269d0, &
                         qn2    = 2.0716446d-06, &
                         qndeca = 1.2533036d-06, &
-                        tmean  = 886.7d0)
+                        tmean  = 886.7d0, &
+                        rho_low_cutoff = 1d-11)
       
 
 
@@ -4554,7 +4555,7 @@
       snep  = 0.0d0
       t9    = temp * 1.0d-9
 
-      if (t9 < lowT9_cutoff) return
+      if (t9 < lowT9_cutoff .or. rho < rho_low_cutoff) return
 
       iflag = 0
       qn    = qn1
