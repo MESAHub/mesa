@@ -4509,9 +4509,9 @@
       end subroutine n14_electron_capture_rate
 
 
-      subroutine ecapnuc(etakep,temp,rpen,rnep,spen,snep)
+      subroutine ecapnuc(etakep,temp,rho,rpen,rnep,spen,snep)
          use const_def
-      real(dp), intent(in) :: etakep,temp
+      real(dp), intent(in) :: etakep,temp,rho
       real(dp), intent(out) :: rpen,rnep,spen,snep
 
 !  given the electron degeneracy parameter etakep (chemical potential

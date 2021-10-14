@@ -304,7 +304,7 @@
             
             ierr = 0
             
-            call eval_ecapnuc_rate(eta, temp, rpen, rnep, spen, snep)
+            call eval_ecapnuc_rate(eta, temp, den, rpen, rnep, spen, snep)
             
             ratraw(irpen) = rpen
             dratrawdt(irpen) = 0
