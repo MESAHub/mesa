@@ -698,7 +698,7 @@
             
       end subroutine get_level5_for_eosdt
       
-      subroutine get_level6_for_eosdt( &  ! OPAL/SCVH
+      subroutine get_level6_for_eosdt( &  ! HELM/ideal
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T_in, logT_in, remaining_fraction, &

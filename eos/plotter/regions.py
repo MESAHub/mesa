@@ -21,11 +21,16 @@ with open('eos_plotter.dat') as f:
     xlabel = f.readline().strip()
     ylabel = f.readline().strip()
 
+# overwrite with fancier labels
+xlabel = r'$\log_{10}(\rho/{\rm g\,cm^{-3}})$'
+ylabel = r'$\log_{10}(T/{\rm K})$'
+title = r'MESA EOS Regions ($X=0.7$, $Z=0.02$)'
+
 eosDT, Yran, Xran = parse('eos_plotter.dat')
 
 # set up plot and labels
 fig, ax = plt.subplots(figsize=(5,4))
-ax.set_title('MESA EOS Regions')
+ax.set_title(title)
 ax.set_xlabel(xlabel)
 ax.set_ylabel(ylabel)
 ax.set_xlim(Xran.min(), Xran.max())
