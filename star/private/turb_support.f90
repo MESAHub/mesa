@@ -155,9 +155,25 @@ contains
 
    end subroutine do1_mlt_eval
 
+   type(auto_diff_real_star_order1) function Will_Psi(M) result(Psi)
+      type(auto_diff_real_star_order1), intent(in) :: M
+      real(dp), parameter :: A = 0.441d0
+      real(dp), parameter :: B = -0.533d0
+      real(dp), parameter :: C = 0.525d0
+      real(dp), parameter :: D = -0.473d0
+      real(dp), parameter :: F1A = -1.451d0
+      real(dp), parameter :: F1B = 0.465d0
+      real(dp), parameter :: F2A = -3.715d0
+      real(dp), parameter :: F2B = 0.067d0
+
+      Psi = 1d0 + (A * tanh(B * log10(M) + C) + D)
+      Psi = Psi / (1d0 + exp((-log10(M) + F1A)/F1B))
+!      Psi = Psi / (1d0 + exp((log10(M) + F2A)/F2B))
+   end function Will_Psi
+
 
    subroutine Get_results(s, k, MLT_option, &  ! NOTE: k=0 is a valid arg
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
+         r, L, T, P, opacity_in, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          alpha_semiconvection, thermohaline_coeff, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
@@ -166,7 +182,7 @@ contains
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
       type(auto_diff_real_star_order1), intent(in) :: &
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height
+         r, L, T, P, opacity_in, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height
       integer, intent(in) :: iso
       real(dp), intent(in) :: &
          XH1, cgrav, m, gradL_composition_term, &
@@ -175,7 +191,7 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       
-      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
+      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta, pseudoMach, Psi, opacity
       real(dp) :: conv_vel_start, scale
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
@@ -193,6 +209,17 @@ contains
       else
          gradL = grada
       end if
+
+      pseudoMach = (L / (4d0 * pi * crad * pow2(r) * pow4(T))) * sqrt(mp / (T * boltzm)) ! s%mu(k) * 
+      pseudoMach = max(pseudoMach,1d-10)
+      pseudoMach = min(pseudoMach,1d5)
+      Psi = Will_Psi(pseudoMach)
+      if (is_bad(Psi%val)) then
+         write(*,*) pseudoMach
+         write(*,*) Psi
+         stop
+      end if
+      opacity = opacity_in * Psi
 
       ! Initialize with no mixing
       mixing_type = no_mixing
