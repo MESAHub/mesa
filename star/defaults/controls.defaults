@@ -11559,6 +11559,7 @@
     x_ctrl(1:num_x_ctrls) = 0d0
     x_integer_ctrl(1:num_x_ctrls) = 0
     x_logical_ctrl(1:num_x_ctrls) = .false.
+    x_character_ctrl(1:num_x_ctrls) = ''
 
       ! One can split controls inlist into pieces using the following parameters.
       ! BTW: it works recursively, so the extras can read extras too.
