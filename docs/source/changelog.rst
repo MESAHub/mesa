@@ -373,8 +373,8 @@ Other changes
 
 * An ``other_screening`` hook was added.
 
-* All parts of test suite cases are now run by default.  To only run
-  the optional inlists, set the environment variable
+* All parts of test suite cases are now run by default.  To skip
+  running the optional inlists, set the environment variable
   ``MESA_SKIP_OPTIONAL`` (to any value).  Previously, optional parts
   were skipped by default, and running all parts required setting
   ``MESA_RUN_OPTIONAL``.
