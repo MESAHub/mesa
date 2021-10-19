@@ -443,36 +443,7 @@
          lnd = xh(s% i_lnd,k)
          rho =  exp(lnd)
       end subroutine get_rho_and_lnd_from_xh
-      
-      
-      real(dp) function get_rho_from_xh(s, k, xh_in) result(rho)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         rho =  exp(xh(s% i_lnd,k))
-      end function get_rho_from_xh
-      
-      
-      real(dp) function get_lnd_from_xh(s, k, xh_in) result(lnd)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         lnd = xh(s% i_lnd,k)
-      end function get_lnd_from_xh
-
-      
+            
       
       subroutine store_rho_in_xh(s, k, rho, xh_in)
          type (star_info), pointer :: s
@@ -2607,7 +2578,7 @@
          integer, intent(in) :: k
          real(dp) :: Ledd, gamma_factor, Lrad_div_Ledd, rmid, r003, rp13
          include 'formats'
-         if (s% fitted_fp_ft_i_rot .and. s% rotation_flag) then
+         if (s% rotation_flag) then
             ! Use equatorial radius (at center of cell by volume)
             r003 = s% r_equatorial(k)*s% r_equatorial(k)*s% r_equatorial(k)
             if (k < s% nz) then
@@ -2806,7 +2777,7 @@
             s% phase_of_evolution = phase_TP_AGB
          else if (center_he4 <= 1d-4) then
             s% phase_of_evolution = phase_TACHeB          
-         else if (s% center_eps_burn(i3alf) > Lsun) then
+         else if (s% center_eps_burn(i3alf) > 1d2) then
             s% phase_of_evolution = phase_ZACHeB
          else if (s% L_by_category(i3alf) > 1d2) then
             s% phase_of_evolution = phase_He_Burn
@@ -2829,17 +2800,7 @@
       subroutine set_rv_info(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: r2
          include 'formats'
-         r2 = s% r(k)*s% r(k)
-         if (s% using_velocity_time_centering) then
-            s% R2(k) = &
-               (r2 + s% r_start(k)*s% r(k) + s% r_start(k)*s% r_start(k))/3d0
-            s% d_R2_dlnR(k) = (2d0*r2 + s% r_start(k)*s% r(k))/3d0            
-         else
-            s% R2(k) = r2
-            s% d_R2_dlnR(k) = 2d0*r2
-         end if
          if (s% v_flag) then
             if (s% using_velocity_time_centering) then
                s% vc(k) = 0.5d0*(s% v_start(k) + s% v(k))

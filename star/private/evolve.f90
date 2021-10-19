@@ -114,7 +114,6 @@
             s% k_for_test_CpT_absMdot_div_L = -999
             s% k_below_just_added = -999
             s% termination_code = -999
-            s% burn_nfcn_total = -999
             s% dX_nuc_drop_max_k = -999
             s% dX_nuc_drop_max_j = -999
             s% solver_test_partials_var = -999

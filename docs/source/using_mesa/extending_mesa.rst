@@ -99,6 +99,9 @@ inlist (i.e., ``initial_mass``, ``xa_central_lower_limit``).  Recall that
 the list of controls is located in
 $MESA_DIR/star/defaults/controls.defaults.
 
+The ``s% xtra(1:30)`` array is a place to write temporary data of type ``real(dp)``
+which follow the logic of a time-step and so get carried over across restarts, restored in retries, etc.
+
 User-specified inlist controls
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

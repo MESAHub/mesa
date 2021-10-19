@@ -30,6 +30,7 @@
       use num_lib
       use utils_lib
       use star_private_def
+      use magnetic_diffusion
 
       implicit none
 
@@ -683,7 +684,7 @@
                end do
 
                ! conductive opacities for ST
-               if (s% D_ST_factor > 0) then
+               if (s% D_ST_factor > 0d0 .or. s% am_nu_factor > 0d0) then
                   do i = 1, nz
                      call kap_get_elect_cond_opacity( &
                         s% kap_handle, zbar(i), log10(rho(i)), log10(T(i)),  &
@@ -1151,36 +1152,11 @@
          do k = 2, nz-1
 
             xkap = 16d0*boltz_sigma*T(k)*T(k)*T(k)/ &
-                     (3d0*opacity(k)*rho(k)*rho(k)*Cp(k)) ! thermal diffusivity
-            xgamma = 0.2275d0*zbar(k)*zbar(k)*pow(rho(k)*1.d-6/abar(k),one_third)*1.d8/T(k)
-            xlg = log10(xgamma)
-            if (xlg < -1.5d0) then
-               xsig1 = sige1(zbar(k),T(k),xgamma)
-               xsig = xsig1
-            else if (xlg >= -1.5d0 .and. xlg <= 0d0) then
-               xxx = (xlg + 0.75d0)*4d0/3d0
-               ffff = 0.25d0*(2d0-3d0*xxx + xxx*xxx*xxx)
-               xsig1 = sige1(zbar(k),T(k),xgamma)
-               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
-               if (ierr /= 0) return
-               xsig = (1d0-ffff)*xsig2 + ffff*xsig1
-            else if (xlg > 0d0 .and. xlg < 0.5d0) then
-               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
-               if (ierr /= 0) return
-               xsig = xsig2
-            else if (xlg >= 0.5d0 .and. xlg < 1d0) then
-               xxx = (xlg-0.75d0)*4d0
-               ffff = 0.25d0*(2d0-3d0*xxx + xxx*xxx*xxx)
-               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
-               if (ierr /= 0) return
-               xsig3 = sige3(zbar(k),T(k),xgamma)
-               xsig = (1d0-ffff)*xsig3 + ffff*xsig2
-            else
-               xsig3 = sige3(zbar(k),T(k),xgamma)
-               xsig = xsig3
-            endif
+               (3d0*opacity(k)*rho(k)*rho(k)*Cp(k)) ! thermal diffusivity
 
-            xeta = 7.1520663d19/xsig ! magnetic diffusivity
+            xsig = calc_sige(abar(k), zbar(k), rho(k), T(k), Cp(k), kap_cond(k), opacity(k))
+            xeta = calc_eta(xsig)  ! magnetic diffusivity
+
             xmagn = N2(k)
             xmagnmu = N2_mu(k)
             xmagnt = xmagn - xmagnmu ! N2_T
@@ -1366,48 +1342,6 @@
             if (dc(k) < tiny) dc(k) = 0
          end do
       end subroutine zero_if_tiny
-
-
-      real(dp) function sige1(z,t,xgamma)
-         ! Written by S.-C. Yoon, Oct. 10, 2003
-         ! Electrical conductivity according to Spitzer 1962
-         ! See also Wendell et al. 1987, ApJ 313:284
-         real(dp), intent(in) :: z, t, xgamma
-         real(dp) :: etan, xlambda,f
-         if (t >= 4.2d5) then
-            f = sqrt(4.2d5/t)
-         else
-            f = 1.d0
-         end if
-         xlambda = sqrt(3d0*z*z*z)*pow(xgamma,-1.5d0)*f + 1d0
-         etan = 3.d11*z*log(xlambda)*pow(t,-1.5d0)             ! magnetic diffusivity
-         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0))) ! correction: gammae
-         sige1 = clight*clight/(pi4*etan)                    ! sigma = c^2/(4pi*eta)
-      end function sige1
-
-
-      real(dp) function sige2(T,rho,kap_cond,ierr)
-         ! writen by S.-C. YOON Oct. 10, 2003
-         ! electrical conductivity using conductive opacity
-         ! see Wendell et al. 1987 ApJ 313:284
-         real(dp), intent(in) :: t,rho,kap_cond
-         integer, intent(out) :: ierr
-         sige2 = 1.11d9*T*T/(rho*kap_cond)
-      end function sige2
-
-
-      real(dp) function sige3(z,t,xgamma)
-         ! writen by S.-C. YOON Oct. 10, 2003
-         ! electrical conductivity in degenerate matter,
-         ! according to Nandkumar & Pethick (1984)
-         real(dp), intent(in) :: z, t, xgamma
-         real(dp) :: rme, rm23, ctmp, xi
-         rme = 8.5646d-23*t*t*t*xgamma*xgamma*xgamma/pow5(z)  ! rme = rho6/mue
-         rm23 = pow(rme,2d0/3d0)
-         ctmp = 1d0 + 1.018d0*rm23
-         xi= sqrt(3.14159d0/3.)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
-         sige3 = 8.630d21*rme/(z*ctmp*xi)
-      end function sige3
 
 
       end module rotation_mix_info

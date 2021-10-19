@@ -8,6 +8,9 @@
 
 / ! end of star_job namelist
 
+&eos
+
+/ ! end of eos namelist
 
 &kap
 

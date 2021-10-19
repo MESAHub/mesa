@@ -493,12 +493,14 @@
                   ! recall that correction dx = B*xscale, so B is a relative correction
                   if (s% xa_start(i,k) >= x_limit) then
                      abs_corr = abs(B(j,k)*s% correction_weight(j,k))
-                     if (abs_corr > max_abs_corr_for_k) max_abs_corr_for_k = abs_corr
-                     if (abs_corr > max_abs_correction) then
-                        max_abs_correction = abs_corr
-                        max_correction = B(j,k)*s% correction_weight(j,k)
-                        max_zone = k
-                        max_var = j
+                     if (.not. s% ignore_species_in_max_correction) then
+                        if (abs_corr > max_abs_corr_for_k) max_abs_corr_for_k = abs_corr
+                        if (abs_corr > max_abs_correction) then
+                           max_abs_correction = abs_corr
+                           max_correction = B(j,k)*s% correction_weight(j,k)
+                           max_zone = k
+                           max_var = j
+                        end if
                      end if
                      sum_corr = sum_corr + abs_corr
                      num_terms = num_terms + 1
