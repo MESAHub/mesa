@@ -12,21 +12,14 @@
    use_momentum_outer_BC = .true.
    
    use_split_merge_amr = .true.
-   !use_split_merge_amr = .false.
-   !okay_to_remesh = .false.
 
-   !v_drag is set in run_star_extras
-   !q_for_v_drag_full_off = 0.98d0
-   !q_for_v_drag_full_on = 0.99d0
-   !v_drag is set in run_star_extras
-   q_for_v_drag_full_off = 2d0
-   q_for_v_drag_full_on = 2d0
+   max_q_for_convection_with_hydro_on = 0.99d0
 
    max_surface_cell_dq = 1d0
    split_merge_amr_dq_min = 1d-16
 
-   angsmt_D_ST = 0d0
-   angsmt_nu_ST = 0d0
+   !angsmt_D_ST = 0d0
+   !angsmt_nu_ST = 0d0
 
    max_mdot_redo_cnt = 0
 

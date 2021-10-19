@@ -36,11 +36,11 @@ fractions.
 This approach means that that EOS components have an order of
 precedence:
 
-    (CMS) > (Skye) > PC > FreeEOS > OPAL/SCVH > HELM.
+    (CMS) > Skye > PC > FreeEOS > OPAL/SCVH > HELM.
 
 EOS components in parentheses are experimental and off by default.
 
-.. figure:: eos_regions_x072_z002.png
+.. figure:: eos_regions_x070_z002.png
    :alt: EOS blends in solar-like compositions
 
    The :math:`\rho-T` coverage of the EOS for a solar-like composition.
@@ -202,16 +202,16 @@ CMS is the EOS for dense H/He mixtures of |CMS|.
 
 
 
-.. |CMS| replace:: `Chabrier, Mazevet, & Soubiran (2019) <https://ui.adsabs.harvard.edu/abs/2019ApJ...872...51C/abstract>`__
+.. |CMS| replace:: `Chabrier, Mazevet, & Soubiran (2019) <https://ui.adsabs.harvard.edu/abs/2019ApJ...872...51C>`__
 
-.. |SCVH| replace:: `(Saumon, Chabrier, & van Horn 1995) <https://ui.adsabs.harvard.edu/abs/1995ApJS...99..713S/abstract>`__
+.. |SCVH| replace:: `(Saumon, Chabrier, & van Horn 1995) <https://ui.adsabs.harvard.edu/abs/1995ApJS...99..713S>`__
 
-.. |OPAL| replace:: `(Rogers & Nayfonov 2002) <https://ui.adsabs.harvard.edu/abs/2002ApJ...576.1064R/abstract>`__
+.. |OPAL| replace:: `(Rogers & Nayfonov 2002) <https://ui.adsabs.harvard.edu/abs/2002ApJ...576.1064R>`__
                     
-.. |HELM| replace:: `(Timmes & Swesty 2000) <https://ui.adsabs.harvard.edu/abs/2000ApJS..126..501T/abstract>`__
+.. |HELM| replace:: `(Timmes & Swesty 2000) <https://ui.adsabs.harvard.edu/abs/2000ApJS..126..501T>`__
 
-.. |PC| replace:: `(Potekhin & Chabrier 2010) <https://ui.adsabs.harvard.edu/abs/2010CoPP...50...82P/abstract>`__
+.. |PC| replace:: `(Potekhin & Chabrier 2010) <https://ui.adsabs.harvard.edu/abs/2010CoPP...50...82P>`__
 
 .. |FreeEOS| replace:: `(Alan W. Irwin) <http://freeeos.sourceforge.net/>`__
 
-.. |Skye| replace:: `(Jermyn et al. 2021) <https://ui.adsabs.harvard.edu/abs/2021ApJ...913...72J/abstract/>`__
+.. |Skye| replace:: `(Jermyn et al. 2021) <https://ui.adsabs.harvard.edu/abs/2021ApJ...913...72J>`__

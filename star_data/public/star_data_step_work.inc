@@ -294,10 +294,9 @@
          d_extra_jdot_domega_p1, d_extra_omegadot_domega_p1
 
       ! velocity time centering
-      real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
+      real(dp), pointer, dimension(:) :: vc
       real(dp) :: d_vc_dv
    
-      
       ! gravitational constant (can be set by user and can be vary within model)
       real(dp), pointer :: cgrav(:)      
       
@@ -390,10 +389,7 @@
 
          real(dp), pointer, dimension(:) :: &
             Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
-            Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &           
-            Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
-               d_Chi_dv00, d_Chi_dvp1, d_Chi_dlnR00, d_Chi_dlnRp1, &
-            f_Edd
+            Fr, Fr_start, Lc_start, Ptrb_start, Chi_start, f_Edd
          integer :: RSP_num_periods
          real(dp) :: RSP_dt, RSP_period, g_Edd, &
             rsp_DeltaR, rsp_DeltaMag, rsp_GRPDV, rsp_GREKM, rsp_GREKM_avg_abs
@@ -476,9 +472,7 @@
          d_uface_domega, &
          RTI_du_diffusion_kick, &
          u_face_start
-      real(dp), pointer, dimension(:) :: &
-         d_Pface_domega, &
-         P_face_start
+      real(dp), pointer, dimension(:) :: P_face_start
       real(dp), pointer, dimension(:) :: &
          abs_du_div_cs, &
          abs_du_plus_cs
@@ -839,7 +833,6 @@
          real(dp), pointer :: Cv_start(:) ! (nz)
          real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
-         real(dp), pointer :: eta_start(:) ! (nz)
          real(dp), pointer :: T_start(:) ! (nz)
          real(dp), pointer :: mu_start(:) ! (nz)
          real(dp), pointer :: phase_start(:) ! (nz)
@@ -1008,7 +1001,6 @@
          integer, pointer, dimension(:) :: burn_num_iters
 
          integer :: termination_code
-         integer :: burn_nfcn_total
          integer :: dX_nuc_drop_max_k
          integer :: dX_nuc_drop_max_j
          integer :: solver_test_partials_var

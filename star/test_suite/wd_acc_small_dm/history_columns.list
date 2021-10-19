@@ -257,9 +257,6 @@
 
       !h_rich_layer_mass ! = star_mass - he_core_mass
       !he_rich_layer_mass ! = he_core_mass - c_core_mass
-      !c_rich_layer_mass ! = c_core_mass - o_core_mass
-      !o_rich_layer_mass ! = o_core_mass - si_core_mass
-      !si_rich_layer_mass ! = si_core_mass - fe_core_mass
    
    
 
@@ -274,19 +271,14 @@
       !mdot_timescale ! star_mass/abs(star_mdot) (years)
       !kh_div_mdot_timescales ! kh_timescale/mdot_timescale
       !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
-      !log_chem_timescale ! burn+mix timescale (years)
          ! approximately min over all cells k and species i of x(i,k)/abs(dxdt_mix + dxdt_burn)
-      !log_chem_timescale_div_time_step
-      !log_cell_collapse_timescale
 
    ! integrated power
    
       !power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
       !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
-      !power_c_burn ! total thermal power from carbon burning, excluding neutrinos (in Lsun units)
       log_LH ! log10 power_h_burn
       log_LHe ! log10 power_he_burn
-      !log_LC ! log10 power_c_burn
       log_LZ ! log10 total burning power including LC, but excluding LH and LHe and photodisintegrations
       log_Lnuc ! log(LH + LHe + LZ)
       !log_Lnuc_sub_log_L
@@ -509,19 +501,9 @@
 
    
    ! info at location of max temperature
-      !max_T_lgT
-      !max_T_mass ! (Msun)
-      !max_T_radius ! (Rsun)
-      !max_T_lgRho
-      !max_T_lgP
-      !max_T_entropy
-      !max_T_L ! (Lsun)
-      !max_T_eps_nuc ! (erg/g/s)
-      !max_T_lgP_thin_shell ! log10(G*Mcore*Menv/(4*pi*Rcore^4))
          ! Mcore = Msun*max_T_mass,
          ! Menv = Msun*(star_mass - max_T_mass),
          ! Rcore = Rsun*max_T_radius
-      !max_T_shell_binding_energy ! integral from max_T out
 
    
    ! info at location of max abs velocity
@@ -618,13 +600,7 @@
       !dt_div_dt_cell_collapse
 
       
-      !dt_explicit ! max dt for an explicit code (sec)
          ! min over all cells of min(dr/csound, dr^2/max(D_mix,eta_RTI))
-      !log_dt_explicit ! log10 min dr_div_csound (sec)
-      !dt_explicit_yr ! dt_explicit (years)
-      !log_dt_explicit_yr ! log10 min dr_div_csound (years)
-      !dt_div_dt_explicit
-      !log_dt_div_dt_explicit
       
       
       
@@ -649,13 +625,7 @@
       !gradT_excess_max_lambda 
             
             
-      !k_below_Eulerian_eps_grav
-      !q_below_Eulerian_eps_grav
-      !logxq_below_Eulerian_eps_grav
             
-      !k_Lagrangian_eps_grav
-      !q_Lagrangian_eps_grav
-      !logxq_Lagrangian_eps_grav
             
       !k_below_const_q
       !q_below_const_q
@@ -673,11 +643,7 @@
       !q_for_test_CpT_absMdot_div_L
       !logxq_for_test_CpT_absMdot_div_L
 
-      !k_CpTMdot_lt_L
-      !q_CpTMdot_lt_L
-      !logxq_CpTMdot_lt_L
       
-      !surface_extra_Pgas
 
 
       !log_max_T ! temperature

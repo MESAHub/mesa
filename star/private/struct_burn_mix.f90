@@ -318,7 +318,6 @@
             s% dE_dRho_start(k) = s% dE_dRho(k)
             s% gam_start(k) = s% gam(k)
             s% lnS_start(k) = s% lnS(k)
-            s% eta_start(k) = s% eta(k)
             s% zbar_start(k) = s% zbar(k)
             s% mu_start(k) = s% mu(k)
             s% phase_start(k) = s% phase(k)
@@ -444,7 +443,6 @@
 
 
       subroutine set_surf_info(s, nvar) ! set to values at start of step
-         use star_utils, only: get_lnd_from_xh, get_lnT_from_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          s% surf_lnS = s% lnS(1)
@@ -1260,6 +1258,13 @@
             integer :: j, i
             include 'formats'
             ierr = 0
+            ! This routine does nothing other than set ierr = 0,
+            ! but we need an empty routine here because
+            ! net_1_zone_burn_const_density
+            ! expects to be passed a routine burn_finish_substep,
+            ! and often that will be a routine that actually does something,
+            ! but here we don't want to do anything.
+
             !step_time = time - substep_start_time
             !if (step_time <= 0d0) return
             !frac = step_time/dt

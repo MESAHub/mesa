@@ -109,14 +109,14 @@
   X_center = 0.70
   Z_center = 0.02
 
-  ! delta_X = 0.1
-  ! delta_Z = 0.1
+  delta_X = 0.1
+  delta_Z = 0.1
 
-  ! X_min = 0
-  ! X_max = 1
+  X_min = 0
+  X_max = 1
 
-  ! Z_min = 0
-  ! Z_max = 0.1
+  Z_min = 0
+  Z_max = 0.1
 
   ! logT_center = 7.3d0
   ! logRho_center = 0d0
@@ -124,10 +124,10 @@
   ! delta_logT = 0.1
   ! delta_logRho = 0.1
 
-  logT_min = 4
-  logT_max = 9
+  logT_min = 2
+  logT_max = 10
 
-  logRho_min = -10
+  logRho_min = -15
   logRho_max = 10
 
 

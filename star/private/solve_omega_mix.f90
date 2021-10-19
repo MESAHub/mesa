@@ -50,7 +50,7 @@
          real(qp) :: remaining_time, total_time, time, dt, &
             J_tot0, J_tot1, max_del, avg_del, &
             tol_correction_max, tol_correction_norm
-         real(dp) :: total, dt_dble
+         real(dp) :: total
          real(dp), pointer, dimension(:) :: am_sig_omega, am_sig_j
          real(qp), pointer, dimension(:) :: &
             du, d, dl, x, b, bp, vp, xp, dX, X_0, X_1, rhs, del

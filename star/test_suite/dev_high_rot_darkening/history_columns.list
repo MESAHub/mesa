@@ -236,9 +236,6 @@
 
       !h_rich_layer_mass ! = star_mass - he_core_mass
       !he_rich_layer_mass ! = he_core_mass - c_core_mass
-      !c_rich_layer_mass ! = c_core_mass - o_core_mass
-      !o_rich_layer_mass ! = o_core_mass - si_core_mass
-      !si_rich_layer_mass ! = si_core_mass - fe_core_mass
    
    
 
@@ -253,10 +250,7 @@
       !mdot_timescale ! star_mass/abs(star_mdot) (years)
       !kh_div_mdot_timescales ! kh_timescale/mdot_timescale
       !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
-      !log_chem_timescale ! burn+mix timescale (years)
          ! approximately min over all cells k and species i of x(i,k)/abs(dxdt_mix + dxdt_burn)
-      !log_chem_timescale_div_time_step
-      !log_cell_collapse_timescale
 
    ! integrated power
    
@@ -298,13 +292,8 @@
       !log_Ledd
       !log_L_div_Ledd ! log10(L/Leddington)
       !lum_div_Ledd
-      !log_surf_opacity
-      !log_surf_P
-      !log_surf_temperature
-      !surface_temperature
       !log_surf_optical_depth
       !surface_optical_depth
-      !log_surf_z
       
       surf_avg_j_rot
       surf_avg_omega
@@ -345,14 +334,12 @@
       
       !center_eps_grav
       !center_non_nuc_neu
-      !center_dL_dm
       !center_eps_nuc
       !d_center_eps_nuc_dlnT
       !d_center_eps_nuc_dlnd
       !log_center_eps_nuc
       
       !center_entropy ! in units of kerg per baryon
-      !iron_core_infall ! max infall velocity at any location with Ye < 0.485 (km/sec)
       
       !compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
       
@@ -459,12 +446,6 @@
 
    
    ! info at location of max temperature
-      !max_T_lgT
-      !max_T_mass ! (Msun)
-      !max_T_radius ! (Rsun)
-      !max_T_lgRho
-      !max_T_L ! (Lsun)
-      !max_T_eps_nuc ! (erg/g/s)
    
    ! asteroseismology
       !delta_nu ! large frequency separation for p-modes (microHz)
@@ -512,12 +493,6 @@
       !max_gradT_sub_grada
       !min_log_mlt_Gamma
       
-      !dt_Courant ! min dr_div_csound (sec) -- min cell sound crossing time
-      !log_dt_Courant ! log10 min dr_div_csound (sec)
-      !dt_Courant_yr ! min dr_div_csound (years)
-      !log_dt_Courant_yr ! log10 min dr_div_csound (years)
-      !dt_div_dt_Courant
-      !log_dt_div_dt_Courant
       
       !h1_czb_mass ! location (in Msun units) of base of 1st convection zone above he core 
       
@@ -544,21 +519,9 @@
       !q_below_just_added 
       !logxq_below_just_added 
             
-      !k_below_recently_added
-      !q_below_recently_added
-      !logxq_below_recently_added
             
-      !k_thermaltime_eq_accretiontime
-      !q_thermaltime_eq_accretiontime
-      !logxq_thermaltime_eq_accretiontime
             
-      !k_below_mdot_eps_grav
-      !q_below_mdot_eps_grav
-      !logxq_below_mdot_eps_grav
       
-      !k_top_adjust_mass_transition 
-      !q_top_adjust_mass_transition 
-      !logxq_top_adjust_mass_transition 
 
       !log_max_T ! temperature
       !max_T
