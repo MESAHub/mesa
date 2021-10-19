@@ -125,7 +125,7 @@ module ideal
       F_coul = 0d0
       
       ! No electrons, so extreme negative chemical potential
-      etaele = -1d99
+      etaele = -1d42
       xnefer = 1d-99
 
       ! no latent heat
