@@ -26,6 +26,7 @@
       module net_approx21
       use const_def, only: dp, qp, avo, clight
       use utils_lib, only: is_bad, mesa_error
+      use math_lib
 
 
       implicit none
@@ -931,12 +932,12 @@
 
          subroutine approx21_dydt( &
             y, rate, ratdum, dydt, deriva, &
-            fe56ec_fake_factor_in, min_T, fe56ec_n_neut, temp, plus_co56, ierr)
+            fe56ec_fake_factor_in, min_T, fe56ec_n_neut, temp, den, plus_co56, ierr)
          logical, intent(in) :: deriva ! false for dydt, true for partials wrt T, Rho
          real(dp), dimension(:), intent(in) :: y, rate, ratdum
          integer, intent(in) :: fe56ec_n_neut
          real(dp), dimension(:), intent(out) :: dydt
-         real(dp), intent(in) :: fe56ec_fake_factor_in, temp
+         real(dp), intent(in) :: fe56ec_fake_factor_in, temp, den
          real(dp) :: fe56ec_fake_factor, min_T
          logical, intent(in) ::  plus_co56
          integer, intent(out) :: ierr
@@ -955,8 +956,11 @@
          ierr = 0
 
          ! Turn on special fe56ec rate above some temperature
-         fe56ec_fake_factor=eval_fe56ec_fake_factor(fe56ec_fake_factor_in, min_T, temp)
-         
+         fe56ec_fake_factor = 0d0
+         if(.not.deriva) then
+            fe56ec_fake_factor = eval_fe56ec_fake_factor(fe56ec_fake_factor_in, min_T, temp)
+         end if
+
          dydt(1:species(plus_co56)) = 0.0d0
          qray(1:species(plus_co56)) = 0.0_qp
 
@@ -1534,6 +1538,10 @@
             end if
          end do
          if (.not. okay) then
+
+            write(*,*) 'log10(temp) = ',safe_log10(temp)
+            write(*,*) 'log10(rho) = ',safe_log10(den)
+
             do i=1,num_reactions(plus_co56)
                write(*,*) trim(ratnam(i)), i, rate(i)
             end do
@@ -2608,11 +2616,11 @@
          
          subroutine approx21_dfdT_dfdRho( & ! epstotal includes neutrinos
                y, mion, dfdy, ratdum, dratdumdt, dratdumdd, &
-               fe56ec_fake_factor, min_T, fe56ec_n_neut, temp, &
+               fe56ec_fake_factor, min_T, fe56ec_n_neut, temp, den, &
                dfdT, dfdRho, d_epstotal_dy,  plus_co56, ierr)
             real(dp), intent(in), dimension(:) :: &
                y, mion, ratdum, dratdumdt, dratdumdd
-            real(dp), intent(in) :: fe56ec_fake_factor, min_T, temp, dfdy(:,:)
+            real(dp), intent(in) :: fe56ec_fake_factor, min_T, temp, den, dfdy(:,:)
             integer, intent(in) :: fe56ec_n_neut
             real(dp), intent(inout), dimension(:) :: d_epstotal_dy, dfdT, dfdRho
             logical, intent(in) ::  plus_co56
@@ -2626,14 +2634,14 @@
             dfdT(1:species(plus_co56)) = 0d0
             call approx21_dydt( &
                y,dratdumdt,ratdum,dfdT,deriva,&
-               fe56ec_fake_factor,min_T,fe56ec_n_neut,temp,plus_co56,ierr)
+               fe56ec_fake_factor,min_T,fe56ec_n_neut,temp,den,plus_co56,ierr)
             if (ierr /= 0) return
 
             ! density dependence of the rate equations
             dfdRho(1:species(plus_co56)) = 0d0
             call approx21_dydt( &
                y,dratdumdd,ratdum,dfdRho,deriva,&
-               fe56ec_fake_factor,min_T,fe56ec_n_neut,0d0,plus_co56,ierr)
+               fe56ec_fake_factor,min_T,fe56ec_n_neut,temp,den,plus_co56,ierr)
             if (ierr /= 0) return
 
             ! energy generation rate partials (total energy; do neutrinos elsewhere)
