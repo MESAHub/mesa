@@ -39,6 +39,8 @@
       integer, parameter :: FIXED_PT_MODE = 5
       integer, parameter :: FIXED_DT_MODE = 6      
 
+      real(dp), parameter :: eos_phase_boundary = 0.9d0
+      
       contains
 
 
@@ -54,7 +56,7 @@
 
          do_premix = .true.
 
-         if(s% phase(s% nz) < 0.5d0) then
+         if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
          end if
@@ -65,7 +67,7 @@
          ! Find zone of phase transition from liquid to solid
          k_bound = -1
          do k = s%nz,1,-1
-            if(s% phase(k-1) <= 0.5d0 .and. s% phase(k) > 0.5d0) then
+            if(s% phase(k-1) <= eos_phase_boundary .and. s% phase(k) > eos_phase_boundary) then
                k_bound = k
                exit
             end if
@@ -97,7 +99,7 @@
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
-               if(s% phase(k) <= 0.5d0) then
+               if(s% phase(k) <= eos_phase_boundary) then
                   k_new = k+1 ! one zone inward from where material becomes liquid
                   s% crystal_core_boundary_mass = s% m(k+1)
                   exit
@@ -164,20 +166,21 @@
         
       end subroutine move_one_zone
       
-      ! mix composition outward until no more positive O gradient
-      ! (maybe should be generalized to no negative molecular weight gradient?)
+      ! mix composition outward until no more negative molecular weight gradient
       subroutine mix_outward(s,kbot)
-        use chem_def, only: chem_isos, ic12, io16
+        use chem_def, only: chem_isos, ihe4, ic12, io16
 
         type(star_info), pointer :: s
         integer, intent(in)      :: kbot
         
         real(dp) :: avg_xa(s%species)
-        real(dp) :: mass
-        integer :: k, l, ktop, net_io16
+        real(dp) :: mass, XHe_out, dXC_top, dXC_bot, dXO_top, dXO_bot
+        integer :: k, l, ktop, net_ihe4, net_ic12, net_io16
         integer :: update_mode(s%nz)
         
         update_mode(:) = FIXED_DT_MODE
+        net_ihe4 = s% net_iso(ihe4)
+        net_ic12 = s% net_iso(ic12)
         net_io16 = s% net_iso(io16)
 
         do k=kbot,1,-1
@@ -192,9 +195,27 @@
            ! avg_xa = MAX(MIN(avg_xa, 1._dp), 0._dp)
            ! avg_xa = avg_xa/SUM(avg_xa)
 
-           do l = 1, s%species
-              s%xa(l,ktop:kbot) = avg_xa(l)
-           end do
+           XHe_out = max(s%xa(net_ihe4,ktop),s%xa(net_ihe4,ktop-1))
+           if(XHe_out < s% eos_rq% mass_fraction_limit_for_Skye) then
+              ! ok to mix all species
+              do l = 1, s%species
+                 s%xa(l,ktop:kbot) = avg_xa(l)
+              end do
+           else
+              ! Mixing He can cause energy problems for eps_phase_separation
+              ! when using Skye, so once we encounter enough He that it is
+              ! included in Skye energy calculation, stop mixing all species.
+              ! Instead, just flatten out the O16 profile, and mix in exchange
+              ! for C12.
+              dXO_top = avg_xa(net_io16) - s%xa(net_io16,ktop)
+              dXO_bot = avg_xa(net_io16) - s%xa(net_io16,kbot)
+              s%xa(net_io16,ktop:kbot) = avg_xa(net_io16)
+              dXC_top = -dXO_top
+              dXC_bot = -dXO_bot
+              s%xa(net_ic12,ktop) = s%xa(net_ic12,ktop) + dXC_top
+              s%xa(net_ic12,ktop+1:kbot) = s%xa(net_ic12,kbot) + dXC_bot
+           end if
+
 
            ! updates, eos, opacities, mu, etc now that abundances have changed,
            ! but only in the cells near the boundary where we need to check here.
