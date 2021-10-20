@@ -1,6 +1,5 @@
 
-      character(len=7) :: version_number ! mesa version from file $MESA_DIR/data/version_number
-         ! truncate to 7 characters for ease of use, instead of the full hash
+      character(len=24) :: version_number ! mesa version from file $MESA_DIR/data/version_number
       
       integer, parameter :: star_def_version = 16
       
