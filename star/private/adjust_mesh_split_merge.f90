@@ -172,11 +172,9 @@
          if (s% rotation_flag) then !update moments of inertia and omega
             do k=1, s% nz
                r00 = get_r_from_xh(s,k)
-               if (s% fitted_fp_ft_i_rot) then
-                  s% w_div_w_crit_roche(k) = &
-                     w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
-                     s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-               end if
+               s% w_div_w_crit_roche(k) = &
+                  w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
+                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
                call update1_i_rot_from_xh(s, k)
                s% omega(k) = s% j_rot(k)/s% i_rot(k)
             end do

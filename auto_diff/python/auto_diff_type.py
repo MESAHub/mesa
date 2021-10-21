@@ -7,8 +7,8 @@ from sympy import symbols
 class AutoDiffType:
 	def __init__(self, name, array, array_length, partials):
 		'''
-		Stores a list of partials that is complete (from the perspective of using the chain rule)
-		and sorted.
+		Stores a list of partials that is complete, in the sense that there is enough information
+		to compute the chain rule within that set of partials, and sorted by total order.
 		'''
 
 		self.name = name	

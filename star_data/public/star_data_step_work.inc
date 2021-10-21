@@ -472,9 +472,7 @@
          d_uface_domega, &
          RTI_du_diffusion_kick, &
          u_face_start
-      real(dp), pointer, dimension(:) :: &
-         d_Pface_domega, &
-         P_face_start
+      real(dp), pointer, dimension(:) :: P_face_start
       real(dp), pointer, dimension(:) :: &
          abs_du_div_cs, &
          abs_du_plus_cs

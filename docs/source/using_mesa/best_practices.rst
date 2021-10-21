@@ -475,7 +475,7 @@ briefly summarize these, including appropriate citations.
   \citet{Poutanen2017}.  Electron conduction opacities are from
   \citet{Cassisi2007}.
   
-  Nuclear reaction rates are from JINA REACLIB \citep{Cyburt2010} plus
+  Nuclear reaction rates are from JINA REACLIB \citep{Cyburt2010}, NACRE \citep{Angulo1999} and
   additional tabulated weak reaction rates \citet{Fuller1985, Oda1994,
   Langanke2000}.  Screening is included via the prescription of \citet{Chugunov2007}.
   Thermal neutrino loss rates are from \citet{Itoh1996}.
