@@ -1265,7 +1265,7 @@
                s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          end if
 
-         call eval_i_rot(s, k, r00, r00, r00, w_div_wcrit_roche,&
+         call eval_i_rot(s, k, r00, w_div_wcrit_roche,&
             s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
 
       end subroutine set1_irot

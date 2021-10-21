@@ -156,9 +156,8 @@
       real(dp), pointer :: r_equatorial(:) ! radius in equatorial direction    
       real(dp) :: rotational_mdot_boost
 
-      ! angular momentum fluxes and their partials
-      real(dp), pointer :: j_flux(:), dj_flux_dw00(:), dj_flux_dwp1(:), dj_flux_dj00(:), dj_flux_djp1(:), &
-         dj_flux_dlnr00(:), dj_flux_dlnrp1(:), dj_flux_dlnd(:)
+      ! angular momentum fluxes
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: j_flux(:)
            
       real(dp), pointer :: am_nu_rot(:)
       real(dp), pointer :: am_nu_non_rot(:) ! diffusion driven by other sources, e.g. convection

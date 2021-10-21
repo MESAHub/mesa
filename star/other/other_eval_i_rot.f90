@@ -37,9 +37,9 @@
             
       contains
 
-      subroutine null_other_eval_i_rot(id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
-         integer, intent(in) :: id
-         real(dp), intent(in) :: ri,r00,ra,w_div_w_crit_roche
+      subroutine null_other_eval_i_rot(id,k,r00,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+         integer, intent(in) :: id, k
+         real(dp), intent(in) :: r00,w_div_w_crit_roche
          real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
 
          i_rot = 0

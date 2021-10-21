@@ -182,21 +182,18 @@
 
       end function w_div_w_roche_jrot
 
-      ! inner radius of shell ri
-      ! outer radius of shell ra
-      subroutine eval_i_rot(s,k,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+      subroutine eval_i_rot(s,k,r00,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k ! just for debugging
-         real(dp), intent(in) :: ri,r00,ra,w_div_w_crit_roche
+         real(dp), intent(in) :: r00,w_div_w_crit_roche
          real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
 
          type(auto_diff_real_2var_order1) :: ir, r, re, w, w2, w4, w6, lg_one_sub_w4, B, A
-         type(auto_diff_real_2var_order1) :: rai,ra2,ri2,rm2
 
          include 'formats'
          if (s% use_other_eval_i_rot) then
-            call s% other_eval_i_rot(s% id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+            call s% other_eval_i_rot(s% id,k,r00,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
          else if (s% simple_i_rot_flag) then
             i_rot = (2d0/3d0)*r00*r00
             di_rot_dlnr = 2*i_rot
@@ -209,9 +206,9 @@
             r = r00
             r%d1val2 = r00 ! Makes the independent variable lnR
 
-            w2 = pow2(w_div_w_crit_roche)
-            w4 = pow4(w_div_w_crit_roche)
-            w6 = pow6(w_div_w_crit_roche)
+            w2 = pow2(w)
+            w4 = pow4(w)
+            w6 = pow6(w)
             lg_one_sub_w4 = log(1d0-w4)
             re = r*(1d0+w2/6d0-0.0002507d0*w4+0.06075d0*w6)
             B = (1d0+w2/5d0-0.2735d0*w4-0.4327d0*w6-3d0/2d0*0.5583d0*lg_one_sub_w4)
@@ -240,13 +237,8 @@
                   w_div_w_roche_jrot(s% r(k),s% m(k),s% j_rot(k),s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             end if
-            if (k==1) then
-               call eval_i_rot(s, k, s% rmid(1), s% r(1), s% r(1), s% w_div_w_crit_roche(1), &
-                  s% i_rot(1), s% di_rot_dlnr(1), s% di_rot_dw_div_wc(1))
-            else
-               call eval_i_rot(s, k, s% rmid(k), s% r(k), s% rmid(k-1), s% w_div_w_crit_roche(k), &
-                  s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
-            end if
+            call eval_i_rot(s, k, s% r(k), s% w_div_w_crit_roche(k), &
+               s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
          end do
 !$OMP END PARALLEL DO
 
@@ -315,7 +307,7 @@
 
          r00 = get_r_from_xh(s,k)
 
-         call eval_i_rot(s, k, r00, r00, r00, s% w_div_w_crit_roche(k), &
+         call eval_i_rot(s, k, r00, s% w_div_w_crit_roche(k), &
             s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
       end subroutine update1_i_rot_from_xh
 
@@ -782,55 +774,15 @@
 
       end subroutine eval_fp_ft
 
-
-      subroutine rad_fcn(n, x, h, y, dydx, lrpar, rpar, lipar, ipar, ierr)
-         integer, intent(in) :: n, lrpar, lipar
-         real(dp), intent(in) :: x, h
-         real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout) :: dydx(:) ! (n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
-         real(dp) :: rov
-         ierr = 0
-         rov = rpar(1)
-         dydx(1)=(6.d0-6.d0*rov*(y(1)+1.d0)-y(1)*(y(1)-1.d0))
-      end subroutine rad_fcn
-
-
-
-      real(dp) function psiint(rho, xm, aw, eta, r0_in, r0_out)
-         real(dp), intent(in) :: rho, xm, aw, eta, r0_in, r0_out
-         psiint=rho*(pow8(r0_out)-pow8(r0_in))/xm
-         psiint=psiint*(5.d0+eta)/(2.d0+eta)*0.125d0*aw*aw
-      end function psiint
-
-
-      real(dp) function gpsi(cgrav, rnu, tegra, kr, a, wr, xm_out, rae)
-         ! rnu = r0; tegra = integral in A9; kr is the theta index
-         real(dp), intent(in) :: cgrav(:), rnu, tegra, a, wr, xm_out
-         real(dp), intent(inout) :: rae(:)
-         integer, intent(in) :: kr
-         real(dp) :: r, ri, ri2, wr2, dpdr, dpdthe
-         r= rnu * (1.d0 - a*utheta(kr))
-         ri=1.0d0/r
-         ri2=ri*ri
-         wr2=wr*wr
-         rae(kr)=r
-         dpdr=-cgrav(kr)*xm_out*ri2 +pi4*ri2*ri2*utheta(kr)*tegra +wr2*r*sint2(kr)
-            ! dpsi/dr from A9
-         dpdthe= (pi4*ri2*ri*tegra + (wr2*r*r))*cost(kr)*sint(kr)
-            ! dpsi/dtheta from A9
-         gpsi=dsqrt(dpdr*dpdr+(dpdthe*dpdthe*ri2)) !   E&S, A14
-      end function gpsi
-
       subroutine compute_j_fluxes_and_extra_jdot(id, ierr)
+         use auto_diff_support
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: omega00, omegap1, r00, rp1, i_rot00, i_rotp1, rho00, part1
 
          integer :: k
-         real(dp) :: pi2_div4, part1
+         real(dp) :: pi2_div4
          ierr = 0
 
          call star_ptr(id, s, ierr)
@@ -859,38 +811,44 @@
 
          pi2_div4 = pow2(pi)/4d0
          do k=1, s% nz-1
-            part1 = -pi2_div4*pow4(s% r(k)+s% r(k+1))*pow2(s% rho(k))*(s% i_rot(k)+s% i_rot(k+1))*(s% am_nu_omega(k)+s% am_nu_omega(k+1))
-            s% j_flux(k) = part1*(s% omega(k)-s% omega(k+1))/s% dm(k)
 
-            s% dj_flux_dw00(k) = s% j_flux(k)/(s% i_rot(k)+s% i_rot(k+1))*s% di_rot_dw_div_wc(k) &
-               -part1*s% j_rot(k)/pow2(s% i_rot(k))*s% di_rot_dw_div_wc(k)/s% dm(k)
-            s% dj_flux_dwp1(k) = s% j_flux(k)/(s% i_rot(k)+s% i_rot(k+1))*s% di_rot_dw_div_wc(k+1) &
-               +part1*s% j_rot(k+1)/pow2(s% i_rot(k+1))*s% di_rot_dw_div_wc(k+1)/s% dm(k)
+            r00 = wrap_r_00(s, k)
+            rp1 = wrap_r_p1(s, k)
+            rho00 = wrap_d_00(s, k)
 
-            s% dj_flux_dj00(k) = part1/s% i_rot(k)/s% dm(k)
-            s% dj_flux_djp1(k) = -part1/s% i_rot(k+1)/s% dm(k)
+            omega00 = 0d0
+            omega00% val = s% omega(k)   
+            omega00% d1Array(i_jrot_00) = 1d0/s% i_rot(k)
+            omega00% d1Array(i_lnR_00) = -s% j_rot(k)/pow2(s% i_rot(k))*s% di_rot_dlnr(k)
+            omega00% d1Array(i_w_div_wc_00) = -s% j_rot(k)/pow2(s% i_rot(k))*s% di_rot_dw_div_wc(k)
+            omegap1 = 0d0
+            omegap1% val = s% omega(k+1)   
+            omegap1% d1Array(i_jrot_p1) = 1d0/s% i_rot(k+1)
+            omegap1% d1Array(i_lnR_p1) = -s% j_rot(k+1)/pow2(s% i_rot(k+1))*s% di_rot_dlnr(k+1)
+            omegap1% d1Array(i_w_div_wc_p1) = -s% j_rot(k+1)/pow2(s% i_rot(k+1))*s% di_rot_dw_div_wc(k+1)
 
-            s% dj_flux_dlnr00(k) = 4d0*s% j_flux(k)/(s% r(k)+s% r(k+1))*s% r(k) &
-               + s% j_flux(k)/(s% i_rot(k)+s% i_rot(k+1))*s% di_rot_dlnr(k) &
-               -part1*s% j_rot(k)/pow2(s% i_rot(k))*s% di_rot_dlnr(k)/s% dm(k)
-            s% dj_flux_dlnrp1(k) = 4d0*s% j_flux(k)/(s% r(k)+s% r(k+1))*s% r(k+1) &
-               + s% j_flux(k)/(s% i_rot(k)+s% i_rot(k+1))*s% di_rot_dlnr(k+1) &
-               +part1*s% j_rot(k+1)/pow2(s% i_rot(k+1))*s% di_rot_dlnr(k+1)/s% dm(k)
+            i_rot00 = 0d0
+            i_rot00% val = s% i_rot(k)   
+            i_rot00% d1Array(i_w_div_wc_00) = s% di_rot_dw_div_wc(k)
+            i_rot00% d1Array(i_lnR_00) = s% di_rot_dlnr(k)
+            i_rotp1 = 0d0
+            i_rotp1% val = s% i_rot(k+1)
+            i_rotp1% d1Array(i_w_div_wc_p1) = s% di_rot_dw_div_wc(k+1)
+            i_rotp1% d1Array(i_lnR_p1) = s% di_rot_dlnr(k+1)
 
-            s% dj_flux_dlnd(k) = 2d0*s% j_flux(k)
+            part1 = -pi2_div4*pow4(r00+rp1)*pow2(rho00)*(i_rot00+i_rotp1)*(s% am_nu_omega(k)+s% am_nu_omega(k+1))
+            s% j_flux(k) = part1*(omega00-omegap1)/s% dm(k)
+
+            !! this is to test partials
+            !if (k==188) then
+            !   part1 = (omega00-omegap1)/s% dm(k)
+            !   s% solver_test_partials_val = part1% val
+            !   s% solver_test_partials_var = s% i_lnR !s% i_w_div_wc
+            !   s% solver_test_partials_dval_dx =  part1% d1Array(i_lnR_00) !part1% d1Array(i_w_div_wc_00)
+            !end if
+
          end do
          s% j_flux(s% nz) = 0d0
-         s% dj_flux_dw00(s% nz) = 0d0
-         s% dj_flux_dwp1(s% nz) = 0d0
-         s% dj_flux_dj00(s% nz) = 0d0
-         s% dj_flux_dlnr00(s% nz) = 0d0
-         s% dj_flux_dlnrp1(s% nz) = 0d0
-         s% dj_flux_dlnd(s% nz) = 0d0
-
-         !! this is to test partials
-         !s% solver_test_partials_val = s% j_flux(19)
-         !s% solver_test_partials_var = s% i_j_rot
-         !s% solver_test_partials_dval_dx =  s% dj_flux_dj00(19)
       end subroutine compute_j_fluxes_and_extra_jdot
 
       subroutine init_rotation(ierr)

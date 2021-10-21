@@ -759,10 +759,10 @@
             integer, intent(out) :: ierr
          end subroutine other_eval_fp_ft_interface
       
-         subroutine other_eval_i_rot_interface(id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+         subroutine other_eval_i_rot_interface(id,k,r00,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
             use const_def, only: dp
-            integer, intent(in) :: id
-            real(dp), intent(in) :: ri,r00,ra,w_div_w_crit_roche
+            integer, intent(in) :: id,k
+            real(dp), intent(in) :: r00,w_div_w_crit_roche
             real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
          end subroutine other_eval_i_rot_interface
       

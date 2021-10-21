@@ -571,22 +571,8 @@
             if (failed('di_rot_dlnr')) exit
             call do1(s% w_div_w_crit_roche, c% w_div_w_crit_roche)
             if (failed('w_div_w_crit_roche')) exit
-            call do1(s% j_flux, c% j_flux)
+            call do1_ad(s% j_flux, c% j_flux)
             if (failed('j_flux')) exit
-            call do1(s% dj_flux_dw00, c% dj_flux_dw00)
-            if (failed('dj_flux_dw00')) exit
-            call do1(s% dj_flux_dwp1, c% dj_flux_dwp1)
-            if (failed('dj_flux_dwp1')) exit
-            call do1(s% dj_flux_dj00, c% dj_flux_dj00)
-            if (failed('dj_flux_dj00')) exit
-            call do1(s% dj_flux_djp1, c% dj_flux_djp1)
-            if (failed('dj_flux_djp1')) exit
-            call do1(s% dj_flux_dlnr00, c% dj_flux_dlnr00)
-            if (failed('dj_flux_dlnr00')) exit
-            call do1(s% dj_flux_dlnrp1, c% dj_flux_dlnrp1)
-            if (failed('dj_flux_dlnrp1')) exit
-            call do1(s% dj_flux_dlnd, c% dj_flux_dlnd)
-            if (failed('dj_flux_dlnd')) exit
 
             call do2(s% xh_start, c% xh_start, nvar_hydro, 'xh_start')
             if (failed('xh_start')) exit

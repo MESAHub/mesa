@@ -698,19 +698,55 @@
       
       subroutine do1_dj_rot_dt_eqn(s, k, nvar, ierr)
          use hydro_rotation
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_dj_rot_dt, i_j_rot
          real(dp) :: scale
-         real(dp) :: F00, dF00_dw00, dF00_dwp1, dF00_dj00, dF00_djp1, dF00_dlnr00, dF00_dlnrp1, dF00_dlnd00
-         real(dp) :: Fm1, dFm1_dwm1, dFm1_dw00, dFm1_djm1, dFm1_dj00, dFm1_dlnrm1, dFm1_dlnr00, dFm1_dlndm1
+         type(auto_diff_real_star_order1) :: resid_ad, jrot00, djrot_dt, F00, Fm1, flux_diff
          logical :: test_partials
          include 'formats'
          
          ierr = 0
-         
-         stop 'PABLO needs to rewrite using auto_diff'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ! Need to find a good way to scale the equation
+         scale = 1d6*max(1d2*sqrt(s% cgrav(k)*s% m(k)*s%r_start(k))/s%dt,&
+            s% total_abs_angular_momentum/(s% dm(k)*s% dt*s% nz))
+
+         i_dj_rot_dt = s% i_dj_rot_dt
+         i_j_rot = s% i_j_rot
+
+         jrot00 = wrap_jrot_00(s, k)
+         F00 = s% j_flux(k)
+         if (k > 1) then
+            Fm1 = shift_m1(s% j_flux(k-1))
+         else
+            Fm1 = 0d0
+         end if
+
+         djrot_dt = (jrot00-s% j_rot_start(k))/s% dt
+         flux_diff = (Fm1-F00)/s% dm_bar(k)
+
+         resid_ad = (djrot_dt+flux_diff-s% extra_jdot(k))/scale
+
+         s% equ(i_dj_rot_dt, k) = resid_ad% val
+
+         call save_eqn_residual_info( &
+            s, k, nvar, i_dj_rot_dt, resid_ad, 'do1_dj_rot_dt_eqn', ierr)           
+
+         !if (test_partials) then
+         !   s% solver_test_partials_val = s% i_rot(k)
+         !end if
+
+         !if (test_partials) then
+         !   s% solver_test_partials_var = s% i_lnR
+         !   s% solver_test_partials_dval_dx = s% di_rot_dlnR(k)
+         !   write(*,*) 'do1_w_div_wc_eqn', s% solver_test_partials_var
+         !end if
          
       end subroutine do1_dj_rot_dt_eqn
 
