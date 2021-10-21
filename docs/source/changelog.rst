@@ -379,6 +379,8 @@ Other changes
   were skipped by default, and running all parts required setting
   ``MESA_RUN_OPTIONAL``.
 
+* The headers for history and profile data now contain the value of Msun (grams), Rsun (cm), and Lsun (erg/s) used.
+
 
 Changes in r15140
 =================
