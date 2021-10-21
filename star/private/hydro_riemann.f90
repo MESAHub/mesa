@@ -355,7 +355,7 @@
          
          ! change PR and PL for gravity
          call get_G(s, k, G_ad, dG_dw_div_wc)
-         G_ad%d1Array(i_L_00) = dG_dw_div_wc
+         G_ad%d1Array(i_w_div_wc_00) = dG_dw_div_wc
          
          dPdm_grav_ad = -G_ad*s% m_grav(k)/(pow2(r_ad)*A_ad)  ! cm^-1 s^-2
          

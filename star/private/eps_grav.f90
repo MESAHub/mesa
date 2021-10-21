@@ -372,6 +372,8 @@
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0)
 
          ! add easy access to this quantity in star

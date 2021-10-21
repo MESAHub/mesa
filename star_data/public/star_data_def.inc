@@ -278,12 +278,18 @@
       integer, parameter :: i_hp_m1 = 19
       integer, parameter :: i_hp_00 = 20
       integer, parameter :: i_hp_p1 = 21
-      integer, parameter :: i_xtra1_m1 = 22
-      integer, parameter :: i_xtra1_00 = 23
-      integer, parameter :: i_xtra1_p1 = 24
-      integer, parameter :: i_xtra2_m1 = 25
-      integer, parameter :: i_xtra2_00 = 26
-      integer, parameter :: i_xtra2_p1 = 27
+      integer, parameter :: i_w_div_wc_m1 = 22
+      integer, parameter :: i_w_div_wc_00 = 23
+      integer, parameter :: i_w_div_wc_p1 = 24
+      integer, parameter :: i_jrot_m1 = 25
+      integer, parameter :: i_jrot_00 = 26
+      integer, parameter :: i_jrot_p1 = 27
+      integer, parameter :: i_xtra1_m1 = 28
+      integer, parameter :: i_xtra1_00 = 29
+      integer, parameter :: i_xtra1_p1 = 30
+      integer, parameter :: i_xtra2_m1 = 31
+      integer, parameter :: i_xtra2_00 = 32
+      integer, parameter :: i_xtra2_p1 = 33
       integer, parameter :: auto_diff_star_num_vars = i_xtra2_p1
       character (len=128) :: auto_diff_star_d1_names(auto_diff_star_num_vars)
       

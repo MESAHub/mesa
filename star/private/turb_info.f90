@@ -145,6 +145,9 @@
             return
          end if
          gradr_ad = gradr_ad*gradr_factor
+         if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
+            gradr_ad% d1Array(i_w_div_wc_00) = gradr_ad% val/gradr_factor*d_gradr_factor_dw
+         end if
          
          ! now can call set_no_mixing if necessary
          
