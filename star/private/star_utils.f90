@@ -2167,9 +2167,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp) :: e_00, e_p1
-         e_00 = s% i_rot(k)*s% omega(k)*s% omega(k)
+         e_00 = s% i_rot(k)% val*s% omega(k)*s% omega(k)
          if (k < s% nz) then
-            e_p1 = s% i_rot(k+1)*s% omega(k+1)*s% omega(k+1)
+            e_p1 = s% i_rot(k+1)% val*s% omega(k+1)*s% omega(k+1)
          else
             e_p1 = 0
          end if

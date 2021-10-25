@@ -1186,9 +1186,9 @@
          end do
          if (s% job% relax_angular_momentum_constant_omega_center) then
             if (k_inner > 0) then
-               omega_target = vals(k_inner)/s% i_rot(k_inner)
+               omega_target = vals(k_inner)/s% i_rot(k_inner)% val
                do k=k_inner+1, s% nz
-                  j_rot_target = omega_target*s% i_rot(k)
+                  j_rot_target = omega_target*s% i_rot(k)% val
                   if (s% j_rot_flag) then
                      s% extra_jdot(k) =  &
                         (1d0 - exp(-s% dt/(s% job% timescale_for_relax_angular_momentum*secyer))) * &

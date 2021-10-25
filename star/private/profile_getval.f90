@@ -1395,18 +1395,18 @@
                   val = -99
                end if
             case (p_i_rot)
-               val = if_rot(s% i_rot,k)
+               val = if_rot_ad(s% i_rot,k)
             case (p_j_rot)
                val = if_rot(s% j_rot,k)
             case (p_v_rot)
                val = if_rot(s% omega,k)*if_rot(s% r_equatorial,k)*1d-5 ! km/sec
             case (p_fp_rot)
-               val = if_rot(s% fp_rot,k, alt=1.0d0)
+               val = if_rot_ad(s% fp_rot,k, alt=1.0d0)
             case (p_ft_rot)
-               val = if_rot(s% ft_rot,k, alt=1.0d0)
+               val = if_rot_ad(s% ft_rot,k, alt=1.0d0)
             case (p_ft_rot_div_fp_rot)
                if(s% rotation_flag) then
-                  val = s% ft_rot(k)/s% fp_rot(k) 
+                  val = s% ft_rot(k)% val/s% fp_rot(k)% val
                else
                   val = 1.0d0
                end if
@@ -2372,6 +2372,22 @@
                end if
             endif
          end function if_rot
+
+
+         real(dp) function if_rot_ad(v,k, alt)
+            type(auto_diff_real_star_order1), dimension(:), pointer :: v
+            integer, intent(in) :: k
+            real(dp), optional, intent(in) :: alt
+            if (s% rotation_flag) then
+               if_rot_ad = v(k)% val
+            else
+               if (present(alt)) then
+                  if_rot_ad = alt
+               else
+                  if_rot_ad = 0
+               end if
+            endif
+         end function if_rot_ad
 
       end subroutine getval_for_profile
 

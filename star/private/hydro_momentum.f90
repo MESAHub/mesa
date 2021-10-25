@@ -358,7 +358,6 @@
 
          if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
             grav = -s% cgrav(k)*s% m_grav(k)*inv_R2*s% fp_rot(k)
-            grav%d1Array(i_w_div_wc_00) = -s% cgrav(k)*s% m_grav(k)*inv_R2%val*s% dfp_rot_dw_div_wc(k)
          else
             grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
          end if

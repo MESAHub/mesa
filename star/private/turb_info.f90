@@ -91,7 +91,8 @@
          real(dp), intent(in), optional :: &
             mixing_length_alpha_in, gradL_composition_term_in
 
-         real(dp) :: v, gradr_factor, d_gradr_factor_dw, f, xh_face, &
+         type(auto_diff_real_star_order1) :: gradr_factor
+         real(dp) :: v, f, xh_face, &
             gradL_composition_term, abs_du_div_cs, cs, mixing_length_alpha
          real(dp), pointer :: vel(:)
          integer :: i, mixing_type, h1, nz, k_T_max
@@ -132,22 +133,14 @@
 
          if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
-            if (s% w_div_wc_flag) then
-               d_gradr_factor_dw = gradr_factor*(s% dft_rot_dw_div_wc(k)/s%ft_rot(k) &
-                  -s% dfp_rot_dw_div_wc(k)/s%fp_rot(k) )
-            end if
          else
             gradr_factor = s% gradr_factor(k)
-            d_gradr_factor_dw = 0d0
          end if
-         if (is_bad_num(gradr_factor)) then
+         if (is_bad_num(gradr_factor% val)) then
             ierr = -1
             return
          end if
          gradr_ad = gradr_ad*gradr_factor
-         if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
-            gradr_ad% d1Array(i_w_div_wc_00) = gradr_ad% val/gradr_factor*d_gradr_factor_dw
-         end if
          
          ! now can call set_no_mixing if necessary
          

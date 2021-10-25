@@ -751,19 +751,22 @@
          subroutine other_eval_fp_ft_interface( &
                id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
             use const_def, only: dp
+            use auto_diff
             integer, intent(in) :: id
             integer, intent(in) :: nz
             real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)
-            real(dp), intent(inout) :: ft(:), fp(:), r_polar(:), r_equatorial(:)
+            type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)
+            real(dp), intent(inout) :: r_polar(:), r_equatorial(:)
             logical, intent(in) :: report_ierr
             integer, intent(out) :: ierr
          end subroutine other_eval_fp_ft_interface
       
-         subroutine other_eval_i_rot_interface(id,k,r00,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+         subroutine other_eval_i_rot_interface(id,k,r00,w_div_w_crit_roche, i_rot)
             use const_def, only: dp
+            use auto_diff
             integer, intent(in) :: id,k
             real(dp), intent(in) :: r00,w_div_w_crit_roche
-            real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
+            type(auto_diff_real_star_order1), intent(out) :: i_rot
          end subroutine other_eval_i_rot_interface
       
          subroutine other_torque_interface(id, ierr)

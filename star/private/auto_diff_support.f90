@@ -1241,6 +1241,37 @@
       end function wrap_jrot_p1
 
 
+      function wrap_omega_m1(s, k) result(omega_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: omega_m1, jrot_m1
+         integer, intent(in) :: k
+         omega_m1 = 0d0
+         jrot_m1 = wrap_jrot_m1(s,k)
+         if (k > 1) then
+            omega_m1 = jrot_m1/shift_m1(s% i_rot(k-1))
+         end if            
+      end function wrap_omega_m1
+
+      function wrap_omega_00(s, k) result(omega_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: omega_00, jrot_00
+         integer, intent(in) :: k
+         jrot_00 = wrap_jrot_00(s,k)
+         omega_00 = jrot_00/s% i_rot(k)
+      end function wrap_omega_00
+
+      function wrap_omega_p1(s, k) result(omega_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: omega_p1, jrot_p1
+         integer, intent(in) :: k
+         omega_p1 = 0d0 
+         jrot_p1 = wrap_jrot_p1(s,k)
+         if (k < s%nz) then
+            omega_p1 = jrot_p1/shift_p1(s% i_rot(k+1))
+         end if
+      end function wrap_omega_p1
+
+
       function wrap_xtra1_m1(s, k) result(xtra1_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: xtra1_m1

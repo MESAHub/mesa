@@ -143,13 +143,8 @@
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
-      real(dp), pointer :: i_rot(:) ! specific moment of inertia at cell boundary
-      real(dp), pointer :: di_rot_dw_div_wc(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: di_rot_dlnr(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: fp_rot(:) ! rotation factor for momentum
-      real(dp), pointer :: ft_rot(:) ! rotation factor for temperature
-      real(dp), pointer :: dfp_rot_dw_div_wc(:) ! partial of fp with respect to w_div_wc
-      real(dp), pointer :: dft_rot_dw_div_wc(:) ! partial of ft with respect to w_div_wc
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: i_rot(:), fp_rot(:), ft_rot(:)
+
       real(dp), pointer :: w_div_w_crit_roche(:) ! fraction of critical rotation at the equator,
                                                  ! without the contribution of the Eddington factor
       real(dp), pointer :: r_polar(:) ! radius in polar direction

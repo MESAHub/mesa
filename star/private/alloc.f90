@@ -545,9 +545,9 @@
             if (failed('am_nu_rot')) exit
             call do1(s% D_omega, c% D_omega)
             if (failed('D_omega')) exit
-            call do1(s% fp_rot, c% fp_rot)
+            call do1_ad(s% fp_rot, c% fp_rot)
             if (failed('fp_rot')) exit
-            call do1(s% ft_rot, c% ft_rot)
+            call do1_ad(s% ft_rot, c% ft_rot)
             if (failed('ft_rot')) exit
             call do1(s% am_nu_non_rot, c% am_nu_non_rot)
             if (failed('am_nu_non_rot')) exit
@@ -559,16 +559,8 @@
             if (failed('am_sig_omega')) exit
             call do1(s% am_sig_j, c% am_sig_j)
             if (failed('am_sig_j')) exit
-            call do1(s% dfp_rot_dw_div_wc, c% dfp_rot_dw_div_wc)
-            if (failed('dfp_rot_dw_div_wc')) exit
-            call do1(s% dft_rot_dw_div_wc, c% dft_rot_dw_div_wc)
-            if (failed('dft_rot_dw_div_wc')) exit
-            call do1(s% i_rot, c% i_rot)
+            call do1_ad(s% i_rot, c% i_rot)
             if (failed('i_rot')) exit
-            call do1(s% di_rot_dw_div_wc, c% di_rot_dw_div_wc)
-            if (failed('di_rot_dw_div_wc')) exit
-            call do1(s% di_rot_dlnr, c% di_rot_dlnr)
-            if (failed('di_rot_dlnr')) exit
             call do1(s% w_div_w_crit_roche, c% w_div_w_crit_roche)
             if (failed('w_div_w_crit_roche')) exit
             call do1_ad(s% j_flux, c% j_flux)

@@ -37,14 +37,13 @@
             
       contains
 
-      subroutine null_other_eval_i_rot(id,k,r00,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+      subroutine null_other_eval_i_rot(id,k,r00,w_div_w_crit_roche, i_rot)
+         use auto_diff_support
          integer, intent(in) :: id, k
          real(dp), intent(in) :: r00,w_div_w_crit_roche
-         real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
+         type(auto_diff_real_star_order1), intent(out) :: i_rot
 
          i_rot = 0
-         di_rot_dlnr = 0
-         di_rot_dw_div_wc = 0
 
          write(*,*) 'no implementation for other_eval_i_rot'
          stop

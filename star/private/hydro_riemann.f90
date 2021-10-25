@@ -205,7 +205,7 @@
          
          subroutine setup_gravity_source
             type(auto_diff_real_star_order1) :: G00, Gp1, gsL, gsR
-            real(dp) :: mR, mL, dG00_dw, dGp1_dw
+            real(dp) :: mR, mL
             ! left 1/2 of dm gets gravity force at left face
             ! right 1/2 of dm gets gravity force at right face.
             ! this form is to match the gravity force equilibrium reconstruction.
@@ -215,15 +215,13 @@
             else
                mL = s% m(k+1)
             end if
-            call get_G(s, k, G00, dG00_dw)
-            G00%d1Array(i_L_00) = dG00_dw
+            call get_G(s, k, G00)
             gsR = -G00*mR*0.5d0*dm*inv_R2_00
             if (k == nz) then
                gsL = 0d0
             else
-               call get_G(s, k+1, Gp1, dGp1_dw)
+               call get_G(s, k+1, Gp1)
                Gp1 = shift_p1(Gp1)
-               Gp1%d1Array(i_L_p1) = dGp1_dw
                gsL = -Gp1*mL*0.5d0*dm*inv_R2_p1
             end if
             gravity_source_ad = gsL + gsR ! total gravitational force on cell
@@ -280,22 +278,15 @@
       end subroutine do_uface_and_Pface
 
 
-      subroutine get_G(s, k, G, dG_dw_div_wc)
+      subroutine get_G(s, k, G)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: G
-         real(dp), intent(out) :: dG_dw_div_wc
          real(dp) :: cgrav
          cgrav = s% cgrav(k)
-         if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
-            cgrav = cgrav*s% fp_rot(k)
          G = cgrav
-         if (s% rotation_flag .and. s% use_gravity_rotation_correction &
-               .and. s% w_div_wc_flag) then
-            dG_dw_div_wc = G%val/s% fp_rot(k)*s% dfp_rot_dw_div_wc(k)
-         else
-            dG_dw_div_wc = 0d0
-         end if
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
+            G = G*s% fp_rot(k)
       end subroutine get_G
 
       
@@ -315,7 +306,7 @@
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
          real(dp), dimension(s% species) :: d_Ptot_dxa ! skip this
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
-         real(dp) :: dG_dw_div_wc, delta_m, f
+         real(dp) :: delta_m, f
             
          include 'formats'
          
@@ -354,8 +345,7 @@
          csR_ad = sqrt(gamma1R_ad*PR_ad/rhoR_ad)
          
          ! change PR and PL for gravity
-         call get_G(s, k, G_ad, dG_dw_div_wc)
-         G_ad%d1Array(i_w_div_wc_00) = dG_dw_div_wc
+         call get_G(s, k, G_ad)
          
          dPdm_grav_ad = -G_ad*s% m_grav(k)/(pow2(r_ad)*A_ad)  ! cm^-1 s^-2
          
