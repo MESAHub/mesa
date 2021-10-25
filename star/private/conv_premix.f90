@@ -1334,7 +1334,7 @@ contains
 
   subroutine update_model_ (s, update_mode, kc_t, kc_b)
 
-    use mlt_info, only: set_mlt_vars
+    use turb_info, only: set_mlt_vars
     use micro
 
     type(star_info), pointer :: s

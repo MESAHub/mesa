@@ -1,0 +1,14 @@
+============
+Release 7624
+============
+
+:Date:   2015-06-03
+
+Revision 7624 has been designated a MESA release version.
+
+For the full release notes, see `this mailing list
+post <https://sourceforge.net/p/mesa/mailman/message/34171342/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r7624.zip/download>`__
+is available for download.

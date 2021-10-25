@@ -1,0 +1,11 @@
+============
+Release 2078
+============
+
+:Date:   2010-01-26
+
+Revision 2078 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2078.zip/download>`__
+is available for download.

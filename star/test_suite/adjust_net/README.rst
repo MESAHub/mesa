@@ -6,15 +6,13 @@ adjust_net
 
 This test suite example checks the functionality of the adaptive nuclear reaction network.
 
-***************
 Physical checks
-***************
+===============
 
 This test case tracks the number of isotopes it has at the end of the run.
 
-*******
 Inlists
-*******
+=======
 
 This test case has two parts. Click to see a larger view of a plot.
 

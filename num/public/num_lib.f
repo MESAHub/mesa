@@ -63,13 +63,6 @@
       ! selections from the Hairer family of ODE/DAE integrators.
       ! from Ernst Hairer's website: http://www.unige.ch/~hairer/
 
-
-      ! explicit ODE solver based on method of Cash and Karp (for non-stiff problems)
-
-         ! explicit Runge-Kutta ODE integrator with variable step size
-         include "num_cash_karp.dek"
-
-
       ! explicit ODE solvers based on methods of Dormand and Prince (for non-stiff problems)
 
          ! explicit Runge-Kutta ODE integrator of order 5

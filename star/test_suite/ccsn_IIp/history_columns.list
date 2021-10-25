@@ -56,8 +56,6 @@
       num_zones ! number of zones in the model
       
       total_energy
-      !total_radiation ! total lost since start of run as photons or neutrinos
-      !total_energy_plus_total_radiation ! total_energy + total_radiation
    
    ! mixing regions
    
@@ -121,7 +119,6 @@
       !gravity 
       log_surf_cell_pressure
       log_surf_cell_density
-      !surface_entropy ! in units of kerg per baryon
       
       Lsurf_m
       

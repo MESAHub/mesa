@@ -1,0 +1,17 @@
+============
+Release 7499
+============
+
+:Date:   2015-03-20
+
+Update: `Revision 7503 </release/2015/03/27/r7503.html>`__ fixes a bug
+in this release.
+
+Revision 7499 has been designated a MESA release version.
+
+For the full release notes, see `this mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/33620873/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r7499.zip/download>`__
+is available for download.

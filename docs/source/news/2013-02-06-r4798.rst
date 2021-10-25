@@ -1,0 +1,11 @@
+============
+Release 4798
+============
+
+:Date:   2013-02-06
+
+Revision 4798 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r4798.zip/download>`__
+is available for download.

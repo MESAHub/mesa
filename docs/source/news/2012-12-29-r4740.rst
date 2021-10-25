@@ -1,0 +1,11 @@
+============
+Release 4740
+============
+
+:Date:   2012-12-29
+
+Revision 4740 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r4740.zip/download>`__
+is available for download.

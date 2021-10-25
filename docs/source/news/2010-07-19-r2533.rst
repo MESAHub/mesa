@@ -1,0 +1,11 @@
+============
+Release 2533
+============
+
+:Date:   2010-07-19
+
+Revision 2533 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2533.zip/download>`__
+is available for download.

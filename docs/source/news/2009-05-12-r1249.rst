@@ -1,0 +1,11 @@
+============
+Release 1249
+============
+
+:Date:   2009-05-12
+
+Revision 1249 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r1249.zip/download>`__
+is available for download.

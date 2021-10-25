@@ -364,8 +364,8 @@
             case (p_lum_conv_MLT)
                val = s% L_conv(k)/Lsun
 
-            !case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
-            !   val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
+            case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
+               val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
             case (p_lum_rad_div_L_Edd)
                val = get_Lrad_div_Ledd(s,k)
             case (p_lum_conv_div_lum_Edd)
@@ -885,6 +885,8 @@
                val = s% eos_frac_FreeEOS(k)
             case (p_eos_frac_CMS)
                val = s% eos_frac_CMS(k)
+            case (p_eos_frac_ideal)
+               val = s% eos_frac_ideal(k)
                
             case (p_log_c_div_tau)
                val = safe_log10(clight/s% tau(k))

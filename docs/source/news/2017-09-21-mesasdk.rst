@@ -1,0 +1,12 @@
+====================
+New MESA SDK Version
+====================
+
+Version 20170921 `has been
+announced <https://lists.mesastar.org/pipermail/mesa-users/2017-September/007956.html>`__
+and is now available for 64-bit Linux and OS X from the `SDK
+website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+
+If you’re currently using the MESA SDK, there’s no immediate need to
+upgrade. This release updates the gcc/gfortran compilers to version 7.2,
+plus a number of other tweaks.

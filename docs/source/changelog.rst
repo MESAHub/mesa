@@ -373,11 +373,13 @@ Other changes
 
 * An ``other_screening`` hook was added.
 
-* All parts of test suite cases are now run by default.  To only run
-  the optional inlists, set the environment variable
+* All parts of test suite cases are now run by default.  To skip
+  running the optional inlists, set the environment variable
   ``MESA_SKIP_OPTIONAL`` (to any value).  Previously, optional parts
   were skipped by default, and running all parts required setting
   ``MESA_RUN_OPTIONAL``.
+
+* The headers for history and profile data now contain the value of Msun (grams), Rsun (cm), and Lsun (erg/s) used.
 
 
 Changes in r15140
@@ -696,6 +698,16 @@ to ``outputs/sample_#.{profile,fgong}``.
          
       end subroutine extras_after_evolve
 
+turb
+~~~~
+
+This new module implements local theories of turbulence, including
+MLT, TDC, semiconvection, and thermohaline turbulence. These used to be
+a part of ``star``.
+
+Users will not generally
+need to interact with this module, but it can be used within
+run_star_extras by writing ``use turb``.
 
 auto_diff
 ~~~~~~~~~

@@ -173,9 +173,6 @@
       log_g ! log10 gravity
       log_L_div_Ledd ! log10(L/Leddington)
       !effective_T
-      !log_surf_opacity
-      !log_surf_temperature
-      !log_surf_z
       !log_Ledd
       
    
@@ -258,15 +255,8 @@
       
       !max_conv_vel_div_csound
       
-      !dt_Courant ! min dr_div_csound (sec) -- min cell sound crossing time
-      !log_dt_Courant ! log10 min dr_div_csound (sec)
-      !dt_Courant_yr ! min dr_div_csound (years)
-      !log_dt_Courant_yr ! log10 min dr_div_csound (years)
-      !dt_div_dt_Courant
-      !log_dt_div_dt_Courant
       
       !h1_czb_mass ! location (in Msun units) of base of 1st convection zone above h1_boundary_mass
       
       !surf_c12_minus_o16 ! this is useful for seeing effects of dredge up on AGB
       
-      !max_burn_times_ratio ! max of (scale_height/conv_vel)/(cp*T/eps_nuc) where both conv_vel and eps_nuc are > 0

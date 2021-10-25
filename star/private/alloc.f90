@@ -740,6 +740,8 @@
             if (failed('eos_frac_FreeEOS')) exit
             call do1(s% eos_frac_CMS, c% eos_frac_CMS)
             if (failed('eos_frac_CMS')) exit
+            call do1(s% eos_frac_ideal, c% eos_frac_ideal)
+            if (failed('eos_frac_ideal')) exit
 
             call do1(s% QQ, c% QQ)
             if (failed('QQ')) exit
@@ -990,10 +992,6 @@
 
             call do1(s% vc, c% vc)
             if (failed('vc')) exit
-            call do1(s% R2, c% R2)
-            if (failed('R2')) exit
-            call do1(s% d_R2_dlnR, c% d_R2_dlnR)
-            if (failed('d_R2_dlnR')) exit
 
             call do1_ad(s% eps_grav_ad, c% eps_grav_ad)
             if (failed('eps_grav_ad')) exit
@@ -1151,9 +1149,6 @@
             if (failed('P_face_ad')) exit
             call do1(s% P_face_start, c% P_face_start)
             if (failed('P_face_start')) exit
-            call do1(s% d_Pface_domega, c% d_Pface_domega)
-            if (failed('d_Pface_domega')) exit
-
             call do1(s% abs_du_div_cs, c% abs_du_div_cs)
             if (failed('abs_du_div_cs')) exit
             call do1(s% abs_du_plus_cs, c% abs_du_plus_cs)
@@ -1261,8 +1256,6 @@
             if (failed('rho_start')) exit
             call do1(s% lnS_start, c% lnS_start)
             if (failed('lnS_start')) exit
-            call do1(s% eta_start, c% eta_start)
-            if (failed('eta_start')) exit
             call do1(s% T_start, c% T_start)
             if (failed('T_start')) exit
             call do1(s% zbar_start, c% zbar_start)
@@ -1326,13 +1319,6 @@
 
             call do1(s% Chi, c% Chi); if (failed('Chi')) exit
             call do1(s% Chi_start, c% Chi_start); if (failed('Chi_start')) exit
-            call do1(s% d_Chi_dwturb, c% d_Chi_dwturb); if (failed('d_Chi_dwturb')) exit
-            call do1(s% d_Chi_dv00, c% d_Chi_dv00); if (failed('d_Chi_dv00')) exit
-            call do1(s% d_Chi_dvp1, c% d_Chi_dvp1); if (failed('d_Chi_dvp1')) exit
-            call do1(s% d_Chi_dlnR00, c% d_Chi_dlnR00); if (failed('d_Chi_dlnR00')) exit
-            call do1(s% d_Chi_dlnRp1, c% d_Chi_dlnRp1); if (failed('d_Chi_dlnRp1')) exit
-            call do1(s% d_Chi_dlnd, c% d_Chi_dlnd); if (failed('d_Chi_dlnd')) exit
-            call do1(s% d_Chi_dlnT, c% d_Chi_dlnT); if (failed('d_Chi_dlnT')) exit
 
             call do1(s% Lr, c% Lr); if (failed('Lr')) exit
             call do1(s% Lc, c% Lc); if (failed('Lc')) exit
@@ -1346,8 +1332,6 @@
             call do1(s% Pvsc_start, c% Pvsc_start); if (failed('Pvsc_start')) exit
             call do1(s% Ptrb, c% Ptrb); if (failed('Ptrb')) exit
             call do1(s% Ptrb_start, c% Ptrb_start); if (failed('Ptrb_start')) exit
-            call do1(s% d_Ptrb_dV_00, c% d_Ptrb_dV_00); if (failed('d_Ptrb_dV_00')) exit
-            call do1(s% d_Ptrb_dw_00, c% d_Ptrb_dw_00); if (failed('d_Ptrb_dw_00')) exit
             call do1(s% Eq, c% Eq); if (failed('Eq')) exit
             call do1(s% SOURCE, c% SOURCE); if (failed('SOURCE')) exit
             call do1(s% DAMP, c% DAMP); if (failed('DAMP')) exit

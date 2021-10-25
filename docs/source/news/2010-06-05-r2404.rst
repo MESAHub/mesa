@@ -1,0 +1,11 @@
+============
+Release 2404
+============
+
+:Date:   2010-06-05
+
+Revision 2404 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2404.zip/download>`__
+is available for download.

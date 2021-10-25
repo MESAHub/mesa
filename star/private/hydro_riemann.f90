@@ -325,7 +325,6 @@
          
          s% RTI_du_diffusion_kick(k) = 0d0
          s% d_uface_domega(k) = 0
-         s% d_Pface_domega(k) = 0
                             
          if (k == 1) then
             s% u_face_ad(k) = wrap_u_00(s,k)
@@ -410,7 +409,6 @@
          P_face_R_ad = rhoR_ad*(uR_ad-Sr_ad)*(uR_ad-Ss_ad) + PR_ad
          
          s% P_face_ad(k) = 0.5d0*(P_face_L_ad + P_face_R_ad) ! these are ideally equal
-         s% d_Pface_domega(k) = s% P_face_ad(k)%d1Array(i_L_00)
          s% P_face_ad(k)%d1Array(i_L_00) = 0d0
 
          if (k < s% nz .and. s% RTI_flag) then

@@ -4,7 +4,9 @@ set -o pipefail
 
 # Get version number from git
 if [ -d ".git" ] || [ -f ".git" ]; then
-    git rev-parse HEAD > data/version_number
+    # Limits hashes to 7 characters
+    version=$(git rev-parse HEAD)
+    printf "%s" "${version:0:7}" > data/version_number
 fi
 
 # Create file for TestHub
@@ -87,7 +89,7 @@ then
     echo "*        MESA should not be installed with root privaleges     *"
     echo "*        Using sudo is a bad idea and unlikely to fix the      *"
     echo "*                   problem you think you have.                *"
-    echo "*                                                              *"	
+    echo "*                                                              *"
     echo "*                 If you have permission issues,               *"
     echo "*              contact the mesa-users mailing list             *"
     echo "*                                                              *"
@@ -350,6 +352,7 @@ do_one_parallel neu
 do_one_parallel net
 
 do_one star_data
+do_one turb
 
 if [ ! -r data/atm_data ]
 then

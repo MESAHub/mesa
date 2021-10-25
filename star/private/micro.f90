@@ -39,7 +39,6 @@ module micro
   ! Parameters
 
   logical, parameter :: dbg = .false.
-  real(dp), parameter :: fmax_fit = 3.47189d0
 
   ! Access specifiers
 
@@ -71,7 +70,7 @@ contains
 
     integer :: j, k, op_err, k_bad, res
     integer(8) :: time0
-    real(dp) :: total, alfa, beta, X_lo, X_lo_fac, X_hi, X_hi_fac
+    real(dp) :: total, alfa, beta
 
     include 'formats'
 
@@ -130,7 +129,6 @@ contains
        end if
 
        if (s% doing_timing) call start_time(s, time0, total)
-       !!$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
        !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
        do k = nzlo, nzhi
           op_err = 0
@@ -164,7 +162,6 @@ contains
 
     subroutine set_eos(ierr)
       integer, intent(out) :: ierr
-      real(dp) :: alfa
       include 'formats'
       ierr = 0
       if (dbg) write(*,*) 'call do_eos'
@@ -381,14 +378,9 @@ contains
     real(dp), intent(in), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
     real(dp), intent(in) :: d_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
-    integer :: i, j
 
-    real(dp) :: T, rho, &
-         dlnd_dV, Pgas, Prad, &
-         P, PV, PT, E, EV, ET, CP, dCp_dV, dCp_dT, &
-         chiT, dchiT_dlnd, dchiT_dlnT, &
-         chiRho, dchiRho_dlnd, dchiRho_dlnT, &
-         Q, dQ_dlnd, dQ_dlnT, QV, QT
+    integer :: i, j
+    real(dp) :: T, rho
 
     include 'formats'
 
@@ -454,6 +446,7 @@ contains
     s% eos_frac_PC(k) = res(i_frac_PC)
     s% eos_frac_FreeEOS(k) = res(i_frac_FreeEOS)
     s% eos_frac_CMS(k) = res(i_frac_CMS)
+    s% eos_frac_ideal(k) = res(i_frac_ideal)
 
     s% chiRho_for_partials(k) = s% Pgas(k)*d_dlnd(i_lnPgas)/s% Peos(k)
     s% chiT_for_partials(k) = (s% Pgas(k)*d_dlnT(i_lnPgas) + 4d0*s% Prad(k))/s% Peos(k)

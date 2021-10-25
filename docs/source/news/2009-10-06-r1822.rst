@@ -1,0 +1,11 @@
+============
+Release 1822
+============
+
+:Date:   2009-10-06
+
+Revision 1822 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r1822.zip/download>`__
+is available for download.

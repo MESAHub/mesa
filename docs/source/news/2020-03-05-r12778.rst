@@ -1,0 +1,14 @@
+=============
+Release 12778
+=============
+
+Revision 12778 has been designated a MESA release version. This release
+contains a number of backwards-incompatible changes, including items
+related to the EOS, overshooting, and run_star_extras.
+
+Please consult the release notes available in `this mailing list
+post <https://lists.mesastar.org/pipermail/mesa-users/2020-March/011168.html>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r12778.zip/download>`__
+is available for download.

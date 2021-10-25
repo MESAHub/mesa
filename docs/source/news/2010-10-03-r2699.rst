@@ -1,0 +1,11 @@
+============
+Release 2699
+============
+
+:Date:   2010-10-03
+
+Revision 2699 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2699.zip/download>`__
+is available for download.

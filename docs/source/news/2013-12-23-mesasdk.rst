@@ -1,0 +1,12 @@
+====================
+New MESA SDK Version
+====================
+
+:Date:   2013-12-23
+
+It’s a Festivus miracle – with great pleasure I can announce the release
+of a new MESA SDK! Version 20131223 is now available for 64-bit Linux
+and OS X from the `SDK
+website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+As usual, there’s no burning need to upgrade to this latest version; but
+on the flip side, a number of important compiler issues have been fixed.

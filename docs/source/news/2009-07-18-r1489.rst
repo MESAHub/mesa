@@ -1,0 +1,11 @@
+============
+Release 1489
+============
+
+:Date:   2009-07-18
+
+Revision 1489 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r1489.zip/download>`__
+is available for download.
