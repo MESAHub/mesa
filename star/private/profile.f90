@@ -544,6 +544,10 @@
                   call do_string(i, 'date', date)
                end if
 
+               call do_val(i, 'msun', msun)
+               call do_val(i, 'rsun', rsun)
+               call do_val(i, 'lsun', lsun)
+
                do j=1,num_extra_header_items
                  call do_val(i, extra_header_item_names(j), extra_header_item_vals(j))
                end do

@@ -3419,6 +3419,7 @@
          write(*,1) 'eos_frac_PC',      s% eos_frac_PC(k)
          write(*,1) 'eos_frac_FreeEOS', s% eos_frac_FreeEOS(k)
          write(*,1) 'eos_frac_CMS',     s% eos_frac_CMS(k)
+         write(*,1) 'eos_frac_ideal',     s% eos_frac_ideal(k)
          write(*,*)
          write(*,1) 'Peos = ', s% Peos(k)
          write(*,1) 'Prad = ', s% Prad(k)

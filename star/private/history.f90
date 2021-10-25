@@ -332,7 +332,11 @@
                !call write_val(io, col, i, 'initial_z', s% initial_z)
                call write_val(io, col, i, 'burn_min1', s% burn_min1)
                call write_val(io, col, i, 'burn_min2', s% burn_min2)
-               
+
+               call write_val(io, col, i, 'msun', msun)
+               call write_val(io, col, i, 'rsun', rsun)
+               call write_val(io, col, i, 'lsun', lsun)
+
                do j=1,num_extra_header_items
                  call write_val(io, col, i, &
                     extra_header_item_names(j), extra_header_item_vals(j))

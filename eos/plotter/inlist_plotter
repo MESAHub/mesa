@@ -2,7 +2,7 @@
 
   !### put eos options here
   ! see eos/defaults/eos.defaults
-
+use_simple_Skye_blends = .false.
 /
 
 
@@ -19,6 +19,7 @@
   ! PC = 4
   ! Skye = 5
   ! CMS = 6
+  ! ideal = 7
   i_eos = 0
 
   !### pick which EOS to compare with
@@ -64,7 +65,7 @@
   ! zero value used for special logic in the plotter
   ! regions = 0 (also use special script regions.py)
 
-  i_var = 15
+  i_var = 0
 
   !### check derivatives?
   ! if doing_dfridr is true, do dfridr and show the error

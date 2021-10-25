@@ -718,6 +718,8 @@
             if (failed('eos_frac_FreeEOS')) exit
             call do1(s% eos_frac_CMS, c% eos_frac_CMS)
             if (failed('eos_frac_CMS')) exit
+            call do1(s% eos_frac_ideal, c% eos_frac_ideal)
+            if (failed('eos_frac_ideal')) exit
 
             call do1(s% QQ, c% QQ)
             if (failed('QQ')) exit

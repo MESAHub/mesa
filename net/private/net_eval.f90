@@ -376,7 +376,7 @@
             call approx21_dydt( &
                n% y, rate_screened, rate_screened, &
                dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, btemp,g% add_co56_to_approx21,  ierr)
+               g% fe56ec_n_neut, btemp, bden, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return
                
             fII = approx21_eval_PPII_fraction(n% y, rate_screened)
@@ -407,7 +407,7 @@
                
                n% y, mion, dfdy, rate_screened, rate_screened_dT, rate_screened_dRho, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, btemp, dfdT, dfdRho, d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
+               g% fe56ec_n_neut, btemp, bden, dfdT, dfdRho, d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             call get_approx21_eps_info( &

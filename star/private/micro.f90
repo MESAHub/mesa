@@ -446,6 +446,7 @@ contains
     s% eos_frac_PC(k) = res(i_frac_PC)
     s% eos_frac_FreeEOS(k) = res(i_frac_FreeEOS)
     s% eos_frac_CMS(k) = res(i_frac_CMS)
+    s% eos_frac_ideal(k) = res(i_frac_ideal)
 
     s% chiRho_for_partials(k) = s% Pgas(k)*d_dlnd(i_lnPgas)/s% Peos(k)
     s% chiT_for_partials(k) = (s% Pgas(k)*d_dlnT(i_lnPgas) + 4d0*s% Prad(k))/s% Peos(k)
