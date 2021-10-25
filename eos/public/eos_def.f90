@@ -157,13 +157,16 @@
       integer, parameter :: i_eos_CMS = 6
       integer, parameter :: i_frac_CMS = i_frac_Skye+1
             ! fraction CMS
+      integer, parameter :: i_eos_ideal = 7
+      integer, parameter :: i_frac_ideal = i_frac_CMS+1
+            ! fraction ideal ion+radiation
 
       ! eos frac entries correspond to the slice
       ! i_frac:i_frac+num_eos_frac_results-1
       integer, parameter :: i_frac = i_frac_HELM ! first frac entry
-      integer, parameter :: num_eos_frac_results = 6
+      integer, parameter :: num_eos_frac_results = 7
       
-      integer, parameter :: num_eos_basic_results = i_frac_CMS
+      integer, parameter :: num_eos_basic_results = i_frac_ideal
       integer, parameter :: nv = num_eos_basic_results
 
       ! only return d_dxa of lnE and lnPgas to star
@@ -489,6 +492,7 @@
          eosDT_result_names(i_frac_PC) = 'PC'
          eosDT_result_names(i_frac_FreeEOS) = 'FreeEOS'
          eosDT_result_names(i_frac_CMS) = 'CMS'
+         eosDT_result_names(i_frac_ideal) = 'ideal'
 
       end subroutine eos_def_init
 
