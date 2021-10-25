@@ -329,9 +329,8 @@
 
          subroutine do_eos_regions
             integer :: ierr
-            real :: logRho1, logRho2, logRho3, logRho4, logRho5, logRho6, logRho7
-            real :: logT1, logT2, logT3, logT4, logT5, logT6, logT7, logT8
-            real :: logRho0, abar, zbar, z53bar, logG0, logRho, logT, logT_hi, logT_lo
+            real :: logRho0, logRho1, logRho2, logRho3, logRho4, logRho5, logRho6
+            real :: logT1, logT2, logT3, logT4, logT5, logT6
 
             call pgsave
 
