@@ -354,19 +354,23 @@ program eos_plotter
 
             ! show blend regions
             res1 = 0d0
-            i_max = 0
+            i_max = -1
             do i = i_frac, i_frac+num_eos_frac_results-1
                if (res(i) > res1) then
                   res1 = res(i)
                   i_max = i
                end if
             end do
-            if (res1 < 1d0) then
+
+            if (i_max < 0) then
+               ! failed to find any eos fracs > 0
+               res1 = -99
+            else if (res1 < 1d0) then
+               ! in a blend region
                res1 = 0
             else
                res1 = i_max - i_frac + 1
             end if
-
          end if
 
          if (doing_dfridr) then
@@ -590,7 +594,7 @@ contains
       else
          ! check for all blends
          in_eos_blend = .false.
-         do i = i_frac, i_frac+num_eos_frac_results
+         do i = i_frac, i_frac+num_eos_frac_results-1
             in_eos_blend = in_eos_blend .or. &
                ((res(i) .gt. 0) .and. (res(i) .lt. 1))
          end do

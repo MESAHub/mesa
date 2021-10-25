@@ -2,7 +2,7 @@
 
   !### put eos options here
   ! see eos/defaults/eos.defaults
-
+use_simple_Skye_blends = .false.
 /
 
 
@@ -19,6 +19,7 @@
   ! PC = 4
   ! Skye = 5
   ! CMS = 6
+  ! ideal = 7
   i_eos = 0
 
   !### pick which EOS to compare with
@@ -64,7 +65,7 @@
   ! zero value used for special logic in the plotter
   ! regions = 0 (also use special script regions.py)
 
-  i_var = 15
+  i_var = 0
 
   !### check derivatives?
   ! if doing_dfridr is true, do dfridr and show the error
@@ -109,14 +110,14 @@
   X_center = 0.70
   Z_center = 0.02
 
-  ! delta_X = 0.1
-  ! delta_Z = 0.1
+  delta_X = 0.1
+  delta_Z = 0.1
 
-  ! X_min = 0
-  ! X_max = 1
+  X_min = 0
+  X_max = 1
 
-  ! Z_min = 0
-  ! Z_max = 0.1
+  Z_min = 0
+  Z_max = 0.1
 
   ! logT_center = 7.3d0
   ! logRho_center = 0d0
@@ -124,10 +125,10 @@
   ! delta_logT = 0.1
   ! delta_logRho = 0.1
 
-  logT_min = 4
-  logT_max = 9
+  logT_min = 2
+  logT_max = 10
 
-  logRho_min = -10
+  logRho_min = -15
   logRho_max = 10
 
 

@@ -12,21 +12,21 @@ chem/ @rjfarmer @fxt @aarondotter
 colors/ @rjfarmer
 const/ @rjfarmer @fxt @aarondotter
 data/ @rjfarmer
-docs/ @rhdtownsend @jschwab
-eos/ @fxt @aarondotter @jschwab @adamjermyn @evbauer
+docs/ @rhdtownsend
+eos/ @fxt @aarondotter @adamjermyn @evbauer
 gyre/ @rhdtownsend @warrickball
 hdfio5 @richtownsend
 interp_1d/ @rhdtownsend @adamjermyn
 interp_2d/ @rhdtownsend @adamjermyn
-kap/ @fxt @aarondotter @jschwab
-linters/ @rjfarmer @jschwab
+kap/ @fxt @aarondotter
+linters/ @rjfarmer
 turb/ @adamjermyn
 math/ @rhdtownsend
 mtx/ @adamjermyn @rjfarmer @mjoyceGR
 net/ @rjfarmer @fxt
 neu/ @rjfarmer @fxt
 num/ @adamjermyn
-rates/ @rjfarmer @fxt @jschwab
+rates/ @rjfarmer @fxt
 #star/
 #star_data/
 #stella/ 

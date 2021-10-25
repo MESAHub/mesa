@@ -287,7 +287,7 @@
     simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
     implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol, &
-    fitted_fp_ft_i_rot, w_div_wcrit_max, w_div_wcrit_max2, &
+    w_div_wcrit_max, w_div_wcrit_max2, &
     fp_min, ft_min, fp_error_limit, ft_error_limit, &
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
     set_uniform_am_nu_non_rot, uniform_am_nu_non_rot, &
@@ -521,7 +521,7 @@
 
     ! misc
     min_chem_eqn_scale, zams_filename, set_rho_to_dm_div_dV, use_other_momentum_implicit, &
-    use_other_surface_PT, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
+    use_other_surface_PT, use_other_mlt_results, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
     use_other_adjust_mdot, use_other_j_for_adjust_J_lost, use_other_alpha_mlt, use_other_remove_surface, &
     use_other_am_mixing, use_other_brunt, use_other_brunt_smoothing, use_other_solver_monitor, &
     use_other_build_initial_model, use_other_cgrav, use_other_energy_implicit, use_other_momentum, &
@@ -1712,7 +1712,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% min_years_dt_for_redo_mdot = min_years_dt_for_redo_mdot
  s% surf_omega_div_omega_crit_limit = surf_omega_div_omega_crit_limit
  s% surf_omega_div_omega_crit_tol = surf_omega_div_omega_crit_tol
- s% fitted_fp_ft_i_rot = fitted_fp_ft_i_rot 
  s% w_div_wcrit_max = w_div_wcrit_max
  s% w_div_wcrit_max2 = w_div_wcrit_max2
  s% fp_min = fp_min
@@ -2422,6 +2421,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% zams_filename = zams_filename
  s% set_rho_to_dm_div_dV = set_rho_to_dm_div_dV
 
+ s% use_other_mlt_results = use_other_mlt_results
  s% use_other_surface_PT = use_other_surface_PT
  s% use_other_kap = use_other_kap
  s% use_other_diffusion = use_other_diffusion
@@ -3386,7 +3386,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  min_years_dt_for_redo_mdot = s% min_years_dt_for_redo_mdot
  surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
  surf_omega_div_omega_crit_tol = S% surf_omega_div_omega_crit_tol
- fitted_fp_ft_i_rot = s% fitted_fp_ft_i_rot 
  w_div_wcrit_max = s% w_div_wcrit_max
  w_div_wcrit_max2 = s% w_div_wcrit_max2
  fp_min = s% fp_min
@@ -4094,6 +4093,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  zams_filename = s% zams_filename
  set_rho_to_dm_div_dV = s% set_rho_to_dm_div_dV
 
+ use_other_mlt_results = s% use_other_mlt_results
  use_other_surface_PT = s% use_other_surface_PT
  use_other_kap = s% use_other_kap
  use_other_diffusion = s% use_other_diffusion

@@ -740,6 +740,8 @@
             if (failed('eos_frac_FreeEOS')) exit
             call do1(s% eos_frac_CMS, c% eos_frac_CMS)
             if (failed('eos_frac_CMS')) exit
+            call do1(s% eos_frac_ideal, c% eos_frac_ideal)
+            if (failed('eos_frac_ideal')) exit
 
             call do1(s% QQ, c% QQ)
             if (failed('QQ')) exit
@@ -1147,9 +1149,6 @@
             if (failed('P_face_ad')) exit
             call do1(s% P_face_start, c% P_face_start)
             if (failed('P_face_start')) exit
-            call do1(s% d_Pface_domega, c% d_Pface_domega)
-            if (failed('d_Pface_domega')) exit
-
             call do1(s% abs_du_div_cs, c% abs_du_div_cs)
             if (failed('abs_du_div_cs')) exit
             call do1(s% abs_du_plus_cs, c% abs_du_plus_cs)

@@ -229,8 +229,9 @@
       integer, parameter :: p_eos_frac_PC = p_eos_frac_Skye + 1
       integer, parameter :: p_eos_frac_FreeEOS = p_eos_frac_PC + 1
       integer, parameter :: p_eos_frac_CMS = p_eos_frac_FreeEOS + 1
+      integer, parameter :: p_eos_frac_ideal = p_eos_frac_CMS + 1
 
-      integer, parameter :: p_log_rho_times_r3 = p_eos_frac_CMS + 1
+      integer, parameter :: p_log_rho_times_r3 = p_eos_frac_ideal + 1
       integer, parameter :: p_rho_times_r3 = p_log_rho_times_r3 + 1
       integer, parameter :: p_v_times_t_div_r = p_rho_times_r3 + 1
       integer, parameter :: p_v_div_r = p_v_times_t_div_r + 1
@@ -928,6 +929,7 @@
          profile_column_name(p_eos_frac_PC) = 'eos_frac_PC'
          profile_column_name(p_eos_frac_FreeEOS) = 'eos_frac_FreeEOS'
          profile_column_name(p_eos_frac_CMS) = 'eos_frac_CMS'
+         profile_column_name(p_eos_frac_ideal) = 'eos_frac_ideal'
 
          profile_column_name(p_log_rho_times_r3) = 'log_rho_times_r3'
          profile_column_name(p_rho_times_r3) = 'rho_times_r3'

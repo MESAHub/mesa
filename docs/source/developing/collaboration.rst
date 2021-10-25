@@ -93,14 +93,14 @@ the MD.  When a candidate developer is identified, there will be a
 comment period where any MD can privately provide feedback to the MAC
 about the addition to the MESA team.  Nominations and suggestions from
 any MDs are welcome. Currently, the MD are Bill P., Warrick, Evan,
-Earl, Lars, Matteo, Aaron, Rob, Adam, Meridith, Pablo, Josiah, Radek,
+Earl, Lars, Matteo, Aaron, Rob, Adam, Meridith, Pablo, Radek,
 Anne, Rich, Bill W, and Frank.
 
 As MESA's "first author", Bill is an ex-officio member of both MAC and
 MTC.
 
-Initially, the MTC has 4 members appointed by Bill Paxton. These are
-Josiah, Rich, Pablo, and Rob.
+Initially, the MTC has members appointed by Bill Paxton. These are
+Rich, Pablo, and Rob.
 
 Currently, the MAC is Lars, Rich, and Frank.
 
