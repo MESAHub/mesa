@@ -521,7 +521,7 @@
 
     ! misc
     min_chem_eqn_scale, zams_filename, set_rho_to_dm_div_dV, use_other_momentum_implicit, &
-    use_other_surface_PT, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
+    use_other_surface_PT, use_other_mlt_results, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
     use_other_adjust_mdot, use_other_j_for_adjust_J_lost, use_other_alpha_mlt, use_other_remove_surface, &
     use_other_am_mixing, use_other_brunt, use_other_brunt_smoothing, use_other_solver_monitor, &
     use_other_build_initial_model, use_other_cgrav, use_other_energy_implicit, use_other_momentum, &
@@ -2421,6 +2421,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% zams_filename = zams_filename
  s% set_rho_to_dm_div_dV = set_rho_to_dm_div_dV
 
+ s% use_other_mlt_results = use_other_mlt_results
  s% use_other_surface_PT = use_other_surface_PT
  s% use_other_kap = use_other_kap
  s% use_other_diffusion = use_other_diffusion
@@ -4092,6 +4093,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  zams_filename = s% zams_filename
  set_rho_to_dm_div_dV = s% set_rho_to_dm_div_dV
 
+ use_other_mlt_results = s% use_other_mlt_results
  use_other_surface_PT = s% use_other_surface_PT
  use_other_kap = s% use_other_kap
  use_other_diffusion = s% use_other_diffusion

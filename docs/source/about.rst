@@ -104,6 +104,7 @@ Developers
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
 * Aaron Dotter
 * `Robert Farmer <http://rjfarmer.io/>`__
+* Eoin Farrell
 * `Adam Jermyn <http://adamjermyn.com/>`__
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
