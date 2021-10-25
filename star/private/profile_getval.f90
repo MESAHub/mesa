@@ -885,6 +885,8 @@
                val = s% eos_frac_FreeEOS(k)
             case (p_eos_frac_CMS)
                val = s% eos_frac_CMS(k)
+            case (p_eos_frac_ideal)
+               val = s% eos_frac_ideal(k)
                
             case (p_log_c_div_tau)
                val = safe_log10(clight/s% tau(k))
