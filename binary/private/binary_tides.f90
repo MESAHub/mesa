@@ -156,7 +156,7 @@
          
          omega_orb = 2d0*pi/b% period
          do k=1,nz
-            j_sync(k) = omega_orb*s% i_rot(k)
+            j_sync(k) = omega_orb*s% i_rot(k)% val
          end do
       
          if (sync_type == "Instantaneous") then ! instantaneous synchronisation
@@ -337,6 +337,7 @@
          real(dp) :: rGyr_squared, moment_of_inertia
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
+         integer :: k
       
          include 'formats'
    
@@ -354,7 +355,10 @@
             return
          end if
          ! calculate the gyration radius squared
-         moment_of_inertia = dot_product(s% i_rot(:s% nz), s% dm_bar(:s% nz))
+         moment_of_inertia = 0d0
+         do k=1, s% nz
+            moment_of_inertia = moment_of_inertia + s% i_rot(k)% val*s% dm_bar(k)
+         end do
          rGyr_squared = (moment_of_inertia/(m*r_phot*r_phot))
          if (sync_type == "Hut_conv") then
             ! eq. (11) of Hut, P. 1981, A&A, 99, 126
