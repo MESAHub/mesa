@@ -91,7 +91,7 @@
       type :: lgz_list ! sorted in decreasing order of lgz ([M/H])
          real(dp) :: lgz ! [Fe_H]
          type (lgz_list), pointer :: nxt => null()
-         real(dp),dimension(max_num_bcs_per_file) :: colors
+         real(dp),dimension(max_num_bcs_per_file) :: colors = -1d99
       end type
 
       type :: lgt_list ! sorted in decreasing order of lgt
