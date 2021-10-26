@@ -67,7 +67,7 @@
          integer, intent(out) :: ierr
 
          real(dp) :: bfield, vinf, eta, factor
-         real(dp) :: j_dot, check_delta_j, i_tot, delta_j
+         real(dp) :: j_dot, check_delta_j, delta_j
          real(dp) :: residual_jdot, torque, j_average
 
          type (star_info), pointer :: s
@@ -92,9 +92,8 @@
          factor = 0d0
          j_average = 0d0
 
-         ! Calculate total specific moment of inertia and angular momentum
+         ! Calculate total angular momentum
 
-         i_tot = sum(s% i_rot(1:s% nz))
          j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz)) ! g cm^2/s Total Stellar Angular Momentum Content
 
         
