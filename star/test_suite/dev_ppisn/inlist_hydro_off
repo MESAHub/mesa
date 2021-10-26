@@ -13,14 +13,15 @@
 
    !use_T_black_body_outer_BC = .false.
    !use_fixed_L_for_BB_outer_BC = .false.
+   !Pextra_factor = 1d0
 
-   atm_option = 'T_tau'
-   atm_T_tau_relation = 'Eddington'
-   atm_T_tau_opacity = 'fixed'
+   !atm_option = 'T_tau'
+   !atm_T_tau_relation = 'Eddington'
+   !atm_T_tau_opacity = 'fixed'
 
    max_surface_cell_dq = 1d-12
 
-   max_q_for_convection_with_hydro_on = 0.99d0
+   !max_q_for_convection_with_hydro_on = 0.99d0
 
    !angsmt_D_ST = 0.2d0
    !angsmt_nu_ST = 0.2d0

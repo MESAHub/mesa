@@ -172,7 +172,7 @@
    Profile_Panels1_other_ymin(1) = 1.28
    
    Profile_Panels1_yaxis_name(2) = 'omega'
-   Profile_Panels1_other_yaxis_name(2) = 'w_div_w_crit_roche' ! 'vel_km_per_s'
+   Profile_Panels1_other_yaxis_name(2) = 'fp_rot' ! 'vel_km_per_s'
    Profile_Panels1_other_ymax(2) = -101d0 ! -101d0
    Profile_Panels1_other_ymin(2) = -101d0 ! -101d0
    !Profile_Panels1_other_ymargin(2) = 0.1 ! 10
@@ -191,7 +191,7 @@
    
    show_TRho_Profile_kap_regions = .false.
    show_TRho_Profile_gamma1_4_3rd = .true.
-            TRho_Profile_xmin = -15
+            TRho_Profile_xmin = -30
             !TRho_Profile_xmax = 10
             TRho_Profile_ymin = 2.5
             !TRho_Profile_ymax = 10

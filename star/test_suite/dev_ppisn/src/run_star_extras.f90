@@ -146,7 +146,7 @@
          s% other_adjust_mdot => my_adjust_mdot
          s% other_before_struct_burn_mix => my_before_struct_burn_mix
          s% other_eval_fp_ft => my_other_eval_fp_ft
-         s% other_kap_get => my_other_kap_get
+         !s% other_kap_get => my_other_kap_get
 
          ! store user provided options from the inlist
          min_T_for_hydro = s% x_ctrl(1)
@@ -351,16 +351,22 @@
 
       subroutine my_other_eval_fp_ft( &
             id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+         use num_lib
+         use auto_diff
          integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
-         real(dp), intent(inout) :: ft(:), fp(:), r_polar(:), r_equatorial(:) ! (nz)
+         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:) ! (nz)
+         real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
+
          type (star_info), pointer :: s
-         real(dp) :: w,w2,w3,w4,w5,w6, lg_one_sub_w4, A_omega, d_A_omega_dw, \
-            fp_numerator, ft_numerator, d_fp_numerator_dw, d_ft_numerator_dw, alpha
          integer :: j
+         real(dp) :: alpha
+
+         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, &
+            d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, fp_temp, ft_temp
 
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -370,32 +376,33 @@
             do j=1, s% nz
                !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
                !by this point in the code, w_div_w_crit_roche is set
-               w2 = pow2(s% w_div_w_crit_roche(j))
-               w4 = pow4(s% w_div_w_crit_roche(j))
-               w6 = pow6(s% w_div_w_crit_roche(j))
+               w = s% w_div_w_crit_roche(j)
+               w%d1val1 = 1d0
+
+               w2 = pow2(w)
+               w4 = pow4(w)
+               w6 = pow6(w)
                lg_one_sub_w4 = log(1d0-w4)
                A_omega = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
                fp_numerator = (1d0-two_thirds*w2-0.06837d0*w4-0.2495d0*w6)
                ft_numerator = (1d0+0.2185d0*w4-0.1109d0*w6)
                !fits for fp, ft
-               fp(j) = fp_numerator/A_omega
-               ft(j) = ft_numerator/A_omega
+               fp_temp = fp_numerator/A_omega
+               ft_temp = ft_numerator/A_omega
                !re and rp can be derived analytically from w_div_wcrit
-               r_equatorial(j) = r(j)*(1d0+w2/6d0-0.0002507d0*w4+0.06075d0*w6)
-               r_polar(j) = r_equatorial(j)/(1d0+0.5d0*w2)
+               r_equatorial(j) = r(j)*(1d0+w2% val/6d0-0.0002507d0*w4% val+0.06075d0*w6% val)
+               r_polar(j) = r_equatorial(j)/(1d0+0.5d0*w2% val)
                ! Be sure they are consistent with r_Phi
                r_equatorial(j) = max(r_equatorial(j),r(j))
                r_polar(j) = min(r_polar(j),r(j))
+
+               fp(j) = 0d0
+               ft(j) = 0d0
+               fp(j)% val = fp_temp% val
+               ft(j)% val = ft_temp% val
                if (s% w_div_wc_flag) then
-                  ! need to compute partials as well
-                  w = s% w_div_w_crit_roche(j)
-                  w3 = pow3(s% w_div_w_crit_roche(j))
-                  w5 = pow5(s% w_div_w_crit_roche(j))
-                  d_fp_numerator_dw = -2d0*two_thirds*w-4d0*0.06837d0*w3-6d0*0.2495d0*w5
-                  d_ft_numerator_dw = 4d0*0.2185d0*w3-6d0*0.1109d0*w5
-                  d_A_omega_dw = -4d0*0.1076d0*w3-6d0*0.2336d0*w5-0.5583d0/(1d0-w4)*(-4d0*w3)
-                  s% dfp_rot_dw_div_wc(j) = (d_fp_numerator_dw/A_omega - fp_numerator*d_A_omega_dw/pow2(A_omega))
-                  s% dft_rot_dw_div_wc(j) = (d_ft_numerator_dw/A_omega - ft_numerator*d_A_omega_dw/pow2(A_omega))
+                  fp(j)% d1Array(i_w_div_wc_00) = fp_temp% d1val1
+                  ft(j)% d1Array(i_w_div_wc_00) = ft_temp% d1val1
                end if
             end do
 !$OMP END PARALLEL DO
@@ -410,10 +417,6 @@
                   alpha = (1d0-(s% q(j)-0.998)/(0.001))
                   fp(j) = fp(j)*alpha + 1d0*(1-alpha)
                   ft(j) = ft(j)*alpha + 1d0*(1-alpha)
-                  if (s% w_div_wc_flag) then
-                     s% dfp_rot_dw_div_wc(j) = s% dfp_rot_dw_div_wc(j)*alpha
-                     s% dft_rot_dw_div_wc(j) = s% dft_rot_dw_div_wc(j)*alpha
-                  end if
                end if
             end do
          end if
@@ -421,88 +424,141 @@
       end subroutine my_other_eval_fp_ft
 
 
-      subroutine my_other_kap_get( &
-            id, k, handle, species, chem_id, net_iso, xa, &
-            log10_rho, log10_T, &
-            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            eta, d_eta_dlnRho, d_eta_dlnT, &
-            kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
-
-         use kap_def, only: num_kap_fracs
-         use kap_lib
- 
-         ! INPUT
-         integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
-         integer, intent(in) :: handle ! from alloc_kap_handle
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-            ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-            ! index from 1 to num_chem_isos (defined in chem_def)
-            ! value is 0 if the iso is not in the current net
-            ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: log10_rho ! density
-         real(dp), intent(in) :: log10_T ! temperature
-         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-            ! free_e := total combined number per nucleon of free electrons and positrons
-         real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
-            ! eta := electron degeneracy parameter
-
-         ! OUTPUT
-         real(dp), intent(out) :: kap_fracs(num_kap_fracs)
-         real(dp), intent(out) :: kap ! opacity
-         real(dp), intent(out) :: dln_kap_dlnRho ! partial derivative at constant T
-         real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
-         real(dp), intent(out) :: dln_kap_dxa(:) ! partial derivative w.r.t. to species
-         integer, intent(out) :: ierr ! 0 means AOK.
-
-         type (star_info), pointer :: s
-         real(dp) :: velocity
-         real(dp) :: radius
-
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-                  
-         kap = 0; dln_kap_dlnRho = 0; dln_kap_dlnT = 0; dln_kap_dxa = 0
-         velocity = 0
-         radius = 0
-
-         !if (k==1 .and. s% u_flag .and. .not. is_nan(s% lnR_start(1))) then !very surface cell can go mad, things are more stable if we fix opacity
-         !   if (s% xh_start(s% i_u,1)>sqrt(2*s% cgrav(1)*s% m(1)/exp(s% lnR_start(1)))) then
-         if (k==1 .and. s% u_flag) then !very surface cell can go mad, things are more stable if we fix opacity
-            ! this is to support restarts, as xh_start and r_start are
-            ! not properly set when model loads
-            if (s% solver_iter > 0) then
-               velocity = s% xh_start(s% i_u,1)
-               radius = s% r_start(1)
-            else
-               velocity = s% xh(s% i_u,1)
-               radius = s% r(1)
-            end if
-            if (velocity>sqrt(2*s% cgrav(1)*s% m(1)/radius)) then
-               kap = 0.2d0*(1 + s% X(1))
-               dln_kap_dlnRho = 0d0
-               dln_kap_dlnT = 0d0
-            else
-               call kap_get( &
-                  s% kap_handle, species, chem_id, net_iso, xa, &
-                  log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-                  eta, d_eta_dlnRho, d_eta_dlnT, &
-                  kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
-            end if
-         else
-            call kap_get( &
-               s% kap_handle, species, chem_id, net_iso, xa, &
-               log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-               eta, d_eta_dlnRho, d_eta_dlnT, &
-               kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
-         end if
-
-      end subroutine my_other_kap_get
+!      subroutine my_other_kap_get( &
+!            id, k, handle, species, chem_id, net_iso, xa, &
+!            log10_rho, log10_T, &
+!            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+!            eta, d_eta_dlnRho, d_eta_dlnT, &
+!            kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!
+!         use kap_def, only: num_kap_fracs
+!         use kap_lib
+! 
+!         ! INPUT
+!         integer, intent(in) :: id ! star id if available; 0 otherwise
+!         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
+!         integer, intent(in) :: handle ! from alloc_kap_handle
+!         integer, intent(in) :: species
+!         integer, pointer :: chem_id(:) ! maps species to chem id
+!            ! index from 1 to species
+!            ! value is between 1 and num_chem_isos         
+!         integer, pointer :: net_iso(:) ! maps chem id to species number
+!            ! index from 1 to num_chem_isos (defined in chem_def)
+!            ! value is 0 if the iso is not in the current net
+!            ! else is value between 1 and number of species in current net
+!         real(dp), intent(in) :: xa(:) ! mass fractions
+!         real(dp), intent(in) :: log10_rho ! density
+!         real(dp), intent(in) :: log10_T ! temperature
+!         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+!            ! free_e := total combined number per nucleon of free electrons and positrons
+!         real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
+!            ! eta := electron degeneracy parameter
+!
+!         ! OUTPUT
+!         real(dp), intent(out) :: kap_fracs(num_kap_fracs)
+!         real(dp), intent(out) :: kap ! opacity
+!         real(dp), intent(out) :: dln_kap_dlnRho ! partial derivative at constant T
+!         real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
+!         real(dp), intent(out) :: dln_kap_dxa(:) ! partial derivative w.r.t. to species
+!         integer, intent(out) :: ierr ! 0 means AOK.
+!
+!         type (star_info), pointer :: s
+!         real(dp) :: velocity
+!         real(dp) :: radius, logR
+!         real(dp) :: logT_alt, inv_diff
+!         real(dp) :: log_kap, alpha
+!
+!         ierr = 0
+!         call star_ptr(id, s, ierr)
+!         if (ierr /= 0) return
+!                  
+!         kap = 0; dln_kap_dlnRho = 0; dln_kap_dlnT = 0; dln_kap_dxa = 0
+!         velocity = 0
+!         radius = 0
+!
+!         !if (k==1 .and. s% u_flag .and. .not. is_nan(s% lnR_start(1))) then !very surface cell can go mad, things are more stable if we fix opacity
+!         !   if (s% xh_start(s% i_u,1)>sqrt(2*s% cgrav(1)*s% m(1)/exp(s% lnR_start(1)))) then
+!         if (k==1 .and. s% u_flag) then !very surface cell can go mad, things are more stable if we fix opacity
+!            ! this is to support restarts, as xh_start and r_start are
+!            ! not properly set when model loads
+!            if (s% solver_iter > 0) then
+!               velocity = s% xh_start(s% i_u,1)
+!               radius = s% r_start(1)
+!            else
+!               velocity = s% xh(s% i_u,1)
+!               radius = s% r(1)
+!            end if
+!            if (velocity>sqrt(2*s% cgrav(1)*s% m(1)/radius)) then
+!               kap = 0.2d0*(1 + s% X(1))
+!               dln_kap_dlnRho = 0d0
+!               dln_kap_dlnT = 0d0
+!               return
+!            else
+!               call kap_get( &
+!                  s% kap_handle, species, chem_id, net_iso, xa, &
+!                  log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+!                  eta, d_eta_dlnRho, d_eta_dlnT, &
+!                  kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!            end if
+!            !else
+!            !   if (log10_T >= 3.1d0) then
+!            !      call kap_get( &
+!            !         s% kap_handle, species, chem_id, net_iso, xa, &
+!            !         log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+!            !         eta, d_eta_dlnRho, d_eta_dlnT, &
+!            !         kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!            !   else
+!            !      logT_alt = 3.1d0+0.6d0*(1d0/(1d0+exp(-4d0/0.6d0*(log10_T-3.1d0)))-0.5d0)
+!            !      inv_diff = (4d0*exp(4d0/0.6d0*(log10_T-3.1d0))/(exp(4d0/0.6d0*(log10_T-3.1d0))+1)**2)
+!            !      call kap_get( &
+!            !         s% kap_handle, species, chem_id, net_iso, xa, &
+!            !         log10_rho, logT_alt, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT/inv_diff, &
+!            !         eta, d_eta_dlnRho, d_eta_dlnT/inv_diff, &
+!            !         kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!            !      dln_kap_dlnT = dln_kap_dlnT*inv_diff
+!            !   end if
+!         else
+!            radius = s% r_start(k)
+!            logR = log10(radius)
+!            !call kap_get( &
+!            !   s% kap_handle, species, chem_id, net_iso, xa, &
+!            !   log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+!            !   eta, d_eta_dlnRho, d_eta_dlnT, &
+!            !   kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!            if (logR <= 4.5d0) then
+!              call kap_get( &
+!                 s% kap_handle, species, chem_id, net_iso, xa, &
+!                 log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+!                 eta, d_eta_dlnRho, d_eta_dlnT, &
+!                 kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!            else if (logR < 5d0) then
+!               call kap_get( &
+!                  s% kap_handle, species, chem_id, net_iso, xa, &
+!                  log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+!                  eta, d_eta_dlnRho, d_eta_dlnT, &
+!                  kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!               alpha = (logR-4.5)/(5d0-4.5d0)
+!               log_kap = (alpha-1)*log(kap) + alpha*log(1d-10)
+!               kap = exp(log_kap)
+!               dln_kap_dlnRho = (alpha-1)*dln_kap_dlnRho
+!               dln_kap_dlnT = (alpha-1)*dln_kap_dlnT
+!            else
+!               kap = log(1d-10)!0.2d0*(1 + s% X(1))
+!               dln_kap_dlnRho = 0d0
+!               dln_kap_dlnT = 0d0
+!               !logT_alt = 3.1d0+0.6d0*(1d0/(1d0+exp(-4d0/0.6d0*(log10_T-3.1d0)))-0.5d0)
+!               !inv_diff = (4d0*exp(4d0/0.6d0*(log10_T-3.1d0))/(exp(4d0/0.6d0*(log10_T-3.1d0))+1)**2)
+!               !call kap_get( &
+!               !   s% kap_handle, species, chem_id, net_iso, xa, &
+!               !   log10_rho, logT_alt, lnfree_e, d_lnfree_e_dlnRho,d_lnfree_e_dlnT/inv_diff, &
+!               !   eta, d_eta_dlnRho, d_eta_dlnT/inv_diff, &
+!               !   kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+!               !dln_kap_dlnT = dln_kap_dlnT*inv_diff
+!            end if
+!         end if
+!
+!
+!      end subroutine my_other_kap_get
 
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
@@ -1246,21 +1302,21 @@
                s% u(k) = s% xh(s% i_u,k)
             end do
 
-            ! use fixed_vsurf if surface v remains too high
-            if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
-               s% use_fixed_vsurf_outer_BC = .true.
-               s% use_momentum_outer_BC = .false.
-               s% fixed_vsurf = vsurf_for_fixed_bc*1d5
-            else
-               if (s% lxtra(lx_using_bb_bcs)) then
-                  s% use_fixed_vsurf_outer_BC = .true.
-                  s% use_momentum_outer_BC = .false.
-                  s% fixed_vsurf = s% xtra(x_vsurf_at_remove_surface)
-               else
-                  s% use_fixed_vsurf_outer_BC = .false.
-                  s% use_momentum_outer_BC = .true.
-               end if
-            end if
+            !! use fixed_vsurf if surface v remains too high
+            !if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
+            !   s% use_fixed_vsurf_outer_BC = .true.
+            !   s% use_momentum_outer_BC = .false.
+            !   s% fixed_vsurf = vsurf_for_fixed_bc*1d5
+            !else
+            !   if (s% lxtra(lx_using_bb_bcs)) then
+            !      s% use_fixed_vsurf_outer_BC = .true.
+            !      s% use_momentum_outer_BC = .false.
+            !      s% fixed_vsurf = s% xtra(x_vsurf_at_remove_surface)
+            !   else
+            !      s% use_fixed_vsurf_outer_BC = .false.
+            !      s% use_momentum_outer_BC = .true.
+            !   end if
+            !end if
 
             if (maxval(abs(s% xh(s% i_u,:s% nz)))<2d7) then
                s% dt_div_min_dr_div_cs_limit = 2d1
@@ -1273,23 +1329,23 @@
             call star_read_controls(id, 'inlist_hydro_off', ierr)
          end if
 
-         !ensure we are using the proper BCs and options every time before struct_burn_mix
-         if (s% lxtra(lx_using_bb_bcs)) then
-            !s% use_atm_PT_at_center_of_surface_cell = .true.
-            s% atm_option = "fixed_Tsurf"
-            s% atm_fixed_Tsurf = s% xtra(x_Tsurf_for_atm)
-            s% tau_factor = s% xtra(x_tau_factor)
-            s% force_tau_factor = s% xtra(x_tau_factor)
-            s% delta_lgL_limit_L_min = 1d99
-         else
-            !s% use_atm_PT_at_center_of_surface_cell = .false.
-            s% atm_option = 'T_tau'
-            s% atm_T_tau_relation = 'Eddington'
-            s% atm_T_tau_opacity = 'fixed'
-            s% tau_factor = 1d0
-            s% force_tau_factor = 1d0
-            s% delta_lgL_limit_L_min = -100
-         end if
+         !!ensure we are using the proper BCs and options every time before struct_burn_mix
+         !if (s% lxtra(lx_using_bb_bcs)) then
+         !   !s% use_atm_PT_at_center_of_surface_cell = .true.
+         !   s% atm_option = "fixed_Tsurf"
+         !   s% atm_fixed_Tsurf = s% xtra(x_Tsurf_for_atm)
+         !   !s% tau_factor = s% xtra(x_tau_factor)
+         !   !s% force_tau_factor = s% xtra(x_tau_factor)
+         !   s% delta_lgL_limit_L_min = 1d99
+         !else
+         !   !s% use_atm_PT_at_center_of_surface_cell = .false.
+         !   s% atm_option = 'T_tau'
+         !   s% atm_T_tau_relation = 'Eddington'
+         !   s% atm_T_tau_opacity = 'fixed'
+         !   !s% tau_factor = 1d0
+         !   !s% force_tau_factor = 1d0
+         !   s% delta_lgL_limit_L_min = -100
+         !end if
 
          !ignore L_nuc limit if L_phot is too high or if we just did a relax
          !(ixtra(ix_steps_since_relax) is set to zero right after a relax)
@@ -1320,9 +1376,9 @@
             end if
          end if
 
-         if (s% use_fixed_vsurf_outer_BC) then
-            write(*,*) "Using fixed_vsurf", s% fixed_vsurf/1e5
-         end if
+         !if (s% use_fixed_vsurf_outer_BC) then
+         !   write(*,*) "Using fixed_vsurf", s% fixed_vsurf/1e5
+         !end if
 
          !ignore winds if neutrino luminosity is too high or for a few steps after
          !a relax
@@ -1382,26 +1438,33 @@
          !   end do
          !end if
 
-         if (remove_extended_layers .and. s% u_flag &
-            .and. s% log_surface_radius > 3.7d0) then
-            do k = 1, s% nz
-               if (log10(s% r(k)/Rsun) < 3.7d0) then
-                  exit
-               end if
-            end do
-            !s% use_atm_PT_at_center_of_surface_cell = .true.
-            s% atm_option = "fixed_Tsurf"
-            s% atm_fixed_Tsurf = s% T(k)
-            s% xtra(x_Tsurf_for_atm) = s% T(k)
-            s% xtra(x_vsurf_at_remove_surface) = max(s% u(k),2*sqrt(2d0*standard_cgrav*s% m(k)/(pow(10d0,3.9d0)*Rsun)))
-            s% lxtra(lx_using_bb_bcs) = .true.
+         !if (remove_extended_layers .and. s% u_flag &
+         !   .and. s% log_surface_radius > 3.7d0) then
+         !   do k = 1, s% nz
+         !      if (log10(s% r(k)/Rsun) < 3.7d0) then
+         !         exit
+         !      end if
+         !   end do
+         !   !s% use_atm_PT_at_center_of_surface_cell = .true.
+         !   s% atm_option = "fixed_Tsurf"
+         !   s% atm_fixed_Tsurf = s% T(k)
+         !   s% xtra(x_Tsurf_for_atm) = s% T(k)
+         !   s% xtra(x_vsurf_at_remove_surface) = max(s% u(k),2*sqrt(2d0*standard_cgrav*s% m(k)/(pow(10d0,3.9d0)*Rsun)))
+         !   s% lxtra(lx_using_bb_bcs) = .true.
 
-            write(*,*) "Removing surface layers", k, s% m(k)/Msun
-            call star_remove_surface_at_cell_k(s% id, k, ierr)
-            if (dbg) write(*,*) "check ierr", ierr
-            if (ierr /= 0) return
-            s% xtra(x_tau_factor) = s% tau_factor
-         end if
+         !   write(*,*) "Removing surface layers", k, s% m(k)/Msun
+         !   call star_remove_surface_at_cell_k(s% id, k, ierr)
+         !   if (dbg) write(*,*) "check ierr", ierr
+         !   if (ierr /= 0) return
+         !   s% xtra(x_tau_factor) = s% tau_factor
+         !end if
+
+         !if (s% T(1) < 1d3) then
+         !   s% atm_option = "fixed_Tsurf"
+         !   s% atm_fixed_Tsurf = s% T(1)
+         !   s% xtra(x_Tsurf_for_atm) = s% T(1)
+         !   s% lxtra(lx_using_bb_bcs) = .true.
+         !end if
 
          s% ixtra(ix_steps_since_relax) = s% ixtra(ix_steps_since_relax) + 1
          s% ixtra(ix_steps_since_hydro_on) = s% ixtra(ix_steps_since_hydro_on) + 1
