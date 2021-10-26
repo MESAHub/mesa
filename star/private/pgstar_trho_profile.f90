@@ -393,6 +393,8 @@
             call show_label(1.0, 3.2, 0.0, 0.5, 'HELM')
             call show_label(-7.2, 5.8, 0.0, 0.5, 'FreeEOS')
             call show_label(-1.5, 3.7, 0.0, 0.5, 'OPAL/SCVH')
+            call show_label(-1.5, 9.7, 0.0, 0.5, 'HELM/Skye EOS')
+            call show_label(6.0, 4.5, 0.0, 0.5, 'Skye EOS')
             
             call pgunsa
          end subroutine do_eos_regions
