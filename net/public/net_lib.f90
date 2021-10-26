@@ -636,7 +636,7 @@
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
 
-         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after subtract reaction neutrinos
+         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after including reaction neutrinos
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
          real(dp), intent(inout) :: d_eps_nuc_dx(:) ! (num_isos) 
@@ -895,7 +895,7 @@
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
 
-         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after subtract reaction neutrinos
+         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after including reaction neutrinos
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
          real(dp), intent(inout) :: d_eps_nuc_dx(:) ! (num_isos) 
@@ -995,7 +995,7 @@
          real(dp), intent(in) :: weak_rate_factor
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after subtract reaction neutrinos
+         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after including reaction neutrinos
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
          real(dp), intent(inout) :: d_eps_nuc_dx(:) ! (num_isos) 

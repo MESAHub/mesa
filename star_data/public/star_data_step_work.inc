@@ -227,14 +227,14 @@
 
       real(dp), pointer :: eps_nuc(:) ! sum of reaction_eps_nuc for all reactions in net
          ! thermal ergs per gram per second from nuclear reactions
-         ! (nuclear reaction neutrinos have been subtracted)
+         ! (including losses to neutrinos produced in the reactions)
       real(dp), pointer :: eps_nuc_categories(:,:) ! (num_categories, nz)
       real(dp), pointer :: d_epsnuc_dlnd(:) ! partial wrt density
       real(dp), pointer :: d_epsnuc_dlnT(:) ! partial wrt temperature
       real(dp), pointer :: d_epsnuc_dx(:,:)  ! (species,nz)
          ! d_ex_dx(j, k) is partial of eps_nuc(k) wrt species(j)
 
-      real(dp), pointer :: eps_nuc_neu_total(:) ! erg/gm/sec as neutrinos from nuclear reactions
+      real(dp), pointer :: eps_nuc_neu_total(:) ! erg/gm/sec, (positive) energy lost to neutrinos in nuclear reactions
 
       real(dp), pointer :: dxdt_nuc(:,:) ! (species,nz)
          ! rate of change of mass fractions from nuclear reactions
@@ -259,7 +259,7 @@
       real(dp), pointer :: luminosity_by_category(:,:) ! (num_categories, nz)
 
       ! non-nuclear-reaction neutrino losses
-      real(dp), pointer :: non_nuc_neu(:)
+      real(dp), pointer :: non_nuc_neu(:) ! positive
       real(dp), pointer :: d_nonnucneu_dlnd(:)
       real(dp), pointer :: d_nonnucneu_dlnT(:)
    
