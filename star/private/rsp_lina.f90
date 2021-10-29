@@ -25,7 +25,7 @@
 
       module rsp_lina
       use star_def, only: star_info
-      use utils_lib, only: is_bad
+      use utils_lib, only: is_bad, mesa_error
       use const_def, only: dp, crad
       use rsp_def
       
@@ -135,7 +135,7 @@
          write(*,*) 'Lr', I, Lr(I)
          write(*,*) 'Et', I, Et(I)
       end do
-      stop 'do_LINA'
+      call mesa_error(__FILE__,__LINE__,'do_LINA')
       end if
       
       ierr = 0
@@ -289,7 +289,7 @@
       dHp_dT_00(NZN)=POM*Vol(NZN)*dP_dT_00(NZN)
       dHp_dT_out(NZN)=0.d0
       
-      !stop 'Hp_face'
+      !call mesa_error(__FILE__,__LINE__,'Hp_face')
 
       do I=1,NZN-1
          POM=0.5d0*(QQS(I)/CPS(I)+QQS(I+1)/CPS(I+1))
@@ -328,7 +328,7 @@
          dY_dT_out(I)=IGR1*IGR2YP+IGR2*IGR1YP
       enddo
       
-      !stop 'IGRS'
+      !call mesa_error(__FILE__,__LINE__,'IGRS')
 
       do I=1,NZN-1
          POM=sqrt(2.d0/3.d0)*0.5d0
@@ -365,7 +365,7 @@
          dPII_dT_out(I)=POM*GGYP
       enddo
  
-      !stop 'LINA'
+      !call mesa_error(__FILE__,__LINE__,'LINA')
 
       do I=IBOTOM+1,NZN-1
 !        SOURCE TERM
@@ -501,7 +501,7 @@
          
       enddo
  
-       !stop 'LINA'
+       !call mesa_error(__FILE__,__LINE__,'LINA')
 
       do I=IBOTOM,NZN-1
 !        CONVECTIVE LUMINOSITY
@@ -1197,7 +1197,7 @@
       end if
       if (is_bad(G+H)) then
          write(*,2) 'LINA mesa_eos_kap G H', k, G, H
-         stop 'mesa_eos_kap'
+         call mesa_error(__FILE__,__LINE__,'mesa_eos_kap')
       end if
       call eval_mesa_eos_and_kap(s,j,G,H, &
                Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT,&

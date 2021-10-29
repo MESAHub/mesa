@@ -25,7 +25,7 @@
 
       module rsp_relax_env
       use star_def, only: star_info
-      use utils_lib, only: is_bad
+      use utils_lib, only: is_bad, mesa_error
       use const_def, only: dp, crad
       use eos_lib, only: Radiation_Pressure
       use rsp_def
@@ -62,7 +62,7 @@
          write(*,*) 'P <= Prad', k, P, Prad, T
          ierr = -1
          return
-         stop 'EOP'
+         call mesa_error(__FILE__,__LINE__,'EOP')
       end if
       rho_guess = eval1_gamma_PT_getRho(s, 0, P, T, ierr)
       if (ierr /= 0) then
@@ -71,7 +71,7 @@
          write(*,*) 'T', T
          ierr = -1
          return
-         stop 'EOP'
+         call mesa_error(__FILE__,__LINE__,'EOP')
       end if
       call eval1_mesa_Rho_given_PT(s, 0, P, T, rho_guess, rho, ierr)
       if (ierr /= 0) then
@@ -81,7 +81,7 @@
          write(*,*) 'rho_guess', rho_guess
          ierr = -1
          return
-         stop 'EOP'
+         call mesa_error(__FILE__,__LINE__,'EOP')
       end if
       V = 1d0/rho ! initial guess to be improved below
       
@@ -342,7 +342,7 @@
       !   write(*,*) 'TNL', TNL
       !   write(*,*) 'dmNL', dmNL
       !   write(*,*) 'dmN', dmN
-      !   stop 'failed in RELAX_ENV'
+      !   call mesa_error(__FILE__,__LINE__,'failed in RELAX_ENV')
       !end if
       CFIDDLE=0.1d0
       if(abs(DDT/dmN).gt.CFIDDLE) DDT=CFIDDLE*dmN*(DDT/abs(DDT))
@@ -459,7 +459,7 @@
          write(*,*) 'RELAX_ENV has reached max num allowed tries for outer dm', max_dmN_cnt
          ierr = -1
          return
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
  24   TNL  = TT
@@ -1251,7 +1251,7 @@
  103  continue
       !write(*,*) 'apply corr', II,dabs(DXXC),dabs(DXXR),dabs(DXXT),ITROUBC, &
       !      Et(ITROUBC),EZH
-      !stop 'debug'
+      !call mesa_error(__FILE__,__LINE__,'debug')
       !write(*,*) 'DXXC/PRECR', ITROUBC, DXXC/PRECR, DXXC
       if(dabs(DXXC).lt.PRECR.and.dabs(DXXR).lt.PRECR.and. &
          dabs(DXXT).lt.PRECR) then

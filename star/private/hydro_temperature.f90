@@ -121,7 +121,7 @@
          if (is_bad(resid%val)) then
 !$OMP critical (star_alt_dlntdm_bad_num)
             write(*,2) 'resid%val', k, resid%val
-            if (s% stop_for_bad_nums) stop 'do1_alt_dlnT_dm_eqn'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_alt_dlnT_dm_eqn')
 !$OMP end critical (star_alt_dlntdm_bad_num)
          end if
 
@@ -185,13 +185,13 @@
          if (is_bad(s% equ(i_equL, k))) then
             ierr = -1
             if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
-            if (s% stop_for_bad_nums) stop 'do1_gradT_eqn'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_gradT_eqn')
             return
             write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
             write(*,2) 'gradT', k, gradT
             write(*,2) 'dlnT', k, dlnT
             write(*,2) 'dlnP', k, dlnP
-            stop 'do1_gradT_eqn'
+            call mesa_error(__FILE__,__LINE__,'do1_gradT_eqn')
          end if
 
          if (test_partials) then
@@ -288,14 +288,14 @@
          if (is_bad(s% equ(i_equL, k))) then
             ierr = -1
             if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
-            if (s% stop_for_bad_nums) stop 'hydro eqns'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'hydro eqns')
             return
             write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
             write(*,2) 'lnTdiff', k, lnTdiff
             write(*,2) 'delm', k, delm
             write(*,2) 'dlnPdm', k, dlnPdm
             write(*,2) 'gradT', k, gradT
-            stop 'i_equL'
+            call mesa_error(__FILE__,__LINE__,'i_equL')
          end if
 
          if (test_partials) then
@@ -357,7 +357,7 @@
             end if
             if (s% stop_for_bad_nums) then
                write(*,2) 'dlnPdm_qhse', k, dlnPdm_qhse
-               stop 'eval_dlnPdm_qhse'
+               call mesa_error(__FILE__,__LINE__,'eval_dlnPdm_qhse')
             end if
             return
          end if

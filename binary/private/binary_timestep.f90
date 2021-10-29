@@ -274,7 +274,7 @@
          else if (set_dt == dtdm) then
             b% dt_why_reason = b_Tlim_dm
          else
-            stop 'Something wrong in binary timestep'
+            call mesa_error(__FILE__,__LINE__,'Something wrong in binary timestep')
          end if
 
          if (set_dt < 1d-7) set_dt = 1d-7 ! there's a limit to everything

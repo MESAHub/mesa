@@ -27,7 +27,7 @@
 
       use star_def
       use math_lib
-      use utils_lib, only: is_bad_num, is_nan
+      use utils_lib, only: is_bad_num, is_nan, mesa_error
 
       implicit none
 
@@ -325,7 +325,7 @@
             end if
          end do
 
-         if (.not. okay) stop 'star_private_def_init'
+         if (.not. okay) call mesa_error(__FILE__,__LINE__,'star_private_def_init')
 
       end subroutine star_private_def_init
 

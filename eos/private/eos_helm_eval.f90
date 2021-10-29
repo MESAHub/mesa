@@ -152,7 +152,7 @@
                write(*,*) 'clip_to_table_boundaries', clip_to_table_boundaries
                write(*,*) 'include_radiation', include_radiation
                write(*,*) 'include_elec_pos', include_elec_pos
-               stop 'Get1_HELMEOS_Results'
+               call mesa_error(__FILE__,__LINE__,'Get1_HELMEOS_Results')
             end if
             !write(*,*) 'failed in helmeos2'
             return
@@ -204,7 +204,7 @@
             write(*,1) 'detot_dRho', helm_res(h_ded)
             write(*,1) 'detot_dabar', helm_res(h_dea)
             write(*,1) 'detot_dzbar', helm_res(h_dez)
-            stop 'do_convert_helm_results'
+            call mesa_error(__FILE__,__LINE__,'do_convert_helm_results')
          end if
          
          energy = helm_res(h_etot)

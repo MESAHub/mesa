@@ -465,7 +465,7 @@
          write(*,1) 'rr', rr
          write(*,1) 'rr1', rr1
          write(*,*)
-         stop 'rate_tripalf_jina' 
+         call mesa_error(__FILE__,__LINE__,'rate_tripalf_jina') 
       end subroutine rate_tripalf_jina
 
 
@@ -4195,7 +4195,7 @@
             write(*,'(a)')  &
                'reaclib_rate_and_dlnT_for_handle: failed in reaclib_indices_for_reaction '  &
                // trim(handle)
-            stop 'reaclib_rate_and_dlnT_for_handle'
+            call mesa_error(__FILE__,__LINE__,'reaclib_rate_and_dlnT_for_handle')
          end if
          if (T9 < reaclib_min_T9 .and. reaclib_rates% reaction_flag(lo) /= 'w' .and. &
              reaclib_rates% reaction_flag(lo) /= 'e') then ! w or ec
@@ -4211,7 +4211,7 @@
             write(*,'(a)')  &
                'reaclib_rate_for_handle: failed in reaclib_reaction_rates '  &
                // trim(handle)
-            stop 'reaclib_rate_for_handle'
+            call mesa_error(__FILE__,__LINE__,'reaclib_rate_for_handle')
             return
          end if
       end subroutine reaclib_rate_for_handle
@@ -4233,7 +4233,7 @@
             write(*,'(a)')  &
                'reaclib_rate_and_dlnT_for_handle: failed in reaclib_indices_for_reaction '  &
                // trim(handle)
-            stop 'reaclib_rate_and_dlnT_for_handle'
+            call mesa_error(__FILE__,__LINE__,'reaclib_rate_and_dlnT_for_handle')
          end if
          call reaclib_rate_and_dlnT( &
             lo, hi, handle, T9, lambda, dlambda_dlnT, rlambda, drlambda_dlnT, ierr)
@@ -4302,7 +4302,7 @@
             write(*,1) 'a6*(tf% T953)', a6*(tf% T953)
             write(*,1) 'a7*(tf% lnT9)', a7*(tf% lnT9)
             write(*,1) 'tf% lnT9/ln10', tf% lnT9/ln10
-            stop 'reaclib'
+            call mesa_error(__FILE__,__LINE__,'reaclib')
          end if
       end subroutine do_reaclib
 

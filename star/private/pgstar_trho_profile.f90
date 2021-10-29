@@ -184,7 +184,7 @@
 
          if (len_trim(s% TRho_Profile_fname) > 0) then
 
-            stop 'NEED TO ADD ABILITY TO SHOW EXTRA PROFILE FOR COMPARISON'
+            call mesa_error(__FILE__,__LINE__,'NEED TO ADD ABILITY TO SHOW EXTRA PROFILE FOR COMPARISON')
 
          end if
 

@@ -89,7 +89,7 @@
          ierr = 0
 
          if (s% u_flag .and. s% use_mass_corrections) &
-            stop 'use_mass_corrections dP not supported with u_flag true'
+            call mesa_error(__FILE__,__LINE__,'use_mass_corrections dP not supported with u_flag true')
 
          if (s% u_flag) then
             call do_uface_and_Pface(s,ierr)
@@ -129,7 +129,7 @@
          else if (trim(s% energy_eqn_option) == 'dedt') then
             s% eps_grav_form_for_energy_eqn = .false.
          else
-            stop 'Invalid choice for energy_eqn_option'
+            call mesa_error(__FILE__,__LINE__,'Invalid choice for energy_eqn_option')
          end if
 
       ! solving structure equations
@@ -320,7 +320,7 @@
             !write(*,*) 'call show_matrix'
             !call show_matrix(s, s% dblk(1:s% nvar_hydro,1:s% nvar_hydro,1), s% nvar_hydro)
             call dump_equ ! debugging
-            stop 'after dump_equ'
+            call mesa_error(__FILE__,__LINE__,'after dump_equ')
          end if
 
          
@@ -554,7 +554,7 @@
                if (s% report_ierr) then
                   write(*,3) 'eval_equ_for_solver: bad ' // trim(str), j, k, dxa
                end if
-               if (s% stop_for_bad_nums) stop 'eval_equ_for_solver'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'eval_equ_for_solver')
 !$omp end critical (eval_equ_for_solver_crit1)
                return
             end if
@@ -624,7 +624,7 @@
          !test_partials = (k == s% solver_test_partials_k-1)
          test_partials = .false.
          
-         stop 'PABLO needs to rewrite using auto_diff'
+         call mesa_error(__FILE__,__LINE__,'PABLO needs to rewrite using auto_diff')
                   
       end subroutine do1_dln_cvpv0_dt_eqn
       
@@ -901,7 +901,7 @@
                write(*,1) 'dP0', dP0
                write(*,1) 'lnP_surf', lnP_surf
                write(*,1) 'r', r
-               stop 'P bc'
+               call mesa_error(__FILE__,__LINE__,'P bc')
             end if
          
             if (is_bad(T_bc)) then
@@ -910,7 +910,7 @@
                write(*,1) 'T_surf', T_surf
                write(*,1) 'dP0', dP0
                write(*,1) 'lnT_surf', lnT_surf
-               stop 'T bc'
+               call mesa_error(__FILE__,__LINE__,'T bc')
             end if
             
             dP0_dlnR = 0
@@ -1053,7 +1053,7 @@
                write(*,1) 'set_Tsurf_BC residual', residual
                write(*,1) 'lnT1_ad%val', lnT1_ad%val
                write(*,1) 'lnT_bc_ad%val', lnT_bc_ad%val
-               stop 'set_Tsurf_BC'
+               call mesa_error(__FILE__,__LINE__,'set_Tsurf_BC')
             end if
             if (test_partials) then
                s% solver_test_partials_val = 0
@@ -1177,7 +1177,7 @@
          if (ierr /= 0) return
          if (s% nvar_hydro /= n) then
             write(*,3) 'nvar_hydro /= n', s% nvar_hydro, n
-            stop 'equ_data_for_extra_profile_columns'
+            call mesa_error(__FILE__,__LINE__,'equ_data_for_extra_profile_columns')
          end if
          do i=1,n
             do k=1,nz

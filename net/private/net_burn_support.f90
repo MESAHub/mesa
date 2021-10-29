@@ -26,7 +26,7 @@
       module net_burn_support
       use const_def, only: dp
       use math_lib
-      use utils_lib, only: is_bad
+      use utils_lib, only: is_bad, mesa_error
       use mtx_def, only: lapack
       
       implicit none
@@ -117,7 +117,7 @@
          if (dbg) then
             if (is_bad(y(i))) then
                write(*,*) 'bad y for nstp', nstp, i, y(i)
-               stop 'netint'
+               call mesa_error(__FILE__,__LINE__,'netint')
             end if
          end if
          y(i) = min(1.0d0, max(y(i),1.0d-30))
@@ -181,7 +181,7 @@
         write(6,220) 'current composition:'
         write(6,230) (y(i), i=1,nvar)
         
-        !stop 'h < stpmin in netint'
+        !call mesa_error(__FILE__,__LINE__,'h < stpmin in netint')
 
 210     format(1x,a,4i6)
 220     format(1x,a,1p3e24.16)
@@ -194,7 +194,7 @@
       enddo
       ierr = -1
       return
-      stop 'more than max_steps steps required in netint'
+      call mesa_error(__FILE__,__LINE__,'more than max_steps steps required in netint')
       end subroutine netint
 
 
@@ -317,7 +317,7 @@
          ierr = -1
          if (dbg) write(*,*) 'ierr: stepsize too small in routine stiffbs'
          return
-         stop 'stepsize too small in routine stiffbs'
+         call mesa_error(__FILE__,__LINE__,'stepsize too small in routine stiffbs')
        end if
 
        call simpr( &
@@ -476,7 +476,7 @@
          if (dbg) then
             if (is_bad(yout(i))) then
                write(*,*) 'bad yout in simpr nstep i yout', nstep, i, yout(i), dydx(i)
-               stop 'simpr'
+               call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
       enddo
@@ -514,7 +514,7 @@
                enddo
             
                write(*,*) 'first step: bad ytemp in simpr nstep i ytemp', nstep, i, ytemp(i), del(i), y(i)
-               stop 'simpr'
+               call mesa_error(__FILE__,__LINE__,'simpr')
             
             end if
             
@@ -536,7 +536,7 @@
          if (dbg) then
             if (is_bad(yout(i))) then
                write(*,*) 'bad yout in simpr nn i yout', nn, i, yout(i)
-               stop 'simpr'
+               call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
 15     continue
@@ -551,7 +551,7 @@
          if (dbg) then
             if (is_bad(ytemp(i))) then
                write(*,*) 'general step: bad ytemp in simpr nn i yout', nn, i, ytemp(i)
-               stop 'simpr'
+               call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
        enddo
@@ -570,7 +570,7 @@
          if (dbg) then 
             if (is_bad(yout(i))) then
                write(*,*) 'bad yout in simpr last step: nstep i yout', nstep, i, yout(i)
-               stop 'simpr'
+               call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
 18    continue
@@ -585,7 +585,7 @@
          if (dbg) then
             if (is_bad(yout(i))) then
                write(*,*) 'bad yout in simpr result: nstep i yout', nstep, i, yout(i)
-               stop 'simpr'
+               call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
       end do
@@ -613,7 +613,7 @@
 
 ! sanity checks
 
-      if (iest .gt. qcol_imax) stop 'iest > qcol_imax in net_pzextr'
+      if (iest .gt. qcol_imax) call mesa_error(__FILE__,__LINE__,'iest > qcol_imax in net_pzextr')
 
 ! save current independent variables
       x(iest) = xest

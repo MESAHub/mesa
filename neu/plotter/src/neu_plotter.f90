@@ -60,7 +60,7 @@ program neu_plotter
    call const_init(my_mesa_dir,ierr)
    if (ierr /= 0) then
       write(*,*) 'const_init failed'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    call math_init()
@@ -313,7 +313,7 @@ program neu_plotter
 
    if (ierr /= 0) then
       write(*,*) 'bad result from neu_get'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
 contains

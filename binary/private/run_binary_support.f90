@@ -597,11 +597,11 @@
                         if (b% have_star_2) then
                            b% s_accretor => b% s2
                         else
-                           stop 'ERROR: missing star pointer for accretor'
+                           call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for accretor')
                         end if
                      end if
                   else
-                     stop 'ERROR: missing star pointer for donor'
+                     call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for donor')
                   end if
                else
                   if (b% have_star_2) then
@@ -610,11 +610,11 @@
                         if (b% have_star_1) then
                            b% s_accretor => b% s1
                         else
-                           stop 'ERROR: missing star pointer for accretor'
+                           call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for accretor')
                         end if
                      end if
                   else
-                     stop 'ERROR: missing star pointer for donor'
+                     call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for donor')
                   end if
                end if
 

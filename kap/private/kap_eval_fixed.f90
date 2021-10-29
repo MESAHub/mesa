@@ -28,6 +28,7 @@
       use kap_eval_support
       use const_def, only: dp, ln10
       use math_lib
+      use utils_lib, only: mesa_error
       
       implicit none
       
@@ -226,19 +227,19 @@
          
          call interp1(logKs, logK, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for logK'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
          
          call interp1(dlogKs_dlogRho, dlnkap_dlnRho, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogRho'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogRho')
             return
          end if
                   
          call interp1(dlogKs_dlogT, dlnkap_dlnT, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogT'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogT')
             return
          end if
          
@@ -516,19 +517,19 @@
          
          call interp1(logKs, logK, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for logK'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
          
          call interp1(dlogKs_dlogRho, dlogK_dlogRho, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogRho'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogRho')
             return
          end if
                   
          call interp1(dlogKs_dlogT, dlogK_dlogT, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogT'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogT')
             return
          end if
          
@@ -652,7 +653,7 @@
 !$omp end critical (load_kap_x_table)
          end if
          if (ierr /= 0) then
-            !stop 'load_one failed in Get_Kap_for_logRho_logT'
+            !call mesa_error(__FILE__,__LINE__,'load_one failed in Get_Kap_for_logRho_logT')
             return
          end if
 
@@ -697,13 +698,13 @@
          if (num_logRs <= 0) then
             write(*,*) 'num_logRs', num_logRs
             write(*,*) 'ix', ix
-            stop 'Get_Kap_for_logRho_logT'
+            call mesa_error(__FILE__,__LINE__,'Get_Kap_for_logRho_logT')
          end if
 
          if (num_logTs <= 0) then
             write(*,*) 'num_logTs', num_logRs
             write(*,*) 'ix', ix
-            stop 'Get_Kap_for_logRho_logT'
+            call mesa_error(__FILE__,__LINE__,'Get_Kap_for_logRho_logT')
          end if
 
          call Locate_logR( &
@@ -721,7 +722,7 @@
                write(*,2) 'logR', i, x_tables(ix)% logRs(i)
             end do
             write(*,*) 'clip_to_kap_table_boundaries', clip_to_kap_table_boundaries
-            stop 'failed in Locate_logR'
+            call mesa_error(__FILE__,__LINE__,'failed in Locate_logR')
             return
          end if
 

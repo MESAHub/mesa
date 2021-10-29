@@ -190,7 +190,7 @@
             write(*,1) 'eps', eps
             write(*,1) 'odescal', odescal
             write(*,2) 'max_steps', max_steps
-            !stop 'burn_const_density_1_zone'
+            !call mesa_error(__FILE__,__LINE__,'burn_const_density_1_zone')
          end if
 
          starting_y => starting_y_a
@@ -460,7 +460,7 @@
                write(*,1) 'xh', xh
                write(*,1) 'abar', abar
                write(*,1) 'zbar', zbar
-               stop 'net burn const density'
+               call mesa_error(__FILE__,__LINE__,'net burn const density')
             end if
             
             rates_only = .false.
@@ -498,7 +498,7 @@
                write(*,1) 'z2bar', z2bar
                write(*,1) 'eta', eta
                write(*,1) 'd_eta_dlnT', d_eta_dlnT
-               stop 'net burn const density'
+               call mesa_error(__FILE__,__LINE__,'net burn const density')
             end if
             
             if (size(f,dim=1) > 0) then
@@ -516,7 +516,7 @@
                      if (.false. .and. is_bad(dfdy(i,j))) then
                         write(*,1) 'x', x
                         write(*,3) 'dfdy(i,j)', i, j, dfdy(i,j)
-                        stop 'jakob_or_derivs'
+                        call mesa_error(__FILE__,__LINE__,'jakob_or_derivs')
                      end if
                   end do
                   !dfdy(j,nvar) = T*d_dxdt_dT(j) ! d_dxdt_dlnT
@@ -538,7 +538,7 @@
                   write(*,1) 'dfdy(nvar,nvar)', dfdy(nvar,nvar)
                   write(*,1) 'd_eps_nuc_dT', d_eps_nuc_dT
                   write(*,1) 'Cv', Cv
-                  stop 'jakob_or_derivs'
+                  call mesa_error(__FILE__,__LINE__,'jakob_or_derivs')
                end if
             end if
          

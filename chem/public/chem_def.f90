@@ -1028,7 +1028,7 @@
             call integer_dict_lookup(chem_isos_dict, \
                chem_element_main_iso_name(i), isotope_index, ierr)
             if (ierr /= 0) then
-               stop 'init_element_atomic_weights'
+               call mesa_error(__FILE__,__LINE__,'init_element_atomic_weights')
                return
             end if
             element_atomic_weight(i) = chem_isos% W(isotope_index)
@@ -2421,14 +2421,14 @@
          if (len_trim(category_name(i)) == 0) then
             write(*,*) 'missing name for category', i
             flush(6)
-            stop 'set_category_names'
+            call mesa_error(__FILE__,__LINE__,'set_category_names')
          end if
          do i=2,num_categories
             if (len_trim(category_name(i)) == 0) then
                write(*,*) 'missing name for category', i
                write(*,*) 'following ' // trim(category_name(i-1))
                flush(6)
-               stop 'set_category_names'
+               call mesa_error(__FILE__,__LINE__,'set_category_names')
             end if
          end do
          

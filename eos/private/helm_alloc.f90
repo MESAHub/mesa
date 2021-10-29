@@ -357,7 +357,7 @@
           close(unit=19)
           !..write cachefile
           
-          if (dmp) stop 'helm_alloc'
+          if (dmp) call mesa_error(__FILE__,__LINE__,'helm_alloc')
           
           ios = -1
           if (use_cache) then

@@ -279,7 +279,7 @@
                write(*, *)
                write(*, *) trim(str) // ' ierr', ierr
                okay = .false.
-               !stop 1
+               !call mesa_error(__FILE__,__LINE__)
             end if
          end function failed
          

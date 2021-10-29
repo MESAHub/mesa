@@ -210,7 +210,7 @@ contains
     end if
 
     if (form /= kap_table_co_enhanced_form) then
-       stop 'form /= kap_table_co_enhanced_form'
+       call mesa_error(__FILE__,__LINE__,'form /= kap_table_co_enhanced_form')
     end if
 
     if (max_num_CO_tables < num_tables) then

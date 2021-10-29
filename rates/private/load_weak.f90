@@ -435,7 +435,7 @@
                         write(*,'(a)') trim(string)
                      end do
                      write(*,*)
-                     stop 'read_table'
+                     call mesa_error(__FILE__,__LINE__,'read_table')
                   end if
                   return
                end if

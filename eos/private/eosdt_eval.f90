@@ -1153,7 +1153,7 @@
                write(*,1) 'logQ1', logQ1
                write(*,1) 'logQ2', logQ2
                write(*,*)
-               stop 'eosdt_eval'
+               call mesa_error(__FILE__,__LINE__,'eosdt_eval')
             end if
 
             ! check validity of Rho's and T's for region boundaries
@@ -1393,7 +1393,7 @@
                iregion = blend_in_x
             end if
 
-            if (dbg) stop 'determine_region'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'determine_region')
             
          end subroutine determine_region_opal_scvh
 
@@ -1807,7 +1807,7 @@
                ierr = -1
                if (.not. stop_for_is_bad) return
                write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
-               stop 'Get1_eosdt_for_X num_Xs'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X num_Xs')
             end if
             
             return
@@ -1859,7 +1859,7 @@
          if (.not. what_we_use_is_equal_spaced) then
             call do_linear
             if (is_bad(d_dX(1))) then
-               stop 'Get1_eosdt_for_X bad d_dX; linear'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X bad d_dX; linear')
             end if
             return
          end if
@@ -1914,7 +1914,7 @@
                dcdX(3)*res_zx(:,3)
 
             if (is_bad(d_dX(1))) then
-               stop 'Get1_eosdt_for_X bad d_dX; 3'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X bad d_dX; 3')
             end if
             
          else
@@ -1958,7 +1958,7 @@
                dcdX(4)*res_zx(:,4)
 
             if (is_bad(d_dX(1))) then
-               stop 'Get1_eosdt_for_X bad d_dX; 4'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X bad d_dX; 4')
             end if
 
          end if
@@ -1978,7 +1978,7 @@
                ierr)
             if (ierr /= 0) then
                if (.not. stop_for_is_bad) return
-               stop 'Get1_eosdt_for_X'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X')
             end if
          
             j = 2
@@ -1988,7 +1988,7 @@
                ierr)
             if (ierr /= 0) then
                if (.not. stop_for_is_bad) return
-               stop 'Get1_eosdt_for_X'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X')
             end if
 
             ! zero these for now
@@ -2149,7 +2149,7 @@
             ierr = -1
             if (.not. stop_for_is_bad) return
             write(*,1) 'fval(i_lnS), logRho, logT', fval(i_lnS), logRho, logT
-            stop 'after Do_Interp_with_2nd_derivs'
+            call mesa_error(__FILE__,__LINE__,'after Do_Interp_with_2nd_derivs')
          end if
          
          res(i_lnPgas) = fval(i_lnPgas)
@@ -2160,14 +2160,14 @@
             ierr = -1
             if (.not. stop_for_is_bad) return
             write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
-            stop 'after interpolation'
+            call mesa_error(__FILE__,__LINE__,'after interpolation')
          end if
          
          if (is_bad(res(i_lnS)) .or. res(i_lnS) > ln10*100) then
             ierr = -1
             if (.not. stop_for_is_bad) return
             write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
-            stop 'after interpolation'
+            call mesa_error(__FILE__,__LINE__,'after interpolation')
          end if
          
          res(i_grad_ad) = fval(i_grad_ad)
@@ -2243,7 +2243,7 @@
             write(*,1) 'fval(i_lnS)', fval(i_lnS)
             write(*,1) 'd_dlnd(i_lnS)', d_dlnd(i_lnS)
             write(*,1) 'd_dlnT(i_lnS)', d_dlnT(i_lnS)
-            stop 'Get1_eosdt_XTable_Results'
+            call mesa_error(__FILE__,__LINE__,'Get1_eosdt_XTable_Results')
          end if
 
       end subroutine Get1_eosdt_XTable_Results
@@ -2486,7 +2486,7 @@
                   write(*,1) 'T', T
                   write(*,1) 'logT', logT
                   write(*,*)
-                  stop 'do_safe_get_Rho_T'
+                  call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
                end if
                return
             end if
@@ -2504,7 +2504,7 @@
                write(*,1) 'T', T
                write(*,1) 'logT', logT
                write(*,*)
-               stop 'do_safe_get_Rho_T'
+               call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
             end if
             
             if (which_other == -1) then ! other_value is egas

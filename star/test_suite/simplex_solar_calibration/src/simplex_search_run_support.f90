@@ -60,7 +60,7 @@
          ierr = 0
          call do_read_star_job('inlist', ierr) ! this does alloc_star
          ! and saves the id in id_from_read_star_job
-         if (ierr /= 0) stop 1
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
          id = id_from_read_star_job
          id_from_read_star_job = 0
@@ -69,7 +69,7 @@
          okay_to_restart = .true.
          
          call init_simplex_search_data(ierr)
-         if (ierr /= 0) stop 1
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
          star_simplex_procs% extras_controls => extras_controls
 
@@ -82,7 +82,7 @@
          call read_simplex_search_controls(inlist_simplex_fname, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in read_simplex_search_controls'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          if (Y_depends_on_Z .and. vary_Y) then
@@ -95,7 +95,7 @@
             call write_simplex_search_controls(save_controls_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in write_simplex_search_controls'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
          end if
          
@@ -378,7 +378,7 @@
             ierr = 0
             allocate(index(num_samples), stat=ierr)
             if (ierr /= 0) then
-               stop 'failed in allocate before calling qsort from show_all_sample_results'
+               call mesa_error(__FILE__,__LINE__,'failed in allocate before calling qsort from show_all_sample_results')
             end if
             call qsort(index, num_samples, sample_chi2)
             max_i = 0
@@ -594,7 +594,7 @@
          call save_sample_results_to_file(-1, simplex_output_filename, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
 
          if (simplex_f < simplex_chi2_tol) then
@@ -651,7 +651,7 @@
             call alloc_sample_ptrs(ierr)
             if (ierr /= 0) then
                write(*,*) 'ERROR -- failed to allocate for samples'
-               stop 'save_best_for_sample'
+               call mesa_error(__FILE__,__LINE__,'save_best_for_sample')
                return
             end if
          end if
@@ -750,7 +750,7 @@
             avg_model_number_top_samples + &
                avg_model_number_sigma_limit*avg_model_number_sigma
          write(*,*)
-         !stop 'set_sample_averages'
+         !call mesa_error(__FILE__,__LINE__,'set_sample_averages')
          
       end subroutine set_sample_averages
       
@@ -1071,7 +1071,7 @@
                 dt_for_smaller_steps_before_age_target <= 0) then
                write(*,*) 'ERROR: must set num_smaller_steps_before_age_target'
                write(*,*) 'and dt_for_smaller_steps_before_age_target'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             if (age_target > s% star_age) then
                remaining_years = age_target - s% star_age
@@ -1131,7 +1131,7 @@
                      dt_for_smaller_steps_before_age_target
                   write(*,1) 'max_years_for_timestep', &
                      s% max_years_for_timestep
-                  stop 'bad max_years_for_timestep'
+                  call mesa_error(__FILE__,__LINE__,'bad max_years_for_timestep')
                else if (mod(s% model_number, s% terminal_interval) == 0) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                      s% model_number, (age_target - s% star_age)/age_sigma
@@ -1821,7 +1821,7 @@
             call star_write_model(s% id, best_model_save_model_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_model'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             write(*, '(a,i7)') 'save ' // trim(best_model_save_model_filename), s% model_number
          end if
@@ -1834,12 +1834,12 @@
             s% write_controls_info_with_profile = write_controls_info_with_profile
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_profile_info'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             call save_profile(s% id, 3, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in save_profile'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
          end if         
          
@@ -2078,7 +2078,7 @@
          integer :: iounit
          write(*,*) 'save_sample_results_to_file ' // trim(results_fname)
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='write', iostat=ierr)
          if (ierr /= 0) return
          call show_all_sample_results(iounit, i_total, ierr)
@@ -2469,7 +2469,7 @@
          write(*,*) 'read samples from file ' // trim(results_fname)
          
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(results_fname)

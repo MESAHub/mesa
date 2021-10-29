@@ -58,7 +58,7 @@
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
-            stop 'do_evolve_step_part1'
+            call mesa_error(__FILE__,__LINE__,'do_evolve_step_part1')
          end if
          
          if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
@@ -322,7 +322,7 @@
          
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
-            stop 'do_step_part1'
+            call mesa_error(__FILE__,__LINE__,'do_step_part1')
          end if
 
          if (s% u_flag .and. s% v_flag) then
@@ -1339,7 +1339,7 @@
                write(*,2) 's% work_inward_at_center', s% model_number, s% work_inward_at_center
                !write(*,2) '', s% model_number, 
                !write(*,2) '', s% model_number, 
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
             end if
   
             s% error_in_energy_conservation = &
@@ -1522,7 +1522,7 @@
                   write(*,*)
                end if
                
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
 
             end if
 
@@ -1550,7 +1550,7 @@
                write(*,2) 's% Lt(1)', s% model_number, s% Lt(1)
                write(*,2) 'sum L', s% model_number, s% Fr(1)*pi4*s% r(1)*s% r(1)+s% Lc(1)+s% Lt(1)
                okay_energy_conservation = .false.
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
                return
             end if
                                     
@@ -1571,7 +1571,7 @@
                write(*,2) 's% work_outward_at_surface', s% model_number, s% work_outward_at_surface
                write(*,2) 's% L_center', s% model_number, s% L_center
                okay_energy_conservation = .false.
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
                return
             end if
 
@@ -1708,7 +1708,7 @@
             write(*,2) 'extra', s% model_number, extra
             write(*,2) 'left_to_inject', s% model_number, left_to_inject
             write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
-            stop 'check_for_extra_heat'
+            call mesa_error(__FILE__,__LINE__,'check_for_extra_heat')
          end if
          do k=nz,1,-1
             q00 = s% q(k)
@@ -1907,7 +1907,7 @@
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
-            stop 'prepare_for_new_step'
+            call mesa_error(__FILE__,__LINE__,'prepare_for_new_step')
          end if
 
          s% retry_cnt = 0
@@ -2066,13 +2066,13 @@
                      okay = .false.
                      if (s% stop_for_bad_nums) then
                         write(*,2) 's% omega(k)', k, s% omega(k)
-                        stop 'prepare_for_new_try'
+                        call mesa_error(__FILE__,__LINE__,'prepare_for_new_try')
                      end if
                   end if
                end do
                if (.not. okay) then
                   write(*,2) 'model_number', s% model_number
-                  stop 'prepare_for_new_try: bad num omega'
+                  call mesa_error(__FILE__,__LINE__,'prepare_for_new_try: bad num omega')
                end if
                call use_xh_to_update_i_rot(s)
                s% total_angular_momentum = total_angular_momentum(s)
@@ -2279,7 +2279,7 @@
             end if
          else
             write(*,'(a, i8)') ' retry', s% model_number
-            !if (.true.) stop 'failed to set retry_message'
+            !if (.true.) call mesa_error(__FILE__,__LINE__,'failed to set retry_message')
          end if
          s% retry_message_k = 0
          if (s% report_ierr) &
@@ -2433,7 +2433,7 @@
                write(*,2) 'prev_num_iounits_in_use', prev_num_iounits_in_use
                write(*,2) 'current_num_iounits_in_use', current_num_iounits_in_use
                write(*,2) 'i', i
-               stop 'finish_step'
+               call mesa_error(__FILE__,__LINE__,'finish_step')
             end if
             prev_num_iounits_in_use = current_num_iounits_in_use
          end subroutine check

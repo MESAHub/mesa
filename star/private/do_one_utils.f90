@@ -484,7 +484,7 @@
                   end if
                   values(i) = val
                   if (is_bad(values(i))) then   
-                     stop 'show_trace_history_values bad from get1_hist_value'
+                     call mesa_error(__FILE__,__LINE__,'show_trace_history_values bad from get1_hist_value')
                   end if
                else if (is_int_value(i)) then
                   write(io,'(a40,i14)') &
@@ -499,7 +499,7 @@
                   write(io,'(a40,99(1pd26.16))') &
                      trim(s% trace_history_value_name(i)), values(i)
                   if (is_bad(values(i))) then   
-                     stop 'show_trace_history_values'
+                     call mesa_error(__FILE__,__LINE__,'show_trace_history_values')
                   end if
                end if
             end do
@@ -741,7 +741,7 @@
                peak_burn_vconv_div_cs, s% peak_burn_vconv_div_cs_limit
             k = maxloc(s% eps_nuc(1:nz), dim=1)
             write(*,2) 'maxloc eps_nuc', k, s% conv_vel(k), s% csound(k), s% eps_nuc(k)
-            stop 'test do_one_utils'
+            call mesa_error(__FILE__,__LINE__,'test do_one_utils')
          end if
          
          if (s% fe_core_infall < s% fe_core_infall_limit .and. &

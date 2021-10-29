@@ -87,7 +87,7 @@
          ierr = 0
          if (is_bad(s% initial_mass)) then
             write(*,1) 's% initial_mass', s% initial_mass
-            stop 'get_zams_model'
+            call mesa_error(__FILE__,__LINE__,'get_zams_model')
          end if
 
          init_mass = s% initial_mass
@@ -100,7 +100,7 @@
             omega, in_range, ierr)
          if (ierr /= 0) then
             write(*,1) 'failed in get1_zams_model'
-            stop 'get_zams_model'
+            call mesa_error(__FILE__,__LINE__,'get_zams_model')
          end if
 
 
@@ -191,7 +191,7 @@
          if (ierr /= 0) then
             close(iounit)
             write(*,*) 'failed in read_zams_header'
-            stop 'get1_zams_model'
+            call mesa_error(__FILE__,__LINE__,'get1_zams_model')
             return
          end if
 
@@ -262,7 +262,7 @@
                omega, j_rot, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in get1_mass'
-            stop 'get_zams_model'
+            call mesa_error(__FILE__,__LINE__,'get_zams_model')
          end if
          close(iounit)
          deallocate(j_rot)
@@ -290,7 +290,7 @@
             if (ierr /= 0) then
                write(*,2) 'year_month_day_when_created', year_month_day_when_created
                write(*,*) 'net_name' // trim(s% net_name)
-               stop 'read_zams_header'
+               call mesa_error(__FILE__,__LINE__,'read_zams_header')
                return
             end if
 

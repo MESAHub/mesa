@@ -434,7 +434,7 @@
          call dealloc
 
          if (dbg .and. ierr /= 0) then
-            stop 'failed in diffusion'
+            call mesa_error(__FILE__,__LINE__,'failed in diffusion')
          end if
 
          if (do_timing) then
@@ -526,7 +526,7 @@
 
             lid = 0; lrd = 0
             if (which_decsol == lapack) then
-               stop 'not ready for lapack in diff'
+               call mesa_error(__FILE__,__LINE__,'not ready for lapack in diff')
                nzmax = 0
                call lapack_work_sizes(neqs,lrd,lid)
             else if (which_decsol == bcyclic_dble) then
@@ -563,7 +563,7 @@
             end do
 
             if (which_decsol == lapack) then
-               stop 'not supported'
+               call mesa_error(__FILE__,__LINE__,'not supported')
                call isolve( &
                   which_solver, neqs, fcn, t, vars1, tend, &
                   h, max_step_size, max_steps, &
@@ -596,7 +596,7 @@
                   lrpar, rpar, lipar, ipar, &
                   lout, idid)
             else
-               stop 'bad which_decsol in mod_diffusion'
+               call mesa_error(__FILE__,__LINE__,'bad which_decsol in mod_diffusion')
             end if
 
             if (idid /= 1) ierr = -1
@@ -644,11 +644,11 @@
             ierr = 0
 
             if (n_blk_dble /= neqs .or. nvar_blk_dble /= nc .or. nz_blk_dble /= n) &
-               stop 'bad args for fcn_blk_dble'
+               call mesa_error(__FILE__,__LINE__,'bad args for fcn_blk_dble')
 
             call update_for_new_vars(vars, time, ierr)
             if (ierr /= 0) then
-               !stop 'fcn_blk_dble'
+               !call mesa_error(__FILE__,__LINE__,'fcn_blk_dble')
                return
             end if
 
@@ -689,11 +689,11 @@
             ierr = 0
 
             if (n_blk_dble /= neqs .or. nvar_blk_dble /= nc .or. nz_blk_dble /= n) &
-               stop 'bad args for jac_blk_dble'
+               call mesa_error(__FILE__,__LINE__,'bad args for jac_blk_dble')
 
             call update_for_new_vars(vars, time, ierr)
             if (ierr /= 0) then
-               !stop 'jac_blk_dble'
+               !call mesa_error(__FILE__,__LINE__,'jac_blk_dble')
                return
             end if
 
@@ -1049,7 +1049,7 @@
                   end if
 
                   if (dbg .and. bad_sum /= 0) then
-                     stop 'bad sum from fixup'
+                     call mesa_error(__FILE__,__LINE__,'bad sum from fixup')
 
                   end if
                   ierr = 0; return
@@ -1102,7 +1102,7 @@
 
             end do solve_loop
 
-            stop 'diffusion bug -- should not fall through solve_loop'
+            call mesa_error(__FILE__,__LINE__,'diffusion bug -- should not fall through solve_loop')
 
          end function BE_solve
 
@@ -1331,7 +1331,7 @@
 
             call show_stuff
 
-            stop 'get_timescale'
+            call mesa_error(__FILE__,__LINE__,'get_timescale')
 
          end if
 
@@ -1849,7 +1849,7 @@
          open(io, file=trim(fname), iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(fname)
-            stop 'write_plot_data'
+            call mesa_error(__FILE__,__LINE__,'write_plot_data')
          end if
 
          write(io,'(a6)',advance='no') 'k'

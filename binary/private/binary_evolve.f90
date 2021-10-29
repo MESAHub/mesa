@@ -139,8 +139,8 @@
                   end if
             end if
 
-            if (is_bad(b% rl_relative_gap(1))) stop 'binarydata_init'
-            if (is_bad(b% rl_relative_gap(2))) stop 'binarydata_init'
+            if (is_bad(b% rl_relative_gap(1))) call mesa_error(__FILE__,__LINE__,'binarydata_init')
+            if (is_bad(b% rl_relative_gap(2))) call mesa_error(__FILE__,__LINE__,'binarydata_init')
             b% using_jdot_mb(1) = .false.
             b% using_jdot_mb(2) = .false.
 

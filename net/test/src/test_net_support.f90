@@ -723,7 +723,7 @@
          else
             
             write(*,*) 'net_file ' // trim(net_file)
-            stop 'set_composition: do not recognize net_file'
+            call mesa_error(__FILE__,__LINE__,'set_composition: do not recognize net_file')
       
          end if
 
@@ -734,7 +734,7 @@
          end do
          if (abs(1d0-sum) > 1d-4) write(*, *) 'change abundance sum by', 1d0-sum
          xin(adjustment_iso) = xin(adjustment_iso) + (1d0 - sum)
-         if (xin(adjustment_iso) < 0d0) stop 'error in sum of abundances'
+         if (xin(adjustment_iso) < 0d0) call mesa_error(__FILE__,__LINE__,'error in sum of abundances')
 
       end subroutine set_composition
       
@@ -824,7 +824,7 @@
          
          write(*,*) 'Do_One_Test ' // trim(net_file)
          
-         if (do_timing) stop 'no support for do_timing'
+         if (do_timing) call mesa_error(__FILE__,__LINE__,'no support for do_timing')
                   
          call test_net_setup(net_file)
             
@@ -1213,7 +1213,7 @@
             
             nrates_to_show = 1
             
-            if (rates_reaction_id('rc12_to_n14') <= 0) stop 'bad reaction'
+            if (rates_reaction_id('rc12_to_n14') <= 0) call mesa_error(__FILE__,__LINE__,'bad reaction')
             write(*,*) 'rc12_to_n14', rates_reaction_id('rc12_to_n14')
          
             rates_to_show(1:nrates_to_show) = (/  &
@@ -1390,7 +1390,7 @@
          else
             
             write(*, *) 'need to define setup for net_file ', trim(net_file)
-            stop 'Do_One_Test'
+            call mesa_error(__FILE__,__LINE__,'Do_One_Test')
          
          end if
          
@@ -1433,7 +1433,7 @@
                std_reaction_Qs, std_reaction_neuQs, &
                screening_mode, &
                lwork, work, ierr)
-            stop 'net_get_rates_only'
+            call mesa_error(__FILE__,__LINE__,'net_get_rates_only')
          end if
 
          call net_get_with_Qs( &
@@ -1475,7 +1475,7 @@
                write(*,1) 'xin(cr56)', xin(j_dx_sink)
                write(*,1) 'eps_nuc', eps_nuc
                write(*,*)
-               !stop 'testing'
+               !call mesa_error(__FILE__,__LINE__,'testing')
             else if (doing_d_dlnd) then
                dx_0 = max(1d-14, abs(logRho*ln10*1d-6))
                dvardx_0 = d_eps_nuc_dRho*Rho ! d_dxdt_dRho(1)*Rho ! analytic value of partial
@@ -1499,7 +1499,7 @@
             write(*,*) 'test net'
             write(*,*)
          
-            stop 'test net'
+            call mesa_error(__FILE__,__LINE__,'test net')
          
          
          
@@ -1801,7 +1801,7 @@
                   
             end if
             
-            if (ierr /= 0) stop 'failed in call on net_get_with_Qs'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in call on net_get_with_Qs')
             !val = eps_nuc ! dxdt(1)
             val = dxdt(j_dx)
             

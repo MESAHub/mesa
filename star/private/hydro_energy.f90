@@ -188,7 +188,7 @@
                      write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
                      write(*,2) 'v_center', s% model_number, s% v_center
                      write(*,2) 'r_center', s% model_number, s% r_center
-                     stop 'setup_dwork_dm'
+                     call mesa_error(__FILE__,__LINE__,'setup_dwork_dm')
                   end if
                end if
             else
@@ -351,7 +351,7 @@
 
             if (eps_grav_form) then
                if (s% RSP2_flag) then
-                  stop 'cannot use eps_grav with et yet.  fix energy eqn.'
+                  call mesa_error(__FILE__,__LINE__,'cannot use eps_grav with et yet.  fix energy eqn.')
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
                if (ierr /= 0) then
@@ -487,7 +487,7 @@
                if (s% report_ierr) then
                   write(*,2) 'get1_energy_eqn: bad ' // trim(str), k, dequ
                end if
-               if (s% stop_for_bad_nums) stop 'get1_energy_eqn'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get1_energy_eqn')
 !$omp end critical (hydro_energy_crit2)
                return
             end if
@@ -594,7 +594,7 @@
                   write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
                   write(*,2) 'v_center', s% model_number, s% v_center
                   write(*,2) 'r_center', s% model_number, s% r_center
-                  stop 'eval1_work'
+                  call mesa_error(__FILE__,__LINE__,'eval1_work')
                end if
             end if
             work_ad%val = work

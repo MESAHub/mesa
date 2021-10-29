@@ -89,7 +89,7 @@ module chem_support
       write(filename,'(a)') trim(data_dir)//'/'//trim(masstable_filename)
       open(newunit=mass_unit, file=trim(filename), iostat=ios, status="old", action="read")
       
-      if (ios /= 0) stop 'unable to open mass table for reading'
+      if (ios /= 0) call mesa_error(__FILE__,__LINE__,'unable to open mass table for reading')
       
       ! first pass
       call skip_header
@@ -127,7 +127,7 @@ module chem_support
          integer :: i,ios
          do i = 1, masstable_header_length
             read(mass_unit,*,iostat=ios)
-            if (ios /= 0) stop 'error while reading header of masstable'
+            if (ios /= 0) call mesa_error(__FILE__,__LINE__,'error while reading header of masstable')
          end do
       end subroutine skip_header
    end subroutine read_mass_table

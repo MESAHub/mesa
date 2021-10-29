@@ -798,7 +798,7 @@
          character (len=*), intent(in) :: str
          failed = (ierr /= 0)
          if (failed) write(*,*) 'load_eosPC_support_Info failed: ' // trim(str)
-         if (failed) stop 'load_eosPC_support_Info'
+         if (failed) call mesa_error(__FILE__,__LINE__,'load_eosPC_support_Info')
       end function failed
       
    end subroutine load_eosPC_support_Info
@@ -961,7 +961,7 @@
       
       if (ierr /= 0) then
          write(*,*) 'read cache file failed 1'
-         stop 'Read_Cache'
+         call mesa_error(__FILE__,__LINE__,'Read_Cache')
          close(io_unit); return
       end if
 
@@ -969,7 +969,7 @@
          fq% tbl1(1:4*fq% nvals*fq% nlnRS*fq% nlnGAME)
       if (ierr /= 0) then
          write(*,*) 'read cache file failed 2'
-         stop 'Read_Cache'
+         call mesa_error(__FILE__,__LINE__,'Read_Cache')
       end if
 
       close(io_unit)

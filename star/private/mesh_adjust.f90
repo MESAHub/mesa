@@ -105,7 +105,7 @@
 
                write(*,*) 'k', k
                write(*,*) 'xq(k)', xq(k)
-               stop 'debug: do_mesh_adjust'
+               call mesa_error(__FILE__,__LINE__,'debug: do_mesh_adjust')
             end if
          end do
 
@@ -389,7 +389,7 @@
             if (err > 1d-8) then
                call show_errors
                write(*,*) 'err too large'
-               stop 'mesh adjust'
+               call mesa_error(__FILE__,__LINE__,'mesh adjust')
             end if
 
          end if
@@ -748,7 +748,7 @@
             return
 
             write(*,*) 'interpolate_vector failed in do_L for remesh'
-            stop 'debug: mesh adjust: do_L'
+            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_L')
          end if
 
          do k=nzlo,nzhi
@@ -807,7 +807,7 @@
             return
 
             write(*,*) 'interpolate_vector failed in do_conv_vel for remesh'
-            stop 'debug: mesh adjust: do_conv_vel'
+            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_conv_vel')
          end if
 
          do k=nzlo,nzhi
@@ -1091,7 +1091,7 @@
                write(*,1) 'Vol_old_plus1(k)', Vol_old_plus1(k)
                write(*,1) 'Vol_old_plus1(k-1)', Vol_old_plus1(k-1)
                write(*,*)
-               stop 'debug: mesh adjust: do_lnR_and_lnd'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_lnR_and_lnd')
             end if
          end do
 
@@ -1102,7 +1102,7 @@
                if (.not. dbg) return
 
                write(*,3) 'bad xq', k, nz, xq(k), xq(k-1)
-               stop 'debug: mesh adjust: do_lnR_and_lnd'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_lnR_and_lnd')
             end if
          end do
 
@@ -1116,7 +1116,7 @@
          if (ierr /= 0) then
             if (.not. dbg) return
             write(*,*) 'failed in interpolate_vector'
-            stop 'debug: mesh_adjust'
+            call mesa_error(__FILE__,__LINE__,'debug: mesh_adjust')
          end if
 
          do k=1,interp_n
@@ -1130,7 +1130,7 @@
                ierr = -1
                if (.not. dbg) return
                write(*,*) '(Vol_new(interp_lo+1) >= Vol_new(interp_lo))'
-               stop 'debug: mesh_adjust'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh_adjust')
             end if
          end if
 
@@ -1145,12 +1145,12 @@
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'Vol_min', k, Vol_min
                      write(*,2) 'Vol_max', k, Vol_max
-                     stop 'mesh_adjust'
+                     call mesa_error(__FILE__,__LINE__,'mesh_adjust')
                   end if
                   if (.not. dbg) return
                   write(*,1) 'Vol_min', Vol_min
                   write(*,1) 'Vol_max', Vol_max
-                  stop 'debug: mesh_adjust'
+                  call mesa_error(__FILE__,__LINE__,'debug: mesh_adjust')
                end if
                Vm1 = Vol_new(k-1)
                V00 = Vol_new(k)
@@ -1166,7 +1166,7 @@
                   write(*,1) 'Vol_new(k-1)', Vol_new(k-1)
                   write(*,1) 'Vol_new(k)', Vol_new(k)
                   write(*,1) 'Vol_new(k+1)', Vol_new(k+1)
-                  stop 'debug: do_lnR_and_lnd in mesh adjust: interpolation gave non-pos volume'
+                  call mesa_error(__FILE__,__LINE__,'debug: do_lnR_and_lnd in mesh adjust: interpolation gave non-pos volume')
                end if
             end if
          end do
@@ -1211,7 +1211,7 @@
 
          if (ierr /= 0) then
             if (.not. dbg) return
-            stop 'debug: failed in mesh adjust do_lnR_and_lnd'
+            call mesa_error(__FILE__,__LINE__,'debug: failed in mesh adjust do_lnR_and_lnd')
          end if
 
          n = nzlo - 1
@@ -1371,7 +1371,7 @@
                write(*,2) 'old outer', k_old, xa_c0(k_old,j) + xa_c1(k_old,j)*dq_old(k_old)/2
                write(*,2) 'old inner', k_old, xa_c0(k_old,j) - xa_c1(k_old,j)*dq_old(k_old)/2
                write(*,*)
-               stop 'debug: mesh adjust: do_xa'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_xa')
             end if
          end do
 
@@ -1382,13 +1382,13 @@
             ierr = -1
             if (s% stop_for_bad_nums) then
                write(*,2) 'xa_sum', k, xa_sum
-               stop 'mesh adjust: do_xa'
+               call mesa_error(__FILE__,__LINE__,'mesh adjust: do_xa')
             end if
             return
 
             write(*,*) 'xa_sum', xa_sum
             write(*,*) 'bug in revise mesh, do_xa bad num: k', k
-            stop 'debug: mesh adjust: do_xa'
+            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_xa')
          end if
 
          if (abs(1-xa_sum) > 1d-3) then
@@ -1437,7 +1437,7 @@
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
-               stop 'debug: mesh adjust: do1_lnT'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do1_lnT')
             end if
             return
          end if
@@ -1454,7 +1454,7 @@
             if (ierr /= 0) then
                if (dbg) write(*,*) 'get_old_value_integral lnT failed for do1_lnT'
                if (.not. dbg) return
-               stop 'debug: mesh adjust: do1_lnT'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do1_lnT')
             end if
             avg_lnT = sum_lnT/cell_dq
          end if
@@ -1463,7 +1463,7 @@
             ierr = -1
             if (s% stop_for_bad_nums) then
                write(*,2) 'avg_lnT', k, avg_lnT
-               stop 'mesh adjust: do1_lnT'
+               call mesa_error(__FILE__,__LINE__,'mesh adjust: do1_lnT')
             end if
             return
          end if
@@ -1473,7 +1473,7 @@
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
-               stop 'debug: mesh adjust: do1_lnT'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do1_lnT')
             end if
             return
          end if
@@ -1484,7 +1484,7 @@
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'eta_old(k_old)', k_old, eta_old(k_old)
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
-               stop 'debug: mesh adjust: do1_lnT'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do1_lnT')
             end if
             return
          end if
@@ -1500,7 +1500,7 @@
             if (ierr /= 0) then
                if (dbg) write(*,*) 'get_old_value_integral failed for do1_lnT'
                if (.not. dbg) return
-               stop 'debug: mesh adjust: energy_old do1_lnT'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: energy_old do1_lnT')
             end if
             avg_energy = sum_energy/cell_dq
          end if
@@ -1520,7 +1520,7 @@
                if (ierr /= 0) then
                   if (dbg) write(*,*) 'get_old_value_integral failed for do1_lnT'
                   if (.not. dbg) return
-                  stop 'debug: mesh adjust: specific_PE_old do1_lnT'
+                  call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: specific_PE_old do1_lnT')
                end if
                avg_PE = sum_energy/cell_dq
             end if
@@ -1534,7 +1534,7 @@
                if (ierr /= 0) then
                   if (dbg) write(*,*) 'get_old_value_integral failed for do1_lnT'
                   if (.not. dbg) return
-                  stop 'debug: mesh adjust: specific_KE_old do1_lnT'
+                  call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: specific_KE_old do1_lnT')
                end if
                avg_KE = sum_energy/cell_dq
             end if
@@ -1582,7 +1582,7 @@
 
          if (ierr /= 0) then
             write(*,2) 'mesh_adjust do1_lnT ierr', ierr
-            stop 'do1_lnT'
+            call mesa_error(__FILE__,__LINE__,'do1_lnT')
          end if
 
       end subroutine do1_lnT
@@ -1756,7 +1756,7 @@
             ierr = -1
             if (s% stop_for_bad_nums) then
                write(*,2) 'lnT', k, lnT
-               stop 'mesh adjust: do1_lnT'
+               call mesa_error(__FILE__,__LINE__,'mesh adjust: do1_lnT')
             end if
             return
          end if
@@ -1865,7 +1865,7 @@
                write(*,2) 'sm1', k, sm1
                write(*,2) 's00', k, s00
                write(*,*)
-               stop 'debug: get1_lpp'
+               call mesa_error(__FILE__,__LINE__,'debug: get1_lpp')
             end if
             c2(k) = 0
             if (abs(sm1) <= abs(s00)) then
@@ -2186,7 +2186,7 @@
             write(*,2) 's% omega(k)', k, s% omega(k)
             write(*,2) 's% j_rot(k)', k, s% j_rot(k)
             write(*,2) 's% i_rot(k)', k, s% i_rot(k)
-            if (s% model_number > 1925) stop 'debugging: adjust1_omega'
+            if (s% model_number > 1925) call mesa_error(__FILE__,__LINE__,'debugging: adjust1_omega')
          end if
 
       end subroutine adjust1_omega
@@ -2243,7 +2243,7 @@
             ierr = -1
             s% retry_message = 'failed in mesh_adjust do_v'
             if (s% report_ierr) write(*, *) s% retry_message
-            !stop 'do_v'
+            !call mesa_error(__FILE__,__LINE__,'do_v')
             return
          end if
 
@@ -2255,7 +2255,7 @@
                err, new_ke_tot, old_ke_tot
             if (err > 1d-10) then
                write(*,*) 'err too large'
-               stop 'do_v'
+               call mesa_error(__FILE__,__LINE__,'do_v')
             end if
          end if
 
@@ -2424,7 +2424,7 @@
                   ierr = -1
                   !return
                   write(*,*) 'dq <= 0', dq
-                  stop 'debugging: adjust1_v'
+                  call mesa_error(__FILE__,__LINE__,'debugging: adjust1_v')
                end if
 
             end if
@@ -2443,7 +2443,7 @@
             write(*,2) 'xh(i_v,k) new_dqbar', k, xh(i_v,k), new_dqbar(k)
             write(*,2) 'xh_old(i_v,comes_from(k)) old_dqbar', &
                comes_from(k), xh_old(i_v,comes_from(k)), old_dqbar(comes_from(k))
-            if (k == k_dbg) stop 'adjust1_v'
+            if (k == k_dbg) call mesa_error(__FILE__,__LINE__,'adjust1_v')
 !$OMP end critical (adjust1_v_dbg)
             !stop
          end if
@@ -2504,7 +2504,7 @@
                err, new_ke_tot, old_ke_tot
             if (err > 1d-10) then
                write(*,*) 'err too large'
-               stop 'do_u'
+               call mesa_error(__FILE__,__LINE__,'do_u')
             end if
          end if
 
@@ -2658,7 +2658,7 @@
                   ierr = -1
                   !return
                   write(*,*) 'dq <= 0', dq
-                  stop 'debugging: adjust1_u'
+                  call mesa_error(__FILE__,__LINE__,'debugging: adjust1_u')
                end if
 
             end if
@@ -2677,7 +2677,7 @@
             write(*,2) 'xh(i_u,k) new_dq', k, xh(i_u,k), new_dq(k)
             write(*,2) 'xh_old(i_u,comes_from(k)) old_dq', &
                comes_from(k), xh_old(i_u,comes_from(k)), old_dq(comes_from(k))
-            if (k == k_dbg) stop 'adjust1_u'
+            if (k == k_dbg) call mesa_error(__FILE__,__LINE__,'adjust1_u')
 !$OMP end critical (adjust1_u_dbg)
             !stop
          end if
@@ -2719,7 +2719,7 @@
          if (ierr /= 0) then
             return
             write(*,*) 'interpolate_vector failed in do_Hp_face for remesh'
-            stop 'debug: mesh adjust: do_Hp_face'
+            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_Hp_face')
          end if
 
          do k=nzlo,nzhi
@@ -2796,7 +2796,7 @@
                err, new_eturb_tot, old_eturb_tot
             if (err > 1d-10) then
                write(*,*) 'err too large'
-               stop 'do_etrb'
+               call mesa_error(__FILE__,__LINE__,'do_etrb')
             end if
          end if
 
@@ -2951,7 +2951,7 @@
                   ierr = -1
                   !return
                   write(*,*) 'dq <= 0', dq
-                  stop 'debugging: adjust1_etrb'
+                  call mesa_error(__FILE__,__LINE__,'debugging: adjust1_etrb')
                end if
 
             end if

@@ -62,14 +62,14 @@
          nz_old = s% nz
          nz = s% RSP2_nz
          if (nz == nz_old) return ! assume have already done remesh for RSP2
-         if (nz > nz_old) stop 'remesh_for_RSP2 cannot increase nz'
+         if (nz > nz_old) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 cannot increase nz')
          call setvars(ierr)
-         if (ierr /= 0) stop 'remesh_for_RSP2 failed in setvars'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in setvars')
          old_L1 = s% L(1)
          old_r1 = s% r(1)
          call set_phot_info(s) ! sets Teff
          call get_PT_surf(P_surf, T_surf, ierr)
-         if (ierr /= 0) stop 'remesh_for_RSP2 failed in get_PT_surf'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in get_PT_surf')
          allocate(&
             xm_old(nz_old+1), xm_mid_old(nz_old), v_old(nz_old+1), &
             xm(nz+1), xm_mid(nz), v_new(nz+1), work1((nz_old+1)*pm_work_size))
@@ -88,7 +88,7 @@
          end do
          call rescale_xa
          call revise_lnT_for_QHSE(P_surf, ierr)
-         if (ierr /= 0) stop 'remesh_for_RSP2 failed in revise_lnT_for_QHSE'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in revise_lnT_for_QHSE')
          do k=1,nz
             call set_Hp_face(k)
          end do
@@ -97,7 +97,7 @@
          write(*,1) 'new old L_surf/Lsun', s% xh(s% i_lum,1)/Lsun, old_L1/Lsun
          write(*,1) 'new old R_surf/Rsun', exp(s% xh(s% i_lnR,1))/Rsun, old_r1/Rsun
          write(*,*)
-         !stop 'remesh_for_RSP2'
+         !call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2')
          
          contains
 
@@ -121,13 +121,13 @@
                skip_eos = .false.
             ierr = 0
             call unpack_xh(s,ierr)
-            if (ierr /= 0) stop 'remesh_for_RSP2 failed in unpack_xh'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in unpack_xh')
             call set_hydro_vars( &
                s, 1, nz_old, skip_basic_vars, &
                skip_micro_vars, skip_m_grav_and_grav, skip_eos, skip_net, skip_neu, &
                skip_kap, skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
                skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
-            if (ierr /= 0) stop 'remesh_for_RSP2 failed in set_hydro_vars'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in set_hydro_vars')
          end subroutine setvars
          
          subroutine get_PT_surf(P_surf, T_surf, ierr)
@@ -146,7 +146,7 @@
                  s, s% tau_factor*s% tau_base, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
                  Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                  lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
-            if (ierr /= 0) stop 'get_P_surf failed in get_atm_PT'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'get_P_surf failed in get_atm_PT')
             P_surf = exp(lnP_surf)
             T_surf = exp(lnT_surf)
             return
@@ -156,7 +156,7 @@
             write(*,1) 'get_PT_surf Teff', Teff
             write(*,1) 'get_PT_surf opacity(1)', s% opacity(1)
             write(*,1)
-            !stop 'get_PT_surf'
+            !call mesa_error(__FILE__,__LINE__,'get_PT_surf')
          end subroutine get_PT_surf
          
          subroutine set_xm_old
@@ -176,7 +176,7 @@
             lnT_anchor = log(s% RSP2_T_anchor)
             if (lnT_anchor <= s% xh(s% i_lnT,1)) then
                write(*,1) 'T_anchor < T_surf', s% RSP2_T_anchor, exp(s% xh(s% i_lnT,1))
-               stop 'find_xm_anchor'
+               call mesa_error(__FILE__,__LINE__,'find_xm_anchor')
             end if
             xm_anchor = xm_old(nz_old)
             do k=2,nz_old
@@ -189,7 +189,7 @@
                      (xm00 - xmm1)*(lnT_anchor - lnTm1)/(lnT00 - lnTm1)
                   if (is_bad(xm_anchor) .or. xm_anchor <= 0d0) then
                      write(*,2) 'bad xm_anchor', k, xm_anchor, xmm1, xm00, lnTm1, lnT00, lnT_anchor, s% lnT(1)
-                     stop 'find_xm_anchor'
+                     call mesa_error(__FILE__,__LINE__,'find_xm_anchor')
                   end if
                   return
                end if
@@ -214,7 +214,7 @@
             lnx = log(xm(nz_outer+1))
             if (is_bad(lnx)) then
                write(*,2) 'bad lnx', nz_outer+1, lnx, xm(nz_outer+1)
-               stop 'set_xm_new'
+               call mesa_error(__FILE__,__LINE__,'set_xm_new')
             end if
             dlnx = (log(s% xmstar) - lnx)/(nz - nz_outer)
             do k=nz_outer+2,nz
@@ -242,7 +242,7 @@
                write(*,2) 'dm(k)/dm(k-1) m(k)', k, s%dm(k)/s%dm(k-1), s%m(k)/Msun
             end do
             write(*,1) 'm_center', s% m_center/msun
-            stop 'set_xm_new'
+            call mesa_error(__FILE__,__LINE__,'set_xm_new')
          end subroutine set_xm_new
          
          subroutine interpolate1_face_val(i, cntr_val)
@@ -268,12 +268,12 @@
             do k=1,nz-1
                if (s% r(k) <= s% r(k+1)) then
                   write(*,2) 'bad r', k, s% r(k), s% r(k+1)
-                  stop 'check_new_lnR remesh rsp2'
+                  call mesa_error(__FILE__,__LINE__,'check_new_lnR remesh rsp2')
                end if
             end do
             if (s% r(nz) <= s% r_center) then
                write(*,2) 'bad r center', nz, s% r(nz), s% r_center
-               stop 'check_new_lnR remesh rsp2'
+               call mesa_error(__FILE__,__LINE__,'check_new_lnR remesh rsp2')
             end if
          end subroutine check_new_lnR
          
@@ -293,7 +293,7 @@
                s% xh(s% i_lnd,k) = s% lnd(k)
                if (is_bad(s% lnd(k))) then
                   write(*,2) 'bad lnd vol dm r300 r3p1', k, s% lnd(k), vol, s% dm(k), r300, r3p1
-                  stop 'remesh for rsp2'
+                  call mesa_error(__FILE__,__LINE__,'remesh for rsp2')
                end if
             end do
          end subroutine set_new_lnd
@@ -390,7 +390,7 @@
                   write(*,1) 'logT_tol', logT_tol
                   write(*,1) 'logP_tol', logP_tol
                   write(*,*)
-                  stop 'revise_lnT_for_QHSE'
+                  call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
                end if
                s% lnT(k) = logT*ln10
                s% xh(s% i_lnT,k) = s% lnT(k)
@@ -407,19 +407,19 @@
                      ierr)
                   if (ierr /= 0) then
                      write(*,2) 'get_kap failed', k
-                     stop 'revise_lnT_for_QHSE'
+                     call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
                   end if
                   old_kap = s% opacity(1)
                   s% opacity(1) = kap ! for use by atm surf PT
                   call get_PT_surf(new_P_surf, new_T_surf, ierr)
                   if (ierr /= 0) then
                      write(*,2) 'get_PT_surf failed', k
-                     stop 'revise_lnT_for_QHSE'
+                     call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
                   end if
                   write(*,1) 'new old T_surf', new_T_surf, T_surf
                   write(*,1) 'new old P_surf', new_P_surf, P_surf
                   write(*,1) 'new old kap(1)', kap, old_kap
-                  !stop 'revise_lnT_for_QHSE'
+                  !call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
                end if
                
             end do

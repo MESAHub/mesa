@@ -272,7 +272,7 @@
             if (s% dq(nz) <= 0) then
                ierr = -1
                if (dbg) write(*,*) 's% dq(nz) <= 0'
-               if (dbg) stop 'debug adjust mesh'
+               if (dbg) call mesa_error(__FILE__,__LINE__,'debug adjust mesh')
                s% result_reason = adjust_mesh_failed
                s% termination_code = t_adjust_mesh_failed
                remesh = terminate
@@ -404,7 +404,7 @@
                ierr = -1
                call dealloc
                return
-               stop 'debug adjust mesh'
+               call mesa_error(__FILE__,__LINE__,'debug adjust mesh')
             end if
          end do
 
@@ -455,7 +455,7 @@
                   revised = revised + 1
                case default
                   write(*,3) 'bad value for cell_type(k)', k, cell_type(k)
-                  stop 'adjust_mesh'
+                  call mesa_error(__FILE__,__LINE__,'adjust_mesh')
                end select
             end do
             write(*,*) '      mesh_plan nz_new', nz_new
@@ -474,7 +474,7 @@
                ierr = -1
                call dealloc
                return
-               stop 'debug: adjust mesh'
+               call mesa_error(__FILE__,__LINE__,'debug: adjust mesh')
             end if
          end do
 
@@ -508,7 +508,7 @@
                ierr = -1
                call dealloc
                return
-               !stop 'adjust_mesh J_tot conservation error'
+               !call mesa_error(__FILE__,__LINE__,'adjust_mesh J_tot conservation error')
             end if
          end if
 
@@ -694,7 +694,7 @@
             write(*,*) '         nz_old', nz_old
             write(*,*) '         nz_new', nz_new
             write(*,*) 'finished dump_mesh'
-            stop 'debugging: end_dump remesh'
+            call mesa_error(__FILE__,__LINE__,'debugging: end_dump remesh')
          end subroutine end_dump
 
 

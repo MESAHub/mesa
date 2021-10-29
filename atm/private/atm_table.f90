@@ -201,7 +201,7 @@ contains
        write(*,*)
        ierr = -1
        return
-       !if (is_bad(lnP) .or. is_bad(lnT)) stop 'eval_table'
+       !if (is_bad(lnP) .or. is_bad(lnT)) call mesa_error(__FILE__,__LINE__,'eval_table')
     end if
 
     ! Finish

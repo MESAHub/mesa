@@ -27,7 +27,7 @@
 
       use star_private_def
       use const_def
-      use utils_lib, only: is_bad
+      use utils_lib, only: is_bad, mesa_error
 
       implicit none
 
@@ -197,7 +197,7 @@
          screening_mode = get_screening_mode(s,ierr)
          if (ierr /= 0) then
             write(*,*) 'unknown string for screening_mode: ' // trim(s% screening_mode)
-            stop 'do1_net'
+            call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
 
@@ -260,13 +260,13 @@
          if (is_bad(s% eps_nuc(k))) then
             ierr = -1
             if (s% report_ierr) write(*,*) 'net_get returned bad eps_nuc', ierr
-            if (s% stop_for_bad_nums) stop 'do1_net'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
 
          if (-k == s% nz) then
             write(*,1) 'logT', log10_T
-            stop 'net'
+            call mesa_error(__FILE__,__LINE__,'net')
          end if
          !if (k == 864 .and. log10_T >= 7.522497408d0 .and. log10_T <= 7.5224974089d0) then
          if (-k == s% nz) then
@@ -281,7 +281,7 @@
             write(*,1) 'sum(eps_nuc_categories)/eps_nuc', &
                sum(s% eps_nuc_categories(:,k))/s% eps_nuc(k)
             write(*,2) trim(s% net_name), s% species
-            stop 'after net_get in star'
+            call mesa_error(__FILE__,__LINE__,'after net_get in star')
          end if
          
          if (s% solver_test_net_partials .and. net_test_partials) then
@@ -342,7 +342,7 @@
             if (is_bad_num(s% eps_nuc(k))) then
                if (s% stop_for_bad_nums) then
                   write(*,2) 'eps_nuc', k, s% eps_nuc(k)
-                  stop 'do1_net'
+                  call mesa_error(__FILE__,__LINE__,'do1_net')
                end if
             end if
             return
@@ -351,7 +351,7 @@
          if (is_bad_num(s% eps_nuc(k))) then
             if (s% stop_for_bad_nums) then
                write(*,2) 'eps_nuc', k, s% eps_nuc(k)
-               stop 'do1_net'
+               call mesa_error(__FILE__,__LINE__,'do1_net')
             end if
             ierr = -1
             return
@@ -383,7 +383,7 @@
             call show_stuff(s,k,net_lwork,net_work)
             write(*,*) '(is_bad_num(s% eps_nuc(k)))'
             write(*,*) 'failed in do1_net'
-            if (s% stop_for_bad_nums) stop 'do1_net'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
          

@@ -1337,7 +1337,7 @@
             new_omega = target_value*1d5/(s% photosphere_r*Rsun)
          else
             write(*,2) 'bad value for kind_of_relax', kind_of_relax
-            stop 'relax_omega_check_model'
+            call mesa_error(__FILE__,__LINE__,'relax_omega_check_model')
          end if
 
          this_step_omega = frac*new_omega + (1 - frac)*starting_omega
@@ -1636,7 +1636,7 @@
             write(*,*)
             write(*,1) 'ERROR: failed doing relax Tsurf_factor', new_Tsurf_factor
             write(*,*)
-            stop 'do_relax_Tsurf_factor'
+            call mesa_error(__FILE__,__LINE__,'do_relax_Tsurf_factor')
          end if
          
          if (new_Tsurf_factor == 1d0) then
@@ -3710,7 +3710,7 @@
          if (ierr /= 0) return
          if (is_bad(y)) then
             write(*,1) 'y', y
-            stop 'do_relax_Y'
+            call mesa_error(__FILE__,__LINE__,'do_relax_Y')
          end if
          
          if (abs(new_Y - y) <= 1d-6*new_Y) return
@@ -3796,7 +3796,7 @@
          current_y = eval_current_y(s, klo, khi, ierr)
          if (is_bad(current_y)) then
             write(*,1) 'current_y', current_y
-            stop 'relax_y_check_model'
+            call mesa_error(__FILE__,__LINE__,'relax_y_check_model')
          end if
          if (ierr /= 0) return
 

@@ -149,7 +149,7 @@
             call get_adipls_frequency_info( &
                s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
                save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
-            if (ierr /= 0) stop 1
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
             if (okay) then
                write(*,'(a,2f20.2)') 'got ok match for expected frequency', freq, expected_freq
             else
@@ -270,7 +270,7 @@
          !write(*,*) 'done adipls_get_one_el_info'
          if (ierr /= 0) then
             write(*,*) 'failed in adipls_get_one_el_info'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          write(*,*)
          write(*,'(2a8,99a20)') 'el', 'order', 'freq (microHz)', 'inertia'

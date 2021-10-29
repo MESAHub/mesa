@@ -377,7 +377,7 @@
             iounit_dev_null = alloc_iounit(ierr)
             if (ierr /= 0) then
                write(*,*) 'adipls failed in alloc_iounit for iounit_dev_null'
-               stop 'run_adipls'
+               call mesa_error(__FILE__,__LINE__,'run_adipls')
             end if
          end if
          
@@ -385,7 +385,7 @@
          open(unit=iounit_dev_null, file=trim(filename), iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'adipls failed to open ' // trim(filename)
-            stop 'run_adipls'
+            call mesa_error(__FILE__,__LINE__,'run_adipls')
          end if            
          istdou = iounit_dev_null
          istdpr = iounit_dev_null
@@ -418,7 +418,7 @@
          if (ierr_param < 0) then
             ierr = ierr_param
             write(*,*) 'call to adipls failed'
-            stop 'run_adipls'
+            call mesa_error(__FILE__,__LINE__,'run_adipls')
          end if
          
          
@@ -429,7 +429,7 @@
             iounit = alloc_iounit(ierr)
             if (ierr /= 0) then
                write(*,*) 'setup_adipls failed in alloc_iounit'
-               stop 'run_adipls'
+               call mesa_error(__FILE__,__LINE__,'run_adipls')
             end if
             filename = 'adipls.c.pruned.in'
             open(unit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -446,7 +446,7 @@
                write(*,*) 
                write(*,*) 
                write(*,*) 
-               stop 'run_adipls'
+               call mesa_error(__FILE__,__LINE__,'run_adipls')
             end if            
             
             write(*,*)
@@ -463,7 +463,7 @@
             if (ierr_param < 0) then
                ierr = ierr_param
                write(*,*) '1st call to adipls failed in setup_adipls'
-               stop 'run_adipls'
+               call mesa_error(__FILE__,__LINE__,'run_adipls')
             end if
             
             write(*,*) 'back from 1st call on adipls'
@@ -482,7 +482,7 @@
             iounit = alloc_iounit(ierr)
             if (ierr /= 0) then
                write(*,*) 'setup_redist failed in alloc_iounit'
-               stop 'run_rdist'
+               call mesa_error(__FILE__,__LINE__,'run_rdist')
             end if
             filename = 'redistrb.c.pruned.in'
             open(unit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -500,14 +500,14 @@
                write(*,*) 
                write(*,*) 
                write(*,*) 
-               stop 'run_adipls'
-               stop 'run_rdist'
+               call mesa_error(__FILE__,__LINE__,'run_adipls')
+               call mesa_error(__FILE__,__LINE__,'run_rdist')
             end if 
             
             read(iounit,*,iostat=ierr) nn_redist
             if (ierr /= 0) then
                write(*,*) 'setup_redist failed to read nn_redist from ' // trim(filename)
-               stop 'run_rdist'
+               call mesa_error(__FILE__,__LINE__,'run_rdist')
             end if 
             write(*,*) 'nn_redist', nn_redist
             
@@ -533,7 +533,7 @@
             if (ierr_param < 0) then
                ierr = ierr_param
                write(*,*) '1st call to srdist failed'
-               stop 'run_rdist'
+               call mesa_error(__FILE__,__LINE__,'run_rdist')
             end if
             
             write(*,*) 'back from 1st call on srdist'
@@ -645,7 +645,7 @@
             end do
          end do
          
-         if (ierr /= 0) stop 'check_arg_data'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'check_arg_data')
          
          
          contains

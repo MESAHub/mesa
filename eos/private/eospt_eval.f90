@@ -83,7 +83,7 @@
                write(*,1) 'Get_eosPT_Results: X bad', X
                ierr = -1
                return
-               stop 'eosPT'
+               call mesa_error(__FILE__,__LINE__,'eosPT')
             end if
             X = 1d0
          end if
@@ -608,7 +608,7 @@
                else if (doing_which == doing_get_Pgas) then
                   dfdx = dlnRho_dlnPgas_c_T*d_dlnRho_c_T(which_other)*ln10
                else
-                  stop 'bad value for doing_which in eosPT_eval'
+                  call mesa_error(__FILE__,__LINE__,'bad value for doing_which in eosPT_eval')
                end if
 
             end function get_f_df

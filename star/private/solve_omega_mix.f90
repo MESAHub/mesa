@@ -119,7 +119,7 @@
             if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
                if (s% stop_for_bad_nums) then
                   write(*,2) 's% omega(k)', k, s% omega(k)
-                  stop 'solve omega'
+                  call mesa_error(__FILE__,__LINE__,'solve omega')
                end if
                okay = .false.
                exit
@@ -127,7 +127,7 @@
          end do
          if (.not. okay) then
             write(*,2) 'model_number', s% model_number
-            stop 'start solve omega: bad num omega'
+            call mesa_error(__FILE__,__LINE__,'start solve omega: bad num omega')
          end if
 
          steps_used = 0
@@ -290,7 +290,7 @@
             end do
             if (.not. okay) then
                write(*,2) 'model_number', s% model_number
-               stop 'end solve omega'
+               call mesa_error(__FILE__,__LINE__,'end solve omega')
             end if
 
             do k=1,nz

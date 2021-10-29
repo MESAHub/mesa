@@ -131,7 +131,7 @@
             if (s% report_ierr) write(*,*) 'do_neu_for_cell ierr for cell', k
             if (s% stop_for_bad_nums) then
                write(*,2) 'bad s% non_nuc_neu(k)', k, s% non_nuc_neu(k)
-               stop 'do_neu_for_cell'
+               call mesa_error(__FILE__,__LINE__,'do_neu_for_cell')
             end if
             return
          end if

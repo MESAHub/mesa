@@ -2055,7 +2055,7 @@
                s% id, s% job% adjust_abundances_for_new_isos, net_name, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_change_to_new_net ' // trim(net_name)
-               stop 'change_net'
+               call mesa_error(__FILE__,__LINE__,'change_net')
                return
             end if
             
@@ -2063,7 +2063,7 @@
                write(*,*) '   new net_name ', trim(net_name)
                write(*,*) 'old s% net_name ', trim(s% net_name)
                write(*,*) 'failed to change'
-               stop 'change_net'
+               call mesa_error(__FILE__,__LINE__,'change_net')
             end if
 
             write(*,'(a)') ' new net = ' // trim(s% net_name)
