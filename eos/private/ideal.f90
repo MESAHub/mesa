@@ -126,7 +126,7 @@ module ideal
       
       ! No electrons, so extreme negative chemical potential
       etaele = -1d99
-      xnefer = 1d-99
+      xnefer = 1d-20
 
       ! no latent heat
       latent_ddlnT = 0d0
