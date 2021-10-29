@@ -1545,7 +1545,7 @@
             do i=1,num_reactions(plus_co56)
                write(*,*) trim(ratnam(i)), i, rate(i)
             end do
-            stop 'approx21_dydt'
+            call mesa_error(__FILE__,__LINE__,'approx21_dydt')
          end if
 
          end subroutine approx21_dydt
@@ -1887,7 +1887,7 @@
                write(*,1) 'sum(cat) - eps_nuc', sum_categories_q - eps_nuc_q
                write(*,1) 'sum(cat)/eps_nuc - 1', (sum_categories_q - eps_nuc_q)/eps_nuc_q
                write(*,*)
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             !$OMP end critical (net21_crit1)
             end if
             
@@ -1911,7 +1911,7 @@
                write(*,1) 'sum(cat)', sum_categories
                write(*,1) 'sum(cat) - eps_nuc', sum_categories_q - eps_nuc_q
                write(*,1) 'sum(cat)/eps_nuc - 1', (sum_categories_q - eps_nuc_q)/eps_nuc_q
-               stop 'approx21_eps_info'
+               call mesa_error(__FILE__,__LINE__,'approx21_eps_info')
             end if
             
             
@@ -3283,7 +3283,7 @@
             do i=num_mesa_reactions(plus_co56)+1,num_reactions(plus_co56)
                write(*,2) 'extra ' // trim(ratnam(i)), i
             end do
-            stop 'init_approx21'
+            call mesa_error(__FILE__,__LINE__,'init_approx21')
 
          end subroutine init_approx21
          

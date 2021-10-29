@@ -543,7 +543,7 @@
                   do i=1,m-1
                      write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
                   end do
-                  stop 'get1_gradient_coeffs'
+                  call mesa_error(__FILE__,__LINE__,'get1_gradient_coeffs')
                end if
 
                call solve_burgers_cgs_with_thermal(2*m+1,m,A,charge,nd,rad_accel,rad, &
@@ -585,7 +585,7 @@
                do i=1,m-1
                   write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
                end do
-               stop 'get1_gradient_coeffs'
+               call mesa_error(__FILE__,__LINE__,'get1_gradient_coeffs')
             end if
          else ! Use the Thoul solver
             call do1_solve_thoul_hu( &
@@ -602,7 +602,7 @@
                do i=1,m-1
                   write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
                end do
-               stop 'get1_gradient_coeffs'
+               call mesa_error(__FILE__,__LINE__,'get1_gradient_coeffs')
             end if
          end if
 
@@ -721,7 +721,7 @@
             end do
             vmax = v_advection_max
             !write(*,3) 'vmax > v_advection_max', im, k, vmax, v_advection_max
-            !stop 'get1_diffusion_velocities'
+            !call mesa_error(__FILE__,__LINE__,'get1_diffusion_velocities')
          end if
 
          if (alfa > 0d0 .and. vmax > vmax_limit) then

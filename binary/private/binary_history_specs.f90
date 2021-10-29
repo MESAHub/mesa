@@ -282,7 +282,7 @@
          b% history_column_values(:) = 0
          !b% need_to_write_history = .false.
          if (dbg) write(*,*) 'binary num log columns', capacity
-         if (dbg) stop 'debug: set_binary_history_columns'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_binary_history_columns')
       end subroutine set_binary_history_columns
 
 

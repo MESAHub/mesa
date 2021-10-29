@@ -384,7 +384,7 @@ contains
          write(*,1) 'fval', fval
 
          write(*,*)
-         stop 'debug: do_bicubic_interpolations'
+         call mesa_error(__FILE__,__LINE__,'debug: do_bicubic_interpolations')
       end if
 
       ! derivatives of bicubic splines
@@ -451,7 +451,7 @@ contains
          write(*,1) 'y1', y1
          write(*,1) 'delta_lYeRho', delta_lYeRho
          write(*,1) 'y_beta', y_beta
-         !stop 'weak setup_for_linear_interp'
+         !call mesa_error(__FILE__,__LINE__,'weak setup_for_linear_interp')
       end if
 
       if (dbg) then
@@ -499,7 +499,7 @@ contains
          write(*,1) 'y_beta', y_beta
          write(*,1) 'f(1,ix,jy)', f(1,ix,jy)
          write(*,1) 'f(1,ix,jy+1)', f(1,ix,jy+1)
-         !stop 'weak do_linear_interp'
+         !call mesa_error(__FILE__,__LINE__,'weak do_linear_interp')
       end if
 
     end subroutine do_linear_interp

@@ -326,7 +326,7 @@
          else if (uniform_Xinit) then
             xin(:) = 0.5d0/(species-1)
             j = net_iso(ih1)
-            if (j <= 0) stop 'where is the h?'
+            if (j <= 0) call mesa_error(__FILE__,__LINE__,'where is the h?')
             xin(j) = 0.5d0
          else
             do i = 1, num_isos_for_Xinit
@@ -582,7 +582,7 @@
             if (num_times > 1) then ! create interpolant
                allocate(pm_work(num_times*nwork))
                call interp_pm(times, num_times, log10Ps_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
-               if (ierr /= 0) stop 'failed in interp for logTs'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for logTs')
             end if
             
             call net_1_zone_burn_const_P( &
@@ -609,11 +609,11 @@
             if (num_times > 1) then ! create interpolants
                allocate(pm_work(num_times*nwork))
                call interp_pm(times, num_times, log10Ts_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
-               if (ierr /= 0) stop 'failed in interp for logTs'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for logTs')
                call interp_pm(times, num_times, log10Rhos_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
-               if (ierr /= 0) stop 'failed in interp for logRhos'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for logRhos')
                call interp_pm(times, num_times, etas_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
-               if (ierr /= 0) stop 'failed in interp for etas'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for etas')
             end if
             
             burn_lwork = net_1_zone_burn_work_size(handle,ierr)
@@ -657,7 +657,7 @@
          if (.not. complete_silence_please) then
             if (nstep >= max_steps) then
                write(*,2) 'hit max number of steps', nstep
-               stop 'burn'
+               call mesa_error(__FILE__,__LINE__,'burn')
             end if
             write(*,2) 'number of species', species
             write(*,1) 'large final abundances', min_for_show_peak_abundances
@@ -1311,7 +1311,7 @@
                   end if
                end do
                write(*,*)
-               stop 'show_Qs'
+               call mesa_error(__FILE__,__LINE__,'show_Qs')
             end if
          
          
@@ -1455,7 +1455,7 @@
          
          if (len_trim(set_rate_1212) > 0) then
             if (set_rate_1212 == 'CF88_1212') then
-               stop 'fix use_rate_1212_CF88'
+               call mesa_error(__FILE__,__LINE__,'fix use_rate_1212_CF88')
                !which_rate = use_rate_1212_CF88
             else
                write(*,*) 'invalid string for set_rate_1212 ' // trim(set_rate_1212)

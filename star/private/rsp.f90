@@ -28,6 +28,7 @@
       use rsp_eval_eos_and_kap, only: init_for_rsp_eos_and_kap
       use rsp_def
       use rsp_step, only: calculate_energies, init_HYD, HYD
+      use utils_lib, only: mesa_error
 
       implicit none
       
@@ -169,12 +170,12 @@
                write(*,2) 's% Prad(k)', k, s% Prad(k)
                write(*,2) 's% erad(k)', k, s% erad(k)
                write(*,2) 's% Vol(k)', k, s% Vol(k)
-               stop 'build_rsp_model'
+               call mesa_error(__FILE__,__LINE__,'build_rsp_model')
             end if
             s% dq(k) = s% dm(k)/s% xmstar
             if (is_bad(s% Vol(k)) .or. s% Vol(k) <= 0d0) then
                write(*,2) 's% Vol(k)', I, s% Vol(k)
-               stop 'build_rsp_model'
+               call mesa_error(__FILE__,__LINE__,'build_rsp_model')
             end if
             call store_rho_in_xh(s, k, 1d0/s% Vol(k))
             call store_T_in_xh(s, k, s% T(k))
@@ -196,7 +197,7 @@
          call set_qs(s, NZN, s% q, s% dq, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in set_qs'
-            stop 'build_rsp_model'
+            call mesa_error(__FILE__,__LINE__,'build_rsp_model')
          end if
          call set_m_and_dm(s)
          call set_m_grav_and_grav(s)
@@ -247,7 +248,7 @@
             write(*,*) '   atm_T_tau_relation = ''Eddington'''
             write(*,*) '   atm_T_tau_opacity = ''iterated'''
             ierr = -1
-            stop 'rsp_setup_part1'
+            call mesa_error(__FILE__,__LINE__,'rsp_setup_part1')
             return
          end if
          if (restart) then
@@ -284,7 +285,7 @@
                   call get_surf_P_T_kap(s, &
                      s% m(1), s% r(1), s% L(1), tau_surf, kap_guess, &
                      T_surf, Psurf, kap_surf, Teff_atm, ierr)
-                  if (ierr /= 0) stop 'failed in get_surf_P_T_kap'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in get_surf_P_T_kap')
                else if (s% RSP_use_Prad_for_Psurf) then
                   Psurf = crad*s% T(1)**4/3d0
                else
@@ -613,7 +614,7 @@
             if (t == eof_token) exit
             if (t /= name_token) then
                write(*,*) 'error reading map columns list ' // trim(filename)
-               stop 'read_map_specs'
+               call mesa_error(__FILE__,__LINE__,'read_map_specs')
                call error; return
             end if
             id = get_profile_id(s, string)
@@ -621,7 +622,7 @@
                write(*,*) 'error: <' // trim(string) // '> in map columns is not in your profile list'
                write(*,*) 'please add it to your profile columns list and try again'
                write(*,*) 'also, replace any TAB characters by spaces in ' // trim(filename)
-               stop 'read_map_specs'
+               call mesa_error(__FILE__,__LINE__,'read_map_specs')
                call error; return
             end if
             col = col+1
@@ -672,7 +673,7 @@
             write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
             write(*,1) 'max_timestep_factor', s% max_timestep_factor
             write(*,1) 'rsp_period/RSP_target_steps_per_cycle/', s% rsp_period/s% RSP_target_steps_per_cycle
-            stop 'do1_step 1'
+            call mesa_error(__FILE__,__LINE__,'do1_step 1')
          end if
 
          max_dt = rsp_min_dr_div_cs*s% RSP_max_dt_times_min_dr_div_cs
@@ -682,14 +683,14 @@
          !      if (s% dt > max_dt) then
          !         write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
          !            s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
-         !         !stop 'rsp'
+         !         !call mesa_error(__FILE__,__LINE__,'rsp')
          !      end if
          !   end if
          !end if
          if (s% dt > max_dt) then
             if (s% RSP_report_limit_dt) then
                write(*,4) 'limit to RSP_max_dt_times_min_dr_div_cs', s% model_number, max_dt, s% dt
-               stop 'do1_step 1'
+               call mesa_error(__FILE__,__LINE__,'do1_step 1')
             end if
             s% dt = max_dt
          end if
@@ -701,7 +702,7 @@
             write(*,1) 'RSP_max_dt_times_min_dr_div_cs', s% RSP_max_dt_times_min_dr_div_cs
             write(*,1) 'rsp_min_dr_div_cs', rsp_min_dr_div_cs
             write(*,1) 'rsp_min_rad_diff_time', rsp_min_rad_diff_time
-            stop 'do1_step 2'
+            call mesa_error(__FILE__,__LINE__,'do1_step 2')
          end if
          
          ierr = 0
@@ -1009,7 +1010,7 @@
                write(*,2) 'TET', s% model_number, TET
                write(*,2) 'T0', s% model_number, T0
                write(*,2) 'TT1', s% model_number, TT1
-               stop 'check_cycle_completed'
+               call mesa_error(__FILE__,__LINE__,'check_cycle_completed')
             end if
             RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
             write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &

@@ -171,7 +171,7 @@
          do k=1,nz ! check that every cell factored exactly once
             if (factored(k) /= 1) then
                write(*,3) 'factored /= 1', k, factored(k)
-               stop 'bcyclic_factor'
+               call mesa_error(__FILE__,__LINE__,'bcyclic_factor')
             end if
          end do
 
@@ -357,7 +357,7 @@
             k = ncycle*(ns-1) + 1
             if (factored(k) > 0) then
                write(*,2) 'compute new dmat after already factored', k
-               stop 'cycle_onestep'
+               call mesa_error(__FILE__,__LINE__,'cycle_onestep')
             end if
             shift2 = nvar2*(k-1)
             dmat(1:nvar,1:nvar) => dblkF1(shift2+1:shift2+nvar2)
@@ -637,7 +637,7 @@
                
             if (ierr > 0 .and. ierr <= nvar) then ! singular
                write(*,3) 'singular matrix for DGESVX', k, ierr
-               stop 'factor_with_DGESVX'
+               call mesa_error(__FILE__,__LINE__,'factor_with_DGESVX')
             end if
             if (ierr == nvar+1) then ! means bad rcond, but may not be fatal
                write(*,2) 'DGESVX reports bad matrix conditioning: k, rcond', k, rcond

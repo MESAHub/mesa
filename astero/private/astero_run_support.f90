@@ -60,7 +60,7 @@
          ierr = 0
          call do_read_star_job('inlist', ierr) ! this does alloc_star
          ! and saves the id in id_from_read_star_job
-         if (ierr /= 0) stop 1
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
          id = id_from_read_star_job
          id_from_read_star_job = 0
@@ -69,7 +69,7 @@
          call star_setup(id, 'inlist', ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in star_setup'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          okay_to_restart = .true.
@@ -85,7 +85,7 @@
          call read_astero_search_controls(inlist_astero_fname, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in read_astero_search_controls'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          if (Y_depends_on_Z .and. vary_Y) then
@@ -132,14 +132,14 @@
             call write_astero_search_controls(save_controls_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in write_astero_search_controls'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
          end if
          
          call check_search_controls(ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in check_search_controls'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          nu_max_sun = s% nu_max_sun
@@ -147,7 +147,7 @@
          call init_obs_data(ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in init_obs_data'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          next_Y_to_try = -1
@@ -742,7 +742,7 @@
          call save_sample_results_to_file(-1,bobyqa_output_filename,ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
-            stop 'bobyqa_fun'
+            call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
          end if
          
       end subroutine bobyqa_fun
@@ -762,7 +762,7 @@
          call save_sample_results_to_file(-1,newuoa_output_filename,ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
-            stop 'newuoa_fun'
+            call mesa_error(__FILE__,__LINE__,'newuoa_fun')
          end if
          
       end subroutine newuoa_fun
@@ -829,7 +829,7 @@
          f = eval1(star_id, ierr)
          if (ierr /= 0) then
             write(*,*) 'got ierr from eval1'
-            stop 'bobyqa_fun'
+            call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
          end if
          if (sample_number == prev_sample_number) then
             if (sample_number <= 0) then ! failed on 1st try
@@ -847,7 +847,7 @@
          call show_all_sample_results(6,-1,ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in show_all_sample_results'
-            stop 'bobyqa_fun'
+            call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
          end if
          
          min_sample_chi2_so_far = minval(sample_chi2(1:sample_number))
@@ -1437,7 +1437,7 @@
             ierr = 0
             allocate(index(num_samples), stat=ierr)
             if (ierr /= 0) then
-               stop 'failed in allocate before calling qsort from show_all_sample_results'
+               call mesa_error(__FILE__,__LINE__,'failed in allocate before calling qsort from show_all_sample_results')
             end if
             call qsort(index, num_samples, sample_chi2)
             max_i = 0
@@ -1533,7 +1533,7 @@
             call alloc_sample_ptrs(ierr)
             if (ierr /= 0) then
                write(*,*) 'ERROR -- failed to allocate for samples'
-               stop 'save_best_for_sample'
+               call mesa_error(__FILE__,__LINE__,'save_best_for_sample')
                return
             end if
          end if
@@ -1662,7 +1662,7 @@
             avg_model_number_top_samples + &
                avg_model_number_sigma_limit*avg_model_number_sigma
          write(*,*)
-         !stop 'set_sample_averages'
+         !call mesa_error(__FILE__,__LINE__,'set_sample_averages')
          
       end subroutine set_sample_averages
       

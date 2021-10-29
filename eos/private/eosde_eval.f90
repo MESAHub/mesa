@@ -83,7 +83,7 @@
                write(*,1) 'P/pow(rho,gamma)', P/pow(rho,gamma)
                write(*,1) 'log(P/pow(rho,gamma)', log(P/pow(rho,gamma))
                write(*,1) 'gamma', gamma
-               stop 'bad gamma law entropy'
+               call mesa_error(__FILE__,__LINE__,'bad gamma law entropy')
 !$OMP end critical (eosde_eval_crit1)
             end if
             entropy = 1d-99

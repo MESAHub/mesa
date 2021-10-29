@@ -226,7 +226,7 @@ module skye
                write(*,1) 'abar', abar
                write(*,1) 'zbar', zbar
                write(*,1) 'X', X
-               stop 'Get_Skye_EOS_Results'
+               call mesa_error(__FILE__,__LINE__,'Get_Skye_EOS_Results')
             end if
             return
          end if     

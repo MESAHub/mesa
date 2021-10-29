@@ -179,7 +179,7 @@
             write(*,1) 'lYeRho', lYeRho
             write(*,1) 'YeRho_in', YeRho_in
             write(*,1) 'log10(YeRho_in)', log10(YeRho_in)
-            !stop 'weak lYeRho'
+            !call mesa_error(__FILE__,__LINE__,'weak lYeRho')
          end if
          
          if (n == 0) then

@@ -232,7 +232,7 @@
 
 ! stop
       if (string(1:2) .eq. '-1') then
-       stop 'normal termination'
+       call mesa_error(__FILE__,__LINE__,'normal termination')
 
 ! read the conditions
       else

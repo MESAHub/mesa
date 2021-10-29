@@ -29,7 +29,7 @@ module eos_support
 
   use const_def
   use star_private_def
-  use utils_lib, only : is_bad
+  use utils_lib, only : is_bad, mesa_error
 
   ! No implicit typing
 
@@ -103,7 +103,7 @@ contains
           write(*,1) 'log10Rho', logRho
           write(*,1) 'log10T', logT
           if (s% stop_for_bad_nums .and. &
-               is_bad(logRho+logT)) stop 'do_eos_for_cell'
+               is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
           !$OMP end critical (get_eos_critical)
        end if
        return

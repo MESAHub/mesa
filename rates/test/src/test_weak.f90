@@ -250,7 +250,7 @@ module test_weak
 
          end do
 
-         stop 'test rate'
+         call mesa_error(__FILE__,__LINE__,'test rate')
 
       end if
 
@@ -301,7 +301,7 @@ module test_weak
 
          end if
 
-         if (ierr /= 0) stop 'failed in call eval_weak_reaction_info'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in call eval_weak_reaction_info')
          val = lambda(i)
 
          end function dfridr_weak_reaction_info

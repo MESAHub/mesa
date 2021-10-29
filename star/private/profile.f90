@@ -262,7 +262,7 @@
          end do
          call realloc_integer(s% profile_column_spec, cnt-1, ierr)
          if (dbg) write(*,*) 'num profile columns', cnt-1
-         if (dbg) stop 'debug: set_profile_columns'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_profile_columns')
       end subroutine set_profile_columns
       
       
@@ -720,7 +720,7 @@
                v = val
                if (is_bad_num(v)) then
                   write(*,1) 'bad value for ' // trim(col_name), v
-                  if (s% stop_for_bad_nums) stop 'profile do_val'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'profile do_val')
                   v = 0
                end if
                write(io, fmt=dbl_fmt, advance='no') v

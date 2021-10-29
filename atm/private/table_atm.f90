@@ -385,7 +385,7 @@
             write(*,*)
             ierr = -1
             return
-            !if (is_bad(newPgas) .or. is_bad(newT)) stop 'get_table_values'
+            !if (is_bad(newPgas) .or. is_bad(newT)) call mesa_error(__FILE__,__LINE__,'get_table_values')
          end if
          
          !if (dbg) write(*,*) 'loaded tables: ', ai% have_atm_table(:)
@@ -691,7 +691,7 @@
             if (failed) then
                write(*,'(a,i6)') &
                   'failed in reading atm table ' // trim(filename), i
-               !stop 'get_table_values'
+               !call mesa_error(__FILE__,__LINE__,'get_table_values')
             end if
          end function failed
          

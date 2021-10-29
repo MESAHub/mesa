@@ -997,7 +997,7 @@
                   s% dt_next = 1d-2*secyer
                case (do_create_RSP2_model)
                   !call build_rsp2_model(s, ierr) ! like build_pre_ms_model
-                  stop 'need to add build_rsp2_model'
+                  call mesa_error(__FILE__,__LINE__,'need to add build_rsp2_model')
                   if (ierr /= 0) then
                      write(*,*) 'failed in build_rsp2_model'
                      return

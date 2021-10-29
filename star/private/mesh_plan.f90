@@ -349,13 +349,13 @@
                do kk=1400,nz_new
                   if (dq_new(kk) < 1d-12) then
                      write(*,2) 'dq_new(kk)', kk, dq_new(kk)
-                     stop 'debug: split1'
+                     call mesa_error(__FILE__,__LINE__,'debug: split1')
                   end if
                end do
                do kk = 2, nz_new
                   if (dq_new(kk-1) < 1d-6*dq_new(kk) .or. dq_new(kk) < 1d-6*dq_new(kk-1)) then
                      write(*,3) 'bad dq_new ratio', kk, nz_new, dq_new(kk), dq_new(kk-1)
-                     stop 'debug: split1'
+                     call mesa_error(__FILE__,__LINE__,'debug: split1')
                   end if
                end do
             end if
@@ -462,7 +462,7 @@
                do kk=1400,nz_new
                   if (dq_new(kk) < 1d-12) then
                      write(*,2) 'dq_new(kk)', kk, dq_new(kk)
-                     stop 'debug: split1'
+                     call mesa_error(__FILE__,__LINE__,'debug: split1')
                   end if
                end do
             end if
@@ -574,7 +574,7 @@
 
                if (dbg) then
                   call test_new(ierr)
-                  if (ierr /= 0) stop 'debug: mesh_plan, smooth_new_points'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'debug: mesh_plan, smooth_new_points')
                end if
 
                if (done) exit
@@ -597,7 +597,7 @@
 
                if (dbg) then
                   call test_new(ierr)
-                  if (ierr /= 0) stop 'debug: mesh_plan, smooth_new_points'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'debug: mesh_plan, smooth_new_points')
                end if
 
                if (done) exit
@@ -918,7 +918,7 @@
             open(newunit=iounit, file=trim('plan_debug.data'), action='write', iostat=ierr)
             if (ierr /= 0) then
                write(*, *) 'open plan_debug.data failed'
-               stop 'debug do_mesh_plan'
+               call mesa_error(__FILE__,__LINE__,'debug do_mesh_plan')
             end if
             write(*,*) 'write plan_debug.data'
          end subroutine open_debug_file
@@ -1086,7 +1086,7 @@
                   write(*,2) 'dq_sum', k, dq_sum
                   write(*,*) 'pick1_dq'
                   ierr = -1
-                  if (s% stop_for_bad_nums) stop 'mesh plan'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
                   return
                end if
                if (dq_sum >= next_dq_max) exit
@@ -1106,7 +1106,7 @@
                      write(*,1) 'gvals(k,j)-gmin', gvals(k,j)-gmin
                      write(*,1) 'dq_old(k-1)', dq_old(k-1)
                      write(*,1) 'gvals(k-1,j) > gvals(k,j)', dq_next
-                     stop 'debug pick1_dq'
+                     call mesa_error(__FILE__,__LINE__,'debug pick1_dq')
                   end if
                else ! we're done -- don't need another point for this gval
                   dq_sum = default; exit ! just return the default
@@ -1135,7 +1135,7 @@
                write(*,2) 'dq_old(k-1)', k, dq_old(k-1)
                write(*,*) 'pick1_dq'
                ierr = -1
-               if (s% stop_for_bad_nums) stop 'mesh plan'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
                return
             end if
             if (xq_old(k-1) >= xq_new(k_new)) then

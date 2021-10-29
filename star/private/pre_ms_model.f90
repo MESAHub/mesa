@@ -255,7 +255,7 @@
             write(*,1) '(mstar-mstar1)/mstar', (mstar-mstar1)/mstar
             write(*,*) 'nz', nz
             write(*,*)
-            stop 'debug: pre ms'
+            call mesa_error(__FILE__,__LINE__,'debug: pre ms')
          end if
 
          ! The following deallocations deal with arrays which were

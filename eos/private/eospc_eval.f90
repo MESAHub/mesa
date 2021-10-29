@@ -198,7 +198,7 @@
          if (is_bad(res(i_lnS))) then
             ierr = -1
             write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
-            stop 'Get_PC_Results'
+            call mesa_error(__FILE__,__LINE__,'Get_PC_Results')
          end if
 
          contains
@@ -264,7 +264,7 @@
                write(*,1) 'logRho', log10(RHO)
                write(*,1) 'logT', log10(T)
                write(*,*) 'ierr from MELANGE9'
-               stop 'debug eos'
+               call mesa_error(__FILE__,__LINE__,'debug eos')
             end if
             
             if (show) then

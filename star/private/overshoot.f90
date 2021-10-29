@@ -214,7 +214,7 @@ contains
              if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
                 
                 if (.not. s% calculate_Brunt_N2) &
-                   stop 'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.'
+                   call mesa_error(__FILE__,__LINE__,'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
 
                 ! (NB: we examine B(k+dk) rather than B(k), as the latter
                 ! would allow the overshoot region to eat into a composition
@@ -328,7 +328,7 @@ contains
              write(*,3) 'mixing_type, D_mix', k, s%mixing_type(k), s%D_mix(k)
           end if
 
-          if (s% stop_for_bad_nums) stop 'add_overshooting'
+          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_overshooting')
 
        end if
 

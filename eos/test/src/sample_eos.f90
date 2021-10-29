@@ -98,7 +98,7 @@
        call Shutdown_eos(handle)
        deallocate(net_iso, chem_id)
        if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-       stop 'normal termination'
+       call mesa_error(__FILE__,__LINE__,'normal termination')
 
 ! read the conditions
       else

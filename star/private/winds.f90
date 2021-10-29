@@ -300,7 +300,7 @@
             call rotation_enhancement(ierr)
             if (is_bad(s% rotational_mdot_boost)) then
                write(*,2) 'is_bad(s% rotational_mdot_boost)', s% model_number
-               if (s% stop_for_bad_nums) stop 'winds: rotation_enhancement'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'winds: rotation_enhancement')
             end if
             if (ierr /= 0) then
                if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: rotation_enhancement ierr'
@@ -332,8 +332,8 @@
                 if (wind <= 0 .or. is_bad_num(wind)) then
                    ierr = -1
                    write(*,*) 'bad value for wind :', wind,L1,R1,M1
-                   if (dbg) stop 'debug: bad value for wind'
-                   if (s% stop_for_bad_nums) stop 'winds'
+                   if (dbg) call mesa_error(__FILE__,__LINE__,'debug: bad value for wind')
+                   if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'winds')
                    return
                 end if
                 X = surface_h1
@@ -372,7 +372,7 @@
                       write(*,1) 'wind', wind
                       write(*,1) 'log10 wind', log10(wind)
                       write(*,*)
-                      stop 'debug: winds'
+                      call mesa_error(__FILE__,__LINE__,'debug: winds')
                    end if
                 else if (scheme == 'Vink') then
                    call eval_Vink_wind(wind)
@@ -397,7 +397,7 @@
                 else
                    ierr = -1
                    write(*,*) 'unknown name for wind scheme : ' // trim(scheme)
-                   if (dbg) stop 'debug: bad value for wind scheme'
+                   if (dbg) call mesa_error(__FILE__,__LINE__,'debug: bad value for wind scheme')
                    return
                 end if
              end if

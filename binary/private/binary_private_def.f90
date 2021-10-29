@@ -243,7 +243,7 @@
             end if
          end do
          
-         if (.not. okay) stop 'binary_private_def_init'
+         if (.not. okay) call mesa_error(__FILE__,__LINE__,'binary_private_def_init')
 
          
          !here we store useful information about the compiler and SDK

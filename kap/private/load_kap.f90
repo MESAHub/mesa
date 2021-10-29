@@ -319,7 +319,7 @@ contains
     end if
 
     if (form /= kap_table_fixed_metal_form) then
-       stop 'form /= kap_table_fixed_metal_form'
+       call mesa_error(__FILE__,__LINE__,'form /= kap_table_fixed_metal_form')
     end if
 
     call Setup_Kap_X_Table(ierr)
@@ -642,7 +642,7 @@ contains
           write(*,*) 'logT', i, logTs(i)
        end do
        write(*,*)
-       stop 'kap interp error'
+       call mesa_error(__FILE__,__LINE__,'kap interp error')
        ierr = -1
        return
     end if

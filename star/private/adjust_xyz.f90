@@ -573,7 +573,7 @@
             write(*,2) 'old_total_o', k, old_total_o
             write(*,2) 'old_other', k, old_other
             write(*,*)
-            stop 'debug: set_new_abundances'
+            call mesa_error(__FILE__,__LINE__,'debug: set_new_abundances')
 !$omp end critical (new_abund)
 
             return
@@ -586,7 +586,7 @@
                write(*,2) trim(chem_isos% name(chem_id(j))), j, xa_new(j,k)
             end do
             write(*,*)
-            stop 'debug: set_new_abundances'
+            call mesa_error(__FILE__,__LINE__,'debug: set_new_abundances')
          end if
 
          contains
@@ -1101,7 +1101,7 @@
             write(*,1) 'Zinit', Zinit
             write(*,*) 'sum of (H1+H2+He3+He4+Z) does not sum to 1: (1-sum)= ', &
                1d0-(h1+h2+he3+he4+Zinit)
-            stop 'get_xa'
+            call mesa_error(__FILE__,__LINE__,'get_xa')
          end if
          ierr = 0
          xa(:) = 0
@@ -1258,7 +1258,7 @@
                write(*, 1) 'initial_z', initial_z
                write(*, 1) 'requested new_z', new_z
                write(*, 1) 'actual current_z', current_z
-               stop 'set_z'
+               call mesa_error(__FILE__,__LINE__,'set_z')
             end if
          end if
 
@@ -1316,7 +1316,7 @@
                      end if
                      if (s% stop_for_bad_nums) then
                         write(*,2) 'set_z s% xa(i, k)', k, s% xa(i, k)
-                        stop 'set_z'
+                        call mesa_error(__FILE__,__LINE__,'set_z')
                      end if
                      return
                   end if

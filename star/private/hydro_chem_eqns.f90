@@ -156,7 +156,7 @@
                   write(*,2) 'dxdt_mix', k, dxdt_mix
                   write(*,2) 'dxdt_nuc', k, dxdt_nuc
                end if
-               if (s% stop_for_bad_nums) stop 'do1_chem_eqns'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_chem_eqns')
 !$OMP end critical (star_chem_eqns_bad_num)
             end if
 
@@ -224,7 +224,7 @@
                if (s% report_ierr) then
                   write(*,2) 'do1_chem_eqns: bad ' // trim(str), k
                end if
-               if (s% stop_for_bad_nums) stop 'do1_chem_eqns'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_chem_eqns')
                return
             end if
          end subroutine check_dequ

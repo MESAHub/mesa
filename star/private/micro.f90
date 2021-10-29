@@ -315,7 +315,7 @@ contains
     if (ierr /= 0) then
        if (s% report_ierr) then
           write(*,*) 'do_eos_for_cell: get_eos ierr', ierr
-          !stop 'do_eos_for_cell'
+          !call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
        end if
        return
     end if
@@ -336,7 +336,7 @@ contains
        s% solver_call_number == s% solver_test_partials_call_number .and. &
        s% solver_iter == s% solver_test_partials_iter_number) then
        call write_eos_call_info(s,k)
-       stop 'do_eos_for_cell: write_eos_call_info'
+       call mesa_error(__FILE__,__LINE__,'do_eos_for_cell: write_eos_call_info')
     end if
 
   contains
@@ -355,7 +355,7 @@ contains
          if (s% report_ierr) then
             call write_eos_call_info(s,k)
             write(*,2) 'store_eos_for_cell failed', k
-            if (s% stop_for_bad_nums) stop 'do_eos_for_cell'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
             return
          end if
          return
@@ -397,7 +397,7 @@ contains
              write(*,2) 'd_dlnT ' // trim(eosDT_result_names(i)), k, d_dlnT(i)
              write(*,*)
              call write_eos_call_info(s,k)
-             if (s% stop_for_bad_nums) stop 'store_eos_for_cell'
+             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
              !$OMP end critical (micro_crit0)
           end if
           return
@@ -490,7 +490,7 @@ contains
           write(*,2) 'zbar', k, s% zbar(k)
           write(*,*) 
           call write_eos_call_info(s,k)
-          stop 'store_eos_for_cell'
+          call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
           !$OMP end critical (micro_crit1)
        end if
        ierr = -1
@@ -572,7 +572,7 @@ contains
           write(*,*) 'do_kap_for_cell: get_kap ierr', ierr
           !$omp critical (star_kap_get)
           call show_stuff()
-          if (s% stop_for_bad_nums) stop 'do_kap_for_cell'
+          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_kap_for_cell')
           !$omp end critical (star_kap_get)
        end if
        ierr = -1
@@ -609,7 +609,7 @@ contains
        if (s% stop_for_bad_nums) then
           !$omp critical (star_kap_get_bad_num)
           call show_stuff()
-          stop 'do_kap_for_cell'
+          call mesa_error(__FILE__,__LINE__,'do_kap_for_cell')
           !$omp end critical (star_kap_get_bad_num)
        end if
        ierr = -1

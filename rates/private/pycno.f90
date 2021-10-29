@@ -309,7 +309,7 @@
                write(*,1) 'analytic F2', dF2dRho 
                write(*,1) 'numeric F2', (F2_0 - F2) / (Rho_0 - Rho)
                write(*,*)
-               stop 'FL_epsnuc_3alf' 
+               call mesa_error(__FILE__,__LINE__,'FL_epsnuc_3alf') 
             end if
                         
          end if

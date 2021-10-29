@@ -287,7 +287,7 @@
                if (.not. a_okay) all_okay = .false.
             end do
 !$OMP END PARALLEL DO
-            if (.not. all_okay) stop 'make_rate_tables'
+            if (.not. all_okay) call mesa_error(__FILE__,__LINE__,'make_rate_tables')
             if (ierr /= 0) then
                write(*,*) 'make_rate_tables failed'
                deallocate(reaction_id)
@@ -602,7 +602,7 @@
             if (ir <= 0) cycle
             if (is_bad(rates(i))) then
                write(*,2) trim(reaction_Name(ir)) // ' rates', i, rates(i)
-               stop 'get_net_rates_for_tables'
+               call mesa_error(__FILE__,__LINE__,'get_net_rates_for_tables')
             end if
          end do
                
@@ -706,7 +706,7 @@
          write(*,1) 'drlambda_dlnT', drlambda_dlnT
          write(*,1) 'reverse_rate_raw', reverse_rate_raw(1:num_rvs)
          write(*,*)
-         !stop 'do_eval_reaclib_22'
+         !call mesa_error(__FILE__,__LINE__,'do_eval_reaclib_22')
 !$omp end critical  (rates_eval_reaclib_22)
          
       end subroutine do_eval_reaclib_22

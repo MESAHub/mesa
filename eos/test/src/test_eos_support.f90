@@ -93,7 +93,7 @@
                res, d_dlnd, d_dlnT, d_dxa, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosPT_get for test1_eosPT'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          Prad = crad*T*T*T*T/3
@@ -133,7 +133,7 @@
                res2, d_dlnd2, d_dlnT2, d_dxa2, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosDT_get for test1_eosPT'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
      
          write(*,*)
@@ -292,7 +292,7 @@
             result = exp10(result_log10)
             if (ierr /= 0) then
                write(*,*) 'ierr in test_get_Rho_T'
-               stop 2
+               call mesa_error(__FILE__,__LINE__)
             end if
             if (.not. quietly) then
                write(*,1) 'actual logRho', log10_rho
@@ -320,7 +320,7 @@
             result = exp10(result_log10)
             if (ierr /= 0) then
                write(*,*) 'ierr in test_get_Rho_T'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             if (.not. quietly) then
                write(*,*)
@@ -353,7 +353,7 @@
             result = exp10(result_log10)
             if (ierr /= 0) then
                write(*,*) 'ierr in test_get_Rho_T (eosDT_get_T_given_Ptotal)'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             if (.not. quietly) then
                write(*,*)
@@ -440,7 +440,7 @@
                eos_calls, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in test1_eosPT_get_T'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          write(*,*)
          write(*,1) 'guess logT', logT_guess
@@ -588,7 +588,7 @@
                eos_calls, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr in eosDT_get_T_given_egas'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          energy = exp(res(i_lnE))
          erad = crad*exp10(logT_result)**4/exp10(logRho)
@@ -655,7 +655,7 @@
          if (info /= 0) then
             write(*,*) 'info', info, 'Rho', Rho, 'T', T
             write(*,*) 'failed in Do_One_TRho'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          if (.not. quietly) then

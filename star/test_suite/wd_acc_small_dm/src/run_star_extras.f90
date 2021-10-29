@@ -260,7 +260,7 @@
             write(*,*) 'expected h1 mass added: ', expected_h1_mass_added, accreted_mass, h1_acc_abund
             write(*,*) 'current h1 mass added: ', h1_mass_added, h1_mass, initial_h1_mass / Msun
             check_initial_accretion_ok = .false.
-            stop 'check_initial_accretion_ok'
+            call mesa_error(__FILE__,__LINE__,'check_initial_accretion_ok')
          else
             write(*,*) 'added h1 mass increasing at expected rate; expect;', expected_h1_mass_added, &
              'got:', h1_mass_added, 'difference(%):', abs(h1_mass_added-expected_h1_mass_added)/expected_h1_mass_added*100

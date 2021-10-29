@@ -1325,7 +1325,7 @@
          integer :: iounit
          write(*,*) 'save_sample_results_to_file ' // trim(results_fname)
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='write', iostat=ierr)
          if (ierr /= 0) return
          call show_all_sample_results(iounit, i_total, ierr)
@@ -1916,7 +1916,7 @@
          write(*,*) 'read samples from file ' // trim(results_fname)
          
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(results_fname)

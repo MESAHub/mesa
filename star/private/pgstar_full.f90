@@ -1596,7 +1596,7 @@
          if (ierr /= 0) then
             write(*,*) 'failed in get_hist_values'
             return
-            stop 'pgstar'
+            call mesa_error(__FILE__,__LINE__,'pgstar')
          end if
          call add_to_pgstar_hist(s, pg)
 

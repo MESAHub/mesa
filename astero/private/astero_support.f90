@@ -97,7 +97,7 @@
             call do_gyre_get_modes(s, l, store_model, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in do_gyre_get_modes'
-               stop 'get_one_el_info'
+               call mesa_error(__FILE__,__LINE__,'get_one_el_info')
             end if
          
          else if (code == 'adipls') then 
@@ -130,7 +130,7 @@
                  do_redistribute_mesh, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in run_adipls'
-               stop 'get_one_el_info'
+               call mesa_error(__FILE__,__LINE__,'get_one_el_info')
             end if
             
          else
@@ -144,7 +144,7 @@
          ! sort results by increasing frequency
          allocate(index(num_results), stat=ierr)
          if (ierr /= 0) then
-            stop 'failed in allocate before calling qsort'
+            call mesa_error(__FILE__,__LINE__,'failed in allocate before calling qsort')
          end if
          call qsort(index, num_results, cyclic_freq)
 
@@ -177,7 +177,7 @@
                model_inertia(3,:), model_inertia_alt_up(3,:), model_inertia_alt_down(3,:), &
                model_order(3,:), model_order_alt_up(3,:), model_order_alt_down(3,:), ierr)
          else
-            stop 'bad value for l in get_one_el_info'
+            call mesa_error(__FILE__,__LINE__,'bad value for l in get_one_el_info')
          end if
          if (ierr /= 0) then
             !write(*,2) 'failed to find frequency for matching for l =', l
@@ -697,7 +697,7 @@
             write(*,1) 'sum_1', sum_1
             write(*,1) 'sum_2', sum_2
             write(*,*)
-            stop 'init_obs_data'
+            call mesa_error(__FILE__,__LINE__,'init_obs_data')
          end if
             
       end subroutine init_obs_data
@@ -782,12 +782,12 @@
 
       
       subroutine get_kjeldsen_nonradial_freq_corr_alt_up
-         !stop 'get_kjeldsen_nonradial_freq_corr_alt_up'
+         !call mesa_error(__FILE__,__LINE__,'get_kjeldsen_nonradial_freq_corr_alt_up')
       end subroutine get_kjeldsen_nonradial_freq_corr_alt_up
 
       
       subroutine get_kjeldsen_nonradial_freq_corr_alt_down 
-         !stop 'get_kjeldsen_nonradial_freq_corr_alt_down'
+         !call mesa_error(__FILE__,__LINE__,'get_kjeldsen_nonradial_freq_corr_alt_down')
       end subroutine get_kjeldsen_nonradial_freq_corr_alt_down
 
       
@@ -1644,7 +1644,7 @@
             stop
          end if
          
-         !if (is_bad(chi2)) stop 'get_chi2'
+         !if (is_bad(chi2)) call mesa_error(__FILE__,__LINE__,'get_chi2')
                   
       end function get_chi2
 

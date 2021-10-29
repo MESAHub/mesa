@@ -275,7 +275,7 @@ contains
          sumx, xh, xhe, xz, mass_correction, dmc_dx(species)
 
     allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
-    if (ierr /= 0) stop 'allocate failed'
+    if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'allocate failed')
     X = 0.70d0
     Z = 0.02d0
 

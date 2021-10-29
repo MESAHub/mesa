@@ -224,7 +224,7 @@
             s% id, adjust_abundances_for_new_isos, net_name, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in change_net ' // trim(net_name)
-            stop 'check_adjust_net'
+            call mesa_error(__FILE__,__LINE__,'check_adjust_net')
             return
          end if
 
@@ -232,7 +232,7 @@
             write(*,*) '   new net_name ', trim(net_name)
             write(*,*) 'old s% net_name ', trim(s% net_name)
             write(*,*) 'failed to change'
-            stop 'check_adjust_net'
+            call mesa_error(__FILE__,__LINE__,'check_adjust_net')
          end if
 
          s% using_revised_net_name = .true.

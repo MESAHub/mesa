@@ -219,7 +219,7 @@
                   end if
 
                case default
-                  stop 'bad case for rotation_mix_info'
+                  call mesa_error(__FILE__,__LINE__,'bad case for rotation_mix_info')
 
             end select
 
@@ -260,13 +260,13 @@
                      s% D_GSF_factor, s% D_GSF(k)
                   write(*,2) 's% D_ST_factor   * s% D_ST(k)', k, s% D_ST_factor   * s% D_ST(k), &
                      s% D_ST_factor, s% D_ST(k)
-                  stop 'rotation mix'
+                  call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
                s% D_omega(k) = D_omega_source
                if (is_bad(s% D_omega(k))) then
                   write(*,2) 's% D_omega(k)', k, s% D_omega(k)
                   write(*,2) 'D_omega_source', k, D_omega_source
-                  stop 'rotation mix'
+                  call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
             end do
             
@@ -275,7 +275,7 @@
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after smooth_for_rotation s% D_omega(k)', k, s% D_omega(k)
-                     stop 'rotation mix'
+                     call mesa_error(__FILE__,__LINE__,'rotation mix')
                   end if
                end do
             end if
@@ -285,7 +285,7 @@
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after mix_D_omega s% D_omega(k)', k, s% D_omega(k)
-                     stop 'rotation mix'
+                     call mesa_error(__FILE__,__LINE__,'rotation mix')
                   end if
                end do
             end if
@@ -296,7 +296,7 @@
             do k=1,nz
                if (is_bad(s% D_omega(k))) then
                   write(*,2) 'before return s% D_omega(k)', k, s% D_omega(k)
-                  stop 'rotation mix'
+                  call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
@@ -384,7 +384,7 @@
                if (is_bad(x(k))) then
                   return
                   write(*,3) 's% D_omega(k) prev, x', k, s% model_number, s% D_omega(k), x(k), bp(i)
-                  stop 'mix_D_omega'
+                  call mesa_error(__FILE__,__LINE__,'mix_D_omega')
                end if
             end do
             
@@ -394,7 +394,7 @@
                s% D_omega(k) = s% D_omega(k) + x(k)
                if (is_bad(s% D_omega(k))) then
                   write(*,3) 's% D_omega(k)', k, s% model_number, s% D_omega(k)
-                  stop 'mix_D_omega'
+                  call mesa_error(__FILE__,__LINE__,'mix_D_omega')
                end if
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
@@ -644,7 +644,7 @@
                      if (abs(denom) < 1d-50 .or. is_bad(denom)) then
                         if (s% stop_for_bad_nums) then
                            write(*,2) 'denom', i, denom
-                           stop 'rotation mix info: velocities for ES and GSF'
+                           call mesa_error(__FILE__,__LINE__,'rotation mix info: velocities for ES and GSF')
                         end if
                         ve0(i) = 1d99
                      else
@@ -656,14 +656,14 @@
                   if (is_bad(ve0(i))) then
                      if (s% stop_for_bad_nums) then
                         write(*,2) 've0(i)', i, ve0(i)
-                        stop 'rotation mix info'
+                        call mesa_error(__FILE__,__LINE__,'rotation mix info')
                      end if
                      ve0(i) = 1d99
                   end if
                   if (is_bad(ve_mu(i))) then
                      if (s% stop_for_bad_nums) then
                         write(*,2) 've_mu(i)', i, ve_mu(i)
-                        stop 'rotation mix info'
+                        call mesa_error(__FILE__,__LINE__,'rotation mix info')
                      end if
                      ve_mu(i) = 1d99
                   end if
@@ -736,7 +736,7 @@
                            s% D_DSI(k), D, scale_height(k)*csound(k), &
                            Ri(k), Ri_crit, height, t_dyn(k), &
                            instability_height, scale_height(k), csound(k)
-                        stop 'set_D_DSI'
+                        call mesa_error(__FILE__,__LINE__,'set_D_DSI')
                      end if
                      height = min(instability_height, scale_height(k))
                      D = height*height/t_dyn(k)
@@ -752,7 +752,7 @@
                end if
 
             end do
-            if (dbg) stop 'set_D_DSI'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'set_D_DSI')
          end subroutine set_D_DSI
 
 
@@ -872,7 +872,7 @@
                         write(*,2) 'dr(k)', k, dr(k)
                         write(*,2) 'visc(k)', k, visc(k)
                         write(*,2) 'domega_dlnR(k)', k, domega_dlnR(k)
-                        stop 'set_D_SSI'
+                        call mesa_error(__FILE__,__LINE__,'set_D_SSI')
                      end if
 
                   end do
@@ -965,7 +965,7 @@
                   write(*,2) 'Hj(i)', i, Hj(i)
                   write(*,2) 'omega(i)', i, omega(i)
                   write(*,2) 'dlnR_domega(i)', i, dlnR_domega(i)
-                  stop 'set_D_GSF'
+                  call mesa_error(__FILE__,__LINE__,'set_D_GSF')
                   v = 0
                end if
                v_diff = abs(v) - abs(ve_mu(i)) ! heger 2000, eqn 43
@@ -1192,7 +1192,7 @@
                   write(*,2) 'xmagw', k, xmagw
                   write(*,2) 'xmagdn', k, xmagdn
                   write(*,2) 'xmags0', k, xmags0
-                  stop 'set_ST'
+                  call mesa_error(__FILE__,__LINE__,'set_ST')
                end if
                xmagbphi0 = xmagwa0*xmag4pd*xmagrn ! B_\phi
                xmagbr0 = xmagbphi0*xmagq*xmagwn*xmagwn ! B_r
@@ -1231,7 +1231,7 @@
                   write(*,2) 'xmags1', k, xmags1
                   write(*,2) 'xmags0', k, xmags0
                   write(*,2) 'xmagsm', k, xmagsm
-                  stop 'set_ST'
+                  call mesa_error(__FILE__,__LINE__,'set_ST')
                end if
                xmagqm=xmagq0+xmagq1 ! q_m
                xmagetam=xmageta0*xmageta1/(xmageta0+xmageta1) ! eta_m
@@ -1307,7 +1307,7 @@
                write(*,3) 'set_ST xmagnu', k, s% model_number, xmagnu
                write(*,3) 'set_ST xmagfdif', k, s% model_number, xmagfdif
                write(*,3) 'set_ST D_ST(k)', k, s% model_number, s% D_ST(k)
-               stop 'set_ST'
+               call mesa_error(__FILE__,__LINE__,'set_ST')
             end if
 
          end do

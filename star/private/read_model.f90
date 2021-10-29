@@ -359,7 +359,7 @@
          if (is_bad(s% M_center)) then
             write(*,1) 'M_center mstar xmstar initial_mass', &
                s% M_center, s% mstar, s% xmstar, initial_mass
-            stop 'do_read_saved_model'
+            call mesa_error(__FILE__,__LINE__,'do_read_saved_model')
          end if
 
          call set_net(s, s% net_name, ierr)

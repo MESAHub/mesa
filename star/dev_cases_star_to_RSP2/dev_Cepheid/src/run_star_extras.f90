@@ -293,7 +293,7 @@
                v_surf = s% u_face_val(1)
                v_surf_start = s% u_face_start(1)
             else
-               stop 'extras_finish_step: both v_flag and u_flag are false'
+               call mesa_error(__FILE__,__LINE__,'extras_finish_step: both v_flag and u_flag are false')
             end if
             cs = s% csound(1)
             if (v_surf > v_div_cs_max*cs) v_div_cs_max = v_surf/cs
@@ -589,7 +589,7 @@
          amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
             write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
          end if
          amixF = 1d0 - (amix1 + amix2)
          
@@ -597,7 +597,7 @@
             write(*,3) 'amixF > 0d0 .and. npts(1) /= nz-1', npts(1)
             write(*,*) 'cannot use fundamental for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
             ierr = -1
             return
          end if
@@ -606,7 +606,7 @@
             write(*,3) 'AMIX1 > 0d0 .and. npts(2) /= nz-1', npts(2)
             write(*,*) 'cannot use 1st overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
             ierr = -1
             return
          end if
@@ -615,7 +615,7 @@
             write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3)
             write(*,*) 'cannot use 2nd overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
             ierr = -1
             return
          end if
@@ -631,7 +631,7 @@
             vel => s% u
             i_v = s% i_u
          else
-            stop 'set_gyre_linear_analysis vel'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis vel')
          end if
          
          do i=nz-1,1,-1

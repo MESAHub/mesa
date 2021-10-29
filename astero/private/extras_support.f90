@@ -146,7 +146,7 @@
                      dt_for_smaller_steps_before_age_target
                   write(*,1) 'max_years_for_timestep', &
                      s% max_years_for_timestep
-                  stop 'bad max_years_for_timestep'
+                  call mesa_error(__FILE__,__LINE__,'bad max_years_for_timestep')
                end if
             end if
          else
@@ -1376,7 +1376,7 @@
          if (i /= (num_extra_history_columns + num_extra)) then
             write(*,2) 'i', i
             write(*,2) 'num_extra_history_columns', num_extra_history_columns
-            stop 'bad num_extra_history_columns'
+            call mesa_error(__FILE__,__LINE__,'bad num_extra_history_columns')
          end if
          
          i = num_extra+1

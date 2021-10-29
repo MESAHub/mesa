@@ -590,7 +590,7 @@
             do i=1,num_reactions
                if (g% reaction_id(i) <= 0) then
                   write(*,2) 'g% reaction_id(i)', i, g% reaction_id(i)
-                  stop 'get_rates_with_screening'
+                  call mesa_error(__FILE__,__LINE__,'get_rates_with_screening')
                end if
             end do
             
@@ -760,7 +760,7 @@
                write(*,*) 'i', i
                write(*,*) 'g% num_isos', g% num_isos
                write(*,*) 'g% chem_id(i)', g% chem_id(i)
-               stop 'set_molar_abundances' 
+               call mesa_error(__FILE__,__LINE__,'set_molar_abundances') 
             end if
             y(i) = min(1d0, max(x(i), 0d0)) / chem_isos% Z_plus_N(ci)
          enddo

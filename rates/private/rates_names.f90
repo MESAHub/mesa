@@ -24,6 +24,8 @@
 ! ***********************************************************************
 
       module rates_names
+
+      use utils_lib, only: mesa_error
       
       implicit none
       
@@ -361,7 +363,7 @@
             end if
          end do
 
-         if (cnt > 0) stop 'set_reaction_names'
+         if (cnt > 0) call mesa_error(__FILE__,__LINE__,'set_reaction_names')
 
       end subroutine set_reaction_names
 

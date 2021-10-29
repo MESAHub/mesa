@@ -30,6 +30,7 @@
       use chem_def, only: chem_isos, ih1, num_chem_isos
       use net_def, only: Net_General_Info, Net_Info
       use rates_def
+      use utils_lib, only: mesa_error
       
       implicit none
       
@@ -92,7 +93,7 @@
             ir = g% reaction_id(i)
             if (ir == 0) then
                write(*,*) 'g% reaction_id(i) == 0', i, num_reactions
-               stop 'screen_net'
+               call mesa_error(__FILE__,__LINE__,'screen_net')
             end if
             if (reaction_screening_info(3,ir) > 0) then
                call eval_screen_triple(  &
@@ -341,7 +342,7 @@
                   rateII  = rate_screened(rtab(irbe7ec_li7_aux))
                else
                   write(*,*) 'need either r_be7_wk_li7 or rbe7ec_li7_aux'
-                  stop 'set_combo_screen_rates'
+                  call mesa_error(__FILE__,__LINE__,'set_combo_screen_rates')
                end if
                if (rtab(ir_be7_pg_b8) /= 0) then
                   rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(ir_be7_pg_b8))
@@ -349,7 +350,7 @@
                   rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(irbe7pg_b8_aux))
                else
                   write(*,*) 'need either r_be7_pg_b8 or rbe7pg_b8_aux'
-                  stop 'set_combo_screen_rates'
+                  call mesa_error(__FILE__,__LINE__,'set_combo_screen_rates')
                end if
                rsum = rateII + rateIII
                if (rsum < 1d-50) then
@@ -506,21 +507,21 @@
                if (irpa /= 0) write(*,*) trim(reaction_Name(g% reaction_id(irpa))) // ' irpa'
                if (ir_with_pg /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pg))) // ' ir_with_pg'
                if (ir_with_pa /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pa))) // ' ir_with_pa'
-               stop 'rate_for_pg_pa_branches'
+               call mesa_error(__FILE__,__LINE__,'rate_for_pg_pa_branches')
             end if
          
             if (irpg == 0) then
                write(*,*) 'irpg', irpg
                if (ir_with_pg /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pg))) // ' ir_with_pg'
                if (ir_with_pa /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pa))) // ' ir_with_pa'
-               stop 'rate_for_pg_pa_branches'
+               call mesa_error(__FILE__,__LINE__,'rate_for_pg_pa_branches')
             end if
          
             if (irpa == 0) then
                write(*,*) 'irpg', irpg
                if (ir_with_pg /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pg))) // ' ir_with_pg'
                if (ir_with_pa /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pa))) // ' ir_with_pa'
-               stop 'rate_for_pg_pa_branches'
+               call mesa_error(__FILE__,__LINE__,'rate_for_pg_pa_branches')
             end if
          
             pg_raw_rate = rate_raw(irpg)

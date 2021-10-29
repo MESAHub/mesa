@@ -500,7 +500,7 @@
                   if (.false. .and. is_bad(f(j))) then
                      write(*,1) 'x', x
                      write(*,2) 'f(j)', j, f(j)
-                     stop 'jakob_or_derivs'
+                     call mesa_error(__FILE__,__LINE__,'jakob_or_derivs')
                   end if
                end do
             end if
@@ -512,7 +512,7 @@
                      if (.false. .and. is_bad(dfdy(i,j))) then
                         write(*,1) 'x', x
                         write(*,3) 'dfdy(i,j)', i, j, dfdy(i,j)
-                        stop 'jakob_or_derivs'
+                        call mesa_error(__FILE__,__LINE__,'jakob_or_derivs')
                      end if
                   end do
                end do

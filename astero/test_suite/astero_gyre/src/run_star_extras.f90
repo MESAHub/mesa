@@ -131,7 +131,7 @@
             if (astero_gyre_is_enabled) then
                call get_gyre_frequency_info(s, .true., okay, ierr)
          
-               if (ierr /= 0) stop 1
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
                if (okay) then
                   write(*,'(a,2f20.2)') 'got ok match for expected frequency', actual_freq, expected_freq
                else
@@ -214,7 +214,7 @@
             s% id, l_to_match, store_model, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in do_gyre_get_modes'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          write(*,*)

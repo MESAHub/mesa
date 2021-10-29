@@ -26,6 +26,7 @@
       module rates_lib
       
       use const_def, only: dp
+      use utils_lib, only: mesa_error
       
       implicit none
 
@@ -964,7 +965,7 @@
         case('PCR2009')
            get_mui_value = PCR2009
         case DEFAULT
-           stop 'Incorrect option for ion_coulomb_corrections'
+           call mesa_error(__FILE__,__LINE__,'Incorrect option for ion_coulomb_corrections')
         end select
 
         return
@@ -985,7 +986,7 @@
         case('Itoh2002')
            get_vs_value = Itoh2002
         case DEFAULT
-           stop 'Incorrect option for electron_coulomb_corrections'
+           call mesa_error(__FILE__,__LINE__,'Incorrect option for electron_coulomb_corrections')
         end select
 
         return

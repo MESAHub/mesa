@@ -562,14 +562,14 @@
                if (cnt <= b_regions) return
                if (i > 1 .and. cnt >= prev_cnt) then
                   write(*,*) 'bug in set_burn_types: cnt, prev_cnt', cnt, prev_cnt
-                  if (dbg) stop 'debug: set_burn_types'
+                  if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_burn_types')
                   return
                end if
                prev_cnt = cnt
                if (dbg) write(*,*) 'remove_region', min_ktop, min_kbot, cnt
                call remove_region(b_type, min_ktop, min_kbot)
             end do
-            if (dbg) stop 'debug: set_burn_types'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_burn_types')
          end subroutine set_burn_types
 
 
@@ -673,7 +673,7 @@
                if (cnt <= mx_regions) exit
                if (i > 1 .and. cnt >= prev_cnt) then
                   write(*,*) 'bug in set_mix_types: cnt, prev_cnt', cnt, prev_cnt
-                  if (dbg) stop 'set_mix_types'
+                  if (dbg) call mesa_error(__FILE__,__LINE__,'set_mix_types')
                   return
                end if
                prev_cnt = cnt
@@ -3075,7 +3075,7 @@
          write(*,2) 'k_inner', k_inner
          write(*,2) 'k_outer', k_outer
 
-         stop 'get_int_k_r_dr'
+         call mesa_error(__FILE__,__LINE__,'get_int_k_r_dr')
 
       end function get_int_k_r_dr
 

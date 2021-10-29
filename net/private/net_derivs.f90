@@ -195,7 +195,7 @@
                case (general_two_two_kind)
                   call get_general_2_to_2_derivs(i,ierr)
                case default
-                  stop 'confusion in net wrt reaction kind'
+                  call mesa_error(__FILE__,__LINE__,'confusion in net wrt reaction kind')
             end select
             i = i+2
             
@@ -252,7 +252,7 @@
                   d_ysf_dy1 = y(i1)*y(i1)/2d0
                case default
                   write(*,2) 'c1 bad for ' // trim(reaction_name(ir)), c1
-                  stop 'get_general_1_to_1_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_1_to_1_derivs')
             end select
             d_f = ys_f
             
@@ -268,7 +268,7 @@
                   d_ysr_dy2 = y(i2)*y(i2)/2d0
                case default
                   write(*,2) 'c2 bad for ' // trim(reaction_name(ir)), c2
-                  stop 'get_general_1_to_1_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_1_to_1_derivs')
             end select
             d_r = ys_r
 
@@ -384,7 +384,7 @@
                   d_ysf_dy1 = y1*y1/2d0
                case default
                   write(*,2) 'c1 too big for ' // trim(reaction_name(ir))
-                  stop 'get_general_2_to_1_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_2_to_1_derivs')
             end select
             ! at this point, ys_f and d_ysf_dy1 only have y1 terms
             ! now combine with y2 info
@@ -403,7 +403,7 @@
                   d_ysf_dy1 = d_ysf_dy1*(y2*y2*y2/6d0)
                case default
                   write(*,2) 'c1 too big for ' // trim(reaction_name(ir))
-                  stop 'get_general_2_to_1_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_2_to_1_derivs')
             end select
                         
             select case(c3)
@@ -418,7 +418,7 @@
                   d_ysr_dy3 = y3*y3/2d0
                case default
                   write(*,2) 'c3 too big for ' // trim(reaction_name(ir))
-                  stop 'get_general_2_to_1_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_2_to_1_derivs')
             end select
 
             d_f = ys_f
@@ -533,7 +533,7 @@
                write(*,1) 'd_dydt_dy(i3,i2)',  c3*d2
                write(*,1) 'd_dydt_dy(i3,i3)',  -c3*d3
                write(*,*)
-               stop 'get_general_2_to_1_derivs'
+               call mesa_error(__FILE__,__LINE__,'get_general_2_to_1_derivs')
             end if
                         
          end subroutine get_general_2_to_1_derivs
@@ -601,7 +601,7 @@
                   d_ysf_dy1 = y1*y1/2d0
                case default
                   write(*,2) 'c1 too big for ' // trim(reaction_name(ir)), c1
-                  stop 'get_general_2_to_2_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_2_to_2_derivs')
             end select
             ! at this point, ys_f and d_ysf_dy1 only have y1 terms
             ! now combine with y2 info
@@ -620,7 +620,7 @@
                   d_ysf_dy1 = d_ysf_dy1*(y2*y2*y2/6d0)
                case default
                   write(*,2) 'c2 too big for ' // trim(reaction_name(ir)), c2
-                  stop 'get_general_2_to_2_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_2_to_2_derivs')
             end select
                         
             select case(c3)
@@ -635,7 +635,7 @@
                   d_ysr_dy3 = y3*y3/2d0
                case default
                   write(*,2) 'c3 too big for ' // trim(reaction_name(ir)), c3
-                  stop 'get_general_2_to_2_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_2_to_2_derivs')
             end select
             ! at this point, ys_r and d_ysf_dy3 only have y3 terms
             ! now combine with y4 info
@@ -654,7 +654,7 @@
                   d_ysr_dy3 = d_ysr_dy3*(y4*y4*y4/6d0)
                case default
                   write(*,2) 'c4 too big for ' // trim(reaction_name(ir))
-                  stop 'get_general_2_to_2_derivs'
+                  call mesa_error(__FILE__,__LINE__,'get_general_2_to_2_derivs')
             end select
 
             d_f = ys_f
@@ -1124,7 +1124,7 @@
             o1 = itab(out1)
             if (o1 == 0) then
                write(*,*) trim(reaction_Name(ir))
-               stop 'get1_derivs: itab(out1) = 0'
+               call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(out1) = 0')
             end if
          end if
             
@@ -1134,7 +1134,7 @@
             o2 = itab(out2)
             if (o2 == 0) then
                write(*,*) trim(reaction_Name(ir))
-               stop 'get1_derivs: itab(out2) = 0'
+               call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(out2) = 0')
             end if
          end if
             
@@ -1144,13 +1144,13 @@
             o3 = itab(out3)
             if (o3 == 0) then
                write(*,*) trim(reaction_Name(ir))
-               stop 'get1_derivs: itab(out3) = 0'
+               call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(out3) = 0')
             end if
          end if
             
          if (num_reaction_outputs >= 4) then
             write(*,*) trim(reaction_Name(ir))
-            stop 'get1_derivs: num_reaction_outputs >= 4'
+            call mesa_error(__FILE__,__LINE__,'get1_derivs: num_reaction_outputs >= 4')
          end if
          
          if (num_reaction_inputs == 1) then            
@@ -1200,7 +1200,7 @@
             if (i1 == 0) then
                write(*,*) trim(reaction_Name(ir))
                write(*,2) 'num_reaction_inputs', num_reaction_inputs
-               stop 'get1_derivs: itab(in1) = 0'
+               call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(in1) = 0')
             end if
             
             if (cin1 == 1) then
@@ -1231,7 +1231,7 @@
                idr2 = i2
                dr2 = 0
                !write(*,*) 'get1_derivs rho=0: ' // trim(reaction_Name(ir))
-               !stop 'net_derivs'
+               !call mesa_error(__FILE__,__LINE__,'net_derivs')
             else if ((cin1 == 1 .and. cin2 == 1) .or. reaction_ye_rho_exponents(2,ir) == 1) then
                ! reaction_ye_rho_exponents(2,ir) == 1 for electron captures; treat as 2 body reaction
                r = y(i1)*y(i2)
@@ -1261,7 +1261,7 @@
                idr2 = i1
             else
                write(*,*) 'get1_derivs: ' // trim(reaction_Name(ir)) // ' invalid coefficient'
-               stop 'get1_derivs'
+               call mesa_error(__FILE__,__LINE__,'get1_derivs')
             end if            
             
             if (num_reaction_inputs == 3) then
@@ -1271,14 +1271,14 @@
                idr3 = i3
                if (i3 == 0) then
                   write(*,*) trim(reaction_Name(ir))
-                  stop 'get1_derivs: itab(in3) = 0'
+                  call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(in3) = 0')
                end if
             end if
 
          else
 
             write(*,*) 'get1_derivs: ' // trim(reaction_Name(ir)) // ' invalid specification'
-            stop 'get1_derivs'
+            call mesa_error(__FILE__,__LINE__,'get1_derivs')
 
          end if
 
@@ -1428,7 +1428,7 @@
                   write(*,2) 'weak_id', weak_id
                   write(*,2) 'g% num_wk_reactions', g% num_wk_reactions
                   write(*,*) trim(trim(reaction_Name(ir)))
-                  stop 'derivs'
+                  call mesa_error(__FILE__,__LINE__,'derivs')
                end if
                if (g% weaklib_ids(weak_id) > 0) then ! > 0 means included in weaklib
 
@@ -1456,7 +1456,7 @@
                        'do_one_one_neu ' // trim(reaction_Name(ir)) // ' ' // &
                        trim(chem_isos% name(g% chem_id(i1))) // ' => ' // &
                        trim(chem_isos% name(g% chem_id(o1)))
-                  stop 'weak reaction not in weaklib'
+                  call mesa_error(__FILE__,__LINE__,'weak reaction not in weaklib')
                end if
 
                call do_in_out( &
@@ -1588,7 +1588,7 @@
             return
             
             write(*,*) 'failed in eval_weak_reaction_info'
-            stop 'eval1_weak_rate'
+            call mesa_error(__FILE__,__LINE__,'eval1_weak_rate')
          end if
          
          rate_out = lambda(1)*weak_rate_factor

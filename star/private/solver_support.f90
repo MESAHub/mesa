@@ -80,7 +80,7 @@
                end do
                write(*,*)
             end do
-            stop 'set_xscale'
+            call mesa_error(__FILE__,__LINE__,'set_xscale')
          end subroutine dump_xscale
 
       end subroutine set_xscale_info
@@ -153,7 +153,7 @@
                      write(*,2) 'cell', i
                      write(*,2) 'nz', s% nz
                   end if
-                  if (s% stop_for_bad_nums) stop 'eval_equations'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'eval_equations')
                end if
             end do
          end do
@@ -176,7 +176,7 @@
                end do
                write(*,*)
             end do
-            stop 'dump_eval_equ'
+            call mesa_error(__FILE__,__LINE__,'dump_eval_equ')
          end subroutine dump_eval_equ
 
 
@@ -255,13 +255,13 @@
                   if (is_bad(sumequ)) then
                      if (dbg) then
                         write(*,3) trim(s% nameofequ(j)) // ' sumequ', j, k, sumequ
-                        stop 'sizeq 1'
+                        call mesa_error(__FILE__,__LINE__,'sizeq 1')
                      end if
                      ierr = -1
                      if (s% report_ierr) &
                         write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
                            j, k, s% equ(j,k)*s% residual_weight(j,k)
-                     if (s% stop_for_bad_nums) stop 'sizeq 2'
+                     if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'sizeq 2')
                      return
                   end if
                   if (absq > equ_max) then
@@ -301,7 +301,7 @@
          
          return
          call dump_equ
-         stop 'sizequ'
+         call mesa_error(__FILE__,__LINE__,'sizequ')
          
          contains
 
@@ -426,7 +426,7 @@
                         found_NaN = .true.
                         write(*,3) s% nameofvar(j) // ' B(j,k)*s% correction_weight(j,k)', &
                            j, k, B(j,k)*s% correction_weight(j,k)
-                        stop 'sizeB'
+                        call mesa_error(__FILE__,__LINE__,'sizeB')
                      end if
                      
                      max_zone = k
@@ -483,7 +483,7 @@
                            found_NaN = .true.
                            write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', &
                               j, k, B(j,k)*s% correction_weight(j,k)
-                           stop 'sizeB'
+                           call mesa_error(__FILE__,__LINE__,'sizeB')
                         max_zone = k
                         max_var = j
                         exit cell_loop
@@ -514,7 +514,7 @@
             ierr = -1
             if (found_NaN .and. s% stop_for_bad_nums) then
                write(*,*) 'found bad num'
-               stop 'sizeB'
+               call mesa_error(__FILE__,__LINE__,'sizeB')
             end if
             if (.not. dbg) return
          end if
@@ -523,11 +523,11 @@
             ierr = -1
             if (s% stop_for_bad_nums) then
                if (report) write(*,*) 'sum_corr', sum_corr
-               stop 'sizeB'
+               call mesa_error(__FILE__,__LINE__,'sizeB')
             end if
             if (.not. dbg) return
             write(*,*) 'sum_corr', sum_corr
-            stop 'sizeB'
+            call mesa_error(__FILE__,__LINE__,'sizeB')
          end if
 
          correction_norm = sum_corr/num_terms  !sqrt(sum_corr/num_terms)
@@ -536,7 +536,7 @@
                s% solver_iter, correction_norm, max_correction
             if (max_correction > 1d50 .or. is_bad_num(correction_norm)) then
                call show_stuff
-               stop 'sizeB'
+               call mesa_error(__FILE__,__LINE__,'sizeB')
             end if
          end if
 
@@ -548,17 +548,17 @@
          s% max_var2 = s% max_var1; s% max_var1 = max_var
          s% max_zone2 = s% max_zone1; s% max_zone1 = max_zone
 
-         if (ierr /= 0) stop 'ierr in sizeB'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'ierr in sizeB')
 
          if (is_bad_num(max_correction)) then
             ierr = -1
             if (s% stop_for_bad_nums) then
                if (report) write(*,*) 'max_correction', max_correction
-               stop 'sizeB'
+               call mesa_error(__FILE__,__LINE__,'sizeB')
             end if
             if (.not. dbg) return
             write(*,*) 'max_correction', max_correction
-            stop 'sizeB'
+            call mesa_error(__FILE__,__LINE__,'sizeB')
          end if
 
          if (s% solver_iter < 3) return
@@ -618,7 +618,7 @@
                end do
                write(*,*)
             end do
-            stop 'dump_equ'
+            call mesa_error(__FILE__,__LINE__,'dump_equ')
          end subroutine dump_B
 
 
@@ -771,7 +771,7 @@
          ierr = 0
          if (s% solver_iter == inspectB_iter_stop) then
             call dumpB
-            stop 'debug: inspectB'
+            call mesa_error(__FILE__,__LINE__,'debug: inspectB')
          end if
 
          contains
@@ -787,7 +787,7 @@
                end do
                write(*,*)
             end do
-            stop 'dumpB'
+            call mesa_error(__FILE__,__LINE__,'dumpB')
          end subroutine dumpB
 
       end subroutine inspectB
@@ -1072,7 +1072,7 @@
                   ierr = -1
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver L', k, s% L(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   return
                   stop
@@ -1211,7 +1211,7 @@
                   s% retry_message = 'bad num for T'
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver T', k, s% T(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num T', k, s% T(k)
                   ierr = -1
@@ -1226,7 +1226,7 @@
                   ierr = -1
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver L', k, s% L(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num L', k, s% L(k)
                end if
@@ -1244,7 +1244,7 @@
                   ierr = -1
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver w', k, s% w(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num w', k, s% w(k)
                end if
@@ -1254,7 +1254,7 @@
                   ierr = -1
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver Hp_face', k, s% Hp_face(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num Hp_face', k, s% Hp_face(k)
                end if
@@ -1267,7 +1267,7 @@
                   s% retry_message = 'bad num for v'
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver v', k, s% v(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num v', k, s% v(k)
                   ierr = -1
@@ -1281,7 +1281,7 @@
                   s% retry_message = 'bad num for u'
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver u', k, s% u(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num u', k, s% u(k)
                   ierr = -1
@@ -1295,7 +1295,7 @@
                   s% retry_message = 'bad num for alpha_RTI'
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver alpha_RTI', k, s% alpha_RTI(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
                   ierr = -1
@@ -1313,7 +1313,7 @@
                   s% retry_message = 'bad num for conv_vel'
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver conv_vel', k, s% conv_vel(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num conv_vel', k, s% conv_vel(k)
                   ierr = -1
@@ -1337,7 +1337,7 @@
                   s% retry_message = 'bad num for w_div_w_crit_roche'
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                   ierr = -1
@@ -1350,7 +1350,7 @@
                   s% retry_message = 'bad num for j_rot'
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver j_rot', k, s% j_rot(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num j_rot', k, s% j_rot(k)
                   ierr = -1
@@ -1366,7 +1366,7 @@
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver r lnR solver_dx', &
                         k, s% r(k), s% lnR(k), s% solver_dx(i_lnR,k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num r lnR solver_dx', &
                      k, s% r(k), s% lnR(k), s% solver_dx(i_lnR,k)
@@ -1416,7 +1416,7 @@
                   write(s% retry_message, *) 'bad num for rho', k
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver rho', k, s% rho(k)
-                     stop 'set_vars_for_solver'
+                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num rho', k, s% rho(k)
                   ierr = -1
@@ -1481,7 +1481,7 @@
             s% retry_message = 'bad num for mass fractions'
             if (s% stop_for_bad_nums) then
                write(*,2) 'set_vars_for_solver sum_xa', k, sum_xa
-               stop 'set_vars_for_solver'
+               call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
             end if
             if (report) then
                write(*,'(a60,i8,99f20.10)') 'bad num sum X', k, s% m(k)/Msun, sum_xa

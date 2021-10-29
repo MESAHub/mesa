@@ -98,7 +98,7 @@
          results(16)=get_bc_by_name('K',log_Teff,log_g, M_div_h, info)-get_bc_by_name('M',log_Teff,log_g, M_div_h, info)
          
          if (info /= 0) then
-            stop 'bad return from colors_get'
+            call mesa_error(__FILE__,__LINE__,'bad return from colors_get')
          end if
          
          write(*,*)
