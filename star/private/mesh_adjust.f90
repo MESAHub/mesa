@@ -62,6 +62,7 @@
          use interp_1d_def
          use interp_1d_lib
          use star_utils, only: set_m_grav_and_grav
+         use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          integer, dimension(:) :: cell_type, comes_from
@@ -70,7 +71,8 @@
             lnd_old, lnPgas_old, mlt_vc_old, lnT_old, w_old, Hp_face_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
-            j_rot_old, i_rot_old, omega_old, D_omega_old, D_mix_old
+            j_rot_old, omega_old, D_omega_old, D_mix_old
+         type(auto_diff_real_star_order1), dimension(:), pointer :: i_rot_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
          real(dp), dimension(:,:), pointer :: xh, xa
          integer, intent(out) :: ierr
@@ -574,13 +576,15 @@
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
             xh, xa, ierr)
+         use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          real(dp), dimension(:), pointer :: &
-            j_rot_old, i_rot_old, omega_old, &
+            j_rot_old, omega_old, &
             D_omega_old, am_nu_rot_old, mlt_vc_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old
+         type(auto_diff_real_star_order1), dimension(:), pointer :: i_rot_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
          real(dp), dimension(:,:), pointer :: xh, xa
          integer, intent(out) :: ierr
@@ -612,7 +616,7 @@
 
          if (s% rotation_flag) then
             call prune1(s% j_rot, j_rot_old, skip)
-            call prune1(s% i_rot, i_rot_old, skip)
+            call prune1_ad(s% i_rot, i_rot_old, skip)
             call prune1(s% omega, omega_old, skip)
             call prune1(s% nu_ST, nu_ST_old, skip)
             call prune1(s% D_ST, D_ST_old, skip)
@@ -641,6 +645,15 @@
                p(k) = p_old(k+skip)
             end do
          end subroutine prune1
+
+         subroutine prune1_ad(p,p_old,skip)
+            type(auto_diff_real_star_order1), dimension(:), pointer :: p, p_old
+            integer, intent(in) :: skip
+            integer :: k
+            do k=1,nz
+               p(k) = p_old(k+skip)
+            end do
+         end subroutine prune1_ad
 
       end subroutine do_prune_mesh_surface
 
@@ -2167,7 +2180,7 @@
             w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
             s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          call update1_i_rot_from_xh(s, k)
-         s% omega(k) = s% j_rot(k)/s% i_rot(k)
+         s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
 
          if (k_dbg == k) then
             write(*,2) 's% omega(k)', k, s% omega(k)

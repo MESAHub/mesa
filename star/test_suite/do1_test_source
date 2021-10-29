@@ -90,11 +90,11 @@ do_one wd_diffusion "passed test for electric field in the core" "final.mod" aut
 do_one wd_he_shell_ignition "stop because power_he_burn >= power_he_burn_upper_limit" "final.mod" auto
 do_one wd_nova_burst "have finished burst" "final.mod" auto
 do_one wd_stable_h_burn "stop because star_mass >= star_mass_max_limit" "final.mod" auto
+do_one high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 
 return
 
 
-#   Pablo needs to fix   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
 #    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
 

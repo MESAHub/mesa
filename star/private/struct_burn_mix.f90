@@ -161,7 +161,9 @@
          if (s% j_rot_flag) then
             s% xh(s% i_j_rot,:s% nz) = s% j_rot(:s% nz)
             s% j_rot_start(:s% nz) = s% j_rot(:s% nz)
-            s% i_rot_start(:s% nz) = s% i_rot(:s% nz)
+            do k=1, s% nz
+               s% i_rot_start(k) = s% i_rot(k)% val
+            end do
             s% total_abs_angular_momentum = dot_product(abs(s% j_rot(:s% nz)),s% dm_bar(:s% nz))
          end if
 

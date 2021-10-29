@@ -631,39 +631,123 @@
 
       subroutine do1_w_div_wc_eqn(s, k, nvar, ierr)
          use hydro_rotation
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_equ_w_div_wc, i_w_div_wc
-         real(dp) :: scale, wwc, dimless_rphi, dimless_rphi_given_wwc, w1, w2
-         real(dp) :: jrot_ratio, sigmoid_jrot_ratio, d_sigmoid_jrot_ratio_dx, &
-            jr_lim1, jr_lim2, A, C, dA_dw, dC_dw
+         real(dp) :: wwc, dimless_rphi, dimless_rphi_given_wwc, w1, w2
+         real(dp) :: jr_lim1, jr_lim2, A, C
+         type(auto_diff_real_star_order1) :: &
+            w_d_wc00, r00, jrot00, resid_ad, A_ad, C_ad, &
+            jrot_ratio, sigmoid_jrot_ratio
          logical :: test_partials
          include 'formats'
          
          ierr = 0
-
          
-         stop 'PABLO needs to rewrite using auto_diff'
+         !test_partials = (k == s% solver_test_partials_k-1)
+         test_partials = .false.
+
+         i_equ_w_div_wc = s% i_equ_w_div_wc
+         i_w_div_wc = s% i_w_div_wc
+
+         wwc = s% w_div_wcrit_max
+         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
+         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
+         jr_lim1 = two_thirds*wwc*C/A
+
+         wwc = s% w_div_wcrit_max2
+         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
+         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
+         jr_lim2 = two_thirds*wwc*C/A
+
+         w_d_wc00 = wrap_w_div_wc_00(s, k)
+         A_ad = 1d0-0.1076d0*pow4(w_d_wc00)-0.2336d0*pow6(w_d_wc00)-0.5583d0*log(1d0-pow4(w_d_wc00))
+         C_ad = 1d0+17d0/60d0*pow2(w_d_wc00)-0.3436d0*pow4(w_d_wc00)-0.4055d0*pow6(w_d_wc00)-0.9277d0*log(1d0-pow4(w_d_wc00))
+
+         r00 = wrap_r_00(s, k)
+         if (s% j_rot_flag) then
+            jrot00 = wrap_jrot_00(s, k)
+            jrot_ratio = jrot00/sqrt(s% cgrav(k)*s% m(k)*r00)
+         else
+            jrot_ratio = s% j_rot(k)/sqrt(s% cgrav(k)*s% m(k)*r00)
+         end if
+         if (abs(jrot_ratio% val) > jr_lim1) then
+            sigmoid_jrot_ratio = 2*(jr_lim2-jr_lim1)/(1+exp(-2*(abs(jrot_ratio)-jr_lim1)/(jr_lim2-jr_lim1)))-jr_lim2+2*jr_lim1
+            if (jrot_ratio% val < 0d0) then
+               sigmoid_jrot_ratio = -sigmoid_jrot_ratio
+            end if
+            resid_ad = (sigmoid_jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
+         else
+            resid_ad = (jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
+         end if
+
+         s% equ(i_equ_w_div_wc, k) = resid_ad% val
+
+         call save_eqn_residual_info( &
+            s, k, nvar, i_equ_w_div_wc, resid_ad, 'do1_w_div_wc_eqn', ierr)           
+
+         if (test_partials) then
+            s% solver_test_partials_var = s% i_w_div_wc
+            s% solver_test_partials_dval_dx = 1d0
+            write(*,*) 'do1_w_div_wc_eqn', s% solver_test_partials_var
+         end if
          
       end subroutine do1_w_div_wc_eqn
       
       
       subroutine do1_dj_rot_dt_eqn(s, k, nvar, ierr)
          use hydro_rotation
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_dj_rot_dt, i_j_rot
          real(dp) :: scale
-         real(dp) :: F00, dF00_dw00, dF00_dwp1, dF00_dj00, dF00_djp1, dF00_dlnr00, dF00_dlnrp1, dF00_dlnd00
-         real(dp) :: Fm1, dFm1_dwm1, dFm1_dw00, dFm1_djm1, dFm1_dj00, dFm1_dlnrm1, dFm1_dlnr00, dFm1_dlndm1
+         type(auto_diff_real_star_order1) :: resid_ad, jrot00, djrot_dt, F00, Fm1, flux_diff
          logical :: test_partials
          include 'formats'
          
          ierr = 0
-         
-         stop 'PABLO needs to rewrite using auto_diff'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ! Need to find a good way to scale the equation
+         scale = 1d6*max(1d2*sqrt(s% cgrav(k)*s% m(k)*s%r_start(k))/s%dt,&
+            s% total_abs_angular_momentum/(s% dm(k)*s% dt*s% nz))
+
+         i_dj_rot_dt = s% i_dj_rot_dt
+         i_j_rot = s% i_j_rot
+
+         jrot00 = wrap_jrot_00(s, k)
+         F00 = s% j_flux(k)
+         if (k > 1) then
+            Fm1 = shift_m1(s% j_flux(k-1))
+         else
+            Fm1 = 0d0
+         end if
+
+         djrot_dt = (jrot00-s% j_rot_start(k))/s% dt
+         flux_diff = (Fm1-F00)/s% dm_bar(k)
+
+         resid_ad = (djrot_dt+flux_diff-s% extra_jdot(k))/scale
+
+         s% equ(i_dj_rot_dt, k) = resid_ad% val
+
+         call save_eqn_residual_info( &
+            s, k, nvar, i_dj_rot_dt, resid_ad, 'do1_dj_rot_dt_eqn', ierr)           
+
+         !if (test_partials) then
+         !   s% solver_test_partials_val = s% i_rot(k)
+         !end if
+
+         !if (test_partials) then
+         !   s% solver_test_partials_var = s% i_lnR
+         !   s% solver_test_partials_dval_dx = s% di_rot_dlnR(k)
+         !   write(*,*) 'do1_w_div_wc_eqn', s% solver_test_partials_var
+         !end if
          
       end subroutine do1_dj_rot_dt_eqn
 
@@ -882,6 +966,8 @@
                0d0, P_bc*dlnP_bc_dL, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
             dlnR00 = dlnP_bc_dlnR
             dlnT00 = dlnP_bc_dlnT
@@ -893,6 +979,8 @@
                0d0, dlnR00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnP_bc_dL, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
@@ -916,6 +1004,8 @@
                0d0, T_bc*dlnT_bc_dL, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
             dlnR00 = dlnT_bc_dlnR
             dlnT00 = dlnT_bc_dlnT
@@ -927,6 +1017,8 @@
                0d0, dlnR00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnT_bc_dL, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)

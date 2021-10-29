@@ -1190,7 +1190,7 @@
                do k=1,k_below_just_added-2 ! remaining 2 done below
                   s% j_rot(k) = s% accreted_material_j
                   call set1_irot(s, k, k_below_just_added, .true.)
-                  s% omega(k) = s% j_rot(k)/s% i_rot(k)
+                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                   actual_total_added = actual_total_added + s% j_rot(k)*new_dmbar(k)
                end do
                k = k_below_just_added
@@ -1207,13 +1207,13 @@
                do k=k_below_just_added-1,k_below_just_added
                   s% j_rot(k) = bdy_j
                   call set1_irot(s, k, k_below_just_added, .true.)
-                  s% omega(k) = s% j_rot(k)/s% i_rot(k)
+                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                end do
             else ! use old surface omega in all the new material
                do k=1,k_below_just_added-1
                   s% omega(k) = s% omega(k_below_just_added)
                   call set1_irot(s, k, k_below_just_added, .false.)
-                  s% j_rot(k) = s% omega(k)*s% i_rot(k)
+                  s% j_rot(k) = s% omega(k)*s% i_rot(k)% val
                end do
             end if
          end if
@@ -1265,8 +1265,7 @@
                s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          end if
 
-         call eval_i_rot(s, k, r00, r00, r00, w_div_wcrit_roche,&
-            s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
+         call eval_i_rot(s, k, r00, w_div_wcrit_roche, s% i_rot(k))
 
       end subroutine set1_irot
 
@@ -1473,12 +1472,12 @@
 
          s% j_rot(k) = j_tot/new_point_dmbar
          call set1_irot(s, k, k_below_just_added, .true.)
-         s% omega(k) = s% j_rot(k)/s% i_rot(k)
+         s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
 
          if (k_dbg == k) then
             write(*,2) 's% omega(k)', k, s% omega(k)
             write(*,2) 's% j_rot(k)', k, s% j_rot(k)
-            write(*,2) 's% i_rot(k)', k, s% i_rot(k)
+            write(*,2) 's% i_rot(k)% val', k, s% i_rot(k)% val
             stop 'debugging: set1_omega'
          end if
 
@@ -1574,7 +1573,7 @@
             J_removed = J_removed + dm*(s% j_rot(k) - jnew)
             s% j_rot(k) = jnew
             call set1_irot(s, k, k_below_just_added, .true.)
-            s% omega(k) = s% j_rot(k)/s% i_rot(k)
+            s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
          end do
 
          s% angular_momentum_removed = actual_J_lost

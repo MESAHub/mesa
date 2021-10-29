@@ -356,10 +356,11 @@
          call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          if (ierr /= 0) return
 
-         grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
-         
-         if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
-            grav = grav*s% fp_rot(k) 
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2*s% fp_rot(k)
+         else
+            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
+         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.

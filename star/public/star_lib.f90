@@ -61,6 +61,8 @@
             wrap_lnR_m1, wrap_lnR_00, wrap_lnR_p1, & ! values from s% lnr
             wrap_v_m1, wrap_v_00, wrap_v_p1, & ! Riemann or non-Riemann velocity at face, s% v or s% u_face
             wrap_u_m1, wrap_u_00, wrap_u_p1, & ! Riemann cell velocity s% u
+            wrap_w_div_wc_m1, wrap_w_div_wc_00, wrap_w_div_wc_p1, & ! Riemann cell velocity s% u
+            wrap_jrot_m1, wrap_jrot_00, wrap_jrot_p1, & ! Riemann cell velocity s% u
             ! the following check the flag using_velocity_time_centering
             wrap_opt_time_center_r_m1, wrap_opt_time_center_r_00, wrap_opt_time_center_r_p1, &
             wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1
