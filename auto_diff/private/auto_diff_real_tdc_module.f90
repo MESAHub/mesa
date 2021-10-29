@@ -67,8 +67,8 @@ module auto_diff_real_tdc_module
    type :: auto_diff_real_tdc
       real(dp) :: val
       real(dp) :: d1val1
-      real(dp) :: d1Array(27)
-      real(dp) :: d1val1_d1Array(27)
+      real(dp) :: d1Array(33)
+      real(dp) :: d1val1_d1Array(33)
    end type auto_diff_real_tdc
    
    interface assignment(=)
@@ -608,8 +608,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = z_val
       unary%d1val1 = x%d1val1*z_d1x
-      unary%d1Array(1:27) = x%d1Array(1:27)*z_d1x
-      unary%d1val1_d1Array(1:27) = x%d1Array(1:27)*x%d1val1*z_d2x + x%d1val1_d1Array(1:27)*z_d1x
+      unary%d1Array(1:33) = x%d1Array(1:33)*z_d1x
+      unary%d1val1_d1Array(1:33) = x%d1Array(1:33)*x%d1val1*z_d2x + x%d1val1_d1Array(1:33)*z_d1x
    end function make_unary_operator
    
    function make_binary_operator(x, y, z_val, z_d1x, z_d1y, z_d2x, z_d1x_d1y, z_d2y) result(binary)
@@ -624,8 +624,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: binary
       binary%val = z_val
       binary%d1val1 = x%d1val1*z_d1x + y%d1val1*z_d1y
-      binary%d1Array(1:27) = x%d1Array(1:27)*z_d1x + y%d1Array(1:27)*z_d1y
-      binary%d1val1_d1Array(1:27) = x%d1Array(1:27)*x%d1val1*z_d2x + x%d1Array(1:27)*y%d1val1*z_d1x_d1y + x%d1val1*y%d1Array(1:27)*z_d1x_d1y + x%d1val1_d1Array(1:27)*z_d1x + y%d1Array(1:27)*y%d1val1*z_d2y + y%d1val1_d1Array(1:27)*z_d1y
+      binary%d1Array(1:33) = x%d1Array(1:33)*z_d1x + y%d1Array(1:33)*z_d1y
+      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*x%d1val1*z_d2x + x%d1Array(1:33)*y%d1val1*z_d1x_d1y + x%d1val1*y%d1Array(1:33)*z_d1x_d1y + x%d1val1_d1Array(1:33)*z_d1x + y%d1Array(1:33)*y%d1val1*z_d2y + y%d1val1_d1Array(1:33)*z_d1y
    end function make_binary_operator
    
    function sign_self(x) result(unary)
@@ -633,8 +633,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = sgn(x%val)
       unary%d1val1 = 0.0_dp
-      unary%d1Array(1:27) = 0.0_dp
-      unary%d1val1_d1Array(1:27) = 0.0_dp
+      unary%d1Array(1:33) = 0.0_dp
+      unary%d1val1_d1Array(1:33) = 0.0_dp
    end function sign_self
    
    function safe_sqrt_self(x) result(unary)
@@ -646,8 +646,8 @@ module auto_diff_real_tdc_module
       q1 = 0.5_dp*q0*powm1(x%val)
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 0.25_dp*q0*(2.0_dp*x%d1val1_d1Array(1:27)*x%val - x%d1Array(1:27)*x%d1val1)*powm1(pow2(x%val))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 0.25_dp*q0*(2.0_dp*x%d1val1_d1Array(1:33)*x%val - x%d1Array(1:33)*x%d1val1)*powm1(pow2(x%val))
    end function safe_sqrt_self
    
    function unary_minus_self(x) result(unary)
@@ -655,8 +655,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = -x%val
       unary%d1val1 = -x%d1val1
-      unary%d1Array(1:27) = -x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = -x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -x%d1val1_d1Array(1:33)
    end function unary_minus_self
    
    function exp_self(x) result(unary)
@@ -666,8 +666,8 @@ module auto_diff_real_tdc_module
       q0 = exp(x%val)
       unary%val = q0
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*(x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27))
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*(x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33))
    end function exp_self
    
    function expm1_self(x) result(unary)
@@ -677,8 +677,8 @@ module auto_diff_real_tdc_module
       q0 = exp(x%val)
       unary%val = expm1(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*(x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27))
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*(x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33))
    end function expm1_self
    
    function exp10_self(x) result(unary)
@@ -692,8 +692,8 @@ module auto_diff_real_tdc_module
       q2 = q0*q1
       unary%val = q0
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q2*(q1*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27))
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q2*(q1*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33))
    end function exp10_self
    
    function powm1_self(x) result(unary)
@@ -703,8 +703,8 @@ module auto_diff_real_tdc_module
       q0 = powm1(pow2(x%val))
       unary%val = powm1(x%val)
       unary%d1val1 = -q0*x%d1val1
-      unary%d1Array(1:27) = -q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (2.0_dp*x%d1Array(1:27)*x%d1val1 - x%d1val1_d1Array(1:27)*x%val)*powm1(pow3(x%val))
+      unary%d1Array(1:33) = -q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (2.0_dp*x%d1Array(1:33)*x%d1val1 - x%d1val1_d1Array(1:33)*x%val)*powm1(pow3(x%val))
    end function powm1_self
    
    function log_self(x) result(unary)
@@ -714,8 +714,8 @@ module auto_diff_real_tdc_module
       q0 = powm1(x%val)
       unary%val = log(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (-x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*powm1(pow2(x%val))
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*powm1(pow2(x%val))
    end function log_self
    
    function log1p_self(x) result(unary)
@@ -727,8 +727,8 @@ module auto_diff_real_tdc_module
       q1 = powm1(q0)
       unary%val = log1p(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (q0*x%d1val1_d1Array(1:27) - x%d1Array(1:27)*x%d1val1)*powm1(pow2(q0))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (q0*x%d1val1_d1Array(1:33) - x%d1Array(1:33)*x%d1val1)*powm1(pow2(q0))
    end function log1p_self
    
    function safe_log_self(x) result(unary)
@@ -738,8 +738,8 @@ module auto_diff_real_tdc_module
       q0 = powm1(x%val)
       unary%val = safe_log(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (-x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*powm1(pow2(x%val))
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*powm1(pow2(x%val))
    end function safe_log_self
    
    function log10_self(x) result(unary)
@@ -751,8 +751,8 @@ module auto_diff_real_tdc_module
       q1 = q0*powm1(x%val)
       unary%val = q0*log(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*(-x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*powm1(pow2(x%val))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*(-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*powm1(pow2(x%val))
    end function log10_self
    
    function safe_log10_self(x) result(unary)
@@ -764,8 +764,8 @@ module auto_diff_real_tdc_module
       q1 = q0*powm1(x%val)
       unary%val = q0*safe_log(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*(-x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*powm1(pow2(x%val))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*(-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*powm1(pow2(x%val))
    end function safe_log10_self
    
    function log2_self(x) result(unary)
@@ -777,8 +777,8 @@ module auto_diff_real_tdc_module
       q1 = q0*powm1(x%val)
       unary%val = q0*log(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*(-x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*powm1(pow2(x%val))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*(-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*powm1(pow2(x%val))
    end function log2_self
    
    function sin_self(x) result(unary)
@@ -790,8 +790,8 @@ module auto_diff_real_tdc_module
       q1 = cos(x%val)
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -q0*x%d1Array(1:27)*x%d1val1 + q1*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -q0*x%d1Array(1:33)*x%d1val1 + q1*x%d1val1_d1Array(1:33)
    end function sin_self
    
    function cos_self(x) result(unary)
@@ -803,8 +803,8 @@ module auto_diff_real_tdc_module
       q1 = sin(x%val)
       unary%val = q0
       unary%d1val1 = -q1*x%d1val1
-      unary%d1Array(1:27) = -q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -q0*x%d1Array(1:27)*x%d1val1 - q1*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = -q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -q0*x%d1Array(1:33)*x%d1val1 - q1*x%d1val1_d1Array(1:33)
    end function cos_self
    
    function tan_self(x) result(unary)
@@ -816,8 +816,8 @@ module auto_diff_real_tdc_module
       q1 = pow2(q0) + 1
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (2.0_dp*q0*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27))*powm1(pow2(cos(x%val)))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (2.0_dp*q0*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33))*powm1(pow2(cos(x%val)))
    end function tan_self
    
    function sinpi_self(x) result(unary)
@@ -833,8 +833,8 @@ module auto_diff_real_tdc_module
       q3 = pi*q2
       unary%val = q1
       unary%d1val1 = q3*x%d1val1
-      unary%d1Array(1:27) = q3*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = pi*(-pi*q1*x%d1Array(1:27)*x%d1val1 + q2*x%d1val1_d1Array(1:27))
+      unary%d1Array(1:33) = q3*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = pi*(-pi*q1*x%d1Array(1:33)*x%d1val1 + q2*x%d1val1_d1Array(1:33))
    end function sinpi_self
    
    function cospi_self(x) result(unary)
@@ -850,8 +850,8 @@ module auto_diff_real_tdc_module
       q3 = pi*q2
       unary%val = q1
       unary%d1val1 = -q3*x%d1val1
-      unary%d1Array(1:27) = -q3*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -pi*(pi*q1*x%d1Array(1:27)*x%d1val1 + q2*x%d1val1_d1Array(1:27))
+      unary%d1Array(1:33) = -q3*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -pi*(pi*q1*x%d1Array(1:33)*x%d1val1 + q2*x%d1val1_d1Array(1:33))
    end function cospi_self
    
    function tanpi_self(x) result(unary)
@@ -865,8 +865,8 @@ module auto_diff_real_tdc_module
       q2 = pi*(pow2(q1) + 1)
       unary%val = q1
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = pi*(2.0_dp*pi*q1*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27))*powm1(pow2(cos(q0)))
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = pi*(2.0_dp*pi*q1*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33))*powm1(pow2(cos(q0)))
    end function tanpi_self
    
    function sinh_self(x) result(unary)
@@ -878,8 +878,8 @@ module auto_diff_real_tdc_module
       q1 = cosh(x%val)
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1Array(1:27)*x%d1val1 + q1*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1Array(1:33)*x%d1val1 + q1*x%d1val1_d1Array(1:33)
    end function sinh_self
    
    function cosh_self(x) result(unary)
@@ -891,8 +891,8 @@ module auto_diff_real_tdc_module
       q1 = sinh(x%val)
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1Array(1:27)*x%d1val1 + q1*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1Array(1:33)*x%d1val1 + q1*x%d1val1_d1Array(1:33)
    end function cosh_self
    
    function tanh_self(x) result(unary)
@@ -904,8 +904,8 @@ module auto_diff_real_tdc_module
       q1 = pow2(q0) - 1
       unary%val = q0
       unary%d1val1 = -q1*x%d1val1
-      unary%d1Array(1:27) = -q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -(2.0_dp*q0*x%d1Array(1:27)*x%d1val1 - x%d1val1_d1Array(1:27))*powm1(pow2(cosh(x%val)))
+      unary%d1Array(1:33) = -q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -(2.0_dp*q0*x%d1Array(1:33)*x%d1val1 - x%d1val1_d1Array(1:33))*powm1(pow2(cosh(x%val)))
    end function tanh_self
    
    function asin_self(x) result(unary)
@@ -917,8 +917,8 @@ module auto_diff_real_tdc_module
       q1 = powm1(sqrt(q0))
       unary%val = asin(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (q0*x%d1val1_d1Array(1:27) + x%d1Array(1:27)*x%d1val1*x%val)*powm1(pow3(sqrt(q0)))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (q0*x%d1val1_d1Array(1:33) + x%d1Array(1:33)*x%d1val1*x%val)*powm1(pow3(sqrt(q0)))
    end function asin_self
    
    function acos_self(x) result(unary)
@@ -932,8 +932,8 @@ module auto_diff_real_tdc_module
       q2 = powm1(sqrt(q1))
       unary%val = acos(x%val)
       unary%d1val1 = -q2*x%d1val1
-      unary%d1Array(1:27) = -q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -(x%d1Array(1:27)*x%d1val1*x%val - x%d1val1_d1Array(1:27)*(q0 - 1))*powm1(pow3(sqrt(q1)))
+      unary%d1Array(1:33) = -q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -(x%d1Array(1:33)*x%d1val1*x%val - x%d1val1_d1Array(1:33)*(q0 - 1))*powm1(pow3(sqrt(q1)))
    end function acos_self
    
    function atan_self(x) result(unary)
@@ -945,8 +945,8 @@ module auto_diff_real_tdc_module
       q1 = powm1(q0)
       unary%val = atan(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (-2.0_dp*x%d1Array(1:27)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:27))*powm1(pow2(q0))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (-2.0_dp*x%d1Array(1:33)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:33))*powm1(pow2(q0))
    end function atan_self
    
    function asinpi_self(x) result(unary)
@@ -960,8 +960,8 @@ module auto_diff_real_tdc_module
       q2 = q0*powm1(sqrt(q1))
       unary%val = q0*asin(x%val)
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*(q1*x%d1val1_d1Array(1:27) + x%d1Array(1:27)*x%d1val1*x%val)*powm1(pow3(sqrt(q1)))
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*(q1*x%d1val1_d1Array(1:33) + x%d1Array(1:33)*x%d1val1*x%val)*powm1(pow3(sqrt(q1)))
    end function asinpi_self
    
    function acospi_self(x) result(unary)
@@ -977,8 +977,8 @@ module auto_diff_real_tdc_module
       q3 = q0*powm1(sqrt(q2))
       unary%val = q0*acos(x%val)
       unary%d1val1 = -q3*x%d1val1
-      unary%d1Array(1:27) = -q3*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -q0*(x%d1Array(1:27)*x%d1val1*x%val - x%d1val1_d1Array(1:27)*(q1 - 1))*powm1(pow3(sqrt(q2)))
+      unary%d1Array(1:33) = -q3*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -q0*(x%d1Array(1:33)*x%d1val1*x%val - x%d1val1_d1Array(1:33)*(q1 - 1))*powm1(pow3(sqrt(q2)))
    end function acospi_self
    
    function atanpi_self(x) result(unary)
@@ -992,8 +992,8 @@ module auto_diff_real_tdc_module
       q2 = powm1(pi + q1)
       unary%val = powm1(pi)*atan(x%val)
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (-2.0_dp*x%d1Array(1:27)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:27) + x%d1val1_d1Array(1:27))*powm1(2.0_dp*q1 + pi*pow4(x%val) + pi)
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (-2.0_dp*x%d1Array(1:33)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:33) + x%d1val1_d1Array(1:33))*powm1(2.0_dp*q1 + pi*pow4(x%val) + pi)
    end function atanpi_self
    
    function asinh_self(x) result(unary)
@@ -1005,8 +1005,8 @@ module auto_diff_real_tdc_module
       q1 = powm1(sqrt(q0))
       unary%val = asinh(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (q0*x%d1val1_d1Array(1:27) - x%d1Array(1:27)*x%d1val1*x%val)*powm1(pow3(sqrt(q0)))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (q0*x%d1val1_d1Array(1:33) - x%d1Array(1:33)*x%d1val1*x%val)*powm1(pow3(sqrt(q0)))
    end function asinh_self
    
    function acosh_self(x) result(unary)
@@ -1018,8 +1018,8 @@ module auto_diff_real_tdc_module
       q1 = powm1(sqrt(q0))
       unary%val = acosh(x%val)
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (q0*x%d1val1_d1Array(1:27) - x%d1Array(1:27)*x%d1val1*x%val)*powm1(pow3(sqrt(q0)))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (q0*x%d1val1_d1Array(1:33) - x%d1Array(1:33)*x%d1val1*x%val)*powm1(pow3(sqrt(q0)))
    end function acosh_self
    
    function atanh_self(x) result(unary)
@@ -1031,8 +1031,8 @@ module auto_diff_real_tdc_module
       q1 = powm1(q0)
       unary%val = atanh(x%val)
       unary%d1val1 = -q1*x%d1val1
-      unary%d1Array(1:27) = -q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = (2.0_dp*x%d1Array(1:27)*x%d1val1*x%val - q0*x%d1val1_d1Array(1:27))*powm1(pow2(q0))
+      unary%d1Array(1:33) = -q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = (2.0_dp*x%d1Array(1:33)*x%d1val1*x%val - q0*x%d1val1_d1Array(1:33))*powm1(pow2(q0))
    end function atanh_self
    
    function sqrt_self(x) result(unary)
@@ -1044,8 +1044,8 @@ module auto_diff_real_tdc_module
       q1 = 0.5_dp*powm1(q0)
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
-      unary%d1Array(1:27) = q1*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 0.25_dp*(2.0_dp*x%d1val1_d1Array(1:27)*x%val - x%d1Array(1:27)*x%d1val1)*powm1(pow3(sqrt(x%val)))
+      unary%d1Array(1:33) = q1*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 0.25_dp*(2.0_dp*x%d1val1_d1Array(1:33)*x%val - x%d1Array(1:33)*x%d1val1)*powm1(pow3(sqrt(x%val)))
    end function sqrt_self
    
    function pow2_self(x) result(unary)
@@ -1055,8 +1055,8 @@ module auto_diff_real_tdc_module
       q0 = 2.0_dp*x%val
       unary%val = pow2(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 2.0_dp*x%d1Array(1:27)*x%d1val1 + q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 2.0_dp*x%d1Array(1:33)*x%d1val1 + q0*x%d1val1_d1Array(1:33)
    end function pow2_self
    
    function pow3_self(x) result(unary)
@@ -1066,8 +1066,8 @@ module auto_diff_real_tdc_module
       q0 = 3.0_dp*pow2(x%val)
       unary%val = pow3(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 3.0_dp*x%val*(2.0_dp*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 3.0_dp*x%val*(2.0_dp*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)
    end function pow3_self
    
    function pow4_self(x) result(unary)
@@ -1077,8 +1077,8 @@ module auto_diff_real_tdc_module
       q0 = 4.0_dp*pow3(x%val)
       unary%val = pow4(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 4.0_dp*(3.0_dp*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*pow2(x%val)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 4.0_dp*(3.0_dp*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*pow2(x%val)
    end function pow4_self
    
    function pow5_self(x) result(unary)
@@ -1088,8 +1088,8 @@ module auto_diff_real_tdc_module
       q0 = 5.0_dp*pow4(x%val)
       unary%val = pow5(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 5.0_dp*(4.0_dp*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*pow3(x%val)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 5.0_dp*(4.0_dp*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*pow3(x%val)
    end function pow5_self
    
    function pow6_self(x) result(unary)
@@ -1099,8 +1099,8 @@ module auto_diff_real_tdc_module
       q0 = 6.0_dp*pow5(x%val)
       unary%val = pow6(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 6.0_dp*(5.0_dp*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*pow4(x%val)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 6.0_dp*(5.0_dp*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*pow4(x%val)
    end function pow6_self
    
    function pow7_self(x) result(unary)
@@ -1110,8 +1110,8 @@ module auto_diff_real_tdc_module
       q0 = 7.0_dp*pow6(x%val)
       unary%val = pow7(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 7.0_dp*(6.0_dp*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*pow5(x%val)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 7.0_dp*(6.0_dp*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*pow5(x%val)
    end function pow7_self
    
    function pow8_self(x) result(unary)
@@ -1121,8 +1121,8 @@ module auto_diff_real_tdc_module
       q0 = 8.0_dp*pow7(x%val)
       unary%val = pow8(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = 8.0_dp*(7.0_dp*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27)*x%val)*pow6(x%val)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = 8.0_dp*(7.0_dp*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*pow6(x%val)
    end function pow8_self
    
    function abs_self(x) result(unary)
@@ -1132,8 +1132,8 @@ module auto_diff_real_tdc_module
       q0 = sgn(x%val)
       unary%val = Abs(x%val)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function abs_self
    
    function add_self(x, y) result(binary)
@@ -1142,8 +1142,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: binary
       binary%val = x%val + y%val
       binary%d1val1 = x%d1val1 + y%d1val1
-      binary%d1Array(1:27) = x%d1Array(1:27) + y%d1Array(1:27)
-      binary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27) + y%d1val1_d1Array(1:27)
+      binary%d1Array(1:33) = x%d1Array(1:33) + y%d1Array(1:33)
+      binary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33) + y%d1val1_d1Array(1:33)
    end function add_self
    
    function add_self_real(x, y) result(unary)
@@ -1152,8 +1152,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = x%val + y
       unary%d1val1 = x%d1val1
-      unary%d1Array(1:27) = x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)
    end function add_self_real
    
    function add_real_self(z, x) result(unary)
@@ -1162,8 +1162,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = x%val + z
       unary%d1val1 = x%d1val1
-      unary%d1Array(1:27) = x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)
    end function add_real_self
    
    function add_self_int(x, y) result(unary)
@@ -1174,8 +1174,8 @@ module auto_diff_real_tdc_module
       y_dp = y
       unary%val = x%val + y_dp
       unary%d1val1 = x%d1val1
-      unary%d1Array(1:27) = x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)
    end function add_self_int
    
    function add_int_self(z, x) result(unary)
@@ -1186,8 +1186,8 @@ module auto_diff_real_tdc_module
       y_dp = z
       unary%val = x%val + y_dp
       unary%d1val1 = x%d1val1
-      unary%d1Array(1:27) = x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)
    end function add_int_self
    
    function sub_self(x, y) result(binary)
@@ -1196,8 +1196,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: binary
       binary%val = x%val - y%val
       binary%d1val1 = x%d1val1 - y%d1val1
-      binary%d1Array(1:27) = x%d1Array(1:27) - y%d1Array(1:27)
-      binary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27) - y%d1val1_d1Array(1:27)
+      binary%d1Array(1:33) = x%d1Array(1:33) - y%d1Array(1:33)
+      binary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33) - y%d1val1_d1Array(1:33)
    end function sub_self
    
    function sub_self_real(x, y) result(unary)
@@ -1206,8 +1206,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = x%val - y
       unary%d1val1 = x%d1val1
-      unary%d1Array(1:27) = x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)
    end function sub_self_real
    
    function sub_real_self(z, x) result(unary)
@@ -1216,8 +1216,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = -x%val + z
       unary%d1val1 = -x%d1val1
-      unary%d1Array(1:27) = -x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = -x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -x%d1val1_d1Array(1:33)
    end function sub_real_self
    
    function sub_self_int(x, y) result(unary)
@@ -1228,8 +1228,8 @@ module auto_diff_real_tdc_module
       y_dp = y
       unary%val = x%val - y_dp
       unary%d1val1 = x%d1val1
-      unary%d1Array(1:27) = x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)
    end function sub_self_int
    
    function sub_int_self(z, x) result(unary)
@@ -1240,8 +1240,8 @@ module auto_diff_real_tdc_module
       y_dp = z
       unary%val = -x%val + y_dp
       unary%d1val1 = -x%d1val1
-      unary%d1Array(1:27) = -x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = -x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = -x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = -x%d1val1_d1Array(1:33)
    end function sub_int_self
    
    function mul_self(x, y) result(binary)
@@ -1250,8 +1250,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: binary
       binary%val = x%val*y%val
       binary%d1val1 = x%d1val1*y%val + x%val*y%d1val1
-      binary%d1Array(1:27) = x%d1Array(1:27)*y%val + x%val*y%d1Array(1:27)
-      binary%d1val1_d1Array(1:27) = x%d1Array(1:27)*y%d1val1 + x%d1val1*y%d1Array(1:27) + x%d1val1_d1Array(1:27)*y%val + x%val*y%d1val1_d1Array(1:27)
+      binary%d1Array(1:33) = x%d1Array(1:33)*y%val + x%val*y%d1Array(1:33)
+      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) + x%d1val1_d1Array(1:33)*y%val + x%val*y%d1val1_d1Array(1:33)
    end function mul_self
    
    function mul_self_real(x, y) result(unary)
@@ -1260,8 +1260,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = x%val*y
       unary%d1val1 = x%d1val1*y
-      unary%d1Array(1:27) = x%d1Array(1:27)*y
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)*y
+      unary%d1Array(1:33) = x%d1Array(1:33)*y
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)*y
    end function mul_self_real
    
    function mul_real_self(z, x) result(unary)
@@ -1270,8 +1270,8 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       unary%val = x%val*z
       unary%d1val1 = x%d1val1*z
-      unary%d1Array(1:27) = x%d1Array(1:27)*z
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)*z
+      unary%d1Array(1:33) = x%d1Array(1:33)*z
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)*z
    end function mul_real_self
    
    function mul_self_int(x, y) result(unary)
@@ -1282,8 +1282,8 @@ module auto_diff_real_tdc_module
       y_dp = y
       unary%val = x%val*y_dp
       unary%d1val1 = x%d1val1*y_dp
-      unary%d1Array(1:27) = x%d1Array(1:27)*y_dp
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)*y_dp
+      unary%d1Array(1:33) = x%d1Array(1:33)*y_dp
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)*y_dp
    end function mul_self_int
    
    function mul_int_self(z, x) result(unary)
@@ -1294,8 +1294,8 @@ module auto_diff_real_tdc_module
       y_dp = z
       unary%val = x%val*y_dp
       unary%d1val1 = x%d1val1*y_dp
-      unary%d1Array(1:27) = x%d1Array(1:27)*y_dp
-      unary%d1val1_d1Array(1:27) = x%d1val1_d1Array(1:27)*y_dp
+      unary%d1Array(1:33) = x%d1Array(1:33)*y_dp
+      unary%d1val1_d1Array(1:33) = x%d1val1_d1Array(1:33)*y_dp
    end function mul_int_self
    
    function div_self(x, y) result(binary)
@@ -1310,8 +1310,8 @@ module auto_diff_real_tdc_module
       q2 = x%val*y%d1val1
       binary%val = x%val*powm1(y%val)
       binary%d1val1 = q1*(-q2 + x%d1val1*y%val)
-      binary%d1Array(1:27) = q1*(x%d1Array(1:27)*y%val - x%val*y%d1Array(1:27))
-      binary%d1val1_d1Array(1:27) = (2.0_dp*q2*y%d1Array(1:27) + q0*x%d1val1_d1Array(1:27) - y%val*(x%d1Array(1:27)*y%d1val1 + x%d1val1*y%d1Array(1:27) + x%val*y%d1val1_d1Array(1:27)))*powm1(pow3(y%val))
+      binary%d1Array(1:33) = q1*(x%d1Array(1:33)*y%val - x%val*y%d1Array(1:33))
+      binary%d1val1_d1Array(1:33) = (2.0_dp*q2*y%d1Array(1:33) + q0*x%d1val1_d1Array(1:33) - y%val*(x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) + x%val*y%d1val1_d1Array(1:33)))*powm1(pow3(y%val))
    end function div_self
    
    function div_self_real(x, y) result(unary)
@@ -1322,8 +1322,8 @@ module auto_diff_real_tdc_module
       q0 = powm1(y)
       unary%val = q0*x%val
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function div_self_real
    
    function div_real_self(z, x) result(unary)
@@ -1334,8 +1334,8 @@ module auto_diff_real_tdc_module
       q0 = z*powm1(pow2(x%val))
       unary%val = z*powm1(x%val)
       unary%d1val1 = -q0*x%d1val1
-      unary%d1Array(1:27) = -q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = z*(2.0_dp*x%d1Array(1:27)*x%d1val1 - x%d1val1_d1Array(1:27)*x%val)*powm1(pow3(x%val))
+      unary%d1Array(1:33) = -q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = z*(2.0_dp*x%d1Array(1:33)*x%d1val1 - x%d1val1_d1Array(1:33)*x%val)*powm1(pow3(x%val))
    end function div_real_self
    
    function div_self_int(x, y) result(unary)
@@ -1348,8 +1348,8 @@ module auto_diff_real_tdc_module
       q0 = powm1(y_dp)
       unary%val = q0*x%val
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function div_self_int
    
    function div_int_self(z, x) result(unary)
@@ -1362,15 +1362,15 @@ module auto_diff_real_tdc_module
       q0 = y_dp*powm1(pow2(x%val))
       unary%val = y_dp*powm1(x%val)
       unary%d1val1 = -q0*x%d1val1
-      unary%d1Array(1:27) = -q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = y_dp*(2.0_dp*x%d1Array(1:27)*x%d1val1 - x%d1val1_d1Array(1:27)*x%val)*powm1(pow3(x%val))
+      unary%d1Array(1:33) = -q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = y_dp*(2.0_dp*x%d1Array(1:33)*x%d1val1 - x%d1val1_d1Array(1:33)*x%val)*powm1(pow3(x%val))
    end function div_int_self
    
    function pow_self(x, y) result(binary)
       type(auto_diff_real_tdc), intent(in) :: x
       type(auto_diff_real_tdc), intent(in) :: y
       type(auto_diff_real_tdc) :: binary
-      real(dp) :: q5(1:27)
+      real(dp) :: q5(1:33)
       real(dp) :: q4
       real(dp) :: q3
       real(dp) :: q2
@@ -1381,25 +1381,25 @@ module auto_diff_real_tdc_module
       q2 = log(x%val)
       q3 = q2*x%val
       q4 = q1 + q3*y%d1val1
-      q5(1:27) = q3*y%d1Array(1:27) + x%d1Array(1:27)*y%val
+      q5(1:33) = q3*y%d1Array(1:33) + x%d1Array(1:33)*y%val
       binary%val = pow(x%val, y%val)
       binary%d1val1 = q0*q4
-      binary%d1Array(1:27) = q0*q5
-      binary%d1val1_d1Array(1:27) = (-q1*x%d1Array(1:27) + q2*y%d1val1_d1Array(1:27)*pow2(x%val) + q4*q5 + x%val*(x%d1Array(1:27)*y%d1val1 + x%d1val1*y%d1Array(1:27) + x%d1val1_d1Array(1:27)*y%val))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
+      binary%d1Array(1:33) = q0*q5
+      binary%d1val1_d1Array(1:33) = (-q1*x%d1Array(1:33) + q2*y%d1val1_d1Array(1:33)*pow2(x%val) + q4*q5 + x%val*(x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) + x%d1val1_d1Array(1:33)*y%val))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
    end function pow_self
    
    function pow_self_real(x, y) result(unary)
       type(auto_diff_real_tdc), intent(in) :: x
       real(dp), intent(in) :: y
       type(auto_diff_real_tdc) :: unary
-      real(dp) :: q1(1:27)
+      real(dp) :: q1(1:33)
       real(dp) :: q0
       q0 = y*pow(x%val, y - 1)
-      q1(1:27) = x%d1Array(1:27)*x%d1val1
+      q1(1:33) = x%d1Array(1:33)*x%d1val1
       unary%val = pow(x%val, y)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = y*(q1*y - q1 + x%d1val1_d1Array(1:27)*x%val)*pow(x%val, -2.0_dp + y)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = y*(q1*y - q1 + x%d1val1_d1Array(1:33)*x%val)*pow(x%val, -2.0_dp + y)
    end function pow_self_real
    
    function pow_real_self(z, x) result(unary)
@@ -1414,8 +1414,8 @@ module auto_diff_real_tdc_module
       q2 = q0*q1
       unary%val = q0
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q2*(q1*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27))
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q2*(q1*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33))
    end function pow_real_self
    
    function pow_self_int(x, y) result(unary)
@@ -1423,15 +1423,15 @@ module auto_diff_real_tdc_module
       integer, intent(in) :: y
       type(auto_diff_real_tdc) :: unary
       real(dp) :: y_dp
-      real(dp) :: q1(1:27)
+      real(dp) :: q1(1:33)
       real(dp) :: q0
       y_dp = y
       q0 = y_dp*pow(x%val, y_dp - 1)
-      q1(1:27) = x%d1Array(1:27)*x%d1val1
+      q1(1:33) = x%d1Array(1:33)*x%d1val1
       unary%val = pow(x%val, y_dp)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = y_dp*(q1*y_dp - q1 + x%d1val1_d1Array(1:27)*x%val)*pow(x%val, -2.0_dp + y_dp)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = y_dp*(q1*y_dp - q1 + x%d1val1_d1Array(1:33)*x%val)*pow(x%val, -2.0_dp + y_dp)
    end function pow_self_int
    
    function pow_int_self(z, x) result(unary)
@@ -1448,8 +1448,8 @@ module auto_diff_real_tdc_module
       q2 = q0*q1
       unary%val = q0
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q2*(q1*x%d1Array(1:27)*x%d1val1 + x%d1val1_d1Array(1:27))
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q2*(q1*x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33))
    end function pow_int_self
    
    function max_self(x, y) result(binary)
@@ -1462,8 +1462,8 @@ module auto_diff_real_tdc_module
       q1 = Heaviside(-x%val + y%val)
       binary%val = Max(x%val, y%val)
       binary%d1val1 = q0*x%d1val1 + q1*y%d1val1
-      binary%d1Array(1:27) = q0*x%d1Array(1:27) + q1*y%d1Array(1:27)
-      binary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27) + q1*y%d1val1_d1Array(1:27)
+      binary%d1Array(1:33) = q0*x%d1Array(1:33) + q1*y%d1Array(1:33)
+      binary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33) + q1*y%d1val1_d1Array(1:33)
    end function max_self
    
    function max_self_real(x, y) result(unary)
@@ -1474,8 +1474,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(x%val - y)
       unary%val = Max(x%val, y)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function max_self_real
    
    function max_real_self(z, x) result(unary)
@@ -1486,8 +1486,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(x%val - z)
       unary%val = Max(x%val, z)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function max_real_self
    
    function max_self_int(x, y) result(unary)
@@ -1500,8 +1500,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(x%val - y_dp)
       unary%val = Max(x%val, y_dp)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function max_self_int
    
    function max_int_self(z, x) result(unary)
@@ -1514,8 +1514,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(x%val - y_dp)
       unary%val = Max(x%val, y_dp)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function max_int_self
    
    function min_self(x, y) result(binary)
@@ -1528,8 +1528,8 @@ module auto_diff_real_tdc_module
       q1 = Heaviside(x%val - y%val)
       binary%val = Min(x%val, y%val)
       binary%d1val1 = q0*x%d1val1 + q1*y%d1val1
-      binary%d1Array(1:27) = q0*x%d1Array(1:27) + q1*y%d1Array(1:27)
-      binary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27) + q1*y%d1val1_d1Array(1:27)
+      binary%d1Array(1:33) = q0*x%d1Array(1:33) + q1*y%d1Array(1:33)
+      binary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33) + q1*y%d1val1_d1Array(1:33)
    end function min_self
    
    function min_self_real(x, y) result(unary)
@@ -1540,8 +1540,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(-x%val + y)
       unary%val = Min(x%val, y)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function min_self_real
    
    function min_real_self(z, x) result(unary)
@@ -1552,8 +1552,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(-x%val + z)
       unary%val = Min(x%val, z)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function min_real_self
    
    function min_self_int(x, y) result(unary)
@@ -1566,8 +1566,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(-x%val + y_dp)
       unary%val = Min(x%val, y_dp)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function min_self_int
    
    function min_int_self(z, x) result(unary)
@@ -1580,8 +1580,8 @@ module auto_diff_real_tdc_module
       q0 = Heaviside(-x%val + y_dp)
       unary%val = Min(x%val, y_dp)
       unary%d1val1 = q0*x%d1val1
-      unary%d1Array(1:27) = q0*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q0*x%d1val1_d1Array(1:27)
+      unary%d1Array(1:33) = q0*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q0*x%d1val1_d1Array(1:33)
    end function min_int_self
    
    function dim_self(x, y) result(binary)
@@ -1594,44 +1594,44 @@ module auto_diff_real_tdc_module
       q1 = 0.5_dp*sgn(q0)
       binary%val = -0.5_dp*y%val + 0.5_dp*x%val + 0.5_dp*Abs(q0)
       binary%d1val1 = -0.5_dp*y%d1val1 + 0.5_dp*x%d1val1 + q1*(x%d1val1 - y%d1val1)
-      binary%d1Array(1:27) = -0.5_dp*y%d1Array(1:27) + 0.5_dp*x%d1Array(1:27) + q1*(x%d1Array(1:27) - y%d1Array(1:27))
-      binary%d1val1_d1Array(1:27) = -0.5_dp*y%d1val1_d1Array(1:27) + 0.5_dp*x%d1val1_d1Array(1:27) + q1*(x%d1val1_d1Array(1:27) - y%d1val1_d1Array(1:27))
+      binary%d1Array(1:33) = -0.5_dp*y%d1Array(1:33) + 0.5_dp*x%d1Array(1:33) + q1*(x%d1Array(1:33) - y%d1Array(1:33))
+      binary%d1val1_d1Array(1:33) = -0.5_dp*y%d1val1_d1Array(1:33) + 0.5_dp*x%d1val1_d1Array(1:33) + q1*(x%d1val1_d1Array(1:33) - y%d1val1_d1Array(1:33))
    end function dim_self
    
    function dim_self_real(x, y) result(unary)
       type(auto_diff_real_tdc), intent(in) :: x
       real(dp), intent(in) :: y
       type(auto_diff_real_tdc) :: unary
-      real(dp) :: q3(1:27)
+      real(dp) :: q3(1:33)
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
       q0 = x%val - y
       q1 = sgn(q0)
       q2 = 0.5_dp*q1 + 0.5_dp
-      q3(1:27) = 0.5_dp*x%d1val1_d1Array(1:27)
+      q3(1:33) = 0.5_dp*x%d1val1_d1Array(1:33)
       unary%val = -0.5_dp*y + 0.5_dp*x%val + 0.5_dp*Abs(q0)
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q1*q3 + q3
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q1*q3 + q3
    end function dim_self_real
    
    function dim_real_self(z, x) result(unary)
       real(dp), intent(in) :: z
       type(auto_diff_real_tdc), intent(in) :: x
       type(auto_diff_real_tdc) :: unary
-      real(dp) :: q3(1:27)
+      real(dp) :: q3(1:33)
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
       q0 = x%val - z
       q1 = sgn(q0)
       q2 = -0.5_dp + 0.5_dp*q1
-      q3(1:27) = 0.5_dp*x%d1val1_d1Array(1:27)
+      q3(1:33) = 0.5_dp*x%d1val1_d1Array(1:33)
       unary%val = -0.5_dp*x%val + 0.5_dp*z + 0.5_dp*Abs(q0)
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q1*q3 - q3
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q1*q3 - q3
    end function dim_real_self
    
    function dim_self_int(x, y) result(unary)
@@ -1639,7 +1639,7 @@ module auto_diff_real_tdc_module
       integer, intent(in) :: y
       type(auto_diff_real_tdc) :: unary
       real(dp) :: y_dp
-      real(dp) :: q3(1:27)
+      real(dp) :: q3(1:33)
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
@@ -1647,11 +1647,11 @@ module auto_diff_real_tdc_module
       q0 = x%val - y_dp
       q1 = sgn(q0)
       q2 = 0.5_dp*q1 + 0.5_dp
-      q3(1:27) = 0.5_dp*x%d1val1_d1Array(1:27)
+      q3(1:33) = 0.5_dp*x%d1val1_d1Array(1:33)
       unary%val = -0.5_dp*y_dp + 0.5_dp*x%val + 0.5_dp*Abs(q0)
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q1*q3 + q3
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q1*q3 + q3
    end function dim_self_int
    
    function dim_int_self(z, x) result(unary)
@@ -1659,7 +1659,7 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc), intent(in) :: x
       type(auto_diff_real_tdc) :: unary
       real(dp) :: y_dp
-      real(dp) :: q3(1:27)
+      real(dp) :: q3(1:33)
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
@@ -1667,11 +1667,11 @@ module auto_diff_real_tdc_module
       q0 = x%val - y_dp
       q1 = sgn(q0)
       q2 = -0.5_dp + 0.5_dp*q1
-      q3(1:27) = 0.5_dp*x%d1val1_d1Array(1:27)
+      q3(1:33) = 0.5_dp*x%d1val1_d1Array(1:33)
       unary%val = -0.5_dp*x%val + 0.5_dp*y_dp + 0.5_dp*Abs(q0)
       unary%d1val1 = q2*x%d1val1
-      unary%d1Array(1:27) = q2*x%d1Array(1:27)
-      unary%d1val1_d1Array(1:27) = q1*q3 - q3
+      unary%d1Array(1:33) = q2*x%d1Array(1:33)
+      unary%d1val1_d1Array(1:33) = q1*q3 - q3
    end function dim_int_self
    
    function differentiate_auto_diff_real_tdc_1(this) result(derivative)

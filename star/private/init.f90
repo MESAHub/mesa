@@ -101,7 +101,6 @@
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use paquette_coeffs, only: initialise_collision_integrals
-         use hydro_rotation, only: init_rotation
          use alloc, only: init_alloc
          character (len=*), intent(in) :: &
             my_mesa_dir, chem_isotopes_filename, net_reaction_filename, &
@@ -136,12 +135,6 @@
             ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in stardata_init'
-            return
-         end if
-
-         call init_rotation(ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in init_rotation'
             return
          end if
 

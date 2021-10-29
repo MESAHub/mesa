@@ -144,22 +144,16 @@
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
-      real(dp), pointer :: i_rot(:) ! specific moment of inertia at cell boundary
-      real(dp), pointer :: di_rot_dw_div_wc(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: di_rot_dlnr(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: fp_rot(:) ! rotation factor for momentum
-      real(dp), pointer :: ft_rot(:) ! rotation factor for temperature
-      real(dp), pointer :: dfp_rot_dw_div_wc(:) ! partial of fp with respect to w_div_wc
-      real(dp), pointer :: dft_rot_dw_div_wc(:) ! partial of ft with respect to w_div_wc
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: i_rot(:), fp_rot(:), ft_rot(:)
+
       real(dp), pointer :: w_div_w_crit_roche(:) ! fraction of critical rotation at the equator,
                                                  ! without the contribution of the Eddington factor
       real(dp), pointer :: r_polar(:) ! radius in polar direction
       real(dp), pointer :: r_equatorial(:) ! radius in equatorial direction    
       real(dp) :: rotational_mdot_boost
 
-      ! angular momentum fluxes and their partials
-      real(dp), pointer :: j_flux(:), dj_flux_dw00(:), dj_flux_dwp1(:), dj_flux_dj00(:), dj_flux_djp1(:), &
-         dj_flux_dlnr00(:), dj_flux_dlnrp1(:), dj_flux_dlnd(:)
+      ! angular momentum fluxes
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: j_flux(:)
            
       real(dp), pointer :: am_nu_rot(:)
       real(dp), pointer :: am_nu_non_rot(:) ! diffusion driven by other sources, e.g. convection

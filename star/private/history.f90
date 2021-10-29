@@ -1899,7 +1899,10 @@
                end do
 
             case(h_i_rot_total)
-               val = dot_product(s% dm_bar(1:nz), s%i_rot(1:nz))
+               val = 0d0
+               do k=1, s% nz
+                  val = val + s% dm_bar(k)*s%i_rot(k)% val
+               end do
             case(h_surf_avg_j_rot)
                val = if_rot(s% j_rot_avg_surf)
             case(h_surf_avg_omega)
