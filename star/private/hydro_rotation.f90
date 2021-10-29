@@ -26,7 +26,6 @@
 
 ! Routine eval_fp_ft for computing rotation corrections to the stellar structure equations.
 ! Following Endal & Sofia, 1976, ApJ 210:184.
-! Based on code from Evert Glebbeek which in turn was based on code from Alex Heger.
 
 
 
@@ -694,7 +693,7 @@
 
          dbg = .false. ! (s% model_number >= 5)
 
-!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, fp_temp, ft_temp, d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
+!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, fp_temp, ft_temp, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
             do j=1, s% nz
                !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
                !by this point in the code, w_div_w_crit_roche is set

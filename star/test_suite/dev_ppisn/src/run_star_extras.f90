@@ -366,13 +366,13 @@
          real(dp) :: alpha
 
          type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, &
-            d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, fp_temp, ft_temp
+            fp_temp, ft_temp
 
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
+!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, fp_temp, ft_temp, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
             do j=1, s% nz
                !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
                !by this point in the code, w_div_w_crit_roche is set
@@ -633,13 +633,24 @@
       integer function extras_check_model(id)
          integer, intent(in) :: id
          integer :: ierr, k
-         real(dp) :: conv_fraction
+         real(dp) :: max_lgT_diff, max_lgrho_diff
+         real(dp) :: max_v
          type (star_info), pointer :: s
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_check_model = keep_going         
+
+         max_lgT_diff=0d0
+         max_lgrho_diff=0d0
+         do k=1, s% nz-1
+            max_lgT_diff = max(max_lgT_diff, abs(log10(s% T(k)/s% T(k+1))))
+            max_lgrho_diff = max(max_lgrho_diff, abs(log10(s% rho(k)/s% rho(k+1))))
+         end do
+         write(*,*) "check max_lgT_diff", max_lgT_diff, max_lgrho_diff
+         write(*,*) "check lgL", s% delta_lgL_hard_limit
+         write(*,*) "check MLT_option", s% MLT_option
 
       end function extras_check_model
 
@@ -1269,23 +1280,23 @@
             if (s% xtra(x_time_start_pulse) > 0d0) then
                !s% v_drag = 1d5*vsurf_for_fixed_bc
                !s% v_drag_factor = 1d0
-               if (.not. s% lxtra(lx_using_bb_bcs)) then
+               !if (.not. s% lxtra(lx_using_bb_bcs)) then
                   s% max_timestep = max_dt_during_pulse
+               !else
+               !   s% max_timestep = 1d99
+               !end if
+               do k = s% nz, 1, -1
+                  v_esc = v_div_vesc_frac_for_remove*sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
+                  if (s% u(k) > 2*v_esc) then
+                     exit
+                  end if
+               end do
+               if (k > 1) then
+                  s% max_q_for_convection_with_hydro_on = min(s%q(k),0.999d0)
+                  write(*,*) "Ignore convection above outermost q where v=vesc",  s% q(k)
                else
-                  s% max_timestep = 1d99
+                  s% max_q_for_convection_with_hydro_on = 0.999d0
                end if
-               !!do k = s% nz, 1, -1
-               !!   v_esc = v_div_vesc_frac_for_remove*sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-               !!   if (s% u(k) > 4*v_esc) then
-               !!      exit
-               !!   end if
-               !!end do
-               !!if (k > 1) then
-               !!   s% max_q_for_convection_with_hydro_on = min(s% q(k),0.999d0)
-               !!   write(*,*) "Ignore convection above outermost q where v=vesc",  s% q(k)
-               !!else
-               !!   s% max_q_for_convection_with_hydro_on = 0.999d0
-               !!end if
                !s% merge_amr_ignore_surface_cells = .true.
             else
                !this prevents surface from going mad right when hydro is turned on
@@ -1293,14 +1304,15 @@
                !s% v_drag = 0d0
                !s% v_drag_factor = 1d1
                s% max_timestep = 1d99
-               !s% max_q_for_convection_with_hydro_on = 0.999d0
+               s% max_q_for_convection_with_hydro_on = 0.99d0
                !s% merge_amr_ignore_surface_cells = .true.
+               !s% merge_amr_ignore_surface_cells = .false.
             end if
 
-            do k=1, s% nz
-               s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
-               s% u(k) = s% xh(s% i_u,k)
-            end do
+            !do k=1, s% nz
+            !   s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
+            !   s% u(k) = s% xh(s% i_u,k)
+            !end do
 
             !! use fixed_vsurf if surface v remains too high
             !if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
@@ -1318,11 +1330,11 @@
             !   end if
             !end if
 
-            if (maxval(abs(s% xh(s% i_u,:s% nz)))<2d7) then
-               s% dt_div_min_dr_div_cs_limit = 2d1
-            else
-               s% dt_div_min_dr_div_cs_limit = dt_div_min_dr_div_cs_limit
-            end if
+            !if (maxval(abs(s% xh(s% i_u,:s% nz)))<2d7) then
+            !   s% dt_div_min_dr_div_cs_limit = 2d1
+            !else
+            !   s% dt_div_min_dr_div_cs_limit = dt_div_min_dr_div_cs_limit
+            !end if
 
          else
             s% max_timestep = 1d99

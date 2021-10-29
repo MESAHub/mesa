@@ -365,6 +365,9 @@ contains
          mixing_type = no_mixing
       end if
       tdc_num_iters = iter          
+      if ((conv_vel_start >0d0 .and. conv_vel% val==0d0) .or. (conv_vel_start ==0d0 .and. conv_vel% val>0d0)) then
+         write(*,*) "check TDC conv_vel", m, conv_vel% val, conv_vel_start
+      end if
    end subroutine get_TDC_solution
          
 

@@ -71,6 +71,9 @@
             if (ierr /= 0) return
             if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(tmp)
             s% xh => tmp
+            do k=1, nz
+               s% xh(:,k) = s% xh_old(:,k)
+            end do
 
             tmp => s% xa_old
             s% xa_old => s% xa
@@ -78,6 +81,9 @@
             if (ierr /= 0) return
             if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(tmp)
             s% xa => tmp
+            do k=1, nz
+               s% xa(:,k) = s% xa_old(:,k)
+            end do
          
          end if
          
@@ -129,6 +135,7 @@
             real(dp), pointer, dimension(:) :: ptr, ptr_old
             integer, intent(out) :: ierr
             logical :: first_time
+            integer :: k
             ierr = 0
             tmp1 => ptr_old
             ptr_old => ptr
@@ -143,6 +150,9 @@
                tmp1(1:nz) = -9d99
             end if
             ptr => tmp1
+            do k=1, nz
+               ptr(k) = ptr_old(k)
+            end do
          end subroutine flip
 
       end subroutine new_generation
@@ -185,6 +195,38 @@
          do i = 1, s% len_extra_iwork
             s% extra_iwork(i) = s% extra_iwork_old(i)
          end do
+
+         if (.not. s% RSP_flag) then
+            ! check dimensions
+            if (size(s% xh_old,dim=1) /= s% nvar_hydro .or. size(s% xh_old,dim=2) < s% nz) then
+               write(*,*) 'bad dimensions for xh_old', size(s% xh_old,dim=1), s% nvar_hydro, &
+                  size(s% xh_old,dim=2), s% nz
+               stop
+            end if
+            if (size(s% xa_old,dim=1) /= s% species .or. size(s% xa_old,dim=2) < s% nz) then
+               write(*,*) 'bad dimensions for xa_old', size(s% xa_old,dim=1), s% species, &
+                  size(s% xa_old,dim=2), s% nz
+               stop
+            end if
+            if (size(s% dq_old,dim=1) < s% nz) then
+               write(*,*) 'bad dimensions for dq_old', size(s% dq_old,dim=1), s% nz
+               stop
+            end if
+
+            do k = 1, s% nz
+               do i=1,s% nvar_hydro
+                  s% xh(i,k) = s% xh_old(i,k)
+               end do
+               do i=1,s% species
+                  s% xa(i,k) = s% xa_old(i,k)
+               end do
+               s% dq(k) = s% dq_old(k)
+               s% mlt_vc(k) = s% mlt_vc_old(k)
+               s% omega(k) = s% omega(k)
+               s% j_rot(k) = s% j_rot(k)
+            end do
+            s% need_to_setvars = .true.
+         end if
 
          s% ixtra = s% ixtra_old
          s% xtra = s% xtra_old

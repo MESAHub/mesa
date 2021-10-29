@@ -2010,42 +2010,7 @@
                return
             end if
 
-            ! check dimensions
-            if (size(s% xh_old,dim=1) /= nvar_hydro .or. size(s% xh_old,dim=2) < nz) then
-               write(*,*) 'bad dimensions for xh_old', size(s% xh_old,dim=1), nvar_hydro, &
-                  size(s% xh_old,dim=2), nz
-               prepare_for_new_try = terminate
-               s% termination_code = t_failed_prepare_for_new_try
-               return
-            end if
-            if (size(s% xa_old,dim=1) /= s% species .or. size(s% xa_old,dim=2) < nz) then
-               write(*,*) 'bad dimensions for xa_old', size(s% xa_old,dim=1), s% species, &
-                  size(s% xa_old,dim=2), nz
-               prepare_for_new_try = terminate
-               s% termination_code = t_failed_prepare_for_new_try
-               return
-            end if
-            if (size(s% dq_old,dim=1) < nz) then
-               write(*,*) 'bad dimensions for dq_old', size(s% dq_old,dim=1), nz
-               prepare_for_new_try = terminate
-               s% termination_code = t_failed_prepare_for_new_try
-               return
-            end if
-            
-            ! note that the following are simply copying values as they were when last did set_vars
-            ! so do not need to set s% need_to_setvars = .true.
-
-            do k = 1, nz
-               do j=1,nvar_hydro
-                  s% xh(j,k) = s% xh_old(j,k)
-               end do
-               do j=1,s% species
-                  s% xa(j,k) = s% xa_old(j,k)
-               end do
-               s% dq(k) = s% dq_old(k)
-               s% mlt_vc(k) = s% mlt_vc_old(k)
-            end do
-            s% okay_to_set_mlt_vc = .true.
+            !s% okay_to_set_mlt_vc = .true.
             
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
