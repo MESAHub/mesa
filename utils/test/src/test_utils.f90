@@ -30,14 +30,14 @@
          allocate(a(10,20),stat=ierr)
          if (ierr /= 0) then
             write(*,*) 'alloc2 failed on mic'
-            write(*,*)
+            write(*,'(A)')
             flush(6)
             return
          end if
          deallocate(a,stat=ierr)
          if (ierr /= 0) then
             write(*,*) 'deallocate(a,stat=ierr) failed on mic'
-            write(*,*)
+            write(*,'(A)')
             flush(6)
             return
          end if
@@ -45,7 +45,7 @@
          call alloc2(10,20,a,ierr)
          if (ierr /= 0) then
             write(*,*) 'alloc2 failed on mic'
-            write(*,*)
+            write(*,'(A)')
             flush(6)
             return
          end if
@@ -53,7 +53,7 @@
          call enlarge_if_needed_2(a,12,30,1,ierr)
          if (ierr /= 0) then
             write(*,*) 'enlarge_if_needed_2 failed on mic'
-            write(*,*)
+            write(*,'(A)')
             flush(6)
             return
          end if
@@ -69,7 +69,7 @@
          if (is_bad(x)) then
             write(*,*) 'x', x
             write(*,*) 'bad num', is_bad(x)
-            write(*,*)
+            write(*,'(A)')
             flush(6)
             ierr = -1
             return
@@ -82,7 +82,7 @@
          if (.not. is_bad(y)) then
             write(*,*) 'y', y
             write(*,*) 'bad num', is_bad(y)
-            write(*,*)
+            write(*,'(A)')
             flush(6)
             ierr = -1
             return
@@ -91,7 +91,7 @@
          deallocate(a,stat=ierr)
          if (ierr /= 0) then
             write(*,*) 'deallocate failed on mic'
-            write(*,*)
+            write(*,'(A)')
             flush(6)
             return
          end if
@@ -108,7 +108,7 @@
          integer :: value, ierr
          logical :: duplicate
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'test_dict'
          
          nullify(dict)
@@ -151,7 +151,7 @@
          call integer_dict_free(dict)
          
          write(*,*) 'okay'
-         write(*,*)
+         write(*,'(A)')
       
       
       end subroutine test_dict
@@ -163,7 +163,7 @@
          integer :: value, ierr
          logical :: duplicate
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'test_idict'
          
          nullify(idict)
@@ -206,7 +206,7 @@
          call integer_idict_free(idict)
          
          write(*,*) 'okay'
-         write(*,*)
+         write(*,'(A)')
       
       
       end subroutine test_idict
@@ -216,9 +216,9 @@
          integer :: iounit, n, i, t, ierr
          character (len=256) :: buffer, string, filename
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'test_token_read'
-         write(*,*)
+         write(*,'(A)')
          
          filename = 'token.txt'
          ierr = 0
@@ -253,9 +253,9 @@
          close(iounit)
          call free_iounit(iounit)
          
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'done test_token_read'
-         write(*,*)
+         write(*,'(A)')
 
       end subroutine test_token_read
 

@@ -610,7 +610,7 @@
          open(unit=io_unit, FILE=trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ierr)
          if (ierr /= 0) then 
             write(*,'(a)') 'failed to create ' // trim(fname)
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__)
          end if
       end if

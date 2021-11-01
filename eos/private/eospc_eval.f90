@@ -282,7 +282,7 @@
                write(*,1) 'CV', CVNkt
                write(*,1) 'CHIR', CHIR
                write(*,1) 'CHIT', CHIT
-               write(*,*)
+               write(*,'(A)')
             end if
             
             Tnk=8.31447d7/CMImean*RHO*T ! n_i kT [erg/cc]

@@ -272,7 +272,7 @@
             write(*,*) 'failed in adipls_get_one_el_info'
             call mesa_error(__FILE__,__LINE__)
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,'(2a8,99a20)') 'el', 'order', 'freq (microHz)', 'inertia'
          if (expected_freq > 0) okay = .false.
          do i = 1, num

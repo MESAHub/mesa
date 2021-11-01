@@ -526,12 +526,12 @@
          s% have_new_cz_bdy_info = .true.
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'set_mixing_info s% n_conv_regions', s% n_conv_regions
             do j = 1, s% n_conv_regions
                write(*,2) 'conv region', j, s% cz_bot_mass(j)/Msun, s% cz_top_mass(j)/Msun
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
 
       end subroutine set_cz_bdy_mass
@@ -655,7 +655,7 @@
                write(*,*) 's% conv_bdy_loc', j, s% conv_bdy_loc(j)
                write(*,*) 'mixing type', s% mixing_type(s% conv_bdy_loc(j)-3:s% conv_bdy_loc(j)+3)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,3) 'mixing_type', 1152, s% mixing_type(1152)
             call mesa_error(__FILE__,__LINE__,'locate_convection_boundaries')
          end if

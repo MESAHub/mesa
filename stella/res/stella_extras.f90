@@ -87,11 +87,11 @@ program main
       do j=1,num_logTs
          if (is_bad(logTs(j))) write(*,*) 'logT', j, logTs(j)
       end do
-      write(*,*)
+      write(*,'(A)')
       do j=1,num_logRhos
          if (is_bad(logRhos(j))) write(*,*) 'logRho', j, logRhos(j)
       end do
-      write(*,*)
+      write(*,'(A)')
    end if
    ! just use "not a knot" bc's at edges of tables
    ibcxmin = 0; bcxmin(1:num_logTs) = 0
@@ -563,7 +563,7 @@ program main
       write(io,'(a20,i25)') 'zones', zone
       write(io,'(a20,2(1p,e25.15))') 'inner boundary mass', mass_IB*msun, mass_IB
       write(io,'(a20,2(1p,e25.15))') 'total mass', star_mass*msun, star_mass
-      write(io,*)
+      write(io,'(A)')
       write(io,'(99a25)') '', &
          'mass of cell (g)', & 
          'cell center m (g)', & 
@@ -601,7 +601,7 @@ program main
          'luminosity', &
          'n_bar', &
          'n_e' 
-      write(io,*)
+      write(io,'(A)')
       do j=1,zone  
          !read(io1,*) i1, data1(1:ncol)
          !read(io2,*) i2, data2(1:ncol)
@@ -616,7 +616,7 @@ program main
             !write(*,*) k, alfa*data1(k) + beta*data2(k), data1(k), data2(k)
             write(io,'(1p,e25.15)', advance = 'no') alfa*data1(k) + beta*data2(k)
          end do
-         write(io,*)
+         write(io,'(A)')
       end do
 
       close(io)

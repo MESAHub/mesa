@@ -362,9 +362,9 @@
          call star_write_model(id, 'start.mod', ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_write_model') 
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'finished create_env'
-         write(*,*)
+         write(*,'(A)')
          !stop
 
          deallocate(dres_dxa)

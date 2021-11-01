@@ -88,8 +88,8 @@
             write(*,1) 'lg dt/secyer', log10(s% dt/secyer)
             write(*,1) 'lg dt_next/secyer', log10(s% dt_next/secyer)
             write(*,1) 'dt_next/dt', s% dt_next/s% dt
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'timestep_controller')
          end if
 
@@ -2459,7 +2459,7 @@
                write(*,2) 'ratio_prev', s% model_number, ratio_prev
                write(*,2) 'limtr', s% model_number, limtr
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               write(*,*)
+               write(*,'(A)')
             end if
 
          else ! no history available, so fall back to the 1st order controller

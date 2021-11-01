@@ -153,7 +153,7 @@
                new_species = new_species + 1
                cycle
             end if
-            write(io,*)
+            write(io,'(A)')
             do N = min_N(Z), max_N(Z)
                write(z_plus_n_str,'(i4)') Z+N
                write(cname,'(a)') trim(el_name(Z)) // trim(adjustl(z_plus_n_str))
@@ -179,7 +179,7 @@
          end do
 
          write(io,'(a)') ')'
-         write(io,*)
+         write(io,'(A)')
 
          close(io)
 

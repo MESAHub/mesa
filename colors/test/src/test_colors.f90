@@ -101,12 +101,12 @@
             call mesa_error(__FILE__,__LINE__,'bad return from colors_get')
          end if
          
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'color magnitude results'
-         write(*,*)
+         write(*,'(A)')
          write(*,'(6a12)') 'teff', 'log_teff', 'log_l', 'mass', '[M_div_h]', 'log_g'
          write(*,'(i12,5f12.2)') floor(exp10(log_teff) + 0.5d0), log_teff, log_l, mass, M_div_h, log_g
-         write(*,*)
+         write(*,'(A)')
          
          !call get_all_bc_names(colors_name,total_num_colors,info)
          colors_name=(/'bol ','bcv ','U-B ','B-V ','V-R ','V-I ','V-K ','R-I ',&
@@ -115,26 +115,26 @@
          do i=1,num_results
             write(*,'(9x,a8,f10.5)') colors_name(i), results(i)
          end do
-         write(*,*)
+         write(*,'(A)')
          vname = 'vcolors'
          write(*,'(9x,a8,f10.5)') vname, results(1)-results(2)
-         write(*,*)
+         write(*,'(A)')
          
          if (doing_solar) then
          
             do i=1,num_results
                if (abs(results(i) - solar_expected_results(i)) > 0.02d0) then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) "warning colors don't match solar expected values"
                   write(*,*) "Color: ",trim(colors_name(i))
                   write(*,*) "Got ", results(i), ' but expected ', solar_expected_results(i)
-                  write(*,*)
+                  write(*,'(A)')
                   stop
                end if
             end do
             
             write(*,*) 'matches expected solar results'
-            write(*,*)
+            write(*,'(A)')
             
          end if         
          

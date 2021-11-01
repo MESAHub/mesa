@@ -65,3 +65,10 @@ check_stop.py
 Checks all .f90 files for stop 1 or stop 'string' and replaces them with a call
 to mesa_error(__FILE__,__LINE__) . This way we can always find where an error
 occurs rather than the non-unique stop 1 location.
+
+
+check_empty_writes.py
+---------------------
+
+Checks all .f90 files for writes thats are both empty and unformatted (i.e write (*,*) ) (it also handlse if the 
+write is to a unit). Unformatted writes are non-portable and can cause issues with ifort.

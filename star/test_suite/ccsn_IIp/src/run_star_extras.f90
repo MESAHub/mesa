@@ -464,10 +464,10 @@
          if (o16 <= 0 .or. he4 <= 0 .or. h1 <= 0) call mesa_error(__FILE__,__LINE__,'missing o16, he4, or h1')
          
          if (s% eos_rq% logRho_min_OPAL_SCVH_limit > -12d0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*)'FIX: have set_logRho_OPAL_SCVH_limits too large'
             write(*,*) 'causes errors in HELM/OPAL blend partials'
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'extras_startup')
          end if
          
@@ -638,7 +638,7 @@
             write(*,1) 's% co_core_mass', s% co_core_mass
             write(*,1) 's% M_center/Msun', s% M_center/Msun
             write(*,1) 's% star_mass', s% star_mass
-            write(*,*)
+            write(*,'(A)')
             !stop
          end if
          
@@ -729,7 +729,7 @@
                logT_tol = 1d-5
                logP_tol = 1d-8
                k = kk
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% Peos(k), &
                   log10(s% r(k)/Rsun), s% u(k)
                do k = kk-1, 1, -1
@@ -790,9 +790,9 @@
                   write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% Peos(k), &
                      log10(s% r(k)/Rsun), s% u(k)
                end do
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'new log(r(1)/Rsun), R/Rsun', log10(s% r(1)/Rsun), s% r(1)/Rsun
-               write(*,*)
+               write(*,'(A)')
                exit
             end do
          end subroutine add_csm
@@ -1085,9 +1085,9 @@
             s% RTI_m_no_boost = 0d0
             s% dedt_RTI_diffusion_factor = 1d0
             s% composition_RTI_diffusion_factor = 1d0
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'turn off RTI', s% model_number, age_days
-            write(*,*)
+            write(*,'(A)')
          end if
          
          L_center = s% x_ctrl(3)

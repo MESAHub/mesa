@@ -116,7 +116,7 @@
          
          if (.not. quietly) then
             write(*,*) trim(test_str)
-            write(*,*)
+            write(*,'(A)')
             call show_args
             call show_results
          end if
@@ -126,16 +126,16 @@
          !call get_pure_fe56_composition_info(abar, zbar, chem_id, xmass, fe56)
          call test_op_mono(fe56,ierr)
          if (ierr /= 0) return
-         write(*,*)
+         write(*,'(A)')
          kap1 = kap
             
          chem_factors(fe56) = 1.75d0
          write(*,1) 'pure fe56; fe56 factor increased', chem_factors(fe56)
          call test_op_mono(fe56,ierr)
          if (ierr /= 0) return
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'new/old', kap/kap1, kap, kap1
-         write(*,*)
+         write(*,'(A)')
 
       
          contains
@@ -241,18 +241,18 @@
             kap = exp10(log10kap)
             
             if (fe56 > 0) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'grad', exp10(lgrad(kk))
                write(*,1) 'lgrad', lgrad(kk)
             end if
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'kap', kap
             write(*,1) 'log10kap', log10kap
             write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
             write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
             write(*,1) 'sum fap', sum(fap(:))
-            write(*,*)
+            write(*,'(A)')
 
          end subroutine test_op_mono
          
@@ -271,7 +271,7 @@
             write(*,1) 'xo', xo
             write(*,1) 'xne', xne
             write(*,1) 'lnfree_e', lnfree_e
-            write(*,*)
+            write(*,'(A)')
          end subroutine show_args
          
       
@@ -281,13 +281,13 @@
             write(*,1) 'log10kap', log10kap
             write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
             write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'kap', kap
             write(*,1) 'dkap_dlnd', dlnkap_dlnRho*kap
             write(*,1) 'dkap_dlnT', dlnkap_dlnT*kap
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'frac_Type2', frac_Type2
-            write(*,*)
+            write(*,'(A)')
             if (is_bad(log10kap)) then
                write(*,*) 'bad log10kap'
             end if
@@ -436,7 +436,7 @@
          if (.not. quietly) then
             write(*,*) 'test number', which
             write(*,*) trim(test_str)
-            write(*,*)
+            write(*,'(A)')
             call show_args
             call show_results
          end if
@@ -457,7 +457,7 @@
             write(*,1) 'xo', xo
             write(*,1) 'xne', xne
             write(*,1) 'lnfree_e', lnfree_e
-            write(*,*)
+            write(*,'(A)')
          end subroutine show_args
 
          subroutine show_results
@@ -466,13 +466,13 @@
             write(*,1) 'log10kap', log10kap
             write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
             write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'kap', kap
             write(*,1) 'dkap_dlnd', dlnkap_dlnRho*kap
             write(*,1) 'dkap_dlnT', dlnkap_dlnT*kap
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'frac_Type2', kap_fracs(i_frac_Type2)
-            write(*,*)
+            write(*,'(A)')
             if (is_bad(log10kap)) then
                write(*,*) 'bad log10kap'
             end if

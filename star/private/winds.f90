@@ -237,7 +237,7 @@
                if (s% trace_super_eddington_wind_boost .or. dbg) then
                   write(*,1) 'super eddington wind boost factor, L_div_Ledd', &
                      super_eddington_boost, L_div_Ledd
-                  write(*,*)
+                  write(*,'(A)')
                end if
             end if
          end if
@@ -313,7 +313,7 @@
          if (dbg) then
             write(*,1) 'final star_mdot', s% mstar_dot/(Msun/secyer)
             write(*,1) 'final lg abs s% mstar_dot/(Msun/secyer)', safe_log10(abs(s% mstar_dot/(Msun/secyer)))
-            write(*,*)
+            write(*,'(A)')
          end if
 
          contains
@@ -371,7 +371,7 @@
                       write(*,1) 'Reimers_scaling_factorReimers_scaling_factor', s% Reimers_scaling_factor
                       write(*,1) 'wind', wind
                       write(*,1) 'log10 wind', log10(wind)
-                      write(*,*)
+                      write(*,'(A)')
                       call mesa_error(__FILE__,__LINE__,'debug: winds')
                    end if
                 else if (scheme == 'Vink') then

@@ -82,7 +82,7 @@
             write(*,1) 'X', X
             write(*,1) 'abar', abar
             write(*,1) 'zbar', zbar
-            write(*,*)
+            write(*,'(A)')
          end if
 
          call eosPT_get( &
@@ -102,27 +102,27 @@
          
          if (quietly) return
          
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'rho', rho
          write(*,1) 'logRho', logRho
          write(*,1) 'logT', logT
          write(*,1) 'logPgas', logPgas
-         write(*,*)
+         write(*,'(A)')
 
          names = eosDT_result_names
          
          if (.not. do_compare) then ! simple form of output
             write(*,1) 'dlnRho_dlnPgas_c_T', dlnRho_dlnPgas_c_T
             write(*,1) 'dlnRho_dlnT_c_Pgas', dlnRho_dlnT_c_Pgas
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'P', P
             write(*,1) 'E', exp(res(i_lnE))
             write(*,1) 'S', exp(res(i_lnS))
-            write(*,*)
+            write(*,'(A)')
             do i=4, num_eos_basic_results
                write(*,1) trim(names(i)), res(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             return
          end if
 
@@ -136,7 +136,7 @@
             call mesa_error(__FILE__,__LINE__)
          end if
      
-         write(*,*)
+         write(*,'(A)')
          
          write(*,1) 'dlnRho_dlnPgas_c_T', dlnRho_dlnPgas_c_T
          write(*,1) 'dlnRho_dlnT_c_Pgas', dlnRho_dlnT_c_Pgas
@@ -144,19 +144,19 @@
             write(*,1) trim(names(i)), res(i), res2(i), &
                   (res(i)-res2(i)) / max(1d0, abs(res(i)), abs(res2(i)))
          end do
-         write(*,*)
+         write(*,'(A)')
          
          do i=1, num_eos_basic_results
             write(*,1) 'd_dlnd ' // trim(names(i)), d_dlnd(i), d_dlnd2(i), &
                   (d_dlnd(i)-d_dlnd2(i)) / max(1d0, abs(d_dlnd(i)), abs(d_dlnd2(i)))
          end do
-         write(*,*)
+         write(*,'(A)')
          
          do i=1, num_eos_basic_results
             write(*,1) 'd_dlnT ' // trim(names(i)), d_dlnT(i), &
                   d_dlnT2(i), (d_dlnT(i)-d_dlnT2(i)) / max(1d0, abs(d_dlnT(i)), abs(d_dlnT2(i)))
          end do
-         write(*,*)
+         write(*,'(A)')
          
       end subroutine test1_eosPT
       
@@ -269,7 +269,7 @@
  1          format(a30,1pe24.16)
             
             if (.not. quietly) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) ' tolerance', tol
             end if
             if (.not. quietly) write(*,*)
@@ -300,7 +300,7 @@
                write(*,1) ' found logRho', result_log10
                write(*,1) '  wanted logS', lnS/ln10
                write(*,1) '     got logS', res(i_lnS)/ln10
-               write(*,*)
+               write(*,'(A)')
             end if
          
             result = T*2d0 ! initial guess
@@ -323,13 +323,13 @@
                call mesa_error(__FILE__,__LINE__)
             end if
             if (.not. quietly) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'actual logT', log10_T
                write(*,1) ' guess logT', logT_guess
                write(*,1) ' found logT', result_log10
                write(*,1) '  wanted logS', lnS/ln10
                write(*,1) '     got logS', res(i_lnS)/ln10
-               write(*,*)
+               write(*,'(A)')
             end if
 
             T = exp10(log10_T)
@@ -356,7 +356,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
             if (.not. quietly) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'actual logT', log10_T
                write(*,1) ' guess logT', logT_guess
                write(*,1) ' found logT', result_log10
@@ -366,7 +366,7 @@
                Pgas = exp(res(i_lnPgas))
                logP = log10(Prad + Pgas)
                write(*,1) '     got logP', logP
-               write(*,*)
+               write(*,'(A)')
             end if
 
          end subroutine test_get_Rho_T
@@ -427,7 +427,7 @@
          write(*,1) 'zbar', zbar
          write(*,1) 'logT_tol', logT_tol
          write(*,1) 'other_tol', other_tol
-         write(*,*)
+         write(*,'(A)')
 
          call eosPT_get_T( &
                handle, &
@@ -442,14 +442,14 @@
             write(*,*) 'ierr in test1_eosPT_get_T'
             call mesa_error(__FILE__,__LINE__)
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'guess logT', logT_guess
          write(*,1) 'found logT', logT_result
          write(*,1) 'wanted logE', other/ln10
          write(*,1) 'got logE', res(i_lnE)/ln10
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'eos_calls', eos_calls
-         write(*,*)
+         write(*,'(A)')
          
       end subroutine test1_eosPT_get_T
       
@@ -482,7 +482,7 @@
          
          write(*,1) 'logT', logT
          write(*,1) 'logRho', logRho
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'xa h1', xa(h1)
          write(*,1) 'xa he4', xa(he4)
          write(*,1) 'xa c12', xa(c12)
@@ -490,19 +490,19 @@
          write(*,1) 'xa o16', xa(o16)
          write(*,1) 'xa ne20', xa(ne20)
          write(*,1) 'xa mg24', xa(mg24)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'X', X
          write(*,1) 'Y', 1d0 - (X + Z)
          write(*,1) 'Z', Z
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a55,9a26)') ' ', 'Pgas', 'energy', 'entropy'
          call test1(1, 'opal_scvh')
          call test1(2, 'helm')
          call test1(4, 'pc')
-         write(*,*)
+         write(*,'(A)')
 
          contains
          
@@ -576,7 +576,7 @@
          write(*,1) 'zbar', zbar
          write(*,1) 'logT_tol', logT_tol
          write(*,1) 'egas_tol', egas_tol
-         write(*,*)
+         write(*,'(A)')
 
          call eosDT_get_T( &
                handle, &
@@ -593,15 +593,15 @@
          energy = exp(res(i_lnE))
          erad = crad*exp10(logT_result)**4/exp10(logRho)
          egas = energy - erad
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'guess logT', logT_guess
          write(*,1) 'found logT', logT_result
          write(*,1) 'wanted egas', egas_want
          write(*,1) 'got egas', egas
          write(*,1) '(want - got)/got', (egas_want - egas)/egas
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'eos_calls', eos_calls
-         write(*,*)
+         write(*,'(A)')
          
          
       end subroutine test1_eosDT_get_T_given_egas
@@ -634,8 +634,8 @@
          call Init_Composition(X, Zinit, dXC, dXO)
          
          if (.not. quietly) then
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,102) 'X', X
             write(*,102) 'Y', Y
             write(*,102) 'Z', Z
@@ -644,7 +644,7 @@
             write(*,102) 'logRho', log10(Rho)
             write(*,102) 'logT', log10(T)
             write(*,102) 'T6', T * 1d-6
-            write(*,*)
+            write(*,'(A)')
          end if
          
          call eosDT_get( &
@@ -678,11 +678,11 @@
                do i = 1, num_eos_basic_results
                   write(*,101) 'd_dlnd ' // trim(eos_names(i)), d_dlnd(i)
                end do
-               write(*,*)
+               write(*,'(A)')
                do i = 1, num_eos_basic_results
                   write(*,101) 'd_dlnT ' // trim(eos_names(i)), d_dlnT(i)
                end do
-               write(*,*)
+               write(*,'(A)')
             end if
             
          end if
@@ -700,10 +700,10 @@
          theta_e = 0.929542529701454d0
          call eos_fermi_dirac_integral(-0.5d0, eta, theta, fdmh, fdeta, fdtheta)
          call eos_fermi_dirac_integral(0.5d0, eta, theta, fdph, fdeta, fdtheta)
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'test_dirac_integrals'
          write(*,1) 'calculated theta_e', fdmh/fdph
-         write(*,*)
+         write(*,'(A)')
          stop
       end subroutine test_dirac_integrals
 

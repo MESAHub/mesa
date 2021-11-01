@@ -1318,7 +1318,7 @@
             pause = (mod(s% model_number, s% pgstar_interval) == 0)
             
          if (pause) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'model_number', s% model_number
             write(*,*) 'PGSTAR: paused -- hit RETURN to continue'
             read(*,*)

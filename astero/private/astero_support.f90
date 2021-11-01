@@ -84,10 +84,10 @@
          
             if (.not. gyre_is_enabled) then
                ierr = -1
-               write(*,*)
+               write(*,'(A)')
                write(*,'(a)') 'gyre is not currently enabled in your configuration of mesa.'
                write(*,'(a)') 'check that your utils/makefile_header has USE_GYRE = YES'
-               write(*,*)
+               write(*,'(A)')
                return
             end if
 
@@ -672,7 +672,7 @@
                write(*,1) 'nmax', nmax
                write(*,2) '(norders+1)/2', (norders+1)/2
                write(*,2) 'l0_n_obs(1)', l0_n_obs(1)
-               write(*,*)
+               write(*,'(A)')
                !stop
             end if
          end if 
@@ -696,7 +696,7 @@
             write(*,2) 'cnt', cnt
             write(*,1) 'sum_1', sum_1
             write(*,1) 'sum_2', sum_2
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'init_obs_data')
          end if
             

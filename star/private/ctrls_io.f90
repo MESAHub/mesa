@@ -629,10 +629,10 @@
     ierr = 0
 
     if (.not. (trim(s% energy_eqn_option) == 'dedt' .or. trim(s% energy_eqn_option) == 'eps_grav')) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) "Invalid choice for energy_eqn_option"
        write(*,*) "Available options are 'dedt' or 'eps_grav'"
-       write(*,*)
+       write(*,'(A)')
        ierr = -1
        return
     end if

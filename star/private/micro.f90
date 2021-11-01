@@ -76,7 +76,7 @@ contains
 
     ierr = 0
     if (dbg) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) 'set_micro_vars'
        write(*,*) 'nzlo', nzlo
        write(*,*) 'nzhi', nzhi
@@ -395,7 +395,7 @@ contains
              write(*,2) trim(eosDT_result_names(i)), k, res(i)
              write(*,2) 'd_dlnd ' // trim(eosDT_result_names(i)), k, d_dlnd(i)
              write(*,2) 'd_dlnT ' // trim(eosDT_result_names(i)), k, d_dlnT(i)
-             write(*,*)
+             write(*,'(A)')
              call write_eos_call_info(s,k)
              if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
              !$OMP end critical (micro_crit0)
@@ -670,7 +670,7 @@ contains
       write(*,1) 'd_lnfree_e_dlnT = ', d_lnfree_e_dlnT
       write(*,1) 'abar = ', s% abar(k)
       write(*,1) 'zbar = ', s% zbar(k)
-      write(*,*)
+      write(*,'(A)')
       write(*,*) 'cubic_interpolation_in_X = ', s% kap_rq% cubic_interpolation_in_X
       write(*,*) 'cubic_interpolation_in_Z = ', s% kap_rq% cubic_interpolation_in_Z
       write(*,*) 'include_electron_conduction = ', s% kap_rq% include_electron_conduction
@@ -680,8 +680,8 @@ contains
       write(*,1) 'kap_Type2_full_on_X = ', s% kap_rq% kap_Type2_full_on_X
       write(*,1) 'kap_Type2_full_off_dZ = ', s% kap_rq% kap_Type2_full_off_dZ
       write(*,1) 'kap_Type2_full_on_dZ = ', s% kap_rq% kap_Type2_full_on_dZ
-      write(*,*)
-      write(*,*)
+      write(*,'(A)')
+      write(*,'(A)')
       write(*,1) 'rho = ', s% rho(k)
       write(*,1) 'lnrho = ', s% lnd(k)
       write(*,1) 'T = ', s% T(k)
@@ -692,17 +692,17 @@ contains
       write(*,1) 'dlnkap_dlnT = ', dlnkap_dlnT
       write(*,1) 'd_opacity_dlnd = ', s% d_opacity_dlnd(k)
       write(*,1) 'd_opacity_dlnT = ', s% d_opacity_dlnT(k)
-      write(*,*)
+      write(*,'(A)')
       write(*,1) 'logQ = ', s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
-      write(*,*)
+      write(*,'(A)')
       write(*,1) 'kap_frac_lowT', s% kap_frac_lowT(k)
       write(*,1) 'kap_frac_highT', s% kap_frac_highT(k)
       write(*,1) 'kap_frac_Type2', s% kap_frac_Type2(k)
       write(*,1) 'kap_frac_Compton', s% kap_frac_Compton(k)
-      write(*,*)
+      write(*,'(A)')
       write(*,1) 'extra_opacity_factor', s% extra_opacity_factor(k)
-      write(*,*)
-      write(*,*)
+      write(*,'(A)')
+      write(*,'(A)')
     end subroutine show_stuff
 
   end subroutine do_kap_for_cell

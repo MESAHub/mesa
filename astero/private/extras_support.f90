@@ -353,7 +353,7 @@
                      i = i+1
                      write(*,2) 'freq', i, cyclic_freq(j)
                   end do
-                  write(*,*)
+                  write(*,'(A)')
                end if
                call check_too_many_bad
                return 
@@ -381,7 +381,7 @@
                         i = i+1
                         write(*,2) 'freq', i, cyclic_freq(j)
                      end do
-                     write(*,*)
+                     write(*,'(A)')
                   end if
                   call check_too_many_bad
                   return
@@ -630,7 +630,7 @@
                   write(*,*) 'have reached Teff limit'
                   write(*,1) 'Teff', s% Teff
                   write(*,1) 'Teff_limit', Teff_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if    
@@ -647,7 +647,7 @@
                   write(*,*) 'have reached logg limit'
                   write(*,1) 'logg', logg
                   write(*,1) 'logg_limit', logg_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -664,7 +664,7 @@
                   write(*,*) 'have reached logL limit'
                   write(*,1) 'logL', s% log_surface_luminosity
                   write(*,1) 'logL_limit', logL_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -682,7 +682,7 @@
                   write(*,*) 'have reached delta_nu limit'
                   write(*,1) 'delta_nu_model', delta_nu_model
                   write(*,1) 'delta_nu_limit', delta_nu_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -699,7 +699,7 @@
                   write(*,*) 'have reached logR limit'
                   write(*,1) 'logR', logR
                   write(*,1) 'logR_limit', logR_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -719,7 +719,7 @@
                   write(*,*) 'have reached surface_Z_div_X limit'
                   write(*,1) 'surface_Z_div_X', surface_Z_div_X
                   write(*,1) 'surface_Z_div_X_limit', surface_Z_div_X_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -739,7 +739,7 @@
                   write(*,*) 'have reached surface_He limit'
                   write(*,1) 'surface_He', surface_He
                   write(*,1) 'surface_He_limit', surface_He_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -756,7 +756,7 @@
                   write(*,*) 'have reached Rcz limit'
                   write(*,1) 'Rcz', Rcz
                   write(*,1) 'Rcz_limit', Rcz_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -776,7 +776,7 @@
                   write(*,*) 'have reached my_var1 limit'
                   write(*,1) 'my_var1', my_var1
                   write(*,1) 'my_var1_limit', my_var1_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -796,7 +796,7 @@
                   write(*,*) 'have reached my_var2 limit'
                   write(*,1) 'my_var2', my_var2
                   write(*,1) 'my_var2_limit', my_var2_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if
@@ -816,7 +816,7 @@
                   write(*,*) 'have reached my_var3 limit'
                   write(*,1) 'my_var3', my_var3
                   write(*,1) 'my_var3_limit', my_var3_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_astero_extras_check_model = terminate
                   return
                end if

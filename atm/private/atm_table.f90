@@ -198,7 +198,7 @@ contains
        write(*,1) 'T', T
        write(*,1) 'dT_dTeff', dT_dTeff
        write(*,1) 'dT_dlogg', dT_dlogg
-       write(*,*)
+       write(*,'(A)')
        ierr = -1
        return
        !if (is_bad(lnP) .or. is_bad(lnT)) call mesa_error(__FILE__,__LINE__,'eval_table')

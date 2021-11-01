@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import re
 from pathlib import Path
 
@@ -42,9 +43,13 @@ def mesa_error(message=None):
     else:
         return "call mesa_error(__FILE__,__LINE__," + message + ")"
 
+if len(sys.argv) > 1:
+    files = sys.argv[1:]
+else:
+    files = Path("./").rglob("*.f90")
 
-os.chdir(MESA_DIR)
-for file in Path("./").rglob("*.f90"):
+
+for file in files:
     if check_skip(file):
         continue
 

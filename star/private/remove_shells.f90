@@ -227,7 +227,7 @@
                   mtotal = dot_product(s% dm(1:nz), &
                      s% xa(co56,1:nz) + s% xa(ni56,1:nz))/Msun
                   write(*,1) 'final mass for Ni56+Co56', mtotal
-                  write(*,*)
+                  write(*,'(A)')
                   call mesa_error(__FILE__,__LINE__,'do_remove_center_to_reduce_co56_ni56')
                end if
                return

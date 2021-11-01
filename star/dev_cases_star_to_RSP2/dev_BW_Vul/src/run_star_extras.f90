@@ -318,10 +318,10 @@
             s% xh(i_v,k) = vel(k)
          end do
          
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'v_surf F 1 2', v_surf, v(1,nz-1), v(2,nz-1), v(3,nz-1)
          write(*,1) 'amixF amix1 amix2', amixF, amix1, amix2
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'nz', nz
          write(*,1) 'v(1)/1d5', vel(1)/1d5    
          write(*,1) 'T(nz)', s% T(s%nz)             
@@ -519,9 +519,9 @@
          run_num_retries_prev_period = s% num_retries
          period_max_vsurf_div_cs = 0d0
          if (num_periods < s% x_integer_ctrl(7) .or. s% x_integer_ctrl(7) <= 0) return
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          target_period = s% x_ctrl(7)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
@@ -535,9 +535,9 @@
             write(*,*) 'good match for period', &
                period/(24*3600), target_period
          end if
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
       

@@ -517,10 +517,10 @@
             testhub_extras_names(1) = 'flame_speed'; testhub_extras_vals(1) = flame_speed
             testhub_extras_names(2) = 'flame_width'; testhub_extras_vals(2) = flame_width
 
-            write(*,*)
+            write(*,'(A)')
             write(*,1) testhub_extras_names(1), testhub_extras_vals(1)
             write(*,1) testhub_extras_names(2), testhub_extras_vals(2)
-            write(*,*)
+            write(*,'(A)')
 
             ! get targets from inlist
             flame_speed_expected = s% x_ctrl(9)

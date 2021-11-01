@@ -60,18 +60,18 @@ contains
 
     ! check that the coulomb corrections are behaving
 
-    write(*,*)
+    write(*,'(A)')
     write(*,*) 'do_test_coulomb'
 
     call do_test_coulomb
 
     write(*,*) 'done'
-    write(*,*)
+    write(*,'(A)')
 
 
     ! check that the special weak reactions are working
 
-    write(*,*)
+    write(*,'(A)')
     write(*,*) 'do_test_special_weak'
 
     use_suzuki_tables = .false.
@@ -85,7 +85,7 @@ contains
     ! on-the-fly weak rates discussed in MESA III (Section 8)
     call do_test_special_weak(.true.)
 
-    write(*,*)
+    write(*,'(A)')
     write(*,*) 'do_test_suzuki'
     use_suzuki_tables = .true.
     ! this shows results from a set of denser tables
@@ -94,7 +94,7 @@ contains
     call do_test_special_weak(.false.)
 
     write(*,*) 'done'
-    write(*,*)
+    write(*,'(A)')
 
     ! deallocate the eos tables
     call free_eos_handle(handle)
@@ -256,7 +256,7 @@ contains
     do i = 1, nr
        write(*,'(6X, 2A6, ES26.16)') weak_lhs(i), weak_rhs(i), lambda(i)
     enddo
-    write(*,*)
+    write(*,'(A)')
 
     deallocate( &
          ids, reaction_ids, &

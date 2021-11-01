@@ -111,10 +111,10 @@
 
          ! check for c12_c12 burning that will make an ONe WD.
          if(s% L_by_category(icc) > 1d4) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) "This model is too massive." 
             write(*,*) "Carbon has ignited in the interior and will produce an ONe WD."
-            write(*,*)
+            write(*,'(A)')
             extras_check_model = terminate
             s% termination_code = t_extras_check_model
          end if

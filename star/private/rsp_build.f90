@@ -279,7 +279,7 @@
  444  format(F6.3,tr2,f8.2,tr2,f7.2,tr2,d9.3) 
       if (s% RSP_trace_RSP_build_model) then
          write(*,*) '*** done creating initial model ***'
-         write(*,*)
+         write(*,'(A)')
       end if
       ! recall that w is actually Et = w**2 at this point
       call set_build_vars(s,M,DM,DM_BAR,R,Vol,T,w,Lr,Lc)

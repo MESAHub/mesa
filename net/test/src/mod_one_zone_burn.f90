@@ -370,12 +370,12 @@
             burn_temp = exp10(logT)
             burn_tend = times_for_burn(num_times)
             if (.false.) then
-               write(*,*)
+               write(*,'(A)')
                do i=1,num_times
                   write(*,2) 'history', i, times_for_burn(i), log10Ts_for_burn(i), &
                      log10Rhos_for_burn(i), etas_for_burn(i)
                end do
-               write(*,*)
+               write(*,'(A)')
             end if
          end if
          starting_logT = logT
@@ -390,21 +390,21 @@
          dxdt_source_term => null()
          
          if (.not. quiet) then
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,1) 'one zone burn ' // trim(net_file)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'number of species', species
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'temp', burn_temp
             write(*,1) 'logT', burn_logT
             write(*,1) 'rho', burn_rho
             write(*,1) 'logRho', burn_logRho
             write(*,1) 'eta', burn_eta
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'tend', burn_tend
             write(*,1) 'tend/secyer', burn_tend/secyer
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'initial abundances'
             call show_X(xin,.false.,.false.)
          end if
@@ -482,14 +482,14 @@
                   chem_isos% N(cid), &
                   chem_isos% name(cid)
             end do
-            write(*,*)
+            write(*,'(A)')
 
             call show_net_reactions_and_info(handle, 6, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in show_net_reactions'
                call mesa_error(__FILE__,__LINE__)
             end if
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (.not. quiet) then
@@ -497,7 +497,7 @@
             write(*,1) 'max_step_size', max_step_size
             write(*,2) 'max_steps', max_steps
             write(*,2) 'screening_mode', screening_mode
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (species >= decsol_switch) then
@@ -554,7 +554,7 @@
                avg_eps_nuc, ending_eps_neu_total, &
                nfcn, njac, nstep, naccpt, nrejct, ierr)
             if (ierr == 0 .and. .not. quiet) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'constant log10Rho', burn_logRho
                write(*,1) 'starting log10T', starting_log10T
                write(*,1) 'ending log10T', ending_log10T
@@ -596,7 +596,7 @@
                ending_x, ending_temp, ending_rho, ending_lnS, initial_rho, initial_lnS, &
                nfcn, njac, nstep, naccpt, nrejct, time_doing_net, time_doing_eos, ierr)
             if (ierr == 0 .and. .not. quiet) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'pressure', pressure
                write(*,1) 'starting_temp', starting_temp
                write(*,1) 'ending_temp', ending_temp
@@ -650,8 +650,8 @@
          end if
          
          if (.not. quiet) then
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
          end if
          
          if (.not. complete_silence_please) then
@@ -672,11 +672,11 @@
                end do
                min_for_show_peak_abundances = -1d99
                call show_X(x_previous(:),.false.,.true.)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'ye', ye
-               write(*,*)
+               write(*,'(A)')
                if (burn_at_constant_density) then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'constant log10Rho', burn_logRho
                   write(*,1) 'starting log10T', starting_log10T
                   write(*,1) 'ending log10T', ending_log10T
@@ -684,34 +684,34 @@
                   write(*,1) 'change in T', exp10(ending_log10T) - exp10(starting_log10T)
                   write(*,1) 'ending_eps_neu_total', ending_eps_neu_total
                   write(*,1) 'avg_eps_nuc', avg_eps_nuc
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'tolerance eps', eps
                   write(*,1) 'odescal', odescal
                else if (.not. burn_at_constant_P) then
                   write(*,1) 'ending eps_neu_total', eps_neu_total
                   write(*,1) 'avg_eps_nuc', avg_eps_nuc
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'logT', logT
                   write(*,1) 'logRho', logRho
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'burn_temp', burn_temp
                   write(*,1) 'burn_rho', burn_rho
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'burn_rtol', burn_rtol
                   write(*,1) 'burn_atol', burn_atol
                else
                   write(*,1) 'burn_temp', burn_temp
                   write(*,1) 'burn_rho', burn_rho
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'burn_rtol', burn_rtol
                   write(*,1) 'burn_atol', burn_atol
                end if
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'burn_tend (seconds)', burn_tend
-               write(*,*)
+               write(*,'(A)')
                write(*,1) trim(net_name)
             end if
-            write(*,*)
+            write(*,'(A)')
          end if
 
          if (.not. quiet) then
@@ -719,14 +719,14 @@
             write(*,2) 'njac', njac
             write(*,2) 'naccpt', naccpt
             write(*,2) 'nrejct', nrejct
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'number of steps', nstep
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,1) 'output file ' // trim(data_filename)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(/,a30,99f18.3,/)') 'runtime (seconds)', dt
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (save_final_abundances) then
@@ -1012,19 +1012,19 @@
             end if
             !stop
 
-            write(*,*)
+            write(*,'(A)')
             xsum = sum(x(1:species))
             write(*,1) 'xsum', xsum
-            write(*,*)
+            write(*,'(A)')
             if (.not. show_peak) return
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'peak x and time'
             do j=1, species
                if (peak_abundance(j) >= min_for_show_peak_abundances) &
                   write(*,1) trim(chem_isos% name(chem_id(j))), &
                      peak_abundance(j), peak_time(j)
             end do
-            write(*,*)
+            write(*,'(A)')
          end subroutine show_X
 
 
@@ -1107,7 +1107,7 @@
                      write(*,2) trim(chem_isos% name(chem_id(j))), j, x(j)
                   end do
                   write(*,1) 'sum(x)', sum(x(1:species))
-                  write(*,*)
+                  write(*,'(A)')
                end if
             end if
 
@@ -1185,7 +1185,7 @@
                   eps_nuc_categories, eps_neu_total, &
                   lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
             if (ierr /= 0) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logT', logT
                write(*,1) 'logRho', logRho
                write(*, *) 'bad return from net_get'
@@ -1296,10 +1296,10 @@
             end if
 
             if (show_Qs) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logT', logT
                write(*,1) 'logRho', logRho
-               write(*,*)
+               write(*,'(A)')
                write(*,'(30x,4a20)') 'Q total', 'Q neutrino', 'Q total-neutrino'
                do i = 1, num_reactions
                   if (from_weaklib(i)) then
@@ -1310,7 +1310,7 @@
                         actual_Qs(i), actual_neuQs(i), actual_Qs(i) - actual_neuQs(i)
                   end if
                end do
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'show_Qs')
             end if
          

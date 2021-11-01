@@ -342,11 +342,11 @@
                     extra_header_item_names(j), extra_header_item_vals(j))
                end do
 
-               write(io,*)
+               write(io,'(A)')
 
             end do
 
-            write(io,*)
+            write(io,'(A)')
 
             if (num_extra_header_items > 0) &
                deallocate(extra_header_item_names, extra_header_item_vals)

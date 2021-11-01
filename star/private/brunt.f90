@@ -268,22 +268,22 @@
             return
             write(*,2) 'logT_face', k, logT_face
             write(*,2) 'logRho_face', k, logRho_face
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% dq(k-1)', k-1, s% dq(k-1)
             write(*,2) 's% dq(k)', k, s% dq(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% T(k-1)', k-1, s% T(k-1)
             write(*,2) 'T_face', k, T_face
             write(*,2) 's% T(k)', k, s% T(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% rho(k-1)', k-1, s% rho(k-1)
             write(*,2) 'rho_face', k, rho_face
             write(*,2) 's% rho(k)', k, s% rho(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% chiT(k-1)', k-1, s% chiT(k-1)
             write(*,2) 'chiT_face', k, chiT_face
             write(*,2) 's% chiT(k)', k, s% chiT(k)
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'get_brunt_B')
          end if
 
@@ -330,7 +330,7 @@
                write(*,2) 's% lnPeos(k-1)', k-1, s% lnPeos(k-1)
                write(*,2) 'lnP1', k, lnP1
                write(*,2) 'lnP2', k, lnP2
-               write(*,*)
+               write(*,'(A)')
                !call mesa_error(__FILE__,__LINE__,'do_brunt_B_MHM_form')
             end if
             if (s% stop_for_bad_nums) then

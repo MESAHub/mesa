@@ -82,9 +82,9 @@
          end if
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'binary_history_columns_file <' // trim(filename) // '>'
-            write(*,*)
+            write(*,'(A)')
          end if
 
          call count_specs
@@ -133,9 +133,9 @@
          end if
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'done add_binary_history_columns ' // trim(filename)
-            write(*,*)
+            write(*,'(A)')
          end if
          
          

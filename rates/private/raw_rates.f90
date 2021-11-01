@@ -111,11 +111,11 @@
                   return
                else
                   ! We want a forward rate from a reverse table
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) "ERROR: Can not evalute ",trim(reaction_name(ir)), &
                              " from detailed balance with ",trim(reaction_name(rir))
                   write(*,*) "Provide either both rates or only provide ",trim(reaction_name(ir))
-                  write(*,*)
+                  write(*,'(A)')
                   call mesa_error(__FILE__,__LINE__)
                   return
                end if

@@ -149,7 +149,7 @@
             do j=1,num_gvals
                write(*,*) j, trim(gval_names(j))
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
 
          nz = nz_old
@@ -213,23 +213,23 @@
                end if
                if (k_old > comes_from(k-1)) then
                   if (xq0 /= xqold_start) then
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'nz_new', nz_new
                      write(*,2) 'k', k
                      write(*,2) 'comes_from(k-1)', comes_from(k-1)
                      write(*,2) 'k_old', k_old
                      write(*,2) 'comes_from(k)', comes_from(k)
                      write(*,2) 'nz_old', nz_old
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'xq0', k, xq0
                      write(*,2) 'xqold_start', k_old, xqold_start
                      write(*,2) 'xqold_end', k_old, xqold_end
                      write(*,2) 'xqold_end - xqold_start', k_old, xqold_end - xqold_start
                      write(*,2) 'xq0 - xqold_start', k_old, xq0 - xqold_start
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'xq_old(comes_from(k))', k, xq_old(comes_from(k))
                      write(*,2) 'xq_old(comes_from(k-1))', k, xq_old(comes_from(k-1))
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,*) 'k_old > comes_from(k-1)', k_old > comes_from(k-1)
                      write(*,*) 'xq0 /= xqold_start', xq0 /= xqold_start
                      write(*,*) 'mesh plan check_before_smooth'
@@ -238,13 +238,13 @@
                   end if
                else if (k_old == comes_from(k-1)) then
                   if (.not. (xq0 > xqold_start .and. xq0 < xqold_end)) then
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,*) '(.not. (xq0 > xqold_start .and. xq0 < xqold_end))', k_old
                      write(*,2) 'xq_new(k)', k, xq_new(k)
                      write(*,2) 'xq_old(k_old)', k, xq_old(k_old)
                      write(*,2) 'xq_old(k_old+1)', k, xq_old(k_old+1)
                      write(*,2) 'xqold_end', k, xqold_end
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,*) 'k_old == comes_from(k-1)', k_old == comes_from(k-1)
                      write(*,*) '.not. (xq0 > xqold_start .and. xq0 < xqold_end)', &
                         .not. (xq0 > xqold_start .and. xq0 < xqold_end)
@@ -390,11 +390,11 @@
                      write(*,2) 'nz_old', nz_old
                      write(*,2) 'k', k
                      write(*,2) 'nz_new', nz_new
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'dq_new(k)', k, dq_new(k)
                      write(*,2) 'dq_old(k_old)', k_old, dq_old(k_old)
                      write(*,2) 'dq_new(k)-dq_old(k_old)', k_old, dq_new(k)-dq_old(k_old)
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'xq_new(k)', k, xq_new(k)
                      write(*,2) 'xq_new(k)+dq_new(k)', k, xq_new(k)+dq_new(k)
                      write(*,2) 'xq_end', k, xq_end
@@ -489,7 +489,7 @@
                write(*,1) 'dq_new', dq_new
                write(*,1) 'min_dq_for_split', min_dq_for_split
                write(*,1) 'min_dq', min_dq
-               write(*,*)
+               write(*,'(A)')
             end if
 
             if (0d0 < remaining_dq_old .and. dq_new > 0.99d0*remaining_dq_old) then
@@ -497,7 +497,7 @@
                   write(*,2) 'dq_old', k_old, remaining_dq_old
                   write(*,1) 'dq_new', dq_new
                   write(*,1) 'dq_new/remaining_dq_old', dq_new/remaining_dq_old
-                  write(*,*)
+                  write(*,'(A)')
                end if
                return
             end if
@@ -645,7 +645,7 @@
 
                ! make initial choice based on gradients. may reduce later.
                if (dbg) then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,3) 'call pick_next_dq', k_old, k_new, next_dq_max
                end if
                
@@ -828,7 +828,7 @@
                         next_dq = next_xq - xq_new(k_new)
                         if (dbg) then
                            write(*,3) 'force merge', k_old, k_new, next_xq, next_dq
-                           write(*,*)
+                           write(*,'(A)')
                         end if
                      end if
 
@@ -875,7 +875,7 @@
 
                xq_new(k_new) = next_xq
                if (abs(xq_new(k_new) - dq_sum) > 1d-6) then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) 'k_new', k_new
                   write(*,1) 'xq_new(k_new) - dq_sum', xq_new(k_new) - dq_sum
                   write(*,1) 'xq_new(k_new)', xq_new(k_new)

@@ -96,7 +96,7 @@
          s% nz = nz
          write(*,1) 'new old L_surf/Lsun', s% xh(s% i_lum,1)/Lsun, old_L1/Lsun
          write(*,1) 'new old R_surf/Rsun', exp(s% xh(s% i_lnR,1))/Rsun, old_r1/Rsun
-         write(*,*)
+         write(*,'(A)')
          !call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2')
          
          contains
@@ -379,7 +379,7 @@
                   logT, res, d_dlnd, d_dlnT, dres_dxa, ierr)
                if (ierr /= 0) then
                   write(*,2) 'solve_eos_given_DP failed', k
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'sum(xa)', sum(s% xa(:,k))
                   do j=1,s% species
                      write(*,4) 'xa(j,k) ' // trim(chem_isos% name(s% chem_id(j))), j, j+s% nvar_hydro, k, s% xa(j,k)
@@ -389,7 +389,7 @@
                   write(*,1) 'logT_guess', logT_guess
                   write(*,1) 'logT_tol', logT_tol
                   write(*,1) 'logP_tol', logP_tol
-                  write(*,*)
+                  write(*,'(A)')
                   call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
                end if
                s% lnT(k) = logT*ln10

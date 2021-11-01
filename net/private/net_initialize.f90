@@ -406,10 +406,10 @@
          end if
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'read_net_file <' // trim(filename) // '>'
             write(*,*) 'net_filename <' // trim(net_filename) // '>'
-            write(*,*)
+            write(*,'(A)')
          end if
 
          n = 0
@@ -521,9 +521,9 @@
 ! done with network veracity checks
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'done read_net_file ' // trim(filename)
-            write(*,*)
+            write(*,'(A)')
          end if
          
          
@@ -1336,7 +1336,7 @@
                   // ' ' // trim(chem_isos% name(reaction_screening_info(2,ir)))  &
                   // ' ' // trim(chem_isos% name(reaction_screening_info(3,ir)))
          end do
-         write(*,*)
+         write(*,'(A)')
       end subroutine show_scr3
       
       
@@ -1740,7 +1740,7 @@
          write(*,2) 'num_general_one_one_kind', num_general_one_one_kind
          write(*,2) 'num_general_two_one_kind', num_general_two_one_kind
          write(*,2) 'num_general_two_two_kind', num_general_two_two_kind
-         write(*,*)
+         write(*,'(A)')
          
          !stop
 

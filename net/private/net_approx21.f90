@@ -1873,7 +1873,7 @@
                !write(*,*) ' please report it.  can edit the file in eos/private to remove this test. '
                write(*,1) 'logT', n% logT
                write(*,1) 'approx21_eps_info'
-               write(*,*)
+               write(*,'(A)')
                do i=1,num_categories
                   if (abs(eps_nuc_categories(i)) > 1d-6) then
                      write(*,1) trim(category_name(i)), eps_nuc_categories(i)
@@ -1886,7 +1886,7 @@
                write(*,1) 'sum(cat)', sum_categories_q
                write(*,1) 'sum(cat) - eps_nuc', sum_categories_q - eps_nuc_q
                write(*,1) 'sum(cat)/eps_nuc - 1', (sum_categories_q - eps_nuc_q)/eps_nuc_q
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
             !$OMP end critical (net21_crit1)
             end if
@@ -1900,7 +1900,7 @@
                write(*,2) 'icrx ' // trim(chem_isos% name(n% g% approx21_ye_iso)), icrx
                write(*,2) 'fe56ec_n_neut', fe56ec_n_neut
                write(*,1) 'fe56ec_fake_factor', fe56ec_fake_factor
-               write(*,*)
+               write(*,'(A)')
                do i=1,num_categories
                   write(*,1) trim(category_name(i)), eps_nuc_categories(i)
                end do

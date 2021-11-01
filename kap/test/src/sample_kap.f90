@@ -149,9 +149,9 @@
       enddo
       close(iounit)
 
-      write(*,*)
+      write(*,'(A)')
       write(*,*) 'Z_init', Z_init
-      write(*,*)
+      write(*,'(A)')
 
       rq1% Zbase = Z_init
       rq2% Zbase = Z_init

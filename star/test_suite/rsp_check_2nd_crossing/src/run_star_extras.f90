@@ -251,7 +251,7 @@ module run_star_extras
                      4, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)    
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm red edge')
                   Teff_red_edge = v_new(1)
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
                   write(io_out,*)
                   write(io_out,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
@@ -271,7 +271,7 @@ module run_star_extras
                3, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)    
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm red edge')
             Teff_red_edge = v_new(1)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
             write(io_out,*)
             write(io_out,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
@@ -317,7 +317,7 @@ module run_star_extras
                write(io_out,'(a20,f20.10)') 'Teff_blue_edge', Teff_blue_edge
             end if
          end if
-         write(*,*)
+         write(*,'(A)')
          write(io_out,*)
          if (Teff_blue_edge < 0d0) then
             write(*,*) 'failed to find blue edge'         
@@ -348,7 +348,7 @@ module run_star_extras
             offset = offset + 100d0
          end do
          write(io_out,*)
-         write(*,*)
+         write(*,'(A)')
          
          close(io_out)
 
@@ -398,9 +398,9 @@ module run_star_extras
          extras_finish_step = keep_going
          if (s% x_integer_ctrl(1) <= 0) return
          if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
@@ -414,9 +414,9 @@ module run_star_extras
             write(*,*) 'good match for period', &
                s% rsp_period/(24*3600), target_period
          end if
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
       

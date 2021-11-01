@@ -449,7 +449,7 @@
                call mesa_error(__FILE__,__LINE__,'run_adipls')
             end if            
             
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a)') 'call adipls to read ' // trim(filename)
             call setups_adi
             nn_arg_0 = 0
@@ -467,7 +467,7 @@
             end if
             
             write(*,*) 'back from 1st call on adipls'
-            write(*,*)
+            write(*,'(A)')
 
          end subroutine setup_adipls
 
@@ -513,7 +513,7 @@
             
             rewind(iounit)
                        
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a)') 'call srdist to read ' // trim(filename)
             
             istdin = iounit
@@ -537,7 +537,7 @@
             end if
             
             write(*,*) 'back from 1st call on srdist'
-            write(*,*)
+            write(*,'(A)')
 
          end subroutine setup_redist
 
@@ -1078,7 +1078,7 @@
          do k = 1, num_results
             write(*,4) 'ADIPLS', k, el(k), order(k), cyclic_freq(k), inertia(k)
          end do
-         write(*,*)
+         write(*,'(A)')
       end subroutine show_adipls_results
 
 

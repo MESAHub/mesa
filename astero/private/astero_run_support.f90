@@ -417,7 +417,7 @@
                next_my_param3_to_try = filedata(file_column_for_my_param3) 
                write(*,1) 'next_my_param3_to_try', next_my_param3_to_try
             end if
-            write(*,*)
+            write(*,'(A)')
             
             call do1_grid(ierr)
             if (ierr /= 0) then
@@ -501,7 +501,7 @@
          write(*,2) 'num_my_param1', num_my_param1
          write(*,2) 'num_my_param2', num_my_param2
          write(*,2) 'num_my_param3', num_my_param3
-         write(*,*)
+         write(*,'(A)')
          
          sample_number = 0
          just_counting = .false.
@@ -737,7 +737,7 @@
 
          call bobyqa_or_newuoa_fun(n,x,f)
 
-         write(*,*)
+         write(*,'(A)')
          ierr = 0
          call save_sample_results_to_file(-1,bobyqa_output_filename,ierr)
          if (ierr /= 0) then
@@ -757,7 +757,7 @@
          
          call bobyqa_or_newuoa_fun(n,x,f)
 
-         write(*,*)
+         write(*,'(A)')
          ierr = 0
          call save_sample_results_to_file(-1,newuoa_output_filename,ierr)
          if (ierr /= 0) then
@@ -842,7 +842,7 @@
          
          call save_best_for_sample(sample_number, 0)
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'current set of sample results'
          call show_all_sample_results(6,-1,ierr)
          if (ierr /= 0) then
@@ -876,8 +876,8 @@
          include 'formats'
          ierr = 0
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          if (vary_Y) then
             nvar = nvar+1; i_Y = nvar
@@ -1035,8 +1035,8 @@
          
          ierr = 0
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          if (vary_Y) then
             next_Y_to_try = simplex_param( &
@@ -1487,7 +1487,7 @@
                      simplex_inverse(sample_my_param3(i), first_my_param3, min_my_param3, max_my_param3)
                   write(*,3) 'my_param3', j, i, sample_my_param3(i)
                end if
-               write(*,*)
+               write(*,'(A)')
             end do
             
             deallocate(index)
@@ -1514,8 +1514,8 @@
                   write(*,'(i6)') i
                end if
             end do
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             num_samples = max_i
             
          end subroutine setup_simplex_and_f
@@ -1651,7 +1651,7 @@
                   avg_model_number_top_samples*avg_model_number_top_samples/n)/(n-1)))
          avg_model_number_top_samples = avg_model_number_top_samples/n
          
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'n for averages', n
          write(*,1) 'avg_age_top_samples', avg_age_top_samples
          write(*,1) 'avg_age_sigma', avg_age_sigma
@@ -1661,7 +1661,7 @@
          write(*,1) 'model number limit', &
             avg_model_number_top_samples + &
                avg_model_number_sigma_limit*avg_model_number_sigma
-         write(*,*)
+         write(*,'(A)')
          !call mesa_error(__FILE__,__LINE__,'set_sample_averages')
          
       end subroutine set_sample_averages

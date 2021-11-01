@@ -217,7 +217,7 @@
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         write(*,*)
+         write(*,'(A)')
          write(*,'(2a8,99a20)') 'el', 'order', 'freq (microHz)', 'inertia', 'growth rate (s)'
          do i = 1, num_results
             write(*,'(2i8,f20.10,2e20.10,i20)') l_to_match, order(i), cyclic_freq(i), inertia(i), growth_rate(i)

@@ -125,7 +125,7 @@
             write(iounit,'(a)',advance='no') &
                ', dq=fraction of total mstar in cell; remaining cols are mass fractions.'
          end if
-         write(iounit,*)
+         write(iounit,'(A)')
          ! write property list
          write(iounit, '(a)') ! blank line before start of property list
          write(iounit, 4) 'version_number', "'" // trim(version_number) // "'"
@@ -242,7 +242,7 @@
             real(dp), intent(in) :: val
             integer, intent(out) :: ierr
             call write1(val,ierr)
-            write(iounit,*)
+            write(iounit,'(A)')
          end subroutine write1_eol
 
          subroutine write1(val,ierr)

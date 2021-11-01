@@ -938,14 +938,14 @@
                   s% dt_next = 1d-5*secyer
                case (do_create_pre_ms_model)
                   if (s% initial_mass < min_mass_for_create_pre_ms) then
-                     write(*,*)
-                     write(*,*)
-                     write(*,*)
+                     write(*,'(A)')
+                     write(*,'(A)')
+                     write(*,'(A)')
                      write(*,'(a,1x,f5.2)') 'sorry: cannot create pre-ms smaller than', &
                         min_mass_for_create_pre_ms
                      write(*,'(a)') &
                         'please create pre-ms and then relax to lower mass as a separate operation'
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,'(a)') 'here is an example:'
                      write(*,'(a)') 'in your inlist &controls section, set initial_mass = 0.03'
                      write(*,'(a)') 'in the &star_job section, add something like these lines'
@@ -953,9 +953,9 @@
                      write(*,'(a)') '  dlgm_per_step = 1d-3 ! log10(delta M/Msun/step)'
                      write(*,'(a)') '  new_mass = 2.863362d-3 ! 3 Mjupiter in Msun units'
                      write(*,'(a)') '  change_mass_years_for_dt = 1'
-                     write(*,*)
-                     write(*,*)
-                     write(*,*)
+                     write(*,'(A)')
+                     write(*,'(A)')
+                     write(*,'(A)')
                      ierr = -1
                      return
                   end if
@@ -1119,13 +1119,13 @@
                   1d-3*initial_mass .and. initial_mass > 0) then
                write(*,1) "WARNING -- inlist initial_mass ignored", initial_mass
                write(*,1) "using saved initial_mass instead", s% initial_mass
-               write(*,*)
+               write(*,'(A)')
             end if
             if (abs(initial_z - s% initial_z) > &
                   1d-3*initial_z .and. initial_z > 0) then
                write(*,1) "WARNING -- inlist initial_z ignored", initial_z
                write(*,1) "using saved initial_z instead", s% initial_z
-               write(*,*)
+               write(*,'(A)')
             end if
          end subroutine check_initials
 
