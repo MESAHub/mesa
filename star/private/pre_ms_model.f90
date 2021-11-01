@@ -131,7 +131,7 @@
             do i=1,species
                write(*,1) trim(chem_isos% name(s% chem_id(i))), xa(i)
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (abs(1-sum(xa(:))) > 1d-8) then
@@ -249,12 +249,12 @@
          nz = s% nz
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'finished pre-MS model'
             write(*,1) 'mstar1/Msun', mstar1/Msun
             write(*,1) '(mstar-mstar1)/mstar', (mstar-mstar1)/mstar
             write(*,*) 'nz', nz
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'debug: pre ms')
          end if
 
@@ -370,7 +370,7 @@
          if (dbg) then
             write(*,1) 'rho_c', rho_c
             write(*,1) 'pre_ms_f', pre_ms_f
-            write(*,*)
+            write(*,'(A)')
          end if
 
       end function pre_ms_f

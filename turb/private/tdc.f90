@@ -204,7 +204,7 @@ contains
             write(*,*) 'L0', L0%val
             write(*,*) 'grada', grada%val
             write(*,*) 'gradL', gradL%val
-            write(*,*)
+            write(*,'(A)')
          ierr = 1
          return
       end if
@@ -350,7 +350,7 @@ contains
             write(*,*) 'L0', L0%val
             write(*,*) 'grada', grada%val
             write(*,*) 'gradL', gradL%val
-            write(*,*)
+            write(*,'(A)')
          !$OMP end critical (tdc_crit0)
          end if
          return

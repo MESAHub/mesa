@@ -84,9 +84,9 @@
          end if
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'weak info filename <' // trim(filename) // '>'
-            write(*,*)
+            write(*,'(A)')
          end if
 
          do ! skip to line starting with 'from '
@@ -205,9 +205,9 @@
             end if
          
             if (dbg) then
-               write(*,*)
+               write(*,'(A)')
                write(*,*) 'weaklib filename <' // trim(filename) // '>'
-               write(*,*)
+               write(*,'(A)')
             end if
 
             do ! skip to after line starting with '='
@@ -434,7 +434,7 @@
                         read(iounit,fmt='(a)') string
                         write(*,'(a)') trim(string)
                      end do
-                     write(*,*)
+                     write(*,'(A)')
                      call mesa_error(__FILE__,__LINE__,'read_table')
                   end if
                   return

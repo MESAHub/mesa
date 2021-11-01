@@ -256,7 +256,7 @@
                   write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
                   write(*,2) 'old dt', s% model_number, s% dt
                   write(*,2) 'reduced dt', s% model_number, dt_max
-                  write(*,*)
+                  write(*,'(A)')
                   call mesa_error(__FILE__,__LINE__,'HYD compressing innermost cell')
                end if
                s% dt = dt_max
@@ -490,7 +490,7 @@
                ! if higher order is worse by a significant factor safe, then bail
                if (abs(a(i,i) - a(i - 1,i - 1)) >= safe*err) then
                   !write(*,1) 'higher order is worse'
-                  write(*,*)
+                  write(*,'(A)')
                   return
                end if
             end do

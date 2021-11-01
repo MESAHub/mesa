@@ -482,7 +482,7 @@
 
          include 'formats'
 
-         write(*,*)
+         write(*,'(A)')
          select case (s% x_integer_ctrl(1))
          case (1)
             write(*,'(A70, F8.3)') '[TestHub] Main-sequence lifetime (Gyr): ', (ms_t1 - ms_t0) / 1d9
@@ -575,7 +575,7 @@
             end if
 
          end select
-         write(*,*)
+         write(*,'(A)')
 
          call test_suite_after_evolve(s, ierr)
 

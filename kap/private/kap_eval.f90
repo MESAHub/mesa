@@ -374,7 +374,7 @@
            write(*,1) 'beta', beta
            write(*,1) 'kap2 (highT)', kap2
            write(*,1) 'kap', kap
-           write(*,*)
+           write(*,'(A)')
         end if
 
         if (dbg) write(*,1) 'Get_kap_blend_logT kap', kap
@@ -618,7 +618,7 @@
            write(*,1) 'max_frac_Type2', max_frac_Type2
            write(*,1) 'frac_Type2', frac_Type2
            write(*,1) 'frac_Type1', frac_Type1
-           write(*,*)
+           write(*,'(A)')
            write(*,1) 'X', X
            write(*,1) 'dXC', dXC
            write(*,1) 'dXO', dXO
@@ -651,7 +651,7 @@
               write(*,1) 'logT', logT
               write(*,1) 'kap_beta', kap_beta
               write(*,1) 'beta', beta
-              write(*,*)
+              write(*,'(A)')
            end if
         else
            kap_beta = 0d0; dlnkap_beta_dlnRho = 0d0; dlnkap_beta_dlnT = 0d0
@@ -672,7 +672,7 @@
               write(*,1) 'logT', logT
               write(*,1) 'kap_alfa', kap_alfa
               write(*,1) 'alfa', alfa
-              write(*,*)
+              write(*,'(A)')
            end if
         else
            kap_alfa = 0d0; dlnkap_alfa_dlnRho = 0d0; dlnkap_alfa_dlnT = 0d0

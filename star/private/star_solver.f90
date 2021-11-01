@@ -1100,7 +1100,7 @@
             integer :: i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             include 'formats'
             ierr = 0
-            write(*,*)
+            write(*,'(A)')
             i_equ = lookup_nameofequ(s, s% solver_test_partials_equ_name)      
             if (i_equ == 0 .and. len_trim(s% solver_test_partials_equ_name) > 0) then
                if (s% solver_test_partials_equ_name == 'lnE') then ! testing eos
@@ -1176,7 +1176,7 @@
                         i_equ, i, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                         k, save_dx, save_equ, ierr)
                      if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
-                     write(*,*)
+                     write(*,'(A)')
                   end do
                else if (i_var == 0) then
                   write(*,*) 'failed to recognize variable name'
@@ -1217,7 +1217,7 @@
                end if
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
             end if               
-            write(*,*)
+            write(*,'(A)')
          end subroutine test_equ_partials
          
          
@@ -1555,7 +1555,7 @@
 !                  'analytic/numeric', abs(dvardx_0)/max(1d-99,abs(dvardx))
                   
             else
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic and numeric partials wrt ' // trim(s% nameofvar(i_var)), &
                   dvardx_0, dvardx
                write(*,1) 'log dfridr relative uncertainty for numeric partial', &

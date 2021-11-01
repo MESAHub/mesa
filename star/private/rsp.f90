@@ -242,7 +242,7 @@
               (s% atm_option /= 'T_tau' .or. &
                s% atm_T_tau_relation /= 'Eddington' .or. &
                s% atm_T_tau_opacity /= 'iterated')) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'when RSP_use_atm_grey_with_kap_for_Psurf, must set:'
             write(*,*) '   atm_option = ''T_tau'''
             write(*,*) '   atm_T_tau_relation = ''Eddington'''
@@ -536,12 +536,12 @@
                   do n=1,num_map_cols
                      write(io,'(1x,i18)',advance='no') n+2
                   end do
-                  write(io,*)
+                  write(io,'(A)')
                   write(io,'(a18,1x,a4)',advance='no') 'phase', 'zone'
                   do n=1,num_map_cols
                      write(io,'(1x,a18)',advance='no') trim(map_col_names(n))
                   end do
-                  write(io,*)
+                  write(io,'(A)')
                   writing_map = .true.
                   done_writing_map = .false.
                   s% need_to_set_history_names_etc = .true.
@@ -558,7 +558,7 @@
                         write(io,'(1x,d18.10)',advance='no') &
                            get_profile_val(s,map_ids(n),k)
                      end do
-                     write(io,*)
+                     write(io,'(A)')
                      !write(io,778) FASE,I,s% T(k), &
                      !    s% Hp_face(k),s% Y_face(k),s% PII(k),s% Lc(k)/s% L(k), &
                      !    4d0*pi*s% r(k)**2*s% Fr(k)/s% L(k),s% Lt(k)/s% L(k), &

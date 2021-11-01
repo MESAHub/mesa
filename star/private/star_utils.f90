@@ -2824,20 +2824,20 @@
          integer, intent(in) :: nvar
          real(dp) :: dmat(nvar,nvar)
          integer :: i, j
-         write(*,*)
+         write(*,'(A)')
          write(*,'(18x)', advance = 'no') 
          do j = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofvar(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          do i = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofequ(i)
             do j = 1, nvar
                write(*,'(e13.4,2x)', advance = 'no') dmat(i,j)
             end do
-            write(*,*)
+            write(*,'(A)')
          end do
-         write(*,*)
+         write(*,'(A)')
       end subroutine show_matrix
 
 
@@ -3402,7 +3402,7 @@
          integer :: j
          include 'formats'
          !$OMP critical (omp_write_eos_call_info)
-         write(*,*)
+         write(*,'(A)')
          do j=1,s% species
             write(*,4) 'xa(j,k) ' // trim(chem_isos% name(s% chem_id(j))), j, j+s% nvar_hydro, k, s% xa(j,k)
          end do
@@ -3412,7 +3412,7 @@
          write(*,1) 'rho = ', s% rho(k)
          write(*,1) 'T = ', s% T(k)
          write(*,1) 'logQ = ', s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'eos_frac_OPAL_SCVH',    s% eos_frac_OPAL_SCVH(k)
          write(*,1) 'eos_frac_HELM',    s% eos_frac_HELM(k)
          write(*,1) 'eos_frac_Skye',    s% eos_frac_Skye(k)
@@ -3420,7 +3420,7 @@
          write(*,1) 'eos_frac_FreeEOS', s% eos_frac_FreeEOS(k)
          write(*,1) 'eos_frac_CMS',     s% eos_frac_CMS(k)
          write(*,1) 'eos_frac_ideal',     s% eos_frac_ideal(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Peos = ', s% Peos(k)
          write(*,1) 'Prad = ', s% Prad(k)
          write(*,1) 'logPeos = ', s% lnPeos(k)/ln10
@@ -3439,7 +3439,7 @@
          write(*,1) 'log_free_e = ', s% lnfree_e(k)/ln10
          write(*,1) 'chiRho = ', s% chiRho(k)
          write(*,1) 'chiT = ', s% chiT(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'do_eos_for_cell k, nz', k, s% nz
          write(*,1) 'logRho = ', s% lnd(k)/ln10
          write(*,1) 'logT = ', s% lnT(k)/ln10
@@ -3447,11 +3447,11 @@
          write(*,1) 'x = ', s% X(k)
          write(*,1) 'abar = ', s% abar(k)
          write(*,1) 'zbar = ', s% zbar(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'tau = ', s% tau(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 's% eos_rq% tiny_fuzz', s% eos_rq% tiny_fuzz
-         write(*,*)
+         write(*,'(A)')
          !call mesa_error(__FILE__,__LINE__,'write_eos_call_info')
          !$OMP end critical (omp_write_eos_call_info)
       end subroutine write_eos_call_info

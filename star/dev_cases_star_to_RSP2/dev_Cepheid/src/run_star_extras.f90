@@ -380,9 +380,9 @@
          
          subroutine report_test_results
             real(dp) :: rel_run_E_err
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
             rel_run_E_err = s% cumulative_energy_error/s% total_energy
             write(*,*) 'rel_run_E_err', rel_run_E_err
             if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
@@ -395,9 +395,9 @@
                write(*,*) 'good match for period', &
                   period/(24*3600), target_period
             end if
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
          end subroutine report_test_results
          
       end function extras_finish_step
@@ -646,10 +646,10 @@
             s% xh(i_v,k) = vel(k)
          end do
          
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'v_surf F 1 2', v_surf, v(1,nz-1), v(2,nz-1), v(3,nz-1)
          write(*,1) 'amixF amix1 amix2', amixF, amix1, amix2
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'nz', nz
          write(*,1) 'v(1)/1d5', vel(1)/1d5    
          write(*,1) 'T(nz)', s% T(s%nz)             

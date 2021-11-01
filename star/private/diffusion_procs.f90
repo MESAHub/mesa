@@ -435,16 +435,16 @@
                         write(*,3) 'dm', j, k, dm
                         write(*,3) 'sum_00 - dm', j, k, sum_00 - dm
                         write(*,3) 'sum_mass(k)', j, k, sum_mass(k)
-                        write(*,*)
+                        write(*,'(A)')
                         write(*,3) 'sum_m1', j, k, sum_m1
                         write(*,3) 'sum_p1', j, k, sum_p1
-                        write(*,*)
+                        write(*,'(A)')
                         write(*,3) 'm_m1', j, k, m_m1
                         write(*,3) 'm_00', j, k, m_00
                         write(*,3) 'm_p1', j, k, m_p1
-                        write(*,*)
+                        write(*,'(A)')
                         write(*,3) 'xavg', j, k, xavg
-                        write(*,*)
+                        write(*,'(A)')
 
                         call mesa_error(__FILE__,__LINE__,'fixup')
                      end if
@@ -680,7 +680,7 @@
                      dm_p1 = sum_mass(k+1)
                      write(*,1) 'xp1', mass(j,k+1)/dm_p1
                   end if
-                  write(*,*)
+                  write(*,'(A)')
                end if
                dX_dm(1:nc,k) = 0d0
                exit
@@ -774,7 +774,7 @@
                      dm = integrate_mass(j,dm0,dm1,diff_dm)
                      if (dm < 0d0) then
                         write(*,3) 'dm', j, k, dm
-                        write(*,*)
+                        write(*,'(A)')
                         call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                      end if
                      X_new(j,k) = X_new(j,k) + dm/cell_dm_k
@@ -789,7 +789,7 @@
                         write(*,3) 'dm0', j, k, dm0
                         write(*,3) 'dm1', j, k, dm1
                         write(*,3) 'remaining_source_mass', j, k, remaining_source_mass
-                        write(*,*)
+                        write(*,'(A)')
                         call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                      end if
                      remaining_needed_mass = remaining_needed_mass - dm
@@ -907,7 +907,7 @@
             write(*,2) 'nzlo', nzlo
             write(*,2) 'nzhi', nzhi
             write(*,2) 'nz', nz
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'redistribute_mass')
          end if
 

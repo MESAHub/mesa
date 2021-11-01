@@ -88,7 +88,7 @@
          
          if (.not. s% x_logical_ctrl(1)) return
          
-         write(*,*)
+         write(*,'(A)')
          call check('star_mass', s% star_mass, 12.5d0, 14.0d0)
          call check('log total_angular_momentum', safe_log10(s% total_angular_momentum), 50d0, 52.5d0)
          call check('log center_omega', safe_log10(s% center_omega), -5.0d0, -3.0d0)
@@ -104,7 +104,7 @@
             if (s% m(k) > 3.4d0*Msun .and. k_surf == 0) k_surf = k
          end do
          
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'avg from 3.0 to 3.4 Msun'
          call check('logT', avg_val(s% lnT)/ln10, 7.5d0, 8.1d0)
          call check('logRho', avg_val(s% lnd)/ln10, 1d0, 3.0d0)
@@ -112,9 +112,9 @@
          call check('D_ES', safe_log10(avg_val(s% D_ES)), 3.5d0, 6.5d0) 
          call check('D_ST', safe_log10(avg_val(s% D_ST)), 1.0d0, 10.0d0)
          call check('nu_ST', safe_log10(avg_val(s% nu_ST)), 9.1d0, 11.9d0)
-         write(*,*)
+         write(*,'(A)')
          if (okay) write(*,'(a)') 'all values are within tolerances'
-         write(*,*)
+         write(*,'(A)')
          
          
          contains

@@ -1262,10 +1262,10 @@
 
  102  continue
  
-      write(*,*)
+      write(*,'(A)')
       write(*,*) ' NO CONVERGENCE IN RELAX_ENV, ITERATION: ',II
       write(*,*) ' try increasing RSP_relax_dm_tolerance', s% RSP_relax_dm_tolerance
-      write(*,*)
+      write(*,'(A)')
       ierr = -1
       return
       stop

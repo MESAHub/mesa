@@ -177,7 +177,7 @@
             write(*,2) 'nzlo', nzlo
             write(*,2) 'nzhi', nzhi
             write(*,2) 'nz', nz
-            write(*,*)
+            write(*,'(A)')
          end if
 
 
@@ -919,7 +919,7 @@
 
                if (retry_count == 1) then ! save starting X in X_0
                   if (trace) then
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) '1st try for substep', steps_used
                   end if
                   do k=nzlo,nzhi
@@ -931,7 +931,7 @@
                   end do
                else ! prepare for retry of solve_loop
                   if (trace) then
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'retry substep', steps_used
                   end if
                   dt = dt*dt_retry_factor
@@ -1292,10 +1292,10 @@
                end do
 
                if (dbg .and. i == i_dbg .and. k == k_dbg .and. iter == iter_dbg) then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) 'dgb get_timescale'
                   call show_stuff
-                  write(*,*)
+                  write(*,'(A)')
                end if
 
                dxdt = (flow_in - flow_out)/cell_dm(k)
@@ -1347,13 +1347,13 @@
             include 'formats'
             dr = 0.5d0*(r_face(k-1) - r_face(k+1))
 
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'timescale total_time', &
                steps_used, iter, i, k, dt, total_time
             write(*,'(a30,4i6)') trim(chem_isos% name(class_chem_id(i))) // &
                ' nzlo, nzhi, nz', nzlo, nzhi, nz
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'dX', &
                steps_used, iter, i, k, &
                dt*(flow_in - flow_out)/cell_dm(k)
@@ -1363,7 +1363,7 @@
             write(*,'(a30,4i6,99e14.5)') 'dX SIG', &
                steps_used, iter, i, k, &
                dt*(flow_in_SIG - flow_out_SIG)/cell_dm(k)
-            write(*,*)
+            write(*,'(A)')
 
             write(*,'(a30,4i6,99e14.5)') 'dX in', &
                steps_used, iter, i, k, &
@@ -1371,53 +1371,53 @@
             write(*,'(a30,4i6,99e14.5)') 'dX out', &
                steps_used, iter, i, k, &
                dt*flow_out/cell_dm(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'rho', &
                steps_used, iter, i, k+1, s% rho(k+1)
             write(*,'(a30,4i6,99e14.5)') 'rho', &
                steps_used, iter, i, k, s% rho(k)
             write(*,'(a30,4i6,99e14.5)') 'rho', &
                steps_used, iter, i, k-1, s% rho(k-1)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'C', &
                steps_used, iter, i, k+1, X(i,k+1)*C_div_X(i,k+1)
             write(*,'(a30,4i6,99e14.5)') 'C', &
                steps_used, iter, i, k, X(i,k)*C_div_X(i,k)
             write(*,'(a30,4i6,99e14.5)') 'C', &
                steps_used, iter, i, k-1, X(i,k-1)*C_div_X(i,k-1)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'X', &
                steps_used, iter, i, k+1, X(i,k+1)
             write(*,'(a30,4i6,99e14.5)') 'X', &
                steps_used, iter, i, k, X(i,k)
             write(*,'(a30,4i6,99e14.5)') 'X', &
                steps_used, iter, i, k-1, X(i,k-1)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'X_face', &
                steps_used, iter, i, k+1, X_face(i,k+1)
             write(*,'(a30,4i6,99e14.5)') 'X_face', &
                steps_used, iter, i, k, X_face(i,k)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'dt*v_advection_face/dr', &
                steps_used, iter, i, k+1, dt*v_advection_face(i,k+1)/dr
             write(*,'(a30,4i6,99e14.5)') 'dt*v_advection_face/dr', &
                steps_used, iter, i, k, dt*v_advection_face(i,k)/dr
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'dt*v_advection_face', &
                steps_used, iter, i, k+1, dt*v_advection_face(i,k+1)
             write(*,'(a30,4i6,99e14.5)') 'dt*v_advection_face', &
                steps_used, iter, i, k, dt*v_advection_face(i,k)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'v_advection_face', &
                steps_used, iter, i, k+1, v_advection_face(i,k+1)
             write(*,'(a30,4i6,99e14.5)') 'v_advection_face', &
                steps_used, iter, i, k, v_advection_face(i,k)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,4i6,99e14.5)') 'GT_face', &
                steps_used, iter, i, k+1, GT_face(i,k+1)
             write(*,'(a30,4i6,99e14.5)') 'GT_face', &
                steps_used, iter, i, k, GT_face(i,k)
-            write(*,*)
+            write(*,'(A)')
 
             write(*,2) 'i_dbg', i_dbg
             write(*,2) 'k_dbg', k_dbg
@@ -1869,7 +1869,7 @@
             write(io,'(a20)',advance='no') &
                'v_' // trim(chem_isos% name(class_chem_id(j)))
          end do
-         write(io,*)
+         write(io,'(A)')
 
          do k=nzlo,nzhi
             write(io,'(i6)',advance='no') k
@@ -1884,7 +1884,7 @@
             do j=1,nc
                write(io,'(1pe20.12)',advance='no') v(j,k)
             end do
-            write(io,*)
+            write(io,'(A)')
          end do
 
          close(io)

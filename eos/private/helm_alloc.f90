@@ -280,7 +280,7 @@
                   do k=1,9
                      write(*,'(1pd24.16)',advance='no') vec(k)
                   end do
-                  write(*,*)
+                  write(*,'(A)')
                end if
             enddo
           enddo
@@ -303,7 +303,7 @@
                do k=1,4
                   write(*,'(1pd24.16)',advance='no') vec(k)
                end do
-               write(*,*)
+               write(*,'(A)')
             end if
            enddo
           enddo
@@ -326,7 +326,7 @@
                do k=1,4
                   write(*,'(1pd24.16)',advance='no') vec(k)
                end do
-               write(*,*)
+               write(*,'(A)')
             end if
            enddo
           enddo
@@ -349,7 +349,7 @@
                do k=1,4
                   write(*,'(1pd24.16)',advance='no') vec(k)
                end do
-               write(*,*)
+               write(*,'(A)')
             end if
            enddo
           enddo

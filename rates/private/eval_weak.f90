@@ -325,7 +325,7 @@
             write(*,1) 'lYeRho', lYeRho
             write(*,1) 'eta', eta
             write(*,1) 'mue', mue
-            write(*,*)
+            write(*,'(A)')
             do i = 1, n
                ir = ids(i)
                in = weak_lhs_nuclide_id(i)
@@ -341,7 +341,7 @@
                   write(*,2) 'Qx', i, chem_isos% mass_excess(in) - chem_isos% mass_excess(out)
                   write(*,2) 'Q', i, Q(i)
                   write(*,2) 'Qneu', i, Qneu(i)
-                  write(*,*)
+                  write(*,'(A)')
                end if
             end do
             call mesa_error(__FILE__,__LINE__)

@@ -276,13 +276,13 @@
          if (dbg_adjm) then
             env_mass = old_mstar - s% he_core_mass*Msun
             write(*,'(a40,f26.16)') 'env_mass/old_mstar', env_mass/old_mstar
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'delta_m/old_mstar', delta_m/old_mstar
             write(*,1) 's% he_core_mass*Msun', s% he_core_mass*Msun
             write(*,1) 'env_mass', env_mass
             write(*,1) 'delta_m/env_mass', delta_m/env_mass
             write(*,1) 'log10(abs(delta_m/env_mass))', safe_log10(abs(delta_m/env_mass))
-            write(*,*)
+            write(*,'(A)')
          end if
 
          call do_alloc(ierr)
@@ -740,9 +740,9 @@
             write(*,1) 'xqA', xqA
             write(*,*) 'kB', kB
             write(*,1) 'xqB_old', xqB_old
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'xqA-xqB_old', xqA-xqB_old
-            write(*,*)
+            write(*,'(A)')
          end if
 
          xqB_new = dqacc + xqB_old*mold_o_mnew  ! in order to keep m interior to kB constant
@@ -795,7 +795,7 @@
             write(*,2) 'kA', kA
             write(*,2) 'kB', kB
             write(*,2) 'nz', nz
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'adjust_mass')
          end if
 
@@ -1032,7 +1032,7 @@
             if (xm1 < xm_outer) then
                ierr = -1
                if (.not. xa_dbg) return
-               write(*,*)
+               write(*,'(A)')
                write(*,*) 'k', k
                write(*,*) 'kk', kk
                write(*,1) 'xm1', xm1

@@ -98,15 +98,15 @@
             if (ierr/= 0) then
                write(*,*) 'table_atm_init: missing atm data'
                write(*,*) trim(filename)
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
                write(*,*) 'FATAL ERROR: missing or bad atm data.'
                write(*,*) 'Please update by removing the directory mesa/data/atm_data,'
                write(*,*) 'and rerunning the mesa ./install script.'
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
             endif
 
@@ -378,11 +378,11 @@
             write(*,1) 'newPgas', newPgas
             write(*,1) 'dPgas_dTeff', dPgas_dTeff
             write(*,1) 'dPgas_dlogg', dPgas_dlogg
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'newT', newT
             write(*,1) 'dT_dTeff', dT_dTeff
             write(*,1) 'dT_dlogg', dT_dlogg
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
             return
             !if (is_bad(newPgas) .or. is_bad(newT)) call mesa_error(__FILE__,__LINE__,'get_table_values')
@@ -521,15 +521,15 @@
             if (ierr/= 0) then
                write(*,*) 'load_atm_table: missing atm data:'
                write(*,*) trim(filename)
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
                write(*,*) 'FATAL ERROR: missing or bad atm data.'
                write(*,*) 'Please update by removing the directory mesa/data/atm_data,'
                write(*,*) 'and rerunning the mesa ./install script.'
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
             endif
             
@@ -539,17 +539,17 @@
                write(*,*) 'load_atm_table: mismatch in table versions'
                write(*,*) 'expected version ', table_atm_version
                write(*,*) 'received version ', text_file_version
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
                write(*,*) 'FATAL ERROR: out-of-date verion of atm data.'
                write(*,*) 'Please update by removing the directory mesa/data/atm_data,'
                write(*,*) 'and rerunning the mesa ./install script.'
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
             endif
             
@@ -563,7 +563,7 @@
                do j=1,ng
                   write(*,*) j, ibound_tmp(j)
                end do
-               write(*,*)
+               write(*,'(A)')
             end if
             if (failed(2)) return
             read(iounit,2,iostat=ierr) logg_tmp(:)

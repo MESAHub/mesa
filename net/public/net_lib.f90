@@ -231,7 +231,7 @@
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         write(iounit,*)
+         write(iounit,'(A)')
          write(iounit,'(4x,a30,3a16,4x,a4,4x,a20)') 'name', 'Qtotal', 'Qneu', 'category', 'info', 'source'
          do i = 1, g% num_reactions
             id = g% reaction_id(i)
@@ -261,7 +261,7 @@
                end if
             end if
          end do
-         write(iounit,*)
+         write(iounit,'(A)')
       end subroutine show_net_reactions_and_info
       
       

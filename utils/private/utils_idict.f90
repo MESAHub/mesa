@@ -307,7 +307,7 @@
          end if
 !$omp end critical (idict_define)
          if (dbg) then ! check tree
-            write(*,*)
+            write(*,'(A)')
             call check_idict(idict, ierr)
             call show_key1_key2_entries(idict)
             write(*,*) 'done insert', key1, key2
@@ -402,9 +402,9 @@
          logical, parameter :: dbg = .false.
          if (dbg) then
             call show_key1_key2_entries(idict)
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'lookup key1, key2', key1, key2
-            write(*,*)
+            write(*,'(A)')
          end if
          ierr = 0
          value = 0

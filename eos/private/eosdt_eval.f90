@@ -1131,7 +1131,7 @@
             logRho4 = logQ2 + 2*logT7 - 12d0
             
             if (.false.) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logRho1', logRho1
                write(*,1) 'logRho2', logRho2
                write(*,1) 'logRho3', logRho3
@@ -1140,7 +1140,7 @@
                write(*,1) 'logRho6', logRho6
                write(*,1) 'logRho7', logRho7
                write(*,1) 'logRho8', logRho8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logT1', logT1
                write(*,1) 'logT2', logT2
                write(*,1) 'logT3', logT3
@@ -1149,10 +1149,10 @@
                write(*,1) 'logT6', logT6
                write(*,1) 'logT7', logT7
                write(*,1) 'logT8', logT8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logQ1', logQ1
                write(*,1) 'logQ2', logQ2
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'eosdt_eval')
             end if
 
@@ -1163,11 +1163,11 @@
                 logRho7 <= logRho8 .or. &
                 logT1 <= logT2 .or. logT2 <= logT3 .or. logT3 <= logT4 .or. &
                 logT7 <= logT8) then
-               write(*,*)
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
                write(*,'(a)') 'must have strictly decreasing values for eos logT + logRho region boundaries'
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logRho1', logRho1
                write(*,1) 'logRho2', logRho2
                write(*,1) 'logRho3', logRho3
@@ -1176,7 +1176,7 @@
                write(*,1) 'logRho6', logRho6
                write(*,1) 'logRho7', logRho7
                write(*,1) 'logRho8', logRho8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logT1', logT1
                write(*,1) 'logT2', logT2
                write(*,1) 'logT3', logT3
@@ -1185,11 +1185,11 @@
                write(*,1) 'logT6', logT6
                write(*,1) 'logT7', logT7
                write(*,1) 'logT8', logT8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logQ1', logQ1
                write(*,1) 'logQ2', logQ2
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
                if (logT3 <= logT4) then
                   write(*,'(a)') 'must have logRho1 > logRho2 + logQ1 - logQ2'
                   write(*,1) 'must have logRho1 > ', logRho2 + logQ1 - logQ2
@@ -1198,7 +1198,7 @@
                   write(*,'(a)') 'logRho2_OPAL_SCVH_limit sets logRho2'
                   write(*,1) 'max allowed logRho1 is', logRho1_max
                end if
-               write(*,*)
+               write(*,'(A)')
                ierr = -1
                return
             end if
@@ -2485,7 +2485,7 @@
                   write(*,1) 'logRho', logRho
                   write(*,1) 'T', T
                   write(*,1) 'logT', logT
-                  write(*,*)
+                  write(*,'(A)')
                   call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
                end if
                return
@@ -2503,7 +2503,7 @@
                write(*,1) 'logRho', logRho
                write(*,1) 'T', T
                write(*,1) 'logT', logT
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
             end if
             

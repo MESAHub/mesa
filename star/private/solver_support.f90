@@ -78,7 +78,7 @@
                do j=1,nvar
                   write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, s% x_scale(j,k)
                end do
-               write(*,*)
+               write(*,'(A)')
             end do
             call mesa_error(__FILE__,__LINE__,'set_xscale')
          end subroutine dump_xscale
@@ -174,7 +174,7 @@
                do j=1,nvar
                   write(*,2) 'dx ' // trim(s% nameofvar(j)), k, s% solver_dx(j, k)
                end do
-               write(*,*)
+               write(*,'(A)')
             end do
             call mesa_error(__FILE__,__LINE__,'dump_eval_equ')
          end subroutine dump_eval_equ
@@ -313,7 +313,7 @@
                   write(*,3) 'equ ' // trim(s% nameofequ(j)), &
                      k, s% solver_iter, s% equ(j, k)
                end do
-               write(*,*)
+               write(*,'(A)')
                !if (k == 6) exit
             end do
          end subroutine dump_equ
@@ -583,7 +583,7 @@
             real(dp) :: dx, prev, new
             include 'formats'
             if (s% solver_iter == 1) then
-               write(*,*)
+               write(*,'(A)')
                write(*,'(4a7,12a16,99a13)') &
                   'model', 'iter', 'var', 'zone', &
                   'corr norm', 'max corr', 'xscale', &
@@ -616,7 +616,7 @@
                do j=1,nvar
                   write(*,2) 'B ' // trim(s% nameofequ(j)), k, B(j, k)
                end do
-               write(*,*)
+               write(*,'(A)')
             end do
             call mesa_error(__FILE__,__LINE__,'dump_equ')
          end subroutine dump_B
@@ -785,7 +785,7 @@
                   write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, s% x_scale(j, k)
                   write(*,2) 'dx ' // trim(s% nameofvar(j)), k, s% solver_dx(j, k)
                end do
-               write(*,*)
+               write(*,'(A)')
             end do
             call mesa_error(__FILE__,__LINE__,'dumpB')
          end subroutine dumpB
@@ -1098,7 +1098,7 @@
 
                   end if
                end do
-               write(*,*)
+               write(*,'(A)')
 
             end if
             return

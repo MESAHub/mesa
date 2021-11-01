@@ -1088,7 +1088,7 @@
             rho_L = dML/dVL
             if (rho_R <= 1d-16 .or. rho_L <= 1d-16) then
    !$omp critical (adjust_mesh_split_merge_crit2)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'nz', nz
                write(*,2) 'rho_RR', iR-1, rho_RR
                write(*,2) 'rho_iR', iR, rho_iR
@@ -1101,13 +1101,13 @@
                write(*,2) 'rho_RR - rho_iR', iR, rho_RR - rho_iR
                write(*,2) 'dr for right', iR, (s% r(iR-1) - s% r(iR+1))/2
                write(*,2) 'grad_rho', iR, grad_rho
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 's% r(iL)', iL, s% r(iL)
                write(*,2) 'dR', iC, dR
                write(*,2) 'dRho', iC, grad_rho*dR
                write(*,2) 'rho_R', iC, rho_R
                write(*,2) 'rho_L', iC, rho_L
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'failed in do_split extrapolation of density from above')
    !$omp end critical  (adjust_mesh_split_merge_crit2)        
             end if

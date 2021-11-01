@@ -92,7 +92,7 @@
          end if
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'profile_columns_file <' // trim(filename) // '>'
          end if
 
@@ -175,9 +175,9 @@
          close(iounit)
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'done add_profile_columns ' // trim(filename)
-            write(*,*)
+            write(*,'(A)')
          end if
 
 

@@ -402,19 +402,19 @@
          write(6,02) 'p gas   =', my_pgas, my_dpgasdd, my_dpgasdt, my_dpgasddd, my_dpgasddt, my_dpgasdtt
          write(6,02) 'p rad   =', my_prad, my_dpraddd, my_dpraddt, my_dpradddd, my_dpradddt, my_dpraddtt
 
-         write(6,*)
+         write(6,'(A)')
          write(6,02) 'e tot   =', my_etot, my_detotdd, my_detotdt, my_detotddd, my_detotddt, my_detotdtt
          write(6,02) 'e gas   =', my_egas, my_degasdd, my_degasdt, my_degasddd, my_degasddt, my_degasdtt
          write(6,02) 'e rad   =', my_erad, my_deraddd, my_deraddt, my_deradddd, my_deradddt, my_deraddtt
 
-         write(6,*)
+         write(6,'(A)')
          write(6,02) 's tot   =', my_stot, my_dstotdd, my_dstotdt, my_dstotddd, my_dstotddt, my_dstotdtt
          write(6,02) 's gas   =', my_sgas, my_dsgasdd, my_dsgasdt, my_dsgasddd, my_dsgasddt, my_dsgasdtt
          write(6,02) 's rad   =', my_srad, my_dsraddd, my_dsraddt, my_dsradddd, my_dsradddt, my_dsraddtt
 
 
 ! ion and free electron matter number density, electron degeneracy parameter
-         write(6,*)
+         write(6,'(A)')
          write(6,02) 'n_ion   =',my_xni, my_dxnidd, my_dxnidt
          write(6,02) 'n_ele   =',my_xne, my_dxnedd, my_dxnedt
          write(6,02) 'eta_e   =',my_eta, my_detadd, my_detadt
@@ -433,7 +433,7 @@
 
          write(6,02) 'c_sound =',my_cs, my_dcsdd, my_dcsdt
 
-         write(6,*)
+         write(6,'(A)')
          write(6,03) 'dsp   =',dse,'dpe   =',dpe,'dsp   =',dsp
 
       end subroutine PrettyOut

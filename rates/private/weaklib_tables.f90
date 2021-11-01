@@ -344,7 +344,7 @@ contains
          write(*,2) 'lYeRho', jy, y0, lYeRho, y1
          write(*,1) 'xpi', xpi
          write(*,1) 'ypi', ypi
-         write(*,*)
+         write(*,'(A)')
       end if
 
     end subroutine setup_for_bicubic_interpolations
@@ -383,7 +383,7 @@ contains
          write(*,1) 'fin(1,ix+1,jy+1)', fin(1,ix+1,jy+1)
          write(*,1) 'fval', fval
 
-         write(*,*)
+         write(*,'(A)')
          call mesa_error(__FILE__,__LINE__,'debug: do_bicubic_interpolations')
       end if
 
@@ -459,7 +459,7 @@ contains
          write(*,2) 'lYeRho', jy, y0, lYeRho, y1
          write(*,1) 'x_alfa, x_beta', x_alfa, x_beta
          write(*,1) 'y_alfa, y_beta', y_alfa, y_beta
-         write(*,*)
+         write(*,'(A)')
       end if
       
     end subroutine setup_for_linear_interp

@@ -414,7 +414,7 @@
             k0 = 1
             k0_from = 1
             k_outer = 2
-            write(*,*)
+            write(*,'(A)')
             do
                if (cell_type(k_outer) == unchanged_type .and. k_outer /= nz) then
                   k_outer = k_outer + 1
@@ -439,7 +439,7 @@
             end do
             write(*,2) 'nz_old', nz_old
             write(*,2) 'nz', nz
-            write(*,*)
+            write(*,'(A)')
 
          end subroutine show_errors
 
@@ -510,13 +510,13 @@
                      write(*,1) 'old mass fraction', old_total
                      write(*,1) 'new - old', new_total - old_total
                      write(*,1) '(new - old)/old', (new_total - old_total) / old_total
-                     write(*,*)
+                     write(*,'(A)')
                   end if
                end if
             end do
             if (okay) return
             ierr = -1
-            write(*,*)
+            write(*,'(A)')
             do j=1,species
                old_total = dot_product(xa_old(j,1:nz_old),dq_old(1:nz_old))
                if (old_total < 1d-9) cycle
@@ -524,7 +524,7 @@
                write(*,2) 'new - old mass fraction ' // chem_isos% name(s% chem_id(j)), &
                      j, new_total-old_total
             end do
-            write(*,*)
+            write(*,'(A)')
             j = jbad
             do k=2, nz
                if (comes_from(k) == comes_from(k-1)) cycle
@@ -534,27 +534,27 @@
                write(*,2) 'partial new - old ' // chem_isos% name(s% chem_id(j)), k, &
                   new_total-old_total, new_total, old_total
             end do
-            write(*,*)
+            write(*,'(A)')
             do k=415, nz
                write(*,'(a30,99i6)') 'cell_type(k)', k, cell_type(k), comes_from(k)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'xq', 439, xq(439)
             write(*,2) 'xq_old', 429, xq_old(429)
             write(*,2) 'dq_old', 429, dq_old(429)
             write(*,2) 'dq', 439, dq(439)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'xq', 424, xq(424)
             write(*,2) 'xq_old', 428, xq_old(428)
             write(*,2) 'dq_old', 428, dq_old(428)
             write(*,2) 'sum dq', 424, sum(dq(424:438))
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'xq_old + dq_old', 428, xq_old(428) + dq_old(428)
             write(*,2) 'xq_old', 429, xq_old(429)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'xq + sum dq', 424, xq(424) + sum(dq(424:438))
             write(*,2) 'xq', 439, xq(439)
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'sum dq_old', sum(dq_old(1:nz_old))
 
             write(*,2) 'dq_old', 427, dq_old(427)
@@ -1090,7 +1090,7 @@
                write(*,3) 'bad old vol', k, nz_old
                write(*,1) 'Vol_old_plus1(k)', Vol_old_plus1(k)
                write(*,1) 'Vol_old_plus1(k-1)', Vol_old_plus1(k-1)
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_lnR_and_lnd')
             end if
          end do
@@ -1351,26 +1351,26 @@
                do jj=1,species
                   write(*,1) 'xa ' // trim(chem_isos% name(s% chem_id(jj))), xa(jj,k)
                end do
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'sum xa', k, sum(xa(:,k))
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'xa ' // trim(chem_isos% name(s% chem_id(j))), k, xa(j,k)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'xq_outer', k, xq_outer
                write(*,2) 'xq_inner', k, xq_outer + cell_dq
                write(*,2) 'cell_dq', k, cell_dq
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'xq_old(k_old)', k_old, xq_old(k_old)
                write(*,2) 'xq_inner(k_old)', k_old, xq_old(k_old)+dq_old(k_old)
                write(*,2) 'dq_old(k_old)', k_old, dq_old(k_old)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'xa_c0(k_old,j)', k_old, xa_c0(k_old,j)
                write(*,2) 'xa_c1(k_old,j)', k_old, xa_c1(k_old,j)
                write(*,2) 'xa_c2(k_old,j)', k_old, xa_c2(k_old,j)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'old outer', k_old, xa_c0(k_old,j) + xa_c1(k_old,j)*dq_old(k_old)/2
                write(*,2) 'old inner', k_old, xa_c0(k_old,j) - xa_c1(k_old,j)*dq_old(k_old)/2
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_xa')
             end if
          end do
@@ -1765,17 +1765,17 @@
 
          subroutine show
             include 'formats'
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'set_lnT_for_energy ierr', ierr
             write(*,*) 'k', k
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'lnT =', lnT
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'logRho =', logRho
             write(*,1) 'logT_guess =', lnT_guess/ln10
             write(*,1) 'energy =', energy
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
          end subroutine show
 
       end subroutine set_lnT_for_energy_with_tol
@@ -1855,16 +1855,16 @@
                write(*,2) 'v(j,k)', k, v(j,k)
                write(*,2) 'vbdy2', k, vbdy2
                write(*,2) 'v(j,k+1)', k+1, v(j,k+1)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'v(j,k-1) - vbdy1', k, v(j,k-1) - vbdy1
                write(*,2) 'vbdy1 - v(j,k+1)', k, vbdy1 - v(j,k+1)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'v(j,k-1) - vbdy2', k, v(j,k-1) - vbdy2
                write(*,2) 'vbdy2 - v(j,k+1)', k, vbdy2 - v(j,k+1)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'sm1', k, sm1
                write(*,2) 's00', k, s00
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'debug: get1_lpp')
             end if
             c2(k) = 0
@@ -1991,7 +1991,7 @@
                write(*,2) 'dq1', k, dq1
                write(*,2) 'avg_value', k, avg_value
                write(*,2) 'integral', k, integral
-               write(*,*)
+               write(*,'(A)')
             end if
             k_old_last = k
             if (old_xq_inner >= xq_inner) exit ! this is the last one

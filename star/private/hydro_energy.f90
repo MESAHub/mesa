@@ -151,7 +151,7 @@
                write(*,2) 'X', k, s% X(k)
                write(*,2) 'Z', k, s% Z(k)
             end if
-            write(*,*)
+            write(*,'(A)')
          end if
          
          contains

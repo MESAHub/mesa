@@ -1322,7 +1322,7 @@ contains
     write(*,*) '  sel_t         :', zi%sel_t
     write(*,*) '  sel_b         :', zi%sel_b
     write(*,*) '  avoid_inc_iso :', zi%avoid_inc_iso
-    write(*,*)
+    write(*,'(A)')
 
     ! Finish
 

@@ -553,7 +553,7 @@
          end if       
          
          write(*,'(a)') '#    T8     rate'
-         write(*,*)
+         write(*,'(A)')
          write(*,*) nrattab
          
          do j = 1, nrattab
@@ -567,7 +567,7 @@
             T8 = exp10(logT - 8d0)
             write(*,'(1pe26.16,3x,1pe26.16e3)') T8, rate
          end do         
-         write(*,*)
+         write(*,'(A)')
          
          close(io_unit)
       
@@ -643,18 +643,18 @@
 
 !$omp critical  (rates_eval_reaclib_21)
          write(*,1) 'do_eval_reaclib_21 ' // trim(reaction_Name(ir))
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'den', den
          write(*,1) 'temp', temp
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'lambda', lambda
          write(*,1) 'dlambda_dlnT', dlambda_dlnT
          write(*,1) 'rate_raw', rate_raw(1:num_rvs)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'rlambda', rlambda
          write(*,1) 'drlambda_dlnT', drlambda_dlnT
          write(*,1) 'reverse_rate_raw', reverse_rate_raw(1:num_rvs)
-         write(*,*)
+         write(*,'(A)')
 !$omp end critical  (rates_eval_reaclib_21)
          
       end subroutine do_eval_reaclib_21
@@ -694,18 +694,18 @@
 
 !$omp critical  (rates_eval_reaclib_22)
          write(*,1) 'do_eval_reaclib_22 ' // trim(reaction_Name(ir))
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'den', den
          write(*,1) 'temp', temp
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'lambda', lambda
          write(*,1) 'dlambda_dlnT', dlambda_dlnT
          write(*,1) 'rate_raw', rate_raw(1:num_rvs)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'rlambda', rlambda
          write(*,1) 'drlambda_dlnT', drlambda_dlnT
          write(*,1) 'reverse_rate_raw', reverse_rate_raw(1:num_rvs)
-         write(*,*)
+         write(*,'(A)')
          !call mesa_error(__FILE__,__LINE__,'do_eval_reaclib_22')
 !$omp end critical  (rates_eval_reaclib_22)
          

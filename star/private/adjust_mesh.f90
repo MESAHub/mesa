@@ -308,11 +308,11 @@
          if (dbg_remesh .or. dbg) write(*,*) 'back from mesh_plan'
 
          if (ierr /= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'mesh_plan problem'
             write(*,*) 'doing mesh_call_number', s% mesh_call_number
             write(*,*) 's% model_number', s% model_number
-            write(*,*)
+            write(*,'(A)')
             s% termination_code = t_adjust_mesh_failed
             remesh = terminate
             s% result_reason = adjust_mesh_failed
@@ -463,7 +463,7 @@
             write(*,*) '                 split', split
             write(*,*) '                merged', merged
             write(*,*) '               revised', revised
-            write(*,*)
+            write(*,'(A)')
 
          end if
 
@@ -484,7 +484,7 @@
             write(*,*) 's% model_number', s% model_number
             write(*,*) 's% nz', s% nz
             write(*,*) 's% num_retries', s% num_retries
-            write(*,*)
+            write(*,'(A)')
          end if
 
          if (remesh /= keep_going) then
@@ -503,7 +503,7 @@
                   write(*,2) 'adjust_mesh J_tot', &
                      s% model_number, (J_tot2 - J_tot1)/J_tot2, J_tot2, J_tot1
                   write(*,*) 'failure to conserve angular momentum in adjust_mesh'
-                  write(*,*)
+                  write(*,'(A)')
                end if
                ierr = -1
                call dealloc

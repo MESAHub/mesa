@@ -339,7 +339,7 @@
                write(*,3) 'energy', k, s% solver_iter, s% energy(k)
                write(*,3) 'L', k, s% solver_iter, s% L(k)
                write(*,3) 'L', k+1, s% solver_iter, s% L(k+1)
-               write(*,*)
+               write(*,'(A)')
                !if (k == 6) exit
             end do
          end subroutine dump_equ

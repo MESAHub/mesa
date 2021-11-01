@@ -273,7 +273,7 @@
             do j=1,num_categories
                write(*,2) trim(category_name(j)), j, s% eps_nuc_categories(j,k)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'logRho', log10_Rho
             write(*,1) 'logT', log10_T
             write(*,1) 'eps_nuc', s% eps_nuc(k)
@@ -334,7 +334,7 @@
 
          if (ierr /= 0) then
             if (s% report_ierr) then
-               write(*,*)
+               write(*,'(A)')
                write(*,*) 'do1_net: net_get failure for cell ', k
                !return
                call show_stuff(s,k,net_lwork,net_work)
@@ -388,7 +388,7 @@
          end if
          
          if (k == -1) then
-            write(*,*)
+            write(*,'(A)')
             call show_stuff(s,k,net_lwork,net_work)
          end if
 
@@ -398,14 +398,14 @@
          end if
          
          if (.false.) then
-            write(*,*)
+            write(*,'(A)')
             call show_stuff(s,k,net_lwork,net_work)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,1) 's% eps_nuc(k)', s% eps_nuc(k)
             write(*,1) 's% d_epsnuc_dlnd(k)', s% d_epsnuc_dlnd(k)
             write(*,1) 's% d_epsnuc_dlnT(k)', s% d_epsnuc_dlnT(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'do1_net'
             stop
             !ierr = -1
@@ -468,7 +468,7 @@
 
          i = max(species, num_reactions)
          allocate(v(i), index(i))
-         write(*,*)
+         write(*,'(A)')
          if (.true.) then
             write(*, *)
             if (do_sort) then
@@ -490,7 +490,7 @@
          end if
 
          if (.false.) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'screened rates'
             do j=1,num_reactions
                write(*,3) 'screened rate ' // trim(reaction_Name(reaction_id(j))), &
@@ -499,19 +499,19 @@
          end if
 
          if (.true.) then
-            write(*,*)
+            write(*,'(A)')
             do j=1,species
                write(*,2) 'dxdt ' // trim(chem_isos% name(s% chem_id(j))), k, s% dxdt_nuc(j, k)
             end do
-            write(*,*)
+            write(*,'(A)')
             do j=1,species
                write(*,2) 'd_epsnuc_dx ' // trim(chem_isos% name(s% chem_id(j))), k, s% d_epsnuc_dx(j, k)
             end do
          end if
-         write(*,*)
+         write(*,'(A)')
 
          if (.false.) then
-            write(*,*)
+            write(*,'(A)')
             do j=1,species
                write(*,2) 'dt*dxdt ' // trim(chem_isos% name(s% chem_id(j))), k, &
                   s% dt * s% dxdt_nuc(j, k)
@@ -529,7 +529,7 @@
                   index(j) = j
                end do
             end if
-            write(*,*)
+            write(*,'(A)')
             do i=1,species
                j = index(species+1-i)
                if (.true. .or. s% xa(j,k) > 1d-9) &
@@ -545,25 +545,25 @@
          end if
 
          write(*,2) 'k', k
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'net_name ', trim(s% net_name)
          write(*,*) 'species', species
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'logT =', log10_T
          write(*,1) 'T =', s% T(k)
          write(*,1) 'logRho =', log10_Rho
          write(*,1) 'rho =', s% rho(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'eta =', s% eta(k)
          write(*,1) 'd_eta_lnT =', s% d_eos_dlnT(i_eta,k)
          write(*,1) 'd_eta_lnd =', s% d_eos_dlnd(i_eta,k)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'abar =', s% abar(k)
          write(*,1) 'zbar =', s% zbar(k)
          write(*,1) 'z2bar =', s% z2bar(k)
          write(*,1) 'ye =', s% ye(k)
          write(*,*) 'screening_mode = ' // trim(s% screening_mode)
-         write(*,*)
+         write(*,'(A)')
 
       end subroutine show_stuff
 

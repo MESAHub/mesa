@@ -420,7 +420,7 @@
          end if
          
          if (s% job% show_log_description_at_start .and. .not. restart) then
-            write(*,*)
+            write(*,'(A)')
             call show_log_description(id, ierr)
             if (failed('show_log_description',ierr)) return
          end if
@@ -455,8 +455,8 @@
          call do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          if (failed('do_star_job_controls_after',ierr)) return
 
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          if (.not. restart) then
             if (dbg) write(*,*) 'call before_evolve'
@@ -489,9 +489,9 @@
          end if
          
          if (len_trim(s% job% echo_at_start) > 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a)') trim(s% job% echo_at_start)
-            write(*,*)
+            write(*,'(A)')
          end if
 
       end subroutine do_before_evolve_loop
@@ -522,7 +522,7 @@
                .not. s% doing_timing) then
             s% doing_timing = .true.
             write(*,*) 'start timing', s% model_number
-            write(*,*)
+            write(*,'(A)')
             call system_clock(s% job% time0, s% job% clock_rate)
             s% job% time0_initial = s% job% time0
             s% job% step_loop_timing = 0
@@ -813,7 +813,7 @@
                   write(*,2) trim(dt_why_str(i)) // ' retries', s% dt_why_retry_count(i)
                end if
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          if (s% job% show_timestep_limit_counts_when_terminate) then
             do i=1,numTlim
@@ -821,7 +821,7 @@
                   write(*,2) trim(dt_why_str(i)) // ' dt limit', s% dt_why_count(i)
                end if
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          call do_saves(id, ierr)
          if (failed('do_saves terminate_normal_evolve_loop',ierr)) return
@@ -900,9 +900,9 @@
          end if
          
          if (len_trim(s% job% echo_at_end) > 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a)') trim(s% job% echo_at_end)
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (do_free_star) then
@@ -1181,7 +1181,7 @@
          s% time_total = s% job% check_before_step_timing + &
              s% job% check_step_loop_timing + s% job% check_after_step_timing
          
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a50,i18)') 'nz', s% nz
          write(*,'(a50,i18)') 'nvar_total', s% nvar_total
          write(*,'(a50,i18)') trim(s% net_name) // ' species', s% species
@@ -1193,7 +1193,7 @@
             s% timing_num_solve_eos_calls
          write(*,'(a50,i18)') 'timing_num_get_kap_calls', &
             s% timing_num_get_kap_calls
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a50,i18)') 'threads', omp_num_threads
          total = 0
          item_num = 0
@@ -1221,8 +1221,8 @@
          index(1:num_items) => index_arry(1:num_items)
          call qsort(index, num_items, item_values)
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          do i=1,num_items
             j = index(num_items+1-i)
             if (item_values(j) == 0d0) cycle
@@ -1232,15 +1232,15 @@
          end do
          
          if (s% job% step_loop_timing/s% job% elapsed_time < 0.9d0) then
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,1) 'before_step', s% job% before_step_timing/s% job% elapsed_time
             write(*,1) 'step_loop', s% job% step_loop_timing/s% job% elapsed_time
             write(*,1) 'after_step', s% job% after_step_timing/s% job% elapsed_time
-            write(*,*)
+            write(*,'(A)')
          end if
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          
          contains
@@ -1554,14 +1554,14 @@
          do k = 1, s% nz
             sumdq = sumdq + s% dq(k)
             if (sumdq >= dq) then
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'total mass in cells from 1 to k', k, sumdq*s% xmstar
                write(*,2) 'logT(k)', k, s% lnT(k)/ln10
                write(*,2) 'logRho(k)', k, s% lnd(k)/ln10
                write(*,2) 'entropy(k)', k, exp(s% lnS(k))*amu/kerg
                write(*,2) 'xmstar*q(k)', k, s% xmstar*s% q(k)
                write(*,2) 'q(k)', k, s% q(k)
-               write(*,*)
+               write(*,'(A)')
                return
             end if
          end do
@@ -1814,7 +1814,7 @@
             if (failed('star_load_restart_photo',ierr)) return
          else if (s% job% load_saved_photo) then
             write(*,'(a)') 'load saved photo ' // trim(s% job% saved_photo_name)
-            write(*,*)
+            write(*,'(A)')
             call star_load_restart_photo(id, s% job% saved_photo_name, ierr)
             if (failed('star_load_restart_photo',ierr)) return
          else if (s% job% load_saved_model) then
@@ -1835,7 +1835,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
             write(*,'(a)') 'load saved model ' // trim(s% job% load_model_filename)
-            write(*,*)
+            write(*,'(A)')
             call star_read_model(id, s% job% load_model_filename, ierr)
             if (failed('star_read_model',ierr)) return
          else if (s% job% create_merger_model) then
@@ -2073,7 +2073,7 @@
             !write(*,*)
             s% dt_next = s% dt_next/5
             !write(*,1) 'reduce timestep', log10(s% dt_next/secyer)
-            write(*,*)
+            write(*,'(A)')
          end subroutine change_net
          
          
@@ -2396,7 +2396,7 @@
             write(*,2) 'first_model_for_timing', s% job% first_model_for_timing
          
          if (s% job% set_uniform_initial_composition .and. .not. restart) then
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'set_uniform_initial_composition'
             write(*,1) 'initial_h1', s% job% initial_h1
             write(*,1) 'initial_h2', s% job% initial_h2
@@ -2967,14 +2967,14 @@
             do j=1,s% species
                write(*,'(i6,3x,a)') j, chem_isos% name(s% chem_id(j))
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (s% job% show_eqns_and_vars_names) then
             do i=1,s% nvar_total
                write(*,*) i, s% nameofvar(i), s% nameofequ(i)
             end do
-            write(*,*)
+            write(*,'(A)')
          end if         
          
          write(*,*) 'kap_option ' // trim(kap_option_str(s% kap_rq% kap_option))
@@ -2993,7 +2993,7 @@
             integer :: num_pts, num_species, i, iounit
             include 'formats'
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'relax_initial_composition'
 
             open(newunit=iounit, file=trim(s% job% relax_composition_filename), &
@@ -3014,7 +3014,7 @@
                write(*,*) 'Error in ',trim(s% job% relax_composition_filename)
                write(*,'(a,I4,a)') 'got ',num_species,' species'
                write(*,'(a,I4,a)') 'expected ', s% species,' species'
-               write(*,*)
+               write(*,'(A)')
                ierr=-1
                return
             end if
@@ -3047,7 +3047,7 @@
             integer :: num_pts, i, iounit
             include 'formats'
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'relax_initial_angular_momentum'
 
             open(newunit=iounit, file=trim(s% job% relax_angular_momentum_filename), &
@@ -3108,7 +3108,7 @@
             integer, parameter :: MAX_ITERS = 20
             include 'formats'
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'relax_initial_entropy'
 
             open(newunit=iounit, file=trim(s% job% relax_entropy_filename), &

@@ -300,7 +300,7 @@ contains
          write(*,2) 'lYeRho', jy, y0, lYeRho, y1
          write(*,1) 'x_alfa, x_beta', x_alfa, x_beta
          write(*,1) 'y_alfa, y_beta', y_alfa, y_beta
-         write(*,*)
+         write(*,'(A)')
       end if
 
     end subroutine setup_for_linear_interp
@@ -374,9 +374,9 @@ contains
      suzuki_data_dir = trim(mesa_data_dir) // '/rates_data'
      filename = trim(suzuki_data_dir) // '/suzuki/Suzuki2016.h5'
      if (dbg) then
-        write(*,*)
+        write(*,'(A)')
         write(*,*) 'read filename <' // trim(filename) // '>'
-        write(*,*)
+        write(*,'(A)')
      end if
 
      ! open file (read-only)

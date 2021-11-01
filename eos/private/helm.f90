@@ -292,7 +292,7 @@
             write(*,'(a30,99e26.16)') 'fi(3)*w0d*w0mt', fi(3)*w0d*w0mt, fi(3),w0d,w0mt 
             write(*,'(a30,99e26.16)') 'fi(4)*w0md*w0mt', fi(4)*w0md*w0mt, fi(4),w0md,w0mt
             write(*,'(a30,99e26.16)') '1 + 2 + 3 + 4', fi(1)*w0d*w0t + fi(2)*w0md*w0t + fi(3)*w0d*w0mt + fi(4)*w0md*w0mt
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a30,99e26.16)') 'fi(5)*w0d*w1t', fi(5)*w0d*w1t, fi(5),w0d,w1t  
             write(*,'(a30,99e26.16)') 'fi(6)*w0md*w1t', fi(6)*w0md*w1t, fi(6),w0md,w1t
             write(*,'(a30,99e26.16)') 'fi(7)*w0d*w1mt', fi(7)*w0d*w1mt, fi(7),w0d,w1mt 

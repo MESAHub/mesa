@@ -190,19 +190,19 @@
 
          if (warn) then
             write(*,*) "WARNING: you are calling a null version of " // trim(routine)
-            write(*,*)
+            write(*,'(A)')
             write(*,*) "If you have customized your run_star_extras.f file, your routine is not being called."
             write(*,*) "Check that your extras_controls has a line like"
             write(*,*) "    s% " // trim(routine) // " => " // trim(routine)
             write(*,*) "See $MESA_DIR/star/job/standard_run_star_extras.inc for the standard example."
-            write(*,*)
+            write(*,'(A)')
             write(*,*) "This error can also occur if you switched MESA versions without recompiling."
             write(*,*) "Do a ./clean and ./mk in your work directory to get recompiled."
-            write(*,*)
+            write(*,'(A)')
             write(*,*) "To disable this warning set"
             write(*,*) "    warn_run_star_extras = .false."
             write(*,*) "in your star_job inlist."
-            write(*,*)
+            write(*,'(A)')
             write(*,*) "MESA exited due to run_star_extras warning."
             stop
          end if

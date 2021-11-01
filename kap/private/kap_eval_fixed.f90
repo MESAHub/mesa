@@ -164,7 +164,7 @@
 
          if (dbg) then
             write(*,1) 'final logK at X and Z', logKap, logT, logRho, X, Z
-            write(*,*)
+            write(*,'(A)')
          end if
 
       end subroutine Get1_kap_fixed_metal_Results
@@ -249,25 +249,25 @@
                write(*,*) 'z_old(i)', z_old(i)
             end do
             write(*,*) 'z_new(1)', z_new(1)
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'logKs(i)', logKs(i)
             end do
             write(*,*) 'logK', logK
-            write(*,*)
+            write(*,'(A)')
 
             do i=1,n_old
                write(*,*) 'dlogKs_dlogRho(i)', dlogKs_dlogRho(i)
             end do
             write(*,*) 'dlnkap_dlnRho', dlnkap_dlnRho
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT(i)', dlogKs_dlogT(i)
             end do
             write(*,*) 'dlnkap_dlnT', dlnkap_dlnT
-            write(*,*)
+            write(*,'(A)')
             
          end if
          
@@ -453,7 +453,7 @@
          
          if (.false.) then
             write(*,1) 'logK at X for Z', logK, logT, logRho, X, z_tables(iz)% Z
-            write(*,*)
+            write(*,'(A)')
          end if
          
       end subroutine Get_Kap_for_X
@@ -539,25 +539,25 @@
                write(*,*) 'x_old(i)', x_old(i)
             end do
             write(*,*) 'x_new(1)', x_new(1)
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'logKs(i)', logKs(i)
             end do
             write(*,*) 'logK', logK
-            write(*,*)
+            write(*,'(A)')
 
             do i=1,n_old
                write(*,*) 'dlogKs_dlogRho(i)', dlogKs_dlogRho(i)
             end do
             write(*,*) 'dlogK_dlogRho', dlogK_dlogRho
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT(i)', dlogKs_dlogT(i)
             end do
             write(*,*) 'dlogK_dlogT', dlogK_dlogT
-            write(*,*)
+            write(*,'(A)')
             
          end if
          

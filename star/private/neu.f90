@@ -108,7 +108,7 @@
                write(*,1) 'log10_rho=', log10_rho
                write(*,1) 'abar', s% abar(k)
                write(*,1) 'zbar', s% zbar(k)
-               write(*,*)
+               write(*,'(A)')
                return
                stop
             end if

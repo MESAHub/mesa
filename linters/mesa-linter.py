@@ -84,13 +84,6 @@ def check_real(line):
         return "Declared real use real(dp) instead"
     return None
 
-
-def check_stop(line):
-    if re.search("stop\ [0-9]", line):
-        return "stop detected maybe use: call mesa_error(__FILE__,__LINE__) instead?"
-    return None
-
-
 def check_omp_critical(line):
     if "!$omp" in line and "critical" in line and "(" not in line and "end" not in line:
         return "Unnamed omp critical block"
@@ -103,15 +96,6 @@ def check_dp(line):
     return None
 
 
-def check_blank(line):
-    if (
-        line.strip() == "write(*,*)"
-        or line.strip() == "write(*,*) ''"
-        or line.strip() == 'write(*,*) ""'
-    ):  # test whole line
-        return "Don't write unformatted blank lines use write(*, '(a)')"
-    return None
-
 
 allchecks = [
     check_float,
@@ -119,10 +103,8 @@ allchecks = [
     check_real_op,
     check_real_exp,
     check_real_d,
-    check_stop,
     check_omp_critical,
     check_dp,
-    check_blank,
 ]
 
 if __name__ == "__main__":

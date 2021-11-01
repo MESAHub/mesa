@@ -3119,7 +3119,7 @@
             'work_arrays: num sz calls returns diff', &
             num, sz, num_calls, num_returns, num_calls-num_returns, &
             num_allocs, num_deallocs, num_allocs-num_deallocs
-         write(*,*)
+         write(*,'(A)')
 
          contains
 

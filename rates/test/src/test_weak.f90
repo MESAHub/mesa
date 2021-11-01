@@ -73,7 +73,7 @@ module test_weak
       write(*,1) trim(key)
       write(*,1) 'halflife', weak_info_list_halflife(i)
       write(*,1) 'Qneu', weak_info_list_Qneu(i)
-      write(*,*)
+      write(*,'(A)')
       
       d_eta_dlnT = 0
       d_eta_dlnRho = 0
@@ -123,7 +123,7 @@ module test_weak
       write(*,1) 'eta', eta
       write(*,1) 'T9', T9
       write(*,1) 'lYeRho', log10(YeRho)
-      write(*,*)
+      write(*,'(A)')
       
       nr = num_weak_reactions
       allocate( &
@@ -138,9 +138,9 @@ module test_weak
          reaction_ids(i) = i
       end do
       
-      write(*,*)
+      write(*,'(A)')
       write(*,2) 'nr', nr
-      write(*,*)
+      write(*,'(A)')
       
       call eval_weak_reaction_info( &
          nr, ids, reaction_ids, cc, T9, YeRho, &
@@ -170,7 +170,7 @@ module test_weak
             write(*,'(a30,99(1pe16.6))') weak_lhs // weak_rhs, &
                ln2/lambda(i), Qneu(i), Q(i)
          end do
-         write(*,*)
+         write(*,'(A)')
       else
          write(*,'(30x,5a12,a20)') 'Q', 'Qneu', 'lambda'
          do i = 1, nr
@@ -184,7 +184,7 @@ module test_weak
             write(*,'(a30,5f12.6,e20.12)') weak_lhs // weak_rhs, &
                Q(i), Qneu(i), lambda(i)
          end do
-         write(*,*)
+         write(*,'(A)')
          
          if (.false.) then
          write(*,'(a30,5a12,a20)') 'd_dT9', 'Q', 'Qneu', 'lambda'
@@ -195,7 +195,7 @@ module test_weak
             write(*,'(a30,5f12.6,e20.12)') weak_lhs // weak_rhs, &
                dQ_dlnT(i), dQneu_dlnT(i), dlambda_dlnT(i)
          end do
-         write(*,*)
+         write(*,'(A)')
          end if
       
          if (.false.) then
@@ -207,7 +207,7 @@ module test_weak
             write(*,'(a30,5f12.6,e20.12)') weak_lhs // weak_rhs, &
                dQ_dlnRho(i), dQneu_dlnRho(i), dlambda_dlnRho(i)
          end do
-         write(*,*)
+         write(*,'(A)')
          end if
 
       end if
@@ -246,7 +246,7 @@ module test_weak
             write(*,*) 'doing dlnT'
          end if
          write(*,*) 'test net'
-         write(*,*)
+         write(*,'(A)')
 
          end do
 

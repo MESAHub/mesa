@@ -95,22 +95,22 @@
          Pgas = exp(res(i_lnPgas))
 
          ! the indices for the results are defined in eos_def.f
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'temperature', T
          write(*,1) 'density', Rho
          write(*,1) 'logT', log10T
          write(*,1) 'logRho', log10(Rho)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Z', Z
          write(*,1) 'X', X
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Pgas', Pgas
          write(*,1) 'logPgas', res(i_lnPgas)/ln10
          write(*,1) 'grad_ad', res(i_grad_ad)
          write(*,1) 'c_P', res(i_Cp)
-         write(*,*)
+         write(*,'(A)')
 
          call eosPT_get(  &
                handle, &
@@ -120,22 +120,22 @@
                res, d_dlnd, d_dlnT, d_dxa, ierr)
       
          ! the indices for the results are defined in eos_def.f
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'temperature', T
          write(*,1) 'Pgas', Pgas
          write(*,1) 'logT', log10(T)
          write(*,1) 'logPgas', res(i_lnPgas)/ln10
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Z', Z
          write(*,1) 'X', X
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'density', Rho
          write(*,1) 'logRho', log10Rho
          write(*,1) 'grad_ad', res(i_grad_ad)
          write(*,1) 'c_P', res(i_Cp)
-         write(*,*)
+         write(*,'(A)')
 
          ! deallocate the eos tables
          call Shutdown_eos(handle)

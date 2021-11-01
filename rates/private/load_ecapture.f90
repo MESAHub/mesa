@@ -67,9 +67,9 @@ contains
     filename = trim(ecapture_states_file)
 
     if (dbg) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) 'ecapture states filename <' // trim(filename) // '>'
-       write(*,*)
+       write(*,'(A)')
     end if
 
     ierr = 0
@@ -209,9 +209,9 @@ contains
     filename = ecapture_transitions_file
 
     if (dbg) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) 'ecapture transitions filename <' // trim(filename) // '>'
-       write(*,*)
+       write(*,'(A)')
     end if
 
     ierr = 0

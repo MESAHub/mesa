@@ -464,7 +464,7 @@
          write(*,1) 'fr1', fr1
          write(*,1) 'rr', rr
          write(*,1) 'rr1', rr1
-         write(*,*)
+         write(*,'(A)')
          call mesa_error(__FILE__,__LINE__,'rate_tripalf_jina') 
       end subroutine rate_tripalf_jina
 
@@ -4271,7 +4271,7 @@
          write(*,1) 'dlambda_dlnT', dlambda_dlnT
          write(*,1) 'rlambda', rlambda
          write(*,1) 'drlambda_dlnT', drlambda_dlnT
-         write(*,*)
+         write(*,'(A)')
       end subroutine reaclib_rate_and_dlnT
 
 

@@ -50,11 +50,11 @@ module chem_support
       
       open(newunit=iounit, file=trim(inlist_fname), iostat=ios, status="old", action="read",delim='quote')
       if ( ios /= 0 ) then
-         write(*,*)
-      write(*,*)
+         write(*,'(A)')
+      write(*,'(A)')
       write(*,*) 'Failed to open namelist file ',trim(inlist_fname)
-      write(*,*)
-      write(*,*)
+      write(*,'(A)')
+      write(*,'(A)')
          stop
       end if
       read(iounit,nml=chem,iostat=ios)

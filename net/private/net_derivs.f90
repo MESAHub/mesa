@@ -500,39 +500,39 @@
             
             if (.false. .and. reaction_name(ir) == 'r_he4_si28_to_o16_o16') then ! .and. &
                   !y1 > 1d-20 .and. y2 > 1d-20 .and. y3 > 1d-20) then
-               write(*,*)
+               write(*,'(A)')
                write(*,2) trim(reaction_name(ir))
                write(*,2) trim(reaction_name(r_ir))
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'c1', c1
                write(*,2) 'c2', c2
                write(*,2) 'c3', c3
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'd1', d1
                write(*,1) 'd2', d2
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'dr1', d_ysf_dy1
                write(*,1) 'dr2', d_ysf_dy2
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'd_ysf_dy1', d_ysf_dy1
                write(*,1) 'd_ysf_dy2', d_ysf_dy2
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'y1',  y1
                write(*,1) 'y2',  y2
                write(*,1) 'y3',  y3
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'd_dydt_dy(i1,i1)',  - c1*d1
                write(*,1) 'd_dydt_dy(i1,i2)',  - c1*d2
                write(*,1) 'd_dydt_dy(i1,i3)',  c1*d3
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'd_dydt_dy(i2,i1)',  - c2*d1
                write(*,1) 'd_dydt_dy(i2,i2)',  - c2*d2
                write(*,1) 'd_dydt_dy(i2,i3)',  c2*d3
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'd_dydt_dy(i3,i1)',  c3*d1
                write(*,1) 'd_dydt_dy(i3,i2)',  c3*d2
                write(*,1) 'd_dydt_dy(i3,i3)',  -c3*d3
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'get_general_2_to_1_derivs')
             end if
                         
@@ -1451,7 +1451,7 @@
             if (.not. done) then ! weak reaction not in weaklib
 
                if (.false. .and. trim(reaction_Name(ir)) == 'r_o15_wk_n15') then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,'(2(i5,1x),a,2x,99e20.10)') i, ir, &
                        'do_one_one_neu ' // trim(reaction_Name(ir)) // ' ' // &
                        trim(chem_isos% name(g% chem_id(i1))) // ' => ' // &

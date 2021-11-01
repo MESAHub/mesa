@@ -511,17 +511,17 @@
 
          if (reaclib_min_T9_in > 0 .and. reaclib_min_T9_in /= reaclib_min_T9) then
             reaclib_min_T9 = reaclib_min_T9_in
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,1) 'change reaclib_min_T9', reaclib_min_T9
             write(*,1) 'must clear data/rates_data/cache of old reaclib rates'
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
          end if
 
          if (dbg) write(*,*) 'call net_init'

@@ -153,10 +153,10 @@ contains
 
     open(newunit=io_unit,file=trim(filename),action='read',status='old',iostat=ios)
     if (ios /= 0) then
-       write(*,*)
-       write(*,*)
-       write(*,*)
-       write(*,*)
+       write(*,'(A)')
+       write(*,'(A)')
+       write(*,'(A)')
+       write(*,'(A)')
        write(*,*) 'NOTICE: missing kap data ' // trim(filename)
        write(*,*) 
        write(*,*) 'Please check the validity of the kap_prefix string for this file.'
@@ -164,7 +164,7 @@ contains
        write(*,*) 'If it is okay, you may need to install new kap data.'
        write(*,*) 'To do that, remove the directory mesa/data/kap_data,'
        write(*,*) 'and rerun the mesa ./install script.'
-       write(*,*)
+       write(*,'(A)')
        call mesa_error(__FILE__,__LINE__)
     end if
 
@@ -197,15 +197,15 @@ contains
     end if
 
     if (ierr /= 0 .or. version < min_version) then
-       write(*,*)
-       write(*,*)
-       write(*,*)
-       write(*,*)
-       write(*,*)
+       write(*,'(A)')
+       write(*,'(A)')
+       write(*,'(A)')
+       write(*,'(A)')
+       write(*,'(A)')
        write(*,*) 'FATAL ERROR: out-of-date version of kap data ' // trim(filename)
        write(*,*) 'Please update by removing the directory mesa/data/kap_data,'
        write(*,*) 'and rerunning the mesa ./install script.'
-       write(*,*)
+       write(*,'(A)')
        call mesa_error(__FILE__,__LINE__)
     end if
 

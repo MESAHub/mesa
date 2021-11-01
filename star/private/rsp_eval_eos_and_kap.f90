@@ -404,17 +404,17 @@
                   write(*,1) 'zbar', zbar
                   write(*,1) 'logT_tol', logT_tol
                   write(*,1) 'egas_tol', egas_tol
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'guess logT', logT_guess
                   write(*,1) 'found logT', logT
                   write(*,1) 'wanted egas', egas
                   write(*,1) 'got egas', new_egas
                   write(*,1) '(want - got)/got', (egas - new_egas)/new_egas
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'eos_calls', eos_calls
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'failed eval1_mesa_eosDEgas_and_kap', k
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) 'is_bad(new_egas)', is_bad(new_egas)
                   write(*,*) 'new_egas <= 0d0', new_egas <= 0d0
                   write(*,*) 'abs(new_egas - egas) > egas_tol', &
@@ -542,17 +542,17 @@
                   write(*,1) 'zbar', zbar
                   write(*,1) 'logT_tol', logT_tol
                   write(*,1) 'logE_tol', logE_tol
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'guess logT', logT_guess
                   write(*,1) 'found logT', logT
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'wanted logE', logE_want
                   write(*,1) 'got logE', logE
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'eos_calls', eos_calls
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'failed eval1_mesa_eosDE_and_kap', k
-                  write(*,*)
+                  write(*,'(A)')
                   call mesa_error(__FILE__,__LINE__,'eval1_mesa_eosDE_and_kap')
                   !$OMP end critical (RSP_eosDE)
                end if
@@ -956,17 +956,17 @@
             write(*,1) 'zbar', zbar
             write(*,1) 'logT_tol', logT_tol
             write(*,1) 'egas_tol', egas_tol
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'guess logT', logT_guess
             write(*,1) 'found logT', logT_result
             write(*,1) 'wanted egas', egas_want
             write(*,1) 'got egas', new_egas
             write(*,1) '(want - got)/got', (egas_want - new_egas)/new_egas
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'eos_calls', eos_calls
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'failed set_T_for_new_egas', kk
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'is_bad(new_egas)', is_bad(new_egas)
             write(*,*) 'new_egas <= 0d0', new_egas <= 0d0
             write(*,*) 'abs(new_egas - egas_want) > egas_tol', &

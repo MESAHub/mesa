@@ -1416,7 +1416,7 @@
          do i = 1, species
             write(*,'(a40,i6,d26.16)')  'init x ' // trim(chem_isos% name(chem_id(i))), i, xin(i)
          end do
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a40,d26.16)') 'logT', logT
          write(*,'(a40,d26.16)') 'logRho', logRho
          write(*,'(a40,d26.16)') 'eta', eta
@@ -1474,7 +1474,7 @@
                write(*,1) 'xin(fe56)', xin(j_dx)
                write(*,1) 'xin(cr56)', xin(j_dx_sink)
                write(*,1) 'eps_nuc', eps_nuc
-               write(*,*)
+               write(*,'(A)')
                !call mesa_error(__FILE__,__LINE__,'testing')
             else if (doing_d_dlnd) then
                dx_0 = max(1d-14, abs(logRho*ln10*1d-6))
@@ -1497,7 +1497,7 @@
                write(*,*) 'doing dlnT'
             end if
             write(*,*) 'test net'
-            write(*,*)
+            write(*,'(A)')
          
             call mesa_error(__FILE__,__LINE__,'test net')
          
@@ -1511,10 +1511,10 @@
          
 
          if (show_Qs) then
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'logT', logT
             write(*,1) 'logRho', logRho
-            write(*,*)
+            write(*,'(A)')
             write(*,'(30x,4a20)') 'Q total', 'Q neutrino', 'Q total-neutrino'
             do i = 1, num_reactions
                if (from_weaklib(i)) then
@@ -1525,7 +1525,7 @@
                      actual_Qs(i), actual_neuQs(i), actual_Qs(i) - actual_neuQs(i)
                end if
             end do
-            write(*,*)
+            write(*,'(A)')
             stop
          end if
          
@@ -1544,18 +1544,18 @@
          if (.true.) then
             write(*,1) 'logT', logT
             write(*,1) 'logRho', logRho
-            write(*,*)
+            write(*,'(A)')
             
             write(*,1) 'eps_nuc', eps_nuc
             write(*,1) 'd_epsnuc_dlnd', d_eps_nuc_dRho*Rho
             write(*,1) 'd_epsnuc_dlnT', d_eps_nuc_dT*T
-            write(*,*)
+            write(*,'(A)')
             
             if (eps_nuc > 0) then
                write(*,1) 'log eps_nuc', log10(eps_nuc)
                write(*,1) 'd_lnepsnuc_dlnd', d_eps_nuc_dRho*Rho/eps_nuc
                write(*,1) 'd_lnepsnuc_dlnT', d_eps_nuc_dT*T/eps_nuc
-               write(*,*)
+               write(*,'(A)')
             end if
 
             
@@ -1567,25 +1567,25 @@
                do i = 1, species
                   write(*,1)  'd_eps_nuc_dx ' // trim(chem_isos% name(chem_id(i))), d_eps_nuc_dx(i)
                end do
-               write(*,*)
+               write(*,'(A)')
 
 
                do i = 1, species
                   write(*,1)  'd_dxdt_dlnRho ' // trim(chem_isos% name(chem_id(i))), d_dxdt_dRho(i)*rho
                end do
-               write(*,*)
+               write(*,'(A)')
             
                do i = 1, species
                   write(*,1)  'd_dxdt_dlnT ' // trim(chem_isos% name(chem_id(i))), d_dxdt_dT(i)*T
                end do
-               write(*,*)
+               write(*,'(A)')
             
                if (.false.) then
                   do i = 1, species
                      write(*,1)  'd_dxdt_dx(:,neut) ' // &
                         trim(chem_isos% name(chem_id(i))), d_dxdt_dx(i, net_iso(ineut))
                   end do
-                  write(*,*)
+                  write(*,'(A)')
                end if
 
 
@@ -1600,7 +1600,7 @@
                   write(*,1) 'd_rate_raw_dT ' // trim(reaction_Name(j)),  &
                                     rate_raw_dT(reaction_table(j))
                end do
-               write(*,*)
+               write(*,'(A)')
             
             end if
          
@@ -1610,7 +1610,7 @@
                write(*,1) 'rate_raw ' // trim(reaction_Name(j)),  &
                                  rate_raw(reaction_table(j))
             end do
-            write(*,*)
+            write(*,'(A)')
             
             do i=1,nrates_to_show
                j = rates_to_show(i)
@@ -1618,7 +1618,7 @@
                write(*,1) 'rate_screened ' // trim(reaction_Name(j)), &
                                  rate_screened(reaction_table(j))
             end do
-            write(*,*)
+            write(*,'(A)')
 
             do i=1,nrates_to_show
                j = rates_to_show(i)
@@ -1626,7 +1626,7 @@
                write(*,1) 'Q total ' // trim(reaction_Name(j)), &
                                  actual_Qs(reaction_table(j))
             end do
-            write(*,*)
+            write(*,'(A)')
             
             do i=1,nrates_to_show
                j = rates_to_show(i)
@@ -1634,7 +1634,7 @@
                write(*,1) 'Q neutrino ' // trim(reaction_Name(j)), &
                                  actual_neuQs(reaction_table(j))
             end do
-            write(*,*)
+            write(*,'(A)')
             
             do i=1,nrates_to_show
                j = rates_to_show(i)
@@ -1642,34 +1642,34 @@
                write(*,1) 'Q total-neutrino ' // trim(reaction_Name(j)), &
                                  actual_Qs(reaction_table(j)) - actual_neuQs(reaction_table(j))
             end do
-            write(*,*)
+            write(*,'(A)')
             
             if (.false.) then
             
                do i = 1, species
                   write(*,1)  'x ' // trim(chem_isos% name(chem_id(i))), xin(i)
                end do
-               write(*,*)
+               write(*,'(A)')
             
                do i = 1, species
                   if (-dxdt(i) > 1d-90)  &
                      write(*,1)  'x/dxdt ' // trim(chem_isos% name(chem_id(i))), xin(i)/dxdt(i)
                end do
-               write(*,*)
+               write(*,'(A)')
          
                do i = 1, num_categories
                   if (abs(eps_nuc_categories(i)) < 1d-20) cycle
                   write(*,1)  'eps_nuc_cat ' // trim(category_name(i)), eps_nuc_categories(i)
                end do
-               write(*,*)
+               write(*,'(A)')
                
             end if
             
             stop
          end if
 
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          write(*,*) 'net_name ', trim(net_file)
          write(*,*) 'species', species
          write(*,1) 'abar =', abar
@@ -1685,26 +1685,26 @@
                stop
             end if
          end do
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'eps_nuc', eps_nuc
          write(*,1) 'd_eps_nuc_dRho', d_eps_nuc_dRho
          write(*,1) 'd_eps_nuc_dT', d_eps_nuc_dT
          do j=1,species
             write(*,1) 'd_eps_nuc_dx ' // trim(chem_isos% name(chem_id(j))), d_eps_nuc_dx(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          do j=1,species
             write(*,1) 'dxdt ' // trim(chem_isos% name(chem_id(j))), dxdt(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          do j=1,species
             write(*,1) 'd_dxdt_dRho ' // trim(chem_isos% name(chem_id(j))), d_dxdt_dRho(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          do j=1,species
             write(*,1) 'd_dxdt_dT ' // trim(chem_isos% name(chem_id(j))), d_dxdt_dT(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          do j=1,species
             write(*,1) 'd_dxdt_dx(1,:) ' // trim(chem_isos% name(chem_id(j))), d_dxdt_dx(1,j)
          end do
@@ -1712,19 +1712,19 @@
          do j=1,num_categories
             write(*,1) trim(category_name(j)), eps_nuc_categories( j)
          end do
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'eta =', eta
          write(*,1) 'logT =', logT
          write(*,1) 'logRho =', logRho
          write(*,*) 'screening_mode =', screening_mode
-         write(*,*)
+         write(*,'(A)')
          do j=1,species
             write(*,1) 'xin(net_iso(i' // trim(chem_isos% name(chem_id(j))) // '))= ', xin(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'sum(xin(1:species))', sum(xin(1:species))
          write(*,1) '1 - sum(xin(1:species))', 1 - sum(xin(1:species))
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'eps_nuc', eps_nuc
          write(*,1) 'eps_nuc_neu_total', eps_neu_total
 
@@ -1763,7 +1763,7 @@
                write(*,1) 'xin(j)', xin_copy(j_dx)
                write(*,1) 'xin(j_sink)', xin_copy(j_dx_sink)
                write(*,1) 'eps_nuc', eps_nuc
-               write(*,*)
+               write(*,'(A)')
             
             else if (doing_d_dlnd) then
             

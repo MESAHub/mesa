@@ -138,7 +138,7 @@
             write(*,*) '   Z0', Z0
             write(*,*) 'Zbase', Zbase
             write(*,*) '   Z1', Z1
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (num_Zs >= 4 .and. rq% cubic_interpolation_in_Z) then
@@ -205,7 +205,7 @@
             write(*,*) 'i1', i1
             write(*,*) 'iz', iz
             write(*,*) 'Z', Z
-            write(*,*)
+            write(*,'(A)')
          end if
          
          do i=1,n_old
@@ -248,30 +248,30 @@
             do i=1,n_old
                write(*,*) 'z_old(i)', z_old(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'z_new(1)', z_new(1)
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'logK', i, logKs(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'logK', logK
-            write(*,*)
+            write(*,'(A)')
 
             do i=1,n_old
                write(*,*) 'dlogKs_dlogRho', i, dlogKs_dlogRho(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'dlnkap_dlnRho', dlnkap_dlnRho
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT', i, dlogKs_dlogT(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'dlnkap_dlnT', dlnkap_dlnT
-            write(*,*)
+            write(*,'(A)')
             
          end if
          
@@ -517,25 +517,25 @@
                write(*,*) 'x_old(i)', x_old(i)
             end do
             write(*,*) 'x_new(1)', x_new(1)
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'logKs(i)', logKs(i)
             end do
             write(*,*) 'logK', logK
-            write(*,*)
+            write(*,'(A)')
 
             do i=1,n_old
                write(*,*) 'dlogKs_dlogRho(i)', dlogKs_dlogRho(i)
             end do
             write(*,*) 'dlogK_dlogRho', dlogK_dlogRho
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT(i)', dlogKs_dlogT(i)
             end do
             write(*,*) 'dlogK_dlogT', dlogK_dlogT
-            write(*,*)
+            write(*,'(A)')
             
          end if
          
@@ -784,7 +784,7 @@
             write(*,1) 'logK_2_4', logK_2_4
             write(*,1) 'alfa', alfa
             write(*,1) 'beta', beta
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'dXC1_lookup', i1, dXC1_lookup
             write(*,2) 'dXO1_lookup', i1, dXO1_lookup
             write(*,2) 'dXC2_lookup', i2, dXC2_lookup
