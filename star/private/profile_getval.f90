@@ -1130,9 +1130,9 @@
                val = s% eps_grav_ad(k)% val
                
             case (p_log_xm_div_delta_m)
-               val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
+               if(abs(s% dt*s% mstar_dot) > 0) val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
             case (p_xm_div_delta_m)
-               val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
+               if(abs(s% dt*s% mstar_dot) > 0) val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
 
             case (p_env_eps_grav)
                val = -s% gradT_sub_grada(k)*s% grav(k)*s% mstar_dot*s% Cp(k)*s% T(k) / &
