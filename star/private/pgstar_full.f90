@@ -80,8 +80,8 @@
          fname = trim(s% log_directory) // '/pgstar.dat'
          inquire(file=trim(fname), exist=fexist)
          if (fexist) then
-            open(newunit=iounit, file=trim(fname), status='replace', action='write')
-            close(iounit)
+            open(newunit=s% pgstar_dat_unit, file=trim(fname), status='replace', action='write')
+            flush(s% pgstar_dat_unit)
          end if
          call pgstar_clear(s)
       end subroutine do_start_new_run_for_pgstar
@@ -1495,12 +1495,12 @@
          fname = trim(s% log_directory) // '/pgstar.dat'
 
          if (associated(pg% next)) then
-            open(newunit=iounit, file=trim(fname), action='write', &
+            open(newunit=s% pgstar_dat_unit, file=trim(fname), action='write', &
                position='append', form='unformatted', iostat=ierr)
          else
-            open(newunit=iounit, file=trim(fname), action='write', &
+            open(newunit=s% pgstar_dat_unit, file=trim(fname), action='write', &
                status='replace', form='unformatted', iostat=ierr)
-            if (ierr == 0) write(iounit) n
+            if (ierr == 0) write(s% pgstar_dat_unit) n
          end if
          if (ierr /= 0) then
             write(*,*) 'save_pgstar_data: cannot open new file'
@@ -1509,11 +1509,11 @@
 
          if (associated(pg% vals)) then
             if (size(pg% vals,dim=1) >= n) then
-               write(iounit) pg% age, pg% step, pg% vals(1:n)
+               write(s% pgstar_dat_unit) pg% age, pg% step, pg% vals(1:n)
             end if
          end if
 
-         close(iounit)
+         flush(s% pgstar_dat_unit)
 
       end subroutine update_pgstar_history_file
 
@@ -1540,14 +1540,14 @@
             return
          end if
 
-         open(newunit=iounit, file=trim(fname), action='read', &
+         open(newunit=s% pgstar_dat_unit, file=trim(fname), action='read', &
                   status='old', iostat=ierr, form='unformatted')
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed to open ' // trim(fname)
             return
          end if
 
-         read(iounit, iostat=ierr) n
+         read(s% pgstar_dat_unit, iostat=ierr) n
          if (ierr == 0) then
             if (s% number_of_history_columns < 0) then
                s% number_of_history_columns = n
@@ -1562,7 +1562,7 @@
             do ! keep reading until reach end of file so take care of restarts
                allocate(pg)
                allocate(pg% vals(n))
-               read(iounit, iostat=ierr) pg% age, pg% step, pg% vals(1:n)
+               read(s% pgstar_dat_unit, iostat=ierr) pg% age, pg% step, pg% vals(1:n)
                if (ierr /= 0) then
                   ierr = 0
                   deallocate(pg% vals)
@@ -1573,7 +1573,7 @@
             end do
          end if
 
-         close(iounit)
+         flush(s% pgstar_dat_unit)
 
       end subroutine read_pgstar_data
 

@@ -1170,6 +1170,7 @@
             ! change total_times function in star_utils if change this list
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
          
-         
+         ! File units
+         integer :: history_unit, pgstar_dat_unit, profile_index_unit
          
            

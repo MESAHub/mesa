@@ -912,7 +912,7 @@
          write(fname, '(3a)') trim(s% log_directory), '/', trim(s% profiles_index_name)
 
          call read_profiles_info( &
-            fname, max_num_mods, num_models, model_numbers, model_priorities, model_logs)
+            s, fname, max_num_mods, num_models, model_numbers, model_priorities, model_logs)
 
          call make_room_for_profile_info( &
             s% model_number, max_num_mods, num_models, model_numbers, model_priorities, model_logs, ierr)
@@ -944,7 +944,7 @@
          end if
 
          call write_profiles_list( &
-            fname, num_models, model_numbers, model_priorities, model_logs, ierr)
+            s, fname, num_models, model_numbers, model_priorities, model_logs, ierr)
          if (ierr /= 0) then
             call dealloc; return
          end if
@@ -962,7 +962,8 @@
 
 
       subroutine write_profiles_list( &
-            fname, num_models, model_numbers, model_priorities, model_logs, ierr)
+            s, fname, num_models, model_numbers, model_priorities, model_logs, ierr)
+         type(star_info), pointer :: s
          character (len=*), intent(in) :: fname
          integer, intent(in) :: num_models
          integer, pointer, dimension(:) :: model_numbers, model_priorities, model_logs
@@ -970,21 +971,21 @@
          integer :: iounit, i
          ierr = 0
          ! write the new list
-         open(newunit=iounit, file=trim(fname), action='write', iostat=ierr)
+         open(newunit=s% profile_index_unit, file=trim(fname), action='write', iostat=ierr)
          if (ierr /= 0) then
             write(*, *) 'failed to open ' // trim(fname)
          else
             if (num_models == 1) then
-               write(iounit, *) num_models, &
+               write(s% profile_index_unit, *) num_models, &
                   'model.    lines hold model number, priority, and profile number.'
             else
-               write(iounit, *) num_models, &
+               write(s% profile_index_unit, *) num_models, &
                   'models.    lines hold model number, priority, and profile number.'
             end if
             do i=1, num_models
-               write(iounit, *) model_numbers(i), model_priorities(i), model_logs(i)
+               write(s% profile_index_unit, *) model_numbers(i), model_priorities(i), model_logs(i)
             end do
-            close(iounit)
+            flush(s% profile_index_unit)
          end if
       end subroutine write_profiles_list
 
@@ -1076,7 +1077,8 @@
 
 
       subroutine read_profiles_info( &
-            fname, max_num_mods, num_models, model_numbers, model_priorities, model_logs)
+            s, fname, max_num_mods, num_models, model_numbers, model_priorities, model_logs)
+         type(star_info), pointer :: s
          character (len=*), intent(in) :: fname
          integer, intent(in) :: max_num_mods
          integer, intent(out) :: num_models
@@ -1084,17 +1086,17 @@
          integer :: iounit, i, ierr
          num_models = 0
          ierr = 0
-         open(newunit=iounit, file=trim(fname), action='read', status='old', iostat=ierr)
+         open(newunit=s% profile_index_unit, file=trim(fname), action='read', status='old', iostat=ierr)
          if (ierr == 0) then ! file exists
-            read(iounit, *, iostat=ierr) num_models
+            read(s% profile_index_unit, *, iostat=ierr) num_models
             if (ierr == 0) then
                if (num_models > max_num_mods) num_models = max_num_mods
                do i=1, num_models
-                  read(iounit, *, iostat=ierr) model_numbers(i), model_priorities(i), model_logs(i)
+                  read(s% profile_index_unit, *, iostat=ierr) model_numbers(i), model_priorities(i), model_logs(i)
                   if (ierr /= 0) exit
                end do
             end if
-            close(iounit)
+            flush(s% profile_index_unit)
             if (ierr /= 0) num_models = 0
          end if
       end subroutine read_profiles_info

@@ -39,10 +39,6 @@
          do_get_data_for_history_columns, write_history_info
 
 
-      logical, parameter :: open_close_log = .true.
-
-
-
       contains
 
 
@@ -251,7 +247,7 @@
          end if
 
          i0 = 1
-         if (write_flag .and. (open_close_log .or. s% model_number == -100)) then
+         if (write_flag) then
             if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
 
             fname = trim(s% log_directory) // '/' // trim(s% star_history_name)
@@ -262,10 +258,13 @@
                if (len_trim(s% star_history_header_name) > 0) then
                   fname = trim(s% log_directory) // '/' // trim(s% star_history_header_name)
                end if
-               open(newunit=io, file=trim(fname), action='write', iostat=ierr)
+               open(newunit=s% history_unit, file=trim(fname), action='write', iostat=ierr)
+               io = s% history_unit
+
             else
                i0 = 3
-               open(newunit=io, file=trim(fname), action='write', position='append', iostat=ierr)
+               io = s% history_unit
+               !open(newunit=io, file=trim(fname), action='write', position='append', iostat=ierr)
             end if
             if (ierr /= 0) then
                write(*,*) 'failed to open ' // trim(fname)
@@ -430,7 +429,7 @@
 
          end do
 
-         if (open_close_log .and. write_flag) close(io)
+         if (write_flag) flush(io)
 
          call dealloc
 
