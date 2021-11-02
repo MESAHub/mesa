@@ -193,12 +193,12 @@
          end if
          
          if (residual > 1d3) then
-         !$OMP critical
+         !$omp critical (hydro_rsp2_1)
             write(*,2) 'residual', k, residual
             write(*,2) 'Hp_expected', k, Hp_expected%val
             write(*,2) 'Hp_actual', k, Hp_actual%val
             call mesa_error(__FILE__,__LINE__,'do1_rsp2_Hp_eqn')
-         !$OMP end critical
+         !$omp end critical (hydro_rsp2_1)
          end if
          
          call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp2_Hp_eqn', ierr)

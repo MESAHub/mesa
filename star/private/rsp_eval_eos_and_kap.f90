@@ -263,7 +263,7 @@
          end if
                    
          if (ierr /= 0) then
-            !$OMP critical
+            !$omp critical (rsp_eval_eos_and_kap_1)
             if (k > 0 .and. k < s% nz) call write_eos_call_info(s,k)
             write(*,2) 'X', k, X
             write(*,2) 'Z', k, Z
@@ -275,7 +275,7 @@
             write(*,2) 'logRho', k, logRho
             write(*,2) 'logT', k, logT
             if (s% stop_for_bad_nums .and. is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
-            !$OMP end critical
+            !$omp end critical (rsp_eval_eos_and_kap_1)
             !return
             call mesa_error(__FILE__,__LINE__,'RSP failed in get_eos')
          end if
@@ -659,7 +659,7 @@
          end if
          frac_Type2 = kap_fracs(i_frac_Type2)
          if (ierr /= 0) then
-!$OMP critical
+!$omp critical (rsp_eval_eos_and_kap_2)
             write(*,*) 'failed in eval1_mesa_eos_and_kap get kap'
             write(*,2) 'logRho', k, logRho
             write(*,2) 'logT', k, logT
@@ -668,7 +668,7 @@
             write(*,2) 'X', k, X
             write(*,2) 'Z', k, Z
             call mesa_error(__FILE__,__LINE__,'eval1_kap')
-!$OMP end critical
+!$omp end critical (rsp_eval_eos_and_kap_2)
             !return
             call mesa_error(__FILE__,__LINE__)
          end if
