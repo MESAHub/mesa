@@ -269,7 +269,7 @@
       
       subroutine update_model_ (s, update_mode, kc_t, kc_b, do_brunt)
 
-        use mlt_info, only: set_mlt_vars
+        use turb_info, only: set_mlt_vars
         use brunt, only: do_brunt_B
         use micro
         
