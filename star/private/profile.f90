@@ -331,6 +331,7 @@
          use write_model, only: do_write_model
          use pulse, only: export_pulse_data
          use math_lib, only: math_backend
+         use utils_lib, only: mkdir, folder_exists
          
          type (star_info), pointer :: s
          character (len=*) :: fname
@@ -441,6 +442,7 @@
          end if
 
          if (write_flag) then
+            if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
 
             if (len_trim(s% profile_data_header_suffix) == 0) then
                fname1 = fname

@@ -63,7 +63,7 @@
 
 
       subroutine do_history_info(s, write_flag, ierr)
-         use utils_lib, only: integer_dict_create_hash, integer_dict_free
+         use utils_lib, only: integer_dict_create_hash, integer_dict_free, mkdir, folder_exists
          use chem_def, only: category_name
          use math_lib, only: math_backend
          use rates_def, only: rates_reaction_id_max, i_rate
@@ -252,6 +252,8 @@
 
          i0 = 1
          if (write_flag .and. (open_close_log .or. s% model_number == -100)) then
+            if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
+
             fname = trim(s% log_directory) // '/' // trim(s% star_history_name)
             inquire(file=trim(fname), exist=history_file_exists)
             if ((.not. history_file_exists) .or. &
