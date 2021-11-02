@@ -186,7 +186,7 @@
             if (p% id_file == 0) then
                if (.not. p% have_called_mkdir .or. &
                     p% file_dir /= p% file_dir_for_previous_mkdir) then
-                  call mkdir(p% file_dir)
+                  if(.not. folder_exists(trim(p% file_dir))) call mkdir(trim(p% file_dir))
                   p% have_called_mkdir = .true.
                   p% file_dir_for_previous_mkdir = p% file_dir
                end if
