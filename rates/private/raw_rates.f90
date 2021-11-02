@@ -111,11 +111,11 @@
                   return
                else
                   ! We want a forward rate from a reverse table
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) "ERROR: Can not evalute ",trim(reaction_name(ir)), &
                              " from detailed balance with ",trim(reaction_name(rir))
                   write(*,*) "Provide either both rates or only provide ",trim(reaction_name(ir))
-                  write(*,*)
+                  write(*,'(A)')
                   call mesa_error(__FILE__,__LINE__)
                   return
                end if
@@ -1186,7 +1186,7 @@
          write(*,1) 'rlambda', rlambda
          write(*,1) 'drlambda_dlnT', drlambda_dlnT
          
-         stop 'get_reaclib_rate_and_dlnT'
+         call mesa_error(__FILE__,__LINE__,'get_reaclib_rate_and_dlnT')
          
          contains
          
@@ -1218,7 +1218,7 @@
             if (ierr /= 0) then
                write(*,'(a,3x,i5)')  &
                   trim(reaction_Name(ir)) // ' failed in do_jina_reaclib', ir
-               !stop 'raw_rates'
+               !call mesa_error(__FILE__,__LINE__,'raw_rates')
                return
             end if
             !write(*,3) trim(reaction_Name(ir)) // ' lo hi', lo, hi
@@ -1245,7 +1245,7 @@
                if (r_id == 0) then 
                   write(*,'(a,3x,i5)')  &
                      trim(reverse_handle) // ' failed in reaclib_index', r_id
-                  !stop 'raw_rates'
+                  !call mesa_error(__FILE__,__LINE__,'raw_rates')
                end if
                reverse_reaction_id(ir) = r_id
             end if
@@ -1253,7 +1253,7 @@
             if (ierr /= 0) then
                write(*,'(a,3x,i5)')  &
                   trim(reverse_handle) // ' failed in do_jina_reaclib_reverse', r_id
-               stop 'raw_rates'
+               call mesa_error(__FILE__,__LINE__,'raw_rates')
                return
             end if
             call reaclib_rate_and_dlnT( &

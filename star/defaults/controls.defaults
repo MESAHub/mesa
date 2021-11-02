@@ -2295,12 +2295,13 @@
       ! + alpha_TDC_DAMP : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
       ! + alpha_TDC_DAMPR : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
       ! + alpha_TDC_PtdVdt : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity.
+      ! + steps_before_use_TDC : TDC often struggles with models on the pre-main-sequence. Set this option to pick MLT_option='Cox' for the first several steps to get past the pre-MS. Note that if this option is positive then only either TDC or Cox will be used (depending on model number). THIS OVERRIDES MLT_option!
       ! ::
 
       alpha_TDC_DAMP = 1d0
       alpha_TDC_DAMPR = 0d0
       alpha_TDC_PtdVdt = 0d0
-   
+      steps_before_use_TDC = 0
 
 
       ! Henyey_MLT_y_param
@@ -3910,12 +3911,10 @@
       ! If false, use slightly more complex expression
       ! that takes into account finite shell thickness.
       ! In practice, there doesn't seem to be a significant difference.
-      ! This is ignored if fitted_fp_ft_i_rot is equal to true, in which
-      ! case rotation dependent moments of inertia are computed.
 
       ! ::
 
-    simple_i_rot_flag = .true.
+    simple_i_rot_flag = .false.
 
 
       ! do_adjust_J_lost
@@ -4001,19 +4000,6 @@
       ! ::
 
     recalc_mixing_info_each_substep = .false.
-
-
-      ! fitted_fp_ft_i_rot
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Use analytical fits to the rotational corrections fp and ft, as well as the moments of inertia,
-      ! computed using the Roche potential for a point mass.
-      ! see Paxton et al. (2019), ApJs, 243, 10 for details
-
-      ! ::
-
-    fitted_fp_ft_i_rot = .true.
-
 
       ! w_div_wcrit_max
       ! ~~~~~~~~~~~~~~~
@@ -11599,6 +11585,7 @@
     x_ctrl(1:num_x_ctrls) = 0d0
     x_integer_ctrl(1:num_x_ctrls) = 0
     x_logical_ctrl(1:num_x_ctrls) = .false.
+    x_character_ctrl(1:num_x_ctrls) = ''
 
       ! One can split controls inlist into pieces using the following parameters.
       ! BTW: it works recursively, so the extras can read extras too.

@@ -1,0 +1,15 @@
+============
+Release 6208
+============
+
+:Date:   2014-03-24
+
+Revision 6208 has been designated a MESA release version. This
+superceeds 6188 and backs out of a few “improvements” which introduced
+dependencies on the Xcode runtime. For the full release notes, see `this
+mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/32138788/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r6208.zip/download>`__
+is available for download.

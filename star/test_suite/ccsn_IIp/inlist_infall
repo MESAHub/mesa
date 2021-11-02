@@ -21,9 +21,8 @@
   new_cumulative_energy_error = 0d0
 
   change_initial_v_flag = .true.
-  new_v_flag = .false.
-
   change_initial_u_flag = .true.
+  new_v_flag = .false.
   new_u_flag = .true.
 
   remove_initial_center_by_entropy = 4
@@ -46,18 +45,6 @@
 
 &controls
 
-  terminal_interval = 5
-  write_header_frequency = 10
-
-  terminal_show_age_units = 'seconds'
-
-  photo_interval = 10
-
-  history_interval = 10
-
-  profile_interval = 10
-
-  max_num_profile_models = 1000
 
   max_model_number = 500
   when_to_stop_rtol = 0.0001
@@ -65,69 +52,71 @@
 
   center_R_lower_limit = 4d+07
   fe_core_infall_limit = 1d+99
-
-  mixing_length_alpha = 1.9
-
-  thermohaline_coeff = 0
-
-  MLT_option = 'TDC'
-
-  okay_to_reduce_gradT_excess = .false.
-
-  use_fixed_vsurf_outer_BC = .true.
-  fixed_vsurf = 0
-
-  okay_to_remesh = .false.
-
-  dxdt_nuc_factor = 0
-
   calculate_Brunt_N2 = .false.
 
-  energy_eqn_option = 'dedt'
-
+! equation controls
+  use_dPrad_dm_form_of_T_gradient_eqn = .true.
+    energy_eqn_option = 'dedt'
+  use_fixed_vsurf_outer_BC = .true.
+  fixed_vsurf = 0d0
+  dxdt_nuc_factor = 0
   eps_nuc_factor = 0
 
-  use_dPrad_dm_form_of_T_gradient_eqn = .true.
+! mixing controls
+  mixing_length_alpha = 1.9
+  MLT_option = 'TDC'
+  thermohaline_coeff = 0
+  okay_to_reduce_gradT_excess = .false.
 
-  convergence_ignore_equL_residuals = .true.
+! mesh controls
+  okay_to_remesh = .false.
+
+! timestep controls
+
+  max_timestep = 0.05
+  varcontrol_target = 3d-4
+
+  dX_nuc_drop_limit_at_high_T = 0.01
+  delta_lgL_He_limit = 0.5
+  delta_lgT_cntr_limit = 0.2
+  delta_lgRho_cntr_limit = 0.5
+
+  delta_XH_cntr_limit = 1d99
+  delta_XHe_cntr_limit = 1d99
+  delta_XC_cntr_limit = 1d99
+  delta_XO_cntr_limit = 1d99
+  delta_XNe_cntr_limit = 1d99
+  delta_XSi_cntr_limit = 1d99
+  delta_XH_cntr_hard_limit = -1d0
+  delta_XHe_cntr_hard_limit = -1d0
+  delta_XC_cntr_hard_limit = -1d0
+  delta_XO_cntr_hard_limit = -1d0
+  delta_XNe_cntr_hard_limit = -1d0
+  delta_XSi_cntr_hard_limit = -1d0
 
   limit_for_rel_error_in_energy_conservation = 1d99
   hard_limit_for_rel_error_in_energy_conservation = 1d99
 
-  max_timestep = 0.05
+! solver controls    
+  convergence_ignore_equL_residuals = .true.
 
-  varcontrol_target = 0.001
+! output controls
+  terminal_interval = 5
+  write_header_frequency = 10
+  terminal_show_age_units = 'seconds'
+  photo_interval = 10
+  history_interval = 10
+  profile_interval = 10
+  max_num_profile_models = 1000
 
-  dX_nuc_drop_limit_at_high_T = 0.01
-
-  delta_lgL_He_limit = 0.5
-
-  delta_lgT_cntr_limit = 0.2
-
-  delta_lgRho_cntr_limit = 0.5
-
-      delta_XH_cntr_limit = 1d99
-      delta_XHe_cntr_limit = 1d99
-      delta_XC_cntr_limit = 1d99
-      delta_XO_cntr_limit = 1d99
-      delta_XNe_cntr_limit = 1d99
-      delta_XSi_cntr_limit = 1d99
-      delta_XH_cntr_hard_limit = -1d0
-      delta_XHe_cntr_hard_limit = -1d0
-      delta_XC_cntr_hard_limit = -1d0
-      delta_XO_cntr_hard_limit = -1d0
-      delta_XNe_cntr_hard_limit = -1d0
-      delta_XSi_cntr_hard_limit = -1d0
-
-   warn_when_large_rel_run_E_err = 1d99
-   warning_limit_for_max_residual = 1d99
-   max_abs_rel_run_E_err = 1d99           ! energy accounting doesn't deal with nonzero v_center.
+  warn_when_large_rel_run_E_err = 1d99
+  warning_limit_for_max_residual = 1d99
+  max_abs_rel_run_E_err = 1d99           ! energy accounting doesn't deal with nonzero v_center.
    
-
-      num_trace_history_values = 3
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-      trace_history_value_name(3) = 'r_center'
+  num_trace_history_values = 3
+  trace_history_value_name(1) = 'rel_E_err'
+  trace_history_value_name(2) = 'log_rel_run_E_err'
+  trace_history_value_name(3) = 'r_center'
 
 / ! end of controls namelist
 

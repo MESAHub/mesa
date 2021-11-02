@@ -252,6 +252,7 @@
          real(dp) :: mixing_length_alpha, remove_small_D_limit
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
+         integer :: steps_before_use_TDC
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid
@@ -1004,7 +1005,6 @@
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
             mdot_revise_factor, implicit_mdot_boost
          real(dp) :: surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol
-         logical :: fitted_fp_ft_i_rot
          real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 

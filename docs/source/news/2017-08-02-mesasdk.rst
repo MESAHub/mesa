@@ -1,0 +1,17 @@
+====================
+New MESA SDK Version
+====================
+
+Version 20170802 is now available for 64-bit Linux and OS X from the
+`SDK
+website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+
+If you’re currently using the MESA SDK, there’s no immediate need to
+upgrade; but the new SDK brings a few benefits:
+
+-  The gdb debugger and valgrind memory checker are now included with
+   the SDK.
+
+-  The ffmpeg movie compiler is now back in the Mac OSX version of the
+   SDK, along with the images_to_movie.sh script — these allow the
+   straightforward creation of movies from sequences of images.

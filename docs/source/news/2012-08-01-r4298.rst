@@ -1,0 +1,11 @@
+============
+Release 4298
+============
+
+:Date:   2012-08-01
+
+Revision 4298 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r4298.zip/download>`__
+is available for download.

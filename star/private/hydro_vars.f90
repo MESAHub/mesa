@@ -469,10 +469,10 @@
          use atm_lib, only: atm_eval_T_tau_dq_dtau
          use atm_support, only: get_T_tau_id
          use micro, only: set_micro_vars
-         use mlt_info, only: set_mlt_vars, check_for_redo_MLT
+         use turb_info, only: set_mlt_vars, check_for_redo_MLT
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
-            set_abs_du_div_cs, set_conv_time_scales, set_using_TDC
+            set_abs_du_div_cs, set_conv_time_scales
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
@@ -541,7 +541,6 @@
             call set_grads(s, ierr)
             if (failed('set_grads')) return
             call set_conv_time_scales(s) ! uses brunt_B
-            call set_using_TDC(s) ! uses max_conv_time_scale
          end if
 
          if (.not. skip_mixing_info) then         
@@ -808,7 +807,7 @@
             write(*,1) 's% tau_factor', s% tau_factor
             write(*,1) 's% tau_base', s% tau_base
             write(*,1) 'tau_surf', tau_surf
-            stop 'bad tau_surf in get_surf_PT'
+            call mesa_error(__FILE__,__LINE__,'bad tau_surf in get_surf_PT')
          end if
 
          ! Evaluate surface temperature and pressure
@@ -873,7 +872,7 @@
             write(*,1) 'lnT_surf', lnT_surf
             write(*,1) 'lnP_surf', lnP_surf
             write(*,*) 'atm_option = ', trim(s% atm_option)
-            if (s% stop_for_bad_nums) stop 'get PT surf'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
          end if
 
          ! Finish

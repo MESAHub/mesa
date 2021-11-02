@@ -163,7 +163,7 @@
             write(*,2) 'xa', i, xa(i)
          end do
          write(*,*) trim(s% net_name)
-         stop 'init_for_rsp_eos_and_kap'
+         call mesa_error(__FILE__,__LINE__,'init_for_rsp_eos_and_kap')
       end subroutine init_for_rsp_eos_and_kap
       
       
@@ -263,7 +263,7 @@
          end if
                    
          if (ierr /= 0) then
-            !$OMP critical
+            !$omp critical (rsp_eval_eos_and_kap_1)
             if (k > 0 .and. k < s% nz) call write_eos_call_info(s,k)
             write(*,2) 'X', k, X
             write(*,2) 'Z', k, Z
@@ -274,10 +274,10 @@
             write(*,2) 'T', k, T
             write(*,2) 'logRho', k, logRho
             write(*,2) 'logT', k, logT
-            if (s% stop_for_bad_nums .and. is_bad(logRho+logT)) stop 'do_eos_for_cell'
-            !$OMP end critical
+            if (s% stop_for_bad_nums .and. is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+            !$omp end critical (rsp_eval_eos_and_kap_1)
             !return
-            stop 'RSP failed in get_eos'
+            call mesa_error(__FILE__,__LINE__,'RSP failed in get_eos')
          end if
          
          if (skip_kap) then
@@ -366,7 +366,7 @@
             !$OMP critical (RSP_eosDEgas)
             write(*,2) 'egas', k, egas
             write(*,*) 'called eval1_mesa_eosDEgas_and_kap with bad value for egas'
-            stop 'eval1_mesa_eosDEgas_and_kap'
+            call mesa_error(__FILE__,__LINE__,'eval1_mesa_eosDEgas_and_kap')
             !$OMP end critical (RSP_eosDEgas)
             ierr = -1
             return
@@ -404,24 +404,24 @@
                   write(*,1) 'zbar', zbar
                   write(*,1) 'logT_tol', logT_tol
                   write(*,1) 'egas_tol', egas_tol
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'guess logT', logT_guess
                   write(*,1) 'found logT', logT
                   write(*,1) 'wanted egas', egas
                   write(*,1) 'got egas', new_egas
                   write(*,1) '(want - got)/got', (egas - new_egas)/new_egas
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'eos_calls', eos_calls
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'failed eval1_mesa_eosDEgas_and_kap', k
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) 'is_bad(new_egas)', is_bad(new_egas)
                   write(*,*) 'new_egas <= 0d0', new_egas <= 0d0
                   write(*,*) 'abs(new_egas - egas) > egas_tol', &
                      abs(new_egas - egas) > egas_tol, &
                      abs(new_egas - egas) - egas_tol, &
                      abs(new_egas - egas), egas_tol
-                  stop 'eval1_mesa_eosDEgas_and_kap'
+                  call mesa_error(__FILE__,__LINE__,'eval1_mesa_eosDEgas_and_kap')
                   !$OMP end critical (RSP_eosDEgas)
                end if
                s% lnPgas(k) = res(i_lnPgas)
@@ -453,10 +453,10 @@
             write(*,2) 'logRho', k, logRho
             write(*,2) 'T', k, T
             write(*,2) 'logT', k, logT
-            if (s% stop_for_bad_nums .and. egas <= 0d0) stop 'do_eos_for_cell'
+            if (s% stop_for_bad_nums .and. egas <= 0d0) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
             !$OMP end critical (RSP_eosDEgas)
             return
-            stop 'RSP failed in eval1_mesa_eosDEgas_and_kap'
+            call mesa_error(__FILE__,__LINE__,'RSP failed in eval1_mesa_eosDEgas_and_kap')
          end if
          
          if (skip_kap) then
@@ -505,7 +505,7 @@
             !$OMP critical (RSP_eosDE)
             write(*,2) 'energy', k, energy
             write(*,*) 'called eval1_mesa_eosDE_and_kap with bad value for energy'
-            stop 'eval1_mesa_eosDE_and_kap'
+            call mesa_error(__FILE__,__LINE__,'eval1_mesa_eosDE_and_kap')
             !$OMP end critical (RSP_eosDE)
             ierr = -1
             return
@@ -542,18 +542,18 @@
                   write(*,1) 'zbar', zbar
                   write(*,1) 'logT_tol', logT_tol
                   write(*,1) 'logE_tol', logE_tol
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'guess logT', logT_guess
                   write(*,1) 'found logT', logT
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,1) 'wanted logE', logE_want
                   write(*,1) 'got logE', logE
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'eos_calls', eos_calls
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'failed eval1_mesa_eosDE_and_kap', k
-                  write(*,*)
-                  stop 'eval1_mesa_eosDE_and_kap'
+                  write(*,'(A)')
+                  call mesa_error(__FILE__,__LINE__,'eval1_mesa_eosDE_and_kap')
                   !$OMP end critical (RSP_eosDE)
                end if
                s% lnPgas(k) = res(i_lnPgas)
@@ -587,7 +587,7 @@
             write(*,2) 'logT', k, logT
             !$OMP end critical (RSP_eosDE)
             return
-            stop 'RSP failed in eval1_mesa_eosDE_and_kap'
+            call mesa_error(__FILE__,__LINE__,'RSP failed in eval1_mesa_eosDE_and_kap')
          end if
          
          if (skip_kap) then
@@ -659,7 +659,7 @@
          end if
          frac_Type2 = kap_fracs(i_frac_Type2)
          if (ierr /= 0) then
-!$OMP critical
+!$omp critical (rsp_eval_eos_and_kap_2)
             write(*,*) 'failed in eval1_mesa_eos_and_kap get kap'
             write(*,2) 'logRho', k, logRho
             write(*,2) 'logT', k, logT
@@ -667,10 +667,10 @@
             write(*,2) 'zbar', k, zbar
             write(*,2) 'X', k, X
             write(*,2) 'Z', k, Z
-            stop 'eval1_kap'
-!$OMP end critical
+            call mesa_error(__FILE__,__LINE__,'eval1_kap')
+!$omp end critical (rsp_eval_eos_and_kap_2)
             !return
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
 
          if (k > 0 .and. k <= s% nz .and. s% use_other_opacity_factor) then
@@ -956,24 +956,24 @@
             write(*,1) 'zbar', zbar
             write(*,1) 'logT_tol', logT_tol
             write(*,1) 'egas_tol', egas_tol
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'guess logT', logT_guess
             write(*,1) 'found logT', logT_result
             write(*,1) 'wanted egas', egas_want
             write(*,1) 'got egas', new_egas
             write(*,1) '(want - got)/got', (egas_want - new_egas)/new_egas
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'eos_calls', eos_calls
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'failed set_T_for_new_egas', kk
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'is_bad(new_egas)', is_bad(new_egas)
             write(*,*) 'new_egas <= 0d0', new_egas <= 0d0
             write(*,*) 'abs(new_egas - egas_want) > egas_tol', &
                abs(new_egas - egas_want) > egas_tol, &
                abs(new_egas - egas_want) - egas_tol, &
                abs(new_egas - egas_want), egas_tol
-            stop 'set_T_for_new_egas'
+            call mesa_error(__FILE__,__LINE__,'set_T_for_new_egas')
          end if
          
       end subroutine set_T_for_new_egas

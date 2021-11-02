@@ -1196,10 +1196,10 @@
          end if
          call free_iounit(unit)
          
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'saved initial &astero_search_controls to ' // trim(filename)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
 
       end subroutine write_astero_search_controls
    
@@ -1325,7 +1325,7 @@
          integer :: iounit
          write(*,*) 'save_sample_results_to_file ' // trim(results_fname)
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='write', iostat=ierr)
          if (ierr /= 0) return
          call show_all_sample_results(iounit, i_total, ierr)
@@ -1624,7 +1624,7 @@
 
          call show_sample_header(iounit)
          do i = 1, 3
-            write(iounit,*)
+            write(iounit,'(A)')
          end do
 
       end subroutine show_all_sample_results
@@ -1731,7 +1731,7 @@
 
          if (Teff_sigma > 0 .and. include_Teff_in_chi2_spectro) then
             chi2term = pow2((best_Teff - Teff_target)/Teff_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('Teff chi2term', chi2term)
             call write1('Teff', best_Teff)
             call write1('Teff_obs', Teff_target)
@@ -1740,7 +1740,7 @@
          
          if (logL_sigma > 0 .and. include_logL_in_chi2_spectro) then
             chi2term = pow2((best_logL - logL_target)/logL_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('logL chi2term', chi2term)
             call write1('logL', best_logL)
             call write1('logL_obs', logL_target)
@@ -1749,7 +1749,7 @@
          
          if (logg_sigma > 0 .and. include_logg_in_chi2_spectro) then
             chi2term = pow2((best_logg - logg_target)/logg_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('logg chi2term', chi2term)
             call write1('logg', best_logg)
             call write1('logg_obs', logg_target)
@@ -1758,7 +1758,7 @@
          
          if (FeH_sigma > 0 .and. include_FeH_in_chi2_spectro) then
             chi2term = pow2((best_FeH - FeH_target)/FeH_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('FeH chi2term', chi2term)
             call write1('FeH', best_FeH)
             call write1('FeH_obs', FeH_target)
@@ -1767,7 +1767,7 @@
          
          if (logR_sigma > 0 .and. include_logR_in_chi2_spectro) then
             chi2term = pow2((best_logR - logR_target)/logR_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('logR chi2term', chi2term)
             call write1('logR', best_logR)
             call write1('logR_obs', logR_target)
@@ -1776,7 +1776,7 @@
          
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
             chi2term = pow2((best_age - age_target)/age_sigma)
-            write(io,*)
+            write(io,'(A)')
             write(io,'(a40,e20.10,99f20.10)') 'age chi2term', chi2term
             write(io,'(a40,1pes20.10)') 'age', best_age
             write(io,'(a40,1pes20.10)') 'age_target', age_target
@@ -1787,7 +1787,7 @@
                include_surface_Z_div_X_in_chi2_spectro) then
             chi2term = &
                pow2((best_surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-            write(io,*)
+            write(io,'(A)')
             write(io,'(a40,e20.10,99f20.10)') 'surface_Z_div_X chi2term', chi2term
             call write1('surface_Z_div_X', best_surface_Z_div_X)
             call write1('surface_Z_div_X_obs', surface_Z_div_X_target)
@@ -1796,7 +1796,7 @@
          
          if (surface_He_sigma > 0 .and. include_surface_He_in_chi2_spectro) then
             chi2term = pow2((best_surface_He - surface_He_target)/surface_He_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('surface_He chi2term', chi2term)
             call write1('surface_He', best_surface_He)
             call write1('surface_He_obs', surface_He_target)
@@ -1805,7 +1805,7 @@
          
          if (Rcz_sigma > 0 .and. include_Rcz_in_chi2_spectro) then
             chi2term = pow2((best_Rcz - Rcz_target)/Rcz_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('Rcz chi2term', chi2term)
             call write1('Rcz', best_Rcz)
             call write1('Rcz_obs', Rcz_target)
@@ -1815,7 +1815,7 @@
          if (my_var1_sigma > 0 .and. include_my_var1_in_chi2_spectro) then
             chi2term = pow2( &
                   (best_my_var1 - my_var1_target)/my_var1_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1(trim(my_var1_name) // ' chi2term', chi2term)
             call write1(trim(my_var1_name), best_my_var1)
             call write1(trim(my_var1_name) // '_obs', my_var1_target)
@@ -1825,7 +1825,7 @@
          if (my_var2_sigma > 0 .and. include_my_var2_in_chi2_spectro) then
             chi2term = pow2( &
                   (best_my_var2 - my_var2_target)/my_var2_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1(trim(my_var2_name) // ' chi2term', chi2term)
             call write1(trim(my_var2_name), best_my_var2)
             call write1(trim(my_var2_name) // '_obs', my_var2_target)
@@ -1835,14 +1835,14 @@
          if (my_var3_sigma > 0 .and. include_my_var3_in_chi2_spectro) then
             chi2term = pow2( &
                   (best_my_var3 - my_var3_target)/my_var3_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1(trim(my_var3_name) // ' chi2term', chi2term)
             call write1(trim(my_var3_name), best_my_var3)
             call write1(trim(my_var3_name) // '_obs', my_var3_target)
             call write1(trim(my_var3_name) // '_sigma', my_var3_sigma)
          end if
          
-         write(io,*)
+         write(io,'(A)')
          call write1('R/Rsun', best_radius)
          call write1('logL/Lsun', best_logL)
          call write1('Teff', best_Teff)
@@ -1872,7 +1872,7 @@
          call write1(trim(my_param2_name), current_my_param2)
          call write1(trim(my_param3_name), current_my_param3)
          write(io,'(a40,1pes20.10)') 'age', best_age
-         write(io,*)
+         write(io,'(A)')
          if (chi2_seismo_fraction == 1d0) then
             call write1('chi^2 seismo', best_chi2_seismo)
          else if (chi2_seismo_fraction == 0d0) then
@@ -1883,10 +1883,10 @@
             call write1('chi^2 seismo', best_chi2_seismo)
             call write1('chi^2 spectro', best_chi2_spectro)
          end if
-         write(io,*)
+         write(io,'(A)')
          write(io,'(a40,i16)') 'model number', best_model_number
-         write(io,*)
-         write(io,*)
+         write(io,'(A)')
+         write(io,'(A)')
          
          contains
          
@@ -1916,7 +1916,7 @@
          write(*,*) 'read samples from file ' // trim(results_fname)
          
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(results_fname)

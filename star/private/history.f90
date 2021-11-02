@@ -63,7 +63,7 @@
 
 
       subroutine do_history_info(s, write_flag, ierr)
-         use utils_lib, only: integer_dict_create_hash, integer_dict_free
+         use utils_lib, only: integer_dict_create_hash, integer_dict_free, mkdir, folder_exists
          use chem_def, only: category_name
          use math_lib, only: math_backend
          use rates_def, only: rates_reaction_id_max, i_rate
@@ -252,6 +252,8 @@
 
          i0 = 1
          if (write_flag .and. (open_close_log .or. s% model_number == -100)) then
+            if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
+
             fname = trim(s% log_directory) // '/' // trim(s% star_history_name)
             inquire(file=trim(fname), exist=history_file_exists)
             if ((.not. history_file_exists) .or. &
@@ -332,17 +334,21 @@
                !call write_val(io, col, i, 'initial_z', s% initial_z)
                call write_val(io, col, i, 'burn_min1', s% burn_min1)
                call write_val(io, col, i, 'burn_min2', s% burn_min2)
-               
+
+               call write_val(io, col, i, 'msun', msun)
+               call write_val(io, col, i, 'rsun', rsun)
+               call write_val(io, col, i, 'lsun', lsun)
+
                do j=1,num_extra_header_items
                  call write_val(io, col, i, &
                     extra_header_item_names(j), extra_header_item_vals(j))
                end do
 
-               write(io,*)
+               write(io,'(A)')
 
             end do
 
-            write(io,*)
+            write(io,'(A)')
 
             if (num_extra_header_items > 0) &
                deallocate(extra_header_item_names, extra_header_item_vals)
@@ -558,14 +564,14 @@
                if (cnt <= b_regions) return
                if (i > 1 .and. cnt >= prev_cnt) then
                   write(*,*) 'bug in set_burn_types: cnt, prev_cnt', cnt, prev_cnt
-                  if (dbg) stop 'debug: set_burn_types'
+                  if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_burn_types')
                   return
                end if
                prev_cnt = cnt
                if (dbg) write(*,*) 'remove_region', min_ktop, min_kbot, cnt
                call remove_region(b_type, min_ktop, min_kbot)
             end do
-            if (dbg) stop 'debug: set_burn_types'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_burn_types')
          end subroutine set_burn_types
 
 
@@ -669,7 +675,7 @@
                if (cnt <= mx_regions) exit
                if (i > 1 .and. cnt >= prev_cnt) then
                   write(*,*) 'bug in set_mix_types: cnt, prev_cnt', cnt, prev_cnt
-                  if (dbg) stop 'set_mix_types'
+                  if (dbg) call mesa_error(__FILE__,__LINE__,'set_mix_types')
                   return
                end if
                prev_cnt = cnt
@@ -794,9 +800,9 @@
             end if
             val = s% q(k)
             if (k == 1) return
-            eps1 = s% eps_nuc(k) - s% eps_nuc_neu_total(k) - s% non_nuc_neu(k)
+            eps1 = s% eps_nuc(k) - s% non_nuc_neu(k)
             bv1 = sign(1d0,eps1)*log10(max(1d0,abs(eps1)))
-            eps0 = s% eps_nuc(k-1) - s% eps_nuc_neu_total(k-1) - s% non_nuc_neu(k-1)
+            eps0 = s% eps_nuc(k-1) - s% non_nuc_neu(k-1)
             bv0 = sign(1d0,eps0)*log10(max(1d0,abs(eps0)))
             bv = max(bv0,bv1)
             eps = pow(10d0,bv)
@@ -1895,7 +1901,10 @@
                end do
 
             case(h_i_rot_total)
-               val = dot_product(s% dm_bar(1:nz), s%i_rot(1:nz))
+               val = 0d0
+               do k=1, s% nz
+                  val = val + s% dm_bar(k)*s%i_rot(k)% val
+               end do
             case(h_surf_avg_j_rot)
                val = if_rot(s% j_rot_avg_surf)
             case(h_surf_avg_omega)
@@ -2886,14 +2895,6 @@
                int_val = s% num_retries
                is_int_val = .true.
 
-            case(h_using_TDC)
-               if (s% using_TDC) then
-                  int_val = 1
-               else
-                  int_val = 0
-               end if
-               is_int_val = .true.
-
             case (h_TDC_num_cells)
                int_val = 0
                do k=1,nz
@@ -3076,7 +3077,7 @@
          write(*,2) 'k_inner', k_inner
          write(*,2) 'k_outer', k_outer
 
-         stop 'get_int_k_r_dr'
+         call mesa_error(__FILE__,__LINE__,'get_int_k_r_dr')
 
       end function get_int_k_r_dr
 

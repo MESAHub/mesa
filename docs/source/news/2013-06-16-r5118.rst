@@ -1,0 +1,13 @@
+============
+Release 5118
+============
+
+:Date:   2013-06-16
+
+Revision 5118 has been designated a MESA release version. For the
+release notes, see `this mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/31074636/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r5118.zip/download>`__
+is available for download.

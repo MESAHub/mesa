@@ -73,7 +73,7 @@ program eos_plotter
    call const_init(my_mesa_dir,ierr)
    if (ierr /= 0 .and. .not. ignore_ierr) then
       write(*,*) 'const_init failed'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    call math_init()
@@ -81,11 +81,11 @@ program eos_plotter
    call chem_init('isotopes.data', ierr)
    if (ierr /= 0 .and. .not. ignore_ierr) then
       write(*,*) 'failed in chem_init'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
-   if (ierr /= 0 .and. .not. ignore_ierr) stop 'allocate failed'
+   if (ierr /= 0 .and. .not. ignore_ierr) call mesa_error(__FILE__,__LINE__,'allocate failed')
 
    ! allocate and initialize the eos tables
    call Setup_eos(handle)
@@ -122,7 +122,7 @@ program eos_plotter
 
    if (ierr /= 0 .and. .not. ignore_ierr) then
       write(*,*) 'bad result from eos_get'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    stop
@@ -144,7 +144,7 @@ contains
       call eos_init(' ', use_cache, ierr)
       if (ierr /= 0 .and. .not. ignore_ierr) then
          write(*,*) 'eos_init failed in Setup_eos'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
       write(*,*) 'loading eos tables'
@@ -152,7 +152,7 @@ contains
       handle = alloc_eos_handle_using_inlist('inlist_plotter', ierr)
       if (ierr /= 0 .and. .not. ignore_ierr) then
          write(*,*) 'failed trying to allocate eos handle'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
    end subroutine Setup_eos

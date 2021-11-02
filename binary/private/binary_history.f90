@@ -243,9 +243,9 @@
                     extra_header_item_names(j), extra_header_item_vals(j))
                end do
 
-               write(io,*)
+               write(io,'(A)')
             end do
-            write(io,*)
+            write(io,'(A)')
          end if
 
          do i=i0,3 ! add a row to the log

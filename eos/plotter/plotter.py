@@ -24,7 +24,7 @@ with open('eos_plotter.dat') as f:
 eosDT, Yran, Xran = parse('eos_plotter.dat')
 
 # set up plot and labels
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(5,4))
 ax.set_title(title)
 ax.set_xlabel(xlabel)
 ax.set_ylabel(ylabel)
@@ -36,7 +36,6 @@ cmap = copy.copy(mpl.cm.get_cmap("viridis"))
 cmap.set_over('white')
 cmap.set_under('black')
 cmap.set_bad('grey')
-
 
 # set color bar limits
 # None will auto-set limits

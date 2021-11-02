@@ -69,6 +69,8 @@
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
             dHp_m1, dHp_00, dHp_p1, &
+            dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
+            djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1)
          type(auto_diff_real_star_order1), intent(in) :: var
@@ -77,6 +79,8 @@
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dHp_m1, dHp_00, dHp_p1, &
+            dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
+            djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1
          val = var%val
@@ -101,6 +105,12 @@
          dHp_m1 = var%d1Array(i_Hp_m1)
          dHp_00 = var%d1Array(i_Hp_00)
          dHp_p1 = var%d1Array(i_Hp_p1)
+         dw_div_wc_m1 = var%d1Array(i_w_div_wc_m1)
+         dw_div_wc_00 = var%d1Array(i_w_div_wc_00)
+         dw_div_wc_p1 = var%d1Array(i_w_div_wc_p1)
+         djrot_m1 = var%d1Array(i_jrot_m1)
+         djrot_00 = var%d1Array(i_jrot_00)
+         djrot_p1 = var%d1Array(i_jrot_p1)
          dxtra1_m1 = var%d1Array(i_xtra1_m1)
          dxtra1_00 = var%d1Array(i_xtra1_00)
          dxtra1_p1 = var%d1Array(i_xtra1_p1)
@@ -117,6 +127,8 @@
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
             dHp_m1, dHp_00, dHp_p1, &
+            dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
+            djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1)
          type(auto_diff_real_star_order1), intent(out) :: var
@@ -125,6 +137,8 @@
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dHp_m1, dHp_00, dHp_p1, &
+            dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
+            djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1
          var%val = val
@@ -149,6 +163,12 @@
          var%d1Array(i_Hp_m1) = dHp_m1
          var%d1Array(i_Hp_00) = dHp_00
          var%d1Array(i_Hp_p1) = dHp_p1
+         var%d1Array(i_w_div_wc_m1) = dw_div_wc_m1
+         var%d1Array(i_w_div_wc_00) = dw_div_wc_00
+         var%d1Array(i_w_div_wc_p1) = dw_div_wc_p1
+         var%d1Array(i_jrot_m1) = djrot_m1
+         var%d1Array(i_jrot_00) = djrot_00
+         var%d1Array(i_jrot_p1) = djrot_p1
          var%d1Array(i_xtra1_m1) = dxtra1_m1
          var%d1Array(i_xtra1_00) = dxtra1_00
          var%d1Array(i_xtra1_p1) = dxtra1_p1
@@ -1155,6 +1175,101 @@
             Hp_p1 % d1Array(i_Hp_p1) = 1d0
          end if
       end function wrap_Hp_p1
+
+
+      function wrap_w_div_wc_m1(s, k) result(w_div_wc_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: w_div_wc_m1
+         integer, intent(in) :: k
+         w_div_wc_m1 = 0d0 
+         if (k > 1) then
+            w_div_wc_m1 % val = s% w_div_w_crit_roche(k-1)
+            w_div_wc_m1 % d1Array(i_w_div_wc_m1) = 1d0
+         end if            
+      end function wrap_w_div_wc_m1
+
+      function wrap_w_div_wc_00(s, k) result(w_div_wc_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: w_div_wc_00
+         integer, intent(in) :: k
+         w_div_wc_00 = 0d0 
+         w_div_wc_00 % val = s% w_div_w_crit_roche(k)
+         w_div_wc_00 % d1Array(i_w_div_wc_00) = 1d0
+      end function wrap_w_div_wc_00
+
+      function wrap_w_div_wc_p1(s, k) result(w_div_wc_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: w_div_wc_p1
+         integer, intent(in) :: k
+         w_div_wc_p1 = 0d0 
+         if (k < s%nz) then
+            w_div_wc_p1 % val = s% w_div_w_crit_roche(k+1)
+            w_div_wc_p1 % d1Array(i_w_div_wc_p1) = 1d0
+         end if
+      end function wrap_w_div_wc_p1
+
+
+      function wrap_jrot_m1(s, k) result(jrot_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: jrot_m1
+         integer, intent(in) :: k
+         jrot_m1 = 0d0 
+         if (k > 1) then
+            jrot_m1 % val = s% j_rot(k-1)
+            jrot_m1 % d1Array(i_jrot_m1) = 1d0
+         end if            
+      end function wrap_jrot_m1
+
+      function wrap_jrot_00(s, k) result(jrot_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: jrot_00
+         integer, intent(in) :: k
+         jrot_00 = 0d0 
+         jrot_00 % val = s% j_rot(k)
+         jrot_00 % d1Array(i_jrot_00) = 1d0
+      end function wrap_jrot_00
+
+      function wrap_jrot_p1(s, k) result(jrot_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: jrot_p1
+         integer, intent(in) :: k
+         jrot_p1 = 0d0 
+         if (k < s%nz) then
+            jrot_p1 % val = s% j_rot(k+1)
+            jrot_p1 % d1Array(i_jrot_p1) = 1d0
+         end if
+      end function wrap_jrot_p1
+
+
+      function wrap_omega_m1(s, k) result(omega_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: omega_m1, jrot_m1
+         integer, intent(in) :: k
+         omega_m1 = 0d0
+         jrot_m1 = wrap_jrot_m1(s,k)
+         if (k > 1) then
+            omega_m1 = jrot_m1/shift_m1(s% i_rot(k-1))
+         end if            
+      end function wrap_omega_m1
+
+      function wrap_omega_00(s, k) result(omega_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: omega_00, jrot_00
+         integer, intent(in) :: k
+         jrot_00 = wrap_jrot_00(s,k)
+         omega_00 = jrot_00/s% i_rot(k)
+      end function wrap_omega_00
+
+      function wrap_omega_p1(s, k) result(omega_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: omega_p1, jrot_p1
+         integer, intent(in) :: k
+         omega_p1 = 0d0 
+         jrot_p1 = wrap_jrot_p1(s,k)
+         if (k < s%nz) then
+            omega_p1 = jrot_p1/shift_p1(s% i_rot(k+1))
+         end if
+      end function wrap_omega_p1
 
 
       function wrap_xtra1_m1(s, k) result(xtra1_m1)

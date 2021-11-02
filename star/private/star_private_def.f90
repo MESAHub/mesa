@@ -27,7 +27,7 @@
 
       use star_def
       use math_lib
-      use utils_lib, only: is_bad_num, is_nan
+      use utils_lib, only: is_bad_num, is_nan, mesa_error
 
       implicit none
 
@@ -76,6 +76,12 @@
          auto_diff_star_d1_names(i_Hp_m1) = 'i_Hp_m1'
          auto_diff_star_d1_names(i_Hp_00) = 'i_Hp_00'
          auto_diff_star_d1_names(i_Hp_p1) = 'i_Hp_p1'
+         auto_diff_star_d1_names(i_w_div_wc_m1) = 'i_w_div_wc_m1'
+         auto_diff_star_d1_names(i_w_div_wc_00) = 'i_w_div_wc_00'
+         auto_diff_star_d1_names(i_w_div_wc_p1) = 'i_w_div_wc_p1'
+         auto_diff_star_d1_names(i_jrot_m1) = 'i_jrot_m1'
+         auto_diff_star_d1_names(i_jrot_00) = 'i_jrot_00'
+         auto_diff_star_d1_names(i_jrot_p1) = 'i_jrot_p1'
          auto_diff_star_d1_names(i_xtra1_m1) = 'i_xtra1_m1'
          auto_diff_star_d1_names(i_xtra1_00) = 'i_xtra1_00'
          auto_diff_star_d1_names(i_xtra1_p1) = 'i_xtra1_p1'
@@ -319,7 +325,7 @@
             end if
          end do
 
-         if (.not. okay) stop 'star_private_def_init'
+         if (.not. okay) call mesa_error(__FILE__,__LINE__,'star_private_def_init')
 
       end subroutine star_private_def_init
 
@@ -505,17 +511,17 @@
 
          if (reaclib_min_T9_in > 0 .and. reaclib_min_T9_in /= reaclib_min_T9) then
             reaclib_min_T9 = reaclib_min_T9_in
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,1) 'change reaclib_min_T9', reaclib_min_T9
             write(*,1) 'must clear data/rates_data/cache of old reaclib rates'
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
          end if
 
          if (dbg) write(*,*) 'call net_init'

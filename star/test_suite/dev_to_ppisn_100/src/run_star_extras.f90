@@ -287,7 +287,7 @@
             write(*,*) 'failed in star_alloc_extras'
             write(*,*) 'alloc_extras num_ints', num_ints
             write(*,*) 'alloc_extras num_dbls', num_dbls
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          contains

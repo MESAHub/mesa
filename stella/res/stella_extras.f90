@@ -47,7 +47,7 @@ program main
    call const_init(my_mesa_dir,ierr)     
 	if (ierr /= 0) then
 	   write(*,*) 'const_init failed'
-	   stop 1
+	   call mesa_error(__FILE__,__LINE__)
 	end if        
 
    call math_init()
@@ -77,7 +77,7 @@ program main
             logTs(i) = logT
          else if (logT /= logTs(i)) then
             write(*,*) 'bad T?', i, j, Ts(1), temperature, density, eta
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          tau_sob_f(1,j,i) = eta
       end do
@@ -87,11 +87,11 @@ program main
       do j=1,num_logTs
          if (is_bad(logTs(j))) write(*,*) 'logT', j, logTs(j)
       end do
-      write(*,*)
+      write(*,'(A)')
       do j=1,num_logRhos
          if (is_bad(logRhos(j))) write(*,*) 'logRho', j, logRhos(j)
       end do
-      write(*,*)
+      write(*,'(A)')
    end if
    ! just use "not a knot" bc's at edges of tables
    ibcxmin = 0; bcxmin(1:num_logTs) = 0
@@ -106,7 +106,7 @@ program main
    if (ierr /= 0) then
       write(*,*) 'interp_mkbicub_db error'
       ierr = -1
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    do j=1,num_logRhos
@@ -195,7 +195,7 @@ program main
          !call interp_value(time_lbol, num_lbol, f1, time-t0, Lbol, ierr)
          !if (ierr /= 0) then
          !   write(*,*) 'failed in interp_value', time
-         !   stop 1
+         !   call mesa_error(__FILE__,__LINE__)
          !end if
          dum = interp_logLbol(time)
          write(24,'(99(1pe18.6,x))') time-t0, dum, log10(gdepos*1d50)
@@ -236,7 +236,7 @@ program main
       ne(j),na(j),mg(j),al(j),si(j),s(j),ar(j),ca(j),fe(j),dum,ni(j)
       if (idum /= j) then
          write(*,*) 'error in abn: idum /= j', idum, j
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
    end do
    star_mass = m(zone)
@@ -267,7 +267,7 @@ program main
             den(j,nm),dum,dum,dum,dum,kap(j,nm)
          if (idum /= j) then
             write(*,*) 'error in swd: idum /= j', idum, j
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          xm(j,nm)=10**xm(j,nm)
          r(j,nm)=10**r(j,nm)
@@ -344,7 +344,7 @@ program main
                !call interp_value(time_lbol, num_lbol, f1, time, Lbol, ierr)
                !if (ierr /= 0) then
                !   write(*,*) 'failed in interp_value', time
-               !   stop 1
+               !   call mesa_error(__FILE__,__LINE__)
                !end if
                dum = interp_logLbol(time)
                Lbol = exp10(dum) 
@@ -391,7 +391,7 @@ program main
          n_Fe = density*avo*fe(k)/A_Fe56
          if (is_bad(n_Fe)) then
             write(*,*) 'n_Fe', k, n_Fe, density, avo, fe(k), A_Fe56
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          logRho = log10(density)
          logRho = min(logRhos(num_logRhos), max(logRhos(1), logRho))  
@@ -405,12 +405,12 @@ program main
             write(*,*) 'logRho', k, logRho
             write(*,*) 'logT', k, logT
             write(*,*) 'interp failed in data_for_extra_profile_columns'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          eta = fval(1)
          if (is_bad(eta)) then
             write(*,*) 'eta', k, eta, logT, logRho, n_Fe
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          time_sec = time*60*60*24
          tau_sob = pi*qe*qe/(me*clight)*n_Fe*eta*f*time_sec*lambda0
@@ -515,7 +515,7 @@ program main
       if (ierr /= 0) then
          write(*,*) 'failed in get_abs_mag_by_id ' // trim(name), &
             time, logT, log_g, Fe_H, Lbol
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
    end function get1_synthetic_color_abs_mag
 
@@ -563,7 +563,7 @@ program main
       write(io,'(a20,i25)') 'zones', zone
       write(io,'(a20,2(1p,e25.15))') 'inner boundary mass', mass_IB*msun, mass_IB
       write(io,'(a20,2(1p,e25.15))') 'total mass', star_mass*msun, star_mass
-      write(io,*)
+      write(io,'(A)')
       write(io,'(99a25)') '', &
          'mass of cell (g)', & 
          'cell center m (g)', & 
@@ -601,7 +601,7 @@ program main
          'luminosity', &
          'n_bar', &
          'n_e' 
-      write(io,*)
+      write(io,'(A)')
       do j=1,zone  
          !read(io1,*) i1, data1(1:ncol)
          !read(io2,*) i2, data2(1:ncol)
@@ -609,14 +609,14 @@ program main
          call get1_data(j,nm2,data2)
          !if (i1 /= j .or. i2 /= j) then
          !   write(*,*) 'bad zone', i1, i2, j
-         !   stop 'save_day50_post_Lbol_max'
+         !   call mesa_error(__FILE__,__LINE__,'save_day50_post_Lbol_max')
          !end if
          write(io,'(i25)', advance = 'no') j
          do k=1,ncol
             !write(*,*) k, alfa*data1(k) + beta*data2(k), data1(k), data2(k)
             write(io,'(1p,e25.15)', advance = 'no') alfa*data1(k) + beta*data2(k)
          end do
-         write(io,*)
+         write(io,'(A)')
       end do
 
       close(io)
@@ -627,7 +627,7 @@ program main
       return
 333    continue
       write(*,*) 'failed in save_day_post_Lbol_max'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
       
    end subroutine save_day_post_Lbol_max
       

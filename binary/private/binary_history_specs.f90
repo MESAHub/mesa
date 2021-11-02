@@ -82,9 +82,9 @@
          end if
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'binary_history_columns_file <' // trim(filename) // '>'
-            write(*,*)
+            write(*,'(A)')
          end if
 
          call count_specs
@@ -133,9 +133,9 @@
          end if
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'done add_binary_history_columns ' // trim(filename)
-            write(*,*)
+            write(*,'(A)')
          end if
          
          
@@ -282,7 +282,7 @@
          b% history_column_values(:) = 0
          !b% need_to_write_history = .false.
          if (dbg) write(*,*) 'binary num log columns', capacity
-         if (dbg) stop 'debug: set_binary_history_columns'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_binary_history_columns')
       end subroutine set_binary_history_columns
 
 

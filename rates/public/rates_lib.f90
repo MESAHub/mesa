@@ -26,6 +26,7 @@
       module rates_lib
       
       use const_def, only: dp
+      use utils_lib, only: mesa_error
       
       implicit none
 
@@ -874,9 +875,9 @@
          end if
       end subroutine screen_pair
 
-      subroutine eval_ecapnuc_rate(etakep,temp,rpen,rnep,spen,snep)
+      subroutine eval_ecapnuc_rate(etakep,temp,rho,rpen,rnep,spen,snep)
          use ratelib, only: ecapnuc
-         real(dp), intent(in) :: etakep,temp
+         real(dp), intent(in) :: etakep,temp,rho
          real(dp), intent(out) :: rpen,rnep,spen,snep
          !  given the electron degeneracy parameter etakep (chemical potential
          !  without the electron's rest mass divided by kt) and the temperature temp,
@@ -885,7 +886,7 @@
          !  positron capture on neutrons rnep (captures/sec/neutron), 
          !  and their associated neutrino energy loss rates 
          !  spen (ergs/sec/proton) and snep (ergs/sec/neutron)
-         call ecapnuc(etakep,temp,rpen,rnep,spen,snep)
+         call ecapnuc(etakep,temp,rho,rpen,rnep,spen,snep)
       end subroutine eval_ecapnuc_rate
 
       subroutine eval_mazurek_rate(btemp,bden,y56,ye,rn56ec,sn56ec)       
@@ -964,7 +965,7 @@
         case('PCR2009')
            get_mui_value = PCR2009
         case DEFAULT
-           stop 'Incorrect option for ion_coulomb_corrections'
+           call mesa_error(__FILE__,__LINE__,'Incorrect option for ion_coulomb_corrections')
         end select
 
         return
@@ -985,7 +986,7 @@
         case('Itoh2002')
            get_vs_value = Itoh2002
         case DEFAULT
-           stop 'Incorrect option for electron_coulomb_corrections'
+           call mesa_error(__FILE__,__LINE__,'Incorrect option for electron_coulomb_corrections')
         end select
 
         return

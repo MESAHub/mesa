@@ -33,6 +33,7 @@
       use eos_HELM_eval
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
       use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
+      use ideal, only: get_ideal_for_eosdt
 
 
       implicit none
@@ -163,6 +164,13 @@
                skip, ierr)
          case(i_eos_CMS)
             call get_CMS_for_eosdt( &
+               rq% handle, dbg, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, 1d0, &
+               res, d_dlnd, d_dlnT, d_dxa, &
+               skip, ierr)
+         case(i_eos_ideal)
+            call get_ideal_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
@@ -672,10 +680,9 @@
          end if
          
          if (dbg) write(*,1) 'OPAL/SCVH', (1d0 - alfa)*remaining_fraction
-         if (dbg) write(*,1) 'HELM', alfa*remaining_fraction
-         
          get_1st => get_opal_scvh_for_eosdt
-         get_2nd => get_helm_for_eosdt
+
+         get_2nd => get_level6_for_eosdt
          call combine_for_eosdt( &
             get_1st, get_2nd, alfa*remaining_fraction, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
@@ -690,6 +697,118 @@
          end if
             
       end subroutine get_level5_for_eosdt
+      
+      subroutine get_level6_for_eosdt( &  ! HELM/ideal
+            handle, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T_in, logT_in, remaining_fraction, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         integer, intent(in) :: handle
+         logical, intent(in) :: dbg
+         real(dp), intent(in) :: &
+            Z, X, abar, zbar, remaining_fraction
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:), net_iso(:)
+         real(dp), intent(in) :: xa(:)
+         real(dp), intent(in) :: rho, logRho, T_in, logT_in
+         real(dp), intent(inout), dimension(nv) :: &
+            res, d_dlnd, d_dlnT
+         real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(out) :: skip
+         integer, intent(out) :: ierr
+         
+         real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+            logT_HELM, T_HELM, logQ, logQ2, T, logT
+         type (EoS_General_Info), pointer :: rq
+         procedure (get_values_for_eosdt_interface), pointer :: get_1st, get_2nd
+
+         include 'formats'
+         
+         ierr = 0
+         rq => eos_handles(handle)
+         
+         T = T_in
+         logT = logT_in
+
+         call get_HELM_alfa(rq, logRho, logT, alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr)
+         
+         if (dbg) write(*,1) 'HELM', (1d0 - alfa)*remaining_fraction
+
+         get_1st => get_helm_for_eosdt
+         get_2nd => get_ideal_for_eosdt
+         call combine_for_eosdt( &
+            get_1st, get_2nd, alfa*remaining_fraction, &
+            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+            rq, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, &
+            skip, ierr)
+         if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
+            skip = .true.
+            ierr = 0
+         end if
+            
+      end subroutine get_level6_for_eosdt
+
+      subroutine get_HELM_alfa( & 
+            rq, logRho, logT, alfa, d_alfa_dlogT, d_alfa_dlogRho, ierr)
+         use const_def
+         use eos_blend
+         use auto_diff
+         type (EoS_General_Info), pointer :: rq
+         real(dp), intent(in) :: logRho, logT
+         real(dp), intent(out) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         integer, intent(out) :: ierr
+
+         logical :: contained
+         type(auto_diff_real_2var_order1) :: p(2), blend, dist
+
+         ! Blend parameters
+         real(dp) :: helm_blend_width
+         integer, parameter :: num_points = 4
+         real(dp) :: bounds(4,2)
+         type (Helm_Table), pointer :: ht
+
+         ierr = 0
+         ht => eos_ht 
+         helm_blend_width = 0.1d0
+
+         bounds(1,1) = ht% logdlo
+         bounds(1,2) = ht% logthi
+
+         bounds(2,1) = ht% logdlo
+         bounds(2,2) = ht% logtlo
+
+         bounds(3,1) = ht% logdhi
+         bounds(3,2) = ht% logtlo
+
+         bounds(4,1) = ht% logdhi
+         bounds(4,2) = ht% logthi
+
+         ! Set up auto_diff point
+         p(1) = logRho
+         p(1)%d1val1 = 1d0
+         p(2) = logT
+         p(2)%d1val2 = 1d0
+
+         contained = is_contained(num_points, bounds, p)
+         dist = min_distance_to_polygon(num_points, bounds, p)
+
+         if (contained) then ! Make distance negative for points inside the polygon
+            dist = -dist
+         end if
+
+         dist = dist / helm_blend_width
+         blend = max(dist, 0d0)
+         blend = min(blend, 1d0)
+
+         alfa = blend%val
+         d_alfa_dlogRho = blend%d1val1
+         d_alfa_dlogT = blend%d1val2
+
+      end subroutine get_HELM_alfa
 
 
       subroutine Get_FreeEOS_alfa( &
@@ -1012,7 +1131,7 @@
             logRho4 = logQ2 + 2*logT7 - 12d0
             
             if (.false.) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logRho1', logRho1
                write(*,1) 'logRho2', logRho2
                write(*,1) 'logRho3', logRho3
@@ -1021,7 +1140,7 @@
                write(*,1) 'logRho6', logRho6
                write(*,1) 'logRho7', logRho7
                write(*,1) 'logRho8', logRho8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logT1', logT1
                write(*,1) 'logT2', logT2
                write(*,1) 'logT3', logT3
@@ -1030,11 +1149,11 @@
                write(*,1) 'logT6', logT6
                write(*,1) 'logT7', logT7
                write(*,1) 'logT8', logT8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logQ1', logQ1
                write(*,1) 'logQ2', logQ2
-               write(*,*)
-               stop 'eosdt_eval'
+               write(*,'(A)')
+               call mesa_error(__FILE__,__LINE__,'eosdt_eval')
             end if
 
             ! check validity of Rho's and T's for region boundaries
@@ -1044,11 +1163,11 @@
                 logRho7 <= logRho8 .or. &
                 logT1 <= logT2 .or. logT2 <= logT3 .or. logT3 <= logT4 .or. &
                 logT7 <= logT8) then
-               write(*,*)
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
                write(*,'(a)') 'must have strictly decreasing values for eos logT + logRho region boundaries'
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logRho1', logRho1
                write(*,1) 'logRho2', logRho2
                write(*,1) 'logRho3', logRho3
@@ -1057,7 +1176,7 @@
                write(*,1) 'logRho6', logRho6
                write(*,1) 'logRho7', logRho7
                write(*,1) 'logRho8', logRho8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logT1', logT1
                write(*,1) 'logT2', logT2
                write(*,1) 'logT3', logT3
@@ -1066,11 +1185,11 @@
                write(*,1) 'logT6', logT6
                write(*,1) 'logT7', logT7
                write(*,1) 'logT8', logT8
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'logQ1', logQ1
                write(*,1) 'logQ2', logQ2
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
                if (logT3 <= logT4) then
                   write(*,'(a)') 'must have logRho1 > logRho2 + logQ1 - logQ2'
                   write(*,1) 'must have logRho1 > ', logRho2 + logQ1 - logQ2
@@ -1079,7 +1198,7 @@
                   write(*,'(a)') 'logRho2_OPAL_SCVH_limit sets logRho2'
                   write(*,1) 'max allowed logRho1 is', logRho1_max
                end if
-               write(*,*)
+               write(*,'(A)')
                ierr = -1
                return
             end if
@@ -1274,7 +1393,7 @@
                iregion = blend_in_x
             end if
 
-            if (dbg) stop 'determine_region'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'determine_region')
             
          end subroutine determine_region_opal_scvh
 
@@ -1688,7 +1807,7 @@
                ierr = -1
                if (.not. stop_for_is_bad) return
                write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
-               stop 'Get1_eosdt_for_X num_Xs'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X num_Xs')
             end if
             
             return
@@ -1740,7 +1859,7 @@
          if (.not. what_we_use_is_equal_spaced) then
             call do_linear
             if (is_bad(d_dX(1))) then
-               stop 'Get1_eosdt_for_X bad d_dX; linear'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X bad d_dX; linear')
             end if
             return
          end if
@@ -1795,7 +1914,7 @@
                dcdX(3)*res_zx(:,3)
 
             if (is_bad(d_dX(1))) then
-               stop 'Get1_eosdt_for_X bad d_dX; 3'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X bad d_dX; 3')
             end if
             
          else
@@ -1839,7 +1958,7 @@
                dcdX(4)*res_zx(:,4)
 
             if (is_bad(d_dX(1))) then
-               stop 'Get1_eosdt_for_X bad d_dX; 4'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X bad d_dX; 4')
             end if
 
          end if
@@ -1859,7 +1978,7 @@
                ierr)
             if (ierr /= 0) then
                if (.not. stop_for_is_bad) return
-               stop 'Get1_eosdt_for_X'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X')
             end if
          
             j = 2
@@ -1869,7 +1988,7 @@
                ierr)
             if (ierr /= 0) then
                if (.not. stop_for_is_bad) return
-               stop 'Get1_eosdt_for_X'
+               call mesa_error(__FILE__,__LINE__,'Get1_eosdt_for_X')
             end if
 
             ! zero these for now
@@ -2030,7 +2149,7 @@
             ierr = -1
             if (.not. stop_for_is_bad) return
             write(*,1) 'fval(i_lnS), logRho, logT', fval(i_lnS), logRho, logT
-            stop 'after Do_Interp_with_2nd_derivs'
+            call mesa_error(__FILE__,__LINE__,'after Do_Interp_with_2nd_derivs')
          end if
          
          res(i_lnPgas) = fval(i_lnPgas)
@@ -2041,14 +2160,14 @@
             ierr = -1
             if (.not. stop_for_is_bad) return
             write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
-            stop 'after interpolation'
+            call mesa_error(__FILE__,__LINE__,'after interpolation')
          end if
          
          if (is_bad(res(i_lnS)) .or. res(i_lnS) > ln10*100) then
             ierr = -1
             if (.not. stop_for_is_bad) return
             write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
-            stop 'after interpolation'
+            call mesa_error(__FILE__,__LINE__,'after interpolation')
          end if
          
          res(i_grad_ad) = fval(i_grad_ad)
@@ -2124,7 +2243,7 @@
             write(*,1) 'fval(i_lnS)', fval(i_lnS)
             write(*,1) 'd_dlnd(i_lnS)', d_dlnd(i_lnS)
             write(*,1) 'd_dlnT(i_lnS)', d_dlnT(i_lnS)
-            stop 'Get1_eosdt_XTable_Results'
+            call mesa_error(__FILE__,__LINE__,'Get1_eosdt_XTable_Results')
          end if
 
       end subroutine Get1_eosdt_XTable_Results
@@ -2366,8 +2485,8 @@
                   write(*,1) 'logRho', logRho
                   write(*,1) 'T', T
                   write(*,1) 'logT', logT
-                  write(*,*)
-                  stop 'do_safe_get_Rho_T'
+                  write(*,'(A)')
+                  call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
                end if
                return
             end if
@@ -2384,8 +2503,8 @@
                write(*,1) 'logRho', logRho
                write(*,1) 'T', T
                write(*,1) 'logT', logT
-               write(*,*)
-               stop 'do_safe_get_Rho_T'
+               write(*,'(A)')
+               call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
             end if
             
             if (which_other == -1) then ! other_value is egas

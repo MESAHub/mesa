@@ -109,7 +109,8 @@
       real(dp), pointer :: eos_frac_PC(:)
       real(dp), pointer :: eos_frac_FreeEOS(:)
       real(dp), pointer :: eos_frac_CMS(:)
-      
+      real(dp), pointer :: eos_frac_ideal(:)
+
       real(dp), pointer :: d_eos_dlnd(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dlnT(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dxa(:,:,:) ! (num_eos_d_dxa_results,species,nz)
@@ -143,22 +144,16 @@
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
-      real(dp), pointer :: i_rot(:) ! specific moment of inertia at cell boundary
-      real(dp), pointer :: di_rot_dw_div_wc(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: di_rot_dlnr(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: fp_rot(:) ! rotation factor for momentum
-      real(dp), pointer :: ft_rot(:) ! rotation factor for temperature
-      real(dp), pointer :: dfp_rot_dw_div_wc(:) ! partial of fp with respect to w_div_wc
-      real(dp), pointer :: dft_rot_dw_div_wc(:) ! partial of ft with respect to w_div_wc
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: i_rot(:), fp_rot(:), ft_rot(:)
+
       real(dp), pointer :: w_div_w_crit_roche(:) ! fraction of critical rotation at the equator,
                                                  ! without the contribution of the Eddington factor
       real(dp), pointer :: r_polar(:) ! radius in polar direction
       real(dp), pointer :: r_equatorial(:) ! radius in equatorial direction    
       real(dp) :: rotational_mdot_boost
 
-      ! angular momentum fluxes and their partials
-      real(dp), pointer :: j_flux(:), dj_flux_dw00(:), dj_flux_dwp1(:), dj_flux_dj00(:), dj_flux_djp1(:), &
-         dj_flux_dlnr00(:), dj_flux_dlnrp1(:), dj_flux_dlnd(:)
+      ! angular momentum fluxes
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: j_flux(:)
            
       real(dp), pointer :: am_nu_rot(:)
       real(dp), pointer :: am_nu_non_rot(:) ! diffusion driven by other sources, e.g. convection
@@ -226,14 +221,14 @@
 
       real(dp), pointer :: eps_nuc(:) ! sum of reaction_eps_nuc for all reactions in net
          ! thermal ergs per gram per second from nuclear reactions
-         ! (nuclear reaction neutrinos have been subtracted)
+         ! (including losses to neutrinos produced in the reactions)
       real(dp), pointer :: eps_nuc_categories(:,:) ! (num_categories, nz)
       real(dp), pointer :: d_epsnuc_dlnd(:) ! partial wrt density
       real(dp), pointer :: d_epsnuc_dlnT(:) ! partial wrt temperature
       real(dp), pointer :: d_epsnuc_dx(:,:)  ! (species,nz)
          ! d_ex_dx(j, k) is partial of eps_nuc(k) wrt species(j)
 
-      real(dp), pointer :: eps_nuc_neu_total(:) ! erg/gm/sec as neutrinos from nuclear reactions
+      real(dp), pointer :: eps_nuc_neu_total(:) ! erg/gm/sec, (positive) energy lost to neutrinos in nuclear reactions
 
       real(dp), pointer :: dxdt_nuc(:,:) ! (species,nz)
          ! rate of change of mass fractions from nuclear reactions
@@ -258,7 +253,7 @@
       real(dp), pointer :: luminosity_by_category(:,:) ! (num_categories, nz)
 
       ! non-nuclear-reaction neutrino losses
-      real(dp), pointer :: non_nuc_neu(:)
+      real(dp), pointer :: non_nuc_neu(:) ! positive
       real(dp), pointer :: d_nonnucneu_dlnd(:)
       real(dp), pointer :: d_nonnucneu_dlnT(:)
    
@@ -294,10 +289,9 @@
          d_extra_jdot_domega_p1, d_extra_omegadot_domega_p1
 
       ! velocity time centering
-      real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
+      real(dp), pointer, dimension(:) :: vc
       real(dp) :: d_vc_dv
    
-      
       ! gravitational constant (can be set by user and can be vary within model)
       real(dp), pointer :: cgrav(:)      
       
@@ -390,10 +384,7 @@
 
          real(dp), pointer, dimension(:) :: &
             Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
-            Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &           
-            Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
-               d_Chi_dv00, d_Chi_dvp1, d_Chi_dlnR00, d_Chi_dlnRp1, &
-            f_Edd
+            Fr, Fr_start, Lc_start, Ptrb_start, Chi_start, f_Edd
          integer :: RSP_num_periods
          real(dp) :: RSP_dt, RSP_period, g_Edd, &
             rsp_DeltaR, rsp_DeltaMag, rsp_GRPDV, rsp_GREKM, rsp_GREKM_avg_abs
@@ -478,9 +469,7 @@
          d_uface_domega, &
          RTI_du_diffusion_kick, &
          u_face_start
-      real(dp), pointer, dimension(:) :: &
-         d_Pface_domega, &
-         P_face_start
+      real(dp), pointer, dimension(:) :: P_face_start
       real(dp), pointer, dimension(:) :: &
          abs_du_div_cs, &
          abs_du_plus_cs
@@ -841,7 +830,6 @@
          real(dp), pointer :: Cv_start(:) ! (nz)
          real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
-         real(dp), pointer :: eta_start(:) ! (nz)
          real(dp), pointer :: T_start(:) ! (nz)
          real(dp), pointer :: mu_start(:) ! (nz)
          real(dp), pointer :: phase_start(:) ! (nz)
@@ -888,7 +876,7 @@
       
       ! misc other stuff        
 
-         logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, using_TDC, &
+         logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
@@ -1010,7 +998,6 @@
          integer, pointer, dimension(:) :: burn_num_iters
 
          integer :: termination_code
-         integer :: burn_nfcn_total
          integer :: dX_nuc_drop_max_k
          integer :: dX_nuc_drop_max_j
          integer :: solver_test_partials_var

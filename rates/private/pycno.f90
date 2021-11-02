@@ -264,52 +264,52 @@
             write(*,1) 'G1', G1
             write(*,1) 'G2', G2
             write(*,1) 'U', U
-            write(*,*)
+            write(*,'(A)')
             
             write(*,1) 'abs(Rho_0 - Rho)', abs(Rho_0 - Rho)
             
             if (.true. .and. abs(Rho_0 - Rho) > 1d-2) then
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic drdRho', drdRho
                write(*,1) 'numeric drdRho', (r_0 - r) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic dG1dRho', dG1dRho
                write(*,1) 'numeric dG1dRho', (G1_0 - G1) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic dG2dRho', dG2dRho
                write(*,1) 'numeric dG2dRho', (G2_0 - G2) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic dUdRho', dUdRho
                write(*,1) 'numeric dUdRho', (U_0 - U) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic AF', dAFdRho 
                write(*,1) 'numeric AF', (AF_0 - AF) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic B1_denom', dB1_denom_dRho
                write(*,1) 'numeric B1_denom', (B1_denom_0 - B1_denom) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic B1', dB1dRho
                write(*,1) 'numeric B1', (B1_0 - B1) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic B2_denom', dB2_denom_dRho 
                write(*,1) 'numeric B2_denom', (B2_denom_0 - B2_denom) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic B2', dB2dRho 
                write(*,1) 'numeric B2', (B2_0 - B2) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic E1', dE1dRho 
                write(*,1) 'numeric E1', (E1_0 - E1) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic F1', dF1dRho 
                write(*,1) 'numeric F1', (F1_0 - F1) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic E2', dE2dRho 
                write(*,1) 'numeric E2', (E2_0 - E2) / (Rho_0 - Rho)
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic F2', dF2dRho 
                write(*,1) 'numeric F2', (F2_0 - F2) / (Rho_0 - Rho)
-               write(*,*)
-               stop 'FL_epsnuc_3alf' 
+               write(*,'(A)')
+               call mesa_error(__FILE__,__LINE__,'FL_epsnuc_3alf') 
             end if
                         
          end if

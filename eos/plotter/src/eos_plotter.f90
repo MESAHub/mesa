@@ -71,7 +71,7 @@ program eos_plotter
    call const_init(my_mesa_dir,ierr)
    if (ierr /= 0 .and. .not. ignore_ierr) then
       write(*,*) 'const_init failed'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    call math_init()
@@ -79,7 +79,7 @@ program eos_plotter
    call chem_init('isotopes.data', ierr)
    if (ierr /= 0 .and. .not. ignore_ierr) then
       write(*,*) 'failed in chem_init'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    ! allocate and initialize the eos tables
@@ -87,7 +87,7 @@ program eos_plotter
    call eos_ptr(handle, rq, ierr)
 
    allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
-   if (ierr /= 0 .and. .not. ignore_ierr) stop 'allocate failed'
+   if (ierr /= 0 .and. .not. ignore_ierr) call mesa_error(__FILE__,__LINE__,'allocate failed')
 
    logRho_center = UNSET
    logT_center = UNSET
@@ -117,7 +117,7 @@ program eos_plotter
 
    ! check i_var
    if ((i_var .lt. 0) .or. (i_var .gt. num_eos_basic_results)) then
-      stop 'invalid value of i_var'
+      call mesa_error(__FILE__,__LINE__,'invalid value of i_var')
    else
 
       if (doing_dfridr) then
@@ -313,7 +313,7 @@ program eos_plotter
             write(*,*) 'failed in eosDT_get'
             write(*,1) 'log10Rho', log10Rho
             write(*,1) 'log10T', log10T
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
 
          if (i_eos_other .ge. 0) then
@@ -326,7 +326,7 @@ program eos_plotter
                write(*,*) 'failed in eosDT_get'
                write(*,1) 'log10Rho', log10Rho
                write(*,1) 'log10T', log10T
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
          end if
 
@@ -354,19 +354,23 @@ program eos_plotter
 
             ! show blend regions
             res1 = 0d0
-            i_max = 0
+            i_max = -1
             do i = i_frac, i_frac+num_eos_frac_results-1
                if (res(i) > res1) then
                   res1 = res(i)
                   i_max = i
                end if
             end do
-            if (res1 < 1d0) then
+
+            if (i_max < 0) then
+               ! failed to find any eos fracs > 0
+               res1 = -99
+            else if (res1 < 1d0) then
+               ! in a blend region
                res1 = 0
             else
                res1 = i_max - i_frac + 1
             end if
-
          end if
 
          if (doing_dfridr) then
@@ -413,7 +417,7 @@ program eos_plotter
 
    if (ierr /= 0 .and. .not. ignore_ierr) then
       write(*,*) 'bad result from eos_get'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
 contains
@@ -433,7 +437,7 @@ contains
       call eos_init(' ', use_cache, ierr)
       if (ierr /= 0 .and. .not. ignore_ierr) then
          write(*,*) 'eos_init failed in Setup_eos'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
       write(*,*) 'loading eos tables'
@@ -441,7 +445,7 @@ contains
       handle = alloc_eos_handle_using_inlist('inlist_plotter', ierr)
       if (ierr /= 0 .and. .not. ignore_ierr) then
          write(*,*) 'failed trying to allocate eos handle'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
    end subroutine Setup_eos
@@ -590,7 +594,7 @@ contains
       else
          ! check for all blends
          in_eos_blend = .false.
-         do i = i_frac, i_frac+num_eos_frac_results
+         do i = i_frac, i_frac+num_eos_frac_results-1
             in_eos_blend = in_eos_blend .or. &
                ((res(i) .gt. 0) .and. (res(i) .lt. 1))
          end do

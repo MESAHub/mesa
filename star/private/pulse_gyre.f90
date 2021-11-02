@@ -177,7 +177,7 @@ contains
 
     ! Check that all point data has correctly been calculated
 
-    if (j /= nn+1) stop 'Invalid cell index in get_gyre_data'
+    if (j /= nn+1) call mesa_error(__FILE__,__LINE__,'Invalid cell index in get_gyre_data')
 
     ! Reverse the data ordering (GYRE format is center-to-surface)
 

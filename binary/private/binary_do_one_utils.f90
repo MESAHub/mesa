@@ -50,9 +50,9 @@
          ierr = 0
          call get_binary_ptr(id, b, ierr)
          if (ierr /= 0) return
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a)') " The binary terminal output contains the following information"
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a)') "      'step' is the number of steps since the start of the run,"
          write(*,'(a)') "      'lg_dt' is log10 timestep in years,"
          write(*,'(a)') "      'age_yr' is the simulated years since the start run,"
@@ -92,7 +92,7 @@
          write(*,'(a)') "      'dot_Jmb', time derivative of Jorb due to magnetic braking (g*cm^2/s^2),"
          write(*,'(a)') "      'dot_Jls', time derivative of Jorb due to spin-orbit coupling (g*cm^2/s^2),"
          write(*,'(a)') "      'rlo_iters', number of iterations for implicit calculation of mass transfer,"
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a)') " All this and more can be saved in binary_history.data during the run."
       end subroutine do_show_binary_log_description
       
@@ -111,7 +111,7 @@
          write(io,'(a)') &
             '_______________________________________________________________________' // &
             '___________________________________________________________________________'
-         write(io,*)
+         write(io,'(A)')
          write(io,'(a)') &
             'binary_step      M1+M2      separ       Porb          e      M2/M1' // &
             '       pm_i    donor_i    dot_Mmt        eff       Jorb      dot_J    dot_Jmb'
@@ -124,7 +124,7 @@
          write(io,'(a)') &
             '_______________________________________________________________________' // &
             '___________________________________________________________________________'
-         write(io,*)
+         write(io,'(A)')
          
       end subroutine output_binary_terminal_header
       
@@ -368,7 +368,7 @@
             b% jdot_ml, &
             rlo_iters
 
-         write(io,*)
+         write(io,'(A)')
          
          b% just_wrote_binary_terminal_header = .false.
          

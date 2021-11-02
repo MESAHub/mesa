@@ -4,21 +4,32 @@
 How to contribute
 =================
 
-.. warning::
-
-   This document is written for MESA developers.  Users are not yet
-   able to contribute via GitHub.
 
 Obtaining MESA
 ==============
 
-Join the MESA team on GitHub
-----------------------------
+There are two ways to submit changes to MESA, depending on who you are.
 
+MESA developer
+--------------
+
+If you are a MESA developer then you will have commit access to the MESA repository on Github.
 You must create an account on `GitHub <https://github.com/>`__.  The
 MESA organization is called `MESAHub <https://github.com/MESAHub/>`__.
 After you are registered on GitHub, you can be invited to the
 organization.
+
+
+Non-MESA developer
+------------------
+
+For those who do not have commit access to the main MESA repository you will need to `fork <https://docs.github.com/en/github/collaborating-with-pull-requests/working-with-forks/about-forks>`__
+MESA and make your changes in your fork. Once you are happy with your changes you can submit a pull request
+against the main MESA repository. At this point your contirbutions will be reviewed by a MESA
+developer who may or may not accept the pull request. If they accept it then it will be merged 
+into MESA.
+
+More details can be found in the `contribution documentation <../contributing.html>`__
 
 
 Set up Git

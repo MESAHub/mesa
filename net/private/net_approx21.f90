@@ -26,6 +26,7 @@
       module net_approx21
       use const_def, only: dp, qp, avo, clight
       use utils_lib, only: is_bad, mesa_error
+      use math_lib
 
 
       implicit none
@@ -304,7 +305,7 @@
             
             ierr = 0
             
-            call eval_ecapnuc_rate(eta, temp, rpen, rnep, spen, snep)
+            call eval_ecapnuc_rate(eta, temp, den, rpen, rnep, spen, snep)
             
             ratraw(irpen) = rpen
             dratrawdt(irpen) = 0
@@ -931,12 +932,12 @@
 
          subroutine approx21_dydt( &
             y, rate, ratdum, dydt, deriva, &
-            fe56ec_fake_factor_in, min_T, fe56ec_n_neut, temp, plus_co56, ierr)
+            fe56ec_fake_factor_in, min_T, fe56ec_n_neut, temp, den, plus_co56, ierr)
          logical, intent(in) :: deriva ! false for dydt, true for partials wrt T, Rho
          real(dp), dimension(:), intent(in) :: y, rate, ratdum
          integer, intent(in) :: fe56ec_n_neut
          real(dp), dimension(:), intent(out) :: dydt
-         real(dp), intent(in) :: fe56ec_fake_factor_in, temp
+         real(dp), intent(in) :: fe56ec_fake_factor_in, temp, den
          real(dp) :: fe56ec_fake_factor, min_T
          logical, intent(in) ::  plus_co56
          integer, intent(out) :: ierr
@@ -955,8 +956,11 @@
          ierr = 0
 
          ! Turn on special fe56ec rate above some temperature
-         fe56ec_fake_factor=eval_fe56ec_fake_factor(fe56ec_fake_factor_in, min_T, temp)
-         
+         fe56ec_fake_factor = 0d0
+         if(.not.deriva) then
+            fe56ec_fake_factor = eval_fe56ec_fake_factor(fe56ec_fake_factor_in, min_T, temp)
+         end if
+
          dydt(1:species(plus_co56)) = 0.0d0
          qray(1:species(plus_co56)) = 0.0_qp
 
@@ -1534,10 +1538,14 @@
             end if
          end do
          if (.not. okay) then
+
+            write(*,*) 'log10(temp) = ',safe_log10(temp)
+            write(*,*) 'log10(rho) = ',safe_log10(den)
+
             do i=1,num_reactions(plus_co56)
                write(*,*) trim(ratnam(i)), i, rate(i)
             end do
-            stop 'approx21_dydt'
+            call mesa_error(__FILE__,__LINE__,'approx21_dydt')
          end if
 
          end subroutine approx21_dydt
@@ -1865,7 +1873,7 @@
                !write(*,*) ' please report it.  can edit the file in eos/private to remove this test. '
                write(*,1) 'logT', n% logT
                write(*,1) 'approx21_eps_info'
-               write(*,*)
+               write(*,'(A)')
                do i=1,num_categories
                   if (abs(eps_nuc_categories(i)) > 1d-6) then
                      write(*,1) trim(category_name(i)), eps_nuc_categories(i)
@@ -1878,8 +1886,8 @@
                write(*,1) 'sum(cat)', sum_categories_q
                write(*,1) 'sum(cat) - eps_nuc', sum_categories_q - eps_nuc_q
                write(*,1) 'sum(cat)/eps_nuc - 1', (sum_categories_q - eps_nuc_q)/eps_nuc_q
-               write(*,*)
-               stop 1
+               write(*,'(A)')
+               call mesa_error(__FILE__,__LINE__)
             !$OMP end critical (net21_crit1)
             end if
             
@@ -1892,7 +1900,7 @@
                write(*,2) 'icrx ' // trim(chem_isos% name(n% g% approx21_ye_iso)), icrx
                write(*,2) 'fe56ec_n_neut', fe56ec_n_neut
                write(*,1) 'fe56ec_fake_factor', fe56ec_fake_factor
-               write(*,*)
+               write(*,'(A)')
                do i=1,num_categories
                   write(*,1) trim(category_name(i)), eps_nuc_categories(i)
                end do
@@ -1903,7 +1911,7 @@
                write(*,1) 'sum(cat)', sum_categories
                write(*,1) 'sum(cat) - eps_nuc', sum_categories_q - eps_nuc_q
                write(*,1) 'sum(cat)/eps_nuc - 1', (sum_categories_q - eps_nuc_q)/eps_nuc_q
-               stop 'approx21_eps_info'
+               call mesa_error(__FILE__,__LINE__,'approx21_eps_info')
             end if
             
             
@@ -2608,11 +2616,11 @@
          
          subroutine approx21_dfdT_dfdRho( & ! epstotal includes neutrinos
                y, mion, dfdy, ratdum, dratdumdt, dratdumdd, &
-               fe56ec_fake_factor, min_T, fe56ec_n_neut, temp, &
+               fe56ec_fake_factor, min_T, fe56ec_n_neut, temp, den, &
                dfdT, dfdRho, d_epstotal_dy,  plus_co56, ierr)
             real(dp), intent(in), dimension(:) :: &
                y, mion, ratdum, dratdumdt, dratdumdd
-            real(dp), intent(in) :: fe56ec_fake_factor, min_T, temp, dfdy(:,:)
+            real(dp), intent(in) :: fe56ec_fake_factor, min_T, temp, den, dfdy(:,:)
             integer, intent(in) :: fe56ec_n_neut
             real(dp), intent(inout), dimension(:) :: d_epstotal_dy, dfdT, dfdRho
             logical, intent(in) ::  plus_co56
@@ -2626,14 +2634,14 @@
             dfdT(1:species(plus_co56)) = 0d0
             call approx21_dydt( &
                y,dratdumdt,ratdum,dfdT,deriva,&
-               fe56ec_fake_factor,min_T,fe56ec_n_neut,temp,plus_co56,ierr)
+               fe56ec_fake_factor,min_T,fe56ec_n_neut,temp,den,plus_co56,ierr)
             if (ierr /= 0) return
 
             ! density dependence of the rate equations
             dfdRho(1:species(plus_co56)) = 0d0
             call approx21_dydt( &
                y,dratdumdd,ratdum,dfdRho,deriva,&
-               fe56ec_fake_factor,min_T,fe56ec_n_neut,0d0,plus_co56,ierr)
+               fe56ec_fake_factor,min_T,fe56ec_n_neut,temp,den,plus_co56,ierr)
             if (ierr /= 0) return
 
             ! energy generation rate partials (total energy; do neutrinos elsewhere)
@@ -3275,7 +3283,7 @@
             do i=num_mesa_reactions(plus_co56)+1,num_reactions(plus_co56)
                write(*,2) 'extra ' // trim(ratnam(i)), i
             end do
-            stop 'init_approx21'
+            call mesa_error(__FILE__,__LINE__,'init_approx21')
 
          end subroutine init_approx21
          

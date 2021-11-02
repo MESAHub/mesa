@@ -247,7 +247,7 @@
          ! it must not include the new column names you are adding here.
 
          ! here is an example for adding a profile column
-         !if (n /= 1) stop 'data_for_extra_profile_columns'
+         !if (n /= 1) call mesa_error(__FILE__,__LINE__,'data_for_extra_profile_columns')
          !names(1) = 'beta'
          !do k = 1, nz
          !   vals(k,1) = s% Pgas(k)/s% P(k)
@@ -482,7 +482,7 @@
 
          include 'formats'
 
-         write(*,*)
+         write(*,'(A)')
          select case (s% x_integer_ctrl(1))
          case (1)
             write(*,'(A70, F8.3)') '[TestHub] Main-sequence lifetime (Gyr): ', (ms_t1 - ms_t0) / 1d9
@@ -575,7 +575,7 @@
             end if
 
          end select
-         write(*,*)
+         write(*,'(A)')
 
          call test_suite_after_evolve(s, ierr)
 

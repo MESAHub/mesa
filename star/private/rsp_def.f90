@@ -26,7 +26,7 @@
       module rsp_def
       use const_def, only: dp, qp, pi, crad, clight, ln10
       use math_lib
-      use utils_lib, only: is_bad
+      use utils_lib, only: is_bad, mesa_error
       use star_def, only: star_info
       use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
          store_T_in_xh, get_T_and_lnT_from_xh, store_r_in_xh, get_r_and_lnR_from_xh, &
@@ -149,6 +149,7 @@
       subroutine init_def(s)
          use const_def, only: standard_cgrav, boltz_sigma, &
             Lsun, Msun, Rsun
+         use utils_lib, only: mkdir, folder_exists
          type (star_info), pointer :: s
          
          P4=4.d0*PI
@@ -187,6 +188,8 @@
          if (ALFA == 0.d0) EFL0=0.d0
          
          writing_map = .false.
+
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
             
       end subroutine init_def
       
@@ -245,7 +248,7 @@
          NZN = nz
          if (NZN > MAX_NZN) then
             write(*,*) 'NZN > MAX_NZN', NZN, MAX_NZN
-            stop 'rsp init_allocate'
+            call mesa_error(__FILE__,__LINE__,'rsp init_allocate')
          end if
          IBOTOM = NZN/s% RSP_nz_div_IBOTOM
          n = NZN + 1 ! room for ghost cell
@@ -408,7 +411,7 @@
          call init_def(s) 
          ierr = 0
          read(iounit, iostat=ierr) NZN
-         if (ierr /= 0) stop 'read failed in rsp_photo_in'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'read failed in rsp_photo_in')
          s% nz = NZN
          call init_allocate(s,NZN)
          n = NZN + 1
@@ -434,7 +437,7 @@
             run_num_iters_prev_period, writing_map, &
             PPP0(1:n), PPQ0(1:n), PPT0(1:n), PPC0(1:n), VV0(1:n), &
             WORK(1:n), WORKQ(1:n), WORKT(1:n), WORKC(1:n)
-         if (ierr /= 0) stop 'read failed in rsp_photo_in'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'read failed in rsp_photo_in')
          if (writing_map) then
             write(*,*) 'sorry, cannot use photo to resume writing map data file'
             writing_map = .false.
@@ -482,7 +485,7 @@
          call set_rmid(s, 1, NZN, ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_rsp_photo_in failed in set_rmid'
-            stop 'finish_rsp_photo_in'
+            call mesa_error(__FILE__,__LINE__,'finish_rsp_photo_in')
          end if
       end subroutine finish_rsp_photo_in
       
@@ -509,7 +512,7 @@
             s% L(k) = Lr(i) + Lc(i)
             if (is_bad(s% L(k))) then
                write(*,2) 'L Lr Lc', k, s% L(k), Lr(i), Lc(i)
-               stop 'set_build_vars'
+               call mesa_error(__FILE__,__LINE__,'set_build_vars')
             end if
          end do
       end subroutine set_build_vars
@@ -533,7 +536,7 @@
          if (s% nz /= NZN) then
             write(*,2) 'NZN', NZN
             write(*,2) 's% nz', s% nz
-            stop 'bad nz'
+            call mesa_error(__FILE__,__LINE__,'bad nz')
          end if
          if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, s% nz, s% dq, ierr)
@@ -543,7 +546,7 @@
             end if
          end if
          call set_qs(s, s% nz, s% q, s% dq, ierr)
-         if (ierr /= 0) stop 'failed in set_qs'         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in set_qs')         
          s% m(1) = s% mstar
          do k=2,s% nz
             s% dm(k-1) = s% dq(k-1)*s% xmstar
@@ -563,7 +566,7 @@
             end if
             if (is_bad(s% Vol(k)))then
                write(*, 2) 's% Vol(k)', k, s% Vol(k)
-               stop 'set_star_vars'
+               call mesa_error(__FILE__,__LINE__,'set_star_vars')
             end if       
                  
             s% rho(k) = 1d0/s% Vol(k)
@@ -606,7 +609,7 @@
                if (s% Vol(k) <= 0d0 .or. is_bad(s% Vol(k))) then
                   write(*,2) 'copy from xh to rsp s% Vol(k) r00 r_center dm', k, &
                      s% Vol(k), s% r(k), s% R_center, s% dm(k)
-                  stop 'copy_from_xh_to_rsp'
+                  call mesa_error(__FILE__,__LINE__,'copy_from_xh_to_rsp')
                end if
             else
                q1 = P43/s% dm(k)
@@ -618,7 +621,7 @@
                if (s% Vol(k) <= 0d0 .or. is_bad(s% Vol(k))) then
                   write(*,2) 'copy from xh to rsp s% Vol(k) r00 rp1 dm', k, &
                      s% Vol(k), s% r(k), s% r(k+1), s% dm(k)
-                  stop 'copy_from_xh_to_rsp'
+                  call mesa_error(__FILE__,__LINE__,'copy_from_xh_to_rsp')
                end if
             end if
             s% erad(k) = s% xh(s% i_erad_RSP,k)
@@ -647,7 +650,7 @@
                okay = .false.
             end if
          end do
-         if (.not. okay) stop 'rsp_one_step check_for_T_or_P_inversions'
+         if (.not. okay) call mesa_error(__FILE__,__LINE__,'rsp_one_step check_for_T_or_P_inversions')
       end subroutine check_for_T_or_P_inversions
 
 
@@ -661,12 +664,12 @@
             if (k == s% nz) then
                if (s% r(k) <= s% r_center) then
                   write(*,3) trim(str) // ' bad r', k, s% model_number, s% r(k), s% r_center
-                  stop 'rsp_one_step check_R'
+                  call mesa_error(__FILE__,__LINE__,'rsp_one_step check_R')
                end if
             else
                if (s% r(k) <= s% r(k+1)) then
                   write(*,3) trim(str) // ' bad r', k, s% model_number, s% r(k), s% r(k+1)
-                  stop 'rsp_one_step check_R'
+                  call mesa_error(__FILE__,__LINE__,'rsp_one_step check_R')
                end if
             end if
          end do
@@ -711,7 +714,7 @@
             write(*,2) 's% Fr(k)', k, s% Fr(k)
             !write(*,2) '', k, 
          end do
-         !stop 'rsp_dump_for_debug'      
+         !call mesa_error(__FILE__,__LINE__,'rsp_dump_for_debug')      
       end subroutine rsp_dump_for_debug
       
       
@@ -753,7 +756,7 @@
          call set_qs(s, NZN, s% q, s% dq, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in set_qs'
-            stop 'build_rsp_model'
+            call mesa_error(__FILE__,__LINE__,'build_rsp_model')
          end if
          call set_m_and_dm(s)
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
@@ -822,7 +825,7 @@
          call set_rmid(s, 1, NZN, ierr)
          if (ierr /= 0) then
             write(*,*) 'copy_results failed in set_rmid'
-            stop 'copy_results'
+            call mesa_error(__FILE__,__LINE__,'copy_results')
          end if
          
          do i=1, NZN         

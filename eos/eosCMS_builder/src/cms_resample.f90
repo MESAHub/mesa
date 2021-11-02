@@ -96,7 +96,7 @@ program cms_resample
       'num logRhos', 'logRho min', 'logRho max', 'del logRho'
    write(io,'(i14,2f14.4,2(i14,3f14.4))') version, H_mass_fraction, 0.0_dp, NT, logT(1,1), &
       logT(1,NT), delta_logT, NRho, logRho_min, logRho_max, delta_logRho
-   write(io,*)
+   write(io,'(A)')
 
    write(io,'(99a15)') 'logT', 'logRho', 'logPgas', 'logU', 'logS', 'chiRho', 'chiT', 'Cp', 'Cv', &
       'dE_dRho', 'dS_dT', 'dS_dRho', 'mu', 'lnfree_e', 'gamma1', 'gamma3', 'grad_ad', 'eta', &

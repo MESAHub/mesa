@@ -1,0 +1,15 @@
+============
+Release 7503
+============
+
+:Date:   2015-03-27
+
+Revision 7503 has been designated a MESA release version. This fixes a
+bug present in r7499.
+
+For a discussion of the bug, see `this mailing list
+post <https://sourceforge.net/p/mesa/mailman/message/33655221/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r7503.zip/download>`__
+is available for download.

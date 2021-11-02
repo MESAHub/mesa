@@ -91,7 +91,7 @@
 !$OMP critical (kap_eval_crit1)
                write(*,*) 'i', i
                write(*,*) 'num_logs', num_logs
-               stop 'Locate_log'
+               call mesa_error(__FILE__,__LINE__,'Locate_log')
 !$OMP end critical (kap_eval_crit1)
             end if       
          end if
@@ -101,7 +101,7 @@
             return
             write(*,*) 'i', i
             write(*,*) 'num_logs', num_logs
-            stop 'Locate_log'
+            call mesa_error(__FILE__,__LINE__,'Locate_log')
          end if
          
          if (logs(i) > log_find .or. log_find > logs(i+1)) then
@@ -120,7 +120,7 @@
             write(*,*) 'ili_logs', ili_logs
 !$OMP end critical (kap_eval_crit2)
             return
-            stop 'error in Locate_log'
+            call mesa_error(__FILE__,__LINE__,'error in Locate_log')
          end if
          log0 = logs(i)
          log1 = logs(i+1)
@@ -133,7 +133,7 @@
             write(*,*) 'logs(i+1)', logs(i+1)
             write(*,*) 'i', i
             write(*,*) 'num_logs', num_logs
-            stop 'error in Locate_log'
+            call mesa_error(__FILE__,__LINE__,'error in Locate_log')
 !$OMP end critical (kap_eval_crit3)
          end if
       end subroutine Locate_log

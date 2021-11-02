@@ -229,8 +229,9 @@
       integer, parameter :: p_eos_frac_PC = p_eos_frac_Skye + 1
       integer, parameter :: p_eos_frac_FreeEOS = p_eos_frac_PC + 1
       integer, parameter :: p_eos_frac_CMS = p_eos_frac_FreeEOS + 1
+      integer, parameter :: p_eos_frac_ideal = p_eos_frac_CMS + 1
 
-      integer, parameter :: p_log_rho_times_r3 = p_eos_frac_CMS + 1
+      integer, parameter :: p_log_rho_times_r3 = p_eos_frac_ideal + 1
       integer, parameter :: p_rho_times_r3 = p_log_rho_times_r3 + 1
       integer, parameter :: p_v_times_t_div_r = p_rho_times_r3 + 1
       integer, parameter :: p_v_div_r = p_v_times_t_div_r + 1
@@ -711,8 +712,10 @@
       integer, parameter :: p_dPdr_dRhodr_info = p_u_face + 1
       integer, parameter :: p_RTI_du_diffusion_kick = p_dPdr_dRhodr_info + 1
       integer, parameter :: p_log_du_kick_div_du = p_RTI_du_diffusion_kick + 1
+
+      integer, parameter :: p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT = p_log_du_kick_div_du + 1
       
-      integer, parameter :: p_col_id_max = p_log_du_kick_div_du
+      integer, parameter :: p_col_id_max = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
       type (integer_dict), pointer :: profile_column_names_dict
@@ -926,6 +929,7 @@
          profile_column_name(p_eos_frac_PC) = 'eos_frac_PC'
          profile_column_name(p_eos_frac_FreeEOS) = 'eos_frac_FreeEOS'
          profile_column_name(p_eos_frac_CMS) = 'eos_frac_CMS'
+         profile_column_name(p_eos_frac_ideal) = 'eos_frac_ideal'
 
          profile_column_name(p_log_rho_times_r3) = 'log_rho_times_r3'
          profile_column_name(p_rho_times_r3) = 'rho_times_r3'
@@ -1402,12 +1406,14 @@
          profile_column_name(p_tau_epsnuc) = 'tau_epsnuc'
          profile_column_name(p_tau_cool) = 'tau_cool'
 
+         profile_column_name(p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT) = 'lum_rad_div_L_Edd_sub_fourPrad_div_PchiT'
+
          cnt = 0
          do i=1,p_col_id_max
             if (len_trim(profile_column_name(i)) == 0) then
                write(*,*) 'missing name for profile column id', i
                if (i > 1) write(*,*) 'following ' // trim(profile_column_name(max(1,i-1))) ! bp: get rid of bogus compiler warning
-               write(*,*)
+               write(*,'(A)')
                cnt = cnt+1
             end if
          end do

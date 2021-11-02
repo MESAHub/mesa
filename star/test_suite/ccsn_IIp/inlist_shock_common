@@ -37,8 +37,6 @@
 
       x_ctrl(16) = 0.11 ! stop_m <= star_mass minus this (Msun)
 
-!      no_MLT_below_shock = .true.
-
       ! inner_bc_v_max = 1d7 ! cm/s
 
 

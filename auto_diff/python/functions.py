@@ -1,6 +1,7 @@
 from sympy import *
 from sympy.codegen.cfunctions import *
 
+# Mathematical constants that MESA provides
 pi = symbols('pi')
 
 # Supported unary functions
@@ -48,7 +49,6 @@ unary_operators = [
 ]
 
 # Supported binary functions
-
 def Dim(x,y):
 	return (x-y+abs(x-y))/Float(2)
 

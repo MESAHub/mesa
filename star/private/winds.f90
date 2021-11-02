@@ -237,7 +237,7 @@
                if (s% trace_super_eddington_wind_boost .or. dbg) then
                   write(*,1) 'super eddington wind boost factor, L_div_Ledd', &
                      super_eddington_boost, L_div_Ledd
-                  write(*,*)
+                  write(*,'(A)')
                end if
             end if
          end if
@@ -300,7 +300,7 @@
             call rotation_enhancement(ierr)
             if (is_bad(s% rotational_mdot_boost)) then
                write(*,2) 'is_bad(s% rotational_mdot_boost)', s% model_number
-               if (s% stop_for_bad_nums) stop 'winds: rotation_enhancement'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'winds: rotation_enhancement')
             end if
             if (ierr /= 0) then
                if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: rotation_enhancement ierr'
@@ -313,7 +313,7 @@
          if (dbg) then
             write(*,1) 'final star_mdot', s% mstar_dot/(Msun/secyer)
             write(*,1) 'final lg abs s% mstar_dot/(Msun/secyer)', safe_log10(abs(s% mstar_dot/(Msun/secyer)))
-            write(*,*)
+            write(*,'(A)')
          end if
 
          contains
@@ -332,8 +332,8 @@
                 if (wind <= 0 .or. is_bad_num(wind)) then
                    ierr = -1
                    write(*,*) 'bad value for wind :', wind,L1,R1,M1
-                   if (dbg) stop 'debug: bad value for wind'
-                   if (s% stop_for_bad_nums) stop 'winds'
+                   if (dbg) call mesa_error(__FILE__,__LINE__,'debug: bad value for wind')
+                   if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'winds')
                    return
                 end if
                 X = surface_h1
@@ -371,8 +371,8 @@
                       write(*,1) 'Reimers_scaling_factorReimers_scaling_factor', s% Reimers_scaling_factor
                       write(*,1) 'wind', wind
                       write(*,1) 'log10 wind', log10(wind)
-                      write(*,*)
-                      stop 'debug: winds'
+                      write(*,'(A)')
+                      call mesa_error(__FILE__,__LINE__,'debug: winds')
                    end if
                 else if (scheme == 'Vink') then
                    call eval_Vink_wind(wind)
@@ -397,7 +397,7 @@
                 else
                    ierr = -1
                    write(*,*) 'unknown name for wind scheme : ' // trim(scheme)
-                   if (dbg) stop 'debug: bad value for wind scheme'
+                   if (dbg) call mesa_error(__FILE__,__LINE__,'debug: bad value for wind scheme')
                    return
                 end if
              end if
@@ -413,9 +413,8 @@
             ! where Osurf = angular velocity at surface
             !       Osurf_crit^2 = (1 - Gamma_edd)*G*M/R_equatorial^3
             !       Gamma_edd = kappa*L/(4 pi c G M), Eddington factor
-            real(dp) :: enhancement, wind_mdot, &
-               kh_timescale, mdot_lim, wind_mdot_prev, dmsfac, dmskhf, &
-               wind_mdot_lim, v_div_v_crit_full_on, v_div_v_crit_full_off
+            real(dp) :: enhancement, wind_mdot, wind_mdot_lim, &
+               kh_timescale, mdot_lim, wind_mdot_prev, dmsfac, dmskhf
 
             include 'formats'
 
@@ -628,8 +627,8 @@
          Ledd = s% prev_Ledd
          Leff = L/s% super_eddington_wind_Ledd_factor
          if (Leff <= Ledd) return
-         vesc2 = s% cgrav(1)*M/R  ! GM/R vs. 2GM/R ?
-         s% super_eddington_wind_mdot = s% super_eddington_scaling_factor*(Leff - Ledd)/vesc2
+         vesc2 = 2d0 * s% cgrav(1)*M/R
+         s% super_eddington_wind_mdot = s% super_eddington_scaling_factor*(Leff - Ledd)/(0.5d0 * vesc2)
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,'(a60,i12,1p2e12.4)') 'super eddington wind: lg_Mdot, L/Ledd', &
                s% model_number, log10(s% super_eddington_wind_mdot/(Msun/secyer)), L/Ledd
@@ -643,7 +642,7 @@
          real(dp), intent(inout) :: xfer_ratio
          integer, intent(out) :: ierr
          real(dp) :: roche_lobe_radius ! Rsun
-         real(dp) :: ratio, rho, p, grav, hp, scale_height, h, rho_exponent, rho_rl, rho_rl0, mdot
+         real(dp) :: ratio, scale_height, mdot
          include 'formats'
          ierr = 0
          eval_rlo_wind = 0

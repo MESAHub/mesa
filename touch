@@ -41,6 +41,7 @@ do_one sample
 do_one star
 do_one star_data
 do_one utils
+do_one turb
 
 echo "cleaning lib directory."
 rm -rf lib

@@ -425,7 +425,7 @@
                         if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
                      end if
                   end if
-                  if (s% stop_for_bad_nums) stop 'set mixing info'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
                end if
             end do
          end subroutine check
@@ -468,7 +468,7 @@
             s% cz_bdy_dq(k-1) = find0(0d0,dg0,s% dq(k-1),dg1)
             if (s% cz_bdy_dq(k-1) < 0d0 .or. s% cz_bdy_dq(k-1) > s% dq(k-1)) then
                write(*,2) 'bad cz_bdy_dq', k-1, s% cz_bdy_dq(k-1), s% dq(k-1)
-               stop 'set_cz_boundary_info'
+               call mesa_error(__FILE__,__LINE__,'set_cz_boundary_info')
                ierr = -1
                return
             end if
@@ -526,12 +526,12 @@
          s% have_new_cz_bdy_info = .true.
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'set_mixing_info s% n_conv_regions', s% n_conv_regions
             do j = 1, s% n_conv_regions
                write(*,2) 'conv region', j, s% cz_bot_mass(j)/Msun, s% cz_top_mass(j)/Msun
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
 
       end subroutine set_cz_bdy_mass
@@ -655,9 +655,9 @@
                write(*,*) 's% conv_bdy_loc', j, s% conv_bdy_loc(j)
                write(*,*) 'mixing type', s% mixing_type(s% conv_bdy_loc(j)-3:s% conv_bdy_loc(j)+3)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,3) 'mixing_type', 1152, s% mixing_type(1152)
-            stop 'locate_convection_boundaries'
+            call mesa_error(__FILE__,__LINE__,'locate_convection_boundaries')
          end if
 
 
@@ -798,7 +798,7 @@
 
 
       subroutine set_use_gradr(s,k)
-         use mlt_info, only: switch_to_radiative
+         use turb_info, only: switch_to_radiative
          type (star_info), pointer :: s
          integer, intent(in) :: k
          call switch_to_radiative(s,k)
@@ -1189,7 +1189,7 @@
          end do
          if (dbg) write(*,3) 'mixing_type', 1152, s% mixing_type(1152)
          if (dbg) write(*,*) 'done close_gaps'
-         !if (dbg) stop 'done close_gaps'
+         !if (dbg) call mesa_error(__FILE__,__LINE__,'done close_gaps')
 
       end subroutine close_gaps
 
@@ -1457,7 +1457,7 @@
             if (is_bad_num(sig(k))) then
                if (s% stop_for_bad_nums) then
                   write(*,2) 'sig(k)', k, sig(k)
-                  stop 'get_convection_sigmas'
+                  call mesa_error(__FILE__,__LINE__,'get_convection_sigmas')
                end if
                sig(k) = 1d99
             end if
@@ -1504,7 +1504,7 @@
             bdy = 2
          end if
          if (.not. s% top_mix_bdy(bdy)) then
-            stop 'bad mix bdy info 1'
+            call mesa_error(__FILE__,__LINE__,'bad mix bdy info 1')
          end if
          ktop = s% mix_bdy_loc(bdy)
          qtop = s% q(ktop)
@@ -1512,13 +1512,13 @@
          do while (bdy < s% num_mix_boundaries)
             bdy = bdy+1
             if (s% top_mix_bdy(bdy)) then
-               stop 'bad mix bdy info 2'
+               call mesa_error(__FILE__,__LINE__,'bad mix bdy info 2')
             end if
             kbot = s% mix_bdy_loc(bdy)
             qbot = s% q(kbot)
             bdy = bdy+1
             if (.not. s% top_mix_bdy(bdy)) then
-               stop 'bad mix bdy info 3'
+               call mesa_error(__FILE__,__LINE__,'bad mix bdy info 3')
             end if
             ktop = s% mix_bdy_loc(bdy)
             qtop = s% q(ktop)
@@ -1779,7 +1779,7 @@
                         if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
                      end if
                   end if
-                  if (s% stop_for_bad_nums) stop 'set mixing info'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
                end if
             end do
          end subroutine check
@@ -1806,7 +1806,7 @@
                         if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
                      end if
                   end if
-                  if (s% stop_for_bad_nums) stop 'set mixing info'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
                end if
             end do
          end subroutine check_D_omega
@@ -1847,13 +1847,13 @@
                      am_nu_ST_factor*s% nu_ST(k))
                   if (is_bad(am_nu_rot_source)) then
                      write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
-                     stop 'set am_nu_rot'
+                     call mesa_error(__FILE__,__LINE__,'set am_nu_rot')
                   end if
                   s% am_nu_rot(k) = am_nu_rot_source
                   if (is_bad(s% am_nu_rot(k))) then
                      write(*,2) 's% am_nu_rot(k)', k, s% am_nu_rot(k)
                      write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
-                     stop 'set am_nu_rot'
+                     call mesa_error(__FILE__,__LINE__,'set am_nu_rot')
                   end if
                end do
                
@@ -1918,7 +1918,7 @@
                      do i = 2,nz
                         if (bp(i-1) == 0) then
                            write(*,*) 'failed in set_am_nu_rot', s% model_number
-                           stop 'mix_am_nu_rot'
+                           call mesa_error(__FILE__,__LINE__,'mix_am_nu_rot')
                            ierr = -1
                            return
                         end if
@@ -1938,7 +1938,7 @@
                            return
                            write(*,3) 's% am_nu_rot(k) prev, x', k, &
                               s% model_number, s% am_nu_rot(k), x(k), bp(i)
-                           stop 'mix_am_nu_rot'
+                           call mesa_error(__FILE__,__LINE__,'mix_am_nu_rot')
                         end if
                      end do
             
@@ -1947,7 +1947,7 @@
                         s% am_nu_rot(k) = s% am_nu_rot(k) + x(k)
                         if (is_bad(s% am_nu_rot(k))) then
                            write(*,3) 's% am_nu_rot(k)', k, s% model_number, s% am_nu_rot(k)
-                           stop 'mix_am_nu_rot'
+                           call mesa_error(__FILE__,__LINE__,'mix_am_nu_rot')
                         end if
                         if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
                      end do
@@ -1963,7 +1963,7 @@
                do k=1,nz
                   if (is_bad(s% am_nu_rot(k))) then
                      write(*,2) 'before return s% am_nu_rot(k)', k, s% am_nu_rot(k)
-                     stop 'set_am_nu_rot'
+                     call mesa_error(__FILE__,__LINE__,'set_am_nu_rot')
                   end if
                   if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
                end do
@@ -2053,7 +2053,7 @@
                   return
                   if (s% stop_for_bad_nums) then
                      write(*,2) 's% eta_RTI(k)', k, s% eta_RTI(k)
-                     stop 'set_RTI_mixing_info'
+                     call mesa_error(__FILE__,__LINE__,'set_RTI_mixing_info')
                   end if
                end if
             
@@ -2127,7 +2127,7 @@
             if (is_bad(sig(k))) then
                if (s% stop_for_bad_nums) then
                   write(*,2) 'sig(k)', k, sig(k)
-                  stop 'get_RTI_sigmas'
+                  call mesa_error(__FILE__,__LINE__,'get_RTI_sigmas')
                end if
                sig(k) = 1d99
             end if
@@ -2157,7 +2157,7 @@
          ierr = 0
          if (.not. s% RTI_flag) return
          if (s% dPdr_dRhodr_info(1) >= 0d0) then
-            if (is_bad(s% dPdr_dRhodr_info(1))) stop 'set_dPdr_dRhodr_info'
+            if (is_bad(s% dPdr_dRhodr_info(1))) call mesa_error(__FILE__,__LINE__,'set_dPdr_dRhodr_info')
             return ! already set this step
          end if
 
@@ -2424,7 +2424,7 @@
             end if
             if (is_bad(D)) then
                write(*,2) 'eta_RTI', k, D
-               if (s% stop_for_bad_nums) stop 'add_RTI_turbulence'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_RTI_turbulence')
                ierr = -1
                cycle
             end if

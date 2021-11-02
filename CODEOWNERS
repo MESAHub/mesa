@@ -12,20 +12,21 @@ chem/ @rjfarmer @fxt @aarondotter
 colors/ @rjfarmer
 const/ @rjfarmer @fxt @aarondotter
 data/ @rjfarmer
-docs/ @rhdtownsend @jschwab
-eos/ @fxt @aarondotter @jschwab @adamjermyn @evbauer
+docs/ @rhdtownsend
+eos/ @fxt @aarondotter @adamjermyn @evbauer
 gyre/ @rhdtownsend @warrickball
 hdfio5 @richtownsend
 interp_1d/ @rhdtownsend @adamjermyn
 interp_2d/ @rhdtownsend @adamjermyn
-kap/ @fxt @aarondotter @jschwab
-linters/ @rjfarmer @jschwab
+kap/ @fxt @aarondotter
+linters/ @rjfarmer
+turb/ @adamjermyn
 math/ @rhdtownsend
 mtx/ @adamjermyn @rjfarmer @mjoyceGR
 net/ @rjfarmer @fxt
 neu/ @rjfarmer @fxt
 num/ @adamjermyn
-rates/ @rjfarmer @fxt @jschwab
+rates/ @rjfarmer @fxt
 #star/
 #star_data/
 #stella/ 
@@ -36,8 +37,6 @@ utils/ @rhdtownsend @warrickball @rjfarmer
 star/private/auto_diff_support.f90 @adamjermyn
 star/private/pgstar_*.f90 @rjfarmer
 star/private/rsp_*.f90 @rsmolec
-star/private/mlt_info.f90 @adamjermyn
-star/private/mlt_get_results.f90 @adamjermyn
 star/private/phase_separation.f90 @evbauer
 
 ### Test suite cases ###
@@ -53,23 +52,19 @@ star/test_suite/1M_thermohaline @mjoyceGR
 star/test_suite/20M_z2m2_high_rotation
 star/test_suite/5M_cepheid_blue_loop @annethoul @rsmolec
 star/test_suite/7M_prems_to_AGB @annethoul
-star/test_suite/accreted_material_j
+star/test_suite/accreted_material_j @orlox
 star/test_suite/adjust_net @rjfarmer
 star/test_suite/c13_pocket @fxt
 star/test_suite/carbon_kh @evbauer
 star/test_suite/cburn_inward @rjfarmer
 star/test_suite/ccsn_IIp @rjfarmer @fxt
-star/test_suite/check_redo 
+star/test_suite/check_redo @fxt
 star/test_suite/conductive_flame @fxt @rjfarmer
-star/test_suite/conserve_angular_momentum
+star/test_suite/conserve_angular_momentum @orlox
 star/test_suite/custom_colors @rjfarmer
 star/test_suite/custom_rates @evbauer @adamjermyn @fxt
-star/test_suite/dev_high_rot_darkening
+star/test_suite/high_rot_darkening @orlox
 star/test_suite/dev_ppisn @rjfarmer
-star/test_suite/dev_split_burn_big_net @rjfarmer
-star/test_suite/dev_to_cc_12 @rjfarmer
-star/test_suite/dev_to_cc_20 @rjfarmer
-star/test_suite/dev_to_cc_80 @rjfarmer
 star/test_suite/dev_to_ppisn_100 @rjfarmer
 star/test_suite/diffusion_smoothness @fxt
 star/test_suite/extended_convective_penetration @fxt
@@ -81,10 +76,10 @@ star/test_suite/gyre_in_mesa_spb @rhdtownsend @annethoul
 star/test_suite/gyre_in_mesa_wd @rhdtownsend @annethoul
 star/test_suite/hb_2M @annethoul
 star/test_suite/high_mass @fxt @rjfarmer
-star/test_suite/high_z
+star/test_suite/high_z @fxt
 star/test_suite/hot_cool_wind @fxt
 star/test_suite/hse_riemann @fxt
-star/test_suite/irradiated_planet
+star/test_suite/irradiated_planet @fxt
 star/test_suite/low_z @aarondotter
 star/test_suite/magnetic_braking @adamjermyn
 star/test_suite/make_brown_dwarf @fxt
@@ -101,11 +96,11 @@ star/test_suite/make_zams_ultra_high_mass @fxt @rjfarmer
 star/test_suite/ns_c @rjfarmer @fxt
 star/test_suite/ns_h @rjfarmer @fxt
 star/test_suite/ns_he @rjfarmer @fxt
-star/test_suite/other_physics_hooks
+star/test_suite/other_physics_hooks @fxt
 star/test_suite/pisn @rjfarmer
 star/test_suite/radiative_levitation @evbauer
 star/test_suite/R_CrB_star @fxt
-star/test_suite/relax_composition_j_entropy
+star/test_suite/relax_composition_j_entropy @warrickball
 star/test_suite/rsp_BEP @rsmolec
 star/test_suite/rsp_BLAP @rsmolec
 star/test_suite/rsp_Cepheid @rsmolec
@@ -118,11 +113,11 @@ star/test_suite/rsp_save_and_load_file @rsmolec
 star/test_suite/rsp_Type_II_Cepheid @rsmolec
 star/test_suite/semiconvection  @annethoul
 star/test_suite/simplex_solar_calibration @mjoyceGR
-star/test_suite/test_case_template
+star/test_suite/test_case_template @fxt
 star/test_suite/test_memory @rjfarmer
 star/test_suite/timing @rjfarmer
 star/test_suite/T_tau_gradr @warrickball
-star/test_suite/twin_studies
+star/test_suite/twin_studies @fxt
 star/test_suite/wd_acc_small_dm @wmwolf
 star/test_suite/wd_aic @fxt
 star/test_suite/wd_c_core_ignition @wmwolf
@@ -131,6 +126,12 @@ star/test_suite/wd_diffusion @evbauer
 star/test_suite/wd_he_shell_ignition @wmwolf
 star/test_suite/wd_nova_burst @wmwolf
 star/test_suite/wd_stable_h_burn @wmwolf
+
+star/test_suite/12M_pre_ms_to_core_collapse @rjfarmer
+star/test_suite/20M_pre_ms_to_core_collapse @rjfarmer
+star/test_suite/split_burn_big_net @rjfarmer
+star/test_suite/zams_to_cc_80 @rjfarmer
+star/test_suite/20M_z2m2_high_rotation @rjfarmer
 
 
 binary/test_suite/double_bh @orlox @rjfarmer

@@ -1,4 +1,4 @@
-# This is the makefile for the mesa library of numerical routines
+# This is the makefile for the mesa library for automatic differentiation
 
 MESA_DIR = ../..
 

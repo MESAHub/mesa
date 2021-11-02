@@ -1,0 +1,11 @@
+============
+Release 2987
+============
+
+:Date:   2011-02-05
+
+Revision 2987 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2987.zip/download>`__
+is available for download.

@@ -287,7 +287,7 @@
     simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
     implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol, &
-    fitted_fp_ft_i_rot, w_div_wcrit_max, w_div_wcrit_max2, &
+    w_div_wcrit_max, w_div_wcrit_max2, &
     fp_min, ft_min, fp_error_limit, ft_error_limit, &
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
     set_uniform_am_nu_non_rot, uniform_am_nu_non_rot, &
@@ -356,7 +356,7 @@
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
-    min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
+    min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, steps_before_use_TDC, &
     conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
@@ -525,7 +525,7 @@
 
     ! misc
     min_chem_eqn_scale, zams_filename, set_rho_to_dm_div_dV, use_other_momentum_implicit, &
-    use_other_surface_PT, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
+    use_other_surface_PT, use_other_mlt_results, use_other_kap, use_other_diffusion, use_other_diffusion_factor, &
     use_other_adjust_mdot, use_other_j_for_adjust_J_lost, use_other_alpha_mlt, use_other_remove_surface, &
     use_other_am_mixing, use_other_brunt, use_other_brunt_smoothing, use_other_solver_monitor, &
     use_other_build_initial_model, use_other_cgrav, use_other_energy_implicit, use_other_momentum, &
@@ -620,8 +620,6 @@
 
  call read_controls_file(s, filename, 1, ierr)
  call check_controls(s, ierr)
- call mkdir(s% photo_directory)
- call mkdir(s% log_directory)
 
  end subroutine read_controls
 
@@ -633,10 +631,10 @@
     ierr = 0
 
     if (.not. (trim(s% energy_eqn_option) == 'dedt' .or. trim(s% energy_eqn_option) == 'eps_grav')) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) "Invalid choice for energy_eqn_option"
        write(*,*) "Available options are 'dedt' or 'eps_grav'"
-       write(*,*)
+       write(*,'(A)')
        ierr = -1
        return
     end if
@@ -1127,6 +1125,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% min_logT_for_make_gradr_sticky_in_solver_iters = min_logT_for_make_gradr_sticky_in_solver_iters
  s% no_MLT_below_shock = no_MLT_below_shock
  s% MLT_option = MLT_option
+ s% steps_before_use_TDC = steps_before_use_TDC
  s% mlt_use_rotation_correction = mlt_use_rotation_correction
  s% mlt_Pturb_factor = mlt_Pturb_factor
 
@@ -1715,7 +1714,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% min_years_dt_for_redo_mdot = min_years_dt_for_redo_mdot
  s% surf_omega_div_omega_crit_limit = surf_omega_div_omega_crit_limit
  s% surf_omega_div_omega_crit_tol = surf_omega_div_omega_crit_tol
- s% fitted_fp_ft_i_rot = fitted_fp_ft_i_rot 
  s% w_div_wcrit_max = w_div_wcrit_max
  s% w_div_wcrit_max2 = w_div_wcrit_max2
  s% fp_min = fp_min
@@ -2429,6 +2427,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% zams_filename = zams_filename
  s% set_rho_to_dm_div_dV = set_rho_to_dm_div_dV
 
+ s% use_other_mlt_results = use_other_mlt_results
  s% use_other_surface_PT = use_other_surface_PT
  s% use_other_kap = use_other_kap
  s% use_other_diffusion = use_other_diffusion
@@ -2812,6 +2811,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  min_logT_for_make_gradr_sticky_in_solver_iters = s% min_logT_for_make_gradr_sticky_in_solver_iters
  no_MLT_below_shock = s% no_MLT_below_shock
  MLT_option = s% MLT_option
+ steps_before_use_TDC = s% steps_before_use_TDC
  mlt_use_rotation_correction = s% mlt_use_rotation_correction
  mlt_Pturb_factor = s% mlt_Pturb_factor
 
@@ -3392,7 +3392,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  min_years_dt_for_redo_mdot = s% min_years_dt_for_redo_mdot
  surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
  surf_omega_div_omega_crit_tol = S% surf_omega_div_omega_crit_tol
- fitted_fp_ft_i_rot = s% fitted_fp_ft_i_rot 
  w_div_wcrit_max = s% w_div_wcrit_max
  w_div_wcrit_max2 = s% w_div_wcrit_max2
  fp_min = s% fp_min
@@ -4103,6 +4102,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  zams_filename = s% zams_filename
  set_rho_to_dm_div_dV = s% set_rho_to_dm_div_dV
 
+ use_other_mlt_results = s% use_other_mlt_results
  use_other_surface_PT = s% use_other_surface_PT
  use_other_kap = s% use_other_kap
  use_other_diffusion = s% use_other_diffusion

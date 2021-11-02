@@ -688,10 +688,10 @@
          call integer_dict_lookup(s% history_names_dict, hist_xaxis_name, ix, ierr)
          if (ierr /= 0) ix = -1
          if (ix <= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'ERROR: failed to find ' // &
                trim(hist_xaxis_name) // ' in history data'
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
          end if
 

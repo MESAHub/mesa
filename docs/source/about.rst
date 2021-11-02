@@ -104,10 +104,10 @@ Developers
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
 * Aaron Dotter
 * `Robert Farmer <http://rjfarmer.io/>`__
+* Eoin Farrell
 * `Adam Jermyn <http://adamjermyn.com/>`__
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
-* `Josiah Schwab <https://yoshiyahu.org/>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
 * `Frank Timmes <http://cococubed.asu.edu/>`__
@@ -119,6 +119,7 @@ Past Developers
 
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
+* `Josiah Schwab <https://yoshiyahu.org/>`__ (2013-2021)
 
 
 Acknowledgments

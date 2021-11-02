@@ -1,0 +1,11 @@
+============
+Release 4442
+============
+
+:Date:   2012-08-29
+
+Revision 4442 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r4442.zip/download>`__
+is available for download.

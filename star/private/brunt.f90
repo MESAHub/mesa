@@ -84,7 +84,7 @@
             s% unsmoothed_brunt_B(k) = s% brunt_B(k)
             if (is_bad(s% unsmoothed_brunt_B(k))) then
                write(*,2) 'unsmoothed_brunt_B(k)', k, s% unsmoothed_brunt_B(k)
-               stop 'brunt'
+               call mesa_error(__FILE__,__LINE__,'brunt')
             end if
          end do
 
@@ -172,7 +172,7 @@
                write(*,2) 's% gradT_sub_grada(k)', k, s% gradT_sub_grada(k)
                write(*,2) 's% gradT(k)', k, s% gradT(k)
                write(*,2) 's% grada_face(k)', k, s% grada_face(k)
-               stop 'brunt'
+               call mesa_error(__FILE__,__LINE__,'brunt')
             end if
             s% brunt_N2(k) = f*(s% brunt_B(k) - s% gradT_sub_grada(k))
             s% brunt_N2_composition_term(k) = f*s% brunt_B(k)
@@ -268,23 +268,23 @@
             return
             write(*,2) 'logT_face', k, logT_face
             write(*,2) 'logRho_face', k, logRho_face
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% dq(k-1)', k-1, s% dq(k-1)
             write(*,2) 's% dq(k)', k, s% dq(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% T(k-1)', k-1, s% T(k-1)
             write(*,2) 'T_face', k, T_face
             write(*,2) 's% T(k)', k, s% T(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% rho(k-1)', k-1, s% rho(k-1)
             write(*,2) 'rho_face', k, rho_face
             write(*,2) 's% rho(k)', k, s% rho(k)
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 's% chiT(k-1)', k-1, s% chiT(k-1)
             write(*,2) 'chiT_face', k, chiT_face
             write(*,2) 's% chiT(k)', k, s% chiT(k)
-            write(*,*)
-            stop 'get_brunt_B'
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'get_brunt_B')
          end if
 
          call get_eos( &
@@ -330,12 +330,12 @@
                write(*,2) 's% lnPeos(k-1)', k-1, s% lnPeos(k-1)
                write(*,2) 'lnP1', k, lnP1
                write(*,2) 'lnP2', k, lnP2
-               write(*,*)
-               !stop 'do_brunt_B_MHM_form'
+               write(*,'(A)')
+               !call mesa_error(__FILE__,__LINE__,'do_brunt_B_MHM_form')
             end if
             if (s% stop_for_bad_nums) then
                write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
-               stop 'do_brunt_B_MHM_form'
+               call mesa_error(__FILE__,__LINE__,'do_brunt_B_MHM_form')
             end if
          end if
 

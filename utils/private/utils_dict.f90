@@ -307,7 +307,7 @@
 !$omp end critical (dict_define)
          if (dbg) then ! check tree
             write(*,*) 'done insert node ' // trim(key) // ' new root ' // trim(dict% key)
-            write(*,*)
+            write(*,'(A)')
             call check_dict(dict, ierr)
             call show_key_entries(dict)
             write(*,*) 'done insert ' // trim(key)
@@ -398,9 +398,9 @@
          logical, parameter :: dbg = .false.
          if (dbg) then
             call show_key_entries(dict)
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'lookup key ' // trim(key)
-            write(*,*)
+            write(*,'(A)')
          end if
          ierr = 0
          value = 0

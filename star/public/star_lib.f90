@@ -28,6 +28,7 @@
 
       use const_def, only: dp
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
+      use utils_lib, only: mesa_error
 
       use pulse, only: &
            star_export_pulse_data => export_pulse_data, &
@@ -61,6 +62,8 @@
             wrap_lnR_m1, wrap_lnR_00, wrap_lnR_p1, & ! values from s% lnr
             wrap_v_m1, wrap_v_00, wrap_v_p1, & ! Riemann or non-Riemann velocity at face, s% v or s% u_face
             wrap_u_m1, wrap_u_00, wrap_u_p1, & ! Riemann cell velocity s% u
+            wrap_w_div_wc_m1, wrap_w_div_wc_00, wrap_w_div_wc_p1, & ! Riemann cell velocity s% u
+            wrap_jrot_m1, wrap_jrot_00, wrap_jrot_p1, & ! Riemann cell velocity s% u
             ! the following check the flag using_velocity_time_centering
             wrap_opt_time_center_r_m1, wrap_opt_time_center_r_00, wrap_opt_time_center_r_p1, &
             wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1
@@ -2102,7 +2105,7 @@
          !   res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
          ierr = -1
          write(*,*) 'star_get_peos no longer supported'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end subroutine star_get_peos
       
       subroutine star_solve_eos_given_PgasT( &
@@ -2263,7 +2266,6 @@
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
        end subroutine star_get_surf_PT       
-
       
       integer function get_result_reason(id, ierr)
          integer, intent(in) :: id
@@ -2276,7 +2278,6 @@
          end if
          get_result_reason = s% result_reason
       end function get_result_reason
-      
       
       real(dp) function eval_tau_at_r(id, r, ierr)
          ! optical depth tau at radius r (cm)
@@ -3046,7 +3047,7 @@
       
       
       subroutine star_set_mlt_vars(id, nzlo, nzhi, ierr)
-         use mlt_info, only: set_mlt_vars
+         use turb_info, only: set_mlt_vars
          use star_def
          integer, intent(in) :: id ! id for star         
          integer, intent(in) :: nzlo, nzhi ! range of cell numbers   
@@ -3063,7 +3064,7 @@
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
-         use mlt_get_results, only: get_gradT
+         use turb_support, only: get_gradT
          integer, intent(in) :: id
          character (len=*), intent(in) :: MLT_option
          real(dp), intent(in) :: &
@@ -3089,7 +3090,7 @@
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
          use auto_diff
-         use mlt_get_results, only: Get_results
+         use turb_support, only: Get_results
          integer, intent(in) :: id
          integer, intent(in) :: k
          character (len=*), intent(in) :: MLT_option

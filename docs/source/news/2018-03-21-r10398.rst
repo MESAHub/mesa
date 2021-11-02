@@ -1,0 +1,14 @@
+=============
+Release 10398
+=============
+
+:Date:   2018-03-21
+
+Revision 10398 has been designated a MESA release version.
+
+The full release notes are available in `this mailing list
+post <https://lists.mesastar.org/pipermail/mesa-users/2018-March/008812.html>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r10398.zip/download>`__
+is available for download.

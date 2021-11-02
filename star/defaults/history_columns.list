@@ -1038,6 +1038,8 @@
       !total_steps_finished
       !total_steps_taken
 
+      !TDC_num_cells
+
    !## Relaxation steps
       !total_relax_step_attempts
       !total_relax_step_redos
