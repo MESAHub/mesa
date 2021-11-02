@@ -149,6 +149,7 @@
       subroutine init_def(s)
          use const_def, only: standard_cgrav, boltz_sigma, &
             Lsun, Msun, Rsun
+         use utils_lib, only: mkdir, folder_exists
          type (star_info), pointer :: s
          
          P4=4.d0*PI
@@ -187,6 +188,8 @@
          if (ALFA == 0.d0) EFL0=0.d0
          
          writing_map = .false.
+
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
             
       end subroutine init_def
       

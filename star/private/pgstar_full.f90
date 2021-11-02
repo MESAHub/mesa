@@ -76,7 +76,8 @@
          character (len=strlen) :: fname
          logical :: fexist
          ierr = 0
-         fname = trim(s% photo_directory) // '/pgstar.dat'
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
+         fname = trim(s% log_directory) // '/pgstar.dat'
          inquire(file=trim(fname), exist=fexist)
          if (fexist) then
             open(newunit=iounit, file=trim(fname), status='replace', action='write')
@@ -1489,6 +1490,8 @@
          if (.not. associated(pg)) return
 
          n = s% number_of_history_columns
+
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
          fname = trim(s% log_directory) // '/pgstar.dat'
 
          if (associated(pg% next)) then
