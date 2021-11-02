@@ -616,8 +616,6 @@
 
  call read_controls_file(s, filename, 1, ierr)
  call check_controls(s, ierr)
- call mkdir(s% photo_directory)
- call mkdir(s% log_directory)
 
  end subroutine read_controls
 

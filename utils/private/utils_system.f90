@@ -44,10 +44,17 @@ module utils_system
          integer(C_INT) :: f_cp
          character(kind=C_CHAR) :: src(*), dest(*)
       end function f_cp
+
+      function f_is_dir(folder) bind(C,name='is_dir')
+         use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
+         integer(C_INT) :: f_is_dir
+         character(kind=C_CHAR) :: folder(*)
+      end function f_is_dir
+
    end interface
 
    private 
-   public :: mkdir_p, mv, cp
+   public :: mkdir_p, mv, cp, is_dir
 
 
    contains
@@ -92,6 +99,14 @@ module utils_system
       cp = f_cp(f_c_string(src),f_c_string(dest))
    
    end function cp
+
+   ! Checks if folder exists or not
+   logical function is_dir(folder)
+      character(len=*), intent(in) :: folder
+
+      is_dir = f_is_dir(folder) == 1
+
+   end function is_dir
 
 
 end module utils_system
