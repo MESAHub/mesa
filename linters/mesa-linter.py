@@ -84,12 +84,6 @@ def check_real(line):
         return "Declared real use real(dp) instead"
     return None
 
-def check_omp_critical(line):
-    if "!$omp" in line and "critical" in line and "(" not in line and "end" not in line:
-        return "Unnamed omp critical block"
-    return None
-
-
 def check_dp(line):
     if "double precision" in line:
         return "Found double precision use real(dp) instead"
@@ -103,7 +97,6 @@ allchecks = [
     check_real_op,
     check_real_exp,
     check_real_d,
-    check_omp_critical,
     check_dp,
 ]
 
