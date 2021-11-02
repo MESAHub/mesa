@@ -162,7 +162,7 @@
         s% xa(net_ic12,k-1) = XC1 + Xfac*dXO * s% dq(k) / s% dq(k-1)
         s% xa(net_io16,k-1) = XO1 - Xfac*dXO * s% dq(k) / s% dq(k-1)
 
-        call update_model_(s,update_mode,k-1,s%nz,.false.)
+        call update_model_(s,update_mode,k-1,s%nz,.true.)
         
       end subroutine move_one_zone
       
@@ -174,11 +174,13 @@
         integer, intent(in)      :: kbot
         
         real(dp) :: avg_xa(s%species)
-        real(dp) :: mass, XHe_out, dXC_top, dXC_bot, dXO_top, dXO_bot
+        real(dp) :: mass, XHe_out, dXC_top, dXC_bot, dXO_top, dXO_bot, B_term, grada, gradr
         integer :: k, l, ktop, net_ihe4, net_ic12, net_io16
         integer :: update_mode(s%nz)
+        logical :: use_brunt
         
         update_mode(:) = FIXED_DT_MODE
+        use_brunt = s% phase_separation_mixing_use_brunt
         net_ihe4 = s% net_iso(ihe4)
         net_ic12 = s% net_iso(ic12)
         net_io16 = s% net_iso(io16)
@@ -220,11 +222,21 @@
            ! updates, eos, opacities, mu, etc now that abundances have changed,
            ! but only in the cells near the boundary where we need to check here.
            ! Will call full update over mixed region after exiting loop.
-           call update_model_(s, update_mode, ktop-1, ktop+1, .false.)
+           call update_model_(s, update_mode, ktop-1, ktop+1, use_brunt)
 
-           if(s% mu(ktop) >= s% mu(ktop-1)) then
-              ! stable against further mixing, so exit loop
-              exit
+           if(use_brunt) then
+              B_term = s% unsmoothed_brunt_B(k)
+              grada = s% grada_face(k)
+              gradr = s% gradr(k)
+              if(B_term + grada - gradr > 0d0) then
+                 ! stable against further mixing, so exit loop
+                 exit
+              end if
+           else ! simpler calculation based on mu gradient
+              if(s% mu(ktop) >= s% mu(ktop-1)) then
+                 ! stable against further mixing, so exit loop
+                 exit
+              end if
            end if
 
         end do
@@ -307,8 +319,6 @@
            if(.not. s% calculate_Brunt_B) then
               stop "phase separation requires s% calculate_Brunt_B = .true."
            end if
-           ! Note that kc_t and kc_b don't actually matter here.
-           ! Brunt profile gets caclulated over whole model regardless.
            call do_brunt_B(s, kc_t, kc_b, ierr) ! for unsmoothed_brunt_B
            if (ierr /= 0) then
               write(*,*) 'phase_separation: error from call to do_brunt_B'

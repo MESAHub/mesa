@@ -154,7 +154,7 @@
             return
          end if
 
-         if (s% phase(k) > 0.5d0) then
+         if (s% phase(k) > 0.9d0) then
             call set_no_mixing('solid_no_mixing')
             return
          end if

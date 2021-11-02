@@ -775,6 +775,7 @@
          
          logical :: do_phase_separation
          logical :: do_phase_separation_heating
+         logical :: phase_separation_mixing_use_brunt
 
       ! opacity controls
 
