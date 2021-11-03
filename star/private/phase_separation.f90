@@ -225,9 +225,9 @@
            call update_model_(s, update_mode, ktop-1, ktop+1, use_brunt)
 
            if(use_brunt) then
-              B_term = s% unsmoothed_brunt_B(k)
-              grada = s% grada_face(k)
-              gradr = s% gradr(k)
+              B_term = s% unsmoothed_brunt_B(ktop)
+              grada = s% grada_face(ktop)
+              gradr = s% gradr(ktop)
               if(B_term + grada - gradr > 0d0) then
                  ! stable against further mixing, so exit loop
                  exit
