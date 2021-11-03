@@ -2886,6 +2886,9 @@
             case(h_C_cntr)
                val = s% center_c12
 
+            case(h_phase_of_evolution)
+               int_val = s% phase_of_evolution
+               is_int_val = .true.
 
             case(h_zones)
                int_val = nz
