@@ -156,7 +156,6 @@
          type (star_info), pointer :: s
          real(dp), pointer :: p1(:)
          integer :: j, k, ierr
-         logical :: okay
 
          include 'formats'
 
@@ -211,20 +210,17 @@
             if (s% rotation_flag) then
                do k=1,s% nz
                   s% j_rot(k) = s% j_rot_old(k)
-                  s% omega(k) = s% omega_old(k)
+               end do
+               call use_xh_to_update_i_rot(s)
+               do k=1,s% nz
+                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                   if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
-                     okay = .false.
                      if (s% stop_for_bad_nums) then
                         write(*,2) 's% omega(k)', k, s% omega(k)
-                        call mesa_error(__FILE__,__LINE__,'prepare_for_new_try')
+                        stop 'set_current_to_old'
                      end if
                   end if
                end do
-               if (.not. okay) then
-                  write(*,2) 'model_number', s% model_number
-                  call mesa_error(__FILE__,__LINE__,'prepare_for_new_try: bad num omega')
-               end if
-               call use_xh_to_update_i_rot(s)
                s% total_angular_momentum = total_angular_momentum(s)
             end if
 
