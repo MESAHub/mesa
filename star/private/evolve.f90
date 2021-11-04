@@ -281,6 +281,7 @@
       
 
       integer function do_step_part1(id, first_try)
+         use evolve_support, only: set_current_to_old
          use hydro_vars, only: set_vars
          use winds, only: set_mdot
          use alloc, only: check_sizes, fill_star_info_arrays_with_NaNs
@@ -398,6 +399,7 @@
          
          call reset_epsnuc_vectors(s)
          
+         call set_current_to_old(s)
          do_step_part1 = prepare_for_new_try(s)
          if (do_step_part1 /= keep_going) then
             if (s% report_ierr) &
@@ -799,14 +801,12 @@
                if (abs(explicit_mdot - implicit_mdot) > &
                      abs(implicit_mdot)*iwind_tolerance) then
                   call set_current_to_old(s) ! preparing for redo
-                  s% need_to_setvars = .true.
                   s% mstar_dot = explicit_mdot + &
                      iwind_lambda*(implicit_mdot - explicit_mdot)
                   explicit_mdot = s% mstar_dot
                   do_step_part2 = prepare_for_new_try(s)
                   if (do_step_part2 /= keep_going) return
                   iwind_redo_cnt = iwind_redo_cnt + 1
-                  s% need_to_setvars = .true.
                   select_mdot_action = cycle_loop
                   return
                end if
@@ -988,7 +988,6 @@
             end if
 
             call set_current_to_old(s)
-            s% need_to_setvars = .true.
             do_step_part2 = prepare_for_new_try(s)
             if (do_step_part2 /= keep_going) return
 
@@ -1974,10 +1973,8 @@
 
          type (star_info), pointer :: s
 
-         integer :: ierr, i, j, k, nz, nvar, nvar_hydro
-         real(dp), parameter :: max_sum_abs = 10d0, xsum_tol = 1d-2
-         real(dp) :: r00, r003, rp13, rm13, r_in, r_out, screening
-         logical :: okay
+         integer :: ierr, i, j, k
+         real(dp) :: screening
 
          include 'formats'
 
@@ -1987,9 +1984,6 @@
          s% solver_iter = 0
          s% solver_adjust_iter = 0
          
-         nvar = s% nvar_total
-         nvar_hydro = s% nvar_hydro
-         nz = s% nz
          s% model_number = s% model_number_old + 1
 
          prepare_for_new_try = keep_going
@@ -2008,39 +2002,6 @@
                prepare_for_new_try = terminate
                s% termination_code = t_failed_prepare_for_new_try
                return
-            end if
-
-            !s% okay_to_set_mlt_vc = .true.
-            
-            call set_qs(s, nz, s% q, s% dq, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'prepare_for_new_try failed in set_qs'
-               prepare_for_new_try = terminate
-               s% termination_code = t_failed_prepare_for_new_try
-               return
-            end if
-            call set_m_and_dm(s)
-            call set_dm_bar(s, nz, s% dm, s% dm_bar)
-
-            if (s% rotation_flag) then
-               okay = .true.
-               do k=1,nz
-                  s% j_rot(k) = s% j_rot_old(k)
-                  s% omega(k) = s% omega_old(k)
-                  if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
-                     okay = .false.
-                     if (s% stop_for_bad_nums) then
-                        write(*,2) 's% omega(k)', k, s% omega(k)
-                        stop 'prepare_for_new_try'
-                     end if
-                  end if
-               end do
-               if (.not. okay) then
-                  write(*,2) 'model_number', s% model_number
-                  stop 'prepare_for_new_try: bad num omega'
-               end if
-               call use_xh_to_update_i_rot(s)
-               s% total_angular_momentum = total_angular_momentum(s)
             end if
 
          end if

@@ -42,9 +42,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         real(dp), pointer :: tmp(:,:), tmp1(:)
-         integer, pointer :: itmp1(:)
-         integer :: nz, i, k, i_u
+         integer :: nz, j, k
 
          include 'formats'
 
@@ -53,36 +51,33 @@
          
          if (.not. s% rsp_flag) then
 
-            call flip(s% dq, s% dq_old, ierr)
+            call copy_to_old(s% dq, s% dq_old, ierr)
             if (ierr /= 0) return
 
-            call flip(s% omega, s% omega_old, ierr)
+            call copy_to_old(s% omega, s% omega_old, ierr)
             if (ierr /= 0) return
 
-            call flip(s% j_rot, s% j_rot_old, ierr)
+            call copy_to_old(s% j_rot, s% j_rot_old, ierr)
             if (ierr /= 0) return
             
-            call flip(s% mlt_vc, s% mlt_vc_old, ierr)
+            call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
 
-            tmp => s% xh_old
-            s% xh_old => s% xh
-            call enlarge_if_needed_2(tmp,s% nvar_hydro,nz,nz_alloc_extra,ierr)
+            call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(tmp)
-            s% xh => tmp
-            do k=1, nz
-               s% xh(:,k) = s% xh_old(:,k)
-            end do
+            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
 
-            tmp => s% xa_old
-            s% xa_old => s% xa
-            call enlarge_if_needed_2(tmp,s% species,nz,nz_alloc_extra,ierr)
+            call enlarge_if_needed_2(s% xa_old,s% species,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(tmp)
-            s% xa => tmp
-            do k=1, nz
-               s% xa(:,k) = s% xa_old(:,k)
+            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
+
+            do k = 1, s% nz
+               do j=1, s% nvar_hydro
+                  s% xh_old(j,k) = s% xh(j,k)
+               end do
+               do j=1,s% species
+                  s% xa_old(j,k) = s% xa(j,k)
+               end do
             end do
          
          end if
@@ -113,12 +108,12 @@
          s% dt_limit_ratio_old = s% dt_limit_ratio
          s% gradT_excess_alpha_old = s% gradT_excess_alpha
 
-         do i = 1, s% len_extra_work
-            s% extra_work_old(i) = s% extra_work(i)
+         do j = 1, s% len_extra_work
+            s% extra_work_old(j) = s% extra_work(j)
          end do
 
-         do i = 1, s% len_extra_iwork
-            s% extra_iwork_old(i) = s% extra_iwork(i)
+         do j = 1, s% len_extra_iwork
+            s% extra_iwork_old(j) = s% extra_iwork(j)
          end do
 
          s% ixtra_old = s% ixtra
@@ -131,37 +126,37 @@
 
          contains
 
-         subroutine flip(ptr, ptr_old, ierr)
+         subroutine copy_to_old(ptr, ptr_old, ierr)
             real(dp), pointer, dimension(:) :: ptr, ptr_old
             integer, intent(out) :: ierr
             logical :: first_time
-            integer :: k
             ierr = 0
-            tmp1 => ptr_old
-            ptr_old => ptr
-            first_time = (.not. associated(tmp1))
-            call realloc_if_needed_1(tmp1,nz,nz_alloc_extra,ierr)
+            first_time = (.not. associated(ptr_old))
+            call realloc_if_needed_1(ptr_old,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
             if (s% fill_arrays_with_NaNs) then
-               call fill_with_NaNs(tmp1)
+               call fill_with_NaNs(ptr_old)
             else if (s% zero_when_allocate) then
-               tmp1(:) = 0
+               ptr_old(:) = 0
             else if (first_time) then
-               tmp1(1:nz) = -9d99
+               ptr_old(1:nz) = -9d99
             end if
-            ptr => tmp1
-            do k=1, nz
-               ptr(k) = ptr_old(k)
+            do j = 1, s% nz
+               ptr_old(j) = ptr(j)
             end do
-         end subroutine flip
+         end subroutine copy_to_old
 
       end subroutine new_generation
 
 
       subroutine set_current_to_old(s)
+         use star_utils, only: total_angular_momentum, set_m_and_dm, set_dm_bar, set_qs
+         use hydro_rotation, only: use_xh_to_update_i_rot
+         use utils_lib
          type (star_info), pointer :: s
          real(dp), pointer :: p1(:)
-         integer :: i, k
+         integer :: j, k, ierr
+         logical :: okay
 
          include 'formats'
 
@@ -187,52 +182,69 @@
          s% L_surf = s% L_surf_old
          s% dt_limit_ratio = s% dt_limit_ratio_old
          s% gradT_excess_alpha = s% gradT_excess_alpha_old
-
-         do i = 1, s% len_extra_work
-            s% extra_work(i) = s% extra_work_old(i)
-         end do
-
-         do i = 1, s% len_extra_iwork
-            s% extra_iwork(i) = s% extra_iwork_old(i)
-         end do
-
+         
          if (.not. s% RSP_flag) then
-            ! check dimensions
-            if (size(s% xh_old,dim=1) /= s% nvar_hydro .or. size(s% xh_old,dim=2) < s% nz) then
-               write(*,*) 'bad dimensions for xh_old', size(s% xh_old,dim=1), s% nvar_hydro, &
-                  size(s% xh_old,dim=2), s% nz
-               stop
+            if (s% fill_arrays_with_NaNs) then
+               call fill_with_NaNs_2d(s% xh)
+               call fill_with_NaNs_2d(s% xa)
             end if
-            if (size(s% xa_old,dim=1) /= s% species .or. size(s% xa_old,dim=2) < s% nz) then
-               write(*,*) 'bad dimensions for xa_old', size(s% xa_old,dim=1), s% species, &
-                  size(s% xa_old,dim=2), s% nz
-               stop
-            end if
-            if (size(s% dq_old,dim=1) < s% nz) then
-               write(*,*) 'bad dimensions for dq_old', size(s% dq_old,dim=1), s% nz
-               stop
-            end if
-
             do k = 1, s% nz
-               do i=1,s% nvar_hydro
-                  s% xh(i,k) = s% xh_old(i,k)
+               do j=1, s% nvar_hydro
+                  s% xh(j,k) = s% xh_old(j,k)
                end do
-               do i=1,s% species
-                  s% xa(i,k) = s% xa_old(i,k)
+               do j=1,s% species
+                  s% xa(j,k) = s% xa_old(j,k)
                end do
                s% dq(k) = s% dq_old(k)
                s% mlt_vc(k) = s% mlt_vc_old(k)
-               s% omega(k) = s% omega(k)
-               s% j_rot(k) = s% j_rot(k)
             end do
-            s% need_to_setvars = .true.
+            s% okay_to_set_mlt_vc = .true.
+            
+            call set_qs(s, s% nz, s% q, s% dq, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'set_current_to_old failed in set_qs'
+               stop
+            end if
+            call set_m_and_dm(s)
+            call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
+
+            if (s% rotation_flag) then
+               do k=1,s% nz
+                  s% j_rot(k) = s% j_rot_old(k)
+                  s% omega(k) = s% omega_old(k)
+                  if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
+                     okay = .false.
+                     if (s% stop_for_bad_nums) then
+                        write(*,2) 's% omega(k)', k, s% omega(k)
+                        call mesa_error(__FILE__,__LINE__,'prepare_for_new_try')
+                     end if
+                  end if
+               end do
+               if (.not. okay) then
+                  write(*,2) 'model_number', s% model_number
+                  call mesa_error(__FILE__,__LINE__,'prepare_for_new_try: bad num omega')
+               end if
+               call use_xh_to_update_i_rot(s)
+               s% total_angular_momentum = total_angular_momentum(s)
+            end if
+
          end if
+
+         do j = 1, s% len_extra_work
+            s% extra_work(j) = s% extra_work_old(j)
+         end do
+
+         do j = 1, s% len_extra_iwork
+            s% extra_iwork(j) = s% extra_iwork_old(j)
+         end do
 
          s% ixtra = s% ixtra_old
          s% xtra = s% xtra_old
          s% lxtra = s% lxtra_old
 
          call s% other_set_current_to_old(s% id)
+
+         s% need_to_setvars = .true.
 
       end subroutine set_current_to_old
 
