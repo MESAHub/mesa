@@ -87,6 +87,19 @@ Hook interface changes
 * ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``, ``eps_he`` or ``eps_z`` as arguments.
 
 
+Auto diff
+~~~~~~~~~
+
+We now make more extensive use of the new ``autodiff`` module for automatically differentiating variables. If you are using a hook
+in your  ``run_star_extras.f90`` then you will need to add ``use auto_diff`` to the top of your  ``run_star_extras.f90`` file.
+
+If you see errors such as:
+
+::
+  Error: Cannot convert REAL(8) to TYPE(auto_diff_real_star_order1) at (1)
+
+
+Then this means you are missing the ``use auto_diff`` statement.
 
 
 .. _Module-level changes main:
