@@ -91,7 +91,7 @@ Auto diff
 ~~~~~~~~~
 
 We now make more extensive use of the new ``autodiff`` module for automatically differentiating variables. If you are using a hook
-in your  ``run_star_extras.f90`` then you will need to add ``use auto_diff`` to the top of your  ``run_star_extras.f90`` file.
+in your ``run_star_extras.f90`` then you will need to add ``use auto_diff`` to the top of your  ``run_star_extras.f90`` file.
 
 If you see errors such as:
 
