@@ -23,6 +23,7 @@
       integer, parameter :: terminate = 3
 
       ! phases of evolution
+      integer, parameter :: phase_relax = -1
       integer, parameter :: phase_starting = 1
       integer, parameter :: phase_PreMS = phase_starting + 1
       integer, parameter :: phase_ZAMS = phase_PreMS + 1

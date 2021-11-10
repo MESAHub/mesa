@@ -2767,7 +2767,9 @@
             center_he4 = 1d99
          end if
 
-         if (s% photosphere_logg > 6d0) then
+         if (s% doing_relax) then
+            s% phase_of_evolution = phase_relax
+         else if (s% photosphere_logg > 6d0) then
             s% phase_of_evolution = phase_WDCS
          else if (s% L_by_category(i_burn_si) > 1d2) then
             s% phase_of_evolution = phase_Si_Burn
