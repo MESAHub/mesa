@@ -1949,9 +1949,6 @@
                if (s% rsp_flag) val = rsp_WORKT(s,k)
             case(p_rsp_WORKC)
                if (s% rsp_flag) val = rsp_WORKC(s,k)
-               
-            case(p_dconv_vel_dt)
-               val = s% dxh_ln_cvpv0(k)*(s% conv_vel(k) + s% conv_vel_v0)/s% dt
 
             case (p_total_energy) ! specific total energy at k
                val = eval_cell_section_total_energy(s,k,k)/s% dm(k)               

@@ -505,18 +505,6 @@
                do k = 1, nz
                   s% xh(j1,k) = s% alpha_RTI(k)
                end do
-            else if (j1 == s% i_ln_cvpv0 .and. s% i_ln_cvpv0 <= nvar) then
-                  stop 'pablo needs to revise this'
-!               do k = 1, nz
-!                  ! create a rough first guess using mlt_vc_start and conv_vel when
-!                  ! mlt_vc is larger than the starting conv_vel
-!                  if (s% mlt_vc_start(k) > 0d0 .and. s% mlt_vc_start(k) > s% conv_vel(k)) then
-!                     s% conv_vel(k) = s% conv_vel(k) + &
-!                        (s% mlt_vc_start(k) -s% conv_vel(k)) * &
-!                        min(1d0, s% dt*s% mlt_vc_start(k)/(s% scale_height_start(k)*s% mixing_length_alpha))
-!                  end if
-!                  s% xh(j1,k) = log(s% conv_vel(k)+s% conv_vel_v0)
-!               end do
             end if
          end do
       end subroutine set_xh

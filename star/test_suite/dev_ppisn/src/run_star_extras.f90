@@ -1441,15 +1441,6 @@
                s% xtra(x_time_since_first_gamma_zero) + s% dt 
          end if
 
-         !if (s% conv_vel_flag) then
-         !   do k=1, s% nz
-         !      if (s% conv_vel(k) < 1d-5 .and. s% mlt_vc(k) <= 0d0) then
-         !         s% xh(s% i_ln_cvpv0, k) = 0d0
-         !         s% conv_vel(k) = 0d0
-         !      end if
-         !   end do
-         !end if
-
          !if (remove_extended_layers .and. s% u_flag &
          !   .and. s% log_surface_radius > 3.7d0) then
          !   do k = 1, s% nz

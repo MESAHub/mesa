@@ -2,10 +2,6 @@
       integer :: change_RSP2_flag_at_model_number
       logical :: create_RSP2_model
       
-   
-      logical :: change_conv_vel_flag, change_initial_conv_vel_flag, new_conv_vel_flag
-      real(dp) :: logT_for_conv_vel_flag
-      
       logical :: use_w_div_wc_flag_with_rotation, use_j_rot_flag_with_rotation
       logical :: change_w_div_wc_flag, change_initial_w_div_wc_flag, new_w_div_wc_flag
       

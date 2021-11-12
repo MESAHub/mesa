@@ -2385,9 +2385,8 @@
                 j == s% i_v .or. &
                 j == s% i_w .or. &
                 j == s% i_Hp .or. &
-                j == s% i_ln_cvpv0 .or. &
                 j == s% i_j_rot .or. &
-                j == s% i_w_div_wc .or. & ! TODO: check why not including this makes restart varcontrol inconsistent
+                j == s% i_w_div_wc .or. &
                 j == s% i_alpha_RTI .or. &
                 j == s% i_Et_RSP) cycle
 

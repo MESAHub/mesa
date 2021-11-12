@@ -46,8 +46,6 @@
    new_rotation_flag = .true.
    change_w_div_wc_flag = .true.
    new_w_div_wc_flag = .true.
-   change_conv_vel_flag = .true.
-   new_conv_vel_flag = .false.
 
    read_extra_star_job_inlist1 = .true.
    extra_star_job_inlist1_name = 'inlist_extra'

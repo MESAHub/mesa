@@ -1138,7 +1138,7 @@
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interp_pm, interp_values, interp_value
          use adjust_xyz, only: change_net
-         use set_flags, only: set_conv_vel_flag, set_v_flag, set_u_flag, set_rotation_flag
+         use set_flags, only: set_v_flag, set_u_flag, set_rotation_flag
          use rotation_mix_info, only: set_rotation_mixing_info
          use hydro_rotation, only: set_i_rot, set_rotation_info
          use relax, only: do_relax_composition, do_relax_angular_momentum, do_relax_entropy
@@ -1150,7 +1150,7 @@
             ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
          integer, intent(out) :: ierr
 
-         logical :: conv_vel_flag, v_flag, u_flag, rotation_flag
+         logical :: v_flag, u_flag, rotation_flag
          type (star_info), pointer :: s
          character (len=net_name_len) :: net_name
          integer :: model_number, num_trace_history_values, photo_interval
@@ -1201,23 +1201,24 @@
             xq(1+k0) = xq(1+k0-1) + (s% dq(k_remove+k0) + s% dq(k_remove+k0-1))/s% q(k_remove)/2
          end do
 
-         !create interpolant for convective velocities
-         conv_vel_flag = .false.
-         if (s% conv_vel_flag) then
-            conv_vel_flag = .true.
-            allocate(interp_work((num_pts)*pm_work_size), &
-               conv_vel_interp(4*(num_pts)), stat=ierr)
-            do k0 = 1, num_pts
-               conv_vel_interp(4*k0-3) = s% conv_vel(k0+k_remove-1)
-               q(k0) = s% q(k0+k_remove-1)/s% q(k_remove)
-            end do
-            call interp_pm(q, num_pts, conv_vel_interp,&
-               pm_work_size, interp_work, 'conv_vel interpolant', ierr)
+         !!create interpolant for convective velocities
+         ! TODO: adapt this for TDC
+         !conv_vel_flag = .false.
+         !if (s% conv_vel_flag) then
+         !   conv_vel_flag = .true.
+         !   allocate(interp_work((num_pts)*pm_work_size), &
+         !      conv_vel_interp(4*(num_pts)), stat=ierr)
+         !   do k0 = 1, num_pts
+         !      conv_vel_interp(4*k0-3) = s% conv_vel(k0+k_remove-1)
+         !      q(k0) = s% q(k0+k_remove-1)/s% q(k_remove)
+         !   end do
+         !   call interp_pm(q, num_pts, conv_vel_interp,&
+         !      pm_work_size, interp_work, 'conv_vel interpolant', ierr)
 
-            ! turn off conv vel flag to load model
-            call set_conv_vel_flag(id, .false., ierr)
-            if (dbg) write(*,*) "set_conv_vel_flag ierr", ierr
-         end if
+         !   ! turn off conv vel flag to load model
+         !   call set_conv_vel_flag(id, .false., ierr)
+         !   if (dbg) write(*,*) "set_conv_vel_flag ierr", ierr
+         !end if
 
          ! save have_mlt_vc and set to false (to load ZAMS model)
          save_have_mlt_vc = s% have_mlt_vc
@@ -1281,12 +1282,6 @@
          if (dbg) write(*,*) "check ierr", ierr
          if (ierr /= 0) return
 
-         if (conv_vel_flag) then
-            call set_conv_vel_flag(id, .true., ierr)
-            if (dbg) write(*,*) "check set_conv_vel_flag ierr", ierr
-            if (ierr /= 0) return
-         end if
-
          ! restore have_mlt_vc
          s% have_mlt_vc = save_have_mlt_vc
 
@@ -1327,24 +1322,25 @@
             deallocate(entropy)
          end if
 
-         !take care of convective velocities
-         if (s% conv_vel_flag) then
-            do k0=1, s% nz
-               call interp_value(q, num_pts, conv_vel_interp, s% q(k0), s% conv_vel(k0), ierr)
-               !avoid extending regions with non-zero conv vel
-               do k=2, num_pts-1
-                  if(s% q(k0) < q(k) .and. s% q(k0) > q(k+1) &
-                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
-                     s% conv_vel(k0) = 0d0
-                     exit
-                  end if
-               end do
-               s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
-            end do
-            write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
-            stop 'do_relax_to_star_cut'
-            deallocate(conv_vel_interp, interp_work)
-         end if
+         !!take care of convective velocities
+         ! TODO: adapt for TDC
+         !if (s% conv_vel_flag) then
+         !   do k0=1, s% nz
+         !      call interp_value(q, num_pts, conv_vel_interp, s% q(k0), s% conv_vel(k0), ierr)
+         !      !avoid extending regions with non-zero conv vel
+         !      do k=2, num_pts-1
+         !         if(s% q(k0) < q(k) .and. s% q(k0) > q(k+1) &
+         !            .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
+         !            s% conv_vel(k0) = 0d0
+         !            exit
+         !         end if
+         !      end do
+         !      s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
+         !   end do
+         !   write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
+         !   stop 'do_relax_to_star_cut'
+         !   deallocate(conv_vel_interp, interp_work)
+         !end if
 
          s% generations = 1
 

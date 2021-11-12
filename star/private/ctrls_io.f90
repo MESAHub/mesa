@@ -350,11 +350,9 @@
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
-    conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
+    include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
-    min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, steps_before_use_TDC, &
-    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
-    conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, compare_TDC_to_MLT, &
+    steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
 
     ! hydro solver
@@ -1893,17 +1891,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RTI_log_max_boost = RTI_log_max_boost 
  s% RTI_m_full_boost = RTI_m_full_boost
  s% RTI_m_no_boost = RTI_m_no_boost
-
- s% conv_vel_D = conv_vel_D
- s% conv_vel_siglimit = conv_vel_siglimit
- s% conv_vel_v0 = conv_vel_v0
- s% min_q_for_normal_mlt_gradT_full_off = min_q_for_normal_mlt_gradT_full_off
- s% max_q_for_normal_mlt_gradT_full_on = max_q_for_normal_mlt_gradT_full_on
- s% conv_vel_ignore_thermohaline = conv_vel_ignore_thermohaline
- s% conv_vel_ignore_semiconvection = conv_vel_ignore_semiconvection
- s% conv_vel_fully_lagrangian = conv_vel_fully_lagrangian
- s% conv_vel_include_homologous_term = conv_vel_include_homologous_term
- s% conv_vel_use_mlt_vc_start = conv_vel_use_mlt_vc_start
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
@@ -3566,17 +3553,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  RTI_m_full_boost = s% RTI_m_full_boost
  RTI_m_no_boost = s% RTI_m_no_boost
 
- conv_vel_D = s% conv_vel_D
- conv_vel_siglimit = s% conv_vel_siglimit
- conv_vel_v0 = s% conv_vel_v0
- min_q_for_normal_mlt_gradT_full_off = s% min_q_for_normal_mlt_gradT_full_off
- max_q_for_normal_mlt_gradT_full_on = s% max_q_for_normal_mlt_gradT_full_on
- conv_vel_ignore_thermohaline = s% conv_vel_ignore_thermohaline
- conv_vel_ignore_semiconvection = s% conv_vel_ignore_semiconvection
- conv_vel_fully_lagrangian = s% conv_vel_fully_lagrangian
- conv_vel_include_homologous_term = s% conv_vel_include_homologous_term
- conv_vel_use_mlt_vc_start = s% conv_vel_use_mlt_vc_start
-
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
@@ -3657,9 +3633,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  solver_itermin = s% solver_itermin
  solver_itermin_until_reduce_min_corr_coeff = s% solver_itermin_until_reduce_min_corr_coeff
  solver_reduced_min_corr_coeff = s% solver_reduced_min_corr_coeff
+ do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
  scale_max_correction_for_negative_surf_lum = s% scale_max_correction_for_negative_surf_lum
  max_frac_for_negative_surf_lum = s% max_frac_for_negative_surf_lum
- do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
  hydro_mtx_max_allowed_abs_dlogT = s% hydro_mtx_max_allowed_abs_dlogT
  hydro_mtx_max_allowed_abs_dlogRho = s% hydro_mtx_max_allowed_abs_dlogRho
  min_logT_for_hydro_mtx_max_allowed = s% min_logT_for_hydro_mtx_max_allowed

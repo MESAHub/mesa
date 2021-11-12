@@ -806,14 +806,6 @@
          call set_RTI_flag(id, RTI_flag, ierr)
       end subroutine star_set_RTI_flag
 
-      subroutine star_set_conv_vel_flag(id, conv_vel_flag, ierr)
-         use set_flags, only: set_conv_vel_flag
-         integer, intent(in) :: id
-         logical, intent(in) :: conv_vel_flag
-         integer, intent(out) :: ierr
-         call set_conv_vel_flag(id, conv_vel_flag, ierr)
-      end subroutine star_set_conv_vel_flag
-
       subroutine star_set_w_div_wc_flag(id, w_div_wc_flag, ierr)
          use set_flags, only: set_w_div_wc_flag
          integer, intent(in) :: id

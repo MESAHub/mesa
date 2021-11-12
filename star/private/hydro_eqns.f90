@@ -72,17 +72,17 @@
 
          integer :: &
             i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
-            i_dalpha_RTI_dt, i_dln_cvpv0_dt, i_equ_w_div_wc, i_dj_rot_dt, i_detrb_dt, &
+            i_dalpha_RTI_dt, i_equ_w_div_wc, i_dj_rot_dt, i_detrb_dt, &
             i, k, j, nvar_hydro, nz, op_err
          integer :: &
-            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
+            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_w_div_wc, i_j_rot, &
             i_alpha_RTI, i_xh1, i_xhe4, kmax_equ(nvar), species
          real(dp) :: max_equ(nvar), L_phot_old
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
-         logical :: v_flag, u_flag, conv_vel_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
+         logical :: v_flag, u_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
             do_chem, do_mix, do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
-            do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
+            do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
 
          include 'formats'
 
@@ -114,7 +114,6 @@
          do_du_dt = (i_du_dt > 0 .and. i_du_dt <= nvar)
          do_dlnR_dt = (i_dlnR_dt > 0 .and. i_dlnR_dt <= nvar)
          do_alpha_RTI = (i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar)
-         do_conv_vel = (i_ln_cvpv0 > 0 .and. i_ln_cvpv0 <= nvar)
          do_w_div_wc = (i_w_div_wc > 0 .and. i_w_div_wc <= nvar)
          do_j_rot = (i_j_rot > 0 .and. i_j_rot <= nvar)
          do_dlnE_dt = (i_dlnE_dt > 0 .and. i_dlnE_dt <= nvar)
@@ -214,14 +213,6 @@
                if (op_err /= 0) then
                   if (s% report_ierr) write(*,2) 'ierr in do1_dalpha_RTI_dt_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dalpha_RTI_dt_eqn'
-                  ierr = op_err
-               end if
-            end if
-            if (do_conv_vel) then
-               call do1_dln_cvpv0_dt_eqn(s, k, nvar, op_err)
-               if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_dln_cvpv0_dt_eqn', k
-                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dln_cvpv0_dt_eqn'
                   ierr = op_err
                end if
             end if
@@ -365,7 +356,6 @@
             i_dlnE_dt = s% i_dlnE_dt
             i_dlnR_dt = s% i_dlnR_dt
             i_dalpha_RTI_dt = s% i_dalpha_RTI_dt
-            i_dln_cvpv0_dt = s% i_dln_cvpv0_dt
             i_equ_w_div_wc = s% i_equ_w_div_wc
             i_dj_rot_dt = s% i_dj_rot_dt
             i_detrb_dt = s% i_detrb_dt
@@ -377,7 +367,6 @@
             i_v = s% i_v
             i_u = s% i_u
             i_alpha_RTI = s% i_alpha_RTI
-            i_ln_cvpv0 = s% i_ln_cvpv0
             i_w_div_wc = s% i_w_div_wc
             i_j_rot = s% i_j_rot
 
@@ -604,29 +593,6 @@
          end if
 
       end subroutine do1_density_eqn
-
-
-      subroutine do1_dln_cvpv0_dt_eqn(s, k, nvar, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         integer, intent(out) :: ierr
-         integer :: i_dln_cvpv0_dt, i_ln_cvpv0
-         real(dp) :: residual, dln_cvpv0_m1, dln_cvpv0_00, dln_cvpv0_p1
-         real(dp) :: d_actual, d_d_actual_dvc, d_expected, d_d_expected_dvc, &
-            dt_div_tau, scale, tau, dt, cs, N2_start, grav_start, &
-            dt_div_lambda, lambda, D, siglimit, sigmid_00, sigmid_m1, rc, f, &
-            mix, dmix_dcvm1, dmix_dcv00, dmix_dcvp1, a, da_dvc, inv, d_inv_dvc, &
-            c, dc_dvc, alfa, d_ln_cvpv0_dq
-         logical :: test_partials
-         include 'formats'
-         
-         ierr = 0         
-         !test_partials = (k == s% solver_test_partials_k-1)
-         test_partials = .false.
-         
-         stop 'PABLO needs to rewrite using auto_diff'
-                  
-      end subroutine do1_dln_cvpv0_dt_eqn
       
 
       subroutine do1_w_div_wc_eqn(s, k, nvar, ierr)
