@@ -107,7 +107,7 @@
 
       call chem_init('isotopes.data', ierr)
       call kap_init(use_cache, '', ierr) 
-      if(ierr/=0) stop 'problem in kap_init'
+      if(ierr/=0) call mesa_error(__FILE__,__LINE__,'problem in kap_init')
 
       !next it is necessary to create a 'handle' for the general kap structure
       !using handles, it is possible to simultaneously access more than one
@@ -120,12 +120,12 @@
       call kap_ptr(handle2, rq2, ierr)
       rq2% use_Type2_opacities = .true.
 
-      if(ierr/=0) stop 'problem in alloc_kap_handle'
+      if(ierr/=0) call mesa_error(__FILE__,__LINE__,'problem in alloc_kap_handle')
 
       !read in AGB model
       iounit=99
       open(unit=iounit,file=trim(model_file),status='old',iostat=ierr)
-      if(ierr/=0) stop 'problem opening agb.mod file'
+      if(ierr/=0) call mesa_error(__FILE__,__LINE__,'problem opening agb.mod file')
       read(iounit,*)
       read(iounit,*)            !skip 3 header lines
       read(iounit,*)
@@ -149,9 +149,9 @@
       enddo
       close(iounit)
 
-      write(*,*)
+      write(*,'(A)')
       write(*,*) 'Z_init', Z_init
-      write(*,*)
+      write(*,'(A)')
 
       rq1% Zbase = Z_init
       rq2% Zbase = Z_init
@@ -198,7 +198,7 @@
 !$omp end parallel do
 
       open(unit=iounit,file=trim(output_file),iostat=ierr)
-      if(ierr/=0) stop 'problem opening kap_test.data file'
+      if(ierr/=0) call mesa_error(__FILE__,__LINE__,'problem opening kap_test.data file')
       
       write(*,*) 'write ' // trim(output_file)
 

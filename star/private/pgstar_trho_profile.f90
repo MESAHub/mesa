@@ -184,7 +184,7 @@
 
          if (len_trim(s% TRho_Profile_fname) > 0) then
 
-            stop 'NEED TO ADD ABILITY TO SHOW EXTRA PROFILE FOR COMPARISON'
+            call mesa_error(__FILE__,__LINE__,'NEED TO ADD ABILITY TO SHOW EXTRA PROFILE FOR COMPARISON')
 
          end if
 
@@ -329,9 +329,8 @@
 
          subroutine do_eos_regions
             integer :: ierr
-            real :: logRho1, logRho2, logRho3, logRho4, logRho5, logRho6, logRho7
-            real :: logT1, logT2, logT3, logT4, logT5, logT6, logT7, logT8
-            real :: logRho0, abar, zbar, z53bar, logG0, logRho, logT, logT_hi, logT_lo
+            real :: logRho0, logRho1, logRho2, logRho3, logRho4, logRho5, logRho6
+            real :: logT1, logT2, logT3, logT4, logT5, logT6
 
             call pgsave
 
@@ -339,128 +338,64 @@
             call pgsci(clr_LightSkyGreen)
             call pgsls(Line_Type_Dash)
 
-            logRho1 =  2.7
-            logRho2 =  2.5
-            logRho3 =  -1.71
-            logRho4  = -2.21
-            logRho5  = -9.0
-            logRho6  = -9.99
-            logRho7  = -12
-            logT1  =  7.7
-            logT2 =   7.6
-            logT3  =  4.65
-            logT4  =  4.75
-            logT5  =  3.60
-            logT6  =  3.50
-            logT7 =   2.3
-            logT8  =  2.2
+            logT1 = s% eos_rq% logT_max_FreeEOS_hi
+            logT2 = s% eos_rq% logT_max_FreeEOS_lo
+            logT3 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
+            logT4 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
 
-            call stroke_line(logRho2, logT1, logRho7, logT1)
-            call stroke_line(logRho2, logT2, logRho7, logT2)
-            call stroke_line(logRho2, logT1, logRho1, logT2)
-            call stroke_line(logRho1, logT2, logRho1, logT3)
+            logRho1 = s% eos_rq% logRho_min_for_all_Skye
+            logRho2 = s% eos_rq% logRho_min_for_any_Skye
+            logRho3 = s% eos_rq% logQ_min_FreeEOS_lo + 2*logT1 - 12
+            logRho4 = s% eos_rq% logQ_min_FreeEOS_hi + 2*logT2 - 12
+            logRho5 = s% eos_rq% logQ_min_FreeEOS_lo + 2*logT3 - 12
+            logRho6 = s% eos_rq% logQ_min_FreeEOS_hi + 2*logT4 - 12
 
-            call stroke_line(logRho4, logT7, logRho5, logT7)
-            call stroke_line(logRho4, logT8, logRho5, logT8)
-            call stroke_line(logRho4, logT8, logRho3, logT7)
-            call stroke_line(logRho6, logT7, logRho5, logT8)
+            call stroke_line(logRho1, logT1, logRho3, logT1)
+            call stroke_line(logRho2, logT2, logRho4, logT2)
+            call stroke_line(logRho3, logT1, logRho5, logT3)
+            call stroke_line(logRho4, logT2, logRho6, logT4)
 
+            call stroke_line(logRho1, logT1, logRho1, logT3)
             call stroke_line(logRho2, logT2, logRho2, logT4)
-            call stroke_line(logRho3, logT7, logRho1, logT3)
-            call stroke_line(logRho4, logT7, logRho2, logT4)
-
-            call stroke_line(logRho5, logT7, logRho5, logT6)
-            call stroke_line(logRho6, logT7, logRho6, logT6)
-            call stroke_line(logRho5, logT6, logRho6, logT5)
-
-            call stroke_line(logRho6, logT5, logRho7, logT5)
-            call stroke_line(logRho6, logT6, logRho7, logT6)
 
             ! blend from OPAL to SCVH
             call pgsci(clr_LightSkyBlue)
             call pgsls(Line_Type_Dot)
 
             logRho0 = logRho1
-            logRho1 = 2.2
-            logRho2 = 1.2
-            logRho3 = -2.0
-            logRho4 = -3.8
-            logRho5 = -5.8
-            logRho6 = -6.8
-            logRho7 = -10
-            logT1 = 6.6
-            logT2 = 6.5
-            logT3 = 4.0
-            logT4 = 3.4
-            logT5 = 3.3
+            
+            logT1 = s% eos_rq% logT_cut_FreeEOS_hi
+            logT2 = s% eos_rq% logT_cut_FreeEOS_lo
+            logT3 = s% eos_rq% logT_min_FreeEOS_hi
+            logT4 = s% eos_rq% logT_min_FreeEOS_lo
+            logT5 = 0.5*(logRho0 - s% eos_rq% logQ_max_OPAL_SCVH + 12)
+            logT6 = s% eos_rq% logT_low_all_HELM
+
+            logRho1 = s% eos_rq% logQ_cut_lo_Z_FreeEOS_hi + 2*logT1 - 12
+            logRho2 = s% eos_rq% logQ_cut_lo_Z_FreeEOS_lo + 2*logT2 - 12
+            logRho3 = s% eos_rq% logQ_cut_lo_Z_FreeEOS_hi + 2*logT3 - 12
+            logRho4 = s% eos_rq% logQ_cut_lo_Z_FreeEOS_lo + 2*logT4 - 12
+            logRho5 = s% eos_rq% logRho_min_OPAL_SCVH_limit
+            logRho6 = s% eos_rq% logQ_max_OPAL_SCVH + 2*logT6 - 12
 
             call stroke_line(logRho0, logT1, logRho2, logT1)
             call stroke_line(logRho2, logT1, logRho4, logT3)
-            call stroke_line(logRho4, logT3, logRho5, logT4)
-            call stroke_line(logRho5, logT4, logRho7, logT4)
+            call stroke_line(logRho4, logT3, logRho5, logT3)            
 
             call stroke_line(logRho0, logT2, logRho1, logT2)
-            call stroke_line(logRho1, logT2, logRho3, logT3)
-            call stroke_line(logRho3, logT3, logRho5, logT5)
-            call stroke_line(logRho5, logT5, logRho7, logT5)
+            call stroke_line(logRho1, logT2, logRho3, logT4)
+            call stroke_line(logRho3, logT4, logRho5, logT4)
+            
+            call stroke_line(logRho0, logT5, logRho6, logT6)
+            call stroke_line(logRho5, logT6, logRho6, logT6)
 
             call pgsci(1)
-            call show_label(2.5, 8.2, 0.0, 0.5, 'HELM')
+            call show_label(1.0, 3.2, 0.0, 0.5, 'HELM')
             call show_label(-7.2, 5.8, 0.0, 0.5, 'FreeEOS')
-            call show_label(-0.8, 3.7, 0.0, 0.5, 'OPAL/SCVH')
-            call show_label(8.1, 8.1, 0.0, 0.5, 'PC')
-            call show_label(8.1, 6.1, 0.0, 0.5, 'PC (solid)')
+            call show_label(-1.5, 3.7, 0.0, 0.5, 'OPAL/SCVH')
+            call show_label(-1.5, 9.7, 0.0, 0.5, 'HELM/Skye EOS')
+            call show_label(6.0, 4.5, 0.0, 0.5, 'Skye EOS')
             
-            !call eos_get_PC_parameters( &
-            !   s% eos_handle, mass_fraction_limit_for_PC,  &
-            !   logRho1_PC_limit, logRho2_PC_limit, &
-            !   log_Gamma_e_all_HELM, log_Gamma_e_all_PC, &
-            !   PC_Gamma_start_crystal, PC_Gamma_full_crystal, &
-            !   use_PC, ierr)
-            
-            !if (ierr == 0) then ! show HELM/PC blend and crystallization
-               abar = s% abar(s% nz)
-               zbar = s% zbar(s% nz)
-               z53bar = s% z53bar(s% nz)
-
-               ! HELM/PC blend
-               logG0 = log10(qe*qe*pow((4.0d0/3.0d0)*pi*avo*zbar/abar,one_third)/kerg)
-               logT_lo = logG0 + s% eos_rq% logRho2_PC_limit/3 - s% eos_rq% log_Gamma_e_all_HELM
-               logT_hi = logG0 + s% eos_rq% logRho1_PC_limit/3 - s% eos_rq% log_Gamma_e_all_PC
-               logRho = 14
-               logT = logG0 + logRho/3 - s% eos_rq% log_Gamma_e_all_PC
-               logRho1 = logRho; logT1 = logT
-               logRho2 = s% eos_rq% logRho1_PC_limit; logT2 = logT_hi
-               call pgsls(Line_Type_Dash_Dot)
-               call pgsci(clr_Crimson)
-               call pgmove(logRho1, logT1)
-               call pgdraw(logRho2, logT2)
-               call pgdraw(logRho2, 1.0)
-               logT = logG0 + logRho/3 - s% eos_rq% log_Gamma_e_all_HELM
-               logRho1 = logRho; logT1 = logT
-               logRho2 = s% eos_rq% logRho2_PC_limit; logT2 = logT_lo
-               call pgmove(logRho1, logT1)
-               call pgdraw(logRho2, logT2)
-               call pgdraw(logRho2, 1.0)
-
-               ! crystallization
-               logG0 = log10(z53bar*qe*qe*pow((4.0d0/3.0d0)*pi*avo*zbar/abar,one_third)/kerg)
-               logT_lo = logG0 + s% eos_rq% logRho1_PC_limit/3 - log10(s% eos_rq% PC_Gamma_start_crystal)
-               logT_hi = logG0 + s% eos_rq% logRho1_PC_limit/3 - log10(s% eos_rq% PC_Gamma_full_crystal)
-               logRho = 14
-               logT = logG0 + logRho/3 - log10(s% eos_rq% PC_Gamma_full_crystal)
-               logRho1 = logRho; logT1 = logT
-               logRho2 = s% eos_rq% logRho1_PC_limit; logT2 = logT_hi
-               call pgsls(Line_Type_Dash)
-               call pgsci(clr_Crimson)
-               call pgmove(logRho1, logT1)
-               call pgdraw(logRho2, logT2)
-               logT = logG0 + logRho/3 - log10(s% eos_rq% PC_Gamma_start_crystal)
-               logRho1 = logRho; logT1 = logT
-               logRho2 = s% eos_rq% logRho1_PC_limit; logT2 = logT_lo
-               call pgmove(logRho1, logT1)
-               call pgdraw(logRho2, logT2)
-            !end if
             call pgunsa
          end subroutine do_eos_regions
 

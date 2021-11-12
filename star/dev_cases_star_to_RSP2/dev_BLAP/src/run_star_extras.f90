@@ -86,9 +86,9 @@
          write(*,*) 'RSP2 period', RSP2_num_periods, RSP2_period/(24*3600)
          time_started = time_ended
          if (RSP2_num_periods < s% x_integer_ctrl(1)) return
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'RSP2 rel_run_E_err', rel_run_E_err
@@ -102,9 +102,9 @@
             write(*,*) 'RSP2 good match for period', &
                RSP2_period/(24*3600), target_period
          end if
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
       

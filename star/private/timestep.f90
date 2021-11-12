@@ -76,7 +76,7 @@
 
          if (is_bad_num(s% dt_next)) then
             write(*, *) 'timestep_controller: dt_next', s% dt_next
-            if (s% stop_for_bad_nums) stop 'timestep_controller'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'timestep_controller')
             timestep_controller = terminate
             s% termination_code = t_timestep_controller
             return
@@ -88,9 +88,9 @@
             write(*,1) 'lg dt/secyer', log10(s% dt/secyer)
             write(*,1) 'lg dt_next/secyer', log10(s% dt_next/secyer)
             write(*,1) 'dt_next/dt', s% dt_next/s% dt
-            write(*,*)
-            write(*,*)
-            stop 'timestep_controller'
+            write(*,'(A)')
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'timestep_controller')
          end if
 
       end function timestep_controller
@@ -367,7 +367,7 @@
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'max_timestep_factor', s% model_number, max_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) stop 'filter_dt_next'
+               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
             if (i_limit == Tlim_struc) i_limit = Tlim_max_timestep_factor
          end if
@@ -378,7 +378,7 @@
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'min_timestep_factor', s% model_number, s% min_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) stop 'filter_dt_next'
+               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
             if (i_limit == Tlim_struc) i_limit = Tlim_min_timestep_factor
          end if
@@ -788,7 +788,7 @@
          include 'formats'
          if (is_bad(delta_value)) then
             write(*,1) trim(msg) // ' delta_value', delta_value
-            stop 'check_change'
+            call mesa_error(__FILE__,__LINE__,'check_change')
          end if
          check_change = keep_going
          abs_change = abs(delta_value)
@@ -805,7 +805,7 @@
          dt_limit_ratio = abs_change/lim ! 1d0/(s% timestep_dt_factor**relative_excess)
          if (is_bad(dt_limit_ratio)) then
             write(*,1) trim(msg) // ' dt_limit_ratio', dt_limit_ratio, abs_change, lim
-            stop 'check_change'
+            call mesa_error(__FILE__,__LINE__,'check_change')
          end if
          if (dt_limit_ratio <= 1d0) dt_limit_ratio = 0
       end function check_change
@@ -1114,7 +1114,7 @@
             drop_factor = s% lgL_z_drop_factor
             relative_limit = s% lgL_z_burn_relative_limit
          else
-            stop 'bad iso arg for check_lgL'
+            call mesa_error(__FILE__,__LINE__,'bad iso arg for check_lgL')
          end if
          
          if (old_L < 0d0) return
@@ -2037,7 +2037,7 @@
          if (is_bad(dlgL)) then
             write(*,2) 's% L_surf', s% model_number, s% L_surf
             write(*,2) 's% L_surf_old', s% model_number, s% L_surf_old
-            stop 'check_delta_lgL'
+            call mesa_error(__FILE__,__LINE__,'check_delta_lgL')
          end if
          check_delta_lgL = check_change(s, dlgL, &
             s% delta_lgL_limit, s% delta_lgL_hard_limit, &
@@ -2067,7 +2067,7 @@
             write(*,1) 's% Teff_old', s% Teff_old
             write(*,1) 's% Teff', s% Teff
             write(*,1) 'dHR', dHR
-            if (s% stop_for_bad_nums) stop 'check_delta_HR'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'check_delta_HR')
          end if
          check_delta_HR = check_change(s, dHR, &
             s% delta_HR_limit, s% delta_HR_hard_limit, &
@@ -2374,7 +2374,7 @@
          sumterm(:) = 0
 
          if (.not. associated(s% xh_old)) then
-            stop 'not associated xh_old'
+            call mesa_error(__FILE__,__LINE__,'not associated xh_old')
          end if
 
          ! use differences in smoothed old and new to filter out high frequency noise.
@@ -2458,7 +2458,7 @@
                write(*,2) 'ratio_prev', s% model_number, ratio_prev
                write(*,2) 'limtr', s% model_number, limtr
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               write(*,*)
+               write(*,'(A)')
             end if
 
          else ! no history available, so fall back to the 1st order controller
@@ -2468,7 +2468,7 @@
                write(*,2) 'dt_limit_ratio_target', s% model_number, dt_limit_ratio_target
                write(*,2) 'dt_limit_ratio', s% model_number, dt_limit_ratio
                write(*,2) 'filter_dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) stop 'filter_dt_next'
+               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
          end if
 

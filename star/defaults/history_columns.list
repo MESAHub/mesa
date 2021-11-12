@@ -909,7 +909,7 @@
       !surf_c12_minus_o16 ! this is useful for seeing effects of dredge up on AGB
       !surf_num_c12_div_num_o16
 
-
+      !phase_of_evolution ! Integer mapping to the type of evolution see star_data/public/star_data_def.inc for definitions
 
    !## MLT++
       !gradT_excess_alpha

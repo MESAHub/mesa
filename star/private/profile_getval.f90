@@ -1130,9 +1130,9 @@
                val = s% eps_grav_ad(k)% val
                
             case (p_log_xm_div_delta_m)
-               val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
+               if(abs(s% dt*s% mstar_dot) > 0) val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
             case (p_xm_div_delta_m)
-               val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
+               if(abs(s% dt*s% mstar_dot) > 0) val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
 
             case (p_env_eps_grav)
                val = -s% gradT_sub_grada(k)*s% grav(k)*s% mstar_dot*s% Cp(k)*s% T(k) / &
@@ -1380,7 +1380,7 @@
                   if (is_bad(val)) then
                      write(*,2) 'val', k, val
                      write(*,2) 's% omega_shear(k)', k, s% omega_shear(k)
-                     stop 'profile'
+                     call mesa_error(__FILE__,__LINE__,'profile')
                   end if
                else
                   val = -99
@@ -1391,7 +1391,7 @@
                   if (is_bad(val)) then
                      write(*,2) 'val', k, val
                      write(*,2) 's% omega_shear(k)', k, s% omega_shear(k)
-                     stop 'profile'
+                     call mesa_error(__FILE__,__LINE__,'profile')
                   end if
                else
                   val = -99
@@ -2175,7 +2175,7 @@
                write(*,*) 'between ' // trim(profile_column_name(c-1)) // ' and ' // &
                   trim(profile_column_name(c+1)), c-1, c+1
                val = 0
-               stop 'profile_getval'
+               call mesa_error(__FILE__,__LINE__,'profile_getval')
 
          end select
 
@@ -2277,7 +2277,7 @@
 
             if (is_bad(get_k_r_integral)) then
                write(*,2) 'get_k_r_integral', k_in, integral_for_k, integral
-               stop 'get_k_r_integral'
+               call mesa_error(__FILE__,__LINE__,'get_k_r_integral')
             end if
 
          end function get_k_r_integral

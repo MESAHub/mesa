@@ -49,7 +49,7 @@
          include 'formats'
          
          if (s% RSP2_flag) then
-            stop 'need to add mlt_vc and Hp_face to remesh_split_merge'
+            call mesa_error(__FILE__,__LINE__,'need to add mlt_vc and Hp_face to remesh_split_merge')
          end if
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
@@ -179,7 +179,7 @@
                s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
             end do
          end if
-         if (s% model_number == -6918) stop 'amr'
+         if (s% model_number == -6918) call mesa_error(__FILE__,__LINE__,'amr')
          
          contains
          
@@ -701,11 +701,11 @@
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
-         if (ierr /= 0) return ! stop 'update_xh_eos_and_kap failed in do_merge'
+         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
          
          s% rmid_start(i) = -1
          call set_rmid(s, i, i, ierr)
-         if (ierr /= 0) return ! stop 'update_xh_eos_and_kap failed in do_merge'
+         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
 
          star_PE1 = get_star_PE(s)
          call revise_star_radius(s, star_PE0, star_PE1)
@@ -801,7 +801,7 @@
             write(*,2) 'IE', k, IE
             write(*,2) 'KE', k, KE
             write(*,2) 'PE', k, PE
-            stop 'get_cell_energies'
+            call mesa_error(__FILE__,__LINE__,'get_cell_energies')
          end if
       end subroutine get_cell_energies
 
@@ -909,7 +909,7 @@
             write(*,2) 'tauL', ip, tauL
             write(*,2) 'tauR', i, tauR
             write(*,2) 'nz', nz
-            stop 'do_split'
+            call mesa_error(__FILE__,__LINE__,'do_split')
             !$omp end critical (adjust_mesh_split_merge_crit1)         
          end if
                  
@@ -1028,7 +1028,7 @@
          call reallocate_star_info_arrays(s, ierr)
          if (ierr /= 0) then
             write(*,2) 'reallocate_star_info_arrays ierr', ierr
-            stop 'split failed'
+            call mesa_error(__FILE__,__LINE__,'split failed')
          end if
 
          if (i_split < nz_old) then ! move i_split..nz-1 to i_split+1..nz
@@ -1091,7 +1091,7 @@
                dMR = rho_R*dVR
                if (abs(dML + dMR - dM) > 1d-14*dM) then
                   write(*,2) '(dML + dMR - dM)/dM', i, (dML + dMR - dM)/dM
-                  stop 'split'
+                  call mesa_error(__FILE__,__LINE__,'split')
                end if
                dMR = dM - dML
             end if
@@ -1109,7 +1109,7 @@
             rho_L = dML/dVL
             if (rho_R <= 1d-16 .or. rho_L <= 1d-16) then
    !$omp critical (adjust_mesh_split_merge_crit2)
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'nz', nz
                write(*,2) 'rho_RR', iR-1, rho_RR
                write(*,2) 'rho_iR', iR, rho_iR
@@ -1122,14 +1122,14 @@
                write(*,2) 'rho_RR - rho_iR', iR, rho_RR - rho_iR
                write(*,2) 'dr for right', iR, (s% r(iR-1) - s% r(iR+1))/2
                write(*,2) 'grad_rho', iR, grad_rho
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 's% r(iL)', iL, s% r(iL)
                write(*,2) 'dR', iC, dR
                write(*,2) 'dRho', iC, grad_rho*dR
                write(*,2) 'rho_R', iC, rho_R
                write(*,2) 'rho_L', iC, rho_L
-               write(*,*)
-               stop 'failed in do_split extrapolation of density from above'
+               write(*,'(A)')
+               call mesa_error(__FILE__,__LINE__,'failed in do_split extrapolation of density from above')
    !$omp end critical  (adjust_mesh_split_merge_crit2)        
             end if
          
@@ -1204,7 +1204,7 @@
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
          if (is_bad(s% tau(ip))) then
             write(*,2) 'tau', ip, s% tau(ip), tauL, tauR, dMR/dM
-            stop 'split'
+            call mesa_error(__FILE__,__LINE__,'split')
          end if
 
          if (i == 1) then
@@ -1324,15 +1324,15 @@
          end if
 
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
-         if (ierr /= 0) return ! stop 'update_xh_eos_and_kap failed in do_split'
+         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
 
          call update_xh_eos_and_kap(s,ip,species,new_xa,ierr)
-         if (ierr /= 0) return ! stop 'update_xh_eos_and_kap failed in do_split'
+         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
          
          s% rmid_start(i) = -1
          s% rmid_start(ip) = -1
          call set_rmid(s, i, ip, ierr)
-         if (ierr /= 0) return ! stop 'update_xh_eos_and_kap failed in do_split'
+         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
 
          star_PE1 = get_star_PE(s)
          call revise_star_radius(s, star_PE0, star_PE1)

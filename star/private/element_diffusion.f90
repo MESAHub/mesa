@@ -359,7 +359,7 @@
             end if
          end if
 
-         if (dumping) stop 'debug: dump_diffusion_info'
+         if (dumping) call mesa_error(__FILE__,__LINE__,'debug: dump_diffusion_info')
          
          do k=nzlo+1,nzhi
             do j=1,species
@@ -376,7 +376,7 @@
          if(s% do_diffusion_heating .and. s% do_WD_sedimentation_heating) then
             write(*,*) "do_diffusion_heating is incompatible with do_WD_sedimentation_heating"
             write(*,*) "at least one of these options must be set to .false."
-            stop 'do_element_diffusion'
+            call mesa_error(__FILE__,__LINE__,'do_element_diffusion')
          end if         
 
          s% eps_WD_sedimentation(1:nz) = 0d0

@@ -28,6 +28,7 @@
 
       use const_def, only: dp
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
+      use utils_lib, only: mesa_error
 
       use pulse, only: &
            star_export_pulse_data => export_pulse_data, &
@@ -2096,7 +2097,7 @@
          !   res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
          ierr = -1
          write(*,*) 'star_get_peos no longer supported'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end subroutine star_get_peos
       
       subroutine star_solve_eos_given_PgasT( &

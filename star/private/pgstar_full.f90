@@ -76,7 +76,8 @@
          character (len=strlen) :: fname
          logical :: fexist
          ierr = 0
-         fname = trim(s% photo_directory) // '/pgstar.dat'
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
+         fname = trim(s% log_directory) // '/pgstar.dat'
          inquire(file=trim(fname), exist=fexist)
          if (fexist) then
             open(newunit=iounit, file=trim(fname), status='replace', action='write')
@@ -1318,7 +1319,7 @@
             pause = (mod(s% model_number, s% pgstar_interval) == 0)
             
          if (pause) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'model_number', s% model_number
             write(*,*) 'PGSTAR: paused -- hit RETURN to continue'
             read(*,*)
@@ -1489,6 +1490,8 @@
          if (.not. associated(pg)) return
 
          n = s% number_of_history_columns
+
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
          fname = trim(s% log_directory) // '/pgstar.dat'
 
          if (associated(pg% next)) then
@@ -1596,7 +1599,7 @@
          if (ierr /= 0) then
             write(*,*) 'failed in get_hist_values'
             return
-            stop 'pgstar'
+            call mesa_error(__FILE__,__LINE__,'pgstar')
          end if
          call add_to_pgstar_hist(s, pg)
 

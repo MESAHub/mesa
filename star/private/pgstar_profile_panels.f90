@@ -641,7 +641,7 @@
             if (found_shock .and. xshock <= 0) then
                write(*,*) 'Panel:',panels_id,' shock location on xaxis must be positive for tracking location in plot.'
                if (panels_xaxis_name == 'logR') write(*,*) 'perhaps use logR_cm instead of logR?'
-               write(*,*)
+               write(*,'(A)')
                found_shock = .false.
             end if
          end if

@@ -113,7 +113,7 @@
             do_struct_burn_mix = do_burn(s, dt)
             if (do_struct_burn_mix /= keep_going) then
                write(*,2) 'failed in do_burn', s% model_number
-               stop 'do_struct_burn_mix'
+               call mesa_error(__FILE__,__LINE__,'do_struct_burn_mix')
                return
             end if            
             call set_vars_if_needed(s, s% dt, 'after do_burn', ierr)
@@ -698,7 +698,7 @@
                   s% species, s% xa(:,k), &
                   s% rho(k), s% lnd(k)/ln10, s% energy(k), s% lnT(k), &
                   new_lnT, revised_energy, ierr)
-               if (ierr /= 0) return ! stop 'do_merge failed in set_lnT_for_energy'
+               if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'do_merge failed in set_lnT_for_energy')
                call store_lnT_in_xh(s, k, new_lnT)
                call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             end if
@@ -753,7 +753,7 @@
                      k, s% lnR(k) - s% lnR(k+1), s% lnR(k), s% lnR(k+1), &
                      s% lnR_start(k) - s% lnR_start(k+1), s% lnR_start(k), s% lnR_start(k+1)
                converged = .false.; exit
-               stop 'check_after_converge'
+               call mesa_error(__FILE__,__LINE__,'check_after_converge')
             else
                if (s% lnT(k) > ln10*12) then
                   if (report) write(*,2) 'after hydro, logT > 12 in cell k', k, s% lnT(k)
@@ -941,7 +941,7 @@
             if (s% report_ierr) &
                write(*,*) 'unknown string for screening_mode: ' // trim(s% screening_mode)
             return
-            stop 'do1_net'
+            call mesa_error(__FILE__,__LINE__,'do1_net')
          end if
 
          dbg = .false. ! (s% model_number == 1137)
@@ -1014,13 +1014,13 @@
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'do_burn failed', k_bad
             return
-            stop 'do_burn'
+            call mesa_error(__FILE__,__LINE__,'do_burn')
          
          
             do_burn = retry
             if (trace .or. s% report_ierr) then
                write(*,*) 'do_burn ierr'
-               !stop 'do_burn'
+               !call mesa_error(__FILE__,__LINE__,'do_burn')
             end if
             call restore
             return
@@ -1138,7 +1138,7 @@
             if (ierr /= 0) then
                if (s% report_ierr) write(*,2) 'net_1_zone_burn_const_density failed', k
                return
-               stop 'burn1_zone'
+               call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
             ! restore temperature
             call store_lnT_in_xh(s, k, starting_log10T*ln10)
@@ -1166,7 +1166,7 @@
             if (ierr /= 0) then
                if (s% report_ierr) write(*,2) 'net_1_zone_burn failed', k
                return
-               stop 'burn1_zone'
+               call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
          end if
          
@@ -1179,7 +1179,7 @@
             if (s% report_ierr) &
                write(*,2) 'net_1_zone_burn final call to do1_net failed', k
             return
-            stop 'burn1_zone'
+            call mesa_error(__FILE__,__LINE__,'burn1_zone')
          end if
                
          s% eps_nuc(k) = 0d0

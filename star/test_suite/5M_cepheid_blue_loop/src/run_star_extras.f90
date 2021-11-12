@@ -133,7 +133,13 @@
          
          real(dp) function get_blue_logT(log_L)
             real(dp), intent(in) :: log_L
-            get_blue_logT = logT2 + (log_L - logL2)*(logT1 - logT2)/(logL1 - logL2)
+            get_blue_logT = -1d99
+            if (abs(logL1 - logL2) > 1d-10) then
+               get_blue_logT = logT2 + (log_L - logL2)*(logT1 - logT2)/(logL1 - logL2)
+            else
+               get_blue_logT = 1d-99
+            end if
+
          end function get_blue_logT
          
          real(dp) function get_red_logT(log_L)
@@ -269,7 +275,7 @@
             write(*,*) 'failed in star_alloc_extras'
             write(*,*) 'alloc_extras num_ints', num_ints
             write(*,*) 'alloc_extras num_dbls', num_dbls
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          contains

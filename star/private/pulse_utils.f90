@@ -163,8 +163,8 @@ contains
     ! Evaluate v at face k, by interpolating (or extrapolating, if
     ! k==k_a or k==k_b+1) from cells k_a:k_b
 
-    if (k_b < k_a) stop 'eval_face: invalid segment indices'
-    if (k < k_a .OR. k > k_b+1) stop 'eval_face: out-of-bounds interpolation'
+    if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_face: invalid segment indices')
+    if (k < k_a .OR. k > k_b+1) call mesa_error(__FILE__,__LINE__,'eval_face: out-of-bounds interpolation')
 
     if (k_b == k_a) then
             
@@ -219,8 +219,8 @@ contains
     ! Evaluate the abundance for species i at face k, by interpolating
     ! (or extrapolating, if k==k_a or k==k_b+1) from cells k_a:k_b
 
-    if (k_b < k_a) stop 'eval_face_X: invalid segment indices'
-    if (k < k_a .OR. k > k_b+1) stop 'eval_face_X: out-of-bounds interpolation'
+    if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_face_X: invalid segment indices')
+    if (k < k_a .OR. k > k_b+1) call mesa_error(__FILE__,__LINE__,'eval_face_X: out-of-bounds interpolation')
 
     if (i >= 1) then
     
@@ -280,10 +280,10 @@ contains
     ! k_a:k_b+1. If k==k_a or k==k_b+1, then use extrapolation from
     ! neighboring faces
 
-    if (k_b < k_a) stop 'eval_face_A_ast: invalid segment indices'
-    if (k < k_a .OR. k > k_b+1) stop 'eval_face_A_ast: out-of-bounds interpolation'
+    if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_face_A_ast: invalid segment indices')
+    if (k < k_a .OR. k > k_b+1) call mesa_error(__FILE__,__LINE__,'eval_face_A_ast: out-of-bounds interpolation')
 
-    if (.not. s% calculate_Brunt_N2) stop 'eval_face_A_ast: must have calculate_Brunt_N2 = .true.'
+    if (.not. s% calculate_Brunt_N2) call mesa_error(__FILE__,__LINE__,'eval_face_A_ast: must have calculate_Brunt_N2 = .true.')
 
     if (k_b == k_a) then
 
@@ -335,8 +335,8 @@ contains
 
     ! Evaluate rho at face k, using data from cells k_a:k_b
 
-    if (k_b < k_a) stop 'eval_face_rho: invalid segment indices'
-    if (k < k_a .OR. k > k_b+1) stop 'eval_face_rho: out-of-bounds interpolation'
+    if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_face_rho: invalid segment indices')
+    if (k < k_a .OR. k > k_b+1) call mesa_error(__FILE__,__LINE__,'eval_face_rho: out-of-bounds interpolation')
 
     if (k_b == k_a) then
 
@@ -396,7 +396,7 @@ contains
     ! Evaluate v at the center, by extrapolating from cells/faces
     ! k_a:k_b
 
-    if (k_b < k_a) stop 'eval_center: invalid segment indices'
+    if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_center: invalid segment indices')
 
     if (k_a == k_b) then
 
@@ -454,7 +454,7 @@ contains
 
     if (i >= 1) then
 
-       if (k_b < k_a) stop 'eval_center: invalid segment indices'
+       if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_center: invalid segment indices')
 
        if (k_a == k_b) then
 
@@ -537,7 +537,7 @@ contains
     ! Evaluate d2v/dr2 at the center, by extrapolating from
     ! cells/faces k_a:k_b
 
-    if (k_b < k_a) stop 'eval_center_d2: invalid segment indices'
+    if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_center_d2: invalid segment indices')
 
     if (k_a == k_b) then
 

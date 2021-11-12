@@ -406,10 +406,10 @@
          end if
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'read_net_file <' // trim(filename) // '>'
             write(*,*) 'net_filename <' // trim(net_filename) // '>'
-            write(*,*)
+            write(*,'(A)')
          end if
 
          n = 0
@@ -521,9 +521,9 @@
 ! done with network veracity checks
          
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'done read_net_file ' // trim(filename)
-            write(*,*)
+            write(*,'(A)')
          end if
          
          
@@ -1113,7 +1113,7 @@
                stop
             end if
             if (dbg) write(*,*) 'add_reaction_for_this_handle ' // trim(string)
-            if (dbg) stop 'add_this_reaction'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'add_this_reaction')
          end subroutine add_this_reaction
          
 
@@ -1227,7 +1227,7 @@
                   
             if (ir < 0 .or. ir > rates_reaction_id_max) then
                write(*,*) 'failed in rates_reaction_id for ' // trim(string)
-               stop 'net_init'
+               call mesa_error(__FILE__,__LINE__,'net_init')
             end if
                   
             if (ir == 0) then ! check if reaction or reverse is defined in reaclib
@@ -1242,7 +1242,7 @@
                   
                   if (ir < 0 .or. ir > rates_reaction_id_max) then
                      write(*,*) 'failed in rates_reaction_id for ' // trim(string)
-                     stop 'net_init'
+                     call mesa_error(__FILE__,__LINE__,'net_init')
                   end if
                   
                else
@@ -1336,7 +1336,7 @@
                   // ' ' // trim(chem_isos% name(reaction_screening_info(2,ir)))  &
                   // ' ' // trim(chem_isos% name(reaction_screening_info(3,ir)))
          end do
-         write(*,*)
+         write(*,'(A)')
       end subroutine show_scr3
       
       
@@ -1740,7 +1740,7 @@
          write(*,2) 'num_general_one_one_kind', num_general_one_one_kind
          write(*,2) 'num_general_two_one_kind', num_general_two_one_kind
          write(*,2) 'num_general_two_two_kind', num_general_two_two_kind
-         write(*,*)
+         write(*,'(A)')
          
          !stop
 
@@ -2071,7 +2071,7 @@
 
          if (reaction_num /= num_reactions) then
             write(*,*) 'reaction_num /= num_reactions', reaction_num, num_reactions
-            stop 'setup_reaction_info'
+            call mesa_error(__FILE__,__LINE__,'setup_reaction_info')
          end if
          
          call check_for_hardwired_pairs
@@ -2097,7 +2097,7 @@
             if (ir < 1 .or. ir > rates_reaction_id_max) then
                write(*,*) '(ir < 1 .or. ir > rates_reaction_id_max)', &
                   ir, i, rates_reaction_id_max
-               stop 'setup_reaction_info'
+               call mesa_error(__FILE__,__LINE__,'setup_reaction_info')
             end if
             rtab(ir) = i
          end do
@@ -2150,14 +2150,14 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
             if (r_ir <= 0) then
                write(*,*) trim(reaction_name(reaction_id(i)))
                write(*,2) 'reaction kind', reaction_reaclib_kind(i)
-               stop 'setup_reaction_info: missing reverse id'
+               call mesa_error(__FILE__,__LINE__,'setup_reaction_info: missing reverse id')
             end if
             r_i = rtab(r_ir)
             if (r_i == 0) then ! reverse reaction not in net
                !g% have_all_reverses = .false.
                cycle
             end if
-            if (reaction_id(r_i) /= r_ir) stop 'setup_reaction_info: bad reverse'
+            if (reaction_id(r_i) /= r_ir) call mesa_error(__FILE__,__LINE__,'setup_reaction_info: bad reverse')
             ir = reaction_id(i)
             if (r_i <= i) then
                write(*,2) 'r_i', r_i
@@ -2234,7 +2234,7 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
          end do
          if (j /= num_wk_reactions) then
             write(*,3) 'problem with num_wk_reactions in setup_reaction_info', j, num_wk_reactions
-            stop 'setup_reaction_info'
+            call mesa_error(__FILE__,__LINE__,'setup_reaction_info')
          end if
 
       end subroutine setup_reaction_info

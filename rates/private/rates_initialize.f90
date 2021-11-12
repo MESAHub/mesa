@@ -312,7 +312,7 @@
             do j = 1, num_in
                write(*,3) 'reaction input', j, reaction_inputs(2*j,ir)
             end do
-            stop 'set_reaction_info'
+            call mesa_error(__FILE__,__LINE__,'set_reaction_info')
          end if
          
          if (iso_out < 0 .or. iso_out > num_chem_isos) then
@@ -323,7 +323,7 @@
             do j = 1, num_out
                write(*,3) 'reaction output', j, reaction_outputs(2*j,ir)
             end do
-            stop 'set_reaction_info'
+            call mesa_error(__FILE__,__LINE__,'set_reaction_info')
          end if
       
          if (weak) then
@@ -595,7 +595,7 @@
          
          close(iounit)
          
-         if (dbg) stop 'read rates'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'read rates')
          !call check
          
          
@@ -625,7 +625,7 @@
                   ierr = 0
                end if
             end do
-            if (.not. okay) stop 'init_raw_rates_records'
+            if (.not. okay) call mesa_error(__FILE__,__LINE__,'init_raw_rates_records')
          end subroutine check
          
          
@@ -827,7 +827,7 @@
          call check_reaction_categories
          call check_reaction_info
          
-         if (dbg) stop 'read_reaction_parameters'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'read_reaction_parameters')
          
          
          contains
@@ -854,7 +854,7 @@
                if (ii <= 0) then
                   write(*,'(a)') 'bad input iso in reaction_parameters file <' // line(i:j) // '>'
                   write(*,'(a)') trim(line)
-                  stop 'read_reaction_parameters'
+                  call mesa_error(__FILE__,__LINE__,'read_reaction_parameters')
                   ierr = -1
                   return
                end if
@@ -886,7 +886,7 @@
                if (ii <= 0) then
                   write(*,'(a)') 'bad output iso in reaction_parameters file <' // line(i:j) // '>'
                   write(*,'(a)') trim(line)
-                  stop 'read_reaction_parameters'
+                  call mesa_error(__FILE__,__LINE__,'read_reaction_parameters')
                   ierr = -1
                   return
                end if
@@ -920,7 +920,7 @@
             if (reaction_ye_rho_exponents(1,ir) > 2) then
                write(*,'(a)') 'ERROR: must revise rates_support for large ye exponent'
                write(*,'(a)') trim(line)
-               stop 'read_reaction_parameters'
+               call mesa_error(__FILE__,__LINE__,'read_reaction_parameters')
             end if
          end subroutine read_ye_rho_exponent1
 
@@ -932,7 +932,7 @@
             if (ii > 4) then
                write(*,'(a)') 'ERROR: must revise rates_support for large rho exponent'
                write(*,'(a)') trim(line)
-               stop 'read_reaction_parameters'
+               call mesa_error(__FILE__,__LINE__,'read_reaction_parameters')
             end if
             if (dbg) write(*,*)  'rho', reaction_ye_rho_exponents(2,ir)+1
          end subroutine read_ye_rho_exponent2
@@ -1074,7 +1074,7 @@
                   cnt = cnt+1
                end if
             end do
-            if (cnt > 0) stop 'check_std_reaction_Qs'
+            if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_std_reaction_Qs')
          end subroutine check_std_reaction_Qs
       
       
@@ -1088,7 +1088,7 @@
                   cnt = cnt+1
                end if
             end do
-            if (cnt > 0) stop 'check_std_reaction_neuQs'
+            if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_std_reaction_neuQs')
          end subroutine check_std_reaction_neuQs
       
       
@@ -1102,7 +1102,7 @@
                   cnt = cnt+1
                end if
             end do
-            if (cnt > 0) stop 'check_reaction_categories'      
+            if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_reaction_categories')      
          end subroutine check_reaction_categories
 
 
@@ -1117,7 +1117,7 @@
                   cnt = cnt+1
                end if
             end do
-            if (cnt > 0) stop 'check_reaction_info'
+            if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_reaction_info')
          end subroutine check_reaction_info
 
 

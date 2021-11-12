@@ -278,6 +278,7 @@
 
       subroutine output_to_file(filename, id, ierr)
          use photo_out, only: output_star_photo
+         use utils_lib, only: folder_exists, mkdir
          character (len=*) :: filename
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -290,6 +291,8 @@
 
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         if(.not. folder_exists(trim(s% photo_directory))) call mkdir(trim(s% photo_directory))
 
          open(newunit=iounit, file=trim(filename), action='write', &
             status='replace', iostat=ierr, iomsg=iomsg, form='unformatted')

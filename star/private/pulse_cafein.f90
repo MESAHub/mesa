@@ -194,7 +194,7 @@ contains
 
     ! Check that all point data has correctly been calculated
 
-    if (j /= nn+1) stop 'Invalid cell index in get_cafein_data'
+    if (j /= nn+1) call mesa_error(__FILE__,__LINE__,'Invalid cell index in get_cafein_data')
 
     ! Reverse the data ordering (CAFein format is center-to-surface)
 

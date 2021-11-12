@@ -678,10 +678,10 @@
          call integer_dict_lookup(s% history_names_dict, color_xaxis1_name, ix1, ierr)
          if (ierr /= 0) ix1 = -1
          if (ix1 <= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'ERROR: failed to find ' // &
                trim(color_xaxis1_name) // ' in history data'
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
          end if
 
@@ -690,10 +690,10 @@
             call integer_dict_lookup(s% history_names_dict, color_xaxis2_name, ix2, ierr)
             if (ierr /= 0) ix2 = -1
             if (ix2 <= 0) then
-               write(*,*)
+               write(*,'(A)')
                write(*,*) 'ERROR: failed to find ' // &
                   trim(color_xaxis2_name) // ' in history data'
-               write(*,*)
+               write(*,'(A)')
                ierr = -1
             end if
          end if

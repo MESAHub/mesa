@@ -29,7 +29,7 @@
       use const_def, only: ln10
       use utils_lib, only: &
          fill_with_NaNs, fill_with_NaNs_2D, fill_with_NaNs_3d, set_nan, &
-         is_bad
+         is_bad, mesa_error
 
       implicit none
 
@@ -517,7 +517,7 @@
                   write(*,2) 's% nz', s% nz
                   write(*,2) 's% prev_mesh_nz', s% prev_mesh_nz
                   write(*,2) 'size(s% xa,dim=2)', size(s% xa,dim=2)
-                  stop 'star_info_arrays'
+                  call mesa_error(__FILE__,__LINE__,'star_info_arrays')
                   exit
                end if
                call do1(s% dq, c% dq)
@@ -1416,7 +1416,7 @@
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (.not. associated(ptr)) then
-                  stop 'do1 ptr not associated'
+                  call mesa_error(__FILE__,__LINE__,'do1 ptr not associated')
                end if
                if (nz <= size(ptr,dim=1)) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
@@ -2600,7 +2600,7 @@
 
          if (.not. associated(ptr)) then
             !write(*,*) 'bogus call on do_return_work_array with nil ptr ' // trim(str)
-            !stop 'do_return_work_array'
+            !call mesa_error(__FILE__,__LINE__,'do_return_work_array')
             return
          end if
 
@@ -3108,7 +3108,7 @@
             'work_arrays: num sz calls returns diff', &
             num, sz, num_calls, num_returns, num_calls-num_returns, &
             num_allocs, num_deallocs, num_allocs-num_deallocs
-         write(*,*)
+         write(*,'(A)')
 
          contains
 

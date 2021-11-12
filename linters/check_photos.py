@@ -31,18 +31,19 @@ def get_star_info_variables(filename):
 def get_photo_in_variables():
     """Extract variables that are (probably) read in photos"""
 
-    filename = 'star/private/photo_in.f90'
+    filename = "star/private/photo_in.f90"
     v = get_star_info_variables(filename)
 
     known_false_positives = {
-        'max_years_for_timestep',
-        'history_names_dict',
-        'report_ierr',
-        'Tsurf_factor',
-        'other_photo_read',
-        'job',
-        'tau_factor',
-        'opacity_factor'}
+        "max_years_for_timestep",
+        "history_names_dict",
+        "report_ierr",
+        "Tsurf_factor",
+        "other_photo_read",
+        "job",
+        "tau_factor",
+        "opacity_factor",
+    }
 
     return v - known_false_positives
 
@@ -50,11 +51,11 @@ def get_photo_in_variables():
 def get_photo_out_variables():
     """Extract variables that are (probably) written in photos"""
 
-    filename = 'star/private/photo_out.f90'
+    filename = "star/private/photo_out.f90"
     v = get_star_info_variables(filename)
 
     known_false_positives = {
-        'other_photo_write',
+        "other_photo_write",
     }
 
     return v - known_false_positives
@@ -63,7 +64,7 @@ def get_photo_out_variables():
 def get_star_data_set_input_variables():
     """Check that the star_data input variables are read by photo_in"""
 
-    filename = 'star_data/public/star_data_step_input.inc'
+    filename = "star_data/public/star_data_step_input.inc"
 
     regexp = "([A-Za-z0-9_]+)"
 
@@ -80,22 +81,24 @@ def get_star_data_set_input_variables():
         line = line.strip()
 
         # if empty, skip
-        if not line: continue
+        if not line:
+            continue
 
         # if a comment line, skip
-        if line.startswith('!'): continue
+        if line.startswith("!"):
+            continue
 
         # if line has a comment, discard
-        if '!' in line:
-            line, _ = line.split('!', maxsplit=1)
+        if "!" in line:
+            line, _ = line.split("!", maxsplit=1)
 
         # if line has a type definition, discard
-        if '::' in line:
-            _, line = line.split('::', maxsplit=1)
+        if "::" in line:
+            _, line = line.split("::", maxsplit=1)
 
         # split on commas
-        if ',' in line:
-            input_vars.extend([v.strip() for v in line.split(',')])
+        if "," in line:
+            input_vars.extend([v.strip() for v in line.split(",")])
         else:
             input_vars.append(line.strip())
 
@@ -119,7 +122,7 @@ def check_in_out():
     print_section("In, not out")
     print_variables(v_in - v_out)
 
-    print_section('Out, not in')
+    print_section("Out, not in")
     print_variables(v_out - v_in)
 
 

@@ -75,15 +75,15 @@
          filename = trim(kap_dir) // '/condtabl.data'
          open(1,file=trim(filename),status='OLD',iostat=ierr)
          if (ierr /= 0) then
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,*) 'NOTICE: missing ' // trim(filename)
             write(*,*) 'Please remove the directory mesa/data/kap_data,'
             write(*,*) 'and rerun the mesa ./install script.'
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__)
          end if
          !print*,'Reading thermal conductivity data...'
@@ -105,15 +105,15 @@
          end do
          close(1)
          if (ierr /= 0) then
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,*) 'NOTICE: error trying to read ' // trim(filename)
             write(*,*) 'Please remove the directory mesa/data/kap_data,'
             write(*,*) 'and rerun the mesa ./install script.'
-            write(*,*)
+            write(*,'(A)')
             call mesa_error(__FILE__,__LINE__)
          end if
          ! boundary condition is slope=0 at edges of tables
@@ -130,14 +130,14 @@
                ibcymin, bcymin, ibcymax, bcymax, &
                ilinx(iz), iliny(iz), ierr)
             if (ierr /= 0) then
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
-               write(*,*)
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
+               write(*,'(A)')
                write(*,*) 'NOTICE: error in ' // trim(filename)
                write(*,*) 'Please report the problem.'
-               write(*,*)
+               write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
             end if
          end do

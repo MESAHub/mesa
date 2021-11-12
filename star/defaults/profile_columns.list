@@ -188,6 +188,7 @@
    !eos_frac_PC
    !eos_frac_FreeEOS
    !eos_frac_CMS
+   !eos_frac_ideal
 
    !pgas_div_p
    !prad_div_pgas
@@ -237,7 +238,7 @@
    !eps_nuc_minus_non_nuc_neu
    !eps_nuc_start
 
-   !eps_nuc ! ergs/g/sec from nuclear reactions (reaction neutrinos subtracted)
+   !eps_nuc ! ergs/g/sec from nuclear reactions (including losses to reaction neutrinos)
    !log_abs_eps_nuc
    !d_lnepsnuc_dlnd
    !d_epsnuc_dlnd

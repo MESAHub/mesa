@@ -221,7 +221,7 @@ contains
       end if
 
       if (report) then
-         write(*,*)
+         write(*,'(A)')
          write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if

@@ -104,11 +104,11 @@
          test_partials = .false.
          
          if (s% use_other_momentum) &
-            stop 'Riemann dudt does not support use_other_momentum'
+            call mesa_error(__FILE__,__LINE__,'Riemann dudt does not support use_other_momentum')
          if (s% use_other_momentum_implicit) &
-            stop 'Riemann dudt does not support use_other_momentum_implicit'
+            call mesa_error(__FILE__,__LINE__,'Riemann dudt does not support use_other_momentum_implicit')
          if (s% use_mass_corrections) &
-            stop 'Riemann dudt does not support use_mass_corrections'
+            call mesa_error(__FILE__,__LINE__,'Riemann dudt does not support use_mass_corrections')
             
          ierr = 0
          nz = s% nz
@@ -153,7 +153,7 @@
             return
 !$omp critical (dudt_eqn)
             write(*,2) 'residual', k, residual
-            stop 'do1_dudt_eqn'
+            call mesa_error(__FILE__,__LINE__,'do1_dudt_eqn')
 !$omp end critical (dudt_eqn)
          end if
          

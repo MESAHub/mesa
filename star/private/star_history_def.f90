@@ -648,7 +648,9 @@
 
       integer, parameter :: h_apsidal_constant_k2 = h_grav_dark_Teff_equatorial + 1
 
-      integer, parameter :: h_lg_Lnuc = h_apsidal_constant_k2 + 1
+      integer, parameter :: h_phase_of_evolution = h_apsidal_constant_k2 + 1
+
+      integer, parameter :: h_lg_Lnuc = h_phase_of_evolution + 1
       integer, parameter :: h_H_rich = h_lg_Lnuc + 1
       integer, parameter :: h_N_cntr = h_H_rich + 1
       integer, parameter :: h_lg_Lneu = h_N_cntr + 1
@@ -1324,6 +1326,8 @@
          history_column_name(h_grav_dark_Teff_equatorial) = 'grav_dark_Teff_equatorial'
 
          history_column_name(h_apsidal_constant_k2) = 'apsidal_constant_k2'
+
+         history_column_name(h_phase_of_evolution) = 'phase_of_evolution'
          
 ! items corresponding to names on terminal output lines
          history_column_name(h_lg_Lnuc) = 'lg_Lnuc'
@@ -1357,7 +1361,7 @@
             if (len_trim(history_column_name(i)) == 0) then
                write(*,*) 'missing name for log column id', i
                if (i > 1) write(*,*) 'following ' // trim(history_column_name(max(1,i-1))) ! bp: get rid of bogus compiler warning
-               write(*,*)
+               write(*,'(A)')
                cnt = cnt+1
             end if
             !write(*,'(a)') '    ! ' // trim(history_column_name(i))

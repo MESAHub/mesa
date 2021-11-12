@@ -83,7 +83,7 @@
                write(*,1) 'Get_eosPT_Results: X bad', X
                ierr = -1
                return
-               stop 'eosPT'
+               call mesa_error(__FILE__,__LINE__,'eosPT')
             end if
             X = 1d0
          end if
@@ -226,7 +226,7 @@
                write(*,1) 'logRho_tol = ', logRho_tol
                write(*,1) 'other_tol = ', other_tol
                write(*,1) 'logRho_guess = ', logRho_guess
-               write(*,*)
+               write(*,'(A)')
             end if
             return
          end if
@@ -474,7 +474,7 @@
          if (xb1 == arg_not_provided .or. xb3 == arg_not_provided .or. xb1 == xb3) then
 
             if (dbg) then
-               write(*,*)
+               write(*,'(A)')
                write(*,*) 'call look_for_brackets'
                write(*,2) 'ntry', ntry
                write(*,1) 'x', x
@@ -486,7 +486,7 @@
                write(*,1) 'Pgas', Pgas
                write(*,1) 'T', T
                write(*,1) 'the_other_log', the_other_log
-               write(*,*)
+               write(*,'(A)')
             end if
 
             call look_for_brackets(x, dx, xb1, xb3, get_f_df, y1, y3, &
@@ -525,7 +525,7 @@
          end if
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'call brent_safe_zero'
             write(*,1) 'xb1', xb1
             write(*,1) 'xb3', xb3
@@ -591,7 +591,7 @@
                      write(*, 22) 'logPgas', logPgas
                      write(*, 22) 'T', T
                      write(*, 22) 'logT', logT
-                     write(*,*)
+                     write(*,'(A)')
                   end if
                   return
                end if
@@ -608,7 +608,7 @@
                else if (doing_which == doing_get_Pgas) then
                   dfdx = dlnRho_dlnPgas_c_T*d_dlnRho_c_T(which_other)*ln10
                else
-                  stop 'bad value for doing_which in eosPT_eval'
+                  call mesa_error(__FILE__,__LINE__,'bad value for doing_which in eosPT_eval')
                end if
 
             end function get_f_df

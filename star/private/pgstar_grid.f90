@@ -782,7 +782,7 @@
                      'and if you are using star/astero', &
                      'Echelle', &
                      'Ratios'
-                  write(*,*)
+                  write(*,'(A)')
 
                end if
 

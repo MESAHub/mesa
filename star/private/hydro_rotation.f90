@@ -285,7 +285,7 @@
          end do
          if (okay) return
          write(*,*) trim(str)
-         stop 'check_omega'
+         call mesa_error(__FILE__,__LINE__,'check_omega')
       end subroutine check_omega
 
 

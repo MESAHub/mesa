@@ -514,7 +514,7 @@
             if (s% dm(k) <= 0d0 .or. is_bad(s% m(k) + s% dm(k))) then
                write(*,2) 'dm m dq q M_center', k, &
                   s% dm(k), s% m(k), s% dq(k), s% q(k), s% M_center
-               if (s% stop_for_bad_nums) stop 'set_m_and_dm'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_m_and_dm')
             end if
          end do
       end subroutine set_m_and_dm
@@ -677,7 +677,7 @@
             write(*,2) 'dq(k)', k, dq(k)
             write(*,2) 'dq(k+1)', k+1, dq(k+1)
 
-            stop 'interp_val_to_pt'
+            call mesa_error(__FILE__,__LINE__,'interp_val_to_pt')
          endif
          interp_val_to_pt = (v(k)*dq(k-1) + v(k-1)*dq(k))/(dq(k-1) + dq(k))
       end function interp_val_to_pt
@@ -735,7 +735,7 @@
             write(*,2) 's% rmid(1)', k, s% rmid(k)
             write(*,2) 's% r(1)', k, s% r(k)
             write(*,2) 's% r(2)', 2, s% r(2)
-            stop 'get_dtau1'
+            call mesa_error(__FILE__,__LINE__,'get_dtau1')
          end if
       end function get_dtau1
 
@@ -765,7 +765,7 @@
                write(*,2) 's% dm(k)', k, s% dm(k)
                write(*,2) 's% opacity(k)', k, s% opacity(k)
                write(*,2) 's% rmid(k)', k, s% rmid(k)
-               stop 'get_tau'
+               call mesa_error(__FILE__,__LINE__,'get_tau')
             end if
             if (k == s% nz) s% tau_center = s% tau(k) + dtau
             !write(*,*) 'dtau, dlogtau', k, tau(k) - tau(k-1), &
@@ -944,7 +944,7 @@
          if (is_bad(luminosity)) then
             write(*,2) 's% L(1)', s% model_number, s% L(1)
             write(*,2) 's% xh(s% i_lum,1)', s% model_number, s% xh(s% i_lum,1)
-            stop 'set_phot_info'
+            call mesa_error(__FILE__,__LINE__,'set_phot_info')
             luminosity = 0d0
          end if
          s% L_surf = luminosity/Lsun
@@ -952,7 +952,7 @@
             ! log10(stellar luminosity in solar units)
          if (is_bad(s% L_surf)) then
             write(*,2) 's% L_surf', s% model_number, s% L_surf
-            stop 'set_phot_info'
+            call mesa_error(__FILE__,__LINE__,'set_phot_info')
          end if
       end subroutine set_phot_info
 
@@ -1200,7 +1200,7 @@
                   shock_radius = &
                      find0(s% r(k), v_div_cs_00-1d0, s% r(k-1), v_div_cs_m1-1d0)
                   if (shock_radius <= 0d0) then
-                     stop 'get_shock_info 1'
+                     call mesa_error(__FILE__,__LINE__,'get_shock_info 1')
                   end if
                   exit
                end if
@@ -1210,7 +1210,7 @@
                   shock_radius = &
                      find0(s% r(k), v_div_cs_00+1d0, s% r(k-1), v_div_cs_m1+1d0)
                   if (shock_radius <= 0d0) then
-                     stop 'get_shock_info 2'
+                     call mesa_error(__FILE__,__LINE__,'get_shock_info 2')
                   end if
                   exit
                end if
@@ -1540,7 +1540,7 @@
                if (s% report_ierr) then
                   write(*,2) 'store_partials: bad ' // trim(str), k, dequ
                end if
-               if (s% stop_for_bad_nums) stop 'store_partials'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_partials')
 !$omp end critical (store_partials_crit)
                return
             end if
@@ -1656,7 +1656,7 @@
                min_collapse_k = -1
                return
                write(*,2) 'bad radii', k, r00, rp1
-               stop 'eval_min_cell_collapse_time'
+               call mesa_error(__FILE__,__LINE__,'eval_min_cell_collapse_time')
             end if
             if (vp1 > v00) then
                time = (r00 - rp1)/(vp1 - v00)
@@ -1788,7 +1788,7 @@
                   write(*,2) 'v_div_vesc-1d0', k, v_div_vesc-1d0
                   write(*,2) 's% dm(k-1)', k, s% dm(k-1)
                   write(*,2) 'dm', k, dm
-                  stop 'get_ejecta_mass'
+                  call mesa_error(__FILE__,__LINE__,'get_ejecta_mass')
                end if
                if (k == 2) then
                   get_ejecta_mass = dm
@@ -2110,7 +2110,7 @@
             write(*,2) 'cell_specific_PE_qp', k, cell_specific_PE_qp
             write(*,2) 'gravp1', k, gravp1
             write(*,2) 'grav00', k, grav00
-            stop 'cell_specific_PE'
+            call mesa_error(__FILE__,__LINE__,'cell_specific_PE')
          end if
       end function cell_specific_PE_qp
       
@@ -2158,7 +2158,7 @@
             write(*,2) 'cell_start_specific_PE_qp', k, cell_start_specific_PE_qp
             write(*,2) 'gravp1', k, gravp1
             write(*,2) 'grav00', k, grav00
-            stop 'cell_start_specific_PE_qp'
+            call mesa_error(__FILE__,__LINE__,'cell_start_specific_PE_qp')
          end if
       end function cell_start_specific_PE_qp
       
@@ -2767,7 +2767,9 @@
             center_he4 = 1d99
          end if
 
-         if (s% photosphere_logg > 6d0) then
+         if (s% doing_relax) then
+            s% phase_of_evolution = phase_relax
+         else if (s% photosphere_logg > 6d0) then
             s% phase_of_evolution = phase_WDCS
          else if (s% L_by_category(i_burn_si) > 1d2) then
             s% phase_of_evolution = phase_Si_Burn
@@ -2824,20 +2826,20 @@
          integer, intent(in) :: nvar
          real(dp) :: dmat(nvar,nvar)
          integer :: i, j
-         write(*,*)
+         write(*,'(A)')
          write(*,'(18x)', advance = 'no') 
          do j = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofvar(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          do i = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofequ(i)
             do j = 1, nvar
                write(*,'(e13.4,2x)', advance = 'no') dmat(i,j)
             end do
-            write(*,*)
+            write(*,'(A)')
          end do
-         write(*,*)
+         write(*,'(A)')
       end subroutine show_matrix
 
 
@@ -2871,14 +2873,14 @@
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop '1 e00'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'1 e00')
 !$omp end critical (star_utils_e00_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop '2 e00'
+            call mesa_error(__FILE__,__LINE__,'2 e00')
          end if
          
          if (j > nvar) return ! hybrid
@@ -2888,7 +2890,7 @@
             write(*,5) 'bad i e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop '3 e00'
+            call mesa_error(__FILE__,__LINE__,'3 e00')
 !$omp end critical (star_utils_e00_crit2)
          end if
 
@@ -2928,14 +2930,14 @@
 !$omp critical (star_utils_em1_crit1)
             write(*,4) 'em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop 'em1'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'em1')
 !$omp end critical (star_utils_em1_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop 'em1'
+            call mesa_error(__FILE__,__LINE__,'em1')
          end if
          
          if (j > nvar) return ! hybrid
@@ -2944,7 +2946,7 @@
             write(*,5) 'bad i em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop 'em1'
+            call mesa_error(__FILE__,__LINE__,'em1')
          end if
 
          if (abs(v) < 1d-250) return
@@ -2982,14 +2984,14 @@
 !$omp critical (star_utils_ep1_crit1)
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop 'ep1'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'ep1')
 !$omp end critical (star_utils_ep1_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop 'ep1'
+            call mesa_error(__FILE__,__LINE__,'ep1')
          end if
          
          if (j > nvar) return
@@ -2998,7 +3000,7 @@
             write(*,5) 'bad i ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop 'ep1'
+            call mesa_error(__FILE__,__LINE__,'ep1')
          end if
 
          if (abs(v) < 1d-250) return
@@ -3201,7 +3203,7 @@
          if (is_bad(Ptrb%val)) then
 !$omp critical (calc_Ptrb_ad_tw_crit)
             write(*,2) 'Ptrb', k, Ptrb%val
-            stop 'calc_Ptrb_tw'
+            call mesa_error(__FILE__,__LINE__,'calc_Ptrb_tw')
 !$omp end critical (calc_Ptrb_ad_tw_crit)
          end if
 
@@ -3402,7 +3404,7 @@
          integer :: j
          include 'formats'
          !$OMP critical (omp_write_eos_call_info)
-         write(*,*)
+         write(*,'(A)')
          do j=1,s% species
             write(*,4) 'xa(j,k) ' // trim(chem_isos% name(s% chem_id(j))), j, j+s% nvar_hydro, k, s% xa(j,k)
          end do
@@ -3412,7 +3414,7 @@
          write(*,1) 'rho = ', s% rho(k)
          write(*,1) 'T = ', s% T(k)
          write(*,1) 'logQ = ', s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'eos_frac_OPAL_SCVH',    s% eos_frac_OPAL_SCVH(k)
          write(*,1) 'eos_frac_HELM',    s% eos_frac_HELM(k)
          write(*,1) 'eos_frac_Skye',    s% eos_frac_Skye(k)
@@ -3420,7 +3422,7 @@
          write(*,1) 'eos_frac_FreeEOS', s% eos_frac_FreeEOS(k)
          write(*,1) 'eos_frac_CMS',     s% eos_frac_CMS(k)
          write(*,1) 'eos_frac_ideal',     s% eos_frac_ideal(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Peos = ', s% Peos(k)
          write(*,1) 'Prad = ', s% Prad(k)
          write(*,1) 'logPeos = ', s% lnPeos(k)/ln10
@@ -3439,7 +3441,7 @@
          write(*,1) 'log_free_e = ', s% lnfree_e(k)/ln10
          write(*,1) 'chiRho = ', s% chiRho(k)
          write(*,1) 'chiT = ', s% chiT(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'do_eos_for_cell k, nz', k, s% nz
          write(*,1) 'logRho = ', s% lnd(k)/ln10
          write(*,1) 'logT = ', s% lnT(k)/ln10
@@ -3447,12 +3449,12 @@
          write(*,1) 'x = ', s% X(k)
          write(*,1) 'abar = ', s% abar(k)
          write(*,1) 'zbar = ', s% zbar(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'tau = ', s% tau(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 's% eos_rq% tiny_fuzz', s% eos_rq% tiny_fuzz
-         write(*,*)
-         !stop 'write_eos_call_info'
+         write(*,'(A)')
+         !call mesa_error(__FILE__,__LINE__,'write_eos_call_info')
          !$OMP end critical (omp_write_eos_call_info)
       end subroutine write_eos_call_info
 
@@ -3842,7 +3844,7 @@
          integer, intent(in) :: k
          real(dp), intent(out) :: alfa, beta
          ! face_value(k) = alfa*cell_value(k) + beta*cell_value(k-1)
-         if (k == 1) stop 'bad k==1 for get_face_weights'
+         if (k == 1) call mesa_error(__FILE__,__LINE__,'bad k==1 for get_face_weights')
          alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
          beta = 1d0 - alfa
       end subroutine get_face_weights
@@ -3901,7 +3903,7 @@
                   L_burn_by_category(j) + s% dm(k)*s% eps_nuc_categories(j, k)
                if (is_bad(L_burn_by_category(j))) then
                   write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
-                  if (s% stop_for_bad_nums) stop 'set_luminosity_by_category'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_luminosity_by_category')
                end if
                s% luminosity_by_category(j,k) = L_burn_by_category(j)
             end do

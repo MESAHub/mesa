@@ -157,9 +157,9 @@
                   end if
                end do
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a50,i5)') 'num non zeros', k
-            write(*,*)
+            write(*,'(A)')
          else if (.not. qt) then
             call show_results( &
                   g, lwork, work, logT, logRho, species, num_reactions, xin,  &

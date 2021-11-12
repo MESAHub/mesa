@@ -142,7 +142,7 @@ contains
 
       ierr = 0
       if (mixing_length_alpha == 0d0 .or. dt <= 0d0) then
-         stop 'bad call to TDC get_TDC_solution'
+         call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
       end if         
 
       ! Set up inputs.
@@ -204,7 +204,7 @@ contains
             write(*,*) 'L0', L0%val
             write(*,*) 'grada', grada%val
             write(*,*) 'gradL', gradL%val
-            write(*,*)
+            write(*,'(A)')
          ierr = 1
          return
       end if
@@ -350,7 +350,7 @@ contains
             write(*,*) 'L0', L0%val
             write(*,*) 'grada', grada%val
             write(*,*) 'gradL', gradL%val
-            write(*,*)
+            write(*,'(A)')
          !$OMP end critical (tdc_crit0)
          end if
          return

@@ -262,6 +262,10 @@
             call get_zlist(glist% zlist, lgz, zlist, num_entries, ierr)
             if (ierr /= 0) exit
             
+            if(zlist% colors(1) > -1d98) then
+               write(*,*) "Warning found duplicated color data for (T, log g, M/H)=", 10**lgT, lgg, lgz
+            end if
+
             zlist% colors = colors
 
          end do

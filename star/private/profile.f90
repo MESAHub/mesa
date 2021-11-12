@@ -92,7 +92,7 @@
          end if
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'profile_columns_file <' // trim(filename) // '>'
          end if
 
@@ -175,9 +175,9 @@
          close(iounit)
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'done add_profile_columns ' // trim(filename)
-            write(*,*)
+            write(*,'(A)')
          end if
 
 
@@ -262,7 +262,7 @@
          end do
          call realloc_integer(s% profile_column_spec, cnt-1, ierr)
          if (dbg) write(*,*) 'num profile columns', cnt-1
-         if (dbg) stop 'debug: set_profile_columns'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_profile_columns')
       end subroutine set_profile_columns
       
       
@@ -331,6 +331,7 @@
          use write_model, only: do_write_model
          use pulse, only: export_pulse_data
          use math_lib, only: math_backend
+         use utils_lib, only: mkdir, folder_exists
          
          type (star_info), pointer :: s
          character (len=*) :: fname
@@ -441,6 +442,7 @@
          end if
 
          if (write_flag) then
+            if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
 
             if (len_trim(s% profile_data_header_suffix) == 0) then
                fname1 = fname
@@ -720,7 +722,7 @@
                v = val
                if (is_bad_num(v)) then
                   write(*,1) 'bad value for ' // trim(col_name), v
-                  if (s% stop_for_bad_nums) stop 'profile do_val'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'profile do_val')
                   v = 0
                end if
                write(io, fmt=dbl_fmt, advance='no') v

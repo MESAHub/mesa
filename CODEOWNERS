@@ -62,7 +62,7 @@ star/test_suite/conductive_flame @fxt @rjfarmer
 star/test_suite/conserve_angular_momentum @orlox
 star/test_suite/custom_colors @rjfarmer
 star/test_suite/custom_rates @evbauer @adamjermyn @fxt
-star/test_suite/dev_high_rot_darkening @orlox
+star/test_suite/high_rot_darkening @orlox
 star/test_suite/dev_ppisn @rjfarmer
 star/test_suite/dev_to_ppisn_100 @rjfarmer
 star/test_suite/diffusion_smoothness @fxt

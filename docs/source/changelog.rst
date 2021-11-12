@@ -87,6 +87,19 @@ Hook interface changes
 * ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``, ``eps_he`` or ``eps_z`` as arguments.
 
 
+Auto diff
+~~~~~~~~~
+
+We now make more extensive use of the new ``autodiff`` module for automatically differentiating variables. If you are using a hook
+in your ``run_star_extras.f90`` then you will need to add ``use auto_diff`` to the top of your  ``run_star_extras.f90`` file.
+
+If you see errors such as:
+
+::
+  Error: Cannot convert REAL(8) to TYPE(auto_diff_real_star_order1) at (1)
+
+
+Then this means you are missing the ``use auto_diff`` statement.
 
 
 .. _Module-level changes main:
@@ -204,7 +217,6 @@ from the EOS right before they are returned, after all components have
 been evaluated.  This allows the user make minor modifications to the
 results from the existing EOS without having to provide a full replacement.
 
-
 Two alternative eos module entry points (``eosDT_HELMEOS_get`` and
 ``eosDT_ideal_gas_get``) and the star options that replaced the
 standard eosDT calls to be with these routines
@@ -212,7 +224,6 @@ standard eosDT calls to be with these routines
 significant simplifications of eos_support.  Restriction to a single
 component EOS can be achieved through the eos namelist options and
 replacement of the EOS should be performed through the other hook.
-
 
 The HELM table was updated to a new, larger 100 points per decade
 version.
@@ -225,6 +236,11 @@ HELM and a neutral version (which dropped the electron-positron terms).
 The HELM-related controls ``always_skip_elec_pos`` and
 ``always_include_elec_pos`` were combined in the
 simplified control ``include_elec_pos`` which defaults to ``.true.``.
+
+There is a new backstop EOS (``ideal``) which analytically models an ideal ion gas with radiation pressure.
+The purpose of this EOS is to provide coverage over the whole density-temperature plane for times when MESA needs
+to run to extreme densities or temperatures.
+No electrons are included in this EOS.
 
 
 kap

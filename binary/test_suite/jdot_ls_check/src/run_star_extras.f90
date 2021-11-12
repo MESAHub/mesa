@@ -109,7 +109,7 @@
          end if
 
          if (n /= 4) then
-            stop 'bad n for data_for_extra_history_columns'
+            call mesa_error(__FILE__,__LINE__,'bad n for data_for_extra_history_columns')
          end if
          spin_period = 2*pi/s% omega_avg_surf
          i = 0

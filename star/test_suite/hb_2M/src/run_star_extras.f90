@@ -129,9 +129,9 @@
             testhub_extras_names(1) = 'mass_conv_core_y050'; testhub_extras_vals(1) = mass_conv_core_y050
 
             ! display value to user
-            write(*,*)
+            write(*,'(A)')
             write(*,'(A70, F8.3)') '[TestHub] Convective core mass at Yc = 0.5 (Msun): ', mass_conv_core_y050
-            write(*,*)
+            write(*,'(A)')
 
             ! get target range from inlist
             min_mass_conv_core = s% x_ctrl(1)

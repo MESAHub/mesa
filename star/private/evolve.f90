@@ -58,7 +58,7 @@
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
-            stop 'do_evolve_step_part1'
+            call mesa_error(__FILE__,__LINE__,'do_evolve_step_part1')
          end if
          
          if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
@@ -323,7 +323,7 @@
          
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
-            stop 'do_step_part1'
+            call mesa_error(__FILE__,__LINE__,'do_step_part1')
          end if
 
          if (s% u_flag .and. s% v_flag) then
@@ -849,7 +849,7 @@
                   s% result_reason = nonzero_ierr
                   return
                end if
-               write(*,*)
+               write(*,'(A)')
                if (w_div_w_crit > surf_omega_div_omega_crit_limit) then
                   write(*,1) 'retry: w_div_w_crit > surf_omega_div_omega_crit_limit', &
                      w_div_w_crit, surf_omega_div_omega_crit_limit
@@ -935,7 +935,7 @@
                      s% surf_omega_div_omega_crit_tol) then
                write(*,3) 'OKAY', s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
-               write(*,*)
+               write(*,'(A)')
                select_mdot_action = exit_loop ! in bounds so accept it
                return
             end if
@@ -959,7 +959,7 @@
                write(*,3) 'failed to fix w > w_crit', &
                   s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
-               write(*,*)
+               write(*,'(A)')
                do_step_part2 = retry
                s% result_reason = nonzero_ierr
                return
@@ -1085,7 +1085,7 @@
             write(*,2) 'gradr', k, s% gradr(k)
             write(*,2) 'gradr/grada', k, s% gradr(k)/grada
             write(*,3) 'mixing_type', k, s% mixing_type(k)
-            write(*,*)
+            write(*,'(A)')
 
          end subroutine show_debug
 
@@ -1338,7 +1338,7 @@
                write(*,2) 's% work_inward_at_center', s% model_number, s% work_inward_at_center
                !write(*,2) '', s% model_number, 
                !write(*,2) '', s% model_number, 
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
             end if
   
             s% error_in_energy_conservation = &
@@ -1362,7 +1362,7 @@
             if (s% model_number == s% energy_conservation_dump_model_number &
                   .and. .not. s% doing_relax) then
 
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 's% error_in_energy_conservation', s% model_number, s% error_in_energy_conservation
                write(*,2) 'total_energy', s% model_number, s% total_energy
                write(*,2) 'rel_E_err = error/total_energy', s% model_number, s% error_in_energy_conservation/s% total_energy
@@ -1370,18 +1370,18 @@
                   (s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks))/s% total_energy
                write(*,2) 'rel err phase2', s% model_number, &
                   (s% total_energy_end - (s% total_energy_start + phase2_sources_and_sinks))/s% total_energy
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
                write(*,2) 's% total_energy_start', s% model_number, s% total_energy_start
                write(*,2) 's% total_energy_end', s% model_number, s% total_energy_end
                write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
-               write(*,*)
+               write(*,'(A)')
                
                if (trim(s% energy_eqn_option) == 'dedt') then
                   
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) 'for debugging phase1_sources_and_sinks'
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
                   write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
                   write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
@@ -1394,7 +1394,7 @@
                   write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
                   write(*,2) 'phase2_total_energy_from_mdot', s% model_number, phase2_total_energy_from_mdot
 
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
                   write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
                   write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
@@ -1405,39 +1405,39 @@
                       s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks)
                   write(*,2) 'rel err phase1_sources_and_sinks', s% model_number, &
                      (s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks))/s% total_energy
-                  write(*,*)
-                  write(*,*)
+                  write(*,'(A)')
+                  write(*,'(A)')
                   
                   
                   
                   write(*,*) 'for debugging phase2_sources_and_sinks'
-                  write(*,*)
+                  write(*,'(A)')
                   
                   write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
                   write(*,2) 's% total_non_nuc_neu_cooling', s% model_number, s% total_non_nuc_neu_cooling
                   write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
                   write(*,2) 's% total_extra_heating', s% model_number, s% total_extra_heating
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
                   write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
                   write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
                   write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
                   write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
                  ! write(*,2) 'phase2_total_energy_from_mdot', s% model_number, phase2_total_energy_from_mdot
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,2) 'phase2_work', s% model_number, phase2_work
                   write(*,2) 'total_radiation', s% model_number, total_radiation
                   write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, &
                      s% non_epsnuc_energy_change_from_split_burn 
-                  write(*,*)
+                  write(*,'(A)')
 
                   write(*,2) 's% work_outward_at_surface', s% model_number, s% work_outward_at_surface
                   write(*,2) 's% work_inward_at_center', s% model_number, s% work_inward_at_center
                   write(*,2) 'L_surf', s% model_number, L_surf
                   write(*,2) 'L_center', s% model_number, s% L_center
-                  write(*,*)
+                  write(*,'(A)')
                   
                   sum_cell_dL = dt*dot_product(s% dm(1:nz), s% dL_dm(1:nz))
                   sum_cell_sources = dt*dot_product(s% dm(1:nz), s% energy_sources(1:nz))
@@ -1477,7 +1477,7 @@
                      (sum_cell_dL - total_radiation)/s% total_energy, sum_cell_dL, total_radiation
                   write(*,2) 'rel err sum_cell_work', s% model_number, &
                      (sum_cell_work - phase2_work)/s% total_energy, sum_cell_work, phase2_work
-                  write(*,*)
+                  write(*,'(A)')
                   
                   diff_total_internal_energy = &
                      s% total_internal_energy_end - s% total_internal_energy_start
@@ -1505,7 +1505,7 @@
                   write(*,2) 'rel err sum_cell_detrb', s% model_number, &
                      (sum_cell_detrb - diff_total_turbulent_energy)/s% total_energy, &
                      sum_cell_detrb, diff_total_turbulent_energy
-                  write(*,*)
+                  write(*,'(A)')
                      
                      
                   write(*,2) 'expected rel sum_cell_ergs_error', s% model_number, &
@@ -1518,10 +1518,10 @@
                   write(*,2) 'total rel_E_err', s% model_number, &
                      s% error_in_energy_conservation/s% total_energy, &
                      s% error_in_energy_conservation, s% total_energy
-                  write(*,*)
+                  write(*,'(A)')
                end if
                
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
 
             end if
 
@@ -1549,7 +1549,7 @@
                write(*,2) 's% Lt(1)', s% model_number, s% Lt(1)
                write(*,2) 'sum L', s% model_number, s% Fr(1)*pi4*s% r(1)*s% r(1)+s% Lc(1)+s% Lt(1)
                okay_energy_conservation = .false.
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
                return
             end if
                                     
@@ -1570,7 +1570,7 @@
                write(*,2) 's% work_outward_at_surface', s% model_number, s% work_outward_at_surface
                write(*,2) 's% L_center', s% model_number, s% L_center
                okay_energy_conservation = .false.
-               stop 'okay_energy_conservation'
+               call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
                return
             end if
 
@@ -1707,7 +1707,7 @@
             write(*,2) 'extra', s% model_number, extra
             write(*,2) 'left_to_inject', s% model_number, left_to_inject
             write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
-            stop 'check_for_extra_heat'
+            call mesa_error(__FILE__,__LINE__,'check_for_extra_heat')
          end if
          do k=nz,1,-1
             q00 = s% q(k)
@@ -1906,7 +1906,7 @@
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
-            stop 'prepare_for_new_step'
+            call mesa_error(__FILE__,__LINE__,'prepare_for_new_step')
          end if
 
          s% retry_cnt = 0
@@ -2205,7 +2205,7 @@
             end if
          else
             write(*,'(a, i8)') ' retry', s% model_number
-            !if (.true.) stop 'failed to set retry_message'
+            !if (.true.) call mesa_error(__FILE__,__LINE__,'failed to set retry_message')
          end if
          s% retry_message_k = 0
          if (s% report_ierr) &
@@ -2359,7 +2359,7 @@
                write(*,2) 'prev_num_iounits_in_use', prev_num_iounits_in_use
                write(*,2) 'current_num_iounits_in_use', current_num_iounits_in_use
                write(*,2) 'i', i
-               stop 'finish_step'
+               call mesa_error(__FILE__,__LINE__,'finish_step')
             end if
             prev_num_iounits_in_use = current_num_iounits_in_use
          end subroutine check

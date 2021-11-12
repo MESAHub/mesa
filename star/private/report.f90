@@ -74,7 +74,7 @@
                do k=1,nz
                   if (is_bad(s% eps_nuc_categories(j,k))) then
                      write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
-                     if (s% stop_for_bad_nums) stop 'set_power_info'
+                     if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_power_info')
                   end if
                end do
             end if
@@ -304,7 +304,7 @@
             if (is_bad(s% entropy(k))) then
                ierr = -1
                write(*,2) 'report: s% entropy(k)', k, s% entropy(k)
-               if (s% stop_for_bad_nums) stop 'report'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
 
@@ -319,7 +319,7 @@
                ierr = -1
                write(*,2) 'report: s% dr_div_csound(k)', &
                   k, s% dr_div_csound(k), dr, s% csound(k)
-               if (s% stop_for_bad_nums) stop 'report'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
             
@@ -334,7 +334,7 @@
             if (is_bad(v)) then
                ierr = -1
                write(*,2) 'report: v', k, v
-               if (s% stop_for_bad_nums) stop 'report'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
             
@@ -343,7 +343,7 @@
                ierr = -1
                write(*,2) 'report: s% v_div_csound(k)', k, s% v_div_csound(k), &
                   v, s% csound_face(k)
-               if (s% stop_for_bad_nums) stop 'report'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
 

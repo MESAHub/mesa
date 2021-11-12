@@ -28,6 +28,7 @@
    use const_def
    use eos_def
    use math_lib
+   use utils_lib, only: mesa_error
 
    implicit none
 
@@ -287,7 +288,7 @@
       rq% Gamma_e_all_HELM = exp10(rq% log_Gamma_e_all_HELM)
       if (FreeEOS_XZ_struct% Zs(num_FreeEOS_Zs) /= 1d0) then
          write(*,*) 'ERROR: expect FreeEOS_XZ_struct% Zs(num_FreeEOS_Zs) == 1d0'
-         stop 'init_eos_handle_data'
+         call mesa_error(__FILE__,__LINE__,'init_eos_handle_data')
       end if
    end subroutine read_namelist
 

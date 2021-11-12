@@ -227,8 +227,8 @@
                   mtotal = dot_product(s% dm(1:nz), &
                      s% xa(co56,1:nz) + s% xa(ni56,1:nz))/Msun
                   write(*,1) 'final mass for Ni56+Co56', mtotal
-                  write(*,*)
-                  stop 'do_remove_center_to_reduce_co56_ni56'
+                  write(*,'(A)')
+                  call mesa_error(__FILE__,__LINE__,'do_remove_center_to_reduce_co56_ni56')
                end if
                return
             end if
@@ -290,7 +290,7 @@
                   write(*,2) 'ie', k, ie
                   write(*,2) 'ke', k, ke
                   write(*,2) 'pe', k, pe
-                  stop 'do_remove_fallback'
+                  call mesa_error(__FILE__,__LINE__,'do_remove_fallback')
                end if
                sum_total_energy = sum_total_energy + ie + ke + pe
                if (is_bad(sum_total_energy)) then
@@ -298,7 +298,7 @@
                   write(*,2) 'ie', k, ie
                   write(*,2) 'ke', k, ke
                   write(*,2) 'pe', k, pe
-                  stop 'do_remove_fallback'
+                  call mesa_error(__FILE__,__LINE__,'do_remove_fallback')
                end if
                !write(*,3) 'sum_total_energy', k, nz, sum_total_energy, ie + ke + pe
                if (sum_total_energy < 0d0) exit
@@ -331,7 +331,7 @@
             end do
          end if
          
-         !stop 'do_remove_fallback'
+         !call mesa_error(__FILE__,__LINE__,'do_remove_fallback')
          
          !write(*,3) 'k0 old nz', k0, s% nz, s% m(k0)/Msun
          
@@ -539,7 +539,7 @@
          else if (s% v_flag) then
             v => s% v
          else
-            stop 'no u or v for do_remove_center_at_inner_max_abs_v?'
+            call mesa_error(__FILE__,__LINE__,'no u or v for do_remove_center_at_inner_max_abs_v?')
             return
          end if
          k_max = minloc(v(1:s% nz),dim=1)
@@ -640,13 +640,13 @@
             s% v_center = s% u(k)
             if (is_bad(s% v_center)) then
                write(*,2) 'center s% u(k)', k, s% u(k)
-               stop 'do_remove_center'
+               call mesa_error(__FILE__,__LINE__,'do_remove_center')
             end if
          else if (s% v_flag) then
             s% v_center = s% v(k)
             if (is_bad(s% v_center)) then
                write(*,2) 'center s% v(k)', k, s% v(k)
-               stop 'do_remove_center'
+               call mesa_error(__FILE__,__LINE__,'do_remove_center')
             end if
          else
             s% v_center = 0d0
@@ -822,7 +822,7 @@
          end do
          write(*,2) 'do_remove_surface_by_v_surf_div_cs', k-1, v(k-1)/s% csound(k-1)
          call do_remove_surface(id, k-1, ierr)
-         !stop 'do_remove_surface_by_v_surf_div_cs'
+         !call mesa_error(__FILE__,__LINE__,'do_remove_surface_by_v_surf_div_cs')
          return
       end subroutine do_remove_surface_by_v_surf_div_cs
 
@@ -1004,7 +1004,7 @@
             if (s% R_center /= 0d0) then
                write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
                ierr = -1
-               stop 'do_remove_surface'
+               call mesa_error(__FILE__,__LINE__,'do_remove_surface')
             end if         
             call do_relax_to_star_cut( &
                id, surface_k, s% job% remove_surface_do_jrot, &
@@ -1125,7 +1125,7 @@
          if (dbg) write(*,1) 'do_remove_surface tau_factor, Tsurf_factor', &
             s% tau_factor, s% Tsurf_factor
             
-         if (dbg) stop 'do_remove_surface'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'do_remove_surface')
             
       end subroutine do_remove_surface
 
@@ -1338,7 +1338,7 @@
          !      s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
          !   end do
          !   write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
-         !   stop 'do_relax_to_star_cut'
+         !   call mesa_error(__FILE__,__LINE__,'do_relax_to_star_cut')
          !   deallocate(conv_vel_interp, interp_work)
          !end if
 

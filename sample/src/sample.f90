@@ -57,7 +57,7 @@
          call const_init(my_mesa_dir,ierr)     
          if (ierr /= 0) then
             write(*,*) 'const_init failed'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if        
          
          call math_init()
@@ -65,14 +65,14 @@
          call chem_init('isotopes.data', ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in chem_init'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
 
          ! allocate and initialize the eos tables
          call Setup_eos(handle)
          
          allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
-         if (ierr /= 0) stop 'allocate failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'allocate failed')
          X = 0.70_dp
          Z = 0.02_dp
          call Init_Composition
@@ -95,22 +95,22 @@
          Pgas = exp(res(i_lnPgas))
 
          ! the indices for the results are defined in eos_def.f
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'temperature', T
          write(*,1) 'density', Rho
          write(*,1) 'logT', log10T
          write(*,1) 'logRho', log10(Rho)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Z', Z
          write(*,1) 'X', X
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Pgas', Pgas
          write(*,1) 'logPgas', res(i_lnPgas)/ln10
          write(*,1) 'grad_ad', res(i_grad_ad)
          write(*,1) 'c_P', res(i_Cp)
-         write(*,*)
+         write(*,'(A)')
 
          call eosPT_get(  &
                handle, &
@@ -120,22 +120,22 @@
                res, d_dlnd, d_dlnT, d_dxa, ierr)
       
          ! the indices for the results are defined in eos_def.f
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'temperature', T
          write(*,1) 'Pgas', Pgas
          write(*,1) 'logT', log10(T)
          write(*,1) 'logPgas', res(i_lnPgas)/ln10
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'Z', Z
          write(*,1) 'X', X
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'density', Rho
          write(*,1) 'logRho', log10Rho
          write(*,1) 'grad_ad', res(i_grad_ad)
          write(*,1) 'c_P', res(i_Cp)
-         write(*,*)
+         write(*,'(A)')
 
          ! deallocate the eos tables
          call Shutdown_eos(handle)
@@ -144,7 +144,7 @@
          
          if (ierr /= 0) then
             write(*,*) 'bad result from eos_get'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
 
       end subroutine Sample
@@ -162,7 +162,7 @@
          call eos_init('', use_cache, ierr)
          if (ierr /= 0) then
             write(*,*) 'eos_init failed in Setup_eos'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          write(*,*) 'loading eos tables'
@@ -170,7 +170,7 @@
          handle = alloc_eos_handle(ierr)
          if (ierr /= 0) then
             write(*,*) 'failed trying to allocate eos handle'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
       
       end subroutine Setup_eos

@@ -86,7 +86,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
          
-         write(*,*)
+         write(*,'(A)')
          k1 = 0
          k2 = 0
          k3 = 0
@@ -96,7 +96,7 @@
             if (s% m(k) > 0.135d0*Msun .and. k2 == 0) k2 = k
             if (s% m(k) > 0.145d0*Msun .and. k3 == 0) k3 = k
          end do
-         write(*,*)
+         write(*,'(A)')
          call check('mixing type at 0.125 Msun', dble(s% mixing_type(k1)), &
             dble(convective_mixing), dble(convective_mixing))
          call check('mixing type at 0.135 Msun', dble(s% mixing_type(k2)), &
@@ -105,9 +105,9 @@
             dble(no_mixing), dble(no_mixing))
          call check('logT', avg_val(s% lnT)/ln10, 7.15d0, 7.31d0)
          call check('logRho', avg_val(s% lnd)/ln10, 1.75d0, 1.80d0)
-         write(*,*)
+         write(*,'(A)')
          if (okay) write(*,'(a)') 'all values are within tolerances'
-         write(*,*)
+         write(*,'(A)')
          
          
          contains

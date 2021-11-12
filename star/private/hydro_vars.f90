@@ -801,7 +801,7 @@
             write(*,1) 's% tau_factor', s% tau_factor
             write(*,1) 's% tau_base', s% tau_base
             write(*,1) 'tau_surf', tau_surf
-            stop 'bad tau_surf in get_surf_PT'
+            call mesa_error(__FILE__,__LINE__,'bad tau_surf in get_surf_PT')
          end if
 
          ! Evaluate surface temperature and pressure
@@ -866,7 +866,7 @@
             write(*,1) 'lnT_surf', lnT_surf
             write(*,1) 'lnP_surf', lnP_surf
             write(*,*) 'atm_option = ', trim(s% atm_option)
-            if (s% stop_for_bad_nums) stop 'get PT surf'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
          end if
 
          ! Finish

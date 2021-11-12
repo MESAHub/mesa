@@ -97,7 +97,7 @@
          
          if (id == 1 .and. .not. s% RSP_flag) then
             write(*,*) 'star id==1, but not RSP_flag'
-            stop 'extras_startup'
+            call mesa_error(__FILE__,__LINE__,'extras_startup')
          end if
 
       end subroutine extras_startup

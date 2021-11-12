@@ -104,7 +104,7 @@
       
       include 'formats'
       
-      write(*,*)
+      write(*,'(A)')
       write(*,*) 'do_test_rates', which
       
       which_rates(:) = which
@@ -138,7 +138,7 @@
 
          write(*,1) 'logT', logT         
          write(*,1) 'temp', temp
-         write(*,*)
+         write(*,'(A)')
          
          raw_rates = missing_value
                      
@@ -152,11 +152,11 @@
             end if
             write(*,1) trim(reaction_Name(irs(i))), raw_rates(i)
          end do
-         write(*,*)
+         write(*,'(A)')
       end do
 
       write(*,*) 'done'
-      write(*,*)
+      write(*,'(A)')
       
    end subroutine do_test_rates 
    
@@ -171,7 +171,7 @@
       
       include 'formats'
       
-      write(*,*)
+      write(*,'(A)')
       write(*,*) 'test1'
       
       tf => tf_rec
@@ -182,7 +182,7 @@
       
       write(*,1) 'logT', logT         
       write(*,1) 'temp', temp
-      write(*,*)
+      write(*,'(A)')
       
       ir = rates_reaction_id('r_ni56_wk_co56')
       if (ir == 0) then
@@ -201,7 +201,7 @@
       write(*,1) 'logT', logT         
       write(*,1) 'temp', temp
       write(*,1) 'raw_rate1', raw_rate1
-      write(*,*)
+      write(*,'(A)')
       
       stop
       
@@ -214,7 +214,7 @@
       write(*,1) 'raw_rate2-raw_rate1', raw_rate2-raw_rate1
 
       write(*,*) 'done'
-      write(*,*)
+      write(*,'(A)')
       
       contains
       
@@ -223,7 +223,7 @@
          call get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) trim(reaction_Name(ir)), raw_rate
-         write(*,*)
+         write(*,'(A)')
       end subroutine run1
       
    end subroutine test1 
@@ -244,7 +244,7 @@
       UE = 2
       call eval_FL_epsnuc_3alf(T, Rho, Y, UE, eps_nuc, deps_nuc_dT, deps_nuc_dRho)
       write(*,1) 'FL_epsnuc_3alf', eps_nuc
-      write(*,*)
+      write(*,'(A)')
    end subroutine do_test_FL_epsnuc_3alf
    
    
@@ -259,7 +259,7 @@
       include 'formats'
       
       
-      write(*,*)
+      write(*,'(A)')
       write(*,*) 'do_test_rate_table'
       
       tf => tf_rec
@@ -270,14 +270,14 @@
       
       write(*,1) 'logT', logT         
       write(*,1) 'temp', temp
-      write(*,*)
+      write(*,'(A)')
       
       ir = rates_reaction_id('r3')
       which_rate = rates_JR_if_available
       call run1   
 
       write(*,*) 'done'
-      write(*,*)
+      write(*,'(A)')
       
       contains
       
@@ -286,7 +286,7 @@
          call get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) trim(reaction_Name(ir)), raw_rate
-         write(*,*)
+         write(*,'(A)')
       end subroutine run1
    
    end subroutine do_test_rate_table
@@ -310,16 +310,16 @@
       UE = 2
       call eval_FL_epsnuc_3alf(T, Rho+dRho, Y, UE, eps_nuc1, deps_nuc_dT, deps_nuc_dRho)
       write(*,1) 'FL_epsnuc_3alf 1', eps_nuc1
-      write(*,*)
+      write(*,'(A)')
       call eval_FL_epsnuc_3alf(T, Rho, Y, UE, eps_nuc2, deps_nuc_dT, deps_nuc_dRho)
       write(*,1) 'FL_epsnuc_3alf 2', eps_nuc2
-      write(*,*)
+      write(*,'(A)')
       write(*,1) 'analytic deps_nuc_dRho', deps_nuc_dRho
       write(*,1) 'numerical deps_nuc_dRho', (eps_nuc1 - eps_nuc2)/dRho
-      write(*,*)
+      write(*,'(A)')
       write(*,1) 'analytic dlneps_nuc_dlnRho', deps_nuc_dRho*Rho/eps_nuc2
       write(*,1) 'numerical dlneps_nuc_dlnRho', (eps_nuc1 - eps_nuc2)/dRho*Rho/eps_nuc2
-      write(*,*)
+      write(*,'(A)')
    end subroutine do_test2_FL_epsnuc_3alf
 
    subroutine teardown

@@ -199,7 +199,7 @@ module test_screen
          write(*,1) 'sc1a = ', sc1a
          write(*,1) 'sc1adt = ', sc1adt
          write(*,1) 'sc1add = ', sc1add
-         write(*,*)
+         write(*,'(A)')
 
       end subroutine do1
       

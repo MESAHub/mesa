@@ -1413,7 +1413,7 @@
             if (len_trim(profile_column_name(i)) == 0) then
                write(*,*) 'missing name for profile column id', i
                if (i > 1) write(*,*) 'following ' // trim(profile_column_name(max(1,i-1))) ! bp: get rid of bogus compiler warning
-               write(*,*)
+               write(*,'(A)')
                cnt = cnt+1
             end if
          end do
