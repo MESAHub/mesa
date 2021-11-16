@@ -784,8 +784,8 @@
       !total_turbulent_energy
       !log_total_turbulent_energy
       !total_turbulent_energy_after_adjust_mass
-      !tot_et
-      !log_tot_et
+      !tot_Et
+      !log_tot_Et
 
       !total_energy_foe
 
@@ -1060,5 +1060,5 @@
       !elapsed_time ! time since start of run (seconds)
 
    !## Extras
-      burning_regions 10
       mixing_regions 10
+      burning_regions 10
