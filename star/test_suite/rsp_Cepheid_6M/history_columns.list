@@ -365,7 +365,7 @@
 
    !## CO core
       co_core_mass
-      !co_core
+      !CO_core
       !co_core_radius
       !co_core_lgT
       !co_core_lgRho
@@ -479,7 +479,7 @@
       !photosphere_cell_free_e
       !photosphere_cell_log_free_e
       !photosphere_logg
-      !photosphere_t
+      !photosphere_T
 
    !## conditions at or near the surface of the model (outer edge of outer cell)
 
@@ -712,7 +712,7 @@
       !shock_entropy
       !shock_tau
       !shock_k
-      !shock_pre_lgrho
+      !shock_pre_lgRho
 
 !----------------------------------------------------------------------------------------------
 
@@ -822,7 +822,7 @@
       !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
       !log_rel_error_in_energy_conservation
 
-      !virial_thm_p_avg
+      !virial_thm_P_avg
       !virial_thm_rel_err
       !work_inward_at_center
       !work_outward_at_surface
@@ -985,17 +985,17 @@
 
 !# RSP
 
-   rsp_deltamag
-   rsp_deltar
-   rsp_grekm
-   rsp_grekm_avg_abs
-   !rsp_grpdv
-   rsp_lina_growth_rate_f
-   rsp_lina_growth_rate_o1
-   !rsp_lina_growth_rate_o2
-   rsp_lina_period_f_days
-   rsp_lina_period_o1_days
-   !rsp_lina_period_o2_days
+   rsp_DeltaMag
+   rsp_DeltaR
+   rsp_GREKM
+   rsp_GREKM_avg_abs
+   !rsp_GRPDV
+   rsp_LINA_growth_rate_F
+   rsp_LINA_growth_rate_O1
+   !rsp_LINA_growth_rate_O2
+   rsp_LINA_period_F_days
+   rsp_LINA_period_O1_days
+   !rsp_LINA_period_O2_days
    rsp_num_periods
    rsp_period_in_days
    rsp_phase
