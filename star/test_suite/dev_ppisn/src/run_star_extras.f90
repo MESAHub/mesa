@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use chem_def
       use utils_lib
       use rates_def, only: i_rate
@@ -352,7 +353,6 @@
       subroutine my_other_eval_fp_ft( &
             id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
-         use auto_diff
          integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
