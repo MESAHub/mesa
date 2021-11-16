@@ -26,6 +26,7 @@ module run_star_extras
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use gyre_lib
 
       implicit none
