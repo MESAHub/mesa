@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use utils_lib, only: mesa_error, is_bad
             
       implicit none

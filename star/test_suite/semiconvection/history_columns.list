@@ -48,6 +48,7 @@
       !star_age_min ! elapsed simulated time in minutes since the start of the run
       !star_age_hr ! elapsed simulated time in hours since the start of the run
       !star_age_day ! elapsed simulated time in days since the start of the run
+      !day ! elapsed simulated time in days since the start of the run
 
       !log_star_age
       !log_star_age_sec
@@ -56,8 +57,10 @@
 
       !time_step ! timestep in years since previous model
       !time_step_sec ! timestep in seconds since previous model
+      !time_step_days
       log_dt ! log10 time_step in years
       !log_dt_sec ! log10 time_step in seconds
+      !log_dt_days ! log10 time_step in days
 
    !## mass
 
@@ -85,10 +88,14 @@
       !m_center_gm
       !r_center
       !r_center_cm
+      !r_center_km
       !L_center
       !log_L_center
       !log_L_center_ergs_s
       !v_center
+      !v_center_kms
+
+      !logt_max
 
 !----------------------------------------------------------------------------------------------
 
@@ -131,7 +138,7 @@
       !mx2_bot_r
 
       ! you might want to get a more complete list of mixing regions by using the following
-   mixing_regions 10
+
       !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
 
          ! the <integer> is the number of regions to report
@@ -227,6 +234,8 @@
 
       !power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
       !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
+      !power_photo
+      !power_z_burn
       !log_power_nuc_burn ! total thermal power from all burning, excluding photodisintegrations
       log_LH ! log10 power_h_burn
       log_LHe ! log10 power_he_burn
@@ -234,6 +243,7 @@
       log_Lnuc ! log(LH + LHe + LZ)
       !log_Lnuc_ergs_s
       !log_Lnuc_sub_log_L
+      !lnuc_photo
 
       !extra_L ! integral of extra_heat in Lsun units
       !log_extra_L ! log10 extra_L
@@ -255,6 +265,27 @@
       pp
       cno
       tri_alfa
+      !c_alpha
+      !n_alpha
+      !o_alpha
+      !ne_alpha
+      !na_alpha
+      !mg_alpha
+      !si_alpha
+      !s_alpha
+      !ar_alpha
+      !ca_alpha
+      !ti_alpha
+      !fe_co_ni
+      !c12_c12
+      !c12_o16
+      !o16_o16
+      !photo
+      !pnhe4
+      !other
+
+
+
 
    !## nuclear reactions at center
 
@@ -334,6 +365,7 @@
 
    !## CO core
       co_core_mass
+      !CO_core
       !co_core_radius
       !co_core_lgT
       !co_core_lgRho
@@ -383,7 +415,7 @@
 
       !h_rich_layer_mass ! = star_mass - he_core_mass
       !he_rich_layer_mass ! = he_core_mass - c_core_mass
-
+      !co_rich_layer_mass
 
 !----------------------------------------------------------------------------------------------
 
@@ -394,10 +426,12 @@
       !mdot_timescale ! star_mass/abs(star_mdot) (years)
       !kh_div_mdot_timescales ! kh_timescale/mdot_timescale
       !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
-         ! approximately min over all cells k and species i of x(i,k)/abs(dxdt_mix + dxdt_burn)
 
       !dt_cell_collapse ! min time for any cell to collapse at current velocities
       !dt_div_dt_cell_collapse
+
+      !dt_div_max_tau_conv ! dt/ maximum conv timescale
+      !dt_div_min_tau_conv ! dt/ minimum conv timescale
 
 
       !min_dr_div_cs ! min over all cells of dr/csound (seconds)
@@ -416,10 +450,14 @@
 
    !## conditions at the photosphere
       !effective_T
+      !Teff
       log_Teff ! log10 effective temperature
+         ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
+         ! where L and R are evaluated at the photosphere (tau_factor < 1)
+         ! or surface of the model (tau_factor >= 1) when photosphere is not inside the model.
 
       !photosphere_black_body_T
-      !photosphere_cell_T
+      !photosphere_cell_T ! temperature at model location closest to the photosphere, not necessarily Teff
       !photosphere_cell_log_T
       !photosphere_cell_density
       !photosphere_cell_log_density
@@ -438,6 +476,10 @@
       !photosphere_opacity
       !photosphere_v_div_cs
       !photosphere_xm
+      !photosphere_cell_free_e
+      !photosphere_cell_log_free_e
+      !photosphere_logg
+      !photosphere_T
 
    !## conditions at or near the surface of the model (outer edge of outer cell)
 
@@ -472,6 +514,9 @@
       !v_surf_km_s ! (km/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       !v_div_csound_max ! max value of velocity divided by sound speed at face
+      !v_div_vesc
+      !v_phot_km_s
+      !v_surf_div_escape_v
 
       !v_surf_div_v_kh ! v_surf/(photosphere_r/kh_timescale)
 
@@ -487,10 +532,10 @@
       !surf_avg_logRho
       !surf_avg_opacity
 
-      !Gravity Darkening, reports the surface averaged L/Lsun and Teff (K) caused by
-      !gravity darkening in rotating stars. Based on the model of Espinosa Lara & Rieutord (2011)
-      !'polar' refers to the line of sight being directed along the rotation axis of the star
-      !'equatorial' refers to the line of sight coincident with the stellar equator
+      ! Gravity Darkening, reports the surface averaged L/Lsun and Teff (K) caused by
+      ! gravity darkening in rotating stars. Based on the model of Espinosa Lara & Rieutord (2011)
+      ! 'polar' refers to the line of sight being directed along the rotation axis of the star
+      ! 'equatorial' refers to the line of sight coincident with the stellar equator
       !grav_dark_L_polar !Lsun 
       !grav_dark_Teff_polar !K
       !grav_dark_L_equatorial !Lsun 
@@ -512,12 +557,6 @@
       !surf_r_equatorial_div_r_polar
       !surf_r_equatorial_div_r
       !surf_r_polar_div_r
-
-   !## info about location where optical depth is 10
-
-
-   !## info about location where optical depth is 100
-
 
 !----------------------------------------------------------------------------------------------
 
@@ -555,8 +594,13 @@
       !max_entropy ! in units of kerg per baryon
       !fe_core_infall
       !non_fe_core_infall
+      !non_fe_core_rebound
+      !max_infall_speed
 
       !compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
+      !compactness
+      !m4 ! Mass co-ordinate where entropy=4
+      !mu4 ! dM(Msun)/dr(1000km) where entropy=4
 
       !center_omega
       !center_omega_div_omega_crit
@@ -632,7 +676,7 @@
       total_mass he4
       ! etc.
 
-      !individial log10  mass totals for entire star (in Msun units)
+      ! individial log10  mass totals for entire star (in Msun units)
       !log_total_mass h1
       !log_total_mass he4
       ! etc.
@@ -640,22 +684,11 @@
 !----------------------------------------------------------------------------------------------
 
 !# info at specific locations
-
-   !## info at a specified mass coordinate (given by trace_mass_location)
-
-
-
-
+      
    !## info at location of max temperature
-      !max_T
-      !log_max_T
-         ! Mcore = Msun*max_T_mass,
-         ! Menv = Msun*(star_mass - max_T_mass),
-         ! Rcore = Rsun*max_T_radius
-      
-      
-   !## info at location of max abs velocity
-      ! note: can use control "min_tau_for_max_abs_v_location" to exclude surface
+   !max_T
+   !log_max_T
+
 
 !----------------------------------------------------------------------------------------------
 
@@ -679,12 +712,7 @@
       !shock_entropy
       !shock_tau
       !shock_k
-
-   !## info at innermost mach 1 location
-      ! excluding locations with q < min_q_for_inner_mach1_location
-
-   !## info at outermost mach 1 location
-      ! excluding locations with q > max_q_for_outer_mach1_location
+      !shock_pre_lgRho
 
 !----------------------------------------------------------------------------------------------
 
@@ -737,7 +765,6 @@
       !tot_PE
       !log_tot_PE
 
-
       !total_internal_energy
       !log_total_internal_energy
       !total_internal_energy_after_adjust_mass
@@ -745,7 +772,6 @@
       ! shorter versions of above
       !tot_IE
       !log_tot_IE
-
 
       !total_radial_kinetic_energy
       !log_total_radial_kinetic_energy
@@ -755,16 +781,16 @@
       !tot_KE
       !log_tot_KE
 
-
       !total_turbulent_energy
       !log_total_turbulent_energy
       !total_turbulent_energy_after_adjust_mass
+      !tot_Et
+      !log_tot_Et
 
+      !total_energy_foe
 
       !tot_IE_div_IE_plus_KE
       !total_IE_div_IE_plus_KE
-
-
 
       !total_entropy
       !total_eps_grav
@@ -778,10 +804,12 @@
 
       !rel_run_E_err
 
-
       !rel_E_err
       !abs_rel_E_err
       !log_rel_E_err
+
+      !tot_e_equ_err
+      !tot_e_err
 
 
       !error_in_energy_conservation ! for this step
@@ -794,7 +822,10 @@
       !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
       !log_rel_error_in_energy_conservation
 
-
+      !virial_thm_P_avg
+      !virial_thm_rel_err
+      !work_inward_at_center
+      !work_outward_at_surface
 
 
 !----------------------------------------------------------------------------------------------
@@ -828,6 +859,8 @@
       !u_div_csound_surf
       !u_div_csound_max
 
+      !infall_div_cs
+
 !----------------------------------------------------------------------------------------------
 
 !# misc
@@ -837,6 +870,7 @@
    !## eos
       !logQ_max ! logQ = logRho - 2*logT + 12
       !logQ_min
+      !gamma1_min
 
    !## core mixing
       !mass_semiconv_core
@@ -852,12 +886,17 @@
       !one_div_yphot
       !log_one_div_yphot
 
-
       !log_min_opacity
       !min_opacity
 
       !log_tau_center
 
+      !log_max_tau_conv
+      !max_tau_conv
+      !log_min_tau_conv
+      !min_tau_conv
+
+      !tau_qhse_yrs
 
    !## other
 
@@ -870,7 +909,7 @@
       !surf_c12_minus_o16 ! this is useful for seeing effects of dredge up on AGB
       !surf_num_c12_div_num_o16
 
-
+      !phase_of_evolution ! Integer mapping to the type of evolution see star_data/public/star_data_def.inc for definitions
 
    !## MLT++
       !gradT_excess_alpha
@@ -914,8 +953,6 @@
       !q_for_test_CpT_absMdot_div_L
       !logxq_for_test_CpT_absMdot_div_L
 
-
-
 !----------------------------------------------------------------------------------------------
 
 !# Color output
@@ -946,6 +983,24 @@
 
 !----------------------------------------------------------------------------------------------
 
+!# RSP
+
+   !rsp_DeltaMag
+   !rsp_DeltaR
+   !rsp_GREKM
+   !rsp_GREKM_avg_abs
+   !rsp_GRPDV
+   !rsp_LINA_growth_rate_F
+   !rsp_LINA_growth_rate_O1
+   !rsp_LINA_growth_rate_O2
+   !rsp_LINA_period_F_days
+   !rsp_LINA_period_O1_days
+   !rsp_LINA_period_O2_days
+   !rsp_num_periods
+   !rsp_period_in_days
+   !rsp_phase
+
+!----------------------------------------------------------------------------------------------
 !# debugging
 
    !## retries
@@ -956,17 +1011,41 @@
       num_iters ! same as num_solver_iterations
       !num_solver_iterations ! iterations at this step
       !total_num_solver_iterations ! total iterations during the run
+      !avg_num_solver_iters
 
       !rotation_solver_steps
 
       !diffusion_solver_steps
       !diffusion_solver_iters
 
+      !avg_setvars_per_step
+      !avg_skipped_setvars_per_step
+      !avg_solver_setvars_per_step
 
-   !## maximum solver residuals
+      !burn_solver_maxsteps
 
+      !total_num_solver_calls_converged
+      !total_num_solver_calls_failed
+      !total_num_solver_calls_made
+      !total_num_solver_relax_calls_converged
+      !total_num_solver_relax_calls_failed
+      !total_num_solver_relax_calls_made
+      !total_num_solver_relax_iterations
 
+      !total_step_attempts
+      !total_step_redos
+      !total_step_retries
+      !total_steps_finished
+      !total_steps_taken
 
+      !TDC_num_cells
+
+   !## Relaxation steps
+      !total_relax_step_attempts
+      !total_relax_step_redos
+      !total_relax_step_retries
+      !total_relax_steps_finished
+      !total_relax_steps_taken
 
    !## conservation during mesh adjust
       !log_mesh_adjust_IE_conservation
@@ -979,3 +1058,6 @@
 
    !## timing
       !elapsed_time ! time since start of run (seconds)
+
+   !## Extras
+      mixing_regions 10

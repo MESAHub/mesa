@@ -26,8 +26,8 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use const_def
-      use math_lib
       use chem_def
       use num_lib
       
