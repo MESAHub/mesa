@@ -507,25 +507,6 @@
 
          i = i_merge
 
-         !s% amr_split_merge_has_undergone_remesh(i) = .true.
-         !if (i>1) then
-         !   max_lgT_diff = abs(s% xh(s% i_lnT, i) - s% xh(s% i_lnT, i-1))
-         !   max_lgrho_diff = abs(s% xh(s% i_lnd, i) - s% xh(s% i_lnd, i-1))
-         !   if (max_lgT_diff>5d-2 .or. max_lgrho_diff>5d-2) then
-         !      write(*,*) "cancelled merge", i, max_lgT_diff, max_lgrho_diff
-         !      return
-         !   end if
-         !end if
-         !if (i<nz) then
-         !   max_lgT_diff = abs(s% xh(s% i_lnT, i) - s% xh(s% i_lnT, i+1))
-         !   max_lgrho_diff = abs(s% xh(s% i_lnd, i) - s% xh(s% i_lnd, i+1))
-         !   if (max_lgT_diff>5d-2 .or. max_lgrho_diff>5d-2) then
-         !      write(*,*) "cancelled merge", i, max_lgT_diff, max_lgrho_diff
-         !      return
-         !   end if
-         !end if
-         !write(*,*) "performing merge", i
-
          s% num_hydro_merges = s% num_hydro_merges+1
          if (i > 1 .and. i < s% nz) then
             ! don't merge across change in most abundance species
@@ -682,6 +663,7 @@
             if (s% RTI_flag) s% alpha_RTI(im) = s% alpha_RTI(i0)
             if (s% rotation_flag) s% j_rot(im) = s% j_rot(i0)
          end do
+         s% amr_split_merge_has_undergone_remesh(i) = .true.
 
          nz = nz - 1
          s% nz = nz
@@ -864,7 +846,6 @@
 
          i = i_split
          ip = i+1
-         !write(*,*) "performing split", i
 
          call get_cell_energies( &
             s, i, cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old)
