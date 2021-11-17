@@ -1993,7 +1993,7 @@
       ! ~~~~~~~~~~~~~~~~~
 
       ! as above for the mass, but for the luminosity.
-      ! ``new_L_center`` in Lsun.
+      ! ``new_L_center`` in erg/s.
       ! ``relax_L_center_dt`` in seconds.
 
       ! ::
