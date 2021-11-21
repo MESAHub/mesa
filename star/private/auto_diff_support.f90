@@ -32,7 +32,6 @@
       implicit none
      
       ! current use of xtra's
-      ! Hp is ln_cvpv0
       ! xtra1 is w_div_wc
 
       public

@@ -504,7 +504,6 @@
          s% u_flag = .false.
          s% rotation_flag = .false.
          s% RTI_flag = .false.
-         s% conv_vel_flag = .false.
          s% w_div_wc_flag = .false.
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.

@@ -80,7 +80,7 @@
             s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
-            s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
+            s% RTI_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% have_mlt_vc, s% species, s% num_reactions, &
             s% model_number, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
@@ -157,10 +157,10 @@
 
          read(iounit, iostat=ierr) &
             s% i_lnd, s% i_lnT, s% i_lnR, s% i_lum, s% i_Et_RSP, s% i_erad_RSP, s% i_Fr_RSP, &
-            s% i_v, s% i_u, s% i_alpha_RTI, s% i_ln_cvpv0, s% i_w, s% i_Hp, s% i_w_div_wc, s% i_j_rot, &
+            s% i_v, s% i_u, s% i_alpha_RTI, s% i_w, s% i_Hp, s% i_w_div_wc, s% i_j_rot, &
             s% i_dv_dt, s% i_equL, s% i_dlnd_dt, s% i_dlnE_dt, &
             s% i_dEt_RSP_dt, s% i_derad_RSP_dt, s% i_dFr_RSP_dt, s% i_du_dt, s% i_dlnR_dt, &
-            s% i_dln_cvpv0_dt, s% i_dalpha_RTI_dt, s% i_detrb_dt, s% i_equ_Hp
+            s% i_dalpha_RTI_dt, s% i_detrb_dt, s% i_equ_Hp
          if (failed('i_dalpha_RTI_dt')) return
 
          read(iounit, iostat=ierr) &

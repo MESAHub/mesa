@@ -1331,10 +1331,8 @@
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnR_00)
             else if (i_var == s% i_lum) then
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_L_00)
-            else if (i_var == s% i_ln_cvpv0) then
-               dvardx0_00 = s% gradT_ad(k)%d1Array(i_xtra1_00)
             else if (i_var == s% i_w_div_wc) then
-               dvardx0_00 = s% gradT_ad(k)%d1Array(i_xtra2_00)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_w_00)
             end if
          end subroutine get_gradT_partials
          

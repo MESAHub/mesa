@@ -614,16 +614,6 @@
             if (ierr /= 0) return
          end if
          
-         if (s% log_max_temperature >= s% job% logT_for_conv_vel_flag &
-               .and. (.not. s% conv_vel_flag)) then
-            write(*,1) 'have reached logT_for_conv_vel_flag', &
-               s% log_max_temperature, s% job% logT_for_conv_vel_flag
-            write(*,1) 'set conv_vel_flag true'
-            call star_set_conv_vel_flag(id, .true., ierr)
-            if (failed('star_set_conv_vel_flag',ierr)) return
-            if (ierr /= 0) return
-         end if
-         
          if (s% job% change_RSP2_flag_at_model_number == s% model_number) then
             write(*,*) 'have reached model number for new_RSP2_flag', &
                s% model_number, s% job% new_RSP2_flag
@@ -2296,13 +2286,6 @@
             if (failed('star_set_RSP_flag',ierr)) return
          end if
 
-         if (s% job% change_conv_vel_flag .or. &
-               (s% job% change_initial_conv_vel_flag .and. .not. restart)) then
-            write(*,*) 'new_conv_vel_flag', s% job% new_conv_vel_flag
-            call star_set_conv_vel_flag(id, s% job% new_conv_vel_flag, ierr)
-            if (failed('star_set_conv_vel_flag',ierr)) return
-         end if
-
          if (s% job% change_w_div_wc_flag .or. &
                (s% job% change_initial_w_div_wc_flag .and. .not. restart)) then
             write(*,*) 'new_w_div_wc_flag', s% job% new_w_div_wc_flag
@@ -2884,9 +2867,6 @@
          
          if (s% rotation_flag) &
             write(*,*) 'rotation_flag', s% rotation_flag
-         
-         if (s% conv_vel_flag) &
-            write(*,*) 'conv_vel_flag', s% conv_vel_flag
          
          if (s% w_div_wc_flag) &
             write(*,*) 'w_div_wc_flag', s% w_div_wc_flag
