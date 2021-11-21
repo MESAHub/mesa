@@ -86,10 +86,9 @@
          r_00 = wrap_r_00(s,k)
          area = pi4*pow2(r_00); area2 = pow2(area)
 
-         if ((check_flag_and_val(s% conv_vel_flag, s% conv_vel, k)) .or. &
-               (.not. s% conv_vel_flag .and. s% lnT(k)/ln10 <= s% max_logT_for_mlt &
+         if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
                .and. s% mixing_type(k) == convective_mixing .and. s% gradr(k) > 0d0 &
-               .and. abs(s% gradr(k) - s% gradT(k)) > abs(s% gradr(k))*1d-5)) then
+               .and. abs(s% gradr(k) - s% gradT(k)) > abs(s% gradr(k))*1d-5) then
             Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k) ! C&G 14.109
          else
             Lrad_ad = L_ad
@@ -139,17 +138,6 @@
          end if
 
          contains 
-         
-         logical function check_flag_and_val(flag, array, index)
-            logical,intent(in) :: flag
-            real(dp), dimension(:),intent(in) :: array
-            integer, intent(in) :: index
-
-            check_flag_and_val = .false.
-            if(flag) then
-               if(array(index)>0d0) check_flag_and_val = .true.
-            end if
-         end function check_flag_and_val
 
       end subroutine do1_alt_dlnT_dm_eqn
 
@@ -257,7 +245,7 @@
             return
          end if
 
-         if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. s% conv_vel_flag) then
+         if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
             call do1_alt_dlnT_dm_eqn(s, k, nvar, ierr)            
             return
          end if

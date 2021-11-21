@@ -609,8 +609,6 @@
             if (failed('dxh_u')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
-            call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
-            if (failed('dxh_ln_cvpv0')) exit
 
             call do1(s% dudt_RTI, c% dudt_RTI)
             if (failed('dudt_RTI')) exit
@@ -2334,12 +2332,6 @@
             s% i_Hp = 0
          end if
 
-         if (s% conv_vel_flag) then
-            i = i+1; s% i_ln_cvpv0 = i
-         else
-            s% i_ln_cvpv0 = 0
-         end if
-
          if (s% w_div_wc_flag) then
             i = i+1; s% i_w_div_wc = i
          else
@@ -2375,7 +2367,6 @@
          s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
-         s% i_dln_cvpv0_dt = s% i_ln_cvpv0
          s% i_equ_w_div_wc = s% i_w_div_wc
          s% i_dj_rot_dt = s% i_j_rot
 
@@ -2394,7 +2385,6 @@
          if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
-         if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
          if (s% i_w_div_wc /= 0) s% nameofvar(s% i_w_div_wc) = 'w_div_wc'
          if (s% i_j_rot /= 0) s% nameofvar(s% i_j_rot) = 'j_rot'
          if (s% i_u /= 0) s% nameofvar(s% i_u) = 'u' 
@@ -2411,7 +2401,6 @@
          if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
-         if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
          if (s% i_equ_w_div_wc /= 0) s% nameofequ(s% i_equ_w_div_wc) = 'equ_w_div_wc'
          if (s% i_dj_rot_dt /= 0) s% nameofequ(s% i_dj_rot_dt) = 'dj_rot_dt'
          if (s% i_du_dt /= 0) s% nameofequ(s% i_du_dt) = 'du_dt'

@@ -719,7 +719,13 @@ turb
 
 This new module implements local theories of turbulence, including
 MLT, TDC, semiconvection, and thermohaline turbulence. These used to be
-a part of ``star``.
+a part of ``star``. TDC (which stands for time-dependent convection) is
+now the recommended method for situations where the time dependence of
+convection must be taken into account. Other methods for time dependent
+convection present in the code have been removed, including the options
+min_T_for_acceleration_limited_conv_velocity and set_conv_vel_flag.
+TDC can be turned on with the option ``MLT_option = "TDC"`` in the 
+``controls`` section of an inlist.
 
 Users will not generally
 need to interact with this module, but it can be used within

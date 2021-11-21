@@ -306,10 +306,6 @@
          new_RSP2_flag, &
          create_RSP2_model, &
          
-         change_conv_vel_flag, &
-         change_initial_conv_vel_flag, &
-         new_conv_vel_flag, &
-         
          change_w_div_wc_flag, &
          change_initial_w_div_wc_flag, &
          new_w_div_wc_flag, &
@@ -343,7 +339,6 @@
          new_reconstruction_flag, &
          
          center_ye_limit_for_v_flag, &
-         logT_for_conv_vel_flag, &
          change_rotation_flag, &
          change_initial_rotation_flag, &
          new_rotation_flag, &
@@ -955,9 +950,6 @@
          s% job% change_RSP2_flag_at_model_number = change_RSP2_flag_at_model_number
          s% job% new_RSP2_flag = new_RSP2_flag
          s% job% create_RSP2_model = create_RSP2_model
-         s% job% change_conv_vel_flag = change_conv_vel_flag
-         s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
-         s% job% new_conv_vel_flag = new_conv_vel_flag
          s% job% change_w_div_wc_flag = change_w_div_wc_flag
          s% job% change_initial_w_div_wc_flag = change_initial_w_div_wc_flag
          s% job% new_w_div_wc_flag = new_w_div_wc_flag
@@ -987,7 +979,6 @@
          s% job% new_reconstruction_flag = new_reconstruction_flag
          
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
-         s% job% logT_for_conv_vel_flag = logT_for_conv_vel_flag
          s% job% change_rotation_flag = change_rotation_flag
          s% job% change_initial_rotation_flag = change_initial_rotation_flag
          s% job% new_rotation_flag = new_rotation_flag
@@ -1529,9 +1520,6 @@
          change_RSP2_flag_at_model_number = s% job% change_RSP2_flag_at_model_number
          new_RSP2_flag = s% job% new_RSP2_flag
          create_RSP2_model = s% job% create_RSP2_model
-         change_conv_vel_flag = s% job% change_conv_vel_flag
-         change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
-         new_conv_vel_flag = s% job% new_conv_vel_flag
          change_w_div_wc_flag = s% job% change_w_div_wc_flag
          change_initial_w_div_wc_flag = s% job% change_initial_w_div_wc_flag
          new_w_div_wc_flag = s% job% new_w_div_wc_flag
@@ -1560,7 +1548,6 @@
          new_reconstruction_flag = s% job% new_reconstruction_flag
 
          center_ye_limit_for_v_flag = s% job% center_ye_limit_for_v_flag
-         logT_for_conv_vel_flag = s% job% logT_for_conv_vel_flag
          change_rotation_flag = s% job% change_rotation_flag
          change_initial_rotation_flag = s% job% change_initial_rotation_flag
          new_rotation_flag = s% job% new_rotation_flag

@@ -156,19 +156,19 @@
             call mesa_error(__FILE__,__LINE__,'do1_dudt_eqn')
 !$omp end critical (dudt_eqn)
          end if
-
-         if (test_partials) then
-            s% solver_test_partials_val = residual
-         end if
          
          call save_eqn_residual_info(s, k, nvar, i_du_dt, resid_ad, 'do1_dudt_eqn', ierr)
 
          if (test_partials) then
-            s% solver_test_partials_var = 0
-            s% solver_test_partials_dval_dx = 0
-            write(*,*) 'do1_dudt_eqn', s% solver_test_partials_var
+            s% solver_test_partials_val = resid_ad% val
          end if
-         
+
+         if (test_partials) then
+            s% solver_test_partials_var = s% i_lnR
+            s% solver_test_partials_dval_dx = resid_ad% d1Array(i_lnR_00)
+            !write(*,*) 'do1_dudt_eqn', s% solver_test_partials_var
+            end if
+
          contains
          
          subroutine setup_momentum_flux
@@ -225,6 +225,7 @@
                gsL = -Gp1*mL*0.5d0*dm*inv_R2_p1
             end if
             gravity_source_ad = gsL + gsR ! total gravitational force on cell
+         
 
          end subroutine setup_gravity_source
 
@@ -392,14 +393,12 @@
          
          s% u_face_ad(k) = Ss_ad
          s% d_uface_domega(k) = s% u_face_ad(k)%d1Array(i_L_00)
-         s% u_face_ad(k)%d1Array(i_L_00) = 0d0
 
          ! contact pressure (eqn 2.19)
          P_face_L_ad = rhoL_ad*(uL_ad-Sl_ad)*(uL_ad-Ss_ad) + PL_ad         
          P_face_R_ad = rhoR_ad*(uR_ad-Sr_ad)*(uR_ad-Ss_ad) + PR_ad
          
          s% P_face_ad(k) = 0.5d0*(P_face_L_ad + P_face_R_ad) ! these are ideally equal
-         s% P_face_ad(k)%d1Array(i_L_00) = 0d0
 
          if (k < s% nz .and. s% RTI_flag) then
              if (s% eta_RTI(k) > 0d0 .and. &
@@ -425,10 +424,10 @@
          end if
 
          if (test_partials) then
-            s% solver_test_partials_val = 0
-            s% solver_test_partials_var = 0        
-            s% solver_test_partials_dval_dx = 0
-            write(*,*) 'do1_uface_and_Pface', s% solver_test_partials_var
+            s% solver_test_partials_val = PL_ad% val
+            s% solver_test_partials_var = s% i_w_div_wc
+            s% solver_test_partials_dval_dx = PL_ad% d1Array(i_w_div_wc_00)
+            write(*,*) 'do1_uface_and_Pface', s% solver_test_partials_var, PL_ad% val
          end if
      
       end subroutine do1_uface_and_Pface
