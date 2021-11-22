@@ -402,7 +402,7 @@ Other changes
   Newton-Raphson relaxation to converge to a solution for the Nusselt
   number based on an initial guess from the asymptotic analysis in
   Appendix B of
-  `Brown, Garaud, & Stellmach (2013)<https://ui.adsabs.harvard.edu/abs/2013ApJ...768...34B>`_.
+  `Brown, Garaud, & Stellmach (2013) <https://ui.adsabs.harvard.edu/abs/2013ApJ...768...34B>`_.
   However, a bug previously caused the routine to immediately return the
   asymptotic guess and skip the NR relaxation step. The asymptotic
   guess is usually fairly accurate, so this usually still produced a

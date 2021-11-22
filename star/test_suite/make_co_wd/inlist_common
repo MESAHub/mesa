@@ -73,6 +73,7 @@
       diffusion_iters_hard_limit = 100      
 
 ! convection
+      mlt_option = 'TDC'
       mixing_length_alpha = 2
       use_Ledoux_criterion = .true.
       thermohaline_coeff = 1d2
