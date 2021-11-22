@@ -397,6 +397,19 @@ Other changes
 
 * The headers for history and profile data now contain the value of Msun (grams), Rsun (cm), and Lsun (erg/s) used.
 
+* A bug has been identified and fixed in the ``Brown_Garaud_Stellmach_13``
+  thermohaline mixing routine. The routine was meant to use
+  Newton-Raphson relaxation to converge to a solution for the Nusselt
+  number based on an initial guess from the asymptotic analysis in
+  Appendix B of
+  `Brown, Garaud, & Stellmach (2013)<https://ui.adsabs.harvard.edu/abs/2013ApJ...768...34B>`_.
+  However, a bug previously caused the routine to immediately return the
+  asymptotic guess and skip the NR relaxation step. The asymptotic
+  guess is usually fairly accurate, so this usually still produced a
+  thermohaline result that was fairly close to the right answer, but
+  the bug has been fixed now so that the NR relaxation is applied as
+  well.
+
 
 Changes in r15140
 =================
@@ -1393,17 +1406,4 @@ Other changes
   These properties are used by eps_mdot to compute the contribution of
   accretion to the energy equation. By default (when this hook is not used),
   these properties are all taken from the surface cell.
-
-* A bug has been identified and fixed in the ``Brown_Garaud_Stellmach_13``
-  thermohaline mixing routine. The routine was meant to use
-  Newton-Raphson relaxation to converge to a solution for the Nusselt
-  number based on an initial guess from the asymptotic analysis in
-  Appendix B of
-  `Brown, Garaud, & Stellmach (2013)<https://ui.adsabs.harvard.edu/abs/2013ApJ...768...34B>`.
-  However, a bug previously caused the routine to immediately return the
-  asymptotic guess and skip the NR relaxation step. The asymptotic
-  guess is usually fairly accurate, so this usually still produced a
-  thermohaline result that was fairly close to the right answer, but
-  the bug has been fixed now so that the NR relaxation is applied as
-  well.
 
