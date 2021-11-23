@@ -92,11 +92,11 @@
          write(*,'(A)')
          call check('star_mass', s% star_mass, 12.5d0, 14.0d0)
          call check('log total_angular_momentum', safe_log10(s% total_angular_momentum), 50d0, 52.5d0)
-         call check('log center_omega', safe_log10(s% center_omega), -5.0d0, -3.0d0)
+         call check('log center_omega', safe_log10(s% center_omega), -6.0d0, -4.0d0)
          call check('log he_core_omega', safe_log10(s% he_core_omega), -5.0d0, -3.0d0)
          call check('he_core_mass', s% he_core_mass, 3.7d0, 4.5d0)
          call check('surface j_rot', safe_log10(s% j_rot(1)),  17d0, 19d0)
-         call check('surface v_rot', s% omega(1)*s% r(1)*1d-5, 0.2d0, 0.6d0)
+         call check('surface v_rot', s% omega(1)*s% r(1)*1d-5, 0.1d0, 0.6d0)
          
          k_cntr = 0
          k_surf = 0
