@@ -95,7 +95,8 @@ in your ``run_star_extras.f90`` then you will need to add ``use auto_diff`` to t
 
 If you see errors such as:
 
-::
+.. code-block:: fortran
+  
   Error: Cannot convert REAL(8) to TYPE(auto_diff_real_star_order1) at (1)
 
 
