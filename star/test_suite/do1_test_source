@@ -32,6 +32,7 @@ do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limi
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
+do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
 
 do_one gyre_in_mesa_bcep "matched target" skip skip
 do_one gyre_in_mesa_envelope "matched target" skip skip
@@ -97,7 +98,6 @@ return
 
 
 #   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-#    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
 
 #  off while testing.    do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
 #  off while testing.    do_one dev_BW_Vul_pulses "good match for period" "final.mod" skip   
