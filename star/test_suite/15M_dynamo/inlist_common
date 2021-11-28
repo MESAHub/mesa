@@ -1,5 +1,9 @@
 &star_job
 
+! pgstar
+      pgstar_flag = .false.
+      save_pgstar_files_when_terminate = .false.
+
 / ! end of star_job namelist
 
 
@@ -18,12 +22,17 @@
 
 &controls
 
-   ! initial model
-
+! initial model
       initial_mass = 15
       initial_z = 0.02
 
-   ! rotation / rotational mixing
+! not a science converged model, but enough for a test case
+
+      max_dq = 4d-3             ! default 1e-2, 1/max_dq = minumum number of cells
+      varcontrol_target = 1d-4  ! default 1d-3 gives non-robust results
+
+
+! rotation / rotational mixing
 
       omega_function_weight = 20
 
@@ -42,7 +51,7 @@
       clip_D_limit = 10
 
 
-    ! mass loss
+! mass loss
 
       hot_wind_scheme = 'Dutch'
       hot_wind_full_on_T = 1d0
@@ -52,7 +61,9 @@
       mdot_omega_power = 0.43
 
 
-    ! convection
+! convection
+
+      MLT_option = 'Cox'   ! 'TDC'
 
       mixing_length_alpha = 1.6
       use_Ledoux_criterion = .true.
@@ -60,16 +71,45 @@
       thermohaline_coeff = 2
 
 
-    ! output
+! output
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      photo_interval = 100
-      profile_interval = 100
-      history_interval = 5
+      photo_interval    = 400
+      profile_interval  = 400
+      history_interval  = 10
       terminal_interval = 50
 
 
 / ! end of controls namelist
+
+
+&pgstar
+
+  file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
+  file_device = 'png'            ! png
+  file_extension = 'png'
+
+  !file_device = 'vcps'          ! postscript
+  !file_extension = 'ps'
+
+   pgstar_interval = 50
+   file_digits = 8
+
+   Dynamo_legend_txt_scale_factor = 0.7
+   Mixing_legend_txt_scale_factor = 0.55
+   Profile_Panels4_txt_scale = 0.8
+
+   Profile_Panels4_win_flag = .true.
+   Profile_Panels4_win_width = 7
+   Profile_Panels4_title = '15M Dynamo'
+
+   Profile_Panels4_file_flag = .true.
+   Profile_Panels4_file_dir = 'png'
+   Profile_Panels4_file_prefix = 'profile_Panels4_'
+   Profile_Panels4_file_interval = 50
+   Profile_Panels4_file_width = 10
+
+/ ! end of pgstar namelist
