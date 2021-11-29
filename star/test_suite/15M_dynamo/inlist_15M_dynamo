@@ -69,6 +69,9 @@
       delta_lgL_nuc_limit = 0.1
       delta_lgL_nuc_hard_limit = 0.2
 
+! output
+
+      photo_interval    = 100
 
 / ! end of controls namelist
 
