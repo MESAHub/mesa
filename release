@@ -2,7 +2,7 @@
 
 VERSION="$1"
 
-if [[ -z ${VERSION}} ]]; then
+if [[ ! -n ${VERSION}} ]]; then
 	echo 'Please specify version number'
 	exit 1
 fi
