@@ -40,14 +40,16 @@
   ! see star/defaults/controls.defaults
 
   ! starting specifications
-    initial_mass = 15 ! in Msun units
+    initial_mass = 1 ! in Msun units
     initial_z = 0.02
+    initial_h2 = 5d-5
 
   ! when to stop
 
     ! stop when the star nears ZAMS (Lnuc/L > 0.99)
-    Lnuc_div_L_zams_limit = 0.99d0
-    stop_near_zams = .true.
+    !Lnuc_div_L_zams_limit = 0.99d0
+    !stop_near_zams = .true.
+    stop_at_phase_ZAMS = .true. 
 
     ! stop when the center mass fraction of h1 drops below this limit
     xa_central_lower_limit_species(1) = 'h1'

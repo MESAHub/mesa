@@ -7,6 +7,7 @@
          real(dp) :: initial_z
          real(dp) :: initial_y
          real(dp) :: initial_he3
+         real(dp) :: initial_h2
 
       ! definition of core boundaries
          real(dp) :: &

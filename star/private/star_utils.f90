@@ -2745,10 +2745,12 @@
          use chem_def
          type (star_info), pointer :: s
          real(dp) :: power_he_burn, power_c_burn, power_neutrinos, &
-            center_h1, center_he4
+            center_h1, center_he4, current_h2
          integer :: nz, j
          include 'formats'
          nz = s% nz
+
+         current_h2 = s% xa(s% net_iso(ih2), 1)
 
          s% phase_of_evolution = phase_starting
          if (s%doing_first_model_of_run) return
@@ -2795,8 +2797,23 @@
             s% phase_of_evolution = phase_IAMS            
          else if (s% L_nuc_burn_total >= s% L_phot*s% Lnuc_div_L_zams_limit) then
             s% phase_of_evolution = phase_ZAMS
+
+ 
+         !! initial_h2 needs to be an inlist option
+         !! are we sure we need to remove the logTc condition as well?
+         else if (s% net_iso(ih2) > 0) then 
+              write(*,*) 'in deuterium preMS phase...'
+              current_h2 = s% xa(s% net_iso(ih2), 1) !! surface deuterium
+               if ((current_h2 / s% initial_h2) <= 0.01) then
+                  s% phase_of_evolution = phase_PreMS
+               end if 
+
+         ! !! fallback PreMS definition      
          else if (s% log_center_temperature > 5d0) then
+            write(*,*) 'in fallback PreMS phase...'
             s% phase_of_evolution = phase_PreMS
+
+         
          else
             s% phase_of_evolution = phase_starting
          end if 

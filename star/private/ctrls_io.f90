@@ -54,7 +54,7 @@
  namelist /controls/ &
  
     ! where to start
-    initial_mass, initial_z, initial_y, initial_he3, &
+    initial_mass, initial_z, initial_y, initial_he3, initial_h2, & !!MJoyce
     
     ! definition of core boundaries
     he_core_boundary_h1_fraction, co_core_boundary_he4_fraction, one_core_boundary_he4_c12_fraction, &
@@ -807,6 +807,7 @@
  s% initial_z = initial_z
  s% initial_y = initial_y
  s% initial_he3 = initial_he3
+ s% initial_h2 = initial_h2 !! MJoyce
 
  ! definition of core boundaries
  s% he_core_boundary_h1_fraction = he_core_boundary_h1_fraction
@@ -2478,6 +2479,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  initial_z = s% initial_z
  initial_y = s% initial_y
  initial_he3 = s% initial_he3
+ initial_h2 = s% initial_h2 !! MJoyce
 
  ! definition of core boundaries
  he_core_boundary_h1_fraction = s% he_core_boundary_h1_fraction
