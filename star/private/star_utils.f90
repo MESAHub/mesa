@@ -2799,25 +2799,26 @@
             s% phase_of_evolution = phase_ZAMS
 
  
+         ! !! fallback PreMS definition               
+         else if ( (s% log_center_temperature > 5d0) .and. (s% net_iso(ih2) <= 0)) then
+            !write(*,*) 'in fallback PreMS phase...'
+            s% phase_of_evolution = phase_PreMS
          !! initial_h2 needs to be an inlist option
          !! are we sure we need to remove the logTc condition as well?
-         else if (s% net_iso(ih2) > 0) then 
+         
+         else if ( s% net_iso(ih2) > 0) then 
               write(*,*) 'in deuterium preMS phase...'
               current_h2 = s% xa(s% net_iso(ih2), 1) !! surface deuterium
+              write(*,*) 'current_h2, initial_h2: ', current_h2, s% initial_h2
                if ((current_h2 / s% initial_h2) <= 0.01) then
                   s% phase_of_evolution = phase_PreMS
                end if 
-
-         ! !! fallback PreMS definition      
-         else if (s% log_center_temperature > 5d0) then
-            write(*,*) 'in fallback PreMS phase...'
-            s% phase_of_evolution = phase_PreMS
-
          
          else
             s% phase_of_evolution = phase_starting
          end if 
          
+      write(*,*) 'current phase_of_evolution: ', s% phase_of_evolution
       end subroutine set_phase_of_evolution
 
       

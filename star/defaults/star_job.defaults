@@ -691,8 +691,6 @@
 
       ! initial_h1
       ! ~~~~~~~~~~
-      ! initial_h2
-      ! ~~~~~~~~~~
       ! initial_he3
       ! ~~~~~~~~~~~
       ! initial_he4
@@ -706,9 +704,24 @@
       ! ::
 
     initial_h1 = -1
-    initial_h2 = -1
     initial_he3 = -1
     initial_he4 = -1
+
+
+      ! initial_h2
+      ! ~~~~~~~~~~~
+
+      ! initial mass fraction of deuterium (h2).
+      ! Necessary for defining the pre-main sequence according to
+      ! the deuterium birth line (DBL). 
+      ! note that h2 is NOT included in basic.net !
+      ! A sensible default value is 2.75d-5 (Lodders et al., 2009)
+
+      ! not used when loading a saved model or a zams model. !!MJoyce- unsure? presumably no?
+
+      ! ::
+
+    initial_h2 = -1
 
 
       ! initial_zfracs
