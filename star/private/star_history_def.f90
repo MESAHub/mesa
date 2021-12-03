@@ -504,22 +504,13 @@
       
       integer, parameter :: h_RSP_DeltaR = h_num_hydro_splits + 1
       integer, parameter :: h_RSP_DeltaMag = h_RSP_DeltaR + 1
-      integer, parameter :: h_RSP_GRPDV = h_RSP_DeltaMag + 1
-      integer, parameter :: h_RSP_GREKM_avg_abs = h_RSP_GRPDV + 1
-      integer, parameter :: h_RSP_GREKM = h_RSP_GREKM_avg_abs + 1
+      integer, parameter :: h_RSP_GREKM = h_RSP_DeltaMag + 1
       
       integer, parameter :: h_rsp_phase = h_RSP_GREKM + 1
       integer, parameter :: h_rsp_period_in_days = h_rsp_phase + 1
       integer, parameter :: h_rsp_num_periods = h_rsp_period_in_days + 1
-      
-      integer, parameter :: h_RSP_LINA_period_F_days = h_rsp_num_periods + 1
-      integer, parameter :: h_RSP_LINA_period_O1_days = h_RSP_LINA_period_F_days + 1
-      integer, parameter :: h_RSP_LINA_period_O2_days = h_RSP_LINA_period_O1_days + 1
-      integer, parameter :: h_RSP_LINA_growth_rate_F = h_RSP_LINA_period_O2_days + 1
-      integer, parameter :: h_RSP_LINA_growth_rate_O1 = h_RSP_LINA_growth_rate_F + 1
-      integer, parameter :: h_RSP_LINA_growth_rate_O2 = h_RSP_LINA_growth_rate_O1 + 1
 
-      integer, parameter :: h_total_num_solver_iterations = h_RSP_LINA_growth_rate_O2 + 1
+      integer, parameter :: h_total_num_solver_iterations = h_rsp_num_periods + 1
       integer, parameter :: h_total_num_solver_calls_made = h_total_num_solver_iterations + 1
       integer, parameter :: h_total_num_solver_calls_converged = h_total_num_solver_calls_made + 1
       integer, parameter :: h_total_num_solver_calls_failed = h_total_num_solver_calls_converged + 1
@@ -939,20 +930,11 @@
 
          history_column_name(h_RSP_DeltaR) = 'rsp_DeltaR'
          history_column_name(h_RSP_DeltaMag) = 'rsp_DeltaMag'
-         history_column_name(h_RSP_GRPDV) = 'rsp_GRPDV'
          history_column_name(h_RSP_GREKM) = 'rsp_GREKM'
-         history_column_name(h_RSP_GREKM_avg_abs) = 'rsp_GREKM_avg_abs'
          
          history_column_name(h_rsp_phase) = 'rsp_phase'
          history_column_name(h_rsp_period_in_days) = 'rsp_period_in_days'
          history_column_name(h_rsp_num_periods) = 'rsp_num_periods'
-
-         history_column_name(h_RSP_LINA_period_F_days) = 'rsp_LINA_period_F_days'
-         history_column_name(h_RSP_LINA_period_O1_days) = 'rsp_LINA_period_O1_days'
-         history_column_name(h_RSP_LINA_period_O2_days) = 'rsp_LINA_period_O2_days'
-         history_column_name(h_RSP_LINA_growth_rate_F) = 'rsp_LINA_growth_rate_F'
-         history_column_name(h_RSP_LINA_growth_rate_O1) = 'rsp_LINA_growth_rate_O1'
-         history_column_name(h_RSP_LINA_growth_rate_O2) = 'rsp_LINA_growth_rate_O2'
 
          history_column_name(h_total_num_solver_iterations) = 'total_num_solver_iterations'
          history_column_name(h_total_num_solver_calls_made) = 'total_num_solver_calls_made'
