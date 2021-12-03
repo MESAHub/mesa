@@ -492,7 +492,6 @@
 
    !superad_reduction_factor
    !conv_vel_div_mlt_vc
-   !dconv_vel_dt
 
    !log_Lconv
    !log_Lconv_div_L
