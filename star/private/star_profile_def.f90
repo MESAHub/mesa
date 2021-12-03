@@ -635,9 +635,7 @@
       integer, parameter :: p_d_u_div_rmid_start = p_rsp_WORKC + 1
       integer, parameter :: p_d_u_div_rmid = p_d_u_div_rmid_start + 1
 
-      integer, parameter :: p_dconv_vel_dt = p_d_u_div_rmid + 1
-
-      integer, parameter :: p_cell_ie_div_star_ie = p_dconv_vel_dt + 1
+      integer, parameter :: p_cell_ie_div_star_ie = p_d_u_div_rmid + 1
       integer, parameter :: p_log_cell_specific_IE = p_cell_ie_div_star_ie + 1
       integer, parameter :: p_log_cell_ie_div_star_ie = p_log_cell_specific_IE + 1
 
@@ -1312,8 +1310,6 @@
 
          profile_column_name(p_d_u_div_rmid) = 'd_u_div_rmid'
          profile_column_name(p_d_u_div_rmid_start) = 'd_u_div_rmid_start'
-
-         profile_column_name(p_dconv_vel_dt) = 'dconv_vel_dt'
 
          profile_column_name(p_cell_specific_IE) = 'cell_specific_IE'
          profile_column_name(p_cell_ie_div_star_ie) = 'cell_ie_div_star_ie'
