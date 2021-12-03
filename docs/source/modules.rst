@@ -61,6 +61,7 @@ automatic calculation of analytic derivatives using the chain rule.
 .. toctree::
 
    auto_diff/overview
+   auto_diff/example
 
 
 .. _chem:
