@@ -985,20 +985,12 @@
 
 !# RSP
 
-   !rsp_DeltaMag
-   !rsp_DeltaR
-   !rsp_GREKM
-   !rsp_GREKM_avg_abs
-   !rsp_GRPDV
-   !rsp_LINA_growth_rate_F
-   !rsp_LINA_growth_rate_O1
-   !rsp_LINA_growth_rate_O2
-   !rsp_LINA_period_F_days
-   !rsp_LINA_period_O1_days
-   !rsp_LINA_period_O2_days
-   !rsp_num_periods
-   !rsp_period_in_days
-   !rsp_phase
+   !rsp_DeltaMag ! absolute magnitude difference between minimum and maximum light (mag)
+   !rsp_DeltaR ! R_max - R_min difference in the max and min radius (Rsun)
+   !rsp_GREKM ! fractional growth of the kinetic energy per pulsation period ("nonlinear growth rate") - see equation 5 in MESA5
+   !rsp_num_periods ! Count of the number of pulsation cycles completed
+   !rsp_period_in_days ! Running period, ie., period between two consecutive values of R_max (days) 
+   !rsp_phase ! Running pulsation phase for a cycle
 
 !----------------------------------------------------------------------------------------------
 !# debugging
