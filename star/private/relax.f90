@@ -2403,7 +2403,7 @@
          dlgm_per_step = rpar(2)
          relax_M_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% M_center>0.0) &
             write(*,1) 'relax_M_center target/current', new_mass/(s% M_center/Msun)
          
          end_now=.false.
@@ -2551,7 +2551,7 @@
          dlgR_per_step = rpar(2)
          relax_R_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% R_center > 0d0) &
             write(*,1) 'relax_R_center target/current', new_R_center/s% R_center
 
          if (abs(s% R_center - new_R_center) < 1d-15) then
@@ -2816,7 +2816,7 @@
          relax_L_center_dt = rpar(3)
 
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% L_center>0.d0) &
             write(*,1) 'relax_L_center target/current', new_L_center/s% L_center
 
          if (abs(new_L_center - s% L_center) < abs(dL)) then
