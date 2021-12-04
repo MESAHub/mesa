@@ -677,37 +677,32 @@
 
 !# RSP
 
-   !rsp_Chi
-   !rsp_Eq
-   !rsp_Et
-   !rsp_Hp_face
-   !rsp_Lc
-   !rsp_Lc_div_L
-   !rsp_Lr
-   !rsp_Lr_div_L
-   !rsp_Lt
-   !rsp_Lt_div_L
-   !rsp_PII_face
-   !rsp_Pt
-   !rsp_Pvsc
-   !rsp_Uq
-   !rsp_WORK
-   !rsp_WORKC
-   !rsp_WORKQ
-   !rsp_WORKT
-   !rsp_Y_face
-   !rsp_damp
-   !rsp_dampR
-   !rsp_erad
-   !rsp_gradT
-   !rsp_heat_exchange_timescale
-   !rsp_logEt
-   !rsp_log_dt_div_heat_exchange_timescale
-   !rsp_log_erad
-   !rsp_log_heat_exchange_timescale
-   !rsp_sink
-   !rsp_src
-   !rsp_src_snk
+   !rsp_Chi        ! dlnP_dlnRho 
+   !rsp_Et         ! Specific turbulent energy
+   !rsp_logEt      ! Log specific turbulent energy
+   !rsp_erad       ! Specific internal (radiative) energy
+   !rsp_log_erad   ! Log specific internal (radiative) energy
+   !rsp_Hp_face    ! Pressure scale height at cell face
+   !rsp_Lc         ! Convective luminosity
+   !rsp_Lc_div_L   ! Convective luminosity div total luminosity 
+   !rsp_Lr         ! Radiative luminosity
+   !rsp_Lr_div_L   ! Radiative luminosity div total luminosity
+   !rsp_Lt         ! Turbulent luminosity 
+   !rsp_Lt_div_L   ! Turbulent luminosity div total luminosity
+   !rsp_Pt         ! Turbulent pressure, p_t, see Table 1 in MESA5
+   !rsp_Uq         ! Viscous momentum transfer rate, U_q, see Table 1 in MESA5
+   !rsp_Eq         ! Viscous energy transfer rate, epsilon_q, see Table 1 in MESA5
+   !rsp_Pvsc       ! Artificial viscosity, p_av, see Table 1 in MESA5
+   !rsp_gradT      ! Temperature gradient
+   !rsp_Y_face     ! Superadiabatic gradient at cell face, Y_sag, see Table 1 in MESA5
+   !rsp_damp       ! Turbulent dissipation, D, see Table 1 in MESA5
+   !rsp_dampR      ! Radiative cooling, D_r, see Table 1 in MESA5
+   !rsp_sink       ! Sum of turbulent dissipation and radiative cooling terms
+   !rsp_src        ! Source function, S, see Table 1 in MESA5
+   !rsp_src_snk    ! Convective coupling, C, see Table 1 in MESA5
+   !rsp_heat_exchange_timescale      !  1d0/(clight * opacity * density)
+   !rsp_log_heat_exchange_timescale 
+   !rsp_log_dt_div_heat_exchange_timescale   ! Ratio of time step to heat exchange timescale
    !w
    !log_w
 

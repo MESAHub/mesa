@@ -1850,8 +1850,6 @@
                if (s% rsp_flag) val = s% Ptrb(k)
             case(p_rsp_Eq)
                if (s% rsp_flag) val = s% Eq(k)
-            case(p_rsp_PII_face)
-               if (s% rsp_flag) val = s% PII(k)
             case(p_rsp_src_snk)
                if (s% rsp_flag) val = s% COUPL(k)
             case(p_rsp_src)
@@ -1940,15 +1938,6 @@
                      val = s% Lt(2)/s% L(2)
                   end if
                end if
-
-            case(p_rsp_WORK)
-               if (s% rsp_flag) val = rsp_WORK(s,k)
-            case(p_rsp_WORKQ)
-               if (s% rsp_flag) val = rsp_WORKQ(s,k)
-            case(p_rsp_WORKT)
-               if (s% rsp_flag) val = rsp_WORKT(s,k)
-            case(p_rsp_WORKC)
-               if (s% rsp_flag) val = rsp_WORKC(s,k)
 
             case (p_total_energy) ! specific total energy at k
                val = eval_cell_section_total_energy(s,k,k)/s% dm(k)               
