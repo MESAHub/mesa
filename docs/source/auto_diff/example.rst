@@ -1,3 +1,5 @@
+.. _autodiff example:
+
 Example of auto_diff in run_star_extras
 =======================================
 

@@ -102,6 +102,8 @@ If you see errors such as:
 
 Then this means you are missing the ``use auto_diff`` statement.
 
+An example of using ``autodiff`` in a hook can be found at :ref:`autodiff example`
+
 
 .. _Module-level changes main:
 
