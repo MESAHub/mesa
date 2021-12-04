@@ -3395,7 +3395,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Lower limit on radial extent of cz (<= 0 to disable).
+      ! In units of average pressure scale height at top and bottom of region.
       ! Remove tiny convection zones unless have strong nuclear burning
+      ! This allows emergence of very small cz at site of he core flash, for example.
       ! i.e., remove if ``size < prune_bad_cz_min_Hp_height`` .and.
       ! ``max_log_eps < prune_bad_cz_min_log_eps_nuc``.
 
@@ -3408,8 +3410,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Lower limit on max log eps nuc in cz.
-      ! In units of average pressure scale height at top and bottom of region.
-      ! This allows emergence of very small cz at site of he core flash, for example.
+      ! remove if ``size < prune_bad_cz_min_Hp_height`` .and.
+      ! ``max_log_eps < prune_bad_cz_min_log_eps_nuc``.
 
       ! ::
 
@@ -3667,7 +3669,7 @@
       ! ::
 
       !     f = 1  when logT <= D_mix_rotation_max_logT_full_on = full_on
-      !       = 0  when logT >= D_mix_rotation_max_logT_full_on = full_off
+      !       = 0  when logT >= D_mix_rotation_min_logT_full_on = full_off
       !       = (log(T)-full_on)/(full_off-full_on) else
 
       ! note that for regions with brunt N^2 < 0, we set Richardson number to 1
