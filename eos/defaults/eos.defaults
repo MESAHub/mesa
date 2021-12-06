@@ -168,7 +168,7 @@
 
    ! use_Skye
    ! ~~~~~~~~
-   ! Select whether to use the Skye EOS. (EXPERIMENTAL)
+   ! Select whether to use the Skye EOS.
    ! ::
 
    use_Skye = .true.
