@@ -71,6 +71,8 @@ Name changes
 
 * The history and profile columns ``burn_*`` where replace with ``*_alpha``.
 
+* History, profile, and binary history column files are now case insensitive. 
+
 Removed options
 ~~~~~~~~~~~~~~~
 

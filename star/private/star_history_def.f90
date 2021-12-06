@@ -26,6 +26,7 @@
       module star_history_def
 
       use star_def
+      use star_utils, only: StrLowCase
 
       implicit none
    ! history column options
@@ -1357,7 +1358,7 @@
 
          nullify(history_column_names_dict)
          do i=1,h_col_id_max
-            call integer_dict_define(history_column_names_dict, history_column_name(i), i, ierr)
+            call integer_dict_define(history_column_names_dict, StrLowCase(history_column_name(i)), i, ierr)
             if (ierr /= 0) then
                write(*,*) 'FATAL ERROR: history_column_names_init failed in integer_dict_define'
                return
@@ -1379,7 +1380,7 @@
          ! returns id for the log column if there is a matching name
          ! returns 0 otherwise.
          integer :: ierr, value
-         call integer_dict_lookup(history_column_names_dict, cname, value, ierr)
+         call integer_dict_lookup(history_column_names_dict, StrLowCase(cname), value, ierr)
          if (ierr /= 0) value = 0
          do_get_history_id = value
       end function do_get_history_id
