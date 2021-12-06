@@ -397,6 +397,10 @@ Other changes
   options and test cases are not ready for general use.
 
 * The ``ionization`` module has been removed.
+  The ``eval_typical_charge`` routine has been moved into
+  ``mod_typical_charge.f90`` within the ``star`` module.
+  The ``eval_ionization`` routine is no longer
+  supported, as it was untested, undocumented, and unused.
 
 * A new module ``hdf5io`` for working with HDF5 files has been added.
 
