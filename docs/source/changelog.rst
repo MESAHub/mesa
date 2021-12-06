@@ -16,6 +16,21 @@ Backwards-incompatible changes
 
    A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
 
+Changes in r21.12.1
+===================
+
+.. _Backwards-incompatible changes r21.12.1:
+
+Backwards-incompatible changes
+------------------------------
+
+
+.. note::
+
+   A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
+
+
+
 Simplification of energy equation options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
