@@ -255,12 +255,23 @@ contains
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'ierr from set_TDC'
+               return
+            end if
+
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
          call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+
+         if (ierr /= 0) then
+            if (s% report_ierr) write(*,*) 'ierr from set_MLT'
+            return
+         end if
 
          ! Experimental method to lower superadiabaticity. Call MLT again with an artificially reduced
          ! gradr if the resulting gradT would lead to the radiative luminosity approaching the Eddington
@@ -312,6 +323,10 @@ contains
                               chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                               gradr_scaled, grada, gradL, &
                               Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+               if (ierr /= 0) then
+                  if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
+                  return
+               end if
             end if
          end if
       end if
@@ -323,12 +338,20 @@ contains
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'
+               return
+            end if
          else if (gradr > grada) then
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
             call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
                                     s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                     gradL_composition_term, &
                                     gradT, Y_face, conv_vel, D, mixing_type, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
+               return
+            end if
          end if         
       end if 
 
