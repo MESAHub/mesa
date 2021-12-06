@@ -26,6 +26,7 @@
       module star_profile_def
 
       use star_def
+      use utils_lib, only: StrLowCase
 
       implicit none
 
@@ -1409,7 +1410,7 @@
 
          nullify(profile_column_names_dict)
          do i=1,p_col_id_max
-            call integer_dict_define(profile_column_names_dict, profile_column_name(i), i, ierr)
+            call integer_dict_define(profile_column_names_dict, StrLowCase(profile_column_name(i)), i, ierr)
             if (ierr /= 0) then
                write(*,*) 'FATAL ERROR: profile_column_names_init failed in integer_dict_define'
                return
@@ -1431,7 +1432,7 @@
          ! returns id for the profile column if there is a matching name
          ! returns 0 otherwise.
          integer :: ierr, value
-         call integer_dict_lookup(profile_column_names_dict, cname, value, ierr)
+         call integer_dict_lookup(profile_column_names_dict, StrLowCase(cname), value, ierr)
          if (ierr /= 0) value = 0
          do_get_profile_id = value
       end function do_get_profile_id
