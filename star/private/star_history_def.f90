@@ -26,7 +26,7 @@
       module star_history_def
 
       use star_def
-      use star_utils, only: StrLowCase
+      use utils_lib, only: StrLowCase
 
       implicit none
    ! history column options
