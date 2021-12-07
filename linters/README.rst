@@ -18,6 +18,12 @@ This script checks that the history and profile code and the
 ``*_columns.list`` files are in sync. It can also check the column files
 in the test_suite if enabled in the source code.
 
+check_defaults.py
+-----------------
+
+This script checks that the controls and star_job defaults, the
+``*_controls.inc``, and ``*_io.f90`` files are in sync. 
+
 check_pgstar.py
 ----------------
 

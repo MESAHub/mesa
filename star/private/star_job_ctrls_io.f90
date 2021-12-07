@@ -790,8 +790,7 @@
 
          s% job% remove_initial_center_at_cell_k = remove_initial_center_at_cell_k
          s% job% remove_initial_center_by_temperature = remove_initial_center_by_temperature
-         s% job% remove_initial_center_by_mass_fraction_q = &
-            remove_initial_center_by_mass_fraction_q
+         s% job% remove_initial_center_by_mass_fraction_q = remove_initial_center_by_mass_fraction_q
          s% job% remove_initial_center_by_mass_gm = remove_initial_center_by_mass_gm
          s% job% remove_initial_center_by_delta_mass_Msun = remove_initial_center_by_delta_mass_Msun
          s% job% remove_initial_center_by_delta_mass_gm = remove_initial_center_by_delta_mass_gm
@@ -839,16 +838,11 @@
          s% job% zero_inner_v_by_mass_Msun = zero_inner_v_by_mass_Msun
 
          s% job% remove_initial_surface_at_cell_k = remove_initial_surface_at_cell_k
-         s% job% remove_initial_surface_at_he_core_boundary = &
-            remove_initial_surface_at_he_core_boundary
-         s% job% remove_initial_surface_by_optical_depth = &
-            remove_initial_surface_by_optical_depth
-         s% job% remove_initial_surface_by_density = &
-            remove_initial_surface_by_density
-         s% job% remove_initial_surface_by_pressure = &
-            remove_initial_surface_by_pressure
-         s% job% remove_initial_surface_by_mass_fraction_q = &
-            remove_initial_surface_by_mass_fraction_q
+         s% job% remove_initial_surface_at_he_core_boundary = remove_initial_surface_at_he_core_boundary
+         s% job% remove_initial_surface_by_optical_depth = remove_initial_surface_by_optical_depth
+         s% job% remove_initial_surface_by_density = remove_initial_surface_by_density
+         s% job% remove_initial_surface_by_pressure = remove_initial_surface_by_pressure
+         s% job% remove_initial_surface_by_mass_fraction_q = remove_initial_surface_by_mass_fraction_q
          s% job% remove_initial_surface_by_mass_gm = remove_initial_surface_by_mass_gm
          s% job% remove_initial_surface_by_radius_cm = remove_initial_surface_by_radius_cm
          s% job% remove_initial_surface_by_mass_Msun = remove_initial_surface_by_mass_Msun
@@ -1026,8 +1020,7 @@
          s% job% max_steps_to_relax_angular_momentum = max_steps_to_relax_angular_momentum
          s% job% timescale_for_relax_angular_momentum = timescale_for_relax_angular_momentum
          s% job% max_dt_for_relax_angular_momentum = max_dt_for_relax_angular_momentum
-         s% job% num_timescales_for_relax_angular_momentum = &
-            num_timescales_for_relax_angular_momentum
+         s% job% num_timescales_for_relax_angular_momentum = num_timescales_for_relax_angular_momentum
          s% job% relax_angular_momentum_filename = relax_angular_momentum_filename
          s% job% relax_angular_momentum_constant_omega_center = relax_angular_momentum_constant_omega_center
          s% job% relax_initial_entropy = relax_initial_entropy
@@ -1072,8 +1065,7 @@
          s% job% set_initial_cumulative_energy_error = set_initial_cumulative_energy_error
          s% job% set_cumulative_energy_error = set_cumulative_energy_error
          s% job% set_cumulative_energy_error_at_step = set_cumulative_energy_error_at_step
-         s% job% set_cumulative_energy_error_each_step_if_age_less_than = &
-            set_cumulative_energy_error_each_step_if_age_less_than
+         s% job% set_cumulative_energy_error_each_step_if_age_less_than = set_cumulative_energy_error_each_step_if_age_less_than
          s% job% new_cumulative_energy_error = new_cumulative_energy_error
          s% job% set_cumulative_energy_error_each_relax = set_cumulative_energy_error_each_relax
          
@@ -1379,18 +1371,15 @@
          fallback_check_total_energy = s% job% fallback_check_total_energy
          remove_fallback_speed_limit = s% job% remove_fallback_speed_limit
          remove_center_set_zero_v_center = s% job% remove_center_set_zero_v_center
-         retain_fallback_at_each_step = s% job% retain_fallback_at_each_step
          limit_center_logP_at_each_step = s% job% limit_center_logP_at_each_step
          remove_center_adjust_L_center = s% job% remove_center_adjust_L_center
          remove_center_logRho_limit = s% job% remove_center_logRho_limit
 
          remove_initial_center_at_cell_k = s% job% remove_initial_center_at_cell_k
          remove_initial_center_by_temperature = s% job% remove_initial_center_by_temperature
-         remove_initial_center_by_mass_fraction_q = &
-            s% job% remove_initial_center_by_mass_fraction_q
+         remove_initial_center_by_mass_fraction_q = s% job% remove_initial_center_by_mass_fraction_q
          remove_initial_center_by_delta_mass_gm = s% job% remove_initial_center_by_delta_mass_gm
-         remove_initial_center_by_delta_mass_Msun = &
-            s% job% remove_initial_center_by_delta_mass_Msun
+         remove_initial_center_by_delta_mass_Msun = s% job% remove_initial_center_by_delta_mass_Msun
          remove_initial_center_by_mass_gm = s% job% remove_initial_center_by_mass_gm
          remove_initial_center_by_mass_Msun = s% job% remove_initial_center_by_mass_Msun
          remove_initial_center_by_radius_Rsun = s% job% remove_initial_center_by_radius_Rsun
@@ -1430,16 +1419,11 @@
          remove_surface_by_relax_to_star_cut = s% job% remove_surface_by_relax_to_star_cut
          
          remove_initial_surface_at_cell_k = s% job% remove_initial_surface_at_cell_k
-         remove_initial_surface_at_he_core_boundary = &
-            s% job% remove_initial_surface_at_he_core_boundary
-         remove_initial_surface_by_optical_depth = &
-            s% job% remove_initial_surface_by_optical_depth
-         remove_initial_surface_by_density = &
-            s% job% remove_initial_surface_by_density
-         remove_initial_surface_by_pressure = &
-            s% job% remove_initial_surface_by_pressure
-         remove_initial_surface_by_mass_fraction_q = &
-            s% job% remove_initial_surface_by_mass_fraction_q
+         remove_initial_surface_at_he_core_boundary = s% job% remove_initial_surface_at_he_core_boundary
+         remove_initial_surface_by_optical_depth = s% job% remove_initial_surface_by_optical_depth
+         remove_initial_surface_by_density = s% job% remove_initial_surface_by_density
+         remove_initial_surface_by_pressure = s% job% remove_initial_surface_by_pressure
+         remove_initial_surface_by_mass_fraction_q = s% job% remove_initial_surface_by_mass_fraction_q
          remove_initial_surface_by_mass_gm = s% job% remove_initial_surface_by_mass_gm
          remove_initial_surface_by_radius_cm = s% job% remove_initial_surface_by_radius_cm
          remove_initial_surface_by_mass_Msun = s% job% remove_initial_surface_by_mass_Msun
@@ -1595,8 +1579,7 @@
          max_steps_to_relax_angular_momentum = s% job% max_steps_to_relax_angular_momentum
          timescale_for_relax_angular_momentum = s% job% timescale_for_relax_angular_momentum
          max_dt_for_relax_angular_momentum = s% job% max_dt_for_relax_angular_momentum
-         num_timescales_for_relax_angular_momentum = &
-            s% job% num_timescales_for_relax_angular_momentum
+         num_timescales_for_relax_angular_momentum = s% job% num_timescales_for_relax_angular_momentum
          relax_angular_momentum_filename = s% job% relax_angular_momentum_filename
          relax_angular_momentum_constant_omega_center = s% job% relax_angular_momentum_constant_omega_center
          relax_initial_entropy = s% job% relax_initial_entropy
@@ -1641,8 +1624,7 @@
          set_initial_cumulative_energy_error = s% job% set_initial_cumulative_energy_error
          set_cumulative_energy_error = s% job% set_cumulative_energy_error
          set_cumulative_energy_error_at_step = s% job% set_cumulative_energy_error_at_step
-         set_cumulative_energy_error_each_step_if_age_less_than = &
-            s% job% set_cumulative_energy_error_each_step_if_age_less_than
+         set_cumulative_energy_error_each_step_if_age_less_than = s% job% set_cumulative_energy_error_each_step_if_age_less_than
          new_cumulative_energy_error = s% job% new_cumulative_energy_error
          set_cumulative_energy_error_each_relax = s% job% set_cumulative_energy_error_each_relax
          

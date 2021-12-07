@@ -1,7 +1,3 @@
-
-         real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad
-         real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
-         real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap
          
          logical :: compare_TDC_to_MLT
  
@@ -18,7 +14,7 @@
          real(dp) :: RSP2_w_fix_if_neg, RSP2_w_min_for_damping, RSP2_source_seed
          
          logical :: RSP2_use_L_eqn_at_surface, RSP2_assume_HSE, RSP2_report_adjust_w
-         logical :: RSP2_use_RSP_eqn_for_Y_face, include_w_in_correction_limits
+         logical :: RSP2_use_RSP_eqn_for_Y_face
          logical :: RSP2_use_mass_interp_face_values
          logical :: RSP2_use_Stellingwerf_Lr
          integer :: RSP2_num_outermost_cells_forced_nonturbulent, &
@@ -39,7 +35,7 @@
             
             
          
-         logical :: use_superad_reduction
+         logical :: use_superad_reduction, use_mass_corrections
          real(dp) :: &
             superad_reduction_Gamma_limit, &
             superad_reduction_Gamma_limit_scale, &
