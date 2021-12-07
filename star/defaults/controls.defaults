@@ -7682,7 +7682,7 @@
     eps_grav_factor = 1d0
 
       ! fix_eps_grav_transition_to_grid 
-      ! ~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     fix_eps_grav_transition_to_grid = .false.
 
@@ -8428,7 +8428,7 @@
     convergence_ignore_equL_residuals = .false.
 
       ! convergence_ignore_alpha_RTI_residuals
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
