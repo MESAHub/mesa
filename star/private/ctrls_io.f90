@@ -1131,36 +1131,36 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  
  s% limit_overshoot_Hp_using_size_of_convection_zone = limit_overshoot_Hp_using_size_of_convection_zone
 
- s%predictive_mix = predictive_mix
- s%predictive_superad_thresh = predictive_superad_thresh
- s%predictive_avoid_reversal = predictive_avoid_reversal
- s%predictive_limit_ingestion = predictive_limit_ingestion
- s%predictive_ingestion_factor = predictive_ingestion_factor
- s%predictive_zone_type = predictive_zone_type
- s%predictive_zone_loc = predictive_zone_loc
- s%predictive_bdy_loc = predictive_bdy_loc
- s%predictive_bdy_q_min = predictive_bdy_q_min
- s%predictive_bdy_q_max = predictive_bdy_q_max
+ s% predictive_mix = predictive_mix
+ s% predictive_superad_thresh = predictive_superad_thresh
+ s% predictive_avoid_reversal = predictive_avoid_reversal
+ s% predictive_limit_ingestion = predictive_limit_ingestion
+ s% predictive_ingestion_factor = predictive_ingestion_factor
+ s% predictive_zone_type = predictive_zone_type
+ s% predictive_zone_loc = predictive_zone_loc
+ s% predictive_bdy_loc = predictive_bdy_loc
+ s% predictive_bdy_q_min = predictive_bdy_q_min
+ s% predictive_bdy_q_max = predictive_bdy_q_max
 
- s%do_conv_premix = do_conv_premix
- s%conv_premix_avoid_increase = conv_premix_avoid_increase
- s%conv_premix_time_factor = conv_premix_time_factor
- s%conv_premix_fix_pgas = conv_premix_fix_pgas
- s%conv_premix_dump_snapshots = conv_premix_dump_snapshots
- s%do_premix_heating = do_premix_heating
+ s% do_conv_premix = do_conv_premix
+ s% conv_premix_avoid_increase = conv_premix_avoid_increase
+ s% conv_premix_time_factor = conv_premix_time_factor
+ s% conv_premix_fix_pgas = conv_premix_fix_pgas
+ s% conv_premix_dump_snapshots = conv_premix_dump_snapshots
+ s% do_premix_heating = do_premix_heating
 
- s%overshoot_f = overshoot_f
- s%overshoot_f0 = overshoot_f0
- s%overshoot_D0 = overshoot_D0
- s%overshoot_Delta0 = overshoot_Delta0
- s%overshoot_mass_full_on = overshoot_mass_full_on
- s%overshoot_mass_full_off = overshoot_mass_full_off
- s%overshoot_scheme = overshoot_scheme
- s%overshoot_zone_type = overshoot_zone_type
- s%overshoot_zone_loc = overshoot_zone_loc
- s%overshoot_bdy_loc = overshoot_bdy_loc
- s%overshoot_D_min = overshoot_D_min
- s%overshoot_brunt_B_max = overshoot_brunt_B_max
+ s% overshoot_f = overshoot_f
+ s% overshoot_f0 = overshoot_f0
+ s% overshoot_D0 = overshoot_D0
+ s% overshoot_Delta0 = overshoot_Delta0
+ s% overshoot_mass_full_on = overshoot_mass_full_on
+ s% overshoot_mass_full_off = overshoot_mass_full_off
+ s% overshoot_scheme = overshoot_scheme
+ s% overshoot_zone_type = overshoot_zone_type
+ s% overshoot_zone_loc = overshoot_zone_loc
+ s% overshoot_bdy_loc = overshoot_bdy_loc
+ s% overshoot_D_min = overshoot_D_min
+ s% overshoot_brunt_B_max = overshoot_brunt_B_max
 
  s% max_conv_vel_div_csound = max_conv_vel_div_csound
  s% max_v_for_convection = max_v_for_convection
@@ -1201,7 +1201,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_alfat = RSP_alfat
    s% RSP_alfas = RSP_alfas
    s% RSP_alfac = RSP_alfac
-   s% RSP_alfad =  RSP_alfad
+   s% RSP_alfad = RSP_alfad
    s% RSP_gammar = RSP_gammar
    s% RSP_efl0 = RSP_efl0
    s% RSP_min_tau_for_turbulent_flux = RSP_min_tau_for_turbulent_flux
@@ -2461,6 +2461,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% diffusion_dump_call_number = diffusion_dump_call_number
 
+ s% surface_accel_div_grav_limit = surface_accel_div_grav_limit
+ s% steps_before_start_stress_test = steps_before_start_stress_test
+ s% stress_test_relax = stress_test_relax
 
  end subroutine store_controls
 
@@ -2802,36 +2805,36 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  
  limit_overshoot_Hp_using_size_of_convection_zone = s% limit_overshoot_Hp_using_size_of_convection_zone
 
- predictive_mix = s%predictive_mix
- predictive_superad_thresh = s%predictive_superad_thresh
- predictive_avoid_reversal = s%predictive_avoid_reversal
- predictive_limit_ingestion = s%predictive_limit_ingestion
- predictive_ingestion_factor = s%predictive_ingestion_factor
- predictive_zone_type = s%predictive_zone_type
- predictive_zone_loc = s%predictive_zone_loc
- predictive_bdy_loc = s%predictive_bdy_loc
- predictive_bdy_q_min = s%predictive_bdy_q_min
- predictive_bdy_q_max = s%predictive_bdy_q_max
+ predictive_mix = s% predictive_mix
+ predictive_superad_thresh = s% predictive_superad_thresh
+ predictive_avoid_reversal = s% predictive_avoid_reversal
+ predictive_limit_ingestion = s% predictive_limit_ingestion
+ predictive_ingestion_factor = s% predictive_ingestion_factor
+ predictive_zone_type = s% predictive_zone_type
+ predictive_zone_loc = s% predictive_zone_loc
+ predictive_bdy_loc = s% predictive_bdy_loc
+ predictive_bdy_q_min = s% predictive_bdy_q_min
+ predictive_bdy_q_max = s% predictive_bdy_q_max
 
- do_conv_premix = s%do_conv_premix
- conv_premix_avoid_increase = s%conv_premix_avoid_increase
- conv_premix_time_factor = s%conv_premix_time_factor
- conv_premix_fix_pgas = s%conv_premix_fix_pgas
- conv_premix_dump_snapshots = s%conv_premix_dump_snapshots
- do_premix_heating = s%do_premix_heating
+ do_conv_premix = s% do_conv_premix
+ conv_premix_avoid_increase = s% conv_premix_avoid_increase
+ conv_premix_time_factor = s% conv_premix_time_factor
+ conv_premix_fix_pgas = s% conv_premix_fix_pgas
+ conv_premix_dump_snapshots = s% conv_premix_dump_snapshots
+ do_premix_heating = s% do_premix_heating
 
- overshoot_f = s%overshoot_f
- overshoot_f0 = s%overshoot_f0
- overshoot_D0 = s%overshoot_D0
- overshoot_Delta0 = s%overshoot_Delta0
- overshoot_mass_full_on = s%overshoot_mass_full_on
- overshoot_mass_full_off = s%overshoot_mass_full_off
- overshoot_scheme = s%overshoot_scheme
- overshoot_zone_type = s%overshoot_zone_type
- overshoot_zone_loc = s%overshoot_zone_loc
- overshoot_bdy_loc = s%overshoot_bdy_loc
- overshoot_D_min = s%overshoot_D_min
- overshoot_brunt_B_max = s%overshoot_brunt_B_max
+ overshoot_f = s% overshoot_f
+ overshoot_f0 = s% overshoot_f0
+ overshoot_D0 = s% overshoot_D0
+ overshoot_Delta0 = s% overshoot_Delta0
+ overshoot_mass_full_on = s% overshoot_mass_full_on
+ overshoot_mass_full_off = s% overshoot_mass_full_off
+ overshoot_scheme = s% overshoot_scheme
+ overshoot_zone_type = s% overshoot_zone_type
+ overshoot_zone_loc = s% overshoot_zone_loc
+ overshoot_bdy_loc = s% overshoot_bdy_loc
+ overshoot_D_min = s% overshoot_D_min
+ overshoot_brunt_B_max = s% overshoot_brunt_B_max
 
  max_conv_vel_div_csound = s% max_conv_vel_div_csound
  max_v_for_convection = s% max_v_for_convection
@@ -3370,7 +3373,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  implicit_mdot_boost = s% implicit_mdot_boost
  min_years_dt_for_redo_mdot = s% min_years_dt_for_redo_mdot
  surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
- surf_omega_div_omega_crit_tol = S% surf_omega_div_omega_crit_tol
+ surf_omega_div_omega_crit_tol = s% surf_omega_div_omega_crit_tol
  w_div_wcrit_max = s% w_div_wcrit_max
  w_div_wcrit_max2 = s% w_div_wcrit_max2
  fp_min = s% fp_min
@@ -4121,6 +4124,17 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  report_bad_negative_xa = s% report_bad_negative_xa
 
  diffusion_dump_call_number = s% diffusion_dump_call_number
+
+ surface_accel_div_grav_limit = s% surface_accel_div_grav_limit
+ gradT_excess_age_fraction = s% gradT_excess_age_fraction
+ gradT_excess_max_change = s% gradT_excess_max_change
+ hot_wind_scheme = s% hot_wind_scheme
+ cool_wind_full_on_T = s% cool_wind_full_on_T
+ hot_wind_full_on_T = s% hot_wind_full_on_T
+ num_cells_for_smooth_brunt_B = s% num_cells_for_smooth_brunt_B
+ steps_before_start_stress_test = s% steps_before_start_stress_test
+ stress_test_relax = s% stress_test_relax
+ 
 
 
  end subroutine set_controls_for_writing

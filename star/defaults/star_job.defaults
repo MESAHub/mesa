@@ -3099,3 +3099,8 @@
       ! ::
 
     warn_run_star_extras = .true.
+
+      ! do_special_test
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+    do_special_test = .false.

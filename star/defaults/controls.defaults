@@ -3087,6 +3087,7 @@
     RSP_nz_outer = 40
     RSP_T_anchor = 11d3
     RSP_T_inner = 2d6
+    RSP_testing = .false. 
 
       ! ::
 
@@ -7680,6 +7681,11 @@
 
     eps_grav_factor = 1d0
 
+      ! fix_eps_grav_transition_to_grid 
+      ! ~~~~~~~~~~~~~~~
+
+    fix_eps_grav_transition_to_grid = .false.
+
 
       ! velocity_q_upper_bound
       ! ~~~~~~~~~~~~~~~~~~~~~~
@@ -8067,6 +8073,8 @@
     RTI_log_max_boost = 3d0
     RTI_m_full_boost = 4d0
     RTI_m_no_boost = 5d0
+
+    
     
 
 ! solver controls
@@ -8418,6 +8426,13 @@
       ! ::
 
     convergence_ignore_equL_residuals = .false.
+
+      ! convergence_ignore_alpha_RTI_residuals
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    convergence_ignore_alpha_RTI_residuals = .false.
 
 
       ! trace_solver_damping
@@ -11427,6 +11442,8 @@
     use_other_surface_PT = .false.
     use_other_remove_surface = .false.
     use_other_set_pgstar_controls = .false.
+    use_other_accreting_state = .false.
+    use_other_eval_i_rot = .false.
     
       ! ::
 

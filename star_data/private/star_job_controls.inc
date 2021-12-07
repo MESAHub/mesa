@@ -95,7 +95,6 @@
       real(dp) :: dlgL_per_step, relax_L_center_dt
 
       integer :: remove_center_at_cell_k, remove_initial_center_at_cell_k
-      logical :: remove_center_at_max_infall_speed, remove_initial_center_at_cmax_infall_speed
       real(dp) :: remove_center_by_temperature, remove_initial_center_by_temperature
       real(dp) :: remove_center_by_mass_fraction_q, remove_initial_center_by_mass_fraction_q
       real(dp) :: remove_center_by_delta_mass_gm, remove_initial_center_by_delta_mass_gm
@@ -114,8 +113,8 @@
       real(dp) :: remove_center_logRho_limit, remove_fallback_speed_limit
       logical :: remove_initial_center_at_inner_max_abs_v, remove_center_at_inner_max_abs_v, &
          remove_fallback_at_each_step, remove_center_adjust_L_center, &
-         remove_center_set_zero_v_center, remove_initial_fe_core, remove_fe_core, &
-         retain_fallback_at_each_step, fallback_check_total_energy
+         retain_fallback_at_each_step, remove_center_set_zero_v_center, remove_initial_fe_core, remove_fe_core, &
+         fallback_check_total_energy
          
       real(dp) :: limit_center_logP_at_each_step
       real(dp) :: min_q_for_remove_surface_by_v_surf_div_v_escape, &
@@ -286,10 +285,6 @@
       logical :: set_initial_dt, limit_initial_dt
       real(dp) :: years_for_initial_dt, seconds_for_initial_dt
 
-      logical :: set_HELM_OPAL_Zs
-      real(dp) :: Z_all_HELM
-      real(dp) :: Z_all_OPAL
-
       logical :: set_initial_cumulative_energy_error, set_cumulative_energy_error, &
          set_cumulative_energy_error_each_relax
       integer :: set_cumulative_energy_error_at_step
@@ -367,8 +362,6 @@
       character (len=strlen) :: save_pulse_data_filename
 
       character (len=strlen) :: chem_isotopes_filename
-
-      character(len=strlen) :: eos_file_prefix
 
       integer :: extras_lipar, extras_lrpar, extras_lcpar, extras_llpar
       integer :: extras_ipar(max_extras_params)
