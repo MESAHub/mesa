@@ -523,7 +523,7 @@
       ! write_pulse_data_with_profile
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! if true, write pulse info file when writing profile
+      ! If ``.true.``, also save model data in a format compatible with pulsation codes.
 
       ! ::
 
@@ -533,7 +533,35 @@
       ! pulse_data_format
       ! ~~~~~~~~~~~~~~~~~
 
-      ! pulsation code format, e.g., 'FGONG', 'OSC', 'GYRE'
+      ! Format of pulsation data.  Current options (case insensitive) are:
+
+      ! ``'CAFEIN'``
+      !   Format defined for CAFein (`Valsecchi et al. 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...773...39V>`_).
+
+      ! ``'FGONG'``
+      !   Format originally defined for the GONG solar model project.  A
+      !   definition was given in 2005 for the `CoRoT/ESTA project
+      !   <http://www.astro.up.pt/corot/ntools/docs/CoRoT_ESTA_Files.pdf>`_ and
+      !   `GONG itself <https://phys.au.dk/~jcd/solar_models/file-format.pdf>`_.
+      !   MESA's implementation largely follows this subsequent 
+      !   `2015 definition <https://phys.au.dk/~jcd/ASTEC_results/file-format.pdf>`_.
+
+      ! ``'OSC'``
+      !   Format similar to FGONG originally produced for models from CESAM.
+      !   Also defined for the `CoRoT/ESTA project
+      !   <http://www.astro.up.pt/corot/ntools/docs/CoRoT_ESTA_Files.pdf>`_.
+
+      ! ``'GYRE'``
+      !   The `plain-text format defined for GYRE <https://gyre.readthedocs.io/en/stable/ref-guide/stellar-models/mesa-file-format.html>`_, which GYRE itself refers to as ``'MESA'`` format.
+
+      ! ``'GSM'``
+      !   The `HDF5-based format defined for GYRE <https://gyre.readthedocs.io/en/stable/ref-guide/stellar-models/gsm-file-format.html>`_.
+
+      ! ``'SAIO'``
+      !   Format for Saio's pulsation code.
+
+      ! ``'GR1D'``
+      !   Format for GR1D.
 
       ! ::
 
@@ -618,6 +646,8 @@
       ! These are the four lines of arbitrary text that appear at the
       ! beginning of an FGONG file to describe its contents.
 
+      ! ::
+
     fgong_header(1) = 'FGONG file'
     fgong_header(2) = 'Created by MESAstar'
     fgong_header(3) = ''
@@ -629,16 +659,17 @@
       ! The version number for the FGONG file, which can only be 300 or 1300.
       ! 300 gives the old narrow format ``'(1P5E16.9,x)'``, which
       ! can produce numbers with no space separating them.
-      ! 1300 gives the 'wide' FGONG format, as agreed on at the
+      ! 1300 gives the 'wide' FGONG format ``'(1P,5(X,E26.18E3))'``, as agreed on at the
       ! 5th Aarhus RGB workshop (University of Birmingham, UK, October 2015).
 
-    fgong_ivers = 1300
+      ! ::
+
+    fgong_ivers = 1300 ! 300 or 1300 only
 
       ! format_for_OSC_data
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! [FGONG Format Documentation]
-      ! (http://www.astro.up.pt/corot/ntools/docs/CoRoT_ESTA_Files.pdf)
+      ! float format for ``'OSC'`` data format 
 
       ! ::
 
@@ -2296,6 +2327,7 @@
       ! + alpha_TDC_DAMPR : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
       ! + alpha_TDC_PtdVdt : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity.
       ! + steps_before_use_TDC : TDC often struggles with models on the pre-main-sequence. Set this option to pick MLT_option='Cox' for the first several steps to get past the pre-MS. Note that if this option is positive then only either TDC or Cox will be used (depending on model number). THIS OVERRIDES MLT_option!
+
       ! ::
 
       alpha_TDC_DAMP = 1d0
