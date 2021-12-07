@@ -55,6 +55,8 @@ Name changes
 
 * The ``controls`` option ``delta_lgL_phot_limit`` was renamed to ``delta_lgL_power_photo_limit`` ("phot" was easily confused with photosphere instead of photodisintegration).
 
+* The ``controls`` options ``surf_w_div_w_crit_limit`` and ``surf_w_div_w_crit_tol`` were renamed to ``surf_omega_div_omega_crit_limit`` and ``surf_omega_div_omega_crit_tol``
+
 * The core/layer mass values ``c_core_*``, ``c_rich_layer``, and
   ``o_core_*`` have been renamed to ``co_core_*``,
   ``co_rich_layer_*``, and ``one_core_*``.  This better reflects the
@@ -72,6 +74,7 @@ Name changes
 * The history and profile columns ``burn_*`` where replace with ``*_alpha``.
 
 * History, profile, and binary history column files are now case insensitive. 
+
 
 Removed options
 ~~~~~~~~~~~~~~~
