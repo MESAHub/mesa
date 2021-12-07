@@ -4995,6 +4995,7 @@
       ! by ``mdot_revise_factor``, and by adjusting it by ``implicit_mdot_boost*mdot_initial``, where
       ! ``mdot_initial`` is the value of mdot at the first iteration. This is done to deal with mass
       ! accreting stars, where mdot might need to change sign for the star to remain below critical.
+      ! This is a direct replacement for ``surf_w_div_w_crit_limit`` and ``surf_w_div_w_crit_tol``
 
       ! ::
 
