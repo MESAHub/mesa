@@ -129,7 +129,7 @@ contains
       integer, intent(out) :: mixing_type, tdc_num_iters, ierr
       
       type(auto_diff_real_tdc) :: L, A0, c0, L0, Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
-      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, gradL, grada
+      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, gradL, grada, Q0
       integer :: iter, line_iter, i
       logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
       real(dp), parameter :: bracket_tolerance = 1d0
@@ -162,8 +162,8 @@ contains
       ! necessarily have Y < 0.
       Y = 0d0
       call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
-      if (Q > 0d0) then
+         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q0, Af)
+      if (Q0 > 0d0) then
          Y_is_positive = .true.
       else
          Y_is_positive = .false.
@@ -187,11 +187,10 @@ contains
             write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
-            write(*,*) 'Q(Y=0)', Q%val
+            write(*,*) 'Q(Y=0)', Q0%val
             write(*,*) 'scale', scale
-            write(*,*) 'Q/scale', Q%val/scale
+            write(*,*) 'Q/scale', Q0%val/scale
             write(*,*) 'tolerance', residual_tolerance
-            write(*,*) 'dQdZ', dQdZ%val
             write(*,*) 'Y', Y%val
             write(*,*) 'dYdZ', Y%d1val1
             write(*,*) 'exp(Z)', exp(Z%val)
@@ -333,7 +332,7 @@ contains
          !$OMP critical (tdc_crit0)
             write(*,*) 'failed get_TDC_solution TDC_iter', &
                iter
-            write(*,*) 'Q(Y=0)', Q%val
+            write(*,*) 'Q(Y=0)', Q0%val
             write(*,*) 'scale', scale
             write(*,*) 'Q/scale', Q%val/scale
             write(*,*) 'tolerance', residual_tolerance
