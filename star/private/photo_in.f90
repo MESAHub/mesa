@@ -191,7 +191,7 @@
             s% total_steps_finished, s% total_relax_steps_finished, &
             s% num_hydro_merges, s% num_hydro_splits, s% num_solver_setvars, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
-            s% gradT_excess_alpha, s% Teff, s% mstar_dot, &
+            s% gradT_excess_alpha, s% gradT_excess_alpha_old, s% Teff, s% mstar_dot, &
             s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             s% why_Tlim, s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
             s% timestep_hold, s% model_number_for_last_retry, s% model_number_for_last_retry_old, &

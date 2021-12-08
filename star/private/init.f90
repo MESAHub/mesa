@@ -520,7 +520,6 @@
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
          s% mstar_dot = 0
-         s% gradT_excess_alpha_old = 0
          s% surf_lnS = 0
 
          s% termination_code = -1
