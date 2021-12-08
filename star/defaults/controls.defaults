@@ -561,7 +561,7 @@
       !   Format for Saio's pulsation code.
 
       ! ``'GR1D'``
-      !   Format for GR1D.
+      !   Format for GR1D, defined in Sec. 3 of the `GR1D documentation <https://github.com/evanoconnor/GR1D/blob/96aa353b929adaf5cc91aa8f11c6ec81eab3ba8b/docs/README.pdf>`_.
 
       ! ::
 
