@@ -1,0 +1,81 @@
+name: Build MESA
+
+on:
+  push:
+  pull_request:
+  release:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: ["sdk"]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+        with:
+          lfs: true
+      - name: Checkout LFS objects
+        run: |
+          git lfs checkout
+
+      - name: Setup testhub
+        run: |
+          export "MESA_DIR=$(readlink -f ./)"
+          mkdir -p ~/.mesa_test
+          echo --- >> ~/.mesa_test/config.yml
+          echo computer_name: github-${{ runner.os }}-${{ matrix.sdk }} >> ~/.mesa_test/config.yml
+          echo email: "rob@mesa.com" >> ~/.mesa_test/config.yml
+          echo password: "${{ secrets.TESTHUB_PWD }}" >> ~/.mesa_test/config.yml
+          echo logs_token: >> ~/.mesa_test/config.yml
+          echo github_protocol: :ssh >> ~/.mesa_test/config.yml
+          echo mesa_mirror: "$MESA_DIR/mirror" >> ~/.mesa_test/config.yml
+          echo mesa_work: "$MESA_DIR" >> ~/.mesa_test/config.yml
+          echo platform: ${{ runner.os }} >> ~/.mesa_test/config.yml
+          echo platform_version: 'Latest' >> ~/.mesa_test/config.yml
+
+      - name: Install dependencies Linux
+        run: |
+          apt-get -y update
+          apt-get -y install binutils wget make libx11-dev zlib1g zlib1g-dev ruby tcsh
+          gem install mesa_test
+        shell: bash
+
+      - uses: actions/cache@v2
+        id: cache
+        with:
+          path: |
+            mesasdk-x86_64-linux-20.12.1.tar.gz
+          key: ${{ runner.os }}-${{ hashFiles('mesasdk-x86_64-linux-20.12.1.tar.gz') }}
+
+      - name: Get SDK ${{ runner.os }}
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+            wget https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
+        shell: bash
+
+      - name: Unpack SDK ${{ runner.os }}
+        run: |
+            tar xvf mesasdk-x86_64-linux-20.12.1.tar.gz
+        shell: bash
+
+      - name: Compile
+        shell: bash
+        run: |
+          export OMP_NUM_THREADS=1
+          export "MESASDK_ROOT=$(readlink -f mesasdk)"
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          export "MESA_DIR=$(readlink -f ./)"
+          # Everything is run as root so we need to disable the root check in the install script
+          sed -i 's/\${EUID:-\$(id -u)}/1/' install
+          if ! mesa_test install --no-checkout --mesadir=${MESA_DIR} ; then
+            exit 1
+          fi
+          if [ ! -f lib/libbinary.a ];then
+            exit 1
+          fi
+          mesa_test submit -f --empty
