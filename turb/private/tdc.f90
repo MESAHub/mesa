@@ -195,8 +195,6 @@ contains
             write(*,*) 'dYdZ', Y%d1val1
             write(*,*) 'exp(Z)', exp(Z%val)
             write(*,*) 'Z', Z%val
-            write(*,*) 'Af', Af%val
-            write(*,*) 'dAfdZ', Af%d1val1
             write(*,*) 'A0', A0%val
             write(*,*) 'c0', c0%val
             write(*,*) 'L', L%val
