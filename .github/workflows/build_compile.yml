@@ -21,13 +21,16 @@ jobs:
           git lfs checkout
 
       - name: Setup testhub
+        shell: bash
+        env:
+          TESTHUB_PWD: ${{ secrets.TESTHUB_PWD }}
         run: |
           export "MESA_DIR=$(readlink -f ./)"
           mkdir -p ~/.mesa_test
           echo --- >> ~/.mesa_test/config.yml
           echo computer_name: github-${{ runner.os }}-${{ matrix.sdk }} >> ~/.mesa_test/config.yml
           echo email: "r.j.farmer@uva.nl" >> ~/.mesa_test/config.yml
-          echo password: "${{ secrets.TESTHUB_PWD }}" >> ~/.mesa_test/config.yml
+          echo password: "$TESTHUB_PWD" >> ~/.mesa_test/config.yml
           echo logs_token: >> ~/.mesa_test/config.yml
           echo github_protocol: :ssh >> ~/.mesa_test/config.yml
           echo mesa_mirror: "$MESA_DIR/mirror" >> ~/.mesa_test/config.yml
