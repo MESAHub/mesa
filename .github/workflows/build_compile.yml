@@ -37,8 +37,8 @@ jobs:
 
       - name: Install dependencies Linux
         run: |
-          apt-get -y update
-          apt-get -y install binutils wget make libx11-dev zlib1g zlib1g-dev ruby tcsh
+          sudo apt-get -y update
+          sudo apt-get -y install binutils wget make libx11-dev zlib1g zlib1g-dev ruby tcsh
           gem install mesa_test
         shell: bash
 
