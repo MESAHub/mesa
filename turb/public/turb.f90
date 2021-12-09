@@ -98,19 +98,49 @@ module turb
       logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
+      real(dp), parameter :: lower_bound_Z = -2d2
+      real(dp), parameter :: upper_bound_Z = 1d2
+      real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
+      type(auto_diff_real_star_order1) :: Y1, Y2, Y3, cv1, cv2, cv3
       include 'formats'
+
       call get_TDC_solution( &
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
          mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, Y_face, tdc_num_iters, ierr)
+         scale_height, gradL, grada, lower_bound_Z, upper_bound_Z, cv1, Y1, tdc_num_iters, ierr)
       if (ierr /= 0) then
          write(*,*) 'get_TDC_solution failed in set_TDC'
          write(*,*) 'Repeating call with reporting on.'
          call get_TDC_solution( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .true., &
             mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, Y_face, tdc_num_iters, ierr)
+            scale_height, gradL, grada, lower_bound_Z, upper_bound_Z, cv1, Y1, tdc_num_iters, ierr)
+      else if (Y1 < 0d0) then ! Check for non-monotone solutions.
+         ! Search for a solution which has smaller Z than what we found before
+         call get_TDC_solution( &
+            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .false., &
+            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, lower_bound_Z, log(-Y1%val) - eps, cv2, Y2, tdc_num_iters, ierr)
+         if (ierr /= 0) then ! Means we didn't find anything, so we had the right root the first time.
+            Y_face = Y1
+            conv_vel = cv1
+         else ! Found a new root closer to Y=0!
+            ! Check once more, because there are at most three roots.
+            call get_TDC_solution( &
+               conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .false., &
+               mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+               scale_height, gradL, grada, lower_bound_Z, log(-Y2%val) - eps, cv3, Y3, tdc_num_iters, ierr)
+            if (ierr /= 0) then ! Means we didn't find anything, so we had the right root the first time.
+               Y_face = Y2
+               conv_vel = cv2
+            else ! Found a new root closer to Y=0!
+               Y_face = Y3
+               conv_vel = cv3
+            end if
+         end if
       end if
+
+
 
       gradT = Y_face + gradL
       D = conv_vel*scale_height*mixing_length_alpha/3d0     ! diffusion coefficient [cm^2/sec]
