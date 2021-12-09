@@ -1,9 +1,6 @@
 name: Build MESA
 
-on:
-  push:
-  pull_request:
-  release:
+on: [push, pull_request, release]
 
 jobs:
   build:
