@@ -26,7 +26,7 @@ jobs:
           mkdir -p ~/.mesa_test
           echo --- >> ~/.mesa_test/config.yml
           echo computer_name: github-${{ runner.os }}-${{ matrix.sdk }} >> ~/.mesa_test/config.yml
-          echo email: "rob@mesa.com" >> ~/.mesa_test/config.yml
+          echo email: "r.j.farmer@uva.nl" >> ~/.mesa_test/config.yml
           echo password: "${{ secrets.TESTHUB_PWD }}" >> ~/.mesa_test/config.yml
           echo logs_token: >> ~/.mesa_test/config.yml
           echo github_protocol: :ssh >> ~/.mesa_test/config.yml
@@ -52,7 +52,7 @@ jobs:
       - name: Get SDK ${{ runner.os }}
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-            wget https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
+            wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
         shell: bash
 
       - name: Unpack SDK ${{ runner.os }}
