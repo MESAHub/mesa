@@ -859,8 +859,10 @@
          if (.not. s% lxtra(lx_hydro_has_been_on)) then
             s% cumulative_energy_error = 0d0
             s% cumulative_extra_heating = 0d0
-            write(*,*) &
-               "Setting energy conservation error to zero until hydro is turned on for the first time"
+            if(mod(s%model_number, s%terminal_interval) == 0) then
+               write(*,*) &
+                  "Setting energy conservation error to zero until hydro is turned on for the first time"
+            end if
          end if
 
          if (pgstar_flag) then
@@ -903,7 +905,9 @@
             ! material below the escape velocity that has a positive net
             ! total specific energy. 
             if (energy_removed_layers > 0d0) then ! possible to eject material
-               write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
+               if(mod(s%model_number, s%terminal_interval) == 0) then
+                  write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
+               end if
                do k0 = k+1, s% nz
                   denergy = &
                      0.5d0*s% u(k0)*s% u(k0) - s% cgrav(k0)*s% m(k0)/s% r(k0) &
@@ -917,7 +921,9 @@
                         s% dm(k0)*s% u(k0)/sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
                   end if
                end do 
-               write(*,*) "k, q, energy_removed_layers after adjustment is", k, s% q(k), energy_removed_layers
+               if(mod(s%model_number, s%terminal_interval) == 0) then
+                  write(*,*) "k, q, energy_removed_layers after adjustment is", k, s% q(k), energy_removed_layers
+               end if
             end if
 
             avg_v_div_vesc = avg_v_div_vesc/(s% m(1) - s% m(k))
@@ -957,17 +963,19 @@
                end if
             end do
  
-            write(*,*) 'Layers above q=', s% q(k), 'will be removed'
-            write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
-            write(*,*) 'check time left', &
-               s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax - s% time
-            write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1e5
-            write(*,*) 'max c/cs inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)/s% csound(k0:s% nz)))
-            write(*,*) 'average v/vesc outside cutoff', avg_v_div_vesc
-            write(*,*) 'Kinetic plus potential energy outside cutoff', energy_removed_layers
-            write(*,*) 'mass inside cutoff', k, s% m(k)/Msun
-            write(*,*) 'relax counter', s% ixtra(ix_steps_met_relax_cond)
-            write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1e5)
+            if(mod(s%model_number, s%terminal_interval) == 0) then
+               write(*,*) 'Layers above q=', s% q(k), 'will be removed'
+               write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
+               write(*,*) 'check time left', &
+                  s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax - s% time
+               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1e5
+               write(*,*) 'max c/cs inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)/s% csound(k0:s% nz)))
+               write(*,*) 'average v/vesc outside cutoff', avg_v_div_vesc
+               write(*,*) 'Kinetic plus potential energy outside cutoff', energy_removed_layers
+               write(*,*) 'mass inside cutoff', k, s% m(k)/Msun
+               write(*,*) 'relax counter', s% ixtra(ix_steps_met_relax_cond)
+               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1e5)
+            end if
             ! If enough time has passed after a pulse, then turn off Riemann hydro
             ! also, wait for the inner q_for_relax_check of what would remain of the star to be below a threshold
             ! in v/cs, and below a threshold in v
@@ -1112,7 +1120,7 @@
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
          end if
-         if(mod(s%model_number, s%history_interval) == 0) then
+         if(mod(s%model_number, s%terminal_interval) == 0) then
              write(*,*) "check gamma integral", gamma1_integral
          end if
 

@@ -310,7 +310,7 @@
                               ! RECOMMENDED .false.
 
    
-      photo_interval = 10
+      photo_interval = 50
       profile_interval = 100
       history_interval = 1
       terminal_interval = 10
