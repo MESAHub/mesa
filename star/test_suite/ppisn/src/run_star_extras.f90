@@ -1112,7 +1112,9 @@
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
          end if
-         write(*,*) "check gamma integral", gamma1_integral
+         if(mod(s%model_number, s%history_interval) == 0) then
+             write(*,*) "check gamma integral", gamma1_integral
+         end if
 
          if (just_did_relax) then
             extras_start_step = keep_going
