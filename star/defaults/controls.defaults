@@ -8093,6 +8093,16 @@
     RTI_m_no_boost = 5d0
 
     
+      ! retry_for_v_above_clight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If .true., a retry will be triggered at the end of a step
+      ! if the maximum velocity exceeds the speed of light.
+      ! If .false., only a warning is printed.
+
+      ! ::
+
+    retry_for_v_above_clight = .true.
     
 
 ! solver controls

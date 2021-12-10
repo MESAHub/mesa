@@ -13,8 +13,6 @@
    
    use_split_merge_amr = .true.
 
-   max_q_for_convection_with_hydro_on = 0.999d0
-
    max_surface_cell_dq = 1d0
    split_merge_amr_dq_min = 1d-16
 
@@ -22,6 +20,8 @@
 
    restore_mesh_on_retry = .true.
    num_steps_to_hold_mesh_after_retry = 5
+
+   MLT_option = "none"
 
 / ! end of controls namelist
 
