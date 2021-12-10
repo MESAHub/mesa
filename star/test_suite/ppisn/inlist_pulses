@@ -13,7 +13,7 @@
 
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
-   required_termination_code_string = 'Successful test: evolved 10 days past first relax'
+   required_termination_code_string = 'Successful test: evolved 100 days past first relax'
 
    load_saved_model = .true.
    load_model_filename = 'he_dep.mod'
