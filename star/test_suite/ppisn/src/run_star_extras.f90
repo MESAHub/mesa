@@ -820,7 +820,7 @@
             max_center_cell_dq, avg_v_div_vesc, energy_removed_layers, dt_next, dt, &
             max_years_for_timestep, omega_crit, &
             denergy
-         real(dp) :: core_mass, rmax, alfa, log10_r, lburn
+         real(dp) :: core_mass, rmax, alfa, log10_r, lburn_div_lsurf
          logical :: just_did_relax
          character (len=200) :: fname
          include 'formats'
@@ -832,10 +832,13 @@
          !this is used to ensure we read the right inlist options
          s% use_other_before_struct_burn_mix = .true.
 
+         ! be sure power info is stored
+         call star_set_power_info(s)
+
          if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
-            lburn  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
-            if (lburn > 0d0) then
-               if((abs(log10(lburn))) < 0.01 .and. &
+            lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
+            if (lburn_div_lsurf > 0d0) then
+               if((abs(log10(lburn_div_lsurf))) < 0.01 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
                   s% use_other_before_struct_burn_mix = .false.
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
@@ -1251,6 +1254,10 @@
          
          !when L_phot exceeds max_Lphoto_for_lgLnuc_limit, the timestep limit is applied
          !to L_phot instead
+
+         ! be sure power info is stored
+         call star_set_power_info(s)
+
          power_photo = dot_product(s% dm(1:s% nz), s% eps_nuc_categories(iphoto,1:s% nz))/Lsun
          if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit2) then
             s% delta_lgL_nuc_limit = -1d0
