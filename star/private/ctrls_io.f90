@@ -354,6 +354,7 @@
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
+    retry_for_v_above_clight, &
 
     ! hydro solver
     use_gold2_tolerances, gold2_solver_iters_timestep_limit, steps_before_use_gold2_tolerances, &
@@ -1893,6 +1894,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
  s% velocity_q_upper_bound = velocity_q_upper_bound
+
+ s% retry_for_v_above_clight = retry_for_v_above_clight
 
  ! solvers
 
@@ -3557,6 +3560,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
+
+ retry_for_v_above_clight = s% retry_for_v_above_clight
 
  ! solvers
 

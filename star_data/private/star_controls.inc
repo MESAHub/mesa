@@ -820,6 +820,8 @@
             RTI_dm_for_center_eta_nondecreasing, RTI_min_m_for_D_mix_floor, &
             RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost
 
+         logical :: retry_for_v_above_clight
+
          logical :: include_composition_in_eps_grav
          real(dp) :: velocity_logT_lower_bound, &
             max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound
