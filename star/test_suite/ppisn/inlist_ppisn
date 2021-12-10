@@ -55,7 +55,7 @@
 
 &controls
 
-   fill_arrays_with_nans = .true.
+   fill_arrays_with_nans = .false.
    report_solver_progress = .true.
    max_resid_jump_limit = 1d99
 
