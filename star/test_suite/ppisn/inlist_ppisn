@@ -55,8 +55,8 @@
 
 &controls
 
-   fill_arrays_with_nans = .true.
-   report_solver_progress = .true.
+   fill_arrays_with_nans = .false.
+   report_solver_progress = .false.
    max_resid_jump_limit = 1d99
 
    okay_to_remove_mixing_singleton = .false.
@@ -310,10 +310,10 @@
                               ! RECOMMENDED .false.
 
    
-      photo_interval = 10
+      photo_interval = 50
       profile_interval = 100
       history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10
 
 / ! end of controls namelist
 

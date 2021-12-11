@@ -37,7 +37,6 @@
       implicit none
       
       include "test_suite_extras_def.inc"
-      integer :: redo_count
 
       logical :: dbg = .false.
 
@@ -504,7 +503,6 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
          if (.not. restart) then
-            call alloc_extra_info(s)
             s% lxtra(lx_hydro_on) = .false.
             s% lxtra(lx_hydro_has_been_on) = .false.
             s% lxtra(lx_have_saved_gamma_prof) = .false.
@@ -518,11 +516,11 @@
             s% ixtra(ix_num_relaxations) = 0
             s% ixtra(ix_steps_since_relax) = 0
             s% ixtra(ix_steps_since_hydro_on) = 0
+            s% xtra(x_star_age_at_relax) = -1d0
             ! to avoid showing pgstar stuff during initial model creation
             s% pgstar_interval = 100000000
             s% Grid2_file_interval = 100000000
          else ! it is a restart
-            call unpack_extra_info(s)
             if (s% lxtra(lx_hydro_on)) then
                call star_read_controls(id, 'inlist_hydro_on', ierr)
                if (dbg) write(*,*) "check ierr", ierr
@@ -820,9 +818,9 @@
          integer :: k, k0, k1, num_pts, species, model_number, num_trace_history_values
          real(dp) :: v_esc, time, gamma1_integral, integral_norm, tdyn, &
             max_center_cell_dq, avg_v_div_vesc, energy_removed_layers, dt_next, dt, &
-            max_years_for_timestep, omega_crit, log_power_nonnuc_neutrinos, &
+            max_years_for_timestep, omega_crit, &
             denergy
-         real(dp) :: core_mass, rmax, alfa, log10_r
+         real(dp) :: core_mass, rmax, alfa, log10_r, lburn_div_lsurf
          logical :: just_did_relax
          character (len=200) :: fname
          include 'formats'
@@ -834,18 +832,25 @@
          !this is used to ensure we read the right inlist options
          s% use_other_before_struct_burn_mix = .true.
 
-         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams) .and. &
-            ((abs(log10(abs(s% L_nuc_burn_total*Lsun/s% L(1)))) < 0.01 .and. &
-            s% star_age > 1d3) .or. s% center_he4 < 0.98d0)) then
-            s% use_other_before_struct_burn_mix = .false.
-            call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
-               s% job% num_steps_to_relax_rotation, 1d0, ierr)
-            s% use_other_before_struct_burn_mix = .true.
-            if (ierr/=0) then
-               write(*,*) "error when relaxing omega at he ZAMS"
-               stop
+         ! be sure power info is stored
+         call star_set_power_info(s)
+
+         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
+            lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
+            if (lburn_div_lsurf > 0d0) then
+               if((abs(log10(lburn_div_lsurf))) < 0.01 .and. &
+                  (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
+                  s% use_other_before_struct_burn_mix = .false.
+                  call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
+                                                s% job% num_steps_to_relax_rotation, 1d0, ierr)
+                  s% use_other_before_struct_burn_mix = .true.
+                  if (ierr/=0) then
+                     write(*,*) "error when relaxing omega at he ZAMS"
+                     stop
+                  end if
+               s% lxtra(lx_he_zams) = .true.
+               end if
             end if
-            s% lxtra(lx_he_zams) = .true.
          end if
 
          ! Ignore energy checks before first time hydro is turned on
@@ -854,8 +859,10 @@
          if (.not. s% lxtra(lx_hydro_has_been_on)) then
             s% cumulative_energy_error = 0d0
             s% cumulative_extra_heating = 0d0
-            write(*,*) &
-               "Setting energy conservation error to zero until hydro is turned on for the first time"
+            if(mod(s%model_number, s%terminal_interval) == 0) then
+               write(*,*) &
+                  "Setting energy conservation error to zero until hydro is turned on for the first time"
+            end if
          end if
 
          if (pgstar_flag) then
@@ -898,7 +905,9 @@
             ! material below the escape velocity that has a positive net
             ! total specific energy. 
             if (energy_removed_layers > 0d0) then ! possible to eject material
-               write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
+               if(mod(s%model_number, s%terminal_interval) == 0) then
+                  write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
+               end if
                do k0 = k+1, s% nz
                   denergy = &
                      0.5d0*s% u(k0)*s% u(k0) - s% cgrav(k0)*s% m(k0)/s% r(k0) &
@@ -912,7 +921,9 @@
                         s% dm(k0)*s% u(k0)/sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
                   end if
                end do 
-               write(*,*) "k, q, energy_removed_layers after adjustment is", k, s% q(k), energy_removed_layers
+               if(mod(s%model_number, s%terminal_interval) == 0) then
+                  write(*,*) "k, q, energy_removed_layers after adjustment is", k, s% q(k), energy_removed_layers
+               end if
             end if
 
             avg_v_div_vesc = avg_v_div_vesc/(s% m(1) - s% m(k))
@@ -952,17 +963,19 @@
                end if
             end do
  
-            write(*,*) 'Layers above q=', s% q(k), 'will be removed'
-            write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
-            write(*,*) 'check time left', &
-               s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax - s% time
-            write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1e5
-            write(*,*) 'max c/cs inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)/s% csound(k0:s% nz)))
-            write(*,*) 'average v/vesc outside cutoff', avg_v_div_vesc
-            write(*,*) 'Kinetic plus potential energy outside cutoff', energy_removed_layers
-            write(*,*) 'mass inside cutoff', k, s% m(k)/Msun
-            write(*,*) 'relax counter', s% ixtra(ix_steps_met_relax_cond)
-            write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1e5)
+            if(mod(s%model_number, s%terminal_interval) == 0) then
+               write(*,*) 'Layers above q=', s% q(k), 'will be removed'
+               write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
+               write(*,*) 'check time left', &
+                  s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax - s% time
+               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1e5
+               write(*,*) 'max c/cs inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)/s% csound(k0:s% nz)))
+               write(*,*) 'average v/vesc outside cutoff', avg_v_div_vesc
+               write(*,*) 'Kinetic plus potential energy outside cutoff', energy_removed_layers
+               write(*,*) 'mass inside cutoff', k, s% m(k)/Msun
+               write(*,*) 'relax counter', s% ixtra(ix_steps_met_relax_cond)
+               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1e5)
+            end if
             ! If enough time has passed after a pulse, then turn off Riemann hydro
             ! also, wait for the inner q_for_relax_check of what would remain of the star to be below a threshold
             ! in v/cs, and below a threshold in v
@@ -1107,13 +1120,14 @@
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
          end if
-         write(*,*) "check gamma integral", gamma1_integral
+         if(mod(s%model_number, s%terminal_interval) == 0) then
+             write(*,*) "check gamma integral", gamma1_integral
+         end if
 
          if (just_did_relax) then
             extras_start_step = keep_going
             return
          end if
-         log_power_nonnuc_neutrinos = log10(abs(s% power_nonnuc_neutrinos))
 
          if (s% ixtra(ix_steps_since_relax) > 10 .and. .not. just_did_relax .and. .not. s% lxtra(lx_hydro_on) &
             .and. gamma1_integral < min_gamma_sub_43_for_hydro) then
@@ -1250,6 +1264,10 @@
          
          !when L_phot exceeds max_Lphoto_for_lgLnuc_limit, the timestep limit is applied
          !to L_phot instead
+
+         ! be sure power info is stored
+         call star_set_power_info(s)
+
          power_photo = dot_product(s% dm(1:s% nz), s% eps_nuc_categories(iphoto,1:s% nz))/Lsun
          if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit2) then
             s% delta_lgL_nuc_limit = -1d0
@@ -1339,96 +1357,5 @@
 
       end function extras_finish_step
       
-      subroutine alloc_extra_info(s)
-         integer, parameter :: extra_info_alloc = 1
-         type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_alloc)
-      end subroutine alloc_extra_info
-      
-      
-      subroutine unpack_extra_info(s)
-         integer, parameter :: extra_info_get = 2
-         type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_get)
-      end subroutine unpack_extra_info
-      
-      
-      subroutine store_extra_info(s)
-         integer, parameter :: extra_info_put = 3
-         type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_put)
-      end subroutine store_extra_info
-      
-      
-      subroutine move_extra_info(s,op)
-         integer, parameter :: extra_info_alloc = 1
-         integer, parameter :: extra_info_get = 2
-         integer, parameter :: extra_info_put = 3
-         type (star_info), pointer :: s
-         integer, intent(in) :: op
-         
-         integer :: i, j, num_ints, num_dbls, ierr
-         
-         i = 0
-         ! call move_int or move_flg
-         call move_int(redo_count)   
-         num_ints = i
-         
-         i = 0
-         num_dbls = i
-         
-         if (op /= extra_info_alloc) return
-         if (num_ints == 0 .and. num_dbls == 0) return
-         
-         ierr = 0
-         call star_alloc_extras(s% id, num_ints, num_dbls, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in star_alloc_extras'
-            write(*,*) 'alloc_extras num_ints', num_ints
-            write(*,*) 'alloc_extras num_dbls', num_dbls
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         contains
-         
-         subroutine move_dbl(dbl)
-            double precision :: dbl
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               dbl = s% extra_work(i)
-            case (extra_info_put)
-               s% extra_work(i) = dbl
-            end select
-         end subroutine move_dbl
-         
-         subroutine move_int(int)
-            integer :: int
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               int = s% extra_iwork(i)
-            case (extra_info_put)
-               s% extra_iwork(i) = int
-            end select
-         end subroutine move_int
-         
-         subroutine move_flg(flg)
-            logical :: flg
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               flg = (s% extra_iwork(i) /= 0)
-            case (extra_info_put)
-               if (flg) then
-                  s% extra_iwork(i) = 1
-               else
-                  s% extra_iwork(i) = 0
-               end if
-            end select
-         end subroutine move_flg
-      
-      end subroutine move_extra_info
-
       end module run_star_extras
       

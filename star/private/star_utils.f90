@@ -3572,7 +3572,11 @@
          grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
          gradT_actual = safe_div_val(s, dlnT, dlnP) ! mlt has not been called yet when doing this
          brunt_N2 = f*(brunt_B - (gradT_actual - grada_face))
-         tau_conv = 1d0/sqrt(abs(brunt_N2))
+         if(abs(brunt_B) > 0d0) then
+            tau_conv = 1d0/sqrt(abs(brunt_N2))
+         else
+            tau_conv = 0d0
+         end if
       end function conv_time_scale
       
       
