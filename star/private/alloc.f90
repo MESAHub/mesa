@@ -1108,6 +1108,8 @@
             if (failed('brunt_B')) exit
             call do1(s% unsmoothed_brunt_B, c% unsmoothed_brunt_B)
             if (failed('unsmoothed_brunt_B')) exit
+            call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
+            if (failed('smoothed_brunt_B')) exit
             
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit

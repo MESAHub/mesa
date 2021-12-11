@@ -484,6 +484,7 @@
       real(dp), pointer :: brunt_B(:) ! (at points)
          ! this is the Brassard et al B := -(chiY/chiT)*(dlnY/dlnP)
       real(dp), pointer :: unsmoothed_brunt_B(:) ! pre-smoothing
+      real(dp), pointer :: smoothed_brunt_B(:) ! with smoothing applied for gradL
          
          
       ! asteroseismology info

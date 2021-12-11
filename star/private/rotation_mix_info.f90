@@ -590,7 +590,7 @@
             do i = 2, nz-1
                ri0 = (rho(i)*delta(i)/P(i))*pow2(dlnR_domega(i)*grav(i))
                Ri_T(i) = ri0*max(0d0,-gradT_sub_grada(i)) ! turn off Ri_T in convection zones
-               Ri_mu(i) = ri0*f_mu*s% gradL_composition_term(i)
+               Ri_mu(i) = ri0*f_mu*s% smoothed_brunt_B(i)
             end do
             Ri_T(1) = 0; Ri_T(nz) = 0
             Ri_mu(1) = 0; Ri_mu(nz) = 0
@@ -651,7 +651,7 @@
                         ve0(i) = grada(i)*omega(i)*omega(i)*r(i)*r(i)*r(i)*L(i)*bracket_term/denom
                      end if
                      ve_mu(i) = (scale_height(i)/t_kh(i))* &
-                              (f_mu*s% gradL_composition_term(i))/(gradT_sub_grada(i))
+                              (f_mu*s% smoothed_brunt_B(i))/(gradT_sub_grada(i))
                   end if
                   if (is_bad(ve0(i))) then
                      if (s% stop_for_bad_nums) then
@@ -672,7 +672,7 @@
                      write(*,2) 'grada(i)', i, grada(i)
                      write(*,2) 'gradT(i)', i, gradT(i)
                      write(*,2) 'gradT_sub_grada(i)', i, gradT_sub_grada(i)
-                     write(*,2) 's% gradL_composition_term(i)', i, s% gradL_composition_term(i)
+                     write(*,2) 's% smoothed_brunt_B(i)', i, s% smoothed_brunt_B(i)
                      write(*,2) 'omega(i)', i, omega(i)
                      write(*,2) 's% omega(i)', i, s% omega(i)
                      write(*,2) '2*r**2*eps_nuc/L', i, 2*r(i)*r(i)*eps_nuc(i)/max(1d0,L(i))
