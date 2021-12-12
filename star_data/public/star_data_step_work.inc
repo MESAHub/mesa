@@ -181,8 +181,8 @@
       real(dp), pointer :: D_ES(:) ! Eddington-Sweet circulation 
       real(dp), pointer :: D_GSF(:) ! Goldreich-Schubert-Fricke instability
        
-      real(dp), pointer :: D_ST(:) ! Spruit dynamo mixing diffusivity
-      real(dp), pointer :: nu_ST(:) ! Spruit dynamo effective viscosity 
+      real(dp), pointer :: D_ST(:), D_ST_old(:) ! Spruit dynamo mixing diffusivity
+      real(dp), pointer :: nu_ST(:), nu_ST_old(:) ! Spruit dynamo effective viscosity 
       real(dp), pointer :: omega_shear(:) ! max(1d-30,min(1d30,abs(domega_dlnr(k)/omega(k))))
 
       real(dp), pointer :: dynamo_B_r(:) ! magnetic field (Gauss)

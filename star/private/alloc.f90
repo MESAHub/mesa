@@ -384,6 +384,8 @@
          if (failed('xh_old')) return
          call do2D(s, s% xa_old, species, nz, action, ierr)
          if (failed('xa_old')) return
+         call do1D(s, s% q_old, nz, action, ierr)
+         if (failed('q_old')) return
          call do1D(s, s% dq_old, nz, action, ierr)
          if (failed('dq_old')) return
          call do1D(s, s% mlt_vc_old, nz, action, ierr)
@@ -392,6 +394,11 @@
          if (failed('omega_old')) return
          call do1D(s, s% j_rot_old, nz, action, ierr)
          if (failed('j_rot_old')) return
+         ! These are needed for time-smoothing of ST mixing
+         call do1D(s, s% D_ST_old, nz, action, ierr)
+         if (failed('D_ST_old')) return
+         call do1D(s, s% nu_ST_old, nz, action, ierr)
+         if (failed('nu_ST_old')) return
          ierr = 0
 
          contains

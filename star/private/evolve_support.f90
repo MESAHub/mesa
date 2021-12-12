@@ -54,6 +54,9 @@
             call copy_to_old(s% dq, s% dq_old, ierr)
             if (ierr /= 0) return
 
+            call copy_to_old(s% q, s% q_old, ierr)
+            if (ierr /= 0) return
+
             call copy_to_old(s% omega, s% omega_old, ierr)
             if (ierr /= 0) return
 
@@ -61,6 +64,12 @@
             if (ierr /= 0) return
             
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
+            if (ierr /= 0) return
+            
+            call copy_to_old(s% D_ST, s% D_ST_old, ierr)
+            if (ierr /= 0) return
+            
+            call copy_to_old(s% nu_ST, s% nu_ST_old, ierr)
             if (ierr /= 0) return
 
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)

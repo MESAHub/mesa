@@ -58,7 +58,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         real(dp) :: f_mu, q
+         real(dp) :: f_mu, q, D_ST_old, nu_ST_old
          ! the following are all defined at cell boundaries
          real(dp), dimension(:), pointer :: & ! just copies of pointers
             r, m, L, j_rot, gradT, grada, grav, visc, Ri
@@ -79,7 +79,7 @@
          real(dp), allocatable :: smooth_work(:,:), saved(:,:)
          logical, allocatable :: unstable(:,:) ! (num_instabilities, nz)
 
-         integer :: nz, i, j, k, which, op_err
+         integer :: nz, i, j, k, k0, which, op_err
          real(dp) :: alfa, beta, growth_limit, age_fraction, &
             D_omega_source, max_replacement_factor
 
@@ -195,6 +195,29 @@
 
                      call smooth_for_rotation(s, s% D_ST, s% smooth_D_ST, smooth_work(1:nz,which))
                      call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, smooth_work(1:nz,which))
+
+                     ! time smooth for ST only
+                     if (s% generations > 1 .and. s% ST_time_smooth_frac/=1d0) then
+                        k0 = 2
+                        do k=2, nz ! ignore k=1 edge case
+                           if (s% m(k) > s% mstar_old) cycle
+                           if (k==nz) then
+                              D_ST_old = s% D_ST_old(s% nz_old)
+                              nu_ST_old = s% nu_ST_old(s% nz_old)
+                           else
+                              do while (k0 < s% nz_old)
+                                 if (s% m(k)/s% mstar_old > s% q_old(k0)) exit
+                                 k0 = k0+1
+                              end do
+                              ! linear interpolation
+                              alfa = (s% m(k)/s% mstar_old - s% q_old(k0))/(s% q_old(k0-1)-s% q_old(k0))
+                              D_ST_old = (alfa-1)*s% D_ST_old(k0) + alfa*s% D_ST_old(k0-1)
+                              nu_ST_old = (alfa-1)*s% nu_ST_old(k0) + alfa*s% nu_ST_old(k0-1)
+                           end if
+                           s% D_ST(k) = s% ST_time_smooth_frac*s% D_ST(k) + (1-s% ST_time_smooth_frac)*D_ST_old
+                           s% nu_ST(k) = s% ST_time_smooth_frac*s% nu_ST(k) + (1-s% ST_time_smooth_frac)*nu_ST_old
+                        end do
+                     end if
 
                      ! calculate B_r and B_phi
                      do k = 1, nz

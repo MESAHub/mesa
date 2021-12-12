@@ -3924,6 +3924,17 @@
     smooth_am_nu_rot = 3
 
 
+      ! ST_time_smooth_frac
+      ! ~~~~~~~~~~~~~~~~
+
+      ! Temporal smoothing of ST coefficients. if /=1d0, ST mixing coefficient is
+      ! set to ST_time_smooth_frac*new_val+(1-ST_time_smooth_frac)*old_val
+
+      ! ::
+
+    ST_time_smooth_frac = 0.8d0
+
+
       ! simple_i_rot_flag
       ! ~~~~~~~~~~~~~~~~~
 
