@@ -31,7 +31,7 @@
       implicit none
 
       private
-      public :: set_current_to_old, new_generation, output, output_to_file, store_ST_info
+      public :: set_current_to_old, new_generation, output, output_to_file
 
 
       contains
@@ -66,10 +66,10 @@
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
             
-            call copy_to_old(s% D_ST, s% D_ST_old, ierr)
+            call copy_to_old(s% D_ST_start, s% D_ST_start_old, ierr)
             if (ierr /= 0) return
             
-            call copy_to_old(s% nu_ST, s% nu_ST_old, ierr)
+            call copy_to_old(s% nu_ST_start, s% nu_ST_start_old, ierr)
             if (ierr /= 0) return
 
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
@@ -156,50 +156,6 @@
          end subroutine copy_to_old
 
       end subroutine new_generation
-
-      subroutine store_ST_info(s, ierr)
-         use utils_lib
-         type (star_info), pointer :: s
-         integer, intent(out) :: ierr
-         integer :: j, nz
-
-         include 'formats'
-
-         ierr = 0
-         nz = s% nz
-         
-         if (.not. s% rsp_flag) then
-
-            call copy_to_old(s% D_ST, s% D_ST_old, ierr)
-            if (ierr /= 0) return
-            
-            call copy_to_old(s% nu_ST, s% nu_ST_old, ierr)
-            if (ierr /= 0) return
-         
-         end if
-
-         contains
-
-         subroutine copy_to_old(ptr, ptr_old, ierr)
-            real(dp), pointer, dimension(:) :: ptr, ptr_old
-            integer, intent(out) :: ierr
-            logical :: first_time
-            ierr = 0
-            first_time = (.not. associated(ptr_old))
-            call realloc_if_needed_1(ptr_old,nz,nz_alloc_extra,ierr)
-            if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) then
-               call fill_with_NaNs(ptr_old)
-            else if (s% zero_when_allocate) then
-               ptr_old(:) = 0
-            else if (first_time) then
-               ptr_old(1:nz) = -9d99
-            end if
-            do j = 1, s% nz
-               ptr_old(j) = ptr(j)
-            end do
-         end subroutine copy_to_old
-      end subroutine store_ST_info
 
       subroutine set_current_to_old(s)
          use star_utils, only: total_angular_momentum, set_m_and_dm, set_dm_bar, set_qs

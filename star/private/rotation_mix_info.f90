@@ -81,7 +81,8 @@
 
          integer :: nz, i, j, k, k0, which, op_err
          real(dp) :: alfa, beta, growth_limit, age_fraction, &
-            D_omega_source, max_replacement_factor
+            D_omega_source, max_replacement_factor, &
+            dgtau, angsml, angsmt
 
          include 'formats'
 
@@ -197,13 +198,15 @@
                      call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, smooth_work(1:nz,which))
 
                      ! time smooth for ST only
-                     if (s% generations > 1 .and. s% ST_time_smooth_frac/=1d0) then
+                     if (s% generations > 1 .and. s% ST_angsmt>0d0) then
                         k0 = 2
-                        do k=2, nz ! ignore k=1 edge case
+                        angsml = s% ST_angsml
+                        angsmt = s% ST_angsmt
+                        do k=2, nz-1 ! ignore k=1 or nz edge case
                            if (s% m(k) > s% mstar_old) cycle
                            if (k==nz) then
-                              D_ST_old = s% D_ST_old(s% nz_old)
-                              nu_ST_old = s% nu_ST_old(s% nz_old)
+                              D_ST_old = s% D_ST_start_old(s% nz_old)
+                              nu_ST_old = s% nu_ST_start_old(s% nz_old)
                            else
                               do while (k0 < s% nz_old)
                                  if (s% m(k)/s% mstar_old > s% q_old(k0)) exit
@@ -211,12 +214,14 @@
                               end do
                               ! linear interpolation
                               alfa = (s% m(k)/s% mstar_old - s% q_old(k0))/(s% q_old(k0-1)-s% q_old(k0))
-                              D_ST_old = (1d0-alfa)*s% D_ST_old(k0) + alfa*s% D_ST_old(k0-1)
-                              nu_ST_old = (1d0-alfa)*s% nu_ST_old(k0) + alfa*s% nu_ST_old(k0-1)
+                              D_ST_old = (1d0-alfa)*s% D_ST_start_old(k0) + alfa*s% D_ST_start_old(k0-1)
+                              nu_ST_old = (1d0-alfa)*s% nu_ST_start_old(k0) + alfa*s% nu_ST_start_old(k0-1)
                            end if
-                           !write(*,*) "check D_ST",k, s% D_ST(k), D_ST_old, alfa, s% m(k), s% q_old(k0)*s%mstar_old, s% q_old(k0-1)*s%mstar_old
-                           s% D_ST(k) = s% ST_time_smooth_frac*s% D_ST(k) + (1-s% ST_time_smooth_frac)*D_ST_old
-                           s% nu_ST(k) = s% ST_time_smooth_frac*s% nu_ST(k) + (1-s% ST_time_smooth_frac)*nu_ST_old
+                           dgtau = angsml*(s% r(k)-s% r(k+1))*(s% r(k-1)*s% r(k))/s% dt
+                           s% D_ST(k) = max(D_ST_old/(1d0 + angsmt), &
+                              min(s% D_ST(k), max(D_ST_old*(1d0 + angsmt), D_ST_old + dgtau)))
+                           s% nu_ST(k) = max(nu_ST_old/(1d0 + angsmt), &
+                              min(s% nu_ST(k), max(nu_ST_old*(1d0 + angsmt), nu_ST_old + dgtau)))
                         end do
                      end if
 

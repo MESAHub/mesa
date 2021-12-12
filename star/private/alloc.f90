@@ -395,9 +395,9 @@
          call do1D(s, s% j_rot_old, nz, action, ierr)
          if (failed('j_rot_old')) return
          ! These are needed for time-smoothing of ST mixing
-         call do1D(s, s% D_ST_old, nz, action, ierr)
+         call do1D(s, s% D_ST_start_old, nz, action, ierr)
          if (failed('D_ST_old')) return
-         call do1D(s, s% nu_ST_old, nz, action, ierr)
+         call do1D(s, s% nu_ST_start_old, nz, action, ierr)
          if (failed('nu_ST_old')) return
          ierr = 0
 
@@ -811,6 +811,10 @@
             if (failed('D_ST')) exit
             call do1(s% nu_ST, c% nu_ST)
             if (failed('nu_ST')) exit
+            call do1(s% D_ST_start, c% D_ST_start)
+            if (failed('D_ST_start')) exit
+            call do1(s% nu_ST_start, c% nu_ST_start)
+            if (failed('nu_ST_start')) exit
             call do1(s% omega_shear, c% omega_shear)
             if (failed('omega_shear')) exit
 

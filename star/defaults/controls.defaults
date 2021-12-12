@@ -3924,15 +3924,18 @@
     smooth_am_nu_rot = 0
 
 
-      ! ST_time_smooth_frac
+      ! ST_angsmt
       ! ~~~~~~~~~~~~~~~~
+      ! ST_angsml
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Temporal smoothing of ST coefficients. if /=1d0, ST mixing coefficient is
-      ! set to ST_time_smooth_frac*new_val+(1-ST_time_smooth_frac)*old_val
+      ! Temporal smoothing of ST coefficients.
+      ! See rotation_mix_info.f90 for details
 
       ! ::
 
-    ST_time_smooth_frac = 0.5d0
+    ST_angsmt = 0.2d0
+    ST_angsml = 1d-3
 
 
       ! simple_i_rot_flag

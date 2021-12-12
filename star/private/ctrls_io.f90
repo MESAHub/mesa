@@ -281,7 +281,7 @@
     D_visc_factor, D_DSI_factor, D_SH_factor, D_SSI_factor, D_ES_factor, D_GSF_factor, D_ST_factor, &
     am_nu_non_rotation_factor, skip_rotation_in_convection_zones, am_nu_DSI_factor, am_nu_SH_factor,&
     am_nu_SSI_factor, am_nu_ES_factor, am_nu_GSF_factor, am_nu_ST_factor, am_nu_visc_factor, smooth_am_nu_rot, &
-    ST_time_smooth_frac, am_nu_omega_rot_factor, am_nu_omega_non_rot_factor, am_nu_j_rot_factor, am_nu_j_non_rot_factor, &
+    ST_angsml, ST_angsmt, am_nu_omega_rot_factor, am_nu_omega_non_rot_factor, am_nu_j_rot_factor, am_nu_j_non_rot_factor, &
     smooth_nu_ST, smooth_D_ST, smooth_D_SH, smooth_D_DSI, smooth_D_ES, smooth_D_SSI, smooth_D_GSF, smooth_D_omega, &
     do_adjust_J_lost, premix_omega, angular_momentum_error_warn, angular_momentum_error_retry, &
     simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
@@ -1693,7 +1693,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% smooth_D_ES = smooth_D_ES
  s% smooth_D_omega = smooth_D_omega
  s% smooth_am_nu_rot = smooth_am_nu_rot
- s% ST_time_smooth_frac = ST_time_smooth_frac
+ s% ST_angsmt = ST_angsmt
+ s% ST_angsml = ST_angsml
 
  s% simple_i_rot_flag = simple_i_rot_flag
  s% do_adjust_J_lost = do_adjust_J_lost
@@ -3362,7 +3363,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  smooth_D_ES = s% smooth_D_ES
  smooth_D_omega = s% smooth_D_omega
  smooth_am_nu_rot = s% smooth_am_nu_rot
- ST_time_smooth_frac = s% ST_time_smooth_frac
+ ST_angsmt = s% ST_angsmt
+ ST_angsml = s% ST_angsml
 
  simple_i_rot_flag = s% simple_i_rot_flag
  do_adjust_J_lost = s% do_adjust_J_lost

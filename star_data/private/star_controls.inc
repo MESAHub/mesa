@@ -990,7 +990,7 @@
          integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
             smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST, smooth_D_omega, smooth_am_nu_rot
 
-         real(dp) :: ST_time_smooth_frac
+         real(dp) :: ST_angsml, ST_angsmt ! uset for ST time smoothing. See rotation_mix_info.f90 for details
 
          real(dp) :: adjust_J_fraction, min_q_for_adjust_J_lost, &
             min_J_div_delta_J
