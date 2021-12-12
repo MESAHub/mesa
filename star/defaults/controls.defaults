@@ -3932,7 +3932,7 @@
 
       ! ::
 
-    ST_time_smooth_frac = 0.8d0
+    ST_time_smooth_frac = 0.2d0
 
 
       ! simple_i_rot_flag

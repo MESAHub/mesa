@@ -211,9 +211,10 @@
                               end do
                               ! linear interpolation
                               alfa = (s% m(k)/s% mstar_old - s% q_old(k0))/(s% q_old(k0-1)-s% q_old(k0))
-                              D_ST_old = (alfa-1)*s% D_ST_old(k0) + alfa*s% D_ST_old(k0-1)
-                              nu_ST_old = (alfa-1)*s% nu_ST_old(k0) + alfa*s% nu_ST_old(k0-1)
+                              D_ST_old = (1d0-alfa)*s% D_ST_old(k0) + alfa*s% D_ST_old(k0-1)
+                              nu_ST_old = (1d0-alfa)*s% nu_ST_old(k0) + alfa*s% nu_ST_old(k0-1)
                            end if
+                           !write(*,*) "check D_ST",k, s%m(k), s% D_ST(k), D_ST_old, alfa
                            s% D_ST(k) = s% ST_time_smooth_frac*s% D_ST(k) + (1-s% ST_time_smooth_frac)*D_ST_old
                            s% nu_ST(k) = s% ST_time_smooth_frac*s% nu_ST(k) + (1-s% ST_time_smooth_frac)*nu_ST_old
                         end do
