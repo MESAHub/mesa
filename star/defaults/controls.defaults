@@ -3918,10 +3918,10 @@
     smooth_D_SSI = 0
     smooth_D_ES = 0
     smooth_D_GSF = 0
-    smooth_D_ST = 3
-    smooth_nu_ST = 3
-    smooth_D_omega = 3
-    smooth_am_nu_rot = 3
+    smooth_D_ST = 0
+    smooth_nu_ST = 0
+    smooth_D_omega = 0
+    smooth_am_nu_rot = 0
 
 
       ! ST_time_smooth_frac
@@ -3932,7 +3932,7 @@
 
       ! ::
 
-    ST_time_smooth_frac = 0.2d0
+    ST_time_smooth_frac = 0.5d0
 
 
       ! simple_i_rot_flag

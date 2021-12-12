@@ -214,7 +214,7 @@
                               D_ST_old = (1d0-alfa)*s% D_ST_old(k0) + alfa*s% D_ST_old(k0-1)
                               nu_ST_old = (1d0-alfa)*s% nu_ST_old(k0) + alfa*s% nu_ST_old(k0-1)
                            end if
-                           !write(*,*) "check D_ST",k, s%m(k), s% D_ST(k), D_ST_old, alfa
+                           !write(*,*) "check D_ST",k, s% D_ST(k), D_ST_old, alfa, s% m(k), s% q_old(k0)*s%mstar_old, s% q_old(k0-1)*s%mstar_old
                            s% D_ST(k) = s% ST_time_smooth_frac*s% D_ST(k) + (1-s% ST_time_smooth_frac)*D_ST_old
                            s% nu_ST(k) = s% ST_time_smooth_frac*s% nu_ST(k) + (1-s% ST_time_smooth_frac)*nu_ST_old
                         end do

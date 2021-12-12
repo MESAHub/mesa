@@ -2262,7 +2262,7 @@
       integer function finish_step(id, ierr)
          ! returns keep_going or terminate
          ! if don't return keep_going, then set result_reason to say why.
-         use evolve_support, only: output
+         use evolve_support, only: output, store_ST_info
          use profile, only: do_save_profiles
          use history, only: write_history_info
          use utils_lib, only: free_iounit, number_iounits_allocated
@@ -2343,6 +2343,10 @@
          s% screening_mode_value = -1 ! force a new lookup for next step
          s% doing_first_model_of_run = .false.
 
+         call store_ST_info(s, ierr)
+         if (ierr /= 0) then
+            call mesa_error(__FILE__,__LINE__,'finish_step')
+         end if
 
          contains
 
