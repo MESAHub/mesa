@@ -921,11 +921,19 @@
          call smooth(s% grad_density,nz)
          call smooth(s% grad_temperature,nz)
 
+         ! this will compute the values of s% smoothed_brunt_B
+         if (s% calculate_Brunt_B) then
+            do k=1,nz
+               s% smoothed_brunt_B(k) = s% unsmoothed_brunt_B(k)
+            end do
+            call compute_smoothed_brunt_B
+         else
+            s% smoothed_brunt_B(:) = 0d0
+         end if
          if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
             do k=1,nz
-               s% gradL_composition_term(k) = s% unsmoothed_brunt_B(k)
+               s% gradL_composition_term(k) = s% smoothed_brunt_B(k)
             end do
-            call smooth_gradL_composition_term
          else
             do k=1,nz
                s% gradL_composition_term(k) = 0d0
@@ -957,7 +965,7 @@
 
          contains
 
-         subroutine smooth_gradL_composition_term
+         subroutine compute_smoothed_brunt_B
             use star_utils, only: weighed_smoothing, threshold_smoothing
             logical, parameter :: preserve_sign = .false.
             real(dp), pointer, dimension(:) :: work
@@ -967,9 +975,9 @@
             work => dlnd
             if (s% num_cells_for_smooth_gradL_composition_term <= 0) return
             call threshold_smoothing( &
-               s% gradL_composition_term, s% threshold_for_smooth_gradL_composition_term, s% nz, &
+               s% smoothed_brunt_B, s% threshold_for_smooth_gradL_composition_term, s% nz, &
                s% num_cells_for_smooth_gradL_composition_term, preserve_sign, work)
-         end subroutine smooth_gradL_composition_term
+         end subroutine compute_smoothed_brunt_B
 
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr

@@ -4116,6 +4116,7 @@
 
          s% doing_relax = .false.
          s% need_to_setvars = .true. ! just to be safe
+         s% have_ST_start_info = .false. ! for ST time smoothing
 
          if (.not. (s% termination_code == t_relax_finished_okay .or. &
                     s% termination_code == t_extras_check_model)) ierr = -1

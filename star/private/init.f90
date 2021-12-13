@@ -240,6 +240,9 @@
          nullify(s% prev_mesh_omega)
          nullify(s% prev_mesh_dq)
 
+         nullify(s% D_ST_start)
+         nullify(s% prev_mesh_D_ST_start)
+
          nullify(s% other_star_info)
 
          nullify(s% bcyclic_odd_storage)
@@ -516,6 +519,9 @@
          s% okay_to_set_mixing_info = .true.
          s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
          s% have_mlt_vc = .false.
+
+         s% have_ST_start_info = .false.
+         s% prev_mesh_have_ST_start_info = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.

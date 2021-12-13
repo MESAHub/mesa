@@ -142,6 +142,7 @@
          s% eps_mdot(1:nz) = 0
          call fill_ad_with_zeros(s% eps_grav_ad,1,-1)
          s% ergs_error(1:nz) = 0
+         if (.not. restart) s% have_ST_start_info = .false.
          if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
