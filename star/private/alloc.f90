@@ -384,6 +384,8 @@
          if (failed('xh_old')) return
          call do2D(s, s% xa_old, species, nz, action, ierr)
          if (failed('xa_old')) return
+         call do1D(s, s% q_old, nz, action, ierr)
+         if (failed('q_old')) return
          call do1D(s, s% dq_old, nz, action, ierr)
          if (failed('dq_old')) return
          call do1D(s, s% mlt_vc_old, nz, action, ierr)
@@ -812,6 +814,12 @@
             call do1(s% dynamo_B_phi, c% dynamo_B_phi)
             if (failed('dynamo_B_phi')) exit
 
+            !for ST time smoothing
+            call do1(s% D_ST_start, c% D_ST_start)
+            if (failed('D_ST_start')) exit
+            call do1(s% nu_ST_start, c% nu_ST_start)
+            if (failed('nu_ST_start')) exit
+
             call do1(s% opacity, c% opacity)
             if (failed('opacity')) exit
             call do1(s% d_opacity_dlnd, c% d_opacity_dlnd)
@@ -1108,6 +1116,8 @@
             if (failed('brunt_B')) exit
             call do1(s% unsmoothed_brunt_B, c% unsmoothed_brunt_B)
             if (failed('unsmoothed_brunt_B')) exit
+            call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
+            if (failed('smoothed_brunt_B')) exit
             
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
@@ -1370,6 +1380,11 @@
             if (failed('prev_mesh_mlt_vc')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
+            ! These are needed for time-smoothing of ST mixing
+            call do1(s% prev_mesh_D_ST_start, c% prev_mesh_D_ST_start)
+            if (failed('prev_mesh_D_ST_start')) exit
+            call do1(s% prev_mesh_nu_ST_start, c% prev_mesh_nu_ST_start)
+            if (failed('prev_mesh_nu_ST_start')) exit
 
             if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
             return

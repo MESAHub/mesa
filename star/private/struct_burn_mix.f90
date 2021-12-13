@@ -196,6 +196,15 @@
 
          if (do_struct_burn_mix /= keep_going) return
 
+         if (s% rotation_flag) then
+            ! store ST mixing info for time smoothing
+            do k=1, s% nz
+               s% D_ST_start(k) = s% D_ST(k)
+               s% nu_ST_start(k) = s% nu_ST(k)
+            end do
+            s% have_ST_start_info = .true.
+         end if
+
          if (.not. s% j_rot_flag) &
             do_struct_burn_mix = do_mix_omega(s,dt)
 
