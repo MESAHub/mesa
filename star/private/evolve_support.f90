@@ -65,12 +65,6 @@
             
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
-            
-            call copy_to_old(s% D_ST_start, s% D_ST_start_old, ierr)
-            if (ierr /= 0) return
-            
-            call copy_to_old(s% nu_ST_start, s% nu_ST_start_old, ierr)
-            if (ierr /= 0) return
 
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return

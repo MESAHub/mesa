@@ -439,6 +439,12 @@
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
          end do
 
+         ! restore ST info (for time smoothing)
+         do k=1, s% prev_mesh_nz
+            s% prev_mesh_D_ST_start(k) = prv% prev_mesh_D_ST_start(k)
+            s% prev_mesh_nu_ST_start(k) = prv% prev_mesh_nu_ST_start(k)
+         end do
+
          if (s% show_mesh_changes) then
             ! note: do_mesh_adjust can change cell_type from unchanged to revised
             ! so need to recount

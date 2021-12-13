@@ -202,6 +202,7 @@
                s% D_ST_start(k) = s% D_ST(k)
                s% nu_ST_start(k) = s% nu_ST(k)
             end do
+            s% have_ST_start_info = .true.
          end if
 
          if (.not. s% j_rot_flag) &

@@ -1851,6 +1851,16 @@
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
+            ! also store ST information for time smoothing
+            if (s% have_ST_start_info) then
+               do k=1, s% nz
+                  s% prev_mesh_D_ST_start(k) = s% D_ST_start(k)
+                  s% prev_mesh_nu_ST_start(k) = s% nu_ST_start(k)
+               end do
+               s% prev_mesh_have_ST_start_info = .true.
+            else
+               s% prev_mesh_have_ST_start_info = .false.
+            end if
          end if
          
          if (s% okay_to_remesh) then

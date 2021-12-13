@@ -82,7 +82,7 @@
          integer :: nz, i, j, k, k0, which, op_err
          real(dp) :: alfa, beta, growth_limit, age_fraction, &
             D_omega_source, max_replacement_factor, &
-            dgtau, angsml, angsmt
+            dgtau, angsml, angsmt, out_q, prev_out_q, prev_out_q_m1, prev_q, prev_q_m1
 
          include 'formats'
 
@@ -198,25 +198,30 @@
                      call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, smooth_work(1:nz,which))
 
                      ! time smooth for ST only
-                     if (s% generations > 1 .and. s% ST_angsmt>0d0) then
-                        k0 = 2
+                     if (s% prev_mesh_have_ST_start_info .and. .not. s% doing_relax &
+                        .and. .not. s% doing_first_model_of_run .and. s% ST_angsmt>0d0) then
+
+                        k0 = 1
                         angsml = s% ST_angsml
                         angsmt = s% ST_angsmt
+                        prev_out_q = 0d0
+                        prev_q = 1d0
                         do k=2, nz-1 ! ignore k=1 or nz edge case
                            if (s% m(k) > s% mstar_old) cycle
-                           if (k==nz) then
-                              D_ST_old = s% D_ST_start_old(s% nz_old)
-                              nu_ST_old = s% nu_ST_start_old(s% nz_old)
-                           else
-                              do while (k0 < s% nz_old)
-                                 if (s% m(k)/s% mstar_old > s% q_old(k0)) exit
-                                 k0 = k0+1
-                              end do
-                              ! linear interpolation
-                              alfa = (s% m(k)/s% mstar_old - s% q_old(k0))/(s% q_old(k0-1)-s% q_old(k0))
-                              D_ST_old = (1d0-alfa)*s% D_ST_start_old(k0) + alfa*s% D_ST_start_old(k0-1)
-                              nu_ST_old = (1d0-alfa)*s% nu_ST_start_old(k0) + alfa*s% nu_ST_start_old(k0-1)
-                           end if
+                           do while (k0 < s% prev_mesh_nz)
+                              if (s% m(k)/s% mstar_old > prev_q) exit
+                              prev_out_q = prev_out_q + s% prev_mesh_dq(k0)
+                              prev_q = 1d0 - prev_out_q
+                              k0 = k0+1
+                           end do
+                           if (s% m(k)/s% mstar_old < prev_q) exit
+                           prev_out_q_m1 = prev_out_q - s% prev_mesh_dq(k0-1)
+                           prev_q_m1 = 1 - prev_out_q_m1
+
+                           ! linear interpolation
+                           alfa = (s% m(k)/s% mstar_old - prev_q)/(prev_q_m1-prev_q)
+                           D_ST_old = (1d0-alfa)*s% prev_mesh_D_ST_start(k0) + alfa*s% prev_mesh_D_ST_start(k0-1)
+                           nu_ST_old = (1d0-alfa)*s% prev_mesh_nu_ST_start(k0) + alfa*s% prev_mesh_nu_ST_start(k0-1)
                            dgtau = angsml*(s% r(k)-s% r(k+1))*(s% r(k-1)*s% r(k))/s% dt
                            s% D_ST(k) = max(D_ST_old/(1d0 + angsmt), &
                               min(s% D_ST(k), max(D_ST_old*(1d0 + angsmt), D_ST_old + dgtau)))

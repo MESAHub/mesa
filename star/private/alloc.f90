@@ -394,11 +394,6 @@
          if (failed('omega_old')) return
          call do1D(s, s% j_rot_old, nz, action, ierr)
          if (failed('j_rot_old')) return
-         ! These are needed for time-smoothing of ST mixing
-         call do1D(s, s% D_ST_start_old, nz, action, ierr)
-         if (failed('D_ST_old')) return
-         call do1D(s, s% nu_ST_start_old, nz, action, ierr)
-         if (failed('nu_ST_old')) return
          ierr = 0
 
          contains
@@ -811,10 +806,6 @@
             if (failed('D_ST')) exit
             call do1(s% nu_ST, c% nu_ST)
             if (failed('nu_ST')) exit
-            call do1(s% D_ST_start, c% D_ST_start)
-            if (failed('D_ST_start')) exit
-            call do1(s% nu_ST_start, c% nu_ST_start)
-            if (failed('nu_ST_start')) exit
             call do1(s% omega_shear, c% omega_shear)
             if (failed('omega_shear')) exit
 
@@ -822,6 +813,12 @@
             if (failed('dynamo_B_r')) exit
             call do1(s% dynamo_B_phi, c% dynamo_B_phi)
             if (failed('dynamo_B_phi')) exit
+
+            !for ST time smoothing
+            call do1(s% D_ST_start, c% D_ST_start)
+            if (failed('D_ST_start')) exit
+            call do1(s% nu_ST_start, c% nu_ST_start)
+            if (failed('nu_ST_start')) exit
 
             call do1(s% opacity, c% opacity)
             if (failed('opacity')) exit
@@ -1383,6 +1380,11 @@
             if (failed('prev_mesh_mlt_vc')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
+            ! These are needed for time-smoothing of ST mixing
+            call do1(s% prev_mesh_D_ST_start, c% prev_mesh_D_ST_start)
+            if (failed('prev_mesh_D_ST_start')) exit
+            call do1(s% prev_mesh_nu_ST_start, c% prev_mesh_nu_ST_start)
+            if (failed('prev_mesh_nu_ST_start')) exit
 
             if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
             return

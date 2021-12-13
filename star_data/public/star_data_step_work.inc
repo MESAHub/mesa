@@ -183,8 +183,6 @@
        
       real(dp), pointer :: D_ST(:) ! Spruit dynamo mixing diffusivity
       real(dp), pointer :: nu_ST(:) ! Spruit dynamo effective viscosity 
-      real(dp), pointer :: D_ST_start(:), D_ST_start_old(:) ! For time smoothing
-      real(dp), pointer :: nu_ST_start(:), nu_ST_start_old(:) 
       real(dp), pointer :: omega_shear(:) ! max(1d-30,min(1d30,abs(domega_dlnr(k)/omega(k))))
 
       real(dp), pointer :: dynamo_B_r(:) ! magnetic field (Gauss)
