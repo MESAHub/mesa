@@ -84,7 +84,7 @@
          use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
-         use brunt, only: do_brunt_B
+         use brunt, only: do_brunt_B, do_brunt_N2
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
@@ -183,11 +183,18 @@
 
          s% doing_finish_load_model = .true.
 
-         if(s% calculate_Brunt_N2) call do_brunt_B(s, 1, s%nz, ierr)
+         if(s% calculate_Brunt_B) call do_brunt_B(s, 1, s%nz, ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in do_brunt_b'
             return
          end if
+
+         if(s% calculate_Brunt_N2) call do_brunt_N2(s, 1, s%nz, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'finish_load_model: failed in do_brunt_N2'
+            return
+         end if
+
          call do_report(s, ierr)
          s% doing_finish_load_model = .false.
          if (ierr /= 0) then
