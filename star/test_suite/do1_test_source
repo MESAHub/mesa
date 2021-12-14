@@ -10,7 +10,7 @@ do_one pisn "termination code: Star is unbound" "final.mod" skip
 do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
 
 # Slow cases
-do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" auto 
+do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" x150
 do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
 do_one ccsn_IIp "shock has reached target location    1" "shock_part5.mod" auto
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
