@@ -352,7 +352,6 @@
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          s% RSP_flag = BTEST(file_type, bit_for_RSP)
          s% RSP2_flag = BTEST(file_type, bit_for_RSP2)
-         s% have_mlt_vc = BTEST(file_type, bit_for_mlt_vc)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
          
          if (BTEST(file_type, bit_for_lnPgas)) then
