@@ -118,6 +118,12 @@ module turb
             mt1, scale, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, lower_bound_Z, upper_bound_Z, cv1, Y1, i1, ierr)
       else if (Y1 < 0d0) then ! Check for non-monotone solutions.
+         Y_face = Y1
+         conv_vel = cv1
+         mixing_type = mt1
+         tdc_num_iters = i1
+         ierr = 0
+      
          ! Search for a solution which has smaller Z than what we found before
          call get_TDC_solution( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .false., &
