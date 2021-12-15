@@ -820,6 +820,8 @@
             RTI_dm_for_center_eta_nondecreasing, RTI_min_m_for_D_mix_floor, &
             RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost
 
+         logical :: retry_for_v_above_clight
+
          logical :: include_composition_in_eps_grav
          real(dp) :: velocity_logT_lower_bound, &
             max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound
@@ -987,6 +989,8 @@
 
          integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
             smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST, smooth_D_omega, smooth_am_nu_rot
+
+         real(dp) :: ST_angsml, ST_angsmt ! uset for ST time smoothing. See rotation_mix_info.f90 for details
 
          real(dp) :: adjust_J_fraction, min_q_for_adjust_J_lost, &
             min_J_div_delta_J

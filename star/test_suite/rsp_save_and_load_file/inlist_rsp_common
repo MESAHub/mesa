@@ -318,10 +318,10 @@
    ! history_interval to 1 to get maximum time resolution.  
    ! restart the run and let it go for as many periods as desired.   
 
-      num_trace_history_values = 3
+      num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
-      trace_history_value_name(3) = 'rsp_GREKM_avg_abs'
+
       
 
       !terminal_show_age_in_years = .false.

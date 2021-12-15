@@ -3918,10 +3918,24 @@
     smooth_D_SSI = 0
     smooth_D_ES = 0
     smooth_D_GSF = 0
-    smooth_D_ST = 3
-    smooth_nu_ST = 3
-    smooth_D_omega = 3
-    smooth_am_nu_rot = 3
+    smooth_D_ST = 0
+    smooth_nu_ST = 0
+    smooth_D_omega = 0
+    smooth_am_nu_rot = 0
+
+
+      ! ST_angsmt
+      ! ~~~~~~~~~~~~~~~~
+      ! ST_angsml
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Temporal smoothing of ST coefficients.
+      ! See rotation_mix_info.f90 for details
+
+      ! ::
+
+    ST_angsmt = 0.2d0
+    ST_angsml = 1d-3
 
 
       ! simple_i_rot_flag
@@ -8093,6 +8107,16 @@
     RTI_m_no_boost = 5d0
 
     
+      ! retry_for_v_above_clight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If .true., a retry will be triggered at the end of a step
+      ! if the maximum velocity exceeds the speed of light.
+      ! If .false., only a warning is printed.
+
+      ! ::
+
+    retry_for_v_above_clight = .true.
     
 
 ! solver controls

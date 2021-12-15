@@ -40,7 +40,7 @@
       photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10 
 
 ! FOR DEBUGGING
 

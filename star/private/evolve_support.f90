@@ -54,6 +54,9 @@
             call copy_to_old(s% dq, s% dq_old, ierr)
             if (ierr /= 0) return
 
+            call copy_to_old(s% q, s% q_old, ierr)
+            if (ierr /= 0) return
+
             call copy_to_old(s% omega, s% omega_old, ierr)
             if (ierr /= 0) return
 
@@ -147,7 +150,6 @@
          end subroutine copy_to_old
 
       end subroutine new_generation
-
 
       subroutine set_current_to_old(s)
          use star_utils, only: total_angular_momentum, set_m_and_dm, set_dm_bar, set_qs

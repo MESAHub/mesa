@@ -1715,6 +1715,13 @@
          if (ierr /= 0) return
          call set_vars(s, dt, ierr)
       end subroutine star_set_vars
+
+
+      subroutine star_set_power_info(s)
+         use report, only: set_power_info
+         type (star_info), pointer :: s
+         call set_power_info(s)
+      end subroutine star_set_power_info
       
       
       subroutine save_profile(id, priority, ierr)

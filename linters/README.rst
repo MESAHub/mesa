@@ -92,3 +92,9 @@ update_columns.py
 
 Copies the history and profile default columns file into each test case while preserving enabled
 options in each test case
+
+
+fix_inlists.py
+--------------
+
+Fixes various controls in the test_suite inlists that should not be enabled by default.

@@ -58,7 +58,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         real(dp) :: f_mu, q
+         real(dp) :: f_mu, q, D_ST_old, nu_ST_old
          ! the following are all defined at cell boundaries
          real(dp), dimension(:), pointer :: & ! just copies of pointers
             r, m, L, j_rot, gradT, grada, grav, visc, Ri
@@ -79,9 +79,10 @@
          real(dp), allocatable :: smooth_work(:,:), saved(:,:)
          logical, allocatable :: unstable(:,:) ! (num_instabilities, nz)
 
-         integer :: nz, i, j, k, which, op_err
+         integer :: nz, i, j, k, k0, which, op_err
          real(dp) :: alfa, beta, growth_limit, age_fraction, &
-            D_omega_source, max_replacement_factor
+            D_omega_source, max_replacement_factor, &
+            dgtau, angsml, angsmt, out_q, prev_out_q, prev_out_q_m1, prev_q, prev_q_m1
 
          include 'formats'
 
@@ -195,6 +196,39 @@
 
                      call smooth_for_rotation(s, s% D_ST, s% smooth_D_ST, smooth_work(1:nz,which))
                      call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, smooth_work(1:nz,which))
+
+                     ! time smooth for ST only
+                     if (s% prev_mesh_have_ST_start_info .and. .not. s% doing_relax &
+                        .and. .not. s% doing_first_model_of_run .and. s% ST_angsmt>0d0) then
+
+                        k0 = 1
+                        angsml = s% ST_angsml
+                        angsmt = s% ST_angsmt
+                        prev_out_q = 0d0
+                        prev_q = 1d0
+                        do k=2, nz-1 ! ignore k=1 or nz edge case
+                           if (s% m(k) > s% mstar_old) cycle
+                           do while (k0 < s% prev_mesh_nz)
+                              if (s% m(k)/s% mstar_old > prev_q) exit
+                              prev_out_q = prev_out_q + s% prev_mesh_dq(k0)
+                              prev_q = 1d0 - prev_out_q
+                              k0 = k0+1
+                           end do
+                           if (s% m(k)/s% mstar_old < prev_q) exit
+                           prev_out_q_m1 = prev_out_q - s% prev_mesh_dq(k0-1)
+                           prev_q_m1 = 1 - prev_out_q_m1
+
+                           ! linear interpolation
+                           alfa = (s% m(k)/s% mstar_old - prev_q)/(prev_q_m1-prev_q)
+                           D_ST_old = (1d0-alfa)*s% prev_mesh_D_ST_start(k0) + alfa*s% prev_mesh_D_ST_start(k0-1)
+                           nu_ST_old = (1d0-alfa)*s% prev_mesh_nu_ST_start(k0) + alfa*s% prev_mesh_nu_ST_start(k0-1)
+                           dgtau = angsml*(s% r(k)-s% r(k+1))*(s% r(k-1)*s% r(k))/s% dt
+                           s% D_ST(k) = max(D_ST_old/(1d0 + angsmt), &
+                              min(s% D_ST(k), max(D_ST_old*(1d0 + angsmt), D_ST_old + dgtau)))
+                           s% nu_ST(k) = max(nu_ST_old/(1d0 + angsmt), &
+                              min(s% nu_ST(k), max(nu_ST_old*(1d0 + angsmt), nu_ST_old + dgtau)))
+                        end do
+                     end if
 
                      ! calculate B_r and B_phi
                      do k = 1, nz
@@ -590,7 +624,7 @@
             do i = 2, nz-1
                ri0 = (rho(i)*delta(i)/P(i))*pow2(dlnR_domega(i)*grav(i))
                Ri_T(i) = ri0*max(0d0,-gradT_sub_grada(i)) ! turn off Ri_T in convection zones
-               Ri_mu(i) = ri0*f_mu*s% gradL_composition_term(i)
+               Ri_mu(i) = ri0*f_mu*s% smoothed_brunt_B(i)
             end do
             Ri_T(1) = 0; Ri_T(nz) = 0
             Ri_mu(1) = 0; Ri_mu(nz) = 0
@@ -651,7 +685,7 @@
                         ve0(i) = grada(i)*omega(i)*omega(i)*r(i)*r(i)*r(i)*L(i)*bracket_term/denom
                      end if
                      ve_mu(i) = (scale_height(i)/t_kh(i))* &
-                              (f_mu*s% gradL_composition_term(i))/(gradT_sub_grada(i))
+                              (f_mu*s% smoothed_brunt_B(i))/(gradT_sub_grada(i))
                   end if
                   if (is_bad(ve0(i))) then
                      if (s% stop_for_bad_nums) then
@@ -672,7 +706,7 @@
                      write(*,2) 'grada(i)', i, grada(i)
                      write(*,2) 'gradT(i)', i, gradT(i)
                      write(*,2) 'gradT_sub_grada(i)', i, gradT_sub_grada(i)
-                     write(*,2) 's% gradL_composition_term(i)', i, s% gradL_composition_term(i)
+                     write(*,2) 's% smoothed_brunt_B(i)', i, s% smoothed_brunt_B(i)
                      write(*,2) 'omega(i)', i, omega(i)
                      write(*,2) 's% omega(i)', i, s% omega(i)
                      write(*,2) '2*r**2*eps_nuc/L', i, 2*r(i)*r(i)*eps_nuc(i)/max(1d0,L(i))

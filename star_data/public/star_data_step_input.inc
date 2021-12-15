@@ -34,6 +34,10 @@
       real(dp), pointer, dimension(:) :: j_rot ! (nz)
         ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
       real(dp), pointer, dimension(:) :: omega ! (nz)
+
+      real(dp), pointer, dimension(:) :: D_ST_start, prev_mesh_D_ST_start ! For time smoothing
+      real(dp), pointer, dimension(:) :: nu_ST_start, prev_mesh_nu_ST_start
+      logical :: have_ST_start_info, prev_mesh_have_ST_start_info
       
       ! convection
       real(dp), pointer, dimension(:) :: mlt_vc ! (nz)

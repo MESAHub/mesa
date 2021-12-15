@@ -109,8 +109,8 @@
          write(*,1) 'avg from 3.0 to 3.4 Msun'
          call check('logT', avg_val(s% lnT)/ln10, 7.2d0, 8.1d0)
          call check('logRho', avg_val(s% lnd)/ln10, 1d0, 3.0d0)
-         call check('log j_rot', safe_log10(avg_val(s% j_rot)), 15.0d0, 17.0d0)
-         call check('D_ES', safe_log10(avg_val(s% D_ES)), 3.0d0, 6.5d0) 
+         call check('log j_rot', safe_log10(avg_val(s% j_rot)), 14.5d0, 15.5d0)
+         call check('D_ES', safe_log10(avg_val(s% D_ES)), 1d0, 5d0) 
          call check('D_ST', safe_log10(avg_val(s% D_ST)), 0.12d0, 12.0d0)
          call check('nu_ST', safe_log10(avg_val(s% nu_ST)), 8.0d0, 12.0d0)
          write(*,'(A)')
