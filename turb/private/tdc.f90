@@ -112,6 +112,8 @@ contains
    !! @param scale_height The pressure scale-height (cm).
    !! @param gradL The Ledoux temperature gradient dlnT/dlnP
    !! @param grada The adiabatic temperature gradient dlnT/dlnP|s
+   !! @param Zlb Lower bound on Z.
+   !! @param Zub Upper bound on Z.
    !! @param conv_vel The convection speed (cm/s).
    !! @param D The chemical diffusion coefficient (cm^2/s).
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
@@ -120,8 +122,8 @@ contains
    !! @param ierr Tracks errors (output).
    subroutine get_TDC_solution( &
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-         mixing_type, scale, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, conv_vel, Y_face, tdc_num_iters, ierr)
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
+         mixing_type, scale, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, Zlb, Zub
       type(auto_diff_real_star_order1), intent(in) :: &
          L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in
       logical, intent(in) :: report
@@ -170,8 +172,8 @@ contains
       end if
 
       ! We start by bisecting to find a narrow interval around the root.
-      lower_bound_Z = -200d0
-      upper_bound_Z = 100d0 
+      lower_bound_Z = Zlb
+      upper_bound_Z = Zub
 
       Y = set_Y(Y_is_positive, lower_bound_Z)
       call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
@@ -184,6 +186,7 @@ contains
       ! Check to make sure that the lower and upper bounds on Z actually bracket
       ! a solution to Q(Y(Z)) = 0.
       if (Q_lb * Q_ub > 0d0) then
+         if (report) then
             write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
@@ -202,6 +205,7 @@ contains
             write(*,*) 'grada', grada%val
             write(*,*) 'gradL', gradL%val
             write(*,'(A)')
+         end if
          ierr = 1
          return
       end if

@@ -12,7 +12,7 @@
       initial_model_number = 0
 
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-12
+      seconds_for_initial_dt = 1d-9
 
       set_initial_age = .true.
       initial_age = 0
