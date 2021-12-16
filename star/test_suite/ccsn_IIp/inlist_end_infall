@@ -28,7 +28,7 @@
       initial_model_number = 0
 
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-12
+      seconds_for_initial_dt = 1d-9
       
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
