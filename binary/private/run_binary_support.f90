@@ -62,6 +62,8 @@
          use mod_other_binary_edot
          use mod_other_binary_ce
          use mod_other_binary_extras
+         use mod_other_binary_photo_read
+         use mod_other_binary_photo_write
          use binary_timestep
          use binary_history
          use binary_history_specs
@@ -160,8 +162,8 @@
             b% have_star_2 = .true.
          end if
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
 
          result_reason = 0
 
@@ -198,6 +200,9 @@
          b% data_for_extra_binary_history_columns => null_data_for_extra_binary_history_columns
          b% how_many_extra_binary_history_header_items => null_how_many_extra_binary_history_header_items
          b% data_for_extra_binary_history_header_items => null_data_for_extra_binary_history_header_items
+
+         b% other_binary_photo_read => default_other_binary_photo_read
+         b% other_binary_photo_write => default_other_binary_photo_write
          
          b% ignore_hard_limits_this_step = .false.
          
@@ -262,8 +267,8 @@
             
             s% doing_timing = .false.
             
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
 
          end do
 
@@ -275,7 +280,7 @@
          call set_binary_history_columns(b, b% job% binary_history_columns_file, ierr)
 
          if (b% job% show_binary_log_description_at_start .and. .not. doing_restart) then
-            write(*,*)
+            write(*,'(A)')
             call do_show_binary_log_description(id, ierr)
             if (failed('show_log_description',ierr)) return
          end if
@@ -592,11 +597,11 @@
                         if (b% have_star_2) then
                            b% s_accretor => b% s2
                         else
-                           stop 'ERROR: missing star pointer for accretor'
+                           call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for accretor')
                         end if
                      end if
                   else
-                     stop 'ERROR: missing star pointer for donor'
+                     call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for donor')
                   end if
                else
                   if (b% have_star_2) then
@@ -605,11 +610,11 @@
                         if (b% have_star_1) then
                            b% s_accretor => b% s1
                         else
-                           stop 'ERROR: missing star pointer for accretor'
+                           call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for accretor')
                         end if
                      end if
                   else
-                     stop 'ERROR: missing star pointer for donor'
+                     call mesa_error(__FILE__,__LINE__,'ERROR: missing star pointer for donor')
                   end if
                end if
 
@@ -648,7 +653,7 @@
                   if (b% write_header_frequency*b% terminal_interval > 0) then
                      if ( mod(model, b% write_header_frequency*b% terminal_interval) .eq. 0 &
                           .and. .not. b% doing_first_model_of_run) then
-                        write(*,*)
+                        write(*,'(A)')
                         call write_binary_terminal_header(b)
                      end if
                   end if         

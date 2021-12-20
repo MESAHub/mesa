@@ -16,6 +16,35 @@ Backwards-incompatible changes
 
    A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
 
+Changes in r21.12.1
+===================
+
+.. _Backwards-incompatible changes r21.12.1:
+
+Backwards-incompatible changes
+------------------------------
+
+
+.. note::
+
+   A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
+
+
+
+Simplification of energy equation options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The desired form of the MESA energy equation is now selected via the control ``energy_eqn_option``.  The available options are
+``'dedt'`` (default) and ``'eps_grav'``.  See the documentation at :ref:`reference/controls:energy_eqn_option` for more information about these forms.
+
+The controls ``use_dedt_form_of_energy_eqn``, ``always_use_dedt_form_of_energy_eqn``, and ``use_eps_grav_form_of_energy_eqn`` were removed and replaced by the functionality of ``energy_eqn_option``.
+
+Simplifications to the energy equation code mean that this selection applies globally (i.e., to all cells in the model and at all timesteps).
+
+* The per-cell energy equation controls ``max_eta_for_dedt_form_of_energy_eqn`` and ``max_gamma_for_dedt_form_of_energy_eqn`` were removed.
+
+* The form-switching control ``steps_before_always_use_dedt_form_of_energy_eqn`` was removed.
+
 
 Name changes
 ~~~~~~~~~~~~
@@ -25,6 +54,8 @@ Name changes
 * The ``controls`` options ``power_c_burn_{lower,upper}_limit`` were replaced with the more generic ``power_z_burn_{lower,upper}_limit``.
 
 * The ``controls`` option ``delta_lgL_phot_limit`` was renamed to ``delta_lgL_power_photo_limit`` ("phot" was easily confused with photosphere instead of photodisintegration).
+
+* The ``controls`` options ``surf_w_div_w_crit_limit`` and ``surf_w_div_w_crit_tol`` were renamed to ``surf_omega_div_omega_crit_limit`` and ``surf_omega_div_omega_crit_tol``
 
 * The core/layer mass values ``c_core_*``, ``c_rich_layer``, and
   ``o_core_*`` have been renamed to ``co_core_*``,
@@ -42,6 +73,9 @@ Name changes
 
 * The history and profile columns ``burn_*`` where replace with ``*_alpha``.
 
+* History, profile, and binary history column files are now case insensitive. 
+
+
 Removed options
 ~~~~~~~~~~~~~~~
 
@@ -50,9 +84,6 @@ Removed options
 * Removed option ``semiconvection_upper_limit_center_h1``. This can be implemented by setting ``s% alpha_semiconvection`` in ``run_star_extras.f90/extras_start_step``.
 
 * Removed the option ``use_brunt_gradmuX_form``.  Alternative forms of the Brunt can be calculated using the ``other_brunt`` hook.
-
-* Simplifications to the energy equation code resulted in the removal of the per-cell energy equation controls ``max_eta_for_dedt_form_of_energy_eqn`` and ``max_gamma_for_dedt_form_of_energy_eqn`` as well as ``steps_before_always_use_dedt_form_of_energy_eqn``.
-
 
 Removed history and profile columns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,6 +107,22 @@ Hook interface changes
 * ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``, ``eps_he`` or ``eps_z`` as arguments.
 
 
+Auto diff
+~~~~~~~~~
+
+We now make more extensive use of the new ``autodiff`` module for automatically differentiating variables. If you are using a hook
+in your ``run_star_extras.f90`` then you will need to add ``use auto_diff`` to the top of your  ``run_star_extras.f90`` file.
+
+If you see errors such as:
+
+.. code-block:: fortran
+  
+  Error: Cannot convert REAL(8) to TYPE(auto_diff_real_star_order1) at (1)
+
+
+Then this means you are missing the ``use auto_diff`` statement.
+
+An example of using ``autodiff`` in a hook can be found at :ref:`autodiff example`
 
 
 .. _Module-level changes main:
@@ -154,6 +201,14 @@ to
           nl, obs, sigma, freq, freq_corr, inertia)
 
 
+binary
+~~~~~~
+
+There are new hooks ``other_binary_photo_read`` and
+``other_binary_photo_write``.  These allow the user to save/restore
+values in ``run_binary_extras``.
+
+
 eos
 ~~~
 
@@ -185,7 +240,6 @@ from the EOS right before they are returned, after all components have
 been evaluated.  This allows the user make minor modifications to the
 results from the existing EOS without having to provide a full replacement.
 
-
 Two alternative eos module entry points (``eosDT_HELMEOS_get`` and
 ``eosDT_ideal_gas_get``) and the star options that replaced the
 standard eosDT calls to be with these routines
@@ -193,7 +247,6 @@ standard eosDT calls to be with these routines
 significant simplifications of eos_support.  Restriction to a single
 component EOS can be achieved through the eos namelist options and
 replacement of the EOS should be performed through the other hook.
-
 
 The HELM table was updated to a new, larger 100 points per decade
 version.
@@ -206,6 +259,11 @@ HELM and a neutral version (which dropped the electron-positron terms).
 The HELM-related controls ``always_skip_elec_pos`` and
 ``always_include_elec_pos`` were combined in the
 simplified control ``include_elec_pos`` which defaults to ``.true.``.
+
+There is a new backstop EOS (``ideal``) which analytically models an ideal ion gas with radiation pressure.
+The purpose of this EOS is to provide coverage over the whole density-temperature plane for times when MESA needs
+to run to extreme densities or temperatures.
+No electrons are included in this EOS.
 
 
 kap
@@ -342,6 +400,10 @@ Other changes
   options and test cases are not ready for general use.
 
 * The ``ionization`` module has been removed.
+  The ``eval_typical_charge`` routine has been moved into
+  ``mod_typical_charge.f90`` within the ``star`` module.
+  The ``eval_ionization`` routine is no longer
+  supported, as it was untested, undocumented, and unused.
 
 * A new module ``hdf5io`` for working with HDF5 files has been added.
 
@@ -354,11 +416,26 @@ Other changes
 
 * An ``other_screening`` hook was added.
 
-* All parts of test suite cases are now run by default.  To only run
-  the optional inlists, set the environment variable
+* All parts of test suite cases are now run by default.  To skip
+  running the optional inlists, set the environment variable
   ``MESA_SKIP_OPTIONAL`` (to any value).  Previously, optional parts
   were skipped by default, and running all parts required setting
   ``MESA_RUN_OPTIONAL``.
+
+* The headers for history and profile data now contain the value of Msun (grams), Rsun (cm), and Lsun (erg/s) used.
+
+* A bug has been identified and fixed in the ``Brown_Garaud_Stellmach_13``
+  thermohaline mixing routine. The routine was meant to use
+  Newton-Raphson relaxation to converge to a solution for the Nusselt
+  number based on an initial guess from the asymptotic analysis in
+  Appendix B of
+  `Brown, Garaud, & Stellmach (2013) <https://ui.adsabs.harvard.edu/abs/2013ApJ...768...34B>`_.
+  However, a bug previously caused the routine to immediately return the
+  asymptotic guess and skip the NR relaxation step. The asymptotic
+  guess is usually fairly accurate, so this usually still produced a
+  thermohaline result that was fairly close to the right answer, but
+  the bug has been fixed now so that the NR relaxation is applied as
+  well.
 
 
 Changes in r15140
@@ -677,6 +754,22 @@ to ``outputs/sample_#.{profile,fgong}``.
          
       end subroutine extras_after_evolve
 
+turb
+~~~~
+
+This new module implements local theories of turbulence, including
+MLT, TDC, semiconvection, and thermohaline turbulence. These used to be
+a part of ``star``. TDC (which stands for time-dependent convection) is
+now the recommended method for situations where the time dependence of
+convection must be taken into account. Other methods for time dependent
+convection present in the code have been removed, including the options
+min_T_for_acceleration_limited_conv_velocity and set_conv_vel_flag.
+TDC can be turned on with the option ``MLT_option = "TDC"`` in the 
+``controls`` section of an inlist.
+
+Users will not generally
+need to interact with this module, but it can be used within
+run_star_extras by writing ``use turb``.
 
 auto_diff
 ~~~~~~~~~
@@ -1340,3 +1433,465 @@ Other changes
   These properties are used by eps_mdot to compute the contribution of
   accretion to the energy equation. By default (when this hook is not used),
   these properties are all taken from the surface cell.
+
+
+Changes in r12115
+=================
+
+This section describes changes that occurred since r11554.  The
+changes were originally described by `this post
+<https://lists.mesastar.org/pipermail/mesa-users/2019-September/010470.html>`__
+to the MESA Users' mailing list.
+
+Backwards incompatible changes
+------------------------------
+
+Changes to atmospheres
+~~~~~~~~~~~~~~~~~~~~~~
+
+There has been a major overhaul of the atmosphere controls and related
+code.  This improves consistency between the atmosphere and interior
+calculations and offers more flexibility to users.  To learn more,
+please consult the user guide available at
+
+    http://mesa.sourceforge.net/assets/atm-user-guide.txt
+
+Changes to ``s% xtra`` variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The MESA star pointer provides a set of extra variables that can be used
+in run_star_extras.f and are automatically saved and restored during
+retries and backups. The old variables were
+
+* ``s% xtra1``, ``s% xtra2``, ..., etc. for floats,
+* ``s% ixtra1``, ``s% ixtra2``, ..., etc. for integers, and
+* ``s% lxtra1``, ``s% lxtra2``, ..., etc. for logicals (booleans).
+
+These have now been collapsed into arrays (e.g., ``s% xtra(:)``). If you use
+these variables in your ``run_star_extras.f``, you will need to enclose the
+variable number in brackets. E.g., ``s% xtra1`` becomes ``s% xtra(1)``,
+``s% ixtra17`` becomes ``s% ixtra(17)``, etc.
+
+The new scheme allows you to define integers with meaningful names that
+can make it more obvious how an ``xtra`` variable is used. For example, if
+you end up storing some integrated quantity in ``s% xtra(11)``, you could
+define ``i_my_integral = 11`` and then refer to the value as
+``s% xtra(i_my_integral)``.
+
+The ``ppisn`` test suite case provides an example of this usage.
+
+Other changes
+-------------
+
+Changes to WD ``atm`` tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are now 2 options for white dwarf atmosphere tables:
+
+* ``WD_tau_25``: the original WD atmosphere table option for DA (H atmosphere)
+WDs; also found and fixed a bug in the header of this file that was
+causing it to use only a small portion of the actual table
+
+* ``DB_WD_tau_25``: new table for DB (He atmosphere) WDs
+
+
+Changes to header format
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The header format is now taken from the ``star_history_*_format`` and
+``profile_*_format`` variables defined in ``controls.defaults``.  This
+addresses the bug caused by the compiler version string exceeding the
+allowed length of a header column found by some users with the MESA
+SDK and running on macOS.  The default is now 40 characters but this
+can be set to a larger (or smaller) value in ``&controls``.
+
+
+In analogy to the routines in ``run_star_extras.f``,
+``run_binary_extras.f`` now has the routines
+
+::
+
+    how_many_extra_binary_history_header_items
+    data_for_extra_binary_history_header_items
+
+that allow the user to add custom header items to the binary history
+output.
+
+
+New overshooting controls
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We have introduced new, easier to use controls for overshooting, based
+on convection-zone matching criteria.
+
+Use ``overshoot_new = .true.`` to use the new controls.
+
+Note that in a future release, these new controls will become the
+default.  Therefore, when you start new inlists, we recommend that you
+use these new controls.
+
+In the new set of controls, for each convective boundary it is possible
+to define an ``overshoot_zone_type``, ``overshoot_zone_loc`` and an
+``overshoot_bdy_loc`` as well as values for the overshooting parameters.
+
+The permitted values are the following:
+
+* ``overshoot_scheme``: ``'exponential'``, ``'double_exponential'`` or ``'step'``
+* ``overshoot_zone_type``: ``'burn_H'``, ``'burn_He'``, ``'burn_Z'``, ``'nonburn'`` or ``'any'``
+* ``overshoot_zone_loc``: ``'core'``, ``'shell'`` or ``'any'``
+* ``overshoot_bdy_loc``: ``'bottom'``, ``'top'`` or ``'any'``
+
+The following controls assign values for the diffusive or step
+overshooting parameters:
+
+* ``overshoot_f``
+* ``overshoot_f0``
+* ``overshoot_f2``
+
+The following example will apply exponential overshoot, with f = 0.128
+and f0 = 0.100, at the bottom of non-burning convective shells; and
+exponential overshoot, with f = 0.014 and f0 = 0.004, at all other
+convective boundaries.
+
+::
+
+    overshoot_scheme(1) = 'exponential'
+    overshoot_zone_type(1) = 'nonburn'
+    overshoot_zone_loc(1) = 'shell'
+    overshoot_bdy_loc(1) = 'bottom'
+    overshoot_f(1) = 0.128
+    overshoot_f0(1) = 0.100
+
+    overshoot_scheme(2) = 'exponential'
+    overshoot_zone_type(2) = 'any'
+    overshoot_zone_loc(2) = 'any'
+    overshoot_bdy_loc(2) = 'any'
+    overshoot_f(2) = 0.014
+    overshoot_f0(2) = 0.004
+
+Other examples are illustrated in the ``gyre_in_mesa_rsg`` and
+``high_mass`` test_suite cases.
+
+
+Changes in r11554
+=================
+
+This section describes changes that occurred since r11532.  The
+changes were originally described by `this post
+<https://lists.mesastar.org/pipermail/mesa-users/2019-March/009905.html>`__
+to the MESA Users' mailing list.
+
+The release was principally made to quickly fix some memory leaks in r11532.
+Several users saw long-running jobs killed due to
+exhaustion of system memory.  Thanks to Avishai Gilkis for the report.
+
+This release also sets the ``star_job`` control
+``num_steps_for_garbage_collection = 1000``.  Periodically MESA will free some
+memory from data structures that are no longer needed but have not been
+deallocated yet.  At present, this only targets the EOS tables.
+(Implemented by Rob Farmer)
+
+The header of MESA history/profile files now includes information about the
+compiler used and start date of the MESA run. (Implemented by Aaron Dotter)
+
+::
+
+               1           2        3                        4           5
+  version_number    compiler    build         MESA_SDK_version        date
+           11554  "gfortran"  "8.3.0"  "x86_64-linux-20190313"  "20190314"
+
+Changes in r11532
+=================
+
+This section describes changes that occurred since r10398.  The
+changes were originally described by `this post
+<https://lists.mesastar.org/pipermail/mesa-users/2019-March/009842.html>`__
+to the MESA Users' mailing list.
+
+RSP is a new functionality in MESAstar that models the non-linear radial
+stellar pulsations that characterize RR Lyrae, Cepheids, and other classes
+of variable stars. See the ``rsp_*`` examples in the test suite.
+
+We significantly enhance numerical energy conservation capabilities,
+including during mass changes. For example, this enables calculations
+through the He flash that conserve energy to better than 0.001%. Most test
+cases now have this enabled, for instance ``1.3M_ms_high_Z``,
+``25M_pre_ms_to_core_collapse``, and ``wd`` as examples.
+
+To improve the modeling of rotating stars in MESA, we introduce a new
+approach to modifying the pressure and temperature equations of stellar
+structure, and a formulation of the projection effects of gravity
+darkening. The latter are controlled by the ``grav_dark`` options in
+``history_columns.list``;  see ``high_rot_darkening`` for an example of its use.
+
+A new scheme for tracking convective boundaries, called Convective
+Pre-Mixing (CPM), yields reliable values of the convective-core mass, and
+allows the natural emergence of adiabatic semiconvection regions during
+both core hydrogen- and helium-burning phases. Examples for this can be
+found in the inlists provided with the mesa 5 paper.
+
+We have updated the equation of state and nuclear reaction physics modules.
+
+There are an increased number of warnings for when MESA goes beyond the
+validity of the input physics (for instance the nuclear reactions rates
+from REACLIB are ill-defined when logT>10.0). These warnings are controlled
+by the ``warn_*`` options.
+
+The definition of ``eps_nuc`` has slightly changed (see MESA V, Section 3.2) in
+order to be suitable for use with the new energy equation.  If you are
+running models using the ``dLdm`` form that includes ``eps_grav``, you should
+consult the controls option ``include_composition_in_eps_grav`` and its
+associated documentation.
+
+A new set of tests (``gyre_in_mesa_*``) demonstrate how to call GYRE on the fly
+during a MESA run.
+
+The ``astero`` module now allows users to define model parameters
+(``my_param[123]``) that will be optimised in a similar way to the standard
+options (``mass``, ``Y``, ``FeH``, ``alpha``, ``f_ov``). These are defined in the subroutine
+``set_my_params`` in ``run_star_extras.f`` in a similar way to how users can define
+their own observables (``my_var[123]``).
+
+The ``astero`` module now has controls ``normalize_chi2_*`` that allow the user to
+decide whether or not to normalize each component of |chi^2| by the number of
+terms that contributed to that component.
+
+The format of the OP_MONO opacity table cache has changed.  If you have
+used these files in a previous version of MESA then you should do:
+
+::
+
+   rm $MESA_OP_MONO_DATA_CACHE_FILENAME
+
+before installing MESA.  If you use multiple MESA versions, this means that
+you cannot share the cache file between old and new versions.  Therefore,
+you should make sure to use a different cache file in each case. This may
+be more easily accomplished using the controls option
+``op_mono_data_cache_filename`` rather than the environment variable.
+
+The version of GYRE bundled with MESA has been updated to version 5.2.
+
+Binaries can now model “twins”, where we can skip the calculation of the
+companion as its assumed to be identical to the primary. This is controlled
+by the ``binary_job`` parameter ``*_model_twins_flag``.
+
+There is a new way to treat convection in a model, via the
+``convective_velocity_flag``. This adds an equation to solve the velocity of
+convective motion, instead of using the value derived from MLT. This is
+useful for models evolving on fast timescales and is a replacement for
+``min_T_for_acceleration_limited_conv_velocity``.
+
+Two new test cases (``hydro_Ttau_solar`` and ``hydro_Ttau_evolve``) demonstrate the
+use of mixing length parameters and T(τ) relations calibrated to 3D
+radiation-coupled hydrodynamics (RHD) simulations computed by
+`Trampedach et al. (2014) <https://ui.adsabs.harvard.edu/abs/2014MNRAS.442..805T>`_. More details are provided in
+`Mosumgaard et al. (2018) <https://ui.adsabs.harvard.edu/abs/2018MNRAS.478.5650M>`_. MESA
+also includes low-temperature opacity tables that match those used in the
+3D RHD simulations, which can be used by setting ``kappa_lowT_prefix =
+'lowT_rt14_ag89'``.
+
+There have been many bug fixes and performance enhancements to MESA.
+Reports of bugs or suggested improvements are welcome on the mesa-users
+mailing list.
+
+A reminder to please share your inlists and run_star_extras on mesastar.org
+upon publication of your science papers!
+
+
+Changes in r10398
+=================
+
+This section describes changes that occurred since r11554.  The
+changes were originally described by `this post
+<https://lists.mesastar.org/pipermail/mesa-users/2018-March/008812.html>`_
+to the MESA Users' mailing list.
+
+Equation of State: PTEH, DT2, and ELM (Bill)
+--------------------------------------------
+
+Several new options for the mesa/eos have been added, all aiming for
+more accurate partials for the Newton solver.  All of these new eos
+options use bicubic spline interpolation in tables of lnPgas, lnS, and
+lnE as a way to get numerically accurate 1st and 2nd partial
+derivatives with respect to lnRho and lnT.  The partials are directly
+calculated from the interpolating bicubic polynomials to give
+numerical accuracy, but this comes at a cost in thermodynamic
+consistency since the actual thermodynamic relations can only be
+approximated by bicubic splines.
+
+The new eos options are called "PTEH", "DT2", and "ELM".  The PTEH
+tables are created using the approach of
+`Pols, Tout, Eggleton, and Han (1995) <https://ui.adsabs.harvard.edu/abs/1995MNRAS.274..964P>`_
+as implemented by `Paxton (2004) <https://ui.adsabs.harvard.edu/abs/2004PASP..116..699P/abstract>`_
+in a program derived from
+Eggleton’s stellar evolution code (1973).  PTEH extends the mesa/eos
+coverage to lower densities than allowed by OPAL (down to 10^-18 g
+cm^-3) and higher metallicity than covered (OPAL stops at Z = 0.04
+while PTEH covers all Z).  When PTEH is enabled, it is used for low
+densities and for high Z in cases that for lower Z would be handled
+using data from OPAL/SCVH tables.  In the old MESA EOS we fell back to
+HELM to provide approximate results for the cases now covered by PTEH.
+
+The mesa/star default controls enable PTEH for both low densities and high Z.
+
+::
+
+      use_eosPTEH_for_low_density = .true.
+      use_eosPTEH_for_high_Z = .true.
+      Z_for_all_PTEH = 0.040d0
+      Z_for_any_PTEH = 0.039d0
+
+The two remaining new eos options, DT2 and ELM, provide high
+resolution tables in logRho and logT for values from mesa/eos for
+OPAL/SCVH values and for HELM respectively.  These cover a subset of
+the standard eos domain with standard eos results for logPgas, logS,
+and logE in a form suitable for bicubic spline interpolation in order
+to give 1st and 2nd partials with high numerical accuracy. However,
+since use of DT2 and ELM will give decreased thermodynamic consistency
+that might not be compensated for by better residuals, these are both
+disabled by default in mesa/star.
+
+::
+
+      use_eosDT2 = .false.
+      use_eosELM = .false.
+
+Opacities (Josiah, Aaron)
+-------------------------
+
+The opacity module (``kap``) underwent some internal restructuring.
+The ``kap`` module now exposes only a single ``kap_get`` interface
+instead of separate ``kap_get_Type1`` and ``kap_get_Type2``
+subroutines.  This has two user-visible consequences.
+
+* The control ``kappa_type2_logT_lower_bdy`` was removed.  That
+  control was no longer needed, as the existing control
+  ``kappa_blend_logT_lower_bdy`` now also applies to Type2 opacities.  All
+  other related opacity controls (e.g., ``use_Type2_opacities``) remain
+  unchanged in name and behavior.
+* Previously, there were separate "other" hooks for Type1 and Type2
+  opacities.  Now, there is only one hook, ``other_kap_get``.  It has the
+  call signature of the previous Type2 hook, which is a super-set of
+  the arguments to the Type1 hook (see ``star/other/other_kap.f90``).
+
+In previous versions opacities where clipped to the edge values of the
+tables when logR=logRho-3logT+18<-8. This has been replaced for a
+blend to Compton opacities between logR=-7.5 and logR=-8.
+
+
+Element Diffusion (Evan)
+------------------------
+
+Fixed a bug in the ionization treatment for diffusion in the pressure
+ionization routine. This was due to a typo in the original paper that
+presented the ionization scheme. Restored the missing factor of
+rho^1/3 thanks to a later presentation of this same scheme (Dupuis et
+al. 1992) and a note `here
+<http://www1.astrophysik.uni-kiel.de/~koester/astrophysics/astrophysics.html>`_.
+
+Added a user control (``D_mix_ignore_diffusion``) for when to ignore
+element diffusion in surface or core mixing regions. Previously,
+diffusion would be turned off for surface mixing regions of ANY
+strength, even very weak mixing where diffusion might still be
+relevant. Now this control is set to a D_mix of 10⁵ (cm²/s), so that
+mixing that will obviously overwhelm diffusion (like convection) will
+turn it off, but weaker mixing won't.
+
+
+Gravity Darkening (Aaron)
+-------------------------
+
+Added options to include gravity darkening, in the form of projected (surface-averaged) luminosities and effective temperatures of the star viewed along the equator and pole, to the history file.  Assumes the star is an oblate spheroid; see `here <https://github.com/aarondotter/GDit>`_ for more info.
+
+::
+
+      grav_dark_L_polar !Lsun 
+      grav_dark_Teff_polar !K
+      grav_dark_L_equatorial !Lsun 
+      grav_dark_Teff_equatorial !K
+
+
+Isomers (Frank, Josiah, Bill)
+-----------------------------
+
+The isomers of ²⁶Al can now be added to a reaction network. To use
+them, include the isomers in your network specification file. Two
+examples include
+
+::
+
+    add_isos_and_reactions(
+       neut
+        h  1  1     ! hydrogen
+       he  4  4    ! helium
+       mg 25 25 ! magnesium
+       al26-1      ! ground state
+       al26-2      ! meta-stable excited state
+       )
+
+and ::
+
+    include 'mesa_45.net'
+    add_isos_and_reactions(
+      al26-1
+      al26-2
+    )
+    remove_iso(al26)
+
+One may use either ``al26`` or ``al26-1`` and ``al26-2``. Reaction
+rates for the ²⁶Al isomers with other isotopes are picked up from the
+JINA reaclib file. Reaction rates for ``al26-1 <-> al26-2`` are
+from `Gupta & Meyer (2001)
+<http://adsabs.harvard.edu/abs/2001PhRvC..64b5805G>`_ and located in
+``data/rates_data/rate_tables`` along with the new default
+``rate_list.txt`` file.
+
+User-Beware: if you want a local ``rate_tables`` directory,
+http://mesa.sourceforge.net/star_job_defaults.html#rate_tables_dir
+<http://mesa.sourceforge.net/star_job_defaults.html#rate_tables_dir>,
+and you want the ²⁶Al isomers, then the two ``al26-1 <-> al26-2`` rate
+files must be copied from their default location to your local
+rate_tables directory and your local ``rate_list.txt`` modified to include
+these two rates.
+
+
+Installation Debugging (Rob, Josiah)
+------------------------------------
+
+There is a new command, ``$MESA_DIR/help`` which outputs system
+information we need when debugging installation issues and/or MESA
+crashes. ``./install`` will now also log its output to a file
+``$MESA_DIR/build.log``, if you have an installation issue please include
+this file when reporting an issue to mesa-users.
+
+
+Miscellaneous improvements (Rob, Josiah)
+----------------------------------------
+
+You can now use the ``MESA_INLIST`` environment variable to set the
+name of the main inlist file when using MESA binary.
+
+The output cadence of MESA binary has been tweaked to that its
+behavior is the same as MESA star.  (If you use the same options, you
+should get output at the same steps.)
+
+There is now a flag ``b% need_to_update_binary_history_now``, which if
+set forces binary history output to occur at the current step.
+
+
+Run_star_extras (Aaron)
+-----------------------
+
+Put calls to ``extra_header_items`` back into
+``standard_run_star_extras`` and provided working examples of how to
+call all of them.  These are useful for adding extra information to
+the history and profile headers beyond what is provided by default,
+such as including ``mixing_length_alpha`` in the history file header.
+
+
+Building with Other Compilers
+-----------------------------
+
+MESA currently does not compile with ifort.
+Other non-SDK compilers that are known to work (at the bit-for-bit level):
+Gfortran 7.3.1 (fedora 27)

@@ -101,7 +101,6 @@
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use paquette_coeffs, only: initialise_collision_integrals
-         use hydro_rotation, only: init_rotation
          use alloc, only: init_alloc
          character (len=*), intent(in) :: &
             my_mesa_dir, chem_isotopes_filename, net_reaction_filename, &
@@ -136,12 +135,6 @@
             ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in stardata_init'
-            return
-         end if
-
-         call init_rotation(ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in init_rotation'
             return
          end if
 
@@ -246,6 +239,9 @@
          nullify(s% prev_mesh_j_rot)
          nullify(s% prev_mesh_omega)
          nullify(s% prev_mesh_dq)
+
+         nullify(s% D_ST_start)
+         nullify(s% prev_mesh_D_ST_start)
 
          nullify(s% other_star_info)
 
@@ -511,13 +507,11 @@
          s% u_flag = .false.
          s% rotation_flag = .false.
          s% RTI_flag = .false.
-         s% conv_vel_flag = .false.
          s% w_div_wc_flag = .false.
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
          s% RSP2_flag = .false.
-         s% using_TDC = .false.
          
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.
@@ -526,10 +520,12 @@
          s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
          s% have_mlt_vc = .false.
 
+         s% have_ST_start_info = .false.
+         s% prev_mesh_have_ST_start_info = .false.
+
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
          s% mstar_dot = 0
-         s% gradT_excess_alpha_old = 0
          s% surf_lnS = 0
 
          s% termination_code = -1
@@ -946,14 +942,14 @@
                   s% dt_next = 1d-5*secyer
                case (do_create_pre_ms_model)
                   if (s% initial_mass < min_mass_for_create_pre_ms) then
-                     write(*,*)
-                     write(*,*)
-                     write(*,*)
+                     write(*,'(A)')
+                     write(*,'(A)')
+                     write(*,'(A)')
                      write(*,'(a,1x,f5.2)') 'sorry: cannot create pre-ms smaller than', &
                         min_mass_for_create_pre_ms
                      write(*,'(a)') &
                         'please create pre-ms and then relax to lower mass as a separate operation'
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,'(a)') 'here is an example:'
                      write(*,'(a)') 'in your inlist &controls section, set initial_mass = 0.03'
                      write(*,'(a)') 'in the &star_job section, add something like these lines'
@@ -961,9 +957,9 @@
                      write(*,'(a)') '  dlgm_per_step = 1d-3 ! log10(delta M/Msun/step)'
                      write(*,'(a)') '  new_mass = 2.863362d-3 ! 3 Mjupiter in Msun units'
                      write(*,'(a)') '  change_mass_years_for_dt = 1'
-                     write(*,*)
-                     write(*,*)
-                     write(*,*)
+                     write(*,'(A)')
+                     write(*,'(A)')
+                     write(*,'(A)')
                      ierr = -1
                      return
                   end if
@@ -1005,7 +1001,7 @@
                   s% dt_next = 1d-2*secyer
                case (do_create_RSP2_model)
                   !call build_rsp2_model(s, ierr) ! like build_pre_ms_model
-                  stop 'need to add build_rsp2_model'
+                  call mesa_error(__FILE__,__LINE__,'need to add build_rsp2_model')
                   if (ierr /= 0) then
                      write(*,*) 'failed in build_rsp2_model'
                      return
@@ -1127,13 +1123,13 @@
                   1d-3*initial_mass .and. initial_mass > 0) then
                write(*,1) "WARNING -- inlist initial_mass ignored", initial_mass
                write(*,1) "using saved initial_mass instead", s% initial_mass
-               write(*,*)
+               write(*,'(A)')
             end if
             if (abs(initial_z - s% initial_z) > &
                   1d-3*initial_z .and. initial_z > 0) then
                write(*,1) "WARNING -- inlist initial_z ignored", initial_z
                write(*,1) "using saved initial_z instead", s% initial_z
-               write(*,*)
+               write(*,'(A)')
             end if
          end subroutine check_initials
 

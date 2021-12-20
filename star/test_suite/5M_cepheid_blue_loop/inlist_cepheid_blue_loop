@@ -56,7 +56,7 @@
    initial_Y = 0.256d0
    initial_Z = 0.008d0
    
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
 
    mixing_length_alpha = 1.8d0
    MLT_option = 'TDC'
@@ -88,6 +88,7 @@
    predictive_zone_type(2) = 'any'
    predictive_zone_loc(2) = 'surf' 
    predictive_bdy_loc(2) = 'any'
+make_gradr_sticky_in_solver_iters = .true.
 
 	 
 ! for core He-burning, to prevent splitting of the core convection zone and/or core breathing pulses

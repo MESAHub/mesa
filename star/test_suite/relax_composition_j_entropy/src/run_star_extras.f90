@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use utils_lib
       
       implicit none
@@ -220,7 +221,7 @@
          ! it must not include the new column names you are adding here.
 
          ! here is an example for adding a profile column
-         !if (n /= 1) stop 'data_for_extra_profile_columns'
+         !if (n /= 1) call mesa_error(__FILE__,__LINE__,'data_for_extra_profile_columns')
          !names(1) = 'beta'
          !do k = 1, nz
          !   vals(k,1) = s% Pgas(k)/s% P(k)

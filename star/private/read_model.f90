@@ -84,6 +84,7 @@
          use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
+         use brunt, only: do_brunt_B, do_brunt_N2
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
@@ -117,7 +118,10 @@
                !   call set_i_rot_from_omega_and_j_rot(s)
                !else
                   ! need to set w_div_w_crit_roche as well
-                  call use_xh_to_update_i_rot(s)
+               call use_xh_to_update_i_rot(s)
+               do k=1, s% nz
+                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
+               end do
                !end if
             else
                ! need to recompute irot and jrot
@@ -139,6 +143,7 @@
          s% eps_mdot(1:nz) = 0
          call fill_ad_with_zeros(s% eps_grav_ad,1,-1)
          s% ergs_error(1:nz) = 0
+         if (.not. restart) s% have_ST_start_info = .false.
          if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
@@ -177,6 +182,19 @@
          end if
 
          s% doing_finish_load_model = .true.
+
+         if(s% calculate_Brunt_B) call do_brunt_B(s, 1, s%nz, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'finish_load_model: failed in do_brunt_b'
+            return
+         end if
+
+         if(s% calculate_Brunt_N2) call do_brunt_N2(s, 1, s%nz, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'finish_load_model: failed in do_brunt_N2'
+            return
+         end if
+
          call do_report(s, ierr)
          s% doing_finish_load_model = .false.
          if (ierr /= 0) then
@@ -244,9 +262,9 @@
 
          ! refuse to load old models using lnPgas as a structure variable
          if (BTEST(file_type, bit_for_lnPgas)) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
             return
          end if
@@ -290,9 +308,9 @@
          if (abs(tau_factor - s% tau_factor) > tau_factor*1d-9 .and. &
                s% tau_factor /= s% job% set_to_this_tau_factor) then
             ! don't change if just set by inlist
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'WARNING: changing to saved tau_factor =', tau_factor
-            write(*,*)
+            write(*,'(A)')
             s% tau_factor = tau_factor
             s% force_tau_factor = tau_factor
          end if
@@ -300,9 +318,9 @@
          if (abs(Tsurf_factor - s% Tsurf_factor) > Tsurf_factor*1d-9 .and. &
                s% Tsurf_factor /= s% job% set_to_this_Tsurf_factor) then
             ! don't change if just set by inlist
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'WARNING: changing to saved Tsurf_factor =', Tsurf_factor
-            write(*,*)
+            write(*,'(A)')
             s% Tsurf_factor = Tsurf_factor
             s% force_Tsurf_factor = Tsurf_factor
          end if
@@ -310,18 +328,18 @@
          if (abs(opacity_factor - s% opacity_factor) > opacity_factor*1d-9 .and. &
                s% opacity_factor /= s% job% relax_to_this_opacity_factor) then
             ! don't change if just set by inlist
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'WARNING: changing to saved opacity_factor =', opacity_factor
-            write(*,*)
+            write(*,'(A)')
             s% opacity_factor = opacity_factor
             s% force_opacity_factor = opacity_factor
          end if
 
          if (abs(mixing_length_alpha - s% mixing_length_alpha) > mixing_length_alpha*1d-9) then
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'WARNING: model saved with mixing_length_alpha =', mixing_length_alpha
             write(*,1) 'but current setting for mixing_length_alpha =', s% mixing_length_alpha
-            write(*,*)
+            write(*,'(A)')
          end if
          
          s% v_flag = BTEST(file_type, bit_for_velocity)
@@ -334,13 +352,12 @@
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          s% RSP_flag = BTEST(file_type, bit_for_RSP)
          s% RSP2_flag = BTEST(file_type, bit_for_RSP2)
-         s% have_mlt_vc = BTEST(file_type, bit_for_mlt_vc)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
          
          if (BTEST(file_type, bit_for_lnPgas)) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
             return
          end if
@@ -359,7 +376,7 @@
          if (is_bad(s% M_center)) then
             write(*,1) 'M_center mstar xmstar initial_mass', &
                s% M_center, s% mstar, s% xmstar, initial_mass
-            stop 'do_read_saved_model'
+            call mesa_error(__FILE__,__LINE__,'do_read_saved_model')
          end if
 
          call set_net(s, s% net_name, ierr)

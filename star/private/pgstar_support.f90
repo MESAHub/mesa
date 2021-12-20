@@ -186,7 +186,7 @@
             if (p% id_file == 0) then
                if (.not. p% have_called_mkdir .or. &
                     p% file_dir /= p% file_dir_for_previous_mkdir) then
-                  call mkdir(p% file_dir)
+                  if(.not. folder_exists(trim(p% file_dir))) call mkdir(trim(p% file_dir))
                   p% have_called_mkdir = .true.
                   p% file_dir_for_previous_mkdir = p% file_dir
                end if
@@ -995,14 +995,14 @@
                   !ierr = -1
                   !write(*,6) 'failed in get_hist_points: not associated', &
                   !   s% model_number, index, numpts, step_min, step_max
-                  !stop 'get_hist_points'
+                  !call mesa_error(__FILE__,__LINE__,'get_hist_points')
                   return
                end if
                if (size(pg% vals,dim=1) < index) then
                   !ierr = -1
                   !write(*,7) 'failed in get_hist_points: size < index', &
                   !   s% model_number, size(pg% vals,dim=1), index, numpts, step_min, step_max
-                  !stop 'get_hist_points'
+                  !call mesa_error(__FILE__,__LINE__,'get_hist_points')
                   return
                end if
                vec(i) = pg% vals(index)
@@ -1064,7 +1064,7 @@
                write(*,1) 'x00', x00
                write(*,1) 'xp1', xp1
                nullify(v)
-               stop 'find_shock'
+               call mesa_error(__FILE__,__LINE__,'find_shock')
             end if
          end if
          nullify(v)

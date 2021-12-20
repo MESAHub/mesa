@@ -232,7 +232,7 @@
 
 ! stop
       if (string(1:2) .eq. '-1') then
-       stop 'normal termination'
+       call mesa_error(__FILE__,__LINE__,'normal termination')
 
 ! read the conditions
       else
@@ -279,7 +279,7 @@
  
 
 ! write out the mass fraction changes
-         write(6,*)
+         write(6,'(A)')
          write(6,24) 'd(h1)/dt   =',dxdt(net_iso(ih1)), 'd(he4)/dt  =',dxdt(net_iso(ihe4)), 'd(c12)/dt  =',dxdt(net_iso(ic12)), 'd(n14)/dt  =',dxdt(net_iso(in14))
          write(6,24) 'd(o16)/dt  =',dxdt(net_iso(io16)), 'd(ne20)/dt =',dxdt(net_iso(ine20)), 'd(mg24)/dt =',dxdt(net_iso(img24))
 

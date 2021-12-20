@@ -26,6 +26,7 @@ module run_star_extras
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use gyre_lib
 
       implicit none
@@ -143,7 +144,7 @@ module run_star_extras
          amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
             write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
          end if
          velkm = s% x_ctrl(6) ! s% RSP_kick_vsurf_km_per_sec
          amixF = 1d0 - (amix1 + amix2)
@@ -152,7 +153,7 @@ module run_star_extras
             write(*,3) 'amixF > 0d0 .and. npts(1) /= nz-1', npts(1)
             write(*,*) 'cannot use fundamental for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
             ierr = -1
             return
          end if
@@ -161,7 +162,7 @@ module run_star_extras
             write(*,3) 'AMIX1 > 0d0 .and. npts(2) /= nz-1', npts(2)
             write(*,*) 'cannot use 1st overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
             ierr = -1
             return
          end if
@@ -170,7 +171,7 @@ module run_star_extras
             write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3)
             write(*,*) 'cannot use 2nd overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'
-            stop 'set_gyre_linear_analysis'
+            call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
             ierr = -1
             return
          end if

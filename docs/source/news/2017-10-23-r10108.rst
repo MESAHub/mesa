@@ -1,0 +1,14 @@
+=============
+Release 10108
+=============
+
+:Date:   2017-10-23
+
+Revision 10108 has been designated a MESA release version.
+
+The full release notes are available in `this mailing list
+post <https://lists.mesastar.org/pipermail/mesa-users/2017-October/008135.html>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r10108.zip/download>`__
+is available for download.

@@ -69,15 +69,15 @@
          if (Y < 0) then ! adjust XC and XO
             if (XC + XO <= 0) then
                write(*,*) 'bad args to Init_Composition'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             frac = (1 - X - Zinit) / (XC + XO)
-            if (frac <= 0) stop 'bad args to Init_Composition'
+            if (frac <= 0) call mesa_error(__FILE__,__LINE__,'bad args to Init_Composition')
             XC = frac*XC; XO = frac*XO
             Y = 1 - (X+Zinit+XC+XO)
             if (Y < -1d-10) then
                write(*,*) 'screw up in Init_Composition'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             if (Y < 0) Y = 0
          end if
@@ -111,14 +111,14 @@
          allocate(d_dxa(num_eos_d_dxa_results,species),stat=info)
          if (info /= 0) then
             write(*,*) 'allocate failed for Setup_eos'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          my_mesa_dir = '../..'
          call const_init(my_mesa_dir,info)
          if (info /= 0) then
             write(*,*) 'const_init failed'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          call math_init()
@@ -126,7 +126,7 @@
          call chem_init('isotopes.data', info)
          if (info /= 0) then
             write(*,*) 'chem_init failed'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          use_cache = .true.
@@ -134,20 +134,20 @@
          call eos_init(' ', use_cache, info)
          if (info /= 0) then
             write(*,*) 'failed in eos_init'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          eos_names = eosDT_result_names
 
          handle = alloc_eos_handle_using_inlist('inlist', info)
          if (info /= 0) then
             write(*,*) 'failed in alloc_eos_handle_using_inlist'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
 
          call eos_ptr(handle,rq,info)
          if (info /= 0) then
             write(*,*) 'failed in eos_ptr'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
       
       end subroutine Setup_eos

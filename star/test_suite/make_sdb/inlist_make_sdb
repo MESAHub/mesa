@@ -62,7 +62,7 @@
       when_to_stop_rtol = 1d-3
       when_to_stop_atol = 1d-5
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -77,7 +77,7 @@
       photo_interval = 50
       profile_interval = 50
       history_interval = 5
-      terminal_interval = 5
+      terminal_interval = 10 
       
       !trace_k = 0
 

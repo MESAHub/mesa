@@ -118,7 +118,7 @@
                   'failed in eval_eps_grav_and_partials', k, eps_grav% val
             end if
             if (s% stop_for_bad_nums) then
-               stop 'eval1_eps_grav_and_partials'
+               call mesa_error(__FILE__,__LINE__,'eval1_eps_grav_and_partials')
             end if
             return
          end if
@@ -201,7 +201,7 @@
             s% retry_message = 'do_lnd_eps_grav -- bad value for eps_grav'
             if (s% report_ierr) &
                write(*,2) 'do_lnd_eps_grav -- bad value for eps_grav', k, eps_grav% val
-            if (s% stop_for_bad_nums) stop 'do_lnd_eps_grav'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnd_eps_grav')
             return
          end if
 
@@ -234,18 +234,31 @@
 
          eps_grav = -T*(entropy - entropy_start)/s% dt
 
-         if (s% include_composition_in_eps_grav) then
-            call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
-            if (ierr /= 0) return
-            eps_grav = eps_grav + eps_grav_composition_term
-         end if
+         ! NOTE: the correct version of the composition term to go with TdS is
+         !     -sum_i (\partial e/\partial Y_i)_{s,\rho} dY_i
+         ! see for example, MESA IV, equation (59)
+         !
+         ! When on PC near crystallization (the only place the lnS form is used)
+         ! there are typically no composition changes, so we drop this term
+         !
+         ! The term we normally use comes from expanding in the (rho,T,X) basis
+         !     -sum_ (\partial e/\partial X_i)_{T,\rho} dX_i
+         ! and in practice can be a reasonable approximation to the above.
+         !
+         ! If an such approximation is desired, one could use the following code:
+
+         ! if (s% include_composition_in_eps_grav) then
+         !    call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
+         !    if (ierr /= 0) return
+         !    eps_grav = eps_grav + eps_grav_composition_term
+         ! end if
 
          if (is_bad(eps_grav% val)) then
             ierr = -1
             s% retry_message = 'do_lnS_eps_grav -- bad value for eps_grav'
             if (s% report_ierr) &
                write(*,2) 'do_lnS_eps_grav -- bad value for eps_grav', k, eps_grav% val
-            if (s% stop_for_bad_nums) stop 'do_lnS_eps_grav'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnS_eps_grav')
             return
          end if
 
@@ -277,9 +290,6 @@
          ierr = 0
 
          eps_grav_composition_term = 0
-
-         ! for now, bail if in new material
-         if (k < s% k_below_just_added) return
 
          if (s% use_time_centered_eps_grav) then
             theta = 0.5_dp
@@ -362,6 +372,8 @@
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0)
 
          ! add easy access to this quantity in star
@@ -381,11 +393,11 @@
           if (s% report_ierr) write(*, *) s% retry_message
             if (s% report_ierr) then
                write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
-               !stop 'eval_eps_grav_composition'
+               !call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             if (s% stop_for_bad_nums) then
                write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val
-               stop 'eval_eps_grav_composition'
+               call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             return
          end if

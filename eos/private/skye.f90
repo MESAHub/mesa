@@ -30,17 +30,13 @@ module skye
          type(auto_diff_real_2var_order1) :: p(2), blend, dist
 
          ! Blend parameters
-         real(dp) :: big
          real(dp) :: skye_blend_width
          integer, parameter :: num_points = 8
          real(dp) :: bounds(8,2)
          type (Helm_Table), pointer :: ht
 
          ierr = 0
-
          ht => eos_ht 
-
-         big = 12d0
          skye_blend_width = 0.1d0
 
          ! Avoid catastrophic loss of precision in HELM tables
@@ -230,7 +226,7 @@ module skye
                write(*,1) 'abar', abar
                write(*,1) 'zbar', zbar
                write(*,1) 'X', X
-               stop 'Get_Skye_EOS_Results'
+               call mesa_error(__FILE__,__LINE__,'Get_Skye_EOS_Results')
             end if
             return
          end if     

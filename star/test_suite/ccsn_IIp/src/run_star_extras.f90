@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use utils_lib, only: mesa_error, is_bad
             
       implicit none
@@ -183,7 +184,7 @@
          ierr = 0
          i_o16 = s% net_iso(io16)
          if (i_o16 <= 0) then
-            stop 'need to have o16 in net for set_nico_mass'
+            call mesa_error(__FILE__,__LINE__,'need to have o16 in net for set_nico_mass')
          end if
          nz = s% nz
          species = s% species
@@ -247,7 +248,7 @@
                min_m = max(min_m, s% M_center)
                if (min_m >= max_m) then
                   write(*,1) 'min_m >= max_m', min_m/Msun, max_m/Msun, s% M_center/Msun
-                  stop 'set_nico_mass'
+                  call mesa_error(__FILE__,__LINE__,'set_nico_mass')
                end if
                new_ni_frac = new_ni*Msun/(max_m - min_m)
                write(*,1) 'new_ni_frac min_m/Msun max_m/Msun', new_ni_frac, min_m/Msun, max_m/Msun
@@ -266,7 +267,7 @@
                   jmax = maxloc(s% xa(1:species,k),dim=1)
                   if (s% xa(jmax,k) < new_ni_frac) then
                      write(*,2) 'too much ni for cell', k
-                     stop 'set_nico_mass'
+                     call mesa_error(__FILE__,__LINE__,'set_nico_mass')
                   end if
                   s% xa(i_ni56,k) = new_ni_frac*dm/s% dm(k)
                   s% xa(jmax,k) = s% xa(jmax,k) - s% xa(i_ni56,k)
@@ -278,10 +279,10 @@
             mass_ni56 = dot_product(s% dm(1:nz), s% xa(i_ni56,1:nz))/Msun
             if (abs(mass_ni56 - new_ni) > 1d-6*new_ni) then
                write(*,1) 'bad new ni', new_ni, mass_ni56
-               stop 'set_nico_mass'
+               call mesa_error(__FILE__,__LINE__,'set_nico_mass')
             end if
             write(*,1) 'new ni56 mass', mass_ni56
-            !stop 'set_nico_mass'
+            !call mesa_error(__FILE__,__LINE__,'set_nico_mass')
             return
          end if
          
@@ -323,7 +324,7 @@
          nico_change = new_ni - old_nico
          if (new_ni < 0d0) then
             write(*,1) 'new_ni', new_ni
-            stop 'bad mass set_nico_mass set_nico_mass'
+            call mesa_error(__FILE__,__LINE__,'bad mass set_nico_mass set_nico_mass')
          end if
          alfa_nico = new_ni/old_nico
          do k=1,kcut
@@ -340,7 +341,7 @@
                s% xa(j,k) = s% xa(j,k) - dxnico
                if (s% xa(j,k) <= 0d0) then
                   write(*,3) 'failed in set_nico_mass', j, k, s% xa(j,k), dxnico
-                  stop 'set_nico_mass'
+                  call mesa_error(__FILE__,__LINE__,'set_nico_mass')
                end if
             end if
          end do
@@ -348,7 +349,7 @@
          if (abs(check_ni56 - new_ni) > 1d-10*max(1d-10,new_ni)) then
             write(*,1) 'check_ni56 - new_ni', check_ni56 - new_ni, check_ni56, new_ni
             write(*,1) 'alfa_nico', alfa_nico
-            stop 'bad check mass in set_nico_mass'
+            call mesa_error(__FILE__,__LINE__,'bad check mass in set_nico_mass')
          end if
          mass_ni56 = new_ni
          write(*,1) 'revised mass Ni56', check_ni56
@@ -372,7 +373,7 @@
          open(unit=io1, file=trim(file_in), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(file_in)
-            stop 'create_sedona_Lbol_file'
+            call mesa_error(__FILE__,__LINE__,'create_sedona_Lbol_file')
             return
          end if
          open(io2, file=trim(file_out), action='write', iostat=ierr)
@@ -393,7 +394,7 @@
                read(io1,*) time, freq_i00, Lnu_i00
                if (time /= time0) then
                   write(*,*) 'time /= time0', time, time0
-                  stop 'create_sedona_Lbol_file'
+                  call mesa_error(__FILE__,__LINE__,'create_sedona_Lbol_file')
                end if
                Lbol = Lbol + 0.5d0*(Lnu_i00 + Lnu_im1)*(freq_i00 - freq_im1)
             end do
@@ -407,7 +408,7 @@
          write(*,*) 'done'
          write(*,*) 'edit file to put number of times in 1st line', n
          write(*,*) trim(file_out)
-         stop 'create_sedona_Lbol_file'
+         call mesa_error(__FILE__,__LINE__,'create_sedona_Lbol_file')
       
       end subroutine create_sedona_Lbol_file
       
@@ -461,14 +462,14 @@
          o16 = s% net_iso(io16)
          he4 = s% net_iso(ihe4)
          h1 = s% net_iso(ih1)
-         if (o16 <= 0 .or. he4 <= 0 .or. h1 <= 0) stop 'missing o16, he4, or h1'
+         if (o16 <= 0 .or. he4 <= 0 .or. h1 <= 0) call mesa_error(__FILE__,__LINE__,'missing o16, he4, or h1')
          
          if (s% eos_rq% logRho_min_OPAL_SCVH_limit > -12d0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*)'FIX: have set_logRho_OPAL_SCVH_limits too large'
             write(*,*) 'causes errors in HELM/OPAL blend partials'
-            write(*,*)
-            stop 'extras_startup'
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'extras_startup')
          end if
          
          if (restart) then
@@ -573,7 +574,7 @@
                      end if
                   end do
                   if (stop_m == 0d0) then
-                     if (s% x_ctrl(99) <= 0d0) stop 'failed to find stop_m'
+                     if (s% x_ctrl(99) <= 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
                      stop_m = s% x_ctrl(99)
                   end if
                case (2)
@@ -594,7 +595,7 @@
                      end do
                   end if
                   if (stop_m == 0d0) then
-                     if (s% x_ctrl(99) <= 0d0) stop 'failed to find stop_m'
+                     if (s% x_ctrl(99) <= 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
                      stop_m = s% x_ctrl(99)
                   end if
                case (3)
@@ -604,7 +605,7 @@
                         exit
                      end if
                   end do
-                  if (stop_m == 0d0) stop 'failed to find stop_m'
+                  if (stop_m == 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
                case (4)
                   stop_m = s% star_mass - s% x_ctrl(16)
                case (5)
@@ -621,14 +622,14 @@
          write(*,1) 'start_m', start_m
          write(*,1) 'stop_m', stop_m
          
-         !if (stop_m < start_m) stop 'bad stop_m'
+         !if (stop_m < start_m) call mesa_error(__FILE__,__LINE__,'bad stop_m')
          
          if (s% x_ctrl(16) > 0d0) &
                stop_m = min(stop_m, s% star_mass - s% x_ctrl(16))
          
          if (start_m > stop_m .and. stop_m > 0d0) then
             write(*,1) 'start_m > stop_m', start_m, stop_m
-            stop 'extras_startup'
+            call mesa_error(__FILE__,__LINE__,'extras_startup')
          end if
 
          if (stop_m > 0d0) then
@@ -638,7 +639,7 @@
             write(*,1) 's% co_core_mass', s% co_core_mass
             write(*,1) 's% M_center/Msun', s% M_center/Msun
             write(*,1) 's% star_mass', s% star_mass
-            write(*,*)
+            write(*,'(A)')
             !stop
          end if
          
@@ -660,7 +661,7 @@
                      logTs(i) = logT
                   else if (logT /= logTs(i)) then
                      write(*,3) 'bad T?', i, j, Ts(1), temperature, density, eta
-                     stop 'table error?'
+                     call mesa_error(__FILE__,__LINE__,'table error?')
                   end if
                   tau_sob_f(1,j,i) = eta
                end do
@@ -729,7 +730,7 @@
                logT_tol = 1d-5
                logP_tol = 1d-8
                k = kk
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% Peos(k), &
                   log10(s% r(k)/Rsun), s% u(k)
                do k = kk-1, 1, -1
@@ -790,9 +791,9 @@
                   write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% Peos(k), &
                      log10(s% r(k)/Rsun), s% u(k)
                end do
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'new log(r(1)/Rsun), R/Rsun', log10(s% r(1)/Rsun), s% r(1)/Rsun
-               write(*,*)
+               write(*,'(A)')
                exit
             end do
          end subroutine add_csm
@@ -861,7 +862,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (n == 0) return
-         if (n /= 6) stop 'bad num cols for data_for_extra_history_columns'
+         if (n /= 6) call mesa_error(__FILE__,__LINE__,'bad num cols for data_for_extra_history_columns')
          names(1) = 'vel_FeII'
          names(2) = 'vel_FeII_cell'
          names(3) = 'vel_FeII_eta_i'
@@ -957,7 +958,7 @@
             if (ierr /= 0) then
                write(*,2) 'logRho', k, s% lnd(k)/ln10
                write(*,2) 'logT', k, s% lnT(k)/ln10
-               stop 'interp failed in data_for_extra_profile_columns'
+               call mesa_error(__FILE__,__LINE__,'interp failed in data_for_extra_profile_columns')
             end if
             eta_i = fval(1)
             if (.false.) then
@@ -969,7 +970,7 @@
                write(*,1) 'logRhos(num_logRhos)', logRhos(num_logRhos)
                write(*,1) 'eta_i', eta_i
                write(*,1) 's% time', s% time
-               stop 'data_for_extra_profile_columns'
+               call mesa_error(__FILE__,__LINE__,'data_for_extra_profile_columns')
             end if
             time = s% time + t0
             tau_sob = pi*qe*qe/(me*clight)*n_Fe*eta_i*f*time*lambda0
@@ -1027,9 +1028,9 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (n == 0) return
-         !stop 'data_for_extra_profile_columns'
+         !call mesa_error(__FILE__,__LINE__,'data_for_extra_profile_columns')
          if (s% x_integer_ctrl(1) == 3) then
-            if (n /= 1) stop 'bad num cols for data_for_extra_profile_columns'
+            if (n /= 1) call mesa_error(__FILE__,__LINE__,'bad num cols for data_for_extra_profile_columns')
             names(1) = 'du'
             vals(1,1) = 0
             do k=2,s% nz
@@ -1037,7 +1038,7 @@
             end do
             return
          end if
-         if (n /= 3) stop 'bad num cols for data_for_extra_profile_columns'
+         if (n /= 3) call mesa_error(__FILE__,__LINE__,'bad num cols for data_for_extra_profile_columns')
          names(1) = 'dlnT4_dtau'
          names(2) = 'v_times_3_div_c'
          names(3) = 'log_ratio'
@@ -1085,9 +1086,9 @@
             s% RTI_m_no_boost = 0d0
             s% dedt_RTI_diffusion_factor = 1d0
             s% composition_RTI_diffusion_factor = 1d0
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'turn off RTI', s% model_number, age_days
-            write(*,*)
+            write(*,'(A)')
          end if
          
          L_center = s% x_ctrl(3)
@@ -1286,7 +1287,7 @@
             write(*,*) 'failed in star_alloc_extras'
             write(*,*) 'alloc_extras num_ints', num_ints
             write(*,*) 'alloc_extras num_dbls', num_dbls
-            stop 'example_cccsn_IIp alloc failed'
+            call mesa_error(__FILE__,__LINE__,'example_cccsn_IIp alloc failed')
             !call mesa_error(__FILE__,__LINE__)
          end if
          

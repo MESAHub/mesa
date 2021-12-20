@@ -1,0 +1,47 @@
+============
+Release 8118
+============
+
+:Date:   2016-02-03
+
+Revision 8118 has been designated a MESA release version.
+
+We call your attention to some high level items. Please consult the full
+release notes, available in `this mailing list
+post <https://lists.mesastar.org/pipermail/mesa-users/2016-February/006205.html>`__,
+to learn more.
+
+-  Almost all extras routines in run_star_extras and run_binary_extras
+   are now implemented as hooks, in a similar way to all other_\*
+   routines. If you use a custom run_star_extras, you need to slightly
+   modify it for it to be compatible with this and future versions.
+
+-  The old ``RGB_wind_scheme`` and ``AGB_wind_scheme`` have been
+   replaced with temperature-dependent ``hot_wind_scheme`` and
+   ``cool_wind_RGB_scheme`` and ``cool_wind_AGB_scheme``.
+
+-  There has been a small change in how opacities are computed when
+   blending Type1 and Type2 tables.
+
+-  Several errors in the on-the-fly weak rate implementation have been
+   corrected. If you have been making use of these capabilities in
+   r7624, please contact Josiah Schwab (jwschwab@berkeley.edu) for more
+   details.
+
+-  MESA’s color module has now be extended. You can output either the
+   raw bolometric correction(s) or the absolute magnitude(s). PGSTAR
+   plots have also been added to plot magnitude-magnitude,
+   color-magnitude and color-color plots.
+
+-  A new pgstar plot “network” has been added to show total abundances
+   of isotopes as a function of N vs Z and is a useful way to visualize
+   the distribution of isotopes in your nuclear network.
+
+-  We now can run the star tests with NaN traps enabled combined with
+   pre-setting all dynamically allocated memory to hold NaNs. This is
+   very effective at showing up accesses to uninitialized data that the
+   compiler can’t catch.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r8118.zip/download>`__
+is available for download.

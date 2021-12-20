@@ -1,0 +1,11 @@
+====================
+New MESA SDK Version
+====================
+
+:Date:   2014-03-13
+
+Version 20140313 is now available for 64-bit Linux and OS X from the
+`SDK
+website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+The SDK reverted to old-style init scripts, as the new ones were causing
+problems.

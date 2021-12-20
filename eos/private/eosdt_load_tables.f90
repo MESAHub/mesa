@@ -59,17 +59,17 @@
       
       
       subroutine request_user_to_reinstall
-         write(*,*)
-         write(*,*)
-         write(*,*)
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          write(*,*) 'NOTICE: you need to install a new verion of the eos data.'
          write(*,*) 'Please update by removing the directory mesa/data/eosDT_data,'
          write(*,*) 'and rerunning the mesa ./install script.'
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          call mesa_error(__FILE__,__LINE__)
       end subroutine request_user_to_reinstall
       
@@ -79,16 +79,16 @@
          character (len=*) :: fname
          if (ierr == 0) return
          write(*,*) 'load eos tables ' // trim(fname)
-         write(*,*)
-         write(*,*)
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          write(*,'(a)') 'FATAL ERROR: missing or bad eos data.'
          write(*,'(a)') 'Please update by removing the directories ' &
             // 'mesa/data/eos*_data' &
             // ' and rerunning the mesa ./install script.'
-         write(*,*)
+         write(*,'(A)')
          call mesa_error(__FILE__,__LINE__)
       end subroutine check_for_error_in_eosDT_data
 
@@ -287,7 +287,7 @@
             if (abs(Z-Z_in) > tiny) then
                write(*,'(a50,l1)') 'abs(Z-Z_in) > tiny', abs(Z-Z_in) > tiny
             end if
-            write(*,*)
+            write(*,'(A)')
             call request_user_to_reinstall
             return
          end if
@@ -298,7 +298,8 @@
             ep% logQs(ep% num_logQs), ep% logTs(ep% num_logTs),   &
             STAT=info)
          if (info /= 0) then
-            return
+            write(*,*)  "Info: ",info
+            call mesa_error(__FILE__,__LINE__, 'Allocation in Load1_eosDT_Table failed, your likely out of memory')
          end if
          
          tbl(1:sz_per_eos_point,1:nv,1:ep% num_logQs,1:ep% num_logTs) =>  &

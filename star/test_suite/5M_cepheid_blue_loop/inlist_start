@@ -47,10 +47,11 @@
    initial_Y = 0.256d0
    initial_Z = 0.008d0
    
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
 
    mixing_length_alpha = 1.8d0
-   MLT_option = 'Cox'
+!   MLT_option = 'Cox'
+steps_before_use_TDC = 10
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.1

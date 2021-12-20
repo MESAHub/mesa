@@ -37,8 +37,6 @@
 
       x_ctrl(16) = 0.11 ! stop_m <= star_mass minus this (Msun)
 
-!      no_MLT_below_shock = .true.
-
       ! inner_bc_v_max = 1d7 ! cm/s
 
 
@@ -67,7 +65,7 @@
       RTI_energy_floor = 1d13
 
 ! equation controls
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
 
       ! turn off energy from nuclear reactions and neutrinos

@@ -38,7 +38,7 @@
 
 
       integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
-         use mix_info, only: set_mixing_info, get_convection_sigmas
+         use mix_info, only: get_convection_sigmas
          use rates_def, only: num_rvs
          use hydro_vars, only: set_vars_if_needed
          use star_utils, only: start_time, update_time
@@ -113,7 +113,7 @@
             do_struct_burn_mix = do_burn(s, dt)
             if (do_struct_burn_mix /= keep_going) then
                write(*,2) 'failed in do_burn', s% model_number
-               stop 'do_struct_burn_mix'
+               call mesa_error(__FILE__,__LINE__,'do_struct_burn_mix')
                return
             end if            
             call set_vars_if_needed(s, s% dt, 'after do_burn', ierr)
@@ -161,7 +161,9 @@
          if (s% j_rot_flag) then
             s% xh(s% i_j_rot,:s% nz) = s% j_rot(:s% nz)
             s% j_rot_start(:s% nz) = s% j_rot(:s% nz)
-            s% i_rot_start(:s% nz) = s% i_rot(:s% nz)
+            do k=1, s% nz
+               s% i_rot_start(k) = s% i_rot(k)% val
+            end do
             s% total_abs_angular_momentum = dot_product(abs(s% j_rot(:s% nz)),s% dm_bar(:s% nz))
          end if
 
@@ -193,6 +195,15 @@
          end if
 
          if (do_struct_burn_mix /= keep_going) return
+
+         if (s% rotation_flag) then
+            ! store ST mixing info for time smoothing
+            do k=1, s% nz
+               s% D_ST_start(k) = s% D_ST(k)
+               s% nu_ST_start(k) = s% nu_ST(k)
+            end do
+            s% have_ST_start_info = .true.
+         end if
 
          if (.not. s% j_rot_flag) &
             do_struct_burn_mix = do_mix_omega(s,dt)
@@ -318,7 +329,6 @@
             s% dE_dRho_start(k) = s% dE_dRho(k)
             s% gam_start(k) = s% gam(k)
             s% lnS_start(k) = s% lnS(k)
-            s% eta_start(k) = s% eta(k)
             s% zbar_start(k) = s% zbar(k)
             s% mu_start(k) = s% mu(k)
             s% phase_start(k) = s% phase(k)
@@ -444,7 +454,6 @@
 
 
       subroutine set_surf_info(s, nvar) ! set to values at start of step
-         use star_utils, only: get_lnd_from_xh, get_lnT_from_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          s% surf_lnS = s% lnS(1)
@@ -505,18 +514,6 @@
                do k = 1, nz
                   s% xh(j1,k) = s% alpha_RTI(k)
                end do
-            else if (j1 == s% i_ln_cvpv0 .and. s% i_ln_cvpv0 <= nvar) then
-                  stop 'pablo needs to revise this'
-!               do k = 1, nz
-!                  ! create a rough first guess using mlt_vc_start and conv_vel when
-!                  ! mlt_vc is larger than the starting conv_vel
-!                  if (s% mlt_vc_start(k) > 0d0 .and. s% mlt_vc_start(k) > s% conv_vel(k)) then
-!                     s% conv_vel(k) = s% conv_vel(k) + &
-!                        (s% mlt_vc_start(k) -s% conv_vel(k)) * &
-!                        min(1d0, s% dt*s% mlt_vc_start(k)/(s% scale_height_start(k)*s% mixing_length_alpha))
-!                  end if
-!                  s% xh(j1,k) = log(s% conv_vel(k)+s% conv_vel_v0)
-!               end do
             end if
          end do
       end subroutine set_xh
@@ -710,7 +707,7 @@
                   s% species, s% xa(:,k), &
                   s% rho(k), s% lnd(k)/ln10, s% energy(k), s% lnT(k), &
                   new_lnT, revised_energy, ierr)
-               if (ierr /= 0) return ! stop 'do_merge failed in set_lnT_for_energy'
+               if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'do_merge failed in set_lnT_for_energy')
                call store_lnT_in_xh(s, k, new_lnT)
                call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             end if
@@ -765,7 +762,7 @@
                      k, s% lnR(k) - s% lnR(k+1), s% lnR(k), s% lnR(k+1), &
                      s% lnR_start(k) - s% lnR_start(k+1), s% lnR_start(k), s% lnR_start(k+1)
                converged = .false.; exit
-               stop 'check_after_converge'
+               call mesa_error(__FILE__,__LINE__,'check_after_converge')
             else
                if (s% lnT(k) > ln10*12) then
                   if (report) write(*,2) 'after hydro, logT > 12 in cell k', k, s% lnT(k)
@@ -953,7 +950,7 @@
             if (s% report_ierr) &
                write(*,*) 'unknown string for screening_mode: ' // trim(s% screening_mode)
             return
-            stop 'do1_net'
+            call mesa_error(__FILE__,__LINE__,'do1_net')
          end if
 
          dbg = .false. ! (s% model_number == 1137)
@@ -1026,13 +1023,13 @@
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'do_burn failed', k_bad
             return
-            stop 'do_burn'
+            call mesa_error(__FILE__,__LINE__,'do_burn')
          
          
             do_burn = retry
             if (trace .or. s% report_ierr) then
                write(*,*) 'do_burn ierr'
-               !stop 'do_burn'
+               !call mesa_error(__FILE__,__LINE__,'do_burn')
             end if
             call restore
             return
@@ -1150,7 +1147,7 @@
             if (ierr /= 0) then
                if (s% report_ierr) write(*,2) 'net_1_zone_burn_const_density failed', k
                return
-               stop 'burn1_zone'
+               call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
             ! restore temperature
             call store_lnT_in_xh(s, k, starting_log10T*ln10)
@@ -1178,7 +1175,7 @@
             if (ierr /= 0) then
                if (s% report_ierr) write(*,2) 'net_1_zone_burn failed', k
                return
-               stop 'burn1_zone'
+               call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
          end if
          
@@ -1191,7 +1188,7 @@
             if (s% report_ierr) &
                write(*,2) 'net_1_zone_burn final call to do1_net failed', k
             return
-            stop 'burn1_zone'
+            call mesa_error(__FILE__,__LINE__,'burn1_zone')
          end if
                
          s% eps_nuc(k) = 0d0
@@ -1260,6 +1257,13 @@
             integer :: j, i
             include 'formats'
             ierr = 0
+            ! This routine does nothing other than set ierr = 0,
+            ! but we need an empty routine here because
+            ! net_1_zone_burn_const_density
+            ! expects to be passed a routine burn_finish_substep,
+            ! and often that will be a routine that actually does something,
+            ! but here we don't want to do anything.
+
             !step_time = time - substep_start_time
             !if (step_time <= 0d0) return
             !frac = step_time/dt

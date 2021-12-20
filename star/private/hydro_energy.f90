@@ -100,7 +100,6 @@
          call setup_d_turbulent_energy_dt(ierr); if (ierr /= 0) return         
          call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return
          
-         s% eps_grav_form_for_energy_eqn(k) = eps_grav_form
          s% dL_dm(k) = dL_dm_ad%val
          s% dwork_dm(k) = dwork_dm_ad%val
          s% energy_sources(k) = sources_ad%val 
@@ -152,7 +151,7 @@
                write(*,2) 'X', k, s% X(k)
                write(*,2) 'Z', k, s% Z(k)
             end if
-            write(*,*)
+            write(*,'(A)')
          end if
          
          contains
@@ -189,7 +188,7 @@
                      write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
                      write(*,2) 'v_center', s% model_number, s% v_center
                      write(*,2) 'r_center', s% model_number, s% r_center
-                     stop 'setup_dwork_dm'
+                     call mesa_error(__FILE__,__LINE__,'setup_dwork_dm')
                   end if
                end if
             else
@@ -343,20 +342,16 @@
                return
             end if
 
-            eps_grav_form = .not. s% use_dedt_form_of_energy_eqn
-         
-            if (eps_grav_form) then ! check if want it false         
-               if (s% always_use_dedt_form_of_energy_eqn) eps_grav_form = .false.            
-            end if
+            ! value from checking s% energy_eqn_option in hydro_eqns.f90
+            eps_grav_form = s% eps_grav_form_for_energy_eqn
          
             if (.not. eps_grav_form) then ! check if want it true
-               if (s% always_use_eps_grav_form_of_energy_eqn) eps_grav_form = .true.             
                if (s% doing_relax .and. s% no_dedt_form_during_relax) eps_grav_form = .true.         
             end if
 
             if (eps_grav_form) then
                if (s% RSP2_flag) then
-                  stop 'cannot use eps_grav with et yet.  fix energy eqn.'
+                  call mesa_error(__FILE__,__LINE__,'cannot use eps_grav with et yet.  fix energy eqn.')
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
                if (ierr /= 0) then
@@ -492,7 +487,7 @@
                if (s% report_ierr) then
                   write(*,2) 'get1_energy_eqn: bad ' // trim(str), k, dequ
                end if
-               if (s% stop_for_bad_nums) stop 'get1_energy_eqn'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get1_energy_eqn')
 !$omp end critical (hydro_energy_crit2)
                return
             end if
@@ -599,7 +594,7 @@
                   write(*,2) 'Peos_start', s% model_number, s% Peos_start(s% nz)
                   write(*,2) 'v_center', s% model_number, s% v_center
                   write(*,2) 'r_center', s% model_number, s% r_center
-                  stop 'eval1_work'
+                  call mesa_error(__FILE__,__LINE__,'eval1_work')
                end if
             end if
             work_ad%val = work

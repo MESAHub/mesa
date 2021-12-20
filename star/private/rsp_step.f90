@@ -256,14 +256,14 @@
                   write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
                   write(*,2) 'old dt', s% model_number, s% dt
                   write(*,2) 'reduced dt', s% model_number, dt_max
-                  write(*,*)
-                  stop 'HYD compressing innermost cell'
+                  write(*,'(A)')
+                  call mesa_error(__FILE__,__LINE__,'HYD compressing innermost cell')
                end if
                s% dt = dt_max
                if (call_is_bad) then
                   if (is_bad(s% dt)) then
                      write(*,1) 'dt', s% dt
-                     stop 'HYD compressing innermost cell'
+                     call mesa_error(__FILE__,__LINE__,'HYD compressing innermost cell')
                   end if
                end if
             end if
@@ -332,7 +332,7 @@
             if (num_tries  ==  max_retries+1) then
                write(*,*) 'NO CONVERGENCE IN HYD, TIME STEP num tries, max allowed', &
                   s% model_number, num_tries, max_retries+1
-               stop 'RSP: step num_retries = RSP_max_retries_per_step'
+               call mesa_error(__FILE__,__LINE__,'RSP: step num_retries = RSP_max_retries_per_step')
             end if  
             call restore_start_vars(s)
             s% R_center = R_center_start
@@ -341,7 +341,7 @@
             if (s% max_number_retries < 0) return
             if (s% num_retries > s% max_number_retries) then
                write(*,3) 'model max_number_retries', s% model_number, s% max_number_retries
-               stop 'RSP: num_retries > max_number_retries'
+               call mesa_error(__FILE__,__LINE__,'RSP: num_retries > max_number_retries')
             end if
          end subroutine doing_retry
          
@@ -365,7 +365,7 @@
             dvardx_0 = s% solver_test_partials_dval_dx ! analytic partial
             if (i_var <= 0) then
                write(*,2) 'need to set test_partials_var', i_var
-               stop 'check_partial'
+               call mesa_error(__FILE__,__LINE__,'check_partial')
             end if            
             dx_0 = get1_val(i_var, s% solver_test_partials_k)
             dx_0 = s% solver_test_partials_dx_0*max(1d-99, abs(dx_0))
@@ -373,7 +373,7 @@
             xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),1d-50)
             write(*,1) 'analytic numeric err rel_diff',dvardx_0,dvardx,err,xdum
             !write(*,*)
-            stop 'check_partial'            
+            call mesa_error(__FILE__,__LINE__,'check_partial')            
          end subroutine check_partial         
          
          real(dp) function get1_val(i_var,k) result(val)
@@ -393,7 +393,7 @@
                val = s% Vol(k)
             else 
                write(*,2) 'bad value for solver_test_partials_var', i_var
-               stop 'solver_test_partials'
+               call mesa_error(__FILE__,__LINE__,'solver_test_partials')
             end if
          end function get1_val
          
@@ -418,7 +418,7 @@
                s% Vol(k) = val
             else 
                write(*,2) 'bad value for solver_test_partials_var', i_var
-               stop 'solver_test_partials'
+               call mesa_error(__FILE__,__LINE__,'solver_test_partials')
             end if
          end subroutine store1_val
 
@@ -432,7 +432,7 @@
             save1 = get1_val(i_var, k)
             call store1_val(i_var, k, save1 + delta_x)
             call eval_vars(s,0,i_min,i_max,ierr)
-            if (ierr /= 0) stop 'failed in eval_vars'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in eval_vars')
             call eval_eqns(s,P_surf)
             val = s% solver_test_partials_val
             !write(*,2) 'dfridr val', k, val
@@ -490,7 +490,7 @@
                ! if higher order is worse by a significant factor safe, then bail
                if (abs(a(i,i) - a(i - 1,i - 1)) >= safe*err) then
                   !write(*,1) 'higher order is worse'
-                  write(*,*)
+                  write(*,'(A)')
                   return
                end if
             end do
@@ -773,7 +773,7 @@
          end if
          if (s% Vol(k) <= 0d0) then
             write(*,2) 'bad Vol', k, s% Vol(k)
-            stop 'do1_specific_volume'
+            call mesa_error(__FILE__,__LINE__,'do1_specific_volume')
          end if
          dVol_dr_00(I) = 3.d0*T1*s% r(k)**2
       end subroutine do1_specific_volume
@@ -816,7 +816,7 @@
                   okay = .false.
                end if
                
-               if (.not. okay) stop 'solve_for_corrections'
+               if (.not. okay) call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
                
                do j = 1,LD_HD
                   if (is_bad(HD(j,IR))) then
@@ -840,7 +840,7 @@
                      okay = .false.
                   end if
                
-                  if (.not. okay) stop 'solve_for_corrections'
+                  if (.not. okay) call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
                   
                end do
 
@@ -873,7 +873,7 @@
                end do
                
             end do
-            !stop 'solve_for_corrections'
+            !call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
          end if
          
          N = NV*NZN+1
@@ -882,14 +882,14 @@
             do I = 1,N
                if (is_bad(HR(I))) then
                   write(*,3) 'HR(I)', iter, I, HR(I)
-                  stop 'solve_for_corrections'
+                  call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
                end if
             end do
             do I = 1,N
                do j = 1,LD_HD
                   if (is_bad(HD(j,i))) then
                      write(*,4) 'HD(j,i)', iter, j, i, HD(j,i)
-                     stop 'solve_for_corrections'
+                     call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
                   end if
                end do
             end do
@@ -931,7 +931,7 @@
             if (call_is_bad) then
                if (is_bad(DX(I))) then
                   write(*,2) 'DX(I)', I, DX(I)
-                  stop 'solve_for_corrections'
+                  call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
                end if
             end if
          end do
@@ -1111,10 +1111,10 @@
          dK_dr_in(I) = dK_dVol(I)*dVol_dr_in(I)
          if (call_is_bad) then
             if (is_bad(s% opacity(k))) then
-!$OMP critical
+!$omp critical (rsp_step_1)
                write(*,2) 's% opacity(k)', k, s% opacity(k)
-               stop 'do1_eos_and_kap'
-!$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'do1_eos_and_kap')
+!$omp end critical (rsp_step_1)
             end if
          end if
       end subroutine do1_eos_and_kap
@@ -1343,7 +1343,7 @@
             
             if (call_is_bad) then
                if (is_bad(s% Y_face(k))) then
-                  !$OMP critical
+                  !$omp critical (rsp_step_2)
                   write(*,2) 's% Y_face(k)', k, s% Y_face(k)
                   write(*,2) 'Y1', k, Y1
                   write(*,2) 'Y2', k, Y2
@@ -1352,8 +1352,8 @@
                   write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                   write(*,2) 's% Prad(k)', k, s% Prad(k)
                   write(*,2) 's% T(k)', k, s% T(k)
-                  stop 'calc_Y_face'
-                  !$OMP end critical
+                  call mesa_error(__FILE__,__LINE__,'calc_Y_face')
+                  !$omp end critical (rsp_step_2)
                end if
             end if
          
@@ -1648,7 +1648,7 @@
 
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
-                  !$OMP critical
+                  !$omp critical (rsp_step_3)
                   write(*,2) 'POM', k, POM
                   write(*,2) 'POM1', k, POM1
                   write(*,2) 'POM2', k, POM2
@@ -1662,8 +1662,8 @@
                   write(*,2) 's% v(k+1)', k+1, s% v(k+1)
                   write(*,2) 's% Vol(k+1)', k+1, s% Vol(k+1)
                   write(*,2) 's% rho(k+1)', k+1, s% rho(k+1)
-                  stop 'calc_Chi'
-                  !$OMP end critical
+                  call mesa_error(__FILE__,__LINE__,'calc_Chi')
+                  !$omp end critical (rsp_step_3)
                end if
             end if
          
@@ -1700,7 +1700,7 @@
             
             if (call_is_bad) then
                if (is_bad(dChi_dr_in(I))) then
-                  !$OMP critical
+                  !$omp critical (rsp_step_4)
                   write(*,2) 's% Chi(k)', k, s% Chi(k)
                   write(*,2) 'Vol', k, Vol
                   write(*,2) 'POMT2', k, POMT2
@@ -1712,8 +1712,8 @@
                   write(*,2) 'dHp_dr_in(I)', I, dHp_dr_in(I)
                   write(*,2) 's% r(k+1)', k+1, s% r(k+1)
                   write(*,2) 's% v(k+1)', k+1, s% v(k+1)
-                  stop 'calc_Chi'
-                  !$OMP end critical
+                  call mesa_error(__FILE__,__LINE__,'calc_Chi')
+                  !$omp end critical (rsp_step_4)
                end if
             end if
             
@@ -2468,7 +2468,7 @@
          
          if (call_is_bad) then
             if (is_bad(Fr_00)) then
-   !$OMP critical
+   !$omp critical (rsp_step_5)
             write(*,2) 'Fr_00', k, Fr_00
             write(*,2) 'Fr1', k, Fr1
             write(*,2) 'Fr2', k, Fr2
@@ -2485,8 +2485,8 @@
             write(*,2) 'BK', k, BK
             write(*,2) 'BW', k, BW
             write(*,2) 'nz', s% nz
-            stop 'calc_Fr'
-   !$OMP end critical
+            call mesa_error(__FILE__,__LINE__,'calc_Fr')
+   !$omp end critical (rsp_step_5)
             end if
          end if
          
@@ -2554,7 +2554,7 @@
             
          if (call_is_bad) then
             if (is_bad(XP)) then
-   !$OMP critical
+   !$omp critical (rsp_step_6)
                write(*,2) 'XP', k, XP
                write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                write(*,2) 's% Prad(k)', k, s% Prad(k)
@@ -2563,8 +2563,8 @@
                write(*,2) 'THETA', k, THETA
                write(*,2) 'THETAQ', k, THETAQ
                write(*,2) 'THETAT', k, THETAT
-               stop 'rsp_calc_XP'
-   !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'rsp_calc_XP')
+   !$omp end critical (rsp_step_6)
             end if
          end if
 
@@ -2737,7 +2737,7 @@
          
          dt = s% dt
          !if (s% use_compression_outer_BC .and. I == NZN) then
-         !   stop 'no rsp support for use_compression_outer_BC'
+         !   call mesa_error(__FILE__,__LINE__,'no rsp support for use_compression_outer_BC')
          !end if
          
          ! XP doesn't include Prad for acceleration equation
@@ -2978,7 +2978,7 @@
          subroutine check_is_bad
             include 'formats'
             if (is_bad(residual)) then
-            !$OMP critical
+            !$omp critical (rsp_step_7)
                write(*,2) 'residual', k, residual
                write(*,2) 's% v(k)', k, s% v(k)
                write(*,2) 's% v_start(k)', k, s% v_start(k)
@@ -2991,118 +2991,118 @@
                write(*,2) 's% Uq(k)', k, s% Uq(k)
                write(*,2) 'Fr_term', k, Fr_term
                write(*,2) 'dt', k, dt
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_7)
             end if
 
             if (is_bad(HD(i_r_dr_in2,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_8)
                write(*,2) 'HD(i_r_dr_in2,IR)', k, HD(i_r_dr_in2,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_8)
             end if
 
             if (is_bad(HD(i_r_dr_in,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_9)
                write(*,2) 'HD(i_r_dr_in,IR)', k, HD(i_r_dr_in,IR)
                write(*,2) 'dXP_00_dr_in', k, dXP_00_dr_in
                write(*,2) 'd_Uq_dr_in', k, d_Uq_dr_in
                write(*,2) 'd_Fr_term_dr_in', k, d_Fr_term_dr_in
                write(*,2) 'd_Chi_out_dr_in', k, d_Chi_out_dr_in
                write(*,2) 'd_Chi_00_dr_in', k, d_Chi_00_dr_in
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_9)
             end if
 
             if (is_bad(HD(i_r_dr_00,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_10)
                write(*,2) 'HD(i_r_dr_00,IR)', k, HD(i_r_dr_00,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_10)
             end if
 
             if (is_bad(HD(i_r_dr_out,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_11)
                write(*,2) 'HD(i_r_dr_out,IR)', k, HD(i_r_dr_out,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_11)
             end if
 
             if (is_bad(HD(i_r_dr_out2,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_12)
                write(*,2) 'HD(i_r_dr_out2,IR)', k, HD(i_r_dr_out2,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_12)
             end if
 
             if (is_bad(HD(i_r_dT_in,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_13)
                write(*,2) 'HD(i_r_dT_in,IR)', k, HD(i_r_dT_in,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_13)
             end if
 
             if (is_bad(HD(i_r_dT_00,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_14)
                write(*,2) 'HD(i_r_dT_00,IR)', k, HD(i_r_dT_00,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_14)
             end if
 
             if (is_bad(HD(i_r_dT_out,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_15)
                write(*,2) 'HD(i_r_dT_out,IR)', k, HD(i_r_dT_out,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_15)
             end if
 
             if (is_bad(HD(i_r_dT_out2,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_16)
                write(*,2) 'HD(i_r_dT_out2,IR)', k, HD(i_r_dT_out2,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_16)
             end if
 
             if (is_bad(HD(i_r_der_in,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_17)
                write(*,2) 'HD(i_r_der_in,IR)', k, HD(i_r_der_in,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_17)
             end if
 
             if (is_bad(HD(i_r_der_00,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_18)
                write(*,2) 'HD(i_r_der_00,IR)', k, HD(i_r_der_00,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_18)
             end if
 
             if (is_bad(HD(i_r_der_out,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_19)
                write(*,2) 'HD(i_r_der_out,IR)', k, HD(i_r_der_out,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_19)
             end if
 
             if (is_bad(HD(i_r_der_out2,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_20)
                write(*,2) 'HD(i_r_der_out2,IR)', k, HD(i_r_der_out2,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_20)
             end if
 
             if (is_bad(HD(i_r_dw_00,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_21)
                write(*,2) 'HD(i_r_dw_00,IR)', k, HD(i_r_dw_00,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_21)
             end if
 
             if (is_bad(HD(i_r_dw_out,IR))) then
-            !$OMP critical
+            !$omp critical (rsp_step_22)
                write(*,2) 'HD(i_r_dw_out,IR)', k, HD(i_r_dw_out,IR)
-               stop 'acceleration_eqn'
-            !$OMP end critical
+               call mesa_error(__FILE__,__LINE__,'acceleration_eqn')
+            !$omp end critical (rsp_step_22)
             end if
          end subroutine check_is_bad
 
@@ -3808,7 +3808,7 @@
                   write(*,3) '1.d0 - BK/BW', i, k, 1.d0 - BK/BW
                   write(*,3) 'W', i, k, W
                   write(*,3) 'WP', i, k, WP
-                  stop 'T_form_of_calc_Fr'
+                  call mesa_error(__FILE__,__LINE__,'T_form_of_calc_Fr')
                end if
             end if
             

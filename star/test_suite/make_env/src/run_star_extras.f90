@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       
       implicit none
       
@@ -55,7 +56,7 @@
          if (.not. s% x_logical_ctrl(1)) return
          
          call create_env(id, s, ierr)
-         if (ierr /= 0) stop 'failed in create_env'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in create_env')
 
       end subroutine extras_controls
       
@@ -206,16 +207,16 @@
          s% star_mass = s% mstar/Msun
 
          call star_set_net(id, net_name, ierr)
-         if (ierr /= 0) stop 'failed in star_set_net'    
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_net')    
          
          call star_set_var_info(id, ierr)
-         if (ierr /= 0) stop 'failed in star_set_var_info'     
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_var_info')     
          
          call star_set_chem_names(id, ierr)
-         if (ierr /= 0) stop 'failed in star_set_chem_names'  
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_chem_names')  
          
          call star_allocate_arrays(id, ierr)
-         if (ierr /= 0) stop 'failed in star_allocate_arrays' 
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_allocate_arrays') 
          
          s% m(1) = s% mstar
          s% m_grav(1) = s% mstar
@@ -266,19 +267,19 @@
          end do
 
          call star_normalize_dqs(s% id, nz, s% dq, ierr)
-         if (ierr /= 0) stop 'failed in star_normalize_dqs'  
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_normalize_dqs')  
 
          call star_set_qs(s% id, nz, s% q, s% dq, ierr)
-         if (ierr /= 0) stop 'failed in star_set_qs'  
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_qs')  
          
          call star_set_m_and_dm(s% id, ierr)
-         if (ierr /= 0) stop 'failed in star_set_qs'  
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_qs')  
          
          call star_set_dm_bar(s% id, ierr)
-         if (ierr /= 0) stop 'failed in star_set_dm_bar' 
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_dm_bar') 
          
          call change_to_xa_for_accretion(s% id, 1, nz, ierr)
-         if (ierr /= 0) stop 'failed in change_to_xa_for_accretion' 
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in change_to_xa_for_accretion') 
 
          do k=1,nz
             s% m_grav(k) = s% m(k)
@@ -360,11 +361,11 @@
                      
          write(*,2) 'start.mod', nz
          call star_write_model(id, 'start.mod', ierr)
-         if (ierr /= 0) stop 'failed in star_write_model' 
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_write_model') 
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'finished create_env'
-         write(*,*)
+         write(*,'(A)')
          !stop
 
          deallocate(dres_dxa)
@@ -382,7 +383,7 @@
                 lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                 ierr)
-            if (ierr /= 0) stop 'failed in get_atm_PT'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in get_atm_PT')
             T_surf = exp(lnT_surf)
             P_surf = exp(lnP_surf)
             ! get rho_surf
@@ -411,7 +412,7 @@
             skip_partials = .true.
             if (s% opacity(1) <= 0d0 .or. is_bad(s% opacity(1))) then
                write(*,1) 's% opacity(1)', s% opacity(1)
-               stop 'run_star_extras get_atm'
+               call mesa_error(__FILE__,__LINE__,'run_star_extras get_atm')
             end if
             s% opacity_start(1) = s% opacity(1)
             call star_get_surf_PT( &
@@ -420,7 +421,7 @@
                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
-            if (ierr /= 0) stop 'get_atm failed in star_get_surf_PT'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'get_atm failed in star_get_surf_PT')
             T_surf = exp(lnT_surf)
             P_surf = exp(lnP_surf)
             ! get rho_surf

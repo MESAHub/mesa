@@ -77,8 +77,7 @@
       accretion_he4 = 0.26
       accretion_zfracs = 3
       
-      always_use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
 
       max_abar_for_burning = 55
       

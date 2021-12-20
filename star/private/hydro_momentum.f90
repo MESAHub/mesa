@@ -164,7 +164,7 @@
          if (is_bad(residual)) then
 !$omp critical (hydro_momentum_crit1)
             write(*,2) 'momentum eqn residual', k, residual
-            stop 'get1_momentum_eqn'
+            call mesa_error(__FILE__,__LINE__,'get1_momentum_eqn')
 !$omp end critical (hydro_momentum_crit1)
          end if
          if (test_partials) then
@@ -330,7 +330,7 @@
                if (s% report_ierr) then
                   write(*,2) 'get1_momentum_eqn: bad ' // trim(str), k, dequ
                end if
-               if (s% stop_for_bad_nums) stop 'get1_momentum_eqn'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get1_momentum_eqn')
 !$omp end critical (hydro_momentum_crit2)
                return
             end if
@@ -356,10 +356,11 @@
          call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          if (ierr /= 0) return
 
-         grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
-         
-         if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
-            grav = grav*s% fp_rot(k) 
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2*s% fp_rot(k)
+         else
+            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
+         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -550,7 +551,7 @@
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0         
-         if (.not. (s% u_flag .or. s% v_flag)) stop 'must have either v or u for do1_radius_eqn'
+         if (.not. (s% u_flag .or. s% v_flag)) call mesa_error(__FILE__,__LINE__,'must have either v or u for do1_radius_eqn')
          
          force_zero_v = (s% q(k) > s% velocity_q_upper_bound) .or. &
             (s% lnT_start(k)/ln10 < s% velocity_logT_lower_bound .and. &

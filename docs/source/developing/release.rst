@@ -28,6 +28,11 @@ via ``git add -f``.
 The variables ``release`` and ``version`` in the ``Project
 information`` section should be set.
 
+- Remove files that shouldn't be shipped
+
+Any files that should not be part of the final release should be added to the .gitattributes file.
+This will prevent the file(s) or folders from appearing in the zip archive.
+
 
 Documentation
 -------------
@@ -76,6 +81,7 @@ Release steps
 - Upload release to Zenodo
 - Send email to mesa-users
 
-
+Archiving
+---------
 
 

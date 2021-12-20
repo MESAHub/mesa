@@ -140,7 +140,7 @@
          scale = 1d0/L_start_max
          if (is_bad(scale)) then
             write(*,2) 'do1_rsp2_L_eqn scale', k, scale
-            stop 'do1_rsp2_L_eqn'
+            call mesa_error(__FILE__,__LINE__,'do1_rsp2_L_eqn')
          end if
          resid = (L_expected - L_actual)*scale         
       
@@ -193,12 +193,12 @@
          end if
          
          if (residual > 1d3) then
-         !$OMP critical
+         !$omp critical (hydro_rsp2_1)
             write(*,2) 'residual', k, residual
             write(*,2) 'Hp_expected', k, Hp_expected%val
             write(*,2) 'Hp_actual', k, Hp_actual%val
-            stop 'do1_rsp2_Hp_eqn'
-         !$OMP end critical
+            call mesa_error(__FILE__,__LINE__,'do1_rsp2_Hp_eqn')
+         !$omp end critical (hydro_rsp2_1)
          end if
          
          call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_rsp2_Hp_eqn', ierr)
@@ -269,7 +269,7 @@
                   !   s% r_start(k), r_00%val
                end if
                if (s% alt_scale_height_flag) then
-                  stop 'Hp_face_for_rsp2_eqn: cannot use alt_scale_height_flag'
+                  call mesa_error(__FILE__,__LINE__,'Hp_face_for_rsp2_eqn: cannot use alt_scale_height_flag')
                   ! consider sound speed*hydro time scale as an alternative scale height
                   d_face = alfa*d_00 + beta*d_m1
                   Peos_face = alfa*Peos_00 + beta*Peos_m1
@@ -418,7 +418,7 @@
          integer, intent(in) :: k
          real(dp), intent(out) :: alfa, beta
          ! face_value = alfa*cell_value(k) + beta*cell_value(k-1)
-         if (k == 1) stop 'bad k==1 for get_RSP2_alfa_beta_face_weights'
+         if (k == 1) call mesa_error(__FILE__,__LINE__,'bad k==1 for get_RSP2_alfa_beta_face_weights')
          if (s% RSP2_use_mass_interp_face_values) then
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta = 1d0 - alfa
@@ -509,7 +509,7 @@
                write(*,3) 'lgT', k-1, s% solver_iter, lnT_m1%val/ln10
                write(*,3) 'lgd', k, s% solver_iter, s% lnd(k)/ln10
                write(*,3) 'lgd', k-1, s% solver_iter, s% lnd(k-1)/ln10
-               !stop 'compute_Y_face'
+               !call mesa_error(__FILE__,__LINE__,'compute_Y_face')
             end if
 
          else
@@ -577,7 +577,7 @@
             !write(*,2) 'T_rho_face%val', k, T_rho_face%val
             !write(*,2) '', k, 
             !write(*,2) '', k, 
-            stop 'compute_PII_face'
+            call mesa_error(__FILE__,__LINE__,'compute_PII_face')
          end if
       end function compute_PII_face
       
@@ -652,7 +652,7 @@
          end if
          Hp_cell = pow2(rmid)*Peos_00/(d_00*cgrav_mid*mmid)
          if (s% alt_scale_height_flag) then
-            stop 'Hp_cell_for_Chi: cannot use alt_scale_height_flag'
+            call mesa_error(__FILE__,__LINE__,'Hp_cell_for_Chi: cannot use alt_scale_height_flag')
          end if
       end function Hp_cell_for_Chi
       
@@ -1062,7 +1062,7 @@
             write(*,2) 'T_rho_face%val', k, T_rho_face%val
             !write(*,2) '', k, 
             !write(*,2) '', k, 
-            stop 'compute_Lc_terms'
+            call mesa_error(__FILE__,__LINE__,'compute_Lc_terms')
          end if
       end function compute_Lc_terms
 

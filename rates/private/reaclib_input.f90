@@ -106,7 +106,7 @@
 
          ! allocate the library
          call allocate_reaclib_data(reaclib,max_nreaclib,ierr)
-         if (ierr /= 0) stop 'unable to allocate storage for reaclib'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'unable to allocate storage for reaclib')
 
          if (use_cache) then
             ios = 0
@@ -183,7 +183,7 @@
          end if
 
          return
-      100 stop 'error in do_read_reaclib'
+      100 call mesa_error(__FILE__,__LINE__,'error in do_read_reaclib')
       
       
          contains
@@ -447,7 +447,7 @@
             write(*,2) 'num_from_reaclib', num_from_reaclib
             write(*,2) 'reaclib+weaklib', num_from_reaclib + weaklib_count
             write(*,2) 'total num reactions', count
-            stop 'extract_rates_from_reaclib'
+            call mesa_error(__FILE__,__LINE__,'extract_rates_from_reaclib')
          end if
          
 

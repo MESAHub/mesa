@@ -279,7 +279,7 @@
  444  format(F6.3,tr2,f8.2,tr2,f7.2,tr2,d9.3) 
       if (s% RSP_trace_RSP_build_model) then
          write(*,*) '*** done creating initial model ***'
-         write(*,*)
+         write(*,'(A)')
       end if
       ! recall that w is actually Et = w**2 at this point
       call set_build_vars(s,M,DM,DM_BAR,R,Vol,T,w,Lr,Lc)
@@ -298,7 +298,7 @@
       s% rsp_period=s% RSP_default_PERIODLIN
       if (is_bad(s% rsp_period)) then
          write(*,1) 'rsp_period', s% rsp_period
-         stop 'rsp_build read_model'
+         call mesa_error(__FILE__,__LINE__,'rsp_build read_model')
       end if
       amix1 = s% RSP_fraction_1st_overtone
       amix2 = s% RSP_fraction_2nd_overtone
@@ -404,7 +404,7 @@
                      write(*,*) 'you might try increasing RSP_T_inner_tolerance'
                      ierr = -1
                      return
-                     !stop 1
+                     !call mesa_error(__FILE__,__LINE__)
                   end if
                   if (s% RSP_trace_RSP_build_model) write(*,*) 'call prepare_for_new_H'
                   call prepare_for_new_H
@@ -434,7 +434,7 @@
                      write(*,*) 'you might try increasing RSP_T_anchor_tolerance'
                      ierr = -1
                      return
-                     !stop 1
+                     !call mesa_error(__FILE__,__LINE__)
                   end if
                   call next_dmN
                   if(NZN-N+1.eq.NZT.and.abs(T_0-TH0).lt.TH0_tol*TH0) then
@@ -589,7 +589,7 @@
          ! just bisect since for H too large, stop short of target cell
          HH = 0.5d0*(H_too_large + H_too_small)
          !write(*,*) 'next_H HH, HH_prev', HH, HH_prev
-         !if (abs(HH - HH_prev) < 1d-6*HH) stop 'next_H'
+         !if (abs(HH - HH_prev) < 1d-6*HH) call mesa_error(__FILE__,__LINE__,'next_H')
       end subroutine next_H
       
       subroutine store_N
@@ -708,7 +708,7 @@
             write(*,2) 'resid_T_min', N, resid_T_min
             write(*,2) 'resid_T_max', N, resid_T_max
             return
-            stop 'get_T failed in root find'
+            call mesa_error(__FILE__,__LINE__,'get_T failed in root find')
          end if
          T_0 = exp(lnT)
          residual = get_T_residual(lnT, &
@@ -746,7 +746,7 @@
             if (T_0 <= 0) then
                ierr = -1
                return
-               stop 'T_0 <= 0 in Lc_loop1'
+               call mesa_error(__FILE__,__LINE__,'T_0 <= 0 in Lc_loop1')
             end if
             T4_0=T_0**4
          end do Lc_loop1
@@ -764,7 +764,7 @@
                get_T = .false.
                if (s% RSP_testing) then
                   write(*,*) 'failed get_T', N, T_0
-                  stop 'get_T'
+                  call mesa_error(__FILE__,__LINE__,'get_T')
                end if
                return
             end if
@@ -783,7 +783,7 @@
                if (T_0 <= 0) then
                   ierr = -1
                   return
-                  stop 'T_0 <= 0 in Lc_loop'
+                  call mesa_error(__FILE__,__LINE__,'T_0 <= 0 in Lc_loop')
                end if
                T4_0=T_0**4
             end do Lc_loop

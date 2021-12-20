@@ -464,8 +464,8 @@
          write(*,1) 'fr1', fr1
          write(*,1) 'rr', rr
          write(*,1) 'rr1', rr1
-         write(*,*)
-         stop 'rate_tripalf_jina' 
+         write(*,'(A)')
+         call mesa_error(__FILE__,__LINE__,'rate_tripalf_jina') 
       end subroutine rate_tripalf_jina
 
 
@@ -4195,7 +4195,7 @@
             write(*,'(a)')  &
                'reaclib_rate_and_dlnT_for_handle: failed in reaclib_indices_for_reaction '  &
                // trim(handle)
-            stop 'reaclib_rate_and_dlnT_for_handle'
+            call mesa_error(__FILE__,__LINE__,'reaclib_rate_and_dlnT_for_handle')
          end if
          if (T9 < reaclib_min_T9 .and. reaclib_rates% reaction_flag(lo) /= 'w' .and. &
              reaclib_rates% reaction_flag(lo) /= 'e') then ! w or ec
@@ -4211,7 +4211,7 @@
             write(*,'(a)')  &
                'reaclib_rate_for_handle: failed in reaclib_reaction_rates '  &
                // trim(handle)
-            stop 'reaclib_rate_for_handle'
+            call mesa_error(__FILE__,__LINE__,'reaclib_rate_for_handle')
             return
          end if
       end subroutine reaclib_rate_for_handle
@@ -4233,7 +4233,7 @@
             write(*,'(a)')  &
                'reaclib_rate_and_dlnT_for_handle: failed in reaclib_indices_for_reaction '  &
                // trim(handle)
-            stop 'reaclib_rate_and_dlnT_for_handle'
+            call mesa_error(__FILE__,__LINE__,'reaclib_rate_and_dlnT_for_handle')
          end if
          call reaclib_rate_and_dlnT( &
             lo, hi, handle, T9, lambda, dlambda_dlnT, rlambda, drlambda_dlnT, ierr)
@@ -4271,7 +4271,7 @@
          write(*,1) 'dlambda_dlnT', dlambda_dlnT
          write(*,1) 'rlambda', rlambda
          write(*,1) 'drlambda_dlnT', drlambda_dlnT
-         write(*,*)
+         write(*,'(A)')
       end subroutine reaclib_rate_and_dlnT
 
 
@@ -4302,7 +4302,7 @@
             write(*,1) 'a6*(tf% T953)', a6*(tf% T953)
             write(*,1) 'a7*(tf% lnT9)', a7*(tf% lnT9)
             write(*,1) 'tf% lnT9/ln10', tf% lnT9/ln10
-            stop 'reaclib'
+            call mesa_error(__FILE__,__LINE__,'reaclib')
          end if
       end subroutine do_reaclib
 
@@ -4509,9 +4509,9 @@
       end subroutine n14_electron_capture_rate
 
 
-      subroutine ecapnuc(etakep,temp,rpen,rnep,spen,snep)
+      subroutine ecapnuc(etakep,temp,rho,rpen,rnep,spen,snep)
          use const_def
-      real(dp), intent(in) :: etakep,temp
+      real(dp), intent(in) :: etakep,temp,rho
       real(dp), intent(out) :: rpen,rnep,spen,snep
 
 !  given the electron degeneracy parameter etakep (chemical potential
@@ -4534,12 +4534,14 @@
                        facv2,facv3,facv4,rjv1,rjv2,spenc,snepc, &
                        exeta,zetan2,f0,etael5, &
                        qn1,ft,qn2, &
-                       qndeca,tmean
+                       qndeca,tmean, &
+                       rho_low_cutoff, eta_low_cutoff
       parameter        (qn1    = -2.0716446d-06, &
                         ft     = 1083.9269d0, &
                         qn2    = 2.0716446d-06, &
                         qndeca = 1.2533036d-06, &
-                        tmean  = 886.7d0)
+                        tmean  = 886.7d0, &
+                        rho_low_cutoff = 1d-9, eta_low_cutoff = -50d0)
       
 
 
@@ -4554,7 +4556,7 @@
       snep  = 0.0d0
       t9    = temp * 1.0d-9
 
-      if (t9 < lowT9_cutoff) return
+      if (t9 < lowT9_cutoff .or. rho < rho_low_cutoff .or. etakep < eta_low_cutoff) return
 
       iflag = 0
       qn    = qn1

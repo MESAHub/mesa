@@ -82,8 +82,7 @@
       
       mesh_delta_coeff = 0.5
 
-      always_use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
+      energy_eqn_option = 'eps_grav'
       max_abs_rel_run_E_err = 1d99
 
       max_abar_for_burning = 55
@@ -94,12 +93,11 @@
       MLT_option = 'TDC'
 
       use_Ledoux_criterion = .true.  
-      alpha_semiconvection = 0.1
-      thermohaline_coeff = 2
+      thermohaline_coeff = 100
       thermohaline_option = 'Kippenhahn'
    
-!      merge_if_dlnR_too_small = .true.
-!      mesh_min_dlnR = 1d-9
+      merge_if_dlnR_too_small = .true.
+      mesh_min_dlnR = 1d-9
 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
@@ -121,7 +119,7 @@
       write_header_frequency = 10
    
 
-report_solver_progress = .true.
+report_solver_progress = .false.
 
 / ! end of controls namelist
 

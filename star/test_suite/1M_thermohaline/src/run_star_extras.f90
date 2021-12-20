@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       
       implicit none
 
@@ -84,7 +85,7 @@
          okay = .true.
 
          call test_suite_after_evolve(s, ierr)
-         write(*,*)
+         write(*,'(A)')
          call check('log total_angular_momentum', safe_log10(s% total_angular_momentum), 45d0, 55d0)
          call check('log center_omega', safe_log10(s% center_omega), -4d0, -2d0)
          call check('log he_core_omega', safe_log10(s% he_core_omega), -5d0, -2d0)
@@ -99,7 +100,7 @@
          end do
          
          if (k_surf >=1 .and. k_cntr <= s% nz) then
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'avg near 0.245 Msun'
             call check('logT', avg_val(s% lnT)/ln10, 7d0, 7.5d0)
             call check('logRho', avg_val(s% lnd)/ln10, 0.5d0, 2.0d0)
@@ -108,10 +109,10 @@
             call check('nu_ST', safe_log10(avg_val(s% nu_ST)), 4.0d0, 9.0d0)
             !call check('dynamo_B_r', safe_log10(avg_val(s% dynamo_B_r)), 0d0, 2d0)
             !call check('dynamo_B_phi', safe_log10(avg_val(s% dynamo_B_phi)), 3d0, 7d0)
-            write(*,*)
+            write(*,'(A)')
             if (okay) write(*,'(a)') 'all values are within tolerances'
             end if
-         write(*,*)
+         write(*,'(A)')
          
          
          contains

@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       
       implicit none
 
@@ -271,7 +272,7 @@
  
          select case (s% x_integer_ctrl(1))
          case(2)
-            read(iounit,iostat=ierr) ign_mass, ign_density, ign_co_core_mass
+            read(iounit,iostat=ierr) ign_mass, ign_density, ign_co_core_mass,flame_mass
          end select
  
        end subroutine extras_photo_read
@@ -287,7 +288,7 @@
  
          select case (s% x_integer_ctrl(1))
          case(2)
-            write(iounit) ign_mass, ign_density, ign_co_core_mass
+            write(iounit) ign_mass, ign_density, ign_co_core_mass,flame_mass
          end select
  
        end subroutine extras_photo_write

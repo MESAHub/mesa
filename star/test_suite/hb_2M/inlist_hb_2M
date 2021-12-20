@@ -46,7 +46,7 @@
       x_ctrl(1) = 0.14d0 ! min (Msun)
       x_ctrl(2) = 0.25d0 ! max (Msun)
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       
       initial_mass = 2
       initial_z = 0.02d0
@@ -54,7 +54,7 @@
       use_Ledoux_criterion = .true.
  
       mixing_length_alpha = 1.8d0
-      MLT_option = 'TDC'
+      MLT_option = 'Cox'
 
       predictive_mix(1) = .true.
       predictive_zone_type(1) = 'any'

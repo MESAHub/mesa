@@ -50,7 +50,7 @@
          real(qp) :: remaining_time, total_time, time, dt, &
             J_tot0, J_tot1, max_del, avg_del, &
             tol_correction_max, tol_correction_norm
-         real(dp) :: total, dt_dble
+         real(dp) :: total
          real(dp), pointer, dimension(:) :: am_sig_omega, am_sig_j
          real(qp), pointer, dimension(:) :: &
             du, d, dl, x, b, bp, vp, xp, dX, X_0, X_1, rhs, del
@@ -119,7 +119,7 @@
             if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
                if (s% stop_for_bad_nums) then
                   write(*,2) 's% omega(k)', k, s% omega(k)
-                  stop 'solve omega'
+                  call mesa_error(__FILE__,__LINE__,'solve omega')
                end if
                okay = .false.
                exit
@@ -127,7 +127,7 @@
          end do
          if (.not. okay) then
             write(*,2) 'model_number', s% model_number
-            stop 'start solve omega: bad num omega'
+            call mesa_error(__FILE__,__LINE__,'start solve omega: bad num omega')
          end if
 
          steps_used = 0
@@ -290,11 +290,11 @@
             end do
             if (.not. okay) then
                write(*,2) 'model_number', s% model_number
-               stop 'end solve omega'
+               call mesa_error(__FILE__,__LINE__,'end solve omega')
             end if
 
             do k=1,nz
-               s% j_rot(k) = s% i_rot(k)*s% omega(k)
+               s% j_rot(k) = s% i_rot(k)% val*s% omega(k)
             end do
 
             if (.not. (s% use_other_torque .or. s% use_other_torque_implicit .or. &
@@ -457,11 +457,11 @@
             do k = 1, nz
 
                omega = s% omega(k)
-               irot = s% i_rot(k)
+               irot = s% i_rot(k)% val
 
                if (k < nz) then
 
-                  irot_mid_00 = 0.5d0*(irot + s% i_rot(k+1))
+                  irot_mid_00 = 0.5d0*(irot + s% i_rot(k+1)% val)
                   am_sig_omega_00 = s% am_sig_omega(k) + s% am_sig_j(k)
                   c_omega_00 = am_sig_omega_00*irot_mid_00
                   del00_omega = omega - s% omega(k+1)
@@ -469,7 +469,7 @@
                   omega_mid_00 = 0.5d0*(omega + s% omega(k+1))
                   am_sig_irot_00 = s% am_sig_j(k)
                   c_irot_00 = am_sig_irot_00*omega_mid_00
-                  del00_irot = irot - s% i_rot(k+1)
+                  del00_irot = irot - s% i_rot(k+1)% val
 
                else
 
@@ -488,7 +488,7 @@
                      dmbar = 0.5d0*s% dm(k-1) + s% dm(k)
                   end if
 
-                  irot_mid_m1 = 0.5d0*(s% i_rot(k-1) + irot)
+                  irot_mid_m1 = 0.5d0*(s% i_rot(k-1)% val + irot)
                   am_sig_omega_m1 = s% am_sig_omega(k-1) + s% am_sig_j(k-1)
                   c_omega_m1 = am_sig_omega_m1*irot_mid_m1
                   delm1_omega = s% omega(k-1) - omega
@@ -496,7 +496,7 @@
                   omega_mid_m1 = 0.5d0*(s% omega(k-1) + omega)
                   am_sig_irot_m1 = s% am_sig_j(k-1)
                   c_irot_m1 = am_sig_irot_m1*omega_mid_m1
-                  delm1_irot = s% i_rot(k-1) - irot
+                  delm1_irot = s% i_rot(k-1)% val - irot
 
                else
 
@@ -553,11 +553,11 @@
             do k = 1, nz
 
                omega = s% omega(k)
-               irot = s% i_rot(k)
+               irot = s% i_rot(k)% val
 
                if (k < nz) then
 
-                  irot_mid_00 = 0.5d0*(irot + s% i_rot(k+1))
+                  irot_mid_00 = 0.5d0*(irot + s% i_rot(k+1)% val)
                   am_sig_omega_00 = s% am_sig_omega(k) + s% am_sig_j(k)
                   c_omega_00 = am_sig_omega_00*irot_mid_00
                   del00_omega = omega - s% omega(k+1)
@@ -567,7 +567,7 @@
                   c_irot_00 = am_sig_irot_00*omega_mid_00
                   d_c_irot_00_domega_p1 = 0.5d0*am_sig_irot_00
                   d_c_irot_00_domega_00 = 0.5d0*am_sig_irot_00
-                  del00_irot = irot - s% i_rot(k+1)
+                  del00_irot = irot - s% i_rot(k+1)% val
 
                else
 
@@ -588,7 +588,7 @@
                      dmbar = 0.5d0*s% dm(k-1) + s% dm(k)
                   end if
 
-                  irot_mid_m1 = 0.5d0*(s% i_rot(k-1) + irot)
+                  irot_mid_m1 = 0.5d0*(s% i_rot(k-1)% val + irot)
                   am_sig_omega_m1 = s% am_sig_omega(k-1) + s% am_sig_j(k-1)
                   c_omega_m1 = am_sig_omega_m1*irot_mid_m1
                   delm1_omega = s% omega(k-1) - omega
@@ -598,7 +598,7 @@
                   c_irot_m1 = am_sig_irot_m1*omega_mid_m1
                   d_c_irot_m1_domega_00 = 0.5d0*am_sig_irot_m1
                   d_c_irot_m1_domega_m1 = 0.5d0*am_sig_irot_m1
-                  delm1_irot = s% i_rot(k-1) - irot
+                  delm1_irot = s% i_rot(k-1)% val - irot
 
                else
 

@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       
       implicit none
       
@@ -97,7 +98,7 @@
             else
                write(*,1) 'avg d2N2 is too large', sum_d2N2/n
             end if
-            write(*,*)
+            write(*,'(A)')
          end if 
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve

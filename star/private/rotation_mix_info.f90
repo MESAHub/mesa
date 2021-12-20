@@ -30,6 +30,7 @@
       use num_lib
       use utils_lib
       use star_private_def
+      use magnetic_diffusion
 
       implicit none
 
@@ -52,12 +53,12 @@
 
 
       subroutine set_rotation_mixing_info(s, ierr)
-         use star_utils, only: weighed_smoothing, median_smoothing
+         use star_utils, only: weighed_smoothing
 
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         real(dp) :: f_mu, q
+         real(dp) :: f_mu, q, D_ST_old, nu_ST_old
          ! the following are all defined at cell boundaries
          real(dp), dimension(:), pointer :: & ! just copies of pointers
             r, m, L, j_rot, gradT, grada, grav, visc, Ri
@@ -78,9 +79,10 @@
          real(dp), allocatable :: smooth_work(:,:), saved(:,:)
          logical, allocatable :: unstable(:,:) ! (num_instabilities, nz)
 
-         integer :: nz, i, j, k, which, op_err
+         integer :: nz, i, j, k, k0, which, op_err
          real(dp) :: alfa, beta, growth_limit, age_fraction, &
-            D_omega_source, max_replacement_factor
+            D_omega_source, max_replacement_factor, &
+            dgtau, angsml, angsmt, out_q, prev_out_q, prev_out_q_m1, prev_q, prev_q_m1
 
          include 'formats'
 
@@ -195,6 +197,39 @@
                      call smooth_for_rotation(s, s% D_ST, s% smooth_D_ST, smooth_work(1:nz,which))
                      call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, smooth_work(1:nz,which))
 
+                     ! time smooth for ST only
+                     if (s% prev_mesh_have_ST_start_info .and. .not. s% doing_relax &
+                        .and. .not. s% doing_first_model_of_run .and. s% ST_angsmt>0d0) then
+
+                        k0 = 1
+                        angsml = s% ST_angsml
+                        angsmt = s% ST_angsmt
+                        prev_out_q = 0d0
+                        prev_q = 1d0
+                        do k=2, nz-1 ! ignore k=1 or nz edge case
+                           if (s% m(k) > s% mstar_old) cycle
+                           do while (k0 < s% prev_mesh_nz)
+                              if (s% m(k)/s% mstar_old > prev_q) exit
+                              prev_out_q = prev_out_q + s% prev_mesh_dq(k0)
+                              prev_q = 1d0 - prev_out_q
+                              k0 = k0+1
+                           end do
+                           if (s% m(k)/s% mstar_old < prev_q) exit
+                           prev_out_q_m1 = prev_out_q - s% prev_mesh_dq(k0-1)
+                           prev_q_m1 = 1 - prev_out_q_m1
+
+                           ! linear interpolation
+                           alfa = (s% m(k)/s% mstar_old - prev_q)/(prev_q_m1-prev_q)
+                           D_ST_old = (1d0-alfa)*s% prev_mesh_D_ST_start(k0) + alfa*s% prev_mesh_D_ST_start(k0-1)
+                           nu_ST_old = (1d0-alfa)*s% prev_mesh_nu_ST_start(k0) + alfa*s% prev_mesh_nu_ST_start(k0-1)
+                           dgtau = angsml*(s% r(k)-s% r(k+1))*(s% r(k-1)*s% r(k))/s% dt
+                           s% D_ST(k) = max(D_ST_old/(1d0 + angsmt), &
+                              min(s% D_ST(k), max(D_ST_old*(1d0 + angsmt), D_ST_old + dgtau)))
+                           s% nu_ST(k) = max(nu_ST_old/(1d0 + angsmt), &
+                              min(s% nu_ST(k), max(nu_ST_old*(1d0 + angsmt), nu_ST_old + dgtau)))
+                        end do
+                     end if
+
                      ! calculate B_r and B_phi
                      do k = 1, nz
                         q = s% omega_shear(k)
@@ -218,7 +253,7 @@
                   end if
 
                case default
-                  stop 'bad case for rotation_mix_info'
+                  call mesa_error(__FILE__,__LINE__,'bad case for rotation_mix_info')
 
             end select
 
@@ -259,13 +294,13 @@
                      s% D_GSF_factor, s% D_GSF(k)
                   write(*,2) 's% D_ST_factor   * s% D_ST(k)', k, s% D_ST_factor   * s% D_ST(k), &
                      s% D_ST_factor, s% D_ST(k)
-                  stop 'rotation mix'
+                  call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
                s% D_omega(k) = D_omega_source
                if (is_bad(s% D_omega(k))) then
                   write(*,2) 's% D_omega(k)', k, s% D_omega(k)
                   write(*,2) 'D_omega_source', k, D_omega_source
-                  stop 'rotation mix'
+                  call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
             end do
             
@@ -274,7 +309,7 @@
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after smooth_for_rotation s% D_omega(k)', k, s% D_omega(k)
-                     stop 'rotation mix'
+                     call mesa_error(__FILE__,__LINE__,'rotation mix')
                   end if
                end do
             end if
@@ -284,7 +319,7 @@
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after mix_D_omega s% D_omega(k)', k, s% D_omega(k)
-                     stop 'rotation mix'
+                     call mesa_error(__FILE__,__LINE__,'rotation mix')
                   end if
                end do
             end if
@@ -295,7 +330,7 @@
             do k=1,nz
                if (is_bad(s% D_omega(k))) then
                   write(*,2) 'before return s% D_omega(k)', k, s% D_omega(k)
-                  stop 'rotation mix'
+                  call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
@@ -383,7 +418,7 @@
                if (is_bad(x(k))) then
                   return
                   write(*,3) 's% D_omega(k) prev, x', k, s% model_number, s% D_omega(k), x(k), bp(i)
-                  stop 'mix_D_omega'
+                  call mesa_error(__FILE__,__LINE__,'mix_D_omega')
                end if
             end do
             
@@ -393,7 +428,7 @@
                s% D_omega(k) = s% D_omega(k) + x(k)
                if (is_bad(s% D_omega(k))) then
                   write(*,3) 's% D_omega(k)', k, s% model_number, s% D_omega(k)
-                  stop 'mix_D_omega'
+                  call mesa_error(__FILE__,__LINE__,'mix_D_omega')
                end if
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
@@ -589,7 +624,7 @@
             do i = 2, nz-1
                ri0 = (rho(i)*delta(i)/P(i))*pow2(dlnR_domega(i)*grav(i))
                Ri_T(i) = ri0*max(0d0,-gradT_sub_grada(i)) ! turn off Ri_T in convection zones
-               Ri_mu(i) = ri0*f_mu*s% gradL_composition_term(i)
+               Ri_mu(i) = ri0*f_mu*s% smoothed_brunt_B(i)
             end do
             Ri_T(1) = 0; Ri_T(nz) = 0
             Ri_mu(1) = 0; Ri_mu(nz) = 0
@@ -643,26 +678,26 @@
                      if (abs(denom) < 1d-50 .or. is_bad(denom)) then
                         if (s% stop_for_bad_nums) then
                            write(*,2) 'denom', i, denom
-                           stop 'rotation mix info: velocities for ES and GSF'
+                           call mesa_error(__FILE__,__LINE__,'rotation mix info: velocities for ES and GSF')
                         end if
                         ve0(i) = 1d99
                      else
                         ve0(i) = grada(i)*omega(i)*omega(i)*r(i)*r(i)*r(i)*L(i)*bracket_term/denom
                      end if
                      ve_mu(i) = (scale_height(i)/t_kh(i))* &
-                              (f_mu*s% gradL_composition_term(i))/(gradT_sub_grada(i))
+                              (f_mu*s% smoothed_brunt_B(i))/(gradT_sub_grada(i))
                   end if
                   if (is_bad(ve0(i))) then
                      if (s% stop_for_bad_nums) then
                         write(*,2) 've0(i)', i, ve0(i)
-                        stop 'rotation mix info'
+                        call mesa_error(__FILE__,__LINE__,'rotation mix info')
                      end if
                      ve0(i) = 1d99
                   end if
                   if (is_bad(ve_mu(i))) then
                      if (s% stop_for_bad_nums) then
                         write(*,2) 've_mu(i)', i, ve_mu(i)
-                        stop 'rotation mix info'
+                        call mesa_error(__FILE__,__LINE__,'rotation mix info')
                      end if
                      ve_mu(i) = 1d99
                   end if
@@ -671,7 +706,7 @@
                      write(*,2) 'grada(i)', i, grada(i)
                      write(*,2) 'gradT(i)', i, gradT(i)
                      write(*,2) 'gradT_sub_grada(i)', i, gradT_sub_grada(i)
-                     write(*,2) 's% gradL_composition_term(i)', i, s% gradL_composition_term(i)
+                     write(*,2) 's% smoothed_brunt_B(i)', i, s% smoothed_brunt_B(i)
                      write(*,2) 'omega(i)', i, omega(i)
                      write(*,2) 's% omega(i)', i, s% omega(i)
                      write(*,2) '2*r**2*eps_nuc/L', i, 2*r(i)*r(i)*eps_nuc(i)/max(1d0,L(i))
@@ -683,7 +718,7 @@
                end do
 
                ! conductive opacities for ST
-               if (s% D_ST_factor > 0) then
+               if (s% D_ST_factor > 0d0 .or. s% am_nu_factor > 0d0) then
                   do i = 1, nz
                      call kap_get_elect_cond_opacity( &
                         s% kap_handle, zbar(i), log10(rho(i)), log10(T(i)),  &
@@ -735,7 +770,7 @@
                            s% D_DSI(k), D, scale_height(k)*csound(k), &
                            Ri(k), Ri_crit, height, t_dyn(k), &
                            instability_height, scale_height(k), csound(k)
-                        stop 'set_D_DSI'
+                        call mesa_error(__FILE__,__LINE__,'set_D_DSI')
                      end if
                      height = min(instability_height, scale_height(k))
                      D = height*height/t_dyn(k)
@@ -751,7 +786,7 @@
                end if
 
             end do
-            if (dbg) stop 'set_D_DSI'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'set_D_DSI')
          end subroutine set_D_DSI
 
 
@@ -871,7 +906,7 @@
                         write(*,2) 'dr(k)', k, dr(k)
                         write(*,2) 'visc(k)', k, visc(k)
                         write(*,2) 'domega_dlnR(k)', k, domega_dlnR(k)
-                        stop 'set_D_SSI'
+                        call mesa_error(__FILE__,__LINE__,'set_D_SSI')
                      end if
 
                   end do
@@ -964,7 +999,7 @@
                   write(*,2) 'Hj(i)', i, Hj(i)
                   write(*,2) 'omega(i)', i, omega(i)
                   write(*,2) 'dlnR_domega(i)', i, dlnR_domega(i)
-                  stop 'set_D_GSF'
+                  call mesa_error(__FILE__,__LINE__,'set_D_GSF')
                   v = 0
                end if
                v_diff = abs(v) - abs(ve_mu(i)) ! heger 2000, eqn 43
@@ -1151,36 +1186,11 @@
          do k = 2, nz-1
 
             xkap = 16d0*boltz_sigma*T(k)*T(k)*T(k)/ &
-                     (3d0*opacity(k)*rho(k)*rho(k)*Cp(k)) ! thermal diffusivity
-            xgamma = 0.2275d0*zbar(k)*zbar(k)*pow(rho(k)*1.d-6/abar(k),one_third)*1.d8/T(k)
-            xlg = log10(xgamma)
-            if (xlg < -1.5d0) then
-               xsig1 = sige1(zbar(k),T(k),xgamma)
-               xsig = xsig1
-            else if (xlg >= -1.5d0 .and. xlg <= 0d0) then
-               xxx = (xlg + 0.75d0)*4d0/3d0
-               ffff = 0.25d0*(2d0-3d0*xxx + xxx*xxx*xxx)
-               xsig1 = sige1(zbar(k),T(k),xgamma)
-               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
-               if (ierr /= 0) return
-               xsig = (1d0-ffff)*xsig2 + ffff*xsig1
-            else if (xlg > 0d0 .and. xlg < 0.5d0) then
-               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
-               if (ierr /= 0) return
-               xsig = xsig2
-            else if (xlg >= 0.5d0 .and. xlg < 1d0) then
-               xxx = (xlg-0.75d0)*4d0
-               ffff = 0.25d0*(2d0-3d0*xxx + xxx*xxx*xxx)
-               xsig2 = sige2(T(k),rho(k),kap_cond(k),ierr)
-               if (ierr /= 0) return
-               xsig3 = sige3(zbar(k),T(k),xgamma)
-               xsig = (1d0-ffff)*xsig3 + ffff*xsig2
-            else
-               xsig3 = sige3(zbar(k),T(k),xgamma)
-               xsig = xsig3
-            endif
+               (3d0*opacity(k)*rho(k)*rho(k)*Cp(k)) ! thermal diffusivity
 
-            xeta = 7.1520663d19/xsig ! magnetic diffusivity
+            xsig = calc_sige(abar(k), zbar(k), rho(k), T(k), Cp(k), kap_cond(k), opacity(k))
+            xeta = calc_eta(xsig)  ! magnetic diffusivity
+
             xmagn = N2(k)
             xmagnmu = N2_mu(k)
             xmagnt = xmagn - xmagnmu ! N2_T
@@ -1216,7 +1226,7 @@
                   write(*,2) 'xmagw', k, xmagw
                   write(*,2) 'xmagdn', k, xmagdn
                   write(*,2) 'xmags0', k, xmags0
-                  stop 'set_ST'
+                  call mesa_error(__FILE__,__LINE__,'set_ST')
                end if
                xmagbphi0 = xmagwa0*xmag4pd*xmagrn ! B_\phi
                xmagbr0 = xmagbphi0*xmagq*xmagwn*xmagwn ! B_r
@@ -1255,7 +1265,7 @@
                   write(*,2) 'xmags1', k, xmags1
                   write(*,2) 'xmags0', k, xmags0
                   write(*,2) 'xmagsm', k, xmagsm
-                  stop 'set_ST'
+                  call mesa_error(__FILE__,__LINE__,'set_ST')
                end if
                xmagqm=xmagq0+xmagq1 ! q_m
                xmagetam=xmageta0*xmageta1/(xmageta0+xmageta1) ! eta_m
@@ -1331,7 +1341,7 @@
                write(*,3) 'set_ST xmagnu', k, s% model_number, xmagnu
                write(*,3) 'set_ST xmagfdif', k, s% model_number, xmagfdif
                write(*,3) 'set_ST D_ST(k)', k, s% model_number, s% D_ST(k)
-               stop 'set_ST'
+               call mesa_error(__FILE__,__LINE__,'set_ST')
             end if
 
          end do
@@ -1366,48 +1376,6 @@
             if (dc(k) < tiny) dc(k) = 0
          end do
       end subroutine zero_if_tiny
-
-
-      real(dp) function sige1(z,t,xgamma)
-         ! Written by S.-C. Yoon, Oct. 10, 2003
-         ! Electrical conductivity according to Spitzer 1962
-         ! See also Wendell et al. 1987, ApJ 313:284
-         real(dp), intent(in) :: z, t, xgamma
-         real(dp) :: etan, xlambda,f
-         if (t >= 4.2d5) then
-            f = sqrt(4.2d5/t)
-         else
-            f = 1.d0
-         end if
-         xlambda = sqrt(3d0*z*z*z)*pow(xgamma,-1.5d0)*f + 1d0
-         etan = 3.d11*z*log(xlambda)*pow(t,-1.5d0)             ! magnetic diffusivity
-         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0))) ! correction: gammae
-         sige1 = clight*clight/(pi4*etan)                    ! sigma = c^2/(4pi*eta)
-      end function sige1
-
-
-      real(dp) function sige2(T,rho,kap_cond,ierr)
-         ! writen by S.-C. YOON Oct. 10, 2003
-         ! electrical conductivity using conductive opacity
-         ! see Wendell et al. 1987 ApJ 313:284
-         real(dp), intent(in) :: t,rho,kap_cond
-         integer, intent(out) :: ierr
-         sige2 = 1.11d9*T*T/(rho*kap_cond)
-      end function sige2
-
-
-      real(dp) function sige3(z,t,xgamma)
-         ! writen by S.-C. YOON Oct. 10, 2003
-         ! electrical conductivity in degenerate matter,
-         ! according to Nandkumar & Pethick (1984)
-         real(dp), intent(in) :: z, t, xgamma
-         real(dp) :: rme, rm23, ctmp, xi
-         rme = 8.5646d-23*t*t*t*xgamma*xgamma*xgamma/pow5(z)  ! rme = rho6/mue
-         rm23 = pow(rme,2d0/3d0)
-         ctmp = 1d0 + 1.018d0*rm23
-         xi= sqrt(3.14159d0/3.)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
-         sige3 = 8.630d21*rme/(z*ctmp*xi)
-      end function sige3
 
 
       end module rotation_mix_info

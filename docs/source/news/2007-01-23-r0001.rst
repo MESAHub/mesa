@@ -1,0 +1,11 @@
+============
+Release 0001
+============
+
+:Date:   2007-01-23
+
+Revision 0001 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r0001.zip/download>`__
+is available for download.

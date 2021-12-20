@@ -51,7 +51,7 @@
   ! make max_age_in_seconds and total_mass_for_inject_extra_ergs_sec large enough so max logT < 10.3
   max_age_in_seconds = 0.2d0
   total_mass_for_inject_extra_ergs_sec = 0.2d0
-  max_timestep = 1d-4
+  max_timestep = 1d-3
   
   start_time_for_inject_extra_ergs_sec = 0d0
   base_of_inject_extra_ergs_sec = -1d0
@@ -80,7 +80,7 @@
 
   dxdt_nuc_factor = 0
 
-  use_dedt_form_of_energy_eqn = .true.
+  energy_eqn_option = 'dedt'
 
   non_nuc_neu_factor = 0
   eps_nuc_factor = 0

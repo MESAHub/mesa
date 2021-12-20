@@ -1,0 +1,16 @@
+============
+Release 7385
+============
+
+:Date:   2015-01-13
+
+Revision 7385 has been designated a MESA release version. Revision 7385
+quickly superseded revision 7380 and contains the following
+`bugfix <http://sourceforge.net/p/mesa/mailman/message/33229645/>`__.
+
+For the full release notes, see `this mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/33225110/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r7385.zip/download>`__
+is available for download.

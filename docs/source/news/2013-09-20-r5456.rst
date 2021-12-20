@@ -1,0 +1,13 @@
+============
+Release 5456
+============
+
+:Date:   2013-09-20
+
+Revision 5456 has been designated a MESA release version. For the
+release notes, see `this mailing list
+post <http://sourceforge.net/p/mesa/mailman/message/31428288/>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r5456.zip/download>`__
+is available for download.

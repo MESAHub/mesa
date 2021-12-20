@@ -35,7 +35,7 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 25000
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
       convergence_ignore_equL_residuals = .true. ! needed during flash
      
       initial_mass = 2
@@ -44,7 +44,7 @@
       use_Ledoux_criterion = .true.
      
       mixing_length_alpha = 1.8d0
-      MLT_option = 'TDC'
+      MLT_option = 'Cox'
 
       predictive_mix(1) = .true.
       predictive_zone_type(1) = 'any'

@@ -1,0 +1,11 @@
+============
+Release 3290
+============
+
+:Date:   2011-05-20
+
+Revision 3290 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3290.zip/download>`__
+is available for download.

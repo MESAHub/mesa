@@ -551,84 +551,6 @@
       end subroutine set_RSP_flag
 
 
-      subroutine set_conv_vel_flag(id, conv_vel_flag, ierr)
-         use const_def, only: no_mixing, convective_mixing
-         integer, intent(in) :: id
-         logical, intent(in) :: conv_vel_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% conv_vel_flag .eqv. conv_vel_flag) return
-
-         nz = s% nz
-         s% conv_vel_flag = conv_vel_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. conv_vel_flag) then ! remove i_ln_cvpv0's
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (conv_vel_flag) then ! insert i_ln_cvpv0's
-            call insert(s% xh)
-            call insert(s% xh_start)
-            if (s% have_previous_conv_vel) then
-               do k=1,nz
-                  s% xh(s% i_ln_cvpv0,k) = log(s% conv_vel(k)+s% conv_vel_v0)
-               end do
-            else
-               s% xh(s% i_ln_cvpv0,1:nz) = 0d0
-            end if
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_ln_cvpv0
-            if (size(xs,dim=2) < nz) return
-            i_ln_cvpv0 = s% i_ln_cvpv0
-            do j = i_ln_cvpv0+1, nvar_hydro_old
-               xs(j-1,1:nz) = xs(j,1:nz)
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_ln_cvpv0
-            if (size(xs,dim=2) < nz) return
-            i_ln_cvpv0 = s% i_ln_cvpv0
-            do j = s% nvar_hydro, i_ln_cvpv0+1, -1
-               xs(j,1:nz) = xs(j-1,1:nz)
-            end do
-            xs(i_ln_cvpv0,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_conv_vel_flag
-
-
       subroutine set_w_div_wc_flag(id, w_div_wc_flag, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: w_div_wc_flag
@@ -665,7 +587,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (w_div_wc_flag) then ! insert i_ln_cvpv0's
+         if (w_div_wc_flag) then ! insert i_w_div_w's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_w_div_wc,1:nz) = 0d0
@@ -736,7 +658,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (j_rot_flag) then ! insert i_ln_cvpv0's
+         if (j_rot_flag) then ! insert i_j_rot's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_j_rot,1:nz) = 0d0

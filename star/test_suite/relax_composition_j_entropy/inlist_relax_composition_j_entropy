@@ -31,7 +31,7 @@
 
 &controls
 
-   use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
 
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
@@ -46,6 +46,8 @@
 
     read_extra_controls_inlist1 = .true.
     extra_controls_inlist1_name = 'inlist_common'
+    
+    use_gold_tolerances = .true.
 
 / ! end of controls namelist
 

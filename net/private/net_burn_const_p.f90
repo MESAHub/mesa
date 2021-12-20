@@ -516,7 +516,7 @@
                ierr = -1
             
             
-               stop 'net_burn_const_P'
+               call mesa_error(__FILE__,__LINE__,'net_burn_const_P')
             
                return
             end if

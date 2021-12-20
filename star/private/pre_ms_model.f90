@@ -131,7 +131,7 @@
             do i=1,species
                write(*,1) trim(chem_isos% name(s% chem_id(i))), xa(i)
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (abs(1-sum(xa(:))) > 1d-8) then
@@ -249,13 +249,13 @@
          nz = s% nz
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'finished pre-MS model'
             write(*,1) 'mstar1/Msun', mstar1/Msun
             write(*,1) '(mstar-mstar1)/mstar', (mstar-mstar1)/mstar
             write(*,*) 'nz', nz
-            write(*,*)
-            stop 'debug: pre ms'
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'debug: pre ms')
          end if
 
          ! The following deallocations deal with arrays which were
@@ -370,7 +370,7 @@
          if (dbg) then
             write(*,1) 'rho_c', rho_c
             write(*,1) 'pre_ms_f', pre_ms_f
-            write(*,*)
+            write(*,'(A)')
          end if
 
       end function pre_ms_f
@@ -683,7 +683,7 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             gradT, ierr )
          use chem_def, only: ih1
-         use mlt_get_results, only: get_gradT
+         use turb_support, only: get_gradT
          use kap_def, only : num_kap_fracs
          use kap_lib, only : kap_get
 
@@ -702,7 +702,6 @@
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
          real(dp) :: Y_face, conv_vel, D, Gamma ! Not used
          integer :: mixing_type
-         logical :: make_gradr_sticky_in_solver_iters
          
          ierr = 0
 

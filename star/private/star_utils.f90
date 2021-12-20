@@ -323,23 +323,7 @@
             xh => s% xh
          end if
          lnR = xh(s% i_lnR,k)
-      end function get_lnR_from_xh
-      
-      
-      subroutine store_r_or_lnR_in_xh(s, k, r, lnR, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: r, lnR
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnR,k) = lnR
-      end subroutine store_r_or_lnR_in_xh
-      
+      end function get_lnR_from_xh      
       
       subroutine store_r_in_xh(s, k, r, xh_in)
          type (star_info), pointer :: s
@@ -415,21 +399,6 @@
       end function get_lnT_from_xh
       
       
-      subroutine store_T_or_lnT_in_xh(s, k, T, lnT, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: T, lnT
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnT,k) = lnT
-      end subroutine store_T_or_lnT_in_xh
-      
-      
       subroutine store_T_in_xh(s, k, T, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -474,50 +443,7 @@
          lnd = xh(s% i_lnd,k)
          rho =  exp(lnd)
       end subroutine get_rho_and_lnd_from_xh
-      
-      
-      real(dp) function get_rho_from_xh(s, k, xh_in) result(rho)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         rho =  exp(xh(s% i_lnd,k))
-      end function get_rho_from_xh
-      
-      
-      real(dp) function get_lnd_from_xh(s, k, xh_in) result(lnd)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         lnd = xh(s% i_lnd,k)
-      end function get_lnd_from_xh
-      
-      
-      subroutine store_rho_or_lnd_in_xh(s, k, rho, lnd, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: rho, lnd
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_lnd,k) = lnd
-      end subroutine store_rho_or_lnd_in_xh
-      
+            
       
       subroutine store_rho_in_xh(s, k, rho, xh_in)
          type (star_info), pointer :: s
@@ -547,36 +473,6 @@
          end if
          xh(s% i_lnd,k) = lnd
       end subroutine store_lnd_in_xh
-
-
-      subroutine store_w_in_xh(s, k, w, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: w
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_w,k) = w
-      end subroutine store_w_in_xh
-      
-      
-      subroutine store_etrb_in_xh(s, k, etrb, xh_in)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: etrb
-         real(dp), intent(in), pointer, optional :: xh_in(:,:)
-         real(dp), pointer :: xh(:,:)
-         if (present(xh_in)) then
-            xh => xh_in
-         else
-            xh => s% xh
-         end if
-         xh(s% i_w,k) = sqrt(max(0d0,etrb))
-      end subroutine store_etrb_in_xh
 
 
       subroutine use_xh_to_set_rho_to_dm_div_dV(s, ierr)
@@ -618,7 +514,7 @@
             if (s% dm(k) <= 0d0 .or. is_bad(s% m(k) + s% dm(k))) then
                write(*,2) 'dm m dq q M_center', k, &
                   s% dm(k), s% m(k), s% dq(k), s% q(k), s% M_center
-               if (s% stop_for_bad_nums) stop 'set_m_and_dm'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_m_and_dm')
             end if
          end do
       end subroutine set_m_and_dm
@@ -781,7 +677,7 @@
             write(*,2) 'dq(k)', k, dq(k)
             write(*,2) 'dq(k+1)', k+1, dq(k+1)
 
-            stop 'interp_val_to_pt'
+            call mesa_error(__FILE__,__LINE__,'interp_val_to_pt')
          endif
          interp_val_to_pt = (v(k)*dq(k-1) + v(k-1)*dq(k))/(dq(k-1) + dq(k))
       end function interp_val_to_pt
@@ -839,7 +735,7 @@
             write(*,2) 's% rmid(1)', k, s% rmid(k)
             write(*,2) 's% r(1)', k, s% r(k)
             write(*,2) 's% r(2)', 2, s% r(2)
-            stop 'get_dtau1'
+            call mesa_error(__FILE__,__LINE__,'get_dtau1')
          end if
       end function get_dtau1
 
@@ -869,7 +765,7 @@
                write(*,2) 's% dm(k)', k, s% dm(k)
                write(*,2) 's% opacity(k)', k, s% opacity(k)
                write(*,2) 's% rmid(k)', k, s% rmid(k)
-               stop 'get_tau'
+               call mesa_error(__FILE__,__LINE__,'get_tau')
             end if
             if (k == s% nz) s% tau_center = s% tau(k) + dtau
             !write(*,*) 'dtau, dlogtau', k, tau(k) - tau(k-1), &
@@ -1025,44 +921,6 @@
             dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          end do
       end function get_tau_at_r
-
-
-      integer function find_tau_phot(s, tau00, taup1, ierr)
-         ! return k for the cell containing optical depth = tau_base
-         type (star_info), pointer :: s
-         real(dp), intent(out) :: tau00, taup1
-         integer, intent(out) :: ierr
-         integer :: k
-         real(dp) :: dtau, tau_phot
-
-         include 'formats'
-         ierr = 0
-         tau00 = 0
-         taup1 = 0
-         find_tau_phot = 1
-         if (s% tau_factor >= 1 .and. .not. s% RSP_flag) return
-         tau_phot = s% tau_base
-         tau00 = s% tau_factor*s% tau_base
-         do k = 1, s% nz
-            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
-            taup1 = tau00 + dtau
-            if (taup1 >= tau_phot) then
-               find_tau_phot = k
-               return
-            end if
-            tau00 = taup1
-         end do
-         ierr = -1
-      end function find_tau_phot
-
-      
-      real(dp) function get_r_phot(s)
-         type (star_info), pointer :: s  
-         real(dp) :: r, m, v, L, T_phot, cs, kap, logg, ysum
-         integer :: k_phot
-         call get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
-         get_r_phot = r
-      end function get_r_phot
       
       
       subroutine set_phot_info(s)
@@ -1086,7 +944,7 @@
          if (is_bad(luminosity)) then
             write(*,2) 's% L(1)', s% model_number, s% L(1)
             write(*,2) 's% xh(s% i_lum,1)', s% model_number, s% xh(s% i_lum,1)
-            stop 'set_phot_info'
+            call mesa_error(__FILE__,__LINE__,'set_phot_info')
             luminosity = 0d0
          end if
          s% L_surf = luminosity/Lsun
@@ -1094,7 +952,7 @@
             ! log10(stellar luminosity in solar units)
          if (is_bad(s% L_surf)) then
             write(*,2) 's% L_surf', s% model_number, s% L_surf
-            stop 'set_phot_info'
+            call mesa_error(__FILE__,__LINE__,'set_phot_info')
          end if
       end subroutine set_phot_info
 
@@ -1179,31 +1037,6 @@
          kap = s% opacity(k_phot)
          logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
       end subroutine get_phot_info
-
-
-      real(dp) function get_phot_kap(s)
-         type (star_info), pointer :: s
-
-         integer :: k
-         real(dp) :: tau00, taup1, dtau, tau_phot
-
-         include 'formats'
-
-         get_phot_kap = s% opacity(1)
-         tau_phot = s% tau_base
-         tau00 = s% tau_factor*s% tau_base
-         if (tau00 >= tau_phot) return
-         do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
-            taup1 = tau00 + dtau
-            if (taup1 >= tau_phot .and. dtau > 0d0) then
-               get_phot_kap = s% opacity(k)
-               return
-            end if
-            tau00 = taup1
-         end do
-         get_phot_kap = s% opacity(s% nz)
-      end function get_phot_kap
 
 
       real(dp) function center_value(s, p)
@@ -1324,70 +1157,6 @@
       end subroutine set_abs_du_div_cs
 
 
-      real(dp) function rsi_div_rsimelt(s,k,species) 
-         ! rsi = ion density parameter for cell k
-         ! rsimelt = ion density parameter of quantum melting
-         ! rsi < rsimelt => liquid, independent of T
-         use chem_def, only: chem_isos
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, species
-         
-         integer :: IX, j
-         real(dp), dimension(species) :: AZion, ACMI, AY
-         real(dp) :: Y, CMImean, Z73, RS, RSI
-         real(dp), parameter :: RSIMELT=140d0, TINY=1d-7, &
-            AUM=1822.888d0 ! a.m.u./m_e
-         
-         include 'formats'
-         
-         ! details from eos/private/pc_eos.f
-         
-         AZion(1:species) = chem_isos% Z(s% chem_id(1:species))
-         ACMI(1:species) = chem_isos% W(s% chem_id(1:species))
-         do j=1,species
-            if (s% xa(j,k) < s% eos_rq% mass_fraction_limit_for_PC) then
-               AY(j) = 0
-            else
-               AY(j) = s% xa(j,k)/ACMI(j)
-            end if
-         end do
-         
-         Y=0.d0
-         do IX=1,species
-            Y=Y+AY(IX)
-         end do
-         if (dabs(Y-1.d0).gt.TINY) then
-           do IX=1,species
-              AY(IX)=AY(IX)/Y
-           end do
-         end if
-
-         CMImean=0.d0
-         Z73=0.d0
-         do IX=1,species
-            if (AY(IX) < TINY) cycle
-            Z73 = Z73 + AY(IX)*pow(AZion(IX),7d0/3d0)
-            CMImean = CMImean + AY(IX)*ACMI(IX)
-         end do
-
-         RS=pow(0.75d0/PI/s% rho(k),one_third)
-         RSI=RS*CMImean*Z73*AUM
-         
-         if (is_bad(RSI)) then
-            write(*,2) 'RSI', k, RSI
-            write(*,2) 'Z73', k, Z73
-            write(*,2) 'CMImean', k, CMImean
-            write(*,2) 'RS', k, RS
-            write(*,2) 's% rho(k)', k, s% rho(k)
-            !write(*,2) '', k, 
-            !write(*,2) '', k, 
-            stop 'rsi_div_rsimelt'
-         end if
-         
-         rsi_div_rsimelt = RSI/RSIMELT
-         
-      end function rsi_div_rsimelt
-
 
       subroutine get_shock_info(s)
          type (star_info), pointer :: s
@@ -1431,7 +1200,7 @@
                   shock_radius = &
                      find0(s% r(k), v_div_cs_00-1d0, s% r(k-1), v_div_cs_m1-1d0)
                   if (shock_radius <= 0d0) then
-                     stop 'get_shock_info 1'
+                     call mesa_error(__FILE__,__LINE__,'get_shock_info 1')
                   end if
                   exit
                end if
@@ -1441,7 +1210,7 @@
                   shock_radius = &
                      find0(s% r(k), v_div_cs_00+1d0, s% r(k-1), v_div_cs_m1+1d0)
                   if (shock_radius <= 0d0) then
-                     stop 'get_shock_info 2'
+                     call mesa_error(__FILE__,__LINE__,'get_shock_info 2')
                   end if
                   exit
                end if
@@ -1694,6 +1463,8 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dHp_m1, dHp_00, dHp_p1, &
+            dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
+            djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1
          integer :: j
@@ -1705,6 +1476,8 @@
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dHp_m1, dHp_00, dHp_p1, &
+            dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
+            djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1) 
                      
@@ -1717,6 +1490,8 @@
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
          if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
          if (s% i_Hp /= 0) call unpack1(s% i_Hp, dHp_m1, dHp_00, dHp_p1)
+         if (s% i_w_div_wc /= 0) call unpack1(s% i_w_div_wc, dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1)
+         if (s% i_j_rot /= 0) call unpack1(s% i_j_rot, djrot_m1, djrot_00, djrot_p1)
          
          contains
          
@@ -1765,7 +1540,7 @@
                if (s% report_ierr) then
                   write(*,2) 'store_partials: bad ' // trim(str), k, dequ
                end if
-               if (s% stop_for_bad_nums) stop 'store_partials'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_partials')
 !$omp end critical (store_partials_crit)
                return
             end if
@@ -1881,7 +1656,7 @@
                min_collapse_k = -1
                return
                write(*,2) 'bad radii', k, r00, rp1
-               stop 'eval_min_cell_collapse_time'
+               call mesa_error(__FILE__,__LINE__,'eval_min_cell_collapse_time')
             end if
             if (vp1 > v00) then
                time = (r00 - rp1)/(vp1 - v00)
@@ -2013,7 +1788,7 @@
                   write(*,2) 'v_div_vesc-1d0', k, v_div_vesc-1d0
                   write(*,2) 's% dm(k-1)', k, s% dm(k-1)
                   write(*,2) 'dm', k, dm
-                  stop 'get_ejecta_mass'
+                  call mesa_error(__FILE__,__LINE__,'get_ejecta_mass')
                end if
                if (k == 2) then
                   get_ejecta_mass = dm
@@ -2335,7 +2110,7 @@
             write(*,2) 'cell_specific_PE_qp', k, cell_specific_PE_qp
             write(*,2) 'gravp1', k, gravp1
             write(*,2) 'grav00', k, grav00
-            stop 'cell_specific_PE'
+            call mesa_error(__FILE__,__LINE__,'cell_specific_PE')
          end if
       end function cell_specific_PE_qp
       
@@ -2383,7 +2158,7 @@
             write(*,2) 'cell_start_specific_PE_qp', k, cell_start_specific_PE_qp
             write(*,2) 'gravp1', k, gravp1
             write(*,2) 'grav00', k, grav00
-            stop 'cell_start_specific_PE_qp'
+            call mesa_error(__FILE__,__LINE__,'cell_start_specific_PE_qp')
          end if
       end function cell_start_specific_PE_qp
       
@@ -2392,9 +2167,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp) :: e_00, e_p1
-         e_00 = s% i_rot(k)*s% omega(k)*s% omega(k)
+         e_00 = s% i_rot(k)% val*s% omega(k)*s% omega(k)
          if (k < s% nz) then
-            e_p1 = s% i_rot(k+1)*s% omega(k+1)*s% omega(k+1)
+            e_p1 = s% i_rot(k+1)% val*s% omega(k+1)*s% omega(k+1)
          else
             e_p1 = 0
          end if
@@ -2809,7 +2584,7 @@
          integer, intent(in) :: k
          real(dp) :: Ledd, gamma_factor, Lrad_div_Ledd, rmid, r003, rp13
          include 'formats'
-         if (s% fitted_fp_ft_i_rot .and. s% rotation_flag) then
+         if (s% rotation_flag) then
             ! Use equatorial radius (at center of cell by volume)
             r003 = s% r_equatorial(k)*s% r_equatorial(k)*s% r_equatorial(k)
             if (k < s% nz) then
@@ -2827,38 +2602,6 @@
          gamma_factor = 1d0 - min(Lrad_div_Ledd, 0.9999d0)
          omega_crit = sqrt(gamma_factor*s% cgrav(k)*s% m_grav(k)/pow3(rmid))
       end function omega_crit
-
-
-      subroutine median_smoothing(dd, n, ns, dmed)
-         use num_lib, only: qsort
-         real(dp), intent(inout) :: dd(:) ! (n)
-         integer, intent(in) :: n, ns
-         real(dp), intent(inout) :: dmed(:) ! (n) work array
-
-         real(dp) :: x(2*ns+1)
-         integer :: i, j, k, nmed, index(2*ns+1)
-
-         nmed = 2*ns+1
-
-         do i=1,n
-            if ((i > 1+ns) .and. (i < n-ns)) then
-               k = 1
-               do j = i-ns, i+ns
-                  x(k) = dd(j)
-                  k = k+1
-               end do
-               call qsort(index,nmed,x)
-               dmed(i) = x(index(ns+1))
-            else
-               dmed(i) = dd(i)
-            end if
-         end do
-
-         do i=1,n
-            if (dmed(i) /= 0) dd(i) = dmed(i)
-         end do
-
-      end subroutine median_smoothing
 
 
       subroutine weighed_smoothing(dd, n, ns, preserve_sign, ddold)
@@ -3024,7 +2767,9 @@
             center_he4 = 1d99
          end if
 
-         if (s% photosphere_logg > 6d0) then
+         if (s% doing_relax) then
+            s% phase_of_evolution = phase_relax
+         else if (s% photosphere_logg > 6d0) then
             s% phase_of_evolution = phase_WDCS
          else if (s% L_by_category(i_burn_si) > 1d2) then
             s% phase_of_evolution = phase_Si_Burn
@@ -3040,7 +2785,7 @@
             s% phase_of_evolution = phase_TP_AGB
          else if (center_he4 <= 1d-4) then
             s% phase_of_evolution = phase_TACHeB          
-         else if (s% center_eps_burn(i3alf) > Lsun) then
+         else if (s% center_eps_burn(i3alf) > 1d2) then
             s% phase_of_evolution = phase_ZACHeB
          else if (s% L_by_category(i3alf) > 1d2) then
             s% phase_of_evolution = phase_He_Burn
@@ -3058,36 +2803,12 @@
          
       end subroutine set_phase_of_evolution
 
-
-      logical function arrived_main_seq(s)
-         type (star_info), pointer :: s
-         include 'formats'
-         arrived_main_seq = &
-            (s% L_nuc_burn_total >= s% L_phot) .and. &
-            (s% power_h_burn >= s% L_nuc_burn_total/2)
-         return
-         write(*,1) 's% L_nuc_burn_total', s% L_nuc_burn_total
-         write(*,1) 's% L_phot', s% L_phot
-         write(*,1) 's% power_h_burn', s% L_phot
-         write(*,*) 'arrived_main_seq',  arrived_main_seq
-         write(*,*)
-      end function arrived_main_seq
       
       
       subroutine set_rv_info(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: r2
          include 'formats'
-         r2 = s% r(k)*s% r(k)
-         if (s% using_velocity_time_centering) then
-            s% R2(k) = &
-               (r2 + s% r_start(k)*s% r(k) + s% r_start(k)*s% r_start(k))/3d0
-            s% d_R2_dlnR(k) = (2d0*r2 + s% r_start(k)*s% r(k))/3d0            
-         else
-            s% R2(k) = r2
-            s% d_R2_dlnR(k) = 2d0*r2
-         end if
          if (s% v_flag) then
             if (s% using_velocity_time_centering) then
                s% vc(k) = 0.5d0*(s% v_start(k) + s% v(k))
@@ -3105,20 +2826,20 @@
          integer, intent(in) :: nvar
          real(dp) :: dmat(nvar,nvar)
          integer :: i, j
-         write(*,*)
+         write(*,'(A)')
          write(*,'(18x)', advance = 'no') 
          do j = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofvar(j)
          end do
-         write(*,*)
+         write(*,'(A)')
          do i = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofequ(i)
             do j = 1, nvar
                write(*,'(e13.4,2x)', advance = 'no') dmat(i,j)
             end do
-            write(*,*)
+            write(*,'(A)')
          end do
-         write(*,*)
+         write(*,'(A)')
       end subroutine show_matrix
 
 
@@ -3152,14 +2873,14 @@
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop '1 e00'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'1 e00')
 !$omp end critical (star_utils_e00_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop '2 e00'
+            call mesa_error(__FILE__,__LINE__,'2 e00')
          end if
          
          if (j > nvar) return ! hybrid
@@ -3169,7 +2890,7 @@
             write(*,5) 'bad i e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop '3 e00'
+            call mesa_error(__FILE__,__LINE__,'3 e00')
 !$omp end critical (star_utils_e00_crit2)
          end if
 
@@ -3209,14 +2930,14 @@
 !$omp critical (star_utils_em1_crit1)
             write(*,4) 'em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop 'em1'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'em1')
 !$omp end critical (star_utils_em1_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop 'em1'
+            call mesa_error(__FILE__,__LINE__,'em1')
          end if
          
          if (j > nvar) return ! hybrid
@@ -3225,7 +2946,7 @@
             write(*,5) 'bad i em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop 'em1'
+            call mesa_error(__FILE__,__LINE__,'em1')
          end if
 
          if (abs(v) < 1d-250) return
@@ -3263,14 +2984,14 @@
 !$omp critical (star_utils_ep1_crit1)
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop 'ep1'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'ep1')
 !$omp end critical (star_utils_ep1_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop 'ep1'
+            call mesa_error(__FILE__,__LINE__,'ep1')
          end if
          
          if (j > nvar) return
@@ -3279,7 +3000,7 @@
             write(*,5) 'bad i ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop 'ep1'
+            call mesa_error(__FILE__,__LINE__,'ep1')
          end if
 
          if (abs(v) < 1d-250) return
@@ -3482,7 +3203,7 @@
          if (is_bad(Ptrb%val)) then
 !$omp critical (calc_Ptrb_ad_tw_crit)
             write(*,2) 'Ptrb', k, Ptrb%val
-            stop 'calc_Ptrb_tw'
+            call mesa_error(__FILE__,__LINE__,'calc_Ptrb_tw')
 !$omp end critical (calc_Ptrb_ad_tw_crit)
          end if
 
@@ -3683,7 +3404,7 @@
          integer :: j
          include 'formats'
          !$OMP critical (omp_write_eos_call_info)
-         write(*,*)
+         write(*,'(A)')
          do j=1,s% species
             write(*,4) 'xa(j,k) ' // trim(chem_isos% name(s% chem_id(j))), j, j+s% nvar_hydro, k, s% xa(j,k)
          end do
@@ -3693,14 +3414,15 @@
          write(*,1) 'rho = ', s% rho(k)
          write(*,1) 'T = ', s% T(k)
          write(*,1) 'logQ = ', s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'eos_frac_OPAL_SCVH',    s% eos_frac_OPAL_SCVH(k)
          write(*,1) 'eos_frac_HELM',    s% eos_frac_HELM(k)
          write(*,1) 'eos_frac_Skye',    s% eos_frac_Skye(k)
          write(*,1) 'eos_frac_PC',      s% eos_frac_PC(k)
          write(*,1) 'eos_frac_FreeEOS', s% eos_frac_FreeEOS(k)
          write(*,1) 'eos_frac_CMS',     s% eos_frac_CMS(k)
-         write(*,*)
+         write(*,1) 'eos_frac_ideal',     s% eos_frac_ideal(k)
+         write(*,'(A)')
          write(*,1) 'Peos = ', s% Peos(k)
          write(*,1) 'Prad = ', s% Prad(k)
          write(*,1) 'logPeos = ', s% lnPeos(k)/ln10
@@ -3719,7 +3441,7 @@
          write(*,1) 'log_free_e = ', s% lnfree_e(k)/ln10
          write(*,1) 'chiRho = ', s% chiRho(k)
          write(*,1) 'chiT = ', s% chiT(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'do_eos_for_cell k, nz', k, s% nz
          write(*,1) 'logRho = ', s% lnd(k)/ln10
          write(*,1) 'logT = ', s% lnT(k)/ln10
@@ -3727,12 +3449,12 @@
          write(*,1) 'x = ', s% X(k)
          write(*,1) 'abar = ', s% abar(k)
          write(*,1) 'zbar = ', s% zbar(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'tau = ', s% tau(k)
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 's% eos_rq% tiny_fuzz', s% eos_rq% tiny_fuzz
-         write(*,*)
-         !stop 'write_eos_call_info'
+         write(*,'(A)')
+         !call mesa_error(__FILE__,__LINE__,'write_eos_call_info')
          !$OMP end critical (omp_write_eos_call_info)
       end subroutine write_eos_call_info
 
@@ -3850,7 +3572,11 @@
          grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
          gradT_actual = safe_div_val(s, dlnT, dlnP) ! mlt has not been called yet when doing this
          brunt_N2 = f*(brunt_B - (gradT_actual - grada_face))
-         tau_conv = 1d0/sqrt(abs(brunt_N2))
+         if(abs(brunt_B) > 0d0) then
+            tau_conv = 1d0/sqrt(abs(brunt_N2))
+         else
+            tau_conv = 0d0
+         end if
       end function conv_time_scale
       
       
@@ -3874,23 +3600,7 @@
          end do
          if (s% max_conv_time_scale == 0d0) s% max_conv_time_scale = 1d99
          if (s% min_conv_time_scale == 1d99) s% min_conv_time_scale = 0d0
-      end subroutine set_conv_time_scales
-      
-      
-      subroutine set_using_TDC(s)
-         type (star_info), pointer :: s      
-         logical :: prev_using_TDC
-         include 'formats'
-         prev_using_TDC = s% using_TDC
-         s% using_TDC = .false.
-         if (s% MLT_option == 'TDC') then
-            s% using_TDC = .true.
-         end if
-         if ((.not. prev_using_TDC) .and. s% using_TDC) then
-            write(*,*)
-            write(*,2) 'turn on TDC at model number', s% model_number
-         end if
-      end subroutine set_using_TDC
+      end subroutine set_conv_time_scales      
       
       
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)
@@ -3908,19 +3618,6 @@
       end function QHSE_time_scale
       
       
-      subroutine set_max_QHSE_time_scale(s)
-         type (star_info), pointer :: s
-         integer :: k
-         real(dp) :: tau_QHSE
-         s% max_QHSE_time_scale = 0d0
-         do k=1,s%nz
-            if (s% q(k) > s% max_q_for_QHSE_timescale) cycle
-            if (s% q(k) < s% min_q_for_QHSE_timescale) exit
-            tau_QHSE = QHSE_time_scale(s,k)
-            if (tau_QHSE > s% max_QHSE_time_scale) &
-               s% max_QHSE_time_scale = tau_QHSE
-         end do
-      end subroutine set_max_QHSE_time_scale
       
       
       real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)
@@ -4072,19 +3769,6 @@
       end function get_grada_face
       
       
-      real(dp) function get_grada_face_val(s,k) result(grada_face)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp) :: alfa, beta, grada_00, grada_m1
-         if (k == 1) then
-            grada_face = s% grada(k)
-            return
-         end if
-         call get_face_weights(s, k, alfa, beta)
-         grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
-      end function get_grada_face_val
-      
-      
       function get_gradr_face(s,k) result(gradr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -4143,14 +3827,6 @@
             end if
          end if
       end function get_scale_height_face_val
-      
-      
-      function get_grav_face(s,k) result(grav)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: grav
-         grav = s% cgrav(k)*s% m_grav(k)/pow2(wrap_r_00(s,k))
-      end function get_grav_face
 
       
       function get_QQ_cell(s,k) result(QQ_cell)
@@ -4167,29 +3843,12 @@
       end function get_QQ_cell
       
       
-      function get_QQ_face(s,k) result(QQ_face)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: QQ_face
-         type(auto_diff_real_star_order1) :: QQ_00, QQ_m1
-         real(dp) :: alfa, beta
-         if (k == 1) then
-            QQ_face = get_QQ_cell(s,k)
-            return
-         end if
-         call get_face_weights(s, k, alfa, beta)
-         QQ_00 = get_QQ_cell(s,k)
-         QQ_m1 = shift_m1(get_QQ_cell(s,k-1)) !, 'get_QQ_face')
-         QQ_face = alfa*QQ_00 + beta*QQ_m1
-      end function get_QQ_face
-      
-      
       subroutine get_face_weights(s, k, alfa, beta)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: alfa, beta
          ! face_value(k) = alfa*cell_value(k) + beta*cell_value(k-1)
-         if (k == 1) stop 'bad k==1 for get_face_weights'
+         if (k == 1) call mesa_error(__FILE__,__LINE__,'bad k==1 for get_face_weights')
          alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
          beta = 1d0 - alfa
       end subroutine get_face_weights
@@ -4248,7 +3907,7 @@
                   L_burn_by_category(j) + s% dm(k)*s% eps_nuc_categories(j, k)
                if (is_bad(L_burn_by_category(j))) then
                   write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
-                  if (s% stop_for_bad_nums) stop 'set_luminosity_by_category'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_luminosity_by_category')
                end if
                s% luminosity_by_category(j,k) = L_burn_by_category(j)
             end do

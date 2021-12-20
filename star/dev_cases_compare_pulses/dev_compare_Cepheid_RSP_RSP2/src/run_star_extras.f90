@@ -76,7 +76,7 @@
                s% m_center /= s_other% m_center .or. &
                s% xmstar /= s_other% xmstar) then
               write(*,2) 'something does not match', s% model_number
-              stop 'extras_finish_step'
+              call mesa_error(__FILE__,__LINE__,'extras_finish_step')
             end if
             do k=1,s% nz
                s% xh(s% i_lum,k) = s_other% L(k)
@@ -121,7 +121,7 @@
          
          if (id == 1 .and. .not. s% RSP_flag) then
             write(*,*) 'star id==1, but not RSP_flag'
-            stop 'extras_startup'
+            call mesa_error(__FILE__,__LINE__,'extras_startup')
          end if
 
       end subroutine extras_startup
@@ -312,7 +312,7 @@
                vals(k,i) = val - s% w(k); i=i+1
                if (.false. .and. abs(vals(k,i-1)) > 1d0 .and. .not. s% doing_first_model_of_run) then
                   write(*,3) 'w diff', k, s% model_number, vals(k,i-1), val, s% w(k)
-                  stop 'data_for_extra_profile_columns'
+                  call mesa_error(__FILE__,__LINE__,'data_for_extra_profile_columns')
                end if
                vals(k,i) = rel_diff(val, s% w(k)); i=i+1
                

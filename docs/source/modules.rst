@@ -61,6 +61,7 @@ automatic calculation of analytic derivatives using the chain rule.
 .. toctree::
 
    auto_diff/overview
+   auto_diff/example
 
 
 .. _chem:
@@ -149,4 +150,13 @@ reaction rates from a range of sources.
 
    rates/overview
 
+Turbulence (``turb``)
+=====================
 
+The ``turb`` module provides various mixing theories (semiconvection, thermohaline,
+mixing length thoery, time-dependant convection)
+
+.. toctree::
+   :maxdepth: 1
+
+   turb/overview

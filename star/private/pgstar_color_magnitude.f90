@@ -678,10 +678,10 @@
          call integer_dict_lookup(s% history_names_dict, color_xaxis1_name, ix1, ierr)
          if (ierr /= 0) ix1 = -1
          if (ix1 <= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'ERROR: failed to find ' // &
                trim(color_xaxis1_name) // ' in history data'
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
          end if
 
@@ -690,10 +690,10 @@
             call integer_dict_lookup(s% history_names_dict, color_xaxis2_name, ix2, ierr)
             if (ierr /= 0) ix2 = -1
             if (ix2 <= 0) then
-               write(*,*)
+               write(*,'(A)')
                write(*,*) 'ERROR: failed to find ' // &
                   trim(color_xaxis2_name) // ' in history data'
-               write(*,*)
+               write(*,'(A)')
                ierr = -1
             end if
          end if
@@ -782,8 +782,21 @@
             yvec=yvec1
             if(have_yaxis2) yvec=yvec-yvec2
 
+         ! Make sure limits are sensible for plotting
+            do i=lbound(yvec,dim=1),ubound(yvec,dim=1)
+               if (yvec(i)>100) yvec(i)=100
+               if (yvec(i)<-100) yvec(i)=-100
+            end do
+
             other_yvec=other_yvec1
             if(have_other_yaxis2) other_yvec=other_yvec-other_yvec2
+
+         ! Make sure limits are sensible for plotting
+            do i=lbound(other_yvec,dim=1),ubound(other_yvec,dim=1)
+               if (other_yvec(i)>100) other_yvec(i)=100
+               if (other_yvec(i)<-100) other_yvec(i)=-100
+            end do
+
 
             panel_ytop = vp_ytop - real(j-1)*panel_dy
             panel_ybot = panel_ytop - panel_dy

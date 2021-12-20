@@ -215,7 +215,7 @@
                   write(*,2) 'nz_max(k)', nz_max(k)
                   write(*,2) 'i_lo(k)', i_lo(k)
                   write(*,2) 'i_hi(k)', i_hi(k)
-                  write(*,*)
+                  write(*,'(A)')
                end do
             end if
             

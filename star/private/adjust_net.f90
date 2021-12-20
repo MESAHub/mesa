@@ -153,7 +153,7 @@
                new_species = new_species + 1
                cycle
             end if
-            write(io,*)
+            write(io,'(A)')
             do N = min_N(Z), max_N(Z)
                write(z_plus_n_str,'(i4)') Z+N
                write(cname,'(a)') trim(el_name(Z)) // trim(adjustl(z_plus_n_str))
@@ -179,7 +179,7 @@
          end do
 
          write(io,'(a)') ')'
-         write(io,*)
+         write(io,'(A)')
 
          close(io)
 
@@ -224,7 +224,7 @@
             s% id, adjust_abundances_for_new_isos, net_name, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in change_net ' // trim(net_name)
-            stop 'check_adjust_net'
+            call mesa_error(__FILE__,__LINE__,'check_adjust_net')
             return
          end if
 
@@ -232,7 +232,7 @@
             write(*,*) '   new net_name ', trim(net_name)
             write(*,*) 'old s% net_name ', trim(s% net_name)
             write(*,*) 'failed to change'
-            stop 'check_adjust_net'
+            call mesa_error(__FILE__,__LINE__,'check_adjust_net')
          end if
 
          s% using_revised_net_name = .true.

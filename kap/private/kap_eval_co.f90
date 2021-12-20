@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module kap_eval_co
-      use utils_lib,only: is_bad
+      use utils_lib,only: is_bad, mesa_error
       use kap_eval_support
       use const_def, only: dp
       use math_lib
@@ -138,7 +138,7 @@
             write(*,*) '   Z0', Z0
             write(*,*) 'Zbase', Zbase
             write(*,*) '   Z1', Z1
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (num_Zs >= 4 .and. rq% cubic_interpolation_in_Z) then
@@ -205,7 +205,7 @@
             write(*,*) 'i1', i1
             write(*,*) 'iz', iz
             write(*,*) 'Z', Z
-            write(*,*)
+            write(*,'(A)')
          end if
          
          do i=1,n_old
@@ -227,19 +227,19 @@
          
          call interp1(logKs, logK, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for logK'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
          
          call interp1(dlogKs_dlogRho, dlnkap_dlnRho, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogRho'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogRho')
             return
          end if
                   
          call interp1(dlogKs_dlogT, dlnkap_dlnT, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogT'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogT')
             return
          end if
          
@@ -248,30 +248,30 @@
             do i=1,n_old
                write(*,*) 'z_old(i)', z_old(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'z_new(1)', z_new(1)
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'logK', i, logKs(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'logK', logK
-            write(*,*)
+            write(*,'(A)')
 
             do i=1,n_old
                write(*,*) 'dlogKs_dlogRho', i, dlogKs_dlogRho(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'dlnkap_dlnRho', dlnkap_dlnRho
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT', i, dlogKs_dlogT(i)
             end do
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'dlnkap_dlnT', dlnkap_dlnT
-            write(*,*)
+            write(*,'(A)')
             
          end if
          
@@ -495,19 +495,19 @@
          
          call interp1(logKs, logK, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for logK'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
          
          call interp1(dlogKs_dlogRho, dlogK_dlogRho, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogRho'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogRho')
             return
          end if
                   
          call interp1(dlogKs_dlogT, dlogK_dlogT, ierr)
          if (ierr /= 0) then
-            stop 'failed in interp1 for dlogK_dlogT'
+            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogT')
             return
          end if
          
@@ -517,25 +517,25 @@
                write(*,*) 'x_old(i)', x_old(i)
             end do
             write(*,*) 'x_new(1)', x_new(1)
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'logKs(i)', logKs(i)
             end do
             write(*,*) 'logK', logK
-            write(*,*)
+            write(*,'(A)')
 
             do i=1,n_old
                write(*,*) 'dlogKs_dlogRho(i)', dlogKs_dlogRho(i)
             end do
             write(*,*) 'dlogK_dlogRho', dlogK_dlogRho
-            write(*,*)
+            write(*,'(A)')
          
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT(i)', dlogKs_dlogT(i)
             end do
             write(*,*) 'dlogK_dlogT', dlogK_dlogT
-            write(*,*)
+            write(*,'(A)')
             
          end if
          
@@ -680,7 +680,7 @@
             return
          end if
                   
-         if (i1 <= 0 .or. i2 <= 0 .or. i3 <= 0) stop 'error in result from Find_CO_Tables'
+         if (i1 <= 0 .or. i2 <= 0 .or. i3 <= 0) call mesa_error(__FILE__,__LINE__,'error in result from Find_CO_Tables')
          
          if (matches_table(i2)) then
             call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i2, logRho, logT,  &
@@ -784,7 +784,7 @@
             write(*,1) 'logK_2_4', logK_2_4
             write(*,1) 'alfa', alfa
             write(*,1) 'beta', beta
-            write(*,*)
+            write(*,'(A)')
             write(*,2) 'dXC1_lookup', i1, dXC1_lookup
             write(*,2) 'dXO1_lookup', i1, dXO1_lookup
             write(*,2) 'dXC2_lookup', i2, dXC2_lookup
@@ -795,7 +795,7 @@
             write(*,2) 'dXO4_lookup', i4, dXO4_lookup
             write(*,1) 'dXC', dXC
             write(*,1) 'dXO', dXO
-            stop 'Get_Kap_for_dXCO'
+            call mesa_error(__FILE__,__LINE__,'Get_Kap_for_dXCO')
          end if
          
          contains       
@@ -806,7 +806,7 @@
             if (i < 1 .or. i > num_CO_tables) then
                write(*,*) 'logRho', logRho
                write(*,*) 'logT', logT
-               stop 'bug in kap_eval_co matches_table'
+               call mesa_error(__FILE__,__LINE__,'bug in kap_eval_co matches_table')
                matches_table = .false.
             else if (abs(dXC_lookup - co_tables(i)% dXC_lookup) == 0 .and.  &
                      abs(dXO_lookup - co_tables(i)% dXO_lookup) == 0) then
@@ -968,7 +968,7 @@
                write(*,1) 'dXC_lookup', dble(dXC_lookup)
                write(*,1) 'dXO_lookup', dble(dXO_lookup)
                
-               stop 'logical failure1 in looking for CO tables'
+               call mesa_error(__FILE__,__LINE__,'logical failure1 in looking for CO tables')
             end if
             if (matches_table(i2)) then
                i1 = i2; i2 = -1; i3 = -1; i4 = -1; return
@@ -1180,13 +1180,13 @@
          if (num_logRs <= 0) then
             write(*,*) 'num_logRs', num_logRs
             write(*,*) 'ix', ix
-            stop 'Get_Kap_for_logRho_logT'
+            call mesa_error(__FILE__,__LINE__,'Get_Kap_for_logRho_logT')
          end if
 
          if (num_logTs <= 0) then
             write(*,*) 'num_logTs', num_logRs
             write(*,*) 'ix', ix
-            stop 'Get_Kap_for_logRho_logT'
+            call mesa_error(__FILE__,__LINE__,'Get_Kap_for_logRho_logT')
          end if
 
          call Locate_logR( &
@@ -1204,7 +1204,7 @@
                write(*,2) 'logR', i, x_tables(ix)% logRs(i)
             end do
             write(*,*) 'clip_to_kap_table_boundaries', clip_to_kap_table_boundaries
-            stop 'failed in Locate_logR'
+            call mesa_error(__FILE__,__LINE__,'failed in Locate_logR')
             return
          end if
 

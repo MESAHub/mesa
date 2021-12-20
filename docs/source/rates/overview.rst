@@ -65,7 +65,7 @@ the rate is not in ``reaclib``, by consulting the file
 ``data/rates_data/weak_info.list``.  Depending on what information is
 included in those files and on the physical processes that set the
 decay, this approach may or may not yield the desired result.  (We
-also must provide the average neutrino energies, which are included in
+also must provide the average neutrino energies, which are not included in
 ``reaclib`` and the values in ``weak_info.list`` are mostly fantasies
 or inappropriate.)
 

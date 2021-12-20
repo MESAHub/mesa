@@ -252,6 +252,10 @@
          real(dp) :: mixing_length_alpha, remove_small_D_limit
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
+         integer :: steps_before_use_TDC
+         real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad
+         real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
+         real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid
@@ -326,7 +330,8 @@
             use_other_RSP_linear_analysis, RSP_testing, RSP_use_Prad_for_Psurf, RSP_use_atm_grey_with_kap_for_Psurf, &
             RSP_fixed_Psurf, RSP_hydro_only, RSP_report_undercorrections, RSP_relax_initial_model, &
             use_other_RSP_build_model, RSP_relax_adjust_inner_mass_distribution, RSP_trace_RSP_build_model, &
-            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme, RSP_do_check_omega, RSP_report_check_omega_changes
+            RSP_relax_alfap_before_alfat, use_RSP_new_start_scheme, RSP_do_check_omega, RSP_report_check_omega_changes, &
+            include_w_in_correction_limits
          integer :: RSP_max_num_periods, RSP_max_iters_per_try, RSP_max_retries_per_step, &
             RSP_mode_for_setting_PERIODLIN, RSP_nmodes, &
             RSP_target_steps_per_cycle, RSP_nz_outer, RSP_nz, &
@@ -350,13 +355,7 @@
             RSP_surface_tau
          
          real(dp) :: &
-            RSP_min_Y, &
-            RSP_alpha, RSP_alpha_m, RSP_alpha_t, RSP_alpha_P_standard, &
-            RSP_alpha_s_standard, RSP_alpha_c_standard, &
-            RSP_alpha_d_standard, RSP_gamma_r_standard, &
-            RSP_alpha_P_factor, RSP_alpha_s_factor, RSP_alpha_c_factor, &
-            RSP_alpha_d_factor, RSP_gamma_r_factor, &
-            RSP_min_tau, RSP_min_q, max_conv_vel_div_csound, &
+            max_conv_vel_div_csound, &
             max_v_for_convection, max_q_for_convection_with_hydro_on, &
             max_v_div_cs_for_convection, &
             max_abs_du_div_cs_for_convection, &
@@ -649,7 +648,7 @@
          real(dp) :: xa_mesh_delta_coeff(num_xa_function)
          
          logical :: use_split_merge_amr, trace_split_merge_amr, &
-            equal_split_density_amr, split_merge_amr_skip_inner_cell, &
+            equal_split_density_amr, &
             split_merge_amr_hybrid_zoning, &
             split_merge_amr_flipped_hybrid_zoning, &
             split_merge_amr_log_zoning, &
@@ -796,17 +795,16 @@
 
       ! hydro parameters
 
+         character(len=32) :: energy_eqn_option
+
          real(dp) :: eps_nuc_factor, max_abs_eps_nuc, op_split_burn_eps_nuc_infall_limit
          real(dp) :: eps_WD_sedimentation_factor, non_nuc_neu_factor, eps_grav_factor, eps_mdot_factor
          real(dp) :: dedt_eqn_r_scale
 
-         logical :: use_mass_corrections, use_gravity_rotation_correction, &
+         logical :: use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
             use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
-            use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
-            always_use_dedt_form_of_energy_eqn, &
-            always_use_eps_grav_form_of_energy_eqn, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
@@ -821,6 +819,8 @@
             RTI_max_alpha, RTI_min_dm_behind_shock_for_full_on, &
             RTI_dm_for_center_eta_nondecreasing, RTI_min_m_for_D_mix_floor, &
             RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost
+
+         logical :: retry_for_v_above_clight
 
          logical :: include_composition_in_eps_grav
          real(dp) :: velocity_logT_lower_bound, &
@@ -927,8 +927,6 @@
             hydro_mtx_min_allowed_logRho, &
             solver_reduced_min_corr_coeff
 
-         character (len=32) :: hydro_solver_name
-
          integer :: num_times_solver_reuse_mtx
          integer :: tiny_corr_coeff_limit
          real(dp) :: scale_correction_norm
@@ -992,16 +990,17 @@
          integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
             smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST, smooth_D_omega, smooth_am_nu_rot
 
+         real(dp) :: ST_angsml, ST_angsmt ! uset for ST time smoothing. See rotation_mix_info.f90 for details
+
          real(dp) :: adjust_J_fraction, min_q_for_adjust_J_lost, &
             min_J_div_delta_J
          logical :: simple_i_rot_flag, do_adjust_J_lost, &
             premix_omega, recalc_mixing_info_each_substep
          real(dp) :: angular_momentum_error_warn, angular_momentum_error_retry
          integer :: max_mdot_redo_cnt
-         real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
+         real(dp) :: min_years_dt_for_redo_mdot,  &
             mdot_revise_factor, implicit_mdot_boost
          real(dp) :: surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol
-         logical :: fitted_fp_ft_i_rot
          real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 
@@ -1014,8 +1013,7 @@
          real(dp) :: nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
          logical :: nu_omega_mixing_across_convection_boundary
 
-         real(dp) :: jacobian_clip_limit
-         real(dp) :: sum_xa_tolerance, xa_clip_limit
+         real(dp) :: xa_clip_limit
 
          real(dp) :: min_xa_hard_limit, min_xa_hard_limit_for_highT
          real(dp) :: logT_max_for_min_xa_hard_limit, &
@@ -1081,7 +1079,7 @@
          real(dp) :: varcontrol_target, varcontrol_dt_limit_ratio_hard_max, &
             min_allowed_varcontrol_target
 
-         real(dp) :: xa_scale, abs_xa_corr_limit
+         real(dp) :: xa_scale
 
          integer :: solver_iters_timestep_limit
 

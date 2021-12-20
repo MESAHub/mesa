@@ -47,35 +47,6 @@
     remove_surface_turn_off_energy_sources_and_sinks = .true.
 
 
-      ! change_conv_vel_flag
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! change_initial_conv_vel_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_conv_vel_flag
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! conv_vel variables
-      ! ``conv_vel_flag`` is true if we are using convection velocity as a solver variable
-
-      ! ::
-
-    change_conv_vel_flag = .false.
-    change_initial_conv_vel_flag = .false.
-    new_conv_vel_flag = .false.
-
-
-      ! logT_for_conv_vel_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! automatically turn on conv_vel_flag if temperature goes above this limit anywhere in the star.
-      ! This is useful to control flip-flops in gradT due to turning on and off of convection,
-      ! and allows the equations to be solved with small residuals.
-
-      ! ::
-
-    logT_for_conv_vel_flag = 50d0
-
-
       ! change_w_div_wc_flag
       ! ~~~~~~~~~~~~~~~~~~~~
       ! change_initial_w_div_wc_flag

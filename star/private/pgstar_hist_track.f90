@@ -666,20 +666,20 @@
          call integer_dict_lookup(s% history_names_dict, xname, ix, ierr)
          if (ierr /= 0) ix = -1
          if (ix <= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'ERROR: failed to find ' // &
                trim(xname) // ' in history data'
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
          end if
 
          call integer_dict_lookup(s% history_names_dict, yname, iy, ierr)
          if (ierr /= 0) iy = -1
          if (iy <= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'ERROR: failed to find ' // &
                trim(yname) // ' in history data'
-            write(*,*)
+            write(*,'(A)')
             ierr = -1
          end if
          if (ierr /= 0) return

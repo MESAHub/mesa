@@ -29,7 +29,7 @@
       use const_def, only: ln10
       use utils_lib, only: &
          fill_with_NaNs, fill_with_NaNs_2D, fill_with_NaNs_3d, set_nan, &
-         is_bad
+         is_bad, mesa_error
 
       implicit none
 
@@ -384,6 +384,8 @@
          if (failed('xh_old')) return
          call do2D(s, s% xa_old, species, nz, action, ierr)
          if (failed('xa_old')) return
+         call do1D(s, s% q_old, nz, action, ierr)
+         if (failed('q_old')) return
          call do1D(s, s% dq_old, nz, action, ierr)
          if (failed('dq_old')) return
          call do1D(s, s% mlt_vc_old, nz, action, ierr)
@@ -517,7 +519,7 @@
                   write(*,2) 's% nz', s% nz
                   write(*,2) 's% prev_mesh_nz', s% prev_mesh_nz
                   write(*,2) 'size(s% xa,dim=2)', size(s% xa,dim=2)
-                  stop 'star_info_arrays'
+                  call mesa_error(__FILE__,__LINE__,'star_info_arrays')
                   exit
                end if
                call do1(s% dq, c% dq)
@@ -545,9 +547,9 @@
             if (failed('am_nu_rot')) exit
             call do1(s% D_omega, c% D_omega)
             if (failed('D_omega')) exit
-            call do1(s% fp_rot, c% fp_rot)
+            call do1_ad(s% fp_rot, c% fp_rot)
             if (failed('fp_rot')) exit
-            call do1(s% ft_rot, c% ft_rot)
+            call do1_ad(s% ft_rot, c% ft_rot)
             if (failed('ft_rot')) exit
             call do1(s% am_nu_non_rot, c% am_nu_non_rot)
             if (failed('am_nu_non_rot')) exit
@@ -559,34 +561,12 @@
             if (failed('am_sig_omega')) exit
             call do1(s% am_sig_j, c% am_sig_j)
             if (failed('am_sig_j')) exit
-            call do1(s% dfp_rot_dw_div_wc, c% dfp_rot_dw_div_wc)
-            if (failed('dfp_rot_dw_div_wc')) exit
-            call do1(s% dft_rot_dw_div_wc, c% dft_rot_dw_div_wc)
-            if (failed('dft_rot_dw_div_wc')) exit
-            call do1(s% i_rot, c% i_rot)
+            call do1_ad(s% i_rot, c% i_rot)
             if (failed('i_rot')) exit
-            call do1(s% di_rot_dw_div_wc, c% di_rot_dw_div_wc)
-            if (failed('di_rot_dw_div_wc')) exit
-            call do1(s% di_rot_dlnr, c% di_rot_dlnr)
-            if (failed('di_rot_dlnr')) exit
             call do1(s% w_div_w_crit_roche, c% w_div_w_crit_roche)
             if (failed('w_div_w_crit_roche')) exit
-            call do1(s% j_flux, c% j_flux)
+            call do1_ad(s% j_flux, c% j_flux)
             if (failed('j_flux')) exit
-            call do1(s% dj_flux_dw00, c% dj_flux_dw00)
-            if (failed('dj_flux_dw00')) exit
-            call do1(s% dj_flux_dwp1, c% dj_flux_dwp1)
-            if (failed('dj_flux_dwp1')) exit
-            call do1(s% dj_flux_dj00, c% dj_flux_dj00)
-            if (failed('dj_flux_dj00')) exit
-            call do1(s% dj_flux_djp1, c% dj_flux_djp1)
-            if (failed('dj_flux_djp1')) exit
-            call do1(s% dj_flux_dlnr00, c% dj_flux_dlnr00)
-            if (failed('dj_flux_dlnr00')) exit
-            call do1(s% dj_flux_dlnrp1, c% dj_flux_dlnrp1)
-            if (failed('dj_flux_dlnrp1')) exit
-            call do1(s% dj_flux_dlnd, c% dj_flux_dlnd)
-            if (failed('dj_flux_dlnd')) exit
 
             call do2(s% xh_start, c% xh_start, nvar_hydro, 'xh_start')
             if (failed('xh_start')) exit
@@ -631,8 +611,6 @@
             if (failed('dxh_u')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
-            call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
-            if (failed('dxh_ln_cvpv0')) exit
 
             call do1(s% dudt_RTI, c% dudt_RTI)
             if (failed('dudt_RTI')) exit
@@ -740,6 +718,8 @@
             if (failed('eos_frac_FreeEOS')) exit
             call do1(s% eos_frac_CMS, c% eos_frac_CMS)
             if (failed('eos_frac_CMS')) exit
+            call do1(s% eos_frac_ideal, c% eos_frac_ideal)
+            if (failed('eos_frac_ideal')) exit
 
             call do1(s% QQ, c% QQ)
             if (failed('QQ')) exit
@@ -833,6 +813,12 @@
             if (failed('dynamo_B_r')) exit
             call do1(s% dynamo_B_phi, c% dynamo_B_phi)
             if (failed('dynamo_B_phi')) exit
+
+            !for ST time smoothing
+            call do1(s% D_ST_start, c% D_ST_start)
+            if (failed('D_ST_start')) exit
+            call do1(s% nu_ST_start, c% nu_ST_start)
+            if (failed('nu_ST_start')) exit
 
             call do1(s% opacity, c% opacity)
             if (failed('opacity')) exit
@@ -990,10 +976,6 @@
 
             call do1(s% vc, c% vc)
             if (failed('vc')) exit
-            call do1(s% R2, c% R2)
-            if (failed('R2')) exit
-            call do1(s% d_R2_dlnR, c% d_R2_dlnR)
-            if (failed('d_R2_dlnR')) exit
 
             call do1_ad(s% eps_grav_ad, c% eps_grav_ad)
             if (failed('eps_grav_ad')) exit
@@ -1012,8 +994,6 @@
             call do1(s% total_energy_profile_after_adjust_mass, c% total_energy_profile_after_adjust_mass)
             if (failed('total_energy_profile_after_adjust_mass')) exit
 
-            call do1_logical(s% eps_grav_form_for_energy_eqn, c% eps_grav_form_for_energy_eqn)
-            if (failed('eps_grav_form_for_energy_eqn')) exit
             call do1(s% dL_dm, c% dL_dm)
             if (failed('dL_dm')) exit
             call do1(s% energy_sources, c% energy_sources)
@@ -1136,6 +1116,8 @@
             if (failed('brunt_B')) exit
             call do1(s% unsmoothed_brunt_B, c% unsmoothed_brunt_B)
             if (failed('unsmoothed_brunt_B')) exit
+            call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
+            if (failed('smoothed_brunt_B')) exit
             
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
@@ -1153,9 +1135,6 @@
             if (failed('P_face_ad')) exit
             call do1(s% P_face_start, c% P_face_start)
             if (failed('P_face_start')) exit
-            call do1(s% d_Pface_domega, c% d_Pface_domega)
-            if (failed('d_Pface_domega')) exit
-
             call do1(s% abs_du_div_cs, c% abs_du_div_cs)
             if (failed('abs_du_div_cs')) exit
             call do1(s% abs_du_plus_cs, c% abs_du_plus_cs)
@@ -1263,8 +1242,6 @@
             if (failed('rho_start')) exit
             call do1(s% lnS_start, c% lnS_start)
             if (failed('lnS_start')) exit
-            call do1(s% eta_start, c% eta_start)
-            if (failed('eta_start')) exit
             call do1(s% T_start, c% T_start)
             if (failed('T_start')) exit
             call do1(s% zbar_start, c% zbar_start)
@@ -1328,13 +1305,6 @@
 
             call do1(s% Chi, c% Chi); if (failed('Chi')) exit
             call do1(s% Chi_start, c% Chi_start); if (failed('Chi_start')) exit
-            call do1(s% d_Chi_dwturb, c% d_Chi_dwturb); if (failed('d_Chi_dwturb')) exit
-            call do1(s% d_Chi_dv00, c% d_Chi_dv00); if (failed('d_Chi_dv00')) exit
-            call do1(s% d_Chi_dvp1, c% d_Chi_dvp1); if (failed('d_Chi_dvp1')) exit
-            call do1(s% d_Chi_dlnR00, c% d_Chi_dlnR00); if (failed('d_Chi_dlnR00')) exit
-            call do1(s% d_Chi_dlnRp1, c% d_Chi_dlnRp1); if (failed('d_Chi_dlnRp1')) exit
-            call do1(s% d_Chi_dlnd, c% d_Chi_dlnd); if (failed('d_Chi_dlnd')) exit
-            call do1(s% d_Chi_dlnT, c% d_Chi_dlnT); if (failed('d_Chi_dlnT')) exit
 
             call do1(s% Lr, c% Lr); if (failed('Lr')) exit
             call do1(s% Lc, c% Lc); if (failed('Lc')) exit
@@ -1348,8 +1318,6 @@
             call do1(s% Pvsc_start, c% Pvsc_start); if (failed('Pvsc_start')) exit
             call do1(s% Ptrb, c% Ptrb); if (failed('Ptrb')) exit
             call do1(s% Ptrb_start, c% Ptrb_start); if (failed('Ptrb_start')) exit
-            call do1(s% d_Ptrb_dV_00, c% d_Ptrb_dV_00); if (failed('d_Ptrb_dV_00')) exit
-            call do1(s% d_Ptrb_dw_00, c% d_Ptrb_dw_00); if (failed('d_Ptrb_dw_00')) exit
             call do1(s% Eq, c% Eq); if (failed('Eq')) exit
             call do1(s% SOURCE, c% SOURCE); if (failed('SOURCE')) exit
             call do1(s% DAMP, c% DAMP); if (failed('DAMP')) exit
@@ -1412,6 +1380,11 @@
             if (failed('prev_mesh_mlt_vc')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
+            ! These are needed for time-smoothing of ST mixing
+            call do1(s% prev_mesh_D_ST_start, c% prev_mesh_D_ST_start)
+            if (failed('prev_mesh_D_ST_start')) exit
+            call do1(s% prev_mesh_nu_ST_start, c% prev_mesh_nu_ST_start)
+            if (failed('prev_mesh_nu_ST_start')) exit
 
             if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
             return
@@ -1458,7 +1431,7 @@
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (.not. associated(ptr)) then
-                  stop 'do1 ptr not associated'
+                  call mesa_error(__FILE__,__LINE__,'do1 ptr not associated')
                end if
                if (nz <= size(ptr,dim=1)) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
@@ -2374,12 +2347,6 @@
             s% i_Hp = 0
          end if
 
-         if (s% conv_vel_flag) then
-            i = i+1; s% i_ln_cvpv0 = i
-         else
-            s% i_ln_cvpv0 = 0
-         end if
-
          if (s% w_div_wc_flag) then
             i = i+1; s% i_w_div_wc = i
          else
@@ -2415,7 +2382,6 @@
          s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
-         s% i_dln_cvpv0_dt = s% i_ln_cvpv0
          s% i_equ_w_div_wc = s% i_w_div_wc
          s% i_dj_rot_dt = s% i_j_rot
 
@@ -2434,7 +2400,6 @@
          if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
-         if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
          if (s% i_w_div_wc /= 0) s% nameofvar(s% i_w_div_wc) = 'w_div_wc'
          if (s% i_j_rot /= 0) s% nameofvar(s% i_j_rot) = 'j_rot'
          if (s% i_u /= 0) s% nameofvar(s% i_u) = 'u' 
@@ -2451,7 +2416,6 @@
          if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
-         if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
          if (s% i_equ_w_div_wc /= 0) s% nameofequ(s% i_equ_w_div_wc) = 'equ_w_div_wc'
          if (s% i_dj_rot_dt /= 0) s% nameofequ(s% i_dj_rot_dt) = 'dj_rot_dt'
          if (s% i_du_dt /= 0) s% nameofequ(s% i_du_dt) = 'du_dt'
@@ -2651,7 +2615,7 @@
 
          if (.not. associated(ptr)) then
             !write(*,*) 'bogus call on do_return_work_array with nil ptr ' // trim(str)
-            !stop 'do_return_work_array'
+            !call mesa_error(__FILE__,__LINE__,'do_return_work_array')
             return
          end if
 
@@ -3159,7 +3123,7 @@
             'work_arrays: num sz calls returns diff', &
             num, sz, num_calls, num_returns, num_calls-num_returns, &
             num_allocs, num_deallocs, num_allocs-num_deallocs
-         write(*,*)
+         write(*,'(A)')
 
          contains
 

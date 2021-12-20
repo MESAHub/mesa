@@ -76,7 +76,7 @@ program kap_plotter
    call const_init(my_mesa_dir,ierr)
    if (ierr /= 0) then
       write(*,*) 'const_init failed'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    call math_init()
@@ -84,7 +84,7 @@ program kap_plotter
    call chem_init('isotopes.data', ierr)
    if (ierr /= 0) then
       write(*,*) 'failed in chem_init'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    ! allocate and initialize the eos tables
@@ -96,7 +96,7 @@ program kap_plotter
    call kap_ptr(kap_handle, kap_rq, ierr)
 
    allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
-   if (ierr /= 0) stop 'allocate failed'
+   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'allocate failed')
 
    logRho_center = UNSET
    logT_center = UNSET
@@ -289,7 +289,7 @@ program kap_plotter
             write(*,*) 'failed in eosDT_get'
             write(*,1) 'log10Rho', log10Rho
             write(*,1) 'log10T', log10T
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          call kap_get( &
@@ -338,7 +338,7 @@ program kap_plotter
 
    if (ierr /= 0) then
       write(*,*) 'bad result from kap_get'
-      stop 1
+      call mesa_error(__FILE__,__LINE__)
    end if
 
 contains
@@ -358,7 +358,7 @@ contains
       call eos_init(' ', use_cache, ierr)
       if (ierr /= 0) then
          write(*,*) 'eos_init failed in Setup_eos'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
       write(*,*) 'loading eos tables'
@@ -366,7 +366,7 @@ contains
       handle = alloc_eos_handle_using_inlist('inlist_plotter', ierr)
       if (ierr /= 0) then
          write(*,*) 'failed trying to allocate eos handle'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
    end subroutine Setup_eos
@@ -393,7 +393,7 @@ contains
       call kap_init(use_cache, ' ', ierr)
       if (ierr /= 0) then
          write(*,*) 'kap_init failed in Setup_eos'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
       write(*,*) 'loading kap tables'
@@ -401,7 +401,7 @@ contains
       handle = alloc_kap_handle_using_inlist('inlist_plotter', ierr)
       if (ierr /= 0) then
          write(*,*) 'failed trying to allocate kap handle'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end if
 
    end subroutine Setup_kap

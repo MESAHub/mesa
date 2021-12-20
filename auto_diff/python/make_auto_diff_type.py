@@ -1,6 +1,12 @@
 from utils import tab, indent_list, indent_list_of_str
 
 def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, comparison_operators, intrinsics):
+	'''
+	Builds the module file defining an auto_diff type along with all overloaded operators.
+	The end result is valid Fortran (assuming availability of MESA imports).
+	'''
+
+
 	# Starting boilerplate
 	header = ['module ' + auto_diff_type.name + '_module']
 	begin = [tab + 'use const_def, only: dp, ln10, pi', tab + 'use utils_lib', tab + 'use support_functions', tab + 'use math_lib']
@@ -110,7 +116,7 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, compa
 		interfaces.append('')
 
 	for op, opname in binary_operators:
-		# (auto_diff, auto_diff)
+		# (auto_diff, auto_diff) operators
 		function = auto_diff_type.specific_binary_operator_function_self(opname, op)
 		functions.append(str(function))
 		functions.append('')
@@ -124,7 +130,7 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, compa
 		interfaces.append('interface ' + interopname)
 		interfaces.append(tab + 'module procedure ' + function.name)
 
-		# (auto_diff, real(dp)) and vice-versa
+		# (auto_diff, real(dp)) operators and vice-versa
 		f1, f2 = auto_diff_type.specific_binary_operator_function_real_dp(opname, op)
 		functions.append(str(f1))
 		functions.append('')
@@ -134,7 +140,7 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, compa
 		interfaces.append(tab + 'module procedure ' + f1.name)
 		interfaces.append(tab + 'module procedure ' + f2.name)
 
-		# (auto_diff, integer) and vice-versa
+		# (auto_diff, integer) operators and vice-versa
 		f1, f2 = auto_diff_type.specific_binary_operator_function_int(opname, op)
 		functions.append(str(f1))
 		functions.append('')

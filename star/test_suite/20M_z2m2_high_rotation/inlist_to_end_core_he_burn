@@ -215,7 +215,7 @@ use_Skye = .false.
       scale_max_correction = 0.1d0
       ignore_species_in_max_correction = .true.
       
-      use_dedt_form_of_energy_eqn = .true.      
+      energy_eqn_option = 'dedt'
       include_composition_in_eps_grav = .true.
       convergence_ignore_equL_residuals = .true. 
       ignore_too_large_correction = .true.

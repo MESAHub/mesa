@@ -282,6 +282,11 @@
       procedure(data_for_extra_binary_history_header_items_interface), pointer, nopass :: &
            data_for_extra_binary_history_header_items => null()
 
+      procedure (other_binary_photo_write_interface), pointer, nopass :: &
+         other_binary_photo_write => null()
+      procedure (other_binary_photo_read_interface), pointer, nopass :: &
+         other_binary_photo_read => null()
+
 
       ! info for binary_history.data
       integer, pointer :: history_column_spec(:)

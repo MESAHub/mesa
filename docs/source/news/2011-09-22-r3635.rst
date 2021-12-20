@@ -1,0 +1,11 @@
+============
+Release 3635
+============
+
+:Date:   2011-09-22
+
+Revision 3635 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r3635.zip/download>`__
+is available for download.

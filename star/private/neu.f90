@@ -108,7 +108,7 @@
                write(*,1) 'log10_rho=', log10_rho
                write(*,1) 'abar', s% abar(k)
                write(*,1) 'zbar', s% zbar(k)
-               write(*,*)
+               write(*,'(A)')
                return
                stop
             end if
@@ -131,7 +131,7 @@
             if (s% report_ierr) write(*,*) 'do_neu_for_cell ierr for cell', k
             if (s% stop_for_bad_nums) then
                write(*,2) 'bad s% non_nuc_neu(k)', k, s% non_nuc_neu(k)
-               stop 'do_neu_for_cell'
+               call mesa_error(__FILE__,__LINE__,'do_neu_for_cell')
             end if
             return
          end if

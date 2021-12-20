@@ -5,7 +5,7 @@
       change_initial_net = .true.      
       new_net_name = 'co_burn_plus.net'
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -24,7 +24,7 @@
 
 &controls
 
-      initial_mass = 10
+      initial_mass = 11
       initial_z = 0.02d0 
 
 ! when to stop
@@ -43,7 +43,7 @@
 ! mlt
       mixing_length_alpha = 2
       use_Ledoux_criterion = .true.
-      alpha_semiconvection = 0.01
+      thermohaline_option = 'Kippenhahn'
       thermohaline_coeff = 100
 
 ! mixing
@@ -62,7 +62,7 @@
       mesh_delta_coeff = 1.5     
 
 ! solver
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
 ! output
       num_trace_history_values = 2

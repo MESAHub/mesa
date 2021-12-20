@@ -33,7 +33,7 @@
 
 &controls
 
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -54,7 +54,7 @@
       photo_interval = 50
       profile_interval = 100
       history_interval = 5
-      terminal_interval = 5
+      terminal_interval = 10 
       write_header_frequency = 50
 
 		use_other_mesh_functions = .true.

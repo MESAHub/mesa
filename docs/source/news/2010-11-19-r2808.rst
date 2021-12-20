@@ -1,0 +1,11 @@
+============
+Release 2808
+============
+
+:Date:   2010-11-19
+
+Revision 2808 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2808.zip/download>`__
+is available for download.

@@ -1,0 +1,90 @@
+
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      load_model_filename = 'zams.mod'
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 'after_core_he_burn.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
+      
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      new_rotation_flag = .true.
+      near_zams_relax_omega_div_omega_crit = .true.
+      change_rotation_flag = .false.  ! rotation off until near zams
+      num_steps_to_relax_rotation = 50
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+      xa_central_lower_limit_species(1) = 'he4'
+      xa_central_lower_limit(1) = 0.05d0
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 3000
+      !max_number_retries = 58
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! mlt
+      alpha_semiconvection = 0.01
+      thermohaline_coeff = 2
+
+! mixing
+
+! timesteps
+      delta_XHe_cntr_hard_limit = 0.02d0
+      delta_XC_cntr_hard_limit = 0.02d0
+      delta_XNe_cntr_hard_limit = 0.02d0
+      delta_XO_cntr_hard_limit = 0.02d0
+      delta_XSi_cntr_hard_limit = 0.02d0
+
+! mesh
+
+! solver
+
+! output
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+      
+      !photo_interval = 10
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+!pause = .true.
+Grid1_plot_name(3) = 'HR'
+Profile_Panels3_xmin = -101d0
+Profile_Panels3_xmax = -101d0
+Profile_Panels3_other_yaxis_name(4) = 'entropy'
+
+TRho_Profile_xmin = -5
+TRho_Profile_xmax = 7.5
+TRho_Profile_ymin = 5.5
+TRho_Profile_ymax = 9.2
+
+/ ! end of pgstar namelist

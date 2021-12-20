@@ -55,13 +55,10 @@ Download MESA
 ^^^^^^^^^^^^^
 
 The simplest way to get the MESA software is to download a zip file of
-the `latest MESA release <http://sourceforge.net/projects/mesa/files/releases/mesa-r15140.zip/download>`__.
+the `latest MESA release <https://zenodo.org/record/4311514>`__.
 
 The compressed file is about 2GB, so don't worry if it takes a little
-while to download.  If you are experiencing slow download speeds, you
-may want to change which mirror you are using. (After you select a
-zipfile to download, click the "try another mirror" link near the top
-of the page.)
+while to download.  
 
 The unzipped and installed package will be large, so make sure you have
 at least 20 GB free on your disk.
@@ -71,7 +68,7 @@ mesa-r\ |version|. This will be your main MESA directory. You are
 free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
-You can also download zip files of `older MESA releases <http://sourceforge.net/projects/mesa/files/releases/>`__.
+You can also download zip files of `older MESA releases <https://zenodo.org/record/4311514>`__.
 If you plan to do so, please read `this FAQ entry <faq:Installing Older Versions of MESA>`__.
 
 .. _environment:
@@ -236,17 +233,3 @@ Please provide the following information:
     echo $PATH
     echo $MESA_DIR
 
-
-If the error message you received was ``./build_and_test FAILED`` also
-attach the file ``$MESA_DIR/MODULE/test/tmp.txt``, where ``MODULE`` is
-replaced with the name of the module that failed. The name of the module
-that failed should be printed on the line before the ./build_and_test
-message was printed.
-
-If the file tmp.txt file does not exist in the folder then run the
-tester program::
-
-   ./tester 2>&1 | tee tester.log
-
-and also attach the tester.log file to your mesa-users message. If the
-tester program does not exist, state that in your message.

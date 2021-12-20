@@ -364,8 +364,8 @@
             case (p_lum_conv_MLT)
                val = s% L_conv(k)/Lsun
 
-            !case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
-            !   val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
+            case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
+               val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
             case (p_lum_rad_div_L_Edd)
                val = get_Lrad_div_Ledd(s,k)
             case (p_lum_conv_div_lum_Edd)
@@ -885,6 +885,8 @@
                val = s% eos_frac_FreeEOS(k)
             case (p_eos_frac_CMS)
                val = s% eos_frac_CMS(k)
+            case (p_eos_frac_ideal)
+               val = s% eos_frac_ideal(k)
                
             case (p_log_c_div_tau)
                val = safe_log10(clight/s% tau(k))
@@ -1128,9 +1130,9 @@
                val = s% eps_grav_ad(k)% val
                
             case (p_log_xm_div_delta_m)
-               val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
+               if(abs(s% dt*s% mstar_dot) > 0) val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
             case (p_xm_div_delta_m)
-               val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
+               if(abs(s% dt*s% mstar_dot) > 0) val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
 
             case (p_env_eps_grav)
                val = -s% gradT_sub_grada(k)*s% grav(k)*s% mstar_dot*s% Cp(k)*s% T(k) / &
@@ -1378,7 +1380,7 @@
                   if (is_bad(val)) then
                      write(*,2) 'val', k, val
                      write(*,2) 's% omega_shear(k)', k, s% omega_shear(k)
-                     stop 'profile'
+                     call mesa_error(__FILE__,__LINE__,'profile')
                   end if
                else
                   val = -99
@@ -1389,24 +1391,24 @@
                   if (is_bad(val)) then
                      write(*,2) 'val', k, val
                      write(*,2) 's% omega_shear(k)', k, s% omega_shear(k)
-                     stop 'profile'
+                     call mesa_error(__FILE__,__LINE__,'profile')
                   end if
                else
                   val = -99
                end if
             case (p_i_rot)
-               val = if_rot(s% i_rot,k)
+               val = if_rot_ad(s% i_rot,k)
             case (p_j_rot)
                val = if_rot(s% j_rot,k)
             case (p_v_rot)
                val = if_rot(s% omega,k)*if_rot(s% r_equatorial,k)*1d-5 ! km/sec
             case (p_fp_rot)
-               val = if_rot(s% fp_rot,k, alt=1.0d0)
+               val = if_rot_ad(s% fp_rot,k, alt=1.0d0)
             case (p_ft_rot)
-               val = if_rot(s% ft_rot,k, alt=1.0d0)
+               val = if_rot_ad(s% ft_rot,k, alt=1.0d0)
             case (p_ft_rot_div_fp_rot)
                if(s% rotation_flag) then
-                  val = s% ft_rot(k)/s% fp_rot(k) 
+                  val = s% ft_rot(k)% val/s% fp_rot(k)% val
                else
                   val = 1.0d0
                end if
@@ -1614,11 +1616,7 @@
             case (p_mlt_log_abs_Y)
                val = safe_log10(abs(s% Y_face(k)))
             case (p_tdc_num_iters)
-               if (s% using_tdc) then
-                  int_val = s% tdc_num_iters(k); val = dble(int_val)
-               else
-                  int_val = 0; val = 0
-               end if
+               int_val = s% tdc_num_iters(k); val = dble(int_val)
                int_flag = .true.
             case(p_COUPL)
                val = s% COUPL(k)
@@ -1852,8 +1850,6 @@
                if (s% rsp_flag) val = s% Ptrb(k)
             case(p_rsp_Eq)
                if (s% rsp_flag) val = s% Eq(k)
-            case(p_rsp_PII_face)
-               if (s% rsp_flag) val = s% PII(k)
             case(p_rsp_src_snk)
                if (s% rsp_flag) val = s% COUPL(k)
             case(p_rsp_src)
@@ -1942,18 +1938,6 @@
                      val = s% Lt(2)/s% L(2)
                   end if
                end if
-
-            case(p_rsp_WORK)
-               if (s% rsp_flag) val = rsp_WORK(s,k)
-            case(p_rsp_WORKQ)
-               if (s% rsp_flag) val = rsp_WORKQ(s,k)
-            case(p_rsp_WORKT)
-               if (s% rsp_flag) val = rsp_WORKT(s,k)
-            case(p_rsp_WORKC)
-               if (s% rsp_flag) val = rsp_WORKC(s,k)
-               
-            case(p_dconv_vel_dt)
-               val = s% dxh_ln_cvpv0(k)*(s% conv_vel(k) + s% conv_vel_v0)/s% dt
 
             case (p_total_energy) ! specific total energy at k
                val = eval_cell_section_total_energy(s,k,k)/s% dm(k)               
@@ -2180,7 +2164,7 @@
                write(*,*) 'between ' // trim(profile_column_name(c-1)) // ' and ' // &
                   trim(profile_column_name(c+1)), c-1, c+1
                val = 0
-               stop 'profile_getval'
+               call mesa_error(__FILE__,__LINE__,'profile_getval')
 
          end select
 
@@ -2282,7 +2266,7 @@
 
             if (is_bad(get_k_r_integral)) then
                write(*,2) 'get_k_r_integral', k_in, integral_for_k, integral
-               stop 'get_k_r_integral'
+               call mesa_error(__FILE__,__LINE__,'get_k_r_integral')
             end if
 
          end function get_k_r_integral
@@ -2376,6 +2360,22 @@
                end if
             endif
          end function if_rot
+
+
+         real(dp) function if_rot_ad(v,k, alt)
+            type(auto_diff_real_star_order1), dimension(:), pointer :: v
+            integer, intent(in) :: k
+            real(dp), optional, intent(in) :: alt
+            if (s% rotation_flag) then
+               if_rot_ad = v(k)% val
+            else
+               if (present(alt)) then
+                  if_rot_ad = alt
+               else
+                  if_rot_ad = 0
+               end if
+            endif
+         end function if_rot_ad
 
       end subroutine getval_for_profile
 

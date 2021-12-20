@@ -26,6 +26,7 @@
       module star_profile_def
 
       use star_def
+      use utils_lib, only: StrLowCase
 
       implicit none
 
@@ -229,8 +230,9 @@
       integer, parameter :: p_eos_frac_PC = p_eos_frac_Skye + 1
       integer, parameter :: p_eos_frac_FreeEOS = p_eos_frac_PC + 1
       integer, parameter :: p_eos_frac_CMS = p_eos_frac_FreeEOS + 1
+      integer, parameter :: p_eos_frac_ideal = p_eos_frac_CMS + 1
 
-      integer, parameter :: p_log_rho_times_r3 = p_eos_frac_CMS + 1
+      integer, parameter :: p_log_rho_times_r3 = p_eos_frac_ideal + 1
       integer, parameter :: p_rho_times_r3 = p_log_rho_times_r3 + 1
       integer, parameter :: p_v_times_t_div_r = p_rho_times_r3 + 1
       integer, parameter :: p_v_div_r = p_v_times_t_div_r + 1
@@ -608,8 +610,7 @@
       integer, parameter :: p_rsp_Lt = p_rsp_Lc + 1
       integer, parameter :: p_rsp_Eq = p_rsp_Lt + 1
       integer, parameter :: p_rsp_Uq = p_rsp_Eq + 1
-      integer, parameter :: p_rsp_PII_face = p_rsp_Uq + 1
-      integer, parameter :: p_rsp_src_snk = p_rsp_PII_face + 1
+      integer, parameter :: p_rsp_src_snk = p_rsp_Uq + 1
       integer, parameter :: p_rsp_src = p_rsp_src_snk + 1
       integer, parameter :: p_rsp_sink = p_rsp_src + 1
       integer, parameter :: p_rsp_damp = p_rsp_sink + 1
@@ -626,17 +627,10 @@
       integer, parameter :: p_rsp_Lc_div_L = p_rsp_Lr_div_L + 1
       integer, parameter :: p_rsp_Lt_div_L = p_rsp_Lc_div_L + 1
 
-      integer, parameter :: p_rsp_WORK = p_rsp_Lt_div_L + 1
-      integer, parameter :: p_rsp_WORKQ = p_rsp_WORK + 1
-      integer, parameter :: p_rsp_WORKT = p_rsp_WORKQ + 1
-      integer, parameter :: p_rsp_WORKC = p_rsp_WORKT + 1
-
-      integer, parameter :: p_d_u_div_rmid_start = p_rsp_WORKC + 1
+      integer, parameter :: p_d_u_div_rmid_start = p_rsp_Lt_div_L + 1
       integer, parameter :: p_d_u_div_rmid = p_d_u_div_rmid_start + 1
 
-      integer, parameter :: p_dconv_vel_dt = p_d_u_div_rmid + 1
-
-      integer, parameter :: p_cell_ie_div_star_ie = p_dconv_vel_dt + 1
+      integer, parameter :: p_cell_ie_div_star_ie = p_d_u_div_rmid + 1
       integer, parameter :: p_log_cell_specific_IE = p_cell_ie_div_star_ie + 1
       integer, parameter :: p_log_cell_ie_div_star_ie = p_log_cell_specific_IE + 1
 
@@ -711,8 +705,10 @@
       integer, parameter :: p_dPdr_dRhodr_info = p_u_face + 1
       integer, parameter :: p_RTI_du_diffusion_kick = p_dPdr_dRhodr_info + 1
       integer, parameter :: p_log_du_kick_div_du = p_RTI_du_diffusion_kick + 1
+
+      integer, parameter :: p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT = p_log_du_kick_div_du + 1
       
-      integer, parameter :: p_col_id_max = p_log_du_kick_div_du
+      integer, parameter :: p_col_id_max = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
       type (integer_dict), pointer :: profile_column_names_dict
@@ -926,6 +922,7 @@
          profile_column_name(p_eos_frac_PC) = 'eos_frac_PC'
          profile_column_name(p_eos_frac_FreeEOS) = 'eos_frac_FreeEOS'
          profile_column_name(p_eos_frac_CMS) = 'eos_frac_CMS'
+         profile_column_name(p_eos_frac_ideal) = 'eos_frac_ideal'
 
          profile_column_name(p_log_rho_times_r3) = 'log_rho_times_r3'
          profile_column_name(p_rho_times_r3) = 'rho_times_r3'
@@ -1283,7 +1280,6 @@
          profile_column_name(p_rsp_Lt) = 'rsp_Lt'
          profile_column_name(p_rsp_Eq) = 'rsp_Eq'
          profile_column_name(p_rsp_Uq) = 'rsp_Uq'
-         profile_column_name(p_rsp_PII_face) = 'rsp_PII_face'
          profile_column_name(p_rsp_src) = 'rsp_src'
          profile_column_name(p_rsp_sink) = 'rsp_sink'
          profile_column_name(p_rsp_damp) = 'rsp_damp'
@@ -1301,15 +1297,8 @@
          profile_column_name(p_rsp_Lc_div_L) = 'rsp_Lc_div_L'
          profile_column_name(p_rsp_Lt_div_L) = 'rsp_Lt_div_L'
 
-         profile_column_name(p_rsp_WORK) = 'rsp_WORK'
-         profile_column_name(p_rsp_WORKQ) = 'rsp_WORKQ'
-         profile_column_name(p_rsp_WORKT) = 'rsp_WORKT'
-         profile_column_name(p_rsp_WORKC) = 'rsp_WORKC'
-
          profile_column_name(p_d_u_div_rmid) = 'd_u_div_rmid'
          profile_column_name(p_d_u_div_rmid_start) = 'd_u_div_rmid_start'
-
-         profile_column_name(p_dconv_vel_dt) = 'dconv_vel_dt'
 
          profile_column_name(p_cell_specific_IE) = 'cell_specific_IE'
          profile_column_name(p_cell_ie_div_star_ie) = 'cell_ie_div_star_ie'
@@ -1402,12 +1391,14 @@
          profile_column_name(p_tau_epsnuc) = 'tau_epsnuc'
          profile_column_name(p_tau_cool) = 'tau_cool'
 
+         profile_column_name(p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT) = 'lum_rad_div_L_Edd_sub_fourPrad_div_PchiT'
+
          cnt = 0
          do i=1,p_col_id_max
             if (len_trim(profile_column_name(i)) == 0) then
                write(*,*) 'missing name for profile column id', i
                if (i > 1) write(*,*) 'following ' // trim(profile_column_name(max(1,i-1))) ! bp: get rid of bogus compiler warning
-               write(*,*)
+               write(*,'(A)')
                cnt = cnt+1
             end if
          end do
@@ -1419,7 +1410,7 @@
 
          nullify(profile_column_names_dict)
          do i=1,p_col_id_max
-            call integer_dict_define(profile_column_names_dict, profile_column_name(i), i, ierr)
+            call integer_dict_define(profile_column_names_dict, StrLowCase(profile_column_name(i)), i, ierr)
             if (ierr /= 0) then
                write(*,*) 'FATAL ERROR: profile_column_names_init failed in integer_dict_define'
                return
@@ -1441,7 +1432,7 @@
          ! returns id for the profile column if there is a matching name
          ! returns 0 otherwise.
          integer :: ierr, value
-         call integer_dict_lookup(profile_column_names_dict, cname, value, ierr)
+         call integer_dict_lookup(profile_column_names_dict, StrLowCase(cname), value, ierr)
          if (ierr /= 0) value = 0
          do_get_profile_id = value
       end function do_get_profile_id

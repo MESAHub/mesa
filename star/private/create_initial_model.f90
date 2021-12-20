@@ -103,7 +103,7 @@
 
          id0 = 1; id1 = 2; id2 = 3
          call get_create_star_ptr(id0, cs, ierr)
-         if (ierr /= 0) stop 'build_initial_model'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'build_initial_model')
 
          if (s% nvar_hydro > 4) then
             write(*,*) 'sorry, current build_initial_model only supports the basic 4 vars.'
@@ -273,7 +273,7 @@
          type (create_star_info), pointer :: cs
 
          call get_create_star_ptr(id, cs, ierr)
-         if (ierr /= 0) stop 'PSerrfunc'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'PSerrfunc')
 
          Pc=Pcguess
          S=Sguess

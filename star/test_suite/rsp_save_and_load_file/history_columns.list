@@ -1,5 +1,5 @@
-! log_columns.list -- determines the contents of star history logs
-! you can use a non-standard version by setting log_columns_file in your inlist
+! history_columns.list -- determines the contents of star history logs
+! you can use a non-standard version by setting history_columns_file in your inlist
 
 ! units are cgs unless otherwise noted.
 
@@ -9,7 +9,7 @@
 
 ! if you have a situation where you want a non-standard set of columns,
 ! make a copy of this file, edit as desired, and give the new filename in your inlist
-! as log_columns_file.   if you are just adding columns, you can 'include' this file,
+! as history_columns_file.   if you are just adding columns, you can 'include' this file,
 ! and just list the additions in your file.   note: to include the standard default
 ! version, use include '' -- the 0 length string means include the default file.
 
@@ -19,99 +19,293 @@
 ! if you need to have something added to the list of options, let me know....
 
 
-! the first few lines of the log file contain parameter values as of the start of the run
-! for completeness, those items are described here:
-   
-   ! initial_mass -- star mass at start of run (Msun units)
-   ! initial_z -- starting metallicity
-   ! h1_boundary_limit -- defines abundance limit for h1_boundary_mass 
-   ! he4_boundary_limit -- defines abundance limit for he4_boundary_mass
+! the first few lines of the log file contain a few items:
+
+   ! version_number -- for the version of mesa being used
    ! burn_min1 -- 1st limit for reported burning, in erg/g/s
    ! burn_min2 -- 2nd limit for reported burning, in erg/g/s
 
+
+!# other files
 
 ! note: you can include another list by doing
 !        include 'filename'
 !        include '' means include the default standard list file
 
-
 ! the following lines of the log file contain info about 1 model per row
-   
-   ! some general info about the model
-   
+
+!----------------------------------------------------------------------------------------------
+
+!# general info about the model
+
       model_number ! counting from the start of the run
+      num_zones ! number of zones in the model
+
+   !## age
+
       star_age ! elapsed simulated time in years since the start of the run
       !star_age_sec ! elapsed simulated time in seconds since the start of the run
       !star_age_min ! elapsed simulated time in minutes since the start of the run
       !star_age_hr ! elapsed simulated time in hours since the start of the run
       star_age_day ! elapsed simulated time in days since the start of the run
-      
-      rsp_phase
-      !rsp_GRPDV
-      rsp_GREKM
-      rsp_GREKM_avg_abs
-      rsp_DeltaR
-      rsp_DeltaMag
-      !rsp_g_Edd
-      !rsp_max_f_Edd
-      !rsp_min_f_Edd
-      !rsp_max_f_Edd_k
-      !rsp_min_f_Edd_k
-      rsp_period_in_days
-      rsp_num_periods
-      
-      
-      
-      
-      !num_rsp_merges
-      !num_rsp_splits
-      
-      !star_mass ! in Msun units
-      !star_mdot ! d(star_mass)/dt (in msolar per year)
-      !time_step ! timestep in years since previous model
-      !log_dt ! log10 time_step in years
-      log_dt_sec ! log10 time_step in seconds
-      !num_zones ! number of zones in the model
-      
-      !dt_cell_collapse
-      !dt_div_dt_cell_collapse
-      
-      !tot_E
-      !tot_KE
-      !tot_PE
-      !tot_IE
-      
-      !log_tot_E
-      !log_tot_KE
-      !log_tot_PE
-      !log_tot_IE
+      !day ! elapsed simulated time in days since the start of the run
 
-      !tot_E_change
-      !tot_KE_change
-      !tot_PE_change
-      !tot_IE_change
-   
-   ! mixing regions
-   
+      !log_star_age
+      !log_star_age_sec
+
+   !## timestep
+
+      !time_step ! timestep in years since previous model
+      !time_step_sec ! timestep in seconds since previous model
+      !time_step_days
+      log_dt ! log10 time_step in years
+      log_dt_sec ! log10 time_step in seconds
+      !log_dt_days ! log10 time_step in days
+
+   !## mass
+
+      star_mass ! in Msun units
+      !log_star_mass
+
+      !star_gravitational_mass ! star_mass is baryonic mass
+      !star_mass_grav_div_mass
+
+      !delta_mass ! star_mass - initial_mass in Msun units
+      log_xmstar ! log10 mass exterior to M_center (grams)
+
+   !## mass change
+
+      !star_mdot ! d(star_mass)/dt (in msolar per year)
+      log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
+
+   !## imposed surface conditions
+      !Tsurf_factor
+      !tau_factor
+      !tau_surface
+
+   !## imposed center conditions
+      !m_center
+      !m_center_gm
+      !r_center
+      !r_center_cm
+      !r_center_km
+      !L_center
+      !log_L_center
+      !log_L_center_ergs_s
+      !v_center
+      !v_center_kms
+
+      !logt_max
+
+!----------------------------------------------------------------------------------------------
+
+!# mixing and convection
+
+      !max_conv_vel_div_csound
+      !max_gradT_div_grada
+      !max_gradT_sub_grada
+      !min_log_mlt_Gamma
+
+
+   !## mixing regions
+
+      mass_conv_core ! (Msun) mass coord of top of convective core.  0 if core is not convective
+
       !  mx1 refers to the largest (by mass) convective region.
       !  mx2 is the 2nd largest.
 
       !  conv_mx1_top and conv_mx1_bot are the region where mixing_type == convective_mixing.
       !  mx1_top and mx1_bot are the extent of all kinds of mixing, convective and other.
 
-      !conv_mx1_top
-      !conv_mx1_bot
-      !conv_mx2_top
-      !conv_mx2_bot
-      !mx1_top
-      !mx1_bot
-      !mx2_top
-      !mx2_bot
-      
-       
-      
-   ! regions of strong nuclear burning
-   
+      ! values are m/Mstar
+      conv_mx1_top
+      conv_mx1_bot
+      conv_mx2_top
+      conv_mx2_bot
+      mx1_top
+      mx1_bot
+      mx2_top
+      mx2_bot
+
+      ! radius -- values are radii in Rsun units
+      !conv_mx1_top_r
+      !conv_mx1_bot_r
+      !conv_mx2_top_r
+      !conv_mx2_bot_r
+      !mx1_top_r
+      !mx1_bot_r
+      !mx2_top_r
+      !mx2_bot_r
+
+      ! you might want to get a more complete list of mixing regions by using the following
+
+      !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
+
+         ! the <integer> is the number of regions to report
+         ! there will be 2*<integer> columns for this in the log file, 2 for each region.
+         ! the first column for a region gives the mixing type as defined in const/public/const_def.f90.
+
+         ! the second column for a region gives the m/mstar location of the top of the region
+         ! entries for extra columns after the last region in the star will have an invalid mixing_type value of -1.
+         ! mstar is the total mass of the star, so these locations range from 0 to 1
+         ! all regions are include starting from the center, so the bottom of one region
+         ! is the top of the previous one.  since we start at the center, the bottom of the 1st region is 0.
+
+         ! the columns in the log file will have names like 'mix_type_1' and 'mix_qtop_1'
+
+         ! if the star has too many regions to report them all,
+         ! the smallest regions will be merged with neighbors for reporting purposes only.
+
+
+      !mix_relr_regions <integer>
+         ! same as above, but locations given as r/rstar instead of m/mstar.
+         ! the columns in the log file will have names like 'mix_relr_type_1' and 'mix_relr_top_1'
+
+
+   !## conditions at base of largest convection zone (by mass)
+      !cz_bot_mass ! mass coordinate of base (Msun)
+      !cz_mass ! mass coordinate of base (Msun) -- same as cz_bot_mass
+      !cz_log_xmass ! mass exterior to base (g)
+      !cz_log_xmsun ! mass exterior to base (Msun)
+      !cz_xm ! mass exterior to base (Msun)
+      !cz_logT
+      !cz_logRho
+      !cz_logP
+      !cz_bot_radius ! Rsun
+      !cz_log_column_depth
+      !cz_log_radial_depth
+      !cz_luminosity ! Lsun
+      !cz_opacity
+      !cz_log_tau
+      !cz_eta
+      !cz_log_eps_nuc ! log10(ergs/g/s)
+      !cz_t_heat ! Cp*T/eps_nuc (seconds)
+
+      !cz_csound
+      !cz_scale_height
+      !cz_grav
+
+      !cz_omega
+      !cz_omega_div_omega_crit
+
+      !cz_zone
+
+      ! mass fractions at base of largest convection zone (by mass)
+      !cz_log_xa h1
+      !cz_log_xa he4
+
+   !## conditions at top of largest convection zone (by mass)
+      !cz_top_mass ! mass coordinate of top (Msun)
+      !cz_top_log_xmass ! mass exterior to top (g)
+      !cz_top_log_xmsun ! mass exterior to top (Msun)
+      !cz_top_xm ! mass exterior to top (Msun)
+      !cz_top_logT
+      !cz_top_logRho
+      !cz_top_logP
+      !cz_top_radius ! Rsun
+      !cz_top_log_column_depth
+      !cz_top_log_radial_depth
+      !cz_top_luminosity ! Lsun
+      !cz_top_opacity
+      !cz_top_log_tau
+      !cz_top_eta
+      !cz_top_log_eps_nuc ! log10(ergs/g/s)
+      !cz_top_t_heat ! Cp*T/eps_nuc (seconds)
+
+      !cz_top_csound
+      !cz_top_scale_height
+      !cz_top_grav
+
+      !cz_top_omega
+      !cz_top_omega_div_omega_crit
+
+      !cz_top_zone
+      !cz_top_zone_logdq
+
+      ! mass fractions at top of largest convection zone (by mass)
+      !cz_top_log_xa h1
+      !cz_top_log_xa he4
+
+!----------------------------------------------------------------------------------------------
+
+!# nuclear reactions
+
+   !## integrated quantities
+
+      !power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
+      !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
+      !power_photo
+      !power_z_burn
+      !log_power_nuc_burn ! total thermal power from all burning, excluding photodisintegrations
+      log_LH ! log10 power_h_burn
+      log_LHe ! log10 power_he_burn
+      log_LZ ! log10 total burning power including LC, but excluding LH and LHe and photodisintegrations
+      log_Lnuc ! log(LH + LHe + LZ)
+      !log_Lnuc_ergs_s
+      !log_Lnuc_sub_log_L
+      !lnuc_photo
+
+      !extra_L ! integral of extra_heat in Lsun units
+      !log_extra_L ! log10 extra_L
+
+   !## neutrino losses
+      !log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+      !log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
+      !log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
+
+      !mass_loc_of_max_eps_nuc ! (in Msun units)
+      !mass_ext_to_max_eps_nuc ! (in Msun units)
+      !eps_grav_integral ! (in Lsun units)
+      !log_abs_Lgrav ! log10 abs(eps_grav_integral) (in Lsun units)
+
+   !## information about reactions (by category)
+
+      ! log10 total luminosity for reaction categories (Lsun units)
+
+      pp
+      cno
+      tri_alfa
+      !c_alpha
+      !n_alpha
+      !o_alpha
+      !ne_alpha
+      !na_alpha
+      !mg_alpha
+      !si_alpha
+      !s_alpha
+      !ar_alpha
+      !ca_alpha
+      !ti_alpha
+      !fe_co_ni
+      !c12_c12
+      !c12_o16
+      !o16_o16
+      !photo
+      !pnhe4
+      !other
+
+
+
+
+   !## nuclear reactions at center
+
+      ! center log10 burn erg/g/s for reaction categories
+
+      !c_log_eps_burn cno
+      !c_log_eps_burn tri_alfa
+
+      ! center d_eps_nuc_dlnd for reaction categories
+
+      !c_d_eps_dlnd cno
+      !c_d_eps_dlnd tri_alfa
+
+      ! center d_eps_nuc_dlnT for reaction categories
+
+      !c_d_eps_dlnT cno
+      !c_d_eps_dlnT tri_alfa
+
+   !## regions of strong nuclear burning
+
       ! 2 zones where eps_nuc > burn_min1 erg/g/s
       ! for each zone have 4 numbers: start1, start2, end2, end1
       ! start1 is mass of inner edge where first goes > burn_min1 (or -20 if none such)
@@ -119,159 +313,740 @@
       ! end2 is mass of outer edge where first zone drops back below burn_min2 erg/g/s
       ! end1 is mass of outer edge where first zone ends (i.e. eps_nuc < burn_min1)
       ! similar for the second zone
-   
-      !epsnuc_M_1 ! start1 for 1st zone
-      !epsnuc_M_2 ! start2
-      !epsnuc_M_3 ! end2
-      !epsnuc_M_4 ! end1
-      
-      !epsnuc_M_5 ! start1 for 2nd zone
-      !epsnuc_M_6 ! start2
-      !epsnuc_M_7 ! end2
-      !epsnuc_M_8 ! end1
-   
-   ! information about abundance transitions
-   
-      !he_core_mass
-      !c_core_mass
-      !o_core_mass   
-      !si_core_mass
-      !fe_core_mass
-   
-   
-   ! info at location of max abs velocity
-      ! note: can use control "min_tau_for_max_abs_v_location" to exclude surface
 
-   ! timescales
-      
+      epsnuc_M_1 ! start1 for 1st zone
+      epsnuc_M_2 ! start2
+      epsnuc_M_3 ! end2
+      epsnuc_M_4 ! end1
+
+      epsnuc_M_5 ! start1 for 2nd zone
+      epsnuc_M_6 ! start2
+      epsnuc_M_7 ! end2
+      epsnuc_M_8 ! end1
+
+
+      ! you might want to get a more complete list of burning regions by using the following
+
+      !burning_regions <integer>
+         ! the <integer> is the number of regions to report
+         ! there will be 2*<integer> columns for this in the log file, 2 for each region.
+         ! the first column for a region gives int(sign(val)*log10(max(1,abs(val))))
+            ! where val = ergs/gm/sec nuclear energy minus all neutrino losses.
+         ! the second column for a region gives the q location of the top of the region
+         ! entries for extra columns after the last region in the star will have a value of -9999
+         ! all regions are included starting from the center, so the bottom of one region
+         ! is the top of the previous one.
+         ! since we start at the center, the bottom of the 1st region is q=0 and top of last is q=1.
+
+         ! the columns in the log file will have names like 'burn_type_1' and 'burn_qtop_1'
+         
+      !burn_relr_regions <integer>
+         ! same as above, but locations given as r/rstar instead of m/mstar.
+         ! the columns in the log file will have names like 'burn_relr_type_1' and 'burn_relr_top_1'
+
+
+         ! if the star has too many regions to report them all,
+         ! the smallest regions will be merged with neighbors for reporting purposes only.
+
+!----------------------------------------------------------------------------------------------
+
+!# information about core and envelope
+
+   !## helium core
+      he_core_mass
+      !he_core_radius
+      !he_core_lgT
+      !he_core_lgRho
+      !he_core_L
+      !he_core_v
+      !he_core_omega
+      !he_core_omega_div_omega_crit
+      !he_core_k
+
+   !## CO core
+      co_core_mass
+      !CO_core
+      !co_core_radius
+      !co_core_lgT
+      !co_core_lgRho
+      !co_core_L
+      !co_core_v
+      !co_core_omega
+      !co_core_omega_div_omega_crit
+      !co_core_k
+
+   !## ONe core
+      one_core_mass
+      !one_core_radius
+      !one_core_lgT
+      !one_core_lgRho
+      !one_core_L
+      !one_core_v
+      !one_core_omega
+      !one_core_omega_div_omega_crit
+      !one_core_k
+
+   !## iron core
+      fe_core_mass
+      !fe_core_radius
+      !fe_core_lgT
+      !fe_core_lgRho
+      !fe_core_L
+      !fe_core_v
+      !fe_core_omega
+      !fe_core_omega_div_omega_crit
+      !fe_core_k
+
+   !## neuton rich core
+      neutron_rich_core_mass
+      !neutron_rich_core_radius
+      !neutron_rich_core_lgT
+      !neutron_rich_core_lgRho
+      !neutron_rich_core_L
+      !neutron_rich_core_v
+      !neutron_rich_core_omega
+      !neutron_rich_core_omega_div_omega_crit
+      !neutron_rich_core_k
+
+   !## envelope
+
+      !envelope_mass ! = star_mass - he_core_mass
+      !envelope_fraction_left ! = envelope_mass / (initial_mass - he_core_mass)
+
+      !h_rich_layer_mass ! = star_mass - he_core_mass
+      !he_rich_layer_mass ! = he_core_mass - c_core_mass
+      !co_rich_layer_mass
+
+!----------------------------------------------------------------------------------------------
+
+!# timescales
+
       !dynamic_timescale ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
       !kh_timescale ! kelvin-helmholtz timescale (years)
+      !mdot_timescale ! star_mass/abs(star_mdot) (years)
+      !kh_div_mdot_timescales ! kh_timescale/mdot_timescale
       !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
 
-   ! integrated power from hydrogen and helium burning
-   
-      !power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
-      !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
-      !log_LH ! log10 power_h_burn
-      !log_LHe ! log10 power_he_burn
-   
-   ! conditions near surface
-      radius
-      log_R
-      v_surf_km_s ! (km/s)
-      v_surf_div_escape_v
-      !v_surf ! (cm/s)
-      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
-      v_div_csound_max
+      !dt_cell_collapse ! min time for any cell to collapse at current velocities
+      !dt_div_dt_cell_collapse
 
-      max_abs_v_div_cs
+      !dt_div_max_tau_conv ! dt/ maximum conv timescale
+      !dt_div_min_tau_conv ! dt/ minimum conv timescale
+
+
+      !min_dr_div_cs ! min over all cells of dr/csound (seconds)
+      !min_dr_div_cs_k ! location of min
+      !log_min_dr_div_cs ! log10 min dr_div_csound (seconds)
+      !min_dr_div_cs_yr ! min over all cells of dr/csound (years)
+      !log_min_dr_div_cs_yr ! log10 min dr_div_csound (years)
       dt_div_min_dr_div_cs
+      !log_dt_div_min_dr_div_cs
 
+      !min_t_eddy ! minimum value of scale_height/conv_velocity
+
+!----------------------------------------------------------------------------------------------
+
+!# conditions at or near the surface of the model
+
+   !## conditions at the photosphere
+      effective_T
+      !Teff
+      log_Teff ! log10 effective temperature
+         ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
+         ! where L and R are evaluated at the photosphere (tau_factor < 1)
+         ! or surface of the model (tau_factor >= 1) when photosphere is not inside the model.
+
+      !photosphere_black_body_T
+      !photosphere_cell_T ! temperature at model location closest to the photosphere, not necessarily Teff
+      !photosphere_cell_log_T
+      !photosphere_cell_density
+      !photosphere_cell_log_density
+      !photosphere_cell_opacity
+      !photosphere_cell_log_opacity
+      photosphere_L ! Lsun units
+      !photosphere_log_L ! Lsun units
+      photosphere_r ! Rsun units
+      !photosphere_log_r ! Rsun units
+      !photosphere_m ! Msun units
+      photosphere_v_km_s
+      !photosphere_cell_k
+      !photosphere_column_density
+      !photosphere_csound
+      !photosphere_log_column_density
+      !photosphere_opacity
+      photosphere_v_div_cs
+      !photosphere_xm
+      !photosphere_cell_free_e
+      !photosphere_cell_log_free_e
+      !photosphere_logg
+      photosphere_T
+
+   !## conditions at or near the surface of the model (outer edge of outer cell)
+
+      luminosity ! luminosity in Lsun units
+      !luminosity_ergs_s ! luminosity in cgs units
+      log_L ! log10 luminosity in Lsun units
+      !log_L_ergs_s ! log10 luminosity in cgs units
+      radius ! Rsun
+      log_R ! log10 radius in Rsun units
+      !radius_cm
+      !log_R_cm
+
+      log_g ! log10 gravity
+      !gravity
+      !log_Ledd
+      !log_L_div_Ledd ! log10(L/Leddington)
+      !lum_div_Ledd
+      !log_surf_optical_depth
+      !surface_optical_depth
+
+      !log_surf_cell_opacity ! old name was log_surf_opacity
+      !log_surf_cell_P ! old name was log_surf_P
+      !log_surf_cell_pressure ! old name was log_surf_pressure
+      !log_surf_cell_density ! old name was log_surf_density
+      !log_surf_cell_temperature ! old name was log_surf_temperature
+      !surface_cell_temperature ! old name was surface_temperature
+      !log_surf_cell_z ! old name was log_surf_z
+      !surface_cell_entropy ! in units of kerg per baryon
+          ! old name was surface_entropy
+
+      !v_surf ! (cm/s)
+      v_surf_km_s ! (km/s)
+      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      v_div_csound_max ! max value of velocity divided by sound speed at face
+      !v_div_vesc
+      !v_phot_km_s
+      v_surf_div_escape_v
+
+      !v_surf_div_v_kh ! v_surf/(photosphere_r/kh_timescale)
+
+      !surf_avg_j_rot
+      !surf_avg_omega
+      !surf_avg_omega_crit
+      !surf_avg_omega_div_omega_crit
+      !surf_avg_v_rot ! km/sec rotational velocity at equator
+      !surf_avg_v_crit ! critical rotational velocity at equator
+      !surf_avg_v_div_v_crit
+      !surf_avg_Lrad_div_Ledd
+      !surf_avg_logT
+      !surf_avg_logRho
+      !surf_avg_opacity
+
+      ! Gravity Darkening, reports the surface averaged L/Lsun and Teff (K) caused by
+      ! gravity darkening in rotating stars. Based on the model of Espinosa Lara & Rieutord (2011)
+      ! 'polar' refers to the line of sight being directed along the rotation axis of the star
+      ! 'equatorial' refers to the line of sight coincident with the stellar equator
+      !grav_dark_L_polar !Lsun 
+      !grav_dark_Teff_polar !K
+      !grav_dark_L_equatorial !Lsun 
+      !grav_dark_Teff_equatorial !K
 
       !surf_escape_v ! cm/s
-      luminosity ! luminosity in Lsun units
-      !gravity 
-   
-      log_L ! log10 luminosity in Lsun units
-      effective_T
-      log_g
-      log_Teff ! log10 effective temperature
-      
-      photosphere_L
-      photosphere_r
-      photosphere_T
-      photosphere_v_km_s
-      photosphere_v_div_cs
-      !photosphere_logg
-      
-      !log_lum_band B
-      !log_lum_band V
-      !log_lum_band I
-      
-      !log_lum_band bb_U
-      !log_lum_band bb_B
-      !log_lum_band bb_V
-      !log_lum_band bb_R
-      !log_lum_band bb_I
-   
-   ! conditions near center
-   
+
+      !v_wind_Km_per_s ! Km/s
+         ! = 1d-5*s% opacity(1)*max(0d0,-s% mstar_dot)/ &
+         !        (4*pi*s% photosphere_r*Rsun*s% tau_base)
+         ! Lars says:
+            ! wind_mdot = 4*pi*R^2*rho*v_wind
+            ! tau = integral(opacity*rho*dr) from R to infinity
+            ! so tau = opacity*wind_mdot/(4*pi*R*v_wind) at photosphere
+            ! or v_wind = opacity*wind_mdot/(4*pi*R*tau) at photosphere
+
+      !rotational_mdot_boost ! factor for increase in mass loss mdot due to rotation
+      !log_rotational_mdot_boost ! log factor for increase in mass loss mdot due to rotation
+      !surf_r_equatorial_div_r_polar
+      !surf_r_equatorial_div_r
+      !surf_r_polar_div_r
+
+!----------------------------------------------------------------------------------------------
+
+!# conditions near center
+
       !log_center_T ! temperature
       !log_center_Rho ! density
       !log_center_P ! pressure
+
+      ! shorter names for above
+      log_cntr_P
+      log_cntr_Rho
+      log_cntr_T
+
+      !center_T ! temperature
+      !center_Rho ! density
+      !center_P ! pressure
+
       !center_degeneracy ! the electron chemical potential in units of k*T
-      !center_gamma ! plasma interaction parameter at the centermost meshpoint.
-      
+      !center_gamma ! plasma interaction parameter
+      center_mu
+      center_ye
+      center_abar
+      !center_zbar
+
+      !center_eps_grav
+
+      !center_non_nuc_neu
+      !center_eps_nuc
+      !d_center_eps_nuc_dlnT
+      !d_center_eps_nuc_dlnd
+      !log_center_eps_nuc
+
+      !center_entropy ! in units of kerg per baryon
+      !max_entropy ! in units of kerg per baryon
+      !fe_core_infall
+      !non_fe_core_infall
+      !non_fe_core_rebound
+      !max_infall_speed
+
+      !compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
+      !compactness
+      !m4 ! Mass co-ordinate where entropy=4
+      !mu4 ! dM(Msun)/dr(1000km) where entropy=4
+
+      !center_omega
+      !center_omega_div_omega_crit
+
+!----------------------------------------------------------------------------------------------
+
+!# abundances
+
+      !species ! size of net
+
+   !## mass fractions near center
+
+      ! the following controls automatically add columns for all of the isos that are in the current net
+      !add_center_abundances
+      !add_log_center_abundances
+
+      ! individual central mass fractions (as many as desired)
+      center h1
+      center he4
+      center c12
+      center o16
+
+      ! individual log10 central mass fractions (as many as desired)
       !log_center h1
-      !log_center h2
-      !log_center he3
       !log_center he4
-      !log_center li7
+      ! etc.
+
+
+   !## mass fractions near surface
+
+      ! the following controls automatically add columns for all of the isos that are in the current net
+      !add_surface_abundances
+      !add_log_surface_abundances
+
+      ! individual surface mass fractions (as many as desired)
+      !surface h1
+      !surface he4
+      surface c12
+      surface o16
+      ! etc.
+
+      ! individual log10 surface mass fractions (as many as desired)
+
+      !log_surface h1
+      !log_surface he4
+
+
+   !## mass fractions for entire star
+
+      ! the following controls automatically add columns for all of the isos that are in the current net
+      !add_average_abundances
+      !add_log_average_abundances
+
+      ! individual average mass fractions (as many as desired)
+      !average h1
+      !average he4
+      ! etc.
+
+      ! individual log10 average mass fractions (as many as desired)
+      !log_average h1
+      !log_average he4
+      ! etc.
+
+
+   !## mass totals for entire star (in Msun units)
+
+      ! the following controls automatically add columns for all of the isos that are in the current net
+      !add_total_mass
+      !add_log_total_mass
+
+      ! individual mass totals for entire star (as many as desired)
+      total_mass h1
+      total_mass he4
+      ! etc.
+
+      ! individial log10  mass totals for entire star (in Msun units)
+      !log_total_mass h1
+      !log_total_mass he4
+      ! etc.
+
+!----------------------------------------------------------------------------------------------
+
+!# info at specific locations
       
-
-   ! log10 total ergs/sec for reaction categories (Lsun units)
-      
-      !pp
-      !cno
-      !tri_alfa
-
-   ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
-      
+   !## info at location of max temperature
+   !max_T
+   !log_max_T
 
 
-      
-      !mixing_regions 40
-      !burning_regions 80
+!----------------------------------------------------------------------------------------------
+
+!# information about shocks
+
+   !## info about outermost outward moving shock
+      ! excluding locations with q > max_q_for_outer_mach1_location
+      ! returns values at location of max velocity
+      !shock_mass ! baryonic (Msun)
+      !shock_mass_gm ! baryonic (grams)
+      !shock_q
+      !shock_radius ! (Rsun)
+      !shock_radius_cm ! (cm)
+      !shock_velocity
+      !shock_csound
+      !shock_v_div_cs
+      !shock_lgT
+      !shock_lgRho
+      !shock_lgP
+      !shock_gamma1
+      !shock_entropy
+      !shock_tau
+      !shock_k
+      !shock_pre_lgRho
+
+!----------------------------------------------------------------------------------------------
+
+!# asteroseismology
+
+      !delta_nu ! large frequency separation for p-modes (microHz)
+         ! 1e6/(seconds for sound to cross diameter of star)
+      !delta_Pg ! g-mode period spacing for l=1 (seconds)
+         ! sqrt(2) pi^2/(integral of brunt_N/r dr)
+      !log_delta_Pg
+      !nu_max ! estimate from scaling relation (microHz)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
+         ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
+      !nu_max_3_4th_div_delta_nu ! nu_max^0.75/delta_nu
+      !acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+      !acoustic_radius ! integral of dr/csound (seconds)
+      !ng_for_nu_max ! = 1 / (nu_max*delta_Pg)
+         ! period for g-mode with frequency nu_max = nu_max_ng*delta_Pg
+      !gs_per_delta_nu ! delta_nu / (nu_max**2*delta_Pg)
+         ! number of g-modes per delta_nu at nu_max
+
+      !int_k_r_dr_nu_max_Sl1 ! integral of k_r*dr where nu < N < Sl for nu = nu_max, l=1
+      !int_k_r_dr_2pt0_nu_max_Sl1 ! integral of k_r*dr where nu < N < Sl for nu = nu_max*2, l=1
+      !int_k_r_dr_0pt5_nu_max_Sl1 ! integral of k_r*dr where nu < N < Sl for nu = nu_max/2, l=1
+      !int_k_r_dr_nu_max_Sl2 ! integral of k_r*dr where nu < N < Sl for nu = nu_max, l=2
+      !int_k_r_dr_2pt0_nu_max_Sl2 ! integral of k_r*dr where nu < N < Sl for nu = nu_max*2, l=2
+      !int_k_r_dr_0pt5_nu_max_Sl2 ! integral of k_r*dr where nu < N < Sl for nu = nu_max/2, l=2
+      !int_k_r_dr_nu_max_Sl3 ! integral of k_r*dr where nu < N < Sl for nu = nu_max, l=3
+      !int_k_r_dr_2pt0_nu_max_Sl3 ! integral of k_r*dr where nu < N < Sl for nu = nu_max*2, l=3
+      !int_k_r_dr_0pt5_nu_max_Sl3 ! integral of k_r*dr where nu < N < Sl for nu = nu_max/2, l=3
+
+!----------------------------------------------------------------------------------------------
+
+!# energy information
+
+      !total_energy ! at end of step
+      !log_total_energy ! log(abs(total_energy))
+      !total_energy_after_adjust_mass ! after mass adjustments
+
+      ! shorter versions of above
+      !tot_E
+      !log_tot_E
 
 
+      !total_gravitational_energy
+      !log_total_gravitational_energy ! log(abs(total_gravitational_energy))
+      !total_gravitational_energy_after_adjust_mass
 
-      ! you might want to get a more complete list of mixing regions by using the following
-      
-      !mixing_regions 40
-      
-      !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
-         ! the <integer> is the number of regions to report
-         ! there will be 2*<integer> columns for this in the log file, 2 for each region.
-         ! the first column for a region gives the mixing type using the values defined in const_def
-         ! the types are no_mixing, convective_mixing, overshoot_mixing, semiconvective_mixing,
-         ! and salt_finger_mixing, numbered from 0 to 4.
-         ! entries for extra columns after the last region in the star will have an invalid mixing_type value of -1.
-         ! the second column for a region gives the m/mstar location of the top of the region
-         ! mstar is the total mass of the star, so these locations range from 0 to 1
-         ! all regions are include starting from the center, so the bottom of one region
-         ! is the top of the previous one.  since we start at the center, the bottom of the 1st region is 0.
-         
-         ! the columns in the log file will have names like 'mix_type_1' and 'mix_qtop_1'
+      ! shorter versions of above
+      !tot_PE
+      !log_tot_PE
 
-      ! energy information
+      !total_internal_energy
+      !log_total_internal_energy
+      !total_internal_energy_after_adjust_mass
+
+      ! shorter versions of above
+      !tot_IE
+      !log_tot_IE
+
+      !total_radial_kinetic_energy
+      !log_total_radial_kinetic_energy
+      !total_radial_kinetic_energy_after_adjust_mass
+
+      ! shorter versions of above (does not include rot KE)
+      !tot_KE
+      !log_tot_KE
+
+      !total_turbulent_energy
+      !log_total_turbulent_energy
+      !total_turbulent_energy_after_adjust_mass
+      !tot_Et
+      !log_tot_Et
+
+      !total_energy_foe
+
+      !tot_IE_div_IE_plus_KE
+      !total_IE_div_IE_plus_KE
+
+      !total_entropy
+      !total_eps_grav
+
+      !total_energy_sources_and_sinks ! for this step
+      !total_nuclear_heating
+      !total_non_nuc_neu_cooling
+      !total_irradiation_heating
+      !total_extra_heating ! extra heat integrated over the model times dt (erg)
+      !total_WD_sedimentation_heating
+
+      !rel_run_E_err
+
+      !rel_E_err
+      !abs_rel_E_err
+      !log_rel_E_err
+
+      !tot_e_equ_err
+      !tot_e_err
+
+
+      !error_in_energy_conservation ! for this step
+         ! = total_energy - (total_energy_start + total_energy_sources_and_sinks)
+      !cumulative_energy_error ! = sum over all steps of error_in_energy_conservation
+      !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
+      !log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
+      !log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
+
+      !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
+      !log_rel_error_in_energy_conservation
+
+      !virial_thm_P_avg
+      !virial_thm_rel_err
+      !work_inward_at_center
+      !work_outward_at_surface
+
+
+!----------------------------------------------------------------------------------------------
+
+ !# rotation
+
+      !total_angular_momentum
+      !log_total_angular_momentum
+      !i_rot_total ! moment of inertia
+
+      !total_rotational_kinetic_energy
+      !log_total_rotational_kinetic_energy
+      !total_rotational_kinetic_energy_after_adjust_mass
+
+!----------------------------------------------------------------------------------------------
+
+!# velocities
+
       !avg_abs_v_div_cs
       !log_avg_abs_v_div_cs
+      max_abs_v_div_cs
       !log_max_abs_v_div_cs
-      
+
       !avg_abs_v
       !log_avg_abs_v
+      !max_abs_v
       !log_max_abs_v
 
+      !u_surf
+      !u_surf_km_s
+      !u_div_csound_surf
+      !u_div_csound_max
+
+      !infall_div_cs
+
+!----------------------------------------------------------------------------------------------
+
+!# misc
+
+      !e_thermal ! sum over all zones of Cp*T*dm
+
+   !## eos
+      !logQ_max ! logQ = logRho - 2*logT + 12
+      !logQ_min
+      !gamma1_min
+
+   !## core mixing
+      !mass_semiconv_core
+
+   !## H-He boundary
+
+      !diffusion_time_H_He_bdy
+      !temperature_H_He_bdy
 
 
-   ! misc
-   
-      !log_rel_run_E_err
-      !rel_E_err
-      
-      !log_total_turbulent_energy
-      
+   !## optical depth and opacity
 
-   ! misc
-      
-      !r_center
-      !v_center
+      !one_div_yphot
+      !log_one_div_yphot
 
-      !num_iters
-      
+      !log_min_opacity
+      !min_opacity
+
+      !log_tau_center
+
+      !log_max_tau_conv
+      !max_tau_conv
+      !log_min_tau_conv
+      !min_tau_conv
+
+      !tau_qhse_yrs
+
+   !## other
+
+      !Lsurf_m
+      !dlnR_dlnM
+      !h1_czb_mass ! location (in Msun units) of base of 1st convection zone above he core
+      !kh_mdot_limit
+      !log_cntr_dr_cm
+      !min_Pgas_div_P
+      !surf_c12_minus_o16 ! this is useful for seeing effects of dredge up on AGB
+      !surf_num_c12_div_num_o16
+
+      !phase_of_evolution ! Integer mapping to the type of evolution see star_data/public/star_data_def.inc for definitions
+
+   !## MLT++
+      !gradT_excess_alpha
+      !gradT_excess_min_beta
+      !gradT_excess_max_lambda
+
+      !max_L_rad_div_Ledd
+      !max_L_rad_div_Ledd_div_phi_Joss
+
+
+   !## RTI
+      !rti_regions <num>
+
+   !## Ni & Co
+      !total_ni_co_56
+
+
+   !## internal structure constants
+
+      ! this is evaluated assuming a spherical star and does not account for rotation
+      !apsidal_constant_k2
+
+
+!----------------------------------------------------------------------------------------------
+
+!# accretion
+
+      !k_below_const_q
+      !q_below_const_q
+      !logxq_below_const_q
+
+      !k_const_mass
+      !q_const_mass
+      !logxq_const_mass
+
+      !k_below_just_added
+      !q_below_just_added
+      !logxq_below_just_added
+
+      !k_for_test_CpT_absMdot_div_L
+      !q_for_test_CpT_absMdot_div_L
+      !logxq_for_test_CpT_absMdot_div_L
+
+!----------------------------------------------------------------------------------------------
+
+!# Color output
+
+      ! Outputs the bolometric correction (bc) for the star in filter band ``filter'' (case sensitive)
+      !bc filter
+
+      ! Outputs the absolute magnitude for the star in filter band ``filter'' (case sensitive)
+      !abs_mag filter
+
+      ! Adds all the bc's to the output
+      !add_bc
+
+      ! Adds all the absolute magnitudes to the output
+      !add_abs_mag
+
+      ! Outputs luminosity in filter band ``filter'' (erg s^-1) (case sensitive)
+      ! lum_band filter
+
+      ! Adds all the filter band luminosities to the output (erg s^-1)
+      ! add_lum_band
+
+      ! Outputs log luminosity in filter band ``filter'' (log erg s^-1) (case sensitive)
+      ! log_lum_band filter
+
+      ! Adds all the filter band luminosities to the output (log erg s^-1)
+      ! add_log_lum_band
+
+!----------------------------------------------------------------------------------------------
+
+!# RSP
+
+   rsp_DeltaMag ! absolute magnitude difference between minimum and maximum light (mag)
+   rsp_DeltaR ! R_max - R_min difference in the max and min radius (Rsun)
+   rsp_GREKM ! fractional growth of the kinetic energy per pulsation period ("nonlinear growth rate") - see equation 5 in MESA5
+   rsp_num_periods ! Count of the number of pulsation cycles completed
+   rsp_period_in_days ! Running period, ie., period between two consecutive values of R_max (days) 
+   rsp_phase ! Running pulsation phase for a cycle
+
+!----------------------------------------------------------------------------------------------
+!# debugging
+
+   !## retries
       num_retries ! total during the run
-      !total_num_newton_solves
-      !total_num_newton_iterations
-      !avg_num_newton_iters
 
+   !## solver iterations
 
+      num_iters ! same as num_solver_iterations
+      !num_solver_iterations ! iterations at this step
+      !total_num_solver_iterations ! total iterations during the run
+      !avg_num_solver_iters
+
+      !rotation_solver_steps
+
+      !diffusion_solver_steps
+      !diffusion_solver_iters
+
+      !avg_setvars_per_step
+      !avg_skipped_setvars_per_step
+      !avg_solver_setvars_per_step
+
+      !burn_solver_maxsteps
+
+      !total_num_solver_calls_converged
+      !total_num_solver_calls_failed
+      !total_num_solver_calls_made
+      !total_num_solver_relax_calls_converged
+      !total_num_solver_relax_calls_failed
+      !total_num_solver_relax_calls_made
+      !total_num_solver_relax_iterations
+
+      !total_step_attempts
+      !total_step_redos
+      !total_step_retries
+      !total_steps_finished
+      !total_steps_taken
+
+      !TDC_num_cells
+
+   !## Relaxation steps
+      !total_relax_step_attempts
+      !total_relax_step_redos
+      !total_relax_step_retries
+      !total_relax_steps_finished
+      !total_relax_steps_taken
+
+   !## conservation during mesh adjust
+      !log_mesh_adjust_IE_conservation
+      !log_mesh_adjust_KE_conservation
+      !log_mesh_adjust_PE_conservation
+
+   !## amr
+      !num_hydro_merges
+      !num_hydro_splits
+
+   !## timing
+      !elapsed_time ! time since start of run (seconds)

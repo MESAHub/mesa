@@ -274,7 +274,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: i_lnd, i_lnT, i_lnR, i_w, i_Hp, &
-            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_Et_RSP, &
+            i_lum, i_v, i_u, i_alpha_RTI, i_Et_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          include 'formats'
          ierr = 0
@@ -292,7 +292,6 @@
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
          i_Et_RSP = s% i_Et_RSP
-         i_ln_cvpv0 = s% i_ln_cvpv0
       
          do j=1,s% nvar_hydro
             if (j == i_lnd) then
@@ -348,11 +347,6 @@
             else if (j == i_Et_RSP) then
                do k=1,nz
                   s% RSP_Et(k) = max(0d0,s% xh(i_Et_RSP,k))
-               end do
-            else if (j == i_ln_cvpv0) then
-               do k=1,nz
-                  s% conv_vel(k) = max(0d0, exp(s% xh(i_ln_cvpv0,k))-s% conv_vel_v0)
-                  s% dxh_ln_cvpv0(k) = 0d0
                end do
             end if
          end do
@@ -469,10 +463,10 @@
          use atm_lib, only: atm_eval_T_tau_dq_dtau
          use atm_support, only: get_T_tau_id
          use micro, only: set_micro_vars
-         use mlt_info, only: set_mlt_vars, check_for_redo_MLT
+         use turb_info, only: set_mlt_vars, check_for_redo_MLT
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
-            set_abs_du_div_cs, set_conv_time_scales, set_using_TDC
+            set_abs_du_div_cs, set_conv_time_scales
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
@@ -541,7 +535,6 @@
             call set_grads(s, ierr)
             if (failed('set_grads')) return
             call set_conv_time_scales(s) ! uses brunt_B
-            call set_using_TDC(s) ! uses max_conv_time_scale
          end if
 
          if (.not. skip_mixing_info) then         
@@ -808,7 +801,7 @@
             write(*,1) 's% tau_factor', s% tau_factor
             write(*,1) 's% tau_base', s% tau_base
             write(*,1) 'tau_surf', tau_surf
-            stop 'bad tau_surf in get_surf_PT'
+            call mesa_error(__FILE__,__LINE__,'bad tau_surf in get_surf_PT')
          end if
 
          ! Evaluate surface temperature and pressure
@@ -873,7 +866,7 @@
             write(*,1) 'lnT_surf', lnT_surf
             write(*,1) 'lnP_surf', lnP_surf
             write(*,*) 'atm_option = ', trim(s% atm_option)
-            if (s% stop_for_bad_nums) stop 'get PT surf'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
          end if
 
          ! Finish
@@ -928,11 +921,19 @@
          call smooth(s% grad_density,nz)
          call smooth(s% grad_temperature,nz)
 
+         ! this will compute the values of s% smoothed_brunt_B
+         if (s% calculate_Brunt_B) then
+            do k=1,nz
+               s% smoothed_brunt_B(k) = s% unsmoothed_brunt_B(k)
+            end do
+            call compute_smoothed_brunt_B
+         else
+            s% smoothed_brunt_B(:) = 0d0
+         end if
          if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
             do k=1,nz
-               s% gradL_composition_term(k) = s% unsmoothed_brunt_B(k)
+               s% gradL_composition_term(k) = s% smoothed_brunt_B(k)
             end do
-            call smooth_gradL_composition_term
          else
             do k=1,nz
                s% gradL_composition_term(k) = 0d0
@@ -964,7 +965,7 @@
 
          contains
 
-         subroutine smooth_gradL_composition_term
+         subroutine compute_smoothed_brunt_B
             use star_utils, only: weighed_smoothing, threshold_smoothing
             logical, parameter :: preserve_sign = .false.
             real(dp), pointer, dimension(:) :: work
@@ -974,9 +975,9 @@
             work => dlnd
             if (s% num_cells_for_smooth_gradL_composition_term <= 0) return
             call threshold_smoothing( &
-               s% gradL_composition_term, s% threshold_for_smooth_gradL_composition_term, s% nz, &
+               s% smoothed_brunt_B, s% threshold_for_smooth_gradL_composition_term, s% nz, &
                s% num_cells_for_smooth_gradL_composition_term, preserve_sign, work)
-         end subroutine smooth_gradL_composition_term
+         end subroutine compute_smoothed_brunt_B
 
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr

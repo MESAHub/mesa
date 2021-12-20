@@ -1,0 +1,14 @@
+============
+Release 9575
+============
+
+:Date:   2017-02-17
+
+Revision 9575 has been designated a MESA release version.
+
+The full release notes are available in `this mailing list
+post <https://lists.mesastar.org/pipermail/mesa-users/2017-February/007507.html>`__.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r9575.zip/download>`__
+is available for download.

@@ -73,17 +73,17 @@
       diffusion_iters_hard_limit = 100      
 
 ! convection
+      mlt_option = 'TDC'
       mixing_length_alpha = 2
       use_Ledoux_criterion = .true.
-      alpha_semiconvection = 0.01
-      thermohaline_coeff = 2
+      thermohaline_coeff = 1d2
 
 ! timesteps
       max_years_for_timestep = 1d9
       
       varcontrol_target = 1d-3
-      dX_nuc_drop_limit = 1d-2
-      delta_HR_limit = 0.05
+      dX_nuc_drop_limit = 3d-2
+      delta_HR_limit = 0.1
 
       delta_XC_cntr_limit = 0.02d0
       delta_XO_cntr_limit = 0.02d0
@@ -106,7 +106,7 @@
 
 ! Output
       history_interval = 10
-      terminal_interval = 5
+      terminal_interval = 10 
       write_header_frequency = 10
 
 

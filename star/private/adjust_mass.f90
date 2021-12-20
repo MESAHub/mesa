@@ -28,7 +28,6 @@
 
       use star_private_def
       use const_def
-      use chem_def, only: ih1, ihe4, ic12, in14, io16
       use utils_lib
 
       implicit none
@@ -66,17 +65,17 @@
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
-            stop 'compute_delta_m'
+            call mesa_error(__FILE__,__LINE__,'compute_delta_m')
          end if
          
          if (is_bad(s% mstar_dot)) then
             write(*,1) 's% mstar_dot', s% mstar_dot
-            stop 'compute_delta_m'
+            call mesa_error(__FILE__,__LINE__,'compute_delta_m')
          end if
          
          if (is_bad(delta_m)) then
             write(*,1) 'delta_m', delta_m
-            stop 'compute_delta_m'
+            call mesa_error(__FILE__,__LINE__,'compute_delta_m')
          end if
 
       end function compute_delta_m
@@ -164,7 +163,6 @@
             r_new = exp(log(vol00/four_thirds_pi)*one_third)
 
             s%r(j) = r_new
-            s%R2(j) = pow2(r_new)
             s%r_start(j) = s%r(j)
             s%rmid(j) = r_new
             s%rmid_start(j) = r_new
@@ -252,7 +250,7 @@
          
          if (is_bad(new_xmstar)) then
             write(*,1) 'new_xmstar', new_xmstar
-            stop 'do_adjust_mass'
+            call mesa_error(__FILE__,__LINE__,'do_adjust_mass')
          end if
 
          if (delta_m > 0 .and. s% max_star_mass_for_gain > 0 &
@@ -278,13 +276,13 @@
          if (dbg_adjm) then
             env_mass = old_mstar - s% he_core_mass*Msun
             write(*,'(a40,f26.16)') 'env_mass/old_mstar', env_mass/old_mstar
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'delta_m/old_mstar', delta_m/old_mstar
             write(*,1) 's% he_core_mass*Msun', s% he_core_mass*Msun
             write(*,1) 'env_mass', env_mass
             write(*,1) 'delta_m/env_mass', delta_m/env_mass
             write(*,1) 'log10(abs(delta_m/env_mass))', safe_log10(abs(delta_m/env_mass))
-            write(*,*)
+            write(*,'(A)')
          end if
 
          call do_alloc(ierr)
@@ -529,7 +527,7 @@
 
          if (s% doing_timing) call update_time(s, time0, total, s% time_adjust_mass)
 
-         if (dbg_adjm) stop 'debugging: do_adjust_mass'
+         if (dbg_adjm) call mesa_error(__FILE__,__LINE__,'debugging: do_adjust_mass')
          if (dbg) write(*,*) 'do_adjust_mass return'
 
          contains
@@ -642,17 +640,17 @@
          
          if (is_bad(old_xmstar)) then
             write(*,1) 'old_xmstar', old_xmstar
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
 
          if (is_bad(new_xmstar)) then
             write(*,1) 'new_xmstar', new_xmstar
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
 
          if (is_bad(delta_m)) then
             write(*,1) 'delta_m', delta_m
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
 
 
@@ -678,12 +676,12 @@
          frac = 1.0d0/sumdq
          if (is_bad(frac)) then
             write(*,1) 'frac for initial renorm', frac
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          do k = 1, nz
             if (is_bad(s% dq(k))) then
                write(*,2) 'bad dq input', s% dq(k)
-               stop 'revise_q_and_dq'
+               call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
             end if
             s% dq(k) = s% dq(k) * frac
          end do
@@ -700,11 +698,11 @@
          
          if (is_bad(s% max_q_for_k_below_const_q)) then
             write(*,*) 's% max_q_for_k_below_const_q', s% max_q_for_k_below_const_q
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          if (is_bad(s% min_q_for_k_below_const_q)) then
             write(*,*) 's% min_q_for_k_below_const_q', s% min_q_for_k_below_const_q
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          
          kA = min_kA
@@ -720,11 +718,11 @@
          
          if (is_bad(s% max_q_for_k_const_mass)) then
             write(*,*) 's% max_q_for_k_const_mass', s% max_q_for_k_const_mass
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          if (is_bad(s% min_q_for_k_const_mass)) then
             write(*,*) 's% min_q_for_k_const_mass', s% min_q_for_k_const_mass
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
 
          kB = kA+1
@@ -742,9 +740,9 @@
             write(*,1) 'xqA', xqA
             write(*,*) 'kB', kB
             write(*,1) 'xqB_old', xqB_old
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'xqA-xqB_old', xqA-xqB_old
-            write(*,*)
+            write(*,'(A)')
          end if
 
          xqB_new = dqacc + xqB_old*mold_o_mnew  ! in order to keep m interior to kB constant
@@ -780,7 +778,7 @@
          frac = frac_qp
          if (is_bad(frac)) then
             write(*,1) 'frac for kA:kB-1', frac
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          s% dq(kB:nz) = s% dq(kB:nz)*frac
          
@@ -797,8 +795,8 @@
             write(*,2) 'kA', kA
             write(*,2) 'kB', kB
             write(*,2) 'nz', nz
-            write(*,*)
-            stop 'adjust_mass'
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'adjust_mass')
          end if
 
          ! renorm
@@ -812,7 +810,7 @@
          frac = frac_qp
          if (is_bad(frac)) then
             write(*,1) 'frac for renorm', frac
-            stop 'revise_q_and_dq'
+            call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          do k = 1, nz
             s% dq(k) = s% dq(k) * frac
@@ -966,7 +964,7 @@
                   write(*,1) 'xm_outer', xm_outer
                   write(*,2) 'old_cell_xbdy(1)', 1, old_cell_xbdy(1)
                   write(*,2) 'old_cell_xbdy(nz)', nz, old_cell_xbdy(nz)
-                  stop 'debugging: set1_xa'
+                  call mesa_error(__FILE__,__LINE__,'debugging: set1_xa')
                end if
 
                if (xm_outer < old_cell_xbdy(k_outer)) then
@@ -979,7 +977,7 @@
                   write(*,1) 'xm_outer', xm_outer
                   write(*,1) 'old_cell_xbdy(k_outer)', old_cell_xbdy(k_outer)
                   write(*,*) '(xm_outer < old_cell_xbdy(k_outer))'
-                  stop 'debugging: set1_xa'
+                  call mesa_error(__FILE__,__LINE__,'debugging: set1_xa')
                end if
 
                if (k_outer < nz) then
@@ -993,7 +991,7 @@
                      write(*,1) 'xm_outer', xm_outer
                      write(*,1) 'old_cell_xbdy(k_outer+1)', old_cell_xbdy(k_outer+1)
                      write(*,*) '(old_cell_xbdy(k_outer+1) <= xm_outer)'
-                     stop 'debugging: set1_xa'
+                     call mesa_error(__FILE__,__LINE__,'debugging: set1_xa')
                   end if
                end if
 
@@ -1034,13 +1032,13 @@
             if (xm1 < xm_outer) then
                ierr = -1
                if (.not. xa_dbg) return
-               write(*,*)
+               write(*,'(A)')
                write(*,*) 'k', k
                write(*,*) 'kk', kk
                write(*,1) 'xm1', xm1
                write(*,1) 'xm_outer', xm_outer
                write(*,*) 'xm1 < xm_outer'
-               stop 'debugging: set1_xa'
+               call mesa_error(__FILE__,__LINE__,'debugging: set1_xa')
             end if
 
             if (xm0 >= xm_outer .and. xm1 <= xm_inner) then
@@ -1095,7 +1093,7 @@
                   ierr = -1
                   if (.not. xa_dbg) return
                   write(*,*) 'dm <= 0', dm
-                  stop 'debugging: set1_xa'
+                  call mesa_error(__FILE__,__LINE__,'debugging: set1_xa')
                end if
 
             end if
@@ -1192,7 +1190,7 @@
                do k=1,k_below_just_added-2 ! remaining 2 done below
                   s% j_rot(k) = s% accreted_material_j
                   call set1_irot(s, k, k_below_just_added, .true.)
-                  s% omega(k) = s% j_rot(k)/s% i_rot(k)
+                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                   actual_total_added = actual_total_added + s% j_rot(k)*new_dmbar(k)
                end do
                k = k_below_just_added
@@ -1209,13 +1207,13 @@
                do k=k_below_just_added-1,k_below_just_added
                   s% j_rot(k) = bdy_j
                   call set1_irot(s, k, k_below_just_added, .true.)
-                  s% omega(k) = s% j_rot(k)/s% i_rot(k)
+                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                end do
             else ! use old surface omega in all the new material
                do k=1,k_below_just_added-1
                   s% omega(k) = s% omega(k_below_just_added)
                   call set1_irot(s, k, k_below_just_added, .false.)
-                  s% j_rot(k) = s% omega(k)*s% i_rot(k)
+                  s% j_rot(k) = s% omega(k)*s% i_rot(k)% val
                end do
             end if
          end if
@@ -1231,14 +1229,14 @@
                end if
                if (s% stop_for_bad_nums) then
                   write(*,2) 's% omega(k)', k, s% omega(k)
-                  stop 'set_omega_adjust_mass'
+                  call mesa_error(__FILE__,__LINE__,'set_omega_adjust_mass')
                end if
                okay = .false.
             end if
          end do
          if (.not. okay) then
             write(*,2) 'model_number', s% model_number
-            stop 'set_omega_adjust_mass'
+            call mesa_error(__FILE__,__LINE__,'set_omega_adjust_mass')
          end if
 
       end subroutine set_omega_adjust_mass
@@ -1255,40 +1253,19 @@
          real(dp) :: w_div_wcrit_roche
 
          r00 = get_r_from_xh(s,k)
-         ! when using the fitted i_rot, the moment of inertia depends
+         ! The moment of inertia depends
          ! on the ratio of rotational frequency to its critical value.
          ! This ratio is computed in two different ways depending on whether
          ! omega or j_rot is known.
-         if (s% fitted_fp_ft_i_rot) then
-            if (jrot_known) then
-               w_div_wcrit_roche = w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
-                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-            else
-               w_div_wcrit_roche = w_div_w_roche_omega(r00,s% m(k),s% omega(k),s% cgrav(k), &
-                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-            end if
+         if (jrot_known) then
+            w_div_wcrit_roche = w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
+         else
+            w_div_wcrit_roche = w_div_w_roche_omega(r00,s% m(k),s% omega(k),s% cgrav(k), &
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          end if
 
-         if (s% simple_i_rot_flag .or. s% fitted_fp_ft_i_rot .or. k < k_below_just_added) then
-            call eval_i_rot(s, k, r00, r00, r00, w_div_wcrit_roche,&
-               s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
-         else
-            r003 = r00*r00*r00
-            if (k == s% nz) then
-               rp13 = pow3(s% R_center)
-            else
-               rp13 = pow3(get_r_from_xh(s,k+1))
-            end if
-            if (k == 1) then
-               rm13 = r003
-            else
-               rm13 = pow3(get_r_from_xh(s,k-1))
-            end if
-            ri = pow((r003 + rp13)/2,one_third)
-            ro = pow((r003 + rm13)/2,one_third)
-            call eval_i_rot(s, k, ri, r00, ro, 0d0,&
-               s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
-         end if
+         call eval_i_rot(s, k, r00, w_div_wcrit_roche, s% i_rot(k))
 
       end subroutine set1_irot
 
@@ -1495,13 +1472,13 @@
 
          s% j_rot(k) = j_tot/new_point_dmbar
          call set1_irot(s, k, k_below_just_added, .true.)
-         s% omega(k) = s% j_rot(k)/s% i_rot(k)
+         s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
 
          if (k_dbg == k) then
             write(*,2) 's% omega(k)', k, s% omega(k)
             write(*,2) 's% j_rot(k)', k, s% j_rot(k)
-            write(*,2) 's% i_rot(k)', k, s% i_rot(k)
-            stop 'debugging: set1_omega'
+            write(*,2) 's% i_rot(k)% val', k, s% i_rot(k)% val
+            call mesa_error(__FILE__,__LINE__,'debugging: set1_omega')
          end if
 
       end subroutine set1_omega
@@ -1596,7 +1573,7 @@
             J_removed = J_removed + dm*(s% j_rot(k) - jnew)
             s% j_rot(k) = jnew
             call set1_irot(s, k, k_below_just_added, .true.)
-            s% omega(k) = s% j_rot(k)/s% i_rot(k)
+            s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
          end do
 
          s% angular_momentum_removed = actual_J_lost

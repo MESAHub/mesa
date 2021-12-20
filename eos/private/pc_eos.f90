@@ -512,27 +512,27 @@
       if (LIQSOL.ne.1.and.LIQSOL.ne.0) then
          ierr = -1
          return
-         !stop 'EOSFI8: invalid LIQSOL'
+         !call mesa_error(__FILE__,__LINE__,'EOSFI8: invalid LIQSOL')
       end if
       if (CMI.le..1d0)  then
          ierr = -1
          return
-         !stop 'EOSFI8: too small CMI'
+         !call mesa_error(__FILE__,__LINE__,'EOSFI8: too small CMI')
       end if
       if (Zion.le..1d0)  then
          ierr = -1
          return
-         !stop 'EOSFI8: too small Zion'
+         !call mesa_error(__FILE__,__LINE__,'EOSFI8: too small Zion')
       end if
       if (RS.le..0d0)  then
          ierr = -1
          return
-         !stop 'EOSFI8: invalid RS'
+         !call mesa_error(__FILE__,__LINE__,'EOSFI8: invalid RS')
       end if
       if (GAMI.le..0d0)  then
          ierr = -1
          return
-         !stop 'EOSFI8: invalid GAMI'
+         !call mesa_error(__FILE__,__LINE__,'EOSFI8: invalid GAMI')
       end if
       GAME=GAMI/pow(Zion,5d0/3d0)
       call EXCOR7(RS,GAME,FXC,UXC,PXC,CVXC,SXC,PDTXC,PDRXC) ! "ee"("xc")
@@ -680,7 +680,7 @@
             xPDTii, dPDTii_dlnGAMI, &
             xPDRii, dPDRii_dlnGAMI, &
             skip, ierr)
-         if (ierr /= 0) stop 'failed in call get_FITION9'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in call get_FITION9')
       else
          skip = .true.
       end if
@@ -751,7 +751,7 @@
             write(*,*) 'rel mismatch ' // trim(str), &
                (val - xv)/max(abs(val),abs(xv),1d-99), &
                xv, val, GAMI%val
-            stop 'FITION9'
+            call mesa_error(__FILE__,__LINE__,'FITION9')
             return
          end if
          check1 = .true.
@@ -810,7 +810,7 @@
       if (RS.lt.0d0) then
          ierr = -1
          return
-         !stop 'FSCRliq8: RS < 0'
+         !call mesa_error(__FILE__,__LINE__,'FSCRliq8: RS < 0')
       end if
       if (RS.lt.TINY) then
          FSCR=0.d0
@@ -1003,7 +1003,7 @@
             write(*,*) 'rel mismatch ' // trim(str), &
                (val - xv)/max(abs(val),abs(xv),1d-99), &
                xv, val, int(Zion), RS%val, GAME%val
-            stop 'FSCRliq8'
+            call mesa_error(__FILE__,__LINE__,'FSCRliq8')
             return
          end if
          check1 = .true.
@@ -1066,7 +1066,7 @@
       if (RS.lt.0d0) then
          ierr = -1
          return
-         !stop 'FSCRsol8: RS < 0'
+         !call mesa_error(__FILE__,__LINE__,'FSCRsol8: RS < 0')
       end if
       if (RS.lt.TINY) then
          FSCR=0.d0
@@ -1342,14 +1342,14 @@
          C9=0.00492387d0
          C11=0.00437506d0
       else
-         stop 'HLfit: unknown lattice type'
+         call mesa_error(__FILE__,__LINE__,'HLfit: unknown lattice type')
       endif
       if (eta.gt.1d0/EPS) then ! asymptote of Eq.(13) of BPY'01
          U=3d0/(C11*eta*eta*eta)
          F=-U/3d0
          CV=4d0*U
       else if (eta.lt.EPS) then ! Eq.(17) of BPY'01
-         if (eta.lt.TINY) eta = TINY !stop 'HLfit8: eta is too small'
+         if (eta.lt.TINY) eta = TINY !call mesa_error(__FILE__,__LINE__,'HLfit8: eta is too small')
          F=3d0*log(eta)+CLM-1.5d0*U1*eta+eta*eta/24.d0
          U=3d0-1.5d0*U1*eta+eta*eta/12d0
          CV=3d0-eta*eta/12d0
@@ -1708,8 +1708,8 @@
       type(auto_diff_real_2var_order1) :: CMU, CMU1, PIT26, CN0, CN1, CN2
       type(auto_diff_real_2var_order1) :: CJ00,CJ10,CJ20,CJ01,CJ11,CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
 
-      if (CHI.lt..5d0) stop 'SOMMERF: non-degenerate (small CHI)'
-      if (TEMR.le.0.d0) stop 'SOMMERF: T < 0'
+      if (CHI.lt..5d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: non-degenerate (small CHI)')
+      if (TEMR.le.0.d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: T < 0')
       CMU1=CHI*TEMR ! chemical potential in rel.units
       CMU=1.d0+CMU1
       call SUBFERMJ(CMU1, &
@@ -1762,7 +1762,7 @@
 
       type(auto_diff_real_2var_order1) :: X0, X3, X5, CL, CMU
 
-      if (CMU1.le.0.d0) stop 'SUBFERMJ: small CHI'
+      if (CMU1.le.0.d0) call mesa_error(__FILE__,__LINE__,'SUBFERMJ: small CHI')
       CMU=1.d0+CMU1
       X0=sqrt(CMU1*(2.d0+CMU1))
       X3=pow3(X0)
@@ -1804,7 +1804,7 @@
       type(auto_diff_real_2var_order1) :: XMAX  ! not sure if this side-effect is desired
       type(auto_diff_real_2var_order1), intent(out) :: FP, FM
       
-      if (XMAX.lt.3.d0) XMAX = 3d0 !stop 'FERMI: XMAX'
+      if (XMAX.lt.3.d0) XMAX = 3d0 !call mesa_error(__FILE__,__LINE__,'FERMI: XMAX')
       if (X.gt.XMAX) then
          FP=0.d0
          FM=1.d0
@@ -2130,7 +2130,7 @@
             write(*,*) 'rel mismatch ' // trim(str), &
                (val - xv)/max(abs(val),abs(xv),1d-99), &
                xv, val, RS%val, GAME%val
-            stop 'EXCOR7'
+            call mesa_error(__FILE__,__LINE__,'EXCOR7')
             return
          end if
          check1 = .true.
@@ -2226,8 +2226,8 @@
              5.415026856351d-1,-3.847241692193d-1,3.739781456585d-2, &
              -3.008504449098d-2/) ! X_{5/2}
       
-      if (N.lt.0d0 .or.N.gt.3d0) stop 'FERINV7: Invalid subscript'
-      if (F.le.0.d0) F = 1d-99 !stop 'FERINV7: Non-positive argument'
+      if (N.lt.0d0 .or.N.gt.3d0) call mesa_error(__FILE__,__LINE__,'FERINV7: Invalid subscript')
+      if (F.le.0.d0) F = 1d-99 !call mesa_error(__FILE__,__LINE__,'FERINV7: Non-positive argument')
       if (F.lt.4.d0) then
          T=F
          UP=0.d0
@@ -2539,7 +2539,7 @@
               3.6087389d-3, 2.3369894d-5/) ! \bar{V}_i
       real(dp), parameter :: EPS=1.d-3
       
-      if (CHI.lt.EPS) CHI = EPS !stop 'BLIN9b: CHI is too small'
+      if (CHI.lt.EPS) CHI = EPS !call mesa_error(__FILE__,__LINE__,'BLIN9b: CHI is too small')
         do K=0,2
            W=0.d0
            WDX=0.d0

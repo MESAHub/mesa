@@ -1,8 +1,7 @@
 
-      character(len=7) :: version_number ! mesa version from file $MESA_DIR/data/version_number
-         ! truncate to 7 characters for ease of use, instead of the full hash
+      character(len=24) :: version_number ! mesa version from file $MESA_DIR/data/version_number
       
-      integer, parameter :: star_def_version = 16
+      integer, parameter :: star_def_version = 17
       
       integer, parameter :: nz_alloc_extra = 200
       
@@ -24,6 +23,7 @@
       integer, parameter :: terminate = 3
 
       ! phases of evolution
+      integer, parameter :: phase_relax = -1
       integer, parameter :: phase_starting = 1
       integer, parameter :: phase_PreMS = phase_starting + 1
       integer, parameter :: phase_ZAMS = phase_PreMS + 1
@@ -279,12 +279,18 @@
       integer, parameter :: i_hp_m1 = 19
       integer, parameter :: i_hp_00 = 20
       integer, parameter :: i_hp_p1 = 21
-      integer, parameter :: i_xtra1_m1 = 22
-      integer, parameter :: i_xtra1_00 = 23
-      integer, parameter :: i_xtra1_p1 = 24
-      integer, parameter :: i_xtra2_m1 = 25
-      integer, parameter :: i_xtra2_00 = 26
-      integer, parameter :: i_xtra2_p1 = 27
+      integer, parameter :: i_w_div_wc_m1 = 22
+      integer, parameter :: i_w_div_wc_00 = 23
+      integer, parameter :: i_w_div_wc_p1 = 24
+      integer, parameter :: i_jrot_m1 = 25
+      integer, parameter :: i_jrot_00 = 26
+      integer, parameter :: i_jrot_p1 = 27
+      integer, parameter :: i_xtra1_m1 = 28
+      integer, parameter :: i_xtra1_00 = 29
+      integer, parameter :: i_xtra1_p1 = 30
+      integer, parameter :: i_xtra2_m1 = 31
+      integer, parameter :: i_xtra2_00 = 32
+      integer, parameter :: i_xtra2_p1 = 33
       integer, parameter :: auto_diff_star_num_vars = i_xtra2_p1
       character (len=128) :: auto_diff_star_d1_names(auto_diff_star_num_vars)
       
@@ -746,19 +752,22 @@
          subroutine other_eval_fp_ft_interface( &
                id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
             use const_def, only: dp
+            use auto_diff
             integer, intent(in) :: id
             integer, intent(in) :: nz
             real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)
-            real(dp), intent(inout) :: ft(:), fp(:), r_polar(:), r_equatorial(:)
+            type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)
+            real(dp), intent(inout) :: r_polar(:), r_equatorial(:)
             logical, intent(in) :: report_ierr
             integer, intent(out) :: ierr
          end subroutine other_eval_fp_ft_interface
       
-         subroutine other_eval_i_rot_interface(id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+         subroutine other_eval_i_rot_interface(id,k,r00,w_div_w_crit_roche, i_rot)
             use const_def, only: dp
-            integer, intent(in) :: id
-            real(dp), intent(in) :: ri,r00,ra,w_div_w_crit_roche
-            real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
+            use auto_diff
+            integer, intent(in) :: id,k
+            real(dp), intent(in) :: r00,w_div_w_crit_roche
+            type(auto_diff_real_star_order1), intent(out) :: i_rot
          end subroutine other_eval_i_rot_interface
       
          subroutine other_torque_interface(id, ierr)
@@ -906,7 +915,7 @@
             real(dp), intent(in) :: weak_rate_factor
             real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
             real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-            real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after subtract reaction neutrinos
+            real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning including losses by reaction neutrinos
             real(dp), intent(out) :: d_eps_nuc_dT
             real(dp), intent(out) :: d_eps_nuc_dRho
             real(dp), intent(inout) :: d_eps_nuc_dx(:) ! (num_isos)       

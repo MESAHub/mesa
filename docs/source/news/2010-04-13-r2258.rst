@@ -1,0 +1,11 @@
+============
+Release 2258
+============
+
+:Date:   2010-04-13
+
+Revision 2258 has been designated a MESA release version.
+
+A `ZIP file of this
+release <http://sourceforge.net/projects/mesa/files/releases/mesa-r2258.zip/download>`__
+is available for download.

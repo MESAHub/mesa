@@ -90,7 +90,7 @@
                write(*,1) 'RS', RS
                write(*,1) 'GAME', GAME
                write(*,1) 'Zion', Zion
-               stop 'do_create_FSCRliq8_table'
+               call mesa_error(__FILE__,__LINE__,'do_create_FSCRliq8_table')
             end if
             write(io_unit,'(99(1pd26.16))') &
                logGAME, FSCR, USCR, PSCR, CVSCR, PDTSCR, PDRSCR, RS, GAME
@@ -143,7 +143,7 @@
       if (RS.lt.0d0) then
          ierr = -1
          return
-         !stop 'FSCRliq8: RS < 0'
+         !call mesa_error(__FILE__,__LINE__,'FSCRliq8: RS < 0')
       end if
       if (RS.lt.TINY) then
          FSCR=0.d0

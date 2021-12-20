@@ -376,7 +376,7 @@
             call approx21_dydt( &
                n% y, rate_screened, rate_screened, &
                dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, btemp,g% add_co56_to_approx21,  ierr)
+               g% fe56ec_n_neut, btemp, bden, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return
                
             fII = approx21_eval_PPII_fraction(n% y, rate_screened)
@@ -407,7 +407,7 @@
                
                n% y, mion, dfdy, rate_screened, rate_screened_dT, rate_screened_dRho, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, btemp, dfdT, dfdRho, d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
+               g% fe56ec_n_neut, btemp, bden, dfdT, dfdRho, d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             call get_approx21_eps_info( &
@@ -590,7 +590,7 @@
             do i=1,num_reactions
                if (g% reaction_id(i) <= 0) then
                   write(*,2) 'g% reaction_id(i)', i, g% reaction_id(i)
-                  stop 'get_rates_with_screening'
+                  call mesa_error(__FILE__,__LINE__,'get_rates_with_screening')
                end if
             end do
             
@@ -760,7 +760,7 @@
                write(*,*) 'i', i
                write(*,*) 'g% num_isos', g% num_isos
                write(*,*) 'g% chem_id(i)', g% chem_id(i)
-               stop 'set_molar_abundances' 
+               call mesa_error(__FILE__,__LINE__,'set_molar_abundances') 
             end if
             y(i) = min(1d0, max(x(i), 0d0)) / chem_isos% Z_plus_N(ci)
          enddo

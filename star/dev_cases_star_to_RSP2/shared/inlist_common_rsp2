@@ -64,7 +64,7 @@
    dxdt_nuc_factor = 0
    mix_factor = 0
 
-   always_use_dedt_form_of_energy_eqn = .true.
+   energy_eqn_option = 'dedt'
 
    tol_max_correction = 1d-6
 

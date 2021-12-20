@@ -26,6 +26,7 @@
       module star_history_def
 
       use star_def
+      use utils_lib, only: StrLowCase
 
       implicit none
    ! history column options
@@ -504,22 +505,13 @@
       
       integer, parameter :: h_RSP_DeltaR = h_num_hydro_splits + 1
       integer, parameter :: h_RSP_DeltaMag = h_RSP_DeltaR + 1
-      integer, parameter :: h_RSP_GRPDV = h_RSP_DeltaMag + 1
-      integer, parameter :: h_RSP_GREKM_avg_abs = h_RSP_GRPDV + 1
-      integer, parameter :: h_RSP_GREKM = h_RSP_GREKM_avg_abs + 1
+      integer, parameter :: h_RSP_GREKM = h_RSP_DeltaMag + 1
       
       integer, parameter :: h_rsp_phase = h_RSP_GREKM + 1
       integer, parameter :: h_rsp_period_in_days = h_rsp_phase + 1
       integer, parameter :: h_rsp_num_periods = h_rsp_period_in_days + 1
-      
-      integer, parameter :: h_RSP_LINA_period_F_days = h_rsp_num_periods + 1
-      integer, parameter :: h_RSP_LINA_period_O1_days = h_RSP_LINA_period_F_days + 1
-      integer, parameter :: h_RSP_LINA_period_O2_days = h_RSP_LINA_period_O1_days + 1
-      integer, parameter :: h_RSP_LINA_growth_rate_F = h_RSP_LINA_period_O2_days + 1
-      integer, parameter :: h_RSP_LINA_growth_rate_O1 = h_RSP_LINA_growth_rate_F + 1
-      integer, parameter :: h_RSP_LINA_growth_rate_O2 = h_RSP_LINA_growth_rate_O1 + 1
 
-      integer, parameter :: h_total_num_solver_iterations = h_RSP_LINA_growth_rate_O2 + 1
+      integer, parameter :: h_total_num_solver_iterations = h_rsp_num_periods + 1
       integer, parameter :: h_total_num_solver_calls_made = h_total_num_solver_iterations + 1
       integer, parameter :: h_total_num_solver_calls_converged = h_total_num_solver_calls_made + 1
       integer, parameter :: h_total_num_solver_calls_failed = h_total_num_solver_calls_converged + 1
@@ -648,7 +640,9 @@
 
       integer, parameter :: h_apsidal_constant_k2 = h_grav_dark_Teff_equatorial + 1
 
-      integer, parameter :: h_lg_Lnuc = h_apsidal_constant_k2 + 1
+      integer, parameter :: h_phase_of_evolution = h_apsidal_constant_k2 + 1
+
+      integer, parameter :: h_lg_Lnuc = h_phase_of_evolution + 1
       integer, parameter :: h_H_rich = h_lg_Lnuc + 1
       integer, parameter :: h_N_cntr = h_H_rich + 1
       integer, parameter :: h_lg_Lneu = h_N_cntr + 1
@@ -671,8 +665,7 @@
       integer, parameter :: h_zones = h_v_div_cs + 1
       integer, parameter :: h_lg_Dsurf = h_zones + 1
       integer, parameter :: h_C_cntr = h_lg_Dsurf + 1
-      integer, parameter :: h_using_TDC = h_C_cntr + 1
-      integer, parameter :: h_TDC_num_cells = h_using_TDC + 1
+      integer, parameter :: h_TDC_num_cells = h_C_cntr + 1
       integer, parameter :: h_retries = h_TDC_num_cells + 1
 
       integer, parameter :: h_col_id_max = h_retries
@@ -938,20 +931,11 @@
 
          history_column_name(h_RSP_DeltaR) = 'rsp_DeltaR'
          history_column_name(h_RSP_DeltaMag) = 'rsp_DeltaMag'
-         history_column_name(h_RSP_GRPDV) = 'rsp_GRPDV'
          history_column_name(h_RSP_GREKM) = 'rsp_GREKM'
-         history_column_name(h_RSP_GREKM_avg_abs) = 'rsp_GREKM_avg_abs'
          
          history_column_name(h_rsp_phase) = 'rsp_phase'
          history_column_name(h_rsp_period_in_days) = 'rsp_period_in_days'
          history_column_name(h_rsp_num_periods) = 'rsp_num_periods'
-
-         history_column_name(h_RSP_LINA_period_F_days) = 'rsp_LINA_period_F_days'
-         history_column_name(h_RSP_LINA_period_O1_days) = 'rsp_LINA_period_O1_days'
-         history_column_name(h_RSP_LINA_period_O2_days) = 'rsp_LINA_period_O2_days'
-         history_column_name(h_RSP_LINA_growth_rate_F) = 'rsp_LINA_growth_rate_F'
-         history_column_name(h_RSP_LINA_growth_rate_O1) = 'rsp_LINA_growth_rate_O1'
-         history_column_name(h_RSP_LINA_growth_rate_O2) = 'rsp_LINA_growth_rate_O2'
 
          history_column_name(h_total_num_solver_iterations) = 'total_num_solver_iterations'
          history_column_name(h_total_num_solver_calls_made) = 'total_num_solver_calls_made'
@@ -1325,6 +1309,8 @@
          history_column_name(h_grav_dark_Teff_equatorial) = 'grav_dark_Teff_equatorial'
 
          history_column_name(h_apsidal_constant_k2) = 'apsidal_constant_k2'
+
+         history_column_name(h_phase_of_evolution) = 'phase_of_evolution'
          
 ! items corresponding to names on terminal output lines
          history_column_name(h_lg_Lnuc) = 'lg_Lnuc'
@@ -1351,7 +1337,6 @@
          history_column_name(h_lg_Dsurf) = 'lg_Dsurf'
          history_column_name(h_C_cntr) = 'C_cntr'
          history_column_name(h_retries) = 'retries'
-         history_column_name(h_using_TDC) = 'using_TDC'
          history_column_name(h_TDC_num_cells) = 'TDC_num_cells'
          
          cnt = 0
@@ -1359,7 +1344,7 @@
             if (len_trim(history_column_name(i)) == 0) then
                write(*,*) 'missing name for log column id', i
                if (i > 1) write(*,*) 'following ' // trim(history_column_name(max(1,i-1))) ! bp: get rid of bogus compiler warning
-               write(*,*)
+               write(*,'(A)')
                cnt = cnt+1
             end if
             !write(*,'(a)') '    ! ' // trim(history_column_name(i))
@@ -1373,7 +1358,7 @@
 
          nullify(history_column_names_dict)
          do i=1,h_col_id_max
-            call integer_dict_define(history_column_names_dict, history_column_name(i), i, ierr)
+            call integer_dict_define(history_column_names_dict, StrLowCase(history_column_name(i)), i, ierr)
             if (ierr /= 0) then
                write(*,*) 'FATAL ERROR: history_column_names_init failed in integer_dict_define'
                return
@@ -1395,7 +1380,7 @@
          ! returns id for the log column if there is a matching name
          ! returns 0 otherwise.
          integer :: ierr, value
-         call integer_dict_lookup(history_column_names_dict, cname, value, ierr)
+         call integer_dict_lookup(history_column_names_dict, StrLowCase(cname), value, ierr)
          if (ierr /= 0) value = 0
          do_get_history_id = value
       end function do_get_history_id

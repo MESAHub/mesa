@@ -171,7 +171,7 @@ contains
           ! Perform the predictive mixing for this boundary
 
           if (s%do_conv_premix) then
-             stop 'Predictive mixing and convective premixing cannot be enabled at the same time'
+             call mesa_error(__FILE__,__LINE__,'Predictive mixing and convective premixing cannot be enabled at the same time')
              stop
           end if
 
@@ -192,7 +192,7 @@ contains
 
        if (is_bad_num(s%D_mix(k))) then
 
-          if (s%stop_for_bad_nums) stop 'add_predictive_mixing'
+          if (s%stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_predictive_mixing')
 
        end if
 
@@ -521,7 +521,7 @@ contains
        do k = 1, s%nz
           print *,k,mix_mask(k),k <= k_bot_mz .AND. k >= k_top_mz
        end do
-       stop 'Double predictive'
+       call mesa_error(__FILE__,__LINE__,'Double predictive')
     else
        mix_mask(k_top_mz:k_bot_mz) = .FALSE.
     endif
@@ -690,7 +690,7 @@ contains
 
     use eos_def
     use micro
-    use mlt_info, only: do1_mlt_2
+    use turb_info, only: do1_mlt_2
 
     type(star_info), pointer :: s
     integer, intent(in)      :: k_bot_mz
@@ -819,7 +819,7 @@ contains
        ! Explicitly set gradL_composition_term to 0 in this call.
        call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err, &
             s% alpha_mlt(k), 0._dp)
-       if (op_err /= 0) stop 'non-zero op_err'
+       if (op_err /= 0) call mesa_error(__FILE__,__LINE__,'non-zero op_err')
 
        D(k) = s%mlt_D(k)
        vc(k) = s%mlt_vc(k)
@@ -869,7 +869,7 @@ contains
 
        s%rho_face(k) = rho_face_save(k)
        call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err)
-       if (op_err /= 0) stop 'non-zero op_err'
+       if (op_err /= 0) call mesa_error(__FILE__,__LINE__,'non-zero op_err')
 
     end do restore_face_loop
 

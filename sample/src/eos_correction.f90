@@ -91,7 +91,7 @@
          call Setup_eos(handle)
    
          allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)
-         if (ierr /= 0) stop 'allocate failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'allocate failed')
       end subroutine setup
    
       subroutine make_correction_table(X,Z,Ecorr,Ytab,Etab)

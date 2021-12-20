@@ -27,7 +27,7 @@
    report_rlo_solver_progress = .true.
 
    ! test as well that the solver works at high accuracy
-   implicit_scheme_tolerance = 1d-10
+   implicit_scheme_tolerance = 1d-8
    implicit_scheme_tiny_factor = 0d0
    max_tries_to_achieve = 20
          
