@@ -16,6 +16,18 @@ Backwards-incompatible changes
 
    A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
 
+
+Module-level changes
+--------------------
+
+Rates
+-----
+
+The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
+due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10**7 K.
+
+
+
 Changes in r21.12.1
 ===================
 
