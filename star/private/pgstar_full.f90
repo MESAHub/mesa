@@ -1494,10 +1494,7 @@
          if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
          fname = trim(s% log_directory) // '/pgstar.dat'
 
-         if (associated(pg% next)) then
-            open(newunit=s% pgstar_dat_unit, file=trim(fname), action='write', &
-               position='append', form='unformatted', iostat=ierr)
-         else
+         if (.not.associated(pg% next)) then
             open(newunit=s% pgstar_dat_unit, file=trim(fname), action='write', &
                status='replace', form='unformatted', iostat=ierr)
             if (ierr == 0) write(s% pgstar_dat_unit) n
