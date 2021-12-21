@@ -55,7 +55,10 @@ Download MESA
 ^^^^^^^^^^^^^
 
 The simplest way to get the MESA software is to download a zip file of
-the `latest MESA release <https://zenodo.org/record/4311514>`__.
+the `latest MESA release <https://github.com/MESAHub/mesa/releases>`__.
+(The full archive of releases can also be found on
+`zenodo <https://zenodo.org/record/4311514>`__,
+but may take a few days to update to include the latest release.)
 
 The compressed file is about 2GB, so don't worry if it takes a little
 while to download.  
@@ -64,7 +67,7 @@ The unzipped and installed package will be large, so make sure you have
 at least 20 GB free on your disk.
 
 When you unzip the file, it will create a directory named
-mesa-r\ |version|. This will be your main MESA directory. You are
+mesa-\ |version|. This will be your main MESA directory. You are
 free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
@@ -98,7 +101,7 @@ uses export to set variables):
 
     # set MESA_DIR to be the directory to which you downloaded MESA
     # The directory shown is only an example and must be modified for your particular system.
-    export MESA_DIR=/Users/jschwab/Software/mesa-r15140
+    export MESA_DIR=/Users/jschwab/Software/mesa-r21.12.1
 
     # set OMP_NUM_THREADS to be the number of cores on your machine
     export OMP_NUM_THREADS=2
