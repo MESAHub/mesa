@@ -72,7 +72,7 @@ free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
 You can also download zip files of `older MESA releases <https://zenodo.org/record/4311514>`__.
-If you plan to do so, please read `this FAQ entry <faq:Installing Older Versions of MESA>`__.
+If you plan to do so, please read :ref:`this FAQ entry <faq:Installing Older Versions of MESA>`.
 
 .. _environment:
 
@@ -198,7 +198,7 @@ Consult the FAQ
 ^^^^^^^^^^^^^^^
 
 Check to see if there is any information about your problem in the
-`MESA FAQ <faq:FAQ>`__.
+:ref:`MESA FAQ <faq:FAQ>`.
 
 If you are using the MESA SDK and are having a problem with
 installation, you should also consult the `MESA SDK
