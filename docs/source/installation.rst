@@ -101,7 +101,7 @@ uses export to set variables):
 
     # set MESA_DIR to be the directory to which you downloaded MESA
     # The directory shown is only an example and must be modified for your particular system.
-    export MESA_DIR=/Users/jschwab/Software/mesa-r15140
+    export MESA_DIR=/Users/jschwab/Software/mesa-r21.12.1
 
     # set OMP_NUM_THREADS to be the number of cores on your machine
     export OMP_NUM_THREADS=2
