@@ -24,7 +24,7 @@
       set_initial_model_number = .true.
       initial_model_number = 0
 
-      pgstar_flag = .false.
+      !pgstar_flag = .true.
 
 
 / ! end of star_job namelist
@@ -48,15 +48,11 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      initial_mass = 7.5d0
+      initial_mass = 7.75d0
       initial_z = 0.02d0
       
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 1d-5
-
-
-  !    thermohaline_option = 'Kippenhahn'
-  !    thermohaline_coeff = 100
 
       use_ledoux_criterion = .true.
 
