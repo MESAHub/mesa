@@ -57,7 +57,7 @@ Download MESA
 The simplest way to get the MESA software is to download a zip file of
 the `latest MESA release <https://github.com/MESAHub/mesa/releases>`__.
 (The full archive of releases can also be found on
-`zenodo <https://zenodo.org/record/4311514>`__,
+`zenodo <https://doi.org/10.5281/zenodo.2602941>`__,
 but may take a few days to update to include the latest release.)
 
 The compressed file is about 2GB, so don't worry if it takes a little
@@ -71,7 +71,7 @@ mesa-\ |version|. This will be your main MESA directory. You are
 free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
-You can also download zip files of `older MESA releases <https://zenodo.org/record/4311514>`__.
+You can also download zip files of `older MESA releases <https://doi.org/10.5281/zenodo.2602941>`__.
 If you plan to do so, please read :ref:`this FAQ entry <faq:Installing Older Versions of MESA>`.
 
 .. _environment:
