@@ -180,6 +180,8 @@
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
 
          include 'formats'
+
+         err_msg = ''
          
          nz = s% nz
 
@@ -796,6 +798,7 @@
             ierr = 0
             coeff = 0
             dbg_adjust = .false.
+            err_msg = ''
 
             skip_eval_f = (min_corr_coeff_in == 1)
             if (skip_eval_f) then
@@ -851,7 +854,7 @@
                      ierr = 0
                      cycle
                   end if
-                  write(err_msg,'(a)') 'adjust_correction failed in eval_equations'
+                  write(err_msg,*) 'adjust_correction failed in eval_equations'
                   if (dbg_msg .or. dbg_adjust) &
                      write(*,2) 'adjust_correction: eval_equations returned ierr', &
                         ierr, min_corr_coeff, max_corr_coeff

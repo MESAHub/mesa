@@ -17,7 +17,7 @@ if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_shock_part2.mod shock_part2.mod
 else
    do_one inlist_shock_part2_header shock_part2.mod LOGS_part2
-   cp shock_part2.mod standard_shock_part32.mod
+   cp shock_part2.mod standard_shock_part2.mod
 fi
 
 # check if can skip shock_part3

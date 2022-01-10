@@ -11,9 +11,6 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 .. image:: https://img.shields.io/github/issues/MESAHub/mesa
     :alt: GitHub issues
     :target: https://github.com/MESAHub/mesa/issues
-.. image:: https://github.com/MESAHub/mesa/actions/workflows/build_compile.yml/badge.svg
-    :alt: MESA build status
-    :target: https://github.com/MESAHub/mesa/actions/workflows/build_compile.yml
 
 **WARNING**: The default ``main`` branch is the development version of
 MESA and is not guaranteed to function correctly.  If you are using
