@@ -117,7 +117,7 @@ contains
       ! a solution to Q(Y(Z)) = 0.
       if (Q_lb * Q_ub > 0d0) then
          if (info%report) then
-            write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
+            write(*,*) 'Q bisection error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
             write(*,*) 'tolerance', bracket_tolerance
@@ -157,7 +157,11 @@ contains
             Q_lb = Q
          end if
 
-         if (upper_bound_Z - lower_bound_Z < bracket_tolerance) return
+         if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
+            Z = (upper_bound_Z + lower_bound_Z) / 2d0
+            call compute_Q(info, Y, Q, Af)
+            return
+         end if
       end do
 
    end subroutine Q_bisection_search
@@ -175,8 +179,8 @@ contains
       logical, intent(out) :: has_root
 
       ! Parameters
-      real(dp), parameter :: bracket_tolerance = 1d-3
-      integer, parameter :: max_iter = 30
+      real(dp), parameter :: bracket_tolerance = 1d-4
+      integer, parameter :: max_iter = 50
 
       ! Intermediates
       type(auto_diff_real_tdc) :: lower_bound_Z, upper_bound_Z
@@ -184,8 +188,10 @@ contains
       integer :: iter
 
       ! Set up
-      lower_bound_Z = lower_bound_Z_in
+      lower_bound_Z = lower_bound_Z_in!lower_bound_Z_in
+      lower_bound_Z%d1val1 = 1d0
       upper_bound_Z = upper_bound_Z_in
+      upper_bound_Z%d1val1 = 1d0
 
       ! Check bounds
       Y = set_Y(.false., lower_bound_Z)
@@ -201,7 +207,7 @@ contains
       has_root = .true.
       if (dQdZ_lb * dQdZ_ub > 0d0) then
          if (info%report) then
-            write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
+            write(*,*) 'dQdZ bisection error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
             write(*,*) 'dQdZ(Lower Z)',dQdZ_lb%val
@@ -226,6 +232,7 @@ contains
       ! Bisection search
       do iter=1,max_iter
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
+         Z%d1val1 = 1d0
          Y = set_Y(.false., Z)
 
          call compute_Q(info, Y, Q, Af)
@@ -234,6 +241,7 @@ contains
          ! We only ever call this when Y < 0.
          ! In this regime, dQ/dZ can take on either sign, and has at most one stationary point.
 
+         if (info%report) write(*,*) 'Bisecting dQdZ. Z, dQdZ, Z_lb, dQdZ_lb, Z_ub, dQdZ_ub', Z%val, dQdZ%val, lower_bound_Z%val, dQdZ_lb%val, upper_bound_Z%val, dQdZ_ub%val
 
          if (dQdZ > 0d0 .and. dQdZ_ub > 0d0) then
             upper_bound_Z = Z
@@ -267,8 +275,8 @@ contains
       type(auto_diff_real_tdc), intent(out) :: Z, Af
 
       ! Parameters
-      real(dp), parameter :: bracket_tolerance = 1d-3
-      integer, parameter :: max_iter = 30
+      real(dp), parameter :: bracket_tolerance = 1d-4
+      integer, parameter :: max_iter = 50
 
       ! Intermediates
       type(auto_diff_real_tdc) :: lower_bound_Z, upper_bound_Z
@@ -302,7 +310,14 @@ contains
             upper_bound_Z = Z
          end if
 
-         if (upper_bound_Z - lower_bound_Z < bracket_tolerance) return
+         if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
+            ! We return the lower bound because this is guaranteed to have Af > 0 (just barely).
+            ! This is important for our later bisection of dQ/dZ, because we want the upper-Z end of
+            ! the domain we bisect to have dQ/dZ < 0, which means it has to capture the fact that d(Af)/dZ < 0.
+            Z = lower_bound_Z
+            call compute_Q(info, Y, Q, Af)
+            return
+         end if
       end do
 
    end subroutine Af_bisection_search

@@ -90,12 +90,26 @@ contains
          Y_is_positive = .false.
       end if
 
+      if (info%report) then
+         open(unit=4,file='out.data')
+         do iter=1,1000
+            Z0 = (Zlb + (Zub-Zlb)*(iter-1)/1000)
+            Y = set_Y(Y_is_positive,Z0)
+            call compute_Q(info, Y, Q, Af)
+            write(4,*) Y%val, Q%val
+         end do
+         write(*,*) 'Wrote Q(Z) to out.data'
+      end if
+
       ! Start down the chain of logic...
       if (Y_is_positive) then
          ! If Y > 0 then Q(Y) is monotone and we can jump straight to the search.
          call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
+         Y = convert(Y_face)
          if (ierr /= 0) return
+         if (info%report) write(*,*) 'Y is positive, Y=',Y_face%val
       else
+         if (info%report) write(*,*) 'Y is negative.'
          ! If Y < 0 then Q(Y) is not guaranteed to be monotone, so we have to be more careful.
          ! One root we could have is the radiative solution (with Af==0), given by
          radY = (info%L - info%L0 * info%gradL) / info%L0
@@ -104,34 +118,51 @@ contains
          ! As a result we can directly write down the solution and get just radY.
          if (info%A0 == 0) then
             Y = radY
+            if (info%report) write(*,*) 'A0 == 0, Y=',Y%val
          else
+            if (info%report) write(*,*) 'A0 > 0.'
             ! Otherwise, we keep going.
             ! We next identify the point where Af(Y) = 0. Call this Y0, corresponding to Z0.
             call Af_bisection_search(info, Zlb, Zub, Z0, Af, ierr)
             if (ierr /= 0) return
             Y0 = set_Y(.false., Z0)
+            call compute_Q(info, Y0, Q, Af)
+            if (info%report) write(*,*) 'Bisected Af. Y0=',Y0%val,'Af(Y0)=',Af%val
 
             ! We next need to do a bracket search for where dQdZ = 0 over the interval [Y0,0] (equivalently from Z=lower_bound to Z=Z0).
             call dQdZ_bisection_search(info, Zlb, Z0, Z1, has_root)
             if (has_root) then
                Y1 = set_Y(.false., Z1)
+               if (info%report) write(*,*) 'Bisected dQdZ, found root, ',Y1%val
                call compute_Q(info, Y1, Q, Af)
                if (Q < 0) then ! Means there are no roots with Af > 0.
+                  if (info%report) write(*,*) 'Root has Q<0, Q=',Q%val,'Y=',radY%val
                   Y = radY
                else
+                  if (info%report) write(*,*) 'Root has Q>0. Q(Y1)=',Q%val
                   ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
+                  if (info%report) write(*,*) 'Searching from Y=',-exp(Zlb%val),'to Y=',-exp(Z1%val)
                   call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
+                  Y = convert(Y_face)
+                  if (info%report) write(*,*) 'ierr',ierr, tdc_num_iters
                   if (ierr /= 0) then
+                     if (info%report) write(*,*) 'No root found. Searching from Y=',-exp(Z1%val),'to Y=',-exp(Z0%val)
                      ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
                      ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
                      call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
+                     Y = convert(Y_face)
                   end if
+                  if (info%report) write(*,*) 'Y=',Y%val
                end if
             else
+               if (info%report) write(*,*) 'Bisected dQdZ, no root found.'
                call compute_Q(info, Y0, Q, Af)
                if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
                   call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
+                  Y = convert(Y_face)
+                  if (info%report) write(*,*) 'Q(Y0) > 0, bisected and found Y=',Y%val
                else ! Means there's no root in [Y0,0] so the only root is radY.
+                  if (info%report) write(*,*) 'Q(Y0) < 0, Y=',radY%val
                   Y = radY
                end if
             end if
@@ -165,10 +196,11 @@ contains
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_star_order1),intent(out) :: Y_face
       type(auto_diff_real_tdc), intent(out) :: Af
-      integer, intent(out) :: tdc_num_iters, ierr
+      integer, intent(out) :: tdc_num_iters
+      integer, intent(out) :: ierr
       
       type(auto_diff_real_tdc) :: Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
-      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, Q0
+      type(auto_diff_real_tdc) :: dQdZ, Q0
       integer :: iter, line_iter, i
       logical :: converged, have_derivatives, corr_has_derivatives
       real(dp), parameter :: correction_tolerance = 1d-13
@@ -177,6 +209,8 @@ contains
       integer, parameter :: max_iter = 200
       integer, parameter :: max_line_search_iter = 5
       include 'formats'
+
+      ierr = 0
 
       ! We start by bisecting to find a narrow interval around the root.
       lower_bound_Z = Zlb
@@ -189,6 +223,7 @@ contains
       ! Set up Z from bisection search
       Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
       if (info%report) write(*,*) 'Z from bisection search', Z%val
+      if (info%report) write(*,*) 'lower_bound_Z, upper_bound_Z',lower_bound_Z%val,upper_bound_Z%val
 
       ! Now we refine the solution with a Newton solve.
       ! This also let's us pick up the derivative of the solution with respect to input parameters.
@@ -211,16 +246,17 @@ contains
          end if
 
          ! We use the fact that Q(Y) is monotonic to iteratively refined bounds on Q.
-         if (Q > 0d0) then
-            ! Q(Y) is monotonic so this means Z is a lower-bound.
+         dQdZ = differentiate_1(Q)
+         if (Q > 0d0 .and. dQdZ < 0d0) then
             lower_bound_Z = Z
-         else
-            ! Q(Y) is monotonic so this means Z is an upper-bound.
+         else if (Q > 0d0 .and. dQdZ > 0d0) then
             upper_bound_Z = Z
+         else if (Q < 0d0 .and. dQdZ < 0d0) then
+            upper_bound_Z = Z
+         else
+            lower_bound_Z = Z
          end if
 
-         prev_dQdZ = dQdZ
-         dQdZ = differentiate_1(Q)
          if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
             ierr = 1
             exit
@@ -263,12 +299,13 @@ contains
             end if
          end do
 
-         if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
-            Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
+         if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, corr', iter, line_iter, &
+            Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, correction%val
          Z_new%d1val1 = 1d0 ! Ensures that dZ/dZ = 1.
          Z = Z_new
 
          Y = set_Y(Y_is_positive,Z)
+         if (converged) exit
 
       end do
 
