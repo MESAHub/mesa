@@ -98,7 +98,7 @@ contains
             call compute_Q(info, Y, Q, Af)
             write(4,*) Y%val, Q%val
          end do
-         write(*,*) 'Wrote Q(Z) to out.data'
+         write(*,*) 'Wrote Q(Y) to out.data'
       end if
 
       ! Start down the chain of logic...
