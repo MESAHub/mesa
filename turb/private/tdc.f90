@@ -102,7 +102,6 @@ contains
          ! As a result we can directly write down the solution and get just radY.
          if (A0 == 0) then
             Y_face = radY
-            call compute_Q(info, Y_face, Q, Af)
          else
             ! Otherwise, we keep going.
             ! We next identify the point where Af(Y) = 0. Call this Y0, corresponding to Z0.
@@ -111,24 +110,35 @@ contains
             Y0 = set_Y(.false., Z0)
 
             ! We next need to do a bracket search for where dQdZ = 0 over the interval [Y0,0] (equivalently from Z=lower_bound to Z=Z0).
-            call dQdZ_bisection_search(info, lower_bound_Z, Z0, Z1, has_root)
+            call dQdZ_bisection_search(info, Zlb, Z0, Z1, has_root)
             if (has_root) then
                Y1 = set_Y(.false., Z1)
                call compute_Q(info, Y1, Q, Af)
                if (Q < 0) then ! Means there are no roots with Af > 0.
                   Y_face = radY
                else
-                  call bracket_plus_Newton_search(info, Y_is_positive, report, scale, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
-
-
+                  ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
+                  call bracket_plus_Newton_search(info, Y_is_positive, report, scale, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
+                  if (ierr /= 0) then
+                     ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
+                     ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
+                     call bracket_plus_Newton_search(info, Y_is_positive, report, scale, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
+                  end if
+               end if
             else
-
+               call compute_Q(info, Y0, Q, Af)
+               if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
+                  call bracket_plus_Newton_search(info, Y_is_positive, report, scale, lower_bound_Z, Z0, Y_face, Af, tdc_num_iters, ierr)
+               else ! Means there's no root in [Y0,0] so the only root is radY.
+                  Y_face = radY
+               end if
             end if
       end if
 
 
 
       ! Process Y into the various outputs.
+      call compute_Q(info, Y_face, Q, Af)
       conv_vel = sqrt_2_div_3*unconvert(Af)   
 
    end subroutine get_TDC_solution
