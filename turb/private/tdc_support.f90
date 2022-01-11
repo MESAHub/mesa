@@ -83,26 +83,22 @@ contains
    end function set_Y
 
    !> This routine performs a bisection search for Q=0 over a domain in Z for which Q is monotone.
-   subroutine Q_bisection_search(&
-         mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y_is_positive, lower_bound_Z, upper_bound_Z, &
-         c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, ierr)
+   subroutine Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, Z, ierr)
       ! Inputs
-      real(dp), intent(in) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
+      type(tdc_info), intent(in) :: info
       logical, intent(in) :: Y_is_positive
-      type(auto_diff_real_tdc), intent(in) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp
-
-      ! In/Out
-      type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
 
       ! Outputs
+      type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
+      type(auto_diff_real_tdc), intent(out) :: Z
       integer, intent(out) :: ierr
 
+      ! Parameters
       real(dp), parameter :: bracket_tolerance = 1d0
       integer, parameter :: max_iter = 30
 
-      type(auto_diff_real_tdc) :: Z_new, Y, Af, Q, Q_ub, Q_lb
+      ! Intermediates
+      type(auto_diff_real_tdc) :: Z, Y, Af, Q, Q_ub, Q_lb
       integer :: iter
 
       ierr = 0
@@ -141,23 +137,23 @@ contains
       end if
 
       do iter=1,max_iter
-         Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
-         Y = set_Y(Y_is_positive, Z_new)
+         Z = (upper_bound_Z + lower_bound_Z) / 2d0
+         Y = set_Y(Y_is_positive, Z)
 
          call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
             Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
 
          if (Q > 0d0 .and. Q_ub > 0d0) then
-            upper_bound_Z = Z_new
+            upper_bound_Z = Z
             Q_ub = Q
          else if (Q > 0d0 .and. Q_lb > 0d0) then
-            lower_bound_Z = Z_new
+            lower_bound_Z = Z
             Q_lb = Q
          else if (Q < 0d0 .and. Q_ub < 0d0) then
-            upper_bound_Z = Z_new
+            upper_bound_Z = Z
             Q_ub = Q
          else if (Q < 0d0 .and. Q_lb < 0d0) then
-            lower_bound_Z = Z_new
+            lower_bound_Z = Z
             Q_lb = Q
          end if
 
@@ -169,36 +165,36 @@ contains
    !> This routine performs a bisection search for dQ/dZ=0 with Y < 0.
    !! The domain is assumed to be restricted to have Af > 0, so that dQ/dZ is
    !! continuous and monotone.
-   subroutine dQdZ_bisection_search(&
-         mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         lower_bound_Z, upper_bound_Z, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, has_root)
+   subroutine dQdZ_bisection_search(info, lower_bound_Z, upper_bound_Z, Z, has_root)
       ! Inputs
-      real(dp), intent(in) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
-      type(auto_diff_real_tdc), intent(in) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp
-
-      ! In/Out
-      type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: lower_bound_Z_in, upper_bound_Z_in
 
       ! Outputs
+      type(auto_diff_real_tdc), intent(out) :: Z
       logical, intent(out) :: has_root
 
+      ! Parameters
       real(dp), parameter :: bracket_tolerance = 1d-3
       integer, parameter :: max_iter = 30
 
-      type(auto_diff_real_tdc) :: Z_new, Y, Af, Q, dQdZ, dQdZ_lb, dQdZ_ub
+      ! Intermediates
+      type(auto_diff_real_tdc) :: lower_bound_Z, upper_bound_Z
+      type(auto_diff_real_tdc) :: Y, Af, Q, dQdZ, dQdZ_lb, dQdZ_ub
       integer :: iter
 
+      ! Set up
       ierr = 0
+      lower_bound_Z = lower_bound_Z_in
+      upper_bound_Z = upper_bound_Z_in
 
+      ! Check bounds
       Y = set_Y(Y_is_positive, lower_bound_Z)
-      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_lb, Af)
+      call compute_Q(info, Y, Q, Af)
       dQdZ_lb = differentiate_1(Q_lb)
 
       Y = set_Y(Y_is_positive, upper_bound_Z)
-      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
+      call compute_Q(info, Y, Q, Af)
       dQdZ_ub = differentiate_1(Q_ub)
 
       ! Check to make sure that the lower and upper bounds on Z actually bracket
@@ -229,12 +225,12 @@ contains
          return
       end if
 
+      ! Bisection search
       do iter=1,max_iter
-         Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
-         Y = set_Y(.false., Z_new)
+         Z = (upper_bound_Z + lower_bound_Z) / 2d0
+         Y = set_Y(.false., Z)
 
-         call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+         call compute_Q(info, Y, Q, Af)
          dQdZ = differentiate_1(Q)
 
          ! We only ever call this when Y < 0.
@@ -242,16 +238,16 @@ contains
 
 
          if (dQdZ > 0d0 .and. dQdZ_ub > 0d0) then
-            upper_bound_Z = Z_new
+            upper_bound_Z = Z
             dQdZ_ub = dQdZ
          else if (dQdZ > 0d0 .and. dQdZ_lb > 0d0) then
-            lower_bound_Z = Z_new
+            lower_bound_Z = Z
             dQdZ_lb = dQdZ
          else if (dQdZ < 0d0 .and. dQdZ_ub < 0d0) then
-            upper_bound_Z = Z_new
+            upper_bound_Z = Z
             dQdZ_ub = dQdZ
          else if (dQdZ < 0d0 .and. dQdZ_lb < 0d0) then
-            lower_bound_Z = Z_new
+            lower_bound_Z = Z
             dQdZ_lb = dQdZ
          end if
 
@@ -263,47 +259,49 @@ contains
    !> This routine performs a bisection search for the least-negative Y such that Af(Y) = 0.
    !! The search halts after max_iter iterations or when the bisection has converged to an interval
    !! less than Ztol in width.
-   subroutine Af_bisection_search(&
-         mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         lower_bound_Z, upper_bound_Z, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Z, Af, ierr)
+   subroutine Af_bisection_search(info, lower_bound_Z_in, upper_bound_Z_in, Z, Af, ierr)
       ! Inputs
-      real(dp), intent(in) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
-      type(auto_diff_real_tdc), intent(in) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1), intent(in) :: T, rho, dV, Cp, kap, Hp
-
-      ! In/Out
-      type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: lower_bound_Z_in, upper_bound_Z_in
 
       ! Outputs
-      type(auto_diff_real_tdc), intent(out) :: Z_new, Af
-      integer, intent(out) :: ierr
+      type(auto_diff_real_tdc), intent(out) :: Z, Af
+      logical, intent(out) :: has_root
 
-      type(auto_diff_real_tdc) :: Y, Q
+      ! Parameters
       real(dp), parameter :: bracket_tolerance = 1d-3
       integer, parameter :: max_iter = 30
 
+      ! Intermediates
+      type(auto_diff_real_tdc) :: lower_bound_Z, upper_bound_Z
+      type(auto_diff_real_tdc) :: Y, Q
+      integer :: iter
+
+      ! Set up
+      ierr = 0
+      lower_bound_Z = lower_bound_Z_in
+      upper_bound_Z = upper_bound_Z_in
+
       Y = set_Y(.false., upper_bound_Z)
-      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+      call compute_Q(info, Y, Q, Af)
       if (Af > 0) then ! d(Af)/dZ < 0, so if Af(upper_bound_Z) > 0 there's no solution in this interval.
          ierr = 1
          return
       end if
 
       do iter=1,max_iter
-         Z_new = (upper_bound_Z + lower_bound_Z) / 2d0
-         Y = set_Y(.false., Z_new)
+         Z = (upper_bound_Z + lower_bound_Z) / 2d0
+         Y = set_Y(.false., Z)
 
-         call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+         call compute_Q(info, Y, Q, Af)
 
          ! Y < 0 so increasing Y means decreasing Z.
          ! d(Af)/dY > 0 so d(Af)/dZ < 0.
 
          if (Af > 0d0) then ! Means we are at too-low Z.
-            lower_bound_Z = Z_new
+            lower_bound_Z = Z
          else
-            upper_bound_Z = Z_new
+            upper_bound_Z = Z
          end if
 
          if (upper_bound_Z - lower_bound_Z < bracket_tolerance) return

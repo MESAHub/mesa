@@ -62,7 +62,7 @@ contains
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
       
-      type(auto_diff_real_tdc) :: Af, Y, Z0, radY
+      type(auto_diff_real_tdc) :: Af, Y, Z0, Z1, radY
       type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, Q0
       logical :: has_root
       integer :: iter
@@ -106,15 +106,14 @@ contains
          else
             ! Otherwise, we keep going.
             ! We next identify the point where Af(Y) = 0. Call this Y0, corresponding to Z0.
-            call Af_bisection_search(info, lower_bound_Z, upper_bound_Z, Z0, Af, ierr)
+            call Af_bisection_search(info, Zlb, Zub, Z0, Af, ierr)
             if (ierr /= 0) return
             Y0 = set_Y(.false., Z0)
 
             ! We next need to do a bracket search for where dQdZ = 0 over the interval [Y0,0] (equivalently from Z=lower_bound to Z=Z0).
-            call dQdZ_bisection_search(info, lower_bound_Z, upper_bound_Z, Z, has_root)
+            call dQdZ_bisection_search(info, lower_bound_Z, Z0, Z1, has_root)
             if (has_root) then
-               Z = (upper_bound_Z + lower_bound_Z) / 2d0
-               Y1 = set_Y(.false., Z)
+               Y1 = set_Y(.false., Z1)
                call compute_Q(info, Y1, Q, Af)
                if (Q < 0) then ! Means there are no roots with Af > 0.
                   Y_face = radY
@@ -171,11 +170,10 @@ contains
       upper_bound_Z = Zub
 
       ! Perform bisection search.
-      call Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, ierr)
+      call Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, Z, ierr)
       if (ierr /= 0) return
 
       ! Set up Z from bisection search
-      Z = (upper_bound_Z + lower_bound_Z) / 2d0
       Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
       if (report) write(*,*) 'Z from bisection search', Z%val
 
@@ -312,7 +310,7 @@ contains
       call eval_xis(info, Y, xi0, xi1, xi2)          
 
       Af = eval_Af(dt, A0, xi0, xi1, xi2)
-      Q = (L - L0*gradL) - (L0 + c0*Af)*Y
+      Q = (info%L - info%L0*info%gradL) - (info%L0 + info%c0*Af)*Y
 
    end subroutine compute_Q
 
