@@ -35,7 +35,9 @@ use star_data_def
 implicit none
 
 private
-public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, convert, unconvert, safe_atan, safe_tanh, tdc_info
+public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, &
+         convert, unconvert, safe_atan, safe_tanh, tdc_info, &
+         eval_Af, eval_xis, compute_Q
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
    !! do not depend on Y.
@@ -373,5 +375,158 @@ contains
       K%val = K_in%val
       K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
    end function unconvert
+
+   !> Q is the residual in the TDC equation, namely:
+   !!
+   !! Q = (L - L0 * gradL) - (L0 + c0 * Af) * Y
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param Y superadiabaticity
+   !! @param Q The residual of the above equation (an output).
+   !! @param Af The final convection speed (an output).
+   subroutine compute_Q(info, Y, Q, Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y
+      type(auto_diff_real_tdc), intent(out) :: Q, Af
+      type(auto_diff_real_tdc) :: xi0, xi1, xi2
+
+      call eval_xis(info, Y, xi0, xi1, xi2)          
+
+      Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
+      Q = (info%L - info%L0*info%gradL) - (info%L0 + info%c0*Af)*Y
+
+   end subroutine compute_Q
+
+   !! Calculates the coefficients of the TDC velocity equation.
+   !! The velocity equation is
+   !!
+   !! 2 dw/dt = xi0 + w * xi1 + w**2 * xi2 - Lambda
+   !!
+   !! where Lambda (currently set to zero) captures coupling between cells.
+   !!
+   !! The coefficients xi0/1/2 are given by
+   !!
+   !! xi0 = (epsilon_q + S * Y) / w
+   !! xi1 = (-D_r + p_turb dV/dt) / w^2    [here V = 1/rho is the volume]
+   !! xi2 = -D / w^3
+   !!
+   !! Note that these terms are evaluated on faces, because the convection speed
+   !! is evaluated on faces. As a result all the inputs must either natively
+   !! live on faces or be interpolated to faces.
+   !!
+   !! This function also has some side effects in terms of storing some of the terms
+   !! it calculates for plotting purposes.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param Y superadiabaticity
+   !! @param xi0 Output, the constant term in the convective velocity equation.
+   !! @param xi1 Output, the prefactor of the linear term in the convective velocity equation.
+   !! @param xi2 Output, the prefactor of the quadratic term in the convective velocity equation.
+   subroutine eval_xis(info, Y, xi0, xi1, xi2) 
+      ! eval_xis sets up Y with partial wrt Z
+      ! so results come back with partials wrt Z
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y
+      type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
+      type(auto_diff_real_tdc) :: S0, D0, DR0
+      type(auto_diff_real_star_order1) :: gammar_div_alfa, Pt0, dVdt
+      real(dp), parameter :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
+      real(dp), parameter :: x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3
+      real(dp), parameter :: x_ALFAP = 2.d0/3.d0
+      real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
+
+      S0 = convert(x_ALFAS*info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
+      S0 = S0*Y
+      D0 = convert(info%alpha_TDC_DAMP*x_CEDE/(info%mixing_length_alpha*info%Hp))
+      gammar_div_alfa = info%alpha_TDC_DAMPR*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
+      DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
+      Pt0 = info%alpha_TDC_PtdVdt*x_ALFAP*info%rho
+      dVdt = info%dV/info%dt
+
+      xi0 = S0
+      xi1 = -(DR0 + convert(Pt0*dVdt))
+      xi2 = -D0
+   end subroutine eval_xis
+
+   !! Calculates the solution to the TDC velocity equation.
+   !! The velocity equation is
+   !!
+   !! 2 dw/dt = xi0 + w * xi1 + w**2 * xi2 - Lambda
+   !!
+   !! where Lambda (currently set to zero) captures coupling between cells.
+   !! The xi0/1/2 variables are constants for purposes of solving this equation.
+   !!
+   !! An important related parameter is J:
+   !! 
+   !! J^2 = xi1^2 - 4 * xi0 * xi2
+   !!
+   !! When J^2 > 0 the solution for w is hyperbolic in time.
+   !! When J^2 < 0 the solution is trigonometric, behaving like tan(J * t / 4 + c).
+   !!
+   !! In the trigonometric branch note that once the solution passes through its first
+   !! root the solution for all later times is w(t) = 0. This is not a solution to the
+   !! convective velocity equation as written above, but *is* a solution to the convective
+   !! energy equation (multiply the velocity equation by w), which is the one we actually
+   !! want to solve (per Radek Smolec's thesis). We just solve the velocity form
+   !! because it's more convenient.
+   !!
+   !! @param dt Time-step
+   !! @param A0 convection speed from the start of the step (cm/s)
+   !! @param xi0 The constant term in the convective velocity equation.
+   !! @param xi1 The prefactor of the linear term in the convective velocity equation.
+   !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.            
+   !! @param Af Output, the convection speed at the end of the step (cm/s)
+   function eval_Af(dt, A0, xi0, xi1, xi2) result(Af)
+      real(dp), intent(in) :: dt    
+      type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
+      type(auto_diff_real_tdc) :: Af ! output
+      type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, lk 
+
+      J2 = pow2(xi1) - 4d0 * xi0 * xi2
+
+      if (J2 > 0d0) then ! Hyperbolic branch
+         J = sqrt(J2)
+         Jt = dt * J
+         Jt4 = 0.25d0 * Jt
+         num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
+         den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
+         Af = num / den 
+         if (Af < 0d0) then
+            Af = -Af
+         end if
+      else if (J2 < 0d0) then ! Trigonometric branch
+         J = sqrt(-J2)
+         Jt = dt * J
+
+         ! This branch contains decaying solutions that reach A = 0, at which point
+         ! they switch onto the 'zero' branch. So we have to calculate the position of
+         ! the first root to check it against dt.
+         y_for_atan = xi1 + 2d0 * A0 * xi2
+         root = safe_atan(J, xi1) - safe_atan(J, y_for_atan)
+
+         ! The root enters into a tangent, so we can freely shift it by pi and
+         ! get another root. We care about the first positive root, and the above prescription
+         ! is guaranteed to give an answer between (-2*pi,2*pi) because atan produces an answer in [-pi,pi],
+         ! so we add/subtract a multiple of pi to get the root into [0,pi).
+         if (root > pi) then
+            root = root - pi
+         else if (root < -pi) then
+            root = root + 2d0*pi
+         else if (root < 0d0) then
+            root = root + pi
+         end if
+
+         if (0.25d0 * Jt < root) then
+            num = -xi1 + J * tan(0.25d0 * Jt + atan(y_for_atan / J)) 
+            den = 2d0 * xi2
+            Af = num / den
+         else
+            Af = 0d0
+         end if
+      else ! if (J2 == 0d0) then         
+         Af = A0            
+      end if
+
+   end function eval_Af
 
 end module tdc_support
