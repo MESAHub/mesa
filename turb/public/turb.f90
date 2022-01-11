@@ -98,73 +98,43 @@ module turb
       logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
+      type(tdc_info) :: info
       real(dp), parameter :: lower_bound_Z = -2d2
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
-      type(auto_diff_real_star_order1) :: Y1, Y2, Y3, cv1, cv2, cv3
-      integer :: mt1, mt2, mt3, i1, i2, i3
 
       include 'formats'
 
-      call get_TDC_solution( &
-         conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-         mt1, scale, L, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, lower_bound_Z, upper_bound_Z, cv1, Y1, i1, ierr)
+      ! Pack TDC info
+      info%mixing_length_alpha = mixing_length_alpha
+      info%alpha_TDC_DAMP = alpha_TDC_DAMP
+      info%alpha_TDC_DAMPR = alpha_TDC_DAMPR
+      info%alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
+      info%dt = dt
+      info%L = convert(L)
+      info%gradL = convert(gradL)
+      info%grada = convert(grada)
+      info%c0 = convert(mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r))
+      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap)) ! assumes QHSE for dP/dm
+      info%A0 = conv_vel_start/sqrt_2_div_3
+      info%T = T
+      info%rho = rho
+      info%dV = dV
+      info%Cp = Cp
+      info%kap = opacity
+      info%Hp = scale_height
 
-      if (ierr /= 0) then ! Catch any errors.
-         write(*,*) 'get_TDC_solution failed in set_TDC'
-         write(*,*) 'Repeating call with reporting on.'
-         call get_TDC_solution( &
-            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .true., &
-            mt1, scale, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, lower_bound_Z, upper_bound_Z, cv1, Y1, i1, ierr)
-      else if (Y1 > 0d0) then ! Equations are monotone, so this is the unique solution.
-         Y_face = Y1
-         conv_vel = cv1
-         mixing_type = mt1
-         tdc_num_iters = i1
-      else if (Y1 < 0d0) then ! Check for non-monotone solutions.
-         ! ierr = 0 because we're in the 'else' clause of the if.
+      ! Get solution
+      call get_TDC_solution(info, report, scale, lower_bound_Z, upper_bound_Z, conv_vel, Y_face, ierr, ierr)
 
-         ! Search for a solution which has smaller Z than what we found before
-         call get_TDC_solution( &
-            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .false., &
-            mt2, scale, L, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, lower_bound_Z, log(-Y1%val) - eps, cv2, Y2, i2, ierr)
-
-
-         if (ierr /= 0) then ! Means we didn't find anything, so we had the right root the first time.
-            Y_face = Y1
-            conv_vel = cv1
-            mixing_type = mt1
-            tdc_num_iters = i1
-            ierr = 0
-         else ! Found a new root closer to Y=0!
-            ! Check once more, because there are at most three roots.
-            call get_TDC_solution( &
-               conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, .false., &
-               mt3, scale, L, r, P, T, rho, dV, Cp, opacity, &
-               scale_height, gradL, grada, lower_bound_Z, log(-Y2%val) - eps, cv3, Y3, i3, ierr)
-            if (ierr /= 0) then ! Means we didn't find anything, so we had the right root the first time.
-               Y_face = Y2
-               conv_vel = cv2
-               mixing_type = mt2
-               tdc_num_iters = i2
-               ierr = 0
-            else ! Found a new root closer to Y=0!
-               Y_face = Y3
-               conv_vel = cv3
-               mixing_type = mt3
-               tdc_num_iters = i3
-               ierr = 0
-            end if
-         end if
-      end if
-
-
+      ! Unpack output
       gradT = Y_face + gradL
       D = conv_vel*scale_height*mixing_length_alpha/3d0     ! diffusion coefficient [cm^2/sec]
-
+      if (conv_vel > 0d0) then
+         mixing_type = convective_mixing
+      else
+         mixing_type = no_mixing
+      end if
    end subroutine set_TDC
 
    !> Calculates the outputs of semiconvective mixing theory.
