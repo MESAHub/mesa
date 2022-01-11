@@ -87,6 +87,20 @@ contains
    end function set_Y
 
    !> This routine performs a bisection search for Q=0 over a domain in Z for which Q is monotone.
+   !! Monotonicity is assumed, not verified! This means failures can occur if monotonicity fails.
+   !! The search continues until the domain is narrowed to less than a width of bracket_tolerance,
+   !! or until more than max_iter iterations have been taken. Because this is just used to get us in
+   !! the right ballpark, bracket_tolerance is set quite wide, to 1.
+   !! 
+   !! There is a check at the start to verify that Q takes on opposite signs on either end of the
+   !! domain. This is allows us to bail early if there is no root in the domain.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param Y_is_positive True if Y > 0, False otherwise.
+   !! @param lower_bound_Z Lower bound on Z. Note that this is an input *and* an output.
+   !! @param upper_bound_Z Upper bound on Z. Note that this is an input *and* an output.
+   !! @param Z Output: the midpoint of the final bounds.
+   !! @param ierr 0 if everything worked, 1 if the domain does not contain a root.
    subroutine Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, Z, ierr)
       ! Inputs
       type(tdc_info), intent(in) :: info
@@ -168,7 +182,21 @@ contains
 
    !> This routine performs a bisection search for dQ/dZ=0 with Y < 0.
    !! The domain is assumed to be restricted to have Af > 0, so that dQ/dZ is
-   !! continuous and monotone.
+   !! continuous and monotone. This is checked, and if it fails a MESA ERROR is called
+   !! rather than throwing an ierr because if the rest of the TDC logic is correct this should
+   !! not happen.
+   !!
+   !! The search continues until the domain is narrowed to less than a width of bracket_tolerance (1d-4),
+   !! or until more than max_iter iterations have been taken.
+   !! 
+   !! There is a check at the start to verify that dQ/dZ takes on opposite signs on either end of the
+   !! domain. This is allows us to bail early if there is no root in the domain.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param lower_bound_Z Lower bound on Z. Note that this is an input *and* an output.
+   !! @param upper_bound_Z Upper bound on Z. Note that this is an input *and* an output.
+   !! @param Z Output: the midpoint of the final bounds.
+   !! @param has_root True if a root was found, False otherwise.
    subroutine dQdZ_bisection_search(info, lower_bound_Z_in, upper_bound_Z_in, Z, has_root)
       ! Inputs
       type(tdc_info), intent(in) :: info
@@ -196,10 +224,16 @@ contains
       ! Check bounds
       Y = set_Y(.false., lower_bound_Z)
       call compute_Q(info, Y, Q_lb, Af)
+      if (Af == 0) then
+         call mesa_error(__FILE__,__LINE__,'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
+      end if
       dQdZ_lb = differentiate_1(Q_lb)
 
       Y = set_Y(.false., upper_bound_Z)
       call compute_Q(info, Y, Q_ub, Af)
+      if (Af == 0) then
+         call mesa_error(__FILE__,__LINE__,'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
+      end if
       dQdZ_ub = differentiate_1(Q_ub)
 
       ! Check to make sure that the lower and upper bounds on Z actually bracket
@@ -257,14 +291,36 @@ contains
             dQdZ_lb = dQdZ
          end if
 
-         if (upper_bound_Z - lower_bound_Z < bracket_tolerance) return         
+         if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
+            Z = (upper_bound_Z + lower_bound_Z) / 2d0
+            call compute_Q(info, Y, Q, Af)
+            return         
+         end if
       end do
 
    end subroutine dQdZ_bisection_search
 
    !> This routine performs a bisection search for the least-negative Y such that Af(Y) = 0.
-   !! The search halts after max_iter iterations or when the bisection has converged to an interval
-   !! less than Ztol in width.
+   !! Once we find that, we return a Y that is just slightly less negative so that Af > 0.
+   !! This is important for our later bisection of dQ/dZ, because we want the upper-Z end of
+   !! the domain we bisect to have dQ/dZ < 0, which means it has to capture the fact that d(Af)/dZ < 0,
+   !! and so the Z we return has to be on the positive-Af side of the discontinuity in dQdZ.
+   !!
+   !! Note that monotonicity is assumed, not verified!
+   !! Af(Y) is monotonic in Y for negative Y by construction, so this shouldn't be a problem.
+   !!
+   !! The search continues until the domain is narrowed to less than a width of bracket_tolerance (1d-4),
+   !! or until more than max_iter iterations have been taken.
+   !! 
+   !! There is a check at the start to verify that Af == 0 at the most-negative end of the domain.
+   !! This is allows us to bail early if there is no root in the domain.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param lower_bound_Z Lower bound on Z. Note that this is an input *and* an output.
+   !! @param upper_bound_Z Upper bound on Z. Note that this is an input *and* an output.
+   !! @param Z Output: The bound on the positive-Af side of the root (which always is the lower bound).
+   !! @param Af Output: Af(Z).
+   !! @param ierr 0 if everything worked, 1 if the domain does not contain a root.
    subroutine Af_bisection_search(info, lower_bound_Z_in, upper_bound_Z_in, Z, Af, ierr)
       ! Inputs
       type(tdc_info), intent(in) :: info
