@@ -35,13 +35,12 @@ use star_data_def
 implicit none
 
 private
-public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, convert, unconvert, safe_atan, safe_tanh
-
-contains
+public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, convert, unconvert, safe_atan, safe_tanh, tdc_info
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
    !! do not depend on Y.
    !!
+   !! @param report Write debug output if true, not if false.
    !! @param mixing_length_alpha Mixing length parameter
    !! @param alpha_TDC_DAMP TDC turbulent damping parameter
    !! @param alpha_TDC_DAMPR TDC radiative damping parameter
@@ -60,10 +59,13 @@ contains
    !! @param gradL gradL is the neutrally buoyant dlnT/dlnP (= grad_ad + grad_mu),
    !! @param grada grada is the adiabatic dlnT/dlnP,
    type tdc_info
+      logical :: report
       real(dp) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
       type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp
    end type tdc_info
+
+contains
 
    !> Y = +- exp(Z)
    !! If Y > 0, Y = exp(Z)
@@ -98,38 +100,35 @@ contains
       integer, parameter :: max_iter = 30
 
       ! Intermediates
-      type(auto_diff_real_tdc) :: Z, Y, Af, Q, Q_ub, Q_lb
+      type(auto_diff_real_tdc) :: Y, Af, Q, Q_ub, Q_lb
       integer :: iter
 
       ierr = 0
 
       Y = set_Y(Y_is_positive, lower_bound_Z)
-      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_lb, Af)
+      call compute_Q(info, Y, Q_lb, Af)
 
       Y = set_Y(Y_is_positive, upper_bound_Z)
-      call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q_ub, Af)
+      call compute_Q(info, Y, Q_ub, Af)
 
       ! Check to make sure that the lower and upper bounds on Z actually bracket
       ! a solution to Q(Y(Z)) = 0.
       if (Q_lb * Q_ub > 0d0) then
-         if (report) then
+         if (info%report) then
             write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
-            write(*,*) 'scale', scale
-            write(*,*) 'tolerance', residual_tolerance
+            write(*,*) 'tolerance', bracket_tolerance
             write(*,*) 'Y', Y%val
             write(*,*) 'dYdZ', Y%d1val1
             write(*,*) 'exp(Z)', exp(Z%val)
             write(*,*) 'Z', Z%val
-            write(*,*) 'A0', A0%val
-            write(*,*) 'c0', c0%val
-            write(*,*) 'L', L%val
-            write(*,*) 'L0', L0%val
-            write(*,*) 'grada', grada%val
-            write(*,*) 'gradL', gradL%val
+            write(*,*) 'A0', info%A0%val
+            write(*,*) 'c0', info%c0%val
+            write(*,*) 'L', info%L%val
+            write(*,*) 'L0', info%L0%val
+            write(*,*) 'grada', info%grada%val
+            write(*,*) 'gradL', info%gradL%val
             write(*,'(A)')
          end if
          ierr = 1
@@ -140,8 +139,7 @@ contains
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Y = set_Y(Y_is_positive, Z)
 
-         call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-            Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
+         call compute_Q(info, Y, Q, Af)
 
          if (Q > 0d0 .and. Q_ub > 0d0) then
             upper_bound_Z = Z
@@ -165,7 +163,7 @@ contains
    !> This routine performs a bisection search for dQ/dZ=0 with Y < 0.
    !! The domain is assumed to be restricted to have Af > 0, so that dQ/dZ is
    !! continuous and monotone.
-   subroutine dQdZ_bisection_search(info, lower_bound_Z, upper_bound_Z, Z, has_root)
+   subroutine dQdZ_bisection_search(info, lower_bound_Z_in, upper_bound_Z_in, Z, has_root)
       ! Inputs
       type(tdc_info), intent(in) :: info
       type(auto_diff_real_tdc), intent(in) :: lower_bound_Z_in, upper_bound_Z_in
@@ -180,45 +178,43 @@ contains
 
       ! Intermediates
       type(auto_diff_real_tdc) :: lower_bound_Z, upper_bound_Z
-      type(auto_diff_real_tdc) :: Y, Af, Q, dQdZ, dQdZ_lb, dQdZ_ub
+      type(auto_diff_real_tdc) :: Y, Af, Q, Q_lb, Q_ub, dQdZ, dQdZ_lb, dQdZ_ub
       integer :: iter
 
       ! Set up
-      ierr = 0
       lower_bound_Z = lower_bound_Z_in
       upper_bound_Z = upper_bound_Z_in
 
       ! Check bounds
-      Y = set_Y(Y_is_positive, lower_bound_Z)
-      call compute_Q(info, Y, Q, Af)
+      Y = set_Y(.false., lower_bound_Z)
+      call compute_Q(info, Y, Q_lb, Af)
       dQdZ_lb = differentiate_1(Q_lb)
 
-      Y = set_Y(Y_is_positive, upper_bound_Z)
-      call compute_Q(info, Y, Q, Af)
+      Y = set_Y(.false., upper_bound_Z)
+      call compute_Q(info, Y, Q_ub, Af)
       dQdZ_ub = differentiate_1(Q_ub)
 
       ! Check to make sure that the lower and upper bounds on Z actually bracket
       ! a solution to dQ/dZ = 0.
       has_root = .true.
       if (dQdZ_lb * dQdZ_ub > 0d0) then
-         if (report) then
+         if (info%report) then
             write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
             write(*,*) 'dQdZ(Lower Z)',dQdZ_lb%val
             write(*,*) 'dQdZ(Upper Z)',dQdZ_ub%val
-            write(*,*) 'scale', scale
-            write(*,*) 'tolerance', residual_tolerance
+            write(*,*) 'tolerance', bracket_tolerance
             write(*,*) 'Y', Y%val
             write(*,*) 'dYdZ', Y%d1val1
             write(*,*) 'exp(Z)', exp(Z%val)
             write(*,*) 'Z', Z%val
-            write(*,*) 'A0', A0%val
-            write(*,*) 'c0', c0%val
-            write(*,*) 'L', L%val
-            write(*,*) 'L0', L0%val
-            write(*,*) 'grada', grada%val
-            write(*,*) 'gradL', gradL%val
+            write(*,*) 'A0', info%A0%val
+            write(*,*) 'c0', info%c0%val
+            write(*,*) 'L', info%L%val
+            write(*,*) 'L0', info%L0%val
+            write(*,*) 'grada', info%grada%val
+            write(*,*) 'gradL', info%gradL%val
             write(*,'(A)')
          end if
          has_root = .false.
@@ -265,8 +261,8 @@ contains
       type(auto_diff_real_tdc), intent(in) :: lower_bound_Z_in, upper_bound_Z_in
 
       ! Outputs
+      integer, intent(out) :: ierr
       type(auto_diff_real_tdc), intent(out) :: Z, Af
-      logical, intent(out) :: has_root
 
       ! Parameters
       real(dp), parameter :: bracket_tolerance = 1d-3
@@ -307,7 +303,7 @@ contains
          if (upper_bound_Z - lower_bound_Z < bracket_tolerance) return
       end do
 
-   end subroutine Af_bracket_search
+   end subroutine Af_bisection_search
 
    !> Computes the hyperbolic tangent of x in a way that is numerically safe.
    !!

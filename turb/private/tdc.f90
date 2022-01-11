@@ -48,7 +48,6 @@ contains
    !! Internally this solves the equation L = L_conv + L_rad.
    !!
    !! @param info tdc_info type storing various quantities that are independent of Y.
-   !! @param report Write debug output if true, not if false.
    !! @param scale The scale for computing residuals to the luminosity equation (erg/s).
    !! @param Zlb Lower bound on Z.
    !! @param Zub Upper bound on Z.
@@ -56,9 +55,8 @@ contains
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   subroutine get_TDC_solution(info, report, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
+   subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
       real(dp), intent(in) :: scale, Zlb, Zub
-      logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
       
@@ -91,7 +89,7 @@ contains
       ! Start down the chain of logic...
       if (Y_is_positive) then
          ! If Y > 0 then Q(Y) is monotone and we can jump straight to the search.
-         call bracket_plus_Newton_search(info, Y_is_positive, report, scale, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
+         call bracket_plus_Newton_search(info, Y_is_positive, scale, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
          if (ierr /= 0) return
       else
          ! If Y < 0 then Q(Y) is not guaranteed to be monotone, so we have to be more careful.
@@ -118,23 +116,23 @@ contains
                   Y_face = radY
                else
                   ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
-                  call bracket_plus_Newton_search(info, Y_is_positive, report, scale, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
+                  call bracket_plus_Newton_search(info, Y_is_positive, scale, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
                   if (ierr /= 0) then
                      ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
                      ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
-                     call bracket_plus_Newton_search(info, Y_is_positive, report, scale, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
+                     call bracket_plus_Newton_search(info, Y_is_positive, scale, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
                   end if
                end if
             else
                call compute_Q(info, Y0, Q, Af)
                if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
-                  call bracket_plus_Newton_search(info, Y_is_positive, report, scale, lower_bound_Z, Z0, Y_face, Af, tdc_num_iters, ierr)
+                  call bracket_plus_Newton_search(info, Y_is_positive, scale, lower_bound_Z, Z0, Y_face, Af, tdc_num_iters, ierr)
                else ! Means there's no root in [Y0,0] so the only root is radY.
                   Y_face = radY
                end if
             end if
+         end if
       end if
-
 
 
       ! Process Y into the various outputs.
@@ -149,25 +147,23 @@ contains
    !! solution and endow the solution with partial derivatives.
    !!
    !! @param info tdc_info type storing various quantities that are independent of Y.
-   !! @param report Write debug output if true, not if false.
    !! @param scale The scale for computing residuals to the luminosity equation (erg/s).
    !! @param Zlb Lower bound on Z.
    !! @param Zub Upper bound on Z.
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   subroutine bracket_plus_Newton_search(info, scale, Y_is_positive, report, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
+   subroutine bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
       type(tdc_info), intent(in) :: info
       logical, intent(in) :: Y_is_positive
       real(dp), intent(in) :: scale, Zlb, Zub
-      logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: Y_face, Af
       integer, intent(out) :: tdc_num_iters, ierr
       
       type(auto_diff_real_tdc) :: Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, Q0
       integer :: iter, line_iter, i
-      logical :: converged, first_Q_is_positive, have_derivatives, corr_has_derivatives
+      logical :: converged, have_derivatives, corr_has_derivatives
       real(dp), parameter :: correction_tolerance = 1d-13
       real(dp), parameter :: residual_tolerance = 1d-8
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
@@ -185,7 +181,7 @@ contains
 
       ! Set up Z from bisection search
       Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
-      if (report) write(*,*) 'Z from bisection search', Z%val
+      if (info%report) write(*,*) 'Z from bisection search', Z%val
 
       ! Now we refine the solution with a Newton solve.
       ! This also let's us pick up the derivative of the solution with respect to input parameters.
@@ -202,7 +198,7 @@ contains
 
          if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
             ! Can't exit on the first iteration, otherwise we have no derivative information.
-            if (report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
+            if (info%report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
             converged = .true.
             exit
          end if
@@ -260,7 +256,7 @@ contains
             end if
          end do
 
-         if (report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
+         if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, pdQdZ, corr', iter, line_iter, &
             Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, prev_dQdZ%val, correction%val
          Z_new%d1val1 = 1d0 ! Ensures that dZ/dZ = 1.
          Z = Z_new
@@ -271,7 +267,7 @@ contains
 
       if (.not. converged) then
          ierr = 1
-         if (report) then
+         if (info%report) then
          !$OMP critical (tdc_crit0)
             write(*,*) 'failed get_TDC_solution TDC_iter', &
                iter
@@ -285,12 +281,12 @@ contains
             write(*,*) 'Z', Z%val
             write(*,*) 'Af', Af%val
             write(*,*) 'dAfdZ', Af%d1val1
-            write(*,*) 'A0', A0%val
-            write(*,*) 'c0', c0%val
-            write(*,*) 'L', L%val
-            write(*,*) 'L0', L0%val
-            write(*,*) 'grada', grada%val
-            write(*,*) 'gradL', gradL%val
+            write(*,*) 'A0', info%A0%val
+            write(*,*) 'c0', info%c0%val
+            write(*,*) 'L', info%L%val
+            write(*,*) 'L0', info%L0%val
+            write(*,*) 'grada', info%grada%val
+            write(*,*) 'gradL', info%gradL%val
             write(*,'(A)')
          !$OMP end critical (tdc_crit0)
          end if

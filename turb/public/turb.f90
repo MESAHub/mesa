@@ -106,6 +106,7 @@ module turb
       include 'formats'
 
       ! Pack TDC info
+      info%report = report
       info%mixing_length_alpha = mixing_length_alpha
       info%alpha_TDC_DAMP = alpha_TDC_DAMP
       info%alpha_TDC_DAMPR = alpha_TDC_DAMPR
@@ -125,7 +126,7 @@ module turb
       info%Hp = scale_height
 
       ! Get solution
-      call get_TDC_solution(info, report, scale, lower_bound_Z, upper_bound_Z, conv_vel, Y_face, ierr, ierr)
+      call get_TDC_solution(info, scale, lower_bound_Z, upper_bound_Z, conv_vel, Y_face, ierr, ierr)
 
       ! Unpack output
       gradT = Y_face + gradL
