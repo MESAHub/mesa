@@ -340,10 +340,5 @@ contains
       Y_face = unconvert(Y)
       tdc_num_iters = iter          
    end subroutine bracket_plus_Newton_search
-         
-
-
-
-
 
 end module tdc
