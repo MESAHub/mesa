@@ -92,6 +92,7 @@ module turb
             mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
       use tdc
+      use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1), intent(in) :: &
          L, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
@@ -99,10 +100,11 @@ module turb
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
+      real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -2d2
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
-
+      type(auto_diff_real_tdc) :: Zub, Zlb
       include 'formats'
 
       ! Pack TDC info
@@ -116,7 +118,7 @@ module turb
       info%gradL = convert(gradL)
       info%grada = convert(grada)
       info%c0 = convert(mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r))
-      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*kap)) ! assumes QHSE for dP/dm
+      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity)) ! assumes QHSE for dP/dm
       info%A0 = conv_vel_start/sqrt_2_div_3
       info%T = T
       info%rho = rho
@@ -126,7 +128,9 @@ module turb
       info%Hp = scale_height
 
       ! Get solution
-      call get_TDC_solution(info, scale, lower_bound_Z, upper_bound_Z, conv_vel, Y_face, ierr, ierr)
+      Zub = upper_bound_Z
+      Zlb = lower_bound_Z
+      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, ierr, ierr)
 
       ! Unpack output
       gradT = Y_face + gradL

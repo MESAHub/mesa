@@ -56,19 +56,23 @@ contains
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
    subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
-      real(dp), intent(in) :: scale, Zlb, Zub
+      type(tdc_info), intent(in) :: info
+      real(dp), intent(in) :: scale
+      type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
       
-      type(auto_diff_real_tdc) :: Af, Y, Z0, Z1, radY
-      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, Q0
+      logical :: Y_is_positive
+      type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
+      type(auto_diff_real_tdc) :: Q, Q0
       logical :: has_root
       integer :: iter
+      real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       integer, parameter :: max_iter = 30
       include 'formats'
 
       ierr = 0
-      if (mixing_length_alpha == 0d0 .or. dt <= 0d0) then
+      if (info%mixing_length_alpha == 0d0 .or. info%dt <= 0d0) then
          call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
       end if         
 
@@ -79,7 +83,8 @@ contains
       !
       ! If Q(Y=0) is negative then the luminosity can be carried by radiation alone, so we'll
       ! necessarily have Y < 0.
-      call compute_Q(info, 0d0, Q0, Af)
+      Y = 0d0
+      call compute_Q(info, Y, Q0, Af)
       if (Q0 > 0d0) then
          Y_is_positive = .true.
       else
@@ -89,17 +94,17 @@ contains
       ! Start down the chain of logic...
       if (Y_is_positive) then
          ! If Y > 0 then Q(Y) is monotone and we can jump straight to the search.
-         call bracket_plus_Newton_search(info, Y_is_positive, scale, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
+         call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
          if (ierr /= 0) return
       else
          ! If Y < 0 then Q(Y) is not guaranteed to be monotone, so we have to be more careful.
          ! One root we could have is the radiative solution (with Af==0), given by
-         radY = (L - L0 * gradL) / L0
+         radY = (info%L - info%L0 * info%gradL) / info%L0
 
          ! If A0 == 0 then, because Af(Y) is monotone-increasing in Y, we know that for Y < 0, Af(Y) = 0.
          ! As a result we can directly write down the solution and get just radY.
-         if (A0 == 0) then
-            Y_face = radY
+         if (info%A0 == 0) then
+            Y = radY
          else
             ! Otherwise, we keep going.
             ! We next identify the point where Af(Y) = 0. Call this Y0, corresponding to Z0.
@@ -113,22 +118,22 @@ contains
                Y1 = set_Y(.false., Z1)
                call compute_Q(info, Y1, Q, Af)
                if (Q < 0) then ! Means there are no roots with Af > 0.
-                  Y_face = radY
+                  Y = radY
                else
                   ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
-                  call bracket_plus_Newton_search(info, Y_is_positive, scale, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
+                  call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
                   if (ierr /= 0) then
                      ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
                      ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
-                     call bracket_plus_Newton_search(info, Y_is_positive, scale, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
+                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
                   end if
                end if
             else
                call compute_Q(info, Y0, Q, Af)
                if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
-                  call bracket_plus_Newton_search(info, Y_is_positive, scale, lower_bound_Z, Z0, Y_face, Af, tdc_num_iters, ierr)
+                  call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
                else ! Means there's no root in [Y0,0] so the only root is radY.
-                  Y_face = radY
+                  Y = radY
                end if
             end if
          end if
@@ -136,7 +141,8 @@ contains
 
 
       ! Process Y into the various outputs.
-      call compute_Q(info, Y_face, Q, Af)
+      call compute_Q(info, Y, Q, Af)
+      Y_face = unconvert(Y)
       conv_vel = sqrt_2_div_3*unconvert(Af)   
 
    end subroutine get_TDC_solution
@@ -156,8 +162,10 @@ contains
    subroutine bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
       type(tdc_info), intent(in) :: info
       logical, intent(in) :: Y_is_positive
-      real(dp), intent(in) :: scale, Zlb, Zub
-      type(auto_diff_real_star_order1),intent(out) :: Y_face, Af
+      real(dp), intent(in) :: scale
+      type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
+      type(auto_diff_real_star_order1),intent(out) :: Y_face
+      type(auto_diff_real_tdc), intent(out) :: Af
       integer, intent(out) :: tdc_num_iters, ierr
       
       type(auto_diff_real_tdc) :: Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
@@ -280,7 +288,6 @@ contains
             write(*,*) 'exp(Z)', exp(Z%val)
             write(*,*) 'Z', Z%val
             write(*,*) 'Af', Af%val
-            write(*,*) 'dAfdZ', Af%d1val1
             write(*,*) 'A0', info%A0%val
             write(*,*) 'c0', info%c0%val
             write(*,*) 'L', info%L%val
@@ -296,7 +303,7 @@ contains
       ! Unpack output
       Y_face = unconvert(Y)
       tdc_num_iters = iter          
-   end subroutine get_TDC_solution
+   end subroutine bracket_plus_Newton_search
          
 
    !> Q is the residual in the TDC equation, namely:
@@ -315,7 +322,7 @@ contains
 
       call eval_xis(info, Y, xi0, xi1, xi2)          
 
-      Af = eval_Af(dt, A0, xi0, xi1, xi2)
+      Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
       Q = (info%L - info%L0*info%gradL) - (info%L0 + info%c0*Af)*Y
 
    end subroutine compute_Q
@@ -364,11 +371,8 @@ contains
       gammar_div_alfa = info%alpha_TDC_DAMPR*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
       Pt0 = info%alpha_TDC_PtdVdt*x_ALFAP*info%rho
-      if (dt > 0) then
-         dVdt = info%dV/info%dt
-      else
-         dVdt = 0d0
-      end if
+      dVdt = info%dV/info%dt
+
       xi0 = S0
       xi1 = -(DR0 + convert(Pt0*dVdt))
       xi2 = -D0
