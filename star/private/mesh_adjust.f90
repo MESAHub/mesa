@@ -239,15 +239,6 @@
             if (failed('do_Hp_face')) return
          end if
 
-         if (s% conv_vel_flag) then
-            if (dbg) write(*,*) 'call do_conv_vel'
-            call do_conv_vel( &
-               s, nz, nz_old, nzlo, nzhi, comes_from, &
-               xh, xh_old, xq, xq_old_plus1, xq_new, &
-               work, tmp1, tmp2, ierr)
-            if (failed('do_conv_vel')) return
-         end if
-
          if (s% rotation_flag) then
             call adjust_omega(s, nz, nz_old, comes_from, &
                xq_old, xq, dq_old, dq, xh, j_rot_old, &
@@ -770,65 +761,6 @@
          end if
 
       end subroutine do_L
-
-
-      subroutine do_conv_vel( &
-            s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
-            xq, xq_old_plus1, xq_new, work, cv_old_plus1, cv_new, ierr)
-         use interp_1d_def
-         use interp_1d_lib
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
-         real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: work
-         real(dp), dimension(:) :: &
-            xq, xq_old_plus1, cv_old_plus1, cv_new, xq_new
-         integer, intent(out) :: ierr
-
-         integer :: n, i_ln_cvpv0, k
-
-         include 'formats'
-
-         ierr = 0
-         i_ln_cvpv0 = s% i_ln_cvpv0
-         if (i_ln_cvpv0 == 0) return
-         n = nzhi - nzlo + 1
-
-         do k=1,nz_old
-            cv_old_plus1(k) = max(0d0,exp(xh_old(i_ln_cvpv0,k))-s% conv_vel_v0)
-         end do
-         cv_old_plus1(nz_old+1) = cv_old_plus1(nz_old)
-
-         call interpolate_vector( &
-               nz_old+1, xq_old_plus1, n, xq_new, &
-               cv_old_plus1, cv_new, interp_pm, nwork, work, &
-               'mesh_adjust do_conv_vel', ierr)
-         if (ierr /= 0) then
-            return
-
-            write(*,*) 'interpolate_vector failed in do_conv_vel for remesh'
-            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_conv_vel')
-         end if
-
-         do k=nzlo,nzhi
-            xh(i_ln_cvpv0,k) = log(cv_new(k+1-nzlo)+s% conv_vel_v0)
-         end do
-
-         n = nzlo - 1
-         if (n > 0) then
-            do k=1,n
-               xh(i_ln_cvpv0,k) = xh_old(i_ln_cvpv0,k)
-            end do
-         end if
-
-         if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
-            do k=0,n
-               xh(i_ln_cvpv0,nz-k) = xh_old(i_ln_cvpv0,nz_old-k)
-            end do
-         end if
-
-      end subroutine do_conv_vel
 
 
       subroutine do_alpha_RTI( &

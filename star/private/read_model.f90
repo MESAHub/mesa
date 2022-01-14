@@ -84,6 +84,7 @@
          use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
+         use brunt, only: do_brunt_B, do_brunt_N2
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
@@ -117,7 +118,10 @@
                !   call set_i_rot_from_omega_and_j_rot(s)
                !else
                   ! need to set w_div_w_crit_roche as well
-                  call use_xh_to_update_i_rot(s)
+               call use_xh_to_update_i_rot(s)
+               do k=1, s% nz
+                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
+               end do
                !end if
             else
                ! need to recompute irot and jrot
@@ -139,6 +143,7 @@
          s% eps_mdot(1:nz) = 0
          call fill_ad_with_zeros(s% eps_grav_ad,1,-1)
          s% ergs_error(1:nz) = 0
+         if (.not. restart) s% have_ST_start_info = .false.
          if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
@@ -177,6 +182,19 @@
          end if
 
          s% doing_finish_load_model = .true.
+
+         if(s% calculate_Brunt_B) call do_brunt_B(s, 1, s%nz, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'finish_load_model: failed in do_brunt_b'
+            return
+         end if
+
+         if(s% calculate_Brunt_N2) call do_brunt_N2(s, 1, s%nz, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'finish_load_model: failed in do_brunt_N2'
+            return
+         end if
+
          call do_report(s, ierr)
          s% doing_finish_load_model = .false.
          if (ierr /= 0) then
@@ -334,7 +352,6 @@
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          s% RSP_flag = BTEST(file_type, bit_for_RSP)
          s% RSP2_flag = BTEST(file_type, bit_for_RSP2)
-         s% have_mlt_vc = BTEST(file_type, bit_for_mlt_vc)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
          
          if (BTEST(file_type, bit_for_lnPgas)) then

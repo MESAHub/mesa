@@ -33,96 +33,45 @@
      ! stopping conditions
 
          ! limit max_model_number as part of test_suite
-         max_model_number = 1000
+         max_model_number = 6000
 
          xa_central_lower_limit_species(1) = 'he4'
          xa_central_lower_limit(1) = 0.7                       
       
          dX_mix_dist_limit = 1d-4 
 
-      ! timestep limits
 
-         dX_nuc_drop_max_A_limit = 52
-         dX_nuc_drop_min_X_limit = 1d-4
-         dX_nuc_drop_limit = 5d-3
-         dX_nuc_drop_hard_limit = 1d99
-         
-         delta_lgRho_cntr_limit = 0.01
-         delta_lgRho_cntr_hard_limit = 0.02
+! time resolution
 
-         delta_lgT_cntr_limit = 0.01
-         delta_lgT_cntr_hard_limit = 0.02
+      dX_nuc_drop_max_A_limit = 52
+      dX_nuc_drop_min_X_limit = 1d-4
+      dX_nuc_drop_limit = 5d-3
+      dX_nuc_drop_hard_limit = 1d99
 
-         delta_lgTeff_limit = 0.01
-         delta_lgTeff_hard_limit = 0.02
+      delta_lgRho_cntr_limit = 0.001       ! default 0.05d0   old 0.01
+      delta_lgRho_cntr_hard_limit = 0.01   ! default -1       old 0.02
 
-         delta_lgL_limit = 0.1
-         delta_lgL_hard_limit = 0.2
+      delta_lgT_cntr_limit = 0.001         ! default 0.01d0    old 0.01
+      delta_lgT_cntr_hard_limit = 0.01     ! default -1        old 0.02
 
-         delta_XH_cntr_limit = 0.005d0
-         delta_XH_cntr_hard_limit = 0.01d0
+      delta_lgTeff_limit = 0.01
+      delta_lgTeff_hard_limit = 0.02
 
-         delta_XHe_cntr_limit = 0.005d0
-         delta_XHe_cntr_hard_limit = 0.01d0
+      delta_lgL_limit = 0.1
+      delta_lgL_hard_limit = 0.2
 
-         delta_lgL_nuc_limit = 0.1
-         delta_lgL_nuc_hard_limit = 0.2
+      delta_XH_cntr_limit = 0.005d0
+      delta_XH_cntr_hard_limit = 0.01d0
 
-      ! mesh resolution
+      delta_XHe_cntr_limit = 0.005d0
+      delta_XHe_cntr_hard_limit = 0.01d0
 
-         mesh_dlog_pp_dlogP_extra = 0.15
-         mesh_dlog_cno_dlogP_extra = 0.15
-      
-         mesh_dlog_3alf_dlogP_extra = 0.15
-         mesh_dlog_burn_c_dlogP_extra = 0.15
-         
-         mesh_dlog_burn_n_dlogP_extra = 0.15
-         mesh_dlog_burn_o_dlogP_extra = 0.15
-      
-         mesh_dlog_burn_ne_dlogP_extra = 0.15
-         
-         mesh_dlog_burn_na_dlogP_extra = 0.15
-         mesh_dlog_burn_mg_dlogP_extra = 0.15
-         
-         mesh_dlog_cc_dlogP_extra = 0.15
-         mesh_dlog_co_dlogP_extra = 0.15
-         
-         mesh_dlog_oo_dlogP_extra = 0.15
-         
-         mesh_dlog_burn_si_dlogP_extra = 0.15
-         mesh_dlog_burn_s_dlogP_extra = 0.15
-         mesh_dlog_burn_ar_dlogP_extra = 0.15
-         mesh_dlog_burn_ca_dlogP_extra = 0.15
-         mesh_dlog_burn_ti_dlogP_extra = 0.15
-         mesh_dlog_burn_cr_dlogP_extra = 0.15
-         mesh_dlog_burn_fe_dlogP_extra = 0.15
-         
-         mesh_dlog_pnhe4_dlogP_extra = 0.15
-         mesh_dlog_other_dlogP_extra = 0.15
-         mesh_dlog_photo_dlogP_extra = 1
-         
-         
-         xa_function_species(1) = 'ne20'
-   	 xa_function_weight(1) = 20
-   	 xa_function_param(1) = 1d-2
-         
-         xa_function_species(1) = 'si28'
-   	 xa_function_weight(1) = 20
-   	 xa_function_param(1) = 1d-2
-         
-         xa_function_species(1) = 's32'
-   	 xa_function_weight(1) = 20
-   	 xa_function_param(1) = 1d-2
-         
-         xa_function_species(1) = 'fe54'
-   	 xa_function_weight(1) = 20
-   	 xa_function_param(1) = 1d-2
-         
-         xa_function_species(1) = 'fe56'
-   	 xa_function_weight(1) = 20
-   	 xa_function_param(1) = 1d-2
+      delta_lgL_nuc_limit = 0.1
+      delta_lgL_nuc_hard_limit = 0.2
 
-         T_mix_limit = 1d4
+! output
+
+      photo_interval    = 100
 
 / ! end of controls namelist
 

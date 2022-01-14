@@ -240,6 +240,9 @@
          nullify(s% prev_mesh_omega)
          nullify(s% prev_mesh_dq)
 
+         nullify(s% D_ST_start)
+         nullify(s% prev_mesh_D_ST_start)
+
          nullify(s% other_star_info)
 
          nullify(s% bcyclic_odd_storage)
@@ -504,7 +507,6 @@
          s% u_flag = .false.
          s% rotation_flag = .false.
          s% RTI_flag = .false.
-         s% conv_vel_flag = .false.
          s% w_div_wc_flag = .false.
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.
@@ -518,10 +520,12 @@
          s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
          s% have_mlt_vc = .false.
 
+         s% have_ST_start_info = .false.
+         s% prev_mesh_have_ST_start_info = .false.
+
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
          s% mstar_dot = 0
-         s% gradT_excess_alpha_old = 0
          s% surf_lnS = 0
 
          s% termination_code = -1

@@ -10,10 +10,11 @@ do_one split_burn_big_net "stop because have dropped below central lower limit f
 do_one 12M_pre_ms_to_core_collapse "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one 20M_pre_ms_to_core_collapse "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one zams_to_cc_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-do_one dev_to_ppisn_100 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one pisn "termination code: Star is unbound" "final.mod" skip
+do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
 
 # Slow cases
+do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" x150
 do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
 do_one ccsn_IIp "shock has reached target location    1" "shock_part5.mod" auto
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
@@ -36,6 +37,7 @@ do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limi
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
+do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
 
 do_one gyre_in_mesa_bcep "matched target" skip skip
 do_one gyre_in_mesa_envelope "matched target" skip skip
@@ -96,11 +98,9 @@ do_one wd_nova_burst "have finished burst" "final.mod" auto
 do_one wd_stable_h_burn "stop because star_mass >= star_mass_max_limit" "final.mod" auto
 do_one high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 
+
 return
 
-
-#   Pablo needs to fix   do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-#    broken without conv_vel      do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
 
 #  off while testing.    do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
 #  off while testing.    do_one dev_BW_Vul_pulses "good match for period" "final.mod" skip   
@@ -116,8 +116,3 @@ return
 #  off while testing.    do_one dev_rsp2_Delta_Scuti "good match for period" "final.mod" auto 
 #  off while testing.    do_one dev_rsp2_RR_Lyrae "good match for period" "final.mod" auto   
 #  off while testing.    do_one dev_rsp2_Type_II_Cepheid "good match for period" "final.mod" auto   
-
-#  Adam says to skip this one for now. If someone decides to care about the physics it tests (rotation & magnetism) they should reenable it.
-#  The issue is that this one can easily fall outside the test tolerances but we have no idea where those tolerances come from or what that
-#  failure means physically.
-# do_one 15M_dynamo "all values are within tolerances" "final.mod" auto

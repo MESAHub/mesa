@@ -729,10 +729,15 @@
          end if
          
          if (max_abs_vel > clight) then
-            write(*, '(/,a,/, I5,1X,2e20.10)') &
-               'retry because maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
-            do_check_limits = retry
-            return
+            if (s% retry_for_v_above_clight) then 
+               write(*, '(/,a,/, I5,1X,2e20.10)') &
+                  'retry because maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
+               do_check_limits = retry
+               return
+            else
+               write(*, '(/,a,/, I5,1X,2e20.10)') &
+                  'Warning: maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
+            end if
          end if
 
          if (peak_burn_vconv_div_cs > 0.75d0*s% peak_burn_vconv_div_cs_limit) then

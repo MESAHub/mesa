@@ -149,7 +149,34 @@ def check_history():
         "Values that are in are in history.f90 but not in history_columns.list"
     )
 
-    print_options(vals_history - vals_history_list)
+    known_false_positives = {
+        "C_cntr",
+        "Fe_core",
+        "H_cntr",
+        "H_rich",
+        "He_cntr",
+        "He_core",
+        "Mass",
+        "N_cntr",
+        "Ne_cntr",
+        "O_cntr",
+        "Si_cntr",
+        "ejecta_M",
+        "eta_cntr",
+        "gam_cntr",
+        "lg_Dsurf",
+        "lg_Lneu",
+        "lg_Lnuc",
+        "lg_Lphoto",
+        "lg_Mdot",
+        "remnant_M",
+        "retries",
+        "star_age_yr",
+        "v_div_cs",
+        "zones",
+    }
+
+    print_options(vals_history - vals_history_list - known_false_positives)
 
     # Values that are in are in history_columns.list but not in history.f90
     print_section(

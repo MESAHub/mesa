@@ -486,6 +486,7 @@
       real(dp), pointer :: brunt_B(:) ! (at points)
          ! this is the Brassard et al B := -(chiY/chiT)*(dlnY/dlnP)
       real(dp), pointer :: unsmoothed_brunt_B(:) ! pre-smoothing
+      real(dp), pointer :: smoothed_brunt_B(:) ! with smoothing applied for gradL
          
          
       ! asteroseismology info
@@ -514,7 +515,6 @@
          real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
          real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
          real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
-         real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
 

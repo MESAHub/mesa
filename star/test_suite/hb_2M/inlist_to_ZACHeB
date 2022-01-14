@@ -44,7 +44,7 @@
       use_Ledoux_criterion = .true.
      
       mixing_length_alpha = 1.8d0
-      MLT_option = 'TDC'
+      MLT_option = 'Cox'
 
       predictive_mix(1) = .true.
       predictive_zone_type(1) = 'any'

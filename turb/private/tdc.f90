@@ -112,6 +112,8 @@ contains
    !! @param scale_height The pressure scale-height (cm).
    !! @param gradL The Ledoux temperature gradient dlnT/dlnP
    !! @param grada The adiabatic temperature gradient dlnT/dlnP|s
+   !! @param Zlb Lower bound on Z.
+   !! @param Zub Upper bound on Z.
    !! @param conv_vel The convection speed (cm/s).
    !! @param D The chemical diffusion coefficient (cm^2/s).
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
@@ -120,8 +122,8 @@ contains
    !! @param ierr Tracks errors (output).
    subroutine get_TDC_solution( &
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-         mixing_type, scale, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, conv_vel, Y_face, tdc_num_iters, ierr)
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
+         mixing_type, scale, L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, Zlb, Zub
       type(auto_diff_real_star_order1), intent(in) :: &
          L_in, r, P, T, rho, dV, Cp, kap, Hp, gradL_in, grada_in
       logical, intent(in) :: report
@@ -129,7 +131,7 @@ contains
       integer, intent(out) :: mixing_type, tdc_num_iters, ierr
       
       type(auto_diff_real_tdc) :: L, A0, c0, L0, Af, Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
-      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, gradL, grada
+      type(auto_diff_real_tdc) :: dQdZ, prev_dQdZ, gradL, grada, Q0
       integer :: iter, line_iter, i
       logical :: converged, Y_is_positive, first_Q_is_positive, have_derivatives, corr_has_derivatives
       real(dp), parameter :: bracket_tolerance = 1d0
@@ -162,16 +164,16 @@ contains
       ! necessarily have Y < 0.
       Y = 0d0
       call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
-         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q, Af)
-      if (Q > 0d0) then
+         Y, c0, L, L0, A0, T, rho, dV, Cp, kap, Hp, gradL, grada, Q0, Af)
+      if (Q0 > 0d0) then
          Y_is_positive = .true.
       else
          Y_is_positive = .false.
       end if
 
       ! We start by bisecting to find a narrow interval around the root.
-      lower_bound_Z = -200d0
-      upper_bound_Z = 100d0 
+      lower_bound_Z = Zlb
+      upper_bound_Z = Zub
 
       Y = set_Y(Y_is_positive, lower_bound_Z)
       call compute_Q(mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, &
@@ -184,20 +186,18 @@ contains
       ! Check to make sure that the lower and upper bounds on Z actually bracket
       ! a solution to Q(Y(Z)) = 0.
       if (Q_lb * Q_ub > 0d0) then
+         if (report) then
             write(*,*) 'TDC Error. Initial Z window does not bracket a solution.'
             write(*,*) 'Q(Lower Z)',Q_lb%val
             write(*,*) 'Q(Upper Z)',Q_ub%val
-            write(*,*) 'Q(Y=0)', Q%val
+            write(*,*) 'Q(Y=0)', Q0%val
             write(*,*) 'scale', scale
-            write(*,*) 'Q/scale', Q%val/scale
+            write(*,*) 'Q/scale', Q0%val/scale
             write(*,*) 'tolerance', residual_tolerance
-            write(*,*) 'dQdZ', dQdZ%val
             write(*,*) 'Y', Y%val
             write(*,*) 'dYdZ', Y%d1val1
             write(*,*) 'exp(Z)', exp(Z%val)
             write(*,*) 'Z', Z%val
-            write(*,*) 'Af', Af%val
-            write(*,*) 'dAfdZ', Af%d1val1
             write(*,*) 'A0', A0%val
             write(*,*) 'c0', c0%val
             write(*,*) 'L', L%val
@@ -205,6 +205,7 @@ contains
             write(*,*) 'grada', grada%val
             write(*,*) 'gradL', gradL%val
             write(*,'(A)')
+         end if
          ierr = 1
          return
       end if
@@ -333,7 +334,7 @@ contains
          !$OMP critical (tdc_crit0)
             write(*,*) 'failed get_TDC_solution TDC_iter', &
                iter
-            write(*,*) 'Q(Y=0)', Q%val
+            write(*,*) 'Q(Y=0)', Q0%val
             write(*,*) 'scale', scale
             write(*,*) 'Q/scale', Q%val/scale
             write(*,*) 'tolerance', residual_tolerance

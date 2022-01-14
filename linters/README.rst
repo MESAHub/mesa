@@ -18,6 +18,12 @@ This script checks that the history and profile code and the
 ``*_columns.list`` files are in sync. It can also check the column files
 in the test_suite if enabled in the source code.
 
+check_defaults.py
+-----------------
+
+This script checks that the controls and star_job defaults, the
+``*_controls.inc``, and ``*_io.f90`` files are in sync. 
+
 check_pgstar.py
 ----------------
 
@@ -76,7 +82,19 @@ write is to a unit). Unformatted writes are non-portable and can cause issues wi
 check_omp_critical.py
 ---------------------
 
-Checks all .f90 files for unamed critical blocks. WHen criticla blocks are unnamed they acts as one block
+Checks all .f90 files for unamed critical blocks. When critical blocks are unnamed they acts as one block
 thus each must be run seperatly. When critical blocks are named they can each be run in parrallel improving 
 perfomance.
 
+
+update_columns.py
+-----------------
+
+Copies the history and profile default columns file into each test case while preserving enabled
+options in each test case
+
+
+fix_inlists.py
+--------------
+
+Fixes various controls in the test_suite inlists that should not be enabled by default.

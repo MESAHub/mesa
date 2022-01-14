@@ -2,8 +2,62 @@
 
 import os
 import re
+from collections.abc import MutableSet
 
 MESA_DIR = "../"
+
+class CaseInsensitiveSet(MutableSet):
+    def __init__(self, iterable):
+        self._values = {}
+        self._fold = str.casefold
+        for v in iterable:
+            self.add(v)
+
+    def __repr__(self):
+        return repr(self._values.values())
+
+    def __contains__(self, value):
+        return self._fold(value) in self._values
+
+    def __iter__(self):
+        return iter(self._values.values())
+
+    def __len__(self):
+        return len(self._values)
+
+    def add(self, value):
+        self._values[self._fold(value)] = value
+
+    def discard(self, value):
+        v = self._fold(value)
+        if v in self._values:
+            del self._values[v]
+
+
+known_false_positives = {
+    "max_years_for_timestep",
+    "history_names_dict",
+    "report_ierr",
+    "Tsurf_factor",
+    "other_photo_read",
+    "job",
+    "tau_factor",
+    "opacity_factor",
+    "binary_id",
+    "chem_id",
+    "pgstar_hist",
+    "profile_column_spec",
+    "history_values",
+    "nameofequ",
+    "nameofvar",
+    "net_iso",
+    "model_profile_filename",
+    "include_binary_history_in_log_file",
+    "i_dj_rot_dt", # Shadows s% i_j_rot
+    "i_equ_w_div_wc", # Shadows s% i_w_div_wc
+    "have_j_rot", # Set from s% rotation_flag
+    "nz_old",
+}
 
 
 def print_section(header):
@@ -25,7 +79,7 @@ def get_star_info_variables(filename):
     with open(os.path.join(MESA_DIR, filename)) as f:
         source = f.read()
 
-    return set(re.findall(regexp, source))
+    return CaseInsensitiveSet(re.findall(regexp, source))
 
 
 def get_photo_in_variables():
@@ -33,17 +87,6 @@ def get_photo_in_variables():
 
     filename = "star/private/photo_in.f90"
     v = get_star_info_variables(filename)
-
-    known_false_positives = {
-        "max_years_for_timestep",
-        "history_names_dict",
-        "report_ierr",
-        "Tsurf_factor",
-        "other_photo_read",
-        "job",
-        "tau_factor",
-        "opacity_factor",
-    }
 
     return v - known_false_positives
 
@@ -110,7 +153,7 @@ def get_star_data_set_input_variables():
         if m is not None:
             final_list.append(m.group(0))
 
-    return set(final_list)
+    return CaseInsensitiveSet(final_list) - known_false_positives
 
 
 def check_in_out():

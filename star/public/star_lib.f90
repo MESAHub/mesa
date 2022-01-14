@@ -807,14 +807,6 @@
          call set_RTI_flag(id, RTI_flag, ierr)
       end subroutine star_set_RTI_flag
 
-      subroutine star_set_conv_vel_flag(id, conv_vel_flag, ierr)
-         use set_flags, only: set_conv_vel_flag
-         integer, intent(in) :: id
-         logical, intent(in) :: conv_vel_flag
-         integer, intent(out) :: ierr
-         call set_conv_vel_flag(id, conv_vel_flag, ierr)
-      end subroutine star_set_conv_vel_flag
-
       subroutine star_set_w_div_wc_flag(id, w_div_wc_flag, ierr)
          use set_flags, only: set_w_div_wc_flag
          integer, intent(in) :: id
@@ -1723,6 +1715,13 @@
          if (ierr /= 0) return
          call set_vars(s, dt, ierr)
       end subroutine star_set_vars
+
+
+      subroutine star_set_power_info(s)
+         use report, only: set_power_info
+         type (star_info), pointer :: s
+         call set_power_info(s)
+      end subroutine star_set_power_info
       
       
       subroutine save_profile(id, priority, ierr)

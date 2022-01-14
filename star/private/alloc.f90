@@ -384,6 +384,8 @@
          if (failed('xh_old')) return
          call do2D(s, s% xa_old, species, nz, action, ierr)
          if (failed('xa_old')) return
+         call do1D(s, s% q_old, nz, action, ierr)
+         if (failed('q_old')) return
          call do1D(s, s% dq_old, nz, action, ierr)
          if (failed('dq_old')) return
          call do1D(s, s% mlt_vc_old, nz, action, ierr)
@@ -609,8 +611,6 @@
             if (failed('dxh_u')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
-            call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
-            if (failed('dxh_ln_cvpv0')) exit
 
             call do1(s% dudt_RTI, c% dudt_RTI)
             if (failed('dudt_RTI')) exit
@@ -813,6 +813,12 @@
             if (failed('dynamo_B_r')) exit
             call do1(s% dynamo_B_phi, c% dynamo_B_phi)
             if (failed('dynamo_B_phi')) exit
+
+            !for ST time smoothing
+            call do1(s% D_ST_start, c% D_ST_start)
+            if (failed('D_ST_start')) exit
+            call do1(s% nu_ST_start, c% nu_ST_start)
+            if (failed('nu_ST_start')) exit
 
             call do1(s% opacity, c% opacity)
             if (failed('opacity')) exit
@@ -1113,6 +1119,8 @@
             if (failed('brunt_B')) exit
             call do1(s% unsmoothed_brunt_B, c% unsmoothed_brunt_B)
             if (failed('unsmoothed_brunt_B')) exit
+            call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
+            if (failed('smoothed_brunt_B')) exit
             
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
@@ -1375,6 +1383,11 @@
             if (failed('prev_mesh_mlt_vc')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
+            ! These are needed for time-smoothing of ST mixing
+            call do1(s% prev_mesh_D_ST_start, c% prev_mesh_D_ST_start)
+            if (failed('prev_mesh_D_ST_start')) exit
+            call do1(s% prev_mesh_nu_ST_start, c% prev_mesh_nu_ST_start)
+            if (failed('prev_mesh_nu_ST_start')) exit
 
             if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
             return
@@ -2337,12 +2350,6 @@
             s% i_Hp = 0
          end if
 
-         if (s% conv_vel_flag) then
-            i = i+1; s% i_ln_cvpv0 = i
-         else
-            s% i_ln_cvpv0 = 0
-         end if
-
          if (s% w_div_wc_flag) then
             i = i+1; s% i_w_div_wc = i
          else
@@ -2378,7 +2385,6 @@
          s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
-         s% i_dln_cvpv0_dt = s% i_ln_cvpv0
          s% i_equ_w_div_wc = s% i_w_div_wc
          s% i_dj_rot_dt = s% i_j_rot
 
@@ -2397,7 +2403,6 @@
          if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
-         if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
          if (s% i_w_div_wc /= 0) s% nameofvar(s% i_w_div_wc) = 'w_div_wc'
          if (s% i_j_rot /= 0) s% nameofvar(s% i_j_rot) = 'j_rot'
          if (s% i_u /= 0) s% nameofvar(s% i_u) = 'u' 
@@ -2414,7 +2419,6 @@
          if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
-         if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
          if (s% i_equ_w_div_wc /= 0) s% nameofequ(s% i_equ_w_div_wc) = 'equ_w_div_wc'
          if (s% i_dj_rot_dt /= 0) s% nameofequ(s% i_dj_rot_dt) = 'dj_rot_dt'
          if (s% i_du_dt /= 0) s% nameofequ(s% i_du_dt) = 'du_dt'

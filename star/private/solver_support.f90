@@ -286,12 +286,6 @@
                end do
             end do
          end if
-         if (s% conv_vel_flag) then
-            do k = 1, nz
-               j = s% i_dln_cvpv0_dt
-               absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-            end do
-         end if
 
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
@@ -639,7 +633,7 @@
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
          integer :: id, i, j, k, nz, species, bad_j, bad_k, &
-            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc
+            i_alpha_RTI, i_w_div_wc
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
             old_E, dE, new_E, old_lnd, dlnd, new_lnd, dw, new_w, &
             dw_div_wc, old_w_div_wc, new_w_div_wc, dconv_vel, old_conv_vel, new_conv_vel, &
@@ -655,20 +649,6 @@
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)
-
-         if (s% conv_vel_flag) then ! clip change in conv_vel to maintain non-negativity.
-            log_conv_vel_v0 = log(s% conv_vel_v0)
-            i_ln_cvpv0 = s% i_ln_cvpv0
-            !note that dconv_vel and others refers to changes in ln(conv_vel+v0)
-            do k = 1, s% nz
-               dconv_vel = B(i_ln_cvpv0,k)*s% x_scale(i_ln_cvpv0,k)*correction_factor
-               old_conv_vel = s% xh_start(i_ln_cvpv0,k) + s% solver_dx(i_ln_cvpv0,k)
-               new_conv_vel = old_conv_vel + dconv_vel
-               if (new_conv_vel >= log_conv_vel_v0) cycle
-               dconv_vel = -old_conv_vel + log_conv_vel_v0
-               B(i_ln_cvpv0,k) = dconv_vel/(s% x_scale(i_ln_cvpv0,k)*correction_factor)
-            end do
-         end if
 
          if (s% i_lum>=0 .and. s% scale_max_correction_for_negative_surf_lum) then
             !ensure surface luminosity does not become negative
@@ -868,7 +848,7 @@
          logical :: do_chem, try_again, do_edit_lnR, report_dx
          integer :: i, j, k, kk, klo, khi, i_var, &
             i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Hp, i_v, &
-            i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
+            i_u, i_alpha_RTI, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
          integer :: op_err, kbad, &
@@ -876,7 +856,7 @@
          real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
          logical :: do_lnd, do_lnT, do_lnR, do_lum, do_w, &
-            do_u, do_v, do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot
+            do_u, do_v, do_alpha_RTI, do_w_div_wc, do_j_rot
 
          include 'formats'
 
@@ -931,7 +911,6 @@
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
-         i_ln_cvpv0 = s% i_ln_cvpv0
          i_w_div_wc = s% i_w_div_wc
          i_j_rot = s% i_j_rot
 
@@ -943,7 +922,6 @@
          do_v = i_v > 0 .and. i_v <= nvar
          do_u = i_u > 0 .and. i_u <= nvar
          do_alpha_RTI = i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar
-         do_conv_vel = i_ln_cvpv0 > 0 .and. i_ln_cvpv0 <= nvar
          do_w_div_wc = i_w_div_wc > 0 .and. i_w_div_wc <= nvar
          do_j_rot = i_j_rot > 0 .and. i_j_rot <= nvar
 
@@ -1303,25 +1281,6 @@
                if (s% alpha_RTI(k) < 0d0) then
                   s% alpha_RTI(k) = 0d0
                   x(i_alpha_RTI) = 0d0
-               end if
-            end if
-
-            if (do_conv_vel) then
-               s% dxh_ln_cvpv0(k) = s% solver_dx(i_ln_cvpv0,k)
-               s% conv_vel(k) = max(0d0, exp(x(i_ln_cvpv0))-s% conv_vel_v0)
-               if (s% conv_vel(k) > 1d90 .or. is_bad_num(s% conv_vel(k))) then
-                  s% retry_message = 'bad num for conv_vel'
-                  if (s% stop_for_bad_nums) then
-                     write(*,2) 'set_vars_for_solver conv_vel', k, s% conv_vel(k)
-                     call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
-                  end if
-                  if (report) write(*,2) 'bad num conv_vel', k, s% conv_vel(k)
-                  ierr = -1
-               end if
-               if (s% conv_vel(k) < 0d0) then
-                  s% conv_vel(k) = 0d0
-                  x(i_ln_cvpv0) = log(s% conv_vel_v0)
-                  s% dxh_ln_cvpv0(k) = x(i_ln_cvpv0) - xh_start(i_ln_cvpv0,k)
                end if
             end if
 

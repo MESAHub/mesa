@@ -101,7 +101,7 @@
   convergence_ignore_equL_residuals = .true.
 
 ! output controls
-  terminal_interval = 5
+  terminal_interval = 10 
   write_header_frequency = 10
   terminal_show_age_units = 'seconds'
   photo_interval = 10

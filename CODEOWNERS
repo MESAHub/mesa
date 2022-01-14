@@ -65,7 +65,6 @@ star/test_suite/custom_colors @rjfarmer
 star/test_suite/custom_rates @evbauer @adamjermyn @fxt
 star/test_suite/high_rot_darkening @orlox
 star/test_suite/dev_ppisn @rjfarmer
-star/test_suite/dev_to_ppisn_100 @rjfarmer
 star/test_suite/diffusion_smoothness @fxt
 star/test_suite/extended_convective_penetration @fxt
 star/test_suite/gyre_in_mesa_bcep @rhdtownsend @annethoul

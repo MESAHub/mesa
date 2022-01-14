@@ -40,6 +40,8 @@ mesa-developers@lists.mesastar.org lists are hosted by `MailmanLists
 Frank who pays the hosting fees (through grants at ASU).
 This costs about $100/year.
 
+New account signups are handled by Frank, Aaron, and Rob.
+
 Marketplace
 ^^^^^^^^^^^
 
@@ -52,7 +54,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__.  Rich controls the account.  This is
+<https://readthedocs.org/>`__.  Rich controls the account (and Rob has access to it).  This is
 currently free for open source software.
 
 

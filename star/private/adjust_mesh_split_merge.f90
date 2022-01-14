@@ -485,6 +485,7 @@
          integer, intent(out) :: ierr
          logical :: merge_center
          integer :: i, ip, i0, im, k, q, nz, qi_max, qim_max, op_err
+         real(dp) :: max_lgT_diff, max_lgrho_diff
          real(dp) :: &
             rR, rL, drR, drL, rC, rho, P, v, &
             dm, dm_i, dm_ip, m_old, star_PE0, star_PE1, &
@@ -504,8 +505,9 @@
          star_PE0 = get_star_PE(s)
          nz = s% nz
 
-         s% num_hydro_merges = s% num_hydro_merges+1
          i = i_merge
+
+         s% num_hydro_merges = s% num_hydro_merges+1
          if (i > 1 .and. i < s% nz) then
             ! don't merge across change in most abundance species
             qi_max = maxloc(s% xa(1:species,i), dim=1)

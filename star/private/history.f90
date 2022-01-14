@@ -482,10 +482,14 @@
             else if (pass == 2) then
                call do_name(j + col_offset, extra_col_names(j))
             else if (pass == 3) then
-               int_val = int(extra_col_vals(j))
-               if (abs(extra_col_vals(j) - dble(int_val)) < &
-                     1d-10*max(1d-10,abs(extra_col_vals(j)))) then
-                  call do_int_val(j + col_offset, int_val)
+               if (abs(extra_col_vals(j)) < huge(int_val))then 
+                  int_val = int(extra_col_vals(j))
+                  if (abs(extra_col_vals(j) - dble(int_val)) < &
+                        1d-10*max(1d-10,abs(extra_col_vals(j)))) then
+                     call do_int_val(j + col_offset, int_val)
+                  else
+                     call do_val(j + col_offset, extra_col_vals(j))
+                  end if
                else
                   call do_val(j + col_offset, extra_col_vals(j))
                end if
@@ -2767,12 +2771,8 @@
                if (s% RSP_flag) val = s% rsp_DeltaR
             case(h_RSP_DeltaMag)
                if (s% RSP_flag) val = s% rsp_DeltaMag
-            case(h_RSP_GRPDV)
-               if (s% RSP_flag) val = s% rsp_GRPDV
             case(h_RSP_GREKM)
                if (s% RSP_flag) val = s% rsp_GREKM
-            case(h_RSP_GREKM_avg_abs)
-               if (s% RSP_flag) val = s% rsp_GREKM_avg_abs
 
             case(h_RSP_phase)
                if (s% RSP_flag) val = (s% time - rsp_phase_time0())/s% RSP_period
@@ -2781,19 +2781,6 @@
             case(h_RSP_num_periods)
                if (s% RSP_flag) int_val = s% RSP_num_periods
                is_int_val = .true.
-
-            case(h_RSP_LINA_period_F_days)
-               if (s% RSP_flag) val = s% rsp_LINA_periods(1)/86400.d0
-            case(h_RSP_LINA_period_O1_days)
-               if (s% RSP_flag) val = s% rsp_LINA_periods(2)/86400.d0
-            case(h_RSP_LINA_period_O2_days)
-               if (s% RSP_flag) val = s% rsp_LINA_periods(3)/86400.d0
-            case(h_RSP_LINA_growth_rate_F)
-               if (s% RSP_flag) val = s% rsp_LINA_growth_rates(1)
-            case(h_RSP_LINA_growth_rate_O1)
-               if (s% RSP_flag) val = s% rsp_LINA_growth_rates(2)
-            case(h_RSP_LINA_growth_rate_O2)
-               if (s% RSP_flag) val = s% rsp_LINA_growth_rates(3)
 
             case(h_grav_dark_L_polar) ! pole is at inclination = 0
                if(s% rotation_flag) then
@@ -2886,6 +2873,9 @@
             case(h_C_cntr)
                val = s% center_c12
 
+            case(h_phase_of_evolution)
+               int_val = s% phase_of_evolution
+               is_int_val = .true.
 
             case(h_zones)
                int_val = nz

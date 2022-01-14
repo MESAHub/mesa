@@ -32,6 +32,7 @@
       use math_lib
       use binary_def
       use binary_private_def
+      use utils_Lib, only: StrLowCase
 
       implicit none
 
@@ -202,7 +203,7 @@
           spec = -1
 
           do j=1, bh_col_id_max
-             if (binary_history_column_name(j) == string) then
+             if (StrLowCase(binary_history_column_name(j)) == StrLowCase(string)) then
                  spec = j
                  return
              end if

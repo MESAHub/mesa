@@ -114,12 +114,12 @@
       photo_interval = 10
       profile_interval = 100
       history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10 
       write_header_frequency = 10
 
       x_integer_ctrl(1) = 2 ! Part number ! Set this to 0 to turn off test suite checks
 
-report_solver_progress = .true.
+report_solver_progress = .false.
 
 / ! end of controls namelist
 

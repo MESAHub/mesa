@@ -142,11 +142,6 @@
                   s% mixing_type(k) = no_mixing
                end if
             end do
-         else if (s% conv_vel_flag) then
-            do k = 1, nz
-               s% D_mix(k) = s% conv_vel(k)*s% mlt_mixing_length(k)/3d0
-               s% cdc(k) = cdc_factor(k)*s% D_mix(k)
-            end do
          else
             do k = 1, nz
                s% D_mix(k) = s% mlt_D(k)
@@ -305,83 +300,77 @@
          
          call check('after update_rotation_mixing_info')
          
-         if (.not. s% conv_vel_flag) then
-
-            region_bottom_q = s% D_mix_zero_region_bottom_q
-            region_top_q = s% D_mix_zero_region_top_q
-            
-            if (s% dq_D_mix_zero_at_H_He_crossover > 0d0) then
-               i_h1 = s% net_iso(ih1)
-               i_he4 = s% net_iso(ihe4)
-               if (i_h1 > 0 .and. i_he4 > 0) then
-                  do k=2,nz
-                     if (s% xa(i_h1,k-1) > s% xa(i_he4,k-1) .and. &
-                         s% xa(i_h1,k) <= s% xa(i_he4,k)) then ! crossover
-                        region_bottom_q = &
-                           s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
-                        region_top_q = &
-                           s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
-                        exit
-                     end if
-                  end do
-               end if
-            end if
-            
-            if (region_bottom_q < region_top_q) then
-               do k=2,nz
-                  if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
-                     s% D_mix(k) = 0d0
-                     s% mixing_type(k) = no_mixing
-                  end if
-               end do
-            end if
-            
-            region_bottom_q = 1d99
-            region_top_q = -1d99
-            if (s% dq_D_mix_zero_at_H_C_crossover > 0d0) then
-               i_h1 = s% net_iso(ih1)
-               i_c12 = s% net_iso(ic12)
-               if (i_h1 > 0 .and. i_c12 > 0) then
-                  do k=2,nz
-                     if (s% xa(i_h1,k-1) > s% xa(i_c12,k-1) .and. &
-                         s% xa(i_h1,k) <= s% xa(i_c12,k)) then ! crossover
-                        region_bottom_q = &
-                           s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
-                        region_top_q = &
-                           s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
-                        exit
-                     end if
-                  end do
-               end if
-            end if
-            
-            if (region_bottom_q < region_top_q) then
-               do k=2,nz
-                  if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
-                     s% D_mix(k) = 0d0
-                     s% mixing_type(k) = no_mixing
-                  end if
-               end do
-            end if
+         region_bottom_q = s% D_mix_zero_region_bottom_q
+         region_top_q = s% D_mix_zero_region_top_q
          
-            ! as last thing, update conv_vel from D_mix and mixing length.
+         if (s% dq_D_mix_zero_at_H_He_crossover > 0d0) then
+            i_h1 = s% net_iso(ih1)
+            i_he4 = s% net_iso(ihe4)
+            if (i_h1 > 0 .and. i_he4 > 0) then
+               do k=2,nz
+                  if (s% xa(i_h1,k-1) > s% xa(i_he4,k-1) .and. &
+                      s% xa(i_h1,k) <= s% xa(i_he4,k)) then ! crossover
+                     region_bottom_q = &
+                        s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
+                     region_top_q = &
+                        s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
+                     exit
+                  end if
+               end do
+            end if
+         end if
+         
+         if (region_bottom_q < region_top_q) then
             do k=2,nz
-               if (s% alpha_mlt(k)*s% scale_height(k) > 0) then
-                  s% conv_vel(k) = &
-                     3*s% D_mix(k)/(s% alpha_mlt(k)*s% scale_height(k))
-               else
-                  s% conv_vel(k) = 0
+               if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
+                  s% D_mix(k) = 0d0
+                  s% mixing_type(k) = no_mixing
                end if
             end do
-            
          end if
+         
+         region_bottom_q = 1d99
+         region_top_q = -1d99
+         if (s% dq_D_mix_zero_at_H_C_crossover > 0d0) then
+            i_h1 = s% net_iso(ih1)
+            i_c12 = s% net_iso(ic12)
+            if (i_h1 > 0 .and. i_c12 > 0) then
+               do k=2,nz
+                  if (s% xa(i_h1,k-1) > s% xa(i_c12,k-1) .and. &
+                      s% xa(i_h1,k) <= s% xa(i_c12,k)) then ! crossover
+                     region_bottom_q = &
+                        s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
+                     region_top_q = &
+                        s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
+                     exit
+                  end if
+               end do
+            end if
+         end if
+         
+         if (region_bottom_q < region_top_q) then
+            do k=2,nz
+               if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
+                  s% D_mix(k) = 0d0
+                  s% mixing_type(k) = no_mixing
+               end if
+            end do
+         end if
+      
+         ! as last thing, update conv_vel from D_mix and mixing length.
+         do k=2,nz
+            if (s% alpha_mlt(k)*s% scale_height(k) > 0) then
+               s% conv_vel(k) = &
+                  3*s% D_mix(k)/(s% alpha_mlt(k)*s% scale_height(k))
+            else
+               s% conv_vel(k) = 0
+            end if
+         end do
 
          ! set these just for plotting.  not used.
          s% mixing_type(1) = s% mixing_type(2)
          s% D_mix(1) = s% D_mix(2)
-         if (.not. s% conv_vel_flag) then
-            s% conv_vel(1) = 0d0
-         end if
+         s% conv_vel(1) = 0d0
 
          call check('final')
          if (failed('set_mixing_info')) return
@@ -691,7 +680,7 @@
                      call set_use_gradr(s,kk)
                      s% cdc(kk) = 0
                      s% D_mix(kk) = 0
-                     if (.not. s% conv_vel_flag) s% conv_vel(kk) = 0
+                     s% conv_vel(kk) = 0
                      s% mixing_type(kk) = no_mixing
                   end do
                   if (s% num_conv_boundaries > 0) &
@@ -995,9 +984,7 @@
             if (s% D_mix(k) < tiny) then
                s% cdc(k) = 0
                s% D_mix(k) = 0
-               if (.not. s% conv_vel_flag) then
-                  s% conv_vel(k) = 0
-               end if
+               s% conv_vel(k) = 0
                s% mixing_type(k) = no_mixing
             end if
          end do
@@ -1030,9 +1017,7 @@
                   s% D_mix(k) = s% cdc(k)/pow2(pi4*s% r(k)*s% r(k)*s% rho(k))
                   lambda = s% alpha_mlt(k)* &
                      (s% scale_height(k-1) + s% scale_height(k+1))/2
-                  if (.not. s% conv_vel_flag) then
-                     s% conv_vel(k) = 3*s% D_mix(k)/lambda
-                  end if
+                  s% conv_vel(k) = 3*s% D_mix(k)/lambda
                   s% mixing_type(k) = max(s% mixing_type(k-1), s% mixing_type(k+1))
                if (dbg) write(*,3) 'remove radiative singleton', k, nz
                end if
@@ -1041,9 +1026,7 @@
                   call set_use_gradr(s,k)
                   s% cdc(k) = 0
                   s% D_mix(k) = 0
-                  if (.not. s% conv_vel_flag) then
-                     s% conv_vel(k) = 0
-                  end if
+                  s% conv_vel(k) = 0
                   s% mixing_type(k) = no_mixing
                   if (dbg) write(*,3) 'remove mixing singleton', k, nz
                end if
@@ -1054,9 +1037,7 @@
             if (s% cdc(2) /= 0) then
                s% cdc(1) = s% cdc(2)
                s% D_mix(1) = s% D_mix(2)
-               if (.not. s% conv_vel_flag) then
-                  s% conv_vel(1) = s% conv_vel(2)
-               end if
+               s% conv_vel(1) = s% conv_vel(2)
                s% mixing_type(1) = s% mixing_type(2)
                if (dbg) write(*,3) 'remove radiative singleton', 1, nz
             end if
@@ -1065,9 +1046,7 @@
                call set_use_gradr(s,1)
                s% cdc(1) = 0
                s% D_mix(1) = 0
-               if (.not. s% conv_vel_flag) then
-                  s% conv_vel(1) = 0
-               end if
+               s% conv_vel(1) = 0
                s% mixing_type(1) = no_mixing
                if (dbg) write(*,2) 'remove mixing singleton', 1
             end if
@@ -1077,7 +1056,7 @@
             if (s% cdc(nz-1) /= 0) then
                s% cdc(nz) = s% cdc(nz-1)
                s% D_mix(nz) = s% D_mix(nz-1)
-               if (.not. s% conv_vel_flag) s% conv_vel(nz) = s% conv_vel(nz-1)
+               s% conv_vel(nz) = s% conv_vel(nz-1)
                s% mixing_type(nz) = s% mixing_type(nz-1)
                if (dbg) write(*,2) 'remove radiative singleton: s% cdc(nz-1)', nz, s% cdc(nz-1)
             end if
@@ -1086,7 +1065,7 @@
                call set_use_gradr(s,nz)
                s% cdc(nz) = 0
                s% D_mix(nz) = 0
-               if(.not. s% conv_vel_flag) s% conv_vel(nz) = 0
+               s% conv_vel(nz) = 0
                s% mixing_type(nz) = no_mixing
                if (dbg) write(*,2) 'remove mixing singleton: s% cdc(nz)', nz, s% cdc(nz)
             end if
@@ -1170,14 +1149,14 @@
                         s% cdc(ktop+1:kbot-1) = (s% cdc(ktop) + s% cdc(kbot))/2
                         s% D_mix(ktop+1:kbot-1) = &
                            (s% D_mix(ktop) + s% D_mix(kbot))/2
-                        if(.not. s% conv_vel_flag) s% conv_vel(ktop+1:kbot-1) = (s% conv_vel(ktop) + s% conv_vel(kbot))/2
+                        s% conv_vel(ktop+1:kbot-1) = (s% conv_vel(ktop) + s% conv_vel(kbot))/2
                         s% mixing_type(ktop+1:kbot-1) = mix_type
                         if (dbg) write(*,3) 'close mixing gap', &
                               ktop+1, kbot-1, (rtop - rbot)/Hp, rtop - rbot, Hp
                      else
                         s% cdc(ktop+1:kbot) = s% cdc(ktop)
                         s% D_mix(ktop+1:kbot) = s% D_mix(ktop)
-                        if(.not. s% conv_vel_flag) s% conv_vel(ktop+1:kbot) = s% conv_vel(ktop)
+                        s% conv_vel(ktop+1:kbot) = s% conv_vel(ktop)
                         s% mixing_type(ktop+1:kbot) = mix_type
                         if (dbg) write(*,3) 'close mixing gap', &
                            ktop+1, kbot, (rtop - rbot)/Hp, rtop - rbot, Hp
@@ -1245,9 +1224,7 @@
                         beta = 1 - alfa
                         s% cdc(j) = alfa*s% cdc(ktop-1) + beta*s% cdc(kbot+1)
                         s% D_mix(j) = alfa*s% D_mix(ktop-1) + beta*s% D_mix(kbot+1)
-                        if (.not. s% conv_vel_flag) then
-                           s% conv_vel(j) = alfa*s% conv_vel(ktop-1) + beta*s% conv_vel(kbot+1)
-                        end if
+                        s% conv_vel(j) = alfa*s% conv_vel(ktop-1) + beta*s% conv_vel(kbot+1)
                         s% mixing_type(j) = thermohaline_mixing
                      end do
                   end if
@@ -1354,7 +1331,7 @@
                end do
                s% D_mix(ktop1+1:kbot1) = s% D_mix(ktop1)
                s% mixing_type(ktop1+1:kbot1) = convective_mixing
-               if (.not. s% conv_vel_flag) s% conv_vel(ktop1+1:kbot1) = s% conv_vel(ktop1)
+               s% conv_vel(ktop1+1:kbot1) = s% conv_vel(ktop1)
                if (dbg) write(*,3) 'merge semiconvective island', kbot1, ktop1+1
                kbot1 = ktop1
             end do
@@ -1401,7 +1378,7 @@
          end if
          ! extend convection region to surface
          j = maxloc(s% cdc(1:i), dim=1)
-         if (.not. s% conv_vel_flag) s% conv_vel(1:i) = s% conv_vel(j)
+         s% conv_vel(1:i) = s% conv_vel(j)
          s% cdc(1:i) = s% cdc(j)
          do k = 1,i
             s% D_mix(k) = s% D_mix(j)

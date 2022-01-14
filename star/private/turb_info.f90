@@ -67,7 +67,8 @@
                   s% fixed_gradr_for_rest_of_solver_iters(k) = &
                      (s% mlt_mixing_type(k) == no_mixing)
                end if
-            end if            
+            end if
+            if (op_err /= 0) ierr = op_err            
          end do
 !$OMP END PARALLEL DO
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)

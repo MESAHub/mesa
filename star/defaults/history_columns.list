@@ -365,7 +365,7 @@
 
    !## CO core
       co_core_mass
-      !co_core
+      !CO_core
       !co_core_radius
       !co_core_lgT
       !co_core_lgRho
@@ -450,7 +450,7 @@
 
    !## conditions at the photosphere
       !effective_T
-      !teff
+      !Teff
       log_Teff ! log10 effective temperature
          ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
          ! where L and R are evaluated at the photosphere (tau_factor < 1)
@@ -479,7 +479,7 @@
       !photosphere_cell_free_e
       !photosphere_cell_log_free_e
       !photosphere_logg
-      !photosphere_t
+      !photosphere_T
 
    !## conditions at or near the surface of the model (outer edge of outer cell)
 
@@ -712,7 +712,7 @@
       !shock_entropy
       !shock_tau
       !shock_k
-      !shock_pre_lgrho
+      !shock_pre_lgRho
 
 !----------------------------------------------------------------------------------------------
 
@@ -784,8 +784,8 @@
       !total_turbulent_energy
       !log_total_turbulent_energy
       !total_turbulent_energy_after_adjust_mass
-      !tot_et
-      !log_tot_et
+      !tot_Et
+      !log_tot_Et
 
       !total_energy_foe
 
@@ -822,7 +822,7 @@
       !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
       !log_rel_error_in_energy_conservation
 
-      !virial_thm_p_avg
+      !virial_thm_P_avg
       !virial_thm_rel_err
       !work_inward_at_center
       !work_outward_at_surface
@@ -909,7 +909,7 @@
       !surf_c12_minus_o16 ! this is useful for seeing effects of dredge up on AGB
       !surf_num_c12_div_num_o16
 
-
+      !phase_of_evolution ! Integer mapping to the type of evolution see star_data/public/star_data_def.inc for definitions
 
    !## MLT++
       !gradT_excess_alpha
@@ -985,20 +985,12 @@
 
 !# RSP
 
-   !rsp_deltamag
-   !rsp_deltar
-   !rsp_grekm
-   !rsp_grekm_avg_abs
-   !rsp_grpdv
-   !rsp_lina_growth_rate_f
-   !rsp_lina_growth_rate_o1
-   !rsp_lina_growth_rate_o2
-   !rsp_lina_period_f_days
-   !rsp_lina_period_o1_days
-   !rsp_lina_period_o2_days
-   !rsp_num_periods
-   !rsp_period_in_days
-   !rsp_phase
+   !rsp_DeltaMag ! absolute magnitude difference between minimum and maximum light (mag)
+   !rsp_DeltaR ! R_max - R_min difference in the max and min radius (Rsun)
+   !rsp_GREKM ! fractional growth of the kinetic energy per pulsation period ("nonlinear growth rate") - see equation 5 in MESA5
+   !rsp_num_periods ! Count of the number of pulsation cycles completed
+   !rsp_period_in_days ! Running period, ie., period between two consecutive values of R_max (days) 
+   !rsp_phase ! Running pulsation phase for a cycle
 
 !----------------------------------------------------------------------------------------------
 !# debugging

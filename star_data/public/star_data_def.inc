@@ -1,7 +1,7 @@
 
       character(len=24) :: version_number ! mesa version from file $MESA_DIR/data/version_number
       
-      integer, parameter :: star_def_version = 16
+      integer, parameter :: star_def_version = 17
       
       integer, parameter :: nz_alloc_extra = 200
       
@@ -23,6 +23,7 @@
       integer, parameter :: terminate = 3
 
       ! phases of evolution
+      integer, parameter :: phase_relax = -1
       integer, parameter :: phase_starting = 1
       integer, parameter :: phase_PreMS = phase_starting + 1
       integer, parameter :: phase_ZAMS = phase_PreMS + 1
