@@ -276,7 +276,7 @@ do this your inlist might look like:
      ! see star/defaults/controls.defaults
 
      ! options for energy conservation (see MESA V, Section 3)
-     use_dedt_form_of_energy_eqn = .true.
+     energy_eqn_option = 'dedt'
      use_gold_tolerances = .true.
    
      ! configure mass loss on RGB & AGB
