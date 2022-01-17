@@ -28,7 +28,7 @@
 &controls
 
 ! energy
-      use_dedt_form_of_energy_eqn = .true.
+      energy_eqn_option = 'dedt'
 ! mass and metallicity
       initial_mass = 2.0
       initial_z = 2d-2
