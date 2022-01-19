@@ -101,7 +101,7 @@ module turb
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
-      real(dp), parameter :: lower_bound_Z = -2d2
+      real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
       type(auto_diff_real_tdc) :: Zub, Zlb
