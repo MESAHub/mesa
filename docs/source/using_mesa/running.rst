@@ -290,7 +290,7 @@ do this your inlist might look like:
 
 If you want to try this out, save the preceding text as a file named
 ``inlist_load`` in your work directory. Make sure your file ends with 
-a carriage return (to an empty line). Then edit your main inlist
+a blank new line. Then edit your main inlist
 file so that it will use ``inlist_load`` instead of ``inlist_project``
 everywhere within inlist (i.e., extra_star_job_inlist1_name and
 extra_controls_inlist1_name).
