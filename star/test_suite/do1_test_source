@@ -2,6 +2,10 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
+do_one wd_cool_0.6M "stop because log_center_temperature <= log_center_temp_lower_limit" "final.mod" auto
+
+return
+
 do_one split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one 12M_pre_ms_to_core_collapse "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one 20M_pre_ms_to_core_collapse "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
@@ -87,7 +91,7 @@ do_one twin_studies "stars have reached stopping age" skip skip
 do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto
 do_one wd_aic "PASS: A=20 electron captures have started a thermal runaway in the core" "final.mod" auto
 do_one wd_c_core_ignition "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto
-do_one wd_cool_0.6M "stop because log_center_temperature <= log_center_temp_lower_limit" "final.mod" auto
+#do_one wd_cool_0.6M "stop because log_center_temperature <= log_center_temp_lower_limit" "final.mod" auto
 do_one wd_diffusion "passed test for electric field in the core" "final.mod" auto
 do_one wd_he_shell_ignition "stop because power_he_burn >= power_he_burn_upper_limit" "final.mod" auto
 do_one wd_nova_burst "have finished burst" "final.mod" auto
