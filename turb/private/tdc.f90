@@ -116,7 +116,9 @@ contains
 
          ! If A0 == 0 then, because Af(Y) is monotone-increasing in Y, we know that for Y < 0, Af(Y) = 0.
          ! As a result we can directly write down the solution and get just radY.
-         if (info%A0 == 0) then
+         ! For numerical reasons we impose a cutoff of 1d-10 cm/s (much smaller than this and the point where
+         ! A0 reaches zero could be at Z < lower_bound_Z).
+         if (info%A0 < 1d-10) then
             Y = radY
             if (info%report) write(*,*) 'A0 == 0, Y=',Y%val
          else
