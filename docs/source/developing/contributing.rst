@@ -25,7 +25,7 @@ Non-MESA developer
 
 For those who do not have commit access to the main MESA repository you will need to `fork <https://docs.github.com/en/github/collaborating-with-pull-requests/working-with-forks/about-forks>`__
 MESA and make your changes in your fork. Once you are happy with your changes you can submit a pull request
-against the main MESA repository. At this point your contirbutions will be reviewed by a MESA
+against the main MESA repository. At this point your contributions will be reviewed by a MESA
 developer who may or may not accept the pull request. If they accept it then it will be merged 
 into MESA.
 
@@ -217,7 +217,7 @@ Checking out a revision
 
 To checkout out a previous version of the repository you first need the hash of the commit.
 This is a 40 character code looking like ``37cbee26a70574189d2e6169594af360215e18b6``, luckily though you do not need the full 40
-characters, you only need the enough of the hash to be unique. This is usually only 6-8 characters long::
+characters, you only need enough of the hash to be unique. This is usually only 6-8 characters long::
 
   git checkout 37cbee26
 
@@ -399,7 +399,7 @@ PR. This allows you to handle conflicts in advance and ensure that the
 test suite will remain passing after you merge your branch back into
 ``main``. 
 
-When you merge ``main`` into your branch is also advisable to add ``[ci optional]`` to the commit message.
+When you merge ``main`` into your branch, it is also advisable to add ``[ci optional]`` to the commit message.
 That way the optional inlists will be tested when the commit is tested.
 
      
