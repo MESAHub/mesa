@@ -1,3 +1,4 @@
+ reading user weak rate file ../../data/rates_data/rate_tables/S13_r_be7_wk_li7.h5
  salpeter
                                                 logT =     7.7110722845770692D+00
                                               logRho =     4.5306372623742392D+00
@@ -52,7 +53,7 @@
                                                  lYeRho    5.3521825181113609D+00
 
 
-                                                     nr         462
+                                                     nr         463
 
                                       halflife            Qneu          Qtotal
               h1      neut        4.692303E+08    2.552701E-01   -7.823466E-01
@@ -336,6 +337,7 @@
               ge65    ga65        1.593931E+01    2.696092E+00    6.242548E+00
               al26-1  mg26        1.157732E+06    1.413846E+00    4.004582E+00
               al26-2  mg26        6.217177E+00    1.894917E+00    4.232582E+00
+              be7     li7         1.230683E+06    8.140000E-01    8.618930E-01
 
  done
 
