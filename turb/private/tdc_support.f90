@@ -225,6 +225,7 @@ contains
       Y = set_Y(.false., lower_bound_Z)
       call compute_Q(info, Y, Q_lb, Af)
       if (Af == 0) then
+         write(*,*) 'Z_lb, A0, Af', lower_bound_Z%val, info%A0%val, Af%val
          call mesa_error(__FILE__,__LINE__,'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
       end if
       dQdZ_lb = differentiate_1(Q_lb)
@@ -232,6 +233,7 @@ contains
       Y = set_Y(.false., upper_bound_Z)
       call compute_Q(info, Y, Q_ub, Af)
       if (Af == 0) then
+         write(*,*) 'Z_ub, A0, Af', lower_bound_Z%val, info%A0%val, Af%val
          call mesa_error(__FILE__,__LINE__,'bad call to tdc_support dQdZ_bisection_search: Af == 0.')
       end if
       dQdZ_ub = differentiate_1(Q_ub)
