@@ -286,9 +286,11 @@ do this your inlist might look like:
      Dutch_scaling_factor = 0.8
    
    / ! end of controls namelist
+   
 
 If you want to try this out, save the preceding text as a file named
-``inlist_load`` in your work directory. Then edit your main inlist
+``inlist_load`` in your work directory. Make sure your file ends with 
+a blank new line. Then edit your main inlist
 file so that it will use ``inlist_load`` instead of ``inlist_project``
 everywhere within inlist (i.e., extra_star_job_inlist1_name and
 extra_controls_inlist1_name).
