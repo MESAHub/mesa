@@ -461,12 +461,25 @@ contains
       type(tdc_info), intent(in) :: info
       type(auto_diff_real_tdc), intent(in) :: Y
       type(auto_diff_real_tdc), intent(out) :: Q, Af
-      type(auto_diff_real_tdc) :: xi0, xi1, xi2
+      type(auto_diff_real_tdc) :: xi0, xi1, xi2, vc, Lambda, Gamma
 
       call eval_xis(info, Y, xi0, xi1, xi2)          
-
       Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
-      Q = (info%L - info%L0*info%gradL) - (info%L0 + info%c0*Af)*Y
+
+      ! Y = grad-gradL
+      ! Gamma=(grad-gradE)/(gradE-gradL)
+      ! So
+      ! grad-gradE = (grad-gradL)*Gamma/(1+Gamma) = Y*Gamma/(1+Gamma)
+      ! So overall we just multiply the convective flux term (proportional to Af) by Gamma/(1+Gamma)
+      !
+      ! And From Cox & Giuli equation 14.39 we get
+      ! Gamma = (Cp / 6 a c) (kappa rho^2 vc Lambda / T^3)
+
+      vc = sqrt_2_div_3 * Af ! Convection speed
+      Lambda = convert(info%Hp) * info%mixing_length_alpha
+      Gamma = convert(info%Cp * info%kap * pow2(info%rho)) * vc * Lambda / (pow3(convert(info%T)) * 6d0 * crad * clight)
+
+      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y*Gamma/(1+Gamma)
 
    end subroutine compute_Q
 
