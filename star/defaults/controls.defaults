@@ -2310,7 +2310,7 @@
       ! Options are:
 
       ! + 'none'       : just give radiative values with no mixing.
-      ! + 'TDC'        : Time-dependent convection based on the Khufuss 1986 model. Reduces to Cox at long times.
+      ! + 'TDC'        : Time-dependent convection based on the Khufuss 1986 model. Reduces to Cox at long times and large optical depths.
       ! + 'Cox'        : MLT as developed in Cox & Giuli 1968, Chapter 14.
       ! + 'ML1'        : Bohm-Vitense 1958
       ! + 'ML2'        : Bohm and Cassinelli 1971
