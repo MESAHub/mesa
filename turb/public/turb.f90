@@ -70,6 +70,8 @@ module turb
    !! @param report Write debug output if true, not if false.
    !! @param mixing_type Set to semiconvective if convection operates (output).
    !! @param scale The scale for computing residuals to the luminosity equation (erg/s).
+   !! @param chiT dlnP/dlnT|rho
+   !! @param chiRho dlnP/dlnRho|T
    !! @param L Luminosity across a face (erg/s).
    !! @param r radial coordinate of the face (cm).
    !! @param P pressure (erg/cm^3).
@@ -89,23 +91,33 @@ module turb
    !! @param ierr Tracks errors (output).
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            mixing_type, scale, chiT, chiRho, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1), intent(in) :: &
-         L, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
+         chiT, chiRho, L, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
       logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
+      type(auto_diff_real_star_order1) :: gradr, grav, Lambda, Gamma
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
       type(auto_diff_real_tdc) :: Zub, Zlb
       include 'formats'
+
+      ! Do a call to MLT
+      grav = P / (rho * scale_height)
+      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
+      Lambda = mixing_length_alpha * scale_height
+      call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
+                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                     gradr, grada, gradL, &
+                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
 
       ! Pack TDC info
       info%report = report
@@ -126,6 +138,7 @@ module turb
       info%Cp = Cp
       info%kap = opacity
       info%Hp = scale_height
+      info%Gamma = Gamma
 
       ! Get solution
       Zub = upper_bound_Z

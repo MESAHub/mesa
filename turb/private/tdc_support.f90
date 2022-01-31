@@ -60,11 +60,12 @@ public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search,
    !! @param Hp Pressure scale height
    !! @param gradL gradL is the neutrally buoyant dlnT/dlnP (= grad_ad + grad_mu),
    !! @param grada grada is the adiabatic dlnT/dlnP,
+   !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
       logical :: report
       real(dp) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma
    end type tdc_info
 
 contains
@@ -461,25 +462,29 @@ contains
       type(tdc_info), intent(in) :: info
       type(auto_diff_real_tdc), intent(in) :: Y
       type(auto_diff_real_tdc), intent(out) :: Q, Af
-      type(auto_diff_real_tdc) :: xi0, xi1, xi2, vc, Lambda, Gamma
-
-      call eval_xis(info, Y, xi0, xi1, xi2)          
-      Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
+      type(auto_diff_real_tdc) :: xi0, xi1, xi2, Y_env
 
       ! Y = grad-gradL
       ! Gamma=(grad-gradE)/(gradE-gradL)
       ! So
-      ! grad-gradE = (grad-gradL)*Gamma/(1+Gamma) = Y*Gamma/(1+Gamma)
-      ! So overall we just multiply the convective flux term (proportional to Af) by Gamma/(1+Gamma)
+      ! Y_env = grad-gradE = (grad-gradL)*Gamma/(1+Gamma) = Y*Gamma/(1+Gamma)
+      ! So overall we just multiply the Y by Gamma/(1+Gamma) to get Y_env.
       !
-      ! And From Cox & Giuli equation 14.39 we get
-      ! Gamma = (Cp / 6 a c) (kappa rho^2 vc Lambda / T^3)
+      ! We only use Y_env /= Y when Y > 0 (i.e. the system is convectively unstable)
+      ! because we only have a Gamma from MLT in that case.
+      ! so when Y < 0 we just use Y_env = Y.
+      if (Y > 0) then
+         Y_env = Y * convert(info%Gamma/(1+info%Gamma))
+      else
+         Y_env = Y
+      end if
 
-      vc = sqrt_2_div_3 * Af ! Convection speed
-      Lambda = convert(info%Hp) * info%mixing_length_alpha
-      Gamma = convert(info%Cp * info%kap * pow2(info%rho)) * vc * Lambda / (pow3(convert(info%T)) * 6d0 * crad * clight)
+      ! Y_env sets the acceleration of blobs.
+      call eval_xis(info, Y_env, xi0, xi1, xi2)          
+      Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
 
-      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y*Gamma/(1+Gamma)
+      ! Y_env sets the convective flux but not the radiative flux.
+      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env
 
    end subroutine compute_Q
 
