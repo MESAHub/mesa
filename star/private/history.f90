@@ -1175,9 +1175,9 @@
          integer, intent(out) :: int_val
          logical, intent(out) :: is_int_val
          integer, intent(out) :: ierr
-         integer :: k, i, min_k
+         integer :: k, i, min_k, k2
          real(dp) :: Ledd, L_rad, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, &
-            min_gamma1
+            min_gamma1, deltam
          real(dp), pointer :: v(:)
          logical :: v_flag
 
@@ -1997,11 +1997,16 @@
                   val = 2.5d0/(r/1d8)
                end if
             case(h_mu4)
+               deltam = 0.3d0 * msun ! Ertl et al 2016 
                if (s% entropy(1) > 4.0) then
                   do k=nz-1, 1, -1
                      if (s% entropy(k) > 4.d0) exit
                   end do
-                  val = (s% dm(k)/msun) / ((s% r(k)-s% r(k+1))/1d8)
+                  do k2=nz-1, 1, -1
+                     if (s% m(k2) > s%m(k) + deltam) exit
+                  end do
+
+                  val = (deltam/msun) / ((s% r(k2)-s% r(k))/1d8)
                end if
             case(h_m4)
                if (s% entropy(1) > 4.0) then
