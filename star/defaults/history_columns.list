@@ -600,7 +600,9 @@
       !compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
       !compactness
       !m4 ! Mass co-ordinate where entropy=4
+      ! mu4 is sensitive to the choice of how much dm/dr you average over, thus we average dm and dr over M(entropy=4) and M(entropy=4)+0.3Msun
       !mu4 ! dM(Msun)/dr(1000km) where entropy=4
+
 
       !center_omega
       !center_omega_div_omega_crit
