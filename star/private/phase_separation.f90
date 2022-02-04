@@ -39,6 +39,8 @@
       integer, parameter :: FIXED_PT_MODE = 5
       integer, parameter :: FIXED_DT_MODE = 6      
 
+      ! offset to higher phase than 0.5 to avoid interference
+      ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
       
       contains
@@ -52,10 +54,7 @@
          
          real(dp) :: dq_crystal, XO, XC, pad
          integer :: k, k_bound, k_new, kstart, net_ic12, net_io16
-         logical :: do_premix
-
-         do_premix = .true.
-
+         
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
@@ -105,7 +104,7 @@
                call move_one_zone(s,k,dq_crystal)
                ! crystallized out to k now, liquid starts at k-1.
                ! now mix the liquid material outward until stably stratified
-               if(do_premix .and. dq_crystal > 0d0) then
+               if(dq_crystal > 0d0) then
                   call mix_outward(s, k-1)
                end if
                
