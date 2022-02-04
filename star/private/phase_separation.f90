@@ -137,7 +137,7 @@
         XO = s% xa(net_io16,k)
         XC = s% xa(net_ic12,k)
         
-        ! Try a real phase diagram (Blouin 2021)
+        ! Call Blouin 2021 phase diagram.
         ! Need to rescale temporarily because phase diagram assumes XO + XC = 1
         Xfac = XO + XC
         XO = XO/Xfac
@@ -159,7 +159,7 @@
         
       end subroutine move_one_zone
       
-      ! mix composition outward until no more negative molecular weight gradient
+      ! mix composition outward until reaching stable composition profile
       subroutine mix_outward(s,kbot)
         use chem_def, only: chem_isos, ihe4, ic12, io16
 
