@@ -7251,6 +7251,17 @@
       ! ::
 
     phase_separation_mixing_use_brunt = .true.
+    
+      ! phase_separation_no_diffusion
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true and element diffusion is on, prevent element diffusion
+      ! from occurring in the layers where phase separation mixing
+      ! is present
+
+      ! ::
+
+    phase_separation_no_diffusion = .true.
 
 
 ! eos controls

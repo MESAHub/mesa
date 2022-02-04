@@ -634,6 +634,8 @@
                   do k=1,s% nz ! for use by energy equation
                      s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
                   end do
+               else
+                  s% crystal_core_boundary_mass = -1d0
                end if
 
                s% okay_to_set_mixing_info = .false. ! no mixing changes in set_vars after this point
