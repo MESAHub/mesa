@@ -915,7 +915,6 @@
 
          logical function is_crystal_boundary(kk)
             integer, intent(in) :: kk
-            ! replace this with mixing type designation when implemented for crystal
             if(s% m(kk) <= s% crystal_core_boundary_mass .and. &
                  s% m(kk-1) >= s% crystal_core_boundary_mass) then
                is_crystal_boundary = .true.
