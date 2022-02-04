@@ -1117,17 +1117,6 @@
          in_region = (s% mixing_type(nz) == mix_type)
          rbot = 0
          kbot = nz
-         do k=nz,1,-1
-            if (s%phase(k) > 0.5d0) then
-               ! push kbot out past crystallized material so closed gaps don't
-               ! cause solids to start mixing.
-               kbot=k+1
-               ! Stop once encounter phase transition.
-               if(s%phase(k-1) <= 0.5d0) then
-                  exit
-               end if
-            end if
-         end do         
          do k=nz-1, 2, -1
             if (in_region) then
                if (s% mixing_type(k) /= mix_type) then ! end of region
@@ -1194,16 +1183,6 @@
          kbot = nz-1
          in_region = (s% mixing_type(kbot) == no_mixing)
          all_small = .false.
-         do k=kbot,1,-1
-            if (s%phase(k) > 0.5d0) then
-               ! push kbot out past crystallized material so closed gaps don't
-               ! cause solids to start mixing.
-               kbot=k+1
-               if(s%phase(k-1) <= 0.5d0) then
-                  exit
-               end if
-            end if
-         end do         
          do k=nz-2, 2, -1
             if (in_region) then
                if (s% mixing_type(k) == no_mixing) then ! check if okay

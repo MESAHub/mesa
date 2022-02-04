@@ -180,6 +180,7 @@
 
         do k=kbot,1,-1
            ktop = k
+           s% mlt_mixing_type(k) = phase_separation_mixing
 
            mass = SUM(s%dm(ktop:kbot))
            do l = 1, s%species
