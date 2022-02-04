@@ -252,6 +252,10 @@
       ! output controls
       character (len=256) :: astero_results_directory
 
+      character (len=strlen) :: astero_results_dbl_format
+      character (len=strlen) :: astero_results_int_format
+      character (len=strlen) :: astero_results_txt_format
+
       logical :: write_best_model_data_for_each_sample
       integer :: num_digits
       character (len=256) :: sample_results_prefix, sample_results_postfix
@@ -471,6 +475,9 @@
 
          astero_results_directory, &
 
+         astero_results_dbl_format, &
+         astero_results_int_format, &
+         astero_results_txt_format, &
          write_best_model_data_for_each_sample, &
          num_digits, &
          sample_results_prefix, sample_results_postfix, &

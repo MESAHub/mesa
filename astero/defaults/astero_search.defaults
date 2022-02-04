@@ -1178,6 +1178,20 @@
 
       astero_results_directory = 'outputs'
 
+   ! astero_results_dbl_format
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! astero_results_int_format
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! astero_results_txt_format
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! Formats for writing floats (reals), integers and characters
+   ! (strings) to the results file.
+
+   astero_results_dbl_format = '(1pes26.16)'
+   astero_results_int_format = '(i26)'
+   astero_results_txt_format = '(a26)'
+
    ! write_best_model_data_for_each_sample
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! ::
