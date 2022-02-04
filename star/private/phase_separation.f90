@@ -92,9 +92,6 @@
                end if
             end do
             
-            ! print *, "kstart, k_bound, phase(k_bound), phase(k_bound - 1)", kstart, k_bound, s%phase(k_bound), s%phase(k_bound - 1)
-            ! print *, "mass(kstart), crystal_core_boundary_mass, mass(kstart+1)", s% m(kstart)/msun, s% crystal_core_boundary_mass/msun, s% m(kstart+1)/msun
-         
             k_new = k_bound
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
@@ -113,8 +110,6 @@
                end if
                
             end do
-            ! print *, "new k after starting phase sep", k_new
-            ! print *, "phase(k+1), phase(k), phase(k-1)", s% phase(k_new+1), s% phase(k_new), s% phase(k_new-1)
 
             s% need_to_setvars = .true.
          end if
@@ -151,7 +146,6 @@
 
         dXO = blouin_delta_xo(XO)
 
-        ! print *, "k, XO, dXO", k, XO, dXO
         s% xa(net_io16,k) = Xfac*(XO + dXO)
         s% xa(net_ic12,k) = Xfac*(XC - dXO)
         
@@ -243,7 +237,6 @@
 
         ! Call a final update over all mixed cells now.
         call update_model_(s, update_mode, ktop, kbot, .true.)
-        ! print *, "kbot, ktop, m(ktop), mu_in, mu_out", kbot, ktop, s% m(ktop)/msun, s% mu(ktop), s% mu(ktop-1)
        
       end subroutine mix_outward
 
