@@ -59,14 +59,16 @@
       initial_z = 0.02d0
 
       mesh_delta_coeff = 1.5
-
-      varcontrol_target = 1d-3
-      
+      varcontrol_target = 1d-4
+      dHe_div_He_limit = 0.5d0
+      delta_lgT_limit = 1d-1
+      delta_lgT_limit_min_lgT = 0d0
+ 
       mixing_length_alpha = 1.8d0
       MLT_option = 'TDC'
- 
+    
       use_ledoux_criterion = .true.
-      make_gradr_sticky_in_solver_iters = .true.
+      make_gradr_sticky_in_solver_iters = .false.
 
       ! We need to only use 'top' overshooting because 'bottom'
       ! overshooting generates unphysical dilution of C12 below
@@ -114,7 +116,7 @@
 
       x_integer_ctrl(1) = 2 ! Part number ! Set this to 0 to turn off test suite checks
 
-report_solver_progress = .false.
+      report_solver_progress = .false.
 
 / ! end of controls namelist
 
