@@ -53,12 +53,15 @@
          integer, intent(out) :: ierr
          
          real(dp) :: dq_crystal, XO, XC, pad
-         integer :: k, k_bound, k_new, kstart, net_ic12, net_io16
+         integer :: k, k_bound, kstart, net_ic12, net_io16
          
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
          end if
+
+         ! Set phase separation mixing mass negative at beginning of phase separation
+         s% phase_sep_mixing_mass = -1d0
 
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
@@ -91,12 +94,10 @@
                end if
             end do
             
-            k_new = k_bound
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
                if(s% phase(k) <= eos_phase_boundary) then
-                  k_new = k+1 ! one zone inward from where material becomes liquid
                   s% crystal_core_boundary_mass = s% m(k+1)
                   exit
                end if
@@ -180,7 +181,10 @@
 
         do k=kbot,1,-1
            ktop = k
-           s% mlt_mixing_type(k) = phase_separation_mixing
+
+           if (s% m(ktop) > s% phase_sep_mixing_mass) then
+              s% phase_sep_mixing_mass = s% m(ktop)
+           end if
 
            mass = SUM(s%dm(ktop:kbot))
            do l = 1, s%species

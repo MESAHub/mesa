@@ -159,8 +159,8 @@
             return
          end if
 
-         if (s% mlt_mixing_type(k) == phase_separation_mixing) then
-            ! This has already been set in phase_separation, so don't touch it with MLT
+         if (s% m(k) <= s% phase_sep_mixing_mass) then
+            ! Treat as radiative for MLT purposes, and label as already mixed by phase separation
             call set_no_mixing('phase_separation_mixing')
             s% mlt_mixing_type(k) = phase_separation_mixing
             return

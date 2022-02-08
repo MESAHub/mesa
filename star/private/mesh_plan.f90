@@ -915,7 +915,8 @@
 
          logical function is_crystal_boundary(kk)
             integer, intent(in) :: kk
-            if(s% m(kk) <= s% crystal_core_boundary_mass .and. &
+            if(s% do_phase_separation .and. & ! only need this protection when phase separation is on
+                 s% m(kk) <= s% crystal_core_boundary_mass .and. &
                  s% m(kk-1) >= s% crystal_core_boundary_mass) then
                is_crystal_boundary = .true.
             else

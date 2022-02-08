@@ -316,6 +316,7 @@
          s% num_rotation_solver_steps = 0
          s% have_mixing_info = .false.
          s% rotational_mdot_boost = 0d0
+         s% phase_sep_mixing_mass = -1d0 ! must be negative at start of step
          s% L_for_BB_outer_BC = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
@@ -1888,7 +1889,7 @@
                s% prev_mesh_have_ST_start_info = .false.
             end if
          end if
-         
+
          if (s% okay_to_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
                call set_start_of_step_info(s, 'before do_mesh', ierr)
