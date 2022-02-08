@@ -21,7 +21,7 @@ This variable then holds five fields: ``x%val`` stores the value of ``x``.
 ``x%d1val1`` stores the derivative of `x` with respect to the first independent
 variable. ``x%d1val2`` is the same for the second independent variable, and so on.
 All ``d1val_`` fields are initialized to zero when the variable is first set.
-Once an `auto_diff` variable it initialized, all mathematical operations can be performed
+Once an `auto_diff` variable is initialized, all mathematical operations can be performed
 as they would be on a ``real(dp)`` variable. `auto_diff` variables also interoperate with
 ``real(dp)`` and ``integer`` types.
 So for instance in the following ``f%d1val1`` stores df/dx and ``f%d1val2`` stores df/dy.::

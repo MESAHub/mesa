@@ -1,0 +1,62 @@
+name: Build on Linux with SDK
+
+on: [push, pull_request, release]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: ["sdk"]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+        with:
+          lfs: true
+      - name: Checkout LFS objects
+        run: |
+          git lfs checkout
+
+      - name: Install dependencies Linux
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install wget binutils make perl libx11-6 libx11-dev zlib1g zlib1g-dev tcsh
+        shell: bash
+
+      - uses: actions/cache@v2
+        id: cache
+        with:
+          path: |
+            mesasdk-x86_64-linux-20.12.1.tar.gz
+          key: ${{ runner.os }}-${{ hashFiles('mesasdk-x86_64-linux-20.12.1.tar.gz') }}
+
+      - name: Get SDK ${{ runner.os }}
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+            wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
+        shell: bash
+
+      - name: Unpack SDK ${{ runner.os }}
+        run: |
+            tar xvf mesasdk-x86_64-linux-20.12.1.tar.gz
+        shell: bash
+
+      - name: Compile
+        shell: bash
+        run: |
+          # Linux runners have 2 cores
+          # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+          export OMP_NUM_THREADS=2
+          export NPROCS=2
+          export "MESASDK_ROOT=$(readlink -f mesasdk)"
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          export "MESA_DIR=$(readlink -f ./)"
+          # Everything is run as root so we need to disable the root check in the install script
+          sed -i 's/\${EUID:-\$(id -u)}/1/' install
+          ./install
+          if [ ! -f lib/libbinary.a ]; then
+            exit 1
+          fi
