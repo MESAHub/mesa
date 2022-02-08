@@ -67,7 +67,6 @@ contains
       type(auto_diff_real_tdc) :: Q, Q0
       logical :: has_root
       integer :: iter
-      integer, parameter :: max_iter = 30
       include 'formats'
 
       ierr = 0
@@ -203,11 +202,10 @@ contains
       
       type(auto_diff_real_tdc) :: Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ, Q0
-      integer :: iter, line_iter, i
+      integer :: iter, line_iter
       logical :: converged, have_derivatives, corr_has_derivatives
       real(dp), parameter :: correction_tolerance = 1d-13
       real(dp), parameter :: residual_tolerance = 1d-8
-      real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       integer, parameter :: max_iter = 200
       integer, parameter :: max_line_search_iter = 5
       include 'formats'
