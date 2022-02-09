@@ -533,6 +533,7 @@
          extras_lpar, &
          num_special_rate_factors, &
          special_rate_factor, &
+         filename_of_special_rate, &
          reaction_for_special_factor,&
          color_num_files,&
          color_file_names,&
@@ -1163,6 +1164,7 @@
          s% job% extras_lpar = extras_lpar
          s% job% num_special_rate_factors = num_special_rate_factors
          s% job% special_rate_factor = special_rate_factor
+         s% job% filename_of_special_rate = filename_of_special_rate
          s% job% reaction_for_special_factor = reaction_for_special_factor
          s% job% color_num_files = color_num_files
          s% job% color_file_names = color_file_names
@@ -1182,6 +1184,7 @@
          extras_cpar(:) = ''
          extras_lpar(:) = .false.
          special_rate_factor(:) = 1d0
+         filename_of_special_rate(:) = ''
          reaction_for_special_factor(:) = ''
          color_num_colors(:) = 0
          color_file_names(:) = ''
@@ -1716,6 +1719,8 @@
          extras_lpar = s% job% extras_lpar
          num_special_rate_factors = s% job% num_special_rate_factors
          special_rate_factor = s% job% special_rate_factor
+         filename_of_special_rate = s% job% filename_of_special_rate
+         
          reaction_for_special_factor = s% job% reaction_for_special_factor
          color_num_files = s% job% color_num_files
          color_file_names = s% job% color_file_names

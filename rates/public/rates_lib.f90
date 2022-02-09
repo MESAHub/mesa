@@ -128,6 +128,37 @@
          end if
       end subroutine read_raw_rates_records
 
+
+      subroutine read_rate_from_file(rate_name, filename, ierr)
+         use rates_initialize
+         character(len=*), intent(in) :: rate_name, filename
+         integer, intent(out) :: ierr
+
+         call rate_from_file(rate_name, filename, ierr)
+         if(ierr/=0) then
+            write(*,*) 'read_rate_from_file for',trim(rate_name), trim(filename)
+            return
+         end if
+
+      end subroutine read_rate_from_file
+
+      subroutine read_rates_from_files(rate_names, filenames, ierr)
+         use rates_initialize
+         character(len=*), intent(in) :: rate_names(:), filenames(:)
+         integer, intent(out) :: ierr
+         integer :: i
+
+         ierr = 0
+         do i=1, ubound(rate_names,dim=1)
+            call rate_from_file(rate_names(i), filenames(i), ierr)
+            if(ierr/=0) then
+               write(*,*) 'read_rates_from_files for num=',i,trim(rate_names(i)), trim(filenames(i))
+               return
+            end if
+         end do
+
+      end subroutine read_rates_from_files      
+
       
       subroutine rates_shutdown
 

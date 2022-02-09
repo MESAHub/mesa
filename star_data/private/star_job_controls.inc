@@ -373,6 +373,7 @@
       real(dp) :: special_rate_factor(max_num_special_rate_factors)
       character(len=maxlen_reaction_Name) :: &
          reaction_for_special_factor(max_num_special_rate_factors)
+      character(len=strlen) :: filename_of_special_rate(max_num_special_rate_factors)
 
       logical :: do_special_test
 

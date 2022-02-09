@@ -572,25 +572,14 @@
                call error; return
             end if
             if (dbg) write(*,*) 'use rate table from file for ', trim(rate_name)
-            ir = lookup_rate_name(rate_name)
-            if (ir <= 0) then
-               call do_add_reaction_for_handle(rate_name, ierr)
-               if (ierr == 0) ir = lookup_rate_name(rate_name)
-               if (ierr /= 0 .or. ir <= 0) then
-                  write(*,*) 'invalid rate file ' // trim(rate_name)
-                  call error; return
-               end if
-            end if
             t = token(iounit, n, i, buffer, rate_fname)
             if (t /= string_token) then
                call error; return
             end if
-            if (dbg) write(*,*) 'rate_fname ', trim(rate_fname)
-            ri => raw_rates_records(ir)
-            ri% use_rate_table = .true.
-            ri% need_to_read = .true.
-            ri% rate_fname = trim(rate_fname)
-            if (dbg) write(*,*) 'done'
+
+            call rate_from_file(rate_name, rate_fname, ierr)
+               if (ierr /= 0) call error()
+
          end do rate_loop
          
          close(iounit)
@@ -649,6 +638,38 @@
       
       
       end subroutine init_raw_rates_records
+
+      subroutine rate_from_file(rate_name, filename, ierr)
+         character(len=*) :: rate_name, filename
+         integer, intent(out) :: ierr
+
+         integer :: ir
+         logical,parameter :: dbg=.false.
+         type (rate_table_info), pointer :: ri =>null()
+
+         ierr = 0 
+
+         if (len_trim(rate_name) == 0 .or. len_trim(filename)==0) return
+
+         ir = lookup_rate_name(rate_name)
+         if (ir <= 0) then
+            call do_add_reaction_for_handle(rate_name, ierr)
+            if (ierr == 0) ir = lookup_rate_name(rate_name)
+            if (ierr /= 0 .or. ir <= 0) then
+               write(*,*) 'invalid rate file ' // trim(rate_name)
+               ierr = -1
+               return 
+            end if
+         end if
+         if (dbg) write(*,*) 'rate_fname ', trim(filename)
+         ri => raw_rates_records(ir)
+         ri% use_rate_table = .true.
+         ri% need_to_read = .true.
+         ri% rate_fname = trim(filename)
+         if (dbg) write(*,*) 'done'
+
+
+      end subroutine rate_from_file
 
       
       subroutine read_reaction_parameters(reactionlist_filename, ierr)
