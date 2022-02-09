@@ -29,6 +29,11 @@
       new_cumulative_energy_error = 0d0
       
       !pgstar_flag = .true.
+
+      num_special_rate_factors = 1
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
       
 
 / ! end of star_job namelist
