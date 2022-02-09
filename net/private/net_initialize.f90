@@ -309,7 +309,7 @@
          g% cache_suffix = trim(cache_suffix)
          
          call make_rate_tables( &
-            g% num_reactions, g% cache_suffix, g% reaction_id, g% which_rates,  &
+            g% num_reactions, g% cache_suffix, g% reaction_id,  &
             g% rate_table, g% rattab_f1, nrattab, g% ttab, g% logttab, ierr)
          if (ierr /= 0) then
             write(*,*) 'alloc_net_general_info failed in call on make_rate_tables'
@@ -1403,13 +1403,10 @@
          if (ierr /= 0) return         
          
          allocate( &
-            g% which_rates(rates_reaction_id_max),  &
             g% reaction_max_Z(g% num_reactions),  &
             g% reaction_max_Z_plus_N_for_max_Z(g% num_reactions),  &
             stat=ierr)
          if (ierr /= 0) return
-         
-         g% which_rates(:) = 1
          
          allocate( &
             g% z158(g% num_isos),  &

@@ -77,9 +77,6 @@
          ! value is between 1 and num_chem_isos         
 
          ! reactions
-
-         integer, allocatable :: which_rates(:) 
-            ! maps reaction id to small integer indicating choice for rate
                   
          integer, pointer :: net_reaction(:) ! maps reaction id to net reaction number
          ! index from 1 to rates_reaction_id_max (in rates_def)   
@@ -364,9 +361,6 @@
          type (Net_General_Info), pointer :: g
          if (handle >= 1 .and. handle <= max_net_handles) then
             g => net_handles(handle)
-            if (allocated(g% which_rates)) then
-               deallocate(g% which_rates)
-            end if
             if (associated(g% net_iso)) then
                deallocate(g% net_iso)
                   nullify(g% net_iso)
@@ -505,27 +499,6 @@
          g% clock_derivs_general = 0
          g% clock_net_get = 0
       end subroutine zero_net_timing
-
-      
-      subroutine do_net_set_which_rates(handle, which_rates, ierr)
-         use rates_def, only: rates_reaction_id_max
-         integer, intent(in) :: handle, which_rates(:)
-         integer, intent(out) :: ierr
-         type (Net_General_Info), pointer :: g
-         integer :: j
-         include 'formats'
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for net_set_which_rates'
-            return
-         end if
-         if (.not. allocated(g% which_rates)) return
-            ! this can happen on coprocessor
-         do j=1,rates_reaction_id_max
-            g% which_rates(j) = which_rates(j)
-         end do
-      end subroutine do_net_set_which_rates
-      
       
       subroutine do_net_set_fe56ec_fake_factor( &
             handle, fe56ec_fake_factor, min_T_for_fe56ec_fake_factor, ierr)

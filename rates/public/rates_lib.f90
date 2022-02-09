@@ -171,59 +171,20 @@
 
 
       subroutine make_rate_tables( &
-            num_reactions, cache_suffix, net_reaction_id, which_rates,  &
+            num_reactions, cache_suffix, net_reaction_id, &
             rattab, rattab_f1, nT8s, ttab, logttab, ierr)  
          use rates_support, only : do_make_rate_tables
-         integer, intent(in) :: num_reactions, nT8s, net_reaction_id(:), which_rates(:)
+         integer, intent(in) :: num_reactions, nT8s, net_reaction_id(:)
          character (len=*), intent(in) :: cache_suffix
          real(dp) :: rattab(:,:), ttab(:), logttab(:)
          real(dp), pointer :: rattab_f1(:)
          integer, intent(out) :: ierr
          call do_make_rate_tables( &
                num_reactions, cache_suffix, net_reaction_id,  &
-               which_rates, rattab, rattab_f1, nT8s, ttab, logttab, ierr)
+               rattab, rattab_f1, nT8s, ttab, logttab, ierr)
       end subroutine make_rate_tables
       
-      
-      subroutine set_which_rate_c12ag(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir_c12_ag_o16) = choice
-         which_rates(ir_o16_ga_c12) = choice
-      end subroutine set_which_rate_c12ag
-      
-      
-      subroutine set_which_rate_n14pg(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir_n14_pg_o15) = choice
-         which_rates(irn14pg_aux) = choice
-         which_rates(irn14_to_n15) = choice
-         which_rates(irn14_to_o16) = choice
-         which_rates(irn14_to_c12) = choice
-         which_rates(ir_o15_gp_n14) = choice
-      end subroutine set_which_rate_n14pg
-      
-      
-      subroutine set_which_rate_3a(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir_he4_he4_he4_to_c12) = choice
-         which_rates(ir_c12_to_he4_he4_he4) = choice
-      end subroutine set_which_rate_3a
-      
-      
-      subroutine set_which_rate_1212(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir1212) = choice
-      end subroutine set_which_rate_1212
-      
-      
+           
       subroutine show_reaction_rates_from_cache(cache_filename, ierr) 
          use rates_support, only: do_show_reaction_from_cache
          character (len=*) :: cache_filename
@@ -286,29 +247,28 @@
       end subroutine eval_tfactors
       
 
-      subroutine get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
+      subroutine get_raw_rate(ir, temp, tf, raw_rate, ierr)
          use rates_def, only : T_Factors
          use raw_rates
-         integer, intent(in) :: ir, which_rate
+         integer, intent(in) :: ir
          real(dp), intent(in) :: temp
          type (T_Factors), pointer :: tf
          real(dp), intent(out) :: raw_rate
          integer, intent(out) :: ierr
-         call set_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
+         call set_raw_rate(ir,  temp, tf, raw_rate, ierr)
       end subroutine get_raw_rate
 
 
-      subroutine get_raw_rates(n, irs, which_rates, temp, tf, rates, ierr)
+      subroutine get_raw_rates(n, irs, temp, tf, rates, ierr)
          use rates_def, only : T_Factors
          use raw_rates, only: set_raw_rates
          integer, intent(in) :: n
          integer, intent(in) :: irs(:) ! (n) maps 1..n to reaction id
-         integer, intent(in) :: which_rates(:) ! (rates_reaction_id_max)
          real(dp), intent(in) :: temp
          type (T_Factors), pointer :: tf
          real(dp), intent(inout) :: rates(:)
          integer, intent(out) :: ierr
-         call set_raw_rates(n, irs, which_rates, temp, tf, rates, ierr)
+         call set_raw_rates(n, irs, temp, tf, rates, ierr)
       end subroutine get_raw_rates
       
       integer function rates_reaction_id(rname)

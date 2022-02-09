@@ -33,7 +33,7 @@
 
       private
       public :: set_net, do_net, do1_net, do_micro_change_net, &
-         get_screening_mode, default_set_which_rates, default_set_rate_factors, &
+         get_screening_mode, default_set_rate_factors, &
          default_set_op_mono_factors
 
 
@@ -740,21 +740,6 @@
             return
          end if
 
-         if (associated(s% which_rates)) deallocate(s% which_rates)
-         allocate(s% which_rates(rates_reaction_id_max))
-
-         call s% set_which_rates(s% id, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'failed in set_which_rates'
-            return
-         end if
-
-         call net_set_which_rates(s% net_handle, s% which_rates, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'failed in net_set_which_rates'
-            return
-         end if
-
          call net_set_logTcut(s% net_handle, s% net_logTcut_lo, s% net_logTcut_lim, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'failed in net_set_logTcut'
@@ -776,19 +761,6 @@
          end if
 
       end subroutine net_tables
-
-
-      subroutine default_set_which_rates(id, ierr)
-         use rates_def, only: rates_NACRE_if_available
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% which_rates(:) = rates_NACRE_if_available
-      end subroutine default_set_which_rates
-
 
       subroutine default_set_rate_factors(id, ierr)
          integer, intent(in) :: id

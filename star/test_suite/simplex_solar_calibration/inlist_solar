@@ -19,8 +19,6 @@
       change_initial_net = .true. ! switch nuclear reaction network
       new_net_name = 'pp_and_cno_extras.net'
 
-	   set_rate_c12ag = 'Kunz'
-	   set_rate_n14pg = 'jina reaclib'
 
       set_initial_model_number = .true.
       initial_model_number = 0
