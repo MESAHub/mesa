@@ -1185,15 +1185,13 @@
 
    ! sample_results_prefix
    ! ~~~~~~~~~~~~~~~~~~~~~
-   ! Prefix for sample results filenames.
-   ! You can include a directory in the prefix if desired. ::
-
-      sample_results_prefix = 'outputs/sample_'
-
    ! sample_results_postfix
    ! ~~~~~~~~~~~~~~~~~~~~~~
-   ! ::
+   ! Prefix and postfix for sample results filenames.
+   ! You can include a directory in the prefix if desired
+   ! but you must create the directory yourself. ::
 
+      sample_results_prefix = 'outputs/sample_'
       sample_results_postfix = '.data'
 
    ! model_num_digits
@@ -1210,15 +1208,13 @@
 
    ! fgong_prefix
    ! ~~~~~~~~~~~~
-   ! Prefix for FGONG filenames.
-   ! You can include a directory in the prefix if desired. ::
-
-      fgong_prefix = 'fgong_'
-
    ! fgong_postfix
    ! ~~~~~~~~~~~~~
-   ! ::
+   ! Prefix and postfix for FGONG filenames.
+   ! You can include a directory in the prefix if desired
+   ! but you must create the directory yourself. ::
 
+      fgong_prefix = 'fgong_'
       fgong_postfix = '.data'
 
    ! write_fgong_for_best_model
@@ -1241,15 +1237,13 @@
 
    ! gyre_prefix
    ! ~~~~~~~~~~~
-   ! Prefix for GYRE filenames.
-   ! You can include a directory in the prefix if desired. ::
-
-      gyre_prefix = 'gyre_'
-
    ! gyre_postfix
    ! ~~~~~~~~~~~~
-   ! ::
+   ! Prefix and postfix for GYRE filenames.
+   ! You can include a directory in the prefix if desired
+   ! but you must create the directory yourself. ::
 
+      gyre_prefix = 'gyre_'
       gyre_postfix = '.data'
 
    ! max_num_gyre_points
@@ -1366,10 +1360,8 @@
    ! ~~~~~~~~~~~~~~
    ! If ``.true.``, then ``star`` adds the atmosphere structure
    ! before passing the model to ADIPLS or GYRE.
-   ! The atmosphere model is determined by the ``star`` control ``atm_option``, which should be
-   ! it should either be one of the T(τ) integration options or ``Paczynski_grey``,
-   ! the scheme inspired by B. Paczynski, 1969, Acta Astr., vol. 19, 1.
-   ! which takes into account radiation dilution when tau < 2/3. ::
+   ! The atmosphere model is determined by the atmosphere boundary
+   ! conditions in the ``&controls`` namelist for ``star``. ::
 
       add_atmosphere = .false.
 

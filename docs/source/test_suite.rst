@@ -663,6 +663,12 @@ An example optimisation run of the ``astero`` module, based on the CoRoT
 target HD 49385.  This is the usual starting point if you want to
 optimise model parameters using the ``astero`` module.
 
+:ref:`fast_simplex`
+^^^^^^^^^^^^^^^^^^^
+
+Executes a handful of iterations of a very crude simplex optimisation
+to make sure the relevant procedures get tested.
+
 surface_effects
 ^^^^^^^^^^^^^^^
 
