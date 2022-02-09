@@ -608,17 +608,16 @@
             use ratelib, only: tfactors
             use raw_rates, only: set_raw_rate
             real(dp) :: logT, temp, raw_rate
-            integer :: which_rate, i, ierr
+            integer :: i, ierr
             type (T_Factors) :: tf 
          
             logT = 8
             temp = exp10(logT)
             call tfactors(tf, logT, temp)
             ierr = 0
-            which_rate = 1
             okay = .true.
             do i = 1, rates_reaction_id_max
-               call set_raw_rate(i, which_rate, temp, tf, raw_rate, ierr)
+               call set_raw_rate(i, temp, tf, raw_rate, ierr)
                if (ierr /= 0) then
                   write(*,'(a)') 'set_raw_rate failed for ' // reaction_Name(i)
                   okay = .false.

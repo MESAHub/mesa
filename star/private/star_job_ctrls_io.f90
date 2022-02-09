@@ -448,12 +448,6 @@
          co_net, &
          adv_net, &
          adjust_abundances_for_new_isos, &
-         set_rates_preference, &
-         new_rates_preference, &
-         set_rate_c12ag, &
-         set_rate_n14pg, &
-         set_rate_3a, &
-         set_rate_1212, &
          set_uniform_xa_from_file, &
          set_uniform_initial_xa_from_file, &
          file_for_uniform_xa, &
@@ -1080,12 +1074,6 @@
          s% job% co_net = co_net
          s% job% adv_net = adv_net
          s% job% adjust_abundances_for_new_isos = adjust_abundances_for_new_isos
-         s% job% set_rates_preference = set_rates_preference
-         s% job% new_rates_preference = new_rates_preference
-         s% job% set_rate_c12ag = set_rate_c12ag
-         s% job% set_rate_n14pg = set_rate_n14pg
-         s% job% set_rate_3a = set_rate_3a
-         s% job% set_rate_1212 = set_rate_1212
          s% job% set_uniform_xa_from_file = set_uniform_xa_from_file
          s% job% set_uniform_initial_xa_from_file = set_uniform_initial_xa_from_file
          s% job% file_for_uniform_xa = file_for_uniform_xa
@@ -1639,12 +1627,6 @@
          co_net = s% job% co_net
          adv_net = s% job% adv_net
          adjust_abundances_for_new_isos = s% job% adjust_abundances_for_new_isos
-         set_rates_preference = s% job% set_rates_preference
-         new_rates_preference = s% job% new_rates_preference
-         set_rate_c12ag = s% job% set_rate_c12ag
-         set_rate_n14pg = s% job% set_rate_n14pg
-         set_rate_3a = s% job% set_rate_3a
-         set_rate_1212 = s% job% set_rate_1212
          set_uniform_xa_from_file = s% job% set_uniform_xa_from_file
          set_uniform_initial_xa_from_file = s% job% set_uniform_initial_xa_from_file
          file_for_uniform_xa = s% job% file_for_uniform_xa

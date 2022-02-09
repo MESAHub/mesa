@@ -173,9 +173,9 @@
 
 
       subroutine alloc_star_data(id, ierr)
-         use rates_def, only: rates_reaction_id_max, rates_NACRE_if_available
+         use rates_def, only: rates_reaction_id_max
          use chem_def, only: num_categories
-         use net, only: default_set_which_rates, default_set_rate_factors, &
+         use net, only: default_set_rate_factors, &
             default_set_op_mono_factors
 
 
@@ -213,9 +213,6 @@
 
          nullify(s% chem_id)
          nullify(s% xa_removed)
-
-         nullify(s% which_rates)
-         s% set_which_rates => default_set_which_rates
 
          nullify(s% rate_factors)
          s% set_rate_factors => default_set_rate_factors

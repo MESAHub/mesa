@@ -329,7 +329,6 @@
          if (ASSOCIATED(s% burn_z_mix_region)) deallocate(s% burn_z_mix_region)
 
          if (ASSOCIATED(s% rate_factors)) deallocate(s% rate_factors)
-         if (ASSOCIATED(s% which_rates)) deallocate(s% which_rates)
 
          if (ASSOCIATED(s% nameofvar)) deallocate(s% nameofvar)
          if (ASSOCIATED(s% nameofequ)) deallocate(s% nameofequ)

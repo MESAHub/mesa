@@ -11,7 +11,6 @@
       required_termination_code_string = 'log_center_temp_limit'
 
       ! Nuclear Reactions
-      set_rate_3a = 'FL87' ! Fushiki and Lamb, Apj, 317, 368-388, 1987
 
       rate_tables_dir = 'tables_hashimoto'
       rate_cache_suffix = 'hashimoto'
