@@ -26,6 +26,40 @@ Rates
 The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
 due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10**7 K.
 
+The ability to set the rates preferences has been removed. This added alot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
+From now on we excusivily use NACRE for any rate that cares about temperatures below 10**7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
+from CF88 (if they aren't in REACLIB or NACRE). 
+
+The options ``set_rates_preferences``, ``new_rates_preference``, and ``set_rate_c1212`` have been removed without replacements.
+
+The options ``set_rate_c12ag``, ``set_rate_n14pg``, and ``set_rate_3a`` have been removed. However, those rates can now be access thorugh a new 
+rate selection mechanism. In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship a number of MESA provided rate tables. These can be loaded,
+either by the normal mechanism of adding the filename to a ``rates_list`` file, or by using the new option ``filename_of_special_rate``.
+This option sets the filename to load the rate from for the rate specified by ``reaction_for_special_factor``.
+
+Thus the options:
+
+::
+
+      num_special_rate_factors = 1
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+
+replaces the previous:
+
+::
+
+  set_rate_c12ag = 'Kunz'
+
+option.
+
+As part of this new scheme we now ship a set of rates from NACREII `Xu et al 2013 <https://ui.adsabs.harvard.edu/abs/2013cgrs.conf..617X/abstract>`_. These rates do not, by default,
+override the default NACRE rates.
+
+.. note::
+
+  Describe the replacement for the FL87 rate
 
 
 Changes in r21.12.1
