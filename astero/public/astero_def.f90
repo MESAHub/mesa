@@ -1348,8 +1348,9 @@
       subroutine show_sample_header(iounit)
          integer, intent(in) ::iounit
          
-         integer :: j
+         integer :: j, l
          character (len=10) :: str
+         character (len=1) :: l_str
       
          write(iounit,'(2x,a6,10a26,a16,22a26,7a20)',advance='no') &
             'sample', &
@@ -1399,73 +1400,20 @@
             'ratios_l1_first'
          
          if (chi2_seismo_fraction > 0) then
-         
-            do j=1,nl(0)
-               if (j < 10) then
-                  write(str,'(i1)') j
-               else if (j < 100) then
-                  write(str,'(i2)') j
-               else
+
+            do l=0,3
+               write(l_str,'(i1)') l
+               do j=1,nl(l)
                   write(str,'(i3)') j
-               end if
-               write(iounit,'(99a26)',advance='no') &
-                  'l0_order_' // trim(str), &
-                  'l0_obs_' // trim(str), &
-                  'l0_obs_sigma_' // trim(str), &
-                  'l0_freq_' // trim(str), &
-                  'l0_freq_corr_' // trim(str), &
-                  'l0_inertia_' // trim(str)
-            end do
-            
-            do j=1,nl(1)
-               if (j < 10) then
-                  write(str,'(i1)') j
-               else if (j < 100) then
-                  write(str,'(i2)') j
-               else
-                  write(str,'(i3)') j
-               end if
-               write(iounit,'(99a26)',advance='no') &
-                  'l1_order_' // trim(str), &
-                  'l1_obs_' // trim(str), &
-                  'l1_obs_sigma_' // trim(str), &
-                  'l1_freq_' // trim(str), &
-                  'l1_freq_corr_' // trim(str), &
-                  'l1_inertia_' // trim(str)
-            end do
-            
-            do j=1,nl(2)
-               if (j < 10) then
-                  write(str,'(i1)') j
-               else if (j < 100) then
-                  write(str,'(i2)') j
-               else
-                  write(str,'(i3)') j
-               end if
-               write(iounit,'(99a26)',advance='no') &
-                  'l2_order_' // trim(str), &
-                  'l2_obs_' // trim(str), &
-                  'l2_obs_sigma_' // trim(str), &
-                  'l2_freq_' // trim(str), &
-                  'l2_freq_corr_' // trim(str), &
-                  'l2_inertia_' // trim(str)
-            end do
-            
-            do j=1,nl(3)
-               if (j < 10) then
-                  write(str,'(i1)') j
-               else if (j < 100) then
-                  write(str,'(i2)') j
-               else
-                  write(str,'(i3)') j
-               end if
-               write(iounit,'(99a26)',advance='no') &
-                  'l3_order_' // trim(str), &
-                  'l3_obs_' // trim(str), &
-                  'l3_obs_sigma_' // trim(str), &
-                  'l3_freq_' // trim(str), &
-                  'l3_freq_corr_' // trim(str), &
-                  'l3_inertia_' // trim(str)
+                  str = adjustl(str)
+                  write(iounit,'(99a26)',advance='no') &
+                     'l' // l_str // '_order_' // trim(str), &
+                     'l' // l_str // '_obs_' // trim(str), &
+                     'l' // l_str // '_obs_sigma_' // trim(str), &
+                     'l' // l_str // '_freq_' // trim(str), &
+                     'l' // l_str // '_freq_corr_' // trim(str), &
+                     'l' // l_str // '_inertia_' // trim(str)
+               end do
             end do
 
             do j=1,ratios_n
