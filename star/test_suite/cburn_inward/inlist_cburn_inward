@@ -52,7 +52,7 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number and max_age as part of test_suite
-      max_model_number = 300
+      max_model_number = 1000
       max_age = 1d6
 
       initial_mass = 7.75
