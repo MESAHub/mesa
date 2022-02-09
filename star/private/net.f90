@@ -740,6 +740,12 @@
             return
          end if
 
+         call read_rates_from_files(s% job% reaction_for_special_factor, s% job% filename_of_special_rate, ierr)
+         if (ierr /= 0) then
+            if (s% report_ierr) write(*,*) 'failed in read_rates_from_files'
+            return
+         end if
+
          call net_set_logTcut(s% net_handle, s% net_logTcut_lo, s% net_logTcut_lim, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'failed in net_set_logTcut'
