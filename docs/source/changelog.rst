@@ -26,6 +26,13 @@ Rates
 The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
 due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10**7 K.
 
+Star
+----
+
+An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
+using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
+More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
+This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
 
 
 Changes in r21.12.1

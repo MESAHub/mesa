@@ -7220,6 +7220,7 @@
 
       ! Phase separation upon crystallization in WD cores
       ! (currently only for C/O white dwarf cores)
+      ! using the phase diagram of `Blouin et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
 
       ! ::
 
