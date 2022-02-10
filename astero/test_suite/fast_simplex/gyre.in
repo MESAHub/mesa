@@ -1,0 +1,34 @@
+&model
+/
+
+&mode
+  l = 0
+  tag = 'l=0'
+/
+
+&osc
+  variables_set = 'JCD'
+  outer_bound = 'JCD'
+/
+
+&rot
+/
+
+&num
+  diff_scheme = 'COLLOC_GL4'
+/
+
+&scan
+  grid_type = 'LINEAR'
+  freq_min = 3000
+  freq_max = 3600
+  freq_min_units = 'UHZ'
+  freq_max_units = 'UHZ'
+  n_freq = 40
+/
+
+&grid
+  ! w_osc = 10
+  ! w_exp = 2
+  ! w_ctr = 10
+/

@@ -1,0 +1,1 @@
+../../../astero/test_suite/example_astero/README.rst
