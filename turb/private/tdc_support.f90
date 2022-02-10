@@ -354,6 +354,18 @@ contains
          return
       end if
 
+      Y = set_Y(.false., lower_bound_Z)
+      call compute_Q(info, Y, Q, Af)
+      if (Af == 0) then
+         ! We want to find Z such that Af(Z) is just barely above zero.
+         ! We do this by finding Z such that Af(Z) == 0, then backing off to slightly smaller Z.
+         ! Because d(Af)/dZ < 0, this gives a Z such that Af(Z) > 0.
+         ! Hence, if Af(lower_bound_Z) == 0 then Af = 0 uniformly in this interval and we cannot
+         ! return Z such that Af(Z) is just barely non-zero.
+         ierr = 2
+         return
+      end if
+
       do iter=1,max_iter
          Z = (upper_bound_Z + lower_bound_Z) / 2d0
          Y = set_Y(.false., Z)

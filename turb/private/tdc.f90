@@ -123,48 +123,93 @@ contains
          else
             if (info%report) write(*,*) 'A0 > 0.'
             ! Otherwise, we keep going.
-            ! We next identify the point where Af(Y) = 0. Call this Y0, corresponding to Z0.
-            call Af_bisection_search(info, Zlb, Zub, Z0, Af, ierr)
-            if (ierr /= 0) return
-            Y0 = set_Y(.false., Z0)
-            call compute_Q(info, Y0, Q, Af)
-            if (info%report) write(*,*) 'Bisected Af. Y0=',Y0%val,'Af(Y0)=',Af%val
 
-            ! We next need to do a bracket search for where dQdZ = 0 over the interval [Y0,0] (equivalently from Z=lower_bound to Z=Z0).
-            call dQdZ_bisection_search(info, Zlb, Z0, Z1, has_root)
-            if (has_root) then
-               Y1 = set_Y(.false., Z1)
-               if (info%report) write(*,*) 'Bisected dQdZ, found root, ',Y1%val
-               call compute_Q(info, Y1, Q, Af)
-               if (Q < 0) then ! Means there are no roots with Af > 0.
-                  if (info%report) write(*,*) 'Root has Q<0, Q=',Q%val,'Y=',radY%val
-                  Y = radY
-               else
-                  if (info%report) write(*,*) 'Root has Q>0. Q(Y1)=',Q%val
-                  ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
-                  if (info%report) write(*,*) 'Searching from Y=',-exp(Zlb%val),'to Y=',-exp(Z1%val)
-                  call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
-                  Y = convert(Y_face)
-                  if (info%report) write(*,*) 'ierr',ierr, tdc_num_iters
-                  if (ierr /= 0) then
-                     if (info%report) write(*,*) 'No root found. Searching from Y=',-exp(Z1%val),'to Y=',-exp(Z0%val)
-                     ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
-                     ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
-                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
-                     Y = convert(Y_face)
-                  end if
-                  if (info%report) write(*,*) 'Y=',Y%val
-               end if
+            ! We divide the possible functions Af(Z) into three classes:
+            ! 1. Af(lower_bound_Z) == 0. In this case Af is zero over the whole interval, because d(Af)/dZ <= 0.
+            !    This means that the system becomes radiative instantly, so we just return the radiative answer.
+            ! 2. Af(upper_bound_Z) > 0. In this case Af is non-zero over the whole interval, so there is no discontinuity
+            !    in dQ/dZ, and we can proceed to bisect to search for a root in dQ/dZ.
+            ! 3. Af(upper_bound_Z) == 0 and Af(lower_bound_Z) > 0. In this case Af hits zero somewhere in our
+            !    search interval and then sticks there for the rest of the interval. This requires more care to handle,
+            !    as it produces a discontinuity in dQ/dZ.
+            !
+            ! We identify and handle these three cases below.
+            ! In cases 2 and 3 our goal is to approximate the greatest Z0 such that dQ/dZ is continuous on [Zlb,Z0] and
+            ! Z0 <= Zub. The continuity requirement is equivalent to Af(Z0) > 0, and the 'approximate the greatest'
+            ! requirement means that Z0 is near the point where Af(Z) first equals 0.
+
+            Y0 = set_Y(.false., Zlb)
+            call compute_Q(info, Y0, Q, Af)
+            if (Af == 0) then
+               ! Means we're in case 1. Return the radiative Y.
+               Y = radY
+               if (info%report) write(*,*) 'Case 1: Af(Zlb) == 0, Y=radY=',Y%val
             else
-               if (info%report) write(*,*) 'Bisected dQdZ, no root found.'
+               Y0 = set_Y(.false., Zub)
                call compute_Q(info, Y0, Q, Af)
-               if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
-                  call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
-                  Y = convert(Y_face)
-                  if (info%report) write(*,*) 'Q(Y0) > 0, bisected and found Y=',Y%val
-               else ! Means there's no root in [Y0,0] so the only root is radY.
-                  if (info%report) write(*,*) 'Q(Y0) < 0, Y=',radY%val
-                  Y = radY
+               if (Af > 0) then
+                  ! Means we're in case 2. Af > 0 on the whole interval, so dQ/dZ is continuous on the whole interval,
+                  ! so return Z0 = Zub.
+                  Z0 = Zub
+                  if (info%report) write(*,*) 'Case 1: Af(Zub) > 0, Z0=',Z0%val
+               else
+                  ! Means we're in case 3.
+
+                  ! We now identify the point where Af(Y) = 0.
+                  ! Once we find that, we return a Y that is just slightly less negative so that Af > 0.
+                  ! Call this Y0, corresponding to Z0.
+                  ! This is important for our later bisection of dQ/dZ, because we want the upper-Z end of
+                  ! the domain we bisect to have dQ/dZ < 0, which means it has to capture the fact that d(Af)/dZ < 0,
+                  ! and so the Z we return has to be on the positive-Af side of the discontinuity in dQdZ.
+                  call Af_bisection_search(info, Zlb, Zub, Z0, Af, ierr)
+
+                  ! ierr /= 0 should be impossible, because we checked the necessary conditions
+                  ! for the bisection search above. Nonetheless, bugs can crop up, so we leave this
+                  ! check in here and leave the checks in Af_bisection_search.
+                  if (ierr /= 0) return 
+                  Y0 = set_Y(.false., Z0)
+                  call compute_Q(info, Y0, Q, Af)
+                  if (info%report) write(*,*) 'Bisected Af. Y0=',Y0%val,'Af(Y0)=',Af%val
+               end if
+
+               ! If we're still here it means we were in either case 2 or case 3.
+               ! In either case, we now need to do a search for where dQ/dZ == 0
+               ! over the interval [Y0,0] (equivalently from Z=lower_bound to Z=Z0).
+               call dQdZ_bisection_search(info, Zlb, Z0, Z1, has_root)
+               if (has_root) then
+                  Y1 = set_Y(.false., Z1)
+                  if (info%report) write(*,*) 'Bisected dQdZ, found root, ',Y1%val
+                  call compute_Q(info, Y1, Q, Af)
+                  if (Q < 0) then ! Means there are no roots with Af > 0.
+                     if (info%report) write(*,*) 'Root has Q<0, Q=',Q%val,'Y=',radY%val
+                     Y = radY
+                  else
+                     if (info%report) write(*,*) 'Root has Q>0. Q(Y1)=',Q%val
+                     ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
+                     if (info%report) write(*,*) 'Searching from Y=',-exp(Zlb%val),'to Y=',-exp(Z1%val)
+                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
+                     Y = convert(Y_face)
+                     if (info%report) write(*,*) 'ierr',ierr, tdc_num_iters
+                     if (ierr /= 0) then
+                        if (info%report) write(*,*) 'No root found. Searching from Y=',-exp(Z1%val),'to Y=',-exp(Z0%val)
+                        ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
+                        ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
+                        call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
+                        Y = convert(Y_face)
+                     end if
+                     if (info%report) write(*,*) 'Y=',Y%val
+                  end if
+               else
+                  if (info%report) write(*,*) 'Bisected dQdZ, no root found.'
+                  call compute_Q(info, Y0, Q, Af)
+                  if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
+                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
+                     Y = convert(Y_face)
+                     if (info%report) write(*,*) 'Q(Y0) > 0, bisected and found Y=',Y%val
+                  else ! Means there's no root in [Y0,0] so the only root is radY.
+                     if (info%report) write(*,*) 'Q(Y0) < 0, Y=',radY%val
+                     Y = radY
+                  end if
                end if
             end if
          end if
