@@ -52,18 +52,15 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
       ! limit max_model_number and max_age as part of test_suite
-      max_model_number = 1000
+      max_model_number = 2000
       max_age = 1d6
 
       initial_mass = 7.75
       initial_z = 0.02d0
 
       mesh_delta_coeff = 1.5
-      varcontrol_target = 1d-4
-      dHe_div_He_limit = 0.5d0
-      delta_lgT_limit = 1d-1
-      delta_lgT_limit_min_lgT = 0d0
- 
+      varcontrol_target = 3d-4 
+
       mixing_length_alpha = 1.8d0
       MLT_option = 'TDC'
     
