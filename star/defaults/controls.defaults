@@ -2317,6 +2317,9 @@
       ! + 'Mihalas'    : Mihalas 1978, Kurucz 1979
       ! + 'Henyey'     : Henyey, Vardya, and Bodenheimer 1965
 
+      ! The 'Cox' and 'TDC' options assumes optically thick material.
+      ! The other options are various ways of extending to include optically thin material.
+
       ! ::
 
     MLT_option = 'Cox'
