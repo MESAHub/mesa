@@ -7258,11 +7258,11 @@
 
       ! if true and element diffusion is on, prevent element diffusion
       ! from occurring in the layers where phase separation mixing
-      ! is present
+      ! is present (experimental)
 
       ! ::
 
-    phase_separation_no_diffusion = .true.
+    phase_separation_no_diffusion = .false.
 
 
 ! eos controls
