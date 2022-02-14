@@ -71,7 +71,7 @@
                 if (s% report_ierr) write(*, *) s% retry_message
             end if
          else
-            call do_brunt_B_MHM_form(s,ierr)
+            call do_brunt_B_MHM_form(s,nzlo,nzhi,ierr)
             if (ierr /= 0) then
                 s% retry_message = 'failed in do_brunt_B_MHM_form'
                 if (s% report_ierr) write(*, *) s% retry_message
@@ -80,7 +80,7 @@
          if (ierr /= 0) return
 
          ! save unsmoothed brunt_B
-         do k=1,nz
+         do k=nzlo,nzhi
             s% unsmoothed_brunt_B(k) = s% brunt_B(k)
             if (is_bad(s% unsmoothed_brunt_B(k))) then
                write(*,2) 'unsmoothed_brunt_B(k)', k, s% unsmoothed_brunt_B(k)
@@ -189,12 +189,13 @@
       end subroutine do_brunt_N2
 
 
-      subroutine do_brunt_B_MHM_form(s, ierr)
+      subroutine do_brunt_B_MHM_form(s, nzlo, nzhi, ierr)
          ! Brassard from Mike Montgomery (MHM)
          use star_utils, only: get_face_values
          use interp_1d_def
 
          type (star_info), pointer :: s
+         integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
 
 
@@ -225,7 +226,7 @@
          if (ierr /= 0) return
 
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-         do k=1,nz
+         do k=nzlo,nzhi
             op_err = 0
             call get_brunt_B(&
                s, species, nz, k, T_face(k), rho_face(k), chiT_face(k), chiRho_face(k), op_err)

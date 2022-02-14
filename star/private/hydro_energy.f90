@@ -105,7 +105,7 @@
          s% energy_sources(k) = sources_ad%val 
             ! nuclear heating, non_nuc_neu_cooling, irradiation heating, extra_heat, eps_mdot
          s% energy_others(k) = others_ad%val
-            ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix
+            ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix, eps_phase_separation
          ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
             esum_ad = - dL_dm_ad + sources_ad + &
@@ -249,7 +249,7 @@
             
             extra_heat_ad = s% extra_heat(k)
             
-            ! other = eps_WD_sedimentation + eps_diffusion + eps_pre_mix
+            ! other = eps_WD_sedimentation + eps_diffusion + eps_pre_mix + eps_phase_separation
             ! no partials for any of these
             others_ad = 0d0 
             if (s% do_element_diffusion) then
@@ -261,6 +261,8 @@
             end if
             if (s% do_conv_premix .and. s% do_premix_heating) &
                others_ad%val = others_ad%val + s% eps_pre_mix(k)
+            if (s% do_phase_separation .and. s% do_phase_separation_heating) &
+               others_ad%val = others_ad%val + s% eps_phase_separation(k)
             
             Eq_ad = 0d0
             if (s% RSP2_flag) then             

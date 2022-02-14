@@ -285,7 +285,7 @@
                dprop, initial_z, initial_y, &
                dprop, iprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, &
-               dprop, dprop, dprop, dprop, dprop, &
+               dprop, dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, iprop, ierr)
             if (ierr /= 0) then
                write(*,2) 'year_month_day_when_created', year_month_day_when_created
@@ -385,7 +385,7 @@
                net_name, iprop, nz_in, iprop, m_in, &
                dprop, dprop, dprop, iprop, &
                dprop, dprop, dprop, dprop, dprop, &
-               dprop, dprop, dprop, dprop, dprop, &
+               dprop, dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, iprop, ierr)
             if (ierr /= 0 .or. m_in < 0 .or. nz_in < 0) then
                write(*,*) 'missing required properties'

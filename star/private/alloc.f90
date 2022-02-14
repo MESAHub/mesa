@@ -902,6 +902,9 @@
             call do1(s% g_field_element_diffusion, c% g_field_element_diffusion)
             if (failed('g_field_element_diffusion')) exit
 
+            call do1(s% eps_phase_separation, c% eps_phase_separation)
+            if (failed('eps_phase_separation')) exit
+
             call do1(s% non_nuc_neu, c% non_nuc_neu)
             if (failed('non_nuc_neu')) exit
             call do1(s% d_nonnucneu_dlnd, c% d_nonnucneu_dlnd)

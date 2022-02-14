@@ -194,6 +194,7 @@ SRCS = \
    diffusion_procs.f90 \
    diffusion.f90 \
    element_diffusion.f90 \
+   phase_separation.f90 \
    evolve_support.f90 \
    star_bcyclic.f90 \
    solver_support.f90 \

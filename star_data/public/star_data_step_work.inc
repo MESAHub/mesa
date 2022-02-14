@@ -458,6 +458,8 @@
       real(dp), pointer :: eps_diffusion(:) ! (nz)
       real(dp), pointer :: g_field_element_diffusion(:) ! (nz)
       
+      ! WD phase separation
+      real(dp), pointer :: eps_phase_separation(:) ! (nz)
       
       ! for Riemann solver      
       type(auto_diff_real_star_order1), pointer, dimension(:) :: &
@@ -1008,6 +1010,9 @@
          logical :: doing_rlo_wind
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
+
+         real(dp) :: crystal_core_boundary_mass_old
+         real(dp) :: phase_sep_mixing_mass
          
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
@@ -1099,6 +1104,7 @@
             total_nuclear_heating, &
             total_non_nuc_neu_cooling, &
             total_irradiation_heating, &
+            total_energy_from_phase_separation, &
             total_WD_sedimentation_heating, &
             total_energy_from_diffusion, &
             total_extra_heating, &

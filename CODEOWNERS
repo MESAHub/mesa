@@ -37,6 +37,7 @@ utils/ @rhdtownsend @warrickball @rjfarmer
 star/private/auto_diff_support.f90 @adamjermyn
 star/private/pgstar_*.f90 @rjfarmer
 star/private/rsp_*.f90 @rsmolec
+star/private/phase_separation.f90 @evbauer
 
 ### Test suite cases ###
 

@@ -271,7 +271,8 @@
       integer, parameter :: p_log_am_nu_non_rot = p_log_am_nu_rot + 1
       integer, parameter :: p_log_am_nu = p_log_am_nu_non_rot + 1
 
-      integer, parameter :: p_eps_WD_sedimentation = p_log_am_nu + 1
+      integer, parameter :: p_eps_phase_separation = p_log_am_nu + 1
+      integer, parameter :: p_eps_WD_sedimentation = p_eps_phase_separation + 1
       integer, parameter :: p_log_eps_WD_sedimentation = p_eps_WD_sedimentation + 1
 
       integer, parameter :: p_eps_diffusion = p_log_eps_WD_sedimentation + 1
@@ -959,6 +960,7 @@
          profile_column_name(p_log_am_nu_non_rot) = 'log_am_nu_non_rot'
          profile_column_name(p_log_am_nu) = 'log_am_nu'
 
+         profile_column_name(p_eps_phase_separation) = 'eps_phase_separation'
          profile_column_name(p_eps_WD_sedimentation) = 'eps_WD_sedimentation'
          profile_column_name(p_log_eps_WD_sedimentation) = 'log_eps_WD_sedimentation'
 
