@@ -167,6 +167,7 @@
          real(dp) :: force_tau_factor, force_Tsurf_factor, force_opacity_factor
          real(dp) :: revised_max_yr_dt, astero_revised_max_yr_dt
          real(dp) :: gradT_excess_alpha_old
+         real(dp) :: crystal_core_boundary_mass
                 
          logical :: include_binary_history_in_log_file
          logical :: using_revised_max_yr_dt, astero_using_revised_max_yr_dt

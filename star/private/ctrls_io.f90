@@ -321,6 +321,12 @@
     diffusion_class_typical_charge, diffusion_class_factor, &
     diffusion_use_isolve, diffusion_rtol_for_isolve, diffusion_atol_for_isolve, &
     diffusion_maxsteps_for_isolve, diffusion_isolve_solver, &
+
+    ! WD phase separation
+    do_phase_separation, &
+    do_phase_separation_heating, &
+    phase_separation_mixing_use_brunt, &
+    phase_separation_no_diffusion, &
     
     ! eos controls
     fix_d_eos_dxa_partials, &
@@ -1814,6 +1820,12 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_atol_for_isolve = diffusion_atol_for_isolve
  s% diffusion_maxsteps_for_isolve = diffusion_maxsteps_for_isolve
  s% diffusion_isolve_solver = diffusion_isolve_solver
+
+ ! WD phase separation
+ s% do_phase_separation = do_phase_separation
+ s% do_phase_separation_heating = do_phase_separation_heating
+ s% phase_separation_mixing_use_brunt = phase_separation_mixing_use_brunt
+ s% phase_separation_no_diffusion = phase_separation_no_diffusion
 
  ! eos controls
  s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
@@ -3430,6 +3442,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_min_T_at_surface = s% diffusion_min_T_at_surface
  diffusion_min_dq_ratio_at_surface = s% diffusion_min_dq_ratio_at_surface
  diffusion_dt_limit = s% diffusion_dt_limit
+
+ do_phase_separation = s% do_phase_separation
+ do_phase_separation_heating = s% do_phase_separation_heating
+ phase_separation_mixing_use_brunt = s% phase_separation_mixing_use_brunt
+ phase_separation_no_diffusion = s% phase_separation_no_diffusion
 
  diffusion_min_X_hard_limit = s% diffusion_min_X_hard_limit
  diffusion_X_total_atol = s% diffusion_X_total_atol
