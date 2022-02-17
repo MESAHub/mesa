@@ -12,7 +12,7 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCE FILES
 
-SRCS = mlt.f90 tdc.f90 thermohaline.f90 semiconvection.f90 turb.f90
+SRCS = mlt.f90 tdc_support.f90 tdc.f90 thermohaline.f90 semiconvection.f90 turb.f90
 
 #################################################################
 #
