@@ -62,7 +62,7 @@
 
   thermohaline_coeff = 0
 
-  MLT_option = 'TDC'
+  MLT_option = 'none'
 
   okay_to_reduce_gradT_excess = .false.
 
