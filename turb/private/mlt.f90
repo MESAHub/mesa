@@ -159,6 +159,7 @@ contains
          Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
       else
          ! Radiative zone, because this means that gradr < gradL
+         Gamma = -1d99
          Zeta = 0d0
          conv_vel = 0d0
          D = 0d0
