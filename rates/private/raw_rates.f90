@@ -754,6 +754,11 @@
                call do_default(ierr)
                
          end select
+
+
+         if(associated(rates_other_rate_get)) then
+            call rates_other_rate_get(ir, temp, raw_rate, ierr)
+         end if
          
          
          contains
