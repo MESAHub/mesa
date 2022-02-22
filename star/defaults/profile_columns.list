@@ -296,7 +296,7 @@
       
    ! erg/g/s
       !reaction_neu r_h1_h1_ec_h2 
-      !reaction_new r_h1_h1_wk_h2
+      !reaction_neu r_h1_h1_wk_h2
       
    ! reactions/second
       !raw_rate r_h1_h1_ec_h2 
