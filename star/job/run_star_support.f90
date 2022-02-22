@@ -2094,6 +2094,22 @@
          logical :: change_v, change_u
          include 'formats'
          
+         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
+            call star_change_to_new_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
+            if (failed('star_change_to_new_net',ierr)) return
+         end if
+
+         if (s% job% change_small_net .or. &
+               (s% job% change_initial_small_net .and. .not. restart)) then         
+            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
+            call star_change_to_new_small_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
+            if (failed('star_change_to_new_small_net',ierr)) return
+            write(*,*) 'number of species', s% species
+         end if
+
+
          if (len_trim(s% job% history_columns_file) > 0) &
             write(*,*) 'read ' // trim(s% job% history_columns_file)
          call star_set_history_columns(id, s% job% history_columns_file, .true., ierr)
@@ -2192,22 +2208,7 @@
             write(*,2) 'steps_before_start_timing', &
                s% job% steps_before_start_timing
          end if
-         
-         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
-            call star_change_to_new_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
-            if (failed('star_change_to_new_net',ierr)) return
-         end if
-
-         if (s% job% change_small_net .or. &
-               (s% job% change_initial_small_net .and. .not. restart)) then         
-            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
-            call star_change_to_new_small_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
-            if (failed('star_change_to_new_small_net',ierr)) return
-            write(*,*) 'number of species', s% species
-         end if
-         
+                  
          if (abs(s% job% T9_weaklib_full_off - T9_weaklib_full_off) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_off', s% job% T9_weaklib_full_off
             T9_weaklib_full_off = s% job% T9_weaklib_full_off
