@@ -58,8 +58,11 @@
       integer, parameter :: log_lum_band_offset = lum_band_offset + idel
       
       integer, parameter :: raw_rate_offset = log_lum_band_offset + idel
+      integer, parameter :: screened_rate_offset = raw_rate_offset + idel
+      integer, parameter :: eps_nuc_offset = screened_rate_offset + idel
+      integer, parameter :: eps_neu_offset = eps_nuc_offset + idel
 
-      integer, parameter :: start_of_special_cases = raw_rate_offset + idel
+      integer, parameter :: start_of_special_cases = eps_neu_offset + idel
       ! mixing and burning regions must be given the largest offsets
       ! so they can be distinguished from the other ones
 
@@ -274,7 +277,34 @@
             end if
 
             if (string == 'add_raw_rates') then
-               call do_raw_rate(raw_rate_offset,'raw_rate_', spec_err)
+               call do_rate(raw_rate_offset,'raw_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_screened_rates') then
+               call do_rate(screened_rate_offset,'screened_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_eps_nuc') then
+               call do_rate(eps_nuc_offset,'eps_nuc_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_eps_neu') then
+               call do_rate(eps_neu_offset,'eps_neu_', spec_err)
                if (spec_err /= 0) then
                   call error; return
                end if
@@ -442,8 +472,7 @@
             end do
          end subroutine do_colors
 
-         subroutine do_raw_rate(offset,prefix,ierr)
-            !use rates_lib, only: rates_reaction_id
+         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc, eps_neu
             use rates_def, only: reaction_name
             integer, intent(in) :: offset
             character(len=*) :: prefix
@@ -455,7 +484,7 @@
                   offset + k,trim(prefix)//trim(reaction_name(k)), ierr)
                if (ierr /= 0) return
             end do
-         end subroutine do_raw_rate
+         end subroutine do_rate
 
 
          subroutine error
@@ -488,7 +517,16 @@
          special_case = .false.
 
          if (string=='raw_rate') then
-            call do1_raw_rate(raw_rate_offset)
+            call do1_rate(raw_rate_offset)
+
+         else if (string=='screened_rate') then
+            call do1_rate(screened_rate_offset)
+
+         else if (string=='eps_nuc') then
+            call do1_rate(eps_nuc_offset)
+
+         else if (string=='eps_neu') then
+            call do1_rate(eps_neu_offset)
 
          else if (string=='abs_mag') then
             call do1_color(abs_mag_offset)
@@ -612,7 +650,7 @@
             ierr = -1
          end subroutine do1_color
 
-         subroutine do1_raw_rate(offset)
+         subroutine do1_rate(offset)
             use rates_lib, only: rates_reaction_id
             integer, intent(in) :: offset
             t = token(iounit, n, i, buffer, string)
@@ -627,7 +665,7 @@
             end if
             write(*,*) 'bad filter name: ' // trim(string)
             ierr = -1
-         end subroutine do1_raw_rate
+         end subroutine do1_rate
 
 
       end function do1_history_spec

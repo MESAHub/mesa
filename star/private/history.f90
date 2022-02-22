@@ -934,6 +934,15 @@
                else ! location of top
                   col_name = 'mix_qtop_' // trim(str)
                end if
+            else if (c > eps_neu_offset) then
+               i = c - eps_neu_offset
+               col_name = 'eps_neu_' // trim(reaction_name(i))
+            else if (c > eps_nuc_offset) then
+               i = c - eps_nuc_offset
+               col_name = 'eps_nuc_' // trim(reaction_name(i))
+            else if (c > screened_rate_offset) then
+               i = c - screened_rate_offset
+               col_name = 'screened_rate_' // trim(reaction_name(i))
             else if (c > raw_rate_offset) then
                i = c - raw_rate_offset
                col_name = 'raw_rate_' // trim(reaction_name(i))
@@ -1204,10 +1213,27 @@
             v_flag = .false.
          end if
          
-         if (c > raw_rate_offset) THEN
+         if (c > eps_neu_offset) THEN
+             i = c - eps_neu_offset
+             val = 0
+             do k = 1, s% nz
+                val = 0 ! TODO
+             end do
+         else if (c > eps_nuc_offset) THEN
+             i = c - eps_nuc_offset
+             val = 0
+             do k = 1, s% nz
+                val = 0 ! TODO
+             end do
+         else if (c > screened_rate_offset) THEN
+             i = c - screened_rate_offset
+             val = 0
+             do k = 1, s% nz
+                val = 0 ! TODO
+             end do
+         else if (c > raw_rate_offset) THEN
              i = c - raw_rate_offset
              ! i is the reaction id 
-             !val = 1d0 ! get rate
              val = 0
              tf => tf2
              do k = 1, s% nz
@@ -1215,6 +1241,7 @@
                 call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
                 val = val + raw_rate
              end do
+             !deallocate(tf)
          else if (c > log_lum_band_offset) THEN
             ! We want log Teff, Log g, M/H, Lum/lsun at the photosphere
             k = s% photosphere_cell_k

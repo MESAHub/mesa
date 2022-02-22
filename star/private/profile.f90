@@ -129,8 +129,25 @@
                end if
                call count_specs
                
+            case ('add_eps_neu')
+               call insert_spec(eps_neu_offset, 'add_eps_neu', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_eps_nuc')
+               call insert_spec(eps_nuc_offset, 'add_eps_nuc', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_screened_rates')
+               call insert_spec(screened_rate_offset, 'add_screened_rates', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
             case ('add_raw_rates')
-               ! add all of the isos that are in the current net
                call insert_spec(raw_rate_offset, 'add_raw_rates', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
@@ -287,7 +304,10 @@
             if (s% profile_column_spec(j) == add_abundances .or. &
                 s% profile_column_spec(j) == add_log_abundances) then
                numcols = numcols + s% species
-            else if (s% profile_column_spec(j) == raw_rate_offset) then
+            else if (s% profile_column_spec(j) == raw_rate_offset .or. &
+                     s% profile_column_spec(j) == screened_rate_offset .or. & 
+                     s% profile_column_spec(j) == eps_nuc_offset .or. & 
+                     s% profile_column_spec(j) == eps_neu_offset) then
                numcols = numcols + s% num_reactions
             else
                numcols = numcols + 1
@@ -609,10 +629,14 @@
                         col = col+1
                         call do_abundance_col(i, j, jj, kk)
                      end do
-                  else if (s% profile_column_spec(j) == raw_rate_offset) then
+                  else if (s% profile_column_spec(j) == raw_rate_offset .or. &
+                           s% profile_column_spec(j) == screened_rate_offset .or. &
+                           s% profile_column_spec(j) == eps_nuc_offset .or. &
+                           s% profile_column_spec(j) == eps_neu_offset) then
                      do jj = 1, s% num_reactions
                         col = col+1
-                        call do_raw_rate_col(i, j, jj, kk)
+                        call do_rate_col(i, j, jj, kk)
+                        !call do_col(i, j+jj, kk)
                      end do
                   else
                      col = col+1
@@ -770,7 +794,7 @@
             use rates_def
             use profile_getval, only: getval_for_profile
             integer, intent(in) :: pass, j, k
-            integer :: i, c, ii, int_val
+            integer :: i, c, int_val
             real(dp) :: val, cno, z, dr, eps, eps_alt
             logical :: int_flag
             character (len=128) :: col_name
@@ -784,6 +808,15 @@
                if (c > extra_offset) then
                   i = c - extra_offset
                   col_name = trim(s% profile_extra_name(i))
+               else if (c > eps_neu_offset) then
+                  i = c - eps_neu_offset
+                  col_name = 'eps_neu_' // trim(reaction_name(i))
+               else if (c > eps_nuc_offset) then
+                  i = c - eps_nuc_offset
+                  col_name = 'eps_nuc_' // trim(reaction_name(i))
+               else if (c > screened_rate_offset) then
+                  i = c - screened_rate_offset
+                  col_name = 'screened_rate_' // trim(reaction_name(i))
                else if (c > raw_rate_offset) then
                   i = c - raw_rate_offset
                   col_name = 'raw_rate_' // trim(reaction_name(i))
@@ -894,14 +927,14 @@
          end subroutine do_abundance_col
 
 
-         subroutine do_raw_rate_col(pass, j, jj, k)
-            ! j is the column name 
+         subroutine do_rate_col(pass, j, jj, k)
+            ! j is the column number 
             ! jj is the reaction number 
             ! k is the zone we're in 
             use rates_lib, only: get_raw_rate, eval_tfactors
             use rates_def, only: reaction_name, T_Factors
             integer, intent(in) :: pass, j, jj, k
-            integer :: i, c, ii
+            integer :: i, c
             real(dp) :: val
             character (len=128) :: col_name
             logical, parameter :: dbg = .false.
@@ -911,20 +944,38 @@
             type (T_Factors), target :: tf2
             
             include 'formats'
+            c = s% profile_column_spec(j)
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') col
             else if (pass == 2) then
-               col_name = trim('raw_rate_') // trim(reaction_name(jj))
+               if (c >= eps_neu_offset) then
+                  col_name = 'eps_neu_' // trim(reaction_name(jj))
+               else if (c >= eps_nuc_offset) then
+                  col_name = 'eps_nuc_' // trim(reaction_name(jj))
+               else if (c >= screened_rate_offset) then
+                  col_name = 'screened_rate_' // trim(reaction_name(jj))
+               else if (c >= raw_rate_offset) then
+                  col_name = 'raw_rate_' // trim(reaction_name(jj))
+               end if
                if (write_flag) then
                   write(io, fmt=txt_fmt, advance='no') trim(col_name)
                else
                   names(col) = trim(col_name)
                end if
             else if (pass == 3) then
-               tf => tf2
-               call eval_tfactors(tf, log10(s% t(k)), s% t(k))
-               call get_raw_rate(jj, s% which_rates(jj), s% t(k), tf, raw_rate, ierr)
-               val = raw_rate
+               if (c >= eps_neu_offset) then
+                  val = 0d0 ! TODO
+               else if (c >= eps_nuc_offset) then
+                  val = 0d0 ! TODO
+               else if (c >= screened_rate_offset) then
+                  val = 0d0 ! TODO
+               else if (c >= raw_rate_offset) then
+                  tf => tf2
+                  call eval_tfactors(tf, log10(s% t(k)), s% t(k))
+                  call get_raw_rate(jj, s% which_rates(jj), s% t(k), tf, raw_rate, ierr)
+                  val = raw_rate
+                  deallocate(tf)
+               end if
                if (write_flag) then
                   write(io, fmt=dbl_fmt, advance='no') val
                else
@@ -932,7 +983,7 @@
                   is_int(col) = .false.
                end if
             end if
-         end subroutine do_raw_rate_col
+         end subroutine do_rate_col
 
 
       end subroutine do_profile_info
