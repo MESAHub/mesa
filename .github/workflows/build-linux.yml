@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["sdk"]
+        sdk: ["20.12.1","21.4.1","20.3.2"]
 
     runs-on: ubuntu-latest
 
@@ -30,18 +30,18 @@ jobs:
         id: cache
         with:
           path: |
-            mesasdk-x86_64-linux-20.12.1.tar.gz
-          key: ${{ runner.os }}-${{ hashFiles('mesasdk-x86_64-linux-20.12.1.tar.gz') }}
+            mesasdk-x86_64-linux-${{ matrix.sdk }}.tar.gz
+          key: ${{ runner.os }}-${{ hashFiles('mesasdk-x86_64-linux-${{ matrix.sdk }}.tar.gz') }}
 
-      - name: Get SDK ${{ runner.os }}
+      - name: Get SDK ${{ runner.os }} sdk-${{ matrix.sdk }}
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-            wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
+            wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-${{ matrix.sdk }}.tar.gz
         shell: bash
 
-      - name: Unpack SDK ${{ runner.os }}
+      - name: Unpack SDK ${{ runner.os }} ${{ matrix.sdk }} 
         run: |
-            tar xvf mesasdk-x86_64-linux-20.12.1.tar.gz
+            tar xvf mesasdk-x86_64-linux-${{ matrix.sdk }}.tar.gz
         shell: bash
 
       - name: Compile
