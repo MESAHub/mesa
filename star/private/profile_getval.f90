@@ -53,7 +53,8 @@
       integer, parameter :: log_concentration_offset = log_g_rad_offset + idel
       integer, parameter :: diffusion_dX_offset = log_concentration_offset + idel
       integer, parameter :: diffusion_D_offset = diffusion_dX_offset + idel
-      integer, parameter :: extra_offset = diffusion_D_offset + idel
+      integer, parameter :: raw_rate_offset = diffusion_D_offset + idel
+      integer, parameter :: extra_offset = raw_rate_offset + idel
 
       integer, parameter :: max_profile_offset = extra_offset + idel
 
@@ -123,6 +124,9 @@
             case ('log') ! add log of abundance
                call do1_nuclide(log_abundance_offset)
 
+            case ('raw_rate')
+                call do1_raw_rate(raw_rate_offset)
+
             case ('extra')
 
                t = token(iounit, n, i, buffer, string)
@@ -173,6 +177,23 @@
             write(*,*) 'bad iso name: ' // trim(string)
             ierr = -1
          end subroutine do1_nuclide
+
+         subroutine do1_raw_rate(offset)
+            use rates_lib, only: rates_reaction_id
+            integer, intent(in) :: offset
+            integer :: t, id
+            t = token(iounit, n, i, buffer, string)
+            if (t /= name_token) then
+               ierr = -1; return
+            end if
+            id = rates_reaction_id(string)
+            if (id > 0) then
+               spec = offset + id
+               return
+            end if
+            write(*,*) 'bad rate name: ' // trim(string)
+            ierr = -1
+         end subroutine do1_raw_rate
 
 
       end function do1_profile_spec
@@ -227,11 +248,16 @@
          use rates_def
          use mod_typical_charge, only: eval_typical_charge
          use rsp_def, only: rsp_WORK, rsp_WORKQ, rsp_WORKT, rsp_WORKC
+         use rates_lib, only: get_raw_rate, eval_tfactors
          type (star_info), pointer :: s
          integer, intent(in) :: c, k
          real(dp), intent(out) :: val
          integer, intent(out) :: int_val
          logical, intent(inout) :: int_flag
+
+         real(dp) :: raw_rate
+         type (T_Factors), pointer :: tf
+         type (T_Factors), target :: tf2
 
          real(dp) :: cno, z, x, frac, eps, eps_alt, L_rad, L_edd, Pbar_00, Pbar_p1, &
             P_face, rho_face, dr, v, r00, rp1, v00, vp1, A00, Ap1, Amid, &
@@ -268,6 +294,12 @@
          if (c > extra_offset) then
             i = c - extra_offset
             val = s% profile_extra(k,i)
+         else if (c > raw_rate_offset) then
+            i = c - raw_rate_offset
+            tf => tf2
+            call eval_tfactors(tf, log10(s% t(k)), s% t(k))
+            call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
+            val = raw_rate
          else if (c > diffusion_D_offset) then
             i = c - diffusion_D_offset
             ii = s% net_iso(i)

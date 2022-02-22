@@ -128,6 +128,13 @@
                   ierr = -1; call error; return
                end if
                call count_specs
+               
+            case ('add_raw_rates')
+               ! add all of the isos that are in the current net
+               call insert_spec(raw_rate_offset, 'add_raw_rates', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
 
             case ('add_abundances')
                ! add all of the isos that are in the current net
@@ -280,6 +287,8 @@
             if (s% profile_column_spec(j) == add_abundances .or. &
                 s% profile_column_spec(j) == add_log_abundances) then
                numcols = numcols + s% species
+            else if (s% profile_column_spec(j) == raw_rate_offset) then
+               numcols = numcols + s% num_reactions
             else
                numcols = numcols + 1
             end if
@@ -600,6 +609,11 @@
                         col = col+1
                         call do_abundance_col(i, j, jj, kk)
                      end do
+                  else if (s% profile_column_spec(j) == raw_rate_offset) then
+                     do jj = 1, s% num_reactions
+                        col = col+1
+                        call do_raw_rate_col(i, j, jj, kk)
+                     end do
                   else
                      col = col+1
                      call do_col(i, j, kk)
@@ -770,6 +784,9 @@
                if (c > extra_offset) then
                   i = c - extra_offset
                   col_name = trim(s% profile_extra_name(i))
+               else if (c > raw_rate_offset) then
+                  i = c - raw_rate_offset
+                  col_name = 'raw_rate_' // trim(reaction_name(i))
                else if (c > diffusion_D_offset) then
                   i = c - diffusion_D_offset
                   col_name = 'diffusion_D_' // trim(chem_isos% name(i))
@@ -844,7 +861,6 @@
 
          subroutine do_abundance_col(pass, j, jj, k)
             integer, intent(in) :: pass, j, jj, k
-            integer :: i, c, ii
             real(dp) :: val
             logical :: int_flag, log_abundance
             character (len=128) :: col_name
@@ -876,6 +892,47 @@
                end if
             end if
          end subroutine do_abundance_col
+
+
+         subroutine do_raw_rate_col(pass, j, jj, k)
+            ! j is the column name 
+            ! jj is the reaction number 
+            ! k is the zone we're in 
+            use rates_lib, only: get_raw_rate, eval_tfactors
+            use rates_def, only: reaction_name, T_Factors
+            integer, intent(in) :: pass, j, jj, k
+            integer :: i, c, ii
+            real(dp) :: val
+            character (len=128) :: col_name
+            logical, parameter :: dbg = .false.
+            
+            real(dp) :: raw_rate
+            type (T_Factors), pointer :: tf
+            type (T_Factors), target :: tf2
+            
+            include 'formats'
+            if (pass == 1) then
+               if (write_flag) write(io, fmt=int_fmt, advance='no') col
+            else if (pass == 2) then
+               col_name = trim('raw_rate_') // trim(reaction_name(jj))
+               if (write_flag) then
+                  write(io, fmt=txt_fmt, advance='no') trim(col_name)
+               else
+                  names(col) = trim(col_name)
+               end if
+            else if (pass == 3) then
+               tf => tf2
+               call eval_tfactors(tf, log10(s% t(k)), s% t(k))
+               call get_raw_rate(jj, s% which_rates(jj), s% t(k), tf, raw_rate, ierr)
+               val = raw_rate
+               if (write_flag) then
+                  write(io, fmt=dbl_fmt, advance='no') val
+               else
+                  vals(k,col) = val
+                  is_int(col) = .false.
+               end if
+            end if
+         end subroutine do_raw_rate_col
 
 
       end subroutine do_profile_info

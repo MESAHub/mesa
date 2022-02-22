@@ -66,7 +66,7 @@
          use utils_lib, only: integer_dict_create_hash, integer_dict_free, mkdir, folder_exists
          use chem_def, only: category_name
          use math_lib, only: math_backend
-         use rates_def, only: rates_reaction_id_max, i_rate
+         use rates_def, only: rates_reaction_id_max
          type (star_info), pointer :: s
 
          logical, intent(in) :: write_flag
@@ -864,6 +864,7 @@
          ! to the order in history_specs
          subroutine do_col_pass2(j) ! get the column name
             use colors_lib, only : get_bc_name_by_id
+            use rates_def, only: reaction_name
             integer, intent(in) :: j
             character (len=100) :: col_name
             character (len=10) :: str
@@ -933,6 +934,9 @@
                else ! location of top
                   col_name = 'mix_qtop_' // trim(str)
                end if
+            else if (c > raw_rate_offset) then
+               i = c - raw_rate_offset
+               col_name = 'raw_rate_' // trim(reaction_name(i))
             else if (c > log_lum_band_offset) then
                i = c - log_lum_band_offset
                col_name = 'log_lum_band_' // trim(get_bc_name_by_id(i,ierr))
@@ -1162,7 +1166,8 @@
       subroutine history_getval( &
             s, c, val, int_val, is_int_val, &
             nz, v_surf, csound_surf, envelope_fraction_left, epsnuc_out, ierr)
-         use rates_def, only: i_rate
+         use rates_def, only: T_Factors
+         use rates_lib, only: get_raw_rate, eval_tfactors
          use colors_lib, only: get_abs_mag_by_id, get_bc_by_id, get_lum_band_by_id
          use chem_lib, only: chem_M_div_h
          use rsp_def, only: rsp_phase_time0
@@ -1175,6 +1180,9 @@
          integer, intent(out) :: int_val
          logical, intent(out) :: is_int_val
          integer, intent(out) :: ierr
+         real(dp) :: raw_rate
+         type (T_Factors), pointer :: tf
+         type (T_Factors), target :: tf2
          integer :: k, i, min_k, k2
          real(dp) :: Ledd, L_rad, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, &
             min_gamma1, deltam
@@ -1196,7 +1204,18 @@
             v_flag = .false.
          end if
          
-         if (c > log_lum_band_offset) THEN
+         if (c > raw_rate_offset) THEN
+             i = c - raw_rate_offset
+             ! i is the reaction id 
+             !val = 1d0 ! get rate
+             val = 0
+             tf => tf2
+             do k = 1, s% nz
+                call eval_tfactors(tf, log10(s% t(k)), s% t(k))
+                call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
+                val = val + raw_rate
+             end do
+         else if (c > log_lum_band_offset) THEN
             ! We want log Teff, Log g, M/H, Lum/lsun at the photosphere
             k = s% photosphere_cell_k
             m_div_h = chem_M_div_h(s% X(k),s% Z(k),s% job% initial_zfracs)
