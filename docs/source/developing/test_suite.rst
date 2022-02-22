@@ -427,3 +427,8 @@ Where ``n`` is an integer. Same as ``[ci optional]`` but only run the first ``n`
 ^^^^^^^^
 
 Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`` set. This requests that we turn on additional debugging checks.
+
+[ci converge]
+^^^^^^^^^^^^^
+
+Runs the test suite with the environment variable ``MESA_TEST_SUITE_RESOLUTION_FACTOR`` set to a factor, giving a different temporal and spatial resolution (and max model number). 
