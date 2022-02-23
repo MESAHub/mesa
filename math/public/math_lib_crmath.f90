@@ -44,6 +44,8 @@ module math_lib
   ! Parameter definitions
 
   character(LEN=16), parameter :: MATH_BACKEND = 'CRMATH'
+  logical, parameter :: use_fast_exp_log = .true.
+  integer, parameter :: i8 = selected_int_kind(14)
 
   ! Module variables
 
@@ -123,6 +125,28 @@ module math_lib
   ! Procedures
 
 contains
+
+  elemental real(dp) function fexp_quintic(x) result(exp_x)
+   real(dp), intent(in) :: x
+
+   integer(i8), parameter :: mantissa = 4503599627370496
+   integer(i8), parameter :: bias = 1023
+   integer(i8), parameter :: ishift = mantissa*bias
+   real(dp), parameter :: log2 = 6.9314718055994529D-01
+   real(dp), parameter :: s5(5)= [-1.90188191959304e-3_dp,&
+            -9.01146535969578e-3_dp,-5.57129652016652e-2_dp,&
+            -2.40226506959101e-1_dp, 3.06852819440055e-1_dp]
+   real(dp) :: y, yf
+   integer(i8) :: i
+
+   y  = x*log2      ! Change of base: e^x -> 2^y
+   yf = y-floor(y) ! Compute fractional part
+   y = y-((((s5(1)*yf+s5(2))*yf+s5(3))*yf+s5(4))*yf+s5(5))*yf ! Add Delta
+   i = mantissa * y + ishift
+   exp_x = transfer(i, exp_x)
+
+  end function fexp_quintic
+
 
   subroutine math_init ()
 
@@ -205,8 +229,11 @@ contains
 
     else
 
-       exp10_x = exp(x*ln10_m)
-
+      if (use_fast_exp_log) then
+        exp10_x = fexp_quintic(x*ln10_m)
+      else
+        exp10_x = exp(x*ln10_m)
+      end if
     endif
 
   end function exp10_
@@ -270,8 +297,11 @@ contains
           
        else
 
-          pow_x = exp(log(x)*y)
-
+         if (use_fast_exp_log) then
+             pow_x = fexp_quintic(log(x)*y)
+         else
+             pow_x = exp(log(x)*y)
+         end if
        end if
 
     end if
