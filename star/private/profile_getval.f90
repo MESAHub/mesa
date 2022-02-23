@@ -303,19 +303,25 @@
          int_flag = .false.
          rsp_or_w = s% RSP_flag .or. s% RSP2_flag
 
+         write(*,*) 'c =', c
          if (c > extra_offset) then
+            write(*,*) 'extra offset'
             i = c - extra_offset
             val = s% profile_extra(k,i)
          else if (c > eps_neu_rate_offset) then
+            write(*,*) 'eps_neu'
             i = c - eps_neu_rate_offset
             val = 0d0 ! TODO
          else if (c > eps_nuc_rate_offset) then
+            write(*,*) 'eps_nuc'
             i = c - eps_nuc_rate_offset
             val = 0d0 ! TODO
          else if (c > screened_rate_offset) then
+            write(*,*) 'screened'
             i = c - screened_rate_offset
             val = 0d0 ! TODO
          else if (c > raw_rate_offset) then
+            write(*,*) 'raw'
             i = c - raw_rate_offset
             tf => tf2
             call eval_tfactors(tf, log10(s% t(k)), s% t(k))

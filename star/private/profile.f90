@@ -635,12 +635,11 @@
                            s% profile_column_spec(j) == eps_neu_rate_offset) then
                      do jj = 1, s% num_reactions
                         col = col+1
-                        call do_rate_col(i, j, jj, kk)
-                        !call do_col(i, j+jj, kk)
+                        call do_col(i, j, jj, kk)
                      end do
                   else
                      col = col+1
-                     call do_col(i, j, kk)
+                     call do_col(i, j, 0, kk)
                   end if
                end do
                do j=1,num_extra_cols
@@ -790,17 +789,17 @@
          end subroutine do_extra_col
 
 
-         subroutine do_col(pass, j, k)
+         subroutine do_col(pass, j, jj, k)
             use rates_def
             use profile_getval, only: getval_for_profile
-            integer, intent(in) :: pass, j, k
+            integer, intent(in) :: pass, j, jj, k
             integer :: i, c, int_val
             real(dp) :: val, cno, z, dr, eps, eps_alt
             logical :: int_flag
             character (len=128) :: col_name
             logical, parameter :: dbg = .false.
             include 'formats'
-            c = s% profile_column_spec(j)
+            c = s% profile_column_spec(j) + jj
             val = 0; int_val = 0
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') col
@@ -925,65 +924,6 @@
                end if
             end if
          end subroutine do_abundance_col
-
-
-         subroutine do_rate_col(pass, j, jj, k)
-            ! j is the column number 
-            ! jj is the reaction number 
-            ! k is the zone we're in 
-            use rates_lib, only: get_raw_rate, eval_tfactors
-            use rates_def, only: reaction_name, T_Factors
-            integer, intent(in) :: pass, j, jj, k
-            integer :: i, c
-            real(dp) :: val
-            character (len=128) :: col_name
-            logical, parameter :: dbg = .false.
-            
-            real(dp) :: raw_rate
-            type (T_Factors), pointer :: tf
-            type (T_Factors), target :: tf2
-            
-            include 'formats'
-            c = s% profile_column_spec(j)
-            if (pass == 1) then
-               if (write_flag) write(io, fmt=int_fmt, advance='no') col
-            else if (pass == 2) then
-               if (c >= eps_neu_rate_offset) then
-                  col_name = 'eps_neu_rate_' // trim(reaction_name(jj))
-               else if (c >= eps_nuc_rate_offset) then
-                  col_name = 'eps_nuc_rate_' // trim(reaction_name(jj))
-               else if (c >= screened_rate_offset) then
-                  col_name = 'screened_rate_' // trim(reaction_name(jj))
-               else if (c >= raw_rate_offset) then
-                  col_name = 'raw_rate_' // trim(reaction_name(jj))
-               end if
-               if (write_flag) then
-                  write(io, fmt=txt_fmt, advance='no') trim(col_name)
-               else
-                  names(col) = trim(col_name)
-               end if
-            else if (pass == 3) then
-               if (c >= eps_neu_rate_offset) then
-                  val = 0d0 ! TODO
-               else if (c >= eps_nuc_rate_offset) then
-                  val = 0d0 ! TODO
-               else if (c >= screened_rate_offset) then
-                  val = 0d0 ! TODO
-               else if (c >= raw_rate_offset) then
-                  tf => tf2
-                  call eval_tfactors(tf, log10(s% t(k)), s% t(k))
-                  call get_raw_rate(jj, s% which_rates(jj), s% t(k), tf, raw_rate, ierr)
-                  val = raw_rate
-                  nullify(tf)
-               end if
-               if (write_flag) then
-                  write(io, fmt=dbl_fmt, advance='no') val
-               else
-                  vals(k,col) = val
-                  is_int(col) = .false.
-               end if
-            end if
-         end subroutine do_rate_col
 
 
       end subroutine do_profile_info
