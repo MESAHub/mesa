@@ -126,6 +126,36 @@ module math_lib
 
 contains
 
+   elemental real(dp) function flog_quintic(x) result(log_x)
+   real(dp), intent(in) :: x
+   ! Local variables and parameters
+   real(dp)   :: yi,yf
+   integer(i8) :: i
+   integer(i8), parameter :: mantissa = not(shiftl(2047_i8,52))
+   integer(i8), parameter :: mantissa_left = 2**52 
+   integer(i8), parameter :: bias = 1023 
+   integer(i8), parameter :: ishift = mantissa_left*bias 
+      real(dp), parameter :: log2 = 6.9314718055994529D-01
+   real(dp), parameter   :: s5(5)= [ 1.44269504088896e+0_dp,&
+                                        -7.21347520444482e-1_dp,&
+                                         4.42145354110618e-1_dp,& 
+                                        -2.12375830888126e-1_dp,&
+                                         4.88829563330264e-2_dp]
+   ! Extract exponent
+   i = transfer(x,i)
+   yi = shiftr(i,52)-bias
+        
+   ! Extract mantissa
+   yf = transfer(iand(i,mantissa)+ishift,yf)-1.0_dp
+        
+   ! Apply quintic polynomial
+   yf = yf*(s5(1)+yf*(s5(2)+yf*(s5(3)+yf*(s5(4)+yf*s5(5)))))
+
+   ! Change of base: log_2(x) -> log_e(x) = log2*log_2(x) 
+   log_x = (yf+yi)*log2
+
+   end function flog_quintic
+
   elemental real(dp) function fexp_quintic(x) result(exp_x)
    real(dp), intent(in) :: x
 
