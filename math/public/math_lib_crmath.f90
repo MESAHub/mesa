@@ -139,7 +139,7 @@ contains
    real(dp) :: y, yf
    integer(i8) :: i
 
-   y  = x*log2      ! Change of base: e^x -> 2^y
+   y  = x/log2      ! Change of base: e^x -> 2^y
    yf = y-floor(y) ! Compute fractional part
    y = y-((((s5(1)*yf+s5(2))*yf+s5(3))*yf+s5(4))*yf+s5(5))*yf ! Add Delta
    i = mantissa * y + ishift
