@@ -129,14 +129,14 @@
                end if
                call count_specs
                
-            case ('add_eps_neu')
-               call insert_spec(eps_neu_offset, 'add_eps_neu', spec_err)
+            case ('add_eps_neu_rates')
+               call insert_spec(eps_neu_rate_offset, 'add_eps_neu_rate', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
                
-            case ('add_eps_nuc')
-               call insert_spec(eps_nuc_offset, 'add_eps_nuc', spec_err)
+            case ('add_eps_nuc_rates')
+               call insert_spec(eps_nuc_rate_offset, 'add_eps_nuc_rate', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
@@ -306,8 +306,8 @@
                numcols = numcols + s% species
             else if (s% profile_column_spec(j) == raw_rate_offset .or. &
                      s% profile_column_spec(j) == screened_rate_offset .or. & 
-                     s% profile_column_spec(j) == eps_nuc_offset .or. & 
-                     s% profile_column_spec(j) == eps_neu_offset) then
+                     s% profile_column_spec(j) == eps_nuc_rate_offset .or. & 
+                     s% profile_column_spec(j) == eps_neu_rate_offset) then
                numcols = numcols + s% num_reactions
             else
                numcols = numcols + 1
@@ -631,8 +631,8 @@
                      end do
                   else if (s% profile_column_spec(j) == raw_rate_offset .or. &
                            s% profile_column_spec(j) == screened_rate_offset .or. &
-                           s% profile_column_spec(j) == eps_nuc_offset .or. &
-                           s% profile_column_spec(j) == eps_neu_offset) then
+                           s% profile_column_spec(j) == eps_nuc_rate_offset .or. &
+                           s% profile_column_spec(j) == eps_neu_rate_offset) then
                      do jj = 1, s% num_reactions
                         col = col+1
                         call do_rate_col(i, j, jj, kk)
@@ -808,12 +808,12 @@
                if (c > extra_offset) then
                   i = c - extra_offset
                   col_name = trim(s% profile_extra_name(i))
-               else if (c > eps_neu_offset) then
-                  i = c - eps_neu_offset
-                  col_name = 'eps_neu_' // trim(reaction_name(i))
-               else if (c > eps_nuc_offset) then
-                  i = c - eps_nuc_offset
-                  col_name = 'eps_nuc_' // trim(reaction_name(i))
+               else if (c > eps_neu_rate_offset) then
+                  i = c - eps_neu_rate_offset
+                  col_name = 'eps_neu_rate_' // trim(reaction_name(i))
+               else if (c > eps_nuc_rate_offset) then
+                  i = c - eps_nuc_rate_offset
+                  col_name = 'eps_nuc_rate_' // trim(reaction_name(i))
                else if (c > screened_rate_offset) then
                   i = c - screened_rate_offset
                   col_name = 'screened_rate_' // trim(reaction_name(i))
@@ -948,10 +948,10 @@
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') col
             else if (pass == 2) then
-               if (c >= eps_neu_offset) then
-                  col_name = 'eps_neu_' // trim(reaction_name(jj))
-               else if (c >= eps_nuc_offset) then
-                  col_name = 'eps_nuc_' // trim(reaction_name(jj))
+               if (c >= eps_neu_rate_offset) then
+                  col_name = 'eps_neu_rate_' // trim(reaction_name(jj))
+               else if (c >= eps_nuc_rate_offset) then
+                  col_name = 'eps_nuc_rate_' // trim(reaction_name(jj))
                else if (c >= screened_rate_offset) then
                   col_name = 'screened_rate_' // trim(reaction_name(jj))
                else if (c >= raw_rate_offset) then
@@ -963,9 +963,9 @@
                   names(col) = trim(col_name)
                end if
             else if (pass == 3) then
-               if (c >= eps_neu_offset) then
+               if (c >= eps_neu_rate_offset) then
                   val = 0d0 ! TODO
-               else if (c >= eps_nuc_offset) then
+               else if (c >= eps_nuc_rate_offset) then
                   val = 0d0 ! TODO
                else if (c >= screened_rate_offset) then
                   val = 0d0 ! TODO
@@ -974,7 +974,7 @@
                   call eval_tfactors(tf, log10(s% t(k)), s% t(k))
                   call get_raw_rate(jj, s% which_rates(jj), s% t(k), tf, raw_rate, ierr)
                   val = raw_rate
-                  deallocate(tf)
+                  nullify(tf)
                end if
                if (write_flag) then
                   write(io, fmt=dbl_fmt, advance='no') val

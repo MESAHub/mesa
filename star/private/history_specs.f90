@@ -59,10 +59,10 @@
       
       integer, parameter :: raw_rate_offset = log_lum_band_offset + idel
       integer, parameter :: screened_rate_offset = raw_rate_offset + idel
-      integer, parameter :: eps_nuc_offset = screened_rate_offset + idel
-      integer, parameter :: eps_neu_offset = eps_nuc_offset + idel
+      integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
+      integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
 
-      integer, parameter :: start_of_special_cases = eps_neu_offset + idel
+      integer, parameter :: start_of_special_cases = eps_neu_rate_offset + idel
       ! mixing and burning regions must be given the largest offsets
       ! so they can be distinguished from the other ones
 
@@ -294,8 +294,8 @@
                cycle
             end if
 
-            if (string == 'add_eps_nuc') then
-               call do_rate(eps_nuc_offset,'eps_nuc_', spec_err)
+            if (string == 'add_eps_nuc_rates') then
+               call do_rate(eps_nuc_rate_offset,'eps_nuc_rate_', spec_err)
                if (spec_err /= 0) then
                   call error; return
                end if
@@ -303,8 +303,8 @@
                cycle
             end if
 
-            if (string == 'add_eps_neu') then
-               call do_rate(eps_neu_offset,'eps_neu_', spec_err)
+            if (string == 'add_eps_neu_rates') then
+               call do_rate(eps_neu_rate_offset,'eps_neu_rate_', spec_err)
                if (spec_err /= 0) then
                   call error; return
                end if
@@ -472,7 +472,7 @@
             end do
          end subroutine do_colors
 
-         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc, eps_neu
+         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
             use rates_def, only: reaction_name
             integer, intent(in) :: offset
             character(len=*) :: prefix
@@ -522,11 +522,11 @@
          else if (string=='screened_rate') then
             call do1_rate(screened_rate_offset)
 
-         else if (string=='eps_nuc') then
-            call do1_rate(eps_nuc_offset)
+         else if (string=='eps_nuc_rate') then
+            call do1_rate(eps_nuc_rate_offset)
 
-         else if (string=='eps_neu') then
-            call do1_rate(eps_neu_offset)
+         else if (string=='eps_neu_rate') then
+            call do1_rate(eps_neu_rate_offset)
 
          else if (string=='abs_mag') then
             call do1_color(abs_mag_offset)

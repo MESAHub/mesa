@@ -55,9 +55,9 @@
       integer, parameter :: diffusion_D_offset = diffusion_dX_offset + idel
       integer, parameter :: raw_rate_offset = diffusion_D_offset + idel
       integer, parameter :: screened_rate_offset = raw_rate_offset + idel
-      integer, parameter :: eps_nuc_offset = screened_rate_offset + idel
-      integer, parameter :: eps_neu_offset = eps_nuc_offset + idel
-      integer, parameter :: extra_offset = eps_neu_offset + idel
+      integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
+      integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
+      integer, parameter :: extra_offset = eps_neu_rate_offset + idel
 
       integer, parameter :: max_profile_offset = extra_offset + idel
 
@@ -127,11 +127,11 @@
             case ('log') ! add log of abundance
                call do1_nuclide(log_abundance_offset)
 
-            case ('eps_neu')
-                call do1_rate(eps_neu_offset)
+            case ('eps_neu_rate')
+                call do1_rate(eps_neu_rate_offset)
 
-            case ('eps_nuc')
-                call do1_rate(eps_nuc_offset)
+            case ('eps_nuc_rate')
+                call do1_rate(eps_nuc_rate_offset)
 
             case ('screened_rate')
                 call do1_rate(screened_rate_offset)
@@ -190,7 +190,7 @@
             ierr = -1
          end subroutine do1_nuclide
 
-         subroutine do1_rate(offset) ! raw_rate, screened_rate, eps_nuc, eps_neu
+         subroutine do1_rate(offset) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
             use rates_lib, only: rates_reaction_id
             integer, intent(in) :: offset
             integer :: t, id
@@ -306,11 +306,11 @@
          if (c > extra_offset) then
             i = c - extra_offset
             val = s% profile_extra(k,i)
-         else if (c > eps_neu_offset) then
-            i = c - eps_neu_offset
+         else if (c > eps_neu_rate_offset) then
+            i = c - eps_neu_rate_offset
             val = 0d0 ! TODO
-         else if (c > eps_nuc_offset) then
-            i = c - eps_nuc_offset
+         else if (c > eps_nuc_rate_offset) then
+            i = c - eps_nuc_rate_offset
             val = 0d0 ! TODO
          else if (c > screened_rate_offset) then
             i = c - screened_rate_offset
@@ -321,7 +321,7 @@
             call eval_tfactors(tf, log10(s% t(k)), s% t(k))
             call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
             val = raw_rate
-            !deallocate(tf)
+            nullify(tf)
          else if (c > diffusion_D_offset) then
             i = c - diffusion_D_offset
             ii = s% net_iso(i)
