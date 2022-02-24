@@ -17,7 +17,7 @@ r21.12.1
 Al26 isomers
 ------------
 
-After running a model with the al26 isomers in you net, when you run the model again, it
+After running a model with the al26 isomers in your net, when you run the model again, it
 immediatly crashes and prints a backtrace containing:
 
 .. code-block:: shell
@@ -37,6 +37,14 @@ The solution for now is to remove all files in ``$MESA_DIR/data/rates_data/cache
 each MESA run.
 
 See `gh-360 <https://github.com/MESAHub/mesa/issues/360>`_
+
+
+Atmosphere in pulse data
+------------------------
+
+The control `add_atmosphere_to_pulse_data` does not work properly with an Eddington atmosphere (the default), and also crashes if `atm_T_tau_opacity = 'varying'` is set. 
+
+See `gh-375 <https://github.com/MESAHub/mesa/issues/375>`_
 
 
 r15140
