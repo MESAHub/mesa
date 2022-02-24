@@ -42,7 +42,7 @@ See `gh-360 <https://github.com/MESAHub/mesa/issues/360>`_
 Atmosphere in pulse data
 ------------------------
 
-The control `add_atmosphere_to_pulse_data` does not work properly with an Eddington atmosphere (the default), and also crashes if `atm_T_tau_opacity = 'varying'` is set. 
+The control ``add_atmosphere_to_pulse_data`` does not work properly with an Eddington atmosphere (the default), and also crashes if ``atm_T_tau_opacity = 'varying'`` is set. 
 
 See `gh-375 <https://github.com/MESAHub/mesa/issues/375>`_
 
