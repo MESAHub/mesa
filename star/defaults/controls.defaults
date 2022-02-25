@@ -2322,7 +2322,7 @@
 
       ! ::
 
-    MLT_option = 'Cox'
+    MLT_option = 'TDC'
 
       ! TDC options
       ! ~~~~~~~~~~~
