@@ -15,7 +15,7 @@ data/ @rjfarmer
 docs/ @rhdtownsend
 eos/ @fxt44 @aarondotter @adamjermyn @evbauer
 gyre/ @rhdtownsend @warrickball
-hdfio5 @richtownsend
+hdfio5 @rhdtownsend
 interp_1d/ @rhdtownsend @adamjermyn
 interp_2d/ @rhdtownsend @adamjermyn
 kap/ @fxt44 @aarondotter
