@@ -934,7 +934,7 @@
             call do1(s% extra_opacity_factor, c% extra_opacity_factor)
             if (failed('extra_opacity_factor')) exit
 
-            call do1(s% extra_pressure, c% extra_pressure)
+            call do1_ad(s% extra_pressure, c% extra_pressure)
             if (failed('extra_pressure')) exit
             call do1(s% eps_heat, c% eps_heat)
             if (failed('eps_heat')) exit

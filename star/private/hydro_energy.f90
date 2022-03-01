@@ -573,12 +573,12 @@
          real(dp), dimension(s% species), intent(out) :: &
             d_work_dxa00, d_work_dxam1
          integer, intent(out) :: ierr
-         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face
+         real(dp) :: alfa, beta, P_theta, Peos_face, Av_face
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_star_order1) :: &
             P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
             PtrbR_ad, PtrbL_ad, PvscL_ad, PvscR_ad, Ptrb_div_etrb, PL_ad, PR_ad, &
-            Peos_ad, Ptrb_ad, Pvsc_ad, inv_R2
+            Peos_ad, Ptrb_ad, Pvsc_ad, inv_R2, extra_P
          logical :: test_partials
          integer :: j
          include 'formats'
@@ -694,7 +694,8 @@
             if (.not. s% use_other_pressure) then
                extra_P = 0d0
             else if (k > 1) then 
-               extra_P = alfa*s% extra_pressure(k) + beta*s% extra_pressure(k-1) 
+               ! my_val_m1 = shift_m1(get_my_val(s,k-1)) for use in terms going into equation at k
+               extra_P = alfa*s% extra_pressure(k) + beta * shift_m1(s%extra_pressure(k-1))
             else
                extra_P = s% extra_pressure(k)
             end if

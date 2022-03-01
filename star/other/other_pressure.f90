@@ -45,7 +45,10 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         s% extra_pressure(:) = 0d0
+         do k=1,s%nz
+            s% extra_pressure(k) = 0d0
+         end do
+         ! note that extra_pressure is type(auto_diff_real_star_order1) so includes partials.
          return
       end subroutine default_other_pressure
 
