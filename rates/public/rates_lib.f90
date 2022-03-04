@@ -51,7 +51,6 @@
          use load_weak, only: load_weak_data
          use load_ecapture, only: load_ecapture_data
          use rates_initialize, only: init_rates_info
-         use screening_chugunov, only: screen_chugunov_init
          
          character (len=*), intent(in) :: reactionlist_filename, jina_reaclib_filename, rates_table_dir_in
          logical, intent(in) :: use_special_weak_rates, use_suzuki_weak_rates
@@ -97,9 +96,6 @@
          if (dbg) write(*,*) 'call init_rates_info'
          call init_rates_info(reactionlist_filename, ierr)
          if (ierr /= 0) return
-         
-         if (dbg) write(*,*) 'call screen_chugunov_init'
-         call screen_chugunov_init()
         
          have_finished_initialization = .true.
          
@@ -134,7 +130,6 @@
          use rates_def
          use rates_initialize, only: free_reaction_arrays, free_raw_rates_records
          use reaclib_input, only: reaclib
-         use screening_chugunov, only: free_chugunov
          use utils_lib
 
          call integer_dict_free(skip_warnings_dict)
@@ -146,8 +141,6 @@
          call free_reaction_data(reaclib_rates)
          call free_reaction_arrays()
          call free_raw_rates_records()
-
-         call free_chugunov()
          
       end subroutine rates_shutdown
          
