@@ -1,5 +1,6 @@
 module skye_coulomb_solid
    use math_lib
+   use math_def
    use auto_diff
    use const_def
 
@@ -163,22 +164,22 @@ module skye_coulomb_solid
          type(auto_diff_real_2var_order3) :: TPT, x, f_inf, A, Q, xr, eta, supp, g, alpha, Fliq, gr, switch
          type(auto_diff_real_2var_order3) :: F
 
-         s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
-         b1 = 1d0 - 1.1866d0 * pow(Z, -0.267d0) + 0.27d0 / Z
-         b2 = 1d0 + (2.25d0 * pow(Z, -1d0/3d0)) * (1d0 + 0.684d0 * pow5(Z) + 0.222d0 * pow6(Z)) / (1d0 + 0.222d0 * pow6(Z))
-         b3 = 41.5d0 / (1d0 + log(Z))
-         b4 = 0.395d0 * log(Z) + 0.347d0 * pow(Z, -1.5d0)
+         s = 1d0 / (1d0 + 1d-2 * pre_z(int(Z))% logz_3_2 + 0.097d0 / pre_z(int(Z))% z2)
+         b1 = 1d0 - 1.1866d0 * pre_z(int(Z))% zm0p267 + 0.27d0 / Z
+         b2 = 1d0 + (2.25d0 * pre_z(int(Z))% zm1_3) * (1d0 + 0.684d0 * pre_z(int(Z))% z5 + 0.222d0 * pre_z(int(Z))% z6) / (1d0 + 0.222d0 * pre_z(int(Z))% z6)
+         b3 = 41.5d0 / (1d0 + pre_z(int(Z))% logz)
+         b4 = 0.395d0 * pre_z(int(Z))% logz + 0.347d0 * pre_z(int(Z))% zm3_2
 
-         g = ge * pow(Z, 5d0/3d0)
+         g = ge * pre_z(int(Z))% z5_3
 
-         COTPT = sqrt(3d0 * me_in_amu / mi) / pow(Z, 7d0/6d0)
+         COTPT = sqrt(3d0 * me_in_amu / mi) / pre_z(int(Z))% z7_6
          TPT = g * COTPT / sqrt(RS)
          supp = safe_exp(-pow2(0.205d0 * TPT))
          Q = sqrt((pow2(0.205d0 * TPT) + log(1d0 + supp)) / log(eulernum - (eulernum - 2d0) * supp))
 
          xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
-         f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
+         f_inf = aTF * pre_z(int(Z))% z2_3 * b1 * sqrt(1d0 + b2 / pow2(xr))
 
          F = -f_inf * g * (1d0 + A * pow(Q / g, s))
 
