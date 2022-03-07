@@ -80,7 +80,7 @@
 /
 
 &controls
-    star_history_name = 'history_m0.20.a1.9500.Z0.0200.B0000.dB0.0000.maxBV0.00d5.spotf0.51.spotx0.80_uniform-photosphere-Joyce-final.data'
+    star_history_name = 'history.data'
     !star_history_name = 'history_m0.20.a1.9500.Z0.0200.B0000.dB0.0000.maxBV0.00d5.spotf0.00.spotx1.00_uniform-photosphere-Joyce-final.data'
 
     max_age = 1.1d9 !! for James only
