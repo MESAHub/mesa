@@ -10,16 +10,8 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-# check if can skip building starting model
-if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-   cp standard_start.mod start.mod
-else
-   do_one inlist_start start.mod
-   cp start.mod standard_start.mod
-fi
-
-do_one inlist_x_header final.mod
+do_one inlist_starspots_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-echo 'finished x'
+echo 'finished inlist_starspots_header'

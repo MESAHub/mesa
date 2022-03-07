@@ -2,7 +2,7 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
-do_one starspots "return message" auto
+do_one starspots "stop because star_age >= max_age" "final.mod" auto
 return
 
 do_one split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
