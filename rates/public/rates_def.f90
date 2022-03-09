@@ -775,7 +775,7 @@
          
          end subroutine other_screening_interface
 
-         subroutine rates_other_rate_get_interface(ir, temp, raw_rate, ierr)
+         subroutine other_rate_get_interface(ir, temp, raw_rate, ierr)
             import dp
             implicit none
       
@@ -784,7 +784,7 @@
             real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
             integer, intent(out) ::   ierr
          
-         end subroutine rates_other_rate_get_interface
+         end subroutine other_rate_get_interface
 
 
       end interface
@@ -800,7 +800,7 @@
       procedure (other_screening_interface), pointer :: &
          rates_other_screening => null()
 
-      procedure (rates_other_rate_get_interface), pointer :: &
+      procedure (other_rate_get_interface), pointer :: &
          rates_other_rate_get => null()
 
 

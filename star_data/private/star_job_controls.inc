@@ -297,10 +297,6 @@
       character (len=strlen) :: new_net_name, new_small_net_name, &
          h_he_net, co_net, adv_net
 
-      logical :: set_rates_preference
-      integer :: new_rates_preference
-      character (len=16) :: set_rate_c12ag, set_rate_n14pg, set_rate_3a, set_rate_1212
-
       logical :: set_uniform_xa_from_file, set_uniform_initial_xa_from_file
       character (len=strlen) :: file_for_uniform_xa
 
