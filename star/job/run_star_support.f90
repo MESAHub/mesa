@@ -1825,10 +1825,6 @@
          if (failed('store_controls',ierr)) return
          call do_star_job_controls_before(id_aux, s_aux, .false., ierr)
          if (ierr /= 0) return
-         s_aux% job% set_rate_c12ag = s% job% set_rate_c12ag
-         s_aux% job% set_rate_n14pg = s% job% set_rate_n14pg
-         s_aux% job% set_rate_3a = s% job% set_rate_3a
-         s_aux% job% set_rate_1212 = s% job% set_rate_1212
          call star_read_model(id_aux, s% job% saved_model_for_merger_2, ierr)
          if (failed('star_read_model',ierr)) return
 
