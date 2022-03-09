@@ -1,0 +1,55 @@
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      save_model_when_terminate = .true.
+      required_termination_code_string = ''
+      save_model_filename = 'final.mod'
+
+      set_to_this_tau_factor = 0.1d0
+      set_tau_factor = .true.
+      set_initial_tau_factor = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+/ ! end of kap namelist
+
+
+&controls
+      x_ctrl(1) = 0.05d0
+
+      initial_mass = 1.0d0
+      initial_y = 0.28d0
+      initial_z = 0.02d0
+      
+      ! limit max_model_number as part of test_suite
+      max_model_number = 75
+
+      atm_T_tau_opacity = 'varying'
+      atm_T_tau_relation = 'Trampedach_solar'
+      use_T_tau_gradr_factor = .true.
+
+      pulse_data_format = 'FGONG'
+      add_atmosphere_to_pulse_data = .true.
+      fgong_ivers = 1300
+
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 5
+      write_header_frequency = 50
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+
+/ ! end of pgstar namelist

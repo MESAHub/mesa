@@ -105,35 +105,96 @@
          integer :: ierr
          type (star_info), pointer :: s
 
-         integer :: k, n
-         real(dp) :: T_check, T_face, T_rms
+         integer :: i, k, n
+         integer :: iounit, nz, iconst, ivar, ivers
+         real(dp) :: Teff, T_check, T_face, T_rms, tau, row(5)
+         real(dp), allocatable :: data(:,:)
+         character(len=strlen) :: filename
+
+         filename = 'check.fgong'
 
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_check_model = keep_going
 
-         T_rms = 0.0_dp
-         n = 0
-         do k = 2, s% nz
-            T_face = exp((s% dq(k-1)*s% lnT(k) + &
-                  s% dq(k)*s% lnT(k-1))/(s% dq(k-1) + s% dq(k)))
-            T_check = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% atm_T_tau_relation, s% tau(k))), 0.25_dp)
-            T_rms = T_rms + (T_face - T_check)**2
-            n = n + 1
-            ! write(*,*) 'k, T_face, T_check:', k, T_face, T_check
-            if (s% tau(k) > 0.1_dp) exit
-         end do
+         ! every N models, save fgong and compare T to T(τ) relation
 
-         T_rms = sqrt(T_rms/n)
+         if (MOD(s% model_number, 5) == 0) then
+            ! save pulse data
+            call star_export_pulse_data( &
+                  id, 'FGONG', filename, &
+                  s% add_center_point_to_pulse_data, &
+                  s% keep_surface_point_for_pulse_data, &
+                  s% add_atmosphere_to_pulse_data, &
+                  ierr)
+            if (ierr /= 0) then
+               write(*,*) 'failed to save '//filename
+               call mesa_error(__FILE__,__LINE__)
+            end if
+            
+            ! load pulse data and compare it to reference value
+            open(newunit=iounit, file=filename, status='OLD', iostat=ierr)
+            if (ierr /= 0) then
+               write(*,*) 'failed to open '//TRIM(filename)
+               call mesa_error(__FILE__,__LINE__)
+            end if
 
-         if (T_rms > s% x_ctrl(1)) then
-            write(*,*) 'T_rms larger than target: ', trim(s% atm_T_tau_relation), T_rms, s% x_ctrl(1)
-            failed = .true.
-         end if
+            ! skip header
+            do k = 1, 4
+               read(iounit, *, iostat=ierr)
+            end do
 
-         ! cycle through all the options
-         if (MOD(s% model_number, 10) == 0) then
+            read(iounit, *, iostat=ierr) nz, iconst, ivar, ivers
+
+            if ((iconst /= 15) .or. (ivar /= 40) .or. (ivers /= 1300)) then
+               write(*,*) 'format of '//TRIM(filename)//' not as expected'
+               call mesa_error(__FILE__,__LINE__)
+            end if
+
+            read(iounit, *, iostat=ierr) row ! M, R, L, ...
+            read(iounit, *, iostat=ierr) row ! 
+            read(iounit, *, iostat=ierr) row ! ..., Teff, G
+
+            Teff = row(4)
+
+            allocate(data(nz, ivar))
+
+            do k = 1, nz
+               do i = 1, 8
+                  read(iounit, *, iostat=ierr) data(k, (i-1)*5+1:i*5)
+               end do
+            end do
+
+            close(iounit)
+
+            ! initialise accumulators
+            T_rms = 0.0_dp
+            tau = s% atm_build_tau_outer
+            n = 0
+
+            do k = 1, nz-1
+               T_check = Teff*pow(0.75_dp*(tau + q(s% atm_T_tau_relation, tau)), 0.25_dp)
+               T_face = data(k,3)
+               T_rms = T_rms + (T_face - T_check)**2
+               n = n + 1
+
+               ! Δτ = <ρ><κ>Δr
+               tau = tau + 0.25_dp*(data(k,5)+data(k+1,5))*(data(k,8)+data(k+1,8))*(data(k,1)-data(k+1,1))
+
+               if (tau > 0.1_dp) exit
+            end do
+
+            deallocate(data)
+
+            T_rms = sqrt(T_rms/n)
+
+            if (T_rms > s% x_ctrl(1)) then
+               write(*,*) 'T_rms larger than target: ', trim(s% atm_T_tau_relation), T_rms, s% x_ctrl(1)
+               failed = .true.
+            end if
+
+            ! cycle through T-tau relations
             select case(s% atm_T_tau_relation)
             case ('Eddington')
                s% atm_T_tau_relation = 'solar_Hopf'
@@ -145,6 +206,22 @@
                s% atm_T_tau_relation = 'Eddington'
             case default
                write(*,*) 'Invalid atm_T_tau_relation: ', s% atm_T_tau_relation
+               call mesa_error(__FILE__,__LINE__)
+            end select
+
+         end if
+
+         ! cycle through opacity integration options
+         if (MOD(s% model_number, 20) == 0) then
+            select case(s% atm_T_tau_opacity)
+            case ('fixed')
+               s% atm_T_tau_opacity = 'iterated'
+            case ('iterated')
+               s% atm_T_tau_opacity = 'varying'
+            case ('varying')
+               s% atm_T_tau_opacity = 'fixed'
+            case default
+               write(*,*) 'Invalid atm_T_tau_opacity: ', s% atm_T_tau_opacity
                call mesa_error(__FILE__,__LINE__)
             end select
          end if

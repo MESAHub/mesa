@@ -95,7 +95,7 @@ contains
     ! Determine data dimensiones
 
     if (add_atmosphere) then
-       call build_atm(s, s%L(1), s%r(1), s%m_grav(1), s%cgrav(1), ierr)
+       call build_atm(s, s%L(1), s%r(1), s%Teff, s%m_grav(1), s%cgrav(1), ierr)
        if (ierr /= 0) then
           write(*,*) 'failed in build_atm'
           return

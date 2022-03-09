@@ -1,0 +1,1 @@
+../../../star/test_suite/check_pulse_atm/README.rst
