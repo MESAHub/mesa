@@ -34,6 +34,12 @@ using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/
 More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
 This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
 
+pgstar
+------
+
+Due to re-organisation of the star_type derived type, all pgstar controls have been moved into a seperate pgstar derived type.
+If you access a pgstar option ``XX`` in your ``run_star_extras.f90`` then you need to replace ``s% XX`` with ``s% pg% XX``.
+
 
 Changes in r21.12.1
 ===================
