@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -48,9 +49,9 @@
          call pgeras()
 
          call do_L_r_Plot(s, id, device_id, &
-            s% L_r_xleft, s% L_r_xright, &
-            s% L_r_ybot, s% L_r_ytop, .false., &
-            s% L_r_title, s% L_r_txt_scale, ierr)
+            s% pg% L_r_xleft, s% pg% L_r_xright, &
+            s% pg% L_r_ybot, s% pg% L_r_ytop, .false., &
+            s% pg% L_r_title, s% pg% L_r_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -75,21 +76,21 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'radius', 'luminosity', &
             'R/R\d\(2281)', 'L/L\d\(2281)', &
-            s% L_r_r_min, s% L_r_r_max, &
-            s% L_r_r_margin, s% L_r_dr_min, &
-            s% L_r_L_min, s% L_r_L_max, &
-            s% L_r_L_margin, s% L_r_dL_min, &
-            s% L_r_step_min, s% L_r_step_max, &
+            s% pg% L_r_r_min, s% pg% L_r_r_max, &
+            s% pg% L_r_r_margin, s% pg% L_r_dr_min, &
+            s% pg% L_r_L_min, s% pg% L_r_L_max, &
+            s% pg% L_r_L_margin, s% pg% L_r_dL_min, &
+            s% pg% L_r_step_min, s% pg% L_r_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_L_r_target_box, s% L_r_target_n_sigma, &
-            s% L_r_target_r, s% L_r_target_L, &
-            s% L_r_target_r_sigma, s% L_r_target_L_sigma, &
-            s% show_L_r_annotation1, &
-            s% show_L_r_annotation2, &
-            s% show_L_r_annotation3, &
-            s% L_r_fname, &
-            s% L_r_use_decorator, &
-            s% L_r_pgstar_decorator, &
+            s% pg% show_L_r_target_box, s% pg% L_r_target_n_sigma, &
+            s% pg% L_r_target_r, s% pg% L_r_target_L, &
+            s% pg% L_r_target_r_sigma, s% pg% L_r_target_L_sigma, &
+            s% pg% show_L_r_annotation1, &
+            s% pg% show_L_r_annotation2, &
+            s% pg% show_L_r_annotation3, &
+            s% pg% L_r_fname, &
+            s% pg% L_r_use_decorator, &
+            s% pg% L_r_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_L_r_Plot
 
