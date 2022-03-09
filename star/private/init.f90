@@ -641,8 +641,6 @@
          s% how_many_extra_binary_history_columns => null_how_many_extra_binary_history_columns
          s% data_for_extra_binary_history_columns => null_data_for_extra_binary_history_columns
          
-         s% Abundance_pgstar_decorator => null_pgstar_decorator
-
          s% generations = 0
 
          s% nz = 0

@@ -3175,10 +3175,10 @@
 
          call integer_dict_lookup(s% history_names_dict, name, i, ierr)
          if (ierr /= 0 .or. i <= 0) return ! didn't find it
-         if (associated(s% pgstar_hist)) then
-            if (associated(s% pgstar_hist% vals)) then
-               if (size(s% pgstar_hist% vals,dim=1) >= i) then
-                  val = s% pgstar_hist% vals(i)
+         if (associated(s% pg% pgstar_hist)) then
+            if (associated(s% pg% pgstar_hist% vals)) then
+               if (size(s% pg% pgstar_hist% vals,dim=1) >= i) then
+                  val = s% pg% pgstar_hist% vals(i)
                   get1_hist_value = .true.
                   return
                end if

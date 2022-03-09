@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -50,9 +51,9 @@
          call pgeras()
 
          call do_dPg_dnu_Plot(s, id, device_id, &
-            s% dPg_dnu_xleft, s% dPg_dnu_xright, &
-            s% dPg_dnu_ybot, s% dPg_dnu_ytop, .false., &
-            s% dPg_dnu_title, s% dPg_dnu_txt_scale, ierr)
+            s% pg% dPg_dnu_xleft, s% pg% dPg_dnu_xright, &
+            s% pg% dPg_dnu_ybot, s% pg% dPg_dnu_ytop, .false., &
+            s% pg% dPg_dnu_title, s% pg% dPg_dnu_txt_scale, ierr)
 
          call pgebuf()
 
@@ -75,18 +76,18 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'delta_nu', 'delta_Pg', &
             'delta nu', 'delta Pg', &
-            s% dPg_dnu_delta_nu_min, s% dPg_dnu_delta_nu_max, &
-            s% dPg_dnu_delta_nu_margin, s% dPg_dnu_d_delta_nu_min, &
-            s% dPg_dnu_delta_Pg_min, s% dPg_dnu_delta_Pg_max, &
-            s% dPg_dnu_delta_Pg_margin, s% dPg_dnu_d_delta_Pg_min, &
-            s% dPg_dnu_step_min, s% dPg_dnu_step_max, &
+            s% pg% dPg_dnu_delta_nu_min, s% pg% dPg_dnu_delta_nu_max, &
+            s% pg% dPg_dnu_delta_nu_margin, s% pg% dPg_dnu_d_delta_nu_min, &
+            s% pg% dPg_dnu_delta_Pg_min, s% pg% dPg_dnu_delta_Pg_max, &
+            s% pg% dPg_dnu_delta_Pg_margin, s% pg% dPg_dnu_d_delta_Pg_min, &
+            s% pg% dPg_dnu_step_min, s% pg% dPg_dnu_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
             .false., 0, 0.0, 0.0, 0.0, 0.0, &
-            s% show_dPg_dnu_annotation1, &
-            s% show_dPg_dnu_annotation2, &
-            s% show_dPg_dnu_annotation3, &
-            s% dPg_dnu_fname, &
-            s% dPg_dnu_use_decorator, s% dPg_dnu_pgstar_decorator, &
+            s% pg% show_dPg_dnu_annotation1, &
+            s% pg% show_dPg_dnu_annotation2, &
+            s% pg% show_dPg_dnu_annotation3, &
+            s% pg% dPg_dnu_fname, &
+            s% pg% dPg_dnu_use_decorator, s% pg% dPg_dnu_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_dPg_dnu_Plot
 

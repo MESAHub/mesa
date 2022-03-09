@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -49,9 +50,9 @@
          call pgeras()
 
          call do_rti_Plot(s, id, device_id, &
-            s% rti_xleft, s% rti_xright, &
-            s% rti_ybot, s% rti_ytop, .false., &
-            s% rti_title, s% rti_txt_scale, ierr)
+            s% pg% rti_xleft, s% pg% rti_xright, &
+            s% pg% rti_ybot, s% pg% rti_ytop, .false., &
+            s% pg% rti_title, s% pg% rti_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -98,26 +99,26 @@
 
          ierr = 0
 
-         step_min = s% rti_step_xmin
+         step_min = s% pg% rti_step_xmin
          if (step_min <= 0) step_min = 1
-         step_max = s% rti_step_xmax
+         step_max = s% pg% rti_step_xmax
          if (step_max <= 0 .or. step_max > s% model_number) step_max = s% model_number
 
          if (step_min >= s% model_number) step_min = 1
 
-         if (s% rti_max_width > 0) &
-            step_min = max(step_min, step_max - s% rti_max_width)
+         if (s% pg% rti_max_width > 0) &
+            step_min = max(step_min, step_max - s% pg% rti_max_width)
 
          n = count_hist_points(s, step_min, step_max)
          if (n <= 1) return
          step_min = max(step_min, step_max-n+1)
 
-         call integer_dict_lookup(s% history_names_dict, s% rti_xaxis_name, ix, ierr)
+         call integer_dict_lookup(s% history_names_dict, s% pg% rti_xaxis_name, ix, ierr)
          if (ierr /= 0) ix = -1
          if (ix <= 0) then
             write(*,'(A)')
             write(*,*) 'ERROR: failed to find ' // &
-               trim(s% rti_xaxis_name) // ' in rti data'
+               trim(s% pg% rti_xaxis_name) // ' in rti data'
             write(*,'(A)')
             ierr = -1
          end if
@@ -140,44 +141,44 @@
 
          call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
          if (ierr /= 0) then 
-            write(*,*) 'pgstar get_hist_points failed ' // trim(s% rti_xaxis_name)
+            write(*,*) 'pgstar get_hist_points failed ' // trim(s% pg% rti_xaxis_name)
             call dealloc
             ierr = 0
             return
          end if
 
-         if (s% rti_xaxis_in_seconds .and. s% rti_xaxis_name=='star_age') then
+         if (s% pg% rti_xaxis_in_seconds .and. s% pg% rti_xaxis_name=='star_age') then
             do k=1,n
                xvec(k) = xvec(k)*secyer
             end do
-         else if (s% rti_xaxis_in_Myr .and. s% rti_xaxis_name=='star_age') then
+         else if (s% pg% rti_xaxis_in_Myr .and. s% pg% rti_xaxis_name=='star_age') then
             do k=1,n
                xvec(k) = xvec(k)*1d-6
             end do
          end if
 
          now=xvec(n)
-         if (s% rti_xaxis_time_from_present .and. s% rti_xaxis_name=='star_age') then
+         if (s% pg% rti_xaxis_time_from_present .and. s% pg% rti_xaxis_name=='star_age') then
             do k=1,n
                xvec(k) = xvec(k)-now
             end do
          end if
 
-         if (s% rti_xaxis_log) then
+         if (s% pg% rti_xaxis_log) then
             do k=1,n
                xvec(k) = log10(max(1e-50,abs(xvec(k))))
             end do
          end if
 
-         if(s% rti_xmin<-100d0) s% rti_xmin=xvec(1)
-         if(s% rti_xmax<-100d0) s% rti_xmax=xvec(n)
+         if(s% pg% rti_xmin<-100d0) s% pg% rti_xmin=xvec(1)
+         if(s% pg% rti_xmax<-100d0) s% pg% rti_xmax=xvec(n)
 
-         xmin=max(s% rti_xmin,xvec(1))
-         xmax=min(s% rti_xmax,xvec(n))
+         xmin=max(s% pg% rti_xmin,xvec(1))
+         xmax=min(s% pg% rti_xmax,xvec(n))
 
          call set_xleft_xright( &
-            n, xvec, xmin, xmax, s% rti_xmargin, &
-            s% rti_xaxis_reversed, dxmin, xleft, xright)
+            n, xvec, xmin, xmax, s% pg% rti_xmargin, &
+            s% pg% rti_xaxis_reversed, dxmin, xleft, xright)
 
          have_star_mass = get1_yvec('star_mass', star_mass)
          if (.not. have_star_mass) then
@@ -215,9 +216,9 @@
          call plot_mass_lines
 
          call show_annotations(s, &
-            s% show_rti_annotation1, &
-            s% show_rti_annotation2, &
-            s% show_rti_annotation3)
+            s% pg% show_rti_annotation1, &
+            s% pg% show_rti_annotation2, &
+            s% pg% show_rti_annotation3)
 
          call pgsch(txt_scale)
          call finish_rti_plot
@@ -245,7 +246,7 @@
             call pgsci(clr_Gray)
             call pgslw(2)
             call show_left_yaxis_label_pgmtxt_pgstar(s,1.0,1.0,'M\dtotal\u',-0.8)
-            call pgslw(s% pgstar_lw)
+            call pgslw(s% pg% pgstar_lw)
             call plot_mass_line(star_mass)
             call pgunsa
          end subroutine plot_total_mass_line
@@ -255,7 +256,7 @@
             real, intent(in) :: yvec(:)
             if (any(yvec > 1e-2*ymax_mass_axis)) then
                call pgsave
-               call pgslw(s% rti_line_weight)
+               call pgslw(s% pg% rti_line_weight)
                call pgline(n, xvec, yvec)
                call pgunsa
             end if
@@ -265,14 +266,14 @@
          subroutine setup_mass_yaxis
             real :: dy, ymin, ymax
             include 'formats'
-            ymax = s% rti_mass_max
+            ymax = s% pg% rti_mass_max
             if (ymax <= 0) ymax = maxval(star_mass)
-            ymin = s% rti_mass_min
+            ymin = s% pg% rti_mass_min
             if (ymin < 0) ymin = minval(star_M_center)
             if (ymax <= ymin) ymax = ymin+1
             dy = ymax - ymin
-            if (s% rti_mass_min /= -101d0) ymin = ymin - s% rti_mass_margin*dy
-            if (s% rti_mass_max /= -101d0) ymax = ymax + s% rti_mass_margin*dy
+            if (s% pg% rti_mass_min /= -101d0) ymin = ymin - s% pg% rti_mass_margin*dy
+            if (s% pg% rti_mass_max /= -101d0) ymax = ymax + s% pg% rti_mass_margin*dy
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
             call pgsci(1)
@@ -291,16 +292,16 @@
             call show_box_pgstar(s,'BCNST1','BCNMSTV1')
 
             xlabel=''
-            if (s% rti_xaxis_log) then
-               xlabel='log '// s% rti_xaxis_name
+            if (s% pg% rti_xaxis_log) then
+               xlabel='log '// s% pg% rti_xaxis_name
             else
-               xlabel=s% rti_xaxis_name
+               xlabel=s% pg% rti_xaxis_name
             end if
 
-            if (s% rti_xaxis_name =='star_age') then
-               if (s% rti_xaxis_in_seconds) then
+            if (s% pg% rti_xaxis_name =='star_age') then
+               if (s% pg% rti_xaxis_in_seconds) then
                   xlabel=trim(xlabel)//' (s)'
-               else if (s% rti_xaxis_in_Myr) then
+               else if (s% pg% rti_xaxis_in_Myr) then
                   xlabel=trim(xlabel)//' (Myr)'
                else
                   xlabel=trim(xlabel)//' (yr)'
@@ -316,8 +317,8 @@
             end if
             call show_title_pgstar(s, title)
             
-            call show_pgstar_decorator(s%id, s% rti_use_decorator, &
-               s% rti_pgstar_decorator, 0, ierr)
+            call show_pgstar_decorator(s% pg%id, s% pg% rti_use_decorator, &
+               s% pg% rti_pgstar_decorator, 0, ierr)
 
          end subroutine finish_rti_plot
 
@@ -359,17 +360,17 @@
             end do
 
             call pgsave
-            call pgslw(s% rti_line_weight)
-            if (.not. associated(s% pgstar_hist)) then
-               write(*,*) '.not. associated(s% pgstar_hist)'
+            call pgslw(s% pg% rti_line_weight)
+            if (.not. associated(s% pg% pgstar_hist)) then
+               write(*,*) '.not. associated(s% pg% pgstar_hist)'
             end if
-            pg => s% pgstar_hist
+            pg => s% pg% pgstar_hist
 
             do
                if (.not. associated(pg)) exit
                step = pg% step
                if (step < step_min) exit
-               if (step <= step_max .and. mod(step, s% rti_interval) == 0) then
+               if (step <= step_max .and. mod(step, s% pg% rti_interval) == 0) then
                   call draw_rti_for_step( &
                      pg, step, i_rti_type_first, i_rti_type_last, real(xvec(step-step_min+1)), &
                      star_mass(step-step_min+1), star_M_center(step-step_min+1))

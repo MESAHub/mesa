@@ -13,8 +13,9 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
+   star_pgstar.f90 \
    star_data_def.f90 \
-   star_data_lib.f90
+   star_data_lib.f90 \
 
 #################################################################
 #
@@ -38,6 +39,7 @@ clean:
 install:
 	@$(CP_IF_NEWER) star_data_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) star_data_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) star_pgstar.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) ../private/*.inc $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 

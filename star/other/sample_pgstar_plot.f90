@@ -36,6 +36,7 @@
       use star_lib
       use star_def
       use math_lib
+      use star_pgstar
 
       implicit none
       
@@ -89,7 +90,7 @@
          
          do i = 1, num_Other_plots
             plot_id = i_Other + i - 1
-            p => s% pgstar_win_file_ptr(plot_id)
+            p => s% pg% pgstar_win_file_ptr(plot_id)
             p% plot => my_plot
             p% id = plot_id
             p% name = 'My_Plot'

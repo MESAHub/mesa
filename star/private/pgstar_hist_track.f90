@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -46,9 +47,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track1_plot(s, id, device_id, &
-            s% History_Track1_xleft, s% History_Track1_xright, &
-            s% History_Track1_ybot, s% History_Track1_ytop, .false., &
-            s% History_Track1_title, s% History_Track1_txt_scale, ierr)
+            s% pg% History_Track1_xleft, s% pg% History_Track1_xright, &
+            s% pg% History_Track1_ybot, s% pg% History_Track1_ytop, .false., &
+            s% pg% History_Track1_title, s% pg% History_Track1_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track1_plot
@@ -64,36 +65,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track1_xname, &
-            s% History_Track1_yname, &
-            s% History_Track1_xaxis_label, &
-            s% History_Track1_yaxis_label, &
-            s% History_Track1_xmin, &
-            s% History_Track1_xmax, &
-            s% History_Track1_xmargin, &
-            s% History_Track1_dxmin, &
-            s% History_Track1_ymin, &
-            s% History_Track1_ymax, &
-            s% History_Track1_ymargin, &
-            s% History_Track1_dymin, &
-            s% History_Track1_step_min, &
-            s% History_Track1_step_max, &
-            s% History_Track1_reverse_xaxis, &
-            s% History_Track1_reverse_yaxis, &
-            s% History_Track1_log_xaxis, &
-            s% History_Track1_log_yaxis, &
-            s% show_History_Track1_target_box, &
-            s% History_Track1_n_sigma, &
-            s% History_Track1_xtarget, &
-            s% History_Track1_ytarget, &
-            s% History_Track1_xsigma, &
-            s% History_Track1_ysigma, &
-            s% show_History_Track1_annotation1, &
-            s% show_History_Track1_annotation2, &
-            s% show_History_Track1_annotation3, &
-            s% History_Track1_fname, &
-            s% History_Track1_use_decorator, &
-            s% History_Track1_pgstar_decorator, &
+            s% pg% History_Track1_xname, &
+            s% pg% History_Track1_yname, &
+            s% pg% History_Track1_xaxis_label, &
+            s% pg% History_Track1_yaxis_label, &
+            s% pg% History_Track1_xmin, &
+            s% pg% History_Track1_xmax, &
+            s% pg% History_Track1_xmargin, &
+            s% pg% History_Track1_dxmin, &
+            s% pg% History_Track1_ymin, &
+            s% pg% History_Track1_ymax, &
+            s% pg% History_Track1_ymargin, &
+            s% pg% History_Track1_dymin, &
+            s% pg% History_Track1_step_min, &
+            s% pg% History_Track1_step_max, &
+            s% pg% History_Track1_reverse_xaxis, &
+            s% pg% History_Track1_reverse_yaxis, &
+            s% pg% History_Track1_log_xaxis, &
+            s% pg% History_Track1_log_yaxis, &
+            s% pg% show_History_Track1_target_box, &
+            s% pg% History_Track1_n_sigma, &
+            s% pg% History_Track1_xtarget, &
+            s% pg% History_Track1_ytarget, &
+            s% pg% History_Track1_xsigma, &
+            s% pg% History_Track1_ysigma, &
+            s% pg% show_History_Track1_annotation1, &
+            s% pg% show_History_Track1_annotation2, &
+            s% pg% show_History_Track1_annotation3, &
+            s% pg% History_Track1_fname, &
+            s% pg% History_Track1_use_decorator, &
+            s% pg% History_Track1_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track1_plot
 
@@ -109,9 +110,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track2_plot(s, id, device_id, &
-            s% History_Track2_xleft, s% History_Track2_xright, &
-            s% History_Track2_ybot, s% History_Track2_ytop, .false., &
-            s% History_Track2_title, s% History_Track2_txt_scale, ierr)
+            s% pg% History_Track2_xleft, s% pg% History_Track2_xright, &
+            s% pg% History_Track2_ybot, s% pg% History_Track2_ytop, .false., &
+            s% pg% History_Track2_title, s% pg% History_Track2_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track2_plot
@@ -127,36 +128,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track2_xname, &
-            s% History_Track2_yname, &
-            s% History_Track2_xaxis_label, &
-            s% History_Track2_yaxis_label, &
-            s% History_Track2_xmin, &
-            s% History_Track2_xmax, &
-            s% History_Track2_xmargin, &
-            s% History_Track2_dxmin, &
-            s% History_Track2_ymin, &
-            s% History_Track2_ymax, &
-            s% History_Track2_ymargin, &
-            s% History_Track2_dymin, &
-            s% History_Track2_step_min, &
-            s% History_Track2_step_max, &
-            s% History_Track2_reverse_xaxis, &
-            s% History_Track2_reverse_yaxis, &
-            s% History_Track2_log_xaxis, &
-            s% History_Track2_log_yaxis, &
-            s% show_History_Track2_target_box, &
-            s% History_Track2_n_sigma, &
-            s% History_Track2_xtarget, &
-            s% History_Track2_ytarget, &
-            s% History_Track2_xsigma, &
-            s% History_Track2_ysigma, &
-            s% show_History_Track2_annotation1, &
-            s% show_History_Track2_annotation2, &
-            s% show_History_Track2_annotation3, &
-            s% History_Track2_fname, &
-            s% History_Track2_use_decorator, &
-            s% History_Track2_pgstar_decorator, &
+            s% pg% History_Track2_xname, &
+            s% pg% History_Track2_yname, &
+            s% pg% History_Track2_xaxis_label, &
+            s% pg% History_Track2_yaxis_label, &
+            s% pg% History_Track2_xmin, &
+            s% pg% History_Track2_xmax, &
+            s% pg% History_Track2_xmargin, &
+            s% pg% History_Track2_dxmin, &
+            s% pg% History_Track2_ymin, &
+            s% pg% History_Track2_ymax, &
+            s% pg% History_Track2_ymargin, &
+            s% pg% History_Track2_dymin, &
+            s% pg% History_Track2_step_min, &
+            s% pg% History_Track2_step_max, &
+            s% pg% History_Track2_reverse_xaxis, &
+            s% pg% History_Track2_reverse_yaxis, &
+            s% pg% History_Track2_log_xaxis, &
+            s% pg% History_Track2_log_yaxis, &
+            s% pg% show_History_Track2_target_box, &
+            s% pg% History_Track2_n_sigma, &
+            s% pg% History_Track2_xtarget, &
+            s% pg% History_Track2_ytarget, &
+            s% pg% History_Track2_xsigma, &
+            s% pg% History_Track2_ysigma, &
+            s% pg% show_History_Track2_annotation1, &
+            s% pg% show_History_Track2_annotation2, &
+            s% pg% show_History_Track2_annotation3, &
+            s% pg% History_Track2_fname, &
+            s% pg% History_Track2_use_decorator, &
+            s% pg% History_Track2_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track2_plot
 
@@ -172,9 +173,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track3_plot(s, id, device_id, &
-            s% History_Track3_xleft, s% History_Track3_xright, &
-            s% History_Track3_ybot, s% History_Track3_ytop, .false., &
-            s% History_Track3_title, s% History_Track3_txt_scale, ierr)
+            s% pg% History_Track3_xleft, s% pg% History_Track3_xright, &
+            s% pg% History_Track3_ybot, s% pg% History_Track3_ytop, .false., &
+            s% pg% History_Track3_title, s% pg% History_Track3_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track3_plot
@@ -190,36 +191,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track3_xname, &
-            s% History_Track3_yname, &
-            s% History_Track3_xaxis_label, &
-            s% History_Track3_yaxis_label, &
-            s% History_Track3_xmin, &
-            s% History_Track3_xmax, &
-            s% History_Track3_xmargin, &
-            s% History_Track3_dxmin, &
-            s% History_Track3_ymin, &
-            s% History_Track3_ymax, &
-            s% History_Track3_ymargin, &
-            s% History_Track3_dymin, &
-            s% History_Track3_step_min, &
-            s% History_Track3_step_max, &
-            s% History_Track3_reverse_xaxis, &
-            s% History_Track3_reverse_yaxis, &
-            s% History_Track3_log_xaxis, &
-            s% History_Track3_log_yaxis, &
-            s% show_History_Track3_target_box, &
-            s% History_Track3_n_sigma, &
-            s% History_Track3_xtarget, &
-            s% History_Track3_ytarget, &
-            s% History_Track3_xsigma, &
-            s% History_Track3_ysigma, &
-            s% show_History_Track3_annotation1, &
-            s% show_History_Track3_annotation2, &
-            s% show_History_Track3_annotation3, &
-            s% History_Track3_fname, &
-            s% History_Track3_use_decorator, &
-            s% History_Track3_pgstar_decorator, &
+            s% pg% History_Track3_xname, &
+            s% pg% History_Track3_yname, &
+            s% pg% History_Track3_xaxis_label, &
+            s% pg% History_Track3_yaxis_label, &
+            s% pg% History_Track3_xmin, &
+            s% pg% History_Track3_xmax, &
+            s% pg% History_Track3_xmargin, &
+            s% pg% History_Track3_dxmin, &
+            s% pg% History_Track3_ymin, &
+            s% pg% History_Track3_ymax, &
+            s% pg% History_Track3_ymargin, &
+            s% pg% History_Track3_dymin, &
+            s% pg% History_Track3_step_min, &
+            s% pg% History_Track3_step_max, &
+            s% pg% History_Track3_reverse_xaxis, &
+            s% pg% History_Track3_reverse_yaxis, &
+            s% pg% History_Track3_log_xaxis, &
+            s% pg% History_Track3_log_yaxis, &
+            s% pg% show_History_Track3_target_box, &
+            s% pg% History_Track3_n_sigma, &
+            s% pg% History_Track3_xtarget, &
+            s% pg% History_Track3_ytarget, &
+            s% pg% History_Track3_xsigma, &
+            s% pg% History_Track3_ysigma, &
+            s% pg% show_History_Track3_annotation1, &
+            s% pg% show_History_Track3_annotation2, &
+            s% pg% show_History_Track3_annotation3, &
+            s% pg% History_Track3_fname, &
+            s% pg% History_Track3_use_decorator, &
+            s% pg% History_Track3_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track3_plot
 
@@ -235,9 +236,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track4_plot(s, id, device_id, &
-            s% History_Track4_xleft, s% History_Track4_xright, &
-            s% History_Track4_ybot, s% History_Track4_ytop, .false., &
-            s% History_Track4_title, s% History_Track4_txt_scale, ierr)
+            s% pg% History_Track4_xleft, s% pg% History_Track4_xright, &
+            s% pg% History_Track4_ybot, s% pg% History_Track4_ytop, .false., &
+            s% pg% History_Track4_title, s% pg% History_Track4_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track4_plot
@@ -253,36 +254,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track4_xname, &
-            s% History_Track4_yname, &
-            s% History_Track4_xaxis_label, &
-            s% History_Track4_yaxis_label, &
-            s% History_Track4_xmin, &
-            s% History_Track4_xmax, &
-            s% History_Track4_xmargin, &
-            s% History_Track4_dxmin, &
-            s% History_Track4_ymin, &
-            s% History_Track4_ymax, &
-            s% History_Track4_ymargin, &
-            s% History_Track4_dymin, &
-            s% History_Track4_step_min, &
-            s% History_Track4_step_max, &
-            s% History_Track4_reverse_xaxis, &
-            s% History_Track4_reverse_yaxis, &
-            s% History_Track4_log_xaxis, &
-            s% History_Track4_log_yaxis, &
-            s% show_History_Track4_target_box, &
-            s% History_Track4_n_sigma, &
-            s% History_Track4_xtarget, &
-            s% History_Track4_ytarget, &
-            s% History_Track4_xsigma, &
-            s% History_Track4_ysigma, &
-            s% show_History_Track4_annotation1, &
-            s% show_History_Track4_annotation2, &
-            s% show_History_Track4_annotation3, &
-            s% History_Track4_fname, &
-            s% History_Track4_use_decorator, &
-            s% History_Track4_pgstar_decorator, &
+            s% pg% History_Track4_xname, &
+            s% pg% History_Track4_yname, &
+            s% pg% History_Track4_xaxis_label, &
+            s% pg% History_Track4_yaxis_label, &
+            s% pg% History_Track4_xmin, &
+            s% pg% History_Track4_xmax, &
+            s% pg% History_Track4_xmargin, &
+            s% pg% History_Track4_dxmin, &
+            s% pg% History_Track4_ymin, &
+            s% pg% History_Track4_ymax, &
+            s% pg% History_Track4_ymargin, &
+            s% pg% History_Track4_dymin, &
+            s% pg% History_Track4_step_min, &
+            s% pg% History_Track4_step_max, &
+            s% pg% History_Track4_reverse_xaxis, &
+            s% pg% History_Track4_reverse_yaxis, &
+            s% pg% History_Track4_log_xaxis, &
+            s% pg% History_Track4_log_yaxis, &
+            s% pg% show_History_Track4_target_box, &
+            s% pg% History_Track4_n_sigma, &
+            s% pg% History_Track4_xtarget, &
+            s% pg% History_Track4_ytarget, &
+            s% pg% History_Track4_xsigma, &
+            s% pg% History_Track4_ysigma, &
+            s% pg% show_History_Track4_annotation1, &
+            s% pg% show_History_Track4_annotation2, &
+            s% pg% show_History_Track4_annotation3, &
+            s% pg% History_Track4_fname, &
+            s% pg% History_Track4_use_decorator, &
+            s% pg% History_Track4_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track4_plot
 
@@ -298,9 +299,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track5_plot(s, id, device_id, &
-            s% History_Track5_xleft, s% History_Track5_xright, &
-            s% History_Track5_ybot, s% History_Track5_ytop, .false., &
-            s% History_Track5_title, s% History_Track5_txt_scale, ierr)
+            s% pg% History_Track5_xleft, s% pg% History_Track5_xright, &
+            s% pg% History_Track5_ybot, s% pg% History_Track5_ytop, .false., &
+            s% pg% History_Track5_title, s% pg% History_Track5_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track5_plot
@@ -316,36 +317,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track5_xname, &
-            s% History_Track5_yname, &
-            s% History_Track5_xaxis_label, &
-            s% History_Track5_yaxis_label, &
-            s% History_Track5_xmin, &
-            s% History_Track5_xmax, &
-            s% History_Track5_xmargin, &
-            s% History_Track5_dxmin, &
-            s% History_Track5_ymin, &
-            s% History_Track5_ymax, &
-            s% History_Track5_ymargin, &
-            s% History_Track5_dymin, &
-            s% History_Track5_step_min, &
-            s% History_Track5_step_max, &
-            s% History_Track5_reverse_xaxis, &
-            s% History_Track5_reverse_yaxis, &
-            s% History_Track5_log_xaxis, &
-            s% History_Track5_log_yaxis, &
-            s% show_History_Track5_target_box, &
-            s% History_Track5_n_sigma, &
-            s% History_Track5_xtarget, &
-            s% History_Track5_ytarget, &
-            s% History_Track5_xsigma, &
-            s% History_Track5_ysigma, &
-            s% show_History_Track5_annotation1, &
-            s% show_History_Track5_annotation2, &
-            s% show_History_Track5_annotation3, &
-            s% History_Track5_fname, &
-            s% History_Track5_use_decorator, &
-            s% History_Track5_pgstar_decorator, &
+            s% pg% History_Track5_xname, &
+            s% pg% History_Track5_yname, &
+            s% pg% History_Track5_xaxis_label, &
+            s% pg% History_Track5_yaxis_label, &
+            s% pg% History_Track5_xmin, &
+            s% pg% History_Track5_xmax, &
+            s% pg% History_Track5_xmargin, &
+            s% pg% History_Track5_dxmin, &
+            s% pg% History_Track5_ymin, &
+            s% pg% History_Track5_ymax, &
+            s% pg% History_Track5_ymargin, &
+            s% pg% History_Track5_dymin, &
+            s% pg% History_Track5_step_min, &
+            s% pg% History_Track5_step_max, &
+            s% pg% History_Track5_reverse_xaxis, &
+            s% pg% History_Track5_reverse_yaxis, &
+            s% pg% History_Track5_log_xaxis, &
+            s% pg% History_Track5_log_yaxis, &
+            s% pg% show_History_Track5_target_box, &
+            s% pg% History_Track5_n_sigma, &
+            s% pg% History_Track5_xtarget, &
+            s% pg% History_Track5_ytarget, &
+            s% pg% History_Track5_xsigma, &
+            s% pg% History_Track5_ysigma, &
+            s% pg% show_History_Track5_annotation1, &
+            s% pg% show_History_Track5_annotation2, &
+            s% pg% show_History_Track5_annotation3, &
+            s% pg% History_Track5_fname, &
+            s% pg% History_Track5_use_decorator, &
+            s% pg% History_Track5_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track5_plot
 
@@ -361,9 +362,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track6_plot(s, id, device_id, &
-            s% History_Track6_xleft, s% History_Track6_xright, &
-            s% History_Track6_ybot, s% History_Track6_ytop, .false., &
-            s% History_Track6_title, s% History_Track6_txt_scale, ierr)
+            s% pg% History_Track6_xleft, s% pg% History_Track6_xright, &
+            s% pg% History_Track6_ybot, s% pg% History_Track6_ytop, .false., &
+            s% pg% History_Track6_title, s% pg% History_Track6_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track6_plot
@@ -379,36 +380,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track6_xname, &
-            s% History_Track6_yname, &
-            s% History_Track6_xaxis_label, &
-            s% History_Track6_yaxis_label, &
-            s% History_Track6_xmin, &
-            s% History_Track6_xmax, &
-            s% History_Track6_xmargin, &
-            s% History_Track6_dxmin, &
-            s% History_Track6_ymin, &
-            s% History_Track6_ymax, &
-            s% History_Track6_ymargin, &
-            s% History_Track6_dymin, &
-            s% History_Track6_step_min, &
-            s% History_Track6_step_max, &
-            s% History_Track6_reverse_xaxis, &
-            s% History_Track6_reverse_yaxis, &
-            s% History_Track6_log_xaxis, &
-            s% History_Track6_log_yaxis, &
-            s% show_History_Track6_target_box, &
-            s% History_Track6_n_sigma, &
-            s% History_Track6_xtarget, &
-            s% History_Track6_ytarget, &
-            s% History_Track6_xsigma, &
-            s% History_Track6_ysigma, &
-            s% show_History_Track6_annotation1, &
-            s% show_History_Track6_annotation2, &
-            s% show_History_Track6_annotation3, &
-            s% History_Track6_fname, &
-            s% History_Track6_use_decorator, &
-            s% History_Track6_pgstar_decorator, &
+            s% pg% History_Track6_xname, &
+            s% pg% History_Track6_yname, &
+            s% pg% History_Track6_xaxis_label, &
+            s% pg% History_Track6_yaxis_label, &
+            s% pg% History_Track6_xmin, &
+            s% pg% History_Track6_xmax, &
+            s% pg% History_Track6_xmargin, &
+            s% pg% History_Track6_dxmin, &
+            s% pg% History_Track6_ymin, &
+            s% pg% History_Track6_ymax, &
+            s% pg% History_Track6_ymargin, &
+            s% pg% History_Track6_dymin, &
+            s% pg% History_Track6_step_min, &
+            s% pg% History_Track6_step_max, &
+            s% pg% History_Track6_reverse_xaxis, &
+            s% pg% History_Track6_reverse_yaxis, &
+            s% pg% History_Track6_log_xaxis, &
+            s% pg% History_Track6_log_yaxis, &
+            s% pg% show_History_Track6_target_box, &
+            s% pg% History_Track6_n_sigma, &
+            s% pg% History_Track6_xtarget, &
+            s% pg% History_Track6_ytarget, &
+            s% pg% History_Track6_xsigma, &
+            s% pg% History_Track6_ysigma, &
+            s% pg% show_History_Track6_annotation1, &
+            s% pg% show_History_Track6_annotation2, &
+            s% pg% show_History_Track6_annotation3, &
+            s% pg% History_Track6_fname, &
+            s% pg% History_Track6_use_decorator, &
+            s% pg% History_Track6_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track6_plot
 
@@ -424,9 +425,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track7_plot(s, id, device_id, &
-            s% History_Track7_xleft, s% History_Track7_xright, &
-            s% History_Track7_ybot, s% History_Track7_ytop, .false., &
-            s% History_Track7_title, s% History_Track7_txt_scale, ierr)
+            s% pg% History_Track7_xleft, s% pg% History_Track7_xright, &
+            s% pg% History_Track7_ybot, s% pg% History_Track7_ytop, .false., &
+            s% pg% History_Track7_title, s% pg% History_Track7_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track7_plot
@@ -442,36 +443,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track7_xname, &
-            s% History_Track7_yname, &
-            s% History_Track7_xaxis_label, &
-            s% History_Track7_yaxis_label, &
-            s% History_Track7_xmin, &
-            s% History_Track7_xmax, &
-            s% History_Track7_xmargin, &
-            s% History_Track7_dxmin, &
-            s% History_Track7_ymin, &
-            s% History_Track7_ymax, &
-            s% History_Track7_ymargin, &
-            s% History_Track7_dymin, &
-            s% History_Track7_step_min, &
-            s% History_Track7_step_max, &
-            s% History_Track7_reverse_xaxis, &
-            s% History_Track7_reverse_yaxis, &
-            s% History_Track7_log_xaxis, &
-            s% History_Track7_log_yaxis, &
-            s% show_History_Track7_target_box, &
-            s% History_Track7_n_sigma, &
-            s% History_Track7_xtarget, &
-            s% History_Track7_ytarget, &
-            s% History_Track7_xsigma, &
-            s% History_Track7_ysigma, &
-            s% show_History_Track7_annotation1, &
-            s% show_History_Track7_annotation2, &
-            s% show_History_Track7_annotation3, &
-            s% History_Track7_fname, &
-            s% History_Track7_use_decorator, &
-            s% History_Track7_pgstar_decorator, &
+            s% pg% History_Track7_xname, &
+            s% pg% History_Track7_yname, &
+            s% pg% History_Track7_xaxis_label, &
+            s% pg% History_Track7_yaxis_label, &
+            s% pg% History_Track7_xmin, &
+            s% pg% History_Track7_xmax, &
+            s% pg% History_Track7_xmargin, &
+            s% pg% History_Track7_dxmin, &
+            s% pg% History_Track7_ymin, &
+            s% pg% History_Track7_ymax, &
+            s% pg% History_Track7_ymargin, &
+            s% pg% History_Track7_dymin, &
+            s% pg% History_Track7_step_min, &
+            s% pg% History_Track7_step_max, &
+            s% pg% History_Track7_reverse_xaxis, &
+            s% pg% History_Track7_reverse_yaxis, &
+            s% pg% History_Track7_log_xaxis, &
+            s% pg% History_Track7_log_yaxis, &
+            s% pg% show_History_Track7_target_box, &
+            s% pg% History_Track7_n_sigma, &
+            s% pg% History_Track7_xtarget, &
+            s% pg% History_Track7_ytarget, &
+            s% pg% History_Track7_xsigma, &
+            s% pg% History_Track7_ysigma, &
+            s% pg% show_History_Track7_annotation1, &
+            s% pg% show_History_Track7_annotation2, &
+            s% pg% show_History_Track7_annotation3, &
+            s% pg% History_Track7_fname, &
+            s% pg% History_Track7_use_decorator, &
+            s% pg% History_Track7_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track7_plot
 
@@ -487,9 +488,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track8_plot(s, id, device_id, &
-            s% History_Track8_xleft, s% History_Track8_xright, &
-            s% History_Track8_ybot, s% History_Track8_ytop, .false., &
-            s% History_Track8_title, s% History_Track8_txt_scale, ierr)
+            s% pg% History_Track8_xleft, s% pg% History_Track8_xright, &
+            s% pg% History_Track8_ybot, s% pg% History_Track8_ytop, .false., &
+            s% pg% History_Track8_title, s% pg% History_Track8_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track8_plot
@@ -505,36 +506,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track8_xname, &
-            s% History_Track8_yname, &
-            s% History_Track8_xaxis_label, &
-            s% History_Track8_yaxis_label, &
-            s% History_Track8_xmin, &
-            s% History_Track8_xmax, &
-            s% History_Track8_xmargin, &
-            s% History_Track8_dxmin, &
-            s% History_Track8_ymin, &
-            s% History_Track8_ymax, &
-            s% History_Track8_ymargin, &
-            s% History_Track8_dymin, &
-            s% History_Track8_step_min, &
-            s% History_Track8_step_max, &
-            s% History_Track8_reverse_xaxis, &
-            s% History_Track8_reverse_yaxis, &
-            s% History_Track8_log_xaxis, &
-            s% History_Track8_log_yaxis, &
-            s% show_History_Track8_target_box, &
-            s% History_Track8_n_sigma, &
-            s% History_Track8_xtarget, &
-            s% History_Track8_ytarget, &
-            s% History_Track8_xsigma, &
-            s% History_Track8_ysigma, &
-            s% show_History_Track8_annotation1, &
-            s% show_History_Track8_annotation2, &
-            s% show_History_Track8_annotation3, &
-            s% History_Track8_fname, &
-            s% History_Track8_use_decorator, &
-            s% History_Track8_pgstar_decorator, &
+            s% pg% History_Track8_xname, &
+            s% pg% History_Track8_yname, &
+            s% pg% History_Track8_xaxis_label, &
+            s% pg% History_Track8_yaxis_label, &
+            s% pg% History_Track8_xmin, &
+            s% pg% History_Track8_xmax, &
+            s% pg% History_Track8_xmargin, &
+            s% pg% History_Track8_dxmin, &
+            s% pg% History_Track8_ymin, &
+            s% pg% History_Track8_ymax, &
+            s% pg% History_Track8_ymargin, &
+            s% pg% History_Track8_dymin, &
+            s% pg% History_Track8_step_min, &
+            s% pg% History_Track8_step_max, &
+            s% pg% History_Track8_reverse_xaxis, &
+            s% pg% History_Track8_reverse_yaxis, &
+            s% pg% History_Track8_log_xaxis, &
+            s% pg% History_Track8_log_yaxis, &
+            s% pg% show_History_Track8_target_box, &
+            s% pg% History_Track8_n_sigma, &
+            s% pg% History_Track8_xtarget, &
+            s% pg% History_Track8_ytarget, &
+            s% pg% History_Track8_xsigma, &
+            s% pg% History_Track8_ysigma, &
+            s% pg% show_History_Track8_annotation1, &
+            s% pg% show_History_Track8_annotation2, &
+            s% pg% show_History_Track8_annotation3, &
+            s% pg% History_Track8_fname, &
+            s% pg% History_Track8_use_decorator, &
+            s% pg% History_Track8_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track8_plot
 
@@ -550,9 +551,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Track9_plot(s, id, device_id, &
-            s% History_Track9_xleft, s% History_Track9_xright, &
-            s% History_Track9_ybot, s% History_Track9_ytop, .false., &
-            s% History_Track9_title, s% History_Track9_txt_scale, ierr)
+            s% pg% History_Track9_xleft, s% pg% History_Track9_xright, &
+            s% pg% History_Track9_ybot, s% pg% History_Track9_ytop, .false., &
+            s% pg% History_Track9_title, s% pg% History_Track9_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Track9_plot
@@ -568,36 +569,36 @@
          integer, intent(out) :: ierr
          call do_Hist_Track(s, id,device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Track9_xname, &
-            s% History_Track9_yname, &
-            s% History_Track9_xaxis_label, &
-            s% History_Track9_yaxis_label, &
-            s% History_Track9_xmin, &
-            s% History_Track9_xmax, &
-            s% History_Track9_xmargin, &
-            s% History_Track9_dxmin, &
-            s% History_Track9_ymin, &
-            s% History_Track9_ymax, &
-            s% History_Track9_ymargin, &
-            s% History_Track9_dymin, &
-            s% History_Track9_step_min, &
-            s% History_Track9_step_max, &
-            s% History_Track9_reverse_xaxis, &
-            s% History_Track9_reverse_yaxis, &
-            s% History_Track9_log_xaxis, &
-            s% History_Track9_log_yaxis, &
-            s% show_History_Track9_target_box, &
-            s% History_Track9_n_sigma, &
-            s% History_Track9_xtarget, &
-            s% History_Track9_ytarget, &
-            s% History_Track9_xsigma, &
-            s% History_Track9_ysigma, &
-            s% show_History_Track9_annotation1, &
-            s% show_History_Track9_annotation2, &
-            s% show_History_Track9_annotation3, &
-            s% History_Track9_fname, &
-            s% History_Track9_use_decorator, &
-            s% History_Track9_pgstar_decorator, &
+            s% pg% History_Track9_xname, &
+            s% pg% History_Track9_yname, &
+            s% pg% History_Track9_xaxis_label, &
+            s% pg% History_Track9_yaxis_label, &
+            s% pg% History_Track9_xmin, &
+            s% pg% History_Track9_xmax, &
+            s% pg% History_Track9_xmargin, &
+            s% pg% History_Track9_dxmin, &
+            s% pg% History_Track9_ymin, &
+            s% pg% History_Track9_ymax, &
+            s% pg% History_Track9_ymargin, &
+            s% pg% History_Track9_dymin, &
+            s% pg% History_Track9_step_min, &
+            s% pg% History_Track9_step_max, &
+            s% pg% History_Track9_reverse_xaxis, &
+            s% pg% History_Track9_reverse_yaxis, &
+            s% pg% History_Track9_log_xaxis, &
+            s% pg% History_Track9_log_yaxis, &
+            s% pg% show_History_Track9_target_box, &
+            s% pg% History_Track9_n_sigma, &
+            s% pg% History_Track9_xtarget, &
+            s% pg% History_Track9_ytarget, &
+            s% pg% History_Track9_xsigma, &
+            s% pg% History_Track9_ysigma, &
+            s% pg% show_History_Track9_annotation1, &
+            s% pg% show_History_Track9_annotation2, &
+            s% pg% show_History_Track9_annotation3, &
+            s% pg% History_Track9_fname, &
+            s% pg% History_Track9_use_decorator, &
+            s% pg% History_Track9_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_History_Track9_plot
 
@@ -755,7 +756,7 @@
          end if
          call show_title_pgstar(s, title)
 
-         call pgslw(s% pgstar_lw)
+         call pgslw(s% pg% pgstar_lw)
 
          call show_file_track
 

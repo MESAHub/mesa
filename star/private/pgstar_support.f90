@@ -29,6 +29,7 @@
       use const_def
       use rates_def, only: i_rate
       use utils_lib
+      use star_pgstar
 
 
       implicit none
@@ -76,21 +77,21 @@
          integer :: step
          step = pg_hist_new% step
          do
-            if (.not. associated(s% pgstar_hist)) then
-               s% pgstar_hist => pg_hist_new
+            if (.not. associated(s% pg% pgstar_hist)) then
+               s% pg% pgstar_hist => pg_hist_new
                nullify(pg_hist_new% next)
                return
             end if
-            if (step > s% pgstar_hist% step) then
-               pg_hist_new% next => s% pgstar_hist
-               s% pgstar_hist => pg_hist_new
+            if (step > s% pg% pgstar_hist% step) then
+               pg_hist_new% next => s% pg% pgstar_hist
+               s% pg% pgstar_hist => pg_hist_new
                return
             end if
             ! discard item
-            next => s% pgstar_hist% next
-            deallocate(s% pgstar_hist% vals)
-            deallocate(s% pgstar_hist)
-            s% pgstar_hist => next
+            next => s% pg% pgstar_hist% next
+            deallocate(s% pg% pgstar_hist% vals)
+            deallocate(s% pg% pgstar_hist)
+            s% pg% pgstar_hist => next
          end do
       end subroutine add_to_pgstar_hist
 
@@ -100,17 +101,17 @@
          integer :: i, id, num
          type (pgstar_win_file_data), pointer :: p
          type (pgstar_hist_node), pointer :: pg_hist=> null(), next=> null()
-         pg_hist => s% pgstar_hist
+         pg_hist => s% pg% pgstar_hist
          do while(associated(pg_hist))
             if (associated(pg_hist% vals)) deallocate(pg_hist% vals)
             next => pg_hist% next
             deallocate(pg_hist)
             pg_hist => next
          end do
-         nullify(s% pgstar_hist)
+         nullify(s% pg% pgstar_hist)
          if (have_initialized_pgstar) return
          do i = 1, num_pgstar_plots
-            p => s% pgstar_win_file_ptr(i)
+            p => s% pg% pgstar_win_file_ptr(i)
             p% id_win = 0
             p% have_called_mkdir = .false.
             p% file_dir_for_previous_mkdir = ''
@@ -191,7 +192,7 @@
                   p% file_dir_for_previous_mkdir = p% file_dir
                end if
                call create_file_name(s, p% file_dir, p% file_prefix, name)
-               name = trim(name) // '/' // trim(s% file_device)
+               name = trim(name) // '/' // trim(s% pg% file_device)
                call open_device(s, p, .true., name, p% id_file, ierr)
                if (ierr /= 0) return
                p% most_recent_filename = name
@@ -207,14 +208,14 @@
          character (len=*), intent(in) :: dir, prefix
          character (len=*), intent(out) :: name
          character (len=strlen) :: num_str, fstring
-         write(fstring,'( "(i",i2.2,".",i2.2,")" )') s% file_digits, s% file_digits
+         write(fstring,'( "(i",i2.2,".",i2.2,")" )') s% pg% file_digits, s% pg% file_digits
          write(num_str,fstring) s% model_number
          if (len_trim(dir) > 0) then
             name = trim(dir) // '/' // trim(prefix)
          else
             name = prefix
          end if
-         name = trim(name) // trim(num_str) // '.' // trim(s% file_extension)
+         name = trim(name) // trim(num_str) // '.' // trim(s% pg% file_extension)
       end subroutine create_file_name
 
 
@@ -225,7 +226,7 @@
          integer, intent(out) :: ierr
          character (len=strlen) :: name
          ierr = 0
-         !name = trim(filename) // '/' // trim(s% file_device)
+         !name = trim(filename) // '/' // trim(s% pg% file_device)
          name = trim(filename) // '/png'
          write(*,'(a)') 'write_plot_to_file device: ' // trim(name)
          call open_device(s, p, .true., trim(name), p% id_file, ierr)
@@ -255,10 +256,10 @@
 
          if (is_file) then
             dir = p% file_dir
-            white_on_black_flag = s% file_white_on_black_flag
+            white_on_black_flag = s% pg% file_white_on_black_flag
          else
             dir = ''
-            white_on_black_flag = s% win_white_on_black_flag
+            white_on_black_flag = s% pg% win_white_on_black_flag
          end if
 
          ierr = 0
@@ -877,7 +878,7 @@
          type (pgstar_hist_node), pointer :: pg
          include 'formats'
          numpts = 0
-         pg => s% pgstar_hist
+         pg => s% pg% pgstar_hist
          do ! recall that hist list is decreasing by age (and step)
             if (.not. associated(pg)) return
             if (pg% step < step_min) return
@@ -933,7 +934,7 @@
          type (pgstar_hist_node), pointer :: pg
          ierr = 0
          if (numpts == 0) return
-         pg => s% pgstar_hist
+         pg => s% pg% pgstar_hist
          i = numpts
          do ! recall that hist list is decreasing by age (and step)
             if (.not. associated(pg)) then
@@ -980,7 +981,7 @@
          type (pgstar_hist_node), pointer :: pg => null()
          include 'formats'
          if (numpts == 0) return
-         pg => s% pgstar_hist
+         pg => s% pg% pgstar_hist
          i = numpts
          vec = 0
          ierr = 0
@@ -1278,26 +1279,26 @@
       subroutine show_annotations(s, show_annotation1, show_annotation2, show_annotation3)
          type (star_info), pointer :: s
          logical, intent(in) :: show_annotation1, show_annotation2, show_annotation3
-         if (show_annotation1 .and. len_trim(s% annotation1_text) > 0) then
-            call pgsci(s% annotation1_ci)
-            call pgscf(s% annotation1_cf)
-            call do1_pgmtxt(s% annotation1_side, s% annotation1_disp, &
-               s% annotation1_coord, s% annotation1_fjust, s% annotation1_text, &
-               s% annotation1_ch, s% annotation1_lw)
+         if (show_annotation1 .and. len_trim(s% pg% annotation1_text) > 0) then
+            call pgsci(s% pg% annotation1_ci)
+            call pgscf(s% pg% annotation1_cf)
+            call do1_pgmtxt(s% pg% annotation1_side, s% pg% annotation1_disp, &
+               s% pg% annotation1_coord, s% pg% annotation1_fjust, s% pg% annotation1_text, &
+               s% pg% annotation1_ch, s% pg% annotation1_lw)
          end if
-         if (show_annotation2 .and. len_trim(s% annotation2_text) > 0) then
-            call pgsci(s% annotation2_ci)
-            call pgscf(s% annotation2_cf)
-            call do1_pgmtxt(s% annotation2_side, s% annotation2_disp, &
-               s% annotation2_coord, s% annotation2_fjust, s% annotation2_text, &
-               s% annotation2_ch, s% annotation2_lw)
+         if (show_annotation2 .and. len_trim(s% pg% annotation2_text) > 0) then
+            call pgsci(s% pg% annotation2_ci)
+            call pgscf(s% pg% annotation2_cf)
+            call do1_pgmtxt(s% pg% annotation2_side, s% pg% annotation2_disp, &
+               s% pg% annotation2_coord, s% pg% annotation2_fjust, s% pg% annotation2_text, &
+               s% pg% annotation2_ch, s% pg% annotation2_lw)
          end if
-         if (show_annotation3 .and. len_trim(s% annotation3_text) > 0) then
-            call pgsci(s% annotation3_ci)
-            call pgscf(s% annotation3_cf)
-            call do1_pgmtxt(s% annotation3_side, s% annotation3_disp, &
-               s% annotation3_coord, s% annotation3_fjust, s% annotation3_text, &
-               s% annotation3_ch, s% annotation3_lw)
+         if (show_annotation3 .and. len_trim(s% pg% annotation3_text) > 0) then
+            call pgsci(s% pg% annotation3_ci)
+            call pgscf(s% pg% annotation3_cf)
+            call do1_pgmtxt(s% pg% annotation3_side, s% pg% annotation3_disp, &
+               s% pg% annotation3_coord, s% pg% annotation3_fjust, s% pg% annotation3_text, &
+               s% pg% annotation3_ch, s% pg% annotation3_lw)
          end if
       end subroutine show_annotations
 
@@ -1539,7 +1540,7 @@
          call pgsave
 
          nz = s% nz
-         call pgsch(s% TRho_Profile_legend_txt_scale*txt_scale)
+         call pgsch(s% pg% TRho_Profile_legend_txt_scale*txt_scale)
 
          call pgsci(clr_Gold)
          call pgslw(14)
@@ -1597,7 +1598,7 @@
             call show_legend_text(clr_semiconvection, 'semiconvection')
             disp = disp + legend_del_disp
             call show_legend_text(clr_thermohaline, 'thermohaline')
-            if(s% show_TRho_accretion_mesh_borders) then
+            if(s% pg% show_TRho_accretion_mesh_borders) then
                disp= disp+legend_del_disp
                call show_legend_text(clr_RoyalPurple, 'Lagrangian Outer Border')
                disp =  disp+legend_del_disp
@@ -1722,16 +1723,16 @@
          type (star_info), pointer :: s
          real, intent(in) :: xvec(:), yvec(:), txt_scale, xmin, xmax, ymin, ymax
          integer :: i
-         do i = 1, s% num_profile_mass_points
+         do i = 1, s% pg% num_profile_mass_points
             call show_mass_point( &
                s, xvec, yvec, txt_scale, xmin, xmax, ymin, ymax, &
-               s% profile_mass_point_q(i), &
-               s% profile_mass_point_color_index(i), &
-               s% profile_mass_point_symbol(i), &
-               s% profile_mass_point_symbol_scale(i), &
-               s% profile_mass_point_str(i), &
-               s% profile_mass_point_str_clr(i), &
-               s% profile_mass_point_str_scale(i))
+               s% pg% profile_mass_point_q(i), &
+               s% pg% profile_mass_point_color_index(i), &
+               s% pg% profile_mass_point_symbol(i), &
+               s% pg% profile_mass_point_symbol_scale(i), &
+               s% pg% profile_mass_point_str(i), &
+               s% pg% profile_mass_point_str_clr(i), &
+               s% pg% profile_mass_point_str_scale(i))
          end do
       end subroutine show_mass_points
 
@@ -1804,8 +1805,8 @@
          integer :: lw
          call pgqch(ch)
          call pgqlw(lw)
-         call pgsch(s% pgstar_num_scale*ch)
-         call pgslw(s% pgstar_box_lw)
+         call pgsch(s% pg% pgstar_num_scale*ch)
+         call pgslw(s% pg% pgstar_box_lw)
          call pgbox(str1,0.0,0,str2,0.0,0)
          call pgsch(ch)
          call pgslw(lw)
@@ -1818,14 +1819,14 @@
          real, intent(in) :: pad
          optional pad
          real :: ch, disp
-         if (.not. s% pgstar_grid_show_title) return
+         if (.not. s% pg% pgstar_grid_show_title) return
          if (len_trim(title) == 0) return
          call pgqch(ch)
-         disp = s% pgstar_grid_title_disp
+         disp = s% pg% pgstar_grid_title_disp
          if (present(pad)) disp = disp + pad
          call do1_pgmtxt('T', disp, &
-            s% pgstar_grid_title_coord, s% pgstar_grid_title_fjust, title, &
-            s% pgstar_grid_title_scale*ch, s% pgstar_grid_title_lw)
+            s% pg% pgstar_grid_title_coord, s% pg% pgstar_grid_title_fjust, title, &
+            s% pg% pgstar_grid_title_scale*ch, s% pg% pgstar_grid_title_lw)
       end subroutine show_grid_title_pgstar
 
 
@@ -1835,14 +1836,14 @@
          real, intent(in) :: pad
          optional pad
          real :: ch, disp
-         if (.not. s% pgstar_show_title) return
+         if (.not. s% pg% pgstar_show_title) return
          if (len_trim(title) == 0) return
          call pgqch(ch)
-         disp = s% pgstar_title_disp
+         disp = s% pg% pgstar_title_disp
          if (present(pad)) disp = disp + pad
          call do1_pgmtxt('T', disp, &
-            s% pgstar_title_coord, s% pgstar_title_fjust, title, &
-            s% pgstar_title_scale*ch, s% pgstar_title_lw)
+            s% pg% pgstar_title_coord, s% pg% pgstar_title_fjust, title, &
+            s% pg% pgstar_title_scale*ch, s% pg% pgstar_title_lw)
       end subroutine show_title_pgstar
 
 
@@ -1853,7 +1854,7 @@
          real, intent(in) :: pad, coord, fjust
          optional pad
          real :: disp
-         disp = s% pgstar_title_disp
+         disp = s% pg% pgstar_title_disp
          if (present(pad)) disp = disp + pad
          call pgmtxt('T', disp, coord, fjust, label)
       end subroutine show_title_label_pgmtxt_pgstar
@@ -1866,10 +1867,10 @@
          optional pad
          real :: ch, disp
          call pgqch(ch)
-         disp = s% pgstar_xaxis_label_disp
+         disp = s% pg% pgstar_xaxis_label_disp
          if (present(pad)) disp = disp + pad
          call do1_pgmtxt('B',disp,0.5,0.5,label, &
-            s% pgstar_xaxis_label_scale*ch, s% pgstar_xaxis_label_lw)
+            s% pg% pgstar_xaxis_label_scale*ch, s% pg% pgstar_xaxis_label_lw)
       end subroutine show_xaxis_label_pgstar
 
 
@@ -1880,7 +1881,7 @@
          real, intent(in) :: pad, coord, fjust
          optional pad
          real :: disp
-         disp = s% pgstar_xaxis_label_disp
+         disp = s% pg% pgstar_xaxis_label_disp
          if (present(pad)) disp = disp + pad
          call pgmtxt('B', disp, coord, fjust, label)
       end subroutine show_xaxis_label_pgmtxt_pgstar
@@ -1893,10 +1894,10 @@
          optional pad
          real :: ch, disp
          call pgqch(ch)
-         disp = s% pgstar_left_yaxis_label_disp
+         disp = s% pg% pgstar_left_yaxis_label_disp
          if (present(pad)) disp = disp + pad
          call do1_pgmtxt('L',disp,0.5,0.5,label, &
-            s% pgstar_left_yaxis_label_scale*ch, s% pgstar_left_yaxis_label_lw)
+            s% pg% pgstar_left_yaxis_label_scale*ch, s% pg% pgstar_left_yaxis_label_lw)
       end subroutine show_left_yaxis_label_pgstar
 
 
@@ -1907,10 +1908,10 @@
          optional pad
          real :: ch, disp
          call pgqch(ch)
-         disp = s% pgstar_right_yaxis_label_disp
+         disp = s% pg% pgstar_right_yaxis_label_disp
          if (present(pad)) disp = disp + pad
          call do1_pgmtxt('R',disp,0.5,0.5,label, &
-            s% pgstar_right_yaxis_label_scale*ch, s% pgstar_right_yaxis_label_lw)
+            s% pg% pgstar_right_yaxis_label_scale*ch, s% pg% pgstar_right_yaxis_label_lw)
       end subroutine show_right_yaxis_label_pgstar
 
 
@@ -1923,7 +1924,7 @@
          real :: ch, disp
          call pgqch(ch)
          call pgsch(1.1*ch)
-         disp = s% pgstar_left_yaxis_label_disp
+         disp = s% pg% pgstar_left_yaxis_label_disp
          if (present(pad)) disp = disp + pad
          call pgmtxt('L', disp, coord, fjust, label)
          call pgsch(ch)
@@ -1939,7 +1940,7 @@
          real :: ch, disp
          call pgqch(ch)
          call pgsch(1.1*ch)
-         disp = s% pgstar_right_yaxis_label_disp
+         disp = s% pg% pgstar_right_yaxis_label_disp
          if (present(pad)) disp = disp + pad
          call pgmtxt('R', disp, coord, fjust, label)
          call pgsch(ch)
@@ -1950,14 +1951,14 @@
          type (star_info), pointer :: s
          character (len=32) :: str
          real :: ch
-         if (.not. s% pgstar_show_model_number) return
+         if (.not. s% pg% pgstar_show_model_number) return
          write(str,'(i9)') s% model_number
          str = 'model ' // trim(adjustl(str))
          call pgqch(ch)
          call do1_pgmtxt('T', &
-            s% pgstar_model_disp,s% pgstar_model_coord, &
-            s% pgstar_model_fjust,str, &
-            s% pgstar_model_scale*ch, s% pgstar_model_lw)
+            s% pg% pgstar_model_disp,s% pg% pgstar_model_coord, &
+            s% pg% pgstar_model_fjust,str, &
+            s% pg% pgstar_model_scale*ch, s% pg% pgstar_model_lw)
       end subroutine show_model_number_pgstar
 
 
@@ -1967,24 +1968,24 @@
          real(dp) :: age
          real :: ch
          integer :: len, i, j, iE, n
-         if (.not. s% pgstar_show_age) return
+         if (.not. s% pg% pgstar_show_age) return
          age = s% star_age
-         if (s% pgstar_show_age_in_seconds) then
+         if (s% pg% pgstar_show_age_in_seconds) then
             age = age*secyer
             units_str = 'secs'
-         else if (s% pgstar_show_age_in_minutes) then
+         else if (s% pg% pgstar_show_age_in_minutes) then
             age = age*secyer/60
             units_str = 'mins'
-         else if (s% pgstar_show_age_in_hours) then
+         else if (s% pg% pgstar_show_age_in_hours) then
             age = age*secyer/(60*60)
             units_str = 'hrs'
-         else if (s% pgstar_show_age_in_days) then
+         else if (s% pg% pgstar_show_age_in_days) then
             age = age*secyer/(60*60*24)
             units_str = 'days'
-         else if (s% pgstar_show_age_in_years) then
+         else if (s% pg% pgstar_show_age_in_years) then
             !age = age
             units_str = 'yrs'
-         else if (s% pgstar_show_log_age_in_years) then
+         else if (s% pg% pgstar_show_log_age_in_years) then
             age = log10(max(1d-99,age))
             units_str = 'log yrs'
          else if (age*secyer < 60) then
@@ -2040,9 +2041,9 @@
          age_str = 'age ' // trim(age_str) // ' ' // trim(units_str)
          call pgqch(ch)
          call do1_pgmtxt('T', &
-            s% pgstar_age_disp, s% pgstar_age_coord, &
-            s% pgstar_age_fjust, age_str, &
-            s% pgstar_age_scale*ch, s% pgstar_age_lw)
+            s% pg% pgstar_age_disp, s% pg% pgstar_age_coord, &
+            s% pg% pgstar_age_fjust, age_str, &
+            s% pg% pgstar_age_scale*ch, s% pg% pgstar_age_lw)
       end subroutine show_age_pgstar
 
 

@@ -27,6 +27,7 @@
       use star_lib
       use star_def
       use astero_support
+      use star_pgstar
 
       implicit none
          
@@ -48,7 +49,7 @@
          
          i = 1
          plot_id = i_Other + i - 1
-         p => s% pgstar_win_file_ptr(plot_id)
+         p => s% pg% pgstar_win_file_ptr(plot_id)
          p_echelle => p
          p% plot => echelle_plot
          p% okay_to_call_do_plot_in_grid = .true.
@@ -68,7 +69,7 @@
          if (nl(1) > 0) then
             i = i+1
             plot_id = i_Other + i - 1
-            p => s% pgstar_win_file_ptr(plot_id)
+            p => s% pg% pgstar_win_file_ptr(plot_id)
             p_ratios => p
             p% plot => ratios_plot
             p% okay_to_call_do_plot_in_grid = .true.
