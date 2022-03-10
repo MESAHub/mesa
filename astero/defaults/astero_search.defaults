@@ -1171,6 +1171,13 @@
 
    ! output controls
 
+   ! astero_results_directory
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
+   ! Directory in which to save ``astero`` outputs.
+   ! If it doesn't exist, it will be created. ::
+
+      astero_results_directory = 'outputs'
+
    ! write_best_model_data_for_each_sample
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! ::
@@ -1187,11 +1194,9 @@
    ! ~~~~~~~~~~~~~~~~~~~~~
    ! sample_results_postfix
    ! ~~~~~~~~~~~~~~~~~~~~~~
-   ! Prefix and postfix for sample results filenames.
-   ! You can include a directory in the prefix if desired
-   ! but you must create the directory yourself. ::
+   ! Prefix and postfix for sample results filenames. ::
 
-      sample_results_prefix = 'outputs/sample_'
+      sample_results_prefix = 'sample_'
       sample_results_postfix = '.data'
 
    ! model_num_digits

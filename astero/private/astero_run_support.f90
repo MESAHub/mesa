@@ -437,6 +437,7 @@
          subroutine do1_grid(ierr)
             integer, intent(out) :: ierr
             real(dp) :: chi2
+            character(len=256) :: filename
             
             include 'formats'
             ierr = 0
@@ -449,7 +450,10 @@
             
             call save_best_for_sample(sample_number, 0)
 
-            call save_sample_results_to_file(-1,from_file_output_filename,ierr)
+            if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+            filename = trim(astero_results_directory) // '/' // trim(from_file_output_filename)
+         
+            call save_sample_results_to_file(-1, filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in save_sample_results_to_file'
                return
@@ -680,6 +684,7 @@
          
          subroutine do1_grid(ierr)
             integer, intent(out) :: ierr
+            character(len=256) :: filename
             include 'formats'
             ierr = 0
             
@@ -716,7 +721,10 @@
             
             call save_best_for_sample(sample_number, 0)
 
-            call save_sample_results_to_file(i_total,scan_grid_output_filename,ierr)
+            if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+            filename = trim(astero_results_directory) // '/' // trim(scan_grid_output_filename)
+
+            call save_sample_results_to_file(i_total, filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in save_sample_results_to_file'
                return
@@ -733,13 +741,18 @@
          double precision, intent(in) :: x(*)
          double precision, intent(out) :: f
          
+         character(len=256) :: filename
          integer :: ierr
 
          call bobyqa_or_newuoa_fun(n,x,f)
 
          write(*,'(A)')
          ierr = 0
-         call save_sample_results_to_file(-1,bobyqa_output_filename,ierr)
+
+         if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+         filename = trim(astero_results_directory) // '/' // trim(bobyqa_output_filename)
+
+         call save_sample_results_to_file(-1, filename, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
             call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
@@ -753,13 +766,18 @@
          double precision, intent(in) :: x(*)
          double precision, intent(out) :: f
          
+         character(len=256) :: filename
          integer :: ierr
          
          call bobyqa_or_newuoa_fun(n,x,f)
 
          write(*,'(A)')
          ierr = 0
-         call save_sample_results_to_file(-1,newuoa_output_filename,ierr)
+
+         if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+         filename = trim(astero_results_directory) // '/' // trim(newuoa_output_filename)
+
+         call save_sample_results_to_file(-1, filename, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
             call mesa_error(__FILE__,__LINE__,'newuoa_fun')
@@ -1030,6 +1048,7 @@
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
          
+         character(len=256) :: filename
          integer :: prev_sample_number
          include 'formats'
          
@@ -1145,7 +1164,10 @@
          
          call save_best_for_sample(sample_number, op_code)
 
-         call save_sample_results_to_file(-1, simplex_output_filename, ierr)
+         if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+         filename = trim(astero_results_directory) // '/' // trim(simplex_output_filename)
+
+         call save_sample_results_to_file(-1, filename, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
             call mesa_error(__FILE__,__LINE__)
