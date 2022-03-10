@@ -1359,13 +1359,17 @@
       
       
       subroutine show_sample_header(iounit)
-         integer, intent(in) ::iounit
+         integer, intent(in) :: iounit
          
          integer :: j, l
+         character (len=strlen) :: fmt
          character (len=10) :: str
          character (len=1) :: l_str
+
+         write(fmt,'(a)') '(2x,a6,99' // trim(astero_results_txt_format) // ')'
       
-         write(iounit,'(2x,a6,10a26,a16,22a26,7a20)',advance='no') &
+         ! write(iounit,'(2x,a6,10a26,a16,22a26,7a20)',advance='no') &
+         write(iounit, fmt, advance='no') &
             'sample', &
             
             'chi2', &
@@ -1412,6 +1416,8 @@
             'ratios_l0_first', &
             'ratios_l1_first'
          
+         write(fmt,'(a)') '(99' // trim(astero_results_txt_format) // ')'
+
          if (chi2_seismo_fraction > 0) then
 
             do l=0,3
@@ -1419,7 +1425,7 @@
                do j=1,nl(l)
                   write(str,'(i3)') j
                   str = adjustl(str)
-                  write(iounit,'(99a26)',advance='no') &
+                  write(iounit, fmt, advance='no') &
                      'l' // l_str // '_order_' // trim(str), &
                      'l' // l_str // '_obs_' // trim(str), &
                      'l' // l_str // '_obs_sigma_' // trim(str), &
@@ -1430,14 +1436,9 @@
             end do
 
             do j=1,ratios_n
-               if (j < 10) then
-                  write(str,'(i1)') j
-               else if (j < 100) then
-                  write(str,'(i2)') j
-               else
-                  write(str,'(i3)') j
-               end if
-               write(iounit,'(99a26)',advance='no') &
+               write(str,'(i3)') j
+               str = adjustl(str)
+               write(iounit, fmt, advance='no') &
                   'r01_obs_' // trim(str), &
                   'r01_obs_sigmas_' // trim(str), &
                   'r01_' // trim(str), &
@@ -1448,14 +1449,9 @@
 
             if (chi2_seismo_r_02_fraction > 0) then
                do j=1,nl(0)
-                  if (j < 10) then
-                     write(str,'(i1)') j
-                  else if (j < 100) then
-                     write(str,'(i2)') j
-                  else
-                     write(str,'(i3)') j
-                  end if
-                  write(iounit,'(99a26)',advance='no') &
+                  write(str,'(i3)') j
+                  str = adjustl(str)
+                  write(iounit, fmt, advance='no') &
                      'r02_obs_' // trim(str), &
                      'r02_obs_sigmas_' // trim(str), &
                      'r02_' // trim(str)
@@ -1464,7 +1460,7 @@
          
          end if
          
-         write(iounit,*) ! end of line
+         write(iounit, '(a)') ! end of line
                                           
       end subroutine show_sample_header
       
@@ -1474,7 +1470,7 @@
          integer, intent(in) :: i, iounit
             
          integer :: j, k, l, op_code, ierr
-         character (len=256) :: info_str
+         character (len=256) :: info_str, fmt
          
          ierr = 0
 
@@ -1488,8 +1484,14 @@
                ierr = 0
             end if
          end if
+
+         write(fmt,'(a)') '(1x,i7,10' // trim(astero_results_dbl_format) // &
+            ',' // trim(astero_results_int_format) // &
+            ',22' // trim(astero_results_dbl_format) // &
+            ',7' // trim(astero_results_int_format) // ')'
          
-         write(iounit,'(3x,i5,10(1pes26.16),i16,22(1pes26.16),7i20)',advance='no') i, &
+         ! write(iounit,'(3x,i5,10(1pes26.16),i16,22(1pes26.16),7i20)',advance='no') i, &
+         write(iounit, fmt, advance='no') i, &
             sample_chi2(i), &
             sample_mass(i), &
             sample_init_Y(i), &
@@ -1532,26 +1534,32 @@
             ratios_l1_first
             
          if (iounit == 6) return
-         
+
          if (chi2_seismo_fraction > 0) then
+
+            write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
+                ',99' // trim(astero_results_dbl_format) // ')'
 
             do l = 0, 3
                do k = 1, nl(l)
-                  write(iounit,'(i26,99(1pes26.16))',advance='no') &
+                  ! write(iounit,'(i26,99(1pes26.16))',advance='no') &
+                  write(iounit, fmt, advance='no') &
                      sample_order(l,k,i), freq_target(l,k), freq_sigma(l,k), &
                      sample_freq(l,k,i), sample_freq_corr(l,k,i), sample_inertia(l,k,i)
                end do
             end do
 
+            write(fmt,'(a)') '(99' // trim(astero_results_dbl_format) // ')'
+
             do k=1,ratios_n
-               write(iounit,'(99(1pes26.16))',advance='no') &
+               write(iounit, fmt, advance='no') &
                   ratios_r01(k), sigmas_r01(k), sample_ratios_r01(k,i), &
                   ratios_r10(k), sigmas_r10(k), sample_ratios_r10(k,i)
             end do
 
             if (chi2_seismo_r_02_fraction > 0) then
                do k=1,nl(0)
-                  write(iounit,'(99(1pes26.16))',advance='no') &
+                  write(iounit, fmt, advance='no') &
                      ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
                end do
             end if
@@ -1869,7 +1877,7 @@
          character (len=*), intent(in) :: results_fname
          integer, intent(out) :: ierr
          integer :: iounit, num, i, j, model_number
-         character (len=100) :: line
+         character (len=strlen) :: line
          
          include 'formats'
          
@@ -1944,7 +1952,7 @@
          integer, intent(out) :: ierr
             
          integer :: i, k, l
-         character (len=256) :: info_str
+         character (len=256) :: info_str, fmt
          real(dp) :: logR
          
          include 'formats'
@@ -1957,8 +1965,14 @@
             ierr = -1
             return
          end if
+
+         write(fmt,'(a)') '(10' // trim(astero_results_dbl_format) // &
+            ',' // trim(astero_results_int_format) // &
+            ',22' // trim(astero_results_dbl_format) // &
+            ',7' // trim(astero_results_int_format) // ')'
          
-         read(iounit,'(10(1pes26.16),i16,22(1pes26.16),7i20)',advance='no',iostat=ierr) &
+         ! read(iounit,'(10(1pes26.16),i16,22(1pes26.16),7i20)',advance='no',iostat=ierr) &
+         read(iounit, fmt, advance='no', iostat=ierr) &
             sample_chi2(i), &
             sample_mass(i), &
             sample_init_Y(i), &
@@ -2005,31 +2019,38 @@
 
          if (chi2_seismo_fraction > 0) then
 
+            write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
+                ',99' // trim(astero_results_dbl_format) // ')'
+
             do l = 0, 3
-               do k = 1, nl(0)
-                  read(iounit,'(i26,99(1pes26.16))',advance='no',iostat=ierr) &
+               do k = 1, nl(l)
+                  read(iounit, fmt, advance='no', iostat=ierr) &
                      sample_order(l,k,i), freq_target(l,k), freq_sigma(l,k), &
                      sample_freq(l,k,i), sample_freq_corr(l,k,i), sample_inertia(l,k,i)
                   if (failed('freqs')) return
                end do
             end do
 
+            write(fmt,'(a)') '(99' // trim(astero_results_dbl_format) // ')'
+
             do k=1,ratios_n
-               read(iounit,'(99(1pes26.16))',advance='no',iostat=ierr) &
+               read(iounit, fmt, advance='no', iostat=ierr) &
                   ratios_r01(k), sigmas_r01(k), sample_ratios_r01(k,i), &
                   ratios_r10(k), sigmas_r10(k), sample_ratios_r10(k,i)
                if (failed('ratios_r010')) return
             end do
 
-            do k=1,nl(0)
-               read(iounit,'(99(1pes26.16))',advance='no',iostat=ierr) &
-                  ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
-               if (failed('ratios_r02')) return
-            end do
+            if (chi2_seismo_r_02_fraction > 0.0_dp) then
+               do k=1,nl(0)
+                  read(iounit, fmt, advance='no', iostat=ierr) &
+                     ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
+                  if (failed('ratios_r02')) return
+               end do
+            end if
          
          end if
             
-         read(iounit,'(a12)',iostat=ierr) info_str
+         read(iounit, '(a12)', iostat=ierr) info_str
          if (ierr /= 0) then
             ierr = 0
             sample_op_code(i) = 0
