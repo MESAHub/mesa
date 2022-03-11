@@ -669,8 +669,8 @@ optimise model parameters using the ``astero`` module.
 Executes a handful of iterations of a very crude simplex optimisation
 to make sure the relevant procedures get tested.
 
-surface_effects
-^^^^^^^^^^^^^^^
+:ref:`surface_effects`
+^^^^^^^^^^^^^^^^^^^^^^
 
 Tests the implementation of the various surface effect corrections
 available in MESA.
