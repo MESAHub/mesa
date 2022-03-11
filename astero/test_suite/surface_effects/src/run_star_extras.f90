@@ -305,6 +305,8 @@
            if (val > 0) then
               write(*,'(a26,1pd26.16,a26,a36)') name, val, '<= 0', 'FAILED'
               check_negative = .false.
+           else
+              check_negative = .true.
            end if
 
          end function check_negative
@@ -316,6 +318,8 @@
            if (val < 0) then
               write(*,'(a26,1pd26.16,a26,a36)') name, val, '>= 0', 'FAILED'
               check_positive = .false.
+           else
+              check_positive = .true.
            end if
 
          end function check_positive
