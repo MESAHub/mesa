@@ -162,21 +162,11 @@
             model_freq_alt_down(0,:) = model_freq(0,:)
             model_inertia_alt_down(0,:) = model_inertia(0,:)
             model_order_alt_down(0,:) = model_order(0,:)
-         else if (l == 1) then
-            call set_to_closest(freq_target(1,:), &
-               model_freq(1,:), model_freq_alt_up(1,:), model_freq_alt_down(1,:), &
-               model_inertia(1,:), model_inertia_alt_up(1,:), model_inertia_alt_down(1,:), &
-               model_order(1,:), model_order_alt_up(1,:), model_order_alt_down(1,:), ierr)
-         else if (l == 2) then
-            call set_to_closest(freq_target(2,:), &
-               model_freq(2,:), model_freq_alt_up(2,:), model_freq_alt_down(2,:), &
-               model_inertia(2,:), model_inertia_alt_up(2,:), model_inertia_alt_down(2,:), &
-               model_order(2,:), model_order_alt_up(2,:), model_order_alt_down(2,:), ierr)
-         else if (l == 3) then
-            call set_to_closest(freq_target(3,:), &
-               model_freq(3,:), model_freq_alt_up(3,:), model_freq_alt_down(3,:), &
-               model_inertia(3,:), model_inertia_alt_up(3,:), model_inertia_alt_down(3,:), &
-               model_order(3,:), model_order_alt_up(3,:), model_order_alt_down(3,:), ierr)
+         else if (0 < l .and. l <= 3) then
+            call set_to_closest(freq_target(l,:), &
+               model_freq(l,:), model_freq_alt_up(l,:), model_freq_alt_down(l,:), &
+               model_inertia(l,:), model_inertia_alt_up(l,:), model_inertia_alt_down(l,:), &
+               model_order(l,:), model_order_alt_up(l,:), model_order_alt_down(l,:), ierr)
          else
             call mesa_error(__FILE__,__LINE__,'bad value for l in get_one_el_info')
          end if
