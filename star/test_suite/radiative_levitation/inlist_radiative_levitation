@@ -75,7 +75,7 @@
       photo_interval = 10
       profile_interval = 10
       history_interval = 10
-      terminal_interval = 1
+      terminal_interval = 10 
       write_header_frequency = 10      
       
       dH_div_H_limit_min_H = 1d99 ! disable this

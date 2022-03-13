@@ -55,10 +55,11 @@
       public :: failed
       public :: id_from_read_star_job
       public :: MESA_INLIST_RESOLVED
+      public :: do_star_job_controls_after
       
       ! deprecated, but kept around for use by binary
       public :: before_evolve_loop, after_step_loop, before_step_loop, do_saves, &
-         resolve_inlist_fname, terminate_normal_evolve_loop
+         resolve_inlist_fname, terminate_normal_evolve_loop, null_binary_controls
       
       contains 
             
@@ -408,22 +409,6 @@
          if (len_trim(s% op_mono_data_cache_filename) == 0) &
             call get_environment_variable( &
                "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)         
-         if (restart_filename /= "restart_photo") then
-            temp_fname  = trim(s% photo_directory) // '/' // trim(restart_filename)
-            restart_filename  = trim(temp_fname)
-         end if
-
-         if (okay_to_restart) then
-            restart = doing_a_restart(restart_filename)
-         else
-            restart = .false.
-         end if
-         
-         if (s% job% show_log_description_at_start .and. .not. restart) then
-            write(*,*)
-            call show_log_description(id, ierr)
-            if (failed('show_log_description',ierr)) return
-         end if
 
          s% extras_startup => null_extras_startup
          s% extras_check_model => null_extras_check_model
@@ -438,6 +423,23 @@
          if (dbg) write(*,*) 'call extras_controls'
          call extras_controls(id, ierr)
          if (ierr /= 0) return
+
+         if (restart_filename /= "restart_photo") then
+            temp_fname  = trim(s% photo_directory) // '/' // trim(restart_filename)
+            restart_filename  = trim(temp_fname)
+         end if
+
+         if (okay_to_restart) then
+            restart = doing_a_restart(restart_filename)
+         else
+            restart = .false.
+         end if
+         
+         if (s% job% show_log_description_at_start .and. .not. restart) then
+            write(*,'(A)')
+            call show_log_description(id, ierr)
+            if (failed('show_log_description',ierr)) return
+         end if
 
          if (dbg) write(*,*) 'call binary_controls'
          call binary_controls(id, binary_id, ierr)
@@ -455,8 +457,8 @@
          call do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          if (failed('do_star_job_controls_after',ierr)) return
 
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          if (.not. restart) then
             if (dbg) write(*,*) 'call before_evolve'
@@ -489,9 +491,9 @@
          end if
          
          if (len_trim(s% job% echo_at_start) > 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a)') trim(s% job% echo_at_start)
-            write(*,*)
+            write(*,'(A)')
          end if
 
       end subroutine do_before_evolve_loop
@@ -522,7 +524,7 @@
                .not. s% doing_timing) then
             s% doing_timing = .true.
             write(*,*) 'start timing', s% model_number
-            write(*,*)
+            write(*,'(A)')
             call system_clock(s% job% time0, s% job% clock_rate)
             s% job% time0_initial = s% job% time0
             s% job% step_loop_timing = 0
@@ -610,16 +612,6 @@
             write(*,1) 'set v_flag true'
             call star_set_v_flag(id, .true., ierr)
             if (failed('star_set_v_flag',ierr)) return
-            if (ierr /= 0) return
-         end if
-         
-         if (s% log_max_temperature >= s% job% logT_for_conv_vel_flag &
-               .and. (.not. s% conv_vel_flag)) then
-            write(*,1) 'have reached logT_for_conv_vel_flag', &
-               s% log_max_temperature, s% job% logT_for_conv_vel_flag
-            write(*,1) 'set conv_vel_flag true'
-            call star_set_conv_vel_flag(id, .true., ierr)
-            if (failed('star_set_conv_vel_flag',ierr)) return
             if (ierr /= 0) return
          end if
          
@@ -813,7 +805,7 @@
                   write(*,2) trim(dt_why_str(i)) // ' retries', s% dt_why_retry_count(i)
                end if
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          if (s% job% show_timestep_limit_counts_when_terminate) then
             do i=1,numTlim
@@ -821,7 +813,7 @@
                   write(*,2) trim(dt_why_str(i)) // ' dt limit', s% dt_why_count(i)
                end if
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          call do_saves(id, ierr)
          if (failed('do_saves terminate_normal_evolve_loop',ierr)) return
@@ -900,9 +892,9 @@
          end if
          
          if (len_trim(s% job% echo_at_end) > 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a)') trim(s% job% echo_at_end)
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (do_free_star) then
@@ -1181,7 +1173,7 @@
          s% time_total = s% job% check_before_step_timing + &
              s% job% check_step_loop_timing + s% job% check_after_step_timing
          
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a50,i18)') 'nz', s% nz
          write(*,'(a50,i18)') 'nvar_total', s% nvar_total
          write(*,'(a50,i18)') trim(s% net_name) // ' species', s% species
@@ -1193,7 +1185,7 @@
             s% timing_num_solve_eos_calls
          write(*,'(a50,i18)') 'timing_num_get_kap_calls', &
             s% timing_num_get_kap_calls
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a50,i18)') 'threads', omp_num_threads
          total = 0
          item_num = 0
@@ -1221,8 +1213,8 @@
          index(1:num_items) => index_arry(1:num_items)
          call qsort(index, num_items, item_values)
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          do i=1,num_items
             j = index(num_items+1-i)
             if (item_values(j) == 0d0) cycle
@@ -1232,15 +1224,15 @@
          end do
          
          if (s% job% step_loop_timing/s% job% elapsed_time < 0.9d0) then
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             write(*,1) 'before_step', s% job% before_step_timing/s% job% elapsed_time
             write(*,1) 'step_loop', s% job% step_loop_timing/s% job% elapsed_time
             write(*,1) 'after_step', s% job% after_step_timing/s% job% elapsed_time
-            write(*,*)
+            write(*,'(A)')
          end if
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          
          contains
@@ -1554,14 +1546,14 @@
          do k = 1, s% nz
             sumdq = sumdq + s% dq(k)
             if (sumdq >= dq) then
-               write(*,*)
+               write(*,'(A)')
                write(*,2) 'total mass in cells from 1 to k', k, sumdq*s% xmstar
                write(*,2) 'logT(k)', k, s% lnT(k)/ln10
                write(*,2) 'logRho(k)', k, s% lnd(k)/ln10
                write(*,2) 'entropy(k)', k, exp(s% lnS(k))*amu/kerg
                write(*,2) 'xmstar*q(k)', k, s% xmstar*s% q(k)
                write(*,2) 'q(k)', k, s% q(k)
-               write(*,*)
+               write(*,'(A)')
                return
             end if
          end do
@@ -1814,7 +1806,7 @@
             if (failed('star_load_restart_photo',ierr)) return
          else if (s% job% load_saved_photo) then
             write(*,'(a)') 'load saved photo ' // trim(s% job% saved_photo_name)
-            write(*,*)
+            write(*,'(A)')
             call star_load_restart_photo(id, s% job% saved_photo_name, ierr)
             if (failed('star_load_restart_photo',ierr)) return
          else if (s% job% load_saved_model) then
@@ -1835,7 +1827,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
             write(*,'(a)') 'load saved model ' // trim(s% job% load_model_filename)
-            write(*,*)
+            write(*,'(A)')
             call star_read_model(id, s% job% load_model_filename, ierr)
             if (failed('star_read_model',ierr)) return
          else if (s% job% create_merger_model) then
@@ -2055,7 +2047,7 @@
                s% id, s% job% adjust_abundances_for_new_isos, net_name, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_change_to_new_net ' // trim(net_name)
-               stop 'change_net'
+               call mesa_error(__FILE__,__LINE__,'change_net')
                return
             end if
             
@@ -2063,7 +2055,7 @@
                write(*,*) '   new net_name ', trim(net_name)
                write(*,*) 'old s% net_name ', trim(s% net_name)
                write(*,*) 'failed to change'
-               stop 'change_net'
+               call mesa_error(__FILE__,__LINE__,'change_net')
             end if
 
             write(*,'(a)') ' new net = ' // trim(s% net_name)
@@ -2073,7 +2065,7 @@
             !write(*,*)
             s% dt_next = s% dt_next/5
             !write(*,1) 'reduce timestep', log10(s% dt_next/secyer)
-            write(*,*)
+            write(*,'(A)')
          end subroutine change_net
          
          
@@ -2103,6 +2095,22 @@
          logical :: change_v, change_u
          include 'formats'
          
+         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
+            call star_change_to_new_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
+            if (failed('star_change_to_new_net',ierr)) return
+         end if
+
+         if (s% job% change_small_net .or. &
+               (s% job% change_initial_small_net .and. .not. restart)) then         
+            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
+            call star_change_to_new_small_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
+            if (failed('star_change_to_new_small_net',ierr)) return
+            write(*,*) 'number of species', s% species
+         end if
+
+
          if (len_trim(s% job% history_columns_file) > 0) &
             write(*,*) 'read ' // trim(s% job% history_columns_file)
          call star_set_history_columns(id, s% job% history_columns_file, .true., ierr)
@@ -2201,22 +2209,7 @@
             write(*,2) 'steps_before_start_timing', &
                s% job% steps_before_start_timing
          end if
-         
-         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
-            call star_change_to_new_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
-            if (failed('star_change_to_new_net',ierr)) return
-         end if
-
-         if (s% job% change_small_net .or. &
-               (s% job% change_initial_small_net .and. .not. restart)) then         
-            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
-            call star_change_to_new_small_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
-            if (failed('star_change_to_new_small_net',ierr)) return
-            write(*,*) 'number of species', s% species
-         end if
-         
+                  
          if (abs(s% job% T9_weaklib_full_off - T9_weaklib_full_off) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_off', s% job% T9_weaklib_full_off
             T9_weaklib_full_off = s% job% T9_weaklib_full_off
@@ -2293,13 +2286,6 @@
             write(*,*) 'new_RSP_flag', s% job% new_RSP_flag
             call star_set_RSP_flag(id, s% job% new_RSP_flag, ierr)
             if (failed('star_set_RSP_flag',ierr)) return
-         end if
-
-         if (s% job% change_conv_vel_flag .or. &
-               (s% job% change_initial_conv_vel_flag .and. .not. restart)) then
-            write(*,*) 'new_conv_vel_flag', s% job% new_conv_vel_flag
-            call star_set_conv_vel_flag(id, s% job% new_conv_vel_flag, ierr)
-            if (failed('star_set_conv_vel_flag',ierr)) return
          end if
 
          if (s% job% change_w_div_wc_flag .or. &
@@ -2396,7 +2382,7 @@
             write(*,2) 'first_model_for_timing', s% job% first_model_for_timing
          
          if (s% job% set_uniform_initial_composition .and. .not. restart) then
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'set_uniform_initial_composition'
             write(*,1) 'initial_h1', s% job% initial_h1
             write(*,1) 'initial_h2', s% job% initial_h2
@@ -2884,9 +2870,6 @@
          if (s% rotation_flag) &
             write(*,*) 'rotation_flag', s% rotation_flag
          
-         if (s% conv_vel_flag) &
-            write(*,*) 'conv_vel_flag', s% conv_vel_flag
-         
          if (s% w_div_wc_flag) &
             write(*,*) 'w_div_wc_flag', s% w_div_wc_flag
          
@@ -2967,14 +2950,14 @@
             do j=1,s% species
                write(*,'(i6,3x,a)') j, chem_isos% name(s% chem_id(j))
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if (s% job% show_eqns_and_vars_names) then
             do i=1,s% nvar_total
                write(*,*) i, s% nameofvar(i), s% nameofequ(i)
             end do
-            write(*,*)
+            write(*,'(A)')
          end if         
          
          write(*,*) 'kap_option ' // trim(kap_option_str(s% kap_rq% kap_option))
@@ -2993,7 +2976,7 @@
             integer :: num_pts, num_species, i, iounit
             include 'formats'
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'relax_initial_composition'
 
             open(newunit=iounit, file=trim(s% job% relax_composition_filename), &
@@ -3014,7 +2997,7 @@
                write(*,*) 'Error in ',trim(s% job% relax_composition_filename)
                write(*,'(a,I4,a)') 'got ',num_species,' species'
                write(*,'(a,I4,a)') 'expected ', s% species,' species'
-               write(*,*)
+               write(*,'(A)')
                ierr=-1
                return
             end if
@@ -3047,7 +3030,7 @@
             integer :: num_pts, i, iounit
             include 'formats'
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'relax_initial_angular_momentum'
 
             open(newunit=iounit, file=trim(s% job% relax_angular_momentum_filename), &
@@ -3108,7 +3091,7 @@
             integer, parameter :: MAX_ITERS = 20
             include 'formats'
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'relax_initial_entropy'
 
             open(newunit=iounit, file=trim(s% job% relax_entropy_filename), &
@@ -3857,7 +3840,7 @@
             write(*,*) "          and should be set to 1 during normal MESA use."
             write(*,*) "***"
             write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
-            write(*,*) "and max_model_number by its inverse:"
+            write(*,*) "and max_model_number by its inverse twice:"
             write(*,*) ""
             write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
             s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
@@ -3868,7 +3851,7 @@
             write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
             write(*,*)    ""
             write(*,*)    "   old max_model_number = ",   s% max_model_number
-            s% max_model_number = s% max_model_number / test_suite_res_factor
+            s% max_model_number = s% max_model_number / test_suite_res_factor / test_suite_res_factor
             write(*,*)    "   new max_model_number = ",   s% max_model_number
             write(*,*)    ""
          end if

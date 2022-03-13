@@ -503,7 +503,7 @@ contains
 
       ! Dummy routine that's never called
 
-      stop 'Bogus call to eval_solout'
+      call mesa_error(__FILE__,__LINE__,'Bogus call to eval_solout')
 
     end subroutine eval_solout
 

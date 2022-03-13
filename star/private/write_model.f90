@@ -125,7 +125,7 @@
             write(iounit,'(a)',advance='no') &
                ', dq=fraction of total mstar in cell; remaining cols are mass fractions.'
          end if
-         write(iounit,*)
+         write(iounit,'(A)')
          ! write property list
          write(iounit, '(a)') ! blank line before start of property list
          write(iounit, 4) 'version_number', "'" // trim(version_number) // "'"
@@ -163,6 +163,9 @@
          end if
          if (s% opacity_factor /= 1) then
             write(iounit, 1) 'opacity_factor', s% opacity_factor
+         end if
+         if (s% crystal_core_boundary_mass > 0d0) then
+            write(iounit, 1) 'crystal_core_boundary_mass', s% crystal_core_boundary_mass
          end if
          write(iounit, 1) 'Teff', s% Teff
          write(iounit, 1) 'power_nuc_burn', s% power_nuc_burn
@@ -242,7 +245,7 @@
             real(dp), intent(in) :: val
             integer, intent(out) :: ierr
             call write1(val,ierr)
-            write(iounit,*)
+            write(iounit,'(A)')
          end subroutine write1_eol
 
          subroutine write1(val,ierr)

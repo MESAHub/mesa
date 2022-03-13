@@ -157,31 +157,17 @@
          xpt_min = 1e9
          xpt_max = -1e9
          ymin = 1e9
-         ymax = 0         
-         if (nl(0) > 0) then
-            ymin = min(ymin,minval(freq_target(0,1:nl(0))))
-            ymax = max(ymax,maxval(freq_target(0,1:nl(0))))
-            xpt_min = min(xpt_min,minval(mod(freq_target(0,1:nl(0)),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(freq_target(0,1:nl(0)),plot_delta_nu)))
-         end if
-         if (nl(1) > 0) then
-            ymin = min(ymin,minval(freq_target(1,1:nl(1))))
-            ymax = max(ymax,maxval(freq_target(1,1:nl(1))))
-            xpt_min = min(xpt_min,minval(mod(freq_target(1,1:nl(1)),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(freq_target(1,1:nl(1)),plot_delta_nu)))
-         end if
-         if (nl(2) > 0) then
-            ymin = min(ymin,minval(freq_target(2,1:nl(2))))
-            ymax = max(ymax,maxval(freq_target(2,1:nl(2))))
-            xpt_min = min(xpt_min,minval(mod(freq_target(2,1:nl(2)),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(freq_target(2,1:nl(2)),plot_delta_nu)))
-         end if
-         if (nl(3) > 0) then
-            ymin = min(ymin,minval(freq_target(3,1:nl(3))))
-            ymax = max(ymax,maxval(freq_target(3,1:nl(3))))
-            xpt_min = min(xpt_min,minval(mod(freq_target(3,1:nl(3)),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(freq_target(3,1:nl(3)),plot_delta_nu)))
-         end if
+         ymax = 0
+
+         do l = 0, 3
+            if (nl(l) > 0) then
+               ymin = min(ymin,minval(freq_target(l,1:nl(l))))
+               ymax = max(ymax,maxval(freq_target(l,1:nl(l))))
+               xpt_min = min(xpt_min,minval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
+               xpt_max = max(xpt_max,maxval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
+            end if
+         end do
+
          dy = ymax - ymin
          dy = max(dy, 1.0)
          ymin = ymin - dy*0.25

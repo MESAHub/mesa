@@ -67,7 +67,8 @@
                   s% fixed_gradr_for_rest_of_solver_iters(k) = &
                      (s% mlt_mixing_type(k) == no_mixing)
                end if
-            end if            
+            end if
+            if (op_err /= 0) ierr = op_err            
          end do
 !$OMP END PARALLEL DO
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
@@ -91,7 +92,8 @@
          real(dp), intent(in), optional :: &
             mixing_length_alpha_in, gradL_composition_term_in
 
-         real(dp) :: v, gradr_factor, d_gradr_factor_dw, f, xh_face, &
+         type(auto_diff_real_star_order1) :: gradr_factor
+         real(dp) :: v, f, xh_face, &
             gradL_composition_term, abs_du_div_cs, cs, mixing_length_alpha
          real(dp), pointer :: vel(:)
          integer :: i, mixing_type, h1, nz, k_T_max
@@ -132,15 +134,10 @@
 
          if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
-            if (s% w_div_wc_flag) then
-               d_gradr_factor_dw = gradr_factor*(s% dft_rot_dw_div_wc(k)/s%ft_rot(k) &
-                  -s% dfp_rot_dw_div_wc(k)/s%fp_rot(k) )
-            end if
          else
             gradr_factor = s% gradr_factor(k)
-            d_gradr_factor_dw = 0d0
          end if
-         if (is_bad_num(gradr_factor)) then
+         if (is_bad_num(gradr_factor% val)) then
             ierr = -1
             return
          end if
@@ -153,11 +150,27 @@
             return
          end if
 
+         if (s% phase(k) > 0.9d0 .and. s% mu(k) > 1.7d0) then
+            ! mu(k) check is so that we only evaluate this in C/O dominated material or heavier.
+            ! Helium can return bad phase info on Skye, so we don't want it to shut off
+            ! convection because of wrong phase information.
+            call set_no_mixing('solid_no_mixing')
+            s% mlt_mixing_type(k) = crystallized
+            return
+         end if
+
+         if (s% m(k) <= s% phase_sep_mixing_mass) then
+            ! Treat as radiative for MLT purposes, and label as already mixed by phase separation
+            call set_no_mixing('phase_separation_mixing')
+            s% mlt_mixing_type(k) = phase_separation_mixing
+            return
+         end if
+         
          if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
             call set_no_mixing('max_logT')
             return
          end if
-         
+
          if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then ! check for outward shock above k
             if (s% u_flag) then
                vel => s% u

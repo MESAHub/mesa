@@ -193,7 +193,7 @@
             if (b% report_rlo_solver_progress) then
                rlo_result = 'OK (in tol)'
                call report_rlo_iter
-               write(*,*)
+               write(*,'(A)')
             end if
             return
          end if

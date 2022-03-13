@@ -81,7 +81,7 @@ contains
        write(*,*) 'tau_surf', tau_surf
        ierr = -1
        return
-       stop 'bad tau_surf arg for get_atm_PT'
+       call mesa_error(__FILE__,__LINE__,'bad tau_surf arg for get_atm_PT')
     end if
 
     ! Evaluate surface temperature and pressure by dispatching to the
@@ -363,7 +363,7 @@ contains
     case default
        
        write(*,*) 'Unknown value for atm_T_tau_opacity: ' // trim(T_tau_opacity)
-       stop 'Please amend your inlist file to correct this problem'
+       call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     end select
 
@@ -450,7 +450,7 @@ contains
        T_tau_id = ATM_T_TAU_TRAMPEDACH_SOLAR
     case default
        write(*,*) 'Unknown value for atm_T_tau_relation: ' // trim(T_tau_relation)
-       stop 'Please amend your inlist file to correct this problem'
+       call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
     end select
 
     ! Finish
@@ -525,7 +525,7 @@ contains
 
     if (s% tau_factor /= 1._dp) then
        write(*,*) 'Cannot use atm_option == ''table'' with tau_factor /= 1'
-       stop 'Please amend your inlist file to correct this problem'
+       call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
     end if
 
     Z = s% Z(1)
@@ -659,13 +659,13 @@ contains
        case ('')
 
           write(*,*) 'Attempt to interpolate outside atmosphere table'
-          stop 'Try setting the which_off_table_option control in your inlist file'
+          call mesa_error(__FILE__,__LINE__,'Try setting the which_off_table_option control in your inlist file')
           stop
 
        case default
 
           write(*,*) 'Unknown value for atm_off_table_option: ' // trim(s% atm_off_table_option)
-          stop 'Please amend your inlist file to correct this problem'
+          call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
           
        end select
 
@@ -764,7 +764,7 @@ contains
        table_id = ATM_TABLE_DB_WD_TAU_25
     case default
        write(*,*) 'Unknown value for atm_table: ' // trim(table_name)
-       stop 'Please amend your inlist file to correct this problem'
+       call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
     end select
 
     ! Finish
@@ -863,7 +863,7 @@ contains
     case default
 
        write(*,*) 'Unknown value for atm_irradiated_opacity: ' // trim(irradiated_opacity)
-       stop 'Please amend your inlist file to correct this problem'
+       call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     end select
 
@@ -1037,7 +1037,7 @@ contains
     ! Stop because we can't continue
 
     ierr = -1 ! ifort complains if this isn't set
-    stop 'Please amend your inlist file to correct this problem'
+    call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     ! Finish
 
@@ -1070,7 +1070,7 @@ contains
     case default
 
        write(*,*) 'Cannot create atm structure for atm_option: ' // TRIM(s% atm_option)
-       stop 'Please amend your inlist file to correct this problem'
+       call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     end select
 
@@ -1171,7 +1171,7 @@ contains
     case default
        
        write(*,*) 'Unknown value for atm_T_tau_opacity: ' // trim(T_tau_opacity)
-       stop 'Please amend your inlist file to correct this problem'
+       call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     end select
 
@@ -1342,7 +1342,7 @@ contains
        write(*,1) 'res(i_eta)', res(i_eta)
        ierr = -1
        return
-       stop 'atm kap_proc'
+       call mesa_error(__FILE__,__LINE__,'atm kap_proc')
     end if
 
     return

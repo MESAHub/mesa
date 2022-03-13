@@ -4,7 +4,6 @@
    temperature
    rsp_Hp_face
    rsp_Y_face
-   rsp_PII_face
    rsp_Lc_div_L
    rsp_Lr_div_L
    rsp_Lt_div_L

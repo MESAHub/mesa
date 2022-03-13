@@ -135,7 +135,7 @@ contains
     if (rq% show_info) write(*,ffmt) 'fN_ref =', kA % fN_ref
 
     if (rq% show_info) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) 'AESOPUS logT and logR range (logR = logRho - 3 * logT + 18)'
     end if
 
@@ -166,7 +166,7 @@ contains
     end if
 
     if (rq% show_info) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) 'AESOPUS metallicities'
        write(*,*) '(These Z values are the reference metallicities)'
     end if
@@ -205,7 +205,7 @@ contains
 100    format(F8.6)  
 
        if (rq% show_info) then
-          write(*,*)
+          write(*,'(A)')
           write(*,'(3A, ES9.3)') "Table ",  trim(group_name), ": Z = ", kA% Zs(n)
        end if
 
@@ -319,9 +319,9 @@ contains
     call hi%final()
 
     if (rq% show_info) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) 'Finished reading AESOPUS tables'
-       write(*,*)
+       write(*,'(A)')
     end if
 
 

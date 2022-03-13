@@ -1130,9 +1130,9 @@
                val = s% eps_grav_ad(k)% val
                
             case (p_log_xm_div_delta_m)
-               val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
+               if(abs(s% dt*s% mstar_dot) > 0) val = safe_log10((s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot))
             case (p_xm_div_delta_m)
-               val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
+               if(abs(s% dt*s% mstar_dot) > 0) val = (s% m(1) - s% m(k))/abs(s% dt*s% mstar_dot)
 
             case (p_env_eps_grav)
                val = -s% gradT_sub_grada(k)*s% grav(k)*s% mstar_dot*s% Cp(k)*s% T(k) / &
@@ -1380,7 +1380,7 @@
                   if (is_bad(val)) then
                      write(*,2) 'val', k, val
                      write(*,2) 's% omega_shear(k)', k, s% omega_shear(k)
-                     stop 'profile'
+                     call mesa_error(__FILE__,__LINE__,'profile')
                   end if
                else
                   val = -99
@@ -1391,24 +1391,24 @@
                   if (is_bad(val)) then
                      write(*,2) 'val', k, val
                      write(*,2) 's% omega_shear(k)', k, s% omega_shear(k)
-                     stop 'profile'
+                     call mesa_error(__FILE__,__LINE__,'profile')
                   end if
                else
                   val = -99
                end if
             case (p_i_rot)
-               val = if_rot(s% i_rot,k)
+               val = if_rot_ad(s% i_rot,k)
             case (p_j_rot)
                val = if_rot(s% j_rot,k)
             case (p_v_rot)
                val = if_rot(s% omega,k)*if_rot(s% r_equatorial,k)*1d-5 ! km/sec
             case (p_fp_rot)
-               val = if_rot(s% fp_rot,k, alt=1.0d0)
+               val = if_rot_ad(s% fp_rot,k, alt=1.0d0)
             case (p_ft_rot)
-               val = if_rot(s% ft_rot,k, alt=1.0d0)
+               val = if_rot_ad(s% ft_rot,k, alt=1.0d0)
             case (p_ft_rot_div_fp_rot)
                if(s% rotation_flag) then
-                  val = s% ft_rot(k)/s% fp_rot(k) 
+                  val = s% ft_rot(k)% val/s% fp_rot(k)% val
                else
                   val = 1.0d0
                end if
@@ -1446,6 +1446,9 @@
                      val = s% omega(k)/val
                   end if
                end if
+
+            case (p_eps_phase_separation)
+               if (s% do_phase_separation_heating) val = s% eps_phase_separation(k)
 
             case (p_eps_WD_sedimentation)
                if (s% do_element_diffusion) val = s% eps_WD_sedimentation(k)
@@ -1850,8 +1853,6 @@
                if (s% rsp_flag) val = s% Ptrb(k)
             case(p_rsp_Eq)
                if (s% rsp_flag) val = s% Eq(k)
-            case(p_rsp_PII_face)
-               if (s% rsp_flag) val = s% PII(k)
             case(p_rsp_src_snk)
                if (s% rsp_flag) val = s% COUPL(k)
             case(p_rsp_src)
@@ -1940,18 +1941,6 @@
                      val = s% Lt(2)/s% L(2)
                   end if
                end if
-
-            case(p_rsp_WORK)
-               if (s% rsp_flag) val = rsp_WORK(s,k)
-            case(p_rsp_WORKQ)
-               if (s% rsp_flag) val = rsp_WORKQ(s,k)
-            case(p_rsp_WORKT)
-               if (s% rsp_flag) val = rsp_WORKT(s,k)
-            case(p_rsp_WORKC)
-               if (s% rsp_flag) val = rsp_WORKC(s,k)
-               
-            case(p_dconv_vel_dt)
-               val = s% dxh_ln_cvpv0(k)*(s% conv_vel(k) + s% conv_vel_v0)/s% dt
 
             case (p_total_energy) ! specific total energy at k
                val = eval_cell_section_total_energy(s,k,k)/s% dm(k)               
@@ -2178,7 +2167,7 @@
                write(*,*) 'between ' // trim(profile_column_name(c-1)) // ' and ' // &
                   trim(profile_column_name(c+1)), c-1, c+1
                val = 0
-               stop 'profile_getval'
+               call mesa_error(__FILE__,__LINE__,'profile_getval')
 
          end select
 
@@ -2280,7 +2269,7 @@
 
             if (is_bad(get_k_r_integral)) then
                write(*,2) 'get_k_r_integral', k_in, integral_for_k, integral
-               stop 'get_k_r_integral'
+               call mesa_error(__FILE__,__LINE__,'get_k_r_integral')
             end if
 
          end function get_k_r_integral
@@ -2374,6 +2363,22 @@
                end if
             endif
          end function if_rot
+
+
+         real(dp) function if_rot_ad(v,k, alt)
+            type(auto_diff_real_star_order1), dimension(:), pointer :: v
+            integer, intent(in) :: k
+            real(dp), optional, intent(in) :: alt
+            if (s% rotation_flag) then
+               if_rot_ad = v(k)% val
+            else
+               if (present(alt)) then
+                  if_rot_ad = alt
+               else
+                  if_rot_ad = 0
+               end if
+            endif
+         end function if_rot_ad
 
       end subroutine getval_for_profile
 

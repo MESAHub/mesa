@@ -129,9 +129,9 @@
          end if
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'history_columns_file <' // trim(filename) // '>'
-            write(*,*)
+            write(*,'(A)')
          end if
 
          call count_specs
@@ -359,9 +359,9 @@
          close(iounit)
 
          if (dbg) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'done add_history_columns ' // trim(filename)
-            write(*,*)
+            write(*,'(A)')
          end if
 
 

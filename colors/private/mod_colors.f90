@@ -225,26 +225,35 @@
          
          include 'formats'
          
-         ! Try local folder first
+              ! Try local folder first
          open(NEWUNIT=IO_UBV, FILE=trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ios)
          if(ios/=0) THEN
             ! Try colors data dir
             open(NEWUNIT=IO_UBV, FILE=trim(mesa_data_dir)//'/colors_data/'//trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ios)
             if (ios /= 0) then ! failed to open lcb98cor.dat
                write(*,*) 'colors_init: failed to open ' // trim(fname)
-               write(*,*) trim(mesa_data_dir)//'/colors_data/'//trim(fname)
-               write(*,*) 'please check the path to the mesa data directory'
+               write(*,*) 'or ',trim(mesa_data_dir)//'/colors_data/'//trim(fname)
+               write(*,*)
+               write(*,*) 'Please check that the file exists in your local work directory'
+               write(*,*) 'or in ',trim(mesa_data_dir)//'/colors_data/'
                ierr = 1; return
             endif
          end if
-         
          
          ierr = 0
          num_entries = 0
          cnt = 0
          !First line should be a header and containing the name of the colours
-         !#teff logg [M/H] col_1 col_2 etc
+         !#teff logg m_div_h col_1 col_2 etc
          read(IO_UBV,fmt=*,iostat=ios) tmp,tmp,tmp,col_names(1:n_colors)
+      
+         if(index(tmp,'[')/=0) then
+            write(*,*) 'Do not write metallicity as [Fe/H] use m_div_h in ',trim(fname)
+            ! https://github.com/MESAHub/mesa/issues/379
+            ! Some reason if we have [Fe/H] in tmp we start reading a completly different file
+            ierr = 1; return
+         end if
+         
          do while (.true.)
             read(IO_UBV,fmt=*,iostat=ios) lgt, lgg, lgz, colors(1:n_colors)
             if (ios /= 0) exit
@@ -262,6 +271,10 @@
             call get_zlist(glist% zlist, lgz, zlist, num_entries, ierr)
             if (ierr /= 0) exit
             
+            if(zlist% colors(1) > -1d98) then
+               write(*,*) "Warning found duplicated color data for (T, log g, M/H)=", 10**lgT, lgg, lgz
+            end if
+
             zlist% colors = colors
 
          end do

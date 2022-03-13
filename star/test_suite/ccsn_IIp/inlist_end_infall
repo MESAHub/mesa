@@ -28,7 +28,7 @@
       initial_model_number = 0
 
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-12
+      seconds_for_initial_dt = 1d-9
       
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
@@ -74,7 +74,7 @@
 
 ! mixing controls
   mixing_length_alpha = 1.9
-  MLT_option = 'TDC'
+  MLT_option = 'none'
   thermohaline_coeff = 0
   okay_to_reduce_gradT_excess = .false.
 
@@ -142,7 +142,7 @@
   terminal_interval = 10
   write_header_frequency = 10
 
-  report_solver_progress = .true.
+  report_solver_progress = .false.
 
 / ! end of controls namelist
 

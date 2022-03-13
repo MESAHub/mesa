@@ -272,7 +272,7 @@
             if (s% dq(nz) <= 0) then
                ierr = -1
                if (dbg) write(*,*) 's% dq(nz) <= 0'
-               if (dbg) stop 'debug adjust mesh'
+               if (dbg) call mesa_error(__FILE__,__LINE__,'debug adjust mesh')
                s% result_reason = adjust_mesh_failed
                s% termination_code = t_adjust_mesh_failed
                remesh = terminate
@@ -308,11 +308,11 @@
          if (dbg_remesh .or. dbg) write(*,*) 'back from mesh_plan'
 
          if (ierr /= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,*) 'mesh_plan problem'
             write(*,*) 'doing mesh_call_number', s% mesh_call_number
             write(*,*) 's% model_number', s% model_number
-            write(*,*)
+            write(*,'(A)')
             s% termination_code = t_adjust_mesh_failed
             remesh = terminate
             s% result_reason = adjust_mesh_failed
@@ -404,7 +404,7 @@
                ierr = -1
                call dealloc
                return
-               stop 'debug adjust mesh'
+               call mesa_error(__FILE__,__LINE__,'debug adjust mesh')
             end if
          end do
 
@@ -439,6 +439,12 @@
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
          end do
 
+         ! restore ST info (for time smoothing)
+         do k=1, s% prev_mesh_nz
+            s% prev_mesh_D_ST_start(k) = prv% prev_mesh_D_ST_start(k)
+            s% prev_mesh_nu_ST_start(k) = prv% prev_mesh_nu_ST_start(k)
+         end do
+
          if (s% show_mesh_changes) then
             ! note: do_mesh_adjust can change cell_type from unchanged to revised
             ! so need to recount
@@ -455,7 +461,7 @@
                   revised = revised + 1
                case default
                   write(*,3) 'bad value for cell_type(k)', k, cell_type(k)
-                  stop 'adjust_mesh'
+                  call mesa_error(__FILE__,__LINE__,'adjust_mesh')
                end select
             end do
             write(*,*) '      mesh_plan nz_new', nz_new
@@ -463,7 +469,7 @@
             write(*,*) '                 split', split
             write(*,*) '                merged', merged
             write(*,*) '               revised', revised
-            write(*,*)
+            write(*,'(A)')
 
          end if
 
@@ -474,7 +480,7 @@
                ierr = -1
                call dealloc
                return
-               stop 'debug: adjust mesh'
+               call mesa_error(__FILE__,__LINE__,'debug: adjust mesh')
             end if
          end do
 
@@ -484,7 +490,7 @@
             write(*,*) 's% model_number', s% model_number
             write(*,*) 's% nz', s% nz
             write(*,*) 's% num_retries', s% num_retries
-            write(*,*)
+            write(*,'(A)')
          end if
 
          if (remesh /= keep_going) then
@@ -503,12 +509,12 @@
                   write(*,2) 'adjust_mesh J_tot', &
                      s% model_number, (J_tot2 - J_tot1)/J_tot2, J_tot2, J_tot1
                   write(*,*) 'failure to conserve angular momentum in adjust_mesh'
-                  write(*,*)
+                  write(*,'(A)')
                end if
                ierr = -1
                call dealloc
                return
-               !stop 'adjust_mesh J_tot conservation error'
+               !call mesa_error(__FILE__,__LINE__,'adjust_mesh J_tot conservation error')
             end if
          end if
 
@@ -694,7 +700,7 @@
             write(*,*) '         nz_old', nz_old
             write(*,*) '         nz_new', nz_new
             write(*,*) 'finished dump_mesh'
-            stop 'debugging: end_dump remesh'
+            call mesa_error(__FILE__,__LINE__,'debugging: end_dump remesh')
          end subroutine end_dump
 
 

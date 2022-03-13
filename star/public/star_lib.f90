@@ -28,6 +28,7 @@
 
       use const_def, only: dp
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
+      use utils_lib, only: mesa_error
 
       use pulse, only: &
            star_export_pulse_data => export_pulse_data, &
@@ -61,6 +62,8 @@
             wrap_lnR_m1, wrap_lnR_00, wrap_lnR_p1, & ! values from s% lnr
             wrap_v_m1, wrap_v_00, wrap_v_p1, & ! Riemann or non-Riemann velocity at face, s% v or s% u_face
             wrap_u_m1, wrap_u_00, wrap_u_p1, & ! Riemann cell velocity s% u
+            wrap_w_div_wc_m1, wrap_w_div_wc_00, wrap_w_div_wc_p1, & ! Riemann cell velocity s% u
+            wrap_jrot_m1, wrap_jrot_00, wrap_jrot_p1, & ! Riemann cell velocity s% u
             ! the following check the flag using_velocity_time_centering
             wrap_opt_time_center_r_m1, wrap_opt_time_center_r_00, wrap_opt_time_center_r_p1, &
             wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1
@@ -803,14 +806,6 @@
          integer, intent(out) :: ierr
          call set_RTI_flag(id, RTI_flag, ierr)
       end subroutine star_set_RTI_flag
-
-      subroutine star_set_conv_vel_flag(id, conv_vel_flag, ierr)
-         use set_flags, only: set_conv_vel_flag
-         integer, intent(in) :: id
-         logical, intent(in) :: conv_vel_flag
-         integer, intent(out) :: ierr
-         call set_conv_vel_flag(id, conv_vel_flag, ierr)
-      end subroutine star_set_conv_vel_flag
 
       subroutine star_set_w_div_wc_flag(id, w_div_wc_flag, ierr)
          use set_flags, only: set_w_div_wc_flag
@@ -1720,6 +1715,13 @@
          if (ierr /= 0) return
          call set_vars(s, dt, ierr)
       end subroutine star_set_vars
+
+
+      subroutine star_set_power_info(s)
+         use report, only: set_power_info
+         type (star_info), pointer :: s
+         call set_power_info(s)
+      end subroutine star_set_power_info
       
       
       subroutine save_profile(id, priority, ierr)
@@ -2102,7 +2104,7 @@
          !   res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
          ierr = -1
          write(*,*) 'star_get_peos no longer supported'
-         stop 1
+         call mesa_error(__FILE__,__LINE__)
       end subroutine star_get_peos
       
       subroutine star_solve_eos_given_PgasT( &

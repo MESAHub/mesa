@@ -72,24 +72,24 @@
 
          integer :: &
             i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
-            i_dalpha_RTI_dt, i_dln_cvpv0_dt, i_equ_w_div_wc, i_dj_rot_dt, i_detrb_dt, &
+            i_dalpha_RTI_dt, i_equ_w_div_wc, i_dj_rot_dt, i_detrb_dt, &
             i, k, j, nvar_hydro, nz, op_err
          integer :: &
-            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
+            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_w_div_wc, i_j_rot, &
             i_alpha_RTI, i_xh1, i_xhe4, kmax_equ(nvar), species
          real(dp) :: max_equ(nvar), L_phot_old
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
-         logical :: v_flag, u_flag, conv_vel_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
+         logical :: v_flag, u_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
             do_chem, do_mix, do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
-            do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
+            do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
 
          include 'formats'
 
          ierr = 0
 
          if (s% u_flag .and. s% use_mass_corrections) &
-            stop 'use_mass_corrections dP not supported with u_flag true'
+            call mesa_error(__FILE__,__LINE__,'use_mass_corrections dP not supported with u_flag true')
 
          if (s% u_flag) then
             call do_uface_and_Pface(s,ierr)
@@ -114,7 +114,6 @@
          do_du_dt = (i_du_dt > 0 .and. i_du_dt <= nvar)
          do_dlnR_dt = (i_dlnR_dt > 0 .and. i_dlnR_dt <= nvar)
          do_alpha_RTI = (i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar)
-         do_conv_vel = (i_ln_cvpv0 > 0 .and. i_ln_cvpv0 <= nvar)
          do_w_div_wc = (i_w_div_wc > 0 .and. i_w_div_wc <= nvar)
          do_j_rot = (i_j_rot > 0 .and. i_j_rot <= nvar)
          do_dlnE_dt = (i_dlnE_dt > 0 .and. i_dlnE_dt <= nvar)
@@ -129,7 +128,7 @@
          else if (trim(s% energy_eqn_option) == 'dedt') then
             s% eps_grav_form_for_energy_eqn = .false.
          else
-            stop 'Invalid choice for energy_eqn_option'
+            call mesa_error(__FILE__,__LINE__,'Invalid choice for energy_eqn_option')
          end if
 
       ! solving structure equations
@@ -214,14 +213,6 @@
                if (op_err /= 0) then
                   if (s% report_ierr) write(*,2) 'ierr in do1_dalpha_RTI_dt_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dalpha_RTI_dt_eqn'
-                  ierr = op_err
-               end if
-            end if
-            if (do_conv_vel) then
-               call do1_dln_cvpv0_dt_eqn(s, k, nvar, op_err)
-               if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_dln_cvpv0_dt_eqn', k
-                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dln_cvpv0_dt_eqn'
                   ierr = op_err
                end if
             end if
@@ -320,7 +311,7 @@
             !write(*,*) 'call show_matrix'
             !call show_matrix(s, s% dblk(1:s% nvar_hydro,1:s% nvar_hydro,1), s% nvar_hydro)
             call dump_equ ! debugging
-            stop 'after dump_equ'
+            call mesa_error(__FILE__,__LINE__,'after dump_equ')
          end if
 
          
@@ -339,7 +330,7 @@
                write(*,3) 'energy', k, s% solver_iter, s% energy(k)
                write(*,3) 'L', k, s% solver_iter, s% L(k)
                write(*,3) 'L', k+1, s% solver_iter, s% L(k+1)
-               write(*,*)
+               write(*,'(A)')
                !if (k == 6) exit
             end do
          end subroutine dump_equ
@@ -365,7 +356,6 @@
             i_dlnE_dt = s% i_dlnE_dt
             i_dlnR_dt = s% i_dlnR_dt
             i_dalpha_RTI_dt = s% i_dalpha_RTI_dt
-            i_dln_cvpv0_dt = s% i_dln_cvpv0_dt
             i_equ_w_div_wc = s% i_equ_w_div_wc
             i_dj_rot_dt = s% i_dj_rot_dt
             i_detrb_dt = s% i_detrb_dt
@@ -377,7 +367,6 @@
             i_v = s% i_v
             i_u = s% i_u
             i_alpha_RTI = s% i_alpha_RTI
-            i_ln_cvpv0 = s% i_ln_cvpv0
             i_w_div_wc = s% i_w_div_wc
             i_j_rot = s% i_j_rot
 
@@ -554,7 +543,7 @@
                if (s% report_ierr) then
                   write(*,3) 'eval_equ_for_solver: bad ' // trim(str), j, k, dxa
                end if
-               if (s% stop_for_bad_nums) stop 'eval_equ_for_solver'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'eval_equ_for_solver')
 !$omp end critical (eval_equ_for_solver_crit1)
                return
             end if
@@ -604,66 +593,127 @@
          end if
 
       end subroutine do1_density_eqn
-
-
-      subroutine do1_dln_cvpv0_dt_eqn(s, k, nvar, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         integer, intent(out) :: ierr
-         integer :: i_dln_cvpv0_dt, i_ln_cvpv0
-         real(dp) :: residual, dln_cvpv0_m1, dln_cvpv0_00, dln_cvpv0_p1
-         real(dp) :: d_actual, d_d_actual_dvc, d_expected, d_d_expected_dvc, &
-            dt_div_tau, scale, tau, dt, cs, N2_start, grav_start, &
-            dt_div_lambda, lambda, D, siglimit, sigmid_00, sigmid_m1, rc, f, &
-            mix, dmix_dcvm1, dmix_dcv00, dmix_dcvp1, a, da_dvc, inv, d_inv_dvc, &
-            c, dc_dvc, alfa, d_ln_cvpv0_dq
-         logical :: test_partials
-         include 'formats'
-         
-         ierr = 0         
-         !test_partials = (k == s% solver_test_partials_k-1)
-         test_partials = .false.
-         
-         stop 'PABLO needs to rewrite using auto_diff'
-                  
-      end subroutine do1_dln_cvpv0_dt_eqn
       
 
       subroutine do1_w_div_wc_eqn(s, k, nvar, ierr)
          use hydro_rotation
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_equ_w_div_wc, i_w_div_wc
-         real(dp) :: scale, wwc, dimless_rphi, dimless_rphi_given_wwc, w1, w2
-         real(dp) :: jrot_ratio, sigmoid_jrot_ratio, d_sigmoid_jrot_ratio_dx, &
-            jr_lim1, jr_lim2, A, C, dA_dw, dC_dw
+         real(dp) :: wwc, dimless_rphi, dimless_rphi_given_wwc, w1, w2
+         real(dp) :: jr_lim1, jr_lim2, A, C
+         type(auto_diff_real_star_order1) :: &
+            w_d_wc00, r00, jrot00, resid_ad, A_ad, C_ad, &
+            jrot_ratio, sigmoid_jrot_ratio
          logical :: test_partials
          include 'formats'
          
          ierr = 0
-
          
-         stop 'PABLO needs to rewrite using auto_diff'
+         !test_partials = (k == s% solver_test_partials_k-1)
+         test_partials = .false.
+
+         i_equ_w_div_wc = s% i_equ_w_div_wc
+         i_w_div_wc = s% i_w_div_wc
+
+         wwc = s% w_div_wcrit_max
+         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
+         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
+         jr_lim1 = two_thirds*wwc*C/A
+
+         wwc = s% w_div_wcrit_max2
+         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
+         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
+         jr_lim2 = two_thirds*wwc*C/A
+
+         w_d_wc00 = wrap_w_div_wc_00(s, k)
+         A_ad = 1d0-0.1076d0*pow4(w_d_wc00)-0.2336d0*pow6(w_d_wc00)-0.5583d0*log(1d0-pow4(w_d_wc00))
+         C_ad = 1d0+17d0/60d0*pow2(w_d_wc00)-0.3436d0*pow4(w_d_wc00)-0.4055d0*pow6(w_d_wc00)-0.9277d0*log(1d0-pow4(w_d_wc00))
+
+         r00 = wrap_r_00(s, k)
+         if (s% j_rot_flag) then
+            jrot00 = wrap_jrot_00(s, k)
+            jrot_ratio = jrot00/sqrt(s% cgrav(k)*s% m(k)*r00)
+         else
+            jrot_ratio = s% j_rot(k)/sqrt(s% cgrav(k)*s% m(k)*r00)
+         end if
+         if (abs(jrot_ratio% val) > jr_lim1) then
+            sigmoid_jrot_ratio = 2*(jr_lim2-jr_lim1)/(1+exp(-2*(abs(jrot_ratio)-jr_lim1)/(jr_lim2-jr_lim1)))-jr_lim2+2*jr_lim1
+            if (jrot_ratio% val < 0d0) then
+               sigmoid_jrot_ratio = -sigmoid_jrot_ratio
+            end if
+            resid_ad = (sigmoid_jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
+         else
+            resid_ad = (jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
+         end if
+
+         s% equ(i_equ_w_div_wc, k) = resid_ad% val
+
+         call save_eqn_residual_info( &
+            s, k, nvar, i_equ_w_div_wc, resid_ad, 'do1_w_div_wc_eqn', ierr)           
+
+         if (test_partials) then
+            s% solver_test_partials_var = s% i_w_div_wc
+            s% solver_test_partials_dval_dx = 1d0
+            write(*,*) 'do1_w_div_wc_eqn', s% solver_test_partials_var
+         end if
          
       end subroutine do1_w_div_wc_eqn
       
       
       subroutine do1_dj_rot_dt_eqn(s, k, nvar, ierr)
          use hydro_rotation
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_dj_rot_dt, i_j_rot
          real(dp) :: scale
-         real(dp) :: F00, dF00_dw00, dF00_dwp1, dF00_dj00, dF00_djp1, dF00_dlnr00, dF00_dlnrp1, dF00_dlnd00
-         real(dp) :: Fm1, dFm1_dwm1, dFm1_dw00, dFm1_djm1, dFm1_dj00, dFm1_dlnrm1, dFm1_dlnr00, dFm1_dlndm1
+         type(auto_diff_real_star_order1) :: resid_ad, jrot00, djrot_dt, F00, Fm1, flux_diff
          logical :: test_partials
          include 'formats'
          
          ierr = 0
-         
-         stop 'PABLO needs to rewrite using auto_diff'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ! Need to find a good way to scale the equation
+         scale = 1d6*max(1d2*sqrt(s% cgrav(k)*s% m(k)*s%r_start(k))/s%dt,&
+            s% total_abs_angular_momentum/(s% dm(k)*s% dt*s% nz))
+
+         i_dj_rot_dt = s% i_dj_rot_dt
+         i_j_rot = s% i_j_rot
+
+         jrot00 = wrap_jrot_00(s, k)
+         F00 = s% j_flux(k)
+         if (k > 1) then
+            Fm1 = shift_m1(s% j_flux(k-1))
+         else
+            Fm1 = 0d0
+         end if
+
+         djrot_dt = (jrot00-s% j_rot_start(k))/s% dt
+         flux_diff = (Fm1-F00)/s% dm_bar(k)
+
+         resid_ad = (djrot_dt+flux_diff-s% extra_jdot(k))/scale
+
+         s% equ(i_dj_rot_dt, k) = resid_ad% val
+
+         call save_eqn_residual_info( &
+            s, k, nvar, i_dj_rot_dt, resid_ad, 'do1_dj_rot_dt_eqn', ierr)           
+
+         !if (test_partials) then
+         !   s% solver_test_partials_val = s% i_rot(k)
+         !end if
+
+         !if (test_partials) then
+         !   s% solver_test_partials_var = s% i_lnR
+         !   s% solver_test_partials_dval_dx = s% di_rot_dlnR(k)
+         !   write(*,*) 'do1_w_div_wc_eqn', s% solver_test_partials_var
+         !end if
          
       end subroutine do1_dj_rot_dt_eqn
 
@@ -817,7 +867,7 @@
                write(*,1) 'dP0', dP0
                write(*,1) 'lnP_surf', lnP_surf
                write(*,1) 'r', r
-               stop 'P bc'
+               call mesa_error(__FILE__,__LINE__,'P bc')
             end if
          
             if (is_bad(T_bc)) then
@@ -826,7 +876,7 @@
                write(*,1) 'T_surf', T_surf
                write(*,1) 'dP0', dP0
                write(*,1) 'lnT_surf', lnT_surf
-               stop 'T bc'
+               call mesa_error(__FILE__,__LINE__,'T bc')
             end if
             
             dP0_dlnR = 0
@@ -882,6 +932,8 @@
                0d0, P_bc*dlnP_bc_dL, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
             dlnR00 = dlnP_bc_dlnR
             dlnT00 = dlnP_bc_dlnT
@@ -893,6 +945,8 @@
                0d0, dlnR00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnP_bc_dL, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
@@ -916,6 +970,8 @@
                0d0, T_bc*dlnT_bc_dL, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
             dlnR00 = dlnT_bc_dlnR
             dlnT00 = dlnT_bc_dlnT
@@ -927,6 +983,8 @@
                0d0, dlnR00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnT_bc_dL, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
@@ -961,7 +1019,7 @@
                write(*,1) 'set_Tsurf_BC residual', residual
                write(*,1) 'lnT1_ad%val', lnT1_ad%val
                write(*,1) 'lnT_bc_ad%val', lnT_bc_ad%val
-               stop 'set_Tsurf_BC'
+               call mesa_error(__FILE__,__LINE__,'set_Tsurf_BC')
             end if
             if (test_partials) then
                s% solver_test_partials_val = 0
@@ -1085,7 +1143,7 @@
          if (ierr /= 0) return
          if (s% nvar_hydro /= n) then
             write(*,3) 'nvar_hydro /= n', s% nvar_hydro, n
-            stop 'equ_data_for_extra_profile_columns'
+            call mesa_error(__FILE__,__LINE__,'equ_data_for_extra_profile_columns')
          end if
          do i=1,n
             do k=1,nz

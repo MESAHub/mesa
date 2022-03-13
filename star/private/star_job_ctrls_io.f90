@@ -306,10 +306,6 @@
          new_RSP2_flag, &
          create_RSP2_model, &
          
-         change_conv_vel_flag, &
-         change_initial_conv_vel_flag, &
-         new_conv_vel_flag, &
-         
          change_w_div_wc_flag, &
          change_initial_w_div_wc_flag, &
          new_w_div_wc_flag, &
@@ -343,7 +339,6 @@
          new_reconstruction_flag, &
          
          center_ye_limit_for_v_flag, &
-         logT_for_conv_vel_flag, &
          change_rotation_flag, &
          change_initial_rotation_flag, &
          new_rotation_flag, &
@@ -795,8 +790,7 @@
 
          s% job% remove_initial_center_at_cell_k = remove_initial_center_at_cell_k
          s% job% remove_initial_center_by_temperature = remove_initial_center_by_temperature
-         s% job% remove_initial_center_by_mass_fraction_q = &
-            remove_initial_center_by_mass_fraction_q
+         s% job% remove_initial_center_by_mass_fraction_q = remove_initial_center_by_mass_fraction_q
          s% job% remove_initial_center_by_mass_gm = remove_initial_center_by_mass_gm
          s% job% remove_initial_center_by_delta_mass_Msun = remove_initial_center_by_delta_mass_Msun
          s% job% remove_initial_center_by_delta_mass_gm = remove_initial_center_by_delta_mass_gm
@@ -844,16 +838,11 @@
          s% job% zero_inner_v_by_mass_Msun = zero_inner_v_by_mass_Msun
 
          s% job% remove_initial_surface_at_cell_k = remove_initial_surface_at_cell_k
-         s% job% remove_initial_surface_at_he_core_boundary = &
-            remove_initial_surface_at_he_core_boundary
-         s% job% remove_initial_surface_by_optical_depth = &
-            remove_initial_surface_by_optical_depth
-         s% job% remove_initial_surface_by_density = &
-            remove_initial_surface_by_density
-         s% job% remove_initial_surface_by_pressure = &
-            remove_initial_surface_by_pressure
-         s% job% remove_initial_surface_by_mass_fraction_q = &
-            remove_initial_surface_by_mass_fraction_q
+         s% job% remove_initial_surface_at_he_core_boundary = remove_initial_surface_at_he_core_boundary
+         s% job% remove_initial_surface_by_optical_depth = remove_initial_surface_by_optical_depth
+         s% job% remove_initial_surface_by_density = remove_initial_surface_by_density
+         s% job% remove_initial_surface_by_pressure = remove_initial_surface_by_pressure
+         s% job% remove_initial_surface_by_mass_fraction_q = remove_initial_surface_by_mass_fraction_q
          s% job% remove_initial_surface_by_mass_gm = remove_initial_surface_by_mass_gm
          s% job% remove_initial_surface_by_radius_cm = remove_initial_surface_by_radius_cm
          s% job% remove_initial_surface_by_mass_Msun = remove_initial_surface_by_mass_Msun
@@ -955,9 +944,6 @@
          s% job% change_RSP2_flag_at_model_number = change_RSP2_flag_at_model_number
          s% job% new_RSP2_flag = new_RSP2_flag
          s% job% create_RSP2_model = create_RSP2_model
-         s% job% change_conv_vel_flag = change_conv_vel_flag
-         s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
-         s% job% new_conv_vel_flag = new_conv_vel_flag
          s% job% change_w_div_wc_flag = change_w_div_wc_flag
          s% job% change_initial_w_div_wc_flag = change_initial_w_div_wc_flag
          s% job% new_w_div_wc_flag = new_w_div_wc_flag
@@ -987,7 +973,6 @@
          s% job% new_reconstruction_flag = new_reconstruction_flag
          
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
-         s% job% logT_for_conv_vel_flag = logT_for_conv_vel_flag
          s% job% change_rotation_flag = change_rotation_flag
          s% job% change_initial_rotation_flag = change_initial_rotation_flag
          s% job% new_rotation_flag = new_rotation_flag
@@ -1035,8 +1020,7 @@
          s% job% max_steps_to_relax_angular_momentum = max_steps_to_relax_angular_momentum
          s% job% timescale_for_relax_angular_momentum = timescale_for_relax_angular_momentum
          s% job% max_dt_for_relax_angular_momentum = max_dt_for_relax_angular_momentum
-         s% job% num_timescales_for_relax_angular_momentum = &
-            num_timescales_for_relax_angular_momentum
+         s% job% num_timescales_for_relax_angular_momentum = num_timescales_for_relax_angular_momentum
          s% job% relax_angular_momentum_filename = relax_angular_momentum_filename
          s% job% relax_angular_momentum_constant_omega_center = relax_angular_momentum_constant_omega_center
          s% job% relax_initial_entropy = relax_initial_entropy
@@ -1081,8 +1065,7 @@
          s% job% set_initial_cumulative_energy_error = set_initial_cumulative_energy_error
          s% job% set_cumulative_energy_error = set_cumulative_energy_error
          s% job% set_cumulative_energy_error_at_step = set_cumulative_energy_error_at_step
-         s% job% set_cumulative_energy_error_each_step_if_age_less_than = &
-            set_cumulative_energy_error_each_step_if_age_less_than
+         s% job% set_cumulative_energy_error_each_step_if_age_less_than = set_cumulative_energy_error_each_step_if_age_less_than
          s% job% new_cumulative_energy_error = new_cumulative_energy_error
          s% job% set_cumulative_energy_error_each_relax = set_cumulative_energy_error_each_relax
          
@@ -1388,18 +1371,15 @@
          fallback_check_total_energy = s% job% fallback_check_total_energy
          remove_fallback_speed_limit = s% job% remove_fallback_speed_limit
          remove_center_set_zero_v_center = s% job% remove_center_set_zero_v_center
-         retain_fallback_at_each_step = s% job% retain_fallback_at_each_step
          limit_center_logP_at_each_step = s% job% limit_center_logP_at_each_step
          remove_center_adjust_L_center = s% job% remove_center_adjust_L_center
          remove_center_logRho_limit = s% job% remove_center_logRho_limit
 
          remove_initial_center_at_cell_k = s% job% remove_initial_center_at_cell_k
          remove_initial_center_by_temperature = s% job% remove_initial_center_by_temperature
-         remove_initial_center_by_mass_fraction_q = &
-            s% job% remove_initial_center_by_mass_fraction_q
+         remove_initial_center_by_mass_fraction_q = s% job% remove_initial_center_by_mass_fraction_q
          remove_initial_center_by_delta_mass_gm = s% job% remove_initial_center_by_delta_mass_gm
-         remove_initial_center_by_delta_mass_Msun = &
-            s% job% remove_initial_center_by_delta_mass_Msun
+         remove_initial_center_by_delta_mass_Msun = s% job% remove_initial_center_by_delta_mass_Msun
          remove_initial_center_by_mass_gm = s% job% remove_initial_center_by_mass_gm
          remove_initial_center_by_mass_Msun = s% job% remove_initial_center_by_mass_Msun
          remove_initial_center_by_radius_Rsun = s% job% remove_initial_center_by_radius_Rsun
@@ -1439,16 +1419,11 @@
          remove_surface_by_relax_to_star_cut = s% job% remove_surface_by_relax_to_star_cut
          
          remove_initial_surface_at_cell_k = s% job% remove_initial_surface_at_cell_k
-         remove_initial_surface_at_he_core_boundary = &
-            s% job% remove_initial_surface_at_he_core_boundary
-         remove_initial_surface_by_optical_depth = &
-            s% job% remove_initial_surface_by_optical_depth
-         remove_initial_surface_by_density = &
-            s% job% remove_initial_surface_by_density
-         remove_initial_surface_by_pressure = &
-            s% job% remove_initial_surface_by_pressure
-         remove_initial_surface_by_mass_fraction_q = &
-            s% job% remove_initial_surface_by_mass_fraction_q
+         remove_initial_surface_at_he_core_boundary = s% job% remove_initial_surface_at_he_core_boundary
+         remove_initial_surface_by_optical_depth = s% job% remove_initial_surface_by_optical_depth
+         remove_initial_surface_by_density = s% job% remove_initial_surface_by_density
+         remove_initial_surface_by_pressure = s% job% remove_initial_surface_by_pressure
+         remove_initial_surface_by_mass_fraction_q = s% job% remove_initial_surface_by_mass_fraction_q
          remove_initial_surface_by_mass_gm = s% job% remove_initial_surface_by_mass_gm
          remove_initial_surface_by_radius_cm = s% job% remove_initial_surface_by_radius_cm
          remove_initial_surface_by_mass_Msun = s% job% remove_initial_surface_by_mass_Msun
@@ -1529,9 +1504,6 @@
          change_RSP2_flag_at_model_number = s% job% change_RSP2_flag_at_model_number
          new_RSP2_flag = s% job% new_RSP2_flag
          create_RSP2_model = s% job% create_RSP2_model
-         change_conv_vel_flag = s% job% change_conv_vel_flag
-         change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
-         new_conv_vel_flag = s% job% new_conv_vel_flag
          change_w_div_wc_flag = s% job% change_w_div_wc_flag
          change_initial_w_div_wc_flag = s% job% change_initial_w_div_wc_flag
          new_w_div_wc_flag = s% job% new_w_div_wc_flag
@@ -1560,7 +1532,6 @@
          new_reconstruction_flag = s% job% new_reconstruction_flag
 
          center_ye_limit_for_v_flag = s% job% center_ye_limit_for_v_flag
-         logT_for_conv_vel_flag = s% job% logT_for_conv_vel_flag
          change_rotation_flag = s% job% change_rotation_flag
          change_initial_rotation_flag = s% job% change_initial_rotation_flag
          new_rotation_flag = s% job% new_rotation_flag
@@ -1608,8 +1579,7 @@
          max_steps_to_relax_angular_momentum = s% job% max_steps_to_relax_angular_momentum
          timescale_for_relax_angular_momentum = s% job% timescale_for_relax_angular_momentum
          max_dt_for_relax_angular_momentum = s% job% max_dt_for_relax_angular_momentum
-         num_timescales_for_relax_angular_momentum = &
-            s% job% num_timescales_for_relax_angular_momentum
+         num_timescales_for_relax_angular_momentum = s% job% num_timescales_for_relax_angular_momentum
          relax_angular_momentum_filename = s% job% relax_angular_momentum_filename
          relax_angular_momentum_constant_omega_center = s% job% relax_angular_momentum_constant_omega_center
          relax_initial_entropy = s% job% relax_initial_entropy
@@ -1654,8 +1624,7 @@
          set_initial_cumulative_energy_error = s% job% set_initial_cumulative_energy_error
          set_cumulative_energy_error = s% job% set_cumulative_energy_error
          set_cumulative_energy_error_at_step = s% job% set_cumulative_energy_error_at_step
-         set_cumulative_energy_error_each_step_if_age_less_than = &
-            s% job% set_cumulative_energy_error_each_step_if_age_less_than
+         set_cumulative_energy_error_each_step_if_age_less_than = s% job% set_cumulative_energy_error_each_step_if_age_less_than
          new_cumulative_energy_error = s% job% new_cumulative_energy_error
          set_cumulative_energy_error_each_relax = s% job% set_cumulative_energy_error_each_relax
          
@@ -1810,7 +1779,7 @@
          character(len=*), intent(out) :: val
          integer, intent(out) :: ierr
    
-         character(len(name)) :: upper_name
+         character(len(name)+1) :: upper_name
          character(len=512) :: str
          integer :: iounit,iostat,ind,i
    
@@ -1826,14 +1795,14 @@
          rewind(iounit)
    
          ! Namelists get written in captials
-         upper_name = StrUpCase(name)
+         upper_name = trim(StrUpCase(name))//'='
          val = ''
          ! Search for name inside namelist
          do 
             read(iounit,'(A)',iostat=iostat) str
-            ind = index(str,trim(upper_name))
+            ind = index(trim(str),trim(upper_name))
             if( ind /= 0 ) then
-               val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+               val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
                do i=1,len(val)
                   if(val(i:i)=='"') val(i:i) = ' '
                end do

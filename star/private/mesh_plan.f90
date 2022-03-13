@@ -149,7 +149,7 @@
             do j=1,num_gvals
                write(*,*) j, trim(gval_names(j))
             end do
-            write(*,*)
+            write(*,'(A)')
          end if
 
          nz = nz_old
@@ -213,23 +213,23 @@
                end if
                if (k_old > comes_from(k-1)) then
                   if (xq0 /= xqold_start) then
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'nz_new', nz_new
                      write(*,2) 'k', k
                      write(*,2) 'comes_from(k-1)', comes_from(k-1)
                      write(*,2) 'k_old', k_old
                      write(*,2) 'comes_from(k)', comes_from(k)
                      write(*,2) 'nz_old', nz_old
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'xq0', k, xq0
                      write(*,2) 'xqold_start', k_old, xqold_start
                      write(*,2) 'xqold_end', k_old, xqold_end
                      write(*,2) 'xqold_end - xqold_start', k_old, xqold_end - xqold_start
                      write(*,2) 'xq0 - xqold_start', k_old, xq0 - xqold_start
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'xq_old(comes_from(k))', k, xq_old(comes_from(k))
                      write(*,2) 'xq_old(comes_from(k-1))', k, xq_old(comes_from(k-1))
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,*) 'k_old > comes_from(k-1)', k_old > comes_from(k-1)
                      write(*,*) 'xq0 /= xqold_start', xq0 /= xqold_start
                      write(*,*) 'mesh plan check_before_smooth'
@@ -238,13 +238,13 @@
                   end if
                else if (k_old == comes_from(k-1)) then
                   if (.not. (xq0 > xqold_start .and. xq0 < xqold_end)) then
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,*) '(.not. (xq0 > xqold_start .and. xq0 < xqold_end))', k_old
                      write(*,2) 'xq_new(k)', k, xq_new(k)
                      write(*,2) 'xq_old(k_old)', k, xq_old(k_old)
                      write(*,2) 'xq_old(k_old+1)', k, xq_old(k_old+1)
                      write(*,2) 'xqold_end', k, xqold_end
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,*) 'k_old == comes_from(k-1)', k_old == comes_from(k-1)
                      write(*,*) '.not. (xq0 > xqold_start .and. xq0 < xqold_end)', &
                         .not. (xq0 > xqold_start .and. xq0 < xqold_end)
@@ -349,13 +349,13 @@
                do kk=1400,nz_new
                   if (dq_new(kk) < 1d-12) then
                      write(*,2) 'dq_new(kk)', kk, dq_new(kk)
-                     stop 'debug: split1'
+                     call mesa_error(__FILE__,__LINE__,'debug: split1')
                   end if
                end do
                do kk = 2, nz_new
                   if (dq_new(kk-1) < 1d-6*dq_new(kk) .or. dq_new(kk) < 1d-6*dq_new(kk-1)) then
                      write(*,3) 'bad dq_new ratio', kk, nz_new, dq_new(kk), dq_new(kk-1)
-                     stop 'debug: split1'
+                     call mesa_error(__FILE__,__LINE__,'debug: split1')
                   end if
                end do
             end if
@@ -390,11 +390,11 @@
                      write(*,2) 'nz_old', nz_old
                      write(*,2) 'k', k
                      write(*,2) 'nz_new', nz_new
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'dq_new(k)', k, dq_new(k)
                      write(*,2) 'dq_old(k_old)', k_old, dq_old(k_old)
                      write(*,2) 'dq_new(k)-dq_old(k_old)', k_old, dq_new(k)-dq_old(k_old)
-                     write(*,*)
+                     write(*,'(A)')
                      write(*,2) 'xq_new(k)', k, xq_new(k)
                      write(*,2) 'xq_new(k)+dq_new(k)', k, xq_new(k)+dq_new(k)
                      write(*,2) 'xq_end', k, xq_end
@@ -462,7 +462,7 @@
                do kk=1400,nz_new
                   if (dq_new(kk) < 1d-12) then
                      write(*,2) 'dq_new(kk)', kk, dq_new(kk)
-                     stop 'debug: split1'
+                     call mesa_error(__FILE__,__LINE__,'debug: split1')
                   end if
                end do
             end if
@@ -489,7 +489,7 @@
                write(*,1) 'dq_new', dq_new
                write(*,1) 'min_dq_for_split', min_dq_for_split
                write(*,1) 'min_dq', min_dq
-               write(*,*)
+               write(*,'(A)')
             end if
 
             if (0d0 < remaining_dq_old .and. dq_new > 0.99d0*remaining_dq_old) then
@@ -497,7 +497,7 @@
                   write(*,2) 'dq_old', k_old, remaining_dq_old
                   write(*,1) 'dq_new', dq_new
                   write(*,1) 'dq_new/remaining_dq_old', dq_new/remaining_dq_old
-                  write(*,*)
+                  write(*,'(A)')
                end if
                return
             end if
@@ -574,7 +574,7 @@
 
                if (dbg) then
                   call test_new(ierr)
-                  if (ierr /= 0) stop 'debug: mesh_plan, smooth_new_points'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'debug: mesh_plan, smooth_new_points')
                end if
 
                if (done) exit
@@ -597,7 +597,7 @@
 
                if (dbg) then
                   call test_new(ierr)
-                  if (ierr /= 0) stop 'debug: mesh_plan, smooth_new_points'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'debug: mesh_plan, smooth_new_points')
                end if
 
                if (done) exit
@@ -645,7 +645,7 @@
 
                ! make initial choice based on gradients. may reduce later.
                if (dbg) then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,3) 'call pick_next_dq', k_old, k_new, next_dq_max
                end if
                
@@ -745,8 +745,9 @@
                            j00 = maxloc(s% xa(:,kk),dim=1)
                            jm1 = maxloc(s% xa(:,kk-1),dim=1)
                            if (maxval_delta_xa > s% max_delta_x_for_merge .or. &
-                               j00 /= jm1 .or. is_convective_boundary(kk)) then
-                              ! don't merge across convective boundary
+                               j00 /= jm1 .or. is_convective_boundary(kk) .or. &
+                               is_crystal_boundary(kk)) then
+                              ! don't merge across convective or crystal boundary
                               k_old_next = kk-1
                               exit
                            else if (next_xq <= xq_old(kk) + min_dq/2) then
@@ -828,7 +829,7 @@
                         next_dq = next_xq - xq_new(k_new)
                         if (dbg) then
                            write(*,3) 'force merge', k_old, k_new, next_xq, next_dq
-                           write(*,*)
+                           write(*,'(A)')
                         end if
                      end if
 
@@ -875,7 +876,7 @@
 
                xq_new(k_new) = next_xq
                if (abs(xq_new(k_new) - dq_sum) > 1d-6) then
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,*) 'k_new', k_new
                   write(*,1) 'xq_new(k_new) - dq_sum', xq_new(k_new) - dq_sum
                   write(*,1) 'xq_new(k_new)', xq_new(k_new)
@@ -912,13 +913,23 @@
                 s% mixing_type(kk) /= convective_mixing)
          end function is_convective_boundary
 
+         logical function is_crystal_boundary(kk)
+            integer, intent(in) :: kk
+            if(s% do_phase_separation .and. & ! only need this protection when phase separation is on
+                 s% m(kk) <= s% crystal_core_boundary_mass .and. &
+                 s% m(kk-1) >= s% crystal_core_boundary_mass) then
+               is_crystal_boundary = .true.
+            else
+               is_crystal_boundary = .false.
+            end if
+         end function is_crystal_boundary
 
          subroutine open_debug_file
             include 'formats'
             open(newunit=iounit, file=trim('plan_debug.data'), action='write', iostat=ierr)
             if (ierr /= 0) then
                write(*, *) 'open plan_debug.data failed'
-               stop 'debug do_mesh_plan'
+               call mesa_error(__FILE__,__LINE__,'debug do_mesh_plan')
             end if
             write(*,*) 'write plan_debug.data'
          end subroutine open_debug_file
@@ -1086,7 +1097,7 @@
                   write(*,2) 'dq_sum', k, dq_sum
                   write(*,*) 'pick1_dq'
                   ierr = -1
-                  if (s% stop_for_bad_nums) stop 'mesh plan'
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
                   return
                end if
                if (dq_sum >= next_dq_max) exit
@@ -1106,7 +1117,7 @@
                      write(*,1) 'gvals(k,j)-gmin', gvals(k,j)-gmin
                      write(*,1) 'dq_old(k-1)', dq_old(k-1)
                      write(*,1) 'gvals(k-1,j) > gvals(k,j)', dq_next
-                     stop 'debug pick1_dq'
+                     call mesa_error(__FILE__,__LINE__,'debug pick1_dq')
                   end if
                else ! we're done -- don't need another point for this gval
                   dq_sum = default; exit ! just return the default
@@ -1135,7 +1146,7 @@
                write(*,2) 'dq_old(k-1)', k, dq_old(k-1)
                write(*,*) 'pick1_dq'
                ierr = -1
-               if (s% stop_for_bad_nums) stop 'mesh plan'
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
                return
             end if
             if (xq_old(k-1) >= xq_new(k_new)) then

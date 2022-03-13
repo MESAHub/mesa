@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use run_star_support
       
       implicit none
@@ -167,9 +168,9 @@
          extras_finish_step = keep_going
          if (s% x_integer_ctrl(1) <= 0) return
          if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
@@ -183,9 +184,9 @@
             write(*,*) 'good match for period', &
                s% rsp_period/(24*3600), target_period
          end if
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
 

@@ -40,8 +40,12 @@
       do_element_diffusion = .true.
       show_diffusion_info = .true.
 
+! prevent solver struggles in the atmosphere at high luminosity
+      Pextra_factor = 3
+
 ! convection
       okay_to_reduce_gradT_excess = .true.
+      gradT_excess_lambda1 = -1 ! turn on full all the time
 
       thermohaline_coeff = 1000
       

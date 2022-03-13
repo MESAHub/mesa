@@ -294,7 +294,7 @@ contains
        if (xne < 0d0 .or. xne > 1d0) write(s% retry_message,2) 'get_kap: xne', k, xne
        if (s% report_ierr) write(*, *) s% retry_message
        return
-       stop 'bad mass fraction: get_kap'
+       call mesa_error(__FILE__,__LINE__,'bad mass fraction: get_kap')
     end if
 
     call get_XYZ(s, xa, xh, xhe, Z)
@@ -306,7 +306,7 @@ contains
        if (Z < 0d0) write(s% retry_message,2) 'Z', k, Z
        if (s% report_ierr) write(*, *) s% retry_message
        return
-       stop 'negative mass fraction: get_kap'
+       call mesa_error(__FILE__,__LINE__,'negative mass fraction: get_kap')
     end if
 
     if (s% use_simple_es_for_kap) then

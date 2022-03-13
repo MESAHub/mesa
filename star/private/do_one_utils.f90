@@ -77,9 +77,9 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a)') " The terminal output contains the following information"
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a)') "      'step' is the number of steps since the start of the run,"
          write(*,'(a)') "      'lg_dt' is log10 timestep in years,"
          write(*,'(a)') "      'age_yr' is the simulated years since the start run,"
@@ -113,7 +113,7 @@
          write(*,'(a)') "      'iters' is the number of solver iterations for the current step,"
          write(*,'(a)') "      'retry' is the number of step retries required during the run,"
          write(*,'(a)') "      'dt_limit' is an indication of what limited the timestep."
-         write(*,*)
+         write(*,'(A)')
          write(*,'(a)') " All this and more are saved in the LOGS directory during the run."
       end subroutine do_show_log_description
       
@@ -149,7 +149,7 @@
          write(io,'(a)') &
             '_______________________________________________________________________' // &
             '___________________________________________________________________________'
-         write(io,*)
+         write(io,'(A)')
          write(io,'(a)') &
             '       step    lg_Tmax     Teff     lg_LH      lg_Lnuc     Mass       ' // &
             'H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry'
@@ -227,7 +227,7 @@
          write(io,'(a)') &
             '_______________________________________________________________________' // &
             '___________________________________________________________________________'
-         write(io,*)
+         write(io,'(A)')
          
       end subroutine output_terminal_header
       
@@ -451,7 +451,7 @@
          end if
          
          call show_trace_history_values(max(0, s% num_trace_history_values))
-         write(io,*)
+         write(io,'(A)')
          
          s% just_wrote_terminal_header = .false.
          
@@ -484,7 +484,7 @@
                   end if
                   values(i) = val
                   if (is_bad(values(i))) then   
-                     stop 'show_trace_history_values bad from get1_hist_value'
+                     call mesa_error(__FILE__,__LINE__,'show_trace_history_values bad from get1_hist_value')
                   end if
                else if (is_int_value(i)) then
                   write(io,'(a40,i14)') &
@@ -499,7 +499,7 @@
                   write(io,'(a40,99(1pd26.16))') &
                      trim(s% trace_history_value_name(i)), values(i)
                   if (is_bad(values(i))) then   
-                     stop 'show_trace_history_values'
+                     call mesa_error(__FILE__,__LINE__,'show_trace_history_values')
                   end if
                end if
             end do
@@ -531,7 +531,7 @@
          if (s% write_header_frequency*s% terminal_interval > 0) then
             if ( mod(model, s% write_header_frequency*s% terminal_interval) .eq. 0 &
                  .and. .not. s% doing_first_model_of_run) then
-               write(*,*)
+               write(*,'(A)')
                call write_terminal_header(s)
             endif
          end if         
@@ -729,10 +729,15 @@
          end if
          
          if (max_abs_vel > clight) then
-            write(*, '(/,a,/, I5,1X,2e20.10)') &
-               'retry because maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
-            do_check_limits = retry
-            return
+            if (s% retry_for_v_above_clight) then 
+               write(*, '(/,a,/, I5,1X,2e20.10)') &
+                  'retry because maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
+               do_check_limits = retry
+               return
+            else
+               write(*, '(/,a,/, I5,1X,2e20.10)') &
+                  'Warning: maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
+            end if
          end if
 
          if (peak_burn_vconv_div_cs > 0.75d0*s% peak_burn_vconv_div_cs_limit) then
@@ -741,7 +746,7 @@
                peak_burn_vconv_div_cs, s% peak_burn_vconv_div_cs_limit
             k = maxloc(s% eps_nuc(1:nz), dim=1)
             write(*,2) 'maxloc eps_nuc', k, s% conv_vel(k), s% csound(k), s% eps_nuc(k)
-            stop 'test do_one_utils'
+            call mesa_error(__FILE__,__LINE__,'test do_one_utils')
          end if
          
          if (s% fe_core_infall < s% fe_core_infall_limit .and. &
@@ -1271,10 +1276,10 @@
             if (len_trim(s% xa_central_lower_limit_species(j)) == 0) cycle
             cid = chem_get_iso_id(s% xa_central_lower_limit_species(j))
             if (cid <= 0) then
-               write(*,*)
+               write(*,'(A)')
                write(*,2) '<' // trim(s% xa_central_lower_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_central_lower_limit_species', j
-               write(*,*)
+               write(*,'(A)')
                do_check_limits = terminate
                return
             end if
@@ -1298,10 +1303,10 @@
             cid = chem_get_iso_id(s% xa_central_upper_limit_species(j))
             if (cid <= 0) then
                !cycle
-               write(*,*)
+               write(*,'(A)')
                write(*,2) '<' // trim(s% xa_central_upper_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_central_upper_limit_species', j
-               write(*,*)
+               write(*,'(A)')
                do_check_limits = terminate
                return
             end if
@@ -1323,10 +1328,10 @@
             if (len_trim(s% xa_surface_lower_limit_species(j)) == 0) cycle
             cid = chem_get_iso_id(s% xa_surface_lower_limit_species(j))
             if (cid <= 0) then
-               write(*,*)
+               write(*,'(A)')
                write(*,2) '<' // trim(s% xa_surface_lower_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_surface_lower_limit_species', j
-               write(*,*)
+               write(*,'(A)')
                do_check_limits = terminate
                return
             end if
@@ -1350,10 +1355,10 @@
             cid = chem_get_iso_id(s% xa_surface_upper_limit_species(j))
             if (cid <= 0) then
                !cycle
-               write(*,*)
+               write(*,'(A)')
                write(*,2) '<' // trim(s% xa_surface_upper_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_surface_upper_limit_species', j
-               write(*,*)
+               write(*,'(A)')
                do_check_limits = terminate
                return
             end if
@@ -1376,10 +1381,10 @@
             cid = chem_get_iso_id(s% xa_average_lower_limit_species(j))
             if (cid <= 0) then
                !cycle
-               write(*,*)
+               write(*,'(A)')
                write(*,2) '<' // trim(s% xa_average_lower_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_average_lower_limit_species', j
-               write(*,*)
+               write(*,'(A)')
                do_check_limits = terminate
                return
             end if
@@ -1402,10 +1407,10 @@
             if (len_trim(s% xa_average_upper_limit_species(j)) == 0) cycle
             cid = chem_get_iso_id(s% xa_average_upper_limit_species(j))
             if (cid <= 0) then
-               write(*,*)
+               write(*,'(A)')
                write(*,2) '<' // trim(s% xa_average_upper_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_average_upper_limit_species', j
-               write(*,*)
+               write(*,'(A)')
                do_check_limits = terminate
                return
             end if
@@ -1501,7 +1506,7 @@
          do_one_check_model = do_check_limits(id)
          if (do_one_check_model /= keep_going) then
             if (dbg) write(*,*) 'do_check_limits /= keep_going'
-            write(*,*)
+            write(*,'(A)')
             must_do_profile = .true.
          end if
          

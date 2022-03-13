@@ -26,6 +26,7 @@
          use star_def
          use const_def
          use math_lib
+      use auto_diff
 
          implicit none
 
@@ -379,7 +380,7 @@
             ! it must not include the new column names you are adding here.
 
             ! here is an example for adding a profile column
-            !if (n /= 1) stop 'data_for_extra_profile_columns'
+            !if (n /= 1) call mesa_error(__FILE__,__LINE__,'data_for_extra_profile_columns')
             !names(1) = 'beta'
             !do k = 1, nz
             !    vals(k,1) = s% Pgas(k)/s% P(k)
@@ -517,10 +518,10 @@
             testhub_extras_names(1) = 'flame_speed'; testhub_extras_vals(1) = flame_speed
             testhub_extras_names(2) = 'flame_width'; testhub_extras_vals(2) = flame_width
 
-            write(*,*)
+            write(*,'(A)')
             write(*,1) testhub_extras_names(1), testhub_extras_vals(1)
             write(*,1) testhub_extras_names(2), testhub_extras_vals(2)
-            write(*,*)
+            write(*,'(A)')
 
             ! get targets from inlist
             flame_speed_expected = s% x_ctrl(9)

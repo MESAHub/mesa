@@ -118,7 +118,7 @@
                   'failed in eval_eps_grav_and_partials', k, eps_grav% val
             end if
             if (s% stop_for_bad_nums) then
-               stop 'eval1_eps_grav_and_partials'
+               call mesa_error(__FILE__,__LINE__,'eval1_eps_grav_and_partials')
             end if
             return
          end if
@@ -201,7 +201,7 @@
             s% retry_message = 'do_lnd_eps_grav -- bad value for eps_grav'
             if (s% report_ierr) &
                write(*,2) 'do_lnd_eps_grav -- bad value for eps_grav', k, eps_grav% val
-            if (s% stop_for_bad_nums) stop 'do_lnd_eps_grav'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnd_eps_grav')
             return
          end if
 
@@ -258,7 +258,7 @@
             s% retry_message = 'do_lnS_eps_grav -- bad value for eps_grav'
             if (s% report_ierr) &
                write(*,2) 'do_lnS_eps_grav -- bad value for eps_grav', k, eps_grav% val
-            if (s% stop_for_bad_nums) stop 'do_lnS_eps_grav'
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnS_eps_grav')
             return
          end if
 
@@ -372,6 +372,8 @@
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0)
 
          ! add easy access to this quantity in star
@@ -391,11 +393,11 @@
           if (s% report_ierr) write(*, *) s% retry_message
             if (s% report_ierr) then
                write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
-               !stop 'eval_eps_grav_composition'
+               !call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             if (s% stop_for_bad_nums) then
                write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val
-               stop 'eval_eps_grav_composition'
+               call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             return
          end if

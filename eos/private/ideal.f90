@@ -126,11 +126,12 @@ module ideal
       
       ! No electrons, so extreme negative chemical potential
       etaele = -1d99
-      xnefer = 1d-99
+      xnefer = 1d-20
 
-      ! no latent heat
+      ! no latent heat, no phase
       latent_ddlnT = 0d0
       latent_ddlnRho = 0d0
+      phase = 0d0
 
       ! Construct rho,T and partials
       temp = temp_in

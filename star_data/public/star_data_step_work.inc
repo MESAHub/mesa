@@ -144,22 +144,16 @@
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
-      real(dp), pointer :: i_rot(:) ! specific moment of inertia at cell boundary
-      real(dp), pointer :: di_rot_dw_div_wc(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: di_rot_dlnr(:) ! partial of i_rot with respect to w_div_wc
-      real(dp), pointer :: fp_rot(:) ! rotation factor for momentum
-      real(dp), pointer :: ft_rot(:) ! rotation factor for temperature
-      real(dp), pointer :: dfp_rot_dw_div_wc(:) ! partial of fp with respect to w_div_wc
-      real(dp), pointer :: dft_rot_dw_div_wc(:) ! partial of ft with respect to w_div_wc
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: i_rot(:), fp_rot(:), ft_rot(:)
+
       real(dp), pointer :: w_div_w_crit_roche(:) ! fraction of critical rotation at the equator,
                                                  ! without the contribution of the Eddington factor
       real(dp), pointer :: r_polar(:) ! radius in polar direction
       real(dp), pointer :: r_equatorial(:) ! radius in equatorial direction    
       real(dp) :: rotational_mdot_boost
 
-      ! angular momentum fluxes and their partials
-      real(dp), pointer :: j_flux(:), dj_flux_dw00(:), dj_flux_dwp1(:), dj_flux_dj00(:), dj_flux_djp1(:), &
-         dj_flux_dlnr00(:), dj_flux_dlnrp1(:), dj_flux_dlnd(:)
+      ! angular momentum fluxes
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: j_flux(:)
            
       real(dp), pointer :: am_nu_rot(:)
       real(dp), pointer :: am_nu_non_rot(:) ! diffusion driven by other sources, e.g. convection
@@ -227,14 +221,14 @@
 
       real(dp), pointer :: eps_nuc(:) ! sum of reaction_eps_nuc for all reactions in net
          ! thermal ergs per gram per second from nuclear reactions
-         ! (nuclear reaction neutrinos have been subtracted)
+         ! (including losses to neutrinos produced in the reactions)
       real(dp), pointer :: eps_nuc_categories(:,:) ! (num_categories, nz)
       real(dp), pointer :: d_epsnuc_dlnd(:) ! partial wrt density
       real(dp), pointer :: d_epsnuc_dlnT(:) ! partial wrt temperature
       real(dp), pointer :: d_epsnuc_dx(:,:)  ! (species,nz)
          ! d_ex_dx(j, k) is partial of eps_nuc(k) wrt species(j)
 
-      real(dp), pointer :: eps_nuc_neu_total(:) ! erg/gm/sec as neutrinos from nuclear reactions
+      real(dp), pointer :: eps_nuc_neu_total(:) ! erg/gm/sec, (positive) energy lost to neutrinos in nuclear reactions
 
       real(dp), pointer :: dxdt_nuc(:,:) ! (species,nz)
          ! rate of change of mass fractions from nuclear reactions
@@ -259,7 +253,7 @@
       real(dp), pointer :: luminosity_by_category(:,:) ! (num_categories, nz)
 
       ! non-nuclear-reaction neutrino losses
-      real(dp), pointer :: non_nuc_neu(:)
+      real(dp), pointer :: non_nuc_neu(:) ! positive
       real(dp), pointer :: d_nonnucneu_dlnd(:)
       real(dp), pointer :: d_nonnucneu_dlnT(:)
    
@@ -464,6 +458,8 @@
       real(dp), pointer :: eps_diffusion(:) ! (nz)
       real(dp), pointer :: g_field_element_diffusion(:) ! (nz)
       
+      ! WD phase separation
+      real(dp), pointer :: eps_phase_separation(:) ! (nz)
       
       ! for Riemann solver      
       type(auto_diff_real_star_order1), pointer, dimension(:) :: &
@@ -490,6 +486,7 @@
       real(dp), pointer :: brunt_B(:) ! (at points)
          ! this is the Brassard et al B := -(chiY/chiT)*(dlnY/dlnP)
       real(dp), pointer :: unsmoothed_brunt_B(:) ! pre-smoothing
+      real(dp), pointer :: smoothed_brunt_B(:) ! with smoothing applied for gradL
          
          
       ! asteroseismology info
@@ -518,7 +515,6 @@
          real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
          real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
          real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
-         real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
 
@@ -1014,6 +1010,9 @@
          logical :: doing_rlo_wind
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
+
+         real(dp) :: crystal_core_boundary_mass_old
+         real(dp) :: phase_sep_mixing_mass
          
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
@@ -1105,6 +1104,7 @@
             total_nuclear_heating, &
             total_non_nuc_neu_cooling, &
             total_irradiation_heating, &
+            total_energy_from_phase_separation, &
             total_WD_sedimentation_heating, &
             total_energy_from_diffusion, &
             total_extra_heating, &

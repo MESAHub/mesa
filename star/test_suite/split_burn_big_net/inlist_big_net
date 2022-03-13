@@ -72,7 +72,7 @@
       photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10 
 
       x_integer_ctrl(1) = 1 ! Part number ! Set this to 0 to turn of test suite checks
 

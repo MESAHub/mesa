@@ -148,6 +148,8 @@ contains
 
     ln10_m = LOG(10._dp)
 
+    call precompute_some_zs()
+
   end subroutine math_init
 
   !****
@@ -351,5 +353,8 @@ contains
     atanpi_x = ATAN(x)/PI
 
   end function atanpi_
+
+  include 'precompute_zs.inc'
+
 
 end module math_lib

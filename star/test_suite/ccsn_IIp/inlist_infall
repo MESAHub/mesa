@@ -64,7 +64,7 @@
 
 ! mixing controls
   mixing_length_alpha = 1.9
-  MLT_option = 'TDC'
+  MLT_option = 'none'
   thermohaline_coeff = 0
   okay_to_reduce_gradT_excess = .false.
 
@@ -101,7 +101,7 @@
   convergence_ignore_equL_residuals = .true.
 
 ! output controls
-  terminal_interval = 5
+  terminal_interval = 10 
   write_header_frequency = 10
   terminal_show_age_units = 'seconds'
   photo_interval = 10

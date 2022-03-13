@@ -60,7 +60,7 @@
          ierr = 0
          call do_read_star_job('inlist', ierr) ! this does alloc_star
          ! and saves the id in id_from_read_star_job
-         if (ierr /= 0) stop 1
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
          id = id_from_read_star_job
          id_from_read_star_job = 0
@@ -69,7 +69,7 @@
          call star_setup(id, 'inlist', ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in star_setup'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          okay_to_restart = .true.
@@ -85,7 +85,7 @@
          call read_astero_search_controls(inlist_astero_fname, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in read_astero_search_controls'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          if (Y_depends_on_Z .and. vary_Y) then
@@ -132,14 +132,14 @@
             call write_astero_search_controls(save_controls_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in write_astero_search_controls'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
          end if
          
          call check_search_controls(ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in check_search_controls'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          nu_max_sun = s% nu_max_sun
@@ -147,7 +147,7 @@
          call init_obs_data(ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in init_obs_data'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          next_Y_to_try = -1
@@ -417,7 +417,7 @@
                next_my_param3_to_try = filedata(file_column_for_my_param3) 
                write(*,1) 'next_my_param3_to_try', next_my_param3_to_try
             end if
-            write(*,*)
+            write(*,'(A)')
             
             call do1_grid(ierr)
             if (ierr /= 0) then
@@ -501,7 +501,7 @@
          write(*,2) 'num_my_param1', num_my_param1
          write(*,2) 'num_my_param2', num_my_param2
          write(*,2) 'num_my_param3', num_my_param3
-         write(*,*)
+         write(*,'(A)')
          
          sample_number = 0
          just_counting = .false.
@@ -737,12 +737,12 @@
 
          call bobyqa_or_newuoa_fun(n,x,f)
 
-         write(*,*)
+         write(*,'(A)')
          ierr = 0
          call save_sample_results_to_file(-1,bobyqa_output_filename,ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
-            stop 'bobyqa_fun'
+            call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
          end if
          
       end subroutine bobyqa_fun
@@ -757,12 +757,12 @@
          
          call bobyqa_or_newuoa_fun(n,x,f)
 
-         write(*,*)
+         write(*,'(A)')
          ierr = 0
          call save_sample_results_to_file(-1,newuoa_output_filename,ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
-            stop 'newuoa_fun'
+            call mesa_error(__FILE__,__LINE__,'newuoa_fun')
          end if
          
       end subroutine newuoa_fun
@@ -829,7 +829,7 @@
          f = eval1(star_id, ierr)
          if (ierr /= 0) then
             write(*,*) 'got ierr from eval1'
-            stop 'bobyqa_fun'
+            call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
          end if
          if (sample_number == prev_sample_number) then
             if (sample_number <= 0) then ! failed on 1st try
@@ -842,12 +842,12 @@
          
          call save_best_for_sample(sample_number, 0)
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'current set of sample results'
          call show_all_sample_results(6,-1,ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in show_all_sample_results'
-            stop 'bobyqa_fun'
+            call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
          end if
          
          min_sample_chi2_so_far = minval(sample_chi2(1:sample_number))
@@ -876,8 +876,8 @@
          include 'formats'
          ierr = 0
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          if (vary_Y) then
             nvar = nvar+1; i_Y = nvar
@@ -1035,8 +1035,8 @@
          
          ierr = 0
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          if (vary_Y) then
             next_Y_to_try = simplex_param( &
@@ -1437,7 +1437,7 @@
             ierr = 0
             allocate(index(num_samples), stat=ierr)
             if (ierr /= 0) then
-               stop 'failed in allocate before calling qsort from show_all_sample_results'
+               call mesa_error(__FILE__,__LINE__,'failed in allocate before calling qsort from show_all_sample_results')
             end if
             call qsort(index, num_samples, sample_chi2)
             max_i = 0
@@ -1487,7 +1487,7 @@
                      simplex_inverse(sample_my_param3(i), first_my_param3, min_my_param3, max_my_param3)
                   write(*,3) 'my_param3', j, i, sample_my_param3(i)
                end if
-               write(*,*)
+               write(*,'(A)')
             end do
             
             deallocate(index)
@@ -1514,8 +1514,8 @@
                   write(*,'(i6)') i
                end if
             end do
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             num_samples = max_i
             
          end subroutine setup_simplex_and_f
@@ -1533,7 +1533,7 @@
             call alloc_sample_ptrs(ierr)
             if (ierr /= 0) then
                write(*,*) 'ERROR -- failed to allocate for samples'
-               stop 'save_best_for_sample'
+               call mesa_error(__FILE__,__LINE__,'save_best_for_sample')
                return
             end if
          end if
@@ -1651,7 +1651,7 @@
                   avg_model_number_top_samples*avg_model_number_top_samples/n)/(n-1)))
          avg_model_number_top_samples = avg_model_number_top_samples/n
          
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'n for averages', n
          write(*,1) 'avg_age_top_samples', avg_age_top_samples
          write(*,1) 'avg_age_sigma', avg_age_sigma
@@ -1661,8 +1661,8 @@
          write(*,1) 'model number limit', &
             avg_model_number_top_samples + &
                avg_model_number_sigma_limit*avg_model_number_sigma
-         write(*,*)
-         !stop 'set_sample_averages'
+         write(*,'(A)')
+         !call mesa_error(__FILE__,__LINE__,'set_sample_averages')
          
       end subroutine set_sample_averages
       

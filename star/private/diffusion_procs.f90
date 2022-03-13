@@ -85,7 +85,7 @@
                   bad_k = k
                   bad_X = X(j,k)
                   if (dbg) write(*,3) 'min_X_hard_limit', j, k, X(j,k), min_X_hard_limit
-                  if (dbg) stop 'fixup'
+                  if (dbg) call mesa_error(__FILE__,__LINE__,'fixup')
                   ierr = -1
                   return
                end if
@@ -129,7 +129,7 @@
 
          if (ierr /= 0) then
             if (dbg) write(*,2) 'failed in get1_dX_dm', bad_k
-            if (dbg) stop 'fixup'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'fixup')
             return
          end if
 
@@ -140,11 +140,11 @@
             xtotal_init, cell_dm, X, .false., ierr)
          if (ierr /= 0) then
             if (dbg) write(*,2) 'failed in redistribute_mass'
-            if (dbg) stop 'fixup'
+            if (dbg) call mesa_error(__FILE__,__LINE__,'fixup')
             return
          end if
 
-         if (dbg) stop 'fixup'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'fixup')
 
       end subroutine fixup
 
@@ -198,7 +198,7 @@
                      write(*,1) 'm0', m0
                      write(*,1) 'm1', m1
                      write(*,1) 'dm', dm
-                     stop 'fixup extremes'
+                     call mesa_error(__FILE__,__LINE__,'fixup extremes')
                   end if
                   mass(j,k1) = m1 - dm
                   sum_mass(k1) = sum(mass(1:nc,k1)) ! sum1 - dm
@@ -209,7 +209,7 @@
                      write(*,1) 'm0', m0
                      write(*,1) 'm1', m1
                      write(*,1) 'dm', dm
-                     stop 'fixup extremes'
+                     call mesa_error(__FILE__,__LINE__,'fixup extremes')
                   end if
                end if
             end do
@@ -218,12 +218,12 @@
          do k=nzlo,nzhi
             if (sum_mass(k) < 0d0) then
                write(*,2) 'sum_mass(k)', k, sum_mass(k)
-               stop 'fixup 3a'
+               call mesa_error(__FILE__,__LINE__,'fixup 3a')
             end if
             do j=1,nc
                if (mass(j,k) > sum_mass(k)) then
                   write(*,3) 'sum_mass(k)', j, k, mass(j,k), sum_mass(k)
-                  stop 'fixup 3b'
+                  call mesa_error(__FILE__,__LINE__,'fixup 3b')
                end if
             end do
          end do
@@ -298,7 +298,7 @@
                   do jj=k_lo,k_hi
                      write(*,3) 'mass', j, jj, mass(j,jj), mass(j,jj)/cell_dm(jj)
                   end do
-                  stop 'fixup'
+                  call mesa_error(__FILE__,__LINE__,'fixup')
                end if
 
             end do fix1
@@ -309,7 +309,7 @@
             do j=1,nc
                if (mass(j,k) < 0d0) then
                   write(*,3) 'mass(j,k)', j, k, mass(j,k)
-                  stop 'fix_negative_masses'
+                  call mesa_error(__FILE__,__LINE__,'fix_negative_masses')
                end if
             end do
          end do
@@ -352,7 +352,7 @@
                if (dbg) write(*,2) 'X_total_atol', j, X_total_atol
                if (dbg) write(*,2) 'X_total_rtol', j, X_total_rtol
                if (dbg) write(*,2) 'frac', j, frac
-               if (dbg) stop 'fixup 1'
+               if (dbg) call mesa_error(__FILE__,__LINE__,'fixup 1')
                bad_j = j
                bad_Xsum = err
                ierr = -1
@@ -367,7 +367,7 @@
             sum_mass(k) = sum(mass(1:nc,k))
             if (sum_mass(k) < 0d0) then
                write(*,2) 'sum_mass(k)', k, sum_mass(k)
-               stop 'fixup 2'
+               call mesa_error(__FILE__,__LINE__,'fixup 2')
             end if
          end do
 
@@ -427,7 +427,7 @@
                      mass(j,k) = m_00 + dm
                      if (mass(j,k) < 0d0) then
                         write(*,3) 'mass00', j, k, mass(j,k), m_00, dm
-                        stop 'fixup 5'
+                        call mesa_error(__FILE__,__LINE__,'fixup 5')
                      end if
                      sum_00 = sum(mass(1:nc,k)) ! sum_00 + dm
                      if (sum_00 < 0d0 .or. is_bad_num(sum_00)) then
@@ -435,16 +435,16 @@
                         write(*,3) 'dm', j, k, dm
                         write(*,3) 'sum_00 - dm', j, k, sum_00 - dm
                         write(*,3) 'sum_mass(k)', j, k, sum_mass(k)
-                        write(*,*)
+                        write(*,'(A)')
                         write(*,3) 'sum_m1', j, k, sum_m1
                         write(*,3) 'sum_p1', j, k, sum_p1
-                        write(*,*)
+                        write(*,'(A)')
                         write(*,3) 'm_m1', j, k, m_m1
                         write(*,3) 'm_00', j, k, m_00
                         write(*,3) 'm_p1', j, k, m_p1
-                        write(*,*)
+                        write(*,'(A)')
                         write(*,3) 'xavg', j, k, xavg
-                        write(*,*)
+                        write(*,'(A)')
 
                         call mesa_error(__FILE__,__LINE__,'fixup')
                      end if
@@ -464,7 +464,7 @@
                         write(*,3) 'dm/(m_m1 + m_p1)', j, k, dm/(m_m1 + m_p1)
                         write(*,3) 'm_m1/(m_m1 + m_p1)', j, k, m_m1/(m_m1 + m_p1)
                         write(*,3) 'm_m1 - dm_m1', j, k, m_m1 - dm_m1
-                        stop 'fixup 6'
+                        call mesa_error(__FILE__,__LINE__,'fixup 6')
                      end if
                      sum_m1 = sum(mass(1:nc,k-1)) ! sum_m1 - dm_m1
                      sum_mass(k-1) = sum_m1
@@ -488,7 +488,7 @@
                         write(*,3) 'dm/(m_m1 + m_p1)', j, k, dm/(m_m1 + m_p1)
                         write(*,3) 'm_p1/(m_m1 + m_p1)', j, k, m_p1/(m_m1 + m_p1)
                         write(*,3) 'm_p1 - dm_p1', j, k, m_p1 - dm_p1
-                        stop 'fixup 7'
+                        call mesa_error(__FILE__,__LINE__,'fixup 7')
                      end if
                      sum_p1 = sum(mass(1:nc,k+1)) ! sum_p1 - dm_p1
                      sum_mass(k+1) = sum_p1
@@ -500,7 +500,7 @@
                      if (abs(xavg - sum(mass(j,k-1:k+1))/sum(sum_mass(k-1:k+1))) > 1d-12*xavg) then
                         write(*,3) 'bad new xavg', j, k, xavg, &
                            sum(mass(j,k-1:k+1))/sum(sum_mass(k-1:k+1))
-                        stop 'fixup 8'
+                        call mesa_error(__FILE__,__LINE__,'fixup 8')
                      end if
 
                   end do
@@ -516,7 +516,7 @@
          do k=nzlo,nzhi
             if (sum_mass(k) < 0d0) then
                write(*,2) 'sum_mass(k)', k, sum_mass(k)
-               stop 'fixup 3'
+               call mesa_error(__FILE__,__LINE__,'fixup 3')
             end if
          end do
 
@@ -644,7 +644,7 @@
          else
 
             write(*,2) 'k bad', k
-            stop 'get1_dX_dm'
+            call mesa_error(__FILE__,__LINE__,'get1_dX_dm')
 
          end if
 
@@ -680,7 +680,7 @@
                      dm_p1 = sum_mass(k+1)
                      write(*,1) 'xp1', mass(j,k+1)/dm_p1
                   end if
-                  write(*,*)
+                  write(*,'(A)')
                end if
                dX_dm(1:nc,k) = 0d0
                exit
@@ -738,12 +738,12 @@
                if (dbg) write(*,4) 'remaining_needed_mass/cell_dm_k', &
                   i, k, k_source, remaining_needed_mass/cell_dm_k, &
                   remaining_needed_mass, cell_dm_k, remaining_source_mass
-               if (is_bad_num(remaining_needed_mass)) stop 'redistribute_mass'
+               if (is_bad_num(remaining_needed_mass)) call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                if (is_bad_num(remaining_source_mass)) then
                   write(*,4) 'remaining_source_mass', &
                      i, k, k_source, remaining_source_mass, &
                      remaining_needed_mass, cell_dm_k
-                  stop 'redistribute_mass'
+                  call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                end if
 
                if (remaining_needed_mass <= remaining_source_mass) then
@@ -758,7 +758,7 @@
                      write(*,2) 'diff_dm', k, diff_dm
                      write(*,2) 'remaining_source_mass', k, remaining_source_mass
                      write(*,2) 'remaining_needed_mass', k, remaining_needed_mass
-                     stop 'redistribute_mass'
+                     call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                   end if
                   total_moved = total_moved + remaining_needed_mass
                   if (dbg) then
@@ -774,8 +774,8 @@
                      dm = integrate_mass(j,dm0,dm1,diff_dm)
                      if (dm < 0d0) then
                         write(*,3) 'dm', j, k, dm
-                        write(*,*)
-                        stop 'redistribute_mass'
+                        write(*,'(A)')
+                        call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                      end if
                      X_new(j,k) = X_new(j,k) + dm/cell_dm_k
                      if (dbg .and. (X_new(j,k) > 1d0 .or. X_new(j,k) < 0d0)) then
@@ -789,8 +789,8 @@
                         write(*,3) 'dm0', j, k, dm0
                         write(*,3) 'dm1', j, k, dm1
                         write(*,3) 'remaining_source_mass', j, k, remaining_source_mass
-                        write(*,*)
-                        stop 'redistribute_mass'
+                        write(*,'(A)')
+                        call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                      end if
                      remaining_needed_mass = remaining_needed_mass - dm
                   end do
@@ -817,12 +817,12 @@
                      write(*,1) 'remaining_source_mass', remaining_source_mass
                      write(*,1) 'remaining_needed_mass', remaining_needed_mass
                      write(*,1) 'cell_dm_k', cell_dm_k
-                     stop 'redistribute_mass'
+                     call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                   end if
                end do
                if (is_bad_num(remaining_needed_mass)) then
                   write(*,4) 'remaining_needed_mass', i, k, k_source, remaining_needed_mass
-                  stop 'redistribute_mass'
+                  call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                end if
                total_moved = total_moved + remaining_source_mass
                remaining_needed_mass = remaining_needed_mass - remaining_source_mass
@@ -830,7 +830,7 @@
                   write(*,2) 'remaining_source_mass', k, remaining_source_mass
                   write(*,2) 'remaining_needed_mass', k, remaining_needed_mass
                   write(*,2) 'cell_dm_k', k, cell_dm_k
-                  stop 'redistribute_mass'
+                  call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                end if
 
                ! go to next source cell
@@ -851,7 +851,7 @@
 
                   write(*,4) 'source_cell_mass', &
                      i, k, k_source, remaining_source_mass, source_cell_mass
-                  stop 'redistribute_mass'
+                  call mesa_error(__FILE__,__LINE__,'redistribute_mass')
                end if
 
             end do fill_loop
@@ -872,7 +872,7 @@
                   remaining_needed_mass
                write(*,1) 'source_cell_mass', source_cell_mass
                write(*,1) 'remaining_source_mass', remaining_source_mass
-               stop 'redistribute_mass'
+               call mesa_error(__FILE__,__LINE__,'redistribute_mass')
             end if
 
             sumX = sum(X_new(1:nc,k))
@@ -885,7 +885,7 @@
                write(*,2) 'nzlo', nzlo
                write(*,2) 'nzhi', nzhi
                write(*,2) 'total_num_iters', total_num_iters
-               stop 'redistribute_mass'
+               call mesa_error(__FILE__,__LINE__,'redistribute_mass')
             end if
 
             do j=1,nc
@@ -907,8 +907,8 @@
             write(*,2) 'nzlo', nzlo
             write(*,2) 'nzhi', nzhi
             write(*,2) 'nz', nz
-            write(*,*)
-            stop 'redistribute_mass'
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'redistribute_mass')
          end if
 
          ! check cell sums
@@ -920,7 +920,7 @@
                okay = .false.
             end if
          end do
-         if (.not. okay) stop 'redistribute_mass'
+         if (.not. okay) call mesa_error(__FILE__,__LINE__,'redistribute_mass')
 
          ! recheck conservation
          mtotal = sum(cell_dm(nzlo:nzhi))
@@ -970,7 +970,7 @@
                write(*,1) 'x1', x1
                write(*,1) 'dm0', dm0
                write(*,1) 'dm1', dm1
-               stop 'integrate_mass'
+               call mesa_error(__FILE__,__LINE__,'integrate_mass')
             end if
             xavg = min(1d0, max(0d0, 0.5d0*(x0 + x1)))
             integrate_mass = xavg*diff
@@ -1262,7 +1262,7 @@
          if (dbg) write(*,2) 'nzlo', nzlo
          if (dbg) write(*,2) 'n', n
          if (dbg) write(*,2) 'nptot*ipe*4*4*n', nptot*ipe*4*4*n
-         if (nptot*ipe*4*4*n < 0) stop 'integer overflow for array size in calc_g_rad'
+         if (nptot*ipe*4*4*n < 0) call mesa_error(__FILE__,__LINE__,'integer overflow for array size in calc_g_rad')
          allocate( &
             umesh1(nptot*n), semesh1(nptot*n), ff1(nptot*ipe*4*4*n), &
             ta1(nptot*nrad*4*4*n), rs1(nptot*4*4*n), &
@@ -1368,7 +1368,7 @@
                fac(i) = op_mono_factors(j)
             else
                write(*,*) 'bad class_chem_id? in set1_g_rad'
-               stop 'set1_g_rad'
+               call mesa_error(__FILE__,__LINE__,'set1_g_rad')
                fac(i) = 1
             end if
          end do
@@ -1404,7 +1404,7 @@
             return
          end if
 
-         if (ierr /= 0) stop 'set1_g_rad'  !return
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'set1_g_rad')  !return
 
          do ii = 1, kk
             do i = 1, nc
@@ -1463,14 +1463,14 @@
                i = class(j)
                if (X_init(i,k) <= 0 .or. is_bad_num(X_init(i,k))) then
                   write(*,3) 'X_init(i,k)', i, k, X_init(i,k)
-                  stop 'set_new_xa'
+                  call mesa_error(__FILE__,__LINE__,'set_new_xa')
                end if
                xa(j,k) = xa(j,k)*X(i,k)/X_init(i,k)
             end do
             tmp = sum(xa(1:species,k))
             if (tmp <= 0 .or. is_bad_num(tmp)) then
                write(*,2) 'tmp', k, tmp
-               stop 'set_new_xa'
+               call mesa_error(__FILE__,__LINE__,'set_new_xa')
             end if
             do j=1,species
                xa(j,k) = xa(j,k)/tmp

@@ -281,7 +281,7 @@
     D_visc_factor, D_DSI_factor, D_SH_factor, D_SSI_factor, D_ES_factor, D_GSF_factor, D_ST_factor, &
     am_nu_non_rotation_factor, skip_rotation_in_convection_zones, am_nu_DSI_factor, am_nu_SH_factor,&
     am_nu_SSI_factor, am_nu_ES_factor, am_nu_GSF_factor, am_nu_ST_factor, am_nu_visc_factor, smooth_am_nu_rot, &
-    am_nu_omega_rot_factor, am_nu_omega_non_rot_factor, am_nu_j_rot_factor, am_nu_j_non_rot_factor, &
+    ST_angsml, ST_angsmt, am_nu_omega_rot_factor, am_nu_omega_non_rot_factor, am_nu_j_rot_factor, am_nu_j_non_rot_factor, &
     smooth_nu_ST, smooth_D_ST, smooth_D_SH, smooth_D_DSI, smooth_D_ES, smooth_D_SSI, smooth_D_GSF, smooth_D_omega, &
     do_adjust_J_lost, premix_omega, angular_momentum_error_warn, angular_momentum_error_retry, &
     simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
@@ -321,6 +321,12 @@
     diffusion_class_typical_charge, diffusion_class_factor, &
     diffusion_use_isolve, diffusion_rtol_for_isolve, diffusion_atol_for_isolve, &
     diffusion_maxsteps_for_isolve, diffusion_isolve_solver, &
+
+    ! WD phase separation
+    do_phase_separation, &
+    do_phase_separation_heating, &
+    phase_separation_mixing_use_brunt, &
+    phase_separation_no_diffusion, &
     
     ! eos controls
     fix_d_eos_dxa_partials, &
@@ -350,12 +356,11 @@
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
-    conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
+    include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
-    min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, steps_before_use_TDC, &
-    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
-    conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, compare_TDC_to_MLT, &
+    steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
+    retry_for_v_above_clight, &
 
     ! hydro solver
     use_gold2_tolerances, gold2_solver_iters_timestep_limit, steps_before_use_gold2_tolerances, &
@@ -616,8 +621,6 @@
 
  call read_controls_file(s, filename, 1, ierr)
  call check_controls(s, ierr)
- call mkdir(s% photo_directory)
- call mkdir(s% log_directory)
 
  end subroutine read_controls
 
@@ -629,10 +632,10 @@
     ierr = 0
 
     if (.not. (trim(s% energy_eqn_option) == 'dedt' .or. trim(s% energy_eqn_option) == 'eps_grav')) then
-       write(*,*)
+       write(*,'(A)')
        write(*,*) "Invalid choice for energy_eqn_option"
        write(*,*) "Available options are 'dedt' or 'eps_grav'"
-       write(*,*)
+       write(*,'(A)')
        ierr = -1
        return
     end if
@@ -1135,36 +1138,36 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  
  s% limit_overshoot_Hp_using_size_of_convection_zone = limit_overshoot_Hp_using_size_of_convection_zone
 
- s%predictive_mix = predictive_mix
- s%predictive_superad_thresh = predictive_superad_thresh
- s%predictive_avoid_reversal = predictive_avoid_reversal
- s%predictive_limit_ingestion = predictive_limit_ingestion
- s%predictive_ingestion_factor = predictive_ingestion_factor
- s%predictive_zone_type = predictive_zone_type
- s%predictive_zone_loc = predictive_zone_loc
- s%predictive_bdy_loc = predictive_bdy_loc
- s%predictive_bdy_q_min = predictive_bdy_q_min
- s%predictive_bdy_q_max = predictive_bdy_q_max
+ s% predictive_mix = predictive_mix
+ s% predictive_superad_thresh = predictive_superad_thresh
+ s% predictive_avoid_reversal = predictive_avoid_reversal
+ s% predictive_limit_ingestion = predictive_limit_ingestion
+ s% predictive_ingestion_factor = predictive_ingestion_factor
+ s% predictive_zone_type = predictive_zone_type
+ s% predictive_zone_loc = predictive_zone_loc
+ s% predictive_bdy_loc = predictive_bdy_loc
+ s% predictive_bdy_q_min = predictive_bdy_q_min
+ s% predictive_bdy_q_max = predictive_bdy_q_max
 
- s%do_conv_premix = do_conv_premix
- s%conv_premix_avoid_increase = conv_premix_avoid_increase
- s%conv_premix_time_factor = conv_premix_time_factor
- s%conv_premix_fix_pgas = conv_premix_fix_pgas
- s%conv_premix_dump_snapshots = conv_premix_dump_snapshots
- s%do_premix_heating = do_premix_heating
+ s% do_conv_premix = do_conv_premix
+ s% conv_premix_avoid_increase = conv_premix_avoid_increase
+ s% conv_premix_time_factor = conv_premix_time_factor
+ s% conv_premix_fix_pgas = conv_premix_fix_pgas
+ s% conv_premix_dump_snapshots = conv_premix_dump_snapshots
+ s% do_premix_heating = do_premix_heating
 
- s%overshoot_f = overshoot_f
- s%overshoot_f0 = overshoot_f0
- s%overshoot_D0 = overshoot_D0
- s%overshoot_Delta0 = overshoot_Delta0
- s%overshoot_mass_full_on = overshoot_mass_full_on
- s%overshoot_mass_full_off = overshoot_mass_full_off
- s%overshoot_scheme = overshoot_scheme
- s%overshoot_zone_type = overshoot_zone_type
- s%overshoot_zone_loc = overshoot_zone_loc
- s%overshoot_bdy_loc = overshoot_bdy_loc
- s%overshoot_D_min = overshoot_D_min
- s%overshoot_brunt_B_max = overshoot_brunt_B_max
+ s% overshoot_f = overshoot_f
+ s% overshoot_f0 = overshoot_f0
+ s% overshoot_D0 = overshoot_D0
+ s% overshoot_Delta0 = overshoot_Delta0
+ s% overshoot_mass_full_on = overshoot_mass_full_on
+ s% overshoot_mass_full_off = overshoot_mass_full_off
+ s% overshoot_scheme = overshoot_scheme
+ s% overshoot_zone_type = overshoot_zone_type
+ s% overshoot_zone_loc = overshoot_zone_loc
+ s% overshoot_bdy_loc = overshoot_bdy_loc
+ s% overshoot_D_min = overshoot_D_min
+ s% overshoot_brunt_B_max = overshoot_brunt_B_max
 
  s% max_conv_vel_div_csound = max_conv_vel_div_csound
  s% max_v_for_convection = max_v_for_convection
@@ -1205,7 +1208,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_alfat = RSP_alfat
    s% RSP_alfas = RSP_alfas
    s% RSP_alfac = RSP_alfac
-   s% RSP_alfad =  RSP_alfad
+   s% RSP_alfad = RSP_alfad
    s% RSP_gammar = RSP_gammar
    s% RSP_efl0 = RSP_efl0
    s% RSP_min_tau_for_turbulent_flux = RSP_min_tau_for_turbulent_flux
@@ -1696,6 +1699,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% smooth_D_ES = smooth_D_ES
  s% smooth_D_omega = smooth_D_omega
  s% smooth_am_nu_rot = smooth_am_nu_rot
+ s% ST_angsmt = ST_angsmt
+ s% ST_angsml = ST_angsml
 
  s% simple_i_rot_flag = simple_i_rot_flag
  s% do_adjust_J_lost = do_adjust_J_lost
@@ -1816,6 +1821,12 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_maxsteps_for_isolve = diffusion_maxsteps_for_isolve
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
+ ! WD phase separation
+ s% do_phase_separation = do_phase_separation
+ s% do_phase_separation_heating = do_phase_separation_heating
+ s% phase_separation_mixing_use_brunt = phase_separation_mixing_use_brunt
+ s% phase_separation_no_diffusion = phase_separation_no_diffusion
+
  ! eos controls
  s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
 
@@ -1894,20 +1905,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RTI_m_full_boost = RTI_m_full_boost
  s% RTI_m_no_boost = RTI_m_no_boost
 
- s% conv_vel_D = conv_vel_D
- s% conv_vel_siglimit = conv_vel_siglimit
- s% conv_vel_v0 = conv_vel_v0
- s% min_q_for_normal_mlt_gradT_full_off = min_q_for_normal_mlt_gradT_full_off
- s% max_q_for_normal_mlt_gradT_full_on = max_q_for_normal_mlt_gradT_full_on
- s% conv_vel_ignore_thermohaline = conv_vel_ignore_thermohaline
- s% conv_vel_ignore_semiconvection = conv_vel_ignore_semiconvection
- s% conv_vel_fully_lagrangian = conv_vel_fully_lagrangian
- s% conv_vel_include_homologous_term = conv_vel_include_homologous_term
- s% conv_vel_use_mlt_vc_start = conv_vel_use_mlt_vc_start
-
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
  s% velocity_q_upper_bound = velocity_q_upper_bound
+
+ s% retry_for_v_above_clight = retry_for_v_above_clight
 
  ! solvers
 
@@ -2476,6 +2478,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% diffusion_dump_call_number = diffusion_dump_call_number
 
+ s% surface_accel_div_grav_limit = surface_accel_div_grav_limit
+ s% steps_before_start_stress_test = steps_before_start_stress_test
+ s% stress_test_relax = stress_test_relax
 
  end subroutine store_controls
 
@@ -2817,36 +2822,36 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  
  limit_overshoot_Hp_using_size_of_convection_zone = s% limit_overshoot_Hp_using_size_of_convection_zone
 
- predictive_mix = s%predictive_mix
- predictive_superad_thresh = s%predictive_superad_thresh
- predictive_avoid_reversal = s%predictive_avoid_reversal
- predictive_limit_ingestion = s%predictive_limit_ingestion
- predictive_ingestion_factor = s%predictive_ingestion_factor
- predictive_zone_type = s%predictive_zone_type
- predictive_zone_loc = s%predictive_zone_loc
- predictive_bdy_loc = s%predictive_bdy_loc
- predictive_bdy_q_min = s%predictive_bdy_q_min
- predictive_bdy_q_max = s%predictive_bdy_q_max
+ predictive_mix = s% predictive_mix
+ predictive_superad_thresh = s% predictive_superad_thresh
+ predictive_avoid_reversal = s% predictive_avoid_reversal
+ predictive_limit_ingestion = s% predictive_limit_ingestion
+ predictive_ingestion_factor = s% predictive_ingestion_factor
+ predictive_zone_type = s% predictive_zone_type
+ predictive_zone_loc = s% predictive_zone_loc
+ predictive_bdy_loc = s% predictive_bdy_loc
+ predictive_bdy_q_min = s% predictive_bdy_q_min
+ predictive_bdy_q_max = s% predictive_bdy_q_max
 
- do_conv_premix = s%do_conv_premix
- conv_premix_avoid_increase = s%conv_premix_avoid_increase
- conv_premix_time_factor = s%conv_premix_time_factor
- conv_premix_fix_pgas = s%conv_premix_fix_pgas
- conv_premix_dump_snapshots = s%conv_premix_dump_snapshots
- do_premix_heating = s%do_premix_heating
+ do_conv_premix = s% do_conv_premix
+ conv_premix_avoid_increase = s% conv_premix_avoid_increase
+ conv_premix_time_factor = s% conv_premix_time_factor
+ conv_premix_fix_pgas = s% conv_premix_fix_pgas
+ conv_premix_dump_snapshots = s% conv_premix_dump_snapshots
+ do_premix_heating = s% do_premix_heating
 
- overshoot_f = s%overshoot_f
- overshoot_f0 = s%overshoot_f0
- overshoot_D0 = s%overshoot_D0
- overshoot_Delta0 = s%overshoot_Delta0
- overshoot_mass_full_on = s%overshoot_mass_full_on
- overshoot_mass_full_off = s%overshoot_mass_full_off
- overshoot_scheme = s%overshoot_scheme
- overshoot_zone_type = s%overshoot_zone_type
- overshoot_zone_loc = s%overshoot_zone_loc
- overshoot_bdy_loc = s%overshoot_bdy_loc
- overshoot_D_min = s%overshoot_D_min
- overshoot_brunt_B_max = s%overshoot_brunt_B_max
+ overshoot_f = s% overshoot_f
+ overshoot_f0 = s% overshoot_f0
+ overshoot_D0 = s% overshoot_D0
+ overshoot_Delta0 = s% overshoot_Delta0
+ overshoot_mass_full_on = s% overshoot_mass_full_on
+ overshoot_mass_full_off = s% overshoot_mass_full_off
+ overshoot_scheme = s% overshoot_scheme
+ overshoot_zone_type = s% overshoot_zone_type
+ overshoot_zone_loc = s% overshoot_zone_loc
+ overshoot_bdy_loc = s% overshoot_bdy_loc
+ overshoot_D_min = s% overshoot_D_min
+ overshoot_brunt_B_max = s% overshoot_brunt_B_max
 
  max_conv_vel_div_csound = s% max_conv_vel_div_csound
  max_v_for_convection = s% max_v_for_convection
@@ -3370,6 +3375,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  smooth_D_ES = s% smooth_D_ES
  smooth_D_omega = s% smooth_D_omega
  smooth_am_nu_rot = s% smooth_am_nu_rot
+ ST_angsmt = s% ST_angsmt
+ ST_angsml = s% ST_angsml
 
  simple_i_rot_flag = s% simple_i_rot_flag
  do_adjust_J_lost = s% do_adjust_J_lost
@@ -3385,7 +3392,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  implicit_mdot_boost = s% implicit_mdot_boost
  min_years_dt_for_redo_mdot = s% min_years_dt_for_redo_mdot
  surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
- surf_omega_div_omega_crit_tol = S% surf_omega_div_omega_crit_tol
+ surf_omega_div_omega_crit_tol = s% surf_omega_div_omega_crit_tol
  w_div_wcrit_max = s% w_div_wcrit_max
  w_div_wcrit_max2 = s% w_div_wcrit_max2
  fp_min = s% fp_min
@@ -3435,6 +3442,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_min_T_at_surface = s% diffusion_min_T_at_surface
  diffusion_min_dq_ratio_at_surface = s% diffusion_min_dq_ratio_at_surface
  diffusion_dt_limit = s% diffusion_dt_limit
+
+ do_phase_separation = s% do_phase_separation
+ do_phase_separation_heating = s% do_phase_separation_heating
+ phase_separation_mixing_use_brunt = s% phase_separation_mixing_use_brunt
+ phase_separation_no_diffusion = s% phase_separation_no_diffusion
 
  diffusion_min_X_hard_limit = s% diffusion_min_X_hard_limit
  diffusion_X_total_atol = s% diffusion_X_total_atol
@@ -3566,20 +3578,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  RTI_m_full_boost = s% RTI_m_full_boost
  RTI_m_no_boost = s% RTI_m_no_boost
 
- conv_vel_D = s% conv_vel_D
- conv_vel_siglimit = s% conv_vel_siglimit
- conv_vel_v0 = s% conv_vel_v0
- min_q_for_normal_mlt_gradT_full_off = s% min_q_for_normal_mlt_gradT_full_off
- max_q_for_normal_mlt_gradT_full_on = s% max_q_for_normal_mlt_gradT_full_on
- conv_vel_ignore_thermohaline = s% conv_vel_ignore_thermohaline
- conv_vel_ignore_semiconvection = s% conv_vel_ignore_semiconvection
- conv_vel_fully_lagrangian = s% conv_vel_fully_lagrangian
- conv_vel_include_homologous_term = s% conv_vel_include_homologous_term
- conv_vel_use_mlt_vc_start = s% conv_vel_use_mlt_vc_start
-
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
+
+ retry_for_v_above_clight = s% retry_for_v_above_clight
 
  ! solvers
 
@@ -3657,9 +3660,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  solver_itermin = s% solver_itermin
  solver_itermin_until_reduce_min_corr_coeff = s% solver_itermin_until_reduce_min_corr_coeff
  solver_reduced_min_corr_coeff = s% solver_reduced_min_corr_coeff
+ do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
  scale_max_correction_for_negative_surf_lum = s% scale_max_correction_for_negative_surf_lum
  max_frac_for_negative_surf_lum = s% max_frac_for_negative_surf_lum
- do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
  hydro_mtx_max_allowed_abs_dlogT = s% hydro_mtx_max_allowed_abs_dlogT
  hydro_mtx_max_allowed_abs_dlogRho = s% hydro_mtx_max_allowed_abs_dlogRho
  min_logT_for_hydro_mtx_max_allowed = s% min_logT_for_hydro_mtx_max_allowed
@@ -4148,6 +4151,17 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
 
  diffusion_dump_call_number = s% diffusion_dump_call_number
 
+ surface_accel_div_grav_limit = s% surface_accel_div_grav_limit
+ gradT_excess_age_fraction = s% gradT_excess_age_fraction
+ gradT_excess_max_change = s% gradT_excess_max_change
+ hot_wind_scheme = s% hot_wind_scheme
+ cool_wind_full_on_T = s% cool_wind_full_on_T
+ hot_wind_full_on_T = s% hot_wind_full_on_T
+ num_cells_for_smooth_brunt_B = s% num_cells_for_smooth_brunt_B
+ steps_before_start_stress_test = s% steps_before_start_stress_test
+ stress_test_relax = s% stress_test_relax
+ 
+
 
  end subroutine set_controls_for_writing
 
@@ -4158,7 +4172,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
       character(len=*), intent(out) :: val
       integer, intent(out) :: ierr
 
-      character(len(name)) :: upper_name
+      character(len(name)+1) :: upper_name
       character(len=512) :: str
       integer :: iounit,iostat,ind,i
 
@@ -4173,14 +4187,14 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
       rewind(iounit)
 
       ! Namelists get written in captials
-      upper_name = StrUpCase(name)
+      upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist
       do 
          read(iounit,'(A)',iostat=iostat) str
-         ind = index(str,trim(upper_name))
+         ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
             do i=1,len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do

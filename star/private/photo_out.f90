@@ -61,7 +61,7 @@
             s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
-            s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
+            s% RTI_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% have_mlt_vc, s% species, s% num_reactions, &
             s% model_number, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
@@ -75,14 +75,17 @@
             s% astero_revised_max_yr_dt, &
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
-            s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor
+            s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor, &
+            s% crystal_core_boundary_mass
 
          write(iounit) s% net_name
 
          call write_part_number(iounit)
          write(iounit) &
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
-            s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz), s% conv_vel(1:nz)
+            s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz), s% conv_vel(1:nz), &
+            s% D_ST_start(1:nz), s% nu_ST_start(1:nz), & ! needed for ST time smoothing
+            s% have_ST_start_info
 
          call write_part_number(iounit)
          write(iounit) &
@@ -91,10 +94,10 @@
 
          write(iounit) &
             s% i_lnd, s% i_lnT, s% i_lnR, s% i_lum, s% i_Et_RSP, s% i_erad_RSP, s% i_Fr_RSP, &
-            s% i_v, s% i_u, s% i_alpha_RTI, s% i_ln_cvpv0, s% i_w, s% i_Hp, s% i_w_div_wc, s% i_j_rot, &
+            s% i_v, s% i_u, s% i_alpha_RTI, s% i_w, s% i_Hp, s% i_w_div_wc, s% i_j_rot, &
             s% i_dv_dt, s% i_equL, s% i_dlnd_dt, s% i_dlnE_dt, &
             s% i_dEt_RSP_dt, s% i_derad_RSP_dt, s% i_dFr_RSP_dt, s% i_du_dt, s% i_dlnR_dt, &
-            s% i_dln_cvpv0_dt, s% i_dalpha_RTI_dt, s% i_detrb_dt, s% i_equ_Hp
+            s% i_dalpha_RTI_dt, s% i_detrb_dt, s% i_equ_Hp
 
          write(iounit) &
             s% model_controls_filename, s% model_data_filename, &
@@ -120,7 +123,7 @@
             s% total_steps_finished, s% total_relax_steps_finished, &
             s% num_hydro_merges, s% num_hydro_splits, s% num_solver_setvars, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
-            s% gradT_excess_alpha, s% Teff, s% mstar_dot, &
+            s% gradT_excess_alpha, s% gradT_excess_alpha_old, s% Teff, s% mstar_dot, &
             s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             s% why_Tlim, s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
             s% timestep_hold, s% model_number_for_last_retry, s% model_number_for_last_retry_old, &

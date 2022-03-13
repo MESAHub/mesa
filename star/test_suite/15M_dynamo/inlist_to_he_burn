@@ -48,18 +48,25 @@
 
 &controls
 
-   ! stopping condition
+! stopping condition
       power_he_burn_upper_limit = 10d0
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 500
+! limit max_model_number as part of test_suite
+      max_model_number = 5000
 
-   ! timestep limits
-      delta_lgRho_cntr_limit = 0.01
-      delta_lgRho_cntr_hard_limit = 0.02
 
-      delta_lgT_cntr_limit = 0.01
-      delta_lgT_cntr_hard_limit = 0.02
+! time resolution
+
+      dX_nuc_drop_max_A_limit = 52
+      dX_nuc_drop_min_X_limit = 1d-4
+      dX_nuc_drop_limit = 5d-3
+      dX_nuc_drop_hard_limit = 1d99
+
+      delta_lgRho_cntr_limit = 0.001       ! default 0.05d0   old 0.01
+      delta_lgRho_cntr_hard_limit = 0.01   ! default -1       old 0.02
+
+      delta_lgT_cntr_limit = 0.001         ! default 0.01d0    old 0.01
+      delta_lgT_cntr_hard_limit = 0.01     ! default -1        old 0.02
 
       delta_lgTeff_limit = 0.01
       delta_lgTeff_hard_limit = 0.02
@@ -75,6 +82,7 @@
 
       delta_lgL_nuc_limit = 0.1
       delta_lgL_nuc_hard_limit = 0.2
+
 
 / ! end of controls namelist
 

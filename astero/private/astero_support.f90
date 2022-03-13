@@ -29,6 +29,7 @@
       use const_def
       use math_lib
       use utils_lib
+      use auto_diff
       
       implicit none
 
@@ -84,10 +85,10 @@
          
             if (.not. gyre_is_enabled) then
                ierr = -1
-               write(*,*)
+               write(*,'(A)')
                write(*,'(a)') 'gyre is not currently enabled in your configuration of mesa.'
                write(*,'(a)') 'check that your utils/makefile_header has USE_GYRE = YES'
-               write(*,*)
+               write(*,'(A)')
                return
             end if
 
@@ -97,7 +98,7 @@
             call do_gyre_get_modes(s, l, store_model, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in do_gyre_get_modes'
-               stop 'get_one_el_info'
+               call mesa_error(__FILE__,__LINE__,'get_one_el_info')
             end if
          
          else if (code == 'adipls') then 
@@ -130,7 +131,7 @@
                  do_redistribute_mesh, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in run_adipls'
-               stop 'get_one_el_info'
+               call mesa_error(__FILE__,__LINE__,'get_one_el_info')
             end if
             
          else
@@ -144,7 +145,7 @@
          ! sort results by increasing frequency
          allocate(index(num_results), stat=ierr)
          if (ierr /= 0) then
-            stop 'failed in allocate before calling qsort'
+            call mesa_error(__FILE__,__LINE__,'failed in allocate before calling qsort')
          end if
          call qsort(index, num_results, cyclic_freq)
 
@@ -161,23 +162,13 @@
             model_freq_alt_down(0,:) = model_freq(0,:)
             model_inertia_alt_down(0,:) = model_inertia(0,:)
             model_order_alt_down(0,:) = model_order(0,:)
-         else if (l == 1) then
-            call set_to_closest(freq_target(1,:), &
-               model_freq(1,:), model_freq_alt_up(1,:), model_freq_alt_down(1,:), &
-               model_inertia(1,:), model_inertia_alt_up(1,:), model_inertia_alt_down(1,:), &
-               model_order(1,:), model_order_alt_up(1,:), model_order_alt_down(1,:), ierr)
-         else if (l == 2) then
-            call set_to_closest(freq_target(2,:), &
-               model_freq(2,:), model_freq_alt_up(2,:), model_freq_alt_down(2,:), &
-               model_inertia(2,:), model_inertia_alt_up(2,:), model_inertia_alt_down(2,:), &
-               model_order(2,:), model_order_alt_up(2,:), model_order_alt_down(2,:), ierr)
-         else if (l == 3) then
-            call set_to_closest(freq_target(3,:), &
-               model_freq(3,:), model_freq_alt_up(3,:), model_freq_alt_down(3,:), &
-               model_inertia(3,:), model_inertia_alt_up(3,:), model_inertia_alt_down(3,:), &
-               model_order(3,:), model_order_alt_up(3,:), model_order_alt_down(3,:), ierr)
+         else if (0 < l .and. l <= 3) then
+            call set_to_closest(freq_target(l,:), &
+               model_freq(l,:), model_freq_alt_up(l,:), model_freq_alt_down(l,:), &
+               model_inertia(l,:), model_inertia_alt_up(l,:), model_inertia_alt_down(l,:), &
+               model_order(l,:), model_order_alt_up(l,:), model_order_alt_down(l,:), ierr)
          else
-            stop 'bad value for l in get_one_el_info'
+            call mesa_error(__FILE__,__LINE__,'bad value for l in get_one_el_info')
          end if
          if (ierr /= 0) then
             !write(*,2) 'failed to find frequency for matching for l =', l
@@ -672,7 +663,7 @@
                write(*,1) 'nmax', nmax
                write(*,2) '(norders+1)/2', (norders+1)/2
                write(*,2) 'l0_n_obs(1)', l0_n_obs(1)
-               write(*,*)
+               write(*,'(A)')
                !stop
             end if
          end if 
@@ -696,8 +687,8 @@
             write(*,2) 'cnt', cnt
             write(*,1) 'sum_1', sum_1
             write(*,1) 'sum_2', sum_2
-            write(*,*)
-            stop 'init_obs_data'
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'init_obs_data')
          end if
             
       end subroutine init_obs_data
@@ -782,12 +773,12 @@
 
       
       subroutine get_kjeldsen_nonradial_freq_corr_alt_up
-         !stop 'get_kjeldsen_nonradial_freq_corr_alt_up'
+         !call mesa_error(__FILE__,__LINE__,'get_kjeldsen_nonradial_freq_corr_alt_up')
       end subroutine get_kjeldsen_nonradial_freq_corr_alt_up
 
       
       subroutine get_kjeldsen_nonradial_freq_corr_alt_down 
-         !stop 'get_kjeldsen_nonradial_freq_corr_alt_down'
+         !call mesa_error(__FILE__,__LINE__,'get_kjeldsen_nonradial_freq_corr_alt_down')
       end subroutine get_kjeldsen_nonradial_freq_corr_alt_down
 
       
@@ -1023,25 +1014,18 @@
       end subroutine get_combined_freq_corr_alt_down
       
       
-      real(dp) function power_law(freq, freq_ref, a, b)
+      type(auto_diff_real_2var_order1) function power_law(freq, freq_ref, a, b)
         real(dp), intent(in) :: freq, freq_ref, a, b
+        type(auto_diff_real_2var_order1) :: a_ad, b_ad
+
+        a_ad = a
+        a_ad%d1val1 = 1.0_dp
+
+        b_ad = b
+        b_ad%d1val2 = 1.0_dp
         
-        power_law = a*pow(freq/freq_ref, b)
+        power_law = a_ad*pow(freq/freq_ref, b_ad)
       end function power_law
-
-      
-      real(dp) function dpower_law_da(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-
-        dpower_law_da = pow(freq/freq_ref, b)
-      end function dpower_law_da
-
-
-      real(dp) function dpower_law_db(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-        
-        dpower_law_db = a*pow(freq/freq_ref, b)*log(freq/freq_ref)
-      end function dpower_law_db
       
       
       subroutine get_power_law_all_freq_corr(a, b, radial_only, freq_ref, &
@@ -1059,6 +1043,7 @@
         real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
         real(dp) :: detXtX, da, db
         real(dp) :: Q(0:3,max_nl)
+        type(auto_diff_real_2var_order1) :: power_law_ad
 
         ! Power_Law's solar values happen to be the same as MESA's but the
         ! commented expression is there in case it changes
@@ -1075,9 +1060,11 @@
            do i = 1, nl(0)
               Q(0,i) = 1
 
-              X(1) = -dpower_law_da(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              X(2) = -dpower_law_db(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              y = (obs(0,i) - freq(0,i) - power_law(freq(0,i), freq_ref, a, b))/sigma(0,i)
+              power_law_ad = power_law(freq(0,i), freq_ref, a, b)
+
+              X(1) = -power_law_ad%d1val1/sigma(0,i) ! dpower_law/da
+              X(2) = -power_law_ad%d1val2/sigma(0,i) ! dpower_law/db
+              y = (obs(0,i) - freq(0,i) - power_law_ad%val)/sigma(0,i)
               
               XtX(1,1) = XtX(1,1) + X(1)*X(1)
               XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1091,9 +1078,11 @@
                  do i = 1, nl(l)
                     Q(l,i) = inertia(l,i)/interpolate_l0_inertia(freq(l,i))
 
-                    X(1) = -dpower_law_da(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    X(2) = -dpower_law_db(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - power_law(freq(l,i), freq_ref, a, b))/sigma(l,i)
+                    power_law_ad = power_law(freq(l,i), freq_ref, a, b)
+
+                    X(1) = -power_law_ad%d1val1/sigma(l,i)
+                    X(2) = -power_law_ad%d1val2/sigma(l,i)
+                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - power_law_ad%val)/sigma(l,i)
                  
                     XtX(1,1) = XtX(1,1) + X(1)*X(1)
                     XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1135,7 +1124,8 @@
 
         do l = 0, 3
            do i = 1, nl(l)
-              freq_corr(l,i) = freq(l,i) + correction_factor*power_law(freq(l,i), freq_ref, a, b)/Q(l,i)
+              power_law_ad = power_law(freq(l,i), freq_ref, a, b)
+              freq_corr(l,i) = freq(l,i) + correction_factor*power_law_ad%val/Q(l,i)
            end do
         end do
 
@@ -1166,25 +1156,18 @@
       end subroutine get_power_law_freq_corr_alt_down
       
       
-      real(dp) function sonoi(freq, freq_ref, a, b)
+      type(auto_diff_real_2var_order1) function sonoi(freq, freq_ref, a, b)
         real(dp), intent(in) :: freq, freq_ref, a, b
+        type(auto_diff_real_2var_order1) :: a_ad, b_ad
+
+        a_ad = a
+        a_ad%d1val1 = 1.0_dp
+
+        b_ad = b
+        b_ad%d1val2 = 1.0_dp
         
-        sonoi = a*freq_ref*(1d0 - 1d0/(1d0+pow(freq/freq_ref,b)))
+        sonoi = a_ad*freq_ref*(1d0 - 1d0/(1d0+pow(freq/freq_ref, b_ad)))
       end function sonoi
-
-
-      real(dp) function dsonoi_da(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-        
-        dsonoi_da = freq_ref*(1d0 - 1d0/(1d0+pow(freq/freq_ref,b)))
-      end function dsonoi_da
-
-
-      real(dp) function dsonoi_db(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-        
-        dsonoi_db = a*freq_ref*pow(freq/freq_ref,b)*log(freq/freq_ref)/(1d0+pow(freq/freq_ref,b))**2
-      end function dsonoi_db
 
 
       subroutine get_sonoi_all_freq_corr(a, b, radial_only, freq_ref, &
@@ -1202,6 +1185,7 @@
         real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
         real(dp) :: detXtX, da, db
         real(dp) :: Q(0:3,max_nl)
+        type(auto_diff_real_2var_order1) :: sonoi_ad
 
         ! Sonoi's solar values happen to be the same as MESA's but the
         ! commented expression is there in case it changes
@@ -1217,9 +1201,11 @@
            do i = 1, nl(0)
               Q(0,i) = 1
 
-              X(1) = -dsonoi_da(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              X(2) = -dsonoi_db(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              y = (obs(0,i) - freq(0,i) - sonoi(freq(0,i), freq_ref, a, b))/sigma(0,i)
+              sonoi_ad = sonoi(freq(0,i), freq_ref, a, b)
+
+              X(1) = -sonoi_ad%d1val1/sigma(0,i)
+              X(2) = -sonoi_ad%d1val2/sigma(0,i)
+              y = (obs(0,i) - freq(0,i) - sonoi_ad%val)/sigma(0,i)
               
               XtX(1,1) = XtX(1,1) + X(1)*X(1)
               XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1233,9 +1219,11 @@
                  do i = 1, nl(l)
                     Q(l,i) = inertia(l,i)/interpolate_l0_inertia(freq(l,i))
 
-                    X(1) = -dsonoi_da(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    X(2) = -dsonoi_db(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - sonoi(freq(l,i), freq_ref, a, b))/sigma(l,i)
+                    sonoi_ad = sonoi(freq(l,i), freq_ref, a, b)
+
+                    X(1) = -sonoi_ad%d1val1/sigma(l,i)
+                    X(2) = -sonoi_ad%d1val2/sigma(l,i)
+                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - sonoi_ad%val)/sigma(l,i)
                  
                     XtX(1,1) = XtX(1,1) + X(1)*X(1)
                     XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1279,7 +1267,8 @@
 
         do l = 0, 3
            do i = 1, nl(l)
-              freq_corr(l,i) = freq(l,i) + correction_factor*sonoi(freq(l,i), freq_ref, a, b)/Q(l,i)
+              sonoi_ad = sonoi(freq(l,i), freq_ref, a, b)
+              freq_corr(l,i) = freq(l,i) + correction_factor*sonoi_ad%val/Q(l,i)
            end do
         end do
 
@@ -1644,7 +1633,7 @@
             stop
          end if
          
-         !if (is_bad(chi2)) stop 'get_chi2'
+         !if (is_bad(chi2)) call mesa_error(__FILE__,__LINE__,'get_chi2')
                   
       end function get_chi2
 

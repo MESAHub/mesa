@@ -219,6 +219,16 @@
             nzhi = (3*nzhi+nz)/4 ! back up some into the convection zone
          end if
 
+         if (s% do_phase_separation .and. s% phase_separation_no_diffusion) then
+            ! check for phase separation boundary, don't do diffusion deeper than that
+            do k = 1,nzhi
+               if(s% mixing_type(k) == phase_separation_mixing) then
+                  nzhi = k
+                  exit
+               end if
+            end do
+         end if
+
          if(s% diffusion_use_full_net) then
             do j=1,nc
                class_chem_id(j) = s% chem_id(j) ! Just a 1-1 map between classes and chem_ids.
@@ -359,7 +369,7 @@
             end if
          end if
 
-         if (dumping) stop 'debug: dump_diffusion_info'
+         if (dumping) call mesa_error(__FILE__,__LINE__,'debug: dump_diffusion_info')
          
          do k=nzlo+1,nzhi
             do j=1,species
@@ -376,7 +386,7 @@
          if(s% do_diffusion_heating .and. s% do_WD_sedimentation_heating) then
             write(*,*) "do_diffusion_heating is incompatible with do_WD_sedimentation_heating"
             write(*,*) "at least one of these options must be set to .false."
-            stop 'do_element_diffusion'
+            call mesa_error(__FILE__,__LINE__,'do_element_diffusion')
          end if         
 
          s% eps_WD_sedimentation(1:nz) = 0d0

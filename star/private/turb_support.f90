@@ -177,6 +177,12 @@ contains
       
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale
+
+      ! these are used by use_superad_reduction
+      real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
+      type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
+         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled
+
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
@@ -215,7 +221,7 @@ contains
       end if
 
       if (report) then
-         write(*,*)
+         write(*,'(A)')
          write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if
@@ -247,14 +253,82 @@ contains
 
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            mixing_type, scale, chiT, chiRho, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'ierr from set_TDC'
+               return
+            end if
+
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
          call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+
+         if (ierr /= 0) then
+            if (s% report_ierr) write(*,*) 'ierr from set_MLT'
+            return
+         end if
+
+         ! Experimental method to lower superadiabaticity. Call MLT again with an artificially reduced
+         ! gradr if the resulting gradT would lead to the radiative luminosity approaching the Eddington
+         ! limit, or when a density inversion is expected to happen.
+         ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess
+         if (s% use_superad_reduction) then
+            Gamma_limit = s% superad_reduction_Gamma_limit
+            scale_value1 = s% superad_reduction_Gamma_limit_scale
+            scale_value2 = s% superad_reduction_Gamma_inv_scale
+            diff_grads_limit = s% superad_reduction_diff_grads_limit
+            reduction_limit = s% superad_reduction_limit
+            Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
+            Gamma_inv_threshold = 4*(1-beta)/chiT
+
+            Gamma_factor = 1d0
+            if (gradT > gradL) then
+               if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
+                  alfa0 = (gradT-gradL)/diff_grads_limit
+                  if (alfa0 < 1d0) then
+                     diff_grads_factor = -alfa0*alfa0*alfa0*(-10d0 + alfa0*(15d0 - 6d0*alfa0))
+                  else
+                     diff_grads_factor = 1d0
+                  end if
+
+                  Gamma_term = 0d0
+                  if (Lrad_div_Ledd > Gamma_limit) then
+                     Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
+                  end if
+                  if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
+                     Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
+                  end if
+                  
+                  if (Gamma_term > 0d0) then
+                     Gamma_factor = Gamma_term/beta*diff_grads_factor
+                     Gamma_factor = Gamma_factor + 1d0
+                     if (reduction_limit > 1d0) then
+                        lambda_limit = 2d0/(reduction_limit-1d0)
+                        exp_limit = exp(-lambda_limit*(Gamma_factor-1d0))
+                        Gamma_factor = 2d0*(reduction_limit-1d0)*(1d0/(1d0+exp_limit)-0.5d0)+1d0
+                     end if
+                  end if
+               end if
+            end if 
+            s% superad_reduction_factor(k) = Gamma_factor% val
+            if (Gamma_factor > 1d0) then
+               grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
+               gradr_scaled = grad_scale*gradr
+               call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
+                              chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                              gradr_scaled, grada, gradL, &
+                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+               if (ierr /= 0) then
+                  if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
+                  return
+               end if
+            end if
+         end if
       end if
 
       ! If we're not convecting, try thermohaline and semiconvection.
@@ -264,12 +338,20 @@ contains
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'
+               return
+            end if
          else if (gradr > grada) then
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
             call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
                                     s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                     gradL_composition_term, &
                                     gradT, Y_face, conv_vel, D, mixing_type, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
+               return
+            end if
          end if         
       end if 
 

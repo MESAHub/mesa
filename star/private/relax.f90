@@ -128,11 +128,11 @@
             s% xmstar = s% mstar - s% M_center
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current mass', s% mstar/Msun
          write(*,1) 'relax to new_mass', new_mass
          write(*,1) 'lg_max_abs_mdot', lg_max_abs_mdot
-         write(*,*)
+         write(*,'(A)')
          if (new_mass <= 0) then
             ierr = -1
             write(*,*) 'invalid new mass'
@@ -1186,9 +1186,9 @@
          end do
          if (s% job% relax_angular_momentum_constant_omega_center) then
             if (k_inner > 0) then
-               omega_target = vals(k_inner)/s% i_rot(k_inner)
+               omega_target = vals(k_inner)/s% i_rot(k_inner)% val
                do k=k_inner+1, s% nz
-                  j_rot_target = omega_target*s% i_rot(k)
+                  j_rot_target = omega_target*s% i_rot(k)% val
                   if (s% j_rot_flag) then
                      s% extra_jdot(k) =  &
                         (1d0 - exp(-s% dt/(s% job% timescale_for_relax_angular_momentum*secyer))) * &
@@ -1337,7 +1337,7 @@
             new_omega = target_value*1d5/(s% photosphere_r*Rsun)
          else
             write(*,2) 'bad value for kind_of_relax', kind_of_relax
-            stop 'relax_omega_check_model'
+            call mesa_error(__FILE__,__LINE__,'relax_omega_check_model')
          end if
 
          this_step_omega = frac*new_omega + (1 - frac)*starting_omega
@@ -1392,12 +1392,12 @@
             s% tau_factor = new_tau_factor
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current tau_factor', tau_factor
          write(*,1) 'relax to new tau_factor', new_tau_factor
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dlogtau_factor', dlogtau_factor
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_tau_factor
          rpar(2) = dlogtau_factor
          max_model_number = s% max_model_number
@@ -1503,12 +1503,12 @@
             s% opacity_factor = new_opacity_factor
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current opacity_factor', opacity_factor
          write(*,1) 'relax to new opacity_factor', new_opacity_factor
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dopacity_factor', dopacity_factor
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_opacity_factor
          rpar(2) = dopacity_factor
          max_model_number = s% max_model_number
@@ -1617,12 +1617,12 @@
             s% Tsurf_factor = new_Tsurf_factor
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current Tsurf_factor', Tsurf_factor
          write(*,1) 'relax to new Tsurf_factor', new_Tsurf_factor
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dlogTsurf_factor', dlogTsurf_factor
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_Tsurf_factor
          rpar(2) = dlogTsurf_factor
          max_model_number = s% max_model_number
@@ -1633,10 +1633,10 @@
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
          s% max_model_number = max_model_number
          if (ierr /= 0) then
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'ERROR: failed doing relax Tsurf_factor', new_Tsurf_factor
-            write(*,*)
-            stop 'do_relax_Tsurf_factor'
+            write(*,'(A)')
+            call mesa_error(__FILE__,__LINE__,'do_relax_Tsurf_factor')
          end if
          
          if (new_Tsurf_factor == 1d0) then
@@ -1752,9 +1752,9 @@
          end do
          if (all_same) return
 
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'relax to new irradiation -- min steps', min_steps
-         write(*,*)
+         write(*,'(A)')
 
          max_model_number = s% max_model_number
          s% max_model_number = -1111
@@ -1878,10 +1878,10 @@
          rpar(1) = initial_mass_change
          rpar(2) = final_mass_change
 
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'relax_mass_change -- min steps, init, final, max dt', &
             min_steps, initial_mass_change, final_mass_change, relax_mass_change_max_yrs_dt
-         write(*,*)
+         write(*,'(A)')
 
          max_model_number = s% max_model_number
          s% max_model_number = -1111
@@ -2009,12 +2009,12 @@
             end if
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current core mass', current_core_mass
          write(*,1) 'relax to new_core_mass', new_core_mass
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dlg_core_mass_per_step', dlg_core_mass_per_step
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_core_mass
          rpar(2) = dlg_core_mass_per_step
          rpar(3) = relax_core_years_for_dt
@@ -2105,7 +2105,7 @@
             write(*,1) 's% dt < relax_core_dt*0.9d0', s% dt, relax_core_dt*0.9d0
             write(*,1) 's% max_timestep', s% max_timestep
             write(*,1) 's% max_years_for_timestep*secyer', s% max_years_for_timestep*secyer
-            write(*,*)
+            write(*,'(A)')
             return ! give a chance to stabilize
          end if
 
@@ -2137,7 +2137,7 @@
             write(*,1) 's% L_center', s% L_center
             write(*,1) 's% R_center', s% R_center
             write(*,1) 's% xmstar', s% xmstar
-            write(*,*)
+            write(*,'(A)')
          end if
          
          if(end_now) then
@@ -2197,12 +2197,12 @@
             s% xmstar = s% mstar - s% M_center
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'relax_mass_scale'
          write(*,1) 'current star_mass', s% star_mass
          write(*,1) 'relax to new_mass', new_mass
          write(*,1) 'dlgm_per_step', dlgm_per_step
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_mass
          rpar(2) = dlgm_per_step
          rpar(3) = change_mass_years_for_dt
@@ -2339,12 +2339,12 @@
             s% xmstar = s% mstar - s% M_center
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current star_mass', s% star_mass
          write(*,1) 'relax to new_mass', new_mass
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dlgm_per_step', dlgm_per_step
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_mass
          rpar(2) = dlgm_per_step
          rpar(3) = relax_M_center_dt
@@ -2403,7 +2403,7 @@
          dlgm_per_step = rpar(2)
          relax_M_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% M_center>0.0) &
             write(*,1) 'relax_M_center target/current', new_mass/(s% M_center/Msun)
          
          end_now=.false.
@@ -2488,12 +2488,12 @@
             s% R_center = new_R_center
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current R_center', s% R_center
          write(*,1) 'relax to new_R_center', new_R_center
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dlgR_per_step', dlgR_per_step
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_R_center
          rpar(2) = dlgR_per_step
          rpar(3) = relax_R_center_dt
@@ -2551,7 +2551,7 @@
          dlgR_per_step = rpar(2)
          relax_R_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% R_center > 0d0) &
             write(*,1) 'relax_R_center target/current', new_R_center/s% R_center
 
          if (abs(s% R_center - new_R_center) < 1d-15) then
@@ -2638,12 +2638,12 @@
             s% v_center = new_v_center
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current v_center', s% v_center
          write(*,1) 'relax to new_v_center', new_v_center
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dv_per_step', dv_per_step
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_v_center
          rpar(2) = dv_per_step
          rpar(3) = relax_v_center_dt
@@ -2752,12 +2752,12 @@
             s% L_center = new_L_center
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current L_center', s% L_center
          write(*,1) 'relax to new_L_center', new_L_center
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dlgL_per_step', dlgL_per_step
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_L_center
          rpar(2) = dlgL_per_step*(new_L_center - s% L_center)
          rpar(3) = relax_L_center_dt
@@ -2816,7 +2816,7 @@
          relax_L_center_dt = rpar(3)
 
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% L_center>0.d0) &
             write(*,1) 'relax_L_center target/current', new_L_center/s% L_center
 
          if (abs(new_L_center - s% L_center) < abs(dL)) then
@@ -2894,12 +2894,12 @@
             s% dxdt_nuc_factor = new_value
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current dxdt_nuc_factor', s% dxdt_nuc_factor
          write(*,1) 'relax to new_value', new_value
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
          max_model_number = s% max_model_number
@@ -2999,12 +2999,12 @@
             s% eps_nuc_factor = new_value
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current eps_nuc_factor', s% eps_nuc_factor
          write(*,1) 'relax to new_value', new_value
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
          max_model_number = s% max_model_number
@@ -3109,12 +3109,12 @@
             s% opacity_max = new_value
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current opacity_max', s% opacity_max
          write(*,1) 'relax to new_value', new_value
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
          max_model_number = s% max_model_number
@@ -3222,12 +3222,12 @@
             s% max_surface_cell_dq = new_value
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current max_surf_dq', s% max_surface_cell_dq
          write(*,1) 'relax to new_value', new_value
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
          max_model_number = s% max_model_number
@@ -3321,9 +3321,9 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'relax_num_steps', num_steps
-         write(*,*)
+         write(*,'(A)')
          ipar(1) = num_steps
          if (max_timestep <= 0) then
             rpar(1) = secyer
@@ -3426,9 +3426,9 @@
          
          max_timestep = 1d3*secyer  ! can provide a parameter for this if necessary
          
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'relax_to_radiative_core'
-         write(*,*)
+         write(*,'(A)')
          if (max_timestep <= 0) then
             rpar(1) = secyer
          else
@@ -3547,13 +3547,13 @@
                return
             end if
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current Z', z
          write(*,1) 'relax to new Z', new_z
          write(*,1) '(new - current) / current', (new_z - z) / z
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'dlnz per step', dlnz
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = log(max(min_z,new_z))
          rpar(2) = new_z
          rpar(3) = abs(dlnz)
@@ -3710,7 +3710,7 @@
          if (ierr /= 0) return
          if (is_bad(y)) then
             write(*,1) 'y', y
-            stop 'do_relax_Y'
+            call mesa_error(__FILE__,__LINE__,'do_relax_Y')
          end if
          
          if (abs(new_Y - y) <= 1d-6*new_Y) return
@@ -3719,11 +3719,11 @@
             write(*,*) 'invalid new_Y', new_Y
             return
          end if
-         write(*,*)
+         write(*,'(A)')
          write(*,1) 'current Y', Y
          write(*,1) 'relax to new_Y', new_Y
          write(*,1) 'dY per step', dY
-         write(*,*)
+         write(*,'(A)')
          rpar(1) = new_Y
          rpar(2) = abs(dY)
          rpar(3) = minq
@@ -3796,7 +3796,7 @@
          current_y = eval_current_y(s, klo, khi, ierr)
          if (is_bad(current_y)) then
             write(*,1) 'current_y', current_y
-            stop 'relax_y_check_model'
+            call mesa_error(__FILE__,__LINE__,'relax_y_check_model')
          end if
          if (ierr /= 0) return
 
@@ -4116,6 +4116,7 @@
 
          s% doing_relax = .false.
          s% need_to_setvars = .true. ! just to be safe
+         s% have_ST_start_info = .false. ! for ST time smoothing
 
          if (.not. (s% termination_code == t_relax_finished_okay .or. &
                     s% termination_code == t_extras_check_model)) ierr = -1
@@ -4306,9 +4307,9 @@
             return
          end if
 
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'finished doing ', name
-         write(*,*)
+         write(*,'(A)')
       end subroutine error_check
 
 

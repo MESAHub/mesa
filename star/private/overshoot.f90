@@ -214,7 +214,7 @@ contains
              if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
                 
                 if (.not. s% calculate_Brunt_N2) &
-                   stop 'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.'
+                   call mesa_error(__FILE__,__LINE__,'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
 
                 ! (NB: we examine B(k+dk) rather than B(k), as the latter
                 ! would allow the overshoot region to eat into a composition
@@ -234,33 +234,31 @@ contains
 
                 ! Update conv_bdy_dq to reflect where D drops below the minimum
 
-                if (.not. s% conv_vel_flag) then
-                   if (s%top_conv_bdy(i)) then
-                      s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
-                      if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
-                         write(*,*) 'k, k_a, k_b', k, k_a, k_b
-                         write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
-                         write(*,*) 'D(k)', D(k)
-                         write(*,*) 's%D_mix(k+1)', s%D_mix(k+1)
-                         write(*,*) 's%overshoot_D_min', s%overshoot_D_min
-                         write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k), s%dq(k)
-                         ierr = -1
-                         return
-                      end if
-                   else
-                      s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
-                      if (s%cz_bdy_dq(k-1) < 0._dp .OR. s%cz_bdy_dq(k-1) > s%dq(k-1)) then
-                         write(*,*) 'k, k_a, k_b', k, k_a, k_b
-                         write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
-                         write(*,*) 'D(k)', D(k)
-                         write(*,*) 's%D_mix(k-1)', s%D_mix(k-1)
-                         write(*,*) 's%overshoot_D_min', s%overshoot_D_min
-                         write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k-1), s%dq(k)
-                         ierr = -1
-                         return
-                      end if
-                   endif
-                end if
+                if (s%top_conv_bdy(i)) then
+                   s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
+                   if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
+                      write(*,*) 'k, k_a, k_b', k, k_a, k_b
+                      write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
+                      write(*,*) 'D(k)', D(k)
+                      write(*,*) 's%D_mix(k+1)', s%D_mix(k+1)
+                      write(*,*) 's%overshoot_D_min', s%overshoot_D_min
+                      write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k), s%dq(k)
+                      ierr = -1
+                      return
+                   end if
+                else
+                   s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
+                   if (s%cz_bdy_dq(k-1) < 0._dp .OR. s%cz_bdy_dq(k-1) > s%dq(k-1)) then
+                      write(*,*) 'k, k_a, k_b', k, k_a, k_b
+                      write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
+                      write(*,*) 'D(k)', D(k)
+                      write(*,*) 's%D_mix(k-1)', s%D_mix(k-1)
+                      write(*,*) 's%overshoot_D_min', s%overshoot_D_min
+                      write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k-1), s%dq(k)
+                      ierr = -1
+                      return
+                   end if
+                endif
 
                 exit face_loop
 
@@ -287,13 +285,13 @@ contains
 
                 s%cdc(k) = cdc
                 s%D_mix(k) = D(k)
-                if (.not. s% conv_vel_flag) s%conv_vel(k) = vc(k)
+                s%conv_vel(k) = vc(k)
 
              elseif (D(k) > s%D_mix(k)) then
 
                 s%cdc(k) = cdc
                 s%D_mix(k) = D(k)
-                if (.not. s% conv_vel_flag) s%conv_vel(k) = vc(k)
+                s%conv_vel(k) = vc(k)
                 s%mixing_type(k) = overshoot_mixing
 
              end if
@@ -305,7 +303,7 @@ contains
 
           s%cdc(k:k_cb:dk) = 0._dp
           s%D_mix(k:k_cb:dk) = 0._dp
-          if (.not. s% conv_vel_flag) s%conv_vel(k:k_cb:dk) = 0._dp
+          s%conv_vel(k:k_cb:dk) = 0._dp
           s%mixing_type(k:k_cb:dk) = no_mixing
           
           ! Finish (we apply at most a single overshoot scheme to each boundary)
@@ -328,7 +326,7 @@ contains
              write(*,3) 'mixing_type, D_mix', k, s%mixing_type(k), s%D_mix(k)
           end if
 
-          if (s% stop_for_bad_nums) stop 'add_overshooting'
+          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_overshooting')
 
        end if
 

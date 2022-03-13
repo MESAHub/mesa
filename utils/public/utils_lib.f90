@@ -990,6 +990,14 @@ contains
   
   end subroutine cp_file
 
+   logical function folder_exists(folder)
+      use utils_system, only: is_dir
+      character(len=*),intent(in) :: folder
+
+      folder_exists = is_dir(folder)
+
+   end function folder_exists
+
   integer function alloc_iounit(ierr)
     use utils_def
     integer, intent(out) :: ierr

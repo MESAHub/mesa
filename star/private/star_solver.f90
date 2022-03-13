@@ -180,6 +180,8 @@
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
 
          include 'formats'
+
+         err_msg = ''
          
          nz = s% nz
 
@@ -387,7 +389,7 @@
                if (s% stop_for_bad_nums) then
                   write(*,1) 'correction_norm', correction_norm
                   write(*,1) 'max_correction', max_correction
-                  stop 'solver'
+                  call mesa_error(__FILE__,__LINE__,'solver')
                end if
                exit iter_loop
             end if
@@ -441,7 +443,7 @@
                if (is_bad_num(slope) .or. slope > 0d0) then ! a very bad sign
                   if (is_bad_num(slope) .and. s% stop_for_bad_nums) then
                      write(*,1) 'slope', slope
-                     stop 'solver'
+                     call mesa_error(__FILE__,__LINE__,'solver')
                   end if
                   slope = 0d0
                   min_corr_coeff = 1d0
@@ -481,7 +483,7 @@
                call oops('residual_norm is a a bad number (NaN or Infinity)')
                if (s% stop_for_bad_nums) then
                   write(*,1) 'residual_norm', residual_norm
-                  stop 'solver'
+                  call mesa_error(__FILE__,__LINE__,'solver')
                end if
                exit iter_loop
             end if
@@ -490,7 +492,7 @@
                call oops('max_residual is a a bad number (NaN or Infinity)')
                if (s% stop_for_bad_nums) then
                   write(*,1) 'max_residual', max_residual
-                  stop 'solver'
+                  call mesa_error(__FILE__,__LINE__,'solver')
                end if
                exit iter_loop
             end if
@@ -680,15 +682,15 @@
                end if
                do k = k_lo, k_hi
                   call test_cell_partials(s, k, save_dx, save_equ, ierr)
-                  if (ierr /= 0) stop 'failed solver_test_partials'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                end do
             else
                k = s% solver_test_partials_k
                call test_cell_partials(s, k, save_dx, save_equ, ierr) 
-               if (ierr /= 0) stop 'failed solver_test_partials'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
             end if
             deallocate(save_dx, save_equ)
-            stop 'done solver_test_partials'
+            call mesa_error(__FILE__,__LINE__,'done solver_test_partials')
 
          end subroutine solver_test_partials
 
@@ -796,6 +798,7 @@
             ierr = 0
             coeff = 0
             dbg_adjust = .false.
+            err_msg = ''
 
             skip_eval_f = (min_corr_coeff_in == 1)
             if (skip_eval_f) then
@@ -815,7 +818,7 @@
                      'adjust_correction: eval_f(nvar,nz,equ)', eval_f(nvar,nz,equ)
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'f', f
-                     stop 'solver adjust_correction'
+                     call mesa_error(__FILE__,__LINE__,'solver adjust_correction')
                   end if
                   return
                end if
@@ -851,7 +854,7 @@
                      ierr = 0
                      cycle
                   end if
-                  write(err_msg,'(a)') 'adjust_correction failed in eval_equations'
+                  write(err_msg,*) 'adjust_correction failed in eval_equations'
                   if (dbg_msg .or. dbg_adjust) &
                      write(*,2) 'adjust_correction: eval_equations returned ierr', &
                         ierr, min_corr_coeff, max_corr_coeff
@@ -873,7 +876,7 @@
                if (is_bad_num(f)) then
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'f', f
-                     stop 'solver adjust_correction eval_f'
+                     call mesa_error(__FILE__,__LINE__,'solver adjust_correction eval_f')
                   end if
                   if (alam > min_corr_coeff) then
                      alam = max(alam/10, min_corr_coeff)
@@ -1100,7 +1103,7 @@
             integer :: i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             include 'formats'
             ierr = 0
-            write(*,*)
+            write(*,'(A)')
             i_equ = lookup_nameofequ(s, s% solver_test_partials_equ_name)      
             if (i_equ == 0 .and. len_trim(s% solver_test_partials_equ_name) > 0) then
                if (s% solver_test_partials_equ_name == 'lnE') then ! testing eos
@@ -1147,13 +1150,13 @@
                   call test_equ_partials(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                      k, save_dx, save_equ, ierr)   
-                  if (ierr /= 0) stop 'failed solver_test_partials'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                end do
             else
                call test_equ_partials(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   k, save_dx, save_equ, ierr)   
-               if (ierr /= 0) stop 'failed solver_test_partials'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
             end if     
          end subroutine test_cell_partials               
 
@@ -1175,8 +1178,8 @@
                      call test3_partials(s, &
                         i_equ, i, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                         k, save_dx, save_equ, ierr)
-                     if (ierr /= 0) stop 'failed solver_test_partials'
-                     write(*,*)
+                     if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
+                     write(*,'(A)')
                   end do
                else if (i_var == 0) then
                   write(*,*) 'failed to recognize variable name'
@@ -1184,7 +1187,7 @@
                   call test3_partials(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                      k, save_dx, save_equ, ierr)
-                  if (ierr /= 0) stop 'failed solver_test_partials'               
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')               
                end if
             else ! i_equ == 0
                if (i_var /= 0) then
@@ -1195,7 +1198,7 @@
                   if (s% solver_test_partials_var <= 0) then
                      write(*,2) 'need to set solver_test_partials_var', s% solver_test_partials_var
                      write(*,2) 'for solver_test_partials_k', s% solver_test_partials_k
-                     stop 'failed solver_test_partials'
+                     call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                   end if
                   if (s% solver_test_partials_var > s% nvar_hydro) then
                      j_var_xa_index = s% solver_test_partials_var - s% nvar_hydro
@@ -1204,7 +1207,7 @@
                      else
                         write(*,*) 'set solver_test_partials_dx_sink to variable index, not to xa index', &
                            s% solver_test_partials_dx_sink
-                        stop 'failed solver_test_partials'
+                        call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                      end if
                   else
                      j_var_xa_index = 0
@@ -1215,9 +1218,9 @@
                      j_var_xa_index, j_var_sink_xa_index, &                     
                      k, 0, s% solver_test_partials_dval_dx, save_dx, save_equ, ierr)
                end if
-               if (ierr /= 0) stop 'failed solver_test_partials'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
             end if               
-            write(*,*)
+            write(*,'(A)')
          end subroutine test_equ_partials
          
          
@@ -1331,10 +1334,8 @@
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnR_00)
             else if (i_var == s% i_lum) then
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_L_00)
-            else if (i_var == s% i_ln_cvpv0) then
-               dvardx0_00 = s% gradT_ad(k)%d1Array(i_xtra1_00)
             else if (i_var == s% i_w_div_wc) then
-               dvardx0_00 = s% gradT_ad(k)%d1Array(i_xtra2_00)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_w_00)
             end if
          end subroutine get_gradT_partials
          
@@ -1441,17 +1442,17 @@
                call test1_partial(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   k, -1, dvardx0_m1, save_dx, save_equ, ierr)
-               if (ierr /= 0) stop 'test3_partials'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'test3_partials')
             end if
             call test1_partial(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                k, 0, dvardx0_00, save_dx, save_equ, ierr)
-            if (ierr /= 0) stop 'test3_partials'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'test3_partials')
             if (k < s% nz) then
                call test1_partial(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   k, 1, dvardx0_p1, save_dx, save_equ, ierr)
-               if (ierr /= 0) stop 'test3_partials'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'test3_partials')
             end if
          end subroutine test3_partials
          
@@ -1499,7 +1500,7 @@
             end if
             if (ierr /= 0) then
                write(*,*) 'test1_partial failed'
-               stop 'setmatrix'
+               call mesa_error(__FILE__,__LINE__,'setmatrix')
             end if
             if (i_equ /= 0) then
                if (k_off == 0) then
@@ -1555,7 +1556,7 @@
 !                  'analytic/numeric', abs(dvardx_0)/max(1d-99,abs(dvardx))
                   
             else
-               write(*,*)
+               write(*,'(A)')
                write(*,1) 'analytic and numeric partials wrt ' // trim(s% nameofvar(i_var)), &
                   dvardx_0, dvardx
                write(*,1) 'log dfridr relative uncertainty for numeric partial', &
@@ -1580,7 +1581,7 @@
                !     dx(i_var,k+k_off), s% xa(i_var - s% nvar_hydro,k+k_off)
                if (i_var_sink_xa_index <= 0 .or. i_var_sink_xa_index > s% species) then
                   write(*,2) 'bad i_var_sink_xa_index', i_var_sink_xa_index
-                  stop 'star_solver dfridr_func'
+                  call mesa_error(__FILE__,__LINE__,'star_solver dfridr_func')
                end if
                s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
@@ -1588,7 +1589,7 @@
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'
-               stop 'setmatrix'
+               call mesa_error(__FILE__,__LINE__,'setmatrix')
             end if
             if (i_equ > 0) then
                val = equ(i_equ,k) ! testing partial of residual for cell k equation
@@ -1811,7 +1812,7 @@
 !               'mix type ' // trim(max_corr_mix_type_str),  &
 !               '   ' // trim(msg)
                
-            if (is_bad(slope)) stop 'write_msg'
+            if (is_bad(slope)) call mesa_error(__FILE__,__LINE__,'write_msg')
 
          end subroutine write_msg
 

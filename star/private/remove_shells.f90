@@ -227,8 +227,8 @@
                   mtotal = dot_product(s% dm(1:nz), &
                      s% xa(co56,1:nz) + s% xa(ni56,1:nz))/Msun
                   write(*,1) 'final mass for Ni56+Co56', mtotal
-                  write(*,*)
-                  stop 'do_remove_center_to_reduce_co56_ni56'
+                  write(*,'(A)')
+                  call mesa_error(__FILE__,__LINE__,'do_remove_center_to_reduce_co56_ni56')
                end if
                return
             end if
@@ -290,7 +290,7 @@
                   write(*,2) 'ie', k, ie
                   write(*,2) 'ke', k, ke
                   write(*,2) 'pe', k, pe
-                  stop 'do_remove_fallback'
+                  call mesa_error(__FILE__,__LINE__,'do_remove_fallback')
                end if
                sum_total_energy = sum_total_energy + ie + ke + pe
                if (is_bad(sum_total_energy)) then
@@ -298,7 +298,7 @@
                   write(*,2) 'ie', k, ie
                   write(*,2) 'ke', k, ke
                   write(*,2) 'pe', k, pe
-                  stop 'do_remove_fallback'
+                  call mesa_error(__FILE__,__LINE__,'do_remove_fallback')
                end if
                !write(*,3) 'sum_total_energy', k, nz, sum_total_energy, ie + ke + pe
                if (sum_total_energy < 0d0) exit
@@ -331,7 +331,7 @@
             end do
          end if
          
-         !stop 'do_remove_fallback'
+         !call mesa_error(__FILE__,__LINE__,'do_remove_fallback')
          
          !write(*,3) 'k0 old nz', k0, s% nz, s% m(k0)/Msun
          
@@ -539,7 +539,7 @@
          else if (s% v_flag) then
             v => s% v
          else
-            stop 'no u or v for do_remove_center_at_inner_max_abs_v?'
+            call mesa_error(__FILE__,__LINE__,'no u or v for do_remove_center_at_inner_max_abs_v?')
             return
          end if
          k_max = minloc(v(1:s% nz),dim=1)
@@ -640,13 +640,13 @@
             s% v_center = s% u(k)
             if (is_bad(s% v_center)) then
                write(*,2) 'center s% u(k)', k, s% u(k)
-               stop 'do_remove_center'
+               call mesa_error(__FILE__,__LINE__,'do_remove_center')
             end if
          else if (s% v_flag) then
             s% v_center = s% v(k)
             if (is_bad(s% v_center)) then
                write(*,2) 'center s% v(k)', k, s% v(k)
-               stop 'do_remove_center'
+               call mesa_error(__FILE__,__LINE__,'do_remove_center')
             end if
          else
             s% v_center = 0d0
@@ -822,7 +822,7 @@
          end do
          write(*,2) 'do_remove_surface_by_v_surf_div_cs', k-1, v(k-1)/s% csound(k-1)
          call do_remove_surface(id, k-1, ierr)
-         !stop 'do_remove_surface_by_v_surf_div_cs'
+         !call mesa_error(__FILE__,__LINE__,'do_remove_surface_by_v_surf_div_cs')
          return
       end subroutine do_remove_surface_by_v_surf_div_cs
 
@@ -1004,7 +1004,7 @@
             if (s% R_center /= 0d0) then
                write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
                ierr = -1
-               stop 'do_remove_surface'
+               call mesa_error(__FILE__,__LINE__,'do_remove_surface')
             end if         
             call do_relax_to_star_cut( &
                id, surface_k, s% job% remove_surface_do_jrot, &
@@ -1125,7 +1125,7 @@
          if (dbg) write(*,1) 'do_remove_surface tau_factor, Tsurf_factor', &
             s% tau_factor, s% Tsurf_factor
             
-         if (dbg) stop 'do_remove_surface'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'do_remove_surface')
             
       end subroutine do_remove_surface
 
@@ -1138,7 +1138,7 @@
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interp_pm, interp_values, interp_value
          use adjust_xyz, only: change_net
-         use set_flags, only: set_conv_vel_flag, set_v_flag, set_u_flag, set_rotation_flag
+         use set_flags, only: set_v_flag, set_u_flag, set_rotation_flag
          use rotation_mix_info, only: set_rotation_mixing_info
          use hydro_rotation, only: set_i_rot, set_rotation_info
          use relax, only: do_relax_composition, do_relax_angular_momentum, do_relax_entropy
@@ -1150,7 +1150,7 @@
             ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
          integer, intent(out) :: ierr
 
-         logical :: conv_vel_flag, v_flag, u_flag, rotation_flag
+         logical :: v_flag, u_flag, rotation_flag
          type (star_info), pointer :: s
          character (len=net_name_len) :: net_name
          integer :: model_number, num_trace_history_values, photo_interval
@@ -1201,23 +1201,24 @@
             xq(1+k0) = xq(1+k0-1) + (s% dq(k_remove+k0) + s% dq(k_remove+k0-1))/s% q(k_remove)/2
          end do
 
-         !create interpolant for convective velocities
-         conv_vel_flag = .false.
-         if (s% conv_vel_flag) then
-            conv_vel_flag = .true.
-            allocate(interp_work((num_pts)*pm_work_size), &
-               conv_vel_interp(4*(num_pts)), stat=ierr)
-            do k0 = 1, num_pts
-               conv_vel_interp(4*k0-3) = s% conv_vel(k0+k_remove-1)
-               q(k0) = s% q(k0+k_remove-1)/s% q(k_remove)
-            end do
-            call interp_pm(q, num_pts, conv_vel_interp,&
-               pm_work_size, interp_work, 'conv_vel interpolant', ierr)
+         !!create interpolant for convective velocities
+         ! TODO: adapt this for TDC
+         !conv_vel_flag = .false.
+         !if (s% conv_vel_flag) then
+         !   conv_vel_flag = .true.
+         !   allocate(interp_work((num_pts)*pm_work_size), &
+         !      conv_vel_interp(4*(num_pts)), stat=ierr)
+         !   do k0 = 1, num_pts
+         !      conv_vel_interp(4*k0-3) = s% conv_vel(k0+k_remove-1)
+         !      q(k0) = s% q(k0+k_remove-1)/s% q(k_remove)
+         !   end do
+         !   call interp_pm(q, num_pts, conv_vel_interp,&
+         !      pm_work_size, interp_work, 'conv_vel interpolant', ierr)
 
-            ! turn off conv vel flag to load model
-            call set_conv_vel_flag(id, .false., ierr)
-            if (dbg) write(*,*) "set_conv_vel_flag ierr", ierr
-         end if
+         !   ! turn off conv vel flag to load model
+         !   call set_conv_vel_flag(id, .false., ierr)
+         !   if (dbg) write(*,*) "set_conv_vel_flag ierr", ierr
+         !end if
 
          ! save have_mlt_vc and set to false (to load ZAMS model)
          save_have_mlt_vc = s% have_mlt_vc
@@ -1281,12 +1282,6 @@
          if (dbg) write(*,*) "check ierr", ierr
          if (ierr /= 0) return
 
-         if (conv_vel_flag) then
-            call set_conv_vel_flag(id, .true., ierr)
-            if (dbg) write(*,*) "check set_conv_vel_flag ierr", ierr
-            if (ierr /= 0) return
-         end if
-
          ! restore have_mlt_vc
          s% have_mlt_vc = save_have_mlt_vc
 
@@ -1327,24 +1322,25 @@
             deallocate(entropy)
          end if
 
-         !take care of convective velocities
-         if (s% conv_vel_flag) then
-            do k0=1, s% nz
-               call interp_value(q, num_pts, conv_vel_interp, s% q(k0), s% conv_vel(k0), ierr)
-               !avoid extending regions with non-zero conv vel
-               do k=2, num_pts-1
-                  if(s% q(k0) < q(k) .and. s% q(k0) > q(k+1) &
-                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
-                     s% conv_vel(k0) = 0d0
-                     exit
-                  end if
-               end do
-               s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
-            end do
-            write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
-            stop 'do_relax_to_star_cut'
-            deallocate(conv_vel_interp, interp_work)
-         end if
+         !!take care of convective velocities
+         ! TODO: adapt for TDC
+         !if (s% conv_vel_flag) then
+         !   do k0=1, s% nz
+         !      call interp_value(q, num_pts, conv_vel_interp, s% q(k0), s% conv_vel(k0), ierr)
+         !      !avoid extending regions with non-zero conv vel
+         !      do k=2, num_pts-1
+         !         if(s% q(k0) < q(k) .and. s% q(k0) > q(k+1) &
+         !            .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
+         !            s% conv_vel(k0) = 0d0
+         !            exit
+         !         end if
+         !      end do
+         !      s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
+         !   end do
+         !   write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
+         !   call mesa_error(__FILE__,__LINE__,'do_relax_to_star_cut')
+         !   deallocate(conv_vel_interp, interp_work)
+         !end if
 
          s% generations = 1
 

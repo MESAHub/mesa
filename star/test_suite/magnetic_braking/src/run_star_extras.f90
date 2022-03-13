@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
 
       implicit none
 
@@ -67,7 +68,7 @@
          integer, intent(out) :: ierr
 
          real(dp) :: bfield, vinf, eta, factor
-         real(dp) :: j_dot, check_delta_j, i_tot, delta_j
+         real(dp) :: v_rot, omega_crit, j_dot, check_delta_j, delta_j
          real(dp) :: residual_jdot, torque, j_average
 
          type (star_info), pointer :: s
@@ -92,14 +93,16 @@
          factor = 0d0
          j_average = 0d0
 
-         ! Calculate total specific moment of inertia and angular momentum
+         omega_crit = star_surface_omega_crit(id, ierr) ! this forces a call to set_surf_avg_rotation_info to ensure things are up
+                                                        ! to date with the state
+         if (ierr /= 0) return
+         v_rot = s% v_rot_avg_surf
 
-         i_tot = sum(s% i_rot(1:s% nz))
+         ! Calculate total angular momentum
          j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz)) ! g cm^2/s Total Stellar Angular Momentum Content
-
         
-         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5)) then ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
-           write(*,*) 'j_tot: ', j_tot, s% omega_avg_surf, s% v_rot_avg_surf/1d5 
+         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (v_rot  .gt. 0.8d5)) then ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
+           write(*,*) 'j_tot: ', j_tot, s% omega(1), v_rot/1d5
           !Calculate V_inf of stellar wind (e.g. Vinf = 1.92 Vesc, see Lamers & Cassinelli 2000)
           !N.B. This is good for line-driven winds in hot stars. For different types of Vinf = Vesc might be a better choice?
           vinf = 1.92d0 * sqrt(2.0d0 * standard_cgrav * s% mstar / (s% photosphere_r * Rsun))

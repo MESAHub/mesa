@@ -41,10 +41,12 @@
             id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
          use star_utils
+         use auto_diff_support
          integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
-         real(dp), intent(inout) :: ft(:), fp(:), r_polar(:), r_equatorial(:) ! (nz)
+         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:) ! (nz)
+         real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
 

@@ -34,6 +34,10 @@
       real(dp), pointer, dimension(:) :: j_rot ! (nz)
         ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
       real(dp), pointer, dimension(:) :: omega ! (nz)
+
+      real(dp), pointer, dimension(:) :: D_ST_start, prev_mesh_D_ST_start ! For time smoothing
+      real(dp), pointer, dimension(:) :: nu_ST_start, prev_mesh_nu_ST_start
+      logical :: have_ST_start_info, prev_mesh_have_ST_start_info
       
       ! convection
       real(dp), pointer, dimension(:) :: mlt_vc ! (nz)
@@ -163,6 +167,7 @@
          real(dp) :: force_tau_factor, force_Tsurf_factor, force_opacity_factor
          real(dp) :: revised_max_yr_dt, astero_revised_max_yr_dt
          real(dp) :: gradT_excess_alpha_old
+         real(dp) :: crystal_core_boundary_mass
                 
          logical :: include_binary_history_in_log_file
          logical :: using_revised_max_yr_dt, astero_using_revised_max_yr_dt
@@ -194,15 +199,12 @@
    
       ! experimental work in progress.
       
-         logical :: conv_vel_flag ! true for conv_vel as a solver variable     
          logical :: w_div_wc_flag ! true for w_div_wc as a solver variable     
          logical :: j_rot_flag ! true for j_rot as a solver variable     
 
-         integer :: i_ln_cvpv0 ! ln(conv_vel + v0) at face of cell. v0 is an arbitrary user defined value.
          integer :: i_w_div_wc ! ratio of omega to critical value without the Eddington factor
          integer :: i_j_rot ! specific angular momentum associated to cell face
 
-         integer :: i_dln_cvpv0_dt ! equation for convection velocities
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
 

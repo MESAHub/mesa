@@ -60,7 +60,7 @@
          ierr = 0
          call do_read_star_job('inlist', ierr) ! this does alloc_star
          ! and saves the id in id_from_read_star_job
-         if (ierr /= 0) stop 1
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
          id = id_from_read_star_job
          id_from_read_star_job = 0
@@ -69,7 +69,7 @@
          okay_to_restart = .true.
          
          call init_simplex_search_data(ierr)
-         if (ierr /= 0) stop 1
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
          star_simplex_procs% extras_controls => extras_controls
 
@@ -82,7 +82,7 @@
          call read_simplex_search_controls(inlist_simplex_fname, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in read_simplex_search_controls'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
          
          if (Y_depends_on_Z .and. vary_Y) then
@@ -95,7 +95,7 @@
             call write_simplex_search_controls(save_controls_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in write_simplex_search_controls'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
          end if
          
@@ -378,7 +378,7 @@
             ierr = 0
             allocate(index(num_samples), stat=ierr)
             if (ierr /= 0) then
-               stop 'failed in allocate before calling qsort from show_all_sample_results'
+               call mesa_error(__FILE__,__LINE__,'failed in allocate before calling qsort from show_all_sample_results')
             end if
             call qsort(index, num_samples, sample_chi2)
             max_i = 0
@@ -428,7 +428,7 @@
                      simplex_inverse(sample_my_param3(i), first_my_param3, min_my_param3, max_my_param3)
                   write(*,3) 'my_param3', j, i, sample_my_param3(i)
                end if
-                write(*,*)
+                write(*,'(A)')
             end do
             
             deallocate(index)
@@ -455,8 +455,8 @@
                   write(*,'(i6)') i
                end if
             end do
-            write(*,*)
-            write(*,*)
+            write(*,'(A)')
+            write(*,'(A)')
             num_samples = max_i
             
          end subroutine setup_simplex_and_f
@@ -481,8 +481,8 @@
          
          ierr = 0
          
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
          
          if (vary_Y) then
             next_Y_to_try = simplex_param( &
@@ -594,7 +594,7 @@
          call save_sample_results_to_file(-1, simplex_output_filename, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in save_sample_results_to_file'
-            stop 1
+            call mesa_error(__FILE__,__LINE__)
          end if
 
          if (simplex_f < simplex_chi2_tol) then
@@ -651,7 +651,7 @@
             call alloc_sample_ptrs(ierr)
             if (ierr /= 0) then
                write(*,*) 'ERROR -- failed to allocate for samples'
-               stop 'save_best_for_sample'
+               call mesa_error(__FILE__,__LINE__,'save_best_for_sample')
                return
             end if
          end if
@@ -739,7 +739,7 @@
                   avg_model_number_top_samples*avg_model_number_top_samples/n)/(n-1)))
          avg_model_number_top_samples = avg_model_number_top_samples/n
          
-         write(*,*)
+         write(*,'(A)')
          write(*,2) 'n for averages', n
          write(*,1) 'avg_age_top_samples', avg_age_top_samples
          write(*,1) 'avg_age_sigma', avg_age_sigma
@@ -749,8 +749,8 @@
          write(*,1) 'model number limit', &
             avg_model_number_top_samples + &
                avg_model_number_sigma_limit*avg_model_number_sigma
-         write(*,*)
-         !stop 'set_sample_averages'
+         write(*,'(A)')
+         !call mesa_error(__FILE__,__LINE__,'set_sample_averages')
          
       end subroutine set_sample_averages
       
@@ -1071,7 +1071,7 @@
                 dt_for_smaller_steps_before_age_target <= 0) then
                write(*,*) 'ERROR: must set num_smaller_steps_before_age_target'
                write(*,*) 'and dt_for_smaller_steps_before_age_target'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             if (age_target > s% star_age) then
                remaining_years = age_target - s% star_age
@@ -1131,7 +1131,7 @@
                      dt_for_smaller_steps_before_age_target
                   write(*,1) 'max_years_for_timestep', &
                      s% max_years_for_timestep
-                  stop 'bad max_years_for_timestep'
+                  call mesa_error(__FILE__,__LINE__,'bad max_years_for_timestep')
                else if (mod(s% model_number, s% terminal_interval) == 0) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                      s% model_number, (age_target - s% star_age)/age_sigma
@@ -1345,7 +1345,7 @@
                   write(*,*) 'have reached Teff limit'
                   write(*,1) 'Teff', s% Teff
                   write(*,1) 'Teff_limit', Teff_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if    
@@ -1362,7 +1362,7 @@
                   write(*,*) 'have reached logg limit'
                   write(*,1) 'logg', logg
                   write(*,1) 'logg_limit', logg_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1379,7 +1379,7 @@
                   write(*,*) 'have reached logL limit'
                   write(*,1) 'logL', s% log_surface_luminosity
                   write(*,1) 'logL_limit', logL_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1396,7 +1396,7 @@
                   write(*,*) 'have reached logR limit'
                   write(*,1) 'logR', logR
                   write(*,1) 'logR_limit', logR_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1416,7 +1416,7 @@
                   write(*,*) 'have reached surface_Z_div_X limit'
                   write(*,1) 'surface_Z_div_X', surface_Z_div_X
                   write(*,1) 'surface_Z_div_X_limit', surface_Z_div_X_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1436,7 +1436,7 @@
                   write(*,*) 'have reached surface_He limit'
                   write(*,1) 'surface_He', surface_He
                   write(*,1) 'surface_He_limit', surface_He_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1453,7 +1453,7 @@
                   write(*,*) 'have reached Rcz limit'
                   write(*,1) 'Rcz', Rcz
                   write(*,1) 'solar_Rcz_limit', solar_Rcz_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1473,7 +1473,7 @@
                   write(*,*) 'have reached solar_cs_rms limit'
                   write(*,1) 'solar_cs_rms', solar_cs_rms
                   write(*,1) 'solar_cs_rms_limit', solar_cs_rms_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1493,7 +1493,7 @@
                   write(*,*) 'have reached my_var1 limit'
                   write(*,1) 'my_var1', my_var1
                   write(*,1) 'my_var1_limit', my_var1_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1513,7 +1513,7 @@
                   write(*,*) 'have reached my_var2 limit'
                   write(*,1) 'my_var2', my_var2
                   write(*,1) 'my_var2_limit', my_var2_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1533,7 +1533,7 @@
                   write(*,*) 'have reached my_var3 limit'
                   write(*,1) 'my_var3', my_var3
                   write(*,1) 'my_var3_limit', my_var3_limit
-                  write(*,*)
+                  write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
                end if
@@ -1821,7 +1821,7 @@
             call star_write_model(s% id, best_model_save_model_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_model'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             write(*, '(a,i7)') 'save ' // trim(best_model_save_model_filename), s% model_number
          end if
@@ -1834,12 +1834,12 @@
             s% write_controls_info_with_profile = write_controls_info_with_profile
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_profile_info'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
             call save_profile(s% id, 3, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in save_profile'
-               stop 1
+               call mesa_error(__FILE__,__LINE__)
             end if
          end if         
          
@@ -2062,10 +2062,10 @@
          end if
          call free_iounit(unit)
          
-         write(*,*)
+         write(*,'(A)')
          write(*,*) 'saved initial &simplex_search_controls to ' // trim(filename)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
 
       end subroutine write_simplex_search_controls
 
@@ -2078,7 +2078,7 @@
          integer :: iounit
          write(*,*) 'save_sample_results_to_file ' // trim(results_fname)
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='write', iostat=ierr)
          if (ierr /= 0) return
          call show_all_sample_results(iounit, i_total, ierr)
@@ -2220,7 +2220,7 @@
 
          call show_sample_header(iounit)
          do i = 1, 3
-            write(iounit,*)
+            write(iounit,'(A)')
          end do
 
       end subroutine show_all_sample_results
@@ -2234,7 +2234,7 @@
 
          if (Teff_sigma > 0 .and. include_Teff_in_chi2) then
             chi2term = pow2((best_Teff - Teff_target)/Teff_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('Teff chi2term', chi2term)
             call write1('Teff', best_Teff)
             call write1('Teff_obs', Teff_target)
@@ -2243,7 +2243,7 @@
          
          if (logL_sigma > 0 .and. include_logL_in_chi2) then
             chi2term = pow2((best_logL - logL_target)/logL_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('logL chi2term', chi2term)
             call write1('logL', best_logL)
             call write1('logL_obs', logL_target)
@@ -2252,7 +2252,7 @@
          
          if (logg_sigma > 0 .and. include_logg_in_chi2) then
             chi2term = pow2((best_logg - logg_target)/logg_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('logg chi2term', chi2term)
             call write1('logg', best_logg)
             call write1('logg_obs', logg_target)
@@ -2261,7 +2261,7 @@
          
          if (FeH_sigma > 0 .and. include_FeH_in_chi2) then
             chi2term = pow2((best_FeH - FeH_target)/FeH_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('FeH chi2term', chi2term)
             call write1('FeH', best_FeH)
             call write1('FeH_obs', FeH_target)
@@ -2270,7 +2270,7 @@
          
          if (logR_sigma > 0 .and. include_logR_in_chi2) then
             chi2term = pow2((best_logR - logR_target)/logR_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('logR chi2term', chi2term)
             call write1('logR', best_logR)
             call write1('logR_obs', logR_target)
@@ -2279,7 +2279,7 @@
          
          if (age_sigma > 0 .and. include_age_in_chi2) then
             chi2term = pow2((best_age - age_target)/age_sigma)
-            write(io,*)
+            write(io,'(A)')
             write(io,'(a40,e20.10,99f20.10)') 'age chi2term', chi2term
             write(io,'(a40,1pd20.10)') 'age', best_age
             write(io,'(a40,1pd20.10)') 'age_target', age_target
@@ -2290,7 +2290,7 @@
                include_surface_Z_div_X_in_chi2) then
             chi2term = &
                pow2((best_surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-            write(io,*)
+            write(io,'(A)')
             write(io,'(a40,e20.10,99f20.10)') 'surface_Z_div_X chi2term', chi2term
             call write1('surface_Z_div_X', best_surface_Z_div_X)
             call write1('surface_Z_div_X_obs', surface_Z_div_X_target)
@@ -2299,7 +2299,7 @@
          
          if (surface_He_sigma > 0 .and. include_surface_He_in_chi2) then
             chi2term = pow2((best_surface_He - surface_He_target)/surface_He_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('surface_He chi2term', chi2term)
             call write1('surface_He', best_surface_He)
             call write1('surface_He_obs', surface_He_target)
@@ -2308,7 +2308,7 @@
          
          if (Rcz_sigma > 0 .and. include_Rcz_in_chi2) then
             chi2term = pow2((best_Rcz - Rcz_target)/Rcz_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('Rcz chi2term', chi2term)
             call write1('Rcz', best_Rcz)
             call write1('Rcz_obs', Rcz_target)
@@ -2317,7 +2317,7 @@
          
          if (solar_cs_rms_sigma > 0 .and. include_solar_cs_rms_in_chi2) then
             chi2term = pow2((best_solar_cs_rms - solar_cs_rms_target)/solar_cs_rms_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1('solar_cs_rms chi2term', chi2term)
             call write1('solar_cs_rms', best_solar_cs_rms)
             call write1('solar_cs_rms_obs', solar_cs_rms_target)
@@ -2327,7 +2327,7 @@
          if (my_var1_sigma > 0 .and. include_my_var1_in_chi2) then
             chi2term = pow2( &
                   (best_my_var1 - my_var1_target)/my_var1_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1(trim(my_var1_name) // ' chi2term', chi2term)
             call write1(trim(my_var1_name), best_my_var1)
             call write1(trim(my_var1_name) // '_obs', my_var1_target)
@@ -2337,7 +2337,7 @@
          if (my_var2_sigma > 0 .and. include_my_var2_in_chi2) then
             chi2term = pow2( &
                   (best_my_var2 - my_var2_target)/my_var2_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1(trim(my_var2_name) // ' chi2term', chi2term)
             call write1(trim(my_var2_name), best_my_var2)
             call write1(trim(my_var2_name) // '_obs', my_var2_target)
@@ -2347,14 +2347,14 @@
          if (my_var3_sigma > 0 .and. include_my_var3_in_chi2) then
             chi2term = pow2( &
                   (best_my_var3 - my_var3_target)/my_var3_sigma)
-            write(io,*)
+            write(io,'(A)')
             call write1(trim(my_var3_name) // ' chi2term', chi2term)
             call write1(trim(my_var3_name), best_my_var3)
             call write1(trim(my_var3_name) // '_obs', my_var3_target)
             call write1(trim(my_var3_name) // '_sigma', my_var3_sigma)
          end if
          
-         write(io,*)
+         write(io,'(A)')
          call write1('R/Rsun', best_radius)
          call write1('logL/Lsun', best_logL)
          call write1('Teff', best_Teff)
@@ -2377,12 +2377,12 @@
          call write1('alpha', current_alpha)
          call write1('f_ov', current_f_ov)
          write(io,'(a40,1pd26.16)') 'age', best_age
-         write(io,*)
+         write(io,'(A)')
          call write1('chi^2', best_chi2)
-         write(io,*)
+         write(io,'(A)')
          write(io,'(a40,i16)') 'model number', best_model_number
-         write(io,*)
-         write(io,*)
+         write(io,'(A)')
+         write(io,'(A)')
          
          contains
          
@@ -2469,7 +2469,7 @@
          write(*,*) 'read samples from file ' // trim(results_fname)
          
          iounit = alloc_iounit(ierr)
-         if (ierr /= 0) stop 'alloc_iounit failed'
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(results_fname)

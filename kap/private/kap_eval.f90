@@ -374,7 +374,7 @@
            write(*,1) 'beta', beta
            write(*,1) 'kap2 (highT)', kap2
            write(*,1) 'kap', kap
-           write(*,*)
+           write(*,'(A)')
         end if
 
         if (dbg) write(*,1) 'Get_kap_blend_logT kap', kap
@@ -618,7 +618,7 @@
            write(*,1) 'max_frac_Type2', max_frac_Type2
            write(*,1) 'frac_Type2', frac_Type2
            write(*,1) 'frac_Type1', frac_Type1
-           write(*,*)
+           write(*,'(A)')
            write(*,1) 'X', X
            write(*,1) 'dXC', dXC
            write(*,1) 'dXO', dXO
@@ -651,7 +651,7 @@
               write(*,1) 'logT', logT
               write(*,1) 'kap_beta', kap_beta
               write(*,1) 'beta', beta
-              write(*,*)
+              write(*,'(A)')
            end if
         else
            kap_beta = 0d0; dlnkap_beta_dlnRho = 0d0; dlnkap_beta_dlnT = 0d0
@@ -672,7 +672,7 @@
               write(*,1) 'logT', logT
               write(*,1) 'kap_alfa', kap_alfa
               write(*,1) 'alfa', alfa
-              write(*,*)
+              write(*,'(A)')
            end if
         else
            kap_alfa = 0d0; dlnkap_alfa_dlnRho = 0d0; dlnkap_alfa_dlnT = 0d0
@@ -738,7 +738,7 @@
 
          if (is_bad(kap_ec)) then
             write(*,*) 'kap_ec', kap_ec
-            stop 'combine_rad_with_conduction'
+            call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
          end if
          if (dbg) write(*,1) 'kap_ec', kap_ec
          if (dbg) write(*,1) 'dlnkap_ec_dlnRho', dlnkap_ec_dlnRho
@@ -753,7 +753,7 @@
          if (is_bad(kap)) then
             ierr = -1; return
             write(*,1) 'kap', kap
-            stop 'Get_kap_Results'
+            call mesa_error(__FILE__,__LINE__,'Get_kap_Results')
          end if
 
          dlnkap_dlnRho = (kap/kap_rad) * dlnkap_rad_dlnRho + (kap/kap_ec) * dlnkap_ec_dlnRho
@@ -767,7 +767,7 @@
             write(*,1) 'dkap_rad_dlnRho', kap_rad * dlnkap_rad_dlnRho
             write(*,1) 'kap_rad', kap_rad
             write(*,1) 'kap_ec', kap_ec
-            stop 'combine_rad_with_conduction'
+            call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
          end if
          
          dlnkap_dlnT = (kap/kap_rad) * dlnkap_rad_dlnT + (kap/kap_ec) * dlnkap_ec_dlnT
@@ -781,12 +781,12 @@
             write(*,1) 'dkap_rad_dlnT', kap_rad * dlnkap_rad_dlnT
             write(*,1) 'kap_rad', kap_rad
             write(*,1) 'kap_ec', kap_ec
-            stop 'combine_rad_with_conduction'
+            call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
          end if
 
          if (dbg) write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
          if (dbg) write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
-         if (dbg) stop 'combine_rad_with_conduction'
+         if (dbg) call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
       
       
       end subroutine combine_rad_with_conduction

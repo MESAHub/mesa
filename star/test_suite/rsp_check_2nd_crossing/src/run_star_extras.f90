@@ -26,6 +26,7 @@ module run_star_extras
       use star_def
       use const_def
       use math_lib
+      use auto_diff
 
       implicit none
       
@@ -125,7 +126,7 @@ module run_star_extras
          read_loop: do
             read(io_in,fmt=*,iostat=ierr) vals(1:num_cols_to_read)
             if (ierr /= 0) exit read_loop
-            if (model_cnt >= max_cnt) stop 'need to increase max_cnt'
+            if (model_cnt >= max_cnt) call mesa_error(__FILE__,__LINE__,'need to increase max_cnt')
             model_cnt = model_cnt + 1
             modnums(model_cnt) = int(vals(col_model_number))
             ages(model_cnt) = vals(col_star_age)
@@ -202,7 +203,7 @@ module run_star_extras
                if (num_beyond_blue_edge > 0 .or. just_failed) exit search_loop
                just_failed = .true.
                cycle search_loop
-               !stop 'failed in star_do1_rsp_build'
+               !call mesa_error(__FILE__,__LINE__,'failed in star_do1_rsp_build')
             end if
             just_failed = .false.
             n = n+1
@@ -249,9 +250,9 @@ module run_star_extras
                   !write(*,*) 'v_old', v_old(1:4)
                   call interpolate_vector_pm( &
                      4, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)    
-                  if (ierr /= 0) stop 'failed in interpolate_vector_pm red edge'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm red edge')
                   Teff_red_edge = v_new(1)
-                  write(*,*)
+                  write(*,'(A)')
                   write(*,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
                   write(io_out,*)
                   write(io_out,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
@@ -269,14 +270,14 @@ module run_star_extras
             !write(*,*) 'v_old', v_old(1:3)
             call interpolate_vector_pm( &
                3, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)    
-            if (ierr /= 0) stop 'failed in interpolate_vector_pm red edge'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm red edge')
             Teff_red_edge = v_new(1)
-            write(*,*)
+            write(*,'(A)')
             write(*,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
             write(io_out,*)
             write(io_out,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
          end if
-         if (Teff_red_edge < 0d0) stop 'failed to find red edge'
+         if (Teff_red_edge < 0d0) call mesa_error(__FILE__,__LINE__,'failed to find red edge')
          
          Teff_blue_edge = -1
          if (num_beyond_blue_edge == 2) then
@@ -292,7 +293,7 @@ module run_star_extras
                   !write(*,*) 'v_old', v_old(1:4)
                   call interpolate_vector_pm( &
                      4, x_old, 1, x_new, v_old, v_new, work1, 'blue edge', ierr)    
-                  if (ierr /= 0) stop 'failed in interpolate_vector_pm blue edge'
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm blue edge')
                   Teff_blue_edge = v_new(1)
                   write(*,'(a20,f20.10)') 'Teff_blue_edge', Teff_blue_edge
                   write(io_out,'(a20,f20.10)') 'Teff_blue_edge', Teff_blue_edge
@@ -311,13 +312,13 @@ module run_star_extras
                !write(*,*) 'v_old', v_old(1:3)
                call interpolate_vector_pm( &
                   3, x_old, 1, x_new, v_old, v_new, work1, 'blue edge', ierr)    
-               if (ierr /= 0) stop 'failed in interpolate_vector_pm blue edge'
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm blue edge')
                Teff_blue_edge = v_new(1)
                write(*,'(a20,f20.10)') 'Teff_blue_edge', Teff_blue_edge
                write(io_out,'(a20,f20.10)') 'Teff_blue_edge', Teff_blue_edge
             end if
          end if
-         write(*,*)
+         write(*,'(A)')
          write(io_out,*)
          if (Teff_blue_edge < 0d0) then
             write(*,*) 'failed to find blue edge'         
@@ -341,14 +342,14 @@ module run_star_extras
             x_new(1) = Teff_blue_edge - offset
             if (x_new(1) < Teff_red_edge) x_new(1) = Teff_red_edge
             call interp_values(temp, n, f1, 1, x_new, v_new, ierr)
-            if (ierr /= 0) stop 'failed in interp_values Ts'
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp_values Ts')
             write(*,'(i10,2f20.10)') int(Teff_blue_edge - x_new(1)), x_new(1), v_new(1)
             write(io_out,'(i10,2f20.10)') int(Teff_blue_edge - x_new(1)), x_new(1), v_new(1)
             if (x_new(1) == Teff_red_edge) exit
             offset = offset + 100d0
          end do
          write(io_out,*)
-         write(*,*)
+         write(*,'(A)')
          
          close(io_out)
 
@@ -398,9 +399,9 @@ module run_star_extras
          extras_finish_step = keep_going
          if (s% x_integer_ctrl(1) <= 0) return
          if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
@@ -414,9 +415,9 @@ module run_star_extras
             write(*,*) 'good match for period', &
                s% rsp_period/(24*3600), target_period
          end if
-         write(*,*)
-         write(*,*)
-         write(*,*)
+         write(*,'(A)')
+         write(*,'(A)')
+         write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
       

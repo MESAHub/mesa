@@ -54,8 +54,7 @@
 
          first_FeH = 0.0971914841d0
          first_Y = 0.2766011029d0
-         ! first_alpha = 1.9328813396d0 ! Cox
-         first_alpha = 1.7925604051111186d0 ! TDC
+         first_alpha = 1.9328813396d0
          first_f_ov = 0.0319201826d0
 
          vary_FeH = .true. ! FeH = [Fe/H] = log10((Z/X)/Z_div_X_solar)

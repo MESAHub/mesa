@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use auto_diff
       use gyre_lib
       
       implicit none
@@ -151,7 +152,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          nz = s% nz
-         write(*,*)
+         write(*,'(A)')
          call test_suite_after_evolve(s, ierr)
          if (.not. s% x_logical_ctrl(37)) return
          call gyre_final()

@@ -55,22 +55,6 @@
             b% mdot_donor_theta(b% anomaly_steps))
          allocate(b% edot_theta(b% anomaly_steps), b% e1(b% anomaly_steps), &
             b% e2(b% anomaly_steps), b% e3(b% anomaly_steps))
-         ! Set all parameters nessessary for integration over the binary orbit
-         ! 1) true anomaly = polar angle from periastron 0 -> 2pi
-         do i = 1,b% anomaly_steps 
-            b% theta_co(i) = (i-1) * (2 * pi) / b% anomaly_steps
-         end do
-         ! 2) time between periastron and polar angle theta 0 -> 1 (fraction of the
-         !    orbital period)
-         do i = 1,b% anomaly_steps ! time between periastron and polar angle theta
-            b% time_co(i) = ( 2 * atan( sqrt( (1-b% eccentricity)/(1 + b% eccentricity) ) * &
-                            tan(b% theta_co(i)/2d0) ) - b% eccentricity * &
-                            sqrt(1 - pow2(b% eccentricity)) * sin(b% theta_co(i)) / &
-                            (1 + b% eccentricity * cos(b% theta_co(i)) ) ) /2.d0 /pi
-            if (i > b% anomaly_steps/2+1) then
-               b% time_co(i) = b% time_co(i) + b% time_co(b% anomaly_steps/2+1) * 2
-            end if
-         end do
 
          if (.not. doing_restart) then
             if (.not. b% evolve_both_stars) then
@@ -139,8 +123,25 @@
                   end if
             end if
 
-            if (is_bad(b% rl_relative_gap(1))) stop 'binarydata_init'
-            if (is_bad(b% rl_relative_gap(2))) stop 'binarydata_init'
+         ! Set all parameters nessessary for integration over the binary orbit
+         ! 1) true anomaly = polar angle from periastron 0 -> 2pi
+            do i = 1,b% anomaly_steps 
+               b% theta_co(i) = (i-1) * (2 * pi) / b% anomaly_steps
+            end do
+            ! 2) time between periastron and polar angle theta 0 -> 1 (fraction of the
+            !    orbital period)
+            do i = 1,b% anomaly_steps ! time between periastron and polar angle theta
+               b% time_co(i) = ( 2 * atan( sqrt( (1-b% eccentricity)/(1 + b% eccentricity) ) * &
+                               tan(b% theta_co(i)/2d0) ) - b% eccentricity * &
+                               sqrt(1 - pow2(b% eccentricity)) * sin(b% theta_co(i)) / &
+                               (1 + b% eccentricity * cos(b% theta_co(i)) ) ) /2.d0 /pi
+               if (i > b% anomaly_steps/2+1) then
+                  b% time_co(i) = b% time_co(i) + b% time_co(b% anomaly_steps/2+1) * 2
+               end if
+            end do
+   
+            if (is_bad(b% rl_relative_gap(1))) call mesa_error(__FILE__,__LINE__,'binarydata_init')
+            if (is_bad(b% rl_relative_gap(2))) call mesa_error(__FILE__,__LINE__,'binarydata_init')
             b% using_jdot_mb(1) = .false.
             b% using_jdot_mb(2) = .false.
 
@@ -164,14 +165,14 @@
                b% eq_initial_bh_mass = b% m(b% point_mass_i) * sqrt(r_isco/6d0)
             end if
             
-            write(*,*)
+            write(*,'(A)')
             write(*,1) 'm2', b% m2
             write(*,1) 'm1', b% m1
             write(*,1) 'initial_period_in_days', b% initial_period_in_days
             write(*,1) 'initial_separation_in_Rsun', b% separation/Rsun
             write(*,1) 'jdot_multiplier', b% jdot_multiplier
             write(*,1) 'fr', b% fr
-            write(*,*)
+            write(*,'(A)')
 
             min_binary_period = b% period
             b% min_binary_separation = b% separation

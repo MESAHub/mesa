@@ -28,6 +28,7 @@
    use const_def
    use eos_def
    use math_lib
+   use utils_lib, only: mesa_error
 
    implicit none
 
@@ -287,7 +288,7 @@
       rq% Gamma_e_all_HELM = exp10(rq% log_Gamma_e_all_HELM)
       if (FreeEOS_XZ_struct% Zs(num_FreeEOS_Zs) /= 1d0) then
          write(*,*) 'ERROR: expect FreeEOS_XZ_struct% Zs(num_FreeEOS_Zs) == 1d0'
-         stop 'init_eos_handle_data'
+         call mesa_error(__FILE__,__LINE__,'init_eos_handle_data')
       end if
    end subroutine read_namelist
 
@@ -664,7 +665,7 @@
       character(len=*), intent(out) :: val
       integer, intent(out) :: ierr
 
-      character(len(name)) :: upper_name
+      character(len(name)+1) :: upper_name
       character(len=512) :: str
       integer :: iounit,iostat,ind,i
 
@@ -680,14 +681,14 @@
       rewind(iounit)
 
       ! Namelists get written in captials
-      upper_name = StrUpCase(name)
+      upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist
       do 
          read(iounit,'(A)',iostat=iostat) str
-         ind = index(str,trim(upper_name))
+         ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
             do i=1,len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do

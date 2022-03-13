@@ -26,6 +26,7 @@
     use star_def
     use const_def
     use math_lib
+      use auto_diff
 
     implicit none
 
@@ -166,7 +167,7 @@
         
         if (s% job% create_pre_main_sequence_model) return
 
-        write(*,*)
+        write(*,'(A)')
         k1 = 0
         k2 = 0
         k3 = 0
@@ -188,22 +189,22 @@
         fraction = (safe_log10(Peclet_number)+2.0_dp)/4.0_dp
         gradient = (fraction*s%grada(k3) + (1.0_dp - fraction) * s%gradr(k3))
 
-        write(*,*)
+        write(*,'(A)')
         call check('grada fraction of gradT at 1.1 Msun', fraction, 0.1_dp, 0.9_dp )
-        write(*,*)
+        write(*,'(A)')
 
         call check('gradT at 0.8 Msun', s%gradT(k1), s%grada(k1) - 1.0d-3, s%grada(k1) + 1.0d-3)   ! gradT = grada
         call check('gradT at 0.95 Msun', s%gradT(k2), s%grada(k2) - 1.0d-3, s%grada(k2) + 1.0d-3)   ! gradT = grada
         call check('gradT at 1.1 Msun', s%gradT(k3), gradient - 1.0d-3, gradient + 1.0d-3)   ! gradT = f*grada + (1-f)*gradr
         call check('gradT at 1.5 Msun', s%gradT(k4), s%gradr(k4) - 1.0d-3, s%gradr(k4)+ 1.0d-3)   ! gradT = gradr
-        write(*,*)
+        write(*,'(A)')
 
         call check('Dmix at 0.95 Msun', s%d_mix(k2), s%d_mix(s%conv_bdy_loc(1))*0.95d0, s%d_mix(s%conv_bdy_loc(1))*1.05d0)
         call check('Dmix at 1.1 Msun', s%d_mix(k3), 1.0d4, s%d_mix(s%conv_bdy_loc(1)) * 1.0d-2)
 
-        write(*,*)
+        write(*,'(A)')
         if (okay) write(*,'(a)') 'All values are within tolerances'
-        write(*,*)
+        write(*,'(A)')
 
         contains
 
