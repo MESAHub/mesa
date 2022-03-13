@@ -246,11 +246,10 @@
          have_radial = .false.
          have_nonradial = .false.
          model_ratios_n = 0
-         
-         model_freq(0,1:nl(0)) = 0
-         model_freq(1,1:nl(1)) = 0
-         model_freq(2,1:nl(2)) = 0
-         model_freq(3,1:nl(3)) = 0
+
+         do l = 0, 3
+            model_freq(l,1:nl(l)) = 0
+         end do
          
          if (delta_nu_sigma > 0) then
             chi2_delta_nu = pow2((delta_nu - delta_nu_model)/delta_nu_sigma)
