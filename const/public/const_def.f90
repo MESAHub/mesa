@@ -68,7 +68,7 @@
       real(dp), parameter :: two_13 = 1.2599210498948730d0 ! = pow(2d0,1d0/3d0)
       real(dp), parameter :: four_13 = 1.5874010519681994d0 ! = pow(4d0,1d0/3d0)
       real(dp), parameter :: sqrt2 = 1.414213562373095d0 ! = sqrt(2)
-      real(dp), parameter :: sqrt_2_div_3 = 0.8164965809d0 ! = sqrt(2/3)
+      real(dp), parameter :: sqrt_2_div_3 = 0.816496580927726d0 ! = sqrt(2/3)
 
 ! exact physical constants
 
