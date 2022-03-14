@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -48,9 +49,9 @@
          call pgeras()
 
          call do_HR_Plot(s, id, device_id, &
-            s% HR_xleft, s% HR_xright, &
-            s% HR_ybot, s% HR_ytop, .false., &
-            s% HR_title, s% HR_txt_scale, ierr)
+            s% pg% HR_xleft, s% pg% HR_xright, &
+            s% pg% HR_ybot, s% pg% HR_ytop, .false., &
+            s% pg% HR_title, s% pg% HR_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -66,14 +67,14 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% show_HR_Mira_instability_region) then
+         if (s% pg% show_HR_Mira_instability_region) then
             logL1 = 2.8
             logL2 = 4.0
             logT2 = 3.7
             logT1 = 3.45
 
             call pgsls(Line_Type_Solid)
-            call pgslw(s% pgstar_lw)
+            call pgslw(s% pg% pgstar_lw)
             call pgsci(clr_Blue)
             call pgmove(logT1, logL1)
             call pgdraw(logT1, logL2)
@@ -81,10 +82,10 @@
             call pgdraw(logT2, logL1)
             call pgdraw(logT1, logL1)
          end if
-         if (s% show_HR_classical_instability_strip) then
+         if (s% pg% show_HR_classical_instability_strip) then
 
             call pgsls(Line_Type_Solid)
-            call pgslw(s% pgstar_lw)
+            call pgslw(s% pg% pgstar_lw)
             
             ! approximate edges
             
@@ -110,11 +111,11 @@
             call pgmove(logT1, logL1)
             call pgdraw(logT2, logL2)
          end if
-         if (s% show_HR_WD_instabilities) then
+         if (s% pg% show_HR_WD_instabilities) then
             ! from Winget & Kepler, Annu. Rev. Astron. Astrophys., 2008, Fig 3.
             call pgsave
             call pgsls(Line_Type_Solid)
-            call pgslw(s% pgstar_lw)
+            call pgslw(s% pg% pgstar_lw)
             call pgsci(clr_Silver)
             call pgmove(5.1, 4.3) ! DOV
             call pgdraw(4.8, 0.3)
@@ -131,7 +132,7 @@
             call pgdraw(4.1, -3.2)
             call pgdraw(4.1, -2.2)
             call pgdraw(4.03, -2.4)
-            call pgsch(s% HR_txt_scale*0.7)
+            call pgsch(s% pg% HR_txt_scale*0.7)
             call pgslw(1)
             call pgptxt(5.1 - 0.05, 4.3, 0.0, 0.0, 'DOV')
             call pgptxt(4.42 - 0.05, -0.7, 0.0, 0.0, 'DBV')
@@ -158,21 +159,21 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'log_Teff', 'log_L', &
             'log Teff', 'log L/L\d\(2281)', &
-            s% HR_logT_min, s% HR_logT_max, &
-            s% HR_logT_margin, s% HR_dlogT_min, &
-            s% HR_logL_min, s% HR_logL_max, &
-            s% HR_logL_margin, s% HR_dlogL_min, &
-            s% HR_step_min, s% HR_step_max, &
+            s% pg% HR_logT_min, s% pg% HR_logT_max, &
+            s% pg% HR_logT_margin, s% pg% HR_dlogT_min, &
+            s% pg% HR_logL_min, s% pg% HR_logL_max, &
+            s% pg% HR_logL_margin, s% pg% HR_dlogL_min, &
+            s% pg% HR_step_min, s% pg% HR_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_HR_target_box, s% HR_target_n_sigma, &
-            s% HR_target_logT, s% HR_target_logL, &
-            s% HR_target_logT_sigma, s% HR_target_logL_sigma, &
-            s% show_HR_annotation1, &
-            s% show_HR_annotation2, &
-            s% show_HR_annotation3, &
-            s% HR_fname, &
-            s% HR_use_decorator, &
-            s% HR_pgstar_decorator, &
+            s% pg% show_HR_target_box, s% pg% HR_target_n_sigma, &
+            s% pg% HR_target_logT, s% pg% HR_target_logL, &
+            s% pg% HR_target_logT_sigma, s% pg% HR_target_logL_sigma, &
+            s% pg% show_HR_annotation1, &
+            s% pg% show_HR_annotation2, &
+            s% pg% show_HR_annotation3, &
+            s% pg% HR_fname, &
+            s% pg% HR_use_decorator, &
+            s% pg% HR_pgstar_decorator, &
             HR_decorate, ierr)
       end subroutine do_HR_Plot
 

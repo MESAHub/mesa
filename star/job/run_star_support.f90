@@ -712,9 +712,9 @@
          if (result == keep_going) then 
             if (s% job% pgstar_flag) then
                 will_read_pgstar_inlist = .false.
-                if (s% pgstar_interval <= 0) then
+                if (s% pg% pgstar_interval <= 0) then
                     will_read_pgstar_inlist = .true.
-                else if(mod(s% model_number, s% pgstar_interval) == 0) then
+                else if(mod(s% model_number, s% pg% pgstar_interval) == 0) then
                     will_read_pgstar_inlist  = .true.
                 end if
                 if(will_read_pgstar_inlist) then

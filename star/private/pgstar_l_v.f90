@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -48,9 +49,9 @@
          call pgeras()
 
          call do_L_v_Plot(s, id, device_id, &
-            s% L_v_xleft, s% L_v_xright, &
-            s% L_v_ybot, s% L_v_ytop, .false., &
-            s% L_v_title, s% L_v_txt_scale, ierr)
+            s% pg% L_v_xleft, s% pg% L_v_xright, &
+            s% pg% L_v_ybot, s% pg% L_v_ytop, .false., &
+            s% pg% L_v_title, s% pg% L_v_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -75,21 +76,21 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'v_surf_km_s', 'luminosity', &
             'v km/s', 'L/L\d\(2281)', &
-            s% L_v_v_min, s% L_v_v_max, &
-            s% L_v_v_margin, s% L_v_dv_min, &
-            s% L_v_L_min, s% L_v_L_max, &
-            s% L_v_L_margin, s% L_v_dL_min, &
-            s% L_v_step_min, s% L_v_step_max, &
+            s% pg% L_v_v_min, s% pg% L_v_v_max, &
+            s% pg% L_v_v_margin, s% pg% L_v_dv_min, &
+            s% pg% L_v_L_min, s% pg% L_v_L_max, &
+            s% pg% L_v_L_margin, s% pg% L_v_dL_min, &
+            s% pg% L_v_step_min, s% pg% L_v_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_L_v_target_box, s% L_v_target_n_sigma, &
-            s% L_v_target_v, s% L_v_target_L, &
-            s% L_v_target_v_sigma, s% L_v_target_L_sigma, &
-            s% show_L_v_annotation1, &
-            s% show_L_v_annotation2, &
-            s% show_L_v_annotation3, &
-            s% L_v_fname, &
-            s% L_v_use_decorator, &
-            s% L_v_pgstar_decorator, &
+            s% pg% show_L_v_target_box, s% pg% L_v_target_n_sigma, &
+            s% pg% L_v_target_v, s% pg% L_v_target_L, &
+            s% pg% L_v_target_v_sigma, s% pg% L_v_target_L_sigma, &
+            s% pg% show_L_v_annotation1, &
+            s% pg% show_L_v_annotation2, &
+            s% pg% show_L_v_annotation3, &
+            s% pg% L_v_fname, &
+            s% pg% L_v_use_decorator, &
+            s% pg% L_v_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_L_v_Plot
 

@@ -29,6 +29,7 @@
       use const_def
       use pgstar_support
       use pgstar_trho_profile
+      use star_pgstar
 
       implicit none
 
@@ -47,9 +48,9 @@
          call pgbbuf()
          call pgeras()
          call do_profile_panels1_plot(s, id, device_id, &
-            s% Profile_Panels1_xleft, s% Profile_Panels1_xright, &
-            s% Profile_Panels1_ybot, s% Profile_Panels1_ytop, .false., &
-            s% Profile_Panels1_title, s% Profile_Panels1_txt_scale, ierr)
+            s% pg% Profile_Panels1_xleft, s% pg% Profile_Panels1_xright, &
+            s% pg% Profile_Panels1_ybot, s% pg% Profile_Panels1_ytop, .false., &
+            s% pg% Profile_Panels1_title, s% pg% Profile_Panels1_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels1_plot
@@ -65,26 +66,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels1_xaxis_reversed, &
-            s% Profile_Panels1_yaxis_reversed, &
-            s% Profile_Panels1_other_yaxis_reversed, &
-            s% Profile_Panels1_yaxis_log, &
-            s% Profile_Panels1_other_yaxis_log, &
-            s% Profile_Panels1_same_yaxis_range, &
-            s% Profile_Panels1_xaxis_name, &
-            s% Profile_Panels1_yaxis_name, &
-            s% Profile_Panels1_other_yaxis_name, &
-            s% Profile_Panels1_xmin, s% Profile_Panels1_xmax, &
-            s% Profile_Panels1_xmargin, s% Profile_Panels1_show_mix_regions_on_xaxis, &
-            s% Profile_Panels1_ymin, s% Profile_Panels1_other_ymin, &
-            s% Profile_Panels1_ymax, s% Profile_Panels1_other_ymax, &
-            s% Profile_Panels1_ycenter, s% Profile_Panels1_other_ycenter, &
-            s% Profile_Panels1_ymargin, s% Profile_Panels1_other_ymargin, &
-            s% Profile_Panels1_dymin, s% Profile_Panels1_other_dymin, &
-            s% Profile_Panels1_show_grid, &
-            s% Profile_Panels1_num_panels, &
-            s% Profile_Panels1_use_decorator, &
-            s% Profile_Panels1_pgstar_decorator, &
+            s% pg% Profile_Panels1_xaxis_reversed, &
+            s% pg% Profile_Panels1_yaxis_reversed, &
+            s% pg% Profile_Panels1_other_yaxis_reversed, &
+            s% pg% Profile_Panels1_yaxis_log, &
+            s% pg% Profile_Panels1_other_yaxis_log, &
+            s% pg% Profile_Panels1_same_yaxis_range, &
+            s% pg% Profile_Panels1_xaxis_name, &
+            s% pg% Profile_Panels1_yaxis_name, &
+            s% pg% Profile_Panels1_other_yaxis_name, &
+            s% pg% Profile_Panels1_xmin, s% pg% Profile_Panels1_xmax, &
+            s% pg% Profile_Panels1_xmargin, s% pg% Profile_Panels1_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels1_ymin, s% pg% Profile_Panels1_other_ymin, &
+            s% pg% Profile_Panels1_ymax, s% pg% Profile_Panels1_other_ymax, &
+            s% pg% Profile_Panels1_ycenter, s% pg% Profile_Panels1_other_ycenter, &
+            s% pg% Profile_Panels1_ymargin, s% pg% Profile_Panels1_other_ymargin, &
+            s% pg% Profile_Panels1_dymin, s% pg% Profile_Panels1_other_dymin, &
+            s% pg% Profile_Panels1_show_grid, &
+            s% pg% Profile_Panels1_num_panels, &
+            s% pg% Profile_Panels1_use_decorator, &
+            s% pg% Profile_Panels1_pgstar_decorator, &
             1, &
             ierr)
       end subroutine do_profile_panels1_plot
@@ -101,9 +102,9 @@
          call pgbbuf()
          call pgeras()
          call do_profile_Panels2_plot(s, id, device_id, &
-            s% Profile_Panels2_xleft, s% Profile_Panels2_xright, &
-            s% Profile_Panels2_ybot, s% Profile_Panels2_ytop, .false., &
-            s% Profile_Panels2_title, s% Profile_Panels2_txt_scale, ierr)
+            s% pg% Profile_Panels2_xleft, s% pg% Profile_Panels2_xright, &
+            s% pg% Profile_Panels2_ybot, s% pg% Profile_Panels2_ytop, .false., &
+            s% pg% Profile_Panels2_title, s% pg% Profile_Panels2_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels2_plot
@@ -119,26 +120,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels2_xaxis_reversed, &
-            s% Profile_Panels2_yaxis_reversed, &
-            s% Profile_Panels2_other_yaxis_reversed, &
-            s% Profile_Panels2_yaxis_log, &
-            s% Profile_Panels2_other_yaxis_log, &
-            s% Profile_Panels2_same_yaxis_range, &
-            s% Profile_Panels2_xaxis_name, &
-            s% Profile_Panels2_yaxis_name, &
-            s% Profile_Panels2_other_yaxis_name, &
-            s% Profile_Panels2_xmin, s% Profile_Panels2_xmax, &
-            s% Profile_Panels2_xmargin, s% Profile_Panels2_show_mix_regions_on_xaxis, &
-            s% Profile_Panels2_ymin, s% Profile_Panels2_other_ymin, &
-            s% Profile_Panels2_ymax, s% Profile_Panels2_other_ymax, &
-            s% Profile_Panels2_ycenter, s% Profile_Panels2_other_ycenter, &
-            s% Profile_Panels2_ymargin, s% Profile_Panels2_other_ymargin, &
-            s% Profile_Panels2_dymin, s% Profile_Panels2_other_dymin, &
-            s% Profile_Panels2_show_grid, &
-            s% Profile_Panels2_num_panels, &
-            s% Profile_Panels2_use_decorator, &
-            s% Profile_Panels2_pgstar_decorator, &
+            s% pg% Profile_Panels2_xaxis_reversed, &
+            s% pg% Profile_Panels2_yaxis_reversed, &
+            s% pg% Profile_Panels2_other_yaxis_reversed, &
+            s% pg% Profile_Panels2_yaxis_log, &
+            s% pg% Profile_Panels2_other_yaxis_log, &
+            s% pg% Profile_Panels2_same_yaxis_range, &
+            s% pg% Profile_Panels2_xaxis_name, &
+            s% pg% Profile_Panels2_yaxis_name, &
+            s% pg% Profile_Panels2_other_yaxis_name, &
+            s% pg% Profile_Panels2_xmin, s% pg% Profile_Panels2_xmax, &
+            s% pg% Profile_Panels2_xmargin, s% pg% Profile_Panels2_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels2_ymin, s% pg% Profile_Panels2_other_ymin, &
+            s% pg% Profile_Panels2_ymax, s% pg% Profile_Panels2_other_ymax, &
+            s% pg% Profile_Panels2_ycenter, s% pg% Profile_Panels2_other_ycenter, &
+            s% pg% Profile_Panels2_ymargin, s% pg% Profile_Panels2_other_ymargin, &
+            s% pg% Profile_Panels2_dymin, s% pg% Profile_Panels2_other_dymin, &
+            s% pg% Profile_Panels2_show_grid, &
+            s% pg% Profile_Panels2_num_panels, &
+            s% pg% Profile_Panels2_use_decorator, &
+            s% pg% Profile_Panels2_pgstar_decorator, &
             2, &
             ierr)
       end subroutine do_profile_Panels2_plot
@@ -155,9 +156,9 @@
          call pgbbuf()
          call pgeras()
          call do_profile_Panels3_plot(s, id, device_id, &
-            s% Profile_Panels3_xleft, s% Profile_Panels3_xright, &
-            s% Profile_Panels3_ybot, s% Profile_Panels3_ytop, .false., &
-            s% Profile_Panels3_title, s% Profile_Panels3_txt_scale, ierr)
+            s% pg% Profile_Panels3_xleft, s% pg% Profile_Panels3_xright, &
+            s% pg% Profile_Panels3_ybot, s% pg% Profile_Panels3_ytop, .false., &
+            s% pg% Profile_Panels3_title, s% pg% Profile_Panels3_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels3_plot
@@ -173,26 +174,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels3_xaxis_reversed, &
-            s% Profile_Panels3_yaxis_reversed, &
-            s% Profile_Panels3_other_yaxis_reversed, &
-            s% Profile_Panels3_yaxis_log, &
-            s% Profile_Panels3_other_yaxis_log, &
-            s% Profile_Panels3_same_yaxis_range, &
-            s% Profile_Panels3_xaxis_name, &
-            s% Profile_Panels3_yaxis_name, &
-            s% Profile_Panels3_other_yaxis_name, &
-            s% Profile_Panels3_xmin, s% Profile_Panels3_xmax, &
-            s% Profile_Panels3_xmargin, s% Profile_Panels3_show_mix_regions_on_xaxis, &
-            s% Profile_Panels3_ymin, s% Profile_Panels3_other_ymin, &
-            s% Profile_Panels3_ymax, s% Profile_Panels3_other_ymax, &
-            s% Profile_Panels3_ycenter, s% Profile_Panels3_other_ycenter, &
-            s% Profile_Panels3_ymargin, s% Profile_Panels3_other_ymargin, &
-            s% Profile_Panels3_dymin, s% Profile_Panels3_other_dymin, &
-            s% Profile_Panels3_show_grid, &
-            s% Profile_Panels3_num_panels, &
-            s% Profile_Panels3_use_decorator, &
-            s% Profile_Panels3_pgstar_decorator, &
+            s% pg% Profile_Panels3_xaxis_reversed, &
+            s% pg% Profile_Panels3_yaxis_reversed, &
+            s% pg% Profile_Panels3_other_yaxis_reversed, &
+            s% pg% Profile_Panels3_yaxis_log, &
+            s% pg% Profile_Panels3_other_yaxis_log, &
+            s% pg% Profile_Panels3_same_yaxis_range, &
+            s% pg% Profile_Panels3_xaxis_name, &
+            s% pg% Profile_Panels3_yaxis_name, &
+            s% pg% Profile_Panels3_other_yaxis_name, &
+            s% pg% Profile_Panels3_xmin, s% pg% Profile_Panels3_xmax, &
+            s% pg% Profile_Panels3_xmargin, s% pg% Profile_Panels3_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels3_ymin, s% pg% Profile_Panels3_other_ymin, &
+            s% pg% Profile_Panels3_ymax, s% pg% Profile_Panels3_other_ymax, &
+            s% pg% Profile_Panels3_ycenter, s% pg% Profile_Panels3_other_ycenter, &
+            s% pg% Profile_Panels3_ymargin, s% pg% Profile_Panels3_other_ymargin, &
+            s% pg% Profile_Panels3_dymin, s% pg% Profile_Panels3_other_dymin, &
+            s% pg% Profile_Panels3_show_grid, &
+            s% pg% Profile_Panels3_num_panels, &
+            s% pg% Profile_Panels3_use_decorator, &
+            s% pg% Profile_Panels3_pgstar_decorator, &
             3, &
             ierr)
       end subroutine do_profile_Panels3_plot
@@ -209,9 +210,9 @@
          call pgbbuf()
          call pgeras()
          call do_profile_Panels4_plot(s, id, device_id, &
-            s% Profile_Panels4_xleft, s% Profile_Panels4_xright, &
-            s% Profile_Panels4_ybot, s% Profile_Panels4_ytop, .false., &
-            s% Profile_Panels4_title, s% Profile_Panels4_txt_scale, ierr)
+            s% pg% Profile_Panels4_xleft, s% pg% Profile_Panels4_xright, &
+            s% pg% Profile_Panels4_ybot, s% pg% Profile_Panels4_ytop, .false., &
+            s% pg% Profile_Panels4_title, s% pg% Profile_Panels4_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels4_plot
@@ -227,26 +228,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels4_xaxis_reversed, &
-            s% Profile_Panels4_yaxis_reversed, &
-            s% Profile_Panels4_other_yaxis_reversed, &
-            s% Profile_Panels4_yaxis_log, &
-            s% Profile_Panels4_other_yaxis_log, &
-            s% Profile_Panels4_same_yaxis_range, &
-            s% Profile_Panels4_xaxis_name, &
-            s% Profile_Panels4_yaxis_name, &
-            s% Profile_Panels4_other_yaxis_name, &
-            s% Profile_Panels4_xmin, s% Profile_Panels4_xmax, &
-            s% Profile_Panels4_xmargin, s% Profile_Panels4_show_mix_regions_on_xaxis, &
-            s% Profile_Panels4_ymin, s% Profile_Panels4_other_ymin, &
-            s% Profile_Panels4_ymax, s% Profile_Panels4_other_ymax, &
-            s% Profile_Panels4_ycenter, s% Profile_Panels4_other_ycenter, &
-            s% Profile_Panels4_ymargin, s% Profile_Panels4_other_ymargin, &
-            s% Profile_Panels4_dymin, s% Profile_Panels4_other_dymin, &
-            s% Profile_Panels4_show_grid, &
-            s% Profile_Panels4_num_panels, &
-            s% Profile_Panels4_use_decorator, &
-            s% Profile_Panels4_pgstar_decorator, &
+            s% pg% Profile_Panels4_xaxis_reversed, &
+            s% pg% Profile_Panels4_yaxis_reversed, &
+            s% pg% Profile_Panels4_other_yaxis_reversed, &
+            s% pg% Profile_Panels4_yaxis_log, &
+            s% pg% Profile_Panels4_other_yaxis_log, &
+            s% pg% Profile_Panels4_same_yaxis_range, &
+            s% pg% Profile_Panels4_xaxis_name, &
+            s% pg% Profile_Panels4_yaxis_name, &
+            s% pg% Profile_Panels4_other_yaxis_name, &
+            s% pg% Profile_Panels4_xmin, s% pg% Profile_Panels4_xmax, &
+            s% pg% Profile_Panels4_xmargin, s% pg% Profile_Panels4_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels4_ymin, s% pg% Profile_Panels4_other_ymin, &
+            s% pg% Profile_Panels4_ymax, s% pg% Profile_Panels4_other_ymax, &
+            s% pg% Profile_Panels4_ycenter, s% pg% Profile_Panels4_other_ycenter, &
+            s% pg% Profile_Panels4_ymargin, s% pg% Profile_Panels4_other_ymargin, &
+            s% pg% Profile_Panels4_dymin, s% pg% Profile_Panels4_other_dymin, &
+            s% pg% Profile_Panels4_show_grid, &
+            s% pg% Profile_Panels4_num_panels, &
+            s% pg% Profile_Panels4_use_decorator, &
+            s% pg% Profile_Panels4_pgstar_decorator, &
             4, &
             ierr)
       end subroutine do_profile_Panels4_plot
@@ -263,9 +264,9 @@
          call pgbbuf()
          call pgeras()
          call do_Profile_Panels5_plot(s, id, device_id, &
-            s% Profile_Panels5_xleft, s% Profile_Panels5_xright, &
-            s% Profile_Panels5_ybot, s% Profile_Panels5_ytop, .false., &
-            s% Profile_Panels5_title, s% Profile_Panels5_txt_scale, ierr)
+            s% pg% Profile_Panels5_xleft, s% pg% Profile_Panels5_xright, &
+            s% pg% Profile_Panels5_ybot, s% pg% Profile_Panels5_ytop, .false., &
+            s% pg% Profile_Panels5_title, s% pg% Profile_Panels5_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels5_plot
@@ -281,26 +282,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels5_xaxis_reversed, &
-            s% Profile_Panels5_yaxis_reversed, &
-            s% Profile_Panels5_other_yaxis_reversed, &
-            s% Profile_Panels5_yaxis_log, &
-            s% Profile_Panels5_other_yaxis_log, &
-            s% Profile_Panels5_same_yaxis_range, &
-            s% Profile_Panels5_xaxis_name, &
-            s% Profile_Panels5_yaxis_name, &
-            s% Profile_Panels5_other_yaxis_name, &
-            s% Profile_Panels5_xmin, s% Profile_Panels5_xmax, &
-            s% Profile_Panels5_xmargin, s% Profile_Panels5_show_mix_regions_on_xaxis, &
-            s% Profile_Panels5_ymin, s% Profile_Panels5_other_ymin, &
-            s% Profile_Panels5_ymax, s% Profile_Panels5_other_ymax, &
-            s% Profile_Panels5_ycenter, s% Profile_Panels5_other_ycenter, &
-            s% Profile_Panels5_ymargin, s% Profile_Panels5_other_ymargin, &
-            s% Profile_Panels5_dymin, s% Profile_Panels5_other_dymin, &
-            s% Profile_Panels5_show_grid, &
-            s% Profile_Panels5_num_panels, &
-            s% Profile_Panels5_use_decorator, &
-            s% Profile_Panels5_pgstar_decorator, &
+            s% pg% Profile_Panels5_xaxis_reversed, &
+            s% pg% Profile_Panels5_yaxis_reversed, &
+            s% pg% Profile_Panels5_other_yaxis_reversed, &
+            s% pg% Profile_Panels5_yaxis_log, &
+            s% pg% Profile_Panels5_other_yaxis_log, &
+            s% pg% Profile_Panels5_same_yaxis_range, &
+            s% pg% Profile_Panels5_xaxis_name, &
+            s% pg% Profile_Panels5_yaxis_name, &
+            s% pg% Profile_Panels5_other_yaxis_name, &
+            s% pg% Profile_Panels5_xmin, s% pg% Profile_Panels5_xmax, &
+            s% pg% Profile_Panels5_xmargin, s% pg% Profile_Panels5_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels5_ymin, s% pg% Profile_Panels5_other_ymin, &
+            s% pg% Profile_Panels5_ymax, s% pg% Profile_Panels5_other_ymax, &
+            s% pg% Profile_Panels5_ycenter, s% pg% Profile_Panels5_other_ycenter, &
+            s% pg% Profile_Panels5_ymargin, s% pg% Profile_Panels5_other_ymargin, &
+            s% pg% Profile_Panels5_dymin, s% pg% Profile_Panels5_other_dymin, &
+            s% pg% Profile_Panels5_show_grid, &
+            s% pg% Profile_Panels5_num_panels, &
+            s% pg% Profile_Panels5_use_decorator, &
+            s% pg% Profile_Panels5_pgstar_decorator, &
             5, &
             ierr)
       end subroutine do_Profile_Panels5_plot
@@ -317,9 +318,9 @@
          call pgbbuf()
          call pgeras()
          call do_Profile_Panels6_plot(s, id, device_id, &
-            s% Profile_Panels6_xleft, s% Profile_Panels6_xright, &
-            s% Profile_Panels6_ybot, s% Profile_Panels6_ytop, .false., &
-            s% Profile_Panels6_title, s% Profile_Panels6_txt_scale, ierr)
+            s% pg% Profile_Panels6_xleft, s% pg% Profile_Panels6_xright, &
+            s% pg% Profile_Panels6_ybot, s% pg% Profile_Panels6_ytop, .false., &
+            s% pg% Profile_Panels6_title, s% pg% Profile_Panels6_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels6_plot
@@ -335,26 +336,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels6_xaxis_reversed, &
-            s% Profile_Panels6_yaxis_reversed, &
-            s% Profile_Panels6_other_yaxis_reversed, &
-            s% Profile_Panels6_yaxis_log, &
-            s% Profile_Panels6_other_yaxis_log, &
-            s% Profile_Panels6_same_yaxis_range, &
-            s% Profile_Panels6_xaxis_name, &
-            s% Profile_Panels6_yaxis_name, &
-            s% Profile_Panels6_other_yaxis_name, &
-            s% Profile_Panels6_xmin, s% Profile_Panels6_xmax, &
-            s% Profile_Panels6_xmargin, s% Profile_Panels6_show_mix_regions_on_xaxis, &
-            s% Profile_Panels6_ymin, s% Profile_Panels6_other_ymin, &
-            s% Profile_Panels6_ymax, s% Profile_Panels6_other_ymax, &
-            s% Profile_Panels6_ycenter, s% Profile_Panels6_other_ycenter, &
-            s% Profile_Panels6_ymargin, s% Profile_Panels6_other_ymargin, &
-            s% Profile_Panels6_dymin, s% Profile_Panels6_other_dymin, &
-            s% Profile_Panels6_show_grid, &
-            s% Profile_Panels6_num_panels, &
-            s% Profile_Panels6_use_decorator, &
-            s% Profile_Panels6_pgstar_decorator, &
+            s% pg% Profile_Panels6_xaxis_reversed, &
+            s% pg% Profile_Panels6_yaxis_reversed, &
+            s% pg% Profile_Panels6_other_yaxis_reversed, &
+            s% pg% Profile_Panels6_yaxis_log, &
+            s% pg% Profile_Panels6_other_yaxis_log, &
+            s% pg% Profile_Panels6_same_yaxis_range, &
+            s% pg% Profile_Panels6_xaxis_name, &
+            s% pg% Profile_Panels6_yaxis_name, &
+            s% pg% Profile_Panels6_other_yaxis_name, &
+            s% pg% Profile_Panels6_xmin, s% pg% Profile_Panels6_xmax, &
+            s% pg% Profile_Panels6_xmargin, s% pg% Profile_Panels6_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels6_ymin, s% pg% Profile_Panels6_other_ymin, &
+            s% pg% Profile_Panels6_ymax, s% pg% Profile_Panels6_other_ymax, &
+            s% pg% Profile_Panels6_ycenter, s% pg% Profile_Panels6_other_ycenter, &
+            s% pg% Profile_Panels6_ymargin, s% pg% Profile_Panels6_other_ymargin, &
+            s% pg% Profile_Panels6_dymin, s% pg% Profile_Panels6_other_dymin, &
+            s% pg% Profile_Panels6_show_grid, &
+            s% pg% Profile_Panels6_num_panels, &
+            s% pg% Profile_Panels6_use_decorator, &
+            s% pg% Profile_Panels6_pgstar_decorator, &
             6, &
             ierr)
       end subroutine do_Profile_Panels6_plot
@@ -371,9 +372,9 @@
          call pgbbuf()
          call pgeras()
          call do_Profile_Panels7_plot(s, id, device_id, &
-            s% Profile_Panels7_xleft, s% Profile_Panels7_xright, &
-            s% Profile_Panels7_ybot, s% Profile_Panels7_ytop, .false., &
-            s% Profile_Panels7_title, s% Profile_Panels7_txt_scale, ierr)
+            s% pg% Profile_Panels7_xleft, s% pg% Profile_Panels7_xright, &
+            s% pg% Profile_Panels7_ybot, s% pg% Profile_Panels7_ytop, .false., &
+            s% pg% Profile_Panels7_title, s% pg% Profile_Panels7_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels7_plot
@@ -389,26 +390,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels7_xaxis_reversed, &
-            s% Profile_Panels7_yaxis_reversed, &
-            s% Profile_Panels7_other_yaxis_reversed, &
-            s% Profile_Panels7_yaxis_log, &
-            s% Profile_Panels7_other_yaxis_log, &
-            s% Profile_Panels7_same_yaxis_range, &
-            s% Profile_Panels7_xaxis_name, &
-            s% Profile_Panels7_yaxis_name, &
-            s% Profile_Panels7_other_yaxis_name, &
-            s% Profile_Panels7_xmin, s% Profile_Panels7_xmax, &
-            s% Profile_Panels7_xmargin, s% Profile_Panels7_show_mix_regions_on_xaxis, &
-            s% Profile_Panels7_ymin, s% Profile_Panels7_other_ymin, &
-            s% Profile_Panels7_ymax, s% Profile_Panels7_other_ymax, &
-            s% Profile_Panels7_ycenter, s% Profile_Panels7_other_ycenter, &
-            s% Profile_Panels7_ymargin, s% Profile_Panels7_other_ymargin, &
-            s% Profile_Panels7_dymin, s% Profile_Panels7_other_dymin, &
-            s% Profile_Panels7_show_grid, &
-            s% Profile_Panels7_num_panels, &
-            s% Profile_Panels7_use_decorator, &
-            s% Profile_Panels7_pgstar_decorator, &
+            s% pg% Profile_Panels7_xaxis_reversed, &
+            s% pg% Profile_Panels7_yaxis_reversed, &
+            s% pg% Profile_Panels7_other_yaxis_reversed, &
+            s% pg% Profile_Panels7_yaxis_log, &
+            s% pg% Profile_Panels7_other_yaxis_log, &
+            s% pg% Profile_Panels7_same_yaxis_range, &
+            s% pg% Profile_Panels7_xaxis_name, &
+            s% pg% Profile_Panels7_yaxis_name, &
+            s% pg% Profile_Panels7_other_yaxis_name, &
+            s% pg% Profile_Panels7_xmin, s% pg% Profile_Panels7_xmax, &
+            s% pg% Profile_Panels7_xmargin, s% pg% Profile_Panels7_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels7_ymin, s% pg% Profile_Panels7_other_ymin, &
+            s% pg% Profile_Panels7_ymax, s% pg% Profile_Panels7_other_ymax, &
+            s% pg% Profile_Panels7_ycenter, s% pg% Profile_Panels7_other_ycenter, &
+            s% pg% Profile_Panels7_ymargin, s% pg% Profile_Panels7_other_ymargin, &
+            s% pg% Profile_Panels7_dymin, s% pg% Profile_Panels7_other_dymin, &
+            s% pg% Profile_Panels7_show_grid, &
+            s% pg% Profile_Panels7_num_panels, &
+            s% pg% Profile_Panels7_use_decorator, &
+            s% pg% Profile_Panels7_pgstar_decorator, &
             7, &
             ierr)
       end subroutine do_Profile_Panels7_plot
@@ -425,9 +426,9 @@
          call pgbbuf()
          call pgeras()
          call do_Profile_Panels8_plot(s, id, device_id, &
-            s% Profile_Panels8_xleft, s% Profile_Panels8_xright, &
-            s% Profile_Panels8_ybot, s% Profile_Panels8_ytop, .false., &
-            s% Profile_Panels8_title, s% Profile_Panels8_txt_scale, ierr)
+            s% pg% Profile_Panels8_xleft, s% pg% Profile_Panels8_xright, &
+            s% pg% Profile_Panels8_ybot, s% pg% Profile_Panels8_ytop, .false., &
+            s% pg% Profile_Panels8_title, s% pg% Profile_Panels8_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels8_plot
@@ -443,26 +444,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels8_xaxis_reversed, &
-            s% Profile_Panels8_yaxis_reversed, &
-            s% Profile_Panels8_other_yaxis_reversed, &
-            s% Profile_Panels8_yaxis_log, &
-            s% Profile_Panels8_other_yaxis_log, &
-            s% Profile_Panels8_same_yaxis_range, &
-            s% Profile_Panels8_xaxis_name, &
-            s% Profile_Panels8_yaxis_name, &
-            s% Profile_Panels8_other_yaxis_name, &
-            s% Profile_Panels8_xmin, s% Profile_Panels8_xmax, &
-            s% Profile_Panels8_xmargin, s% Profile_Panels8_show_mix_regions_on_xaxis, &
-            s% Profile_Panels8_ymin, s% Profile_Panels8_other_ymin, &
-            s% Profile_Panels8_ymax, s% Profile_Panels8_other_ymax, &
-            s% Profile_Panels8_ycenter, s% Profile_Panels8_other_ycenter, &
-            s% Profile_Panels8_ymargin, s% Profile_Panels8_other_ymargin, &
-            s% Profile_Panels8_dymin, s% Profile_Panels8_other_dymin, &
-            s% Profile_Panels8_show_grid, &
-            s% Profile_Panels8_num_panels, &
-            s% Profile_Panels8_use_decorator, &
-            s% Profile_Panels8_pgstar_decorator, &
+            s% pg% Profile_Panels8_xaxis_reversed, &
+            s% pg% Profile_Panels8_yaxis_reversed, &
+            s% pg% Profile_Panels8_other_yaxis_reversed, &
+            s% pg% Profile_Panels8_yaxis_log, &
+            s% pg% Profile_Panels8_other_yaxis_log, &
+            s% pg% Profile_Panels8_same_yaxis_range, &
+            s% pg% Profile_Panels8_xaxis_name, &
+            s% pg% Profile_Panels8_yaxis_name, &
+            s% pg% Profile_Panels8_other_yaxis_name, &
+            s% pg% Profile_Panels8_xmin, s% pg% Profile_Panels8_xmax, &
+            s% pg% Profile_Panels8_xmargin, s% pg% Profile_Panels8_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels8_ymin, s% pg% Profile_Panels8_other_ymin, &
+            s% pg% Profile_Panels8_ymax, s% pg% Profile_Panels8_other_ymax, &
+            s% pg% Profile_Panels8_ycenter, s% pg% Profile_Panels8_other_ycenter, &
+            s% pg% Profile_Panels8_ymargin, s% pg% Profile_Panels8_other_ymargin, &
+            s% pg% Profile_Panels8_dymin, s% pg% Profile_Panels8_other_dymin, &
+            s% pg% Profile_Panels8_show_grid, &
+            s% pg% Profile_Panels8_num_panels, &
+            s% pg% Profile_Panels8_use_decorator, &
+            s% pg% Profile_Panels8_pgstar_decorator, &
             8, &
             ierr)
       end subroutine do_Profile_Panels8_plot
@@ -479,9 +480,9 @@
          call pgbbuf()
          call pgeras()
          call do_Profile_Panels9_plot(s, id, device_id, &
-            s% Profile_Panels9_xleft, s% Profile_Panels9_xright, &
-            s% Profile_Panels9_ybot, s% Profile_Panels9_ytop, .false., &
-            s% Profile_Panels9_title, s% Profile_Panels9_txt_scale, ierr)
+            s% pg% Profile_Panels9_xleft, s% pg% Profile_Panels9_xright, &
+            s% pg% Profile_Panels9_ybot, s% pg% Profile_Panels9_ytop, .false., &
+            s% pg% Profile_Panels9_title, s% pg% Profile_Panels9_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Profile_Panels9_plot
@@ -497,26 +498,26 @@
          integer, intent(out) :: ierr
          call Pro_panels_plot(s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Profile_Panels9_xaxis_reversed, &
-            s% Profile_Panels9_yaxis_reversed, &
-            s% Profile_Panels9_other_yaxis_reversed, &
-            s% Profile_Panels9_yaxis_log, &
-            s% Profile_Panels9_other_yaxis_log, &
-            s% Profile_Panels9_same_yaxis_range, &
-            s% Profile_Panels9_xaxis_name, &
-            s% Profile_Panels9_yaxis_name, &
-            s% Profile_Panels9_other_yaxis_name, &
-            s% Profile_Panels9_xmin, s% Profile_Panels9_xmax, &
-            s% Profile_Panels9_xmargin, s% Profile_Panels9_show_mix_regions_on_xaxis, &
-            s% Profile_Panels9_ymin, s% Profile_Panels9_other_ymin, &
-            s% Profile_Panels9_ymax, s% Profile_Panels9_other_ymax, &
-            s% Profile_Panels9_ycenter, s% Profile_Panels9_other_ycenter, &
-            s% Profile_Panels9_ymargin, s% Profile_Panels9_other_ymargin, &
-            s% Profile_Panels9_dymin, s% Profile_Panels9_other_dymin, &
-            s% Profile_Panels9_show_grid, &
-            s% Profile_Panels9_num_panels, &
-            s% Profile_Panels9_use_decorator, &
-            s% Profile_Panels9_pgstar_decorator, &
+            s% pg% Profile_Panels9_xaxis_reversed, &
+            s% pg% Profile_Panels9_yaxis_reversed, &
+            s% pg% Profile_Panels9_other_yaxis_reversed, &
+            s% pg% Profile_Panels9_yaxis_log, &
+            s% pg% Profile_Panels9_other_yaxis_log, &
+            s% pg% Profile_Panels9_same_yaxis_range, &
+            s% pg% Profile_Panels9_xaxis_name, &
+            s% pg% Profile_Panels9_yaxis_name, &
+            s% pg% Profile_Panels9_other_yaxis_name, &
+            s% pg% Profile_Panels9_xmin, s% pg% Profile_Panels9_xmax, &
+            s% pg% Profile_Panels9_xmargin, s% pg% Profile_Panels9_show_mix_regions_on_xaxis, &
+            s% pg% Profile_Panels9_ymin, s% pg% Profile_Panels9_other_ymin, &
+            s% pg% Profile_Panels9_ymax, s% pg% Profile_Panels9_other_ymax, &
+            s% pg% Profile_Panels9_ycenter, s% pg% Profile_Panels9_other_ycenter, &
+            s% pg% Profile_Panels9_ymargin, s% pg% Profile_Panels9_other_ymargin, &
+            s% pg% Profile_Panels9_dymin, s% pg% Profile_Panels9_other_dymin, &
+            s% pg% Profile_Panels9_show_grid, &
+            s% pg% Profile_Panels9_num_panels, &
+            s% pg% Profile_Panels9_use_decorator, &
+            s% pg% Profile_Panels9_pgstar_decorator, &
             9, &
             ierr)
       end subroutine do_Profile_Panels9_plot
@@ -624,17 +625,17 @@
          panels_xmax = panels_xmax_in
          panels_xmargin = panels_xmargin_in
 
-         xwidth_left_frac = s% Profile_Panels_xwidth_left_div_shock_value
-         xwidth_right_frac = s% Profile_Panels_xwidth_right_div_shock_value
-         xwidth_left_of_shock = s% Profile_Panels_xwidth_left_of_shock
-         xwidth_right_of_shock = s% Profile_Panels_xwidth_right_of_shock
+         xwidth_left_frac = s% pg% Profile_Panels_xwidth_left_div_shock_value
+         xwidth_right_frac = s% pg% Profile_Panels_xwidth_right_div_shock_value
+         xwidth_left_of_shock = s% pg% Profile_Panels_xwidth_left_of_shock
+         xwidth_right_of_shock = s% pg% Profile_Panels_xwidth_right_of_shock
 
          xshock = 0
          found_shock = .false.
 
          xaxis_id = get_profile_id(s, panels_xaxis_name)
          if (xaxis_id > 0 .and. s% v_center >= 0 .and. ( &
-               s% Profile_Panels_show_Mach_1_location .or. &
+               s% pg% Profile_Panels_show_Mach_1_location .or. &
                xwidth_left_frac > 0 .or. xwidth_right_frac > 0 .or. &
                xwidth_left_of_shock > 0 .or. xwidth_right_of_shock > 0)) then
             found_shock = find_shock(s, xaxis_id, xshock)
@@ -694,7 +695,7 @@
          end if
          if (xleft == xright) return
 
-         if (found_shock .and. s% Profile_Panels_show_Mach_1_location) then
+         if (found_shock .and. s% pg% Profile_Panels_show_Mach_1_location) then
             ! mark shock location
             call pgsave
             call pgsvp(vp_xleft, vp_xright, vp_ybot, vp_ytop)
@@ -708,7 +709,7 @@
             call pgunsa
          end if
 
-         if (s% Profile_Panels_show_photosphere_location .and. &
+         if (s% pg% Profile_Panels_show_photosphere_location .and. &
                (panels_xaxis_name == 'mass' .or. &
                 panels_xaxis_name == 'logxm' .or. &
                 panels_xaxis_name == 'radius' .or. &
@@ -931,7 +932,7 @@
                else
                   call show_right_yaxis_label_pgstar(s,other_yname)
                end if
-               call pgslw(s% pgstar_lw)
+               call pgslw(s% pg% pgstar_lw)
                call pgsci(other_y_color)
                if (other_yfile_data_len > 0) then
                   call pgline( &
@@ -973,14 +974,14 @@
             else
                call show_left_yaxis_label_pgstar(s,yname)
             end if
-            call pgslw(s% pgstar_lw)
+            call pgslw(s% pg% pgstar_lw)
             if (yfile_data_len > 0) then
-               call pgsls(s% pgstar_profile_line_style)
+               call pgsls(s% pg% pgstar_profile_line_style)
                call pgline(yfile_data_len, yfile_xdata, yfile_ydata)
                call pgsls(1)
                deallocate(yfile_xdata, yfile_ydata)
             else
-               call pgsls(s% pgstar_profile_line_style)
+               call pgsls(s% pg% pgstar_profile_line_style)
                call pgline(npts, xvec, yvec)
                call pgsls(1)
                if (panels_show_grid) then
@@ -993,7 +994,7 @@
             call pgslw(1)
             call pgsci(1)
          
-            call show_pgstar_decorator(s%id, use_decorator, pgstar_decorator, j, ierr)
+            call show_pgstar_decorator(s% id, use_decorator, pgstar_decorator, j, ierr)
          end do
 
          xname = trim(panels_xaxis_name)

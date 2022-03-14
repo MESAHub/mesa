@@ -125,8 +125,8 @@
 
          ! we turn pgstar on and off at some points, so we store the original setting
          pgstar_flag = s% job% pgstar_flag
-         pgstar_interval = s% pgstar_interval
-         pgstar_file_interval = s% Grid2_file_interval
+         pgstar_interval = s% pg% pgstar_interval
+         pgstar_file_interval = s% pg% Grid2_file_interval
 
          ! this is optional
          s% other_wind => brott_wind
@@ -518,8 +518,8 @@
             s% ixtra(ix_steps_since_hydro_on) = 0
             s% xtra(x_star_age_at_relax) = -1d0
             ! to avoid showing pgstar stuff during initial model creation
-            s% pgstar_interval = 100000000
-            s% Grid2_file_interval = 100000000
+            s% pg% pgstar_interval = 100000000
+            s% pg% Grid2_file_interval = 100000000
          else ! it is a restart
             if (s% lxtra(lx_hydro_on)) then
                call star_read_controls(id, 'inlist_hydro_on', ierr)
@@ -866,8 +866,8 @@
          end if
 
          if (pgstar_flag) then
-            s% pgstar_interval = pgstar_interval
-            s% Grid2_file_interval = pgstar_file_interval
+            s% pg% pgstar_interval = pgstar_interval
+            s% pg% Grid2_file_interval = pgstar_file_interval
          end if
          just_did_relax = .false.
          if (s% u_flag) then ! get point where v<vesc
@@ -1051,8 +1051,8 @@
                call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
 
                ! to avoid showing pgstar stuff during relax
-               s% pgstar_interval = 100000000
-               s% Grid2_file_interval = 100000000
+               s% pg% pgstar_interval = 100000000
+               s% pg% Grid2_file_interval = 100000000
                s% job% pgstar_flag = .false.
 
                max_years_for_timestep = s% max_years_for_timestep
@@ -1078,8 +1078,8 @@
 
                s% max_center_cell_dq = max_center_cell_dq
                if (pgstar_flag) then
-                  s% pgstar_interval = pgstar_interval
-                  s% Grid2_file_interval = pgstar_file_interval
+                  s% pg% pgstar_interval = pgstar_interval
+                  s% pg% Grid2_file_interval = pgstar_file_interval
                   s% job% pgstar_flag = .true.
                end if
                just_did_relax = .true.
