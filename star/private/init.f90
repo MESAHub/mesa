@@ -745,7 +745,9 @@
 
          s% len_extra_iwork = 0
          s% len_extra_work = 0
-         
+
+         s% phase_sep_mixing_mass = -1
+
          call init_random(s)
 
       end subroutine set_starting_star_data
