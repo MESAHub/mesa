@@ -201,6 +201,14 @@ This test suite example checks the inward propagation of a carbon burning front 
 This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
 
 
+:ref:`check_pulse_atm`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test checks that the atmosphere structure written to the
+pulsation output closely matches what is expected for the
+:math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
+
+
 :ref:`conserve_angular_momentum`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

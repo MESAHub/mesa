@@ -1048,10 +1048,10 @@ contains
   !****
 
   subroutine build_atm( &
-       s, L, R, M, cgrav, ierr)
+       s, L, R, Teff, M, cgrav, ierr)
 
     type(star_info), pointer :: s
-    real(dp), intent(in)     :: L, R, M, cgrav
+    real(dp), intent(in)     :: L, R, Teff, M, cgrav
     integer, intent(out)     :: ierr
        
     ! Create the atmosphere structure by dispatching to the
@@ -1062,7 +1062,7 @@ contains
     case ('T_tau')
 
        call build_T_tau( &
-            s, s% tau_factor*s% tau_base, L, R, M, cgrav, &
+            s, s% tau_factor*s% tau_base, L, R, Teff, M, cgrav, &
             s% atm_T_tau_relation, s% atm_T_tau_opacity, &
             s% atm_structure_num_pts, s% atm_structure, &
             ierr)
@@ -1081,7 +1081,7 @@ contains
   !****
 
   subroutine build_T_tau( &
-       s, tau_surf, L, R, M, cgrav, T_tau_relation, T_tau_opacity, &
+       s, tau_surf, L, R, Teff, M, cgrav, T_tau_relation, T_tau_opacity, &
        atm_structure_num_pts, atm_structure, &
        ierr)
 
@@ -1090,14 +1090,13 @@ contains
          atm_build_T_tau_varying
     
     type(star_info), pointer :: s
-    real(dp), intent(in)     :: tau_surf, L, R, M, cgrav
+    real(dp), intent(in)     :: tau_surf, L, R, Teff, M, cgrav
     character(*), intent(in) :: T_tau_relation
     character(*), intent(in) :: T_tau_opacity
     integer, intent(out)     :: atm_structure_num_pts
     real(dp), pointer        :: atm_structure(:,:)
     integer, intent(out)     :: ierr
 
-    real(dp) :: Teff
     real(dp) :: kap
     real(dp) :: lnT_surf
     real(dp) :: dlnT_dL
@@ -1124,6 +1123,7 @@ contains
     if (ierr /= 0) then
        s% retry_message = 'Call to get_T_tau failed in build_T_tau'
        if (s% report_ierr) write(*, *) s% retry_message
+       return
     end if
 
     ! Get the T-tau id
@@ -1143,7 +1143,7 @@ contains
     case ('fixed', 'iterated')
 
        call atm_build_T_tau_uniform( &
-            tau_surf, L, R, M, cgrav, kap, s% Pextra_factor, s% atm_build_tau_outer, &
+            tau_surf, L, R, Teff, M, cgrav, kap, s% Pextra_factor, s% atm_build_tau_outer, &
             T_tau_id, eos_proc_for_build_T_tau, kap_proc_for_build_T_tau, &
             s% atm_build_errtol, s% atm_build_dlogtau, &
             atm_structure_num_pts, atm_structure, &
@@ -1157,7 +1157,7 @@ contains
     case ('varying')
 
        call atm_build_T_tau_varying( &
-            tau_surf, L, R, M, cgrav, lnP_surf, s% atm_build_tau_outer, &
+            tau_surf, L, R, Teff, M, cgrav, lnP_surf, s% atm_build_tau_outer, &
             T_tau_id, eos_proc_for_build_T_tau, kap_proc_for_build_T_tau, &
             s% atm_build_errtol, s% atm_build_dlogtau, &
             atm_structure_num_pts, atm_structure, &
