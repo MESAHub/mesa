@@ -79,5 +79,5 @@
       
       
       subroutine resdif
-      return
+         return
       end subroutine resdif
