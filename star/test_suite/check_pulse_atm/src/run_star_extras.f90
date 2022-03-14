@@ -158,11 +158,11 @@
 
             Teff = row(4)
 
-            allocate(data(nz, ivar))
+            allocate(data(ivar, nz))
 
             do k = 1, nz
-               do i = 1, 8
-                  read(iounit, *, iostat=ierr) data(k, (i-1)*5+1:i*5)
+               do i = 1, 40, 5
+                  read(iounit, *, iostat=ierr) (data(n, k), n=i, i+4)
                end do
             end do
 
@@ -175,12 +175,12 @@
 
             do k = 1, nz-1
                T_check = Teff*pow(0.75_dp*(tau + q(s% atm_T_tau_relation, tau)), 0.25_dp)
-               T_face = data(k,3)
+               T_face = data(3,k)
                T_rms = T_rms + (T_face - T_check)**2
                n = n + 1
 
                ! Δτ = <ρ><κ>Δr
-               tau = tau + 0.25_dp*(data(k,5)+data(k+1,5))*(data(k,8)+data(k+1,8))*(data(k,1)-data(k+1,1))
+               tau = tau + 0.25_dp*(data(5,k)+data(5,k+1))*(data(8,k)+data(8,k+1))*(data(1,k)-data(1,k+1))
 
                if (tau > 0.1_dp) exit
             end do
