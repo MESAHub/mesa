@@ -998,22 +998,27 @@
          type (star_info), pointer :: s
          integer :: ierr
          logical :: write_controls_info_with_profile
+         character (len=256) :: filename
          
          include 'formats'
          
          if (save_model_for_best_model) then
             ierr = 0
-            call star_write_model(s% id, best_model_save_model_filename, ierr)
+            filename = trim(astero_results_directory) // '/' // trim(best_model_save_model_filename)
+            if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+            call star_write_model(s% id, filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_model'
                call mesa_error(__FILE__,__LINE__)
             end if
-            write(*, '(a,i7)') 'save ' // trim(best_model_save_model_filename), s% model_number
+            write(*, '(a,i7)') 'save ' // filename, s% model_number
          end if
          
          if (write_fgong_for_best_model) then
             ierr = 0
-            call star_export_pulse_data(s%id, 'FGONG', best_model_fgong_filename, &
+            filename = trim(astero_results_directory) // '/' // trim(best_model_fgong_filename)
+            if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+            call star_export_pulse_data(s%id, 'FGONG', filename, &
                add_center_point, keep_surface_point, add_atmosphere, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_export_pulse_data'
@@ -1023,7 +1028,9 @@
          
          if (write_gyre_for_best_model) then
             ierr = 0
-            call star_export_pulse_data(s%id, 'GYRE', best_model_gyre_filename, &
+            filename = trim(astero_results_directory) // '/' // trim(best_model_gyre_filename)
+            if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+            call star_export_pulse_data(s%id, 'GYRE', filename, &
                add_center_point, keep_surface_point, add_atmosphere, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_export_pulse_data'
@@ -1033,9 +1040,11 @@
          
          if (write_profile_for_best_model) then
             ierr = 0
+            filename = trim(astero_results_directory) // '/' // trim(best_model_profile_filename)
+            if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
             write_controls_info_with_profile = s% write_controls_info_with_profile
             s% write_controls_info_with_profile = .false.
-            call star_write_profile_info(s% id, best_model_profile_filename, ierr)
+            call star_write_profile_info(s% id, filename, ierr)
             s% write_controls_info_with_profile = write_controls_info_with_profile
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_profile_info'
@@ -1074,9 +1083,12 @@
          ierr = 0
          iounit = alloc_iounit(ierr)
          if (ierr /= 0) return
+
+         if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+
          write(format_string,'( "(i",i2.2,".",i2.2,")" )') num_digits, num_digits
          write(num_string,format_string) num
-         filename = trim(sample_results_prefix) // trim(num_string) // trim(sample_results_postfix)
+         filename = trim(astero_results_directory) // '/' // trim(sample_results_prefix) // trim(num_string) // trim(sample_results_postfix)
          open(unit=iounit, file=trim(filename), action='write', status='replace', iostat=ierr)
          if (ierr == 0) then
             call show_best(iounit)
@@ -1418,6 +1430,7 @@
          integer, intent(out) :: ierr
          integer :: iounit, ckm
          type (star_info), pointer :: s
+         character (len=256) :: filename
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -1435,16 +1448,18 @@
             call get_all_el_info(s,ierr)
             if (ierr /= 0) return
             call store_best_info(s)
+
+            filename = trim(astero_results_directory) // '/' // trim(last_model_save_info_filename)
+
             iounit = alloc_iounit(ierr)
             if (ierr /= 0) return
-            open(unit=iounit, file=trim(last_model_save_info_filename), &
+            open(unit=iounit, file=filename, &
                action='write', status='replace', iostat=ierr)
             if (ierr /= 0) then
-               write(*,'(a)') 'failed to open last_model_save_info_filename ' // &
-                  trim(last_model_save_info_filename)
+               write(*,'(a)') 'failed to open last_model_save_info_filename ' // filename
                return
             end if
-            write(*,*) 'write ' // trim(last_model_save_info_filename)
+            write(*,*) 'write ' // filename
             write(*,*) 'call show_best'
             call show_best(iounit)
             write(*,*) 'done show_best'
