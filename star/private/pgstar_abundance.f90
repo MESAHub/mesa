@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -51,9 +52,9 @@
          call pgeras()
 
          call do_abundance_plot(s, id, device_id, &
-            s% Abundance_xleft, s% Abundance_xright, &
-            s% Abundance_ybot, s% Abundance_ytop, .false., &
-            s% Abundance_title, s% Abundance_txt_scale, ierr)
+            s% pg% Abundance_xleft, s% pg% Abundance_xright, &
+            s% pg% Abundance_ybot, s% pg% Abundance_ytop, .false., &
+            s% pg% Abundance_title, s% pg% Abundance_txt_scale, ierr)
 
          call pgebuf()
 
@@ -72,9 +73,9 @@
          integer, intent(out) :: ierr
          call do_abundance_panel(s, id, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, &
-            title, txt_scale, s% Abundance_xaxis_name, &
-            s% Abundance_xmin, s% Abundance_xmax, s% Abundance_xaxis_reversed, &
-            s% abundance_log_mass_frac_min, s% abundance_log_mass_frac_max, &
+            title, txt_scale, s% pg% Abundance_xaxis_name, &
+            s% pg% Abundance_xmin, s% pg% Abundance_xmax, s% pg% Abundance_xaxis_reversed, &
+            s% pg% abundance_log_mass_frac_min, s% pg% abundance_log_mass_frac_max, &
             .false., .true., ierr)
       end subroutine do_abundance_plot
 
@@ -123,8 +124,8 @@
 
          ymin = ymin_in
          ymax = ymax_in
-         if (abs(ymin+101.0) < 1e-6) ymin = s% abundance_log_mass_frac_min
-         if (abs(ymax+101.0) < 1e-6) ymax = s% abundance_log_mass_frac_max
+         if (abs(ymin+101.0) < 1e-6) ymin = s% pg% abundance_log_mass_frac_min
+         if (abs(ymax+101.0) < 1e-6) ymax = s% pg% abundance_log_mass_frac_max
 
          windy = winymax - winymin
 
@@ -174,7 +175,7 @@
                end if
             end if
 
-            num_labels = max(0,min(max_num_labels, s% num_abundance_line_labels))
+            num_labels = max(0,min(max_num_labels, s% pg% num_abundance_line_labels))
             
             iloc_abundance_label = -HUGE(grid_min)
             xloc_abundance_label = -HUGE(grid_min)
@@ -191,7 +192,7 @@
 
             dylbl = (ymax - ymin)*0.015
 
-            lw = s% pgstar_lw
+            lw = s% pg% pgstar_lw
             call pgqlw(lw_sav)
 
             call pgsave
@@ -240,7 +241,7 @@
 
             call pgunsa
             
-            if (s% Abundance_show_photosphere_location .and. &
+            if (s% pg% Abundance_show_photosphere_location .and. &
                   (xaxis_name == 'mass' .or. &
                    xaxis_name == 'logxm' .or. &
                    xaxis_name == 'radius')) then
@@ -273,7 +274,7 @@
                call pgunsa
             end if
             
-         call show_pgstar_decorator(s%id,s% Abundance_use_decorator,s% Abundance_pgstar_decorator,0, ierr)
+         call show_pgstar_decorator(s%id,s% pg% Abundance_use_decorator,s% pg% Abundance_pgstar_decorator,0, ierr)
 
          end subroutine plot
 
@@ -284,7 +285,7 @@
             real(dp) :: max_abund(s% species)
             include 'formats'
             cnt = 0
-            num_to_show = s% Abundance_num_isos_to_show
+            num_to_show = s% pg% Abundance_num_isos_to_show
             do j=1, s% species
                max_abund(j) = maxval(s% xa(j,grid_min:grid_max))
             end do
@@ -301,7 +302,7 @@
                end do
             else
                do i = 1, num_to_show
-                  cnt = do1(cnt, s% Abundance_which_isos_to_show(i), legend_flag)
+                  cnt = do1(cnt, s% pg% Abundance_which_isos_to_show(i), legend_flag)
                end do
             end if
          end subroutine do_all
@@ -323,9 +324,9 @@
             do k=1,nz
                yvec(k) = safe_log10(s% xa(i,k))
             end do
-            if (s% abundance_log_mass_frac_min < 0) then
+            if (s% pg% abundance_log_mass_frac_min < 0) then
                if (maxval(yvec(grid_min:grid_max)) < &
-                     s% abundance_log_mass_frac_min) return
+                     s% pg% abundance_log_mass_frac_min) return
             end if
             if (legend_flag) then
                do1 = abundance_line_legend(cnt, str)
@@ -359,7 +360,7 @@
             call pgslw(lw)
             call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
             call pgslw(lw_sav)
-            call pgsch(txt_scale*s% Abundance_line_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Abundance_line_txt_scale_factor)
             abundance_line = cnt + 1
             do i=1,num_labels
                ii = iloc_abundance_label(i)
@@ -387,7 +388,7 @@
             character (len=*), intent(in) :: str
             real :: ymx, dx, dyline, ypos, xpts(2), ypts(2)
             integer :: iclr, max_cnt
-            max_cnt = min(max_num_labels, s% Abundance_legend_max_cnt)
+            max_cnt = min(max_num_labels, s% pg% Abundance_legend_max_cnt)
             if (cnt >= max_cnt) then
                abundance_line_legend = cnt
                return
@@ -403,7 +404,7 @@
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
             call pgsci(1)
-            call pgsch(txt_scale*s% Abundance_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Abundance_legend_txt_scale_factor)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, trim(str))
             abundance_line_legend = cnt + 1
          end function abundance_line_legend

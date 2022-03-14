@@ -1,9 +1,13 @@
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      ! PGstar controls
+      ! PGStar state
 
       type (pgstar_win_file_data) :: pgstar_win_file_ptr(num_pgstar_plots)
 
+      type (pgstar_hist_node), pointer :: pgstar_hist => null()
+
+
+      ! PGstar controls
       integer :: pgstar_interval
       character (len=32) :: file_device
       character (len=32) :: file_extension
@@ -2152,4 +2156,3 @@
             trho_use_decorator, &
             tmaxrho_use_decorator, &
             trho_profile_use_decorator
-

@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -51,9 +52,9 @@
          call pgeras()
 
          call do_power_plot(s, id, device_id, &
-            s% Power_xleft, s% Power_xright, &
-            s% Power_ybot, s% Power_ytop, .false., &
-            s% Power_title, s% Power_txt_scale, ierr)
+            s% pg% Power_xleft, s% pg% Power_xright, &
+            s% pg% Power_ybot, s% pg% Power_ytop, .false., &
+            s% pg% Power_title, s% pg% Power_txt_scale, ierr)
 
          call pgebuf()
 
@@ -72,9 +73,9 @@
          integer, intent(out) :: ierr
          call do_power_panel(s, id, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, &
-            title, txt_scale, s% Power_xaxis_name, &
-            s% Power_xmin, s% Power_xmax, s% Power_xaxis_reversed, &
-            s% Power_ymin, s% Power_ymax, .false., .true., ierr)
+            title, txt_scale, s% pg% Power_xaxis_name, &
+            s% pg% Power_xmin, s% pg% Power_xmax, s% pg% Power_xaxis_reversed, &
+            s% pg% Power_ymin, s% pg% Power_ymax, .false., .true., ierr)
       end subroutine do_power_plot
 
 
@@ -180,7 +181,7 @@
 
             exp10_ymin = exp10(dble(ymin))
 
-            lw = s% pgstar_lw
+            lw = s% pg% pgstar_lw
             call pgqlw(lw_sav)
 
             call pgsave
@@ -232,7 +233,7 @@
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)
             end if
 
-         call show_pgstar_decorator(s%id,s% power_use_decorator,s% power_pgstar_decorator, 0, ierr)
+         call show_pgstar_decorator(s%id,s% pg% power_use_decorator,s% pg% power_pgstar_decorator, 0, ierr)
 
 
          end subroutine plot
@@ -259,7 +260,7 @@
             integer, intent(in) :: cnt, icat
             real :: ymx, dx, dyline, ypos, xpts(2), ypts(2)
             integer :: iclr, num_max
-            num_max = min(num_categories, s% Power_legend_max_cnt)
+            num_max = min(num_categories, s% pg% Power_legend_max_cnt)
             power_line_legend = cnt
             if (cnt >= num_max) return
             ymx = maxval(s% eps_nuc_categories(icat,grid_min:grid_max))
@@ -277,7 +278,7 @@
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
             call pgsci(1)
-            call pgsch(txt_scale*s% Power_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Power_legend_txt_scale_factor)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, &
                trim(adjustl(category_name(icat))))
             power_line_legend = cnt + 1

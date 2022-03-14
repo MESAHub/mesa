@@ -455,11 +455,11 @@
             c13 = s% net_iso(ic13)
             k_max_c13 = maxloc(s% xa(c13,1:s% nz),dim=1)
             if (s% xa(c13,k_max_c13) .gt. 0.01) then
-               s% Abundance_xmin = s% m(k_max_c13)/Msun - 0.0001
-               s% Abundance_xmax = s% m(k_max_c13)/Msun + 0.0001
+               s% pg% Abundance_xmin = s% m(k_max_c13)/Msun - 0.0001
+               s% pg% Abundance_xmax = s% m(k_max_c13)/Msun + 0.0001
             else
-               s% Abundance_xmin = s% he_core_mass - 0.0125
-               s% Abundance_xmax = s% he_core_mass + 0.0025
+               s% pg% Abundance_xmin = s% he_core_mass - 0.0125
+               s% pg% Abundance_xmax = s% he_core_mass + 0.0025
             end if
          end if
 

@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -48,9 +49,9 @@
          call pgeras()
 
          call do_R_Teff_Plot(s, id, device_id, &
-            s% R_Teff_xleft, s% R_Teff_xright, &
-            s% R_Teff_ybot, s% R_Teff_ytop, .false., &
-            s% R_Teff_title, s% R_Teff_txt_scale, ierr)
+            s% pg% R_Teff_xleft, s% pg% R_Teff_xright, &
+            s% pg% R_Teff_ybot, s% pg% R_Teff_ytop, .false., &
+            s% pg% R_Teff_title, s% pg% R_Teff_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -75,21 +76,21 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'effective_T', 'radius', &
             'Teff', 'R/R\d\(2281)', &
-            s% R_Teff_Teff_min, s% R_Teff_Teff_max, &
-            s% R_Teff_Teff_margin, s% R_Teff_dTeff_min, &
-            s% R_Teff_R_min, s% R_Teff_R_max, &
-            s% R_Teff_R_margin, s% R_Teff_dR_min, &
-            s% R_Teff_step_min, s% R_Teff_step_max, &
+            s% pg% R_Teff_Teff_min, s% pg% R_Teff_Teff_max, &
+            s% pg% R_Teff_Teff_margin, s% pg% R_Teff_dTeff_min, &
+            s% pg% R_Teff_R_min, s% pg% R_Teff_R_max, &
+            s% pg% R_Teff_R_margin, s% pg% R_Teff_dR_min, &
+            s% pg% R_Teff_step_min, s% pg% R_Teff_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_R_Teff_target_box, s% R_Teff_target_n_sigma, &
-            s% R_Teff_target_Teff, s% R_Teff_target_R, &
-            s% R_Teff_target_Teff_sigma, s% R_Teff_target_R_sigma, &
-            s% show_R_Teff_annotation1, &
-            s% show_R_Teff_annotation2, &
-            s% show_R_Teff_annotation3, &
-            s% R_Teff_fname, &
-            s% R_Teff_use_decorator, &
-            s% R_Teff_pgstar_decorator, &
+            s% pg% show_R_Teff_target_box, s% pg% R_Teff_target_n_sigma, &
+            s% pg% R_Teff_target_Teff, s% pg% R_Teff_target_R, &
+            s% pg% R_Teff_target_Teff_sigma, s% pg% R_Teff_target_R_sigma, &
+            s% pg% show_R_Teff_annotation1, &
+            s% pg% show_R_Teff_annotation2, &
+            s% pg% show_R_Teff_annotation3, &
+            s% pg% R_Teff_fname, &
+            s% pg% R_Teff_use_decorator, &
+            s% pg% R_Teff_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_R_Teff_Plot
 
