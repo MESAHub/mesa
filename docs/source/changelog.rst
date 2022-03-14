@@ -20,13 +20,20 @@ Backwards-incompatible changes
 Module-level changes
 --------------------
 
-Rates
+astero
+------
+
+``&astero_search_controls`` now has an option ``astero_results_directory`` to specify a folder into which all of
+``astero``'s results are saved (like ``log_directory`` in ``star``).  The default is ``outputs``, so if you
+can't seem to find your ``astero`` output, have a look there.
+
+rates
 -----
 
 The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
 due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10**7 K.
 
-Star
+star
 ----
 
 An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
