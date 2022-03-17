@@ -182,6 +182,8 @@ if __name__ == "__main__":
 # python3 linters/update_ctrls.py star/p*/*.f90 
 # python3 linters/update_ctrls.py star/test_suite/*/src/*.f90
 # python3 linters/update_ctrls.py star/other/*.f90
+# python3 linters/update_ctrls.py */test_suite/*/src/*.inc
+# python3 linters/update_ctrls.py */test_suite/*/src/*/*.inc
 
 # python3 linters/update_ctrls.py binary/test/src/*
 # python3 linters/update_ctrls.py binary/work/src/*

@@ -22,12 +22,12 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% x_integer_ctrl(1) <= 0) return
-         if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
+         if (s% ctrl% x_integer_ctrl(1) <= 0) return
+         if (s% rsp_num_periods < s% ctrl% x_integer_ctrl(1)) return
          write(*,*)
          write(*,*)
          write(*,*)
-         target_period = s% x_ctrl(1)
+         target_period = s% ctrl% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
          if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then

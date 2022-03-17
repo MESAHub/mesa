@@ -185,8 +185,8 @@
                ! initially overflowing system will evolve rapidly to q=1, limit mdot
                ! for contact system to work and remove hard limit on mdot change
                b% max_implicit_abs_mdot = 1d-3
-               b% s1% delta_mdot_hard_limit = -1
-               b% s2% delta_mdot_hard_limit = -1
+               b% s1% ctrl% delta_mdot_hard_limit = -1
+               b% s2% ctrl% delta_mdot_hard_limit = -1
             else
                write(*,*) "model is not overflowing at ZAMS"
             end if
