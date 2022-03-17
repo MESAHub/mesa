@@ -55,7 +55,7 @@
       
 ! NOTE: the number of classes of isos = m-1; m is for electrons
 ! for j from 1 to m-1, you can get the chem id for class j by
-!        cid = chem_get_iso_id(s% diffusion_class_representative(j))
+!        cid = chem_get_iso_id(s% ctrl% diffusion_class_representative(j))
 ! e.g., if the representative for class j is he4, then cid will = ihe4 (defined in chem_def)
 
       

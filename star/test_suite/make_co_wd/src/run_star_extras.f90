@@ -71,11 +71,11 @@
          s% lxtra(2) = restart
 
          ! Only allow diffusion after burning from thermal pulse has settled down
-         if(s% x_integer_ctrl(1) == 3) then
+         if(s% ctrl% x_integer_ctrl(1) == 3) then
             if(s% power_he_burn > 1d3) then
-               s% do_element_diffusion = .false.
+               s% ctrl% do_element_diffusion = .false.
             else
-               s% do_element_diffusion = .true.
+               s% ctrl% do_element_diffusion = .true.
             end if
          end if
 
@@ -121,11 +121,11 @@
          end if
 
          ! Only allow diffusion after burning from thermal pulse has settled down
-         if(s% x_integer_ctrl(1) == 3) then
+         if(s% ctrl% x_integer_ctrl(1) == 3) then
             if(s% power_he_burn > 1d3) then
-               s% do_element_diffusion = .false.
+               s% ctrl% do_element_diffusion = .false.
             else
-               s% do_element_diffusion = .true.
+               s% ctrl% do_element_diffusion = .true.
             end if
          end if
          
@@ -192,13 +192,13 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% x_integer_ctrl(1) == 2) then ! part2
-            H_env_limit = s% x_ctrl(1)
+         if (s% ctrl% x_integer_ctrl(1) == 2) then ! part2
+            H_env_limit = s% ctrl% x_ctrl(1)
             if (.not. (s% lxtra(1) .or. s% lxtra(2))) then
                ! find mass coordinate for cut
                kbot = 1
                do k = s% nz, 1, -1
-                  if (s% X(k) > s% he_core_boundary_h1_fraction) then
+                  if (s% X(k) > s% ctrl% he_core_boundary_h1_fraction) then
                      bottom_mass = s% m(k)
                      kbot = k
                      exit

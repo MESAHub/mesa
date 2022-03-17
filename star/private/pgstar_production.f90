@@ -192,8 +192,8 @@
             !Get initial composotion
 
             !Stolen from star/private/create_initial_model
-            initial_z = s% initial_z
-            initial_y = s% initial_y
+            initial_z = s% ctrl% initial_z
+            initial_y = s% ctrl% initial_y
             if (initial_y < 0) initial_y = max(0d0, min(1d0, 0.24d0 + 2*initial_z))
             initial_h1 = max(0d0, min(1d0, 1d0 - (initial_z + initial_y)))
             initial_h2 = chem_Xsol('h2')

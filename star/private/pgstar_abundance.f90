@@ -164,7 +164,7 @@
 
             if (ymin > 0) then
                ymin = -5.1
-               lgz = log10(s% initial_z + 1e-9) - 1
+               lgz = log10(s% ctrl% initial_z + 1e-9) - 1
                if (lgz-1 < ymin) ymin = lgz
             end if
             if (ymax >= 100) then

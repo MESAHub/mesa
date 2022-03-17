@@ -46,7 +46,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         s% alpha_mlt(:) = s% mixing_length_alpha
+         s% alpha_mlt(:) = s% ctrl% mixing_length_alpha
       end subroutine default_other_alpha_mlt
 
 

@@ -88,14 +88,14 @@
 
          ierr = 0
 
-         if (s% u_flag .and. s% use_mass_corrections) &
+         if (s% u_flag .and. s% ctrl% use_mass_corrections) &
             call mesa_error(__FILE__,__LINE__,'use_mass_corrections dP not supported with u_flag true')
 
          if (s% u_flag) then
             call do_uface_and_Pface(s,ierr)
             if (ierr /= 0) then
                if (len_trim(s% retry_message) == 0) s% retry_message = 'do_uface_and_Pface failed'
-               if (s% report_ierr) write(*,*) 'ierr from do_uface_and_Pface'
+               if (s% ctrl% report_ierr) write(*,*) 'ierr from do_uface_and_Pface'
                return
             end if
          end if
@@ -120,12 +120,12 @@
          do_equL = (i_equL > 0 .and. i_equL <= nvar)
          do_detrb_dt = (i_detrb_dt > 0 .and. i_detrb_dt <= nvar)
 
-         if (s% fill_arrays_with_NaNs) call set_nan(s% equ1)
+         if (s% ctrl% fill_arrays_with_NaNs) call set_nan(s% equ1)
 
          ! select form of energy equation
-         if (trim(s% energy_eqn_option) == 'eps_grav') then
+         if (trim(s% ctrl% energy_eqn_option) == 'eps_grav') then
             s% eps_grav_form_for_energy_eqn = .true.
-         else if (trim(s% energy_eqn_option) == 'dedt') then
+         else if (trim(s% ctrl% energy_eqn_option) == 'dedt') then
             s% eps_grav_form_for_energy_eqn = .false.
          else
             call mesa_error(__FILE__,__LINE__,'Invalid choice for energy_eqn_option')
@@ -137,31 +137,31 @@
          do k = nzlo, nzhi
             op_err = 0
             ! hack for composition partials
-            if (s% fix_d_eos_dxa_partials) then
+            if (s% ctrl% fix_d_eos_dxa_partials) then
                call fix_d_eos_dxa_partials(s, k, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr from fix_d_eos_dxa_partials', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr from fix_d_eos_dxa_partials', k
                   ierr = op_err
                end if
             end if
          end do
 !$OMP END PARALLEL DO
 
-         if (s% use_other_energy_implicit) then
+         if (s% ctrl% use_other_energy_implicit) then
             call s% other_energy_implicit(s% id, ierr)
             if (ierr /= 0) then
                if (len_trim(s% retry_message) == 0) s% retry_message = 'other_energy_implicit failed'
-               if (s% report_ierr) &
+               if (s% ctrl% report_ierr) &
                   write(*,*) 'ierr from other_energy_implicit'
                return
             end if
          end if
 
-         if (s% use_other_momentum_implicit) then
+         if (s% ctrl% use_other_momentum_implicit) then
             call s% other_momentum_implicit(s% id, ierr)
             if (ierr /= 0) then
                if (len_trim(s% retry_message) == 0) s% retry_message = 'other_momentum_implicit failed'
-               if (s% report_ierr) &
+               if (s% ctrl% report_ierr) &
                   write(*,*) 'ierr from other_momentum_implicit'
                return
             end if
@@ -178,7 +178,7 @@
                call do1_density_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_density_eqn'
-                  if (s% report_ierr) write(*,2) 'ierr in do1_density_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_density_eqn', k
                   ierr = op_err
                end if
             end if
@@ -186,7 +186,7 @@
                if (do_du_dt) then
                   call do1_Riemann_momentum_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
-                     if (s% report_ierr) write(*,2) 'ierr in do1_Riemann_momentum_eqn', k
+                     if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_Riemann_momentum_eqn', k
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_Riemann_momentum_eqn'
                      ierr = op_err
                   end if
@@ -194,7 +194,7 @@
                if (do_dv_dt) then
                   call do1_momentum_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
-                     if (s% report_ierr) write(*,2) 'ierr in do1_momentum_eqn', k
+                     if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_momentum_eqn', k
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_momentum_eqn'
                      ierr = op_err
                   end if
@@ -203,7 +203,7 @@
             if (do_dlnR_dt) then
                call do1_radius_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_radius_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_radius_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_radius_eqn'
                   ierr = op_err
                end if
@@ -211,7 +211,7 @@
             if (do_alpha_RTI) then
                call do1_dalpha_RTI_dt_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_dalpha_RTI_dt_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_dalpha_RTI_dt_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dalpha_RTI_dt_eqn'
                   ierr = op_err
                end if
@@ -219,7 +219,7 @@
             if (do_w_div_wc) then
                call do1_w_div_wc_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_w_div_wc_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_w_div_wc_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_w_div_wc_eqn'
                   ierr = op_err
                end if
@@ -227,7 +227,7 @@
             if (do_j_rot) then
                call do1_dj_rot_dt_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_dj_rot_dt_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_dj_rot_dt_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dj_rot_dt_eqn'
                   ierr = op_err
                end if
@@ -237,7 +237,7 @@
                call zero_eps_grav_and_partials(s, k)
                call do1_energy_eqn(s, k, do_chem, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_energy_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_energy_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_energy_eqn'
                   ierr = op_err
                end if
@@ -245,29 +245,29 @@
             if (do_detrb_dt) then
                call do1_turbulent_energy_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_turbulent_energy_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_turbulent_energy_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_turbulent_energy_eqn'
                   ierr = op_err
                end if
                call do1_rsp2_Hp_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_Hp_eqn', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_rsp2_Hp_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_Hp_eqn'
                   ierr = op_err
                end if
             end if
             if (do_equL) then
-               if (s% RSP2_flag .and. (k > 1 .or. s% RSP2_use_L_eqn_at_surface)) then
+               if (s% RSP2_flag .and. (k > 1 .or. s% ctrl% RSP2_use_L_eqn_at_surface)) then
                   call do1_rsp2_L_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
-                     if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_L_eqn', k
+                     if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_rsp2_L_eqn', k
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_L_eqn'
                      ierr = op_err
                   end if
                else if (k > 1) then ! k==1 is done by T_surf BC
                   call do1_dlnT_dm_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
-                     if (s% report_ierr) write(*,2) 'ierr in do1_dlnT_dm_eqn', k
+                     if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_dlnT_dm_eqn', k
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dlnT_dm_eqn'
                      ierr = op_err
                   end if
@@ -277,7 +277,7 @@
             if (do_chem) then
                call do1_chem_eqns(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_chem_eqns', k
+                  if (s% ctrl% report_ierr) write(*,2) 'ierr in do1_chem_eqns', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_chem_eqns'
                   ierr = op_err
                end if
@@ -288,13 +288,13 @@
          if (ierr == 0 .and. nzlo == 1) then
             call PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) write(*,2) 'ierr in PT_eqns_surf', ierr
+               if (s% ctrl% report_ierr) write(*,2) 'ierr in PT_eqns_surf', ierr
                if (len_trim(s% retry_message) == 0) s% retry_message = 'error in PT_eqns_surf'
             end if
          end if
 
          if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'ierr in eval_equ_for_solver'
+            if (s% ctrl% report_ierr) write(*,*) 'ierr in eval_equ_for_solver'
             return
          end if
          
@@ -418,17 +418,17 @@
             ! those currently without dx partials are PC & Skye & ideal
             frac_without_dxa = s% eos_frac_PC(k) + s% eos_frac_Skye(k) + s% eos_frac_ideal(k)
             
-            if (debug .and. k == s% solver_test_partials_k) then
+            if (debug .and. k == s% ctrl% solver_test_partials_k) then
               write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
               write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
               write(*,2) 's% eos_frac_ideal(k)', k, s% eos_frac_ideal(k)
               write(*,2) 'frac_without_dxa', k, frac_without_dxa
             end if
 
-            if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
-               i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
+            if (k == s% ctrl% solver_test_partials_k .and. s% solver_iter == s% ctrl% solver_test_partials_iter_number) then
+               i_var = lookup_nameofvar(s, s% ctrl% solver_test_partials_var_name)
                if (i_var .gt. s% nvar_hydro) then
-                  i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
+                  i_var_sink = lookup_nameofvar(s, s% ctrl% solver_test_partials_sink_name)
                end if
             end if
 
@@ -439,8 +439,8 @@
                do j=1, s% species
                   dxa = s% xa(j,k) - s% xa_start(j,k)
 
-                  if (debug .and. k == s% solver_test_partials_k .and. &
-                        s% solver_iter == s% solver_test_partials_iter_number) &
+                  if (debug .and. k == s% ctrl% solver_test_partials_k .and. &
+                        s% solver_iter == s% ctrl% solver_test_partials_iter_number) &
                      write(*,2) 'dxa', j, dxa
 
                   if (abs(dxa) .ge. dxa_threshold) then
@@ -452,7 +452,7 @@
                         s% rho(k), s% lnd(k)/ln10, s% T(k), s% lnT(k)/ln10, &
                         res, dres_dlnd, dres_dlnT, dres_dxa, ierr)
                      if (ierr /= 0) then
-                        if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start', k
+                        if (s% ctrl% report_ierr) write(*,2) 'failed in get_eos with xa_start', k
                         return
                      end if
 
@@ -477,13 +477,13 @@
                         ierr = 0
                         return
                         
-                        if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start_1', k
+                        if (s% ctrl% report_ierr) write(*,2) 'failed in get_eos with xa_start_1', k
                         return
                      end if
 
                      ! fix up derivatives
 
-                     if (debug .and. k == s% solver_test_partials_k) & ! .and. s% solver_iter == s% solver_test_partials_iter_number) &
+                     if (debug .and. k == s% ctrl% solver_test_partials_k) & ! .and. s% solver_iter == s% ctrl% solver_test_partials_iter_number) &
                         write(*,2) 'res(i_lnE) - lnE_with_xa_start', j, res(i_lnE) - lnE_with_xa_start
 
                      s% dlnE_dxa_for_partials(j,k) = dres_dxa(i_lnE, j) + &
@@ -510,15 +510,15 @@
 
                   else
 
-                     if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
+                     if (k == s% ctrl% solver_test_partials_k .and. s% solver_iter == s% ctrl% solver_test_partials_iter_number) then
                         if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
                            if (dxa < dxa_threshold) then
                               if (j .eq. i_var - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_var_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% ctrl% solver_test_partials_var_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               endif
                               if (j .eq. i_var_sink - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_sink_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% ctrl% solver_test_partials_sink_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if
                            end if
@@ -540,10 +540,10 @@
             if (is_bad(dxa)) then
 !$omp critical (eval_equ_for_solver_crit1)
                ierr = -1
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,3) 'eval_equ_for_solver: bad ' // trim(str), j, k, dxa
                end if
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'eval_equ_for_solver')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'eval_equ_for_solver')
 !$omp end critical (eval_equ_for_solver_crit1)
                return
             end if
@@ -564,7 +564,7 @@
          logical :: test_partials
          include 'formats'
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          ierr = 0
@@ -612,18 +612,18 @@
          
          ierr = 0
          
-         !test_partials = (k == s% solver_test_partials_k-1)
+         !test_partials = (k == s% ctrl% solver_test_partials_k-1)
          test_partials = .false.
 
          i_equ_w_div_wc = s% i_equ_w_div_wc
          i_w_div_wc = s% i_w_div_wc
 
-         wwc = s% w_div_wcrit_max
+         wwc = s% ctrl% w_div_wcrit_max
          A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
          C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
          jr_lim1 = two_thirds*wwc*C/A
 
-         wwc = s% w_div_wcrit_max2
+         wwc = s% ctrl% w_div_wcrit_max2
          A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
          C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
          jr_lim2 = two_thirds*wwc*C/A
@@ -677,7 +677,7 @@
          
          ierr = 0
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          ! Need to find a good way to scale the equation
@@ -736,7 +736,7 @@
 
          include 'formats'
 
-         !test_partials = (s% solver_iter == s% solver_test_partials_iter_number)
+         !test_partials = (s% solver_iter == s% ctrl% solver_test_partials_iter_number)
          test_partials = .false.         
          ierr = 0
          if (s% u_flag) then
@@ -746,15 +746,15 @@
          end if
 
          need_P_surf = .false.
-         if (s% use_compression_outer_BC) then
+         if (s% ctrl% use_compression_outer_BC) then
             call set_compression_BC(ierr)
-         else if (s% use_zero_Pgas_outer_BC) then
+         else if (s% ctrl% use_zero_Pgas_outer_BC) then
             P_bc_ad = Radiation_Pressure(s% T_start(1))
             call set_momentum_BC(ierr)
-         else if (s% use_fixed_Psurf_outer_BC) then
-            P_bc_ad = s% fixed_Psurf
+         else if (s% ctrl% use_fixed_Psurf_outer_BC) then
+            P_bc_ad = s% ctrl% fixed_Psurf
             call set_momentum_BC(ierr)
-         else if (s% use_fixed_vsurf_outer_BC) then
+         else if (s% ctrl% use_fixed_vsurf_outer_BC) then
             call set_fixed_vsurf_outer_BC(ierr)
          else 
             need_P_surf = .true.
@@ -763,24 +763,24 @@
 
          need_T_surf = .false.
          if ((.not. do_equL) .or. &
-               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface)) then 
+               (s% RSP2_flag .and. s% ctrl% RSP2_use_L_eqn_at_surface)) then 
             ! no Tsurf BC
          else
             need_T_surf = .true.
          end if
          if (ierr /= 0) return
          
-         offset_P_to_cell_center = .not. s% use_momentum_outer_BC
+         offset_P_to_cell_center = .not. s% ctrl% use_momentum_outer_BC
          
          offset_T_to_cell_center = .true.
-         if (s% use_other_surface_PT .or. s% RSP2_flag) &
+         if (s% ctrl% use_other_surface_PT .or. s% RSP2_flag) &
             offset_T_to_cell_center = .false.
 
          call get_PT_bc_ad(ierr)
          if (ierr /= 0) return
          
          if (need_P_surf) then
-            if (s% use_momentum_outer_BC) then
+            if (s% ctrl% use_momentum_outer_BC) then
                call set_momentum_BC(ierr)
             else
                call set_Psurf_BC(ierr)
@@ -834,7 +834,7 @@
                lnP_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap, &
                ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,*) 'PT_eqns_surf: ierr from set_Teff_info_for_eqns'
                end if
                return
@@ -999,7 +999,7 @@
                lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected
             real(dp) :: residual
             include 'formats'
-            !test_partials = (1 == s% solver_test_partials_k)
+            !test_partials = (1 == s% ctrl% solver_test_partials_k)
             test_partials = .false.
             ierr = 0  
             if (s% RSP2_flag) then ! interpolate lnT by mass
@@ -1039,7 +1039,7 @@
             logical :: test_partials
             type(auto_diff_real_star_order1) :: lnP1_ad
             include 'formats'
-            !test_partials = (1 == s% solver_test_partials_k)
+            !test_partials = (1 == s% ctrl% solver_test_partials_k)
             test_partials = .false.
             ierr = 0           
             lnP1_ad = wrap_lnPeos_00(s,1)            
@@ -1105,7 +1105,7 @@
                write(*,*) 'set_fixed_vsurf_outer_BC requires u_flag or v_flag true'
                return
             end if 
-            resid_ad = (vsurf - s% fixed_vsurf)/s% csound_start(1)
+            resid_ad = (vsurf - s% ctrl% fixed_vsurf)/s% csound_start(1)
             s% equ(i_P_eqn,1) = resid_ad%val
             call save_eqn_residual_info( &
                s, 1, nvar, i_P_eqn, resid_ad, 'set_fixed_vsurf_outer_BC', ierr)           

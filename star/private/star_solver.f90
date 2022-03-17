@@ -95,7 +95,7 @@
          call realloc_if_needed_1(s% AF1,ldAF*neqns,(ldAF+2)*200,ierr)
          if (ierr /= 0) return
 
-         if (s% fill_arrays_with_NaNs) call fill_with_NaNs(s% AF1)
+         if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs(s% AF1)
 
          call do_solver( &
             s, nvar, s% AF1, ldAF, neqns, skip_global_corr_coeff_limit, &
@@ -208,29 +208,29 @@
          s% solver_iter = iter
 
          call set_param_defaults
-         dbg_msg = s% report_solver_progress
+         dbg_msg = s% ctrl% report_solver_progress
          
          if (gold_tolerances_level == 2) then
-            tol_residual_norm = s% gold2_tol_residual_norm1
-            tol_max_residual = s% gold2_tol_max_residual1
-            tol_residual_norm2 = s% gold2_tol_residual_norm2
-            tol_max_residual2 = s% gold2_tol_max_residual2
-            tol_residual_norm3 = s% gold2_tol_residual_norm3
-            tol_max_residual3 = s% gold2_tol_max_residual3
+            tol_residual_norm = s% ctrl% gold2_tol_residual_norm1
+            tol_max_residual = s% ctrl% gold2_tol_max_residual1
+            tol_residual_norm2 = s% ctrl% gold2_tol_residual_norm2
+            tol_max_residual2 = s% ctrl% gold2_tol_max_residual2
+            tol_residual_norm3 = s% ctrl% gold2_tol_residual_norm3
+            tol_max_residual3 = s% ctrl% gold2_tol_max_residual3
          else if (gold_tolerances_level == 1) then
-            tol_residual_norm = s% gold_tol_residual_norm1
-            tol_max_residual = s% gold_tol_max_residual1
-            tol_residual_norm2 = s% gold_tol_residual_norm2
-            tol_max_residual2 = s% gold_tol_max_residual2
-            tol_residual_norm3 = s% gold_tol_residual_norm3
-            tol_max_residual3 = s% gold_tol_max_residual3
+            tol_residual_norm = s% ctrl% gold_tol_residual_norm1
+            tol_max_residual = s% ctrl% gold_tol_max_residual1
+            tol_residual_norm2 = s% ctrl% gold_tol_residual_norm2
+            tol_max_residual2 = s% ctrl% gold_tol_max_residual2
+            tol_residual_norm3 = s% ctrl% gold_tol_residual_norm3
+            tol_max_residual3 = s% ctrl% gold_tol_max_residual3
          else
-            tol_residual_norm = s% tol_residual_norm1
-            tol_max_residual = s% tol_max_residual1
-            tol_residual_norm2 = s% tol_residual_norm2
-            tol_max_residual2 = s% tol_max_residual2
-            tol_residual_norm3 = s% tol_residual_norm3
-            tol_max_residual3 = s% tol_max_residual3
+            tol_residual_norm = s% ctrl% tol_residual_norm1
+            tol_max_residual = s% ctrl% tol_max_residual1
+            tol_residual_norm2 = s% ctrl% tol_residual_norm2
+            tol_max_residual2 = s% ctrl% tol_max_residual2
+            tol_residual_norm3 = s% ctrl% tol_residual_norm3
+            tol_max_residual3 = s% ctrl% tol_max_residual3
          end if
 
          tol_abs_slope_min = -1 ! unused
@@ -238,18 +238,18 @@
          if (skip_global_corr_coeff_limit) then
             min_corr_coeff = 1
          else
-            min_corr_coeff = s% corr_coeff_limit
+            min_corr_coeff = s% ctrl% corr_coeff_limit
          end if
          
          if (gold_tolerances_level == 2) then
-            iter_for_resid_tol2 = s% gold2_iter_for_resid_tol2
-            iter_for_resid_tol3 = s% gold2_iter_for_resid_tol3
+            iter_for_resid_tol2 = s% ctrl% gold2_iter_for_resid_tol2
+            iter_for_resid_tol3 = s% ctrl% gold2_iter_for_resid_tol3
          else if (gold_tolerances_level == 1) then
-            iter_for_resid_tol2 = s% gold_iter_for_resid_tol2
-            iter_for_resid_tol3 = s% gold_iter_for_resid_tol3
+            iter_for_resid_tol2 = s% ctrl% gold_iter_for_resid_tol2
+            iter_for_resid_tol3 = s% ctrl% gold_iter_for_resid_tol3
          else
-            iter_for_resid_tol2 = s% iter_for_resid_tol2
-            iter_for_resid_tol3 = s% iter_for_resid_tol3
+            iter_for_resid_tol2 = s% ctrl% iter_for_resid_tol2
+            iter_for_resid_tol3 = s% ctrl% iter_for_resid_tol3
          end if
 
          call pointers(ierr)
@@ -298,17 +298,17 @@
          iter = 1
          s% solver_iter = iter
          if (s% doing_first_model_of_run) then
-            max_tries = s% max_tries1
+            max_tries = s% ctrl% max_tries1
          else if (s% retry_cnt > 20) then
-            max_tries = s% max_tries_after_20_retries
+            max_tries = s% ctrl% max_tries_after_20_retries
          else if (s% retry_cnt > 10) then
-            max_tries = s% max_tries_after_10_retries
+            max_tries = s% ctrl% max_tries_after_10_retries
          else if (s% retry_cnt > 5) then
-            max_tries = s% max_tries_after_5_retries
+            max_tries = s% ctrl% max_tries_after_5_retries
          else if (s% retry_cnt > 0) then
-            max_tries = s% max_tries_for_retry
+            max_tries = s% ctrl% max_tries_for_retry
          else
-            max_tries = s% solver_max_tries_before_reject
+            max_tries = s% ctrl% solver_max_tries_before_reject
          end if
          tiny_corr_cnt = 0
 
@@ -386,7 +386,7 @@
             if (is_bad_num(correction_norm) .or. is_bad_num(max_abs_correction)) then
                ! bad news -- bogus correction
                call oops('bad result from sizeB -- correction info either NaN or Inf')
-               if (s% stop_for_bad_nums) then
+               if (s% ctrl% stop_for_bad_nums) then
                   write(*,1) 'correction_norm', correction_norm
                   write(*,1) 'max_correction', max_correction
                   call mesa_error(__FILE__,__LINE__,'solver')
@@ -394,8 +394,8 @@
                exit iter_loop
             end if
 
-            if (.not. s% ignore_too_large_correction) then
-               if ((correction_norm > s% corr_param_factor*s% scale_correction_norm) .and. &
+            if (.not. s% ctrl% ignore_too_large_correction) then
+               if ((correction_norm > s% ctrl% corr_param_factor*s% ctrl% scale_correction_norm) .and. &
                      .not. s% doing_first_model_of_run) then
                   call oops('avg corr too large')
                   exit iter_loop
@@ -406,23 +406,23 @@
             correction_factor = 1d0
             temp_correction_factor = 1d0
 
-            if (correction_norm*correction_factor > s% scale_correction_norm) then
-               correction_factor = min(correction_factor,s% scale_correction_norm/correction_norm)
+            if (correction_norm*correction_factor > s% ctrl% scale_correction_norm) then
+               correction_factor = min(correction_factor,s% ctrl% scale_correction_norm/correction_norm)
             end if
             
-            if (max_abs_correction*correction_factor > s% scale_max_correction) then
-               temp_correction_factor = s% scale_max_correction/max_abs_correction
+            if (max_abs_correction*correction_factor > s% ctrl% scale_max_correction) then
+               temp_correction_factor = s% ctrl% scale_max_correction/max_abs_correction
             end if
 
-            if (iter > s% solver_itermin_until_reduce_min_corr_coeff) then
+            if (iter > s% ctrl% solver_itermin_until_reduce_min_corr_coeff) then
                if (min_corr_coeff == 1d0 .and. &
-                  s% solver_reduced_min_corr_coeff < 1d0) then
-                     min_corr_coeff = s% solver_reduced_min_corr_coeff
+                  s% ctrl% solver_reduced_min_corr_coeff < 1d0) then
+                     min_corr_coeff = s% ctrl% solver_reduced_min_corr_coeff
                end if
             end if
 
             correction_factor = max(min_corr_coeff, correction_factor)
-            if (.not. s% ignore_min_corr_coeff_for_scale_max_correction) then
+            if (.not. s% ctrl% ignore_min_corr_coeff_for_scale_max_correction) then
                temp_correction_factor = max(min_corr_coeff, temp_correction_factor)
             end if
             correction_factor = min(correction_factor, temp_correction_factor)
@@ -441,7 +441,7 @@
 
                slope = eval_slope(nvar, nz, grad_f, soln)
                if (is_bad_num(slope) .or. slope > 0d0) then ! a very bad sign
-                  if (is_bad_num(slope) .and. s% stop_for_bad_nums) then
+                  if (is_bad_num(slope) .and. s% ctrl% stop_for_bad_nums) then
                      write(*,1) 'slope', slope
                      call mesa_error(__FILE__,__LINE__,'solver')
                   end if
@@ -465,7 +465,7 @@
             s% solver_adjust_iter = 0
 
             ! coeff is factor by which adjust_correction rescaled the correction vector
-            if (coeff > s% tiny_corr_factor*min_corr_coeff .or. min_corr_coeff >= 1d0) then
+            if (coeff > s% ctrl% tiny_corr_factor*min_corr_coeff .or. min_corr_coeff >= 1d0) then
                tiny_corr_cnt = 0
             else
                tiny_corr_cnt = tiny_corr_cnt + 1
@@ -481,7 +481,7 @@
 
             if (is_bad_num(residual_norm)) then
                call oops('residual_norm is a a bad number (NaN or Infinity)')
-               if (s% stop_for_bad_nums) then
+               if (s% ctrl% stop_for_bad_nums) then
                   write(*,1) 'residual_norm', residual_norm
                   call mesa_error(__FILE__,__LINE__,'solver')
                end if
@@ -490,7 +490,7 @@
             
             if (is_bad_num(max_residual)) then
                call oops('max_residual is a a bad number (NaN or Infinity)')
-               if (s% stop_for_bad_nums) then
+               if (s% ctrl% stop_for_bad_nums) then
                   write(*,1) 'max_residual', max_residual
                   call mesa_error(__FILE__,__LINE__,'solver')
                end if
@@ -555,19 +555,19 @@
                   convergence_failure = .true.
                   exit iter_loop
                else if (.not. first_try .and. .not. s% doing_first_model_of_run) then
-                  if (correction_norm > s% corr_norm_jump_limit*corr_norm_min) then
+                  if (correction_norm > s% ctrl% corr_norm_jump_limit*corr_norm_min) then
                      call oops('avg correction jumped')
                      exit iter_loop
-                  else if (residual_norm > s% resid_norm_jump_limit*resid_norm_min) then
+                  else if (residual_norm > s% ctrl% resid_norm_jump_limit*resid_norm_min) then
                      call oops('avg residual jumped')
                      exit iter_loop
-                  else if (max_abs_correction > s% max_corr_jump_limit*max_corr_min) then
+                  else if (max_abs_correction > s% ctrl% max_corr_jump_limit*max_corr_min) then
                      call oops('max correction jumped')
                      exit iter_loop
-                  else if (max_residual > s% max_resid_jump_limit*max_resid_min) then
+                  else if (max_residual > s% ctrl% max_resid_jump_limit*max_resid_min) then
                      call oops('max residual jumped')
                      exit iter_loop
-                  else if (tiny_corr_cnt >= s% tiny_corr_coeff_limit &
+                  else if (tiny_corr_cnt >= s% ctrl% tiny_corr_coeff_limit &
                         .and. min_corr_coeff < 1) then
                      call oops('tiny corrections')
                      exit iter_loop
@@ -586,7 +586,7 @@
                end if
                if (.not. passed_tol_tests) then
                   call write_msg(message)
-               else if (iter < s% solver_itermin) then
+               else if (iter < s% ctrl% solver_itermin) then
                   call write_msg('iter < itermin')
                else
                   call write_msg('okay!')
@@ -595,7 +595,7 @@
 
             if (passed_tol_tests .and. (iter+1 < max_tries)) then
                ! about to declare victory... but may want to do another iteration
-               force_iter_value = force_another_iteration(s, iter, s% solver_itermin)
+               force_iter_value = force_another_iteration(s, iter, s% ctrl% solver_itermin)
                if (force_iter_value > 0) then
                   passed_tol_tests = .false. ! force another
                   tiny_corr_cnt = 0 ! reset the counter
@@ -609,7 +609,7 @@
                end if
             end if
 
-            if (s% use_other_solver_monitor .and. &
+            if (s% ctrl% use_other_solver_monitor .and. &
                   associated(s% other_solver_monitor)) then
                call s% other_solver_monitor( &
                   s% id, iter, passed_tol_tests, &
@@ -627,9 +627,9 @@
 
          end do iter_loop
             
-         if (max_residual > s% warning_limit_for_max_residual .and. .not. convergence_failure) &
+         if (max_residual > s% ctrl% warning_limit_for_max_residual .and. .not. convergence_failure) &
             write(*,2) 'WARNING: max_residual > warning_limit_for_max_residual', &
-               s% model_number, max_residual, s% warning_limit_for_max_residual
+               s% model_number, max_residual, s% ctrl% warning_limit_for_max_residual
 
 
          contains
@@ -653,10 +653,10 @@
 
             ierr = 0
             testing_partial = & ! check inlist parameters
-               s% solver_test_partials_dx_0 > 0d0 .and. &
-               s% solver_test_partials_k > 0 .and. &
-               s% solver_call_number == s% solver_test_partials_call_number .and. &
-               s% solver_test_partials_iter_number == iter
+               s% ctrl% solver_test_partials_dx_0 > 0d0 .and. &
+               s% ctrl% solver_test_partials_k > 0 .and. &
+               s% solver_call_number == s% ctrl% solver_test_partials_call_number .and. &
+               s% ctrl% solver_test_partials_iter_number == iter
             if (.not. testing_partial) return
 
             call do_equations(ierr)
@@ -672,9 +672,9 @@
             end do
             
             s% doing_check_partials = .true. ! let set_vars_for_solver know
-            k_lo = s% solver_test_partials_k_low
+            k_lo = s% ctrl% solver_test_partials_k_low
             if (k_lo > 0 .and. k_lo <= s% nz) then
-               k_hi = s% solver_test_partials_k_high
+               k_hi = s% ctrl% solver_test_partials_k_high
                if (k_hi <= 0) then
                   k_hi = s% nz
                else
@@ -685,7 +685,7 @@
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                end do
             else
-               k = s% solver_test_partials_k
+               k = s% ctrl% solver_test_partials_k
                call test_cell_partials(s, k, save_dx, save_equ, ierr) 
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
             end if
@@ -711,10 +711,10 @@
 
 
          subroutine set_param_defaults
-            if (s% corr_param_factor == 0) s% corr_param_factor = 10d0
-            if (s% scale_max_correction == 0) s% scale_max_correction = 1d99
-            if (s% corr_norm_jump_limit == 0) s% corr_norm_jump_limit = 1d99
-            if (s% max_corr_jump_limit == 0) s% max_corr_jump_limit = 1d99
+            if (s% ctrl% corr_param_factor == 0) s% ctrl% corr_param_factor = 10d0
+            if (s% ctrl% scale_max_correction == 0) s% ctrl% scale_max_correction = 1d99
+            if (s% ctrl% corr_norm_jump_limit == 0) s% ctrl% corr_norm_jump_limit = 1d99
+            if (s% ctrl% max_corr_jump_limit == 0) s% ctrl% max_corr_jump_limit = 1d99
          end subroutine set_param_defaults
 
 
@@ -816,7 +816,7 @@
                   write(err_msg,*) 'adjust_correction failed in eval_f'
                   if (dbg_msg) write(*,*) &
                      'adjust_correction: eval_f(nvar,nz,equ)', eval_f(nvar,nz,equ)
-                  if (s% stop_for_bad_nums) then
+                  if (s% ctrl% stop_for_bad_nums) then
                      write(*,1) 'f', f
                      call mesa_error(__FILE__,__LINE__,'solver adjust_correction')
                   end if
@@ -874,7 +874,7 @@
 
                f = eval_f(nvar,nz,equ)
                if (is_bad_num(f)) then
-                  if (s% stop_for_bad_nums) then
+                  if (s% ctrl% stop_for_bad_nums) then
                      write(*,1) 'f', f
                      call mesa_error(__FILE__,__LINE__,'solver adjust_correction eval_f')
                   end if
@@ -1042,7 +1042,7 @@
                b1(i) = -equ1(i)
             end do
             
-            if (s% use_DGESVX_in_bcyclic) then
+            if (s% ctrl% use_DGESVX_in_bcyclic) then
                !$omp simd
                do i = 1, nvar*nvar*nz
                   save_ublk1(i) = ublk1(i)
@@ -1054,7 +1054,7 @@
             call factor_mtx(ierr)
             if (ierr == 0) call solve_mtx(ierr)
             
-            if (s% use_DGESVX_in_bcyclic) then
+            if (s% ctrl% use_DGESVX_in_bcyclic) then
                !$omp simd
                do i = 1, nvar*nvar*nz
                   ublk1(i) = save_ublk1(i)
@@ -1104,39 +1104,39 @@
             include 'formats'
             ierr = 0
             write(*,'(A)')
-            i_equ = lookup_nameofequ(s, s% solver_test_partials_equ_name)      
-            if (i_equ == 0 .and. len_trim(s% solver_test_partials_equ_name) > 0) then
-               if (s% solver_test_partials_equ_name == 'lnE') then ! testing eos
+            i_equ = lookup_nameofequ(s, s% ctrl% solver_test_partials_equ_name)      
+            if (i_equ == 0 .and. len_trim(s% ctrl% solver_test_partials_equ_name) > 0) then
+               if (s% ctrl% solver_test_partials_equ_name == 'lnE') then ! testing eos
                   i_equ = -1
-               else if (s% solver_test_partials_equ_name == 'eps_nuc') then
+               else if (s% ctrl% solver_test_partials_equ_name == 'eps_nuc') then
                   i_equ = -2
-               else if (s% solver_test_partials_equ_name == 'opacity') then
+               else if (s% ctrl% solver_test_partials_equ_name == 'opacity') then
                   i_equ = -3
-               else if (s% solver_test_partials_equ_name == 'lnP') then
+               else if (s% ctrl% solver_test_partials_equ_name == 'lnP') then
                   i_equ = -4
-               else if (s% solver_test_partials_equ_name == 'non_nuc_neu') then
+               else if (s% ctrl% solver_test_partials_equ_name == 'non_nuc_neu') then
                   i_equ = -5
-               else if (s% solver_test_partials_equ_name == 'gradT') then
+               else if (s% ctrl% solver_test_partials_equ_name == 'gradT') then
                   i_equ = -6
-               else if (s% solver_test_partials_equ_name == 'mlt_vc') then
+               else if (s% ctrl% solver_test_partials_equ_name == 'mlt_vc') then
                   i_equ = -7
-               else if (s% solver_test_partials_equ_name == 'grad_ad') then
+               else if (s% ctrl% solver_test_partials_equ_name == 'grad_ad') then
                   i_equ = -8
                end if 
             else if (i_equ /= 0) then
-               write(*,1) 'equ name ' // trim(s% solver_test_partials_equ_name)
+               write(*,1) 'equ name ' // trim(s% ctrl% solver_test_partials_equ_name)
             end if
-            i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)            
-            if (i_var /= 0) write(*,1) 'var name ' // trim(s% solver_test_partials_var_name)
+            i_var = lookup_nameofvar(s, s% ctrl% solver_test_partials_var_name)            
+            if (i_var /= 0) write(*,1) 'var name ' // trim(s% ctrl% solver_test_partials_var_name)
             if (i_var > s% nvar_hydro) then ! get index in xa
                i_var_xa_index = i_var - s% nvar_hydro
             else
                i_var_xa_index = 0
             end if
-            i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
+            i_var_sink = lookup_nameofvar(s, s% ctrl% solver_test_partials_sink_name)
             i_var_sink_xa_index  = 0
             if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
-               write(*,1) 'sink name ' // trim(s% solver_test_partials_sink_name)
+               write(*,1) 'sink name ' // trim(s% ctrl% solver_test_partials_sink_name)
                if (i_var_sink > s% nvar_hydro) then ! get index in xa
                   i_var_sink_xa_index = i_var_sink - s% nvar_hydro
                else
@@ -1145,7 +1145,7 @@
                   return
                end if
             end if
-            if (s% solver_test_partials_equ_name == 'all') then
+            if (s% ctrl% solver_test_partials_equ_name == 'all') then
                do i_equ = 1, s% nvar_hydro
                   call test_equ_partials(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
@@ -1173,7 +1173,7 @@
             integer :: i, j_var_xa_index, j_var_sink_xa_index
             include 'formats'
             if (i_equ /= 0) then
-               if (s% solver_test_partials_var_name == 'all') then
+               if (s% ctrl% solver_test_partials_var_name == 'all') then
                   do i = 1, s% nvar_hydro
                      call test3_partials(s, &
                         i_equ, i, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
@@ -1197,7 +1197,7 @@
                else ! i_var == 0
                   if (s% solver_test_partials_var <= 0) then
                      write(*,2) 'need to set solver_test_partials_var', s% solver_test_partials_var
-                     write(*,2) 'for solver_test_partials_k', s% solver_test_partials_k
+                     write(*,2) 'for solver_test_partials_k', s% ctrl% solver_test_partials_k
                      call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                   end if
                   if (s% solver_test_partials_var > s% nvar_hydro) then
@@ -1474,17 +1474,17 @@
             ierr = 0
 
             if (i_var > s% nvar_hydro) then ! testing abundance
-               dx_0 = s% solver_test_partials_dx_0 * &
+               dx_0 = s% ctrl% solver_test_partials_dx_0 * &
                   max(abs(s% xa_start(i_var_xa_index,k) + s% solver_dx(i_var,k)), &
                       abs(s% xa_start(i_var_xa_index,k)), &
                       1d-99)
                write(*,1) 'var name ' // chem_isos% name(s% chem_id(i_var_xa_index))
                write(*,1) 'sink name ' // chem_isos% name(s% chem_id(i_var_sink_xa_index))
             else
-               dx_0 = s% solver_test_partials_dx_0 * &
+               dx_0 = s% ctrl% solver_test_partials_dx_0 * &
                   max(abs(s% xh_start(i_var,k) + s% solver_dx(i_var,k)), &
                       abs(s% xh_start(i_var,k)))
-               if (dx_0 == 0d0) dx_0 = s% solver_test_partials_dx_0
+               if (dx_0 == 0d0) dx_0 = s% ctrl% solver_test_partials_dx_0
             end if
             dvardx = dfridr(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
@@ -1652,8 +1652,8 @@
             !write(*,2) 'f2', 1, f2, save_dx(i_var,k) - hh
             a(1,1) = (f1 - f2)/(2d0*hh)
             !write(*,2) 'dfdx', 1, a(1,1), &
-            !   hh, (save_dx(s% solver_test_partials_var,s% solver_test_partials_k) + hh)/ln10, &
-            !   save_dx(s% solver_test_partials_var,s% solver_test_partials_k)/ln10
+            !   hh, (save_dx(s% solver_test_partials_var,s% ctrl% solver_test_partials_k) + hh)/ln10, &
+            !   save_dx(s% solver_test_partials_var,s% ctrl% solver_test_partials_k)/ln10
             err = big
             ! succesive columns in the neville tableu will go to smaller stepsizes
             ! and higher orders of extrapolation
@@ -1669,8 +1669,8 @@
                !write(*,2) 'f2', i, f2, save_dx(i_var,k) - hh
                a(1,i) = (f1 - f2)/(2d0*hh)
                !write(*,2) 'dfdx', i, a(1,i), &
-               !   hh, (save_dx(s% solver_test_partials_var,s% solver_test_partials_k) + hh)/ln10, &
-               !   save_dx(s% solver_test_partials_var,s% solver_test_partials_k)/ln10
+               !   hh, (save_dx(s% solver_test_partials_var,s% ctrl% solver_test_partials_k) + hh)/ln10, &
+               !   save_dx(s% solver_test_partials_var,s% ctrl% solver_test_partials_k)/ln10
                ! compute extrapolations of various orders; the error stratagy is to compare
                ! each new extrapolation to one order lower but both at the same stepsize
                ! and at the previous stepsize
@@ -1852,7 +1852,7 @@
 
             if (i-1 > lwork) then
                ierr = -1
-               write(*,*) 'use_DGESVX_in_bcyclic', s% use_DGESVX_in_bcyclic
+               write(*,*) 'use_DGESVX_in_bcyclic', s% ctrl% use_DGESVX_in_bcyclic
                write(*,  &
                   '(a, i12, a, i12, e26.6)') 'solver: lwork is too small.  must be at least', i-1, &
                   '   but is only ', lwork, dble(i-1 - lwork)/(neq*nvar)

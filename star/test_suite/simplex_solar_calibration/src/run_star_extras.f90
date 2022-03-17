@@ -99,7 +99,7 @@
          if (i == 1 .and. vary_my_param1) then
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
-            s% mixing_length_alpha = new_value
+            s% ctrl% mixing_length_alpha = new_value
          end if
       end subroutine will_set_my_param
       
@@ -237,9 +237,9 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         weight = s% x_ctrl(1)
-         width = s% x_ctrl(2)
-         center = s% x_ctrl(3)
+         weight = s% ctrl% x_ctrl(1)
+         width = s% ctrl% x_ctrl(2)
+         center = s% ctrl% x_ctrl(3)
 
          names(1) = 'gradr_grada_function'
          gval_is_xa_function(1) = .false.

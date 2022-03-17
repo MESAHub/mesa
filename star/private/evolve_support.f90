@@ -68,11 +68,11 @@
 
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
+            if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
 
             call enlarge_if_needed_2(s% xa_old,s% species,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
+            if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
 
             do k = 1, s% nz
                do j=1, s% nvar_hydro
@@ -138,9 +138,9 @@
             first_time = (.not. associated(ptr_old))
             call realloc_if_needed_1(ptr_old,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) then
+            if (s% ctrl% fill_arrays_with_NaNs) then
                call fill_with_NaNs(ptr_old)
-            else if (s% zero_when_allocate) then
+            else if (s% ctrl% zero_when_allocate) then
                ptr_old(:) = 0
             else if (first_time) then
                ptr_old(1:nz) = -9d99
@@ -187,7 +187,7 @@
          s% crystal_core_boundary_mass = s% crystal_core_boundary_mass_old
 
          if (.not. s% RSP_flag) then
-            if (s% fill_arrays_with_NaNs) then
+            if (s% ctrl% fill_arrays_with_NaNs) then
                call fill_with_NaNs_2d(s% xh)
                call fill_with_NaNs_2d(s% xa)
             end if
@@ -219,7 +219,7 @@
                do k=1,s% nz
                   s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                   if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
-                     if (s% stop_for_bad_nums) then
+                     if (s% ctrl% stop_for_bad_nums) then
                         write(*,2) 's% omega(k)', k, s% omega(k)
                         stop 'set_current_to_old'
                      end if
@@ -267,8 +267,8 @@
 
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call get_name_for_restart_file(s% model_number, s% photo_digits, num_str)
-         filename = trim(s% photo_directory) // '/' // trim(num_str)
+         call get_name_for_restart_file(s% model_number, s% ctrl% photo_digits, num_str)
+         filename = trim(s% ctrl% photo_directory) // '/' // trim(num_str)
          call output_to_file(filename, id, ierr)
          if (ierr /= 0) return
 
@@ -296,7 +296,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         if(.not. folder_exists(trim(s% photo_directory))) call mkdir(trim(s% photo_directory))
+         if(.not. folder_exists(trim(s% ctrl% photo_directory))) call mkdir(trim(s% ctrl% photo_directory))
 
          open(newunit=iounit, file=trim(filename), action='write', &
             status='replace', iostat=ierr, iomsg=iomsg, form='unformatted')

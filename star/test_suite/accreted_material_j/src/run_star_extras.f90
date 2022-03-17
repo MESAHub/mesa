@@ -68,11 +68,11 @@
          integer, intent(out) :: ierr
          type(star_info), pointer :: s
          call star_ptr(id, s, ierr)
-         s% accreted_material_j = &
-              s% x_ctrl(1)*sqrt(s% cgrav(1) * s% mstar * s% photosphere_r*Rsun)
+         s% ctrl% accreted_material_j = &
+              s% ctrl% x_ctrl(1)*sqrt(s% cgrav(1) * s% mstar * s% photosphere_r*Rsun)
 
-         !write(*,*) "debug", s% mstar_dot/Msun*secyer, 10**(s% x_ctrl(2))
-         s% mstar_dot = s% mstar_dot + pow(10d0, s% x_ctrl(2))*Msun/secyer
+         !write(*,*) "debug", s% mstar_dot/Msun*secyer, 10**(s% ctrl% x_ctrl(2))
+         s% mstar_dot = s% mstar_dot + pow(10d0, s% ctrl% x_ctrl(2))*Msun/secyer
 
       end subroutine accretor_adjust_mdot
       
@@ -114,18 +114,18 @@
          ! Check accretion of angular momentum
          if (s% model_number > 1 .and. s% mstar_dot > 0) then
             if (.false.) then ! off for now
-               write(*,*) "Total accreted J should be:", s% accreted_material_j*s% mstar_dot*s% dt
+               write(*,*) "Total accreted J should be:", s% ctrl% accreted_material_j*s% mstar_dot*s% dt
                write(*,*) "Current J, old J, delta J:", s% total_angular_momentum, &
                    s% total_angular_momentum_old, &
                    s% total_angular_momentum - s% total_angular_momentum_old
             end if
-            am_error = (s% accreted_material_j*s% mstar_dot*s% dt &
+            am_error = (s% ctrl% accreted_material_j*s% mstar_dot*s% dt &
                 - (s% total_angular_momentum - s% total_angular_momentum_old)) &
-                / (s% accreted_material_j*s% mstar_dot*s% dt)
+                / (s% ctrl% accreted_material_j*s% mstar_dot*s% dt)
             if (.true.) write(*,*) "Relative diff in accreted J vs expected:", am_error
             ! Ignore large error if per step change is only small part of total angular momentum
             ! otherwise can run into floating point precision
-            if (abs(am_error) > 1d-5 .and. s% accreted_material_j*s% mstar_dot*s% dt > 1e-5*s% total_angular_momentum) then
+            if (abs(am_error) > 1d-5 .and. s% ctrl% accreted_material_j*s% mstar_dot*s% dt > 1e-5*s% total_angular_momentum) then
                 extras_check_model = terminate
                 write(*,*) "Error in accreted J is too high!"
             end if

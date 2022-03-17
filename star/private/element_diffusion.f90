@@ -91,29 +91,29 @@
             ! s% energy_start gets reset later in do_struct_burn_mix before structure solve.
          end do
 
-         if ((.not. s% do_element_diffusion) .or. dt < s% diffusion_dt_limit) then
+         if ((.not. s% ctrl% do_element_diffusion) .or. dt < s% ctrl% diffusion_dt_limit) then
             s% num_diffusion_solver_iters = 0 ! Flush diff iters to avoid crashing the timestep.
             s% edv(:,1:nz) = 0
             s% eps_WD_sedimentation(1:nz) = 0d0
-            if (s% do_element_diffusion .and. s% report_ierr .and. dt < s% diffusion_dt_limit) &
-               write(*,2) 'skip diffusion this step: dt < s% diffusion_dt_limit', &
-                  s% model_number, dt, s% diffusion_dt_limit
+            if (s% ctrl% do_element_diffusion .and. s% ctrl% report_ierr .and. dt < s% ctrl% diffusion_dt_limit) &
+               write(*,2) 'skip diffusion this step: dt < s% ctrl% diffusion_dt_limit', &
+                  s% model_number, dt, s% ctrl% diffusion_dt_limit
             return
          end if
                          
          s% need_to_setvars = .true.
 
-         if (s% use_other_diffusion_factor) then
+         if (s% ctrl% use_other_diffusion_factor) then
             call s% other_diffusion_factor(s% id, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) write(*,*) 'do_element_diffusion failed in other_diffusion_factor'
+               if (s% ctrl% report_ierr) write(*,*) 'do_element_diffusion failed in other_diffusion_factor'
                return
             end if
          end if
 
-         if (s% use_other_diffusion) then
+         if (s% ctrl% use_other_diffusion) then
             call s% other_diffusion(s% id, dt_in, ierr)
-            if (ierr /= 0 .and. s% report_ierr) &
+            if (ierr /= 0 .and. s% ctrl% report_ierr) &
                write(*,*) 'do_element_diffusion failed in other_diffusion_factor'
             return
          end if
@@ -123,15 +123,15 @@
          nz = s% nz
          nzlo = 1
          nzhi = nz
-         min_D_mix = s% D_mix_ignore_diffusion
+         min_D_mix = s% ctrl% D_mix_ignore_diffusion
          species = s% species
-         if ( s% diffusion_use_full_net ) then
+         if ( s% ctrl% diffusion_use_full_net ) then
             if( species > 100 ) then
                stop "Net is too large for diffusion_use_full_net. max_num_diffusion_classes = 100"
             end if
             nc = species
          else
-            nc = s% diffusion_num_classes
+            nc = s% ctrl% diffusion_num_classes
          end if
          m = nc+1
 
@@ -145,17 +145,17 @@
 
          call set_extras(ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'do_element_diffusion failed in set_extras'
+            if (s% ctrl% report_ierr) write(*,*) 'do_element_diffusion failed in set_extras'
             return
          end if
 
 
-         !write(*,1) 's% diffusion_min_T_at_surface', s% diffusion_min_T_at_surface
+         !write(*,1) 's% ctrl% diffusion_min_T_at_surface', s% ctrl% diffusion_min_T_at_surface
          !reset nzlo if necessary; nzlo=1 above
          nzlo = 1
-         if (s% diffusion_min_T_at_surface > 0) then
+         if (s% ctrl% diffusion_min_T_at_surface > 0) then
             k = nzlo
-            do while (s% T(k) < s% diffusion_min_T_at_surface)
+            do while (s% T(k) < s% ctrl% diffusion_min_T_at_surface)
                k = k+1
                if (k > nz) exit
                nzlo = k
@@ -164,10 +164,10 @@
 
          !write(*,2) 'diffusion_min_T_at_surface', nzlo
 
-         if (s% diffusion_min_dq_ratio_at_surface > 0) then
+         if (s% ctrl% diffusion_min_dq_ratio_at_surface > 0) then
             dqsum = sum(s% dq(1:nzlo))
             k = nzlo
-            do while (dqsum < s% diffusion_min_dq_ratio_at_surface*s% dq(k+1))
+            do while (dqsum < s% ctrl% diffusion_min_dq_ratio_at_surface*s% dq(k+1))
                k = k+1
                if (k >= nz) exit
                dqsum = dqsum + s% dq(k)
@@ -175,12 +175,12 @@
             end do
          end if
 
-         !write(*,2) 'before diffusion_min_dq_ratio_at_surface', nzlo, s% diffusion_min_dq_at_surface
+         !write(*,2) 'before diffusion_min_dq_ratio_at_surface', nzlo, s% ctrl% diffusion_min_dq_at_surface
 
-         if (s% diffusion_min_dq_at_surface > 0) then
+         if (s% ctrl% diffusion_min_dq_at_surface > 0) then
             dqsum = sum(s% dq(1:nzlo))
             k = nzlo
-            do while (dqsum < s% diffusion_min_dq_at_surface)
+            do while (dqsum < s% ctrl% diffusion_min_dq_at_surface)
                k = k+1
                if (k > nz) exit
                ! don't go across composition transition
@@ -219,7 +219,7 @@
             nzhi = (3*nzhi+nz)/4 ! back up some into the convection zone
          end if
 
-         if (s% do_phase_separation .and. s% phase_separation_no_diffusion) then
+         if (s% ctrl% do_phase_separation .and. s% ctrl% phase_separation_no_diffusion) then
             ! check for phase separation boundary, don't do diffusion deeper than that
             do k = 1,nzhi
                if(s% mixing_type(k) == phase_separation_mixing) then
@@ -229,16 +229,16 @@
             end do
          end if
 
-         if(s% diffusion_use_full_net) then
+         if(s% ctrl% diffusion_use_full_net) then
             do j=1,nc
                class_chem_id(j) = s% chem_id(j) ! Just a 1-1 map between classes and chem_ids.
             end do
          else
             do j=1,nc
-               cid = chem_get_iso_id(s% diffusion_class_representative(j))
+               cid = chem_get_iso_id(s% ctrl% diffusion_class_representative(j))
                if (cid <= 0) then
                   write(*,'(a,3x,i3)') 'bad entry for diffusion_class_representative: ' // &
-                       trim(s% diffusion_class_representative(j)), j
+                       trim(s% ctrl% diffusion_class_representative(j)), j
                   return
                end if
                class_chem_id(j) = cid
@@ -246,19 +246,19 @@
          end if
 
          call set_diffusion_classes( &
-            nc, species, s% chem_id, class_chem_id, s% diffusion_class_A_max, s% diffusion_use_full_net, &
+            nc, species, s% chem_id, class_chem_id, s% ctrl% diffusion_class_A_max, s% ctrl% diffusion_use_full_net, &
             class, class_name)
 
          s% diffusion_call_number = s% diffusion_call_number + 1
-         dumping = (s% diffusion_call_number == s% diffusion_dump_call_number)
+         dumping = (s% diffusion_call_number == s% ctrl% diffusion_dump_call_number)
 
-         if ( s% diffusion_use_full_net ) then
-            s% diffusion_calculates_ionization = .true. ! class_typical_charges can't be used, so make sure they aren't.
+         if ( s% ctrl% diffusion_use_full_net ) then
+            s% ctrl% diffusion_calculates_ionization = .true. ! class_typical_charges can't be used, so make sure they aren't.
          end if
          
-         if (.not. s% diffusion_calculates_ionization) then
+         if (.not. s% ctrl% diffusion_calculates_ionization) then
             do j=1,nc
-               typical_charge(j,1:nz) = s% diffusion_class_typical_charge(j)
+               typical_charge(j,1:nz) = s% ctrl% diffusion_class_typical_charge(j)
             end do
          end if
 
@@ -310,7 +310,7 @@
          ! print *, "class name:     ", class_name
          
          ! args are at cell center points.
-         !if (s% show_diffusion_info) write(*,*) 'call solve_diffusion'
+         !if (s% ctrl% show_diffusion_info) write(*,*) 'call solve_diffusion'
          !write(*,4) 'call do_solve_diffusion nzlo nzhi nz', nzlo, nzhi, nz, &
          !   sum(s% xa(1,1:nzlo))
          call do_solve_diffusion( &
@@ -319,26 +319,26 @@
             s% T, s% lnT, s% rho, s% lnd, s% rmid, &
             dlnPdm_mid, dlnT_dm_mid, dlnRho_dm_mid, &
             s% L, s% r, dlnPdm_face, dlnT_dm_face, dlnRho_dm_face, &
-            s% diffusion_use_iben_macdonald, dt, s% diffusion_dt_div_timescale, &
-            s% diffusion_steps_hard_limit, s% diffusion_iters_hard_limit, &
-            s% diffusion_max_iters_per_substep, &
-            s% diffusion_calculates_ionization, typical_charge, &
-            s% diffusion_nsmooth_typical_charge, &
-            s% diffusion_min_T_for_radaccel, s% diffusion_max_T_for_radaccel, &
-            s% diffusion_min_Z_for_radaccel, s% diffusion_max_Z_for_radaccel, &
-            s% diffusion_screening_for_radaccel, &
-            s% op_mono_data_path, s% op_mono_data_cache_filename, &
-            s% diffusion_v_max, s% R_center, &
-            gamma, s% diffusion_gamma_full_on, s% diffusion_gamma_full_off, &
-            s% diffusion_T_full_on, s% diffusion_T_full_off, &
-            s% diffusion_class_factor, s% xa, &
+            s% ctrl% diffusion_use_iben_macdonald, dt, s% ctrl% diffusion_dt_div_timescale, &
+            s% ctrl% diffusion_steps_hard_limit, s% ctrl% diffusion_iters_hard_limit, &
+            s% ctrl% diffusion_max_iters_per_substep, &
+            s% ctrl% diffusion_calculates_ionization, typical_charge, &
+            s% ctrl% diffusion_nsmooth_typical_charge, &
+            s% ctrl% diffusion_min_T_for_radaccel, s% ctrl% diffusion_max_T_for_radaccel, &
+            s% ctrl% diffusion_min_Z_for_radaccel, s% ctrl% diffusion_max_Z_for_radaccel, &
+            s% ctrl% diffusion_screening_for_radaccel, &
+            s% ctrl% op_mono_data_path, s% ctrl% op_mono_data_cache_filename, &
+            s% ctrl% diffusion_v_max, s% R_center, &
+            gamma, s% ctrl% diffusion_gamma_full_on, s% ctrl% diffusion_gamma_full_off, &
+            s% ctrl% diffusion_T_full_on, s% ctrl% diffusion_T_full_off, &
+            s% ctrl% diffusion_class_factor, s% xa, &
             steps_used, total_num_iters, total_num_retries, nzlo, nzhi, X_init, X_final, &
             D_self, v_advection, v_total, vlnP, vlnT, v_rad, g_rad, &
             s% E_field, s% g_field_element_diffusion, ierr )
          s% num_diffusion_solver_steps = steps_used
          s% num_diffusion_solver_iters = total_num_iters
 
-         if (dbg .or. s% show_diffusion_info .or. ierr /= 0) then
+         if (dbg .or. s% ctrl% show_diffusion_info .or. ierr /= 0) then
             if (ierr == 0) then
                write(*,'(a,f6.3,3x,a,1pe10.3,3x,99(a,i5,3x))') &
                   'log_dt', log10(s% dt/secyer), 'age', s% star_age, 'model', s% model_number, &
@@ -360,7 +360,7 @@
                   s% xa(j,k) = xa_save(j,k)
                end do
             end do
-            if (s% report_ierr) then
+            if (s% ctrl% report_ierr) then
                write(*, *)
                write(*, *) 'solve_diffusion returned false'
                write(*, *) 's% model_number', s% model_number
@@ -383,7 +383,7 @@
             end do
          end do
 
-         if(s% do_diffusion_heating .and. s% do_WD_sedimentation_heating) then
+         if(s% ctrl% do_diffusion_heating .and. s% ctrl% do_WD_sedimentation_heating) then
             write(*,*) "do_diffusion_heating is incompatible with do_WD_sedimentation_heating"
             write(*,*) "at least one of these options must be set to .false."
             call mesa_error(__FILE__,__LINE__,'do_element_diffusion')
@@ -391,18 +391,18 @@
 
          s% eps_WD_sedimentation(1:nz) = 0d0
 
-         if(s% do_WD_sedimentation_heating) then
+         if(s% ctrl% do_WD_sedimentation_heating) then
             do k=nzlo+1,nzhi
                ! loop over all ion species
                do i = 1,s% species
                   ! limit heating to species with significant mass fractions
-                  if(s% xa(i,k) > s% min_xa_for_WD_sedimentation_heating) then
+                  if(s% xa(i,k) > s% ctrl% min_xa_for_WD_sedimentation_heating) then
                      Amass = chem_isos% Z_plus_N(s% chem_id(i))
                      Zcharge = chem_isos% Z(s% chem_id(i))
                      s% eps_WD_sedimentation(k) = s% eps_WD_sedimentation(k) + &
-                          s% eps_WD_sedimentation_factor * &
+                          s% ctrl% eps_WD_sedimentation_factor * &
                           ( Amass - Zcharge * qe * s% E_field(k)/(amu * s% g_field_element_diffusion(k)) ) * &
-                          sign(1d0,-1d0*s% edv(i,k)) * min( s% diffusion_v_max, abs(s% edv(i,k)) ) * s% xa(i,k) * &
+                          sign(1d0,-1d0*s% edv(i,k)) * min( s% ctrl% diffusion_v_max, abs(s% edv(i,k)) ) * s% xa(i,k) * &
                           s% g_field_element_diffusion(k) / Amass
                   end if
                end do
@@ -485,8 +485,8 @@
 
             ! args
             write(iounit, '(99i20)') nz, nzlo, nzhi, species, nc, &
-               s% diffusion_steps_hard_limit, &
-               s% diffusion_nsmooth_typical_charge
+               s% ctrl% diffusion_steps_hard_limit, &
+               s% ctrl% diffusion_nsmooth_typical_charge
 
             do i=1,species
                write(iounit,*) trim(chem_isos% name(s% chem_id(i)))
@@ -508,19 +508,19 @@
                write(iounit, '(a)') trim(class_name(i))
             end do
 
-            if (s% diffusion_calculates_ionization) then
+            if (s% ctrl% diffusion_calculates_ionization) then
                write(iounit,*) 1
             else
                write(iounit,*) 0
             end if
 
-            if (s% diffusion_use_iben_macdonald) then
+            if (s% ctrl% diffusion_use_iben_macdonald) then
                write(iounit,*) 1
             else
                write(iounit,*) 0
             end if
 
-            if (s% diffusion_screening_for_radaccel) then
+            if (s% ctrl% diffusion_screening_for_radaccel) then
                write(iounit,*) 1
             else
                write(iounit,*) 0
@@ -528,9 +528,9 @@
 
             write(iounit, '(99(1pd26.16))') &
                s% mstar, s% dt, &
-               s% diffusion_v_max, s% diffusion_gamma_full_on, s% diffusion_gamma_full_off, &
-               s% diffusion_T_full_on, s% diffusion_T_full_off, &
-               s% diffusion_max_T_for_radaccel, s% diffusion_dt_div_timescale, &
+               s% ctrl% diffusion_v_max, s% ctrl% diffusion_gamma_full_on, s% ctrl% diffusion_gamma_full_off, &
+               s% ctrl% diffusion_T_full_on, s% ctrl% diffusion_T_full_off, &
+               s% ctrl% diffusion_max_T_for_radaccel, s% ctrl% diffusion_dt_div_timescale, &
                s% R_center
 
             do k=1, nz

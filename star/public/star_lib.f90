@@ -250,7 +250,7 @@
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         s% log_directory = dir_name
+         s% ctrl% log_directory = dir_name
       end subroutine set_dir_for_logs_and_profiles
       
       

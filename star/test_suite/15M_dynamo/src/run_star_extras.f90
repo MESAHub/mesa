@@ -87,7 +87,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
          
-         if (.not. s% x_logical_ctrl(1)) return
+         if (.not. s% ctrl% x_logical_ctrl(1)) return
          
          write(*,'(A)')
          call check('star_mass', s% star_mass, 12.5d0, 14.5d0)

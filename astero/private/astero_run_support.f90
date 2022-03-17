@@ -142,8 +142,8 @@
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         nu_max_sun = s% nu_max_sun
-         delta_nu_sun = s% delta_nu_sun
+         nu_max_sun = s% ctrl% nu_max_sun
+         delta_nu_sun = s% ctrl% delta_nu_sun
          call init_obs_data(ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in init_obs_data'
@@ -242,9 +242,9 @@
             ierr)
          if (ierr /= 0) return
          
-         s% max_years_for_timestep = initial_max_years_for_timestep
+         s% ctrl% max_years_for_timestep = initial_max_years_for_timestep
          s% astero_using_revised_max_yr_dt = .false.
-         s% astero_revised_max_yr_dt = s% max_years_for_timestep         
+         s% astero_revised_max_yr_dt = s% ctrl% max_years_for_timestep         
          
          okay_to_restart = .false. ! only allow restart on 1st call to run1_star
          

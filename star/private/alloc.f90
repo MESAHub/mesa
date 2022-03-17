@@ -126,10 +126,10 @@
          if (ierr == 0) then
             s% len_extra_iwork = liwork
             s% len_extra_work = lwork
-            if (s% fill_arrays_with_NaNs) then
+            if (s% ctrl% fill_arrays_with_NaNs) then
                call fill_with_NaNs(s% extra_work)
                call fill_with_NaNs(s% extra_work_old)
-            else if (s% zero_when_allocate) then
+            else if (s% ctrl% zero_when_allocate) then
                s% extra_work = 0
                s% extra_work_old = 0
             end if
@@ -975,7 +975,7 @@
             if (failed('alpha_mlt')) exit
             if (action == do_allocate .or. &
                   action == do_copy_pointers_and_resize) &
-               s% alpha_mlt(1:nz) = s% mixing_length_alpha
+               s% alpha_mlt(1:nz) = s% ctrl% mixing_length_alpha
 
             call do1(s% vc, c% vc)
             if (failed('vc')) exit
@@ -1389,7 +1389,7 @@
             call do1(s% prev_mesh_nu_ST_start, c% prev_mesh_nu_ST_start)
             if (failed('prev_mesh_nu_ST_start')) exit
 
-            if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
+            if (s% ctrl% fill_arrays_with_NaNs) s% need_to_setvars = .true.
             return
          end do
          ierr = -1
@@ -1406,21 +1406,21 @@
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (nz <= size(ptr,dim=1)) then
-                  if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
                   return
                end if
                deallocate(ptr)
                allocate(ptr(sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
-               if (s% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
+               if (s% ctrl% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+               if (s% ctrl% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
             else
                if (action == do_reallocate) then
                   if (nz <= size(ptr,dim=1)) return
                end if
                call do1D_ad(s, ptr, sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
-                  if (s% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+                  if (s% ctrl% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
                end if
             end if
          end subroutine do1_ad
@@ -1437,21 +1437,21 @@
                   call mesa_error(__FILE__,__LINE__,'do1 ptr not associated')
                end if
                if (nz <= size(ptr,dim=1)) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                   return
                end if
                deallocate(ptr)
                allocate(ptr(sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-               if (s% zero_when_allocate) ptr(:) = 0
+               if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
+               if (s% ctrl% zero_when_allocate) ptr(:) = 0
             else
                if (action == do_reallocate) then
                   if (nz <= size(ptr,dim=1)) return
                end if
                call do1D(s, ptr, sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-                  if (s% zero_when_allocate) ptr(:) = 0
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
+                  if (s% ctrl% zero_when_allocate) ptr(:) = 0
                end if
             end if
          end subroutine do1
@@ -1465,22 +1465,22 @@
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (nvar*nz <= size(ptr,dim=1)) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-                  if (s% zero_when_allocate) ptr(:) = 0
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
+                  if (s% ctrl% zero_when_allocate) ptr(:) = 0
                   return
                end if
                deallocate(ptr)
                allocate(ptr(nvar*sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-               if (s% zero_when_allocate) ptr(:) = 0
+               if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
+               if (s% ctrl% zero_when_allocate) ptr(:) = 0
             else
                if (action == do_reallocate) then
                   if (nvar*nz <= size(ptr,dim=1)) return
                end if
                call do1D(s, ptr, nvar*sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-                  if (s% zero_when_allocate) ptr(:) = 0
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
+                  if (s% ctrl% zero_when_allocate) ptr(:) = 0
                end if
             end if
          end subroutine do1_neq
@@ -1549,22 +1549,22 @@
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
-                  if (s% zero_when_allocate) ptr(:,:) = 0
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
+                  if (s% ctrl% zero_when_allocate) ptr(:,:) = 0
                   return
                end if
                deallocate(ptr)
                allocate(ptr(sz1, sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
-               if (s% zero_when_allocate) ptr(:,:) = 0
+               if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
+               if (s% ctrl% zero_when_allocate) ptr(:,:) = 0
             else
                if (action == do_reallocate) then
                   if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
                end if
                call do2D(s, ptr, sz1, sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
-                  if (s% zero_when_allocate) ptr(:,:) = 0
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
+                  if (s% ctrl% zero_when_allocate) ptr(:,:) = 0
                end if
             end if
          end subroutine do2
@@ -1580,14 +1580,14 @@
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. sz2 == size(ptr, dim=2) &
                      .and. nz <= size(ptr, dim=3)) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
-                  if (s% zero_when_allocate) ptr(:,:,:) = 0
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
+                  if (s% ctrl% zero_when_allocate) ptr(:,:,:) = 0
                   return
                end if
                deallocate(ptr)
                allocate(ptr(sz1, sz2, sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
-               if (s% zero_when_allocate) ptr(:,:,:) = 0
+               if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
+               if (s% ctrl% zero_when_allocate) ptr(:,:,:) = 0
             else
                if (action == do_reallocate) then
                    if (sz1 == size(ptr, dim=1) .and. &
@@ -1596,8 +1596,8 @@
                end if
                call do3D(s, ptr, sz1, sz2, sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
-                  if (s% zero_when_allocate) ptr(:,:,:) = 0
+                  if (s% ctrl% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
+                  if (s% ctrl% zero_when_allocate) ptr(:,:,:) = 0
                end if
             end if
          end subroutine do3
@@ -1686,9 +1686,9 @@
                end if
             case (do_allocate)
                allocate(ptr(sz), stat=ierr)
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   call fill_ad_with_NaNs(ptr,1,-1)
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   call fill_ad_with_zeros(ptr,1,-1)
                end if
             case (do_check_size)
@@ -1714,9 +1714,9 @@
                do j=1,old_sz
                   ptr2(j) = ptr(j)
                end do
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   call fill_ad_with_NaNs(ptr2,old_sz+1,sz)
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   call fill_ad_with_zeros(ptr2,old_sz+1,sz)
                end if
                deallocate(ptr)
@@ -1745,9 +1745,9 @@
                end if
             case (do_allocate)
                allocate(ptr(sz), stat=ierr)
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   call set_nan(ptr)
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   ptr(1:sz) = 0
                end if
             case (do_check_size)
@@ -1773,11 +1773,11 @@
                do j=1,old_sz
                   ptr2(j) = ptr(j)
                end do
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   do j=old_sz+1,sz
                      call set_nan(ptr2(j))
                   end do
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   do j=old_sz+1,sz
                      ptr2(j) = 0
                   end do
@@ -1808,9 +1808,9 @@
                end if
             case (do_allocate)
                allocate(ptr(sz1, sz2), stat=ierr)
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   call set_nan(ptr)
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   ptr(1:sz1,1:sz2) = 0
                end if
             case (do_check_size)
@@ -1845,13 +1845,13 @@
                      ptr2(i,j) = ptr(i,j)
                   end do
                end do
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   do j=old_sz2+1,sz2
                      do i=1,sz1
                         call set_nan(ptr2(i,j))
                      end do
                   end do
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   do j=old_sz2+1,sz2
                      do i=1,sz1
                         ptr2(i,j) = 0
@@ -1884,7 +1884,7 @@
                end if
             case (do_allocate)
                allocate(ptr(sz1, sz2), stat=ierr)
-               if (s% zero_when_allocate) ptr = 0
+               if (s% ctrl% zero_when_allocate) ptr = 0
             case (do_check_size)
                if (size(ptr,dim=1) /= sz1) ierr = -1
                if (size(ptr,dim=2) < sz2) ierr = -1
@@ -1941,9 +1941,9 @@
                end if
             case (do_allocate)
                allocate(ptr(sz1, sz2), stat=ierr)
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   call set_nan(ptr)
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   ptr(1:sz1,1:sz2) = 0
                end if
             case (do_remove_from_center)
@@ -1978,9 +1978,9 @@
                end if
             case (do_allocate)
                allocate(ptr(sz1, sz2, sz3), stat=ierr)
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   call set_nan(ptr)
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   ptr(1:sz1,1:sz2,1:sz3) = 0
                end if
             case (do_check_size)
@@ -2020,7 +2020,7 @@
                      end do
                   end do
                end do
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   do k=old_sz3+1,sz3
                      do j=1,sz2
                         do i=1,sz1
@@ -2028,7 +2028,7 @@
                         end do
                      end do
                   end do
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   do k=old_sz3+1,sz3
                      do j=1,sz2
                         do i=1,sz1
@@ -2063,9 +2063,9 @@
                end if
             case (do_allocate)
                allocate(ptr(sz1, sz2, sz3, sz4), stat=ierr)
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   call set_nan(ptr)
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   ptr(1:sz1,1:sz2,1:sz3,1:sz4) = 0
                end if
             case (do_check_size)
@@ -2112,7 +2112,7 @@
                      end do
                   end do
                end do
-               if (s% fill_arrays_with_NaNs) then
+               if (s% ctrl% fill_arrays_with_NaNs) then
                   do m=old_sz4+1,sz4
                      do k=1,sz3
                         do j=1,sz2
@@ -2122,7 +2122,7 @@
                         end do
                      end do
                   end do
-               else if (s% zero_when_allocate) then
+               else if (s% ctrl% zero_when_allocate) then
                   do m=old_sz4+1,sz4
                      do k=1,sz3
                         do j=1,sz2
@@ -2158,7 +2158,7 @@
                end if
             case (do_allocate)
                allocate(ptr(sz), stat=ierr)
-               if (s% zero_when_allocate) ptr = 0
+               if (s% ctrl% zero_when_allocate) ptr = 0
             case (do_check_size)
                if (size(ptr,dim=1) < sz) ierr = -1
             case (do_remove_from_center)
@@ -2205,7 +2205,7 @@
                end if
             case (do_allocate)
                allocate(ptr(sz1, sz2), stat=ierr)
-               if (s% zero_when_allocate) ptr = 0
+               if (s% ctrl% zero_when_allocate) ptr = 0
             case (do_check_size)
                if (size(ptr,dim=1) /= sz1) ierr = -1
                if (size(ptr,dim=2) < sz2) ierr = -1
@@ -2261,7 +2261,7 @@
                end if
             case (do_allocate)
                allocate(ptr(sz), stat=ierr)
-               if (s% zero_when_allocate) ptr = .false.
+               if (s% ctrl% zero_when_allocate) ptr = .false.
             case (do_check_size)
                if (size(ptr,dim=1) < sz) ierr = -1
             case (do_remove_from_center)
@@ -2536,7 +2536,7 @@
 
          if (work_array_debug) then
             allocate(ptr(sz + extra), stat=ierr)
-            if (s% fill_arrays_with_NaNs) call set_nan(ptr)
+            if (s% ctrl% fill_arrays_with_NaNs) call set_nan(ptr)
             return
          end if
 
@@ -2565,9 +2565,9 @@
 
          allocate(ptr(sz + extra), stat=ierr)
          num_allocs = num_allocs + 1
-         if (s% fill_arrays_with_NaNs) then
+         if (s% ctrl% fill_arrays_with_NaNs) then
             call set_nan(ptr)
-         else if (s% zero_when_allocate) then
+         else if (s% ctrl% zero_when_allocate) then
             ptr(:) = 0
          end if
 
@@ -2597,9 +2597,9 @@
             end if
             ptr => p
             get1 = .true.
-            if (s% fill_arrays_with_NaNs) then
+            if (s% ctrl% fill_arrays_with_NaNs) then
                call set_nan(ptr)
-            else if (s% zero_when_allocate) then
+            else if (s% ctrl% zero_when_allocate) then
                ptr(:) = 0
             end if
          end function get1

@@ -76,7 +76,7 @@
 
          ierr = 0
 
-         if (s% non_nuc_neu_factor <= 0d0) then
+         if (s% ctrl% non_nuc_neu_factor <= 0d0) then
             call do_clear_neu_for_cell(s,k,ierr)
             return
          end if
@@ -87,7 +87,7 @@
          log10_rho = s% lnd(k)/ln10
          log10_T = s% lnT(k)/ln10
 
-         if (s% use_other_neu) then
+         if (s% ctrl% use_other_neu) then
             call s% other_neu( &
                s% id, k, s% T(k), log10_T, s% rho(k), log10_rho, &
                s% abar(k), s% zbar(k), &
@@ -100,7 +100,7 @@
          end if
 
          if (ierr /= 0) then
-            if (s% report_ierr) then
+            if (s% ctrl% report_ierr) then
                write(*,3) 'do_neu_for_cell: neu_get ierr', ierr, k
                write(*,1) 'T=', s% T(k)
                write(*,1) 'log10_T=', log10_T
@@ -115,7 +115,7 @@
             return
          end if
 
-         if (s% non_nuc_neu_factor /= 1d0) loss(:) = loss(:)*s% non_nuc_neu_factor
+         if (s% ctrl% non_nuc_neu_factor /= 1d0) loss(:) = loss(:)*s% ctrl% non_nuc_neu_factor
          s% non_nuc_neu(k) = loss(ineu)
          s% d_nonnucneu_dlnd(k) = loss(idneu_dRho)*s% rho(k)
          s% d_nonnucneu_dlnT(k) = loss(idneu_dT)*s% T(k)
@@ -128,8 +128,8 @@
 
          if (is_bad(s% non_nuc_neu(k))) then
             ierr = -1
-            if (s% report_ierr) write(*,*) 'do_neu_for_cell ierr for cell', k
-            if (s% stop_for_bad_nums) then
+            if (s% ctrl% report_ierr) write(*,*) 'do_neu_for_cell ierr for cell', k
+            if (s% ctrl% stop_for_bad_nums) then
                write(*,2) 'bad s% non_nuc_neu(k)', k, s% non_nuc_neu(k)
                call mesa_error(__FILE__,__LINE__,'do_neu_for_cell')
             end if

@@ -95,63 +95,63 @@
             if (age_target > s% star_age) then
                remaining_years = age_target - s% star_age
                if (s% astero_using_revised_max_yr_dt) &
-                  s% max_years_for_timestep = s% astero_revised_max_yr_dt
-               n = floor(remaining_years/s% max_years_for_timestep + 1d-6)
+                  s% ctrl% max_years_for_timestep = s% astero_revised_max_yr_dt
+               n = floor(remaining_years/s% ctrl% max_years_for_timestep + 1d-6)
                j = num_smaller_steps_before_age_target
-               if (remaining_years <= s% max_years_for_timestep) then
+               if (remaining_years <= s% ctrl% max_years_for_timestep) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                      s% model_number, (age_target - s% star_age)/age_sigma
-                  s% max_years_for_timestep = remaining_years
+                  s% ctrl% max_years_for_timestep = remaining_years
                   s% astero_using_revised_max_yr_dt = .true.
-                  s% astero_revised_max_yr_dt = s% max_years_for_timestep
-                  astero_max_dt_next = s% max_years_for_timestep*secyer
+                  s% astero_revised_max_yr_dt = s% ctrl% max_years_for_timestep
+                  astero_max_dt_next = s% ctrl% max_years_for_timestep*secyer
                else if (n <= j) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                      s% model_number, (age_target - s% star_age)/age_sigma
-                  prev_max_years = s% max_years_for_timestep
+                  prev_max_years = s% ctrl% max_years_for_timestep
                   i = floor(remaining_years/dt_for_smaller_steps_before_age_target + 1d-6)
                   if ((i+1d-9)*dt_for_smaller_steps_before_age_target < remaining_years) then
-                     s% max_years_for_timestep = remaining_years/(i+1)
+                     s% ctrl% max_years_for_timestep = remaining_years/(i+1)
                   else
-                     s% max_years_for_timestep = remaining_years/i
+                     s% ctrl% max_years_for_timestep = remaining_years/i
                   end if
-                  min_max = prev_max_years*s% reduction_factor_for_max_timestep
-                  if (s% max_years_for_timestep < min_max) &
-                     s% max_years_for_timestep = min_max
+                  min_max = prev_max_years*s% ctrl% reduction_factor_for_max_timestep
+                  if (s% ctrl% max_years_for_timestep < min_max) &
+                     s% ctrl% max_years_for_timestep = min_max
                   if (.not. s% astero_using_revised_max_yr_dt) then
                      s% astero_using_revised_max_yr_dt = .true.
                      write(*,2) 'begin reducing max timestep prior to age target', &
                         s% model_number, remaining_years
-                  else if (s% astero_revised_max_yr_dt > s% max_years_for_timestep) then
+                  else if (s% astero_revised_max_yr_dt > s% ctrl% max_years_for_timestep) then
                      write(*,2) 'reducing max timestep prior to age target', &
                         s% model_number, remaining_years
-                  else if (s% max_years_for_timestep <= dt_for_smaller_steps_before_age_target) then
-                     i = floor(remaining_years/s% max_years_for_timestep + 1d-6)
+                  else if (s% ctrl% max_years_for_timestep <= dt_for_smaller_steps_before_age_target) then
+                     i = floor(remaining_years/s% ctrl% max_years_for_timestep + 1d-6)
                      write(*,3) 'remaining steps and years until age target', &
                         s% model_number, i, remaining_years
                   else 
                      write(*,2) 'remaining_years until age target', &
                         s% model_number, remaining_years
                   end if
-                  s% astero_revised_max_yr_dt = s% max_years_for_timestep
-                  if (s% dt_next/secyer > s% max_years_for_timestep) &
-                     astero_max_dt_next = s% max_years_for_timestep*secyer
+                  s% astero_revised_max_yr_dt = s% ctrl% max_years_for_timestep
+                  if (s% dt_next/secyer > s% ctrl% max_years_for_timestep) &
+                     astero_max_dt_next = s% ctrl% max_years_for_timestep*secyer
                end if
             else if (include_age_in_chi2_spectro) then
                write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                   s% model_number, (age_target - s% star_age)/age_sigma
-               if (abs(s% max_years_for_timestep - dt_for_smaller_steps_before_age_target) > &
+               if (abs(s% ctrl% max_years_for_timestep - dt_for_smaller_steps_before_age_target) > &
                      dt_for_smaller_steps_before_age_target*1d-2) then
                   write(*,1) 'dt_for_smaller_steps_before_age_target', &
                      dt_for_smaller_steps_before_age_target
                   write(*,1) 'max_years_for_timestep', &
-                     s% max_years_for_timestep
+                     s% ctrl% max_years_for_timestep
                   call mesa_error(__FILE__,__LINE__,'bad max_years_for_timestep')
                end if
             end if
          else
             if (s% star_age < min_age_for_chi2) return
-            s% max_years_for_timestep = max_yrs_dt_when_cold
+            s% ctrl% max_years_for_timestep = max_yrs_dt_when_cold
          end if
 
          if (include_age_in_chi2_spectro .and. s% star_age < min_age_for_chi2) return         
@@ -292,7 +292,7 @@
                s% model_number, chi2, chi2_seismo, chi2_spectro
             if (best_chi2 < 0 .or. chi2 < best_chi2) call save_best_info(s)
             if (chi2 < chi2_radial_limit .and. .not. checking_age) &
-               s% max_years_for_timestep = max_yrs_dt_when_warm
+               s% ctrl% max_years_for_timestep = max_yrs_dt_when_warm
             call final_checks
             return
          end if
@@ -315,7 +315,7 @@
          ! chi2_spectro <= limit and chi2_delta_nu <= limit        
 
          if (.not. checking_age) then
-            s% max_years_for_timestep = max_yrs_dt_when_warm
+            s% ctrl% max_years_for_timestep = max_yrs_dt_when_warm
             if (s% dt > max_yrs_dt_when_warm*secyer) then
                s% dt = max_yrs_dt_when_warm*secyer
                s% timestep_hold = s% model_number + 10
@@ -328,7 +328,7 @@
          end if
          
          if (.not. checking_age) then
-            s% max_years_for_timestep = max_yrs_dt_when_hot 
+            s% ctrl% max_years_for_timestep = max_yrs_dt_when_hot 
             if (s% dt > max_yrs_dt_when_hot*secyer) then
                s% dt = max_yrs_dt_when_hot*secyer
                s% timestep_hold = s% model_number + 10
@@ -463,7 +463,7 @@
          if (checking_age) then
             ! leave max_years_for_timestep as is
          else if (chi2 <= chi2_limit_for_smallest_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit 
+            s% ctrl% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit 
             if (s% dt > max_yrs_dt_chi2_smallest_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smallest_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -474,7 +474,7 @@
                return
             end if         
          else if (chi2 <= chi2_limit_for_smaller_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit 
+            s% ctrl% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit 
             if (s% dt > max_yrs_dt_chi2_smaller_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smaller_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -485,7 +485,7 @@
                return
             end if         
          else if (chi2 <= chi2_limit_for_small_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_small_limit 
+            s% ctrl% max_years_for_timestep = max_yrs_dt_chi2_small_limit 
             if (s% dt > max_yrs_dt_chi2_small_limit*secyer) then
                s% dt = max_yrs_dt_chi2_small_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -1042,10 +1042,10 @@
             ierr = 0
             filename = trim(astero_results_directory) // '/' // trim(best_model_profile_filename)
             if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
-            write_controls_info_with_profile = s% write_controls_info_with_profile
-            s% write_controls_info_with_profile = .false.
+            write_controls_info_with_profile = s% ctrl% write_controls_info_with_profile
+            s% ctrl% write_controls_info_with_profile = .false.
             call star_write_profile_info(s% id, filename, ierr)
-            s% write_controls_info_with_profile = write_controls_info_with_profile
+            s% ctrl% write_controls_info_with_profile = write_controls_info_with_profile
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_profile_info'
                call mesa_error(__FILE__,__LINE__)
@@ -1185,15 +1185,15 @@
          if (s% job% astero_just_call_my_extras_check_model) return
          
          s% other_pgstar_plots_info => astero_pgstar_plots_info
-         s% use_other_pgstar_plots = .true.
+         s% ctrl% use_other_pgstar_plots = .true.
          
          
          ! overwrite various inlist controls
 
          if (vary_alpha) then
-            s% mixing_length_alpha = next_alpha_to_try
+            s% ctrl% mixing_length_alpha = next_alpha_to_try
          else
-            s% mixing_length_alpha = first_alpha
+            s% ctrl% mixing_length_alpha = first_alpha
          end if
 
          if (vary_f_ov) then
@@ -1275,10 +1275,10 @@
          end if
          
          s% job% relax_initial_mass = .true.
-         s% initial_mass = s% job% new_mass
+         s% ctrl% initial_mass = s% job% new_mass
          
          initial_Y = Y
-         !s% initial_Z = Z << don't do this. it interferes with use of zams file.
+         !s% ctrl% initial_Z = Z << don't do this. it interferes with use of zams file.
          
          s% job% initial_h1 = X
          s% job% initial_h2 = 0
@@ -1289,7 +1289,7 @@
          current_Y = Y
          current_FeH = FeH
          current_mass = s% job% new_mass
-         current_alpha = s% mixing_length_alpha
+         current_alpha = s% ctrl% mixing_length_alpha
          current_f_ov = f_ov
 
          current_my_param1 = my_param1
@@ -1302,19 +1302,19 @@
          current_Z = Z
 
          if (f_ov > 0._dp) then
-            s% overshoot_scheme(1) = 'exponential'
-            s% overshoot_zone_type(1) = 'any'
-            s% overshoot_zone_loc(1) = 'any'
-            s% overshoot_bdy_loc(1) = 'any'
-            s% overshoot_f(1) = f_ov
-            s% overshoot_f0(1) = f0_ov_div_f_ov*f_ov
+            s% ctrl% overshoot_scheme(1) = 'exponential'
+            s% ctrl% overshoot_zone_type(1) = 'any'
+            s% ctrl% overshoot_zone_loc(1) = 'any'
+            s% ctrl% overshoot_bdy_loc(1) = 'any'
+            s% ctrl% overshoot_f(1) = f_ov
+            s% ctrl% overshoot_f0(1) = f0_ov_div_f_ov*f_ov
          else
-            s% overshoot_scheme(1) = ''
-            s% overshoot_zone_type(1) = ''
-            s% overshoot_zone_loc(1) = ''
-            s% overshoot_bdy_loc(1) = ''
-            s% overshoot_f(1) = 0d0
-            s% overshoot_f0(1) = 0d0
+            s% ctrl% overshoot_scheme(1) = ''
+            s% ctrl% overshoot_zone_type(1) = ''
+            s% ctrl% overshoot_zone_loc(1) = ''
+            s% ctrl% overshoot_bdy_loc(1) = ''
+            s% ctrl% overshoot_f(1) = 0d0
+            s% ctrl% overshoot_f0(1) = 0d0
          end if
          
       end subroutine astero_extras_controls

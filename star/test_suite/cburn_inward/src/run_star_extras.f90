@@ -92,7 +92,7 @@
          if (ierr /= 0) return
 
 
-         select case (s% x_integer_ctrl(1)) 
+         select case (s% ctrl% x_integer_ctrl(1)) 
 
          case(2) ! inlist_cburn_inward
 
@@ -197,7 +197,7 @@
       
          
          ! Store initial flame location 
-         select case (s% x_integer_ctrl(1)) 
+         select case (s% ctrl% x_integer_ctrl(1)) 
 
          case(2) ! inlist_cburn_inward
             flame_cell = -1
@@ -270,7 +270,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
  
-         select case (s% x_integer_ctrl(1))
+         select case (s% ctrl% x_integer_ctrl(1))
          case(2)
             read(iounit,iostat=ierr) ign_mass, ign_density, ign_co_core_mass,flame_mass
          end select
@@ -286,7 +286,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
  
-         select case (s% x_integer_ctrl(1))
+         select case (s% ctrl% x_integer_ctrl(1))
          case(2)
             write(iounit) ign_mass, ign_density, ign_co_core_mass,flame_mass
          end select

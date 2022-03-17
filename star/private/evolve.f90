@@ -54,15 +54,15 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         if (s% trace_evolve) write(*,'(/,a)') 'start evolve step'
+         if (s% ctrl% trace_evolve) write(*,'(/,a)') 'start evolve step'
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
             call mesa_error(__FILE__,__LINE__,'do_evolve_step_part1')
          end if
          
-         if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
-            if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (first_try .and. s% ctrl% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+            if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
                write(*,*) 'fill_arrays_with_NaNs at start of step'
             call test_set_undefined
             call fill_star_info_arrays_with_NaNs(s, ierr)
@@ -356,7 +356,7 @@
          end if
          
          if (s% doing_first_model_of_run) then
-            if (s% do_history_file) then
+            if (s% ctrl% do_history_file) then
                if (first_try) then
                   call write_terminal_header(s)
                else
@@ -380,21 +380,21 @@
             s% have_new_generation = .false.
             do_step_part1 = prepare_for_new_step(s)
             if (do_step_part1 /= keep_going) then
-               if (s% report_ierr) &
+               if (s% ctrl% report_ierr) &
                   write(*,*) 'do_step_part1: prepare_for_new_step'
                return
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
-                (s% steps_before_use_velocity_time_centering > 0 .and. &
-                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
+            if ((s% ctrl% steps_before_use_velocity_time_centering == 0) .or. &
+                (s% ctrl% steps_before_use_velocity_time_centering > 0 .and. &
+                   s% model_number >= s% ctrl% steps_before_use_velocity_time_centering)) &
                s% using_velocity_time_centering = .true.
-            if (.not. s% doing_relax .and. s% steps_before_use_TDC > 0) then
-               if (s% model_number >= s% steps_before_use_TDC) then
-                  s% MLT_option = 'TDC'
+            if (.not. s% doing_relax .and. s% ctrl% steps_before_use_TDC > 0) then
+               if (s% model_number >= s% ctrl% steps_before_use_TDC) then
+                  s% ctrl% MLT_option = 'TDC'
                else
-                  s% MLT_option = 'Cox'
+                  s% ctrl% MLT_option = 'Cox'
                end if
             end if
          end if
@@ -404,7 +404,7 @@
          call set_current_to_old(s)
          do_step_part1 = prepare_for_new_try(s)
          if (do_step_part1 /= keep_going) then
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*,*) 'do_step_part1: prepare_for_new_try'
             return
          end if
@@ -465,7 +465,7 @@
             end if
             failed = .true.
             do_step_part1 = retry
-            if (s% report_ierr) write(*, *) 'do_step_part1 ' // trim(str)
+            if (s% ctrl% report_ierr) write(*, *) 'do_step_part1 ' // trim(str)
             s% result_reason = nonzero_ierr
          end function failed
 
@@ -495,7 +495,7 @@
             if (s% doing_relax) &
                s% total_relax_steps_finished = s% total_relax_steps_finished + 1
          end if
-         if (s% trace_evolve) write(*,'(/,a)') 'done evolve step'
+         if (s% ctrl% trace_evolve) write(*,'(/,a)') 'done evolve step'
       end function do_evolve_step_part2
 
 
@@ -561,7 +561,7 @@
 
          time0 = s% starting_system_clock_time
          clock_rate = s% system_clock_rate
-         trace = s% trace_evolve
+         trace = s% ctrl% trace_evolve
          nz = s% nz
 
          call setup_for_implicit_mdot_loop
@@ -611,7 +611,7 @@
                call set_vars_if_needed(s, dt, 'after calculate_eps_mdot', ierr)
                if (failed('set_vars_if_needed after calculate_eps_mdot')) return
 
-               if (s% do_conv_premix) then
+               if (s% ctrl% do_conv_premix) then
                   do k=1,s% nz
                      s% eps_pre_mix(k) = s% energy(k)
                   end do
@@ -624,7 +624,7 @@
                   end do
                end if
 
-               if(s% do_phase_separation) then
+               if(s% ctrl% do_phase_separation) then
                   do k=1,s% nz
                      s% eps_phase_separation(k) = s% energy(k)
                   end do
@@ -641,7 +641,7 @@
 
                s% okay_to_set_mixing_info = .false. ! no mixing changes in set_vars after this point
                
-               if (s% do_element_diffusion) then
+               if (s% ctrl% do_element_diffusion) then
                   call do_element_diffusion(s, dt, ierr)
                   if (failed('do_element_diffusion')) return
                   call set_vars_if_needed(s, dt, 'after element diffusion', ierr)
@@ -655,7 +655,7 @@
             
             end if
 
-            if (s% rotation_flag .and. s% premix_omega .and. .not. s% j_rot_flag) then
+            if (s% rotation_flag .and. s% ctrl% premix_omega .and. .not. s% j_rot_flag) then
                do_step_part2 = do_solve_omega_mix(s, 0.5d0*dt)
                if (do_step_part2 /= keep_going) return
                call set_rotation_info(s, .false., ierr)
@@ -664,7 +664,7 @@
                if (failed('after do_solve_omega_mix')) return
             end if
             
-            if (s% use_other_pressure) then
+            if (s% ctrl% use_other_pressure) then
                call s% other_pressure(s% id, ierr)
                if (failed('other_pressure returned ierr')) return
             end if
@@ -695,7 +695,7 @@
             if (failed('select_mdot_action')) return
             if (do_step_part2 /= keep_going) return
             if (mdot_action == exit_loop) exit implicit_mdot_loop
-            if (s% trace_evolve) write(*,*) 'cycle implicit_mdot_loop'
+            if (s% ctrl% trace_evolve) write(*,*) 'cycle implicit_mdot_loop'
             
          end do implicit_mdot_loop
 
@@ -712,12 +712,12 @@
 
          if (.not. okay_energy_conservation()) return
 
-         if (s% max_timestep_hi_T_limit > 0 .and. &
-               s% max_years_for_timestep /= s% hi_T_max_years_for_timestep) then
-            if (maxval(s% T(1:nz)) >= s% max_timestep_hi_T_limit) then
+         if (s% ctrl% max_timestep_hi_T_limit > 0 .and. &
+               s% ctrl% max_years_for_timestep /= s% ctrl% hi_T_max_years_for_timestep) then
+            if (maxval(s% T(1:nz)) >= s% ctrl% max_timestep_hi_T_limit) then
                write(*,1) 'switch to high T max timesteps'
-               s% max_years_for_timestep = s% hi_T_max_years_for_timestep
-               s% max_timestep = secyer*s% max_years_for_timestep
+               s% ctrl% max_years_for_timestep = s% ctrl% hi_T_max_years_for_timestep
+               s% ctrl% max_timestep = secyer*s% ctrl% max_years_for_timestep
             end if
          end if
 
@@ -749,7 +749,7 @@
             end if
             failed = .true.
             do_step_part2 = retry
-            if (s% report_ierr) write(*, *) 'do_step_part2: ' // trim(str)
+            if (s% ctrl% report_ierr) write(*, *) 'do_step_part2: ' // trim(str)
             s% result_reason = nonzero_ierr
          end function failed
 
@@ -760,9 +760,9 @@
 
             mstar_dot = 0
             w_div_w_crit = -1
-            surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
+            surf_omega_div_omega_crit_limit = s% ctrl% surf_omega_div_omega_crit_limit
             mdot_redo_cnt = 0
-            max_mdot_redo_cnt = s% max_mdot_redo_cnt
+            max_mdot_redo_cnt = s% ctrl% max_mdot_redo_cnt
 
             max_wind_mdot = 10*Msun/secyer
             have_too_large_wind_mdot = .false.
@@ -777,7 +777,7 @@
                if (was_in_implicit_wind_limit .and. &
                    s% generations == 2 .and. &
                    abs((s% mstar_dot-s% mstar_dot_old)/s% mstar_dot_old)+1 > &
-                   s% mdot_revise_factor) then
+                   s% ctrl% mdot_revise_factor) then
                    write(*,*) "Skipping first step in implicit mdot"
                    s% mstar_dot = s% mstar_dot_old
                    mdot_redo_cnt = 1
@@ -788,9 +788,9 @@
             abs_mstar_delta = 0
          
             iwind_redo_cnt = 0
-            iwind_max_redo_cnt = s% max_tries_for_implicit_wind
-            iwind_tolerance = s% iwind_tolerance
-            iwind_lambda = s% iwind_lambda         
+            iwind_max_redo_cnt = s% ctrl% max_tries_for_implicit_wind
+            iwind_tolerance = s% ctrl% iwind_tolerance
+            iwind_lambda = s% ctrl% iwind_lambda         
             
          end subroutine setup_for_implicit_mdot_loop
 
@@ -812,7 +812,7 @@
                if (ierr /= 0) then
                   do_step_part2 = retry
                   s% result_reason = nonzero_ierr
-                  if (s% report_ierr) write(*, *) 'do_step_part2: set_mdot ierr'
+                  if (s% ctrl% report_ierr) write(*, *) 'do_step_part2: set_mdot ierr'
                   return
                end if
                implicit_mdot = s% mstar_dot
@@ -846,8 +846,8 @@
                ! this is the 1st correction to mdot
                r_phot = sqrt(s% L(1)/(pi*crad*clight*pow4(s% Teff)))
                kh_timescale = eval_kh_timescale(s% cgrav(1), s% mstar, r_phot, s% L(1))
-               dmskhf = s% rotational_mdot_kh_fac
-               dmsfac = s% rotational_mdot_boost_fac
+               dmskhf = s% ctrl% rotational_mdot_kh_fac
+               dmsfac = s% ctrl% rotational_mdot_boost_fac
                max_wind_mdot = dmskhf*s% mstar/kh_timescale
                if (wind_mdot > 0) max_wind_mdot = min(max_wind_mdot, wind_mdot*dmsfac)
             end if
@@ -903,10 +903,10 @@
 
             s% was_in_implicit_wind_limit = .true.
 
-            if (dt/secyer < s% min_years_dt_for_redo_mdot) then
+            if (dt/secyer < s% ctrl% min_years_dt_for_redo_mdot) then
                if (.true.) write(*,1) &
                   'dt too small for fix to fix w > w_crit; min_years_dt_for_redo_mdot', &
-                  dt/secyer, s% min_years_dt_for_redo_mdot
+                  dt/secyer, s% ctrl% min_years_dt_for_redo_mdot
                select_mdot_action = exit_loop
                return
             end if
@@ -924,9 +924,9 @@
                have_too_small_wind_mdot = .true.
                too_small_wind_mdot = wind_mdot
                if (s% mstar_dot < 0) then
-                  s% mstar_dot = mstar_dot*s% mdot_revise_factor
+                  s% mstar_dot = mstar_dot*s% ctrl% mdot_revise_factor
                else
-                  s% mstar_dot = mstar_dot/s% mdot_revise_factor
+                  s% mstar_dot = mstar_dot/s% ctrl% mdot_revise_factor
                end if
 
                if (-s% mstar_dot > max_wind_mdot) s% mstar_dot = -max_wind_mdot
@@ -950,7 +950,7 @@
             if (w_div_w_crit <= surf_omega_div_omega_crit_limit .and. &
                   have_too_small_wind_mdot .and. &
                   abs((wind_mdot-too_small_wind_mdot)/wind_mdot) < &
-                     s% surf_omega_div_omega_crit_tol) then
+                     s% ctrl% surf_omega_div_omega_crit_tol) then
                write(*,3) 'OKAY', s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
                write(*,'(A)')
@@ -1011,7 +1011,7 @@
 
             if (have_too_large_wind_mdot .and. have_too_small_wind_mdot) then
                if (abs((too_large_wind_mdot-too_small_wind_mdot)/too_large_wind_mdot) &
-                   < s% surf_omega_div_omega_crit_tol) then
+                   < s% ctrl% surf_omega_div_omega_crit_tol) then
                   write(*,*) "too_large_wind_mdot good enough, using it"
                   s% mstar_dot = -too_large_wind_mdot
                else
@@ -1027,26 +1027,26 @@
             else ! still have wind too small so boost it again
                if (have_too_small_wind_mdot) then
                   if (mod(mdot_redo_cnt,2) == 1) then
-                     boost = s% implicit_mdot_boost
+                     boost = s% ctrl% implicit_mdot_boost
                      ! increase mass loss
                      mstar_dot_nxt = mstar_dot - boost*abs_mstar_delta
                   else
                      if (mstar_dot < 0) then ! increase mass loss
-                        mstar_dot_nxt = mstar_dot*s% mdot_revise_factor
+                        mstar_dot_nxt = mstar_dot*s% ctrl% mdot_revise_factor
                      else ! decrease mass gain
-                        mstar_dot_nxt = mstar_dot/s% mdot_revise_factor
+                        mstar_dot_nxt = mstar_dot/s% ctrl% mdot_revise_factor
                      end if
                   end if
                else
                   if (mod(mdot_redo_cnt,2) == 1) then
-                     boost = s% implicit_mdot_boost
+                     boost = s% ctrl% implicit_mdot_boost
                      ! decrease mass loss
                      mstar_dot_nxt = mstar_dot + boost*abs_mstar_delta
                   else
                      if (mstar_dot < 0) then ! decrease mass loss
-                        mstar_dot_nxt = mstar_dot/s% mdot_revise_factor
+                        mstar_dot_nxt = mstar_dot/s% ctrl% mdot_revise_factor
                      else ! increase mass gain
-                        mstar_dot_nxt = mstar_dot*s% mdot_revise_factor
+                        mstar_dot_nxt = mstar_dot*s% ctrl% mdot_revise_factor
                      end if
                   end if
                end if
@@ -1227,17 +1227,17 @@
 
 
             if (s% rotation_flag .and. &
-                  (s% use_other_torque .or. s% use_other_torque_implicit .or. &
+                  (s% ctrl% use_other_torque .or. s% ctrl% use_other_torque_implicit .or. &
                      associated(s% binary_other_torque))) then
                ! keep track of rotational kinetic energy
             end if
             
-            if (s% eps_nuc_factor == 0d0 .or. s% nonlocal_NiCo_decay_heat) then
+            if (s% ctrl% eps_nuc_factor == 0d0 .or. s% ctrl% nonlocal_NiCo_decay_heat) then
                s% total_nuclear_heating = 0d0
-            else if (s% op_split_burn) then
+            else if (s% ctrl% op_split_burn) then
                s% total_nuclear_heating = 0d0
                do k = 1, nz
-                  if (s% T_start(k) >= s% op_split_burn_min_T) then
+                  if (s% T_start(k) >= s% ctrl% op_split_burn_min_T) then
                      s% total_nuclear_heating = s% total_nuclear_heating + &
                         dt*s% dm(k)*s% burn_avg_epsnuc(k)
                   else
@@ -1260,25 +1260,25 @@
             end if
             
             s% total_WD_sedimentation_heating = 0d0
-            if (s% do_element_diffusion .and. s% do_WD_sedimentation_heating) then
+            if (s% ctrl% do_element_diffusion .and. s% ctrl% do_WD_sedimentation_heating) then
                s% total_WD_sedimentation_heating = &
                   dt*dot_product(s% dm(1:nz), s% eps_WD_sedimentation(1:nz))
             end if
             
             s% total_energy_from_diffusion = 0d0
-            if (s% do_element_diffusion .and. s% do_diffusion_heating) then
+            if (s% ctrl% do_element_diffusion .and. s% ctrl% do_diffusion_heating) then
                s% total_energy_from_diffusion = &
                   dt*dot_product(s% dm(1:nz), s% eps_diffusion(1:nz))
             end if
             
             total_energy_from_pre_mixing = 0d0
-            if (s% do_conv_premix) then
+            if (s% ctrl% do_conv_premix) then
                total_energy_from_pre_mixing = &
                   dt*dot_product(s% dm(1:nz), s% eps_pre_mix(1:nz))
             end if
 
             s% total_energy_from_phase_separation = 0d0
-            if (s% do_phase_separation) then
+            if (s% ctrl% do_phase_separation) then
                s% total_energy_from_phase_separation = &
                   dt*dot_product(s% dm(1:nz), s% eps_phase_separation(1:nz))
             end if
@@ -1292,8 +1292,8 @@
             
             if (.not. s% RSP_flag) then
                if (s% using_velocity_time_centering .and. &
-                     s% include_L_in_velocity_time_centering) then
-                  L_theta = s% L_theta_for_velocity_time_centering
+                     s% ctrl% include_L_in_velocity_time_centering) then
+                  L_theta = s% ctrl% L_theta_for_velocity_time_centering
                else
                   L_theta = 1d0
                end if
@@ -1314,7 +1314,7 @@
             ! being neglected.
             ! after the iterations, we update m_grav before doing the energy accounting.
             ! this changes the potential energy so we need to correct by that amount.
-            if (s% use_mass_corrections) then
+            if (s% ctrl% use_mass_corrections) then
                total_energy_from_fixed_m_grav = &
                     -dot_product(s% cgrav(1:nz)/s%r(1:nz)*(s%m_grav(1:nz)-s%m_grav_start(1:nz)), s% dm(1:nz))
             else
@@ -1381,11 +1381,11 @@
             s% total_energy = s% total_energy_end
 
             ! provide info about non-conservation due to mass corrections
-            if (s% use_mass_corrections) then
+            if (s% ctrl% use_mass_corrections) then
                write(*,2) 'INFO: use_mass_corrections incurred rel_E_err', s% model_number, -total_energy_from_fixed_m_grav/s% total_energy
             end if
 
-            if (s% model_number == s% energy_conservation_dump_model_number &
+            if (s% model_number == s% ctrl% energy_conservation_dump_model_number &
                   .and. .not. s% doing_relax) then
 
                write(*,'(A)')
@@ -1403,7 +1403,7 @@
                write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
                write(*,'(A)')
                
-               if (trim(s% energy_eqn_option) == 'dedt') then
+               if (trim(s% ctrl% energy_eqn_option) == 'dedt') then
                   
                   write(*,'(A)')
                   write(*,*) 'for debugging phase1_sources_and_sinks'
@@ -1646,26 +1646,26 @@
          include 'formats'
 
          ierr = 0
-         if (s% use_other_energy_implicit) return
+         if (s% ctrl% use_other_energy_implicit) return
 
          nz = s% nz
          dt = s% dt
          do k=1,nz
-            s% extra_heat(k) = s% extra_power_source
+            s% extra_heat(k) = s% ctrl% extra_power_source
          end do
          
-         if (s% use_other_energy) then
+         if (s% ctrl% use_other_energy) then
             call s% other_energy(s% id, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) &
+               if (s% ctrl% report_ierr) &
                   write(*, *) 'check_for_extra_heat: other_energy returned ierr', ierr
                return
             end if
-         else if (s% inject_uniform_extra_heat /= 0) then
+         else if (s% ctrl% inject_uniform_extra_heat /= 0) then
             qp1 = 0d0
-            qmin = s% min_q_for_uniform_extra_heat
-            qmax = s% max_q_for_uniform_extra_heat
-            extra = s% inject_uniform_extra_heat
+            qmin = s% ctrl% min_q_for_uniform_extra_heat
+            qmax = s% ctrl% max_q_for_uniform_extra_heat
+            extra = s% ctrl% inject_uniform_extra_heat
             do k=nz,1,-1
                q00 = s% q(k)
                if (qp1 >= qmin .and. q00 <= qmax) then ! all inside of region
@@ -1680,14 +1680,14 @@
                qp1 = q00
             end do
             s% need_to_setvars = .true.
-         else if (s% nonlocal_NiCo_decay_heat) then
-            kap_gamma = s% nonlocal_NiCo_kap_gamma
+         else if (s% ctrl% nonlocal_NiCo_decay_heat) then
+            kap_gamma = s% ctrl% nonlocal_NiCo_kap_gamma
             do k1=1,nz
                tau_gamma_sum = 0
                do k=k1,1,-1 ! move eps_nuc outward from k1 to extra_heat at k
                   tau_gamma_sum = tau_gamma_sum + &
                      kap_gamma*s% dm(k)/(pi4*s% rmid(k)*s% rmid(k))
-                  if (tau_gamma_sum >= s% dtau_gamma_NiCo_decay_heat) then
+                  if (tau_gamma_sum >= s% ctrl% dtau_gamma_NiCo_decay_heat) then
                      s% extra_heat(k) = s% extra_heat(k) + &
                         s% eps_nuc(k1)*s% dm(k1)/s% dm(k)
                      exit
@@ -1697,33 +1697,33 @@
             s% need_to_setvars = .true.
          end if
 
-         if (s% inject_until_reach_model_with_total_energy <= s% total_energy_initial &
-               .or. dt <= 0d0 .or. s% total_mass_for_inject_extra_ergs_sec <= 0d0) return         
+         if (s% ctrl% inject_until_reach_model_with_total_energy <= s% total_energy_initial &
+               .or. dt <= 0d0 .or. s% ctrl% total_mass_for_inject_extra_ergs_sec <= 0d0) return         
 
-         start_time = s% start_time_for_inject_extra_ergs_sec
+         start_time = s% ctrl% start_time_for_inject_extra_ergs_sec
          if (s% time < start_time) return
 
-         if (s% duration_for_inject_extra_ergs_sec > 0) then
-            end_time = start_time + s% duration_for_inject_extra_ergs_sec
-         else if (s% max_age_in_seconds > 0) then
-            end_time = s% max_age_in_seconds
-         else if (s% max_age_in_days > 0) then
-            end_time = s% max_age_in_days*(60*60*24)
+         if (s% ctrl% duration_for_inject_extra_ergs_sec > 0) then
+            end_time = start_time + s% ctrl% duration_for_inject_extra_ergs_sec
+         else if (s% ctrl% max_age_in_seconds > 0) then
+            end_time = s% ctrl% max_age_in_seconds
+         else if (s% ctrl% max_age_in_days > 0) then
+            end_time = s% ctrl% max_age_in_days*(60*60*24)
          else
-            end_time = s% max_age*secyer
+            end_time = s% ctrl% max_age*secyer
          end if
          if (s% time_old > end_time) return
          
          target_injection_ergs = &
-            s% inject_until_reach_model_with_total_energy - s% total_energy_initial
+            s% ctrl% inject_until_reach_model_with_total_energy - s% total_energy_initial
          target_injection_time = end_time - start_time
-         s% inject_extra_ergs_sec = target_injection_ergs/target_injection_time 
+         s% ctrl% inject_extra_ergs_sec = target_injection_ergs/target_injection_time 
          left_to_inject = &
-            s% inject_until_reach_model_with_total_energy - s% total_energy_old
+            s% ctrl% inject_until_reach_model_with_total_energy - s% total_energy_old
          qp1 = 0d0
-         qmin = max(0d0, Msun*s% base_of_inject_extra_ergs_sec - s% M_center)/s% xmstar
-         qmax = min(1d0, qmin + Msun*s% total_mass_for_inject_extra_ergs_sec/s% xmstar)
-         extra = s% inject_extra_ergs_sec/(s% xmstar*(qmax - qmin))
+         qmin = max(0d0, Msun*s% ctrl% base_of_inject_extra_ergs_sec - s% M_center)/s% xmstar
+         qmax = min(1d0, qmin + Msun*s% ctrl% total_mass_for_inject_extra_ergs_sec/s% xmstar)
+         extra = s% ctrl% inject_extra_ergs_sec/(s% xmstar*(qmax - qmin))
          if (s% time > end_time .or. s% time_old < start_time) then
             extra = extra*(min(s% time, end_time) - max(s% time_old, start_time))/dt
          end if
@@ -1771,7 +1771,7 @@
          include 'formats'
 
          ierr = 0
-         trace = s% trace_evolve
+         trace = s% ctrl% trace_evolve
          nz = s% nz
 
          if (.not. s% RSP_flag) then
@@ -1810,7 +1810,7 @@
                return
             end if
             failed = .true.
-            if (s% report_ierr) write(*, *) 'set_start_of_step_info: ' // trim(str)
+            if (s% ctrl% report_ierr) write(*, *) 'set_start_of_step_info: ' // trim(str)
             s% result_reason = nonzero_ierr
          end function failed
 
@@ -1834,16 +1834,16 @@
          include 'formats'
 
          ierr = 0
-         trace = s% trace_evolve
+         trace = s% ctrl% trace_evolve
 
          prepare_for_new_step = keep_going
 
          if (s% dt_next <= 0) then
             write(*, *) 's% dt_next', s% dt_next
             prepare_for_new_step = terminate
-            if ((s% time >= s% max_age*secyer .and. s% max_age > 0) .or. &
-                (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) .or. &
-                (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0)) then
+            if ((s% time >= s% ctrl% max_age*secyer .and. s% ctrl% max_age > 0) .or. &
+                (s% time >= s% ctrl% max_age_in_days*(60*60*24) .and. s% ctrl% max_age_in_days > 0) .or. &
+                (s% time >= s% ctrl% max_age_in_seconds .and. s% ctrl% max_age_in_seconds > 0)) then
                s% result_reason = result_reason_normal
                s% termination_code = t_max_age
             else
@@ -1853,16 +1853,16 @@
             return
          end if
 
-         if (s% dt_next < s% min_timestep_limit) then
+         if (s% dt_next < s% ctrl% min_timestep_limit) then
             write(*, *) 's% dt_next', s% dt_next
-            write(*, *) 's% min_timestep_limit', s% min_timestep_limit
+            write(*, *) 's% ctrl% min_timestep_limit', s% ctrl% min_timestep_limit
             prepare_for_new_step = terminate
             s% termination_code = t_min_timestep_limit
             s% result_reason = timestep_limits
             return
          end if
 
-         if (s% set_rho_to_dm_div_dV .and. .not. (s% u_flag .or. s% RSP_flag)) then
+         if (s% ctrl% set_rho_to_dm_div_dV .and. .not. (s% u_flag .or. s% RSP_flag)) then
             call use_xh_to_set_rho_to_dm_div_dV(s,ierr)
             if (failed('use_xh_to_set_rho_to_dm_div_dV ierr')) return
          end if
@@ -1890,7 +1890,7 @@
             end if
          end if
 
-         if (s% okay_to_remesh) then
+         if (s% ctrl% okay_to_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
                call set_start_of_step_info(s, 'before do_mesh', ierr)
                if (failed('set_start_of_step_info ierr')) return
@@ -1907,35 +1907,35 @@
          if (failed('new_generation ierr')) return
          s% generations = 2
 
-         if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
-            s% dt_next = max(0d0, s% max_age*secyer - s% time)
+         if ((s% time + s% dt_next) > s% ctrl% max_age*secyer .and. s% ctrl% max_age > 0) then
+            s% dt_next = max(0d0, s% ctrl% max_age*secyer - s% time)
             if ( s% dt_next == 0d0 ) then
                write(*,*) 'WARNING: max_age reached'
-               write(*,1) 's% max_age*secyer', s% max_age*secyer
+               write(*,1) 's% ctrl% max_age*secyer', s% ctrl% max_age*secyer
                write(*,1) 's% time', s% time
-               write(*,1) 's% max_age', s% max_age
+               write(*,1) 's% ctrl% max_age', s% ctrl% max_age
             end if
-         else if ((s% time + s% dt_next) > s% max_age_in_seconds &
-                  .and. s% max_age_in_seconds > 0) then
-            s% dt_next = max(0d0, s% max_age_in_seconds - s% time)
-         else if ((s% time + s% dt_next) > s% max_age_in_days*(60*60*24) &
-                  .and. s% max_age_in_days > 0) then
-            s% dt_next = max(0d0, s% max_age_in_days*(60*60*24) - s% time)
+         else if ((s% time + s% dt_next) > s% ctrl% max_age_in_seconds &
+                  .and. s% ctrl% max_age_in_seconds > 0) then
+            s% dt_next = max(0d0, s% ctrl% max_age_in_seconds - s% time)
+         else if ((s% time + s% dt_next) > s% ctrl% max_age_in_days*(60*60*24) &
+                  .and. s% ctrl% max_age_in_days > 0) then
+            s% dt_next = max(0d0, s% ctrl% max_age_in_days*(60*60*24) - s% time)
          end if
          
          s% dt = s% dt_next
             
-         force_timestep_min = s% force_timestep_min
+         force_timestep_min = s% ctrl% force_timestep_min
          if (force_timestep_min == 0) &
-            force_timestep_min = secyer*s% force_timestep_min_years
+            force_timestep_min = secyer*s% ctrl% force_timestep_min_years
          if (s% dt < force_timestep_min) then
-            s% dt = min(s% dt*s% force_timestep_min_factor, force_timestep_min)
+            s% dt = min(s% dt*s% ctrl% force_timestep_min_factor, force_timestep_min)
             write(*,2) 'force increase in timestep', s% model_number, s% dt
          end if
          
-         force_timestep = s% force_timestep
+         force_timestep = s% ctrl% force_timestep
          if (force_timestep == 0) &
-            force_timestep = secyer*s% force_timestep_years
+            force_timestep = secyer*s% ctrl% force_timestep_years
          if (force_timestep > 0) s% dt = force_timestep
          
          s% dt_start = s% dt
@@ -1962,7 +1962,7 @@
             end if
             failed = .true.
             prepare_for_new_step = terminate
-            if (s% report_ierr) write(*, *) 'prepare_for_new_step: ' // trim(str)
+            if (s% ctrl% report_ierr) write(*, *) 'prepare_for_new_step: ' // trim(str)
             s% result_reason = nonzero_ierr
          end function failed
 
@@ -1979,18 +1979,18 @@
          real(dp) :: total
          include 'formats'
          do_mesh = keep_going
-         if (.not. s% okay_to_remesh) return
-         if (s% restore_mesh_on_retry &
-            .and. s% model_number_for_last_retry > s% model_number - s% num_steps_to_hold_mesh_after_retry) return
+         if (.not. s% ctrl% okay_to_remesh) return
+         if (s% ctrl% restore_mesh_on_retry &
+            .and. s% model_number_for_last_retry > s% model_number - s% ctrl% num_steps_to_hold_mesh_after_retry) return
          s% need_to_setvars = .true.
          if (s% doing_timing) call start_time(s, time0, total)        
-         if (s% use_split_merge_amr) then
+         if (s% ctrl% use_split_merge_amr) then
             do_mesh = remesh_split_merge(s) ! sets s% need_to_setvars = .true. if changes anything
-            if (do_mesh /= keep_going .and. s% report_ierr) &
+            if (do_mesh /= keep_going .and. s% ctrl% report_ierr) &
                write(*, *) 'do_mesh: remesh_split_merge failed'
          else if (.not. s% rsp_flag) then
             do_mesh = remesh(s) ! sets s% need_to_setvars = .true. if changes anything
-            if (do_mesh /= keep_going .and. s% report_ierr) &
+            if (do_mesh /= keep_going .and. s% ctrl% report_ierr) &
                write(*, *) 'do_mesh: remesh failed'
          end if
          if (s% doing_timing) call update_time(s, time0, total, s% time_remesh)
@@ -2035,7 +2035,7 @@
          
             screening = get_screening_mode(s,ierr)
             if (ierr /= 0) then
-               write(*,*) 'bad value for screening_mode ' // trim(s% screening_mode)
+               write(*,*) 'bad value for screening_mode ' // trim(s% ctrl% screening_mode)
                prepare_for_new_try = terminate
                s% termination_code = t_failed_prepare_for_new_try
                return
@@ -2069,19 +2069,19 @@
             return
          end if         
          
-         if (s% trace_evolve) write(*,'(/,a)') 'pick_next_timestep'
+         if (s% ctrl% trace_evolve) write(*,'(/,a)') 'pick_next_timestep'
 
-         if (s% max_years_for_timestep > 0) then
-            max_timestep = secyer*s% max_years_for_timestep
-            if (s% max_timestep > 0 .and. s% max_timestep < max_timestep) &
-               max_timestep = s% max_timestep
+         if (s% ctrl% max_years_for_timestep > 0) then
+            max_timestep = secyer*s% ctrl% max_years_for_timestep
+            if (s% ctrl% max_timestep > 0 .and. s% ctrl% max_timestep < max_timestep) &
+               max_timestep = s% ctrl% max_timestep
          else
-            max_timestep = s% max_timestep
+            max_timestep = s% ctrl% max_timestep
          end if
 
          pick_next_timestep = timestep_controller(s, max_timestep)
          if (pick_next_timestep /= keep_going) then
-            if (s% trace_evolve) &
+            if (s% ctrl% trace_evolve) &
                write(*,*) 'pick_next_timestep: timestep_controller /= keep_going'
             return
          end if
@@ -2090,66 +2090,66 @@
                ! write out the unclipped timestep in saved models
          if (s% time < 0 .and. s% time + s% dt_next > 0) then
             s% dt_next = -s% time
-         else if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
-            s% dt_next = max(0d0, s% max_age*secyer - s% time)
-         else if ((s% time + s% dt_next) > s% max_age_in_days*(60*60*24) &
-                  .and. s% max_age_in_days > 0) then
-            s% dt_next = max(0d0, s% max_age_in_days*(60*60*24) - s% time)
-         else if ((s% time + s% dt_next) > s% max_age_in_seconds &
-                  .and. s% max_age_in_seconds > 0) then
-            s% dt_next = max(0d0, s% max_age_in_seconds - s% time)
-         else if (s% num_adjusted_dt_steps_before_max_age > 0 .and. &
-                  s% max_years_for_timestep > 0) then
-            if (s% max_age > 0) then
-               remaining_years = s% max_age - s% star_age
-            else if (s% max_age_in_days > 0) then
-               remaining_years = (s% max_age_in_days*(60*60*24) - s% time)/secyer
-            else if (s% max_age_in_seconds > 0) then
-               remaining_years = (s% max_age_in_seconds - s% time)/secyer
+         else if ((s% time + s% dt_next) > s% ctrl% max_age*secyer .and. s% ctrl% max_age > 0) then
+            s% dt_next = max(0d0, s% ctrl% max_age*secyer - s% time)
+         else if ((s% time + s% dt_next) > s% ctrl% max_age_in_days*(60*60*24) &
+                  .and. s% ctrl% max_age_in_days > 0) then
+            s% dt_next = max(0d0, s% ctrl% max_age_in_days*(60*60*24) - s% time)
+         else if ((s% time + s% dt_next) > s% ctrl% max_age_in_seconds &
+                  .and. s% ctrl% max_age_in_seconds > 0) then
+            s% dt_next = max(0d0, s% ctrl% max_age_in_seconds - s% time)
+         else if (s% ctrl% num_adjusted_dt_steps_before_max_age > 0 .and. &
+                  s% ctrl% max_years_for_timestep > 0) then
+            if (s% ctrl% max_age > 0) then
+               remaining_years = s% ctrl% max_age - s% star_age
+            else if (s% ctrl% max_age_in_days > 0) then
+               remaining_years = (s% ctrl% max_age_in_days*(60*60*24) - s% time)/secyer
+            else if (s% ctrl% max_age_in_seconds > 0) then
+               remaining_years = (s% ctrl% max_age_in_seconds - s% time)/secyer
             else
                remaining_years = 1d99
             end if
             if (s% using_revised_max_yr_dt) &
-               s% max_years_for_timestep = s% revised_max_yr_dt
-            n = floor(remaining_years/s% max_years_for_timestep + 1d-6)
-            j = s% num_adjusted_dt_steps_before_max_age
-            if (remaining_years <= s% max_years_for_timestep) then
-               s% max_years_for_timestep = remaining_years
+               s% ctrl% max_years_for_timestep = s% revised_max_yr_dt
+            n = floor(remaining_years/s% ctrl% max_years_for_timestep + 1d-6)
+            j = s% ctrl% num_adjusted_dt_steps_before_max_age
+            if (remaining_years <= s% ctrl% max_years_for_timestep) then
+               s% ctrl% max_years_for_timestep = remaining_years
                s% using_revised_max_yr_dt = .true.
-               s% revised_max_yr_dt = s% max_years_for_timestep
-               s% dt_next = s% max_years_for_timestep*secyer
+               s% revised_max_yr_dt = s% ctrl% max_years_for_timestep
+               s% dt_next = s% ctrl% max_years_for_timestep*secyer
                write(*,3) 'remaining steps and years until max age', &
                   s% model_number, 1, remaining_years
             else if (n <= j) then
-               prev_max_years = s% max_years_for_timestep
-               i = floor(remaining_years/s% dt_years_for_steps_before_max_age + 1d-6)
-               if ((i+1d-9)*s% dt_years_for_steps_before_max_age < remaining_years) then
-                  s% max_years_for_timestep = remaining_years/(i+1)
+               prev_max_years = s% ctrl% max_years_for_timestep
+               i = floor(remaining_years/s% ctrl% dt_years_for_steps_before_max_age + 1d-6)
+               if ((i+1d-9)*s% ctrl% dt_years_for_steps_before_max_age < remaining_years) then
+                  s% ctrl% max_years_for_timestep = remaining_years/(i+1)
                else
-                  s% max_years_for_timestep = remaining_years/i
+                  s% ctrl% max_years_for_timestep = remaining_years/i
                end if
-               min_max = prev_max_years*s% reduction_factor_for_max_timestep
-               if (s% max_years_for_timestep < min_max) &
-                  s% max_years_for_timestep = min_max
+               min_max = prev_max_years*s% ctrl% reduction_factor_for_max_timestep
+               if (s% ctrl% max_years_for_timestep < min_max) &
+                  s% ctrl% max_years_for_timestep = min_max
                if (.not. s% using_revised_max_yr_dt) then
                   s% using_revised_max_yr_dt = .true.
                   write(*,2) 'begin reducing max timestep prior to max age', &
                      s% model_number, remaining_years
-               else if (s% revised_max_yr_dt > s% max_years_for_timestep) then
+               else if (s% revised_max_yr_dt > s% ctrl% max_years_for_timestep) then
                   write(*,2) 'reducing max timestep prior to max age', &
                      s% model_number, remaining_years
-               else if (s% max_years_for_timestep <= &
-                     s% dt_years_for_steps_before_max_age) then
-                  i = floor(remaining_years/s% max_years_for_timestep + 1d-6)
+               else if (s% ctrl% max_years_for_timestep <= &
+                     s% ctrl% dt_years_for_steps_before_max_age) then
+                  i = floor(remaining_years/s% ctrl% max_years_for_timestep + 1d-6)
                   write(*,3) 'remaining steps and years until max age', &
                      s% model_number, i, remaining_years
                else
                   write(*,2) 'remaining_years until max age', &
                      s% model_number, remaining_years
                end if
-               s% revised_max_yr_dt = s% max_years_for_timestep
-               if (s% dt_next/secyer > s% max_years_for_timestep) &
-                  s% dt_next = s% max_years_for_timestep*secyer
+               s% revised_max_yr_dt = s% ctrl% max_years_for_timestep
+               if (s% dt_next/secyer > s% ctrl% max_years_for_timestep) &
+                  s% dt_next = s% ctrl% max_years_for_timestep*secyer
             end if
 
          end if
@@ -2170,16 +2170,16 @@
             return
          end if
          s% redo_cnt = s% redo_cnt + 1
-         if (s% redo_limit > 0 .and. s% redo_cnt > s% redo_limit) then
+         if (s% ctrl% redo_limit > 0 .and. s% redo_cnt > s% ctrl% redo_limit) then
             write(*,2) 'redo_cnt', s% redo_cnt
-            write(*,2) 'redo_limit', s% redo_limit
+            write(*,2) 'redo_limit', s% ctrl% redo_limit
             call report_problems(s, '-- too many redos')
             s% termination_code = t_redo_limit
             prepare_to_redo = terminate
             return
          end if
          prepare_to_redo = keep_going
-         if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_redo'         
+         if (s% ctrl% trace_evolve) write(*,'(/,a)') 'prepare_to_redo'         
          call set_current_to_old(s)         
          s% need_to_setvars = .true.
       end function prepare_to_redo
@@ -2201,7 +2201,7 @@
          
          s% need_to_setvars = .true.
 
-         if (s% restore_mesh_on_retry .and. .not. s% RSP_flag) then
+         if (s% ctrl% restore_mesh_on_retry .and. .not. s% RSP_flag) then
             if (.not. s% prev_mesh_species_or_nvar_hydro_changed) then
                do k=1, s% prev_mesh_nz
                   s% xh_old(:,k) = s% prev_mesh_xh(:,k)
@@ -2220,10 +2220,10 @@
             end if
          end if
          
-         if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_retry'
+         if (s% ctrl% trace_evolve) write(*,'(/,a)') 'prepare_to_retry'
          
          s% retry_cnt = s% retry_cnt + 1
-         if (s% retry_limit > 0 .and. s% retry_cnt > s% retry_limit) then
+         if (s% ctrl% retry_limit > 0 .and. s% retry_cnt > s% ctrl% retry_limit) then
             s% dt_start = sqrt(s% dt*s% dt_start)
             prepare_to_retry = terminate
             return
@@ -2231,7 +2231,7 @@
 
          prepare_to_retry = keep_going
 
-         retry_factor = s% timestep_factor_for_retries
+         retry_factor = s% ctrl% timestep_factor_for_retries
          s% dt = s% dt*retry_factor
          s% time_step = s% dt/secyer
          if (len_trim(s% retry_message) > 0) then
@@ -2245,13 +2245,13 @@
             !if (.true.) call mesa_error(__FILE__,__LINE__,'failed to set retry_message')
          end if
          s% retry_message_k = 0
-         if (s% report_ierr) &
+         if (s% ctrl% report_ierr) &
             write(*,'(a50,2i6,3f16.6)') 'retry log10(dt/yr), log10(dt), retry_factor', &
                s% retry_cnt, s% model_number, log10(s% dt*retry_factor/secyer), &
                log10(s% dt*retry_factor), retry_factor
-         if (s% dt <= max(s% min_timestep_limit,0d0)) then
+         if (s% dt <= max(s% ctrl% min_timestep_limit,0d0)) then
             write(*,1) 'dt', s% dt
-            write(*,1) 'min_timestep_limit', s% min_timestep_limit
+            write(*,1) 'min_timestep_limit', s% ctrl% min_timestep_limit
             call report_problems(s, 'dt < min_timestep_limit')
             prepare_to_retry = terminate
             s% termination_code = t_min_timestep_limit
@@ -2259,19 +2259,19 @@
             return
          end if
 
-         if (s% max_years_for_timestep > 0) &
-            s% max_timestep = secyer*s% max_years_for_timestep
-         if (s% max_timestep > 0 .and. s% dt > s% max_timestep) then
-            s% dt = s% max_timestep
+         if (s% ctrl% max_years_for_timestep > 0) &
+            s% ctrl% max_timestep = secyer*s% ctrl% max_years_for_timestep
+         if (s% ctrl% max_timestep > 0 .and. s% dt > s% ctrl% max_timestep) then
+            s% dt = s% ctrl% max_timestep
             s% time_step = s% dt/secyer
          end if
 
          call set_current_to_old(s)
          
          s% num_retries = s% num_retries+1
-         if (s% num_retries > s% max_number_retries .and. s% max_number_retries >= 0) then
+         if (s% num_retries > s% ctrl% max_number_retries .and. s% ctrl% max_number_retries >= 0) then
             write(*,2) 'num_retries', s% num_retries
-            write(*,2) 'max_number_retries', s% max_number_retries
+            write(*,2) 'max_number_retries', s% ctrl% max_number_retries
             call report_problems(s, '-- too many retries')
             s% termination_code = t_max_number_retries
             prepare_to_retry = terminate; return
@@ -2280,9 +2280,9 @@
          s% model_number_for_last_retry = s% model_number
          if (s% why_Tlim == Tlim_neg_X) then
             s% timestep_hold = s% model_number + &
-               max(s% retry_hold, s% neg_mass_fraction_hold)
+               max(s% ctrl% retry_hold, s% ctrl% neg_mass_fraction_hold)
          else
-            s% timestep_hold = s% model_number + s% retry_hold
+            s% timestep_hold = s% model_number + s% ctrl% retry_hold
          end if
          s% why_Tlim = Tlim_retry
 
@@ -2324,26 +2324,26 @@
          if (ierr /= 0) return
 
          nz = s% nz
-         trace = s% trace_evolve
+         trace = s% ctrl% trace_evolve
          prev_num_iounits_in_use = number_iounits_allocated()
 
          finish_step = keep_going
          s% result_reason = result_reason_normal
 
-         if (s% need_to_save_profiles_now .and. s% write_profiles_flag) then
+         if (s% need_to_save_profiles_now .and. s% ctrl% write_profiles_flag) then
             call do_save_profiles(s, ierr)
             s% need_to_save_profiles_now = .false.
          end if
 
          call check(1)
 
-         if (s% need_to_update_history_now .and. s% do_history_file) then
+         if (s% need_to_update_history_now .and. s% ctrl% do_history_file) then
 
             call write_history_info( &
                s, ierr)
             if (ierr /= 0) then
                finish_step = terminate
-               if (s% report_ierr) write(*, *) 'finish_step: write_history_info ierr', ierr
+               if (s% ctrl% report_ierr) write(*, *) 'finish_step: write_history_info ierr', ierr
                s% result_reason = nonzero_ierr
                return
             end if
@@ -2354,11 +2354,11 @@
 
          will_do_photo = .false.
          if (.not. s% doing_relax) then
-            if(s% photo_interval > 0) then
-               if(mod(s% model_number, s% photo_interval) == 0) will_do_photo = .true.
+            if(s% ctrl% photo_interval > 0) then
+               if(mod(s% model_number, s% ctrl% photo_interval) == 0) will_do_photo = .true.
             end if
-            if(s% solver_save_photo_call_number > 0)then
-               if(s% solver_call_number == s% solver_save_photo_call_number - 1) will_do_photo = .true.
+            if(s% ctrl% solver_save_photo_call_number > 0)then
+               if(s% solver_call_number == s% ctrl% solver_save_photo_call_number - 1) will_do_photo = .true.
             end if
         end if
 
@@ -2368,7 +2368,7 @@
 
             if (ierr /= 0) then
                finish_step = terminate
-               if (s% report_ierr) write(*, *) 'finish_step: output ierr', ierr
+               if (s% ctrl% report_ierr) write(*, *) 'finish_step: output ierr', ierr
                s% result_reason = nonzero_ierr
                return
             end if

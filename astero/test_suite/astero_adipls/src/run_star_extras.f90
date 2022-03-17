@@ -92,7 +92,7 @@
          ! if (i == 1) then
          !    call star_ptr(id, s, ierr)
          !    if (ierr /= 0) return
-         !    s% mixing_length_alpha = new_value
+         !    s% ctrl% mixing_length_alpha = new_value
          ! end if
       end subroutine will_set_my_param
 
@@ -135,12 +135,12 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (s% x_ctrl(1) > 0d0) then
+         if (s% ctrl% x_ctrl(1) > 0d0) then
          
             store_for_adipls = .true.
             l_to_match = 0
             order_to_match = 4
-            expected_freq = s% x_ctrl(1)
+            expected_freq = s% ctrl% x_ctrl(1)
 
             save_mode_info = .true.
             order_to_save = 5
@@ -179,7 +179,7 @@
          
          extras_check_model = keep_going
          
-         if (s% x_ctrl(1) > 0d0) then
+         if (s% ctrl% x_ctrl(1) > 0d0) then
          
             ! get frequencies for certain models
             if (mod(s% model_number,50) /= 0) return

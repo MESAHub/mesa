@@ -497,12 +497,12 @@
          if (rp1 > r) then
             ierr = -1
             s% retry_message = 'error in remove center by radius: r < R_center'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
          end if
          if (s% r(1) <= r) then
             ierr = -1
             s% retry_message = 'error in remove center by radius: r >= R_surface'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
          end if
          if (rp1 == r) return
          qp1 = 0d0
@@ -602,7 +602,7 @@
          if (q < 0d0 .or. q > 1d0) then
             ierr = -1
             s% retry_message = 'error in remove center: invalid location q'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
             return
          end if
          do k = 1, s% nz
@@ -656,10 +656,10 @@
          do kk=1,k-1
             s% dq(kk) = s% dm(kk)/new_xmstar
          end do
-         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+         if (.not. s% ctrl% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, s% nz, s% dq, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) write(*,*) 'normalize_dqs failed in do_remove_center'
+               if (s% ctrl% report_ierr) write(*,*) 'normalize_dqs failed in do_remove_center'
                return
             end if
          end if
@@ -995,7 +995,7 @@
 
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*,*) 'do_remove_surface: get_star_ptr ierr'
             return
          end if
@@ -1053,7 +1053,7 @@
          if (dbg) write(*,1) 'call resize_star_info_arrays'
          call resize_star_info_arrays(s, c, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*,*) 'resize_star_info_arrays failed in do_remove_surface'
             return
          end if
@@ -1102,13 +1102,13 @@
 
          if (Lmid > 0d0) then
             T_black_body = pow(Lmid/(pi4*rmid*rmid*boltz_sigma), 0.25d0)
-            s% Tsurf_factor = T/T_black_body
+            s% ctrl% Tsurf_factor = T/T_black_body
          else
-            s% Tsurf_factor = 1d0
+            s% ctrl% Tsurf_factor = 1d0
          end if
-         s% force_Tsurf_factor = s% Tsurf_factor
+         s% force_Tsurf_factor = s% ctrl% Tsurf_factor
 
-         if (s% use_momentum_outer_bc) then
+         if (s% ctrl% use_momentum_outer_bc) then
             s% tau_factor = tau_factor_new
             s% force_tau_factor = s% tau_factor
          end if
@@ -1117,13 +1117,13 @@
          if (dbg) write(*,1) 'call finish_load_model'
          call finish_load_model(s, restart, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*,*) 'finish_load_model failed in do_remove_surface'
             return
          end if
 
          if (dbg) write(*,1) 'do_remove_surface tau_factor, Tsurf_factor', &
-            s% tau_factor, s% Tsurf_factor
+            s% tau_factor, s% ctrl% Tsurf_factor
             
          if (dbg) call mesa_error(__FILE__,__LINE__,'do_remove_surface')
             
@@ -1169,14 +1169,14 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         eps_nuc_factor = s% eps_nuc_factor
-         non_nuc_neu_factor = s% non_nuc_neu_factor
+         eps_nuc_factor = s% ctrl% eps_nuc_factor
+         non_nuc_neu_factor = s% ctrl% non_nuc_neu_factor
          net_name = s% net_name
-         num_trace_history_values = s% num_trace_history_values
+         num_trace_history_values = s% ctrl% num_trace_history_values
 
          time = s% time
          model_number = s% model_number
-         num_trace_history_values = s% num_trace_history_values
+         num_trace_history_values = s% ctrl% num_trace_history_values
          cumulative_energy_error = s% cumulative_energy_error
          cumulative_extra_heating = s% cumulative_extra_heating
 
@@ -1253,8 +1253,8 @@
          end if
 
          ! avoid making photos
-         photo_interval = s% photo_interval
-         s% photo_interval = 10000000
+         photo_interval = s% ctrl% photo_interval
+         s% ctrl% photo_interval = 10000000
          s% have_previous_conv_vel = .false.
          s% have_j_rot = .false.
          ! WARNING, might need to add stuff here to actually get the ZAMS model to load.
@@ -1263,12 +1263,12 @@
          ! and be sure they're turned off.
 
          ! set values used to load the starting model that will be relaxed
-         initial_z = s% initial_z
-         initial_y = s% initial_y
-         initial_mass = s% initial_mass
-         s% initial_z = 0.02d0
-         s% initial_y = 0.28d0
-         s% initial_mass = s% m(k_remove)/Msun
+         initial_z = s% ctrl% initial_z
+         initial_y = s% ctrl% initial_y
+         initial_mass = s% ctrl% initial_mass
+         s% ctrl% initial_z = 0.02d0
+         s% ctrl% initial_y = 0.28d0
+         s% ctrl% initial_mass = s% m(k_remove)/Msun
 
          s% prev_mesh_nz = 0
 
@@ -1286,11 +1286,11 @@
          s% have_mlt_vc = save_have_mlt_vc
 
          if (turn_off_energy_sources_and_sinks) then
-            s% non_nuc_neu_factor = 0d0
-            s% eps_nuc_factor = 0d0
+            s% ctrl% non_nuc_neu_factor = 0d0
+            s% ctrl% eps_nuc_factor = 0d0
          end if
 
-         s% num_trace_history_values = 0
+         s% ctrl% num_trace_history_values = 0
          call do_relax_composition( &
             id, s% job% num_steps_to_relax_composition, num_pts, species, xa, xq, ierr)
          if (dbg) write(*,*) "check ierr", ierr
@@ -1357,17 +1357,17 @@
 
          s% time = time
          s% model_number = model_number
-         s% num_trace_history_values = num_trace_history_values
+         s% ctrl% num_trace_history_values = num_trace_history_values
          s% cumulative_energy_error = cumulative_energy_error
          s% cumulative_extra_heating = cumulative_extra_heating
 
-         s% non_nuc_neu_factor = non_nuc_neu_factor
-         s% eps_nuc_factor = eps_nuc_factor
+         s% ctrl% non_nuc_neu_factor = non_nuc_neu_factor
+         s% ctrl% eps_nuc_factor = eps_nuc_factor
 
-         s% initial_z = initial_z
-         s% initial_y = initial_y
-         s% initial_mass = initial_mass
-         s% photo_interval = photo_interval
+         s% ctrl% initial_z = initial_z
+         s% ctrl% initial_y = initial_y
+         s% ctrl% initial_mass = initial_mass
+         s% ctrl% photo_interval = photo_interval
 
          deallocate(q, xq)
          

@@ -172,16 +172,16 @@ contains
     global_data(1) = m_outer
     global_data(2) = r_outer
     global_data(3) = s%L(1)
-    global_data(4) = s%initial_z
-    global_data(5) = 1d0 - (s%initial_y + s%initial_z)
-    global_data(6) = s%mixing_length_alpha
+    global_data(4) = s% ctrl% initial_z
+    global_data(5) = 1d0 - (s% ctrl% initial_y + s% ctrl% initial_z)
+    global_data(6) = s% ctrl% mixing_length_alpha
     if (s%largest_conv_mixing_region /= 0) then
        k = s%mixing_region_bottom(s%largest_conv_mixing_region)
        global_data(7) = s%X(k)
        global_data(8) = s%Y(k)
     end if
 
-    if (s%interpolate_rho_for_pulse_data) then
+    if (s% ctrl% interpolate_rho_for_pulse_data) then
        rho_c = eval_center_rho(s, k_b(n_sg))
     else
        rho_c = eval_center(s%rmid, s%rho, k_a(n_sg), k_b(n_sg))
@@ -417,7 +417,7 @@ contains
         lnq = log(s%m_grav(k)/m_outer)
         T = eval_face(s%dq, s%T, k, 1, s%nz)
         P = eval_face(s%dq, s%Peos, k, 1, s%nz)
-        if (s%interpolate_rho_for_pulse_data) then
+        if (s% ctrl% interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, k_a, k_b)
         else
            rho = eval_face_rho(s, k, k_a, k_b)
@@ -615,10 +615,10 @@ contains
     write(iounit, '(a)') '14 H1 H2 He3 He4 Li7 Be7 C12 C13 N14 N15 O16 O17 Be9 Si28'
     write(iounit, '(5I10)') nn, ICONST, IVAR, IABUND, 2000
 
-    write(iounit, s%format_for_osc_data) (global_data(i), i=1,n_global)
+    write(iounit, s% ctrl% format_for_osc_data) (global_data(i), i=1,n_global)
 
     do k = 1, nn
-       write(iounit, s%format_for_osc_data) (point_data(j,k), j=1,n_point)
+       write(iounit, s% ctrl% format_for_osc_data) (point_data(j,k), j=1,n_point)
     end do
 
     ! Close the file

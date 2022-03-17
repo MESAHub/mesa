@@ -365,12 +365,12 @@
                
                   do k=grid_min, grid_max
                      yvec(k) = safe_log10( &
-                        s% D_DSI_factor  * s% D_DSI(k)  + &
-                        s% D_SH_factor   * s% D_SH(k)   + &
-                        s% D_SSI_factor  * s% D_SSI(k)  + &
-                        s% D_ES_factor   * s% D_ES(k)   + &
-                        s% D_GSF_factor  * s% D_GSF(k)  + &
-                        s% D_ST_factor   * s% D_ST(k))
+                        s% ctrl% D_DSI_factor  * s% D_DSI(k)  + &
+                        s% ctrl% D_SH_factor   * s% D_SH(k)   + &
+                        s% ctrl% D_SSI_factor  * s% D_SSI(k)  + &
+                        s% ctrl% D_ES_factor   * s% D_ES(k)   + &
+                        s% ctrl% D_GSF_factor  * s% D_GSF(k)  + &
+                        s% ctrl% D_ST_factor   * s% D_ST(k))
                   end do
                   call pgsci(clr_rotation)
                   call pgslw(lw)
@@ -381,13 +381,13 @@
             
                if (s% pg% Mixing_show_rotation_details) then
 
-                  D_DSI_factor = s% D_DSI_factor
-                  D_SH_factor = s% D_SH_factor
-                  D_SSI_factor = s% D_SSI_factor
-                  D_ES_factor = s% D_ES_factor
-                  D_GSF_factor = s% D_GSF_factor
-                  D_ST_factor = s% D_ST_factor
-                  D_visc_factor = s% D_visc_factor
+                  D_DSI_factor = s% ctrl% D_DSI_factor
+                  D_SH_factor = s% ctrl% D_SH_factor
+                  D_SSI_factor = s% ctrl% D_SSI_factor
+                  D_ES_factor = s% ctrl% D_ES_factor
+                  D_GSF_factor = s% ctrl% D_GSF_factor
+                  D_ST_factor = s% ctrl% D_ST_factor
+                  D_visc_factor = s% ctrl% D_visc_factor
 
                   do k=grid_min, grid_max
                      yvec(k) = safe_log10(D_ST_factor*s% D_ST(k))
@@ -500,11 +500,11 @@
                lw, lw_sav, txt_scale, 'convection')
             cnt = mixing_line_legend(cnt, clr_overshoot, &
                lw, lw_sav, txt_scale, 'overshooting')
-            if (s% alpha_semiconvection > 0) then
+            if (s% ctrl% alpha_semiconvection > 0) then
                cnt = mixing_line_legend(cnt, clr_semiconvection, &
                   lw, lw_sav, txt_scale, 'semiconvection')
             end if
-            if (s% thermohaline_coeff > 0) then
+            if (s% ctrl% thermohaline_coeff > 0) then
                cnt = mixing_line_legend(cnt, clr_thermohaline, &
                   lw, lw_sav, txt_scale, 'thermohaline')
             end if

@@ -48,7 +48,7 @@
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
 
-        select case (s% x_integer_ctrl(1))
+        select case (s% ctrl% x_integer_ctrl(1))
         case(3)
            read(iounit,iostat=ierr) mass_conv_core_y050
         end select
@@ -64,7 +64,7 @@
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
 
-        select case (s% x_integer_ctrl(1))
+        select case (s% ctrl% x_integer_ctrl(1))
         case(3)
            write(iounit) mass_conv_core_y050
         end select
@@ -123,7 +123,7 @@
 
          include 'formats'
 
-         select case (s% x_integer_ctrl(1))
+         select case (s% ctrl% x_integer_ctrl(1))
          case (3) ! inlist_hb_2M
 
             ! put target info in TestHub output
@@ -135,8 +135,8 @@
             write(*,'(A)')
 
             ! get target range from inlist
-            min_mass_conv_core = s% x_ctrl(1)
-            max_mass_conv_core = s% x_ctrl(2)
+            min_mass_conv_core = s% ctrl% x_ctrl(1)
+            max_mass_conv_core = s% ctrl% x_ctrl(2)
 
             ! check if value is outside of the target range
             if ((mass_conv_core_y050 .lt. min_mass_conv_core) .or. (mass_conv_core_y050 .gt. max_mass_conv_core)) then
@@ -232,7 +232,7 @@
          extras_finish_step = keep_going
 
          ! during part 3: CHeB
-         if (s% x_integer_ctrl(1) == 3) then
+         if (s% ctrl% x_integer_ctrl(1) == 3) then
             ! save core mass the first time Yc < 0.5
             if (s% center_he4 .lt. 0.5d0 .and. mass_conv_core_y050 .lt. 0) then
                mass_conv_core_y050 = s% mass_conv_core

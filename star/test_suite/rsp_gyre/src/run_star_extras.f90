@@ -57,7 +57,7 @@ module run_star_extras
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
 
-         if (.not. s% use_other_RSP_linear_analysis) return
+         if (.not. s% ctrl% use_other_RSP_linear_analysis) return
 
          s% other_rsp_linear_analysis => rsp_set_gyre_linear_analysis
 
@@ -140,13 +140,13 @@ module run_star_extras
 
          call gyre_final()
          
-         amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
-         amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
+         amix1 = s% ctrl% x_ctrl(4) ! s% ctrl% RSP_fraction_1st_overtone
+         amix2 = s% ctrl% x_ctrl(5) ! s% ctrl% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
             write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
             call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
          end if
-         velkm = s% x_ctrl(6) ! s% RSP_kick_vsurf_km_per_sec
+         velkm = s% ctrl% x_ctrl(6) ! s% ctrl% RSP_kick_vsurf_km_per_sec
          amixF = 1d0 - (amix1 + amix2)
          
          if (amixF > 0d0 .and. npts(1) /= nz-1) then
@@ -190,7 +190,7 @@ module run_star_extras
             s% xh(s% i_v,k) = s% v(k)
          end do
          
-         s% rsp_period = period(s% RSP_mode_for_setting_PERIODLIN + 1)
+         s% rsp_period = period(s% ctrl% RSP_mode_for_setting_PERIODLIN + 1)
          
          !write(*,*) 'amix1 amix2 amixF velkm v_surf period', amix1, amix2, amixF, velkm, v_surf, s% rsp_period
 

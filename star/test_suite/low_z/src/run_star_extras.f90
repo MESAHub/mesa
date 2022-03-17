@@ -127,7 +127,7 @@
          if(ierr/=0) return
 
          names(1) = 'mixing_length_alpha'
-         vals(1) = s% mixing_length_alpha
+         vals(1) = s% ctrl% mixing_length_alpha
 
       end subroutine data_for_extra_history_header_items
 
@@ -150,7 +150,7 @@
          if(ierr/=0) return
 
          names(1) = 'mixing_length_alpha'
-         vals(1) = s% mixing_length_alpha
+         vals(1) = s% ctrl% mixing_length_alpha
 
       end subroutine data_for_extra_profile_header_items
 

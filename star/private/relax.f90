@@ -145,39 +145,39 @@
 
          adding_mass = (new_mass > s% star_mass)
 
-         cool_wind_AGB_scheme = s% cool_wind_AGB_scheme
-         s% cool_wind_AGB_scheme = ''
+         cool_wind_AGB_scheme = s% ctrl% cool_wind_AGB_scheme
+         s% ctrl% cool_wind_AGB_scheme = ''
 
-         cool_wind_RGB_scheme = s% cool_wind_RGB_scheme
-         s% cool_wind_RGB_scheme = ''
+         cool_wind_RGB_scheme = s% ctrl% cool_wind_RGB_scheme
+         s% ctrl% cool_wind_RGB_scheme = ''
 
-         varcontrol_target = s% varcontrol_target
-         s% varcontrol_target = 1d-3
+         varcontrol_target = s% ctrl% varcontrol_target
+         s% ctrl% varcontrol_target = 1d-3
 
-         eps_mdot_factor = s% eps_mdot_factor
-         s% eps_mdot_factor = 0
+         eps_mdot_factor = s% ctrl% eps_mdot_factor
+         s% ctrl% eps_mdot_factor = 0
 
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          starting_dt_next = s% dt_next
          call do_internal_evolve( &
             id, before_evolve_relax_mass, relax_mass_adjust_model, relax_mass_check_model, &
             null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% dt_next = min(s% dt_next, starting_dt_next) * 1d-1
-         s% initial_mass = new_mass
+         s% ctrl% initial_mass = new_mass
 
-         s% cool_wind_AGB_scheme = cool_wind_AGB_scheme
-         s% cool_wind_RGB_scheme = cool_wind_RGB_scheme
-         s% varcontrol_target = varcontrol_target
-         s% eps_mdot_factor = eps_mdot_factor
+         s% ctrl% cool_wind_AGB_scheme = cool_wind_AGB_scheme
+         s% ctrl% cool_wind_RGB_scheme = cool_wind_RGB_scheme
+         s% ctrl% varcontrol_target = varcontrol_target
+         s% ctrl% eps_mdot_factor = eps_mdot_factor
          s% star_mass = new_mass
          s% mstar = new_mass*Msun
          s% xmstar = s% mstar - s% M_center
 
          call error_check('relax mass',ierr)
 
-         write(*,2) 's% max_model_number', s% max_model_number
+         write(*,2) 's% ctrl% max_model_number', s% ctrl% max_model_number
 
 
       end subroutine do_relax_mass
@@ -191,7 +191,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% mass_change = 0
+         s% ctrl% mass_change = 0
          s% dt_next = min(s% dt_next, 1d4*secyer)
       end subroutine before_evolve_relax_mass
 
@@ -243,9 +243,9 @@
          max_abs_mdot = exp10(lg_max_abs_mdot)*(Msun/secyer)
          old_mass = rpar(3)
 
-         if (s% model_number >= s% max_model_number .and. s% max_model_number > 0) then
-            write(*,3) 's% model_number >= s% max_model_number', &
-               s% model_number, s% max_model_number
+         if (s% model_number >= s% ctrl% max_model_number .and. s% ctrl% max_model_number > 0) then
+            write(*,3) 's% model_number >= s% ctrl% max_model_number', &
+               s% model_number, s% ctrl% max_model_number
             relax_mass_check_model = terminate
             return
          end if
@@ -257,20 +257,20 @@
          end if
 
          if (abs_diff < 1d-4*new_mass .or. abs(mdot) < 1d-50) then
-            s% mass_change = 0
+            s% ctrl% mass_change = 0
             s% star_mass = new_mass
             s% mstar = new_mass*Msun
             s% xmstar = s% mstar - s% M_center
-            s% mass_change = 0
+            s% ctrl% mass_change = 0
             write(*,1) 's% tau_base =', s% tau_base
             write(*,1) 's% tau_factor =', s% tau_factor
-            write(*,1) 'atm_option = ' // trim(s% atm_option)
+            write(*,1) 'atm_option = ' // trim(s% ctrl% atm_option)
             relax_mass_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
          end if
 
-         s% max_timestep = abs(new_mass - s% mstar)/mdot
+         s% ctrl% max_timestep = abs(new_mass - s% mstar)/mdot
 
          if (dbg) then
             write(*,1) 'new_mass/Msun', new_mass/Msun
@@ -285,9 +285,9 @@
 
          if (abs(mdot)*s% dt > 0.05d0*s% mstar) mdot = sign(0.05d0*s% mstar/s% dt,mdot)
 
-         s% mass_change = mdot/(Msun/secyer)
+         s% ctrl% mass_change = mdot/(Msun/secyer)
 
-         if (dbg) write(*,1) 's% mass_change', s% mass_change
+         if (dbg) write(*,1) 's% ctrl% mass_change', s% ctrl% mass_change
 
       end function relax_mass_check_model
 
@@ -341,30 +341,30 @@
          call store_rpar(species, num_pts, ierr)
          if (ierr /= 0) return
 
-         max_model_number = s% max_model_number
-         s% max_model_number = num_steps_to_use + s% model_number + 1
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = num_steps_to_use + s% model_number + 1
          write(*,*) 'relax_composition: num_steps_to_use', num_steps_to_use
 
-         dxdt_nuc_factor = s% dxdt_nuc_factor
-         s% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
-         mix_factor = s% mix_factor
-         s% mix_factor = 0 ! turn off mixing
-         do_element_diffusion = s% do_element_diffusion
-         s% do_element_diffusion = .false. ! turn off diffusion
-         include_composition_in_eps_grav = s% include_composition_in_eps_grav
-         s% include_composition_in_eps_grav = .false. ! don't need energetic effects of artificial changes
+         dxdt_nuc_factor = s% ctrl% dxdt_nuc_factor
+         s% ctrl% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
+         mix_factor = s% ctrl% mix_factor
+         s% ctrl% mix_factor = 0 ! turn off mixing
+         do_element_diffusion = s% ctrl% do_element_diffusion
+         s% ctrl% do_element_diffusion = .false. ! turn off diffusion
+         include_composition_in_eps_grav = s% ctrl% include_composition_in_eps_grav
+         s% ctrl% include_composition_in_eps_grav = .false. ! don't need energetic effects of artificial changes
          starting_dt_next = s% dt_next
          call do_internal_evolve( &
                id, before_evolve_relax_composition, &
                relax_composition_adjust_model, relax_composition_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% dt_next = starting_dt_next
-         s% dxdt_nuc_factor = dxdt_nuc_factor
-         s% mix_factor = mix_factor
-         s% do_element_diffusion = do_element_diffusion
-         s% include_composition_in_eps_grav = include_composition_in_eps_grav
+         s% ctrl% dxdt_nuc_factor = dxdt_nuc_factor
+         s% ctrl% mix_factor = mix_factor
+         s% ctrl% do_element_diffusion = do_element_diffusion
+         s% ctrl% include_composition_in_eps_grav = include_composition_in_eps_grav
          
          call error_check('relax composition',ierr)
 
@@ -568,21 +568,21 @@
 
          call get_xa_for_accretion(s, xa, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*, *) 'get_xa_for_accretion failed in relax_to_xaccrete'
             deallocate(rpar)
             return
          end if
 
-         max_model_number = s% max_model_number
-         s% max_model_number = num_steps_to_use + 1
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = num_steps_to_use + 1
          write(*,*) 'num_steps_to_use', num_steps_to_use
 
-         dxdt_nuc_factor = s% dxdt_nuc_factor
-         s% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
-         mix_factor = s% mix_factor
-         s% mix_factor = 0 ! turn off mixing
-         do_element_diffusion = s% do_element_diffusion
+         dxdt_nuc_factor = s% ctrl% dxdt_nuc_factor
+         s% ctrl% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
+         mix_factor = s% ctrl% mix_factor
+         s% ctrl% mix_factor = 0 ! turn off mixing
+         do_element_diffusion = s% ctrl% do_element_diffusion
          do_element_diffusion = .false. ! turn off diffusion
          starting_dt_next = s% dt_next
 
@@ -591,11 +591,11 @@
                relax_to_xaccrete_adjust_model, relax_to_xaccrete_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% dt_next = starting_dt_next
-         s% dxdt_nuc_factor = dxdt_nuc_factor
-         s% mix_factor = mix_factor
-         s% do_element_diffusion = do_element_diffusion
+         s% ctrl% dxdt_nuc_factor = dxdt_nuc_factor
+         s% ctrl% mix_factor = mix_factor
+         s% ctrl% do_element_diffusion = do_element_diffusion
 
          call error_check('relax to xacrrete',ierr)
 
@@ -658,7 +658,7 @@
             end do
          end do
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,2) 'relax to xaccrete: fraction', s% model_number, frac
 
          if (s% model_number - starting_model_number >= num_steps_to_use) then
@@ -702,12 +702,12 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         max_model_number = s% max_model_number
-         s% max_model_number = max_steps_to_use + s% model_number + 1
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = max_steps_to_use + s% model_number + 1
          write(*,*) 'relax_entropy: max_steps_to_use', max_steps_to_use
 
          ipar(1) = num_pts
-         ipar(2) = s% max_model_number
+         ipar(2) = s% ctrl% max_model_number
          lrpar = 5*num_pts
          allocate(rpar(lrpar), stat=ierr)
          if (ierr /= 0) return
@@ -724,18 +724,18 @@
          relax_num_pts = num_pts
          relax_work_array => rpar
 
-         dxdt_nuc_factor = s% dxdt_nuc_factor
-         s% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
-         mix_factor = s% mix_factor
-         s% mix_factor = 0 ! turn off mixing
-         do_element_diffusion = s% do_element_diffusion
-         s% do_element_diffusion = .false. ! turn off diffusion
+         dxdt_nuc_factor = s% ctrl% dxdt_nuc_factor
+         s% ctrl% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
+         mix_factor = s% ctrl% mix_factor
+         s% ctrl% mix_factor = 0 ! turn off mixing
+         do_element_diffusion = s% ctrl% do_element_diffusion
+         s% ctrl% do_element_diffusion = .false. ! turn off diffusion
          starting_dt_next = s% dt_next
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_years_for_timestep = s% job% max_dt_for_relax_entropy
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_years_for_timestep = s% job% max_dt_for_relax_entropy
          s% dt_next = min(s% dt_next, s% job% max_dt_for_relax_entropy * secyer)
-         use_other_energy = s% use_other_energy
-         s% use_other_energy = .true.
+         use_other_energy = s% ctrl% use_other_energy
+         s% ctrl% use_other_energy = .true.
          other_energy => s% other_energy
          s% other_energy => entropy_relax_other_energy
 
@@ -744,13 +744,13 @@
                relax_entropy_adjust_model, relax_entropy_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% dt_next = starting_dt_next
-         s% dxdt_nuc_factor = dxdt_nuc_factor
-         s% mix_factor = mix_factor
-         s% do_element_diffusion = do_element_diffusion
-         s% max_years_for_timestep = max_years_for_timestep
-         s% use_other_energy = use_other_energy
+         s% ctrl% dxdt_nuc_factor = dxdt_nuc_factor
+         s% ctrl% mix_factor = mix_factor
+         s% ctrl% do_element_diffusion = do_element_diffusion
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% use_other_energy = use_other_energy
          s% other_energy => other_energy
 
          call error_check('relax entropy',ierr)
@@ -839,7 +839,7 @@
          call adjust_entropy(num_pts, avg_err, ierr)
          if (ierr /= 0) relax_entropy_check_model = terminate
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,*) 'relax_entropy avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
          if (s% star_age >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
@@ -952,12 +952,12 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         max_model_number = s% max_model_number
-         s% max_model_number = max_steps_to_use + s% model_number + 1
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = max_steps_to_use + s% model_number + 1
          write(*,*) 'relax_angular_momentum: max_steps_to_use', max_steps_to_use
 
          ipar(1) = num_pts
-         ipar(2) = s% max_model_number
+         ipar(2) = s% ctrl% max_model_number
          lrpar = 5*num_pts
          allocate(rpar(lrpar), stat=ierr)
          if (ierr /= 0) return
@@ -974,20 +974,20 @@
          relax_num_pts = num_pts
          relax_work_array => rpar
 
-         dxdt_nuc_factor = s% dxdt_nuc_factor
-         s% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
-         mix_factor = s% mix_factor
-         s% mix_factor = 0 ! turn off mixing
-         am_D_mix_factor = s% am_D_mix_factor
-         s% am_D_mix_factor = 0d0
-         do_element_diffusion = s% do_element_diffusion
-         s% do_element_diffusion = .false. ! turn off diffusion
+         dxdt_nuc_factor = s% ctrl% dxdt_nuc_factor
+         s% ctrl% dxdt_nuc_factor = 0 ! turn off composition change by nuclear burning
+         mix_factor = s% ctrl% mix_factor
+         s% ctrl% mix_factor = 0 ! turn off mixing
+         am_D_mix_factor = s% ctrl% am_D_mix_factor
+         s% ctrl% am_D_mix_factor = 0d0
+         do_element_diffusion = s% ctrl% do_element_diffusion
+         s% ctrl% do_element_diffusion = .false. ! turn off diffusion
          starting_dt_next = s% dt_next
-         max_timestep = s% max_timestep
-         s% max_timestep = s% job% max_dt_for_relax_angular_momentum * secyer
+         max_timestep = s% ctrl% max_timestep
+         s% ctrl% max_timestep = s% job% max_dt_for_relax_angular_momentum * secyer
          s% dt_next = min(s% dt_next, s% job% max_dt_for_relax_angular_momentum * secyer)
-         use_other_torque = s% use_other_torque
-         s% use_other_torque = .true.
+         use_other_torque = s% ctrl% use_other_torque
+         s% ctrl% use_other_torque = .true.
          other_torque => s% other_torque
          s% other_torque => angular_momentum_relax_other_torque
 
@@ -996,14 +996,14 @@
                relax_angular_momentum_adjust_model, relax_angular_momentum_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% dt_next = starting_dt_next
-         s% dxdt_nuc_factor = dxdt_nuc_factor
-         s% mix_factor = mix_factor
-         s% am_D_mix_factor = am_D_mix_factor
-         s% do_element_diffusion = do_element_diffusion
-         s% max_timestep = max_timestep
-         s% use_other_torque = use_other_torque
+         s% ctrl% dxdt_nuc_factor = dxdt_nuc_factor
+         s% ctrl% mix_factor = mix_factor
+         s% ctrl% am_D_mix_factor = am_D_mix_factor
+         s% ctrl% do_element_diffusion = do_element_diffusion
+         s% ctrl% max_timestep = max_timestep
+         s% ctrl% use_other_torque = use_other_torque
          s% other_torque => other_torque
 
          call error_check('relax angular momentum',ierr)
@@ -1092,7 +1092,7 @@
          call adjust_angular_momentum(num_pts, avg_err, ierr)
          if (ierr /= 0) relax_angular_momentum_check_model = terminate
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,*) 'relax_angular_momentum avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
          if (s% star_age >= &
@@ -1254,16 +1254,16 @@
             return
          end if
 
-         dxdt_nuc_factor = s% dxdt_nuc_factor
-         s% dxdt_nuc_factor = 0d0 ! turn off composition change by nuclear burning
-         mix_factor = s% mix_factor
-         am_D_mix_factor = s% am_D_mix_factor
-         s% mix_factor = 0d0
-         s% am_D_mix_factor = 0d0
-         max_model_number = s% max_model_number
-         s% max_model_number = num_steps_to_relax_rotation + 1
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_years_for_timestep = relax_omega_max_yrs_dt
+         dxdt_nuc_factor = s% ctrl% dxdt_nuc_factor
+         s% ctrl% dxdt_nuc_factor = 0d0 ! turn off composition change by nuclear burning
+         mix_factor = s% ctrl% mix_factor
+         am_D_mix_factor = s% ctrl% am_D_mix_factor
+         s% ctrl% mix_factor = 0d0
+         s% ctrl% am_D_mix_factor = 0d0
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = num_steps_to_relax_rotation + 1
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_years_for_timestep = relax_omega_max_yrs_dt
          write(*,*) 'num_steps_to_relax_rotation', num_steps_to_relax_rotation
 
          call do_internal_evolve( &
@@ -1271,11 +1271,11 @@
                relax_omega_adjust_model, relax_omega_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% dxdt_nuc_factor = dxdt_nuc_factor
-         s% mix_factor = mix_factor
-         s% am_D_mix_factor = am_D_mix_factor
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% dxdt_nuc_factor = dxdt_nuc_factor
+         s% ctrl% mix_factor = mix_factor
+         s% ctrl% am_D_mix_factor = am_D_mix_factor
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
          call error_check('relax uniform omega',ierr)
          s% D_omega(1:s% nz) = 0
          s% am_nu_rot(1:s% nz) = 0
@@ -1348,7 +1348,7 @@
                s% model_number, new_omega-s% omega(1), s% omega(1), new_omega
             relax_omega_check_model = terminate
             s% termination_code = t_relax_finished_okay
-         else if (mod(s% model_number, s% terminal_interval) == 0) then
+         else if (mod(s% model_number, s% ctrl% terminal_interval) == 0) then
             write(*,2) 'relax to omega: wanted-current, current, wanted', &
                s% model_number, new_omega-s% omega(1), s% omega(1), new_omega
          end if
@@ -1400,13 +1400,13 @@
          write(*,'(A)')
          rpar(1) = new_tau_factor
          rpar(2) = dlogtau_factor
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          call do_internal_evolve( &
                id, before_evolve_relax_tau_factor, &
                relax_tau_factor_adjust_model, relax_tau_factor_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          if (ierr == 0) s% force_tau_factor = s% tau_factor
          call error_check('relax tau factor',ierr)
       end subroutine do_relax_tau_factor
@@ -1420,7 +1420,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call turn_off_winds(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
       end subroutine before_evolve_relax_tau_factor
 
       integer function relax_tau_factor_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -1449,7 +1449,7 @@
          dlogtau_factor = rpar(2)
          current_tau_factor = s% tau_factor
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,1) 'tau_factor target current', new_tau_factor, current_tau_factor
 
          if (abs(current_tau_factor-new_tau_factor) < 1d-15) then
@@ -1470,7 +1470,7 @@
          if (dbg) write(*,1) 'next', next, log10(next)
 
          s% tau_factor = next
-         s% max_timestep = secyer*s% time_step
+         s% ctrl% max_timestep = secyer*s% time_step
 
       end function relax_tau_factor_check_model
 
@@ -1498,9 +1498,9 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         opacity_factor = s% opacity_factor
+         opacity_factor = s% ctrl% opacity_factor
          if (abs(new_opacity_factor - opacity_factor) <= 1d-6) then
-            s% opacity_factor = new_opacity_factor
+            s% ctrl% opacity_factor = new_opacity_factor
             return
          end if
          write(*,'(A)')
@@ -1511,14 +1511,14 @@
          write(*,'(A)')
          rpar(1) = new_opacity_factor
          rpar(2) = dopacity_factor
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          call do_internal_evolve( &
                id, before_evolve_relax_opacity_factor, &
                relax_opacity_factor_adjust_model, relax_opacity_factor_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
-         if (ierr == 0) s% force_opacity_factor = s% opacity_factor
+         s% ctrl% max_model_number = max_model_number
+         if (ierr == 0) s% force_opacity_factor = s% ctrl% opacity_factor
          call error_check('relax opacity factor',ierr)
       end subroutine do_relax_opacity_factor
 
@@ -1531,7 +1531,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call turn_off_winds(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
       end subroutine before_evolve_relax_opacity_factor
 
       integer function relax_opacity_factor_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -1558,7 +1558,7 @@
 
          new_opacity_factor = rpar(1)
          dopacity_factor = rpar(2)
-         current_opacity_factor = s% opacity_factor
+         current_opacity_factor = s% ctrl% opacity_factor
 
          if (dbg) then
             write(*,1) 'new_opacity_factor', new_opacity_factor
@@ -1566,7 +1566,7 @@
          end if
 
          if (abs(current_opacity_factor-new_opacity_factor) < 1d-15) then
-            s% opacity_factor = new_opacity_factor
+            s% ctrl% opacity_factor = new_opacity_factor
             s% termination_code = t_relax_finished_okay
             relax_opacity_factor_check_model = terminate
             return
@@ -1580,11 +1580,11 @@
             if (next > new_opacity_factor) next = new_opacity_factor
          end if
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,1) 'next opacity_factor', next ! provide terminal feedback to show working.
 
-         s% opacity_factor = next
-         s% max_timestep = secyer*s% time_step
+         s% ctrl% opacity_factor = next
+         s% ctrl% max_timestep = secyer*s% time_step
 
       end function relax_opacity_factor_check_model
 
@@ -1612,9 +1612,9 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         Tsurf_factor = s% Tsurf_factor
+         Tsurf_factor = s% ctrl% Tsurf_factor
          if (abs(new_Tsurf_factor - Tsurf_factor) <= 1d-6) then
-            s% Tsurf_factor = new_Tsurf_factor
+            s% ctrl% Tsurf_factor = new_Tsurf_factor
             return
          end if
          write(*,'(A)')
@@ -1625,13 +1625,13 @@
          write(*,'(A)')
          rpar(1) = new_Tsurf_factor
          rpar(2) = dlogTsurf_factor
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          call do_internal_evolve( &
                id, before_evolve_relax_Tsurf_factor, &
                relax_Tsurf_factor_adjust_model, relax_Tsurf_factor_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          if (ierr /= 0) then
             write(*,'(A)')
             write(*,1) 'ERROR: failed doing relax Tsurf_factor', new_Tsurf_factor
@@ -1642,7 +1642,7 @@
          if (new_Tsurf_factor == 1d0) then
             s% force_Tsurf_factor = 0d0
          else
-            s% force_Tsurf_factor = s% Tsurf_factor
+            s% force_Tsurf_factor = s% ctrl% Tsurf_factor
          end if
          
          call error_check('relax tsurf factor',ierr)
@@ -1658,7 +1658,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call turn_off_winds(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
       end subroutine before_evolve_relax_Tsurf_factor
 
       integer function relax_Tsurf_factor_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -1685,13 +1685,13 @@
 
          new_Tsurf_factor = rpar(1)
          dlogTsurf_factor = rpar(2)
-         current_Tsurf_factor = s% Tsurf_factor
+         current_Tsurf_factor = s% ctrl% Tsurf_factor
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,1) 'Tsurf_factor target current', new_Tsurf_factor, current_Tsurf_factor
 
          if (abs(current_Tsurf_factor-new_Tsurf_factor) < 1d-15) then
-            s% Tsurf_factor = new_Tsurf_factor
+            s% ctrl% Tsurf_factor = new_Tsurf_factor
             s% termination_code = t_relax_finished_okay
             relax_Tsurf_factor_check_model = terminate
             return
@@ -1707,8 +1707,8 @@
 
          if (dbg) write(*,1) 'next Tsurf_factor', next, log10(next)
 
-         s% Tsurf_factor = next
-         s% max_timestep = secyer*s% time_step
+         s% ctrl% Tsurf_factor = next
+         s% ctrl% max_timestep = secyer*s% time_step
 
       end function relax_Tsurf_factor_check_model
 
@@ -1741,8 +1741,8 @@
 
          rpar(1) = new_irrad_flux
          rpar(2) = new_irrad_col_depth
-         rpar(3) = s% irradiation_flux
-         rpar(4) = s% column_depth_for_irradiation
+         rpar(3) = s% ctrl% irradiation_flux
+         rpar(4) = s% ctrl% column_depth_for_irradiation
 
          all_same = .true.
          do i = 1, 2
@@ -1756,16 +1756,16 @@
          write(*,2) 'relax to new irradiation -- min steps', min_steps
          write(*,'(A)')
 
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_years_for_timestep = relax_irradiation_max_yrs_dt
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_years_for_timestep = relax_irradiation_max_yrs_dt
          call do_internal_evolve( &
                id, before_evolve_relax_irradiation, &
                relax_irradiation_adjust_model, relax_irradiation_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
          call error_check('relax irradiation',ierr)
       end subroutine do_relax_irradiation
 
@@ -1778,7 +1778,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call turn_off_winds(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
       end subroutine before_evolve_relax_irradiation
 
       integer function relax_irradiation_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -1816,32 +1816,32 @@
          num_steps = s% model_number - adjust_model
          frac = dble(num_steps)/dble(max_num_steps)
 
-         if (s% dt < s% max_years_for_timestep*secyer) then
+         if (s% dt < s% ctrl% max_years_for_timestep*secyer) then
             ipar(1) = adjust_model + 1
             write(*,'(a60,2i6,3x,99e12.3)') 'relax irradiation, model, step, frac, flux, wait for dt', &
-               s% model_number, num_steps, frac, s% irradiation_flux
+               s% model_number, num_steps, frac, s% ctrl% irradiation_flux
             return
          end if
 
          if (frac >= 1d0) then
-            s% irradiation_flux = new_irrad_flux
-            s% column_depth_for_irradiation = new_irrad_col_depth
+            s% ctrl% irradiation_flux = new_irrad_flux
+            s% ctrl% column_depth_for_irradiation = new_irrad_col_depth
             relax_irradiation_check_model = terminate
             s% termination_code = t_relax_finished_okay
             write(*,'(a60,2i6,3x,99e12.3)') &
                'DONE: relax irradiation, model, step, fraction done, flux', &
-               s% model_number, num_steps, frac, s% irradiation_flux
+               s% model_number, num_steps, frac, s% ctrl% irradiation_flux
             return
          end if
 
-         s% irradiation_flux = &
+         s% ctrl% irradiation_flux = &
             frac*new_irrad_flux + (1-frac)*old_irrad_flux
-         s% column_depth_for_irradiation = &
+         s% ctrl% column_depth_for_irradiation = &
             frac*new_irrad_col_depth + (1-frac)*old_irrad_col_depth
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,'(a60,2i6,3x,99e12.3)') 'relax irradiation, model, step, fraction done, flux', &
-               s% model_number, num_steps, frac, s% irradiation_flux
+               s% model_number, num_steps, frac, s% ctrl% irradiation_flux
 
       end function relax_irradiation_check_model
 
@@ -1883,20 +1883,20 @@
             min_steps, initial_mass_change, final_mass_change, relax_mass_change_max_yrs_dt
          write(*,'(A)')
 
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_years_for_timestep = relax_mass_change_max_yrs_dt
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_years_for_timestep = relax_mass_change_max_yrs_dt
 
          call do_internal_evolve( &
                id, before_evolve_relax_mass_change, &
                relax_mass_change_adjust_model, relax_mass_change_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
 
-         if (ierr == 0) s% mass_change = final_mass_change
+         if (ierr == 0) s% ctrl% mass_change = final_mass_change
 
          call error_check('relax mass change',ierr)
 
@@ -1911,7 +1911,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call turn_off_winds(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
       end subroutine before_evolve_relax_mass_change
 
       integer function relax_mass_change_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -1946,7 +1946,7 @@
          final_mass_change = rpar(2)
          frac = dble(num_steps)/dble(max_num_steps)
 
-         if (s% dt < s% max_years_for_timestep*secyer) then
+         if (s% dt < s% ctrl% max_years_for_timestep*secyer) then
             ipar(1) = adjust_model + 1 ! don't count this one
             write(*,'(a60,2i6,3x,99e12.3)') 'relax_mass_change wait for dt: model, step, frac', &
                s% model_number, num_steps, frac
@@ -1954,18 +1954,18 @@
          end if
 
          if (frac >= 1d0) then
-            s% mass_change = final_mass_change
+            s% ctrl% mass_change = final_mass_change
             relax_mass_change_check_model = terminate
             s% termination_code = t_relax_finished_okay
             write(*,'(a60,2i6,3x,99e12.3)') 'DONE: relax_mass_change'
             return
          end if
 
-         s% mass_change = frac*final_mass_change + (1-frac)*init_mass_change
+         s% ctrl% mass_change = frac*final_mass_change + (1-frac)*init_mass_change
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,'(a60,2i6,3x,99e12.3)') 'relax_mass_change, model, step, fraction done, mass_change', &
-               s% model_number, num_steps, frac, s% mass_change
+               s% model_number, num_steps, frac, s% ctrl% mass_change
 
       end function relax_mass_change_check_model
 
@@ -2020,16 +2020,16 @@
          rpar(3) = relax_core_years_for_dt
          rpar(4) = core_avg_rho
          rpar(5) = core_avg_eps
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_years_for_timestep = relax_core_years_for_dt
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_years_for_timestep = relax_core_years_for_dt
          call do_internal_evolve( &
                id, before_evolve_relax_core, relax_core_adjust_model, &
                relax_core_check_model, null_finish_model,  &
                .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
          call error_check('relax core',ierr)
       end subroutine do_relax_core
 
@@ -2043,7 +2043,7 @@
          real(dp) :: relax_core_years_for_dt
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          relax_core_years_for_dt = rpar(3)
          s% dt_next = secyer*relax_core_years_for_dt
       end subroutine before_evolve_relax_core
@@ -2093,7 +2093,7 @@
             return
          end if
 
-         if (mod(s% model_number, s% terminal_interval) == 0) then
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) then
             write(*,1) 'current & target core masses', &
                current_core_mass, new_core_mass, &
                (new_core_mass - current_core_mass)/new_core_mass
@@ -2103,8 +2103,8 @@
 
          if (s% dt < relax_core_dt*0.9d0) then
             write(*,1) 's% dt < relax_core_dt*0.9d0', s% dt, relax_core_dt*0.9d0
-            write(*,1) 's% max_timestep', s% max_timestep
-            write(*,1) 's% max_years_for_timestep*secyer', s% max_years_for_timestep*secyer
+            write(*,1) 's% ctrl% max_timestep', s% ctrl% max_timestep
+            write(*,1) 's% ctrl% max_years_for_timestep*secyer', s% ctrl% max_years_for_timestep*secyer
             write(*,'(A)')
             return ! give a chance to stabilize
          end if
@@ -2206,27 +2206,27 @@
          rpar(1) = new_mass
          rpar(2) = dlgm_per_step
          rpar(3) = change_mass_years_for_dt
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
 
          adding_mass = (new_mass > s% star_mass)
 
-         eps_mdot_factor = s% eps_mdot_factor
-         s% eps_mdot_factor = 0
+         eps_mdot_factor = s% ctrl% eps_mdot_factor
+         s% ctrl% eps_mdot_factor = 0
 
-         max_years_for_timestep = s% max_years_for_timestep
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
          relax_mass_scale_dt = secyer*change_mass_years_for_dt
-         s% max_years_for_timestep = relax_mass_scale_dt/secyer
+         s% ctrl% max_years_for_timestep = relax_mass_scale_dt/secyer
          call do_internal_evolve( &
                id, before_evolve_relax_mass_scale, &
                relax_mass_scale_adjust_model, relax_mass_scale_check_model, null_finish_model, &
                .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% star_mass = new_mass
          s% mstar = new_mass*Msun
          s% xmstar = s% mstar - s% M_center
-         s% eps_mdot_factor = eps_mdot_factor
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% eps_mdot_factor = eps_mdot_factor
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
 
          call error_check('relax mass scale',ierr)
       end subroutine do_relax_mass_scale
@@ -2241,7 +2241,7 @@
          real(dp) :: change_mass_years_for_dt
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          change_mass_years_for_dt = rpar(3)
          s% dt_next = secyer*change_mass_years_for_dt
       end subroutine before_evolve_relax_mass_scale
@@ -2348,17 +2348,17 @@
          rpar(1) = new_mass
          rpar(2) = dlgm_per_step
          rpar(3) = relax_M_center_dt
-         max_model_number = s% max_model_number
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_model_number = -1111
-         s% max_years_for_timestep = relax_M_center_dt/secyer
+         max_model_number = s% ctrl% max_model_number
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_model_number = -1111
+         s% ctrl% max_years_for_timestep = relax_M_center_dt/secyer
          call do_internal_evolve( &
                id, before_evolve_relax_M_center, &
                relax_M_center_adjust_model, relax_M_center_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
          call error_check('relax M center',ierr)
       end subroutine do_relax_M_center
 
@@ -2371,7 +2371,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next =  rpar(3) ! relax_M_center_dt
       end subroutine before_evolve_relax_M_center
 
@@ -2403,7 +2403,7 @@
          dlgm_per_step = rpar(2)
          relax_M_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% M_center>0.0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0 .and. s% M_center>0.0) &
             write(*,1) 'relax_M_center target/current', new_mass/(s% M_center/Msun)
          
          end_now=.false.
@@ -2497,17 +2497,17 @@
          rpar(1) = new_R_center
          rpar(2) = dlgR_per_step
          rpar(3) = relax_R_center_dt
-         max_model_number = s% max_model_number
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_model_number = -1111
-         s% max_years_for_timestep = relax_R_center_dt/secyer
+         max_model_number = s% ctrl% max_model_number
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_model_number = -1111
+         s% ctrl% max_years_for_timestep = relax_R_center_dt/secyer
          call do_internal_evolve( &
                id, before_evolve_relax_R_center, &
                relax_R_center_adjust_model, relax_R_center_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
          call error_check('relax R center',ierr)
       end subroutine do_relax_R_center
 
@@ -2520,7 +2520,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next =  rpar(3) ! relax_R_center_dt
       end subroutine before_evolve_relax_R_center
 
@@ -2551,7 +2551,7 @@
          dlgR_per_step = rpar(2)
          relax_R_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% R_center > 0d0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0 .and. s% R_center > 0d0) &
             write(*,1) 'relax_R_center target/current', new_R_center/s% R_center
 
          if (abs(s% R_center - new_R_center) < 1d-15) then
@@ -2647,17 +2647,17 @@
          rpar(1) = new_v_center
          rpar(2) = dv_per_step
          rpar(3) = relax_v_center_dt
-         max_model_number = s% max_model_number
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_model_number = -1111
-         s% max_years_for_timestep = relax_v_center_dt/secyer
+         max_model_number = s% ctrl% max_model_number
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_model_number = -1111
+         s% ctrl% max_years_for_timestep = relax_v_center_dt/secyer
          call do_internal_evolve( &
                id, before_evolve_relax_v_center, &
                relax_v_center_adjust_model, relax_v_center_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
          call error_check('relax V center',ierr)
       end subroutine do_relax_v_center
 
@@ -2670,7 +2670,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next =  rpar(3) ! relax_v_center_dt
       end subroutine before_evolve_relax_v_center
 
@@ -2701,7 +2701,7 @@
          dv_per_step = rpar(2)
          relax_v_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,1) 'target v_center current', new_v_center, s% v_center
 
          if (abs(s% v_center - new_v_center) < &
@@ -2761,17 +2761,17 @@
          rpar(1) = new_L_center
          rpar(2) = dlgL_per_step*(new_L_center - s% L_center)
          rpar(3) = relax_L_center_dt
-         max_model_number = s% max_model_number
-         max_years_for_timestep = s% max_years_for_timestep
-         s% max_model_number = -1111
-         s% max_years_for_timestep = relax_L_center_dt/secyer
+         max_model_number = s% ctrl% max_model_number
+         max_years_for_timestep = s% ctrl% max_years_for_timestep
+         s% ctrl% max_model_number = -1111
+         s% ctrl% max_years_for_timestep = relax_L_center_dt/secyer
          call do_internal_evolve( &
                id, before_evolve_relax_L_center, &
                relax_L_center_adjust_model, relax_L_center_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
 
-         s% max_model_number = max_model_number
-         s% max_years_for_timestep = max_years_for_timestep
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_years_for_timestep = max_years_for_timestep
          call error_check('relax L center',ierr)
       end subroutine do_relax_L_center
 
@@ -2784,7 +2784,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next =  rpar(3) ! relax_L_center_dt
       end subroutine before_evolve_relax_L_center
 
@@ -2816,7 +2816,7 @@
          relax_L_center_dt = rpar(3)
 
 
-         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% L_center>0.d0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0 .and. s% L_center>0.d0) &
             write(*,1) 'relax_L_center target/current', new_L_center/s% L_center
 
          if (abs(new_L_center - s% L_center) < abs(dL)) then
@@ -2890,26 +2890,26 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (abs(new_value - s% dxdt_nuc_factor) <= 1d-6) then
-            s% dxdt_nuc_factor = new_value
+         if (abs(new_value - s% ctrl% dxdt_nuc_factor) <= 1d-6) then
+            s% ctrl% dxdt_nuc_factor = new_value
             return
          end if
          write(*,'(A)')
-         write(*,1) 'current dxdt_nuc_factor', s% dxdt_nuc_factor
+         write(*,1) 'current dxdt_nuc_factor', s% ctrl% dxdt_nuc_factor
          write(*,1) 'relax to new_value', new_value
          write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
          write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          call do_internal_evolve( &
                id, before_evolve_relax_dxdt_nuc_factor, &
                relax_dxdt_nuc_factor_adjust_model, relax_dxdt_nuc_factor_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
-         s% dxdt_nuc_factor = new_value
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% dxdt_nuc_factor = new_value
          call error_check('relax dxdt nuc factor',ierr)
       end subroutine do_relax_dxdt_nuc_factor
 
@@ -2922,7 +2922,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call turn_off_winds(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next = secyer*1d-3
       end subroutine before_evolve_relax_dxdt_nuc_factor
 
@@ -2952,14 +2952,14 @@
          new_value = rpar(1)
          per_step_multiplier = rpar(2)
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
-            write(*,1) 'new_value current', new_value, s% dxdt_nuc_factor
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
+            write(*,1) 'new_value current', new_value, s% ctrl% dxdt_nuc_factor
 
-         s% dxdt_nuc_factor = s% dxdt_nuc_factor * per_step_multiplier
+         s% ctrl% dxdt_nuc_factor = s% ctrl% dxdt_nuc_factor * per_step_multiplier
 
-         if ((per_step_multiplier < 1 .and. s% dxdt_nuc_factor < new_value) .or. &
-             (per_step_multiplier > 1 .and. s% dxdt_nuc_factor > new_value)) then
-            s% dxdt_nuc_factor = new_value
+         if ((per_step_multiplier < 1 .and. s% ctrl% dxdt_nuc_factor < new_value) .or. &
+             (per_step_multiplier > 1 .and. s% ctrl% dxdt_nuc_factor > new_value)) then
+            s% ctrl% dxdt_nuc_factor = new_value
             relax_dxdt_nuc_factor_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
@@ -2995,26 +2995,26 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (abs(new_value - s% eps_nuc_factor) <= 1d-6) then
-            s% eps_nuc_factor = new_value
+         if (abs(new_value - s% ctrl% eps_nuc_factor) <= 1d-6) then
+            s% ctrl% eps_nuc_factor = new_value
             return
          end if
          write(*,'(A)')
-         write(*,1) 'current eps_nuc_factor', s% eps_nuc_factor
+         write(*,1) 'current eps_nuc_factor', s% ctrl% eps_nuc_factor
          write(*,1) 'relax to new_value', new_value
          write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
          write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          call do_internal_evolve( &
                id, before_evolve_relax_eps_nuc_factor, &
                relax_eps_nuc_factor_adjust_model, relax_eps_nuc_factor_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
-         s% eps_nuc_factor = new_value
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% eps_nuc_factor = new_value
          call error_check('relax eps nuc factor',ierr)
       end subroutine do_relax_eps_nuc_factor
 
@@ -3027,7 +3027,7 @@
          integer, intent(out) :: ierr
          ierr = 0
          call turn_off_winds(s)
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next = secyer*1d-3
       end subroutine before_evolve_relax_eps_nuc_factor
 
@@ -3057,14 +3057,14 @@
          new_value = rpar(1)
          per_step_multiplier = rpar(2)
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
-            write(*,1) 'new_value, current', new_value, s% eps_nuc_factor
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
+            write(*,1) 'new_value, current', new_value, s% ctrl% eps_nuc_factor
 
-         s% eps_nuc_factor = s% eps_nuc_factor * per_step_multiplier
+         s% ctrl% eps_nuc_factor = s% ctrl% eps_nuc_factor * per_step_multiplier
 
-         if ((per_step_multiplier < 1 .and. s% eps_nuc_factor < new_value) .or. &
-             (per_step_multiplier > 1 .and. s% eps_nuc_factor > new_value)) then
-            s% eps_nuc_factor = new_value
+         if ((per_step_multiplier < 1 .and. s% ctrl% eps_nuc_factor < new_value) .or. &
+             (per_step_multiplier > 1 .and. s% ctrl% eps_nuc_factor > new_value)) then
+            s% ctrl% eps_nuc_factor = new_value
             relax_eps_nuc_factor_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
@@ -3100,32 +3100,32 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% opacity_max <= 0) then
+         if (s% ctrl% opacity_max <= 0) then
             ierr = -1
-            write(*,*) 'invalid opacity_max', s% opacity_max
+            write(*,*) 'invalid opacity_max', s% ctrl% opacity_max
             return
          end if
-         if (abs(new_value - s% opacity_max) <= 1d-6) then
-            s% opacity_max = new_value
+         if (abs(new_value - s% ctrl% opacity_max) <= 1d-6) then
+            s% ctrl% opacity_max = new_value
             return
          end if
          write(*,'(A)')
-         write(*,1) 'current opacity_max', s% opacity_max
+         write(*,1) 'current opacity_max', s% ctrl% opacity_max
          write(*,1) 'relax to new_value', new_value
          write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
          write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          call do_internal_evolve( &
                id, before_evolve_relax_opacity_max, &
                relax_opacity_max_adjust_model, relax_opacity_max_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
          
-         s% max_model_number = max_model_number
-         s% opacity_max = new_value
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% opacity_max = new_value
          s% dt_next = rpar(1) ! keep dt from relax
          call error_check('relax opacity max',ierr)
       end subroutine do_relax_opacity_max
@@ -3138,7 +3138,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          ierr = 0
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next = secyer*1d-3
          call turn_off_winds(s)
       end subroutine before_evolve_relax_opacity_max
@@ -3168,14 +3168,14 @@
          new_value = rpar(1)
          per_step_multiplier = rpar(2)
 
-         s% opacity_max = s% opacity_max * per_step_multiplier
+         s% ctrl% opacity_max = s% ctrl% opacity_max * per_step_multiplier
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
-            write(*,1) 'relax opacity', s% opacity_max, new_value
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
+            write(*,1) 'relax opacity', s% ctrl% opacity_max, new_value
 
-         if ((per_step_multiplier < 1 .and. s% opacity_max < new_value) .or. &
-             (per_step_multiplier > 1 .and. s% opacity_max > new_value)) then
-            s% opacity_max = new_value
+         if ((per_step_multiplier < 1 .and. s% ctrl% opacity_max < new_value) .or. &
+             (per_step_multiplier > 1 .and. s% ctrl% opacity_max > new_value)) then
+            s% ctrl% opacity_max = new_value
             relax_opacity_max_check_model = terminate
             s% termination_code = t_relax_finished_okay
             rpar(1) = s% dt
@@ -3212,32 +3212,32 @@
          end if
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% max_surface_cell_dq <= 0) then
+         if (s% ctrl% max_surface_cell_dq <= 0) then
             ierr = -1
-            write(*,*) 'invalid max_surf_dq', s% max_surface_cell_dq
+            write(*,*) 'invalid max_surf_dq', s% ctrl% max_surface_cell_dq
             return
          end if
-         if (abs(new_value - s% max_surface_cell_dq) <= &
-               1d-6*min(new_value,s% max_surface_cell_dq)) then
-            s% max_surface_cell_dq = new_value
+         if (abs(new_value - s% ctrl% max_surface_cell_dq) <= &
+               1d-6*min(new_value,s% ctrl% max_surface_cell_dq)) then
+            s% ctrl% max_surface_cell_dq = new_value
             return
          end if
          write(*,'(A)')
-         write(*,1) 'current max_surf_dq', s% max_surface_cell_dq
+         write(*,1) 'current max_surf_dq', s% ctrl% max_surface_cell_dq
          write(*,1) 'relax to new_value', new_value
          write(*,'(A)')
          write(*,1) 'per_step_multiplier', per_step_multiplier
          write(*,'(A)')
          rpar(1) = new_value
          rpar(2) = per_step_multiplier
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
          call do_internal_evolve( &
                id, before_evolve_relax_max_surf_dq, &
                relax_max_surf_dq_adjust_model, relax_max_surf_dq_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
-         s% max_surface_cell_dq = new_value
+         s% ctrl% max_model_number = max_model_number
+         s% ctrl% max_surface_cell_dq = new_value
          s% dt_next = rpar(1) ! keep dt from relax
          call error_check('relax max surf dq',ierr)
       end subroutine do_relax_max_surf_dq
@@ -3250,7 +3250,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          ierr = 0
-         s% max_model_number = -111
+         s% ctrl% max_model_number = -111
          s% dt_next = secyer*1d-3
          call turn_off_winds(s)
       end subroutine before_evolve_relax_max_surf_dq
@@ -3280,14 +3280,14 @@
          new_value = rpar(1)
          per_step_multiplier = rpar(2)
 
-         s% max_surface_cell_dq = s% max_surface_cell_dq * per_step_multiplier
+         s% ctrl% max_surface_cell_dq = s% ctrl% max_surface_cell_dq * per_step_multiplier
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
-           write(*,1) 'relax max_surface_cell_dq', s% max_surface_cell_dq, new_value
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
+           write(*,1) 'relax max_surface_cell_dq', s% ctrl% max_surface_cell_dq, new_value
 
-         if ((per_step_multiplier < 1 .and. s% max_surface_cell_dq < new_value) .or. &
-             (per_step_multiplier > 1 .and. s% max_surface_cell_dq > new_value)) then
-            s% max_surface_cell_dq = new_value
+         if ((per_step_multiplier < 1 .and. s% ctrl% max_surface_cell_dq < new_value) .or. &
+             (per_step_multiplier > 1 .and. s% ctrl% max_surface_cell_dq > new_value)) then
+            s% ctrl% max_surface_cell_dq = new_value
             relax_max_surf_dq_check_model = terminate
             s% termination_code = t_relax_finished_okay
             rpar(1) = s% dt
@@ -3330,22 +3330,22 @@
          else
             rpar(1) = max_timestep
          end if
-         max_model_number = s% max_model_number
+         max_model_number = s% ctrl% max_model_number
          model_number = s% model_number
-         save_max_timestep = s% max_timestep
-         save_max_years_for_timestep = s% max_years_for_timestep
-         save_use_gradT = s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
-         s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+         save_max_timestep = s% ctrl% max_timestep
+         save_max_years_for_timestep = s% ctrl% max_years_for_timestep
+         save_use_gradT = s% ctrl% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+         s% ctrl% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
          s% model_number = 0
          call do_internal_evolve( &
                id, before_evolve_relax_num_steps, &
                relax_num_steps_adjust_model, relax_num_steps_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% model_number = model_number
-         s% max_timestep = save_max_timestep
-         s% max_years_for_timestep = save_max_years_for_timestep
-         s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = save_use_gradT
+         s% ctrl% max_timestep = save_max_timestep
+         s% ctrl% max_years_for_timestep = save_max_years_for_timestep
+         s% ctrl% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = save_use_gradT
          call error_check('relax num steps',ierr)
 
       end subroutine do_relax_num_steps
@@ -3359,10 +3359,10 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% max_timestep = rpar(1)
-         s% max_years_for_timestep = s% max_timestep/secyer
-         s% dt_next = s% max_timestep
-         s% max_model_number = ipar(1)
+         s% ctrl% max_timestep = rpar(1)
+         s% ctrl% max_years_for_timestep = s% ctrl% max_timestep/secyer
+         s% dt_next = s% ctrl% max_timestep
+         s% ctrl% max_model_number = ipar(1)
       end subroutine before_evolve_relax_num_steps
 
       integer function relax_num_steps_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -3435,19 +3435,19 @@
             rpar(1) = max_timestep
          end if
          rpar(2) = 1d99 ! min_conv_mx1_bot
-         max_model_number = s% max_model_number
+         max_model_number = s% ctrl% max_model_number
          model_number = s% model_number
-         save_max_timestep = s% max_timestep
-         save_max_years_for_timestep = s% max_years_for_timestep
+         save_max_timestep = s% ctrl% max_timestep
+         save_max_years_for_timestep = s% ctrl% max_years_for_timestep
          s% model_number = 0
          call do_internal_evolve( &
                id, before_evolve_relax_to_radiative_core, &
                relax_to_radiative_core_adjust_model, relax_to_radiative_core_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          s% model_number = model_number
-         s% max_timestep = save_max_timestep
-         s% max_years_for_timestep = save_max_years_for_timestep
+         s% ctrl% max_timestep = save_max_timestep
+         s% ctrl% max_years_for_timestep = save_max_years_for_timestep
          call error_check('relax_to_radiative_core',ierr)
 
       end subroutine do_relax_to_radiative_core
@@ -3460,9 +3460,9 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         !s% max_timestep = rpar(1)
-         !s% max_years_for_timestep = s% max_timestep/secyer
-         !s% dt_next = s% max_timestep
+         !s% ctrl% max_timestep = rpar(1)
+         !s% ctrl% max_years_for_timestep = s% ctrl% max_timestep/secyer
+         !s% dt_next = s% ctrl% max_timestep
       end subroutine before_evolve_relax_to_radiative_core
 
       integer function relax_to_radiative_core_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -3504,10 +3504,10 @@
                write(*,2) 'finished relax to begin radiative core', s% model_number, s% conv_mx1_bot
                relax_to_radiative_core_check_model = terminate
                s% termination_code = t_relax_finished_okay
-            else if (mod(s% model_number, s% terminal_interval) == 0) then
+            else if (mod(s% model_number, s% ctrl% terminal_interval) == 0) then
                write(*,2) 'relative mass of radiative core still tiny', s% model_number, s% conv_mx1_bot
             end if
-         else if (mod(s% model_number, s% terminal_interval) == 0) then
+         else if (mod(s% model_number, s% ctrl% terminal_interval) == 0) then
             write(*,2) 'waiting for fully convective core to develop', s% model_number, s% conv_mx1_bot
          end if
       end function relax_to_radiative_core_check_model
@@ -3559,14 +3559,14 @@
          rpar(3) = abs(dlnz)
          rpar(4) = minq
          rpar(5) = maxq
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
-         s% initial_z = z
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
+         s% ctrl% initial_z = z
          call do_internal_evolve( &
                id, before_evolve_relax_Z, &
                relax_Z_adjust_model, relax_Z_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          call error_check('relax Z',ierr)
       end subroutine do_relax_Z
 
@@ -3579,9 +3579,9 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
-         s% max_timestep = secyer
-         s% dt_next = s% max_timestep
+         s% ctrl% max_model_number = -111
+         s% ctrl% max_timestep = secyer
+         s% dt_next = s% ctrl% max_timestep
       end subroutine before_evolve_relax_Z
 
       integer function relax_Z_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -3625,7 +3625,7 @@
          current_z = eval_current_z(s, klo, khi, ierr)
          if (ierr /= 0) return
 
-         if (mod(s% model_number, s% terminal_interval) == 0) &
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
             write(*,1) 'new_z, current', new_z, current_z
 
          if (abs(current_z-new_z) <= 1d-6*new_z) then
@@ -3667,7 +3667,7 @@
          ierr = 0
          call set_z(s, next_z, klo, khi, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) write(*, *) 'relax_Z_check_model ierr', ierr
+            if (s% ctrl% report_ierr) write(*, *) 'relax_Z_check_model ierr', ierr
             relax_Z_check_model = terminate
             s% result_reason = nonzero_ierr
             return
@@ -3675,8 +3675,8 @@
 
          write(*,1) 'relax Z, z diff, new, current', new_z - current_z, new_z, current_z
 
-         if (klo == 1 .and. khi == s% nz) s% initial_z = next_z
-         s% max_timestep = secyer*s% time_step
+         if (klo == 1 .and. khi == s% nz) s% ctrl% initial_z = next_z
+         s% ctrl% max_timestep = secyer*s% time_step
 
       end function relax_Z_check_model
 
@@ -3728,14 +3728,14 @@
          rpar(2) = abs(dY)
          rpar(3) = minq
          rpar(4) = maxq
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
-         s% initial_y = y
+         max_model_number = s% ctrl% max_model_number
+         s% ctrl% max_model_number = -1111
+         s% ctrl% initial_y = y
          call do_internal_evolve( &
                id, before_evolve_relax_Y, &
                relax_Y_adjust_model, relax_Y_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
+         s% ctrl% max_model_number = max_model_number
          call error_check('relax Y',ierr)
       end subroutine do_relax_Y
 
@@ -3748,9 +3748,9 @@
          integer, intent(out) :: ierr
          ierr = 0
          call setup_before_relax(s)
-         s% max_model_number = -111
-         s% max_timestep = secyer
-         s% dt_next = s% max_timestep
+         s% ctrl% max_model_number = -111
+         s% ctrl% max_timestep = secyer
+         s% dt_next = s% ctrl% max_timestep
       end subroutine before_evolve_relax_Y
 
       integer function relax_Y_adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -3800,7 +3800,7 @@
          end if
          if (ierr /= 0) return
 
-         if (mod(s% model_number, s% terminal_interval) == 0) then
+         if (mod(s% model_number, s% ctrl% terminal_interval) == 0) then
             write(*,1) 'new_y', new_y
             write(*,1) 'dy', dy
             write(*,1) 'current_y', current_y
@@ -3831,7 +3831,7 @@
 
          call set_y(s, next_y, klo, khi, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) write(*, *) 'relax_Y_check_model ierr', ierr
+            if (s% ctrl% report_ierr) write(*, *) 'relax_Y_check_model ierr', ierr
             relax_Y_check_model = terminate
             s% result_reason = nonzero_ierr
             return
@@ -3851,35 +3851,35 @@
             return
          end if
 
-         if (klo == 1 .and. khi == s% nz) s% initial_y = next_y
-         s% max_timestep = secyer*s% time_step
+         if (klo == 1 .and. khi == s% nz) s% ctrl% initial_y = next_y
+         s% ctrl% max_timestep = secyer*s% time_step
 
       end function relax_Y_check_model
 
 
       subroutine setup_before_relax(s)
          type (star_info), pointer :: s
-         s% dxdt_nuc_factor = 0
-         s% max_age = 1d50
-         s% max_age_in_days = 1d50
-         s% max_age_in_seconds = 1d50
-         s% max_timestep_factor = 2
-         s% max_model_number = -1111
+         s% ctrl% dxdt_nuc_factor = 0
+         s% ctrl% max_age = 1d50
+         s% ctrl% max_age_in_days = 1d50
+         s% ctrl% max_age_in_seconds = 1d50
+         s% ctrl% max_timestep_factor = 2
+         s% ctrl% max_model_number = -1111
          call turn_off_winds(s)
       end subroutine setup_before_relax
 
 
       subroutine turn_off_winds(s)
          type (star_info), pointer :: s
-         s% mass_change = 0
-         s% Reimers_scaling_factor = 0d0
-         s% Blocker_scaling_factor = 0d0
-         s% de_Jager_scaling_factor = 0d0
-         s% van_Loon_scaling_factor = 0d0
-         s% Nieuwenhuijzen_scaling_factor = 0d0
-         s% Vink_scaling_factor = 0d0
-         s% Dutch_scaling_factor = 0d0
-         s% use_other_wind = .false.
+         s% ctrl% mass_change = 0
+         s% ctrl% Reimers_scaling_factor = 0d0
+         s% ctrl% Blocker_scaling_factor = 0d0
+         s% ctrl% de_Jager_scaling_factor = 0d0
+         s% ctrl% van_Loon_scaling_factor = 0d0
+         s% ctrl% Nieuwenhuijzen_scaling_factor = 0d0
+         s% ctrl% Vink_scaling_factor = 0d0
+         s% ctrl% Dutch_scaling_factor = 0d0
+         s% ctrl% use_other_wind = .false.
       end subroutine turn_off_winds
 
 
@@ -3960,57 +3960,57 @@
 
          call save_stuff
 
-         s% do_history_file = .false.
-         s% write_profiles_flag = .false.
-         s% warning_limit_for_max_residual = 1d99
+         s% ctrl% do_history_file = .false.
+         s% ctrl% write_profiles_flag = .false.
+         s% ctrl% warning_limit_for_max_residual = 1d99
          s% recent_log_header = -1
-         s% max_number_retries = s% relax_max_number_retries
-         s% use_gold_tolerances = s% relax_use_gold_tolerances
-         s% steps_before_use_gold_tolerances = -1
-         s% use_gold2_tolerances = .false.
-         s% steps_before_use_gold2_tolerances = -1
-         if (s% MLT_option == 'TDC') then
-            s% MLT_option = 'Cox'
+         s% ctrl% max_number_retries = s% ctrl% relax_max_number_retries
+         s% ctrl% use_gold_tolerances = s% ctrl% relax_use_gold_tolerances
+         s% ctrl% steps_before_use_gold_tolerances = -1
+         s% ctrl% use_gold2_tolerances = .false.
+         s% ctrl% steps_before_use_gold2_tolerances = -1
+         if (s% ctrl% MLT_option == 'TDC') then
+            s% ctrl% MLT_option = 'Cox'
          end if
 
-         if (s% relax_solver_iters_timestep_limit /= 0) &
-            s% solver_iters_timestep_limit = s% relax_solver_iters_timestep_limit
+         if (s% ctrl% relax_solver_iters_timestep_limit /= 0) &
+            s% ctrl% solver_iters_timestep_limit = s% ctrl% relax_solver_iters_timestep_limit
 
-         if (s% relax_tol_correction_norm /= 0) &
-            s% tol_correction_norm = s% relax_tol_correction_norm
-         if (s% relax_tol_max_correction /= 0) &
-            s% tol_max_correction = s% relax_tol_max_correction
+         if (s% ctrl% relax_tol_correction_norm /= 0) &
+            s% ctrl% tol_correction_norm = s% ctrl% relax_tol_correction_norm
+         if (s% ctrl% relax_tol_max_correction /= 0) &
+            s% ctrl% tol_max_correction = s% ctrl% relax_tol_max_correction
             
-         if (s% relax_iter_for_resid_tol2 /= 0) &
-            s% iter_for_resid_tol2 = s% relax_iter_for_resid_tol2
-         if (s% relax_tol_residual_norm1 /= 0) &
-            s% tol_residual_norm1 = s% relax_tol_residual_norm1
-         if (s% relax_tol_max_residual1 /= 0) &
-            s% tol_max_residual1 = s% relax_tol_max_residual1
+         if (s% ctrl% relax_iter_for_resid_tol2 /= 0) &
+            s% ctrl% iter_for_resid_tol2 = s% ctrl% relax_iter_for_resid_tol2
+         if (s% ctrl% relax_tol_residual_norm1 /= 0) &
+            s% ctrl% tol_residual_norm1 = s% ctrl% relax_tol_residual_norm1
+         if (s% ctrl% relax_tol_max_residual1 /= 0) &
+            s% ctrl% tol_max_residual1 = s% ctrl% relax_tol_max_residual1
          
-         if (s% relax_iter_for_resid_tol3 /= 0) &
-            s% iter_for_resid_tol3 = s% relax_iter_for_resid_tol3
-         if (s% relax_tol_residual_norm2 /= 0) &
-            s% tol_residual_norm2 = s% relax_tol_residual_norm2
-         if (s% relax_tol_max_residual2 /= 0) &
-            s% tol_max_residual2 = s% relax_tol_max_residual2
+         if (s% ctrl% relax_iter_for_resid_tol3 /= 0) &
+            s% ctrl% iter_for_resid_tol3 = s% ctrl% relax_iter_for_resid_tol3
+         if (s% ctrl% relax_tol_residual_norm2 /= 0) &
+            s% ctrl% tol_residual_norm2 = s% ctrl% relax_tol_residual_norm2
+         if (s% ctrl% relax_tol_max_residual2 /= 0) &
+            s% ctrl% tol_max_residual2 = s% ctrl% relax_tol_max_residual2
             
-         if (s% relax_tol_residual_norm3 /= 0) &
-            s% tol_residual_norm3 = s% relax_tol_residual_norm3
-         if (s% relax_tol_max_residual3 /= 0) &
-            s% tol_max_residual3 = s% relax_tol_max_residual3
+         if (s% ctrl% relax_tol_residual_norm3 /= 0) &
+            s% ctrl% tol_residual_norm3 = s% ctrl% relax_tol_residual_norm3
+         if (s% ctrl% relax_tol_max_residual3 /= 0) &
+            s% ctrl% tol_max_residual3 = s% ctrl% relax_tol_max_residual3
             
-         if (s% relax_maxT_for_gold_tolerances /= 0) &
-            s% maxT_for_gold_tolerances = s% relax_maxT_for_gold_tolerances
+         if (s% ctrl% relax_maxT_for_gold_tolerances /= 0) &
+            s% ctrl% maxT_for_gold_tolerances = s% ctrl% relax_maxT_for_gold_tolerances
 
          if (s% doing_first_model_of_run) then
             s% num_retries = 0
             s% time = 0
             s% star_age = 0
             s% model_number_for_last_retry = 0
-            s% photo_interval = 0
-            s% profile_interval = 0
-            s% priority_profile_interval = 0
+            s% ctrl% photo_interval = 0
+            s% ctrl% profile_interval = 0
+            s% ctrl% priority_profile_interval = 0
          end if
 
          if( s% job% pgstar_flag) then
@@ -4146,55 +4146,55 @@
 
          subroutine save_stuff
 
-            warning_limit_for_max_residual = s% warning_limit_for_max_residual
-            do_history_file = s% do_history_file
-            write_profiles_flag = s% write_profiles_flag
+            warning_limit_for_max_residual = s% ctrl% warning_limit_for_max_residual
+            do_history_file = s% ctrl% do_history_file
+            write_profiles_flag = s% ctrl% write_profiles_flag
             recent_log_header = s% recent_log_header
-            mass_change = s% mass_change
-            Reimers_scaling_factor = s% Reimers_scaling_factor
-            Blocker_scaling_factor = s% Blocker_scaling_factor
-            de_Jager_scaling_factor = s% de_Jager_scaling_factor
-            van_Loon_scaling_factor = s% van_Loon_scaling_factor
-            Nieuwenhuijzen_scaling_factor = s% Nieuwenhuijzen_scaling_factor
-            Vink_scaling_factor = s% Vink_scaling_factor
-            Dutch_scaling_factor = s% Dutch_scaling_factor
-            use_other_wind = s% use_other_wind
+            mass_change = s% ctrl% mass_change
+            Reimers_scaling_factor = s% ctrl% Reimers_scaling_factor
+            Blocker_scaling_factor = s% ctrl% Blocker_scaling_factor
+            de_Jager_scaling_factor = s% ctrl% de_Jager_scaling_factor
+            van_Loon_scaling_factor = s% ctrl% van_Loon_scaling_factor
+            Nieuwenhuijzen_scaling_factor = s% ctrl% Nieuwenhuijzen_scaling_factor
+            Vink_scaling_factor = s% ctrl% Vink_scaling_factor
+            Dutch_scaling_factor = s% ctrl% Dutch_scaling_factor
+            use_other_wind = s% ctrl% use_other_wind
 
             num_retries = s% num_retries
             star_age = s% star_age
             time = s% time
             model_number = s% model_number
-            dxdt_nuc_factor = s% dxdt_nuc_factor
-            max_age = s% max_age
-            max_age_in_days = s% max_age_in_days
-            max_age_in_seconds = s% max_age_in_seconds
-            max_timestep_factor = s% max_timestep_factor
-            varcontrol_target = s% varcontrol_target
-            max_timestep = s% max_timestep
+            dxdt_nuc_factor = s% ctrl% dxdt_nuc_factor
+            max_age = s% ctrl% max_age
+            max_age_in_days = s% ctrl% max_age_in_days
+            max_age_in_seconds = s% ctrl% max_age_in_seconds
+            max_timestep_factor = s% ctrl% max_timestep_factor
+            varcontrol_target = s% ctrl% varcontrol_target
+            max_timestep = s% ctrl% max_timestep
             model_number_for_last_retry = s% model_number_for_last_retry
-            photo_interval = s% photo_interval
-            profile_interval = s% profile_interval
-            priority_profile_interval = s% priority_profile_interval
+            photo_interval = s% ctrl% photo_interval
+            profile_interval = s% ctrl% profile_interval
+            priority_profile_interval = s% ctrl% priority_profile_interval
             dt_next = s% dt_next
-            max_number_retries = s% max_number_retries
-            MLT_option = s% MLT_option
+            max_number_retries = s% ctrl% max_number_retries
+            MLT_option = s% ctrl% MLT_option
             
-            use_gold2_tolerances = s% use_gold2_tolerances
-            steps_before_use_gold2_tolerances = s% steps_before_use_gold2_tolerances
-            use_gold_tolerances = s% use_gold_tolerances
-            steps_before_use_gold_tolerances = s% steps_before_use_gold_tolerances
-            solver_iters_timestep_limit = s% solver_iters_timestep_limit
-            tol_correction_norm = s% tol_correction_norm
-            tol_max_correction = s% tol_max_correction            
-            iter_for_resid_tol2 = s% iter_for_resid_tol2
-            tol_residual_norm1 = s% tol_residual_norm1
-            tol_max_residual1 = s% tol_max_residual1         
-            iter_for_resid_tol3 = s% iter_for_resid_tol3
-            tol_residual_norm2 = s% tol_residual_norm2
-            tol_max_residual2 = s% tol_max_residual2         
-            tol_residual_norm3 = s% tol_residual_norm3
-            tol_max_residual3 = s% tol_max_residual3
-            maxT_for_gold_tolerances = s% maxT_for_gold_tolerances
+            use_gold2_tolerances = s% ctrl% use_gold2_tolerances
+            steps_before_use_gold2_tolerances = s% ctrl% steps_before_use_gold2_tolerances
+            use_gold_tolerances = s% ctrl% use_gold_tolerances
+            steps_before_use_gold_tolerances = s% ctrl% steps_before_use_gold_tolerances
+            solver_iters_timestep_limit = s% ctrl% solver_iters_timestep_limit
+            tol_correction_norm = s% ctrl% tol_correction_norm
+            tol_max_correction = s% ctrl% tol_max_correction            
+            iter_for_resid_tol2 = s% ctrl% iter_for_resid_tol2
+            tol_residual_norm1 = s% ctrl% tol_residual_norm1
+            tol_max_residual1 = s% ctrl% tol_max_residual1         
+            iter_for_resid_tol3 = s% ctrl% iter_for_resid_tol3
+            tol_residual_norm2 = s% ctrl% tol_residual_norm2
+            tol_max_residual2 = s% ctrl% tol_max_residual2         
+            tol_residual_norm3 = s% ctrl% tol_residual_norm3
+            tol_max_residual3 = s% ctrl% tol_max_residual3
+            maxT_for_gold_tolerances = s% ctrl% maxT_for_gold_tolerances
 
             ! selected history
             time_old = s% time_old
@@ -4203,54 +4203,54 @@
          end subroutine save_stuff
 
          subroutine restore_stuff
-            s% warning_limit_for_max_residual = warning_limit_for_max_residual
-            s% do_history_file = do_history_file
-            s% write_profiles_flag = write_profiles_flag
+            s% ctrl% warning_limit_for_max_residual = warning_limit_for_max_residual
+            s% ctrl% do_history_file = do_history_file
+            s% ctrl% write_profiles_flag = write_profiles_flag
             s% recent_log_header = recent_log_header
-            s% mass_change = mass_change
-            s% Reimers_scaling_factor = Reimers_scaling_factor
-            s% Blocker_scaling_factor = Blocker_scaling_factor
-            s% de_Jager_scaling_factor = de_Jager_scaling_factor
-            s% van_Loon_scaling_factor = van_Loon_scaling_factor
-            s% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
-            s% Vink_scaling_factor = Vink_scaling_factor
-            s% Dutch_scaling_factor = Dutch_scaling_factor
-            s% use_other_wind = use_other_wind
+            s% ctrl% mass_change = mass_change
+            s% ctrl% Reimers_scaling_factor = Reimers_scaling_factor
+            s% ctrl% Blocker_scaling_factor = Blocker_scaling_factor
+            s% ctrl% de_Jager_scaling_factor = de_Jager_scaling_factor
+            s% ctrl% van_Loon_scaling_factor = van_Loon_scaling_factor
+            s% ctrl% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
+            s% ctrl% Vink_scaling_factor = Vink_scaling_factor
+            s% ctrl% Dutch_scaling_factor = Dutch_scaling_factor
+            s% ctrl% use_other_wind = use_other_wind
             s% num_retries = num_retries
             s% star_age = star_age
             s% time = time
             s% model_number = model_number
-            s% dxdt_nuc_factor = dxdt_nuc_factor
-            s% max_age = max_age
-            s% max_age_in_days = max_age_in_days
-            s% max_age_in_seconds = max_age_in_seconds
-            s% max_timestep_factor = max_timestep_factor
-            s% varcontrol_target = varcontrol_target
-            s% max_timestep = max_timestep
+            s% ctrl% dxdt_nuc_factor = dxdt_nuc_factor
+            s% ctrl% max_age = max_age
+            s% ctrl% max_age_in_days = max_age_in_days
+            s% ctrl% max_age_in_seconds = max_age_in_seconds
+            s% ctrl% max_timestep_factor = max_timestep_factor
+            s% ctrl% varcontrol_target = varcontrol_target
+            s% ctrl% max_timestep = max_timestep
             s% model_number_for_last_retry = model_number_for_last_retry
-            s% photo_interval = photo_interval
-            s% profile_interval = profile_interval
-            s% priority_profile_interval = priority_profile_interval
+            s% ctrl% photo_interval = photo_interval
+            s% ctrl% profile_interval = profile_interval
+            s% ctrl% priority_profile_interval = priority_profile_interval
             s% dt_next = dt_next
-            s% max_number_retries = max_number_retries
-            s% MLT_option = MLT_option
+            s% ctrl% max_number_retries = max_number_retries
+            s% ctrl% MLT_option = MLT_option
             
-            s% use_gold2_tolerances = use_gold2_tolerances
-            s% steps_before_use_gold2_tolerances = steps_before_use_gold2_tolerances
-            s% use_gold_tolerances = use_gold_tolerances
-            s% steps_before_use_gold_tolerances = steps_before_use_gold_tolerances
-            s% solver_iters_timestep_limit = solver_iters_timestep_limit
-            s% tol_correction_norm = tol_correction_norm
-            s% tol_max_correction = tol_max_correction
-            s% iter_for_resid_tol2 = iter_for_resid_tol2
-            s% tol_residual_norm1 = tol_residual_norm1
-            s% tol_max_residual1 = tol_max_residual1
-            s% iter_for_resid_tol3 = iter_for_resid_tol3
-            s% tol_residual_norm2 = tol_residual_norm2
-            s% tol_max_residual2 = tol_max_residual2
-            s% tol_residual_norm3 = tol_residual_norm3
-            s% tol_max_residual3 = tol_max_residual3
-            s% maxT_for_gold_tolerances = maxT_for_gold_tolerances
+            s% ctrl% use_gold2_tolerances = use_gold2_tolerances
+            s% ctrl% steps_before_use_gold2_tolerances = steps_before_use_gold2_tolerances
+            s% ctrl% use_gold_tolerances = use_gold_tolerances
+            s% ctrl% steps_before_use_gold_tolerances = steps_before_use_gold_tolerances
+            s% ctrl% solver_iters_timestep_limit = solver_iters_timestep_limit
+            s% ctrl% tol_correction_norm = tol_correction_norm
+            s% ctrl% tol_max_correction = tol_max_correction
+            s% ctrl% iter_for_resid_tol2 = iter_for_resid_tol2
+            s% ctrl% tol_residual_norm1 = tol_residual_norm1
+            s% ctrl% tol_max_residual1 = tol_max_residual1
+            s% ctrl% iter_for_resid_tol3 = iter_for_resid_tol3
+            s% ctrl% tol_residual_norm2 = tol_residual_norm2
+            s% ctrl% tol_max_residual2 = tol_max_residual2
+            s% ctrl% tol_residual_norm3 = tol_residual_norm3
+            s% ctrl% tol_max_residual3 = tol_max_residual3
+            s% ctrl% maxT_for_gold_tolerances = maxT_for_gold_tolerances
 
             ! selected history
             s% time_old = time_old

@@ -69,9 +69,9 @@
             ! choose a uniform composition
             allocate(xa(s% species))
             xa = 0
-            xa(s% net_iso(ic12)) = s% x_ctrl(6)
-            xa(s% net_iso(io16)) = s% x_ctrl(7)
-            xa(s% net_iso(ine20)) = s% x_ctrl(8)
+            xa(s% net_iso(ic12)) = s% ctrl% x_ctrl(6)
+            xa(s% net_iso(io16)) = s% ctrl% x_ctrl(7)
+            xa(s% net_iso(ine20)) = s% ctrl% x_ctrl(8)
 
             call basic_composition_info( &
                    s% species, s% chem_id, xa, &
@@ -79,7 +79,7 @@
                    mass_correction, sumx)
 
             ! get arrays for model
-            nz = s% x_integer_ctrl(1)
+            nz = s% ctrl% x_integer_ctrl(1)
             s% nz = nz
             call star_allocate_arrays(id, ierr)
             if (ierr /= 0) then
@@ -91,12 +91,12 @@
             s% R_center = 0
             s% v_center = 0
 
-            s% mstar = s% x_ctrl(1)
+            s% mstar = s% ctrl% x_ctrl(1)
             s% star_mass = s% mstar/Msun
             s% xmstar = s% mstar
 
-            Rho_c = s% x_ctrl(2)
-            T_c = s% x_ctrl(3)
+            Rho_c = s% ctrl% x_ctrl(2)
+            T_c = s% ctrl% x_ctrl(3)
 
             ! initialize at constant density and temperature
             s% xh(s% i_lnd, 1:nz) = log(Rho_c)
@@ -142,8 +142,8 @@
 
             ! bump the center
             do k = nz, 1, -1
-                if (s% q(k) < s% x_ctrl(4)) then
-                     s% xh(s% i_lnT, k) = log(s% x_ctrl(5))
+                if (s% q(k) < s% ctrl% x_ctrl(4)) then
+                     s% xh(s% i_lnT, k) = log(s% ctrl% x_ctrl(5))
                 end if
             end do
 
@@ -411,19 +411,19 @@
             if(ierr/=0) return
 
             names(1) = 'x_ctrl(1)'
-            vals(1) = s% x_ctrl(1)
+            vals(1) = s% ctrl% x_ctrl(1)
 
             names(2) = 'x_ctrl(2)'
-            vals(2) = s% x_ctrl(2)
+            vals(2) = s% ctrl% x_ctrl(2)
 
             names(3) = 'x_ctrl(3)'
-            vals(3) = s% x_ctrl(3)
+            vals(3) = s% ctrl% x_ctrl(3)
 
             names(4) = 'x_ctrl(4)'
-            vals(4) = s% x_ctrl(4)
+            vals(4) = s% ctrl% x_ctrl(4)
 
             names(5) = 'x_ctrl(5)'
-            vals(5) = s% x_ctrl(5)
+            vals(5) = s% ctrl% x_ctrl(5)
 
          end subroutine data_for_extra_history_header_items
 
@@ -452,7 +452,7 @@
             ! here is an example for adding an extra profile header item
             ! also set how_many_extra_history_profile_items
             ! names(1) = 'mixing_length_alpha'
-            ! vals(1) = s% mixing_length_alpha
+            ! vals(1) = s% ctrl% mixing_length_alpha
 
          end subroutine data_for_extra_profile_header_items
 
@@ -524,8 +524,8 @@
             write(*,'(A)')
 
             ! get targets from inlist
-            flame_speed_expected = s% x_ctrl(9)
-            flame_width_expected = s% x_ctrl(10)
+            flame_speed_expected = s% ctrl% x_ctrl(9)
+            flame_width_expected = s% ctrl% x_ctrl(10)
 
             if (abs(flame_speed - flame_speed_expected) > 0.1 * flame_speed_expected) then
                write(*,*) 'bad value for flame_speed'

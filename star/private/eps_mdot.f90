@@ -560,7 +560,7 @@
          end do
          !$OMP END PARALLEL DO
 
-         if (s% use_other_accreting_state) then
+         if (s% ctrl% use_other_accreting_state) then
             call s%other_accreting_state(s%id, te_bar(1), p_bar(1), rho_bar(1), ierr)
             s% surface_cell_specific_total_energy_old = te_bar(1)
          end if
@@ -641,7 +641,7 @@
          ! Calculate leak fraction
          allocate(leak_frac(nz))
          call set_leak_frac(nz, s%L, dm, dt, thermal_energy, grad_r_sub_grad_a,&
-                            mass_flux, leak_frac, s%eps_mdot_leak_frac_factor)
+                            mass_flux, leak_frac, s% ctrl% eps_mdot_leak_frac_factor)
 
          ! Now we calculate what ought to have happened accounting for energy retention/leakage.
          allocate(accumulated(nz))
@@ -655,7 +655,7 @@
 
          ! Apply user-specified scaling factor.
          ! This non-physical, but can be useful for stellar engineering.
-         s% eps_mdot(1:nz) = s% eps_mdot_factor * s% eps_mdot(1:nz)
+         s% eps_mdot(1:nz) = s% ctrl% eps_mdot_factor * s% eps_mdot(1:nz)
 
          ! Evaluate total energies for later use outside of eps_mdot.
             call eval_deltaM_total_energy_integrals( &

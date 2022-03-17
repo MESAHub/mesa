@@ -455,7 +455,7 @@ contains
         r = s%r(k)
         l = s%L(k)
         
-        if (s%interpolate_rho_for_pulse_data) then
+        if (s% ctrl% interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, 1, s%nz)
         else
            rho = eval_face_rho(s, k, 1, s%nz)
@@ -573,7 +573,7 @@ contains
         r = 0d0
         l = 0d0
 
-        if (s%interpolate_rho_for_pulse_data) then
+        if (s% ctrl% interpolate_rho_for_pulse_data) then
            rho = eval_center(s%rmid, s%rho, 1, s%nz)
         else
            rho = eval_center_rho(s, s%nz)

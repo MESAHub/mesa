@@ -968,14 +968,14 @@
              b% r(b% a_i), min_r/rsun, b% separation/rsun
          if (b% r(b% a_i) < min_r) then
             b% accretion_mode = 2
-            b% s_accretor% accreted_material_j = &
+            b% s_accretor% ctrl% accreted_material_j = &
                sqrt(standard_cgrav * b% m(b% a_i) * b% r(b% a_i)) 
          else
             b% accretion_mode = 1
-            b% s_accretor% accreted_material_j = &
+            b% s_accretor% ctrl% accreted_material_j = &
                sqrt(standard_cgrav * b% m(b% a_i) * 1.7d0*min_r)
          end if
-         b% acc_am_div_kep_am = b% s_accretor% accreted_material_j / &
+         b% acc_am_div_kep_am = b% s_accretor% ctrl% accreted_material_j / &
              sqrt(standard_cgrav * b% m(b% a_i) * b% r(b% a_i))
 
           !TODO: when using wind mass transfer donor star can end up
@@ -992,27 +992,27 @@
 
          if (acc_index == b% a_i) then
             !set accreted material composition
-            b% s_accretor% num_accretion_species = b% s_donor% species
+            b% s_accretor% ctrl% num_accretion_species = b% s_donor% species
             
-            if(b% s_donor% species > size(b% s_accretor% accretion_species_id,dim=1)) then
+            if(b% s_donor% species > size(b% s_accretor% ctrl% accretion_species_id,dim=1)) then
                call mesa_error(__FILE__,__LINE__,'Nuclear network is too large for accretor, increase max_num_accretion_species')
             end if
 
             do j = 1, b% s_donor% species
-               b% s_accretor% accretion_species_id(j) = chem_isos% name(b% s_donor% chem_id(j))
-               b% s_accretor% accretion_species_xa(j) = b% s_donor% xa_removed(j)
+               b% s_accretor% ctrl% accretion_species_id(j) = chem_isos% name(b% s_donor% chem_id(j))
+               b% s_accretor% ctrl% accretion_species_xa(j) = b% s_donor% xa_removed(j)
             end do
          else
             ! also for the donor to account for wind mass transfer
-            b% s_donor% num_accretion_species = b% s_accretor% species
+            b% s_donor% ctrl% num_accretion_species = b% s_accretor% species
 
-            if(b% s_accretor% species > size(b% s_donor% accretion_species_id,dim=1)) then
+            if(b% s_accretor% species > size(b% s_donor% ctrl% accretion_species_id,dim=1)) then
                call mesa_error(__FILE__,__LINE__,'Nuclear network is too large for donor, increase max_num_accretion_species')
             end if
 
             do j = 1, b% s_accretor% species
-               b% s_donor% accretion_species_id(j) = chem_isos% name(b% s_accretor% chem_id(j))
-               b% s_donor% accretion_species_xa(j) = b% s_accretor% xa_removed(j)
+               b% s_donor% ctrl% accretion_species_id(j) = chem_isos% name(b% s_accretor% chem_id(j))
+               b% s_donor% ctrl% accretion_species_xa(j) = b% s_accretor% xa_removed(j)
             end do
          end if
 

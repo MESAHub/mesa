@@ -129,14 +129,14 @@
          else if (s% RSP2_flag) then
             do k = 1, nz
                s% conv_vel(k) = get_RSP2_conv_velocity(s,k)
-               s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0
+               s% D_mix(k) = s% conv_vel(k)*s% ctrl% mixing_length_alpha*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))
                if (abs(s% Lt(k)) > &
-                     L_val*s% RSP2_min_Lt_div_L_for_overshooting_mixing_type) then
+                     L_val*s% ctrl% RSP2_min_Lt_div_L_for_overshooting_mixing_type) then
                   s% mixing_type(k) = overshoot_mixing
                else if (abs(s% Lc(k)) > &
-                     L_val*s% RSP2_min_Lc_div_L_for_convective_mixing_type) then
+                     L_val*s% ctrl% RSP2_min_Lc_div_L_for_convective_mixing_type) then
                   s% mixing_type(k) = convective_mixing
                else
                   s% mixing_type(k) = no_mixing
@@ -152,7 +152,7 @@
          
          call check('after get mlt_D')
          
-         if (s% remove_mixing_glitches .and. .not. RSP2_or_RSP) then
+         if (s% ctrl% remove_mixing_glitches .and. .not. RSP2_or_RSP) then
 
             call remove_tiny_mixing(s, ierr)
             if (failed('remove_tiny_mixing')) return
@@ -236,17 +236,17 @@
             if (failed('set_cz_bdy_mass')) return
          end if
 
-         if (s% set_min_D_mix .and. s% ye(nz) >= s% min_center_Ye_for_min_D_mix) then
+         if (s% ctrl% set_min_D_mix .and. s% ye(nz) >= s% ctrl% min_center_Ye_for_min_D_mix) then
             do k=1,nz
-               if (s% D_mix(k) >= s% min_D_mix) cycle
-               if (s% m(k) > s% mass_upper_limit_for_min_D_mix*Msun) cycle
-               if (s% m(k) < s% mass_lower_limit_for_min_D_mix*Msun) cycle
-               s% D_mix(k) = s% min_D_mix
+               if (s% D_mix(k) >= s% ctrl% min_D_mix) cycle
+               if (s% m(k) > s% ctrl% mass_upper_limit_for_min_D_mix*Msun) cycle
+               if (s% m(k) < s% ctrl% mass_lower_limit_for_min_D_mix*Msun) cycle
+               s% D_mix(k) = s% ctrl% min_D_mix
                s% mixing_type(k) = minimum_mixing
             end do
          end if
 
-         if (s% set_min_D_mix_below_Tmax) then
+         if (s% ctrl% set_min_D_mix_below_Tmax) then
             Tmax = -1
             k_Tmax = -1
             do k=1,nz
@@ -256,22 +256,22 @@
                end if
             end do
             do k=k_Tmax+1,nz
-               if (s% D_mix(k) >= s% min_D_mix_below_Tmax) cycle
-               s% D_mix(k) = s% min_D_mix_below_Tmax
+               if (s% D_mix(k) >= s% ctrl% min_D_mix_below_Tmax) cycle
+               s% D_mix(k) = s% ctrl% min_D_mix_below_Tmax
                s% mixing_type(k) = minimum_mixing
             end do
          end if
 
-         if (s% set_min_D_mix_in_H_He) then
+         if (s% ctrl% set_min_D_mix_in_H_He) then
             do k=1,nz
                if (s% X(k) + s% Y(k) < 0.5d0) exit
-               if (s% D_mix(k) >= s% min_D_mix_in_H_He) cycle
-               s% D_mix(k) = s% min_D_mix_in_H_He
+               if (s% D_mix(k) >= s% ctrl% min_D_mix_in_H_He) cycle
+               s% D_mix(k) = s% ctrl% min_D_mix_in_H_He
                s% mixing_type(k) = minimum_mixing
             end do
          end if
 
-         if (s% use_other_D_mix) then
+         if (s% ctrl% use_other_D_mix) then
             call s% other_D_mix(s% id, ierr)
             if (failed('other_D_mix')) return
          end if
@@ -300,10 +300,10 @@
          
          call check('after update_rotation_mixing_info')
          
-         region_bottom_q = s% D_mix_zero_region_bottom_q
-         region_top_q = s% D_mix_zero_region_top_q
+         region_bottom_q = s% ctrl% D_mix_zero_region_bottom_q
+         region_top_q = s% ctrl% D_mix_zero_region_top_q
          
-         if (s% dq_D_mix_zero_at_H_He_crossover > 0d0) then
+         if (s% ctrl% dq_D_mix_zero_at_H_He_crossover > 0d0) then
             i_h1 = s% net_iso(ih1)
             i_he4 = s% net_iso(ihe4)
             if (i_h1 > 0 .and. i_he4 > 0) then
@@ -311,9 +311,9 @@
                   if (s% xa(i_h1,k-1) > s% xa(i_he4,k-1) .and. &
                       s% xa(i_h1,k) <= s% xa(i_he4,k)) then ! crossover
                      region_bottom_q = &
-                        s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
+                        s% q(k) - 0.5d0*s% ctrl% dq_D_mix_zero_at_H_He_crossover
                      region_top_q = &
-                        s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
+                        s% q(k) + 0.5d0*s% ctrl% dq_D_mix_zero_at_H_He_crossover
                      exit
                   end if
                end do
@@ -331,7 +331,7 @@
          
          region_bottom_q = 1d99
          region_top_q = -1d99
-         if (s% dq_D_mix_zero_at_H_C_crossover > 0d0) then
+         if (s% ctrl% dq_D_mix_zero_at_H_C_crossover > 0d0) then
             i_h1 = s% net_iso(ih1)
             i_c12 = s% net_iso(ic12)
             if (i_h1 > 0 .and. i_c12 > 0) then
@@ -339,9 +339,9 @@
                   if (s% xa(i_h1,k-1) > s% xa(i_c12,k-1) .and. &
                       s% xa(i_h1,k) <= s% xa(i_c12,k)) then ! crossover
                      region_bottom_q = &
-                        s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
+                        s% q(k) - 0.5d0*s% ctrl% dq_D_mix_zero_at_H_C_crossover
                      region_top_q = &
-                        s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
+                        s% q(k) + 0.5d0*s% ctrl% dq_D_mix_zero_at_H_C_crossover
                      exit
                   end if
                end do
@@ -388,7 +388,7 @@
                failed = .false.
                return
             end if
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*,*) 'set_mixing_info failed in call to ' // trim(str)
             failed = .true.
          end function failed
@@ -400,7 +400,7 @@
             do k = 1, s% nz
                if (is_bad_num(s% D_mix(k))) then
                   ierr = -1
-                  if (s% report_ierr) then
+                  if (s% ctrl% report_ierr) then
                      write(*,3) trim(str) // ' mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
                      if (s% rotation_flag) then
                         if (is_bad_num(s% D_mix_non_rotation(k))) &
@@ -414,7 +414,7 @@
                         if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
                      end if
                   end if
-                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
+                  if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
                end if
             end do
          end subroutine check
@@ -670,11 +670,11 @@
             dr = top_r - bot_r
             Hp = (bot_Hp + top_Hp)/2
 
-            if (dr/Hp < s% prune_bad_cz_min_Hp_height .and. s% prune_bad_cz_min_Hp_height > 0) then
+            if (dr/Hp < s% ctrl% prune_bad_cz_min_Hp_height .and. s% ctrl% prune_bad_cz_min_Hp_height > 0) then
                max_eps = maxval(eps_h(k:k_bot) + eps_he(k:k_bot) + eps_z(k:k_bot))
                if (end_dbg) write(*,3) 'max_eps', k, k_bot, max_eps, &
-                  exp10(s% prune_bad_cz_min_log_eps_nuc)
-               if (max_eps < exp10(s% prune_bad_cz_min_log_eps_nuc) &
+                  exp10(s% ctrl% prune_bad_cz_min_log_eps_nuc)
+               if (max_eps < exp10(s% ctrl% prune_bad_cz_min_log_eps_nuc) &
                      .and. all(s% mixing_type(k+1:k_bot-1) /= thermohaline_mixing)) then
                   do kk = k, k_bot ! this includes the radiative points at boundaries
                      call set_use_gradr(s,kk)
@@ -714,23 +714,23 @@
                   max_Y = s% Y(kk)
                end if
             end do
-            if (max_logT > s% burn_z_mix_region_logT &
-                  .and. max_Y < s% max_Y_for_burn_z_mix_region) then            
+            if (max_logT > s% ctrl% burn_z_mix_region_logT &
+                  .and. max_Y < s% ctrl% max_Y_for_burn_z_mix_region) then            
                s% burn_z_conv_region(i) = .true.
                if (i > 1) s% burn_z_conv_region(i-1) = .true.
                !write(*,*) 'burn z mix region', i, &
-               !   s% burn_z_mix_region_logT, max_logT, s% m(max_logT_loc)/Msun
-            else if (max_logT > s% burn_he_mix_region_logT &
-                  .and. max_X < s% max_X_for_burn_he_mix_region) then
+               !   s% ctrl% burn_z_mix_region_logT, max_logT, s% m(max_logT_loc)/Msun
+            else if (max_logT > s% ctrl% burn_he_mix_region_logT &
+                  .and. max_X < s% ctrl% max_X_for_burn_he_mix_region) then
                s% burn_he_conv_region(i) = .true.
                if (i > 1) s% burn_he_conv_region(i-1) = .true.
                !write(*,*) 'burn he mix region', i, &
-               !   s% burn_he_mix_region_logT, max_logT, s% m(max_logT_loc)/Msun
-            else if (max_logT > s% burn_h_mix_region_logT) then
+               !   s% ctrl% burn_he_mix_region_logT, max_logT, s% m(max_logT_loc)/Msun
+            else if (max_logT > s% ctrl% burn_h_mix_region_logT) then
                s% burn_h_conv_region(i) = .true.
                if (i > 1) s% burn_h_conv_region(i-1) = .true.
                !write(*,*) 'burn h mix region', i, &
-               !   s% burn_h_mix_region_logT, max_logT, s% m(max_logT_loc)/Msun
+               !   s% ctrl% burn_h_mix_region_logT, max_logT, s% m(max_logT_loc)/Msun
             end if
 
             if (k == 1) then
@@ -894,17 +894,17 @@
                   max_Y = s% Y(kk)
                end if
             end do
-            if (max_logT > s% burn_z_mix_region_logT &
-                  .and. max_Y < s% max_Y_for_burn_z_mix_region) then            
+            if (max_logT > s% ctrl% burn_z_mix_region_logT &
+                  .and. max_Y < s% ctrl% max_Y_for_burn_z_mix_region) then            
                s% burn_z_mix_region(i) = .true.
                if (i > 1) s% burn_z_mix_region(i-1) = .true.
                !write(*,*) 'burn z mix region', i
-            else if (max_logT > s% burn_he_mix_region_logT &
-                  .and. max_X < s% max_X_for_burn_he_mix_region) then
+            else if (max_logT > s% ctrl% burn_he_mix_region_logT &
+                  .and. max_X < s% ctrl% max_X_for_burn_he_mix_region) then
                s% burn_he_mix_region(i) = .true.
                if (i > 1) s% burn_he_mix_region(i-1) = .true.
                !write(*,*) 'burn he mix region', i
-            else if (max_logT > s% burn_h_mix_region_logT) then
+            else if (max_logT > s% ctrl% burn_h_mix_region_logT) then
                s% burn_h_mix_region(i) = .true.
                if (i > 1) s% burn_h_mix_region(i-1) = .true.
                !write(*,*) 'burn h mix region', i
@@ -979,7 +979,7 @@
          ierr = 0
          nz = s% nz
 
-         tiny = s% clip_D_limit
+         tiny = s% ctrl% clip_D_limit
          do k=1,nz
             if (s% D_mix(k) < tiny) then
                s% cdc(k) = 0
@@ -1021,7 +1021,7 @@
                   s% mixing_type(k) = max(s% mixing_type(k-1), s% mixing_type(k+1))
                if (dbg) write(*,3) 'remove radiative singleton', k, nz
                end if
-            else if (s% okay_to_remove_mixing_singleton) then
+            else if (s% ctrl% okay_to_remove_mixing_singleton) then
                if (s% cdc(k-1) == 0 .and. s% cdc(k+1) == 0) then
                   call set_use_gradr(s,k)
                   s% cdc(k) = 0
@@ -1077,21 +1077,21 @@
       subroutine close_convection_gaps(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         call close_gaps(s, convective_mixing, s% min_convective_gap, ierr)
+         call close_gaps(s, convective_mixing, s% ctrl% min_convective_gap, ierr)
       end subroutine close_convection_gaps
 
 
       subroutine close_thermohaline_gaps(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         call close_gaps(s, thermohaline_mixing, s% min_thermohaline_gap, ierr)
+         call close_gaps(s, thermohaline_mixing, s% ctrl% min_thermohaline_gap, ierr)
       end subroutine close_thermohaline_gaps
 
 
       subroutine close_semiconvection_gaps(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         call close_gaps(s, semiconvective_mixing, s% min_semiconvection_gap, ierr)
+         call close_gaps(s, semiconvective_mixing, s% ctrl% min_semiconvection_gap, ierr)
       end subroutine close_semiconvection_gaps
 
 
@@ -1186,7 +1186,7 @@
          do k=nz-2, 2, -1
             if (in_region) then
                if (s% mixing_type(k) == no_mixing) then ! check if okay
-                  if (s% gradL(k) - s% grada_face(k) > s% max_dropout_gradL_sub_grada) &
+                  if (s% gradL(k) - s% grada_face(k) > s% ctrl% max_dropout_gradL_sub_grada) &
                      all_small = .false.
                else ! end of radiative region
                   ktop = k+1
@@ -1194,7 +1194,7 @@
                   Hp = s% Peos(ktop)/(s% rho(ktop)*s% grav(ktop))
                   q_upper = s% q(ktop-1)
                   q_lower = s% q(kbot+1)
-                  if (rtop - rbot < Hp*s% min_thermohaline_dropout .and. &
+                  if (rtop - rbot < Hp*s% ctrl% min_thermohaline_dropout .and. &
                       s% mixing_type(ktop-1) == thermohaline_mixing .and. &
                       s% mixing_type(kbot+1) == thermohaline_mixing .and. &
                       q_upper - q_lower > 1d-20 .and. all_small) then
@@ -1215,7 +1215,7 @@
                   rbot = s% r(kbot)
                   in_region = .true.
                   all_small = &
-                     (s% gradL(k) - s% grada_face(k) <= s% max_dropout_gradL_sub_grada)
+                     (s% gradL(k) - s% grada_face(k) <= s% ctrl% max_dropout_gradL_sub_grada)
                end if
             end if
          end do
@@ -1236,7 +1236,7 @@
          include 'formats'
 
          ierr = 0
-         if (.not. s% remove_embedded_semiconvection) return
+         if (.not. s% ctrl% remove_embedded_semiconvection) return
 
          nz = s% nz
 
@@ -1334,7 +1334,7 @@
 
          include 'formats'
 
-         T_mix_limit = s% T_mix_limit
+         T_mix_limit = s% ctrl% T_mix_limit
          !write(*,1) 'T_mix_limit', T_mix_limit
          if (T_mix_limit <= 0) return
          nz = s% nz
@@ -1385,7 +1385,7 @@
 
          include 'formats'
 
-         sig_term_limit = s% sig_term_limit
+         sig_term_limit = s% ctrl% sig_term_limit
 
          ierr = 0
          nz = s% nz
@@ -1405,13 +1405,13 @@
             f1 = pi4*s% r(k)*s% r(k)*rho_face
             f = f1*f1
             cdc = D*f
-            cdcterm = s% mix_factor*cdc
+            cdcterm = s% ctrl% mix_factor*cdc
             dq00 = s% dq(k)
             dqm1 = s% dq(k-1)
             dmavg = xmstar*(dq00+dqm1)/2
             sig(k) = cdcterm/dmavg
             if (is_bad_num(sig(k))) then
-               if (s% stop_for_bad_nums) then
+               if (s% ctrl% stop_for_bad_nums) then
                   write(*,2) 'sig(k)', k, sig(k)
                   call mesa_error(__FILE__,__LINE__,'get_convection_sigmas')
                end if
@@ -1437,10 +1437,10 @@
          ! limit sigma to avoid negative mass fractions
          cushion = 10d0
          Tc = s% T(s% nz)
-         full_off = s% Tcenter_max_for_sig_min_factor_full_off
+         full_off = s% ctrl% Tcenter_max_for_sig_min_factor_full_off
          if (Tc <= full_off) return
-         full_on = s% Tcenter_min_for_sig_min_factor_full_on
-         limit = s% sig_min_factor_for_high_Tcenter
+         full_on = s% ctrl% Tcenter_min_for_sig_min_factor_full_on
+         limit = s% ctrl% sig_min_factor_for_high_Tcenter
          if (Tc < full_on) then
             alfa = (Tc - full_off)/(full_on - full_off)
             ! limit is full on for alfa = 1 and limit is 1 for alfa = 0
@@ -1488,8 +1488,8 @@
          subroutine do1_region
             real(dp) :: delta_m, max_lim, alfa, beta, delta_m_upper, delta_m_lower
             delta_m = s% m(ktop) - s% m(kbot)
-            delta_m_upper = s% delta_m_upper_for_sig_min_factor
-            delta_m_lower = s% delta_m_lower_for_sig_min_factor
+            delta_m_upper = s% ctrl% delta_m_upper_for_sig_min_factor
+            delta_m_lower = s% ctrl% delta_m_lower_for_sig_min_factor
             if (delta_m >= delta_m_upper) then
                max_lim = 1d0
             else if (delta_m <= delta_m_lower) then
@@ -1514,7 +1514,7 @@
             siglim = sig(k)
             if (siglim == 0d0) return
             ! okay to increase limit up to max_lim
-            max_delta_m_to_bdy = s% max_delta_m_to_bdy_for_sig_min_factor
+            max_delta_m_to_bdy = s% ctrl% max_delta_m_to_bdy_for_sig_min_factor
             if (delta_m_to_bdy >= max_delta_m_to_bdy) return ! no change in sig
             lim = limit + (max_lim - limit)*delta_m_to_bdy/max_delta_m_to_bdy
             if (lim >= 1d0) return
@@ -1573,7 +1573,7 @@
 
          call set_rotation_mixing_info(s, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*,*) 'update_rotation_mixing_info failed in call to set_rotation_mixing_info'
             return
          end if
@@ -1582,8 +1582,8 @@
          if (s% D_omega_flag) call check_D_omega('check_D_omega after set_rotation_mixing_info')
 
          ! include rotation part for mixing abundances
-         full_on = s% D_mix_rotation_max_logT_full_on
-         full_off = s% D_mix_rotation_min_logT_full_off
+         full_on = s% ctrl% D_mix_rotation_max_logT_full_on
+         full_off = s% ctrl% D_mix_rotation_min_logT_full_off
          do k = 2, nz
             lgT = s% lnT(k)/ln10
             if (lgT <= full_on) then
@@ -1594,42 +1594,42 @@
                f = (lgT - full_on) / (full_off - full_on)
             end if
             if (s% D_omega_flag) then
-               s% D_mix_rotation(k) = f*s% am_D_mix_factor*s% D_omega(k)
+               s% D_mix_rotation(k) = f*s% ctrl% am_D_mix_factor*s% D_omega(k)
             else
                s% D_mix_rotation(k) = &
-                  f*s% am_D_mix_factor *(  &
+                  f*s% ctrl% am_D_mix_factor *(  &
                      ! note: have dropped viscosity from mixing
-                     s% D_DSI_factor * s% D_DSI(k)  + &
-                     s% D_SH_factor  * s% D_SH(k)   + &
-                     s% D_SSI_factor * s% D_SSI(k)  + &
-                     s% D_ES_factor  * s% D_ES(k)   + &
-                     s% D_GSF_factor * s% D_GSF(k)  + &
-                     s% D_ST_factor  * s% D_ST(k))
+                     s% ctrl% D_DSI_factor * s% D_DSI(k)  + &
+                     s% ctrl% D_SH_factor  * s% D_SH(k)   + &
+                     s% ctrl% D_SSI_factor * s% D_SSI(k)  + &
+                     s% ctrl% D_ES_factor  * s% D_ES(k)   + &
+                     s% ctrl% D_GSF_factor * s% D_GSF(k)  + &
+                     s% ctrl% D_ST_factor  * s% D_ST(k))
             end if
             s% D_mix(k) = s% D_mix_non_rotation(k) + s% D_mix_rotation(k)
          end do
          
          call check('after include rotation part for mixing abundances')
 
-         am_nu_DSI_factor = s% am_nu_DSI_factor
-         am_nu_SH_factor = s% am_nu_SH_factor
-         am_nu_SSI_factor = s% am_nu_SSI_factor
-         am_nu_ES_factor = s% am_nu_ES_factor
-         am_nu_GSF_factor = s% am_nu_GSF_factor
-         am_nu_ST_factor = s% am_nu_ST_factor
-         am_nu_visc_factor = s% am_nu_visc_factor
+         am_nu_DSI_factor = s% ctrl% am_nu_DSI_factor
+         am_nu_SH_factor = s% ctrl% am_nu_SH_factor
+         am_nu_SSI_factor = s% ctrl% am_nu_SSI_factor
+         am_nu_ES_factor = s% ctrl% am_nu_ES_factor
+         am_nu_GSF_factor = s% ctrl% am_nu_GSF_factor
+         am_nu_ST_factor = s% ctrl% am_nu_ST_factor
+         am_nu_visc_factor = s% ctrl% am_nu_visc_factor
          
          if ((.not. s% am_nu_rot_flag) .and. &
                (s% D_omega_flag .and. .not. s% job% use_D_omega_for_am_nu_rot)) then
             ! check for any am_nu factors > 0 and not same as for D_omega
             okay = .true.
-            if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% D_DSI_factor) okay = .false.
-            if (am_nu_SH_factor >= 0 .and. am_nu_SH_factor /= s% D_SH_factor) okay = .false.
-            if (am_nu_SSI_factor >= 0 .and. am_nu_SSI_factor /= s% D_SSI_factor) okay = .false.
-            if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% D_DSI_factor) okay = .false.
-            if (am_nu_ES_factor >= 0 .and. am_nu_ES_factor /= s% D_ES_factor) okay = .false.
-            if (am_nu_GSF_factor >= 0 .and. am_nu_GSF_factor /= s% D_GSF_factor) okay = .false.
-            if (am_nu_ST_factor >= 0 .and. am_nu_ST_factor /= s% D_ST_factor) okay = .false.
+            if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% ctrl% D_DSI_factor) okay = .false.
+            if (am_nu_SH_factor >= 0 .and. am_nu_SH_factor /= s% ctrl% D_SH_factor) okay = .false.
+            if (am_nu_SSI_factor >= 0 .and. am_nu_SSI_factor /= s% ctrl% D_SSI_factor) okay = .false.
+            if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% ctrl% D_DSI_factor) okay = .false.
+            if (am_nu_ES_factor >= 0 .and. am_nu_ES_factor /= s% ctrl% D_ES_factor) okay = .false.
+            if (am_nu_GSF_factor >= 0 .and. am_nu_GSF_factor /= s% ctrl% D_GSF_factor) okay = .false.
+            if (am_nu_ST_factor >= 0 .and. am_nu_ST_factor /= s% ctrl% D_ST_factor) okay = .false.
             if (.not. okay) then
                write(*,*) 'have an am_nu factor >= 0 and not same as corresponding D_omega factor'
                write(*,*) 'so if want smoothing like D_omega, must set am_nu_rot_flag true'
@@ -1640,21 +1640,21 @@
          end if
          
          ! If am_nu_..._factor < -1, use the D_..._factor
-         if (am_nu_DSI_factor < 0) am_nu_DSI_factor = s% D_DSI_factor
-         if (am_nu_SH_factor < 0) am_nu_SH_factor = s% D_SH_factor
-         if (am_nu_SSI_factor < 0) am_nu_SSI_factor = s% D_SSI_factor
-         if (am_nu_ES_factor < 0) am_nu_ES_factor = s% D_ES_factor
-         if (am_nu_GSF_factor < 0) am_nu_GSF_factor = s% D_GSF_factor
-         if (am_nu_ST_factor < 0) am_nu_ST_factor = s% D_ST_factor
-         if (am_nu_visc_factor < 0) am_nu_visc_factor = s% D_visc_factor
+         if (am_nu_DSI_factor < 0) am_nu_DSI_factor = s% ctrl% D_DSI_factor
+         if (am_nu_SH_factor < 0) am_nu_SH_factor = s% ctrl% D_SH_factor
+         if (am_nu_SSI_factor < 0) am_nu_SSI_factor = s% ctrl% D_SSI_factor
+         if (am_nu_ES_factor < 0) am_nu_ES_factor = s% ctrl% D_ES_factor
+         if (am_nu_GSF_factor < 0) am_nu_GSF_factor = s% ctrl% D_GSF_factor
+         if (am_nu_ST_factor < 0) am_nu_ST_factor = s% ctrl% D_ST_factor
+         if (am_nu_visc_factor < 0) am_nu_visc_factor = s% ctrl% D_visc_factor
 
-         ! set set_min_am_nu_non_rot to s% set_min_am_nu_non_rot if
+         ! set set_min_am_nu_non_rot to s% ctrl% set_min_am_nu_non_rot if
          ! ye > min_center_ye_for_min_am_nu_non_rot
-         ! and s% set_min_am_nu_non_rot
+         ! and s% ctrl% set_min_am_nu_non_rot
          set_min_am_nu_non_rot = &
-            s% set_min_am_nu_non_rot .and. &
-            s% ye(nz) >= s% min_center_Ye_for_min_am_nu_non_rot .and. &
-            (.not. s% set_uniform_am_nu_non_rot)
+            s% ctrl% set_min_am_nu_non_rot .and. &
+            s% ye(nz) >= s% ctrl% min_center_Ye_for_min_am_nu_non_rot .and. &
+            (.not. s% ctrl% set_uniform_am_nu_non_rot)
 
          if (s% am_nu_rot_flag) then
             call set_am_nu_rot(ierr)
@@ -1662,20 +1662,20 @@
          end if
 
          do k=1,nz
-            if (s% set_uniform_am_nu_non_rot) then
-               s% am_nu_non_rot(k) = s% uniform_am_nu_non_rot
+            if (s% ctrl% set_uniform_am_nu_non_rot) then
+               s% am_nu_non_rot(k) = s% ctrl% uniform_am_nu_non_rot
             else
-               s% am_nu_non_rot(k) = s% am_nu_factor* &
-                  s% am_nu_non_rotation_factor*s% D_mix_non_rotation(k)
+               s% am_nu_non_rot(k) = s% ctrl% am_nu_factor* &
+                  s% ctrl% am_nu_non_rotation_factor*s% D_mix_non_rotation(k)
             end if
             if (set_min_am_nu_non_rot) &
-               s% am_nu_non_rot(k) = max(s% min_am_nu_non_rot, s% am_nu_non_rot(k))
+               s% am_nu_non_rot(k) = max(s% ctrl% min_am_nu_non_rot, s% am_nu_non_rot(k))
             if (s% am_nu_rot_flag) then
                ! already have am_nu_rot(k) from calling set_am_nu_rot above
             else if (s% D_omega_flag .and. s% job% use_D_omega_for_am_nu_rot) then
-               s% am_nu_rot(k) = s% am_nu_factor*s% D_omega(k)
+               s% am_nu_rot(k) = s% ctrl% am_nu_factor*s% D_omega(k)
             else
-               s% am_nu_rot(k) = s% am_nu_factor * ( &
+               s% am_nu_rot(k) = s% ctrl% am_nu_factor * ( &
                   am_nu_visc_factor*s% D_visc(k) + &
                   am_nu_DSI_factor*s% D_DSI(k) + &
                   am_nu_SH_factor*s% D_SH(k) + &
@@ -1686,28 +1686,28 @@
             end if
             if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
             s% am_nu_omega(k) = &
-               s% am_nu_omega_non_rot_factor*s% am_nu_non_rot(k) + &
-               s% am_nu_omega_rot_factor*s% am_nu_rot(k)
+               s% ctrl% am_nu_omega_non_rot_factor*s% am_nu_non_rot(k) + &
+               s% ctrl% am_nu_omega_rot_factor*s% am_nu_rot(k)
             if (s% am_nu_omega(k) < 0) then
                ierr = -1
-               if (s% report_ierr) write(*,3) &
+               if (s% ctrl% report_ierr) write(*,3) &
                   'update_rotation_mixing_info: am_nu_omega(k) < 0', k, nz, s% am_nu_omega(k), &
                   s% am_nu_non_rot(k), s% am_nu_rot(k), s% D_omega(k)
                return
             end if
             s% am_nu_j(k) = &
-               s% am_nu_j_non_rot_factor*s% am_nu_non_rot(k) + &
-               s% am_nu_j_rot_factor*s% am_nu_rot(k)
+               s% ctrl% am_nu_j_non_rot_factor*s% am_nu_non_rot(k) + &
+               s% ctrl% am_nu_j_rot_factor*s% am_nu_rot(k)
             if (s% am_nu_j(k) < 0) then
                ierr = -1
-               if (s% report_ierr) write(*,3) &
+               if (s% ctrl% report_ierr) write(*,3) &
                   'update_rotation_mixing_info: am_nu_j(k) < 0', k, nz, s% am_nu_j(k), &
                   s% am_nu_non_rot(k), s% am_nu_rot(k), s% D_omega(k)
                return
             end if
          end do
 
-         if (s% use_other_am_mixing) then
+         if (s% ctrl% use_other_am_mixing) then
             call s% other_am_mixing(s% id, ierr)
             if (ierr /= 0) return
          end if
@@ -1721,7 +1721,7 @@
             do k = 2, s% nz
                if (is_bad_num(s% D_mix(k))) then
                   ierr = -1
-                  if (s% report_ierr) then
+                  if (s% ctrl% report_ierr) then
                      write(*,3) trim(str) // ' mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
                      if (s% rotation_flag) then
                         if (is_bad_num(s% D_mix_non_rotation(k))) &
@@ -1735,7 +1735,7 @@
                         if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
                      end if
                   end if
-                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
+                  if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
                end if
             end do
          end subroutine check
@@ -1747,7 +1747,7 @@
             do k = 2, s% nz
                if (is_bad_num(s% D_omega(k))) then
                   ierr = -1
-                  if (s% report_ierr) then
+                  if (s% ctrl% report_ierr) then
                      write(*,3) trim(str) // ' mixing_type, D_omega', k, s% mixing_type(k), s% D_omega(k)
                      write(*,*) 's% doing_finish_load_model', s% doing_finish_load_model
                      if (s% rotation_flag) then
@@ -1762,7 +1762,7 @@
                         if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
                      end if
                   end if
-                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
+                  if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set mixing info')
                end if
             end do
          end subroutine check_D_omega
@@ -1788,12 +1788,12 @@
             else if (s% am_nu_rot_flag) then
                      
                do k=1,nz
-                  if (s% q(k) <= s% max_q_for_nu_omega_zero_in_convection_region .and. &
+                  if (s% q(k) <= s% ctrl% max_q_for_nu_omega_zero_in_convection_region .and. &
                       s% mixing_type(k) == convective_mixing) then
                      s% am_nu_rot(k) = 0d0
                      cycle
                   end if
-                  am_nu_rot_source = s% am_nu_factor * ( &
+                  am_nu_rot_source = s% ctrl% am_nu_factor * ( &
                      am_nu_visc_factor*s% D_visc(k) + &
                      am_nu_DSI_factor*s% D_DSI(k) + &
                      am_nu_SH_factor*s% D_SH(k) + &
@@ -1813,22 +1813,22 @@
                   end if
                end do
                
-               if (s% smooth_am_nu_rot > 0 .or. &
-                    (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0)) then
+               if (s% ctrl% smooth_am_nu_rot > 0 .or. &
+                    (s% ctrl% nu_omega_mixing_rate > 0d0 .and. s% dt > 0)) then
                   
                   allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
 
-                  if (s% smooth_am_nu_rot > 0) then
-                     call smooth_for_rotation(s, s% am_nu_rot, s% smooth_am_nu_rot, sig)
+                  if (s% ctrl% smooth_am_nu_rot > 0) then
+                     call smooth_for_rotation(s, s% am_nu_rot, s% ctrl% smooth_am_nu_rot, sig)
                   end if
             
-                  if (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then ! mix am_nu_rot
+                  if (s% ctrl% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then ! mix am_nu_rot
             
-                     rate = min(s% nu_omega_mixing_rate, 1d0/dt)
+                     rate = min(s% ctrl% nu_omega_mixing_rate, 1d0/dt)
                      do k=2,nz-1
                         if (s% am_nu_rot(k) == 0 .or. s% am_nu_rot(k+1) == 0) then
                            sig(k) = 0
-                        else if ((.not. s% nu_omega_mixing_across_convection_boundary) .and. &
+                        else if ((.not. s% ctrl% nu_omega_mixing_across_convection_boundary) .and. &
                            s% mixing_type(k) /= convective_mixing .and. &
                                (s% mixing_type(k-1) == convective_mixing .or. &
                                 s% mixing_type(k+1) == convective_mixing)) then
@@ -1953,7 +1953,7 @@
          s% sig_RTI(1:nz) = 0d0
          s% sigmid_RTI(1:nz) = 0d0
 
-         if (s% RTI_C <= 0d0) return
+         if (s% ctrl% RTI_C <= 0d0) return
              
          i_h1 = s% net_iso(ih1)
          
@@ -1970,19 +1970,19 @@
             end if
          end do
           
-         min_dm = s% RTI_min_dm_behind_shock_for_full_on*Msun         
-         log_max_boost = s% RTI_log_max_boost
+         min_dm = s% ctrl% RTI_min_dm_behind_shock_for_full_on*Msun         
+         log_max_boost = s% ctrl% RTI_log_max_boost
          max_boost = exp10(log_max_boost)
-         m_full_boost = s% RTI_m_full_boost*Msun
-         m_no_boost = s% RTI_m_no_boost*Msun
+         m_full_boost = s% ctrl% RTI_m_full_boost*Msun
+         m_no_boost = s% ctrl% RTI_m_no_boost*Msun
          
          min_eta = -1d0
-         dm_for_center_eta_nondecreasing = Msun*s% RTI_dm_for_center_eta_nondecreasing
+         dm_for_center_eta_nondecreasing = Msun*s% ctrl% RTI_dm_for_center_eta_nondecreasing
          
          do k=1,nz
             
-            f = max(0d0, s% X(k) - s% RTI_C_X0_frac*s% surface_h1)
-            C = s% RTI_C*(1d0 + f*f*s% RTI_C_X_factor)
+            f = max(0d0, s% X(k) - s% ctrl% RTI_C_X0_frac*s% surface_h1)
+            C = s% ctrl% RTI_C*(1d0 + f*f*s% ctrl% RTI_C_X_factor)
             
             if (s% m(k) < m_no_boost) then
                if (s% m(k) <= m_full_boost) then
@@ -2007,7 +2007,7 @@
                if (is_bad(s% eta_RTI(k))) then
                   ierr = -1
                   return
-                  if (s% stop_for_bad_nums) then
+                  if (s% ctrl% stop_for_bad_nums) then
                      write(*,2) 's% eta_RTI(k)', k, s% eta_RTI(k)
                      call mesa_error(__FILE__,__LINE__,'set_RTI_mixing_info')
                   end if
@@ -2024,7 +2024,7 @@
             end if
             
             s% etamid_RTI(k) = max(min_eta, C*s% alpha_RTI(k)*s% csound(k)*s% rmid(k))
-            s% boost_for_eta_RTI(k) = C/s% RTI_C
+            s% boost_for_eta_RTI(k) = C/s% ctrl% RTI_C
             
             if (is_bad(s% etamid_RTI(k))) then
                ierr = -1
@@ -2065,7 +2065,7 @@
          ierr = 0
          nz = s% nz
          xmstar = s% xmstar
-         sig_term_limit = s% sig_term_limit
+         sig_term_limit = s% ctrl% sig_term_limit
 
          sig(1) = 0d0
          max_sig = 0d0
@@ -2078,10 +2078,10 @@
             end if
             f1 = pi4*r(k)*r(k)*rho(k)
             f = f1*f1
-            cdcterm = s% mix_factor*D*f
+            cdcterm = s% ctrl% mix_factor*D*f
             sig(k) = cdcterm/dm_bar(k)
             if (is_bad(sig(k))) then
-               if (s% stop_for_bad_nums) then
+               if (s% ctrl% stop_for_bad_nums) then
                   write(*,2) 'sig(k)', k, sig(k)
                   call mesa_error(__FILE__,__LINE__,'get_RTI_sigmas')
                end if
@@ -2140,7 +2140,7 @@
             end if
             if (k == nz .or. k == 1 .or.  &
                   (s% alpha_RTI_start(k) == 0d0 .and. &
-                     v/s% csound(k) < s% alpha_RTI_src_min_v_div_cs)) then
+                     v/s% csound(k) < s% ctrl% alpha_RTI_src_min_v_div_cs)) then
                drhodr(k) = 0d0
                dPdr(k) = 0d0
             else if (do_slope_limiting) then
@@ -2158,15 +2158,15 @@
          end do
 
          ! smooth dPdr and drhodr
-         if (s% RTI_smooth_mass > 0d0 .and. s% RTI_smooth_iterations > 0) then
+         if (s% ctrl% RTI_smooth_mass > 0d0 .and. s% ctrl% RTI_smooth_iterations > 0) then
             call do_smoothing_by_mass( &
-               s, s% RTI_smooth_mass, s% RTI_smooth_iterations, drhodr, ierr)
+               s, s% ctrl% RTI_smooth_mass, s% ctrl% RTI_smooth_iterations, drhodr, ierr)
             if (ierr /= 0) return
             call do_smoothing_by_mass( &
-               s, s% RTI_smooth_mass, s% RTI_smooth_iterations, dPdr, ierr)
+               s, s% ctrl% RTI_smooth_mass, s% ctrl% RTI_smooth_iterations, dPdr, ierr)
             if (ierr /= 0) return
-         else if (s% RTI_smooth_fraction < 1d0) then
-            c = s% RTI_smooth_fraction
+         else if (s% ctrl% RTI_smooth_fraction < 1d0) then
+            c = s% ctrl% RTI_smooth_fraction
             d = 0.5d0*(1d0 - c)
             am1 = 0
             a00 = dPdr(1)
@@ -2363,12 +2363,12 @@
 
          if (.not. s% RTI_flag) return
 
-         coeff = s% composition_RTI_diffusion_factor
+         coeff = s% ctrl% composition_RTI_diffusion_factor
          if (coeff <= 0) return
          lg_coeff = log10(coeff)
-         full_off = s% min_M_RTI_factors_full_off*Msun
-         full_on = s% max_M_RTI_factors_full_on*Msun
-         min_m = s% RTI_min_m_for_D_mix_floor*Msun
+         full_off = s% ctrl% min_M_RTI_factors_full_off*Msun
+         full_on = s% ctrl% max_M_RTI_factors_full_on*Msun
+         min_m = s% ctrl% RTI_min_m_for_D_mix_floor*Msun
          do k = 2, nz
             D = s% eta_RTI(k)
             if (s% m(k) <= full_on) then
@@ -2380,12 +2380,12 @@
             end if
             if (is_bad(D)) then
                write(*,2) 'eta_RTI', k, D
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_RTI_turbulence')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_RTI_turbulence')
                ierr = -1
                cycle
             end if
-            if (D < s% RTI_D_mix_floor .and. s% m(k) >= min_m) &
-               D = s% RTI_D_mix_floor
+            if (D < s% ctrl% RTI_D_mix_floor .and. s% m(k) >= min_m) &
+               D = s% ctrl% RTI_D_mix_floor
             if (D > s% D_mix(k)) &
                s% mixing_type(k) = rayleigh_taylor_mixing
             D = D + s% D_mix(k)

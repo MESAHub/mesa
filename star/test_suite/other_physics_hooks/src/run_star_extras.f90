@@ -62,7 +62,7 @@
          include 'xtrans_mesh_factor/xtrans_mesh_factor_extras_controls.inc'
          if (ierr /= 0) return
          
-         s% use_other_kap = .true.
+         s% ctrl% use_other_kap = .true.
          s% other_kap_get => my_kap_get
          
          s% eos_rq% use_other_eos_results = .true.
@@ -71,7 +71,7 @@
          s% eos_rq% other_eos_frac => my_other_eos_frac
          s% eos_rq% other_eos_component => my_other_eos_component
 
-         s% use_other_screening = .true.
+         s% ctrl% use_other_screening = .true.
          s% other_screening => my_screening
          
          s% extras_startup => extras_startup

@@ -46,12 +46,12 @@
          include 'formats'
          s% min_gamma1 = 1d99
          do k = s% nz, 1, -1
-            if (s% q(k) > s% gamma1_limit_max_q) exit
+            if (s% q(k) > s% ctrl% gamma1_limit_max_q) exit
             vesc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
             if (s% u_flag) then
-               if (s% u(k) > vesc*s% gamma1_limit_max_v_div_vesc) exit
+               if (s% u(k) > vesc*s% ctrl% gamma1_limit_max_v_div_vesc) exit
             else if (s% v_flag) then
-               if (s% v(k) > vesc*s% gamma1_limit_max_v_div_vesc) exit
+               if (s% v(k) > vesc*s% ctrl% gamma1_limit_max_v_div_vesc) exit
             end if
             if (s% gamma1(k) < s% min_gamma1) s% min_gamma1 = s% gamma1(k)
          end do
@@ -74,13 +74,13 @@
                do k=1,nz
                   if (is_bad(s% eps_nuc_categories(j,k))) then
                      write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
-                     if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_power_info')
+                     if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_power_info')
                   end if
                end do
             end if
          end do  
                 
-         if (s% eps_nuc_factor == 0d0) then
+         if (s% ctrl% eps_nuc_factor == 0d0) then
             s% power_nuc_burn = 0d0
             s% power_nuc_neutrinos = 0d0
             s% power_nonnuc_neutrinos = 0d0
@@ -94,7 +94,7 @@
             ! categories can be subject to numerical jitters at very high temperatures
             s% power_nuc_burn = 0d0
             do k=1,nz
-               if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
+               if (s% ctrl% op_split_burn .and. s% T_start(k) >= s% ctrl% op_split_burn_min_T) then
                   eps_nuc = s% burn_avg_epsnuc(k)
                else
                   eps_nuc = s% eps_nuc(k)
@@ -109,7 +109,7 @@
             s% power_photo = s% L_by_category(iphoto)
          end if
          
-         if (s% non_nuc_neu_factor == 0d0) then
+         if (s% ctrl% non_nuc_neu_factor == 0d0) then
             s% power_nonnuc_neutrinos = 0d0
          else
             s% power_nonnuc_neutrinos = &
@@ -129,9 +129,9 @@
             do k = s% nz, 1, -1
                dq = s% dq(k)
                dx = s% eps_nuc_categories(j,k)*dq
-               if (sum_dq+dq >= s% center_avg_value_dq) then
-                  sum_x = sum_x + dx*(s% center_avg_value_dq - sum_dq)/dq
-                  sum_dq = s% center_avg_value_dq
+               if (sum_dq+dq >= s% ctrl% center_avg_value_dq) then
+                  sum_x = sum_x + dx*(s% ctrl% center_avg_value_dq - sum_dq)/dq
+                  sum_dq = s% ctrl% center_avg_value_dq
                   exit
                end if
                sum_x = sum_x + dx
@@ -304,7 +304,7 @@
             if (is_bad(s% entropy(k))) then
                ierr = -1
                write(*,2) 'report: s% entropy(k)', k, s% entropy(k)
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
 
@@ -319,7 +319,7 @@
                ierr = -1
                write(*,2) 'report: s% dr_div_csound(k)', &
                   k, s% dr_div_csound(k), dr, s% csound(k)
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
             
@@ -334,7 +334,7 @@
             if (is_bad(v)) then
                ierr = -1
                write(*,2) 'report: v', k, v
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
             
@@ -343,7 +343,7 @@
                ierr = -1
                write(*,2) 'report: s% v_div_csound(k)', k, s% v_div_csound(k), &
                   v, s% csound_face(k)
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
 
@@ -364,23 +364,23 @@
             end do
          end if
 
-         if (.not. s% get_delta_nu_from_scaled_solar) then
+         if (.not. s% ctrl% get_delta_nu_from_scaled_solar) then
             s% delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
          else
             s% delta_nu = &
-               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
+               s% ctrl% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% ctrl% Teff_sun) / &
                   pow(s% L_phot,0.75d0)
          end if
          
          call get_mass_info(s, s% dm, ierr)
          if (failed('get_mass_info')) return
          
-         s% nu_max = s% nu_max_sun*s% star_mass/ &
-            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
+         s% nu_max = s% ctrl% nu_max_sun*s% star_mass/ &
+            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% ctrl% Teff_sun))
          s% acoustic_cutoff = &
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
-         if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
+         if (s% ctrl% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% ctrl% delta_Pg_mode_freq
          call get_delta_Pg(s, nu_for_delta_Pg, s% delta_Pg)
 
          if (s% rsp_flag) return
@@ -469,7 +469,7 @@
             real(dp) :: dm_limit
             include 'formats'
             s% mass_conv_core = 0
-            dm_limit = s% conv_core_gap_dq_limit*s% xmstar
+            dm_limit = s% ctrl% conv_core_gap_dq_limit*s% xmstar
             nz = s% nz
             do j = 1, s% n_conv_regions
                ! ignore possible small gap at center
@@ -592,9 +592,9 @@
             do k = s% nz, 1, -1
                dq = s% dq(k)
                dx = dq*s% omega(k)/omega_crit(s,k)
-               if (sum_dq+dq >= s% center_avg_value_dq) then
-                  sum_x = sum_x+ dx*(s% center_avg_value_dq - sum_dq)/dq
-                  sum_dq = s% center_avg_value_dq
+               if (sum_dq+dq >= s% ctrl% center_avg_value_dq) then
+                  sum_x = sum_x+ dx*(s% ctrl% center_avg_value_dq - sum_dq)/dq
+                  sum_dq = s% ctrl% center_avg_value_dq
                   exit
                end if
                sum_x = sum_x + dx
@@ -750,7 +750,7 @@
          real(dp) :: burn_min1, burn_min2
          integer :: i, i_start
          include 'formats'
-         burn_min1 = s% burn_min1; burn_min2 = s% burn_min2
+         burn_min1 = s% ctrl% burn_min1; burn_min2 = s% ctrl% burn_min2
          ! up to 3 zones where eps_nuc > burn_min1 erg/g/s
          ! for each zone have 4 numbers: start1, start2, end2, end1
          ! start1 is mass of inner edge where first goes > burn_min1 (or -20 if none such)
@@ -763,7 +763,7 @@
             call find_epsnuc_zone(s, i_start, &
                s% burn_zone_mass(1,i), s% burn_zone_mass(2,i), &
                s% burn_zone_mass(3,i), s% burn_zone_mass(4,i), &
-               s% burn_min1, s% burn_min2, ierr)
+               s% ctrl% burn_min1, s% ctrl% burn_min2, ierr)
          end do
       end subroutine get_burn_zone_info
 
@@ -1064,7 +1064,7 @@
          o16 = net_iso(io16)
          ne20 = net_iso(ine20)
          si28 = net_iso(isi28)
-         min_x = s% min_boundary_fraction
+         min_x = s% ctrl% min_boundary_fraction
 
          call clear_core_info(s% neutron_rich_core_k, &
             s% neutron_rich_core_mass, s% neutron_rich_core_radius, s% neutron_rich_core_lgT, &
@@ -1072,7 +1072,7 @@
             s% neutron_rich_core_omega, s% neutron_rich_core_omega_div_omega_crit)
 
          do k=1,nz
-            if (s% Ye(k) <= s% neutron_rich_core_boundary_Ye_max) then
+            if (s% Ye(k) <= s% ctrl% neutron_rich_core_boundary_Ye_max) then
                call set_core_info(s, k, s% neutron_rich_core_k, &
                   s% neutron_rich_core_mass, s% neutron_rich_core_radius, s% neutron_rich_core_lgT, &
                   s% neutron_rich_core_lgRho, s% neutron_rich_core_L, s% neutron_rich_core_v, &
@@ -1109,7 +1109,7 @@
             A_max = chem_isos% Z_plus_N(s% chem_id(j))
 
             if (.not. have_fe) then
-               if (s% fe_core_boundary_si28_fraction < 0) then
+               if (s% ctrl% fe_core_boundary_si28_fraction < 0) then
                   if (A_max >= A_max_fe) then
                      call set_core_info(s, k, s% fe_core_k, &
                         s% fe_core_mass, s% fe_core_radius, s% fe_core_lgT, &
@@ -1118,7 +1118,7 @@
                      exit
                   end if
                else if (si28 /= 0) then
-                  if (s% xa(si28,k) <= s% fe_core_boundary_si28_fraction) then
+                  if (s% xa(si28,k) <= s% ctrl% fe_core_boundary_si28_fraction) then
                      sumx = 0
                      do j=1,species
                         if (chem_isos% Z_plus_N(s% chem_id(j)) >= A_max_fe) &
@@ -1136,7 +1136,7 @@
             end if
 
             if (.not. have_one) then
-               if (s% one_core_boundary_he4_c12_fraction < 0) then
+               if (s% ctrl% one_core_boundary_he4_c12_fraction < 0) then
                   if (A_max >= A_max_one) then
                      call set_core_info(s, k, s% one_core_k, &
                         s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
@@ -1145,7 +1145,7 @@
                      have_one = .true.
                   end if
                else if (he4 /= 0 .and. c12 /= 0 .and. o16 /= 0 .and. ne20 /=0) then
-                  if (s% xa(he4,k)+s% xa(c12,k) <= s% one_core_boundary_he4_c12_fraction .and. &
+                  if (s% xa(he4,k)+s% xa(c12,k) <= s% ctrl% one_core_boundary_he4_c12_fraction .and. &
                       s% xa(o16,k)+s% xa(ne20,k) >= min_x) then
                      call set_core_info(s, k, s% one_core_k, &
                         s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
@@ -1157,7 +1157,7 @@
             end if
 
             if (.not. have_co) then
-               if (s% co_core_boundary_he4_fraction < 0) then
+               if (s% ctrl% co_core_boundary_he4_fraction < 0) then
                   if (A_max >= A_max_co) then
                      call set_core_info(s, k, s% co_core_k, &
                         s% co_core_mass, s% co_core_radius, s% co_core_lgT, &
@@ -1166,7 +1166,7 @@
                      have_co = .true.
                   end if
                else if (he4 /= 0 .and. c12 /= 0 .and. o16 /= 0) then
-                  if (s% xa(he4,k) <= s% co_core_boundary_he4_fraction .and. &
+                  if (s% xa(he4,k) <= s% ctrl% co_core_boundary_he4_fraction .and. &
                       s% xa(c12,k)+s% xa(o16,k) >= min_x) then
                      call set_core_info(s, k, s% co_core_k, &
                         s% co_core_mass, s% co_core_radius, s% co_core_lgT, &
@@ -1178,7 +1178,7 @@
             end if
 
             if (.not. have_he) then
-               if (s% he_core_boundary_h1_fraction < 0) then
+               if (s% ctrl% he_core_boundary_h1_fraction < 0) then
                   if (A_max >= A_max_he) then
                      call set_core_info(s, k, s% he_core_k, &
                         s% he_core_mass, s% he_core_radius, s% he_core_lgT, &
@@ -1187,7 +1187,7 @@
                      have_he = .true.
                   end if
                else if (h1 /= 0 .and. he4 /= 0) then
-                  if (s% xa(h1,k) <= s% he_core_boundary_h1_fraction .and. &
+                  if (s% xa(h1,k) <= s% ctrl% he_core_boundary_h1_fraction .and. &
                       s% xa(he4,k) >= min_x) then
                      call set_core_info(s, k, s% he_core_k, &
                         s% he_core_mass, s% he_core_radius, s% he_core_lgT, &

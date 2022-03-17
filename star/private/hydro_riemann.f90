@@ -100,14 +100,14 @@
          include 'formats'
          dbg = .false.
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          
-         if (s% use_other_momentum) &
+         if (s% ctrl% use_other_momentum) &
             call mesa_error(__FILE__,__LINE__,'Riemann dudt does not support use_other_momentum')
-         if (s% use_other_momentum_implicit) &
+         if (s% ctrl% use_other_momentum_implicit) &
             call mesa_error(__FILE__,__LINE__,'Riemann dudt does not support use_other_momentum_implicit')
-         if (s% use_mass_corrections) &
+         if (s% ctrl% use_mass_corrections) &
             call mesa_error(__FILE__,__LINE__,'Riemann dudt does not support use_mass_corrections')
             
          ierr = 0
@@ -232,11 +232,11 @@
          subroutine setup_diffusion_source
             type(auto_diff_real_star_order1) :: u_m1, u_00, u_p1
             real(dp) :: sig00, sigp1
-            do_diffusion = s% RTI_flag .and. s% dudt_RTI_diffusion_factor > 0d0
+            do_diffusion = s% RTI_flag .and. s% ctrl% dudt_RTI_diffusion_factor > 0d0
             if (do_diffusion) then ! add diffusion source term to dudt
                u_p1 = 0d0 ! sets val and d1Array to 0
                if (k < nz) then
-                  sigp1 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k+1)
+                  sigp1 = s% ctrl% dudt_RTI_diffusion_factor*s% sig_RTI(k+1)
                   u_p1%val = s% u(k+1)
                   u_p1%d1Array(i_v_p1) = 1d0
                else
@@ -244,7 +244,7 @@
                end if
                u_m1 = 0d0 ! sets val and d1Array to 0
                if (k > 1) then
-                  sig00 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k)
+                  sig00 = s% ctrl% dudt_RTI_diffusion_factor*s% sig_RTI(k)
                   u_m1%val = s% u(k-1)
                   u_m1%d1Array(i_v_m1) = 1d0
                else
@@ -286,7 +286,7 @@
          real(dp) :: cgrav
          cgrav = s% cgrav(k)
          G = cgrav
-         if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
+         if (s% rotation_flag .and. s% ctrl% use_gravity_rotation_correction) &
             G = G*s% fp_rot(k)
       end subroutine get_G
 
@@ -313,7 +313,7 @@
          
          ierr = 0
          test_partials = .false.
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          
          s% RTI_du_diffusion_kick(k) = 0d0
          s% d_uface_domega(k) = 0
@@ -383,7 +383,7 @@
 
          if (denominator_ad%val == 0d0 .or. is_bad(denominator_ad%val)) then
             ierr = -1
-            if (s% report_ierr) then
+            if (s% ctrl% report_ierr) then
                write(*,2) 'u_face denominator bad', k, denominator_ad%val
             end if
             return
@@ -402,8 +402,8 @@
 
          if (k < s% nz .and. s% RTI_flag) then
              if (s% eta_RTI(k) > 0d0 .and. &
-                   s% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
-                f = s% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/s% dm_bar(k)
+                   s% ctrl% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
+                f = s% ctrl% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/s% dm_bar(k)
                 du_ad = f*A_ad*(rhoL_ad - rhoR_ad) ! bump uface in direction of lower density
                 s% RTI_du_diffusion_kick(k) = du_ad%val
                 s% u_face_ad(k) = s% u_face_ad(k) + du_ad

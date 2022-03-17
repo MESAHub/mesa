@@ -65,7 +65,7 @@
 
          ! Debugging setup
          ierr = 0
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          ! Equation setup
@@ -79,7 +79,7 @@
          dm = s% dm(k)
          rho = s% rho_start(k)
          r00 = s% r_start(k)        
-         fac = s% alpha_RTI_diffusion_factor
+         fac = s% ctrl% alpha_RTI_diffusion_factor
           
          sig00 = fac*sig(k)
          if (k < nz) then
@@ -120,7 +120,7 @@
          ! Sources and sink s        
          dPdr_drhodr = s% dPdr_dRhodr_info(k)
 
-         if (a_00 <= 0d0 .or. s% RTI_D <= 0d0) then
+         if (a_00 <= 0d0 .or. s% ctrl% RTI_D <= 0d0) then
             source_minus = 0d0
          else
             cs = s% csound_start(k)
@@ -129,24 +129,24 @@
             else
                rmid = 0.5d0*(s% r_start(k) + s% R_center)
             end if
-            RTI_D = s% RTI_D*max(1d0,a_00/s% RTI_max_alpha)
+            RTI_D = s% ctrl% RTI_D*max(1d0,a_00/s% ctrl% RTI_max_alpha)
             source_minus = RTI_D*a_00*cs/rmid
          end if
          
          instability2 = -dPdr_drhodr ! > 0 means Rayleigh-Taylor unstable         
          if (instability2 <= 0d0 .or. &
-               s% q(k) > s% alpha_RTI_src_max_q .or. &
-               s% q(k) < s% alpha_RTI_src_min_q .or. &
+               s% q(k) > s% ctrl% alpha_RTI_src_max_q .or. &
+               s% q(k) < s% ctrl% alpha_RTI_src_min_q .or. &
                s% rho(k) < 1d99) then
             source_plus = 0d0
             instability2 = 0d0
             instability = 0d0
             A_plus_B_div_rho = 0d0
          else
-            RTI_B = s% RTI_B
+            RTI_B = s% ctrl% RTI_B
             instability = sqrt(instability2)
-            if (s% alpha_RTI_start(k) < s% RTI_max_alpha) then
-               A_plus_B_div_rho = (s% RTI_A + RTI_B*a_00)/rho
+            if (s% alpha_RTI_start(k) < s% ctrl% RTI_max_alpha) then
+               A_plus_B_div_rho = (s% ctrl% RTI_A + RTI_B*a_00)/rho
             else ! turn off source when reach max
                A_plus_B_div_rho = 0d0
             end if
@@ -187,7 +187,7 @@
             write(*,2) 's% q(k)', k, s% q(k)
             write(*,2) 's% Peos(k)', k, s% Peos(k)
             write(*,2) 's% rho(k)', k, s% rho(k)
-            write(*,2) 's% alpha_RTI_src_max_q', k, s% alpha_RTI_src_max_q
+            write(*,2) 's% ctrl% alpha_RTI_src_max_q', k, s% ctrl% alpha_RTI_src_max_q
             write(*,2) 'dadt_expected', k, dadt_expected
             write(*,2) 'dadt_actual', k, dadt_actual
             write(*,2) 'eqn_scale', k, eqn_scale

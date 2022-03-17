@@ -85,10 +85,10 @@
          s% extra_jdot(1:nz) = 0
          s% extra_omegadot(1:nz) = 0
 
-         if (s% use_other_torque) then
+         if (s% ctrl% use_other_torque) then
             call s% other_torque(s% id, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr .or. dbg) &
+               if (s% ctrl% report_ierr .or. dbg) &
                   write(*, *) 'solve_omega_mix: other_torque returned ierr', ierr
                return
             end if
@@ -97,7 +97,7 @@
          if (associated(s% binary_other_torque)) then
             call s% binary_other_torque(s% id, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr .or. dbg) &
+               if (s% ctrl% report_ierr .or. dbg) &
                   write(*, *) 'solve_omega_mix: binary_other_torque returned ierr', ierr
                return
             end if
@@ -108,7 +108,7 @@
             do_solve_omega_mix = terminate
             s% termination_code = t_solve_omega_mix
             s% result_reason = nonzero_ierr
-            if (s% report_ierr) write(*,*) 'allocate failed in do_solve_omega_mix'
+            if (s% ctrl% report_ierr) write(*,*) 'allocate failed in do_solve_omega_mix'
             return
          end if
 
@@ -117,7 +117,7 @@
          okay = .true.
          do k=1,nz
             if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
-               if (s% stop_for_bad_nums) then
+               if (s% ctrl% stop_for_bad_nums) then
                   write(*,2) 's% omega(k)', k, s% omega(k)
                   call mesa_error(__FILE__,__LINE__,'solve omega')
                end if
@@ -131,7 +131,7 @@
          end if
 
          steps_used = 0
-         recalc_mixing_info_each_substep = s% recalc_mixing_info_each_substep
+         recalc_mixing_info_each_substep = s% ctrl% recalc_mixing_info_each_substep
 
       step_loop: do while &
                (total_time - time > 1d-10*total_time .and. &
@@ -143,7 +143,7 @@
                   do_solve_omega_mix = terminate
                   s% termination_code = t_solve_omega_mix
                   s% result_reason = nonzero_ierr
-                  if (s% report_ierr) write(*,*) 'update_rotation_mixing_info failed in do_solve_omega_mix'
+                  if (s% ctrl% report_ierr) write(*,*) 'update_rotation_mixing_info failed in do_solve_omega_mix'
                   return
                end if
             end if
@@ -160,7 +160,7 @@
                   do_solve_omega_mix = terminate
                   s% termination_code = t_solve_omega_mix
                   s% result_reason = nonzero_ierr
-                  if (s% report_ierr) write(*,*) 'get_rotation_sigmas failed in do_solve_omega_mix'
+                  if (s% ctrl% report_ierr) write(*,*) 'get_rotation_sigmas failed in do_solve_omega_mix'
                   return
                end if
                if (steps_used > 0) then
@@ -205,7 +205,7 @@
 
                total_num_iters = total_num_iters+1
 
-               if (s% use_other_torque_implicit) then
+               if (s% ctrl% use_other_torque_implicit) then
                   call s% other_torque_implicit(s% id, ierr)
                   if (ierr /= 0) then
                      s% retry_message = 'other_torque_implicit returned ierr'
@@ -297,17 +297,17 @@
                s% j_rot(k) = s% i_rot(k)% val*s% omega(k)
             end do
 
-            if (.not. (s% use_other_torque .or. s% use_other_torque_implicit .or. &
+            if (.not. (s% ctrl% use_other_torque .or. s% ctrl% use_other_torque_implicit .or. &
                   associated(s% binary_other_torque))) then
 
                ! check conservation for cases with no extra torque
                J_tot1 = total_angular_momentum(s) ! what we have
 
-               if (abs(J_tot0 - J_tot1) > s% angular_momentum_error_retry*abs(J_tot0)) then
+               if (abs(J_tot0 - J_tot1) > s% ctrl% angular_momentum_error_retry*abs(J_tot0)) then
                   s% retry_message = 'retry: failed to conserve angular momentum in mixing'
                   write(*,*) "angular momentum error larger than angular_momentum_error_retry", abs(J_tot0 - J_tot1)/abs(J_tot0)
                   do_solve_omega_mix = retry
-               else if (abs(J_tot0 - J_tot1) > s% angular_momentum_error_warn*abs(J_tot0)) then
+               else if (abs(J_tot0 - J_tot1) > s% ctrl% angular_momentum_error_warn*abs(J_tot0)) then
                   write(*,*) "angular momentum error larger than angular_momentum_error_warn", abs(J_tot0 - J_tot1)/abs(J_tot0)
                end if
                if (dbg) then
@@ -654,7 +654,7 @@
                   dl(k-1) = -(d_d2omega_domega_m1 + d_d2irot_domega_m1)*f
                end if
 
-               if (s% use_other_torque_implicit) then
+               if (s% ctrl% use_other_torque_implicit) then
                   d(k) = d(k) - &
                      dt*(s% d_extra_jdot_domega_00(k)/irot + &
                            s% d_extra_omegadot_domega_00(k))

@@ -50,13 +50,13 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         if (len_trim(s% op_mono_data_path) == 0) then
+         if (len_trim(s% ctrl% op_mono_data_path) == 0) then
             ierr = -1
          else
-            fname = trim(s% op_mono_data_path) // '/a06.140'
+            fname = trim(s% ctrl% op_mono_data_path) // '/a06.140'
             inquire(file=trim(fname), exist=dir_exists)
             if (.not. dir_exists) then
-               write(*,'(a)') ' control op_mono_data_path = "' // trim(s% op_mono_data_path) // '"'
+               write(*,'(a)') ' control op_mono_data_path = "' // trim(s% ctrl% op_mono_data_path) // '"'
                write(*,'(a)') ' the file "' // trim(fname) // '" does not exist, so skip this test.'
                ierr = -1
             end if

@@ -84,7 +84,7 @@
          ! when the model stops, we save the cell location of the bottom of the envelope
          ! to an inlist and then we will read this when we start again
 
-         if (s% x_logical_ctrl(1)) then
+         if (s% ctrl% x_logical_ctrl(1)) then
             do k = 1, s% nz
                if (s% T(k) .gt. 1e8) exit
             end do

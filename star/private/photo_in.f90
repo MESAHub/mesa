@@ -59,7 +59,7 @@
          open(newunit=iounit, file=trim(fname), action='read', &
             status='old', iostat=ierr, form='unformatted')
          if (ierr /= 0) then
-            if (s% report_ierr) write(*, *) 'Failed to open ', trim(fname)
+            if (s% ctrl% report_ierr) write(*, *) 'Failed to open ', trim(fname)
             return
          end if
 
@@ -76,7 +76,7 @@
          if (failed('initial_z')) return
 
          read(iounit, iostat=ierr) &
-            s% initial_z, & ! need this since read_model can change what is in the inlist
+            s% ctrl% initial_z, & ! need this since read_model can change what is in the inlist
             s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
@@ -106,26 +106,26 @@
             write(*,1) 'set tau_factor to photo value', s% tau_factor
          end if
 
-         if (s% force_Tsurf_factor > 0 .and. s% Tsurf_factor /= s% force_Tsurf_factor .and. &
-               s% Tsurf_factor /= s% job% set_to_this_Tsurf_factor) then
-            s% Tsurf_factor = s% force_Tsurf_factor
-            write(*,1) 'set Tsurf_factor to photo value', s% Tsurf_factor
+         if (s% force_Tsurf_factor > 0 .and. s% ctrl% Tsurf_factor /= s% force_Tsurf_factor .and. &
+               s% ctrl% Tsurf_factor /= s% job% set_to_this_Tsurf_factor) then
+            s% ctrl% Tsurf_factor = s% force_Tsurf_factor
+            write(*,1) 'set Tsurf_factor to photo value', s% ctrl% Tsurf_factor
          end if
 
-         if (s% force_opacity_factor > 0 .and. s% opacity_factor /= s% force_opacity_factor .and. &
-               s% opacity_factor /= s% job% relax_to_this_opacity_factor) then
-            s% opacity_factor = s% force_opacity_factor
-            write(*,1) 'set opacity_factor to photo value', s% opacity_factor
+         if (s% force_opacity_factor > 0 .and. s% ctrl% opacity_factor /= s% force_opacity_factor .and. &
+               s% ctrl% opacity_factor /= s% job% relax_to_this_opacity_factor) then
+            s% ctrl% opacity_factor = s% force_opacity_factor
+            write(*,1) 'set opacity_factor to photo value', s% ctrl% opacity_factor
          end if
 
          if (s% using_revised_net_name)  &
             s% net_name = s% revised_net_name
 
          if (s% using_revised_max_yr_dt) &
-            s% max_years_for_timestep = s% revised_max_yr_dt
+            s% ctrl% max_years_for_timestep = s% revised_max_yr_dt
 
          if (s% astero_using_revised_max_yr_dt) &
-            s% max_years_for_timestep = s% astero_revised_max_yr_dt
+            s% ctrl% max_years_for_timestep = s% astero_revised_max_yr_dt
 
          nz = s% nz
 

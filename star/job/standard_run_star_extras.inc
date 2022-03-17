@@ -173,7 +173,7 @@
          ! here is an example for adding an extra history header item
          ! also set how_many_extra_history_header_items
          ! names(1) = 'mixing_length_alpha'
-         ! vals(1) = s% mixing_length_alpha
+         ! vals(1) = s% ctrl% mixing_length_alpha
 
       end subroutine data_for_extra_history_header_items
 
@@ -202,7 +202,7 @@
          ! here is an example for adding an extra profile header item
          ! also set how_many_extra_profile_header_items
          ! names(1) = 'mixing_length_alpha'
-         ! vals(1) = s% mixing_length_alpha
+         ! vals(1) = s% ctrl% mixing_length_alpha
 
       end subroutine data_for_extra_profile_header_items
 

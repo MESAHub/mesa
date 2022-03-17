@@ -262,7 +262,7 @@
          integer :: k, nz
          include 'formats'
          nz = s% nz
-         if (.not. s% use_mass_corrections) then
+         if (.not. s% ctrl% use_mass_corrections) then
             do k=1,nz
                s% m_grav(k) = s% m(k)
             end do
@@ -514,7 +514,7 @@
             if (s% dm(k) <= 0d0 .or. is_bad(s% m(k) + s% dm(k))) then
                write(*,2) 'dm m dq q M_center', k, &
                   s% dm(k), s% m(k), s% dq(k), s% q(k), s% M_center
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_m_and_dm')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_m_and_dm')
             end if
          end do
       end subroutine set_m_and_dm
@@ -594,7 +594,7 @@
          ierr = 0
          ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
          ! ok for create pre ms etc., but not for read model
-         if (s% do_normalize_dqs_as_part_of_set_qs) then
+         if (s% ctrl% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, nz, dq, ierr)
             if (ierr /= 0) return
          end if
@@ -727,7 +727,7 @@
          get_dtau1 = s% dm(1)*kap/(pi4*s% rmid(1)*s% rmid(1))
          if (is_bad(get_dtau1)) then
             ierr = -1
-            if (.not. s% report_ierr) return
+            if (.not. s% ctrl% report_ierr) return
             k = 1
             write(*,2) 'get_dtau1', k, get_dtau1
             write(*,2) 's% dm(1)', k, s% dm(k)
@@ -760,7 +760,7 @@
             dtau = s% dm(k)*kap/(pi4*s% rmid(k)*s% rmid(k))
             if (is_bad(dtau)) then
                ierr = -1
-               if (.not. s% report_ierr) return
+               if (.not. s% ctrl% report_ierr) return
                write(*,2) 'dtau', k, dtau
                write(*,2) 's% dm(k)', k, s% dm(k)
                write(*,2) 's% opacity(k)', k, s% opacity(k)
@@ -805,7 +805,7 @@
             write(*,2) 's% Teff', s% model_number, s% Teff
          end if
          delta_Pg = 0
-         if (.not. s% calculate_Brunt_N2) return
+         if (.not. s% ctrl% calculate_Brunt_N2) return
          integral = 0
          I_integral = 0
          I_integral_limit = 0.5d0
@@ -865,7 +865,7 @@
          nz = s% nz
          dbg = .false.
          if (s% RSP_flag) then ! mid = avg r
-            !dbg = s% model_number >= s% max_model_number - 1
+            !dbg = s% model_number >= s% ctrl% max_model_number - 1
             do k=nzlo, nzhi
                if (k < nz) then
                   rmid = 0.5d0*(s% r(k) + s% r(k+1))
@@ -1049,9 +1049,9 @@
          do k = s% nz, 1, -1
             dq = s% dq(k)
             dx = p(k)*dq
-            if (sum_dq+dq >= s% center_avg_value_dq) then
-               sum_x = sum_x + dx*(s% center_avg_value_dq - sum_dq)/dq
-               sum_dq = s% center_avg_value_dq
+            if (sum_dq+dq >= s% ctrl% center_avg_value_dq) then
+               sum_x = sum_x + dx*(s% ctrl% center_avg_value_dq - sum_dq)/dq
+               sum_dq = s% ctrl% center_avg_value_dq
                exit
             end if
             sum_x = sum_x + dx
@@ -1328,18 +1328,18 @@
          nz = s% nz
          min_k = nz
          min_dr_div_cs = 1d99
-         min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
-         max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
-         k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
-         if (s% check_remnant_only_for_dt_div_min_dr_div_cs_limit) then
+         min_q = s% ctrl% min_q_for_dt_div_min_dr_div_cs_limit
+         max_q = s% ctrl% max_q_for_dt_div_min_dr_div_cs_limit
+         k_min = max(1, s% ctrl% min_k_for_dt_div_min_dr_div_cs_limit)
+         if (s% ctrl% check_remnant_only_for_dt_div_min_dr_div_cs_limit) then
             remnant_mass = get_remnant_mass(s)
          else
             remnant_mass = s% m(1)
          end if
          min_abs_u_div_cs = &
-            s% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
+            s% ctrl% min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
          min_abs_du_div_cs = &
-            s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+            s% ctrl% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
          if (s% v_flag) then
             do k = k_min, nz-1
                if (s% m(k) > remnant_mass) cycle
@@ -1537,10 +1537,10 @@
             if (is_bad(dequ)) then
 !$omp critical (store_partials_crit)
                ierr = -1
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,2) 'store_partials: bad ' // trim(str), k, dequ
                end if
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_partials')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_partials')
 !$omp end critical (store_partials_crit)
                return
             end if
@@ -1598,7 +1598,7 @@
          end if
          Peos = (s% dq(k-1)*s% Peos(k) + s% dq(k)*s% Peos(k-1))/(s% dq(k-1) + s% dq(k))
          g = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k))
-         Pextra_factor = s% Pextra_factor
+         Pextra_factor = s% ctrl% Pextra_factor
          tau_eff = s% opacity(k)*(Peos/g - &
                Pextra_factor*(s% L(k)/s% m_grav(k))/(6d0*pi*clight*s% cgrav(k)))
       end function tau_eff
@@ -1622,7 +1622,7 @@
          Ledd_sum = s% dq(1)*pi4*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(1)
          do k = 2, s% nz
             tau = tau + dtau
-            if (tau > s% surf_avg_tau) exit
+            if (tau > s% ctrl% surf_avg_tau) exit
             dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             dqsum = dqsum + s% dq(k)
             Ledd_sum = Ledd_sum + &
@@ -1687,11 +1687,11 @@
          integer, intent(in) :: k
          real(dp) :: irradiation_dq, xq, eps
          eval_irradiation_heat = 0
-         if (s% irradiation_flux /= 0) then
-            irradiation_dq = pi4*s% r(1)*s% r(1)*s% column_depth_for_irradiation/s% xmstar
+         if (s% ctrl% irradiation_flux /= 0) then
+            irradiation_dq = pi4*s% r(1)*s% r(1)*s% ctrl% column_depth_for_irradiation/s% xmstar
             xq = 1 - s% q(k)
             if (irradiation_dq > xq) then ! add irradiation heat for cell k
-               eps = 0.25d0 * s% irradiation_flux / s% column_depth_for_irradiation
+               eps = 0.25d0 * s% ctrl% irradiation_flux / s% ctrl% column_depth_for_irradiation
                if (irradiation_dq < xq + s% dq(k)) then ! only part of cell gets heated
                   eval_irradiation_heat = eps*(irradiation_dq - xq)/s% dq(k)
                else ! all of cell gets heated
@@ -1987,7 +1987,7 @@
          integer, intent(in) :: k
          real(qp) :: qhalf, v0, v1, v2, Mbar
          qhalf = 0.5d0
-         if (s% use_mass_corrections) then
+         if (s% ctrl% use_mass_corrections) then
             Mbar = s% mass_correction(k)
          else
             Mbar = 1.0_qp
@@ -2027,7 +2027,7 @@
          real(dp) :: dv2_dv00, dv2_dvp1
          real(qp) :: qhalf, v0, v1, v2, Mbar
          qhalf = 0.5d0
-         if (s% use_mass_corrections) then
+         if (s% ctrl% use_mass_corrections) then
             Mbar = s% mass_correction(k)
          else
             Mbar = 1.0_qp
@@ -2077,7 +2077,7 @@
          real(dp) :: d_grav00_dlnR00, d_gravp1_dlnRp1
          include 'formats'
          qhalf = 0.5d0
-         if (s% use_mass_corrections) then
+         if (s% ctrl% use_mass_corrections) then
             Mbar = s% mass_correction(k)
          else
             Mbar = 1.0_qp
@@ -2130,7 +2130,7 @@
          real(qp) :: qhalf, rp1, r00, mp1, m00, Gp1, G00, gravp1, grav00, Mbar
          include 'formats'
          qhalf = 0.5d0
-         if (s% use_mass_corrections) then
+         if (s% ctrl% use_mass_corrections) then
             Mbar = s% mass_correction_start(k)
          else
             Mbar = 1.0_qp
@@ -2242,7 +2242,7 @@
          if (s% v_flag .or. s% u_flag) &
             cell_total = cell_total + cell_specific_KE(s,k,d_dv00,d_dvp1)
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
-         if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
+         if (s% rotation_flag .and. s% ctrl% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
          if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
@@ -2324,7 +2324,7 @@
             if (s% rotation_flag) then
                cell1 = dm*cell_specific_rotational_energy(s,k)
                total_rotational_kinetic_energy = total_rotational_kinetic_energy + cell1
-               if (s% include_rotation_in_total_energy) &
+               if (s% ctrl% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
             if (s% RSP2_flag) then
@@ -2345,7 +2345,7 @@
          sum_total = total_internal_energy + total_gravitational_energy + &
             total_radial_kinetic_energy + total_turbulent_energy
             
-         if (s% include_rotation_in_total_energy) &
+         if (s% ctrl% include_rotation_in_total_energy) &
             sum_total = sum_total + total_rotational_kinetic_energy
 
       end subroutine eval_deltaM_total_energy_integrals
@@ -2373,7 +2373,7 @@
             cell_total = cell_total + cell1
             if (s% rotation_flag) then
                cell1 = dm*cell_specific_rotational_energy(s,k)
-               if (s% include_rotation_in_total_energy) &
+               if (s% ctrl% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
             if (s% RSP2_flag) then
@@ -2732,10 +2732,10 @@
 
       real(dp) function yrs_for_init_timestep(s)
          type (star_info), pointer :: s
-         if (s% initial_mass <= 1) then
+         if (s% ctrl% initial_mass <= 1) then
             yrs_for_init_timestep = 1d5
          else
-            yrs_for_init_timestep = 1d5 / pow(s% initial_mass,2.5d0)
+            yrs_for_init_timestep = 1d5 / pow(s% ctrl% initial_mass,2.5d0)
          end if
       end function yrs_for_init_timestep
 
@@ -2793,7 +2793,7 @@
             s% phase_of_evolution = phase_TAMS            
          else if (center_h1 <= 0.3d0) then
             s% phase_of_evolution = phase_IAMS            
-         else if (s% L_nuc_burn_total >= s% L_phot*s% Lnuc_div_L_zams_limit) then
+         else if (s% L_nuc_burn_total >= s% L_phot*s% ctrl% Lnuc_div_L_zams_limit) then
             s% phase_of_evolution = phase_ZAMS
          else if (s% log_center_temperature > 5d0) then
             s% phase_of_evolution = phase_PreMS
@@ -2873,7 +2873,7 @@
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'1 e00')
+            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'1 e00')
 !$omp end critical (star_utils_e00_crit1)
          end if
          
@@ -2930,7 +2930,7 @@
 !$omp critical (star_utils_em1_crit1)
             write(*,4) 'em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'em1')
+            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'em1')
 !$omp end critical (star_utils_em1_crit1)
          end if
          
@@ -2984,7 +2984,7 @@
 !$omp critical (star_utils_ep1_crit1)
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'ep1')
+            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'ep1')
 !$omp end critical (star_utils_ep1_crit1)
          end if
          
@@ -3014,15 +3014,15 @@
          type (star_info), pointer :: s
          real(dp) :: logTc, alfa
          logTc = s% lnT(s% nz)/ln10
-         if (logTc <= s% logT_max_for_min_xa_hard_limit) then
-            min_xa_hard_limit = s% min_xa_hard_limit
-         else if (logTc >= s% logT_min_for_min_xa_hard_limit_for_highT) then
-            min_xa_hard_limit = s% min_xa_hard_limit_for_highT
+         if (logTc <= s% ctrl% logT_max_for_min_xa_hard_limit) then
+            min_xa_hard_limit = s% ctrl% min_xa_hard_limit
+         else if (logTc >= s% ctrl% logT_min_for_min_xa_hard_limit_for_highT) then
+            min_xa_hard_limit = s% ctrl% min_xa_hard_limit_for_highT
          else
-            alfa = (logTc - s% logT_max_for_min_xa_hard_limit) / &
-                   (s% logT_min_for_min_xa_hard_limit_for_highT - s% logT_max_for_min_xa_hard_limit)
+            alfa = (logTc - s% ctrl% logT_max_for_min_xa_hard_limit) / &
+                   (s% ctrl% logT_min_for_min_xa_hard_limit_for_highT - s% ctrl% logT_max_for_min_xa_hard_limit)
             min_xa_hard_limit = &
-               alfa*s% min_xa_hard_limit_for_highT + (1d0 - alfa)*s% min_xa_hard_limit
+               alfa*s% ctrl% min_xa_hard_limit_for_highT + (1d0 - alfa)*s% ctrl% min_xa_hard_limit
          end if
       end function current_min_xa_hard_limit
 
@@ -3032,15 +3032,15 @@
          real(dp) :: logTc, alfa
          include 'formats'
          logTc = s% lnT(s% nz)/ln10
-         if (logTc <= s% logT_max_for_sum_xa_hard_limit) then
-            sum_xa_hard_limit = s% sum_xa_hard_limit
-         else if (logTc >= s% logT_min_for_sum_xa_hard_limit_for_highT) then
-            sum_xa_hard_limit = s% sum_xa_hard_limit_for_highT
+         if (logTc <= s% ctrl% logT_max_for_sum_xa_hard_limit) then
+            sum_xa_hard_limit = s% ctrl% sum_xa_hard_limit
+         else if (logTc >= s% ctrl% logT_min_for_sum_xa_hard_limit_for_highT) then
+            sum_xa_hard_limit = s% ctrl% sum_xa_hard_limit_for_highT
          else
-            alfa = (logTc - s% logT_max_for_sum_xa_hard_limit) / &
-                   (s% logT_min_for_sum_xa_hard_limit_for_highT - s% logT_max_for_sum_xa_hard_limit)
+            alfa = (logTc - s% ctrl% logT_max_for_sum_xa_hard_limit) / &
+                   (s% ctrl% logT_min_for_sum_xa_hard_limit_for_highT - s% ctrl% logT_max_for_sum_xa_hard_limit)
             sum_xa_hard_limit = &
-               alfa*s% sum_xa_hard_limit_for_highT + (1d0 - alfa)*s% sum_xa_hard_limit
+               alfa*s% ctrl% sum_xa_hard_limit_for_highT + (1d0 - alfa)*s% ctrl% sum_xa_hard_limit
          end if
          !write(*,1) 'logTc hard_limit', logTc, sum_xa_hard_limit
       end function current_sum_xa_hard_limit
@@ -3181,23 +3181,23 @@
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0 .or. &
-               k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-               k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+         if (s% ctrl% RSP2_alfap == 0 .or. s% ctrl% mixing_length_alpha == 0 .or. &
+               k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+               k > s% nz - int(s% nz/s% ctrl% RSP_nz_div_IBOTOM)) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
          end if
          rho = wrap_d_00(s,k)
          etrb = wrap_etrb_00(s,k)
-         Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*etrb*rho
+         Ptrb_div_etrb = s% ctrl% RSP2_alfap*x_ALFAP*etrb*rho
          Ptrb = Ptrb_div_etrb*etrb ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering)
+                  s% ctrl% include_P_in_velocity_time_centering)
          if (time_center) then
-            Ptrb_start = s% RSP2_alfap*get_etrb_start(s,k)*s% rho_start(k)
-            Ptrb = s% P_theta_for_velocity_time_centering*Ptrb + &
-               (1d0 - s% P_theta_for_velocity_time_centering)*Ptrb_start
+            Ptrb_start = s% ctrl% RSP2_alfap*get_etrb_start(s,k)*s% rho_start(k)
+            Ptrb = s% ctrl% P_theta_for_velocity_time_centering*Ptrb + &
+               (1d0 - s% ctrl% P_theta_for_velocity_time_centering)*Ptrb_start
          end if
 
          if (is_bad(Ptrb%val)) then
@@ -3207,7 +3207,7 @@
 !$omp end critical (calc_Ptrb_ad_tw_crit)
          end if
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = Ptrb%val
@@ -3240,9 +3240,9 @@
          d_Ptot_dxa = 0d0
          
          time_center = (s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering)
+                  s% ctrl% include_P_in_velocity_time_centering)
          if (time_center) then
-            alfa = s% P_theta_for_velocity_time_centering
+            alfa = s% ctrl% P_theta_for_velocity_time_centering
          else
             alfa = 1d0
          end if
@@ -3259,7 +3259,7 @@
          end if
 
          Pvsc_ad = 0d0
-         if (s% use_Pvsc_art_visc) then
+         if (s% ctrl% use_Pvsc_art_visc) then
             call get_Pvsc_ad(s, k, Pvsc_ad, ierr) ! no time centering for Pvsc
             if (ierr /= 0) return
             ! NO TIME CENTERING FOR Pvsc: Pvsc_ad = alfa*Pvsc_ad + beta*s% Pvsc_start(k)
@@ -3273,18 +3273,18 @@
          end if
 
          mlt_Pturb_ad = 0d0
-         if ((.not. skip_mlt_Pturb) .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
-            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+         if ((.not. skip_mlt_Pturb) .and. s% ctrl% mlt_Pturb_factor > 0d0 .and. k > 1) then
+            mlt_Pturb_ad = s% ctrl% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
             if (time_center) then
                mlt_Pturb_start = &
-                  s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
+                  s% ctrl% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
                mlt_Pturb_ad = alfa*mlt_Pturb_ad + beta*mlt_Pturb_start
             end if
          end if           
          
          Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad
          
-         if (s% use_other_pressure) Ptot_ad%val = Ptot_ad%val + s% extra_pressure(k)
+         if (s% ctrl% use_other_pressure) Ptot_ad%val = Ptot_ad%val + s% extra_pressure(k)
 
       end subroutine calc_Ptot_ad_tw
       
@@ -3303,10 +3303,10 @@
          s% Pvsc(k) = 0d0
          Pvsc_start = s% Pvsc_start(k)
          if (Pvsc_start < 0d0) s% Pvsc_start(k) = 0d0
-         if (.not. (s% v_flag .and. s% use_Pvsc_art_visc)) return
-         cq = s% Pvsc_cq
+         if (.not. (s% v_flag .and. s% ctrl% use_Pvsc_art_visc)) return
+         cq = s% ctrl% Pvsc_cq
          if (cq == 0d0) return
-         zsh = s% Pvsc_zsh
+         zsh = s% ctrl% Pvsc_zsh
          v00 = wrap_v_00(s,k)
          vp1 = wrap_v_p1(s,k)
          Peos = wrap_Peos_00(s,k)
@@ -3378,9 +3378,9 @@
          character(len=*), intent(in) :: str
          logical, intent(in) :: advance
          integer :: id, ierr, io
-         if (len_trim(s% extra_terminal_output_file) > 0) then
+         if (len_trim(s% ctrl% extra_terminal_output_file) > 0) then
             ierr = 0
-            open(newunit=io, file=trim(s% extra_terminal_output_file), &
+            open(newunit=io, file=trim(s% ctrl% extra_terminal_output_file), &
                action='write', position='append', iostat=ierr)
             if (ierr == 0) then
                if (advance) then
@@ -3391,7 +3391,7 @@
                close(io)
             else
                write(*,*) 'failed to open extra_terminal_output_file ' // &
-                  trim(s% extra_terminal_output_file)
+                  trim(s% ctrl% extra_terminal_output_file)
             end if
          end if
       end subroutine write_to_extra_terminal_output_file
@@ -3475,7 +3475,7 @@
          do k = 1, s% nz
             sum_x = sum_x + s% xa(j,k)*s% dq(k)
             sum_dq = sum_dq + s% dq(k)
-            if (sum_dq >= s% surface_avg_abundance_dq) exit
+            if (sum_dq >= s% ctrl% surface_avg_abundance_dq) exit
          end do
          surface_avg_x = sum_x/sum_dq
       end function surface_avg_x
@@ -3495,9 +3495,9 @@
          do k = s% nz, 1, -1
             dq = s% dq(k)
             dx = s% xa(j,k)*dq
-            if (sum_dq+dq >= s% center_avg_value_dq) then
-               sum_x = sum_x+ dx*(s% center_avg_value_dq - sum_dq)/dq
-               sum_dq = s% center_avg_value_dq
+            if (sum_dq+dq >= s% ctrl% center_avg_value_dq) then
+               sum_x = sum_x+ dx*(s% ctrl% center_avg_value_dq - sum_dq)/dq
+               sum_dq = s% ctrl% center_avg_value_dq
                exit
             end if
             sum_x = sum_x + dx
@@ -3540,10 +3540,10 @@
          else
             scal = 1d-6
          end if
-         if (s% dedt_eqn_r_scale > 0d0) then
+         if (s% ctrl% dedt_eqn_r_scale > 0d0) then
             cell_energy_fraction_start = &
                s% energy_start(k)*s% dm(k)/s% total_internal_energy_old                    
-            scal = min(scal, cell_energy_fraction_start*s% dedt_eqn_r_scale) 
+            scal = min(scal, cell_energy_fraction_start*s% ctrl% dedt_eqn_r_scale) 
          end if
          scal = scal*s% dt/s% energy_start(k)
       end subroutine set_energy_eqn_scal
@@ -3555,7 +3555,7 @@
          integer :: k
          real(dp) :: brunt_B, alfa, beta, rho_face, Peos_face, chiT_face, chiRho_face, &
             f, dlnP, dlnT, grada_face, gradT_actual, brunt_N2
-         if (.not. s% calculate_Brunt_B) then
+         if (.not. s% ctrl% calculate_Brunt_B) then
             tau_conv = 0d0
             return
          end if
@@ -3588,10 +3588,10 @@
          s% min_conv_time_scale = 1d99
          s% max_conv_time_scale = 0d0
          do k=1,s%nz
-            if (s% X(k) > s% max_X_for_conv_timescale) cycle
-            if (s% X(k) < s% min_X_for_conv_timescale) cycle
-            if (s% q(k) > s% max_q_for_conv_timescale) cycle
-            if (s% q(k) < s% min_q_for_conv_timescale) exit
+            if (s% X(k) > s% ctrl% max_X_for_conv_timescale) cycle
+            if (s% X(k) < s% ctrl% min_X_for_conv_timescale) cycle
+            if (s% q(k) > s% ctrl% max_q_for_conv_timescale) cycle
+            if (s% q(k) < s% ctrl% min_q_for_conv_timescale) exit
             tau_conv = conv_time_scale(s,k)
             if (tau_conv < s% min_conv_time_scale) &
                s% min_conv_time_scale = tau_conv
@@ -3795,7 +3795,7 @@
          P = get_Peos_face(s,k)
          rho = get_rho_face(s,k)
          scale_height = P/(grav*rho) ! this assumes HSE
-         if (s% alt_scale_height_flag) then
+         if (s% ctrl% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
             ! (this comes from Eggleton's code.)
             scale_height2 = sqrt(P/G)/rho
@@ -3818,7 +3818,7 @@
          rho_face = get_rho_face(s,k)
          rho = rho_face%val
          scale_height = P/(grav*rho) ! this assumes HSE
-         if (s% alt_scale_height_flag) then
+         if (s% ctrl% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
             ! (this comes from Eggleton's code.)
             scale_height2 = sqrt(P/G)/rho
@@ -3907,7 +3907,7 @@
                   L_burn_by_category(j) + s% dm(k)*s% eps_nuc_categories(j, k)
                if (is_bad(L_burn_by_category(j))) then
                   write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
-                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_luminosity_by_category')
+                  if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'set_luminosity_by_category')
                end if
                s% luminosity_by_category(j,k) = L_burn_by_category(j)
             end do

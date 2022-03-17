@@ -383,7 +383,7 @@
          call set_RSP2_vars(s,ierr)
          if (ierr /= 0) return
          
-         if (s% RSP2_remesh_when_load) then
+         if (s% ctrl% RSP2_remesh_when_load) then
             write(*,*) 'doing automatic remesh for RSP2'
             call remesh_for_RSP2(s,ierr)
             if (ierr /= 0) return

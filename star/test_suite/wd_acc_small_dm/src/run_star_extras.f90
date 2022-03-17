@@ -95,7 +95,7 @@
          h1_index = s% net_iso(ih1)
 
          ! get abundance of accreted material (for testing profile)
-         h1_acc_abund = s% accretion_h1
+         h1_acc_abund = s% ctrl% accretion_h1
 
          if (.not. restart) then
 

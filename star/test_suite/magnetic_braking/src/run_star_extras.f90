@@ -80,7 +80,7 @@
 
          !Parameters
 
-         bfield = s% x_ctrl(1) ! Surface Magnetic Fields in Gauss
+         bfield = s% ctrl% x_ctrl(1) ! Surface Magnetic Fields in Gauss
 
          !Initialize variables
 
@@ -125,7 +125,7 @@
           ! Check if spindown timescale is shorter than timestep. Print a warning in case.
           ! In other_timestep_limit we enforce timestep controls such that dt << t_spindown.
           t_spindown = abs(j_tot / j_dot) ! Estimate spindown timescale
-          if (s% x_logical_ctrl(1)) then
+          if (s% ctrl% x_logical_ctrl(1)) then
              write(*,1) 'Spindown Timescale (Myr): ', t_spindown / (1d6*secyer)
              write(*,1) 'Spindown Timescale / dt: ', t_spindown / s% dt
           end if
@@ -168,7 +168,7 @@
           !write(*,*) 'Specific Torque not allocated: ', residual_jdot
 
           ! Angular Momentum Conservation check
-          if (s% x_logical_ctrl(1)) then
+          if (s% ctrl% x_logical_ctrl(1)) then
              write(*,1) 'Fraction of total angular momentum to remove', (j_dot * s% dt) / j_tot
              write(*,1) 'Torque/J_dot (if = 1.0 angular momentum is conserved): ', (torque / j_dot)
           end if
@@ -296,7 +296,7 @@
 
          if ((j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5) .and. t_spindown > 0d0) then
             ! Only limit the timestep when the star is actually spinning fast.
-            dt_limit_ratio = s% x_ctrl(2) * s%dt / t_spindown
+            dt_limit_ratio = s% ctrl% x_ctrl(2) * s%dt / t_spindown
          end if
 
       end function other_timestep_limit

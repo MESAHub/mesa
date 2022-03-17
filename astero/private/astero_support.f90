@@ -1304,7 +1304,7 @@
          logical, intent(in) :: radial_only
          integer, intent(out) :: ierr
          ierr = 0
-         if (s% use_other_astero_freq_corr) then
+         if (s% ctrl% use_other_astero_freq_corr) then
             call s% other_astero_freq_corr(s% id, ierr)
             return
          end if
@@ -1320,7 +1320,7 @@
             call get_kjeldsen_freq_corr
          else if (correction_scheme == 'cubic') then
             call get_cubic_freq_corr(radial_only)
-            surf_coef1 = a3*pow3(5000.*s%nu_max/s% nu_max_sun)
+            surf_coef1 = a3*pow3(5000.*s%nu_max/s% ctrl% nu_max_sun)
             surf_coef2 = 0
             
             if (save_next_best_at_higher_frequency) &
@@ -1330,8 +1330,8 @@
             call get_cubic_freq_corr(radial_only)
          else if (correction_scheme == 'combined') then
             call get_combined_freq_corr(radial_only)
-            surf_coef1 = a3*pow3(5000.*s%nu_max/s% nu_max_sun)
-            surf_coef2 = a1/(5000.*s%nu_max/s% nu_max_sun)
+            surf_coef1 = a3*pow3(5000.*s%nu_max/s% ctrl% nu_max_sun)
+            surf_coef2 = a1/(5000.*s%nu_max/s% ctrl% nu_max_sun)
             
             if (save_next_best_at_higher_frequency) &
                call get_combined_freq_corr_alt_up(radial_only)

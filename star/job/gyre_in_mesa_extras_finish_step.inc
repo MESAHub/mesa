@@ -30,11 +30,11 @@
 
     ! Extract parameters
 
-    step_interval = s% x_integer_ctrl(1)
-    mode_l = s% x_integer_ctrl(3)
-    growth_lim = s% x_ctrl(2)
+    step_interval = s% ctrl% x_integer_ctrl(1)
+    mode_l = s% ctrl% x_integer_ctrl(3)
+    growth_lim = s% ctrl% x_ctrl(2)
 
-    if (s% need_to_save_profiles_now .and. s% x_logical_ctrl(1)) then
+    if (s% need_to_save_profiles_now .and. s% ctrl% x_logical_ctrl(1)) then
        call_gyre = .TRUE.
     elseif (step_interval > 0) then
        call_gyre = MOD(s% model_number, step_interval) == 0
@@ -100,15 +100,15 @@
       if (ierr /= 0) return
 
       num_written = ipar(2)
-      max_to_write = s% x_integer_ctrl(2)
+      max_to_write = s% ctrl% x_integer_ctrl(2)
       if (num_written >= max_to_write) return
       num_written = num_written + 1
       ipar(2) = num_written
 
       model_number = s% model_number
-      freq_target = s% x_ctrl(1)
-      growth_lim = s% x_ctrl(2)
-      write_flag = s% x_logical_ctrl(2)
+      freq_target = s% ctrl% x_ctrl(1)
+      growth_lim = s% ctrl% x_ctrl(2)
+      write_flag = s% ctrl% x_logical_ctrl(2)
 
       cfreq = md% freq('HZ')
       growth = AIMAG(cfreq) ! in seconds

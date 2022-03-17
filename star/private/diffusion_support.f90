@@ -107,9 +107,9 @@
             X(m,k) = A(m)/dot_product(A(1:nc),C(1:nc,k)) 
          end do
          
-         Vlimit_dm_full_on = s% diffusion_Vlimit_dm_full_on*Msun
-         Vlimit_dm_full_off = s% diffusion_Vlimit_dm_full_off*Msun
-         Vlimit = s% diffusion_Vlimit
+         Vlimit_dm_full_on = s% ctrl% diffusion_Vlimit_dm_full_on*Msun
+         Vlimit_dm_full_off = s% ctrl% diffusion_Vlimit_dm_full_off*Msun
+         Vlimit = s% ctrl% diffusion_Vlimit
 
          
 !$OMP PARALLEL DO PRIVATE(k, j, i, total_diffusion_factor, op_err, C_face, Z_face, dC_dr_face, dlnne_dr_face, tmp) SCHEDULE(dynamic,2)
@@ -119,7 +119,7 @@
             ! Total diffusion scaling factor is product of
             ! diffusion_class_factor (const throughout the star), and
             ! extra_diffusion_factor (profile set in other_diffusion_factor)
-            if(s% use_other_diffusion_factor) then
+            if(s% ctrl% use_other_diffusion_factor) then
                do j=1,nc
                   total_diffusion_factor(j) = diffusion_factor(j)*s% extra_diffusion_factor(j,k)
                end do
@@ -142,8 +142,8 @@
                Vlimit_dm_full_on, Vlimit_dm_full_off, Vlimit, xm_face(k), r_mid, dt, &
                A, X_face(:,k), Z_face, C_face, C_div_X_face(:,k), &
                total_diffusion_factor, rad_accel_face(:,k), &
-               s% diffusion_use_cgs_solver, s% eta(k), &
-               s% cgs_thermal_diffusion_eta_full_on, s% cgs_thermal_diffusion_eta_full_off, &
+               s% ctrl% diffusion_use_cgs_solver, s% eta(k), &
+               s% ctrl% cgs_thermal_diffusion_eta_full_on, s% ctrl% cgs_thermal_diffusion_eta_full_off, &
                (T_face(k) <= max_T_for_radaccel .and. T_face(k) >= min_T_for_radaccel), &
                v_advection_face(:,k), vlnP_face(:,k), vlnT_face(:,k), v_rad_face(:,k), &
                e_ap(k), e_at(k), e_ar(k), e_ax(:,k), &
@@ -151,7 +151,7 @@
                sigma_lnC(:,:,k), op_err)
             if (op_err /= 0) ierr = op_err
 
-            if(s% diffusion_use_cgs_solver) then
+            if(s% ctrl% diffusion_use_cgs_solver) then
                ! Electric Field from Iben & MacDonald solve.
                E_field_face(k) = &
                     boltzm*T_face(k)*dlnT_dr_face(k)*e_at(k) + &
@@ -199,12 +199,12 @@
          if (ierr /= 0) return
          sum_dm = cell_dm(nzlo)
          
-         AD_dm_full_on = s% diffusion_AD_dm_full_on*Msun
-         AD_dm_full_off = s% diffusion_AD_dm_full_off*Msun
-         AD_boost_factor = s% diffusion_AD_boost_factor
+         AD_dm_full_on = s% ctrl% diffusion_AD_dm_full_on*Msun
+         AD_dm_full_off = s% ctrl% diffusion_AD_dm_full_off*Msun
+         AD_boost_factor = s% ctrl% diffusion_AD_boost_factor
          
-         SIG_factor = s% diffusion_SIG_factor
-         GT_factor = s% diffusion_GT_factor
+         SIG_factor = s% ctrl% diffusion_SIG_factor
+         GT_factor = s% ctrl% diffusion_GT_factor
          
          !write(*,1) 'GT_factor SIG_factor', GT_factor, SIG_factor
 
@@ -407,7 +407,7 @@
             call paquette_coefficients( &
                rho, T, m, A, charge, na, Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)
 
-            if(.not. s% diffusion_use_paquette .and. .not. s% use_other_diffusion_coefficients) then
+            if(.not. s% ctrl% diffusion_use_paquette .and. .not. s% ctrl% use_other_diffusion_coefficients) then
                call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
                ! This must get called after Paquette because it doesn't calculate
                ! the electron entries (m). It leaves them untouched while calculating
@@ -416,7 +416,7 @@
                ! all ion-electron coefficients from Paquette&al.
             end if
 
-            if(s% use_other_diffusion_coefficients) then
+            if(s% ctrl% use_other_diffusion_coefficients) then
                call s% other_diffusion_coefficients( &
                   s% id, k, nc, m, rho, T,  A, X, Z, C, charge, na, &
                   Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)

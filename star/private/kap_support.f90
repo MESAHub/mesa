@@ -82,8 +82,8 @@ contains
     if (s% op_mono_n > 0) return ! already setup
 
     if (check_if_need) then
-       if (s% high_logT_op_mono_full_off < 0d0 .or. &
-            s% low_logT_op_mono_full_off > 99d0) return
+       if (s% ctrl% high_logT_op_mono_full_off < 0d0 .or. &
+            s% ctrl% low_logT_op_mono_full_off > 99d0) return
        need_op = .false.
        do k=1,s% nz
           beta = fraction_of_op_mono(s, k)
@@ -96,7 +96,7 @@ contains
     end if
 
     call load_op_mono_data( &
-         s% op_mono_data_path, s% op_mono_data_cache_filename, ierr)
+         s% ctrl% op_mono_data_path, s% ctrl% op_mono_data_cache_filename, ierr)
     if (ierr /= 0) then
        write(*,*) 'error while loading OP data, ierr = ',ierr
        return
@@ -114,7 +114,7 @@ contains
        if (associated(s% op_mono_semesh1)) deallocate(s% op_mono_semesh1)
        if (associated(s% op_mono_ff1)) deallocate(s% op_mono_ff1)
        if (associated(s% op_mono_rs1)) deallocate(s% op_mono_rs1)
-       if (s% use_op_mono_alt_get_kap) then
+       if (s% ctrl% use_op_mono_alt_get_kap) then
           allocate( &
              s% op_mono_umesh1(nptot*n), s% op_mono_semesh1(nptot*n), s% op_mono_ff1(nptot*ipe*6*6*n), &
              s% op_mono_rs1(nptot*6*6*n), stat=ierr)
@@ -162,10 +162,10 @@ contains
     ! default to 0
     beta = 0
     
-    high_full_off = s% high_logT_op_mono_full_off
-    high_full_on = s% high_logT_op_mono_full_on
-    low_full_off = s% low_logT_op_mono_full_off
-    low_full_on = s% low_logT_op_mono_full_on
+    high_full_off = s% ctrl% high_logT_op_mono_full_off
+    high_full_on = s% ctrl% high_logT_op_mono_full_on
+    low_full_off = s% ctrl% low_logT_op_mono_full_off
+    low_full_on = s% ctrl% low_logT_op_mono_full_on
 
     if (high_full_off < high_full_on &
           .or. high_full_on < low_full_on &
@@ -292,7 +292,7 @@ contains
        if (xn < 0d0 .or. xn > 1d0) write(s% retry_message,2) 'get_kap: xn', k, xn
        if (xo < 0d0 .or. xo > 1d0) write(s% retry_message,2) 'get_kap: xo', k, xo
        if (xne < 0d0 .or. xne > 1d0) write(s% retry_message,2) 'get_kap: xne', k, xne
-       if (s% report_ierr) write(*, *) s% retry_message
+       if (s% ctrl% report_ierr) write(*, *) s% retry_message
        return
        call mesa_error(__FILE__,__LINE__,'bad mass fraction: get_kap')
     end if
@@ -304,12 +304,12 @@ contains
        if (xh < 0d0) write(s% retry_message,2) 'xh', k, xh
        if (xhe < 0d0) write(s% retry_message,2) 'xhe', k, xhe
        if (Z < 0d0) write(s% retry_message,2) 'Z', k, Z
-       if (s% report_ierr) write(*, *) s% retry_message
+       if (s% ctrl% report_ierr) write(*, *) s% retry_message
        return
        call mesa_error(__FILE__,__LINE__,'negative mass fraction: get_kap')
     end if
 
-    if (s% use_simple_es_for_kap) then
+    if (s% ctrl% use_simple_es_for_kap) then
        kap = 0.2d0*(1 + xh)
        dlnkap_dlnd = 0
        dlnkap_dlnT = 0
@@ -322,7 +322,7 @@ contains
     if (beta > 0d0) then
 
        call get_op_mono_args( &
-            s% species, xa, s% op_mono_min_X_to_include, s% chem_id, &
+            s% species, xa, s% ctrl% op_mono_min_X_to_include, s% chem_id, &
             s% op_mono_factors, nel, izzp, fap, fac, ierr)
        if (ierr /= 0) then
           write(*,*) 'error in get_op_mono_args, ierr = ',ierr
@@ -349,7 +349,7 @@ contains
           sz = nptot; offset = thread_num*sz
           umesh(1:nptot) => s% op_mono_umesh1(offset+1:offset+sz)
           semesh(1:nptot) => s% op_mono_semesh1(offset+1:offset+sz)
-          if (s% use_op_mono_alt_get_kap) then
+          if (s% ctrl% use_op_mono_alt_get_kap) then
              sz = nptot*ipe*6*6; offset = thread_num*sz
              ff(1:nptot,1:ipe,1:6,1:6) => s% op_mono_ff1(offset+1:offset+sz)
              sz = nptot*6*6; offset = thread_num*sz
@@ -366,14 +366,14 @@ contains
        else
 
           call load_op_mono_data( &
-               s% op_mono_data_path, s% op_mono_data_cache_filename, ierr)
+               s% ctrl% op_mono_data_path, s% ctrl% op_mono_data_cache_filename, ierr)
           if (ierr /= 0) then
              write(*,*) 'error while loading OP data, ierr = ',ierr
              return
           end if
 
           call get_op_mono_params(nptot, ipe, nrad)
-          if (s% use_op_mono_alt_get_kap) then
+          if (s% ctrl% use_op_mono_alt_get_kap) then
              allocate( &
                 umesh(nptot), semesh(nptot), ff(nptot,ipe,6,6), &
                 rs(nptot,6,6), stat=ierr)
@@ -386,28 +386,28 @@ contains
 
        end if
 
-       if (s% solver_test_kap_partials) then
-          kap_test_partials = (k == s% solver_test_partials_k .and. &
-             s% solver_call_number == s% solver_test_partials_call_number .and. &
-             s% solver_iter == s% solver_test_partials_iter_number )
+       if (s% ctrl% solver_test_kap_partials) then
+          kap_test_partials = (k == s% ctrl% solver_test_partials_k .and. &
+             s% solver_call_number == s% ctrl% solver_test_partials_call_number .and. &
+             s% solver_iter == s% ctrl% solver_test_partials_iter_number )
        end if
 
        screening = .true.
-       if (s% use_other_kap) then
+       if (s% ctrl% use_other_kap) then
           call s% other_kap_get_op_mono( &
                s% kap_handle, zbar, logRho, logT, &
-               s% use_op_mono_alt_get_kap, &
+               s% ctrl% use_op_mono_alt_get_kap, &
                nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
                kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
        else
           call kap_get_op_mono( &
                s% kap_handle, zbar, logRho, logT, &
-               s% use_op_mono_alt_get_kap, &
+               s% ctrl% use_op_mono_alt_get_kap, &
                nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
                kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
        end if
 
-       if (s% solver_test_kap_partials .and. kap_test_partials) then
+       if (s% ctrl% solver_test_kap_partials .and. kap_test_partials) then
           s% solver_test_partials_val = kap_test_partials_val
           s% solver_test_partials_dval_dx = kap_test_partials_dval_dx
        end if
@@ -416,7 +416,7 @@ contains
 
        if (ierr /= 0) then
           s% retry_message = 'error in op_mono kap'
-          if (s% report_ierr) write(*, *) s% retry_message
+          if (s% ctrl% report_ierr) write(*, *) s% retry_message
           beta = 0
           if (k > 0 .and. k <= s% nz) s% kap_frac_op_mono(k) = 0
           ierr = 0
@@ -443,13 +443,13 @@ contains
 
     end if
 
-    if (s% solver_test_kap_partials) then
-       kap_test_partials = (k == s% solver_test_partials_k .and. &
-          s% solver_call_number == s% solver_test_partials_call_number .and. &
-          s% solver_iter == s% solver_test_partials_iter_number )
+    if (s% ctrl% solver_test_kap_partials) then
+       kap_test_partials = (k == s% ctrl% solver_test_partials_k .and. &
+          s% solver_call_number == s% ctrl% solver_test_partials_call_number .and. &
+          s% solver_iter == s% ctrl% solver_test_partials_iter_number )
     end if
 
-    if (s% use_other_kap) then
+    if (s% ctrl% use_other_kap) then
        call s% other_kap_get( &
             s% id, k, s% kap_handle, s% species, s% chem_id, s% net_iso, xa, &
             logRho, logT, &
@@ -469,7 +469,7 @@ contains
        return
     end if
 
-    if (s% solver_test_kap_partials .and. kap_test_partials) then
+    if (s% ctrl% solver_test_kap_partials .and. kap_test_partials) then
        s% solver_test_partials_val = kap_test_partials_val
        s% solver_test_partials_dval_dx = kap_test_partials_dval_dx
     end if

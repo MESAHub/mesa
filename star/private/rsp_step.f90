@@ -206,17 +206,17 @@
          include 'formats'
          
          ierr = 0
-         dbg_msg = s% report_solver_progress
-         trace = s% trace_evolve
+         dbg_msg = s% ctrl% report_solver_progress
+         trace = s% ctrl% trace_evolve
          iter = 0
          iter_for_dfridr = - 1
-         test_partials_k = s% solver_test_partials_k
-         s% solver_test_partials_k = 0
-         if (s% model_number == s% solver_test_partials_call_number &
-              .and. s% solver_test_partials_dx_0 > 0 &
-              .and. s% solver_test_partials_iter_number > 0 &
+         test_partials_k = s% ctrl% solver_test_partials_k
+         s% ctrl% solver_test_partials_k = 0
+         if (s% model_number == s% ctrl% solver_test_partials_call_number &
+              .and. s% ctrl% solver_test_partials_dx_0 > 0 &
+              .and. s% ctrl% solver_test_partials_iter_number > 0 &
               .and. test_partials_k > 0) then
-            iter_for_dfridr = s% solver_test_partials_iter_number   
+            iter_for_dfridr = s% ctrl% solver_test_partials_iter_number   
             s% solver_test_partials_var = 0
             s% solver_test_partials_val = 0
             s% solver_test_partials_dval_dx = 0
@@ -224,10 +224,10 @@
          nz = s% nz
          i_min = 1
          i_max = nz
-         PREC2 = s% RSP_tol_max_corr
+         PREC2 = s% ctrl% RSP_tol_max_corr
          DXH = 0.3d0
-         max_retries = s% RSP_max_retries_per_step
-         max_iters = s% RSP_max_iters_per_try
+         max_retries = s% ctrl% RSP_max_retries_per_step
+         max_iters = s% ctrl% RSP_max_iters_per_try
          R_center_start = s% R_center
          call save_start_vars(s)
          do k=1,s% nz
@@ -250,7 +250,7 @@
                !write(*,2) 'reduce dt in HYD', s% model_number, s% dt, dt_max
                !write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
                !write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
-               if (s% RSP_report_limit_dt) then
+               if (s% ctrl% RSP_report_limit_dt) then
                   write(*,4) 'limit dt to avoid over-compressing innermost cell', s% model_number
                   write(*,2) 's% r(nz) - s% r_center', s% model_number, s% r(nz) - s% r_center
                   write(*,2) 's% v_center - s% v(nz)', s% model_number, s% v_center - s% v(nz)
@@ -268,9 +268,9 @@
                end if
             end if
          end if
-         if (s% dt < s% force_timestep_min .and. s% force_timestep_min > 0) &
-            s% dt = s% force_timestep_min
-         if (s% force_timestep > 0) s% dt = s% force_timestep
+         if (s% dt < s% ctrl% force_timestep_min .and. s% ctrl% force_timestep_min > 0) &
+            s% dt = s% ctrl% force_timestep_min
+         if (s% ctrl% force_timestep > 0) s% dt = s% ctrl% force_timestep
 
          retry_loop: do num_tries = 1, max_retries+1
 
@@ -282,7 +282,7 @@
             iter_loop: do iter = 1, max_iters  
                s% solver_iter = iter
                if (iter == iter_for_dfridr) then
-                  s% solver_test_partials_k = test_partials_k
+                  s% ctrl% solver_test_partials_k = test_partials_k
                end if
                call eval_vars(s,iter,i_min,i_max,ierr)
                if (ierr /= 0) return
@@ -290,7 +290,7 @@
                if (iter == iter_for_dfridr) call check_partial()
                if (converged) then
                   s% num_solver_iterations = iter - 1
-                  s% solver_test_partials_k = test_partials_k
+                  s% ctrl% solver_test_partials_k = test_partials_k
                   return      
                end if
                if (s% doing_timing) call start_time(s, time0, total)
@@ -319,7 +319,7 @@
             do k = 1, nz-1
                rmid = 0.5d0*(s% r(k) + s% r(k+1))
                tau = tau + s% dm(k)*s% opacity(k)/(4*pi*rmid**2)
-               if (tau >= s% RSP_min_tau_for_turbulent_flux) then
+               if (tau >= s% ctrl% RSP_min_tau_for_turbulent_flux) then
                   min_k_for_turbulent_flux = k
                   exit
                end if
@@ -338,9 +338,9 @@
             s% R_center = R_center_start
             s% dt = s% dt/2.d0   
             s% num_retries = s% num_retries + 1
-            if (s% max_number_retries < 0) return
-            if (s% num_retries > s% max_number_retries) then
-               write(*,3) 'model max_number_retries', s% model_number, s% max_number_retries
+            if (s% ctrl% max_number_retries < 0) return
+            if (s% num_retries > s% ctrl% max_number_retries) then
+               write(*,3) 'model max_number_retries', s% model_number, s% ctrl% max_number_retries
                call mesa_error(__FILE__,__LINE__,'RSP: num_retries > max_number_retries')
             end if
          end subroutine doing_retry
@@ -367,8 +367,8 @@
                write(*,2) 'need to set test_partials_var', i_var
                call mesa_error(__FILE__,__LINE__,'check_partial')
             end if            
-            dx_0 = get1_val(i_var, s% solver_test_partials_k)
-            dx_0 = s% solver_test_partials_dx_0*max(1d-99, abs(dx_0))
+            dx_0 = get1_val(i_var, s% ctrl% solver_test_partials_k)
+            dx_0 = s% ctrl% solver_test_partials_dx_0*max(1d-99, abs(dx_0))
             dvardx = dfridr(dx_0,err)
             xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),1d-50)
             write(*,1) 'analytic numeric err rel_diff',dvardx_0,dvardx,err,xdum
@@ -428,7 +428,7 @@
             real(dp) :: save1
             include 'formats'
             i_var = s% solver_test_partials_var
-            k = s% solver_test_partials_k
+            k = s% ctrl% solver_test_partials_k
             save1 = get1_val(i_var, k)
             call store1_val(i_var, k, save1 + delta_x)
             call eval_vars(s,0,i_min,i_max,ierr)
@@ -506,9 +506,9 @@
          real(dp) :: kap_guess, T_surf, kap_surf, Teff_atm
          include 'formats'
          ierr = 0
-         if (s% RSP_fixed_Psurf) then
+         if (s% ctrl% RSP_fixed_Psurf) then
             P_surf = Psurf_from_atm
-         else if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
+         else if (s% ctrl% RSP_use_atm_grey_with_kap_for_Psurf) then
             ierr = 0
             kap_guess = 1d-2
             call get_surf_P_T_kap(s, &
@@ -519,10 +519,10 @@
                write(*,*) 'ierr from get_surf_P_T_kap'
                return
             end if
-         else if (s% RSP_use_Prad_for_Psurf) then
+         else if (s% ctrl% RSP_use_Prad_for_Psurf) then
             P_surf = crad*s% T(1)**4/3d0
-         else if (s% RSP_Psurf >= 0d0) then
-            P_surf = s% RSP_Psurf
+         else if (s% ctrl% RSP_Psurf >= 0d0) then
+            P_surf = s% ctrl% RSP_Psurf
          else
             P_surf = 0d0
          end if
@@ -555,7 +555,7 @@
             !end if
             
          enddo
-         if (s% RSP_hydro_only) then
+         if (s% ctrl% RSP_hydro_only) then
             total_radiation = 0d0
          else
             total_radiation = s% dt*(s% L_center - (WTR*s% L(1) + WTR1*s% L_start(1)))
@@ -721,7 +721,7 @@
             call calc_Pvsc(s,i)
          end do
          !$OMP END PARALLEL DO
-         if (iter == 1 .and. s% RSP_do_check_omega) then
+         if (iter == 1 .and. s% ctrl% RSP_do_check_omega) then
             do i = i_min,i_max
                call check_omega(s,i)
             end do
@@ -786,8 +786,8 @@
          logical :: okay
          include 'formats'
          
-         !if (s% model_number >= s% max_model_number-1 .and. iter == 1) then
-         !if (.false. .and. s% model_number == s% max_model_number) then !.and. iter == 1) then
+         !if (s% model_number >= s% ctrl% max_model_number-1 .and. iter == 1) then
+         !if (.false. .and. s% model_number == s% ctrl% max_model_number) then !.and. iter == 1) then
          if (.false.) then
             ! this can be useful for finding restart bugs.
             write(*,*) 'solve_for_corrections'
@@ -1005,7 +1005,7 @@
             if (EZH1 /= EZH) kEZH = k
          end do
          
-         if (EZH < 1d0 .and. s% RSP_report_undercorrections) then
+         if (EZH < 1d0 .and. s% ctrl% RSP_report_undercorrections) then
             write(*,'(i6, 2x, i3, 6(4x, a, 1x, i4, 1x, 1pe10.3))') &
                s% model_number, iter, &
                'EZH', kEZH, EZH, &
@@ -1135,7 +1135,7 @@
          d_Pr_dr_00(i) = d_Pr_dVol(i)*dVol_dr_00(i)
          d_Pr_dr_in(i) = d_Pr_dVol(i)*dVol_dr_in(i)
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          
          if (test_partials) then
@@ -1213,7 +1213,7 @@
             
          end if
 
-         !test_partials = (k-1 == s% solver_test_partials_k)
+         !test_partials = (k-1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = s% Hp_face(k)
@@ -1370,7 +1370,7 @@
             dY_der_out(I) = 0
          end if
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = s% Y_face(k)
@@ -1424,7 +1424,7 @@
             dPII_der_out(I) = POM*POM2*dY_der_out(I) ! 
          end if
 
-         !test_partials = (k-1 == s% solver_test_partials_k)
+         !test_partials = (k-1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = s% PII(k)
@@ -1515,7 +1515,7 @@
          d_Pvsc_dr_in(i) = CQ/V*2d0*dv*d_dv_dr_in - CQ*dv**2*dVol_dr_in(I)/V**2
          d_Pvsc_dr_00(i) = CQ/V*2d0*dv*d_dv_dr_00 - CQ*dv**2*dVol_dr_00(I)/V**2
          
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = s% Pvsc(k)
@@ -1564,7 +1564,7 @@
             if (SOL >= 0.d0) SOL = SOL**2
             if (SOL > 0.d0) then
                s% RSP_w(k) = sqrt(SOL)
-               if (s% RSP_report_check_omega_changes) &
+               if (s% ctrl% RSP_report_check_omega_changes) &
                   write(*,3) 'RSP_w modified initial guess vs initial', k, s% model_number, &
                      s% RSP_w(k), w_start
             end if
@@ -1596,7 +1596,7 @@
             dPtrb_dr_00(I) = TEM1*dVol_dr_00(I)
             dPtrb_dr_in(I) = TEM1*dVol_dr_in(I)
          end if
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = 0 ! residual
@@ -1723,7 +1723,7 @@
             !   write(*,2) 'RSP Chi', k, s% Chi(k)
             !end if
          
-         !test_partials = (k-1 == s% solver_test_partials_k)
+         !test_partials = (k-1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = s% Chi(k)
@@ -1791,7 +1791,7 @@
             dEq_dw_00(I) = POM*dChi_dw_00(I) ! 
          end if
          
-         !test_partials = (k+1 == s% solver_test_partials_k)
+         !test_partials = (k+1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = s% Eq(k)
@@ -2043,7 +2043,7 @@
             dC_der_in(I) = dsrc_der_in - d_damp_der_in - d_dampR_der_in ! 
             dC_dw_00(I) = dsrc_dw_00 - d_damp_dw_00 - d_dampR_dw_00 ! 
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = s% COUPL(k)
@@ -2202,7 +2202,7 @@
          end if
          if (i > 0) s% Lt(k) = Lt_00
          
-         !test_partials = (k-1 == s% solver_test_partials_k)
+         !test_partials = (k-1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = Lt_00
@@ -2305,7 +2305,7 @@
          
          if (i > 0) s% Lc(k) = Lc_00
 
-         !test_partials = (k-1 == s% solver_test_partials_k)
+         !test_partials = (k-1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = Lc_00
@@ -2344,7 +2344,7 @@
          k = NZN+1-i
          
          if (i < 1) then
-            if (s% RSP_hydro_only) then
+            if (s% ctrl% RSP_hydro_only) then
                Fr_00 = 0d0
             else
                Fr_00 = s% L_center
@@ -2457,7 +2457,7 @@
          dFr_der_00 = & ! 
             + d_Fr_dW_00*d_W_00_der_00
          
-         !test_partials = (k-1 == s% solver_test_partials_k)
+         !test_partials = (k-1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = Fr_00
@@ -2510,9 +2510,9 @@
          
          k = NZN+1-i
          if (k == 0) then ! pressure outside of surface
-            if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
+            if (s% ctrl% RSP_use_atm_grey_with_kap_for_Psurf) then
                XP = P_surf
-            else if (s% RSP_use_Prad_for_Psurf) then
+            else if (s% ctrl% RSP_use_Prad_for_Psurf) then
                T_surf = s% T_start(1)
                XP = crad*T_surf**4/3d0
             else
@@ -2568,7 +2568,7 @@
             end if
          end if
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -2736,7 +2736,7 @@
          HD(1:LD_HD,IR) = 0.d0   
          
          dt = s% dt
-         !if (s% use_compression_outer_BC .and. I == NZN) then
+         !if (s% ctrl% use_compression_outer_BC .and. I == NZN) then
          !   call mesa_error(__FILE__,__LINE__,'no rsp support for use_compression_outer_BC')
          !end if
          
@@ -2963,7 +2963,7 @@
          !HD(i_r_dw_00,IR) ! 
          !HD(i_r_dw_out,IR) ! 
 
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -3194,7 +3194,7 @@
          area_00_start = 4d0*pi*s% r_start(k)**2
          Lr_00_start = s% Fr_start(k)*area_00_start
          if (i == 1) then
-            if (s% RSP_hydro_only) then
+            if (s% ctrl% RSP_hydro_only) then
                Lr_in = 0d0
             else
                Lr_in = s% L_center
@@ -3341,7 +3341,7 @@
                + dt_div_dm*WTC*dLc_00_dw_out
          end if
          
-         if (i == -6 .and. s% model_number == s% max_model_number) then
+         if (i == -6 .and. s% model_number == s% ctrl% max_model_number) then
             write(*,5) 'HD(i_T_dw_00,IT)', k, i, iter, s% model_number, HD(i_T_dw_00,IT)
             write(*,5) 's% RSP_w(k)', k, i, iter, s% model_number, s% RSP_w(k)
             write(*,5) 'dt_div_dm', k, i, iter, s% model_number, dt_div_dm
@@ -3374,7 +3374,7 @@
          !HD(i_T_dw_00,IT) ! 
          !HD(i_T_dw_out,IT) ! 
 
-         !test_partials = (k+1 == s% solver_test_partials_k)
+         !test_partials = (k+1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -3551,7 +3551,7 @@
          !HD(i_w_der_00,IW) ! 
          !HD(i_w_der_out,IW) ! 
          
-         !test_partials = (k+1 == s% solver_test_partials_k)
+         !test_partials = (k+1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -3620,7 +3620,7 @@
 
          include 'formats'
          
-         if (s% RSP_hydro_only) then
+         if (s% ctrl% RSP_hydro_only) then
             k = NZN+1-i
             IL = i_var_Fr + NV*(i-1)
             HD(1:LD_HD,IL) = 0d0        
@@ -3671,7 +3671,7 @@
          HD(i_Fr_dT_out,IL) = dFr_dT_out
          HD(i_Fr_dFr_00,IL) = -1d0
          
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -3709,7 +3709,7 @@
          HD(i_er_dr_00,IE) = crad*T**4*dVol_dr_00(i)
          HD(i_er_dr_in,IE) = crad*T**4*dVol_dr_in(i)
          
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -3735,7 +3735,7 @@
          include 'formats'
          k = NZN+1-i
          if (i < 1) then
-            if (s% RSP_hydro_only) then
+            if (s% ctrl% RSP_hydro_only) then
                Fr_00 = 0d0
             else
                Fr_00 = s% L_center
@@ -3815,7 +3815,7 @@
             dFr_dVol_00 = dFr_dK_00*dK_dVol(I)            
          end if
          
-         !test_partials = (k-1 == s% solver_test_partials_k)
+         !test_partials = (k-1 == s% ctrl% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
             s% solver_test_partials_val = Fr_00
@@ -3854,7 +3854,7 @@
          HD(i_Fr_dr_out,IL) = dFr_00_dr_out
          HD(i_Fr_dT_00,IL) = dFr_00_dT_00
          HD(i_Fr_dT_out,IL) = dFr_00_dT_out
-         !test_partials = (k == s% solver_test_partials_k)
+         !test_partials = (k == s% ctrl% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then

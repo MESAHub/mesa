@@ -80,7 +80,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if(s% x_integer_ctrl(1) == 1) then
+         if(s% ctrl% x_integer_ctrl(1) == 1) then
             nz = s% nz
             sum_d2N2 = 0
             n = 150

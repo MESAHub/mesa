@@ -97,7 +97,7 @@
          ! if (i == 1) then
          !    call star_ptr(id, s, ierr)
          !    if (ierr /= 0) return
-         !    s% mixing_length_alpha = new_value
+         !    s% ctrl% mixing_length_alpha = new_value
          ! end if
       end subroutine will_set_my_param
 
@@ -127,7 +127,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (s% x_ctrl(1) > 0d0) then
+         if (s% ctrl% x_ctrl(1) > 0d0) then
             if (astero_gyre_is_enabled) then
                call get_gyre_frequency_info(s, .true., okay, ierr)
          
@@ -167,7 +167,7 @@
          
          extras_check_model = keep_going
          
-         if (s% x_ctrl(1) > 0d0) then
+         if (s% ctrl% x_ctrl(1) > 0d0) then
          
             ! get frequencies for certain models
             if (mod(s% model_number,50) /= 0) return
@@ -202,7 +202,7 @@
          ! change the following for your specific case
          l_to_match = 0
          order_to_match = 4
-         expected_freq = s% x_ctrl(1)
+         expected_freq = s% ctrl% x_ctrl(1)
          
          ! get values for gyre_input_file and gyre_non_ad from the astero controls inlist
          ! store_model must be .true. since this is the 1st call on gyre for this model.

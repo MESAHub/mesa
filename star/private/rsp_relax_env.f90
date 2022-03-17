@@ -208,9 +208,9 @@
 
       !write(*,*) 'RELAX_ENV'
       EFL02 = EFL0*EFL0
-      FSUB = s% RSP_dq_1_factor         
-      EMR = s% RSP_mass
-      ELR = s% RSP_L
+      FSUB = s% ctrl% RSP_dq_1_factor         
+      EMR = s% ctrl% RSP_mass
+      ELR = s% ctrl% RSP_L
 
       n = NZN+1
       allocate( &
@@ -250,7 +250,7 @@
 
       TNL = 0d0 
 
-      if (s% RSP_use_Prad_for_Psurf) then
+      if (s% ctrl% RSP_use_Prad_for_Psurf) then
          if(.not.RSP_eddi) then !     EXACT GREY RELATION
             T_0= pow(sqrt(3.d0)/4.d0,0.25d0)*TE !0.811194802d0*TE
          else !     EDDINGTON APPROXIMATION
@@ -262,7 +262,7 @@
       end if
 
       ending=.false.
-      if (s% RSP_trace_RSP_build_model) &
+      if (s% ctrl% RSP_trace_RSP_build_model) &
          write(*,*) '*** relax envelope ***'  
       
       NEGFLU=0
@@ -272,8 +272,8 @@
       ok_to_adjust_mass = .true. ! s% RSP_ok_to_adjust_mass
       ok_to_adjust_Tsurf = .true. ! s% RSP_ok_to_adjust_Tsurf
       dmN_cnt = 0
-      max_dmN_cnt = s% RSP_relax_max_tries
-      PREC1 = s% RSP_relax_dm_tolerance
+      max_dmN_cnt = s% ctrl% RSP_relax_max_tries
+      PREC1 = s% ctrl% RSP_relax_dm_tolerance
 
 !     SUMM IS ZONE OF THE ENVELOPE UP TO ANCHOR 
 !     (NOT CHANGED IN THE ITERATIONS)
@@ -358,12 +358,12 @@
       endif
       if(abs(DDT/dmN).lt.PREC1.and.ICAA.eq.NDIVAA+1)then
          write(*,*) '***** ALFA ITERATION FINISHED *****'
-         write(*,*) 'final ALFA =', ALFA, s% RSP_alfa
+         write(*,*) 'final ALFA =', ALFA, s% ctrl% RSP_alfa
          dmN_cnt = 0
          NDIVAA=-99
       endif
       
-      if (s% RSP_relax_alfap_before_alfat) then
+      if (s% ctrl% RSP_relax_alfap_before_alfat) then
       
          ! CHECK IF ALFAP ITERATION IS FINISHED 
          if(abs(DDT/dmN).lt.PREC1.and.ALFAP.ne.AALFAP) then
@@ -466,7 +466,7 @@
       dmNL = dmN
       dmN_cnt = dmN_cnt + 1
       
-      if (s% RSP_relax_adjust_inner_mass_distribution) then
+      if (s% ctrl% RSP_relax_adjust_inner_mass_distribution) then
       
          dmN  = dmN-DDT
 
@@ -1264,7 +1264,7 @@
  
       write(*,'(A)')
       write(*,*) ' NO CONVERGENCE IN RELAX_ENV, ITERATION: ',II
-      write(*,*) ' try increasing RSP_relax_dm_tolerance', s% RSP_relax_dm_tolerance
+      write(*,*) ' try increasing RSP_relax_dm_tolerance', s% ctrl% RSP_relax_dm_tolerance
       write(*,'(A)')
       ierr = -1
       return
@@ -1281,7 +1281,7 @@
       !write(*,*) 'MAXFLUXD= ',MAXFLUXD
 
       POM=MSTAR-M(1)+dm(1)
-      if (s% RSP_trace_RSP_build_model) then
+      if (s% ctrl% RSP_trace_RSP_build_model) then
          write(*,*) ' inner temper. rel. diff',(T(1)-TINNER)/TINNER
          write(*,*) '  inner radius rel. diff',(R(1)-RINNER)/RINNER
          write(*,*) '  outer radius rel. diff',(R(NZN)-ROUTER)/ROUTER

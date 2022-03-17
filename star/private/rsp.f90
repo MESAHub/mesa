@@ -82,7 +82,7 @@
          integer :: i, j, k
          include 'formats'
          NSTART = 1
-         s% nz = s% RSP_nz         
+         s% nz = s% ctrl% RSP_nz         
          if (s% job% change_initial_net) then
             call do_micro_change_net(s, s% job% new_net_name, ierr)
          else
@@ -92,7 +92,7 @@
             write(*,*) 'failed in do_micro_change_net'
             return
          end if         
-         s% tau_factor = s% RSP_surface_tau/s% tau_base
+         s% tau_factor = s% ctrl% RSP_surface_tau/s% tau_base
          call init_def(s)
          call init_allocate(s,s% nz)         
          call allocate_star_info_arrays(s, ierr)
@@ -107,11 +107,11 @@
          end if
          call init_for_rsp_eos_and_kap(s)  
          s% rsp_period = 0d0
-         if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
-            s% tau_factor = s% RSP_tau_surf_for_atm_grey_with_kap/s% tau_base
+         if (s% ctrl% RSP_use_atm_grey_with_kap_for_Psurf) then
+            s% tau_factor = s% ctrl% RSP_tau_surf_for_atm_grey_with_kap/s% tau_base
             write(*,1) 'set s% tau_factor using RSP_tau_surf', s% tau_factor
          end if
-         if (s% use_other_rsp_build_model) then
+         if (s% ctrl% use_other_rsp_build_model) then
             call s% other_rsp_build_model(s% id,ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in other_rsp_build_model'
@@ -124,12 +124,12 @@
                return
             end if            
          end if
-         if (.not. s% use_RSP_new_start_scheme) &
+         if (.not. s% ctrl% use_RSP_new_start_scheme) &
             call set_random_velocities(s)
          rsp_tau_factor = s% tau_factor
          PERIODLIN = s% rsp_period
          if (s% rsp_period > 0d0) then
-            s% rsp_dt = s% rsp_period/dble(s% rsp_target_steps_per_cycle)
+            s% rsp_dt = s% rsp_period/dble(s% ctrl% rsp_target_steps_per_cycle)
          else
             s% rsp_dt = 1d0
          end if
@@ -187,10 +187,10 @@
             s% xh(s% i_v,k) = s% v(k)
          end do
          s% dq(s% nz) = (s% m(NZN) - s% M_center)/s% xmstar
-         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+         if (.not. s% ctrl% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, NZN, s% dq, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) write(*,*) 'normalize_dqs failed in finish_build_rsp_model'
+               if (s% ctrl% report_ierr) write(*,*) 'normalize_dqs failed in finish_build_rsp_model'
                return
             end if
          end if
@@ -209,11 +209,11 @@
          use star_utils, only: rand
          type (star_info), pointer :: s
          integer :: i, k
-         if (s% RSP_Avel /= 0d0 .or. s% RSP_Arnd /= 0d0) then
+         if (s% ctrl% RSP_Avel /= 0d0 .or. s% ctrl% RSP_Arnd /= 0d0) then
             do i=1,NZN
                k = NZN+1-i
                s% v(k) = s% v(k) + &
-                  1d5*dble(i)/dble(NZN)*(s% RSP_Avel + s% RSP_Arnd*(2d0*rand(s) - 1d0))
+                  1d5*dble(i)/dble(NZN)*(s% ctrl% RSP_Avel + s% ctrl% RSP_Arnd*(2d0*rand(s) - 1d0))
             end do
             write(*,*) 'set random velocities'
             s% RSP_have_set_velocities = .true.
@@ -238,10 +238,10 @@
          logical :: okay
          include 'formats'
          ierr = 0
-         if (s% RSP_use_atm_grey_with_kap_for_Psurf .and. &
-              (s% atm_option /= 'T_tau' .or. &
-               s% atm_T_tau_relation /= 'Eddington' .or. &
-               s% atm_T_tau_opacity /= 'iterated')) then
+         if (s% ctrl% RSP_use_atm_grey_with_kap_for_Psurf .and. &
+              (s% ctrl% atm_option /= 'T_tau' .or. &
+               s% ctrl% atm_T_tau_relation /= 'Eddington' .or. &
+               s% ctrl% atm_T_tau_opacity /= 'iterated')) then
             write(*,'(A)')
             write(*,*) 'when RSP_use_atm_grey_with_kap_for_Psurf, must set:'
             write(*,*) '   atm_option = ''T_tau'''
@@ -263,30 +263,30 @@
             if (.not. s% job% create_RSP_model) then
                call init_def(s)
                call init_allocate(s,s% nz)
-               call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)               
+               call get_XYZ(s, s% xa(:,1), s% ctrl% RSP_X, Y, s% ctrl% RSP_Z)               
                call init_for_rsp_eos_and_kap(s)
                IWORK=0
                NZN = s% nz
                ELSTA = s% L(1)
                RSTA = s% r(1)  
                s% rsp_dt = s% dt_next
-               if (s% max_timestep > 0d0 .and. s% rsp_dt > s% max_timestep) &
-                  s% rsp_dt = s% max_timestep
+               if (s% ctrl% max_timestep > 0d0 .and. s% rsp_dt > s% ctrl% max_timestep) &
+                  s% rsp_dt = s% ctrl% max_timestep
                rsp_tau_factor = s% tau_factor
-               s% rsp_period = s% rsp_dt*dble(s% RSP_target_steps_per_cycle)               
+               s% rsp_period = s% rsp_dt*dble(s% ctrl% RSP_target_steps_per_cycle)               
                s% RSP_have_set_velocities = .true.
                call copy_from_xh_to_rsp(s,-1)
                do k=1,NZN
                   s% L_start(k) = 0d0
                end do
-               if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
-                  tau_surf = s% RSP_tau_surf_for_atm_grey_with_kap
+               if (s% ctrl% RSP_use_atm_grey_with_kap_for_Psurf) then
+                  tau_surf = s% ctrl% RSP_tau_surf_for_atm_grey_with_kap
                   kap_guess = 1d-2
                   call get_surf_P_T_kap(s, &
                      s% m(1), s% r(1), s% L(1), tau_surf, kap_guess, &
                      T_surf, Psurf, kap_surf, Teff_atm, ierr)
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in get_surf_P_T_kap')
-               else if (s% RSP_use_Prad_for_Psurf) then
+               else if (s% ctrl% RSP_use_Prad_for_Psurf) then
                   Psurf = crad*s% T(1)**4/3d0
                else
                   Psurf = 0d0
@@ -329,20 +329,20 @@
          call copy_results(s)  
          call set_Teff(s, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) &
+            if (s% ctrl% report_ierr) &
                write(*,*) 'rsp_setup_part2: set_Teff returned ierr', ierr
             return
          end if
          TEFF = s% Teff
          if (s% rsp_period > 0d0) then
-            s% rsp_dt = s% rsp_period/dble(s% rsp_target_steps_per_cycle)
-            s% dt_next = s% rsp_dt*s% RSP_initial_dt_factor
+            s% rsp_dt = s% rsp_period/dble(s% ctrl% rsp_target_steps_per_cycle)
+            s% dt_next = s% rsp_dt*s% ctrl% RSP_initial_dt_factor
             s% dt = s% dt_next
          end if
-         if (s% use_other_rsp_build_model .and. &
-               s% set_RSP_Psurf_to_multiple_of_initial_P1 > 0d0) then
-            s% RSP_Psurf = s% Peos(1)*s% set_RSP_Psurf_to_multiple_of_initial_P1
-            write(*,1) 'rsp_setup_part2 set RSP_Psurf', s% RSP_Psurf
+         if (s% ctrl% use_other_rsp_build_model .and. &
+               s% ctrl% set_RSP_Psurf_to_multiple_of_initial_P1 > 0d0) then
+            s% ctrl% RSP_Psurf = s% Peos(1)*s% ctrl% set_RSP_Psurf_to_multiple_of_initial_P1
+            write(*,1) 'rsp_setup_part2 set RSP_Psurf', s% ctrl% RSP_Psurf
          end if
       end subroutine rsp_setup_part2
 
@@ -361,7 +361,7 @@
          include 'formats'
          ierr = 0
          
-         if (s% RSP_kick_vsurf_km_per_sec == 0d0) then
+         if (s% ctrl% RSP_kick_vsurf_km_per_sec == 0d0) then
             write(*,*) 'skip calling LINA since RSP_kick_vsurf_km_per_sec = 0'
             return
          end if
@@ -383,9 +383,9 @@
             Lr(i) = 4d0*pi*s% r(k)**2*s% Fr(k)
          end do                    
         
-         NMODES = s% RSP_nmodes
+         NMODES = s% ctrl% RSP_nmodes
 
-         call do_LINA(s, s% RSP_L*SUNL, NZN, NMODES, VEL, &
+         call do_LINA(s, s% ctrl% RSP_L*SUNL, NZN, NMODES, VEL, &
             s% rsp_LINA_periods, s% rsp_LINA_growth_rates, &
             M, DM, DM_BAR, R, Vol, T, RSP_Et, Lr, ierr)
          if (ierr /= 0) return
@@ -398,11 +398,11 @@
          enddo
          
          s% rsp_period = &
-            s% rsp_LINA_periods(s% RSP_mode_for_setting_PERIODLIN + 1)
+            s% rsp_LINA_periods(s% ctrl% RSP_mode_for_setting_PERIODLIN + 1)
          
-         amix1 = s% RSP_fraction_1st_overtone
-         amix2 = s% RSP_fraction_2nd_overtone
-         velkm = s% RSP_kick_vsurf_km_per_sec
+         amix1 = s% ctrl% RSP_fraction_1st_overtone
+         amix2 = s% ctrl% RSP_fraction_2nd_overtone
+         velkm = s% ctrl% RSP_kick_vsurf_km_per_sec
          s% v_center = 0d0
          do i=1,NZN
             k = NZN+1-i    
@@ -448,7 +448,7 @@
             write(*,3) 'relaxation max_abs_rel_hse_err, days', s% model_number, k_max_abs_rel_hse_err, &
                max_abs_rel_hse_err, s% time/(24*3600)
             
-            if (.not. s% use_other_RSP_linear_analysis) then    
+            if (.not. s% ctrl% use_other_RSP_linear_analysis) then    
                call get_LINA_info(s,ierr)               
             else               
                ! must set gradT before calling since gyre needs it.
@@ -466,13 +466,13 @@
                   end do
                end do
                s% gradT(1) = s% gradT(2)
-               s% calculate_Brunt_N2 = .true.
+               s% ctrl% calculate_Brunt_N2 = .true.
                call do_brunt_N2(s, 1, NZN, ierr)
                if (ierr /= 0) return
                restart = .false.
                call s% other_rsp_linear_analysis(s% id, restart, ierr)
                if (ierr /= 0) then
-                  if (s% report_ierr) &
+                  if (s% ctrl% report_ierr) &
                      write(*,*) 'other_rsp_linear_analysis ierr', ierr
                   return
                end if  
@@ -480,7 +480,7 @@
             end if                              
             
             PERIODLIN = s% rsp_period
-            s% rsp_dt = s% rsp_period/dble(s% rsp_target_steps_per_cycle)
+            s% rsp_dt = s% rsp_period/dble(s% ctrl% rsp_target_steps_per_cycle)
             s% dt = s% rsp_dt  
             
             s% cumulative_energy_error_old = 0d0
@@ -493,11 +493,11 @@
             
          end if 
          
-         s% do_history_file = s% RSP_have_set_velocities ! don't write history entries until set velocities
+         s% ctrl% do_history_file = s% RSP_have_set_velocities ! don't write history entries until set velocities
          !call turn_on_time_weighting(s)
          
-         if (s% dt > s% RSP_max_dt .and. s% RSP_max_dt > 0d0) then
-            s% dt = s% RSP_max_dt
+         if (s% dt > s% ctrl% RSP_max_dt .and. s% ctrl% RSP_max_dt > 0d0) then
+            s% dt = s% ctrl% RSP_max_dt
          end if
          
          call do1_step(s,ierr) 
@@ -505,7 +505,7 @@
          
          call copy_results(s)  
          call rsp_set_Teff(s)
-         if (s% RSP_write_map) call add_to_map
+         if (s% ctrl% RSP_write_map) call add_to_map
 
          
          contains
@@ -516,8 +516,8 @@
             real(dp) :: ph_x, FASE
             character (len=256) :: fname
             include 'formats'
-            NPCH1 = s% RSP_map_first_period
-            NPCH2 = s% RSP_map_last_period
+            NPCH1 = s% ctrl% RSP_map_first_period
+            NPCH2 = s% ctrl% RSP_map_last_period
             IP = s% RSP_num_periods
             io = 77
             if (IP+1.ge.NPCH1.and.IP+1.le.NPCH2) then
@@ -527,9 +527,9 @@
                      write(*,*) 'failed in read_map_specs'
                      return
                   end if
-                  if (len_trim(s% RSP_map_filename) == 0) &
-                     s% RSP_map_filename = 'map.data'
-                  fname = trim(s% log_directory) // '/' // trim(s% RSP_map_filename)
+                  if (len_trim(s% ctrl% RSP_map_filename) == 0) &
+                     s% ctrl% RSP_map_filename = 'map.data'
+                  fname = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% RSP_map_filename)
                   open(io,file=trim(fname),status='unknown')
                   write(*,*) 'writing ' // trim(fname)
                   write(io,'(i18,1x,i4)',advance='no') 1, 2
@@ -545,12 +545,12 @@
                   writing_map = .true.
                   done_writing_map = .false.
                   s% need_to_set_history_names_etc = .true.
-                  s% star_history_name = s% RSP_map_history_filename
+                  s% ctrl% star_history_name = s% ctrl% RSP_map_history_filename
                   FASE0 = s% time
                endif     
                FASE=(s% time-FASE0)/s% rsp_period
                !write(*,4) 'add to map', s% model_number, IP, NPCH2, FASE
-               do k=1,NZN,s% RSP_map_zone_interval ! gnuplot pm3d map
+               do k=1,NZN,s% ctrl% RSP_map_zone_interval ! gnuplot pm3d map
                   I = NZN+1 - k
                   if(I.gt.IBOTOM.and.I.lt.NZN) then
                      write(io,'(d18.10,1x,i4)',advance='no') FASE, k
@@ -571,7 +571,7 @@
             end if
             if(IP.eq.NPCH2 .and. .not. done_writing_map) then
                close(io)
-               fname = trim(s% log_directory) // '/' // trim(s% RSP_map_filename)
+               fname = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% RSP_map_filename)
                write(*,*) '  close ' // trim(fname)
                done_writing_map = .true.
             end if
@@ -595,7 +595,7 @@
 
          ierr = 0
             
-         filename = s% RSP_map_columns_filename
+         filename = s% ctrl% RSP_map_columns_filename
          if (len_trim(filename) == 0) filename = 'map_columns.list'
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
@@ -661,45 +661,45 @@
          ID=ID+1
       
          target_dt = min( &
-            s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
-            s% dt*s% max_timestep_factor)
-         if (s% rsp_max_dt > 0) target_dt = min(target_dt, s% rsp_max_dt)
-         if (s% max_timestep > 0) target_dt = min(target_dt, s% max_timestep)
+            s% rsp_period/dble(s% ctrl% RSP_target_steps_per_cycle), &
+            s% dt*s% ctrl% max_timestep_factor)
+         if (s% ctrl% rsp_max_dt > 0) target_dt = min(target_dt, s% ctrl% rsp_max_dt)
+         if (s% ctrl% max_timestep > 0) target_dt = min(target_dt, s% ctrl% max_timestep)
          s% dt = target_dt
 
          if (is_bad(s% dt)) then
             write(*,1) 'do1_step dt', s% dt
             write(*,1) 'rsp_period', s% rsp_period
-            write(*,2) 'RSP_target_steps_per_cycle', s% RSP_target_steps_per_cycle
-            write(*,1) 'max_timestep_factor', s% max_timestep_factor
-            write(*,1) 'rsp_period/RSP_target_steps_per_cycle/', s% rsp_period/s% RSP_target_steps_per_cycle
+            write(*,2) 'RSP_target_steps_per_cycle', s% ctrl% RSP_target_steps_per_cycle
+            write(*,1) 'max_timestep_factor', s% ctrl% max_timestep_factor
+            write(*,1) 'rsp_period/RSP_target_steps_per_cycle/', s% rsp_period/s% ctrl% RSP_target_steps_per_cycle
             call mesa_error(__FILE__,__LINE__,'do1_step 1')
          end if
 
-         max_dt = rsp_min_dr_div_cs*s% RSP_max_dt_times_min_dr_div_cs
-         !if (s% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
-         !   if (rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time < max_dt) then
-         !      max_dt = rsp_min_rad_diff_time*s% RSP_max_dt_times_min_rad_diff_time
+         max_dt = rsp_min_dr_div_cs*s% ctrl% RSP_max_dt_times_min_dr_div_cs
+         !if (s% ctrl% RSP_max_dt_times_min_rad_diff_time > 0d0 .and. rsp_min_rad_diff_time > 0d0) then
+         !   if (rsp_min_rad_diff_time*s% ctrl% RSP_max_dt_times_min_rad_diff_time < max_dt) then
+         !      max_dt = rsp_min_rad_diff_time*s% ctrl% RSP_max_dt_times_min_rad_diff_time
          !      if (s% dt > max_dt) then
          !         write(*,3) 'dt limited by rad diff time', NZN+1-i_min_rad_diff_time, s% model_number, &
-         !            s% dt, rsp_min_rad_diff_time, s% RSP_max_dt_times_min_rad_diff_time
+         !            s% dt, rsp_min_rad_diff_time, s% ctrl% RSP_max_dt_times_min_rad_diff_time
          !         !call mesa_error(__FILE__,__LINE__,'rsp')
          !      end if
          !   end if
          !end if
          if (s% dt > max_dt) then
-            if (s% RSP_report_limit_dt) then
+            if (s% ctrl% RSP_report_limit_dt) then
                write(*,4) 'limit to RSP_max_dt_times_min_dr_div_cs', s% model_number, max_dt, s% dt
                call mesa_error(__FILE__,__LINE__,'do1_step 1')
             end if
             s% dt = max_dt
          end if
          
-         if (s% force_timestep > 0d0) s% dt = s% force_timestep ! overrides everything else
+         if (s% ctrl% force_timestep > 0d0) s% dt = s% ctrl% force_timestep ! overrides everything else
          
          if (is_bad(s% dt) .or. s% dt <= 0d0) then
             write(*,1) 'dt', s% dt
-            write(*,1) 'RSP_max_dt_times_min_dr_div_cs', s% RSP_max_dt_times_min_dr_div_cs
+            write(*,1) 'RSP_max_dt_times_min_dr_div_cs', s% ctrl% RSP_max_dt_times_min_dr_div_cs
             write(*,1) 'rsp_min_dr_div_cs', rsp_min_dr_div_cs
             write(*,1) 'rsp_min_rad_diff_time', rsp_min_rad_diff_time
             call mesa_error(__FILE__,__LINE__,'do1_step 2')
@@ -720,7 +720,7 @@
             k = NZN+1-i
             r_in = r_00
             r_00 = s% r(k)
-            if (abs(s% v(k))/s% csound(k) < s% RSP_v_div_cs_threshold_for_dt_limit) cycle
+            if (abs(s% v(k))/s% csound(k) < s% ctrl% RSP_v_div_cs_threshold_for_dt_limit) cycle
             k = nzn+1-i
             dr_div_cs = (r_00 - r_in)/s% csound(k)
             if (dr_div_cs < rsp_min_dr_div_cs) then
@@ -731,15 +731,15 @@
          
          rsp_min_rad_diff_time = 1d99
          i_min_rad_diff_time = -1
-         if (s% RSP_max_dt_times_min_rad_diff_time > 0d0) then
+         if (s% ctrl% RSP_max_dt_times_min_rad_diff_time > 0d0) then
             rsp_min_rad_diff_time = dt_for_radiative_diffusion(i_min_rad_diff_time)
          end if
          
          call calculate_work_integrals(s)      
          call calculate_energies(s,total_radiation)
          call gather_pulse_statistics(s)
-         if (s% RSP_max_num_periods < 0 .or. &
-             s% rsp_num_periods < s% RSP_max_num_periods) return
+         if (s% ctrl% RSP_max_num_periods < 0 .or. &
+             s% rsp_num_periods < s% ctrl% RSP_max_num_periods) return
          call get_GRPDV(s)
                   
          contains
@@ -791,8 +791,8 @@
          if (cycle_complete) then
             if (s% rsp_num_periods > 1) then
                s% rsp_GREKM = (EKMAX-EKMAXL)/(EKMAX+EKMAXL)*2.d0
-               s% rsp_GREKM_avg_abs = s% rsp_GREKM_avg_abs_frac_new*abs(s% rsp_GREKM) + &
-                  (1d0 - s% rsp_GREKM_avg_abs_frac_new)*s% rsp_GREKM_avg_abs
+               s% rsp_GREKM_avg_abs = s% ctrl% rsp_GREKM_avg_abs_frac_new*abs(s% rsp_GREKM) + &
+                  (1d0 - s% ctrl% rsp_GREKM_avg_abs_frac_new)*s% rsp_GREKM_avg_abs
             end if
             EKDEL = EKMAX-EKMIN
             EKMAXL = EKMAX
@@ -895,8 +895,8 @@
                WORKT(I) = WORKT(I) + dVol*dm*Ptrb_tw
                WORKC(I) = WORKC(I) - dt*dm*s% Eq(k)
             enddo
-            if (s% rsp_num_periods == s% RSP_work_period) then
-               fname = trim(s% log_directory) // '/' // trim(s% RSP_work_filename)
+            if (s% rsp_num_periods == s% ctrl% RSP_work_period) then
+               fname = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% RSP_work_filename)
                write(*,*) 'write work integral data to ' // trim(fname)
                open(78,file=trim(fname),status='unknown')
                do I=1,NZN
@@ -975,7 +975,7 @@
 
       
       subroutine check_cycle_completed(s,cycle_complete)
-         ! uses ULL, FIRST, s% RSP_min_max_R_for_periods, PERIODLIN, s% RSP_min_PERIOD_div_PERIODLIN
+         ! uses ULL, FIRST, s% ctrl% RSP_min_max_R_for_periods, PERIODLIN, s% ctrl% RSP_min_PERIOD_div_PERIODLIN
          ! depends on s% RSP_have_set_velocities = .true.
          ! sets s% rsp_num_periods, s% rsp_period
          
@@ -991,16 +991,16 @@
          end if
          if (s% model_number.eq.1) return
          if (.not. s% RSP_have_set_velocities) return
-         if (s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
+         if (s% r(1)/SUNR < s% ctrl% RSP_min_max_R_for_periods) return
          if (UN/s% csound(1) > VMAX) then
             VMAX = UN/s% csound(1)
          end if
          if(UN*ULL.gt.0.0d0.or.UN.gt.0.d0) return
          T0=TET
-         min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
+         min_PERIOD = PERIODLIN*s% ctrl% RSP_min_PERIOD_div_PERIODLIN
          if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
-         if (s% r(1)/SUNR - RMIN < s% RSP_min_deltaR_for_periods) return
+         if (s% r(1)/SUNR - RMIN < s% ctrl% RSP_min_deltaR_for_periods) return
          if(FIRST.eq.1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1

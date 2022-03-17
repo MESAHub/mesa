@@ -228,7 +228,7 @@ contains
        write(*,*) 'Advancing zone boundary: i_bdy, t_bdy, j_it=', i_bdy, t_bdy, j_it
     end if
 
-    if (s% conv_premix_dump_snapshots) then
+    if (s% ctrl% conv_premix_dump_snapshots) then
 
        write(filename, 100) 'cpm-snap.', s%model_number, '.it_', j_it, '.ad_', 0, '.dat'
 100    format(A,I5.5,A,I5.5,A,I5.5,A)
@@ -262,7 +262,7 @@ contains
 
        ! If necessary, dump a snapshot
 
-       if (s% conv_premix_dump_snapshots .AND. MOD(j_ad, 50) == 0) then
+       if (s% ctrl% conv_premix_dump_snapshots .AND. MOD(j_ad, 50) == 0) then
 
           write(filename, 100) 'cpm-snap.', s%model_number, '.it_', j_it, '.ad_', j_ad, '.dat'
 
@@ -274,7 +274,7 @@ contains
 
     end do advance_loop
 
-    if (s% conv_premix_dump_snapshots) then
+    if (s% ctrl% conv_premix_dump_snapshots) then
 
        write(filename, 100) 'cpm-snap.', s%model_number, '.it_', j_it, '.ad_', j_ad-1, '.dat'
 
@@ -352,8 +352,8 @@ contains
 
     ! Check whether we have enough time; if not, return
 
-    if (s%conv_premix_time_factor > 0._dp) then
-       dt_limit = s%conv_premix_time_factor*s%dt
+    if (s% ctrl% conv_premix_time_factor > 0._dp) then
+       dt_limit = s% ctrl% conv_premix_time_factor*s%dt
     else
        dt_limit = HUGE(0._dp)
     endif
@@ -435,7 +435,7 @@ contains
 
        ! Set update_mode over the cells being mixed
 
-       if (s%conv_premix_fix_pgas) then
+       if (s% ctrl% conv_premix_fix_pgas) then
           update_mode(kc_t:kc_b) = FIXED_PT_MODE
        else
           update_mode(kc_t:kc_b) = FIXED_DT_MODE
@@ -565,7 +565,7 @@ contains
 
     s%xa(:,kc_new) = avg_xa
 
-    if (s%conv_premix_fix_pgas) then
+    if (s% ctrl% conv_premix_fix_pgas) then
        update_mode(kc_new) = FIXED_PT_MODE
     else
        update_mode(kc_new) = FIXED_DT_MODE
@@ -1139,7 +1139,7 @@ contains
     ! Based on the burning type, decide which isotope (if any)
     ! should be monitored for abundance reversal avoidance
 
-    if (s%conv_premix_avoid_increase) then
+    if (s% ctrl% conv_premix_avoid_increase) then
 
        select case (zi%burn_type)
        case (BURN_TYPE_H)

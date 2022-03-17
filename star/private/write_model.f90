@@ -132,7 +132,7 @@
          write(iounit, 1) 'M/Msun', s% star_mass
          write(iounit, 2) 'model_number', s% model_number
          write(iounit, 1) 'star_age', s% star_age
-         write(iounit, 1) 'initial_z', s% initial_z
+         write(iounit, 1) 'initial_z', s% ctrl% initial_z
          write(iounit, 2) 'n_shells', nz
          write(iounit, 4) 'net_name', "'" // trim(s% net_name) // "'"
          write(iounit, 2) 'species', species
@@ -158,11 +158,11 @@
          if (s% tau_factor /= 1) then
             write(iounit, 1) 'tau_factor', s% tau_factor
          end if
-         if (s% Tsurf_factor /= 1) then
-            write(iounit, 1) 'Tsurf_factor', s% Tsurf_factor
+         if (s% ctrl% Tsurf_factor /= 1) then
+            write(iounit, 1) 'Tsurf_factor', s% ctrl% Tsurf_factor
          end if
-         if (s% opacity_factor /= 1) then
-            write(iounit, 1) 'opacity_factor', s% opacity_factor
+         if (s% ctrl% opacity_factor /= 1) then
+            write(iounit, 1) 'opacity_factor', s% ctrl% opacity_factor
          end if
          if (s% crystal_core_boundary_mass > 0d0) then
             write(iounit, 1) 'crystal_core_boundary_mass', s% crystal_core_boundary_mass

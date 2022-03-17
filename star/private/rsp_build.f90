@@ -95,14 +95,14 @@
          
       allocate(TA(NZN+1),VEL(NZN+1,15),TEMP(NZN))
 
-      TH0 = s% RSP_T_anchor
-      TIN = s% RSP_T_inner
-      NZT = s% RSP_nz_outer
-      FSUB = s% RSP_dq_1_factor         
+      TH0 = s% ctrl% RSP_T_anchor
+      TIN = s% ctrl% RSP_T_inner
+      NZT = s% ctrl% RSP_nz_outer
+      FSUB = s% ctrl% RSP_dq_1_factor         
       ddmfac = 1d0 ! s% RSP_ddmfac
       hhfac = 1.02d0 ! s% RSP_hhfac
-      nmodes = s% RSP_nmodes
-      RELAX = s% RSP_relax_initial_model
+      nmodes = s% ctrl% RSP_nmodes
+      RELAX = s% ctrl% RSP_relax_initial_model
       EFL02 = EFL0*EFL0
 
 !     START MAIN CYCLE
@@ -150,13 +150,13 @@
 !     PRECISIONS
       PREC    = 1d-10
       
-      EMR = s% RSP_mass
-      ELR = s% RSP_L
-      TE = s% RSP_Teff
+      EMR = s% ctrl% RSP_mass
+      ELR = s% ctrl% RSP_L
+      TE = s% ctrl% RSP_Teff
       Mass=EMR*SUNM
       L=ELR*SUNL       
       
-      if (s% RSP_trace_RSP_build_model) then
+      if (s% ctrl% RSP_trace_RSP_build_model) then
          write(*,*) '*** build initial model ***'
          write(*,'(a9,f15.5)') 'M/Msun', EMR
          write(*,'(a9,f15.5)') 'L/Lsun', ELR
@@ -239,8 +239,8 @@
       
       if(NMODES.eq.0) goto 11 ! jesli masz liczyc tylko static envelope
       
-      if (.not. (s% use_RSP_new_start_scheme .or. s% use_other_RSP_linear_analysis)) then          
-         if (s% RSP_trace_RSP_build_model) write(*,*) '*** linear analysis ***'
+      if (.not. (s% ctrl% use_RSP_new_start_scheme .or. s% ctrl% use_other_RSP_linear_analysis)) then          
+         if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) '*** linear analysis ***'
          do I=1,NZN ! LINA changes Et, so make a work copy for it
             Et(I) = w(I)
          end do
@@ -249,7 +249,7 @@
          if (ierr /= 0) then
             return
          end if
-         FILENAME=trim(s% log_directory) // '/' // 'LINA_period_growth.data'
+         FILENAME=trim(s% ctrl% log_directory) // '/' // 'LINA_period_growth.data'
          open(15,file=trim(FILENAME),status='unknown')
          write(*,'(a)') '            P(days)         growth'
          do I=1,NMODES
@@ -277,7 +277,7 @@
 5568  format(1X,1P,5E15.6)
 
  444  format(F6.3,tr2,f8.2,tr2,f7.2,tr2,d9.3) 
-      if (s% RSP_trace_RSP_build_model) then
+      if (s% ctrl% RSP_trace_RSP_build_model) then
          write(*,*) '*** done creating initial model ***'
          write(*,'(A)')
       end if
@@ -295,20 +295,20 @@
       end do
       s% L_center=L
       if(ALFA.eq.0.d0) EFL0=0.d0          
-      s% rsp_period=s% RSP_default_PERIODLIN
+      s% rsp_period=s% ctrl% RSP_default_PERIODLIN
       if (is_bad(s% rsp_period)) then
          write(*,1) 'rsp_period', s% rsp_period
          call mesa_error(__FILE__,__LINE__,'rsp_build read_model')
       end if
-      amix1 = s% RSP_fraction_1st_overtone
-      amix2 = s% RSP_fraction_2nd_overtone
+      amix1 = s% ctrl% RSP_fraction_1st_overtone
+      amix2 = s% ctrl% RSP_fraction_2nd_overtone
       if((AMIX1+AMIX2).gt.1.d0) write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
-      if (.not. s% use_RSP_new_start_scheme) then      
-         PERIODLIN=PERS(s% RSP_mode_for_setting_PERIODLIN+1)         
+      if (.not. s% ctrl% use_RSP_new_start_scheme) then      
+         PERIODLIN=PERS(s% ctrl% RSP_mode_for_setting_PERIODLIN+1)         
          s% rsp_period=PERIODLIN            
          s% v_center = 0d0
          do I=1,NZN
-            s% v(NZN+1-i)=1.0d5*s% RSP_kick_vsurf_km_per_sec* &
+            s% v(NZN+1-i)=1.0d5*s% ctrl% RSP_kick_vsurf_km_per_sec* &
               ((1.0d0-AMIX1-AMIX2)*VEL(I,1)+AMIX1*VEL(I,2)+AMIX2*VEL(I,3))
          enddo      
       end if
@@ -365,8 +365,8 @@
          have_H_too_large = .false.
          have_H_too_small = .false.
          
-         TH0_tol = s% RSP_T_anchor_tolerance
-         TIN_tol = s% RSP_T_inner_tolerance
+         TH0_tol = s% ctrl% RSP_T_anchor_tolerance
+         TIN_tol = s% ctrl% RSP_T_inner_tolerance
       
          call ZNVAR(s,H,dmN,L,TE,MX,ierr)
          if (ierr /= 0) return
@@ -374,46 +374,46 @@
          H_cnt = 1
          
          start_from_top_loop: do
-            if (s% RSP_trace_RSP_build_model) write(*,*) 'call setup_outer_zone'
+            if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call setup_outer_zone'
             call setup_outer_zone(ierr)
             if (ierr /= 0) return
-            if (s% RSP_trace_RSP_build_model) write(*,*) 'call store_N'
+            if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call store_N'
             call store_N
             zone_loop: do
                R_1=pow(R_1**3-3.d0*V_0*dm_0/P4,1.d0/3.d0)
                N=N-1  
-               if (s% RSP_trace_RSP_build_model) write(*,*) 'zone_loop', N, T_0, TIN
+               if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'zone_loop', N, T_0, TIN
                if (N.eq.0 .or. T_0 >= TIN) then
-                  if (s% RSP_trace_RSP_build_model) write(*,*) 'call next_H'
+                  if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call next_H'
                   call next_H ! sets HH
                   if (N.eq.0 .and. abs(T(1)-TIN).lt.TIN*TIN_tol) then
                      s% M_center = M_0 - dm_0
-                     s% star_mass = s% RSP_mass
+                     s% star_mass = s% ctrl% RSP_mass
                      s% mstar = s% star_mass*SUNM
                      s% xmstar = s% mstar - s% M_center
                      s% M_center = s% mstar - s% xmstar ! this is how it is set when read file
-                     s% L_center = s% RSP_L*SUNL
+                     s% L_center = s% ctrl% RSP_L*SUNL
                      s% R_center = pow(r(1)**3 - Vol(1)*dm(1)/P43, 1d0/3d0)
                      s% v_center = 0                     
-                     if (s% RSP_trace_RSP_build_model) &
+                     if (s% ctrl% RSP_trace_RSP_build_model) &
                         write(*,*) '   inner dm growth scale', HH
                      exit start_from_top_loop ! done
                   end if
-                  if (H_cnt >= s% RSP_max_inner_scale_tries) then
+                  if (H_cnt >= s% ctrl% RSP_max_inner_scale_tries) then
                      write(*,*) 'failed to find inner dm scaling to satisify tolerance for T_inner'
                      write(*,*) 'you might try increasing RSP_T_inner_tolerance'
                      ierr = -1
                      return
                      !call mesa_error(__FILE__,__LINE__)
                   end if
-                  if (s% RSP_trace_RSP_build_model) write(*,*) 'call prepare_for_new_H'
+                  if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call prepare_for_new_H'
                   call prepare_for_new_H
                   cycle zone_loop
                end if
-               if (s% RSP_trace_RSP_build_model) write(*,*) 'call setup_next_zone'
+               if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call setup_next_zone'
                call setup_next_zone
                ! pick T to make Lr + Lc = L
-               if (s% RSP_trace_RSP_build_model) write(*,*) 'call get_T'
+               if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call get_T'
                have_T = get_T(ierr)
                if (ierr /= 0) return
                if (.not. have_T) then
@@ -422,14 +422,14 @@
                   dmN = dmN-DDT
                   cycle start_from_top_loop            
                end if
-               if (s% RSP_trace_RSP_build_model) write(*,*) 'call get_V'
+               if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call get_V'
                call get_V(ierr)
                if (ierr /= 0) return
                if((NZN-N+1.eq.NZT .or. T_0 >= TH0) &
                      .and. adjusting_dmN) then
-                  if (s% RSP_trace_RSP_build_model) &
+                  if (s% ctrl% RSP_trace_RSP_build_model) &
                      write(*,*) 'call next_dmN', dmN_cnt, NZN-N+1, T_0, TH0, abs(T_0-TH0), TH0_tol*TH0
-                  if (dmN_cnt >= s% RSP_max_outer_dm_tries) then
+                  if (dmN_cnt >= s% ctrl% RSP_max_outer_dm_tries) then
                      write(*,*) 'failed to find outer dm to satisify tolerance for T_anchor'
                      write(*,*) 'you might try increasing RSP_T_anchor_tolerance'
                      ierr = -1
@@ -439,14 +439,14 @@
                   call next_dmN
                   if(NZN-N+1.eq.NZT.and.abs(T_0-TH0).lt.TH0_tol*TH0) then
                      adjusting_dmN = .false.
-                     if (s% RSP_trace_RSP_build_model) &
+                     if (s% ctrl% RSP_trace_RSP_build_model) &
                         write(*,*) '           outer dm/Msun', dmN/SUNM
                   end if
                   ! one last repeat with final dmN
-                  !if (s% RSP_trace_RSP_build_model) write(*,*) 'cycle start_from_top_loop', dmN_cnt, dmN/SUNM
+                  !if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'cycle start_from_top_loop', dmN_cnt, dmN/SUNM
                   cycle start_from_top_loop            
                end if
-               if (s% RSP_trace_RSP_build_model) write(*,*) 'call store_N'
+               if (s% ctrl% RSP_trace_RSP_build_model) write(*,*) 'call store_N'
                call store_N
             end do zone_loop  
          end do start_from_top_loop
@@ -491,8 +491,8 @@
          endif      
          RM=sqrt(L/(P4*SIG*WE))
          R_1=RM
-         if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
-            tau_surf = s% RSP_tau_surf_for_atm_grey_with_kap
+         if (s% ctrl% RSP_use_atm_grey_with_kap_for_Psurf) then
+            tau_surf = s% ctrl% RSP_tau_surf_for_atm_grey_with_kap
             kap_guess = 1d-2
             call get_surf_P_T_kap(s, &
                MX, RM, L, tau_surf, kap_guess, &
@@ -502,7 +502,7 @@
                write(*,*) 'failed in get_surf_P_T_kap'
                return
             end if
-         else if (s% RSP_use_Prad_for_Psurf) then
+         else if (s% ctrl% RSP_use_Prad_for_Psurf) then
             Psurf = crad*T_0*T_0*T_0*T_0/3d0
          else
             Psurf = 0d0
@@ -612,7 +612,7 @@
          w(N) = w_0
          dtau = dm(N)*K(N)/(P4*R(N)**2)
          if (in_photosphere .and. T(N) >= TE) then
-            if (s% RSP_testing) &
+            if (s% ctrl% RSP_testing) &
                write(*,*) 'nz phot, tau_sum, T', &
                   NZN-N, tau_sum, tau_sum+dtau, T(N+1), TE, T(N)
             in_photosphere = .false.
@@ -639,7 +639,7 @@
          else if (T_1 > TH0) then
             if (in_outer_env) then
                in_outer_env = .false.
-               if (s% RSP_testing) write(*,*) 'nz outer', NZN-N, T_1, TH0
+               if (s% ctrl% RSP_testing) write(*,*) 'nz outer', NZN-N, T_1, TH0
             end if
             dm_0=dm_0*H
          end if         
@@ -726,7 +726,7 @@
          else
             T4_0=T4_1*1.2d0
             T_0=sqrt(sqrt(T4_0))
-            if (s% RSP_testing) then
+            if (s% ctrl% RSP_testing) then
                do
                   Prad = Radiation_Pressure(T_0)
                   if (Prad < P_0) exit
@@ -762,7 +762,7 @@
             I=I+1
             if(I.gt.10000) then
                get_T = .false.
-               if (s% RSP_testing) then
+               if (s% ctrl% RSP_testing) then
                   write(*,*) 'failed get_T', N, T_0
                   call mesa_error(__FILE__,__LINE__,'get_T')
                end if
@@ -797,7 +797,7 @@
          end do T1_loop
          
          get_T = .true.
-         if (s% RSP_testing) write(*,*) 'done get_T', N, T_0
+         if (s% ctrl% RSP_testing) write(*,*) 'done get_T', N, T_0
       end function get_T
       
       subroutine failed
@@ -874,7 +874,7 @@
       else !     EDDINGTON APPROXIMATION
          T0= pow(0.5d0, 0.25d0)*TE ! T0= pow(1.0d0/2.d0,0.25d0)*TE 
       endif      
-      if (s% RSP_use_Prad_for_Psurf) then
+      if (s% ctrl% RSP_use_Prad_for_Psurf) then
          Psurf = crad*T0*T0*T0*T0/3d0
       else
          Psurf = 0d0
@@ -936,7 +936,7 @@
       !write(*,*) 'V, P, kap, residual', i, V, P, kap, residual
       
       dmN = 4*pi*R**2*dtau/kap
-      if (s% RSP_testing) write(*,*) 'initial dmN', dmN/SUNM
+      if (s% ctrl% RSP_testing) write(*,*) 'initial dmN', dmN/SUNM
       !stop 
       end subroutine ZNVAR
 

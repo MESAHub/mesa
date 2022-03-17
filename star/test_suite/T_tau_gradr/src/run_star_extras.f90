@@ -118,7 +118,7 @@
          do k = 2, s% nz
             T_face = exp((s% dq(k-1)*s% lnT(k) + &
                   s% dq(k)*s% lnT(k-1))/(s% dq(k-1) + s% dq(k)))
-            T_check = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% atm_T_tau_relation, s% tau(k))), 0.25_dp)
+            T_check = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% ctrl% atm_T_tau_relation, s% tau(k))), 0.25_dp)
             T_rms = T_rms + (T_face - T_check)**2
             n = n + 1
             ! write(*,*) 'k, T_face, T_check:', k, T_face, T_check
@@ -127,24 +127,24 @@
 
          T_rms = sqrt(T_rms/n)
 
-         if (T_rms > s% x_ctrl(1)) then
-            write(*,*) 'T_rms larger than target: ', trim(s% atm_T_tau_relation), T_rms, s% x_ctrl(1)
+         if (T_rms > s% ctrl% x_ctrl(1)) then
+            write(*,*) 'T_rms larger than target: ', trim(s% ctrl% atm_T_tau_relation), T_rms, s% ctrl% x_ctrl(1)
             failed = .true.
          end if
 
          ! cycle through all the options
          if (MOD(s% model_number, 10) == 0) then
-            select case(s% atm_T_tau_relation)
+            select case(s% ctrl% atm_T_tau_relation)
             case ('Eddington')
-               s% atm_T_tau_relation = 'solar_Hopf'
+               s% ctrl% atm_T_tau_relation = 'solar_Hopf'
             case ('solar_Hopf')
-               s% atm_T_tau_relation = 'Krishna_Swamy'
+               s% ctrl% atm_T_tau_relation = 'Krishna_Swamy'
             case ('Krishna_Swamy')
-               s% atm_T_tau_relation = 'Trampedach_solar'
+               s% ctrl% atm_T_tau_relation = 'Trampedach_solar'
             case ('Trampedach_solar')
-               s% atm_T_tau_relation = 'Eddington'
+               s% ctrl% atm_T_tau_relation = 'Eddington'
             case default
-               write(*,*) 'Invalid atm_T_tau_relation: ', s% atm_T_tau_relation
+               write(*,*) 'Invalid atm_T_tau_relation: ', s% ctrl% atm_T_tau_relation
                call mesa_error(__FILE__,__LINE__)
             end select
          end if
@@ -202,7 +202,7 @@
 
          names(1) = 'T_check'
          do k = 1, s% nz
-            vals(k,1) = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% atm_T_tau_relation, s% tau(k))), 0.25_dp)
+            vals(k,1) = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% ctrl% atm_T_tau_relation, s% tau(k))), 0.25_dp)
          end do
 
       end subroutine data_for_extra_profile_columns

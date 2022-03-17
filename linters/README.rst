@@ -98,3 +98,9 @@ fix_inlists.py
 --------------
 
 Fixes various controls in the test_suite inlists that should not be enabled by default.
+
+
+update_ctrls.py
+---------------
+
+This handles the replacement of ``s%`` with ``s% ctrl%`` while being smart about only doing that to controls.

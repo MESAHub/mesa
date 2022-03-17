@@ -167,11 +167,11 @@
          total_num_iters = 0
          total_num_retries = 0
 
-         use_isolve = s% diffusion_use_isolve
+         use_isolve = s% ctrl% diffusion_use_isolve
 
-         min_num_substeps = s% diffusion_min_num_substeps
-         trace = s% show_diffusion_substep_info
-         do_timing = s% show_diffusion_timing
+         min_num_substeps = s% ctrl% diffusion_min_num_substeps
+         trace = s% ctrl% show_diffusion_substep_info
+         do_timing = s% ctrl% show_diffusion_timing
 
          if (dbg) then
             write(*,2) 'nzlo', nzlo
@@ -208,8 +208,8 @@
             end if
          end if
 
-         X_total_atol = s% diffusion_X_total_atol
-         X_total_rtol = s% diffusion_X_total_rtol
+         X_total_atol = s% ctrl% diffusion_X_total_atol
+         X_total_rtol = s% ctrl% diffusion_X_total_rtol
 
          h1 = net_iso(ih1)
          if (h1 == 0) then
@@ -272,7 +272,7 @@
          ldb = neqs
          ldx = neqs
 
-         upwind_limit = s% diffusion_upwind_abs_v_limit
+         upwind_limit = s% ctrl% diffusion_upwind_abs_v_limit
 
          mstar = sum(dm_in(1:nz))
          do i=1,species
@@ -282,7 +282,7 @@
 
          call do_alloc(ierr)
          if (ierr /= 0) then
-            if (dbg .or. s% report_ierr) write(*,*) 'diffusion failed in do_alloc'
+            if (dbg .or. s% ctrl% report_ierr) write(*,*) 'diffusion failed in do_alloc'
             return
          end if
 
@@ -370,8 +370,8 @@
                dot_product(cell_dm(nzlo:nzhi),X(j,nzlo:nzhi))/mtotal
          end do
 
-         tol_correction_max = s% diffusion_tol_correction_max
-         tol_correction_norm = s% diffusion_tol_correction_norm
+         tol_correction_max = s% ctrl% diffusion_tol_correction_max
+         tol_correction_norm = s% ctrl% diffusion_tol_correction_norm
          dt = 0
          min_dt = total_time/(1000*max_steps)
          time = 0
@@ -382,7 +382,7 @@
          if (dbg) write(*,*) '1st time call fixup'
          call fixup(s,  &
             nz, nc, m, nzlo, nzhi, &
-            total_num_iters, s% diffusion_min_X_hard_limit, X_total_atol, X_total_rtol, &
+            total_num_iters, s% ctrl% diffusion_min_X_hard_limit, X_total_atol, X_total_rtol, &
             cell_dm, mtotal, xtotal_init, X, &
             lnT, sum_ending_mass, ending_mass, ending_dX_dm, &
             bad_j, bad_k, bad_X, bad_sum, bad_Xsum, ierr)
@@ -487,10 +487,10 @@
 
             which_decsol = bcyclic_dble
 
-            which_solver = solver_option(s% diffusion_isolve_solver, ierr)
+            which_solver = solver_option(s% ctrl% diffusion_isolve_solver, ierr)
             if (ierr /= 0) then
                write(*,*) 'unknown solver name for diffusion_isolve_solver' // &
-                  trim(s% diffusion_isolve_solver)
+                  trim(s% ctrl% diffusion_isolve_solver)
                return
             end if
 
@@ -503,17 +503,17 @@
             end if
 
             itol = 0
-            rtol(1) = s% diffusion_rtol_for_isolve
-            atol(1) = s% diffusion_atol_for_isolve
+            rtol(1) = s% ctrl% diffusion_rtol_for_isolve
+            atol(1) = s% ctrl% diffusion_atol_for_isolve
 
             iout = 1
-            max_steps = s% diffusion_maxsteps_for_isolve
+            max_steps = s% ctrl% diffusion_maxsteps_for_isolve
             isparse = 0
             lout = 6
             caller_id = 0
 
-            x_min = s% diffusion_min_X_hard_limit
-            x_max = 1d0 - s% diffusion_min_X_hard_limit
+            x_min = s% ctrl% diffusion_min_X_hard_limit
+            x_max = 1d0 - s% ctrl% diffusion_min_X_hard_limit
 
             ijac = 1 ! analytic jacobian
 
@@ -748,13 +748,13 @@
 
                call fixup(s,  &
                   nz, nc, m, nzlo, nzhi, total_num_iters, &
-                  s% diffusion_min_X_hard_limit, X_total_atol, X_total_rtol, &
+                  s% ctrl% diffusion_min_X_hard_limit, X_total_atol, X_total_rtol, &
                   cell_dm, mtotal, xtotal_init, X, &
                   lnT, sum_ending_mass, ending_mass, ending_dX_dm, &
                   bad_j, bad_k, bad_X, bad_sum, bad_Xsum, ierr)
                if (ierr /= 0) then
                   s% retry_message = 'element diffusion failed in fixup'
-                  if (s% report_ierr) write(*, *) s% retry_message
+                  if (s% ctrl% report_ierr) write(*, *) s% retry_message
                   return
                end if
                if (failed('fixup')) return
@@ -849,7 +849,7 @@
             end interface
             integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
             include 'formats'
-            if (s% show_diffusion_substep_info .and. mod(nr,10) == 0) write(*,2) 'nr', nr, time
+            if (s% ctrl% show_diffusion_substep_info .and. mod(nr,10) == 0) write(*,2) 'nr', nr, time
             irtrn = 0
          end subroutine solout
 
@@ -875,7 +875,7 @@
 
             if (dbg) write(*,*) 'call get_timescale'
             call get_timescale( &
-               s, nz, nzlo, nzhi, m, nc, -s% diffusion_min_X_hard_limit*0.5d0, v_advection_face, &
+               s, nz, nzlo, nzhi, m, nc, -s% ctrl% diffusion_min_X_hard_limit*0.5d0, v_advection_face, &
                upwind_limit, X, X_face, C_div_X, SIG_face, GT_face, AD_face, cell_dm, r_face, &
                steps_used, total_num_iters, dbg, iter_dbg, j_dbg, k_dbg, &
                j, k, class_chem_id, total_time, timescale)
@@ -909,7 +909,7 @@
                dt/remaining_time, remaining_time/total_time
             if (dbg) write(*,*)
 
-            max_retries = s% diffusion_max_retries_per_substep
+            max_retries = s% ctrl% diffusion_max_retries_per_substep
          retry_loop: do retry_count = 1, max_retries
 
                if (dt < min_dt) then
@@ -1017,7 +1017,7 @@
 
                ! set lambda for positivity
                call positivity( &
-                  nc, nzlo, nzhi, X_1, -s% diffusion_min_X_hard_limit, &
+                  nc, nzlo, nzhi, X_1, -s% ctrl% diffusion_min_X_hard_limit, &
                   del, lambda, num_iters)
                if (dbg) write(*,2) 'lambda', num_iters, lambda
 
@@ -1036,7 +1036,7 @@
 
                call fixup(s,  &
                   nz, nc, m, nzlo, nzhi, total_num_iters, &
-                  s% diffusion_min_X_hard_limit, X_total_atol, X_total_rtol, &
+                  s% ctrl% diffusion_min_X_hard_limit, X_total_atol, X_total_rtol, &
                   cell_dm, mtotal, xtotal_init, X, &
                   lnT, sum_ending_mass, ending_mass, ending_dX_dm, &
                   bad_j, bad_k, bad_X, bad_sum, bad_Xsum, ierr)
@@ -1203,7 +1203,7 @@
             character (len=*) :: str
             failed = .false.
             if (ierr == 0) return
-            if (dbg .or. s% report_ierr) write(*,*) 'failed in ' // trim(str), ierr
+            if (dbg .or. s% ctrl% report_ierr) write(*,*) 'failed in ' // trim(str), ierr
             call dealloc
             failed = .true.
          end function failed

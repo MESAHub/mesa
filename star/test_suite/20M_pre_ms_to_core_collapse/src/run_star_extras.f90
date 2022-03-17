@@ -34,9 +34,9 @@
       include "test_suite_extras_def.inc"
 
 !alpha_mlt_routine
-         !alpha_H = s% x_ctrl(21)
-         !alpha_other = s% x_ctrl(22)
-         !H_limit = s% x_ctrl(23)
+         !alpha_H = s% ctrl% x_ctrl(21)
+         !alpha_other = s% ctrl% x_ctrl(22)
+         !H_limit = s% ctrl% x_ctrl(23)
       
       contains
 
@@ -73,9 +73,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         alpha_H = s% x_ctrl(21)
-         alpha_other = s% x_ctrl(22)
-         H_limit = s% x_ctrl(23)
+         alpha_H = s% ctrl% x_ctrl(21)
+         alpha_other = s% ctrl% x_ctrl(22)
+         H_limit = s% ctrl% x_ctrl(23)
          h1 = s% net_iso(ih1)
          !write(*,1) 'alpha_H', alpha_H
          !write(*,1) 'alpha_other', alpha_other

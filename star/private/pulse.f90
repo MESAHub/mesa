@@ -77,7 +77,7 @@ contains
 
     ! If necessary, hand off to the user hook
 
-    if (s%use_other_export_pulse_data .AND. ASSOCIATED(s%other_export_pulse_data)) then
+    if (s% ctrl% use_other_export_pulse_data .AND. ASSOCIATED(s%other_export_pulse_data)) then
        call s%other_export_pulse_data(id, data_format, filename, &
             add_center_point, keep_surface_point, add_atmosphere, ierr)
        return
@@ -126,7 +126,7 @@ contains
 
     ! If necessary, hand off to the user hook
 
-    if (s%use_other_get_pulse_data .AND. ASSOCIATED(s%other_get_pulse_data)) then
+    if (s% ctrl% use_other_get_pulse_data .AND. ASSOCIATED(s%other_get_pulse_data)) then
        call s%other_get_pulse_data(id, data_format, &
             add_center_point, keep_surface_point, add_atmosphere, global_data, point_data, ierr)
        return
@@ -154,7 +154,7 @@ contains
 
     ! Edit the data
 
-    if (s%use_other_edit_pulse_data .AND. ASSOCIATED(s%other_edit_pulse_data)) then
+    if (s% ctrl% use_other_edit_pulse_data .AND. ASSOCIATED(s%other_edit_pulse_data)) then
        call s%other_edit_pulse_data(s%id, data_format, global_data, point_data, ierr)
     end if
 

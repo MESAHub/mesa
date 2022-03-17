@@ -124,9 +124,9 @@
             ! save pulse data
             call star_export_pulse_data( &
                   id, 'FGONG', filename, &
-                  s% add_center_point_to_pulse_data, &
-                  s% keep_surface_point_for_pulse_data, &
-                  s% add_atmosphere_to_pulse_data, &
+                  s% ctrl% add_center_point_to_pulse_data, &
+                  s% ctrl% keep_surface_point_for_pulse_data, &
+                  s% ctrl% add_atmosphere_to_pulse_data, &
                   ierr)
             if (ierr /= 0) then
                write(*,*) 'failed to save '//filename
@@ -170,11 +170,11 @@
 
             ! initialise accumulators
             T_rms = 0.0_dp
-            tau = s% atm_build_tau_outer
+            tau = s% ctrl% atm_build_tau_outer
             n = 0
 
             do k = 1, nz-1
-               T_check = Teff*pow(0.75_dp*(tau + q(s% atm_T_tau_relation, tau)), 0.25_dp)
+               T_check = Teff*pow(0.75_dp*(tau + q(s% ctrl% atm_T_tau_relation, tau)), 0.25_dp)
                T_face = data(3,k)
                T_rms = T_rms + (T_face - T_check)**2
                n = n + 1
@@ -189,23 +189,23 @@
 
             T_rms = sqrt(T_rms/n)
 
-            if (T_rms > s% x_ctrl(1)) then
-               write(*,*) 'T_rms larger than target: ', trim(s% atm_T_tau_relation), T_rms, s% x_ctrl(1)
+            if (T_rms > s% ctrl% x_ctrl(1)) then
+               write(*,*) 'T_rms larger than target: ', trim(s% ctrl% atm_T_tau_relation), T_rms, s% ctrl% x_ctrl(1)
                failed = .true.
             end if
 
             ! cycle through T-tau relations
-            select case(s% atm_T_tau_relation)
+            select case(s% ctrl% atm_T_tau_relation)
             case ('Eddington')
-               s% atm_T_tau_relation = 'solar_Hopf'
+               s% ctrl% atm_T_tau_relation = 'solar_Hopf'
             case ('solar_Hopf')
-               s% atm_T_tau_relation = 'Krishna_Swamy'
+               s% ctrl% atm_T_tau_relation = 'Krishna_Swamy'
             case ('Krishna_Swamy')
-               s% atm_T_tau_relation = 'Trampedach_solar'
+               s% ctrl% atm_T_tau_relation = 'Trampedach_solar'
             case ('Trampedach_solar')
-               s% atm_T_tau_relation = 'Eddington'
+               s% ctrl% atm_T_tau_relation = 'Eddington'
             case default
-               write(*,*) 'Invalid atm_T_tau_relation: ', s% atm_T_tau_relation
+               write(*,*) 'Invalid atm_T_tau_relation: ', s% ctrl% atm_T_tau_relation
                call mesa_error(__FILE__,__LINE__)
             end select
 
@@ -213,15 +213,15 @@
 
          ! cycle through opacity integration options
          if (MOD(s% model_number, 20) == 0) then
-            select case(s% atm_T_tau_opacity)
+            select case(s% ctrl% atm_T_tau_opacity)
             case ('fixed')
-               s% atm_T_tau_opacity = 'iterated'
+               s% ctrl% atm_T_tau_opacity = 'iterated'
             case ('iterated')
-               s% atm_T_tau_opacity = 'varying'
+               s% ctrl% atm_T_tau_opacity = 'varying'
             case ('varying')
-               s% atm_T_tau_opacity = 'fixed'
+               s% ctrl% atm_T_tau_opacity = 'fixed'
             case default
-               write(*,*) 'Invalid atm_T_tau_opacity: ', s% atm_T_tau_opacity
+               write(*,*) 'Invalid atm_T_tau_opacity: ', s% ctrl% atm_T_tau_opacity
                call mesa_error(__FILE__,__LINE__)
             end select
          end if
@@ -279,7 +279,7 @@
 
          names(1) = 'T_check'
          do k = 1, s% nz
-            vals(k,1) = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% atm_T_tau_relation, s% tau(k))), 0.25_dp)
+            vals(k,1) = s% Teff*pow(0.75_dp*(s% tau(k) + q(s% ctrl% atm_T_tau_relation, s% tau(k))), 0.25_dp)
          end do
 
       end subroutine data_for_extra_profile_columns

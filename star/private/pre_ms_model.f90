@@ -95,8 +95,8 @@
          end if
 
          ierr = 0
-         initial_z = s% initial_z
-         initial_y = s% initial_y
+         initial_z = s% ctrl% initial_z
+         initial_y = s% ctrl% initial_y
          if (initial_y < 0) initial_y = max(0d0, min(1d0, 0.24d0 + 2*initial_z))
          s% M_center = 0
          s% L_center = 0
@@ -105,14 +105,14 @@
          
          initial_h1 = max(0d0, min(1d0, 1d0 - (initial_z + initial_y)))
          initial_h2 = 0
-         if (s% initial_he3 < 0d0) then
+         if (s% ctrl% initial_he3 < 0d0) then
             xsol_he3 = chem_Xsol('he3')
             xsol_he4 = chem_Xsol('he4')
             initial_he3 = initial_y*xsol_he3/(xsol_he3 + xsol_he4)
             initial_he4 = initial_y*xsol_he4/(xsol_he3 + xsol_he4)
-         else if (s% initial_he3 < initial_y) then
-            initial_he3 = s% initial_he3
-            initial_he4 = initial_y - s% initial_he3
+         else if (s% ctrl% initial_he3 < initial_y) then
+            initial_he3 = s% ctrl% initial_he3
+            initial_he4 = initial_y - s% ctrl% initial_he3
          else
             write(*,*) "ERROR: initial_he3 is larger than initial_y"
             ierr = -1
@@ -353,7 +353,7 @@
 
          call build1_pre_ms_model( &
                s, T_c, rho_c, d_log10_P, eps_grav, &
-               x, s% initial_z, abar, zbar, &
+               x, s% ctrl% initial_z, abar, zbar, &
                xa, nz, mstar1, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in build1_pre_ms_model'
@@ -643,16 +643,16 @@
          
          mstar = m ! actual total mass
          
-         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+         if (.not. s% ctrl% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, nz, dq, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) write(*,*) 'normalize_dqs failed in pre ms model'
+               if (s% ctrl% report_ierr) write(*,*) 'normalize_dqs failed in pre ms model'
                return
             end if
          end if
          call set_qs(s, nz, q, dq, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'set_qs failed in pre ms model'
+            if (s% ctrl% report_ierr) write(*,*) 'set_qs failed in pre ms model'
             return
          end if
 
@@ -705,7 +705,7 @@
          
          ierr = 0
 
-         if (s% use_simple_es_for_kap) then
+         if (s% ctrl% use_simple_es_for_kap) then
             opacity = 0.2d0*(1 + x)
             dlnkap_dlnd = 0
             dlnkap_dlnT = 0
@@ -726,7 +726,7 @@
          cgrav = standard_cgrav
          grav = cgrav*m/pow2(r)
          scale_height = P/(grav*rho) ! this assumes HSE
-         if (s% alt_scale_height_flag) then
+         if (s% ctrl% alt_scale_height_flag) then
             scale_height2 = sqrt(P/cgrav)/rho
             if (scale_height2 < scale_height) then
                scale_height = scale_height2
@@ -734,9 +734,9 @@
          end if
          gradr = P*opacity*L/(16d0*pi*clight*m*cgrav*crad*pow4(T)/3d0) 
          
-         call get_gradT(s, s% MLT_option, & ! used to create models
+         call get_gradT(s, s% ctrl% MLT_option, & ! used to create models
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
-            s% net_iso(ih1), x, standard_cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
+            s% net_iso(ih1), x, standard_cgrav, m, gradL_composition_term, s% ctrl% mixing_length_alpha, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
   
       end subroutine eval_gradT

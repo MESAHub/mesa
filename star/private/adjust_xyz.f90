@@ -92,7 +92,7 @@
          call do_micro_change_net(s, new_net_name, ierr)
          if (ierr /= 0) then
             s% retry_message = 'micro_change_net failed'
-            if (s% report_ierr) write(*,*) s% retry_message
+            if (s% ctrl% report_ierr) write(*,*) s% retry_message
             return
          end if
 
@@ -211,7 +211,7 @@
 !$OMP END PARALLEL DO
          if (ierr /= 0) then
             s% retry_message = 'set_new_abundances failed in set_x_new'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
             return
          end if
 
@@ -256,9 +256,9 @@
          dbg = .false. !(k == nz) .or. (k == nz-1)
 
          ierr = 0
-         zfrac = s% initial_z / zsol
-         lgT_lo = s% lgT_lo_for_set_new_abundances
-         lgT_hi = s% lgT_hi_for_set_new_abundances
+         zfrac = s% ctrl% initial_z / zsol
+         lgT_lo = s% ctrl% lgT_lo_for_set_new_abundances
+         lgT_hi = s% ctrl% lgT_hi_for_set_new_abundances
 
          if (dbg) then
             write(*,'(A)')
@@ -839,19 +839,19 @@
          if (num_species /= species) then
             ierr = -1
             s% retry_message = 'set_composition requires number of species to match current model'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
             return
          end if
          if (nzlo < 1 .or. nzhi > nz) then
             ierr = -1
             s% retry_message = 'set_composition requires nzlo and nzhi to be within 1 to current num zones'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
             return
          end if
          if (abs(1d0-sum(xa_new(1:species))) > 1d-6) then
             ierr = -1
             s% retry_message = 'set_composition requires new mass fractions to add to 1.'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
             return
          end if
          do k=nzlo,nzhi
@@ -894,22 +894,22 @@
          include 'formats'
          ierr = 0
          species = s% species
-         if (s% accrete_given_mass_fractions) then
+         if (s% ctrl% accrete_given_mass_fractions) then
             xa(1:species) = 0
-            do j=1,s% num_accretion_species
-               if (len_trim(s% accretion_species_id(j)) == 0) cycle
-               cid = chem_get_iso_id(s% accretion_species_id(j))
+            do j=1,s% ctrl% num_accretion_species
+               if (len_trim(s% ctrl% accretion_species_id(j)) == 0) cycle
+               cid = chem_get_iso_id(s% ctrl% accretion_species_id(j))
                if (cid <= 0) cycle
                i = s% net_iso(cid)
                if (i == 0) cycle
-               xa(i) = s% accretion_species_xa(j)
+               xa(i) = s% ctrl% accretion_species_xa(j)
             end do
             if (abs(1d0 - sum(xa(1:species))) > 1d-2) then
                write(*,'(a)') &
                   'get_xa_for_accretion: accretion species mass fractions do not add to 1.0'
                write(*,1) 'sum(xa(1:species))', sum(xa(1:species))
-               do j=1,s% num_accretion_species
-                  write(*,2) trim(s% accretion_species_id(j)), j, xa(j)
+               do j=1,s% ctrl% num_accretion_species
+                  write(*,2) trim(s% ctrl% accretion_species_id(j)), j, xa(j)
                end do
                ierr = -1
                return
@@ -919,9 +919,9 @@
          end if
          call get_xa_for_standard_metals(s, &
             s% species, s% chem_id, s% net_iso, &
-            s% accretion_h1, s% accretion_h2, s% accretion_he3, s% accretion_he4, &
-            s% accretion_zfracs, &
-            s% accretion_dump_missing_metals_into_heaviest, xa, ierr)
+            s% ctrl% accretion_h1, s% ctrl% accretion_h2, s% ctrl% accretion_he3, s% ctrl% accretion_he4, &
+            s% ctrl% accretion_zfracs, &
+            s% ctrl% accretion_dump_missing_metals_into_heaviest, xa, ierr)
       end subroutine get_xa_for_accretion
 
 
@@ -943,7 +943,7 @@
          if (nzlo < 1) nzlo = 1
          if (nzhi < 1 ) nzhi = s% nz
          allocate(xa(species))
-         if (s% accrete_same_as_surface) then
+         if (s% ctrl% accrete_same_as_surface) then
             do j=1,species
                xa(j) = s% xa(j,1)
             end do
@@ -951,7 +951,7 @@
             call get_xa_for_accretion(s, xa, ierr)
             if (ierr /= 0) then
                s% retry_message = 'get_xa_for_accretion failed in change_to_xa_for_accretion'
-               if (s% report_ierr) write(*, *) s% retry_message
+               if (s% ctrl% report_ierr) write(*, *) s% retry_message
                deallocate(xa)
                return
             end if
@@ -1000,34 +1000,34 @@
                zfrac(:) = A09_Prz_zfrac(:)
             case (0) ! use non-standard values given in controls
                zfrac(:) = 0
-               zfrac(e_li) = s% z_fraction_li
-               zfrac(e_be) = s% z_fraction_be
-               zfrac(e_b)  = s% z_fraction_b
-               zfrac(e_c)  = s% z_fraction_c
-               zfrac(e_n)  = s% z_fraction_n
-               zfrac(e_o)  = s% z_fraction_o
-               zfrac(e_f)  = s% z_fraction_f
-               zfrac(e_ne) = s% z_fraction_ne
-               zfrac(e_na) = s% z_fraction_na
-               zfrac(e_mg) = s% z_fraction_mg
-               zfrac(e_al) = s% z_fraction_al
-               zfrac(e_si) = s% z_fraction_si
-               zfrac(e_p)  = s% z_fraction_p
-               zfrac(e_s)  = s% z_fraction_s
-               zfrac(e_cl) = s% z_fraction_cl
-               zfrac(e_ar) = s% z_fraction_ar
-               zfrac(e_k)  = s% z_fraction_k
-               zfrac(e_ca) = s% z_fraction_ca
-               zfrac(e_sc) = s% z_fraction_sc
-               zfrac(e_ti) = s% z_fraction_ti
-               zfrac(e_v)  = s% z_fraction_v
-               zfrac(e_cr) = s% z_fraction_cr
-               zfrac(e_mn) = s% z_fraction_mn
-               zfrac(e_fe) = s% z_fraction_fe
-               zfrac(e_co) = s% z_fraction_co
-               zfrac(e_ni) = s% z_fraction_ni
-               zfrac(e_cu) = s% z_fraction_cu
-               zfrac(e_zn) = s% z_fraction_zn
+               zfrac(e_li) = s% ctrl% z_fraction_li
+               zfrac(e_be) = s% ctrl% z_fraction_be
+               zfrac(e_b)  = s% ctrl% z_fraction_b
+               zfrac(e_c)  = s% ctrl% z_fraction_c
+               zfrac(e_n)  = s% ctrl% z_fraction_n
+               zfrac(e_o)  = s% ctrl% z_fraction_o
+               zfrac(e_f)  = s% ctrl% z_fraction_f
+               zfrac(e_ne) = s% ctrl% z_fraction_ne
+               zfrac(e_na) = s% ctrl% z_fraction_na
+               zfrac(e_mg) = s% ctrl% z_fraction_mg
+               zfrac(e_al) = s% ctrl% z_fraction_al
+               zfrac(e_si) = s% ctrl% z_fraction_si
+               zfrac(e_p)  = s% ctrl% z_fraction_p
+               zfrac(e_s)  = s% ctrl% z_fraction_s
+               zfrac(e_cl) = s% ctrl% z_fraction_cl
+               zfrac(e_ar) = s% ctrl% z_fraction_ar
+               zfrac(e_k)  = s% ctrl% z_fraction_k
+               zfrac(e_ca) = s% ctrl% z_fraction_ca
+               zfrac(e_sc) = s% ctrl% z_fraction_sc
+               zfrac(e_ti) = s% ctrl% z_fraction_ti
+               zfrac(e_v)  = s% ctrl% z_fraction_v
+               zfrac(e_cr) = s% ctrl% z_fraction_cr
+               zfrac(e_mn) = s% ctrl% z_fraction_mn
+               zfrac(e_fe) = s% ctrl% z_fraction_fe
+               zfrac(e_co) = s% ctrl% z_fraction_co
+               zfrac(e_ni) = s% ctrl% z_fraction_ni
+               zfrac(e_cu) = s% ctrl% z_fraction_cu
+               zfrac(e_zn) = s% ctrl% z_fraction_zn
                if (abs(sum(zfrac)-1) > 1d-6) then
                   write(*,*) 'bad sum(zfrac) for specified z fractions', sum(zfrac)
                   ierr = -1
@@ -1244,7 +1244,7 @@
          if (abs(current_z-new_z) > 1d-8 .or. is_bad(current_z)) then
             ierr = -1
             s% retry_message = 'set_z failed'
-            if (s% report_ierr) then
+            if (s% ctrl% report_ierr) then
                write(*, *) 'set_z failed'
                write(*, 1) 'initial_z', initial_z
                write(*, 1) 'requested new_z', new_z
@@ -1254,7 +1254,7 @@
                write(*, 1) 'requested/final', new_z/current_z
                write(*, *)
             end if
-            if (s% stop_for_bad_nums) then
+            if (s% ctrl% stop_for_bad_nums) then
                write(*, 1) 'initial_z', initial_z
                write(*, 1) 'requested new_z', new_z
                write(*, 1) 'actual current_z', current_z
@@ -1263,8 +1263,8 @@
          end if
 
          if (s% doing_first_model_of_run) then
-            s% initial_z = new_z
-            write(*,1) 's% initial_z =', new_z
+            s% ctrl% initial_z = new_z
+            write(*,1) 's% ctrl% initial_z =', new_z
          end if
 
          s% need_to_setvars = .true.
@@ -1311,10 +1311,10 @@
                   if (is_bad(s% xa(i, k))) then
                      ierr = -1
                      s% retry_message = 'set_z failed - bad mass fraction'
-                     if (s% report_ierr) then
+                     if (s% ctrl% report_ierr) then
                         write(*,2) 'set_z s% xa(i, k)', k, s% xa(i, k)
                      end if
-                     if (s% stop_for_bad_nums) then
+                     if (s% ctrl% stop_for_bad_nums) then
                         write(*,2) 'set_z s% xa(i, k)', k, s% xa(i, k)
                         call mesa_error(__FILE__,__LINE__,'set_z')
                      end if

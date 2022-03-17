@@ -94,9 +94,9 @@
 
          include 'formats'
 
-         dbl_fmt = s% star_history_dbl_format
-         int_fmt = s% star_history_int_format
-         txt_fmt = s% star_history_txt_format
+         dbl_fmt = s% ctrl% star_history_dbl_format
+         int_fmt = s% ctrl% star_history_int_format
+         txt_fmt = s% ctrl% star_history_txt_format
 
          ierr = 0
 
@@ -252,15 +252,15 @@
 
          i0 = 1
          if (write_flag .and. (open_close_log .or. s% model_number == -100)) then
-            if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
+            if(.not. folder_exists(trim(s% ctrl% log_directory))) call mkdir(trim(s% ctrl% log_directory))
 
-            fname = trim(s% log_directory) // '/' // trim(s% star_history_name)
+            fname = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% star_history_name)
             inquire(file=trim(fname), exist=history_file_exists)
             if ((.not. history_file_exists) .or. &
                   s% doing_first_model_of_run .or. s% need_to_set_history_names_etc) then
                ierr = 0
-               if (len_trim(s% star_history_header_name) > 0) then
-                  fname = trim(s% log_directory) // '/' // trim(s% star_history_header_name)
+               if (len_trim(s% ctrl% star_history_header_name) > 0) then
+                  fname = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% star_history_header_name)
                end if
                open(newunit=io, file=trim(fname), action='write', iostat=ierr)
             else
@@ -288,9 +288,9 @@
             v_surf = 0d0
          end if
 
-         if (s% initial_mass > s% he_core_mass) then
+         if (s% ctrl% initial_mass > s% he_core_mass) then
             envelope_fraction_left = &
-               (s% star_mass - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
+               (s% star_mass - s% he_core_mass)/(s% ctrl% initial_mass - s% he_core_mass)
          else
             envelope_fraction_left = 1
          end if
@@ -330,10 +330,10 @@
                call write_string(io, col, i, 'MESA_SDK_version', mesasdk_version_name)
                call write_string(io, col, i, 'math_backend',math_backend)
                call write_string(io, col, i, 'date', date)
-               !call write_val(io, col, i, 'initial_mass', s% initial_mass)
-               !call write_val(io, col, i, 'initial_z', s% initial_z)
-               call write_val(io, col, i, 'burn_min1', s% burn_min1)
-               call write_val(io, col, i, 'burn_min2', s% burn_min2)
+               !call write_val(io, col, i, 'initial_mass', s% ctrl% initial_mass)
+               !call write_val(io, col, i, 'initial_z', s% ctrl% initial_z)
+               call write_val(io, col, i, 'burn_min1', s% ctrl% burn_min1)
+               call write_val(io, col, i, 'burn_min2', s% ctrl% burn_min2)
 
                call write_val(io, col, i, 'msun', msun)
                call write_val(io, col, i, 'rsun', rsun)
@@ -367,9 +367,9 @@
             col = 0
             if (i==3) then
 
-               if (write_flag .and. i0 == 1 .and. len_trim(s% star_history_header_name) > 0) then
+               if (write_flag .and. i0 == 1 .and. len_trim(s% ctrl% star_history_header_name) > 0) then
                   close(io)
-                  fname = trim(s% log_directory) // '/' // trim(s% star_history_name)
+                  fname = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% star_history_name)
                   open(newunit=io, file=trim(fname), action='write', status='replace', iostat=ierr)
                   if (ierr /= 0) then
                      call dealloc
@@ -602,7 +602,7 @@
             integer :: i
             logical, parameter :: dbg = .false.
             include 'formats'
-            D_cutoff = s% mixing_D_limit_for_log
+            D_cutoff = s% ctrl% mixing_D_limit_for_log
             do i = 1, 1000
                call find_weakest_mixing_region( &
                   mx_type, mx_regions, D_max_in_region, min_ktop, min_kbot)
@@ -1327,7 +1327,7 @@
             case(h_log_xmstar)
                val = safe_log10(s% xmstar)
             case(h_delta_mass)
-               val = s% star_mass - s% initial_mass
+               val = s% star_mass - s% ctrl% initial_mass
             case(h_star_mdot)
                val = s% star_mdot
             case(h_log_abs_mdot)
@@ -1381,7 +1381,7 @@
                int_val = s% species
                is_int_val = .true.
             case(h_Tsurf_factor)
-               val = s% Tsurf_factor
+               val = s% ctrl% Tsurf_factor
             case(h_tau_factor)
                val = s% tau_factor
             case(h_tau_surface)
@@ -1787,7 +1787,7 @@
            case(h_total_irradiation_heating)
                val = s% total_irradiation_heating
            case(h_total_WD_sedimentation_heating)
-               if (s% do_element_diffusion) val = s% total_WD_sedimentation_heating
+               if (s% ctrl% do_element_diffusion) val = s% total_WD_sedimentation_heating
            case(h_total_extra_heating)
                val = s% total_extra_heating
 
@@ -1940,7 +1940,7 @@
 
             case (h_kh_mdot_limit)
                if(s% rotation_flag) then
-                  val = s% rotational_mdot_kh_fac*s% star_mass/s% kh_timescale
+                  val = s% ctrl% rotational_mdot_kh_fac*s% star_mass/s% kh_timescale
                else
                   val = 0d0
                end if
@@ -2615,7 +2615,7 @@
             case(h_max_conv_vel_div_csound)
                val = 0
                do k = 2, nz
-                  if (s% q(k) > s% max_conv_vel_div_csound_maxq .or. s% csound(k) == 0) cycle 
+                  if (s% q(k) > s% ctrl% max_conv_vel_div_csound_maxq .or. s% csound(k) == 0) cycle 
                   if (s% conv_vel(k)/s% csound(k) > val) val = s% conv_vel(k)/s% csound(k)
                end do
 
@@ -2631,17 +2631,17 @@
                val = s% total_elapsed_time
 
             case(h_delta_nu)
-               if (.not. s% get_delta_nu_from_scaled_solar) then
+               if (.not. s% ctrl% get_delta_nu_from_scaled_solar) then
                   val = 1d6/(2*s% photosphere_acoustic_r) ! microHz
                else
                   val = &
-                     s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
+                     s% ctrl% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% ctrl% Teff_sun) / &
                         pow(s% L_phot,0.75d0)
                end if
             case(h_delta_Pg)
-               if (s% calculate_Brunt_N2) val = s% delta_Pg
+               if (s% ctrl% calculate_Brunt_N2) val = s% delta_Pg
             case(h_log_delta_Pg)
-               if (s% calculate_Brunt_N2) val = safe_log10(s% delta_Pg)
+               if (s% ctrl% calculate_Brunt_N2) val = safe_log10(s% delta_Pg)
             case(h_nu_max)
                val = s% nu_max
             case(h_nu_max_3_4th_div_delta_nu)
@@ -2651,33 +2651,33 @@
             case(h_acoustic_radius)
                val = s% photosphere_acoustic_r
             case(h_gs_per_delta_nu)
-               if (s% calculate_Brunt_N2 .and. s% nu_max > 0 .and. s% delta_Pg >= 0) then
+               if (s% ctrl% calculate_Brunt_N2 .and. s% nu_max > 0 .and. s% delta_Pg >= 0) then
                   val = 1d6/(2*s% photosphere_acoustic_r) ! delta_nu
                   val = 1d6*val/(s% nu_max*s% nu_max*s% delta_Pg)
                end if
             case(h_ng_for_nu_max)
-               if (s% calculate_Brunt_N2 .and. s% nu_max > 0 .and. s% delta_Pg >= 0) then
+               if (s% ctrl% calculate_Brunt_N2 .and. s% nu_max > 0 .and. s% delta_Pg >= 0) then
                   val = 1d6/(s% nu_max*s% delta_Pg)
                end if
 
             case(h_int_k_r_dr_nu_max_Sl1)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,1,1.0d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,1,1.0d0)
             case(h_int_k_r_dr_2pt0_nu_max_Sl1)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,1,2d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,1,2d0)
             case(h_int_k_r_dr_0pt5_nu_max_Sl1)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,1,0.5d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,1,0.5d0)
             case(h_int_k_r_dr_nu_max_Sl2)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,2,1.0d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,2,1.0d0)
             case(h_int_k_r_dr_2pt0_nu_max_Sl2)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,2,2d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,2,2d0)
             case(h_int_k_r_dr_0pt5_nu_max_Sl2)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,2,0.5d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,2,0.5d0)
             case(h_int_k_r_dr_nu_max_Sl3)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,1.0d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,1.0d0)
             case(h_int_k_r_dr_2pt0_nu_max_Sl3)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,2d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,2d0)
             case(h_int_k_r_dr_0pt5_nu_max_Sl3)
-               if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,0.5d0)
+               if (s% ctrl% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,0.5d0)
 
             case (h_k_below_const_q)
                int_val = s% k_below_const_q
@@ -2724,7 +2724,7 @@
                is_int_val = .true.
 
             case (h_burn_solver_maxsteps)
-               if (s% op_split_burn) &
+               if (s% ctrl% op_split_burn) &
                   int_val = maxval(s% burn_num_iters(1:s% nz))
                is_int_val = .true.
 
@@ -3268,9 +3268,9 @@
             v_surf = 0d0
          end if
 
-         if (s% initial_mass > s% he_core_mass) then
+         if (s% ctrl% initial_mass > s% he_core_mass) then
             envelope_fraction_left = &
-               (s% star_mass - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
+               (s% star_mass - s% he_core_mass)/(s% ctrl% initial_mass - s% he_core_mass)
          else
             envelope_fraction_left = 1
          end if

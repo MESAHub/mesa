@@ -939,7 +939,7 @@
          endif
       enddo
       
-      if (s% RSP_trace_RSP_build_model) &
+      if (s% ctrl% RSP_trace_RSP_build_model) &
          write(*,*) 'waiting for DGEEV to solve eigenvalue problem....'
       call DGEEV('n','v',NZN3,LLL,LD_LLL,WRx,WIx,VLx,LD_VL,VRx,LD_VR, &
                  WORKx,4*NZN3,INFO)         
@@ -961,7 +961,7 @@
 
 !     THIS LOOP FINDS THE SMALLEST BUT POSITIVE VALUE OF VECTOR WI (MINI)
 !     AND RETURNS THE CORRESPONDING INDEX (IMI)
-      FILENAME=trim(s% log_directory) // '/' // 'LINA_period_growth_info.data'
+      FILENAME=trim(s% ctrl% log_directory) // '/' // 'LINA_period_growth_info.data'
       !open(15,file=trim(FILENAME),status='unknown')
       MINI=5.d0
       IMI=0
@@ -1084,11 +1084,11 @@
 !        WRITE WORK-INTEGRALS INTO FILE
          if(J.le.9)then
             write(NUMER1,'(I1)') J
-            FILENAME=trim(s% log_directory) // '/' // 'LINA_work'//NUMER1//'.data'
+            FILENAME=trim(s% ctrl% log_directory) // '/' // 'LINA_work'//NUMER1//'.data'
          endif
          if(J.ge.10)then
             write(NUMER2,'(I2)') J
-            FILENAME=trim(s% log_directory) // '/' // 'LINA_work'//NUMER2//'.data'
+            FILENAME=trim(s% ctrl% log_directory) // '/' // 'LINA_work'//NUMER2//'.data'
          endif
 
          open(57,file=trim(FILENAME),status='unknown')
@@ -1131,11 +1131,11 @@
 !        WRITE EIGENVECTORS TO FILE
          if(J.le.9)then
             write(NUMER1,'(I1)') J
-            FILENAME=trim(s% log_directory) // '/' // 'LINA_eigen'//NUMER1//'.data'
+            FILENAME=trim(s% ctrl% log_directory) // '/' // 'LINA_eigen'//NUMER1//'.data'
          endif
          if(J.ge.10)then
             write(NUMER2,'(I2)') J
-            FILENAME=trim(s% log_directory) // '/' // 'LINA_eigen'//NUMER2//'.data'
+            FILENAME=trim(s% ctrl% log_directory) // '/' // 'LINA_eigen'//NUMER2//'.data'
          endif
          open(56,file=trim(FILENAME),status='unknown')
          write(56,'(a)') &

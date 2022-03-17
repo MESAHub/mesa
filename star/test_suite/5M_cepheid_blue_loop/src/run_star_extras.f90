@@ -101,14 +101,14 @@
          extras_check_model = keep_going         
 
          ! approx edges
-         logT1 = s% x_ctrl(2)
-         logL1 = s% x_ctrl(3)
-         logT2 = s% x_ctrl(4)
-         logL2 = s% x_ctrl(5)
-         logT3 = s% x_ctrl(6)
-         logL3 = s% x_ctrl(7)
-         logT4 = s% x_ctrl(8)
-         logL4 = s% x_ctrl(9)
+         logT1 = s% ctrl% x_ctrl(2)
+         logL1 = s% ctrl% x_ctrl(3)
+         logT2 = s% ctrl% x_ctrl(4)
+         logL2 = s% ctrl% x_ctrl(5)
+         logT3 = s% ctrl% x_ctrl(6)
+         logL3 = s% ctrl% x_ctrl(7)
+         logT4 = s% ctrl% x_ctrl(8)
+         logL4 = s% ctrl% x_ctrl(9)
 
          log_T = log10(s% Teff)
          log_L = log10(s% L_surf)

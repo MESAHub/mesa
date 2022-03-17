@@ -53,7 +53,7 @@
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
          
-         if (.not. s% x_logical_ctrl(1)) return
+         if (.not. s% ctrl% x_logical_ctrl(1)) return
          
          call create_env(id, s, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in create_env')
@@ -196,13 +196,13 @@
          
          ierr = 0
          
-         nz = s% x_integer_ctrl(1)
+         nz = s% ctrl% x_integer_ctrl(1)
          s% nz = nz     
          max_iters = 100
           
-         net_name = s% x_character_ctrl(1)
-         s% mstar = s% x_ctrl(1)*Msun
-         s% xmstar = s% x_ctrl(2)*s% mstar
+         net_name = s% ctrl% x_character_ctrl(1)
+         s% mstar = s% ctrl% x_ctrl(1)*Msun
+         s% xmstar = s% ctrl% x_ctrl(2)*s% mstar
          s% M_center = s% mstar - s% xmstar
          s% star_mass = s% mstar/Msun
 
@@ -221,21 +221,21 @@
          s% m(1) = s% mstar
          s% m_grav(1) = s% mstar
          s% cgrav(1) = standard_cgrav
-         s% tau_factor = s% x_ctrl(6)
+         s% tau_factor = s% ctrl% x_ctrl(6)
 
          species = s% species
 
          allocate(dres_dxa(num_eos_d_dxa_results, species))
          
-         if (s% x_logical_ctrl(2)) then ! R and L in cgs units
-            s% r(1) = s% x_ctrl(3)
-            s% L(1:nz) = s% x_ctrl(4)
+         if (s% ctrl% x_logical_ctrl(2)) then ! R and L in cgs units
+            s% r(1) = s% ctrl% x_ctrl(3)
+            s% L(1:nz) = s% ctrl% x_ctrl(4)
          else ! x_ctrl(3) = Teff; x_ctrl(4) = L/Lsun
-            s% L(1:nz) = s% x_ctrl(4)*Lsun
+            s% L(1:nz) = s% ctrl% x_ctrl(4)*Lsun
             ! L = 4*pi*R^2*boltz_sigma*Tsurf**4
             tau_base = two_thirds ! just use Eddington for this
             tau_surf = s% tau_factor*tau_base
-            Teff = s% x_ctrl(3)
+            Teff = s% ctrl% x_ctrl(3)
             Teff4 = pow4(Teff)
             T4 = Teff4*0.75d0*(tau_surf + tau_base)
             s% r(1) = sqrt(s% L(1)/(4d0*pi*boltz_sigma*T4))
@@ -255,7 +255,7 @@
          s% L_center = s% L(nz)
          s% r_start(1) = s% r(1)        
          
-         ln_dq1 = s% x_ctrl(5)*ln10
+         ln_dq1 = s% ctrl% x_ctrl(5)*ln10
          dq1 = exp(ln_dq1)
          dq_factor = calc_dq_factor(nz,dq1)
                   
@@ -291,14 +291,14 @@
 
          s% tau_base = two_thirds
          tau_surf = s% tau_factor*s% tau_base
-         save_atm_option = s% atm_option
-         save_atm_T_tau_relation = s% atm_T_tau_relation
-         save_atm_T_tau_opacity = s% atm_T_tau_opacity
-         save_Pextra_factor = s% Pextra_factor
-         s% atm_option = 'T_tau'
-         s% atm_T_tau_relation = 'Eddington'
-         s% atm_T_tau_opacity = 'iterated'
-         s% Pextra_factor = 2
+         save_atm_option = s% ctrl% atm_option
+         save_atm_T_tau_relation = s% ctrl% atm_T_tau_relation
+         save_atm_T_tau_opacity = s% ctrl% atm_T_tau_opacity
+         save_Pextra_factor = s% ctrl% Pextra_factor
+         s% ctrl% atm_option = 'T_tau'
+         s% ctrl% atm_T_tau_relation = 'Eddington'
+         s% ctrl% atm_T_tau_opacity = 'iterated'
+         s% ctrl% Pextra_factor = 2
          s% Teff = atm_Teff(s% L(1), s% r(1))
          call get_initial_guess_for_atm(ierr)
          if (ierr /= 0) then
@@ -306,7 +306,7 @@
             stop
          end if
 
-         if (.not. s% x_logical_ctrl(2) .and. &
+         if (.not. s% ctrl% x_logical_ctrl(2) .and. &
              abs(Teff - s% Teff) > 1d-5*Teff) then ! report Teff
             write(*,1) 'desired Teff', Teff
             write(*,1) '1st actual s% Teff', s% Teff
@@ -325,17 +325,17 @@
             write(*, *) 'Call do1_cell initial failed', k
             stop
          end if
-         s% atm_option = save_atm_option
-         s% atm_T_tau_relation = save_atm_T_tau_relation
-         s% atm_T_tau_opacity = save_atm_T_tau_opacity
-         s% Pextra_factor = save_Pextra_factor
+         s% ctrl% atm_option = save_atm_option
+         s% ctrl% atm_T_tau_relation = save_atm_T_tau_relation
+         s% ctrl% atm_T_tau_opacity = save_atm_T_tau_opacity
+         s% ctrl% Pextra_factor = save_Pextra_factor
          call get_atm(ierr)
          if (ierr /= 0) then
             write(*, *) 'Call get_atm initial failed', k
             stop
          end if
 
-         if (.not. s% x_logical_ctrl(2) .and. &
+         if (.not. s% ctrl% x_logical_ctrl(2) .and. &
              abs(Teff - s% Teff) > 1d-5*Teff) then ! report Teff
             write(*,1) 'final actual s% Teff', s% Teff
          end if
@@ -496,11 +496,11 @@
                s% lnT_start(k) = s% lnT(k)
                s% csound_face(k) = s% csound(k)
                s% csound_start(k) = s% csound(k)
-               s% mlt_gradT_fraction = -1d0
+               s% ctrl% mlt_gradT_fraction = -1d0
                s% adjust_mlt_gradT_fraction(k) = -1d0
                
                ! skipping use_other_alpha_mlt and other_gradr_factor
-               s% alpha_mlt(k) = s% mixing_length_alpha
+               s% alpha_mlt(k) = s% ctrl% mixing_length_alpha
                s% gradr_factor(k) = 1d0               
                call star_set_mlt_vars(s% id, k, k, ierr)
                if (ierr /= 0) then

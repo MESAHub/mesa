@@ -96,13 +96,13 @@
          
          extras_check_model = keep_going
          
-         !if (abs(s% Blocker_scaling_factor - Blocker_scaling_factor_after_TP) < 1d-8) return
+         !if (abs(s% ctrl% Blocker_scaling_factor - Blocker_scaling_factor_after_TP) < 1d-8) return
          
          !if (s% center_he4 < 1d-4 .and. &
          !      any(s% burn_he_conv_region(1:s% num_conv_boundaries)) .and. &
          !      s% he_core_mass - s% c_core_mass <= s% TP_he_shell_max) then
          !   !write(*,1) 'set Blocker_scaling_factor = Blocker_scaling_factor_after_TP', Blocker_scaling_factor_after_TP
-         !   !s% Blocker_scaling_factor = Blocker_scaling_factor_after_TP
+         !   !s% ctrl% Blocker_scaling_factor = Blocker_scaling_factor_after_TP
          !   write(*,*) '1st thermal pulse'
          !   extras_check_model = terminate
          !   s% termination_code = t_extras_finish_step
@@ -170,14 +170,14 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% x_integer_ctrl(1) == 2) then ! part2
-            if (s% L(1)/Lsun < s% x_ctrl(1) .and. &
-                s% Teff > s% x_ctrl(2) .and. &
-                safe_log10(s% power_he_burn) < s% x_ctrl(3)) then
-               write(*,1) 'L/Lsun < limit', s% L(1)/Lsun, s% x_ctrl(1)
-               write(*,1) 'Teff > limit', s% Teff, s% x_ctrl(2)
+         if (s% ctrl% x_integer_ctrl(1) == 2) then ! part2
+            if (s% L(1)/Lsun < s% ctrl% x_ctrl(1) .and. &
+                s% Teff > s% ctrl% x_ctrl(2) .and. &
+                safe_log10(s% power_he_burn) < s% ctrl% x_ctrl(3)) then
+               write(*,1) 'L/Lsun < limit', s% L(1)/Lsun, s% ctrl% x_ctrl(1)
+               write(*,1) 'Teff > limit', s% Teff, s% ctrl% x_ctrl(2)
                write(*,1) 'log_LHe < limit', &
-                  safe_log10(s% power_he_burn), s% x_ctrl(3)
+                  safe_log10(s% power_he_burn), s% ctrl% x_ctrl(3)
                extras_finish_step = terminate
             end if
          end if

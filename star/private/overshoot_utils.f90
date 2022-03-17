@@ -193,7 +193,7 @@ contains
     ! (Possibly) limit the scale height using the size of the
     ! convection zone
 
-    if (s%limit_overshoot_Hp_using_size_of_convection_zone) then
+    if (s% ctrl% limit_overshoot_Hp_using_size_of_convection_zone) then
 
        ! Determine the radial extent of the convection zone (note that
        ! r_top/r_bot don't coincide exactly with the r calculated
@@ -235,10 +235,10 @@ contains
 
        ! Apply the limit
 
-       if (s%overshoot_alpha > 0d0) then
-          if (s%overshoot_alpha*Hp > dr) Hp = dr/s%overshoot_alpha
+       if (s% ctrl% overshoot_alpha > 0d0) then
+          if (s% ctrl% overshoot_alpha*Hp > dr) Hp = dr/s% ctrl% overshoot_alpha
        else
-          if (s%alpha_mlt(k)*Hp > dr) Hp = dr/s%mixing_length_alpha
+          if (s%alpha_mlt(k)*Hp > dr) Hp = dr/s% ctrl% mixing_length_alpha
        end if
 
     end if

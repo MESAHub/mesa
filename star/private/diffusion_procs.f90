@@ -841,7 +841,7 @@
                if (source_cell_mass < 0d0 .or. is_bad_num(source_cell_mass)) then
                   ierr = -1
                   s% retry_message = 'bad source cell mass in element diffusion'
-                  if (s% report_ierr) then
+                  if (s% ctrl% report_ierr) then
 !$OMP critical (diffusion_source_cell_mass)
                      write(*,4) 'source_cell_mass', &
                         i, k, k_source, remaining_source_mass, source_cell_mass
@@ -860,7 +860,7 @@
             if (remaining_needed_mass > 0d0) then
                ierr = -1
                s% retry_message = 'bad remaining mass in element diffusion'
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
 !$OMP critical (diffusion_dist_cell_mass)
                   write(*,1) 'redistribute_mass: remaining_needed_mass', &
                      remaining_needed_mass

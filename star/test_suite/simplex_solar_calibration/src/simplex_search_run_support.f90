@@ -818,9 +818,9 @@
             ierr)
          if (ierr /= 0) return
          
-         s% max_years_for_timestep = initial_max_years_for_timestep
+         s% ctrl% max_years_for_timestep = initial_max_years_for_timestep
          simplex_using_revised_max_yr_dt = .false.
-         simplex_revised_max_yr_dt = s% max_years_for_timestep
+         simplex_revised_max_yr_dt = s% ctrl% max_years_for_timestep
                   
          okay_to_restart = .false. ! only allow restart on 1st call to run1_star
          
@@ -858,16 +858,16 @@
          call star_simplex_procs% extras_controls(id, ierr)
          if (ierr /= 0) return
 
-         initial_max_years_for_timestep = s% max_years_for_timestep
+         initial_max_years_for_timestep = s% ctrl% max_years_for_timestep
          
          if (simplex_just_call_my_extras_check_model) return
 
          ! overwrite various inlist controls
 
          if (vary_alpha) then
-            s% mixing_length_alpha = next_alpha_to_try
+            s% ctrl% mixing_length_alpha = next_alpha_to_try
          else
-            s% mixing_length_alpha = first_alpha
+            s% ctrl% mixing_length_alpha = first_alpha
          end if
 
          if (vary_my_param1) then
@@ -933,10 +933,10 @@
          end if
          
          s% job% relax_initial_mass = .true.
-         s% initial_mass = s% job% new_mass
+         s% ctrl% initial_mass = s% job% new_mass
          
          initial_Y = Y
-         !s% initial_Z = Z << don't do this. it interferes with use of zams file.
+         !s% ctrl% initial_Z = Z << don't do this. it interferes with use of zams file.
          
          s% job% initial_h1 = X
          s% job% initial_h2 = 0
@@ -947,7 +947,7 @@
          current_Y = Y
          current_FeH = FeH
          current_mass = s% job% new_mass
-         current_alpha = s% mixing_length_alpha
+         current_alpha = s% ctrl% mixing_length_alpha
          current_f_ov = f_ov
          
          current_h1 = X
@@ -956,12 +956,12 @@
          current_Z = Z
          
          if (f_ov /= 0d0) then
-            s% overshoot_scheme(1) = 'exponential'
-            s% overshoot_zone_type(1) = 'any'
-            s% overshoot_zone_loc(1) = 'any'
-            s% overshoot_bdy_loc(1) = 'any'
-            s% overshoot_f(1) = f_ov
-            s% overshoot_f0(1) = f0_ov_div_f_ov*f_ov
+            s% ctrl% overshoot_scheme(1) = 'exponential'
+            s% ctrl% overshoot_zone_type(1) = 'any'
+            s% ctrl% overshoot_zone_loc(1) = 'any'
+            s% ctrl% overshoot_bdy_loc(1) = 'any'
+            s% ctrl% overshoot_f(1) = f_ov
+            s% ctrl% overshoot_f0(1) = f0_ov_div_f_ov*f_ov
          end if
          
          s% extras_check_model => simplex_extras_check_model
@@ -1076,41 +1076,41 @@
             if (age_target > s% star_age) then
                remaining_years = age_target - s% star_age
                if (simplex_using_revised_max_yr_dt) &
-                  s% max_years_for_timestep = simplex_revised_max_yr_dt
-               n = floor(remaining_years/s% max_years_for_timestep + 1d-6)
+                  s% ctrl% max_years_for_timestep = simplex_revised_max_yr_dt
+               n = floor(remaining_years/s% ctrl% max_years_for_timestep + 1d-6)
                j = num_smaller_steps_before_age_target
-               if (remaining_years <= s% max_years_for_timestep) then
-                  if (mod(s% model_number, s% terminal_interval) == 0) &
+               if (remaining_years <= s% ctrl% max_years_for_timestep) then
+                  if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
                      write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                         s% model_number, (age_target - s% star_age)/age_sigma
-                  s% max_years_for_timestep = remaining_years
+                  s% ctrl% max_years_for_timestep = remaining_years
                   simplex_using_revised_max_yr_dt = .true.
-                  simplex_revised_max_yr_dt = s% max_years_for_timestep
-                  simplex_max_dt_next = s% max_years_for_timestep*secyer
+                  simplex_revised_max_yr_dt = s% ctrl% max_years_for_timestep
+                  simplex_max_dt_next = s% ctrl% max_years_for_timestep*secyer
                else if (n <= j) then
-                  if (mod(s% model_number, s% terminal_interval) == 0) &
+                  if (mod(s% model_number, s% ctrl% terminal_interval) == 0) &
                      write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                         s% model_number, (age_target - s% star_age)/age_sigma
-                  prev_max_years = s% max_years_for_timestep
+                  prev_max_years = s% ctrl% max_years_for_timestep
                   i = floor(remaining_years/dt_for_smaller_steps_before_age_target + 1d-6)
                   if ((i+1d-9)*dt_for_smaller_steps_before_age_target < remaining_years) then
-                     s% max_years_for_timestep = remaining_years/(i+1)
+                     s% ctrl% max_years_for_timestep = remaining_years/(i+1)
                   else
-                     s% max_years_for_timestep = remaining_years/i
+                     s% ctrl% max_years_for_timestep = remaining_years/i
                   end if
-                  min_max = prev_max_years*s% reduction_factor_for_max_timestep
-                  if (s% max_years_for_timestep < min_max) &
-                     s% max_years_for_timestep = min_max
+                  min_max = prev_max_years*s% ctrl% reduction_factor_for_max_timestep
+                  if (s% ctrl% max_years_for_timestep < min_max) &
+                     s% ctrl% max_years_for_timestep = min_max
                   if (.not. simplex_using_revised_max_yr_dt) then
                      simplex_using_revised_max_yr_dt = .true.
                      write(*,2) 'begin reducing max timestep prior to age target', &
                         s% model_number, remaining_years
-                  else if (mod(s% model_number, s% terminal_interval) == 0) then
-                     if (simplex_revised_max_yr_dt > s% max_years_for_timestep) then
+                  else if (mod(s% model_number, s% ctrl% terminal_interval) == 0) then
+                     if (simplex_revised_max_yr_dt > s% ctrl% max_years_for_timestep) then
                         write(*,2) 'reducing max timestep prior to age target', &
                            s% model_number, remaining_years
-                     else if (s% max_years_for_timestep <= dt_for_smaller_steps_before_age_target) then
-                        i = floor(remaining_years/s% max_years_for_timestep + 1d-6)
+                     else if (s% ctrl% max_years_for_timestep <= dt_for_smaller_steps_before_age_target) then
+                        i = floor(remaining_years/s% ctrl% max_years_for_timestep + 1d-6)
                         write(*,3) 'remaining steps and years until age target', &
                            s% model_number, i, remaining_years
                      else 
@@ -1118,21 +1118,21 @@
                            s% model_number, remaining_years
                      end if
                   end if
-                  simplex_revised_max_yr_dt = s% max_years_for_timestep
-                  if (s% dt_next/secyer > s% max_years_for_timestep) &
-                     simplex_max_dt_next = s% max_years_for_timestep*secyer
+                  simplex_revised_max_yr_dt = s% ctrl% max_years_for_timestep
+                  if (s% dt_next/secyer > s% ctrl% max_years_for_timestep) &
+                     simplex_max_dt_next = s% ctrl% max_years_for_timestep*secyer
                end if
             else if (include_age_in_chi2) then
-               if (abs(s% max_years_for_timestep - dt_for_smaller_steps_before_age_target) > &
+               if (abs(s% ctrl% max_years_for_timestep - dt_for_smaller_steps_before_age_target) > &
                      dt_for_smaller_steps_before_age_target*1d-2) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                      s% model_number, (age_target - s% star_age)/age_sigma
                   write(*,1) 'dt_for_smaller_steps_before_age_target', &
                      dt_for_smaller_steps_before_age_target
                   write(*,1) 'max_years_for_timestep', &
-                     s% max_years_for_timestep
+                     s% ctrl% max_years_for_timestep
                   call mesa_error(__FILE__,__LINE__,'bad max_years_for_timestep')
-               else if (mod(s% model_number, s% terminal_interval) == 0) then
+               else if (mod(s% model_number, s% ctrl% terminal_interval) == 0) then
                   write(*,'(a40,i6,f20.10)') '(age_target - star_age)/age_sigma', &
                      s% model_number, (age_target - s% star_age)/age_sigma
                end if
@@ -1238,7 +1238,7 @@
          if (checking_age) then
             ! leave max_years_for_timestep as is
          else if (chi2 <= chi2_limit_for_smallest_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit 
+            s% ctrl% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit 
             if (s% dt > max_yrs_dt_chi2_smallest_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smallest_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -1249,7 +1249,7 @@
                return
             end if         
          else if (chi2 <= chi2_limit_for_smaller_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit 
+            s% ctrl% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit 
             if (s% dt > max_yrs_dt_chi2_smaller_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smaller_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -1260,7 +1260,7 @@
                return
             end if         
          else if (chi2 <= chi2_limit_for_small_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_small_limit 
+            s% ctrl% max_years_for_timestep = max_yrs_dt_chi2_small_limit 
             if (s% dt > max_yrs_dt_chi2_small_limit*secyer) then
                s% dt = max_yrs_dt_chi2_small_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -1828,10 +1828,10 @@
 
          if (write_profile_for_best_model) then
             ierr = 0
-            write_controls_info_with_profile = s% write_controls_info_with_profile
-            s% write_controls_info_with_profile = .false.
+            write_controls_info_with_profile = s% ctrl% write_controls_info_with_profile
+            s% ctrl% write_controls_info_with_profile = .false.
             call star_write_profile_info(s% id, best_model_profile_filename, ierr)
-            s% write_controls_info_with_profile = write_controls_info_with_profile
+            s% ctrl% write_controls_info_with_profile = write_controls_info_with_profile
             if (ierr /= 0) then
                write(*,*) 'failed in star_write_profile_info'
                call mesa_error(__FILE__,__LINE__)

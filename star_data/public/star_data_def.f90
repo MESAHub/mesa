@@ -56,6 +56,11 @@
              check_step_loop_timing, check_after_step_timing, check_before_step_timing
          integer(8) :: time0, time1, clock_rate, time0_extra, time1_extra, time0_initial
       end type star_job_controls
+
+      type star_controls
+         include "star_controls.inc"
+         include "star_controls_dev.inc"
+      end type star_controls
       
       type star_info
          
@@ -109,10 +114,8 @@
             
          ! controls
             type (star_job_controls) :: job ! separate type to avoid name clashes
-            include "star_controls.inc"
-            include "star_controls_dev.inc"
-
-            type(pgstar_controls) :: pg
+            type (star_controls) :: ctrl
+            type (pgstar_controls) :: pg
          
       end type star_info
 

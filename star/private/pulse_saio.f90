@@ -279,7 +279,7 @@ contains
         r = s%r(k)
         m = s%m_grav(k)
         T = eval_face(s%dq, s%T, k, 1, s%nz)
-        if (s%interpolate_rho_for_pulse_data) then
+        if (s% ctrl% interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, k_a, k_b)
         else
            rho = eval_face_rho(s, k, k_a, k_b)

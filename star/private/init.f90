@@ -867,8 +867,8 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         initial_mass = s% initial_mass
-         initial_z = s% initial_z
+         initial_mass = s% ctrl% initial_mass
+         initial_z = s% ctrl% initial_z
          s% dt = 0
          s% termination_code = -1
 
@@ -883,16 +883,16 @@
             if (s% rotation_flag) s% have_j_rot = .true.
             call init_def(s) ! RSP
             call finish_load_model(s, restart, ierr)
-            if (s% max_years_for_timestep > 0) &
-               s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
+            if (s% ctrl% max_years_for_timestep > 0) &
+               s% dt_next = min(s% dt_next, secyer*s% ctrl% max_years_for_timestep)
             return
          end if
 
-         num_trace_history_values = s% num_trace_history_values
-         s% num_trace_history_values = 0
+         num_trace_history_values = s% ctrl% num_trace_history_values
+         s% ctrl% num_trace_history_values = 0
          
-         warning_limit_for_max_residual = s% warning_limit_for_max_residual
-         s% warning_limit_for_max_residual = 1d0
+         warning_limit_for_max_residual = s% ctrl% warning_limit_for_max_residual
+         s% ctrl% warning_limit_for_max_residual = 1d0
          
          s% doing_first_model_of_run = .true.
          s% doing_first_model_after_restart = .false.
@@ -907,15 +907,15 @@
             call check_initials
             if (s% dt_next < 0) s% dt_next = yrs_for_init_timestep(s)*secyer
          else
-            s% net_name = s% default_net_name
+            s% net_name = s% ctrl% default_net_name
             s% species = 0
             s% v_flag = .false.
             s% u_flag = .false.
             s% rotation_flag = .false.
             s% D_omega_flag = .false.
             s% am_nu_rot_flag = .false.
-            s% star_mass = s% initial_mass
-            s% mstar = s% initial_mass*Msun
+            s% star_mass = s% ctrl% initial_mass
+            s% mstar = s% ctrl% initial_mass*Msun
             s% M_center = s% mstar - s% xmstar
             call set_var_info(s, ierr)
             if (ierr /= 0) then
@@ -941,7 +941,7 @@
                   s% generations = 1
                   s% dt_next = 1d-5*secyer
                case (do_create_pre_ms_model)
-                  if (s% initial_mass < min_mass_for_create_pre_ms) then
+                  if (s% ctrl% initial_mass < min_mass_for_create_pre_ms) then
                      write(*,'(A)')
                      write(*,'(A)')
                      write(*,'(A)')
@@ -983,7 +983,7 @@
                   s% dt_next = 1d-5*secyer
                case (do_load_zams_model)
                   s% generations = 1
-                  call get_zams_model(s, s% zams_filename, ierr)
+                  call get_zams_model(s, s% ctrl% zams_filename, ierr)
                   if (ierr /= 0) then
                      write(*,*) 'failed in get_zams_model'
                      return
@@ -1025,8 +1025,8 @@
             return
          end if
          
-         if (s% max_years_for_timestep > 0) &
-            s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
+         if (s% ctrl% max_years_for_timestep > 0) &
+            s% dt_next = min(s% dt_next, secyer*s% ctrl% max_years_for_timestep)
          call set_phase_of_evolution(s)
 
          if (s% RSP_flag) then
@@ -1052,17 +1052,17 @@
 
          if (do_which == do_create_pre_ms_model) then
             call setup_for_relax_after_create_pre_ms_model
-            if (s% mstar > s% initial_mass*Msun) then ! need to reduce mass
-               write(*,1) 'reduce mass to', s% initial_mass
-               call do_relax_mass(s% id, s% initial_mass, lg_max_abs_mdot, ierr)
+            if (s% mstar > s% ctrl% initial_mass*Msun) then ! need to reduce mass
+               write(*,1) 'reduce mass to', s% ctrl% initial_mass
+               call do_relax_mass(s% id, s% ctrl% initial_mass, lg_max_abs_mdot, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_mass'
                   return
                end if
-            else if (s% mstar < s% initial_mass*Msun) then ! need to increase mass
-               write(*,1) 'increase mass to', s% initial_mass
+            else if (s% mstar < s% ctrl% initial_mass*Msun) then ! need to increase mass
+               write(*,1) 'increase mass to', s% ctrl% initial_mass
                call do_relax_mass_scale( &
-                  s% id, s% initial_mass, s% job% dlgm_per_step, s% job% change_mass_years_for_dt, ierr)
+                  s% id, s% ctrl% initial_mass, s% job% dlgm_per_step, s% job% change_mass_years_for_dt, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_mass'
                   return
@@ -1094,41 +1094,41 @@
          end if
 
          s% doing_first_model_of_run = .true.
-         s% num_trace_history_values = num_trace_history_values
-         s% warning_limit_for_max_residual = warning_limit_for_max_residual
+         s% ctrl% num_trace_history_values = num_trace_history_values
+         s% ctrl% warning_limit_for_max_residual = warning_limit_for_max_residual
 
          contains
          
          subroutine setup_for_relax_after_create_pre_ms_model
-            save_atm_option = s% atm_option
-            save_atm_T_tau_relation = s% atm_T_tau_relation
-            save_atm_T_tau_opacity = s% atm_T_tau_opacity
-            save_Pextra_factor = s% Pextra_factor
-            s% atm_option = 'T_tau'
-            s% atm_T_tau_relation = 'Eddington'
-            s% atm_T_tau_opacity = 'fixed'
-            s% Pextra_factor = 2
+            save_atm_option = s% ctrl% atm_option
+            save_atm_T_tau_relation = s% ctrl% atm_T_tau_relation
+            save_atm_T_tau_opacity = s% ctrl% atm_T_tau_opacity
+            save_Pextra_factor = s% ctrl% Pextra_factor
+            s% ctrl% atm_option = 'T_tau'
+            s% ctrl% atm_T_tau_relation = 'Eddington'
+            s% ctrl% atm_T_tau_opacity = 'fixed'
+            s% ctrl% Pextra_factor = 2
          end subroutine setup_for_relax_after_create_pre_ms_model
 
          subroutine done_relax_after_create_pre_ms_model
-            s% atm_option = save_atm_option
-            s% atm_T_tau_relation = save_atm_T_tau_relation
-            s% atm_T_tau_opacity = save_atm_T_tau_opacity
-            s% Pextra_factor = save_Pextra_factor
+            s% ctrl% atm_option = save_atm_option
+            s% ctrl% atm_T_tau_relation = save_atm_T_tau_relation
+            s% ctrl% atm_T_tau_opacity = save_atm_T_tau_opacity
+            s% ctrl% Pextra_factor = save_Pextra_factor
          end subroutine done_relax_after_create_pre_ms_model
 
          subroutine check_initials
             include 'formats'
-            if (abs(initial_mass - s% initial_mass) > &
+            if (abs(initial_mass - s% ctrl% initial_mass) > &
                   1d-3*initial_mass .and. initial_mass > 0) then
                write(*,1) "WARNING -- inlist initial_mass ignored", initial_mass
-               write(*,1) "using saved initial_mass instead", s% initial_mass
+               write(*,1) "using saved initial_mass instead", s% ctrl% initial_mass
                write(*,'(A)')
             end if
-            if (abs(initial_z - s% initial_z) > &
+            if (abs(initial_z - s% ctrl% initial_z) > &
                   1d-3*initial_z .and. initial_z > 0) then
                write(*,1) "WARNING -- inlist initial_z ignored", initial_z
-               write(*,1) "using saved initial_z instead", s% initial_z
+               write(*,1) "using saved initial_z instead", s% ctrl% initial_z
                write(*,'(A)')
             end if
          end subroutine check_initials

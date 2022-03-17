@@ -121,9 +121,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         alpha_H = s% x_ctrl(21)
-         alpha_other = s% x_ctrl(22)
-         H_limit = s% x_ctrl(23)
+         alpha_H = s% ctrl% x_ctrl(21)
+         alpha_other = s% ctrl% x_ctrl(22)
+         H_limit = s% ctrl% x_ctrl(23)
          h1 = s% net_iso(ih1)
          if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
          do k=1,s% nz
@@ -199,12 +199,12 @@
                end do
             end if
          end do
-         min_m = s% x_ctrl(35)*Msun + s% M_center
-         max_m = s% x_ctrl(36)*Msun + s% he_core_mass*Msun
+         min_m = s% ctrl% x_ctrl(35)*Msun + s% M_center
+         max_m = s% ctrl% x_ctrl(36)*Msun + s% he_core_mass*Msun
          
          if (s% u_flag) then
             do k=nz,1,-1
-               if (s% u(k) > s% x_ctrl(37)) then 
+               if (s% u(k) > s% ctrl% x_ctrl(37)) then 
                   ! prepare for removal before give to Stella
                   if (s% m(k) > min_m) then
                      min_m = s% m(k)
@@ -487,8 +487,8 @@
             initial_he_core_mass = s% he_core_mass
             call alloc_extra_info(s)
          
-            if (s% x_integer_ctrl(1) == 0) then
-               if (s% total_mass_for_inject_extra_ergs_sec > 0) then ! doing edep
+            if (s% ctrl% x_integer_ctrl(1) == 0) then
+               if (s% ctrl% total_mass_for_inject_extra_ergs_sec > 0) then ! doing edep
                   if (s% v_flag) then
                      do k=1,s% nz
                         s% xh(s% i_v,k) = 0d0
@@ -499,36 +499,36 @@
                return
             end if
 
-            if (s% x_integer_ctrl(1) == 5 .and. &
-                s% x_ctrl(17) > 0) call add_csm ! part 5, add csm
+            if (s% ctrl% x_integer_ctrl(1) == 5 .and. &
+                s% ctrl% x_ctrl(17) > 0) call add_csm ! part 5, add csm
             
-            if (s% x_ctrl(47) > 0d0 .and. s% x_integer_ctrl(3) > 0) then
-               min_mass = s% x_ctrl(45) + s% M_center/Msun
-               max_mass = s% x_ctrl(46) + s% he_core_mass
-               boxcar_mass = s% x_ctrl(47)
+            if (s% ctrl% x_ctrl(47) > 0d0 .and. s% ctrl% x_integer_ctrl(3) > 0) then
+               min_mass = s% ctrl% x_ctrl(45) + s% M_center/Msun
+               max_mass = s% ctrl% x_ctrl(46) + s% he_core_mass
+               boxcar_mass = s% ctrl% x_ctrl(47)
                call smooth_xa_by_boxcar_mass( &
-                  s% id, min_mass, max_mass, boxcar_mass, s% x_integer_ctrl(3), ierr)
+                  s% id, min_mass, max_mass, boxcar_mass, s% ctrl% x_integer_ctrl(3), ierr)
                if (ierr /= 0) return
             end if
 
             if (ni56 > 0 .and. co56 > 0) then
-               if (s% x_ctrl(12) > 0) then
-                  call set_nico_mass(s, ni56, co56, s% x_ctrl(12), .false., xni56, ierr)
+               if (s% ctrl% x_ctrl(12) > 0) then
+                  call set_nico_mass(s, ni56, co56, s% ctrl% x_ctrl(12), .false., xni56, ierr)
                   if (ierr /= 0) return
                end if
                initial_nico = xni56
             end if
             
-            if (s% x_ctrl(50) > 0d0 .and. s% x_integer_ctrl(4) > 0) then
-               min_mass = s% x_ctrl(48) + s% M_center/Msun
-               max_mass = s% x_ctrl(49) + s% he_core_mass
-               boxcar_mass = s% x_ctrl(50)
+            if (s% ctrl% x_ctrl(50) > 0d0 .and. s% ctrl% x_integer_ctrl(4) > 0) then
+               min_mass = s% ctrl% x_ctrl(48) + s% M_center/Msun
+               max_mass = s% ctrl% x_ctrl(49) + s% he_core_mass
+               boxcar_mass = s% ctrl% x_ctrl(50)
                call smooth_xa_by_boxcar_mass( &
-                  s% id, min_mass, max_mass, boxcar_mass, s% x_integer_ctrl(4), ierr)
+                  s% id, min_mass, max_mass, boxcar_mass, s% ctrl% x_integer_ctrl(4), ierr)
                if (ierr /= 0) return
             end if
          
-            if (s% x_integer_ctrl(1) == 1) &
+            if (s% ctrl% x_integer_ctrl(1) == 1) &
                s% cumulative_energy_error = 0d0 ! set to 0 at start of part1
                
             start_m = s% shock_mass
@@ -546,14 +546,14 @@
             end if
             write(*,2) 'M_center', s% nz, s% M_center/Msun
             
-            write(*,1) 's% x_ctrl(98)', s% x_ctrl(98)
-            write(*,2) 's% x_integer_ctrl(1)', s% x_integer_ctrl(1)
+            write(*,1) 's% ctrl% x_ctrl(98)', s% ctrl% x_ctrl(98)
+            write(*,2) 's% ctrl% x_integer_ctrl(1)', s% ctrl% x_integer_ctrl(1)
          
-            if (s% x_ctrl(98) > 0d0) then
-               stop_m = s% x_ctrl(98)
+            if (s% ctrl% x_ctrl(98) > 0d0) then
+               stop_m = s% ctrl% x_ctrl(98)
             else
                stop_m = 0d0
-               select case(s% x_integer_ctrl(1))
+               select case(s% ctrl% x_integer_ctrl(1))
                case (1)
                   do k=1,s% nz
                      if (s% xa(o16,k) > s% xa(he4,k)) then
@@ -574,8 +574,8 @@
                      end if
                   end do
                   if (stop_m == 0d0) then
-                     if (s% x_ctrl(99) <= 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
-                     stop_m = s% x_ctrl(99)
+                     if (s% ctrl% x_ctrl(99) <= 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
+                     stop_m = s% ctrl% x_ctrl(99)
                   end if
                case (2)
                   k1 = 0
@@ -588,15 +588,15 @@
                   if (k1 > 0) then
                      do k=k1+1,s% nz
                         if (s% xa(o16,k) > s% xa(he4,k)) then
-                           f = s% x_ctrl(7)
+                           f = s% ctrl% x_ctrl(7)
                            stop_m = ((1d0 - f)*s% m(k) + f*s% m(k1))/Msun
                            exit
                         end if
                      end do
                   end if
                   if (stop_m == 0d0) then
-                     if (s% x_ctrl(99) <= 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
-                     stop_m = s% x_ctrl(99)
+                     if (s% ctrl% x_ctrl(99) <= 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
+                     stop_m = s% ctrl% x_ctrl(99)
                   end if
                case (3)
                   do k=1,s% nz
@@ -607,25 +607,25 @@
                   end do
                   if (stop_m == 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
                case (4)
-                  stop_m = s% star_mass - s% x_ctrl(16)
+                  stop_m = s% star_mass - s% ctrl% x_ctrl(16)
                case (5)
-                  if (s% x_ctrl(16) > 0d0) &
-                     stop_m = s% star_mass - s% x_ctrl(16)
+                  if (s% ctrl% x_ctrl(16) > 0d0) &
+                     stop_m = s% star_mass - s% ctrl% x_ctrl(16)
                case (6)
                end select
             end if
             
          end if ! not restart
          
-         write(*,1) 's% x_ctrl(16)', s% x_ctrl(16)
+         write(*,1) 's% ctrl% x_ctrl(16)', s% ctrl% x_ctrl(16)
          write(*,1) 's% star_mass', s% star_mass
          write(*,1) 'start_m', start_m
          write(*,1) 'stop_m', stop_m
          
          !if (stop_m < start_m) call mesa_error(__FILE__,__LINE__,'bad stop_m')
          
-         if (s% x_ctrl(16) > 0d0) &
-               stop_m = min(stop_m, s% star_mass - s% x_ctrl(16))
+         if (s% ctrl% x_ctrl(16) > 0d0) &
+               stop_m = min(stop_m, s% star_mass - s% ctrl% x_ctrl(16))
          
          if (start_m > stop_m .and. stop_m > 0d0) then
             write(*,1) 'start_m > stop_m', start_m, stop_m
@@ -633,7 +633,7 @@
          end if
 
          if (stop_m > 0d0) then
-            s% x_ctrl(2) = stop_m
+            s% ctrl% x_ctrl(2) = stop_m
             write(*,1) 'stop when shock reaches', stop_m
             write(*,1) 's% he_core_mass', s% he_core_mass
             write(*,1) 's% co_core_mass', s% co_core_mass
@@ -643,7 +643,7 @@
             !stop
          end if
          
-         if (s% x_integer_ctrl(1) == 6 .and. s% x_logical_ctrl(6)) then
+         if (s% ctrl% x_integer_ctrl(1) == 6 .and. s% ctrl% x_logical_ctrl(6)) then
             ! setup interpolation table for tau sob eta_i 
             open(unit=iounit, file='FeII_5169_eta.dat', action='read')
             allocate(logRhos(num_logRhos), logTs(num_logTs), &
@@ -693,18 +693,18 @@
          
          subroutine add_csm
             include 'formats'
-            csm_mass = s% x_ctrl(17)*Msun
-            csm_mdot = s% x_ctrl(16)*Msun/secyer
+            csm_mass = s% ctrl% x_ctrl(17)*Msun
+            csm_mdot = s% ctrl% x_ctrl(16)*Msun/secyer
             do kk=2,s% nz-2
                if (s% m(1) - s% m(kk) < csm_mass) cycle
                r0 = s% r(kk)
-               if (s% x_ctrl(28) > 0) then
-                  rho0 = s% x_ctrl(28)
+               if (s% ctrl% x_ctrl(28) > 0) then
+                  rho0 = s% ctrl% x_ctrl(28)
                else
                   rho0 = s% rho(kk)
                end if
-               if (s% x_ctrl(29) > 0) then
-                  T0 = s% x_ctrl(29)
+               if (s% ctrl% x_ctrl(29) > 0) then
+                  T0 = s% ctrl% x_ctrl(29)
                else
                   T0 = s% T(kk)
                end if
@@ -810,7 +810,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% x_integer_ctrl(1) == 5 .and. &
+         if (s% ctrl% x_integer_ctrl(1) == 5 .and. &
              save_stella_data_when_terminate) then
             call write_stella_data(s, ierr)
             if (ierr /= 0) return
@@ -843,7 +843,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
-         if (s% x_integer_ctrl(1) == 6 .and. s% x_logical_ctrl(6)) &
+         if (s% ctrl% x_integer_ctrl(1) == 6 .and. s% ctrl% x_logical_ctrl(6)) &
             how_many_extra_history_columns = 6
       end function how_many_extra_history_columns
       
@@ -874,7 +874,7 @@
             return
          end if
          call get_tau_sob_info_for_this_step(s)
-         tau_vel_FeII = s% x_ctrl(31)
+         tau_vel_FeII = s% ctrl% x_ctrl(31)
          k_tau = s% photosphere_cell_k
          tau_vel = s% photosphere_v
          if (.false. .and. tau_sob_values(1) >= tau_vel_FeII) then
@@ -1006,9 +1006,9 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
-         if (s% x_integer_ctrl(1) == 3) &
+         if (s% ctrl% x_integer_ctrl(1) == 3) &
             how_many_extra_profile_columns = 1
-         if (s% x_integer_ctrl(1) == 6 .and. s% x_logical_ctrl(6)) &
+         if (s% ctrl% x_integer_ctrl(1) == 6 .and. s% ctrl% x_logical_ctrl(6)) &
             how_many_extra_profile_columns = 3
       end function how_many_extra_profile_columns
       
@@ -1029,7 +1029,7 @@
          if (ierr /= 0) return
          if (n == 0) return
          !call mesa_error(__FILE__,__LINE__,'data_for_extra_profile_columns')
-         if (s% x_integer_ctrl(1) == 3) then
+         if (s% ctrl% x_integer_ctrl(1) == 3) then
             if (n /= 1) call mesa_error(__FILE__,__LINE__,'bad num cols for data_for_extra_profile_columns')
             names(1) = 'du'
             vals(1,1) = 0
@@ -1073,30 +1073,30 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (s% x_integer_ctrl(1) == 1 .and. s% model_number >= 1000) &
-            s% max_timestep = 0 ! turn off limit
+         if (s% ctrl% x_integer_ctrl(1) == 1 .and. s% model_number >= 1000) &
+            s% ctrl% max_timestep = 0 ! turn off limit
             
          age_days = s% star_age*365.25d0
          
-         if (s% x_ctrl(14) > 0 .and. age_days >= s% x_ctrl(14) .and. &
-               s% RTI_C > 0d0) then
-            s% RTI_C = 0d0
-            s% RTI_log_max_boost = 0d0 
-            s% RTI_m_full_boost = -1d0
-            s% RTI_m_no_boost = 0d0
-            s% dedt_RTI_diffusion_factor = 1d0
-            s% composition_RTI_diffusion_factor = 1d0
+         if (s% ctrl% x_ctrl(14) > 0 .and. age_days >= s% ctrl% x_ctrl(14) .and. &
+               s% ctrl% RTI_C > 0d0) then
+            s% ctrl% RTI_C = 0d0
+            s% ctrl% RTI_log_max_boost = 0d0 
+            s% ctrl% RTI_m_full_boost = -1d0
+            s% ctrl% RTI_m_no_boost = 0d0
+            s% ctrl% dedt_RTI_diffusion_factor = 1d0
+            s% ctrl% composition_RTI_diffusion_factor = 1d0
             write(*,'(A)')
             write(*,2) 'turn off RTI', s% model_number, age_days
             write(*,'(A)')
          end if
          
-         L_center = s% x_ctrl(3)
+         L_center = s% ctrl% x_ctrl(3)
          if (L_center > 0) then  ! magnetar
-            start_ramp_up = s% x_ctrl(4)
-            end_ramp_up = s% x_ctrl(5)
-            start_ramp_down = s% x_ctrl(6)
-            end_ramp_down = s% x_ctrl(7)
+            start_ramp_up = s% ctrl% x_ctrl(4)
+            end_ramp_up = s% ctrl% x_ctrl(5)
+            start_ramp_down = s% ctrl% x_ctrl(6)
+            end_ramp_down = s% ctrl% x_ctrl(7)
             if (age_days <= start_ramp_up) then
                s% L_center = 0d0
             else if (age_days < end_ramp_up) then
@@ -1112,63 +1112,63 @@
             end if
          end if
          
-         if (s% x_integer_ctrl(1) == 6) then
+         if (s% ctrl% x_integer_ctrl(1) == 6) then
          
-            if (s% x_ctrl(41) > 0d0) then
-               if (s% rho(1) < s% x_ctrl(41) .and. age_days < s% x_ctrl(44)) then
-                  if (s% mass_change == 0) then
-                     s% mass_change = s% x_ctrl(42)
-                     s% mass_depth_for_L_surf = s% x_ctrl(43)
-                     write(*,2) 'turn on mass_change', s% model_number, s% mass_change
+            if (s% ctrl% x_ctrl(41) > 0d0) then
+               if (s% rho(1) < s% ctrl% x_ctrl(41) .and. age_days < s% ctrl% x_ctrl(44)) then
+                  if (s% ctrl% mass_change == 0) then
+                     s% ctrl% mass_change = s% ctrl% x_ctrl(42)
+                     s% ctrl% mass_depth_for_L_surf = s% ctrl% x_ctrl(43)
+                     write(*,2) 'turn on mass_change', s% model_number, s% ctrl% mass_change
                   end if 
-               else if (s% mass_change /= 0) then
-                  s% mass_change = 0d0
-                  s% mass_depth_for_L_surf = 0d0
+               else if (s% ctrl% mass_change /= 0) then
+                  s% ctrl% mass_change = 0d0
+                  s% ctrl% mass_depth_for_L_surf = 0d0
                   write(*,2) 'turn off mass_change', s% model_number
                end if
             end if
             
-            if (s% x_ctrl(24) > 0) then ! adjust kap factor
-               start_ramp_up = s% x_ctrl(24)
-               end_ramp_up = s% x_ctrl(25)
-               factor_start = s% x_ctrl(26)
-               factor_end = s% x_ctrl(27)
+            if (s% ctrl% x_ctrl(24) > 0) then ! adjust kap factor
+               start_ramp_up = s% ctrl% x_ctrl(24)
+               end_ramp_up = s% ctrl% x_ctrl(25)
+               factor_start = s% ctrl% x_ctrl(26)
+               factor_end = s% ctrl% x_ctrl(27)
                if (age_days <= start_ramp_up) then
-                  s% opacity_factor = factor_start
+                  s% ctrl% opacity_factor = factor_start
                else if (age_days >= end_ramp_up) then
-                  s% opacity_factor = factor_end
+                  s% ctrl% opacity_factor = factor_end
                else
-                  s% opacity_factor = factor_start + &
+                  s% ctrl% opacity_factor = factor_start + &
                      (factor_end - factor_start)* &
                         (age_days - start_ramp_up)/(end_ramp_up - start_ramp_up)
-                  write(*,2) 'opacity_factor age', s% model_number, s% opacity_factor, age_days
+                  write(*,2) 'opacity_factor age', s% model_number, s% ctrl% opacity_factor, age_days
                end if            
             end if            
             
          end if
          
-         if (s% x_ctrl(18) > 0d0 .and. s% x_ctrl(19) > 0d0 .and. &
-               s% time > s% x_ctrl(18) .and. &
-               abs(s% max_timestep - s% x_ctrl(19)) > 1d-6*s% x_ctrl(19)) then
+         if (s% ctrl% x_ctrl(18) > 0d0 .and. s% ctrl% x_ctrl(19) > 0d0 .and. &
+               s% time > s% ctrl% x_ctrl(18) .and. &
+               abs(s% ctrl% max_timestep - s% ctrl% x_ctrl(19)) > 1d-6*s% ctrl% x_ctrl(19)) then
             write(*,2) 'change max_timestep', s% model_number, &
-               s% time, s% x_ctrl(18), s% x_ctrl(19), &
-               s% max_timestep - s% x_ctrl(19)
-            s% max_timestep = s% x_ctrl(19)
-            !s% okay_to_remesh = .true.
+               s% time, s% ctrl% x_ctrl(18), s% ctrl% x_ctrl(19), &
+               s% ctrl% max_timestep - s% ctrl% x_ctrl(19)
+            s% ctrl% max_timestep = s% ctrl% x_ctrl(19)
+            !s% ctrl% okay_to_remesh = .true.
          end if
          
-         if (age_days >= s% x_ctrl(32)) then
-            s% delta_lgL_limit = s% x_ctrl(33)
-            s% delta_lgL_hard_limit = s% x_ctrl(34)
+         if (age_days >= s% ctrl% x_ctrl(32)) then
+            s% ctrl% delta_lgL_limit = s% ctrl% x_ctrl(33)
+            s% ctrl% delta_lgL_hard_limit = s% ctrl% x_ctrl(34)
          end if
          
-         if (s% x_logical_ctrl(1) .and. s% dt > 0d0) then
+         if (s% ctrl% x_logical_ctrl(1) .and. s% dt > 0d0) then
             s% v_center = &
                s% v_center - s% cgrav(s% nz)*s% M_center/(s% R_center*s% R_center)
-            s% v_center = max(s% v_center, -s% x_ctrl(1)*clight)
+            s% v_center = max(s% v_center, -s% ctrl% x_ctrl(1)*clight)
             next_R_center = s% R_center + s% v_center*s% dt
-            if (next_R_center < s% center_R_lower_limit) then
-               s% v_center = (s% center_R_lower_limit - s% R_center)/s% dt
+            if (next_R_center < s% ctrl% center_R_lower_limit) then
+               s% v_center = (s% ctrl% center_R_lower_limit - s% R_center)/s% dt
             end if
          end if
 
@@ -1190,27 +1190,27 @@
          if (ierr /= 0) return
          call store_extra_info(s)
          
-         if (s% x_ctrl(2) <= 0) return
+         if (s% ctrl% x_ctrl(2) <= 0) return
          shock_mass = s% shock_mass
-         if (shock_mass >= s% x_ctrl(2)) then
+         if (shock_mass >= s% ctrl% x_ctrl(2)) then
             write(*,'(a,2f12.5)') 'shock has reached target location', &
-               shock_mass, s% x_ctrl(2)
+               shock_mass, s% ctrl% x_ctrl(2)
             extras_finish_step = terminate
             s% termination_code = t_extras_finish_step
             ! restore Ni+Co mass
             if (s% net_iso(ini56) > 0 .and. s% net_iso(ico56) > 0) then
-               if (s% x_ctrl(12) > 0) then
+               if (s% ctrl% x_ctrl(12) > 0) then
                   call set_nico_mass( &
-                     s, s% net_iso(ini56), s% net_iso(ico56), s% x_ctrl(12), .true., xni56, ierr)
+                     s, s% net_iso(ini56), s% net_iso(ico56), s% ctrl% x_ctrl(12), .true., xni56, ierr)
                   if (ierr /= 0) return
                end if
             end if
-         else if (shock_mass >= 0.9995d0*s% x_ctrl(2)) then
+         else if (shock_mass >= 0.9995d0*s% ctrl% x_ctrl(2)) then
                write(*,1) 'shock has reached this fraction of target', &
-                  shock_mass/s% x_ctrl(2)
+                  shock_mass/s% ctrl% x_ctrl(2)
          end if
          
-         if (s% x_integer_ctrl(1) == 5 .and. &
+         if (s% ctrl% x_integer_ctrl(1) == 5 .and. &
              s% model_number == save_stella_data_for_model_number) then
             call write_stella_data(s, ierr)
             if (ierr /= 0) return

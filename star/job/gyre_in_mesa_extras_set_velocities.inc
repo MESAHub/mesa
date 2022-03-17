@@ -89,13 +89,13 @@
 
          call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
          
-         if (s% x_ctrl(4) == 1d0) then
+         if (s% ctrl% x_ctrl(4) == 1d0) then
             mode = 2
             write(*,*) 'set gyre starting velocities for order 2'
-         else if (s% x_ctrl(5) == 1d0) then
+         else if (s% ctrl% x_ctrl(5) == 1d0) then
             mode = 3
             write(*,*) 'set gyre starting velocities for order 3'
-         else if (s% x_ctrl(4) + s% x_ctrl(5) == 0d0) then
+         else if (s% ctrl% x_ctrl(4) + s% ctrl% x_ctrl(5) == 0d0) then
             mode = 1
             write(*,*) 'set gyre starting velocities for order 1'
          else
@@ -113,7 +113,7 @@
          
          v_surf = v(mode,nz_gyre)
          v1 = 1d5/v_surf ! rescale v's
-         if (s% x_ctrl(6) > 0d0) v1 = v1*s% x_ctrl(6)
+         if (s% ctrl% x_ctrl(6) > 0d0) v1 = v1*s% ctrl% x_ctrl(6)
 
          do i=1,nz_gyre ! change to star index order
             k = nz_gyre-i+1

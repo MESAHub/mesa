@@ -74,7 +74,7 @@ contains
     ! Set up index ranges for segments which are delineated by
     ! composition jumps
 
-    if (s%add_double_points_to_pulse_data) then
+    if (s% ctrl% add_double_points_to_pulse_data) then
 
        ! Calculate grad_mu
 
@@ -92,13 +92,13 @@ contains
 
        ! Set up the mask marking faces which will have a double point
 
-       mask = ABS(grad_mu) > s%threshold_grad_mu_for_double_point
+       mask = ABS(grad_mu) > s% ctrl% threshold_grad_mu_for_double_point
 
-       if (s%max_number_of_double_points > 0) then
+       if (s% ctrl% max_number_of_double_points > 0) then
 
           ! Limit the number of marked faces
 
-          n_mk = MIN(s%max_number_of_double_points, s%nz)
+          n_mk = MIN(s% ctrl% max_number_of_double_points, s%nz)
 
           call qsort(i, s%nz, -ABS(grad_mu))
 
@@ -283,7 +283,7 @@ contains
     if (k_b < k_a) call mesa_error(__FILE__,__LINE__,'eval_face_A_ast: invalid segment indices')
     if (k < k_a .OR. k > k_b+1) call mesa_error(__FILE__,__LINE__,'eval_face_A_ast: out-of-bounds interpolation')
 
-    if (.not. s% calculate_Brunt_N2) call mesa_error(__FILE__,__LINE__,'eval_face_A_ast: must have calculate_Brunt_N2 = .true.')
+    if (.not. s% ctrl% calculate_Brunt_N2) call mesa_error(__FILE__,__LINE__,'eval_face_A_ast: must have calculate_Brunt_N2 = .true.')
 
     if (k_b == k_a) then
 

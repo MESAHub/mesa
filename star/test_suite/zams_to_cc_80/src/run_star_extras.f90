@@ -47,9 +47,9 @@
       !x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 !alpha_mlt_routine
-         !alpha_H = s% x_ctrl(21)
-         !alpha_other = s% x_ctrl(22)
-         !H_limit = s% x_ctrl(23)
+         !alpha_H = s% ctrl% x_ctrl(21)
+         !alpha_other = s% ctrl% x_ctrl(22)
+         !H_limit = s% ctrl% x_ctrl(23)
 
 ! inlists
       ! x_integer_ctrl(2) = X ! part number of inlist
@@ -89,9 +89,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         alpha_H = s% x_ctrl(21)
-         alpha_other = s% x_ctrl(22)
-         H_limit = s% x_ctrl(23)
+         alpha_H = s% ctrl% x_ctrl(21)
+         alpha_other = s% ctrl% x_ctrl(22)
+         H_limit = s% ctrl% x_ctrl(23)
          h1 = s% net_iso(ih1)
          !write(*,1) 'alpha_H', alpha_H
          !write(*,1) 'alpha_other', alpha_other
@@ -121,7 +121,7 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)         
          
-         if (.not. s% x_logical_ctrl(37)) return
+         if (.not. s% ctrl% x_logical_ctrl(37)) return
          
          ! Initialize GYRE
 
@@ -154,7 +154,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         select case (s% x_integer_ctrl(2))
+         select case (s% ctrl% x_integer_ctrl(2))
          case(7)
             testhub_extras_names(1) = 'fe_core_mass'
             testhub_extras_vals(1) = s% fe_core_mass
@@ -169,7 +169,7 @@
 
          call test_suite_after_evolve(s, ierr)
          if (ierr /= 0) return         
-         if (.not. s% x_logical_ctrl(37)) return
+         if (.not. s% ctrl% x_logical_ctrl(37)) return
          call gyre_final()
       end subroutine extras_after_evolve
       
@@ -252,7 +252,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (.not. s% x_logical_ctrl(37)) return
+         if (.not. s% ctrl% x_logical_ctrl(37)) return
          extras_finish_step = gyre_in_mesa_extras_finish_step(id)
          if (extras_finish_step == terminate) &
              s% termination_code = t_extras_finish_step

@@ -113,14 +113,14 @@
          
          do j=1,species ! composition equation for species j in cell k
 
-            !test_partials = (k == s% solver_test_partials_k .and. s% net_iso(ihe4) == j)
+            !test_partials = (k == s% ctrl% solver_test_partials_k .and. s% net_iso(ihe4) == j)
             test_partials = .false.
 
             i = s%nvar_hydro+j
 
             dxdt_actual = s% xa_sub_xa_start(j,k)/s% dt
             
-            doing_op_split_burn = s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T
+            doing_op_split_burn = s% ctrl% op_split_burn .and. s% T_start(k) >= s% ctrl% op_split_burn_min_T
             if (s% do_burn .and. .not. doing_op_split_burn) then
                dxdt_nuc = s% dxdt_nuc(j,k)
             else
@@ -137,7 +137,7 @@
 
             dxdt_factor = 1d0
 
-            eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)/s% dt)
+            eqn_scale = max(s% ctrl% min_chem_eqn_scale, s% x_scale(i,k)/s% dt)
             residual = (dxdt_expected - dxdt_actual)/eqn_scale
             s% equ(i,k) = residual
             
@@ -147,7 +147,7 @@
             if (is_bad(s% equ(i,k))) then
                s% retry_message = 'bad residual for do1_chem_eqns'
 !$OMP critical (star_chem_eqns_bad_num)
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,3) 'do1_chem_eqns: equ ' // trim(s% nameofequ(i)), &
                         i, k, s% equ(i,k)
                   write(*,2) 'dxdt_expected', k, dxdt_expected
@@ -156,7 +156,7 @@
                   write(*,2) 'dxdt_mix', k, dxdt_mix
                   write(*,2) 'dxdt_nuc', k, dxdt_nuc
                end if
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_chem_eqns')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_chem_eqns')
 !$OMP end critical (star_chem_eqns_bad_num)
             end if
 
@@ -221,10 +221,10 @@
             include 'formats'
             if (is_bad(dequ)) then
                ierr = -1
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,2) 'do1_chem_eqns: bad ' // trim(str), k
                end if
-               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_chem_eqns')
+               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_chem_eqns')
                return
             end if
          end subroutine check_dequ

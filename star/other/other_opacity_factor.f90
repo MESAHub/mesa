@@ -46,7 +46,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         s% extra_opacity_factor(1:s% nz) = s% opacity_factor
+         s% extra_opacity_factor(1:s% nz) = s% ctrl% opacity_factor
       end subroutine default_other_opacity_factor
 
 

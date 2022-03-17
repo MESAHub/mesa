@@ -121,7 +121,7 @@
          skip_other_cgrav = .false.
          skip_set_cz_bdy_mass = .false.
          skip_m_grav_and_grav = .false.
-         skip_mixing_info = .not. s% recalc_mix_info_after_evolve         
+         skip_mixing_info = .not. s% ctrl% recalc_mix_info_after_evolve         
 
          ! only need to do things that were skipped in set_vars_for_solver
          ! i.e., skip what it already did for the last solver iteration
@@ -148,14 +148,14 @@
             skip_kap, skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr .or. dbg) &
+            if (s% ctrl% report_ierr .or. dbg) &
                write(*,*) 'update_vars: set_hydro_vars returned ierr', ierr
             return
          end if
 
-         if (s% op_split_burn) then
+         if (s% ctrl% op_split_burn) then
             do k = 1, nz
-               if (s% T_start(k) >= s% op_split_burn_min_T) &
+               if (s% T_start(k) >= s% ctrl% op_split_burn_min_T) &
                   s% eps_nuc(k) = s% burn_avg_epsnuc(k)
             end do
          end if
@@ -195,7 +195,7 @@
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
             skip_mlt, skip_eos, dt, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr .or. dbg) &
+            if (s% ctrl% report_ierr .or. dbg) &
                write(*,*) 'set_some_vars: update_vars returned ierr', ierr
             return
          end if
@@ -226,7 +226,7 @@
          if (s% doing_finish_load_model .or. .not. s% RSP_flag) then
             call unpack_xh(s,ierr)
             if (ierr /= 0) then
-               if (s% report_ierr .or. dbg) &
+               if (s% ctrl% report_ierr .or. dbg) &
                   write(*,*) 'after unpack ierr', ierr
                return
             end if
@@ -242,22 +242,22 @@
             skip_kap, skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr .or. dbg) &
+            if (s% ctrl% report_ierr .or. dbg) &
                write(*,*) 'update_vars: set_hydro_vars returned ierr', ierr
             return
          end if
 
-         if (s% use_other_momentum) then
+         if (s% ctrl% use_other_momentum) then
             call s% other_momentum(s% id, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr .or. dbg) &
+               if (s% ctrl% report_ierr .or. dbg) &
                   write(*,*) 'update_vars: other_momentum returned ierr', ierr
                return
             end if
          end if
          
          if (.not. skip_irradiation_heat) then
-            if (s% irradiation_flux /= 0) then
+            if (s% ctrl% irradiation_flux /= 0) then
                do k=1,nz
                   s% irradiation_heat(k) = eval_irradiation_heat(s,k)
                end do
@@ -318,7 +318,7 @@
                   if (s% w(k) < 0d0) then
                      !write(*,4) 'unpack: fix w < 0', k, &
                      !   s% solver_iter, s% model_number, s% w(k)
-                     s% w(k) = s% RSP2_w_fix_if_neg
+                     s% w(k) = s% ctrl% RSP2_w_fix_if_neg
                   end if
                end do
             else if (j == i_Hp) then
@@ -428,7 +428,7 @@
             return
          end if
          
-         if (s% use_other_surface_PT) then
+         if (s% ctrl% use_other_surface_PT) then
             call s% other_surface_PT( &
                s% id, skip_partials, &
                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
@@ -442,7 +442,7 @@
                ierr)
          end if
          if (ierr /= 0) then
-            if (s% report_ierr) then
+            if (s% ctrl% report_ierr) then
                write(*,*) 'error in get_surf_PT'
             end if
             return
@@ -550,27 +550,27 @@
          if (.not. skip_mlt .and. .not. s% RSP_flag) then
          
             if (.not. skip_mixing_info) then
-               if (s% make_gradr_sticky_in_solver_iters) then
+               if (s% ctrl% make_gradr_sticky_in_solver_iters) then
                   s% fixed_gradr_for_rest_of_solver_iters(nzlo:nzhi) = .false.   
                end if         
-               s% alpha_mlt(nzlo:nzhi) = s% mixing_length_alpha
-               if (s% use_other_alpha_mlt) then
+               s% alpha_mlt(nzlo:nzhi) = s% ctrl% mixing_length_alpha
+               if (s% ctrl% use_other_alpha_mlt) then
                   call s% other_alpha_mlt(s% id, ierr)
                   if (ierr /= 0) then
-                     if (s% report_ierr .or. dbg) &
+                     if (s% ctrl% report_ierr .or. dbg) &
                         write(*,*) 'other_alpha_mlt returned ierr', ierr
                      return
                   end if
                end if
             end if
             
-            if (s% use_other_gradr_factor) then
+            if (s% ctrl% use_other_gradr_factor) then
                if (dbg) write(*,*) 'call other_gradr_factor'
                call s% other_gradr_factor(s% id, ierr)
                if (failed('other_gradr_factor')) return
-            else if (s% use_T_tau_gradr_factor) then
+            else if (s% ctrl% use_T_tau_gradr_factor) then
                if (dbg) write(*,*) 'call use_T_tau_gradr_factor'
-               call get_T_tau_id(s% atm_T_tau_relation, T_tau_id, ierr)
+               call get_T_tau_id(s% ctrl% atm_T_tau_relation, T_tau_id, ierr)
                do k = nzlo, nzhi
                   ! slightly inconsistent to use s% tau, defined at
                   ! faces, with s% gradr, which is a cell average
@@ -616,7 +616,7 @@
             call set_RSP2_vars(s,ierr)
             if (ierr /= 0) then
                if (len_trim(s% retry_message) == 0) s% retry_message = 'set_RSP2_vars failed'
-               if (s% report_ierr) write(*,*) 'ierr from set_RSP2_vars'
+               if (s% ctrl% report_ierr) write(*,*) 'ierr from set_RSP2_vars'
                return
             end if
          end if
@@ -635,7 +635,7 @@
                failed = .false.
                return
             end if
-            if (s% report_ierr .or. dbg) &
+            if (s% ctrl% report_ierr .or. dbg) &
                write(*,*) 'set_hydro_vars failed in call to ' // trim(str)
             failed = .true.
          end function failed
@@ -653,7 +653,7 @@
          okay = .true.
          do k=2, s% nz
             if (s% r(k) > s% r(k-1)) then
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,2) 's% r(k) > s% r(k-1)', k, &
                      s% r(k)/Rsun, s% r(k-1)/Rsun, s% r(k)/Rsun-s% r(k-1)/Rsun
                end if
@@ -663,7 +663,7 @@
          if (okay) return
          s% retry_message = 'invalid values for r'
          ierr = -1
-         if (s% report_ierr) write(*,*)
+         if (s% ctrl% report_ierr) write(*,*)
       end subroutine check_rs
 
 
@@ -738,10 +738,10 @@
       subroutine set_cgrav(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         if (s% use_other_cgrav) then
+         if (s% ctrl% use_other_cgrav) then
             call s% other_cgrav(s% id, ierr)
             if (ierr /= 0) then
-               if (s% report_ierr .or. dbg) &
+               if (s% ctrl% report_ierr .or. dbg) &
                   write(*,*) 'other_cgrav returned ierr', ierr
                return
             end if
@@ -826,8 +826,8 @@
 
             ! Evaluate temperature and pressure based on atm_option
                
-            if (.false. .and. 1 == s% solver_test_partials_k .and. &
-                  s% solver_iter == s% solver_test_partials_iter_number) then
+            if (.false. .and. 1 == s% ctrl% solver_test_partials_k .and. &
+                  s% solver_iter == s% ctrl% solver_test_partials_iter_number) then
                star_debugging_atm_flag = .true.
             end if
 
@@ -837,7 +837,7 @@
                  lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                  ierr)
             if (ierr /= 0) then
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,1) 'tau_surf', tau_surf
                   write(*,1) 'L_surf', L_surf
                   write(*,1) 'R_surf', R_surf
@@ -849,8 +849,8 @@
                return
             end if
 
-            if (.false. .and. 1 == s% solver_test_partials_k .and. &
-                  s% solver_iter == s% solver_test_partials_iter_number) then
+            if (.false. .and. 1 == s% ctrl% solver_test_partials_k .and. &
+                  s% solver_iter == s% ctrl% solver_test_partials_iter_number) then
                s% solver_test_partials_val = atm_test_partials_val
                s% solver_test_partials_dval_dx = atm_test_partials_dval_dx
             end if
@@ -865,8 +865,8 @@
             write(*,1) 'bad outputs in get_surf_PT'
             write(*,1) 'lnT_surf', lnT_surf
             write(*,1) 'lnP_surf', lnP_surf
-            write(*,*) 'atm_option = ', trim(s% atm_option)
-            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
+            write(*,*) 'atm_option = ', trim(s% ctrl% atm_option)
+            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
          end if
 
          ! Finish
@@ -922,7 +922,7 @@
          call smooth(s% grad_temperature,nz)
 
          ! this will compute the values of s% smoothed_brunt_B
-         if (s% calculate_Brunt_B) then
+         if (s% ctrl% calculate_Brunt_B) then
             do k=1,nz
                s% smoothed_brunt_B(k) = s% unsmoothed_brunt_B(k)
             end do
@@ -930,7 +930,7 @@
          else
             s% smoothed_brunt_B(:) = 0d0
          end if
-         if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
+         if (s% ctrl% use_Ledoux_criterion .and. s% ctrl% calculate_Brunt_B) then
             do k=1,nz
                s% gradL_composition_term(k) = s% smoothed_brunt_B(k)
             end do
@@ -973,10 +973,10 @@
             include 'formats'
             ierr = 0
             work => dlnd
-            if (s% num_cells_for_smooth_gradL_composition_term <= 0) return
+            if (s% ctrl% num_cells_for_smooth_gradL_composition_term <= 0) return
             call threshold_smoothing( &
-               s% smoothed_brunt_B, s% threshold_for_smooth_gradL_composition_term, s% nz, &
-               s% num_cells_for_smooth_gradL_composition_term, preserve_sign, work)
+               s% smoothed_brunt_B, s% ctrl% threshold_for_smooth_gradL_composition_term, s% nz, &
+               s% ctrl% num_cells_for_smooth_gradL_composition_term, preserve_sign, work)
          end subroutine compute_smoothed_brunt_B
 
          subroutine do_alloc(ierr)

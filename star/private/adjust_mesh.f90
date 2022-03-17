@@ -90,23 +90,23 @@
 
          if (dbg_remesh) write(*,*) 'enter adjust mesh'
 
-         if (.not. s% okay_to_remesh) then
-            if (dbg_remesh) write(*,*) 's% okay_to_remesh', s% okay_to_remesh
+         if (.not. s% ctrl% okay_to_remesh) then
+            if (dbg_remesh) write(*,*) 's% ctrl% okay_to_remesh', s% ctrl% okay_to_remesh
             return
          end if
 
-         if (s% remesh_max_allowed_logT < 1d2) then ! check it
-            if (maxval(s% lnT(1:s% nz))/ln10 > s% remesh_max_allowed_logT) then
+         if (s% ctrl% remesh_max_allowed_logT < 1d2) then ! check it
+            if (maxval(s% lnT(1:s% nz))/ln10 > s% ctrl% remesh_max_allowed_logT) then
                if (dbg_remesh) write(*,2) &
-                  's% remesh_max_allowed_logT', s% model_number, s% remesh_max_allowed_logT
+                  's% ctrl% remesh_max_allowed_logT', s% model_number, s% ctrl% remesh_max_allowed_logT
                return
             end if
          end if
 
          call nullify_work_ptrs
 
-         if (s% dt < s% remesh_dt_limit) then
-            if (dbg_remesh) write(*,*) 's% dt < s% remesh_dt_limit'
+         if (s% dt < s% ctrl% remesh_dt_limit) then
+            if (dbg_remesh) write(*,*) 's% dt < s% ctrl% remesh_dt_limit'
             return
          end if
 
@@ -162,21 +162,21 @@
          end do
 
          center_logT = s% lnT(s% nz)/ln10
-         if (center_logT <= s% logT_max_for_standard_mesh_delta_coeff) then
-            delta_coeff = s% mesh_delta_coeff
-         else if (center_logT >= s% logT_min_for_highT_mesh_delta_coeff) then
-            delta_coeff = s% mesh_delta_coeff_for_highT
+         if (center_logT <= s% ctrl% logT_max_for_standard_mesh_delta_coeff) then
+            delta_coeff = s% ctrl% mesh_delta_coeff
+         else if (center_logT >= s% ctrl% logT_min_for_highT_mesh_delta_coeff) then
+            delta_coeff = s% ctrl% mesh_delta_coeff_for_highT
          else
-            alfa = (center_logT - s% logT_max_for_standard_mesh_delta_coeff)/ &
-               (s% logT_min_for_highT_mesh_delta_coeff - s% logT_max_for_standard_mesh_delta_coeff)
+            alfa = (center_logT - s% ctrl% logT_max_for_standard_mesh_delta_coeff)/ &
+               (s% ctrl% logT_min_for_highT_mesh_delta_coeff - s% ctrl% logT_max_for_standard_mesh_delta_coeff)
             beta = 1d0 - alfa
-            delta_coeff = alfa*s% mesh_delta_coeff_for_highT + beta*s% mesh_delta_coeff
+            delta_coeff = alfa*s% ctrl% mesh_delta_coeff_for_highT + beta*s% ctrl% mesh_delta_coeff
          end if
 
-         mesh_max_allowed_ratio = s% mesh_max_allowed_ratio
+         mesh_max_allowed_ratio = s% ctrl% mesh_max_allowed_ratio
          if (mesh_max_allowed_ratio < 2.5d0) then
             write(*,*) 'WARNING: increasing mesh_max_allowed_ratio to 2.5'
-            s% mesh_max_allowed_ratio = 2.5d0
+            s% ctrl% mesh_max_allowed_ratio = 2.5d0
          end if
 
          ! find the heaviest species in the current net
@@ -190,13 +190,13 @@
          end do
 
          do j = 1, num_xa_function
-            if (s% xa_mesh_delta_coeff(j) == 1) cycle
-            if (len_trim(s% xa_function_species(j)) == 0) cycle
-            cid = chem_get_iso_id(s% xa_function_species(j))
+            if (s% ctrl% xa_mesh_delta_coeff(j) == 1) cycle
+            if (len_trim(s% ctrl% xa_function_species(j)) == 0) cycle
+            cid = chem_get_iso_id(s% ctrl% xa_function_species(j))
             if (cid <= 0) cycle
             if (s% net_iso(cid) == 0) cycle
             if (chem_isos% W(cid) /= A_max) cycle
-            delta_coeff = delta_coeff*s% xa_mesh_delta_coeff(j)
+            delta_coeff = delta_coeff*s% ctrl% xa_mesh_delta_coeff(j)
          end do
 
          call check_validity(s, ierr)
@@ -231,7 +231,7 @@
 
          if (dbg_remesh) write(*,*) 'call mesh_plan'
 
-         if (s% show_mesh_changes) then
+         if (s% ctrl% show_mesh_changes) then
             write(*,*) 'doing mesh_call_number', s% mesh_call_number
             write(*,*) '      mesh_plan nz_old', nz_old
          end if
@@ -251,11 +251,11 @@
 
          do k=1,nz-1
             do_not_split(k) = &
-               (s% lnR(k) - s% lnR(k+1) < 2*s% mesh_min_dlnR) .or. &
-               (s% r(k) - s% r(k+1) < 2*s% mesh_min_dr_div_cs*s% csound(k))
+               (s% lnR(k) - s% lnR(k+1) < 2*s% ctrl% mesh_min_dlnR) .or. &
+               (s% r(k) - s% r(k+1) < 2*s% ctrl% mesh_min_dr_div_cs*s% csound(k))
          end do
          do_not_split(nz) = &
-            (s% r(nz) - s% R_center < 2*s% mesh_min_dr_div_cs*s% csound(nz))
+            (s% r(nz) - s% R_center < 2*s% ctrl% mesh_min_dr_div_cs*s% csound(nz))
 
          if (dbg_remesh) write(*,*) 'call do_mesh_plan'
 
@@ -296,13 +296,13 @@
          end do
 
          call do_mesh_plan( &
-            s, nz, s% max_allowed_nz, s% mesh_ok_to_merge, s% D_mix, &
-            s% mesh_max_k_old_for_split, s% mesh_min_k_old_for_split, xq_old, s% dq, &
-            s% min_dq, s% max_dq*s% mesh_delta_coeff, s% min_dq_for_split, mesh_max_allowed_ratio, &
+            s, nz, s% ctrl% max_allowed_nz, s% ctrl% mesh_ok_to_merge, s% D_mix, &
+            s% ctrl% mesh_max_k_old_for_split, s% ctrl% mesh_min_k_old_for_split, xq_old, s% dq, &
+            s% ctrl% min_dq, s% ctrl% max_dq*s% ctrl% mesh_delta_coeff, s% ctrl% min_dq_for_split, mesh_max_allowed_ratio, &
             do_not_split, num_gvals, gval_names, &
             gval_is_xa_function, gval_is_logT_function, gvals, delta_gval_max, &
-            s% max_center_cell_dq*s% mesh_delta_coeff, s% max_surface_cell_dq*s% mesh_delta_coeff, &
-            s% max_num_subcells, s% max_num_merge_cells, &
+            s% ctrl% max_center_cell_dq*s% ctrl% mesh_delta_coeff, s% ctrl% max_surface_cell_dq*s% ctrl% mesh_delta_coeff, &
+            s% ctrl% max_num_subcells, s% ctrl% max_num_merge_cells, &
             nz_new, xq_new, dq_new, which_gval, comes_from, ierr)
 
          if (dbg_remesh .or. dbg) write(*,*) 'back from mesh_plan'
@@ -422,7 +422,7 @@
             cell_type, comes_from, prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
          if (ierr /= 0) then
             s% retry_message = 'do_mesh_adjust failed in mesh_adjust'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
             s% termination_code = t_adjust_mesh_failed
             remesh = terminate
             call dealloc
@@ -445,7 +445,7 @@
             s% prev_mesh_nu_ST_start(k) = prv% prev_mesh_nu_ST_start(k)
          end do
 
-         if (s% show_mesh_changes) then
+         if (s% ctrl% show_mesh_changes) then
             ! note: do_mesh_adjust can change cell_type from unchanged to revised
             ! so need to recount
             unchanged=0; split=0; merged=0; revised=0
@@ -484,7 +484,7 @@
             end if
          end do
 
-         if (ierr /= 0 .and. s% report_ierr) then
+         if (ierr /= 0 .and. s% ctrl% report_ierr) then
             write(*,*) 'mesh_adjust problem'
             write(*,*) 'doing mesh_call_number', s% mesh_call_number
             write(*,*) 's% model_number', s% model_number
@@ -496,7 +496,7 @@
          if (remesh /= keep_going) then
             s% result_reason = adjust_mesh_failed
             s% retry_message = 'mesh_adjust failed'
-            if (s% report_ierr) write(*, *) s% retry_message
+            if (s% ctrl% report_ierr) write(*, *) s% retry_message
             call dealloc
             return
          end if
@@ -505,7 +505,7 @@
             J_tot2 = total_angular_momentum(s)
             if (abs(J_tot2 - J_tot1) > 1d-2*max(J_tot1,J_tot2)) then
                s% retry_message = 'adjust_mesh failed'
-               if (s% report_ierr) then
+               if (s% ctrl% report_ierr) then
                   write(*,2) 'adjust_mesh J_tot', &
                      s% model_number, (J_tot2 - J_tot1)/J_tot2, J_tot2, J_tot1
                   write(*,*) 'failure to conserve angular momentum in adjust_mesh'
