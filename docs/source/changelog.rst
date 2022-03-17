@@ -41,6 +41,10 @@ using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/
 More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
 This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
 
+Fixed a combination of bugs whereby the atmosphere data written to pulsation file formats (e.g. FGONG)
+was incorrect or wouldn't work if ``tau_factor`` or ``atm_T_tau_opacity`` differed from their defaults
+(``1.0`` and ``'fixed'``, respectively).
+
 pgstar
 ------
 
