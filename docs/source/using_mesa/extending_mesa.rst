@@ -324,7 +324,7 @@ discuss some useful MESA features.
      ! by default there are num_x_ctrls, which defaults to 100, of each.
      ! they can be specified in the controls section of your inlist.
   
-     f = s% x_integer_ctrl(1)
+     f = s% ctrl% x_integer_ctrl(1)
   
      ! MESA also provides a number of arrays that are useful for implementing
      ! algorithms which require a state. if you use these variables
@@ -503,11 +503,11 @@ Let's rename the subroutine and add the functionality that we want.
      end if
   
      ! separately control whether each type of neutrino loss is included
-     flags(pair_neu_type) = s% x_logical_ctrl(1)
-     flags(plas_neu_type) = s% x_logical_ctrl(2)
-     flags(phot_neu_type) = s% x_logical_ctrl(3)
-     flags(brem_neu_type) = s% x_logical_ctrl(4)
-     flags(reco_neu_type) = s% x_logical_ctrl(5)
+     flags(pair_neu_type) = s% ctrl% x_logical_ctrl(1)
+     flags(plas_neu_type) = s% ctrl% x_logical_ctrl(2)
+     flags(phot_neu_type) = s% ctrl% x_logical_ctrl(3)
+     flags(brem_neu_type) = s% ctrl% x_logical_ctrl(4)
+     flags(reco_neu_type) = s% ctrl% x_logical_ctrl(5)
   
      ! the is the normal routine that MESA provides
      call neu_get(  &

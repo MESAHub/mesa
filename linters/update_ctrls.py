@@ -144,8 +144,11 @@ for f in ctrls_files[1:]:
 
 
 def update(filename):
-    lines = load_file(filename)
-
+    try:
+        lines = load_file(filename)
+    except (UnicodeDecodeError, IsADirectoryError):
+        return
+        
     " s[0 or more space] % [0 or more space] [1 or more character or number or _]"
     # This wont match when s has been renamed 
     regex_all = "(s[ \t]?[a-zA-Z0-9_]?%[ \t]?[a-zA-Z0-9_]*)"

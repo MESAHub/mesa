@@ -492,7 +492,7 @@ start of the routine, set
 
 .. code-block:: fortran
   
-      test_partials = (s% solver_iter == s% solver_test_partials_iter_number)
+      test_partials = (s% solver_iter == s% ctrl% solver_test_partials_iter_number)
       !test_partials = .false.
 
 Almost all the equation routines will already have ``test_partials``
@@ -510,7 +510,7 @@ might have to add them yourself.)
     
     .. code-block:: fortran
       
-          test_partials = (k == s% solve_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number)
+          test_partials = (k == s% solve_test_partials_k .and. s% solver_iter == s% ctrl% solver_test_partials_iter_number)
           !test_partials = .false.
     
 Set ``solver_test_partials_val`` to a variable that is used in
@@ -700,7 +700,7 @@ Therefore, to check ``d_esum_dlnTm1`` one can do
 
 .. code-block:: fortran
   
-      test_partials = (k-1 == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number)
+      test_partials = (k-1 == s% ctrl% solver_test_partials_k .and. s% solver_iter == s% ctrl% solver_test_partials_iter_number)
       !test_partials = .false.
 
 and
