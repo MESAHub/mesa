@@ -299,7 +299,7 @@
      
          if (dbg) write(*,*) 'call get_derivs'
          call get_derivs(  &
-             n, dydt, eps_nuc_MeV, eta, ye, &
+             n, dydt, eps_nuc_MeV(1:num_rvs), eta, ye, &
              logtemp, btemp, bden, abar, zbar,  &
              num_reactions, rate_factors, &
              symbolic, just_dxdt, ierr)

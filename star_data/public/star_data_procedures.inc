@@ -120,6 +120,8 @@
             other_screening => null()
          procedure (other_rate_get_interface), pointer, nopass :: &
             other_rate_get => null()
+         procedure (other_net_derivs_interface), pointer, nopass :: &
+            other_net_derivs => null()
 
          procedure (other_surface_PT_interface), pointer, nopass :: &
             other_surface_PT => null()

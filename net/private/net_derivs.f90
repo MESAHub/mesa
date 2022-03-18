@@ -43,7 +43,7 @@
             symbolic, just_dydt, ierr)
          type (Net_Info), pointer :: n
          real(qp), pointer, intent(inout) :: dydt(:,:)
-         real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
+         real(qp), intent(out) :: eps_nuc_MeV(:)
          integer, intent(in) :: num_reactions
          real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
             rate_factors(:)
@@ -209,6 +209,12 @@
             
          
          end do
+
+         if(associated(net_other_net_derivs)) then
+            call net_other_net_derivs(n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
+               num_reactions, rate_factors, &
+               symbolic, just_dydt, ierr)
+         end if
 
          
          contains
