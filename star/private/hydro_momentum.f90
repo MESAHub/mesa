@@ -426,11 +426,8 @@
          
          end if ! v_flag
 
-         Uq_ad = 0d0
-         if (s% RSP2_flag) then ! Uq(k) is turbulent viscosity drag at face k
-            Uq_ad = compute_Uq_face(s, k, ierr)
-            if (ierr /= 0) return
-         end if
+         Uq_ad = compute_Uq_face(s, k, ierr)
+         if (ierr /= 0) return
          
          other_ad = extra_ad - accel_ad + Uq_ad
          other = other_ad%val
