@@ -11475,6 +11475,7 @@
     use_other_torque = .false.
     use_other_screening = .false.
     use_other_rate_get = .false.
+    use_other_net_derivs = .false.
 
       ! ::
 

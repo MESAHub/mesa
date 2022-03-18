@@ -53,6 +53,10 @@
          integer, parameter :: max_kind = general_two_two_kind
          
 
+
+
+
+
          
       type Net_General_Info ! things that are constant for the particular net
       ! it is okay to have multiple threads using the same instance of this simultaneously.
@@ -164,11 +168,10 @@
          logical :: in_use
 
       end type Net_General_Info
-               
-      
+
       integer, parameter :: num_weak_info_arrays_in_Net_Info = 9 ! weaklib results
       
-                  
+            
       type Net_Info
          ! this is working storage for the nuclear reaction calculations
          
@@ -218,8 +221,35 @@
 
          real(dp) :: eps_neu_total
          real(dp) :: weak_rate_factor
-         
+      
       end type Net_Info
+
+
+      ! Interface for net hooks
+      interface
+         subroutine other_net_derivs_interface( &
+            n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
+            num_reactions, rate_factors, &
+            symbolic, just_dydt, ierr)
+         import dp, qp, Net_Info
+         implicit none
+
+         type(Net_Info), pointer :: n
+         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(out) :: eps_nuc_MeV(:)
+         integer, intent(in) :: num_reactions
+         real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
+            rate_factors(:)
+         logical, intent(in) :: symbolic, just_dydt
+         integer, intent(out) :: ierr
+
+         end subroutine other_net_derivs_interface
+
+      end interface
+
+      ! Other net_derivs handling
+      procedure(other_net_derivs_interface), pointer  :: &
+         net_other_net_derivs => null()
 
       
    ! private to the implementation

@@ -43,6 +43,7 @@
       subroutine do_net(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
          use net_lib, only: net_work_size
+         use net_def, only: net_other_net_derivs
          use rates_def, only: rates_other_screening
          use alloc
          type (star_info), pointer :: s
@@ -84,6 +85,16 @@
          rates_other_screening => null()
          if(s% use_other_screening) then
             rates_other_screening => s% other_screening
+         end if
+
+         net_other_net_derivs => null()
+         if(s% use_other_net_derivs) then
+            if(index(s% net_name,'approx')>0) then
+               write(*,*) 'use_other_net_derivs does not work with approx nets'
+               ierr = -1
+               return
+            end if
+            net_other_net_derivs => s% other_net_derivs
          end if
 
          net_lwork = net_work_size(s% net_handle, ierr)

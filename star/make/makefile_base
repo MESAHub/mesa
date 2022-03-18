@@ -116,6 +116,7 @@ SRCS = \
    other_timestep_limit.f90 \
    other_screening.f90 \
    other_rate_get.f90 \
+   other_net_derivs.f90 \
    star_utils.f90 \
    ctrls_io.f90 \
    alloc.f90 \

@@ -65,6 +65,13 @@ only works on rates that are NOT currently in your rates_cache.
 
   Describe the replacement for the FL87 rate
 
+Net
+---
+
+There is a new hook ``other_net_derivs`` that allows for modifying the ``dydt`` term MESA computes for each zone inside ``net/``.
+This allows adding changes in compostion due to nuclear reactions that MESA could otherwise not handle or does not know about. 
+This hook only works with soft networks (thus no ``approx`` nets).
+
 
 Changes in r21.12.1
 ===================
