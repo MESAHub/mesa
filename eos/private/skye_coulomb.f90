@@ -1,5 +1,6 @@
 module skye_coulomb
    use math_lib
+   use math_def
    use auto_diff
    use const_def, only: dp, PI, rbohr, qe, amu, me
    use skye_coulomb_solid
@@ -269,8 +270,8 @@ module skye_coulomb
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
-      GAMI = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
-      COTPT=sqrt(3d0 * me_in_amu / CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
+      GAMI = pre_z(int(Zion))% z5_3 * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
+      COTPT=sqrt(3d0 * me_in_amu / CMI)/pre_z(int(Zion))%z7_6 ! auxiliary coefficient
       TPT=GAMI*COTPT/sqrt(RS)                   ! T_p/T
 
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then
@@ -299,7 +300,7 @@ module skye_coulomb
          temp_boundary%d1val1 = 1d0 
 
          ! Compute new (differentiable) Gamma and TPT at the boundary
-         g = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp_boundary * RS) ! ion Coulomb parameter Gamma_i
+         g = pre_z(int(Zion))% z5_3 * qe * qe / (rbohr * boltzm * temp_boundary * RS) ! ion Coulomb parameter Gamma_i
          tp=g*COTPT/sqrt(RS)                  ! T_p/T
 
          ! Compute boundary free energy

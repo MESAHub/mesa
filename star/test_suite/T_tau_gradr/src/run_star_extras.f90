@@ -28,12 +28,6 @@
       use math_lib
       use auto_diff
       use utils_lib, only: mesa_error
-
-      use atm_def, only: &
-         ATM_T_TAU_EDDINGTON, &
-         ATM_T_TAU_SOLAR_HOPF, &
-         ATM_T_TAU_KRISHNA_SWAMY, &
-         ATM_T_TAU_TRAMPEDACH_SOLAR
       
       implicit none
 
@@ -60,7 +54,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
       end subroutine extras_controls
       
       
@@ -117,7 +111,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
 
          T_rms = 0.0_dp
          n = 0

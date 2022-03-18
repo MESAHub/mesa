@@ -745,8 +745,9 @@
                            j00 = maxloc(s% xa(:,kk),dim=1)
                            jm1 = maxloc(s% xa(:,kk-1),dim=1)
                            if (maxval_delta_xa > s% max_delta_x_for_merge .or. &
-                               j00 /= jm1 .or. is_convective_boundary(kk)) then
-                              ! don't merge across convective boundary
+                               j00 /= jm1 .or. is_convective_boundary(kk) .or. &
+                               is_crystal_boundary(kk)) then
+                              ! don't merge across convective or crystal boundary
                               k_old_next = kk-1
                               exit
                            else if (next_xq <= xq_old(kk) + min_dq/2) then
@@ -912,6 +913,16 @@
                 s% mixing_type(kk) /= convective_mixing)
          end function is_convective_boundary
 
+         logical function is_crystal_boundary(kk)
+            integer, intent(in) :: kk
+            if(s% do_phase_separation .and. & ! only need this protection when phase separation is on
+                 s% m(kk) <= s% crystal_core_boundary_mass .and. &
+                 s% m(kk-1) >= s% crystal_core_boundary_mass) then
+               is_crystal_boundary = .true.
+            else
+               is_crystal_boundary = .false.
+            end if
+         end function is_crystal_boundary
 
          subroutine open_debug_file
             include 'formats'

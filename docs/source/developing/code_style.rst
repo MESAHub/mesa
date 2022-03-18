@@ -167,6 +167,20 @@ different compilers.
 
 Some helpful formats are provided in ``include/formats``.
 
+Unformatted reads
+-----------------
+
+.. code-block:: fortran
+
+    read(unit,*) x,y,z
+
+
+Should be avoided when the variables that are strings. This is becuase if the string contains a / (forward-slash) then when doing a unformatted 
+read frotran will stop reading the line.
+
+Either build a full format statement or read the line into one string and split on whitespace. There is also a function ``split_line`` in 
+``utils_lib.f90`` that can be used to split a line up based on whitespace.
+
 
 Constants
 ---------

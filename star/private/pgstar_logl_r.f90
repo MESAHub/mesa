@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -48,10 +49,10 @@
          call pgeras()
 
          call do_logL_R_Plot( &
-            s, id, device_id, s% show_logL_photosphere_r, &
-            s% logL_R_xleft, s% logL_R_xright, &
-            s% logL_R_ybot, s% logL_R_ytop, .false., &
-            s% logL_R_title, s% logL_R_txt_scale, ierr)
+            s, id, device_id, s% pg% show_logL_photosphere_r, &
+            s% pg% logL_R_xleft, s% pg% logL_R_xright, &
+            s% pg% logL_R_ybot, s% pg% logL_R_ytop, .false., &
+            s% pg% logL_R_title, s% pg% logL_R_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -83,21 +84,21 @@
          call do_Hist_Track(s, id, device_id, &
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             xname, 'log_L', xaxis_label, 'log L/L\d\(2281)', &
-            s% logL_R_R_min, s% logL_R_R_max, &
-            s% logL_R_R_margin, s% logL_R_dR_min, &
-            s% logL_R_logL_min, s% logL_R_logL_max, &
-            s% logL_R_logL_margin, s% logL_R_dlogL_min, &
-            s% logL_R_step_min, s% logL_R_step_max, &
+            s% pg% logL_R_R_min, s% pg% logL_R_R_max, &
+            s% pg% logL_R_R_margin, s% pg% logL_R_dR_min, &
+            s% pg% logL_R_logL_min, s% pg% logL_R_logL_max, &
+            s% pg% logL_R_logL_margin, s% pg% logL_R_dlogL_min, &
+            s% pg% logL_R_step_min, s% pg% logL_R_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_logL_R_target_box, s% logL_R_target_n_sigma, &
-            s% logL_R_target_R, s% logL_R_target_logL, &
-            s% logL_R_target_R_sigma, s% logL_R_target_logL_sigma, &
-            s% show_logL_R_annotation1, &
-            s% show_logL_R_annotation2, &
-            s% show_logL_R_annotation3, &
-            s% logL_R_fname, &
-            s% logL_R_use_decorator, &
-            s% logL_R_pgstar_decorator, &
+            s% pg% show_logL_R_target_box, s% pg% logL_R_target_n_sigma, &
+            s% pg% logL_R_target_R, s% pg% logL_R_target_logL, &
+            s% pg% logL_R_target_R_sigma, s% pg% logL_R_target_logL_sigma, &
+            s% pg% show_logL_R_annotation1, &
+            s% pg% show_logL_R_annotation2, &
+            s% pg% show_logL_R_annotation3, &
+            s% pg% logL_R_fname, &
+            s% pg% logL_R_use_decorator, &
+            s% pg% logL_R_pgstar_decorator, &
             null_decorate, ierr)
 
       end subroutine do_logL_R_Plot

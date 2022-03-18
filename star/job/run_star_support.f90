@@ -408,6 +408,21 @@
          if (len_trim(s% op_mono_data_cache_filename) == 0) &
             call get_environment_variable( &
                "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)         
+
+         s% extras_startup => null_extras_startup
+         s% extras_check_model => null_extras_check_model
+         s% extras_start_step => null_extras_start_step
+         s% extras_finish_step => null_extras_finish_step
+         s% extras_after_evolve => null_extras_after_evolve
+         s% how_many_extra_history_columns => null_how_many_extra_history_columns
+         s% data_for_extra_history_columns => null_data_for_extra_history_columns
+         s% how_many_extra_profile_columns => null_how_many_extra_profile_columns
+         s% data_for_extra_profile_columns => null_data_for_extra_profile_columns
+
+         if (dbg) write(*,*) 'call extras_controls'
+         call extras_controls(id, ierr)
+         if (ierr /= 0) return
+
          if (restart_filename /= "restart_photo") then
             temp_fname  = trim(s% photo_directory) // '/' // trim(restart_filename)
             restart_filename  = trim(temp_fname)
@@ -424,20 +439,6 @@
             call show_log_description(id, ierr)
             if (failed('show_log_description',ierr)) return
          end if
-
-         s% extras_startup => null_extras_startup
-         s% extras_check_model => null_extras_check_model
-         s% extras_start_step => null_extras_start_step
-         s% extras_finish_step => null_extras_finish_step
-         s% extras_after_evolve => null_extras_after_evolve
-         s% how_many_extra_history_columns => null_how_many_extra_history_columns
-         s% data_for_extra_history_columns => null_data_for_extra_history_columns
-         s% how_many_extra_profile_columns => null_how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => null_data_for_extra_profile_columns
-
-         if (dbg) write(*,*) 'call extras_controls'
-         call extras_controls(id, ierr)
-         if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call binary_controls'
          call binary_controls(id, binary_id, ierr)
@@ -710,9 +711,9 @@
          if (result == keep_going) then 
             if (s% job% pgstar_flag) then
                 will_read_pgstar_inlist = .false.
-                if (s% pgstar_interval <= 0) then
+                if (s% pg% pgstar_interval <= 0) then
                     will_read_pgstar_inlist = .true.
-                else if(mod(s% model_number, s% pgstar_interval) == 0) then
+                else if(mod(s% model_number, s% pg% pgstar_interval) == 0) then
                     will_read_pgstar_inlist  = .true.
                 end if
                 if(will_read_pgstar_inlist) then
@@ -1986,6 +1987,22 @@
          logical :: change_v, change_u
          include 'formats'
          
+         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
+            call star_change_to_new_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
+            if (failed('star_change_to_new_net',ierr)) return
+         end if
+
+         if (s% job% change_small_net .or. &
+               (s% job% change_initial_small_net .and. .not. restart)) then         
+            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
+            call star_change_to_new_small_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
+            if (failed('star_change_to_new_small_net',ierr)) return
+            write(*,*) 'number of species', s% species
+         end if
+
+
          if (len_trim(s% job% history_columns_file) > 0) &
             write(*,*) 'read ' // trim(s% job% history_columns_file)
          call star_set_history_columns(id, s% job% history_columns_file, .true., ierr)
@@ -2084,22 +2101,7 @@
             write(*,2) 'steps_before_start_timing', &
                s% job% steps_before_start_timing
          end if
-         
-         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
-            call star_change_to_new_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
-            if (failed('star_change_to_new_net',ierr)) return
-         end if
-
-         if (s% job% change_small_net .or. &
-               (s% job% change_initial_small_net .and. .not. restart)) then         
-            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
-            call star_change_to_new_small_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
-            if (failed('star_change_to_new_small_net',ierr)) return
-            write(*,*) 'number of species', s% species
-         end if
-         
+                  
          if (abs(s% job% T9_weaklib_full_off - T9_weaklib_full_off) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_off', s% job% T9_weaklib_full_off
             T9_weaklib_full_off = s% job% T9_weaklib_full_off
@@ -3730,7 +3732,7 @@
             write(*,*) "          and should be set to 1 during normal MESA use."
             write(*,*) "***"
             write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
-            write(*,*) "and max_model_number by its inverse:"
+            write(*,*) "and max_model_number by its inverse twice:"
             write(*,*) ""
             write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
             s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
@@ -3741,7 +3743,7 @@
             write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
             write(*,*)    ""
             write(*,*)    "   old max_model_number = ",   s% max_model_number
-            s% max_model_number = s% max_model_number / test_suite_res_factor
+            s% max_model_number = s% max_model_number / test_suite_res_factor / test_suite_res_factor
             write(*,*)    "   new max_model_number = ",   s% max_model_number
             write(*,*)    ""
          end if

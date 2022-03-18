@@ -221,7 +221,7 @@
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
-            tau_factor, Teff, Tsurf_factor, opacity_factor, mixing_length_alpha
+            tau_factor, Tsurf_factor, opacity_factor, mixing_length_alpha
          character (len=strlen) :: buffer, string, message
          character (len=net_name_len) :: net_name
          character(len=iso_name_length), pointer :: names(:) ! (species)
@@ -273,7 +273,6 @@
          s% star_age = 0
          s% xmstar = -1
          
-         Teff = s% Teff
          tau_factor = s% tau_factor
          Tsurf_factor = s% Tsurf_factor
          mixing_length_alpha = s% mixing_length_alpha
@@ -284,7 +283,7 @@
             initial_mass, initial_z, initial_y, mixing_length_alpha, &
             s% model_number, s% star_age, tau_factor, s% Teff, &
             s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, s% crystal_core_boundary_mass, &
             s% xmstar, s% R_center, s% L_center, s% v_center, &
             s% cumulative_energy_error, s% num_retries, ierr)
 
@@ -682,7 +681,7 @@
             num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
             mixing_length_alpha, star_age, &
-            Teff, tau_factor, Tsurf_factor, opacity_factor, &
+            Teff, tau_factor, Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          call do_read_saved_model_properties(fname, &
@@ -690,7 +689,7 @@
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_saved_model_number
@@ -701,7 +700,7 @@
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
          use utils_lib
@@ -712,7 +711,7 @@
          real(dp), intent(inout) :: m_div_msun, initial_z, &
             mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          integer, intent(out) :: ierr
          integer :: iounit
@@ -738,7 +737,7 @@
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
          close(iounit)
@@ -754,14 +753,14 @@
          real(dp) :: m_div_msun, initial_z, initial_y, &
             mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          call read_properties(iounit, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_net_name
@@ -778,14 +777,14 @@
             mixing_length_alpha, cumulative_energy_error, &
             Teff, tau_factor, Tsurf_factor, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            opacity_factor, &
+            opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center
          call do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_saved_model_age
@@ -796,7 +795,7 @@
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
          integer, intent(in) :: iounit
@@ -806,7 +805,7 @@
          real(dp), intent(inout) :: m_div_msun, initial_z, initial_y, &
             mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, crystal_core_boundary_mass, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          integer, intent(out) :: ierr
          character (len=132) :: line
@@ -834,6 +833,7 @@
             if (match_keyword('power_photo', line, power_photo)) cycle
             if (match_keyword('Tsurf_factor', line, Tsurf_factor)) cycle
             if (match_keyword('opacity_factor', line, opacity_factor)) cycle
+            if (match_keyword('crystal_core_boundary_mass', line, crystal_core_boundary_mass)) cycle
             if (match_keyword('xmstar', line, xmstar)) cycle
             if (match_keyword('R_center', line, R_center)) cycle
             if (match_keyword('L_center', line, L_center)) cycle

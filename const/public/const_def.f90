@@ -68,7 +68,7 @@
       real(dp), parameter :: two_13 = 1.2599210498948730d0 ! = pow(2d0,1d0/3d0)
       real(dp), parameter :: four_13 = 1.5874010519681994d0 ! = pow(4d0,1d0/3d0)
       real(dp), parameter :: sqrt2 = 1.414213562373095d0 ! = sqrt(2)
-      real(dp), parameter :: sqrt_2_div_3 = 0.8164965809d0 ! = sqrt(2/3)
+      real(dp), parameter :: sqrt_2_div_3 = 0.816496580927726d0 ! = sqrt(2/3)
 
 ! exact physical constants
 
@@ -156,6 +156,7 @@
 
       ! mixing types
       ! NOTE: some packages may depend on the order
+      integer, parameter :: crystallized = -1
       integer, parameter :: no_mixing = 0
       integer, parameter :: convective_mixing = 1
       integer, parameter :: overshoot_mixing = 2
@@ -167,8 +168,9 @@
       integer, parameter :: anonymous_mixing = 8  ! AKA "WTF_mixing"
       integer, parameter :: leftover_convective_mixing = 9  ! for regions with non-zero conv_vel that are not unstable to convection
                                                             ! used for time dependent convection
+      integer, parameter :: phase_separation_mixing = 10
       
-      integer, parameter :: number_of_mixing_types = leftover_convective_mixing+1
+      integer, parameter :: number_of_mixing_types =  phase_separation_mixing+1
 
 
       contains

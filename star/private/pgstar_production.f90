@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -51,9 +52,9 @@
          call pgeras()
 
          call do_Production_plot(s, id, device_id, &
-            s% Production_xleft, s% Production_xright, &
-            s% Production_ybot, s% Production_ytop, .false., &
-            s% Production_title, s% Production_txt_scale, ierr)
+            s% pg% Production_xleft, s% pg% Production_xright, &
+            s% pg% Production_ybot, s% pg% Production_ytop, .false., &
+            s% pg% Production_title, s% pg% Production_txt_scale, ierr)
 
          call pgebuf()
 
@@ -156,16 +157,16 @@
             ymin=HUGE(ymin)
 
 
-            if (s% production_min_mass > 0.0) then
-               min_mass = s% production_min_mass
+            if (s% pg% production_min_mass > 0.0) then
+               min_mass = s% pg% production_min_mass
             else
                min_mass = 0.d0
             end if
 
-            if (s% production_max_mass > -100) then
-               max_mass = s% production_max_mass
+            if (s% pg% production_max_mass > -100) then
+               max_mass = s% pg% production_max_mass
             else
-               max_mass = s%mstar/msun
+               max_mass = s% mstar/msun
             end if
 
             min_zone=1
@@ -231,7 +232,7 @@
                lac=safe_log10(scaled_abun_init(i))
    
                !Remove low abundance isotopes, low in star and low in solar can lead to large production factor
-               if(la .lt.s%production_min_mass_frac .or. lac .lt.s%production_min_mass_frac) then
+               if(la .lt.s% pg%production_min_mass_frac .or. lac .lt.s% pg%production_min_mass_frac) then
                   scaled_abun(i)=-HUGE(ymin)
                else
                   scaled_abun(i)=real(la-lac)
@@ -243,31 +244,31 @@
 
             end do
 
-            if (s% production_ymax > -100) then
-               ymax = s% production_ymax
+            if (s% pg% production_ymax > -100) then
+               ymax = s% pg% production_ymax
             else
                ymax = ymax+0.01
             end if
 
-            if (s% production_ymin > -100) then
-               ymin = s% production_ymin
+            if (s% pg% production_ymin > -100) then
+               ymin = s% pg% production_ymin
             else
                ymin = ymin
             end if
 
-            if (s% production_amax > -100) then
-               xright = s% production_amax
+            if (s% pg% production_amax > -100) then
+               xright = s% pg% production_amax
             else
                xright= amax
             end if
 
-            if (s% production_amin > -100) then
-               xleft = s% production_amin
+            if (s% pg% production_amin > -100) then
+               xleft = s% pg% production_amin
             else
                xleft = amin
             end if
 
-            if (s% Production_show_element_names) THEN
+            if (s% pg% Production_show_element_names) THEN
                extra_pad=2.5
             else
                extra_pad=1.0
@@ -299,7 +300,7 @@
                call set_line_style(izsol(i))
 
                !Shows element name, alternates between two levels to spread them out
-               if (s% Production_show_element_names &
+               if (s% pg% Production_show_element_names &
                   .and.(iasol(i).le.xright).and.(iasol(i).ge.xleft)) THEN
                      yloc=(ymax*1.0)+abs(0.75+(alternate)/2.0)
                      call pgtext(iasol(i)*1.0,yloc,el_name(izsol(i)))
@@ -342,8 +343,8 @@
             call pgunsa
             deallocate(abun,init_comp)
             
-            call show_pgstar_decorator(s%id,s% production_use_decorator,&
-                  s% production_pgstar_decorator, 0, ierr)
+            call show_pgstar_decorator(id,s% pg% production_use_decorator,&
+                  s% pg% production_pgstar_decorator, 0, ierr)
 
             
          end subroutine plot

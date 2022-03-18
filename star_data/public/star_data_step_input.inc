@@ -150,10 +150,7 @@
          character (len=strlen) :: &
             most_recent_profile_filename, most_recent_controls_filename, &
             most_recent_model_data_filename
-         
-      ! pgstar
-         type (pgstar_hist_node), pointer :: pgstar_hist => null()
-      
+               
       ! random number generator (marsaglia and zaman). period is 2**43 with
          ! 900 million different sequences. the state of the generator (for restarts)
          integer :: rand_i97, rand_j97
@@ -167,6 +164,7 @@
          real(dp) :: force_tau_factor, force_Tsurf_factor, force_opacity_factor
          real(dp) :: revised_max_yr_dt, astero_revised_max_yr_dt
          real(dp) :: gradT_excess_alpha_old
+         real(dp) :: crystal_core_boundary_mass
                 
          logical :: include_binary_history_in_log_file
          logical :: using_revised_max_yr_dt, astero_using_revised_max_yr_dt

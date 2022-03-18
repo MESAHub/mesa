@@ -299,7 +299,7 @@
             STAT=info)
          if (info /= 0) then
             write(*,*)  "Info: ",info
-            call mesa_error(__FILE__,__LINE__, 'Allocation in Load1_eosDT_Table failed, your likely out of memory')
+            call mesa_error(__FILE__,__LINE__, "Allocation in Load1_eosDT_Table failed, you're likely out of memory")
          end if
          
          tbl(1:sz_per_eos_point,1:nv,1:ep% num_logQs,1:ep% num_logTs) =>  &

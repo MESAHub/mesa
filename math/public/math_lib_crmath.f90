@@ -32,6 +32,7 @@ module math_lib
   use math_pown
   use math_io
   use utils_lib
+  use math_def
 
   use crmath
 
@@ -129,6 +130,8 @@ contains
     call crmath_init()
 
     ln10_m = log(10._dp)
+
+    call precompute_some_zs()
 
   end subroutine math_init
 
@@ -277,5 +280,9 @@ contains
     end if
 
   end function pow_r_
+
+
+  include 'precompute_zs.inc'
+
 
 end module math_lib

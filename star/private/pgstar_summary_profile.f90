@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -50,9 +51,9 @@
          call pgeras()
 
          call do_summary_profile_plot(s, id, device_id, &
-            s% Summary_Profile_xleft, s% Summary_Profile_xright, &
-            s% Summary_Profile_ybot, s% Summary_Profile_ytop, .false., &
-            s% Summary_Profile_title, s% Summary_Profile_txt_scale, ierr)
+            s% pg% Summary_Profile_xleft, s% pg% Summary_Profile_xright, &
+            s% pg% Summary_Profile_ybot, s% pg% Summary_Profile_ytop, .false., &
+            s% pg% Summary_Profile_title, s% pg% Summary_Profile_txt_scale, ierr)
 
          call pgebuf()
 
@@ -70,9 +71,9 @@
          integer, intent(out) :: ierr
          call do_summary_profile_panel(s, id, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, &
-            title, txt_scale, s% Summary_Profile_xaxis_name, &
-            s% Summary_Profile_xmin, s% Summary_Profile_xmax, &
-            s% Summary_Profile_xaxis_reversed, &
+            title, txt_scale, s% pg% Summary_Profile_xaxis_name, &
+            s% pg% Summary_Profile_xmin, s% pg% Summary_Profile_xmax, &
+            s% pg% Summary_Profile_xaxis_reversed, &
             .false., .true., ierr)
       end subroutine do_summary_profile_plot
 
@@ -112,7 +113,7 @@
 
          nz = s% nz
 
-         num_lines = s% Summary_Profile_num_lines
+         num_lines = s% pg% Summary_Profile_num_lines
 
          colors(:) = (/ &
                clr_MediumSlateBlue, clr_Goldenrod, clr_LightSkyBlue, clr_Lilac, &
@@ -165,7 +166,7 @@
             ymax = 1.02
             ymin = 0.0
 
-            lw = s% pgstar_lw
+            lw = s% pg% pgstar_lw
             call pgqlw(lw_sav)
 
             call pgsvp(winxmin, winxmax, winymin, winymax)
@@ -199,7 +200,7 @@
             cnt = 0
             do j = 1, num_lines
 
-               yname = s% Summary_Profile_name(j)
+               yname = s% pg% Summary_Profile_name(j)
                if (len_trim(yname) == 0 .or. trim(yname) == trim(xaxis_name)) then
                   show(j) = .false.
                   cycle
@@ -216,7 +217,7 @@
                   yvec(k) = get_profile_val(s, yaxis_id, k+grid_min-1)
                end do
 
-               if (s% Summary_Profile_scaled_value(j)) then ! scale yvec
+               if (s% pg% Summary_Profile_scaled_value(j)) then ! scale yvec
 
                   yvec_max = maxval(yvec(1:npts))
                   yvec_min = minval(yvec(1:npts))
@@ -257,18 +258,18 @@
             cnt = 0
             do j=1,num_lines
                if (.not. show(j)) cycle
-               if (len_trim(s% Summary_Profile_legend(j)) == 0) then
+               if (len_trim(s% pg% Summary_Profile_legend(j)) == 0) then
                   cnt = summary_profile_line_legend( &
-                           cnt,s% Summary_Profile_name(j))
+                           cnt,s% pg% Summary_Profile_name(j))
                else
                   cnt = summary_profile_line_legend( &
-                           cnt,s% Summary_Profile_legend(j))
+                           cnt,s% pg% Summary_Profile_legend(j))
                end if
             end do
             call pgunsa
 
-         call show_pgstar_decorator(s%id, s% summary_profile_use_decorator, &
-               s% summary_profile_pgstar_decorator, 0, ierr)
+         call show_pgstar_decorator(s%id, s% pg% summary_profile_use_decorator, &
+               s% pg% summary_profile_pgstar_decorator, 0, ierr)
 
 
          end subroutine plot

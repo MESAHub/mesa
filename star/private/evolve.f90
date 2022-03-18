@@ -225,6 +225,7 @@
             call set_to_NaN(s% total_energy_change_from_mdot) 
             call set_to_NaN(s% total_energy_end)                  
             call set_to_NaN(s% total_energy_from_diffusion)
+            call set_to_NaN(s% total_energy_from_phase_separation)
             call set_to_NaN(s% total_energy_old)
             call set_to_NaN(s% total_energy_sources_and_sinks)
             call set_to_NaN(s% total_energy_start)           
@@ -315,6 +316,7 @@
          s% num_rotation_solver_steps = 0
          s% have_mixing_info = .false.
          s% rotational_mdot_boost = 0d0
+         s% phase_sep_mixing_mass = -1d0 ! must be negative at start of step
          s% L_for_BB_outer_BC = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
@@ -503,6 +505,7 @@
          use report, only: do_report, set_power_info
          use adjust_mass, only: do_adjust_mass
          use element_diffusion, only: do_element_diffusion, finish_element_diffusion
+         use phase_separation, only: do_phase_separation
          use conv_premix, only: do_conv_premix
          use evolve_support, only: set_current_to_old
          use eps_mdot, only: calculate_eps_mdot
@@ -619,6 +622,21 @@
                   do k=1,s% nz ! for use by energy equation
                      s% eps_pre_mix(k) = (s% eps_pre_mix(k) - s% energy(k)) / dt
                   end do
+               end if
+
+               if(s% do_phase_separation) then
+                  do k=1,s% nz
+                     s% eps_phase_separation(k) = s% energy(k)
+                  end do
+                  call do_phase_separation(s, ierr)
+                  if (failed('do_phase_separation')) return
+                  call set_vars_if_needed(s, dt, 'after phase separation', ierr)
+                  if (failed('set_vars_if_needed after phase separation')) return
+                  do k=1,s% nz ! for use by energy equation
+                     s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+                  end do
+               else
+                  s% crystal_core_boundary_mass = -1d0
                end if
 
                s% okay_to_set_mixing_info = .false. ! no mixing changes in set_vars after this point
@@ -1258,7 +1276,13 @@
                total_energy_from_pre_mixing = &
                   dt*dot_product(s% dm(1:nz), s% eps_pre_mix(1:nz))
             end if
-            
+
+            s% total_energy_from_phase_separation = 0d0
+            if (s% do_phase_separation) then
+               s% total_energy_from_phase_separation = &
+                  dt*dot_product(s% dm(1:nz), s% eps_phase_separation(1:nz))
+            end if
+
             phase2_total_energy_from_mdot = &
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             
@@ -1304,12 +1328,14 @@
             phase1_sources_and_sinks = &
                  phase1_total_energy_from_mdot &
                + total_energy_from_pre_mixing &
+               + s% total_energy_from_phase_separation &
                + s% total_WD_sedimentation_heating &
                + s% total_energy_from_diffusion &
                + s% non_epsnuc_energy_change_from_split_burn
 
             phase2_sources_and_sinks = &
                - total_energy_from_pre_mixing &
+               - s% total_energy_from_phase_separation &
                - s% total_WD_sedimentation_heating &
                - s% total_energy_from_diffusion &
                + phase2_total_energy_from_mdot &
@@ -1455,6 +1481,7 @@
                   
                   expected_sum_cell_others = &
                      - total_energy_from_pre_mixing &
+                     - s% total_energy_from_phase_separation &
                      - s% total_WD_sedimentation_heating &
                      - s% total_energy_from_diffusion
                   expected_sum_cell_sources = &
@@ -1862,7 +1889,7 @@
                s% prev_mesh_have_ST_start_info = .false.
             end if
          end if
-         
+
          if (s% okay_to_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
                call set_start_of_step_info(s, 'before do_mesh', ierr)

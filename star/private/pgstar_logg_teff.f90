@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -49,9 +50,9 @@
          call pgeras()
 
          call do_logg_Teff_Plot(s, id, device_id, &
-            s% logg_Teff_xleft, s% logg_Teff_xright, &
-            s% logg_Teff_ybot, s% logg_Teff_ytop, .false., &
-            s% logg_Teff_title, s% logg_Teff_txt_scale, ierr)
+            s% pg% logg_Teff_xleft, s% pg% logg_Teff_xright, &
+            s% pg% logg_Teff_ybot, s% pg% logg_Teff_ytop, .false., &
+            s% pg% logg_Teff_title, s% pg% logg_Teff_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -76,21 +77,21 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'effective_T', 'log_g', &
             'Teff', 'log g', &
-            s% logg_Teff_Teff_min, s% logg_Teff_Teff_max, &
-            s% logg_Teff_Teff_margin, s% logg_Teff_dTeff_min, &
-            s% logg_Teff_logg_min, s% logg_Teff_logg_max, &
-            s% logg_Teff_logg_margin, s% logg_Teff_dlogg_min, &
-            s% logg_Teff_step_min, s% logg_Teff_step_max, &
+            s% pg% logg_Teff_Teff_min, s% pg% logg_Teff_Teff_max, &
+            s% pg% logg_Teff_Teff_margin, s% pg% logg_Teff_dTeff_min, &
+            s% pg% logg_Teff_logg_min, s% pg% logg_Teff_logg_max, &
+            s% pg% logg_Teff_logg_margin, s% pg% logg_Teff_dlogg_min, &
+            s% pg% logg_Teff_step_min, s% pg% logg_Teff_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_logg_Teff_target_box, s% logg_Teff_target_n_sigma, &
-            s% logg_Teff_target_Teff, s% logg_Teff_target_logg, &
-            s% logg_Teff_target_Teff_sigma, s% logg_Teff_target_logg_sigma, &
-            s% show_logg_Teff_annotation1, &
-            s% show_logg_Teff_annotation2, &
-            s% show_logg_Teff_annotation3, &
-            s% logg_Teff_fname, &
-            s% logg_Teff_use_decorator, &
-            s% logg_Teff_pgstar_decorator, &
+            s% pg% show_logg_Teff_target_box, s% pg% logg_Teff_target_n_sigma, &
+            s% pg% logg_Teff_target_Teff, s% pg% logg_Teff_target_logg, &
+            s% pg% logg_Teff_target_Teff_sigma, s% pg% logg_Teff_target_logg_sigma, &
+            s% pg% show_logg_Teff_annotation1, &
+            s% pg% show_logg_Teff_annotation2, &
+            s% pg% show_logg_Teff_annotation3, &
+            s% pg% logg_Teff_fname, &
+            s% pg% logg_Teff_use_decorator, &
+            s% pg% logg_Teff_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_logg_Teff_Plot
 
