@@ -29,6 +29,7 @@
       use const_def
       use math_lib
       use utils_lib
+      use star_pgstar
       
       implicit none
       
@@ -249,6 +250,8 @@
          ratios_r02, sigmas_r02
       
       ! output controls
+      character (len=256) :: astero_results_directory
+
       logical :: write_best_model_data_for_each_sample
       integer :: num_digits
       character (len=256) :: sample_results_prefix, sample_results_postfix
@@ -465,6 +468,9 @@
          correction_scheme, surf_coef1_name, surf_coef2_name, &
          correction_b, correction_factor, &
          l0_n_obs, &
+
+         astero_results_directory, &
+
          write_best_model_data_for_each_sample, &
          num_digits, &
          sample_results_prefix, sample_results_postfix, &

@@ -29,6 +29,7 @@
       use const_def
       use pgstar_support
       use pgstar_trho_profile
+      use star_pgstar
 
       implicit none
 
@@ -52,9 +53,9 @@
          call pgeras()
 
          call do_Mixing_plot(s, id, device_id, &
-            s% Mixing_xleft, s% Mixing_xright, &
-            s% Mixing_ybot, s% Mixing_ytop, .false., &
-            s% Mixing_title, s% Mixing_txt_scale, ierr)
+            s% pg% Mixing_xleft, s% pg% Mixing_xright, &
+            s% pg% Mixing_ybot, s% pg% Mixing_ytop, .false., &
+            s% pg% Mixing_title, s% pg% Mixing_txt_scale, ierr)
 
          call pgebuf()
 
@@ -73,8 +74,8 @@
          integer, intent(out) :: ierr
          call do_Mixing_panel(s, id, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-            s% Mixing_xaxis_name, s% Mixing_xmin, s% Mixing_xmax, &
-            s% Mixing_xaxis_reversed, s% Mixing_ymin, s% Mixing_ymax, &
+            s% pg% Mixing_xaxis_name, s% pg% Mixing_xmin, s% pg% Mixing_xmax, &
+            s% pg% Mixing_xaxis_reversed, s% pg% Mixing_ymin, s% pg% Mixing_ymax, &
             .false., .true., ierr)
       end subroutine do_Mixing_plot
 
@@ -93,18 +94,18 @@
             xaxis_reversed, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
          call MixDs_plot(s, device_id, &
-            s% Mixing_win_flag, s% Mixing_file_flag, &
-            s% do_Mixing_win, s% do_Mixing_file, &
-            s% id_Mixing_win, s% id_Mixing_file, s% Mixing_file_interval, &
-            s% Mixing_file_dir, s% Mixing_file_prefix, &
-            s% show_Mixing_annotation1, s% show_Mixing_annotation2, &
-            s% show_Mixing_annotation3, &
+            s% pg% Mixing_win_flag, s% pg% Mixing_file_flag, &
+            s% pg% do_Mixing_win, s% pg% do_Mixing_file, &
+            s% pg% id_Mixing_win, s% pg% id_Mixing_file, s% pg% Mixing_file_interval, &
+            s% pg% Mixing_file_dir, s% pg% Mixing_file_prefix, &
+            s% pg% show_Mixing_annotation1, s% pg% show_Mixing_annotation2, &
+            s% pg% show_Mixing_annotation3, &
             xaxis_name, xmin, xmax, xaxis_reversed, &
-            ymin, ymax, s% Mixing_dymin, &
-            s% Mixing_win_width, s% Mixing_win_aspect_ratio, &
-            s% prev_Mixing_win_width, s% prev_Mixing_win_ratio, &
-            s% Mixing_file_width, s% Mixing_file_aspect_ratio, &
-            s% prev_Mixing_file_width, s% prev_Mixing_file_ratio, &
+            ymin, ymax, s% pg% Mixing_dymin, &
+            s% pg% Mixing_win_width, s% pg% Mixing_win_aspect_ratio, &
+            s% pg% prev_Mixing_win_width, s% pg% prev_Mixing_win_ratio, &
+            s% pg% Mixing_file_width, s% pg% Mixing_file_aspect_ratio, &
+            s% pg% prev_Mixing_file_width, s% pg% prev_Mixing_file_ratio, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
             panel_flag, xaxis_numeric_labels_flag, ierr)
       end subroutine do_Mixing_panel
@@ -346,7 +347,7 @@
             end if
             call show_left_yaxis_label_pgstar(s,'log D (cm\u2\d s\u-1\d)')
 
-            call pgsch(txt_scale*s% Mixing_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Mixing_legend_txt_scale_factor)
             
             if (rotation) then
             
@@ -360,7 +361,7 @@
                   call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
                   call pgslw(lw_sav)               
                   
-               else if (.not. s% Mixing_show_rotation_details) then
+               else if (.not. s% pg% Mixing_show_rotation_details) then
                
                   do k=grid_min, grid_max
                      yvec(k) = safe_log10( &
@@ -378,7 +379,7 @@
                   
                end if
             
-               if (s% Mixing_show_rotation_details) then
+               if (s% pg% Mixing_show_rotation_details) then
 
                   D_DSI_factor = s% D_DSI_factor
                   D_SH_factor = s% D_SH_factor
@@ -492,7 +493,7 @@
             call pgsvp(legend_xmin, legend_xmax, legend_ymin, legend_ymax)
             call pgswin(0.0, 1.0, ymin, ymax)
             number_of_legend_lines = 6
-            if (rotation .and. s% Mixing_show_rotation_details) &
+            if (rotation .and. s% pg% Mixing_show_rotation_details) &
                   number_of_legend_lines = number_of_legend_lines + 7
             cnt = 1
             cnt = mixing_line_legend(cnt, clr_convection, &
@@ -520,7 +521,7 @@
                cnt = mixing_line_legend(cnt, clr_rayleigh_taylor, &
                   lw, lw_sav, txt_scale, 'RTI')
             end if
-            if (rotation .and. s% Mixing_show_rotation_details) then
+            if (rotation .and. s% pg% Mixing_show_rotation_details) then
                cnt = mixing_line_legend(cnt, clr_IndianRed, &
                   lw, lw_sav, txt_scale, 'ST')
                cnt = mixing_line_legend(cnt, clr_Silver, &
@@ -539,7 +540,7 @@
             
             call pgunsa
 
-            call show_pgstar_decorator(s%id,s% mixing_use_decorator,s% mixing_pgstar_decorator, 0, ierr)
+            call show_pgstar_decorator(s%id,s% pg% mixing_use_decorator,s% pg% mixing_pgstar_decorator, 0, ierr)
 
          end subroutine plot
 
@@ -561,7 +562,7 @@
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
             call pgsci(1)
-            call pgsch(txt_scale*s% Mixing_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Mixing_legend_txt_scale_factor)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, trim(str))
             mixing_line_legend = cnt + 1
          end function mixing_line_legend

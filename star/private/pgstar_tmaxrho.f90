@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -49,9 +50,9 @@
          call pgeras()
 
          call do_TmaxRho_Plot(s, id, device_id, &
-            s% TmaxRho_xleft, s% TmaxRho_xright, &
-            s% TmaxRho_ybot, s% TmaxRho_ytop, .false., &
-            s% TmaxRho_title, s% TmaxRho_txt_scale, ierr)
+            s% pg% TmaxRho_xleft, s% pg% TmaxRho_xright, &
+            s% pg% TmaxRho_ybot, s% pg% TmaxRho_ytop, .false., &
+            s% pg% TmaxRho_title, s% pg% TmaxRho_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -75,19 +76,19 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'log_center_Rho', 'log_max_T', &
             'log Rho\dc\u (g cm\u-3\d)', 'log T\dmax\u (K)', &
-            s% TmaxRho_logRho_min, s% TmaxRho_logRho_max, &
-            s% TmaxRho_logRho_margin, s% TmaxRho_logRho_dlogRho_min, &
-            s% TmaxRho_logT_min, s% TmaxRho_logT_max, &
-            s% TmaxRho_logT_margin, s% TmaxRho_logT_dlogT_min, &
-            s% TmaxRho_step_min, s% TmaxRho_step_max, &
+            s% pg% TmaxRho_logRho_min, s% pg% TmaxRho_logRho_max, &
+            s% pg% TmaxRho_logRho_margin, s% pg% TmaxRho_logRho_dlogRho_min, &
+            s% pg% TmaxRho_logT_min, s% pg% TmaxRho_logT_max, &
+            s% pg% TmaxRho_logT_margin, s% pg% TmaxRho_logT_dlogT_min, &
+            s% pg% TmaxRho_step_min, s% pg% TmaxRho_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
             .false., 0, 0.0, 0.0, 0.0, 0.0, &
-            s% show_TmaxRho_annotation1, &
-            s% show_TmaxRho_annotation2, &
-            s% show_TmaxRho_annotation3, &
-            s% TmaxRho_fname, &
-            s% TmaxRho_use_decorator, &
-            s% TmaxRho_pgstar_decorator, &
+            s% pg% show_TmaxRho_annotation1, &
+            s% pg% show_TmaxRho_annotation2, &
+            s% pg% show_TmaxRho_annotation3, &
+            s% pg% TmaxRho_fname, &
+            s% pg% TmaxRho_use_decorator, &
+            s% pg% TmaxRho_pgstar_decorator, &
             do_degeneracy_line, ierr)
       end subroutine do_TmaxRho_Plot
 
@@ -99,7 +100,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (.not. s% show_TmaxRho_degeneracy_line) return
+         if (.not. s% pg% show_TmaxRho_degeneracy_line) return
          call pgsave
          call pgsci(clr_Gray)
          call pgsls(Line_Type_Dash)

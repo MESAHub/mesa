@@ -42,7 +42,6 @@
          character(len=*),dimension(:),intent(in) :: fnames 
          character(len=strlen) :: fname
          type (lgt_list), pointer :: thead =>null()
-         character(len=strlen),dimension(:),pointer :: col_names=>null()
          
          integer, intent(out) :: ierr
          integer :: i
@@ -81,10 +80,8 @@
                ierr=-1
                return
             end if
-         
-            col_names => thead_all(i)%color_names
             
-            call init_colors(fname,thead,col_names,thead_all(i)%n_colors,ierr)
+            call init_colors(fname,thead,thead_all(i)%color_names,thead_all(i)%n_colors,ierr)
 
             thead_all(i)%thead=>thead
             bc_total_num_colors=bc_total_num_colors+thead_all(i)%n_colors
@@ -100,7 +97,7 @@
          integer, intent(out) :: ierr
          character(len=*),intent(in) :: fname
          type (lgt_list), pointer :: thead 
-         character(len=*),dimension(:),pointer :: col_names
+         character(len=*),dimension(:) :: col_names
          integer, intent(in) :: n_colors
          call Read_Colors_Data(fname, thead, col_names, n_colors, ierr) 
       end subroutine init_colors
@@ -217,34 +214,41 @@
          type (lgt_list), pointer :: tlist => null()
          type (lgz_list), pointer :: zlist => null()
          real(dp), dimension(max_num_bcs_per_file) :: colors
-         character(len=*),dimension(:),pointer,intent(inout) :: col_names
-         
-         
-         character(len=strlen) :: tmp
+         character(len=*),dimension(:),intent(out) :: col_names
+         character(len=256) :: tmp_cols(3+n_colors)
+
+         character(len=4096) :: tmp
          integer :: num_entries, num_made, IO_UBV
          
          include 'formats'
          
-         ! Try local folder first
+              ! Try local folder first
          open(NEWUNIT=IO_UBV, FILE=trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ios)
          if(ios/=0) THEN
             ! Try colors data dir
             open(NEWUNIT=IO_UBV, FILE=trim(mesa_data_dir)//'/colors_data/'//trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ios)
             if (ios /= 0) then ! failed to open lcb98cor.dat
                write(*,*) 'colors_init: failed to open ' // trim(fname)
-               write(*,*) trim(mesa_data_dir)//'/colors_data/'//trim(fname)
-               write(*,*) 'please check the path to the mesa data directory'
+               write(*,*) 'or ',trim(mesa_data_dir)//'/colors_data/'//trim(fname)
+               write(*,*)
+               write(*,*) 'Please check that the file exists in your local work directory'
+               write(*,*) 'or in ',trim(mesa_data_dir)//'/colors_data/'
                ierr = 1; return
             endif
          end if
          
-         
          ierr = 0
          num_entries = 0
          cnt = 0
+         tmp = ''
          !First line should be a header and containing the name of the colours
-         !#teff logg [M/H] col_1 col_2 etc
-         read(IO_UBV,fmt=*,iostat=ios) tmp,tmp,tmp,col_names(1:n_colors)
+         !#teff logg m_div_h col_1 col_2 etc
+         read(IO_UBV,'(a)') tmp
+
+         call split_line(tmp,3+n_colors,tmp_cols)
+      
+         col_names(1:n_colors) = tmp_cols(4:n_colors+3)
+         
          do while (.true.)
             read(IO_UBV,fmt=*,iostat=ios) lgt, lgg, lgz, colors(1:n_colors)
             if (ios /= 0) exit
@@ -318,7 +322,7 @@
          integer, intent(out) :: ierr ! 0 means ok
          type (lgt_list), pointer,intent(inout) :: thead
          character (len=*),intent(in) :: fname
-         character(len=*),dimension(:),pointer :: col_names
+         character(len=*),dimension(:),intent(out) :: col_names
          integer, intent(in) :: n_colors
          
          Call Read_One_Colors_Data(fname, thead, n_colors, col_names, ierr)

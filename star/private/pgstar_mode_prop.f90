@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -50,9 +51,9 @@
          call pgeras()
 
          call do_mode_propagation_plot(s, id, device_id, &
-            s% Mode_Prop_xleft, s% Mode_Prop_xright, &
-            s% Mode_Prop_ybot, s% Mode_Prop_ytop, .false., &
-            s% Mode_Prop_title, s% Mode_Prop_txt_scale, ierr)
+            s% pg% Mode_Prop_xleft, s% pg% Mode_Prop_xright, &
+            s% pg% Mode_Prop_ybot, s% pg% Mode_Prop_ytop, .false., &
+            s% pg% Mode_Prop_title, s% pg% Mode_Prop_txt_scale, ierr)
 
          call pgebuf()
 
@@ -70,9 +71,9 @@
          integer, intent(out) :: ierr
          call do_mode_propagation_panel(s, id, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, &
-            title, txt_scale, s% Mode_Prop_xaxis_name, &
-            s% Mode_Prop_xmin, s% Mode_Prop_xmax, &
-            s% Mode_Prop_xaxis_reversed, .false., .true., ierr)
+            title, txt_scale, s% pg% Mode_Prop_xaxis_name, &
+            s% pg% Mode_Prop_xmin, s% pg% Mode_Prop_xmax, &
+            s% pg% Mode_Prop_xaxis_reversed, .false., .true., ierr)
       end subroutine do_mode_propagation_plot
 
 
@@ -174,16 +175,16 @@
             lg_nu_max = log10(dble(nu_max))
             lg_2pt0_nu_max = log10(dble(2.0*nu_max))
             lg_0pt5_nu_max = log10(dble(0.5*nu_max))
-            lg_nu_max_obs = safe_log10(dble(s% Mode_Prop_nu_max_obs))
+            lg_nu_max_obs = safe_log10(dble(s% pg% Mode_Prop_nu_max_obs))
 
             ymax = max(1.33*lg_2pt0_nu_max, maxval(log_brunt_nu(grid_min:grid_max)))
             ymin = 0.5*lg_0pt5_nu_max
             ymax = ymax + 0.1*(ymax-ymin)
 
-            if (s% Mode_Prop_ymax /= -101) ymax = s% Mode_Prop_ymax
-            if (s% Mode_Prop_ymin /= -101) ymin = s% Mode_Prop_ymin
+            if (s% pg% Mode_Prop_ymax /= -101) ymax = s% pg% Mode_Prop_ymax
+            if (s% pg% Mode_Prop_ymin /= -101) ymin = s% pg% Mode_Prop_ymin
 
-            lw = s% pgstar_lw
+            lw = s% pg% pgstar_lw
             call pgqlw(lw_sav)
 
             call pgsave
@@ -253,8 +254,8 @@
 
             call pgunsa
 
-            call show_pgstar_decorator(s%id,s% mode_prop_use_decorator,&
-               s% mode_prop_pgstar_decorator, 0, ierr)
+            call show_pgstar_decorator(s%id,s% pg% mode_prop_use_decorator,&
+               s% pg% mode_prop_pgstar_decorator, 0, ierr)
 
 
          end subroutine plot

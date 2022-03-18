@@ -29,6 +29,7 @@
       use math_lib
       use const_def
       use rates_def, only: screen_info
+      use math_def
    
       implicit none
       private
@@ -64,42 +65,11 @@
    
       real(dp), parameter :: h0fitlim = 300d0, h0fit0 = 295d0
       real(dp), parameter :: deltah0fit = h0fitlim - h0fit0
-   
-      real(dp), dimension(:), allocatable :: z13 ! Z^1/3
-      logical :: have_initialization = .false.
-   
-   
-      public  eval_screen_chugunov, screen_chugunov_init, free_chugunov
+      
+      public  eval_screen_chugunov
    
    contains
    
-
-      subroutine screen_chugunov_init()
-         integer :: i
-      
-         if(have_initialization) return
-!$omp critical  (omp_critical_screen_chugunov_init)
-         if(.not. have_initialization) then
-            allocate(z13(0:150))
-            do i=lbound(z13,dim=1), ubound(z13,dim=1)
-               z13(i) = pow(i*1d0,x13)
-            end do
-            have_initialization = .true.
-         end if
-!$omp end critical  (omp_critical_screen_chugunov_init) 
-      
-      end subroutine  screen_chugunov_init
-   
-
-      subroutine free_chugunov()
-
-!$omp critical  (omp_critical_screen_free_chugunov)
-         if(allocated(z13)) deallocate(z13)
-         have_initialization = .false.
-!$omp end critical  (omp_critical_screen_free_chugunov)
-
-      end subroutine free_chugunov
-
    
       subroutine eval_screen_chugunov(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
          implicit none
@@ -170,8 +140,8 @@
          !a_e = pow((3.d0 /(pi4 * zbar * ntot)),x13)
          a_e = sc% a_e
 
-         a_1 = a_e * z13(int(z1)) !pow(z1,x13)
-         a_2 = a_e * z13(int(z2)) !pow(z2,x13)
+         a_1 = a_e * pre_z(int(z1))%z1_3 !pow(z1,x13)
+         a_2 = a_e * pre_z(int(z2))%z1_3 !pow(z2,x13)
          
          da_1dd = -x13 * a_1/rho
          da_2dd = -x13 * a_2/rho

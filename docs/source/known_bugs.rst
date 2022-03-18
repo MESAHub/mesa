@@ -38,13 +38,34 @@ each MESA run.
 
 See `gh-360 <https://github.com/MESAHub/mesa/issues/360>`_
 
-
+  
 Atmosphere in pulse data
 ------------------------
 
 The control ``add_atmosphere_to_pulse_data`` does not work properly with an Eddington atmosphere (the default), and also crashes if ``atm_T_tau_opacity = 'varying'`` is set. 
 
 See `gh-375 <https://github.com/MESAHub/mesa/issues/375>`_
+
+
+Colors: bad filter name
+-----------------------
+
+If you get an error:
+
+.. code-block:: shell
+
+    bad filter name: 
+
+First check that the name matches in your history_coloumns.list file and your color file. Next check for non-printing characters history_coloumns.list in the filter name. This can bee checked with:
+
+.. code-block:: shell
+
+    cat -A history_columns.list | grep "abs_mag"
+
+Finally, there is a bug if you name the any coloumn with either ``[]`` charcters in there (for instance ``[Fe/H]``). The solution is to rename the column to remove the square brackets.
+
+See `gh-379 <https://github.com/MESAHub/mesa/issues/379>`_
+
 
 
 r15140

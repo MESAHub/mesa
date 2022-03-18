@@ -171,8 +171,10 @@ contains
     ! If necessary, write an FGONG file
          
     if (write_fgong_for_each_model) then
-       
-       filename = TRIM(fgong_prefix)//TRIM(num_string(s%model_number))//TRIM(fgong_postfix)
+
+       if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+
+       filename = TRIM(astero_results_directory) // '/' // TRIM(fgong_prefix)//TRIM(num_string(s%model_number))//TRIM(fgong_postfix)
 
        call star_export_pulse_data(s%id, 'FGONG', filename, &
             add_center_point, keep_surface_point, add_atmosphere, ierr)
@@ -210,7 +212,9 @@ contains
          
     if (write_gyre_for_each_model) then
 
-       filename = TRIM(gyre_prefix)//TRIM(num_string(s%model_number))//TRIM(gyre_postfix)
+       if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+
+       filename = TRIM(astero_results_directory) // '/' // TRIM(gyre_prefix)//TRIM(num_string(s%model_number))//TRIM(gyre_postfix)
 
        call star_write_pulse_data(s%id, 'GYRE', filename, &
             global_data, point_data, ierr)

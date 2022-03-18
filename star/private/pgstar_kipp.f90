@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -49,9 +50,9 @@
          call pgeras()
 
          call do_Kipp_Plot(s, id, device_id, &
-            s% Kipp_xleft, s% Kipp_xright, &
-            s% Kipp_ybot, s% Kipp_ytop, .false., &
-            s% Kipp_title, s% Kipp_txt_scale, ierr)
+            s% pg% Kipp_xleft, s% pg% Kipp_xright, &
+            s% pg% Kipp_ybot, s% pg% Kipp_ytop, .false., &
+            s% pg% Kipp_title, s% pg% Kipp_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -125,26 +126,26 @@
          max_mix_type_to_show = thermohaline_mixing
          showed_this_mix_type = .false.
 
-         step_min = s% Kipp_step_xmin
+         step_min = s% pg% Kipp_step_xmin
          if (step_min <= 0) step_min = 1
-         step_max = s% Kipp_step_xmax
+         step_max = s% pg% Kipp_step_xmax
          if (step_max <= 0 .or. step_max > s% model_number) step_max = s% model_number
 
          if (step_min >= s% model_number) step_min = 1
 
-         if (s% Kipp_max_width > 0) &
-            step_min = max(step_min, step_max - s% Kipp_max_width)
+         if (s% pg% Kipp_max_width > 0) &
+            step_min = max(step_min, step_max - s% pg% Kipp_max_width)
 
          n = count_hist_points(s, step_min, step_max)
          if (n <= 1) return
          step_min = max(step_min, step_max-n+1)
 
-         call integer_dict_lookup(s% history_names_dict, s% kipp_xaxis_name, ix, ierr)
+         call integer_dict_lookup(s% history_names_dict, s% pg% kipp_xaxis_name, ix, ierr)
          if (ierr /= 0) ix = -1
          if (ix <= 0) then
             write(*,'(A)')
             write(*,*) 'ERROR: failed to find ' // &
-               trim(s% kipp_xaxis_name) // ' in kipp data'
+               trim(s% pg% kipp_xaxis_name) // ' in kipp data'
             write(*,'(A)')
             ierr = -1
          end if
@@ -170,46 +171,46 @@
 
          call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
          if (ierr /= 0) then
-            write(*,*) 'pgstar get_hist_points failed ' // trim(s% kipp_xaxis_name)
+            write(*,*) 'pgstar get_hist_points failed ' // trim(s% pg% kipp_xaxis_name)
             call dealloc
             ierr = 0
             return
          end if
 
-         if (s% kipp_xaxis_in_seconds .and. s% kipp_xaxis_name=='star_age')THEN
+         if (s% pg% kipp_xaxis_in_seconds .and. s% pg% kipp_xaxis_name=='star_age')THEN
             do k=1,n
                xvec(k) = xvec(k)*secyer
             end do
-         else if (s% kipp_xaxis_in_Myr .and. s% kipp_xaxis_name=='star_age')THEN
+         else if (s% pg% kipp_xaxis_in_Myr .and. s% pg% kipp_xaxis_name=='star_age')THEN
             do k=1,n
                xvec(k) = xvec(k)*1d-6
             end do
          end if
 
          now=xvec(n)
-         if (s% kipp_xaxis_time_from_present .and. s% kipp_xaxis_name=='star_age') then
+         if (s% pg% kipp_xaxis_time_from_present .and. s% pg% kipp_xaxis_name=='star_age') then
             do k=1,n
                xvec(k) = xvec(k)-now
             end do
          end if
 
-         if (s% kipp_xaxis_log) then
+         if (s% pg% kipp_xaxis_log) then
             do k=1,n
                xvec(k) = log10(max(tiny(xvec(k)),abs(xvec(k))))
             end do
          end if
 
-         if(s% kipp_xmin<-100d0) s% kipp_xmin=xvec(1)
-         if(s% kipp_xmax<-100d0) s% kipp_xmax=xvec(n)
+         if(s% pg% kipp_xmin<-100d0) s% pg% kipp_xmin=xvec(1)
+         if(s% pg% kipp_xmax<-100d0) s% pg% kipp_xmax=xvec(n)
 
-         xmin=max(s% kipp_xmin,xvec(1))
-         xmax=min(s% kipp_xmax,xvec(n))
+         xmin=max(s% pg% kipp_xmin,xvec(1))
+         xmax=min(s% pg% kipp_xmax,xvec(n))
          
-         burn_type_cutoff = s% Kipp_burn_type_cutoff
+         burn_type_cutoff = s% pg% Kipp_burn_type_cutoff
 
          call set_xleft_xright( &
-            n, xvec, xmin, xmax, s% kipp_xmargin, &
-            s% kipp_xaxis_reversed, dxmin, xleft, xright)
+            n, xvec, xmin, xmax, s% pg% kipp_xmargin, &
+            s% pg% kipp_xaxis_reversed, dxmin, xleft, xright)
 
          have_star_mass = get1_yvec('star_mass', star_mass)
          if (.not. have_star_mass) then
@@ -227,7 +228,7 @@
             star_M_center(:) = 0
          end if
 
-         if (s% Kipp_show_luminosities) then
+         if (s% pg% Kipp_show_luminosities) then
             have_log_L = get1_yvec('log_L', log_L)
             have_log_Lneu = get1_yvec('log_Lneu', log_Lneu)
             have_log_LH = get1_yvec('log_LH', log_LH)
@@ -239,7 +240,7 @@
             have_log_LHe = .false.
          end if
 
-         if (s% Kipp_show_mass_boundaries) then
+         if (s% pg% Kipp_show_mass_boundaries) then
             have_he_core_mass = get1_yvec('he_core_mass', he_core_mass)
             have_c_core_mass = get1_yvec('c_core_mass', c_core_mass)
             have_o_core_mass = get1_yvec('o_core_mass', o_core_mass)
@@ -260,19 +261,19 @@
          call init_Kipp_plot
          call setup_mass_yaxis
          call plot_total_mass_line
-         if (s% Kipp_show_burn) then
+         if (s% pg% Kipp_show_burn) then
             call plot_burn_data(dx)
-            if (s% Kipp_show_mixing) call plot_mix_data
-         else if (s% Kipp_show_mixing) then
+            if (s% pg% Kipp_show_mixing) call plot_mix_data
+         else if (s% pg% Kipp_show_mixing) then
             call plot_mix_data
          end if
-         if (s% Kipp_show_mass_boundaries) call plot_mass_lines
-         if (s% Kipp_show_luminosities) call plot_L_lines
+         if (s% pg% Kipp_show_mass_boundaries) call plot_mass_lines
+         if (s% pg% Kipp_show_luminosities) call plot_L_lines
 
          call show_annotations(s, &
-            s% show_Kipp_annotation1, &
-            s% show_Kipp_annotation2, &
-            s% show_Kipp_annotation3)
+            s% pg% show_Kipp_annotation1, &
+            s% pg% show_Kipp_annotation2, &
+            s% pg% show_Kipp_annotation3)
 
          call pgsch(txt_scale)
          call finish_Kipp_plot
@@ -307,29 +308,29 @@
 
          subroutine finish_Kipp_plot
             character(len=256) :: xlabel
-            if (s% Kipp_show_luminosities) then
+            if (s% pg% Kipp_show_luminosities) then
                call setup_L_yaxis
                call show_box_pgstar(s,'','CMSTV')
                call show_right_yaxis_label_pgstar(s,'log (L\d\(2281)\u)')
             end if
             call setup_mass_yaxis
-            if (s% Kipp_show_luminosities) then
+            if (s% pg% Kipp_show_luminosities) then
                call show_box_pgstar(s,'BCNST1','BNSTV1')
             else
                call show_box_pgstar(s,'BCNST1','BCNMSTV1')
             end if
 
             xlabel=''
-            if (s% kipp_xaxis_log) then
-               xlabel='log '// s% kipp_xaxis_name
+            if (s% pg% kipp_xaxis_log) then
+               xlabel='log '// s% pg% kipp_xaxis_name
             else
-               xlabel=s% kipp_xaxis_name
+               xlabel=s% pg% kipp_xaxis_name
                end if
 
-            if (s% kipp_xaxis_name =='star_age') then
-               if (s% kipp_xaxis_in_seconds) then
+            if (s% pg% kipp_xaxis_name =='star_age') then
+               if (s% pg% kipp_xaxis_in_seconds) then
                   xlabel=trim(xlabel)//' (s)'
-               else if (s% Kipp_xaxis_in_Myr) then
+               else if (s% pg% Kipp_xaxis_in_Myr) then
                   xlabel=trim(xlabel)//' (Myr)'
                else
                   xlabel=trim(xlabel)//' (yr)'
@@ -347,7 +348,7 @@
             call show_mix_legend
             call show_burn_legend
             
-            call show_pgstar_decorator(s%id, s% kipp_use_decorator,s% kipp_pgstar_decorator, 0, ierr)
+            call show_pgstar_decorator(s%id, s% pg% kipp_use_decorator,s% pg% kipp_pgstar_decorator, 0, ierr)
 
             
          end subroutine finish_Kipp_plot
@@ -368,11 +369,11 @@
             if (have_log_LH) ymax = max(ymax, maxval(log_LH))
             if (have_log_LHe) ymax = max(ymax, maxval(log_LHe))
             if (ymax <= ymin) ymax = ymin+1
-            if (s% Kipp_lgL_min /= -101d0) ymin = s% Kipp_lgL_min
-            if (s% Kipp_lgL_max /= -101d0) ymax = s% Kipp_lgL_max
+            if (s% pg% Kipp_lgL_min /= -101d0) ymin = s% pg% Kipp_lgL_min
+            if (s% pg% Kipp_lgL_max /= -101d0) ymax = s% pg% Kipp_lgL_max
             dy = ymax - ymin
-            if (s% Kipp_lgL_min /= -101d0) ymin = ymin - s% Kipp_lgL_margin*dy
-            if (s% Kipp_lgL_max /= -101d0) ymax = ymax + s% Kipp_lgL_margin*dy
+            if (s% pg% Kipp_lgL_min /= -101d0) ymin = ymin - s% pg% Kipp_lgL_margin*dy
+            if (s% pg% Kipp_lgL_max /= -101d0) ymax = ymax + s% pg% Kipp_lgL_margin*dy
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
             call pgsci(1)
@@ -383,14 +384,14 @@
 
          subroutine setup_mass_yaxis
             real :: dy, ymin, ymax
-            ymax = s% Kipp_mass_max
+            ymax = s% pg% Kipp_mass_max
             if (ymax <= 0) ymax = maxval(star_mass)
-            ymin = s% Kipp_mass_min
+            ymin = s% pg% Kipp_mass_min
             if (ymin < 0) ymin = minval(star_M_center)
             if (ymax <= ymin) ymax = ymin+1
             dy = ymax - ymin
-            if (s% Kipp_mass_min /= -101d0) ymin = ymin - s% Kipp_mass_margin*dy
-            if (s% Kipp_mass_max /= -101d0) ymax = ymax + s% Kipp_mass_margin*dy
+            if (s% pg% Kipp_mass_min /= -101d0) ymin = ymin - s% pg% Kipp_mass_margin*dy
+            if (s% pg% Kipp_mass_max /= -101d0) ymax = ymax + s% pg% Kipp_mass_margin*dy
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
             call pgsci(1)
@@ -409,7 +410,7 @@
 
             include 'formats'
 
-            if (.not. s% Kipp_show_burn) return
+            if (.not. s% pg% Kipp_show_burn) return
             i_burn_type_first = 0
             num_specs = size(s% history_column_spec, dim=1)
             do k = 1, num_specs
@@ -430,7 +431,7 @@
 
             burn_max = 0.1
             burn_min = -0.1
-            pg => s% pgstar_hist
+            pg => s% pg% pgstar_hist
             do
                if (.not. associated(pg)) exit
                step = pg% step
@@ -454,8 +455,8 @@
             end do
 
             call pgsave
-            call pgslw(s% Kipp_burn_line_weight)
-            pg => s% pgstar_hist
+            call pgslw(s% pg% Kipp_burn_line_weight)
+            pg => s% pg% pgstar_hist
             xnext = xmax
             do
                if (.not. associated(pg)) exit
@@ -597,7 +598,7 @@
             call pgsci(clr_Gray)
             call pgslw(2)
             call show_left_yaxis_label_pgmtxt_pgstar(s,1.0,1.0,'M\dtotal\u',-0.8)
-            call pgslw(s% pgstar_lw)
+            call pgslw(s% pg% pgstar_lw)
             call plot_mass_line(star_mass)
 
             call pgunsa
@@ -707,7 +708,7 @@
             real, intent(in) :: yvec(:)
             if (any(yvec > 1e-2*ymax_mass_axis)) then
                call pgsave
-               call pgslw(s% Kipp_masses_line_weight)
+               call pgslw(s% pg% Kipp_masses_line_weight)
                call pgline(n, xvec, yvec)
                call pgunsa
             end if
@@ -718,7 +719,7 @@
             real, intent(in) :: yvec(:)
             if (any(yvec > ymin_L_axis)) then
                call pgsave
-               call pgslw(s% Kipp_luminosities_line_weight)
+               call pgslw(s% pg% Kipp_luminosities_line_weight)
                call pgline(n, xvec, yvec)
                call pgunsa
             end if
@@ -755,16 +756,16 @@
             end do
 
             call pgsave
-            call pgslw(s% Kipp_mix_line_weight)
-            if (.not. associated(s% pgstar_hist)) then
-               write(*,*) '.not. associated(s% pgstar_hist)'
+            call pgslw(s% pg% Kipp_mix_line_weight)
+            if (.not. associated(s% pg% pgstar_hist)) then
+               write(*,*) '.not. associated(s% pg% pgstar_hist)'
             end if
-            pg => s% pgstar_hist
+            pg => s% pg% pgstar_hist
             do
                if (.not. associated(pg)) exit
                step = pg% step
                if (step < step_min) exit
-               if (step <= step_max .and. mod(step, s% Kipp_mix_interval) == 0) then
+               if (step <= step_max .and. mod(step, s% pg% Kipp_mix_interval) == 0) then
                   call draw_mix_for_step( &
                      pg, step, i_mix_type_first, i_mix_type_last, real(xvec(step-step_min+1)), &
                      star_mass(step-step_min+1), star_M_center(step-step_min+1))

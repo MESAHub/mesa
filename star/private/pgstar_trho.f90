@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -49,9 +50,9 @@
          call pgeras()
 
          call do_TRho_Plot(s, id, device_id, &
-            s% TRho_xleft, s% TRho_xright, &
-            s% TRho_ybot, s% TRho_ytop, .false., &
-            s% TRho_title, s% TRho_txt_scale, ierr)
+            s% pg% TRho_xleft, s% pg% TRho_xright, &
+            s% pg% TRho_ybot, s% pg% TRho_ytop, .false., &
+            s% pg% TRho_title, s% pg% TRho_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -75,19 +76,19 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'log_center_Rho', 'log_center_T', &
             'log Rho\dc\u (g cm\u-3\d)', 'log T\dc\u (K)', &
-            s% TRho_logRho_min, s% TRho_logRho_max, &
-            s% TRho_logRho_margin, s% TRho_logRho_dlogRho_min, &
-            s% TRho_logT_min, s% TRho_logT_max, &
-            s% TRho_logT_margin, s% TRho_logT_dlogT_min, &
-            s% TRho_step_min, s% TRho_step_max, &
+            s% pg% TRho_logRho_min, s% pg% TRho_logRho_max, &
+            s% pg% TRho_logRho_margin, s% pg% TRho_logRho_dlogRho_min, &
+            s% pg% TRho_logT_min, s% pg% TRho_logT_max, &
+            s% pg% TRho_logT_margin, s% pg% TRho_logT_dlogT_min, &
+            s% pg% TRho_step_min, s% pg% TRho_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
             .false., 0, 0.0, 0.0, 0.0, 0.0, &
-            s% show_TRho_annotation1, &
-            s% show_TRho_annotation2, &
-            s% show_TRho_annotation3, &
-            s% TRho_fname, &
-            s% TRho_use_decorator, &
-            s% TRho_pgstar_decorator, &
+            s% pg% show_TRho_annotation1, &
+            s% pg% show_TRho_annotation2, &
+            s% pg% show_TRho_annotation3, &
+            s% pg% TRho_fname, &
+            s% pg% TRho_use_decorator, &
+            s% pg% TRho_pgstar_decorator, &
             do_degeneracy_line, ierr)
       end subroutine do_TRho_Plot
 
@@ -99,7 +100,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (.not. s% show_TRho_degeneracy_line) return
+         if (.not. s% pg% show_TRho_degeneracy_line) return
          call pgsave
          call pgsci(clr_Gray)
          call pgsls(Line_Type_Dash)

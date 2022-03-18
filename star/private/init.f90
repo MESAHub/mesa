@@ -641,8 +641,6 @@
          s% how_many_extra_binary_history_columns => null_how_many_extra_binary_history_columns
          s% data_for_extra_binary_history_columns => null_data_for_extra_binary_history_columns
          
-         s% Abundance_pgstar_decorator => null_pgstar_decorator
-
          s% generations = 0
 
          s% nz = 0
@@ -747,7 +745,9 @@
 
          s% len_extra_iwork = 0
          s% len_extra_work = 0
-         
+
+         s% phase_sep_mixing_mass = -1
+
          call init_random(s)
 
       end subroutine set_starting_star_data

@@ -20,19 +20,36 @@ Backwards-incompatible changes
 Module-level changes
 --------------------
 
-Rates
+astero
+------
+
+``&astero_search_controls`` now has an option ``astero_results_directory`` to specify a folder into which all of
+``astero``'s results are saved (like ``log_directory`` in ``star``).  The default is ``outputs``, so if you
+can't seem to find your ``astero`` output, have a look there.
+
+rates
 -----
 
 The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
 due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10**7 K.
 
-Star
+star
 ----
 
 An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
 using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
 More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
 This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
+
+Fixed a combination of bugs whereby the atmosphere data written to pulsation file formats (e.g. FGONG)
+was incorrect or wouldn't work if ``tau_factor`` or ``atm_T_tau_opacity`` differed from their defaults
+(``1.0`` and ``'fixed'``, respectively).
+
+pgstar
+------
+
+Due to re-organisation of the star_type derived type, all pgstar controls have been moved into a seperate pgstar derived type.
+If you access a pgstar option ``XX`` in your ``run_star_extras.f90`` then you need to replace ``s% XX`` with ``s% pg% XX``.
 
 
 Changes in r21.12.1

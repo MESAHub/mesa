@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -49,9 +50,9 @@
          call pgeras()
 
          call do_logg_logT_Plot(s, id, device_id, &
-            s% logg_logT_xleft, s% logg_logT_xright, &
-            s% logg_logT_ybot, s% logg_logT_ytop, .false., &
-            s% logg_logT_title, s% logg_logT_txt_scale, ierr)
+            s% pg% logg_logT_xleft, s% pg% logg_logT_xright, &
+            s% pg% logg_logT_ybot, s% pg% logg_logT_ytop, .false., &
+            s% pg% logg_logT_title, s% pg% logg_logT_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -76,21 +77,21 @@
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             'log_Teff', 'log_g', &
             'logT', 'log g', &
-            s% logg_logT_logT_min, s% logg_logT_logT_max, &
-            s% logg_logT_logT_margin, s% logg_logT_dlogT_min, &
-            s% logg_logT_logg_min, s% logg_logT_logg_max, &
-            s% logg_logT_logg_margin, s% logg_logT_dlogg_min, &
-            s% logg_logT_step_min, s% logg_logT_step_max, &
+            s% pg% logg_logT_logT_min, s% pg% logg_logT_logT_max, &
+            s% pg% logg_logT_logT_margin, s% pg% logg_logT_dlogT_min, &
+            s% pg% logg_logT_logg_min, s% pg% logg_logT_logg_max, &
+            s% pg% logg_logT_logg_margin, s% pg% logg_logT_dlogg_min, &
+            s% pg% logg_logT_step_min, s% pg% logg_logT_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_logg_logT_target_box, s% logg_logT_target_n_sigma, &
-            s% logg_logT_target_logT, s% logg_logT_target_logg, &
-            s% logg_logT_target_logT_sigma, s% logg_logT_target_logg_sigma, &
-            s% show_logg_logT_annotation1, &
-            s% show_logg_logT_annotation2, &
-            s% show_logg_logT_annotation3, &
-            s% logg_logT_fname, &
-            s% logg_logT_use_decorator, &
-            s% logg_logT_pgstar_decorator, &
+            s% pg% show_logg_logT_target_box, s% pg% logg_logT_target_n_sigma, &
+            s% pg% logg_logT_target_logT, s% pg% logg_logT_target_logg, &
+            s% pg% logg_logT_target_logT_sigma, s% pg% logg_logT_target_logg_sigma, &
+            s% pg% show_logg_logT_annotation1, &
+            s% pg% show_logg_logT_annotation2, &
+            s% pg% show_logg_logT_annotation3, &
+            s% pg% logg_logT_fname, &
+            s% pg% logg_logT_use_decorator, &
+            s% pg% logg_logT_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_logg_logT_Plot
 
