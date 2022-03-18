@@ -24,10 +24,10 @@ Rates
 -----
 
 The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
-due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10**7 K.
+due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10^7 K.
 
 The ability to set the rates preferences has been removed. This added alot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
-From now on we excusivily use NACRE for any rate that cares about temperatures below 10**7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
+From now on we excusivily use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
 from CF88 (if they aren't in REACLIB or NACRE). 
 
 The options ``set_rates_preferences``, ``new_rates_preference``, and ``set_rate_c1212`` have been removed without replacements.
@@ -55,7 +55,11 @@ replaces the previous:
 option.
 
 As part of this new scheme we now ship a set of rates from NACREII `Xu et al 2013 <https://ui.adsabs.harvard.edu/abs/2013cgrs.conf..617X/abstract>`_. These rates do not, by default,
-override the default NACRE rates.
+override the default NACRE rates. You must explicity ask for them with ``filename_of_special_rate``.
+
+There is now a new hook ``other_rate_get`` to provide a simple way to change an existing rate in a ``run_star_extras.f90``. Note this hook
+only works on rates that are NOT currently in your rates_cache. 
+
 
 .. note::
 
