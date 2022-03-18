@@ -110,6 +110,7 @@
          s% L_surf_old = s% L_surf
          s% dt_limit_ratio_old = s% dt_limit_ratio
          s% gradT_excess_alpha_old = s% gradT_excess_alpha
+         s% crystal_core_boundary_mass_old = s% crystal_core_boundary_mass
 
          do j = 1, s% len_extra_work
             s% extra_work_old(j) = s% extra_work(j)
@@ -183,7 +184,8 @@
          s% L_surf = s% L_surf_old
          s% dt_limit_ratio = s% dt_limit_ratio_old
          s% gradT_excess_alpha = s% gradT_excess_alpha_old
-         
+         s% crystal_core_boundary_mass = s% crystal_core_boundary_mass_old
+
          if (.not. s% RSP_flag) then
             if (s% fill_arrays_with_NaNs) then
                call fill_with_NaNs_2d(s% xh)

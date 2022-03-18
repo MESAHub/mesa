@@ -117,13 +117,44 @@
       
       
       subroutine extras_after_evolve(id, ierr)
+         use astero_def
+         use utils_lib, only: mv
+
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         character (len=256) :: format_string, num_string, basename
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
+
+         ! demonstrate how to move some files generated for each
+         ! sample
+         write(format_string,'( "(i",i2.2,".",i2.2,")" )') num_digits, num_digits
+         write(num_string,format_string) sample_number+1 ! sample number hasn't been incremented yet
+         basename = trim(sample_results_prefix) // trim(num_string)
+         call move(best_model_fgong_filename, '.fgong')
+         call move(best_model_gyre_filename, '.gyre')
+         call move(best_model_profile_filename, '.profile')
+         call move(best_model_save_model_filename, '.mod')
+
+         contains
+
+         subroutine move(filename, extension)
+            character (len=*), intent(in) :: filename, extension
+            character (len=256) :: src, tgt
+
+            src = trim(astero_results_directory) // '/' // trim(filename)
+            tgt = trim(astero_results_directory) // '/' // trim(basename) // extension
+
+            ! file won't exist if sample quit early because of bad chi-squared,
+            ! so skip errors
+            call mv(trim(src), trim(tgt), skip_errors=.true.)
+
+            write(*,*) 'moved ' // trim(src) // ' to ' // trim(tgt)
+         end subroutine move
+
       end subroutine extras_after_evolve
       
 

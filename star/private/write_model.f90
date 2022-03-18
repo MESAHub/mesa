@@ -164,6 +164,9 @@
          if (s% opacity_factor /= 1) then
             write(iounit, 1) 'opacity_factor', s% opacity_factor
          end if
+         if (s% crystal_core_boundary_mass > 0d0) then
+            write(iounit, 1) 'crystal_core_boundary_mass', s% crystal_core_boundary_mass
+         end if
          write(iounit, 1) 'Teff', s% Teff
          write(iounit, 1) 'power_nuc_burn', s% power_nuc_burn
          write(iounit, 1) 'power_h_burn', s% power_h_burn

@@ -2873,6 +2873,8 @@
       !     For a filter named filter1 history output will be bc_filter1 for bolometric corrections
       !     and abs_mag_filter1 for absolute magnitude
 
+      !     Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code 
+
       ! ::
 
     color_num_files = -1

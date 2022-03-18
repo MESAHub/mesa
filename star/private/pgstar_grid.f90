@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -43,21 +44,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid1_xleft, s% Grid1_xright, &
-            s% Grid1_ybot, s% Grid1_ytop, .false., s% Grid1_title, &
-            s% Grid1_txt_scale_factor, &
-            s% Grid1_num_cols, &
-            s% Grid1_num_rows, &
-            s% Grid1_num_plots, &
-            s% Grid1_plot_name, &
-            s% Grid1_plot_row, &
-            s% Grid1_plot_rowspan, &
-            s% Grid1_plot_col, &
-            s% Grid1_plot_colspan, &
-            s% Grid1_plot_pad_left, &
-            s% Grid1_plot_pad_right, &
-            s% Grid1_plot_pad_top, &
-            s% Grid1_plot_pad_bot, &
+            s% pg% Grid1_xleft, s% pg% Grid1_xright, &
+            s% pg% Grid1_ybot, s% pg% Grid1_ytop, .false., s% pg% Grid1_title, &
+            s% pg% Grid1_txt_scale_factor, &
+            s% pg% Grid1_num_cols, &
+            s% pg% Grid1_num_rows, &
+            s% pg% Grid1_num_plots, &
+            s% pg% Grid1_plot_name, &
+            s% pg% Grid1_plot_row, &
+            s% pg% Grid1_plot_rowspan, &
+            s% pg% Grid1_plot_col, &
+            s% pg% Grid1_plot_colspan, &
+            s% pg% Grid1_plot_pad_left, &
+            s% pg% Grid1_plot_pad_right, &
+            s% pg% Grid1_plot_pad_top, &
+            s% pg% Grid1_plot_pad_bot, &
             ierr)
       end subroutine grid1_plot
 
@@ -70,21 +71,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid2_xleft, s% Grid2_xright, &
-            s% Grid2_ybot, s% Grid2_ytop, .false., s% Grid2_title, &
-            s% Grid2_txt_scale_factor, &
-            s% Grid2_num_cols, &
-            s% Grid2_num_rows, &
-            s% Grid2_num_plots, &
-            s% Grid2_plot_name, &
-            s% Grid2_plot_row, &
-            s% Grid2_plot_rowspan, &
-            s% Grid2_plot_col, &
-            s% Grid2_plot_colspan, &
-            s% Grid2_plot_pad_left, &
-            s% Grid2_plot_pad_right, &
-            s% Grid2_plot_pad_top, &
-            s% Grid2_plot_pad_bot, &
+            s% pg% Grid2_xleft, s% pg% Grid2_xright, &
+            s% pg% Grid2_ybot, s% pg% Grid2_ytop, .false., s% pg% Grid2_title, &
+            s% pg% Grid2_txt_scale_factor, &
+            s% pg% Grid2_num_cols, &
+            s% pg% Grid2_num_rows, &
+            s% pg% Grid2_num_plots, &
+            s% pg% Grid2_plot_name, &
+            s% pg% Grid2_plot_row, &
+            s% pg% Grid2_plot_rowspan, &
+            s% pg% Grid2_plot_col, &
+            s% pg% Grid2_plot_colspan, &
+            s% pg% Grid2_plot_pad_left, &
+            s% pg% Grid2_plot_pad_right, &
+            s% pg% Grid2_plot_pad_top, &
+            s% pg% Grid2_plot_pad_bot, &
             ierr)
       end subroutine grid2_plot
 
@@ -97,21 +98,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid3_xleft, s% Grid3_xright, &
-            s% Grid3_ybot, s% Grid3_ytop, .false., s% Grid3_title, &
-            s% Grid3_txt_scale_factor, &
-            s% Grid3_num_cols, &
-            s% Grid3_num_rows, &
-            s% Grid3_num_plots, &
-            s% Grid3_plot_name, &
-            s% Grid3_plot_row, &
-            s% Grid3_plot_rowspan, &
-            s% Grid3_plot_col, &
-            s% Grid3_plot_colspan, &
-            s% Grid3_plot_pad_left, &
-            s% Grid3_plot_pad_right, &
-            s% Grid3_plot_pad_top, &
-            s% Grid3_plot_pad_bot, &
+            s% pg% Grid3_xleft, s% pg% Grid3_xright, &
+            s% pg% Grid3_ybot, s% pg% Grid3_ytop, .false., s% pg% Grid3_title, &
+            s% pg% Grid3_txt_scale_factor, &
+            s% pg% Grid3_num_cols, &
+            s% pg% Grid3_num_rows, &
+            s% pg% Grid3_num_plots, &
+            s% pg% Grid3_plot_name, &
+            s% pg% Grid3_plot_row, &
+            s% pg% Grid3_plot_rowspan, &
+            s% pg% Grid3_plot_col, &
+            s% pg% Grid3_plot_colspan, &
+            s% pg% Grid3_plot_pad_left, &
+            s% pg% Grid3_plot_pad_right, &
+            s% pg% Grid3_plot_pad_top, &
+            s% pg% Grid3_plot_pad_bot, &
             ierr)
       end subroutine grid3_plot
 
@@ -124,21 +125,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid4_xleft, s% Grid4_xright, &
-            s% Grid4_ybot, s% Grid4_ytop, .false., s% Grid4_title, &
-            s% Grid4_txt_scale_factor, &
-            s% Grid4_num_cols, &
-            s% Grid4_num_rows, &
-            s% Grid4_num_plots, &
-            s% Grid4_plot_name, &
-            s% Grid4_plot_row, &
-            s% Grid4_plot_rowspan, &
-            s% Grid4_plot_col, &
-            s% Grid4_plot_colspan, &
-            s% Grid4_plot_pad_left, &
-            s% Grid4_plot_pad_right, &
-            s% Grid4_plot_pad_top, &
-            s% Grid4_plot_pad_bot, &
+            s% pg% Grid4_xleft, s% pg% Grid4_xright, &
+            s% pg% Grid4_ybot, s% pg% Grid4_ytop, .false., s% pg% Grid4_title, &
+            s% pg% Grid4_txt_scale_factor, &
+            s% pg% Grid4_num_cols, &
+            s% pg% Grid4_num_rows, &
+            s% pg% Grid4_num_plots, &
+            s% pg% Grid4_plot_name, &
+            s% pg% Grid4_plot_row, &
+            s% pg% Grid4_plot_rowspan, &
+            s% pg% Grid4_plot_col, &
+            s% pg% Grid4_plot_colspan, &
+            s% pg% Grid4_plot_pad_left, &
+            s% pg% Grid4_plot_pad_right, &
+            s% pg% Grid4_plot_pad_top, &
+            s% pg% Grid4_plot_pad_bot, &
             ierr)
       end subroutine grid4_plot
 
@@ -151,21 +152,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid5_xleft, s% Grid5_xright, &
-            s% Grid5_ybot, s% Grid5_ytop, .false., s% Grid5_title, &
-            s% Grid5_txt_scale_factor, &
-            s% Grid5_num_cols, &
-            s% Grid5_num_rows, &
-            s% Grid5_num_plots, &
-            s% Grid5_plot_name, &
-            s% Grid5_plot_row, &
-            s% Grid5_plot_rowspan, &
-            s% Grid5_plot_col, &
-            s% Grid5_plot_colspan, &
-            s% Grid5_plot_pad_left, &
-            s% Grid5_plot_pad_right, &
-            s% Grid5_plot_pad_top, &
-            s% Grid5_plot_pad_bot, &
+            s% pg% Grid5_xleft, s% pg% Grid5_xright, &
+            s% pg% Grid5_ybot, s% pg% Grid5_ytop, .false., s% pg% Grid5_title, &
+            s% pg% Grid5_txt_scale_factor, &
+            s% pg% Grid5_num_cols, &
+            s% pg% Grid5_num_rows, &
+            s% pg% Grid5_num_plots, &
+            s% pg% Grid5_plot_name, &
+            s% pg% Grid5_plot_row, &
+            s% pg% Grid5_plot_rowspan, &
+            s% pg% Grid5_plot_col, &
+            s% pg% Grid5_plot_colspan, &
+            s% pg% Grid5_plot_pad_left, &
+            s% pg% Grid5_plot_pad_right, &
+            s% pg% Grid5_plot_pad_top, &
+            s% pg% Grid5_plot_pad_bot, &
             ierr)
       end subroutine grid5_plot
 
@@ -178,21 +179,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid6_xleft, s% Grid6_xright, &
-            s% Grid6_ybot, s% Grid6_ytop, .false., s% Grid6_title, &
-            s% Grid6_txt_scale_factor, &
-            s% Grid6_num_cols, &
-            s% Grid6_num_rows, &
-            s% Grid6_num_plots, &
-            s% Grid6_plot_name, &
-            s% Grid6_plot_row, &
-            s% Grid6_plot_rowspan, &
-            s% Grid6_plot_col, &
-            s% Grid6_plot_colspan, &
-            s% Grid6_plot_pad_left, &
-            s% Grid6_plot_pad_right, &
-            s% Grid6_plot_pad_top, &
-            s% Grid6_plot_pad_bot, &
+            s% pg% Grid6_xleft, s% pg% Grid6_xright, &
+            s% pg% Grid6_ybot, s% pg% Grid6_ytop, .false., s% pg% Grid6_title, &
+            s% pg% Grid6_txt_scale_factor, &
+            s% pg% Grid6_num_cols, &
+            s% pg% Grid6_num_rows, &
+            s% pg% Grid6_num_plots, &
+            s% pg% Grid6_plot_name, &
+            s% pg% Grid6_plot_row, &
+            s% pg% Grid6_plot_rowspan, &
+            s% pg% Grid6_plot_col, &
+            s% pg% Grid6_plot_colspan, &
+            s% pg% Grid6_plot_pad_left, &
+            s% pg% Grid6_plot_pad_right, &
+            s% pg% Grid6_plot_pad_top, &
+            s% pg% Grid6_plot_pad_bot, &
             ierr)
       end subroutine grid6_plot
 
@@ -205,21 +206,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid7_xleft, s% Grid7_xright, &
-            s% Grid7_ybot, s% Grid7_ytop, .false., s% Grid7_title, &
-            s% Grid7_txt_scale_factor, &
-            s% Grid7_num_cols, &
-            s% Grid7_num_rows, &
-            s% Grid7_num_plots, &
-            s% Grid7_plot_name, &
-            s% Grid7_plot_row, &
-            s% Grid7_plot_rowspan, &
-            s% Grid7_plot_col, &
-            s% Grid7_plot_colspan, &
-            s% Grid7_plot_pad_left, &
-            s% Grid7_plot_pad_right, &
-            s% Grid7_plot_pad_top, &
-            s% Grid7_plot_pad_bot, &
+            s% pg% Grid7_xleft, s% pg% Grid7_xright, &
+            s% pg% Grid7_ybot, s% pg% Grid7_ytop, .false., s% pg% Grid7_title, &
+            s% pg% Grid7_txt_scale_factor, &
+            s% pg% Grid7_num_cols, &
+            s% pg% Grid7_num_rows, &
+            s% pg% Grid7_num_plots, &
+            s% pg% Grid7_plot_name, &
+            s% pg% Grid7_plot_row, &
+            s% pg% Grid7_plot_rowspan, &
+            s% pg% Grid7_plot_col, &
+            s% pg% Grid7_plot_colspan, &
+            s% pg% Grid7_plot_pad_left, &
+            s% pg% Grid7_plot_pad_right, &
+            s% pg% Grid7_plot_pad_top, &
+            s% pg% Grid7_plot_pad_bot, &
             ierr)
       end subroutine grid7_plot
 
@@ -232,21 +233,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid8_xleft, s% Grid8_xright, &
-            s% Grid8_ybot, s% Grid8_ytop, .false., s% Grid8_title, &
-            s% Grid8_txt_scale_factor, &
-            s% Grid8_num_cols, &
-            s% Grid8_num_rows, &
-            s% Grid8_num_plots, &
-            s% Grid8_plot_name, &
-            s% Grid8_plot_row, &
-            s% Grid8_plot_rowspan, &
-            s% Grid8_plot_col, &
-            s% Grid8_plot_colspan, &
-            s% Grid8_plot_pad_left, &
-            s% Grid8_plot_pad_right, &
-            s% Grid8_plot_pad_top, &
-            s% Grid8_plot_pad_bot, &
+            s% pg% Grid8_xleft, s% pg% Grid8_xright, &
+            s% pg% Grid8_ybot, s% pg% Grid8_ytop, .false., s% pg% Grid8_title, &
+            s% pg% Grid8_txt_scale_factor, &
+            s% pg% Grid8_num_cols, &
+            s% pg% Grid8_num_rows, &
+            s% pg% Grid8_num_plots, &
+            s% pg% Grid8_plot_name, &
+            s% pg% Grid8_plot_row, &
+            s% pg% Grid8_plot_rowspan, &
+            s% pg% Grid8_plot_col, &
+            s% pg% Grid8_plot_colspan, &
+            s% pg% Grid8_plot_pad_left, &
+            s% pg% Grid8_plot_pad_right, &
+            s% pg% Grid8_plot_pad_top, &
+            s% pg% Grid8_plot_pad_bot, &
             ierr)
       end subroutine grid8_plot
 
@@ -259,21 +260,21 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call Grid_plot(s, id, device_id, &
-            s% Grid9_xleft, s% Grid9_xright, &
-            s% Grid9_ybot, s% Grid9_ytop, .false., s% Grid9_title, &
-            s% Grid9_txt_scale_factor, &
-            s% Grid9_num_cols, &
-            s% Grid9_num_rows, &
-            s% Grid9_num_plots, &
-            s% Grid9_plot_name, &
-            s% Grid9_plot_row, &
-            s% Grid9_plot_rowspan, &
-            s% Grid9_plot_col, &
-            s% Grid9_plot_colspan, &
-            s% Grid9_plot_pad_left, &
-            s% Grid9_plot_pad_right, &
-            s% Grid9_plot_pad_top, &
-            s% Grid9_plot_pad_bot, &
+            s% pg% Grid9_xleft, s% pg% Grid9_xright, &
+            s% pg% Grid9_ybot, s% pg% Grid9_ytop, .false., s% pg% Grid9_title, &
+            s% pg% Grid9_txt_scale_factor, &
+            s% pg% Grid9_num_cols, &
+            s% pg% Grid9_num_rows, &
+            s% pg% Grid9_num_plots, &
+            s% pg% Grid9_plot_name, &
+            s% pg% Grid9_plot_row, &
+            s% pg% Grid9_plot_rowspan, &
+            s% pg% Grid9_plot_col, &
+            s% pg% Grid9_plot_colspan, &
+            s% pg% Grid9_plot_pad_left, &
+            s% pg% Grid9_plot_pad_right, &
+            s% pg% Grid9_plot_pad_top, &
+            s% pg% Grid9_plot_pad_bot, &
             ierr)
       end subroutine grid9_plot
 
@@ -445,295 +446,295 @@
             case ('abundance')
                call do_abundance_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
-                  s% Abundance_title, Grid_txt_scale_factor(i)*s% Abundance_txt_scale, ierr)
+                  s% pg% Abundance_title, Grid_txt_scale_factor(i)*s% pg% Abundance_txt_scale, ierr)
             case ('power')
                call do_power_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
-                  s% Power_title, Grid_txt_scale_factor(i)*s% Power_txt_scale, ierr)
+                  s% pg% Power_title, Grid_txt_scale_factor(i)*s% pg% Power_txt_scale, ierr)
             case ('mixing')
                call do_Mixing_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
-                  s% Mixing_title, Grid_txt_scale_factor(i)*s% Mixing_txt_scale, ierr)
+                  s% pg% Mixing_title, Grid_txt_scale_factor(i)*s% pg% Mixing_txt_scale, ierr)
             case ('dynamo')
                call do_Dynamo_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
-                  s% Dynamo_title, Grid_txt_scale_factor(i)*s% Dynamo_txt_scale, ierr)
+                  s% pg% Dynamo_title, Grid_txt_scale_factor(i)*s% pg% Dynamo_txt_scale, ierr)
             case ('trho')
                call do_TRho_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
-                  s% TRho_title, Grid_txt_scale_factor(i)*s% TRho_txt_scale, ierr)
+                  s% pg% TRho_title, Grid_txt_scale_factor(i)*s% pg% TRho_txt_scale, ierr)
             case ('tmaxrho')
                call do_TmaxRho_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
-                  s% TmaxRho_title, Grid_txt_scale_factor(i)*s% TmaxRho_txt_scale, ierr)
+                  s% pg% TmaxRho_title, Grid_txt_scale_factor(i)*s% pg% TmaxRho_txt_scale, ierr)
             case ('mode_prop')
                call do_mode_propagation_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Mode_Prop_title, &
-                  Grid_txt_scale_factor(i)*s% Mode_Prop_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Mode_Prop_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Mode_Prop_txt_scale, ierr)
             case ('summary_burn')
                call do_summary_burn_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Summary_Burn_title, &
-                  Grid_txt_scale_factor(i)*s% Summary_Burn_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Summary_Burn_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Summary_Burn_txt_scale, ierr)
             case ('summary_profile')
                call do_summary_profile_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Summary_Profile_title, &
-                  Grid_txt_scale_factor(i)*s% Summary_Profile_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Summary_Profile_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Summary_Profile_txt_scale, ierr)
             case ('summary_history')
                call do_summary_history_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Summary_History_title, &
-                  Grid_txt_scale_factor(i)*s% Summary_History_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Summary_History_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Summary_History_txt_scale, ierr)
             case ('trho_profile')
                call do_TRho_Profile_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% TRho_Profile_title, &
-                  Grid_txt_scale_factor(i)*s% TRho_Profile_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% TRho_Profile_title, &
+                  Grid_txt_scale_factor(i)*s% pg% TRho_Profile_txt_scale, ierr)
             case ('profile_panels1')
                call do_Profile_Panels1_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels1_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels1_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels1_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels1_txt_scale, ierr)
             case ('profile_panels2')
                call do_Profile_Panels2_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels2_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels2_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels2_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels2_txt_scale, ierr)
             case ('profile_panels3')
                call do_Profile_Panels3_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels3_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels3_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels3_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels3_txt_scale, ierr)
             case ('profile_panels4')
                call do_Profile_Panels4_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels4_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels4_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels4_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels4_txt_scale, ierr)
             case ('profile_panels5')
                call do_Profile_Panels5_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels5_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels5_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels5_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels5_txt_scale, ierr)
             case ('profile_panels6')
                call do_Profile_Panels6_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels6_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels6_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels6_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels6_txt_scale, ierr)
             case ('profile_panels7')
                call do_Profile_Panels7_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels7_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels7_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels7_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels7_txt_scale, ierr)
             case ('profile_panels8')
                call do_Profile_Panels8_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels8_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels8_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels8_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels8_txt_scale, ierr)
             case ('profile_panels9')
                call do_Profile_Panels9_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Profile_Panels9_title, &
-                  Grid_txt_scale_factor(i)*s% Profile_Panels9_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Profile_Panels9_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Profile_Panels9_txt_scale, ierr)
             case ('logg_teff')
                call do_logg_Teff_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% logg_Teff_title, &
-                  Grid_txt_scale_factor(i)*s% logg_Teff_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% logg_Teff_title, &
+                  Grid_txt_scale_factor(i)*s% pg% logg_Teff_txt_scale, ierr)
             case ('logg_logt')
                call do_logg_logT_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% logg_logT_title, &
-                  Grid_txt_scale_factor(i)*s% logg_logT_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% logg_logT_title, &
+                  Grid_txt_scale_factor(i)*s% pg% logg_logT_txt_scale, ierr)
             case ('hr')
                call do_HR_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% HR_title, &
-                  Grid_txt_scale_factor(i)*s% HR_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% HR_title, &
+                  Grid_txt_scale_factor(i)*s% pg% HR_txt_scale, ierr)
             case ('logl_r')
                call do_logL_R_plot( &
-                  s, id, device_id, s% show_logL_photosphere_r, xleft, xright, ybot, ytop, &
-                  grid_subplot, s% logL_R_title, &
-                  Grid_txt_scale_factor(i)*s% logL_R_txt_scale, ierr)
+                  s, id, device_id, s% pg% show_logL_photosphere_r, xleft, xright, ybot, ytop, &
+                  grid_subplot, s% pg% logL_R_title, &
+                  Grid_txt_scale_factor(i)*s% pg% logL_R_txt_scale, ierr)
             case ('logl_v')
                call do_logL_v_plot( &
-                  s, id, device_id, s% show_logL_photosphere_v, xleft, xright, ybot, ytop, &
-                  grid_subplot, s% logL_v_title, &
-                  Grid_txt_scale_factor(i)*s% logL_v_txt_scale, ierr)
+                  s, id, device_id, s% pg% show_logL_photosphere_v, xleft, xright, ybot, ytop, &
+                  grid_subplot, s% pg% logL_v_title, &
+                  Grid_txt_scale_factor(i)*s% pg% logL_v_txt_scale, ierr)
             case ('logl_teff')
                call do_logL_Teff_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% logL_Teff_title, &
-                  Grid_txt_scale_factor(i)*s% logL_Teff_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% logL_Teff_title, &
+                  Grid_txt_scale_factor(i)*s% pg% logL_Teff_txt_scale, ierr)
             case ('l_r')
                call do_L_R_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% L_R_title, &
-                  Grid_txt_scale_factor(i)*s% L_R_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% L_R_title, &
+                  Grid_txt_scale_factor(i)*s% pg% L_R_txt_scale, ierr)
             case ('l_v')
                call do_L_v_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% L_v_title, &
-                  Grid_txt_scale_factor(i)*s% L_v_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% L_v_title, &
+                  Grid_txt_scale_factor(i)*s% pg% L_v_txt_scale, ierr)
             case ('l_teff')
                call do_L_Teff_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% L_Teff_title, &
-                  Grid_txt_scale_factor(i)*s% L_Teff_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% L_Teff_title, &
+                  Grid_txt_scale_factor(i)*s% pg% L_Teff_txt_scale, ierr)
             case ('r_l')
                call do_R_L_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% R_L_title, &
-                  Grid_txt_scale_factor(i)*s% R_L_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% R_L_title, &
+                  Grid_txt_scale_factor(i)*s% pg% R_L_txt_scale, ierr)
             case ('r_teff')
                call do_R_Teff_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% R_Teff_title, &
-                  Grid_txt_scale_factor(i)*s% R_Teff_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% R_Teff_title, &
+                  Grid_txt_scale_factor(i)*s% pg% R_Teff_txt_scale, ierr)
             case ('dpg_dnu')
                call do_dPg_dnu_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% dPg_dnu_title, &
-                  Grid_txt_scale_factor(i)*s% dPg_dnu_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% dPg_dnu_title, &
+                  Grid_txt_scale_factor(i)*s% pg% dPg_dnu_txt_scale, ierr)
             case ('history_panels1')
                call do_History_Panels1_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels1_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels1_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels1_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels1_txt_scale, ierr)
             case ('history_panels2')
                call do_History_Panels2_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels2_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels2_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels2_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels2_txt_scale, ierr)
             case ('history_panels3')
                call do_History_Panels3_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels3_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels3_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels3_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels3_txt_scale, ierr)
             case ('history_panels4')
                call do_History_Panels4_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels4_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels4_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels4_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels4_txt_scale, ierr)
             case ('history_panels5')
                call do_History_Panels5_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels5_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels5_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels5_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels5_txt_scale, ierr)
             case ('history_panels6')
                call do_History_Panels6_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels6_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels6_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels6_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels6_txt_scale, ierr)
             case ('history_panels7')
                call do_History_Panels7_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels7_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels7_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels7_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels7_txt_scale, ierr)
             case ('history_panels8')
                call do_History_Panels8_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels8_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels8_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels8_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels8_txt_scale, ierr)
             case ('history_panels9')
                call do_History_Panels9_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Panels9_title, &
-                  Grid_txt_scale_factor(i)*s% History_Panels9_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Panels9_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Panels9_txt_scale, ierr)
             case ('color_magnitude1')
                call do_Color_Magnitude1_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude1_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude1_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude1_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude1_txt_scale, ierr)
             case ('color_magnitude2')
                call do_Color_Magnitude2_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude2_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude2_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude2_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude2_txt_scale, ierr)
             case ('color_magnitude3')
                call do_Color_Magnitude3_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude3_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude3_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude3_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude3_txt_scale, ierr)
             case ('color_magnitude4')
                call do_Color_Magnitude4_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude4_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude4_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude4_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude4_txt_scale, ierr)
             case ('color_magnitude5')
                call do_Color_Magnitude5_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude5_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude5_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude5_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude5_txt_scale, ierr)
             case ('color_magnitude6')
                call do_Color_Magnitude6_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude6_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude6_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude6_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude6_txt_scale, ierr)
             case ('color_magnitude7')
                call do_Color_Magnitude7_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude7_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude7_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude7_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude7_txt_scale, ierr)
             case ('color_magnitude8')
                call do_Color_Magnitude8_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude8_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude8_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude8_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude8_txt_scale, ierr)
             case ('color_magnitude9')
                call do_Color_Magnitude9_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Color_Magnitude9_title, &
-                  Grid_txt_scale_factor(i)*s% Color_Magnitude9_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude9_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Color_Magnitude9_txt_scale, ierr)
             case ('history_track1')
                call do_History_Track1_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track1_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track1_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track1_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track1_txt_scale, ierr)
             case ('history_track2')
                call do_History_Track2_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track2_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track2_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track2_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track2_txt_scale, ierr)
             case ('history_track3')
                call do_History_Track3_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track3_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track3_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track3_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track3_txt_scale, ierr)
             case ('history_track4')
                call do_History_Track4_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track4_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track4_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track4_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track4_txt_scale, ierr)
             case ('history_track5')
                call do_History_Track5_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track5_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track5_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track5_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track5_txt_scale, ierr)
             case ('history_track6')
                call do_History_Track6_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track6_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track6_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track6_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track6_txt_scale, ierr)
             case ('history_track7')
                call do_History_Track7_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track7_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track7_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track7_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track7_txt_scale, ierr)
             case ('history_track8')
                call do_History_Track8_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track8_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track8_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track8_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track8_txt_scale, ierr)
             case ('history_track9')
                call do_History_Track9_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% History_Track9_title, &
-                  Grid_txt_scale_factor(i)*s% History_Track9_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track9_title, &
+                  Grid_txt_scale_factor(i)*s% pg% History_Track9_txt_scale, ierr)
             case ('kipp')
                call do_Kipp_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Kipp_title, &
-                  Grid_txt_scale_factor(i)*s% Kipp_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Kipp_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Kipp_txt_scale, ierr)
             case ('network')
                call do_Network_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Network_title, &
-                  Grid_txt_scale_factor(i)*s% Network_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Network_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Network_txt_scale, ierr)
             case ('production')
                call do_Production_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Production_title, &
-                  Grid_txt_scale_factor(i)*s% Production_txt_scale, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Production_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Production_txt_scale, ierr)
             case ('text_summary1')
                call do_Text_Summary1_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary1_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary1_txt_scale, s% Text_Summary1_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary1_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary1_txt_scale, s% pg% Text_Summary1_dxval, ierr)
             case ('text_summary2')
                call do_Text_Summary2_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary2_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary2_txt_scale, s% Text_Summary2_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary2_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary2_txt_scale, s% pg% Text_Summary2_dxval, ierr)
             case ('text_summary3')
                call do_Text_Summary3_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary3_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary3_txt_scale, s% Text_Summary3_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary3_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary3_txt_scale, s% pg% Text_Summary3_dxval, ierr)
             case ('text_summary4')
                call do_Text_Summary4_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary4_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary4_txt_scale, s% Text_Summary4_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary4_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary4_txt_scale, s% pg% Text_Summary4_dxval, ierr)
             case ('text_summary5')
                call do_Text_Summary5_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary5_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary5_txt_scale, s% Text_Summary5_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary5_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary5_txt_scale, s% pg% Text_Summary5_dxval, ierr)
             case ('text_summary6')
                call do_Text_Summary6_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary6_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary6_txt_scale, s% Text_Summary6_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary6_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary6_txt_scale, s% pg% Text_Summary6_dxval, ierr)
             case ('text_summary7')
                call do_Text_Summary7_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary7_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary7_txt_scale, s% Text_Summary7_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary7_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary7_txt_scale, s% pg% Text_Summary7_dxval, ierr)
             case ('text_summary8')
                call do_Text_Summary8_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary8_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary8_txt_scale, s% Text_Summary8_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary8_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary8_txt_scale, s% pg% Text_Summary8_dxval, ierr)
             case ('text_summary9')
                call do_Text_Summary9_plot( &
-                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Text_Summary9_title, &
-                  Grid_txt_scale_factor(i)*s% Text_Summary9_txt_scale, s% Text_Summary9_dxval, ierr)
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Text_Summary9_title, &
+                  Grid_txt_scale_factor(i)*s% pg% Text_Summary9_txt_scale, s% pg% Text_Summary9_dxval, ierr)
             case default
                ! check for "other" plot
                found_it = .false.
                do j = 1, max_num_Other_plots
                   plot_id = i_Other + j - 1
-                  p => s% pgstar_win_file_ptr(plot_id)
+                  p => s% pg% pgstar_win_file_ptr(plot_id)
                   if (p% okay_to_call_do_plot_in_grid .and. &
                         StrLowCase(p% name) == StrLowCase(Grid_plot_name(i))) then
                      call p% do_plot_in_grid( &

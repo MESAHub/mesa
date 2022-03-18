@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -51,9 +52,9 @@
          call pgeras()
 
          call do_Dynamo_plot(s, id, device_id, &
-            s% Dynamo_xleft, s% Dynamo_xright, &
-            s% Dynamo_ybot, s% Dynamo_ytop, .false., &
-            s% Dynamo_title, s% Dynamo_txt_scale, ierr)
+            s% pg% Dynamo_xleft, s% pg% Dynamo_xright, &
+            s% pg% Dynamo_ybot, s% pg% Dynamo_ytop, .false., &
+            s% pg% Dynamo_title, s% pg% Dynamo_txt_scale, ierr)
 
          call pgebuf()
 
@@ -72,9 +73,9 @@
          integer, intent(out) :: ierr
          call do_Dynamo_panel(s, id, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, &
-            title, txt_scale, s% Dynamo_xaxis_name, &
-            s% Dynamo_xmin, s% Dynamo_xmax, &
-            s% Dynamo_xaxis_reversed, .false., .true., ierr)
+            title, txt_scale, s% pg% Dynamo_xaxis_name, &
+            s% pg% Dynamo_xmin, s% pg% Dynamo_xmax, &
+            s% pg% Dynamo_xaxis_reversed, .false., .true., ierr)
       end subroutine do_Dynamo_plot
 
 
@@ -92,11 +93,11 @@
             reverse_xaxis, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
          call Dyn_plot(s, device_id, &
-            s% show_Dynamo_annotation1, s% show_Dynamo_annotation2, &
-            s% show_Dynamo_annotation3, &
+            s% pg% show_Dynamo_annotation1, s% pg% show_Dynamo_annotation2, &
+            s% pg% show_Dynamo_annotation3, &
             xaxis_name, xmin, xmax, reverse_xaxis, &
-            s% Dynamo_ymin_left, s% Dynamo_ymax_left, s% Dynamo_dymin_left, &
-            s% Dynamo_ymin_right, s% Dynamo_ymax_right, s% Dynamo_dymin_right, &
+            s% pg% Dynamo_ymin_left, s% pg% Dynamo_ymax_left, s% pg% Dynamo_dymin_left, &
+            s% pg% Dynamo_ymin_right, s% pg% Dynamo_ymax_right, s% pg% Dynamo_dymin_right, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
             panel_flag, xaxis_numeric_labels_flag, ierr)
       end subroutine do_Dynamo_panel
@@ -176,7 +177,7 @@
             include 'formats'
             ierr = 0
 
-            lw = s% pgstar_lw
+            lw = s% pg% pgstar_lw
             call pgqlw(lw_sav)
 
             if (.not. panel_flag) then
@@ -227,14 +228,14 @@
             call show_box_pgstar(s,'','BNSTV')
 
             call pgsci(clr_Teal)
-            call pgsch(txt_scale*s% Dynamo_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Dynamo_legend_txt_scale_factor)
             call show_left_yaxis_label_pgstar(s,'log B\dphi\u (Gauss)',-0.5)
             call pgslw(lw)
             call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
             call pgslw(lw_sav)
 
             call pgsci(clr_Coral)
-            call pgsch(txt_scale*s% Dynamo_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Dynamo_legend_txt_scale_factor)
             call show_left_yaxis_label_pgstar(s,'log B\dr\u (Gauss)',1.3)
             call pgslw(lw)
             call pgline(npts, xvec(grid_min:grid_max), yvec2(grid_min:grid_max))
@@ -286,7 +287,7 @@
             end if
 
             call pgsci(clr_FireBrick)
-            call pgsch(txt_scale*s% Dynamo_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Dynamo_legend_txt_scale_factor)
             call show_right_yaxis_label_pgstar( &
                   s,'log j (10\u20\d cm\u2\d/s)',1.3)
             call pgslw(lw)
@@ -294,7 +295,7 @@
             call pgslw(lw_sav)
 
             call pgsci(clr_RoyalBlue)
-            call pgsch(txt_scale*s% Dynamo_legend_txt_scale_factor)
+            call pgsch(txt_scale*s% pg% Dynamo_legend_txt_scale_factor)
             call show_right_yaxis_label_pgstar(s,'log \(0650) (rad/s)',-0.5)
             call pgslw(lw)
             call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
@@ -309,8 +310,8 @@
                   s,ybot,0.85,grid_min,grid_max,xvec)
             end if
 
-         call show_pgstar_decorator(s%id,s% dynamo_use_decorator, &
-            s% dynamo_pgstar_decorator, 0, ierr)
+         call show_pgstar_decorator(s%id,s% pg% dynamo_use_decorator, &
+            s% pg% dynamo_pgstar_decorator, 0, ierr)
 
 
          end subroutine plot

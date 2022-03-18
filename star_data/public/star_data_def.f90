@@ -36,6 +36,7 @@
       use net_def, only: Net_General_Info, other_net_derivs_interface
       use colors_def, only:  max_num_color_files, max_num_bcs_per_file
       use auto_diff, only: auto_diff_real_star_order1
+      use star_pgstar, only: pgstar_controls
       
       implicit none      
       
@@ -56,7 +57,6 @@
          integer(8) :: time0, time1, clock_rate, time0_extra, time1_extra, time0_initial
       end type star_job_controls
       
-
       type star_info
          
          include "star_data.inc"
@@ -111,9 +111,12 @@
             type (star_job_controls) :: job ! separate type to avoid name clashes
             include "star_controls.inc"
             include "star_controls_dev.inc"
-            include "pgstar_controls.inc"
 
+            type(pgstar_controls) :: pg
+         
       end type star_info
+
+
 
       logical :: have_initialized_star_handles = .false.
       integer, parameter :: max_star_handles = 10 ! this can be increased as necessary

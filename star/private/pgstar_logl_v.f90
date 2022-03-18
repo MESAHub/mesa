@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -47,10 +48,10 @@
          call pgbbuf()
          call pgeras()
 
-         call do_logL_v_Plot(s, id, device_id, s% show_logL_photosphere_v, &
-            s% logL_v_xleft, s% logL_v_xright, &
-            s% logL_v_ybot, s% logL_v_ytop, .false., &
-            s% logL_v_title, s% logL_v_txt_scale, ierr)
+         call do_logL_v_Plot(s, id, device_id, s% pg% show_logL_photosphere_v, &
+            s% pg% logL_v_xleft, s% pg% logL_v_xright, &
+            s% pg% logL_v_ybot, s% pg% logL_v_ytop, .false., &
+            s% pg% logL_v_title, s% pg% logL_v_txt_scale, ierr)
          if (ierr /= 0) return
 
          call pgebuf()
@@ -81,21 +82,21 @@
          call do_Hist_Track(s, id, device_id, &
             xleft, xright, ybot, ytop, subplot, title, txt_scale, &
             xname, 'log_L', xaxis_label, 'log L/L\d\(2281)', &
-            s% logL_v_v_min, s% logL_v_v_max, &
-            s% logL_v_v_margin, s% logL_v_dv_min, &
-            s% logL_v_logL_min, s% logL_v_logL_max, &
-            s% logL_v_logL_margin, s% logL_v_dlogL_min, &
-            s% logL_v_step_min, s% logL_v_step_max, &
+            s% pg% logL_v_v_min, s% pg% logL_v_v_max, &
+            s% pg% logL_v_v_margin, s% pg% logL_v_dv_min, &
+            s% pg% logL_v_logL_min, s% pg% logL_v_logL_max, &
+            s% pg% logL_v_logL_margin, s% pg% logL_v_dlogL_min, &
+            s% pg% logL_v_step_min, s% pg% logL_v_step_max, &
             reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% show_logL_v_target_box, s% logL_v_target_n_sigma, &
-            s% logL_v_target_v, s% logL_v_target_logL, &
-            s% logL_v_target_v_sigma, s% logL_v_target_logL_sigma, &
-            s% show_logL_v_annotation1, &
-            s% show_logL_v_annotation2, &
-            s% show_logL_v_annotation3, &
-            s% logL_v_fname, &
-            s% logL_v_use_decorator, &
-            s% logL_v_pgstar_decorator, &
+            s% pg% show_logL_v_target_box, s% pg% logL_v_target_n_sigma, &
+            s% pg% logL_v_target_v, s% pg% logL_v_target_logL, &
+            s% pg% logL_v_target_v_sigma, s% pg% logL_v_target_logL_sigma, &
+            s% pg% show_logL_v_annotation1, &
+            s% pg% show_logL_v_annotation2, &
+            s% pg% show_logL_v_annotation3, &
+            s% pg% logL_v_fname, &
+            s% pg% logL_v_use_decorator, &
+            s% pg% logL_v_pgstar_decorator, &
             null_decorate, ierr)
       end subroutine do_logL_v_Plot
 

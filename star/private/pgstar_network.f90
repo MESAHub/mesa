@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -50,9 +51,9 @@
          call pgeras()
 
          call do_Network_plot(s, id, device_id, &
-            s% Network_xleft, s% Network_xright, &
-            s% Network_ybot, s% Network_ytop, .false., &
-            s% Network_title, s% Network_txt_scale, ierr)
+            s% pg% Network_xleft, s% pg% Network_xright, &
+            s% pg% Network_ybot, s% pg% Network_ytop, .false., &
+            s% pg% Network_title, s% pg% Network_txt_scale, ierr)
 
          call pgebuf()
 
@@ -135,8 +136,8 @@
             nmin=HUGE(nmin)
 
 
-            log10_min_abun=s%Network_log_mass_frac_min
-            log10_max_abun=s%Network_log_mass_frac_max
+            log10_min_abun=s% pg% Network_log_mass_frac_min
+            log10_max_abun=s% pg% Network_log_mass_frac_max
 
             do i=1,s%species
 
@@ -151,26 +152,26 @@
 
             end do
 
-            if (s% network_zmax > -100) then
-               ymax = s% network_zmax
+            if (s% pg% network_zmax > -100) then
+               ymax = s% pg% network_zmax
             else
                ymax = zmax
             end if
 
-            if (s% network_zmin > -100) then
-               ymin = s% network_zmin
+            if (s% pg% network_zmin > -100) then
+               ymin = s% pg% network_zmin
             else
                ymin = zmin
             end if
 
-            if (s% network_nmax > -100) then
-               xright = s% network_nmax
+            if (s% pg% network_nmax > -100) then
+               xright = s% pg% network_nmax
             else
                xright= nmax
             end if
 
-            if (s% network_nmin > -100) then
-               xleft = s% network_nmin
+            if (s% pg% network_nmin > -100) then
+               xleft = s% pg% network_nmin
             else
                xleft = nmin
             end if
@@ -201,13 +202,13 @@
 
                if(z.lt.ymin .or. z.gt.ymax .or. n.lt.xleft .or.n.gt.xright)CYCLE
 
-               if (s% Network_show_element_names) THEN
+               if (s% pg% Network_show_element_names) THEN
                   call pgsci(1)
                   call pgtext(xleft-3.5,z*1.0-0.25,el_name(Z))
                end if
 
                !Plot colored dots for mass fractions
-               if(s% Network_show_mass_fraction) then
+               if(s% pg% Network_show_mass_fraction) then
                   if(abun>log10_min_abun .and. abun < log10_max_abun)THEN
                      do j=mid_map,colormap_size
                         xlow=log10_min_abun+(j-mid_map)*(log10_max_abun-log10_min_abun)/(colormap_size-mid_map)
@@ -229,11 +230,11 @@
 
             call pgunsa
 
-            if(s% network_show_colorbar)then
+            if(s% pg% network_show_colorbar)then
                call network_colorbar_legend(winxmin, winxmax, winymin, winymax,log10_min_abun,log10_max_abun)
             end if
             
-            call show_pgstar_decorator(s%id,s% network_use_decorator,s% network_pgstar_decorator, 0, ierr)
+            call show_pgstar_decorator(s%id,s% pg% network_use_decorator,s% pg% network_pgstar_decorator, 0, ierr)
 
 
          end subroutine plot

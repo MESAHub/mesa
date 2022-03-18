@@ -253,7 +253,7 @@ contains
 
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            mixing_type, scale, chiT, chiRho, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
 
             if (ierr /= 0) then

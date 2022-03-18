@@ -635,10 +635,12 @@
             
       
    ! output controls
-   
+
+      astero_results_directory = 'outputs'
+
       write_best_model_data_for_each_sample = .true.
       num_digits = 4 ! number of digits in sample number (with leading 0's)
-      sample_results_prefix = 'outputs/sample_' 
+      sample_results_prefix = 'sample_'
          ! note that you can include a directory in the prefix if desired
       sample_results_postfix = '.data'
       
@@ -649,8 +651,8 @@
          ! note that you can include a directory in the prefix if desired
       fgong_postfix = '.data'
       
-      write_fgong_for_best_model = .false.
-      best_model_fgong_filename = ''
+      write_fgong_for_best_model = .true.
+      best_model_fgong_filename = 'best.fgong'
 
       write_gyre_for_each_model = .false.
       gyre_prefix = 'gyre_' 
@@ -658,14 +660,14 @@
       gyre_postfix = '.data'
       max_num_gyre_points = -1 ! only used if > 1
       
-      write_gyre_for_best_model = .false.
-      best_model_gyre_filename = ''
+      write_gyre_for_best_model = .true.
+      best_model_gyre_filename = 'best.gyre'
       
-      write_profile_for_best_model = .false.
-      best_model_profile_filename = ''
+      write_profile_for_best_model = .true.
+      best_model_profile_filename = 'best.profile'
       
-      save_model_for_best_model = .false.
-      best_model_save_model_filename = ''
+      save_model_for_best_model = .true.
+      best_model_save_model_filename = 'best.mod'
       
       save_info_for_last_model = .false. ! if true, treat final model as "best"
       last_model_save_info_filename = '' ! and save info about final model to this file.
@@ -684,8 +686,8 @@
    
    
       ! save all control settings to file
-         save_controls = .false. ! dumps &astero_search_controls controls to file
-         save_controls_filename = '' ! if empty, uses a default name
+         save_controls = .true. ! dumps &astero_search_controls controls to file
+         save_controls_filename = 'astero_search_controls.out' ! if empty, uses a default name
       
       
       ! composition control

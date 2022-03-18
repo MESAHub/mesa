@@ -321,6 +321,12 @@
     diffusion_class_typical_charge, diffusion_class_factor, &
     diffusion_use_isolve, diffusion_rtol_for_isolve, diffusion_atol_for_isolve, &
     diffusion_maxsteps_for_isolve, diffusion_isolve_solver, &
+
+    ! WD phase separation
+    do_phase_separation, &
+    do_phase_separation_heating, &
+    phase_separation_mixing_use_brunt, &
+    phase_separation_no_diffusion, &
     
     ! eos controls
     fix_d_eos_dxa_partials, &
@@ -1814,6 +1820,12 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_atol_for_isolve = diffusion_atol_for_isolve
  s% diffusion_maxsteps_for_isolve = diffusion_maxsteps_for_isolve
  s% diffusion_isolve_solver = diffusion_isolve_solver
+
+ ! WD phase separation
+ s% do_phase_separation = do_phase_separation
+ s% do_phase_separation_heating = do_phase_separation_heating
+ s% phase_separation_mixing_use_brunt = phase_separation_mixing_use_brunt
+ s% phase_separation_no_diffusion = phase_separation_no_diffusion
 
  ! eos controls
  s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
@@ -3433,6 +3445,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_min_dq_ratio_at_surface = s% diffusion_min_dq_ratio_at_surface
  diffusion_dt_limit = s% diffusion_dt_limit
 
+ do_phase_separation = s% do_phase_separation
+ do_phase_separation_heating = s% do_phase_separation_heating
+ phase_separation_mixing_use_brunt = s% phase_separation_mixing_use_brunt
+ phase_separation_no_diffusion = s% phase_separation_no_diffusion
+
  diffusion_min_X_hard_limit = s% diffusion_min_X_hard_limit
  diffusion_X_total_atol = s% diffusion_X_total_atol
  diffusion_X_total_rtol = s% diffusion_X_total_rtol
@@ -4159,7 +4176,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
       character(len=*), intent(out) :: val
       integer, intent(out) :: ierr
 
-      character(len(name)) :: upper_name
+      character(len(name)+1) :: upper_name
       character(len=512) :: str
       integer :: iounit,iostat,ind,i
 
@@ -4174,14 +4191,14 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
       rewind(iounit)
 
       ! Namelists get written in captials
-      upper_name = StrUpCase(name)
+      upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist
       do 
          read(iounit,'(A)',iostat=iostat) str
-         ind = index(str,trim(upper_name))
+         ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
             do i=1,len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do

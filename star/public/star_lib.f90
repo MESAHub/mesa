@@ -686,13 +686,13 @@
          call write_controls(s, filename, ierr)
       end subroutine star_write_controls
 
-      subroutine star_build_atm(s, L, R, M, cgrav, ierr)
+      subroutine star_build_atm(s, L, R, Teff, M, cgrav, ierr)
          ! sets s% atm_structure_num_pts and s% atm_structure
         use atm_support
          type (star_info), pointer :: s
-         real(dp), intent(in) :: L, R, M, cgrav
+         real(dp), intent(in) :: L, R, Teff, M, cgrav
          integer, intent(out) :: ierr
-         call build_atm(s, L, R, M, cgrav, ierr)
+         call build_atm(s, L, R, Teff, M, cgrav, ierr)
        end subroutine star_build_atm
 
       
@@ -2774,7 +2774,7 @@
       
 
       subroutine pgstar_write_plot_to_file(s, p, filename, ierr)
-         use star_def, only: pgstar_win_file_data
+         use star_pgstar, only: pgstar_win_file_data
          use pgstar, only: do_write_plot_to_file
          type (star_info), pointer :: s
          type (pgstar_win_file_data), pointer :: p
