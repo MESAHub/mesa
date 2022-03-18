@@ -702,7 +702,7 @@
       subroutine net_tables(s, ierr)
          use net_lib ! setup net
          use rates_lib
-         use rates_def, only: rates_reaction_id_max
+         use rates_def, only: rates_reaction_id_max, rates_other_rate_get
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          ierr = 0
@@ -757,6 +757,11 @@
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'failed in net_set_fe56ec_fake_factor'
             return
+         end if
+
+         rates_other_rate_get => null()
+         if(s% use_other_rate_get) then
+            rates_other_rate_get => s% other_rate_get
          end if
 
          call net_setup_tables( &

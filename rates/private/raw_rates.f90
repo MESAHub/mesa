@@ -757,7 +757,7 @@
 
 
          if(associated(rates_other_rate_get)) then
-            call rates_other_rate_get(ir, temp, raw_rate, ierr)
+            call rates_other_rate_get(ir, temp, tf, raw_rate, ierr)
          end if
          
          

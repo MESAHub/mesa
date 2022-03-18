@@ -775,12 +775,13 @@
          
          end subroutine other_screening_interface
 
-         subroutine other_rate_get_interface(ir, temp, raw_rate, ierr)
-            import dp
+         subroutine other_rate_get_interface(ir, temp, tf, raw_rate, ierr)
+            import dp, t_factors
             implicit none
       
             integer :: ir ! Rate id
             real(dp),intent(in) ::    temp      !< Temperature
+            type (T_Factors) :: tf !< Various temperature factors
             real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
             integer, intent(out) ::   ierr
          
