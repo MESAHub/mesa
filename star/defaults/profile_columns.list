@@ -283,29 +283,13 @@
       !other    
 
    ! adds columns for all of the reactions that are in the current net 
-   !add_eps_nuc_rates  ! energy from reactions, erg/g/s
-   !add_eps_neu_rates  ! energy lost to neutrinos, erg/g/s
    !add_raw_rates      ! raw reaction rates,       reactions/second
-   !add_screened_rates ! screened reaction rates,  reactions/second
 
    ! individual reactions (as many as desired)
-   ! use list_net_reactions = .true. in star_job to list all reactions in the current net 
-   ! erg/g/s
-      !eps_nuc_rate r_h1_h1_ec_h2 ! proton-proton (pp) reaction 
-      !eps_nuc_rate r_h1_h1_wk_h2 ! proton-electron-proton (pep) reaction 
-      
-   ! erg/g/s
-      !eps_neu_rate r_h1_h1_ec_h2 
-      !eps_neu_rate r_h1_h1_wk_h2
-      
+   ! use list_net_reactions = .true. in star_job to list all reactions in the current net    
    ! reactions/second
       !raw_rate r_h1_h1_ec_h2 
       !raw_rate r_h1_h1_wk_h2
-      
-   ! reactions/second
-      !screened_rate r_h1_h1_ec_h2 
-      !screened_rate r_h1_h1_wk_h2
-
 
    !burn_num_iters ! Number of split_burn iterations taken
    !burn_avg_epsnuc
