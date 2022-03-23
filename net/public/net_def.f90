@@ -221,6 +221,9 @@
 
          real(dp) :: eps_neu_total
          real(dp) :: weak_rate_factor
+
+         ! Passed in by star
+         integer :: star_id = -1, zone = -1
       
       end type Net_Info
 
