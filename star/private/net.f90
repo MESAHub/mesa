@@ -179,6 +179,9 @@
          net_work => net_work_ary
          netinfo => net_info_target
 
+         netinfo% star_id = s% id
+         netinfo% zone = k
+         
          s% eps_nuc(k) = 0d0
          s% d_epsnuc_dlnd(k) = 0d0
          s% d_epsnuc_dlnT(k) = 0d0
