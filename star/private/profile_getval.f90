@@ -261,11 +261,11 @@
          use mod_typical_charge, only: eval_typical_charge
          use rsp_def, only: rsp_WORK, rsp_WORKQ, rsp_WORKT, rsp_WORKC
          
-         use net_def, only: Net_Info
-         use net_lib, only: net_work_size, get_reaction_id_table_ptr, get_net_rate_ptrs
-         use rates_def, only: T_Factors, reaction_name, std_reaction_Qs, std_reaction_neuQs
-         use rates_lib, only: get_raw_rate, eval_tfactors, rates_reaction_id, screening_option
-         use eos_def, only : i_eta
+         !use net_def, only: Net_Info
+         !use net_lib, only: net_work_size, get_reaction_id_table_ptr, get_net_rate_ptrs
+         use rates_def, only: T_Factors!, reaction_name, std_reaction_Qs, std_reaction_neuQs
+         use rates_lib, only: get_raw_rate, eval_tfactors!, rates_reaction_id, screening_option
+         !use eos_def, only : i_eta
          
          type (star_info), pointer :: s
          integer, intent(in) :: c, k
@@ -276,18 +276,17 @@
          real(dp) :: raw_rate
          type (T_Factors), pointer :: tf
          type (T_Factors), target :: tf2
-         !real(dp), pointer :: work(:)
-         integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: net_lwork
-         real(dp), target :: net_work_ary
-         real(dp), pointer :: net_work(:)
-         real(dp), pointer, dimension(:) :: &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho
-         integer :: ir
-         real(dp) :: log10_rho, log10_T, d_eps_nuc_dRho, d_eps_nuc_dT
-         type (Net_Info), target :: net_info_target
-         type (Net_Info), pointer :: netinfo
+         !integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
+         !integer :: net_lwork
+         !real(dp), target :: net_work_ary
+         !real(dp), pointer :: net_work(:)
+         !real(dp), pointer, dimension(:) :: &
+         !   rate_screened, rate_screened_dT, rate_screened_dRho, &
+         !   rate_raw, rate_raw_dT, rate_raw_dRho
+         !integer :: ir
+         !real(dp) :: log10_rho, log10_T, d_eps_nuc_dRho, d_eps_nuc_dT
+         !type (Net_Info), target :: net_info_target
+         !type (Net_Info), pointer :: netinfo
 
          real(dp) :: cno, z, x, frac, eps, eps_alt, L_rad, L_edd, Pbar_00, Pbar_p1, &
             P_face, rho_face, dr, v, r00, rp1, v00, vp1, A00, Ap1, Amid, &
@@ -321,64 +320,66 @@
          int_flag = .false.
          rsp_or_w = s% RSP_flag .or. s% RSP2_flag
          
-         if (c < eps_neu_rate_offset + idel .and. c > screened_rate_offset) then
-             if (s% screening_mode_value < 0) then
-                s% screening_mode_value = screening_option(s% screening_mode, ierr)
-                if (ierr /= 0) then
-                   write(*,*) 'failed in screening_option'
-                   stop 1
-                end if
-             end if
-             
-             net_work => net_work_ary
-             netinfo => net_info_target
-          
-             log10_rho = s% lnd(k)/ln10
-             log10_T = s% lnT(k)/ln10
-             
-             net_lwork = net_work_size(s% net_handle, ierr)
-             
-             call net_get( &
-                s% net_handle, .false., netinfo, species, s% num_reactions, s% xa(1:species,k), &
-                s% T(k), log10_T, s% rho(k), log10_Rho, &
-                s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
-                s% eta(k), s% d_eos_dlnd(i_eta,k), s% d_eos_dlnT(i_eta,k), &
-                s% rate_factors, s% weak_rate_factor, &
-                std_reaction_Qs, std_reaction_neuQs, &
-                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), & 
-                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
-                s% screening_mode_value, &
-                s% eps_nuc_categories(:,k), &
-                s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
-             if (ierr /= 0) then
-                write(*,*) 'failed in net_get'
-                stop 1
-             end if
-         
-             call get_net_rate_ptrs(s% net_handle, &
-                rate_screened, rate_screened_dT, rate_screened_dRho, &
-                rate_raw, rate_raw_dT, rate_raw_dRho, net_lwork, net_work, &
-                ierr)
-             if (ierr /= 0) then
-                write(*,*) 'failed in get_net_rate_ptrs'
-                stop 1
-             end if
-             ir = rates_reaction_id(reaction_name(i))
-         end if
+         ! TODO: implement eps_neu_rate, eps_nuc_rate, screened_rate
+         !if (c < eps_neu_rate_offset + idel .and. c > screened_rate_offset) then
+         !    if (s% screening_mode_value < 0) then
+         !       s% screening_mode_value = screening_option(s% screening_mode, ierr)
+         !       if (ierr /= 0) then
+         !          write(*,*) 'failed in screening_option'
+         !          stop 1
+         !       end if
+         !    end if
+         !    
+         !    net_work => net_work_ary
+         !    netinfo => net_info_target
+         ! 
+         !    log10_rho = s% lnd(k)/ln10
+         !    log10_T = s% lnT(k)/ln10
+         !    
+         !    net_lwork = net_work_size(s% net_handle, ierr)
+         !    
+         !    call net_get( &
+         !       s% net_handle, .false., netinfo, species, s% num_reactions, s% xa(1:species,k), &
+         !       s% T(k), log10_T, s% rho(k), log10_Rho, &
+         !       s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
+         !       s% eta(k), s% d_eos_dlnd(i_eta,k), s% d_eos_dlnT(i_eta,k), &
+         !       s% rate_factors, s% weak_rate_factor, &
+         !       std_reaction_Qs, std_reaction_neuQs, &
+         !       s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), & 
+         !       s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
+         !       s% screening_mode_value, &
+         !       s% eps_nuc_categories(:,k), &
+         !       s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
+         !    if (ierr /= 0) then
+         !       write(*,*) 'failed in net_get'
+         !       stop 1
+         !    end if
+         !
+         !    call get_net_rate_ptrs(s% net_handle, &
+         !       rate_screened, rate_screened_dT, rate_screened_dRho, &
+         !       rate_raw, rate_raw_dT, rate_raw_dRho, net_lwork, net_work, &
+         !       ierr)
+         !    if (ierr /= 0) then
+         !       write(*,*) 'failed in get_net_rate_ptrs'
+         !       stop 1
+         !    end if
+         !    ir = rates_reaction_id(reaction_name(i))
+         !end if
 
          if (c > extra_offset) then
             i = c - extra_offset
             val = s% profile_extra(k,i)
+         ! TODO: implement eps_neu_rate, eps_nuc_rate, screened_rate
          else if (c > eps_neu_rate_offset) then
             i = c - eps_neu_rate_offset
-            val = rate_screened(i) * std_reaction_neuQs(ir) * Qconv
+            val = 0 !rate_screened(i) * std_reaction_neuQs(ir) * Qconv
          else if (c > eps_nuc_rate_offset) then
             i = c - eps_nuc_rate_offset
-            val = rate_screened(i) * &
-                (std_reaction_Qs(ir) - std_reaction_neuQs(ir)) * Qconv
+            val = 0 !rate_screened(i) * &
+                !(std_reaction_Qs(ir) - std_reaction_neuQs(ir)) * Qconv
          else if (c > screened_rate_offset) then
             i = c - screened_rate_offset
-            val = rate_screened(i)
+            val = 0 !rate_screened(i)
          else if (c > raw_rate_offset) then
             i = c - raw_rate_offset
             tf => tf2
