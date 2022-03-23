@@ -1188,12 +1188,14 @@ contains
       kstart = 1
       outer: do i=1, num
          inner: do
-            if(line(k:k)==' ' .and. line(k+1:k+1)==' ' .and. k < len(line)) then
-               k = k+1
-               cycle inner
+            if(k < len(line)) then
+               if(line(k:k)==' ' .and. line(k+1:k+1)==' ') then
+                  k = k+1
+                  cycle inner
+               end if
             end if
 
-            if(line(k:k)==' ' .or. k > len(line))then
+            if(line(k:k)==' ' .or. k >= len(line))then
                !write(*,*) '*',i,kstart,k,line(kstart:k-1)
                out(i) = line(kstart:k-1)
                k = k+1
