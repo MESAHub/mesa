@@ -56,8 +56,13 @@
       integer, parameter :: abs_mag_offset = bc_offset + idel
       integer, parameter :: lum_band_offset = abs_mag_offset + idel
       integer, parameter :: log_lum_band_offset = lum_band_offset + idel
+      
+      integer, parameter :: raw_rate_offset = log_lum_band_offset + idel
+      integer, parameter :: screened_rate_offset = raw_rate_offset + idel
+      integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
+      integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
 
-      integer, parameter :: start_of_special_cases = log_lum_band_offset + idel
+      integer, parameter :: start_of_special_cases = eps_neu_rate_offset + idel
       ! mixing and burning regions must be given the largest offsets
       ! so they can be distinguished from the other ones
 
@@ -271,6 +276,42 @@
                cycle
             end if
 
+            if (string == 'add_raw_rates') then
+               call do_rate(raw_rate_offset,'raw_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_screened_rates') then
+               call do_rate(screened_rate_offset,'screened_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_eps_nuc_rates') then
+               call do_rate(eps_nuc_rate_offset,'eps_nuc_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_eps_neu_rates') then
+               call do_rate(eps_neu_rate_offset,'eps_neu_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
             nxt_spec = do1_history_spec( &
                iounit, t, n, i, string, buffer, special_case, report, spec_err)
             if (spec_err /= 0) then
@@ -431,6 +472,20 @@
             end do
          end subroutine do_colors
 
+         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
+            use rates_def, only: reaction_name
+            integer, intent(in) :: offset
+            character(len=*) :: prefix
+            integer, intent(out) :: ierr
+            integer :: k
+            ierr = 0
+            do k=1,s% num_reactions
+               call insert_spec( &
+                  offset + k,trim(prefix)//trim(reaction_name(k)), ierr)
+               if (ierr /= 0) return
+            end do
+         end subroutine do_rate
+
 
          subroutine error
             ierr = -1
@@ -461,7 +516,19 @@
          spec = -1
          special_case = .false.
 
-         if (string=='abs_mag') then
+         if (string=='raw_rate') then
+            call do1_rate(raw_rate_offset)
+
+         else if (string=='screened_rate') then
+            call do1_rate(screened_rate_offset)
+
+         else if (string=='eps_nuc_rate') then
+            call do1_rate(eps_nuc_rate_offset)
+
+         else if (string=='eps_neu_rate') then
+            call do1_rate(eps_neu_rate_offset)
+
+         else if (string=='abs_mag') then
             call do1_color(abs_mag_offset)
 
          else if (string=='bc') then
@@ -582,6 +649,23 @@
             write(*,*) 'bad filter name: ' // trim(string)
             ierr = -1
          end subroutine do1_color
+
+         subroutine do1_rate(offset)
+            use rates_lib, only: rates_reaction_id
+            integer, intent(in) :: offset
+            t = token(iounit, n, i, buffer, string)
+            if (t /= name_token) then
+               ierr = -1; return
+            end if
+            id = rates_reaction_id(string)
+            if (ierr/=0) return
+            if (id > 0) then
+               spec = offset + id
+               return
+            end if
+            write(*,*) 'bad filter name: ' // trim(string)
+            ierr = -1
+         end subroutine do1_rate
 
 
       end function do1_history_spec
