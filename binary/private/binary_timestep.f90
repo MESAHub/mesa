@@ -126,7 +126,8 @@
 
          if (b% max_timestep < 0) b% max_timestep = b% s_donor% dt
 
-         b% env = s% star_mass - s% he_core_mass 
+         b% env = s% star_mass - s% he_core_mass
+         b% env_old = s% mstar_old / Msun - s% he_core_mass_old  ! donor might have switched
          if (b% env_old /= 0) then
             env_change = b% env - b% env_old
          else
