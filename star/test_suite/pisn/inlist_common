@@ -86,6 +86,15 @@
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
 
+
+      overshoot_scheme(1) = 'exponential' ! ``exponential``, ``step``, ``other``
+      overshoot_zone_type(1) = 'burn_Z' !  ``burn_H``, ``burn_He``, ``burn_Z``, ``nonburn``, ``any``
+      overshoot_zone_loc(1) = 'shell' ! ``core``, ``shell``, ``any``
+      overshoot_bdy_loc(1) = 'bottom' ! ``bottom``, ``top``, ``any``
+
+      overshoot_f(1) = 0.001d0
+      overshoot_f0(1) = 0.0001d0
+
 ! timesteps
       varcontrol_target = 1d-3
       
