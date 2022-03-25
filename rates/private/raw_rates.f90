@@ -129,16 +129,16 @@
          select case(ir)
 
             case(ir_he4_he4_he4_to_c12) ! triple alpha to c12 
-               call do1(rate_tripalf_nacre)
+               call do1(rate_tripalf_jina)
       
             case(ir_c12_to_he4_he4_he4) ! c12 to 3 alpha
-               call do1(rate_tripalf_nacre)
+               call do1(rate_tripalf_jina)
 
             case(ir_c12_ag_o16)
-               call do1(rate_c12ag_nacre)
+               call do1(rate_c12ag_jina)
 
-            case(ir_o16_ga_c12) ! o16(g, a)c12
-               call do1(rate_c12ag_nacre)
+            ! case(ir_o16_ga_c12) ! o16(g, a)c12
+            !    call do1(rate_c12ag_nacre)
 
             case(ir1212) ! c12(c12,n)mg23, c12(c12,p)na23, c12(c12,a)ne20
                call do1(rate_c12c12_fxt_multi)
