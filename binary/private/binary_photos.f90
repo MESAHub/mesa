@@ -105,7 +105,8 @@
              b% m(1), b% m_old(1), &
              b% m(2), b% m_old(2), &
              b% dt, b% dt_old, &
-             b% env, b% env_old, &
+             b% env(1), b% env_old(1), &
+             b% env(2), b% env_old(2), &
              b% eq_initial_bh_mass, &
              b% period, b% period_old, & 
              b% max_timestep, b% max_timestep_old, &
@@ -208,7 +209,8 @@
              b% m(1), b% m_old(1), &
              b% m(2), b% m_old(2), &
              b% dt, b% dt_old, &
-             b% env, b% env_old, &
+             b% env(1), b% env_old(1), &
+             b% env(2), b% env_old(2), &
              b% eq_initial_bh_mass, &
              b% period, b% period_old, & 
              b% max_timestep, b% max_timestep_old, &

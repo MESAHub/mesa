@@ -126,10 +126,10 @@
 
          if (b% max_timestep < 0) b% max_timestep = b% s_donor% dt
 
-         b% env = s% star_mass - s% he_core_mass
-         b% env_old = s% mstar_old / Msun - s% he_core_mass_old  ! donor might have switched
-         if (b% env_old /= 0) then
-            env_change = b% env - b% env_old
+         b% env(b% d_i) = s% star_mass - s% he_core_mass
+         b% env(b% a_i) = b% s_accretor% star_mass - b% s_accretor% he_core_mass
+         if (b% env_old(b% d_i) /= 0) then
+            env_change = b% env(b% d_i) - b% env_old(b% d_i)
          else
             env_change = 0
          end if
@@ -172,7 +172,7 @@
          end if
 
          if (b% fm > 0) then
-            rel_change = abs(env_change/max(b% env, b% fm_limit))
+            rel_change = abs(env_change/max(b% env(b% d_i), b% fm_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
                b% fm_hard > 0d0 .and. rel_change > b% fm_hard) then
                write(*,*) "retry because of fm_hard limit,", &
