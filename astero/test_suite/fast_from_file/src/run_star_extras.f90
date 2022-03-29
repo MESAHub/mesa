@@ -50,10 +50,17 @@
          s% extras_check_model => extras_check_model
          s% extras_finish_step => extras_finish_step
          s% extras_after_evolve => extras_after_evolve
+
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+
+         s% how_many_extra_history_header_items => how_many_extra_history_header_items
+         s% data_for_extra_history_header_items => data_for_extra_history_header_items
+         s% how_many_extra_profile_header_items => how_many_extra_profile_header_items
+         s% data_for_extra_profile_header_items => data_for_extra_profile_header_items
+
          include 'set_star_astero_procs.inc'
       end subroutine extras_controls
 
@@ -84,6 +91,8 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
 
          ! old value has not yet been changed.
          ! do whatever is necessary for this new value.
@@ -94,6 +103,22 @@
          !    if (ierr /= 0) return
          !    s% mixing_length_alpha = new_value
          ! end if
+
+         if (i == 1) then
+            s% alpha_semiconvection = new_value
+            write(*,*) 'set semiconvection to', new_value
+         else if (i == 2) then
+            s% thermohaline_coeff = new_value
+            write(*,*) 'set thermohaline to', new_value
+         else if (i == 3) then
+            s% diffusion_class_factor(:) = new_value
+            write(*,*) 'set diffusion to', new_value
+         else
+            ierr = -1
+            write(*,*) 'invalid index in will_set_my_param', i
+            return
+         end if
+
       end subroutine will_set_my_param
       
       
@@ -110,33 +135,44 @@
       
       
       subroutine extras_after_evolve(id, ierr)
-         use astero_def, only: best_chi2
+         use astero_def
+         use utils_lib, only: mv
+
          integer, intent(in) :: id
          integer, intent(out) :: ierr
-         real(dp) :: dt
-         include 'formats'
          type (star_info), pointer :: s
+         character (len=256) :: format_string, num_string, basename
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-         write(*,1) 'best_chi2', best_chi2
-         if (best_chi2 < 15 .and. best_chi2 > 1) then
-            write(*,*) 'chi square within limit'
-            termination_code_str(t_xtra1) = 'good chi^2'
-            s% termination_code = t_xtra1
-         else if (best_chi2 <= 0) then
-            write(*,*) 'ERROR: failed to evaluate chi square'
-         else if (best_chi2 <= 1) then
-            write(*,*) 'bogus chi square ???  value too small??'
-         else
-            write(*,*) 'ERROR: chi square too large'
-         end if
-
-         testhub_extras_names(1) = 'chi2'
-         testhub_extras_vals(1) = best_chi2
-
          call test_suite_after_evolve(s, ierr)
+
+         ! demonstrate how to move some files generated for each
+         ! sample
+         write(format_string,'( "(i",i2.2,".",i2.2,")" )') num_digits, num_digits
+         write(num_string,format_string) sample_number+1 ! sample number hasn't been incremented yet
+         basename = trim(sample_results_prefix) // trim(num_string)
+         call move(best_model_fgong_filename, '.fgong')
+         call move(best_model_gyre_filename, '.gyre')
+         call move(best_model_profile_filename, '.profile')
+         call move(best_model_save_model_filename, '.mod')
+
+         contains
+
+         subroutine move(filename, extension)
+            character (len=*), intent(in) :: filename, extension
+            character (len=256) :: src, tgt
+
+            src = trim(astero_results_directory) // '/' // trim(filename)
+            tgt = trim(astero_results_directory) // '/' // trim(basename) // extension
+
+            ! file won't exist if sample quit early because of bad chi-squared,
+            ! so skip errors
+            call mv(trim(src), trim(tgt), skip_errors=.true.)
+
+            write(*,*) 'moved ' // trim(src) // ' to ' // trim(tgt)
+         end subroutine move
+
       end subroutine extras_after_evolve
       
 
@@ -234,6 +270,64 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
+
+
+      integer function how_many_extra_history_header_items(id)
+         integer, intent(in) :: id
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         how_many_extra_history_header_items = 0
+      end function how_many_extra_history_header_items
+
+
+      subroutine data_for_extra_history_header_items(id, n, names, vals, ierr)
+         integer, intent(in) :: id, n
+         character (len=maxlen_history_column_name) :: names(n)
+         real(dp) :: vals(n)
+         type(star_info), pointer :: s
+         integer, intent(out) :: ierr
+         ierr = 0
+         call star_ptr(id,s,ierr)
+         if(ierr/=0) return
+
+         ! here is an example for adding an extra history header item
+         ! also set how_many_extra_history_header_items
+         ! names(1) = 'mixing_length_alpha'
+         ! vals(1) = s% mixing_length_alpha
+
+      end subroutine data_for_extra_history_header_items
+
+
+      integer function how_many_extra_profile_header_items(id)
+         integer, intent(in) :: id
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         how_many_extra_profile_header_items = 0
+      end function how_many_extra_profile_header_items
+
+
+      subroutine data_for_extra_profile_header_items(id, n, names, vals, ierr)
+         integer, intent(in) :: id, n
+         character (len=maxlen_profile_column_name) :: names(n)
+         real(dp) :: vals(n)
+         type(star_info), pointer :: s
+         integer, intent(out) :: ierr
+         ierr = 0
+         call star_ptr(id,s,ierr)
+         if(ierr/=0) return
+
+         ! here is an example for adding an extra profile header item
+         ! also set how_many_extra_profile_header_items
+         ! names(1) = 'mixing_length_alpha'
+         ! vals(1) = s% mixing_length_alpha
+
+      end subroutine data_for_extra_profile_header_items
       
 
       ! returns either keep_going or terminate.
