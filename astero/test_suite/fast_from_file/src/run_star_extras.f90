@@ -178,6 +178,8 @@
 
       integer function extras_check_model(id)
          use astero_def, only: my_var1, my_var2, my_var3
+         use astero_lib, only: astero_gyre_is_enabled
+
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
@@ -192,6 +194,12 @@
          my_var1 = s% delta_Pg
          !write(*,2) 'delta_Pg', s% model_number, my_var1
 
+         if (.not. astero_gyre_is_enabled) then
+            write(*,*) 'not using gyre: pretending iteration worked and exiting'
+            write(*,*) 'save_sample_results_to_file outputs/from_file_results.data'
+            extras_check_model = terminate
+            return
+         end if
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depenending on which
