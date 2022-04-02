@@ -13,8 +13,11 @@ This includes a compilation of tables (in
 ``/data/rates_data/weakreactions.tables``) suitable for the high
 densities and temperatures encountered in late stages of stellar
 evolution.  These rates are based (in order of precedence) on the
-tabulations of Langanke & Martı́nez-Pinedo (2000), Oda et al.  (1994),
-and Fuller et al. (1985).  (These were referred to as a separate
+tabulations of
+`Langanke & Martı́nez-Pinedo (2000) <https://ui.adsabs.harvard.edu/abs/2000NuPhA.673..481L>`_,
+`Oda et al. (1994) <https://ui.adsabs.harvard.edu/abs/1994ADNDT..56..231O>`_,
+and `Fuller et al. (1985) <https://ui.adsabs.harvard.edu/abs/1985ApJ...293....1F>`_.
+(These were referred to as a separate
 ``weaklib`` module in |MESA I|, but are now part of ``rates``.)
 
 These reaction rates are tabulated as function of :math:`\rho Y_e` and
