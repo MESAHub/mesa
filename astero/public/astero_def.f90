@@ -1619,24 +1619,73 @@
          ! sort results by increasing sample_chi2
          call set_sample_index_by_chi2
 
-         write(txt_fmt,'(a)') '(a8,99' // trim(astero_results_txt_format) // ')'
-         write(int_fmt,'(a)') '(i8,99' // trim(astero_results_int_format) // ')'
+         do j = 1, 3 ! line number
+            ! first column is special because it's narrow
+            select case (j)
+            case (1)
+               write(iounit, '(i8)', advance='no') 1
+            case (2)
+               write(iounit, '(a8)', advance='no') 'samples'
+            case (3)
+               write(iounit, '(i8)', advance='no') sample_number
+            end select
 
-         if (i_total > 0) then
-            write(iounit, txt_fmt) 'samples', 'total'
-            write(iounit, int_fmt) sample_number, i_total
-         else
-            write(iounit, txt_fmt) 'samples'
-            write(iounit, int_fmt) sample_number
-         end if
+            i = 2 ! column number, incremented after each column is written
+            if (i_total > 0) call write_int('total', i_total)
 
-         write(iounit, '(a)')
+            call write_txt('version_number', version_number)
+            call write_txt('compiler', compiler_name)
+            call write_txt('build', compiler_version_name)
+            call write_txt('MESA_SDK_version', mesasdk_version_name)
+            call write_txt('math_backend',math_backend)
+            call write_txt('date', date)
+            call write_txt('search_type', search_type)
+
+            write(iounit, '(a)') ! new line
+         end do
+
+         write(iounit, '(a)') ! blank line between header and sample data
 
          call show_sample_header(iounit)
          do j = 1, sample_number
             i = sample_index_by_chi2(j)
             call show1_sample_results(i, iounit)
          end do
+
+         contains
+
+         subroutine write_txt(name, val)
+            character(len=*), intent(in) :: name, val
+
+            select case (j)
+            case (1)
+               write(iounit, astero_results_int_format, advance='no') i
+            case (2)
+               write(iounit, astero_results_txt_format, advance='no') name
+            case (3)
+               write(iounit, astero_results_txt_format, advance='no') '"'//trim(val)//'"'
+            end select
+
+            i = i+1
+
+         end subroutine write_txt
+
+         subroutine write_int(name, val)
+            character(len=*), intent(in) :: name
+            integer, intent(in) :: val
+
+            select case (j)
+            case (1)
+               write(iounit, astero_results_int_format, advance='no') i
+            case (2)
+               write(iounit, astero_results_txt_format, advance='no') name
+            case (3)
+               write(iounit, astero_results_int_format, advance='no') val
+            end select
+
+            i = i+1
+
+         end subroutine write_int
 
       end subroutine show_all_sample_results
       
