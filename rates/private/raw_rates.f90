@@ -930,8 +930,8 @@
          use math_lib, only: str_to_vector
          character (len=*), intent(in) :: f_name
          integer, intent(out) :: nT8s
-         real(dp), pointer :: T8s_out(:) ! will be allocated.  (nT8s)
-         real(dp), pointer :: f1_out(:) ! will be allocated.  (4,nT8s)
+         real(dp), allocatable :: T8s_out(:) ! will be allocated.  (nT8s)
+         real(dp), allocatable :: f1_out(:) ! will be allocated.  (4,nT8s)
          integer, intent(out) :: ierr
          
          integer :: iounit, j, nvec
@@ -992,12 +992,13 @@
          
          ! don't set the pointers until have finished setting up the data
          
-         if (associated(T8s_out)) deallocate(T8s_out)
-         if (associated(f1_out)) deallocate(f1_out)
+         allocate(T8s_out(nT8s), f1_out(4*nT8s), stat=ierr)
 
-         T8s_out => T8s
-         f1_out => f1
+         T8s_out = T8s
+         f1_out = f1
          
+         deallocate(T8s,f1)
+
          contains
 
          logical function failed(str)
