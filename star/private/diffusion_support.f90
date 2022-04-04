@@ -1666,6 +1666,43 @@
         lam_eff = pow(lam_sum,-0.5d0)
       end subroutine lam_SM
 
+      ! Calculate coefficients given in Section 4 of Caplan, Bauer, & Freeman 2022
+      subroutine get_Ddiff_Caplan(nc,Gamma,kappa,Z,Zbar,Ddiff)
+        integer, intent(in) :: nc
+        real(dp), intent(in) :: Gamma, kappa, Zbar
+        real(dp), dimension(:), intent(in) :: Z ! nc
+        real(dp), dimension(:), intent(out) :: Ddiff ! nc
+
+        real(dp) :: a0, a1, a2, b0, b1, b2, c0, c1, c2, c3
+        real(dp) :: Ak, Bk, Ck, Dstar
+        integer :: j
+
+        a0 = 1.55973d0
+        a1 = 1.10941d0
+        a2 = 1.36909d0
+        
+        b0 = 0.0070782d0
+        b1 = 0.80499d0
+        b2 = 4.53523d0
+        
+        c0 = 2.20689d0
+        c1 = 1.351594d0
+        c2 = 1.57138d0
+        c3 = 3.34187d0
+        
+        Ak = sqrt(pi/3d0)*(a0 + a1*pow(kappa,a2))
+        Bk = b0*exp(-b1*pow(kappa,b2))
+        Ck = c0 + c1*erf(c2*pow(kappa,c3))
+
+        ! Eqn (5)
+        Dstar = sqrt(pi/3d0)*Ak*pow(Gamma,-2.5d0)*exp(-Bk*Gamma)/log(1d0 + Ck*pow(Gamma,-1.5d0)/sqrt(3d0))
+
+        ! Eqn (11)
+        do j = 1,nc
+           Ddiff(j) = Dstar*pow(Z(j)/Zbar,-0.6d0)
+        end do
+
+      end subroutine get_Ddiff_Caplan
 
       end module diffusion_support
 
