@@ -134,11 +134,6 @@
             case(ir_c12_to_he4_he4_he4) ! c12 to 3 alpha
                call do1(rate_tripalf_jina)
 
-            case(ir_c12_ag_o16)
-               call do1(rate_c12ag_jina)
-
-            ! case(ir_o16_ga_c12) ! o16(g, a)c12
-            !    call do1(rate_c12ag_nacre)
 
             case(ir1212) ! c12(c12,n)mg23, c12(c12,p)na23, c12(c12,a)ne20
                call do1(rate_c12c12_fxt_multi)
@@ -991,9 +986,11 @@
          close(iounit)
          
          ! don't set the pointers until have finished setting up the data
-         
-         allocate(T8s_out(nT8s), f1_out(4*nT8s), stat=ierr)
+                 
+         if(allocated(T8s_out)) deallocate(T8s_out)
+         if(allocated(f1_out)) deallocate(f1_out)
 
+         allocate(T8s_out(nT8s), f1_out(4*nT8s))
          T8s_out = T8s
          f1_out = f1
          
