@@ -552,6 +552,7 @@
          logical function get_radial(code)
             character (len=*), intent(in) :: code
             integer :: ierr
+            real(dp) :: chi2term
             include 'formats'
             ierr = 0
             get_radial = .false.
@@ -577,7 +578,28 @@
                write(*,'(a65,i6)') 'failed in get_freq_corr', s% model_number
                return
             end if
-            chi2_radial = get_chi2(s, 0, .false., ierr)
+            ! you might think we can use the function get_chi2 from astero_support for this
+            ! but that causes a lot of problems
+            ! chi2_radial = get_chi2(s, 0, .false., ierr)
+            ! instead, we just add up the radial chi^2
+            chi2_radial = 0.0_dp
+            n = 0
+            do i = 1, nl(0)
+               if (freq_target(0,i) < 0) cycle
+               chi2term = &
+                  pow2((model_freq_corr(0,i) - freq_target(0,i))/freq_sigma(0,i))
+               if (.false. .and. trace_chi2_seismo_frequencies_info) &
+                  write(*,'(4i6,99(1pe20.10))') &
+                     s% model_number, i, 0, model_order(0,i), chi2term, model_freq(0,i), &
+                     model_freq_corr(0,i), freq_target(0,i), freq_sigma(0,i), safe_log10(model_inertia(0,i))
+               chi2_radial = chi2_radial + chi2term
+               n = n + 1
+            end do
+
+            if (normalize_chi2_seismo_frequencies) then
+               chi2_radial = chi2_radial/max(1,n)
+            end if
+
             if (ierr /= 0) then
                write(*,'(a65,i6)') 'failed to get chi2_radial', s% model_number
                return
