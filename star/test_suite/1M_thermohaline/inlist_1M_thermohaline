@@ -55,12 +55,13 @@
          
          he_core_mass_limit = 0.24d0
 
-         num_trace_history_values = 2
+         num_trace_history_values = 3
          trace_history_value_name(1) = 'rel_E_err'
          trace_history_value_name(2) = 'log_rel_run_E_err'
+         trace_history_value_name(3) = 'he_core_mass'
 
          ! limit max_model_number as part of test_suite
-         max_model_number = 3000
+         max_model_number = 6500
 
          initial_mass = 1.0
          initial_z = 2d-2
