@@ -1666,6 +1666,42 @@
         lam_eff = pow(lam_sum,-0.5d0)
       end subroutine lam_SM
 
+      ! Screening Length for Caplan diffusion coefficients.
+      ! Only electron screening, accounts for potentially relativistic electron degeneracy.
+      subroutine kappa_Caplan(nc,m,rho,T,nd,lam_e,kappa)
+        integer, intent(in) :: nc, m
+        real(dp), intent(in) :: rho, T
+        real(dp), dimension(:), intent(in) :: nd ! m. number densities of all species
+        real(dp), intent(out) :: lam_e
+        real(dp), intent(out) :: kappa ! ion separation relative to electron screening length.
+
+        real(dp) :: tiny_n, ne, EF, kF, lam_e_SM, lam_e_rel, ni_tot
+        integer :: i
+
+        tiny_n = 1d-20 ! g/cc
+        ne = nd(m) ! electron number density
+        ! Electron Fermi energy
+        EF = (hbar*hbar*pow(3d0*pi*pi*ne,2d0/3d0))/(2d0*me)
+        ! Electron screening length accounting for degeneracy correction
+        lam_e_SM = pow(pi4*qe*qe*ne/sqrt(pow2(boltzm*T) + pow2((2d0/3d0)*EF)),-0.5d0)
+
+        if (rho < 1d6) then
+           lam_e = lam_e_SM
+        else ! calculate and use relativistic screening length if rho > 1d6
+           kF = pow(3d0*pi*pi*ne,one_third) ! electron Fermi momentum
+           lam_e_rel = 1d0/(2d0*kF*sqrt(fine/pi)) ! fine = fine structure constant ~1/137
+           lam_e = min(lam_e_SM,lam_e_rel) ! min for continuity
+        end if
+
+        ! Compute kappa
+        ni_tot = 0d0
+        do i = 1,nc
+           ni_tot = ni_tot + nd(i)
+        end do
+        kappa = pow(3d0/(pi4*ni_tot),one_third)/lam_e
+
+      end subroutine kappa_Caplan
+      
       ! Calculate coefficients given in Section 4 of Caplan, Bauer, & Freeman 2022
       subroutine get_Ddiff_Caplan(nc,Gamma,kappa,Z,Zbar,Ddiff)
         integer, intent(in) :: nc
