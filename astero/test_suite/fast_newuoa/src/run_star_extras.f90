@@ -73,6 +73,8 @@
             if (ierr /= 0) return
             !my_var1 = s% Teff
          !end if
+
+         write(*,*) 'called run_star_extras.f90: set_my_vars.f90'
       end subroutine set_my_vars
       
       
@@ -120,28 +122,13 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         write(*,1) 'best_chi2', best_chi2
-         if (best_chi2 < 15 .and. best_chi2 > 1) then
-            write(*,*) 'chi square within limit'
-            termination_code_str(t_xtra1) = 'good chi^2'
-            s% termination_code = t_xtra1
-         else if (best_chi2 <= 0) then
-            write(*,*) 'ERROR: failed to evaluate chi square'
-         else if (best_chi2 <= 1) then
-            write(*,*) 'bogus chi square ???  value too small??'
-         else
-            write(*,*) 'ERROR: chi square too large'
-         end if
-
-         testhub_extras_names(1) = 'chi2'
-         testhub_extras_vals(1) = best_chi2
-
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
       
 
       integer function extras_check_model(id)
          use astero_def, only: my_var1, my_var2, my_var3
+         use astero_def, only: my_var1_name, my_var2_name, my_var3_name
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
@@ -151,11 +138,15 @@
          if (ierr /= 0) return
          
          include 'formats'
+
+         ! call get1('photosphere_r', my_var1)
+         ! call get1('luminosity', my_var3)
+         my_var1 = star_get_history_output(s, my_var1_name)
+         my_var2 = star_get_history_output(s, my_var2_name)
+         my_var3 = star_get_history_output(s, my_var3_name)
          
-
-         my_var1 = s% delta_Pg
+         ! my_var1 = s% delta_Pg
          !write(*,2) 'delta_Pg', s% model_number, my_var1
-
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depenending on which
@@ -168,7 +159,6 @@
          ! by default, indicate where (in the code) MESA terminated
          if (extras_check_model == terminate) s% termination_code = t_extras_check_model
       end function extras_check_model
-
 
       subroutine set_my_param(s, i, new_value)
          type (star_info), pointer :: s
