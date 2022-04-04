@@ -517,8 +517,8 @@
          if (ASSOCIATED(raw_rates_records)) then
             do i = 1, rates_reaction_id_max
                ri => raw_rates_records(i)
-               if (allocated(ri% T8s)) deallocate(ri% T8s)
-               if (allocated(ri% f1)) deallocate(ri% f1)
+               if (ASSOCIATED(ri% T8s)) deallocate(ri% T8s)
+               if (ASSOCIATED(ri% f1)) deallocate(ri% f1)
             end do
             deallocate(raw_rates_records)
          end if
@@ -1176,8 +1176,8 @@
          ri% nT8s = 0
          ri% use_rate_table = .false.
          ri% need_to_read = .false.
-         if(allocated(ri% T8s)) deallocate(ri% T8s)
-         if(allocated(ri% f1)) deallocate(ri% f1)
+         nullify(ri% T8s)
+         nullify(ri% f1)
 
       end subroutine increase_num_reactions
 
@@ -1287,16 +1287,19 @@
       
       subroutine init1_rates_info
          use rates_names, only: set_reaction_names
+         type (rate_table_info), pointer :: ri =>null()
          integer :: i
          rates_reaction_id_max = num_predefined_reactions
          allocate( &
             raw_rates_records(rates_reaction_id_max), &
             reaction_Name(rates_reaction_id_max))
          do i = 1, rates_reaction_id_max
-            raw_rates_records(i)% nT8s = 0
-            raw_rates_records(i)% use_rate_table = .false.
-            raw_rates_records(i)% need_to_read = .false.
-            raw_rates_records(i)% rate_fname = ''
+            ri => raw_rates_records(i)
+            ri% nT8s = 0
+            ri% use_rate_table = .false.
+            ri% need_to_read = .false.
+            nullify(ri% T8s)
+            nullify(ri% f1)
          end do
          call set_reaction_names
       end subroutine init1_rates_info

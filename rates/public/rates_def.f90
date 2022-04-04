@@ -835,8 +835,8 @@
          logical :: need_to_read
          character (len=132) :: rate_fname
          integer :: nT8s
-         real(dp), allocatable :: T8s(:) ! (nT8s)
-         real(dp), allocatable :: f1(:)  ! =(4,nT8s)
+         real(dp), pointer :: T8s(:) ! (nT8s)
+         real(dp), pointer :: f1(:) ! =(4,nT8s)
       end type rate_table_info
       
       type (rate_table_info), pointer :: raw_rates_records(:)

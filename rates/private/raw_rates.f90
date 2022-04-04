@@ -134,6 +134,11 @@
             case(ir_c12_to_he4_he4_he4) ! c12 to 3 alpha
                call do1(rate_tripalf_jina)
 
+            case(ir_c12_ag_o16)
+               call do1(rate_c12ag_jina)
+
+            ! case(ir_o16_ga_c12) ! o16(g, a)c12
+            !    call do1(rate_c12ag_nacre)
 
             case(ir1212) ! c12(c12,n)mg23, c12(c12,p)na23, c12(c12,a)ne20
                call do1(rate_c12c12_fxt_multi)
@@ -925,8 +930,8 @@
          use math_lib, only: str_to_vector
          character (len=*), intent(in) :: f_name
          integer, intent(out) :: nT8s
-         real(dp), allocatable :: T8s_out(:) ! will be allocated.  (nT8s)
-         real(dp), allocatable :: f1_out(:) ! will be allocated.  (4,nT8s)
+         real(dp), pointer :: T8s_out(:) ! will be allocated.  (nT8s)
+         real(dp), pointer :: f1_out(:) ! will be allocated.  (4,nT8s)
          integer, intent(out) :: ierr
          
          integer :: iounit, j, nvec
@@ -986,16 +991,13 @@
          close(iounit)
          
          ! don't set the pointers until have finished setting up the data
-                 
-         if(allocated(T8s_out)) deallocate(T8s_out)
-         if(allocated(f1_out)) deallocate(f1_out)
-
-         allocate(T8s_out(nT8s), f1_out(4*nT8s))
-         T8s_out = T8s
-         f1_out = f1
          
-         deallocate(T8s,f1)
+         if (associated(T8s_out)) deallocate(T8s_out)
+         if (associated(f1_out)) deallocate(f1_out)
 
+         T8s_out => T8s
+         f1_out => f1
+         
          contains
 
          logical function failed(str)
