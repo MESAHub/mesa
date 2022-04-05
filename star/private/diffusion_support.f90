@@ -412,7 +412,7 @@
                Gamma = s% gam(k)
                Gamlo = 5d0
                Gamhi = 10d0 ! for blending over from Stanton & Murillo coeffs to CBF coeffs at high Gamma
-               if(Gamma < Gamlo) then
+               if(Gamma < Gamlo .or. .not. s% diffusion_use_caplan) then
                   call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
                   ! This must get called after Paquette because it doesn't calculate
                   ! the electron entries (m). It leaves them untouched while calculating

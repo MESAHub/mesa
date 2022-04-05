@@ -710,6 +710,7 @@
          logical :: do_element_diffusion
          logical :: diffusion_use_iben_macdonald
          logical :: diffusion_use_paquette
+         logical :: diffusion_use_caplan
          logical :: diffusion_use_cgs_solver
          logical :: diffusion_use_full_net
          logical :: do_WD_sedimentation_heating

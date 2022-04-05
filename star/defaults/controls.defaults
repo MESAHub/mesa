@@ -6642,7 +6642,6 @@
 
     diffusion_dt_limit = 3.15d7
 
-
       ! diffusion_use_paquette
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -6654,6 +6653,18 @@
       ! ::
 
     diffusion_use_paquette = .false.
+
+
+      ! diffusion_use_caplan
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, use atomic diffusion coefficients according to
+      ! Caplan, Bauer, & Freeman (2022) at strong coupling (Gamma > 10),
+      ! relevant for white dwarf interiors.
+
+      ! ::
+
+    diffusion_use_caplan = .true.
 
 
       ! diffusion_use_iben_macdonald
