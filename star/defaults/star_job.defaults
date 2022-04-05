@@ -2465,6 +2465,15 @@
     filename_of_special_rate(:) = ''
 
 
+      ! use_3a_fl87
+      ! ~~~~~~~~~~~
+
+      ! If true then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
+      ! This replaces the old set_rate_3a = 'Fl87' option
+
+      use_3a_fl87 = .false.
+
+
       ! auto_extend_net
       ! ~~~~~~~~~~~~~~~
       ! h_he_net

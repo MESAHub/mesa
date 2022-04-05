@@ -17,6 +17,8 @@
       ion_coulomb_corrections = 'PCR2009'
       electron_coulomb_corrections = 'Itoh2002'
 
+      use_3a_fl87 = .true.
+
       change_net = .true.
       new_net_name = 'nco.net'
 

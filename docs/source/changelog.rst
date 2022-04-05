@@ -65,19 +65,31 @@ As part of this new scheme we now ship a set of rates from NACREII `Xu et al 201
 override the default NACRE rates. You must explicity ask for them with ``filename_of_special_rate``.
 
 There is now a new hook ``other_rate_get`` to provide a simple way to change an existing rate in a ``run_star_extras.f90``. Note this hook
-only works on rates that are NOT currently in your rates_cache. 
+only works on rates that are NOT currently in your rates_cache. It is recommended when using this option to set a custom ``rates_cache_dir`` otherwise the cache files in
+``MESA_DIR`` will be over written.
 
+The previous option:
 
-.. note::
+::
 
-  Describe the replacement for the FL87 rate
+    use_rate_3a = 'Fl87'
+
+has been replaced with:
+
+::
+
+    use_3a_fl87 = .true.
+
 
 Net
 ---
 
 There is a new hook ``other_net_derivs`` that allows for modifying the ``dydt`` term MESA computes for each zone inside ``net/``.
 This allows adding changes in compostion due to nuclear reactions that MESA could otherwise not handle or does not know about. 
-This hook only works with soft networks (thus no ``approx`` nets).
+This hook only works with soft networks (thus no ``approx`` nets). This hook does requre many eriatives to be set, 
+thus users should look at ``net_derivs.f90`` for reference to what needs setting.
+
+
 star
 ----
 

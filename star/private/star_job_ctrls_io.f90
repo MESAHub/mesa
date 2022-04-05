@@ -462,6 +462,7 @@
          T9_weaklib_full_on_hi_Z, &
 
          use_suzuki_weak_rates, &
+         use_3a_fl87, &
 
          use_special_weak_rates, &
          special_weak_states_file, &
@@ -1091,6 +1092,7 @@
          s% job% T9_weaklib_full_on_hi_Z = T9_weaklib_full_on_hi_Z
 
          s% job% use_suzuki_weak_rates = use_suzuki_weak_rates
+         s% job% use_3a_fl87 = use_3a_fl87
 
          s% job% use_special_weak_rates = use_special_weak_rates
          s% job% special_weak_states_file = special_weak_states_file
@@ -1646,6 +1648,7 @@
          T9_weaklib_full_on_hi_Z = s% job% T9_weaklib_full_on_hi_Z
 
          use_suzuki_weak_rates = s% job% use_suzuki_weak_rates
+         use_3a_fl87 = s% job% use_3a_fl87
 
          use_special_weak_rates = s% job% use_special_weak_rates
          special_weak_states_file = s% job% special_weak_states_file

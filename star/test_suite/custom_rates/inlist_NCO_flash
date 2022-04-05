@@ -17,6 +17,8 @@
       ion_coulomb_corrections = 'PCR2009'
       electron_coulomb_corrections = 'Itoh2002'
 
+      use_3a_fl87 = .true.
+
       show_net_reactions_info = .true.
       show_net_species_info = .true.
 
