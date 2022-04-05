@@ -1977,17 +1977,18 @@
          end if
 
          read(iounit, fmt='(a)') line
+         read(iounit, fmt='(a)') line
          
-         read(iounit, fmt='(i8)', iostat=ierr) num
+         read(iounit, fmt=astero_results_int_format, iostat=ierr) num
          if (ierr /= 0) then
-            write(*,*) 'failed to read number of samples on line 2 of ' // trim(results_fname)
+            write(*,*) 'failed to read number of samples on line 3 of ' // trim(results_fname)
             call done
             return
          end if
          
          write(*,2) 'number of samples in file', num
 
-         do j = 3, 5
+         do j = 4, 6
             read(iounit, fmt='(a)', iostat=ierr) line
             if (ierr /= 0) then
                write(*,'(a,i1,a)') 'failed to line ', j, ' of ' // trim(results_fname)
@@ -2045,7 +2046,7 @@
          include 'formats'
          
          ierr = 0
-         read(iounit,fmt='(i8)',advance='no',iostat=ierr) i
+         read(iounit,fmt=astero_results_int_format,advance='no',iostat=ierr) i
          if (ierr /= 0) return
          if (i <= 0 .or. i > size(sample_chi2,dim=1)) then
             write(*,2) 'invalid sample number', i
