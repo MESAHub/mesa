@@ -589,10 +589,8 @@
             Hj(1) = Hj(2); Hj(nz) = Hj(nz-1)
 
             do i = 1, nz
-               dlnRho_dlnP = s% grad_density(i)
-               dlnT_dlnP = s% grad_temperature(i)
-               N2(i) = -grav(i)*(1/gamma1(i) - dlnRho_dlnP)/scale_height(i)
-               N2_mu(i) = -grav(i)/scale_height(i)*(1/chiRho(i) - delta(i)*dlnT_dlnP - dlnRho_dlnP)
+               N2(i) = s%brunt_N2(i)
+               N2_mu(i) = s%brunt_N2_composition_term(i)
             end do
 
             do k=1,nz
