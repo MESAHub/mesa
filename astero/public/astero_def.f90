@@ -1367,12 +1367,10 @@
          character (len=1) :: l_str
 
          ! column numbers
-         write(iounit, '(i8)', advance='no') 1
-
          write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
 
-         k = 2
-         do i = 1, 40
+         k = 1
+         do i = 1, 41
             write(iounit, fmt, advance='no') k
             k = k+1
          end do
@@ -1396,8 +1394,8 @@
             end do
 
             if (chi2_seismo_r_02_fraction > 0) then
-               do j = 1, ratios_n
-                  do i = 1, 6
+               do j = 1, nl(0)
+                  do i = 1, 3
                      write(iounit, fmt, advance='no') k
                      k = k+1
                   end do
@@ -1411,9 +1409,8 @@
          ! column names
          write(fmt,'(a)') '(99' // trim(astero_results_txt_format) // ')'
 
-         write(iounit, '(2x,a6)', advance='no') 'sample'
-      
          write(iounit, fmt, advance='no') &
+            'sample', &
             'chi2', &
             'mass', &
             'init_Y', &
@@ -1525,7 +1522,8 @@
             end if
          end if
 
-         write(fmt,'(a)') '(1x,i7,10' // trim(astero_results_dbl_format) // &
+         write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
+            ',10' // trim(astero_results_dbl_format) // &
             ',' // trim(astero_results_int_format) // &
             ',22' // trim(astero_results_dbl_format) // &
             ',7' // trim(astero_results_int_format) // ')'
@@ -1620,17 +1618,11 @@
          call set_sample_index_by_chi2
 
          do j = 1, 3 ! line number
-            ! first column is special because it's narrow
-            select case (j)
-            case (1)
-               write(iounit, '(i8)', advance='no') 1
-            case (2)
-               write(iounit, '(a8)', advance='no') 'samples'
-            case (3)
-               write(iounit, '(i8)', advance='no') sample_number
-            end select
+            i = 1 ! column number, incremented after each column is written
 
-            i = 2 ! column number, incremented after each column is written
+            call write_int('samples', sample_number)
+
+            ! for scan_grid, we also write total size of grid
             if (i_total > 0) call write_int('total', i_total)
 
             call write_txt('version_number', version_number)
