@@ -5,7 +5,16 @@
       change_initial_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
       dump_missing_metals_into_heaviest = .false.
-      
+
+      num_special_rate_factors = 2
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+
+      reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+      special_rate_factor(2) = 1
+      filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
+
 
       change_initial_D_omega_flag = .true.
       new_D_omega_flag = .true.
