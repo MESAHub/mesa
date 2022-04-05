@@ -1097,6 +1097,11 @@
          ! These rates are setup in update_special_rates
          select case(ir)
 
+            case(ir_he4_he4_he4_to_c12) ! triple alpha
+               if (g% use_3a_fl87) then 
+                  return
+            end if
+
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
                return
          
@@ -1685,6 +1690,13 @@
 
          select case(ir)
             
+         case(ir_he4_he4_he4_to_c12) ! triple alpha
+            if (g% use_3a_fl87) then 
+               call do_FL_3alf(i) ! Fushiki and Lamb, Apj, 317, 368-388, 1987
+               return
+         end if
+
+
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
                n14 = itab(in14)
                ne20 = itab(ine20)

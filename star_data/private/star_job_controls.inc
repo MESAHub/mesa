@@ -308,7 +308,7 @@
          T9_weaklib_full_off, T9_weaklib_full_on, &
          T9_weaklib_full_off_hi_Z, T9_weaklib_full_on_hi_Z
 
-      logical :: use_suzuki_weak_rates
+      logical :: use_suzuki_weak_rates, use_3a_fl87
 
       logical :: use_special_weak_rates
       character (len=1000) :: special_weak_states_file, special_weak_transitions_file

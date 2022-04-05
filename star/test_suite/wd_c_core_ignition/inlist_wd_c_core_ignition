@@ -12,7 +12,8 @@
 
       change_initial_net = .true.      
       new_net_name = 'approx21.net'
-      
+
+      use_3a_fl87 = .true.      
 
       show_log_description_at_start = .false. 
 

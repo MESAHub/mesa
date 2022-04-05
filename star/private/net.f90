@@ -707,6 +707,8 @@
             write(*,*) 'set_net failed in s% set_op_mono_factors'
             return
          end if
+
+         s% net_rq% use_3a_fl87 = s% job% use_3a_fl87
          
          s% need_to_setvars = .true.
 
