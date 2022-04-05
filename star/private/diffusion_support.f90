@@ -384,9 +384,9 @@
             kappa_st, Zdiff, Zdiff1, Zdiff2 ! (m,m)
 
          integer :: i, j
-         real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda
+         real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda, alfa, Gamlo, Gamhi
          real(dp), dimension(m) :: charge, na
-         real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff
+         real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff, Kdiff2
          real(dp) :: Gamma, ai, lam_e, kappa, kappa_SM, Abar, Zbar, omegap
          real(dp) :: Ddiff_Caplan(nc)
             
@@ -409,16 +409,24 @@
                rho, T, m, A, charge, na, Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)
 
             if(.not. s% diffusion_use_paquette .and. .not. s% use_other_diffusion_coefficients) then
-               call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
-               ! This must get called after Paquette because it doesn't calculate
-               ! the electron entries (m). It leaves them untouched while calculating
-               ! and changing all the ion-ion terms (1:nc), so after calling this
-               ! routine we have all ion-ion coefficients from Stanton&Murillo and
-               ! all ion-electron coefficients from Paquette&al.
-
-               ! use Caplan, Bauer, & Freeman coefficients at moderate to strong coupling
                Gamma = s% gam(k)
-               if (Gamma > 5d0) then
+               Gamlo = 5d0
+               Gamhi = 10d0 ! for blending over from Stanton & Murillo coeffs to CBF coeffs at high Gamma
+               if(Gamma < Gamlo) then
+                  call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
+                  ! This must get called after Paquette because it doesn't calculate
+                  ! the electron entries (m). It leaves them untouched while calculating
+                  ! and changing all the ion-ion terms (1:nc), so after calling this
+                  ! routine we have all ion-ion coefficients from Stanton&Murillo and
+                  ! all ion-electron coefficients from Paquette&al.
+               else if(Gamma >= Gamlo .and. Gamma <= Gamhi) then ! blend
+                  alfa = (Gamhi - Gamma)/(Gamhi - Gamlo)
+                  Kdiff2(:,:) = Kdiff(:,:) ! need to initialize so that (m,m) entries are set
+                  call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM) ! alfa = 1
+                  call get_CBF_coeffs(nc,m,rho,T,A,charge,na,Gamma,Ddiff_Caplan,Kdiff2) ! alfa = 0
+                  Kdiff(:,:) = alfa*Kdiff(:,:) + (1d0-alfa)*Kdiff2(:,:)
+               else
+                  ! use Caplan, Bauer, & Freeman coefficients at moderate to strong coupling
                   call get_CBF_coeffs(nc,m,rho,T,A,charge,na,Gamma,Ddiff_Caplan,Kdiff)
                end if
             end if
