@@ -387,7 +387,8 @@
          real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda
          real(dp), dimension(m) :: charge, na
          real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff
-         real(dp) :: kappa_SM ! For diagnosis right now.
+         real(dp) :: Gamma, ai, lam_e, kappa, kappa_SM, Abar, Zbar, omegap
+         real(dp) :: Ddiff_Caplan(nc)
             
          do i = 1, nc
             charge(i) = max(1d0, Z(i)) ! assume some ionization
@@ -414,6 +415,12 @@
                ! and changing all the ion-ion terms (1:nc), so after calling this
                ! routine we have all ion-ion coefficients from Stanton&Murillo and
                ! all ion-electron coefficients from Paquette&al.
+
+               ! use Caplan, Bauer, & Freeman coefficients at moderate to strong coupling
+               Gamma = s% gam(k)
+               if (Gamma > 5d0) then
+                  call get_CBF_coeffs(nc,m,rho,T,A,charge,na,Gamma,Ddiff_Caplan,Kdiff)
+               end if
             end if
 
             if(s% use_other_diffusion_coefficients) then
@@ -1666,13 +1673,85 @@
         lam_eff = pow(lam_sum,-0.5d0)
       end subroutine lam_SM
 
-      ! Screening Length for Caplan diffusion coefficients.
-      ! Only electron screening, accounts for potentially relativistic electron degeneracy.
-      subroutine kappa_Caplan(nc,m,rho,T,nd,lam_e,kappa)
+      ! Calculate coefficients given in Section 4 of Caplan, Bauer, & Freeman 2022
+      subroutine get_CBF_coeffs(nc,m,rho,T,A,Z,nd,Gamma,Ddiff,Kdiff)
         integer, intent(in) :: nc, m
-        real(dp), intent(in) :: rho, T
+        real(dp), intent(in) :: rho, T, Gamma
+        real(dp), dimension(:), intent(in) :: A, Z, nd ! m
+        real(dp), dimension(:), intent(out) :: Ddiff ! nc
+        real(dp), dimension(:,:), intent(inout) :: Kdiff ! (m,m), but only touch (nc,nc)
+
+        real(dp) :: kappa, DstarOCP, omegap, ai, lam_e, Docp
+        real(dp) :: Abar, Zbar, ni_sum, Zp6bar, Kfac
+        integer :: i, j
+
+        ni_sum = sum(nd(1:nc)) ! total ion number density (excludes electron entry m)
+        Abar = sum(A(1:nc)*nd(1:nc))/ni_sum
+        Zbar = sum(Z(1:nc)*nd(1:nc))/ni_sum
+        Zp6bar = 0d0 ! average of Z^0.6, needed for constructing Kij
+        do j = 1,nc
+           Zp6bar = Zp6bar + pow(Z(j),0.6d0)*nd(j)/ni_sum
+        end do
+        
+        ! Set kappa as input for Dstar calculation,
+        ! also sets omegap, ai, lam_e for converting to cgs units later.
+        call kappa_CBF(nc,m,rho,T,Abar,Zbar,nd,omegap,ai,lam_e,kappa)
+        
+        ! Calculate Dstar using fit of Eqn (5)
+        call get_Dstar_OCP(Gamma,kappa,DstarOCP)
+        Docp = DstarOCP*ai*ai*omegap ! convert from dimensionless to cgs units
+        
+        ! Eqn (11)
+        do j = 1,nc
+           Ddiff(j) = Docp*pow(Z(j)/Zbar,-0.6d0)
+        end do
+
+        ! Translate into Kij coefficients for Burgers equations
+        Kfac = boltzm*T/(ni_sum*Zp6bar*pow(Zbar,0.6d0)*Docp)
+        do i = 1,nc
+           do j = 1,nc
+              Kdiff(i,j) = nd(i)*nd(j)*pow(Z(i)*Z(j),0.6d0)*Kfac
+           end do
+        end do
+
+      end subroutine get_CBF_coeffs
+      
+      subroutine get_Dstar_OCP(Gamma,kappa,DstarOCP)
+        real(dp), intent(in) :: Gamma, kappa
+        real(dp), intent(out) :: DstarOCP
+
+        real(dp) :: a0, a1, a2, b0, b1, b2, c0, c1, c2, c3
+        real(dp) :: Ak, Bk, Ck
+
+        a0 = 1.55973d0
+        a1 = 1.10941d0
+        a2 = 1.36909d0
+        
+        b0 = 0.0070782d0
+        b1 = 0.80499d0
+        b2 = 4.53523d0
+        
+        c0 = 2.20689d0
+        c1 = 1.351594d0
+        c2 = 1.57138d0
+        c3 = 3.34187d0
+        
+        Ak = sqrt(pi/3d0)*(a0 + a1*pow(kappa,a2))
+        Bk = b0*exp(-b1*pow(kappa,b2))
+        Ck = c0 + c1*erf(c2*pow(kappa,c3))
+
+        ! Eqn (5)
+        DstarOCP = sqrt(pi/3d0)*Ak*pow(Gamma,-2.5d0)*exp(-Bk*Gamma)/log(1d0 + Ck*pow(Gamma,-1.5d0)/sqrt(3d0))
+
+      end subroutine get_Dstar_OCP
+      
+      ! Screening Length for CBF diffusion coefficients.
+      ! Only electron screening, accounts for potentially relativistic electron degeneracy.
+      subroutine kappa_CBF(nc,m,rho,T,Abar,Zbar,nd,omegap,ai,lam_e,kappa)
+        integer, intent(in) :: nc, m
+        real(dp), intent(in) :: rho, T, Abar, Zbar
         real(dp), dimension(:), intent(in) :: nd ! m. number densities of all species
-        real(dp), intent(out) :: lam_e
+        real(dp), intent(out) :: omegap, ai, lam_e
         real(dp), intent(out) :: kappa ! ion separation relative to electron screening length.
 
         real(dp) :: tiny_n, ne, EF, kF, lam_e_SM, lam_e_rel, ni_tot
@@ -1698,47 +1777,11 @@
         do i = 1,nc
            ni_tot = ni_tot + nd(i)
         end do
-        kappa = pow(3d0/(pi4*ni_tot),one_third)/lam_e
+        omegap = sqrt(pi4*ni_tot*Zbar*Zbar*qe*qe/(Abar*amu)) ! plasma frequency
+        ai = pow(3d0/(pi4*ni_tot),one_third)
+        kappa = ai/lam_e
 
-      end subroutine kappa_Caplan
+      end subroutine kappa_CBF
       
-      ! Calculate coefficients given in Section 4 of Caplan, Bauer, & Freeman 2022
-      subroutine get_Ddiff_Caplan(nc,Gamma,kappa,Z,Zbar,Ddiff)
-        integer, intent(in) :: nc
-        real(dp), intent(in) :: Gamma, kappa, Zbar
-        real(dp), dimension(:), intent(in) :: Z ! nc
-        real(dp), dimension(:), intent(out) :: Ddiff ! nc
-
-        real(dp) :: a0, a1, a2, b0, b1, b2, c0, c1, c2, c3
-        real(dp) :: Ak, Bk, Ck, Dstar
-        integer :: j
-
-        a0 = 1.55973d0
-        a1 = 1.10941d0
-        a2 = 1.36909d0
-        
-        b0 = 0.0070782d0
-        b1 = 0.80499d0
-        b2 = 4.53523d0
-        
-        c0 = 2.20689d0
-        c1 = 1.351594d0
-        c2 = 1.57138d0
-        c3 = 3.34187d0
-        
-        Ak = sqrt(pi/3d0)*(a0 + a1*pow(kappa,a2))
-        Bk = b0*exp(-b1*pow(kappa,b2))
-        Ck = c0 + c1*erf(c2*pow(kappa,c3))
-
-        ! Eqn (5)
-        Dstar = sqrt(pi/3d0)*Ak*pow(Gamma,-2.5d0)*exp(-Bk*Gamma)/log(1d0 + Ck*pow(Gamma,-1.5d0)/sqrt(3d0))
-
-        ! Eqn (11)
-        do j = 1,nc
-           Ddiff(j) = Dstar*pow(Z(j)/Zbar,-0.6d0)
-        end do
-
-      end subroutine get_Ddiff_Caplan
-
       end module diffusion_support
 
