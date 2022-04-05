@@ -1404,7 +1404,7 @@
 
          end if
 
-         write(iounit, '(a)') 
+         write(iounit, '(a)')
 
          ! column names
          write(fmt,'(a)') '(99' // trim(astero_results_txt_format) // ')'
