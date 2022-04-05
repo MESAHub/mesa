@@ -66,7 +66,7 @@
          use utils_lib, only: integer_dict_create_hash, integer_dict_free, mkdir, folder_exists
          use chem_def, only: category_name
          use math_lib, only: math_backend
-         use rates_def, only: rates_reaction_id_max, i_rate
+         use rates_def, only: rates_reaction_id_max
          type (star_info), pointer :: s
 
          logical, intent(in) :: write_flag
@@ -864,6 +864,7 @@
          ! to the order in history_specs
          subroutine do_col_pass2(j) ! get the column name
             use colors_lib, only : get_bc_name_by_id
+            use rates_def, only: reaction_name
             integer, intent(in) :: j
             character (len=100) :: col_name
             character (len=10) :: str
@@ -933,6 +934,18 @@
                else ! location of top
                   col_name = 'mix_qtop_' // trim(str)
                end if
+            else if (c > eps_neu_rate_offset) then
+               i = c - eps_neu_rate_offset
+               col_name = 'eps_neu_rate_' // trim(reaction_name(i))
+            else if (c > eps_nuc_rate_offset) then
+               i = c - eps_nuc_rate_offset
+               col_name = 'eps_nuc_rate_' // trim(reaction_name(i))
+            else if (c > screened_rate_offset) then
+               i = c - screened_rate_offset
+               col_name = 'screened_rate_' // trim(reaction_name(i))
+            else if (c > raw_rate_offset) then
+               i = c - raw_rate_offset
+               col_name = 'raw_rate_' // trim(reaction_name(i))
             else if (c > log_lum_band_offset) then
                i = c - log_lum_band_offset
                col_name = 'log_lum_band_' // trim(get_bc_name_by_id(i,ierr))
@@ -1162,11 +1175,17 @@
       subroutine history_getval( &
             s, c, val, int_val, is_int_val, &
             nz, v_surf, csound_surf, envelope_fraction_left, epsnuc_out, ierr)
-         use rates_def, only: i_rate
          use colors_lib, only: get_abs_mag_by_id, get_bc_by_id, get_lum_band_by_id
          use chem_lib, only: chem_M_div_h
          use rsp_def, only: rsp_phase_time0
          use gravity_darkening
+         
+         !use net_def, only: Net_Info
+         !use net_lib, only: net_work_size, get_reaction_id_table_ptr, get_net_rate_ptrs
+         use rates_def, only: T_Factors!, reaction_name, std_reaction_Qs, std_reaction_neuQs
+         use rates_lib, only: get_raw_rate, eval_tfactors!, rates_reaction_id, screening_option
+         !use eos_def, only : i_eta
+         
          type (star_info), pointer :: s
          integer, intent(in) :: c, nz
          real(dp), intent(in) :: &
@@ -1175,6 +1194,23 @@
          integer, intent(out) :: int_val
          logical, intent(out) :: is_int_val
          integer, intent(out) :: ierr
+         
+         real(dp) :: raw_rate
+         type (T_Factors), pointer :: tf
+         type (T_Factors), target :: tf2
+         !real(dp), pointer :: work(:)
+         !integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
+         !integer :: net_lwork
+         !real(dp), target :: net_work_ary(net_lwork)
+         !real(dp), pointer :: net_work(:)
+         !real(dp), pointer, dimension(:) :: &
+         !   rate_screened, rate_screened_dT, rate_screened_dRho, &
+         !   rate_raw, rate_raw_dT, rate_raw_dRho
+         !integer :: ir
+         !real(dp) :: log10_rho, log10_T, d_eps_nuc_dRho, d_eps_nuc_dT
+         !type (Net_Info), target :: net_info_target
+         !type (Net_Info), pointer :: netinfo
+         
          integer :: k, i, min_k, k2
          real(dp) :: Ledd, L_rad, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, &
             min_gamma1, deltam
@@ -1196,7 +1232,81 @@
             v_flag = .false.
          end if
          
-         if (c > log_lum_band_offset) THEN
+         !if (c < eps_neu_rate_offset + idel .and. c > screened_rate_offset) then
+         !    if (s% screening_mode_value < 0) then
+         !       s% screening_mode_value = screening_option(s% screening_mode, ierr)
+         !       if (ierr /= 0) then
+         !          write(*,*) 'failed in screening_option'
+         !          stop 1
+         !       end if
+         !    end if
+         !    
+         !    net_work => net_work_ary
+         !    netinfo => net_info_target
+         ! 
+         !    log10_rho = s% lnd(k)/ln10
+         !    log10_T = s% lnT(k)/ln10
+         !    
+         !    net_lwork = net_work_size(s% net_handle, ierr)
+         !    
+         !    call net_get( &
+         !       s% net_handle, .false., netinfo, species, s% num_reactions, s% xa(1:species,k), &
+         !       s% T(k), log10_T, s% rho(k), log10_Rho, &
+         !       s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
+         !       s% eta(k), s% d_eos_dlnd(i_eta,k), s% d_eos_dlnT(i_eta,k), &
+         !       s% rate_factors, s% weak_rate_factor, &
+         !       std_reaction_Qs, std_reaction_neuQs, &
+         !       s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), & 
+         !       s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
+         !       s% screening_mode_value, &
+         !       s% eps_nuc_categories(:,k), &
+         !       s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
+         !    if (ierr /= 0) then
+         !       write(*,*) 'failed in net_get'
+         !       stop 1
+         !    end if
+         !
+         !    call get_net_rate_ptrs(s% net_handle, &
+         !       rate_screened, rate_screened_dT, rate_screened_dRho, &
+         !       rate_raw, rate_raw_dT, rate_raw_dRho, net_lwork, net_work, &
+         !       ierr)
+         !    if (ierr /= 0) then
+         !       write(*,*) 'failed in get_net_rate_ptrs'
+         !       stop 1
+         !    end if
+         !    ir = rates_reaction_id(reaction_name(i))
+         !end if
+         
+         if (c > eps_neu_rate_offset) then 
+             i = c - eps_neu_rate_offset
+             val = 0
+             do k = 1, s% nz
+                ! rates are in num_reaction order, Q's are in irate order
+                val = 0 !val + rate_screened(i) * std_reaction_neuQs(ir) * Qconv
+             end do
+         else if (c > eps_nuc_rate_offset) then
+             do k = 1, s% nz
+                val = 0 !val + rate_screened(i) * &
+                    !(std_reaction_Qs(ir) - std_reaction_neuQs(ir)) * Qconv
+             end do
+         else if (c > screened_rate_offset) then
+             i = c - screened_rate_offset
+             val = 0
+             do k = 1, s% nz
+                val = 0 !val + rate_screened(i)
+             end do
+         else if (c > raw_rate_offset) then
+             i = c - raw_rate_offset
+             ! i is the reaction id 
+             val = 0
+             tf => tf2
+             do k = 1, s% nz
+                call eval_tfactors(tf, log10(s% t(k)), s% t(k))
+                call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
+                val = val + raw_rate
+             end do
+             nullify(tf)
+         else if (c > log_lum_band_offset) then
             ! We want log Teff, Log g, M/H, Lum/lsun at the photosphere
             k = s% photosphere_cell_k
             m_div_h = chem_M_div_h(s% X(k),s% Z(k),s% job% initial_zfracs)
@@ -1207,7 +1317,7 @@
                if (ierr /= 0) return
             end if
             val=safe_log10(val*lsun)
-         else if (c > lum_band_offset) THEN
+         else if (c > lum_band_offset) then
             ! We want log Teff, Log g, M/H, Lum/lsun at the photosphere
             k = s% photosphere_cell_k
             m_div_h = chem_M_div_h(s% X(k),s% Z(k),s% job% initial_zfracs)
@@ -1219,7 +1329,7 @@
                val=val*lsun
                if (ierr /= 0) return
             end if
-         else if (c > abs_mag_offset) THEN
+         else if (c > abs_mag_offset) then
             ! We want log Teff, Log g, M/H, Lum/lsun at the photosphere
             k = s% photosphere_cell_k
             m_div_h = chem_M_div_h(s% X(k),s% Z(k),s% job% initial_zfracs)
@@ -1230,7 +1340,7 @@
                   s% photosphere_logg, m_div_h, s% photosphere_L, ierr)
                if (ierr /= 0) return
             end if
-         else if (c > bc_offset) THEN
+         else if (c > bc_offset) then
             ! We want log Teff, Log g, M/H at the photosphere
             k = s% photosphere_cell_k
             m_div_h = chem_M_div_h(s% X(k),s% Z(k),s% job% initial_zfracs)

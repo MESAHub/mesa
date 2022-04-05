@@ -128,6 +128,30 @@
                   ierr = -1; call error; return
                end if
                call count_specs
+               
+            case ('add_eps_neu_rates')
+               call insert_spec(eps_neu_rate_offset, 'add_eps_neu_rate', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_eps_nuc_rates')
+               call insert_spec(eps_nuc_rate_offset, 'add_eps_nuc_rate', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_screened_rates')
+               call insert_spec(screened_rate_offset, 'add_screened_rates', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_raw_rates')
+               call insert_spec(raw_rate_offset, 'add_raw_rates', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
 
             case ('add_abundances')
                ! add all of the isos that are in the current net
@@ -280,6 +304,11 @@
             if (s% profile_column_spec(j) == add_abundances .or. &
                 s% profile_column_spec(j) == add_log_abundances) then
                numcols = numcols + s% species
+            else if (s% profile_column_spec(j) == raw_rate_offset .or. &
+                     s% profile_column_spec(j) == screened_rate_offset .or. & 
+                     s% profile_column_spec(j) == eps_nuc_rate_offset .or. & 
+                     s% profile_column_spec(j) == eps_neu_rate_offset) then
+               numcols = numcols + s% num_reactions
             else
                numcols = numcols + 1
             end if
@@ -600,9 +629,17 @@
                         col = col+1
                         call do_abundance_col(i, j, jj, kk)
                      end do
+                  else if (s% profile_column_spec(j) == raw_rate_offset .or. &
+                           s% profile_column_spec(j) == screened_rate_offset .or. &
+                           s% profile_column_spec(j) == eps_nuc_rate_offset .or. &
+                           s% profile_column_spec(j) == eps_neu_rate_offset) then
+                     do jj = 1, s% num_reactions
+                        col = col+1
+                        call do_col(i, j, jj, kk)
+                     end do
                   else
                      col = col+1
-                     call do_col(i, j, kk)
+                     call do_col(i, j, 0, kk)
                   end if
                end do
                do j=1,num_extra_cols
@@ -752,17 +789,17 @@
          end subroutine do_extra_col
 
 
-         subroutine do_col(pass, j, k)
+         subroutine do_col(pass, j, jj, k)
             use rates_def
             use profile_getval, only: getval_for_profile
-            integer, intent(in) :: pass, j, k
-            integer :: i, c, ii, int_val
+            integer, intent(in) :: pass, j, jj, k
+            integer :: i, c, int_val
             real(dp) :: val, cno, z, dr, eps, eps_alt
             logical :: int_flag
             character (len=128) :: col_name
             logical, parameter :: dbg = .false.
             include 'formats'
-            c = s% profile_column_spec(j)
+            c = s% profile_column_spec(j) + jj
             val = 0; int_val = 0
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') col
@@ -770,6 +807,18 @@
                if (c > extra_offset) then
                   i = c - extra_offset
                   col_name = trim(s% profile_extra_name(i))
+               else if (c > eps_neu_rate_offset) then
+                  i = c - eps_neu_rate_offset
+                  col_name = 'eps_neu_rate_' // trim(reaction_name(i))
+               else if (c > eps_nuc_rate_offset) then
+                  i = c - eps_nuc_rate_offset
+                  col_name = 'eps_nuc_rate_' // trim(reaction_name(i))
+               else if (c > screened_rate_offset) then
+                  i = c - screened_rate_offset
+                  col_name = 'screened_rate_' // trim(reaction_name(i))
+               else if (c > raw_rate_offset) then
+                  i = c - raw_rate_offset
+                  col_name = 'raw_rate_' // trim(reaction_name(i))
                else if (c > diffusion_D_offset) then
                   i = c - diffusion_D_offset
                   col_name = 'diffusion_D_' // trim(chem_isos% name(i))
@@ -844,7 +893,6 @@
 
          subroutine do_abundance_col(pass, j, jj, k)
             integer, intent(in) :: pass, j, jj, k
-            integer :: i, c, ii
             real(dp) :: val
             logical :: int_flag, log_abundance
             character (len=128) :: col_name

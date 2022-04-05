@@ -1626,7 +1626,7 @@
          l0_first = ratios_l0_first
          l1_first = ratios_l1_first
           
-         write(io,'(/,2a6,99a16)') &
+         write(io,'(/,2a6,99a20)') &
             'r01', 'l=0 n', 'chi2term', 'r01', 'r01_obs', 'r01_sigma', 'l0_obs'
          do i=1,ratios_n
             chi2term = &
@@ -1636,7 +1636,7 @@
                freq_target(0,i + l0_first)
          end do
           
-         write(io,'(/,2a6,99a16)') &
+         write(io,'(/,2a6,99a20)') &
             'r10', 'l=1 n', 'chi2term', 'r10', 'r10_obs', 'r10_sigma', 'l1_obs'
          do i=1,ratios_n
             chi2term = &
@@ -1655,7 +1655,7 @@
          real(dp) :: chi2term
          integer :: i
          
-         write(io,'(/,2a6,99a16)') &
+         write(io,'(/,2a6,99a20)') &
             'r02', 'l=0 n', 'chi2term', 'r02', 'r02_obs', 'r02_sigma', 'l0_obs'
          do i=1,nl(0)
             if (sigmas_r02(i) == 0d0) cycle

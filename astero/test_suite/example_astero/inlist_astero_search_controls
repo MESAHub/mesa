@@ -686,7 +686,7 @@
    
       write_best_model_data_for_each_sample = .true.
       num_digits = 4 ! number of digits in sample number (with leading 0's)
-      sample_results_prefix = 'outputs/sample_' 
+      sample_results_prefix = 'sample_'
          ! note that you can include a directory in the prefix if desired
       sample_results_postfix = '.data'
       
