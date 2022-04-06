@@ -1369,42 +1369,29 @@
          ! column numbers
          write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
 
-         k = 1
-         do i = 1, 41
-            write(iounit, fmt, advance='no') k
-            k = k+1
-         end do
+         k = 41 ! fixed columns
 
          if (chi2_seismo_fraction > 0) then
 
             do l = 0, 3
-               do j = 1, nl(l)
-                  do i = 1, 6
-                     write(iounit, fmt, advance='no') k
-                     k = k+1
-                  end do
-               end do
+               k = k + 6*nl(l)
             end do
 
-            do j = 1, ratios_n
-               do i = 1, 6
-                  write(iounit, fmt, advance='no') k
-                  k = k+1
-               end do
-            end do
+            k = k + 6*ratios_n
 
             if (chi2_seismo_r_02_fraction > 0) then
-               do j = 1, nl(0)
-                  do i = 1, 3
-                     write(iounit, fmt, advance='no') k
-                     k = k+1
-                  end do
-               end do
+               k = k + 3*nl(0)
             end if
 
          end if
 
-         write(iounit, '(a)')
+         if (search_type == 'simplex') k = k+1
+
+         do i = 1, k
+            write(iounit, fmt, advance='no') i
+         end do
+
+         write(iounit, '(a)') ! end of column numbers line
 
          ! column names
          write(fmt,'(a)') '(99' // trim(astero_results_txt_format) // ')'
@@ -1496,8 +1483,12 @@
             end if
          
          end if
+
+         if (search_type == 'simplex') then
+            write(iounit, astero_results_txt_format, advance='no') 'step_type'
+         end if
          
-         write(iounit, '(a)') ! end of line
+         write(iounit, '(a)') ! end of column names line
                                           
       end subroutine show_sample_header
       
@@ -1601,8 +1592,12 @@
             end if
          
          end if
-            
-         write(iounit, '(a12)') trim(info_str)
+
+         if (search_type == 'simplex') then
+            write(iounit, astero_results_txt_format, advance='no') trim(info_str)
+         end if
+
+         write(iounit, '(a)') ! end of line
       
       end subroutine show1_sample_results
       
