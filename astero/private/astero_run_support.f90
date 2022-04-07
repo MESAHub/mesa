@@ -511,7 +511,8 @@
          just_counting = .false.
          
          if (restart_scan_grid_from_file) then
-            call read_samples_from_file(scan_grid_output_filename, ierr)
+            call read_samples_from_file( &
+               trim(astero_results_directory) // '/' // trim(scan_grid_output_filename), ierr)
             if (ierr /= 0) return
             scan_grid_skip_number = sample_number
             sample_number = 0
@@ -1327,7 +1328,8 @@
          end if
                   
          if (restart_simplex_from_file) then
-            call read_samples_from_file(simplex_output_filename, ierr)
+            call read_samples_from_file( &
+               trim(astero_results_directory) // '/' // trim(simplex_output_filename), ierr)
             if (ierr /= 0) return
             if (sample_number < nvar+1) then
                write(*,2) 'sorry: too few points. for simplex restart need at least', nvar+1
