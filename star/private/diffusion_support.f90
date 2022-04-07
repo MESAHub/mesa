@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2015-2019  Evan Bauer & The MESA Team
+!   Copyright (C) 2015-2022  Evan Bauer & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -1746,7 +1746,7 @@
         
         Ak = sqrt(pi/3d0)*(a0 + a1*pow(kappa,a2))
         Bk = b0*exp(-b1*pow(kappa,b2))
-        Ck = c0 + c1*erf(c2*pow(kappa,c3))
+        Ck = c0 + c1*bitsafe_erf_fit(c2*pow(kappa,c3))
 
         ! Eqn (5)
         DstarOCP = sqrt(pi/3d0)*Ak*pow(Gamma,-2.5d0)*exp(-Bk*Gamma)/log(1d0 + Ck*pow(Gamma,-1.5d0)/sqrt(3d0))
@@ -1790,6 +1790,23 @@
         kappa = ai/lam_e
 
       end subroutine kappa_CBF
+
+      ! crlibm does not include error function, so implement an
+      ! erf fit good to 2.5e-5 (Abramowitz and Stegun 1964)
+      ! in terms of other bitsafe functions.
+      real(dp) function bitsafe_erf_fit(x)
+        real(dp) :: x
+        real(dp) :: t, p, a1, a2, a3
+
+        p = 0.47047d0
+        a1 = 0.3480242d0
+        a2 = -0.0958798d0
+        a3 = 0.7478556d0
+
+        t = 1d0/(1d0 + p*x)
+
+        bitsafe_erf_fit = 1d0 - (a1*t + a2*t*t + a3*t*t*t)*exp(-x*x)
+      end function bitsafe_erf_fit
       
       end module diffusion_support
 
