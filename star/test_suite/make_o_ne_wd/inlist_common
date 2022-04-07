@@ -45,6 +45,7 @@
       use_Ledoux_criterion = .true.
       thermohaline_option = 'Kippenhahn'
       thermohaline_coeff = 100
+      MLT_option = 'Cox'
 
 ! mixing
        overshoot_scheme(1) = 'exponential'
