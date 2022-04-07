@@ -252,6 +252,10 @@
       ! output controls
       character (len=256) :: astero_results_directory
 
+      character (len=strlen) :: astero_results_dbl_format
+      character (len=strlen) :: astero_results_int_format
+      character (len=strlen) :: astero_results_txt_format
+
       logical :: write_best_model_data_for_each_sample
       integer :: num_digits
       character (len=256) :: sample_results_prefix, sample_results_postfix
@@ -471,6 +475,9 @@
 
          astero_results_directory, &
 
+         astero_results_dbl_format, &
+         astero_results_int_format, &
+         astero_results_txt_format, &
          write_best_model_data_for_each_sample, &
          num_digits, &
          sample_results_prefix, sample_results_postfix, &
@@ -1352,15 +1359,45 @@
       
       
       subroutine show_sample_header(iounit)
-         integer, intent(in) ::iounit
+         integer, intent(in) :: iounit
          
-         integer :: j, l
+         integer :: i, j, k, l
+         character (len=strlen) :: fmt
          character (len=10) :: str
          character (len=1) :: l_str
-      
-         write(iounit,'(2x,a6,10a26,a16,22a26,7a20)',advance='no') &
+
+         ! column numbers
+         write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
+
+         k = 41 ! fixed columns
+
+         if (chi2_seismo_fraction > 0) then
+
+            do l = 0, 3
+               k = k + 6*nl(l)
+            end do
+
+            k = k + 6*ratios_n
+
+            if (chi2_seismo_r_02_fraction > 0) then
+               k = k + 3*nl(0)
+            end if
+
+         end if
+
+         if (search_type == 'simplex') k = k+1
+
+         do i = 1, k
+            write(iounit, fmt, advance='no') i
+         end do
+
+         write(iounit, '(a)') ! end of column numbers line
+
+         ! column names
+         write(fmt,'(a)') '(99' // trim(astero_results_txt_format) // ')'
+
+         write(iounit, fmt, advance='no') &
             'sample', &
-            
             'chi2', &
             'mass', &
             'init_Y', &
@@ -1412,7 +1449,7 @@
                do j=1,nl(l)
                   write(str,'(i3)') j
                   str = adjustl(str)
-                  write(iounit,'(99a26)',advance='no') &
+                  write(iounit, fmt, advance='no') &
                      'l' // l_str // '_order_' // trim(str), &
                      'l' // l_str // '_obs_' // trim(str), &
                      'l' // l_str // '_obs_sigma_' // trim(str), &
@@ -1423,14 +1460,9 @@
             end do
 
             do j=1,ratios_n
-               if (j < 10) then
-                  write(str,'(i1)') j
-               else if (j < 100) then
-                  write(str,'(i2)') j
-               else
-                  write(str,'(i3)') j
-               end if
-               write(iounit,'(99a26)',advance='no') &
+               write(str,'(i3)') j
+               str = adjustl(str)
+               write(iounit, fmt, advance='no') &
                   'r01_obs_' // trim(str), &
                   'r01_obs_sigmas_' // trim(str), &
                   'r01_' // trim(str), &
@@ -1441,14 +1473,9 @@
 
             if (chi2_seismo_r_02_fraction > 0) then
                do j=1,nl(0)
-                  if (j < 10) then
-                     write(str,'(i1)') j
-                  else if (j < 100) then
-                     write(str,'(i2)') j
-                  else
-                     write(str,'(i3)') j
-                  end if
-                  write(iounit,'(99a26)',advance='no') &
+                  write(str,'(i3)') j
+                  str = adjustl(str)
+                  write(iounit, fmt, advance='no') &
                      'r02_obs_' // trim(str), &
                      'r02_obs_sigmas_' // trim(str), &
                      'r02_' // trim(str)
@@ -1456,8 +1483,12 @@
             end if
          
          end if
+
+         if (search_type == 'simplex') then
+            write(iounit, astero_results_txt_format, advance='no') 'step_type'
+         end if
          
-         write(iounit,*) ! end of line
+         write(iounit, '(a)') ! end of column names line
                                           
       end subroutine show_sample_header
       
@@ -1467,7 +1498,7 @@
          integer, intent(in) :: i, iounit
             
          integer :: j, k, l, op_code, ierr
-         character (len=256) :: info_str
+         character (len=256) :: info_str, fmt
          
          ierr = 0
 
@@ -1481,8 +1512,14 @@
                ierr = 0
             end if
          end if
+
+         write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
+            ',10' // trim(astero_results_dbl_format) // &
+            ',' // trim(astero_results_int_format) // &
+            ',22' // trim(astero_results_dbl_format) // &
+            ',7' // trim(astero_results_int_format) // ')'
          
-         write(iounit,'(3x,i5,10(1pes26.16),i16,22(1pes26.16),7i20)',advance='no') i, &
+         write(iounit, fmt, advance='no') i, &
             sample_chi2(i), &
             sample_mass(i), &
             sample_init_Y(i), &
@@ -1525,34 +1562,42 @@
             ratios_l1_first
             
          if (iounit == 6) return
-         
+
          if (chi2_seismo_fraction > 0) then
+
+            write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
+                ',99' // trim(astero_results_dbl_format) // ')'
 
             do l = 0, 3
                do k = 1, nl(l)
-                  write(iounit,'(i26,99(1pes26.16))',advance='no') &
+                  write(iounit, fmt, advance='no') &
                      sample_order(l,k,i), freq_target(l,k), freq_sigma(l,k), &
                      sample_freq(l,k,i), sample_freq_corr(l,k,i), sample_inertia(l,k,i)
                end do
             end do
 
+            write(fmt,'(a)') '(99' // trim(astero_results_dbl_format) // ')'
+
             do k=1,ratios_n
-               write(iounit,'(99(1pes26.16))',advance='no') &
+               write(iounit, fmt, advance='no') &
                   ratios_r01(k), sigmas_r01(k), sample_ratios_r01(k,i), &
                   ratios_r10(k), sigmas_r10(k), sample_ratios_r10(k,i)
             end do
 
             if (chi2_seismo_r_02_fraction > 0) then
                do k=1,nl(0)
-                  write(iounit,'(99(1pes26.16))',advance='no') &
+                  write(iounit, fmt, advance='no') &
                      ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
                end do
             end if
          
          end if
-            
-         write(iounit,'(a12)') trim(info_str)
-      
+
+         if (search_type == 'simplex') then
+            write(iounit, astero_results_txt_format, advance='no') trim(info_str)
+         end if
+
+         write(iounit, '(a)') ! end of line
       
       end subroutine show1_sample_results
       
@@ -1561,25 +1606,73 @@
          integer, intent(in) :: iounit, i_total
          integer, intent(out) :: ierr
          integer :: i, j
+         character (len=strlen) :: int_fmt, txt_fmt
 
          ierr = 0
          ! sort results by increasing sample_chi2
          call set_sample_index_by_chi2
-         if (i_total > 0) then
-            write(iounit,*) sample_number, ' of ', i_total
-         else
-            write(iounit,*) sample_number, ' samples'
-         end if
+
+         do j = 1, 3 ! line number
+            i = 1 ! column number, incremented after each column is written
+
+            call write_int('samples', sample_number)
+
+            ! for scan_grid, we also write total size of grid
+            if (i_total > 0) call write_int('total', i_total)
+
+            call write_txt('version_number', version_number)
+            call write_txt('compiler', compiler_name)
+            call write_txt('build', compiler_version_name)
+            call write_txt('MESA_SDK_version', mesasdk_version_name)
+            call write_txt('math_backend',math_backend)
+            call write_txt('date', date)
+            call write_txt('search_type', search_type)
+
+            write(iounit, '(a)') ! new line
+         end do
+
+         write(iounit, '(a)') ! blank line between header and sample data
+
          call show_sample_header(iounit)
          do j = 1, sample_number
             i = sample_index_by_chi2(j)
             call show1_sample_results(i, iounit)
          end do
 
-         call show_sample_header(iounit)
-         do i = 1, 3
-            write(iounit,'(A)')
-         end do
+         contains
+
+         subroutine write_txt(name, val)
+            character(len=*), intent(in) :: name, val
+
+            select case (j)
+            case (1)
+               write(iounit, astero_results_int_format, advance='no') i
+            case (2)
+               write(iounit, astero_results_txt_format, advance='no') name
+            case (3)
+               write(iounit, astero_results_txt_format, advance='no') '"'//trim(val)//'"'
+            end select
+
+            i = i+1
+
+         end subroutine write_txt
+
+         subroutine write_int(name, val)
+            character(len=*), intent(in) :: name
+            integer, intent(in) :: val
+
+            select case (j)
+            case (1)
+               write(iounit, astero_results_int_format, advance='no') i
+            case (2)
+               write(iounit, astero_results_txt_format, advance='no') name
+            case (3)
+               write(iounit, astero_results_int_format, advance='no') val
+            end select
+
+            i = i+1
+
+         end subroutine write_int
 
       end subroutine show_all_sample_results
       
@@ -1862,7 +1955,7 @@
          character (len=*), intent(in) :: results_fname
          integer, intent(out) :: ierr
          integer :: iounit, num, i, j, model_number
-         character (len=100) :: line
+         character (len=strlen) :: line
          
          include 'formats'
          
@@ -1877,23 +1970,28 @@
             call free_iounit(iounit) 
             return
          end if
+
+         read(iounit, fmt='(a)') line
+         read(iounit, fmt='(a)') line
          
-         read(iounit, fmt=*, iostat=ierr) num
+         read(iounit, fmt=astero_results_int_format, iostat=ierr) num
          if (ierr /= 0) then
-            write(*,*) 'failed to read number of samples on 1st line of ' // trim(results_fname)
+            write(*,*) 'failed to read number of samples on line 3 of ' // trim(results_fname)
             call done
             return
          end if
          
          write(*,2) 'number of samples in file', num
-         
-         read(iounit, fmt='(a)', iostat=ierr) line
-         if (ierr /= 0) then
-            write(*,*) 'failed to read 2nd line of ' // trim(results_fname)
-            write(*,'(a)') 'line <' // trim(line) // '>'
-            call done
-            return
-         end if
+
+         do j = 4, 6
+            read(iounit, fmt='(a)', iostat=ierr) line
+            if (ierr /= 0) then
+               write(*,'(a,i1,a)') 'failed to line ', j, ' of ' // trim(results_fname)
+               write(*,'(a)') 'line <' // trim(line) // '>'
+               call done
+               return
+            end if
+         end do
          
          do while (max_num_samples < num)
             call alloc_sample_ptrs(ierr)
@@ -1937,21 +2035,26 @@
          integer, intent(out) :: ierr
             
          integer :: i, k, l
-         character (len=256) :: info_str
+         character (len=256) :: info_str, fmt
          real(dp) :: logR
          
          include 'formats'
          
          ierr = 0
-         read(iounit,fmt='(i8)',advance='no',iostat=ierr) i
+         read(iounit,fmt=astero_results_int_format,advance='no',iostat=ierr) i
          if (ierr /= 0) return
          if (i <= 0 .or. i > size(sample_chi2,dim=1)) then
             write(*,2) 'invalid sample number', i
             ierr = -1
             return
          end if
+
+         write(fmt,'(a)') '(10' // trim(astero_results_dbl_format) // &
+            ',' // trim(astero_results_int_format) // &
+            ',22' // trim(astero_results_dbl_format) // &
+            ',7' // trim(astero_results_int_format) // ')'
          
-         read(iounit,'(10(1pes26.16),i16,22(1pes26.16),7i20)',advance='no',iostat=ierr) &
+         read(iounit, fmt, advance='no', iostat=ierr) &
             sample_chi2(i), &
             sample_mass(i), &
             sample_init_Y(i), &
@@ -1998,31 +2101,38 @@
 
          if (chi2_seismo_fraction > 0) then
 
+            write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
+                ',99' // trim(astero_results_dbl_format) // ')'
+
             do l = 0, 3
-               do k = 1, nl(0)
-                  read(iounit,'(i26,99(1pes26.16))',advance='no',iostat=ierr) &
+               do k = 1, nl(l)
+                  read(iounit, fmt, advance='no', iostat=ierr) &
                      sample_order(l,k,i), freq_target(l,k), freq_sigma(l,k), &
                      sample_freq(l,k,i), sample_freq_corr(l,k,i), sample_inertia(l,k,i)
                   if (failed('freqs')) return
                end do
             end do
 
+            write(fmt,'(a)') '(99' // trim(astero_results_dbl_format) // ')'
+
             do k=1,ratios_n
-               read(iounit,'(99(1pes26.16))',advance='no',iostat=ierr) &
+               read(iounit, fmt, advance='no', iostat=ierr) &
                   ratios_r01(k), sigmas_r01(k), sample_ratios_r01(k,i), &
                   ratios_r10(k), sigmas_r10(k), sample_ratios_r10(k,i)
                if (failed('ratios_r010')) return
             end do
 
-            do k=1,nl(0)
-               read(iounit,'(99(1pes26.16))',advance='no',iostat=ierr) &
-                  ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
-               if (failed('ratios_r02')) return
-            end do
+            if (chi2_seismo_r_02_fraction > 0.0_dp) then
+               do k=1,nl(0)
+                  read(iounit, fmt, advance='no', iostat=ierr) &
+                     ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
+                  if (failed('ratios_r02')) return
+               end do
+            end if
          
          end if
             
-         read(iounit,'(a12)',iostat=ierr) info_str
+         read(iounit, '(a12)', iostat=ierr) info_str
          if (ierr /= 0) then
             ierr = 0
             sample_op_code(i) = 0
