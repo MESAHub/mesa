@@ -28,13 +28,19 @@
       use math_lib
       use chem_def !! maybe taking up uncessary space but whatever
       
-      implicit none
 
+      implicit none
       real(dp) :: spotf, spotx, PB_i, Teff_local, sb_sigma
 
+      include "test_suite_extras_def.inc"
+
+      contains
+
+      include "test_suite_extras.inc"
+   
 
       ! these routines are called by the standard run_star check_model
-      contains
+     ! contains
       
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
