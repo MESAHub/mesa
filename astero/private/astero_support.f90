@@ -318,7 +318,7 @@
          integer, intent(in) :: nl0, nl1
          real(dp), intent(in) :: l0(:), l1(:)
          integer, intent(out) :: n, l0_first, l1_first
-         real(dp), intent(inout) :: r01(:), r10(:)
+         real(dp), intent(out) :: r01(:), r10(:)
          
          integer :: l0_seq_n, l0_last, l1_seq_n, l1_last, i, i0, i1
          real(dp) :: d01, d10, sd01, sd10, dnu, sdnu
@@ -328,12 +328,14 @@
          include 'formats'
          
          dbg = .false.
+         call fill_with_NaNs(r01)
+         call fill_with_NaNs(r10)
          
          n = 0
          
          if (nl1 <= 0) return
       
-         call get_max_sequence(nl(0), l0, l0_first, l0_seq_n)
+         call get_max_sequence(nl0, l0, l0_first, l0_seq_n)
          l0_last = l0_first + l0_seq_n - 1
          if (dbg) write(*,4) 'l0_first l0_last l0_seq_n', l0_first, l0_last, l0_seq_n
 
@@ -387,7 +389,7 @@
          
          do i = 1, n         
             i0 = i + l0_first
-            i1 = i + l1_first            
+            i1 = i + l1_first
             d01 = (l0(i0-1) - 4*l1(i1-1) + 6*l0(i0) - 4*l1(i1) + l0(i0+1))/8d0
             r01(i) = d01/(l1(i1) - l1(i1-1))
             d10 = -(l1(i1-1) - 4*l0(i0) + 6*l1(i1) - 4*l0(i0+1) + l1(i1+1))/8d0
@@ -417,7 +419,7 @@
          logical, intent(in) :: init
          integer, intent(in) :: nl0, nl1, nl2
          real(dp), intent(in) :: l0(:), l1(:), l2(:)
-         real(dp), intent(inout) :: r02(:)
+         real(dp), intent(out) :: r02(:)
          
          integer :: i, i0, i1, i2, jmin, j
          real(dp) :: d02, sd02, dnu, sdnu, df, f0, f2, fmin, fmax, dfmin
@@ -427,6 +429,7 @@
          include 'formats'
          
          dbg = .false.
+         call fill_with_NaNs(r02)
          
          if (init) then ! set i2_for_r02
             do i = 1, ratios_n         
@@ -1389,9 +1392,9 @@
          
          ierr = 0
          chi2sum1 = 0
-         chi2N1 = 0     
-         chi2_r_010_ratios = -1    
-         chi2_r_02_ratios = -1   
+         chi2N1 = 0
+         chi2_r_010_ratios = 0
+         chi2_r_02_ratios = 0
          chi2_frequencies = 0
          
          if (chi2_seismo_freq_fraction > 0) then
@@ -1483,7 +1486,7 @@
             
             chi2sum1 = 0
             n = 0
-            do i=2,nl(0)
+            do i=1,nl(0)
                if (sigmas_r02(i) == 0d0) cycle
                model_r02 = interpolate_ratio_r02( &
                   freq_target(0,i + ratios_l0_first), model_freq(0,:), model_ratios_r02)

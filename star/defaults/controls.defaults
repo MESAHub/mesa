@@ -2275,6 +2275,8 @@
 
       ! If false, then stick to the usual definition -- P/(g*rho).
       ! If true, use min of the usual and sound speed * hydro time scale, sqrt(P/G)/rho.
+      ! Note that the 'TDC' ``MLT_option`` does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``   
+      ! even if that flag is set.
 
       ! ::
 
@@ -2319,10 +2321,12 @@
 
       ! The 'Cox' and 'TDC' options assumes optically thick material.
       ! The other options are various ways of extending to include optically thin material.
+      ! Note that TDC does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``
+      ! even if that flag is set.
 
       ! ::
 
-    MLT_option = 'Cox'
+    MLT_option = 'TDC'
 
       ! TDC options
       ! ~~~~~~~~~~~

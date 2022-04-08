@@ -136,7 +136,7 @@ program test_turb
 
       call set_TDC(&
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-         mixing_type, scale, chiT, chiRho, L, r, P, T, rho, dV, Cp, opacity, &
+         mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
          scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
 
       write(*,1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel% val, dt
@@ -187,6 +187,7 @@ program test_turb
       report = .false.
       chiT = 1d0
       chiRho = 1d0
+      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * cgrav * m)
 
       write(*,*) "####################################"
       write(*,*) "Running dt test"
@@ -195,7 +196,7 @@ program test_turb
          dt = 500d0*pow(1.02d0,j)
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
-            mixing_type, scale, chiT, chiRho, L, r, P, T, rho, dV, Cp, opacity, &
+            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
 
          write(*,1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel% val
