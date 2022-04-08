@@ -87,6 +87,8 @@
       accretion_he4 = 0.237D+00
       accretion_zfracs = 4 ! Lodders 03
 
+      MLT_option = 'Cox'
+
       xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
 		xa_function_weight(1) = 20
 		xa_function_param(1) = 1d-6

@@ -62,7 +62,7 @@
       varcontrol_target = 3d-4 
 
       mixing_length_alpha = 1.8d0
-      MLT_option = 'TDC'
+      MLT_option = 'Cox'
     
       use_ledoux_criterion = .true.
       make_gradr_sticky_in_solver_iters = .false.
