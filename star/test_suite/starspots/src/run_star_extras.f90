@@ -94,7 +94,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
+         call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
       
 
@@ -400,7 +400,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
+         call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
 
       ! subroutine extras_after_evolve(id, ierr)
