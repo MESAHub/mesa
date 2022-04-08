@@ -3329,7 +3329,7 @@
 
       ! ::
 
-    RSP_do_check_omega = .false.
+    RSP_do_check_omega = .true.
 
       ! ::
 
