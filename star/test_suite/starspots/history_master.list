@@ -1,0 +1,326 @@
+!--------------------------------------------------------------------
+!_____________________________________________________________________
+! 15140+ history_columns.list options -- evolutionary quantities
+
+model_number
+star_mass
+star_age
+
+log_R
+log_Teff ! log10 effective temperature
+
+log_L
+log_L_div_Ledd ! log10 (luminosity/Eddington luminosity)
+log_LZ   !log10 total burning power excluding LH and LHe and photodisintegrations
+log_LH   ! log10 power_h_burn
+log_LHe  ! log10 power_he_burn
+!log_LC  ! log10 power_c_burn
+log_LZ   ! log10 total burning power including LC, but excluding LH and LHe and photodisintegrations
+log_Lnuc ! log(LH + LHe + LZ)
+
+log_g
+
+add_center_abundances
+add_surface_abundances
+
+pp
+cno
+tri_alfa
+!burn_c
+!burn_n
+!burn_o
+!c12_c12
+!! can use these to calculate the photospheric pressure 
+co_core_mass ! he4 boundary is outermost location where h1 mass fraction is < 0.01
+center_degeneracy ! the electron chemical potential in units of k*T
+
+! redundant with add_center_abundances
+! center h1  ! core H fraction
+! center he3 ! ... etc, for any isotope (that MESA traces) you want
+! center mg24
+! center n14
+! center ne20
+! center_omega ! angular frequency of rotation
+! center si28
+! c_log_eps_burn cno
+c_log_eps_burn pp
+c_log_eps_burn tri_alfa
+
+conv_mx1_bot_r    ! and lower (interior) radii
+conv_mx1_top_r    ! for a star w/ convective envelope only, these will give you upper
+conv_mx2_bot_r
+conv_mx2_top_r
+!core_overshoot_f
+!core_overshoot_f0
+!core_overshoot_Hp
+!core_overshoot_hstep
+!core_overshoot_r0
+!cumulative_Ne22_sedimentation_heating
+!cumulative_WD_sedimentation_heating
+cz_bot_mass ! mass coordinate of base (Msun)
+cz_bot_mass ! mass coordinate of base (Msun)
+cz_bot_radius ! Rsun
+
+cz_log_xmsun ! mass exterior to base (Msun)
+!cz_log_xmsun ! mass exterior to base (Msun)
+cz_mass ! mass coordinate of base (Msun) -- same as cz_bot_mass
+cz_mass  ! mass coordinate of base (Msun) -- same as cz_bot_mass
+cz_scale_height
+!cz_top_mass ! mass coordinate of top (Msun)
+cz_top_mass ! mass coordinate of top (Msun)
+cz_top_mass ! mass coordinate of top (Msun)
+cz_top_radius ! Rsun
+cz_top_scale_height 
+!cz_xm ! mass exterior to base (Msun)
+cz_zone
+
+acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+nu_max
+delta_nu
+delta_Pg ! g-mode period spacing for l=1 (seconds)
+dt_div_max_tau_conv ! dt/ maximum conv timescale
+dt_div_min_tau_conv ! dt/ minimum conv timescale
+!dynamic_timescale ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
+dynamic_timescale ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
+
+! EBs project
+!effective_T
+envelope_mass     ! defined as envelope mass = star_mass - he_core_mass
+! envelope properites -- see !## envelope section
+e_thermal ! sum over all zones of Cp*T*dm
+!fe_core_mass
+fe_core_mass
+!! from these, compute [Fe/H] by computing Z/X_surf and transforming w/ abundance scale
+gradT_excess_alpha ! between 0 and 1; 0 means no MLT++, 1 means MLT++ fully on
+grav_dark_L_equatorial !Lsun 
+grav_dark_L_polar !Lsun 
+grav_dark_Teff_equatorial !K
+grav_dark_Teff_polar !K
+h1_czb_mass ! location (in Msun units) of base of 1st convection zone above he core
+!he_core_lgRho
+he_core_lgRho
+!he_core_lgT
+he_core_lgT
+he_core_mass ! h1 boundary is outermost location where h1 mass fraction is < 0.01
+
+
+i_rot_total             ! moment of inertia; actual I
+! just for massive rotating stars
+!k_below_Eulerian_eps_grav
+!kh_timescale ! kelvin-helmholtz timescale (years)
+kh_timescale ! kelvin-helmholtz timescale (years)
+!k_Lagrangian_eps_grav
+! log10 total luminosity for reaction categories (Lsun units)
+log_abs_Lgrav !log10 abs(eps_grav_integral) (in Lsun units)
+log_center_Rho ! density
+log_center_T ! temperature
+
+log_cntr_P
+log_cntr_Rho
+log_cntr_T
+
+
+v_surf_km_s
+surf_avg_omega_div_omega_crit
+surf_avg_v_rot ! km/sec rotational velocity at equator
+surf_avg_v_crit
+
+!log_surf_cell_opacity ! old name was log_surf_opacity
+log_surf_cell_opacity   ! old name was log_surf_opacity
+log_surf_cell_opacity ! old name was log_surf_opacity
+log_surf_cell_P         ! old name was log_surf_P
+log_surf_cell_pressure  ! old name was log_surf_pressure
+log_surf_optical_depth
+!log_surf_z ! surface mass fraction in metals
+
+
+mass_conv_core ! mass of the convective core
+max_conv_vel_div_csound ! maximum value of the ratio of convective vel. to local sound speed
+max_gradT_div_grada ! maximum value of superadiabaticity
+max_L_rad_div_Ledd ! lambda to check stability
+min_Pgas_div_P ! beta to check stability
+min_t_eddy ! minimum value of scale_height/conv_velocity 
+! misc
+
+! mixing and convection
+!## mixing regions
+mx1_bot_r
+mx1_top_r
+mx2_bot_r
+mx2_top_r
+neutron_rich_core_mass
+
+num_iters ! same as num_newton_iterations
+!o_core_mass ! c12 boundary is outermost location where h1 mass fraction is < 0.01
+! or surface of the model (tau_factor >= 1) when photosphere is not inside the model.
+!# other files
+! Outputs log luminosity in filter band ``filter'' (log erg s^-1) (case sensitive)
+! Outputs log luminosity in filter band ``filter'' (log lsun) (case sensitive)
+! Outputs luminosity in filter band ``filter'' (erg s^-1) (case sensitive)
+! Outputs luminosity in filter band ``filter'' (lsun) (case sensitive)
+!photosphere_black_body_T
+!photosphere_cell_density
+!photosphere_cell_log_density
+!photosphere_cell_log_opacity
+!photosphere_cell_log_T
+photosphere_cell_opacity
+photosphere_cell_T ! temperature at model location closest to the photosphere, not necessarily Teff
+!photosphere_opacity
+!power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
+power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
+power_he_burn
+!power_c_burn
+
+! some general info about the model
+star_mdot ! d(star_mass)/dt (in msolar per year)
+surface b11
+surface be9
+surface c12 
+surface c13
+surface ca40
+surface f19
+surface fe56
+
+surface h1
+surface h1
+surface he3
+surface he4
+surface he4
+surface li7
+surface mg24
+surface n14
+surface na23
+surface ne20
+surface o16 ! etc
+surface_optical_depth
+surface s32
+surface si28
+surface ti48
+
+surf_avg_Lrad_div_Ledd ! ratio of surface radiative luminosity to eddington luminosity
+surf_avg_omega_crit ! critical angular rotational frequency at equator
+surf_avg_omega_div_omega_crit
+surf_avg_omega_div_omega_crit ! ratio of angular rotational frequency to critical rotational frequency
+surf_avg_omega ! surf_v_rot/R
+surf_avg_v_div_v_crit ! ratio of rotational velocity to critical rotational velocity
+surf_num_c12_div_num_o16 ! ratio of number fractions, >1 for C star
+surf_r_equatorial_div_r
+surf_r_equatorial_div_r_polar
+surf_r_polar_div_r
+
+! timescales -- see !## timescales section of mesa/star/defaults/history_columns.list
+total_angular_momentum  ! total angular momentuml J not I
+total_mass h1
+total_mass he4
+
+v_surf_km_s ! (km/s)
+v_wind_Km_per_s ! wind velocity
+! what Aaron's EEP code needs
+! what I gave to Jen
+! where L and R are evaluated at the photosphere (tau_factor < 1)
+!! X + Y + Z = 1 where Z=(surface o16  + surface c12 ...etc ), Y = surface he4; X = surface h1
+! you can use a non-standard version by setting history_columns_file in your inlist
+
+
+! some general info about the model
+
+star_age ! elapsed simulated time in years since the start of the run
+star_mass ! in Msun units
+star_mdot ! d(star_mass)/dt (in msolar per year)
+
+! information about abundance transitions
+
+he_core_mass ! h1 boundary is outermost location where h1 mass fraction is < 0.01
+co_core_mass ! he4 boundary is outermost location where h1 mass fraction is < 0.01
+
+! conditions near surface
+
+log_L ! log10 luminosity in Lsun units
+log_L_div_Ledd ! log10 (luminosity/Eddington luminosity)
+log_LH ! log10 power_h_burn
+log_LHe ! log10 power_he_burn
+!log_LC
+log_LZ  !log10 total burning power excluding LH and LHe and photodisintegrations
+log_Teff ! log10 effective temperature
+log_abs_Lgrav !log10 abs(eps_grav_integral) (in Lsun units)
+log_R ! log10 radius in Rsun units
+log_g ! log10 gravity
+!log_surf_z ! surface mass fraction in metals
+surf_avg_omega ! surf_v_rot/R
+surf_avg_v_rot ! km/sec rotational velocity at equator
+surf_num_c12_div_num_o16 ! ratio of number fractions, >1 for C star
+v_wind_Km_per_s ! wind velocity
+
+! just for massive rotating stars
+
+surf_avg_omega_crit ! critical angular rotational frequency at equator
+surf_avg_omega_div_omega_crit ! ratio of angular rotational frequency to critical rotational frequency
+surf_avg_v_crit ! critical rotational velocity at equator
+surf_avg_v_div_v_crit ! ratio of rotational velocity to critical rotational velocity
+surf_avg_Lrad_div_Ledd ! ratio of surface radiative luminosity to eddington luminosity
+v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+
+! mass fractions near surface (averaged over the outer 1e−6% of the total stellar mass)
+ 
+surface h1
+surface he3
+surface he4
+surface li7
+surface be9
+surface b11
+surface c12
+surface c13
+surface n14
+surface o16
+surface f19
+surface ne20
+surface na23
+surface mg24
+surface si28
+surface s32
+surface ca40
+surface ti48
+surface fe56
+
+! conditions near center
+
+log_center_T ! temperature
+log_center_Rho ! density
+center_degeneracy ! the electron chemical potential in units of k*T
+center_omega ! angular frequency of rotation
+center_gamma ! plasma interaction parameter
+mass_conv_core ! mass of the convective core
+
+! mass fractions near center (averaged over the inner 1e−6% of the total stellar mass)
+
+center h1
+center he4
+center c12
+center n14
+center o16
+center ne20
+center mg24
+center si28
+
+
+!asteroseismic properties
+
+delta_nu ! large frequency separation for p-modes (microHz)
+! 1e6/(seconds for sound to cross diameter of star)
+delta_Pg ! g-mode period spacing for l=1 (seconds)
+! sqrt(2) pi^2/(integral of brunt_N/r dr)
+nu_max ! estimate from scaling relation (microHz)
+! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
+! with nu_max_sun = 3100 microHz, Teff_sun = 5777
+acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+
+! misc
+
+max_conv_vel_div_csound ! maximum value of the ratio of convective vel. to local sound speed
+max_gradT_div_grada ! maximum value of superadiabaticity
+gradT_excess_alpha ! between 0 and 1; 0 means no MLT++, 1 means MLT++ fully on
+min_Pgas_div_P ! beta to check stability
+max_L_rad_div_Ledd ! lambda to check stability
+e_thermal ! sum over all zones of Cp*T*dm
+
+num_retries

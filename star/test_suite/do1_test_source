@@ -2,6 +2,10 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
+do_one starspots "stop because star_age >= max_age" "final.mod" auto
+return
+
+
 # Slow cases
 do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" x150
 do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
@@ -96,7 +100,7 @@ do_one wd_stable_h_burn "stop because star_mass >= star_mass_max_limit" "final.m
 do_one high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 
 
-return
+# return
 
 
 #  off while testing.    do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
