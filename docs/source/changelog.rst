@@ -27,6 +27,18 @@ astero
 ``astero``'s results are saved (like ``log_directory`` in ``star``).  The default is ``outputs``, so if you
 can't seem to find your ``astero`` output, have a look there.
 
+``&astero_search_controls`` also now has options ::
+
+    astero_results_dbl_format = '(1pes26.16)'
+    astero_results_int_format = '(i26)'
+    astero_results_txt_format = '(a26)'
+
+by which the user can set the formats of floats, integers and strings in the ``astero`` results file,
+much like ``star_history_*_format`` does for history files.
+
+The format of the ``astero`` results file has changed to match histories and profiles.
+The contents of the file are unchanged.
+
 rates
 -----
 

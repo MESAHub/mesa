@@ -79,6 +79,8 @@
          ! Tighten the following controls to reduce the number of retries.
          dX_div_X_limit_min_X = 3d-4
          dX_div_X_limit = 3d-2
+
+         MLT_option = 'Cox'
         
          omega_function_weight = 20
 

@@ -119,6 +119,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
          write(*,1) 'best_chi2', best_chi2
          if (best_chi2 < 15 .and. best_chi2 > 1) then
             write(*,*) 'chi square within limit'
@@ -131,6 +132,10 @@
          else
             write(*,*) 'ERROR: chi square too large'
          end if
+
+         testhub_extras_names(1) = 'chi2'
+         testhub_extras_vals(1) = best_chi2
+
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
       
