@@ -58,7 +58,6 @@
          include 'formats'
          ierr = 0
 
-!x$OMP PARALLEL DO PRIVATE(i,ir,op_err)
          do i=1,n
             ir = irs(i)
             if (ir <= 0) cycle
@@ -69,7 +68,7 @@
                cycle
             end if
          end do
-!x$OMP END PARALLEL DO
+
       end subroutine set_raw_rates
       
 
