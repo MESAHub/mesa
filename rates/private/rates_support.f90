@@ -255,7 +255,9 @@
                if (num_to_add_to_cache > 100) write(*,*) 'this will take some time .....'
             end if
             all_okay = .true.
-!$OMP PARALLEL DO PRIVATE(i, operr, logT, btemp, a_okay, j)
+!x$OMP PARALLEL DO PRIVATE(i, operr, logT, btemp, a_okay, j)
+            ! Disable parralisation as this can cause bugs in the 
+            ! load tables See github bug #360
             do i=1, nrattab
                logT = rattab_tlo + real(i-1,kind=dp)*rattab_tstp
                btemp = exp10(logT)
@@ -285,7 +287,7 @@
                end do
                if (.not. a_okay) all_okay = .false.
             end do
-!$OMP END PARALLEL DO
+!x$OMP END PARALLEL DO
             if (.not. all_okay) call mesa_error(__FILE__,__LINE__,'make_rate_tables')
             if (ierr /= 0) then
                write(*,*) 'make_rate_tables failed'
@@ -307,8 +309,7 @@
                call interp_m3q(logttab, nrattab, f1, mp_work_size, work1,  &
                         'rates do_make_rate_tables', operr)
                if (operr /= 0) ierr = -1
-               nullify(f1)
-               call fill_with_NaNs(work1)
+               nullify(f1,work1)
             end do
 !$OMP END PARALLEL DO
             deallocate(work)
