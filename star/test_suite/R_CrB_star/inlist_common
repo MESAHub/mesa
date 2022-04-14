@@ -16,6 +16,15 @@
 
       kap_lowT_prefix = 'AESOPUS'
       AESOPUS_filename = 'AESOPUS_GS98_RCrB.h5'
+
+      num_special_rate_factors = 2
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+
+      reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+      special_rate_factor(2) = 1
+      filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
       
       !show_info = .true.
 
