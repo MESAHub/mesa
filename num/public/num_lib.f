@@ -620,19 +620,63 @@
       end subroutine two_piece_linear_coeffs
 
 
-      real(dp) function integrate(func, minx, maxx, args, atol, rtol, max_steps, ierr)
+      function integrate(func, minx, maxx, args, atol, rtol, min_steps, max_steps, ierr) result(res)
          procedure(integrand) :: func
          real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
          real(dp), intent(in) :: args(:) ! Extra args passed to func
          real(dp), intent(in) :: atol,rtol ! Absoulate and relative tolerances
+         integer, intent(in) :: min_steps ! Min number of sub-steps
          integer, intent(in) :: max_steps ! Max number of sub-steps
          integer, intent(inout) :: ierr ! Error code
+         real(dp) :: res
 
          ierr = 0
 
-         integrate = integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr)
+         res = integrator(func, minx, maxx, args, atol, rtol, min_steps, max_steps, ierr)
 
       end function integrate
+
+
+      ! Integrate function between minx and +infinity.
+      ! Integrates over the transformation x= minx + (1-t)/t then does
+      ! integral f(minx + (1-t)/t) / t2 
+      ! between 0 and 1
+      ! Based on GSL's qagiu 
+      ! https://www.gnu.org/software/gsl/doc/html/integration.html#c.gsl_integration_qagiu
+
+      function integrate_infinity(func, minx, args, atol, rtol, min_steps, max_steps, ierr) result(res)
+         procedure(integrand) :: func
+         real(dp),intent(in) :: minx ! Min value to integrate over
+         real(dp), intent(in) :: args(:) ! Extra args passed to func
+         real(dp), intent(in) :: atol,rtol ! Absoulate and relative tolerances
+         integer, intent(in) :: min_steps ! Min number of sub-steps
+         integer, intent(in) :: max_steps ! Max number of sub-steps
+         integer, intent(inout) :: ierr ! Error code
+         real(dp) :: res
+
+         ierr = 0
+
+         res = integrator(transform, 1d-15 , 1d0 , args, atol, rtol, min_steps, max_steps, ierr)
+
+
+         contains
+
+            real(dp) function transform(t, args, ierr)
+               real(dp), intent(in) :: t
+               real(dp), intent(in) :: args(:) ! Extra args passed to func
+               integer, intent(inout) :: ierr ! Error code
+               real(dp) :: x
+
+               ! Convert back from t to orignal variable x
+               x = minx + (1d0-t)/t
+
+               transform = func(x, args, ierr)/(t*t)
+
+            end function transform
+
+
+      end function integrate_infinity
+
 
       end module num_lib
 

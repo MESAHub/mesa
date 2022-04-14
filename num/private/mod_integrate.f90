@@ -33,11 +33,12 @@
 
       contains
 
-      function integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr) result(result)
+      recursive function integrator(func, minx, maxx, args, atol, rtol, min_steps, max_steps, ierr) result(result)
          procedure(integrand) :: func
          real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
          real(dp), intent(in) :: args(:) ! Extra args passed to func
          real(dp), intent(in) :: atol, rtol ! Absolute and relative tolerances
+         integer, intent(in) :: min_steps ! Min number of sub-steps
          integer, intent(in) :: max_steps ! Max number of sub-steps
          integer, intent(inout) :: ierr ! Error code
          real(dp) :: result
@@ -50,16 +51,17 @@
             return
          end if
 
-         if(xhigh< xlow) then
-            ierr = -1
-            return
-         end if
-
          ierr = 0
 
          xlow = minx
          xhigh = maxx
          xmid = (xhigh+xlow)/2.d0
+
+         if(xhigh< xlow) then
+            ierr = -1
+            return
+         end if
+
 
          val1 = simp38(func, xlow, xhigh, args, ierr)
          if(ierr/=0) return
@@ -69,18 +71,25 @@
 
          if(val1==0d0 .or. val2 == 0d0) then
             result = val2
-            return
-         end if
-
-         if(abs(val1-val2) < atol .or. abs(val1-val2)/val1 < rtol ) then
+         else if(abs(val1-val2) < atol .or. abs(val1-val2)/val1 < rtol ) then
             result = val2
          else
-            val1 = integrator(func, xlow, xmid, args, atol, rtol, max_steps-1, ierr) 
-            val2 = integrator(func, xmid, xhigh, args, atol, rtol, max_steps-1, ierr) 
+            val1 = integrator(func, xlow, xmid, args, atol, rtol, min_steps-1, max_steps-1, ierr) 
+            val2 = integrator(func, xmid, xhigh, args, atol, rtol, min_steps-1, max_steps-1, ierr) 
 
             result = val1+val2
             if(ierr/=0) return
          end if
+
+         if(min_steps>0) then
+            val1 = integrator(func, xlow, xmid, args, atol, rtol, min_steps-1, max_steps-1, ierr) 
+            val2 = integrator(func, xmid, xhigh, args, atol, rtol, min_steps-1, max_steps-1, ierr) 
+
+            result = val1+val2
+            if(ierr/=0) return
+         end if
+
+
 
       end function integrator
 

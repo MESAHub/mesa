@@ -15,6 +15,7 @@
             call test_sine()
             call test_exp()
             call test_box()
+            call test_infinity()
 
          end subroutine run_test_integrate
 
@@ -26,7 +27,7 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(linear, xlow, xhigh, (/1d0/), 1d-3,1d-3, 10,ierr)
+            res = integrate(linear, xlow, xhigh, (/1d0/), 1d-3,1d-3, 2,10, ierr)
 
             write(*,*) 'integrate linear expected ',expected, ' got ', res, ierr
 
@@ -49,11 +50,11 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(sine, 0d0, pi, (/1d0/), 1d-8,1d-8, 10, ierr)
+            res = integrate(sine, 0d0, pi, (/1d0/), 1d-8,1d-8, 2, 10, ierr)
 
             write(*,*) 'integrate sine expected ',2d0, ' got ', res, ierr
 
-            res = integrate(sine, 0d0, 2*pi, (/1d0/), 1d-8,1d-8, 10, ierr)
+            res = integrate(sine, 0d0, 2*pi, (/1d0/), 1d-8,1d-8, 10, 15, ierr)
 
             write(*,*) 'integrate sine expected ',0d0, ' got ', res, ierr
 
@@ -77,11 +78,11 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(iexp, 0d0, 2d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(iexp, 0d0, 2d0, (/1d0/), 1d-8,1d-8, 2, 50, ierr)
 
             write(*,*) 'integrate exp expected ',exp(2d0)-1d0, ' got ', res, ierr
 
-            res = integrate(iexp, 0d0, 10d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(iexp, 0d0, 10d0, (/1d0/), 1d-8,1d-8, 2, 50,ierr)
 
             write(*,*) 'integrate exp expected ',exp(10d0)-1d0, ' got ', res, ierr
 
@@ -104,11 +105,11 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(box, 0d0, 2d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(box, 0d0, 2d0, (/1d0/), 1d-8,1d-8, 2, 50, ierr)
 
             write(*,*) 'integrate box expected ',1d0, ' got ', res, ierr
 
-            res = integrate(box, 0.99d0, 1.5d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(box, 0.99d0, 1.5d0, (/1d0/), 1d-8,1d-8, 2, 50, ierr)
 
             write(*,*) 'integrate box expected ',0.5d0, ' got ', res, ierr
 
@@ -135,5 +136,30 @@
 
          end subroutine test_box
 
+
+         subroutine test_infinity()
+
+            real(dp) :: res
+            integer :: ierr
+
+            res = integrate_infinity(f, 1d0, (/1d0/), 1d-8,1d-8, 2, 50, ierr)
+
+            write(*,*) 'integrate infinity expected ',1d0, ' got ', res, ierr
+
+
+            contains
+
+            real(dp) function f(x, args, ierr)
+               real(dp), intent(in) :: x
+               real(dp), intent(in) :: args(:)
+               integer, intent(inout) :: ierr
+
+               ierr = 0
+
+               f = 1d0/(x*x)
+
+            end function f
+
+         end subroutine test_infinity
 
       end module test_integrate
