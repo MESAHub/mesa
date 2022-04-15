@@ -50,7 +50,7 @@
    pgstar_flag = .false.
    save_pgstar_files_when_terminate = .true.
 
-   num_special_rate_factors = 2
+   num_special_rate_factors = 5
    reaction_for_special_factor(1) = 'r_c12_ag_o16'
    special_rate_factor(1) = 1
    filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
@@ -59,6 +59,17 @@
    special_rate_factor(2) = 1
    filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
 
+   reaction_for_special_factor(3) = 'rn14_to_o16'
+   special_rate_factor(3) = 1
+   filename_of_special_rate(3) = 'rn14_to_o16_cf88.txt'
+
+   reaction_for_special_factor(4) = 'rn14_to_c12'
+   special_rate_factor(4) = 1
+   filename_of_special_rate(4) = 'rn14_to_c12_cf88.txt'
+
+   reaction_for_special_factor(5) = 'rn14pg_aux'
+   special_rate_factor(5) = 1
+   filename_of_special_rate(5) = 'rn14pg_aux_cf88.txt'
 / !end of star_job namelist
 
 

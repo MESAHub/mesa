@@ -1,4 +1,4 @@
-#return
+return
 
 do_one double_bh "Terminate due to helium depletion" "final.mod" x700
 do_one wind_fed_bhhmxb "Properly tested sub and super Eddington phases" "final.mod" auto
