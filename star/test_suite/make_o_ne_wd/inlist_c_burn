@@ -23,7 +23,7 @@
 &controls
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 3000
+      !max_model_number = 4500
 
 ! when to stop
       star_species_mass_max_limit = 0.3d0 ! Msun
@@ -66,7 +66,7 @@
       overshoot_zone_type(3) = 'burn_Z'
       overshoot_zone_loc(3) = 'shell'
       overshoot_bdy_loc(3) = 'top'
-      overshoot_f(3) = 0.01
+      overshoot_f(3) = 0.025
       overshoot_f0(3) = 0.005
 
 ! timesteps

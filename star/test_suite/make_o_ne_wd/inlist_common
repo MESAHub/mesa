@@ -34,7 +34,7 @@
 
 &controls
 
-      initial_mass = 11
+      initial_mass = 13.0
       initial_z = 0.02d0 
 
 ! when to stop
