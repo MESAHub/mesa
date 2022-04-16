@@ -2,11 +2,6 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
-do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" x150
-do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
-
-return
-
 # Slow cases
 do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" x150
 do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
