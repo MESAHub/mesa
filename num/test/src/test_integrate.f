@@ -14,6 +14,7 @@
             call test_basic()
             call test_sine()
             call test_exp()
+            call test_box()
 
          end subroutine run_test_integrate
 
@@ -52,6 +53,10 @@
 
             write(*,*) 'integrate sine expected ',2d0, ' got ', res, ierr
 
+            res = integrate(sine, 0d0, 2*pi, (/1d0/), 1d-8,1d-8, 10, ierr)
+
+            write(*,*) 'integrate sine expected ',0d0, ' got ', res, ierr
+
             contains
 
 
@@ -76,6 +81,10 @@
 
             write(*,*) 'integrate exp expected ',exp(2d0)-1d0, ' got ', res, ierr
 
+            res = integrate(iexp, 0d0, 10d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+
+            write(*,*) 'integrate exp expected ',exp(10d0)-1d0, ' got ', res, ierr
+
             contains
 
 
@@ -90,6 +99,41 @@
             end function iexp
 
          end subroutine test_exp
+
+         subroutine test_box
+            real(dp) :: res
+            integer :: ierr
+
+            res = integrate(box, 0d0, 2d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+
+            write(*,*) 'integrate box expected ',1d0, ' got ', res, ierr
+
+            res = integrate(box, 0.99d0, 1.5d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+
+            write(*,*) 'integrate box expected ',0.5d0, ' got ', res, ierr
+
+            contains
+
+
+            real(dp) function box(x, args, ierr)
+               real(dp), intent(in) :: x
+               real(dp), intent(in) :: args(:)
+               integer, intent(inout) :: ierr
+ 
+               ierr = 0
+         
+               if(x<1) then
+                  box = 0d0
+               else if(x.ge.1d0 .and. x.le.2d0) then
+                  box = 1d0
+               else
+                  box = 0d0
+               end if
+
+
+            end function box
+
+         end subroutine test_box
 
 
       end module test_integrate
