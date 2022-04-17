@@ -29,6 +29,7 @@
       use const_def
       use math_lib
       use num_def
+      use mod_integrate
       
       ! NOTE: because of copyright restrictions, 
       !       mesa doesn't use any routines from Numerical Recipes.
@@ -542,7 +543,8 @@
          integer, intent(out) :: ierr
          real(dp) :: a, b, s2, denom
          ierr = 0; x = 0
-         s2 = (xx3**2*(-yy1 + yy2) + xx2**2*(yy1 - yy3) + xx1**2*(-yy2 + yy3))**2 -  
+         s2 = (xx3**2*(-yy1 + yy2) + xx2**2*(yy1 - yy3) + xx1**2*
+     >        (-yy2 + yy3))**2 -  
      >        4*(xx3*(-yy1 + yy2) + xx2*(yy1 - yy3) + xx1*(-yy2 + yy3)) 
      >           *(xx1*xx3*(-xx1 + xx3)*yy2 +  
      >              xx2**2*(xx3*yy1 - xx1*yy3) + xx2*(-xx3**2*yy1 + xx1**2*yy3))
@@ -616,6 +618,21 @@
             ierr = -1
          end if
       end subroutine two_piece_linear_coeffs
+
+
+      real(dp) function integrate(func, minx, maxx, args, atol, rtol, max_steps, ierr)
+         procedure(integrand) :: func
+         real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
+         real(dp), intent(in) :: args(:) ! Extra args passed to func
+         real(dp), intent(in) :: atol,rtol ! Absoulate and relative tolerances
+         integer, intent(in) :: max_steps ! Max number of sub-steps
+         integer, intent(inout) :: ierr ! Error code
+
+         ierr = 0
+
+         integrate = integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr)
+
+      end function integrate
 
       end module num_lib
 
