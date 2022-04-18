@@ -750,3 +750,11 @@ g_05(x) = exp( x ) - 2x + 1/(100x) - 1/(1000000x^2)
                                               reference           9    6.5584890447885325D-01
                                               reference          10    6.7661972646501933D-01
 
+ call test_integrate routines
+ integrate linear expected   0.50000000000000000       got   0.50000000000000000                0
+ integrate sine expected    2.0000000000000000       got    2.0000000023087257                0
+ integrate sine expected    0.0000000000000000       got    4.4408920985006262E-016           0
+ integrate exp expected    6.3890560989306495       got    6.3890561029587083                0
+ integrate exp expected    22025.465794806714       got    22025.465802720293                0
+ integrate box expected    1.0000000000000000       got    1.0000000074505806                0
+ integrate box expected   0.50000000000000000       got   0.49999999679625018                0
