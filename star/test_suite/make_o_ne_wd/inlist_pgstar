@@ -362,7 +362,7 @@ Text_Summary1_name(6,1) = 'log_cntr_Rho'
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'Si_cntr'
-Text_Summary1_name(6,5) = 'retries'
+Text_Summary1_name(6,5) = 'num_retries'
 
 
 !------------------------------------------------------------------------------------
@@ -630,7 +630,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_dymin(3) = -1
       ! ::
 
-    History_Panels1_yaxis_name(4) = 'retries'
+    History_Panels1_yaxis_name(4) = 'num_retries'
     History_Panels1_yaxis_reversed(4) = .false.
     History_Panels1_ymin(4) = -101d0
     History_Panels1_ymax(4) = -101d0
