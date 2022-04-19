@@ -12,8 +12,8 @@
 
       change_initial_net = .true.      
       new_net_name = 'approx21.net'
-      
-      set_rate_3a = 'FL87' ! Fushiki and Lamb, Apj, 317, 368-388, 1987
+
+      use_3a_fl87 = .true.      
 
       show_log_description_at_start = .false. 
 

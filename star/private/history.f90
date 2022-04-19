@@ -1302,7 +1302,7 @@
              tf => tf2
              do k = 1, s% nz
                 call eval_tfactors(tf, log10(s% t(k)), s% t(k))
-                call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
+                call get_raw_rate(i, s% t(k), tf, raw_rate, ierr)
                 val = val + raw_rate
              end do
              nullify(tf)

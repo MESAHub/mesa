@@ -1,4 +1,3 @@
-#return
 
 do_one example_astero "chi square within limit" "final.mod" skip
 do_one fast_newuoa "save_sample_results_to_file outputs/newuoa_results.data" skip skip

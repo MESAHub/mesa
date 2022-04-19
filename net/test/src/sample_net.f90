@@ -38,12 +38,11 @@
       
       
       subroutine test
-         use rates_def, only: rates_NACRE_if_available
          use chem_def, only: num_categories
          
-         integer :: ierr, handle, which_rates_choice, species, &
+         integer :: ierr, handle, species, &
             num_reactions, lwork
-         integer, pointer :: which_rates(:), chem_id(:), net_iso(:)
+         integer, pointer :: chem_id(:), net_iso(:)
          character (len=100) :: net_file
          character (len=64) :: mesa_dir
 
@@ -56,7 +55,6 @@
 ! choose the network to use
 
          net_file = 'approx21.net'
-         which_rates_choice = rates_NACRE_if_available
 
 
 ! initialize
@@ -66,7 +64,7 @@
 
 ! set up the network         
          call setup_net( &
-            net_file, handle, which_rates, which_rates_choice, &
+            net_file, handle, &
             species, chem_id, net_iso, num_reactions, lwork, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
@@ -113,14 +111,12 @@
       
       
       subroutine setup_net( &
-            net_file, handle, which_rates, which_rates_choice, &
+            net_file, handle, &
             species, chem_id, net_iso, num_reactions, lwork, ierr)
          use net_lib
          use rates_def, only: rates_reaction_id_max
          
          character (len=*), intent(in) :: net_file
-         integer, intent(in) :: which_rates_choice
-         integer, pointer :: which_rates(:) ! will be allocated
          integer, pointer :: chem_id(:), net_iso(:) ! set, but not allocated
          integer, intent(out) :: handle, species, num_reactions, lwork, ierr
          
@@ -137,13 +133,7 @@
          
          call net_finish_def(handle, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
-         allocate(which_rates(rates_reaction_id_max))
-         which_rates(:) = which_rates_choice
-
-         call net_set_which_rates(handle, which_rates, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+               
          call net_setup_tables(handle, '', ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          

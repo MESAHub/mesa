@@ -11,12 +11,13 @@
       required_termination_code_string = 'log_center_temp_limit'
 
       ! Nuclear Reactions
-      set_rate_3a = 'FL87' ! Fushiki and Lamb, Apj, 317, 368-388, 1987
 
       rate_tables_dir = 'tables_hashimoto'
       rate_cache_suffix = 'hashimoto'
       ion_coulomb_corrections = 'PCR2009'
       electron_coulomb_corrections = 'Itoh2002'
+
+      use_3a_fl87 = .true.
 
       show_net_reactions_info = .true.
       show_net_species_info = .true.

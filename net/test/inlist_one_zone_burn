@@ -170,10 +170,6 @@ odescal = 1d-5
       
       cache_suffix = '' ! use this only for reactions from rate_tables
       
-      which_rates_choice = 2
-         ! nacre = 1
-         ! jina reaclib = 2
-
       ! reaction rate factors
          num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
          reaction_for_special_factor(:) = ''
