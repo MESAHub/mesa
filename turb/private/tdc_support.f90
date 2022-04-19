@@ -566,25 +566,17 @@ contains
       real(dp), intent(in) :: dt    
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, lk 
+      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root, lk 
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
+      J = sqrt(abs(J2))
+      Jt4 = 0.25d0 * dt * J
 
       if (J2 > 0d0) then ! Hyperbolic branch
-         J = sqrt(J2)
-         Jt = dt * J
-         Jt4 = 0.25d0 * Jt
          num = safe_tanh(Jt4) * (pow2(xi1) / xi2 - 2d0 * xi0 + A0 * xi1) + A0 * J
          den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
          Af = -num / den 
       else if (J2 < 0d0) then ! Trigonometric branch
-         J = sqrt(-J2)
-         Jt = dt * J
-         Jt4 = 0.25d0 * Jt
-
-         ! Double check that this is consistent with
-         ! -xi1 + (J/2 xi2) tan(...)
-
          ! This branch contains decaying solutions that reach A = 0, at which point
          ! they switch onto the 'zero' branch. So we have to calculate the position of
          ! the first root to check it against dt.
@@ -603,7 +595,7 @@ contains
             root = root + pi
          end if
 
-         if (0.25d0 * Jt < root) then
+         if (Jt4 < root) then
             num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J)) 
             den = 2d0 * xi2
             Af = num / den
