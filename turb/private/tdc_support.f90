@@ -573,7 +573,7 @@ contains
       Jt4 = 0.25d0 * dt * J
 
       if (J2 > 0d0) then ! Hyperbolic branch
-         num = safe_tanh(Jt4) * (pow2(xi1) / xi2 - 2d0 * xi0 + A0 * xi1) + A0 * J
+         num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
          den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
          Af = -num / den 
       else if (J2 < 0d0) then ! Trigonometric branch
