@@ -299,7 +299,7 @@
     dtau_gamma_NiCo_decay_heat, max_logT_for_net, reaction_neuQs_factor, &
     
     ! element diffusion parameters
-    diffusion_use_iben_macdonald, diffusion_use_paquette, diffusion_use_cgs_solver, &
+    diffusion_use_iben_macdonald, diffusion_use_paquette, diffusion_use_caplan, diffusion_use_cgs_solver, &
     diffusion_use_full_net, do_WD_sedimentation_heating, min_xa_for_WD_sedimentation_heating, &
     do_diffusion_heating, do_element_diffusion, &
     cgs_thermal_diffusion_eta_full_on, cgs_thermal_diffusion_eta_full_off, diffusion_min_dq_at_surface, &
@@ -1754,6 +1754,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  ! element diffusion parameters
  s% diffusion_use_iben_macdonald = diffusion_use_iben_macdonald
  s% diffusion_use_paquette = diffusion_use_paquette
+ s% diffusion_use_caplan = diffusion_use_caplan
  s% diffusion_use_cgs_solver = diffusion_use_cgs_solver
  s% diffusion_use_full_net = diffusion_use_full_net
  s% do_WD_sedimentation_heating = do_WD_sedimentation_heating
@@ -3432,6 +3433,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  ! element diffusion parameters
  diffusion_use_iben_macdonald = s% diffusion_use_iben_macdonald
  diffusion_use_paquette = s% diffusion_use_paquette
+ diffusion_use_caplan = s% diffusion_use_caplan
  diffusion_use_cgs_solver = s% diffusion_use_cgs_solver
  diffusion_use_full_net = s% diffusion_use_full_net
  do_WD_sedimentation_heating = s% do_WD_sedimentation_heating
