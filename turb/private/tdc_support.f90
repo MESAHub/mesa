@@ -591,15 +591,15 @@ contains
          J = sqrt(J2)
          Jt = dt * J
          Jt4 = 0.25d0 * Jt
-         num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
+         num = safe_tanh(Jt4) * (pow2(xi1) / xi2 - 2d0 * xi0 + A0 * xi1) + A0 * J
          den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
-         Af = num / den 
-         if (Af < 0d0) then
-            Af = -Af
-         end if
+         Af = -num / den 
       else if (J2 < 0d0) then ! Trigonometric branch
          J = sqrt(-J2)
          Jt = dt * J
+
+         ! Double check that this is consistent with
+         ! -xi1 + (J/2 xi2) tan(...)
 
          ! This branch contains decaying solutions that reach A = 0, at which point
          ! they switch onto the 'zero' branch. So we have to calculate the position of
