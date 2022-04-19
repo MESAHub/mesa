@@ -36,7 +36,7 @@ implicit none
 
 private
 public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, &
-         convert, unconvert, safe_tanh, tdc_info, &
+         convert, unconvert, safe_atan, safe_tanh, tdc_info, &
          eval_Af, eval_xis, compute_Q
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
@@ -409,6 +409,23 @@ contains
       end if
    end function safe_tanh
 
+   !> Computes the arctangent of y/x in a way that is numerically safe near x=0.
+   !!
+   !! @param x x coordinate for the arctangent.
+   !! @param y y coordinate for the arctangent.
+   !! @param z Polar angle z such that tan(z) = y / x.
+   type(auto_diff_real_tdc) function safe_atan(x,y) result(z)
+      type(auto_diff_real_tdc), intent(in) :: x,y
+      type(auto_diff_real_tdc) :: x1, y1
+      if (abs(x) < 1d-50) then
+         ! x is basically zero, so for ~any non-zero y the ratio y/x is ~infinity.
+         ! That means that z = +- pi. We want z to be positive, so we return pi.
+         z = pi
+      else
+         z = atan(y/x)
+      end if
+   end function safe_atan
+
    !> The TDC newton solver needs higher-order partial derivatives than
    !! the star newton solver, because the TDC one needs to pass back a result
    !! which itself contains the derivatives that the star solver needs.
@@ -580,7 +597,6 @@ contains
       else if (J2 < 0d0) then ! Trigonometric branch
          J = sqrt(-J2)
          Jt = dt * J
-         Jt4 = 0.25d0 * Jt
 
          ! Double check that this is consistent with
          ! -xi1 + (J/2 xi2) tan(...)
@@ -589,7 +605,7 @@ contains
          ! they switch onto the 'zero' branch. So we have to calculate the position of
          ! the first root to check it against dt.
          y_for_atan = xi1 + 2d0 * A0 * xi2
-         root = atan(xi1 / J) - atan(y_for_atan / J)
+         root = safe_atan(J, xi1) - safe_atan(J, y_for_atan)
 
          ! The root enters into a tangent, so we can freely shift it by pi and
          ! get another root. We care about the first positive root, and the above prescription
@@ -604,7 +620,7 @@ contains
          end if
 
          if (0.25d0 * Jt < root) then
-            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J)) 
+            num = -xi1 + J * tan(0.25d0 * Jt + atan(y_for_atan / J)) 
             den = 2d0 * xi2
             Af = num / den
          else
