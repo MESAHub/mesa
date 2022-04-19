@@ -297,23 +297,7 @@
          write(iounit,2) 'logTcut_lo =', g% logTcut_lo
          write(iounit,2) 'logTcut_lim =', g% logTcut_lim
       end subroutine show_net_params
-      
-      
-      ! before calling net_setup_tables, you can specify options for various rates
-      ! NOTE: these choices are used in building the rates tables, so if you want
-      ! to change your choice, you'll need to rebuild the rate tables.
-      
-      
-      subroutine net_set_which_rates(handle, which_rates, ierr)
-         use net_def, only: do_net_set_which_rates
-         integer, intent(in) :: handle, which_rates(:)
-         integer, intent(out) :: ierr
-         ierr = 0
-         call do_net_set_which_rates(handle, which_rates, ierr)
-         if (ierr /= 0) return
-      end subroutine net_set_which_rates
-      
-      
+            
       subroutine net_set_fe56ec_fake_factor( &
             handle, fe56ec_fake_factor, min_T_for_fe56ec_fake_factor, ierr)
          use net_def, only: do_net_set_fe56ec_fake_factor
@@ -518,6 +502,7 @@
             ierr = -1
             return
          end if
+
          reaction_id(1:num_reactions) = g% reaction_id(1:num_reactions)
          ierr = 0
       end subroutine get_reaction_id_table

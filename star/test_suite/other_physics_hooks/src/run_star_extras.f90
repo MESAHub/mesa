@@ -73,6 +73,9 @@
 
          s% use_other_screening = .true.
          s% other_screening => my_screening
+
+         s% use_other_rate_get = .true.
+         s% other_rate_get => my_rate_get
          
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
@@ -366,6 +369,29 @@
          dscreendd = 0d0
          ierr = 0
       end subroutine my_screening
+
+
+      subroutine my_rate_get(ir, temp, tf, raw_rate, ierr)
+         use rates_def
+         use rates_lib
+         implicit none
+   
+         integer :: ir ! Rate id
+         real(dp),intent(in) ::    temp      !< Temperature
+         type (T_Factors) :: tf !< Various temperature factors
+         real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
+         integer, intent(out) ::   ierr
+      
+         ierr = 0
+   
+         if (.false. .and. trim(reaction_name(ir)) == 'r_he4_he4_he4_to_c12') then
+            if(temp<1d8) then
+               raw_rate = 0d0
+            end if
+         
+         end if
+   
+      end subroutine my_rate_get
 
 
       end module run_star_extras

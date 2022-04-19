@@ -88,7 +88,7 @@
          write(*,'(A)')
          call check('log total_angular_momentum', safe_log10(s% total_angular_momentum), 45d0, 55d0)
          call check('log center_omega', safe_log10(s% center_omega), -4d0, -2d0)
-         call check('log he_core_omega', safe_log10(s% he_core_omega), -5d0, -2d0)
+         call check('log he_core_omega', safe_log10(s% he_core_omega), -6d0, -4d0)
          call check('surface j_rot', safe_log10(s% j_rot(1)),  5d0, 25d0)
          call check('surface v_rot', s% omega(1)*s% r(1)*1d-5, 0d0, 1d0)
          

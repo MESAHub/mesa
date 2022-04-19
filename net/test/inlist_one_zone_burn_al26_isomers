@@ -70,11 +70,7 @@
       large_mtx_decsol = 'bcyclic_dble'
 
       use_pivoting = .true.
-      !use_pivoting = .false.
-
-
-! rates
-      which_rates_choice = 2 ! nacre = 1 jina reaclib = 2      
+      !use_pivoting = .false.   
 
 ! this sets 
 ! create rate data for r_al26-2_to_al26-1

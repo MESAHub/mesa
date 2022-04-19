@@ -43,7 +43,7 @@
             symbolic, just_dydt, ierr)
          type (Net_Info), pointer :: n
          real(qp), pointer, intent(inout) :: dydt(:,:)
-         real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
+         real(qp), intent(out) :: eps_nuc_MeV(:)
          integer, intent(in) :: num_reactions
          real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
             rate_factors(:)
@@ -209,6 +209,12 @@
             
          
          end do
+
+         if(associated(net_other_net_derivs)) then
+            call net_other_net_derivs(n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
+               num_reactions, rate_factors, &
+               symbolic, just_dydt, ierr)
+         end if
 
          
          contains
@@ -1092,10 +1098,10 @@
          select case(ir)
 
             case(ir_he4_he4_he4_to_c12) ! triple alpha
-               if (g% which_rates(ir) == use_rate_3a_FL87) then 
+               if (g% use_3a_fl87) then 
                   return
-               end if
-            
+            end if
+
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
                return
          
@@ -1683,13 +1689,14 @@
 
 
          select case(ir)
-
-            case(ir_he4_he4_he4_to_c12) ! triple alpha
-               if (g% which_rates(ir) == use_rate_3a_FL87) then 
-                  call do_FL_3alf(i) ! Fushiki and Lamb, Apj, 317, 368-388, 1987
-                  return
-               end if
             
+         case(ir_he4_he4_he4_to_c12) ! triple alpha
+            if (g% use_3a_fl87) then 
+               call do_FL_3alf(i) ! Fushiki and Lamb, Apj, 317, 368-388, 1987
+               return
+         end if
+
+
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
                n14 = itab(in14)
                ne20 = itab(ine20)
