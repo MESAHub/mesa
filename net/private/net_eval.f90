@@ -299,7 +299,7 @@
      
          if (dbg) write(*,*) 'call get_derivs'
          call get_derivs(  &
-             n, dydt, eps_nuc_MeV, eta, ye, &
+             n, dydt, eps_nuc_MeV(1:num_rvs), eta, ye, &
              logtemp, btemp, bden, abar, zbar,  &
              num_reactions, rate_factors, &
              symbolic, just_dxdt, ierr)
@@ -367,8 +367,7 @@
             
             call approx21_special_reactions( &
                btemp, bden, abar, zbar, n% y, &
-               g% which_rates(ir_he4_he4_he4_to_c12) == use_rate_3a_FL87, &
-               Qconv*reaction_Qs(ir_he4_he4_he4_to_c12), &
+               g% use_3a_fl87, Qconv*reaction_Qs(ir_he4_he4_he4_to_c12), &
                rate_screened, rate_screened_dT, rate_screened_dRho, &
                dratdumdy1, dratdumdy2, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return            

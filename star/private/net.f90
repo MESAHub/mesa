@@ -33,7 +33,7 @@
 
       private
       public :: set_net, do_net, do1_net, do_micro_change_net, &
-         get_screening_mode, default_set_which_rates, default_set_rate_factors, &
+         get_screening_mode, default_set_rate_factors, &
          default_set_op_mono_factors
 
 
@@ -43,6 +43,7 @@
       subroutine do_net(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
          use net_lib, only: net_work_size
+         use net_def, only: net_other_net_derivs
          use rates_def, only: rates_other_screening
          use alloc
          type (star_info), pointer :: s
@@ -84,6 +85,16 @@
          rates_other_screening => null()
          if(s% use_other_screening) then
             rates_other_screening => s% other_screening
+         end if
+
+         net_other_net_derivs => null()
+         if(s% use_other_net_derivs) then
+            if(index(s% net_name,'approx')>0) then
+               write(*,*) 'use_other_net_derivs does not work with approx nets'
+               ierr = -1
+               return
+            end if
+            net_other_net_derivs => s% other_net_derivs
          end if
 
          net_lwork = net_work_size(s% net_handle, ierr)
@@ -168,6 +179,9 @@
          net_work => net_work_ary
          netinfo => net_info_target
 
+         netinfo% star_id = s% id
+         netinfo% zone = k
+         
          s% eps_nuc(k) = 0d0
          s% d_epsnuc_dlnd(k) = 0d0
          s% d_epsnuc_dlnT(k) = 0d0
@@ -693,6 +707,8 @@
             write(*,*) 'set_net failed in s% set_op_mono_factors'
             return
          end if
+
+         s% net_rq% use_3a_fl87 = s% job% use_3a_fl87
          
          s% need_to_setvars = .true.
 
@@ -702,7 +718,7 @@
       subroutine net_tables(s, ierr)
          use net_lib ! setup net
          use rates_lib
-         use rates_def, only: rates_reaction_id_max
+         use rates_def, only: rates_reaction_id_max, rates_other_rate_get
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          ierr = 0
@@ -740,18 +756,9 @@
             return
          end if
 
-         if (associated(s% which_rates)) deallocate(s% which_rates)
-         allocate(s% which_rates(rates_reaction_id_max))
-
-         call s% set_which_rates(s% id, ierr)
+         call read_rates_from_files(s% job% reaction_for_special_factor, s% job% filename_of_special_rate, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'failed in set_which_rates'
-            return
-         end if
-
-         call net_set_which_rates(s% net_handle, s% which_rates, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'failed in net_set_which_rates'
+            if (s% report_ierr) write(*,*) 'failed in read_rates_from_files'
             return
          end if
 
@@ -768,6 +775,11 @@
             return
          end if
 
+         rates_other_rate_get => null()
+         if(s% use_other_rate_get) then
+            rates_other_rate_get => s% other_rate_get
+         end if
+
          call net_setup_tables( &
             s% net_handle, rates_cache_suffix_for_star, ierr)
          if (ierr /= 0) then
@@ -776,19 +788,6 @@
          end if
 
       end subroutine net_tables
-
-
-      subroutine default_set_which_rates(id, ierr)
-         use rates_def, only: rates_NACRE_if_available
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% which_rates(:) = rates_NACRE_if_available
-      end subroutine default_set_which_rates
-
 
       subroutine default_set_rate_factors(id, ierr)
          integer, intent(in) :: id

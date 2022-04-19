@@ -14,8 +14,8 @@
 
       change_initial_net = .true.      
       new_net_name = 'co_burn.net'
-      
-      set_rate_3a = 'FL87' ! Fushiki and Lamb, Apj, 317, 368-388, 1987
+
+      use_3a_fl87 = .true.      
 
       change_v_flag = .true.
       new_v_flag = .false.

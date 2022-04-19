@@ -7,7 +7,7 @@ new_omega_div_omega_crit = 0.10d0
 / ! end of controls namelist
 
 &controls
-initial_mass = 70.00d0
+initial_mass = 72.50d0
 initial_Y = 0.99858d0
 initial_Z = 0.00142d0
 initial_he3 = 0d0

@@ -189,13 +189,13 @@
 
       
       subroutine do_make_rate_tables( &
-           num_reactions, cache_suffix, net_reaction_id, which_rates,  &
+           num_reactions, cache_suffix, net_reaction_id, &
            rattab, rattab_f1, nT8s, ttab, logttab, ierr)  
          use const_def
          use interp_1d_lib, only: interp_pm, interp_m3q
          use interp_1d_def, only: pm_work_size, mp_work_size
          use utils_lib
-         integer, intent(in) :: nT8s, num_reactions, net_reaction_id(:), which_rates(:)
+         integer, intent(in) :: nT8s, num_reactions, net_reaction_id(:)
          character (len=*), intent(in) :: cache_suffix
          real(dp) :: rattab(:,:), ttab(:), logttab(:)
          real(dp), pointer :: rattab_f1(:)
@@ -225,8 +225,7 @@
          else
             all_in_cache = .true.
             do i=1, num_reactions
-               if (read_reaction_from_cache( &
-                        net_reaction_id, cache_suffix, which_rates, i, rattab)) then
+               if (read_reaction_from_cache( net_reaction_id, cache_suffix, i, rattab)) then
                   reaction_id(i) = 0
                   cycle
                end if
@@ -256,7 +255,9 @@
                if (num_to_add_to_cache > 100) write(*,*) 'this will take some time .....'
             end if
             all_okay = .true.
-!$OMP PARALLEL DO PRIVATE(i, operr, logT, btemp, a_okay, j)
+!x$OMP PARALLEL DO PRIVATE(i, operr, logT, btemp, a_okay, j)
+            ! Disable parralisation as this can cause bugs in the 
+            ! load tables See github bug #360
             do i=1, nrattab
                logT = rattab_tlo + real(i-1,kind=dp)*rattab_tstp
                btemp = exp10(logT)
@@ -269,7 +270,7 @@
                operr = 0
                !write(*,2) 'logT', i, logT
                call get_net_rates_for_tables( &
-                  which_rates, reaction_id, logT, btemp, num_reactions,  &
+                  reaction_id, logT, btemp, num_reactions,  &
                   rattab(1:num_reactions, i), operr)
                if (operr /= 0) then
                   ierr = -1
@@ -286,7 +287,7 @@
                end do
                if (.not. a_okay) all_okay = .false.
             end do
-!$OMP END PARALLEL DO
+!x$OMP END PARALLEL DO
             if (.not. all_okay) call mesa_error(__FILE__,__LINE__,'make_rate_tables')
             if (ierr /= 0) then
                write(*,*) 'make_rate_tables failed'
@@ -308,8 +309,7 @@
                call interp_m3q(logttab, nrattab, f1, mp_work_size, work1,  &
                         'rates do_make_rate_tables', operr)
                if (operr /= 0) ierr = -1
-               nullify(f1)
-               call fill_with_NaNs(work1)
+               nullify(f1,work1)
             end do
 !$OMP END PARALLEL DO
             deallocate(work)
@@ -318,7 +318,7 @@
          if (ierr == 0 .and. nrattab > 1 .and. .not. all_in_cache) then
             do i=1, num_reactions
                if (reaction_id(i) <= 0) cycle
-               call write_reaction_to_cache(reaction_id, cache_suffix, which_rates, i, rattab) 
+               call write_reaction_to_cache(reaction_id, cache_suffix, i, rattab) 
             end do
          end if
          
@@ -359,8 +359,8 @@
       
 
       
-      logical function read_reaction_from_cache(reaction_id, cache_suffix, which_rates, i, rattab) 
-         integer, intent(in) :: i, reaction_id(:), which_rates(:)
+      logical function read_reaction_from_cache(reaction_id, cache_suffix, i, rattab) 
+         integer, intent(in) :: i, reaction_id(:)
          character (len=*), intent(in) :: cache_suffix
          real(dp),intent(out) :: rattab(:,:)
          
@@ -379,7 +379,7 @@
          if (.not. rates_use_cache) return
          
          ir = reaction_id(i)
-         which = which_rates(ir)
+         which = 1
          
          reverse_is_table = .false.
          rir = reverse_reaction_id(ir)
@@ -468,10 +468,10 @@
       
       
       
-      subroutine write_reaction_to_cache(reaction_id, cache_suffix, which_rates, i, rattab) 
+      subroutine write_reaction_to_cache(reaction_id, cache_suffix,  i, rattab) 
          integer, intent(in) :: i
          character (len=*), intent(in) :: cache_suffix
-         integer, intent(in) :: reaction_id(:), which_rates(:)
+         integer, intent(in) :: reaction_id(:)
          real(dp), intent(in) :: rattab(:,:)
 
          character (len=256) :: cache_filename, temp_cache_filename
@@ -484,7 +484,7 @@
          if (.not. rates_use_cache) return
          
          ir = reaction_id(i)
-         which = which_rates(ir)
+         which = 1
 
          reverse_is_table = .false.
          rir = reverse_reaction_id(ir)
@@ -575,13 +575,13 @@
 
 
       subroutine get_net_rates_for_tables( &
-               which_rates, reaction_id, logT, btemp, num_reactions, rates, ierr)
+               reaction_id, logT, btemp, num_reactions, rates, ierr)
          use ratelib, only: tfactors
          use raw_rates, only: set_raw_rates
          use utils_lib, only: is_bad
 
          real(dp), intent(in) :: logT, btemp
-         integer, intent(in) :: num_reactions, reaction_id(:), which_rates(:)
+         integer, intent(in) :: num_reactions, reaction_id(:)
          real(dp), intent(inout) :: rates(:)
          integer, intent(out) :: ierr
       
@@ -594,7 +594,7 @@
 
          call tfactors(tf, logT, btemp)
          call set_raw_rates( &
-               num_reactions, reaction_id, which_rates, btemp, tf, rates, ierr)
+               num_reactions, reaction_id, btemp, tf, rates, ierr)
          if (ierr /= 0) return
 
          do i = 1, num_reactions

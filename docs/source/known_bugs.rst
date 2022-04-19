@@ -17,7 +17,7 @@ r21.12.1
 Al26 isomers
 ------------
 
-After running a model with the al26 isomers in your net, when you run the model again, it
+After running a model with the al26 isomers in your net, when you run the model again, it may
 immediatly crashes and prints a backtrace containing:
 
 .. code-block:: shell
@@ -34,7 +34,7 @@ immediatly crashes and prints a backtrace containing:
     #1  0x99a523 in __interp_1d_misc_MOD_do_interp_values
 
 The solution for now is to remove all files in ``$MESA_DIR/data/rates_data/cache/`` before
-each MESA run.
+each MESA run, you may also find that changing the number of OMP threads also fixes the problem.
 
 See `gh-360 <https://github.com/MESAHub/mesa/issues/360>`_
 
@@ -62,7 +62,7 @@ First check that the name matches in your history_coloumns.list file and your co
 
     cat -A history_columns.list | grep "abs_mag"
 
-Finally, there is a bug if you name the any coloumn with either ``[]`` charcters in there (for instance ``[Fe/H]``). The solution is to rename the column to remove the square brackets.
+Finally, there is a bug if you name the any column with ``/`` in it (for instance ``[Fe/H]``). The solution is to rename the column to remove the forward slash.
 
 See `gh-379 <https://github.com/MESAHub/mesa/issues/379>`_
 

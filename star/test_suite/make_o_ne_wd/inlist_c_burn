@@ -38,6 +38,8 @@
       RGB_to_AGB_wind_switch = 1d-4
       Reimers_scaling_factor = 0.5 ! 0d0  
       Blocker_scaling_factor = 50d0
+      max_wind = 1d0 ! no need for faster AGB winds than this
+      T_mix_limit = 1d5 ! helps keep mixing near surface simple during AGB winds
 
 ! atmosphere
 

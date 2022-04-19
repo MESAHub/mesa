@@ -361,11 +361,11 @@
                ratdum, dratdumdt, dratdumdd, dratdumdy1, dratdumdy2, &
                plus_co56, ierr)
             use math_lib
-            use rates_lib, only: eval_FL_epsnuc_3alf
             use utils_lib, only: mesa_error
+            use rates_lib, only: eval_FL_epsnuc_3alf
             real(dp), intent(in) :: &
                btemp, bden, abar, zbar, y(:), conv_eps_3a
-            logical, intent(in) :: use_3a_FL
+            logical, intent(in) :: use_3a_fl
             real(dp), dimension(:) :: &
                ratdum,dratdumdt,dratdumdd,dratdumdy1,dratdumdy2
             logical, intent(in) ::  plus_co56
@@ -378,26 +378,25 @@
             include 'formats'
             
             ierr = 0
-            
-            
-         if (use_3a_FL) then
-            ! Fushiki and Lamb, Apj, 317, 368-388, 1987
-            if (y(ihe4) < tiny_y) then
-               ratdum(ir3a)     = 0.0d0
-               dratdumdt(ir3a)  = 0.0d0
-               dratdumdd(ir3a)  = 0.0d0
-            else
-               call eval_FL_epsnuc_3alf( &
-                  btemp, bden, 4*y(ihe4), abar/zbar, eps, deps_dT, deps_dRho)
-               ! convert from eps back to rate
-               xx = conv_eps_3a*y(ihe4)*y(ihe4)*y(ihe4)/6d0
-               ratdum(ir3a) = eps/xx
-               dratdumdt(ir3a) = deps_dT/xx
-               dratdumdd(ir3a) = deps_dRho/xx    
+
+            if (use_3a_FL) then
+               ! Fushiki and Lamb, Apj, 317, 368-388, 1987
+               if (y(ihe4) < tiny_y) then
+                  ratdum(ir3a)     = 0.0d0
+                  dratdumdt(ir3a)  = 0.0d0
+                  dratdumdd(ir3a)  = 0.0d0
+               else
+                  call eval_FL_epsnuc_3alf( &
+                     btemp, bden, 4*y(ihe4), abar/zbar, eps, deps_dT, deps_dRho)
+                  ! convert from eps back to rate
+                  xx = conv_eps_3a*y(ihe4)*y(ihe4)*y(ihe4)/6d0
+                  ratdum(ir3a) = eps/xx
+                  dratdumdt(ir3a) = deps_dT/xx
+                  dratdumdd(ir3a) = deps_dRho/xx    
+               end if
             end if
-         end if
-            
-            
+
+                        
             okay = .true.
             do i=1,num_mesa_reactions(plus_co56) 
                if (ratdum(i) < 0d0) then

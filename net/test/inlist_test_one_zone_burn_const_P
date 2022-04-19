@@ -74,11 +74,6 @@
       large_mtx_decsol = 'bcyclic_dble'
       
       cache_suffix = '' ! use this only for reactions from rate_tables
-      
-      which_rates_choice = 2
-         ! rates_NACRE_if_available = 1
-         ! rates_JR05_if_available = 2 << for jina reaclib
-
          
       ! reaction rate factors
          num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors

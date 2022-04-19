@@ -384,7 +384,7 @@
             i = c - raw_rate_offset
             tf => tf2
             call eval_tfactors(tf, log10(s% t(k)), s% t(k))
-            call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
+            call get_raw_rate(i, s% t(k), tf, raw_rate, ierr)
             val = raw_rate
             nullify(tf)
          else if (c > diffusion_D_offset) then
