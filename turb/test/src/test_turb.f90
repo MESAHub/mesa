@@ -113,7 +113,7 @@ program test_turb
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
 
       ! Adjust L down to get just slightly superadiabatic gradR)
-      L = L * (1d0 + 1d-7) * (grada/gradr)
+      L = L * (1d0 + 1d-5) * (grada/gradr)
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
 
 
