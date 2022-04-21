@@ -73,5 +73,72 @@
       end subroutine neu_get
       
 
+      subroutine neu_p_e_to_n_nue(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+         use neu_cap
+         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: mu ! electron chemical potential
+         real(dp), intent(out) :: rate, Q
+         real(dp), intent(out) :: dratedt, dratedmu
+         integer,intent(inout) :: ierr
+         ierr = 0
+
+         rate = lambda_ec(temp, mu, ierr)
+         Q = 0d0 !TODO
+         dratedmu =0d0 !TODO
+         dratedt = 0d0 !TODO 
+
+         write(60,*) temp, mu, rate
+
+      end subroutine neu_p_e_to_n_nue
+
+      subroutine neu_n_ae_to_p_anue(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+         use neu_cap
+         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: mu ! electron chemical potential
+         real(dp), intent(out) :: rate, Q
+         real(dp), intent(out) :: dratedt, dratedmu
+         integer,intent(inout) :: ierr
+         ierr = 0
+
+         rate = lambda_pc(temp, mu, ierr)
+         Q = 0d0 !TODO
+         dratedmu =0d0 !TODO
+         dratedt = 0d0 !TODO 
+
+      end subroutine neu_n_ae_to_p_anue
+
+      subroutine neu_n_nue_to_p_e(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+         use neu_cap
+         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: mu ! electron chemical potential
+         real(dp), intent(out) :: rate, Q
+         real(dp), intent(out) :: dratedt, dratedmu
+         integer,intent(inout) :: ierr
+         ierr = 0
+
+         rate = lambda_nue(temp, mu, ierr)
+         Q = 0d0 !TODO
+         dratedmu =0d0 !TODO
+         dratedt = 0d0 !TODO 
+
+      end subroutine neu_n_nue_to_p_e
+
+
+      subroutine neu_p_anue_to_n_ae(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+         use neu_cap
+         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: mu ! electron chemical potential
+         real(dp), intent(out) :: rate, Q
+         real(dp), intent(out) :: dratedt, dratedmu
+         integer,intent(inout) :: ierr
+         ierr = 0
+
+         rate = lambda_anue(temp, mu, ierr)
+         Q = 0d0 !TODO
+         dratedmu =0d0 !TODO
+         dratedt = 0d0 !TODO 
+
+      end subroutine neu_p_anue_to_n_ae
+
       end module neu_lib
 

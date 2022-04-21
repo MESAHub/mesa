@@ -15,7 +15,8 @@ include $(MESA_DIR)/utils/makefile_header
 SRCS = \
    neu_def.f90 \
    mod_neu.f90 \
-   neu_lib.f90
+   neu_cap.f90 \
+   neu_lib.f90 
 
 #################################################################
 #

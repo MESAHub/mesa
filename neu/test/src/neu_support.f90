@@ -2,7 +2,7 @@ module neu_support
    use neu_def
    use neu_lib
    use math_lib
-   use const_def, only: dp
+   use const_def, only: dp,mev_to_ergs
    use utils_lib, only: mkdir, mesa_error
 
    implicit none
@@ -52,6 +52,56 @@ module neu_support
       end do
 
    end subroutine do_test_neutrinos
+
+
+   subroutine do_test_neu_captures()
+      real(dp),parameter :: logT_start=9.d0, logT_end=11.0d0
+      real(dp),parameter :: mu_start=-5d0, mu_end = 0d0
+
+      integer,parameter :: num_temps=20,  num_mu=20
+
+      real(dp) :: T, logT, mu
+
+      real(dp) :: lec,lpc,lnuc,lanuc
+      real(dp) :: q,dratedt, dratedrho, E,estart,eend
+      integer :: ierr,esteps
+
+      integer :: i,j,k
+
+
+      write(*,'(A)')
+      write(*,'(A)')
+      write(*,'(A)')
+      write(*,*) "Testing neutrino and electron captures"
+      write(*,'(A)')
+      write(*,'(A)')
+      write(*,'(A)')
+
+      ! do i=1,num_temps
+
+      !    logT = logT_start + (i-1)*(logT_end-logT_start)/num_temps
+      !    T = exp10(logT)
+
+      !    do j=1,num_mu
+      !       mu = mu_start + (j-1) * (mu_end-mu_start)/num_mu
+
+            t = 1d10
+            logT = log10(t)
+            mu = -1d0
+
+            call neu_p_e_to_n_nue(T, mu, lec, Q, dratedt, dratedrho,  ierr)
+            call neu_n_ae_to_p_anue(T, mu, lpc, Q, dratedt, dratedrho,  ierr)
+            call neu_n_nue_to_p_e(T, mu, lnuc, Q, dratedt, dratedrho,  ierr)
+            call neu_p_anue_to_n_ae(T, mu, lanuc, Q, dratedt, dratedrho,  ierr)
+
+            write(*,'(99(1pe26.16))') logT, mu, lec, lpc, lnuc, lanuc
+
+      !    end do
+      ! end do
+
+
+   end subroutine do_test_neu_captures
+
 
 end module neu_support
 

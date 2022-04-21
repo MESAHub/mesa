@@ -16,4 +16,6 @@
       call math_init()
       call do_test_neutrinos()
 
+      call do_test_neu_captures()
+
       end program
