@@ -342,5 +342,5 @@
 
 !..various derived constants
       real(dp) :: third,sioncon,sifac,kergavo,asoli3
-      real(dp) :: clight2,eostol,fpmin
+      real(dp) :: eostol,fpmin
       real(dp) :: forth,fiveth,teninth,esqu,forthpi

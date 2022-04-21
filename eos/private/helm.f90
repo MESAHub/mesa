@@ -151,7 +151,6 @@
          sifac  = 8.6322745944370191d-45
          kergavo = kerg * avo
          asoli3  = asol/3.0d0
-         clight2 = clight*clight
          eostol = 1.0d-13
          fpmin  = 1.0d-14
          !..note: sifac = h**3/(2.0d0*pi*amu)**1.5d0

@@ -76,6 +76,7 @@
       real(dp), parameter :: avo = 6.02214076d23 ! Avogadro constant (mole^-1)
       real(dp), parameter :: amu = 1d0 / avo ! atomic mass unit (g)
       real(dp), parameter :: clight = 2.99792458d10 ! speed of light in vacuum (cm s^-1)
+      real(dp), parameter :: clight2 = clight * clight ! speed of light in vacuum ^2 (cm^2 s^-2)
       real(dp), parameter :: qe = (clight/10d0) * 1.602176634d-19 ! elementary charge (esu == (g cm^3 s^-2)^(1/2))
       real(dp), parameter :: kerg = 1.380649d-16
       real(dp), parameter :: boltzm = kerg ! Boltzmann constant (erg K^-1)
