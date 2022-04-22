@@ -6650,7 +6650,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, use atomic diffusion coefficients according to Paquette et al. (1986).
-      ! if false, use Stanton & Murillo (2016) for diffusion coefficients.
+      ! if false, use Stanton & Murillo PhRvE, 93, 043203 (2016) for diffusion coefficients.
       ! (Paquette coefficients still used for electron-ion because Stanton & Murillo
       ! did not do calculations for attractive potentials.)
 
@@ -6663,7 +6663,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, use atomic diffusion coefficients according to
-      ! Caplan, Bauer, & Freeman (2022) at strong coupling (Gamma > 10),
+      ! Caplan, Bauer, & Freeman MNRAS, 513, L52 (2022) at strong coupling (Gamma > 10),
       ! relevant for white dwarf interiors.
 
       ! ::
