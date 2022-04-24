@@ -64,6 +64,7 @@
          character (len=strlen) :: buffer, string, filename
          integer, parameter :: max_level = 20
 
+         logical :: exists
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -79,17 +80,25 @@
 
          ! first try local directory
          filename = profile_columns_file
-         if (len_trim(filename) == 0) filename = 'profile_columns.list'
-         open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in star/defaults
-            filename = trim(mesa_dir) // '/star/defaults/' // trim(filename)
-            ierr = 0
-            open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-            if (ierr /= 0) then
-               write(*,*) 'failed to open ' // trim(filename)
-               return
-            end if
+
+         if(level==1) then ! First pass either the user set the file or we load the defaults
+            if (len_trim(filename) == 0) filename = 'profile_columns.list'
+
+            exists=.false.
+            inquire(file=filename,exist=exists)
+
+            if(.not.exists) filename = trim(mesa_dir) // '/star/defaults/profile_columns.list'
+         else
+            ! User had include '' in their profile_columns.list file, so dont try to load the local one, jump to the defaults
+            if (len_trim(filename) == 0) filename =trim(mesa_dir) // '/star/defaults/profile_columns.list'
          end if
+
+         open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
+         if (ierr /= 0) then 
+            write(*,*) 'failed to open ' // trim(profile_columns_file)
+            return
+         end if
+
 
          if (dbg) then
             write(*,'(A)')

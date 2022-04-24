@@ -98,7 +98,7 @@
          integer :: iounit, n, i, t, id, j, k, cnt, ii, nxt_spec, spec_err
          character (len=strlen) :: buffer, string, filename
          integer, parameter :: max_level = 20
-         logical :: bad_item, special_case
+         logical :: bad_item, special_case, exists
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -112,21 +112,28 @@
          ierr = 0
          spec_err = 0
 
+
          ! first try local directory
          filename = history_columns_file
 
-         ! User had include '' in their history_columns.list file, so dont try to load the local one, jump to the defaults
-         if (len_trim(filename) == 0) filename = trim(mesa_dir) // '/star/defaults/history_columns.list'
+         if(level==1) then ! First pass either the user set the file or we load the defaults
+            if (len_trim(filename) == 0) filename = 'history_columns.list'
+
+            exists=.false.
+            inquire(file=filename,exist=exists)
+
+            if(.not.exists) filename = trim(mesa_dir) // '/star/defaults/history_columns.list'
+         else
+            ! User had include '' in their history_columns.list file, so dont try to load the local one, jump to the defaults
+            if (len_trim(filename) == 0) filename =trim(mesa_dir) // '/star/defaults/history_columns.list'
+         end if
+
+
 
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in star/defaults
-            filename = trim(mesa_dir) // '/star/defaults/' // trim(history_columns_file)
-            ierr = 0
-            open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-            if (ierr /= 0) then
-               write(*,*) 'failed to open ' // trim(history_columns_file)
-               return
-            end if
+         if (ierr /= 0) then 
+            write(*,*) 'failed to open ' // trim(history_columns_file)
+            return
          end if
 
          if (dbg) then
