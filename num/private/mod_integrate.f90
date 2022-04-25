@@ -33,24 +33,19 @@
 
       contains
 
-      recursive function integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr) result(result)
+      recursive function integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr) result(res)
          procedure(integrand) :: func
          real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
          real(dp), intent(in) :: args(:) ! Extra args passed to func
          real(dp), intent(in) :: atol, rtol ! Absolute and relative tolerances
          integer, intent(in) :: max_steps ! Max number of sub-steps
          integer, intent(inout) :: ierr ! Error code
-         real(dp) :: result
+         real(dp) :: res
 
          real(dp) :: val1, val2
          real(dp) :: xlow,xhigh,xmid
 
          if(max_steps < 1) then
-            ierr = -1
-            return
-         end if
-
-         if(xhigh< xlow) then
             ierr = -1
             return
          end if
@@ -61,6 +56,11 @@
          xhigh = maxx
          xmid = (xhigh+xlow)/2.d0
 
+         if(xhigh < xlow) then
+            ierr = -1
+            return
+         end if
+
          val1 = simp38(func, xlow, xhigh, args, ierr)
          if(ierr/=0) return
 
@@ -68,17 +68,17 @@
          if(ierr/=0) return
 
          if(val1==0d0 .or. val2 == 0d0) then
-            result = val2
+            res = val2
             return
          end if
 
          if(abs(val1-val2) < atol .or. abs(val1-val2)/val1 < rtol ) then
-            result = val2
+            res = val2
          else
             val1 = integrator(func, xlow, xmid, args, atol, rtol, max_steps-1, ierr) 
             val2 = integrator(func, xmid, xhigh, args, atol, rtol, max_steps-1, ierr) 
 
-            result = val1+val2
+            res = val1+val2
             if(ierr/=0) return
          end if
 
