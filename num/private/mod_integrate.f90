@@ -33,7 +33,7 @@
 
       contains
 
-      function integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr) result(result)
+      recursive function integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr) result(result)
          procedure(integrand) :: func
          real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
          real(dp), intent(in) :: args(:) ! Extra args passed to func
