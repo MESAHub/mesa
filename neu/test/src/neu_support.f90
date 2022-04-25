@@ -58,12 +58,13 @@ module neu_support
       real(dp),parameter :: logT_start=9.d0, logT_end=11.0d0
       real(dp),parameter :: mu_start=-5d0, mu_end = 0d0
 
-      integer,parameter :: num_temps=20,  num_mu=20
+      integer,parameter :: num_temps=21,  num_mu=21
 
       real(dp) :: T, logT, mu
 
-      real(dp) :: lec,lpc,lnuc,lanuc
-      real(dp) :: q,dratedt, dratedrho, E,estart,eend
+      real(dp) :: lec,lpc,lneu,laneu
+      real(dp) :: Qec,Qpc,Qneu,Qaneu
+      real(dp) :: dratedt, dratedrho, qdt, qdmu
       integer :: ierr,esteps
 
       integer :: i,j,k
@@ -77,27 +78,31 @@ module neu_support
       write(*,'(A)')
       write(*,'(A)')
 
-      ! do i=1,num_temps
+      call neu_lib_init('../../data/neu_data/neutrino_captures.txt',ierr)
+      if(ierr/=0) then
+         write(*,*) 'neu capture init failed',ierr
+         return
+      end if
 
-      !    logT = logT_start + (i-1)*(logT_end-logT_start)/num_temps
-      !    T = exp10(logT)
+      do i=1,num_temps
 
-      !    do j=1,num_mu
-      !       mu = mu_start + (j-1) * (mu_end-mu_start)/num_mu
+         logT = logT_start + (i-1)*(logT_end-logT_start)/num_temps
+         T = exp10(logT)
 
-            t = 1d10
-            logT = log10(t)
-            mu = -1d0
+         do j=1,num_mu
+            mu = mu_start + (j-1) * (mu_end-mu_start)/num_mu
 
-            call neu_p_e_to_n_nue(T, mu, lec, Q, dratedt, dratedrho,  ierr)
-            call neu_n_ae_to_p_anue(T, mu, lpc, Q, dratedt, dratedrho,  ierr)
-            call neu_n_nue_to_p_e(T, mu, lnuc, Q, dratedt, dratedrho,  ierr)
-            call neu_p_anue_to_n_ae(T, mu, lanuc, Q, dratedt, dratedrho,  ierr)
+            call neu_prot_ec(logT, mu, lec,  dratedt, dratedrho, Qec, Qdt, Qdmu,  ierr)
+            call neu_neut_pc(logT, mu, lpc,  dratedt, dratedrho, Qpc, Qdt, Qdmu,  ierr)
+            call neu_neut_neu_cap(logT, mu, lneu,  dratedt, dratedrho, Qneu, Qdt, Qdmu,  ierr)
+            call neu_prot_aneu_cap(logT, mu, laneu,  dratedt, dratedrho, Qaneu, Qdt, Qdmu,  ierr)
 
-            write(*,'(99(1pe26.16))') logT, mu, lec, lpc, lnuc, lanuc
+            write(*,'(99(1pe26.16))') logT, mu, lec, lpc, lneu, laneu, Qec, Qpc, Qneu, Qaneu
 
-      !    end do
-      ! end do
+         end do
+      end do
+
+      call neu_lib_shutdown(ierr)
 
 
    end subroutine do_test_neu_captures

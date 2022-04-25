@@ -31,6 +31,20 @@
 
       implicit none
 
+      abstract interface
+         real(dp) function integrator_rule(func, minx, maxx, args, ierr)
+            use const_def
+            use num_def
+            procedure(integrand) :: func
+            real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
+            real(dp), intent(in) :: args(:) ! Extra args passed to func
+            integer, intent(inout) :: ierr
+         end function integrator_rule
+
+      end interface
+
+
+
       contains
 
       recursive function integrator(func, minx, maxx, args, atol, rtol, min_steps, max_steps, ierr) result(result)
@@ -124,6 +138,5 @@
          simp38 = (maxx-minx)/8.d0 * simp38
 
       end function simp38
-
 
    end module mod_integrate

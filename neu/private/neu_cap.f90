@@ -30,6 +30,7 @@
       use num_def
       use math_lib
       use utils_lib, only: mesa_error, is_bad
+      use interp_2d_lib_db
 
       implicit none
 
@@ -40,192 +41,351 @@
       real(dp), parameter :: Qpc = -Qec ! ergs
       real(dp), parameter :: me_erg = me * clight2 ! ergs
 
-      real(dp), parameter :: B = 5.76d0
-      real(dp), parameter :: K = 6144.0d0
-      real(dp), parameter :: C = (B*ln2)/(K*me_erg*me_erg*me_erg*me_erg*me_erg)
+      type neu_cap_rates
+         real(dp),allocatable,dimension(:) :: logT, mu
+         integer :: ntemp, nmu, ntot ! Num of temperature, mu, and total
+         real(dp),pointer,dimension(:) :: lecf1=>null(), lpcf1=>null(), lneuf1=>null(), laneuf1=>null()
+         real(dp),pointer,dimension(:) :: Qecf1=>null(), Qpcf1=>null(), Qneuf1=>null(), Qaneuf1=>null()
+         logical :: init=.false.
+      end type neu_cap_rates
 
-      ! Indexs to args
-      integer, parameter :: IND_MUE = 1 ! electron chemical potential
-      integer, parameter :: IND_TEMP = 2 ! temperature (kelvin)
-      integer, parameter :: IND_Q = 3 ! Energy (ev)
-      integer, parameter :: IND_NU = 4 ! neutrino distribution functions normally 0
+      type(neu_cap_rates) :: rate_data
 
-      integer, parameter :: NUM_IND = 5
-
-      ! Integration tolerances
-      real(dp), parameter :: atol=1d-5, rtol=1d-5
-      integer,  parameter :: MAX_STEPS = 20, MIN_STEPS=15
-      real(dp), parameter :: MAX_EXP = 200d0
-
+      integer,dimension(6),parameter :: ict = (/1,1,1,0,0,0/)
 
 
       contains
-   
-      real(dp) function fermidirac(temp, E, mu)
-         real(dp),intent(in) :: temp ! Kelvin
-         real(dp),intent(in) :: E ! erg
-         real(dp),intent(in) :: mu ! ergs?
-         real(dp) :: ex
+  
 
-         ex = (E/(boltzm*temp)) - mu
+      subroutine  lambda_ec(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
+         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
+         integer, intent(inout) :: ierr
+         real(dp) :: fval(6)
 
-         if(ex>MAX_EXP) then
-            fermidirac = 0d0
+         ierr = 0
+
+         if(.not. rate_data% init) then
+            write(*,*) 'Neutrino capture data not initialized'
+            ierr=-1
             return
          end if
 
-         fermidirac = 1.d0/(exp(ex)+1d0)
+         call interp_evbicub_db( mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% lecf1,rate_data% nMu, &
+                                 ict, fval, ierr)
+         if(ierr/=0) return
 
-         !write(90,*) log10(temp),mu,E,fermidirac,(E- mu),(E- mu)/(boltzm*temp),ex,(boltzm*temp)
+         rate = fval(1)
+         dratedt = fval(3)! Fix log to T
+         dratedmu = fval(2)
 
-      end function fermidirac
 
+         fval = 0
+         call interp_evbicub_db(mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% Qecf1,rate_data% nMu, &
+                                 ict, fval, ierr)
+         if(ierr/=0) return
 
-      real(dp) function w(Q) ! Lower bound on E integral
-         real(dp), intent(in) :: Q ! erg
+         Q = fval(1)
+         Qdt = fval(3)! Fix log to T
+         Qdmu = fval(2)
 
-         w = max(me_erg,Q)
+      end subroutine lambda_ec
 
-      end function w
-
-      real(dp) function hwm() ! weak magnetism and recoil corrections Horowitz 2002
-         !TODO: compute it
-
-         hwm=0d0
-
-      end function hwm
-
-      real(dp) function lambda_ec(temp ,mu, ierr)
-         real(dp),intent(in) :: temp, mu ! Temp in K mu electron chemical potential
+      subroutine  lambda_pc(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
+         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
          integer, intent(inout) :: ierr
-         real(dp) :: args(NUM_IND)
+         real(dp) :: fval(6)
 
          ierr = 0
-
-         args(IND_TEMP) = temp
-         args(IND_MUE) = mu + me_erg/(boltzm*temp)
-         args(IND_NU) = 0
-         args(IND_Q) = Qec
-
-         lambda_ec = C * integrate_infinity(lambda1, w(args(IND_Q)), args, atol, rtol,MIN_STEPS,MAX_STEPS,ierr)
-
-         ! write(70,*) log10(temp),mu, args(IND_MUE),w(args(IND_Q)),lambda_ec,i
-         ! flush(70)
-
-
-      end function lambda_ec
-
-      real(dp) function lambda_pc(temp ,mu, ierr)
-         real(dp),intent(in) :: temp, mu ! Temp in K mu electron chemical potential
-         integer, intent(inout) :: ierr
-         real(dp) :: args(NUM_IND)
-         integer :: i
-
-         ierr = 0
-
-         args(IND_TEMP) = temp
-         args(IND_MUE) = -mu - 2*me_erg/(boltzm*temp)
-         args(IND_NU) = 0
-         args(IND_Q) = Qpc
-
-         lambda_pc = C * integrate_infinity(lambda1,w(args(IND_Q)),args,atol,rtol,MIN_STEPS,MAX_STEPS,ierr)
-
-         !write(70,*) log10(temp),mu, args(IND_MUE),w(args(IND_Q)),lambda_pc,i
-         !flush(70)
-
-      end function lambda_pc
-
-      real(dp) function lambda_nue(temp ,mu, ierr)
-         real(dp),intent(in) :: temp, mu ! Temp in K mu electron chemical potential
-         integer, intent(inout) :: ierr
-         real(dp) :: args(NUM_IND)
-
-         ierr = 0
-
-         args(IND_TEMP) = temp
-         args(IND_MUE) = mu + me_erg/(boltzm*temp)
-         args(IND_NU) = 0
-         args(IND_Q) = Qec
-
-         lambda_nue = C * integrate_infinity(lambda2,w(args(IND_Q)),args,atol,rtol,MIN_STEPS,MAX_STEPS,ierr)
-
-      end function lambda_nue
-
-      real(dp) function lambda_anue(temp ,mu, ierr)
-         real(dp),intent(in) :: temp, mu ! Temp in K mu electron chemical potential
-         integer, intent(inout) :: ierr
-         real(dp) :: args(NUM_IND)
-
-         ierr = 0
-
-         args(IND_TEMP) = temp
-         args(IND_MUE) = -mu - 2*me_erg/(boltzm*temp)
-         args(IND_NU) = 0
-         args(IND_Q) = Qpc
-
-         lambda_anue = C * integrate_infinity(lambda2,w(args(IND_Q)),args,atol,rtol,MIN_STEPS,MAX_STEPS,ierr)
-
-      end function lambda_anue
-
-      real(dp) function lambda1(E, args, ierr)
-         real(dp),intent(in) :: E ! erg
-         real(dp), intent(in) :: args(:)
-         integer, intent(inout) :: ierr
-
-         real(dp) :: temp,mu,nu,q
-         real(dp) :: EmQ
-
-         ierr = 0
-
-         temp = args(IND_TEMP)
-         mu= args(IND_MUE)
-         nu = args(IND_NU)
-         Q = args(IND_Q)
-
-         EmQ = E-Q
-
-         if(abs(E)<abs(Q)) then
-            lambda1=0d0
+         if(.not. rate_data% init) then
+            write(*,*) 'Neutrino capture data not initialized'
+            ierr=-1
             return
-         end if 
+         end if
 
-         lambda1 = E * sqrt(E*E-Q*Q) * EmQ*EmQ * (1+E*hwm()) * &
-                  fermidirac(temp, E, mu) * (1d0-fermidirac(temp, EmQ, nu))
+         call interp_evbicub_db(mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% lpcf1, rate_data% nMu, &
+                                 ict, fval, ierr)
+         if(ierr/=0) return
+
+         rate = fval(1)
+         dratedt = fval(3)! Fix log to T
+         dratedmu = fval(2)
 
 
-        ! write(80,*) log10(temp),E,mu,sqrt(E*E-Q*Q),EmQ*EmQ,fermidirac(temp, E, mu),fermidirac(temp, EmQ, nu),lambda1
+         fval = 0
+         call interp_evbicub_db(mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% Qpcf1,rate_data% nMu, &
+                                 ict, fval, ierr)
+         if(ierr/=0) return
 
-      end function lambda1
+         Q = fval(1)
+         Qdt = fval(3)! Fix log to T
+         Qdmu = fval(2)
 
-      real(dp) function lambda2(E, args, ierr)
-         real(dp),intent(in) :: E ! erg
-         real(dp), intent(in) :: args(:)
+
+      end subroutine lambda_pc
+
+      subroutine  lambda_neu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
+         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
          integer, intent(inout) :: ierr
+         real(dp) :: fval(6)
 
-         real(dp) :: temp,mu,nu,q
-         real(dp) :: EmQ
+         ierr = 0
+         if(.not. rate_data% init) then
+            write(*,*) 'Neutrino capture data not initialized'
+            ierr=-1
+            return
+         end if
+
+         call interp_evbicub_db(mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% lneuf1,rate_data% nMu, &
+                                 ict, fval, ierr)
+         if(ierr/=0) return
+
+         rate = fval(1)
+         Qdt = fval(3)! Fix log to T
+         Qdmu = fval(2)
+
+         fval = 0
+         call interp_evbicub_db(mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% Qneuf1,rate_data% nMu, &
+                                 ict, fval, ierr)
+         if(ierr/=0) return
+
+         Q = fval(1)
+         Qdt = fval(3)! Fix log to T
+         Qdmu = fval(2)
+
+
+
+
+      end subroutine lambda_neu
+
+      subroutine  lambda_aneu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
+         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
+         integer, intent(inout) :: ierr
+         real(dp) :: fval(6)
+
+         ierr = 0
+         if(.not. rate_data% init) then
+            write(*,*) 'Neutrino capture data not initialized'
+            ierr=-1
+            return
+         end if
+
+         call interp_evbicub_db(mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% laneuf1, rate_data% nMu,&
+                                 ict, fval, ierr)
+         if(ierr/=0) return
+
+         rate = fval(1)
+         dratedt = fval(3)! Fix log to T
+         dratedmu = fval(2)
+
+
+         fval = 0
+         call interp_evbicub_db(mu, logT, &
+                                 rate_data% mu, rate_data% nMu,&
+                                 rate_data% logT, rate_data% nTemp,&
+                                 1,1, rate_data% Qaneuf1,rate_data% nMu, &
+                                 ict, fval, ierr)
+         if(ierr/=0) return
+
+         Q = fval(1)
+         Qdt = fval(3)! Fix log to T
+         Qdmu = fval(2)
+
+      end subroutine lambda_aneu
+
+  
+      subroutine neu_cap_init(filename, ierr)
+         use interp_2d_lib_db
+         character(len=*), intent(in) :: filename
+         integer, intent(inout) :: ierr
+         integer :: io,ioerr,ntot, i,j, ind, nMu, nTemp
+         character(len=1) :: tmp
+         integer :: ibcMumin, ibcMumax, ibcTempmin, ibcTempmax, ilinx, iliny
+         real(dp), allocatable :: bcMumin(:),bcMumax(:), bcTempmin(:),  bcTempmax(:)
+
+         integer :: count
 
          ierr = 0
 
-         temp = args(IND_TEMP)
-         mu= args(IND_MUE)
-         nu = args(IND_NU)
-         Q = args(IND_Q)
-
-         EmQ = E-Q
-
-         if(abs(E)<abs(Q)) then
-            lambda2=0d0
+         open(newunit=io,file=trim(filename),iostat=ioerr)
+         if(ioerr/=0) then
+            ierr = -1
+            write(*,*) "Could not open file ",trim(filename)
             return
-         end if 
+         end if
 
-         lambda2 = E * sqrt(E*E-Q*Q) * EmQ*EmQ * (1+E*hwm()) * &
-                     (1.d0-fermidirac(temp, E, mu)) * fermidirac(temp, EmQ, nu)
+         ! First line is number of lines of data
+         ! Second is a header
+         ! Third onwards is the data
 
-         !write(80,*) log10(temp),E,mu,Q,sqrt(E*E-Q*Q),EmQ*EmQ,fermidirac(temp, E, mu),fermidirac(temp, EmQ, nu),lambda2
+         read(io,*) tmp, rate_data% ntot, rate_data% ntemp, rate_data% nmu 
 
-      end function lambda2
+         ntot = rate_data% ntot
+         nTemp = rate_data% ntemp
+         nMu = rate_data% nmu
+         
+         ! Read empty line
+         read(io,'(a)')
 
+         if(allocated(rate_data% logT)) deallocate(rate_data% logT)
+         if(allocated(rate_data% mu)) deallocate(rate_data% mu)
+
+         allocate(rate_data% logT(1:nTemp), rate_data% mu(1:nMu),&
+                  rate_data% lecf1(1:ntot*4),rate_data% lpcf1(1:ntot*4),&
+                  rate_data% lneuf1(1:ntot*4),rate_data% laneuf1(1:ntot*4),&
+                  rate_data% Qecf1(1:ntot*4),rate_data% Qpcf1(1:ntot*4),&
+                  rate_data% Qneuf1(1:ntot*4),rate_data% Qaneuf1(1:ntot*4)&
+                  )
+
+         ! Read rest of data
+         do i=1,nTemp
+            do j=1, nMu
+               ind = 1 + ((j-1) + (i-1)*nMu) * 4
+               read(io,*) rate_data% logT(i), rate_data% mu(j),&
+                       rate_data% lecf1(ind),rate_data% lpcf1(ind),&
+                       rate_data% lneuf1(ind),rate_data% laneuf1(ind),&
+                       rate_data% Qecf1(ind),rate_data% Qpcf1(ind),&
+                       rate_data% Qneuf1(ind),rate_data% Qaneuf1(ind)
+            end do
+         end do
+
+         ! use "not a knot" bc's
+         allocate(bcMumin(nMu),bcMumax(nMu), bcTempmin(nTemp),  bcTempmax(nTemp))
+
+         ibcMumin = 0; bcMumin(:) = 0d0
+         ibcMumax = 0; bcMumax(:) = 0d0
+         ibcTempmin = 0; bcTempmin(:) = 0d0
+         ibcTempmax = 0; bcTempmax(:) = 0d0
+
+         ! Setup the interpolants
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% lecf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% lpcf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% lneuf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% laneuf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+         
+
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% Qecf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% Qpcf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% Qneuf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+
+         call interp_mkbicub_db( rate_data% mu(1:nMu), nMu,&
+                                 rate_data% logT(1:nTemp), nTemp,&
+                                 rate_data% Qaneuf1, nMu, &
+                                 ibcMumin, bcMumin, ibcMumax, bcMumax,  &
+                                 ibcTempmin, bcTempmin, ibcTempmax, bcTempmax, &
+                                 ilinx, iliny, ierr &
+         )
+         if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+         rate_data% init = .true.
+
+      end subroutine neu_cap_init
+
+      subroutine neu_cap_shutdown()
+
+         if(rate_data% init) then
+
+            if(allocated(rate_data% logT)) deallocate(rate_data% logT)
+            if(allocated(rate_data% mu)) deallocate(rate_data% mu)
+
+            deallocate(rate_data% lecf1)
+            deallocate(rate_data% lpcf1)
+            deallocate(rate_data% lneuf1)
+            deallocate(rate_data% laneuf1)
+            deallocate(rate_data% Qecf1)
+            deallocate(rate_data% Qpcf1)
+            deallocate(rate_data% Qneuf1)
+            deallocate(rate_data% Qaneuf1)
+
+            nullify(rate_data% lecf1, rate_data% lpcf1, rate_data% lneuf1, rate_data% laneuf1)
+            nullify(rate_data% Qecf1, rate_data% Qpcf1, rate_data% Qneuf1, rate_data% Qaneuf1)
+
+            rate_data% init = .false.
+         end if
+      end subroutine neu_cap_shutdown
 
 
    end module neu_cap

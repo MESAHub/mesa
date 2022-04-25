@@ -1,0 +1,37 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+echo 'create neu_data'
+
+cd data
+check_okay
+
+rm -rf neu_data
+
+mkdir -p neu_data
+cd neu_data
+check_okay
+
+echo 'xz ../neutrino_captures.txt.xz'
+xz -dk ../neutrino_captures.txt.xz
+mv ../neutrino_captures.txt .
+check_okay
+
+cd ../../
+
+rm -rf ../data/neu_data
+check_okay
+
+mkdir -p ../data/neu_data
+check_okay
+
+mv data/neu_data/* ../data/neu_data
+check_okay
+
+

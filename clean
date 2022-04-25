@@ -16,6 +16,7 @@ rm -rf data/kap_data
 rm -rf data/chem_data
 rm -rf data/colors_data
 rm -rf data/rates_data/cache
+rm -rf data/neu_data
 
 rm -rf data/rates_data/cache/*
 

@@ -1,0 +1,65 @@
+From 325e1a1c069db6a919876bebb9814047946c5fdc Mon Sep 17 00:00:00 2001
+From: Rob Farmer <robert.j.farmer37@gmail.com>
+Date: Sun, 24 Apr 2022 17:51:21 -0700
+Subject: [PATCH] Make it easier to call the neutrino capture rates from python
+
+SWIG doesn't yet have the ability to handle valarray's so make a wrapper
+around NeutrinoDistributionFermiDirac::Create that takes just
+a double T9 and mu and convert it into valarrays
+
+This embeds the assumption that the neutrino potentials follow a fermi-dirac
+with mu=0
+---
+ .../NeutrinoDistributionFermiDirac.cpp        | 21 +++++++++++++++++++
+ .../NeutrinoDistributionFermiDirac.hpp        |  3 +++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/src/EquationsOfState/NeutrinoDistributionFermiDirac.cpp b/src/EquationsOfState/NeutrinoDistributionFermiDirac.cpp
+index d08cb8f..1f9bb61 100644
+--- a/src/EquationsOfState/NeutrinoDistributionFermiDirac.cpp
++++ b/src/EquationsOfState/NeutrinoDistributionFermiDirac.cpp
+@@ -26,6 +26,27 @@ std::shared_ptr<NeutrinoDistribution> NeutrinoDistributionFermiDirac::Create(
+       new NeutrinoDistributionFermiDirac(species, T9, eta, normalization));
+ }
+ 
++std::shared_ptr<NeutrinoDistribution> NeutrinoDistributionFermiDirac::Create(
++    const double& T9, const double& eta) {
++
++    std::valarray<NeutrinoSpecies> speciesval(0, 7);
++
++    speciesval[0]=NeutrinoSpecies::NuE;
++    speciesval[1]=NeutrinoSpecies::AntiNuE;
++    speciesval[2]=NeutrinoSpecies::NuX;
++    speciesval[3]=NeutrinoSpecies::NuMu;
++    speciesval[4]=NeutrinoSpecies::AntiNuMu;
++    speciesval[5]=NeutrinoSpecies::NuTau;
++    speciesval[6]=NeutrinoSpecies::AntiNuTau;   
++
++    std::valarray<double> T9val(T9, speciesval.size());  
++    std::valarray<double> etaval(eta, speciesval.size());  
++
++  return std::shared_ptr<NeutrinoDistribution>(
++      new NeutrinoDistributionFermiDirac(speciesval, T9val, etaval,
++          std::valarray<double>(1.0, speciesval.size())));
++}
++
+ std::function<double(double)>
+ NeutrinoDistributionFermiDirac::DistributionFunction(
+     const NeutrinoSpecies species) const {
+diff --git a/src/EquationsOfState/NeutrinoDistributionFermiDirac.hpp b/src/EquationsOfState/NeutrinoDistributionFermiDirac.hpp
+index 9322c9f..8dc1b7e 100644
+--- a/src/EquationsOfState/NeutrinoDistributionFermiDirac.hpp
++++ b/src/EquationsOfState/NeutrinoDistributionFermiDirac.hpp
+@@ -22,6 +22,9 @@ public:
+       const std::valarray<double>& T9, const std::valarray<double>& eta,
+       const std::valarray<double>& normalization);
+ 
++  static std::shared_ptr<NeutrinoDistribution> Create(
++    const double& T9, const double& eta);
++
+   std::function<double(double)> DistributionFunction(
+       const NeutrinoSpecies species) const;
+ 
+-- 
+2.35.1
+

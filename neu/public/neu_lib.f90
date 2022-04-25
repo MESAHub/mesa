@@ -73,72 +73,81 @@
       end subroutine neu_get
       
 
-      subroutine neu_p_e_to_n_nue(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+      subroutine neu_prot_ec(logT, mu, rate, Q, dratedt, dratedmu, Qdt, Qdmu,  ierr)
          use neu_cap
-         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu
+         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         rate = lambda_ec(temp, mu, ierr)
-         Q = 0d0 !TODO
-         dratedmu =0d0 !TODO
-         dratedt = 0d0 !TODO 
+         call lambda_ec(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
 
-         write(60,*) temp, mu, rate
+      end subroutine neu_prot_ec
 
-      end subroutine neu_p_e_to_n_nue
-
-      subroutine neu_n_ae_to_p_anue(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+      subroutine neu_neut_pc(logT, mu, rate, Q, dratedt, dratedmu, Qdt, Qdmu,  ierr)
          use neu_cap
-         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu
+         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         rate = lambda_pc(temp, mu, ierr)
-         Q = 0d0 !TODO
-         dratedmu =0d0 !TODO
-         dratedt = 0d0 !TODO 
+         call lambda_pc(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
 
-      end subroutine neu_n_ae_to_p_anue
+      end subroutine neu_neut_pc
 
-      subroutine neu_n_nue_to_p_e(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+      subroutine neu_neut_neu_cap(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu,  ierr)
          use neu_cap
-         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu
+         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         rate = lambda_nue(temp, mu, ierr)
-         Q = 0d0 !TODO
-         dratedmu =0d0 !TODO
-         dratedt = 0d0 !TODO 
+         call lambda_neu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
 
-      end subroutine neu_n_nue_to_p_e
+      end subroutine neu_neut_neu_cap
 
 
-      subroutine neu_p_anue_to_n_ae(temp, mu, rate, Q, dratedt, dratedmu,  ierr)
+      subroutine neu_prot_aneu_cap(logT, mu, rate, Q, dratedt, dratedmu, Qdt, Qdmu,  ierr)
          use neu_cap
-         real(dp), intent(in) :: temp ! Temperature
+         real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu
+         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         rate = lambda_anue(temp, mu, ierr)
-         Q = 0d0 !TODO
-         dratedmu =0d0 !TODO
-         dratedt = 0d0 !TODO 
+         call lambda_aneu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
 
-      end subroutine neu_p_anue_to_n_ae
+      end subroutine neu_prot_aneu_cap
+
+
+      subroutine neu_lib_init(filename, ierr)
+         use neu_cap
+         character(len=*), intent(in) :: filename
+         integer, intent(inout) :: ierr
+
+
+         !$omp critical (neu_init)
+         call neu_cap_init(filename, ierr)
+         !$omp end critical (neu_init)
+
+
+      end subroutine neu_lib_init
+
+      subroutine neu_lib_shutdown(ierr)
+         use neu_cap
+         integer, intent(inout) :: ierr
+
+         ierr = 0
+         call neu_cap_shutdown()
+
+      end subroutine neu_lib_shutdown
 
       end module neu_lib
 
