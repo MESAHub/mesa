@@ -1,8 +1,9 @@
       module test_integrate
-            
+
+         use math_lib
          use num_def
          use num_lib
-         use const_def   
+         use const_def
 
          implicit none
 
@@ -26,9 +27,9 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(linear, xlow, xhigh, (/1d0/), 1d-3,1d-3, 10,ierr)
+            res = integrate(linear, xlow, xhigh, (/1d0/), 1d-3, 1d-3, 10, ierr)
 
-            write(*,*) 'integrate linear expected ',expected, ' got ', res, ierr
+            call check_result('linear', expected, res, ierr)
 
             contains
 
@@ -49,13 +50,13 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(sine, 0d0, pi, (/1d0/), 1d-8,1d-8, 10, ierr)
+            res = integrate(sine, 0d0, pi, (/1d0/), 1d-8, 1d-8, 10, ierr)
 
-            write(*,*) 'integrate sine expected ',2d0, ' got ', res, ierr
+            call check_result('sine', 2d0, res, ierr)
 
-            res = integrate(sine, 0d0, 2*pi, (/1d0/), 1d-8,1d-8, 10, ierr)
+            res = integrate(sine, 0d0, 2*pi, (/1d0/), 1d-8, 1d-8, 10, ierr)
 
-            write(*,*) 'integrate sine expected ',0d0, ' got ', res, ierr
+            call check_result('sine', 0d0, res, ierr)
 
             contains
 
@@ -77,13 +78,13 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(iexp, 0d0, 2d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(iexp, 0d0, 2d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
 
-            write(*,*) 'integrate exp expected ',exp(2d0)-1d0, ' got ', res, ierr
+            call check_result('exp', exp(2d0)-1d0, res, ierr)
 
-            res = integrate(iexp, 0d0, 10d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(iexp, 0d0, 10d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
 
-            write(*,*) 'integrate exp expected ',exp(10d0)-1d0, ' got ', res, ierr
+            call check_result('exp', exp(10d0)-1d0, res, ierr)
 
             contains
 
@@ -100,17 +101,18 @@
 
          end subroutine test_exp
 
+
          subroutine test_box
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(box, 0d0, 2d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(box, 0d0, 2d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
 
-            write(*,*) 'integrate box expected ',1d0, ' got ', res, ierr
+            call check_result('box', 1d0, res, ierr)
 
-            res = integrate(box, 0.99d0, 1.5d0, (/1d0/), 1d-8,1d-8, 50, ierr)
+            res = integrate(box, 0.99d0, 1.5d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
 
-            write(*,*) 'integrate box expected ',0.5d0, ' got ', res, ierr
+            call check_result('box', 0.5d0, res, ierr)
 
             contains
 
@@ -130,10 +132,20 @@
                   box = 0d0
                end if
 
-
             end function box
 
          end subroutine test_box
 
+
+         subroutine check_result(name, tgt, val, ierr)
+            character(len=*), intent(in) :: name
+            real(dp), intent(in) :: tgt, val
+            integer, intent(in) :: ierr
+
+            write(*, '(a40, 1pd26.16, a7, 1pd26.16, i4)') &
+                 'integrate '// trim(name) // ' expected', &
+                 tgt, 'got', val, ierr
+
+         end subroutine check_result
 
       end module test_integrate
