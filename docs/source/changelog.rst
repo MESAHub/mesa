@@ -107,11 +107,6 @@ thus users should look at ``net_derivs.f90`` for reference to what needs setting
 star
 ----
 
-An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
-using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
-More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
-This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
-
 Diffusion coefficients for white dwarf interiors are now included based on
 `Caplan et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022MNRAS.tmpL..33C/abstract>`_.
 By default, these coefficients are used for strong plasma coupling :math:`\Gamma > 10`, but there is an inlist option
