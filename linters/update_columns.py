@@ -9,7 +9,7 @@ from pathlib import Path
 
 MESA_DIR = os.environ["MESA_DIR"]
 
-# This syncs up the history and profile files in each test case with the dfeault versions
+# This syncs up the history and profile files in each test case with the default versions
 # leaving options enabled.
 
 
