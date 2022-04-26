@@ -161,7 +161,8 @@ New readthedocs version
 First gain access to the readthedocs account (that is currently accessible by Rich and Rob). Then:
 
 - Goto the ``Versions`` page
-- Find the release tag and ``Activate`` it
+- Find the release branch (not the tag) and ``Activate`` it
+- We want the branch not the tag so that we can update the docs post release.
 - Wait for it to build and check it works
 - Goto ``Admin`` page and then the ``Advanced settings`` tab
 - Switch the default version to the release.
