@@ -409,39 +409,5 @@
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
 
-      ! subroutine extras_after_evolve(id, ierr)
-      !    integer, intent(in) :: id
-      !    integer, intent(out) :: ierr
-      !    type (star_info), pointer :: s
-      !    real(dp) :: dt, eEmg
-      !    integer :: k, k0
-         
-      !    ierr = 0
-      !    call star_ptr(id, s, ierr)
-      !    if (ierr /= 0) return
-         
-         
-
-      !    ! Find a zone at mass coordinate 0.5
-      !    do k=1,s%nz
-      !       if(s% m(k)/msun < 0.5d0) then
-      !          k0 = k
-      !          exit
-      !       end if
-      !    end do
-      !    eEmg = qe * s% E_field(k0)/(amu * s% g_field_element_diffusion(k0))
-         
-      !    write(*,*) 'Core eE/mg = ', eEmg
-      !    if (eEmg > 1.95d0 .and. eEmg < 2.05d0) then
-      !       write(*,*) 'passed test for electric field in the core'
-      !    else
-      !       write(*,*) 'failed test for electric field in the core'
-      !    end if         
-         
-      !    call test_suite_after_evolve(s, ierr)
-      ! end subroutine extras_after_evolve
-
-
-
       end module run_star_extras
       
