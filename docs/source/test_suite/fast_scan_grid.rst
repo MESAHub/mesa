@@ -1,0 +1,1 @@
+../../../astero/test_suite/fast_scan_grid/README.rst
