@@ -52,7 +52,7 @@
          optional inlist_astero_search_controls_fname
 
          type (star_info), pointer :: s
-         integer :: id, ierr
+         integer :: id, i, ierr
          character (len=256) :: inlist_fname
          
          include 'formats'
@@ -87,6 +87,11 @@
             write(*,*) 'failed in read_astero_search_controls'
             call mesa_error(__FILE__,__LINE__)
          end if
+
+         num_constraints = 0
+         do i = 1, max_constraints
+            if (my_var_name(i) /= '') num_constraints = num_constraints + 1
+         end do
          
          if (Y_depends_on_Z .and. vary_Y) then
             vary_Y = .false.

@@ -132,6 +132,7 @@
       real(dp) :: Rcz_target, Rcz_sigma
 
       integer, parameter :: max_constraints = 3
+      integer :: num_constraints ! how many are actually used
 
       logical :: include_my_var_in_chi2_spectro(max_constraints)
       real(dp) :: my_var_target(max_constraints), my_var_sigma(max_constraints)
@@ -1347,7 +1348,7 @@
          ! column numbers
          write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
 
-         k = 41 ! fixed columns
+         k = 38 + num_constraints ! fixed columns
 
          if (chi2_seismo_fraction > 0) then
 
@@ -1401,10 +1402,13 @@
             'logR', &
             'surface_Z_div_X', &
             'surface_He', &
-            'Rcz', &
-            trim(my_var_name(1)), &
-            trim(my_var_name(2)), &
-            trim(my_var_name(3)), &
+            'Rcz'
+
+         do i = 1, max_constraints
+            if (my_var_name(i) /= '') write(iounit, fmt, advance='no') trim(my_var_name(i))
+         end do
+
+         write(iounit, fmt, advance='no') &
             'delta_nu', &
             'nu_max', &
             trim(surf_coef1_name), &
@@ -1491,53 +1495,49 @@
             end if
          end if
 
-         write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
-            ',10' // trim(astero_results_dbl_format) // &
-            ',' // trim(astero_results_int_format) // &
-            ',22' // trim(astero_results_dbl_format) // &
-            ',7' // trim(astero_results_int_format) // ')'
-         
-         write(iounit, fmt, advance='no') i, &
-            sample_chi2(i), &
-            sample_mass(i), &
-            sample_init_Y(i), &
-            sample_init_FeH(i), &
-            sample_alpha(i), &
-            sample_f_ov(i), &
-            sample_my_param1(i), &
-            sample_my_param2(i), &
-            sample_my_param3(i), &
-            sample_age(i), &
-            sample_model_number(i), &
-            sample_init_h1(i), &
-            sample_init_he3(i), &
-            sample_init_he4(i), &
-            sample_init_Z(i), &
-            safe_log10(sample_radius(i)), &
-            sample_logL(i), &
-            sample_Teff(i), &
-            sample_logg(i), &
-            sample_FeH(i), &
-            sample_logR(i), &
-            sample_surface_Z_div_X(i), &
-            sample_surface_He(i), &
-            sample_Rcz(i), &
-            sample_my_var(1,i), &
-            sample_my_var(2,i), &
-            sample_my_var(3,i), &
-            sample_delta_nu(i), &
-            sample_nu_max(i), &
-            sample_surf_coef1(i), &
-            sample_surf_coef2(i), &
-            sample_chi2_seismo(i), &
-            sample_chi2_spectro(i), &
-            nl(0), &
-            nl(1), &
-            nl(2), &
-            nl(3), &
-            ratios_n, &
-            ratios_l0_first, &
-            ratios_l1_first
+         call write1_int(i)
+         call write1_dbl(sample_chi2(i))
+         call write1_dbl(sample_mass(i))
+         call write1_dbl(sample_init_Y(i))
+         call write1_dbl(sample_init_FeH(i))
+         call write1_dbl(sample_alpha(i))
+         call write1_dbl(sample_f_ov(i))
+         call write1_dbl(sample_my_param1(i))
+         call write1_dbl(sample_my_param2(i))
+         call write1_dbl(sample_my_param3(i))
+         call write1_dbl(sample_age(i))
+         call write1_int(sample_model_number(i))
+         call write1_dbl(sample_init_h1(i))
+         call write1_dbl(sample_init_he3(i))
+         call write1_dbl(sample_init_he4(i))
+         call write1_dbl(sample_init_Z(i))
+         call write1_dbl(safe_log10(sample_radius(i)))
+         call write1_dbl(sample_logL(i))
+         call write1_dbl(sample_Teff(i))
+         call write1_dbl(sample_logg(i))
+         call write1_dbl(sample_FeH(i))
+         call write1_dbl(sample_logR(i))
+         call write1_dbl(sample_surface_Z_div_X(i))
+         call write1_dbl(sample_surface_He(i))
+         call write1_dbl(sample_Rcz(i))
+
+         do k = 1, max_constraints
+            if (my_var_name(i) /= '') call write1_dbl(sample_my_var(k,i))
+         end do
+
+         call write1_dbl(sample_delta_nu(i))
+         call write1_dbl(sample_nu_max(i))
+         call write1_dbl(sample_surf_coef1(i))
+         call write1_dbl(sample_surf_coef2(i))
+         call write1_dbl(sample_chi2_seismo(i))
+         call write1_dbl(sample_chi2_spectro(i))
+         call write1_int(nl(0))
+         call write1_int(nl(1))
+         call write1_int(nl(2))
+         call write1_int(nl(3))
+         call write1_int(ratios_n)
+         call write1_int(ratios_l0_first)
+         call write1_int(ratios_l1_first)
             
          if (iounit == 6) return
 
@@ -1576,6 +1576,20 @@
          end if
 
          write(iounit, '(a)') ! end of line
+
+         contains
+
+         subroutine write1_dbl(x)
+            real(dp), intent(in) :: x
+
+            write(iounit, astero_results_dbl_format, advance='no', iostat=ierr) x
+         end subroutine write1_dbl
+
+         subroutine write1_int(i)
+            integer, intent(in) :: i
+
+            write(iounit, astero_results_int_format, advance='no', iostat=ierr) i
+         end subroutine write1_int
       
       end subroutine show1_sample_results
       
@@ -1758,55 +1772,55 @@
          if (Teff_sigma > 0 .and. include_Teff_in_chi2_spectro) then
             chi2term = pow2((best_Teff - Teff_target)/Teff_sigma)
             write(io,'(A)')
-            call write1('Teff chi2term', chi2term)
             call write1('Teff', best_Teff)
             call write1('Teff_obs', Teff_target)
             call write1('Teff_sigma', Teff_sigma)
+            call write1('Teff chi2term', chi2term)
          end if
          
          if (logL_sigma > 0 .and. include_logL_in_chi2_spectro) then
             chi2term = pow2((best_logL - logL_target)/logL_sigma)
             write(io,'(A)')
-            call write1('logL chi2term', chi2term)
             call write1('logL', best_logL)
             call write1('logL_obs', logL_target)
             call write1('logL_sigma', logL_sigma)
+            call write1('logL chi2term', chi2term)
          end if
          
          if (logg_sigma > 0 .and. include_logg_in_chi2_spectro) then
             chi2term = pow2((best_logg - logg_target)/logg_sigma)
             write(io,'(A)')
-            call write1('logg chi2term', chi2term)
             call write1('logg', best_logg)
             call write1('logg_obs', logg_target)
             call write1('logg_sigma', logg_sigma)
+            call write1('logg chi2term', chi2term)
          end if
          
          if (FeH_sigma > 0 .and. include_FeH_in_chi2_spectro) then
             chi2term = pow2((best_FeH - FeH_target)/FeH_sigma)
             write(io,'(A)')
-            call write1('FeH chi2term', chi2term)
             call write1('FeH', best_FeH)
             call write1('FeH_obs', FeH_target)
             call write1('FeH_sigma', FeH_sigma)
+            call write1('FeH chi2term', chi2term)
          end if
          
          if (logR_sigma > 0 .and. include_logR_in_chi2_spectro) then
             chi2term = pow2((best_logR - logR_target)/logR_sigma)
             write(io,'(A)')
-            call write1('logR chi2term', chi2term)
             call write1('logR', best_logR)
             call write1('logR_obs', logR_target)
             call write1('logR_sigma', logR_sigma)
+            call write1('logR chi2term', chi2term)
          end if
          
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
             chi2term = pow2((best_age - age_target)/age_sigma)
             write(io,'(A)')
-            write(io,'(a40,e20.10,99f20.10)') 'age chi2term', chi2term
             write(io,'(a40,1pes20.10)') 'age', best_age
             write(io,'(a40,1pes20.10)') 'age_target', age_target
             write(io,'(a40,1pes20.10)') 'age_sigma', age_sigma
+            write(io,'(a40,e20.10,99f20.10)') 'age chi2term', chi2term
          end if
          
          if (surface_Z_div_X_sigma > 0 .and. &
@@ -1814,39 +1828,42 @@
             chi2term = &
                pow2((best_surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
             write(io,'(A)')
-            write(io,'(a40,e20.10,99f20.10)') 'surface_Z_div_X chi2term', chi2term
             call write1('surface_Z_div_X', best_surface_Z_div_X)
             call write1('surface_Z_div_X_obs', surface_Z_div_X_target)
             call write1('surface_Z_div_X_sigma', surface_Z_div_X_sigma)
+            write(io,'(a40,e20.10,99f20.10)') 'surface_Z_div_X chi2term', chi2term
          end if
          
          if (surface_He_sigma > 0 .and. include_surface_He_in_chi2_spectro) then
             chi2term = pow2((best_surface_He - surface_He_target)/surface_He_sigma)
             write(io,'(A)')
-            call write1('surface_He chi2term', chi2term)
             call write1('surface_He', best_surface_He)
             call write1('surface_He_obs', surface_He_target)
             call write1('surface_He_sigma', surface_He_sigma)
+            call write1('surface_He chi2term', chi2term)
          end if
          
          if (Rcz_sigma > 0 .and. include_Rcz_in_chi2_spectro) then
             chi2term = pow2((best_Rcz - Rcz_target)/Rcz_sigma)
             write(io,'(A)')
-            call write1('Rcz chi2term', chi2term)
             call write1('Rcz', best_Rcz)
             call write1('Rcz_obs', Rcz_target)
             call write1('Rcz_sigma', Rcz_sigma)
+            call write1('Rcz chi2term', chi2term)
          end if
 
          do i = 1, max_constraints
+            if (my_var_name(i) == '') cycle
+
+            write(io,'(A)')
+            call write1(trim(my_var_name(i)), best_my_var(i))
+
             if (my_var_sigma(i) > 0 .and. include_my_var_in_chi2_spectro(i)) then
                chi2term = pow2( &
                      (best_my_var(i) - my_var_target(i))/my_var_sigma(i))
-               write(io,'(A)')
-               call write1(trim(my_var_name(i)) // ' chi2term', chi2term)
-               call write1(trim(my_var_name(i)), best_my_var(i))
                call write1(trim(my_var_name(i)) // '_obs', my_var_target(i))
                call write1(trim(my_var_name(i)) // '_sigma', my_var_sigma(i))
+               call write1(trim(my_var_name(i)) // ' chi2term', chi2term)
             end if
          end do
          
@@ -2002,7 +2019,7 @@
          include 'formats'
          
          ierr = 0
-         read(iounit,fmt=astero_results_int_format,advance='no',iostat=ierr) i
+         call read1_int(i)
          if (ierr /= 0) return
          if (i <= 0 .or. i > size(sample_chi2,dim=1)) then
             write(*,2) 'invalid sample number', i
@@ -2010,52 +2027,49 @@
             return
          end if
 
-         write(fmt,'(a)') '(10' // trim(astero_results_dbl_format) // &
-            ',' // trim(astero_results_int_format) // &
-            ',22' // trim(astero_results_dbl_format) // &
-            ',7' // trim(astero_results_int_format) // ')'
-         
-         read(iounit, fmt, advance='no', iostat=ierr) &
-            sample_chi2(i), &
-            sample_mass(i), &
-            sample_init_Y(i), &
-            sample_init_FeH(i), &
-            sample_alpha(i), &
-            sample_f_ov(i), &
-            sample_my_param1(i), &
-            sample_my_param2(i), &
-            sample_my_param3(i), &
-            sample_age(i), &
-            sample_model_number(i), &
-            sample_init_h1(i), &
-            sample_init_he3(i), &
-            sample_init_he4(i), &
-            sample_init_Z(i), &
-            logR, &
-            sample_logL(i), &
-            sample_Teff(i), &
-            sample_logg(i), &
-            sample_FeH(i), &
-            sample_logR(i), &
-            sample_surface_Z_div_X(i), &
-            sample_surface_He(i), &
-            sample_Rcz(i), &
-            sample_my_var(1,i), &
-            sample_my_var(2,i), &
-            sample_my_var(3,i), &
-            sample_delta_nu(i), &
-            sample_nu_max(i), &
-            sample_surf_coef1(i), &
-            sample_surf_coef2(i), &
-            sample_chi2_seismo(i), &
-            sample_chi2_spectro(i), &
-            nl(0), &
-            nl(1), &
-            nl(2), &
-            nl(3), &
-            ratios_n, &
-            ratios_l0_first, &
-            ratios_l1_first
+         call read1_dbl(sample_chi2(i))
+         call read1_dbl(sample_mass(i))
+         call read1_dbl(sample_init_Y(i))
+         call read1_dbl(sample_init_FeH(i))
+         call read1_dbl(sample_alpha(i))
+         call read1_dbl(sample_f_ov(i))
+         call read1_dbl(sample_my_param1(i))
+         call read1_dbl(sample_my_param2(i))
+         call read1_dbl(sample_my_param3(i))
+         call read1_dbl(sample_age(i))
+         call read1_int(sample_model_number(i))
+         call read1_dbl(sample_init_h1(i))
+         call read1_dbl(sample_init_he3(i))
+         call read1_dbl(sample_init_he4(i))
+         call read1_dbl(sample_init_Z(i))
+         call read1_dbl(logR)
+         call read1_dbl(sample_logL(i))
+         call read1_dbl(sample_Teff(i))
+         call read1_dbl(sample_logg(i))
+         call read1_dbl(sample_FeH(i))
+         call read1_dbl(sample_logR(i))
+         call read1_dbl(sample_surface_Z_div_X(i))
+         call read1_dbl(sample_surface_He(i))
+         call read1_dbl(sample_Rcz(i))
+
+         do k = 1, max_constraints
+            if (my_var_name(k) /= '') call read1_dbl(sample_my_var(k,i))
+         end do
+
+         call read1_dbl(sample_delta_nu(i))
+         call read1_dbl(sample_nu_max(i))
+         call read1_dbl(sample_surf_coef1(i))
+         call read1_dbl(sample_surf_coef2(i))
+         call read1_dbl(sample_chi2_seismo(i))
+         call read1_dbl(sample_chi2_spectro(i))
+         call read1_int(nl(0))
+         call read1_int(nl(1))
+         call read1_int(nl(2))
+         call read1_int(nl(3))
+         call read1_int(ratios_n)
+         call read1_int(ratios_l0_first)
+         call read1_int(ratios_l1_first)
+
          if (failed('results')) return
             
          sample_radius(i) = exp10(logR)
@@ -2123,6 +2137,18 @@
             write(*,2) 'failed reading ' // trim(str) // ' data for sample number', i
             failed = .true.
          end function failed
+
+         subroutine read1_dbl(x)
+            real(dp), intent(out) :: x
+
+            read(iounit, astero_results_dbl_format, advance='no', iostat=ierr) x
+         end subroutine read1_dbl
+
+         subroutine read1_int(i)
+            integer, intent(out) :: i
+
+            read(iounit, astero_results_int_format, advance='no', iostat=ierr) i
+         end subroutine read1_int
          
       
       end subroutine read1_sample_from_file
