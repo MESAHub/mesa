@@ -95,23 +95,14 @@
       Rcz_sigma = 1d-3
    
       ! to include user-defined variables in chi^2 spectro
-      ! set the variable "my_var1" in your extras_check_model routine.
-      !     use astero_data, only: my_var1, my_var2, my_var3
-      !     my_var1 = ......
-      include_my_var1_in_chi2_spectro = .false.
-      my_var1_target = 0
-      my_var1_sigma = 0
-      my_var1_name = 'my_var1'
-      
-      include_my_var2_in_chi2_spectro = .false.
-      my_var2_target = 0
-      my_var2_sigma = 0
-      my_var2_name = 'my_var2'
-      
-      include_my_var3_in_chi2_spectro = .false.
-      my_var3_target = 0
-      my_var3_sigma = 0
-      my_var3_name = 'my_var3'
+      ! set the variable "my_var(1)" in your extras_check_model routine.
+      !     use astero_data, only: my_var
+      !     my_var(1) = ......
+      ! and so on
+      include_my_var_in_chi2_spectro(1) = .false.
+      my_var_target(1) = 0
+      my_var_sigma(1) = 0
+      my_var_name(1) = 'my_var1'
       
 
    ! chi2_seismo is a weighted combination of
@@ -623,9 +614,7 @@
          sigmas_coeff_for_surface_He_limit = 0 ! disable by setting to 0
          sigmas_coeff_for_Rcz_limit = 0 ! disable by setting to 0
          sigmas_coeff_for_delta_nu_limit = 0 ! -5 ! disable by setting to 0
-         sigmas_coeff_for_my_var1_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_my_var2_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_my_var3_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_my_var_limit(1) = 0 ! disable by setting to 0
       
       
       ! you can stop the run if chi^2 is rising.

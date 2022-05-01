@@ -59,7 +59,7 @@
 
       
       subroutine set_my_vars(id, ierr) ! called from star_astero code
-         !use astero_search_data, only: include_my_var1_in_chi2, my_var1
+         !use astero_search_data, only: include_my_var_in_chi2, my_var
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -68,10 +68,10 @@
          ! it is called whenever a new value of chi2 is calculated.
          ! only necessary to set the my_var's you are actually using.
          ierr = 0
-         !if (include_my_var1_in_chi2) then
+         !if (include_my_var_in_chi2(1)) then
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
-            !my_var1 = s% Teff
+            !my_var(1) = s% Teff
          !end if
 
          write(*,*) 'called run_star_extras.f90: set_my_vars.f90'
@@ -127,10 +127,9 @@
       
 
       integer function extras_check_model(id)
-         use astero_def, only: my_var1, my_var2, my_var3
-         use astero_def, only: my_var1_name, my_var2_name, my_var3_name
+         use astero_def, only: my_var, my_var_name
          integer, intent(in) :: id
-         integer :: ierr
+         integer :: i, ierr
          type (star_info), pointer :: s
          extras_check_model = keep_going         
          ierr = 0
@@ -141,12 +140,12 @@
 
          ! call get1('photosphere_r', my_var1)
          ! call get1('luminosity', my_var3)
-         my_var1 = star_get_history_output(s, my_var1_name)
-         my_var2 = star_get_history_output(s, my_var2_name)
-         my_var3 = star_get_history_output(s, my_var3_name)
+         do i = 1, 3
+            my_var(i) = star_get_history_output(s, my_var_name(i))
+         end do
          
-         ! my_var1 = s% delta_Pg
-         !write(*,2) 'delta_Pg', s% model_number, my_var1
+         ! my_var(1) = s% delta_Pg
+         !write(*,2) 'delta_Pg', s% model_number, my_var(1)
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depenending on which

@@ -66,7 +66,7 @@
 
       
       subroutine set_my_vars(id, ierr) ! called from star_astero code
-         !use astero_search_data, only: include_my_var1_in_chi2, my_var1
+         !use astero_search_data, only: include_my_var_in_chi2, my_var
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -75,10 +75,10 @@
          ! it is called whenever a new value of chi2 is calculated.
          ! only necessary to set the my_var's you are actually using.
          ierr = 0
-         !if (include_my_var1_in_chi2) then
+         !if (include_my_var_in_chi2(1)) then
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
-            !my_var1 = s% Teff
+            !my_var(1) = s% Teff
          !end if
       end subroutine set_my_vars
       
@@ -159,7 +159,7 @@
       
 
       integer function extras_check_model(id)
-         use astero_def, only: my_var1, my_var2, my_var3
+         use astero_def, only: my_var
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
@@ -170,10 +170,8 @@
          
          include 'formats'
          
-
-         my_var1 = s% delta_Pg
-         !write(*,2) 'delta_Pg', s% model_number, my_var1
-
+         my_var(1) = s% delta_Pg
+         !write(*,2) 'delta_Pg', s% model_number, my_var(1)
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depenending on which

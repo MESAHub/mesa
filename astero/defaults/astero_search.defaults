@@ -207,49 +207,27 @@
       Rcz_target = 0.713d0 ! Bahcall, Serenelli, Basu, 2005
       Rcz_sigma = 1d-3
 
-   ! include_my_var1_in_chi2_spectro
+   ! include_my_var_in_chi2_spectro
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! my_var1_target
+   ! my_var_target
    ! ~~~~~~~~~~~~~~
-   ! my_var1_sigma
-   ! ~~~~~~~~~~~~~
-
-   ! include_my_var2_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! my_var2_target
-   ! ~~~~~~~~~~~~~~
-   ! my_var2_sigma
-   ! ~~~~~~~~~~~~~
-
-   ! include_my_var3_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! my_var3_target
-   ! ~~~~~~~~~~~~~~
-   ! my_var3_sigma
+   ! my_var_sigma
    ! ~~~~~~~~~~~~~
 
    ! To include user-defined variables in the non-seismic |chi^2|,
    ! set the ``my_var`` variables in your ``extras_check_model`` routine. i.e. ::
 
-   !     use astero_data, only: my_var1, my_var2, my_var3
-   !     my_var1 = ......
+   !     use astero_data, only: my_var
+   !     my_var(1) = ......
 
    ! then set the target values and uncertainties using these controls. ::
 
-      include_my_var1_in_chi2_spectro = .false.
-      my_var1_target = 0
-      my_var1_sigma = 0
-      my_var1_name = 'my_var1' ! change this to whatever you want
-
-      include_my_var2_in_chi2_spectro = .false.
-      my_var2_target = 0
-      my_var2_sigma = 0
-      my_var2_name = 'my_var2' ! change this to whatever you want
-
-      include_my_var3_in_chi2_spectro = .false.
-      my_var3_target = 0
-      my_var3_sigma = 0
-      my_var3_name = 'my_var3' ! change this to whatever you want
+      include_my_var_in_chi2_spectro(:) = .false.
+      my_var_target(:) = 0
+      my_var_sigma(:) = 0
+      my_var_name(1) = 'my_var1' ! change this to whatever you want
+      my_var_name(2) = 'my_var2' ! change this to whatever you want
+      my_var_name(3) = 'my_var3' ! change this to whatever you want
 
    ! Seismic observations
    ! --------------------
@@ -1015,11 +993,7 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! sigmas_coeff_for_delta_nu_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_my_var1_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_my_var2_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_my_var3_limit
+   ! sigmas_coeff_for_my_var_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! We need a way to decide when to stop an evolution run.
@@ -1046,9 +1020,7 @@
       sigmas_coeff_for_surface_He_limit = 0
       sigmas_coeff_for_Rcz_limit = 0
       sigmas_coeff_for_delta_nu_limit = 0
-      sigmas_coeff_for_my_var1_limit = 0
-      sigmas_coeff_for_my_var2_limit = 0
-      sigmas_coeff_for_my_var3_limit = 0
+      sigmas_coeff_for_my_var_limit(:) = 0
 
    ! |chi^2| limits
    ! --------------

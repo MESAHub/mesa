@@ -131,17 +131,11 @@
       logical :: include_Rcz_in_chi2_spectro
       real(dp) :: Rcz_target, Rcz_sigma
 
-      logical :: include_my_var1_in_chi2_spectro
-      real(dp) :: my_var1_target, my_var1_sigma
-      character (len=32) :: my_var1_name
+      integer, parameter :: max_constraints = 3
 
-      logical :: include_my_var2_in_chi2_spectro
-      real(dp) :: my_var2_target, my_var2_sigma
-      character (len=32) :: my_var2_name
-
-      logical :: include_my_var3_in_chi2_spectro
-      real(dp) :: my_var3_target, my_var3_sigma
-      character (len=32) :: my_var3_name
+      logical :: include_my_var_in_chi2_spectro(max_constraints)
+      real(dp) :: my_var_target(max_constraints), my_var_sigma(max_constraints)
+      character (len=32) :: my_var_name(max_constraints)
       
       real(dp) :: Z_div_X_solar
 
@@ -232,9 +226,7 @@
          sigmas_coeff_for_surface_He_limit, &
          sigmas_coeff_for_Rcz_limit, &
          sigmas_coeff_for_delta_nu_limit, &
-         sigmas_coeff_for_my_var1_limit, &
-         sigmas_coeff_for_my_var2_limit, &
-         sigmas_coeff_for_my_var3_limit
+         sigmas_coeff_for_my_var_limit(max_constraints)
       
       character(len=32) :: correction_scheme, &
          surf_coef1_name, surf_coef2_name
@@ -385,14 +377,8 @@
          include_Rcz_in_chi2_spectro, &
          Rcz_target, Rcz_sigma, &
 
-         include_my_var1_in_chi2_spectro, &
-         my_var1_target, my_var1_sigma, my_var1_name, &
-         
-         include_my_var2_in_chi2_spectro, &
-         my_var2_target, my_var2_sigma, my_var2_name, &
-         
-         include_my_var3_in_chi2_spectro, &
-         my_var3_target, my_var3_sigma, my_var3_name, &
+         include_my_var_in_chi2_spectro, &
+         my_var_target, my_var_sigma, my_var_name, &
          
          Z_div_X_solar, &
          nl, &
@@ -463,9 +449,7 @@
          sigmas_coeff_for_surface_Z_div_X_limit, &
          sigmas_coeff_for_surface_He_limit, &
          sigmas_coeff_for_Rcz_limit, &
-         sigmas_coeff_for_my_var1_limit, &
-         sigmas_coeff_for_my_var2_limit, &
-         sigmas_coeff_for_my_var3_limit, &
+         sigmas_coeff_for_my_var_limit, &
          
          sigmas_coeff_for_delta_nu_limit, &
          min_age_limit, &
@@ -688,9 +672,6 @@
          best_surface_Z_div_X, &
          best_surface_He, &
          best_Rcz, &
-         best_my_var1, &
-         best_my_var2, &
-         best_my_var3, &
          best_my_param1, &
          best_my_param2, &
          best_my_param3, &
@@ -698,6 +679,8 @@
          best_nu_max, &
          best_surf_coef1, &
          best_surf_coef2
+
+      real(dp) :: best_my_var(max_constraints)
          
       integer :: &
          best_model_number
@@ -738,9 +721,6 @@
          sample_surface_Z_div_X, &
          sample_surface_He, &
          sample_Rcz, &
-         sample_my_var1, &
-         sample_my_var2, &
-         sample_my_var3, &
          sample_my_param1, &
          sample_my_param2, &
          sample_my_param3, &
@@ -748,6 +728,8 @@
          sample_nu_max, &
          sample_surf_coef1, &
          sample_surf_coef2
+
+      real(dp), pointer, dimension(:,:) :: sample_my_var
          
       integer, pointer, dimension(:) :: &
          sample_index_by_chi2, &
@@ -777,7 +759,7 @@
          chi2_r_010_ratios, chi2_r_02_ratios, chi2_frequencies, &
          initial_Y, initial_FeH, initial_Z_div_X, &
          logg, FeH, logR, surface_Z_div_X, surface_He, Rcz, &
-         my_var1, my_var2, my_var3, my_param1, my_param2, my_param3
+         my_var(max_constraints), my_param1, my_param2, my_param3
 
       integer :: star_id, star_model_number
       integer :: num_chi2_seismo_terms, num_chi2_spectro_terms
@@ -935,9 +917,7 @@
             sample_surface_Z_div_X, &
             sample_surface_He, &
             sample_Rcz, &
-            sample_my_var1, &
-            sample_my_var2, &
-            sample_my_var3, &
+            sample_my_var, &
             sample_delta_nu, &
             sample_nu_max, &
             sample_surf_coef1, &
@@ -987,9 +967,7 @@
          call realloc_double(sample_surface_Z_div_X,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_surface_He,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_Rcz,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_var1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_var2,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_var3,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2(sample_my_var,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
          
          call realloc_double(sample_delta_nu,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_nu_max,max_num_samples,ierr); if (ierr /= 0) return
@@ -1424,9 +1402,9 @@
             'surface_Z_div_X', &
             'surface_He', &
             'Rcz', &
-            trim(my_var1_name), &
-            trim(my_var2_name), &
-            trim(my_var3_name), &
+            trim(my_var_name(1)), &
+            trim(my_var_name(2)), &
+            trim(my_var_name(3)), &
             'delta_nu', &
             'nu_max', &
             trim(surf_coef1_name), &
@@ -1544,9 +1522,9 @@
             sample_surface_Z_div_X(i), &
             sample_surface_He(i), &
             sample_Rcz(i), &
-            sample_my_var1(i), &
-            sample_my_var2(i), &
-            sample_my_var3(i), &
+            sample_my_var(1,i), &
+            sample_my_var(2,i), &
+            sample_my_var(3,i), &
             sample_delta_nu(i), &
             sample_nu_max(i), &
             sample_surf_coef1(i), &
@@ -1766,6 +1744,7 @@
          integer, intent(in) :: io
          
          real(dp) :: chi2term
+         integer :: i
          include 'formats'
          
          if (chi2_seismo_fraction > 0) then
@@ -1858,36 +1837,18 @@
             call write1('Rcz_obs', Rcz_target)
             call write1('Rcz_sigma', Rcz_sigma)
          end if
-         
-         if (my_var1_sigma > 0 .and. include_my_var1_in_chi2_spectro) then
-            chi2term = pow2( &
-                  (best_my_var1 - my_var1_target)/my_var1_sigma)
-            write(io,'(A)')
-            call write1(trim(my_var1_name) // ' chi2term', chi2term)
-            call write1(trim(my_var1_name), best_my_var1)
-            call write1(trim(my_var1_name) // '_obs', my_var1_target)
-            call write1(trim(my_var1_name) // '_sigma', my_var1_sigma)
-         end if
-         
-         if (my_var2_sigma > 0 .and. include_my_var2_in_chi2_spectro) then
-            chi2term = pow2( &
-                  (best_my_var2 - my_var2_target)/my_var2_sigma)
-            write(io,'(A)')
-            call write1(trim(my_var2_name) // ' chi2term', chi2term)
-            call write1(trim(my_var2_name), best_my_var2)
-            call write1(trim(my_var2_name) // '_obs', my_var2_target)
-            call write1(trim(my_var2_name) // '_sigma', my_var2_sigma)
-         end if
-         
-         if (my_var3_sigma > 0 .and. include_my_var3_in_chi2_spectro) then
-            chi2term = pow2( &
-                  (best_my_var3 - my_var3_target)/my_var3_sigma)
-            write(io,'(A)')
-            call write1(trim(my_var3_name) // ' chi2term', chi2term)
-            call write1(trim(my_var3_name), best_my_var3)
-            call write1(trim(my_var3_name) // '_obs', my_var3_target)
-            call write1(trim(my_var3_name) // '_sigma', my_var3_sigma)
-         end if
+
+         do i = 1, max_constraints
+            if (my_var_sigma(i) > 0 .and. include_my_var_in_chi2_spectro(i)) then
+               chi2term = pow2( &
+                     (best_my_var(i) - my_var_target(i))/my_var_sigma(i))
+               write(io,'(A)')
+               call write1(trim(my_var_name(i)) // ' chi2term', chi2term)
+               call write1(trim(my_var_name(i)), best_my_var(i))
+               call write1(trim(my_var_name(i)) // '_obs', my_var_target(i))
+               call write1(trim(my_var_name(i)) // '_sigma', my_var_sigma(i))
+            end if
+         end do
          
          write(io,'(A)')
          call write1('R/Rsun', best_radius)
@@ -2079,9 +2040,9 @@
             sample_surface_Z_div_X(i), &
             sample_surface_He(i), &
             sample_Rcz(i), &
-            sample_my_var1(i), &
-            sample_my_var2(i), &
-            sample_my_var3(i), &
+            sample_my_var(1,i), &
+            sample_my_var(2,i), &
+            sample_my_var(3,i), &
             sample_delta_nu(i), &
             sample_nu_max(i), &
             sample_surf_coef1(i), &

@@ -639,8 +639,8 @@
          subroutine check_limits
             real(dp) :: logg_limit, logL_limit, Teff_limit, delta_nu_limit, &
                logR_limit, surface_Z_div_X_limit, surface_He_limit, Rcz_limit, &
-               my_var1_limit, my_var2_limit, my_var3_limit
-            integer :: nz
+               my_var_limit
+            integer :: nz, i
             include 'formats'
             nz = s% nz
 
@@ -786,66 +786,28 @@
                   write(*,1) 'Rcz_limit', Rcz_limit
                end if
             end if
-            
-            if (sigmas_coeff_for_my_var1_limit /= 0 .and. my_var1_sigma > 0) then
-               my_var1_limit = &
-                  my_var1_target + my_var1_sigma*sigmas_coeff_for_my_var1_limit
-               if ((sigmas_coeff_for_my_var1_limit > 0 .and. &
-                        my_var1 > my_var1_limit) .or. &
-                   (sigmas_coeff_for_my_var1_limit < 0 .and. &
-                        my_var1 < my_var1_limit)) then
-                  write(*,*) 'have reached my_var1 limit'
-                  write(*,1) 'my_var1', my_var1
-                  write(*,1) 'my_var1_limit', my_var1_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
+
+            do i = 1, max_constraints
+               if (sigmas_coeff_for_my_var_limit(i) /= 0 .and. my_var_sigma(i) > 0) then
+                  my_var_limit = &
+                     my_var_target(i) + my_var_sigma(i)*sigmas_coeff_for_my_var_limit(i)
+                  if ((sigmas_coeff_for_my_var_limit(i) > 0 .and. &
+                           my_var(i) > my_var_limit) .or. &
+                      (sigmas_coeff_for_my_var_limit(i) < 0 .and. &
+                           my_var(i) < my_var_limit)) then
+                     write(*,*) 'have reached my_var(i) limit'
+                     write(*,1) 'my_var(i)', my_var(i)
+                     write(*,1) 'my_var(i)_limit', my_var_limit
+                     write(*,'(A)')
+                     do_astero_extras_check_model = terminate
+                     return
+                  end if
+                  if (trace_limits) then
+                     write(*,1) 'my_var(i)', my_var(i)
+                     write(*,1) 'my_var_limit', my_var_limit
+                  end if
                end if
-               if (trace_limits) then
-                  write(*,1) 'my_var1', my_var1
-                  write(*,1) 'my_var1_limit', my_var1_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_my_var2_limit /= 0 .and. my_var2_sigma > 0) then
-               my_var2_limit = &
-                  my_var2_target + my_var2_sigma*sigmas_coeff_for_my_var2_limit
-               if ((sigmas_coeff_for_my_var2_limit > 0 .and. &
-                        my_var2 > my_var2_limit) .or. &
-                   (sigmas_coeff_for_my_var2_limit < 0 .and. &
-                        my_var2 < my_var2_limit)) then
-                  write(*,*) 'have reached my_var2 limit'
-                  write(*,1) 'my_var2', my_var2
-                  write(*,1) 'my_var2_limit', my_var2_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'my_var2', my_var2
-                  write(*,1) 'my_var2_limit', my_var2_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_my_var3_limit /= 0 .and. my_var3_sigma > 0) then
-               my_var3_limit = &
-                  my_var3_target + my_var3_sigma*sigmas_coeff_for_my_var3_limit
-               if ((sigmas_coeff_for_my_var3_limit > 0 .and. &
-                        my_var3 > my_var3_limit) .or. &
-                   (sigmas_coeff_for_my_var3_limit < 0 .and. &
-                        my_var3 < my_var3_limit)) then
-                  write(*,*) 'have reached my_var3 limit'
-                  write(*,1) 'my_var3', my_var3
-                  write(*,1) 'my_var3_limit', my_var3_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'my_var3', my_var3
-                  write(*,1) 'my_var3_limit', my_var3_limit
-               end if
-            end if
+            end do
             
          end subroutine check_limits         
 
@@ -854,7 +816,7 @@
       
       real(dp) function get_chi2_spectro(s)
          type (star_info), pointer :: s
-         integer :: cnt
+         integer :: cnt, i
          real(dp) :: logL, sum
          include 'formats'
          cnt = 0
@@ -899,21 +861,14 @@
             cnt = cnt + 1
             sum = sum + pow2((Rcz - Rcz_target)/Rcz_sigma)
          end if
-         if (include_my_var1_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (my_var1 - my_var1_target)/my_var1_sigma)
-         end if
-         if (include_my_var2_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (my_var2 - my_var2_target)/my_var2_sigma)
-         end if
-         if (include_my_var3_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (my_var3 - my_var3_target)/my_var3_sigma)
-         end if
+
+         do i = 1, max_constraints
+            if (include_my_var_in_chi2_spectro(i)) then
+               cnt = cnt + 1
+               sum = sum + pow2( &
+                  (my_var(i) - my_var_target(i))/my_var_sigma(i))
+            end if
+         end do
 
          if (normalize_chi2_spectro) then
             get_chi2_spectro = sum/cnt
@@ -943,9 +898,7 @@
          best_surface_Z_div_X = surface_Z_div_X
          best_surface_He = surface_He
          best_Rcz = Rcz
-         best_my_var1 = my_var1
-         best_my_var2 = my_var2
-         best_my_var3 = my_var3
+         best_my_var = my_var
 
          best_my_param1 = my_param1
          best_my_param2 = my_param2

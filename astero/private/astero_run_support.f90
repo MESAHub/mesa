@@ -167,9 +167,7 @@
          avg_model_number_sigma = 1d99
          nvar = 0
          total_time_in_oscillation_code = 0d0
-         my_var1 = 0d0
-         my_var2 = 0d0
-         my_var3 = 0d0
+         my_var = 0d0
          
          call init_sample_ptrs
          
@@ -1592,9 +1590,7 @@
          sample_surface_Z_div_X(i) = best_surface_Z_div_X
          sample_surface_He(i) = best_surface_He
          sample_Rcz(i) = best_Rcz
-         sample_my_var1(i) = best_my_var1
-         sample_my_var2(i) = best_my_var2
-         sample_my_var3(i) = best_my_var3
+         sample_my_var(1:max_constraints,i) = best_my_var
          
          sample_surf_coef1(i) = best_surf_coef1
          sample_surf_coef2(i) = best_surf_coef2
@@ -1709,9 +1705,7 @@
          best_surface_Z_div_X = 0
          best_surface_He = 0
          best_Rcz = 0
-         best_my_var1 = 0
-         best_my_var2 = 0
-         best_my_var3 = 0
+         best_my_var = 0
          best_my_param1 = 0
          best_my_param2 = 0
          best_my_param3 = 0

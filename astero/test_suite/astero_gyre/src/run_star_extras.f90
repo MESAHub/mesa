@@ -64,7 +64,7 @@
 
       
       subroutine set_my_vars(id, ierr) ! called from star_astero code
-         !use astero_search_data, only: include_my_var1_in_chi2, my_var1
+         !use astero_search_data, only: include_my_var_in_chi2, my_var
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -73,10 +73,10 @@
          ! it is called whenever a new value of chi2 is calculated.
          ! only necessary to set the my_var's you are actually using.
          ierr = 0
-         !if (include_my_var1_in_chi2) then
+         !if (include_my_var_in_chi2(1)) then
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
-            !my_var1 = s% Teff
+            !my_var(1) = s% Teff
          !end if
       end subroutine set_my_vars
       

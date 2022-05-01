@@ -1594,30 +1594,16 @@
             chi2sum2 = chi2sum2 + chi2term
             chi2N2 = chi2N2 + 1
          end if
-         
-         if (my_var1_sigma > 0 .and. include_my_var1_in_chi2_spectro) then
-            chi2term = pow2((my_var1 - my_var1_target)/my_var1_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var1_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var2_sigma > 0 .and. include_my_var2_in_chi2_spectro) then
-            chi2term = pow2((my_var2 - my_var2_target)/my_var2_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var2_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var3_sigma > 0 .and. include_my_var3_in_chi2_spectro) then
-            chi2term = pow2((my_var3 - my_var3_target)/my_var3_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var3_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
+
+         do i = 1, max_constraints
+            if (my_var_sigma(i) > 0 .and. include_my_var_in_chi2_spectro(i)) then
+               chi2term = pow2((my_var(i) - my_var_target(i))/my_var_sigma(i))
+               if (trace_okay .and. trace_chi2_spectro_info) &
+                  write(*,2) 'chi2_spectro_term ' // trim(my_var_name(i)), s% model_number, chi2term
+               chi2sum2 = chi2sum2 + chi2term
+               chi2N2 = chi2N2 + 1
+            end if
+         end do
 
          num_chi2_spectro_terms = chi2N2
          if (normalize_chi2_spectro) then
