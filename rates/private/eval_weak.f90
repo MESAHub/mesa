@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019 The MESA Team
+!   Copyright (C) 2010-2022 The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -140,6 +140,7 @@
          use chem_def
          use interp_1d_def
          use utils_lib, only: is_bad, integer_dict_lookup
+         use neu_lib
          integer, intent(in) :: n, ids(:)
          real(dp), intent(in) :: T9_in, YeRho_in, eta, d_eta_dlnT, d_eta_dlnRho
          real(dp), dimension(:), intent(inout), pointer :: &
@@ -150,7 +151,7 @@
          
          logical, parameter :: dbg = .false.
          
-         real(dp) :: T, T9, YeRho, lYeRho
+         real(dp) :: T, T9, logT, YeRho, lYeRho
          integer :: i, ir, in, out, rxn_idx
          logical :: neg
          real(dp) :: decay, capture, Qx, Qn, conv, mue, d_mue_dlnRho, d_mue_dlnT
@@ -170,6 +171,7 @@
          ierr = 0
          
          T9 = T9_in
+         logT = log10(T9_in*1d9)
          YeRho = YeRho_in
          lYeRho = log10(YeRho_in)
          if (is_bad(lYeRho)) then
@@ -308,6 +310,12 @@
             end if
             
          end do
+
+          ! Handle neutrino captures (which also include electron and positron captures)
+         if(do_neu_captures) then
+            call do_neu_cap(neu_neut_pc,neu_neut_neu_cap,'n','p')
+            call do_neu_cap(neu_prot_ec,neu_prot_aneu_cap,'p','n')
+          end if
                   
          if (is_bad(lYeRho)) then
             ierr = -1
@@ -317,7 +325,42 @@
       
       
          contains
-         
+      
+         subroutine do_neu_cap(func1,func2,lhs,rhs)
+            procedure(neu_prot_ec) :: func1, func2
+            character(len=iso_name_length) :: lhs,rhs
+            real(dp) :: rate, Q
+            real(dp) :: dratedlogT, dratedeta, QdlogT, Qdeta
+
+            call func1(logT, eta, rate, Q, dratedlogT, dratedeta, QdlogT, Qdeta,  ierr)
+            if(ierr/=0) return
+            ! Find reaction id
+            i = do_get_weak_info_list_id(lhs,rhs)
+            if(i==0) return
+            ! Replace existing values
+            lambda(i) = rate
+            dlambda_dlnT(i) = dratedlogT * ln10
+            dlambda_dlnRho(i) = dratedeta/d_eta_dlnRho
+            Qneu(i) = Q
+            dQneu_dlnT(i) = QdlogT* ln10
+            dQneu_dlnRho(i) = Qdeta/d_eta_dlnRho
+
+            ! Negatives are alreay built into the Q values
+            call func2(logT, eta, rate, Q, dratedlogT, dratedeta, QdlogT, Qdeta,  ierr)
+            if(ierr/=0) return
+            ! Replace existing values
+            lambda(i) = lambda(i) + rate
+            dlambda_dlnT(i) = dlambda_dlnT(i) + dratedlogT * ln10
+            dlambda_dlnRho(i) = dlambda_dlnRho(i) + dratedeta/d_eta_dlnRho
+            Qneu(i) = Qneu(i) + Q
+            dQneu_dlnT(i) = dQneu_dlnT(i) + QdlogT * ln10
+            dQneu_dlnRho(i) = dQneu_dlnRho(i)+ Qdeta/d_eta_dlnRho
+
+
+         end subroutine do_neu_cap
+
+
+
          subroutine show_stuff
             integer :: i
             include 'formats'

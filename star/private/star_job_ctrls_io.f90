@@ -542,7 +542,10 @@
          warn_run_star_extras, &
          
          report_garbage_collection, &
-         num_steps_for_garbage_collection
+         num_steps_for_garbage_collection, &
+
+         use_neutrino_captures, &
+         neutrino_capture_filename
 
       contains
 
@@ -1176,6 +1179,9 @@
          s% job% report_garbage_collection = report_garbage_collection
          s% job% num_steps_for_garbage_collection = num_steps_for_garbage_collection
 
+         s% job% use_neutrino_captures = use_neutrino_captures
+         s% job% neutrino_capture_filename = neutrino_capture_filename
+
       end subroutine store_star_job_controls
 
 
@@ -1732,6 +1738,9 @@
          warn_run_star_extras = s% job% warn_run_star_extras
          report_garbage_collection = s% job% report_garbage_collection
          num_steps_for_garbage_collection = s% job% num_steps_for_garbage_collection
+
+         use_neutrino_captures = s% job% use_neutrino_captures
+         neutrino_capture_filename = s% job% neutrino_capture_filename
 
       end subroutine set_star_job_controls_for_writing
 

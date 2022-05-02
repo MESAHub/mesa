@@ -742,7 +742,7 @@
             ierr)
            use rates_def, only: Coulomb_Info
          use eval_weak, only: do_eval_weak_reaction_info
-           use rates_def, only : do_ecapture
+           use rates_def, only : do_ecapture, do_neu_captures
          integer, intent(in) :: n, ids(:), reaction_ids(:)
            type(Coulomb_Info), pointer :: cc
          real(dp), intent(in) :: T9, YeRho, eta, d_eta_dlnT, d_eta_dlnRho

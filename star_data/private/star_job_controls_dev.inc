@@ -20,3 +20,5 @@
       character (len=strlen) :: save_photo_filename
       !save_photo_when_terminate = .true.
       
+      logical :: use_neutrino_captures
+      character(len=strlen) :: neutrino_capture_filename

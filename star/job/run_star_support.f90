@@ -1975,6 +1975,7 @@
          use const_def
          use rates_def
          use rates_lib
+         use neu_lib
          use utils_lib, only: utils_OMP_GET_MAX_THREADS
 
          integer, intent(in) :: id
@@ -2742,6 +2743,12 @@
                  log10(s% max_timestep/secyer)
            end if
         end if
+
+        if(s% job% use_neutrino_captures) then
+            call neu_lib_init(s% job% neutrino_capture_filename, ierr)
+            if (failed('neu_lib_init',ierr)) return
+            do_neu_captures = .true.
+        end if
          
          ! print out info about selected non-standard parameter settings
          
@@ -2851,6 +2858,9 @@
             end do
             write(*,'(A)')
          end if         
+
+         if(s% job% use_neutrino_captures) &
+            write(*,'(A)') 'Loading neutrino captures from ' // trim(s% job% neutrino_capture_filename)
          
          write(*,*) 'kap_option ' // trim(kap_option_str(s% kap_rq% kap_option))
          write(*,*) 'kap_CO_option ' // trim(kap_CO_option_str(s% kap_rq% kap_CO_option))

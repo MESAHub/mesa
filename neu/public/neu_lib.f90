@@ -73,56 +73,56 @@
       end subroutine neu_get
       
 
-      subroutine neu_prot_ec(logT, mu, rate, Q, dratedt, dratedmu, Qdt, Qdmu,  ierr)
+      subroutine neu_prot_ec(logT, mu, rate, Q, dratedlogT, dratedmu, QdlogT, Qdmu,  ierr)
          use neu_cap
          real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
+         real(dp), intent(out) :: dratedlogT, dratedmu, QdlogT, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         call lambda_ec(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         call lambda_ec(logT, mu, rate, dratedlogT, dratedmu, Q, QdlogT, Qdmu, ierr)
 
       end subroutine neu_prot_ec
 
-      subroutine neu_neut_pc(logT, mu, rate, Q, dratedt, dratedmu, Qdt, Qdmu,  ierr)
+      subroutine neu_neut_pc(logT, mu, rate, Q, dratedlogT, dratedmu, QdlogT, Qdmu,  ierr)
          use neu_cap
          real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
+         real(dp), intent(out) :: dratedlogT, dratedmu, QdlogT, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         call lambda_pc(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         call lambda_pc(logT, mu, rate, dratedlogT, dratedmu, Q, QdlogT, Qdmu, ierr)
 
       end subroutine neu_neut_pc
 
-      subroutine neu_neut_neu_cap(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu,  ierr)
+      subroutine neu_neut_neu_cap(logT, mu, rate, dratedlogT, dratedmu, Q, QdlogT, Qdmu,  ierr)
          use neu_cap
          real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
+         real(dp), intent(out) :: dratedlogT, dratedmu, QdlogT, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         call lambda_neu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         call lambda_neu(logT, mu, rate, dratedlogT, dratedmu, Q, QdlogT, Qdmu, ierr)
 
       end subroutine neu_neut_neu_cap
 
 
-      subroutine neu_prot_aneu_cap(logT, mu, rate, Q, dratedt, dratedmu, Qdt, Qdmu,  ierr)
+      subroutine neu_prot_aneu_cap(logT, mu, rate, Q, dratedlogT, dratedmu, QdlogT, Qdmu,  ierr)
          use neu_cap
          real(dp), intent(in) :: logT ! Temperature
          real(dp), intent(in) :: mu ! electron chemical potential
          real(dp), intent(out) :: rate, Q
-         real(dp), intent(out) :: dratedt, dratedmu, Qdt, Qdmu
+         real(dp), intent(out) :: dratedlogT, dratedmu, QdlogT, Qdmu
          integer,intent(inout) :: ierr
          ierr = 0
 
-         call lambda_aneu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+         call lambda_aneu(logT, mu, rate, dratedlogT, dratedmu, Q, QdlogT, Qdmu, ierr)
 
       end subroutine neu_prot_aneu_cap
 
@@ -136,7 +136,6 @@
          !$omp critical (neu_init)
          call neu_cap_init(filename, ierr)
          !$omp end critical (neu_init)
-
 
       end subroutine neu_lib_init
 

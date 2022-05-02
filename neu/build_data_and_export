@@ -25,7 +25,7 @@ check_okay
 
 cd ../../
 
-rm -rf ../data/neu_data
+rm -rf ../data/neu_data/ 2>/dev/null
 check_okay
 
 mkdir -p ../data/neu_data

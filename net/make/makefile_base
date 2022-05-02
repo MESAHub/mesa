@@ -31,9 +31,9 @@ SRCS = \
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = eos rates chem $(LIBS_MESA_NUMERICS)
+     LIBS_OTHER = eos rates chem neu $(LIBS_MESA_NUMERICS)
      DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lrates -lchem $(LOAD_MESA_NUMERICS)
+     LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lrates -lchem -lneu $(LOAD_MESA_NUMERICS)
 endif
 
 #################################################################

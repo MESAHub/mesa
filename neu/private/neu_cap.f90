@@ -53,15 +53,18 @@
 
       integer,dimension(6),parameter :: ict = (/1,1,1,0,0,0/)
 
+      integer, parameter :: IN_BOUNDS=0, BELOW_BOUNDS=1, ABOVE_BOUNDS=2
+
 
       contains
   
 
-      subroutine  lambda_ec(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+      subroutine  lambda_ec(logT, mu, rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu, ierr)
          real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
-         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
+         real(dp), intent(out) :: rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu
          integer, intent(inout) :: ierr
          real(dp) :: fval(6)
+         integer :: bounds
 
          ierr = 0
 
@@ -71,6 +74,22 @@
             return
          end if
 
+         call bounds_check(logT, mu, bounds)
+         select case(bounds)
+            case(ABOVE_BOUNDS)
+               write(*,*) 'logT or mu above neutrino capture limits'
+               ierr = -1
+               return
+            case(BELOW_BOUNDS)
+               rate = 0d0
+               dratedlogt = 0d0
+               dratedmu = 0d0
+               Q = 0d0
+               QdlogT = 0d0
+               Qdmu = 0d0
+               return
+         end select
+
          call interp_evbicub_db( mu, logT, &
                                  rate_data% mu, rate_data% nMu,&
                                  rate_data% logT, rate_data% nTemp,&
@@ -79,7 +98,7 @@
          if(ierr/=0) return
 
          rate = fval(1)
-         dratedt = fval(3)! Fix log to T
+         dratedlogT = fval(3)
          dratedmu = fval(2)
 
 
@@ -92,16 +111,17 @@
          if(ierr/=0) return
 
          Q = fval(1)
-         Qdt = fval(3)! Fix log to T
+         QdlogT = fval(3)
          Qdmu = fval(2)
 
       end subroutine lambda_ec
 
-      subroutine  lambda_pc(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+      subroutine  lambda_pc(logT, mu, rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu, ierr)
          real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
-         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
+         real(dp), intent(out) :: rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu
          integer, intent(inout) :: ierr
          real(dp) :: fval(6)
+         integer :: bounds
 
          ierr = 0
          if(.not. rate_data% init) then
@@ -109,6 +129,22 @@
             ierr=-1
             return
          end if
+
+         call bounds_check(logT, mu, bounds)
+         select case(bounds)
+            case(ABOVE_BOUNDS)
+               write(*,*) 'logT or mu above neutrino capture limits'
+               ierr = -1
+               return
+            case(BELOW_BOUNDS)
+               rate = 0d0
+               dratedlogt = 0d0
+               dratedmu = 0d0
+               Q = 0d0
+               QdlogT = 0d0
+               Qdmu = 0d0
+               return
+         end select
 
          call interp_evbicub_db(mu, logT, &
                                  rate_data% mu, rate_data% nMu,&
@@ -118,7 +154,7 @@
          if(ierr/=0) return
 
          rate = fval(1)
-         dratedt = fval(3)! Fix log to T
+         dratedlogT = fval(3)
          dratedmu = fval(2)
 
 
@@ -131,17 +167,18 @@
          if(ierr/=0) return
 
          Q = fval(1)
-         Qdt = fval(3)! Fix log to T
+         QdlogT = fval(3)
          Qdmu = fval(2)
 
 
       end subroutine lambda_pc
 
-      subroutine  lambda_neu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+      subroutine  lambda_neu(logT, mu, rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu, ierr)
          real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
-         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
+         real(dp), intent(out) :: rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu
          integer, intent(inout) :: ierr
          real(dp) :: fval(6)
+         integer :: bounds
 
          ierr = 0
          if(.not. rate_data% init) then
@@ -149,6 +186,22 @@
             ierr=-1
             return
          end if
+
+         call bounds_check(logT, mu, bounds)
+         select case(bounds)
+            case(ABOVE_BOUNDS)
+               write(*,*) 'logT or mu above neutrino capture limits'
+               ierr = -1
+               return
+            case(BELOW_BOUNDS)
+               rate = 0d0
+               dratedlogt = 0d0
+               dratedmu = 0d0
+               Q = 0d0
+               QdlogT = 0d0
+               Qdmu = 0d0
+               return
+         end select
 
          call interp_evbicub_db(mu, logT, &
                                  rate_data% mu, rate_data% nMu,&
@@ -158,8 +211,8 @@
          if(ierr/=0) return
 
          rate = fval(1)
-         Qdt = fval(3)! Fix log to T
-         Qdmu = fval(2)
+         dratedlogT = fval(3)
+         dratedmu = fval(2)
 
          fval = 0
          call interp_evbicub_db(mu, logT, &
@@ -170,19 +223,17 @@
          if(ierr/=0) return
 
          Q = fval(1)
-         Qdt = fval(3)! Fix log to T
+         QdlogT = fval(3)
          Qdmu = fval(2)
-
-
-
 
       end subroutine lambda_neu
 
-      subroutine  lambda_aneu(logT, mu, rate, dratedt, dratedmu, Q, Qdt, Qdmu, ierr)
+      subroutine  lambda_aneu(logT, mu, rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu, ierr)
          real(dp),intent(in) :: logT, mu ! Temp in K mu electron chemical potential
-         real(dp), intent(out) :: rate, dratedt, dratedmu, Q, Qdt, Qdmu
+         real(dp), intent(out) :: rate, dratedlogt, dratedmu, Q, QdlogT, Qdmu
          integer, intent(inout) :: ierr
          real(dp) :: fval(6)
+         integer :: bounds
 
          ierr = 0
          if(.not. rate_data% init) then
@@ -190,6 +241,22 @@
             ierr=-1
             return
          end if
+
+         call bounds_check(logT, mu, bounds)
+         select case(bounds)
+            case(ABOVE_BOUNDS)
+               write(*,*) 'logT or mu above neutrino capture limits'
+               ierr = -1
+               return
+            case(BELOW_BOUNDS)
+               rate = 0d0
+               dratedlogt = 0d0
+               dratedmu = 0d0
+               Q = 0d0
+               QdlogT = 0d0
+               Qdmu = 0d0
+               return
+         end select
 
          call interp_evbicub_db(mu, logT, &
                                  rate_data% mu, rate_data% nMu,&
@@ -199,7 +266,7 @@
          if(ierr/=0) return
 
          rate = fval(1)
-         dratedt = fval(3)! Fix log to T
+         dratedlogT = fval(3)
          dratedmu = fval(2)
 
 
@@ -212,7 +279,7 @@
          if(ierr/=0) return
 
          Q = fval(1)
-         Qdt = fval(3)! Fix log to T
+         QdlogT = fval(3)
          Qdmu = fval(2)
 
       end subroutine lambda_aneu
@@ -228,15 +295,29 @@
          real(dp), allocatable :: bcMumin(:),bcMumax(:), bcTempmin(:),  bcTempmax(:)
 
          integer :: count
+         logical :: exists
 
          ierr = 0
-
-         open(newunit=io,file=trim(filename),iostat=ioerr)
-         if(ioerr/=0) then
-            ierr = -1
-            write(*,*) "Could not open file ",trim(filename)
-            return
+         
+         ! First check for local file then if not exisiting load the one form MESA_DIR/data/neu_data
+         inquire(file=trim(filename),exist=exists)
+         if(exists) then
+            open(newunit=io,file=trim(filename),iostat=ioerr,action='read',status='old')
+            if(ioerr/=0) then
+               ierr = -1
+               write(*,*) "Could not open file ",trim(filename)
+               return
+            end if
+         else
+            open(newunit=io,file=trim(mesa_data_dir)//'/neu_data/'//trim(filename),iostat=ioerr,action='read',status='old')
+            if(ioerr/=0) then
+               ierr = -1
+               write(*,*) "Could not open file ",trim(mesa_data_dir)//'/neu_data/'//trim(filename)
+               return
+            end if
          end if
+
+
 
          ! First line is number of lines of data
          ! Second is a header
@@ -272,6 +353,8 @@
                        rate_data% Qneuf1(ind),rate_data% Qaneuf1(ind)
             end do
          end do
+
+         close(io)
 
          ! use "not a knot" bc's
          allocate(bcMumin(nMu),bcMumax(nMu), bcTempmin(nTemp),  bcTempmax(nTemp))
@@ -386,6 +469,32 @@
             rate_data% init = .false.
          end if
       end subroutine neu_cap_shutdown
+
+
+      subroutine bounds_check(logT, mu, flag)
+         real(dp), intent(in) :: logT, mu
+         integer,intent(out) :: flag
+
+         flag = ABOVE_BOUNDS ! Default to error state
+         if(rate_data% init) then
+
+            if(logT < rate_data% logT(1) .or. mu < rate_data% mu(1)) then
+               flag = BELOW_BOUNDS
+               return ! Not really an error just return rates as 0
+            end if
+
+            if(logT > rate_data% logT(rate_data% nTemp) .or. mu > rate_data% mu(rate_data % nmu)) then
+               flag = ABOVE_BOUNDS
+               return ! Error
+            end if
+
+            flag = IN_BOUNDS
+            return
+         end if
+
+
+      
+      end subroutine bounds_check
 
 
    end module neu_cap

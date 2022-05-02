@@ -347,14 +347,15 @@ then
 fi
 do_one_parallel kap
 
-do_one_parallel rates
-
 if [ ! -r data/neu_data ]
 then
 	do_input_data neu
 fi
 
 do_one_parallel neu
+
+do_one_parallel rates
+
 do_one_parallel net
 
 do_one star_data

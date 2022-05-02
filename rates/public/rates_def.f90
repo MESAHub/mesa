@@ -295,6 +295,8 @@
          ! for all of these, 0 means "cache entry not yet set -- don't have the information"
 
 
+      logical :: do_neu_captures ! Turn on SkyNet neutrino captures?
+
 
          
       ! for tabular evaluation of the raw reaction rates
