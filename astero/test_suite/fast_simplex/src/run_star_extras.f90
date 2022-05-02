@@ -65,9 +65,10 @@
       end subroutine extras_controls
 
       
-      subroutine set_my_vars(id, ierr) ! called from star_astero code
-         !use astero_search_data, only: include_my_var_in_chi2, my_var
+      subroutine set_my_vars(id, name, val, ierr) ! called from star_astero code
          integer, intent(in) :: id
+         character(len=strlen), intent(in) :: name
+         real(dp), intent(out) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ! my_var's are predefined in the simplex_search_data.
@@ -75,11 +76,19 @@
          ! it is called whenever a new value of chi2 is calculated.
          ! only necessary to set the my_var's you are actually using.
          ierr = 0
-         !if (include_my_var_in_chi2(1)) then
-            call star_ptr(id, s, ierr)
-            if (ierr /= 0) return
-            !my_var(1) = s% Teff
-         !end if
+
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         select case (name)
+            ! for custom constraints, create a case with the name of your constraint e.g.
+            ! case ('delta_Pg')
+            !    val = s% delta_Pg
+            ! fall back to history column if user doesn't define name
+            case default
+               val = star_get_history_output(s, name)
+         end select
+
       end subroutine set_my_vars
       
       
@@ -159,7 +168,6 @@
       
 
       integer function extras_check_model(id)
-         use astero_def, only: my_var
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
@@ -169,9 +177,6 @@
          if (ierr /= 0) return
          
          include 'formats'
-         
-         my_var(1) = s% delta_Pg
-         !write(*,2) 'delta_Pg', s% model_number, my_var(1)
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depenending on which

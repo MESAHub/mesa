@@ -136,7 +136,7 @@
 
       logical :: include_my_var_in_chi2_spectro(max_constraints)
       real(dp) :: my_var_target(max_constraints), my_var_sigma(max_constraints)
-      character (len=32) :: my_var_name(max_constraints)
+      character (len=strlen) :: my_var_name(max_constraints)
       
       real(dp) :: Z_div_X_solar
 
@@ -786,8 +786,11 @@
 
       abstract interface
 
-         subroutine set_my_vars_interface(id, ierr)
+         subroutine set_my_vars_interface(id, name, val, ierr)
+            use const_def, only: dp, strlen
             integer, intent(in) :: id
+            character(len=strlen), intent(in) :: name
+            real(dp), intent(out) :: val
             integer, intent(out) :: ierr
          end subroutine set_my_vars_interface
 

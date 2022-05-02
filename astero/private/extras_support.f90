@@ -226,6 +226,13 @@
                end if
             end do
          end if
+
+         ! must set constraint values before checking limits
+         do i = 1, max_constraints
+            if (my_var_name(i) == '') cycle
+            call star_astero_procs% set_my_vars(id, my_var_name(i), my_var(i), ierr)
+            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'ierr /=0 in set_my_vars')
+         end do
          
          call check_limits
          if (do_astero_extras_check_model /= keep_going) return
@@ -898,7 +905,7 @@
          best_surface_Z_div_X = surface_Z_div_X
          best_surface_He = surface_He
          best_Rcz = Rcz
-         best_my_var = my_var
+         best_my_var(1:max_constraints) = my_var(1:max_constraints)
 
          best_my_param1 = my_param1
          best_my_param2 = my_param2
