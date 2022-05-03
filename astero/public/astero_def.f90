@@ -102,46 +102,25 @@
       real(dp) :: delta_nu, delta_nu_sigma
       real(dp) :: nu_max, nu_max_sigma
 
-      logical :: include_logg_in_chi2_spectro
-      real(dp) :: logg_target, logg_sigma
-      
-      logical :: include_logL_in_chi2_spectro
-      real(dp) :: logL_target, logL_sigma
-
-      logical :: include_Teff_in_chi2_spectro
-      real(dp) :: Teff_target, Teff_sigma
-
-      logical :: include_FeH_in_chi2_spectro
-      real(dp) :: FeH_target, FeH_sigma
-         
-      logical :: include_logR_in_chi2_spectro
-      real(dp) :: logR_target, logR_sigma
-         
       logical :: include_age_in_chi2_spectro
       real(dp) :: age_target, age_sigma
       integer :: num_smaller_steps_before_age_target
       real(dp) :: dt_for_smaller_steps_before_age_target
-         
-      logical :: include_surface_Z_div_X_in_chi2_spectro
-      real(dp) :: surface_Z_div_X_target, surface_Z_div_X_sigma
-         
-      logical :: include_surface_He_in_chi2_spectro
-      real(dp) :: surface_He_target, surface_He_sigma
-         
-      logical :: include_Rcz_in_chi2_spectro
-      real(dp) :: Rcz_target, Rcz_sigma
 
-      integer, parameter :: max_constraints = 10
+      ! spectro (non-seismic) constraints
+      integer, parameter :: max_constraints = 100
       integer :: num_constraints ! how many are actually used
 
       logical :: include_my_var_in_chi2_spectro(max_constraints)
-      real(dp) :: my_var_target(max_constraints), my_var_sigma(max_constraints)
+      real(dp) :: my_var_target(max_constraints)
+      real(dp) :: my_var_sigma(max_constraints)
+      real(dp) :: sigmas_coeff_for_my_var_limit(max_constraints)
+
       character (len=strlen) :: my_var_name(max_constraints)
       
       real(dp) :: Z_div_X_solar
 
-      integer, parameter :: & ! increase these if necessary
-         max_nl = 1000
+      integer, parameter :: max_nl = 1000 ! increase this if necessary
 
       ! observed modes to match to model
       integer  :: nl(0:3)
@@ -212,22 +191,13 @@
          max_yrs_dt_chi2_smallest_limit, chi2_limit_for_smallest_timesteps, &
          chi2_search_limit1, chi2_search_limit2, chi2_relative_increase_limit, &
          avg_age_sigma_limit, avg_model_number_sigma_limit
+
+      real(dp) :: sigmas_coeff_for_delta_nu_limit
          
       integer :: min_num_samples_for_avg, max_num_samples_for_avg, &
          limit_num_chi2_too_big
       
       real(dp) :: min_age_limit
-      
-      real(dp) :: &
-         sigmas_coeff_for_logg_limit, &
-         sigmas_coeff_for_logL_limit, &
-         sigmas_coeff_for_Teff_limit, &
-         sigmas_coeff_for_logR_limit, &
-         sigmas_coeff_for_surface_Z_div_X_limit, &
-         sigmas_coeff_for_surface_He_limit, &
-         sigmas_coeff_for_Rcz_limit, &
-         sigmas_coeff_for_delta_nu_limit, &
-         sigmas_coeff_for_my_var_limit(max_constraints)
       
       character(len=32) :: correction_scheme, &
          surf_coef1_name, surf_coef2_name
@@ -349,34 +319,10 @@
          delta_nu, delta_nu_sigma, &
          nu_max, nu_max_sigma, &
          
-         include_logg_in_chi2_spectro, &
-         logg_target, logg_sigma, &
-         
-         include_logL_in_chi2_spectro, &
-         logL_target, logL_sigma, &
-         
-         include_Teff_in_chi2_spectro, &
-         Teff_target, Teff_sigma, &
-         
-         include_FeH_in_chi2_spectro, &
-         FeH_target, FeH_sigma, &
-         
-         include_logR_in_chi2_spectro, &
-         logR_target, logR_sigma, &
-         
          include_age_in_chi2_spectro, &
          age_target, age_sigma, &
          num_smaller_steps_before_age_target, &
          dt_for_smaller_steps_before_age_target, &
-         
-         include_surface_Z_div_X_in_chi2_spectro, &
-         surface_Z_div_X_target, surface_Z_div_X_sigma, &
-         
-         include_surface_He_in_chi2_spectro, &
-         surface_He_target, surface_He_sigma, &
-         
-         include_Rcz_in_chi2_spectro, &
-         Rcz_target, Rcz_sigma, &
 
          include_my_var_in_chi2_spectro, &
          my_var_target, my_var_sigma, my_var_name, &
@@ -442,16 +388,9 @@
          limit_num_chi2_too_big, chi2_relative_increase_limit, &
          avg_age_sigma_limit, avg_model_number_sigma_limit, &
          min_num_samples_for_avg, max_num_samples_for_avg, &
-         sigmas_coeff_for_logg_limit, &
-         sigmas_coeff_for_logL_limit, &
-         sigmas_coeff_for_Teff_limit, &
-         
-         sigmas_coeff_for_logR_limit, &
-         sigmas_coeff_for_surface_Z_div_X_limit, &
-         sigmas_coeff_for_surface_He_limit, &
-         sigmas_coeff_for_Rcz_limit, &
+
          sigmas_coeff_for_my_var_limit, &
-         
+
          sigmas_coeff_for_delta_nu_limit, &
          min_age_limit, &
          correction_scheme, surf_coef1_name, surf_coef2_name, &
@@ -664,15 +603,6 @@
          best_init_he4, &
          best_init_Z, &
          best_age, &
-         best_radius, &
-         best_logL, &
-         best_Teff, &
-         best_logg, &
-         best_FeH, &
-         best_logR, &
-         best_surface_Z_div_X, &
-         best_surface_He, &
-         best_Rcz, &
          best_my_param1, &
          best_my_param2, &
          best_my_param3, &
@@ -713,15 +643,6 @@
          sample_mass, &
          sample_alpha, &
          sample_f_ov, &
-         sample_radius, &
-         sample_logL, &
-         sample_Teff, &
-         sample_logg, &
-         sample_FeH, &
-         sample_logR, &
-         sample_surface_Z_div_X, &
-         sample_surface_He, &
-         sample_Rcz, &
          sample_my_param1, &
          sample_my_param2, &
          sample_my_param3, &
@@ -759,7 +680,6 @@
          chi2_seismo, chi2_spectro, chi2_radial, chi2_delta_nu, chi2_nu_max, &
          chi2_r_010_ratios, chi2_r_02_ratios, chi2_frequencies, &
          initial_Y, initial_FeH, initial_Z_div_X, &
-         logg, FeH, logR, surface_Z_div_X, surface_He, Rcz, &
          my_var(max_constraints), my_param1, my_param2, my_param3
 
       integer :: star_id, star_model_number
@@ -912,15 +832,6 @@
             sample_my_param1, &
             sample_my_param2, &
             sample_my_param3, &
-            sample_radius, &
-            sample_logL, &
-            sample_Teff, &
-            sample_logg, &
-            sample_FeH, &
-            sample_logR, &
-            sample_surface_Z_div_X, &
-            sample_surface_He, &
-            sample_Rcz, &
             sample_my_var, &
             sample_delta_nu, &
             sample_nu_max, &
@@ -961,16 +872,7 @@
          call realloc_double(sample_my_param1,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_my_param2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_my_param3,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_radius,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_logL,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_Teff,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_logg,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_FeH,max_num_samples,ierr); if (ierr /= 0) return
-         
-         call realloc_double(sample_logR,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_surface_Z_div_X,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_surface_He,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_Rcz,max_num_samples,ierr); if (ierr /= 0) return
+
          call realloc_double2(sample_my_var,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
          
          call realloc_double(sample_delta_nu,max_num_samples,ierr); if (ierr /= 0) return
@@ -1351,7 +1253,7 @@
          ! column numbers
          write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
 
-         k = 38 + num_constraints ! fixed columns
+         k = 29 + num_constraints ! fixed columns
 
          if (chi2_seismo_fraction > 0) then
 
@@ -1396,16 +1298,7 @@
             'init_h1', &
             'init_he3', &
             'init_he4', &
-            'init_Z', &
-            'log_radius', &
-            'logL', &
-            'Teff', &
-            'logg', &
-            'Fe_H', &
-            'logR', &
-            'surface_Z_div_X', &
-            'surface_He', &
-            'Rcz'
+            'init_Z'
 
          do i = 1, max_constraints
             if (my_var_name(i) /= '') write(iounit, fmt, advance='no') trim(my_var_name(i))
@@ -1514,15 +1407,6 @@
          call write1_dbl(sample_init_he3(i))
          call write1_dbl(sample_init_he4(i))
          call write1_dbl(sample_init_Z(i))
-         call write1_dbl(safe_log10(sample_radius(i)))
-         call write1_dbl(sample_logL(i))
-         call write1_dbl(sample_Teff(i))
-         call write1_dbl(sample_logg(i))
-         call write1_dbl(sample_FeH(i))
-         call write1_dbl(sample_logR(i))
-         call write1_dbl(sample_surface_Z_div_X(i))
-         call write1_dbl(sample_surface_He(i))
-         call write1_dbl(sample_Rcz(i))
 
          do k = 1, max_constraints
             if (my_var_name(k) /= '') call write1_dbl(sample_my_var(k,i))
@@ -1772,51 +1656,6 @@
                call show_best_r02_ratios_info(io)
          end if
 
-         if (Teff_sigma > 0 .and. include_Teff_in_chi2_spectro) then
-            chi2term = pow2((best_Teff - Teff_target)/Teff_sigma)
-            write(io,'(A)')
-            call write1('Teff', best_Teff)
-            call write1('Teff_obs', Teff_target)
-            call write1('Teff_sigma', Teff_sigma)
-            call write1('Teff chi2term', chi2term)
-         end if
-         
-         if (logL_sigma > 0 .and. include_logL_in_chi2_spectro) then
-            chi2term = pow2((best_logL - logL_target)/logL_sigma)
-            write(io,'(A)')
-            call write1('logL', best_logL)
-            call write1('logL_obs', logL_target)
-            call write1('logL_sigma', logL_sigma)
-            call write1('logL chi2term', chi2term)
-         end if
-         
-         if (logg_sigma > 0 .and. include_logg_in_chi2_spectro) then
-            chi2term = pow2((best_logg - logg_target)/logg_sigma)
-            write(io,'(A)')
-            call write1('logg', best_logg)
-            call write1('logg_obs', logg_target)
-            call write1('logg_sigma', logg_sigma)
-            call write1('logg chi2term', chi2term)
-         end if
-         
-         if (FeH_sigma > 0 .and. include_FeH_in_chi2_spectro) then
-            chi2term = pow2((best_FeH - FeH_target)/FeH_sigma)
-            write(io,'(A)')
-            call write1('FeH', best_FeH)
-            call write1('FeH_obs', FeH_target)
-            call write1('FeH_sigma', FeH_sigma)
-            call write1('FeH chi2term', chi2term)
-         end if
-         
-         if (logR_sigma > 0 .and. include_logR_in_chi2_spectro) then
-            chi2term = pow2((best_logR - logR_target)/logR_sigma)
-            write(io,'(A)')
-            call write1('logR', best_logR)
-            call write1('logR_obs', logR_target)
-            call write1('logR_sigma', logR_sigma)
-            call write1('logR chi2term', chi2term)
-         end if
-         
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
             chi2term = pow2((best_age - age_target)/age_sigma)
             write(io,'(A)')
@@ -1824,35 +1663,6 @@
             write(io,'(a40,1pes20.10)') 'age_target', age_target
             write(io,'(a40,1pes20.10)') 'age_sigma', age_sigma
             write(io,'(a40,e20.10,99f20.10)') 'age chi2term', chi2term
-         end if
-         
-         if (surface_Z_div_X_sigma > 0 .and. &
-               include_surface_Z_div_X_in_chi2_spectro) then
-            chi2term = &
-               pow2((best_surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-            write(io,'(A)')
-            call write1('surface_Z_div_X', best_surface_Z_div_X)
-            call write1('surface_Z_div_X_obs', surface_Z_div_X_target)
-            call write1('surface_Z_div_X_sigma', surface_Z_div_X_sigma)
-            write(io,'(a40,e20.10,99f20.10)') 'surface_Z_div_X chi2term', chi2term
-         end if
-         
-         if (surface_He_sigma > 0 .and. include_surface_He_in_chi2_spectro) then
-            chi2term = pow2((best_surface_He - surface_He_target)/surface_He_sigma)
-            write(io,'(A)')
-            call write1('surface_He', best_surface_He)
-            call write1('surface_He_obs', surface_He_target)
-            call write1('surface_He_sigma', surface_He_sigma)
-            call write1('surface_He chi2term', chi2term)
-         end if
-         
-         if (Rcz_sigma > 0 .and. include_Rcz_in_chi2_spectro) then
-            chi2term = pow2((best_Rcz - Rcz_target)/Rcz_sigma)
-            write(io,'(A)')
-            call write1('Rcz', best_Rcz)
-            call write1('Rcz_obs', Rcz_target)
-            call write1('Rcz_sigma', Rcz_sigma)
-            call write1('Rcz chi2term', chi2term)
          end if
 
          do i = 1, max_constraints
@@ -1871,15 +1681,6 @@
          end do
          
          write(io,'(A)')
-         call write1('R/Rsun', best_radius)
-         call write1('logL/Lsun', best_logL)
-         call write1('Teff', best_Teff)
-         call write1('logg', best_logg)
-         call write1('FeH', best_FeH)
-         call write1('logR', best_logR)
-         call write1('surface_Z_div_X', best_surface_Z_div_X)
-         call write1('surface_He', best_surface_He)
-         call write1('Rcz', best_Rcz)
          call write1('delta_nu', best_delta_nu)
          call write1('nu_max', best_nu_max)
          write(io,*)        
@@ -2045,15 +1846,6 @@
          call read1_dbl(sample_init_he3(i))
          call read1_dbl(sample_init_he4(i))
          call read1_dbl(sample_init_Z(i))
-         call read1_dbl(logR)
-         call read1_dbl(sample_logL(i))
-         call read1_dbl(sample_Teff(i))
-         call read1_dbl(sample_logg(i))
-         call read1_dbl(sample_FeH(i))
-         call read1_dbl(sample_logR(i))
-         call read1_dbl(sample_surface_Z_div_X(i))
-         call read1_dbl(sample_surface_He(i))
-         call read1_dbl(sample_Rcz(i))
 
          do k = 1, max_constraints
             if (my_var_name(k) /= '') call read1_dbl(sample_my_var(k,i))
@@ -2075,8 +1867,6 @@
 
          if (failed('results')) return
             
-         sample_radius(i) = exp10(logR)
-
          if (chi2_seismo_fraction > 0) then
 
             write(fmt,'(a)') '(' // trim(astero_results_int_format) // &

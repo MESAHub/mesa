@@ -66,11 +66,16 @@
 
       
       subroutine set_my_vars(id, name, val, ierr) ! called from star_astero code
+         use astero_def, only: Z_div_X_solar
+
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name
          real(dp), intent(out) :: val
          integer, intent(out) :: ierr
+
          type (star_info), pointer :: s
+         integer :: i
+         real(dp) :: X, Y, Z
          ! my_var's are predefined in the simplex_search_data.
          ! this routine's job is to assign those variables to current value in the model.
          ! it is called whenever a new value of chi2 is calculated.
@@ -80,11 +85,35 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
+         X = max(s% surface_h1, 1d-10)
+         Y = s% surface_he3 + s% surface_he4
+         Z = max(1d-99, min(1d0, 1-X-Y))
+
          select case (name)
             ! for custom constraints, create a case with the name of your constraint e.g.
             ! case ('delta_Pg')
             !    val = s% delta_Pg
             ! fall back to history column if user doesn't define name
+            case ('M_H')
+               val = log10(Z/X/Z_div_X_solar)
+
+            case ('surface_Z_div_X')
+               val = Z/X
+
+            case ('surface_He')
+               val = Y
+
+            case ('Rcz')
+               do i = 1, s% nz-1 ! locate bottom of solar convective zone
+                  if (s% mixing_type(i+1) /= convective_mixing &
+                        .and. s% mixing_type(i) == convective_mixing) then
+                     if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
+                        val = s% r(i)/Rsun
+                        exit
+                     end if
+                  end if
+               end do
+
             case default
                val = star_get_history_output(s, name)
          end select

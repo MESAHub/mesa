@@ -31,29 +31,36 @@
    ! quantities are added to this |chi^2| and, in some cases, how they
    ! are computed.
 
-   ! Each standard component ``X`` is included by setting the flag
-   ! ``include_X_in_chi2_spectro`` to ``.true.`` and specifying the value
-   ! with ``X_target`` and the uncertainty with ``X_sigma``.
+   ! Each component is identified by setting its name to either a string
+   ! matching a history column or one of the cases defined in ``run_star_extras.f90``.
+   ! If target value and uncertainty ``sigma`` are greater than zero, a |chi^2| component
+   ! will be computed and output in the sample data.
 
-   ! The standard options for ``X`` are:
+   ! If ``include_in_chi2_spectro`` is set to ``.true.``, that component will be included
+   ! in ``chi2_spectro``.  The old fixed options were equivalent to:
 
    ! + ``Teff``
-   ! + ``logg``
-   ! + ``logL``
-   ! + ``FeH``
-   ! + ``logR``
+   ! + ``log_g``
+   ! + ``log_L``
+   ! + ``log_R``
+   ! + ``M_H``
    ! + ``surface_Z_div_X``
    ! + ``surface_He``
-   ! + ``age``
    ! + ``Rcz``
 
-   ! Target values and uncertainties for other observables can be
-   ! defined by specifying controls for ``my_var1``, ``my_var2`` and
-   ! ``my_var3`` in the inlist and computing them in
-   ! ``run_star_extras.f``.
+   ! where ``M_H``, ``surface_Z_div_X``, ``surface_He`` and ``Rcz``
+   ! are now implemented in the standard ``run_star_extras.f90`.
+   ! The other options fall back to the history columns.
 
-   ! The target values must be set separately for PGstar.  If you want
-   ! the targets to appear in the ``loggTe`` window, you need to set
+   ! To implement your own constraints, creat the appropriate case
+   ! in ``set_my_vars`` in ``run_star_extras.f90``.
+
+   ! The ``age`` option is still treated separately because there are
+   ! additional controls that determine how the age target is
+   ! approached.
+
+   ! Target values must be set separately for PGstar.  If you want
+   ! targets to appear in the ``loggTe`` window, you need to set
    ! the following PGstar controls: ::
 
    !    loggTe_target_logg
@@ -61,13 +68,27 @@
    !    loggTe_target_Teff
    !    loggTe_target_Teff_sigma
 
-   ! Similarly, if you want the targets to appear in the HR window,
+   ! Similarly, if you want targets to appear in the HR window,
    ! you need to set the following PGstar controls: ::
 
    !    HR_target_logL
    !    HR_target_logL_sigma
    !    HR_target_Teff
    !    HR_target_Teff_sigma
+
+   ! my_var_name(:)
+   ! ~~~~~~~~~~~~~~
+   ! include_my_var_in_chi2_spectro(:)
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! my_var_target(:)
+   ! ~~~~~~~~~~~~~~~~~~~~~~
+   ! my_var_sigma(:)
+   ! ~~~~~~~~~~~~~~~~~~~~~
+
+      my_var_name(:) = '' ! change this to whatever you want
+      my_var_target(:) = 0
+      my_var_sigma(:) = 0
+      include_my_var_in_chi2_spectro(:) = .false.
 
    ! normalize_chi2_spectro
    ! ~~~~~~~~~~~~~~~~~~~~~~
@@ -77,95 +98,12 @@
 
       normalize_chi2_spectro = .true.
 
-   ! include_Teff_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! Teff_target
-   ! ~~~~~~~~~~~
-   ! Teff_sigma
-   ! ~~~~~~~~~~
-   ! ``Teff`` is the effective temperature, in kelvin. ::
-
-      include_Teff_in_chi2_spectro = .false.
-      Teff_target = -1
-      Teff_sigma = -1
-
-   ! include_logg_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! logg_target
-   ! ~~~~~~~~~~~
-   ! logg_sigma
-   ! ~~~~~~~~~~
-   ! ``logg`` is the logarithm (base 10) of the surface gravity, in cgs units. ::
-
-      include_logg_in_chi2_spectro = .false.
-      logg_target = -1
-      logg_sigma = -1
-
-   ! include_logL_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! logL_target
-   ! ~~~~~~~~~~~
-   ! logL_sigma
-   ! ~~~~~~~~~~
-   ! ``logL`` is the logarithm (base 10) of the luminosity in solar units. ::
-
-      include_logL_in_chi2_spectro = .false.
-      logL_target = -1
-      logL_sigma = -1
-
-   ! include_FeH_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! FeH_target
-   ! ~~~~~~~~~~
-   ! FeH_sigma
-   ! ~~~~~~~~~
    ! Z_div_X_solar
    ! ~~~~~~~~~~~~~
-   ! ``FeH`` is the the model [Fe/H] computed as ``log10((Z/X)/Z_div_X_solar)``
-   ! using model surface average values for ``Z`` and ``X``. ::
+   ! Convenience parameter leftover from the old interface that
+   ! can be used when calculating things relative to solar metallicity.
 
-      include_FeH_in_chi2_spectro = .false. ! [Fe/H]
-      FeH_target = -1
-      FeH_sigma = -1
       Z_div_X_solar = 0.02293d0
-
-   ! include_logR_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! logR_target
-   ! ~~~~~~~~~~~
-   ! logR_sigma
-   ! ~~~~~~~~~~
-   ! ``logR`` is the logarithm (base 10) of the radius, in solar units. ::
-
-      include_logR_in_chi2_spectro = .false.
-      logR_target = 0
-      logR_sigma = 1d-4
-
-   ! include_surface_Z_div_X_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! surface_Z_div_X_target
-   ! ~~~~~~~~~~~~~~~~~~~~~~
-   ! surface_Z_div_X_sigma
-   ! ~~~~~~~~~~~~~~~~~~~~~
-   ! ``surface_Z_div_X`` is the ratio of the surface average
-   ! metallicity ``Z`` and hydrogen abundance ``X``. ::
-
-      include_surface_Z_div_X_in_chi2_spectro = .false.
-      surface_Z_div_X_target = 2.292d-2 ! GS98 value
-!      !surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
-      surface_Z_div_X_sigma = 1d-3
-
-   ! include_surface_He_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! surface_He_target
-   ! ~~~~~~~~~~~~~~~~~
-   ! surface_He_sigma
-   ! ~~~~~~~~~~~~~~~~
-   ! ``surface_He`` is the surface helium abundance. ::
-
-      include_surface_He_in_chi2_spectro = .false.
-      surface_He_target = 0.2485d0 ! Bahcall, Serenelli, Basu, 2005
-      surface_He_sigma = 0.0034
 
    ! include_age_in_chi2_spectro
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,38 +132,6 @@
    ! This should be much smaller than ``age_sigma``.
 
       dt_for_smaller_steps_before_age_target = 0.0065d8 ! 1/10 age_sigma
-
-   ! include_Rcz_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! Rcz_target
-   ! ~~~~~~~~~~
-   ! Rcz_sigma
-   ! ~~~~~~~~~
-   ! ``Rcz`` is the radius of the base of the convective zone, in solar radii. ::
-
-      include_Rcz_in_chi2_spectro = .false. ! radius of base of convective zone
-      Rcz_target = 0.713d0 ! Bahcall, Serenelli, Basu, 2005
-      Rcz_sigma = 1d-3
-
-   ! include_my_var_in_chi2_spectro
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! my_var_target
-   ! ~~~~~~~~~~~~~~
-   ! my_var_sigma
-   ! ~~~~~~~~~~~~~
-
-   ! To include user-defined variables in the non-seismic |chi^2|,
-   ! set the ``my_var`` variables in your ``extras_check_model`` routine. i.e. ::
-
-   !     use astero_data, only: my_var
-   !     my_var(1) = ......
-
-   ! then set the target values and uncertainties using these controls. ::
-
-      include_my_var_in_chi2_spectro(:) = .false.
-      my_var_target(:) = 0
-      my_var_sigma(:) = 0
-      my_var_name(:) = '' ! change this to whatever you want
 
    ! Seismic observations
    ! --------------------
@@ -975,20 +881,6 @@
 
       max_yrs_dt_chi2_smallest_limit = 5d4 ! < max_yrs_dt_chi2_smaller_limit
 
-   ! sigmas_coeff_for_logg_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_logL_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_Teff_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_logR_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_surface_Z_div_X_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_surface_He_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_Rcz_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! sigmas_coeff_for_delta_nu_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! sigmas_coeff_for_my_var_limit
@@ -1006,17 +898,10 @@
    ! We only use limits where ``sigma_coeff_X`` is not zero.
    ! If ``sigma_coeff`` is positive, we stop when that value is greater than the limit.
    ! If ``sigma_coeff`` is negative, we stop when that value is less than the limit.
-   ! Hence, use positive ``sigma_coeff`` for values that are increasing (e.g. ``logL``)
+   ! Hence, use positive ``sigma_coeff`` for values that are increasing (e.g. ``log_L``)
    ! and negative ``sigma_coeff`` for values that are decreasing
-   ! (e.g. ``logg``, ``Teff``, ``delta_nu``). ::
+   ! (e.g. ``log_g``, ``Teff``, ``delta_nu``). ::
 
-      sigmas_coeff_for_logg_limit = -5
-      sigmas_coeff_for_logL_limit = 5
-      sigmas_coeff_for_Teff_limit = -5
-      sigmas_coeff_for_logR_limit = 0
-      sigmas_coeff_for_surface_Z_div_X_limit = 0
-      sigmas_coeff_for_surface_He_limit = 0
-      sigmas_coeff_for_Rcz_limit = 0
       sigmas_coeff_for_delta_nu_limit = 0
       sigmas_coeff_for_my_var_limit(:) = 0
 

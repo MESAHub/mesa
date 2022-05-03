@@ -1565,6 +1565,8 @@
             end if
          end if
                   
+         sample_my_var(1:max_constraints,i) = best_my_var(1:max_constraints)
+
          sample_op_code(i) = op_code
          sample_chi2(i) = best_chi2
          sample_chi2_seismo(i) = best_chi2_seismo
@@ -1585,18 +1587,6 @@
          sample_init_he4(i) = current_he4
          sample_init_Z(i) = current_Z
 
-         sample_radius(i) = best_radius
-         sample_logL(i) = best_logL
-         sample_Teff(i) = best_Teff
-         sample_logg(i) = best_logg
-         sample_FeH(i) = best_FeH
-         
-         sample_logR(i) = best_logR
-         sample_surface_Z_div_X(i) = best_surface_Z_div_X
-         sample_surface_He(i) = best_surface_He
-         sample_Rcz(i) = best_Rcz
-         sample_my_var(1:max_constraints,i) = best_my_var
-         
          sample_surf_coef1(i) = best_surf_coef1
          sample_surf_coef2(i) = best_surf_coef2
          sample_delta_nu(i) = best_delta_nu
@@ -1701,15 +1691,6 @@
          best_init_he4 = 0
          best_init_Z = 0
          best_age = 0
-         best_radius = 0
-         best_logL = 0
-         best_Teff = 0
-         best_logg = 0
-         best_FeH = 0
-         best_logR = 0
-         best_surface_Z_div_X = 0
-         best_surface_He = 0
-         best_Rcz = 0
          best_my_var = 0
          best_my_param1 = 0
          best_my_param2 = 0

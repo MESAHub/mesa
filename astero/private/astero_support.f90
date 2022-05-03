@@ -1521,76 +1521,10 @@
          chi2sum2 = 0
          chi2N2 = 0
          
-         if (Teff_sigma > 0 .and. include_Teff_in_chi2_spectro) then
-            Teff = s% Teff
-            chi2term = pow2((Teff - Teff_target)/Teff_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term Teff', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logL_sigma > 0 .and. include_logL_in_chi2_spectro) then
-            logL = s% log_surface_luminosity
-            chi2term = pow2((logL - logL_target)/logL_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logL', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logg_sigma > 0 .and. include_logg_in_chi2_spectro) then
-            chi2term = pow2((logg - logg_target)/logg_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logg', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (FeH_sigma > 0 .and. include_FeH_in_chi2_spectro) then
-            chi2term = pow2((FeH - FeH_target)/FeH_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term FeH', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logR_sigma > 0 .and. include_logR_in_chi2_spectro) then
-            chi2term = pow2((logR - logR_target)/logR_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logR', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
             chi2term = pow2((s% star_age - age_target)/age_sigma)
             if (trace_okay .and. trace_chi2_spectro_info) &
                write(*,2) 'chi2_spectro_term age', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (surface_Z_div_X_sigma > 0 .and. include_surface_Z_div_X_in_chi2_spectro) then
-            chi2term = pow2((surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term surface_Z_div_X', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (surface_He_sigma > 0 .and. include_surface_He_in_chi2_spectro) then
-            chi2term = pow2((surface_He - surface_He_target)/surface_He_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term surface_He', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (Rcz_sigma > 0 .and. include_Rcz_in_chi2_spectro) then
-            chi2term = pow2((Rcz - Rcz_target)/Rcz_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term Rcz', s% model_number, chi2term
             chi2sum2 = chi2sum2 + chi2term
             chi2N2 = chi2N2 + 1
          end if

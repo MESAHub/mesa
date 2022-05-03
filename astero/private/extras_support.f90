@@ -77,7 +77,6 @@
          chi2 = -1
          chi2_seismo = -1
          chi2_spectro = -1
-         FeH = -1
          delta_nu_model = -1
          nu_max_model = -1
          a_div_r = -1
@@ -206,27 +205,6 @@
 
          end if
          
-         surface_X = max(s% surface_h1, 1d-10)
-         surface_He = s% surface_he3 + s% surface_he4
-         surface_Z = max(1d-99, min(1d0, 1 - (surface_X + surface_He)))
-         surface_Z_div_X = surface_Z/surface_X
-         FeH = log10((surface_Z_div_X)/Z_div_X_solar)
-         logg = log10(s% grav(1))
-         logR = log10(s% photosphere_r)
-         if (.not. include_Rcz_in_chi2_spectro) then
-            Rcz = 0
-         else
-            do i = 1, s% nz-1 ! locate bottom of solar convective zone
-               if (s% mixing_type(i+1) /= convective_mixing &
-                     .and. s% mixing_type(i) == convective_mixing) then
-                  if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
-                     Rcz = s% r(i)/Rsun
-                     exit
-                  end if
-               end if
-            end do
-         end if
-
          ! must set constraint values before checking limits
          do i = 1, max_constraints
             if (my_var_name(i) == '') cycle
@@ -240,10 +218,11 @@
          chi2_spectro = get_chi2_spectro(s)         
          if (is_bad(chi2_spectro)) then
             write(*,1) 'bad chi2_spectro', chi2_spectro
-            write(*,1) 'FeH', FeH
-            write(*,1) 'surface_Z', surface_Z
-            write(*,1) 'surface_X', surface_X
-            write(*,1) 'Z_div_X_solar', Z_div_X_solar
+
+            do i = 1, max_constraints
+               if (my_var_name(i) /= '') write(*,1) my_var_name(i), my_var(i)
+            end do
+
             chi2_spectro = 1d99
             do_astero_extras_check_model = terminate
             return
@@ -644,64 +623,11 @@
          
          
          subroutine check_limits
-            real(dp) :: logg_limit, logL_limit, Teff_limit, delta_nu_limit, &
-               logR_limit, surface_Z_div_X_limit, surface_He_limit, Rcz_limit, &
-               my_var_limit
+            real(dp) :: delta_nu_limit, my_var_limit
             integer :: nz, i
             include 'formats'
             nz = s% nz
 
-            if (sigmas_coeff_for_Teff_limit /= 0 .and. Teff_sigma > 0) then
-               Teff_limit = Teff_target + Teff_sigma*sigmas_coeff_for_Teff_limit
-               if ((sigmas_coeff_for_Teff_limit > 0 .and. s% Teff > Teff_limit) .or. &
-                   (sigmas_coeff_for_Teff_limit < 0 .and. s% Teff < Teff_limit)) then
-                  write(*,*) 'have reached Teff limit'
-                  write(*,1) 'Teff', s% Teff
-                  write(*,1) 'Teff_limit', Teff_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if    
-               if (trace_limits) then
-                  write(*,1) 'Teff', s% Teff
-                  write(*,1) 'Teff_limit', Teff_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_logg_limit /= 0 .and. logg_sigma > 0) then    
-               logg_limit = logg_target + logg_sigma*sigmas_coeff_for_logg_limit
-               if ((sigmas_coeff_for_logg_limit > 0 .and. logg > logg_limit) .or. &
-                   (sigmas_coeff_for_logg_limit < 0 .and. logg < logg_limit)) then
-                  write(*,*) 'have reached logg limit'
-                  write(*,1) 'logg', logg
-                  write(*,1) 'logg_limit', logg_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'logg', logg
-                  write(*,1) 'logg_limit', logg_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_logL_limit /= 0 .and. logL_sigma > 0) then
-               logL_limit = logL_target + logL_sigma*sigmas_coeff_for_logL_limit
-               if ((sigmas_coeff_for_logL_limit > 0 .and. s% log_surface_luminosity > logL_limit) .or. &
-                   (sigmas_coeff_for_logL_limit < 0 .and. s% log_surface_luminosity < logL_limit)) then
-                  write(*,*) 'have reached logL limit'
-                  write(*,1) 'logL', s% log_surface_luminosity
-                  write(*,1) 'logL_limit', logL_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'logL', s% log_surface_luminosity
-                  write(*,1) 'logL_limit', logL_limit
-               end if
-            end if
-            
             if (sigmas_coeff_for_delta_nu_limit /= 0 .and. delta_nu_sigma > 0 .and. delta_nu > 0) then
                delta_nu_limit = &
                   delta_nu + delta_nu_sigma*sigmas_coeff_for_delta_nu_limit
@@ -717,80 +643,6 @@
                if (trace_limits) then
                   write(*,1) 'delta_nu_model', delta_nu_model
                   write(*,1) 'delta_nu_limit', delta_nu_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_logR_limit /= 0 .and. logR_sigma > 0) then
-               logR_limit = logR_target + logR_sigma*sigmas_coeff_for_logR_limit
-               if ((sigmas_coeff_for_logR_limit > 0 .and. logR > logR_limit) .or. &
-                   (sigmas_coeff_for_logR_limit < 0 .and. logR < logR_limit)) then
-                  write(*,*) 'have reached logR limit'
-                  write(*,1) 'logR', logR
-                  write(*,1) 'logR_limit', logR_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'logR', logR
-                  write(*,1) 'logR_limit', logR_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_surface_Z_div_X_limit /= 0 .and. surface_Z_div_X_sigma > 0) then
-               surface_Z_div_X_limit = surface_Z_div_X_target + &
-                  surface_Z_div_X_sigma*sigmas_coeff_for_surface_Z_div_X_limit
-               if ((sigmas_coeff_for_surface_Z_div_X_limit > 0 .and. &
-                     surface_Z_div_X > surface_Z_div_X_limit) .or. &
-                     (sigmas_coeff_for_surface_Z_div_X_limit < 0 .and. &
-                      surface_Z_div_X < surface_Z_div_X_limit)) then
-                  write(*,*) 'have reached surface_Z_div_X limit'
-                  write(*,1) 'surface_Z_div_X', surface_Z_div_X
-                  write(*,1) 'surface_Z_div_X_limit', surface_Z_div_X_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'surface_Z_div_X', surface_Z_div_X
-                  write(*,1) 'surface_Z_div_X_limit', surface_Z_div_X_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_surface_He_limit /= 0 .and. surface_He_sigma > 0) then
-               surface_He_limit = surface_He_target + &
-                     surface_He_sigma*sigmas_coeff_for_surface_He_limit
-               if ((sigmas_coeff_for_surface_He_limit > 0 .and. &
-                     surface_He > surface_He_limit) .or. &
-                   (sigmas_coeff_for_surface_He_limit < 0 .and. &
-                     surface_He < surface_He_limit)) then
-                  write(*,*) 'have reached surface_He limit'
-                  write(*,1) 'surface_He', surface_He
-                  write(*,1) 'surface_He_limit', surface_He_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'surface_He', surface_He
-                  write(*,1) 'surface_He_limit', surface_He_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_Rcz_limit /= 0 .and. Rcz_sigma > 0) then
-               Rcz_limit = Rcz_target + Rcz_sigma*sigmas_coeff_for_Rcz_limit
-               if ((sigmas_coeff_for_Rcz_limit > 0 .and. Rcz > Rcz_limit) .or. &
-                   (sigmas_coeff_for_Rcz_limit < 0 .and. Rcz < Rcz_limit)) then
-                  write(*,*) 'have reached Rcz limit'
-                  write(*,1) 'Rcz', Rcz
-                  write(*,1) 'Rcz_limit', Rcz_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'Rcz', Rcz
-                  write(*,1) 'Rcz_limit', Rcz_limit
                end if
             end if
 
@@ -828,45 +680,10 @@
          include 'formats'
          cnt = 0
          sum = 0
-         if (include_logL_in_chi2_spectro) then
-            cnt = cnt + 1
-            logL = s% log_surface_luminosity
-            sum = sum + pow2((logL - logL_target)/logL_sigma)
-         end if
-         if (include_logg_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((logg - logg_target)/logg_sigma)
-         end if
-         if (include_Teff_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((s% Teff - Teff_target)/Teff_sigma)
-         end if
-         if (include_FeH_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((FeH - FeH_target)/FeH_sigma)
-         end if
-         if (include_logR_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((logR - logR_target)/logR_sigma)
-         end if
+
          if (include_age_in_chi2_spectro) then
             cnt = cnt + 1
             sum = sum + pow2((s% star_age - age_target)/age_sigma)
-         end if
-         if (include_surface_Z_div_X_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + &
-               pow2( &
-               (surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-         end if
-         if (include_surface_He_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (surface_He - surface_He_target)/surface_He_sigma)
-         end if
-         if (include_Rcz_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((Rcz - Rcz_target)/Rcz_sigma)
          end if
 
          do i = 1, max_constraints
@@ -895,16 +712,7 @@
          
          best_age = s% star_age
          best_model_number = s% model_number
-         best_radius = s% photosphere_r
-         best_logL = s% log_surface_luminosity
-         best_Teff = s% Teff
-         best_logg = logg
-         best_FeH = FeH
-         
-         best_logR = logR
-         best_surface_Z_div_X = surface_Z_div_X
-         best_surface_He = surface_He
-         best_Rcz = Rcz
+
          best_my_var(1:max_constraints) = my_var(1:max_constraints)
 
          best_my_param1 = my_param1
