@@ -18,26 +18,55 @@
       normalize_chi2_spectro = .true.
       ! only need to give values for target and sigma if include in chi^2
       
-      include_Teff_in_chi2_spectro = .true.
-      Teff_target = 5650d0
-      Teff_sigma = 65d0
+      include_my_var_in_chi2_spectro(1) = .true.
+      my_var_target(1) = 5650d0
+      my_var_sigma(1) = 65d0
+      my_var_name(1) = 'Teff'
 
-      include_logg_in_chi2_spectro = .false.
-      logg_target = 3.97d0
-      logg_sigma = 0.02d0
-   
-      include_logL_in_chi2_spectro = .true.
-      logL_target = -0.1d0
-      logL_sigma = 0.05d0
-      
-      include_FeH_in_chi2_spectro = .false. ! [Fe/H]
-      FeH_target = 0.0
-      FeH_sigma = 0.05
-      
-         ! we calculate model [Fe/H] as = log10((Z/X)/Z_div_X_solar)
-         ! using model surface average values for Z and X.
-         Z_div_X_solar = 0.02293d0
-      
+      include_my_var_in_chi2_spectro(2) = .false.
+      my_var_target(2) = 3.97d0
+      my_var_sigma(2) = 0.02d0
+      my_var_name(2) = 'log_g'
+
+      include_my_var_in_chi2_spectro(3) = .true.
+      my_var_target(3) = -0.1d0
+      my_var_sigma(3) = 0.05d0
+      my_var_name(3) = 'log_L'
+
+      ! we calculate model [M/H] as = log10((Z/X)/Z_div_X_solar)
+      ! using model surface average values for Z and X.
+      Z_div_X_solar = 0.02293d0
+
+      include_my_var_in_chi2_spectro(4) = .true. ! [Fe/H]
+      my_var_target(4) = 0.0
+      my_var_sigma(4) = 0.05
+      my_var_name(4) = 'M_H'
+
+      include_my_var_in_chi2_spectro(5) = .false.
+      my_var_target(5) = 0
+      my_var_sigma(5) = 1d-4
+      my_var_name(5) = 'log_R'
+
+      my_var_name(6) = 'star_mass'
+
+      include_my_var_in_chi2_spectro(7) = .false.
+      my_var_target(7) = 0.6960363964d0
+      my_var_sigma(7) = 0.001d0
+      my_var_name(7) = 'Rcz'
+
+      include_my_var_in_chi2_spectro(8) = .false.
+      my_var_target(8) = 0.02293d0
+      my_var_sigma(8) = 1d-3
+      my_var_name(8) = 'surface_Z_div_X'
+         ! reminder: surface_Z_div_X = surface_Z/surface_X
+         ! and FeH = log10(surface_Z_div_X/Z_div_X_solar)
+         ! where Z_div_X_solar is a parameter specified in this inlist
+
+      include_my_var_in_chi2_spectro(9) = .false.
+      my_var_target(9) = 0.267d0
+      my_var_sigma(9) = 0.0034d0
+      my_var_name(9) = 'surface_He'
+
       ! NOTE: for plotting with pgstar loggTe window -- logg vs. Teff
          ! you need to set the following pgstar controls
          ! loggTe_target_logg
@@ -50,25 +79,6 @@
          ! HR_target_logL_sigma
          ! HR_target_Teff
          ! HR_target_Teff_sigma
-   ! optional extra chi2 terms -- e.g., can be used for solar calibration
-      ! for simplicity, we lump these in with the chi2_spectro terms.
-      ! only need to give values for target and sigma if include in chi^2
-   
-      include_logR_in_chi2_spectro = .false.
-      logR_target = 0
-      logR_sigma = 1d-4
-   
-      include_surface_Z_div_X_in_chi2_spectro = .false.
-      surface_Z_div_X_target = 2.292d-2 ! GS98 value
-      !surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
-      surface_Z_div_X_sigma = 1d-3
-         ! reminder: surface_Z_div_X = surface_Z/surface_X
-         ! and FeH = log10(surface_Z_div_X/Z_div_X_solar)
-         ! where Z_div_X_solar is a parameter specified in this inlist
-   
-      include_surface_He_in_chi2_spectro = .false.
-      surface_He_target = 0.2485d0 ! Bahcall, Serenelli, Basu, 2005
-      surface_He_sigma = 0.0034
 
       include_age_in_chi2_spectro = .false.
       age_target = 4.5695d9 ! (see Bahcall, Serenelli, and Basu, 2006)
@@ -526,33 +536,19 @@
       ! NOTE: we don't want to stop too soon, so these limits
          ! are only tested for models that are okay for the Lnuc_div_L_limit.
       
-         ! logg_limit = logg_target + logg_sigma*sigmas_coeff_for_logg_limit
-         ! logL_limit = logL_target + logL_sigma*sigmas_coeff_for_logL_limit
-         ! Teff_limit = Teff_target + Teff_sigma*sigmas_coeff_for_Teff_limit
-         ! logR_limit = logR_target + logR_sigma*sigmas_coeff_for_logR_limit
-         ! surface_Z_div_X_limit = surface_Z_div_X_target + 
-            ! surface_Z_div_X_sigma*sigmas_coeff_for_surface_Z_div_X_limit
-         ! surface_He_limit = surface_He_target + &
-            ! surface_He_sigma*sigmas_coeff_for_surface_He_limit
-         ! Rcz_limit = Rcz_target + Rcz_sigma*sigmas_coeff_for_Rcz_limit
+         ! limit = target + sigma*sigmas_coeff_for_limit
+
          ! delta_nu_limit = delta_nu + &
             ! delta_nu_sigma*sigmas_coeff_for_delta_nu_limit
          
          ! only use limits with sigma_coeff /= 0
          ! if the sigma_coeff is > 0, then stop when value is > limit
          ! if the sigma_coeff is < 0, then stop when value is < limit
-         ! so use positive sigma_coeff for values that are increasing (such as logL)
-         ! and negative ones for values that are decreasing (logg, Teff, delta_nu)
-         
-         sigmas_coeff_for_logg_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_logL_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_Teff_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_logR_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_surface_Z_div_X_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_surface_He_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_Rcz_limit = 0 ! disable by setting to 0
+         ! so use positive sigma_coeff for values that are increasing (such as log_L)
+         ! and negative ones for values that are decreasing (log_g, Teff, delta_nu)
+
          sigmas_coeff_for_delta_nu_limit = 0 ! disable by setting to 0
-         sigmas_coeff_for_my_var_limit = 0, 0, 0 ! disable by setting to 0
+         sigmas_coeff_for_my_var_limit(:) = 0 ! disable by setting to 0, which is the default
       
       
       ! you can stop the run if chi^2 is rising.
@@ -654,10 +650,7 @@
       ! trace limits
          trace_limits = .false.
          ! if true, write info to terminal about status relative to various limits
-         ! such as Teff_limit = Teff_target + Teff_sigma*sigmas_coeff_for_Teff_limit
-         ! run will stop when Teff < Teff_limit.
-         ! trace will write out values of Teff and Teff_limit
-         ! same for other limits such as for logg, logL, delta_nu, etc.
+         ! set using sigmas_coeff_for_limit above
    
    
       ! save all control settings to file

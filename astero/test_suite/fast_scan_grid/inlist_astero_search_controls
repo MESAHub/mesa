@@ -113,7 +113,7 @@
       
       trace_chi2_seismo_delta_nu_info = .false. ! if true, output info to terminal
       trace_chi2_seismo_nu_max_info = .false. ! if true, output info to terminal
-      trace_chi2_seismo_ratios_info = .true. ! if true, output info to terminal
+      trace_chi2_seismo_ratios_info = .false. ! if true, output info to terminal
       trace_chi2_seismo_frequencies_info = .false. ! if true, output info to terminal
 
       trace_chi2_spectro_info = .false. ! if true, output info to terminal

@@ -131,7 +131,7 @@
       logical :: include_Rcz_in_chi2_spectro
       real(dp) :: Rcz_target, Rcz_sigma
 
-      integer, parameter :: max_constraints = 3
+      integer, parameter :: max_constraints = 10
       integer :: num_constraints ! how many are actually used
 
       logical :: include_my_var_in_chi2_spectro(max_constraints)
@@ -1525,7 +1525,7 @@
          call write1_dbl(sample_Rcz(i))
 
          do k = 1, max_constraints
-            if (my_var_name(i) /= '') call write1_dbl(sample_my_var(k,i))
+            if (my_var_name(k) /= '') call write1_dbl(sample_my_var(k,i))
          end do
 
          call write1_dbl(sample_delta_nu(i))
