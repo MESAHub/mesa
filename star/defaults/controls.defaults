@@ -11492,6 +11492,7 @@
     use_other_screening = .false.
     use_other_rate_get = .false.
     use_other_net_derivs = .false.
+    use_other_split_burn = .false.
 
       ! ::
 

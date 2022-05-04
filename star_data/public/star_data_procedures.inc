@@ -107,6 +107,8 @@
             other_neu => null()
          procedure (other_net_get_interface), pointer, nopass :: &
             other_net_get => null()
+         procedure (other_split_burn_interface), pointer, nopass :: &
+            other_split_burn =>null()
             
          procedure (other_adjust_mlt_gradT_fraction_interface), pointer, nopass :: &
             other_adjust_mlt_gradT_fraction => null()
