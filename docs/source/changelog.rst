@@ -103,6 +103,7 @@ This allows adding changes in composition due to nuclear reactions that MESA cou
 This hook only works with soft networks (thus no ``approx`` nets). This hook requires many derivatives to be set, 
 thus users should look at ``net_derivs.f90`` for reference to what needs setting.
 
+There is now a hook ``other_split_burn`` for replacing MESA's split burn routine.
 
 star
 ----

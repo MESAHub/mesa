@@ -61,6 +61,7 @@ install:
 	@$(CP_IF_NEWER) net_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) net_def.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+	@$(CP_IF_NEWER) ../public/burner_finish_substep.inc $(MESA_DIR)/include
 
 nodeps : $(.DEFAULT_GOAL)
 
