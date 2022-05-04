@@ -121,43 +121,34 @@
       end subroutine set_my_vars
       
       
-      subroutine will_set_my_param(id, i, new_value, ierr) ! called from star_astero code
-         !use astero_search_data, only: vary_my_param1
+      subroutine set_my_param(id, name, val, ierr) ! called from star_astero code
          integer, intent(in) :: id
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
+         character(len=strlen), intent(in) :: name ! which of my_param's will be set
+         real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! as example, my_param1 is alpha_mlt
-         ! if (i == 1) then
-         !    call star_ptr(id, s, ierr)
-         !    if (ierr /= 0) return
-         !    s% mixing_length_alpha = new_value
-         ! end if
+         select case (name)
+            case ('semiconv')
+               s% alpha_semiconvection = val
+               write(*,*) 'set semiconvection to', val
+            case ('thermohal')
+               s% thermohaline_coeff = val
+               write(*,*) 'set thermohaline to', val
+            case ('diffusion')
+               s% diffusion_class_factor(:) = val
+               write(*,*) 'set diffusion to', val
+            case default
+               ierr = -1
+               write(*,*) 'invalid name in set_my_param', name
+               return
+         end select
 
-         if (i == 1) then
-            s% alpha_semiconvection = new_value
-            write(*,*) 'set semiconvection to', new_value
-         else if (i == 2) then
-            s% thermohaline_coeff = new_value
-            write(*,*) 'set thermohaline to', new_value
-         else if (i == 3) then
-            s% diffusion_class_factor(:) = new_value
-            write(*,*) 'set diffusion to', new_value
-         else
-            ierr = -1
-            write(*,*) 'invalid index in will_set_my_param', i
-            return
-         end if
-
-      end subroutine will_set_my_param
+      end subroutine set_my_param
       
       
       subroutine extras_startup(id, restart, ierr)
@@ -247,22 +238,6 @@
       end function extras_check_model
 
 
-      subroutine set_my_param(s, i, new_value)
-         type (star_info), pointer :: s
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
-         include 'formats'
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! for example, my_param1 is mass
-         if (i == 1) then
-            s% job% new_mass = new_value
-         end if
-         
-      end subroutine set_my_param
-
-       
       integer function how_many_extra_history_columns(id)
          integer, intent(in) :: id
          integer :: ierr

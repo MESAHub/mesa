@@ -126,6 +126,9 @@
       integer  :: nl(0:3)
       real(dp) :: freq_target(0:3,max_nl)
       real(dp) :: freq_sigma(0:3,max_nl)
+
+      integer, parameter :: max_parameters = 3
+      integer :: num_parameters = 3
             
       character (len=100) :: search_type
       
@@ -161,8 +164,7 @@
       integer :: &
          file_column_for_FeH, file_column_for_Y, file_column_for_f_ov, &
          file_column_for_alpha, file_column_for_mass, &
-         file_column_for_my_param1, file_column_for_my_param2, &
-         file_column_for_my_param3
+         file_column_for_my_param(max_parameters)
       character (len=256) :: from_file_output_filename
       
       logical :: Y_depends_on_Z
@@ -174,13 +176,10 @@
       real(dp) :: max_FeH, max_Y, max_mass, max_alpha, max_f_ov
       real(dp) :: delta_Y, delta_FeH, delta_mass, delta_alpha, delta_f_ov
       
-      logical :: vary_my_param1, vary_my_param2, vary_my_param3
-      real(dp) :: &
-         first_my_param1, first_my_param2, first_my_param3, &
-         min_my_param1, min_my_param2, min_my_param3, &
-         max_my_param1, max_my_param2, max_my_param3, &
-         delta_my_param1, delta_my_param2, delta_my_param3
-      character (len=32) :: my_param1_name, my_param2_name, my_param3_name
+      logical :: vary_my_param(max_parameters)
+      real(dp), dimension(max_parameters) :: &
+         first_my_param, min_my_param, max_my_param, delta_my_param
+      character (len=strlen) :: my_param_name(max_parameters)
       
       real(dp) :: f0_ov_div_f_ov, Lnuc_div_L_limit, &
          chi2_spectroscopic_limit, chi2_radial_limit, chi2_delta_nu_limit
@@ -362,21 +361,20 @@
          max_num_from_file, &
          file_column_for_FeH, file_column_for_Y, file_column_for_f_ov, &
          file_column_for_alpha, file_column_for_mass, &
-         file_column_for_my_param1, file_column_for_my_param2, &
-         file_column_for_my_param3, &
+         file_column_for_my_param, &
          from_file_output_filename, &
          Y_depends_on_Z, Y0, dYdZ, &
          vary_FeH, vary_Y, vary_mass, vary_alpha, vary_f_ov, &
-         vary_my_param1, vary_my_param2, vary_my_param3, &
+         vary_my_param, &
          first_FeH, first_Y, first_mass, first_alpha, first_f_ov, &
-         first_my_param1, first_my_param2, first_my_param3, &
+         first_my_param, &
          min_FeH, min_Y, min_mass, min_alpha, min_f_ov, &
-         min_my_param1, min_my_param2, min_my_param3, &
+         min_my_param, &
          max_FeH, max_Y, max_mass, max_alpha, max_f_ov, &
-         max_my_param1, max_my_param2, max_my_param3, &
+         max_my_param, &
          delta_Y, delta_FeH, delta_mass, delta_alpha, delta_f_ov, &
-         delta_my_param1, delta_my_param2, delta_my_param3, &
-         my_param1_name, my_param2_name, my_param3_name, &
+         delta_my_param, &
+         my_param_name, &
          f0_ov_div_f_ov, &
          Lnuc_div_L_limit, chi2_spectroscopic_limit, &
          chi2_radial_limit, chi2_delta_nu_limit, &
@@ -572,11 +570,11 @@
       integer :: &
          i_Y, i_FeH, &
          i_mass, i_alpha, i_f_ov, &
-         i_my_param1, i_my_param2, i_my_param3
+         i_my_param(max_parameters)
       real(dp) :: &
          final_Y, final_FeH, &
          final_mass, final_alpha, final_f_ov, &
-         final_my_param1, final_my_param2, final_my_param3
+         final_my_param(max_parameters)
 
       real(dp) :: initial_max_years_for_timestep
       logical :: okay_to_restart
@@ -587,7 +585,7 @@
          next_initial_h1_to_try, next_initial_he3_to_try, &
          next_initial_he4_to_try, &
          next_mass_to_try, next_alpha_to_try, next_f_ov_to_try, &
-         next_my_param1_to_try, next_my_param2_to_try, next_my_param3_to_try
+         next_my_param_to_try(max_parameters)
 
       real(dp) :: avg_nu_obs, avg_radial_n
       real(dp) :: chi2_seismo_freq_fraction
@@ -603,9 +601,7 @@
          best_init_he4, &
          best_init_Z, &
          best_age, &
-         best_my_param1, &
-         best_my_param2, &
-         best_my_param3, &
+         best_my_param(max_parameters), &
          best_delta_nu, &
          best_nu_max, &
          best_surf_coef1, &
@@ -643,15 +639,13 @@
          sample_mass, &
          sample_alpha, &
          sample_f_ov, &
-         sample_my_param1, &
-         sample_my_param2, &
-         sample_my_param3, &
          sample_delta_nu, &
          sample_nu_max, &
          sample_surf_coef1, &
          sample_surf_coef2
 
       real(dp), pointer, dimension(:,:) :: sample_my_var
+      real(dp), pointer, dimension(:,:) :: sample_my_param
          
       integer, pointer, dimension(:) :: &
          sample_index_by_chi2, &
@@ -680,7 +674,7 @@
          chi2_seismo, chi2_spectro, chi2_radial, chi2_delta_nu, chi2_nu_max, &
          chi2_r_010_ratios, chi2_r_02_ratios, chi2_frequencies, &
          initial_Y, initial_FeH, initial_Z_div_X, &
-         my_var(max_constraints), my_param1, my_param2, my_param3
+         my_var(max_constraints), my_param(max_parameters)
 
       integer :: star_id, star_model_number
       integer :: num_chi2_seismo_terms, num_chi2_spectro_terms
@@ -696,9 +690,7 @@
          current_he3, &
          current_he4, &
          current_Z, &
-         current_my_param1, &
-         current_my_param2, &
-         current_my_param3
+         current_my_param(max_parameters)
 
       integer, parameter :: num_extra_history_columns = 5
 
@@ -714,13 +706,13 @@
             integer, intent(out) :: ierr
          end subroutine set_my_vars_interface
 
-         subroutine will_set_my_param_interface(id, i, new_value, ierr)
-            use const_def, only: dp
+         subroutine set_my_param_interface(id, name, val, ierr)
+            use const_def, only: dp, strlen
             integer, intent(in) :: id
-            integer, intent(in) :: i ! which of my_param's will be set
-            real(dp), intent(in) :: new_value
+            character(len=strlen), intent(in) :: name ! which my_param to set
+            real(dp), intent(in) :: val
             integer, intent(out) :: ierr
-         end subroutine will_set_my_param_interface
+         end subroutine set_my_param_interface
 
          subroutine extras_controls_interface(id, ierr)
             integer, intent(in) :: id
@@ -731,7 +723,7 @@
 
       type astero_procs
          procedure(set_my_vars_interface), pointer, nopass :: set_my_vars
-         procedure(will_set_my_param_interface), pointer, nopass :: will_set_my_param
+         procedure(set_my_param_interface), pointer, nopass :: set_my_param
          procedure(extras_startup_interface), pointer, nopass :: extras_startup
          procedure(extras_controls_interface), pointer, nopass :: extras_controls
          procedure(extras_check_model_interface), pointer, nopass :: extras_check_model
@@ -754,7 +746,7 @@
       
       subroutine init_astero_def
          star_astero_procs% set_my_vars => null()
-         star_astero_procs% will_set_my_param => null()
+         star_astero_procs% set_my_param => null()
          star_astero_procs% extras_startup => null()
          star_astero_procs% extras_controls => null()
          star_astero_procs% extras_check_model => null()
@@ -829,9 +821,7 @@
             sample_mass, &
             sample_alpha, &
             sample_f_ov, &
-            sample_my_param1, &
-            sample_my_param2, &
-            sample_my_param3, &
+            sample_my_param, &
             sample_my_var, &
             sample_delta_nu, &
             sample_nu_max, &
@@ -869,9 +859,8 @@
          call realloc_double(sample_mass,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_alpha,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_f_ov,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_param1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_param2,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_param3,max_num_samples,ierr); if (ierr /= 0) return
+
+         call realloc_double2(sample_my_param,max_parameters,max_num_samples,ierr); if (ierr /= 0) return
 
          call realloc_double2(sample_my_var,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
          
@@ -1253,7 +1242,7 @@
          ! column numbers
          write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
 
-         k = 29 + num_constraints ! fixed columns
+         k = 26 + num_constraints + num_parameters ! fixed columns
 
          if (chi2_seismo_fraction > 0) then
 
@@ -1287,14 +1276,15 @@
             'init_Y', &
             'init_FeH', &
             'alpha', &
-            'f_ov', &
-            trim(my_param1_name), &
-            trim(my_param2_name), &
-            trim(my_param3_name), &
+            'f_ov'
+
+         do i = 1, max_parameters
+            if (my_param_name(i) /= '') write(iounit, fmt, advance='no') trim(my_param_name(i))
+         end do
+
+         write(iounit, fmt, advance='no') &
             'age', &
-            
             'model_number', &
-            
             'init_h1', &
             'init_he3', &
             'init_he4', &
@@ -1398,9 +1388,11 @@
          call write1_dbl(sample_init_FeH(i))
          call write1_dbl(sample_alpha(i))
          call write1_dbl(sample_f_ov(i))
-         call write1_dbl(sample_my_param1(i))
-         call write1_dbl(sample_my_param2(i))
-         call write1_dbl(sample_my_param3(i))
+
+         do k = 1, max_parameters
+            if (my_param_name(k) /= '') call write1_dbl(sample_my_param(k,i))
+         end do
+
          call write1_dbl(sample_age(i))
          call write1_int(sample_model_number(i))
          call write1_dbl(sample_init_h1(i))
@@ -1697,9 +1689,11 @@
          call write1('mass/Msun', current_mass)
          call write1('alpha', current_alpha)
          call write1('f_ov', current_f_ov)
-         call write1(trim(my_param1_name), current_my_param1)
-         call write1(trim(my_param2_name), current_my_param2)
-         call write1(trim(my_param3_name), current_my_param3)
+
+         do i = 1, max_parameters
+            if (my_param_name(i) /= '') call write1(trim(my_param_name(i)), current_my_param(i))
+         end do
+
          write(io,'(a40,1pes20.10)') 'age', best_age
          write(io,'(A)')
          if (chi2_seismo_fraction == 1d0) then
@@ -1837,9 +1831,11 @@
          call read1_dbl(sample_init_FeH(i))
          call read1_dbl(sample_alpha(i))
          call read1_dbl(sample_f_ov(i))
-         call read1_dbl(sample_my_param1(i))
-         call read1_dbl(sample_my_param2(i))
-         call read1_dbl(sample_my_param3(i))
+
+         do k = 1, max_parameters
+            if (my_param_name(k) /= '') call read1_dbl(sample_my_param(k,i))
+         end do
+
          call read1_dbl(sample_age(i))
          call read1_int(sample_model_number(i))
          call read1_dbl(sample_init_h1(i))

@@ -85,25 +85,17 @@
       end subroutine set_my_vars
       
       
-      subroutine will_set_my_param(id, i, new_value, ierr) ! called from star_astero code
+      subroutine set_my_param(id, name, val, ierr) ! called from star_astero code
          !use astero_search_data, only: vary_my_param1
          integer, intent(in) :: id
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
+         character(len=strlen), intent(in) :: name ! which of my_param's will be set
+         real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+
          ierr = 0
 
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! as example, my_param1 is alpha_mlt
-         ! if (i == 1) then
-         !    call star_ptr(id, s, ierr)
-         !    if (ierr /= 0) return
-         !    s% mixing_length_alpha = new_value
-         ! end if
-      end subroutine will_set_my_param
+      end subroutine set_my_param
 
 
       subroutine my_other_adipls_mode_info( &
@@ -211,22 +203,6 @@
       end function extras_check_model
       
       
-      subroutine set_my_param(s, i, new_value)
-         type (star_info), pointer :: s
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
-         include 'formats'
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! for example, my_param1 is mass
-         if (i == 1) then
-            s% job% new_mass = new_value
-         end if
-         
-      end subroutine set_my_param
-
-
       subroutine get_adipls_frequency_info( &
             s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
             save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)

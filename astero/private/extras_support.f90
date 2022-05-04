@@ -715,9 +715,7 @@
 
          best_my_var(1:max_constraints) = my_var(1:max_constraints)
 
-         best_my_param1 = my_param1
-         best_my_param2 = my_param2
-         best_my_param3 = my_param3
+         best_my_param(1:max_parameters) = my_param(1:max_parameters)
          
          best_delta_nu = delta_nu_model
          best_nu_max = nu_max_model
@@ -944,11 +942,13 @@
       
 
       subroutine astero_extras_controls(id, ierr)
-         !use run_star_extras, only: extras_controls, will_set_my_param
+         !use run_star_extras, only: extras_controls, set_my_param
          use pgstar_astero_plots, only: astero_pgstar_plots_info
          use gyre_support, only: gyre_is_enabled, init_gyre
          integer, intent(in) :: id
          integer, intent(out) :: ierr
+
+         integer :: i
          real(dp) :: X, Y, Z, FeH, f_ov, a, b, c
          type (star_info), pointer :: s
          include 'formats'
@@ -1028,41 +1028,21 @@
             s% job% new_mass = first_mass
          end if
 
-         if (vary_my_param1) then
-            call star_astero_procs% will_set_my_param( &
-               s% id, 1, next_my_param1_to_try, ierr)
-            if (ierr /= 0) return
-            my_param1 = next_my_param1_to_try
-         else
-            call star_astero_procs% will_set_my_param( &
-               s% id, 1, first_my_param1, ierr)
-            if (ierr /= 0) return
-            my_param1 = first_my_param1
-         end if
-
-         if (vary_my_param2) then
-            call star_astero_procs% will_set_my_param( &
-               s% id, 2, next_my_param2_to_try, ierr)
-            if (ierr /= 0) return
-            my_param2 = next_my_param2_to_try
-         else
-            call star_astero_procs% will_set_my_param( &
-               s% id, 2, first_my_param2, ierr)
-            if (ierr /= 0) return
-            my_param2 = first_my_param2
-         end if
-
-         if (vary_my_param3) then
-            call star_astero_procs% will_set_my_param( &
-               s% id, 3, next_my_param3_to_try, ierr)
-            if (ierr /= 0) return
-            my_param3 = next_my_param3_to_try
-         else
-            call star_astero_procs% will_set_my_param( &
-               s% id, 3, first_my_param3, ierr)
-            if (ierr /= 0) return
-            my_param3 = first_my_param3
-         end if
+         do i = 1, max_parameters
+            if (my_param_name(i) /= '') then
+               if (vary_my_param(i)) then
+                  call star_astero_procs% set_my_param(&
+                     s% id, my_param_name(i), next_my_param_to_try(i), ierr)
+                  if (ierr /= 0) return
+                  my_param(i) = next_my_param_to_try(i)
+               else
+                  call star_astero_procs% set_my_param(&
+                     s% id, my_param_name(i), first_my_param(i), ierr)
+                  if (ierr /= 0) return
+                  my_param(i) = first_my_param(i)
+               end if
+            end if
+         end do
          
          s% job% relax_initial_mass = .true.
          s% initial_mass = s% job% new_mass
@@ -1082,9 +1062,7 @@
          current_alpha = s% mixing_length_alpha
          current_f_ov = f_ov
 
-         current_my_param1 = my_param1
-         current_my_param2 = my_param2
-         current_my_param3 = my_param3
+         current_my_param(1:max_parameters) = my_param(1:max_parameters)
          
          current_h1 = X
          current_he3 = s% job% initial_he3

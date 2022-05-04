@@ -376,9 +376,9 @@
          file_column_for_FeH = 5
          file_column_for_alpha = 6
          file_column_for_f_ov = 7
-         file_column_for_my_param1 = 8
-         file_column_for_my_param2 = 9
-         file_column_for_my_param3 = 10
+         file_column_for_my_param(1) = 8
+         file_column_for_my_param(2) = 9
+         file_column_for_my_param(3) = 10
          ! note that if you are not varying one of the parameters, f_ov e.g.,
          ! then you don't need to set the file_col for that parameter.
 
@@ -407,13 +407,13 @@
       ! to optimise user-defined parameters
       ! set the "my_param" variables in your set_my_param routine
       ! and set the vary_, first_, min_, max_ and delta_ controls below
-         vary_my_param1 = .true.
-         vary_my_param2 = .false.
-         vary_my_param3 = .true.
+         vary_my_param(1) = .true.
+         vary_my_param(2) = .false.
+         vary_my_param(3) = .true.
 
-         my_param1_name = 'semiconv'
-         my_param2_name = 'thermohal'
-         my_param3_name = 'diffusion'
+         my_param_name(1) = 'semiconv'
+         my_param_name(2) = 'thermohal'
+         my_param_name(3) = 'diffusion'
 
       ! >>>> NOTE: if "vary" is false, the "first" value is used for all runs.
          ! so you must set the first value even when you have vary = .false.
@@ -427,27 +427,27 @@
          first_alpha = 1.8d0
          first_f_ov = 0.015d0
 
-         first_my_param1 = 1d0
-         first_my_param2 = 1d0
-         first_my_param3 = 1d0
+         first_my_param(1) = 1d0
+         first_my_param(2) = 1d0
+         first_my_param(3) = 1d0
 
          min_FeH = -0.1d0
          min_Y = 0.24d0
          min_mass = 0.99d0
          min_alpha = 1.5d0
          min_f_ov = 0d0
-         min_my_param1 = 0.0d0
-         min_my_param2 = 0.0d0
-         min_my_param3 = 0.0d0
+         min_my_param(1) = 0.0d0
+         min_my_param(2) = 0.0d0
+         min_my_param(3) = 0.0d0
          
          max_FeH = 0.1d0
          max_Y = 0.30d0
          max_mass = 1.01d0
          max_alpha = 1.9d0
          max_f_ov = 0.03d0
-         max_my_param1 = 2.0d0
-         max_my_param2 = 2.0d0
-         max_my_param3 = 2.0d0
+         max_my_param(1) = 2.0d0
+         max_my_param(2) = 2.0d0
+         max_my_param(3) = 2.0d0
    
       !search_type = 'scan_grid' uses this grid spacing
          ! note: grid spacing does not apply to other searches
@@ -456,9 +456,9 @@
          delta_mass = 0.02
          delta_alpha = 0.1
          delta_f_ov = 0
-         delta_my_param1 = 2d0
-         delta_my_param2 = 2d0
-         delta_my_param3 = 2d0
+         delta_my_param(1) = 2d0
+         delta_my_param(2) = 2d0
+         delta_my_param(3) = 2d0
          
       ! overshoot_f0 is changed along with overshoot_f
          ! f0_ov = f0_ov_div_f_ov * f_ov

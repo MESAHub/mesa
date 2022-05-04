@@ -542,12 +542,8 @@
    ! ~~~~~~~~~~~~~~~~~~~~~
    ! file_column_for_f_ov
    ! ~~~~~~~~~~~~~~~~~~~~
-   ! file_column_for_my_param1
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! file_column_for_my_param2
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! file_column_for_my_param3
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! file_column_for_my_param
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
    ! You need to say which columns in the file hold the various parameters.
    ! For example, if your file starts like the following: ::
 
@@ -561,9 +557,9 @@
       file_column_for_FeH = 5
       file_column_for_alpha = 6
       file_column_for_f_ov = 7
-      file_column_for_my_param1 = 8
-      file_column_for_my_param2 = 9
-      file_column_for_my_param3 = 10
+      file_column_for_my_param(1) = 8
+      file_column_for_my_param(2) = 9
+      file_column_for_my_param(3) = 10
 
    ! Note that if you are not varying one of the parameters, e.g. ``f_ov``,
    ! then you don't need to set the ``file_column`` for that parameter.
@@ -602,12 +598,8 @@
    ! ~~~~~~~~~~
    ! vary_f_ov
    ! ~~~~~~~~~
-   ! vary_my_param1
-   ! ~~~~~~~~~~~~~~
-   ! vary_my_param2
-   ! ~~~~~~~~~~~~~~
-   ! vary_my_param3
-   ! ~~~~~~~~~~~~~~
+   ! vary_my_param
+   ! ~~~~~~~~~~~~~
    ! If ``vary_X = .true.``, that parameter will be varied by the search.
    ! If ``vary_X = .false.``, that parameter will be fixed at ``first_X``.
    ! To optimise user-defined parameters,
@@ -620,9 +612,7 @@
       vary_alpha = .false. ! mixing length parameter
       vary_f_ov = .false.  ! overshoot parameter
 
-      vary_my_param1 = .false.
-      vary_my_param2 = .false.
-      vary_my_param3 = .false.
+      vary_my_param(:) = .false.
 
    ! my_param1_name
    ! ~~~~~~~~~~~~~~
@@ -632,9 +622,9 @@
    ! ~~~~~~~~~~~~~~
    ! Names for user-defined parameters that will be used in output. ::
 
-      my_param1_name = 'my_param1'
-      my_param2_name = 'my_param2'
-      my_param3_name = 'my_param3'
+      my_param_name(1) = 'my_param1'
+      my_param_name(2) = 'my_param2'
+      my_param_name(3) = 'my_param3'
 
    ! first_FeH
    ! ~~~~~~~~~
@@ -646,12 +636,8 @@
    ! ~~~~~~~~~~~
    ! first_f_ov
    ! ~~~~~~~~~~
-   ! first_my_param1
-   ! ~~~~~~~~~~~~~~~
-   ! first_my_param2
-   ! ~~~~~~~~~~~~~~~
-   ! first_my_param3
-   ! ~~~~~~~~~~~~~~~
+   ! first_my_param
+   ! ~~~~~~~~~~~~~~
    ! Initial parameter values for parameters that vary;
    ! fixed values for parameters that don't. ::
 
@@ -660,9 +646,7 @@
       first_mass = 0
       first_alpha = 0
       first_f_ov = 0
-      first_my_param1 = 0
-      first_my_param2 = 0
-      first_my_param3 = 0
+      first_my_param(:) = 0
 
    ! min_FeH
    ! ~~~~~~~
@@ -674,12 +658,8 @@
    ! ~~~~~~~~~
    ! min_f_ov
    ! ~~~~~~~~
-   ! min_my_param1
-   ! ~~~~~~~~~~~~~
-   ! min_my_param2
-   ! ~~~~~~~~~~~~~
-   ! min_my_param3
-   ! ~~~~~~~~~~~~~
+   ! min_my_param
+   ! ~~~~~~~~~~~~
    ! Lower bounds for parameter values. ::
 
       min_FeH = 0
@@ -687,9 +667,7 @@
       min_mass = 0
       min_alpha = 0
       min_f_ov = 0
-      min_my_param1 = 0
-      min_my_param2 = 0
-      min_my_param3 = 0
+      min_my_param(:) = 0
 
    ! max_FeH
    ! ~~~~~~~
@@ -701,12 +679,8 @@
    ! ~~~~~~~~~
    ! max_f_ov
    ! ~~~~~~~~
-   ! max_my_param1
-   ! ~~~~~~~~~~~~~
-   ! max_my_param2
-   ! ~~~~~~~~~~~~~
-   ! max_my_param3
-   ! ~~~~~~~~~~~~~
+   ! max_my_param
+   ! ~~~~~~~~~~~~
    ! Upper bounds for parameter values. ::
 
       max_FeH = 0
@@ -714,9 +688,7 @@
       max_mass = 0
       max_alpha = 0
       max_f_ov = 0
-      max_my_param1 = 0
-      max_my_param2 = 0
-      max_my_param3 = 0
+      max_my_param(:) = 0
 
    ! delta_FeH
    ! ~~~~~~~~~
@@ -728,12 +700,8 @@
    ! ~~~~~~~~~~~
    ! delta_f_ov
    ! ~~~~~~~~~~
-   ! delta_my_param1
-   ! ~~~~~~~~~~~~~~~
-   ! delta_my_param2
-   ! ~~~~~~~~~~~~~~~
-   ! delta_my_param3
-   ! ~~~~~~~~~~~~~~~
+   ! delta_my_param
+   ! ~~~~~~~~~~~~~~
    ! Grid spacing for parameter values, used when ``search_type = 'scan_grid'``. ::
 
       delta_FeH = 0
@@ -741,9 +709,7 @@
       delta_mass = 0
       delta_alpha = 0
       delta_f_ov = 0
-      delta_my_param1 = 0
-      delta_my_param2 = 0
-      delta_my_param3 = 0
+      delta_my_param(:) = 0
 
    ! f0_ov_div_f_ov
    ! ~~~~~~~~~~~~~~
