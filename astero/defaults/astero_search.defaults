@@ -749,7 +749,7 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! ::
 
-      chi2_limit_for_small_timesteps = 50
+      chi2_limit_for_small_timesteps = -1
 
    ! max_yrs_dt_chi2_small_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -761,7 +761,7 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! ::
 
-      chi2_limit_for_smaller_timesteps = 20 ! < chi2_limit_for_small_timesteps
+      chi2_limit_for_smaller_timesteps = -1 ! < chi2_limit_for_small_timesteps
 
    ! max_yrs_dt_chi2_smaller_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -773,7 +773,7 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! ::
 
-      chi2_limit_for_smallest_timesteps = 10 ! < chi2_limit_for_smaller_timesteps
+      chi2_limit_for_smallest_timesteps = -1 ! < chi2_limit_for_smaller_timesteps
 
    ! max_yrs_dt_chi2_smallest_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
