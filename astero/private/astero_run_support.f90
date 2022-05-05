@@ -473,7 +473,7 @@
          num_my_param(1:max_parameters) = 0
          
          just_counting = .true.
-         call do_my_param3(ierr)
+         call do_my_param(max_parameters, ierr)
          i_total = sample_number
          
          write(*,2) 'grid total', i_total
@@ -503,7 +503,7 @@
             scan_grid_skip_number = 0
          end if
 
-         call do_my_param3(ierr)
+         call do_my_param(max_parameters, ierr)
                  
                  
          contains
@@ -517,60 +517,29 @@
             f_ov = min_f_ov
             my_param(1:max_parameters) = min_my_param(1:max_parameters)
          end subroutine set_starting_values
-         
-         
-         subroutine do_my_param3(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (my_param(3) <= max_my_param(3) + eps .or. .not. vary_my_param(3))
-               if (vary_my_param(3)) next_my_param_to_try(3) = my_param(3)
-               call do_my_param2(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_my_param(3) <= 0 .or. .not. vary_my_param(3)) exit
-               my_param(3) = my_param(3) + delta_my_param(3)
-            end do
-            if (num_my_param(3) == 0) num_my_param(3) = cnt
-            my_param(3) = min_my_param(3)
-         end subroutine do_my_param3
-         
-         
-         subroutine do_my_param2(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (my_param(2) <= max_my_param(2) + eps .or. .not. vary_my_param(2))
-               if (vary_my_param(2)) next_my_param_to_try(2) = my_param(2)
-               call do_my_param1(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_my_param(2) <= 0 .or. .not. vary_my_param(2)) exit
-               my_param(2) = my_param(2) + delta_my_param(2)
-            end do
-            if (num_my_param(2) == 0) num_my_param(2) = cnt
-            my_param(2) = min_my_param(2)
-         end subroutine do_my_param2
 
 
-         subroutine do_my_param1(ierr)
+         recursive subroutine do_my_param(k, ierr)
+            integer, intent(in) :: k
             integer, intent(out) :: ierr
             integer :: cnt
             cnt = 0
             ierr = 0
-            do while (my_param(1) <= max_my_param(1) + eps .or. .not. vary_my_param(1))
-               if (vary_my_param(1)) next_my_param_to_try(1) = my_param(1)
-               call do_f_ov(ierr)
+            do while (my_param(k) <= max_my_param(k) + eps .or. .not. vary_my_param(k))
+               if (vary_my_param(k)) next_my_param_to_try(k) = my_param(k)
+               if (k == 1) then
+                  call do_f_ov(ierr)
+               else
+                  call do_my_param(k-1, ierr)
+               end if
                if (ierr /= 0) return
                cnt = cnt+1
-               if (delta_my_param(1) <= 0 .or. .not. vary_my_param(1)) exit
-               my_param(1) = my_param(1) + delta_my_param(1)
+               if (delta_my_param(k) <= 0 .or. .not. vary_my_param(k)) exit
+               my_param(k) = my_param(k) + delta_my_param(k)
             end do
-            if (num_my_param(1) == 0) num_my_param(1) = cnt
-            my_param(1) = min_my_param(1)
-         end subroutine do_my_param1
+            if (num_my_param(k) == 0) num_my_param(k) = cnt
+            my_param(k) = min_my_param(k)
+         end subroutine do_my_param
 
          
          subroutine do_f_ov(ierr)
