@@ -43,7 +43,7 @@
    ! + ``log_g``
    ! + ``log_L``
    ! + ``log_R``
-   ! + ``M_H``
+   ! + ``M_H`` (was ``FeH``)
    ! + ``surface_Z_div_X``
    ! + ``surface_He``
    ! + ``Rcz``
@@ -93,8 +93,9 @@
    ! normalize_chi2_spectro
    ! ~~~~~~~~~~~~~~~~~~~~~~
 
-   ! If ``.true.``, the total |chi^2| is divided by the number of
-   ! components used to define it. ::
+   ! If ``.true.``, the total |chi^2| computed for the non-seismic
+   ! components (defined above) is divided by the number of components
+   ! used to define it. ::
 
       normalize_chi2_spectro = .true.
 
@@ -268,8 +269,8 @@
 
       l0_n_obs(:) = -1
 
-   ! Optimization parameters
-   ! -----------------------
+   ! Optimization method
+   ! -------------------
 
    ! eval_chi2_at_target_age_only
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -343,13 +344,13 @@
 
    ! The two methods from Powell use quadratic interpolation,
    ! either unconstrained (NEWUOA) or bounded (BOBYQA).
-   ! The Nelder-Mead simplex method doesn't do interpolation;
+   ! The Nelder-Mead simplex method doesn't interpolate;
    ! instead it simply compares values and moves toward lower |chi^2|
    ! and away from higher ones.  In general, you can expect the
    ! Powell methods to converge faster than the simplex if the |chi^2|
    ! terrain is not too "bumpy" (bumps confuse the interpolation).
    ! Since the simplex scheme doesn't do interpolation, bumps
-   ! don't cause it trouble, so it may be more robust.
+   ! don't cause it as much trouble, so it may be more robust.
    ! If you are just getting started, go with simplex at first.
    ! Try the interpolation methods when you have a very good
    ! candidate and want to look near it for even better results. ::
@@ -560,12 +561,68 @@
 
       from_file_output_filename = 'from_file_results.data'
 
+   ! Parameters
+   ! ----------
+
+   ! You can set a large number of parameters (currently up to 100) that will be
+   ! searched/optimized for a best-fitting solution.  Specify the
+   ! parameters by the name, then either implement your own
+   ! parameters in the ``set_my_param`` subroutine in
+   ! ``run_star_extras.f90``, or rely on the default
+   ! implementation, which provides the legacy options
+   ! * ``initial_mass``
+   ! * ``initial_Y``
+   ! * ``initial_FeH``
+   ! * ``alpha``
+   ! * ``f_ov``
+
+   ! my_param_name
+   ! ~~~~~~~~~~~~~~
+   ! Names for parameters that will searched/optimized.  Empty names ``''``
+   ! are ignored. ::
+
+      my_param_name(:) = ''
+
+   ! vary_my_param
+   ! ~~~~~~~~~~~~~
+   ! If ``.true.``, that parameter will be varied by the search.
+   ! If ``.false.``, that parameter will be fixed at the first value
+   ! (see ``first_my_param``).
+
+      vary_my_param(:) = .false.
+
+   ! first_my_param
+   ! ~~~~~~~~~~~~~~
+   ! Initial parameter values for parameters that vary;
+   ! fixed values for parameters that don't. ::
+
+      first_my_param(:) = 0
+
+   ! min_my_param
+   ! ~~~~~~~~~~~~
+   ! max_my_param
+   ! ~~~~~~~~~~~~
+   ! Lower and upper bounds for parameter values. ::
+
+      min_my_param(:) = 0
+      max_my_param(:) = 0
+
+   ! delta_my_param
+   ! ~~~~~~~~~~~~~~
+   ! Grid spacing for parameter values, used when ``search_type = 'scan_grid'``. ::
+
+      delta_my_param(:) = 0
+
    ! Y_depends_on_Z
    ! ~~~~~~~~~~~~~~
    ! Y0
    ! ~~
    ! dYdZ
    ! ~~~~
+   ! Legacy controls from the old interface, which is available with
+   ! the default ``run_star_extras.f90`` by using the parameter names
+   ! ``initial_Y`` and ``initial_FeH`.
+
    ! If ``Y_depends_on_Z = .false.``, ``Y`` is a parameter like any other and you should set
    ! ``vary_Y``, ``first_Y``, ``min_Y`` and ``max_Y`` (and ``delta_Y`` for a grid).
    ! If ``.true.``, ``Y`` depends on ``Z`` according to ::
@@ -578,50 +635,18 @@
       Y0 = 0.248d0
       dYdZ = 1.4d0
 
-   ! vary_my_param
-   ! ~~~~~~~~~~~~~
-   ! If ``vary_X = .true.``, that parameter will be varied by the search.
-   ! If ``vary_X = .false.``, that parameter will be fixed at ``first_X``.
-   ! To optimise user-defined parameters,
-   ! set the ``my_param`` variables in your ``set_my_param`` routine
-   ! and set the ``vary_``, ``first_``, ``min_``, ``max_`` and ``delta_`` controls below. ::
+   ! Y_frac_he3
+   ! ~~~~~~~~~~
+   ! If using the legacy ``initial_Y`` parameter, this controls the
+   ! proportion of the initial helium abundance that's ³He rather than
+   ! ⁴He. ::
 
-      vary_my_param(:) = .false.
-
-   ! my_param_name
-   ! ~~~~~~~~~~~~~~
-   ! Names for user-defined parameters that will be used in output. ::
-
-      my_param_name(:) = ''
-
-   ! first_my_param
-   ! ~~~~~~~~~~~~~~
-   ! Initial parameter values for parameters that vary;
-   ! fixed values for parameters that don't. ::
-
-      first_my_param(:) = 0
-
-   ! min_my_param
-   ! ~~~~~~~~~~~~
-   ! Lower bounds for parameter values. ::
-
-      min_my_param(:) = 0
-
-   ! max_my_param
-   ! ~~~~~~~~~~~~
-   ! Upper bounds for parameter values. ::
-
-      max_my_param(:) = 0
-
-   ! delta_my_param
-   ! ~~~~~~~~~~~~~~
-   ! Grid spacing for parameter values, used when ``search_type = 'scan_grid'``. ::
-
-      delta_my_param(:) = 0
+      Y_frac_he3 = 1d-4 ! = xhe3/(xhe3 + xhe4); Y = xhe3 + xhe4
 
    ! f0_ov_div_f_ov
    ! ~~~~~~~~~~~~~~
-   ! Overshoot ``f0`` is changed along with overshoot ``f`` according to ::
+   ! If using the legacy parameter ``f_ov``, the overshoot ``f0`` is
+   ! changed along with overshoot ``f`` according to ::
 
    !     f0_ov = f0_ov_div_f_ov * f_ov
 
@@ -681,7 +706,8 @@
 
       chi2_radial_limit = 100
 
-   ! We only calculate full chi^2 if pass all these limit checks.
+   ! We only calculate full |chi^2| if the model passes all these
+   ! limit checks.
 
    ! Timestep adjustment
    ! -------------------
@@ -917,9 +943,9 @@
    ! Formats for writing floats (reals), integers and characters
    ! (strings) to the results file.
 
-   astero_results_dbl_format = '(1pes26.16)'
-   astero_results_int_format = '(i26)'
-   astero_results_txt_format = '(a26)'
+      astero_results_dbl_format = '(1pes26.16)'
+      astero_results_int_format = '(i26)'
+      astero_results_txt_format = '(a26)'
 
    ! write_best_model_data_for_each_sample
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1082,12 +1108,6 @@
 
       save_controls = .false. ! dumps &astero_search_controls controls to file
       save_controls_filename = '' ! if empty, uses a default name
-
-   ! Y_frac_he3
-   ! ~~~~~~~~~~
-   ! ::
-
-      Y_frac_he3 = 1d-4 ! = xhe3/(xhe3 + xhe4); Y = xhe3 + xhe4
 
    ! save_mode_model_number
    ! ~~~~~~~~~~~~~~~~~~~~~~

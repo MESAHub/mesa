@@ -127,7 +127,7 @@
       real(dp) :: freq_target(0:3,max_nl)
       real(dp) :: freq_sigma(0:3,max_nl)
 
-      integer, parameter :: max_parameters = 10
+      integer, parameter :: max_parameters = 100
       integer :: num_parameters
             
       character (len=100) :: search_type
