@@ -1,45 +1,13 @@
-
-! PLEASE NOTE:
-! the following is just an example -- it is NOT a complete set of options.
-! see star/astero_adipls/defaults/astero_search_controls.defaults
-! for current set of controls and their default values.
-
-
 &astero_search_controls ! based on HD49385
 
-   ! the overall chi^2 is a combination of spectroscopic and seismic 
-   
-      ! chi2 = chi2_seismo*chi2_seismo_fraction
-      !      + chi2_spectro*(1 - chi2_seismo_fraction)
       chi2_seismo_fraction = 0 ! 0.5d0
-   
-   ! chi2_spectro is a sum of terms for different non-seismic
-   ! observables (e.g. Teff, logg, FeH)
-   ! if normalize_chi2_spectro, the sum is divided by the number of
-   ! terms
       normalize_chi2_spectro = .true.
-      ! only need to give values for target and sigma if include in chi^2
-
-   ! chi2_seismo is a weighted combination of
-         ! frequencies, ratios of frequencies, delta_nu, and nu_max
-         
-      ! you specify the weighting of the terms in chi2_seismo by setting the following
    
       chi2_seismo_delta_nu_fraction = 0d0  
-         ! if > 0 then delta_nu and delta_nu_sigma must be set (see below)
       chi2_seismo_nu_max_fraction = 0d0    
-         ! if > 0 then nu_max and nu_max_sigma must be set (see below)
       chi2_seismo_r_010_fraction = 0d0
-         ! if > 0, then include r_010 frequency ratios 
       chi2_seismo_r_02_fraction = 0d0
-         ! if > 0, then include r_02 frequency ratios 
-      ! fraction for frequencies = 1 - (frac_r_010_ratios + frac_r_02_ratios + frac_delta_nu + frac_nu_max)
-      
-      ! naturally the fractions must all be between 0 and 1, else get error message.
-      
-      ! the terms for the frequencies and ratios are sums of terms for
-      ! each frequency and ratio
-      ! if you normalize them, they are divided by the number of terms
+
       normalize_chi2_seismo_frequencies = .true.
       normalize_chi2_seismo_r_010 = .true.
       normalize_chi2_seismo_r_02 = .true.
@@ -51,10 +19,9 @@
 
       trace_chi2_spectro_info = .false. ! if true, output info to terminal
 
-
    ! seismic data (frequencies in microHz)
 
-      delta_nu = 135.54d0 ! median difference of radial modes
+      delta_nu = 135.54d0 ! median of differences of radial modes
       delta_nu_sigma = 1.0
          ! only need delta_nu_sigma if chi2_seismo_delta_nu_fraction > 0
 
@@ -239,19 +206,6 @@
          freq_sigma(3,15) = 0.053d0
          freq_sigma(3,16) = 0.075d0
          freq_sigma(3,17) = 0.105d0
-   
-      ! calculating mode frequencies is a relatively costly process,
-      ! so we don't want to do it for models that are not good candidates.
-      ! i.e., we want to filter out the bad candidates using the following
-      ! less expensive tests whenever possible.
-
-         ! NOTE: if none of the models in a run pass these tests,
-         ! then you will not get any total chi2 result for that run.
-         ! in some situations that might not matter,
-         ! but if you are eliminating too many candidates in this way,
-         ! the search routines might not be getting enough valid results to work properly.
-         ! So watch what you are doing!  If your search or scan is getting lots of
-         ! runs that fail to give chi^2 results, you'll need to adjust the limits.
       
          ! don't consider models that aren't old enough
             min_age_limit = 1d6
@@ -266,9 +220,6 @@
             chi2_delta_nu_limit = 1d99
 
          ! we calculate radial modes only if pass the previous checks
-      
-         ! calculating nonradial modes is much more expensive than radial ones.
-         ! so we skip the nonradial calculation if the radial results are poor.
 
          ! don't consider models with chi2_radial above this limit 
             chi2_radial_limit = 1d99
@@ -299,23 +250,12 @@
       
       
       ! only calculate chi^2 if pass all the checks
-   
-
-      ! we need a way to decide when to stop an evolution run.
-      ! the following limits are used for this.
-      ! NOTE: we don't want to stop too soon, so these limits
-         ! are only tested for models that are okay for the Lnuc_div_L_limit.
       
       ! you can stop the run if chi^2 is rising.
          
          ! here is a relative limit
          limit_num_chi2_too_big = 3
          chi2_relative_increase_limit = 2.0
-         ! if limit_num_chi2_too_big consequtive chi2s
-         ! are > chi2_relative_increase_limit times the best chi2 for the run,
-         ! or a chi2 component exceeds its corresponding limit,
-         ! or chi2 can't be evaluated,
-         ! then stop the run.
          
          ! and this is an absolute limit
          chi2_search_limit1 = 3.0
@@ -323,26 +263,10 @@
          ! if best chi2 for the run is <= chi2_search_limit1,
          ! then stop the run if chi2 >= chi2_search_limit2.
          
-         
-      ! if you are doing a search or scanning a grid, you can use previous results
-      !    as a guide for when to stop a run
-      
-         min_num_samples_for_avg = 2 ! want at least this many samples to form averages
-         max_num_samples_for_avg = 10 ! use this many of the best chi^2 samples for averages
-         
-         ! these use results for the best chi^2 model of the previous best samples
-         avg_age_sigma_limit = 5 ! stop if age > avg age + this limit times sigma of avg age
-         avg_model_number_sigma_limit = 5 ! ditto for model number
-   
    
    ! surface corrections
       correction_scheme = 'kjeldsen' ! options are
-         ! 'kjeldsen'   Correction of Kjeldsen et al. (2008)
-         ! 'cubic'      Cubic correction of Ball & Gizon (2014, eqn 3)
-         ! 'combined'   Combined correction of Ball & Gizon (2014, eq 4)
-         ! ''           no corrections
       correction_factor = 1 
-         ! use this fraction of the correction; set to 0 to skip doing corrections.
 
       l0_n_obs(1) = 6 ! the observed radial orders (ignored if < 0)
       l0_n_obs(2) = 7
@@ -368,8 +292,6 @@
       l0_n_obs(22) = 27
       l0_n_obs(23) = 28
 
-         ! the observed radial orders are used in calculating surface corrections
-         ! if <= 0, use default calculation for radial orders
       correction_b = 4.9d0
             
       surf_coef1_name = 'a_div_r'
@@ -405,40 +327,17 @@
    ! miscellaneous
    
       ! save all control settings to file
-         save_controls = .true. ! dumps &astero_search_controls controls to file
+         save_controls = .false. ! dumps &astero_search_controls controls to file
          save_controls_filename = '' ! if empty, uses a default name
-      
-      
-      ! composition control
-         Y_frac_he3 = 1d-4 ! = xhe3/(xhe3 + xhe4); Y = xhe3 + xhe4
-
-   
-      ! save an eigenfunction
-         save_mode_model_number = 0
-         save_mode_filename = ''
-         el_to_save = 0
-         order_to_save = 0
-
 
       ! options for input model to pulsation codes
          add_atmosphere = .false. 
-            ! if true, then star adds atmosphere before passing model to adipls
-            ! the atmosphere model is determined by the mesa/star control atm_option
-            ! it should either be one of the T(tau) integration options or Paczynski_grey,
-               ! scheme inspired by B. Paczynski, 1969, Acta Astr., vol. 19, 1.
-               ! which takes into account radiation dilution when tau < 2/3,
          keep_surface_point = .false.
-            ! if true, keep k=1 point of model.
          add_center_point = .true. 
-            ! if true, add point at r=0
-
       
       ! oscillation analysis
 
          oscillation_code = 'adipls' ! or 'gyre'   <<< lowercase
-         !oscillation_code = 'gyre'
-         !trace_time_in_oscillation_code = .true.
-         
          
       ! gyre controls
       
@@ -447,12 +346,6 @@
       ! adipls controls
          
          do_redistribute_mesh = .false.
-         
-            ! note: number of zones for redistribute is set in redistrb.c.pruned.in
-            ! if you set this false, then the mesh from star is used directly.
-            ! if you set this true, then astero calls adipls redistb before doing
-            ! the frequency analysis.
-            
             
          ! iscan for adipls = the following factor times the given number of observed modes
          iscan_factor(0) = 15
