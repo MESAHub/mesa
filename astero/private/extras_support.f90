@@ -949,7 +949,6 @@
          integer, intent(out) :: ierr
 
          integer :: i
-         real(dp) :: X, Y, Z, FeH, f_ov, a, b, c
          type (star_info), pointer :: s
          include 'formats'
          ierr = 0
@@ -971,63 +970,11 @@
          s% how_many_extra_profile_columns => astero_how_many_extra_profile_columns
          s% data_for_extra_profile_columns => astero_data_for_extra_profile_columns  
          
-         
          if (s% job% astero_just_call_my_extras_check_model) return
          
          s% other_pgstar_plots_info => astero_pgstar_plots_info
          s% use_other_pgstar_plots = .true.
          
-         
-         ! overwrite various inlist controls
-
-         if (vary_alpha) then
-            s% mixing_length_alpha = next_alpha_to_try
-         else
-            s% mixing_length_alpha = first_alpha
-         end if
-
-         if (vary_f_ov) then
-            f_ov = next_f_ov_to_try
-         else
-            f_ov = first_f_ov
-         end if
-      
-         if (vary_FeH) then
-            FeH = next_FeH_to_try
-         else
-            FeH = first_FeH
-         end if
-
-         initial_FeH = FeH
-         initial_Z_div_X = Z_div_X_solar*exp10(FeH)
-
-         if (Y_depends_on_Z) then
-            a = initial_Z_div_X
-            b = dYdZ
-            c = 1d0 + a*(1d0 + b)
-            X = (1d0 - Y0)/c
-            Y = (Y0 + a*(b + Y0))/c
-            Z = 1d0 - (X + Y)
-            !write(*,1) 'init X', X
-            !write(*,1) 'init Y', Y
-            !write(*,1) 'init Z', Z
-            !stop
-         else 
-            if (vary_Y) then
-               Y = next_Y_to_try
-            else
-               Y = first_Y
-            end if
-            X = (1d0 - Y)/(1d0 + initial_Z_div_X)
-            Z = X*initial_Z_div_X
-         end if
-
-         if (vary_mass) then
-            s% job% new_mass = next_mass_to_try
-         else
-            s% job% new_mass = first_mass
-         end if
-
          do i = 1, max_parameters
             if (my_param_name(i) /= '') then
                if (vary_my_param(i)) then
@@ -1044,46 +991,7 @@
             end if
          end do
          
-         s% job% relax_initial_mass = .true.
-         s% initial_mass = s% job% new_mass
-         
-         initial_Y = Y
-         !s% initial_Z = Z << don't do this. it interferes with use of zams file.
-         
-         s% job% initial_h1 = X
-         s% job% initial_h2 = 0
-         s% job% initial_he3 = Y_frac_he3*Y
-         s% job% initial_he4 = Y - s% job% initial_he3
-         s% job% set_uniform_initial_composition = .true. 
-         
-         current_Y = Y
-         current_FeH = FeH
-         current_mass = s% job% new_mass
-         current_alpha = s% mixing_length_alpha
-         current_f_ov = f_ov
-
          current_my_param(1:max_parameters) = my_param(1:max_parameters)
-         
-         current_h1 = X
-         current_he3 = s% job% initial_he3
-         current_he4 = s% job% initial_he4
-         current_Z = Z
-
-         if (f_ov > 0._dp) then
-            s% overshoot_scheme(1) = 'exponential'
-            s% overshoot_zone_type(1) = 'any'
-            s% overshoot_zone_loc(1) = 'any'
-            s% overshoot_bdy_loc(1) = 'any'
-            s% overshoot_f(1) = f_ov
-            s% overshoot_f0(1) = f0_ov_div_f_ov*f_ov
-         else
-            s% overshoot_scheme(1) = ''
-            s% overshoot_zone_type(1) = ''
-            s% overshoot_zone_loc(1) = ''
-            s% overshoot_bdy_loc(1) = ''
-            s% overshoot_f(1) = 0d0
-            s% overshoot_f0(1) = 0d0
-         end if
          
       end subroutine astero_extras_controls
       

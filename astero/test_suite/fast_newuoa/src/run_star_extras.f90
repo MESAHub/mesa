@@ -115,13 +115,73 @@
       
       
       subroutine set_my_param(id, name, val, ierr) ! called from star_astero code
+         use astero_def, only: f0_ov_div_f_ov, Y_frac_he3, Z_div_X_solar, &
+            Y_depends_on_Z, dYdZ, Y0
+
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name ! which of my_param's will be set
          real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
 
+         real(dp) :: X, Y, Z_div_X, c
+
          ierr = 0
+
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         select case (name)
+            case ('initial_mass')
+               s% job% new_mass = val
+               s% job% relax_initial_mass = .true.
+               s% initial_mass = val
+            case ('initial_Y')
+               s% job% initial_he3 = Y_frac_he3*val
+               s% job% initial_he4 = val - s% job% initial_he3
+               s% job% set_uniform_initial_composition = .true.
+            case ('initial_FeH')
+               ! this only works because initial_Y is an earlier parameter than FeH
+               ! so set first and we can use that value to infer Z and X
+               Z_div_X = Z_div_X_solar*exp10(val) ! (Z/X) = (Z/X)sun * 10^[Fe/H]
+
+               if (Y_depends_on_Z) then
+                  c = 1d0 + Z_div_X*(1d0 + dYdZ)
+                  X = (1d0 - Y0)/c
+                  Y = (Y0 + Z_div_X*(dYdZ + Y0))/c
+
+                  s% job% initial_he3 = Y_frac_he3*Y
+                  s% job% initial_he4 = Y - s% job% initial_he3
+               else
+                  Y = s% job% initial_he3/Y_frac_he3 ! get Y, which we know has been set
+                  X = (1d0 - Y)/(1d0 + Z_div_X) ! X = (1-Y)/(1 + (Z/X))
+               end if
+
+               s% job% initial_h1 = X
+               s% job% initial_h2 = 0
+               s% job% set_uniform_initial_composition = .true.
+            case ('alpha')
+               s% mixing_length_alpha = val
+            case ('f_ov')
+               if (val > 0._dp) then
+                  s% overshoot_scheme(1) = 'exponential'
+                  s% overshoot_zone_type(1) = 'any'
+                  s% overshoot_zone_loc(1) = 'any'
+                  s% overshoot_bdy_loc(1) = 'any'
+                  s% overshoot_f(1) = val
+                  s% overshoot_f0(1) = f0_ov_div_f_ov*val
+               else
+                  s% overshoot_scheme(1) = ''
+                  s% overshoot_zone_type(1) = ''
+                  s% overshoot_zone_loc(1) = ''
+                  s% overshoot_bdy_loc(1) = ''
+                  s% overshoot_f(1) = 0d0
+                  s% overshoot_f0(1) = 0d0
+               end if
+            case default
+               ierr = -1
+               write(*,*) 'invalid name in set_my_param', name
+            end select
 
       end subroutine set_my_param
       
