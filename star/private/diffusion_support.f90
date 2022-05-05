@@ -410,7 +410,7 @@
 
             if(.not. s% diffusion_use_paquette .and. .not. s% use_other_diffusion_coefficients) then
                Gamma = s% gam(k)
-               Gamlo = 5d0
+               Gamlo = 3d0
                Gamhi = 10d0 ! for blending over from Stanton & Murillo coeffs to CBF coeffs at high Gamma
                if(Gamma < Gamlo .or. .not. s% diffusion_use_caplan) then
                   call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
