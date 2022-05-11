@@ -7,7 +7,7 @@ Known bugs
 
 This page lists a number of known bugs or issues in released versions of MESA. Where possible 
 we will also list work arounds, but for some bugs the only option will be to update to
-a newer version of MESA. Note this list is NOT comprenhisive, users should check this first if they have an 
+a newer version of MESA. Note this list is NOT comprehensive, users should check this first if they have an 
 issue but it may not be complete.
 
 
@@ -18,7 +18,7 @@ Al26 isomers
 ------------
 
 After running a model with the al26 isomers in your net, when you run the model again, it may
-immediatly crashes and prints a backtrace containing:
+immediately crashes and prints a backtrace containing:
 
 .. code-block:: shell
 
@@ -62,9 +62,14 @@ First check that the name matches in your history_coloumns.list file and your co
 
     cat -A history_columns.list | grep "abs_mag"
 
-Finally, there is a bug if you name the any column with ``/`` in it (for instance ``[Fe/H]``). The solution is to rename the column to remove the forward slash.
+Finally, there is a bug if you name any column with ``/`` in it (for instance ``[Fe/H]``). The solution is to rename the column to remove the forward slash.
 
 See `gh-379 <https://github.com/MESAHub/mesa/issues/379>`_
+
+RSP
+---
+
+An experimental RSP solver feature was turned on by default, leading to convergence issues in nonlinear model integration. Users should include RSP_do_check_omega = .true. in the &controls section of their inlists to get rid of this issue.
 
 
 

@@ -124,6 +124,11 @@ pgstar
 Due to re-organization of the star_type derived type, all pgstar controls have been moved into a separate pgstar derived type.
 If you access a pgstar option ``XX`` in your ``run_star_extras.f90`` then you need to replace ``s% XX`` with ``s% pg% XX``.
 
+RSP
+---
+
+In r21.12.1 an experimental RSP solver feature was turned on by default, leading to convergence issues in nonlinear model integration. This is now turned off by default. Users that continue to use RSP in r.21.12.1 should include RSP_do_check_omega = .true. in the &controls section of their inlists to get rid of this issue.
+
 
 Changes in r21.12.1
 ===================
