@@ -20,6 +20,22 @@ Backwards-incompatible changes
 Module-level changes
 --------------------
 
+Changes in r22.05.1
+===================
+
+.. _Backwards-incompatible changes r22.05.1:
+
+Backwards-incompatible changes
+------------------------------
+
+.. note::
+
+   A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
+
+
+Module-level changes
+--------------------
+
 astero
 ------
 
@@ -95,7 +111,7 @@ has been replaced with:
     use_3a_fl87 = .true.
 
 
-Net
+net
 ---
 
 There is a new hook ``other_net_derivs`` that allows for modifying the ``dydt`` term MESA computes for each zone inside ``net/``.
