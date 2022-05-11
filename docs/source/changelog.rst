@@ -2,12 +2,10 @@
 Changelog
 *********
 
-Changes in main
-===============
+Changes in r22.05.1
+===================
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r22.05.1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -95,7 +93,7 @@ has been replaced with:
     use_3a_fl87 = .true.
 
 
-Net
+net
 ---
 
 There is a new hook ``other_net_derivs`` that allows for modifying the ``dydt`` term MESA computes for each zone inside ``net/``.
