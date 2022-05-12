@@ -161,16 +161,16 @@
       logical :: restart_scan_grid_from_file
       character (len=256) :: filename_for_parameters
       integer :: max_num_from_file
-      integer :: file_column_for_my_param(max_parameters)
+      integer :: file_column_for_param(max_parameters)
       character (len=256) :: from_file_output_filename
       
       logical :: Y_depends_on_Z
       real(dp) :: Y0, dYdZ
 
-      logical :: vary_my_param(max_parameters)
+      logical :: vary_param(max_parameters)
       real(dp), dimension(max_parameters) :: &
-         first_my_param, min_my_param, max_my_param, delta_my_param
-      character (len=strlen) :: my_param_name(max_parameters)
+         first_param, min_param, max_param, delta_param
+      character (len=strlen) :: param_name(max_parameters)
       
       real(dp) :: f0_ov_div_f_ov, Lnuc_div_L_limit, &
          chi2_spectroscopic_limit, chi2_radial_limit, chi2_delta_nu_limit
@@ -350,15 +350,15 @@
          restart_scan_grid_from_file, &
          filename_for_parameters, &
          max_num_from_file, &
-         file_column_for_my_param, &
+         file_column_for_param, &
          from_file_output_filename, &
          Y_depends_on_Z, Y0, dYdZ, &
-         vary_my_param, &
-         first_my_param, &
-         min_my_param, &
-         max_my_param, &
-         delta_my_param, &
-         my_param_name, &
+         vary_param, &
+         first_param, &
+         min_param, &
+         max_param, &
+         delta_param, &
+         param_name, &
          f0_ov_div_f_ov, &
          Lnuc_div_L_limit, chi2_spectroscopic_limit, &
          chi2_radial_limit, chi2_delta_nu_limit, &
@@ -551,8 +551,8 @@
       real(dp) :: min_sample_chi2_so_far = -1
       integer :: sample_number, nvar, num_chi2_too_big
       
-      integer :: i_my_param(max_parameters)
-      real(dp) :: final_my_param(max_parameters)
+      integer :: i_param(max_parameters)
+      real(dp) :: final_param(max_parameters)
 
       real(dp) :: initial_max_years_for_timestep
       logical :: okay_to_restart
@@ -561,7 +561,7 @@
       real(dp) :: &
          next_initial_h1_to_try, next_initial_he3_to_try, &
          next_initial_he4_to_try, &
-         next_my_param_to_try(max_parameters)
+         next_param_to_try(max_parameters)
 
       real(dp) :: avg_nu_obs, avg_radial_n
       real(dp) :: chi2_seismo_freq_fraction
@@ -573,7 +573,7 @@
          best_chi2_seismo, &
          best_chi2_spectro, &
          best_age, &
-         best_my_param(max_parameters), &
+         best_param(max_parameters), &
          best_delta_nu, &
          best_nu_max, &
          best_surf_coef1, &
@@ -607,7 +607,7 @@
          sample_surf_coef2
 
       real(dp), pointer, dimension(:,:) :: sample_my_var
-      real(dp), pointer, dimension(:,:) :: sample_my_param
+      real(dp), pointer, dimension(:,:) :: sample_param
          
       integer, pointer, dimension(:) :: &
          sample_index_by_chi2, &
@@ -636,13 +636,13 @@
          chi2_seismo, chi2_spectro, chi2_radial, chi2_delta_nu, chi2_nu_max, &
          chi2_r_010_ratios, chi2_r_02_ratios, chi2_frequencies, &
          initial_Y, initial_FeH, initial_Z_div_X, &
-         my_var(max_constraints), my_param(max_parameters)
+         my_var(max_constraints), param(max_parameters)
 
       integer :: star_id, star_model_number
       integer :: num_chi2_seismo_terms, num_chi2_spectro_terms
       
       ! current values for parameters set by adipls_extras_controls
-      real(dp) :: current_my_param(max_parameters)
+      real(dp) :: current_param(max_parameters)
 
       integer, parameter :: num_extra_history_columns = 5
 
@@ -658,13 +658,13 @@
             integer, intent(out) :: ierr
          end subroutine set_my_vars_interface
 
-         subroutine set_my_param_interface(id, name, val, ierr)
+         subroutine set_param_interface(id, name, val, ierr)
             use const_def, only: dp, strlen
             integer, intent(in) :: id
-            character(len=strlen), intent(in) :: name ! which my_param to set
+            character(len=strlen), intent(in) :: name ! which param to set
             real(dp), intent(in) :: val
             integer, intent(out) :: ierr
-         end subroutine set_my_param_interface
+         end subroutine set_param_interface
 
          subroutine extras_controls_interface(id, ierr)
             integer, intent(in) :: id
@@ -675,7 +675,7 @@
 
       type astero_procs
          procedure(set_my_vars_interface), pointer, nopass :: set_my_vars
-         procedure(set_my_param_interface), pointer, nopass :: set_my_param
+         procedure(set_param_interface), pointer, nopass :: set_param
          procedure(extras_startup_interface), pointer, nopass :: extras_startup
          procedure(extras_controls_interface), pointer, nopass :: extras_controls
          procedure(extras_check_model_interface), pointer, nopass :: extras_check_model
@@ -698,7 +698,7 @@
       
       subroutine init_astero_def
          star_astero_procs% set_my_vars => null()
-         star_astero_procs% set_my_param => null()
+         star_astero_procs% set_param => null()
          star_astero_procs% extras_startup => null()
          star_astero_procs% extras_controls => null()
          star_astero_procs% extras_check_model => null()
@@ -764,7 +764,7 @@
             sample_chi2_seismo, &
             sample_chi2_spectro, &
             sample_age, &
-            sample_my_param, &
+            sample_param, &
             sample_my_var, &
             sample_delta_nu, &
             sample_nu_max, &
@@ -794,7 +794,7 @@
          call realloc_double(sample_chi2_spectro,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_age,max_num_samples,ierr); if (ierr /= 0) return
 
-         call realloc_double2(sample_my_param,max_parameters,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2(sample_param,max_parameters,max_num_samples,ierr); if (ierr /= 0) return
 
          call realloc_double2(sample_my_var,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
          
@@ -1208,7 +1208,7 @@
             'chi2'
 
          do i = 1, max_parameters
-            if (my_param_name(i) /= '') write(iounit, fmt, advance='no') trim(my_param_name(i))
+            if (param_name(i) /= '') write(iounit, fmt, advance='no') trim(param_name(i))
          end do
 
          write(iounit, fmt, advance='no') &
@@ -1310,7 +1310,7 @@
          call write1_dbl(sample_chi2(i))
 
          do k = 1, max_parameters
-            if (my_param_name(k) /= '') call write1_dbl(sample_my_param(k,i))
+            if (param_name(k) /= '') call write1_dbl(sample_param(k,i))
          end do
 
          call write1_dbl(sample_age(i))
@@ -1597,7 +1597,7 @@
          write(io,*)        
 
          do i = 1, max_parameters
-            if (my_param_name(i) /= '') call write1(trim(my_param_name(i)), current_my_param(i))
+            if (param_name(i) /= '') call write1(trim(param_name(i)), current_param(i))
          end do
 
          write(io,'(a40,1pes20.10)') 'age', best_age
@@ -1732,7 +1732,7 @@
          end if
 
          do k = 1, max_parameters
-            if (my_param_name(k) /= '') call read1_dbl(sample_my_param(k,i))
+            if (param_name(k) /= '') call read1_dbl(sample_param(k,i))
          end do
 
          call read1_dbl(sample_age(i))

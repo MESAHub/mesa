@@ -90,16 +90,16 @@
       end subroutine set_my_vars
       
       
-      subroutine set_my_param(id, name, val, ierr) ! called from star_astero code
+      subroutine set_param(id, name, val, ierr) ! called from star_astero code
          integer, intent(in) :: id
-         character(len=strlen), intent(in) :: name ! which of my_param's will be set
+         character(len=strlen), intent(in) :: name ! which of param's will be set
          real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
 
          ierr = 0
 
-      end subroutine set_my_param
+      end subroutine set_param
 
       
       subroutine extras_startup(id, restart, ierr)

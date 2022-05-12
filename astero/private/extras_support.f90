@@ -715,7 +715,7 @@
 
          best_my_var(1:max_constraints) = my_var(1:max_constraints)
 
-         best_my_param(1:max_parameters) = my_param(1:max_parameters)
+         best_param(1:max_parameters) = param(1:max_parameters)
          
          best_delta_nu = delta_nu_model
          best_nu_max = nu_max_model
@@ -942,7 +942,7 @@
       
 
       subroutine astero_extras_controls(id, ierr)
-         !use run_star_extras, only: extras_controls, set_my_param
+         !use run_star_extras, only: extras_controls, set_param
          use pgstar_astero_plots, only: astero_pgstar_plots_info
          use gyre_support, only: gyre_is_enabled, init_gyre
          integer, intent(in) :: id
@@ -976,22 +976,22 @@
          s% use_other_pgstar_plots = .true.
          
          do i = 1, max_parameters
-            if (my_param_name(i) /= '') then
-               if (vary_my_param(i)) then
-                  call star_astero_procs% set_my_param(&
-                     s% id, my_param_name(i), next_my_param_to_try(i), ierr)
+            if (param_name(i) /= '') then
+               if (vary_param(i)) then
+                  call star_astero_procs% set_param(&
+                     s% id, param_name(i), next_param_to_try(i), ierr)
                   if (ierr /= 0) return
-                  my_param(i) = next_my_param_to_try(i)
+                  param(i) = next_param_to_try(i)
                else
-                  call star_astero_procs% set_my_param(&
-                     s% id, my_param_name(i), first_my_param(i), ierr)
+                  call star_astero_procs% set_param(&
+                     s% id, param_name(i), first_param(i), ierr)
                   if (ierr /= 0) return
-                  my_param(i) = first_my_param(i)
+                  param(i) = first_param(i)
                end if
             end if
          end do
          
-         current_my_param(1:max_parameters) = my_param(1:max_parameters)
+         current_param(1:max_parameters) = param(1:max_parameters)
          
       end subroutine astero_extras_controls
       

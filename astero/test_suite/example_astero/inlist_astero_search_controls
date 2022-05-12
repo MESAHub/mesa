@@ -197,14 +197,14 @@
          filename_for_parameters = 'undefined'
          max_num_from_file = -1 ! if > 0, then stop after doing this many lines from file.
 
-         file_column_for_my_param(1) = 3
-         file_column_for_my_param(2) = 4
-         file_column_for_my_param(3) = 5
-         file_column_for_my_param(4) = 6
-         file_column_for_my_param(5) = 7
-         file_column_for_my_param(6) = 8
-         file_column_for_my_param(7) = 9
-         file_column_for_my_param(8) = 10
+         file_column_for_param(1) = 3
+         file_column_for_param(2) = 4
+         file_column_for_param(3) = 5
+         file_column_for_param(4) = 6
+         file_column_for_param(5) = 7
+         file_column_for_param(6) = 8
+         file_column_for_param(7) = 9
+         file_column_for_param(8) = 10
 
          from_file_output_filename = 'from_file_results.data'
          
@@ -227,40 +227,40 @@
          f0_ov_div_f_ov = 1  ! THIS SHOULD BE < 1
 
       ! parameters
-         my_param_name(1) = 'initial_mass'
-         first_my_param(1) = 1.2724010961d0
-         vary_my_param(1) = .true.
-         min_my_param(1) = 1.24d0
-         max_my_param(1) = 1.32d0
-         delta_my_param(1) = 0.01d0
+         param_name(1) = 'initial_mass'
+         first_param(1) = 1.2724010961d0
+         vary_param(1) = .true.
+         min_param(1) = 1.24d0
+         max_param(1) = 1.32d0
+         delta_param(1) = 0.01d0
 
-         my_param_name(2) = 'initial_Y'
-         first_my_param(2) = 0.2651812580d0
-         vary_my_param(2) = .true.
-         min_my_param(2) = 0.24d0
-         max_my_param(2) = 0.30d0
-         delta_my_param(2) = 0.01d0
+         param_name(2) = 'initial_Y'
+         first_param(2) = 0.2651812580d0
+         vary_param(2) = .true.
+         min_param(2) = 0.24d0
+         max_param(2) = 0.30d0
+         delta_param(2) = 0.01d0
 
-         my_param_name(3) = 'initial_FeH'
-         first_my_param(3) = 0.064226926d0
-         vary_my_param(3) = .true.
-         min_my_param(3) = 0.0d0
-         max_my_param(3) = 0.17d0
-         delta_my_param(3) = 0.03d0
+         param_name(3) = 'initial_FeH'
+         first_param(3) = 0.064226926d0
+         vary_param(3) = .true.
+         min_param(3) = 0.0d0
+         max_param(3) = 0.17d0
+         delta_param(3) = 0.03d0
 
-         my_param_name(4) = 'alpha'
-         first_my_param(4) = 1.6550575946d0
-         vary_my_param(4) = .true.
-         min_my_param(4) = 1.5d0
-         max_my_param(4) = 1.9d0
-         delta_my_param(4) = 0.1d0
+         param_name(4) = 'alpha'
+         first_param(4) = 1.6550575946d0
+         vary_param(4) = .true.
+         min_param(4) = 1.5d0
+         max_param(4) = 1.9d0
+         delta_param(4) = 0.1d0
 
-         my_param_name(5) = 'f_ov'
-         first_my_param(5) = 0.015d0
-         vary_my_param(5) = .false.
-         min_my_param(5) = 0d0
-         max_my_param(5) = 0.03d0
-         delta_my_param(5) = 0d0
+         param_name(5) = 'f_ov'
+         first_param(5) = 0.015d0
+         vary_param(5) = .false.
+         min_param(5) = 0d0
+         max_param(5) = 0.03d0
+         delta_param(5) = 0d0
       
          ! don't consider models that aren't old enough
             min_age_limit = 1d6
