@@ -1530,10 +1530,10 @@
          end if
 
          do i = 1, max_constraints
-            if (my_var_sigma(i) > 0 .and. include_my_var_in_chi2_spectro(i)) then
-               chi2term = pow2((my_var(i) - my_var_target(i))/my_var_sigma(i))
+            if (constraint_sigma(i) > 0 .and. include_constraint_in_chi2_spectro(i)) then
+               chi2term = pow2((constraint_value(i) - constraint_target(i))/constraint_sigma(i))
                if (trace_okay .and. trace_chi2_spectro_info) &
-                  write(*,2) 'chi2_spectro_term ' // trim(my_var_name(i)), s% model_number, chi2term
+                  write(*,2) 'chi2_spectro_term ' // trim(constraint_name(i)), s% model_number, chi2term
                chi2sum2 = chi2sum2 + chi2term
                chi2N2 = chi2N2 + 1
             end if

@@ -90,7 +90,7 @@
 
          num_constraints = 0
          do i = 1, max_constraints
-            if (my_var_name(i) /= '') num_constraints = num_constraints + 1
+            if (constraint_name(i) /= '') num_constraints = num_constraints + 1
          end do
          
          num_parameters = 0
@@ -164,7 +164,7 @@
          avg_model_number_sigma = 1d99
          nvar = 0
          total_time_in_oscillation_code = 0d0
-         my_var = 0d0
+         constraint_value = 0d0
          
          call init_sample_ptrs
          
@@ -979,7 +979,7 @@
             end if
          end if
                   
-         sample_my_var(1:max_constraints,i) = best_my_var(1:max_constraints)
+         sample_constraint_value(1:max_constraints,i) = best_constraint_value(1:max_constraints)
 
          sample_op_code(i) = op_code
          sample_chi2(i) = best_chi2
@@ -1090,7 +1090,7 @@
          best_chi2_seismo = 0
          best_chi2_spectro = 0
          best_age = 0
-         best_my_var(1:max_constraints) = 0
+         best_constraint_value(1:max_constraints) = 0
          best_param(1:max_parameters) = 0
          best_delta_nu = 0
          best_nu_max = 0

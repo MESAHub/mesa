@@ -111,12 +111,12 @@
       integer, parameter :: max_constraints = 100
       integer :: num_constraints ! how many are actually used
 
-      logical :: include_my_var_in_chi2_spectro(max_constraints)
-      real(dp) :: my_var_target(max_constraints)
-      real(dp) :: my_var_sigma(max_constraints)
-      real(dp) :: sigmas_coeff_for_my_var_limit(max_constraints)
+      logical :: include_constraint_in_chi2_spectro(max_constraints)
+      real(dp) :: constraint_target(max_constraints)
+      real(dp) :: constraint_sigma(max_constraints)
+      real(dp) :: sigmas_coeff_for_constraint_limit(max_constraints)
 
-      character (len=strlen) :: my_var_name(max_constraints)
+      character (len=strlen) :: constraint_name(max_constraints)
       
       real(dp) :: Z_div_X_solar
 
@@ -314,8 +314,8 @@
          num_smaller_steps_before_age_target, &
          dt_for_smaller_steps_before_age_target, &
 
-         include_my_var_in_chi2_spectro, &
-         my_var_target, my_var_sigma, my_var_name, &
+         include_constraint_in_chi2_spectro, &
+         constraint_target, constraint_sigma, constraint_name, &
          
          Z_div_X_solar, &
          nl, &
@@ -371,7 +371,7 @@
          avg_age_sigma_limit, avg_model_number_sigma_limit, &
          min_num_samples_for_avg, max_num_samples_for_avg, &
 
-         sigmas_coeff_for_my_var_limit, &
+         sigmas_coeff_for_constraint_limit, &
 
          sigmas_coeff_for_delta_nu_limit, &
          min_age_limit, &
@@ -578,7 +578,7 @@
          best_nu_max, &
          best_surf_coef1, &
          best_surf_coef2, &
-         best_my_var(max_constraints)
+         best_constraint_value(max_constraints)
          
       integer :: &
          best_model_number
@@ -606,7 +606,7 @@
          sample_surf_coef1, &
          sample_surf_coef2
 
-      real(dp), pointer, dimension(:,:) :: sample_my_var
+      real(dp), pointer, dimension(:,:) :: sample_constraint_value
       real(dp), pointer, dimension(:,:) :: sample_param
          
       integer, pointer, dimension(:) :: &
@@ -636,7 +636,7 @@
          chi2_seismo, chi2_spectro, chi2_radial, chi2_delta_nu, chi2_nu_max, &
          chi2_r_010_ratios, chi2_r_02_ratios, chi2_frequencies, &
          initial_Y, initial_FeH, initial_Z_div_X, &
-         my_var(max_constraints), param(max_parameters)
+         constraint_value(max_constraints), param(max_parameters)
 
       integer :: star_id, star_model_number
       integer :: num_chi2_seismo_terms, num_chi2_spectro_terms
@@ -650,13 +650,13 @@
 
       abstract interface
 
-         subroutine set_my_vars_interface(id, name, val, ierr)
+         subroutine set_constraint_value_interface(id, name, val, ierr)
             use const_def, only: dp, strlen
             integer, intent(in) :: id
             character(len=strlen), intent(in) :: name
             real(dp), intent(out) :: val
             integer, intent(out) :: ierr
-         end subroutine set_my_vars_interface
+         end subroutine set_constraint_value_interface
 
          subroutine set_param_interface(id, name, val, ierr)
             use const_def, only: dp, strlen
@@ -674,7 +674,7 @@
       end interface
 
       type astero_procs
-         procedure(set_my_vars_interface), pointer, nopass :: set_my_vars
+         procedure(set_constraint_value_interface), pointer, nopass :: set_constraint_value
          procedure(set_param_interface), pointer, nopass :: set_param
          procedure(extras_startup_interface), pointer, nopass :: extras_startup
          procedure(extras_controls_interface), pointer, nopass :: extras_controls
@@ -697,7 +697,7 @@
       contains
       
       subroutine init_astero_def
-         star_astero_procs% set_my_vars => null()
+         star_astero_procs% set_constraint_value => null()
          star_astero_procs% set_param => null()
          star_astero_procs% extras_startup => null()
          star_astero_procs% extras_controls => null()
@@ -765,7 +765,7 @@
             sample_chi2_spectro, &
             sample_age, &
             sample_param, &
-            sample_my_var, &
+            sample_constraint_value, &
             sample_delta_nu, &
             sample_nu_max, &
             sample_surf_coef1, &
@@ -796,7 +796,7 @@
 
          call realloc_double2(sample_param,max_parameters,max_num_samples,ierr); if (ierr /= 0) return
 
-         call realloc_double2(sample_my_var,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2(sample_constraint_value,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
          
          call realloc_double(sample_delta_nu,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_nu_max,max_num_samples,ierr); if (ierr /= 0) return
@@ -1216,7 +1216,7 @@
             'model_number'
 
          do i = 1, max_constraints
-            if (my_var_name(i) /= '') write(iounit, fmt, advance='no') trim(my_var_name(i))
+            if (constraint_name(i) /= '') write(iounit, fmt, advance='no') trim(constraint_name(i))
          end do
 
          write(iounit, fmt, advance='no') &
@@ -1317,7 +1317,7 @@
          call write1_int(sample_model_number(i))
 
          do k = 1, max_constraints
-            if (my_var_name(k) /= '') call write1_dbl(sample_my_var(k,i))
+            if (constraint_name(k) /= '') call write1_dbl(sample_constraint_value(k,i))
          end do
 
          call write1_dbl(sample_delta_nu(i))
@@ -1574,17 +1574,17 @@
          end if
 
          do i = 1, max_constraints
-            if (my_var_name(i) == '') cycle
+            if (constraint_name(i) == '') cycle
 
             write(io,'(A)')
-            call write1(trim(my_var_name(i)), best_my_var(i))
+            call write1(trim(constraint_name(i)), best_constraint_value(i))
 
-            if (my_var_sigma(i) > 0 .and. include_my_var_in_chi2_spectro(i)) then
+            if (constraint_sigma(i) > 0 .and. include_constraint_in_chi2_spectro(i)) then
                chi2term = pow2( &
-                     (best_my_var(i) - my_var_target(i))/my_var_sigma(i))
-               call write1(trim(my_var_name(i)) // '_obs', my_var_target(i))
-               call write1(trim(my_var_name(i)) // '_sigma', my_var_sigma(i))
-               call write1(trim(my_var_name(i)) // ' chi2term', chi2term)
+                     (best_constraint_value(i) - constraint_target(i))/constraint_sigma(i))
+               call write1(trim(constraint_name(i)) // '_obs', constraint_target(i))
+               call write1(trim(constraint_name(i)) // '_sigma', constraint_sigma(i))
+               call write1(trim(constraint_name(i)) // ' chi2term', chi2term)
             end if
          end do
          
@@ -1739,7 +1739,7 @@
          call read1_int(sample_model_number(i))
 
          do k = 1, max_constraints
-            if (my_var_name(k) /= '') call read1_dbl(sample_my_var(k,i))
+            if (constraint_name(k) /= '') call read1_dbl(sample_constraint_value(k,i))
          end do
 
          call read1_dbl(sample_delta_nu(i))

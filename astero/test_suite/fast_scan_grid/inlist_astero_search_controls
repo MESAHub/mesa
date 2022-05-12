@@ -3,33 +3,33 @@
       chi2_seismo_fraction = 0.667d0
       normalize_chi2_spectro = .true.
 
-      my_var_name(1) = 'Teff'
-      my_var_target(1) = 5650d0
-      my_var_sigma(1) = 65d0
-      include_my_var_in_chi2_spectro(1) = .true.
+      constraint_name(1) = 'Teff'
+      constraint_target(1) = 5650d0
+      constraint_sigma(1) = 65d0
+      include_constraint_in_chi2_spectro(1) = .true.
 
-      my_var_name(2) = 'log_g'
-      my_var_target(2) = 3.97d0
-      my_var_sigma(2) = 0.02d0
-      include_my_var_in_chi2_spectro(2) = .false.
+      constraint_name(2) = 'log_g'
+      constraint_target(2) = 3.97d0
+      constraint_sigma(2) = 0.02d0
+      include_constraint_in_chi2_spectro(2) = .false.
 
-      my_var_name(3) = 'log_L'
-      my_var_target(3) = -0.10d0
-      my_var_sigma(3) = 0.050d0
-      include_my_var_in_chi2_spectro(3) = .true.
+      constraint_name(3) = 'log_L'
+      constraint_target(3) = -0.10d0
+      constraint_sigma(3) = 0.050d0
+      include_constraint_in_chi2_spectro(3) = .true.
 
-      my_var_name(4) = 'M_H'
-      my_var_target(4) = 0.0
-      my_var_sigma(4) = 0.05
-      include_my_var_in_chi2_spectro(4) = .false. ! [Fe/H]
+      constraint_name(4) = 'M_H'
+      constraint_target(4) = 0.0
+      constraint_sigma(4) = 0.05
+      include_constraint_in_chi2_spectro(4) = .false. ! [Fe/H]
       
          ! we calculate model [Fe/H] as = log10((Z/X)/Z_div_X_solar)
          ! using model surface average values for Z and X.
          Z_div_X_solar = 0.02293d0
 
-      my_var_name(5) = 'log_R'
+      constraint_name(5) = 'log_R'
 
-      my_var_name(6) = 'Rcz'
+      constraint_name(6) = 'Rcz'
 
       chi2_seismo_delta_nu_fraction = 0d0  
       chi2_seismo_nu_max_fraction = 0d0    

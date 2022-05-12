@@ -15,16 +15,16 @@
 
    chi2_seismo_fraction = 0d0 ! no oscillation data yet
 
-   my_var_name(1) = 'log_L'
-   my_var_target(1) = 0.0
-   my_var_sigma(1) = 1d-2
-   include_my_var_in_chi2_spectro(1) = .true.
-   sigmas_coeff_for_my_var_limit(1) = 5
+   constraint_name(1) = 'log_L'
+   constraint_target(1) = 0.0
+   constraint_sigma(1) = 1d-2
+   include_constraint_in_chi2_spectro(1) = .true.
+   sigmas_coeff_for_constraint_limit(1) = 5
 
-   my_var_name(2) = 'Teff'
-   my_var_target(2) = 5772d0
-   my_var_sigma(2) = 60d0
-   include_my_var_in_chi2_spectro(2) = .true.
+   constraint_name(2) = 'Teff'
+   constraint_target(2) = 5772d0
+   constraint_sigma(2) = 60d0
+   include_constraint_in_chi2_spectro(2) = .true.
 
    param_name(1) = 'initial_mass'
    vary_param(1) = .false.

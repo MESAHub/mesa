@@ -3,33 +3,33 @@
       chi2_seismo_fraction = 0d0
       normalize_chi2_spectro = .true.
 
-      my_var_target(1) = 1
-      my_var_sigma(1) = 1e-3
-      include_my_var_in_chi2_spectro(1) = .true.
+      constraint_target(1) = 1
+      constraint_sigma(1) = 1e-3
+      include_constraint_in_chi2_spectro(1) = .true.
       
-      my_var_name(2) = 'Teff'
-      my_var_target(2) = 5772
-      my_var_sigma(2) = 1
-      include_my_var_in_chi2_spectro(2) = .false.
+      constraint_name(2) = 'Teff'
+      constraint_target(2) = 5772
+      constraint_sigma(2) = 1
+      include_constraint_in_chi2_spectro(2) = .false.
 
-      my_var_name(3) = 'radius'
-      my_var_target(3) = 1
-      my_var_sigma(3) = 1e-3
-      include_my_var_in_chi2_spectro(3) = .true.
+      constraint_name(3) = 'radius'
+      constraint_target(3) = 1
+      constraint_sigma(3) = 1e-3
+      include_constraint_in_chi2_spectro(3) = .true.
 
-      my_var_name(5) = 'M_H'
-      my_var_target(5) = 0.0
-      my_var_sigma(5) = 1d-3
-      include_my_var_in_chi2_spectro(5) = .true.
+      constraint_name(5) = 'M_H'
+      constraint_target(5) = 0.0
+      constraint_sigma(5) = 1d-3
+      include_constraint_in_chi2_spectro(5) = .true.
       
          ! we calculate model [Fe/H] as = log10((Z/X)/Z_div_X_solar)
          ! using model surface average values for Z and X.
          Z_div_X_solar = 0.02293d0
 
-      my_var_name(8) = 'log_R'
-      my_var_target(8) = 0
-      my_var_sigma(8) = 1d-4
-      include_my_var_in_chi2_spectro(8) = .false.
+      constraint_name(8) = 'log_R'
+      constraint_target(8) = 0
+      constraint_sigma(8) = 1d-4
+      include_constraint_in_chi2_spectro(8) = .false.
    
       chi2_seismo_delta_nu_fraction = 0d0  
       chi2_seismo_nu_max_fraction = 0d0    

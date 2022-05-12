@@ -52,8 +52,8 @@
    ! are now implemented in the standard ``run_star_extras.f90`.
    ! The other options fall back to the history columns.
 
-   ! To implement your own constraints, creat the appropriate case
-   ! in ``set_my_vars`` in ``run_star_extras.f90``.
+   ! To implement your own constraints, create the appropriate case
+   ! in ``set_constraint_value`` in ``run_star_extras.f90``.
 
    ! The ``age`` option is still treated separately because there are
    ! additional controls that determine how the age target is
@@ -76,19 +76,19 @@
    !    HR_target_Teff
    !    HR_target_Teff_sigma
 
-   ! my_var_name(:)
-   ! ~~~~~~~~~~~~~~
-   ! include_my_var_in_chi2_spectro(:)
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! my_var_target(:)
-   ! ~~~~~~~~~~~~~~~~~~~~~~
-   ! my_var_sigma(:)
-   ! ~~~~~~~~~~~~~~~~~~~~~
+   ! constraint_name(:)
+   ! ~~~~~~~~~~~~~~~~~~
+   ! include_constraint_in_chi2_spectro(:)
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! constraint_target(:)
+   ! ~~~~~~~~~~~~~~~~~~~~
+   ! constraint_sigma(:)
+   ! ~~~~~~~~~~~~~~~~~~~
 
-      my_var_name(:) = '' ! change this to whatever you want
-      my_var_target(:) = 0
-      my_var_sigma(:) = 0
-      include_my_var_in_chi2_spectro(:) = .false.
+      constraint_name(:) = '' ! change this to whatever you want
+      constraint_target(:) = 0
+      constraint_sigma(:) = 0
+      include_constraint_in_chi2_spectro(:) = .false.
 
    ! normalize_chi2_spectro
    ! ~~~~~~~~~~~~~~~~~~~~~~
@@ -783,8 +783,8 @@
 
    ! sigmas_coeff_for_delta_nu_limit
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! sigmas_coeff_for_my_var_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! sigmas_coeff_for_constraint_limit
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! We need a way to decide when to stop an evolution run.
    ! The following limits are used for this.
@@ -803,7 +803,7 @@
    ! (e.g. ``log_g``, ``Teff``, ``delta_nu``). ::
 
       sigmas_coeff_for_delta_nu_limit = 0
-      sigmas_coeff_for_my_var_limit(:) = 0
+      sigmas_coeff_for_constraint_limit(:) = 0
 
    ! |chi^2| limits
    ! --------------

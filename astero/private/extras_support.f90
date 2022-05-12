@@ -207,9 +207,9 @@
          
          ! must set constraint values before checking limits
          do i = 1, max_constraints
-            if (my_var_name(i) == '') cycle
-            call star_astero_procs% set_my_vars(id, my_var_name(i), my_var(i), ierr)
-            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'ierr /=0 in set_my_vars')
+            if (constraint_name(i) == '') cycle
+            call star_astero_procs% set_constraint_value(id, constraint_name(i), constraint_value(i), ierr)
+            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'ierr /=0 in set_constraint_value')
          end do
          
          call check_limits
@@ -220,7 +220,7 @@
             write(*,1) 'bad chi2_spectro', chi2_spectro
 
             do i = 1, max_constraints
-               if (my_var_name(i) /= '') write(*,1) my_var_name(i), my_var(i)
+               if (constraint_name(i) /= '') write(*,1) constraint_name(i), constraint_value(i)
             end do
 
             chi2_spectro = 1d99
@@ -623,7 +623,7 @@
          
          
          subroutine check_limits
-            real(dp) :: delta_nu_limit, my_var_limit
+            real(dp) :: delta_nu_limit, constraint_limit
             integer :: nz, i
             include 'formats'
             nz = s% nz
@@ -647,23 +647,23 @@
             end if
 
             do i = 1, max_constraints
-               if (sigmas_coeff_for_my_var_limit(i) /= 0 .and. my_var_sigma(i) > 0) then
-                  my_var_limit = &
-                     my_var_target(i) + my_var_sigma(i)*sigmas_coeff_for_my_var_limit(i)
-                  if ((sigmas_coeff_for_my_var_limit(i) > 0 .and. &
-                           my_var(i) > my_var_limit) .or. &
-                      (sigmas_coeff_for_my_var_limit(i) < 0 .and. &
-                           my_var(i) < my_var_limit)) then
-                     write(*,*) 'have reached my_var(i) limit'
-                     write(*,1) 'my_var(i)', my_var(i)
-                     write(*,1) 'my_var(i)_limit', my_var_limit
+               if (sigmas_coeff_for_constraint_limit(i) /= 0 .and. constraint_sigma(i) > 0) then
+                  constraint_limit = &
+                     constraint_target(i) + constraint_sigma(i)*sigmas_coeff_for_constraint_limit(i)
+                  if ((sigmas_coeff_for_constraint_limit(i) > 0 .and. &
+                           constraint_value(i) > constraint_limit) .or. &
+                      (sigmas_coeff_for_constraint_limit(i) < 0 .and. &
+                           constraint_value(i) < constraint_limit)) then
+                     write(*,*) 'have reached constraint_value(i) limit'
+                     write(*,1) 'constraint_value(i)', constraint_value(i)
+                     write(*,1) 'constraint_value(i)_limit', constraint_limit
                      write(*,'(A)')
                      do_astero_extras_check_model = terminate
                      return
                   end if
                   if (trace_limits) then
-                     write(*,1) 'my_var(i)', my_var(i)
-                     write(*,1) 'my_var_limit', my_var_limit
+                     write(*,1) 'constraint_value(i)', constraint_value(i)
+                     write(*,1) 'constraint_limit', constraint_limit
                   end if
                end if
             end do
@@ -687,10 +687,10 @@
          end if
 
          do i = 1, max_constraints
-            if (include_my_var_in_chi2_spectro(i)) then
+            if (include_constraint_in_chi2_spectro(i)) then
                cnt = cnt + 1
                sum = sum + pow2( &
-                  (my_var(i) - my_var_target(i))/my_var_sigma(i))
+                  (constraint_value(i) - constraint_target(i))/constraint_sigma(i))
             end if
          end do
 
@@ -713,7 +713,7 @@
          best_age = s% star_age
          best_model_number = s% model_number
 
-         best_my_var(1:max_constraints) = my_var(1:max_constraints)
+         best_constraint_value(1:max_constraints) = constraint_value(1:max_constraints)
 
          best_param(1:max_parameters) = param(1:max_parameters)
          

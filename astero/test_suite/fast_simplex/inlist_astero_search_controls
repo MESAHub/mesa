@@ -3,51 +3,51 @@
       chi2_seismo_fraction = 0.667d0
       normalize_chi2_spectro = .true.
       
-      include_my_var_in_chi2_spectro(1) = .true.
-      my_var_target(1) = 5650d0
-      my_var_sigma(1) = 65d0
-      my_var_name(1) = 'Teff'
+      include_constraint_in_chi2_spectro(1) = .true.
+      constraint_target(1) = 5650d0
+      constraint_sigma(1) = 65d0
+      constraint_name(1) = 'Teff'
 
-      include_my_var_in_chi2_spectro(2) = .false.
-      my_var_target(2) = 3.97d0
-      my_var_sigma(2) = 0.02d0
-      my_var_name(2) = 'log_g'
+      include_constraint_in_chi2_spectro(2) = .false.
+      constraint_target(2) = 3.97d0
+      constraint_sigma(2) = 0.02d0
+      constraint_name(2) = 'log_g'
 
-      include_my_var_in_chi2_spectro(3) = .true.
-      my_var_target(3) = -0.1d0
-      my_var_sigma(3) = 0.05d0
-      my_var_name(3) = 'log_L'
+      include_constraint_in_chi2_spectro(3) = .true.
+      constraint_target(3) = -0.1d0
+      constraint_sigma(3) = 0.05d0
+      constraint_name(3) = 'log_L'
 
       ! we calculate model [M/H] as = log10((Z/X)/Z_div_X_solar)
       ! using model surface average values for Z and X.
       Z_div_X_solar = 0.02293d0
 
-      include_my_var_in_chi2_spectro(4) = .true. ! [Fe/H]
-      my_var_target(4) = 0.0
-      my_var_sigma(4) = 0.05
-      my_var_name(4) = 'M_H'
+      include_constraint_in_chi2_spectro(4) = .true. ! [Fe/H]
+      constraint_target(4) = 0.0
+      constraint_sigma(4) = 0.05
+      constraint_name(4) = 'M_H'
 
-      include_my_var_in_chi2_spectro(5) = .false.
-      my_var_target(5) = 0
-      my_var_sigma(5) = 1d-4
-      my_var_name(5) = 'log_R'
+      include_constraint_in_chi2_spectro(5) = .false.
+      constraint_target(5) = 0
+      constraint_sigma(5) = 1d-4
+      constraint_name(5) = 'log_R'
 
-      my_var_name(6) = 'star_mass'
+      constraint_name(6) = 'star_mass'
 
-      include_my_var_in_chi2_spectro(7) = .false.
-      my_var_target(7) = 0.6960363964d0
-      my_var_sigma(7) = 0.001d0
-      my_var_name(7) = 'Rcz'
+      include_constraint_in_chi2_spectro(7) = .false.
+      constraint_target(7) = 0.6960363964d0
+      constraint_sigma(7) = 0.001d0
+      constraint_name(7) = 'Rcz'
 
-      include_my_var_in_chi2_spectro(8) = .false.
-      my_var_target(8) = 0.02293d0
-      my_var_sigma(8) = 1d-3
-      my_var_name(8) = 'surface_Z_div_X'
+      include_constraint_in_chi2_spectro(8) = .false.
+      constraint_target(8) = 0.02293d0
+      constraint_sigma(8) = 1d-3
+      constraint_name(8) = 'surface_Z_div_X'
 
-      include_my_var_in_chi2_spectro(9) = .false.
-      my_var_target(9) = 0.267d0
-      my_var_sigma(9) = 0.0034d0
-      my_var_name(9) = 'surface_He'
+      include_constraint_in_chi2_spectro(9) = .false.
+      constraint_target(9) = 0.267d0
+      constraint_sigma(9) = 0.0034d0
+      constraint_name(9) = 'surface_He'
    
       chi2_seismo_delta_nu_fraction = 0d0  
       chi2_seismo_nu_max_fraction = 0d0    

@@ -58,7 +58,7 @@
       end subroutine extras_controls
 
       
-      subroutine set_my_vars(id, name, val, ierr) ! called from star_astero code
+      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
          use astero_def, only: Z_div_X_solar
 
          integer, intent(in) :: id
@@ -69,10 +69,10 @@
          type (star_info), pointer :: s
          integer :: i
          real(dp) :: X, Y, Z
-         ! my_var's are predefined in the simplex_search_data.
+         ! constraints are predefined in the simplex_search_data.
          ! this routine's job is to assign those variables to current value in the model.
          ! it is called whenever a new value of chi2 is calculated.
-         ! only necessary to set the my_var's you are actually using.
+         ! only necessary to set the constraints you are actually using.
          ierr = 0
 
          call star_ptr(id, s, ierr)
@@ -111,7 +111,7 @@
                val = star_get_history_output(s, name)
          end select
 
-      end subroutine set_my_vars
+      end subroutine set_constraint_value
       
       
       subroutine set_param(id, name, val, ierr) ! called from star_astero code
@@ -214,7 +214,6 @@
       
 
       integer function extras_check_model(id)
-         use astero_def, only: my_var, my_var_name
          integer, intent(in) :: id
          integer :: i, ierr
          type (star_info), pointer :: s
@@ -224,13 +223,6 @@
          if (ierr /= 0) return
          
          include 'formats'
-
-         ! do i = 1, 3
-         !    my_var(i) = star_get_history_output(s, my_var_name(i))
-         ! end do
-         
-         ! my_var(1) = s% delta_Pg
-         !write(*,2) 'delta_Pg', s% model_number, my_var(1)
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depenending on which
