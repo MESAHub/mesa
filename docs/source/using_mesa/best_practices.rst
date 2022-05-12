@@ -473,7 +473,7 @@ briefly summarize these, including appropriate citations.
   Iglesias1996}, with low-temperature data from \citet{Ferguson2005}
   and the high-temperature, Compton-scattering dominated regime by
   \citet{Poutanen2017}.  Electron conduction opacities are from
-  \citet{Cassisi2007}.
+  \citet{Cassisi2007} and \citet{Blouin2020}.
   
   Nuclear reaction rates are from JINA REACLIB \citep{Cyburt2010}, NACRE \citep{Angulo1999} and
   additional tabulated weak reaction rates \citet{Fuller1985, Oda1994,
