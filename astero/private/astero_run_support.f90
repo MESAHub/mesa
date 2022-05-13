@@ -416,8 +416,15 @@
          
          
          subroutine set_starting_values
-            ! this looks like a bug: only set varied parameters to mins; rest to first?
-            param(1:max_parameters) = min_param(1:max_parameters)
+            do i = 1, max_parameters
+               if (param_name(i) /= '') then
+                  if (vary_param(i)) then
+                     param(i) = min_param(i)
+                  else
+                     param(i) = first_param(i)
+                  end if
+               end if
+            end do
          end subroutine set_starting_values
 
 
@@ -440,7 +447,7 @@
                param(k) = param(k) + delta_param(k)
             end do
             if (num_param(k) == 0) num_param(k) = cnt
-            param(k) = min_param(k)
+            if (vary_param(k)) param(k) = min_param(k)
          end subroutine do_param
          
          
