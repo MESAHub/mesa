@@ -20,6 +20,67 @@ Backwards-incompatible changes
 Module-level changes
 --------------------
 
+astero
+------
+
+The main controls for the selection of parameters and non-seismic
+constraints (which were dubbed "variables") has changed.  The defaults
+files document the new interface but the most important changes are
+repeated here.
+
+Each non-seismic constraint is now given a name, target value,
+uncertainty and flag for whether to include it in the |chi^2|
+calculation.  The default ``work`` folder will either try for one of
+the custom options included for backward compatibility (e.g. ``Rcz``)
+or fall back to computing the matching history column (e.g. for
+``log_g``).  So whereas an effective temperature constraint would
+previously be included using, say ::
+
+    include_Teff_in_chi2_spectro = .false.
+    Teff_target = 6000
+    Teff_sigma = 100
+
+you would now use ::
+
+    constraint_name(1) = 'Teff'
+    constraint_target(1) = 6000
+    constraint_sigma(1) = 100
+
+The maximum number of such constraints is currently 100 but can
+trivially be increased at compile time by modifying ``astero_def``.
+
+Similarly, each parameter now has a name, initial value, minimum,
+maximum and grid-spacing.  So whereas the mixing-length parameter
+was previously controlled with something like ::
+
+    vary_alpha = .true.
+    first_alpha = 1.7
+    min_alpha = 1.5
+    max_alpha = 1.9
+    delta_alpha = 0.1
+
+you would now use ::
+
+    param_name(1) = 'alpha'
+    first_param(1) = 1.7
+    min_param(1) = 1.5
+    max_param(1) = 1.9
+    delta_param(1) = 0.1
+
+Again, the maximum number of parameters is 100 and can be increased at
+compile time by modifying ``astero_def``.
+
+The default ``run_star_extras.f90`` defines the hooks
+``set_constraint_value`` and ``set_param`` so that the old options
+remain available, though with a new syntax.  Users can also use those
+routines to define their own parameters and constraints.
+
+The output files contain information for constraints or parameters
+with names that are not ``''``.  Thus, the column order now varies but
+the same information is present and now follows the same structure as
+histories and profiles.
+
+
 Changes in r22.05.1
 ===================
 
