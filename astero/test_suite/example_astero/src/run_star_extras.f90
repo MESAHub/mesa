@@ -58,43 +58,132 @@
       end subroutine extras_controls
 
       
-      subroutine set_my_vars(id, ierr) ! called from star_astero code
-         !use astero_search_data, only: include_my_var1_in_chi2, my_var1
+      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
+         use astero_def, only: Z_div_X_solar
+
          integer, intent(in) :: id
+         character(len=strlen), intent(in) :: name
+         real(dp), intent(out) :: val
          integer, intent(out) :: ierr
+
          type (star_info), pointer :: s
-         ! my_var's are predefined in the simplex_search_data.
+         integer :: i
+         real(dp) :: X, Y, Z
+         ! constraints are predefined in the simplex_search_data.
          ! this routine's job is to assign those variables to current value in the model.
          ! it is called whenever a new value of chi2 is calculated.
-         ! only necessary to set the my_var's you are actually using.
-         ierr = 0
-         !if (include_my_var1_in_chi2) then
-            call star_ptr(id, s, ierr)
-            if (ierr /= 0) return
-            !my_var1 = s% Teff
-         !end if
-      end subroutine set_my_vars
-      
-      
-      subroutine will_set_my_param(id, i, new_value, ierr) ! called from star_astero code
-         !use astero_search_data, only: vary_my_param1
-         integer, intent(in) :: id
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
+         ! only necessary to set the constraints you are actually using.
          ierr = 0
 
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! as example, my_param1 is alpha_mlt
-         ! if (i == 1) then
-         !    call star_ptr(id, s, ierr)
-         !    if (ierr /= 0) return
-         !    s% mixing_length_alpha = new_value
-         ! end if
-      end subroutine will_set_my_param
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         X = max(s% surface_h1, 1d-10)
+         Y = s% surface_he3 + s% surface_he4
+         Z = max(1d-99, min(1d0, 1-X-Y))
+
+         select case (name)
+            ! for custom constraints, create a case with the name of your constraint e.g.
+            ! case ('delta_Pg')
+            !    val = s% delta_Pg
+            ! fall back to history column if user doesn't define name
+            case ('M_H')
+               val = log10(Z/X/Z_div_X_solar)
+
+            case ('surface_Z_div_X')
+               val = Z/X
+
+            case ('surface_He')
+               val = Y
+
+            case ('Rcz')
+               do i = 1, s% nz-1 ! locate bottom of solar convective zone
+                  if (s% mixing_type(i+1) /= convective_mixing &
+                        .and. s% mixing_type(i) == convective_mixing) then
+                     if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
+                        val = s% r(i)/Rsun
+                        exit
+                     end if
+                  end if
+               end do
+
+            case default
+               val = star_get_history_output(s, name)
+         end select
+
+      end subroutine set_constraint_value
+      
+      
+      subroutine set_param(id, name, val, ierr) ! called from star_astero code
+         use astero_def, only: f0_ov_div_f_ov, Y_frac_he3, Z_div_X_solar, &
+            Y_depends_on_Z, dYdZ, Y0
+
+         integer, intent(in) :: id
+         character(len=strlen), intent(in) :: name ! which of param's will be set
+         real(dp), intent(in) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         real(dp) :: X, Y, Z_div_X, c
+
+         ierr = 0
+
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         select case (name)
+            case ('initial_mass')
+               s% job% new_mass = val
+               s% job% relax_initial_mass = .true.
+               s% initial_mass = val
+            case ('initial_Y')
+               s% job% initial_he3 = Y_frac_he3*val
+               s% job% initial_he4 = val - s% job% initial_he3
+               s% job% set_uniform_initial_composition = .true.
+            case ('initial_FeH')
+               ! this only works because initial_Y is an earlier parameter than FeH
+               ! so set first and we can use that value to infer Z and X
+               Z_div_X = Z_div_X_solar*exp10(val) ! (Z/X) = (Z/X)sun * 10^[Fe/H]
+
+               if (Y_depends_on_Z) then
+                  c = 1d0 + Z_div_X*(1d0 + dYdZ)
+                  X = (1d0 - Y0)/c
+                  Y = (Y0 + Z_div_X*(dYdZ + Y0))/c
+
+                  s% job% initial_he3 = Y_frac_he3*Y
+                  s% job% initial_he4 = Y - s% job% initial_he3
+               else
+                  Y = s% job% initial_he3/Y_frac_he3 ! get Y, which we know has been set
+                  X = (1d0 - Y)/(1d0 + Z_div_X) ! X = (1-Y)/(1 + (Z/X))
+               end if
+
+               s% job% initial_h1 = X
+               s% job% initial_h2 = 0
+               s% job% set_uniform_initial_composition = .true.
+            case ('alpha')
+               s% mixing_length_alpha = val
+            case ('f_ov')
+               if (val > 0._dp) then
+                  s% overshoot_scheme(1) = 'exponential'
+                  s% overshoot_zone_type(1) = 'any'
+                  s% overshoot_zone_loc(1) = 'any'
+                  s% overshoot_bdy_loc(1) = 'any'
+                  s% overshoot_f(1) = val
+                  s% overshoot_f0(1) = f0_ov_div_f_ov*val
+               else
+                  s% overshoot_scheme(1) = ''
+                  s% overshoot_zone_type(1) = ''
+                  s% overshoot_zone_loc(1) = ''
+                  s% overshoot_bdy_loc(1) = ''
+                  s% overshoot_f(1) = 0d0
+                  s% overshoot_f0(1) = 0d0
+               end if
+            case default
+               ierr = -1
+               write(*,*) 'invalid name in set_param', name
+            end select
+
+      end subroutine set_param
       
       
       subroutine extras_startup(id, restart, ierr)
@@ -141,7 +230,6 @@
       
 
       integer function extras_check_model(id)
-         use astero_def, only: my_var1, my_var2, my_var3
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
@@ -151,11 +239,6 @@
          if (ierr /= 0) return
          
          include 'formats'
-         
-
-         my_var1 = s% delta_Pg
-         !write(*,2) 'delta_Pg', s% model_number, my_var1
-
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depenending on which
@@ -170,22 +253,6 @@
       end function extras_check_model
 
 
-      subroutine set_my_param(s, i, new_value)
-         type (star_info), pointer :: s
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
-         include 'formats'
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! for example, my_param1 is mass
-         if (i == 1) then
-            s% job% new_mass = new_value
-         end if
-         
-      end subroutine set_my_param
-
-       
       integer function how_many_extra_history_columns(id)
          integer, intent(in) :: id
          integer :: ierr

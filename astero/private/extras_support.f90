@@ -77,7 +77,6 @@
          chi2 = -1
          chi2_seismo = -1
          chi2_spectro = -1
-         FeH = -1
          delta_nu_model = -1
          nu_max_model = -1
          a_div_r = -1
@@ -206,26 +205,12 @@
 
          end if
          
-         surface_X = max(s% surface_h1, 1d-10)
-         surface_He = s% surface_he3 + s% surface_he4
-         surface_Z = max(1d-99, min(1d0, 1 - (surface_X + surface_He)))
-         surface_Z_div_X = surface_Z/surface_X
-         FeH = log10((surface_Z_div_X)/Z_div_X_solar)
-         logg = log10(s% grav(1))
-         logR = log10(s% photosphere_r)
-         if (.not. include_Rcz_in_chi2_spectro) then
-            Rcz = 0
-         else
-            do i = 1, s% nz-1 ! locate bottom of solar convective zone
-               if (s% mixing_type(i+1) /= convective_mixing &
-                     .and. s% mixing_type(i) == convective_mixing) then
-                  if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
-                     Rcz = s% r(i)/Rsun
-                     exit
-                  end if
-               end if
-            end do
-         end if
+         ! must set constraint values before checking limits
+         do i = 1, max_constraints
+            if (constraint_name(i) == '') cycle
+            call star_astero_procs% set_constraint_value(id, constraint_name(i), constraint_value(i), ierr)
+            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'ierr /=0 in set_constraint_value')
+         end do
          
          call check_limits
          if (do_astero_extras_check_model /= keep_going) return
@@ -233,10 +218,11 @@
          chi2_spectro = get_chi2_spectro(s)         
          if (is_bad(chi2_spectro)) then
             write(*,1) 'bad chi2_spectro', chi2_spectro
-            write(*,1) 'FeH', FeH
-            write(*,1) 'surface_Z', surface_Z
-            write(*,1) 'surface_X', surface_X
-            write(*,1) 'Z_div_X_solar', Z_div_X_solar
+
+            do i = 1, max_constraints
+               if (constraint_name(i) /= '') write(*,1) constraint_name(i), constraint_value(i)
+            end do
+
             chi2_spectro = 1d99
             do_astero_extras_check_model = terminate
             return
@@ -637,64 +623,11 @@
          
          
          subroutine check_limits
-            real(dp) :: logg_limit, logL_limit, Teff_limit, delta_nu_limit, &
-               logR_limit, surface_Z_div_X_limit, surface_He_limit, Rcz_limit, &
-               my_var1_limit, my_var2_limit, my_var3_limit
-            integer :: nz
+            real(dp) :: delta_nu_limit, constraint_limit
+            integer :: nz, i
             include 'formats'
             nz = s% nz
 
-            if (sigmas_coeff_for_Teff_limit /= 0 .and. Teff_sigma > 0) then
-               Teff_limit = Teff_target + Teff_sigma*sigmas_coeff_for_Teff_limit
-               if ((sigmas_coeff_for_Teff_limit > 0 .and. s% Teff > Teff_limit) .or. &
-                   (sigmas_coeff_for_Teff_limit < 0 .and. s% Teff < Teff_limit)) then
-                  write(*,*) 'have reached Teff limit'
-                  write(*,1) 'Teff', s% Teff
-                  write(*,1) 'Teff_limit', Teff_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if    
-               if (trace_limits) then
-                  write(*,1) 'Teff', s% Teff
-                  write(*,1) 'Teff_limit', Teff_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_logg_limit /= 0 .and. logg_sigma > 0) then    
-               logg_limit = logg_target + logg_sigma*sigmas_coeff_for_logg_limit
-               if ((sigmas_coeff_for_logg_limit > 0 .and. logg > logg_limit) .or. &
-                   (sigmas_coeff_for_logg_limit < 0 .and. logg < logg_limit)) then
-                  write(*,*) 'have reached logg limit'
-                  write(*,1) 'logg', logg
-                  write(*,1) 'logg_limit', logg_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'logg', logg
-                  write(*,1) 'logg_limit', logg_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_logL_limit /= 0 .and. logL_sigma > 0) then
-               logL_limit = logL_target + logL_sigma*sigmas_coeff_for_logL_limit
-               if ((sigmas_coeff_for_logL_limit > 0 .and. s% log_surface_luminosity > logL_limit) .or. &
-                   (sigmas_coeff_for_logL_limit < 0 .and. s% log_surface_luminosity < logL_limit)) then
-                  write(*,*) 'have reached logL limit'
-                  write(*,1) 'logL', s% log_surface_luminosity
-                  write(*,1) 'logL_limit', logL_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'logL', s% log_surface_luminosity
-                  write(*,1) 'logL_limit', logL_limit
-               end if
-            end if
-            
             if (sigmas_coeff_for_delta_nu_limit /= 0 .and. delta_nu_sigma > 0 .and. delta_nu > 0) then
                delta_nu_limit = &
                   delta_nu + delta_nu_sigma*sigmas_coeff_for_delta_nu_limit
@@ -712,140 +645,28 @@
                   write(*,1) 'delta_nu_limit', delta_nu_limit
                end if
             end if
-            
-            if (sigmas_coeff_for_logR_limit /= 0 .and. logR_sigma > 0) then
-               logR_limit = logR_target + logR_sigma*sigmas_coeff_for_logR_limit
-               if ((sigmas_coeff_for_logR_limit > 0 .and. logR > logR_limit) .or. &
-                   (sigmas_coeff_for_logR_limit < 0 .and. logR < logR_limit)) then
-                  write(*,*) 'have reached logR limit'
-                  write(*,1) 'logR', logR
-                  write(*,1) 'logR_limit', logR_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
+
+            do i = 1, max_constraints
+               if (sigmas_coeff_for_constraint_limit(i) /= 0 .and. constraint_sigma(i) > 0) then
+                  constraint_limit = &
+                     constraint_target(i) + constraint_sigma(i)*sigmas_coeff_for_constraint_limit(i)
+                  if ((sigmas_coeff_for_constraint_limit(i) > 0 .and. &
+                           constraint_value(i) > constraint_limit) .or. &
+                      (sigmas_coeff_for_constraint_limit(i) < 0 .and. &
+                           constraint_value(i) < constraint_limit)) then
+                     write(*,*) 'have reached constraint_value(i) limit'
+                     write(*,1) 'constraint_value(i)', constraint_value(i)
+                     write(*,1) 'constraint_value(i)_limit', constraint_limit
+                     write(*,'(A)')
+                     do_astero_extras_check_model = terminate
+                     return
+                  end if
+                  if (trace_limits) then
+                     write(*,1) 'constraint_value(i)', constraint_value(i)
+                     write(*,1) 'constraint_limit', constraint_limit
+                  end if
                end if
-               if (trace_limits) then
-                  write(*,1) 'logR', logR
-                  write(*,1) 'logR_limit', logR_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_surface_Z_div_X_limit /= 0 .and. surface_Z_div_X_sigma > 0) then
-               surface_Z_div_X_limit = surface_Z_div_X_target + &
-                  surface_Z_div_X_sigma*sigmas_coeff_for_surface_Z_div_X_limit
-               if ((sigmas_coeff_for_surface_Z_div_X_limit > 0 .and. &
-                     surface_Z_div_X > surface_Z_div_X_limit) .or. &
-                     (sigmas_coeff_for_surface_Z_div_X_limit < 0 .and. &
-                      surface_Z_div_X < surface_Z_div_X_limit)) then
-                  write(*,*) 'have reached surface_Z_div_X limit'
-                  write(*,1) 'surface_Z_div_X', surface_Z_div_X
-                  write(*,1) 'surface_Z_div_X_limit', surface_Z_div_X_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'surface_Z_div_X', surface_Z_div_X
-                  write(*,1) 'surface_Z_div_X_limit', surface_Z_div_X_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_surface_He_limit /= 0 .and. surface_He_sigma > 0) then
-               surface_He_limit = surface_He_target + &
-                     surface_He_sigma*sigmas_coeff_for_surface_He_limit
-               if ((sigmas_coeff_for_surface_He_limit > 0 .and. &
-                     surface_He > surface_He_limit) .or. &
-                   (sigmas_coeff_for_surface_He_limit < 0 .and. &
-                     surface_He < surface_He_limit)) then
-                  write(*,*) 'have reached surface_He limit'
-                  write(*,1) 'surface_He', surface_He
-                  write(*,1) 'surface_He_limit', surface_He_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'surface_He', surface_He
-                  write(*,1) 'surface_He_limit', surface_He_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_Rcz_limit /= 0 .and. Rcz_sigma > 0) then
-               Rcz_limit = Rcz_target + Rcz_sigma*sigmas_coeff_for_Rcz_limit
-               if ((sigmas_coeff_for_Rcz_limit > 0 .and. Rcz > Rcz_limit) .or. &
-                   (sigmas_coeff_for_Rcz_limit < 0 .and. Rcz < Rcz_limit)) then
-                  write(*,*) 'have reached Rcz limit'
-                  write(*,1) 'Rcz', Rcz
-                  write(*,1) 'Rcz_limit', Rcz_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'Rcz', Rcz
-                  write(*,1) 'Rcz_limit', Rcz_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_my_var1_limit /= 0 .and. my_var1_sigma > 0) then
-               my_var1_limit = &
-                  my_var1_target + my_var1_sigma*sigmas_coeff_for_my_var1_limit
-               if ((sigmas_coeff_for_my_var1_limit > 0 .and. &
-                        my_var1 > my_var1_limit) .or. &
-                   (sigmas_coeff_for_my_var1_limit < 0 .and. &
-                        my_var1 < my_var1_limit)) then
-                  write(*,*) 'have reached my_var1 limit'
-                  write(*,1) 'my_var1', my_var1
-                  write(*,1) 'my_var1_limit', my_var1_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'my_var1', my_var1
-                  write(*,1) 'my_var1_limit', my_var1_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_my_var2_limit /= 0 .and. my_var2_sigma > 0) then
-               my_var2_limit = &
-                  my_var2_target + my_var2_sigma*sigmas_coeff_for_my_var2_limit
-               if ((sigmas_coeff_for_my_var2_limit > 0 .and. &
-                        my_var2 > my_var2_limit) .or. &
-                   (sigmas_coeff_for_my_var2_limit < 0 .and. &
-                        my_var2 < my_var2_limit)) then
-                  write(*,*) 'have reached my_var2 limit'
-                  write(*,1) 'my_var2', my_var2
-                  write(*,1) 'my_var2_limit', my_var2_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'my_var2', my_var2
-                  write(*,1) 'my_var2_limit', my_var2_limit
-               end if
-            end if
-            
-            if (sigmas_coeff_for_my_var3_limit /= 0 .and. my_var3_sigma > 0) then
-               my_var3_limit = &
-                  my_var3_target + my_var3_sigma*sigmas_coeff_for_my_var3_limit
-               if ((sigmas_coeff_for_my_var3_limit > 0 .and. &
-                        my_var3 > my_var3_limit) .or. &
-                   (sigmas_coeff_for_my_var3_limit < 0 .and. &
-                        my_var3 < my_var3_limit)) then
-                  write(*,*) 'have reached my_var3 limit'
-                  write(*,1) 'my_var3', my_var3
-                  write(*,1) 'my_var3_limit', my_var3_limit
-                  write(*,'(A)')
-                  do_astero_extras_check_model = terminate
-                  return
-               end if
-               if (trace_limits) then
-                  write(*,1) 'my_var3', my_var3
-                  write(*,1) 'my_var3_limit', my_var3_limit
-               end if
-            end if
+            end do
             
          end subroutine check_limits         
 
@@ -854,66 +675,24 @@
       
       real(dp) function get_chi2_spectro(s)
          type (star_info), pointer :: s
-         integer :: cnt
+         integer :: cnt, i
          real(dp) :: logL, sum
          include 'formats'
          cnt = 0
          sum = 0
-         if (include_logL_in_chi2_spectro) then
-            cnt = cnt + 1
-            logL = s% log_surface_luminosity
-            sum = sum + pow2((logL - logL_target)/logL_sigma)
-         end if
-         if (include_logg_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((logg - logg_target)/logg_sigma)
-         end if
-         if (include_Teff_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((s% Teff - Teff_target)/Teff_sigma)
-         end if
-         if (include_FeH_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((FeH - FeH_target)/FeH_sigma)
-         end if
-         if (include_logR_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((logR - logR_target)/logR_sigma)
-         end if
+
          if (include_age_in_chi2_spectro) then
             cnt = cnt + 1
             sum = sum + pow2((s% star_age - age_target)/age_sigma)
          end if
-         if (include_surface_Z_div_X_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + &
-               pow2( &
-               (surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-         end if
-         if (include_surface_He_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (surface_He - surface_He_target)/surface_He_sigma)
-         end if
-         if (include_Rcz_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2((Rcz - Rcz_target)/Rcz_sigma)
-         end if
-         if (include_my_var1_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (my_var1 - my_var1_target)/my_var1_sigma)
-         end if
-         if (include_my_var2_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (my_var2 - my_var2_target)/my_var2_sigma)
-         end if
-         if (include_my_var3_in_chi2_spectro) then
-            cnt = cnt + 1
-            sum = sum + pow2( &
-               (my_var3 - my_var3_target)/my_var3_sigma)
-         end if
+
+         do i = 1, max_constraints
+            if (include_constraint_in_chi2_spectro(i)) then
+               cnt = cnt + 1
+               sum = sum + pow2( &
+                  (constraint_value(i) - constraint_target(i))/constraint_sigma(i))
+            end if
+         end do
 
          if (normalize_chi2_spectro) then
             get_chi2_spectro = sum/cnt
@@ -933,23 +712,10 @@
          
          best_age = s% star_age
          best_model_number = s% model_number
-         best_radius = s% photosphere_r
-         best_logL = s% log_surface_luminosity
-         best_Teff = s% Teff
-         best_logg = logg
-         best_FeH = FeH
-         
-         best_logR = logR
-         best_surface_Z_div_X = surface_Z_div_X
-         best_surface_He = surface_He
-         best_Rcz = Rcz
-         best_my_var1 = my_var1
-         best_my_var2 = my_var2
-         best_my_var3 = my_var3
 
-         best_my_param1 = my_param1
-         best_my_param2 = my_param2
-         best_my_param3 = my_param3
+         best_constraint_value(1:max_constraints) = constraint_value(1:max_constraints)
+
+         best_param(1:max_parameters) = param(1:max_parameters)
          
          best_delta_nu = delta_nu_model
          best_nu_max = nu_max_model
@@ -1176,12 +942,13 @@
       
 
       subroutine astero_extras_controls(id, ierr)
-         !use run_star_extras, only: extras_controls, will_set_my_param
+         !use run_star_extras, only: extras_controls, set_param
          use pgstar_astero_plots, only: astero_pgstar_plots_info
          use gyre_support, only: gyre_is_enabled, init_gyre
          integer, intent(in) :: id
          integer, intent(out) :: ierr
-         real(dp) :: X, Y, Z, FeH, f_ov, a, b, c
+
+         integer :: i
          type (star_info), pointer :: s
          include 'formats'
          ierr = 0
@@ -1203,141 +970,28 @@
          s% how_many_extra_profile_columns => astero_how_many_extra_profile_columns
          s% data_for_extra_profile_columns => astero_data_for_extra_profile_columns  
          
-         
          if (s% job% astero_just_call_my_extras_check_model) return
          
          s% other_pgstar_plots_info => astero_pgstar_plots_info
          s% use_other_pgstar_plots = .true.
          
-         
-         ! overwrite various inlist controls
-
-         if (vary_alpha) then
-            s% mixing_length_alpha = next_alpha_to_try
-         else
-            s% mixing_length_alpha = first_alpha
-         end if
-
-         if (vary_f_ov) then
-            f_ov = next_f_ov_to_try
-         else
-            f_ov = first_f_ov
-         end if
-      
-         if (vary_FeH) then
-            FeH = next_FeH_to_try
-         else
-            FeH = first_FeH
-         end if
-
-         initial_FeH = FeH
-         initial_Z_div_X = Z_div_X_solar*exp10(FeH)
-
-         if (Y_depends_on_Z) then
-            a = initial_Z_div_X
-            b = dYdZ
-            c = 1d0 + a*(1d0 + b)
-            X = (1d0 - Y0)/c
-            Y = (Y0 + a*(b + Y0))/c
-            Z = 1d0 - (X + Y)
-            !write(*,1) 'init X', X
-            !write(*,1) 'init Y', Y
-            !write(*,1) 'init Z', Z
-            !stop
-         else 
-            if (vary_Y) then
-               Y = next_Y_to_try
-            else
-               Y = first_Y
+         do i = 1, max_parameters
+            if (param_name(i) /= '') then
+               if (vary_param(i)) then
+                  call star_astero_procs% set_param(&
+                     s% id, param_name(i), next_param_to_try(i), ierr)
+                  if (ierr /= 0) return
+                  param(i) = next_param_to_try(i)
+               else
+                  call star_astero_procs% set_param(&
+                     s% id, param_name(i), first_param(i), ierr)
+                  if (ierr /= 0) return
+                  param(i) = first_param(i)
+               end if
             end if
-            X = (1d0 - Y)/(1d0 + initial_Z_div_X)
-            Z = X*initial_Z_div_X
-         end if
-
-         if (vary_mass) then
-            s% job% new_mass = next_mass_to_try
-         else
-            s% job% new_mass = first_mass
-         end if
-
-         if (vary_my_param1) then
-            call star_astero_procs% will_set_my_param( &
-               s% id, 1, next_my_param1_to_try, ierr)
-            if (ierr /= 0) return
-            my_param1 = next_my_param1_to_try
-         else
-            call star_astero_procs% will_set_my_param( &
-               s% id, 1, first_my_param1, ierr)
-            if (ierr /= 0) return
-            my_param1 = first_my_param1
-         end if
-
-         if (vary_my_param2) then
-            call star_astero_procs% will_set_my_param( &
-               s% id, 2, next_my_param2_to_try, ierr)
-            if (ierr /= 0) return
-            my_param2 = next_my_param2_to_try
-         else
-            call star_astero_procs% will_set_my_param( &
-               s% id, 2, first_my_param2, ierr)
-            if (ierr /= 0) return
-            my_param2 = first_my_param2
-         end if
-
-         if (vary_my_param3) then
-            call star_astero_procs% will_set_my_param( &
-               s% id, 3, next_my_param3_to_try, ierr)
-            if (ierr /= 0) return
-            my_param3 = next_my_param3_to_try
-         else
-            call star_astero_procs% will_set_my_param( &
-               s% id, 3, first_my_param3, ierr)
-            if (ierr /= 0) return
-            my_param3 = first_my_param3
-         end if
+         end do
          
-         s% job% relax_initial_mass = .true.
-         s% initial_mass = s% job% new_mass
-         
-         initial_Y = Y
-         !s% initial_Z = Z << don't do this. it interferes with use of zams file.
-         
-         s% job% initial_h1 = X
-         s% job% initial_h2 = 0
-         s% job% initial_he3 = Y_frac_he3*Y
-         s% job% initial_he4 = Y - s% job% initial_he3
-         s% job% set_uniform_initial_composition = .true. 
-         
-         current_Y = Y
-         current_FeH = FeH
-         current_mass = s% job% new_mass
-         current_alpha = s% mixing_length_alpha
-         current_f_ov = f_ov
-
-         current_my_param1 = my_param1
-         current_my_param2 = my_param2
-         current_my_param3 = my_param3
-         
-         current_h1 = X
-         current_he3 = s% job% initial_he3
-         current_he4 = s% job% initial_he4
-         current_Z = Z
-
-         if (f_ov > 0._dp) then
-            s% overshoot_scheme(1) = 'exponential'
-            s% overshoot_zone_type(1) = 'any'
-            s% overshoot_zone_loc(1) = 'any'
-            s% overshoot_bdy_loc(1) = 'any'
-            s% overshoot_f(1) = f_ov
-            s% overshoot_f0(1) = f0_ov_div_f_ov*f_ov
-         else
-            s% overshoot_scheme(1) = ''
-            s% overshoot_zone_type(1) = ''
-            s% overshoot_zone_loc(1) = ''
-            s% overshoot_bdy_loc(1) = ''
-            s% overshoot_f(1) = 0d0
-            s% overshoot_f0(1) = 0d0
-         end if
+         current_param(1:max_parameters) = param(1:max_parameters)
          
       end subroutine astero_extras_controls
       
