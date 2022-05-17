@@ -102,56 +102,33 @@
       real(dp) :: delta_nu, delta_nu_sigma
       real(dp) :: nu_max, nu_max_sigma
 
-      logical :: include_logg_in_chi2_spectro
-      real(dp) :: logg_target, logg_sigma
-      
-      logical :: include_logL_in_chi2_spectro
-      real(dp) :: logL_target, logL_sigma
-
-      logical :: include_Teff_in_chi2_spectro
-      real(dp) :: Teff_target, Teff_sigma
-
-      logical :: include_FeH_in_chi2_spectro
-      real(dp) :: FeH_target, FeH_sigma
-         
-      logical :: include_logR_in_chi2_spectro
-      real(dp) :: logR_target, logR_sigma
-         
       logical :: include_age_in_chi2_spectro
       real(dp) :: age_target, age_sigma
       integer :: num_smaller_steps_before_age_target
       real(dp) :: dt_for_smaller_steps_before_age_target
-         
-      logical :: include_surface_Z_div_X_in_chi2_spectro
-      real(dp) :: surface_Z_div_X_target, surface_Z_div_X_sigma
-         
-      logical :: include_surface_He_in_chi2_spectro
-      real(dp) :: surface_He_target, surface_He_sigma
-         
-      logical :: include_Rcz_in_chi2_spectro
-      real(dp) :: Rcz_target, Rcz_sigma
 
-      logical :: include_my_var1_in_chi2_spectro
-      real(dp) :: my_var1_target, my_var1_sigma
-      character (len=32) :: my_var1_name
+      ! spectro (non-seismic) constraints
+      integer, parameter :: max_constraints = 100
+      integer :: num_constraints ! how many are actually used
 
-      logical :: include_my_var2_in_chi2_spectro
-      real(dp) :: my_var2_target, my_var2_sigma
-      character (len=32) :: my_var2_name
+      logical :: include_constraint_in_chi2_spectro(max_constraints)
+      real(dp) :: constraint_target(max_constraints)
+      real(dp) :: constraint_sigma(max_constraints)
+      real(dp) :: sigmas_coeff_for_constraint_limit(max_constraints)
 
-      logical :: include_my_var3_in_chi2_spectro
-      real(dp) :: my_var3_target, my_var3_sigma
-      character (len=32) :: my_var3_name
+      character (len=strlen) :: constraint_name(max_constraints)
       
       real(dp) :: Z_div_X_solar
 
-      integer, parameter :: & ! increase these if necessary
-         max_nl = 1000
+      integer, parameter :: max_nl = 1000 ! increase this if necessary
 
       ! observed modes to match to model
       integer  :: nl(0:3)
       real(dp) :: freq_target(0:3,max_nl)
       real(dp) :: freq_sigma(0:3,max_nl)
+
+      integer, parameter :: max_parameters = 100
+      integer :: num_parameters
             
       character (len=100) :: search_type
       
@@ -184,29 +161,16 @@
       logical :: restart_scan_grid_from_file
       character (len=256) :: filename_for_parameters
       integer :: max_num_from_file
-      integer :: &
-         file_column_for_FeH, file_column_for_Y, file_column_for_f_ov, &
-         file_column_for_alpha, file_column_for_mass, &
-         file_column_for_my_param1, file_column_for_my_param2, &
-         file_column_for_my_param3
+      integer :: file_column_for_param(max_parameters)
       character (len=256) :: from_file_output_filename
       
       logical :: Y_depends_on_Z
       real(dp) :: Y0, dYdZ
 
-      logical :: vary_FeH, vary_Y, vary_mass, vary_alpha, vary_f_ov
-      real(dp) :: first_FeH, first_Y, first_mass, first_alpha, first_f_ov
-      real(dp) :: min_FeH, min_Y, min_mass, min_alpha, min_f_ov
-      real(dp) :: max_FeH, max_Y, max_mass, max_alpha, max_f_ov
-      real(dp) :: delta_Y, delta_FeH, delta_mass, delta_alpha, delta_f_ov
-      
-      logical :: vary_my_param1, vary_my_param2, vary_my_param3
-      real(dp) :: &
-         first_my_param1, first_my_param2, first_my_param3, &
-         min_my_param1, min_my_param2, min_my_param3, &
-         max_my_param1, max_my_param2, max_my_param3, &
-         delta_my_param1, delta_my_param2, delta_my_param3
-      character (len=32) :: my_param1_name, my_param2_name, my_param3_name
+      logical :: vary_param(max_parameters)
+      real(dp), dimension(max_parameters) :: &
+         first_param, min_param, max_param, delta_param
+      character (len=strlen) :: param_name(max_parameters)
       
       real(dp) :: f0_ov_div_f_ov, Lnuc_div_L_limit, &
          chi2_spectroscopic_limit, chi2_radial_limit, chi2_delta_nu_limit
@@ -217,24 +181,13 @@
          max_yrs_dt_chi2_smallest_limit, chi2_limit_for_smallest_timesteps, &
          chi2_search_limit1, chi2_search_limit2, chi2_relative_increase_limit, &
          avg_age_sigma_limit, avg_model_number_sigma_limit
+
+      real(dp) :: sigmas_coeff_for_delta_nu_limit
          
       integer :: min_num_samples_for_avg, max_num_samples_for_avg, &
          limit_num_chi2_too_big
       
       real(dp) :: min_age_limit
-      
-      real(dp) :: &
-         sigmas_coeff_for_logg_limit, &
-         sigmas_coeff_for_logL_limit, &
-         sigmas_coeff_for_Teff_limit, &
-         sigmas_coeff_for_logR_limit, &
-         sigmas_coeff_for_surface_Z_div_X_limit, &
-         sigmas_coeff_for_surface_He_limit, &
-         sigmas_coeff_for_Rcz_limit, &
-         sigmas_coeff_for_delta_nu_limit, &
-         sigmas_coeff_for_my_var1_limit, &
-         sigmas_coeff_for_my_var2_limit, &
-         sigmas_coeff_for_my_var3_limit
       
       character(len=32) :: correction_scheme, &
          surf_coef1_name, surf_coef2_name
@@ -356,43 +309,13 @@
          delta_nu, delta_nu_sigma, &
          nu_max, nu_max_sigma, &
          
-         include_logg_in_chi2_spectro, &
-         logg_target, logg_sigma, &
-         
-         include_logL_in_chi2_spectro, &
-         logL_target, logL_sigma, &
-         
-         include_Teff_in_chi2_spectro, &
-         Teff_target, Teff_sigma, &
-         
-         include_FeH_in_chi2_spectro, &
-         FeH_target, FeH_sigma, &
-         
-         include_logR_in_chi2_spectro, &
-         logR_target, logR_sigma, &
-         
          include_age_in_chi2_spectro, &
          age_target, age_sigma, &
          num_smaller_steps_before_age_target, &
          dt_for_smaller_steps_before_age_target, &
-         
-         include_surface_Z_div_X_in_chi2_spectro, &
-         surface_Z_div_X_target, surface_Z_div_X_sigma, &
-         
-         include_surface_He_in_chi2_spectro, &
-         surface_He_target, surface_He_sigma, &
-         
-         include_Rcz_in_chi2_spectro, &
-         Rcz_target, Rcz_sigma, &
 
-         include_my_var1_in_chi2_spectro, &
-         my_var1_target, my_var1_sigma, my_var1_name, &
-         
-         include_my_var2_in_chi2_spectro, &
-         my_var2_target, my_var2_sigma, my_var2_name, &
-         
-         include_my_var3_in_chi2_spectro, &
-         my_var3_target, my_var3_sigma, my_var3_name, &
+         include_constraint_in_chi2_spectro, &
+         constraint_target, constraint_sigma, constraint_name, &
          
          Z_div_X_solar, &
          nl, &
@@ -427,23 +350,15 @@
          restart_scan_grid_from_file, &
          filename_for_parameters, &
          max_num_from_file, &
-         file_column_for_FeH, file_column_for_Y, file_column_for_f_ov, &
-         file_column_for_alpha, file_column_for_mass, &
-         file_column_for_my_param1, file_column_for_my_param2, &
-         file_column_for_my_param3, &
+         file_column_for_param, &
          from_file_output_filename, &
          Y_depends_on_Z, Y0, dYdZ, &
-         vary_FeH, vary_Y, vary_mass, vary_alpha, vary_f_ov, &
-         vary_my_param1, vary_my_param2, vary_my_param3, &
-         first_FeH, first_Y, first_mass, first_alpha, first_f_ov, &
-         first_my_param1, first_my_param2, first_my_param3, &
-         min_FeH, min_Y, min_mass, min_alpha, min_f_ov, &
-         min_my_param1, min_my_param2, min_my_param3, &
-         max_FeH, max_Y, max_mass, max_alpha, max_f_ov, &
-         max_my_param1, max_my_param2, max_my_param3, &
-         delta_Y, delta_FeH, delta_mass, delta_alpha, delta_f_ov, &
-         delta_my_param1, delta_my_param2, delta_my_param3, &
-         my_param1_name, my_param2_name, my_param3_name, &
+         vary_param, &
+         first_param, &
+         min_param, &
+         max_param, &
+         delta_param, &
+         param_name, &
          f0_ov_div_f_ov, &
          Lnuc_div_L_limit, chi2_spectroscopic_limit, &
          chi2_radial_limit, chi2_delta_nu_limit, &
@@ -455,18 +370,9 @@
          limit_num_chi2_too_big, chi2_relative_increase_limit, &
          avg_age_sigma_limit, avg_model_number_sigma_limit, &
          min_num_samples_for_avg, max_num_samples_for_avg, &
-         sigmas_coeff_for_logg_limit, &
-         sigmas_coeff_for_logL_limit, &
-         sigmas_coeff_for_Teff_limit, &
-         
-         sigmas_coeff_for_logR_limit, &
-         sigmas_coeff_for_surface_Z_div_X_limit, &
-         sigmas_coeff_for_surface_He_limit, &
-         sigmas_coeff_for_Rcz_limit, &
-         sigmas_coeff_for_my_var1_limit, &
-         sigmas_coeff_for_my_var2_limit, &
-         sigmas_coeff_for_my_var3_limit, &
-         
+
+         sigmas_coeff_for_constraint_limit, &
+
          sigmas_coeff_for_delta_nu_limit, &
          min_age_limit, &
          correction_scheme, surf_coef1_name, surf_coef2_name, &
@@ -645,25 +551,17 @@
       real(dp) :: min_sample_chi2_so_far = -1
       integer :: sample_number, nvar, num_chi2_too_big
       
-      integer :: &
-         i_Y, i_FeH, &
-         i_mass, i_alpha, i_f_ov, &
-         i_my_param1, i_my_param2, i_my_param3
-      real(dp) :: &
-         final_Y, final_FeH, &
-         final_mass, final_alpha, final_f_ov, &
-         final_my_param1, final_my_param2, final_my_param3
+      integer :: i_param(max_parameters)
+      real(dp) :: final_param(max_parameters)
 
       real(dp) :: initial_max_years_for_timestep
       logical :: okay_to_restart
       real(dp) :: nu_max_sun, delta_nu_sun
 
       real(dp) :: &
-         next_FeH_to_try, next_Y_to_try, &
          next_initial_h1_to_try, next_initial_he3_to_try, &
          next_initial_he4_to_try, &
-         next_mass_to_try, next_alpha_to_try, next_f_ov_to_try, &
-         next_my_param1_to_try, next_my_param2_to_try, next_my_param3_to_try
+         next_param_to_try(max_parameters)
 
       real(dp) :: avg_nu_obs, avg_radial_n
       real(dp) :: chi2_seismo_freq_fraction
@@ -674,30 +572,13 @@
          best_chi2, &
          best_chi2_seismo, &
          best_chi2_spectro, &
-         best_init_h1, &
-         best_init_he3, &
-         best_init_he4, &
-         best_init_Z, &
          best_age, &
-         best_radius, &
-         best_logL, &
-         best_Teff, &
-         best_logg, &
-         best_FeH, &
-         best_logR, &
-         best_surface_Z_div_X, &
-         best_surface_He, &
-         best_Rcz, &
-         best_my_var1, &
-         best_my_var2, &
-         best_my_var3, &
-         best_my_param1, &
-         best_my_param2, &
-         best_my_param3, &
+         best_param(max_parameters), &
          best_delta_nu, &
          best_nu_max, &
          best_surf_coef1, &
-         best_surf_coef2
+         best_surf_coef2, &
+         best_constraint_value(max_constraints)
          
       integer :: &
          best_model_number
@@ -720,34 +601,13 @@
          sample_chi2_seismo, &
          sample_chi2_spectro, &
          sample_age, &
-         sample_init_Y, &
-         sample_init_FeH, &
-         sample_init_h1, &
-         sample_init_he3, &
-         sample_init_he4, &
-         sample_init_Z, &
-         sample_mass, &
-         sample_alpha, &
-         sample_f_ov, &
-         sample_radius, &
-         sample_logL, &
-         sample_Teff, &
-         sample_logg, &
-         sample_FeH, &
-         sample_logR, &
-         sample_surface_Z_div_X, &
-         sample_surface_He, &
-         sample_Rcz, &
-         sample_my_var1, &
-         sample_my_var2, &
-         sample_my_var3, &
-         sample_my_param1, &
-         sample_my_param2, &
-         sample_my_param3, &
          sample_delta_nu, &
          sample_nu_max, &
          sample_surf_coef1, &
          sample_surf_coef2
+
+      real(dp), pointer, dimension(:,:) :: sample_constraint_value
+      real(dp), pointer, dimension(:,:) :: sample_param
          
       integer, pointer, dimension(:) :: &
          sample_index_by_chi2, &
@@ -776,26 +636,13 @@
          chi2_seismo, chi2_spectro, chi2_radial, chi2_delta_nu, chi2_nu_max, &
          chi2_r_010_ratios, chi2_r_02_ratios, chi2_frequencies, &
          initial_Y, initial_FeH, initial_Z_div_X, &
-         logg, FeH, logR, surface_Z_div_X, surface_He, Rcz, &
-         my_var1, my_var2, my_var3, my_param1, my_param2, my_param3
+         constraint_value(max_constraints), param(max_parameters)
 
       integer :: star_id, star_model_number
       integer :: num_chi2_seismo_terms, num_chi2_spectro_terms
       
       ! current values for parameters set by adipls_extras_controls
-      real(dp) :: &
-         current_Y, &
-         current_FeH, &
-         current_mass, &
-         current_alpha, &
-         current_f_ov, &
-         current_h1, &
-         current_he3, &
-         current_he4, &
-         current_Z, &
-         current_my_param1, &
-         current_my_param2, &
-         current_my_param3
+      real(dp) :: current_param(max_parameters)
 
       integer, parameter :: num_extra_history_columns = 5
 
@@ -803,18 +650,21 @@
 
       abstract interface
 
-         subroutine set_my_vars_interface(id, ierr)
+         subroutine set_constraint_value_interface(id, name, val, ierr)
+            use const_def, only: dp, strlen
             integer, intent(in) :: id
+            character(len=strlen), intent(in) :: name
+            real(dp), intent(out) :: val
             integer, intent(out) :: ierr
-         end subroutine set_my_vars_interface
+         end subroutine set_constraint_value_interface
 
-         subroutine will_set_my_param_interface(id, i, new_value, ierr)
-            use const_def, only: dp
+         subroutine set_param_interface(id, name, val, ierr)
+            use const_def, only: dp, strlen
             integer, intent(in) :: id
-            integer, intent(in) :: i ! which of my_param's will be set
-            real(dp), intent(in) :: new_value
+            character(len=strlen), intent(in) :: name ! which param to set
+            real(dp), intent(in) :: val
             integer, intent(out) :: ierr
-         end subroutine will_set_my_param_interface
+         end subroutine set_param_interface
 
          subroutine extras_controls_interface(id, ierr)
             integer, intent(in) :: id
@@ -824,8 +674,8 @@
       end interface
 
       type astero_procs
-         procedure(set_my_vars_interface), pointer, nopass :: set_my_vars
-         procedure(will_set_my_param_interface), pointer, nopass :: will_set_my_param
+         procedure(set_constraint_value_interface), pointer, nopass :: set_constraint_value
+         procedure(set_param_interface), pointer, nopass :: set_param
          procedure(extras_startup_interface), pointer, nopass :: extras_startup
          procedure(extras_controls_interface), pointer, nopass :: extras_controls
          procedure(extras_check_model_interface), pointer, nopass :: extras_check_model
@@ -847,8 +697,8 @@
       contains
       
       subroutine init_astero_def
-         star_astero_procs% set_my_vars => null()
-         star_astero_procs% will_set_my_param => null()
+         star_astero_procs% set_constraint_value => null()
+         star_astero_procs% set_param => null()
          star_astero_procs% extras_startup => null()
          star_astero_procs% extras_controls => null()
          star_astero_procs% extras_check_model => null()
@@ -914,30 +764,8 @@
             sample_chi2_seismo, &
             sample_chi2_spectro, &
             sample_age, &
-            sample_init_Y, &
-            sample_init_FeH, &
-            sample_init_h1, &
-            sample_init_he3, &
-            sample_init_he4, &
-            sample_init_Z, &
-            sample_mass, &
-            sample_alpha, &
-            sample_f_ov, &
-            sample_my_param1, &
-            sample_my_param2, &
-            sample_my_param3, &
-            sample_radius, &
-            sample_logL, &
-            sample_Teff, &
-            sample_logg, &
-            sample_FeH, &
-            sample_logR, &
-            sample_surface_Z_div_X, &
-            sample_surface_He, &
-            sample_Rcz, &
-            sample_my_var1, &
-            sample_my_var2, &
-            sample_my_var3, &
+            sample_param, &
+            sample_constraint_value, &
             sample_delta_nu, &
             sample_nu_max, &
             sample_surf_coef1, &
@@ -965,31 +793,10 @@
          call realloc_double(sample_chi2_seismo,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_chi2_spectro,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_age,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_init_Y,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_init_FeH,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_init_h1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_init_he3,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_init_he4,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_init_Z,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_mass,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_alpha,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_f_ov,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_param1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_param2,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_param3,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_radius,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_logL,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_Teff,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_logg,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_FeH,max_num_samples,ierr); if (ierr /= 0) return
-         
-         call realloc_double(sample_logR,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_surface_Z_div_X,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_surface_He,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_Rcz,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_var1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_var2,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double(sample_my_var3,max_num_samples,ierr); if (ierr /= 0) return
+
+         call realloc_double2(sample_param,max_parameters,max_num_samples,ierr); if (ierr /= 0) return
+
+         call realloc_double2(sample_constraint_value,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
          
          call realloc_double(sample_delta_nu,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_nu_max,max_num_samples,ierr); if (ierr /= 0) return
@@ -1369,7 +1176,7 @@
          ! column numbers
          write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
 
-         k = 41 ! fixed columns
+         k = 17 + num_constraints + num_parameters ! fixed columns
 
          if (chi2_seismo_fraction > 0) then
 
@@ -1398,35 +1205,21 @@
 
          write(iounit, fmt, advance='no') &
             'sample', &
-            'chi2', &
-            'mass', &
-            'init_Y', &
-            'init_FeH', &
-            'alpha', &
-            'f_ov', &
-            trim(my_param1_name), &
-            trim(my_param2_name), &
-            trim(my_param3_name), &
+            'chi2'
+
+         do i = 1, max_parameters
+            if (param_name(i) /= '') write(iounit, fmt, advance='no') trim(param_name(i))
+         end do
+
+         write(iounit, fmt, advance='no') &
             'age', &
-            
-            'model_number', &
-            
-            'init_h1', &
-            'init_he3', &
-            'init_he4', &
-            'init_Z', &
-            'log_radius', &
-            'logL', &
-            'Teff', &
-            'logg', &
-            'Fe_H', &
-            'logR', &
-            'surface_Z_div_X', &
-            'surface_He', &
-            'Rcz', &
-            trim(my_var1_name), &
-            trim(my_var2_name), &
-            trim(my_var3_name), &
+            'model_number'
+
+         do i = 1, max_constraints
+            if (constraint_name(i) /= '') write(iounit, fmt, advance='no') trim(constraint_name(i))
+         end do
+
+         write(iounit, fmt, advance='no') &
             'delta_nu', &
             'nu_max', &
             trim(surf_coef1_name), &
@@ -1513,53 +1306,33 @@
             end if
          end if
 
-         write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
-            ',10' // trim(astero_results_dbl_format) // &
-            ',' // trim(astero_results_int_format) // &
-            ',22' // trim(astero_results_dbl_format) // &
-            ',7' // trim(astero_results_int_format) // ')'
-         
-         write(iounit, fmt, advance='no') i, &
-            sample_chi2(i), &
-            sample_mass(i), &
-            sample_init_Y(i), &
-            sample_init_FeH(i), &
-            sample_alpha(i), &
-            sample_f_ov(i), &
-            sample_my_param1(i), &
-            sample_my_param2(i), &
-            sample_my_param3(i), &
-            sample_age(i), &
-            sample_model_number(i), &
-            sample_init_h1(i), &
-            sample_init_he3(i), &
-            sample_init_he4(i), &
-            sample_init_Z(i), &
-            safe_log10(sample_radius(i)), &
-            sample_logL(i), &
-            sample_Teff(i), &
-            sample_logg(i), &
-            sample_FeH(i), &
-            sample_logR(i), &
-            sample_surface_Z_div_X(i), &
-            sample_surface_He(i), &
-            sample_Rcz(i), &
-            sample_my_var1(i), &
-            sample_my_var2(i), &
-            sample_my_var3(i), &
-            sample_delta_nu(i), &
-            sample_nu_max(i), &
-            sample_surf_coef1(i), &
-            sample_surf_coef2(i), &
-            sample_chi2_seismo(i), &
-            sample_chi2_spectro(i), &
-            nl(0), &
-            nl(1), &
-            nl(2), &
-            nl(3), &
-            ratios_n, &
-            ratios_l0_first, &
-            ratios_l1_first
+         call write1_int(i)
+         call write1_dbl(sample_chi2(i))
+
+         do k = 1, max_parameters
+            if (param_name(k) /= '') call write1_dbl(sample_param(k,i))
+         end do
+
+         call write1_dbl(sample_age(i))
+         call write1_int(sample_model_number(i))
+
+         do k = 1, max_constraints
+            if (constraint_name(k) /= '') call write1_dbl(sample_constraint_value(k,i))
+         end do
+
+         call write1_dbl(sample_delta_nu(i))
+         call write1_dbl(sample_nu_max(i))
+         call write1_dbl(sample_surf_coef1(i))
+         call write1_dbl(sample_surf_coef2(i))
+         call write1_dbl(sample_chi2_seismo(i))
+         call write1_dbl(sample_chi2_spectro(i))
+         call write1_int(nl(0))
+         call write1_int(nl(1))
+         call write1_int(nl(2))
+         call write1_int(nl(3))
+         call write1_int(ratios_n)
+         call write1_int(ratios_l0_first)
+         call write1_int(ratios_l1_first)
             
          if (iounit == 6) return
 
@@ -1598,6 +1371,20 @@
          end if
 
          write(iounit, '(a)') ! end of line
+
+         contains
+
+         subroutine write1_dbl(x)
+            real(dp), intent(in) :: x
+
+            write(iounit, astero_results_dbl_format, advance='no', iostat=ierr) x
+         end subroutine write1_dbl
+
+         subroutine write1_int(i)
+            integer, intent(in) :: i
+
+            write(iounit, astero_results_int_format, advance='no', iostat=ierr) i
+         end subroutine write1_int
       
       end subroutine show1_sample_results
       
@@ -1766,6 +1553,7 @@
          integer, intent(in) :: io
          
          real(dp) :: chi2term
+         integer :: i
          include 'formats'
          
          if (chi2_seismo_fraction > 0) then
@@ -1776,148 +1564,42 @@
                call show_best_r02_ratios_info(io)
          end if
 
-         if (Teff_sigma > 0 .and. include_Teff_in_chi2_spectro) then
-            chi2term = pow2((best_Teff - Teff_target)/Teff_sigma)
-            write(io,'(A)')
-            call write1('Teff chi2term', chi2term)
-            call write1('Teff', best_Teff)
-            call write1('Teff_obs', Teff_target)
-            call write1('Teff_sigma', Teff_sigma)
-         end if
-         
-         if (logL_sigma > 0 .and. include_logL_in_chi2_spectro) then
-            chi2term = pow2((best_logL - logL_target)/logL_sigma)
-            write(io,'(A)')
-            call write1('logL chi2term', chi2term)
-            call write1('logL', best_logL)
-            call write1('logL_obs', logL_target)
-            call write1('logL_sigma', logL_sigma)
-         end if
-         
-         if (logg_sigma > 0 .and. include_logg_in_chi2_spectro) then
-            chi2term = pow2((best_logg - logg_target)/logg_sigma)
-            write(io,'(A)')
-            call write1('logg chi2term', chi2term)
-            call write1('logg', best_logg)
-            call write1('logg_obs', logg_target)
-            call write1('logg_sigma', logg_sigma)
-         end if
-         
-         if (FeH_sigma > 0 .and. include_FeH_in_chi2_spectro) then
-            chi2term = pow2((best_FeH - FeH_target)/FeH_sigma)
-            write(io,'(A)')
-            call write1('FeH chi2term', chi2term)
-            call write1('FeH', best_FeH)
-            call write1('FeH_obs', FeH_target)
-            call write1('FeH_sigma', FeH_sigma)
-         end if
-         
-         if (logR_sigma > 0 .and. include_logR_in_chi2_spectro) then
-            chi2term = pow2((best_logR - logR_target)/logR_sigma)
-            write(io,'(A)')
-            call write1('logR chi2term', chi2term)
-            call write1('logR', best_logR)
-            call write1('logR_obs', logR_target)
-            call write1('logR_sigma', logR_sigma)
-         end if
-         
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
             chi2term = pow2((best_age - age_target)/age_sigma)
             write(io,'(A)')
-            write(io,'(a40,e20.10,99f20.10)') 'age chi2term', chi2term
             write(io,'(a40,1pes20.10)') 'age', best_age
             write(io,'(a40,1pes20.10)') 'age_target', age_target
             write(io,'(a40,1pes20.10)') 'age_sigma', age_sigma
+            write(io,'(a40,e20.10,99f20.10)') 'age chi2term', chi2term
          end if
-         
-         if (surface_Z_div_X_sigma > 0 .and. &
-               include_surface_Z_div_X_in_chi2_spectro) then
-            chi2term = &
-               pow2((best_surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
+
+         do i = 1, max_constraints
+            if (constraint_name(i) == '') cycle
+
             write(io,'(A)')
-            write(io,'(a40,e20.10,99f20.10)') 'surface_Z_div_X chi2term', chi2term
-            call write1('surface_Z_div_X', best_surface_Z_div_X)
-            call write1('surface_Z_div_X_obs', surface_Z_div_X_target)
-            call write1('surface_Z_div_X_sigma', surface_Z_div_X_sigma)
-         end if
-         
-         if (surface_He_sigma > 0 .and. include_surface_He_in_chi2_spectro) then
-            chi2term = pow2((best_surface_He - surface_He_target)/surface_He_sigma)
-            write(io,'(A)')
-            call write1('surface_He chi2term', chi2term)
-            call write1('surface_He', best_surface_He)
-            call write1('surface_He_obs', surface_He_target)
-            call write1('surface_He_sigma', surface_He_sigma)
-         end if
-         
-         if (Rcz_sigma > 0 .and. include_Rcz_in_chi2_spectro) then
-            chi2term = pow2((best_Rcz - Rcz_target)/Rcz_sigma)
-            write(io,'(A)')
-            call write1('Rcz chi2term', chi2term)
-            call write1('Rcz', best_Rcz)
-            call write1('Rcz_obs', Rcz_target)
-            call write1('Rcz_sigma', Rcz_sigma)
-         end if
-         
-         if (my_var1_sigma > 0 .and. include_my_var1_in_chi2_spectro) then
-            chi2term = pow2( &
-                  (best_my_var1 - my_var1_target)/my_var1_sigma)
-            write(io,'(A)')
-            call write1(trim(my_var1_name) // ' chi2term', chi2term)
-            call write1(trim(my_var1_name), best_my_var1)
-            call write1(trim(my_var1_name) // '_obs', my_var1_target)
-            call write1(trim(my_var1_name) // '_sigma', my_var1_sigma)
-         end if
-         
-         if (my_var2_sigma > 0 .and. include_my_var2_in_chi2_spectro) then
-            chi2term = pow2( &
-                  (best_my_var2 - my_var2_target)/my_var2_sigma)
-            write(io,'(A)')
-            call write1(trim(my_var2_name) // ' chi2term', chi2term)
-            call write1(trim(my_var2_name), best_my_var2)
-            call write1(trim(my_var2_name) // '_obs', my_var2_target)
-            call write1(trim(my_var2_name) // '_sigma', my_var2_sigma)
-         end if
-         
-         if (my_var3_sigma > 0 .and. include_my_var3_in_chi2_spectro) then
-            chi2term = pow2( &
-                  (best_my_var3 - my_var3_target)/my_var3_sigma)
-            write(io,'(A)')
-            call write1(trim(my_var3_name) // ' chi2term', chi2term)
-            call write1(trim(my_var3_name), best_my_var3)
-            call write1(trim(my_var3_name) // '_obs', my_var3_target)
-            call write1(trim(my_var3_name) // '_sigma', my_var3_sigma)
-         end if
+            call write1(trim(constraint_name(i)), best_constraint_value(i))
+
+            if (constraint_sigma(i) > 0 .and. include_constraint_in_chi2_spectro(i)) then
+               chi2term = pow2( &
+                     (best_constraint_value(i) - constraint_target(i))/constraint_sigma(i))
+               call write1(trim(constraint_name(i)) // '_obs', constraint_target(i))
+               call write1(trim(constraint_name(i)) // '_sigma', constraint_sigma(i))
+               call write1(trim(constraint_name(i)) // ' chi2term', chi2term)
+            end if
+         end do
          
          write(io,'(A)')
-         call write1('R/Rsun', best_radius)
-         call write1('logL/Lsun', best_logL)
-         call write1('Teff', best_Teff)
-         call write1('logg', best_logg)
-         call write1('FeH', best_FeH)
-         call write1('logR', best_logR)
-         call write1('surface_Z_div_X', best_surface_Z_div_X)
-         call write1('surface_He', best_surface_He)
-         call write1('Rcz', best_Rcz)
          call write1('delta_nu', best_delta_nu)
          call write1('nu_max', best_nu_max)
          write(io,*)        
          write(io,'(a40,1pes20.10)') trim(surf_coef1_name), best_surf_coef1
          write(io,'(a40,1pes20.10)') trim(surf_coef2_name), best_surf_coef2
          write(io,*)        
-         call write1('initial h1', current_h1)
-         call write1('initial he3', current_he3)
-         call write1('initial he4', current_he4)
-         call write1('initial Y', current_Y)
-         call write1('initial Z', current_Z)
-         call write1('initial FeH', current_FeH)
-         write(io,*)        
-         call write1('mass/Msun', current_mass)
-         call write1('alpha', current_alpha)
-         call write1('f_ov', current_f_ov)
-         call write1(trim(my_param1_name), current_my_param1)
-         call write1(trim(my_param2_name), current_my_param2)
-         call write1(trim(my_param3_name), current_my_param3)
+
+         do i = 1, max_parameters
+            if (param_name(i) /= '') call write1(trim(param_name(i)), current_param(i))
+         end do
+
          write(io,'(a40,1pes20.10)') 'age', best_age
          write(io,'(A)')
          if (chi2_seismo_fraction == 1d0) then
@@ -2041,7 +1723,7 @@
          include 'formats'
          
          ierr = 0
-         read(iounit,fmt=astero_results_int_format,advance='no',iostat=ierr) i
+         call read1_int(i)
          if (ierr /= 0) return
          if (i <= 0 .or. i > size(sample_chi2,dim=1)) then
             write(*,2) 'invalid sample number', i
@@ -2049,56 +1731,33 @@
             return
          end if
 
-         write(fmt,'(a)') '(10' // trim(astero_results_dbl_format) // &
-            ',' // trim(astero_results_int_format) // &
-            ',22' // trim(astero_results_dbl_format) // &
-            ',7' // trim(astero_results_int_format) // ')'
-         
-         read(iounit, fmt, advance='no', iostat=ierr) &
-            sample_chi2(i), &
-            sample_mass(i), &
-            sample_init_Y(i), &
-            sample_init_FeH(i), &
-            sample_alpha(i), &
-            sample_f_ov(i), &
-            sample_my_param1(i), &
-            sample_my_param2(i), &
-            sample_my_param3(i), &
-            sample_age(i), &
-            sample_model_number(i), &
-            sample_init_h1(i), &
-            sample_init_he3(i), &
-            sample_init_he4(i), &
-            sample_init_Z(i), &
-            logR, &
-            sample_logL(i), &
-            sample_Teff(i), &
-            sample_logg(i), &
-            sample_FeH(i), &
-            sample_logR(i), &
-            sample_surface_Z_div_X(i), &
-            sample_surface_He(i), &
-            sample_Rcz(i), &
-            sample_my_var1(i), &
-            sample_my_var2(i), &
-            sample_my_var3(i), &
-            sample_delta_nu(i), &
-            sample_nu_max(i), &
-            sample_surf_coef1(i), &
-            sample_surf_coef2(i), &
-            sample_chi2_seismo(i), &
-            sample_chi2_spectro(i), &
-            nl(0), &
-            nl(1), &
-            nl(2), &
-            nl(3), &
-            ratios_n, &
-            ratios_l0_first, &
-            ratios_l1_first
+         do k = 1, max_parameters
+            if (param_name(k) /= '') call read1_dbl(sample_param(k,i))
+         end do
+
+         call read1_dbl(sample_age(i))
+         call read1_int(sample_model_number(i))
+
+         do k = 1, max_constraints
+            if (constraint_name(k) /= '') call read1_dbl(sample_constraint_value(k,i))
+         end do
+
+         call read1_dbl(sample_delta_nu(i))
+         call read1_dbl(sample_nu_max(i))
+         call read1_dbl(sample_surf_coef1(i))
+         call read1_dbl(sample_surf_coef2(i))
+         call read1_dbl(sample_chi2_seismo(i))
+         call read1_dbl(sample_chi2_spectro(i))
+         call read1_int(nl(0))
+         call read1_int(nl(1))
+         call read1_int(nl(2))
+         call read1_int(nl(3))
+         call read1_int(ratios_n)
+         call read1_int(ratios_l0_first)
+         call read1_int(ratios_l1_first)
+
          if (failed('results')) return
             
-         sample_radius(i) = exp10(logR)
-
          if (chi2_seismo_fraction > 0) then
 
             write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
@@ -2162,6 +1821,18 @@
             write(*,2) 'failed reading ' // trim(str) // ' data for sample number', i
             failed = .true.
          end function failed
+
+         subroutine read1_dbl(x)
+            real(dp), intent(out) :: x
+
+            read(iounit, astero_results_dbl_format, advance='no', iostat=ierr) x
+         end subroutine read1_dbl
+
+         subroutine read1_int(i)
+            integer, intent(out) :: i
+
+            read(iounit, astero_results_int_format, advance='no', iostat=ierr) i
+         end subroutine read1_int
          
       
       end subroutine read1_sample_from_file
