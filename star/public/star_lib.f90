@@ -3006,16 +3006,18 @@
       end function star_get1_history_value
       
 
-      real(dp) function star_get_history_output(s,name)
-         ! If error return -huge(double)
+      real(dp) function star_get_history_output(s, name, ierr)
+         ! If error return -huge(double) and ierr = 1
          use history, only: get_history_specs, get_history_values, get1_hist_value
          type (star_info), pointer :: s   
-         character(len=*),intent(in) :: name
-         integer,parameter :: num_rows=1
+         character(len=*), intent(in) :: name
+         integer, intent(out) :: ierr
+         integer, parameter :: num_rows = 1
          real(dp) :: values(num_rows)
          integer :: int_values(num_rows), specs(num_rows)
          logical :: is_int_value(num_rows)
          logical :: failed_to_find_value(num_rows)
+         ierr = 0
          call get_history_specs(s, num_rows, (/name/), specs, .false.)
          call get_history_values( &
             s, num_rows, specs, &
@@ -3023,6 +3025,7 @@
          if (failed_to_find_value(num_rows)) then
             if (.not. get1_hist_value(s, name, values(num_rows))) then
                star_get_history_output = -HUGE(star_get_history_output)
+               ierr = 1
                return
             end if
          end if
@@ -3041,7 +3044,7 @@
          star_get_history_output_by_id = -HUGE(star_get_history_output_by_id)
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         star_get_history_output_by_id = star_get_history_output(s, name)
+         star_get_history_output_by_id = star_get_history_output(s, name, ierr)
       end function star_get_history_output_by_id
       
       
