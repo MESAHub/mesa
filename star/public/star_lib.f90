@@ -3007,11 +3007,11 @@
       
 
       real(dp) function star_get_history_output(s, name, ierr)
-         ! If error return -huge(double) and ierr = 1
+         ! If error return -huge(double) and ierr = 1, if provided
          use history, only: get_history_specs, get_history_values, get1_hist_value
          type (star_info), pointer :: s   
          character(len=*), intent(in) :: name
-         integer, intent(out) :: ierr
+         integer, intent(out), optional :: ierr
          integer, parameter :: num_rows = 1
          real(dp) :: values(num_rows)
          integer :: int_values(num_rows), specs(num_rows)
@@ -3025,7 +3025,7 @@
          if (failed_to_find_value(num_rows)) then
             if (.not. get1_hist_value(s, name, values(num_rows))) then
                star_get_history_output = -HUGE(star_get_history_output)
-               ierr = 1
+               if (present(ierr)) ierr = 1
                return
             end if
          end if
