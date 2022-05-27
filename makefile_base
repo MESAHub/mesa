@@ -1,0 +1,426 @@
+# This is the makefile for the mesa star package
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCE FILES
+
+ifeq ($(USE_PGSTAR),YES)
+   PGSTAR_SRCS = \
+      pgstar_decorator.f90 \
+      pgstar_ctrls_io.f90 \
+      pgstar_support.f90 \
+      pgstar_hist_track.f90 \
+      pgstar_kipp.f90 \
+      pgstar_dpg_dnu.f90 \
+      pgstar_trho.f90 \
+      pgstar_tmaxrho.f90 \
+      pgstar_hr.f90 \
+      pgstar_r_l.f90 \
+      pgstar_r_teff.f90 \
+      pgstar_l_teff.f90 \
+      pgstar_l_r.f90 \
+      pgstar_l_v.f90 \
+      pgstar_logl_teff.f90 \
+      pgstar_logl_r.f90 \
+      pgstar_logl_v.f90 \
+      pgstar_logg_teff.f90 \
+      pgstar_logg_logt.f90 \
+      pgstar_history_panels.f90 \
+      pgstar_trho_profile.f90 \
+      pgstar_mode_prop.f90 \
+      pgstar_power.f90 \
+      pgstar_production.f90 \
+      pgstar_abundance.f90 \
+      pgstar_dynamo.f90 \
+      pgstar_mixing_ds.f90 \
+      pgstar_summary_burn.f90 \
+      pgstar_summary_profile.f90 \
+      pgstar_summary_history.f90 \
+      pgstar_summary.f90 \
+      pgstar_color_magnitude.f90 \
+      pgstar_profile_panels.f90 \
+      pgstar_grid.f90 \
+      pgstar_network.f90 \
+      sample_pgstar_plot.f90 \
+      pgstar.f90
+   ifneq ($(MAKECMDGOALS),clean)
+      $(shell ln -sf $(MOD_PRIVATE_DIR)/pgstar_full.f90 pgstar.f90)
+   endif
+else
+   PGSTAR_SRCS = pgstar.f90 pgstar_decorator.f90
+   ifneq ($(MAKECMDGOALS),clean)
+      $(shell ln -sf $(MOD_PRIVATE_DIR)/pgstar_stub.f90 pgstar.f90)
+   endif
+endif
+
+SRCS = \
+   star_def.f90 \
+   star_profile_def.f90 \
+   star_history_def.f90 \
+   star_private_def.f90 \
+   other_extras.f90 \
+   other_d_mix.f90 \
+   other_alpha_mlt.f90 \
+   other_am_mixing.f90 \
+   other_wind.f90 \
+   other_accreting_state.f90 \
+   other_adjust_mdot.f90 \
+   other_j_for_adjust_j_lost.f90 \
+   other_brunt.f90 \
+   other_brunt_smoothing.f90 \
+   other_build_initial_model.f90 \
+   other_torque.f90 \
+   other_torque_implicit.f90 \
+   other_pressure.f90 \
+   other_energy.f90 \
+   other_energy_implicit.f90 \
+   other_cgrav.f90 \
+   other_opacity_factor.f90 \
+   other_adjust_mlt_gradt_fraction.f90 \
+   other_after_set_mixing_info.f90 \
+   other_after_solver_setmatrix.f90 \
+	other_mlt_results.f90 \
+   other_neu.f90 \
+   other_net_get.f90 \
+   other_diffusion_coefficients.f90 \
+   other_diffusion.f90 \
+   other_diffusion_factor.f90 \
+   other_kap.f90 \
+   other_eps_grav.f90 \
+   other_overshooting_scheme.f90 \
+   other_remove_surface.f90 \
+   other_rsp_build_model.f90 \
+   other_rsp_linear_analysis.f90 \
+   other_gradr_factor.f90 \
+   other_momentum_implicit.f90 \
+   other_momentum.f90 \
+   other_pgstar_plots.f90 \
+   other_mesh_functions.f90 \
+   other_mesh_delta_coeff_factor.f90 \
+   other_surface_pt.f90 \
+   other_solver_monitor.f90 \
+   other_photo_write.f90 \
+   other_photo_read.f90 \
+   other_set_pgstar_controls.f90 \
+   other_astero_freq_corr.f90 \
+   other_eval_fp_ft.f90 \
+   other_eval_i_rot.f90 \
+   other_timestep_limit.f90 \
+   other_screening.f90 \
+   star_utils.f90 \
+   ctrls_io.f90 \
+   alloc.f90 \
+   auto_diff_support.f90 \
+   predictive_mix.f90 \
+   conv_premix.f90 \
+   overshoot.f90 \
+   overshoot_utils.f90 \
+   overshoot_exp.f90 \
+   overshoot_step.f90 \
+   turb_support.f90 \
+   turb_info.f90 \
+   magnetic_diffusion.f90 \
+   rotation_mix_info.f90 \
+   mix_info.f90 \
+   kap_support.f90 \
+   eos_support.f90 \
+   atm_support.f90 \
+   net.f90 \
+   neu.f90 \
+   micro.f90 \
+   hydro_rotation.f90 \
+   brunt.f90 \
+   hydro_riemann.f90 \
+   hydro_vars.f90 \
+   report.f90 \
+   rsp_eval_eos_and_kap.f90 \
+   rsp_def.f90 \
+   rsp_step.f90 \
+   rsp_relax_env.f90 \
+   rsp_lina.f90 \
+   rsp_build.f90 \
+   rsp.f90 \
+   read_model.f90 \
+   write_model.f90 \
+   photo_in.f90 \
+   photo_out.f90 \
+   pulse.f90 \
+   pulse_cafein.f90 \
+   pulse_fgong.f90 \
+   pulse_osc.f90 \
+   pulse_gyre.f90 \
+   pulse_gsm.f90 \
+   pulse_saio.f90 \
+   pulse_gr1d.f90 \
+   pulse_utils.f90 \
+   ionization_potentials.f90 \
+   mod_typical_charge.f90 \
+   profile_getval.f90 \
+   profile.f90 \
+   mesh_functions.f90 \
+   mesh_plan.f90 \
+   mesh_adjust.f90 \
+   eps_grav.f90 \
+   hydro_chem_eqns.f90 \
+   hydro_alpha_rti_eqns.f90 \
+   hydro_energy.f90 \
+   hydro_momentum.f90 \
+   hydro_temperature.f90 \
+   hydro_rsp2.f90 \
+   hydro_rsp2_support.f90 \
+   hydro_eqns.f90 \
+   solve_omega_mix.f90 \
+   history_specs.f90 \
+   history.f90 \
+   $(PGSTAR_SRCS) \
+   timestep.f90 \
+   do_one_utils.f90 \
+   adjust_xyz.f90 \
+   adjust_net.f90 \
+   adjust_mass.f90 \
+   adjust_mesh_split_merge.f90 \
+   adjust_mesh_support.f90 \
+   adjust_mesh.f90 \
+   paquette_coeffs.f90 \
+   diffusion_support.f90 \
+   diffusion_procs.f90 \
+   diffusion.f90 \
+   element_diffusion.f90 \
+   phase_separation.f90 \
+   evolve_support.f90 \
+   star_bcyclic.f90 \
+   solver_support.f90 \
+   star_solver.f90 \
+   struct_burn_mix.f90 \
+   winds.f90 \
+   gravity_darkening.f90 \
+   mass_utils.f90 \
+   eps_mdot.f90 \
+   evolve.f90 \
+   relax.f90 \
+   set_flags.f90 \
+   create_initial_model.f90 \
+   pre_ms_model.f90 \
+   init_model.f90 \
+   remove_shells.f90 \
+   init.f90 \
+   star_job_ctrls_io.f90 \
+   star_lib.f90 \
+   run_star_support.f90 
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = $(LIBS_MESA_STAR_SUPPORT)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR_SUPPORT) 
+
+ifeq ($(USE_PGSTAR), YES)
+    LOAD_OTHER +=  $(LOAD_PGPLOT) 
+endif
+
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libstar.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.f90 *.o *.mod *.smod *genmod.f90 *.so *.a .depend .order
+
+install:
+	@$(CP_IF_NEWER) star_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) star_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) run_star_support.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) other_extras.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) pulse.mod $(MESA_DIR)/include
+
+ifneq (,$(findstring ifort,$(FC)))
+	@$(CP_IF_NEWER) overshoot_utils.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) auto_diff_support.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) star_private_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) star_utils.mod $(MESA_DIR)/include
+endif
+	@$(CP_IF_NEWER) ../job/*.inc $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../job/*.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib	
+
+#################################################################
+#
+# COMPILATION RULES
+
+MOD_DEFAULTS_DIR = $(MODULE_DIR)/defaults
+MOD_JOB_DIR = $(MODULE_DIR)/job
+MOD_OTHER_DIR = $(MODULE_DIR)/other
+
+INCLUDE_DEFAULTS = -I$(MOD_DEFAULTS_DIR)
+INCLUDE_JOB = -I$(MOD_JOB_DIR)
+INCLUDE_OTHER = -I$(MOD_OTHER_DIR)
+
+STAR_INCLUDES = \
+   $(INCLUDE_DEFAULTS) $(INCLUDE_JOB) $(INCLUDE_OTHER)
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(STAR_INCLUDES) 
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(STAR_INCLUDES)
+
+#COMPILE = $(COMPILE_NO_OPENMP_NO_OPT) $(FCfree) $(STAR_INCLUDES)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(FCwarn_unused) $(STAR_INCLUDES)
+#COMPILE = $(COMPILE_FAST) $(FCfree) -g $(STAR_INCLUDES)
+
+COMPILE_XTRA = $(COMPILE_BASIC) $(FCopt) $(FCfixed) -c
+
+STAR_COMPILE_BASIC = $(COMPILE_BASIC) $(FCfree) $(STAR_INCLUDES) -c -O${OPT_LEVEL}
+
+COMPILE_CMD = $(COMPILE)
+
+COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE))
+
+star_def.o star_lib.o ctrls_io.o star_job_ctrls_io.o : %.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE $<
+	@$(COMPILE) $<
+else
+	$(COMPILE) $<
+endif
+
+pgstar_ctrls_io.o: %.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_LEGACY $<
+	@$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
+else
+	$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
+endif
+
+se_support_full.o se_support_stub.o report.o profile.o : %.o : %.f90
+ifneq ($(QUIET),)
+	@echo STAR_COMPILE_BASIC $<
+	@$(STAR_COMPILE_BASIC) $<
+else
+	$(STAR_COMPILE_BASIC) $<
+endif
+
+############################################################################################
+
+# NOTE: fixed format must have .f and free format must have .f90
+
+# comments from Rich:
+
+# Free source form was introduced in Fortran 90, 
+# hence the .f90 extension convention 
+# (which in retrospect was a bad choice, but we're stuck with it).
+# In our build system, we pass flags to the compiler explicitly 
+# telling it that .f files should be compiled as fixed-form, 
+# and .f90 files as free-form. Trying to compile a free-form file 
+# as a fixed-form file, or vice versa, will lead to syntax errors.
+# We also use the makedepf90 dependency tool, which determines 
+# which modules are 'use'd in a given source file. A mixed-up file 
+# extension will usually lead to incorrect dependency generation, 
+# which can then in turn produce weird make errors.
+
+############################################################################################
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+# Paths to search for source & include files
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):$(MOD_JOB_DIR):$(MOD_OTHER_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.inc $(SRC_PATH)
+vpath %.defaults $(MOD_DEFAULTS_DIR)
+
+vpath %.mod $(MESA_DIR)/include
+
+# Automatic dependency generation using makedepf90. If full
+# dependencies are required, set FULLDEPS to the value 'yes';
+# otherwise, order-only dependencies will be generated. Note that
+# the default value given below can be overridden from the command
+# line and/or the shell environment; this provides a simple way
+# to turn off full dependencies without editing this file
+
+FULLDEPS ?= yes
+
+# Turning off FULLDEPS makes Bill happy because eliminates unnecessary extra compiles
+# but beware; here are comments from Rich:
+#
+# Generally speaking, we *DON'T* want to make the order-only checking the default, 
+# because then a modification to a module which changes its public interface 
+# would not trigger a rebuild of all the modules which depend on it. 
+# Bad things would result.
+#
+# However, for when one is playing around with internals, in a way that doesn't 
+# affect public interfaces, it can be a time-saving measure to use order-only checking.
+
+# reminders for Bill: the name of the file must be the same as the name of the module
+       # and no upper case letters in filenames.
+       # use COMPILE_LEGACY for old files that do not comply with f2008 standards.
+       # use .f for fixed format, .f90 for free
+
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+
+  DEPEND_DIRS = .:$(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):$(MOD_DEFAULTS_DIR):$(MOD_JOB_DIR):$(MOD_OTHER_DIR)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(DEPEND_DIRS) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(DEPEND_DIRS) $(SRCS) > .depend
+  endif	
+
+  .order : .depend
+	@sed -e 's/:/:|/g' .depend > .order
+
+  ifeq ($(FULLDEPS),yes)
+    -include .depend
+  else
+    -include .order
+  endif
+
+endif
