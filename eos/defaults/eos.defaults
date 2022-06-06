@@ -208,8 +208,8 @@
    ! ::
 
    use_simple_Skye_blends = .false.
-   logRho_min_for_any_Skye = 1.8
-   logRho_min_for_all_Skye = 2.0
+   logRho_min_for_any_Skye = 2.3
+   logRho_min_for_all_Skye = 2.4
    logT_min_for_any_Skye = 6.8
    logT_min_for_all_Skye = 7.0
 
