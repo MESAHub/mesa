@@ -31,8 +31,6 @@
       change_v_flag = .true.
       new_v_flag = .true.
       
-      set_rates_preference = .true.
-      new_rates_preference = 2   ! 1 = nacre ; 2 = jina reaclib
 
       set_initial_age = .true.
       initial_age = 0

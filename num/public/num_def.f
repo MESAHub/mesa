@@ -217,5 +217,19 @@
          
          integer, parameter :: num_work_params = r_D_norm_err_est
 
+
+         ! Interface for integrators
+         abstract interface
+            real(dp) function integrand(x, args, ierr)
+               ! Evalaute the function at point x, with possible extra args and return error in ierr
+               use const_def, only: dp
+               implicit none
+               real(dp), intent(in) :: x
+               real(dp), intent(in) :: args(:)
+               integer, intent(inout) :: ierr
+            end function integrand
+         end interface
+
+
       end module num_def
 

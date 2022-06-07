@@ -774,6 +774,20 @@
             integer, intent(out) ::   ierr
          
          end subroutine other_screening_interface
+
+         subroutine other_rate_get_interface(ir, temp, tf, raw_rate, ierr)
+            import dp, t_factors
+            implicit none
+      
+            integer :: ir ! Rate id
+            real(dp),intent(in) ::    temp      !< Temperature
+            type (T_Factors) :: tf !< Various temperature factors
+            real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
+            integer, intent(out) ::   ierr
+         
+         end subroutine other_rate_get_interface
+
+
       end interface
       
       
@@ -787,58 +801,20 @@
       procedure (other_screening_interface), pointer :: &
          rates_other_screening => null()
 
+      procedure (other_rate_get_interface), pointer :: &
+         rates_other_rate_get => null()
+
 
       ! choices for various rates
          ! NOTE: if change these, must edit raw_rates to match.
          
-         ! NACRE = Angulo et al. 1999 Nucl. Phys. A, 656, 3
+         ! NACRE = Angulo et al. 1999 Nucl. Phys. A, 656, 3 
+            ! This is for reactions that care about thier values beloew 10^7K
          ! JR = jina reaclib -- (Sakharuk et al. 2006)
+            ! This is for everything else
          ! CF88 = Frank Timmes' version of 
             ! Caughlin, G. R. & Fowler, W. A. 1988, Atom. Data and Nuc. Data Tables, 40, 283
-         
-         
-         ! when possible, NACRE is 1, jina reaclib is 2
-         integer, parameter :: rates_NACRE_if_available = 1
-         integer, parameter :: rates_JR_if_available = 2
-         
-         ! the jina reaclib rates are not valid below T = 10^7.
-         ! if we have the option, we automatically blend over to nacre for low temperatures.
-         ! the following values determine the blend region.
-         real(dp) :: JR_T_full_off = 1.0d7 ! don't use JR below this
-         real(dp) :: JR_T_full_on = 1.1d7 ! don't need to blend above this
-         
-                  
-         ! triple alpha
-         integer, parameter :: use_rate_3a_NACRE = 1
-         integer, parameter :: use_rate_3a_JR = 2 
-         integer, parameter :: use_rate_3a_CF88 = 3
-         integer, parameter :: use_rate_3a_FL87 = 4 ! Fushiki and Lamb, Apj, 317, 368-388, 1987
-            ! note: use_rate_3a_FL87 is a special case. see eval_FL_epsnuc_3alf in rate_lib
-         
-         ! c12(a,g)o16
-         integer, parameter :: use_rate_c12ag_NACRE = 1
-         integer, parameter :: use_rate_c12ag_JR = 2 
-         integer, parameter :: use_rate_c12ag_Kunz = 3 ! Kunz et al. (2002)
-         integer, parameter :: use_rate_c12ag_CF88 = 4
-         
-         ! c12 + c12
-         integer, parameter :: use_rate_1212_CF88_multi = 1
-            ! combines the rates for the n, p, and a channels.
-            ! using neutron branching from dayras switkowski and woosley 1976
-            ! and an estimate of proton branching.
-         integer, parameter :: use_rate_1212_CF88_basic = 2
-            ! the single rate approximation from CF88
-      
-         ! n14(p,g)o15
-         integer, parameter :: use_rate_n14pg_NACRE = 1
-         integer, parameter :: use_rate_n14pg_JR = 2
-         integer, parameter :: use_rate_n14pg_CF88 = 3
-         
-         
-         ! o16 + o16
-         integer, parameter :: use_rate_1616_CF88 = 1
-         integer, parameter :: use_rate_1616_reaclib = 2
-         
+            ! This fills in some of the gaps for rates not in REACLIB or NACRE
 
          ! Here be dragons, higher temperatures
          ! will generate possibly un-physical values as the partition table cuts off at 1d10

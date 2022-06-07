@@ -318,7 +318,7 @@
          integer, intent(in) :: nl0, nl1
          real(dp), intent(in) :: l0(:), l1(:)
          integer, intent(out) :: n, l0_first, l1_first
-         real(dp), intent(inout) :: r01(:), r10(:)
+         real(dp), intent(out) :: r01(:), r10(:)
          
          integer :: l0_seq_n, l0_last, l1_seq_n, l1_last, i, i0, i1
          real(dp) :: d01, d10, sd01, sd10, dnu, sdnu
@@ -328,12 +328,14 @@
          include 'formats'
          
          dbg = .false.
+         call fill_with_NaNs(r01)
+         call fill_with_NaNs(r10)
          
          n = 0
          
          if (nl1 <= 0) return
       
-         call get_max_sequence(nl(0), l0, l0_first, l0_seq_n)
+         call get_max_sequence(nl0, l0, l0_first, l0_seq_n)
          l0_last = l0_first + l0_seq_n - 1
          if (dbg) write(*,4) 'l0_first l0_last l0_seq_n', l0_first, l0_last, l0_seq_n
 
@@ -387,7 +389,7 @@
          
          do i = 1, n         
             i0 = i + l0_first
-            i1 = i + l1_first            
+            i1 = i + l1_first
             d01 = (l0(i0-1) - 4*l1(i1-1) + 6*l0(i0) - 4*l1(i1) + l0(i0+1))/8d0
             r01(i) = d01/(l1(i1) - l1(i1-1))
             d10 = -(l1(i1-1) - 4*l0(i0) + 6*l1(i1) - 4*l0(i0+1) + l1(i1+1))/8d0
@@ -417,7 +419,7 @@
          logical, intent(in) :: init
          integer, intent(in) :: nl0, nl1, nl2
          real(dp), intent(in) :: l0(:), l1(:), l2(:)
-         real(dp), intent(inout) :: r02(:)
+         real(dp), intent(out) :: r02(:)
          
          integer :: i, i0, i1, i2, jmin, j
          real(dp) :: d02, sd02, dnu, sdnu, df, f0, f2, fmin, fmax, dfmin
@@ -427,6 +429,7 @@
          include 'formats'
          
          dbg = .false.
+         call fill_with_NaNs(r02)
          
          if (init) then ! set i2_for_r02
             do i = 1, ratios_n         
@@ -1389,9 +1392,9 @@
          
          ierr = 0
          chi2sum1 = 0
-         chi2N1 = 0     
-         chi2_r_010_ratios = -1    
-         chi2_r_02_ratios = -1   
+         chi2N1 = 0
+         chi2_r_010_ratios = 0
+         chi2_r_02_ratios = 0
          chi2_frequencies = 0
          
          if (chi2_seismo_freq_fraction > 0) then
@@ -1483,7 +1486,7 @@
             
             chi2sum1 = 0
             n = 0
-            do i=2,nl(0)
+            do i=1,nl(0)
                if (sigmas_r02(i) == 0d0) cycle
                model_r02 = interpolate_ratio_r02( &
                   freq_target(0,i + ratios_l0_first), model_freq(0,:), model_ratios_r02)
@@ -1518,48 +1521,6 @@
          chi2sum2 = 0
          chi2N2 = 0
          
-         if (Teff_sigma > 0 .and. include_Teff_in_chi2_spectro) then
-            Teff = s% Teff
-            chi2term = pow2((Teff - Teff_target)/Teff_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term Teff', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logL_sigma > 0 .and. include_logL_in_chi2_spectro) then
-            logL = s% log_surface_luminosity
-            chi2term = pow2((logL - logL_target)/logL_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logL', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logg_sigma > 0 .and. include_logg_in_chi2_spectro) then
-            chi2term = pow2((logg - logg_target)/logg_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logg', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (FeH_sigma > 0 .and. include_FeH_in_chi2_spectro) then
-            chi2term = pow2((FeH - FeH_target)/FeH_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term FeH', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logR_sigma > 0 .and. include_logR_in_chi2_spectro) then
-            chi2term = pow2((logR - logR_target)/logR_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logR', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
             chi2term = pow2((s% star_age - age_target)/age_sigma)
             if (trace_okay .and. trace_chi2_spectro_info) &
@@ -1567,54 +1528,16 @@
             chi2sum2 = chi2sum2 + chi2term
             chi2N2 = chi2N2 + 1
          end if
-         
-         if (surface_Z_div_X_sigma > 0 .and. include_surface_Z_div_X_in_chi2_spectro) then
-            chi2term = pow2((surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term surface_Z_div_X', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (surface_He_sigma > 0 .and. include_surface_He_in_chi2_spectro) then
-            chi2term = pow2((surface_He - surface_He_target)/surface_He_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term surface_He', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (Rcz_sigma > 0 .and. include_Rcz_in_chi2_spectro) then
-            chi2term = pow2((Rcz - Rcz_target)/Rcz_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term Rcz', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var1_sigma > 0 .and. include_my_var1_in_chi2_spectro) then
-            chi2term = pow2((my_var1 - my_var1_target)/my_var1_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var1_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var2_sigma > 0 .and. include_my_var2_in_chi2_spectro) then
-            chi2term = pow2((my_var2 - my_var2_target)/my_var2_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var2_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var3_sigma > 0 .and. include_my_var3_in_chi2_spectro) then
-            chi2term = pow2((my_var3 - my_var3_target)/my_var3_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var3_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
+
+         do i = 1, max_constraints
+            if (constraint_sigma(i) > 0 .and. include_constraint_in_chi2_spectro(i)) then
+               chi2term = pow2((constraint_value(i) - constraint_target(i))/constraint_sigma(i))
+               if (trace_okay .and. trace_chi2_spectro_info) &
+                  write(*,2) 'chi2_spectro_term ' // trim(constraint_name(i)), s% model_number, chi2term
+               chi2sum2 = chi2sum2 + chi2term
+               chi2N2 = chi2N2 + 1
+            end if
+         end do
 
          num_chi2_spectro_terms = chi2N2
          if (normalize_chi2_spectro) then

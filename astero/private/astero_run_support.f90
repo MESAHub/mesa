@@ -52,7 +52,7 @@
          optional inlist_astero_search_controls_fname
 
          type (star_info), pointer :: s
-         integer :: id, ierr
+         integer :: id, i, ierr
          character (len=256) :: inlist_fname
          
          include 'formats'
@@ -87,12 +87,16 @@
             write(*,*) 'failed in read_astero_search_controls'
             call mesa_error(__FILE__,__LINE__)
          end if
+
+         num_constraints = 0
+         do i = 1, max_constraints
+            if (constraint_name(i) /= '') num_constraints = num_constraints + 1
+         end do
          
-         if (Y_depends_on_Z .and. vary_Y) then
-            vary_Y = .false.
-            write(*,*) &
-               'WARNING: vary_Y has been changed to false since Y_depends_on_Z is true'
-         end if
+         num_parameters = 0
+         do i = 1, max_parameters
+            if (param_name(i) /= '') num_parameters = num_parameters + 1
+         end do
 
          nullify(el, order, cyclic_freq, inertia)
 
@@ -150,14 +154,7 @@
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         next_Y_to_try = -1
-         next_FeH_to_try = -1
-         next_mass_to_try = -1
-         next_alpha_to_try = -1
-         next_f_ov_to_try = -1
-         next_my_param1_to_try = -1
-         next_my_param2_to_try = -1
-         next_my_param3_to_try = -1
+         next_param_to_try(1:max_parameters) = -1
          sample_number = 0
          max_num_samples = 0
          num_chi2_too_big = 0
@@ -167,9 +164,7 @@
          avg_model_number_sigma = 1d99
          nvar = 0
          total_time_in_oscillation_code = 0d0
-         my_var1 = 0d0
-         my_var2 = 0d0
-         my_var3 = 0d0
+         constraint_value = 0d0
          
          call init_sample_ptrs
          
@@ -177,14 +172,7 @@
          
          if (search_type == 'use_first_values' .or. &
                s% job% astero_just_call_my_extras_check_model) then
-            vary_Y = .false.
-            vary_FeH = .false.
-            vary_mass = .false.
-            vary_alpha = .false.
-            vary_f_ov = .false.
-            vary_my_param1 = .false.
-            vary_my_param2 = .false.
-            vary_my_param3 = .false.
+            vary_param(1:max_parameters) = .false.
             chi2 = eval1(id,ierr)
          else if (search_type == 'simplex') then
             call do_simplex(ierr)
@@ -276,7 +264,7 @@
          
          integer, parameter :: max_col_num = 500
          real(dp) :: filedata(max_col_num)
-         integer :: iounit, num_to_read
+         integer :: iounit, num_to_read, i
          
          include 'formats'
          
@@ -287,78 +275,17 @@
          ierr = 0
 
          num_to_read = 0
-         
-         if (vary_FeH) then
-            if (file_column_for_FeH < 1 .or. file_column_for_FeH > max_col_num) then
-               write(*,1) 'need to set file_column_for_FeH'
-               ierr = -1
-               return
-            end if
-            if (file_column_for_FeH > num_to_read) num_to_read = file_column_for_FeH
-         end if
-         
-         if (vary_Y) then
-            if (file_column_for_Y < 1 .or. file_column_for_Y > max_col_num) then
-               write(*,1) 'need to set file_column_for_Y'
-               ierr = -1
-               return
-            end if
-            if (file_column_for_Y > num_to_read) num_to_read = file_column_for_Y
-         end if
-         
-         if (vary_f_ov) then
-            if (file_column_for_f_ov < 1 .or. file_column_for_f_ov > max_col_num) then
-               write(*,1) 'need to set file_column_for_f_ov'
-               ierr = -1
-               return
-            end if
-            if (file_column_for_f_ov > num_to_read) num_to_read = file_column_for_f_ov
-         end if
 
-         if (vary_alpha) then
-            if (file_column_for_alpha < 1 .or. file_column_for_alpha > max_col_num) then
-               write(*,1) 'need to set file_column_for_alpha'
-               ierr = -1
-               return
+         do i = 1, max_parameters
+            if (param_name(i) /= '' .and. vary_param(i)) then
+               if (file_column_for_param(i) < 1 .or. file_column_for_param(i) > max_col_num) then
+                  write(*,1) 'need to set file_column_for_param '//trim(param_name(i)), i
+                  ierr = -1
+                  return
+               end if
+               if (file_column_for_param(i) > num_to_read) num_to_read = file_column_for_param(i)
             end if
-            if (file_column_for_alpha > num_to_read) num_to_read = file_column_for_alpha
-         end if
-
-         if (vary_mass) then
-            if (file_column_for_mass < 1 .or. file_column_for_mass > max_col_num) then
-               write(*,1) 'need to set file_column_for_mass'
-               ierr = -1
-               return
-            end if
-            if (file_column_for_mass > num_to_read) num_to_read = file_column_for_mass
-         end if
-
-         if (vary_my_param1) then
-            if (file_column_for_my_param1 < 1 .or. file_column_for_my_param1 > max_col_num) then
-               write(*,1) 'need to set file_column_for_my_param1'
-               ierr = -1
-               return
-            end if
-            if (file_column_for_my_param1 > num_to_read) num_to_read = file_column_for_my_param1
-         end if
-
-         if (vary_my_param2) then
-            if (file_column_for_my_param2 < 1 .or. file_column_for_my_param2 > max_col_num) then
-               write(*,1) 'need to set file_column_for_my_param2'
-               ierr = -1
-               return
-            end if
-            if (file_column_for_my_param2 > num_to_read) num_to_read = file_column_for_my_param2
-         end if
-
-         if (vary_my_param3) then
-            if (file_column_for_my_param3 < 1 .or. file_column_for_my_param3 > max_col_num) then
-               write(*,1) 'need to set file_column_for_my_param3'
-               ierr = -1
-               return
-            end if
-            if (file_column_for_my_param3 > num_to_read) num_to_read = file_column_for_my_param3
-         end if
+         end do
 
          iounit = alloc_iounit(ierr)
          if (ierr /= 0) return
@@ -385,39 +312,12 @@
                exit
             end if
             
-            if (vary_FeH) then
-               next_FeH_to_try = filedata(file_column_for_FeH)
-               write(*,1) 'next_FeH_to_try', next_FeH_to_try
-            end if
-            if (vary_Y) then
-               next_Y_to_try = filedata(file_column_for_Y) 
-               write(*,1) 'next_Y_to_try', next_Y_to_try
-            end if
-            if (vary_f_ov) then
-               next_f_ov_to_try = filedata(file_column_for_f_ov) 
-               write(*,1) 'next_f_ov_to_try', next_f_ov_to_try
-            end if
-            if (vary_alpha) then
-               next_alpha_to_try = filedata(file_column_for_alpha) 
-               write(*,1) 'next_alpha_to_try', next_alpha_to_try
-            end if
-            if (vary_mass) then
-               next_mass_to_try = filedata(file_column_for_mass) 
-               write(*,1) 'next_mass_to_try', next_mass_to_try
-            end if
-            if (vary_my_param1) then
-               next_my_param1_to_try = filedata(file_column_for_my_param1) 
-               write(*,1) 'next_my_param1_to_try', next_my_param1_to_try
-            end if
-            if (vary_my_param2) then
-               next_my_param2_to_try = filedata(file_column_for_my_param2) 
-               write(*,1) 'next_my_param2_to_try', next_my_param2_to_try
-            end if
-            if (vary_my_param3) then
-               next_my_param3_to_try = filedata(file_column_for_my_param3) 
-               write(*,1) 'next_my_param3_to_try', next_my_param3_to_try
-            end if
-            write(*,'(A)')
+            do i = 1, max_parameters
+               if (param_name(i) /= '' .and. vary_param(i)) then
+                  next_param_to_try(i) = filedata(file_column_for_param(i))
+                  write(*,2) 'next_param_to_try '//trim(param_name(i)), i, next_param_to_try(i)
+               end if
+            end do
             
             call do1_grid(ierr)
             if (ierr /= 0) then
@@ -470,11 +370,9 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          
-         integer :: num_FeH, num_Y, num_alpha, num_mass, num_f_ov, &
-              num_my_param1, num_my_param2, num_my_param3
-         integer :: i_total
-         real(dp) :: FeH, Y, alpha, mass, f_ov, chi2, &
-              my_param1, my_param2, my_param3
+         integer :: num_param(1:max_parameters)
+         integer :: i_total, i
+         real(dp) :: chi2, param(1:max_parameters)
          real(dp), parameter :: eps = 1d-6
          logical :: just_counting
          
@@ -483,35 +381,26 @@
          ierr = 0
          call set_starting_values
          
-         num_FeH = 0
-         num_Y = 0
-         num_alpha = 0
-         num_mass = 0
-         num_f_ov = 0
-         num_my_param1 = 0
-         num_my_param2 = 0
-         num_my_param3 = 0
+         num_param(1:max_parameters) = 0
          
          just_counting = .true.
-         call do_my_param3(ierr)
+         call do_param(max_parameters, ierr)
          i_total = sample_number
          
          write(*,2) 'grid total', i_total
-         write(*,2) 'num_FeH', num_FeH
-         write(*,2) 'num_Y', num_Y
-         write(*,2) 'num_alpha', num_alpha
-         write(*,2) 'num_mass', num_mass
-         write(*,2) 'num_f_ov', num_f_ov
-         write(*,2) 'num_my_param1', num_my_param1
-         write(*,2) 'num_my_param2', num_my_param2
-         write(*,2) 'num_my_param3', num_my_param3
+
+         do i = 1, max_parameters
+            if (param_name(i) /= '') write(*,3) 'num_param(i) '//trim(param_name(i)), i, num_param(i)
+         end do
+
          write(*,'(A)')
          
          sample_number = 0
          just_counting = .false.
          
          if (restart_scan_grid_from_file) then
-            call read_samples_from_file(scan_grid_output_filename, ierr)
+            call read_samples_from_file( &
+               trim(astero_results_directory) // '/' // trim(scan_grid_output_filename), ierr)
             if (ierr /= 0) return
             scan_grid_skip_number = sample_number
             sample_number = 0
@@ -520,166 +409,46 @@
             scan_grid_skip_number = 0
          end if
 
-         call do_my_param3(ierr)
+         call do_param(max_parameters, ierr)
                  
                  
          contains
          
          
          subroutine set_starting_values
-            FeH = min_FeH
-            Y = min_Y
-            alpha = min_alpha
-            mass = min_mass
-            f_ov = min_f_ov
-            my_param1 = min_my_param1
-            my_param2 = min_my_param2
-            my_param3 = min_my_param3
+            do i = 1, max_parameters
+               if (param_name(i) /= '') then
+                  if (vary_param(i)) then
+                     param(i) = min_param(i)
+                  else
+                     param(i) = first_param(i)
+                  end if
+               end if
+            end do
          end subroutine set_starting_values
-         
-         
-         subroutine do_my_param3(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (my_param3 <= max_my_param3 + eps .or. .not. vary_my_param3)          
-               if (vary_my_param3) next_my_param3_to_try = my_param3
-               call do_my_param2(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_my_param3 <= 0 .or. .not. vary_my_param3) exit
-               my_param3 = my_param3 + delta_my_param3         
-            end do
-            if (num_my_param3 == 0) num_my_param3 = cnt
-            my_param3 = min_my_param3
-         end subroutine do_my_param3
-         
-         
-         subroutine do_my_param2(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (my_param2 <= max_my_param2 + eps .or. .not. vary_my_param2)          
-               if (vary_my_param2) next_my_param2_to_try = my_param2
-               call do_my_param1(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_my_param2 <= 0 .or. .not. vary_my_param2) exit
-               my_param2 = my_param2 + delta_my_param2         
-            end do
-            if (num_my_param2 == 0) num_my_param2 = cnt
-            my_param2 = min_my_param2
-         end subroutine do_my_param2
 
 
-         subroutine do_my_param1(ierr)
+         recursive subroutine do_param(k, ierr)
+            integer, intent(in) :: k
             integer, intent(out) :: ierr
             integer :: cnt
             cnt = 0
             ierr = 0
-            do while (my_param1 <= max_my_param1 + eps .or. .not. vary_my_param1)          
-               if (vary_my_param1) next_my_param1_to_try = my_param1
-               call do_f_ov(ierr)
+            do while (param(k) <= max_param(k) + eps .or. .not. vary_param(k))
+               if (vary_param(k)) next_param_to_try(k) = param(k)
+               if (k == 1) then
+                  call do1_grid(ierr)
+               else
+                  call do_param(k-1, ierr)
+               end if
                if (ierr /= 0) return
                cnt = cnt+1
-               if (delta_my_param1 <= 0 .or. .not. vary_my_param1) exit
-               my_param1 = my_param1 + delta_my_param1         
+               if (delta_param(k) <= 0 .or. .not. vary_param(k)) exit
+               param(k) = param(k) + delta_param(k)
             end do
-            if (num_my_param1 == 0) num_my_param1 = cnt
-            my_param1 = min_my_param1
-         end subroutine do_my_param1
-
-         
-         subroutine do_f_ov(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (f_ov <= max_f_ov + eps .or. .not. vary_f_ov)          
-               if (vary_f_ov) next_f_ov_to_try = f_ov
-               call do_alpha(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_f_ov <= 0 .or. .not. vary_f_ov) exit
-               f_ov = f_ov + delta_f_ov         
-            end do
-            if (num_f_ov == 0) num_f_ov = cnt
-            f_ov = min_f_ov
-         end subroutine do_f_ov
-         
-         
-         subroutine do_alpha(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (alpha <= max_alpha + eps .or. .not. vary_alpha)                 
-               if (vary_alpha) next_alpha_to_try = alpha
-               call do_FeH(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_alpha <= 0 .or. .not. vary_alpha) exit
-               alpha = alpha + delta_alpha                  
-            end do
-            if (num_alpha == 0) num_alpha = cnt
-            alpha = min_alpha
-         end subroutine do_alpha
-         
-         
-         subroutine do_FeH(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (FeH <= max_FeH + eps .or. .not. vary_FeH)          
-               if (vary_FeH) next_FeH_to_try = FeH
-               call do_Y(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_FeH <= 0 .or. .not. vary_FeH) exit
-               FeH = FeH + delta_FeH            
-            end do
-            if (num_FeH == 0) num_FeH = cnt
-            FeH = min_FeH
-         end subroutine do_FeH
-         
-         
-         subroutine do_Y(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (Y <= max_Y + eps .or. .not. vary_Y)           
-               if (vary_Y) next_Y_to_try = Y  
-               call do_mass(ierr)
-               if (ierr /= 0) return
-               cnt = cnt+1
-               if (delta_Y <= 0 .or. .not. vary_Y) exit
-               Y = Y + delta_Y               
-            end do
-            if (num_Y == 0) num_Y = cnt
-            Y = min_Y
-         end subroutine do_Y
-         
-         
-         subroutine do_mass(ierr)
-            integer, intent(out) :: ierr
-            integer :: cnt
-            cnt = 0
-            ierr = 0
-            do while (mass <= max_mass + eps .or. .not. vary_mass)             
-               if (vary_mass) next_mass_to_try = mass
-               call do1_grid(ierr)
-               if (ierr /= 0) return
-               if (delta_mass <= 0 .or. .not. vary_mass) exit
-               cnt = cnt+1
-               mass = mass + delta_mass
-            end do
-            if (num_mass == 0) num_mass = cnt
-            mass = min_mass
-         end subroutine do_mass
+            if (num_param(k) == 0) num_param(k) = cnt
+            if (vary_param(k)) param(k) = min_param(k)
+         end subroutine do_param
          
          
          subroutine do1_grid(ierr)
@@ -695,17 +464,32 @@
             
             if (sample_number < scan_grid_skip_number) then
                sample_number = sample_number + 1
-               if (mod(sample_number,20) == 1) &
-                  write(*,'(67x,99a26)') 'mass', 'Y', 'FeH', 'alpha', 'f_ov', &
-                    'my_param1', 'my_param2', 'my_param3'
-               write(*,2) 'restore sample from file', sample_number, mass, Y, FeH, alpha, f_ov, &
-                    my_param1, my_param2, my_param3
+               if (mod(sample_number,20) == 1) then
+                  write(*,'(66x,a1)',advance='no') ' '
+                  do i = 1, max_parameters
+                     if (param_name(i) /= '') write(*,'(a26)',advance='no') trim(param_name(i))
+                  end do
+                  write(*,*) ''
+               end if
+
+               write(*,2,advance='no') 'restore sample from file', sample_number
+               do i = 1, max_parameters
+                  if (param_name(i) /= '') write(*,'(1pd26.16)',advance='no') param(i)
+               end do
+               write(*,*) ''
+
                return
             end if
-            
-            write(*,2) 'eval1 sample_number', sample_number+1, mass, Y, FeH, alpha, f_ov, &
-                 my_param1, my_param2, my_param3
-            
+
+            write(*,2) 'eval1 sample_number', sample_number+1
+            write(*,'(a)') ''
+
+            do i = 1, max_parameters
+               if (param_name(i) /= '') write(*,1) trim(param_name(i)), param(i)
+            end do
+
+            write(*,'(a)') ''
+
             chi2 = eval1(s% id,ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in eval1'
@@ -790,58 +574,18 @@
          integer, intent(in) :: n
          double precision, intent(in) :: x(*)
          double precision, intent(out) :: f
-         integer :: ierr, prev_sample_number
+         integer :: ierr, prev_sample_number, i
          include 'formats'
          
          ierr = 0
-         
-         if (vary_Y) then
-            next_Y_to_try = bobyqa_param( &
-               x(i_Y), first_Y, min_Y, max_Y)
-            write(*,1) 'next_Y_to_try', next_Y_to_try, x(i_Y)
-         end if
 
-         if (vary_FeH) then
-            next_FeH_to_try = bobyqa_param( &
-               x(i_FeH), first_FeH, min_FeH, max_FeH)
-            write(*,1) 'next_FeH_to_try', next_FeH_to_try, x(i_FeH)
-         end if
-         
-         if (vary_mass) then
-            next_mass_to_try = bobyqa_param( &
-               x(i_mass), first_mass, min_mass, max_mass)
-            write(*,1) 'next_mass_to_try', next_mass_to_try
-         end if
-         
-         if (vary_alpha) then
-            next_alpha_to_try = bobyqa_param( &
-               x(i_alpha), first_alpha, min_alpha, max_alpha)
-            write(*,1) 'next_alpha_to_try', next_alpha_to_try, x(i_alpha)
-         end if
-         
-         if (vary_f_ov) then
-            next_f_ov_to_try = bobyqa_param( &
-               x(i_f_ov), first_f_ov, min_f_ov, max_f_ov)
-            write(*,1) 'next_f_ov_to_try', next_f_ov_to_try, x(i_f_ov)
-         end if
-
-         if (vary_my_param1) then
-            next_my_param1_to_try = bobyqa_param( &
-               x(i_my_param1), first_my_param1, min_my_param1, max_my_param1)
-            write(*,1) 'next_my_param1_to_try', next_my_param1_to_try, x(i_my_param1)
-         end if
-         
-         if (vary_my_param2) then
-            next_my_param2_to_try = bobyqa_param( &
-               x(i_my_param2), first_my_param2, min_my_param2, max_my_param2)
-            write(*,1) 'next_my_param2_to_try', next_my_param2_to_try, x(i_my_param2)
-         end if
-         
-         if (vary_my_param3) then
-            next_my_param3_to_try = bobyqa_param( &
-               x(i_my_param3), first_my_param3, min_my_param3, max_my_param3)
-            write(*,1) 'next_my_param3_to_try', next_my_param3_to_try, x(i_my_param3)
-         end if
+         do i = 1, max_parameters
+            if (param_name(i) /= '' .and. vary_param(i)) then
+               next_param_to_try(i) = bobyqa_param( &
+                  x(i_param(i)), first_param(i), min_param(i), max_param(i))
+               write(*,2) 'next_param_to_try '//trim(param_name(i)), i, next_param_to_try(i), x(i_param(i))
+            end if
+         end do
          
          prev_sample_number = sample_number
          f = eval1(star_id, ierr)
@@ -896,76 +640,17 @@
          
          write(*,'(A)')
          write(*,'(A)')
-         
-         if (vary_Y) then
-            nvar = nvar+1; i_Y = nvar
-            if (min_Y >= max_Y) then
-               write(*,1) 'min_Y >= max_Y', min_Y, max_Y
-               ierr = -1
-            end if
-         end if
-         
-         if (vary_FeH) then
-            nvar = nvar+1; i_FeH = nvar
-            if (min_FeH >= max_FeH) then
-               write(*,1) 'min_FeH >= max_FeH', min_FeH, max_FeH
-               ierr = -1
-            end if
-         end if
-                  
-         if (vary_mass) then
-            nvar = nvar+1; i_mass = nvar
-            if (min_mass >= max_mass) then
-               write(*,1) 'min_mass >= max_mass', &
-                  min_mass, max_mass
-               ierr = -1
-            end if
-         end if
-         
-         if (vary_alpha) then
-            nvar = nvar+1; i_alpha = nvar
-            if (min_alpha >= max_alpha) then
-               write(*,1) 'min_alpha >= max_alpha', &
-                  min_alpha, max_alpha
-               ierr = -1
-            end if
-         end if
-         
-         if (vary_f_ov) then
-            nvar = nvar+1; i_f_ov = nvar
-            if (min_f_ov >= max_f_ov) then
-               write(*,1) 'min_f_ov >= max_f_ov', &
-                  min_f_ov, max_f_ov
-               ierr = -1
-            end if
-         end if
 
-         if (vary_my_param1) then
-            nvar = nvar+1; i_my_param1 = nvar
-            if (min_my_param1 >= max_my_param1) then
-               write(*,1) 'min_my_param1 >= max_my_param1', &
-                  min_my_param1, max_my_param1
-               ierr = -1
+         do i = 1, max_parameters
+            if (param_name(i) /= '' .and. vary_param(i)) then
+               nvar = nvar+1; i_param(i) = nvar
+               if (min_param(i) >= max_param(i)) then
+                  write(*,2) 'min_param >= max_param', &
+                     i, min_param(i), max_param(i)
+                  ierr = -1
+               end if
             end if
-         end if
-
-         if (vary_my_param2) then
-            nvar = nvar+1; i_my_param2 = nvar
-            if (min_my_param2 >= max_my_param2) then
-               write(*,1) 'min_my_param2 >= max_my_param2', &
-                  min_my_param2, max_my_param2
-               ierr = -1
-            end if
-         end if
-
-         if (vary_my_param3) then
-            nvar = nvar+1; i_my_param3 = nvar
-            if (min_my_param3 >= max_my_param3) then
-               write(*,1) 'min_my_param3 >= max_my_param3', &
-                  min_my_param3, max_my_param3
-               ierr = -1
-            end if
-         end if
+         end do
 
          if (ierr /= 0) return
          
@@ -997,38 +682,13 @@
                nvar,npt,x,xl,xu,rhobeg,bobyqa_rhoend,iprint,&
                maxfun,w,bobyqa_fun,max_value)
          end if
-         
-         if (vary_Y) &
-            final_Y = bobyqa_param( &
-               x(i_Y), first_Y, min_Y, max_Y)
 
-         if (vary_FeH) &
-            final_FeH = bobyqa_param( &
-               x(i_FeH), first_FeH, min_FeH, max_FeH)
-      
-         if (vary_mass) &
-            final_mass = bobyqa_param( &
-               x(i_mass), first_mass, min_mass, max_mass)
-         
-         if (vary_alpha) &
-            final_alpha = bobyqa_param( &
-               x(i_alpha), first_alpha, min_alpha, max_alpha)
-         
-         if (vary_f_ov) &
-            final_f_ov = bobyqa_param( &
-               x(i_f_ov), first_f_ov, min_f_ov, max_f_ov)
-         
-         if (vary_my_param1) &
-            final_my_param1 = bobyqa_param( &
-               x(i_my_param1), first_my_param1, min_my_param1, max_my_param1)
-         
-         if (vary_my_param2) &
-            final_my_param2 = bobyqa_param( &
-               x(i_my_param2), first_my_param2, min_my_param2, max_my_param2)
-         
-         if (vary_my_param3) &
-            final_my_param3 = bobyqa_param( &
-               x(i_my_param3), first_my_param3, min_my_param3, max_my_param3)
+         do i = 1, max_parameters
+            if (param_name(i) /= '' .and. vary_param(i)) then
+               final_param(i) = bobyqa_param( &
+                  x(i_param(i)), first_param(i), min_param(i), max_param(i))
+            end if
+         end do
          
          deallocate(xl, xu, x, w)
       
@@ -1049,103 +709,22 @@
          integer, intent(out) :: ierr
          
          character(len=256) :: filename
-         integer :: prev_sample_number
+         integer :: prev_sample_number, i
          include 'formats'
          
          ierr = 0
          
          write(*,'(A)')
          write(*,'(A)')
-         
-         if (vary_Y) then
-            next_Y_to_try = simplex_param( &
-               x(i_Y), first_Y, min_Y, max_Y)
-            write(*,1) 'next_Y_to_try', next_Y_to_try, x(i_Y)
-            if (next_Y_to_try < 0) then
-               write(*,1) 'ERROR: bad arg from simplex -- try again'
-               simplex_f = 1d99
-               return
-            end if
-         end if
 
-         if (vary_FeH) then
-            next_FeH_to_try = simplex_param( &
-               x(i_FeH), first_FeH, min_FeH, max_FeH)
-            write(*,1) 'next_FeH_to_try', &
-               next_FeH_to_try, x(i_FeH)
-         end if
-         
-         if (vary_mass) then
-            next_mass_to_try = simplex_param(&
-               x(i_mass), first_mass, min_mass, max_mass)
-            write(*,1) 'next_mass_to_try', &
-               next_mass_to_try, x(i_mass)
-            if (next_mass_to_try < 0) then
-               write(*,1) 'ERROR: bad arg from simplex -- try again'
-               simplex_f = 1d99
-               return
+         do i = 1, max_parameters
+            if (vary_param(i)) then
+               next_param_to_try(i) = simplex_param( &
+                  x(i_param(i)), first_param(i), min_param(i), max_param(i))
+               write(*,2) 'next_param_to_try '//trim(param_name(i)), &
+                  i, next_param_to_try(i), x(i_param(i))
             end if
-         end if
-         
-         if (vary_alpha) then
-            next_alpha_to_try = simplex_param( &
-               x(i_alpha), first_alpha, min_alpha, max_alpha)
-            write(*,1) 'next_alpha_to_try', &
-               next_alpha_to_try, x(i_alpha)
-            if (next_alpha_to_try < 0) then
-               write(*,1) 'ERROR: bad arg from simplex -- try again'
-               simplex_f = 1d99
-               return
-            end if
-         end if
-         
-         if (vary_f_ov) then
-            next_f_ov_to_try = simplex_param( &
-               x(i_f_ov), first_f_ov, min_f_ov, max_f_ov)
-            write(*,1) 'next_f_ov_to_try', &
-               next_f_ov_to_try, x(i_f_ov)
-            if (next_f_ov_to_try < 0) then
-               write(*,1) 'ERROR: bad arg from simplex -- try again'
-               simplex_f = 1d99
-               return
-            end if
-         end if
-         
-         if (vary_my_param1) then
-            next_my_param1_to_try = simplex_param( &
-               x(i_my_param1), first_my_param1, min_my_param1, max_my_param1)
-            write(*,1) 'next_my_param1_to_try', &
-               next_my_param1_to_try, x(i_my_param1)
-            if (next_my_param1_to_try < 0) then
-               write(*,1) 'ERROR: bad arg from simplex -- try again'
-               simplex_f = 1d99
-               return
-            end if
-         end if
-
-         if (vary_my_param2) then
-            next_my_param2_to_try = simplex_param( &
-               x(i_my_param2), first_my_param2, min_my_param2, max_my_param2)
-            write(*,1) 'next_my_param2_to_try', &
-               next_my_param2_to_try, x(i_my_param2)
-            if (next_my_param2_to_try < 0) then
-               write(*,1) 'ERROR: bad arg from simplex -- try again'
-               simplex_f = 1d99
-               return
-            end if
-         end if
-
-         if (vary_my_param3) then
-            next_my_param3_to_try = simplex_param( &
-               x(i_my_param3), first_my_param3, min_my_param3, max_my_param3)
-            write(*,1) 'next_my_param3_to_try', &
-               next_my_param3_to_try, x(i_my_param3)
-            if (next_my_param3_to_try < 0) then
-               write(*,1) 'ERROR: bad arg from simplex -- try again'
-               simplex_f = 1d99
-               return
-            end if
-         end if
+         end do
          
          prev_sample_number = sample_number
          simplex_f = eval1(star_id, ierr)
@@ -1223,7 +802,7 @@
          integer, intent(out) :: ierr
          
          real(dp) :: final_mass, final_alpha, final_Y, final_FeH, &
-              final_my_param1, final_my_param2, final_my_param3
+              final_param(1:max_parameters)
          real(dp), dimension(:), pointer :: x_first, x_lower, x_upper, x_final
          real(dp), pointer :: simplex(:,:), f(:)
          real(dp) :: f_final
@@ -1239,76 +818,16 @@
          
          ierr = 0
          
-         if (vary_mass) then
-            nvar = nvar+1; i_mass = nvar
-            if (min_mass >= max_mass) then
-               write(*,1) 'min_mass >= max_mass', &
-                  min_mass, max_mass
-               ierr = -1
+         do i = 1, max_parameters
+            if (param_name(i) /= '' .and. vary_param(i)) then
+               nvar = nvar+1; i_param(i) = nvar
+               if (min_param(i) >= max_param(i)) then
+                  write(*,2) 'min_param >= max_param '//trim(param_name(i)), &
+                     i, min_param(i), max_param(i)
+                  ierr = -1
+               end if
             end if
-         end if
-
-         if (vary_Y) then
-            nvar = nvar+1; i_Y = nvar
-            if (min_Y >= max_Y) then
-               write(*,1) 'min_Y >= max_Y', min_Y, max_Y
-               ierr = -1
-            end if
-         end if
-         
-         if (vary_FeH) then
-            nvar = nvar+1; i_FeH = nvar
-            if (min_FeH >= max_FeH) then
-               write(*,1) 'min_FeH >= max_FeH', &
-                  min_FeH, max_FeH
-               ierr = -1
-            end if
-         end if
-         
-         if (vary_alpha) then
-            nvar = nvar+1; i_alpha = nvar
-            if (min_alpha >= max_alpha) then
-               write(*,1) 'min_alpha >= max_alpha', &
-                  min_alpha, max_alpha
-               ierr = -1
-            end if
-         end if
-         
-         if (vary_f_ov) then
-            nvar = nvar+1; i_f_ov = nvar
-            if (min_f_ov >= max_f_ov) then
-               write(*,1) 'min_f_ov >= max_f_ov', &
-                  min_f_ov, max_f_ov
-               ierr = -1
-            end if
-         end if
-
-         if (vary_my_param1) then
-            nvar = nvar+1; i_my_param1 = nvar
-            if (min_my_param1 >= max_my_param1) then
-               write(*,1) 'min_my_param1 >= max_my_param1', &
-                  min_my_param1, max_my_param1
-               ierr = -1
-            end if
-         end if
-
-         if (vary_my_param2) then
-            nvar = nvar+1; i_my_param2 = nvar
-            if (min_my_param2 >= max_my_param2) then
-               write(*,1) 'min_my_param2 >= max_my_param2', &
-                  min_my_param2, max_my_param2
-               ierr = -1
-            end if
-         end if
-
-         if (vary_my_param3) then
-            nvar = nvar+1; i_my_param3 = nvar
-            if (min_my_param3 >= max_my_param3) then
-               write(*,1) 'min_my_param3 >= max_my_param3', &
-                  min_my_param3, max_my_param3
-               ierr = -1
-            end if
-         end if
+         end do
 
          if (ierr /= 0) return
          
@@ -1327,7 +846,8 @@
          end if
                   
          if (restart_simplex_from_file) then
-            call read_samples_from_file(simplex_output_filename, ierr)
+            call read_samples_from_file( &
+               trim(astero_results_directory) // '/' // trim(simplex_output_filename), ierr)
             if (ierr /= 0) return
             if (sample_number < nvar+1) then
                write(*,2) 'sorry: too few points. for simplex restart need at least', nvar+1
@@ -1355,45 +875,14 @@
             lrpar, rpar, lipar, ipar, &
             num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
-         
-         if (vary_Y) &
-            final_Y = simplex_param( &
-               x_final(i_Y), first_Y, min_Y, max_Y)
 
-         if (vary_FeH) &
-            final_FeH = simplex_param( &
-               x_final(i_FeH), first_FeH, &
-               min_FeH, max_FeH)
-         
-         if (vary_mass) &
-            final_mass = simplex_param( &
-               x_final(i_mass), first_mass, &
-               min_mass, max_mass)
-         
-         if (vary_alpha) &
-            final_alpha = simplex_param( &
-               x_final(i_alpha), first_alpha, &
-               min_alpha, max_alpha)
-         
-         if (vary_f_ov) &
-            final_f_ov = simplex_param( &
-               x_final(i_f_ov), first_f_ov, &
-               min_f_ov, max_f_ov)
-         
-         if (vary_my_param1) &
-            final_my_param1 = simplex_param( &
-               x_final(i_my_param1), first_my_param1, &
-               min_my_param1, max_my_param1)
-         
-         if (vary_my_param2) &
-            final_my_param2 = simplex_param( &
-               x_final(i_my_param2), first_my_param2, &
-               min_my_param2, max_my_param2)
-         
-         if (vary_my_param3) &
-            final_my_param3 = simplex_param( &
-               x_final(i_my_param3), first_my_param3, &
-               min_my_param3, max_my_param3)
+         do i = 1, max_parameters
+            if (param_name(i) /= '' .and. vary_param(i)) then
+               final_param(i) = simplex_param( &
+                  x_final(i_param(i)), first_param(i), &
+                  min_param(i), max_param(i))
+            end if
+         end do
 
          deallocate( &
             rpar, ipar, simplex, f, x_lower, x_upper, x_first, x_final)
@@ -1403,46 +892,15 @@
          
          
          subroutine set_xs ! x_first, x_lower, x_upper
-            if (vary_Y) then
-               x_first(i_Y) = first_Y
-               x_lower(i_Y) = min_Y
-               x_upper(i_Y) = max_Y
-            end if
-            if (vary_FeH) then
-               x_first(i_FeH) = first_FeH
-               x_lower(i_FeH) = min_FeH
-               x_upper(i_FeH) = max_FeH
-            end if
-            if (vary_mass) then
-               x_first(i_mass) = first_mass
-               x_lower(i_mass) = min_mass
-               x_upper(i_mass) = max_mass
-            end if
-            if (vary_alpha) then
-               x_first(i_alpha) = first_alpha
-               x_lower(i_alpha) = min_alpha
-               x_upper(i_alpha) = max_alpha
-            end if
-            if (vary_f_ov) then
-               x_first(i_f_ov) = first_f_ov
-               x_lower(i_f_ov) = min_f_ov
-               x_upper(i_f_ov) = max_f_ov
-            end if         
-            if (vary_my_param1) then
-               x_first(i_my_param1) = first_my_param1
-               x_lower(i_my_param1) = min_my_param1
-               x_upper(i_my_param1) = max_my_param1
-            end if         
-            if (vary_my_param2) then
-               x_first(i_my_param2) = first_my_param2
-               x_lower(i_my_param2) = min_my_param2
-               x_upper(i_my_param2) = max_my_param2
-            end if         
-            if (vary_my_param3) then
-               x_first(i_my_param3) = first_my_param3
-               x_lower(i_my_param3) = min_my_param3
-               x_upper(i_my_param3) = max_my_param3
-            end if         
+
+            do i = 1, max_parameters
+               if (vary_param(i)) then
+                  x_first(i_param(i)) = first_param(i)
+                  x_lower(i_param(i)) = min_param(i)
+                  x_upper(i_param(i)) = max_param(i)
+               end if
+            end do
+
          end subroutine set_xs
          
          
@@ -1469,47 +927,15 @@
                write(*,3) 'restore simplex', j, i
                f(j) = sample_chi2(i)
                write(*,3) 'chi2', j, i, f(j)
-               if (vary_Y) then
-                  simplex(i_Y,j) = &
-                     simplex_inverse(sample_init_Y(i), first_Y, min_Y, max_Y)
-                  write(*,3) 'Y', j, i, sample_init_Y(i)
-               end if
-               if (vary_FeH) then
-                  simplex(i_FeH,j) = &
-                     simplex_inverse(sample_init_FeH(i), first_FeH, min_FeH, max_FeH)
-                  write(*,3) 'FeH', j, i, sample_init_FeH(i)
-               end if         
-               if (vary_mass) then
-                  simplex(i_mass,j) = &
-                     simplex_inverse(sample_mass(i), first_mass, min_mass, max_mass)
-                  write(*,3) 'mass', j, i, sample_mass(i)
-               end if        
-               if (vary_alpha) then
-                  simplex(i_alpha,j) = &
-                     simplex_inverse(sample_alpha(i), first_alpha, min_alpha, max_alpha)
-                  write(*,3) 'alpha', j, i, sample_alpha(i)
-               end if         
-               if (vary_f_ov) then
-                  simplex(i_f_ov,j) = &
-                     simplex_inverse(sample_f_ov(i), first_f_ov, min_f_ov, max_f_ov)
-                  write(*,3) 'f_ov', j, i, sample_f_ov(i)
-               end if
-               if (vary_my_param1) then
-                  simplex(i_my_param1,j) = &
-                     simplex_inverse(sample_my_param1(i), first_my_param1, min_my_param1, max_my_param1)
-                  write(*,3) 'my_param1', j, i, sample_my_param1(i)
-               end if
-               if (vary_my_param2) then
-                  simplex(i_my_param2,j) = &
-                     simplex_inverse(sample_my_param2(i), first_my_param2, min_my_param2, max_my_param2)
-                  write(*,3) 'my_param2', j, i, sample_my_param2(i)
-               end if
-               if (vary_my_param3) then
-                  simplex(i_my_param3,j) = &
-                     simplex_inverse(sample_my_param3(i), first_my_param3, min_my_param3, max_my_param3)
-                  write(*,3) 'my_param3', j, i, sample_my_param3(i)
-               end if
-               write(*,'(A)')
+
+               do k = 1, max_parameters
+                  if (param_name(k) /= '' .and. vary_param(k)) then
+                     simplex(i_param(k),j) = &
+                        simplex_inverse(sample_param(k,i), first_param(k), min_param(k), max_param(k))
+                     write(*,4) 'param '//trim(param_name(i)), k, j, i, sample_param(k,i)
+                  end if
+               end do
+
             end do
             
             deallocate(index)
@@ -1560,40 +986,17 @@
             end if
          end if
                   
+         sample_constraint_value(1:max_constraints,i) = best_constraint_value(1:max_constraints)
+
          sample_op_code(i) = op_code
          sample_chi2(i) = best_chi2
          sample_chi2_seismo(i) = best_chi2_seismo
          sample_chi2_spectro(i) = best_chi2_spectro
          
          sample_age(i) = best_age
-         sample_init_Y(i) = current_Y
-         sample_init_FeH(i) = current_FeH
-         sample_mass(i) = current_mass
-         sample_alpha(i) = current_alpha
-         sample_f_ov(i) = current_f_ov
-         sample_my_param1(i) = current_my_param1
-         sample_my_param2(i) = current_my_param2
-         sample_my_param3(i) = current_my_param3
 
-         sample_init_h1(i) = current_h1
-         sample_init_he3(i) = current_he3
-         sample_init_he4(i) = current_he4
-         sample_init_Z(i) = current_Z
+         sample_param(1:max_parameters,i) = current_param(1:max_parameters)
 
-         sample_radius(i) = best_radius
-         sample_logL(i) = best_logL
-         sample_Teff(i) = best_Teff
-         sample_logg(i) = best_logg
-         sample_FeH(i) = best_FeH
-         
-         sample_logR(i) = best_logR
-         sample_surface_Z_div_X(i) = best_surface_Z_div_X
-         sample_surface_He(i) = best_surface_He
-         sample_Rcz(i) = best_Rcz
-         sample_my_var1(i) = best_my_var1
-         sample_my_var2(i) = best_my_var2
-         sample_my_var3(i) = best_my_var3
-         
          sample_surf_coef1(i) = best_surf_coef1
          sample_surf_coef2(i) = best_surf_coef2
          sample_delta_nu(i) = best_delta_nu
@@ -1693,26 +1096,9 @@
          best_chi2 = 0
          best_chi2_seismo = 0
          best_chi2_spectro = 0
-         best_init_h1 = 0
-         best_init_he3 = 0
-         best_init_he4 = 0
-         best_init_Z = 0
          best_age = 0
-         best_radius = 0
-         best_logL = 0
-         best_Teff = 0
-         best_logg = 0
-         best_FeH = 0
-         best_logR = 0
-         best_surface_Z_div_X = 0
-         best_surface_He = 0
-         best_Rcz = 0
-         best_my_var1 = 0
-         best_my_var2 = 0
-         best_my_var3 = 0
-         best_my_param1 = 0
-         best_my_param2 = 0
-         best_my_param3 = 0
+         best_constraint_value(1:max_constraints) = 0
+         best_param(1:max_parameters) = 0
          best_delta_nu = 0
          best_nu_max = 0
          best_surf_coef1 = 0

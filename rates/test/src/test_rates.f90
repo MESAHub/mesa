@@ -86,8 +86,7 @@
    end subroutine setup
 
 
-   subroutine do_test_rates(which)
-      integer, intent(in) :: which
+   subroutine do_test_rates()
 
       integer :: ierr
       type (T_Factors), target :: tf_rec
@@ -95,7 +94,7 @@
       real(dp) :: logT, temp, raw_rate
       integer :: i, t,ir
       
-      integer :: nrates_to_eval, which_rates(rates_reaction_id_max) 
+      integer :: nrates_to_eval
       integer, allocatable :: irs(:)
       real(dp), allocatable :: raw_rates(:)
       real(dp),dimension(9) :: temps
@@ -105,9 +104,7 @@
       include 'formats'
       
       write(*,'(A)')
-      write(*,*) 'do_test_rates', which
       
-      which_rates(:) = which
       temps = (/6.0d0,6.5d0,7.0d0,7.5d0,8.0d0,8.5d0,9.0d0,9.5d0,10.0d0/)
       
       tf => tf_rec
@@ -142,7 +139,7 @@
          
          raw_rates = missing_value
                      
-         call get_raw_rates(nrates_to_eval, irs, which_rates, temp, tf, raw_rates, ierr)
+         call get_raw_rates(nrates_to_eval, irs, temp, tf, raw_rates, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
          do i=1,nrates_to_eval
@@ -166,7 +163,7 @@
       type (T_Factors), target :: tf_rec
       type (T_Factors), pointer :: tf
       real(dp) :: logT, temp, raw_rate, raw_rate1, raw_rate2
-      integer :: i, ir, which_rate
+      integer :: i, ir
       logical, parameter :: dbg = .false.
       
       include 'formats'
@@ -190,7 +187,6 @@
          call mesa_error(__FILE__,__LINE__)
       end if
       
-      which_rate = 1
       call run1 
       raw_rate1 = raw_rate  
       
@@ -206,7 +202,6 @@
       stop
       
       ir = rates_reaction_id('r_s32_ga_si28')
-      which_rate = 1
       call run1   
       raw_rate2 = raw_rate
       
@@ -220,14 +215,13 @@
       
       subroutine run1
          include 'formats'
-         call get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
+         call get_raw_rate(ir, temp, tf, raw_rate, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) trim(reaction_Name(ir)), raw_rate
          write(*,'(A)')
       end subroutine run1
       
    end subroutine test1 
-   
    
    subroutine do_test_FL_epsnuc_3alf
       real(dp) :: T ! temperature
@@ -246,14 +240,13 @@
       write(*,1) 'FL_epsnuc_3alf', eps_nuc
       write(*,'(A)')
    end subroutine do_test_FL_epsnuc_3alf
-   
-   
+
    subroutine do_test_rate_table
       integer :: ierr
       type (T_Factors), target :: tf_rec
       type (T_Factors), pointer :: tf
       real(dp) :: logT, temp, raw_rate
-      integer :: i, ir, which_rate
+      integer :: i, ir
       logical, parameter :: dbg = .false.
       
       include 'formats'
@@ -273,7 +266,6 @@
       write(*,'(A)')
       
       ir = rates_reaction_id('r3')
-      which_rate = rates_JR_if_available
       call run1   
 
       write(*,*) 'done'
@@ -283,14 +275,13 @@
       
       subroutine run1
          include 'formats'
-         call get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
+         call get_raw_rate(ir, temp, tf, raw_rate, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) trim(reaction_Name(ir)), raw_rate
          write(*,'(A)')
       end subroutine run1
    
    end subroutine do_test_rate_table
-   
    
    subroutine do_test2_FL_epsnuc_3alf
       real(dp) :: T ! temperature
@@ -351,9 +342,8 @@ program test_rates
    
    call do_test_ecapture
          
-   call do_test_rates(rates_NACRE_if_available)
-   call do_test_rates(rates_JR_if_available)
-   call do_test_FL_epsnuc_3alf
+   call do_test_rates()
+   call do_test_FL_epsnuc_3alf()
    call do_test_rate_table
 
    call teardown

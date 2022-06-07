@@ -710,6 +710,7 @@
          logical :: do_element_diffusion
          logical :: diffusion_use_iben_macdonald
          logical :: diffusion_use_paquette
+         logical :: diffusion_use_caplan
          logical :: diffusion_use_cgs_solver
          logical :: diffusion_use_full_net
          logical :: do_WD_sedimentation_heating
@@ -1374,6 +1375,9 @@
          logical :: use_other_timestep_limit
          logical :: use_other_set_pgstar_controls
          logical :: use_other_screening
+         logical :: use_other_rate_get
+         logical :: use_other_net_derivs
+         logical :: use_other_split_burn
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

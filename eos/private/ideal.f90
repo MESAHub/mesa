@@ -177,6 +177,7 @@ module ideal
 
       call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
                         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
+      res(i_mu) = 1d0 ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
 
    end subroutine ideal_eos
 

@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_binary_support
 
       use star_lib
@@ -33,7 +33,7 @@
       use binary_ce
       use binary_photos
 
-      
+
       implicit none
 
       contains
@@ -68,27 +68,27 @@
          use binary_history
          use binary_history_specs
          use run_star_support
-         
+
          logical, intent(in) :: tst
-         
+
          interface
 
             subroutine extras_controls(id, ierr)
                integer, intent(in) :: id
                integer, intent(out) :: ierr
-            end subroutine extras_controls      
+            end subroutine extras_controls
 
             subroutine extras_binary_controls(binary_id, ierr)
                integer :: binary_id
                integer, intent(out) :: ierr
-            end subroutine extras_binary_controls      
+            end subroutine extras_binary_controls
 
          end interface
-         
+
          integer, intent(out) :: ierr
          character (len=*) :: inlist_fname_arg
          optional inlist_fname_arg
-         
+
 
          integer :: id, i, j, k, l, i_prev, result, partial_result, result_reason, model_number, iounit,binary_startup
          type (star_info), pointer :: s
@@ -161,7 +161,7 @@
             b% have_star_1 = .true.
             b% have_star_2 = .true.
          end if
-         
+
          write(*,'(A)')
          write(*,'(A)')
 
@@ -203,9 +203,9 @@
 
          b% other_binary_photo_read => default_other_binary_photo_read
          b% other_binary_photo_write => default_other_binary_photo_write
-         
+
          b% ignore_hard_limits_this_step = .false.
-         
+
          call do_one_binary_setup(b, inlist_fname, ierr)
          ! extras_binary_controls is defined in run_binary_extras.f and hooks can
          ! be specified there
@@ -227,7 +227,7 @@
             else if (i==2 .and. .not. b% have_star_2) then
                cycle
             end if
-         
+
             call do_read_star_job(b% job% inlist_names(i), ierr)
             if (failed('do_read_star_job',ierr)) return
 
@@ -264,9 +264,9 @@
             s% accrete_given_mass_fractions = .true.
             s% accrete_same_as_surface = .false.
             s% binary_other_torque => sync_spin_orbit_torque
-            
+
             s% doing_timing = .false.
-            
+
             write(*,'(A)')
             write(*,'(A)')
 
@@ -310,7 +310,7 @@
          continue_evolve_loop = .true.
          s% doing_timing = .false.
          i_prev = 0
-         
+
          binary_startup = b% extras_binary_startup(b% binary_id,doing_restart,ierr)
          if (ierr /= 0) return
 
@@ -344,7 +344,7 @@
                call before_step_loop(id, ierr)
                if (ierr /= 0) return
             end do
-             
+
             first_try = .true.
             b% donor_started_implicit_wind = .false.
             b% num_tries = 0
@@ -369,7 +369,6 @@
                   num_stars = 2
                end if
 
-
                call set_donor_star(b)
                call set_star_timesteps(b)
                result = keep_going
@@ -377,30 +376,29 @@
                ! Store mtransfer_rate used in a step, as it is rewritten by binary_check_model and
                ! that can produce inconsistent output.
                b% step_mtransfer_rate = b% mtransfer_rate
-               
+
                if (.not. b% CE_flag) then
                   ! if donor reaches implicit wind limit during mass transfer, set was_in_implicit_wind_limit = .true.
                   ! so that further iterations of the implicit wind do not start far off from the required mdot.
                   ! system will likely detach suddenly, so set change_factor to double its maximum
                   if (b% donor_started_implicit_wind) then
                      b% s_donor% was_in_implicit_wind_limit = .true.
-                     b% change_factor = 2*b% max_change_factor 
+                     b% change_factor = 2*b% max_change_factor
                   end if
                end if
 
                do l = 1, num_stars
-                  if (l == 1 .and. b% point_mass_i == 1) then
-                     i = 2
-                  else
-                     i = l
+
+                  if (b% point_mass_i /= 0) then  ! if any point mass, evolve the other one
+                     j = 3 - b% point_mass_i
+                  else  ! both stars
+                     if (l == 1) then
+                        j = b% d_i  ! evolve the donor first
+                     else
+                        j = b% a_i
+                     end if
                   end if
 
-                  ! evolve donor first
-                  if (i == 1 .or. b% point_mass_i /= 0) then
-                     j = b% d_i
-                  else
-                     j = b% a_i
-                  end if
                   id = b% star_ids(j)
 
                   ! Avoid repeting the accretor when using the implicit scheme plus
@@ -416,7 +414,7 @@
                   else if (j == 2) then
                      b% t_sync_2 = 0
                   end if
-                  
+
                   result = worst_result(result, &
                      star_evolve_step_part1(id, first_try))
 
@@ -434,33 +432,25 @@
                      result = terminate
                      exit step_loop
                   end if
+                  k = b% a_i  ! donor is gaining while accretor is losing, accretor plays donor in this step
                else if (b% point_mass_i /= 0 .and. b% s_donor% mstar_dot > 0) then
                   write(*,*) "ERROR: donor accreting, terminating evolution"
                   result = terminate
                   exit step_loop
-               else
-                  ! donor can end up accreting due to winds
-                  ! NOTE: this is a bit confusing, need to modify things so the
-                  ! donor is simply the accreting star.
-                  if (b% point_mass_i == 0 .and. b% s_donor% mstar_dot > 0) &
-                     k = b% a_i
                end if
 
                if (result == keep_going) then
                   do l = 1, num_stars
-                     if (l == 1 .and. b% point_mass_i == 1) then
-                        i = 2
-                     else
-                        i = l
-                     end if
-                     if (i == 1 .and. b% point_mass_i == 1) i = 2
-
-                     ! evolve donor first
-                     if (i == 1 .or. b% point_mass_i /= 0) then
-                        j = k
-                     else
-                        ! ids are 1 and 2, so 3-k represents the other star
-                        j = 3-k
+                     ! if there's any point mass, evolve the non-point mass, num_stars should be 1 here
+                     ! so no risk of evolving things twice
+                     if (b% point_mass_i /= 0) then
+                        k = 3 - b% point_mass_i
+                     else  ! two stars present
+                        if (l == 1) then  ! evolve donor in first loop pass
+                           j = k
+                        else  ! evolve acc in second loop pass
+                           j = 3-k
+                        end if
                      end if
                      id = b% star_ids(j)
 
@@ -471,7 +461,7 @@
                      if (.not. b% CE_flag) then
                         if (i == 2) call set_accretion_composition(b, j)
                      end if
-                     
+
                      result = worst_result(result, &
                         star_evolve_step_part2(id, first_try))
 
@@ -506,7 +496,7 @@
                      result = worst_result(result, star_check_model(id))
                   end if
                end do
-               
+
                partial_result = b% extras_binary_check_model(b% binary_id)
                result = worst_result(result, partial_result)
 
@@ -534,7 +524,7 @@
                   exit step_loop
                end if
 
-               
+
                do l = 1, num_stars
                   if (l == 1 .and. b% point_mass_i == 1) then
                      i = 2
@@ -545,7 +535,7 @@
                   id = b% star_ids(i)
                   model_number = get_model_number(id, ierr)
                   if (failed('get_model_number',ierr)) return
-                  
+
                   result_reason = get_result_reason(id, ierr)
                   if (result == retry) then
                      if (failed('get_result_reason',ierr)) return
@@ -555,7 +545,7 @@
                   end if
 
                end do
-               
+
                b% generations = b% s_donor% generations
                if (result == redo) then
                   do l = 1, num_stars
@@ -623,14 +613,14 @@
                   exit step_loop
                end if
                first_try = .false.
-               
+
             end do step_loop
 
             if(result == keep_going) result = binary_finish_step(b)
             if (b% CE_flag .and. b% CE_init .and. result == keep_going) then
                result = worst_result(result, CE_binary_finish_step(b))
             end if
-            
+
             partial_result=b% extras_binary_finish_step(b% binary_id)
             result=worst_result(result,partial_result)
 

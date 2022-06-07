@@ -18,7 +18,7 @@ COMMON_SRCS = test_support.o test_int_support.o \
    bari_medakzo.o test_medakzo.o \
    bari_vdpol.o test_vdpol.o \
    test_diffusion.o test_brent.o test_bobyqa.o test_newuoa.o \
-   test_simplex.o test_newton.o
+   test_simplex.o test_newton.o test_integrate.f
 
 TEST_SRCS = $(COMMON_SRCS) test_num.o
 

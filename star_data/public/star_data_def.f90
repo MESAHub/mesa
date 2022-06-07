@@ -26,14 +26,14 @@
 
       module star_data_def
 
-      use rates_def, only: rates_reaction_id_max, other_screening_interface
+      use rates_def, only: rates_reaction_id_max, other_screening_interface, other_rate_get_interface
       use utils_def, only: integer_dict
       use chem_def, only: num_categories, iso_name_length
       use const_def, only: sp, dp, qp, strlen
       use rates_def, only: maxlen_reaction_Name
       use eos_def, only: EoS_General_Info
       use kap_def, only: Kap_General_Info
-      use net_def, only: Net_General_Info
+      use net_def, only: Net_General_Info, other_net_derivs_interface
       use colors_def, only:  max_num_color_files, max_num_bcs_per_file
       use auto_diff, only: auto_diff_real_star_order1
       use star_pgstar, only: pgstar_controls

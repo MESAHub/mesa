@@ -23,23 +23,173 @@ Module-level changes
 astero
 ------
 
+The main controls for the selection of parameters and non-seismic
+constraints (which were dubbed "variables") has changed.  The defaults
+files document the new interface but the most important changes are
+repeated here.
+
+Each non-seismic constraint is now given a name, target value,
+uncertainty and flag for whether to include it in the |chi^2|
+calculation.  The default ``work`` folder will either try for one of
+the custom options included for backward compatibility (e.g. ``Rcz``)
+or fall back to computing the matching history column (e.g. for
+``log_g``).  So whereas an effective temperature constraint would
+previously be included using, say ::
+
+    include_Teff_in_chi2_spectro = .false.
+    Teff_target = 6000
+    Teff_sigma = 100
+
+you would now use ::
+
+    constraint_name(1) = 'Teff'
+    constraint_target(1) = 6000
+    constraint_sigma(1) = 100
+
+The maximum number of such constraints is currently 100 but can
+trivially be increased at compile time by modifying ``astero_def``.
+
+Similarly, each parameter now has a name, initial value, minimum,
+maximum and grid-spacing.  So whereas the mixing-length parameter
+was previously controlled with something like ::
+
+    vary_alpha = .true.
+    first_alpha = 1.7
+    min_alpha = 1.5
+    max_alpha = 1.9
+    delta_alpha = 0.1
+
+you would now use ::
+
+    param_name(1) = 'alpha'
+    first_param(1) = 1.7
+    min_param(1) = 1.5
+    max_param(1) = 1.9
+    delta_param(1) = 0.1
+
+Again, the maximum number of parameters is 100 and can be increased at
+compile time by modifying ``astero_def``.
+
+The default ``run_star_extras.f90`` defines the hooks
+``set_constraint_value`` and ``set_param`` so that the old options
+remain available, though with a new syntax.  Users can also use those
+routines to define their own parameters and constraints.
+
+The output files contain information for constraints or parameters
+with names that are not ``''``.  Thus, the column order now varies but
+the same information is present and now follows the same structure as
+histories and profiles.
+
+
+Changes in r22.05.1
+===================
+
+.. _Backwards-incompatible changes r22.05.1:
+
+Backwards-incompatible changes
+------------------------------
+
+.. note::
+
+   A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
+
+
+Module-level changes
+--------------------
+
+astero
+------
+
 ``&astero_search_controls`` now has an option ``astero_results_directory`` to specify a folder into which all of
 ``astero``'s results are saved (like ``log_directory`` in ``star``).  The default is ``outputs``, so if you
 can't seem to find your ``astero`` output, have a look there.
+
+``&astero_search_controls`` also now has options ::
+
+    astero_results_dbl_format = '(1pes26.16)'
+    astero_results_int_format = '(i26)'
+    astero_results_txt_format = '(a26)'
+
+by which the user can set the formats of floats, integers and strings in the ``astero`` results file,
+much like ``star_history_*_format`` does for history files.
+
+The format of the ``astero`` results file has changed to match histories and profiles.
+The contents of the file are unchanged.
 
 rates
 -----
 
 The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
-due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10**7 K.
+due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10^7 K.
+
+The ability to set the rates preferences has been removed. This added alot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
+From now on we excusivily use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
+from CF88 (if they aren't in REACLIB or NACRE). 
+
+Of note is that the default C12(a,g)O16 rate has thus changed from NACRE to that of REACLIB.
+
+The options ``set_rates_preferences``, ``new_rates_preference``, and ``set_rate_c1212`` have been removed without replacements.
+
+The options ``set_rate_c12ag``, ``set_rate_n14pg``, and ``set_rate_3a`` have been removed. However, those rates can now be access thorugh a new 
+rate selection mechanism. In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship a number of MESA provided rate tables. These can be loaded,
+either by the normal mechanism of adding the filename to a ``rates_list`` file, or by using the new option ``filename_of_special_rate``.
+This option sets the filename to load the rate from for the rate specified by ``reaction_for_special_factor``.
+
+Thus the options:
+
+::
+
+      num_special_rate_factors = 1
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+
+replaces the previous:
+
+::
+
+  set_rate_c12ag = 'Kunz'
+
+option.
+
+As part of this new scheme we now ship a set of rates from NACREII `Xu et al 2013 <https://ui.adsabs.harvard.edu/abs/2013cgrs.conf..617X/abstract>`_. These rates do not, by default,
+override the default NACRE rates. You must explicitly ask for them with ``filename_of_special_rate``.
+
+There is now a new hook ``other_rate_get`` to provide a simple way to change an existing rate in a ``run_star_extras.f90``. Note this hook
+only works on rates that are NOT currently in your rates_cache. It is recommended when using this option to set a custom ``rates_cache_dir`` otherwise the cache files in
+``MESA_DIR`` will be over written.
+
+The previous option:
+
+::
+
+    use_rate_3a = 'Fl87'
+
+has been replaced with:
+
+::
+
+    use_3a_fl87 = .true.
+
+
+net
+---
+
+There is a new hook ``other_net_derivs`` that allows for modifying the ``dydt`` term MESA computes for each zone inside ``net/``.
+This allows adding changes in composition due to nuclear reactions that MESA could otherwise not handle or does not know about. 
+This hook only works with soft networks (thus no ``approx`` nets). This hook requires many derivatives to be set, 
+thus users should look at ``net_derivs.f90`` for reference to what needs setting.
+
+There is now a hook ``other_split_burn`` for replacing MESA's split burn routine.
 
 star
 ----
 
-An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
-using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
-More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
-This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
+Diffusion coefficients for white dwarf interiors are now included based on
+`Caplan et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022MNRAS.tmpL..33C/abstract>`_.
+By default, these coefficients are used for strong plasma coupling :math:`\Gamma > 10`, but there is an inlist option
+to turn them off and revert to the previous default `Stanton & Murillo (2016) <https://ui.adsabs.harvard.edu/abs/2016PhRvE..93d3203S/abstract>`_
+coefficients if desired.
 
 Fixed a combination of bugs whereby the atmosphere data written to pulsation file formats (e.g. FGONG)
 was incorrect or wouldn't work if ``tau_factor`` or ``atm_T_tau_opacity`` differed from their defaults
@@ -48,8 +198,13 @@ was incorrect or wouldn't work if ``tau_factor`` or ``atm_T_tau_opacity`` differ
 pgstar
 ------
 
-Due to re-organisation of the star_type derived type, all pgstar controls have been moved into a seperate pgstar derived type.
+Due to re-organization of the star_type derived type, all pgstar controls have been moved into a separate pgstar derived type.
 If you access a pgstar option ``XX`` in your ``run_star_extras.f90`` then you need to replace ``s% XX`` with ``s% pg% XX``.
+
+RSP
+---
+
+In r21.12.1 an experimental RSP solver feature was turned on by default, leading to convergence issues in nonlinear model integration. This is now turned off by default. Users that continue to use RSP in r.21.12.1 should include RSP_do_check_omega = .true. in the &controls section of their inlists to get rid of this issue.
 
 
 Changes in r21.12.1

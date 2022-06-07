@@ -1,0 +1,49 @@
+2  'amdl.mesa'   @
+9  'ttt.adipls.prt'   @
+11 'agsm.mesa'   @
+15 'ttt.adipls.ssm'   @
+16 'ttt.adipls.fsm'  @
+-1 ''   @
+  cntrd,
+mod.osc.cst.int.out     @
+
+mod:
+  ifind,xmod,imlds,in,irname,nprmod,
+,,,,,,,   @
+  ntrnct,ntrnsf,imdmod,
+,,1,,,,,,,,,,,,,,,,,,,, @
+osc:
+  el,nsel,els1,dels,,dfsig1,dfsig2,nsig1,nsig2
+   0,3,0,1,,,,,,,     @
+  itrsig,sig1,istsig,inomde,itrds,
+    1,  220,   ,    1,10,,,,,,,,     @
+  dfsig,nsig,iscan,sig2,
+,2,100,1000,,,,,,,,,,,,     @
+eltrw1, eltrw2, sgtrw1, sgtrw2
+,,,,,,,,,,,,,,,,    @
+cst:
+cgrav
+6.67430e-8               @
+int:
+  iplneq,iturpr,icow,alb,
+,,0,,             @
+  istsbc,fctsbc,ibotbc,fcttbc,
+1,,,,,,,,,,,,,,,  @
+  mdintg,iriche,xfit,fcnorm,eps,epssol,itmax,
+1,1,0.99,,,,,,,,,,,,,,  @
+  fsig,dsigmx,irsevn,xmnevn,nftmax,itsord
+,,,,,-1,,,,,,,,,,,,,,  @
+out:
+  istdpr,nout,nprcen,irsord,iekinr
+9,10,,20,1,,,,,,,,     @
+  iper,ivarf,kvarf,npvarf,nfmode,
+1,,,,,,,,,,,,,,,     @
+  irotkr,nprtkr,igm1kr,npgmkr,ispcpr,
+0,,,,6,,,,,,     @
+icaswn, sigwn1, sigwn2, frqwn1, frqwn2,iorwn1, iorwn2, frlwn1, frlwn2
+,,,,,-5000,100,,,,,,,,,,,,,,,,,,,,,,,,   @
+dgn:
+  itssol,idgtss,moddet,iprdet,npout
+,,,,,,,,,,     
+  imstsl,imissl,imjssl,idgnrk
+,,,,,,,,,,,,    

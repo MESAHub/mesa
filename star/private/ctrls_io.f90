@@ -299,7 +299,7 @@
     dtau_gamma_NiCo_decay_heat, max_logT_for_net, reaction_neuQs_factor, &
     
     ! element diffusion parameters
-    diffusion_use_iben_macdonald, diffusion_use_paquette, diffusion_use_cgs_solver, &
+    diffusion_use_iben_macdonald, diffusion_use_paquette, diffusion_use_caplan, diffusion_use_cgs_solver, &
     diffusion_use_full_net, do_WD_sedimentation_heating, min_xa_for_WD_sedimentation_heating, &
     do_diffusion_heating, do_element_diffusion, &
     cgs_thermal_diffusion_eta_full_on, cgs_thermal_diffusion_eta_full_off, diffusion_min_dq_at_surface, &
@@ -535,7 +535,7 @@
     use_other_diffusion_coefficients, use_other_pgstar_plots, use_other_eval_fp_ft, use_other_eval_i_rot, use_other_torque, &
     use_other_torque_implicit, use_other_wind, use_other_accreting_state, use_other_after_struct_burn_mix, use_other_mesh_delta_coeff_factor, &
     use_other_before_struct_burn_mix, use_other_astero_freq_corr, use_other_timestep_limit, use_other_set_pgstar_controls, &
-    use_other_screening, &
+    use_other_screening, use_other_rate_get, use_other_net_derivs, use_other_split_burn, &
     x_ctrl, x_integer_ctrl, x_logical_ctrl, x_character_ctrl, &
     
     ! extra files
@@ -1754,6 +1754,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  ! element diffusion parameters
  s% diffusion_use_iben_macdonald = diffusion_use_iben_macdonald
  s% diffusion_use_paquette = diffusion_use_paquette
+ s% diffusion_use_caplan = diffusion_use_caplan
  s% diffusion_use_cgs_solver = diffusion_use_cgs_solver
  s% diffusion_use_full_net = diffusion_use_full_net
  s% do_WD_sedimentation_heating = do_WD_sedimentation_heating
@@ -2465,6 +2466,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_other_timestep_limit = use_other_timestep_limit
  s% use_other_set_pgstar_controls = use_other_set_pgstar_controls
  s% use_other_screening = use_other_screening
+ s% use_other_rate_get = use_other_rate_get
+ s% use_other_net_derivs = use_other_net_derivs
+ s% use_other_split_burn = use_other_split_burn
 
  s% x_ctrl = x_ctrl
  s% x_integer_ctrl = x_integer_ctrl
@@ -3430,6 +3434,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  ! element diffusion parameters
  diffusion_use_iben_macdonald = s% diffusion_use_iben_macdonald
  diffusion_use_paquette = s% diffusion_use_paquette
+ diffusion_use_caplan = s% diffusion_use_caplan
  diffusion_use_cgs_solver = s% diffusion_use_cgs_solver
  diffusion_use_full_net = s% diffusion_use_full_net
  do_WD_sedimentation_heating = s% do_WD_sedimentation_heating
@@ -4138,6 +4143,9 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_other_timestep_limit = s% use_other_timestep_limit
  use_other_set_pgstar_controls = s% use_other_set_pgstar_controls
  use_other_screening = s% use_other_screening
+ use_other_rate_get = s% use_other_rate_get
+ use_other_net_derivs = s% use_other_net_derivs
+ use_other_split_burn = s% use_other_split_burn
 
  x_ctrl = s% x_ctrl
  x_integer_ctrl = s% x_integer_ctrl
