@@ -127,7 +127,6 @@
          if (b% max_timestep < 0) b% max_timestep = b% s_donor% dt
 
          b% env(b% d_i) = s% star_mass - s% he_core_mass
-         b% env(b% a_i) = b% s_accretor% star_mass - b% s_accretor% he_core_mass
          if (b% env_old(b% d_i) /= 0) then
             env_change = b% env(b% d_i) - b% env_old(b% d_i)
          else
