@@ -2970,30 +2970,36 @@
       end function star_get_profile_val
 
 
-      real(dp) function star_get_profile_output(s,name,k)
+      real(dp) function star_get_profile_output(s, name, k, ierr)
          use profile, only : get_profile_val
          type (star_info), pointer :: s
          character(len=*),intent(in) :: name
          integer,intent(in) :: k
+         integer, intent(out), optional :: ierr
          integer :: id
+         if (present(ierr)) ierr = 0
          star_get_profile_output = -HUGE(star_get_profile_output)
-         id = star_get_profile_id(s,name)
-         if(id<0) return
+         id = star_get_profile_id(s, name)
+         if (id < 0) then
+            if (present(ierr)) ierr = 1
+            return
+         end if
          star_get_profile_output = get_profile_val(s,id,k)
       end function star_get_profile_output
 
-      real(dp) function star_get_profile_output_by_id(id, name, k)
+      real(dp) function star_get_profile_output_by_id(id, name, k, ierr_opt)
          integer, intent(in) :: id
          type (star_info), pointer :: s
          character(len=*),intent(in) :: name
          integer,intent(in) :: k
+         integer, intent(out), optional :: ierr_opt
          integer :: ierr
          star_get_profile_output_by_id = -HUGE(star_get_profile_output_by_id)
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then
-            return
-         end if
-         star_get_profile_output_by_id = star_get_profile_output(s, name, k)
+         if (present(ierr_opt)) ierr_opt = ierr
+         if (ierr /= 0) return
+         star_get_profile_output_by_id = star_get_profile_output(s, name, k, ierr)
+         if (present(ierr_opt)) ierr_opt = ierr
       end function star_get_profile_output_by_id
 
 
@@ -3036,15 +3042,18 @@
          end if
       end function star_get_history_output
 
-      real(dp) function star_get_history_output_by_id(id, name)
+      real(dp) function star_get_history_output_by_id(id, name, ierr_opt)
          integer, intent(in) :: id
          character(len=*),intent(in) :: name
          type(star_info), pointer :: s
+         integer, intent(out), optional :: ierr_opt
          integer :: ierr
          star_get_history_output_by_id = -HUGE(star_get_history_output_by_id)
          call star_ptr(id, s, ierr)
+         if (present(ierr_opt)) ierr_opt = ierr
          if (ierr /= 0) return
          star_get_history_output_by_id = star_get_history_output(s, name, ierr)
+         if (present(ierr_opt)) ierr_opt = ierr
       end function star_get_history_output_by_id
       
       
