@@ -1,7 +1,6 @@
 
 &star_job
 
-      mesa_dir = '../../..'
 
       read_extra_star_job_inlist2 = .true.
       extra_star_job_inlist2_name = 'inlist_initial_model'

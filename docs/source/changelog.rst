@@ -81,6 +81,13 @@ the same information is present and now follows the same structure as
 histories and profiles.
 
 
+test_suite
+==========
+
+All test cases have now had the inlist option, makefile variable, and shell script variable, ``MESA_DIR`` removed.
+This means that you no longer need to do anything to make a ``MESA`` test case work outside of the test suite.
+Test cases now infer their ``MESA_DIR`` variable entirely by the environment variable ``$MESA_DIR``. 
+
 Changes in r22.05.1
 ===================
 

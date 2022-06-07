@@ -1,5 +1,4 @@
 
-MESA_DIR = ../../../..
 
 # change this as necessary.  see utils/makefile_header for definitions.
 
