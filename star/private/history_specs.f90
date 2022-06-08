@@ -620,7 +620,6 @@
                ! Rewrite string so its in the form string value (i.e total_mass c12)
                ! By finding the last _ and replacing with a space
                k = index(string,'_',.true.)
-               write(*,*) trim(string), k
                string(k:) = ' '
                buffer(k:k) = ' '
                i = len_trim(name)
