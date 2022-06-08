@@ -112,7 +112,7 @@ module run_star_extras
          target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
-         if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
+         if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-4) then
             write(*,*) '*** BAD rel_run_E_error ***', &
             s% cumulative_energy_error/s% total_energy
          else if (abs(s% rsp_period/(24*3600) - target_period) > 1d-2) then
