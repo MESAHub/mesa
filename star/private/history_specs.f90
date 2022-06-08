@@ -519,90 +519,118 @@
          spec = -1
          special_case = .false.
 
-         if (string=='raw_rate') then
-            call do1_rate(raw_rate_offset)
+         ! These must come first otherwise things like center_mu will be caught by the
+         ! center abundaces check
+         id = do_get_history_id(string)
+         if (id > 0) then
+            spec = id
+            if (id == h_mixing_regions .or. &
+                id == h_mix_relr_regions .or. &
+                id == h_burning_regions .or. &
+                id == h_burn_relr_regions) then
+               special_case = .true.
+            end if
+            return
+         end if
+         id = rates_category_id(string)
+         if (id > 0) then
+            spec = category_offset + id
+            return
+         end if
 
-         else if (string=='screened_rate') then
-            call do1_rate(screened_rate_offset)
+         if (do1(string, 'raw_rate', raw_rate_offset, do1_rate)) then
+            return
 
-         else if (string=='eps_nuc_rate') then
-            call do1_rate(eps_nuc_rate_offset)
+         else if (do1(string, 'screened_rate', screened_rate_offset, do1_rate)) then
+               return
 
-         else if (string=='eps_neu_rate') then
-            call do1_rate(eps_neu_rate_offset)
+         else if (do1(string, 'eps_nuc_rate', eps_nuc_rate_offset, do1_rate)) then
+            return
 
-         else if (string=='abs_mag') then
-            call do1_color(abs_mag_offset)
+         else if (do1(string, 'eps_neu_rate', eps_neu_rate_offset, do1_rate)) then
+            return
 
-         else if (string=='bc') then
-            call do1_color(bc_offset)
-            
-         else if (string=='lum_band') then
-            call do1_color(lum_band_offset)
+         else if (do1(string, 'abs_mag', abs_mag_offset, do1_color)) then
+            return
 
-        else if (string=='log_lum_band') then
-            call do1_color(log_lum_band_offset)
+         else if (do1(string, 'bc', bc_offset, do1_color)) then
+            return
 
-         else if (string == 'center') then
-            call do1_nuclide(center_xa_offset)
+         else if (do1(string, 'lum_band', lum_band_offset, do1_color)) then
+            return
 
-         else if (string == 'surface') then
-            call do1_nuclide(surface_xa_offset)
+         else if (do1(string, 'log_lum_band', log_lum_band_offset, do1_color)) then
+            return
 
-         else if (string == 'average') then
-            call do1_nuclide(average_xa_offset)
+         else if (do1(string, 'center', center_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'total_mass') then
-            call do1_nuclide(total_mass_offset)
+         else if (do1(string, 'surface', surface_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'log_total_mass') then
-            call do1_nuclide(log_total_mass_offset)
+         else if (do1(string, 'average', average_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'log_average') then
-            call do1_nuclide(log_average_xa_offset)
+         else if (do1(string, 'total_mass', total_mass_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'log_center') then
-            call do1_nuclide(log_center_xa_offset)
+         else if (do1(string, 'log_total_mass', log_total_mass_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'log_surface') then
-            call do1_nuclide(log_surface_xa_offset)
+         else if (do1(string, 'log_average', log_average_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'max_eps_nuc_log_xa') then
-            call do1_nuclide(max_eps_nuc_offset)
+         else if (do1(string, 'log_center', log_center_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'cz_top_log_xa') then
-            call do1_nuclide(cz_top_max_offset)
+         else if (do1(string, 'log_surface', log_surface_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'cz_log_xa') then
-            call do1_nuclide(cz_max_offset)
+         else if (do1(string, 'max_eps_nuc_log_xa', max_eps_nuc_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'c_log_eps_burn') then
-            call do1_rates_category(c_log_eps_burn_offset)
+         else if (do1(string, 'cz_top_log_xa', cz_top_max_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'cz_log_xa', cz_max_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'c_log_eps_burn', c_log_eps_burn_offset, do1_rates_category)) then
+            return
 
          else
-            id = do_get_history_id(string)
-            if (id > 0) then
-               spec = id
-               if (id == h_mixing_regions .or. &
-                   id == h_mix_relr_regions .or. &
-                   id == h_burning_regions .or. &
-                   id == h_burn_relr_regions) then
-                  special_case = .true.
-               end if
-               return
-            end if
-            id = rates_category_id(string)
-            if (id > 0) then
-               spec = category_offset + id
-               return
-            end if
             if (report) write(*,*) 'bad history list name: ' // trim(string)
             ierr = -1
-
          end if
 
 
          contains
+
+         logical function do1(string, name, offset, func)
+            character(len=*) :: string,name
+            integer :: offset, k
+            external :: func
+
+            if(string == name) then
+               ! We have string value (i.e total_mass c12)
+               call func(offset)
+               do1 = .true.
+            else if(string(1:len_trim(name)+1) == trim(name)//'_') then  
+               ! We have string_value (i.e total_mass_c12) 
+               ! Rewrite string so its in the form string value (i.e total_mass c12)
+               ! By finding the last _ and replacing with a space
+               k = index(string,'_',.true.)
+               write(*,*) trim(string), k
+               string(k:) = ' '
+               buffer(k:k) = ' '
+               i = len_trim(name)
+               call func(offset)
+               do1 = .true.
+            else
+               do1 = .false.
+            end if
+         end function do1
+
 
 
          subroutine do1_nuclide(offset)
