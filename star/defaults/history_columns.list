@@ -824,7 +824,7 @@
 
       !error_in_energy_conservation ! for this step
          ! = total_energy - (total_energy_start + total_energy_sources_and_sinks)
-      !cumulative_energy_error ! = sum over all steps of error_in_energy_conservation
+      !cumulative_energy_error ! = sum over all steps of abs(error_in_energy_conservation)
       !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
       !log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
       !log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
