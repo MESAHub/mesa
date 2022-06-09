@@ -401,7 +401,7 @@
       
       pp
       cno
-      tri_alfa
+      tri_alpha
 !      burn_c
 !      burn_n
 !      burn_o
@@ -426,17 +426,17 @@
    ! center log10 burn erg/g/s for reaction categories
    
       !c_log_eps_burn cno
-      !c_log_eps_burn tri_alfa
+      !c_log_eps_burn tri_alpha
 
    ! center d_eps_nuc_dlnd for reaction categories
    
       !c_d_eps_dlnd cno
-      !c_d_eps_dlnd tri_alfa
+      !c_d_eps_dlnd tri_alpha
 
    ! center d_eps_nuc_dlnT for reaction categories
    
       !c_d_eps_dlnT cno
-      !c_d_eps_dlnT tri_alfa
+      !c_d_eps_dlnT tri_alpha
 
 
    ! info about the max burning locations for hydrogen, helium, and metals
