@@ -264,7 +264,7 @@
 
       pp
       cno
-      tri_alfa
+      tri_alpha
       !c_alpha
       !n_alpha
       !o_alpha
@@ -283,9 +283,17 @@
       !photo
       !pnhe4
       !other
-
-
-
+   
+   !## information about individual reactions
+   
+          ! adds columns for all of the reactions that are in the current net 
+      !add_raw_rates      ! raw reaction rates,       reactions/second
+   
+          ! individual reactions (as many as desired)
+          ! use list_net_reactions = .true. in star_job to list all reactions in the current net 
+          ! reactions/second
+      !raw_rate r_h1_h1_ec_h2 
+      !raw_rate r_h1_h1_wk_h2
 
    !## nuclear reactions at center
 
@@ -600,7 +608,9 @@
       !compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
       compactness
       m4 ! Mass co-ordinate where entropy=4
+      ! mu4 is sensitive to the choice of how much dm/dr you average over, thus we average dm and dr over M(entropy=4) and M(entropy=4)+0.3Msun
       mu4 ! dM(Msun)/dr(1000km) where entropy=4
+
 
       center_omega
       center_omega_div_omega_crit
@@ -1050,3 +1060,5 @@
 
    !## timing
       !elapsed_time ! time since start of run (seconds)
+
+   !## Extras

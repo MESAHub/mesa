@@ -81,6 +81,12 @@ the same information is present and now follows the same structure as
 histories and profiles.
 
 
+test_suite
+==========
+
+The history output option ``tri_alfa`` (and other quantities that relate to the triple-alpha nuclear reaction) have been renamed to ``tri_alpha`` for better consistency with other ``_alpha`` reactions.
+
+
 Changes in r22.05.1
 ===================
 

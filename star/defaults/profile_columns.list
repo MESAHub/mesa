@@ -262,7 +262,7 @@
       ! NOTE: you can list specific categories by giving their names (from chem_def)
       pp
       cno
-      tri_alfa
+      tri_alpha
       !c_alpha
       !n_alpha
       !o_alpha
