@@ -272,6 +272,20 @@
 
          end do
 
+         ! Error if users set the saved model to the same filename
+         if(b% have_star_1 .and. b% have_star_2) then
+            if(b% s1% job% save_model_when_terminate .and. b% s2% job% save_model_when_terminate) then
+               if(len_trim(b% s1% job% save_model_filename) > 0 .and. len_trim(b% s2% job% save_model_filename) >0) then
+                  if(trim(b% s1% job% save_model_filename) == trim(b% s2% job% save_model_filename)) then
+                     write(*,*) "ERROR: Both stars are set to write save_model_filename to the same file"
+                     call mesa_error(__FILE__,__LINE__)
+                  end if
+               end if
+            end if
+         end if
+
+
+
          ! binary data must be initiated after stars, such that masses are available
          ! if using saved models
          call binarydata_init(b, doing_restart)
