@@ -125,7 +125,7 @@
       
       !pp
       !cno
-      !tri_alfa
+      !tri_alpha
 
    ! ergs/g/sec for specific reactions (names from rates_def)
       

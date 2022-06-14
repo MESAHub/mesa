@@ -115,7 +115,8 @@
                end do
 
             case default
-               val = star_get_history_output(s, name)
+               val = star_get_history_output(s, name, ierr)
+               if (ierr /= 0) call mesa_error(__FILE__, __LINE__)
          end select
 
       end subroutine set_constraint_value

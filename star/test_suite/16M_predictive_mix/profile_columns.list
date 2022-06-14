@@ -262,7 +262,7 @@
       ! NOTE: you can list specific categories by giving their names (from chem_def)
       pp
       cno
-      tri_alfa
+      tri_alpha
       !c_alpha
       !n_alpha
       !o_alpha
@@ -281,6 +281,15 @@
       !photo
       !pnhe4
       !other    
+
+   ! adds columns for all of the reactions that are in the current net 
+   !add_raw_rates      ! raw reaction rates,       reactions/second
+
+   ! individual reactions (as many as desired)
+   ! use list_net_reactions = .true. in star_job to list all reactions in the current net    
+   ! reactions/second
+      !raw_rate r_h1_h1_ec_h2 
+      !raw_rate r_h1_h1_wk_h2
 
    !burn_num_iters ! Number of split_burn iterations taken
    !burn_avg_epsnuc
@@ -629,7 +638,8 @@
    !log_g_rad he4   ! log10 acceleration from radiative levitation
    !log_g_rad ne20   ! log10 acceleration from radiative levitation
 
-
+!# Phase Separation
+   !eps_phase_separation
 
 !# Oscillations
    brunt_N2 ! brunt-vaisala frequency squared

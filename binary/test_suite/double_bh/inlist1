@@ -3,7 +3,7 @@
 
     show_log_description_at_start = .false.
     save_model_when_terminate = .true.
-    save_model_filename = 'final.mod'
+    save_model_filename = 'final_1.mod'
 
     new_rotation_flag = .true.
     change_rotation_flag = .true.
