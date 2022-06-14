@@ -51,6 +51,12 @@ The test_suite examples require a few tweaks in order to be used
 "outside" of the test_suite directory. First, you need to edit
 make/makefile and delete the line
 
+.. note::
+   This is no longer needed and is left only as a reference for previous versions of MESA.
+   All instances of MESA_DIR have been removed from all test cases.
+   You may still need to adjust some inlist paths if they specify relative paths instead of
+   absolute paths.
+
 ::
 
    MESA_DIR = ../../../..

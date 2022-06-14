@@ -2,7 +2,6 @@
 
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
-MESA_DIR=../../..
 source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 do_one inlist_he_shell_ignition_header final.mod

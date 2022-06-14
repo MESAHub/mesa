@@ -8,7 +8,6 @@
 &star_job
       show_log_description_at_start = .false.
 
-      mesa_dir = '../../..'
 
       load_saved_model = .true.
       load_model_filename = 'wd_aic.mod'
