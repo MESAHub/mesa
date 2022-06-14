@@ -1,6 +1,5 @@
 &star_job
 
-      mesa_dir = '../../..'
       show_log_description_at_start = .false.
 
 

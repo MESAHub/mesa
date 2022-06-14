@@ -43,7 +43,7 @@
       end if
       call GET_COMMAND_ARGUMENT(1, cache_filename)
       write(*,'(a)') '# rates from ' // trim(cache_filename)
-      my_mesa_dir = '../..'         
+      my_mesa_dir = ''         
       call const_init(my_mesa_dir,ierr)     
       if (ierr /= 0) then
          write(*,*) 'const_init failed'

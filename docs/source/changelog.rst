@@ -84,6 +84,10 @@ histories and profiles.
 test_suite
 ==========
 
+All test cases have now had the inlist option, makefile variable, and shell script variable, ``MESA_DIR`` removed.
+This means that you no longer need to do anything to make a ``MESA`` test case work outside of the test suite.
+Test cases now infer their ``MESA_DIR`` variable entirely by the environment variable ``$MESA_DIR``. 
+
 The history output option ``tri_alfa`` (and other quantities that relate to the triple-alpha nuclear reaction) have been renamed to ``tri_alpha`` for better consistency with other ``_alpha`` reactions.
 
 
