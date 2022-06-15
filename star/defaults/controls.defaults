@@ -11355,6 +11355,17 @@
 
     warn_when_large_rel_run_E_err = 0.01d0
 
+      ! absolute_cumulative_energy_err
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! cumulative energy error is the sum of the absolute value of per-step errors.
+      ! Set this to .false. to allow positive and negative errors to cancel
+      ! when integrating over multiple steps.
+
+      ! ::
+
+    absolute_cumulative_energy_err = .true.
+
 
       ! warn_when_stop_checking_residuals    obsolete
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
