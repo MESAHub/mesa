@@ -1362,6 +1362,118 @@
          call do_clean1(species, xa, 1, max_sum_abs, xsum_tol, ierr)
       end subroutine clean1
       
+
+      real(dp) function net_get_reaction_rate_data(output, rate_name, temp, logT, rho, logRho, &
+                                                   ye, y, cids, raw_rate_factor, screening_mode, ierr)
+      ! Note these do not take into account things like eps_{nuc,neu}_factors
+         use rates_def
+         use net_def
+         use rates_lib
+         integer, intent(in) :: output ! Output type see rates_def *_OUT options 
+         character(len=*),intent(in) :: rate_name ! Reaction rate name i.e r_c12_ag_o16
+         real(dp), intent(in) :: temp, rho ! Temperature K, density g/cm^3
+         real(dp), intent(in) :: logT, logRho ! log Temperature K, log density g/cm^3
+         real(dp), intent(in) :: ye ! Electron fraction
+         real(dp), dimension(:), intent(in) :: y ! Abundance of reaction inputs
+         integer, dimension(:), intent(in) :: cids ! chem_iso ids of inputs, must be in same order as xa
+         real(dp), intent(in) :: raw_rate_factor ! Scalar to mulply rate by
+         integer, intent(in) :: screening_mode ! Screening mode from 
+         integer,intent(inout) :: ierr  ! Error
+
+         integer :: ir
+         type(t_factors),target :: tf_t
+         type(t_factors),pointer :: tf
+
+         tf => tf_t
+         call eval_tfactors(tf, logT, temp)
+
+         ir = get_rates_reaction_id(rate_name)
+         if(ir == 0) then
+            ierr = -1
+            write(*,*) "Unable to match rate ",trim(rate_name)
+            return 
+         end if
+
+         if(size(y) /= size(cids)) then
+            ierr = -1
+            write(*,*) "Size mismatch in arrays xa=",size(y)," isos=",size(cids)
+            return 
+         end if
+
+
+         select case(output)
+            case(RAW_RATE_OUT) ! reaction/s/density of inputs
+               net_get_reaction_rate_data = get_raw()
+
+            case(RAW_RATE_RHO_OUT) ! reaction/s
+               net_get_reaction_rate_data = get_raw_rho()
+
+            case(SCREEN_FACTOR_OUT) ! Scalar
+               ierr = -1
+
+            case(SCREENED_RATE_OUT) ! screening * raw_rate (reactions/s)
+               ierr = -1
+
+            case(EPS_NUC_OUT) ! MeV (nuclear energy per reaction) maybe negative
+               net_get_reaction_rate_data = std_reaction_Qs(ir)
+
+            case(EPS_NUC_RAW_RATE_OUT) ! MeV * raw_rate
+               net_get_reaction_rate_data = get_raw_rho() * std_reaction_Qs(ir)
+
+            case(EPS_NEU_OUT) ! MeV energy lost to neutrino per reaction (>=0)
+               net_get_reaction_rate_data = std_reaction_neuQs(ir)
+
+            case(EPS_NEU_RAW_RATE_OUT) ! MeV * raw_rate
+               net_get_reaction_rate_data = get_raw_rho() * std_reaction_neuQs(ir)
+
+            case default
+               ierr = -1
+               write(*,*) "Unable to match get_reaction_rate_data option=",output
+               return 
+         end select
+
+
+         contains
+
+            real(dp) function get_raw()
+               ! Get raw_rate, this is reaction/s/density of inputs
+               call get_raw_rate(ir, temp, tf, get_raw, ierr)
+               if (ierr/=0) return
+
+               get_raw = get_raw  * raw_rate_factor
+
+            end function get_raw
+
+
+            real(dp) function get_raw_rho()
+               real(dp) :: rate
+               real(dp) :: factor, factor_drho
+
+               integer :: i, k, num, iso
+
+               rate = get_raw()
+
+               call rates_get_density_factors(ir, ye, rho, factor, factor_drho)
+   
+               rate = rate * factor
+               ! Roll in the abundances
+
+               do i=1,max_num_reaction_inputs,2
+                  num = reaction_inputs(i,ir) ! Number of reactions
+                  if(num==0) exit ! Signal we found the last isotope
+                  iso = reaction_inputs(i+1,ir) ! chem_id
+                  do k=1,size(cids)
+                     if(iso == cids(k)) then
+                        rate = rate * pow(y(k),num)
+                        exit
+                     end if
+                  end do
+               end do
+
+            end function get_raw_rho
+
+      end function net_get_reaction_rate_data
+
       
       end module net_lib
 

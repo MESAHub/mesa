@@ -155,30 +155,83 @@
 
       
       integer function how_many_extra_profile_columns(id)
-         use star_def, only: star_info
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 0
+         how_many_extra_profile_columns = 6
       end function how_many_extra_profile_columns
       
       
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
-         use star_def, only: star_info, maxlen_profile_column_name
-         use const_def, only: dp
+         use net_lib
+         use net_def
+         use chem_def
+         use chem_lib
+         use rates_lib
+         use rates_def
          integer, intent(in) :: id, n, nz
          character (len=maxlen_profile_column_name) :: names(n)
          real(dp) :: vals(nz,n)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
+         integer :: k, ir
+         real(dp) :: xa(2)
+         integer :: cids(2)
+         character(len=100) :: name
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         
+         cids(1) = chem_get_iso_id('h1')
+         cids(2) = chem_get_iso_id('h1') 
+
+         name = 'rpp_to_he3'
+         
+         ir =  get_rates_reaction_id(name)
+
+         names(1) = 'net_'//trim(name)
+         names(2) = 'net_rho_'//trim(name)
+         names(3) = 'net_eps_'//trim(name)
+         names(4) = 'net_eps_raw_'//trim(name)
+         names(5) = 'net_neu_'//trim(name)
+         names(6) = 'net_neu_raw_'//trim(name)
+
+         do k=1,s%nz
+            xa(1) = s% xa(s% net_iso(cids(1)), k)
+            xa(2) = s% xa(s% net_iso(cids(2)), k)
+
+            vals(k,1) = net_get_reaction_rate_data(RAW_RATE_OUT, name, s% T(k),&
+                           log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
+                           xa, cids,1d0,s% screening_mode_value,ierr)
+
+            vals(k,2) = net_get_reaction_rate_data(RAW_RATE_RHO_OUT, name, s% T(k),&
+                           log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
+                           xa, cids,1d0,s% screening_mode_value,ierr)            
+
+            vals(k,3) = net_get_reaction_rate_data(EPS_NUC_OUT, name, s% T(k),&
+                           log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
+                           xa, cids,1d0,s% screening_mode_value,ierr)    
+
+            vals(k,4) = net_get_reaction_rate_data(EPS_NUC_RAW_RATE_OUT, name, s% T(k),&
+                           log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
+                           xa, cids,1d0,s% screening_mode_value,ierr)    
+
+            vals(k,5) = net_get_reaction_rate_data(EPS_NEU_OUT, name, s% T(k),&
+                           log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
+                           xa, cids,1d0,s% screening_mode_value,ierr)    
+
+            vals(k,6) = net_get_reaction_rate_data(EPS_NEU_RAW_RATE_OUT, name, s% T(k),&
+                           log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
+                           xa, cids,1d0,s% screening_mode_value,ierr)    
+
+         end do
+
+         
       end subroutine data_for_extra_profile_columns
+
       
 
       ! returns either keep_going or terminate.
