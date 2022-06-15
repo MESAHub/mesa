@@ -1370,8 +1370,13 @@
             s% error_in_energy_conservation = &
                s% total_energy_end - (s% total_energy_old + s% total_energy_sources_and_sinks)
 
-            s% cumulative_energy_error = s% cumulative_energy_error_old + &
-               s% error_in_energy_conservation
+            if (s% absolute_cumulative_energy_err) then
+               s% cumulative_energy_error = s% cumulative_energy_error_old + &
+                    abs(s% error_in_energy_conservation)
+            else
+               s% cumulative_energy_error = s% cumulative_energy_error_old + &
+                    s% error_in_energy_conservation
+            end if
 
             s% total_internal_energy = s% total_internal_energy_end
             s% total_gravitational_energy = s% total_gravitational_energy_end

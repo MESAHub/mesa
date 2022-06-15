@@ -408,7 +408,7 @@
     solver_test_partials_write_eos_call_info, solver_save_photo_call_number, RSP2_min_Lc_div_L_for_convective_mixing_type, &
     solver_test_partials_var_name, solver_test_partials_equ_name, RSP2_min_Lt_div_L_for_overshooting_mixing_type, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
-    fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
+    fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, absolute_cumulative_energy_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     RSP2_alfap, RSP2_alfat, RSP2_alfam, RSP2_alfar, RSP2_Lsurf_factor, RSP2_use_Stellingwerf_Lr, RSP2_remesh_when_load, &
     RSP2_alfad, RSP2_num_outermost_cells_forced_nonturbulent, RSP2_num_innermost_cells_forced_nonturbulent, &
@@ -2079,6 +2079,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% fill_arrays_with_NaNs = fill_arrays_with_NaNs
  s% zero_when_allocate = zero_when_allocate
  s% warn_when_large_rel_run_E_err = warn_when_large_rel_run_E_err
+ s% absolute_cumulative_energy_err = absolute_cumulative_energy_err
  s% warn_when_large_virial_thm_rel_err = warn_when_large_virial_thm_rel_err
  s% warn_when_get_a_bad_eos_result = warn_when_get_a_bad_eos_result
  s% warn_rates_for_high_temp = warn_rates_for_high_temp
@@ -3756,6 +3757,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  fill_arrays_with_NaNs = s% fill_arrays_with_NaNs
  zero_when_allocate = s% zero_when_allocate
  warn_when_large_rel_run_E_err = s% warn_when_large_rel_run_E_err
+ absolute_cumulative_energy_err = s% absolute_cumulative_energy_err
  warn_when_large_virial_thm_rel_err = s% warn_when_large_virial_thm_rel_err
  warn_when_get_a_bad_eos_result = s% warn_when_get_a_bad_eos_result
  warn_rates_for_high_temp = s% warn_rates_for_high_temp

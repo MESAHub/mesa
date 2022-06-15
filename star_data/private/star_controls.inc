@@ -1052,7 +1052,7 @@
          
          logical :: fill_arrays_with_NaNs
          logical :: zero_when_allocate, warn_when_get_a_bad_eos_result, &
-            warn_rates_for_high_temp
+            warn_rates_for_high_temp, absolute_cumulative_energy_err
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
             eps_mdot_leak_frac_factor
