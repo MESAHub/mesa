@@ -141,6 +141,7 @@
          s% D_mix(1:nz) = 0
          s% adjust_mlt_gradT_fraction(1:nz) = -1
          s% eps_mdot(1:nz) = 0
+         s% dvc_dt_TDC(1:nz) = 0
          call fill_ad_with_zeros(s% eps_grav_ad,1,-1)
          s% ergs_error(1:nz) = 0
          if (.not. restart) s% have_ST_start_info = .false.
