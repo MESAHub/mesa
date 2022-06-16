@@ -47,7 +47,7 @@
          type (star_info), pointer :: s
          real(dp) :: function_to_solve, explicit_mdot, q, slope_contact
          integer :: ierr
-         logical :: use_sum
+         logical :: use_sum, detachment
          character (len=90) :: rlo_result
          
          include 'formats'
@@ -59,6 +59,7 @@
          end if
          s => b% s_donor
          use_sum = .false.
+         detachment = .false.
          
          ! NOTE: keep in mind that for mass loss, mdot is negative.
          ! b% mtransfer_rate will be considered valid if function_to_solve = 0
@@ -91,10 +92,17 @@
          end if
 
          if (b% use_other_implicit_function_to_solve) then
-            call b% other_implicit_function_to_solve(b% binary_id, function_to_solve, use_sum, ierr)
+            call b% other_implicit_function_to_solve(b% binary_id, function_to_solve, use_sum, detachment, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in other_implicit_function_to_solve'
                check_implicit_rlo = retry
+               return
+            end if
+            if (detachment) then
+               if (b% report_rlo_solver_progress) then
+                  rlo_result = 'OK (detached)'
+                  call report_rlo_iter
+               end if
                return
             end if
          else if (b% mdot_scheme == "roche_lobe" .and. .not. b% use_other_rlo_mdot) then
@@ -188,7 +196,7 @@
                return
             end if
          end if
-         
+
          if (abs(function_to_solve) <= b% implicit_scheme_tolerance) then
             if (b% report_rlo_solver_progress) then
                rlo_result = 'OK (in tol)'
