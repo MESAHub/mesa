@@ -1126,6 +1126,7 @@
          profile_column_name(p_mlt_Y_face) = 'mlt_Y_face'
          profile_column_name(p_mlt_log_abs_Y) = 'mlt_log_abs_Y'
          profile_column_name(p_tdc_num_iters) = 'tdc_num_iters'
+         profile_column_name(p_dvc_dt_TDC_div_g) = 'dvc_dt_TDC_div_g'
 
          profile_column_name(p_delta_r) = 'delta_r'
          profile_column_name(p_delta_L) = 'delta_L'
