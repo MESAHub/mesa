@@ -531,8 +531,6 @@
                if (failed('mlt_vc')) exit
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
-               call do1(s% dvc_dt_TDC, c% dvc_dt_TDC)
-               if (failed('dvc_dt_TDC')) exit
             end if
             
             call do1(s% q, c% q)
@@ -1044,6 +1042,8 @@
             if (failed('mlt_cdc')) exit
             call do1(s% cdc, c% cdc)
             if (failed('cdc')) exit
+            call do1(s% dvc_dt_TDC, c% dvc_dt_TDC)
+            if (failed('dvc_dt_TDC')) exit
 
             call do1(s% D_mix, c% D_mix)
             if (failed('D_mix')) exit

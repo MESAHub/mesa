@@ -235,7 +235,9 @@ contains
       if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
       if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
 
-      s% dvc_dt_TDC(k) = 0d0
+      if (k >= 1) then
+         s% dvc_dt_TDC(k) = 0d0
+      end if
       if (using_TDC) then
          if (report) write(*,3) 'call set_TDC', k, s% solver_iter
          if (s% okay_to_set_mlt_vc) then
