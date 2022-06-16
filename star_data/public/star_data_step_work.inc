@@ -260,6 +260,9 @@
       real(dp), pointer :: nonnucneu_pair(:) 
       real(dp), pointer :: nonnucneu_reco(:) 
 
+      ! dvc/dt from TDC
+      real(dp), pointer :: dvc_dt_TDC(:) ! cm/sec/sec
+
       ! irradiation heat profile
       real(dp), pointer :: irradiation_heat(:) ! (ergs/gm/sec)      
       

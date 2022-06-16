@@ -235,6 +235,7 @@ contains
       if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
       if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
 
+      s% dvc_dt_TDC(k) = 0d0
       if (using_TDC) then
          if (report) write(*,3) 'call set_TDC', k, s% solver_iter
          if (s% okay_to_set_mlt_vc) then
@@ -255,6 +256,7 @@ contains
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+         s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_TDC'

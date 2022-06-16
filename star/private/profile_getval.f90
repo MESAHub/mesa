@@ -1440,7 +1440,8 @@
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
                val = s% conv_vel(k)/s% csound(k)
-
+            case (p_dvc_dt_TDC_div_g)
+               val = s%dvc_dt_TDC(k) / s%grav(k)
             case (p_mix_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)
