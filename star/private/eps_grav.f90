@@ -149,7 +149,7 @@
          test_partials = .false.
 
          ! select time-centering
-         if (s% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav .and. .not. s% doing_relax) then
             theta = 0.5_dp
          else
             theta = 1.0_dp
@@ -177,7 +177,7 @@
 
 
          ! for time centered version
-         if (s% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav .and. .not. s% doing_relax) then
 
             ! start values are constants during Newton iters
             eps_grav_start = -s% T_start(k)*s% cp_start(k) * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
@@ -291,7 +291,7 @@
 
          eps_grav_composition_term = 0
 
-         if (s% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav .and. .not. s% doing_relax) then
             theta = 0.5_dp
          else
             theta = 1.0_dp
@@ -329,7 +329,7 @@
          d_de_dlnd = (s% dE_dRho_for_partials(k)*s% Rho(k) - d_e_with_xa_start_dlnd)
          d_de_dlnT = (s% Cv_for_partials(k)*s% T(k) - d_e_with_xa_start_dlnT)
 
-         if (s% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav .and. .not. s% doing_relax) then
 
             e_start = s% energy_start(k)
 
