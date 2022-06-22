@@ -7699,7 +7699,7 @@
 
       ! ::
 
-    use_time_centered_eps_grav = .false.
+    use_time_centered_eps_grav = .true.
 
 
       ! Gamma_lnS_eps_grav_full_off
