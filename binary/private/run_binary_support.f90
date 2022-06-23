@@ -357,6 +357,12 @@
                if (failed('star_ptr',ierr)) return
                call before_step_loop(id, ierr)
                if (ierr /= 0) return
+
+               result = s% extras_start_step(id)  
+               if (result /= keep_going) then
+                  continue_evolve_loop = .false.
+                  exit evolve_loop
+               end if       
             end do
 
             first_try = .true.
