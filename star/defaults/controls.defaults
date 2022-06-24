@@ -7696,6 +7696,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, use a time-centered version of ``eps_grav`` and ``eps_grav_composition_term``.
+      ! (Disabled during relax.)
 
       ! ::
 
