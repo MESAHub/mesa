@@ -355,7 +355,7 @@ contains
          diff_grads_limit = s% superad_reduction_diff_grads_limit
          reduction_limit = s% superad_reduction_limit
          Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
-         Gamma_inv_threshold = 4d0*(1d0-beta)/chiT
+         Gamma_inv_threshold = 4d0*(1d0-beta)/(4d0-3*beta)
 
          Gamma_factor = 1d0
          if (gradT > gradL) then

@@ -233,9 +233,9 @@ contains
              if (D(k) < s%overshoot_D_min) then
 
                 ! Update conv_bdy_dq to reflect where D drops below the minimum
-
-                if (s%top_conv_bdy(i)) then
-                   if (s%D_mix(k+1) > s%overshoot_D_min) then
+                ! Ignore this for single-cell overshoot regions
+                if (k_a /= k_b) then
+                   if (s%top_conv_bdy(i)) then
                       s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
                       if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
                          write(*,*) 'k, k_a, k_b', k, k_a, k_b
@@ -247,10 +247,8 @@ contains
                          ierr = -1
                          return
                       end if
-                   end if
-                else
-                   s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
-                   if (s%D_mix(k-1) > s%overshoot_D_min) then
+                   else
+                      s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
                       if (s%cz_bdy_dq(k-1) < 0._dp .OR. s%cz_bdy_dq(k-1) > s%dq(k-1)) then
                          write(*,*) 'k, k_a, k_b', k, k_a, k_b
                          write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
@@ -261,7 +259,7 @@ contains
                          ierr = -1
                          return
                       end if
-                   end if
+                   endif
                 endif
 
                 exit face_loop
