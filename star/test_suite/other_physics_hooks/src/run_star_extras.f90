@@ -177,20 +177,26 @@
          real(dp) :: vals(nz,n)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k, ir
-         real(dp) :: xa(2)
-         integer :: cids(2)
+         integer :: j, k, ir, num_reaction_inputs
+         !real(dp) :: xa(2)
+         real(dp), allocatable :: xa(:)
+         integer, allocatable :: cids(:)
          character(len=100) :: name
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         cids(1) = chem_get_iso_id('h1')
-         cids(2) = chem_get_iso_id('h1') 
-
          name = 'rpp_to_he3'
          
-         ir =  get_rates_reaction_id(name)
+         ir = get_rates_reaction_id(name)
+         num_reaction_inputs = get_num_reaction_inputs(ir)
+         
+         allocate(xa(num_reaction_inputs))
+         allocate(cids(num_reaction_inputs))
+         
+         do j = 1, num_reaction_inputs
+             cids(j) = reaction_inputs(j*2, ir)
+         end do
 
          names(1) = 'net_'//trim(name)
          names(2) = 'net_rho_'//trim(name)
@@ -200,8 +206,9 @@
          names(6) = 'net_neu_raw_'//trim(name)
 
          do k=1,s%nz
-            xa(1) = s% xa(s% net_iso(cids(1)), k)
-            xa(2) = s% xa(s% net_iso(cids(2)), k)
+            do j=1,num_reaction_inputs
+                xa(j) = s% xa(s% net_iso(cids(j)), k)
+            end do
 
             vals(k,1) = net_get_reaction_rate_data(RAW_RATE_OUT, name, s% T(k),&
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
@@ -209,26 +216,25 @@
 
             vals(k,2) = net_get_reaction_rate_data(RAW_RATE_RHO_OUT, name, s% T(k),&
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
-                           xa, cids,1d0,s% screening_mode_value,ierr)            
+                           xa, cids,1d0,s% screening_mode_value,ierr)
 
             vals(k,3) = net_get_reaction_rate_data(EPS_NUC_OUT, name, s% T(k),&
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
-                           xa, cids,1d0,s% screening_mode_value,ierr)    
+                           xa, cids,1d0,s% screening_mode_value,ierr)
 
             vals(k,4) = net_get_reaction_rate_data(EPS_NUC_RAW_RATE_OUT, name, s% T(k),&
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
-                           xa, cids,1d0,s% screening_mode_value,ierr)    
+                           xa, cids,1d0,s% screening_mode_value,ierr)
 
             vals(k,5) = net_get_reaction_rate_data(EPS_NEU_OUT, name, s% T(k),&
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
-                           xa, cids,1d0,s% screening_mode_value,ierr)    
+                           xa, cids,1d0,s% screening_mode_value,ierr)
 
             vals(k,6) = net_get_reaction_rate_data(EPS_NEU_RAW_RATE_OUT, name, s% T(k),&
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
-                           xa, cids,1d0,s% screening_mode_value,ierr)    
+                           xa, cids,1d0,s% screening_mode_value,ierr)
 
          end do
-
          
       end subroutine data_for_extra_profile_columns
 

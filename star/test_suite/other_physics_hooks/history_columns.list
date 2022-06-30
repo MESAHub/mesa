@@ -294,6 +294,7 @@
           ! reactions/second
       !raw_rate r_h1_h1_ec_h2 
       !raw_rate r_h1_h1_wk_h2
+      raw_rate rpp_to_he3
 
    !## nuclear reactions at center
 
