@@ -32,7 +32,8 @@ eosDT, Yran, Xran = parse('eos_plotter.dat')
 
 apjcolwidth=3.38
 # set up plot and labels
-fig, ax = plt.subplots(figsize=(apjcolwidth,apjcolwidth*4./5.))
+#fig, ax = plt.subplots(figsize=(apjcolwidth,apjcolwidth*4./5.)) # for paper figures
+fig, ax = plt.subplots(figsize=(5,4)) # for website pngs
 ax.set_title(title)
 ax.set_xlabel(xlabel)
 ax.set_ylabel(ylabel)
@@ -57,7 +58,7 @@ cax.ax.minorticks_off()
 cax.ax.set_yticklabels(['blend', 'HELM', 'OPAL/SCVH', 'FreeEOS', 'Skye', 'ideal'])
 
 # save figure
-#fig.savefig('eos_regions.png', dpi=300)
-fig.savefig('eos_regions.pdf')
+#fig.savefig('eos_regions.pdf')
+fig.savefig('eos_regions.png', dpi=300)
 
 # plt.show()
