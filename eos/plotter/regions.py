@@ -39,10 +39,14 @@ ax.set_ylabel(ylabel)
 ax.set_xlim(Xran.min(), Xran.max())
 ax.set_ylim(Yran.min(), Yran.max())
 
-# set up color map
-cmap = mpl.cm.get_cmap("Accent")
+# set up color map (slightly customized to make Skye blue)
+my_colors = np.array(mpl.cm.get_cmap("Accent").colors) # array so that entries are editable
+tmp = my_colors[4].copy()
+my_colors[4] = my_colors[3]
+my_colors[5] = tmp
+cmap = colors.ListedColormap(my_colors)
 bounds = [-0.5, 0.5, 1.5, 2.5, 3.5, 5.5, 7.5]
-norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
+norm = colors.BoundaryNorm(bounds, cmap.N)
 
 pcol = ax.pcolormesh(Xran, Yran, eosDT[...,2], shading='nearest', cmap=cmap, norm=norm, rasterized=True)
 pcol.set_edgecolor('face')
