@@ -233,9 +233,10 @@ contains
              if (D(k) < s%overshoot_D_min) then
 
                 ! Update conv_bdy_dq to reflect where D drops below the minimum
-                ! Ignore this for single-cell overshoot regions
-                if (k_a /= k_b) then
-                   if (s%top_conv_bdy(i)) then
+                ! Convective regions can happen to be entirely below s%overshoot_D_min, 
+                ! in which case we ignore this correction.
+                if (s%top_conv_bdy(i)) then
+                   if (D(k) > s%overshoot_D_min .and. s%D_mix(k+1) < s%overshoot_D_min) then
                       s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
                       if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
                          write(*,*) 'k, k_a, k_b', k, k_a, k_b
@@ -247,7 +248,9 @@ contains
                          ierr = -1
                          return
                       end if
-                   else
+                   end if
+                else
+                   if (D(k) > s%overshoot_D_min .and. s%D_mix(k-1) < s%overshoot_D_min) then
                       s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
                       if (s%cz_bdy_dq(k-1) < 0._dp .OR. s%cz_bdy_dq(k-1) > s%dq(k-1)) then
                          write(*,*) 'k, k_a, k_b', k, k_a, k_b
@@ -259,7 +262,7 @@ contains
                          ierr = -1
                          return
                       end if
-                   endif
+                   end if
                 endif
 
                 exit face_loop
