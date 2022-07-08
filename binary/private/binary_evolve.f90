@@ -526,7 +526,8 @@
          b% separation_old = b% separation
          b% eccentricity_old = b% eccentricity
          b% dt_old = b% dt
-         b% env_old = b% env
+         b% env_old(1) = b% env(1)
+         b% env_old(2) = b% env(2)
          b% period_old = b% period
          b% rl_relative_gap_old(1) = b% rl_relative_gap(1)
          b% rl_relative_gap_old(2) = b% rl_relative_gap(2)
@@ -596,7 +597,8 @@
          b% separation = b% separation_old
          b% eccentricity = b% eccentricity_old
          b% dt = b% dt_old
-         b% env = b% env_old
+         b% env(1) = b% env_old(1)
+         b% env(2) = b% env_old(2)
          b% period = b% period_old
          b% rl_relative_gap(1) = b% rl_relative_gap_old(1)
          b% rl_relative_gap(2) = b% rl_relative_gap_old(2)
