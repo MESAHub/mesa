@@ -1344,7 +1344,6 @@ contains
 
     logical, parameter :: TRACE_UPDATE_MODEL = .FALSE.
 
-    logical  :: lnPgas_flag
     integer  :: ierr
     integer  :: kf_t
     integer  :: kf_b
@@ -1359,28 +1358,23 @@ contains
     ! Perform the EOS updates, in accordance with the update_mode
     ! values. We make two passes -- the first to handle cells with
     ! update_mode == FIXED_PT_MODE, the second to handle cells with
-    ! update_mode == FIXED_DT_MODE. If/when the lnPgas_flag
-    ! functionality is retired, this will need to be rewritten
+    ! update_mode == FIXED_DT_MODE.
 
-    lnPgas_flag = .FALSE. ! s%lnPgas_flag
+    s%fix_Pgas = .TRUE.
 
-    !s%lnPgas_flag = .TRUE.
+    call set_eos_with_mask(s, kc_t, kc_b, update_mode==FIXED_PT_MODE, ierr)
+    if (ierr /= 0) then
+       write(*,*) 'conv_premix: error from call to set_eos_with_mask'
+       stop
+    end if
 
-    !call set_eos_with_mask(s, kc_t, kc_b, update_mode==FIXED_PT_MODE, ierr)
-    !if (ierr /= 0) then
-    !   write(*,*) 'conv_premix: error from call to set_eos_with_mask'
-    !   stop
-    !end if
-
-    !s%lnPgas_flag = .FALSE.
+    s%fix_Pgas = .FALSE.
 
     call set_eos_with_mask(s, kc_t, kc_b, update_mode==FIXED_DT_MODE, ierr)
     if (ierr /= 0) then
        write(*,*) 'conv_premix: error from call to set_eos_with_mask'
        stop
     end if
-
-    !s%lnPgas_flag = lnPgas_flag
 
     ! Update opacities across cells kc_t:kc_b (this also sets rho_face
     ! and related quantities on faces kc_t:kc_b)
