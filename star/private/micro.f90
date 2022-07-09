@@ -284,7 +284,7 @@ contains
     integer, pointer :: net_iso(:)
     integer :: j, species, i_var, i_var_sink
     real(dp), parameter :: epsder = 1d-4, Z_limit = 0.5d0
-    real(dp), parameter :: logRho_tol = 1d-6, logPgas_tol = 1d-6
+    real(dp), parameter :: LOGRHO_TOL = 1d-8, LOGPGAS_TOL = 1d-8
 
     logical, parameter :: testing = .false.
 
@@ -307,7 +307,7 @@ contains
 
        call solve_eos_given_PgasT( &
             s, k, s% xa(:,k), &
-            logT, logPgas, s% lnd(k)/ln10, logRho_tol, logPgas_tol, &
+            logT, logPgas, s% lnd(k)/ln10, LOGRHO_TOL, LOGPGAS_TOL, &
             logRho, res, d_dlnd, d_dlnT, d_dxa, ierr)
        if (ierr /= 0) then
           if (s% report_ierr) then
