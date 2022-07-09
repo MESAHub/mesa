@@ -500,6 +500,7 @@
          s% species = 0
          s% num_reactions = 0
 
+         s% fix_Pgas = .false.
          s% v_flag = .false.
          s% u_flag = .false.
          s% rotation_flag = .false.

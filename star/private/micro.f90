@@ -277,12 +277,14 @@ contains
 
     real(dp), dimension(num_eos_basic_results) :: &
          res, res_a, res_b, d_dlnd, d_dlnT
+    real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
     real(dp) :: &
          sumx, dx, dxh_a, dxh_b, &
-         Rho, logRho, lnd, lnE, logT, T, energy, logQ, frac
+         Rho, logRho, lnd, lnE, logT, T, logPgas, energy, logQ, frac
     integer, pointer :: net_iso(:)
     integer :: j, species, i_var, i_var_sink
     real(dp), parameter :: epsder = 1d-4, Z_limit = 0.5d0
+    real(dp), parameter :: logRho_tol = 1d-6, logPgas_tol = 1d-6
 
     logical, parameter :: testing = .false.
 
@@ -298,6 +300,27 @@ contains
          s% ye(k), s% mass_correction(k), sumx)
 
     logT = s% lnT(k)/ln10
+
+    if (s%fix_Pgas) then
+
+       logPgas = s% lnPgas(k)/ln10
+
+       call solve_eos_given_PgasT( &
+            s, k, s% xa(:,k), &
+            logT, logPgas, s% lnd(k)/ln10, logRho_tol, logPgas_tol, &
+            logRho, res, d_dlnd, d_dlnT, d_dxa, ierr)
+       if (ierr /= 0) then
+          if (s% report_ierr) then
+             write(*,*) 'do_eos_for_cell: solve_eos_given_PT ierr', ierr
+             !call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+          end if
+          return
+       end if
+
+       s% lnd(k) = logRho*ln10
+       s% rho(k) = exp(s% lnd(k))
+
+    end if
 
     logRho = s% lnd(k)/ln10
 

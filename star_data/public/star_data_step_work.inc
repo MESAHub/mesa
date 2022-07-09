@@ -141,6 +141,8 @@
       real(dp), pointer :: gradr_factor(:)
 
       real(dp), pointer :: rmid(:) ! radius at center by mass (cm)
+
+      logical :: fix_Pgas ! Flag to keep Pgas fixed during cell updates
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
