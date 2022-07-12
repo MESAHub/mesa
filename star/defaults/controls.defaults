@@ -7373,6 +7373,11 @@
 
     op_mono_data_cache_filename = ''      ! '' defaults to $MESA_OP_MONO_DATA_CACHE_FILENAME
 
+      ! emesh_data_for_op_mono_path
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    emesh_data_for_op_mono_path = ''
+
 
       ! high_logT_op_mono_full_off
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -316,6 +316,7 @@
     diffusion_max_T_for_radaccel, diffusion_min_T_for_radaccel, diffusion_max_Z_for_radaccel, &
     diffusion_min_Z_for_radaccel, diffusion_screening_for_radaccel, &
     op_mono_data_path, op_mono_data_cache_filename, &
+    emesh_data_for_op_mono_path, op_mono_method, &
     show_diffusion_info, show_diffusion_substep_info, show_diffusion_timing, &
     diffusion_num_classes, diffusion_class_representative, diffusion_class_A_max, &
     diffusion_class_typical_charge, diffusion_class_factor, &
@@ -1805,6 +1806,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_screening_for_radaccel = diffusion_screening_for_radaccel
  s% op_mono_data_path = op_mono_data_path
  s% op_mono_data_cache_filename = op_mono_data_cache_filename
+ s% emesh_data_for_op_mono_path = emesh_data_for_op_mono_path
+ s% op_mono_method = op_mono_method
 
  s% show_diffusion_info = show_diffusion_info
  s% show_diffusion_substep_info = show_diffusion_substep_info
@@ -3491,6 +3494,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_screening_for_radaccel = s% diffusion_screening_for_radaccel
  op_mono_data_path = s% op_mono_data_path
  op_mono_data_cache_filename = s% op_mono_data_cache_filename
+ emesh_data_for_op_mono_path = s% emesh_data_for_op_mono_path
+ op_mono_method = s% op_mono_method
 
  show_diffusion_info = s% show_diffusion_info
  show_diffusion_substep_info = s% show_diffusion_substep_info
