@@ -755,7 +755,7 @@
          real(dp) :: diffusion_max_T_for_radaccel, diffusion_min_T_for_radaccel
          integer :: diffusion_max_Z_for_radaccel, diffusion_min_Z_for_radaccel
          logical :: diffusion_screening_for_radaccel
-         character (len=strlen) :: op_mono_data_path, op_mono_data_cache_filename
+         character (len=strlen) :: op_mono_data_path, op_mono_data_cache_filename, emesh_data_for_op_mono_path, op_mono_method
 
          integer :: diffusion_num_classes
          character (len=iso_name_length) :: &
