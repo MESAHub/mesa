@@ -7373,8 +7373,18 @@
 
     op_mono_data_cache_filename = ''      ! '' defaults to $MESA_OP_MONO_DATA_CACHE_FILENAME
 
+      ! op_mono_method
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Compute the Rosseland mean opacity and radiative accelerations from the OP mono data by brute force ('hu')
+      ! or use the faster method by allowing for a small tolerance on the mixture used for the computations of these variables ('mombarg').
+
+      op_mono_method = 'mombarg'
+
       ! emesh_data_for_op_mono_path
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! path to the OP_mono_master_grid_MESA_emesh.txt file containing the data need for when op_mono_method = 'mombarg'.
 
     emesh_data_for_op_mono_path = ''
 
