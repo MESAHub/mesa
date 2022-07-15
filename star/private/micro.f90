@@ -40,6 +40,7 @@ module micro
 
   logical, parameter :: dbg = .false.
 
+
   ! Access specifiers
 
   private
@@ -51,6 +52,9 @@ module micro
   public :: do_kap_for_cell
   public :: shutdown_microphys
 
+  logical :: initiaze_kap_grid = .true.
+  real(dp), public, save :: fk_pcg_old(17)
+
 contains
 
   subroutine set_micro_vars( &
@@ -60,17 +64,23 @@ contains
     use star_utils, only: start_time, update_time
     use net_lib, only: net_work_size
     use net, only: do_net
-    use chem_def, only: icno, ipp
+    use chem_def, only: icno, ipp, chem_isos
     use rates_def, only: i_rate
+    use kap_lib
+
 
     type (star_info), pointer :: s
     integer, intent(in) :: nzlo, nzhi
     logical, intent(in) :: skip_eos, skip_net, skip_neu, skip_kap
     integer, intent(out) :: ierr
 
-    integer :: j, k, op_err, k_bad, res
+    integer :: j, k, op_err, k_bad, res, i
     integer(8) :: time0
     real(dp) :: total, alfa, beta
+    character(len=4) :: e_name
+    real(dp) :: fk(17), delta
+
+
 
     include 'formats'
 
@@ -111,7 +121,7 @@ contains
 
     if (.not. (skip_kap .and. skip_neu)) then
 
-       if (.not. skip_kap) then
+       if (.not. skip_kap .and. s% op_mono_method == 'hu') then
           call prepare_kap(s, ierr)
           if (ierr /= 0) return
           if (s% use_other_opacity_factor) then
@@ -129,6 +139,50 @@ contains
        end if
 
        if (s% doing_timing) call start_time(s, time0, total)
+
+
+      if (s% op_mono_method == 'mombarg' .and. s% high_logT_op_mono_full_on - s% low_logT_op_mono_full_on > 0  ) then
+       fk = 0
+       do i=1, s% species
+          e_name = chem_isos% name(s% chem_id(i))
+             if (e_name == 'h1')  fk(1) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'he4') fk(2) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'c12') fk(3) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'n14') fk(4) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'o16') fk(5) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'ne20')fk(6) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'na23')fk(7) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'mg24')fk(8) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'al27')fk(9) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'si28')fk(10) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 's32') fk(11) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'ar40')fk(12) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'ca40')fk(13) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'cr52')fk(14) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'mn55')fk(15) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'fe56')fk(16) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+             if (e_name == 'ni58')fk(17) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
+       end do
+       fk = fk / sum(fk)
+       delta = MAXVAL(ABS(fk - fk_pcg_old)/fk_pcg_old)
+
+       !if (s% do_element_diffusion .and. initiaze_kap_grid .and. s% op_mono_method == 'mombarg' ) then
+       if (initiaze_kap_grid) then
+         call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
+         write(*,*) 'Computing kappa grid for initial mixture.'
+         call call_compute_kappa_grid(fk, ierr)
+         !write(*,*) 'Finished computing grid for initial mixture.'
+         fk_pcg_old = fk
+         initiaze_kap_grid = .false.
+       else if (delta > 1d-4) THEN
+         write(*,*) 'Computing kappa grid for core mixture.'
+         write(*,*) delta
+         call call_compute_kappa_grid(fk, ierr)
+         !write(*,*) 'Finished computing grid for core mixture.'
+         fk_pcg_old = fk
+       endif
+      endif
+
        !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
        do k = nzlo, nzhi
           op_err = 0
@@ -260,7 +314,7 @@ contains
   end subroutine set_eos_with_mask
 
   !****
-  
+
   subroutine do_eos_for_cell(s,k,ierr)
 
     use const_def
@@ -319,7 +373,7 @@ contains
        end if
        return
     end if
-    
+
     if (s% solver_test_eos_partials .and. eos_test_partials) then
        s% solver_test_partials_val = eos_test_partials_val
        s% solver_test_partials_dval_dx = eos_test_partials_dval_dx
@@ -458,7 +512,7 @@ contains
        s% dlnE_dxa_for_partials(j,k) = d_dxa(i_lnE,j)
        s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*d_dxa(i_lnPgas,j)/s% Peos(k)
     end do
-    
+
     s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
     s% csound(k) = eval_csound(s,k,ierr)
 
@@ -488,7 +542,7 @@ contains
           write(*,2) 'logT', k, s% lnT(k)/ln10
           write(*,2) 'abar', k, s% abar(k)
           write(*,2) 'zbar', k, s% zbar(k)
-          write(*,*) 
+          write(*,*)
           call write_eos_call_info(s,k)
           call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
           !$OMP end critical (micro_crit1)
@@ -527,7 +581,11 @@ contains
          log_r, log_r_in, log_r_out, log_r_frac, frac, min_cno_for_kap_limit, &
          P, Prad, Pgas, Ledd_factor, Ledd_kap, Ledd_log, &
          a, b, da_dlnd, da_dlnT, db_dlnd, db_dlnT, opacity_factor
+         !kap_ross_cell, log_kap_rad, fk(17), delta
+
     real(dp), dimension(num_kap_fracs) :: kap_fracs
+    !character(len=4) :: e_name
+
     character (len=100) :: message
     real(dp), pointer :: xa(:)
     logical :: test_partials
@@ -554,12 +612,13 @@ contains
        xa(1:s% species) => s% xa(1:s% species,k)
        zbar = s% zbar(k)
     end if
-    
+
     call get_kap( &
          s, k, zbar, xa, log10_rho, log10_T, &
          lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
          eta, d_eta_dlnRho, d_eta_dlnT, &
          kap_fracs, s% opacity(k), dlnkap_dlnd, dlnkap_dlnT, ierr)
+
 
     ! unpack fractions
     s% kap_frac_lowT(k) = kap_fracs(i_frac_lowT)
@@ -638,10 +697,10 @@ contains
 
       real(dp) :: xc, xo, xh, xhe, Z
       integer :: i, iz
-      
+
       write(*,*) 'eos info'
       call write_eos_call_info(s,k)
-      
+
       write(*,*) 'kap info'
       call get_XYZ(s, s% xa(:,k), xh, xhe, Z)
       xc = 0; xo = 0
@@ -720,4 +779,3 @@ contains
 
 
 end module micro
-

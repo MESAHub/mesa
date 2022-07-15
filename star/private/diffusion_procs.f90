@@ -1321,6 +1321,8 @@
           fk = fk / sum(fk)
           delta = MAXVAL(ABS(fk - fk_gam_old(j,:))/fk_gam_old(j,:))
           if (initialize_gamma_grid) then
+            call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
+
             write(*,*) 'Precompute gamma grid initialize.'
             call call_compute_gamma_grid(j, fk, ierr)
             !write(*,*) 'Done precomputing gamma grid initialize.'

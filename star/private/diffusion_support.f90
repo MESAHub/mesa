@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2015-2022  Evan Bauer & The MESA Team
+!   Copyright (C) 2015-2019  Evan Bauer & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -384,11 +384,10 @@
             kappa_st, Zdiff, Zdiff1, Zdiff2 ! (m,m)
 
          integer :: i, j
-         real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda, alfa, Gamlo, Gamhi
+         real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda
          real(dp), dimension(m) :: charge, na
-         real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff, Kdiff2
-         real(dp) :: Gamma, ai, lam_e, kappa, kappa_SM, Abar, Zbar, omegap
-         real(dp) :: Ddiff_Caplan(nc)
+         real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff
+         real(dp) :: kappa_SM ! For diagnosis right now.
             
          do i = 1, nc
             charge(i) = max(1d0, Z(i)) ! assume some ionization
@@ -409,26 +408,12 @@
                rho, T, m, A, charge, na, Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)
 
             if(.not. s% diffusion_use_paquette .and. .not. s% use_other_diffusion_coefficients) then
-               Gamma = s% gam(k)
-               Gamlo = 3d0
-               Gamhi = 10d0 ! for blending over from Stanton & Murillo coeffs to CBF coeffs at high Gamma
-               if(Gamma < Gamlo .or. .not. s% diffusion_use_caplan) then
-                  call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
-                  ! This must get called after Paquette because it doesn't calculate
-                  ! the electron entries (m). It leaves them untouched while calculating
-                  ! and changing all the ion-ion terms (1:nc), so after calling this
-                  ! routine we have all ion-ion coefficients from Stanton&Murillo and
-                  ! all ion-electron coefficients from Paquette&al.
-               else if(Gamma >= Gamlo .and. Gamma <= Gamhi) then ! blend
-                  alfa = (Gamhi - Gamma)/(Gamhi - Gamlo)
-                  Kdiff2(:,:) = Kdiff(:,:) ! need to initialize so that (m,m) entries are set
-                  call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM) ! alfa = 1
-                  call get_CBF_coeffs(nc,m,rho,T,A,charge,na,Gamma,Ddiff_Caplan,Kdiff2) ! alfa = 0
-                  Kdiff(:,:) = alfa*Kdiff(:,:) + (1d0-alfa)*Kdiff2(:,:)
-               else
-                  ! use Caplan, Bauer, & Freeman coefficients at moderate to strong coupling
-                  call get_CBF_coeffs(nc,m,rho,T,A,charge,na,Gamma,Ddiff_Caplan,Kdiff)
-               end if
+               call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
+               ! This must get called after Paquette because it doesn't calculate
+               ! the electron entries (m). It leaves them untouched while calculating
+               ! and changing all the ion-ion terms (1:nc), so after calling this
+               ! routine we have all ion-ion coefficients from Stanton&Murillo and
+               ! all ion-electron coefficients from Paquette&al.
             end if
 
             if(s% use_other_diffusion_coefficients) then
@@ -1681,132 +1666,6 @@
         lam_eff = pow(lam_sum,-0.5d0)
       end subroutine lam_SM
 
-      ! Calculate coefficients given in Section 4 of Caplan, Bauer, & Freeman 2022
-      subroutine get_CBF_coeffs(nc,m,rho,T,A,Z,nd,Gamma,Ddiff,Kdiff)
-        integer, intent(in) :: nc, m
-        real(dp), intent(in) :: rho, T, Gamma
-        real(dp), dimension(:), intent(in) :: A, Z, nd ! m
-        real(dp), dimension(:), intent(out) :: Ddiff ! nc
-        real(dp), dimension(:,:), intent(inout) :: Kdiff ! (m,m), but only touch (nc,nc)
 
-        real(dp) :: kappa, DstarOCP, omegap, ai, lam_e, Docp
-        real(dp) :: Abar, Zbar, ni_sum, Zp6bar, Kfac
-        integer :: i, j
-
-        ni_sum = sum(nd(1:nc)) ! total ion number density (excludes electron entry m)
-        Abar = sum(A(1:nc)*nd(1:nc))/ni_sum
-        Zbar = sum(Z(1:nc)*nd(1:nc))/ni_sum
-        Zp6bar = 0d0 ! average of Z^0.6, needed for constructing Kij
-        do j = 1,nc
-           Zp6bar = Zp6bar + pow(Z(j),0.6d0)*nd(j)/ni_sum
-        end do
-        
-        ! Set kappa as input for Dstar calculation,
-        ! also sets omegap, ai, lam_e for converting to cgs units later.
-        call kappa_CBF(nc,m,rho,T,Abar,Zbar,nd,omegap,ai,lam_e,kappa)
-        
-        ! Calculate Dstar using fit of Eqn (5)
-        call get_Dstar_OCP(Gamma,kappa,DstarOCP)
-        Docp = DstarOCP*ai*ai*omegap ! convert from dimensionless to cgs units
-        
-        ! Eqn (11)
-        do j = 1,nc
-           Ddiff(j) = Docp*pow(Z(j)/Zbar,-0.6d0)
-        end do
-
-        ! Translate into Kij coefficients for Burgers equations
-        Kfac = boltzm*T/(ni_sum*Zp6bar*pow(Zbar,0.6d0)*Docp)
-        do i = 1,nc
-           do j = 1,nc
-              Kdiff(i,j) = nd(i)*nd(j)*pow(Z(i)*Z(j),0.6d0)*Kfac
-           end do
-        end do
-
-      end subroutine get_CBF_coeffs
-      
-      subroutine get_Dstar_OCP(Gamma,kappa,DstarOCP)
-        real(dp), intent(in) :: Gamma, kappa
-        real(dp), intent(out) :: DstarOCP
-
-        real(dp) :: a0, a1, a2, b0, b1, b2, c0, c1, c2, c3
-        real(dp) :: Ak, Bk, Ck
-
-        a0 = 1.55973d0
-        a1 = 1.10941d0
-        a2 = 1.36909d0
-        
-        b0 = 0.0070782d0
-        b1 = 0.80499d0
-        b2 = 4.53523d0
-        
-        c0 = 2.20689d0
-        c1 = 1.351594d0
-        c2 = 1.57138d0
-        c3 = 3.34187d0
-        
-        Ak = sqrt(pi/3d0)*(a0 + a1*pow(kappa,a2))
-        Bk = b0*exp(-b1*pow(kappa,b2))
-        Ck = c0 + c1*bitsafe_erf_fit(c2*pow(kappa,c3))
-
-        ! Eqn (5)
-        DstarOCP = sqrt(pi/3d0)*Ak*pow(Gamma,-2.5d0)*exp(-Bk*Gamma)/log(1d0 + Ck*pow(Gamma,-1.5d0)/sqrt(3d0))
-
-      end subroutine get_Dstar_OCP
-      
-      ! Screening Length for CBF diffusion coefficients.
-      ! Only electron screening, accounts for potentially relativistic electron degeneracy.
-      subroutine kappa_CBF(nc,m,rho,T,Abar,Zbar,nd,omegap,ai,lam_e,kappa)
-        integer, intent(in) :: nc, m
-        real(dp), intent(in) :: rho, T, Abar, Zbar
-        real(dp), dimension(:), intent(in) :: nd ! m. number densities of all species
-        real(dp), intent(out) :: omegap, ai, lam_e
-        real(dp), intent(out) :: kappa ! ion separation relative to electron screening length.
-
-        real(dp) :: tiny_n, ne, EF, kF, lam_e_SM, lam_e_rel, ni_tot
-        integer :: i
-
-        tiny_n = 1d-20 ! g/cc
-        ne = nd(m) ! electron number density
-        ! Electron Fermi energy
-        EF = (hbar*hbar*pow(3d0*pi*pi*ne,2d0/3d0))/(2d0*me)
-        ! Electron screening length accounting for degeneracy correction
-        lam_e_SM = pow(pi4*qe*qe*ne/sqrt(pow2(boltzm*T) + pow2((2d0/3d0)*EF)),-0.5d0)
-
-        if (rho < 1d6) then
-           lam_e = lam_e_SM
-        else ! calculate and use relativistic screening length if rho > 1d6
-           kF = pow(3d0*pi*pi*ne,one_third) ! electron Fermi momentum
-           lam_e_rel = 1d0/(2d0*kF*sqrt(fine/pi)) ! fine = fine structure constant ~1/137
-           lam_e = min(lam_e_SM,lam_e_rel) ! min for continuity
-        end if
-
-        ! Compute kappa
-        ni_tot = 0d0
-        do i = 1,nc
-           ni_tot = ni_tot + nd(i)
-        end do
-        omegap = sqrt(pi4*ni_tot*Zbar*Zbar*qe*qe/(Abar*amu)) ! plasma frequency
-        ai = pow(3d0/(pi4*ni_tot),one_third)
-        kappa = ai/lam_e
-
-      end subroutine kappa_CBF
-
-      ! crlibm does not include error function, so implement an
-      ! erf fit good to 2.5e-5 (Abramowitz and Stegun 1964)
-      ! in terms of other bitsafe functions.
-      real(dp) function bitsafe_erf_fit(x)
-        real(dp) :: x
-        real(dp) :: t, p, a1, a2, a3
-
-        p = 0.47047d0
-        a1 = 0.3480242d0
-        a2 = -0.0958798d0
-        a3 = 0.7478556d0
-
-        t = 1d0/(1d0 + p*x)
-
-        bitsafe_erf_fit = 1d0 - (a1*t + a2*t*t + a3*t*t*t)*exp(-x*x)
-      end function bitsafe_erf_fit
-      
       end module diffusion_support
 
