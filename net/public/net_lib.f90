@@ -1400,38 +1400,28 @@
             return 
          end if
 
-
          select case(output)
             case(RAW_RATE_OUT) ! reaction/s/density of inputs
                net_get_reaction_rate_data = get_raw()
-
             case(RAW_RATE_RHO_OUT) ! reaction/s
                net_get_reaction_rate_data = get_raw_rho()
-
             case(SCREEN_FACTOR_OUT) ! Scalar
                ierr = -1
-
             case(SCREENED_RATE_OUT) ! screening * raw_rate (reactions/s)
                ierr = -1
-
             case(EPS_NUC_OUT) ! MeV (nuclear energy per reaction) maybe negative
                net_get_reaction_rate_data = std_reaction_Qs(ir)
-
             case(EPS_NUC_RAW_RATE_OUT) ! MeV * raw_rate
                net_get_reaction_rate_data = get_raw_rho() * std_reaction_Qs(ir)
-
             case(EPS_NEU_OUT) ! MeV energy lost to neutrino per reaction (>=0)
                net_get_reaction_rate_data = std_reaction_neuQs(ir)
-
             case(EPS_NEU_RAW_RATE_OUT) ! MeV * raw_rate
                net_get_reaction_rate_data = get_raw_rho() * std_reaction_neuQs(ir)
-
             case default
                ierr = -1
                write(*,*) "Unable to match get_reaction_rate_data option=",output
                return 
          end select
-
 
          contains
 
@@ -1451,11 +1441,11 @@
 
                integer :: i, k, num, iso
 
-               rate = get_raw()
+               get_raw_rho = get_raw()
 
                call rates_get_density_factors(ir, ye, rho, factor, factor_drho)
    
-               rate = rate * factor
+               get_raw_rho = get_raw_rho * factor
                ! Roll in the abundances
 
                do i=1,max_num_reaction_inputs,2
@@ -1464,11 +1454,13 @@
                   iso = reaction_inputs(i+1,ir) ! chem_id
                   do k=1,size(cids)
                      if(iso == cids(k)) then
-                        rate = rate * pow(y(k),num)
+                        get_raw_rho = get_raw_rho * pow(y(k),num)
                         exit
                      end if
                   end do
                end do
+
+               
 
             end function get_raw_rho
 
