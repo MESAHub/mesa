@@ -1363,16 +1363,19 @@
       end subroutine clean1
       
 
-      real(dp) function net_get_reaction_rate_data(output, rate_name, temp, logT, rho, logRho, &
+      real(dp) function net_get_reaction_rate_data(output, handle, rate_name, temp, logT, rho, logRho, &
+                                                   zbar, abar, z2bar, &
                                                    ye, y, cids, raw_rate_factor, screening_mode, ierr)
       ! Note these do not take into account things like eps_{nuc,neu}_factors
          use rates_def
          use net_def
          use rates_lib
          integer, intent(in) :: output ! Output type see rates_def *_OUT options 
+         integer, intent(in) :: handle ! net_handle
          character(len=*),intent(in) :: rate_name ! Reaction rate name i.e r_c12_ag_o16
          real(dp), intent(in) :: temp, rho ! Temperature K, density g/cm^3
          real(dp), intent(in) :: logT, logRho ! log Temperature K, log density g/cm^3
+         real(dp), intent(in) :: zbar, abar, z2bar ! average charge, mass, and charge^2
          real(dp), intent(in) :: ye ! Electron fraction
          real(dp), dimension(:), intent(in) :: y ! Abundance of reaction inputs
          integer, dimension(:), intent(in) :: cids ! chem_iso ids of inputs, must be in same order as xa
@@ -1406,17 +1409,17 @@
             case(RAW_RATE_RHO_OUT) ! reaction/s
                net_get_reaction_rate_data = get_raw_rho()
             case(SCREEN_FACTOR_OUT) ! Scalar
-               ierr = -1
+               net_get_reaction_rate_data = get_screen_factor()
             case(SCREENED_RATE_OUT) ! screening * raw_rate (reactions/s)
-               ierr = -1
+               net_get_reaction_rate_data = get_screened()
             case(EPS_NUC_OUT) ! MeV (nuclear energy per reaction) maybe negative
                net_get_reaction_rate_data = std_reaction_Qs(ir)
             case(EPS_NUC_RAW_RATE_OUT) ! MeV * raw_rate
-               net_get_reaction_rate_data = get_raw_rho() * std_reaction_Qs(ir)
+               net_get_reaction_rate_data = get_screened() * std_reaction_Qs(ir)
             case(EPS_NEU_OUT) ! MeV energy lost to neutrino per reaction (>=0)
                net_get_reaction_rate_data = std_reaction_neuQs(ir)
             case(EPS_NEU_RAW_RATE_OUT) ! MeV * raw_rate
-               net_get_reaction_rate_data = get_raw_rho() * std_reaction_neuQs(ir)
+               net_get_reaction_rate_data = get_screened() * std_reaction_neuQs(ir)
             case default
                ierr = -1
                write(*,*) "Unable to match get_reaction_rate_data option=",output
@@ -1460,11 +1463,126 @@
                   end do
                end do
 
-               
-
             end function get_raw_rho
 
+            real(dp) function get_screened()
+
+               call net_get_screen_net(handle, ir, temp, logT, rho, logRho,&
+                  zbar, abar, z2bar, ye, y, screening_mode, get_screened, &
+                  ierr)
+               if(ierr/=0) return
+
+               get_screened = get_screened * raw_rate_factor
+
+            end function get_screened
+
+
+            real(dp) function get_screen_factor()
+               real(dp) :: screen_rate
+
+               call net_get_screen_net(handle, ir, temp, logT, rho, logRho,&
+                  zbar, abar, z2bar, ye, y, screening_mode, screen_rate, &
+                  ierr)
+               if(ierr/=0) return
+
+               get_screen_factor = screen_rate / get_raw_rho()
+
+            end function get_screen_factor
+
+
       end function net_get_reaction_rate_data
+
+      subroutine net_get_screen_net(handle, ir, btemp, bden, logtemp, logrho,&
+            zbar, abar, z2bar, ye, y, screening_mode, screened_rate, &
+            ierr)
+         use net_def
+         use net_screen, only: screen_net_with_approx
+         use net_initialize, only: set_rate_ptrs
+         use net_approx21, only: num_reactions_func => num_reactions
+         integer :: handle
+
+         type (Net_General_Info), pointer  :: g
+         real(dp) :: btemp, bden, logtemp, logrho
+
+         real(dp), dimension(:), pointer :: &
+            rate_raw, rate_raw_dT, rate_raw_dRho, &
+            rate_screened, rate_screened_dT, rate_screened_dRho
+
+         real(dp) :: zbar, abar, z2bar, ye, y(:), screened_rate
+         integer :: screening_mode, ir
+
+         integer, intent(out) :: ierr
+
+         integer :: lwork, iwork, num_reactions 
+         real(dp), pointer :: net_work(:)
+         logical, parameter :: dbg=.false.
+
+         ierr = 0
+         call get_net_ptr(handle, g, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for net_get -- did you call alloc_net_handle?'
+            return
+         end if
+
+         lwork = net_work_size(handle, ierr)
+         if (ierr /= 0) then
+            if (dbg) write(*,*) 'failed in net_work_size'
+            return
+         end if
+
+         allocate(net_work(lwork))
+
+         num_reactions =  g% num_reactions     
+         if (g% doing_approx21) num_reactions = num_reactions + num_reactions_func(g% add_co56_to_approx21)
+
+         allocate(rate_raw(num_reactions), rate_raw_dt(num_reactions), rate_raw_drho(num_reactions), &
+            rate_screened(num_reactions), rate_screened_dT(num_reactions), rate_screened_dRho(num_reactions))
+
+         if (dbg) write(*,*) 'call set_rate_ptrs'
+         call set_rate_ptrs(g, &
+            rate_screened, rate_screened_dT, rate_screened_dRho, &
+            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, net_work, &
+            iwork, ierr) ! iwork is number of entries in work used for rates
+         if (ierr /= 0) then
+            if (dbg) write(*,*) 'failed in set_ptrs_in_work'
+            call cleanup()
+            return
+         end if
+
+         call screen_net_with_approx(g, btemp, bden, logtemp, logrho,&
+            rate_raw, rate_raw_dT, rate_raw_dRho, &
+            rate_screened, rate_screened_dT, rate_screened_dRho, &
+            y, screening_mode,&
+            zbar, abar, z2bar, ye,&
+            ierr)
+            if (ierr /= 0) then
+               if (dbg) write(*,*) 'failed in screen_net_with_approx'
+               call cleanup()
+               return
+            end if
+
+        screened_rate = rate_screened(ir)
+
+
+        call cleanup()
+
+         contains
+            subroutine cleanup()
+
+               if(associated(net_work)) deallocate(net_work)
+
+               if(associated(rate_raw)) deallocate(rate_raw)
+               if(associated(rate_raw_dt)) deallocate(rate_raw_dt)
+               if(associated(rate_raw_drho)) deallocate(rate_raw_drho)
+               if(associated(rate_screened)) deallocate(rate_screened)
+               if(associated(rate_screened_dt)) deallocate(rate_screened_dt)
+               if(associated(rate_screened_drho)) deallocate(rate_screened_drho)
+
+
+            end subroutine cleanup
+
+
+      end subroutine net_get_screen_net
 
       
       end module net_lib

@@ -1252,8 +1252,9 @@
                 do j = 1, num_reaction_inputs
                     xa(j) = s% xa(s% net_iso(cids(j)), k)
                 end do
-                val = val + net_get_reaction_rate_data(RAW_RATE_RHO_OUT, r_name, s% T(k),&
-                    log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
+                val = val + net_get_reaction_rate_data(RAW_RATE_RHO_OUT, s%net_handle, r_name, s% T(k),&
+                    log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+                    s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
                     xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
              end do
              

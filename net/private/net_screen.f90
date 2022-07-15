@@ -31,6 +31,7 @@
       use net_def, only: Net_General_Info, Net_Info
       use rates_def
       use utils_lib, only: mesa_error
+      use net_approx21, only: num_reactions_func => num_reactions
       
       implicit none
       
@@ -50,6 +51,52 @@
             n% screening_mode,  &
              0d0, 0d0, 0d0, 1d0, ierr)
       end subroutine make_screening_tables
+
+
+      subroutine screen_net_with_approx(g, btemp, bden, logtemp, logrho,&
+            rate_raw, rate_raw_dT, rate_raw_dRho, &
+            rate_screened, rate_screened_dT, rate_screened_dRho, &
+            y, screening_mode, &
+            zbar, abar, z2bar, ye,&
+            ierr)
+         type (Net_Info), pointer :: n
+         type(Net_General_Info), pointer :: g
+         real(dp) :: btemp, bden, logtemp, logrho
+
+         real(dp), dimension(:), pointer :: &
+            rate_raw, rate_raw_dT, rate_raw_dRho, &
+            rate_screened, rate_screened_dT, rate_screened_dRho
+
+         real(dp) :: zbar, abar, z2bar, ye, y(:)
+         integer :: screening_mode
+
+         integer, intent(out) :: ierr
+
+         integer :: num, i
+         logical, parameter :: dbg=.false.
+
+         ! get the reaction rates including screening factors
+         if (dbg) write(*,*) 'call screen_net with init=.false.'
+         call screen_net( &
+            g, g% num_isos, y, btemp, bden, logtemp, logrho, .false.,  &
+            rate_raw, rate_raw_dT, rate_raw_dRho, &
+            rate_screened, rate_screened_dT, rate_screened_dRho, &
+            screening_mode, &
+            zbar, abar, z2bar, ye, ierr)
+         if (dbg) write(*,*) 'done screen_net with init=.false.'
+         if (ierr /= 0) return
+         if (g% doing_approx21) then
+            num = num_reactions_func(g% add_co56_to_approx21)
+            do i = g% num_reactions+1,num
+               rate_screened(i) = rate_raw(i)
+               rate_screened_dT(i) = rate_raw_dT(i)
+               rate_screened_dRho(i) = rate_raw_dRho(i)
+            end do    
+         end if
+
+      end subroutine screen_net_with_approx
+
+
       
 
       subroutine screen_net( &
