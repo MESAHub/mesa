@@ -7385,8 +7385,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! path to the OP_mono_master_grid_MESA_emesh.txt file containing the data need for when op_mono_method = 'mombarg'.
+      ! if this is set to the empty string, '', then it defaults to the
+      ! environment variable ``$(MESA_OP_MONO_MASTER_GRID)``
 
-    emesh_data_for_op_mono_path = ''
+    emesh_data_for_op_mono_path = ''      ! '' defaults to $MESA_OP_MONO_MASTER_GRID
 
 
       ! high_logT_op_mono_full_off
