@@ -1182,11 +1182,9 @@
          
          use net_lib
          use net_def
-         use rates_def, only: reaction_name, get_num_reaction_inputs, reaction_inputs
+         use rates_def, only: reaction_name, get_num_reaction_inputs, reaction_inputs, max_num_reaction_inputs
          character(len=100) :: r_name
          
-         real(dp), allocatable :: xa(:)
-         integer, allocatable :: cids(:)
          integer :: j, ir, num_reaction_inputs
          
          type (star_info), pointer :: s
@@ -1204,6 +1202,9 @@
             min_gamma1, deltam
          real(dp), pointer :: v(:)
          logical :: v_flag
+
+         real(dp) :: xa(max_num_reaction_inputs)
+         integer :: cids(max_num_reaction_inputs)
 
          include 'formats'
 
@@ -1240,10 +1241,7 @@
          else if (c > raw_rate_offset) then
              ir = c - raw_rate_offset
              num_reaction_inputs = get_num_reaction_inputs(ir)
-             
-             allocate(xa(num_reaction_inputs))
-             allocate(cids(num_reaction_inputs))
-             
+            
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
              end do
@@ -1256,7 +1254,7 @@
                 end do
                 val = val + net_get_reaction_rate_data(RAW_RATE_RHO_OUT, r_name, s% T(k),&
                     log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
-                    xa, cids, 1d0, s% screening_mode_value, ierr)
+                    xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
              end do
              
          else if (c > log_lum_band_offset) then

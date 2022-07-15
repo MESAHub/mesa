@@ -263,11 +263,9 @@
          
          use net_lib
          use net_def
-         use rates_def, only: reaction_name, get_num_reaction_inputs, reaction_inputs
+         use rates_def, only: reaction_name, get_num_reaction_inputs, reaction_inputs, max_num_reaction_inputs
          character(len=100) :: r_name
          
-         real(dp), allocatable :: xa(:)
-         integer, allocatable :: cids(:)
          integer :: ir, num_reaction_inputs
          
          type (star_info), pointer :: s
@@ -283,6 +281,10 @@
          integer :: j, nz, ionization_k, klo, khi, i, ii, kk, ierr
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor, Lconv, conv_vel
          logical :: rsp_or_w
+
+         real(dp) :: xa(max_num_reaction_inputs)
+         integer :: cids(max_num_reaction_inputs)
+
          include 'formats'
 
          if (s% rotation_flag) then
@@ -324,10 +326,7 @@
          else if (c > raw_rate_offset) then
             ir = c - raw_rate_offset
             num_reaction_inputs = get_num_reaction_inputs(ir)
-            
-            allocate(xa(num_reaction_inputs))
-            allocate(cids(num_reaction_inputs))
-            
+                        
             do j = 1, num_reaction_inputs
                 cids(j) = reaction_inputs(j*2, ir)
                 xa(j) = s% xa(s% net_iso(cids(j)), k)
@@ -335,7 +334,7 @@
             r_name = reaction_name(ir)
             val = net_get_reaction_rate_data(RAW_RATE_RHO_OUT, r_name, s% T(k),&
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), s% ye(k),&
-                           xa, cids, 1d0, s% screening_mode_value, ierr)
+                           xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
             
          else if (c > diffusion_D_offset) then
             i = c - diffusion_D_offset
