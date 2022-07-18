@@ -121,7 +121,7 @@ contains
 
     if (.not. (skip_kap .and. skip_neu)) then
 
-       if (.not. skip_kap .and. s% op_mono_method == 'hu') then
+       if (.not. skip_kap) then
           call prepare_kap(s, ierr)
           if (ierr /= 0) return
           if (s% use_other_opacity_factor) then
