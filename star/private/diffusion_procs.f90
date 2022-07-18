@@ -1274,22 +1274,6 @@
             end if
          end do
 
-         if (dbg) write(*,*) 'call get_op_mono_params'
-         !call get_op_mono_params(nptot, ipe, nrad)
-         if (dbg) write(*,*) 'done get_op_mono_params'
-         n = utils_OMP_GET_MAX_THREADS()
-         if (dbg) write(*,2) 'nptot', nptot
-         if (dbg) write(*,2) 'ipe', ipe
-         if (dbg) write(*,2) 'nrad', nrad
-         if (dbg) write(*,2) 'kmax', kmax
-         if (dbg) write(*,2) 'nzlo', nzlo
-         if (dbg) write(*,2) 'n', n
-         if (dbg) write(*,2) 'nptot*ipe*4*4*n', nptot*ipe*4*4*n
-         if (nptot*ipe*4*4*n < 0) stop 'integer overflow for array size in calc_g_rad'
-
-         if (ierr /= 0) return
-
-
         do j = 1, ngp
         k1 = INT((kmax - (nzlo+1))/ ngp * (j-1) + (nzlo+1))
         if (j == ngp) THEN
