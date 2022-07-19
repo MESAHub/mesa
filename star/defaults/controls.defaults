@@ -7381,7 +7381,7 @@
 
       ! ::
       
-      op_mono_method = 'mombarg'
+      op_mono_method = 'hu'
 
       ! emesh_data_for_op_mono_path
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
