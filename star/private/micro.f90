@@ -154,14 +154,14 @@ contains
           if (initiaze_kap_grid) then
              call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
              write(*,*) 'Computing kappa grid for initial mixture.'
-             call call_compute_kappa_grid(fk, ierr)
+             call call_compute_kappa_grid_mombarg(fk, ierr)
              !write(*,*) 'Finished computing grid for initial mixture.'
              fk_pcg_old = fk
              initiaze_kap_grid = .false.
           else if (delta > 1d-4) THEN
              write(*,*) 'Computing kappa grid for core mixture.'
              write(*,*) delta
-             call call_compute_kappa_grid(fk, ierr)
+             call call_compute_kappa_grid_mombarg(fk, ierr)
              !write(*,*) 'Finished computing grid for core mixture.'
              fk_pcg_old = fk
           endif

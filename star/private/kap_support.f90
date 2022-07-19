@@ -229,7 +229,7 @@ contains
     use kap_lib, only: &
          load_op_mono_data, get_op_mono_params, &
          get_op_mono_args, kap_get_op_mono, kap_get, &
-         call_compute_kappa
+         call_compute_kappa_mombarg
 
     use chem_def, only: ih1, ihe3, ihe4, chem_isos
     use star_utils, only: get_XYZ, lookup_nameofvar
@@ -446,7 +446,7 @@ contains
                if (e_name == 'ni58')fk(17) =  xa(i)/ chem_isos% W(s% chem_id(i))
             end do
             fk = fk / sum(fk)
-            call call_compute_kappa(s% kap_handle, k, &
+            call call_compute_kappa_mombarg(s% kap_handle, k, &
                  fk, s% T(k), s% rho(k), logT, logRho, &
                  s% zbar(k), lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                  kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)

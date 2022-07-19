@@ -716,7 +716,7 @@
 
 
 
-      subroutine call_compute_grad(k, j, blend, fk, T_face, Rho_face,&
+      subroutine call_compute_grad_mombarg(k, j, blend, fk, T_face, Rho_face,&
         l, r, logKappa, lgrad, ierr)
         use op_eval_mombarg, only : compute_grad, compute_grad_fast
         !use crlibm_lib
@@ -753,9 +753,9 @@
                   lgrad, ierr,&
                   ite,jne,epatom,amamu,logT_pcg(j,:),logRho_pcg(j,:),lgamm_pcg(j,:,:),lkap_face_pcg(j,:))
         endif
-      end subroutine call_compute_grad
+      end subroutine call_compute_grad_mombarg
 
-      subroutine call_compute_gamma_grid(j, fk, ierr)
+      subroutine call_compute_gamma_grid_mombarg(j, fk, ierr)
         use op_eval_mombarg, only : compute_gamma_grid
         !use crlibm_lib
 
@@ -770,9 +770,9 @@
           ite,jne,epatom,amamu,sig,eumesh)
 
 
-      end subroutine call_compute_gamma_grid
+      end subroutine call_compute_gamma_grid_mombarg
 
-      subroutine call_compute_kappa(handle, k,&
+      subroutine call_compute_kappa_mombarg(handle, k,&
         fk, T_cntr, Rho_cntr, logT_cntr, logRho_cntr,&
         zbar, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
         kap, dlnkap_dlnT, dlnkap_dlnRho, log_kap_rad_cell, ierr)
@@ -855,9 +855,9 @@
              kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
              kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
-      end subroutine call_compute_kappa
+      end subroutine call_compute_kappa_mombarg
 
-      subroutine call_compute_kappa_grid(fk, ierr)
+      subroutine call_compute_kappa_grid_mombarg(fk, ierr)
         use op_eval_mombarg, only : compute_kappa_grid
 
         real(dp), intent(in) :: fk(:)
@@ -869,6 +869,6 @@
           lkap_ross_pcg, ierr,&
           ite,jne,epatom,amamu,sig)
 
-      end subroutine call_compute_kappa_grid
+      end subroutine call_compute_kappa_grid_mombarg
 
       end module kap_lib

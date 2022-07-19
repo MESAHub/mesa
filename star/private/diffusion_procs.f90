@@ -1222,7 +1222,7 @@
             screening, log10_g_rad, g_rad, &
             rad_accel_face, ierr)
 
-         use kap_lib, only: get_op_mono_params, call_load_op_master, call_compute_gamma_grid
+         use kap_lib, only: get_op_mono_params, call_load_op_master, call_compute_gamma_grid_mombarg
          use utils_lib, only: utils_OMP_GET_MAX_THREADS, utils_OMP_GET_THREAD_NUM
          type (star_info), pointer :: s
 
@@ -1308,13 +1308,13 @@
             call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
 
             write(*,*) 'Precompute gamma grid initialize.'
-            call call_compute_gamma_grid(j, fk, ierr)
+            call call_compute_gamma_grid_mombarg(j, fk, ierr)
             !write(*,*) 'Done precomputing gamma grid initialize.'
             fk_gam_old(j,:) = fk
             if (j == ngp) initialize_gamma_grid = .false.
           else if (delta > 1d-4) then
             write(*,*) 'Precompute gamma grid.'
-            call call_compute_gamma_grid(j, fk, ierr)
+            call call_compute_gamma_grid_mombarg(j, fk, ierr)
             !write(*,*) 'Done precomputing gamma grid.'
             fk_gam_old(j,:) = fk
           endif
@@ -1381,7 +1381,7 @@
       subroutine set1_g_rad_mombarg( &
          s, k, nc, j, blend, iZ, kk, T, rho, L, r, A, X, X_c,&
          log10_g_rad, g_rad, ierr)
-         use kap_lib, only : call_compute_grad
+         use kap_lib, only : call_compute_grad_mombarg
          use chem_def
 
          type (star_info), pointer :: s
@@ -1434,7 +1434,7 @@
                   if (e_name == 'ni58')fk(17) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
             end do
             fk = fk / sum(fk)
-            call call_compute_grad(k, j, blend, fk, T, rho,&
+            call call_compute_grad_mombarg(k, j, blend, fk, T, rho,&
                         L, r,&
                         logKappa, lgrad, ierr)
 
