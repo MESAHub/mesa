@@ -121,30 +121,15 @@ contains
 
     if (.not. (skip_kap .and. skip_neu)) then
 
-       if (.not. skip_kap) then
+       if (.not. skip_kap .and. s% op_mono_method == 'hu') then
           call prepare_kap(s, ierr)
           if (ierr /= 0) return
-          if (s% use_other_opacity_factor) then
-             call s% other_opacity_factor(s% id, ierr)
-             if (ierr /= 0) return
-          else
-             s% extra_opacity_factor(1:s% nz) = s% opacity_factor
-          end if
        endif
-       if (s% use_other_opacity_factor) then
-          call s% other_opacity_factor(s% id, ierr)
-          if (ierr /= 0) return
-       else
-          s% extra_opacity_factor(1:s% nz) = s% opacity_factor
-       end if
-
-       if (s% doing_timing) call start_time(s, time0, total)
-
-
-      if (s% op_mono_method == 'mombarg' .and. s% high_logT_op_mono_full_on - s% low_logT_op_mono_full_on > 0  ) then
-       fk = 0
-       do i=1, s% species
-          e_name = chem_isos% name(s% chem_id(i))
+       if (.not. skip_kap .and. s% op_mono_method == 'mombarg' .and. &
+            s% high_logT_op_mono_full_on - s% low_logT_op_mono_full_on > 0  ) then
+          fk = 0
+          do i=1, s% species
+             e_name = chem_isos% name(s% chem_id(i))
              if (e_name == 'h1')  fk(1) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
              if (e_name == 'he4') fk(2) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
              if (e_name == 'c12') fk(3) =   s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
@@ -162,26 +147,36 @@ contains
              if (e_name == 'mn55')fk(15) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
              if (e_name == 'fe56')fk(16) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
              if (e_name == 'ni58')fk(17) =  s% xa(i,s% nz)/ chem_isos% W(s% chem_id(i))
-       end do
-       fk = fk / sum(fk)
-       delta = MAXVAL(ABS(fk - fk_pcg_old)/fk_pcg_old)
-
-       !if (s% do_element_diffusion .and. initiaze_kap_grid .and. s% op_mono_method == 'mombarg' ) then
-       if (initiaze_kap_grid) then
-         call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
-         write(*,*) 'Computing kappa grid for initial mixture.'
-         call call_compute_kappa_grid(fk, ierr)
-         !write(*,*) 'Finished computing grid for initial mixture.'
-         fk_pcg_old = fk
-         initiaze_kap_grid = .false.
-       else if (delta > 1d-4) THEN
-         write(*,*) 'Computing kappa grid for core mixture.'
-         write(*,*) delta
-         call call_compute_kappa_grid(fk, ierr)
-         !write(*,*) 'Finished computing grid for core mixture.'
-         fk_pcg_old = fk
+          end do
+          fk = fk / sum(fk)
+          delta = MAXVAL(ABS(fk - fk_pcg_old)/fk_pcg_old)
+          
+          if (initiaze_kap_grid) then
+             call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
+             write(*,*) 'Computing kappa grid for initial mixture.'
+             call call_compute_kappa_grid(fk, ierr)
+             !write(*,*) 'Finished computing grid for initial mixture.'
+             fk_pcg_old = fk
+             initiaze_kap_grid = .false.
+          else if (delta > 1d-4) THEN
+             write(*,*) 'Computing kappa grid for core mixture.'
+             write(*,*) delta
+             call call_compute_kappa_grid(fk, ierr)
+             !write(*,*) 'Finished computing grid for core mixture.'
+             fk_pcg_old = fk
+          endif
        endif
-      endif
+       
+       if (s% use_other_opacity_factor) then
+          call s% other_opacity_factor(s% id, ierr)
+          if (ierr /= 0) return
+       else
+          s% extra_opacity_factor(1:s% nz) = s% opacity_factor
+       end if
+
+       if (s% doing_timing) call start_time(s, time0, total)
+
+
 
        !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
        do k = nzlo, nzhi

@@ -329,106 +329,104 @@ contains
     if (beta > 0d0) then
 
       if (s% op_mono_method == 'hu') then
-      call get_op_mono_args( &
-            s% species, xa, s% op_mono_min_X_to_include, s% chem_id, &
-            s% op_mono_factors, nel, izzp, fap, fac, ierr)
-       if (ierr /= 0) then
-          write(*,*) 'error in get_op_mono_args, ierr = ',ierr
-          return
-       end if
+         call get_op_mono_args( &
+              s% species, xa, s% op_mono_min_X_to_include, s% chem_id, &
+              s% op_mono_factors, nel, izzp, fap, fac, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'error in get_op_mono_args, ierr = ',ierr
+            return
+         end if
 
-       if (associated(s% op_mono_umesh1)) then
+         if (associated(s% op_mono_umesh1)) then
 
-          thread_num = utils_OMP_GET_THREAD_NUM() ! in range 0 to op_mono_n-1
-          if (thread_num < 0) then
-             write(*,3) 'thread_num < 0', thread_num, s% op_mono_n
-             ierr = -1
-             return
-          end if
-          if (thread_num >= s% op_mono_n) then
-             write(*,3) 'thread_num >= s% op_mono_n', thread_num, s% op_mono_n
-             ierr = -1
-             return
-          end if
-          nptot = s% op_mono_nptot
-          ipe = s% op_mono_ipe
-          nrad = s% op_mono_nrad
+            thread_num = utils_OMP_GET_THREAD_NUM() ! in range 0 to op_mono_n-1
+            if (thread_num < 0) then
+               write(*,3) 'thread_num < 0', thread_num, s% op_mono_n
+               ierr = -1
+               return
+            end if
+            if (thread_num >= s% op_mono_n) then
+               write(*,3) 'thread_num >= s% op_mono_n', thread_num, s% op_mono_n
+               ierr = -1
+               return
+            end if
+            nptot = s% op_mono_nptot
+            ipe = s% op_mono_ipe
+            nrad = s% op_mono_nrad
+            
+            sz = nptot; offset = thread_num*sz
+            umesh(1:nptot) => s% op_mono_umesh1(offset+1:offset+sz)
+            semesh(1:nptot) => s% op_mono_semesh1(offset+1:offset+sz)
+            if (s% use_op_mono_alt_get_kap) then
+               sz = nptot*ipe*6*6; offset = thread_num*sz
+               ff(1:nptot,1:ipe,1:6,1:6) => s% op_mono_ff1(offset+1:offset+sz)
+               sz = nptot*6*6; offset = thread_num*sz
+               rs(1:nptot,1:6,1:6) => s% op_mono_rs1(offset+1:offset+sz)
+               sz = nptot*nrad*6*6; offset = thread_num*sz
+            else
+               sz = nptot*ipe*4*4; offset = thread_num*sz
+               ff(1:nptot,1:ipe,1:4,1:4) => s% op_mono_ff1(offset+1:offset+sz)
+               sz = nptot*4*4; offset = thread_num*sz
+               rs(1:nptot,1:4,1:4) => s% op_mono_rs1(offset+1:offset+sz)
+               sz = nptot*nrad*4*4; offset = thread_num*sz
+            end if
+            
+         else
+            
+            call load_op_mono_data( &
+                 s% op_mono_data_path, s% op_mono_data_cache_filename, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'error while loading OP data, ierr = ',ierr
+               return
+            end if
+            
+            call get_op_mono_params(nptot, ipe, nrad)
+            if (s% use_op_mono_alt_get_kap) then
+               allocate( &
+                    umesh(nptot), semesh(nptot), ff(nptot,ipe,6,6), &
+                    rs(nptot,6,6), stat=ierr)
+            else
+               allocate( &
+                    umesh(nptot), semesh(nptot), ff(nptot,ipe,4,4), &
+                    rs(nptot,4,4), stat=ierr)
+            end if
+            if (ierr /= 0) return
+            
+         end if
+         
+         if (s% solver_test_kap_partials) then
+            kap_test_partials = (k == s% solver_test_partials_k .and. &
+                 s% solver_call_number == s% solver_test_partials_call_number .and. &
+                 s% solver_iter == s% solver_test_partials_iter_number )
+         end if
+       
+         screening = .true.
+         if (s% use_other_kap) then
+            call s% other_kap_get_op_mono( &
+                 s% kap_handle, zbar, logRho, logT, &
+                 s% use_op_mono_alt_get_kap, &
+                 nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
+                 kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
+         else
+            call kap_get_op_mono( &
+                 s% kap_handle, zbar, logRho, logT, &
+                 s% use_op_mono_alt_get_kap, &
+                 nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
+                 kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
+         end if
 
-          sz = nptot; offset = thread_num*sz
-          umesh(1:nptot) => s% op_mono_umesh1(offset+1:offset+sz)
-          semesh(1:nptot) => s% op_mono_semesh1(offset+1:offset+sz)
-          if (s% use_op_mono_alt_get_kap) then
-             sz = nptot*ipe*6*6; offset = thread_num*sz
-             ff(1:nptot,1:ipe,1:6,1:6) => s% op_mono_ff1(offset+1:offset+sz)
-             sz = nptot*6*6; offset = thread_num*sz
-             rs(1:nptot,1:6,1:6) => s% op_mono_rs1(offset+1:offset+sz)
-             sz = nptot*nrad*6*6; offset = thread_num*sz
-          else
-             sz = nptot*ipe*4*4; offset = thread_num*sz
-             ff(1:nptot,1:ipe,1:4,1:4) => s% op_mono_ff1(offset+1:offset+sz)
-             sz = nptot*4*4; offset = thread_num*sz
-             rs(1:nptot,1:4,1:4) => s% op_mono_rs1(offset+1:offset+sz)
-             sz = nptot*nrad*4*4; offset = thread_num*sz
-          end if
+         if (s% solver_test_kap_partials .and. kap_test_partials) then
+            s% solver_test_partials_val = kap_test_partials_val
+            s% solver_test_partials_dval_dx = kap_test_partials_dval_dx
+         end if
 
-       else
-
-          call load_op_mono_data( &
-               s% op_mono_data_path, s% op_mono_data_cache_filename, ierr)
-          if (ierr /= 0) then
-             write(*,*) 'error while loading OP data, ierr = ',ierr
-             return
-          end if
-
-          call get_op_mono_params(nptot, ipe, nrad)
-          if (s% use_op_mono_alt_get_kap) then
-             allocate( &
-                umesh(nptot), semesh(nptot), ff(nptot,ipe,6,6), &
-                rs(nptot,6,6), stat=ierr)
-          else
-             allocate( &
-                umesh(nptot), semesh(nptot), ff(nptot,ipe,4,4), &
-                rs(nptot,4,4), stat=ierr)
-          end if
-          if (ierr /= 0) return
-
-       end if
-
-       if (s% solver_test_kap_partials) then
-          kap_test_partials = (k == s% solver_test_partials_k .and. &
-             s% solver_call_number == s% solver_test_partials_call_number .and. &
-             s% solver_iter == s% solver_test_partials_iter_number )
-       end if
-
-       screening = .true.
-       if (s% use_other_kap) then
-          call s% other_kap_get_op_mono( &
-               s% kap_handle, zbar, logRho, logT, &
-               s% use_op_mono_alt_get_kap, &
-               nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
-               kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
-       else
-          call kap_get_op_mono( &
-               s% kap_handle, zbar, logRho, logT, &
-               s% use_op_mono_alt_get_kap, &
-               nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
-               kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
-       end if
-
-       if (s% solver_test_kap_partials .and. kap_test_partials) then
-          s% solver_test_partials_val = kap_test_partials_val
-          s% solver_test_partials_dval_dx = kap_test_partials_dval_dx
-       end if
-
-       if (.not. associated(s% op_mono_umesh1)) deallocate(umesh, semesh, ff, rs)
-
-
-
-     else if (s% op_mono_method == 'mombarg') then
-       fk = 0
-       if (logT > 3.5 .and. logT < 8.0) then
-         do i=1, s% species
-            e_name = chem_isos% name(s% chem_id(i))
+         if (.not. associated(s% op_mono_umesh1)) deallocate(umesh, semesh, ff, rs)
+         
+      else if (s% op_mono_method == 'mombarg') then
+         fk = 0
+         if (logT > 3.5 .and. logT < 8.0) then
+            do i=1, s% species
+               e_name = chem_isos% name(s% chem_id(i))
                if (e_name == 'h1')  fk(1)  =  xa(i)/ chem_isos% W(s% chem_id(i))
                if (e_name == 'he4') fk(2)  =  xa(i)/ chem_isos% W(s% chem_id(i))
                if (e_name == 'c12') fk(3)  =  xa(i)/ chem_isos% W(s% chem_id(i))
@@ -446,16 +444,16 @@ contains
                if (e_name == 'mn55')fk(15) =  xa(i)/ chem_isos% W(s% chem_id(i))
                if (e_name == 'fe56')fk(16) =  xa(i)/ chem_isos% W(s% chem_id(i))
                if (e_name == 'ni58')fk(17) =  xa(i)/ chem_isos% W(s% chem_id(i))
-         end do
-         fk = fk / sum(fk)
-         call call_compute_kappa(s% kap_handle, k, &
-         fk, s% T(k), s% rho(k), logT, logRho, &
-         s% zbar(k), lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
-         kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
-        endif
+            end do
+            fk = fk / sum(fk)
+            call call_compute_kappa(s% kap_handle, k, &
+                 fk, s% T(k), s% rho(k), logT, logRho, &
+                 s% zbar(k), lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
+                 kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
+         endif
       else
-       write(*,*) 'Invalid argument for op_mono_method.'
-       stop
+         write(*,*) 'Invalid argument for op_mono_method.'
+         stop
       end if
 
        if (ierr /= 0) then
