@@ -46,7 +46,7 @@ module kap_support
   public :: get_kap
 
   ! Procedures
-  
+
 contains
 
   subroutine prepare_kap (s, ierr)
@@ -161,7 +161,7 @@ contains
 
     ! default to 0
     beta = 0
-    
+
     high_full_off = s% high_logT_op_mono_full_off
     high_full_on = s% high_logT_op_mono_full_on
     low_full_off = s% low_logT_op_mono_full_off
@@ -209,7 +209,7 @@ contains
     ! beta is fraction of op mono
     ! transform linear blend to smooth quintic blend
     alfa = -alfa*alfa*alfa*(-10d0 + alfa*(15d0 - 6d0*alfa))
-    beta = 1d0 - alfa 
+    beta = 1d0 - alfa
 
   end function frac_op_mono
 
@@ -228,7 +228,9 @@ contains
        num_kap_fracs
     use kap_lib, only: &
          load_op_mono_data, get_op_mono_params, &
-         get_op_mono_args, kap_get_op_mono, kap_get
+         get_op_mono_args, kap_get_op_mono, kap_get, &
+         call_compute_kappa
+
     use chem_def, only: ih1, ihe3, ihe4, chem_isos
     use star_utils, only: get_XYZ, lookup_nameofvar
 
@@ -248,7 +250,12 @@ contains
     integer :: i, iz, nptot, ipe, nrad, thread_num, sz, offset
     type(auto_diff_real_2var_order1) :: beta, lnkap, lnkap_op
     real(dp) :: kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, &
-       Z, xh, xhe, xc, xn, xo, xne
+       Z, xh, xhe, xc, xn, xo, xne, &
+       kap_ross_cell, log_kap_rad, fk(17), delta
+
+    character(len=4) :: e_name
+
+    !real(dp), pointer :: xa(:)
     integer, pointer :: net_iso(:)
     real, pointer :: &
          umesh(:), semesh(:), ff(:,:,:,:), rs(:,:,:)
@@ -321,7 +328,8 @@ contains
 
     if (beta > 0d0) then
 
-       call get_op_mono_args( &
+      if (s% op_mono_method == 'hu') then
+      call get_op_mono_args( &
             s% species, xa, s% op_mono_min_X_to_include, s% chem_id, &
             s% op_mono_factors, nel, izzp, fap, fac, ierr)
        if (ierr /= 0) then
@@ -414,6 +422,42 @@ contains
 
        if (.not. associated(s% op_mono_umesh1)) deallocate(umesh, semesh, ff, rs)
 
+
+
+     else if (s% op_mono_method == 'mombarg') then
+       fk = 0
+       if (logT > 3.5 .and. logT < 8.0) then
+         do i=1, s% species
+            e_name = chem_isos% name(s% chem_id(i))
+               if (e_name == 'h1')  fk(1)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'he4') fk(2)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'c12') fk(3)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'n14') fk(4)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'o16') fk(5)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'ne20')fk(6)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'na23')fk(7)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'mg24')fk(8)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'al27')fk(9)  =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'si28')fk(10) =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 's32') fk(11) =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'ar40')fk(12) =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'ca40')fk(13) =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'cr52')fk(14) =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'mn55')fk(15) =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'fe56')fk(16) =  xa(i)/ chem_isos% W(s% chem_id(i))
+               if (e_name == 'ni58')fk(17) =  xa(i)/ chem_isos% W(s% chem_id(i))
+         end do
+         fk = fk / sum(fk)
+         call call_compute_kappa(s% kap_handle, k, &
+         fk, s% T(k), s% rho(k), logT, logRho, &
+         s% zbar(k), lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
+         kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
+        endif
+      else
+       write(*,*) 'Invalid argument for op_mono_method.'
+       stop
+      end if
+
        if (ierr /= 0) then
           s% retry_message = 'error in op_mono kap'
           if (s% report_ierr) write(*, *) s% retry_message
@@ -437,9 +481,9 @@ contains
          return
        end if
 
-       lnkap_op = log(kap_op)
-       lnkap_op% d1val1 = dlnkap_op_dlnRho
-       lnkap_op% d1val2 = dlnkap_op_dlnT
+    lnkap_op = log(kap_op)
+    lnkap_op% d1val1 = dlnkap_op_dlnRho
+    lnkap_op% d1val2 = dlnkap_op_dlnT
 
     end if
 
