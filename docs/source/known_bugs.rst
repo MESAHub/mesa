@@ -18,8 +18,8 @@ Convective Premixing
 ------------
 
 Convective premixing (CPM) has not worked properly since release r15140. CPM was broken by the
-removal of the `lnPgas_flag`, which caused some of the necessary EOS updates to be missed after
-CPM updates the abundances in mixed cells. CPM does not need `lnPgas_flag`, but it does require
+removal of the ``lnPgas_flag``, which caused some of the necessary EOS updates to be missed after
+CPM updates the abundances in mixed cells. CPM does not need ``lnPgas_flag``, but it does require
 EOS updates at constant pressure. This will be fixed in future releases.
 
 See `gh-425 <https://github.com/MESAHub/mesa/issues/425>`_
