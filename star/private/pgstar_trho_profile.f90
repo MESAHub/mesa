@@ -339,8 +339,8 @@
             call pgsci(clr_LightSkyGreen)
             call pgsls(Line_Type_Dash)
 
-            logT1 = s% eos_rq% logT_max_FreeEOS_hi
-            logT2 = s% eos_rq% logT_max_FreeEOS_lo
+            logT1 = s% eos_rq% logT_min_for_all_Skye
+            logT2 = s% eos_rq% logT_min_for_any_Skye
             logT3 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
             logT4 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
 
