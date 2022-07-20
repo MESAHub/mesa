@@ -15,7 +15,7 @@
       required_termination_code_string = 'max_age'
 
       change_initial_net = .true.      
-      new_net_name = 'basic_for_radlev.net'
+      new_net_name = 'basic_plus_fe56_ni58.net'
 
       set_initial_age = .true.
       initial_age = 0
