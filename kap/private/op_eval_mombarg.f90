@@ -1,9 +1,14 @@
       module op_eval_mombarg
 
-      use const_def, only: dp
+      use const_def, only: dp, pi
       !use crlibm_lib
 
       implicit none
+
+      real(dp), parameter :: log_c = 10.476820702927927d0 !log10_cr(dble(299792458e2)) c = speed of light
+      real(dp), parameter :: log10_bohr_radius_sqr = -16.55280d0
+      real(dp), parameter :: logNa = 23.779750912481397d0 !log10_cr(6.0221409d23) Avogadro's number
+
       contains
 
 
@@ -38,17 +43,13 @@
 
       real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
-      real(dp) :: log10_bohr_radius_sqr = -16.55280
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: logNa = 23.779750912481397 !log10_cr(6.0221409d23) Avogadro's number
-      real(dp) :: dv = (1.0552976117319748 - 0.00010565516589892675)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       integer ::  delta_min_idx
       real(dp) :: lkap_Ross(4,4),gamma_k(4,4,nel),lgamm(4,4,nel),sig_Ross(4,4) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
       real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
-      real(dp), parameter :: pi = 3.141592653589793239
-      real(dp), parameter :: log_c = 10.476820702927927 !log10_cr(dble(299792458e2)) c = speed of light
       real, allocatable :: sig_mix_cell(:,:,:),sig_int(:)
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
@@ -79,16 +80,16 @@
 
       mH = chem_isos% W(ih1) * 1.660538782d-24
       log_amu_mix_cell = log10(amu_mix_cell * mH)
-      !logRho = 0.25*jne + log_amu_mix_cell - log10(epa_mix_cell)
-      logRho = 0.25*jne + log10(amu_mix_cell) - log10(epa_mix_cell) -logNa
-      logT   = 0.025*ite
+      !logRho = 0.25d0*jne + log_amu_mix_cell - log10(epa_mix_cell)
+      logRho = 0.25d0*jne + log10(amu_mix_cell) - log10(epa_mix_cell) -logNa
+      logT   = 0.025d0*ite
       !write(*,*) 'rho computed'
 
       !!! Select nearest points in logT,logRho for interpolation.
       !!! First, find the nearest OP data point, and check which of the four possible positionings this minimum has wrt to (T,Rho)_cell.
       !!! Acquire the remaining 15 points of the 4x4 grid, where (T,Rho)_cell is located in the inner square.
 
-      delta = sqrt((logRho - logRho_face)*(logRho - logRho_face)/0.25 + (logT-logT_face)*(logT-logT_face)/0.025)
+      delta = sqrt((logRho - logRho_face)*(logRho - logRho_face)/0.25d0 + (logT-logT_face)*(logT-logT_face)/0.025d0)
 
       delta_min_idx = MINLOC(delta, DIM=1)
       ite_min   = ite(delta_min_idx)
@@ -293,9 +294,7 @@
       !real(dp) :: fk_norm_fac !Local fractional abudance per element and normalization factor.
       real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       !integer ::  eid(nel)
-      real(dp) :: log10_bohr_radius_sqr = -16.55280
-      real(dp) :: logNa = 23.779750912481397 !log10_cr(6.0221409d23) Avogadro's number
-      real(dp) :: dv = (1.0552976117319748 - 0.00010565516589892675)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
@@ -350,8 +349,8 @@
 !$OMP END PARALLEL DO
 
 
-      logT_pcg   = 0.025*ite
-      logRho_pcg = 0.25*jne + log10(amu_mix_cell) - log10(epa_mix_cell) - logNa
+      logT_pcg   = 0.025d0*ite
+      logRho_pcg = 0.25d0*jne + log10(amu_mix_cell) - log10(epa_mix_cell) - logNa
       !if (j==1) allocate(lkap_face_pcg(ngp,1648),stat=ierr)
       lkap_face_pcg =  log10_bohr_radius_sqr - log_amu_mix_cell - log10(sig_Ross)
 !$OMP PARALLEL DO PRIVATE(i,ke,m,gam) SCHEDULE(guided)
@@ -398,18 +397,14 @@
       real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
       integer ::  eid(nel)
-      real(dp) :: log10_bohr_radius_sqr = -16.55280
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: logNa = 23.779750912481397 !log10_cr(6.0221409d23) Avogadro's number
-      real(dp) :: dv = (1.0552976117319748 - 0.00010565516589892675)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
       integer ::  delta_min_idx
       real(dp) :: lkap_Ross(4,4),sig_Ross(4,4) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
       real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
-      real(dp), parameter :: pi = 3.141592653589793239
-      real(dp), parameter :: log_c = 10.476820702927927 !log10_cr(dble(299792458e2)) c = speed of light
 
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
@@ -431,8 +426,8 @@
 
       amu_mix_cell = dot_product(fk,amamu)
 
-      logT   = logT_pcg !0.025*ite
-      logRho = logRho_pcg !0.25*jne + log10_cr(amu_mix_cell) - log10(epa_mix_cell) - logNa
+      logT   = logT_pcg !0.025d0*ite
+      logRho = logRho_pcg !0.25d0*jne + log10_cr(amu_mix_cell) - log10(epa_mix_cell) - logNa
 
       !!! Compute an estimated temperature range.
       imin = 1
@@ -440,7 +435,7 @@
       ite_step = 2
       jne_step = 2
 
-      delta = sqrt((logRho - logRho_face)*(logRho - logRho_face)/0.25 +(logT-logT_face)*(logT-logT_face)/0.025)
+      delta = sqrt((logRho - logRho_face)*(logRho - logRho_face)/0.25d0 +(logT-logT_face)*(logT-logT_face)/0.025d0)
 
       delta_min_idx = MINLOC(delta, DIM=1)
       ite_min   = ite(delta_min_idx)
@@ -621,18 +616,14 @@
 
       real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
-      real(dp) :: log10_bohr_radius_sqr = -16.55280
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: logNa = 23.779750912481397 !log10_cr(6.0221409d23) Avogadro's number
-      real(dp) :: dv = (1.0552976117319748 - 0.00010565516589892675)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
 
       integer ::  delta_min_idx
       real(dp) :: sig_Ross(4,4)!,lkap_Ross(4,4), ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
       real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
-      real(dp), parameter :: pi = 3.141592653589793239
-      real(dp), parameter :: log_c = 10.476820702927927 !log10_cr(dble(299792458e2)) c = speed of light
 
       real, allocatable :: sig_mix_cell(:,:,:),sig_int(:)
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
@@ -664,17 +655,17 @@
 
       mH = chem_isos% W(ih1) * 1.660538782d-24
       log_amu_mix_cell = log10(amu_mix_cell * mH)
-      !logRho = 0.25*jne + log_amu_mix_cell - log10(epa_mix_cell)
-      logRho = 0.25*jne + log10(amu_mix_cell) - log10(epa_mix_cell) -logNa
+      !logRho = 0.25d0*jne + log_amu_mix_cell - log10(epa_mix_cell)
+      logRho = 0.25d0*jne + log10(amu_mix_cell) - log10(epa_mix_cell) -logNa
 
-      logT   = 0.025*ite
+      logT   = 0.025d0*ite
 
       !!! Select nearest points in logT,logRho for interpolation.
       !!! First, find the nearest OP data point, and check which of the four possible positionings this minimum has wrt to (T,Rho)_cell.
       !!! Acquire the remaining 15 points of the 4x4 grid, where (T,Rho)_cell is located in the inner square.
 
 
-      delta = sqrt((logRho - logRho_cntr)*(logRho - logRho_cntr)/0.25 +(logT-logT_cntr)*(logT-logT_cntr)/0.025)
+      delta = sqrt((logRho - logRho_cntr)*(logRho - logRho_cntr)/0.25d0 +(logT-logT_cntr)*(logT-logT_cntr)/0.025d0)
 
       delta_min_idx = MINLOC(delta, DIM=1)
       ite_min   = ite(delta_min_idx)
@@ -832,18 +823,14 @@
       integer :: n, ke, nz, id, m, ik, i
 
       real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
-      real(dp) :: log10_bohr_radius_sqr = -16.55280
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: logNa = 23.779750912481397 !log10_cr(6.0221409d23) Avogadro's number
-      real(dp) :: dv = (1.0552976117319748 - 0.00010565516589892675)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
       integer ::  delta_min_idx
 
       real(dp) :: sig_Ross(1648) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
-      real(dp), parameter :: pi = 3.141592653589793239
-      real(dp), parameter :: log_c = 10.476820702927927 !log10_cr(dble(299792458e2)) c = speed of light
 
       real, allocatable :: sig_mix_cell(:,:),sig_int(:)
       real(dp) :: log_amu_mix_cell
@@ -892,8 +879,8 @@
 
       deallocate(sig_mix_cell,sig_int)
 
-      logT_pcg   = 0.025*ite
-      logRho_pcg = 0.25*jne + log10(amu_mix_cell) - log10(epa_mix_cell) - logNa
+      logT_pcg   = 0.025d0*ite
+      logRho_pcg = 0.25d0*jne + log10(amu_mix_cell) - log10(epa_mix_cell) - logNa
       allocate(lkap_ross_pcg(1648),stat=ierr)
       lkap_ross_pcg =  log10_bohr_radius_sqr - log_amu_mix_cell - log10(sig_Ross)
 
@@ -921,18 +908,14 @@
 
       real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
-      real(dp) :: log10_bohr_radius_sqr = -16.55280
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: logNa = 23.779750912481397 !log10(6.0221409d23) Avogadro's number
-      real(dp) :: dv = (1.0552976117319748 - 0.00010565516589892675)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
       integer ::  delta_min_idx
       real(dp) :: lkap_Ross(4,4),sig_Ross(4,4) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
       real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
-      real(dp), parameter :: pi = 3.141592653589793239
-      real(dp), parameter :: log_c = 10.476820702927927 !log10_cr(dble(299792458e2)) c = speed of light
 
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
@@ -958,8 +941,8 @@
 
       amu_mix_cell = dot_product(fk,amamu)
 
-      logT   = 0.025*ite
-      logRho = 0.25*jne + log10(amu_mix_cell) - log10(epa_mix_cell) - logNa
+      logT   = 0.025d0*ite
+      logRho = 0.25d0*jne + log10(amu_mix_cell) - log10(epa_mix_cell) - logNa
 
       imin = 1
       imax = 1648
@@ -970,7 +953,7 @@
       !!! First, find the nearest OP data point, and check which of the four possible positionings this minimum has wrt to (T,Rho)_cell.
       !!! Acquire the remaining 15 points of the 4x4 grid, where (T,Rho)_cell is located in the inner square.
 
-      delta = sqrt((logRho - logRho_cntr)*(logRho - logRho_cntr)/0.25 +(logT-logT_cntr)*(logT-logT_cntr)/0.025)
+      delta = sqrt((logRho - logRho_cntr)*(logRho - logRho_cntr)/0.25d0 +(logT-logT_cntr)*(logT-logT_cntr)/0.025d0)
 
       delta_min_idx = MINLOC(delta, DIM=1)
       !delta_min(1)     = MINVAL(delta)(1)
