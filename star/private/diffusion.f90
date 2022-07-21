@@ -197,7 +197,7 @@
             return
          end if
 
-         if (T(1) <= max_T_for_radaccel) then
+         if (T(1) <= max_T_for_radaccel .and. s% op_mono_method == 'hu') then
             if (dbg) write(*,*) 'call load_op_mono_data'
             call load_op_mono_data( &
                op_mono_data_path, op_mono_data_cache_filename, ierr)
@@ -229,7 +229,7 @@
             endif
          enddo
          nzlo=nbound
-           
+
          allocate( &
             e_ap(nz), e_at(nz), e_ar(nz), e_ax(m,nz), & ! for e field
             g_ap(nz), g_at(nz), g_ar(nz), g_ax(m,nz), & ! for g field
@@ -245,7 +245,7 @@
             xm_face(nz), sum_ending_mass(nz), &
             X_face(m,nz), C_div_X_face(m,nz), &
             rad_accel_face(m,nz), log10_g_rad(m,nz))
-         
+
          call get_limit_coeffs( &
             s, nz, nzlo, nzhi, &
             gamma_full_on, gamma_full_off, &
@@ -1149,7 +1149,7 @@
             call get_integer_work_array(s, ipar_decsol, lid, 0, ierr)
             if (ierr /= 0) return
             call do_work_arrays(.true.,ierr)
-            if (ierr /= 0) return                        
+            if (ierr /= 0) return
             em1(1:nc,1:nc,1:nz) => lblk1(1:nc*nc*nz)
             e00(1:nc,1:nc,1:nz) => dblk1(1:nc*nc*nz)
             ep1(1:nc,1:nc,1:nz) => ublk1(1:nc*nc*nz)
@@ -2059,4 +2059,3 @@
 
 
       end module diffusion
-

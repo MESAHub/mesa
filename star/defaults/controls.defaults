@@ -7329,7 +7329,7 @@
       ! as modified by Haili Hu.  Since the tar.gz file is large (656 MB),
       ! it is not included in the standard mesa download.
 
-      ! You can get ``OP4STARS_1.3.tar.xz`` [here](http://sourceforge.net/projects/mesa/files)
+      ! You can get ``OP4STARS_1.3.tar.xz`` from http://sourceforge.net/projects/mesa/files
 
       ! Put it any place you want on your disk.
 
@@ -7372,6 +7372,32 @@
       ! ::
 
     op_mono_data_cache_filename = ''      ! '' defaults to $MESA_OP_MONO_DATA_CACHE_FILENAME
+
+      ! op_mono_method
+      ! ~~~~~~~~~~~~~~
+
+      ! Compute the Rosseland mean opacity and radiative accelerations from the OP mono data by brute force (``'hu'``)
+      ! or use the faster method by allowing for a small tolerance on the mixture used for the computations of these variables (``'mombarg'``).
+
+      ! ::
+      
+      op_mono_method = 'hu'
+
+      ! emesh_data_for_op_mono_path
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! path to the OP_mono_master_grid_MESA_emesh.txt file containing the data need for when op_mono_method = ``'mombarg'``.
+      ! If this is set to the empty string, '', then it defaults to the
+      ! environment variable ``$(MESA_OP_MONO_MASTER_GRID)``
+
+      ! You can get OP_mono_master_grid_MESA_emesh.txt from https://doi.org/10.5281/zenodo.6850861
+
+      ! You can either download the uncompressed ``.txt`` file, or download the compressed ``.xz`` file
+      ! and then unpack it in place with ``unxz -v OP_mono_master_grid_MESA_emesh.txt.xz``
+
+      ! ::
+      
+    emesh_data_for_op_mono_path = ''      ! '' defaults to $MESA_OP_MONO_MASTER_GRID
 
 
       ! high_logT_op_mono_full_off
