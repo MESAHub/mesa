@@ -32,7 +32,11 @@ module pulse_fgong
   use utils_lib
   use chem_def
   use atm_def
+  use eos_def, only: i_Gamma1, i_lnPgas, i_chiRho, i_chiT
+  use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
+
   use atm_support
+  use eos_support
 
   use pulse_utils
 
@@ -98,6 +102,16 @@ contains
     integer                  :: k
     integer                  :: sg
 
+    real(dp), dimension(num_eos_basic_results) :: &
+       res, res_loX, res_hiX, dres_dlnRho, dres_dlnT
+
+    ! Rather than allocating these arrays before use in each region,
+    ! allocate them in outer calling subroutine.
+    ! ∂lnΓ₁/∂… blocks in each region can probably be refactored.
+    real(dp), allocatable :: dres_dxa(:,:)
+    real(dp), allocatable :: xa(:)
+    real(dp), parameter :: dxa = 1d-3 ! perturbation of abundances for ∂lnΓ₁/∂Y
+
     ! Get FGONG data
 
     call get_star_ptr(id, s, ierr)
@@ -130,6 +144,9 @@ contains
     ne20 = s%net_iso(ine20)
 
     ! Determine data dimensiones
+
+    allocate(dres_dxa(num_eos_basic_results, s% species))
+    allocate(xa(s% species))
 
     if (add_atmosphere) then
        call build_atm(s, s%L(1), s%r(1), s%Teff, s%m_grav(1), s%cgrav(1), ierr)
@@ -240,6 +257,9 @@ contains
        deallocate(s%atm_structure)
     end if
 
+    deallocate(dres_dxa)
+    deallocate(xa)
+
     ! Finish
 
     return
@@ -284,6 +304,9 @@ contains
            X_C13 => point_data(23,j), &
            X_N14 => point_data(24,j), &
            X_O16 => point_data(25,j), &
+           dlnGamma1_dlnrho => point_data(26,j), &
+           dlnGamma1_dlnP => point_data(27,j), &
+           dlnGamma1_dY => point_data(28,j), &
            X_H2 => point_data(29,j), &
            X_He4 => point_data(30,j), &
            X_Li7 => point_data(31,j), &
@@ -333,6 +356,39 @@ contains
         X_O18 = eval_face_X(s, o18, 1, k_a, k_b)
         X_Ne20 = eval_face_X(s, ne20, 1, k_a, k_b)
 
+        ! Γ₁ derivatives
+        xa(:) = s% xa(:,1)
+
+        ! evaluate EoS at low X
+        xa(h1) = s% xa(h1,1) - dxa
+        xa(he4) = s% xa(he4,1) + dxa
+        call get_eos(s, k, xa(:), rho, log10(rho), T, log10(T), &
+           res_loX, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! evaluate EoS at high X
+        xa(h1) = s% xa(h1,1) + dxa
+        xa(he4) = s% xa(he4,1) - dxa
+        call get_eos(s, k, xa(:), rho, log10(rho), T, log10(T), &
+           res_hiX, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! evaluate EoS at  actual X
+        call get_eos(s, k, s% xa(:,1), rho, log10(rho), T, log10(T), &
+           res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! use dres_dxa(:,1) to store finite difference,
+        ! which is evaluated at constant (ρ,T)
+        dres_dxa(:,1) = (res_hiX-res_loX)/2/dxa
+
+        dlnGamma1_dlnRho = dres_dlnRho(i_Gamma1) &
+           - dres_dlnT(i_Gamma1)*res(i_chiRho)/res(i_chiT)
+        dlnGamma1_dlnRho = dlnGamma1_dlnRho/res(i_Gamma1)
+
+        dlnGamma1_dlnP = dres_dlnT(i_Gamma1)/res(i_chiT)/res(i_Gamma1)
+
+        dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
+           - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+
       end associate
 
       ! Finish
@@ -378,6 +434,9 @@ contains
            X_C13 => point_data(23,j), &
            X_N14 => point_data(24,j), &
            X_O16 => point_data(25,j), &
+           dlnGamma1_dlnrho => point_data(26,j), &
+           dlnGamma1_dlnP => point_data(27,j), &
+           dlnGamma1_dY => point_data(28,j), &
            X_H2 => point_data(29,j), &
            X_He4 => point_data(30,j), &
            X_Li7 => point_data(31,j), &
@@ -430,6 +489,39 @@ contains
         X_O18 = eval_face_X(s, o18, k, k_a, k_b)
         X_Ne20 = eval_face_X(s, ne20, k, k_a, k_b)
 
+        ! Γ₁ derivatives
+        xa(:) = s% xa(:,k)
+
+        ! evaluate EoS at low X
+        xa(h1) = s% xa(h1,k) - dxa
+        xa(he4) = s% xa(he4,k) + dxa
+        call get_eos(s, k, xa(:), rho, log10(rho), T, log10(T), &
+           res_loX, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! evaluate EoS at high X
+        xa(h1) = s% xa(h1,k) + dxa
+        xa(he4) = s% xa(he4,k) - dxa
+        call get_eos(s, k, xa(:), rho, log10(rho), T, log10(T), &
+           res_hiX, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! evaluate EoS at  actual X
+        call get_eos(s, k, s% xa(:,k), rho, log10(rho), T, log10(T), &
+           res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! use dres_dxa(:,1) to store finite difference,
+        ! which is evaluated at constant (ρ,T)
+        dres_dxa(:,1) = (res_hiX-res_loX)/2/dxa
+
+        dlnGamma1_dlnRho = dres_dlnRho(i_Gamma1) &
+           - dres_dlnT(i_Gamma1)*res(i_chiRho)/res(i_chiT)
+        dlnGamma1_dlnRho = dlnGamma1_dlnRho/res(i_Gamma1)
+
+        dlnGamma1_dlnP = dres_dlnT(i_Gamma1)/res(i_chiT)/res(i_Gamma1)
+
+        dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
+           - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+
       end associate
 
       ! Finish
@@ -475,6 +567,9 @@ contains
            X_C13 => point_data(23,j), &
            X_N14 => point_data(24,j), &
            X_O16 => point_data(25,j), &
+           dlnGamma1_dlnrho => point_data(26,j), &
+           dlnGamma1_dlnP => point_data(27,j), &
+           dlnGamma1_dY => point_data(28,j), &
            X_H2 => point_data(29,j), &
            X_He4 => point_data(30,j), &
            X_Li7 => point_data(31,j), &
@@ -518,6 +613,41 @@ contains
         X_O17 = eval_center_X(s, o17, k_a, k_b)
         X_O18 = eval_center_X(s, o18, k_a, k_b)
         X_Ne20 = eval_center_X(s, ne20, k_a, k_b)
+
+        ! Γ₁ derivatives
+        ! I assume the abundances at r=0 are the same as in the innermost cell
+        ! This could be improved using eval_center_X
+        xa(:) = s% xa(:, s% nz)
+
+        ! evaluate EoS at low X
+        xa(h1) = s% xa(h1, s% nz) - dxa
+        xa(he4) = s% xa(he4, s% nz) + dxa
+        call get_eos(s, k, xa(:), rho, log10(rho), T, log10(T), &
+           res_loX, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! evaluate EoS at high X
+        xa(h1) = s% xa(h1, s% nz) + dxa
+        xa(he4) = s% xa(he4, s% nz) - dxa
+        call get_eos(s, k, xa(:), rho, log10(rho), T, log10(T), &
+           res_hiX, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! evaluate EoS at  actual X
+        call get_eos(s, k, s% xa(:, s% nz), rho, log10(rho), T, log10(T), &
+           res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+
+        ! use dres_dxa(:,1) to store finite difference,
+        ! which is evaluated at constant (ρ,T)
+        dres_dxa(:,1) = (res_hiX-res_loX)/2/dxa
+
+        dlnGamma1_dlnRho = dres_dlnRho(i_Gamma1) &
+           - dres_dlnT(i_Gamma1)*res(i_chiRho)/res(i_chiT)
+        dlnGamma1_dlnRho = dlnGamma1_dlnRho/res(i_Gamma1)
+
+        dlnGamma1_dlnP = dres_dlnT(i_Gamma1)/res(i_chiT)/res(i_Gamma1)
+
+        dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
+           - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
 
       end associate
 
