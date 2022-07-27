@@ -2278,9 +2278,9 @@
             case(h_nuc_timescale)
                val = s% nuc_timescale
             case(h_dt_div_max_tau_conv)
-               val = s% dt/s% max_conv_time_scale
+               if(s% max_conv_time_scale > 0d0) val = s% dt/s% max_conv_time_scale
             case(h_dt_div_min_tau_conv)
-               val = s% dt/s% min_conv_time_scale
+               if(s% min_conv_time_scale > 0d0) val = s% dt/s% min_conv_time_scale
             case(h_max_tau_conv)
                val = s% max_conv_time_scale
             case(h_min_tau_conv)
