@@ -42,13 +42,9 @@
       integer :: num_reactions
       
       integer, dimension(:), pointer :: net_iso, chem_id, isos_to_show
-
-      integer :: which_rates_choice
       
       integer, pointer :: reaction_table(:)
       integer, pointer :: rates_to_show(:)
-      integer, pointer :: which_rates(:)
-
 
       real(dp), dimension(:), pointer :: rho_vector, T_vector
 
@@ -144,16 +140,8 @@
          end if
       
          allocate(reaction_id(rates_reaction_id_max), reaction_table(rates_reaction_id_max))
-         allocate(rates_to_show(rates_reaction_id_max), which_rates(rates_reaction_id_max))
-      
-         which_rates(:) = which_rates_choice
-
-         call net_set_which_rates(handle, which_rates, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'net_set_which_rate_f17pg failed'
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
+         allocate(rates_to_show(rates_reaction_id_max))
+               
          cache_suffix = ''
          call net_setup_tables(handle, cache_suffix, info)
          if (ierr /= 0) then

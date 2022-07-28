@@ -88,8 +88,8 @@
          
          if (s% op_split_burn) then
             do k=1,nz
+               s% burn_num_iters(k) = 0
                if (s% T(k) >= s% op_split_burn_min_T) then
-                  s% burn_num_iters(k) = 0
                   s% eps_nuc(k) = 0d0
                   s% d_epsnuc_dlnd(k) = 0d0
                   s% d_epsnuc_dlnT(k) = 0d0
@@ -1128,7 +1128,33 @@
          
          substep_start_time = 0d0
          
-         if (s% T(k) >= min_T_for_const_density_solver) then
+         if (s% use_other_split_burn) then
+            log10Ts_f1 => log10Ts_ary
+            log10Rhos_f1 => log10Rhos_ary
+            etas_f1 => etas_ary
+            nullify(dxdt_source_term, times)
+            log10Ts_f1(1) = s% lnT(k)/ln10
+            log10Rhos_f1(1) = s% lnd(k)/ln10
+            etas_f1(1) = s% eta(k)
+            call s% other_split_burn( &
+               s%id, k, s% net_handle, s% eos_handle, species, s% num_reactions, 0d0, dt, xa_start, &
+               num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
+               s% rate_factors, s% weak_rate_factor, &
+               std_reaction_Qs, std_reaction_neuQs, &
+               screening_mode,  &
+               stptry, max_steps, eps, odescal, &
+               use_pivoting, trace, burn_dbg, burn_finish_substep, &
+               burn_lwork, burn_work, net_lwork, net_work, s% xa(1:species,k), &
+               s% eps_nuc_categories(:,k), &
+               avg_epsnuc, ending_eps_neu_total, &
+               nfcn, njac, ntry, naccpt, nrejct, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,2) 'other_split_burn failed', k
+               return
+               call mesa_error(__FILE__,__LINE__,'burn1_zone')
+            end if
+            
+         else if (s% T(k) >= min_T_for_const_density_solver) then
             Cv0 = s% Cv(k)
             eta0 = s% eta(k)
             call net_1_zone_burn_const_density( &

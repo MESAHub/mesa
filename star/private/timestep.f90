@@ -438,7 +438,8 @@
          integer :: max_steps, i
          check_burn_steps_limit = keep_going
          if (.not. s% op_split_burn .or. maxval(s% T_start(1:s%nz)) < s% op_split_burn_min_T) return
-         max_steps = maxval(s% burn_num_iters(1:s% nz))
+ 
+         max_steps = maxval(s% burn_num_iters(1:s% nz),mask=s% T(1:s%nz)>s% op_split_burn_min_T)
          check_burn_steps_limit = check_integer_limit( &
            s, s% burn_steps_limit, s% burn_steps_hard_limit, max_steps,  &
            'num_burn_solver_steps', skip_hard_limit, dt, dt_limit_ratio)

@@ -12,11 +12,27 @@
 &astero_search_controls
    ! see star/astero/defaults/astero_search_controls.defaults
    ! for current set of controls and their default values.
-   first_mass = 1.0
-   first_Y = 0.28
-   first_FeH = 0.09552790091978557 ! Z = 0.02
-   first_alpha = 2.0
-   first_f_ov = 0
+
+   chi2_seismo_fraction = 0d0 ! no oscillation data yet
+
+   constraint_name(1) = 'log_L'
+   constraint_target(1) = 0.0
+   constraint_sigma(1) = 1d-2
+   include_constraint_in_chi2_spectro(1) = .true.
+   sigmas_coeff_for_constraint_limit(1) = 5
+
+   constraint_name(2) = 'Teff'
+   constraint_target(2) = 5772d0
+   constraint_sigma(2) = 60d0
+   include_constraint_in_chi2_spectro(2) = .true.
+
+   param_name(1) = 'initial_mass'
+   vary_param(1) = .false.
+   first_param(1) = 1.0
+
+   param_name(2) = 'alpha'
+   vary_param(2) = .false.
+   first_param(2) = 1.8
 / ! end astero_search_controls
 
 

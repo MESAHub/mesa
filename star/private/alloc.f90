@@ -329,7 +329,6 @@
          if (ASSOCIATED(s% burn_z_mix_region)) deallocate(s% burn_z_mix_region)
 
          if (ASSOCIATED(s% rate_factors)) deallocate(s% rate_factors)
-         if (ASSOCIATED(s% which_rates)) deallocate(s% which_rates)
 
          if (ASSOCIATED(s% nameofvar)) deallocate(s% nameofvar)
          if (ASSOCIATED(s% nameofequ)) deallocate(s% nameofequ)
@@ -1043,6 +1042,8 @@
             if (failed('mlt_cdc')) exit
             call do1(s% cdc, c% cdc)
             if (failed('cdc')) exit
+            call do1(s% dvc_dt_TDC, c% dvc_dt_TDC)
+            if (failed('dvc_dt_TDC')) exit
 
             call do1(s% D_mix, c% D_mix)
             if (failed('D_mix')) exit

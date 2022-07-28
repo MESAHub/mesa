@@ -297,10 +297,6 @@
       character (len=strlen) :: new_net_name, new_small_net_name, &
          h_he_net, co_net, adv_net
 
-      logical :: set_rates_preference
-      integer :: new_rates_preference
-      character (len=16) :: set_rate_c12ag, set_rate_n14pg, set_rate_3a, set_rate_1212
-
       logical :: set_uniform_xa_from_file, set_uniform_initial_xa_from_file
       character (len=strlen) :: file_for_uniform_xa
 
@@ -312,7 +308,7 @@
          T9_weaklib_full_off, T9_weaklib_full_on, &
          T9_weaklib_full_off_hi_Z, T9_weaklib_full_on_hi_Z
 
-      logical :: use_suzuki_weak_rates
+      logical :: use_suzuki_weak_rates, use_3a_fl87
 
       logical :: use_special_weak_rates
       character (len=1000) :: special_weak_states_file, special_weak_transitions_file
@@ -373,6 +369,7 @@
       real(dp) :: special_rate_factor(max_num_special_rate_factors)
       character(len=maxlen_reaction_Name) :: &
          reaction_for_special_factor(max_num_special_rate_factors)
+      character(len=strlen) :: filename_of_special_rate(max_num_special_rate_factors)
 
       logical :: do_special_test
 

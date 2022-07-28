@@ -273,7 +273,7 @@
                      str = category_name(docat(i))
                      if (str(1:5) == 'burn_') then
                         str = str(6:len_trim(str))
-                     else if (str == 'tri_alfa') then
+                     else if (str == 'tri_alpha') then
                         str = '3a'
                      else if (str == 'c12_c12') then
                         str = 'c+c'

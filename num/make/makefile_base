@@ -18,7 +18,7 @@ SRCS = \
    mod_rosenbrock.f mod_brent.f90 mod_qsort.f90 mod_root.f mod_solout_root.f \
    mod_random.f90 mod_newton.f mod_bobyqa.f mod_newuoa.f \
    accurate_sum_auto_diff_star_order1.f90  \
-	accurate_sum.f90 mod_simplex.f90 num_lib.f \
+   accurate_sum.f90 mod_simplex.f90 mod_integrate.f90 num_lib.f \
 
 #################################################################
 #
@@ -54,6 +54,7 @@ install:
 	@$(CP_IF_NEWER) num_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) accurate_sum.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) accurate_sum_auto_diff_star_order1.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) mod_integrate.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) ../public/num_fcn.dek $(MESA_DIR)/include
 	@$(CP_IF_NEWER) ../public/num_jac.dek $(MESA_DIR)/include
 	@$(CP_IF_NEWER) ../public/num_sjac.dek $(MESA_DIR)/include

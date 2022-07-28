@@ -28,28 +28,38 @@
       ! library for calculating opacities
 
       ! the data interface for the library is defined in kap_def
-      
+
       use const_def, only: dp
       use math_lib
-      
+
       implicit none
 
-
+      integer , pointer, public, save :: izz(:),ite(:),jne(:)
+      real(dp), pointer, public, save :: sig(:,:,:)
+      real(dp), pointer, public, save :: epatom(:,:),amamu(:),eumesh(:,:,:)
+      real(dp), pointer, public, save :: lkap_ross_pcg(:)
+      integer, public, parameter :: ngp = 2
+      real(dp), public, save :: lgamm_pcg(ngp,17,1648), lkap_face_pcg(ngp,1648), logT_pcg(ngp,1648), logRho_pcg(ngp,1648)
+      integer, parameter :: nzm = 3000
+      real(dp), public, save :: fk_old(nzm,17), fk_old_grad(nzm,17)
+      real(dp), public, save ::logT_grid_old(nzm,4,4), logRho_grid_old(nzm,4,4), fk_pcg(17), fk_grad_pcg(ngp,17)
+      real(dp), public, save :: lkap_grid_old(nzm,4,4), logT_cntr_old(nzm), logRho_cntr_old(nzm)
+      logical :: initialize_fk_old = .true.
       contains ! the procedure interface for the library
       ! client programs should only call these routines.
-            
-      
-      ! call this routine to initialize the kap module. 
+
+
+      ! call this routine to initialize the kap module.
       ! only needs to be done once at start of run.
       ! Reads data from the 'kap' directory in the data_dir.
       ! If use_cache is true and there is a 'kap/cache' directory, it will try that first.
-      ! If it doesn't find what it needs in the cache, 
-      ! it reads the data and writes the cache for next time.    
+      ! If it doesn't find what it needs in the cache,
+      ! it reads the data and writes the cache for next time.
       subroutine kap_init(use_cache, kap_cache_dir, ierr)
          use kap_def, only : kap_def_init, kap_use_cache, kap_is_initialized
          logical, intent(in) :: use_cache
          character (len=*), intent(in) :: kap_cache_dir ! blank means use default
-         integer, intent(out) :: ierr ! 0 means AOK.         
+         integer, intent(out) :: ierr ! 0 means AOK.
          ierr = 0
          if (kap_is_initialized) return
          call kap_def_init(kap_cache_dir)
@@ -57,16 +67,16 @@
          kap_is_initialized = .true.
       end subroutine kap_init
 
-      
+
       subroutine kap_shutdown
          use kap_def, only: do_Free_Kap_Tables, kap_is_initialized
          call do_Free_Kap_Tables()
          kap_is_initialized = .false.
       end subroutine kap_shutdown
 
-      
+
       ! after kap_init has finished, you can allocate a "handle".
-      
+
       integer function alloc_kap_handle(ierr) result(handle)
          integer, intent(out) :: ierr ! 0 means AOK.
          character (len=0) :: inlist
@@ -97,8 +107,8 @@
          integer, intent(in) :: handle
          call do_free_kap(handle)
       end subroutine free_kap_handle
-      
-      
+
+
       subroutine kap_ptr(handle,rq,ierr)
          use kap_def,only:Kap_General_Info,get_kap_ptr,kap_is_initialized
          integer, intent(in) :: handle ! from alloc_kap_handle
@@ -117,7 +127,7 @@
          use load_kap, only : Setup_Kap_Tables
          integer, intent(in) :: handle
          integer, intent(out):: ierr
-         
+
          type (Kap_General_Info), pointer :: rq
          logical, parameter :: use_cache = .true.
          logical, parameter :: load_on_demand = .true.
@@ -151,9 +161,9 @@
       ! you can call these routines after you've setup the tables for the handle.
       ! NOTE: the structures referenced via the handle are read-only
       ! for the evaulation routines, so you can do multiple evaluations in parallel
-      ! using the same handle. 
-      
-      
+      ! using the same handle.
+
+
       subroutine kap_get( &
          handle, species, chem_id, net_iso, xa, &
          logRho, logT, &
@@ -261,8 +271,8 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
       end subroutine kap_get_elect_cond_opacity
-      
-      
+
+
       subroutine kap_get_compton_opacity( &
          handle, &
          Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
@@ -337,7 +347,7 @@
 
       end subroutine kap_get_radiative_opacity
 
-      
+
       subroutine kap_get_op_mono( &
             handle, zbar, logRho, logT, &
             ! args for op_mono
@@ -384,7 +394,7 @@
 
          Rho = exp10(logRho)
          T = exp10(logT)
-         
+
          if (use_op_mono_alt_get_kap) then
             call op_mono_alt_get_kap( &
                nel, izzp, fap, fac, logT, logRho, screening, &
@@ -397,22 +407,22 @@
                umesh, semesh, ff, rs, ierr)
          end if
          if (ierr /= 0) return
-         
+
          kap_rad = exp10(g1)
 
          call combine_rad_with_conduction( &
             rq, rho, logRho, T, logT, zbar, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-         
+
       end subroutine kap_get_op_mono
-      
-      
-      
+
+
+
       ! interface to OP routines as modified by Haili Hu for radiative levitation in diffusion
-      
+
       ! ref: Hu et al MNRAS 418 (2011)
-      
+
       subroutine load_op_mono_data(op_mono_data_path, op_mono_data_cache_filename, ierr)
          use kap_def
          use op_load, only: op_dload
@@ -424,8 +434,18 @@
          endif
          call op_dload(op_mono_data_path, op_mono_data_cache_filename, ierr)
       end subroutine load_op_mono_data
-      
-      
+
+      subroutine call_load_op_master(emesh_data_for_op_mono_path, ierr)
+      use op_load_master, only: load_op_master
+
+      character (len=*), intent(in) :: emesh_data_for_op_mono_path
+      integer, intent(inout) :: ierr
+
+      call load_op_master(emesh_data_for_op_mono_path, izz,ite,jne,epatom,amamu,sig,eumesh,ierr)
+
+      end subroutine call_load_op_master
+
+
       ! sizes for work arrays
       subroutine get_op_mono_params(op_nptot, op_ipe, op_nrad)
          use kap_def
@@ -435,35 +455,35 @@
          op_ipe = ipe
          op_nrad = nrad
       end subroutine get_op_mono_params
-      
-      
+
+
 ! HH: Based on "op_ax.f"
-! Input:   kk = number of elements to calculate g_rad for   
-!          iz1(kk) = charge of element to calculate g_rad for   
-!          nel = number of elements in mixture   
-!          izzp(nel) = charge of elements   
-!          fap(nel) = number fractions of elements   
-!          fac(nel) = scale factors for element opacity   
-!          flux = local radiative flux (Lrad/4*pi*r^2)   
-!          fltp = log10 T   
-!          flrhop = log10 rho   
-!          screening   if true, use screening corrections   
-! Output: g1 = log10 kappa   
-!         gx1 = d(log kappa)/d(log T)   
-!         gy1 = d(log kappa)/d(log rho)   
-!         gp1(kk) = d(log kappa)/d(log xi)    
-!         grl1(kk) = log10 grad   
-!         fx1(kk) = d(log grad)/d(log T)    
-!         fy1(kk) = d(log grad)/d(log rho)   
+! Input:   kk = number of elements to calculate g_rad for
+!          iz1(kk) = charge of element to calculate g_rad for
+!          nel = number of elements in mixture
+!          izzp(nel) = charge of elements
+!          fap(nel) = number fractions of elements
+!          fac(nel) = scale factors for element opacity
+!          flux = local radiative flux (Lrad/4*pi*r^2)
+!          fltp = log10 T
+!          flrhop = log10 rho
+!          screening   if true, use screening corrections
+! Output: g1 = log10 kappa
+!         gx1 = d(log kappa)/d(log T)
+!         gy1 = d(log kappa)/d(log rho)
+!         gp1(kk) = d(log kappa)/d(log xi)
+!         grl1(kk) = log10 grad
+!         fx1(kk) = d(log grad)/d(log T)
+!         fy1(kk) = d(log grad)/d(log rho)
 !         grlp1(kk) = d(log grad)/d(log chi),
 !              chi is the fraction with which the number fraction is varied, i.e.:
 !                 chi = nf_new/nf_previous
 !                 where nf is the number fraction
-!         meanZ(nel) = average ionic charge of elements   
-!         zetx1(nel) = d(meanZ)/d(log T)    
-!         zety1(nel) = d(meanZ)/d(log rho)   
+!         meanZ(nel) = average ionic charge of elements
+!         zetx1(nel) = d(meanZ)/d(log T)
+!         zety1(nel) = d(meanZ)/d(log rho)
 !         ierr = 0 for correct use
-!         ierr = 101 for rho out of range for this T 
+!         ierr = 101 for rho out of range for this T
 !         ierr = 102 for T out of range
       subroutine op_mono_get_radacc( &
             kk, izk, nel, izzp, fap, fac, flux, fltp, flrhop, screening, &
@@ -481,12 +501,12 @@
          real(dp), intent(out) :: g1
          real(dp), intent(inout) :: &
             grl1(kk)
-         ! work arrays 
+         ! work arrays
          real, pointer :: umesh(:), semesh(:), ff(:,:,:,:), ta(:,:,:,:), rs(:,:,:)
             ! umesh(nptot)
             ! semesh(nptot)
             ! ff(nptot, ipe, 4, 4)
-            ! ta(nptot, nrad, 4, 4), 
+            ! ta(nptot, nrad, 4, 4),
             ! rs(nptot, 4, 4)
          integer,intent(out) :: ierr
          if (.not. kap_is_initialized) then
@@ -498,23 +518,23 @@
             g1, grl1, &
             umesh, semesh, ff, ta, rs, ierr)
       end subroutine op_mono_get_radacc
-      
+
 
 ! note: for op mono, elements must come from the set given in op_mono_element_Z in kap_def.
-      
-! HH: Based on "op_mx.f", opacity calculations to be used for stellar evolution calculations 
+
+! HH: Based on "op_mx.f", opacity calculations to be used for stellar evolution calculations
 ! Input:   nel = number of elements in mixture
 !          izzp(nel) = charge of elements
 !          fap(nel) = number fractions of elements
-!          fac(nel) = scale factors for element opacity   
+!          fac(nel) = scale factors for element opacity
 !          fltp = log10 (temperature)
-!          flrhop = log10 (mass density) 
+!          flrhop = log10 (mass density)
 !          screening   if true, use screening corrections
 ! Output: g1 = log10 kappa
 !         gx1 = d(log kappa)/d(log T)
 !         gy1 = d(log kappa)/d(log rho)
 !         ierr = 0 for correct use
-!         ierr = 101 for rho out of range for this T 
+!         ierr = 101 for rho out of range for this T
 !         ierr = 102 for T out of range
       subroutine op_mono_get_kap( &
             nel, izzp, fap, fac, fltp, flrhop, screening, &
@@ -546,22 +566,22 @@
             g1, gx1, gy1, &
             umesh, semesh, ff, rs, ierr)
       end subroutine op_mono_get_kap
-      
-      
+
+
 ! HH: Based on "op_mx.f", opacity calculations to be used for non-adiabatic pulsation calculations
 ! Special care is taken to ensure smoothness of opacity derivatives
 ! Input:   nel = number of elements in mixture
 !          izzp(nel) = charge of elements
 !          fap(nel) = number fractions of elements
-!          fac(nel) = scale factors for element opacity   
+!          fac(nel) = scale factors for element opacity
 !          fltp = log10 (temperature)
-!          flrhop = log10 (mass density) 
+!          flrhop = log10 (mass density)
 !          screening   if true, use screening corrections
 ! Output: g1 = log10 kappa
 !         gx1 = d(log kappa)/d(log T)
 !         gy1 = d(log kappa)/d(log rho)
 !         ierr = 0 for correct use
-!         ierr = 101 for rho out of range for this T 
+!         ierr = 101 for rho out of range for this T
 !         ierr = 102 for T out of range
       subroutine op_mono_alt_get_kap( &
             nel, izzp, fap, fac, fltp, flrhop, screening, &
@@ -593,8 +613,8 @@
             g1, gx1, gy1, &
             umesh, semesh, ff, rs, ierr)
       end subroutine op_mono_alt_get_kap
-      
-      
+
+
       subroutine get_op_mono_args( &
             species, X, min_X_to_include, chem_id, chem_factors, &
             nel, izzp, fap, fac, ierr)
@@ -609,20 +629,20 @@
          real(dp), intent(inout) :: fap(:)
          real(dp), intent(inout) :: fac(:)
          integer,intent(out) :: ierr
-         
+
          integer :: i, cid, j, Z, iel
          real(dp) :: tot
-         
+
          ierr = 0
          if (.not. kap_is_initialized) then
             ierr=-1
             return
          endif
-         
+
          nel = 0
          izzp(:) = 0
          fap(:) = 0d0
-         
+
          do i=1,species
             if (X(i) < min_X_to_include) cycle
             cid = chem_id(i)
@@ -650,17 +670,17 @@
             fap(iel) = fap(iel) + X(i)/dble(chem_isos% Z_plus_N(cid))
             fac(iel) = chem_factors(i)
          end do
-         
+
          tot = sum(fap(1:nel))
          if (tot <= 0d0) then
             ierr = -1
             return
          end if
-         
+
          do j=1,nel
             fap(j) = fap(j)/tot ! number fractions
          end do
-         
+
       end subroutine get_op_mono_args
 
 
@@ -695,6 +715,160 @@
       end subroutine kap_set_control_namelist
 
 
+
+      subroutine call_compute_grad_mombarg(k, j, blend, fk, T_face, Rho_face,&
+        l, r, logKappa, lgrad, ierr)
+        use op_eval_mombarg, only : compute_grad, compute_grad_fast
+        !use crlibm_lib
+
+        integer, intent(in) :: k, j
+        real(dp), intent(in) :: fk(:)
+        real(dp), intent(in) ::  blend, T_face, Rho_face, l, r
+        integer, intent(inout) :: ierr
+        real(dp), intent(out) :: logKappa, lgrad(17)
+        real(dp) :: logT_face, logRho_face, lgrad1(17), lgrad2(17)
+
+        !write(*,*) 'calling compute_grad'
+        logT_face   = log10(T_face)
+        logRho_face = log10(Rho_face)
+
+        !call compute_grad(k, fk, logT_face, logRho_face,&
+        !  l, r, &
+        !  logKappa,lgrad, ierr,&
+        !  izz,ite,jne,epatom,amamu,sig,eumesh)
+        if (j == -1) then
+            call compute_grad_fast(k, &
+              fk_grad_pcg(1,:), logT_face, logRho_face, l, r, &
+              lgrad1, ierr,&
+              ite,jne,epatom,amamu,logT_pcg(1,:),logRho_pcg(1,:),lgamm_pcg(1,:,:),lkap_face_pcg(1,:))
+            call compute_grad_fast(k, &
+              fk_grad_pcg(2,:), logT_face, logRho_face, l, r, &
+              lgrad2, ierr,&
+              ite,jne,epatom,amamu,logT_pcg(2,:),logRho_pcg(2,:),lgamm_pcg(2,:,:),lkap_face_pcg(2,:))
+            lgrad = (lgrad1*blend + lgrad2*(1-blend))
+
+        else
+          call compute_grad_fast(k, &
+                  fk_grad_pcg(j,:), logT_face, logRho_face, l, r, &
+                  lgrad, ierr,&
+                  ite,jne,epatom,amamu,logT_pcg(j,:),logRho_pcg(j,:),lgamm_pcg(j,:,:),lkap_face_pcg(j,:))
+        endif
+      end subroutine call_compute_grad_mombarg
+
+      subroutine call_compute_gamma_grid_mombarg(j, fk, ierr)
+        use op_eval_mombarg, only : compute_gamma_grid
+        !use crlibm_lib
+
+        integer, intent(in) :: j
+        real(dp), intent(in) :: fk(:)
+        integer, intent(inout) :: ierr
+
+        fk_grad_pcg(j,:) = fk
+
+        call compute_gamma_grid(ngp, fk, &
+          lgamm_pcg(j,:,:), lkap_face_pcg(j,:), logT_pcg(j,:), logRho_pcg(j,:), ierr,&
+          ite,jne,epatom,amamu,sig,eumesh)
+
+
+      end subroutine call_compute_gamma_grid_mombarg
+
+      subroutine call_compute_kappa_mombarg(handle, k,&
+        fk, T_cntr, Rho_cntr, logT_cntr, logRho_cntr,&
+        zbar, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+        kap, dlnkap_dlnT, dlnkap_dlnRho, log_kap_rad_cell, ierr)
+        use kap_eval, only: combine_rad_with_conduction
+        use kap_def, only : kap_is_initialized, Kap_General_Info
+        use op_eval_mombarg, only : compute_kappa, compute_kappa_fast, interpolate_kappa
+        use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+
+        integer, intent(in) :: handle ! from alloc_kap_handle
+        integer, intent(in) :: k
+        real(dp), intent(in) :: fk(:)
+        real(dp), intent(in) :: T_cntr, Rho_cntr, logT_cntr, logRho_cntr
+        real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+        real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+        integer, intent(inout) :: ierr
+        real(dp), intent(out) :: log_kap_rad_cell, kap, dlnkap_dlnT, dlnkap_dlnRho
+
+        integer ::  eid(17), ke
+        real(dp) :: dlnkap_rad_dlnT, dlnkap_rad_dlnRho, kap_rad, delta, delta2!,fk(17),fk_norm_fac
+        type (Kap_General_Info), pointer :: rq
+
+        ierr = 0
+        if (.not. kap_is_initialized) then
+           ierr=-1
+           return
+        endif
+        call kap_ptr(handle,rq,ierr)
+        if (ierr /= 0) return
+
+        eid = (/ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
+        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 /)
+
+        if (initialize_fk_old) then
+        fk_old = 0
+        initialize_fk_old = .false.
+        endif
+
+
+        delta  = MAXVAL(ABS(fk - fk_pcg)/fk_pcg, MASK=fk_pcg.gt.0 )
+        delta2 = MAXVAL(ABS(fk - fk_old(k,:))/fk_old(k,:), MASK=fk_old(k,:).gt.0 )
+        if (SUM(fk_old(k,:)) == 0) then
+          delta2 = 1d99
+        endif
+
+
+
+        if (delta > 1d-4) then
+          if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01 &
+          .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1) then
+            call compute_kappa(k,&
+              fk, logT_cntr, logRho_cntr, &
+              log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
+              ite,jne,epatom,amamu,sig,logT_grid_old(k,:,:),logRho_grid_old(k,:,:),&
+              lkap_grid_old(k,:,:))
+              fk_old(k,:) = fk
+              logT_cntr_old(k)   = logT_cntr
+              logRho_cntr_old(k) = logRho_cntr
+            else
+              call interpolate_kappa(k,&
+                logT_cntr, logRho_cntr, &
+                log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
+                logT_grid_old(k,:,:),logRho_grid_old(k,:,:),&
+                lkap_grid_old(k,:,:))
+          endif
+        else
+          call compute_kappa_fast(k,&
+              fk_pcg, logT_cntr, logRho_cntr, &
+              log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
+              ite,jne,epatom,amamu,sig,lkap_ross_pcg)
+
+        endif
+
+        if (ierr == 1) return
+
+        kap_rad = exp10(log_kap_rad_cell)
+
+        call combine_rad_with_conduction( &
+             rq, Rho_cntr, logRho_cntr, T_cntr, logT_cntr, zbar, &
+             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
+             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+
+      end subroutine call_compute_kappa_mombarg
+
+      subroutine call_compute_kappa_grid_mombarg(fk, ierr)
+        use op_eval_mombarg, only : compute_kappa_grid
+
+        real(dp), intent(in) :: fk(:)
+        integer, intent(inout) :: ierr
+
+        fk_pcg = fk
+
+        call compute_kappa_grid(fk, &
+          lkap_ross_pcg, ierr,&
+          ite,jne,epatom,amamu,sig)
+
+      end subroutine call_compute_kappa_grid_mombarg
+
       end module kap_lib
-
-

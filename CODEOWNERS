@@ -59,6 +59,7 @@ star/test_suite/carbon_kh @evbauer
 star/test_suite/cburn_inward @rjfarmer
 star/test_suite/ccsn_IIp @rjfarmer @fxt44
 star/test_suite/check_redo @fxt44
+star/test_suite/check_pulse_atm @warrickball
 star/test_suite/conductive_flame @fxt44 @rjfarmer
 star/test_suite/conserve_angular_momentum @orlox
 star/test_suite/custom_colors @rjfarmer
@@ -146,3 +147,7 @@ astero/test_suite/astero_adipls @warrickball
 astero/test_suite/astero_gyre @warrickball
 astero/test_suite/example_astero @warrickball
 astero/test_suite/surface_effects @warrickball
+astero/test_suite/fast_from_file @warrickball
+astero/test_suite/fast_newuoa @warrickball
+astero/test_suite/fast_scan_grid @warrickball
+astero/test_suite/fast_simplex @warrickball

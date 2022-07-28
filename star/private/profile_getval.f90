@@ -384,7 +384,7 @@
             i = c - raw_rate_offset
             tf => tf2
             call eval_tfactors(tf, log10(s% t(k)), s% t(k))
-            call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
+            call get_raw_rate(i, s% t(k), tf, raw_rate, ierr)
             val = raw_rate
             nullify(tf)
          else if (c > diffusion_D_offset) then
@@ -1440,7 +1440,8 @@
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
                val = s% conv_vel(k)/s% csound(k)
-
+            case (p_dvc_dt_TDC_div_g)
+               val = s%dvc_dt_TDC(k) / s%grav(k)
             case (p_mix_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)

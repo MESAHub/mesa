@@ -134,11 +134,25 @@ Send an email announcing the release, this should include:
 - Acknowledge those in the community who have helped in some way during this release (bug reports, PR's, testing during the RC phase, being very active on mesa-users)
 - Remind people that we welcome any contributions (big or small)
 
+Acknowledging support
+---------------------
+
+Getting all authors who committed code (this includes merged pull requests) ::
+
+    git log --format='%aN' r21.12.1..HEAD | sort -u
+
+
+Listing all commits that acknowledge help from someone ::
+
+    git log --all --grep="-by" r21.12.1..HEAD
+
+
+
 Post release fixes
 ------------------
 
-By having the release be in a seperate branch we can push changes if we need to to fix issues however this should be done with caution. Changes to the documentation (highlighting some workaround
-are fine). Making changes to the code itself is more tricky (due to the Zenodo upload being fixed and change rquiring a new Zenodo upload). It may be easier if a version
+By having the release be in a separate branch we can push changes if we need to to fix issues however this should be done with caution. Changes to the documentation (highlighting some workaround
+are fine). Making changes to the code itself is more tricky (due to the Zenodo upload being fixed and change requiring a new Zenodo upload). It may be easier if a version
 needs fixes to simply push a new release, and flag the current release as not working.
 
 New readthedocs version
@@ -147,7 +161,8 @@ New readthedocs version
 First gain access to the readthedocs account (that is currently accessible by Rich and Rob). Then:
 
 - Goto the ``Versions`` page
-- Find the release tag and ``Activate`` it
+- Find the release branch (not the tag) and ``Activate`` it
+- We want the branch not the tag so that we can update the docs post release.
 - Wait for it to build and check it works
 - Goto ``Admin`` page and then the ``Advanced settings`` tab
 - Switch the default version to the release.

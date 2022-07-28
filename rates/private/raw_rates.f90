@@ -46,11 +46,10 @@
       contains
       
       
-      subroutine set_raw_rates(n, irs, which_rates, temp, tf, rates, ierr)
+      subroutine set_raw_rates(n, irs, temp, tf, rates, ierr)
          use rates_def, only : T_Factors
          integer, intent(in) :: n
          integer, intent(in) :: irs(:) ! (n) maps 1..n to reaction id
-         integer, intent(in) :: which_rates(:) ! (rates_reaction_id_max)
          real(dp), intent(in) :: temp
          type (T_Factors) :: tf
          real(dp), intent(inout) :: rates(:)
@@ -59,25 +58,24 @@
          include 'formats'
          ierr = 0
 
-!x$OMP PARALLEL DO PRIVATE(i,ir,op_err)
          do i=1,n
             ir = irs(i)
             if (ir <= 0) cycle
             op_err = 0
-            call set_raw_rate(ir, which_rates(ir), temp, tf, rates(i), op_err)
+            call set_raw_rate(ir, temp, tf, rates(i), op_err)
             if (op_err /= 0) then
                ierr = op_err
                cycle
             end if
          end do
-!x$OMP END PARALLEL DO
+
       end subroutine set_raw_rates
       
 
-      subroutine set_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
+      subroutine set_raw_rate(ir, temp, tf, raw_rate, ierr)
          use ratelib
          use reaclib_eval, only: do_reaclib_lookup
-         integer, intent(in) :: ir, which_rate
+         integer, intent(in) :: ir
          real(dp), intent(in) :: temp
          type (T_Factors) :: tf
          real(dp), intent(out) :: raw_rate
@@ -130,46 +128,42 @@
          select case(ir)
 
             case(ir_he4_he4_he4_to_c12) ! triple alpha to c12 
-               call do1_of_3( &
-                  rate_tripalf_nacre, rate_tripalf_jina, rate_tripalf_fxt)
+               call do1(rate_tripalf_jina)
       
             case(ir_c12_to_he4_he4_he4) ! c12 to 3 alpha
-               call do1_of_3_reverse( &
-                  rate_tripalf_nacre, rate_tripalf_jina, rate_tripalf_fxt)
+               call do1(rate_tripalf_jina)
 
             case(ir_c12_ag_o16)
-               call do1_of_4( &
-                  rate_c12ag_nacre, rate_c12ag_jina, rate_c12ag_kunz, rate_c12ag_fxt)
+               call do1(rate_c12ag_jina)
 
-            case(ir_o16_ga_c12) ! o16(g, a)c12
-               call do1_of_4_reverse( &
-                  rate_c12ag_nacre, rate_c12ag_jina, rate_c12ag_kunz, rate_c12ag_fxt)
+            ! case(ir_o16_ga_c12) ! o16(g, a)c12
+            !    call do1(rate_c12ag_nacre)
 
             case(ir1212) ! c12(c12,n)mg23, c12(c12,p)na23, c12(c12,a)ne20
-               call do1_of_2(rate_c12c12_fxt_multi, rate_c12c12_fxt_basic)
+               call do1(rate_c12c12_fxt_multi)
                ! NOTE: Gasques option for c12+c12 is implemented in net, not in rates.
       
             case(ir1216)
                call do1(rate_c12o16_fxt)
 
             case(ir1616) ! o16 + o16 -> si28 + he4
-               call do1_of_2(rate_o16o16_fxt, rate_o16o16_jina)
+               call do1(rate_o16o16_jina)
 
             case(ir1216_to_mg24) ! ! c12 + o16 -> mg24 + he4
-               call do1_of_2(rate_c12o16_to_mg24_fxt, rate_c12o16a_jina)
+               call do1(rate_c12o16a_jina)
 
             case(ir1216_to_si28) ! ! c12 + o16 -> si28
-               call do1_of_2(rate_c12o16_to_si28_fxt, rate_c12o16p_jina)
+               call do1(rate_c12o16p_jina)
 
             case(ir1616a) ! o16(o16, a)si28 
-               call do1_of_2(rate_o16o16a_fxt, rate_o16o16a_jina)
+               call do1(rate_o16o16a_jina)
 
             case(ir1616g) ! o16(o16, g)s32 
                ! no jina rate
                call do1(rate_o16o16g_fxt)
 
             case(ir1616p_aux) ! o16(o16, p)p31
-               call do1_of_2(rate_o16o16p_fxt, rate_o16o16p_jina)
+               call do1(rate_o16o16p_jina)
 
             case(ir1616ppa) ! o16(o16, p)p31(p, a)si28 
                call do1(rate_o16o16p_jina)
@@ -178,47 +172,33 @@
                call do1(rate_o16o16p_jina)
 
             case(ir_he3_ag_be7) ! he3(he4, g)be7
-               call do1_of_2(rate_he3he4_nacre, rate_he3he4_jina)
+               call do1(rate_he3he4_nacre)
 
             case(ir34_pp2) ! he4(he3, g)be7(e-, nu)li7(p, a)he4
-               call do1_of_2(rate_he3he4_nacre, rate_he3he4_jina)
+               call do1(rate_he3he4_nacre)
 
             case(ir34_pp3) ! he4(he3, g)be7(p, g)b8(e+, nu)be8(, a)he4
-               call do1_of_2(rate_he3he4_nacre, rate_he3he4_jina)
+               call do1(rate_he3he4_nacre)
 
             case(ir_b8_gp_be7) ! be7(p, g)b8
                 ! no jina rate
-               call do1_of_2_reverse(rate_be7pg_nacre, rate_be7pg_nacre)
+               call do1_reverse(rate_be7pg_nacre)
 
-            case(ir_be7_wk_li7)      ! be7(e-, nu)li7
-               call do1_of_2(rate_be7em_fxt, rate_be7em_jina)
+            case(ir_be7_wk_li7)      ! be7(e-, nu)li7 ! This is now actually handled by a custom rate
+               call do1(rate_be7em_fxt)
 
-            case(ir_c12_ap_n15) ! c12(a, p)n15
-               call do1_reverse(rate_n15pa_jina)
-
+       
             case(ir_c12_pg_n13)
-               call do1_of_2(rate_c12pg_nacre, rate_c12pg_jina)
+               call do1(rate_c12pg_nacre)
 
             case(ir_c13_pg_n14)
-               call do1_of_2(rate_c13pg_nacre, rate_c13pg_jina)
-
-            case(ir_f17_ap_ne20) ! f17(a, p)ne20
-               call do1(rate_f17ap_jina)
+               call do1(rate_c13pg_nacre)
 
             case(ir_f17_gp_o16) ! f17(g, p)o16
-               call do1_of_2_reverse(rate_o16pg_nacre, rate_o16pg_jina)
-
-            case(ir_f18_gp_o17) ! f18(g, p)o17
-               call do1_reverse(rate_o17pg_jina)
-
-            case(ir_f19_gp_o18) ! f19(g, p)o18
-               call do1_reverse(rate_o18pg_jina)
+               call do1_reverse(rate_o16pg_nacre)
 
             case(ir_f19_pa_o16)  ! f19(p, a)o16
-               call do1_of_2(rate_f19pa_nacre, rate_f19pa_jina)
-
-            case(ir_f19_pg_ne20)
-               call do1(rate_f19pg_jina)
+               call do1(rate_f19pa_nacre)
 
             case(ir_h2_be7_to_h1_he4_he4)      ! be7(d, p)2he4
                call do1(rate_be7dp_jina)
@@ -230,97 +210,55 @@
                call do1(rate_he3d_jina)
 
             case(ir_h2_pg_he3)
-               call do1_of_2(rate_dpg_nacre, rate_dpg_jina)
+               call do1(rate_dpg_nacre)
 
             case(ir_he3_be7_to_h1_h1_he4_he4)      ! be7(he3, 2p)2he4
                call do1(rate_be7he3_jina)
 
             case(ir_he3_he3_to_h1_h1_he4) ! he3(he3, 2p)he4
-               call do1_of_2(rate_he3he3_nacre, rate_he3he3_jina)
+               call do1(rate_he3he3_nacre)
 
             case(ir_h1_h1_he4_to_he3_he3) ! he4(2p, he3)he3
-               call do1_of_2_reverse(rate_he3he3_nacre, rate_he3he3_jina)
+               call do1_reverse(rate_he3he3_nacre)
 
             case(ir_li7_pa_he4) ! li7(p, a)he4
-               call do1_of_2(rate_li7pa_nacre, rate_li7pa_jina)
-
-            case(ir_mg24_ga_ne20) ! mg24(g, a)ne20
-               call do1_reverse(rate_ne20ag_jina)
+               call do1(rate_li7pa_nacre)
 
             case(ir_n13_gp_c12) ! n13(g, p)c12
-               call do1_of_2_reverse(rate_c12pg_nacre, rate_c12pg_jina)
+               call do1_reverse(rate_c12pg_nacre)
 
             case(ir_n13_pg_o14)
-               call do1_of_2(rate_n13pg_nacre, rate_n13pg_jina)
-
-            case(ir_n14_ag_f18) ! n14(a, g)f18
-               call do1(rate_n14ag_jina)
-
-            case(ir_n14_ap_o17) ! n14(a, p)o17
-               call do1_reverse(rate_o17pa_jina)
+               call do1(rate_n13pg_nacre)
 
             case(ir_n14_gp_c13) ! n14(g, p)c13
-               call do1_of_2_reverse(rate_c13pg_nacre, rate_c13pg_jina)
+               call do1_reverse(rate_c13pg_nacre)
                
             case(ir_n14_pg_o15)
-               call do1_of_2(rate_n14pg_nacre, rate_n14pg_jina)
+               call do1(rate_n14pg_nacre)
 
             case(ir_n15_ap_o18) ! n15(a, p)o18
-               call do1_of_2_reverse(rate_o18pa_nacre, rate_o18pa_jina)
-
-            case(ir_n15_pa_c12) ! n15(p, a)c12
-               call do1(rate_n15pa_jina)
-
-            case(ir_n15_pg_o16)
-               call do1(rate_n15pg_jina)
-
-            case(ir_ne20_ag_mg24) ! ne20(a, g)mg24
-               call do1(rate_ne20ag_jina)
-
-            case(ir_ne20_ap_na23) ! ne20(a, p)na23
-               call do1(rate_ne20ap_jina)
+               call do1_reverse(rate_o18pa_nacre)
 
             case(ir_ne20_ga_o16) ! ne20(g, a)o16
-               call do1_of_2_reverse(rate_o16ag_nacre, rate_o16ag_jina)
-
-            case(ir_ne20_gp_f19) ! ne20(g, p)f19
-               call do1_reverse(rate_f19pg_jina)
-
-            case(ir_ne22_pg_na23)
-               call do1(rate_ne22pg_jina)
+               call do1_reverse(rate_o16ag_nacre)
 
             case(ir_o14_gp_n13) ! o14(g, p)n13
-               call do1_of_2_reverse(rate_n13pg_nacre, rate_n13pg_jina)
+               call do1_reverse(rate_n13pg_nacre)
 
             case(ir_o15_gp_n14)  ! o15(g, p)n14
-               call do1_of_2_reverse(rate_n14pg_nacre, rate_n14pg_jina)
+               call do1_reverse(rate_n14pg_nacre)
 
             case(ir_o16_ag_ne20) ! o16(a, g)ne20
-               call do1_of_2(rate_o16ag_nacre, rate_o16ag_jina)
+               call do1(rate_o16ag_nacre)
 
             case(ir_o16_ap_f19)  ! o16(a, p)f19
-               call do1_of_2_reverse(rate_f19pa_nacre, rate_f19pa_jina)
-
-            case(ir_o16_gp_n15)  ! o16(g, p)n15
-               call do1_reverse(rate_n15pg_jina)
+               call do1_reverse(rate_f19pa_nacre)
 
             case(ir_o16_pg_f17)
-               call do1_of_2(rate_o16pg_nacre, rate_o16pg_jina)
-
-            case(ir_o17_pa_n14) ! o17(p, a)n14
-               call do1( rate_o17pa_jina)
-
-            case(ir_o17_pg_f18)
-               call do1(rate_o17pg_jina)
-
-            case(ir_o18_ag_ne22) ! o18(a, g)ne22 
-               call do1(rate_o18ag_jina)
+               call do1(rate_o16pg_nacre)
 
             case(ir_o18_pa_n15) ! o18(p, a)n15 and n15(a, p)o18
-               call do1_of_2(rate_o18pa_nacre, rate_o18pa_jina)
-
-            case(ir_o18_pg_f19)
-               call do1(rate_o18pg_jina)
+               call do1(rate_o18pa_nacre)
 
             case(iral27pa_aux) ! al27(p, a)mg24 
                call do1_reverse(rate_mg24ap_jina)
@@ -344,13 +282,13 @@
                call do1(rate_be7em_fxt)
 
             case(irbe7pg_b8_aux) ! be7(p, g)b8(e+, nu)be8(, a)he4
-               call do1_of_2(rate_be7pg_nacre, rate_be7pg_jina)
+               call do1(rate_be7pg_nacre)
 
             case(irc12_to_c13) ! c12(p, g)n13(e+nu)c13
-               call do1_of_2(rate_c12pg_nacre, rate_c12pg_jina)
+               call do1(rate_c12pg_nacre)
 
             case(irc12_to_n14) ! c12(p, g)n13(e+nu)c13(p, g)n14
-               call do1_of_2(rate_c12pg_nacre, rate_c12pg_jina)
+               call do1(rate_c12pg_nacre)
 
             case(irc12ap_aux)  ! c12(a, p)n15
                call do1_reverse(rate_n15pa_jina)
@@ -530,7 +468,7 @@
                call do1(rate_he3ng_fxt)
 
             case(irhe3gprot_aux) ! he3(g, prot)h2
-               call do1_of_2_reverse(rate_dpg_fxt, rate_dpg_jina)
+               call do1_reverse(rate_dpg_fxt)
 
             case(irhe4_breakup) ! he4(g, neut)he3(g, prot)h2(g, neut)prot
                raw_rate = -1 ! rate calculated by special routine.
@@ -563,13 +501,13 @@
                call do1(rate_mn51pg_jina)
 
             case(irn14_to_c12) ! n14(p, g)o15(e+nu)n15(p, a)c12
-               call do1_of_3(rate_n14pg_nacre, rate_n14pg_jina, rate_n14pg_fxt)
+               call do1(rate_n14pg_nacre)
 
             case(irn14_to_n15) ! n14(p, g)o15(e+nu)n15
-               call do1_of_3(rate_n14pg_nacre, rate_n14pg_jina, rate_n14pg_fxt)
+               call do1(rate_n14pg_nacre)
 
             case(irn14_to_o16) ! n14(p, g)o15(e+nu)n15(p, g)o16
-               call do1_of_3(rate_n14pg_nacre, rate_n14pg_jina, rate_n14pg_fxt)
+               call do1(rate_n14pg_nacre)
 
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
                call do1(rate_n14ag_jina)
@@ -578,10 +516,10 @@
                call do1(rate_n14ag_jina)
 
             case(irn14gc12) ! n14 => c12 + neut + prot
-               call do1_of_2_reverse(rate_c13pg_nacre, rate_c13pg_jina)
+               call do1_reverse(rate_c13pg_nacre)
 
             case(irn14pg_aux) ! n14(p, g)o15
-               call do1_of_3(rate_n14pg_nacre, rate_n14pg_jina, rate_n14pg_fxt)
+               call do1(rate_n14pg_nacre)
 
             case(irn15pa_aux) ! n15(p, a)c12
                call do1( rate_n15pa_jina)
@@ -626,7 +564,7 @@
                call do1(rate_ne20pg_nacre)
 
             case(irne20pg_to_mg24) ! ne20(p, g)na21(p, g)mg22 -> mg24
-               call do1_of_2(rate_ne20pg_nacre, rate_ne20pg_jina)
+               call do1(rate_ne20pg_nacre)
 
             case(irneut_to_prot) ! neut(e+nu)prot
                raw_rate = -1 ! rate calculated by special routine.
@@ -665,16 +603,16 @@
                call do1_reverse(rate_fe54an_jina)
 
             case(iro16_to_n14) ! o16(p, g)f17(e+nu)o17(p, a)n14
-               call do1_of_2(rate_o16pg_nacre, rate_o16pg_jina)
+               call do1(rate_o16pg_nacre)
 
             case(iro16_to_o17) ! o16(p, g)f17(e+nu)o17
-               call do1_of_2(rate_o16pg_nacre, rate_o16pg_jina)
+               call do1(rate_o16pg_nacre)
 
             case(iro16ap_aux)  ! o16(a, p)f19
-               call do1_of_2_reverse(rate_f19pa_nacre, rate_f19pa_jina)
+               call do1_reverse(rate_f19pa_nacre)
 
             case(iro16ap_to_ne20)  ! o16(a, p)f19(p, a)ne20
-               call do1_of_2_reverse(rate_f19pa_nacre, rate_f19pa_jina)
+               call do1_reverse(rate_f19pa_nacre)
 
             case(iro16gp_aux)  ! o16(g, p)n15 
                call do1_reverse(rate_n15pg_jina)
@@ -692,10 +630,10 @@
                call do1(rate_p31pg_jina)
 
             case(irpep_to_he3)        ! p(e-p, nu)h2(p, g)he3
-               call do1_of_2(rate_pep_fxt, rate_pep_jina)
+               call do1(rate_pep_fxt)
 
             case(irpp_to_he3) ! p(p, e+nu)h2(p, g)he3
-               call do1_of_2(rate_pp_nacre, rate_pp_jina)
+               call do1(rate_pp_nacre)
 
             case(irprot_neutg_aux) ! prot(neut, g)h2
                call do1(rate_png_fxt)
@@ -752,22 +690,22 @@
                call do1(rate_v47pg_jina)
 
             case(ir_h1_h1_wk_h2) ! p(p, e+nu)h2
-               call do1_of_2(rate_pp_nacre, rate_pp_jina)
+               call do1(rate_pp_nacre)
 
             case(ir_h1_h1_ec_h2)        ! p(e-p, nu)h2
-               call do1_of_2(rate_pep_fxt, rate_pep_jina)
+               call do1(rate_pep_fxt)
 
             case(irn14ag_to_ne22) ! n14(a, g)f18(e+nu)o18(a, g)ne22
                call do1(rate_n14ag_jina)
 
             case(irf19pa_aux)  ! f19(p, a)o16
-               call do1_of_2(rate_f19pa_nacre, rate_f19pa_jina)
+               call do1(rate_f19pa_nacre)
 
             case(ir_be7_pg_b8)
-               call do1_of_2(rate_be7pg_nacre, rate_be7pg_jina)
+               call do1(rate_be7pg_nacre)
 
             case(ir_b8_wk_he4_he4) ! b8(p=>n)be8=>2 he4
-               call do1_of_2(rate_b8ep, rate_b8_wk_he4_he4_jina)               
+               call do1(rate_b8ep)               
 
             case(irmn51pa_aux) ! mn51(p, a)cr48 
                call do1_reverse(rate_cr48ap_jina)
@@ -782,7 +720,7 @@
                call do1_reverse(rate_fe52ap_jina)
 
             case(ir_h1_he3_wk_he4)  ! he3(p, e+nu)he4
-               call do1_of_2(rate_hep_fxt, rate_hep_jina)
+               call do1(rate_hep_fxt)
                         
             case(ir_he3_ng_he4)
                call do1(rate_he3ng_fxt)
@@ -815,6 +753,11 @@
                call do_default(ierr)
                
          end select
+
+
+         if(associated(rates_other_rate_get)) then
+            call rates_other_rate_get(ir, temp, tf, raw_rate, ierr)
+         end if
          
          
          contains
@@ -843,58 +786,6 @@
             call eval_raw_rate(ir, rate_fcn1, tf, temp, rr, raw_rate, ierr)
          end subroutine do1_reverse
          
-         
-         subroutine do1_of_2(rate_fcn1, rate_fcn2)
-            procedure(rate_fcn) :: rate_fcn1, rate_fcn2
-            call eval_which_raw_rate(  &
-               ir, min(2,which_rate),  &
-               rate_fcn1, rate_fcn2, rate_fcn_null, rate_fcn_null,  &
-               tf, temp, raw_rate, rr, ierr)
-         end subroutine do1_of_2
-         
-         
-         subroutine do1_of_2_reverse(rate_fcn1, rate_fcn2)
-            procedure(rate_fcn) :: rate_fcn1, rate_fcn2
-            real(dp) :: r
-            call do1_of_2(rate_fcn1, rate_fcn2)
-            r = raw_rate; raw_rate = rr; rr = r
-         end subroutine do1_of_2_reverse
-         
-         
-         subroutine do1_of_3(rate_fcn1, rate_fcn2, rate_fcn3)
-            procedure(rate_fcn) :: rate_fcn1, rate_fcn2, rate_fcn3
-            call eval_which_raw_rate(  &
-               ir, min(3,which_rate),  &
-               rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn_null,  &
-               tf, temp, raw_rate, rr, ierr)
-         end subroutine do1_of_3
-         
-         
-         subroutine do1_of_3_reverse(rate_fcn1, rate_fcn2, rate_fcn3)
-            procedure(rate_fcn) :: rate_fcn1, rate_fcn2, rate_fcn3
-            real(dp) :: r
-            call do1_of_3(rate_fcn1, rate_fcn2, rate_fcn3)
-            r = raw_rate; raw_rate = rr; rr = r
-         end subroutine do1_of_3_reverse
-         
-         
-         subroutine do1_of_4(rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn4)
-            procedure(rate_fcn) :: rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn4
-            call eval_which_raw_rate(  &
-               ir, min(4,which_rate),  &
-               rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn4,  &
-               tf, temp, raw_rate, rr, ierr)
-         end subroutine do1_of_4
-         
-         
-         subroutine do1_of_4_reverse(rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn4)
-            procedure(rate_fcn) :: rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn4
-            real(dp) :: r
-            call do1_of_4(rate_fcn1, rate_fcn2, rate_fcn3, rate_fcn4)
-            r = raw_rate; raw_rate = rr; rr = r
-         end subroutine do1_of_4_reverse
-
-
       end subroutine set_raw_rate
 
 
@@ -924,35 +815,9 @@
          real(dp) :: fr1, rr1, alfa, beta
          include 'formats'
          ierr = 0
-         if (which_rate == 2 .and. temp < JR_T_full_on) then
-            call eval_raw_rate(ir, rate_fcn1, tf, temp, fr1, rr1, ierr)
-            if (ierr /= 0) return
-            if (temp <= JR_T_full_off) then
-               fr = fr1; rr = rr1; return
-            end if
-         end if
-         select case(which_rate)
-            case (1)
-               call eval_raw_rate(ir, rate_fcn1, tf, temp, fr, rr, ierr)
-            case (2)
-               call eval_raw_rate(ir, rate_fcn2, tf, temp, fr, rr, ierr)
-            case (3)
-               call eval_raw_rate(ir, rate_fcn3, tf, temp, fr, rr, ierr)
-            case (4)
-               call eval_raw_rate(ir, rate_fcn4, tf, temp, fr, rr, ierr)
-            case default         
-               write(*,*) 'bad which rate ' // trim(reaction_Name(ir)), which_rate
-               ierr = -1
-               return
-         end select
-         if (which_rate == 2 .and. temp < JR_T_full_on) then ! blend 1 and 2
-            ! alfa = fraction from rate_fcn2; beta = 1-alfa = fraction from rate_fcn1
-            alfa = (temp - JR_T_full_off) / (JR_T_full_on - JR_T_full_off)
-            alfa = 0.5d0*(1d0 - cospi(alfa))
-            beta = 1d0 - alfa
-            fr = beta*fr1 + alfa*fr
-            rr = beta*rr1 + alfa*rr
-         end if
+
+         call eval_raw_rate(ir, rate_fcn1, tf, temp, fr, rr, ierr)
+
       end subroutine eval_which_raw_rate
 
 
@@ -1094,8 +959,9 @@
             ierr = 0
             read(iounit, fmt=*, iostat=ierr) nT8s
             if (ierr == 0) exit
+            if (is_iostat_end(ierr)) exit
          end do
-         if (failed('skip to find line starting with an integer for nT8s')) return
+         if (failed('Failed to find line starting with an integer for nT8s')) return
 
          allocate(T8s(nT8s), f1(4*nT8s), stat=ierr)
          if (failed('allocate')) return

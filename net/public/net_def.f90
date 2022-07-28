@@ -53,6 +53,10 @@
          integer, parameter :: max_kind = general_two_two_kind
          
 
+
+
+
+
          
       type Net_General_Info ! things that are constant for the particular net
       ! it is okay to have multiple threads using the same instance of this simultaneously.
@@ -77,9 +81,6 @@
          ! value is between 1 and num_chem_isos         
 
          ! reactions
-
-         integer, allocatable :: which_rates(:) 
-            ! maps reaction id to small integer indicating choice for rate
                   
          integer, pointer :: net_reaction(:) ! maps reaction id to net reaction number
          ! index from 1 to rates_reaction_id_max (in rates_def)   
@@ -166,12 +167,13 @@
          logical :: net_has_been_defined
          logical :: in_use
 
+         logical :: use_3a_fl87 ! Whether triple alpha should use Fushiki and Lamb 1987
+
       end type Net_General_Info
-               
-      
+
       integer, parameter :: num_weak_info_arrays_in_Net_Info = 9 ! weaklib results
       
-                  
+            
       type Net_Info
          ! this is working storage for the nuclear reaction calculations
          
@@ -221,8 +223,38 @@
 
          real(dp) :: eps_neu_total
          real(dp) :: weak_rate_factor
-         
+
+         ! Passed in by star
+         integer :: star_id = -1, zone = -1
+      
       end type Net_Info
+
+
+      ! Interface for net hooks
+      interface
+         subroutine other_net_derivs_interface( &
+            n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
+            num_reactions, rate_factors, &
+            symbolic, just_dydt, ierr)
+         import dp, qp, Net_Info
+         implicit none
+
+         type(Net_Info), pointer :: n
+         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(out) :: eps_nuc_MeV(:)
+         integer, intent(in) :: num_reactions
+         real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
+            rate_factors(:)
+         logical, intent(in) :: symbolic, just_dydt
+         integer, intent(out) :: ierr
+
+         end subroutine other_net_derivs_interface
+
+      end interface
+
+      ! Other net_derivs handling
+      procedure(other_net_derivs_interface), pointer  :: &
+         net_other_net_derivs => null()
 
       
    ! private to the implementation
@@ -364,9 +396,6 @@
          type (Net_General_Info), pointer :: g
          if (handle >= 1 .and. handle <= max_net_handles) then
             g => net_handles(handle)
-            if (allocated(g% which_rates)) then
-               deallocate(g% which_rates)
-            end if
             if (associated(g% net_iso)) then
                deallocate(g% net_iso)
                   nullify(g% net_iso)
@@ -505,27 +534,6 @@
          g% clock_derivs_general = 0
          g% clock_net_get = 0
       end subroutine zero_net_timing
-
-      
-      subroutine do_net_set_which_rates(handle, which_rates, ierr)
-         use rates_def, only: rates_reaction_id_max
-         integer, intent(in) :: handle, which_rates(:)
-         integer, intent(out) :: ierr
-         type (Net_General_Info), pointer :: g
-         integer :: j
-         include 'formats'
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for net_set_which_rates'
-            return
-         end if
-         if (.not. allocated(g% which_rates)) return
-            ! this can happen on coprocessor
-         do j=1,rates_reaction_id_max
-            g% which_rates(j) = which_rates(j)
-         end do
-      end subroutine do_net_set_which_rates
-      
       
       subroutine do_net_set_fe56ec_fake_factor( &
             handle, fe56ec_fake_factor, min_T_for_fe56ec_fake_factor, ierr)

@@ -1302,7 +1302,7 @@
              tf => tf2
              do k = 1, s% nz
                 call eval_tfactors(tf, log10(s% t(k)), s% t(k))
-                call get_raw_rate(i, s% which_rates(i), s% t(k), tf, raw_rate, ierr)
+                call get_raw_rate(i, s% t(k), tf, raw_rate, ierr)
                 val = val + raw_rate
              end do
              nullify(tf)
@@ -2278,9 +2278,9 @@
             case(h_nuc_timescale)
                val = s% nuc_timescale
             case(h_dt_div_max_tau_conv)
-               val = s% dt/s% max_conv_time_scale
+               if(s% max_conv_time_scale > 0d0) val = s% dt/s% max_conv_time_scale
             case(h_dt_div_min_tau_conv)
-               val = s% dt/s% min_conv_time_scale
+               if(s% min_conv_time_scale > 0d0) val = s% dt/s% min_conv_time_scale
             case(h_max_tau_conv)
                val = s% max_conv_time_scale
             case(h_min_tau_conv)

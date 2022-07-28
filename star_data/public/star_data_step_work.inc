@@ -216,9 +216,6 @@
       procedure (), pointer, nopass :: set_rate_factors => null()
          ! called whenever the net changes
 
-      integer, pointer :: which_rates(:) ! (rates_reaction_id_max)  controls for rates
-      procedure (), pointer, nopass :: set_which_rates => null()
-
       real(dp), pointer :: eps_nuc(:) ! sum of reaction_eps_nuc for all reactions in net
          ! thermal ergs per gram per second from nuclear reactions
          ! (including losses to neutrinos produced in the reactions)
@@ -262,6 +259,9 @@
       real(dp), pointer :: nonnucneu_phot(:)
       real(dp), pointer :: nonnucneu_pair(:) 
       real(dp), pointer :: nonnucneu_reco(:) 
+
+      ! dvc/dt from TDC
+      real(dp), pointer :: dvc_dt_TDC(:) ! cm/sec/sec
 
       ! irradiation heat profile
       real(dp), pointer :: irradiation_heat(:) ! (ergs/gm/sec)      

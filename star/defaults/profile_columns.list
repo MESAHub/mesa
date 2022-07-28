@@ -262,7 +262,7 @@
       ! NOTE: you can list specific categories by giving their names (from chem_def)
       pp
       cno
-      tri_alfa
+      tri_alpha
       !c_alpha
       !n_alpha
       !o_alpha
@@ -498,6 +498,7 @@
    !mlt_log_abs_Y
    !mlt_vc
    !log_mlt_vc
+   !dvc_dt_TDC_div_g 
 
    !superad_reduction_factor
    !conv_vel_div_mlt_vc

@@ -710,6 +710,7 @@
          logical :: do_element_diffusion
          logical :: diffusion_use_iben_macdonald
          logical :: diffusion_use_paquette
+         logical :: diffusion_use_caplan
          logical :: diffusion_use_cgs_solver
          logical :: diffusion_use_full_net
          logical :: do_WD_sedimentation_heating
@@ -754,7 +755,7 @@
          real(dp) :: diffusion_max_T_for_radaccel, diffusion_min_T_for_radaccel
          integer :: diffusion_max_Z_for_radaccel, diffusion_min_Z_for_radaccel
          logical :: diffusion_screening_for_radaccel
-         character (len=strlen) :: op_mono_data_path, op_mono_data_cache_filename
+         character (len=strlen) :: op_mono_data_path, op_mono_data_cache_filename, emesh_data_for_op_mono_path, op_mono_method
 
          integer :: diffusion_num_classes
          character (len=iso_name_length) :: &
@@ -1051,7 +1052,7 @@
          
          logical :: fill_arrays_with_NaNs
          logical :: zero_when_allocate, warn_when_get_a_bad_eos_result, &
-            warn_rates_for_high_temp
+            warn_rates_for_high_temp, absolute_cumulative_energy_err
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
             eps_mdot_leak_frac_factor
@@ -1374,6 +1375,9 @@
          logical :: use_other_timestep_limit
          logical :: use_other_set_pgstar_controls
          logical :: use_other_screening
+         logical :: use_other_rate_get
+         logical :: use_other_net_derivs
+         logical :: use_other_split_burn
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

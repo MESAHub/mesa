@@ -19,7 +19,7 @@
              ! star masses
              m(2), m_old(2), &
              dt, dt_old, &
-             env, env_old, &
+             env(2), env_old(2), &
              period, period_old, & 
              max_timestep, max_timestep_old, &
              change_factor, change_factor_old, &

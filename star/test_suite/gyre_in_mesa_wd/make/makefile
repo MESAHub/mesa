@@ -1,5 +1,4 @@
 
-MESA_DIR = ../../../..
 
 include $(MESA_DIR)/utils/makefile_header
 

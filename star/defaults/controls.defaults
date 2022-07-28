@@ -2275,6 +2275,8 @@
 
       ! If false, then stick to the usual definition -- P/(g*rho).
       ! If true, use min of the usual and sound speed * hydro time scale, sqrt(P/G)/rho.
+      ! Note that the 'TDC' ``MLT_option`` does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``   
+      ! even if that flag is set.
 
       ! ::
 
@@ -2319,10 +2321,12 @@
 
       ! The 'Cox' and 'TDC' options assumes optically thick material.
       ! The other options are various ways of extending to include optically thin material.
+      ! Note that TDC does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``
+      ! even if that flag is set.
 
       ! ::
 
-    MLT_option = 'Cox'
+    MLT_option = 'TDC'
 
       ! TDC options
       ! ~~~~~~~~~~~
@@ -3325,7 +3329,7 @@
 
       ! ::
 
-    RSP_do_check_omega = .false.
+    RSP_do_check_omega = .true.
 
       ! ::
 
@@ -6642,18 +6646,29 @@
 
     diffusion_dt_limit = 3.15d7
 
-
       ! diffusion_use_paquette
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, use atomic diffusion coefficients according to Paquette et al. (1986).
-      ! if false, use Stanton & Murillo (2016) for diffusion coefficients.
+      ! if false, use Stanton & Murillo PhRvE, 93, 043203 (2016) for diffusion coefficients.
       ! (Paquette coefficients still used for electron-ion because Stanton & Murillo
       ! did not do calculations for attractive potentials.)
 
       ! ::
 
     diffusion_use_paquette = .false.
+
+
+      ! diffusion_use_caplan
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, use atomic diffusion coefficients according to
+      ! Caplan, Bauer, & Freeman MNRAS, 513, L52 (2022) at strong coupling (Gamma > 10),
+      ! relevant for white dwarf interiors.
+
+      ! ::
+
+    diffusion_use_caplan = .true.
 
 
       ! diffusion_use_iben_macdonald
@@ -7212,59 +7227,6 @@
     diffusion_dump_call_number = -1
 
 
-! WD phase separation
-! ===================
-
-      ! do_phase_separation
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! Phase separation upon crystallization in WD cores
-      ! (currently only for C/O white dwarf cores)
-      ! using the phase diagram of `Blouin et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
-
-      ! ::
-
-    do_phase_separation = .false.
-
-      ! do_phase_separation_heating
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if true, calculate heating term associated with changes in
-      ! internal energy due to any abundance changes from phase
-      ! separation, and include this term in the energy equation.
-
-      ! ::
-
-    do_phase_separation_heating = .true.
-
-      ! phase_separation_mixing_use_brunt
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if true, the phase separation mixing recalculates relevant
-      ! EOS quantities and evaluates the Ledoux criterion,
-      ! including the brunt B term that depends on the composition
-      ! gradient. This can be somewhat expensive, so this option can
-      ! be set to false to instead just mix outward until there is
-      ! no more negative mu gradient. These will produce similar
-      ! final chemical profiles, but setting this option to true
-      ! is the only way to properly evaluate the physical criterion.
-
-      ! ::
-
-    phase_separation_mixing_use_brunt = .true.
-    
-      ! phase_separation_no_diffusion
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if true and element diffusion is on, prevent element diffusion
-      ! from occurring in the layers where phase separation mixing
-      ! is present (experimental)
-
-      ! ::
-
-    phase_separation_no_diffusion = .false.
-
-
 ! eos controls
 ! ============
 
@@ -7367,7 +7329,7 @@
       ! as modified by Haili Hu.  Since the tar.gz file is large (656 MB),
       ! it is not included in the standard mesa download.
 
-      ! You can get ``OP4STARS_1.3.tar.xz`` [here](http://sourceforge.net/projects/mesa/files)
+      ! You can get ``OP4STARS_1.3.tar.xz`` from http://sourceforge.net/projects/mesa/files
 
       ! Put it any place you want on your disk.
 
@@ -7410,6 +7372,32 @@
       ! ::
 
     op_mono_data_cache_filename = ''      ! '' defaults to $MESA_OP_MONO_DATA_CACHE_FILENAME
+
+      ! op_mono_method
+      ! ~~~~~~~~~~~~~~
+
+      ! Compute the Rosseland mean opacity and radiative accelerations from the OP mono data by brute force (``'hu'``)
+      ! or use the faster method by allowing for a small tolerance on the mixture used for the computations of these variables (``'mombarg'``).
+
+      ! ::
+      
+      op_mono_method = 'hu'
+
+      ! emesh_data_for_op_mono_path
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! path to the OP_mono_master_grid_MESA_emesh.txt file containing the data need for when op_mono_method = ``'mombarg'``.
+      ! If this is set to the empty string, '', then it defaults to the
+      ! environment variable ``$(MESA_OP_MONO_MASTER_GRID)``
+
+      ! You can get OP_mono_master_grid_MESA_emesh.txt from https://doi.org/10.5281/zenodo.6850861
+
+      ! You can either download the uncompressed ``.txt`` file, or download the compressed ``.xz`` file
+      ! and then unpack it in place with ``unxz -v OP_mono_master_grid_MESA_emesh.txt.xz``
+
+      ! ::
+      
+    emesh_data_for_op_mono_path = ''      ! '' defaults to $MESA_OP_MONO_MASTER_GRID
 
 
       ! high_logT_op_mono_full_off
@@ -11393,6 +11381,17 @@
 
     warn_when_large_rel_run_E_err = 0.01d0
 
+      ! absolute_cumulative_energy_err
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! cumulative energy error is the sum of the absolute value of per-step errors.
+      ! Set this to .false. to allow positive and negative errors to cancel
+      ! when integrating over multiple steps.
+
+      ! ::
+
+    absolute_cumulative_energy_err = .true.
+
 
       ! warn_when_stop_checking_residuals    obsolete
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -11528,6 +11527,9 @@
     use_other_eval_fp_ft = .false.
     use_other_torque = .false.
     use_other_screening = .false.
+    use_other_rate_get = .false.
+    use_other_net_derivs = .false.
+    use_other_split_burn = .false.
 
       ! ::
 

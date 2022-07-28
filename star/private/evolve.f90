@@ -320,7 +320,6 @@
          s% L_for_BB_outer_BC = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
-         s% generations = 1
          s% okay_to_set_mlt_vc = .false. ! don't change mlt_vc until have set mlt_vc_old
          
          if (s% timestep_hold > s% model_number + 10000) then 
@@ -1370,8 +1369,13 @@
             s% error_in_energy_conservation = &
                s% total_energy_end - (s% total_energy_old + s% total_energy_sources_and_sinks)
 
-            s% cumulative_energy_error = s% cumulative_energy_error_old + &
-               s% error_in_energy_conservation
+            if (s% absolute_cumulative_energy_err) then
+               s% cumulative_energy_error = s% cumulative_energy_error_old + &
+                    abs(s% error_in_energy_conservation)
+            else
+               s% cumulative_energy_error = s% cumulative_energy_error_old + &
+                    s% error_in_energy_conservation
+            end if
 
             s% total_internal_energy = s% total_internal_energy_end
             s% total_gravitational_energy = s% total_gravitational_energy_end

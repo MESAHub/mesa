@@ -36,7 +36,7 @@ implicit none
 
 private
 public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, &
-         convert, unconvert, safe_atan, safe_tanh, tdc_info, &
+         convert, unconvert, safe_tanh, tdc_info, &
          eval_Af, eval_xis, compute_Q
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
@@ -409,23 +409,6 @@ contains
       end if
    end function safe_tanh
 
-   !> Computes the arctangent of y/x in a way that is numerically safe near x=0.
-   !!
-   !! @param x x coordinate for the arctangent.
-   !! @param y y coordinate for the arctangent.
-   !! @param z Polar angle z such that tan(z) = y / x.
-   type(auto_diff_real_tdc) function safe_atan(x,y) result(z)
-      type(auto_diff_real_tdc), intent(in) :: x,y
-      type(auto_diff_real_tdc) :: x1, y1
-      if (abs(x) < 1d-50) then
-         ! x is basically zero, so for ~any non-zero y the ratio y/x is ~infinity.
-         ! That means that z = +- pi. We want z to be positive, so we return pi.
-         z = pi
-      else
-         z = atan(y/x)
-      end if
-   end function safe_atan
-
    !> The TDC newton solver needs higher-order partial derivatives than
    !! the star newton solver, because the TDC one needs to pass back a result
    !! which itself contains the derivatives that the star solver needs.
@@ -583,14 +566,13 @@ contains
       real(dp), intent(in) :: dt    
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt, Jt4, num, den, y_for_atan, root, lk 
+      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root, lk 
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
 
       if (J2 > 0d0) then ! Hyperbolic branch
-         J = sqrt(J2)
-         Jt = dt * J
-         Jt4 = 0.25d0 * Jt
+         J = sqrt(abs(J2)) ! Only compute once we know J2 is not 0
+         Jt4 = 0.25d0 * dt * J
          num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
          den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
          Af = num / den 
@@ -598,14 +580,14 @@ contains
             Af = -Af
          end if
       else if (J2 < 0d0) then ! Trigonometric branch
-         J = sqrt(-J2)
-         Jt = dt * J
+         J = sqrt(abs(J2))  ! Only compute once we know J2 is not 0
+         Jt4 = 0.25d0 * dt * J
 
          ! This branch contains decaying solutions that reach A = 0, at which point
          ! they switch onto the 'zero' branch. So we have to calculate the position of
          ! the first root to check it against dt.
          y_for_atan = xi1 + 2d0 * A0 * xi2
-         root = safe_atan(J, xi1) - safe_atan(J, y_for_atan)
+         root = atan(xi1 / J) - atan(y_for_atan / J)
 
          ! The root enters into a tangent, so we can freely shift it by pi and
          ! get another root. We care about the first positive root, and the above prescription
@@ -619,8 +601,8 @@ contains
             root = root + pi
          end if
 
-         if (0.25d0 * Jt < root) then
-            num = -xi1 + J * tan(0.25d0 * Jt + atan(y_for_atan / J)) 
+         if (Jt4 < root) then
+            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J)) 
             den = 2d0 * xi2
             Af = num / den
          else

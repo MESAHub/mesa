@@ -233,30 +233,35 @@ contains
              if (D(k) < s%overshoot_D_min) then
 
                 ! Update conv_bdy_dq to reflect where D drops below the minimum
-
+                ! Convective regions can happen to be entirely below s%overshoot_D_min, 
+                ! in which case we ignore this correction.
                 if (s%top_conv_bdy(i)) then
-                   s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
-                   if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
-                      write(*,*) 'k, k_a, k_b', k, k_a, k_b
-                      write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
-                      write(*,*) 'D(k)', D(k)
-                      write(*,*) 's%D_mix(k+1)', s%D_mix(k+1)
-                      write(*,*) 's%overshoot_D_min', s%overshoot_D_min
-                      write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k), s%dq(k)
-                      ierr = -1
-                      return
+                   if (s%D_mix(k+1) > s%overshoot_D_min) then
+                      s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
+                      if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
+                         write(*,*) 'k, k_a, k_b', k, k_a, k_b
+                         write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
+                         write(*,*) 'D(k)', D(k)
+                         write(*,*) 's%D_mix(k+1)', s%D_mix(k+1)
+                         write(*,*) 's%overshoot_D_min', s%overshoot_D_min
+                         write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k), s%dq(k)
+                         ierr = -1
+                         return
+                      end if
                    end if
                 else
-                   s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
-                   if (s%cz_bdy_dq(k-1) < 0._dp .OR. s%cz_bdy_dq(k-1) > s%dq(k-1)) then
-                      write(*,*) 'k, k_a, k_b', k, k_a, k_b
-                      write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
-                      write(*,*) 'D(k)', D(k)
-                      write(*,*) 's%D_mix(k-1)', s%D_mix(k-1)
-                      write(*,*) 's%overshoot_D_min', s%overshoot_D_min
-                      write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k-1), s%dq(k)
-                      ierr = -1
-                      return
+                   if (s%D_mix(k-1) > s%overshoot_D_min) then
+                      s%cz_bdy_dq(k-1) = find0(0._dp, s%D_mix(k-1)-s%overshoot_D_min, s%dq(k-1), D(k)-s%overshoot_D_min)
+                      if (s%cz_bdy_dq(k-1) < 0._dp .OR. s%cz_bdy_dq(k-1) > s%dq(k-1)) then
+                         write(*,*) 'k, k_a, k_b', k, k_a, k_b
+                         write(*,*) 's%top_conv_bdy(i)=', s%top_conv_bdy(i)
+                         write(*,*) 'D(k)', D(k)
+                         write(*,*) 's%D_mix(k-1)', s%D_mix(k-1)
+                         write(*,*) 's%overshoot_D_min', s%overshoot_D_min
+                         write(*,*) 'Invalid location for overshoot boundary: cz_bdy_dq, dq=', s%cz_bdy_dq(k-1), s%dq(k)
+                         ierr = -1
+                         return
+                      end if
                    end if
                 endif
 
