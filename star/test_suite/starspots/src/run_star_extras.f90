@@ -30,7 +30,7 @@
       
 
       implicit none
-      real(dp) :: spotf, spotx, PB_i, Teff_local, sb_sigma
+      real(dp) :: fspot, xspot, PB_i, Teff_local, sb_sigma
 
       include "test_suite_extras_def.inc"
 
@@ -58,8 +58,8 @@
          ! otherwise we use a null_ version which does nothing (except warn).
 
 
-         spotf = s% x_ctrl(1)
-         spotx = s% x_ctrl(2)
+         fspot = s% x_ctrl(1)
+         xspot = s% x_ctrl(2)
 
 
          s% extras_startup => extras_startup
@@ -133,7 +133,7 @@
 
          R2 = pow2(s%R(1))
          Teff_local = pow( s%L(1)/(4.0*pi*sb_sigma*R2), 0.25d0)
-         PB_i = (R_gas_constant* s%rho(1)/mu_ideal_gas) * (1.0 - spotx) * Teff_local
+         PB_i = (R_gas_constant* s%rho(1)/mu_ideal_gas) * (1.0 - xspot) * Teff_local
 
       end function extras_start_step
 
@@ -166,7 +166,7 @@
          type(auto_diff_real_star_order1), intent(out) :: &
             gradT, Y_face, conv_vel, D, Gamma
          integer, intent(out) :: ierr
-        type(auto_diff_real_star_order1) :: spotx_of_r !, spotx4
+        type(auto_diff_real_star_order1) :: xspot_of_r !, xspot4
         type(auto_diff_real_star_order1) :: gradr_spot
             !ierr = 0
         ! ------------------------------ 10/26/21
@@ -178,8 +178,8 @@
         !------------------------------
          !if (s% star_age >= 10d0) then
          if (.not. s% doing_relax) then
-            spotx_of_r = (P - PB_i)/P 
-            gradr_spot = gradr/( spotf*pow( spotx_of_r, 4d0) + 1d0 - spotf)
+            xspot_of_r = (P - PB_i)/P 
+            gradr_spot = gradr/( fspot*pow( xspot_of_r, 4d0) + 1d0 - fspot)
          else
             gradr_spot = gradr
          end if
@@ -210,7 +210,7 @@
             integer, intent(out) :: ierr
 
             ! For my tweaks
-            real(dp) ::  alp !, spotf, spotx
+            real(dp) ::  alp !, fspot, xspot
 
             ! Call the stock get_surf_PT
             type (star_info), pointer :: s
@@ -226,7 +226,7 @@
             need_atm_Tsurf = .true. 
             sb_sigma = boltz_sigma
             
-            alp = 1d0 - spotf + spotf*spotx*spotx*spotx*spotx
+            alp = 1d0 - fspot + fspot*xspot*xspot*xspot*xspot
 
             ! This is the surface-average value for luminosity
             L_init = s% L(1)

@@ -1,24 +1,20 @@
-.. _test_case_template:
+.. _starspots:
 
 ******************
-test_case_template
+starspots
 ******************
 
-Test suite cases should have a ``README.rst`` file that contains a
-brief description of the test and its purpose.
+This test suite case evolves a 1 solar mass, solar metallicity (Z=0.02) model to an age of 0.8 Gyr using MESA's implementation of the YREC (Yale Rotating Evolution Code) SPOTS formalism introduced by Somers et al. (2020; ApJ).
 
-If possible, articulate the criteria that indicate a passing test and
-include information that would allow someone else to evaluate the test
-status.  Supplementary material like plots, plotting scripts, etc.,
-should go in a subdirectory ``docs``.
+The impedence of the surface flux due to magnetic pressure from starspots is parameterized in the style of an atmospheric boundary modification.
+As first described by Somers et al. (2015; ApJ), the degree of "spottiness" on the stellar surface is characterized using two parameters:
+ * SPOTF (hereafter fspot): a coverage fraction, or "spot filling factor" (in the notation of the YREC documentation); and
 
-For tests that are likely to serve as examples of MESA usage, provide
-additional information about key options or important caveats.  This
-assists users who are adapting the test case to their own science.
+* SPOTX (hereafter xspot): the temperature contrast between the spotted and unspotted regions: xspot = T_spot/T_photosphere.
 
-The README file should end with a line that describes when the most
-recent significant changes to this test case occurred.  This gives
-both users and developers a sense of how "fresh" the information is.
+Currently, x_ctrl(1) corresponds to fspot, and x_ctrl(2) corresponds to xspot. The coverage fraction is set to fspot = 0.34 (for consistency with observations of low-mass stars: Cao et al., 2022) and the temperature contrast is set to xspot = 0.85 (also from fits to observations).
+ 
+Detailed discussion of this functionality can be found in MESA Instrument Paper VI: Starspots
 
-Last-Updated: 2020-10-01 (mesa r14552) by Josiah Schwab
+Last-Updated: 2022-07-28 by Meridith Joyce
 
