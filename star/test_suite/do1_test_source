@@ -82,6 +82,7 @@ do_one rsp_Type_II_Cepheid "good match for period" "final.mod" skip
 
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
+do_one starspots "stop because star_age >= max_age" "final.mod" auto
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
 do_one timing "stop because have dropped below central lower limit for h1" skip skip
 do_one twin_studies "stars have reached stopping age" skip skip
@@ -96,7 +97,7 @@ do_one wd_stable_h_burn "stop because star_mass >= star_mass_max_limit" "final.m
 do_one high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 
 
-return
+# return
 
 
 #  off while testing.    do_one dev_beta_Cepheid_pulses "good match for period" "final.mod" skip   
