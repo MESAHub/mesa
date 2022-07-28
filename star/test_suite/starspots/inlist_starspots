@@ -40,11 +40,6 @@
     ! display on-screen plots
     pgstar_flag = .false.
 
-
-    !use jina
-    set_rates_preference = .true.
-    new_rates_preference = 2
-
     !network 
     change_net = .true.
     new_net_name= 'pp_extras.net' !
