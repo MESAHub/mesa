@@ -25,7 +25,7 @@ add_surface_abundances
 
 pp
 cno
-tri_alfa
+tri_alpha
 !burn_c
 !burn_n
 !burn_o
@@ -44,7 +44,7 @@ center_degeneracy ! the electron chemical potential in units of k*T
 ! center si28
 ! c_log_eps_burn cno
 c_log_eps_burn pp
-c_log_eps_burn tri_alfa
+c_log_eps_burn tri_alpha
 
 conv_mx1_bot_r    ! and lower (interior) radii
 conv_mx1_top_r    ! for a star w/ convective envelope only, these will give you upper
