@@ -245,7 +245,7 @@
             real(dp), intent(in) :: val
             integer, intent(out) :: ierr
             call write1(val,ierr)
-            write(iounit,'(A)')
+            write(iounit,'(A)') ''
          end subroutine write1_eol
 
          subroutine write1(val,ierr)
