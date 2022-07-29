@@ -7722,10 +7722,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, use a time-centered version of ``eps_grav`` and ``eps_grav_composition_term``.
+      ! (Disabled during relax.)
 
       ! ::
 
-    use_time_centered_eps_grav = .false.
+    use_time_centered_eps_grav = .true.
 
 
       ! Gamma_lnS_eps_grav_full_off
