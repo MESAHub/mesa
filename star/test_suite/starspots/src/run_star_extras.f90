@@ -30,7 +30,7 @@
       
 
       implicit none
-      real(dp) :: fspot, xspot, PB_i, Teff_local, sb_sigma
+      real(dp) :: fspot, xspot, PB_i, Teff_local
 
       include "test_suite_extras_def.inc"
 
@@ -40,7 +40,6 @@
    
 
       ! these routines are called by the standard run_star check_model
-     ! contains
       
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -77,17 +76,8 @@
          s% how_many_extra_profile_header_items => how_many_extra_profile_header_items
          s% data_for_extra_profile_header_items => data_for_extra_profile_header_items
 
-
-         if (s% use_other_surface_PT) then
-            s% other_surface_PT => starspot_tweak_PT
-            !s% other_surface_PT => starspot_tweak_PT_Joyce
-         end if
-
-
-         if (s% use_other_mlt_results) then
-           s% other_mlt_results => YREC_spots_other_mlt_results
-         end if
-        
+         s% other_surface_PT => starspot_tweak_PT
+         s% other_mlt_results => YREC_spots_other_mlt_results
 
       end subroutine extras_controls
 
@@ -107,7 +97,7 @@
       integer function extras_start_step(id)
          integer, intent(in) :: id
          integer :: ierr
-         real(dp) :: mu_ideal_gas, R2, R_gas_constant !! pi can be deleted
+         real(dp) :: mu_ideal_gas, R2 !! pi can be deleted
          type (star_info), pointer :: s
          real(dp) :: power_he_burn, power_c_burn, power_neutrinos, &
          center_h1, center_he4, ocz_top_mass, ocz_bot_mass, &
@@ -126,14 +116,12 @@
          ! quantities set here are carried over the course of a timestep, 
          ! AKA all newton iterations
          
-         sb_sigma = boltz_sigma !5.67d-5 !!cgs units
          mu_ideal_gas = s% mu(1)  !1.00794d0 ! for hydrogen, 1 gram per mole
          !write(*,*) 'MESA def, my def: ', s% mu(1), mu_ideal_gas  
-         R_gas_constant = cgas !8.314d7 ! cgs units
 
          R2 = pow2(s%R(1))
-         Teff_local = pow( s%L(1)/(4.0*pi*sb_sigma*R2), 0.25d0)
-         PB_i = (R_gas_constant* s%rho(1)/mu_ideal_gas) * (1.0 - xspot) * Teff_local
+         Teff_local = pow(s%L(1)/(pi4*boltz_sigma*R2), 0.25d0)
+         PB_i = (cgas* s%rho(1)/mu_ideal_gas) * (1.0 - xspot) * Teff_local
 
       end function extras_start_step
 
@@ -179,7 +167,7 @@
          !if (s% star_age >= 10d0) then
          if (.not. s% doing_relax) then
             xspot_of_r = (P - PB_i)/P 
-            gradr_spot = gradr/( fspot*pow( xspot_of_r, 4d0) + 1d0 - fspot)
+            gradr_spot = gradr/( fspot*pow4(xspot_of_r) + 1d0 - fspot)
          else
             gradr_spot = gradr
          end if
@@ -224,9 +212,8 @@
 
             need_atm_Psurf = .true.
             need_atm_Tsurf = .true. 
-            sb_sigma = boltz_sigma
             
-            alp = 1d0 - fspot + fspot*xspot*xspot*xspot*xspot
+            alp = 1d0 - fspot + fspot*pow4(xspot)
 
             ! This is the surface-average value for luminosity
             L_init = s% L(1)
@@ -235,7 +222,7 @@
             s% L(1) = s% L(1) / alp
 
             ! Now, set the Teff. Used in atm table lookup to set boundary conditions
-            s% Teff = pow(s% L(1)/(4._dp*pi*s% r(1)*s% r(1)*sb_sigma), 0.25_dp)
+            s% Teff = pow(s% L(1)/(pi4*s% r(1)*s% r(1)*boltz_sigma), 0.25_dp)
 
             ! Set everything with Lamb.
             call star_get_surf_PT(id, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
@@ -243,7 +230,7 @@
                   lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                   ierr)
 
-            s% Teff = pow(L_init/(4._dp*pi*s% r(1)*s% r(1)*sb_sigma), 0.25_dp)
+            s% Teff = pow(L_init/(pi4*s% r(1)*s% r(1)*boltz_sigma), 0.25_dp)
             s% L(1) = L_init
 
       end subroutine starspot_tweak_PT
