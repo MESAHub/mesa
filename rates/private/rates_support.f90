@@ -67,30 +67,7 @@
          do i = 1,num_reactions
          
             ir = reaction_id(i)
-            !dtab(i) = ye**reaction_ye_rho_exponents(1,ir)
-            select case(reaction_ye_rho_exponents(1,ir))
-            case (0)
-               dtab(i) = 1d0
-            case (1)
-               dtab(i) = ye
-            case (2)
-               dtab(i) = ye*ye
-            end select
-
-            !dtab(i) = dtab(i)*bden**reaction_ye_rho_exponents(2,ir)
-            irho = reaction_ye_rho_exponents(2,ir)
-            select case(irho)
-            case (1)
-               dtab(i) = dtab(i)*bden
-            case (2)
-               dtab(i) = dtab(i)*bden*bden
-            case (3)
-               dtab(i) = dtab(i)*bden*bden*bden
-            case (4)
-               dtab(i) = dtab(i)*bden*bden*bden*bden
-            end select
-
-            ddtab(i) = irho*dtab(i)/bden
+            call get_density_factors(ir, ye, bden, dtab(i),ddtab(i))
             
          end do
          
@@ -186,6 +163,42 @@
          
       
       end subroutine do_get_raw_rates
+
+
+      subroutine get_density_factors(ir, ye, rho, factor, factor_drho)
+         integer,intent(in) :: ir
+         real(dp), intent(in) :: ye,rho
+         real(dp),intent(out) :: factor, factor_drho
+
+         integer :: irho
+
+         !dtab(i) = ye**reaction_ye_rho_exponents(1,ir)
+         select case(reaction_ye_rho_exponents(1,ir))
+         case (0)
+            factor = 1d0
+         case (1)
+            factor = ye
+         case (2)
+            factor = ye*ye
+         end select
+
+         !dtab(i) = dtab(i)*rho**reaction_ye_rho_exponents(2,ir)
+         irho = reaction_ye_rho_exponents(2,ir)
+         select case(irho)
+         case (1)
+            factor = factor*rho
+         case (2)
+            factor = factor*rho*rho
+         case (3)
+            factor = factor*rho*rho*rho
+         case (4)
+            factor = factor*rho*rho*rho*rho
+         end select
+
+         factor_drho = irho*factor/rho
+
+      end subroutine get_density_factors
+
 
       
       subroutine do_make_rate_tables( &

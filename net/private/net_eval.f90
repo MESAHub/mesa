@@ -617,27 +617,20 @@
 
             ! get the reaction rates including screening factors
             if (dbg) write(*,*) 'call screen_net with init=.false.'
-            call screen_net( &
-               g, num_isos, n% y, btemp, bden, logtemp, logrho, .false.,  &
+            call screen_net_with_approx(g, btemp, bden, logtemp, logrho, &
                rate_raw, rate_raw_dT, rate_raw_dRho, &
                rate_screened, rate_screened_dT, rate_screened_dRho, &
-               n% screening_mode, &
+               n% y, n% screening_mode, &
                zbar, abar, z2bar, ye, ierr)
             if (dbg) write(*,*) 'done screen_net with init=.false.'
             if (ierr /= 0) return
+
             if (g% doing_approx21) then
-               num = num_reactions_func(g%add_co56_to_approx21)
-               do i=num_reactions+1,num
-                  rate_screened(i) = rate_raw(i)
-                  rate_screened_dT(i) = rate_raw_dT(i)
-                  rate_screened_dRho(i) = rate_raw_dRho(i)
-               end do
-               do i=1,num
+               do i=1, num_reactions_func(g%add_co56_to_approx21)
                   dratdumdy1(i) = 0d0
                   dratdumdy2(i) = 0d0
                end do           
             end if
-
             
             if (doing_timing) then
                call system_clock(time1)

@@ -977,5 +977,15 @@
 
       end function get_vs_value
 
+      subroutine rates_get_density_factors(ir, ye, rho, factor, factor_drho)
+         use rates_support
+         integer,intent(in) :: ir
+         real(dp), intent(in) :: ye,rho
+         real(dp),intent(out) :: factor, factor_drho
+
+        call get_density_factors(ir, ye, rho, factor, factor_drho)
+
+      end subroutine rates_get_density_factors
+
 
       end module rates_lib

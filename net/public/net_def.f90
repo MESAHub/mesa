@@ -53,11 +53,18 @@
          integer, parameter :: max_kind = general_two_two_kind
          
 
+      !Rate Output
 
+         integer, parameter :: RAW_RATE_OUT = 0
+         integer, parameter :: RAW_RATE_RHO_OUT = 1
+         integer, parameter :: SCREEN_FACTOR_OUT = 2
+         integer, parameter :: SCREENED_RATE_OUT = 3
+         integer, parameter :: EPS_NUC_OUT = 4
+         integer, parameter :: EPS_NUC_RAW_RATE_OUT = 5
+         integer, parameter :: EPS_NEU_OUT = 6
+         integer, parameter :: EPS_NEU_RAW_RATE_OUT = 7
+   
 
-
-
-         
       type Net_General_Info ! things that are constant for the particular net
       ! it is okay to have multiple threads using the same instance of this simultaneously.
 
