@@ -1222,30 +1222,62 @@
          end if
          
          if (c > eps_neu_rate_offset) then 
-             i = c - eps_neu_rate_offset
+             ir = c - eps_neu_rate_offset
+             num_reaction_inputs = get_num_reaction_inputs(ir)
+             do j = 1, num_reaction_inputs
+                 cids(j) = reaction_inputs(j*2, ir)
+             end do
+             r_name = reaction_name(ir)
              val = 0
              do k = 1, s% nz
-                ! rates are in num_reaction order, Q's are in irate order
-                val = 0 ! TODO
+                do j = 1, num_reaction_inputs
+                    xa(j) = s% xa(s% net_iso(cids(j)), k)
+                end do
+                val = val + net_get_reaction_rate_data(EPS_NEU_OUT, s%net_handle, r_name, s% T(k),&
+                    log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+                    s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
+                    xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
              end do
          else if (c > eps_nuc_rate_offset) then
-             do k = 1, s% nz
-                val = 0 ! TODO
+             ir = c - eps_nuc_rate_offset
+             num_reaction_inputs = get_num_reaction_inputs(ir)
+             do j = 1, num_reaction_inputs
+                 cids(j) = reaction_inputs(j*2, ir)
              end do
-         else if (c > screened_rate_offset) then
-             i = c - screened_rate_offset
+             r_name = reaction_name(ir)
              val = 0
              do k = 1, s% nz
-                val = 0 ! TODO
+                do j = 1, num_reaction_inputs
+                    xa(j) = s% xa(s% net_iso(cids(j)), k)
+                end do
+                val = val + net_get_reaction_rate_data(EPS_NUC_OUT, s%net_handle, r_name, s% T(k),&
+                    log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+                    s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
+                    xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
+             end do
+         else if (c > screened_rate_offset) then
+             ir = c - screened_rate_offset
+             num_reaction_inputs = get_num_reaction_inputs(ir)
+             do j = 1, num_reaction_inputs
+                 cids(j) = reaction_inputs(j*2, ir)
+             end do
+             r_name = reaction_name(ir)
+             val = 0
+             do k = 1, s% nz
+                do j = 1, num_reaction_inputs
+                    xa(j) = s% xa(s% net_iso(cids(j)), k)
+                end do
+                val = val + net_get_reaction_rate_data(SCREENED_RATE_OUT, s%net_handle, r_name, s% T(k),&
+                    log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+                    s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
+                    xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
              end do
          else if (c > raw_rate_offset) then
              ir = c - raw_rate_offset
              num_reaction_inputs = get_num_reaction_inputs(ir)
-            
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
              end do
-             
              r_name = reaction_name(ir)
              val = 0
              do k = 1, s% nz

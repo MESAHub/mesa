@@ -313,20 +313,45 @@
          if (c > extra_offset) then
             i = c - extra_offset
             val = s% profile_extra(k,i)
-         ! TODO: implement eps_neu_rate, eps_nuc_rate, screened_rate
          else if (c > eps_neu_rate_offset) then
-            i = c - eps_neu_rate_offset
-            val = 0 ! TODO
+            ir = c - eps_neu_rate_offset
+            num_reaction_inputs = get_num_reaction_inputs(ir)
+            do j = 1, num_reaction_inputs
+                cids(j) = reaction_inputs(j*2, ir)
+                xa(j) = s% xa(s% net_iso(cids(j)), k)
+            end do
+            r_name = reaction_name(ir)
+            val = net_get_reaction_rate_data(EPS_NEU_OUT, s%net_handle, r_name, s% T(k),&
+               log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+               s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
+               xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
          else if (c > eps_nuc_rate_offset) then
-            i = c - eps_nuc_rate_offset
-            val = 0 ! TODO
+            ir = c - eps_nuc_rate_offset
+            num_reaction_inputs = get_num_reaction_inputs(ir)
+            do j = 1, num_reaction_inputs
+                cids(j) = reaction_inputs(j*2, ir)
+                xa(j) = s% xa(s% net_iso(cids(j)), k)
+            end do
+            r_name = reaction_name(ir)
+            val = net_get_reaction_rate_data(EPS_NUC_OUT, s%net_handle, r_name, s% T(k),&
+               log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+               s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
+               xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
          else if (c > screened_rate_offset) then
-            i = c - screened_rate_offset
-            val = 0 ! TODO
+            ir = c - screened_rate_offset
+            num_reaction_inputs = get_num_reaction_inputs(ir)
+            do j = 1, num_reaction_inputs
+                cids(j) = reaction_inputs(j*2, ir)
+                xa(j) = s% xa(s% net_iso(cids(j)), k)
+            end do
+            r_name = reaction_name(ir)
+            val = net_get_reaction_rate_data(SCREENED_RATE_OUT, s%net_handle, r_name, s% T(k),&
+               log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+               s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
+               xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
          else if (c > raw_rate_offset) then
             ir = c - raw_rate_offset
             num_reaction_inputs = get_num_reaction_inputs(ir)
-                        
             do j = 1, num_reaction_inputs
                 cids(j) = reaction_inputs(j*2, ir)
                 xa(j) = s% xa(s% net_iso(cids(j)), k)
@@ -336,7 +361,7 @@
                            log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
                            s% zbar(k), s% abar(k), s% z2bar(k), s% ye(k),&
                            xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
-            
+         
          else if (c > diffusion_D_offset) then
             i = c - diffusion_D_offset
             ii = s% net_iso(i)
