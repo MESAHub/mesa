@@ -477,14 +477,21 @@
 
          subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
             use rates_def, only: reaction_name
+            use net_def
             integer, intent(in) :: offset
             character(len=*) :: prefix
             integer, intent(out) :: ierr
-            integer :: k
+            integer :: k,ir
+            type(Net_General_Info), pointer :: g
             ierr = 0
-            do k=1,s% num_reactions
+
+            call get_net_ptr(s% net_handle, g, ierr)
+            if(ierr/=0) return
+
+            do k=1, s% num_reactions
+               ir = g% reaction_id(k)
                call insert_spec( &
-                  offset + k,trim(prefix)//trim(reaction_name(k)), ierr)
+                  offset + k,trim(prefix)//trim(reaction_name(ir)), ierr)
                if (ierr /= 0) return
             end do
          end subroutine do_rate

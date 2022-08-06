@@ -388,7 +388,7 @@
          character (len=maxlen_profile_column_name), pointer :: &
             extra_col_names(:), extra_header_item_names(:)
          real(dp), pointer :: extra_col_vals(:,:), extra_header_item_vals(:)
-
+   
          include "formats"
 
          dbl_fmt = s% profile_dbl_format
@@ -807,9 +807,14 @@
             logical :: int_flag
             character (len=128) :: col_name
             logical, parameter :: dbg = .false.
+            type(Net_General_Info), pointer :: g
             include 'formats'
             c = s% profile_column_spec(j) + jj
             val = 0; int_val = 0
+
+            call get_net_ptr(s% net_handle, g, ierr)
+            if(ierr/=0) return
+
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') col
             else if (pass == 2) then
@@ -818,15 +823,19 @@
                   col_name = trim(s% profile_extra_name(i))
                else if (c > eps_neu_rate_offset) then
                   i = c - eps_neu_rate_offset
+                  i = g% reaction_id(i)
                   col_name = 'eps_neu_rate_' // trim(reaction_name(i))
                else if (c > eps_nuc_rate_offset) then
                   i = c - eps_nuc_rate_offset
+                  i = g% reaction_id(i)
                   col_name = 'eps_nuc_rate_' // trim(reaction_name(i))
                else if (c > screened_rate_offset) then
                   i = c - screened_rate_offset
+                  i = g% reaction_id(i)
                   col_name = 'screened_rate_' // trim(reaction_name(i))
                else if (c > raw_rate_offset) then
                   i = c - raw_rate_offset
+                  i = g% reaction_id(i)
                   col_name = 'raw_rate_' // trim(reaction_name(i))
                else if (c > diffusion_D_offset) then
                   i = c - diffusion_D_offset

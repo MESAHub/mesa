@@ -865,10 +865,16 @@
          subroutine do_col_pass2(j) ! get the column name
             use colors_lib, only : get_bc_name_by_id
             use rates_def, only: reaction_name
+            use net_def
             integer, intent(in) :: j
             character (len=100) :: col_name
             character (len=10) :: str
             integer :: c, i, ii
+            type(Net_General_Info), pointer :: g
+            ierr = 0
+
+            call get_net_ptr(s% net_handle, g, ierr)
+            if(ierr/=0) return
             c = s% history_column_spec(j)
             if (c > burn_relr_offset) then
                i = c - burn_relr_offset
@@ -936,15 +942,19 @@
                end if
             else if (c > eps_neu_rate_offset) then
                i = c - eps_neu_rate_offset
+               i = g% reaction_id(i)
                col_name = 'eps_neu_rate_' // trim(reaction_name(i))
             else if (c > eps_nuc_rate_offset) then
                i = c - eps_nuc_rate_offset
+               i = g% reaction_id(i)
                col_name = 'eps_nuc_rate_' // trim(reaction_name(i))
             else if (c > screened_rate_offset) then
                i = c - screened_rate_offset
+               i = g% reaction_id(i)
                col_name = 'screened_rate_' // trim(reaction_name(i))
             else if (c > raw_rate_offset) then
                i = c - raw_rate_offset
+               i = g% reaction_id(i)
                col_name = 'raw_rate_' // trim(reaction_name(i))
             else if (c > log_lum_band_offset) then
                i = c - log_lum_band_offset
@@ -1202,6 +1212,7 @@
             min_gamma1, deltam
          real(dp), pointer :: v(:)
          logical :: v_flag
+         type(Net_General_Info), pointer :: g
 
          real(dp) :: xa(max_num_reaction_inputs)
          integer :: cids(max_num_reaction_inputs)
@@ -1213,6 +1224,9 @@
          int_val = 0
          val = 0
          
+         call get_net_ptr(s% net_handle, g, ierr)
+         if(ierr/=0) return
+
          v_flag = .true.
          v(1:nz) => s% v(1:nz)  ! need this outside of conditional to keep compiler happy
          if (s% u_flag) then
@@ -1223,6 +1237,7 @@
          
          if (c > eps_neu_rate_offset) then 
              ir = c - eps_neu_rate_offset
+             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
@@ -1240,6 +1255,7 @@
              end do
          else if (c > eps_nuc_rate_offset) then
              ir = c - eps_nuc_rate_offset
+             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
@@ -1257,6 +1273,7 @@
              end do
          else if (c > screened_rate_offset) then
              ir = c - screened_rate_offset
+             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
@@ -1274,6 +1291,7 @@
              end do
          else if (c > raw_rate_offset) then
              ir = c - raw_rate_offset
+             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)

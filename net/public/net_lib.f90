@@ -1501,12 +1501,12 @@
          use net_approx21, only: num_reactions_func => num_reactions
          integer :: handle
 
-         type (Net_General_Info), pointer  :: g
+         type (Net_General_Info), pointer  :: g => null()
          real(dp) :: btemp, bden, logtemp, logrho
 
          real(dp), dimension(:), pointer :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
+            rate_raw => null(), rate_raw_dT => null(), rate_raw_dRho => null(), &
+            rate_screened => null(), rate_screened_dT => null(), rate_screened_dRho => null()
 
          real(dp) :: zbar, abar, z2bar, ye, y(:), screened_rate
          integer :: screening_mode, ir
@@ -1514,7 +1514,7 @@
          integer, intent(out) :: ierr
 
          integer :: lwork, iwork, num_reactions 
-         real(dp), pointer :: net_work(:)
+         real(dp), pointer :: net_work(:) => null()
          logical, parameter :: dbg=.false.
 
          ierr = 0
@@ -1531,6 +1531,7 @@
          end if
 
          allocate(net_work(lwork))
+
 
          num_reactions =  g% num_reactions     
          if (g% doing_approx21) num_reactions = num_reactions + num_reactions_func(g% add_co56_to_approx21)
@@ -1570,14 +1571,6 @@
             subroutine cleanup()
 
                if(associated(net_work)) deallocate(net_work)
-
-               if(associated(rate_raw)) deallocate(rate_raw)
-               if(associated(rate_raw_dt)) deallocate(rate_raw_dt)
-               if(associated(rate_raw_drho)) deallocate(rate_raw_drho)
-               if(associated(rate_screened)) deallocate(rate_screened)
-               if(associated(rate_screened_dt)) deallocate(rate_screened_dt)
-               if(associated(rate_screened_drho)) deallocate(rate_screened_drho)
-
 
             end subroutine cleanup
 
