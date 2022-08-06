@@ -263,7 +263,7 @@
          
          use net_lib
          use net_def
-         use rates_def, only: reaction_name, get_num_reaction_inputs, reaction_inputs, max_num_reaction_inputs
+         use rates_def
          character(len=100) :: r_name
          
          integer :: ir, num_reaction_inputs
@@ -284,8 +284,12 @@
 
          real(dp) :: xa(max_num_reaction_inputs)
          integer :: cids(max_num_reaction_inputs)
+         type(Net_General_Info), pointer :: g
 
          include 'formats'
+
+         call get_net_ptr(s% net_handle, g, ierr)
+         if(ierr/=0) return
 
          if (s% rotation_flag) then
             full_on = s% D_mix_rotation_max_logT_full_on
@@ -315,6 +319,7 @@
             val = s% profile_extra(k,i)
          else if (c > eps_neu_rate_offset) then
             ir = c - eps_neu_rate_offset
+            ir = g% reaction_id(ir)
             num_reaction_inputs = get_num_reaction_inputs(ir)
             do j = 1, num_reaction_inputs
                 cids(j) = reaction_inputs(j*2, ir)
@@ -327,6 +332,7 @@
                xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
          else if (c > eps_nuc_rate_offset) then
             ir = c - eps_nuc_rate_offset
+            ir = g% reaction_id(ir)
             num_reaction_inputs = get_num_reaction_inputs(ir)
             do j = 1, num_reaction_inputs
                 cids(j) = reaction_inputs(j*2, ir)
@@ -339,6 +345,7 @@
                xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
          else if (c > screened_rate_offset) then
             ir = c - screened_rate_offset
+            ir = g% reaction_id(ir)
             num_reaction_inputs = get_num_reaction_inputs(ir)
             do j = 1, num_reaction_inputs
                 cids(j) = reaction_inputs(j*2, ir)
@@ -351,6 +358,7 @@
                xa, cids, s% rate_factors(ir), s% screening_mode_value, ierr)
          else if (c > raw_rate_offset) then
             ir = c - raw_rate_offset
+            ir = g% reaction_id(ir)
             num_reaction_inputs = get_num_reaction_inputs(ir)
             do j = 1, num_reaction_inputs
                 cids(j) = reaction_inputs(j*2, ir)
