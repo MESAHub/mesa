@@ -491,7 +491,7 @@
             do k=1, s% num_reactions
                ir = g% reaction_id(k)
                call insert_spec( &
-                  offset + k,trim(prefix)//trim(reaction_name(ir)), ierr)
+                  offset + ir,trim(prefix)//trim(reaction_name(ir)), ierr)
                if (ierr /= 0) return
             end do
          end subroutine do_rate
@@ -549,7 +549,7 @@
             return
 
          else if (do1(string, 'screened_rate', screened_rate_offset, do1_rate)) then
-               return
+            return
 
          else if (do1(string, 'eps_nuc_rate', eps_nuc_rate_offset, do1_rate)) then
             return

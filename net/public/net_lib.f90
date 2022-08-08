@@ -1365,11 +1365,12 @@
 
       real(dp) function net_get_reaction_rate_data(output, handle, rate_name, temp, logT, rho, logRho, &
                                                    zbar, abar, z2bar, &
-                                                   ye, y, cids, raw_rate_factor, screening_mode, ierr)
+                                                   ye, x, cids, raw_rate_factor, screening_mode, ierr)
       ! Note these do not take into account things like eps_{nuc,neu}_factors
          use rates_def
          use net_def
          use rates_lib
+         use net_eval, only: set_molar_abundances
          integer, intent(in) :: output ! Output type see rates_def *_OUT options 
          integer, intent(in) :: handle ! net_handle
          character(len=*),intent(in) :: rate_name ! Reaction rate name i.e r_c12_ag_o16
@@ -1377,7 +1378,8 @@
          real(dp), intent(in) :: logT, logRho ! log Temperature K, log density g/cm^3
          real(dp), intent(in) :: zbar, abar, z2bar ! average charge, mass, and charge^2
          real(dp), intent(in) :: ye ! Electron fraction
-         real(dp), dimension(:), intent(in) :: y ! Abundance of reaction inputs
+         real(dp), dimension(:), intent(in) :: x ! Abundance of reaction inputs
+         real(dp), dimension(size(x)) :: y ! Molar fraction
          integer, dimension(:), intent(in) :: cids ! chem_iso ids of inputs, must be in same order as xa
          real(dp), intent(in) :: raw_rate_factor ! Scalar to mulply rate by
          integer, intent(in) :: screening_mode ! Screening mode from 
@@ -1386,6 +1388,16 @@
          integer :: ir
          type(t_factors),target :: tf_t
          type(t_factors),pointer :: tf
+
+         type (Net_General_Info), pointer  :: g => null()
+
+
+         ierr = 0
+         call get_net_ptr(handle, g, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for net_get -- did you call alloc_net_handle?'
+            return
+         end if
 
          tf => tf_t
          call eval_tfactors(tf, logT, temp)
@@ -1397,9 +1409,15 @@
             return 
          end if
 
-         if(size(y) /= size(cids)) then
+         if(size(x) /= size(cids)) then
             ierr = -1
-            write(*,*) "Size mismatch in arrays xa=",size(y)," isos=",size(cids)
+            write(*,*) "Size mismatch in arrays xa=",size(x)," isos=",size(cids)
+            return 
+         end if
+         call set_molar_abundances(cids, get_num_reaction_inputs(ir) , x, y, .false., ierr)
+         if(ierr /= 0) then
+            ierr = -1
+            write(*,*) "Bad molar abundances"
             return 
          end if
 
@@ -1457,7 +1475,7 @@
                   iso = reaction_inputs(i+1,ir) ! chem_id
                   do k=1,size(cids)
                      if(iso == cids(k)) then
-                        get_raw_rho = get_raw_rho * pow(y(k),num)
+                        get_raw_rho = get_raw_rho * pow(y(k),num)/factorial(num)
                         exit
                      end if
                   end do
@@ -1488,6 +1506,24 @@
                get_screen_factor = screen_rate / get_raw_rho()
 
             end function get_screen_factor
+
+            integer function factorial(n)
+               integer :: n
+
+               if (n==1) then
+                  factorial = 1
+               else if(n==2) then
+                  factorial = 2
+               else if(n==3) then
+                  factorial = 6
+               else if(n==4) then
+                  factorial = 16
+               else
+                  write(*,*) "Bad factorial"
+                  ierr = -1
+               end if
+
+            end function factorial
 
 
       end function net_get_reaction_rate_data

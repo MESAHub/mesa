@@ -215,7 +215,7 @@
          end if
 
          if (dbg) write(*,*) 'call set_molar_abundances'
-         call set_molar_abundances(g, num_isos, x, n% y, dbg, ierr)
+         call set_molar_abundances(g% chem_id, num_isos, x, n% y, dbg, ierr)
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in set_molar_abundances'
             return
@@ -731,51 +731,28 @@
       end subroutine get_T_limit_factor
 
          
-      subroutine set_molar_abundances(g, num_isos, x, y, dbg, ierr)
-         type (Net_General_Info), pointer :: g
+      subroutine set_molar_abundances(chem_id, num_isos, x, y, dbg, ierr)
+         integer, intent(in) :: chem_id(:)
          integer, intent(in) :: num_isos
          real(dp), intent(in) :: x(:)
          real(dp), intent(inout) :: y(:)
          logical, intent(in) :: dbg
          integer, intent(out) :: ierr
-         
-         real(dp) :: sum
-         integer :: i, ci
+                  integer :: i, ci
          character (len=256) :: message
          include 'formats'
-         sum = 0
-         do i = 1, g% num_isos
-            sum = sum + x(i)
-            ci = g% chem_id(i)
+         do i = 1, num_isos
+            ci = chem_id(i)
             if (ci <= 0) then
                write(*,*) 'problem in set_molar_abundances'
                write(*,*) 'i', i
-               write(*,*) 'g% num_isos', g% num_isos
-               write(*,*) 'g% chem_id(i)', g% chem_id(i)
+               write(*,*) 'num_isos', num_isos
+               write(*,*) 'chem_id(i)', chem_id(i)
                call mesa_error(__FILE__,__LINE__,'set_molar_abundances') 
             end if
             y(i) = min(1d0, max(x(i), 0d0)) / chem_isos% Z_plus_N(ci)
          enddo
          
-         
-         
-         return      ! let it go even with bad xsum.
-         
-         
-         
-   
-         if (abs(sum - 1d0) > 1d-2) then
-            ierr = -1
-            if (dbg) then
-               do i = 1, g% num_isos
-                  ci = g% chem_id(i)
-                  write(*,2) chem_isos% name(ci), i, x(i)
-               end do
-               write(*,1) 'abs(sum - 1d0)', abs(sum - 1d0)
-            end if
-            return
-         end if
-      
       end subroutine set_molar_abundances
 
       

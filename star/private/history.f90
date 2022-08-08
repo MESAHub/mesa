@@ -942,19 +942,15 @@
                end if
             else if (c > eps_neu_rate_offset) then
                i = c - eps_neu_rate_offset
-               i = g% reaction_id(i)
                col_name = 'eps_neu_rate_' // trim(reaction_name(i))
             else if (c > eps_nuc_rate_offset) then
                i = c - eps_nuc_rate_offset
-               i = g% reaction_id(i)
                col_name = 'eps_nuc_rate_' // trim(reaction_name(i))
             else if (c > screened_rate_offset) then
                i = c - screened_rate_offset
-               i = g% reaction_id(i)
                col_name = 'screened_rate_' // trim(reaction_name(i))
             else if (c > raw_rate_offset) then
                i = c - raw_rate_offset
-               i = g% reaction_id(i)
                col_name = 'raw_rate_' // trim(reaction_name(i))
             else if (c > log_lum_band_offset) then
                i = c - log_lum_band_offset
@@ -1237,7 +1233,6 @@
          
          if (c > eps_neu_rate_offset) then 
              ir = c - eps_neu_rate_offset
-             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
@@ -1255,7 +1250,6 @@
              end do
          else if (c > eps_nuc_rate_offset) then
              ir = c - eps_nuc_rate_offset
-             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
@@ -1273,7 +1267,6 @@
              end do
          else if (c > screened_rate_offset) then
              ir = c - screened_rate_offset
-             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
@@ -1291,7 +1284,6 @@
              end do
          else if (c > raw_rate_offset) then
              ir = c - raw_rate_offset
-             ir = g% reaction_id(ir)
              num_reaction_inputs = get_num_reaction_inputs(ir)
              do j = 1, num_reaction_inputs
                  cids(j) = reaction_inputs(j*2, ir)
