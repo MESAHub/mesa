@@ -1,6 +1,6 @@
 ---
 name: Other issues
-about: Things that are not about getting models to work or issues with inlists
+about: Issues that are not about installing MESA, getting models to work or problems with inlists
 title: ''
 labels: ''
 assignees: ''
