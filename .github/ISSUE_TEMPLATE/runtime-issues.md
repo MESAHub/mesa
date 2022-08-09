@@ -27,8 +27,7 @@ Include any plots you made to try and diagnose what went wrong.
 Also include any warnings or error messages MESA produced.
 
 **Inlists and models**
-Try to create the smallest inlist that reproduces your problem
-and copy it into a code block here, e.g.
+Try to create the smallest inlist that reproduces your problem and copy it into a code block here, e.g.
 ```f90
 &controls
 /
