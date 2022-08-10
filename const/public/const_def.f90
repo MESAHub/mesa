@@ -96,7 +96,6 @@
       real(dp), parameter :: dayyer = 365.25d0 ! days per (Julian) year
       real(dp), parameter :: secyer = secday*dayyer ! seconds per year
       real(dp), parameter :: secday = 24*60*60  ! seconds in a day
-      real(dp), parameter :: secyer = secday*dayyer ! seconds per year
       real(dp), parameter :: ly = clight*secyer ! light year (cm)
 
 ! inexact but very well measured physical constants
