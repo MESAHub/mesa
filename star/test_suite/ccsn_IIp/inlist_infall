@@ -10,7 +10,9 @@
 
   set_initial_age = .true.
   initial_age = 0
-  
+
+  this is not valid inlist content
+
   set_initial_model_number = .true.
   initial_model_number = 0
   
