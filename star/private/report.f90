@@ -226,7 +226,7 @@
          ! s% time is in seconds
          s% star_age = s% time/secyer
          s% time_years = s% time/secyer
-         s% time_days = s% time/dble(60*60*24)
+         s% time_days = s% time/secday
          if ( s% model_number <= 0 ) then
             s% star_age = 0d0
             s% time_days = 0d0
@@ -236,7 +236,7 @@
          ! s% dt is in seconds
          s% time_step = s% dt/secyer         ! timestep in years
          s% dt_years = s% dt/secyer
-         s% dt_days = s% dt/dble(60*60*24)
+         s% dt_days = s% dt/secday
          
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units

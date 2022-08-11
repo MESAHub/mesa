@@ -113,7 +113,7 @@
          end if
          spin_period = 2*pi/s% omega_avg_surf
          i = 0
-         i=i+1; names(i) = 'spin_period_days'; vals(i) = spin_period/(60d0*60d0*24d0)
+         i=i+1; names(i) = 'spin_period_days'; vals(i) = spin_period/secday
          i=i+1; names(i) = 'spin_period_hr'; vals(i) = spin_period/(60d0*60d0)
          i=i+1; names(i) = 'spin_period_minutes'; vals(i) = spin_period/60d0
          i=i+1; names(i) = 'spin_orital_period_ratio'; vals(i) = spin_period/b% period

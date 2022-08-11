@@ -933,10 +933,10 @@
 
          if (b% job% change_period_eccentricity .or. &
             (b% job% change_initial_period_eccentricity .and. .not. restart)) then
-            if (b% period /= b% job% new_period*60d0*60d0*24d0 .or. &
+            if (b% period /= b% job% new_period*secday .or. &
                   b% eccentricity /= b% job% new_eccentricity) then
                call set_period_eccentricity(binary_id, &
-                  b% job% new_period*60d0*60d0*24d0, b% job% new_eccentricity, ierr)
+                  b% job% new_period*secday, b% job% new_eccentricity, ierr)
                if (ierr /= 0) then
                   write(*,*) "error in set_period_eccentricity"
                   return
