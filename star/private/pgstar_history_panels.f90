@@ -675,7 +675,7 @@
          else if (hist_xaxis_name == 'star_age' .and. automatic_star_age_units) then
             if (s% star_age > 1d0) then
                hist_xaxis_name = 'star_age_yr'
-            else if (s% star_age*secyer > 24*60*60) then
+            else if (s% star_age*secyer > secday) then
                hist_xaxis_name = 'star_age_day'
             else if (s% star_age*secyer > 60*60) then
                hist_xaxis_name = 'star_age_hr'

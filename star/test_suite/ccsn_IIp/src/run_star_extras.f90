@@ -359,7 +359,7 @@
       subroutine create_sedona_Lbol_file()
       
          integer, parameter :: num_times = 205, num_freq = 2999, &   ! from 1st line of sedona data
-            secperday = 24*60*60, io1 = 34, io2 = 35
+            io1 = 34, io2 = 35
          integer :: j, k, ierr, n
          real(dp) :: Lbol, time0, freq_i00, Lnu_i00, time, freq_im1, Lnu_im1
          character (len=256) :: file_in, file_out
@@ -399,7 +399,7 @@
                Lbol = Lbol + 0.5d0*(Lnu_i00 + Lnu_im1)*(freq_i00 - freq_im1)
             end do
             if (Lbol > 0d0) then
-               write(io2,'(f8.2,f10.4)') time0/secperday, log10(Lbol)
+               write(io2,'(f8.2,f10.4)') time0/secday, log10(Lbol)
                n = n+1
             end if
          end do
@@ -905,7 +905,7 @@
          end do
          open(newunit=iounit,file='tau100_L.data', &
             status="unknown",form='formatted',position="append")
-         write(iounit,*) s% time/(24*60*60), vals(5), vals(6)
+         write(iounit,*) s% time/secday, vals(5), vals(6)
          close(iounit)
          
       end subroutine data_for_extra_history_columns
