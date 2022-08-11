@@ -751,15 +751,16 @@
          if (dbg) write(*,1) 'log10(kap)', log10(kap)
          
          if (is_bad(kap)) then
-            ierr = -1; return
+            ierr = -1
             write(*,1) 'kap', kap
             call mesa_error(__FILE__,__LINE__,'Get_kap_Results')
+            return
          end if
 
          dlnkap_dlnRho = (kap/kap_rad) * dlnkap_rad_dlnRho + (kap/kap_ec) * dlnkap_ec_dlnRho
 
          if (is_bad(dlnkap_dlnRho)) then
-            ierr = -1; return
+            ierr = -1
             write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
             write(*,1) 'kap', kap
             write(*,1) 'dkap_dlnRho', kap * dlnkap_dlnRho
@@ -768,12 +769,13 @@
             write(*,1) 'kap_rad', kap_rad
             write(*,1) 'kap_ec', kap_ec
             call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
+            return
          end if
          
          dlnkap_dlnT = (kap/kap_rad) * dlnkap_rad_dlnT + (kap/kap_ec) * dlnkap_ec_dlnT
          
          if (is_bad(dlnkap_dlnT)) then
-            ierr = -1; return
+            ierr = -1
             write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
             write(*,1) 'kap', kap
             write(*,1) 'dkap_dlnT', kap * dlnkap_dlnT
@@ -782,6 +784,7 @@
             write(*,1) 'kap_rad', kap_rad
             write(*,1) 'kap_ec', kap_ec
             call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
+            return
          end if
 
          if (dbg) write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
