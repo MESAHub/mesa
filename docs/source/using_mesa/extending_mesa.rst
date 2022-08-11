@@ -107,8 +107,9 @@ User-specified inlist controls
 
 There is one set of controls that will prove useful time and time
 again when using ``run_star_extras.f90`` and that is ``x_ctrl``,
-``x_integer_ctrl``, and ``x_logical_ctrl``.  These are arrays (of length
-100 by default) of double precision, integer, and boolean values.  You
+``x_integer_ctrl``, ``x_logical_ctrl``, and ``x_character_ctrl``.  
+These are arrays (of length 100 by default) of double precision, 
+integer, boolean, and character values.  You
 can set the elements in your inlists::
 
   &controls
@@ -116,6 +117,7 @@ can set the elements in your inlists::
     x_ctrl(2) = 2.78
     x_integer_ctrl(1) = 42
     x_logical_ctrl(1) = .true.
+    x_character_ctrl(1) = 'hello world'
   / ! end of controls inlist
 
 and access them later on as part of the star structure (i.e., ``s%

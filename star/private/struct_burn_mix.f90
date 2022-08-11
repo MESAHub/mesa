@@ -88,8 +88,8 @@
          
          if (s% op_split_burn) then
             do k=1,nz
+               s% burn_num_iters(k) = 0
                if (s% T(k) >= s% op_split_burn_min_T) then
-                  s% burn_num_iters(k) = 0
                   s% eps_nuc(k) = 0d0
                   s% d_epsnuc_dlnd(k) = 0d0
                   s% d_epsnuc_dlnT(k) = 0d0

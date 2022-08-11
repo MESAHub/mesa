@@ -409,6 +409,10 @@
             call get_environment_variable( &
                "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)         
 
+         if (len_trim(s% emesh_data_for_op_mono_path) == 0) &
+            call get_environment_variable( &
+               "MESA_OP_MONO_MASTER_GRID", s% emesh_data_for_op_mono_path)
+
          s% extras_startup => null_extras_startup
          s% extras_check_model => null_extras_check_model
          s% extras_start_step => null_extras_start_step
