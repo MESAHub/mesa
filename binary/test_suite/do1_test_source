@@ -1,4 +1,3 @@
-
 do_one double_bh "Terminate due to helium depletion" "final.mod" x700
 do_one wind_fed_bhhmxb "Properly tested sub and super Eddington phases" "final.mod" auto
 do_one star_plus_point_mass "termination code: xa_central_lower_limit" "final.mod" x100

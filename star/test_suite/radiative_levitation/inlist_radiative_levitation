@@ -75,7 +75,7 @@
       photo_interval = 10
       profile_interval = 10
       history_interval = 10
-      terminal_interval = 10 
+      terminal_interval = 10
       write_header_frequency = 10      
       
       dH_div_H_limit_min_H = 1d99 ! disable this
@@ -163,7 +163,7 @@
          ! use environment variables for these
          !op_mono_data_path = ...
          !op_mono_data_cache_filename = ...
-         
+
          high_logT_op_mono_full_off = 6.3d0
          high_logT_op_mono_full_on = 5.8d0
          
