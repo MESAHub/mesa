@@ -194,57 +194,51 @@
          
          if (zlog <= logzs(1)) then ! use 1st
             call get1(1, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
-            kap = exp10(logK)
-            return
-         end if
-         
-         if (zlog >= logzs(num_logzs)) then ! use last
+         else if (zlog >= logzs(num_logzs)) then ! use last
             call get1(num_logzs, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
-            kap = exp10(logK)
-            return
-         end if
-         
-         iz1 = -1
-         do iz = 2, num_logzs
-            if (zlog >= logzs(iz-1) .and. zlog <= logzs(iz)) then
-               iz1 = iz-1; iz2 = iz; exit
-            end if
-         end do
-         if (iz1 < 0) then
-            write(*,2) 'num_logzs', num_logzs
-            do iz = 1, num_logzs
-               write(*,2) 'logzs(iz)', iz, logzs(iz)
+         else ! interpolate
+            iz1 = -1
+            do iz = 2, num_logzs
+               if (zlog >= logzs(iz-1) .and. zlog <= logzs(iz)) then
+                  iz1 = iz-1; iz2 = iz; exit
+               end if
             end do
-            write(*,1) 'zlog', zlog
-            write(*,*) 'confusion in do_electron_conduction'
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         call get1(iz1, logK1, dlogK1_dlogRho, dlogK1_dlogT, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'interp failed for iz1 in do_electron_conduction', iz1, logRho, logT
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         call get1(iz2, logK2, dlogK2_dlogRho, dlogK2_dlogT, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'interp failed for iz2 in do_electron_conduction', iz2, logRho, logT
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         ! linear interpolation in zlog
-         alfa = (zlog - logzs(iz1)) / (logzs(iz2) - logzs(iz1))
-         beta = 1d0-alfa
-         logK = alfa*logK2 + beta*logK1
-         if (clipped_logRho) then
-            dlogK_dlogRho = 0
-         else
-            dlogK_dlogRho = alfa*dlogK2_dlogRho + beta*dlogK1_dlogRho
-         end if
-         if (clipped_logT) then
-            dlogK_dlogT = 0
-         else
-            dlogK_dlogT = alfa*dlogK2_dlogT + beta*dlogK1_dlogT
+            if (iz1 < 0) then
+               write(*,2) 'num_logzs', num_logzs
+               do iz = 1, num_logzs
+                  write(*,2) 'logzs(iz)', iz, logzs(iz)
+               end do
+               write(*,1) 'zlog', zlog
+               write(*,*) 'confusion in do_electron_conduction'
+               call mesa_error(__FILE__,__LINE__)
+            end if
+            
+            call get1(iz1, logK1, dlogK1_dlogRho, dlogK1_dlogT, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'interp failed for iz1 in do_electron_conduction', iz1, logRho, logT
+               call mesa_error(__FILE__,__LINE__)
+            end if
+            
+            call get1(iz2, logK2, dlogK2_dlogRho, dlogK2_dlogT, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'interp failed for iz2 in do_electron_conduction', iz2, logRho, logT
+               call mesa_error(__FILE__,__LINE__)
+            end if
+            
+            ! linear interpolation in zlog
+            alfa = (zlog - logzs(iz1)) / (logzs(iz2) - logzs(iz1))
+            beta = 1d0-alfa
+            logK = alfa*logK2 + beta*logK1
+            if (clipped_logRho) then
+               dlogK_dlogRho = 0
+            else
+               dlogK_dlogRho = alfa*dlogK2_dlogRho + beta*dlogK1_dlogRho
+            end if
+            if (clipped_logT) then
+               dlogK_dlogT = 0
+            else
+               dlogK_dlogT = alfa*dlogK2_dlogT + beta*dlogK1_dlogT
+            end if
          end if
 
          ! chi = thermal conductivity, = 10**logK (cgs units)
