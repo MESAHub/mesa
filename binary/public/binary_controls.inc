@@ -96,7 +96,7 @@
       logical :: include_accretor_mb
       real(dp) :: magnetic_braking_gamma
       logical :: keep_mb_on
-      real(dp) :: jdot_mb_min_qconv_env, jdot_mb_max_qconv_env, jdot_mb_max_qrad_core, &
+      real(dp) :: jdot_mb_min_qconv_env, jdot_mb_max_qconv_env, jdot_mb_max_qconv_core, &
          jdot_mb_qlim_for_check_rad_core, jdot_mb_qlim_for_check_conv_env
       logical :: jdot_mb_scale_for_low_qconv_env
       real(dp) :: jdot_mb_mass_frac_for_scale
