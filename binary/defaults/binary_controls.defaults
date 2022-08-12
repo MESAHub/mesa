@@ -943,14 +943,14 @@
 
 ! Conditions for magnetic braking to operate. Magnetic braking is
 ! turned off if any of these do not apply.
-! The mass fraction of the convective envelope has to be > jdot_mb_min_qconv_env
-! The mass fraction of the convective envelope has to be < jdot_mb_max_qconv_env
-! The mass fraction of the radiative core has to be < jdot_mb_max_qconv_core
+! The mass fraction of the convective envelope has to be > jdot_mb_min_qconv_env.
+! The mass fraction of the convective envelope has to be < jdot_mb_max_qconv_env.
+! The mass fraction of the convective core has to be < jdot_mb_max_qconv_core.
 ! Here by mass fraction we refer to the mass of the respective zone divided by the
 ! total mass of the star. To compute the mass in the envelope we add all convective
 ! layers down to jdot_mb_qlim_for_check_conv_env, and keep adding layers downwards
 ! until we reach a non-convective zone. This is because the very outermost cell is
-! likely radiative. A simular thing is done for the core with jdot_mb_qlim_for_check_rad_core.
+! likely radiative. A similar thing is done for the core with jdot_mb_qlim_for_check_rad_core.
 ! For full details check binary_jdot.f90.
 
 ! ::
