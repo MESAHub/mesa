@@ -957,7 +957,7 @@
 
     jdot_mb_min_qconv_env = 1d-6
     jdot_mb_max_qconv_env = 0.99d0
-    jdot_mb_max_qrad_core = 1d-2
+    jdot_mb_max_qconv_core = 1d-2
     jdot_mb_qlim_for_check_rad_core = 1d-3
     jdot_mb_qlim_for_check_conv_env = 0.999d0
 
