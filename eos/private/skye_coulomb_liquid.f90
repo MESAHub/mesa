@@ -124,6 +124,13 @@ module skye_coulomb_liquid
       type(auto_diff_real_2var_order3) :: FMIX
 
       real(dp), parameter :: TINY = 1d-9
+
+
+      ! Skip balls of neutrons
+      if(zmean==0) then
+         FMIX=0d0
+         return
+      end if
       
       GAMImean=GAME*Z53
       if (RS.lt.TINY) then ! OCP
