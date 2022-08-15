@@ -122,6 +122,9 @@
          if (z1 <= 0d0 .or. z2  <= 0d0) then
             return
          end if
+
+         ! No free charges to screen things
+         if(sc% zbar<=1d0) return
          
    
          rho = sc% den
