@@ -25,11 +25,16 @@ else
 GYRE_SRCS = gyre_support_stub.f90
 endif
 
+ifeq ($(USE_ADIPLS),YES)
+ADIPLS_SRCS = adipls_support.f90 adipls_support_procs.f90
+else
+ADIPLS_SRCS = adipls_support_stub.f90 adipls_support_procs_stub.f90
+endif
+
 
 SRCS = \
 	astero_def.f90 \
-	adipls_support.f90 \
-	adipls_support_procs.f90 \
+	$(ADIPLS_SRCS) \
 	$(GYRE_SRCS) \
 	astero_support.f90 \
 	$(PGSTAR_SRCS) \
@@ -149,4 +154,10 @@ endif
 ifeq ($(USE_PGSTAR),NO)
 pgstar_astero_plots.mod : pgstar_astero_plots_stub.o
 	@true
+endif
+
+ifeq ($(USE_ADIPLS),NO)
+adipls_support.mod : adipls_support_stub.o
+	@true
+adipls_support_procs.mod : adipls_support_procs_stub.o
 endif
