@@ -101,11 +101,13 @@ module skye_thermodynamics
    !! @param d_dlnRho The derivative of the EOS return vector with respect to lnRho.
    !! @param d_dlnT The derivative of the EOS return vector with respect to lnT.
    subroutine pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele, abar, zbar, &
-                                          phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT)
+                                          phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT, ierr)
       use eos_def
       type(auto_diff_real_2var_order3), intent(in) :: F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele
       type(auto_diff_real_2var_order3), intent(in) :: phase, latent_ddlnT, latent_ddlnRho
       real(dp), intent(in) :: abar, zbar
+
+      integer, intent(out) :: ierr
 
       ! Intermediates
       type(auto_diff_real_2var_order3) :: srad, erad, prad, sgas, egas, pgas, p, e, s
@@ -117,6 +119,8 @@ module skye_thermodynamics
       real(dp), intent(inout) :: d_dlnRho(nv)
       real(dp), intent(inout) :: d_dlnT(nv)
 
+      ierr = 0
+
       ! Form the electron-positron-ion gas plus Coulomb corrections
       F_gas = F_ideal_ion + F_coul + F_ele
 
@@ -126,6 +130,11 @@ module skye_thermodynamics
       p = prad + pgas
       e = erad + egas
       s = srad + sgas
+
+      if(s<0 .or. e<0 .or. pgas <0 ) then
+         ierr = -1
+         return
+      end if
 
       lnS = log(s)
       lnE = log(e)
