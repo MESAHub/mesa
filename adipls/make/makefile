@@ -8,5 +8,7 @@ QUIET = yes
 export QUIET
 
 all clean install:
+ifeq ($(USE_ADIPLS),YES)
 	@make -f makefile_adipls $@
 	@make -f makefile_adiajobs $@
+endif

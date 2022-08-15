@@ -119,11 +119,12 @@
          
          else if (oscillation_code == 'adipls') then 
 
-            call run_adipls(s, .true., .false., &
-               add_center_point, keep_surface_point, add_atmosphere, &
-               do_redistribute_mesh, ierr)
-            if (ierr /= 0) return
-            
+            if(adipls_is_enabled) then
+               call run_adipls(s, .true., .false., &
+                  add_center_point, keep_surface_point, add_atmosphere, &
+                  do_redistribute_mesh, ierr)
+               if (ierr /= 0) return
+            end if
          else
          
             write(*,'(a)') 'invalid oscillation_code: ' // trim(oscillation_code)
