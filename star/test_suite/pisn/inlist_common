@@ -197,6 +197,7 @@
       op_split_burn_eps = 1d-5
       op_split_burn_odescal = 1d-5
 
+      calculate_brunt_N2= .false.
 ! output
       gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
 
