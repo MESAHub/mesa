@@ -34,6 +34,10 @@
 
    x_logical_ctrl(2) = .true.
 
+   ! See Farag et al 2022
+   set_min_d_mix=.true.
+   min_d_mix=1d-2
+
 / ! end of controls namelist
 
 &pgstar
