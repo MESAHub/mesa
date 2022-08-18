@@ -265,37 +265,23 @@
             s% dynamic_timescale = 2*pi*sqrt(radius*radius*radius/(s% cgrav(1)*mstar))
          end if
 
-         if (h1 /= 0) then
-            s% center_h1 = center_avg_x(s,h1)
-            s% surface_h1 = surface_avg_x(s,h1)
-         end if
-         if (he3 /= 0) then
-            s% center_he3 = center_avg_x(s,he3)
-            s% surface_he3 = surface_avg_x(s,he3)
-         end if
-         if (he4 /= 0) then
-            s% center_he4 = center_avg_x(s,he4)
-            s% surface_he4 = surface_avg_x(s,he4)
-         end if
-         if (c12 /= 0) then
-            s% center_c12 = center_avg_x(s,c12)
-            s% surface_c12 = surface_avg_x(s,c12)
-         end if
-         if (n14 /= 0) then
-            s% center_n14 = center_avg_x(s,n14)
-            s% surface_n14 = surface_avg_x(s,n14)
-         end if
-         if (o16 /= 0) then
-            s% center_o16 = center_avg_x(s,o16)
-            s% surface_o16 = surface_avg_x(s,o16)
-         end if
-         if (ne20 /= 0) then
-            s% center_ne20 = center_avg_x(s,ne20)
-            s% surface_ne20 = surface_avg_x(s,ne20)
-         end if
-         if (si28 /= 0) then
-            s% center_si28 = center_avg_x(s,si28)
-         end if
+         ! center_avg_x and surface_avg_x check if the species is not in the net
+         ! and set's the values to 0 if so. So dont check species here. 
+         s% center_h1 = center_avg_x(s,h1)
+         s% surface_h1 = surface_avg_x(s,h1)
+         s% center_he3 = center_avg_x(s,he3)
+         s% surface_he3 = surface_avg_x(s,he3)
+         s% center_he4 = center_avg_x(s,he4)
+         s% surface_he4 = surface_avg_x(s,he4)
+         s% center_c12 = center_avg_x(s,c12)
+         s% surface_c12 = surface_avg_x(s,c12)
+         s% center_n14 = center_avg_x(s,n14)
+         s% surface_n14 = surface_avg_x(s,n14)
+         s% center_o16 = center_avg_x(s,o16)
+         s% surface_o16 = surface_avg_x(s,o16)
+         s% center_ne20 = center_avg_x(s,ne20)
+         s% surface_ne20 = surface_avg_x(s,ne20)
+         s% center_si28 = center_avg_x(s,si28)
 
          ! FYI profile stuff
          do k=1,nz
