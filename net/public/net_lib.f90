@@ -1364,24 +1364,31 @@
       
 
       real(dp) function net_get_reaction_rate_data(output, handle, rate_name, temp, logT, rho, logRho, &
-                                                   zbar, abar, z2bar, &
-                                                   ye, x, cids, raw_rate_factor, screening_mode, ierr)
+                                                   zbar, abar, z2bar, eta, &
+                                                   ye, x, cids, &
+                                                   raw_rate_factor, weak_rate_factor,&
+                                                   screening_mode, ierr)
       ! Note these do not take into account things like eps_{nuc,neu}_factors
          use rates_def
          use net_def
          use rates_lib
          use net_eval, only: set_molar_abundances
+         use net_approx21, only: &
+            approx21_pa_pg_fractions, approx21_weak_rates,  num_reactions_func => num_reactions
+         use net_screen, only: screen_net_with_approx
          integer, intent(in) :: output ! Output type see rates_def *_OUT options 
          integer, intent(in) :: handle ! net_handle
          character(len=*),intent(in) :: rate_name ! Reaction rate name i.e r_c12_ag_o16
          real(dp), intent(in) :: temp, rho ! Temperature K, density g/cm^3
          real(dp), intent(in) :: logT, logRho ! log Temperature K, log density g/cm^3
          real(dp), intent(in) :: zbar, abar, z2bar ! average charge, mass, and charge^2
+         real(dp), intent(in) :: eta
          real(dp), intent(in) :: ye ! Electron fraction
          real(dp), dimension(:), intent(in) :: x ! Abundance of reaction inputs
          real(dp), dimension(size(x)) :: y ! Molar fraction
          integer, dimension(:), intent(in) :: cids ! chem_iso ids of inputs, must be in same order as xa
          real(dp), intent(in) :: raw_rate_factor ! Scalar to mulply rate by
+         real(dp), intent(in) :: weak_rate_factor ! Scalar to mulply weak rate by
          integer, intent(in) :: screening_mode ! Screening mode from 
          integer,intent(inout) :: ierr  ! Error
 
@@ -1390,7 +1397,7 @@
          type(t_factors),pointer :: tf
 
          type (Net_General_Info), pointer  :: g => null()
-
+         integer :: num_reactions
 
          ierr = 0
          call get_net_ptr(handle, g, ierr)
@@ -1421,15 +1428,19 @@
             return 
          end if
 
+         num_reactions = g% num_reactions
+         if (g% doing_approx21) num_reactions = num_reactions_func(g% add_co56_to_approx21)
+
+
          select case(output)
-            case(RAW_RATE_OUT) ! reaction/s/density of inputs
+            case(RAW_RATE_OUT) ! reaction/s (No composition term)
                net_get_reaction_rate_data = get_raw()
-            case(RAW_RATE_RHO_OUT) ! reaction/s
+            case(RAW_RATE_RHO_OUT) ! reaction/s (With composition)
                net_get_reaction_rate_data = get_raw_rho()
             case(SCREEN_FACTOR_OUT) ! Scalar
                net_get_reaction_rate_data = get_screen_factor()
             case(SCREENED_RATE_OUT) ! screening * raw_rate (reactions/s)
-               net_get_reaction_rate_data = get_screened()
+               net_get_reaction_rate_data = get_screened_rho()
             case(EPS_NUC_OUT) ! MeV (nuclear energy per reaction) maybe negative
                net_get_reaction_rate_data = std_reaction_Qs(ir)
             case(EPS_NUC_RAW_RATE_OUT) ! MeV * raw_rate
@@ -1447,11 +1458,36 @@
          contains
 
             real(dp) function get_raw()
-               ! Get raw_rate, this is reaction/s/density of inputs
-               call get_raw_rate(ir, temp, tf, get_raw, ierr)
+               real(dp),allocatable,dimension(:) ::  rate_raw, rate_raw_dT, &
+                                                rate_raw_dRho,rate_factors
+
+               allocate(rate_raw(num_reactions), rate_raw_dT(num_reactions), &
+                  rate_raw_dRho(num_reactions),rate_factors(num_reactions))
+
+               rate_factors = raw_rate_factor
+
+               call eval_using_rate_tables( &
+                  g% num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
+                  ye, logt, temp, rho, rate_factors, g% logttab, &
+                  rate_raw, rate_raw_dT, rate_raw_dRho, ierr) 
                if (ierr/=0) return
 
-               get_raw = get_raw  * raw_rate_factor
+               if (g% doing_approx21) then
+                  call approx21_pa_pg_fractions( &
+                     rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
+                  if (ierr /= 0) return            
+                  
+                  call approx21_weak_rates( &
+                     y, rate_raw, rate_raw_dT, rate_raw_dRho, &
+                     temp, rho, ye, eta, zbar, &
+                     weak_rate_factor, g% add_co56_to_approx21, ierr)
+                  if (ierr /= 0) return            
+               end if
+
+               get_raw = rate_raw(g% net_reaction(ir)) 
+
+               deallocate(rate_raw, rate_raw_dT, &
+                  rate_raw_dRho,rate_factors)
 
             end function get_raw
 
@@ -1462,11 +1498,67 @@
 
                integer :: i, k, num, iso
 
-               get_raw_rho = get_raw()
-
-               call rates_get_density_factors(ir, ye, rho, factor, factor_drho)
+               get_raw_rho = get_raw() * get_comp_scale()
    
-               get_raw_rho = get_raw_rho * factor
+               ! Roll in the abundances
+
+            end function get_raw_rho
+
+            real(dp) function get_screened()
+               real(dp),allocatable,dimension(:) ::  rate_raw, rate_raw_dT, &
+                  rate_raw_dRho,rate_factors,rate_screened, rate_screened_dT, rate_screened_dRho
+
+               allocate(rate_raw(num_reactions), rate_raw_dT(num_reactions), &
+                  rate_raw_dRho(num_reactions), rate_factors(num_reactions),&
+                  rate_screened(num_reactions), rate_screened_dT(num_reactions),&
+                  rate_screened_dRho(num_reactions))
+
+               rate_factors = raw_rate_factor
+
+               call eval_using_rate_tables( &
+                  g%num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
+                  ye, logt, temp, rho, rate_factors, g% logttab, &
+                  rate_raw, rate_raw_dT, rate_raw_dRho, ierr) 
+               if (ierr/=0) return
+
+               if (g% doing_approx21) then
+                  call approx21_pa_pg_fractions( &
+                     rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
+                  if (ierr /= 0) return            
+
+                  call approx21_weak_rates( &
+                     y, rate_raw, rate_raw_dT, rate_raw_dRho, &
+                     temp, rho, ye, eta, zbar, &
+                     weak_rate_factor, g% add_co56_to_approx21, ierr)
+                  if (ierr /= 0) return            
+               end if
+
+               call screen_net_with_approx(g, temp, rho, logt, logrho, &
+                  rate_raw, rate_raw_dT, rate_raw_dRho, &
+                  rate_screened, rate_screened_dT, rate_screened_dRho, &
+                  y, screening_mode, &
+                  zbar, abar, z2bar, ye, ierr)
+               if (ierr /= 0) return
+
+               get_screened = rate_screened(g% net_reaction(ir)) 
+
+            end function get_screened
+
+            real(dp) function get_screened_rho()
+
+               get_screened_rho = get_screened() * get_comp_scale()
+   
+            end function get_screened_rho
+
+
+            real(dp) function get_comp_scale()
+               real(dp) :: rate
+               real(dp) :: factor, factor_drho
+
+               integer :: i, k, num, iso
+
+               get_comp_scale = 1d0
+   
                ! Roll in the abundances
 
                do i=1,max_num_reaction_inputs,2
@@ -1475,35 +1567,20 @@
                   iso = reaction_inputs(i+1,ir) ! chem_id
                   do k=1,size(cids)
                      if(iso == cids(k)) then
-                        get_raw_rho = get_raw_rho * pow(y(k),num)/factorial(num)
+                        get_comp_scale = get_comp_scale * pow(y(k),num)/factorial(num)
                         exit
                      end if
                   end do
                end do
 
-            end function get_raw_rho
+            end function get_comp_scale
 
-            real(dp) function get_screened()
-
-               call net_get_screen_net(handle, ir, temp, logT, rho, logRho,&
-                  zbar, abar, z2bar, ye, y, screening_mode, get_screened, &
-                  ierr)
-               if(ierr/=0) return
-
-               get_screened = get_screened * raw_rate_factor
-
-            end function get_screened
 
 
             real(dp) function get_screen_factor()
                real(dp) :: screen_rate
 
-               call net_get_screen_net(handle, ir, temp, logT, rho, logRho,&
-                  zbar, abar, z2bar, ye, y, screening_mode, screen_rate, &
-                  ierr)
-               if(ierr/=0) return
-
-               get_screen_factor = screen_rate / get_raw_rho()
+               get_screen_factor = get_screened() / get_raw() 
 
             end function get_screen_factor
 
@@ -1525,94 +1602,7 @@
 
             end function factorial
 
-
       end function net_get_reaction_rate_data
-
-      subroutine net_get_screen_net(handle, ir, btemp, bden, logtemp, logrho,&
-            zbar, abar, z2bar, ye, y, screening_mode, screened_rate, &
-            ierr)
-         use net_def
-         use net_screen, only: screen_net_with_approx
-         use net_initialize, only: set_rate_ptrs
-         use net_approx21, only: num_reactions_func => num_reactions
-         integer :: handle
-
-         type (Net_General_Info), pointer  :: g => null()
-         real(dp) :: btemp, bden, logtemp, logrho
-
-         real(dp), dimension(:), pointer :: &
-            rate_raw => null(), rate_raw_dT => null(), rate_raw_dRho => null(), &
-            rate_screened => null(), rate_screened_dT => null(), rate_screened_dRho => null()
-
-         real(dp) :: zbar, abar, z2bar, ye, y(:), screened_rate
-         integer :: screening_mode, ir
-
-         integer, intent(out) :: ierr
-
-         integer :: lwork, iwork, num_reactions 
-         real(dp), pointer :: net_work(:) => null()
-         logical, parameter :: dbg=.false.
-
-         ierr = 0
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for net_get -- did you call alloc_net_handle?'
-            return
-         end if
-
-         lwork = net_work_size(handle, ierr)
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in net_work_size'
-            return
-         end if
-
-         allocate(net_work(lwork))
-
-
-         num_reactions =  g% num_reactions     
-         if (g% doing_approx21) num_reactions = num_reactions + num_reactions_func(g% add_co56_to_approx21)
-
-         allocate(rate_raw(num_reactions), rate_raw_dt(num_reactions), rate_raw_drho(num_reactions), &
-            rate_screened(num_reactions), rate_screened_dT(num_reactions), rate_screened_dRho(num_reactions))
-
-         if (dbg) write(*,*) 'call set_rate_ptrs'
-         call set_rate_ptrs(g, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, net_work, &
-            iwork, ierr) ! iwork is number of entries in work used for rates
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in set_ptrs_in_work'
-            call cleanup()
-            return
-         end if
-
-         call screen_net_with_approx(g, btemp, bden, logtemp, logrho,&
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            y, screening_mode,&
-            zbar, abar, z2bar, ye,&
-            ierr)
-            if (ierr /= 0) then
-               if (dbg) write(*,*) 'failed in screen_net_with_approx'
-               call cleanup()
-               return
-            end if
-
-        screened_rate = rate_screened(ir)
-
-
-        call cleanup()
-
-         contains
-            subroutine cleanup()
-
-               if(associated(net_work)) deallocate(net_work)
-
-            end subroutine cleanup
-
-
-      end subroutine net_get_screen_net
-
       
       end module net_lib
 

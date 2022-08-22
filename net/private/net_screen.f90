@@ -63,7 +63,7 @@
          type(Net_General_Info), pointer :: g
          real(dp) :: btemp, bden, logtemp, logrho
 
-         real(dp), dimension(:), pointer :: &
+         real(dp), dimension(:) :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
 
