@@ -1188,6 +1188,7 @@
          
          use net_lib
          use net_def
+         use net, only: get_screening_mode
          use rates_def, only: reaction_name, get_num_reaction_inputs, reaction_inputs, max_num_reaction_inputs
          character(len=100) :: r_name
          
@@ -1211,7 +1212,7 @@
          type(Net_General_Info), pointer :: g
 
          real(dp) :: xa(max_num_reaction_inputs)
-         integer :: cids(max_num_reaction_inputs)
+         integer :: cids(max_num_reaction_inputs), screening_mode
 
          include 'formats'
 
@@ -1231,6 +1232,8 @@
             v_flag = .false.
          end if
          
+         screening_mode = get_screening_mode(s, ierr)
+         
          if (c > eps_neu_rate_offset) then 
              ir = c - eps_neu_rate_offset
              num_reaction_inputs = get_num_reaction_inputs(ir)
@@ -1243,10 +1246,10 @@
                 do j = 1, num_reaction_inputs
                     xa(j) = s% xa(s% net_iso(cids(j)), k)
                 end do
-                val = val + net_get_reaction_rate_data(EPS_NEU_OUT, s%net_handle, r_name, s% T(k),&
+                val = val + net_get_reaction_rate_data(EPS_NEU_RAW_RATE_OUT, s%net_handle, r_name, s% T(k),&
                     log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
                     s% zbar(k), s% abar(k), s% z2bar(k), s%eta(k), s% ye(k),&
-                    xa, cids, s% rate_factors(ir), s% weak_rate_factor, s% screening_mode_value, ierr)* s%dm(k)
+                    xa, cids, s% rate_factors(ir), s% weak_rate_factor, screening_mode, ierr)* s%dm(k)
              end do
          else if (c > eps_nuc_rate_offset) then
              ir = c - eps_nuc_rate_offset
@@ -1256,14 +1259,15 @@
              end do
              r_name = reaction_name(ir)
              val = 0
+
              do k = 1, s% nz
                 do j = 1, num_reaction_inputs
                     xa(j) = s% xa(s% net_iso(cids(j)), k)
                 end do
-                val = val + net_get_reaction_rate_data(EPS_NUC_OUT, s%net_handle, r_name, s% T(k),&
+                val = val + net_get_reaction_rate_data(EPS_NUC_RAW_RATE_OUT, s%net_handle, r_name, s% T(k),&
                     log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
                     s% zbar(k), s% abar(k), s% z2bar(k), s%eta(k), s% ye(k),&
-                    xa, cids, s% rate_factors(ir), s% weak_rate_factor, s% screening_mode_value, ierr) * s%dm(k)
+                    xa, cids, s% rate_factors(ir), s% weak_rate_factor, screening_mode, ierr) * s%dm(k)
              end do
          else if (c > screened_rate_offset) then
              ir = c - screened_rate_offset
@@ -1278,9 +1282,9 @@
                     xa(j) = s% xa(s% net_iso(cids(j)), k)
                 end do
                 val = val + net_get_reaction_rate_data(SCREENED_RATE_OUT, s%net_handle, r_name, s% T(k),&
-                    log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
-                    s% zbar(k), s% abar(k), s% z2bar(k), s% eta(k), s% ye(k),&
-                    xa, cids, s% rate_factors(ir), s% weak_rate_factor, s% screening_mode_value, ierr)* s%dm(k)
+                     log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
+                     s% zbar(k), s% abar(k), s% z2bar(k), s%eta(k), s% ye(k),&
+                     xa, cids, s% rate_factors(ir), s% weak_rate_factor, screening_mode, ierr)* s%dm(k)
              end do
          else if (c > raw_rate_offset) then
              ir = c - raw_rate_offset
@@ -1297,7 +1301,7 @@
                 val = val + net_get_reaction_rate_data(RAW_RATE_RHO_OUT, s%net_handle, r_name, s% T(k),&
                     log10(s% T(k)), s% rho(k), log10(s% rho(k)), &
                     s% zbar(k), s% abar(k), s% z2bar(k), s%eta(k), s% ye(k),&
-                    xa, cids, s% rate_factors(ir), s% weak_rate_factor, s% screening_mode_value, ierr)* s%dm(k)
+                    xa, cids, s% rate_factors(ir), s% weak_rate_factor, screening_mode, ierr)* s%dm(k)
              end do
              
          else if (c > log_lum_band_offset) then
