@@ -1208,8 +1208,7 @@
          !   rate_raw, rate_raw_dT, rate_raw_dRho
          !integer :: ir
          !real(dp) :: log10_rho, log10_T, d_eps_nuc_dRho, d_eps_nuc_dT
-         !type (Net_Info), target :: net_info_target
-         !type (Net_Info), pointer :: netinfo
+         !type (Net_Info) :: n
          
          integer :: k, i, min_k, k2
          real(dp) :: Ledd, L_rad, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, &
@@ -1241,8 +1240,6 @@
          !       end if
          !    end if
          !    
-         !    net_work => net_work_ary
-         !    netinfo => net_info_target
          ! 
          !    log10_rho = s% lnd(k)/ln10
          !    log10_T = s% lnT(k)/ln10
@@ -1250,7 +1247,7 @@
          !    net_lwork = net_work_size(s% net_handle, ierr)
          !    
          !    call net_get( &
-         !       s% net_handle, .false., netinfo, species, s% num_reactions, s% xa(1:species,k), &
+         !       s% net_handle, .false., n, species, s% num_reactions, s% xa(1:species,k), &
          !       s% T(k), log10_T, s% rho(k), log10_Rho, &
          !       s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
          !       s% eta(k), s% d_eos_dlnd(i_eta,k), s% d_eos_dlnT(i_eta,k), &

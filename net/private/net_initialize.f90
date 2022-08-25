@@ -156,7 +156,7 @@
             i, ierr)
          use chem_def
          type (Net_General_Info), pointer  :: g
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          integer, intent(in) :: lwork
          real(dp), intent(inout), target :: eps_nuc_categories(:) ! (num_categories)
          integer, intent(in) :: screening_mode
@@ -245,9 +245,7 @@
          character (len=*), intent(in) :: cache_suffix
          integer, intent(out) :: ierr
          
-         type (Net_Info), target :: netinfo 
-            ! just used during initialization and then discarded
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          integer :: ios, status, lwork, num_reactions, &
             num_isos, num_wk_reactions, i, iwork
          real(dp), dimension(:), pointer :: eps_nuc_categories
@@ -267,9 +265,8 @@
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
 
-         netinfo % g => g
-         n => netinfo
-         
+         n% g => g
+
          n% reaction_Qs => std_reaction_Qs
          n% reaction_neuQs => std_reaction_neuQs
                   

@@ -182,8 +182,7 @@
          real(dp), target :: work_ary(lwork), rate_factors_ary(num_reactions)
          real(dp), pointer, dimension(:) :: work, rate_factors
          logical :: skip_jacobian
-         type (Net_Info), target :: netinfo_target
-         type (Net_Info), pointer :: netinfo
+         type (Net_Info) :: n
          character (len=80) :: string
          
          include "formats"
@@ -200,7 +199,6 @@
          ierr = 0
          work => work_ary
          rate_factors => rate_factors_ary
-         netinfo => netinfo_target
 
          eta = 0
          rate_factors(:) = 1
@@ -249,7 +247,7 @@
 ! this is the instantaneous eps_nuc only
 
          call net_get( &
-            handle, skip_jacobian, netinfo, species, num_reactions, &
+            handle, skip_jacobian, n, species, num_reactions, &
             xa, T, logT, Rho, logRho, & 
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
             rate_factors, weak_rate_factor, & 

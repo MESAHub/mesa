@@ -592,7 +592,7 @@
       
          integer, intent(in) :: handle
          logical, intent(in) :: just_dxdt
-         type (Net_Info), pointer:: n
+         type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
@@ -733,7 +733,7 @@
          ! same for Rho and logRho
       
          integer, intent(in) :: handle
-         type (Net_Info), pointer:: n
+         type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
@@ -851,7 +851,7 @@
          use rates_def, only: num_rvs
       
          integer, intent(in) :: handle
-         type (Net_Info), pointer :: n
+         type (Net_Info)  :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
@@ -965,7 +965,7 @@
          use rates_def, only: num_rvs
          integer, intent(in) :: handle
          logical, intent(in) :: just_dxdt
-         type (Net_Info), pointer:: n
+         type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)

@@ -59,7 +59,7 @@
             net_test_partials_val, net_test_partials_dval_dx, &
             net_test_partials_i, net_test_partials_iother
 
-         type (Net_Info), pointer:: n
+         type (Net_Info) :: n
          type (Net_General_Info), pointer :: g
          logical, intent(in) :: rates_only, just_dxdt
          integer, intent(in) :: num_isos

@@ -90,6 +90,12 @@ Test cases now infer their ``MESA_DIR`` variable entirely by the environment var
 
 The history output option ``tri_alfa`` (and other quantities that relate to the triple-alpha nuclear reaction) have been renamed to ``tri_alpha`` for better consistency with other ``_alpha`` reactions.
 
+net
+===
+
+The derived type net_info (conventional given the symbol ``n``) is no longer a pointer. If you declare a local copy of the variable, you should also ensure to do ``n% g => g`` to make sure that net_info knows
+about the ``net_general_info`` derived type. ``g`` can be had from a call to ``get_net_ptr(handle, g, ierr)``.
+
 
 Changes in r22.05.1
 ===================

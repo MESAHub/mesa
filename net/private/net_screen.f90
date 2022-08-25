@@ -39,7 +39,7 @@
 
 
       subroutine make_screening_tables(n, ierr)
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          integer, intent(out) :: ierr
          real(dp) :: y(num_chem_isos)
          y = 0

@@ -99,8 +99,7 @@
             ! else on return has input value plus time spent doing eos
          integer, intent(out) :: ierr
          
-         type (Net_Info), target :: netinfo_target
-         type (Net_Info), pointer :: netinfo
+         type (Net_Info) :: n
          type (Net_General_Info), pointer :: g
          integer :: ijac, nzmax, isparse, mljac, mujac, imas, mlmas, mumas, lrd, lid, &
                lout, liwork, lwork, i, j, lrpar, lipar, idid, net_lwork, nvar
@@ -109,9 +108,7 @@
          real(dp) :: t, lgT, lgRho, tend
          
          include 'formats'
-         
-         netinfo => netinfo_target
-         
+                  
          ending_x = 0
          ending_temp = 0
          ending_rho = 0
@@ -475,7 +472,7 @@
             skip_jacobian = .false.
 
             call eval_net( &
-                  netinfo, g, rates_only, skip_jacobian, &
+                  n, g, rates_only, skip_jacobian, &
                   num_isos, num_reactions, g% num_wk_reactions, &
                   x, T, logT, rho, logRho, &
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &

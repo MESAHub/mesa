@@ -46,8 +46,7 @@
       real(dp), dimension(:), pointer ::  &
          xin, xin_copy, d_eps_nuc_dx, dxdt, d_dxdt_dRho, d_dxdt_dT
       real(dp), pointer :: d_dxdt_dx(:,:)  
-      type (Net_Info), target :: net_info_target
-      type (Net_Info), pointer :: n
+      type (Net_Info) :: n
       
 
       contains
