@@ -141,7 +141,7 @@
             star_debugging_rates_flag, rates_test_partials_val, rates_test_partials_dval_dx
          use net_def, only: Net_Info, net_test_partials, &
             net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i, &
-            net_test_partials_iother
+            net_test_partials_iother, get_net_ptr
          use net_lib, only: net_get
          use star_utils, only: lookup_nameofvar
          use chem_def, only: chem_isos, category_name, i_ni56_co56, i_co56_fe56, &
@@ -158,8 +158,7 @@
             d_eps_nuc_dRho, d_eps_nuc_dT, cat_factor, tau_gamma, eps_cat_sum
          real(dp), target :: net_work_ary(net_lwork)
          real(dp), pointer :: net_work(:)
-         type (Net_Info), target :: net_info_target
-         type (Net_Info), pointer :: netinfo
+         type (Net_Info) :: n
          character (len=100) :: message
          real(dp), pointer :: reaction_neuQs(:)
          logical :: clipped_T
@@ -177,10 +176,9 @@
          end if
 
          net_work => net_work_ary
-         netinfo => net_info_target
 
-         netinfo% star_id = s% id
-         netinfo% zone = k
+         n% star_id = s% id
+         n% zone = k
          
          s% eps_nuc(k) = 0d0
          s% d_epsnuc_dlnd(k) = 0d0
@@ -247,7 +245,7 @@
          if (s% use_other_net_get) then
             call s% other_net_get( &
                s% id, k, &
-               s% net_handle, .false., netinfo, species, num_reactions, s% xa(1:species,k), &
+               s% net_handle, .false., n, species, num_reactions, s% xa(1:species,k), &
                T, log10_T, s% rho(k), log10_Rho, &
                s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
                s% eta(k), s% d_eos_dlnT(i_eta,k), s% d_eos_dlnd(i_eta,k), &
@@ -259,7 +257,7 @@
                s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
          else
             call net_get( &
-               s% net_handle, .false., netinfo, species, num_reactions, s% xa(1:species,k), &
+               s% net_handle, .false., n, species, num_reactions, s% xa(1:species,k), &
                T, log10_T, s% rho(k), log10_Rho, &
                s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
                s% eta(k), s% d_eos_dlnT(i_eta,k), s% d_eos_dlnd(i_eta,k), &

@@ -1618,7 +1618,7 @@
                i_burn_mg, i_burn_si, i_burn_s, i_burn_ar, i_burn_ca, i_burn_ti, i_burn_cr, &
                i_burn_fe, icc, ico, ioo, ipnhe4, iphoto, i_ni56_co56, i_co56_fe56, iother
             use net_def, only: Net_Info
-            type (Net_Info), pointer :: n
+            type (Net_Info) :: n
             real(dp), dimension(:), intent(in) :: y, mion, dydt, rate
             real(dp), intent(in) :: fII, &
                Qtotal_rpp, Qneu_rpp, Qr33, &

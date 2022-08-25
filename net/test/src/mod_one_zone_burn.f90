@@ -219,8 +219,7 @@
          integer, parameter :: nwork = pm_work_size
          real(dp), pointer :: pm_work(:)
          
-         type (Net_Info), target :: netinfo_target
-         type (Net_Info), pointer :: netinfo
+         type (Net_Info) :: n
          type (Net_General_Info), pointer :: g
          
          include 'formats'
@@ -229,7 +228,6 @@
          told = 0
          
          net_file = net_file_in
-         netinfo => netinfo_target
 
          call test_net_setup(net_file)
 
@@ -1086,6 +1084,7 @@
             real(dp), pointer :: work(:), actual_Qs(:), actual_neuQs(:)
             logical, pointer :: from_weaklib(:)
             type (Net_General_Info), pointer  :: g
+            type(net_info) :: netinfo
             logical :: skip_jacobian
 
             include 'formats'
@@ -1170,6 +1169,13 @@
             eta = res(i_eta)
             d_eta_dlnT = 0d0
             d_eta_dlnRho = 0d0
+
+            call get_net_ptr(handle, g, ierr)
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+         
+
+            netinfo% g => g
+
          
             call net_get_with_Qs( &
                   handle, skip_jacobian, netinfo, species, num_reactions, &
@@ -1190,9 +1196,6 @@
                call mesa_error(__FILE__,__LINE__)
             end if
 
-            call get_net_ptr(handle, g, ierr)
-            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
             dt = time - told
 
             ! set burn_ergs according to change from initial abundances

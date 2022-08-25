@@ -176,8 +176,7 @@
       
          logical :: dbg
          
-         type (Net_Info), target :: net_info_target
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          
          real(dp), dimension(:), pointer :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
@@ -198,7 +197,6 @@
          starting_y => starting_y_a
          ending_y => ending_y_a
          save_x => save_x_a
-         n => net_info_target
          
          have_set_rate_screened = .false.
          

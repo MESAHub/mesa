@@ -713,7 +713,7 @@
             integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
             integer, intent(in) :: net_handle
             logical, intent(in) :: just_dxdt
-            type (Net_Info), pointer:: n
+            type (Net_Info) :: n
             integer, intent(in) :: num_isos
             integer, intent(in) :: num_reactions
             real(dp), intent(in)  :: x(:) ! (num_isos)

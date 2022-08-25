@@ -239,7 +239,7 @@
          import dp, qp, Net_Info
          implicit none
 
-         type(Net_Info), pointer :: n
+         type(Net_Info) :: n
          real(qp), pointer, intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(:)
          integer, intent(in) :: num_reactions
