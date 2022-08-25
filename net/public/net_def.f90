@@ -508,8 +508,16 @@
       end subroutine get_net_ptr
 
 
-      integer function get_net_timing_total(g)
+      integer function get_net_timing_total(handle, ierr)
+         integer, intent(in) :: handle
          type (Net_General_Info), pointer :: g
+         integer, intent(inout) :: ierr 
+         ierr = 0
+         call get_net_ptr(handle, g, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for net_set_logTcut'
+            return
+         end if
          get_net_timing_total = 0
          if (.not. g% doing_timing) return
          get_net_timing_total = &
@@ -521,8 +529,17 @@
       end function get_net_timing_total
 
 
-      subroutine zero_net_timing(g)
+      subroutine zero_net_timing(handle,ierr)
+         integer, intent(in) :: handle
          type (Net_General_Info), pointer :: g
+         integer, intent(inout) :: ierr 
+         ierr = 0
+         call get_net_ptr(handle, g, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for net_set_logTcut'
+            return
+         end if
+
          g% clock_net_eval = 0
          g% clock_net_weak_rates = 0
          g% clock_net_rate_tables = 0 
