@@ -35,7 +35,7 @@
 
       envelope_mass_limit = 1d-2 ! Msun
 
-      energy_eqn_option = 'dedt'
+      energy_eqn_option = 'eps_grav'
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
