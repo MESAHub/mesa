@@ -134,6 +134,9 @@
                            z158(:), & ! screen z**1.58
                            z52(:) ! columb z**5/2
 
+         real(dp), allocatable, dimension(:) :: mion ! (num_isos) Mass excess in ergs
+
+
          ! info for evaluation of weak rates
          integer :: num_wk_reactions ! number of weak reactions in the current net
          integer, pointer :: &
@@ -208,6 +211,12 @@
          real(dp), allocatable :: y(:) ! units [moles/gram]     (num_isos)
          real(dp), allocatable :: d_dydt_dy(:,:) ! units [1/second] (num_isos, num_isos)
          real(dp), allocatable :: d_eps_nuc_dy(:) ! (num_isos)
+         real(dp), allocatable :: x(:) ! mass fraction
+
+         ! approx21 arrays
+         real(dp), allocatable,dimension(:,:) :: dfdy
+         real(dp), allocatable,dimension(:) :: dratdumdy1, dratdumdy2, &
+            d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
          
          ! weaklib results
          real(dp), dimension(:), allocatable :: &
@@ -220,6 +229,8 @@
          integer :: screening_mode
 
          real(dp) :: temp, logT, rho, logRho
+
+         real(dp) :: abar, zbar, z2bar, ye, eta, d_eta_dlnt, d_eta_dlnrho
 
          real(dp) :: eps_neu_total
          real(dp) :: weak_rate_factor
@@ -279,7 +290,7 @@
       integer, parameter :: burn_lipar = i_ntimes
 
       ! Note: We need  burn_lrpar /= burn_const_P_lrpar so that we can determine whether we are doing a normal burn or 
-      ! one at const_P. This is needed in burn_solout in mod_one_zone_burn
+      ! one at const_P. This is needed in burn_solout in mod_one_zone_burn. 
       integer, parameter :: r_burn_temp = 1
       integer, parameter :: r_burn_lgT = 2
       integer, parameter :: r_burn_rho = 3
@@ -414,6 +425,10 @@
             end if
             if (allocated(g% reaction_kind)) then
                deallocate(g% reaction_kind)
+            end if
+
+            if(allocated(g% mion)) then
+               deallocate(g% mion)
             end if
 
             if (associated(g% reaction_reaclib_kind)) then

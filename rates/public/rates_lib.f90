@@ -740,22 +740,23 @@
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho, &
             ierr)
-           use rates_def, only: Coulomb_Info
+         use rates_def, only: Coulomb_Info
          use eval_weak, only: do_eval_weak_reaction_info
-           use rates_def, only : do_ecapture
+         use rates_def, only : do_ecapture
          integer, intent(in) :: n, ids(:), reaction_ids(:)
-           type(Coulomb_Info), pointer :: cc
+         type(Coulomb_Info), pointer :: cc
          real(dp), intent(in) :: T9, YeRho, eta, d_eta_dlnT, d_eta_dlnRho
          ! lambda = combined rate (capture and decay)
          ! Q and Qneu are for combined rate of beta decay and electron capture.
          ! Q is total, so Q-Qneu is the actual thermal energy.
          ! note: lambdas include Ye Rho factors for electron captures.
          ! so treat the rates as if just beta decays
-         real(dp), dimension(:) :: &
+         real(dp), dimension(:),intent(inout) :: &
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
          integer, intent(out) :: ierr
+         write(50,*) "**",n, size(lambda)
          call do_eval_weak_reaction_info( &
             n, ids, reaction_ids, T9, YeRho, &
             eta, d_eta_dlnT, d_eta_dlnRho, &

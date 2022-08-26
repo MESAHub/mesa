@@ -95,8 +95,6 @@
          integer, parameter :: max_z_for_cache = 14
          real(qp), target :: dydt_a(num_rvs*num_isos)
          real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
-         real(dp), target :: mion_a(num_isos)
-         real(dp), pointer :: mion(:)
          real(dp) :: enuc, temp, logtemp, T9, rho, logrho, total, prev, curr, prev_T
          real(dp) :: btemp, bden, eps_total, Ys, sum_dxdt, compare, Z_plus_N
          real(qp) :: eps_nuc_MeV(num_rvs)
@@ -105,16 +103,10 @@
          integer(8) :: time0, time1
          logical :: doing_timing
          
-         ! for approx21
-         real(dp), allocatable :: dfdy(:,:)
-         real(dp), dimension(:), allocatable :: &
-            dratdumdy1, dratdumdy2, d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
          real(dp) :: &
             deps_total_dRho, deps_total_dT, &
             deps_neu_dT, deps_neu_dRho, fII
-               
-         real(dp) :: mev2gr
-         
+                        
          logical, parameter :: dbg = .false.
          !logical, parameter :: dbg = .true.
          
@@ -148,6 +140,7 @@
          end if
          T9 = temp*1d-9
          
+         n% g => g
          n% reaction_Qs => reaction_Qs
          n% reaction_neuQs => reaction_neuQs
          n% eps_neu_total = 0
@@ -157,13 +150,17 @@
          n% logRho = logrho
          n% rho = rho
          n% screening_mode = screening_mode
+         n% x = x
+         n% zbar = zbar
+         n% abar = abar
+         n% z2bar = z2bar
+         n% ye = ye
+         n% eta = eta
+         n% d_eta_dlnT = d_eta_dlnT
+         n% d_eta_dlnRho = d_eta_dlnRho
          
          if (dbg) write(*,*) 'call setup_net_info'
-         call setup_net_info( g, n, ierr) 
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in setup_net_info'
-            return
-         end if
+         call setup_net_info(n) 
 
          if (g% doing_approx21) then
             approx21_num_rates = num_reactions_func(g%add_co56_to_approx21)
@@ -172,31 +169,17 @@
          end if
          
          if (g% doing_approx21) then
-            call set_ptrs_for_approx21( &
-               g% add_co56_to_approx21, &
-               dfdy, dratdumdy1, dratdumdy2, &
-               d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho)
-            mion => mion_a
-            mev2gr = 1d6*ev2erg/(clight*clight)
-            do i=1,num_isos
-                mion(i) = get_mass_excess(chem_isos,g% chem_id(i))*mev2gr
-            end do
+            call set_ptrs_for_approx21(n)
          end if
-         
+
          if (.not. g% net_has_been_defined) then
             ierr = -1
             if (dbg) write(*,*) 'failed (.not. g% net_has_been_defined)'
             return
          end if
          
-         if (doing_timing) then
-            call system_clock(time1)
-            g% clock_net_eval = g% clock_net_eval + (time1 - time0)
-            time0 = time1
-         end if
-
          if (dbg) write(*,*) 'call set_molar_abundances'
-         call set_molar_abundances(g, num_isos, x, n% y, dbg, ierr)
+         call set_molar_abundances(n, dbg, ierr)
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in set_molar_abundances'
             return
@@ -204,7 +187,7 @@
          
          if (num_wk_reactions > 0) then
             if (dbg) write(*,*) 'call get_weaklib_rates'
-            call get_weaklib_rates(ierr)
+            call get_weaklib_rates(n, ierr)
             if (ierr /= 0) then
                if (dbg) write(*,*) 'failed in get_weaklib_rates'
                return
@@ -350,55 +333,55 @@
                btemp, bden, abar, zbar, n% y, &
                g% use_3a_fl87, Qconv*reaction_Qs(ir_he4_he4_he4_to_c12), &
                n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
-               dratdumdy1, dratdumdy2, g% add_co56_to_approx21, ierr)
+               n% dratdumdy1, n% dratdumdy2, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return            
             
             call approx21_dydt( &
                n% y, n% rate_screened, n% rate_screened, &
-               dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
+               n% dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
                g% fe56ec_n_neut, btemp, bden, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return
                
             fII = approx21_eval_PPII_fraction(n% y, n% rate_screened)
             
             call get_approx21_eps_info( &
-                  dydt1, n% rate_screened, .true., eps_total, eps_neu_total, &
+                  n% dydt1, n% rate_screened, .true., eps_total, eps_neu_total, &
                   g% add_co56_to_approx21,  ierr)
                   
             if (ierr /= 0) return               
             eps_nuc = eps_total - eps_neu_total
             
             do i=1,num_isos
-               dxdt(i) = chem_isos% Z_plus_N(chem_id(i))*dydt1(i)
+               dxdt(i) = chem_isos% Z_plus_N(chem_id(i)) * n% dydt1(i)
             end do
 
             if (just_dxdt) return
 
             call approx21_dfdy( &
-               n% y, dfdy, &
+               n% y, n% dfdy, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, g% fe56ec_n_neut, &
                n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
-               dratdumdy1, dratdumdy2, btemp,g% add_co56_to_approx21,  ierr)
+               n% dratdumdy1, n% dratdumdy2, btemp,g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             call approx21_dfdT_dfdRho( & 
                
                ! NOTE: currently this gives d_eps_total_dy -- should fix to account for neutrinos too
                
-               n% y, mion, dfdy, n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
+               n% y, g% mion, n% dfdy, n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, btemp, bden, dfdT, dfdRho, d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
+               g% fe56ec_n_neut, btemp, bden, n% dfdT, n% dfdRho, n% d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             call get_approx21_eps_info( &
-               dfdT, n% rate_screened_dT, .false., deps_total_dT, deps_neu_dT, &
+               n% dfdT, n% rate_screened_dT, .false., deps_total_dT, deps_neu_dT, &
                g% add_co56_to_approx21,  ierr)
 
             if (ierr /= 0) return
             d_eps_nuc_dT = deps_total_dT - deps_neu_dT
                               
             call get_approx21_eps_info( &
-               dfdRho, n% rate_screened_dRho, .false., deps_total_dRho, deps_neu_dRho, &
+               n% dfdRho, n% rate_screened_dRho, .false., deps_total_dRho, deps_neu_dRho, &
                g% add_co56_to_approx21,  ierr)
 
             if (ierr /= 0) return             
@@ -412,19 +395,19 @@
                reaction_neuQs(irc12_to_n14), &  
                reaction_neuQs(irn14_to_c12), &  
                reaction_neuQs(iro16_to_n14), &  
-               d_epsneu_dy, &
+               n% d_epsneu_dy, &
                g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             do i=1,num_isos
                ci = chem_id(i)
                Z_plus_N = dble(chem_isos% Z_plus_N(ci))
-               d_eps_nuc_dx(i) = (d_epsnuc_dy(i) - d_epsneu_dy(i))/Z_plus_N 
-               d_dxdt_dRho(i) = Z_plus_N*dfdRho(i)
-               d_dxdt_dT(i) = Z_plus_N*dfdT(i)
+               d_eps_nuc_dx(i) = (n% d_epsnuc_dy(i) - n% d_epsneu_dy(i))/Z_plus_N 
+               d_dxdt_dRho(i) = Z_plus_N * n% dfdRho(i)
+               d_dxdt_dT(i) = Z_plus_N * n% dfdT(i)
                do j=1, num_isos
                   d_dxdt_dx(i,j) = &
-                     dfdy(i,j)*Z_plus_N/chem_isos% Z_plus_N(chem_id(j))
+                     n% dfdy(i,j)*Z_plus_N/chem_isos% Z_plus_N(chem_id(j))
                end do
             end do
 
@@ -448,7 +431,7 @@
             call get_Qs_rfe56ec(Qtotal_rfe56ec, Qneu_rfe56ec)
 
             call approx21_eps_info( &
-               n, n% y, mion, dydt1, rate_screened, fII, &               
+               n, n% y, g% mion, dydt1, rate_screened, fII, &               
                reaction_Qs(irpp_to_he3), reaction_neuQs(irpp_to_he3), & 
                reaction_Qs(ir_he3_he3_to_h1_h1_he4), &
                reaction_Qs(ir34_pp2), reaction_neuQs(ir34_pp2), & 
@@ -567,6 +550,7 @@
             
             include 'formats'
 
+
             do i=1,num_reactions
                if (g% reaction_id(i) <= 0) then
                   write(*,2) 'g% reaction_id(i)', i, g% reaction_id(i)
@@ -614,8 +598,8 @@
                   n% rate_screened_dRho(i) = n% rate_raw_dRho(i)
                end do
                do i=1,num
-                  dratdumdy1(i) = 0d0
-                  dratdumdy2(i) = 0d0
+                  n% dratdumdy1(i) = 0d0
+                  n% dratdumdy2(i) = 0d0
                end do           
             end if
 
@@ -644,55 +628,65 @@
             if (ierr /= 0) return            
          end subroutine approx21_rates
 
-
-         subroutine get_weaklib_rates(ierr)
-            use rates_def, only : Coulomb_Info
-            use rates_lib, only: eval_weak_reaction_info, coulomb_set_context
-            use net_def, only: other_kind
-
-            type (Coulomb_Info), target :: cc_info
-            type (Coulomb_Info), pointer :: cc
-
-            integer, intent(out) :: ierr
-            integer :: i, j, id, ir
-            include 'formats'
-
-            ! before getting the weaklib rates, the Coulomb_Info
-            ! structure must be populated.  the ecapture routines need
-            ! to know some local quantities (functions of the density,
-            ! temperature, and composition), to calculate Coulomb
-            ! corrections to the rates
-
-            ierr = 0
-            cc => cc_info
-
-            call coulomb_set_context( &
-               cc, temp, rho, logtemp, logrho, zbar, abar, z2bar)
-            
-            call eval_weak_reaction_info( &
-               num_wk_reactions, &
-               g% weaklib_ids(1:num_wk_reactions), &
-               g% reaction_id_for_weak_reactions(1:num_wk_reactions), &
-               cc, temp*1d-9, ye*rho, eta, d_eta_dlnT, d_eta_dlnRho, &
-               n% lambda, n% dlambda_dlnT, n% dlambda_dlnRho, &
-               n% Q, n% dQ_dlnT, n% dQ_dlnRho, &
-               n% Qneu, n% dQneu_dlnT, n% dQneu_dlnRho, &
-               ierr)
-            if (weak_rate_factor < 1d0) then
-               do i=1,num_wk_reactions
-                  n% lambda(i) = weak_rate_factor*n% lambda(i)
-                  n% dlambda_dlnT(i) = weak_rate_factor*n% dlambda_dlnT(i)
-                  n% dlambda_dlnRho(i) = weak_rate_factor*n% dlambda_dlnRho(i)
-               end do
-            end if          
-            if (doing_timing) then
-               call system_clock(time1)
-               g% clock_net_weak_rates = g% clock_net_weak_rates + (time1 - time0)
-               time0 = time1
-            end if
-         end subroutine get_weaklib_rates
-      
       end subroutine eval_net
+
+      subroutine get_weaklib_rates(n, ierr)
+         use rates_def, only : Coulomb_Info
+         use rates_lib, only: eval_weak_reaction_info, coulomb_set_context
+         use net_def, only: other_kind
+
+         type (net_info) :: n
+         type(net_general_info), pointer :: g
+
+         type (Coulomb_Info), target :: cc_info
+         type (Coulomb_Info), pointer :: cc
+
+         integer, intent(out) :: ierr
+         integer :: i, j, id, ir
+         integer(8) :: time0, time1
+
+         include 'formats'
+
+         ! before getting the weaklib rates, the Coulomb_Info
+         ! structure must be populated.  the ecapture routines need
+         ! to know some local quantities (functions of the density,
+         ! temperature, and composition), to calculate Coulomb
+         ! corrections to the rates
+
+         ierr = 0
+         cc => cc_info
+
+         g => n% g
+
+         if(g% doing_timing) then
+            call system_clock(time0)
+         end if
+
+         call coulomb_set_context(cc, n% temp, n% rho, n% logT, n% logRho, n% zbar, n% abar, n% z2bar)
+         
+         call eval_weak_reaction_info( &
+            g% num_wk_reactions, &
+            g% weaklib_ids(1:g% num_wk_reactions), &
+            g% reaction_id_for_weak_reactions(1:g% num_wk_reactions), &
+            cc, n% temp*1d-9, n% ye * n% rho, n% eta, n% d_eta_dlnT, n% d_eta_dlnRho, &
+            n% lambda, n% dlambda_dlnT, n% dlambda_dlnRho, &
+            n% Q, n% dQ_dlnT, n% dQ_dlnRho, &
+            n% Qneu, n% dQneu_dlnT, n% dQneu_dlnRho, &
+            ierr)
+         if (n% weak_rate_factor < 1d0) then
+            do i=1,g% num_wk_reactions
+               n% lambda(i) = n% weak_rate_factor*n% lambda(i)
+               n% dlambda_dlnT(i) = n% weak_rate_factor*n% dlambda_dlnT(i)
+               n% dlambda_dlnRho(i) = n% weak_rate_factor*n% dlambda_dlnRho(i)
+            end do
+         end if        
+         if (g% doing_timing) then
+            call system_clock(time1)
+            g% clock_net_weak_rates = g% clock_net_weak_rates + (time1 - time0)
+         end if         
+      
+      end subroutine get_weaklib_rates
+   
          
          
       subroutine get_T_limit_factor( &
@@ -719,11 +713,9 @@
       end subroutine get_T_limit_factor
 
          
-      subroutine set_molar_abundances(g, num_isos, x, y, dbg, ierr)
-         type (Net_General_Info), pointer :: g
-         integer, intent(in) :: num_isos
-         real(dp), intent(in) :: x(:)
-         real(dp), intent(inout) :: y(:)
+      subroutine set_molar_abundances(n, dbg, ierr)
+         type (net_info) :: n
+         type(net_general_info), pointer :: g
          logical, intent(in) :: dbg
          integer, intent(out) :: ierr
          
@@ -732,8 +724,9 @@
          character (len=256) :: message
          include 'formats'
          sum = 0
+         g => n% g
          do i = 1, g% num_isos
-            sum = sum + x(i)
+            sum = sum + n% x(i)
             ci = g% chem_id(i)
             if (ci <= 0) then
                write(*,*) 'problem in set_molar_abundances'
@@ -742,7 +735,7 @@
                write(*,*) 'g% chem_id(i)', g% chem_id(i)
                call mesa_error(__FILE__,__LINE__,'set_molar_abundances') 
             end if
-            y(i) = min(1d0, max(x(i), 0d0)) / chem_isos% Z_plus_N(ci)
+            n% y(i) = min(1d0, max(n% x(i), 0d0)) / chem_isos% Z_plus_N(ci)
          enddo
          
          
@@ -755,9 +748,9 @@
          if (abs(sum - 1d0) > 1d-2) then
             ierr = -1
             if (dbg) then
-               do i = 1, g% num_isos
+               do i = 1, n% g% num_isos
                   ci = g% chem_id(i)
-                  write(*,2) chem_isos% name(ci), i, x(i)
+                  write(*,2) chem_isos% name(ci), i, n% x(i)
                end do
                write(*,1) 'abs(sum - 1d0)', abs(sum - 1d0)
             end if
