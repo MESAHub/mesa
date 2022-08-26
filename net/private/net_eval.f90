@@ -139,8 +139,14 @@
             temp = exp10(logtemp)
          end if
          T9 = temp*1d-9
+
+
          
          n% g => g
+
+         if (dbg) write(*,*) 'call setup_net_info'
+         call setup_net_info(n) 
+
          n% reaction_Qs => reaction_Qs
          n% reaction_neuQs => reaction_neuQs
          n% eps_neu_total = 0
@@ -159,9 +165,6 @@
          n% d_eta_dlnT = d_eta_dlnT
          n% d_eta_dlnRho = d_eta_dlnRho
          
-         if (dbg) write(*,*) 'call setup_net_info'
-         call setup_net_info(n) 
-
          if (g% doing_approx21) then
             approx21_num_rates = num_reactions_func(g%add_co56_to_approx21)
          else
