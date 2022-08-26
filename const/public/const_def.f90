@@ -85,6 +85,7 @@
       real(dp), parameter :: ev2erg = 1.602176634d-12 ! electron volt (erg)
       real(dp), parameter :: mev_to_ergs = 1d6*ev2erg
       real(dp), parameter :: mev_amu = mev_to_ergs/amu
+      real(dp), parameter :: mev2gr = 1d6*ev2erg/(clight*clight) ! MeV to grams
       real(dp), parameter :: Qconv = mev_to_ergs*avo
       real(dp), parameter :: kev = kerg / ev2erg ! converts temp to ev (ev K^-1)
       real(dp), parameter :: boltz_sigma = (pi*pi * boltzm*boltzm*boltzm*boltzm) / (60 * hbar*hbar*hbar * clight*clight) ! Stefan-Boltzmann constant (erg cm^-2 K^-4 s^-1)

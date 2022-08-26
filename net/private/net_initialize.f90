@@ -34,9 +34,6 @@
       
       implicit none
 
-
-         
-         
       integer, parameter :: max_num_special_case_reactants = 5
       integer, parameter :: max_num_special_case_reactions = 70
       integer :: num_special_case_reactions
@@ -48,67 +45,43 @@
 
       contains
 
-      integer function work_size(g)
-         type (Net_General_Info), pointer  :: g         
-         integer :: num_isos, num_reactions, num_wk_reactions
-         num_reactions = g% num_reactions
-         if (g% doing_approx21) then
-            num_reactions  = num_reactions_func(g% add_co56_to_approx21)
-         end if
-         num_isos = g% num_isos
-         num_wk_reactions = g% num_wk_reactions
-         work_size = -1
-      end function work_size
+      subroutine set_ptrs_for_approx21(n)
 
-      subroutine set_ptrs_for_approx21( &
-            add_co56, dfdy, dratdumdy1, dratdumdy2, &
-            d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho)
-
-         logical, intent(in) :: add_co56
-         real(dp), allocatable :: dfdy(:,:)
-         real(dp), dimension(:), allocatable :: &
-            dratdumdy1, dratdumdy2, &
-            d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
+         type(net_info) :: n
             
          integer :: num_isos, num_reactions
 
-         num_reactions = num_reactions_func(add_co56)
-         if (add_co56) then
+         num_reactions = num_reactions_func(n% g% add_co56_to_approx21)
+         if (n% g% add_co56_to_approx21) then
             num_isos = 22
          else
             num_isos = 21
          end if
          
-         allocate(dfdy(num_isos,num_isos))
-         allocate(dratdumdy1(num_reactions),dratdumdy2(num_reactions))
-         allocate(d_epsnuc_dy(num_isos), d_epsneu_dy(num_isos))
-         allocate(dydt1(num_isos),dfdT(num_isos),dfdRho(num_isos))
+         if(.not.allocated(n% dfdy)) allocate(n% dfdy(num_isos,num_isos))
+         if(.not.allocated(n% dratdumdy1)) allocate(n% dratdumdy1(num_reactions))
+         if(.not.allocated(n% dratdumdy2)) allocate(n%dratdumdy2(num_reactions))
+         if(.not.allocated(n% d_epsnuc_dy)) allocate(n% d_epsnuc_dy(num_isos))
+         if(.not.allocated(n% d_epsneu_dy)) allocate(n% d_epsneu_dy(num_isos))
+         if(.not.allocated(n% dydt1)) allocate(n% dydt1(num_isos))
+         if(.not.allocated(n% dfdt)) allocate(n% dfdT(num_isos))
+         if(.not.allocated(n% dfdRho))  allocate(n% dfdRho(num_isos))
          
       end subroutine set_ptrs_for_approx21
 
          
-      subroutine setup_net_info( &
-            g, n, &
-            ierr)
+      subroutine setup_net_info(n)
          use chem_def
-         type (Net_General_Info), pointer  :: g
          type (Net_Info) :: n
-         integer, intent(out) :: ierr
          
          integer :: num_reactions, num_isos, num_wk_reactions
-         character (len=256) :: err_msg    
-         real(dp) :: qneu
          
-         include 'formats'
-         
-         ierr = 0
-         n% g => g
-         num_isos = g% num_isos
-         num_wk_reactions = g% num_wk_reactions
-         if (g% doing_approx21) then
-            num_reactions = num_reactions_func(g% add_co56_to_approx21)
+         num_isos = n% g% num_isos
+         num_wk_reactions = n% g% num_wk_reactions
+         if (n% g% doing_approx21) then
+            num_reactions = num_reactions_func(n% g% add_co56_to_approx21)
          else
-            num_reactions = g% num_reactions
+            num_reactions = n% g% num_reactions
          end if
          
          if(.not.allocated(n% eps_nuc_categories)) allocate(n% eps_nuc_categories(num_categories))
@@ -121,24 +94,23 @@
          if(.not.allocated(n% rate_raw_dT)) allocate(n% rate_raw_dT(num_reactions))
          if(.not.allocated(n% rate_raw_dRho)) allocate(n% rate_raw_dRho(num_reactions))
 
-      
-         ! input value of i is amount already used
          if(.not.allocated(n% y)) allocate(n% y(num_isos))
+         if(.not.allocated(n% x)) allocate(n% x(num_isos))
          
          if(.not.allocated(n% d_eps_nuc_dy)) allocate(n% d_eps_nuc_dy(num_isos))
          if(.not.allocated(n% d_dydt_dy)) allocate(n% d_dydt_dy(num_isos,num_isos))
 
-         if(.not.allocated(n% lambda)) allocate(n% lambda(num_isos))
-         if(.not.allocated(n% dlambda_dlnT)) allocate(n% dlambda_dlnT(num_isos))
-         if(.not.allocated(n% dlambda_dlnRho)) allocate(n% dlambda_dlnRho(num_isos))
+         if(.not.allocated(n% lambda)) allocate(n% lambda(num_wk_reactions))
+         if(.not.allocated(n% dlambda_dlnT)) allocate(n% dlambda_dlnT(num_wk_reactions))
+         if(.not.allocated(n% dlambda_dlnRho)) allocate(n% dlambda_dlnRho(num_wk_reactions))
 
-         if(.not.allocated(n% Q)) allocate(n% Q(num_isos))
-         if(.not.allocated(n% dQ_dlnT)) allocate(n% dQ_dlnT(num_isos))
-         if(.not.allocated(n% dQ_dlnRho)) allocate(n% dQ_dlnRho(num_isos))
+         if(.not.allocated(n% Q)) allocate(n% Q(num_wk_reactions))
+         if(.not.allocated(n% dQ_dlnT)) allocate(n% dQ_dlnT(num_wk_reactions))
+         if(.not.allocated(n% dQ_dlnRho)) allocate(n% dQ_dlnRho(num_wk_reactions))
 
-         if(.not.allocated(n% Qneu)) allocate(n% Qneu(num_isos))
-         if(.not.allocated(n% dQneu_dlnT)) allocate(n% dQneu_dlnT(num_isos))
-         if(.not.allocated(n% dQneu_dlnRho)) allocate(n% dQneu_dlnRho(num_isos))
+         if(.not.allocated(n% Qneu)) allocate(n% Qneu(num_wk_reactions))
+         if(.not.allocated(n% dQneu_dlnT)) allocate(n% dQneu_dlnT(num_wk_reactions))
+         if(.not.allocated(n% dQneu_dlnRho)) allocate(n% dQneu_dlnRho(num_wk_reactions))
 
       end subroutine setup_net_info
       
@@ -146,6 +118,7 @@
       subroutine alloc_net_general_info(handle, cache_suffix, ierr)
          use rates_def, only: extended_screening
          use rates_lib, only: make_rate_tables
+         use chem_def, only: chem_isos
          
          integer, intent(in) :: handle
          character (len=*), intent(in) :: cache_suffix
@@ -175,15 +148,9 @@
          num_isos = g% num_isos
          num_wk_reactions = g% num_wk_reactions
                   
-         call setup_net_info( &
-            g, n, &
-            ierr) 
-         if (ierr /= 0) then
-            write(*,*) 'alloc_net_general_info failed in setup_net_info'
-            return
-         end if
+         call setup_net_info(n) 
          
-         g% cache_suffix = trim(cache_suffix)
+         g% cache_suffix = trim(cache_suffix)         
          
          call make_rate_tables( &
             g% num_reactions, g% cache_suffix, g% reaction_id,  &
@@ -1219,6 +1186,8 @@
       subroutine finish_net_def(handle, ierr)
          use rates_def, only: reaction_names_dict
          use utils_lib, only: integer_dict_create_hash, realloc_integer
+         use chem_def, only: chem_isos
+         use chem_lib, only: get_mass_excess
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
          
@@ -1287,12 +1256,17 @@
          allocate( &
             g% z158(g% num_isos),  &
             g% z52(g% num_isos),  &
+            g% mion(g% num_isos), &
             stat=ierr)
          if (ierr /= 0) return
          ! Precompute some powers of Z for screening and coulomb
          do i=1, g% num_isos
             g% z158(i) = pow(real(chem_isos% Z(g% chem_id(i)),kind=dp),1.58d0)
             g% z52(i)  = pow(real(chem_isos% Z(g% chem_id(i)),kind=dp),2.50d0) ! 5.d0/2.d0)
+         end do
+
+         do i=1, g% num_isos
+            g% mion(i) = get_mass_excess(chem_isos, g% chem_id(i)) * mev2gr
          end do
          
          call set_reaction_max_Z(g)

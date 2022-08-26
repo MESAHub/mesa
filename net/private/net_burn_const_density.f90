@@ -88,9 +88,8 @@
          use mtx_def
          use rates_def, only: rates_reaction_id_max, reaction_Name
          use rates_lib, only: rates_reaction_id
-         use net_initialize, only: setup_net_info, work_size
+         use net_initialize, only: setup_net_info
          use chem_lib, only: basic_composition_info, get_Q
-         use net_initialize, only: work_size
          use net_approx21, only: approx21_nrat
          
          integer, intent(in) :: net_handle, eos_handle, species, nvar, num_reactions
@@ -232,12 +231,8 @@
          n% screening_mode = screening_mode
                   
          if (dbg) write(*,2) 'call setup_net_info', iwork
-         call setup_net_info( g, n, ierr) 
+         call setup_net_info(n) 
          if (dbg) write(*,*) 'done setup_net_info'
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in setup_net_info'
-            return
-         end if
       
          if (dbg) write(*,*) 'call get_pointers'
          call get_pointers( &

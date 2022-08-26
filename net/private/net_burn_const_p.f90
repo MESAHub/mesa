@@ -49,7 +49,6 @@
          use num_lib 
          use mtx_lib
          use rates_def, only: rates_reaction_id_max
-         use net_initialize, only: work_size
          
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: num_isos
