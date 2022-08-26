@@ -47,32 +47,14 @@
 
       contains
       
-      
-      integer function burn_const_density_1_zone_work_size(g) result(sz)
-         use net_initialize, only: work_size
-         use net_approx21, only: approx21_nrat
-         type (Net_General_Info), pointer :: g
-         integer :: net_lwork, num_reactions, species, nvar
-         include 'formats'
-         num_reactions = g% num_reactions
-         if (g% doing_approx21) num_reactions = approx21_nrat
-         species = g% num_isos
-         nvar = species + 1
-         net_lwork = work_size(g)
-         sz = net_lwork + 2*num_reactions + 2*nvar*nvar         
-         ! dratdumdy1, dratdumdy2, dens_dfdy1, dmat1
-      end function burn_const_density_1_zone_work_size
-         
-
       subroutine get_pointers( &
-            g, burn_lwork, burn_work_array, species, nvar, num_reactions, &
+            g, species, nvar, num_reactions, &
             dratdumdy1, dratdumdy2, dens_dfdy, dmat, i, ierr)
          use net_approx21, only: approx21_nrat
          type (Net_General_Info), pointer :: g
-         real(dp), pointer :: burn_work_array(:)
-         integer, intent(in) :: burn_lwork, species, nvar, num_reactions
-         real(dp), pointer, dimension(:) :: dratdumdy1, dratdumdy2
-         real(dp), pointer, dimension(:,:) :: dens_dfdy, dmat
+         integer, intent(in) :: species, nvar, num_reactions
+         real(dp), allocatable, dimension(:) :: dratdumdy1, dratdumdy2
+         real(dp), allocatable, dimension(:,:) :: dens_dfdy, dmat
          integer, intent(inout) :: i
          integer, intent(out) :: ierr
          integer :: sz
@@ -80,12 +62,12 @@
          ierr = 0
          sz = num_reactions
          if (g% doing_approx21) sz = approx21_nrat
-         dratdumdy1(1:sz) => burn_work_array(i+1:i+sz); i = i+sz
-         dratdumdy2(1:sz) => burn_work_array(i+1:i+sz); i = i+sz
+         allocate(dratdumdy1(1:sz))
+         allocate(dratdumdy2(1:sz))
          
          sz = nvar*nvar
-         dens_dfdy(1:nvar,1:nvar) => burn_work_array(i+1:i+sz); i = i+sz
-         dmat(1:nvar,1:nvar) => burn_work_array(i+1:i+sz); i = i+sz
+         allocate(dens_dfdy(1:nvar,1:nvar))
+         allocate(dmat(1:nvar,1:nvar))
          
       end subroutine get_pointers
 
@@ -98,7 +80,6 @@
             screening_mode, &
             stptry_in, max_steps, eps, odescal, &
             use_pivoting, trace, burn_dbg, burner_finish_substep, &
-            burn_lwork, burn_work_array, net_lwork, net_work_array, &
             ending_x, eps_nuc_categories, ending_log10T, avg_eps_nuc, eps_neu_total, &
             nfcn, njac, nstep, naccpt, nrejct, ierr)
          use num_def
@@ -107,7 +88,7 @@
          use mtx_def
          use rates_def, only: rates_reaction_id_max, reaction_Name
          use rates_lib, only: rates_reaction_id
-         use net_initialize, only: set_rate_ptrs, setup_net_info, work_size
+         use net_initialize, only: setup_net_info, work_size
          use chem_lib, only: basic_composition_info, get_Q
          use net_initialize, only: work_size
          use net_approx21, only: approx21_nrat
@@ -131,9 +112,6 @@
          interface
             include 'burner_finish_substep.inc'
          end interface
-         integer, intent(in) :: net_lwork, burn_lwork
-         real(dp), intent(inout), pointer :: burn_work_array(:) ! (burn_lwork)
-         real(dp), intent(inout), pointer :: net_work_array(:) ! (net_lwork)
          real(dp), intent(inout) :: ending_x(:) ! (species)
          real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
          real(dp), intent(out) :: ending_log10T, avg_eps_nuc, eps_neu_total
@@ -156,9 +134,9 @@
                   
          real(dp), dimension(nvar), target :: starting_y_a, ending_y_a, save_x_a
          real(dp), dimension(:), pointer :: starting_y, ending_y, save_x
-         real(dp), dimension(:), pointer :: dratdumdy1, dratdumdy2
+         real(dp), dimension(:), allocatable :: dratdumdy1, dratdumdy2
 
-         real(dp), dimension(:,:), pointer :: dens_dfdy, dmat
+         real(dp), allocatable, dimension(:,:) :: dens_dfdy, dmat
 
          real(dp) :: xh, xhe, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          real(dp) :: aion(species)
@@ -250,24 +228,11 @@
          stpmin = min(t_end*1d-20,stptry*1d-6)
          stopp = t_end
          stpmax = max_steps
-         
-         if (dbg) write(*,2) 'call set_rate_ptrs', burn_lwork
-         call set_rate_ptrs(g, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            burn_lwork, burn_work_array, iwork, ierr)
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in set_ptrs_in_work'
-            return
-         end if
-         
+
+         n% screening_mode = screening_mode
+                  
          if (dbg) write(*,2) 'call setup_net_info', iwork
-         call setup_net_info( &
-            g, n, eps_nuc_categories,  &
-            screening_mode, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, burn_lwork, burn_work_array, &
-            iwork, ierr)
+         call setup_net_info( g, n, ierr) 
          if (dbg) write(*,*) 'done setup_net_info'
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in setup_net_info'
@@ -276,7 +241,7 @@
       
          if (dbg) write(*,*) 'call get_pointers'
          call get_pointers( &
-            g, burn_lwork, burn_work_array, species, nvar, num_reactions, &
+            g, species, nvar, num_reactions, &
             dratdumdy1, dratdumdy2, dens_dfdy, dmat, iwork, ierr)
          if (ierr /= 0) return
 
@@ -332,8 +297,7 @@
             real(dp) :: x, y(:), f(:)
             integer, intent(out) :: ierr
             integer, parameter :: ld_dfdx = 0
-            real(dp), target :: dfdx_arry(ld_dfdx,nvar)
-            real(dp), pointer :: dfdx(:,:)
+            real(dp) :: dfdx(ld_dfdx,nvar)
             real(dp) :: dxdt_sum, dxdt_sum_aprox21, &
                Z_plus_N, xsum, r, r1, r2
             integer :: i, ir, ci, j, k, ibad
@@ -346,7 +310,6 @@
             
             ierr = 0
             nfcn = nfcn + 1
-            dfdx => dfdx_arry
             call jakob_or_derivs(x,y,f,dfdx,ierr)
             if (ierr /= 0) return            
          
@@ -355,13 +318,11 @@
          subroutine burner_jakob(x,y,dfdy,nvar,ierr)
             integer, intent(in) :: nvar
             real(dp) :: x, y(:)
-            real(dp), pointer :: dfdy(:,:)
+            real(dp) :: dfdy(:,:)
             integer, intent(out) :: ierr
             real(dp), target :: f_arry(0)
             real(dp), pointer :: f(:)
             
-            real(dp), target :: dfdy21_a(nvar,nvar)
-            real(dp), pointer :: dfdy21(:,:)
             real(dp) :: Z_plus_N, df_t, df_m
             integer :: i, ci, j, cj
             logical :: okay
@@ -383,7 +344,7 @@
             use interp_1d_lib, only: interp_value
          
             real(dp) :: time, y(:), f(:)
-            real(dp), pointer :: dfdy(:,:)
+            real(dp) :: dfdy(:,:)
             integer, intent(out) :: ierr
          
             real(dp) :: T, lgT, rate_limit, rat, dratdt, dratdd
@@ -478,7 +439,6 @@
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
-               net_lwork, net_work_array, &
                actual_Qs, actual_neuQs, from_weaklib, .false., ierr)
             if (ierr /= 0) then
                !write(*,*) 'failed in eval_net'

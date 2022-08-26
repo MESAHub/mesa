@@ -57,27 +57,16 @@
          end if
          num_isos = g% num_isos
          num_wk_reactions = g% num_wk_reactions
-         work_size = &
-            num_isos*(2+num_isos) + &
-            num_weak_info_arrays_in_Net_Info*num_wk_reactions + &
-            6*num_reactions
-               ! ratraw, dratrawdt, dratrawdd
-               ! ratdum, dratdumdt, dratdumdd
-         if (g% doing_approx21) &
-            work_size = work_size + num_isos*num_isos + & ! dfdy
-               2*num_reactions + & ! dratdumdy1, dratdumdy2
-               5*num_isos ! d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
+         work_size = -1
       end function work_size
 
       subroutine set_ptrs_for_approx21( &
-            add_co56, i, work, dfdy, dratdumdy1, dratdumdy2, &
+            add_co56, dfdy, dratdumdy1, dratdumdy2, &
             d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho)
 
          logical, intent(in) :: add_co56
-         integer, intent(inout) :: i
-         real(dp), pointer :: work(:) ! (lwork)
-         real(dp), pointer :: dfdy(:,:)
-         real(dp), dimension(:), pointer :: &
+         real(dp), allocatable :: dfdy(:,:)
+         real(dp), dimension(:), allocatable :: &
             dratdumdy1, dratdumdy2, &
             d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
             
@@ -90,81 +79,20 @@
             num_isos = 21
          end if
          
-         dfdy(1:num_isos,1:num_isos) => work(i:i+num_isos*num_isos-1)
-         i=i+num_isos*num_isos
-      
-         dratdumdy1(1:num_reactions) => work(i:i+num_reactions-1)
-         i=i+num_reactions
-      
-         dratdumdy2(1:num_reactions) => work(i:i+num_reactions-1)
-         i=i+num_reactions
-      
-         d_epsnuc_dy(1:num_isos) => work(i:i+num_isos-1)
-         i=i+num_isos
-      
-         d_epsneu_dy(1:num_isos) => work(i:i+num_isos-1)
-         i=i+num_isos
-      
-         dydt1(1:num_isos) => work(i:i+num_isos-1)
-         i=i+num_isos
-      
-         dfdT(1:num_isos) => work(i:i+num_isos-1)
-         i=i+num_isos
-      
-         dfdRho(1:num_isos) => work(i:i+num_isos-1)
-         i=i+num_isos
+         allocate(dfdy(num_isos,num_isos))
+         allocate(dratdumdy1(num_reactions),dratdumdy2(num_reactions))
+         allocate(d_epsnuc_dy(num_isos), d_epsneu_dy(num_isos))
+         allocate(dydt1(num_isos),dfdT(num_isos),dfdRho(num_isos))
          
       end subroutine set_ptrs_for_approx21
 
-      subroutine set_rate_ptrs(g, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            i, ierr)
-         type (Net_General_Info), pointer  :: g
-         integer, intent(in) :: lwork
-         integer, intent(inout) :: i
-         real(dp), pointer, dimension(:) :: work, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho
-         integer, intent(out) :: ierr
-         integer :: sz
-         ierr = 0
-         if (g% doing_approx21) then
-            sz = num_reactions_func(g% add_co56_to_approx21)
-         else
-            sz = g% num_reactions
-         end if
-         if (6*sz > lwork) then
-            ierr = -1
-            return
-         end if
-         i = 0         
-         rate_screened(1:sz) => work(i+1:i+sz); i=i+sz      
-         rate_screened_dT(1:sz) => work(i+1:i+sz); i=i+sz      
-         rate_screened_dRho(1:sz) => work(i+1:i+sz); i=i+sz      
-         rate_raw(1:sz) => work(i+1:i+sz); i=i+sz      
-         rate_raw_dT(1:sz) => work(i+1:i+sz); i=i+sz      
-         rate_raw_dRho(1:sz) => work(i+1:i+sz); i=i+sz      
-      end subroutine set_rate_ptrs
-      
-      
+         
       subroutine setup_net_info( &
-            g, n, eps_nuc_categories,  &
-            screening_mode,  &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            i, ierr)
+            g, n, &
+            ierr)
          use chem_def
          type (Net_General_Info), pointer  :: g
          type (Net_Info) :: n
-         integer, intent(in) :: lwork
-         real(dp), intent(inout), target :: eps_nuc_categories(:) ! (num_categories)
-         integer, intent(in) :: screening_mode
-         real(dp), intent(inout), dimension(:), target :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
-         real(dp), pointer :: work(:) ! (lwork)
-         integer, intent(inout) :: i
          integer, intent(out) :: ierr
          
          integer :: num_reactions, num_isos, num_wk_reactions
@@ -183,56 +111,34 @@
             num_reactions = g% num_reactions
          end if
          
-         n% screening_mode = screening_mode
- 
-         n% eps_nuc_categories => eps_nuc_categories
+         if(.not.allocated(n% eps_nuc_categories)) allocate(n% eps_nuc_categories(num_categories))
          
+         if(.not.allocated(n% rate_screened)) allocate(n% rate_screened(num_reactions))
+         if(.not.allocated(n% rate_screened_dT)) allocate(n% rate_screened_dT(num_reactions))
+         if(.not.allocated(n% rate_screened_dRho)) allocate(n% rate_screened_dRho(num_reactions))
+         
+         if(.not.allocated(n% rate_raw)) allocate(n% rate_raw(num_reactions))
+         if(.not.allocated(n% rate_raw_dT)) allocate(n% rate_raw_dT(num_reactions))
+         if(.not.allocated(n% rate_raw_dRho)) allocate(n% rate_raw_dRho(num_reactions))
 
-         rate_screened(:) = 0
-         rate_screened_dT(:) = 0
-         rate_screened_dRho(:) = 0
-
-         n% rate_screened => rate_screened
-         n% rate_screened_dT => rate_screened_dT
-         n% rate_screened_dRho => rate_screened_dRho
-         
-         rate_raw(:) = 0
-         rate_raw_dT(:) = 0
-         rate_raw_dRho(:) = 0
-
-         
-         n% rate_raw => rate_raw
-         n% rate_raw_dT => rate_raw_dT
-         n% rate_raw_dRho => rate_raw_dRho
-         
+      
          ! input value of i is amount already used
-         n% y => work(i+1:i+num_isos); i=i+num_isos
+         if(.not.allocated(n% y)) allocate(n% y(num_isos))
          
-         n% d_eps_nuc_dy => work(i+1:i+num_isos); i=i+num_isos
-         
-         n% d_dydt_dy(1:num_isos,1:num_isos) => work(i+1:i+num_isos*num_isos)
-         i = i+num_isos*num_isos 
-         
-         n% lambda(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         n% dlambda_dlnT(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         n% dlambda_dlnRho(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         
-         n% Q(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         n% dQ_dlnT(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         n% dQ_dlnRho(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         
-         n% Qneu(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         n% dQneu_dlnT(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
-         n% dQneu_dlnRho(1:num_wk_reactions) => work(i+1:i+num_wk_reactions)
-         i=i+num_wk_reactions
+         if(.not.allocated(n% d_eps_nuc_dy)) allocate(n% d_eps_nuc_dy(num_isos))
+         if(.not.allocated(n% d_dydt_dy)) allocate(n% d_dydt_dy(num_isos,num_isos))
+
+         if(.not.allocated(n% lambda)) allocate(n% lambda(num_isos))
+         if(.not.allocated(n% dlambda_dlnT)) allocate(n% dlambda_dlnT(num_isos))
+         if(.not.allocated(n% dlambda_dlnRho)) allocate(n% dlambda_dlnRho(num_isos))
+
+         if(.not.allocated(n% Q)) allocate(n% Q(num_isos))
+         if(.not.allocated(n% dQ_dlnT)) allocate(n% dQ_dlnT(num_isos))
+         if(.not.allocated(n% dQ_dlnRho)) allocate(n% dQ_dlnRho(num_isos))
+
+         if(.not.allocated(n% Qneu)) allocate(n% Qneu(num_isos))
+         if(.not.allocated(n% dQneu_dlnT)) allocate(n% dQneu_dlnT(num_isos))
+         if(.not.allocated(n% dQneu_dlnRho)) allocate(n% dQneu_dlnRho(num_isos))
 
       end subroutine setup_net_info
       
@@ -248,11 +154,6 @@
          type (Net_Info) :: n
          integer :: ios, status, lwork, num_reactions, &
             num_isos, num_wk_reactions, i, iwork
-         real(dp), dimension(:), pointer :: eps_nuc_categories
-         real(dp), dimension(:), pointer :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
-         real(dp), pointer :: work(:)
          type (Net_General_Info), pointer  :: g
          
          ! the following not used during initialization, but need as args.
@@ -273,31 +174,10 @@
          num_reactions = g% num_reactions
          num_isos = g% num_isos
          num_wk_reactions = g% num_wk_reactions
-         lwork = work_size(g)
-         
-         allocate(work(lwork), eps_nuc_categories(num_categories), stat=ierr)
-         if (ierr /= 0) then
-            write(*,*) 'alloc_net_general_info failed in allocate'
-            return
-         end if
-         
-         eps_nuc_categories = 0
-
-         call set_rate_ptrs(g, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            iwork, ierr) ! iwork is number of entries in work used for rates
-         if (ierr /= 0) then
-            write(*,*) 'failed in set_ptrs_in_work'
-            return
-         end if
-         
+                  
          call setup_net_info( &
-            g, n, eps_nuc_categories,  &
-            screening_mode, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            iwork, ierr) ! iwork updated for amount now used in work
+            g, n, &
+            ierr) 
          if (ierr /= 0) then
             write(*,*) 'alloc_net_general_info failed in setup_net_info'
             return
@@ -319,7 +199,6 @@
             return
          end if
          
-         deallocate(work, eps_nuc_categories)
          
       end subroutine alloc_net_general_info
       

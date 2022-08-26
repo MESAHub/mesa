@@ -871,8 +871,6 @@
 
 
       integer function do_burn(s, dt)
-         use net_lib, only: net_work_size, net_1_zone_burn_const_density_work_size, &
-            net_1_zone_burn_work_size
          use star_utils, only: start_time, update_time
          use net, only: get_screening_mode
          use chem_def
@@ -882,9 +880,9 @@
          real(dp), intent(in) :: dt
 
          integer :: &
-            k_bad, net_lwork, ierr, max_num_iters_k, nz, op_err, &
+            k_bad, ierr, max_num_iters_k, nz, op_err, &
             i, j, k, num_iters, species, max_num_iters_used, &
-            screening_mode, burn_lwork, burn_lwork_const_density, kmin
+            screening_mode, kmin
          integer(8) :: time0, clock_rate
          real(dp) :: total, avg_epsnuc, min_T_for_const_density_solver
          logical :: trace, dbg, okay, skip_burn
@@ -912,35 +910,7 @@
          end if
 
          if (dt <= 0d0) return
-         
-         net_lwork = net_work_size(s% net_handle, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'do_burn failed in net_work_size'
-            do_burn = terminate
-            s% termination_code = t_solve_burn
-            s% result_reason = nonzero_ierr
-            return
-         end if
-         
-         burn_lwork_const_density = net_1_zone_burn_const_density_work_size(s% net_handle,ierr)
-         if (ierr /= 0) then
-            write(*,*) 'do_burn failed in net_1_zone_burn_const_density_work_size'
-            do_burn = terminate
-            s% termination_code = t_solve_burn
-            s% result_reason = nonzero_ierr
-            return
-         end if
-         burn_lwork = net_1_zone_burn_work_size(s% net_handle,ierr)
-         if (ierr /= 0) then
-            write(*,*) 'do_burn failed in net_1_zone_burn_work_size'
-            do_burn = terminate
-            s% termination_code = t_solve_burn
-            s% result_reason = nonzero_ierr
-            return
-         end if
-         
-         burn_lwork = max(burn_lwork, burn_lwork_const_density)
-
+                  
          max_num_iters_used = 0
          max_num_iters_k = 0
          k_bad = 0
@@ -991,7 +961,7 @@
             op_err = 0
             call burn1_zone( &
                s, k, species, min_T_for_const_density_solver, skip_burn, &
-               net_lwork, burn_lwork, screening_mode, &
+               screening_mode, &
                dt, num_iters, avg_epsnuc, burn_dbg, op_err)
             if (op_err /= 0) then
                ierr = -1
@@ -1054,7 +1024,7 @@
 
       subroutine burn1_zone( &
             s, k, species, min_T_for_const_density_solver, skip_burn, &
-            net_lwork, burn_lwork, screening_mode, &
+            screening_mode, &
             dt, num_iters_out, avg_epsnuc, dbg_in, ierr)
          use net_lib, only: net_1_zone_burn_const_density, net_1_zone_burn, &
             show_net_reactions_and_info
@@ -1063,15 +1033,14 @@
          use net, only: do1_net
          use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
          type (star_info), pointer :: s
-         integer, intent(in) :: k, species, &
-            net_lwork, burn_lwork, screening_mode
+         integer, intent(in) :: k, species,  screening_mode
          real(dp), intent(in) :: dt, min_T_for_const_density_solver
          logical, intent(in) :: skip_burn, dbg_in
          real(dp), intent(out) :: avg_epsnuc
          integer, intent(out) :: num_iters_out, ierr
          
-         real(dp), target :: net_work_ary(net_lwork), burn_work_ary(burn_lwork), xa_start_ary(species)
-         real(dp), pointer :: net_work(:), burn_work(:), xa_start(:)
+         real(dp), target :: xa_start_ary(species)
+         real(dp), pointer :: xa_start(:)
          
          real(dp) :: stptry, eps, odescal, &
             starting_log10T, ending_log10T, ending_eps_neu_total, &
@@ -1109,8 +1078,6 @@
          
          nullify(dxdt_source_term, times)
          
-         net_work => net_work_ary
-         burn_work => burn_work_ary
          xa_start => xa_start_ary
 
          stptry = 0d0
@@ -1144,7 +1111,7 @@
                screening_mode,  &
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
-               burn_lwork, burn_work, net_lwork, net_work, s% xa(1:species,k), &
+               s% xa(1:species,k), &
                s% eps_nuc_categories(:,k), &
                avg_epsnuc, ending_eps_neu_total, &
                nfcn, njac, ntry, naccpt, nrejct, ierr)
@@ -1166,7 +1133,7 @@
                screening_mode, &
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
-               burn_lwork, burn_work, net_lwork, net_work, s% xa(1:species,k), &
+               s% xa(1:species,k), &
                s% eps_nuc_categories(:,k), &
                ending_log10T, avg_epsnuc, ending_eps_neu_total, &
                nfcn, njac, ntry, naccpt, nrejct, ierr)
@@ -1194,7 +1161,7 @@
                screening_mode,  &
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
-               burn_lwork, burn_work, net_lwork, net_work, s% xa(1:species,k), &
+               s% xa(1:species,k), &
                s% eps_nuc_categories(:,k), &
                avg_epsnuc, ending_eps_neu_total, &
                nfcn, njac, ntry, naccpt, nrejct, ierr)
@@ -1208,8 +1175,7 @@
          num_iters_out = naccpt
          
          ! make extra call to get eps_nuc_categories
-         call do1_net(s, k, s% species, s% num_reactions, &
-            net_lwork, .false., ierr)
+         call do1_net(s, k, s% species, s% num_reactions, .false., ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &
                write(*,2) 'net_1_zone_burn final call to do1_net failed', k

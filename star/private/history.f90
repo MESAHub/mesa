@@ -1181,7 +1181,7 @@
          use gravity_darkening
          
          !use net_def, only: Net_Info
-         !use net_lib, only: net_work_size, get_reaction_id_table_ptr, get_net_rate_ptrs
+         !use net_lib, only: net_work_size, get_reaction_id_table_ptr
          use rates_def, only: T_Factors!, reaction_name, std_reaction_Qs, std_reaction_neuQs
          use rates_lib, only: get_raw_rate, eval_tfactors!, rates_reaction_id, screening_option
          !use eos_def, only : i_eta
@@ -1200,9 +1200,6 @@
          type (T_Factors), target :: tf2
          !real(dp), pointer :: work(:)
          !integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         !integer :: net_lwork
-         !real(dp), target :: net_work_ary(net_lwork)
-         !real(dp), pointer :: net_work(:)
          !real(dp), pointer, dimension(:) :: &
          !   rate_screened, rate_screened_dT, rate_screened_dRho, &
          !   rate_raw, rate_raw_dT, rate_raw_dRho
@@ -1244,7 +1241,6 @@
          !    log10_rho = s% lnd(k)/ln10
          !    log10_T = s% lnT(k)/ln10
          !    
-         !    net_lwork = net_work_size(s% net_handle, ierr)
          !    
          !    call net_get( &
          !       s% net_handle, .false., n, species, s% num_reactions, s% xa(1:species,k), &
@@ -1257,20 +1253,12 @@
          !       s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
          !       s% screening_mode_value, &
          !       s% eps_nuc_categories(:,k), &
-         !       s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
+         !       s% eps_nuc_neu_total(k), ierr)
          !    if (ierr /= 0) then
          !       write(*,*) 'failed in net_get'
          !       stop 1
          !    end if
          !
-         !    call get_net_rate_ptrs(s% net_handle, &
-         !       rate_screened, rate_screened_dT, rate_screened_dRho, &
-         !       rate_raw, rate_raw_dT, rate_raw_dRho, net_lwork, net_work, &
-         !       ierr)
-         !    if (ierr /= 0) then
-         !       write(*,*) 'failed in get_net_rate_ptrs'
-         !       stop 1
-         !    end if
          !    ir = rates_reaction_id(reaction_name(i))
          !end if
          

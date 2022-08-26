@@ -182,10 +182,10 @@
          real(dp), pointer :: reaction_Qs(:) ! if null, use standard values         
          real(dp), pointer :: reaction_neuQs(:) ! if null, use standard values
 
-         real(dp), pointer :: eps_nuc_categories(:) ! (num_categories)
+         real(dp), allocatable :: eps_nuc_categories(:) ! (num_categories)
          ! eps_nuc subtotals for each reaction category
          
-         real(dp), pointer, dimension(:) :: &
+         real(dp), allocatable, dimension(:) :: &
             rate_screened, rate_screened_dT, rate_screened_dRho ! (num_rates)
          ! the units here depend on the number of reactants.
          ! in all cases, the rate_screened times as many molar fractions as there are reactants
@@ -198,19 +198,19 @@
          ! similarly, a 3 body reaction will have rate_screened
          ! with units of [gram^2/(mole^2-sec)].
 
-         real(dp), pointer, dimension(:) :: &
+         real(dp), allocatable, dimension(:) :: &
             rate_raw, rate_raw_dT, rate_raw_dRho ! (num_rates)
          ! raw rates are unscreened (but include density factors)
                   
          ! pointers into work array ----------------------------------
 
          ! molar fractions and their rates of change
-         real(dp), pointer :: y(:) ! units [moles/gram]     (num_isos)
-         real(dp), pointer :: d_dydt_dy(:,:) ! units [1/second] (num_isos, num_isos)
-         real(dp), pointer :: d_eps_nuc_dy(:) ! (num_isos)
+         real(dp), allocatable :: y(:) ! units [moles/gram]     (num_isos)
+         real(dp), allocatable :: d_dydt_dy(:,:) ! units [1/second] (num_isos, num_isos)
+         real(dp), allocatable :: d_eps_nuc_dy(:) ! (num_isos)
          
          ! weaklib results
-         real(dp), dimension(:), pointer :: &
+         real(dp), dimension(:), allocatable :: &
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
@@ -271,14 +271,15 @@
       integer, parameter :: i_burn_caller_id = 1
       integer, parameter :: i_net_handle = 2
       integer, parameter :: i_screening_mode = 3
-      integer, parameter :: i_net_lwork = 4
-      integer, parameter :: i_eos_handle = 5
-      integer, parameter :: i_sparse_format = 6
-      integer, parameter :: i_clip = 7
-      integer, parameter :: i_ntimes = 8
+      integer, parameter :: i_eos_handle = 4
+      integer, parameter :: i_sparse_format = 5
+      integer, parameter :: i_clip = 6
+      integer, parameter :: i_ntimes = 7
       
       integer, parameter :: burn_lipar = i_ntimes
 
+      ! Note: We need  burn_lrpar /= burn_const_P_lrpar so that we can determine whether we are doing a normal burn or 
+      ! one at const_P. This is needed in burn_solout in mod_one_zone_burn
       integer, parameter :: r_burn_temp = 1
       integer, parameter :: r_burn_lgT = 2
       integer, parameter :: r_burn_rho = 3

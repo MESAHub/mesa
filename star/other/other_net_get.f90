@@ -48,7 +48,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode, &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, ierr)      
+            ierr)      
          use net_lib, only: net_get
          use net_def, only: Net_Info
          integer, intent(in) :: id ! id for star         
@@ -81,8 +81,6 @@
          real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
          real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
          integer, intent(in) :: screening_mode
-         integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
-         real(dp), pointer :: work(:) ! (lwork)
          integer, intent(out) :: ierr ! 0 means okay
          call net_get( &
             net_handle, just_dxdt, n, num_isos, num_reactions,  &
@@ -94,7 +92,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode, &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, ierr)
+            ierr)
       end subroutine null_other_net_get
 
 

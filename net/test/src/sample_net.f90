@@ -41,7 +41,7 @@
          use chem_def, only: num_categories
          
          integer :: ierr, handle, species, &
-            num_reactions, lwork
+            num_reactions
          integer, pointer :: chem_id(:), net_iso(:)
          character (len=100) :: net_file
          character (len=64) :: mesa_dir
@@ -65,14 +65,14 @@
 ! set up the network         
          call setup_net( &
             net_file, handle, &
-            species, chem_id, net_iso, num_reactions, lwork, ierr)
+            species, chem_id, net_iso, num_reactions, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
 
 ! call the burner         
          call do1_net_eval( &
             handle, species, num_reactions, &
-            chem_id, net_iso, lwork, ierr)
+            chem_id, net_iso,  ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)         
          
       end subroutine test
@@ -112,13 +112,13 @@
       
       subroutine setup_net( &
             net_file, handle, &
-            species, chem_id, net_iso, num_reactions, lwork, ierr)
+            species, chem_id, net_iso, num_reactions, ierr)
          use net_lib
          use rates_def, only: rates_reaction_id_max
          
          character (len=*), intent(in) :: net_file
          integer, pointer :: chem_id(:), net_iso(:) ! set, but not allocated
-         integer, intent(out) :: handle, species, num_reactions, lwork, ierr
+         integer, intent(out) :: handle, species, num_reactions, ierr
          
          ierr = 0
          handle = alloc_net_handle(ierr)
@@ -148,15 +148,12 @@
          
          num_reactions = net_num_reactions(handle, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-
-         lwork = net_work_size(handle, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
       end subroutine setup_net
       
       
       subroutine do1_net_eval( &
-            handle, species, num_reactions, chem_id, net_iso, lwork, ierr)
+            handle, species, num_reactions, chem_id, net_iso, ierr)
             
          use rates_def
          use chem_def
@@ -166,7 +163,7 @@
       
 ! declare the pass   
          integer, intent(in) :: handle, species, num_reactions, &
-            chem_id(:), net_iso(:), lwork
+            chem_id(:), net_iso(:)
          integer, intent(out) :: ierr
          
 
@@ -179,8 +176,8 @@
             eps_nuc_categories(num_categories), eps_neu_total, &
             dxdt(species), d_dxdt_dRho(species), d_dxdt_dT(species), &
             d_dxdt_dx(species,species)
-         real(dp), target :: work_ary(lwork), rate_factors_ary(num_reactions)
-         real(dp), pointer, dimension(:) :: work, rate_factors
+         real(dp), target :: rate_factors_ary(num_reactions)
+         real(dp), pointer, dimension(:) :: rate_factors
          logical :: skip_jacobian
          type (Net_Info) :: n
          character (len=80) :: string
@@ -197,7 +194,6 @@
 
 ! set some pointers and options
          ierr = 0
-         work => work_ary
          rate_factors => rate_factors_ary
 
          eta = 0
@@ -256,7 +252,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, & 
             screening_mode, &     
             eps_nuc_categories, eps_neu_total, & 
-            lwork, work, ierr)
+            ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
 

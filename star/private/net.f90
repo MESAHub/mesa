@@ -42,7 +42,6 @@
 
       subroutine do_net(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
-         use net_lib, only: net_work_size
          use net_def, only: net_other_net_derivs
          use rates_def, only: rates_other_screening
          use alloc
@@ -51,7 +50,7 @@
          integer, intent(out) :: ierr
 
          logical, parameter :: use_omp = .true.
-         integer :: k, op_err, net_lwork, j, jj, cnt, kmax
+         integer :: k, op_err, j, jj, cnt, kmax
          integer(8) :: time0, clock_rate
          real(dp) :: total
          integer, pointer :: ks(:)
@@ -97,14 +96,12 @@
             net_other_net_derivs => s% other_net_derivs
          end if
 
-         net_lwork = net_work_size(s% net_handle, ierr)
-         
          check_op_split_burn = s% op_split_burn
          
          if (nzlo == nzhi) then
             call do1_net(s, nzlo, s% species, &
                s% num_reactions, &
-               net_lwork, check_op_split_burn, ierr)
+               check_op_split_burn, ierr)
             return
          end if
 
@@ -117,7 +114,7 @@
                op_err = 0
                call do1_net(s, k, s% species, &
                   s% num_reactions, &
-                  net_lwork, check_op_split_burn, op_err)
+                  check_op_split_burn, op_err)
                if (op_err /= 0) okay = .false.
             end do
 !$OMP END PARALLEL DO
@@ -126,7 +123,7 @@
             do k = nzlo, nzhi
                call do1_net(s, k, s% species, &
                   s% num_reactions, &
-                  net_lwork, check_op_split_burn, ierr)
+                  check_op_split_burn, ierr)
                if (ierr /= 0) exit
             end do
          end if
@@ -136,7 +133,7 @@
 
 
       subroutine do1_net(s, k, species, &
-            num_reactions, net_lwork, check_op_split_burn, ierr)
+            num_reactions, check_op_split_burn, ierr)
          use rates_def, only: std_reaction_Qs, std_reaction_neuQs, i_rate, &
             star_debugging_rates_flag, rates_test_partials_val, rates_test_partials_dval_dx
          use net_def, only: Net_Info, net_test_partials, &
@@ -149,15 +146,13 @@
          use eos_def, only : i_eta
          use utils_lib,only: realloc_double, realloc_double3
          type (star_info), pointer :: s
-         integer, intent(in) :: k, species, num_reactions, net_lwork
+         integer, intent(in) :: k, species, num_reactions
          logical, intent(in) :: check_op_split_burn
          integer, intent(out) :: ierr
 
          integer :: i, j, kk, screening_mode, sz, i_var, i_var_sink
          real(dp) :: log10_rho, log10_T, T, alfa, beta, eps_nuc_factor, &
             d_eps_nuc_dRho, d_eps_nuc_dT, cat_factor, tau_gamma, eps_cat_sum
-         real(dp), target :: net_work_ary(net_lwork)
-         real(dp), pointer :: net_work(:)
          type (Net_Info) :: n
          character (len=100) :: message
          real(dp), pointer :: reaction_neuQs(:)
@@ -174,8 +169,6 @@
              s% T_start(k) >= s% op_split_burn_min_T) then ! leave this to do_burn
             return
          end if
-
-         net_work => net_work_ary
 
          n% star_id = s% id
          n% zone = k
@@ -254,7 +247,7 @@
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
                screening_mode, s% eps_nuc_categories(:,k), &
-               s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
+               s% eps_nuc_neu_total(k), ierr)
          else
             call net_get( &
                s% net_handle, .false., n, species, num_reactions, s% xa(1:species,k), &
@@ -266,7 +259,7 @@
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
                screening_mode, s% eps_nuc_categories(:,k), &
-               s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
+               s% eps_nuc_neu_total(k), ierr)
          end if
 
          if (is_bad(s% eps_nuc(k))) then
@@ -349,7 +342,7 @@
                write(*,'(A)')
                write(*,*) 'do1_net: net_get failure for cell ', k
                !return
-               call show_stuff(s,k,net_lwork,net_work)
+               call show_stuff(s,k)
             end if
             if (is_bad_num(s% eps_nuc(k))) then
                if (s% stop_for_bad_nums) then
@@ -392,7 +385,7 @@
             write(*,*) 'k', k
             write(*,1) 's% eps_nuc(k)', s% eps_nuc(k)
             ierr = -1
-            call show_stuff(s,k,net_lwork,net_work)
+            call show_stuff(s,k)
             write(*,*) '(is_bad_num(s% eps_nuc(k)))'
             write(*,*) 'failed in do1_net'
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
@@ -401,7 +394,7 @@
          
          if (k == -1) then
             write(*,'(A)')
-            call show_stuff(s,k,net_lwork,net_work)
+            call show_stuff(s,k)
          end if
 
          if (s% model_number == -1) then
@@ -411,7 +404,7 @@
          
          if (.false.) then
             write(*,'(A)')
-            call show_stuff(s,k,net_lwork,net_work)
+            call show_stuff(s,k)
             write(*,'(A)')
             write(*,'(A)')
             write(*,1) 's% eps_nuc(k)', s% eps_nuc(k)
@@ -423,22 +416,21 @@
             !ierr = -1
          end if
 
-         if (.false.) call show_stuff(s,k,net_lwork,net_work)
+         if (.false.) call show_stuff(s,k)
 
       end subroutine do1_net
 
 
 
-      subroutine show_stuff(s,k,lwork,work)
+      subroutine show_stuff(s,k)
          use chem_def
          use eos_def, only : i_eta
          use rates_def
-         use net_lib, only: get_reaction_id_table_ptr, get_net_rate_ptrs
+         use net_lib, only: get_reaction_id_table_ptr
          use num_lib, only: qsort
          use eos_def, only: i_eta
          type (star_info), pointer :: s
-         integer, intent(in) :: k, lwork
-         real(dp), pointer :: work(:)
+         integer, intent(in) :: k
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
          integer :: i, j, ierr, species, num_reactions
@@ -458,15 +450,6 @@
          num_reactions = s% num_reactions
          log10_T = s% lnT(k)/ln10
          log10_Rho = s% lnd(k)/ln10
-
-         call get_net_rate_ptrs(s% net_handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in get_net_rate_ptrs'
-            call mesa_error(__FILE__,__LINE__)
-         end if
 
          call get_reaction_id_table_ptr(s% net_handle, reaction_id, ierr)
          if (ierr /= 0) return

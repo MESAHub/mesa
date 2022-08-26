@@ -53,7 +53,7 @@ contains
     integer, intent(in) :: n, ids(:)
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: T9, YeRho, etak, d_etak_dlnT, d_etak_dlnRho
-    real(dp), dimension(:), intent(inout), pointer :: &
+    real(dp), dimension(:), intent(inout) :: &
          lambda, dlambda_dlnT, dlambda_dlnRho, &
          Q, dQ_dlnT, dQ_dlnRho, &
          Qneu, dQneu_dlnT, dQneu_dlnRho
