@@ -48,9 +48,9 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode, &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, ierr)
+            actual_Qs, actual_neuQs, from_weaklib, symbolic, ierr)
          use net_initialize, only: &
-            set_rate_ptrs, setup_net_info, set_ptrs_for_approx21
+            setup_net_info, set_ptrs_for_approx21
          use net_approx21, only: num_reactions_func => num_reactions
          use net_screen
          use net_derivs
@@ -87,16 +87,11 @@
          real(dp), intent(inout) :: eps_nuc_categories(:)
          real(dp), intent(out) :: eps_neu_total
          integer, intent(in) :: screening_mode
-         integer, intent(in) :: lwork
-         real(dp), pointer :: work(:) ! (lwork)
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null
          logical, pointer :: from_weaklib(:) ! ignore if null
          logical, intent(in) :: symbolic
          integer, intent(out) :: ierr
 
-         real(dp), dimension(:), pointer :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
          integer, parameter :: max_z_for_cache = 14
          real(qp), target :: dydt_a(num_rvs*num_isos)
          real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
@@ -111,8 +106,8 @@
          logical :: doing_timing
          
          ! for approx21
-         real(dp), pointer :: dfdy(:,:)
-         real(dp), dimension(:), pointer :: &
+         real(dp), allocatable :: dfdy(:,:)
+         real(dp), dimension(:), allocatable :: &
             dratdumdy1, dratdumdy2, d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
          real(dp) :: &
             deps_total_dRho, deps_total_dT, &
@@ -161,24 +156,10 @@
          n% temp = temp
          n% logRho = logrho
          n% rho = rho
+         n% screening_mode = screening_mode
          
-         if (dbg) write(*,*) 'call set_rate_ptrs'
-         call set_rate_ptrs(g, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            iwork, ierr) ! iwork is number of entries in work used for rates
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in set_ptrs_in_work'
-            return
-         end if
-
          if (dbg) write(*,*) 'call setup_net_info'
-         call setup_net_info( &
-            g, n, eps_nuc_categories,  &
-            screening_mode, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            iwork, ierr) ! iwork updated for amount now used in work
+         call setup_net_info( g, n, ierr) 
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in setup_net_info'
             return
@@ -193,7 +174,7 @@
          if (g% doing_approx21) then
             call set_ptrs_for_approx21( &
                g% add_co56_to_approx21, &
-               iwork, work, dfdy, dratdumdy1, dratdumdy2, &
+               dfdy, dratdumdy1, dratdumdy2, &
                d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho)
             mion => mion_a
             mev2gr = 1d6*ev2erg/(clight*clight)
@@ -352,8 +333,8 @@
             !net_test_partials_val = eps_nuc
             !net_test_partials_dval_dx = d_eps_nuc_dx(net_test_partials_i)
             net_test_partials_val = &
-               rate_screened(g% net_reaction(irn14_to_c12))/ &
-               rate_raw(g% net_reaction(irn14_to_c12))
+               n% rate_screened(g% net_reaction(irn14_to_c12))/ &
+               n% rate_raw(g% net_reaction(irn14_to_c12))
             net_test_partials_dval_dx = 0d0 
             write(*,*) 'net_test_partials'
          end if
@@ -368,20 +349,20 @@
             call approx21_special_reactions( &
                btemp, bden, abar, zbar, n% y, &
                g% use_3a_fl87, Qconv*reaction_Qs(ir_he4_he4_he4_to_c12), &
-               rate_screened, rate_screened_dT, rate_screened_dRho, &
+               n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                dratdumdy1, dratdumdy2, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return            
             
             call approx21_dydt( &
-               n% y, rate_screened, rate_screened, &
+               n% y, n% rate_screened, n% rate_screened, &
                dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
                g% fe56ec_n_neut, btemp, bden, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return
                
-            fII = approx21_eval_PPII_fraction(n% y, rate_screened)
+            fII = approx21_eval_PPII_fraction(n% y, n% rate_screened)
             
             call get_approx21_eps_info( &
-                  dydt1, rate_screened, .true., eps_total, eps_neu_total, &
+                  dydt1, n% rate_screened, .true., eps_total, eps_neu_total, &
                   g% add_co56_to_approx21,  ierr)
                   
             if (ierr /= 0) return               
@@ -396,7 +377,7 @@
             call approx21_dfdy( &
                n% y, dfdy, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, g% fe56ec_n_neut, &
-               rate_screened, rate_screened_dT, rate_screened_dRho, &
+               n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                dratdumdy1, dratdumdy2, btemp,g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
@@ -404,27 +385,27 @@
                
                ! NOTE: currently this gives d_eps_total_dy -- should fix to account for neutrinos too
                
-               n% y, mion, dfdy, rate_screened, rate_screened_dT, rate_screened_dRho, &
+               n% y, mion, dfdy, n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
                g% fe56ec_n_neut, btemp, bden, dfdT, dfdRho, d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             call get_approx21_eps_info( &
-               dfdT, rate_screened_dT, .false., deps_total_dT, deps_neu_dT, &
+               dfdT, n% rate_screened_dT, .false., deps_total_dT, deps_neu_dT, &
                g% add_co56_to_approx21,  ierr)
 
             if (ierr /= 0) return
             d_eps_nuc_dT = deps_total_dT - deps_neu_dT
                               
             call get_approx21_eps_info( &
-               dfdRho, rate_screened_dRho, .false., deps_total_dRho, deps_neu_dRho, &
+               dfdRho, n% rate_screened_dRho, .false., deps_total_dRho, deps_neu_dRho, &
                g% add_co56_to_approx21,  ierr)
 
             if (ierr /= 0) return             
             d_eps_nuc_dRho = deps_total_dRho - deps_neu_dRho
             
             call approx21_d_epsneu_dy( &
-               n% y, rate_screened, &
+               n% y, n% rate_screened, &
                reaction_neuQs(irpp_to_he3), &   
                reaction_neuQs(ir34_pp2), &  
                reaction_neuQs(ir34_pp3), &  
@@ -597,7 +578,7 @@
             call eval_using_rate_tables( &
                num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
                ye, logtemp, btemp, bden, rate_factors, g% logttab, &
-               rate_raw, rate_raw_dT, rate_raw_dRho, ierr) 
+               n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, ierr) 
             if (ierr /= 0) then
                if (dbg) write(*,*) 'ierr from eval_using_rate_tables'
                return
@@ -619,8 +600,8 @@
             if (dbg) write(*,*) 'call screen_net with init=.false.'
             call screen_net( &
                g, num_isos, n% y, btemp, bden, logtemp, logrho, .false.,  &
-               rate_raw, rate_raw_dT, rate_raw_dRho, &
-               rate_screened, rate_screened_dT, rate_screened_dRho, &
+               n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
+               n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                n% screening_mode, &
                zbar, abar, z2bar, ye, ierr)
             if (dbg) write(*,*) 'done screen_net with init=.false.'
@@ -628,9 +609,9 @@
             if (g% doing_approx21) then
                num = num_reactions_func(g%add_co56_to_approx21)
                do i=num_reactions+1,num
-                  rate_screened(i) = rate_raw(i)
-                  rate_screened_dT(i) = rate_raw_dT(i)
-                  rate_screened_dRho(i) = rate_raw_dRho(i)
+                  n% rate_screened(i) = n% rate_raw(i)
+                  n% rate_screened_dT(i) = n% rate_raw_dT(i)
+                  n% rate_screened_dRho(i) = n% rate_raw_dRho(i)
                end do
                do i=1,num
                   dratdumdy1(i) = 0d0
@@ -654,10 +635,10 @@
             integer, intent(out) :: ierr
             ierr = 0
             call approx21_pa_pg_fractions( &
-               rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
+               n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, ierr)
             if (ierr /= 0) return            
             call approx21_weak_rates( &
-               n% y, rate_raw, rate_raw_dT, rate_raw_dRho, &
+               n% y, n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
                btemp, bden, ye, eta, zbar, &
                weak_rate_factor, plus_co56, ierr)
             if (ierr /= 0) return            

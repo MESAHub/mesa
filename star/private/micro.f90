@@ -62,7 +62,6 @@ contains
 
     use kap_support, only: prepare_kap
     use star_utils, only: start_time, update_time
-    use net_lib, only: net_work_size
     use net, only: do_net
     use chem_def, only: icno, ipp, chem_isos
     use rates_def, only: i_rate

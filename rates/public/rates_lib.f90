@@ -694,7 +694,7 @@
          ! Q is total, so Q-Qneu is the actual thermal energy.
          ! note: lambdas include Ye Rho factors for electron captures.
          ! so treat the rates as if just beta decays
-         real(dp), dimension(:), pointer, intent(inout) :: &
+         real(dp), dimension(:), intent(inout) :: &
                 lambda, dlambda_dlnT, dlambda_dlnRho, &
                 Q, dQ_dlnT, dQ_dlnRho, &
                 Qneu, dQneu_dlnT, dQneu_dlnRho
@@ -751,7 +751,7 @@
          ! Q is total, so Q-Qneu is the actual thermal energy.
          ! note: lambdas include Ye Rho factors for electron captures.
          ! so treat the rates as if just beta decays
-         real(dp), dimension(:), pointer :: &
+         real(dp), dimension(:) :: &
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho

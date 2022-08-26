@@ -36,7 +36,6 @@
 
       logical :: qt
       character (len=64) :: net_file
-      integer :: handle
       integer :: species
       real(dp) :: z, abar, zbar, z2bar, z53bar, ye, &
          eta, d_eta_dlnT, d_eta_dlnRho, eps_neu_total
@@ -46,24 +45,25 @@
       real(dp), dimension(:), pointer ::  &
          xin, xin_copy, d_eps_nuc_dx, dxdt, d_dxdt_dRho, d_dxdt_dT
       real(dp), pointer :: d_dxdt_dx(:,:)  
-      type (Net_Info) :: n
       
 
       contains
       
       
-      subroutine do1_net(symbolic)
+      subroutine do1_net(handle, symbolic)
          use chem_lib, only:composition_info
+         integer, intent(in) :: handle
          logical, intent(in) :: symbolic
 
          real(dp) :: logRho, logT, Rho, T, sum, mass_correction, weak_rate_factor, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, xh, xhe, rate_limit
 
-         integer :: info, i, j, k, lwork, chem_id(species), num_reactions
+         integer :: info, i, j, k, chem_id(species), num_reactions
          real(dp), dimension(species) :: dabar_dx, dzbar_dx, dmc_dx
          real(dp), dimension(:), pointer :: eps_nuc_categories
-         real(dp), pointer :: work(:), rate_factors(:)
+         real(dp), pointer :: rate_factors(:)
          type (Net_General_Info), pointer  :: g
+         type (Net_Info) :: n
          logical :: skip_jacobian
          
          info = 0
@@ -77,10 +77,7 @@
 
          if (.not. qt) write(*,*)
          
-         lwork = net_work_size(handle, info) 
-         if (info /= 0) call mesa_error(__FILE__,__LINE__)
-         
-         allocate(work(lwork),  &
+         allocate( &
             rate_factors(num_reactions), &
             eps_nuc_categories(num_categories), &
             stat=info)
@@ -125,7 +122,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                   screening_mode,      &
                   eps_nuc_categories, eps_neu_total, &
-                  lwork, work, info)
+                  info)
          else
             call net_get(handle, skip_jacobian, n, species, num_reactions,  &
                   xin, T, logT, Rho, logRho,  &
@@ -136,7 +133,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                   screening_mode,    &
                   eps_nuc_categories, eps_neu_total, &
-                  lwork, work, info)
+                  info)
          end if
          if (info /= 0) then
             write(*, *) 'bad return from net_get'
@@ -161,13 +158,13 @@
             write(*,'(A)')
          else if (.not. qt) then
             call show_results( &
-                  g, lwork, work, logT, logRho, species, num_reactions, xin,  &
+                  g, n, logT, logRho, species, num_reactions, xin,  &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  eps_nuc_categories, extended_set, sorted)         
+                  n% eps_nuc_categories, extended_set, sorted)         
          end if
 
-         deallocate(work, rate_factors, eps_nuc_categories)
+         deallocate(rate_factors, eps_nuc_categories)
  
          return
 
@@ -190,14 +187,13 @@
 
 
       subroutine show_results( &
-            g, lwork, work, logT, logRho, species, num_reactions, xin,  &
+            g,  n, logT, logRho, species, num_reactions, xin,  &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             eps_nuc_categories,  &
             extended_set, sorted)
          type (Net_General_Info), pointer  :: g
-         integer, intent(in) :: lwork
-         real(dp), pointer :: work(:)
+         type(net_info) :: n
          real(dp), intent(in) :: logT, logRho
          integer, intent(in) :: species, num_reactions
          real(dp), intent(in) :: xin(species)
@@ -214,21 +210,9 @@
          logical, intent(in) :: sorted
          
          integer :: ierr, j
-         real(dp), dimension(:), pointer :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
             
          include 'formats'
-         
-         call get_net_rate_ptrs(g% handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in get_net_rate_ptrs'
-            call mesa_error(__FILE__,__LINE__)
-         end if
-                  
+                           
          if (net_file == 'approx21_cr60_plus_co56.net') then
             write(*, *)
             write(*, '(a40, f20.9)') 'log temp', logT
@@ -236,10 +220,10 @@
             write(*, *)
             j = irco56ec_to_fe56
             write(*,1) 'rate_raw rco56ec_to_fe56', &
-               rate_raw(g% net_reaction(j))
+               n% rate_raw(g% net_reaction(j))
             j = irni56ec_to_co56
             write(*,1) 'rate_raw rni56ec_to_co56', &
-               rate_raw(g% net_reaction(j))
+               n% rate_raw(g% net_reaction(j))
             return
          end if
          
@@ -250,8 +234,7 @@
          if (extended_set) then
             write(*, *)
             call show_all_rates( &
-                g, num_reactions, rate_raw, rate_raw_dT, rate_raw_dRho, &
-                rate_screened, rate_screened_dT, rate_screened_dRho, &
+                g, num_reactions, n, &
                 logT, logRho, sorted)
          end if
          
@@ -303,17 +286,14 @@
 
       
       subroutine show_all_rates( &
-            g, num_reactions, rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, logT, logRho, sorted)
+            g, num_reactions, n, logT, logRho, sorted)
          type (Net_General_Info), pointer  :: g
+         type(net_info) :: n
          integer, intent(in) :: num_reactions
          real(dp), intent(in) :: logT, logRho
-         real(dp), dimension(num_reactions), intent(in) :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
          logical, intent(in) :: sorted
-         
          real(dp), dimension(num_reactions) :: rfact
+         
          integer :: i
          real(dp) :: T, Rho
          T = exp10(logT); Rho = exp10(logRho)
@@ -321,13 +301,13 @@
          write(*, *)
          write(*, *) 'summary of log raw rates'
          write(*, *)
-         call show_log_rates(g, rate_raw, T, Rho, sorted)
+         call show_log_rates(g, n% rate_raw, T, Rho, sorted)
          write(*, *)
          write(*, *) 'summary of screening factors'
          write(*, *)
-         do i=1,num_reactions
-            if (rate_raw(i) > 1d-50) then
-               rfact(i) = rate_screened(i) / rate_raw(i)
+         do i=1, num_reactions
+            if (n% rate_raw(i) > 1d-50) then
+               rfact(i) = n% rate_screened(i) / n% rate_raw(i)
             else
                rfact(i) = 1
             end if
@@ -336,9 +316,6 @@
          write(*, *)
          write(*, *) 'summary of log screened rates (reactions/gm/sec)'
          write(*, *)
-         do i=1,num_reactions
-            rfact(i) = rate_screened(i)
-         end do
          call show_log_rates(g, rfact, T, Rho, sorted)
          write(*, *)
 
@@ -429,7 +406,7 @@
 
       subroutine show_log_rates(g, rts, T, Rho, sorted)
          type (Net_General_Info), pointer  :: g
-         real(dp), intent(in) :: rts(rates_reaction_id_max), T, Rho
+         real(dp), intent(in) :: rts(:), T, Rho
          logical, intent(in) :: sorted
          
          logical :: flgs(rates_reaction_id_max)
