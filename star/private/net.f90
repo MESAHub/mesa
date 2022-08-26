@@ -693,6 +693,8 @@
          
          s% need_to_setvars = .true.
 
+         s% net_rq% fill_arrays_with_nans = s% fill_arrays_with_NaNs
+
       end subroutine set_net
 
 

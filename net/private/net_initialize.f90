@@ -46,6 +46,7 @@
       contains
 
       subroutine set_ptrs_for_approx21(n)
+         use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
 
          type(net_info) :: n
             
@@ -60,18 +61,31 @@
          
          if(.not.allocated(n% dfdy)) allocate(n% dfdy(num_isos,num_isos))
          if(.not.allocated(n% dratdumdy1)) allocate(n% dratdumdy1(num_reactions))
-         if(.not.allocated(n% dratdumdy2)) allocate(n%dratdumdy2(num_reactions))
+         if(.not.allocated(n% dratdumdy2)) allocate(n% dratdumdy2(num_reactions))
          if(.not.allocated(n% d_epsnuc_dy)) allocate(n% d_epsnuc_dy(num_isos))
          if(.not.allocated(n% d_epsneu_dy)) allocate(n% d_epsneu_dy(num_isos))
          if(.not.allocated(n% dydt1)) allocate(n% dydt1(num_isos))
          if(.not.allocated(n% dfdt)) allocate(n% dfdT(num_isos))
          if(.not.allocated(n% dfdRho))  allocate(n% dfdRho(num_isos))
+
+
+         if(n% g% fill_arrays_with_NaNs) then
+            call fill_with_NaNs_2D(n% dfdy)
+            call fill_with_NaNs(n% dratdumdy1)
+            call fill_with_NaNs(n% dratdumdy2)
+            call fill_with_NaNs(n% d_epsnuc_dy)
+            call fill_with_NaNs(n% d_epsneu_dy)
+            call fill_with_NaNs(n% dydt1)
+            call fill_with_NaNs(n% dfdt)
+            call fill_with_NaNs(n% dfdRho)
+         end if
          
       end subroutine set_ptrs_for_approx21
 
          
       subroutine setup_net_info(n)
          use chem_def
+         use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
          type (Net_Info) :: n
          
          integer :: num_reactions, num_isos, num_wk_reactions
@@ -111,6 +125,30 @@
          if(.not.allocated(n% Qneu)) allocate(n% Qneu(num_wk_reactions))
          if(.not.allocated(n% dQneu_dlnT)) allocate(n% dQneu_dlnT(num_wk_reactions))
          if(.not.allocated(n% dQneu_dlnRho)) allocate(n% dQneu_dlnRho(num_wk_reactions))
+
+         if(n% g% fill_arrays_with_NaNs) then
+            call fill_with_NaNs(n% eps_nuc_categories)
+            call fill_with_NaNs(n% rate_screened)
+            call fill_with_NaNs(n% rate_screened_dt)
+            call fill_with_NaNs(n% rate_screened_drho)
+            call fill_with_NaNs(n% rate_raw)
+            call fill_with_NaNs(n% rate_raw_dt)
+            call fill_with_NaNs(n% rate_raw_drho)
+            call fill_with_NaNs(n% y)
+            call fill_with_NaNs(n% x)
+            call fill_with_NaNs(n% d_eps_nuc_dy)
+            call fill_with_NaNs_2D(n% d_dydt_dy)
+            call fill_with_NaNs(n% lambda)
+            call fill_with_NaNs(n% dlambda_dlnT)
+            call fill_with_NaNs(n% dlambda_dlnRho)
+            call fill_with_NaNs(n% Q)
+            call fill_with_NaNs(n% dQ_dlnT)
+            call fill_with_NaNs(n% dQ_dlnRho)
+            call fill_with_NaNs(n% Qneu)
+            call fill_with_NaNs(n% dQneu_dlnT)
+            call fill_with_NaNs(n% dQneu_dlnRho)
+         end if
+
 
       end subroutine setup_net_info
       

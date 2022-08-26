@@ -172,6 +172,9 @@
 
          logical :: use_3a_fl87 ! Whether triple alpha should use Fushiki and Lamb 1987
 
+         ! Array initialization
+         logical :: fill_arrays_with_nans = .false.
+
       end type Net_General_Info
 
       integer, parameter :: num_weak_info_arrays_in_Net_Info = 9 ! weaklib results

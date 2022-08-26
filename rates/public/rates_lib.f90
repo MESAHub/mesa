@@ -756,7 +756,6 @@
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
          integer, intent(out) :: ierr
-         write(50,*) "**",n, size(lambda)
          call do_eval_weak_reaction_info( &
             n, ids, reaction_ids, T9, YeRho, &
             eta, d_eta_dlnT, d_eta_dlnRho, &
