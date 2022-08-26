@@ -125,6 +125,8 @@
             end if
          end do
          if (ierr /= 0) return
+
+         if(init) return
          
          call set_combo_screen_rates(num_isos, y, sc, ierr)
          if (ierr /= 0) then

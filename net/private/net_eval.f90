@@ -167,6 +167,7 @@
          else
             approx21_num_rates = -1
          end if
+
          
          if (g% doing_approx21) then
             call set_ptrs_for_approx21(n)
@@ -241,6 +242,7 @@
          d_dxdt_dRho(:) = 0
          d_dxdt_dT(:) = 0
          if (.not. just_dxdt) d_dxdt_dx(:,:) = 0
+         n% eps_nuc_categories(:) = 0
          eps_nuc_categories(:) = 0
          eps_neu_total = 0
          
@@ -290,6 +292,7 @@
          ! convert the eps_nuc_categories
          do i=1,num_categories
             n% eps_nuc_categories(i) = Qconv*n% eps_nuc_categories(i)
+            eps_nuc_categories(i) = n% eps_nuc_categories(i)
          end do
 
          ! store the results
@@ -578,7 +581,6 @@
                call approx21_rates(g% add_co56_to_approx21,ierr)
                if (ierr /= 0) return            
             end if
-            
 
             ! get the reaction rates including screening factors
             if (dbg) write(*,*) 'call screen_net with init=.false.'

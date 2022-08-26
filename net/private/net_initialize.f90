@@ -128,10 +128,7 @@
          integer :: ios, status, lwork, num_reactions, &
             num_isos, num_wk_reactions, i, iwork
          type (Net_General_Info), pointer  :: g
-         
-         ! the following not used during initialization, but need as args.
-         integer, parameter :: screening_mode = extended_screening
-         
+                  
          include 'formats'
          
          ierr = 0
@@ -147,7 +144,7 @@
          num_reactions = g% num_reactions
          num_isos = g% num_isos
          num_wk_reactions = g% num_wk_reactions
-                  
+
          call setup_net_info(n) 
          
          g% cache_suffix = trim(cache_suffix)         
