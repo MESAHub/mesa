@@ -32,6 +32,7 @@
       use utils_lib, only: is_bad, fill_with_NaNs,fill_with_NaNs_2D
       
       use net_burn_support, only: netint
+      use net_approx21, only : num_reactions_func => num_reactions
          
       implicit none
       
@@ -61,7 +62,7 @@
          include 'formats'
          ierr = 0
          sz = num_reactions
-         if (g% doing_approx21) sz = approx21_nrat
+         if (g% doing_approx21) sz = num_reactions_func(g% add_co56_to_approx21)
          allocate(dratdumdy1(1:sz))
          allocate(dratdumdy2(1:sz))
          

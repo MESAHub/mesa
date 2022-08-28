@@ -334,7 +334,7 @@
             call approx21_dydt( &
                n% y, n% rate_screened, n% rate_screened, &
                n% dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, n% rho, n% rho, g% add_co56_to_approx21, ierr)
+               g% fe56ec_n_neut, n% temp, n% rho, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return
                
             fII = approx21_eval_PPII_fraction(n% y, n% rate_screened)
