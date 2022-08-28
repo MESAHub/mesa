@@ -40,7 +40,7 @@
       subroutine eval_net( &
             n, g, rates_only, just_dxdt, &
             num_isos, num_reactions, num_wk_reactions, &
-            x, atemp, alogtemp, arho, alogrho, &
+            x, temp, logtemp, rho, logrho, &
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
             rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, &
@@ -65,8 +65,8 @@
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions, num_wk_reactions
          real(dp), intent(in)  :: x(:)
-         real(dp), intent(in)  :: atemp, alogtemp
-         real(dp), intent(in)  :: arho, alogrho
+         real(dp), intent(in)  :: temp, logtemp
+         real(dp), intent(in)  :: rho, logrho
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
          real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
@@ -95,10 +95,10 @@
          integer, parameter :: max_z_for_cache = 14
          real(qp), target :: dydt_a(num_rvs*num_isos)
          real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
-         real(dp) :: enuc, temp, logtemp, T9, rho, logrho, total, prev, curr, prev_T
-         real(dp) :: btemp, bden, eps_total, Ys, sum_dxdt, compare, Z_plus_N
+         real(dp) :: enuc, T9, total, prev, curr, prev_T
+         real(dp) :: eps_total, Ys, sum_dxdt, compare, Z_plus_N
          real(qp) :: eps_nuc_MeV(num_rvs)
-         integer :: ci, i, j, ir, weak_id, h1, iwork, approx21_num_rates
+         integer :: ci, i, j, ir, weak_id, h1, iwork
          integer, pointer :: chem_id(:)
          integer(8) :: time0, time1
          logical :: doing_timing
@@ -120,6 +120,19 @@
             g% doing_timing = .false.
          end if
 
+         if (.not. g% net_has_been_defined) then
+            ierr = -1
+            if (dbg) write(*,*) 'failed (.not. g% net_has_been_defined)'
+            return
+         end if
+
+         if (temp == arg_not_provided .or. logtemp == arg_not_provided .or. &
+             rho == arg_not_provided .or. logrho == arg_not_provided) then
+               write(*,*) "You must now eplxicity pass both the linear and log values of the temperature and density"
+               ierr = -1
+               return
+         end if
+
          ierr = 0
          
          dydt(1:num_rvs,1:num_isos) => dydt_a(1:num_rvs*num_isos)
@@ -127,21 +140,6 @@
 
          eps_nuc = 0
 
-         temp = atemp; logtemp = alogtemp; rho = arho; logrho = alogrho
-         call get_T_rho_args(temp, logtemp, rho, logrho, ierr)
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in get_T_rho_args'
-            return
-         end if
-         
-         if (logtemp < rattab_tlo) then ! clip to table so can eval beta decays
-            logtemp = rattab_tlo
-            temp = exp10(logtemp)
-         end if
-         T9 = temp*1d-9
-
-
-         
          n% g => g
 
          if (dbg) write(*,*) 'call setup_net_info'
@@ -164,22 +162,16 @@
          n% eta = eta
          n% d_eta_dlnT = d_eta_dlnT
          n% d_eta_dlnRho = d_eta_dlnRho
-         
-         if (g% doing_approx21) then
-            approx21_num_rates = num_reactions_func(g%add_co56_to_approx21)
-         else
-            approx21_num_rates = -1
+
+         if (n% logT < rattab_tlo) then ! clip to table so can eval beta decays
+            n% logT = rattab_tlo
+            n% temp = rattab_temp_lo
          end if
 
-         
+         T9 = n% temp*1d-9
+                  
          if (g% doing_approx21) then
             call set_ptrs_for_approx21(n)
-         end if
-
-         if (.not. g% net_has_been_defined) then
-            ierr = -1
-            if (dbg) write(*,*) 'failed (.not. g% net_has_been_defined)'
-            return
          end if
          
          if (dbg) write(*,*) 'call set_molar_abundances'
@@ -217,10 +209,6 @@
 
          n% d_eps_nuc_dy(:) = 0
 
-         ! limit range of temperatures and densities
-         btemp = min(rattab_temp_hi, max(temp, rattab_temp_lo))
-         bden = min(1d11, max(rho, 1d-10))
-         
          if (doing_timing) then
             call system_clock(time1)
             g% clock_net_eval = g% clock_net_eval + (time1 - time0)
@@ -268,8 +256,8 @@
      
          if (dbg) write(*,*) 'call get_derivs'
          call get_derivs(  &
-             n, dydt, eps_nuc_MeV(1:num_rvs), eta, ye, &
-             logtemp, btemp, bden, abar, zbar,  &
+             n, dydt, eps_nuc_MeV(1:num_rvs), n% eta, n% ye, &
+             n% logT, n% temp, n% rho, n% abar, n% zbar,  &
              num_reactions, rate_factors, &
              symbolic, just_dxdt, ierr)
          if (ierr /= 0) then
@@ -336,7 +324,7 @@
             ierr = 0
             
             call approx21_special_reactions( &
-               btemp, bden, abar, zbar, n% y, &
+               n% temp, n% rho, abar, zbar, n% y, &
                g% use_3a_fl87, Qconv*reaction_Qs(ir_he4_he4_he4_to_c12), &
                n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                n% dratdumdy1, n% dratdumdy2, g% add_co56_to_approx21, ierr)
@@ -345,7 +333,7 @@
             call approx21_dydt( &
                n% y, n% rate_screened, n% rate_screened, &
                n% dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, btemp, bden, g% add_co56_to_approx21, ierr)
+               g% fe56ec_n_neut, n% rho, n% rho, g% add_co56_to_approx21, ierr)
             if (ierr /= 0) return
                
             fII = approx21_eval_PPII_fraction(n% y, n% rate_screened)
@@ -367,7 +355,7 @@
                n% y, n% dfdy, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, g% fe56ec_n_neut, &
                n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
-               n% dratdumdy1, n% dratdumdy2, btemp,g% add_co56_to_approx21,  ierr)
+               n% dratdumdy1, n% dratdumdy2, n% temp, g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             call approx21_dfdT_dfdRho( & 
@@ -376,7 +364,7 @@
                
                n% y, g% mion, n% dfdy, n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-               g% fe56ec_n_neut, btemp, bden, n% dfdT, n% dfdRho, n% d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
+               g% fe56ec_n_neut, n% temp, n% rho, n% dfdT, n% dfdRho, n% d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
             if (ierr /= 0) return
 
             call get_approx21_eps_info( &
@@ -567,7 +555,7 @@
             if (dbg) write(*,*) 'call eval_using_rate_tables'
             call eval_using_rate_tables( &
                num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
-               ye, logtemp, btemp, bden, rate_factors, g% logttab, &
+               ye, n% logT, n% temp, n% rho, rate_factors, g% logttab, &
                n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, ierr) 
             if (ierr /= 0) then
                if (dbg) write(*,*) 'ierr from eval_using_rate_tables'
@@ -588,7 +576,7 @@
             ! get the reaction rates including screening factors
             if (dbg) write(*,*) 'call screen_net with init=.false.'
             call screen_net( &
-               g, num_isos, n% y, btemp, bden, logtemp, logrho, .false.,  &
+               g, num_isos, n% y, n% temp, n% rho, n% logT, n% logrho, .false.,  &
                n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
                n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
                n% screening_mode, &
@@ -628,7 +616,7 @@
             if (ierr /= 0) return            
             call approx21_weak_rates( &
                n% y, n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
-               btemp, bden, ye, eta, zbar, &
+               n% temp, n% rho, ye, eta, zbar, &
                weak_rate_factor, plus_co56, ierr)
             if (ierr /= 0) return            
          end subroutine approx21_rates
@@ -764,35 +752,6 @@
       
       end subroutine set_molar_abundances
 
-      
-      subroutine get_T_rho_args(temp, logtemp, rho, logrho, info)
-         real(dp), intent(inout) :: temp, logtemp ! log10 of temp
-         real(dp), intent(inout) :: rho, logrho ! log10 of rho
-         integer, intent(out) :: info
-         info = 0
-         if (temp == arg_not_provided .and. logtemp == arg_not_provided) then
-            info = -2
-            return
-         end if
-         if (logtemp == arg_not_provided) logtemp = log10(temp)
-         if (temp == arg_not_provided) temp = exp10(logtemp)
-         if (temp <= 0) then
-            info = -1
-            return
-         end if
-         if (rho == arg_not_provided .and. logrho == arg_not_provided) then
-            info = -3
-            return
-         end if
-         if (logrho == arg_not_provided) logrho = log10(rho)
-         if (rho == arg_not_provided) rho = exp10(logrho)
-         if (rho <= 0) then
-            info = -1
-            return
-         end if
-      end subroutine get_T_rho_args
-      
-      
       subroutine do_clean_up_fractions(nzlo, nzhi, species, nz, xa, max_sum_abs, xsum_tol, ierr)
          integer, intent(in) :: nzlo, nzhi, species, nz
          real(dp), intent(inout) :: xa(:,:) ! (species, nz)

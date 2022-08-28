@@ -581,11 +581,7 @@
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
          real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: rho, log10rho ! log10 of rho
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
          real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
@@ -691,11 +687,7 @@
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
          real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: rho, log10rho ! log10 of rho
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
          real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
@@ -806,11 +798,7 @@
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
          real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: rho, log10rho ! log10 of rho
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
          real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
