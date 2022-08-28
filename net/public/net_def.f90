@@ -254,7 +254,7 @@
          implicit none
 
          type(Net_Info) :: n
-         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(:)
          integer, intent(in) :: num_reactions
          real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &

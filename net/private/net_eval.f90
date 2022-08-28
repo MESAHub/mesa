@@ -30,6 +30,7 @@
       use chem_def
       use chem_lib, only: get_mass_excess
       use net_def, only: Net_General_Info, Net_Info
+      use utils_lib, only: fill_with_NaNs
       
       implicit none
       
@@ -93,8 +94,7 @@
          integer, intent(out) :: ierr
 
          integer, parameter :: max_z_for_cache = 14
-         real(qp), target :: dydt_a(num_rvs*num_isos)
-         real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
+         real(qp), allocatable :: dydt(:,:) ! (num_rvs, num_isos)
          real(dp) :: enuc, T9, total, prev, curr, prev_T
          real(dp) :: eps_total, Ys, sum_dxdt, compare, Z_plus_N
          real(qp) :: eps_nuc_MeV(num_rvs)
@@ -134,8 +134,7 @@
          end if
 
          ierr = 0
-         
-         dydt(1:num_rvs,1:num_isos) => dydt_a(1:num_rvs*num_isos)
+          
          chem_id => g% chem_id
 
          eps_nuc = 0
@@ -236,6 +235,8 @@
          n% eps_nuc_categories(:) = 0
          eps_nuc_categories(:) = 0
          eps_neu_total = 0
+
+         allocate(dydt(1:num_rvs,1:num_isos))
          
          if (g% doing_approx21) then
             call eval_net_approx21_procs()
