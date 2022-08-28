@@ -29,7 +29,7 @@
       use chem_def
       use net_def
          
-      use utils_lib, only: is_bad
+      use utils_lib, only: is_bad,fill_with_NaNs,fill_with_NaNs_2D
       
       use net_burn_support, only: netint
          
@@ -72,6 +72,13 @@
          
          allocate(dens_dfdy(1:species,1:species))
          allocate(dmat(1:species,1:species))
+
+         if (g% fill_arrays_with_nans) then
+            call fill_with_NaNs(dratdumdy1)
+            call fill_with_NaNs(dratdumdy2)
+            call fill_with_NaNs_2D(dens_dfdy)
+            call fill_with_NaNs_2D(dmat)
+         end if
          
       end subroutine get_pointers
 
