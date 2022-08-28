@@ -42,7 +42,7 @@
             num_reactions, rate_factors, &
             symbolic, just_dydt, ierr)
          type (Net_Info) :: n
-         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(:)
          integer, intent(in) :: num_reactions
          real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
@@ -1022,7 +1022,7 @@
          use rates_lib, only: eval_n14_electron_capture_rate
          type (Net_Info) :: n
          integer, intent(in) :: i, num_reactions
-         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
          real(dp), intent(in) :: eta, ye, temp, den, abar, zbar, rate_factors(:)
          integer, pointer, intent(in) :: rtab(:), itab(:)
@@ -1613,7 +1613,7 @@
          use rates_lib, only: eval_n14_electron_capture_rate
          type (Net_Info) :: n
          integer, intent(in) :: i, num_reactions
-         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
          real(dp), intent(in) :: eta, ye, temp, den, abar, zbar, rate_factors(:)
          integer, pointer, intent(in) :: rtab(:), itab(:)
