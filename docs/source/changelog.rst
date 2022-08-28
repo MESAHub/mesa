@@ -99,6 +99,7 @@ about the ``net_general_info`` derived type. ``g`` can be had from a call to ``g
 The pointer array ``net_work`` and its size ``net_lwork`` have been removed from the net interface, thus these variables should be removed form any ``other_net_get`` and ``other_split_burn`` hooks.
 The following routines have also been removed as they are no longer needed ``net_work_size``, ``get_net_rate_ptrs``, ``net_1_zone_burn_work_size``, ``get_burn_work_array_pointers``, ``net_1_zone_burn_const_density_work_size``, and ``get_burn_const_density_work_array_pointers``
 
+Previously you could pass ``arg_not_provided`` for either the temperature (density) or log(temperature) (log(density)). Now you must pass both explicity.
 
 Changes in r22.05.1
 ===================
