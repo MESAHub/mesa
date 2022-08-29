@@ -599,7 +599,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_other_yaxis_name(2) = 'v_div_cs' ! 'v_surf_km_s'
+    History_Panels1_other_yaxis_name(2) = '' ! 'v_surf_km_s'
     History_Panels1_other_yaxis_reversed(2) = .false.
     History_Panels1_other_ymin(2) = -101d0
     History_Panels1_other_ymax(2) = -101d0
@@ -622,7 +622,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_dymin(3) = 0.14
       ! ::
 
-    History_Panels1_yaxis_name(4) = 'retries'
+    History_Panels1_yaxis_name(4) = 'model_number'
     History_Panels1_yaxis_reversed(4) = .false.
     History_Panels1_ymin(4) = -101d0
     History_Panels1_ymax(4) = -101d0
