@@ -122,7 +122,7 @@
 
          write(*,'(A)')
          select case (s% x_integer_ctrl(1))
-         case (6)
+         case (7)
             ! put target info in TestHub output
             testhub_extras_names(1) = 'fe_core_mass'; testhub_extras_vals(1) = s% fe_core_mass
 
