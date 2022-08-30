@@ -130,7 +130,8 @@
 
          real(dp) :: min_timestep_limit
          real(dp) :: center_Ye_lower_limit, center_R_lower_limit, &
-            fe_core_infall_limit, non_fe_core_infall_limit, non_fe_core_rebound_limit
+            fe_core_infall_limit, non_fe_core_infall_limit, non_fe_core_rebound_limit, &
+            fe_core_infall_mass, non_fe_core_infall_mass
          real(dp) :: v_div_csound_surf_limit, v_div_csound_max_limit
          real(dp) :: Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit
          real(dp) :: v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit

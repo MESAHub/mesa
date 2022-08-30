@@ -1834,21 +1834,39 @@
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if max infall speed at any location interior to ``fe_core_mass``, in cm/s
+      ! stop if atleast ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
 
       ! ::
 
     fe_core_infall_limit = 3d7
 
+      ! fe_core_infall_mass
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a 
+      ! transistent velocity spike causing the model to prematurely exit.  In solar masses
+
+
+      fe_core_infall_mass = 0.1d0
+
 
       ! non_fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if max infall speed (inward) at any location interior to ``he_core_mass``. in cm/s
+      ! stop if atleast ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
 
       ! ::
 
     non_fe_core_infall_limit = 1d99
+
+      ! non_fe_core_infall_mass
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``non_fe_core_infall`` but there will be a greater chance of a 
+      ! transistent velocity spike causing the model to prematurely exit. In solar masses
+
+
+      non_fe_core_infall_mass = 0.1d0
 
 
       ! non_fe_core_rebound_limit

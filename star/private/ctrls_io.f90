@@ -69,6 +69,7 @@
     log_center_density_lower_limit, center_entropy_limit, center_entropy_lower_limit, &
     max_entropy_limit, max_entropy_lower_limit, min_timestep_limit, non_fe_core_rebound_limit, &
     fe_core_infall_limit, center_Ye_lower_limit, center_R_lower_limit, non_fe_core_infall_limit, &
+    fe_core_infall_mass, non_fe_core_infall_mass, &
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
     v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit, v_surf_div_v_esc_limit, v_surf_kms_limit, &
     stop_near_zams, Lnuc_div_L_zams_limit, Pgas_div_P_limit, Pgas_div_P_limit_max_q, gamma1_limit, gamma1_limit_max_q, &
@@ -853,9 +854,11 @@
  s% max_entropy_lower_limit = max_entropy_lower_limit
 
  s% fe_core_infall_limit = fe_core_infall_limit
+ s% fe_core_infall_mass = fe_core_infall_mass
  s% center_Ye_lower_limit = center_Ye_lower_limit
  s% center_R_lower_limit = center_R_lower_limit
  s% non_fe_core_infall_limit = non_fe_core_infall_limit
+ s% non_fe_core_infall_mass = non_fe_core_infall_mass
  s% non_fe_core_rebound_limit = non_fe_core_rebound_limit
  s% v_div_csound_surf_limit = v_div_csound_surf_limit
  s% v_div_csound_max_limit = v_div_csound_max_limit
@@ -2544,9 +2547,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  max_entropy_lower_limit = s% max_entropy_lower_limit
 
  fe_core_infall_limit = s% fe_core_infall_limit
+ fe_core_infall_mass = s% fe_core_infall_mass
  center_Ye_lower_limit = s% center_Ye_lower_limit
  center_R_lower_limit = s% center_R_lower_limit
  non_fe_core_infall_limit = s% non_fe_core_infall_limit
+ non_fe_core_infall_mass = s% non_fe_core_infall_mass
  non_fe_core_rebound_limit = s% non_fe_core_rebound_limit
  v_div_csound_surf_limit = s% v_div_csound_surf_limit
  v_div_csound_max_limit = s% v_div_csound_max_limit
