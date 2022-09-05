@@ -207,6 +207,8 @@
          real(dp), allocatable, dimension(:) :: &
             rate_raw, rate_raw_dT, rate_raw_dRho ! (num_rates)
          ! raw rates are unscreened (but include density factors)
+
+         real(dp), allocatable,dimension(:) :: rate_factors ! (num_rates)
                   
          ! pointers into work array ----------------------------------
 
@@ -235,8 +237,17 @@
 
          real(dp) :: abar, zbar, z2bar, ye, eta, d_eta_dlnt, d_eta_dlnrho
 
-         real(dp) :: eps_neu_total
+         real(dp) :: fII
+
+         real(dp) :: eps_nuc, eps_total, eps_neu_total
+         real(dp) :: d_eps_nuc_dT, deps_total_dT, deps_neu_dT
+         real(dp) :: d_eps_nuc_dRho, deps_total_dRho, deps_neu_dRho
          real(dp) :: weak_rate_factor
+
+         real(dp),allocatable,dimension(:) :: d_dxdt_dRho, d_dxdt_dT, d_eps_nuc_dx, dxdt
+         real(qp), allocatable,dimension(:,:) :: dydt
+         real(dp), allocatable,dimension(:,:) :: d_dxdt_dx
+
 
          ! Passed in by star
          integer :: star_id = -1, zone = -1
