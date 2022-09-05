@@ -108,8 +108,17 @@
          if(.not.allocated(n% rate_raw_dT)) allocate(n% rate_raw_dT(num_reactions))
          if(.not.allocated(n% rate_raw_dRho)) allocate(n% rate_raw_dRho(num_reactions))
 
+         if(.not.allocated(n% rate_factors)) allocate(n% rate_factors(num_reactions))
+
          if(.not.allocated(n% y)) allocate(n% y(num_isos))
          if(.not.allocated(n% x)) allocate(n% x(num_isos))
+
+         if(.not.allocated(n% d_eps_nuc_dx)) allocate(n% d_eps_nuc_dx(num_isos))
+         if(.not.allocated(n% dxdt)) allocate(n% dxdt(num_isos))
+         if(.not.allocated(n% d_dxdt_dRho)) allocate(n% d_dxdt_dRho(num_isos))
+         if(.not.allocated(n% d_dxdt_dT)) allocate(n% d_dxdt_dT(num_isos))
+         if(.not.allocated(n% dydt)) allocate(n% dydt(num_rvs, num_isos))
+         if(.not.allocated(n% d_dxdt_dx)) allocate(n% d_dxdt_dx(num_isos, num_isos))
          
          if(.not.allocated(n% d_eps_nuc_dy)) allocate(n% d_eps_nuc_dy(num_isos))
          if(.not.allocated(n% d_dydt_dy)) allocate(n% d_dydt_dy(num_isos,num_isos))
@@ -134,8 +143,14 @@
             call fill_with_NaNs(n% rate_raw)
             call fill_with_NaNs(n% rate_raw_dt)
             call fill_with_NaNs(n% rate_raw_drho)
+            call fill_with_NaNs(n% rate_factors)
             call fill_with_NaNs(n% y)
             call fill_with_NaNs(n% x)
+            call fill_with_NaNs(n% d_eps_nuc_dx)
+            call fill_with_NaNs(n% dxdt)
+            call fill_with_NaNs(n% d_dxdt_dRho)
+            call fill_with_NaNs(n% d_dxdt_dT)
+            call fill_with_NaNs_2D(n% d_dxdt_dx)
             call fill_with_NaNs(n% d_eps_nuc_dy)
             call fill_with_NaNs_2D(n% d_dydt_dy)
             call fill_with_NaNs(n% lambda)
