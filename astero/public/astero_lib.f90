@@ -30,6 +30,7 @@
       
       use const_def, only: dp
       use gyre_support, only: GYRE_IS_ENABLED
+      use adipls_support, only: ADIPLS_IS_ENABLED
 
       use astero_support, only: &
             astero_get_cubic_all_freq_corr => get_cubic_all_freq_corr, &
@@ -39,6 +40,7 @@
       implicit none
       
       logical, parameter :: astero_gyre_is_enabled = GYRE_IS_ENABLED
+      logical, parameter :: astero_adipls_is_enabled = ADIPLS_IS_ENABLED
 
       contains ! the procedure interface for the library
       ! client programs should only call these routines.

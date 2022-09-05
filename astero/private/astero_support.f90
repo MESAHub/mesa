@@ -103,6 +103,15 @@
          
          else if (code == 'adipls') then 
 
+            if (.not. adipls_is_enabled) then
+               ierr = -1
+               write(*,'(A)')
+               write(*,'(a)') 'adipls is not currently enabled in your configuration of mesa.'
+               write(*,'(a)') 'check that your utils/makefile_header has USE_ADIPLS = YES'
+               write(*,'(A)')
+               return
+            end if
+
             R = Rsun*s% photosphere_r
             G = standard_cgrav
             M = s% m_grav(1)

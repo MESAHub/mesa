@@ -96,12 +96,19 @@ LOAD_PGPLOT = `mesasdk_pgplot_link` -lz
 LOAD_HDF5 = `mesasdk_hdf5_link`
 
 
-# step 7) do you want to use GYRE?
+# step 7a) do you want to use GYRE?
 
 # if you don't plan to use GYRE and want to skip building it, then
 # USE_GYRE = NO
 # if you want to have GYRE built along with the rest of mesa, then
 USE_GYRE = YES
+
+# step 7b) do you want to use ADIPLS?
+
+# if you don't plan to use ADIPLS and want to skip building it, then
+# USE_ADIPLS = NO
+# if you want to have ADIPLS built along with the rest of mesa, then
+USE_ADIPLS = YES
 
 
 # step 8) now do the mesa install
