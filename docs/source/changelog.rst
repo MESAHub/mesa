@@ -90,6 +90,11 @@ Test cases now infer their ``MESA_DIR`` variable entirely by the environment var
 
 The history output option ``tri_alfa`` (and other quantities that relate to the triple-alpha nuclear reaction) have been renamed to ``tri_alpha`` for better consistency with other ``_alpha`` reactions.
 
+ADIPLS
+======
+
+ADIPLS now has a ``USE_ADIPLS`` flag in ``utils/makefile_header`` to enable is build to be disabled.
+
 
 Changes in r22.05.1
 ===================
