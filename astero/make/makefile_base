@@ -27,8 +27,10 @@ endif
 
 ifeq ($(USE_ADIPLS),YES)
 ADIPLS_SRCS = adipls_support.f90 adipls_support_procs.f90
+ADIPLS_LIB = -ladipls
 else
 ADIPLS_SRCS = adipls_support_stub.f90 adipls_support_procs_stub.f90
+ADIPLS_LIB = 
 endif
 
 
@@ -50,7 +52,7 @@ SRCS = \
 ifeq ($(USE_SHARED), YES)
      LIBS_OTHER = $(LIBS_MESA_STAR)
      DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR) -ladipls
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR) $(ADIPLS_LIB)
 endif
 
 #################################################################
