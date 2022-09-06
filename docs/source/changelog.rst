@@ -101,6 +101,12 @@ The following routines have also been removed as they are no longer needed ``net
 
 Previously you could pass ``arg_not_provided`` for either the temperature (density) or log(temperature) (log(density)). Now you must pass both explicity.
 
+ADIPLS
+======
+
+ADIPLS now has a ``USE_ADIPLS`` flag in ``utils/makefile_header`` to enable is build to be disabled.
+
+
 Changes in r22.05.1
 ===================
 

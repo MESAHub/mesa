@@ -50,6 +50,7 @@
       integer :: nn_arg
       real(dp) :: data_arg(8)
       
+      logical, parameter :: ADIPLS_IS_ENABLED = .true.
 
       
       contains
