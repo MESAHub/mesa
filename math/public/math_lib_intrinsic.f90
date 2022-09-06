@@ -31,6 +31,7 @@ module math_lib
 
   use math_io
   use math_pown
+  use math_def
 
   use IEEE_ARITHMETIC
 
