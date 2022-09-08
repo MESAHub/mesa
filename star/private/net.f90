@@ -801,14 +801,15 @@
       subroutine save_rates(s, n, k, Q, neuQ, ierr)
          use net_def, only: net_Info, Net_General_Info, get_net_ptr
          use rates_def
+         use chem_def, only: ih1
          type(star_info),pointer :: s
          type(net_info) :: n
          integer,intent(in) :: k
          real(dp),pointer :: Q(:),neuQ(:)
          integer, intent(inout) :: ierr
          type(Net_General_Info), pointer :: g=> null()
-         integer :: i, j, ir, net_id
-         real(dp) :: y
+         integer :: i, j, ir, net_id, weak_id, num_reaction_inputs
+         real(dp) :: y, Qrate, Qneu_rate, f
 
          ierr = 0
 
@@ -818,19 +819,44 @@
          do i=1, g% num_reactions
             ir = g% reaction_id(i)
 
+            weak_id = g% weak_reaction_index(i)
+            num_reaction_inputs = get_num_reaction_inputs(ir)
+
+            Qrate = (Q(ir)-neuQ(ir)) * Qconv
+            Qneu_rate = neuQ(ir) * Qconv
+
+            if(weak_id>0) then
+               if (g% weaklib_ids(weak_id) > 0) then ! > 0 means included in weaklib
+
+                  Qrate = (n% Q(weak_id) - n% Qneu(weak_id)) ! Does not need Qconv
+                  Qneu_rate = n% Qneu(weak_id) ! Does not need Qconv
+
+               end if  
+            end if
+
             ! Correct for mass fractions
             y = 1d0
             do j=1, max_num_reaction_inputs*2, 2
                if(reaction_inputs(j,ir)==0) exit
+               
                net_id = g% net_iso(reaction_inputs(j+1,ir))
-               y = y * n% y(net_id)**reaction_inputs(j,ir) * (1d0/factorial(reaction_inputs(j,ir)))
+
+               if(reaction_inputs(j,ir)==3) then
+                  if(reaction_inputs(j+1,ir)==ih1) then ! Treat as two body?
+                     y = y * n% y(net_id)**2 * 0.5d0
+                  else
+                     y = y * n% y(net_id)**reaction_inputs(j,ir) * (1d0/factorial(reaction_inputs(j,ir)))
+                  end if
+               else
+                  y = y * n% y(net_id)**reaction_inputs(j,ir) * (1d0/factorial(reaction_inputs(j,ir)))
+               end if
             end do
                
 
             s% raw_rate(i,k) = n% rate_raw(i) * y
             s% screened_rate(i,k) = n% rate_screened(i) * y
-            s% eps_nuc_rate(i,k) = n% rate_screened(i) * (Q(ir)-neuQ(ir)) * Qconv * y! eps nuc factor (std_reaction_Qs(i) - std_reaction_neuQs(i)) * Qconv
-            s% eps_neu_rate(i,k) = n% rate_screened(i) * neuQ(ir) * Qconv * y! eps_neu factors  std_reaction_neuQs(i)) * Qconv
+            s% eps_nuc_rate(i,k) = n% rate_screened(i) * Qrate * y! eps nuc factor (std_reaction_Qs(i) - std_reaction_neuQs(i)) * Qconv
+            s% eps_neu_rate(i,k) = n% rate_screened(i) * Qneu_rate * y! eps_neu factors  std_reaction_neuQs(i)) * Qconv
          end do
 
          contains
