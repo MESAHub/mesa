@@ -388,6 +388,7 @@
          character (len=maxlen_profile_column_name), pointer :: &
             extra_col_names(:), extra_header_item_names(:)
          real(dp), pointer :: extra_col_vals(:,:), extra_header_item_vals(:)
+         type(net_general_info),pointer :: g=>null()
 
          include "formats"
 
@@ -397,6 +398,9 @@
 
          ierr = 0
          nullify(extra_col_names, extra_col_vals)
+
+         call get_net_ptr(s%net_handle, g, ierr)
+         if(ierr/=0) return
 
          nz = s% nz
          species = s% species
@@ -802,7 +806,7 @@
             use rates_def
             use profile_getval, only: getval_for_profile
             integer, intent(in) :: pass, j, jj, k
-            integer :: i, c, int_val
+            integer :: i, c, int_val, ir
             real(dp) :: val, cno, z, dr, eps, eps_alt
             logical :: int_flag
             character (len=128) :: col_name
@@ -818,16 +822,20 @@
                   col_name = trim(s% profile_extra_name(i))
                else if (c > eps_neu_rate_offset) then
                   i = c - eps_neu_rate_offset
-                  col_name = 'eps_neu_rate_' // trim(reaction_name(i))
+                  ir = g% reaction_id(i)
+                  col_name = 'eps_neu_rate_' // trim(reaction_name(ir))
                else if (c > eps_nuc_rate_offset) then
                   i = c - eps_nuc_rate_offset
-                  col_name = 'eps_nuc_rate_' // trim(reaction_name(i))
+                  ir = g% reaction_id(i)
+                  col_name = 'eps_nuc_rate_' // trim(reaction_name(ir))
                else if (c > screened_rate_offset) then
                   i = c - screened_rate_offset
-                  col_name = 'screened_rate_' // trim(reaction_name(i))
+                  ir = g% reaction_id(i)
+                  col_name = 'screened_rate_' // trim(reaction_name(ir))
                else if (c > raw_rate_offset) then
                   i = c - raw_rate_offset
-                  col_name = 'raw_rate_' // trim(reaction_name(i))
+                  ir = g% reaction_id(i)
+                  col_name = 'raw_rate_' // trim(reaction_name(ir))
                else if (c > diffusion_D_offset) then
                   i = c - diffusion_D_offset
                   col_name = 'diffusion_D_' // trim(chem_isos% name(i))

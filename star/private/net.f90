@@ -262,12 +262,16 @@
                s% eps_nuc_neu_total(k), ierr)
          end if
 
+
          if (is_bad(s% eps_nuc(k))) then
             ierr = -1
             if (s% report_ierr) write(*,*) 'net_get returned bad eps_nuc', ierr
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
+
+         call save_rates(s, n, k, std_reaction_Qs, reaction_neuQs, ierr)
+         if(ierr/=0) return
 
          if (-k == s% nz) then
             write(*,1) 'logT', log10_T
@@ -792,6 +796,72 @@
          if (ierr /= 0) return
          s% op_mono_factors(:) = 1
       end subroutine default_set_op_mono_factors
+
+
+      subroutine save_rates(s, n, k, Q, neuQ, ierr)
+         use net_def, only: net_Info, Net_General_Info, get_net_ptr
+         use rates_def
+         type(star_info),pointer :: s
+         type(net_info) :: n
+         integer,intent(in) :: k
+         real(dp),pointer :: Q(:),neuQ(:)
+         integer, intent(inout) :: ierr
+         type(Net_General_Info), pointer :: g=> null()
+         integer :: i, j, ir, net_id
+         real(dp) :: y
+
+         ierr = 0
+
+         call get_net_ptr(s% net_handle, g, ierr)
+         if(ierr/=0) return
+
+         do i=1, g% num_reactions
+            ir = g% reaction_id(i)
+
+            ! Correct for mass fractions
+            y = 1d0
+            do j=1, max_num_reaction_inputs*2, 2
+               if(reaction_inputs(j,ir)==0) exit
+               net_id = g% net_iso(reaction_inputs(j+1,ir))
+               y = y * n% y(net_id)**reaction_inputs(j,ir) * (1d0/factorial(reaction_inputs(j,ir)))
+            end do
+               
+
+            s% raw_rate(i,k) = n% rate_raw(i) * y
+            s% screened_rate(i,k) = n% rate_screened(i)
+            s% eps_nuc_rate(i,k) = n% rate_screened(i) * (Q(ir)-neuQ(ir)) * Qconv * y! eps nuc factor (std_reaction_Qs(i) - std_reaction_neuQs(i)) * Qconv
+            s% eps_neu_rate(i,k) = n% rate_screened(i) * neuQ(ir) * Qconv * y! eps_neu factors  std_reaction_neuQs(i)) * Qconv
+         end do
+
+         contains
+
+
+         integer function factorial(x)
+            integer, intent(in) :: x
+
+            factorial = 0
+            select case(x)
+            case(1)
+               factorial = 1
+            case(2)
+               factorial = 2
+            case(3)
+               factorial = 6
+            case(4)
+               factorial = 24
+            end select
+
+         end function factorial
+
+
+      end subroutine save_rates
+
+
+      ! integer, pointer :: reaction_inputs(:,:)=>NULL() ! (2*max_num_reaction_inputs,rates_reaction_id_max)
+      ! ! up to max_num_reaction_inputs pairs of coefficients and chem id's, terminated by 0's.
+      ! ! e.g.,  o16(p,g)f17 would be (/ 1, io16, 1, ih1, 0 /)
+      ! ! triple alpha would be (/ 3, ihe4, 0 /)
+      ! ! he3(he4, g)be7(e-,nu)li7(p,a)he4 would be (/ 1, ihe3, 1, ihe4, i, ih1, 0 /)
 
 
       end module net
