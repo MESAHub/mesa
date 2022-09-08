@@ -828,7 +828,7 @@
                
 
             s% raw_rate(i,k) = n% rate_raw(i) * y
-            s% screened_rate(i,k) = n% rate_screened(i)
+            s% screened_rate(i,k) = n% rate_screened(i) * y
             s% eps_nuc_rate(i,k) = n% rate_screened(i) * (Q(ir)-neuQ(ir)) * Qconv * y! eps nuc factor (std_reaction_Qs(i) - std_reaction_neuQs(i)) * Qconv
             s% eps_neu_rate(i,k) = n% rate_screened(i) * neuQ(ir) * Qconv * y! eps_neu factors  std_reaction_neuQs(i)) * Qconv
          end do
