@@ -487,7 +487,7 @@
             call get_net_ptr(s% net_handle, g, ierr)
             if(ierr/=0) return
             do k=1,s% num_reactions
-               ir = g% reaction_id(i)
+               ir = g% reaction_id(k)
                call insert_spec( &
                   offset + k,trim(prefix)//trim(reaction_name(ir)), ierr)
                if (ierr /= 0) return
