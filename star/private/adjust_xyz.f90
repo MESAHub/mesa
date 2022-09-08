@@ -138,6 +138,15 @@
          call do_xa(s% nz, s% xh, s% xa)
          if (s% generations > 1) call do_xa(s% nz_old, s% xh_old, s% xa_old)
 
+         call realloc_reactions(s% raw_rate)
+         if(ierr/=0) return 
+         call realloc_reactions(s% screened_rate)
+         if(ierr/=0) return 
+         call realloc_reactions(s% eps_nuc_rate)
+         if(ierr/=0) return 
+         call realloc_reactions(s% eps_neu_rate)
+         if(ierr/=0) return 
+
          s% need_to_setvars = .true.
          s% prev_mesh_species_or_nvar_hydro_changed = .true.
 
@@ -167,6 +176,12 @@
             if (associated(ptr)) deallocate(ptr)
             allocate(ptr(species, nz + nz_alloc_extra), stat=ierr)
          end subroutine realloc
+
+         subroutine realloc_reactions(ptr)
+            real(dp), pointer :: ptr(:, :)
+            if (associated(ptr)) deallocate(ptr)
+            allocate(ptr(num_reactions, nz + nz_alloc_extra), stat=ierr)
+         end subroutine realloc_reactions
 
          subroutine realloc_integer(ptr)
             integer, pointer :: ptr(:, :)
