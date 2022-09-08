@@ -1172,6 +1172,11 @@
             end if
          end if
          
+         s% raw_rate(:,k) = 0d0
+         s% screened_rate(:,k) = 0d0
+         s% eps_nuc_rate(:,k) = 0d0
+         s% eps_neu_rate(:,k) = 0d0
+
          num_iters_out = naccpt
          
          ! make extra call to get eps_nuc_categories
