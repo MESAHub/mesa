@@ -270,7 +270,7 @@
             return
          end if
 
-         call save_rates(s, n, k, std_reaction_Qs, reaction_neuQs, ierr)
+         call save_rates(s, n, k, ierr)
          if(ierr/=0) return
 
          if (-k == s% nz) then
@@ -798,144 +798,28 @@
       end subroutine default_set_op_mono_factors
 
 
-      subroutine save_rates(s, n, k, Q, neuQ, ierr)
+      subroutine save_rates(s, n, k, ierr)
          use net_def, only: net_Info, Net_General_Info, get_net_ptr
-         use rates_def
-         use chem_def, only: ih1, iprot
          type(star_info),pointer :: s
          type(net_info) :: n
          integer,intent(in) :: k
-         real(dp),pointer :: Q(:),neuQ(:)
          integer, intent(inout) :: ierr
          type(Net_General_Info), pointer :: g=> null()
-         integer :: i, j, ir, net_id, weak_id, num_reaction_inputs
-         real(dp) :: y, Qrate, Qneu_rate, f, r
-         integer :: in1, in2, in3, cin1, cin2, cin3, i1, i2, i3
-         integer :: max_Z, Z_plus_N_for_max_Z 
-         logical :: switch_to_prot
-         integer :: prot, h1
-         integer, parameter :: min_Z_for_switch_to_prot = 12
+         integer :: i
 
          ierr = 0
 
          call get_net_ptr(s% net_handle, g, ierr)
          if(ierr/=0) return
 
-         prot = g% net_iso(iprot)
-         h1 = g% net_iso(ih1)
-
-
          do i=1, g% num_reactions
-            ir = g% reaction_id(i)
-
-            if (reaction_outputs(1,ir) == 0) continue ! skip aux reactions
-
-            weak_id = g% weak_reaction_index(i)
-            num_reaction_inputs = get_num_reaction_inputs(ir)
-
-            Qrate = (Q(ir)-neuQ(ir)) * Qconv
-            Qneu_rate = neuQ(ir) * Qconv
-
-            if(weak_id>0) then
-               if (g% weaklib_ids(weak_id) > 0) then ! > 0 means included in weaklib
-
-                  Qrate = (n% Q(weak_id) - n% Qneu(weak_id)) ! Does not need Qconv
-                  Qneu_rate = n% Qneu(weak_id) ! Does not need Qconv
-               end if  
-            end if 
-
-            cin1 = 0; in1 = 0; i1 = 0
-            cin2 = 0; in2 = 0; i2 = 0
-            cin3 = 0; in3 = 0; i3 = 0
-            switch_to_prot = .false.
-
-            ! Tries to reproduce get1_derivs
-            !write(*,*) trim(reaction_name(ir)),num_reaction_inputs, reaction_inputs(:,ir)
-            if (num_reaction_inputs >= 1) then   ! We need this as rbe7ec_li7_aux has no inputs?
-               cin1 = reaction_inputs(1,ir)
-               in1 = reaction_inputs(2,ir)
-               i1 = g% net_iso(in1)
-            end if
-
-            if(num_reaction_inputs>=2) then
-               cin2 = reaction_inputs(3,ir)
-               in2 = reaction_inputs(4,ir)
-               i2 = g% net_iso(in2)
-            end if
-
-            if(num_reaction_inputs==3) then
-               cin3 = reaction_inputs(5,ir)
-               in3 = reaction_inputs(6,ir)
-               i3 = g% net_iso(in3)
-            end if
-
-            max_Z = g% reaction_max_Z(i)
-            Z_plus_N_for_max_Z = g% reaction_max_Z_plus_N_for_max_Z(i)
-
-            switch_to_prot = (prot /= 0) .and. (max_Z >= min_Z_for_switch_to_prot)
-            if (switch_to_prot) then
-               if (i1 == h1) then
-                  in1 = iprot
-                  i1 = prot
-               else if (i2 == h1) then
-                  in2 = iprot
-                  i2 = prot
-               else if (i3 == h1) then
-                  in3 = iprot
-                  i3 = prot
-               end if
-            end if
-
-            if (num_reaction_inputs == 1) then
-               if (i1 == 0) then
-                  write(*,*) trim(reaction_Name(ir))
-                  write(*,*) 'num_reaction_inputs', num_reaction_inputs
-                  call mesa_error(__FILE__,__LINE__)
-               end if
-
-               if(cin1 == 1) then
-                  r = n% y(i1)
-               else if(cin1==3 .and. i1/=ih1) then
-                  r = (1d0/6d0)*n% y(i1)*n% y(i1)*n% y(i1)
-               else
-                  r = 0.5d0*n% y(i1)*n% y(i1)
-               end if
-            else if (num_reaction_inputs == 2 .or. num_reaction_inputs == 3) then
-            
-               if (reaction_ye_rho_exponents(2,ir) == 0) then
-                  ! treat as 1 body reaction
-                  r = n% y(i1)
-               else if ((cin1 == 1 .and. cin2 == 1) .or. reaction_ye_rho_exponents(2,ir) == 1) then
-                  ! reaction_ye_rho_exponents(2,ir) == 1 for electron captures; treat as 2 body reaction
-                  r = n% y(i1)*n% y(i2)
-               else if (cin1 == 2 .and. cin2 == 1) then 
-                  r = 0.5d0*n% y(i1)*n% y(i1)*n% y(i2)
-               else if (cin1 == 1 .and. cin2 == 2) then 
-                  ! e.g., rhe4p, r_neut_he4_he4_to_be9, r_neut_h1_h1_to_h1_h2
-                  r = n% y(i1)*0.5d0*n% y(i2)*n% y(i2)
-               else if (cin1 == 2 .and. cin2 == 2) then 
-                  ! e.g., r_neut_neut_he4_he4_to_h3_li7, r_h1_h1_he4_he4_to_he3_be7
-                  r = 0.5d0*n% y(i1)*n% y(i1)*0.5d0*n% y(i2)*n% y(i2)
-               else
-                  call mesa_error(__FILE__,__LINE__,'get1_derivs')
-               end if         
-            end if   
-
-            s% raw_rate(i,k) = n% rate_raw(i) * r
-            s% screened_rate(i,k) = n% rate_screened(i) * r
-            s% eps_nuc_rate(i,k) = n% rate_screened(i) * Qrate * r! eps nuc factor (std_reaction_Qs(i) - std_reaction_neuQs(i)) * Qconv
-            s% eps_neu_rate(i,k) = n% rate_screened(i) * Qneu_rate * r! eps_neu factors  std_reaction_neuQs(i)) * Qconv
+            s% raw_rate(i,k) = n% raw_rate(i)
+            s% screened_rate(i,k) = n% screened_rate(i)
+            s% eps_nuc_rate(i,k) = n% eps_nuc_rate(i)
+            s% eps_neu_rate(i,k) = n% eps_neu_rate(i)
          end do
 
       end subroutine save_rates
-
-
-      ! integer, pointer :: reaction_inputs(:,:)=>NULL() ! (2*max_num_reaction_inputs,rates_reaction_id_max)
-      ! ! up to max_num_reaction_inputs pairs of coefficients and chem id's, terminated by 0's.
-      ! ! e.g.,  o16(p,g)f17 would be (/ 1, io16, 1, ih1, 0 /)
-      ! ! triple alpha would be (/ 3, ihe4, 0 /)
-      ! ! he3(he4, g)be7(e-,nu)li7(p,a)he4 would be (/ 1, ihe3, 1, ihe4, i, ih1, 0 /)
-
 
       end module net
 
