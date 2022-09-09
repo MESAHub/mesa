@@ -248,6 +248,10 @@
          real(qp), allocatable,dimension(:,:) :: dydt
          real(dp), allocatable,dimension(:,:) :: d_dxdt_dx
 
+         ! These contain the rates after being mutlplied by th various density and composition factors 
+         ! but would still need to be mulipled by the zone mass for the absolute value
+         real(dp), allocatable,dimension(:) :: raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate 
+
 
          ! Passed in by star
          integer :: star_id = -1, zone = -1

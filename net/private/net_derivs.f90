@@ -161,7 +161,7 @@
             !end if
             
             eps_factor = 1d0
-                                    
+            !write(*,*) trim(reaction_name(ir)),kind         
             select case(kind)
                case (other_kind)
                   call get1_derivs( &
@@ -283,6 +283,13 @@
             b = b_f - b_r
             dydt(i_rate,i1) = dydt(i_rate,i1) - c1*b
             dydt(i_rate,i2) = dydt(i_rate,i2) + c2*b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -294,6 +301,12 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) + b_r
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
+
+            n% eps_nuc_rate(i) = b_f * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
                         
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
@@ -436,6 +449,13 @@
             dydt(i_rate,i1) = dydt(i_rate,i1) - c1*b
             dydt(i_rate,i2) = dydt(i_rate,i2) - c2*b
             dydt(i_rate,i3) = dydt(i_rate,i3) + c3*b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -448,6 +468,11 @@
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
                         
+            n% eps_nuc_rate(i) = b_f * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -673,6 +698,13 @@
             dydt(i_rate,i2) = dydt(i_rate,i2) - c2*b
             dydt(i_rate,i3) = dydt(i_rate,i3) + c3*b
             dydt(i_rate,i4) = dydt(i_rate,i4) + c4*b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -685,6 +717,11 @@
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
                         
+            n% eps_nuc_rate(i) = b_f * Qconv
+            n% eps_nuc_rate(r_i) = b_r  * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -809,6 +846,13 @@
             dydt(i_rate,i2) = dydt(i_rate,i2) - b
             dydt(i_rate,i3) = dydt(i_rate,i3) + b
             dydt(i_rate,i4) = dydt(i_rate,i4) + b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -817,7 +861,13 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) - b_r*Q
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-                        
+            
+            n% eps_nuc_rate(i) = b_f * Q  * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Q  * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+               
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -938,6 +988,13 @@
             dydt(i_rate,i1) = dydt(i_rate,i1) - b
             dydt(i_rate,i2) = dydt(i_rate,i2) - b
             dydt(i_rate,i3) = dydt(i_rate,i3) + b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+            
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -946,7 +1003,12 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) - b_r*Q
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-                        
+      
+            n% eps_nuc_rate(i) = b_f * Q  * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Q  * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -1217,7 +1279,7 @@
             else ! 2 body
                !write(*,'(/,a)') '1/2*r  reaction name <' // trim(reaction_Name(ir)) // '>'
                !write(*,'(i3,3x,99e20.10)') i, n% rate_raw(i), n% rate_screened(i)
-               r = 0.5d0*n% y(i1)*n% y(i1)
+               r=  0.5d0*n% y(i1)*n% y(i1)
                idr1 = i1
                dr1 = n% y(i1)
                !stop
@@ -1447,7 +1509,6 @@
                        deriv_flgs, symbolic, just_dydt)
 
                   done = .true.
-
                end if
             end if
             if (.not. done) then ! weak reaction not in weaklib

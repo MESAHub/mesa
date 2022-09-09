@@ -135,6 +135,11 @@
          if(.not.allocated(n% dQneu_dlnT)) allocate(n% dQneu_dlnT(num_wk_reactions))
          if(.not.allocated(n% dQneu_dlnRho)) allocate(n% dQneu_dlnRho(num_wk_reactions))
 
+         if(.not.allocated(n% raw_rate)) allocate(n% raw_rate(num_reactions))
+         if(.not.allocated(n% screened_rate)) allocate(n% screened_rate(num_reactions))
+         if(.not.allocated(n% eps_nuc_rate)) allocate(n% eps_nuc_rate(num_reactions))
+         if(.not.allocated(n% eps_neu_rate)) allocate(n% eps_neu_rate(num_reactions))
+
          if(n% g% fill_arrays_with_NaNs) then
             call fill_with_NaNs(n% eps_nuc_categories)
             call fill_with_NaNs(n% rate_screened)
@@ -162,6 +167,10 @@
             call fill_with_NaNs(n% Qneu)
             call fill_with_NaNs(n% dQneu_dlnT)
             call fill_with_NaNs(n% dQneu_dlnRho)
+            call fill_with_NaNs(n% raw_rate)
+            call fill_with_NaNs(n% screened_rate)
+            call fill_with_NaNs(n% eps_nuc_rate)
+            call fill_with_NaNs(n% eps_neu_rate)
          end if
 
 
