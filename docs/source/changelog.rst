@@ -36,18 +36,20 @@ or fall back to computing the matching history column (e.g. for
 ``log_g``).  So whereas an effective temperature constraint would
 previously be included using, say ::
 
-    include_Teff_in_chi2_spectro = .false.
+    include_Teff_in_chi2_spectro = .true.
     Teff_target = 6000
     Teff_sigma = 100
 
 you would now use ::
 
     constraint_name(1) = 'Teff'
+    include_constraint_in_chi2_spectro(1) = .true.
     constraint_target(1) = 6000
     constraint_sigma(1) = 100
 
 The maximum number of such constraints is currently 100 but can
-trivially be increased at compile time by modifying ``astero_def``.
+trivially be increased at compile time by modifying
+``max_constraints`` in ``astero/public/astero_def.f90``.
 
 Similarly, each parameter now has a name, initial value, minimum,
 maximum and grid-spacing.  So whereas the mixing-length parameter
@@ -62,13 +64,15 @@ was previously controlled with something like ::
 you would now use ::
 
     param_name(1) = 'alpha'
+    vary_param(1) = .true.
     first_param(1) = 1.7
     min_param(1) = 1.5
     max_param(1) = 1.9
     delta_param(1) = 0.1
 
 Again, the maximum number of parameters is 100 and can be increased at
-compile time by modifying ``astero_def``.
+compile time by modifying ``max_parameters`` in
+``astero/public/astero_def.f90``.
 
 The default ``run_star_extras.f90`` defines the hooks
 ``set_constraint_value`` and ``set_param`` so that the old options
