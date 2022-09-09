@@ -1133,8 +1133,15 @@
 
          ir = reaction_id(i)       
          
-         if (reaction_outputs(1,ir) == 0) return ! skip aux reactions
-         
+         if (reaction_outputs(1,ir) == 0) then
+            n% raw_rate(i) = 0d0
+            n% screened_rate(i) = 0d0
+            n% eps_nuc_rate(i) = 0d0
+            n% eps_neu_rate(i) = 0d0
+            return ! skip aux reactions
+         end if
+
+
          if (dbg) &
             write(*,'(/,a,2i6)') ' reaction name <' // trim(reaction_Name(ir)) // '>', i, ir
          
