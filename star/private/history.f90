@@ -2892,7 +2892,7 @@
             case(h_RSP_phase)
                if (s% RSP_flag) val = (s% time - rsp_phase_time0())/s% RSP_period
             case(h_RSP_period_in_days)
-               if (s% RSP_flag) val = s% RSP_period/(24*60*60) ! days
+               if (s% RSP_flag) val = s% RSP_period/secday ! days
             case(h_RSP_num_periods)
                if (s% RSP_flag) int_val = s% RSP_num_periods
                is_int_val = .true.

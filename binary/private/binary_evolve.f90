@@ -117,7 +117,7 @@
                   end if
             else
                call set_period_eccentricity(b% binary_id, &
-                  b% initial_period_in_days*(24d0*60d0*60d0), b% initial_eccentricity, ierr)
+                  b% initial_period_in_days*secday, b% initial_eccentricity, ierr)
                   if (ierr /= 0) then
                      return
                   end if
