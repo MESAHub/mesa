@@ -2153,7 +2153,7 @@
                if (s% calculate_Brunt_N2) val = sqrt(max(0d0,s% brunt_N2(k)))
             case (p_brunt_frequency) ! cycles per day
                if (s% calculate_Brunt_N2) val = &
-                  (24d0*60d0*60d0/(2*pi))*sqrt(max(0d0,s% brunt_N2(k)))
+                  (secday/(2*pi))*sqrt(max(0d0,s% brunt_N2(k)))
             case (p_log_brunt_N)
                if (s% calculate_Brunt_N2) val = safe_log10(sqrt(max(0d0,s% brunt_N2(k))))
             case (p_log_brunt_N2)
