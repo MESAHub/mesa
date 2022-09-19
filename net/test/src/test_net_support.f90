@@ -37,8 +37,6 @@
       
       
       character (len=256) :: cache_suffix
-      
-      type (Net_General_Info), pointer  :: g
       integer :: num_reactions
       
       integer, dimension(:), pointer :: net_iso, chem_id, isos_to_show
@@ -48,7 +46,7 @@
 
       real(dp), dimension(:), pointer :: rho_vector, T_vector
 
-      integer :: nrates_to_show, nisos_to_show
+      integer :: nrates_to_show, nisos_to_show, net_handle
       
 
 
@@ -57,10 +55,10 @@
 
       subroutine do_test_net(do_plots, symbolic)
          logical, intent(in) :: do_plots, symbolic
-         call set_composition(g, species, xin)
+         call set_composition(species, xin)
          eta = 0
          if (do_plots) then
-            call Create_Plot_Files(species, xin, g)
+            call Create_Plot_Files(species, xin)
          else
             call Do_One_Net(symbolic)
          end if
@@ -103,6 +101,7 @@
       subroutine test_net_setup(net_file_in)
          character (len=*), intent(in) :: net_file_in
          integer, pointer :: r_id(:)
+         type(Net_General_Info), pointer :: g
 
          integer :: info, i, ierr
          
@@ -115,25 +114,25 @@
          call net_init(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
-         handle = alloc_net_handle(ierr)
+         net_handle = alloc_net_handle(ierr)
          if (ierr /= 0) then
             write(*,*) 'alloc_net_handle failed'
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         call net_start_def(handle, ierr)
+         call net_start_def(net_handle, ierr)
          if (ierr /= 0) then
             write(*,*) 'net_start_def failed'
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         call read_net_file(net_file, handle, ierr)
+         call read_net_file(net_file, net_handle, ierr)
          if (ierr /= 0) then
             write(*,*) 'read_net_file failed ', trim(net_file)
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         call net_finish_def(handle, ierr)
+         call net_finish_def(net_handle, ierr)
          if (ierr /= 0) then
             write(*,*) 'net_finish_def failed'
             call mesa_error(__FILE__,__LINE__)
@@ -143,13 +142,13 @@
          allocate(rates_to_show(rates_reaction_id_max))
                
          cache_suffix = ''
-         call net_setup_tables(handle, cache_suffix, info)
+         call net_setup_tables(net_handle, cache_suffix, info)
          if (ierr /= 0) then
             write(*,*) 'net_setup_tables failed'
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         call net_ptr(handle, g, ierr)
+         call net_ptr(net_handle, g, ierr)
          if (ierr /= 0) then
             write(*,*) 'net_ptr failed'
             call mesa_error(__FILE__,__LINE__)
@@ -158,32 +157,31 @@
          species = g% num_isos
          num_reactions = g% num_reactions
          
-         call get_chem_id_table(handle, species, chem_id, ierr)
+         call get_chem_id_table(net_handle, species, chem_id, ierr)
          if (ierr /= 0) then
             write(*,*) 'get_chem_id_table failed'
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         call get_net_iso_table(handle, net_iso, ierr)
+         call get_net_iso_table(net_handle, net_iso, ierr)
          if (ierr /= 0) then
             write(*,*) 'get_net_iso_table failed'
             call mesa_error(__FILE__,__LINE__)
          end if
                   
-         call get_reaction_id_table(handle, num_reactions, reaction_id, ierr)
+         call get_reaction_id_table(net_handle, num_reactions, reaction_id, ierr)
          if (ierr /= 0) then
             write(*,*) 'get_reaction_id_table failed'
             call mesa_error(__FILE__,__LINE__)
          end if
          
-         call get_net_reaction_table(handle, reaction_table, ierr)
+         call get_net_reaction_table(net_handle, reaction_table, ierr)
          if (ierr /= 0) then
             write(*,*) 'get_net_reaction_table failed'
             call mesa_error(__FILE__,__LINE__)
          end if
          
          call do_test_net_alloc(species)
-
 
       end subroutine test_net_setup        
               
@@ -198,13 +196,7 @@
       subroutine Do_One_Net(symbolic)
          logical, intent(in) :: symbolic
          integer :: i, id
-         if (.false.) then
-            do i = 1, g% num_reactions
-               id = g% reaction_id(i)
-               if (id > 0) write(*,'(a,2i6)') trim(reaction_Name(id)), i, id
-            end do
-         end if
-         call do1_net(symbolic)
+         call do1_net(net_handle, symbolic)
       end subroutine Do_One_Net
 
       subroutine Setup_eos(handle)
@@ -229,7 +221,7 @@
       
       subroutine test_net_cleanup
          call do_test_net_cleanup
-         call free_net_handle(handle)
+         call free_net_handle(net_handle)
       end subroutine test_net_cleanup
            
       subroutine do_test_net_cleanup
@@ -249,13 +241,13 @@
       end subroutine change_net
 
 
-      subroutine Create_Plot_Files(species, xin, g)
+      subroutine Create_Plot_Files(species, xin)
          use utils_lib, only: mkdir
          integer, intent(in) :: species
          real(dp) :: xin(species)
-         type (Net_General_Info), pointer  :: g
+         type (net_info)  :: n
 
-         integer:: i, j, k, lwork, ierr, num_reactions
+         integer:: i, j, k, ierr, num_reactions
          real(dp) :: T, logT, logT_min, logT_max
          real(dp) :: logRho_min, logRho_max, dlogT, dlogRho
          integer :: logT_points, logRho_points
@@ -263,6 +255,9 @@
          character (len=256) :: fname, dir
 
          real(dp), allocatable :: output_values(:, :, :)
+         type(Net_General_Info), pointer :: g
+
+
 
  ! full range
          logT_max = 9.1d0
@@ -327,9 +322,10 @@
          io = io_first-1
          io_last = Open_Files(io, dir)
          num_out = io_last - io_first + 1
+
+         call get_net_ptr(net_handle, g, ierr)
+         if(ierr/=0) return
          
-         lwork = net_work_size(handle, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          num_reactions = g% num_reactions
 
          allocate(output_values(logRho_points, logT_points, num_out))
@@ -339,8 +335,8 @@
             logT = logT_min + dlogT*(j-1)
             T = exp10(logT)
 
-            call do_inner_loop(species, num_reactions, logT, T, j, output_values, g, xin,  &
-                     logRho_points, logRho_min, dlogRho, lwork)
+            call do_inner_loop(species, num_reactions, logT, T, j, output_values, n, xin,  &
+                     logRho_points, logRho_min, dlogRho)
             
          end do
 !xx$OMP END PARALLEL DO
@@ -373,12 +369,12 @@
       end subroutine Create_Plot_Files
 
 
-      subroutine do_inner_loop(species, num_reactions, logT, T, j, output_values, g, xin,  &
-               logRho_points, logRho_min, dlogRho, lwork)
-         integer, intent(in) :: species, num_reactions, lwork
+      subroutine do_inner_loop(species, num_reactions, logT, T, j, output_values, n, xin,  &
+               logRho_points, logRho_min, dlogRho)
+         integer, intent(in) :: species, num_reactions
          real(dp), intent(in) :: logT, T
          integer, intent(in) :: j, logRho_points
-         type (Net_General_Info), pointer :: g
+         type (Net_info) :: n
          real(dp), intent(OUT) :: output_values(:, :, :)
          real(dp), intent(in) :: xin(species), logRho_min, dlogRho
 
@@ -389,19 +385,20 @@
             logRho = logRho_min + dlogRho*(i-1)
             Rho = exp10(logRho)
             call do_one_net_eval(species, num_reactions, logT, T, logRho, Rho,  &
-                        i, j, output_values, g, xin, lwork)
+                        i, j, output_values, n, xin)
          enddo
          
       end subroutine do_inner_loop
       
       
       subroutine do_one_net_eval(species, num_reactions, logT, T, logRho, Rho,  &
-               i, j, output_values, g, xin, lwork)
+               i, j, output_values, n, xin)
          use chem_lib, only:composition_info
-         integer, intent(in) :: species, num_reactions, lwork
+         integer, intent(in) :: species, num_reactions
          real(dp), intent(in) :: logT, T, logRho, Rho
          integer, intent(in) :: i, j
-         type (Net_General_Info), pointer :: g
+         type (Net_General_Info), pointer :: g => null()
+         type(net_info) :: n
          real(dp), intent(OUT) :: output_values(:, :, :)
          real(dp), intent(in) :: xin(species)
       
@@ -425,17 +422,16 @@
          integer :: info, k, h1, he4, chem_id(species)
          real(dp) :: xh, xhe, mass_correction
          real(dp), dimension(species) :: dabar_dx, dzbar_dx, dmc_dx
-         real(dp), pointer :: work(:)
-         real(dp), target :: work_ary(lwork)
          logical :: skip_jacobian
          
-         work => work_ary
          rate_factors => rate_factors_a
          
          h1 = net_iso(ih1)
          he4 = net_iso(ihe4)
+
+         g => n% g
       
-         call get_chem_id_table(handle, species, chem_id, info)
+         call get_chem_id_table(net_handle, species, chem_id, info)
          if (info /= 0) call mesa_error(__FILE__,__LINE__)
 
          call composition_info( &
@@ -446,7 +442,7 @@
          weak_rate_factor = 1
          skip_jacobian = .false.
          
-         call net_get(handle, skip_jacobian, n, species, num_reactions,  &
+         call net_get(net_handle, skip_jacobian, n, species, num_reactions,  &
                   xin, T, logT, Rho, logRho,  &
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                   rate_factors, weak_rate_factor, &
@@ -455,7 +451,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                   screening_mode,  &
                   eps_nuc_categories, eps_neu_total, &
-                  lwork, work, info)
+                  info)
          if (info /= 0) then
             write(*, *) 'bad result from net_get'
             call mesa_error(__FILE__,__LINE__)
@@ -519,8 +515,7 @@
       end function Open_Files
 
 
-      subroutine set_composition(g, species, xin)
-         type (Net_General_Info), pointer  :: g
+      subroutine set_composition(species, xin)
          integer, intent(in) :: species
          real(dp), intent(OUT) :: xin(species)
    
@@ -798,15 +793,16 @@
            eps_nuc_categories(num_categories), xh, xhe, mass_correction !approx_abar, approx_zbar
          integer :: i, j, k, info, ierr
          integer :: j_dx, j_dx_sink
-         integer :: lwork, adjustment_iso, ir_c12_c12_to_he4_ne20, ir_he4_ne20_to_c12_c12
+         integer :: adjustment_iso, ir_c12_c12_to_he4_ne20, ir_he4_ne20_to_c12_c12
          real(dp), dimension(:), pointer :: d_eps_nuc_dx, dabar_dx, dzbar_dx, dmc_dx
-         real(dp), pointer :: work(:), rate_factors(:), &
+         real(dp), pointer :: rate_factors(:), &
             actual_Qs(:), actual_neuQs(:)       
          logical, pointer :: from_weaklib(:)
          logical :: skip_jacobian, doing_d_dlnd, doing_dx
          real(dp), dimension(:), pointer :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
+         type(net_info) :: n
          
          include 'formats'
          
@@ -823,10 +819,9 @@
          allocate(d_eps_nuc_dx(species), dabar_dx(species), dzbar_dx(species), dmc_dx(species))
          
          info = 0
-         lwork = net_work_size(handle, info) 
-         if (info /= 0) call mesa_error(__FILE__,__LINE__)
+
          
-         allocate(work(lwork),  &
+         allocate(&
                rate_factors(num_reactions), &
                actual_Qs(num_reactions), &
                actual_neuQs(num_reactions), &
@@ -1095,7 +1090,7 @@
                                    
                screening_mode = extended_screening
                
-               call net_set_logTcut(handle, 0d0, 0d0, info)
+               call net_set_logTcut(net_handle, 0d0, 0d0, info)
                if (info /= 0) then
                   write(*,*) 'failed in net_set_logTcut'
                   call mesa_error(__FILE__,__LINE__)
@@ -1142,7 +1137,7 @@
                                    
                screening_mode = extended_screening
                
-               call net_set_logTcut(handle, 0d0, 0d0, info)
+               call net_set_logTcut(net_handle, 0d0, 0d0, info)
                if (info /= 0) then
                   write(*,*) 'failed in net_set_logTcut'
                   call mesa_error(__FILE__,__LINE__)
@@ -1191,7 +1186,7 @@
                                    
                screening_mode = extended_screening
                
-               call net_set_logTcut(handle, 0d0, 0d0, info)
+               call net_set_logTcut(net_handle, 0d0, 0d0, info)
                if (info /= 0) then
                   write(*,*) 'failed in net_set_logTcut'
                   call mesa_error(__FILE__,__LINE__)
@@ -1231,7 +1226,7 @@
                                    
                screening_mode = extended_screening
                
-               call net_set_logTcut(handle, 0d0, 0d0, info)
+               call net_set_logTcut(net_handle, 0d0, 0d0, info)
                if (info /= 0) then
                   write(*,*) 'failed in net_set_logTcut'
                   call mesa_error(__FILE__,__LINE__)
@@ -1258,7 +1253,7 @@
                                    
                screening_mode = extended_screening
                
-               call net_set_logTcut(handle, 0d0, 0d0, info)
+               call net_set_logTcut(net_handle, 0d0, 0d0, info)
                if (info /= 0) then
                   write(*,*) 'failed in net_set_logTcut'
                   call mesa_error(__FILE__,__LINE__)
@@ -1410,22 +1405,24 @@
          write(*,'(a40,d26.16)') 'eta', eta
          
          skip_jacobian = .false.
-         
+
+         n% screening_mode = screening_mode
+
          if (.false.) then
             write(*,*) 'call net_get_rates_only'
             call net_get_rates_only( &
-               handle, n, species, num_reactions,  &
+               net_handle, n, species, num_reactions,  &
                xin, T, logT, Rho, logRho,  &
                abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                rate_factors, weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
                screening_mode, &
-               lwork, work, ierr)
+               ierr)
             call mesa_error(__FILE__,__LINE__,'net_get_rates_only')
          end if
 
          call net_get_with_Qs( &
-               handle, skip_jacobian, n, species, num_reactions,  &
+               net_handle, skip_jacobian, n, species, num_reactions,  &
                xin, T, logT, Rho, logRho,  &
                abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                rate_factors, weak_rate_factor, &
@@ -1434,7 +1431,7 @@
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                screening_mode,  &
                eps_nuc_categories, eps_neu_total,  &
-               lwork, work, actual_Qs, actual_neuQs, from_weaklib, info)
+               actual_Qs, actual_neuQs, from_weaklib, info)
          if (info /= 0) then
             write(*,1) 'logT', logT
             write(*,1) 'logRho', logRho
@@ -1516,17 +1513,7 @@
             write(*,'(A)')
             stop
          end if
-         
-         
-         call get_net_rate_ptrs(g% handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in get_net_rate_ptrs'
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
+                  
          write(*,2) 'screening_mode', screening_mode
             
          if (.true.) then
@@ -1717,7 +1704,7 @@
          write(*,1) 'eps_nuc_neu_total', eps_neu_total
 
 
-         deallocate(work, rate_factors, actual_Qs, actual_neuQs, from_weaklib)
+         deallocate(rate_factors, actual_Qs, actual_neuQs, from_weaklib)
 
             
          contains
@@ -1737,7 +1724,7 @@
                xin_copy(j_dx_sink) = xin_copy(j_dx_sink) - delta_x
                
                call net_get_with_Qs( &
-                  handle, skip_jacobian, n, species, num_reactions,  &
+                  net_handle, skip_jacobian, n, species, num_reactions,  &
                   xin_copy, T, logT, Rho, logRho,  &
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                   rate_factors, weak_rate_factor, &
@@ -1746,7 +1733,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                   screening_mode,    &
                   eps_nuc_categories, eps_neu_total,  &
-                  lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
+                  actual_Qs, actual_neuQs, from_weaklib, ierr)
 
                write(*,1) 'xin(j)', xin_copy(j_dx)
                write(*,1) 'xin(j_sink)', xin_copy(j_dx_sink)
@@ -1759,7 +1746,7 @@
                var = exp10(log_var)
                
                call net_get_with_Qs( &
-                  handle, skip_jacobian, n, species, num_reactions,  &
+                  net_handle, skip_jacobian, n, species, num_reactions,  &
                   xin, T, logT, var, log_var,  &
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                   rate_factors, weak_rate_factor, &
@@ -1768,7 +1755,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                   screening_mode,   &
                   eps_nuc_categories, eps_neu_total,  &
-                  lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
+                  actual_Qs, actual_neuQs, from_weaklib, ierr)
 
             else
             
@@ -1776,7 +1763,7 @@
                var = exp10(log_var)
                
                call net_get_with_Qs( &
-                  handle, skip_jacobian, n, species, num_reactions,  &
+                  net_handle, skip_jacobian, n, species, num_reactions,  &
                   xin, var, log_var, Rho, logRho,  &
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                   rate_factors, weak_rate_factor, &
@@ -1785,7 +1772,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                   screening_mode,  &
                   eps_nuc_categories, eps_neu_total,  &
-                  lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
+                  actual_Qs, actual_neuQs, from_weaklib, ierr)
                   
             end if
             

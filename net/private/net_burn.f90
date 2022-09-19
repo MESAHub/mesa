@@ -29,9 +29,10 @@
       use chem_def
       use net_def
          
-      use utils_lib, only: is_bad
+      use utils_lib, only: is_bad,fill_with_NaNs,fill_with_NaNs_2D
       
       use net_burn_support, only: netint
+      use net_approx21, only : num_reactions_func => num_reactions
          
       implicit none
       
@@ -50,30 +51,14 @@
 
       contains
       
-      
-      integer function burn_1_zone_work_size(g) result(sz)
-         use net_initialize, only: work_size
-         use net_approx21, only: approx21_nrat
-         type (Net_General_Info), pointer :: g
-         integer :: net_lwork, num_reactions, species
-         num_reactions = g% num_reactions
-         if (g% doing_approx21) num_reactions = approx21_nrat
-         species = g% num_isos
-         net_lwork = work_size(g)
-         sz = net_lwork + 2*num_reactions + 2*species*species
-         ! dratdumdy1, dratdumdy2, dens_dfdy1, dmat1
-      end function burn_1_zone_work_size
-         
-
       subroutine get_pointers( &
-            g, burn_lwork, burn_work_array, species, num_reactions, &
+            g, species, num_reactions, &
             dratdumdy1, dratdumdy2, dens_dfdy, dmat, i, ierr)
          use net_approx21, only: approx21_nrat
          type (Net_General_Info), pointer :: g
-         real(dp), pointer :: burn_work_array(:)
-         integer, intent(in) :: burn_lwork, species, num_reactions
-         real(dp), pointer, dimension(:) :: dratdumdy1, dratdumdy2
-         real(dp), pointer, dimension(:,:) :: dens_dfdy, dmat
+         integer, intent(in) :: species, num_reactions
+         real(dp), allocatable, dimension(:) :: dratdumdy1, dratdumdy2
+         real(dp), allocatable, dimension(:,:) :: dens_dfdy, dmat
          integer, intent(inout) :: i
          integer, intent(out) :: ierr
          integer :: sz
@@ -81,13 +66,20 @@
          ierr = 0
                   
          sz = num_reactions
-         if (g% doing_approx21) sz = approx21_nrat
-         dratdumdy1(1:sz) => burn_work_array(i+1:i+sz); i = i+sz
-         dratdumdy2(1:sz) => burn_work_array(i+1:i+sz); i = i+sz
+         if (g% doing_approx21) sz = num_reactions_func(g% add_co56_to_approx21)
+
+         allocate(dratdumdy1(1:sz))
+         allocate(dratdumdy2(1:sz))
          
-         sz = species*species
-         dens_dfdy(1:species,1:species) => burn_work_array(i+1:i+sz); i = i+sz
-         dmat(1:species,1:species) => burn_work_array(i+1:i+sz); i = i+sz
+         allocate(dens_dfdy(1:species,1:species))
+         allocate(dmat(1:species,1:species))
+
+         if (g% fill_arrays_with_nans) then
+            call fill_with_NaNs(dratdumdy1)
+            call fill_with_NaNs(dratdumdy2)
+            call fill_with_NaNs_2D(dens_dfdy)
+            call fill_with_NaNs_2D(dmat)
+         end if
          
       end subroutine get_pointers
 
@@ -100,8 +92,6 @@
             screening_mode,  &
             stptry_in, max_steps, eps, odescal, &
             use_pivoting, trace, burn_dbg, burner_finish_substep, &
-            burn_lwork, burn_work_array, &
-            net_lwork, net_work_array, &
             ending_x, eps_nuc_categories, avg_eps_nuc, eps_neu_total, &
             nfcn, njac, nstep, naccpt, nrejct, ierr)
          use num_def
@@ -110,9 +100,8 @@
          use mtx_def
          use rates_def, only: rates_reaction_id_max, reaction_Name, reaction_categories
          use rates_lib, only: rates_reaction_id
-         use net_initialize, only: set_rate_ptrs, setup_net_info, work_size
+         use net_initialize, only: setup_net_info
          use chem_lib, only: basic_composition_info, get_Q
-         use net_initialize, only: work_size
          use net_approx21, only: approx21_nrat
          
          integer, intent(in) :: net_handle, eos_handle
@@ -142,9 +131,6 @@
          interface
             include 'burner_finish_substep.inc'
          end interface
-         integer, intent(in) :: burn_lwork, net_lwork
-         real(dp), intent(inout), pointer :: burn_work_array(:)
-         real(dp), intent(inout), pointer :: net_work_array(:)
          real(dp), intent(inout) :: ending_x(:) ! (species)
          real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
          real(dp), intent(out) :: avg_eps_nuc, eps_neu_total
@@ -167,21 +153,17 @@
                   
          real(dp), dimension(species), target :: starting_y_a, ending_y_a, save_x_a
          real(dp), dimension(:), pointer :: starting_y, ending_y, save_x
-         real(dp), dimension(:), pointer :: dratdumdy1, dratdumdy2
+         real(dp), dimension(:), allocatable :: dratdumdy1, dratdumdy2
 
-         real(dp), dimension(:,:), pointer :: dens_dfdy, dmat
+         real(dp), dimension(:,:), allocatable :: dens_dfdy, dmat
 
          real(dp) :: xh, xhe, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          real(dp) :: aion(species)
       
          logical :: dbg
          
-         type (Net_Info), target :: net_info_target
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          
-         real(dp), dimension(:), pointer :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
          integer :: iwork, cid
          
          include 'formats'
@@ -198,7 +180,6 @@
          starting_y => starting_y_a
          ending_y => ending_y_a
          save_x => save_x_a
-         n => net_info_target
          
          have_set_rate_screened = .false.
          
@@ -252,33 +233,17 @@
          stpmin = min(t_end*1d-20,stptry*1d-6)
          stopp = t_end
          stpmax = max_steps
-         
-         if (dbg) write(*,2) 'call set_rate_ptrs', burn_lwork
-         call set_rate_ptrs(g, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            burn_lwork, burn_work_array, iwork, ierr)
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in set_ptrs_in_work'
-            return
-         end if
-         
-         if (dbg) write(*,2) 'call setup_net_info', iwork
-         call setup_net_info( &
-            g, n, eps_nuc_categories,  &
-            screening_mode, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, burn_lwork, burn_work_array, &
-            iwork, ierr)
+
+         n% screening_mode = screening_mode
+         n% g => g
+                  
+         if (dbg) write(*,*) 'call setup_net_info'
+         call setup_net_info(n) 
          if (dbg) write(*,*) 'done setup_net_info'
-         if (ierr /= 0) then
-            if (dbg) write(*,*) 'failed in setup_net_info'
-            return
-         end if
       
          if (dbg) write(*,*) 'call get_pointers'
          call get_pointers( &
-            g, burn_lwork, burn_work_array, species, num_reactions, &
+            g, species, num_reactions, &
             dratdumdy1, dratdumdy2, dens_dfdy, dmat, iwork, ierr)
          if (ierr /= 0) return
 
@@ -349,13 +314,11 @@
          subroutine burner_jakob(x,y,dfdy,species,ierr)
             integer, intent(in) :: species
             real(dp) :: x, y(:)
-            real(dp), pointer :: dfdy(:,:)
+            real(dp) :: dfdy(:,:)
             integer, intent(out) :: ierr
             real(dp), target :: f_arry(0)
             real(dp), pointer :: f(:)
             
-            real(dp), target :: dfdy21_a(species,species)
-            real(dp), pointer :: dfdy21(:,:)
             real(dp) :: Z_plus_N, df_t, df_m
             integer :: i, ci, j, cj
             logical :: okay
@@ -380,7 +343,7 @@
             use eos_lib, only: eosDT_get
          
             real(dp) :: time, y(:), f(:)
-            real(dp), pointer :: dfdy(:,:)
+            real(dp) :: dfdy(:,:)
             integer, intent(out) :: ierr
          
             real(dp) :: rho, lgRho, T, lgT, rate_limit, rat, dratdt, dratdd
@@ -491,7 +454,6 @@
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                screening_mode, &
                eps_nuc_categories, eps_neu_total, &
-               net_lwork, net_work_array, &
                actual_Qs, actual_neuQs, from_weaklib, .false., ierr)
             
             if (size(f,dim=1) > 0) then

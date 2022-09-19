@@ -164,7 +164,20 @@
             testhub_extras_vals(3) = star_get_history_output(s, 'mu4')
             testhub_extras_names(4) = 'm4'
             testhub_extras_vals(4) = star_get_history_output(s, 'm4')
+
+
+            if(s% fe_core_mass < 1d0) then
+               write(*,1) "Bad fe_core_mass", s%fe_core_mass
+            else
+               if(s% fe_core_infall > s% fe_core_infall_limit) then
+                  write(*,'(a)') 'all values are within tolerance'
+               else
+                  write(*,'(a)') "Bad fe core infall"
+               end if
+            end if
          end select
+
+
 
 
          call test_suite_after_evolve(s, ierr)

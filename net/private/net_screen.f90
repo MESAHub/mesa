@@ -39,7 +39,7 @@
 
 
       subroutine make_screening_tables(n, ierr)
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          integer, intent(out) :: ierr
          real(dp) :: y(num_chem_isos)
          y = 0
@@ -125,6 +125,8 @@
             end if
          end do
          if (ierr /= 0) return
+
+         if(init) return
          
          call set_combo_screen_rates(num_isos, y, sc, ierr)
          if (ierr /= 0) then

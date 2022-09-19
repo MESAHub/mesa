@@ -42,5 +42,7 @@
       history_interval = 5
       terminal_interval = 10
 
+      x_integer_ctrl(1) = 1 ! Inlist part
+
 / ! end of controls namelist
 

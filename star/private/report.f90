@@ -156,9 +156,11 @@
          real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
             twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
             prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
-            prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum
+            prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum,&
+            mass_sum
          logical, parameter :: new_only = .false.
          integer, pointer :: net_iso(:)
+         real(dp), pointer :: velocity(:) => null()
 
          include 'formats'
 
@@ -381,62 +383,56 @@
          call get_burn_zone_info(s, ierr)
          if (failed('get_burn_zone_info')) return
 
+
          s% fe_core_infall = 0
          s% non_fe_core_infall = 0
          s% non_fe_core_rebound = 0
-         if (s% u_flag) then
-            k_min = minloc(s% u(1:nz),dim=1)
-            if (k_min > 0) then
-               s% max_infall_speed_mass = s% m(k_min)/Msun
+         s% max_infall_speed_mass = 0
+
+         if(s% u_flag .or. s% v_flag) then
+
+            if(s% u_flag) then
+               velocity => s% u
             else
-               s% max_infall_speed_mass = s% m(k_min)/Msun
+               velocity => s% v
             end if
+            k_min = minloc(velocity(1:nz), dim=1)
+
+            s% max_infall_speed_mass = s% m(k_min)/Msun
+
+            mass_sum = 0d0
             if (s% fe_core_mass > 0) then
-               do k = 1, nz
+               do k=1, nz
                   if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if (-s% u(k) > s% fe_core_infall) &
-                     s% fe_core_infall = -s% u(k)
+                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% m(k)
                end do
+
+               if(mass_sum > s% fe_core_infall_mass*msun) then
+                  s% fe_core_infall = -velocity(k_min)
+               end if
             end if
+
             non_fe_core_mass = s% he_core_mass
+            mass_sum = 0d0
+
             if (non_fe_core_mass > 0) then
-               do k = 1, nz
-                  if (s% m(k) > Msun*non_fe_core_mass) cycle
-                  if (s% m(k) < Msun*s% fe_core_mass) exit
-                  if (-s% u(k) > s% non_fe_core_infall) &
-                     s% non_fe_core_infall = -s% u(k)
-                  if (s% u(k) > s% non_fe_core_rebound) then
-                     s% non_fe_core_rebound = s% u(k)
-                     !write(*,2) 's% non_fe_core_rebound', k, s% non_fe_core_rebound, s% m(k)/Msun
-                  end if
+               do k=1, nz
+                  if (s% m(k) > Msun * non_fe_core_mass) cycle
+                  if (s% m(k) < Msun * s% fe_core_mass) exit
+                  if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% m(k)
                end do
+   
+               if(mass_sum > s% non_fe_core_infall_mass*msun) then
+                  s% non_fe_core_infall = -velocity(k_min)
+               end if
+               
+               s% non_fe_core_rebound = maxval(velocity(s%he_core_k:s%fe_core_k),dim=1)
+
             end if
-         else if (s% v_flag) then
-            k_min = minloc(s% v(1:nz),dim=1)
-            if (k_min > 0) then
-               s% max_infall_speed_mass = s% m(k_min)/Msun
-            else
-               s% max_infall_speed_mass = s% m(k_min)/Msun
-            end if
-            if (s% fe_core_mass > 0) then
-               do k = 1, nz
-                  if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if (-s% v(k) > s% fe_core_infall) &
-                     s% fe_core_infall = -s% v(k)
-               end do
-            end if
-            non_fe_core_mass = max(s% he_core_mass, s% co_core_mass)
-            if (non_fe_core_mass > 0) then
-               do k = 1, nz
-                  if (s% m(k) > Msun*non_fe_core_mass) cycle
-                  if (s% m(k) < Msun*s% fe_core_mass) exit
-                  if (-s% v(k) > s% non_fe_core_infall) &
-                     s% non_fe_core_infall = -s% v(k)
-                  if (s% v(k) > s% non_fe_core_rebound) &
-                     s% non_fe_core_rebound = s% v(k)
-               end do
-            end if
+
+            nullify(velocity)
          end if
+
 
          contains
 

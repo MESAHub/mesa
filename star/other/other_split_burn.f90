@@ -46,8 +46,6 @@
          screening_mode, &
          stptry, max_steps, eps, odescal, &
          use_pivoting, trace, dbg,  burner_finish_substep, &
-         burn_lwork, burn_work_array, &
-         net_lwork, net_work_array, &
          ! results
          ending_x, eps_nuc_categories, avg_eps_nuc, eps_neu_total, &
          nfcn, njac, nstep, naccpt, nrejct, ierr)
@@ -79,9 +77,6 @@
          interface
             include 'burner_finish_substep.inc'
          end interface
-         integer, intent(in) :: net_lwork, burn_lwork
-         real(dp), intent(inout), pointer :: burn_work_array(:) ! (burn_lwork)
-         real(dp), intent(inout), pointer :: net_work_array(:) ! (net_lwork)
 
          ! These should be set for the output
          real(dp), intent(inout) :: ending_x(:) ! (num_isos)

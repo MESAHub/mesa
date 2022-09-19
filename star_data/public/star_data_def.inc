@@ -706,14 +706,14 @@
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
-               lwork, work, ierr)      
+               ierr)      
             use const_def, only: dp
             use net_def, only: Net_Info
             integer, intent(in) :: id ! id for star         
             integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
             integer, intent(in) :: net_handle
             logical, intent(in) :: just_dxdt
-            type (Net_Info), pointer:: n
+            type (Net_Info) :: n
             integer, intent(in) :: num_isos
             integer, intent(in) :: num_reactions
             real(dp), intent(in)  :: x(:) ! (num_isos)
@@ -739,8 +739,6 @@
             real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
             real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
             integer, intent(in) :: screening_mode
-            integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
-            real(dp), pointer :: work(:) ! (lwork)
             integer, intent(out) :: ierr ! 0 means okay
          end subroutine other_net_get_interface
 
@@ -753,8 +751,6 @@
             screening_mode, &
             stptry, max_steps, eps, odescal, &
             use_pivoting, trace, dbg, burner_finish_substep, &
-            burn_lwork, burn_work_array, &
-            net_lwork, net_work_array, &
             ! results
             ending_x, eps_nuc_categories, avg_eps_nuc, eps_neu_total, &
             nfcn, njac, nstep, naccpt, nrejct, ierr)
@@ -785,9 +781,6 @@
             interface
                include 'burner_finish_substep.inc'
             end interface
-            integer, intent(in) :: net_lwork, burn_lwork
-            real(dp), intent(inout), pointer :: burn_work_array(:) ! (burn_lwork)
-            real(dp), intent(inout), pointer :: net_work_array(:) ! (net_lwork)
    
             ! These should be set for the output
             real(dp), intent(inout) :: ending_x(:) ! (num_isos)
