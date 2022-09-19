@@ -66,12 +66,15 @@
 
 
       integer function do1_profile_spec( &
-            iounit, n, i, string, buffer, report, ierr) result(spec)
+            s, iounit, n, i, string, buffer, report, ierr) result(spec)
 
          use utils_lib
          use utils_def
          use chem_def
          use chem_lib
+         use net_def
+
+         type(star_info), pointer :: s
          integer :: iounit, n, i, num, t
 
          character (len=*) :: string, buffer
@@ -79,9 +82,13 @@
          integer, intent(out) :: ierr
 
          integer :: id
+         type(Net_General_Info), pointer :: g
 
          ierr = 0
          spec = -1
+
+         call get_net_ptr(s% net_handle, g, ierr)
+         if(ierr/=0) return
 
          id = do_get_profile_id(string)
          if (id > 0) then
@@ -199,6 +206,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
+            id = g% net_reaction(id) ! Convert to net id not the gloabl rate id            
             if (id > 0) then
                spec = offset + id
                return
@@ -228,7 +236,7 @@
          if (t /= name_token) then
             spec = -1; return
          end if
-         spec = do1_profile_spec(iounit, n, i, string, buffer, .false., ierr)
+         spec = do1_profile_spec(s, iounit, n, i, string, buffer, .false., ierr)
          if (ierr == 0) return
          ! check to see if it is one of the extra profile columns
          do i=1,s% num_extra_profile_cols

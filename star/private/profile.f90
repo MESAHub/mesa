@@ -186,7 +186,7 @@
 
             case default
                spec_err = 0
-               nxt_spec = do1_profile_spec(iounit, n, i, string, buffer, report, spec_err)
+               nxt_spec = do1_profile_spec(s, iounit, n, i, string, buffer, report, spec_err)
                if (spec_err /= 0) then
                   ierr = spec_err
                else
