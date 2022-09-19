@@ -3195,7 +3195,7 @@
             end if
             special_case = .false.
             specs(i) = do1_history_spec( &
-               iounit, t, n, j, string, buffer, special_case, report, ierr)
+               s, iounit, t, n, j, string, buffer, special_case, report, ierr)
             if (ierr /= 0 .or. special_case) then
                if (report) write(*,*) 'get_history_specs failed for ' // trim(names(i))
                specs(i) = -1
