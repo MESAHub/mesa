@@ -48,7 +48,7 @@
          use utils_lib, only: is_bad
          integer, intent(in) :: n, ids(:), reaction_ids(:)
          real(dp), intent(in) :: T9, YeRho, eta, d_eta_dlnT, d_eta_dlnRho
-         real(dp), dimension(:), intent(inout), pointer :: &
+         real(dp), dimension(:), intent(inout) :: &
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
@@ -58,7 +58,7 @@
          integer :: i, ir, cid
 
          include 'formats'
-         
+
          call do_eval_weaklib_reaction_info( &
             n, ids, T9, YeRho, &
             eta, d_eta_dlnT, d_eta_dlnRho, &
@@ -142,7 +142,7 @@
          use utils_lib, only: is_bad, integer_dict_lookup
          integer, intent(in) :: n, ids(:)
          real(dp), intent(in) :: T9_in, YeRho_in, eta, d_eta_dlnT, d_eta_dlnRho
-         real(dp), dimension(:), intent(inout), pointer :: &
+         real(dp), dimension(:), intent(inout) :: &
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho

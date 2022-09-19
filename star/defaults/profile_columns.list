@@ -283,7 +283,11 @@
       !other    
 
    ! adds columns for all of the reactions that are in the current net 
+   ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for thier rates
    !add_raw_rates      ! raw reaction rates,       reactions/second
+   !add_screened_rates ! screened reaction rates reactions/second
+   !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
+   !add_eps_neu_rates  ! Neutrino losses             erg/s
 
    ! individual reactions (as many as desired)
    ! use list_net_reactions = .true. in star_job to list all reactions in the current net    

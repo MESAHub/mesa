@@ -1618,7 +1618,7 @@
                i_burn_mg, i_burn_si, i_burn_s, i_burn_ar, i_burn_ca, i_burn_ti, i_burn_cr, &
                i_burn_fe, icc, ico, ioo, ipnhe4, iphoto, i_ni56_co56, i_co56_fe56, iother
             use net_def, only: Net_Info
-            type (Net_Info), pointer :: n
+            type (Net_Info) :: n
             real(dp), dimension(:), intent(in) :: y, mion, dydt, rate
             real(dp), intent(in) :: fII, &
                Qtotal_rpp, Qneu_rpp, Qr33, &
@@ -1720,140 +1720,158 @@
             do i=1,num_categories
                eps_nuc_cat(i) = 0d0
             end do
-            
-            eps_nuc_cat(ipp) = &
-               m5(Qtotal_rpp - Qneu_rpp, 0.5d0, y(ih1), y(ih1), rate(irpp)) + &
-               m5(Qr33, 0.5d0, y(ihe3), y(ihe3), rate(ir33)) + &
-               m4(y(ihe3), y(ihe4), rate(irhe3ag), ( &
-                  (Qtotal_rpp2 - Qneu_rpp2)*fII + &
-                  (Qtotal_rpp3 - Qneu_rpp3)*(1d0 - fII)) )
-            eps_nuc_cat(ipp) = eps_nuc_cat(ipp) * Qconv
-               
-            eps_nuc_cat(icno) = &
-               m4(Qtotal_rcpg - Qneu_rcpg, y(ic12), y(ih1), rate(ircpg)) + &
-               m5(Qtotal_rnpg - Qneu_rnpg, y(in14), y(ih1), rate(ifa), rate(irnpg)) + &
-               m4(Qtotal_ropg - Qneu_ropg, y(io16), y(ih1), rate(iropg)) 
-            eps_nuc_cat(icno) = eps_nuc_cat(icno) * Qconv
-               
-            eps_nuc_cat(i3alf) = m5((1d0/6d0)*Qr3alf, y(ihe4), y(ihe4), y(ihe4), rate(ir3a))
-            eps_nuc_cat(i3alf) = eps_nuc_cat(i3alf) * Qconv
-            
-            eps_nuc_cat(i_burn_c) = m4(Qrc12ag, y(ic12), y(ihe4), rate(ircag))
-            eps_nuc_cat(i_burn_c) = eps_nuc_cat(i_burn_c) * Qconv
-               
-            eps_nuc_cat(i_burn_n) = &
-               m4(Qrn14ag, y(ihe4), y(in14), rate(irnag)) + &
-               m5(Qrn14_to_o16, y(in14), y(ih1), rate(ifg), rate(irnpg)) 
-            eps_nuc_cat(i_burn_n) = eps_nuc_cat(i_burn_n) * Qconv
 
-            eps_nuc_cat(i_burn_o) = m4(Qro16ag, y(io16), y(ihe4), rate(iroag) )
-            eps_nuc_cat(i_burn_o) = eps_nuc_cat(i_burn_o) * Qconv
+            ! Set the rates
+            n% raw_rate = 0d0
+            n% screened_rate = 0d0
+            n% eps_nuc_rate = 0d0
+            n% eps_neu_rate = 0d0
 
-            eps_nuc_cat(icc) = m5(Qr1212, 0.5d0, y(ic12), y(ic12), rate(ir1212))
-            eps_nuc_cat(icc) = eps_nuc_cat(icc) * Qconv
-            
-            eps_nuc_cat(ico) = m4(0.5d0*(Qr1216_to_mg24 + Qr1216_to_si28), &
-               y(ic12), y(io16), rate(ir1216))
-            eps_nuc_cat(ico) = eps_nuc_cat(ico) * Qconv
+            ! Set neutrinos first
+            n% eps_neu_rate(irpp) = m5(Qneu_rpp, 0.5d0, y(ih1), y(ih1), rate(irpp))
+            n% eps_neu_rate(irhe3ag) = m5(Qneu_rpp2, y(ihe3), y(ihe4), rate(irhe3ag), fII) + &
+                                       m5(Qneu_rpp3, y(ihe3), y(ihe4), rate(irhe3ag), (1d0-fII))
+            n% eps_neu_rate(ircpg) = m4(Qneu_rcpg, y(ic12), y(ih1), rate(ircpg))
+            n% eps_neu_rate(irnpg) = m5(Qneu_rnpg, y(in14), y(ih1), rate(irnpg), rate(ifa))
+            n% eps_neu_rate(iropg) = m4(Qneu_ropg, y(io16), y(ih1), rate(iropg))
+            n% eps_neu_rate(irpen) = m3(Qneu_rpen, y(ih1), rate(irpen)) + &
+                                    m3(Qneu_rpen, y(iprot), rate(irpen))
+            n% eps_neu_rate(irnep) = m3(Qneu_rnep, y(ineut), rate(irnep))
+            n% eps_neu_rate(irn56ec) = m4(Qneu_rfe56ec, y(ife56), fe56ec_fake_factor, rate(irn56ec))
+            if (plus_co56) then
+               n% eps_neu_rate(irn56ec) = n% eps_neu_rate(irn56ec) + &
+                  m3(Qneu_rni56ec, y(ini56), rate(irn56ec)) + &
+                  m3(Qneu_rco56ec, y(ico56), rate(irco56ec))
+            else
+               n% eps_neu_rate(irn56ec) = n% eps_neu_rate(irn56ec) + &
+                  m3(Qneu_rni56ec + Qneu_rco56ec, y(ini56), rate(irn56ec))
+            end if
 
-            eps_nuc_cat(ioo) = m5(0.5d0, y(io16), y(io16), rate(ir1616), &
-               ! these make he4 + si28
-               Qr1616a * (0.56d0 + 0.34d0*rate(irs1)) + &
-               ! these make s32
-               Qr1616g * (0.1d0 + 0.34d0*(1d0 - rate(irs1))))
-            eps_nuc_cat(ioo) = eps_nuc_cat(ioo) * Qconv
-            
-            eps_nuc_cat(i_burn_ne) = m4(Qrne20ag, y(ihe4), y(ine20), rate(irneag))
-            eps_nuc_cat(i_burn_ne) = eps_nuc_cat(i_burn_ne) * Qconv
-               
-            eps_nuc_cat(i_burn_mg) = m4(Qrmg24ag, y(ihe4), y(img24), ( &
-               rate(irmgag) + rate(irmgap)*(1.0d0-rate(irr1))) )
-            eps_nuc_cat(i_burn_mg) = eps_nuc_cat(i_burn_mg) * Qconv
-               
-            eps_nuc_cat(i_burn_si) = m4(Qrsi28ag, y(ihe4), y(isi28), ( &
-               rate(irsiag) + rate(irsiap)*(1.0d0-rate(irs1))) )
-            eps_nuc_cat(i_burn_si) = eps_nuc_cat(i_burn_si) * Qconv
-               
-            eps_nuc_cat(i_burn_s) = m4(Qrs32ag, y(ihe4), y(is32), ( &
-               rate(irsag) + rate(irsap)*(1.0d0-rate(irt1))) )
-            eps_nuc_cat(i_burn_s) = eps_nuc_cat(i_burn_s) * Qconv
-               
-            eps_nuc_cat(i_burn_ar) = m4(Qrar36ag, y(ihe4), y(iar36), ( &
-               rate(irarag) + rate(irarap)*(1.0d0-rate(iru1))) )
-            eps_nuc_cat(i_burn_ar) = eps_nuc_cat(i_burn_ar) * Qconv
-               
-            eps_nuc_cat(i_burn_ca) = m4(Qrca40ag, y(ihe4), y(ica40), ( &
-               rate(ircaag) + rate(ircaap)*(1.0d0-rate(irv1))) )
-            eps_nuc_cat(i_burn_ca) = eps_nuc_cat(i_burn_ca) * Qconv
-               
-            eps_nuc_cat(i_burn_ti) = m4(Qrti44ag, y(ihe4), y(iti44), ( &
-               rate(irtiag) + rate(irtiap)*(1.0d0-rate(irw1)) ))
-            eps_nuc_cat(i_burn_ti) = eps_nuc_cat(i_burn_ti) * Qconv
-               
-            eps_nuc_cat(i_burn_cr) = m4(Qrcr48ag, y(ihe4), y(icr48), ( &
-               rate(ircrag) + rate(ircrap)*(1.0d0-rate(irx1)) ))
-            eps_nuc_cat(i_burn_cr) = eps_nuc_cat(i_burn_cr) * Qconv
-               
-            eps_nuc_cat(i_burn_fe) = &
-               m4(Qrfe52ag, y(ihe4), y(ife52), rate(irfeag)) + &
-               m5(Qrfe52aprot_to_ni56, y(ife52), y(ihe4), y(iprot), rate(ir7f54)) + &
-               m5(Qrfe52neut_to_fe54, y(ife52), y(ineut), y(ineut), rate(ir2f54)) + &
-               m5(Qrfe54ng_to_fe56, y(ife54), y(ineut), y(ineut), rate(irfe56_aux2)) + &
-               m4(Qrfe52aprot_to_fe54, y(ife52), y(ihe4), rate(ir6f54)) + &
-               m4(Qrfe54aprot_to_fe56, y(ife54), y(ihe4), rate(irfe56_aux4)) + &
-               m5(Qrfe54prot_to_ni56, y(ife54), y(iprot), y(iprot), rate(ir3f54)) + &
-               m4(Qtotal_rfe56ec - Qneu_rfe56ec, y(ife56), fe56ec_fake_factor, rate(irn56ec))
-            eps_nuc_cat(i_burn_fe) = eps_nuc_cat(i_burn_fe) * Qconv
-            
-            eps_nuc_cat(ipnhe4) = &
-               m4(Qrhe4_rebuild, y(ineut)*y(ineut), y(iprot)*y(iprot), rate(iralf2))
-            eps_nuc_cat(ipnhe4) = eps_nuc_cat(ipnhe4) * Qconv
+            n% eps_neu_rate = n% eps_neu_rate * Qconv
+        
+            call set_eps_nuc(Qtotal_rpp - Qneu_rpp,(/0.5d0, y(ih1), y(ih1)/),irpp, ipp)
+            call set_eps_nuc(Qr33, (/0.5d0, y(ihe3), y(ihe3)/), ir33, ipp)
+            call set_eps_nuc(( &
+                              (Qtotal_rpp2 - Qneu_rpp2)*fII + &
+                              (Qtotal_rpp3 - Qneu_rpp3)*(1d0 - fII)), &
+                              (/y(ihe3), y(ihe4)/),irhe3ag, ipp)
 
-            eps_nuc_cat(iother) = &
-               m3(Qtotal_rpen, y(ih1), rate(irpen)) + &
-               m3(Qtotal_rpen, y(iprot), rate(irpen)) + &
-               m3(Qtotal_rnep, y(ineut), rate(irnep))
-            eps_nuc_cat(iother) = eps_nuc_cat(iother) * Qconv
+            call set_eps_nuc(Qtotal_rcpg - Qneu_rcpg, (/y(ic12), y(ih1)/),ircpg,icno)
+            call set_eps_nuc(Qtotal_rcpg - Qneu_rnpg, (/y(in14), y(ih1)/),irnpg,icno)
+            call set_eps_nuc(Qtotal_ropg - Qneu_ropg, (/y(io16), y(ih1),rate(ifa)/),iropg,icno)
                
-            eps_nuc_cat(iphoto) = &
-               m3(Qrhe4_breakup, y(ihe4), rate(iralf1)) - ( & ! note: Qrhe4_breakup < 0
-               m3(Qrc12ag, y(io16), rate(iroga)) + & ! all the rest are > 0 Q's for forward reactions
-               m3(Qr3alf, y(ic12), rate(irg3a)) + &
-               m3(Qro16ag, y(ine20), rate(irnega)) + & 
-               m3(Qrne20ag, y(img24), rate(irmgga)) + &
-               m3(Qrmg24ag, y(isi28), rate(irsiga)) + &
-               m4(Qrmg24ag, y(isi28), rate(irsigp), rate(irr1)) + &
-               m3(Qrsi28ag, y(is32), rate(irsga)) + &
-               m4(Qrsi28ag, y(is32), rate(irsgp), rate(irs1)) + &
-               m3(Qrs32ag, y(iar36), rate(irarga)) + &
-               m4(Qrs32ag, y(iar36), rate(irargp), rate(irt1)) + &
-               m3(Qrar36ag, y(ica40), rate(ircaga)) + &
-               m4(Qrar36ag, y(ica40), rate(ircagp), rate(iru1)) + &
-               m3(Qrca40ag, y(iti44), rate(irtiga)) + &
-               m4(Qrca40ag, y(iti44), rate(irtigp), rate(irv1)) + &
-               m3(Qrti44ag, y(icr48), rate(ircrga)) + &
-               m4(Qrti44ag, y(icr48), rate(ircrgp), rate(irw1)) + &
-               m3(Qrcr48ag, y(ife52), rate(irfega)) + &
-               m4(Qrcr48ag, y(ife52), rate(irfegp), rate(irx1)) + &
-               m4(Qrfe52aprot_to_ni56, y(ini56), y(iprot), rate(ir8f54)) + &
-               m5(Qrfe52aprot_to_fe54, y(ife54), y(iprot), y(iprot), rate(ir5f54)) + &
-               m3(Qrfe52ag, y(ini56), rate(irniga)) + &
-               m3(Qrfe52neut_to_fe54, y(ife54), rate(ir1f54)) + &
-               m3(Qrfe54ng_to_fe56, y(ife56), rate(irfe56_aux1)) + &
-               m5(Qrfe54aprot_to_fe56, y(ife56), y(iprot), y(iprot), rate(irfe56_aux3)) + &
-               m3(Qrfe54prot_to_ni56, y(ini56), rate(ir4f54)))
-            eps_nuc_cat(iphoto) = eps_nuc_cat(iphoto) * Qconv
+            call set_eps_nuc(Qr3alf, (/1d0/6d0,y(ihe4), y(ihe4), y(ihe4)/),ir3a,i3alf)
+
+            call set_eps_nuc(Qrc12ag, (/y(ic12), y(ihe4)/),ircag,i_burn_c)
+
+            call set_eps_nuc(Qrn14ag, (/ y(ihe4), y(in14)/),irnag,i_burn_n)
+            call set_eps_nuc(Qrn14_to_o16, (/y(in14), y(ih1),rate(ifg)/),irnpg,i_burn_n)
+
+            call set_eps_nuc(Qro16ag, (/y(io16), y(ihe4)/), iroag, i_burn_o)
+
+            call set_eps_nuc(Qr1212, (/0.5d0,y(ic12), y(ic12)/),ir1212,icc)
             
-            eps_nuc_cat(i_ni56_co56) = &
-               m4(Qtotal_rni56ec - Qneu_rni56ec, y(ini56), rate(irn56ec), Qconv)
+            call set_eps_nuc(0.5d0*(Qr1216_to_mg24 + Qr1216_to_si28), (/y(ic12), y(io16)/), ir1216, ico )
+
+            ! these make he4 + si28
+            call set_eps_nuc( Qr1616a * (0.56d0 + 0.34d0*rate(irs1)), (/0.5d0,y(io16), y(io16)/), ir1616, ioo)
+            ! these make s32
+            call set_eps_nuc( Qr1616g * (0.1d0 + 0.34d0*(1d0 - rate(irs1))) , (/0.5d0,y(io16), y(io16)/), ir1616, ioo )
+            
+            call set_eps_nuc(Qrne20ag, (/y(ihe4), y(ine20)/), irneag, i_burn_ne)
+               
+            call set_eps_nuc(Qrmg24ag, (/y(ihe4), y(img24)/),irmgag,i_burn_mg)
+            call set_eps_nuc(Qrmg24ag, (/y(ihe4), y(img24),1.0d0-rate(irr1)/),irmgap,i_burn_mg)
+               
+            call set_eps_nuc(Qrsi28ag, (/y(ihe4), y(isi28)/),irsiag,i_burn_si)
+            call set_eps_nuc(Qrsi28ag, (/y(ihe4), y(isi28),(1.0d0-rate(irs1))/),irsiap,i_burn_si)
+
+            call set_eps_nuc(Qrs32ag, (/y(ihe4), y(is32)/), irsag, i_burn_s)
+            call set_eps_nuc(Qrs32ag, (/y(ihe4), y(is32),(1.0d0-rate(irt1))/), irsap, i_burn_s)
+               
+            call set_eps_nuc(Qrar36ag, (/y(ihe4), y(iar36)/), irarag, i_burn_ar)
+            call set_eps_nuc(Qrar36ag, (/y(ihe4), y(iar36),(1.0d0-rate(iru1))/), irarap, i_burn_ar)
+
+            call set_eps_nuc(Qrca40ag, (/y(ihe4), y(ica40)/), ircaag, i_burn_ca)
+            call set_eps_nuc(Qrca40ag, (/y(ihe4), y(ica40), (1.0d0-rate(irv1))/), ircaap, i_burn_ca)
+
+            call set_eps_nuc(Qrti44ag, (/y(ihe4), y(iti44)/), irtiag, i_burn_ti)
+            call set_eps_nuc(Qrti44ag, (/y(ihe4), y(iti44),(1.0d0-rate(irw1))/), irtiap, i_burn_ti)
+
+            call set_eps_nuc(Qrcr48ag, (/y(ihe4), y(icr48)/), ircrag, i_burn_cr)
+            call set_eps_nuc(Qrcr48ag, (/y(ihe4), y(icr48),(1.0d0-rate(irx1))/), ircrap, i_burn_cr)
+
+            call set_eps_nuc(Qrfe52ag, (/y(ihe4), y(ife52)/), irfeag, i_burn_fe)
+            call set_eps_nuc(Qrfe52aprot_to_ni56, (/y(ife52), y(ihe4), y(iprot)/), ir7f54, i_burn_fe)
+            call set_eps_nuc(Qrfe52neut_to_fe54, (/ y(ife52), y(ineut), y(ineut)/), ir2f54, i_burn_fe)
+            call set_eps_nuc(Qrfe54ng_to_fe56, (/ y(ife54), y(ineut), y(ineut)/), irfe56_aux2, i_burn_fe)
+            call set_eps_nuc(Qrfe52aprot_to_fe54, (/y(ife52), y(ihe4)/), ir6f54, i_burn_fe)
+            call set_eps_nuc(Qrfe54aprot_to_fe56, (/y(ife54), y(ihe4)/), irfe56_aux4, i_burn_fe)
+            call set_eps_nuc(Qrfe54prot_to_ni56, (/y(ife54), y(iprot),y(iprot)/), ir3f54, i_burn_fe)
+            call set_eps_nuc(Qtotal_rfe56ec - Qneu_rfe56ec, (/y(ife56),fe56ec_fake_factor/), irn56ec, i_burn_fe)
+
+            call set_eps_nuc(Qrhe4_rebuild, (/y(ineut),y(ineut), y(iprot),y(iprot)/),iralf2,ipnhe4)
+
+            call set_eps_nuc(Qtotal_rpen, (/y(ih1)/),irpen,iother)
+            call set_eps_nuc(Qtotal_rpen, (/y(iprot)/),irpen,iother)
+            call set_eps_nuc(Qtotal_rnep, (/y(ineut)/),irnep,iother)
+
+               ! m4(Qrfe52aprot_to_ni56, y(ini56), y(iprot), rate(ir8f54)) + &
+               ! m5(Qrfe52aprot_to_fe54, y(ife54), y(iprot), y(iprot), rate(ir5f54)) + &
+               ! m3(Qrfe52ag, y(ini56), rate(irniga)) + &
+               ! m3(Qrfe52neut_to_fe54, y(ife54), rate(ir1f54)) + &
+               ! m3(Qrfe54ng_to_fe56, y(ife56), rate(irfe56_aux1)) + &
+               ! m5(Qrfe54aprot_to_fe56, y(ife56), y(iprot), y(iprot), rate(irfe56_aux3)) + &
+               ! m3(Qrfe54prot_to_ni56, y(ini56), rate(ir4f54)))
+
+            call set_eps_nuc(Qrhe4_breakup,(/ y(ihe4)/),iralf1,iphoto)! note: Qrhe4_breakup < 0
+            call set_eps_nuc(-Qrc12ag,(/ y(io16)/),iroga, iphoto) ! all the rest are > 0 Q's for forward reactions
+            call set_eps_nuc(-Qr3alf,(/ y(ic12)/),irg3a, iphoto)
+            call set_eps_nuc(-Qro16ag,(/ y(ine20)/),irnega, iphoto)
+            call set_eps_nuc(-Qrne20ag,(/ y(img24)/),irmgga, iphoto)
+
+            call set_eps_nuc(-Qrmg24ag,(/ y(isi28)/),irsiga, iphoto)
+            call set_eps_nuc(-Qrmg24ag,(/ y(isi28),rate(irr1)/),irsigp, iphoto)
+
+            call set_eps_nuc(-Qrsi28ag,(/ y(is32)/),irsga, iphoto)
+            call set_eps_nuc(-Qrsi28ag,(/ y(is32),rate(irs1)/),irsgp, iphoto)
+
+            call set_eps_nuc(-Qrs32ag,(/ y(iar36)/),irarga, iphoto)
+            call set_eps_nuc(-Qrs32ag,(/ y(iar36),rate(irt1)/),irargp, iphoto)
+
+            call set_eps_nuc(-Qrar36ag,(/ y(ica40)/),ircaga, iphoto)
+            call set_eps_nuc(-Qrar36ag,(/ y(ica40),rate(iru1)/),ircagp, iphoto)
+
+            call set_eps_nuc(-Qrca40ag,(/ y(iti44)/),irtiga, iphoto)
+            call set_eps_nuc(-Qrca40ag,(/ y(iti44),rate(irv1)/),irtigp, iphoto)
+
+            call set_eps_nuc(-Qrti44ag,(/ y(icr48)/),ircrga, iphoto)
+            call set_eps_nuc(-Qrti44ag,(/ y(icr48),rate(irw1)/),ircrgp, iphoto)
+
+            call set_eps_nuc(-Qrcr48ag,(/ y(ife52)/),irfega, iphoto)
+            call set_eps_nuc(-Qrcr48ag,(/ y(ife52),rate(irx1)/),irfegp, iphoto)
+
+            call set_eps_nuc(-Qrfe52aprot_to_ni56,(/ y(ini56), y(iprot)/),ir8f54, iphoto)
+            call set_eps_nuc(-Qrfe52aprot_to_fe54,(/ y(ife54), y(iprot), y(iprot)/),ir5f54, iphoto)
+            call set_eps_nuc(-Qrfe52ag,(/ y(ini56)/),irniga, iphoto)        
+            call set_eps_nuc(-Qrfe52neut_to_fe54,(/ y(ife54)/),ir1f54, iphoto)
+            call set_eps_nuc(-Qrfe54ng_to_fe56,(/ y(ife56)/),irfe56_aux1, iphoto)
+            call set_eps_nuc(-Qrfe54aprot_to_fe56,(/ y(ife56), y(iprot), y(iprot)/),irfe56_aux3, iphoto)
+            call set_eps_nuc(-Qrfe54prot_to_ni56,(/ y(ini56)/),ir4f54, iphoto)
+
+
+                        
+            call set_eps_nuc(Qtotal_rni56ec - Qneu_rni56ec, (/y(ini56)/), irn56ec, i_ni56_co56)
 
             if (plus_co56) then
-               eps_nuc_cat(i_co56_fe56) = &
-                  m4(Qtotal_rco56ec - Qneu_rco56ec, y(ico56), rate(irco56ec), Qconv)
+               call set_eps_nuc(Qtotal_rco56ec - Qneu_rco56ec, (/y(ico56)/), irco56ec, i_co56_fe56)
             else
-               eps_nuc_cat(i_co56_fe56) = &
-                  m4(Qtotal_rco56ec - Qneu_rco56ec, y(ini56), rate(irn56ec), Qconv)
+               call set_eps_nuc(Qtotal_rco56ec - Qneu_rco56ec, (/y(ini56)/), irn56ec, i_co56_fe56)
+
             end if
+
+            eps_nuc_cat = eps_nuc_cat * Qconv
+            n% eps_nuc_rate = n% eps_nuc_rate * Qconv
             
             do i=1,num_categories
                eps_nuc_categories(i) = eps_nuc_cat(i)
@@ -1939,6 +1957,33 @@
                real(qp) :: q1, q2, q3, q4, q5
                q1 = a1; q2 = a2; q3 = a3; q4 = a4; q5 = a5; m5 = q1*q2*q3*q4*q5
             end function m5
+
+
+            subroutine set_eps_nuc(q, ys, rat_id, eps_id)
+               real(dp),intent(in) :: q
+               real(dp),intent(in)  :: ys(:)
+               integer :: rat_id, eps_id
+               real(qp) :: val1,val2,val3
+
+               val1 = product(real(ys,kind=qp))
+               val2 = val1 * real(rate(rat_id),kind=qp)
+
+               val3 = real(q,kind=qp) * val2
+
+               eps_nuc_cat(eps_id) = eps_nuc_cat(eps_id) + val3
+
+               if(rat_id < ifa) then
+                  n% raw_rate(rat_id) = n% raw_rate(rat_id) + val1 * real(n% rate_raw(rat_id),kind=qp)
+                  n% screened_rate(rat_id)  = n% screened_rate(rat_id) + val2
+                  n% eps_nuc_rate(rat_id) = n% eps_nuc_rate(rat_id) + val3
+               else
+                  n% raw_rate(rat_id) = 0d0
+                  n% screened_rate(rat_id)  = 0d0
+                  n% eps_nuc_rate(rat_id) = 0d0
+               end if
+
+            end subroutine set_eps_nuc
+
 
          end subroutine approx21_eps_info
 

@@ -41,8 +41,8 @@
             n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
             num_reactions, rate_factors, &
             symbolic, just_dydt, ierr)
-         type (Net_Info), pointer :: n
-         real(qp), pointer, intent(inout) :: dydt(:,:)
+         type (Net_Info) :: n
+         real(qp), intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(:)
          integer, intent(in) :: num_reactions
          real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
@@ -57,7 +57,6 @@
          logical, target :: deriv_flgs_data(num_reactions)
          logical, pointer :: deriv_flgs(:)
          type (Net_General_Info), pointer  :: g
-         real(dp), pointer :: y(:)
          real(dp) :: T9, T932, eps_nuc_cancel_factor, eps_factor, &
             old_eps_nuc_categories_val
          
@@ -68,7 +67,6 @@
          T9 = temp*1d-9
          T932 = T9*sqrt(T9)
          
-         y => n% y
          g => n% g
          
          if (.true. .or. logtemp <= g% logT_lo_eps_nuc_cancel) then
@@ -163,7 +161,7 @@
             !end if
             
             eps_factor = 1d0
-                                    
+            !write(*,*) trim(reaction_name(ir)),kind         
             select case(kind)
                case (other_kind)
                   call get1_derivs( &
@@ -248,14 +246,14 @@
          
             select case(c1)
                case (1)
-                  ys_f = y(i1)
+                  ys_f = n% y(i1)
                   d_ysf_dy1 = 1d0
                case (2)
-                  ys_f = y(i1)*y(i1)/2d0
-                  d_ysf_dy1 = y(i1)
+                  ys_f = n% y(i1)*n% y(i1)/2d0
+                  d_ysf_dy1 = n% y(i1)
                case (3)
-                  ys_f = y(i1)*y(i1)*y(i1)/6d0
-                  d_ysf_dy1 = y(i1)*y(i1)/2d0
+                  ys_f = n% y(i1)*n% y(i1)*n% y(i1)/6d0
+                  d_ysf_dy1 = n% y(i1)*n% y(i1)/2d0
                case default
                   write(*,2) 'c1 bad for ' // trim(reaction_name(ir)), c1
                   call mesa_error(__FILE__,__LINE__,'get_general_1_to_1_derivs')
@@ -264,14 +262,14 @@
             
             select case(c2)
                case (1)
-                  ys_r = y(i2)
+                  ys_r = n% y(i2)
                   d_ysr_dy2 = 1d0
                case (2)
-                  ys_r = y(i2)*y(i2)/2d0
-                  d_ysr_dy2 = y(i2)
+                  ys_r = n% y(i2)*n% y(i2)/2d0
+                  d_ysr_dy2 = n% y(i2)
                case (3)
-                  ys_r = y(i2)*y(i2)*y(i2)/6d0
-                  d_ysr_dy2 = y(i2)*y(i2)/2d0
+                  ys_r = n% y(i2)*n% y(i2)*n% y(i2)/6d0
+                  d_ysr_dy2 = n% y(i2)*n% y(i2)/2d0
                case default
                   write(*,2) 'c2 bad for ' // trim(reaction_name(ir)), c2
                   call mesa_error(__FILE__,__LINE__,'get_general_1_to_1_derivs')
@@ -285,6 +283,13 @@
             b = b_f - b_r
             dydt(i_rate,i1) = dydt(i_rate,i1) - c1*b
             dydt(i_rate,i2) = dydt(i_rate,i2) + c2*b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -296,6 +301,12 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) + b_r
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
+
+            n% eps_nuc_rate(i) = b_f * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
                         
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
@@ -374,9 +385,9 @@
                return
             end if
             
-            y1 = y(i1)
-            y2 = y(i2)
-            y3 = y(i3)
+            y1 = n% y(i1)
+            y2 = n% y(i2)
+            y3 = n% y(i3)
          
             select case(c1)
                case (1)
@@ -438,6 +449,13 @@
             dydt(i_rate,i1) = dydt(i_rate,i1) - c1*b
             dydt(i_rate,i2) = dydt(i_rate,i2) - c2*b
             dydt(i_rate,i3) = dydt(i_rate,i3) + c3*b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -450,6 +468,11 @@
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
                         
+            n% eps_nuc_rate(i) = b_f * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -590,10 +613,10 @@
                return
             end if
             
-            y1 = y(i1)
-            y2 = y(i2)
-            y3 = y(i3)
-            y4 = y(i4)
+            y1 = n% y(i1)
+            y2 = n% y(i2)
+            y3 = n% y(i3)
+            y4 = n% y(i4)
          
             select case(c1)
                case (1)
@@ -675,6 +698,13 @@
             dydt(i_rate,i2) = dydt(i_rate,i2) - c2*b
             dydt(i_rate,i3) = dydt(i_rate,i3) + c3*b
             dydt(i_rate,i4) = dydt(i_rate,i4) + c4*b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -687,6 +717,11 @@
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
                         
+            n% eps_nuc_rate(i) = b_f * Qconv
+            n% eps_nuc_rate(r_i) = b_r  * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -791,10 +826,10 @@
                return
             end if
             
-            y1 = y(i1)
-            y2 = y(i2)
-            y3 = y(i3)
-            y4 = y(i4)
+            y1 = n% y(i1)
+            y2 = n% y(i2)
+            y3 = n% y(i3)
+            y4 = n% y(i4)
          
             ys_f = y1*y2
             d_f = ys_f
@@ -811,6 +846,13 @@
             dydt(i_rate,i2) = dydt(i_rate,i2) - b
             dydt(i_rate,i3) = dydt(i_rate,i3) + b
             dydt(i_rate,i4) = dydt(i_rate,i4) + b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -819,7 +861,13 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) - b_r*Q
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-                        
+            
+            n% eps_nuc_rate(i) = b_f * Q  * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Q  * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+               
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -922,9 +970,9 @@
                return
             end if
 
-            y1 = y(i1)
-            y2 = y(i2)
-            y3 = y(i3)
+            y1 = n% y(i1)
+            y2 = n% y(i2)
+            y3 = n% y(i3)
          
             ys_f = y1*y2
             d_f = ys_f
@@ -940,6 +988,13 @@
             dydt(i_rate,i1) = dydt(i_rate,i1) - b
             dydt(i_rate,i2) = dydt(i_rate,i2) - b
             dydt(i_rate,i3) = dydt(i_rate,i3) + b
+
+            n% raw_rate(i) = d_f * n% rate_raw(i)
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            
+            n% screened_rate(i) = d_f * n% rate_screened(i)
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+            
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -948,7 +1003,12 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) - b_r*Q
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-                        
+      
+            n% eps_nuc_rate(i) = b_f * Q  * Qconv
+            n% eps_nuc_rate(r_i) = b_r * Q  * Qconv
+            n% eps_neu_rate(i) = 0d0
+            n% eps_neu_rate(r_i) = 0d0
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -1022,9 +1082,9 @@
             num_reactions, rate_factors, rtab, itab, &
             deriv_flgs, symbolic, just_dydt, ierr)
          use rates_lib, only: eval_n14_electron_capture_rate
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          integer, intent(in) :: i, num_reactions
-         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
          real(dp), intent(in) :: eta, ye, temp, den, abar, zbar, rate_factors(:)
          integer, pointer, intent(in) :: rtab(:), itab(:)
@@ -1048,7 +1108,6 @@
          real(dp) :: dout1, dout2, dout3, dout4, dout5
          type (Net_General_Info), pointer  :: g
          integer, pointer :: reaction_id(:)
-         real(dp), pointer :: y(:)
          integer :: i1, i2, i3, idr1, idr2, idr3, o1, o2, o3
          real(dp) :: r, dr1, dr2, dr3, rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, rn14ec
 
@@ -1063,7 +1122,6 @@
          
          include 'formats'
          
-         y => n% y
          g => n% g
          reaction_id => g% reaction_id
 
@@ -1075,8 +1133,15 @@
 
          ir = reaction_id(i)       
          
-         if (reaction_outputs(1,ir) == 0) return ! skip aux reactions
-         
+         if (reaction_outputs(1,ir) == 0) then
+            n% raw_rate(i) = 0d0
+            n% screened_rate(i) = 0d0
+            n% eps_nuc_rate(i) = 0d0
+            n% eps_neu_rate(i) = 0d0
+            return ! skip aux reactions
+         end if
+
+
          if (dbg) &
             write(*,'(/,a,2i6)') ' reaction name <' // trim(reaction_Name(ir)) // '>', i, ir
          
@@ -1210,20 +1275,20 @@
             end if
             
             if (cin1 == 1) then
-               r = y(i1)
+               r = n% y(i1)
                idr1 = i1
                dr1 = 1
             else if (cin1 == 3 .and. in1 /= ih1) then ! 3 he4
                !write(*,'(/,a)') '1/6*r  reaction name <' // trim(reaction_Name(ir)) // '>'
-               r = (1d0/6d0)*y(i1)*y(i1)*y(i1)
+               r = (1d0/6d0)*n% y(i1)*n% y(i1)*n% y(i1)
                idr1 = i1
-               dr1 = 0.5d0*y(i1)*y(i1)
+               dr1 = 0.5d0*n% y(i1)*n% y(i1)
             else ! 2 body
                !write(*,'(/,a)') '1/2*r  reaction name <' // trim(reaction_Name(ir)) // '>'
                !write(*,'(i3,3x,99e20.10)') i, n% rate_raw(i), n% rate_screened(i)
-               r = 0.5d0*y(i1)*y(i1)
+               r=  0.5d0*n% y(i1)*n% y(i1)
                idr1 = i1
-               dr1 = y(i1)
+               dr1 = n% y(i1)
                !stop
             end if
             
@@ -1231,7 +1296,7 @@
                         
             if (reaction_ye_rho_exponents(2,ir) == 0) then
                ! treat as 1 body reaction
-               r = y(i1)
+               r = n% y(i1)
                idr1 = i1
                dr1 = 1
                idr2 = i2
@@ -1240,30 +1305,30 @@
                !call mesa_error(__FILE__,__LINE__,'net_derivs')
             else if ((cin1 == 1 .and. cin2 == 1) .or. reaction_ye_rho_exponents(2,ir) == 1) then
                ! reaction_ye_rho_exponents(2,ir) == 1 for electron captures; treat as 2 body reaction
-               r = y(i1)*y(i2)
-               dr1 = y(i1)
+               r = n% y(i1)*n% y(i2)
+               dr1 = n% y(i1)
                idr1 = i2
-               dr2 = y(i2)
+               dr2 = n% y(i2)
                idr2 = i1
             else if (cin1 == 2 .and. cin2 == 1) then 
-               r = 0.5d0*y(i1)*y(i1)*y(i2)
-               dr1 = 0.5d0*y(i1)*y(i1)
+               r = 0.5d0*n% y(i1)*n% y(i1)*n% y(i2)
+               dr1 = 0.5d0*n% y(i1)*n% y(i1)
                idr1 = i2
-               dr2 = y(i1)*y(i2)
+               dr2 = n% y(i1)*n% y(i2)
                idr2 = i1
             else if (cin1 == 1 .and. cin2 == 2) then 
                ! e.g., rhe4p, r_neut_he4_he4_to_be9, r_neut_h1_h1_to_h1_h2
-               r = y(i1)*0.5d0*y(i2)*y(i2)
-               dr1 = y(i1)*y(i2)
+               r = n% y(i1)*0.5d0*n% y(i2)*n% y(i2)
+               dr1 = n% y(i1)*n% y(i2)
                idr1 = i2
-               dr2 = 0.5d0*y(i2)*y(i2)
+               dr2 = 0.5d0*n% y(i2)*n% y(i2)
                idr2 = i1
             else if (cin1 == 2 .and. cin2 == 2) then 
                ! e.g., r_neut_neut_he4_he4_to_h3_li7, r_h1_h1_he4_he4_to_he3_be7
-               r = 0.5d0*y(i1)*y(i1)*0.5d0*y(i2)*y(i2)
-               dr1 = 0.5d0*y(i1)*y(i1)*y(i2)
+               r = 0.5d0*n% y(i1)*n% y(i1)*0.5d0*n% y(i2)*n% y(i2)
+               dr1 = 0.5d0*n% y(i1)*n% y(i1)*n% y(i2)
                idr1 = i2
-               dr2 = y(i1)*0.5d0*y(i2)*y(i2)
+               dr2 = n% y(i1)*0.5d0*n% y(i2)*n% y(i2)
                idr2 = i1
             else
                write(*,*) 'get1_derivs: ' // trim(reaction_Name(ir)) // ' invalid coefficient'
@@ -1323,7 +1388,7 @@
                      trim(chem_isos% name(g% chem_id(i1))) // ' => ' // &
                      trim(chem_isos% name(g% chem_id(o1))) // ' + ' // &
                      trim(chem_isos% name(g% chem_id(o2))), &
-                     n% rate_screened(i), r, dr1, y(i1)
+                     n% rate_screened(i), r, dr1, n% y(i1)
                   stop
                end if
 
@@ -1349,22 +1414,22 @@
                if (dbg) write(*,*) 'do_two_one dout1', dout1, trim(chem_isos% name(g% chem_id(o1)))
                
                if (.false. .and. reaction_Name(ir) == 'r_neut_he4_he4_to_be9' .and. r > 0 .and. &
-                     abs(y(i1) - 7.7763751756339478D-05) < 1d-20) then
+                     abs(n% y(i1) - 7.7763751756339478D-05) < 1d-20) then
                   write(*,'(i3,3x,a,2x,99e20.10)') i, &
                      'do_two_one ' // trim(reaction_Name(ir)) // ' ' // &
                      trim(chem_isos% name(g% chem_id(i1))) // ' + ' // &
                      trim(chem_isos% name(g% chem_id(i2))) // ' => ' // &
                      trim(chem_isos% name(g% chem_id(o1))), &
-                     r, dr1, dr2, y(i1), y(i2)
+                     r, dr1, dr2, n% y(i1), n% y(i2)
                   !stop
                end if
                
                if (.false. .and. reaction_Name(ir) == 'r_he4_si28_to_o16_o16') then
-                  write(*,2) 'y(i1)', i1, y(i1)
-                  write(*,2) 'y(i2)', i2, y(i2)
+                  write(*,2) 'n% y(i1)', i1, n% y(i1)
+                  write(*,2) 'n% y(i2)', i2, n% y(i2)
                   write(*,1) 'r', r
                   write(*,1) 'rate screened', n% rate_screened(i)
-                  write(*,1) 'r*y1*y2', y(i1)*y(i2)*n% rate_screened(i)
+                  write(*,1) 'r*y1*y2', n% y(i1)*n% y(i2)*n% rate_screened(i)
                   !stop
                end if
 
@@ -1451,7 +1516,6 @@
                        deriv_flgs, symbolic, just_dydt)
 
                   done = .true.
-
                end if
             end if
             if (.not. done) then ! weak reaction not in weaklib
@@ -1615,9 +1679,9 @@
             num_reactions, rate_factors, rtab, itab, &
             deriv_flgs, symbolic, just_dydt, ierr)
          use rates_lib, only: eval_n14_electron_capture_rate
-         type (Net_Info), pointer :: n
+         type (Net_Info) :: n
          integer, intent(in) :: i, num_reactions
-         real(qp), pointer, intent(inout) :: dydt(:,:)
+         real(qp), intent(inout) :: dydt(:,:)
          real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
          real(dp), intent(in) :: eta, ye, temp, den, abar, zbar, rate_factors(:)
          integer, pointer, intent(in) :: rtab(:), itab(:)
@@ -1641,7 +1705,6 @@
          real(dp) :: dout1, dout2, dout3, dout4, dout5
          type (Net_General_Info), pointer  :: g
          integer, pointer :: reaction_id(:)
-         real(dp), pointer :: y(:)
          integer :: i1, i2, i3, idr1, idr2, idr3, o1, o2, o3
          real(dp) :: r, dr1, dr2, dr3, rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, rn14ec
 
@@ -1656,7 +1719,6 @@
          
          include 'formats'
          
-         y => n% y
          g => n% g
          reaction_id => g% reaction_id
 
@@ -1700,9 +1762,9 @@
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
                n14 = itab(in14)
                ne20 = itab(ine20)
-               r = y(n14) * y(he4)
-               dr1 = y(n14)
-               dr2 = y(he4)
+               r = n% y(n14) * n% y(he4)
+               dr1 = n% y(n14)
+               dr2 = n% y(he4)
 
 
                i_in(1) = n14; i_in(2) = he4; i_in(3) = 0
@@ -1737,7 +1799,7 @@
             he4 = itab(ihe4)
             c12 = itab(ic12)
             UE = abar/zbar
-            YHe4 = y(he4)
+            YHe4 = n% y(he4)
             XHe4 = 4d0*YHe4
             if (YHe4 < 1d-50) then
                n% rate_screened(i) = 0

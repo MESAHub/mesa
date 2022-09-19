@@ -30,6 +30,7 @@
       use net_def
       use rates_def, only: num_rvs
       use mtx_def
+      use utils_lib, only: fill_with_NaNs,fill_with_NaNs_2D
       
       implicit none
 
@@ -49,7 +50,6 @@
          use num_lib 
          use mtx_lib
          use rates_def, only: rates_reaction_id_max
-         use net_initialize, only: work_size
          
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: num_isos
@@ -99,19 +99,16 @@
             ! else on return has input value plus time spent doing eos
          integer, intent(out) :: ierr
          
-         type (Net_Info), target :: netinfo_target
-         type (Net_Info), pointer :: netinfo
+         type (Net_Info) :: n
          type (Net_General_Info), pointer :: g
          integer :: ijac, nzmax, isparse, mljac, mujac, imas, mlmas, mumas, lrd, lid, &
-               lout, liwork, lwork, i, j, lrpar, lipar, idid, net_lwork, nvar
+               lout, liwork, lwork, i, j, lrpar, lipar, idid, nvar
          integer, pointer :: ipar(:), iwork(:), ipar_burn_const_P_decsol(:)
          real(dp), pointer :: rpar(:), work(:), v(:), rpar_burn_const_P_decsol(:)
          real(dp) :: t, lgT, lgRho, tend
          
          include 'formats'
-         
-         netinfo => netinfo_target
-         
+                  
          ending_x = 0
          ending_temp = 0
          ending_rho = 0
@@ -158,13 +155,11 @@
          mumas = 0        
          
          lout = 0
-         
-         net_lwork = work_size(g)
-         
+                  
          call isolve_work_sizes(nvar, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
 
          lipar = burn_lipar
-         lrpar = burn_const_P_lrpar + net_lwork
+         lrpar = burn_const_P_lrpar 
          
          allocate(v(nvar), iwork(liwork), work(lwork), rpar(lrpar), ipar(lipar), &
                ipar_burn_const_P_decsol(lid), rpar_burn_const_P_decsol(lrd), stat=ierr)
@@ -172,6 +167,14 @@
             write(*, *) 'allocate ierr', ierr
             return
          end if
+
+         if (g% fill_arrays_with_nans) then
+            call fill_with_NaNs(v)
+            call fill_with_NaNs(work)
+            call fill_with_NaNs(rpar)
+            call fill_with_NaNs(rpar_burn_const_P_decsol)
+         end if
+
          
          i = burn_const_P_lrpar
             
@@ -179,7 +182,6 @@
          ipar(i_net_handle) = net_handle
          ipar(i_eos_handle) = eos_handle
          ipar(i_screening_mode) = screening_mode
-         ipar(i_net_lwork) = net_lwork
          ipar(i_sparse_format) = isparse
          if (clip) then
             ipar(i_clip) = 1
@@ -332,9 +334,8 @@
             real(dp) :: d_dxdt_dx(nvar-1, nvar-1)
             real(dp), target :: eps_nuc_categories(num_categories)
             logical :: rates_only, skip_jacobian
-            integer :: screening_mode, lwork, i, num_isos
+            integer :: screening_mode, i, num_isos
             integer(8) :: time0, time1, clock_rate
-            real(dp), pointer :: work(:) ! (lwork)
 
             real(dp) :: xh, Y, z, Cp, rate_limit
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
@@ -377,17 +378,6 @@
             num_reactions = g% num_reactions
 
             i = burn_const_P_lrpar
-            lwork = ipar(i_net_lwork)
-            work => rpar(i+1:i+lwork)
-         
-            i = i+lwork
-
-            if (i /= lrpar) then
-               write(*,2) 'burn_jacob i', i
-               write(*,2) 'lrpar', lrpar
-               ierr = -1
-               return
-            end if
          
             if (ipar(i_clip) /= 0) then
                do i=1,num_isos
@@ -475,7 +465,7 @@
             skip_jacobian = .false.
 
             call eval_net( &
-                  netinfo, g, rates_only, skip_jacobian, &
+                  n, g, rates_only, skip_jacobian, &
                   num_isos, num_reactions, g% num_wk_reactions, &
                   x, T, logT, rho, logRho, &
                   abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
@@ -485,7 +475,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
                   screening_mode, &
                   eps_nuc_categories, eps_neu_total, &
-                  lwork, work, actual_Qs, actual_neuQs, from_weaklib, .false., ierr)
+                  actual_Qs, actual_neuQs, from_weaklib, .false., ierr)
 
             if (rpar(r_burn_const_P_time_net) >= 0) then
                call system_clock(time1,clock_rate)
@@ -564,6 +554,9 @@
             ierr = 0
             ld_dfdv = n
             allocate(dfdv(n,n),stat=ierr)
+            if(g% fill_arrays_with_nans) then
+               call fill_with_NaNs_2D(dfdv)
+            end if
             if (ierr /= 0) return
             call burn_jacob(n,time,h,y,f,dfdv,ld_dfdv,lrpar,rpar,lipar,ipar,ierr)
             if (ierr /= 0) then

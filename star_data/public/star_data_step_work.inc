@@ -1179,5 +1179,6 @@
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
          
          
-         
+         real(dp), dimension(:,:),pointer :: raw_rate, screened_rate, eps_neu_rate, eps_nuc_rate !(num_reactions, nz)
+
            

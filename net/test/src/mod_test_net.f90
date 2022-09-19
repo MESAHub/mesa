@@ -40,9 +40,7 @@
          integer :: ierr
          
          qt = quiet
-      
-         n => net_info_target
-         
+               
          call load_libs
       
          test_logT = 7.833d0

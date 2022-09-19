@@ -68,7 +68,7 @@
 ! nbad     = number of bad steps taken, bad but retried and then succesful
 ! nstp     = total number of steps taken
 
-      real(dp), pointer :: dens_dfdy(:,:),dmat(:,:)
+      real(dp) :: dens_dfdy(:,:),dmat(:,:)
       integer, intent(out) :: ierr
       
       interface
@@ -223,7 +223,7 @@
       integer :: ierr
 
 
-      real(dp), pointer :: dens_dfdy(:,:),dmat(:,:)
+      real(dp) :: dens_dfdy(:,:),dmat(:,:)
       
       interface
          include 'burner_derivs.inc'
@@ -431,7 +431,7 @@
          y,dydx,nvar,xs,htot,nstep,yout,dens_dfdy,dmat, &
          derivs,ierr)
 !
-      real(dp), pointer :: dens_dfdy(:,:),dmat(:,:)
+      real(dp) :: dens_dfdy(:,:),dmat(:,:)
       
       interface
          include 'burner_derivs.inc'
