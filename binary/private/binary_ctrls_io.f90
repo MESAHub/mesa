@@ -151,7 +151,7 @@
          keep_mb_on, &
          jdot_mb_min_qconv_env, &
          jdot_mb_max_qconv_env, &
-         jdot_mb_max_qrad_core, &
+         jdot_mb_max_qconv_core, &
          jdot_mb_qlim_for_check_rad_core, &
          jdot_mb_qlim_for_check_conv_env, &
          jdot_mb_scale_for_low_qconv_env, &
@@ -501,7 +501,7 @@
          b% keep_mb_on = keep_mb_on
          b% jdot_mb_min_qconv_env = jdot_mb_min_qconv_env
          b% jdot_mb_max_qconv_env = jdot_mb_max_qconv_env
-         b% jdot_mb_max_qrad_core = jdot_mb_max_qrad_core
+         b% jdot_mb_max_qconv_core = jdot_mb_max_qconv_core
          b% jdot_mb_qlim_for_check_rad_core = jdot_mb_qlim_for_check_rad_core
          b% jdot_mb_qlim_for_check_conv_env = jdot_mb_qlim_for_check_conv_env
          b% jdot_mb_scale_for_low_qconv_env = jdot_mb_scale_for_low_qconv_env
@@ -691,7 +691,7 @@
          keep_mb_on = b% keep_mb_on
          jdot_mb_min_qconv_env = b% jdot_mb_min_qconv_env
          jdot_mb_max_qconv_env = b% jdot_mb_max_qconv_env
-         jdot_mb_max_qrad_core = b% jdot_mb_max_qrad_core
+         jdot_mb_max_qconv_core = b% jdot_mb_max_qconv_core
          jdot_mb_qlim_for_check_rad_core = b% jdot_mb_qlim_for_check_rad_core
          jdot_mb_qlim_for_check_conv_env = b% jdot_mb_qlim_for_check_conv_env
          jdot_mb_scale_for_low_qconv_env = b% jdot_mb_scale_for_low_qconv_env
