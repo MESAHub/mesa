@@ -197,9 +197,12 @@ def check_history():
         "add_log_total_mass",
         "add_total_mass",
         "add_raw_rates",
+        "add_eps_neu_rates",
+        "add_eps_nuc_rates",
+        "add_screened_rates",
         "pp",
         "cno",
-        "tri_alfa",
+        "tri_alpha",
         "c_alpha",
         "n_alpha",
         "o_alpha",
@@ -382,6 +385,11 @@ def check_profile():
         "s_alpha",
         "si_alpha",
         "ti_alpha",
+        "tri_alpha",
+        "add_raw_rates",
+        "add_eps_neu_rates",
+        "add_eps_nuc_rates",
+        "add_screened_rates",
     }
 
     vals_profile_list = get_profile_columns() - general_info
