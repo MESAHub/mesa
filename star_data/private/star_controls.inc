@@ -771,13 +771,6 @@
          integer :: diffusion_maxsteps_for_isolve
          character(len=64) :: diffusion_isolve_solver
 
-      ! WD phase separation
-         
-         logical :: do_phase_separation
-         logical :: do_phase_separation_heating
-         logical :: phase_separation_mixing_use_brunt
-         logical :: phase_separation_no_diffusion
-
       ! opacity controls
 
          logical :: use_simple_es_for_kap, use_starting_composition_for_kap
