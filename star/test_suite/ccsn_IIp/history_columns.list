@@ -287,13 +287,19 @@
    !## information about individual reactions
    
           ! adds columns for all of the reactions that are in the current net 
+      ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for thier rates
       !add_raw_rates      ! raw reaction rates,       reactions/second
+      !add_screened_rates ! screened reaction rates reactions/second
+      !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
+      !add_eps_neu_rates  ! Neutrino losses             erg/s
    
           ! individual reactions (as many as desired)
           ! use list_net_reactions = .true. in star_job to list all reactions in the current net 
           ! reactions/second
       !raw_rate r_h1_h1_ec_h2 
       !raw_rate r_h1_h1_wk_h2
+
+
 
    !## nuclear reactions at center
 
@@ -824,7 +830,7 @@
 
       !error_in_energy_conservation ! for this step
          ! = total_energy - (total_energy_start + total_energy_sources_and_sinks)
-      cumulative_energy_error ! = sum over all steps of error_in_energy_conservation
+      cumulative_energy_error ! = sum over all steps of abs(error_in_energy_conservation)
       !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
       log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
       log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
@@ -1060,5 +1066,3 @@
 
    !## timing
       !elapsed_time ! time since start of run (seconds)
-
-   !## Extras
