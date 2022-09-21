@@ -55,10 +55,6 @@
       logical :: load_saved_model
       character (len=strlen) :: load_model_filename
 
-      logical :: create_merger_model
-      character (len=strlen) :: saved_model_for_merger_1
-      character (len=strlen) :: saved_model_for_merger_2
-
       logical :: set_max_dt_to_frac_lifetime
       real(dp) :: max_frac_of_lifetime_per_step
 

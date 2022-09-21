@@ -20,3 +20,6 @@
       character (len=strlen) :: save_photo_filename
       !save_photo_when_terminate = .true.
       
+      logical :: create_merger_model
+      character (len=strlen) :: saved_model_for_merger_1
+      character (len=strlen) :: saved_model_for_merger_2
