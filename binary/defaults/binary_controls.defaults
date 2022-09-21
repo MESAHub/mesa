@@ -935,7 +935,7 @@
 ! jdot_mb_max_qconv_env
 ! ~~~~~~~~~~~~~~~~~~~~~
 ! jdot_mb_max_qconv_core
-! ~~~~~~~~~~~~~~~~~~~~~
+! ~~~~~~~~~~~~~~~~~~~~~~
 ! jdot_mb_qlim_for_check_rad_core
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ! jdot_mb_qlim_for_check_conv_env

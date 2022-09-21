@@ -3947,9 +3947,9 @@
 
 
       ! ST_angsmt
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~
       ! ST_angsml
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~
 
       ! Temporal smoothing of ST coefficients.
       ! See rotation_mix_info.f90 for details
@@ -6678,7 +6678,7 @@
 
 
       ! diffusion_use_caplan
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
 
       ! if true, use atomic diffusion coefficients according to
       ! Caplan, Bauer, & Freeman MNRAS, 513, L52 (2022) at strong coupling (Gamma > 10),
@@ -8169,7 +8169,7 @@
 
     
       ! retry_for_v_above_clight
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If .true., a retry will be triggered at the end of a step
       ! if the maximum velocity exceeds the speed of light.
@@ -11401,7 +11401,7 @@
     warn_when_large_rel_run_E_err = 0.01d0
 
       ! absolute_cumulative_energy_err
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! cumulative energy error is the sum of the absolute value of per-step errors.
       ! Set this to .false. to allow positive and negative errors to cancel
