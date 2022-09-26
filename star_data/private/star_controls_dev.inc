@@ -35,13 +35,7 @@
             
             
          
-         logical :: use_superad_reduction, use_mass_corrections
-         real(dp) :: &
-            superad_reduction_Gamma_limit, &
-            superad_reduction_Gamma_limit_scale, &
-            superad_reduction_Gamma_inv_scale, &
-            superad_reduction_diff_grads_limit, &
-            superad_reduction_limit
+         logical :: use_mass_corrections
             
       ! WD phase separation
          

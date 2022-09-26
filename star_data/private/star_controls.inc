@@ -287,6 +287,17 @@
 
          real(dp) :: mlt_gradT_fraction, max_logT_for_mlt
 
+    
+            
+         
+         logical :: use_superad_reduction
+         real(dp) :: &
+            superad_reduction_Gamma_limit, &
+            superad_reduction_Gamma_limit_scale, &
+            superad_reduction_Gamma_inv_scale, &
+            superad_reduction_diff_grads_limit, &
+            superad_reduction_limit
+
       ! mixing parameters
 
          real(dp) :: min_overshoot_q, overshoot_alpha
