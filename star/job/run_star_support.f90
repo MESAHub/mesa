@@ -657,13 +657,13 @@
       end subroutine before_step_loop
 
 
-      subroutine after_step_loop(id, inlist_fname, &
-             dbg, result, ierr)
+      subroutine after_step_loop(id, inlist_fname, dbg, result, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s         
          character (len=*) :: inlist_fname
          logical, intent(in) :: dbg
-         integer, intent(out) :: result, ierr
+         integer, intent(out) :: ierr
+         integer, intent(inout) :: result
          logical :: will_read_pgstar_inlist
 
          real(dp) :: tmp
