@@ -186,6 +186,13 @@
             integer, intent(in) :: binary_id, iounit
             integer, intent(out) :: ierr
          end subroutine other_binary_photo_read_interface
+
+         subroutine other_e2_interface(id, e2, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: id
+            real(dp),intent (out) :: e2
+            integer, intent(out) :: ierr
+         end subroutine other_e2_interface
                
       end interface
 
