@@ -243,6 +243,9 @@
       procedure(other_edot_interface), pointer, nopass :: &
           other_extra_edot => null()
 
+          procedure(other_e2_interface), pointer, nopass :: &
+          other_e2 => null()
+
       procedure(other_CE_init_interface), pointer, nopass :: &
           other_CE_init => null()
 

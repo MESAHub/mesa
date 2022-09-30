@@ -1481,3 +1481,4 @@
     use_other_CE_rlo_mdot = .false.
     use_other_CE_binary_evolve_step = .false.
     use_other_CE_binary_finish_step = .false.
+    use_other_e2 = .false.

@@ -173,5 +173,6 @@
       logical :: use_other_CE_rlo_mdot
       logical :: use_other_CE_binary_evolve_step
       logical :: use_other_CE_binary_finish_step
+      logical :: use_other_e2
 
       ! end of controls

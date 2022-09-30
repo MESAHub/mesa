@@ -64,6 +64,7 @@
          use mod_other_binary_extras
          use mod_other_binary_photo_read
          use mod_other_binary_photo_write
+         use mod_other_e2
          use binary_timestep
          use binary_history
          use binary_history_specs
@@ -190,6 +191,7 @@
          b% other_CE_rlo_mdot => null_other_CE_rlo_mdot
          b% other_CE_binary_evolve_step => null_other_CE_binary_evolve_step
          b% other_CE_binary_finish_step => null_other_CE_binary_finish_step
+         b% other_e2 => null_other_e2
 
          b% extras_binary_startup => null_extras_binary_startup
          b% extras_binary_start_step => null_extras_binary_start_step
