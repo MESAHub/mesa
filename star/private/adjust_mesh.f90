@@ -437,6 +437,7 @@
             s% prev_mesh_j_rot(k) = prv% prev_mesh_j_rot(k)
             s% prev_mesh_omega(k) = prv% prev_mesh_omega(k)
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
+            s% prev_mesh_mlt_vc(k) = prv% prev_mesh_mlt_vc(k)
          end do
 
          ! restore ST info (for time smoothing)
