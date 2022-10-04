@@ -254,6 +254,7 @@ clean:
 	-@rm -f *.f90 *.o *.mod *.smod *genmod.f90 *.so *.a .depend .order
 
 install:
+	@$(CP_IF_NEWER) pgstar*.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) star_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) star_def.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) run_star_support.mod $(MESA_DIR)/include
