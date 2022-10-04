@@ -29,7 +29,7 @@ module pgbinary_support
    use const_def
    use rates_def, only : i_rate
    use utils_lib
-   use pgstar_support, only : Set_Colours, set_black_white, do1_pgmtxt, &
+   use pgstar_support, only : Set_Colours, do1_pgmtxt, &
       clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
       clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
       clr_anonymous, clr_D_smooth, colormap_offset, colormap_last, colormap_size, &
@@ -51,21 +51,21 @@ contains
       integer :: step
       step = pg_hist_new% step
       do
-         if (.not. associated(b% pgbinary_hist)) then
-            b% pgbinary_hist => pg_hist_new
+         if (.not. associated(b% pg% pgbinary_hist)) then
+            b% pg% pgbinary_hist => pg_hist_new
             nullify(pg_hist_new% next)
             return
          end if
-         if (step > b% pgbinary_hist% step) then
-            pg_hist_new% next => b% pgbinary_hist
-            b% pgbinary_hist => pg_hist_new
+         if (step > b% pg% pgbinary_hist% step) then
+            pg_hist_new% next => b% pg% pgbinary_hist
+            b% pg% pgbinary_hist => pg_hist_new
             return
          end if
          ! discard item
-         next => b% pgbinary_hist% next
-         deallocate(b% pgbinary_hist% vals)
-         deallocate(b% pgbinary_hist)
-         b% pgbinary_hist => next
+         next => b% pg% pgbinary_hist% next
+         deallocate(b% pg% pgbinary_hist% vals)
+         deallocate(b% pg% pgbinary_hist)
+         b% pg% pgbinary_hist => next
       end do
    end subroutine add_to_pgbinary_hist
 
@@ -75,17 +75,17 @@ contains
       integer :: i, num
       type (pgbinary_win_file_data), pointer :: p
       type (pgbinary_hist_node), pointer :: pg_hist => null(), next => null()
-      pg_hist => b% pgbinary_hist
+      pg_hist => b% pg% pgbinary_hist
       do while(associated(pg_hist))
          if (associated(pg_hist% vals)) deallocate(pg_hist% vals)
          next => pg_hist% next
          deallocate(pg_hist)
          pg_hist => next
       end do
-      nullify(b% pgbinary_hist)
+      nullify(b% pg% pgbinary_hist)
       if (have_initialized_pgbinary) return
       do i = 1, num_pgbinary_plots
-         p => b% pgbinary_win_file_ptr(i)
+         p => b% pg% pgbinary_win_file_ptr(i)
          p% id_win = 0
          p% have_called_mkdir = .false.
          p% file_dir_for_previous_mkdir = ''
@@ -153,7 +153,7 @@ contains
                p% file_dir_for_previous_mkdir = p% file_dir
             end if
             call create_file_name(b, p% file_dir, p% file_prefix, name)
-            name = trim(name) // '/' // trim(b% file_device)
+            name = trim(name) // '/' // trim(b% pg% file_device)
             call open_device(b, p, .true., name, p% id_file, ierr)
             if (ierr /= 0) return
             p% most_recent_filename = name
@@ -168,14 +168,15 @@ contains
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
       character (len = strlen) :: num_str, fstring
-      write(fstring, '( "(i",i2.2,".",i2.2,")" )') b% file_digits, b% file_digits
+      write(fstring, '( "(i",i2.2,".",i2.2,")" )') &
+         b% pg% file_digits, b% pg% file_digits
       write(num_str, fstring) b% model_number
       if (len_trim(dir) > 0) then
          name = trim(dir) // '/' // trim(prefix)
       else
          name = prefix
       end if
-      name = trim(name) // trim(num_str) // '.' // trim(b% file_extension)
+      name = trim(name) // trim(num_str) // '.' // trim(b% pg% file_extension)
    end subroutine create_file_name
 
 
@@ -216,10 +217,10 @@ contains
 
       if (is_file) then
          dir = p% file_dir
-         white_on_black_flag = b% file_white_on_black_flag
+         white_on_black_flag = b% pg% file_white_on_black_flag
       else
          dir = ''
-         white_on_black_flag = b% win_white_on_black_flag
+         white_on_black_flag = b% pg% win_white_on_black_flag
       end if
 
       ierr = 0
@@ -248,7 +249,7 @@ contains
       type (pgbinary_hist_node), pointer :: pg
       include 'formats'
       numpts = 0
-      pg => b% pgbinary_hist
+      pg => b% pg% pgbinary_hist
       do ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) return
@@ -279,7 +280,7 @@ contains
             key_name(i:i) = name(i:i)
          end if
       end do
-      call integer_dict_lookup(b% binary_history_names_dict, key_name, i, ierr)
+      call integer_dict_lookup(b% pg% binary_history_names_dict, key_name, i, ierr)
       if (ierr /= 0 .or. i <= 0) then ! didn't find it
          get1_hist_yvec = .false.
          return
@@ -299,7 +300,7 @@ contains
       type (pgbinary_hist_node), pointer :: pg
       ierr = 0
       if (numpts == 0) return
-      pg => b% pgbinary_hist
+      pg => b% pg% pgbinary_hist
       i = numpts
       do ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) then

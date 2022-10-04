@@ -45,9 +45,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Star1_plot(b, id, device_id, &
-         b% Star1_xleft, b% Star1_xright, &
-         b% Star1_ybot, b% Star1_ytop, .false., b% Star1_title, &
-         b% Star1_txt_scale_factor, b% Star1_plot_name, ierr)
+         b% pg% Star1_xleft, b% pg% Star1_xright, &
+         b% pg% Star1_ybot, b% pg% Star1_ytop, .false., b% pg% Star1_title, &
+         b% pg% Star1_txt_scale_factor, b% pg% Star1_plot_name, ierr)
       call pgebuf()
    end subroutine Star1_plot
 
@@ -77,9 +77,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Star2_plot(b, id, device_id, &
-         b% Star2_xleft, b% Star2_xright, &
-         b% Star2_ybot, b% Star2_ytop, .false., b% Star2_title, &
-         b% Star2_txt_scale_factor, b% Star2_plot_name, ierr)
+         b% pg% Star2_xleft, b% pg% Star2_xright, &
+         b% pg% Star2_ybot, b% pg% Star2_ytop, .false., b% pg% Star2_title, &
+         b% pg% Star2_txt_scale_factor, b% pg% Star2_plot_name, ierr)
       call pgebuf()
    end subroutine Star2_plot
 
@@ -179,10 +179,10 @@ contains
       case(1)
          if (b% have_star_1) then
             if (b% do_star1_box) then
-               write(*, *) b% star1_box_pad_top
-               call pgsvp(xleft + b% star1_box_pad_left, &
-                  xright + b% star1_box_pad_right, &
-                  ybot + b% star1_box_pad_bot, ytop + b% star1_box_pad_top)
+               write(*, *) b% pg% Star1_box_pad_top
+               call pgsvp(xleft + b% pg% Star1_box_pad_left, &
+                  xright + b% pg% Star1_box_pad_right, &
+                  ybot + b% pg% Star1_box_pad_bot, ytop + b% pg% Star1_box_pad_top)
                call draw_rect()
                call pgsvp(xleft, xright, ybot, ytop)
             end if
@@ -195,9 +195,9 @@ contains
       case(2)
          if (b% have_star_2) then
             if (b% do_star2_box) then
-               call pgsvp(xleft + b% star2_box_pad_left, &
-                  xright + b% star2_box_pad_right, &
-                  ybot + b% star2_box_pad_bot, ytop + b% star2_box_pad_top)
+               call pgsvp(xleft + b% pg% Star2_box_pad_left, &
+                  xright + b% pg% Star2_box_pad_right, &
+                  ybot + b% pg% Star2_box_pad_bot, ytop + b% pg% Star2_box_pad_top)
                call draw_rect()
                call pgsvp(xleft, xright, ybot, ytop)
             end if

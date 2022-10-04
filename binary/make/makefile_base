@@ -13,6 +13,7 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCE FILES
 
 SRCS = \
+   binary_pgbinary.f90\
    binary_def.f90 \
    binary_private_def.f90 \
    binary_utils.f90 \
