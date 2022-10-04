@@ -15,7 +15,7 @@ include $(MESA_DIR)/utils/makefile_header
 SRCS = \
    binary_def.f90 \
    binary_private_def.f90 \
-	binary_utils.f90 \
+   binary_utils.f90 \
    binary_photos.f90 \
    binary_jdot.f90 \
    binary_wind.f90 \
@@ -29,8 +29,18 @@ SRCS = \
    binary_evolve.f90 \
    binary_timestep.f90\
    binary_ce.f90\
-	binary_job_ctrls_io.f90\
-	binary_do_one_utils.f90\
+   binary_job_ctrls_io.f90\
+   binary_do_one_utils.f90\
+   pgbinary_decorator.f90 \
+   pgbinary_support.f90 \
+   pgbinary_ctrls_io.f90 \
+   pgbinary_summary.f90 \
+   pgbinary_summary_history.f90 \
+   pgbinary_hist_track.f90 \
+   pgbinary_history_panels.f90 \
+   pgbinary_star.f90 \
+   pgbinary_grid.f90 \
+   pgbinary.f90 \
    run_binary_support.f90 \
    binary_lib.f90 \
    mod_other_rlo_mdot.f90 \

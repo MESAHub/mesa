@@ -48,4 +48,4 @@
       real(dp) :: new_separation
       real(dp) :: new_period
       real(dp) :: new_eccentricity
-
+      logical :: pgbinary_flag
