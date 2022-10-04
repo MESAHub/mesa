@@ -115,9 +115,18 @@ with names that are not ``''``.  Thus, the column order now varies but
 the same information is present and now follows the same structure as
 histories and profiles.
 
+star
+----
+
+For wind mass loss, schemes that scale with metallicity now employ
+``Zbase`` rather than ``Z`` (as long as ``Zbase`` is set to a non-negative value,
+otherwise we fall back to ``Z``). This reflects the fact that wind recipes primarily
+account for the opacity of iron-group elements, which have surface abundances that
+are unlikely to change during evolution. This change therefore avoids
+unphysical influence on winds by, e.g., evolution of surface CNO abundances.
 
 test_suite
-==========
+----------
 
 All test cases have now had the inlist option, makefile variable, and shell script variable, ``MESA_DIR`` removed.
 This means that you no longer need to do anything to make a ``MESA`` test case work outside of the test suite.
@@ -126,7 +135,7 @@ Test cases now infer their ``MESA_DIR`` variable entirely by the environment var
 The history output option ``tri_alfa`` (and other quantities that relate to the triple-alpha nuclear reaction) have been renamed to ``tri_alpha`` for better consistency with other ``_alpha`` reactions.
 
 net
-===
+---
 
 The derived type net_info (conventional given the symbol ``n``) is no longer a pointer. If you declare a local copy of the variable, you should also ensure to do ``n% g => g`` to make sure that net_info knows
 about the ``net_general_info`` derived type. ``g`` can be had from a call to ``get_net_ptr(handle, g, ierr)``.
@@ -137,7 +146,7 @@ The following routines have also been removed as they are no longer needed ``net
 Previously you could pass ``arg_not_provided`` for either the temperature (density) or log(temperature) (log(density)). Now you must pass both explicity.
 
 ADIPLS
-======
+------
 
 ADIPLS now has a ``USE_ADIPLS`` flag in ``utils/makefile_header`` to enable is build to be disabled.
 
