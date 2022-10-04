@@ -195,6 +195,11 @@ module binary_def
          integer, intent(out) :: ierr
       end subroutine other_e2_interface
 
+      subroutine other_pgbinary_plots_info_interface(id, ierr)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+      end subroutine other_pgbinary_plots_info_interface
+
    end interface
 
    type binary_job_controls

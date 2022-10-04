@@ -142,554 +142,554 @@ contains
 
       ! store win and file info in records
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary1)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary1)
       p% plot => Text_Summary1_Plot
       p% id = i_Binary_Text_Summary1
       p% name = 'Text_Summary1'
-      p% win_flag = b% Text_Summary1_win_flag
-      p% win_width = b% Text_Summary1_win_width
-      p% win_aspect_ratio = b% Text_Summary1_win_aspect_ratio
-      p% file_flag = b% Text_Summary1_file_flag
-      p% file_dir = b% Text_Summary1_file_dir
-      p% file_prefix = b% Text_Summary1_file_prefix
-      p% file_interval = b% Text_Summary1_file_interval
-      p% file_width = b% Text_Summary1_file_width
-      p% file_aspect_ratio = b% Text_Summary1_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary1_win_flag
+      p% win_width = b% pg% Text_Summary1_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary1_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary1_file_flag
+      p% file_dir = b% pg% Text_Summary1_file_dir
+      p% file_prefix = b% pg% Text_Summary1_file_prefix
+      p% file_interval = b% pg% Text_Summary1_file_interval
+      p% file_width = b% pg% Text_Summary1_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary1_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary2)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary2)
       p% plot => Text_Summary2_Plot
       p% id = i_Binary_Text_Summary2
       p% name = 'Text_Summary2'
-      p% win_flag = b% Text_Summary2_win_flag
-      p% win_width = b% Text_Summary2_win_width
-      p% win_aspect_ratio = b% Text_Summary2_win_aspect_ratio
-      p% file_flag = b% Text_Summary2_file_flag
-      p% file_dir = b% Text_Summary2_file_dir
-      p% file_prefix = b% Text_Summary2_file_prefix
-      p% file_interval = b% Text_Summary2_file_interval
-      p% file_width = b% Text_Summary2_file_width
-      p% file_aspect_ratio = b% Text_Summary2_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary2_win_flag
+      p% win_width = b% pg% Text_Summary2_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary2_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary2_file_flag
+      p% file_dir = b% pg% Text_Summary2_file_dir
+      p% file_prefix = b% pg% Text_Summary2_file_prefix
+      p% file_interval = b% pg% Text_Summary2_file_interval
+      p% file_width = b% pg% Text_Summary2_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary2_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary3)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary3)
       p% plot => Text_Summary3_Plot
       p% id = i_Binary_Text_Summary3
       p% name = 'Text_Summary3'
-      p% win_flag = b% Text_Summary3_win_flag
-      p% win_width = b% Text_Summary3_win_width
-      p% win_aspect_ratio = b% Text_Summary3_win_aspect_ratio
-      p% file_flag = b% Text_Summary3_file_flag
-      p% file_dir = b% Text_Summary3_file_dir
-      p% file_prefix = b% Text_Summary3_file_prefix
-      p% file_interval = b% Text_Summary3_file_interval
-      p% file_width = b% Text_Summary3_file_width
-      p% file_aspect_ratio = b% Text_Summary3_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary3_win_flag
+      p% win_width = b% pg% Text_Summary3_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary3_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary3_file_flag
+      p% file_dir = b% pg% Text_Summary3_file_dir
+      p% file_prefix = b% pg% Text_Summary3_file_prefix
+      p% file_interval = b% pg% Text_Summary3_file_interval
+      p% file_width = b% pg% Text_Summary3_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary3_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary4)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary4)
       p% plot => Text_Summary4_Plot
       p% id = i_Binary_Text_Summary4
       p% name = 'Text_Summary4'
-      p% win_flag = b% Text_Summary4_win_flag
-      p% win_width = b% Text_Summary4_win_width
-      p% win_aspect_ratio = b% Text_Summary4_win_aspect_ratio
-      p% file_flag = b% Text_Summary4_file_flag
-      p% file_dir = b% Text_Summary4_file_dir
-      p% file_prefix = b% Text_Summary4_file_prefix
-      p% file_interval = b% Text_Summary4_file_interval
-      p% file_width = b% Text_Summary4_file_width
-      p% file_aspect_ratio = b% Text_Summary4_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary4_win_flag
+      p% win_width = b% pg% Text_Summary4_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary4_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary4_file_flag
+      p% file_dir = b% pg% Text_Summary4_file_dir
+      p% file_prefix = b% pg% Text_Summary4_file_prefix
+      p% file_interval = b% pg% Text_Summary4_file_interval
+      p% file_width = b% pg% Text_Summary4_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary4_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary5)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary5)
       p% plot => Text_Summary5_Plot
       p% id = i_Binary_Text_Summary5
       p% name = 'Text_Summary5'
-      p% win_flag = b% Text_Summary5_win_flag
-      p% win_width = b% Text_Summary5_win_width
-      p% win_aspect_ratio = b% Text_Summary5_win_aspect_ratio
-      p% file_flag = b% Text_Summary5_file_flag
-      p% file_dir = b% Text_Summary5_file_dir
-      p% file_prefix = b% Text_Summary5_file_prefix
-      p% file_interval = b% Text_Summary5_file_interval
-      p% file_width = b% Text_Summary5_file_width
-      p% file_aspect_ratio = b% Text_Summary5_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary5_win_flag
+      p% win_width = b% pg% Text_Summary5_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary5_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary5_file_flag
+      p% file_dir = b% pg% Text_Summary5_file_dir
+      p% file_prefix = b% pg% Text_Summary5_file_prefix
+      p% file_interval = b% pg% Text_Summary5_file_interval
+      p% file_width = b% pg% Text_Summary5_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary5_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary6)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary6)
       p% plot => Text_Summary6_Plot
       p% id = i_Binary_Text_Summary6
       p% name = 'Text_Summary6'
-      p% win_flag = b% Text_Summary6_win_flag
-      p% win_width = b% Text_Summary6_win_width
-      p% win_aspect_ratio = b% Text_Summary6_win_aspect_ratio
-      p% file_flag = b% Text_Summary6_file_flag
-      p% file_dir = b% Text_Summary6_file_dir
-      p% file_prefix = b% Text_Summary6_file_prefix
-      p% file_interval = b% Text_Summary6_file_interval
-      p% file_width = b% Text_Summary6_file_width
-      p% file_aspect_ratio = b% Text_Summary6_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary6_win_flag
+      p% win_width = b% pg% Text_Summary6_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary6_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary6_file_flag
+      p% file_dir = b% pg% Text_Summary6_file_dir
+      p% file_prefix = b% pg% Text_Summary6_file_prefix
+      p% file_interval = b% pg% Text_Summary6_file_interval
+      p% file_width = b% pg% Text_Summary6_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary6_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary7)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary7)
       p% plot => Text_Summary7_Plot
       p% id = i_Binary_Text_Summary7
       p% name = 'Text_Summary7'
-      p% win_flag = b% Text_Summary7_win_flag
-      p% win_width = b% Text_Summary7_win_width
-      p% win_aspect_ratio = b% Text_Summary7_win_aspect_ratio
-      p% file_flag = b% Text_Summary7_file_flag
-      p% file_dir = b% Text_Summary7_file_dir
-      p% file_prefix = b% Text_Summary7_file_prefix
-      p% file_interval = b% Text_Summary7_file_interval
-      p% file_width = b% Text_Summary7_file_width
-      p% file_aspect_ratio = b% Text_Summary7_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary7_win_flag
+      p% win_width = b% pg% Text_Summary7_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary7_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary7_file_flag
+      p% file_dir = b% pg% Text_Summary7_file_dir
+      p% file_prefix = b% pg% Text_Summary7_file_prefix
+      p% file_interval = b% pg% Text_Summary7_file_interval
+      p% file_width = b% pg% Text_Summary7_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary7_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary8)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary8)
       p% plot => Text_Summary8_Plot
       p% id = i_Binary_Text_Summary8
       p% name = 'Text_Summary8'
-      p% win_flag = b% Text_Summary8_win_flag
-      p% win_width = b% Text_Summary8_win_width
-      p% win_aspect_ratio = b% Text_Summary8_win_aspect_ratio
-      p% file_flag = b% Text_Summary8_file_flag
-      p% file_dir = b% Text_Summary8_file_dir
-      p% file_prefix = b% Text_Summary8_file_prefix
-      p% file_interval = b% Text_Summary8_file_interval
-      p% file_width = b% Text_Summary8_file_width
-      p% file_aspect_ratio = b% Text_Summary8_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary8_win_flag
+      p% win_width = b% pg% Text_Summary8_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary8_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary8_file_flag
+      p% file_dir = b% pg% Text_Summary8_file_dir
+      p% file_prefix = b% pg% Text_Summary8_file_prefix
+      p% file_interval = b% pg% Text_Summary8_file_interval
+      p% file_width = b% pg% Text_Summary8_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary8_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Text_Summary9)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Text_Summary9)
       p% plot => Text_Summary9_Plot
       p% id = i_Binary_Text_Summary9
       p% name = 'Text_Summary9'
-      p% win_flag = b% Text_Summary9_win_flag
-      p% win_width = b% Text_Summary9_win_width
-      p% win_aspect_ratio = b% Text_Summary9_win_aspect_ratio
-      p% file_flag = b% Text_Summary9_file_flag
-      p% file_dir = b% Text_Summary9_file_dir
-      p% file_prefix = b% Text_Summary9_file_prefix
-      p% file_interval = b% Text_Summary9_file_interval
-      p% file_width = b% Text_Summary9_file_width
-      p% file_aspect_ratio = b% Text_Summary9_file_aspect_ratio
+      p% win_flag = b% pg% Text_Summary9_win_flag
+      p% win_width = b% pg% Text_Summary9_win_width
+      p% win_aspect_ratio = b% pg% Text_Summary9_win_aspect_ratio
+      p% file_flag = b% pg% Text_Summary9_file_flag
+      p% file_dir = b% pg% Text_Summary9_file_dir
+      p% file_prefix = b% pg% Text_Summary9_file_prefix
+      p% file_interval = b% pg% Text_Summary9_file_interval
+      p% file_width = b% pg% Text_Summary9_file_width
+      p% file_aspect_ratio = b% pg% Text_Summary9_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels1)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels1)
       p% plot => History_Panels1_plot
       p% id = i_Binary_Hist_Panels1
       p% name = 'History_Panels1'
-      p% win_flag = b% History_Panels1_win_flag
-      p% win_width = b% History_Panels1_win_width
-      p% win_aspect_ratio = b% History_Panels1_win_aspect_ratio
-      p% file_flag = b% History_Panels1_file_flag
-      p% file_dir = b% History_Panels1_file_dir
-      p% file_prefix = b% History_Panels1_file_prefix
-      p% file_interval = b% History_Panels1_file_interval
-      p% file_width = b% History_Panels1_file_width
-      p% file_aspect_ratio = b% History_Panels1_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels1_win_flag
+      p% win_width = b% pg% History_Panels1_win_width
+      p% win_aspect_ratio = b% pg% History_Panels1_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels1_file_flag
+      p% file_dir = b% pg% History_Panels1_file_dir
+      p% file_prefix = b% pg% History_Panels1_file_prefix
+      p% file_interval = b% pg% History_Panels1_file_interval
+      p% file_width = b% pg% History_Panels1_file_width
+      p% file_aspect_ratio = b% pg% History_Panels1_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels2)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels2)
       p% plot => History_Panels2_plot
       p% id = i_Binary_Hist_Panels2
       p% name = 'History_Panels2'
-      p% win_flag = b% History_Panels2_win_flag
-      p% win_width = b% History_Panels2_win_width
-      p% win_aspect_ratio = b% History_Panels2_win_aspect_ratio
-      p% file_flag = b% History_Panels2_file_flag
-      p% file_dir = b% History_Panels2_file_dir
-      p% file_prefix = b% History_Panels2_file_prefix
-      p% file_interval = b% History_Panels2_file_interval
-      p% file_width = b% History_Panels2_file_width
-      p% file_aspect_ratio = b% History_Panels2_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels2_win_flag
+      p% win_width = b% pg% History_Panels2_win_width
+      p% win_aspect_ratio = b% pg% History_Panels2_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels2_file_flag
+      p% file_dir = b% pg% History_Panels2_file_dir
+      p% file_prefix = b% pg% History_Panels2_file_prefix
+      p% file_interval = b% pg% History_Panels2_file_interval
+      p% file_width = b% pg% History_Panels2_file_width
+      p% file_aspect_ratio = b% pg% History_Panels2_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels3)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels3)
       p% plot => History_Panels3_plot
       p% id = i_Binary_Hist_Panels3
       p% name = 'History_Panels3'
-      p% win_flag = b% History_Panels3_win_flag
-      p% win_width = b% History_Panels3_win_width
-      p% win_aspect_ratio = b% History_Panels3_win_aspect_ratio
-      p% file_flag = b% History_Panels3_file_flag
-      p% file_dir = b% History_Panels3_file_dir
-      p% file_prefix = b% History_Panels3_file_prefix
-      p% file_interval = b% History_Panels3_file_interval
-      p% file_width = b% History_Panels3_file_width
-      p% file_aspect_ratio = b% History_Panels3_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels3_win_flag
+      p% win_width = b% pg% History_Panels3_win_width
+      p% win_aspect_ratio = b% pg% History_Panels3_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels3_file_flag
+      p% file_dir = b% pg% History_Panels3_file_dir
+      p% file_prefix = b% pg% History_Panels3_file_prefix
+      p% file_interval = b% pg% History_Panels3_file_interval
+      p% file_width = b% pg% History_Panels3_file_width
+      p% file_aspect_ratio = b% pg% History_Panels3_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels4)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels4)
       p% plot => History_Panels4_plot
       p% id = i_Binary_Hist_Panels4
       p% name = 'History_Panels4'
-      p% win_flag = b% History_Panels4_win_flag
-      p% win_width = b% History_Panels4_win_width
-      p% win_aspect_ratio = b% History_Panels4_win_aspect_ratio
-      p% file_flag = b% History_Panels4_file_flag
-      p% file_dir = b% History_Panels4_file_dir
-      p% file_prefix = b% History_Panels4_file_prefix
-      p% file_interval = b% History_Panels4_file_interval
-      p% file_width = b% History_Panels4_file_width
-      p% file_aspect_ratio = b% History_Panels4_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels4_win_flag
+      p% win_width = b% pg% History_Panels4_win_width
+      p% win_aspect_ratio = b% pg% History_Panels4_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels4_file_flag
+      p% file_dir = b% pg% History_Panels4_file_dir
+      p% file_prefix = b% pg% History_Panels4_file_prefix
+      p% file_interval = b% pg% History_Panels4_file_interval
+      p% file_width = b% pg% History_Panels4_file_width
+      p% file_aspect_ratio = b% pg% History_Panels4_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels5)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels5)
       p% plot => History_Panels5_plot
       p% id = i_Binary_Hist_Panels5
       p% name = 'History_Panels5'
-      p% win_flag = b% History_Panels5_win_flag
-      p% win_width = b% History_Panels5_win_width
-      p% win_aspect_ratio = b% History_Panels5_win_aspect_ratio
-      p% file_flag = b% History_Panels5_file_flag
-      p% file_dir = b% History_Panels5_file_dir
-      p% file_prefix = b% History_Panels5_file_prefix
-      p% file_interval = b% History_Panels5_file_interval
-      p% file_width = b% History_Panels5_file_width
-      p% file_aspect_ratio = b% History_Panels5_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels5_win_flag
+      p% win_width = b% pg% History_Panels5_win_width
+      p% win_aspect_ratio = b% pg% History_Panels5_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels5_file_flag
+      p% file_dir = b% pg% History_Panels5_file_dir
+      p% file_prefix = b% pg% History_Panels5_file_prefix
+      p% file_interval = b% pg% History_Panels5_file_interval
+      p% file_width = b% pg% History_Panels5_file_width
+      p% file_aspect_ratio = b% pg% History_Panels5_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels6)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels6)
       p% plot => History_Panels6_plot
       p% id = i_Binary_Hist_Panels6
       p% name = 'History_Panels6'
-      p% win_flag = b% History_Panels6_win_flag
-      p% win_width = b% History_Panels6_win_width
-      p% win_aspect_ratio = b% History_Panels6_win_aspect_ratio
-      p% file_flag = b% History_Panels6_file_flag
-      p% file_dir = b% History_Panels6_file_dir
-      p% file_prefix = b% History_Panels6_file_prefix
-      p% file_interval = b% History_Panels6_file_interval
-      p% file_width = b% History_Panels6_file_width
-      p% file_aspect_ratio = b% History_Panels6_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels6_win_flag
+      p% win_width = b% pg% History_Panels6_win_width
+      p% win_aspect_ratio = b% pg% History_Panels6_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels6_file_flag
+      p% file_dir = b% pg% History_Panels6_file_dir
+      p% file_prefix = b% pg% History_Panels6_file_prefix
+      p% file_interval = b% pg% History_Panels6_file_interval
+      p% file_width = b% pg% History_Panels6_file_width
+      p% file_aspect_ratio = b% pg% History_Panels6_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels7)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels7)
       p% plot => History_Panels7_plot
       p% id = i_Binary_Hist_Panels7
       p% name = 'History_Panels7'
-      p% win_flag = b% History_Panels7_win_flag
-      p% win_width = b% History_Panels7_win_width
-      p% win_aspect_ratio = b% History_Panels7_win_aspect_ratio
-      p% file_flag = b% History_Panels7_file_flag
-      p% file_dir = b% History_Panels7_file_dir
-      p% file_prefix = b% History_Panels7_file_prefix
-      p% file_interval = b% History_Panels7_file_interval
-      p% file_width = b% History_Panels7_file_width
-      p% file_aspect_ratio = b% History_Panels7_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels7_win_flag
+      p% win_width = b% pg% History_Panels7_win_width
+      p% win_aspect_ratio = b% pg% History_Panels7_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels7_file_flag
+      p% file_dir = b% pg% History_Panels7_file_dir
+      p% file_prefix = b% pg% History_Panels7_file_prefix
+      p% file_interval = b% pg% History_Panels7_file_interval
+      p% file_width = b% pg% History_Panels7_file_width
+      p% file_aspect_ratio = b% pg% History_Panels7_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels8)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels8)
       p% plot => History_Panels8_plot
       p% id = i_Binary_Hist_Panels8
       p% name = 'History_Panels8'
-      p% win_flag = b% History_Panels8_win_flag
-      p% win_width = b% History_Panels8_win_width
-      p% win_aspect_ratio = b% History_Panels8_win_aspect_ratio
-      p% file_flag = b% History_Panels8_file_flag
-      p% file_dir = b% History_Panels8_file_dir
-      p% file_prefix = b% History_Panels8_file_prefix
-      p% file_interval = b% History_Panels8_file_interval
-      p% file_width = b% History_Panels8_file_width
-      p% file_aspect_ratio = b% History_Panels8_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels8_win_flag
+      p% win_width = b% pg% History_Panels8_win_width
+      p% win_aspect_ratio = b% pg% History_Panels8_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels8_file_flag
+      p% file_dir = b% pg% History_Panels8_file_dir
+      p% file_prefix = b% pg% History_Panels8_file_prefix
+      p% file_interval = b% pg% History_Panels8_file_interval
+      p% file_width = b% pg% History_Panels8_file_width
+      p% file_aspect_ratio = b% pg% History_Panels8_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Panels9)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Panels9)
       p% plot => History_Panels9_plot
       p% id = i_Binary_Hist_Panels9
       p% name = 'History_Panels9'
-      p% win_flag = b% History_Panels9_win_flag
-      p% win_width = b% History_Panels9_win_width
-      p% win_aspect_ratio = b% History_Panels9_win_aspect_ratio
-      p% file_flag = b% History_Panels9_file_flag
-      p% file_dir = b% History_Panels9_file_dir
-      p% file_prefix = b% History_Panels9_file_prefix
-      p% file_interval = b% History_Panels9_file_interval
-      p% file_width = b% History_Panels9_file_width
-      p% file_aspect_ratio = b% History_Panels9_file_aspect_ratio
+      p% win_flag = b% pg% History_Panels9_win_flag
+      p% win_width = b% pg% History_Panels9_win_width
+      p% win_aspect_ratio = b% pg% History_Panels9_win_aspect_ratio
+      p% file_flag = b% pg% History_Panels9_file_flag
+      p% file_dir = b% pg% History_Panels9_file_dir
+      p% file_prefix = b% pg% History_Panels9_file_prefix
+      p% file_interval = b% pg% History_Panels9_file_interval
+      p% file_width = b% pg% History_Panels9_file_width
+      p% file_aspect_ratio = b% pg% History_Panels9_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track1)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track1)
       p% plot => History_Track1_plot
       p% id = i_Binary_Hist_Track1
       p% name = 'History_Track1'
-      p% win_flag = b% History_Track1_win_flag
-      p% win_width = b% History_Track1_win_width
-      p% win_aspect_ratio = b% History_Track1_win_aspect_ratio
-      p% file_flag = b% History_Track1_file_flag
-      p% file_dir = b% History_Track1_file_dir
-      p% file_prefix = b% History_Track1_file_prefix
-      p% file_interval = b% History_Track1_file_interval
-      p% file_width = b% History_Track1_file_width
-      p% file_aspect_ratio = b% History_Track1_file_aspect_ratio
+      p% win_flag = b% pg% History_Track1_win_flag
+      p% win_width = b% pg% History_Track1_win_width
+      p% win_aspect_ratio = b% pg% History_Track1_win_aspect_ratio
+      p% file_flag = b% pg% History_Track1_file_flag
+      p% file_dir = b% pg% History_Track1_file_dir
+      p% file_prefix = b% pg% History_Track1_file_prefix
+      p% file_interval = b% pg% History_Track1_file_interval
+      p% file_width = b% pg% History_Track1_file_width
+      p% file_aspect_ratio = b% pg% History_Track1_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track2)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track2)
       p% plot => History_Track2_plot
       p% id = i_Binary_Hist_Track2
       p% name = 'History_Track2'
-      p% win_flag = b% History_Track2_win_flag
-      p% win_width = b% History_Track2_win_width
-      p% win_aspect_ratio = b% History_Track2_win_aspect_ratio
-      p% file_flag = b% History_Track2_file_flag
-      p% file_dir = b% History_Track2_file_dir
-      p% file_prefix = b% History_Track2_file_prefix
-      p% file_interval = b% History_Track2_file_interval
-      p% file_width = b% History_Track2_file_width
-      p% file_aspect_ratio = b% History_Track2_file_aspect_ratio
+      p% win_flag = b% pg% History_Track2_win_flag
+      p% win_width = b% pg% History_Track2_win_width
+      p% win_aspect_ratio = b% pg% History_Track2_win_aspect_ratio
+      p% file_flag = b% pg% History_Track2_file_flag
+      p% file_dir = b% pg% History_Track2_file_dir
+      p% file_prefix = b% pg% History_Track2_file_prefix
+      p% file_interval = b% pg% History_Track2_file_interval
+      p% file_width = b% pg% History_Track2_file_width
+      p% file_aspect_ratio = b% pg% History_Track2_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track3)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track3)
       p% plot => History_Track3_plot
       p% id = i_Binary_Hist_Track3
       p% name = 'History_Track3'
-      p% win_flag = b% History_Track3_win_flag
-      p% win_width = b% History_Track3_win_width
-      p% win_aspect_ratio = b% History_Track3_win_aspect_ratio
-      p% file_flag = b% History_Track3_file_flag
-      p% file_dir = b% History_Track3_file_dir
-      p% file_prefix = b% History_Track3_file_prefix
-      p% file_interval = b% History_Track3_file_interval
-      p% file_width = b% History_Track3_file_width
-      p% file_aspect_ratio = b% History_Track3_file_aspect_ratio
+      p% win_flag = b% pg% History_Track3_win_flag
+      p% win_width = b% pg% History_Track3_win_width
+      p% win_aspect_ratio = b% pg% History_Track3_win_aspect_ratio
+      p% file_flag = b% pg% History_Track3_file_flag
+      p% file_dir = b% pg% History_Track3_file_dir
+      p% file_prefix = b% pg% History_Track3_file_prefix
+      p% file_interval = b% pg% History_Track3_file_interval
+      p% file_width = b% pg% History_Track3_file_width
+      p% file_aspect_ratio = b% pg% History_Track3_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track4)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track4)
       p% plot => History_Track4_plot
       p% id = i_Binary_Hist_Track4
       p% name = 'History_Track4'
-      p% win_flag = b% History_Track4_win_flag
-      p% win_width = b% History_Track4_win_width
-      p% win_aspect_ratio = b% History_Track4_win_aspect_ratio
-      p% file_flag = b% History_Track4_file_flag
-      p% file_dir = b% History_Track4_file_dir
-      p% file_prefix = b% History_Track4_file_prefix
-      p% file_interval = b% History_Track4_file_interval
-      p% file_width = b% History_Track4_file_width
-      p% file_aspect_ratio = b% History_Track4_file_aspect_ratio
+      p% win_flag = b% pg% History_Track4_win_flag
+      p% win_width = b% pg% History_Track4_win_width
+      p% win_aspect_ratio = b% pg% History_Track4_win_aspect_ratio
+      p% file_flag = b% pg% History_Track4_file_flag
+      p% file_dir = b% pg% History_Track4_file_dir
+      p% file_prefix = b% pg% History_Track4_file_prefix
+      p% file_interval = b% pg% History_Track4_file_interval
+      p% file_width = b% pg% History_Track4_file_width
+      p% file_aspect_ratio = b% pg% History_Track4_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track5)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track5)
       p% plot => History_Track5_plot
       p% id = i_Binary_Hist_Track5
       p% name = 'History_Track5'
-      p% win_flag = b% History_Track5_win_flag
-      p% win_width = b% History_Track5_win_width
-      p% win_aspect_ratio = b% History_Track5_win_aspect_ratio
-      p% file_flag = b% History_Track5_file_flag
-      p% file_dir = b% History_Track5_file_dir
-      p% file_prefix = b% History_Track5_file_prefix
-      p% file_interval = b% History_Track5_file_interval
-      p% file_width = b% History_Track5_file_width
-      p% file_aspect_ratio = b% History_Track5_file_aspect_ratio
+      p% win_flag = b% pg% History_Track5_win_flag
+      p% win_width = b% pg% History_Track5_win_width
+      p% win_aspect_ratio = b% pg% History_Track5_win_aspect_ratio
+      p% file_flag = b% pg% History_Track5_file_flag
+      p% file_dir = b% pg% History_Track5_file_dir
+      p% file_prefix = b% pg% History_Track5_file_prefix
+      p% file_interval = b% pg% History_Track5_file_interval
+      p% file_width = b% pg% History_Track5_file_width
+      p% file_aspect_ratio = b% pg% History_Track5_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track6)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track6)
       p% plot => History_Track6_plot
       p% id = i_Binary_Hist_Track6
       p% name = 'History_Track6'
-      p% win_flag = b% History_Track6_win_flag
-      p% win_width = b% History_Track6_win_width
-      p% win_aspect_ratio = b% History_Track6_win_aspect_ratio
-      p% file_flag = b% History_Track6_file_flag
-      p% file_dir = b% History_Track6_file_dir
-      p% file_prefix = b% History_Track6_file_prefix
-      p% file_interval = b% History_Track6_file_interval
-      p% file_width = b% History_Track6_file_width
-      p% file_aspect_ratio = b% History_Track6_file_aspect_ratio
+      p% win_flag = b% pg% History_Track6_win_flag
+      p% win_width = b% pg% History_Track6_win_width
+      p% win_aspect_ratio = b% pg% History_Track6_win_aspect_ratio
+      p% file_flag = b% pg% History_Track6_file_flag
+      p% file_dir = b% pg% History_Track6_file_dir
+      p% file_prefix = b% pg% History_Track6_file_prefix
+      p% file_interval = b% pg% History_Track6_file_interval
+      p% file_width = b% pg% History_Track6_file_width
+      p% file_aspect_ratio = b% pg% History_Track6_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track7)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track7)
       p% plot => History_Track7_plot
       p% id = i_Binary_Hist_Track7
       p% name = 'History_Track7'
-      p% win_flag = b% History_Track7_win_flag
-      p% win_width = b% History_Track7_win_width
-      p% win_aspect_ratio = b% History_Track7_win_aspect_ratio
-      p% file_flag = b% History_Track7_file_flag
-      p% file_dir = b% History_Track7_file_dir
-      p% file_prefix = b% History_Track7_file_prefix
-      p% file_interval = b% History_Track7_file_interval
-      p% file_width = b% History_Track7_file_width
-      p% file_aspect_ratio = b% History_Track7_file_aspect_ratio
+      p% win_flag = b% pg% History_Track7_win_flag
+      p% win_width = b% pg% History_Track7_win_width
+      p% win_aspect_ratio = b% pg% History_Track7_win_aspect_ratio
+      p% file_flag = b% pg% History_Track7_file_flag
+      p% file_dir = b% pg% History_Track7_file_dir
+      p% file_prefix = b% pg% History_Track7_file_prefix
+      p% file_interval = b% pg% History_Track7_file_interval
+      p% file_width = b% pg% History_Track7_file_width
+      p% file_aspect_ratio = b% pg% History_Track7_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track8)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track8)
       p% plot => History_Track8_plot
       p% id = i_Binary_Hist_Track8
       p% name = 'History_Track8'
-      p% win_flag = b% History_Track8_win_flag
-      p% win_width = b% History_Track8_win_width
-      p% win_aspect_ratio = b% History_Track8_win_aspect_ratio
-      p% file_flag = b% History_Track8_file_flag
-      p% file_dir = b% History_Track8_file_dir
-      p% file_prefix = b% History_Track8_file_prefix
-      p% file_interval = b% History_Track8_file_interval
-      p% file_width = b% History_Track8_file_width
-      p% file_aspect_ratio = b% History_Track8_file_aspect_ratio
+      p% win_flag = b% pg% History_Track8_win_flag
+      p% win_width = b% pg% History_Track8_win_width
+      p% win_aspect_ratio = b% pg% History_Track8_win_aspect_ratio
+      p% file_flag = b% pg% History_Track8_file_flag
+      p% file_dir = b% pg% History_Track8_file_dir
+      p% file_prefix = b% pg% History_Track8_file_prefix
+      p% file_interval = b% pg% History_Track8_file_interval
+      p% file_width = b% pg% History_Track8_file_width
+      p% file_aspect_ratio = b% pg% History_Track8_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Hist_Track9)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Hist_Track9)
       p% plot => History_Track9_plot
       p% id = i_Binary_Hist_Track9
       p% name = 'History_Track9'
-      p% win_flag = b% History_Track9_win_flag
-      p% win_width = b% History_Track9_win_width
-      p% win_aspect_ratio = b% History_Track9_win_aspect_ratio
-      p% file_flag = b% History_Track9_file_flag
-      p% file_dir = b% History_Track9_file_dir
-      p% file_prefix = b% History_Track9_file_prefix
-      p% file_interval = b% History_Track9_file_interval
-      p% file_width = b% History_Track9_file_width
-      p% file_aspect_ratio = b% History_Track9_file_aspect_ratio
+      p% win_flag = b% pg% History_Track9_win_flag
+      p% win_width = b% pg% History_Track9_win_width
+      p% win_aspect_ratio = b% pg% History_Track9_win_aspect_ratio
+      p% file_flag = b% pg% History_Track9_file_flag
+      p% file_dir = b% pg% History_Track9_file_dir
+      p% file_prefix = b% pg% History_Track9_file_prefix
+      p% file_interval = b% pg% History_Track9_file_interval
+      p% file_width = b% pg% History_Track9_file_width
+      p% file_aspect_ratio = b% pg% History_Track9_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Summary_Binary_History)
+      p => b% pg% pgbinary_win_file_ptr(i_Summary_Binary_History)
       p% plot => summary_history_plot
       p% id = i_Summary_Binary_History
       p% name = 'Summary_History'
-      p% win_flag = b% Summary_History_win_flag
-      p% win_width = b% Summary_History_win_width
-      p% win_aspect_ratio = b% Summary_History_win_aspect_ratio
-      p% file_flag = b% Summary_History_file_flag
-      p% file_dir = b% Summary_History_file_dir
-      p% file_prefix = b% Summary_History_file_prefix
-      p% file_interval = b% Summary_History_file_interval
-      p% file_width = b% Summary_History_file_width
-      p% file_aspect_ratio = b% Summary_History_file_aspect_ratio
+      p% win_flag = b% pg% Summary_History_win_flag
+      p% win_width = b% pg% Summary_History_win_width
+      p% win_aspect_ratio = b% pg% Summary_History_win_aspect_ratio
+      p% file_flag = b% pg% Summary_History_file_flag
+      p% file_dir = b% pg% Summary_History_file_dir
+      p% file_prefix = b% pg% Summary_History_file_prefix
+      p% file_interval = b% pg% Summary_History_file_interval
+      p% file_width = b% pg% Summary_History_file_width
+      p% file_aspect_ratio = b% pg% Summary_History_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid1)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid1)
       p% plot => grid1_plot
       p% id = i_Binary_Grid1
       p% name = 'Grid1'
-      p% win_flag = b% Grid1_win_flag
-      p% win_width = b% Grid1_win_width
-      p% win_aspect_ratio = b% Grid1_win_aspect_ratio
-      p% file_flag = b% Grid1_file_flag
-      p% file_dir = b% Grid1_file_dir
-      p% file_prefix = b% Grid1_file_prefix
-      p% file_interval = b% Grid1_file_interval
-      p% file_width = b% Grid1_file_width
-      p% file_aspect_ratio = b% Grid1_file_aspect_ratio
+      p% win_flag = b% pg% Grid1_win_flag
+      p% win_width = b% pg% Grid1_win_width
+      p% win_aspect_ratio = b% pg% Grid1_win_aspect_ratio
+      p% file_flag = b% pg% Grid1_file_flag
+      p% file_dir = b% pg% Grid1_file_dir
+      p% file_prefix = b% pg% Grid1_file_prefix
+      p% file_interval = b% pg% Grid1_file_interval
+      p% file_width = b% pg% Grid1_file_width
+      p% file_aspect_ratio = b% pg% Grid1_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid2)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid2)
       p% plot => grid2_plot
       p% id = i_Binary_Grid2
       p% name = 'Grid2'
-      p% win_flag = b% Grid2_win_flag
-      p% win_width = b% Grid2_win_width
-      p% win_aspect_ratio = b% Grid2_win_aspect_ratio
-      p% file_flag = b% Grid2_file_flag
-      p% file_dir = b% Grid2_file_dir
-      p% file_prefix = b% Grid2_file_prefix
-      p% file_interval = b% Grid2_file_interval
-      p% file_width = b% Grid2_file_width
-      p% file_aspect_ratio = b% Grid2_file_aspect_ratio
+      p% win_flag = b% pg% Grid2_win_flag
+      p% win_width = b% pg% Grid2_win_width
+      p% win_aspect_ratio = b% pg% Grid2_win_aspect_ratio
+      p% file_flag = b% pg% Grid2_file_flag
+      p% file_dir = b% pg% Grid2_file_dir
+      p% file_prefix = b% pg% Grid2_file_prefix
+      p% file_interval = b% pg% Grid2_file_interval
+      p% file_width = b% pg% Grid2_file_width
+      p% file_aspect_ratio = b% pg% Grid2_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid3)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid3)
       p% plot => grid3_plot
       p% id = i_Binary_Grid3
       p% name = 'Grid3'
-      p% win_flag = b% Grid3_win_flag
-      p% win_width = b% Grid3_win_width
-      p% win_aspect_ratio = b% Grid3_win_aspect_ratio
-      p% file_flag = b% Grid3_file_flag
-      p% file_dir = b% Grid3_file_dir
-      p% file_prefix = b% Grid3_file_prefix
-      p% file_interval = b% Grid3_file_interval
-      p% file_width = b% Grid3_file_width
-      p% file_aspect_ratio = b% Grid3_file_aspect_ratio
+      p% win_flag = b% pg% Grid3_win_flag
+      p% win_width = b% pg% Grid3_win_width
+      p% win_aspect_ratio = b% pg% Grid3_win_aspect_ratio
+      p% file_flag = b% pg% Grid3_file_flag
+      p% file_dir = b% pg% Grid3_file_dir
+      p% file_prefix = b% pg% Grid3_file_prefix
+      p% file_interval = b% pg% Grid3_file_interval
+      p% file_width = b% pg% Grid3_file_width
+      p% file_aspect_ratio = b% pg% Grid3_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid4)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid4)
       p% plot => grid4_plot
       p% id = i_Binary_Grid4
       p% name = 'Grid4'
-      p% win_flag = b% Grid4_win_flag
-      p% win_width = b% Grid4_win_width
-      p% win_aspect_ratio = b% Grid4_win_aspect_ratio
-      p% file_flag = b% Grid4_file_flag
-      p% file_dir = b% Grid4_file_dir
-      p% file_prefix = b% Grid4_file_prefix
-      p% file_interval = b% Grid4_file_interval
-      p% file_width = b% Grid4_file_width
-      p% file_aspect_ratio = b% Grid4_file_aspect_ratio
+      p% win_flag = b% pg% Grid4_win_flag
+      p% win_width = b% pg% Grid4_win_width
+      p% win_aspect_ratio = b% pg% Grid4_win_aspect_ratio
+      p% file_flag = b% pg% Grid4_file_flag
+      p% file_dir = b% pg% Grid4_file_dir
+      p% file_prefix = b% pg% Grid4_file_prefix
+      p% file_interval = b% pg% Grid4_file_interval
+      p% file_width = b% pg% Grid4_file_width
+      p% file_aspect_ratio = b% pg% Grid4_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid5)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid5)
       p% plot => grid5_plot
       p% id = i_Binary_Grid5
       p% name = 'Grid5'
-      p% win_flag = b% Grid5_win_flag
-      p% win_width = b% Grid5_win_width
-      p% win_aspect_ratio = b% Grid5_win_aspect_ratio
-      p% file_flag = b% Grid5_file_flag
-      p% file_dir = b% Grid5_file_dir
-      p% file_prefix = b% Grid5_file_prefix
-      p% file_interval = b% Grid5_file_interval
-      p% file_width = b% Grid5_file_width
-      p% file_aspect_ratio = b% Grid5_file_aspect_ratio
+      p% win_flag = b% pg% Grid5_win_flag
+      p% win_width = b% pg% Grid5_win_width
+      p% win_aspect_ratio = b% pg% Grid5_win_aspect_ratio
+      p% file_flag = b% pg% Grid5_file_flag
+      p% file_dir = b% pg% Grid5_file_dir
+      p% file_prefix = b% pg% Grid5_file_prefix
+      p% file_interval = b% pg% Grid5_file_interval
+      p% file_width = b% pg% Grid5_file_width
+      p% file_aspect_ratio = b% pg% Grid5_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid6)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid6)
       p% plot => grid6_plot
       p% id = i_Binary_Grid6
       p% name = 'Grid6'
-      p% win_flag = b% Grid6_win_flag
-      p% win_width = b% Grid6_win_width
-      p% win_aspect_ratio = b% Grid6_win_aspect_ratio
-      p% file_flag = b% Grid6_file_flag
-      p% file_dir = b% Grid6_file_dir
-      p% file_prefix = b% Grid6_file_prefix
-      p% file_interval = b% Grid6_file_interval
-      p% file_width = b% Grid6_file_width
-      p% file_aspect_ratio = b% Grid6_file_aspect_ratio
+      p% win_flag = b% pg% Grid6_win_flag
+      p% win_width = b% pg% Grid6_win_width
+      p% win_aspect_ratio = b% pg% Grid6_win_aspect_ratio
+      p% file_flag = b% pg% Grid6_file_flag
+      p% file_dir = b% pg% Grid6_file_dir
+      p% file_prefix = b% pg% Grid6_file_prefix
+      p% file_interval = b% pg% Grid6_file_interval
+      p% file_width = b% pg% Grid6_file_width
+      p% file_aspect_ratio = b% pg% Grid6_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid7)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid7)
       p% plot => grid7_plot
       p% id = i_Binary_Grid7
       p% name = 'Grid7'
-      p% win_flag = b% Grid7_win_flag
-      p% win_width = b% Grid7_win_width
-      p% win_aspect_ratio = b% Grid7_win_aspect_ratio
-      p% file_flag = b% Grid7_file_flag
-      p% file_dir = b% Grid7_file_dir
-      p% file_prefix = b% Grid7_file_prefix
-      p% file_interval = b% Grid7_file_interval
-      p% file_width = b% Grid7_file_width
-      p% file_aspect_ratio = b% Grid7_file_aspect_ratio
+      p% win_flag = b% pg% Grid7_win_flag
+      p% win_width = b% pg% Grid7_win_width
+      p% win_aspect_ratio = b% pg% Grid7_win_aspect_ratio
+      p% file_flag = b% pg% Grid7_file_flag
+      p% file_dir = b% pg% Grid7_file_dir
+      p% file_prefix = b% pg% Grid7_file_prefix
+      p% file_interval = b% pg% Grid7_file_interval
+      p% file_width = b% pg% Grid7_file_width
+      p% file_aspect_ratio = b% pg% Grid7_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid8)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid8)
       p% plot => grid8_plot
       p% id = i_Binary_Grid8
       p% name = 'Grid8'
-      p% win_flag = b% Grid8_win_flag
-      p% win_width = b% Grid8_win_width
-      p% win_aspect_ratio = b% Grid8_win_aspect_ratio
-      p% file_flag = b% Grid8_file_flag
-      p% file_dir = b% Grid8_file_dir
-      p% file_prefix = b% Grid8_file_prefix
-      p% file_interval = b% Grid8_file_interval
-      p% file_width = b% Grid8_file_width
-      p% file_aspect_ratio = b% Grid8_file_aspect_ratio
+      p% win_flag = b% pg% Grid8_win_flag
+      p% win_width = b% pg% Grid8_win_width
+      p% win_aspect_ratio = b% pg% Grid8_win_aspect_ratio
+      p% file_flag = b% pg% Grid8_file_flag
+      p% file_dir = b% pg% Grid8_file_dir
+      p% file_prefix = b% pg% Grid8_file_prefix
+      p% file_interval = b% pg% Grid8_file_interval
+      p% file_width = b% pg% Grid8_file_width
+      p% file_aspect_ratio = b% pg% Grid8_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Grid9)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Grid9)
       p% plot => grid9_plot
       p% id = i_Binary_Grid9
       p% name = 'Grid9'
-      p% win_flag = b% Grid9_win_flag
-      p% win_width = b% Grid9_win_width
-      p% win_aspect_ratio = b% Grid9_win_aspect_ratio
-      p% file_flag = b% Grid9_file_flag
-      p% file_dir = b% Grid9_file_dir
-      p% file_prefix = b% Grid9_file_prefix
-      p% file_interval = b% Grid9_file_interval
-      p% file_width = b% Grid9_file_width
-      p% file_aspect_ratio = b% Grid9_file_aspect_ratio
+      p% win_flag = b% pg% Grid9_win_flag
+      p% win_width = b% pg% Grid9_win_width
+      p% win_aspect_ratio = b% pg% Grid9_win_aspect_ratio
+      p% file_flag = b% pg% Grid9_file_flag
+      p% file_dir = b% pg% Grid9_file_dir
+      p% file_prefix = b% pg% Grid9_file_prefix
+      p% file_interval = b% pg% Grid9_file_interval
+      p% file_width = b% pg% Grid9_file_width
+      p% file_aspect_ratio = b% pg% Grid9_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Star1)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Star1)
       p% plot => Star1_plot
       p% id = i_Binary_Star1
       p% name = 'Star1'
-      p% win_flag = b% Star1_win_flag
-      p% win_width = b% Star1_win_width
-      p% win_aspect_ratio = b% Star1_win_aspect_ratio
-      p% file_flag = b% Star1_file_flag
-      p% file_dir = b% Star1_file_dir
-      p% file_prefix = b% Star1_file_prefix
-      p% file_interval = b% Star1_file_interval
-      p% file_width = b% Star1_file_width
-      p% file_aspect_ratio = b% Star1_file_aspect_ratio
+      p% win_flag = b% pg% Star1_win_flag
+      p% win_width = b% pg% Star1_win_width
+      p% win_aspect_ratio = b% pg% Star1_win_aspect_ratio
+      p% file_flag = b% pg% Star1_file_flag
+      p% file_dir = b% pg% Star1_file_dir
+      p% file_prefix = b% pg% Star1_file_prefix
+      p% file_interval = b% pg% Star1_file_interval
+      p% file_width = b% pg% Star1_file_width
+      p% file_aspect_ratio = b% pg% Star1_file_aspect_ratio
 
-      p => b% pgbinary_win_file_ptr(i_Binary_Star2)
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Star2)
       p% plot => Star2_plot
       p% id = i_Binary_Star2
       p% name = 'Star2'
-      p% win_flag = b% Star2_win_flag
-      p% win_width = b% Star2_win_width
-      p% win_aspect_ratio = b% Star2_win_aspect_ratio
-      p% file_flag = b% Star2_file_flag
-      p% file_dir = b% Star2_file_dir
-      p% file_prefix = b% Star2_file_prefix
-      p% file_interval = b% Star2_file_interval
-      p% file_width = b% Star2_file_width
-      p% file_aspect_ratio = b% Star2_file_aspect_ratio
+      p% win_flag = b% pg% Star2_win_flag
+      p% win_width = b% pg% Star2_win_width
+      p% win_aspect_ratio = b% pg% Star2_win_aspect_ratio
+      p% file_flag = b% pg% Star2_file_flag
+      p% file_dir = b% pg% Star2_file_dir
+      p% file_prefix = b% pg% Star2_file_prefix
+      p% file_interval = b% pg% Star2_file_interval
+      p% file_width = b% pg% Star2_file_width
+      p% file_aspect_ratio = b% pg% Star2_file_aspect_ratio
 
       do i = 1, max_num_Binary_Other_plots
-         p => b% pgbinary_win_file_ptr(i_Binary_Other + i - 1)
+         p => b% pg% pgbinary_win_file_ptr(i_Binary_Other + i - 1)
          p% win_flag = .false.
          p% file_flag = .false.
          p% okay_to_call_do_plot_in_binary_grid = .false.
@@ -714,7 +714,7 @@ contains
 
       ierr = 0
 
-      if (b% clear_history) call pgbinary_clear(b)
+      if (b% pg% clear_history) call pgbinary_clear(b)
 
       call update_pgbinary_data(b, ierr)
       if (failed('update_pgbinary_data')) return
@@ -722,9 +722,9 @@ contains
       if (failed('onScreen_Plots')) return
       call update_pgbinary_history_file(b, ierr)
       if (failed('save_text_data')) return
-      pause = b% pause
-      if ((.not. pause) .and. b% pause_interval > 0) &
-         pause = (mod(b% model_number, b% pause_interval) == 0)
+      pause = b% pg% pause
+      if ((.not. pause) .and. b% pg% pause_interval > 0) &
+         pause = (mod(b% model_number, b% pg% pause_interval) == 0)
       if (pause) then
          write(*, *)
          write(*, *) 'model_number', b% model_number
@@ -732,11 +732,11 @@ contains
          read(*, *)
       end if
 
-      if (b% pgbinary_sleep > 0) then
+      if (b% pg% pgbinary_sleep > 0) then
          time0 = b% system_clock_at_start_of_step
          do
             call system_clock(time1, clock_rate)
-            if (dble(time1 - time0) / dble(clock_rate) >= b% pgbinary_sleep) exit
+            if (dble(time1 - time0) / dble(clock_rate) >= b% pg% pgbinary_sleep) exit
          end do
       end if
 
@@ -758,11 +758,6 @@ contains
    ! pgbinary driver, called after each timestep
    subroutine onScreen_Plots(b, must_write_files_in, ierr)
       use utils_lib
-      use chem_def
-      use net_def
-      use net_lib, only : get_net_reaction_table
-      use rates_def, only : rates_reaction_id_max
-      use const_def, only : Msun, Rsun
 
       type (binary_info), pointer :: b
       logical :: must_write_files_in
@@ -787,15 +782,15 @@ contains
       must_write_files = must_write_files_in
 
       show_plot_now = .false.
-      if (b% pgbinary_interval > 0) then
-         if(mod(b% model_number, b% pgbinary_interval) == 0) then
+      if (b% pg% pgbinary_interval > 0) then
+         if(mod(b% model_number, b% pg% pgbinary_interval) == 0) then
             show_plot_now = .true.
          end if
       end if
 
       ! loop through all plots
       do i = 1, num_pgbinary_plots
-         p => b% pgbinary_win_file_ptr(i)
+         p => b% pg% pgbinary_win_file_ptr(i)
          if(show_plot_now) then
             ! call to check_window opens device
             call check_window(b, p, ierr)
@@ -824,7 +819,7 @@ contains
                call p% plot(b% binary_id, p% id_file, ierr)
                if (failed(p% name)) return
                call pgclos
-               if (b% pgbinary_report_writing_files) &
+               if (b% pg% pgbinary_report_writing_files) &
                   write(*, *) trim(p% most_recent_filename)
                p% id_file = 0
                p% do_file = .false.
@@ -859,7 +854,7 @@ contains
       include 'formats'
 
       ierr = 0
-      pg => b% pgbinary_hist
+      pg => b% pg% pgbinary_hist
       if (.not. associated(pg)) return
 
       n = b% number_of_binary_history_columns

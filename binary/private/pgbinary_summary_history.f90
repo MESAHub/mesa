@@ -50,9 +50,9 @@ contains
       call pgeras()
 
       call do_summary_history_plot(b, id, device_id, &
-         b% Summary_History_xleft, b% Summary_History_xright, &
-         b% Summary_History_ybot, b% Summary_History_ytop, .false., &
-         b% Summary_History_title, b% Summary_History_txt_scale, ierr)
+         b% pg% Summary_History_xleft, b% pg% Summary_History_xright, &
+         b% pg% Summary_History_ybot, b% pg% Summary_History_ytop, .false., &
+         b% pg% Summary_History_title, b% pg% Summary_History_txt_scale, ierr)
 
       call pgebuf()
 
@@ -88,15 +88,15 @@ contains
 
       ierr = 0
 
-      step_min = b% Summary_History_xmin
+      step_min = b% pg% Summary_History_xmin
       if (step_min <= 0) step_min = 1
-      step_max = b% Summary_History_xmax
+      step_max = b% pg% Summary_History_xmax
       if (step_max <= 0) step_max = b% model_number
 
       if (step_min >= b% model_number) step_min = 1
 
-      if (b% Summary_History_max_width > 0) &
-         step_min = max(step_min, step_max - b% Summary_History_max_width)
+      if (b% pg% Summary_History_max_width > 0) &
+         step_min = max(step_min, step_max - b% pg% Summary_History_max_width)
 
       npts = count_hist_points(b, step_min, step_max)
       if (npts <= 1) return
@@ -104,7 +104,7 @@ contains
       xmin = real(max(1, step_min))
       xmax = real(min(b% model_number, step_max))
 
-      num_lines = b% Summary_History_num_lines
+      num_lines = b% pg% Summary_History_num_lines
 
       colors(:) = (/ &
          clr_MediumSlateBlue, clr_Goldenrod, clr_LightSkyBlue, clr_Lilac, &
@@ -157,7 +157,7 @@ contains
          ymax = 1.02
          ymin = 0.0
 
-         lw = b% pgbinary_lw
+         lw = b% pg% pgbinary_lw
          call pgqlw(lw_sav)
 
          call pgsvp(winxmin, winxmax, winymin, winymax)
@@ -177,7 +177,7 @@ contains
          cnt = 0
          do j = 1, num_lines
 
-            yname = b% Summary_History_name(j)
+            yname = b% pg% Summary_History_name(j)
             if (len_trim(yname) == 0) then
                show(j) = .false.
                cycle
@@ -189,7 +189,7 @@ contains
                cycle
             end if
 
-            if (b% Summary_History_scaled_value(j)) then ! scale yvec
+            if (b% pg% Summary_History_scaled_value(j)) then ! scale yvec
 
                yvec_max = maxval(yvec(1:npts))
                yvec_min = minval(yvec(1:npts))
@@ -226,18 +226,18 @@ contains
          cnt = 0
          do j = 1, num_lines
             if (.not. show(j)) cycle
-            if (len_trim(b% Summary_History_legend(j)) == 0) then
+            if (len_trim(b% pg% Summary_History_legend(j)) == 0) then
                cnt = summary_history_line_legend(&
-                  cnt, b% Summary_History_name(j))
+                  cnt, b% pg% Summary_History_name(j))
             else
                cnt = summary_history_line_legend(&
-                  cnt, b% Summary_History_legend(j))
+                  cnt, b% pg% Summary_History_legend(j))
             end if
          end do
          call pgunsa
 
-         call show_pgbinary_decorator(b% binary_id, b% summary_history_use_decorator, &
-            b% summary_history_pgbinary_decorator, 0, ierr)
+         call show_pgbinary_decorator(b% binary_id, b% pg% Summary_history_use_decorator, &
+            b% pg% Summary_history_pgbinary_decorator, 0, ierr)
 
       end subroutine plot
 

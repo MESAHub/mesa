@@ -43,21 +43,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid1_xleft, b% Grid1_xright, &
-         b% Grid1_ybot, b% Grid1_ytop, .false., b% Grid1_title, &
-         b% Grid1_txt_scale_factor, &
-         b% Grid1_num_cols, &
-         b% Grid1_num_rows, &
-         b% Grid1_num_plots, &
-         b% Grid1_plot_name, &
-         b% Grid1_plot_row, &
-         b% Grid1_plot_rowspan, &
-         b% Grid1_plot_col, &
-         b% Grid1_plot_colspan, &
-         b% Grid1_plot_pad_left, &
-         b% Grid1_plot_pad_right, &
-         b% Grid1_plot_pad_top, &
-         b% Grid1_plot_pad_bot, &
+         b% pg% Grid1_xleft, b% pg% Grid1_xright, &
+         b% pg% Grid1_ybot, b% pg% Grid1_ytop, .false., b% pg% Grid1_title, &
+         b% pg% Grid1_txt_scale_factor, &
+         b% pg% Grid1_num_cols, &
+         b% pg% Grid1_num_rows, &
+         b% pg% Grid1_num_plots, &
+         b% pg% Grid1_plot_name, &
+         b% pg% Grid1_plot_row, &
+         b% pg% Grid1_plot_rowspan, &
+         b% pg% Grid1_plot_col, &
+         b% pg% Grid1_plot_colspan, &
+         b% pg% Grid1_plot_pad_left, &
+         b% pg% Grid1_plot_pad_right, &
+         b% pg% Grid1_plot_pad_top, &
+         b% pg% Grid1_plot_pad_bot, &
          ierr)
    end subroutine grid1_plot
 
@@ -70,21 +70,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid2_xleft, b% Grid2_xright, &
-         b% Grid2_ybot, b% Grid2_ytop, .false., b% Grid2_title, &
-         b% Grid2_txt_scale_factor, &
-         b% Grid2_num_cols, &
-         b% Grid2_num_rows, &
-         b% Grid2_num_plots, &
-         b% Grid2_plot_name, &
-         b% Grid2_plot_row, &
-         b% Grid2_plot_rowspan, &
-         b% Grid2_plot_col, &
-         b% Grid2_plot_colspan, &
-         b% Grid2_plot_pad_left, &
-         b% Grid2_plot_pad_right, &
-         b% Grid2_plot_pad_top, &
-         b% Grid2_plot_pad_bot, &
+         b% pg% Grid2_xleft, b% pg% Grid2_xright, &
+         b% pg% Grid2_ybot, b% pg% Grid2_ytop, .false., b% pg% Grid2_title, &
+         b% pg% Grid2_txt_scale_factor, &
+         b% pg% Grid2_num_cols, &
+         b% pg% Grid2_num_rows, &
+         b% pg% Grid2_num_plots, &
+         b% pg% Grid2_plot_name, &
+         b% pg% Grid2_plot_row, &
+         b% pg% Grid2_plot_rowspan, &
+         b% pg% Grid2_plot_col, &
+         b% pg% Grid2_plot_colspan, &
+         b% pg% Grid2_plot_pad_left, &
+         b% pg% Grid2_plot_pad_right, &
+         b% pg% Grid2_plot_pad_top, &
+         b% pg% Grid2_plot_pad_bot, &
          ierr)
    end subroutine grid2_plot
 
@@ -97,21 +97,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid3_xleft, b% Grid3_xright, &
-         b% Grid3_ybot, b% Grid3_ytop, .false., b% Grid3_title, &
-         b% Grid3_txt_scale_factor, &
-         b% Grid3_num_cols, &
-         b% Grid3_num_rows, &
-         b% Grid3_num_plots, &
-         b% Grid3_plot_name, &
-         b% Grid3_plot_row, &
-         b% Grid3_plot_rowspan, &
-         b% Grid3_plot_col, &
-         b% Grid3_plot_colspan, &
-         b% Grid3_plot_pad_left, &
-         b% Grid3_plot_pad_right, &
-         b% Grid3_plot_pad_top, &
-         b% Grid3_plot_pad_bot, &
+         b% pg% Grid3_xleft, b% pg% Grid3_xright, &
+         b% pg% Grid3_ybot, b% pg% Grid3_ytop, .false., b% pg% Grid3_title, &
+         b% pg% Grid3_txt_scale_factor, &
+         b% pg% Grid3_num_cols, &
+         b% pg% Grid3_num_rows, &
+         b% pg% Grid3_num_plots, &
+         b% pg% Grid3_plot_name, &
+         b% pg% Grid3_plot_row, &
+         b% pg% Grid3_plot_rowspan, &
+         b% pg% Grid3_plot_col, &
+         b% pg% Grid3_plot_colspan, &
+         b% pg% Grid3_plot_pad_left, &
+         b% pg% Grid3_plot_pad_right, &
+         b% pg% Grid3_plot_pad_top, &
+         b% pg% Grid3_plot_pad_bot, &
          ierr)
    end subroutine grid3_plot
 
@@ -124,21 +124,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid4_xleft, b% Grid4_xright, &
-         b% Grid4_ybot, b% Grid4_ytop, .false., b% Grid4_title, &
-         b% Grid4_txt_scale_factor, &
-         b% Grid4_num_cols, &
-         b% Grid4_num_rows, &
-         b% Grid4_num_plots, &
-         b% Grid4_plot_name, &
-         b% Grid4_plot_row, &
-         b% Grid4_plot_rowspan, &
-         b% Grid4_plot_col, &
-         b% Grid4_plot_colspan, &
-         b% Grid4_plot_pad_left, &
-         b% Grid4_plot_pad_right, &
-         b% Grid4_plot_pad_top, &
-         b% Grid4_plot_pad_bot, &
+         b% pg% Grid4_xleft, b% pg% Grid4_xright, &
+         b% pg% Grid4_ybot, b% pg% Grid4_ytop, .false., b% pg% Grid4_title, &
+         b% pg% Grid4_txt_scale_factor, &
+         b% pg% Grid4_num_cols, &
+         b% pg% Grid4_num_rows, &
+         b% pg% Grid4_num_plots, &
+         b% pg% Grid4_plot_name, &
+         b% pg% Grid4_plot_row, &
+         b% pg% Grid4_plot_rowspan, &
+         b% pg% Grid4_plot_col, &
+         b% pg% Grid4_plot_colspan, &
+         b% pg% Grid4_plot_pad_left, &
+         b% pg% Grid4_plot_pad_right, &
+         b% pg% Grid4_plot_pad_top, &
+         b% pg% Grid4_plot_pad_bot, &
          ierr)
    end subroutine grid4_plot
 
@@ -151,21 +151,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid5_xleft, b% Grid5_xright, &
-         b% Grid5_ybot, b% Grid5_ytop, .false., b% Grid5_title, &
-         b% Grid5_txt_scale_factor, &
-         b% Grid5_num_cols, &
-         b% Grid5_num_rows, &
-         b% Grid5_num_plots, &
-         b% Grid5_plot_name, &
-         b% Grid5_plot_row, &
-         b% Grid5_plot_rowspan, &
-         b% Grid5_plot_col, &
-         b% Grid5_plot_colspan, &
-         b% Grid5_plot_pad_left, &
-         b% Grid5_plot_pad_right, &
-         b% Grid5_plot_pad_top, &
-         b% Grid5_plot_pad_bot, &
+         b% pg% Grid5_xleft, b% pg% Grid5_xright, &
+         b% pg% Grid5_ybot, b% pg% Grid5_ytop, .false., b% pg% Grid5_title, &
+         b% pg% Grid5_txt_scale_factor, &
+         b% pg% Grid5_num_cols, &
+         b% pg% Grid5_num_rows, &
+         b% pg% Grid5_num_plots, &
+         b% pg% Grid5_plot_name, &
+         b% pg% Grid5_plot_row, &
+         b% pg% Grid5_plot_rowspan, &
+         b% pg% Grid5_plot_col, &
+         b% pg% Grid5_plot_colspan, &
+         b% pg% Grid5_plot_pad_left, &
+         b% pg% Grid5_plot_pad_right, &
+         b% pg% Grid5_plot_pad_top, &
+         b% pg% Grid5_plot_pad_bot, &
          ierr)
    end subroutine grid5_plot
 
@@ -178,21 +178,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid6_xleft, b% Grid6_xright, &
-         b% Grid6_ybot, b% Grid6_ytop, .false., b% Grid6_title, &
-         b% Grid6_txt_scale_factor, &
-         b% Grid6_num_cols, &
-         b% Grid6_num_rows, &
-         b% Grid6_num_plots, &
-         b% Grid6_plot_name, &
-         b% Grid6_plot_row, &
-         b% Grid6_plot_rowspan, &
-         b% Grid6_plot_col, &
-         b% Grid6_plot_colspan, &
-         b% Grid6_plot_pad_left, &
-         b% Grid6_plot_pad_right, &
-         b% Grid6_plot_pad_top, &
-         b% Grid6_plot_pad_bot, &
+         b% pg% Grid6_xleft, b% pg% Grid6_xright, &
+         b% pg% Grid6_ybot, b% pg% Grid6_ytop, .false., b% pg% Grid6_title, &
+         b% pg% Grid6_txt_scale_factor, &
+         b% pg% Grid6_num_cols, &
+         b% pg% Grid6_num_rows, &
+         b% pg% Grid6_num_plots, &
+         b% pg% Grid6_plot_name, &
+         b% pg% Grid6_plot_row, &
+         b% pg% Grid6_plot_rowspan, &
+         b% pg% Grid6_plot_col, &
+         b% pg% Grid6_plot_colspan, &
+         b% pg% Grid6_plot_pad_left, &
+         b% pg% Grid6_plot_pad_right, &
+         b% pg% Grid6_plot_pad_top, &
+         b% pg% Grid6_plot_pad_bot, &
          ierr)
    end subroutine grid6_plot
 
@@ -205,21 +205,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid7_xleft, b% Grid7_xright, &
-         b% Grid7_ybot, b% Grid7_ytop, .false., b% Grid7_title, &
-         b% Grid7_txt_scale_factor, &
-         b% Grid7_num_cols, &
-         b% Grid7_num_rows, &
-         b% Grid7_num_plots, &
-         b% Grid7_plot_name, &
-         b% Grid7_plot_row, &
-         b% Grid7_plot_rowspan, &
-         b% Grid7_plot_col, &
-         b% Grid7_plot_colspan, &
-         b% Grid7_plot_pad_left, &
-         b% Grid7_plot_pad_right, &
-         b% Grid7_plot_pad_top, &
-         b% Grid7_plot_pad_bot, &
+         b% pg% Grid7_xleft, b% pg% Grid7_xright, &
+         b% pg% Grid7_ybot, b% pg% Grid7_ytop, .false., b% pg% Grid7_title, &
+         b% pg% Grid7_txt_scale_factor, &
+         b% pg% Grid7_num_cols, &
+         b% pg% Grid7_num_rows, &
+         b% pg% Grid7_num_plots, &
+         b% pg% Grid7_plot_name, &
+         b% pg% Grid7_plot_row, &
+         b% pg% Grid7_plot_rowspan, &
+         b% pg% Grid7_plot_col, &
+         b% pg% Grid7_plot_colspan, &
+         b% pg% Grid7_plot_pad_left, &
+         b% pg% Grid7_plot_pad_right, &
+         b% pg% Grid7_plot_pad_top, &
+         b% pg% Grid7_plot_pad_bot, &
          ierr)
    end subroutine grid7_plot
 
@@ -232,21 +232,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid8_xleft, b% Grid8_xright, &
-         b% Grid8_ybot, b% Grid8_ytop, .false., b% Grid8_title, &
-         b% Grid8_txt_scale_factor, &
-         b% Grid8_num_cols, &
-         b% Grid8_num_rows, &
-         b% Grid8_num_plots, &
-         b% Grid8_plot_name, &
-         b% Grid8_plot_row, &
-         b% Grid8_plot_rowspan, &
-         b% Grid8_plot_col, &
-         b% Grid8_plot_colspan, &
-         b% Grid8_plot_pad_left, &
-         b% Grid8_plot_pad_right, &
-         b% Grid8_plot_pad_top, &
-         b% Grid8_plot_pad_bot, &
+         b% pg% Grid8_xleft, b% pg% Grid8_xright, &
+         b% pg% Grid8_ybot, b% pg% Grid8_ytop, .false., b% pg% Grid8_title, &
+         b% pg% Grid8_txt_scale_factor, &
+         b% pg% Grid8_num_cols, &
+         b% pg% Grid8_num_rows, &
+         b% pg% Grid8_num_plots, &
+         b% pg% Grid8_plot_name, &
+         b% pg% Grid8_plot_row, &
+         b% pg% Grid8_plot_rowspan, &
+         b% pg% Grid8_plot_col, &
+         b% pg% Grid8_plot_colspan, &
+         b% pg% Grid8_plot_pad_left, &
+         b% pg% Grid8_plot_pad_right, &
+         b% pg% Grid8_plot_pad_top, &
+         b% pg% Grid8_plot_pad_bot, &
          ierr)
    end subroutine grid8_plot
 
@@ -259,21 +259,21 @@ contains
       call get_binary_ptr(id, b, ierr)
       if (ierr /= 0) return
       call Grid_plot(b, id, device_id, &
-         b% Grid9_xleft, b% Grid9_xright, &
-         b% Grid9_ybot, b% Grid9_ytop, .false., b% Grid9_title, &
-         b% Grid9_txt_scale_factor, &
-         b% Grid9_num_cols, &
-         b% Grid9_num_rows, &
-         b% Grid9_num_plots, &
-         b% Grid9_plot_name, &
-         b% Grid9_plot_row, &
-         b% Grid9_plot_rowspan, &
-         b% Grid9_plot_col, &
-         b% Grid9_plot_colspan, &
-         b% Grid9_plot_pad_left, &
-         b% Grid9_plot_pad_right, &
-         b% Grid9_plot_pad_top, &
-         b% Grid9_plot_pad_bot, &
+         b% pg% Grid9_xleft, b% pg% Grid9_xright, &
+         b% pg% Grid9_ybot, b% pg% Grid9_ytop, .false., b% pg% Grid9_title, &
+         b% pg% Grid9_txt_scale_factor, &
+         b% pg% Grid9_num_cols, &
+         b% pg% Grid9_num_rows, &
+         b% pg% Grid9_num_plots, &
+         b% pg% Grid9_plot_name, &
+         b% pg% Grid9_plot_row, &
+         b% pg% Grid9_plot_rowspan, &
+         b% pg% Grid9_plot_col, &
+         b% pg% Grid9_plot_colspan, &
+         b% pg% Grid9_plot_pad_left, &
+         b% pg% Grid9_plot_pad_right, &
+         b% pg% Grid9_plot_pad_top, &
+         b% pg% Grid9_plot_pad_bot, &
          ierr)
    end subroutine grid9_plot
 
@@ -413,131 +413,131 @@ contains
          select case(StrLowCase(Grid_plot_name(i)))
          case ('summary_history')
             call do_summary_history_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Summary_History_title, &
-               Grid_txt_scale_factor(i) * b% Summary_History_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% Summary_History_title, &
+               Grid_txt_scale_factor(i) * b% pg% Summary_History_txt_scale, ierr)
          case ('history_panels1')
             call do_History_Panels1_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels1_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels1_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels1_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels1_txt_scale, ierr)
          case ('history_panels2')
             call do_History_Panels2_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels2_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels2_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels2_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels2_txt_scale, ierr)
          case ('history_panels3')
             call do_History_Panels3_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels3_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels3_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels3_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels3_txt_scale, ierr)
          case ('history_panels4')
             call do_History_Panels4_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels4_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels4_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels4_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels4_txt_scale, ierr)
          case ('history_panels5')
             call do_History_Panels5_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels5_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels5_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels5_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels5_txt_scale, ierr)
          case ('history_panels6')
             call do_History_Panels6_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels6_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels6_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels6_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels6_txt_scale, ierr)
          case ('history_panels7')
             call do_History_Panels7_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels7_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels7_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels7_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels7_txt_scale, ierr)
          case ('history_panels8')
             call do_History_Panels8_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels8_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels8_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels8_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels8_txt_scale, ierr)
          case ('history_panels9')
             call do_History_Panels9_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Panels9_title, &
-               Grid_txt_scale_factor(i) * b% History_Panels9_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Panels9_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Panels9_txt_scale, ierr)
          case ('history_track1')
             call do_History_Track1_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track1_title, &
-               Grid_txt_scale_factor(i) * b% History_Track1_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track1_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track1_txt_scale, ierr)
          case ('history_track2')
             call do_History_Track2_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track2_title, &
-               Grid_txt_scale_factor(i) * b% History_Track2_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track2_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track2_txt_scale, ierr)
          case ('history_track3')
             call do_History_Track3_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track3_title, &
-               Grid_txt_scale_factor(i) * b% History_Track3_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track3_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track3_txt_scale, ierr)
          case ('history_track4')
             call do_History_Track4_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track4_title, &
-               Grid_txt_scale_factor(i) * b% History_Track4_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track4_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track4_txt_scale, ierr)
          case ('history_track5')
             call do_History_Track5_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track5_title, &
-               Grid_txt_scale_factor(i) * b% History_Track5_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track5_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track5_txt_scale, ierr)
          case ('history_track6')
             call do_History_Track6_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track6_title, &
-               Grid_txt_scale_factor(i) * b% History_Track6_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track6_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track6_txt_scale, ierr)
          case ('history_track7')
             call do_History_Track7_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track7_title, &
-               Grid_txt_scale_factor(i) * b% History_Track7_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track7_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track7_txt_scale, ierr)
          case ('history_track8')
             call do_History_Track8_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track8_title, &
-               Grid_txt_scale_factor(i) * b% History_Track8_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track8_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track8_txt_scale, ierr)
          case ('history_track9')
             call do_History_Track9_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% History_Track9_title, &
-               Grid_txt_scale_factor(i) * b% History_Track9_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% history_Track9_title, &
+               Grid_txt_scale_factor(i) * b% pg% history_Track9_txt_scale, ierr)
          case ('text_summary1')
             call do_Text_Summary1_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary1_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary1_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary1_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary1_txt_scale, ierr)
          case ('text_summary2')
             call do_Text_Summary2_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary2_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary2_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary2_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary2_txt_scale, ierr)
          case ('text_summary3')
             call do_Text_Summary3_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary3_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary3_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary3_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary3_txt_scale, ierr)
          case ('text_summary4')
             call do_Text_Summary4_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary4_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary4_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary4_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary4_txt_scale, ierr)
          case ('text_summary5')
             call do_Text_Summary5_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary5_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary5_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary5_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary5_txt_scale, ierr)
          case ('text_summary6')
             call do_Text_Summary6_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary6_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary6_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary6_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary6_txt_scale, ierr)
          case ('text_summary7')
             call do_Text_Summary7_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary7_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary7_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary7_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary7_txt_scale, ierr)
          case ('text_summary8')
             call do_Text_Summary8_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary8_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary8_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary8_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary8_txt_scale, ierr)
          case ('text_summary9')
             call do_Text_Summary9_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Text_Summary9_title, &
-               Grid_txt_scale_factor(i) * b% Text_Summary9_txt_scale, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% text_Summary9_title, &
+               Grid_txt_scale_factor(i) * b% pg% text_Summary9_txt_scale, ierr)
          case ('star1')
             call do_Star1_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Star1_Title, &
-               Grid_txt_scale_factor(i) * b% Star1_txt_scale_factor, b% Star1_plot_name, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% Star1_Title, &
+               Grid_txt_scale_factor(i) * b% pg% Star1_txt_scale_factor, b% pg% Star1_plot_name, ierr)
          case ('star2')
             call do_Star2_plot(&
-               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% Star2_Title, &
-               Grid_txt_scale_factor(i) * b% Star2_txt_scale_factor, b% Star2_plot_name, ierr)
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% Star2_Title, &
+               Grid_txt_scale_factor(i) * b% pg% Star2_txt_scale_factor, b% pg% Star2_plot_name, ierr)
 
          case default
             ! check for "other" plot
             found_it = .false.
             do j = 1, max_num_Other_plots
                plot_id = i_Other + j - 1
-               p => b% pgbinary_win_file_ptr(plot_id)
+               p => b% pg% pgbinary_win_file_ptr(plot_id)
                if (p% okay_to_call_do_plot_in_binary_grid .and. &
                   StrLowCase(p% name) == StrLowCase(Grid_plot_name(i))) then
                   call p% do_plot_in_binary_grid(&

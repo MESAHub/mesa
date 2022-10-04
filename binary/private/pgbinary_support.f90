@@ -32,9 +32,10 @@ module pgbinary_support
    use pgstar_support, only : Set_Colours, do1_pgmtxt, &
       clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
       clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
-      clr_anonymous, clr_D_smooth, colormap_offset, colormap_last, colormap_size, &
+      clr_anonymous, colormap_offset, colormap_last, colormap_size, &
       colormap, Line_Type_Solid, Line_Type_Dash, Line_Type_Dash_Dot, Line_Type_Dot_Dash, &
       Line_Type_Dot ! inherit colors/linetypes + some routines from pgstar
+   use star_pgstar
 
    implicit none
 
@@ -238,8 +239,7 @@ contains
          p% prev_win_width = p% win_width
          p% prev_win_aspect_ratio = p% win_aspect_ratio
       end if
-      call set_black_white(white_on_black_flag, ierr)
-      call Set_Colours(ierr)
+      call Set_Colours(white_on_black_flag, ierr)
    end subroutine open_device
 
 
@@ -280,7 +280,7 @@ contains
             key_name(i:i) = name(i:i)
          end if
       end do
-      call integer_dict_lookup(b% pg% binary_history_names_dict, key_name, i, ierr)
+      call integer_dict_lookup(b% binary_history_names_dict, key_name, i, ierr)
       if (ierr /= 0 .or. i <= 0) then ! didn't find it
          get1_hist_yvec = .false.
          return
@@ -346,7 +346,7 @@ contains
       type (pgbinary_hist_node), pointer :: pg => null()
       include 'formats'
       if (numpts == 0) return
-      pg => b% pgbinary_hist
+      pg => b% pg% pgbinary_hist
       i = numpts
       vec = 0
       do ! recall that hist list is decreasing by age (and step)
@@ -370,26 +370,26 @@ contains
    subroutine show_annotations(b, show_annotation1, show_annotation2, show_annotation3)
       type (binary_info), pointer :: b
       logical, intent(in) :: show_annotation1, show_annotation2, show_annotation3
-      if (show_annotation1 .and. len_trim(b% annotation1_text) > 0) then
-         call pgsci(b% annotation1_ci)
-         call pgscf(b% annotation1_cf)
-         call do1_pgmtxt(b% annotation1_side, b% annotation1_disp, &
-            b% annotation1_coord, b% annotation1_fjust, b% annotation1_text, &
-            b% annotation1_ch, b% annotation1_lw)
+      if (show_annotation1 .and. len_trim(b% pg% annotation1_text) > 0) then
+         call pgsci(b% pg% annotation1_ci)
+         call pgscf(b% pg% annotation1_cf)
+         call do1_pgmtxt(b% pg% annotation1_side, b% pg% annotation1_disp, &
+            b% pg% annotation1_coord, b% pg% annotation1_fjust, b% pg% annotation1_text, &
+            b% pg% annotation1_ch, b% pg% annotation1_lw)
       end if
-      if (show_annotation2 .and. len_trim(b% annotation2_text) > 0) then
-         call pgsci(b% annotation2_ci)
-         call pgscf(b% annotation2_cf)
-         call do1_pgmtxt(b% annotation2_side, b% annotation2_disp, &
-            b% annotation2_coord, b% annotation2_fjust, b% annotation2_text, &
-            b% annotation2_ch, b% annotation2_lw)
+      if (show_annotation2 .and. len_trim(b% pg% annotation2_text) > 0) then
+         call pgsci(b% pg% annotation2_ci)
+         call pgscf(b% pg% annotation2_cf)
+         call do1_pgmtxt(b% pg% annotation2_side, b% pg% annotation2_disp, &
+            b% pg% annotation2_coord, b% pg% annotation2_fjust, b% pg% annotation2_text, &
+            b% pg% annotation2_ch, b% pg% annotation2_lw)
       end if
-      if (show_annotation3 .and. len_trim(b% annotation3_text) > 0) then
-         call pgsci(b% annotation3_ci)
-         call pgscf(b% annotation3_cf)
-         call do1_pgmtxt(b% annotation3_side, b% annotation3_disp, &
-            b% annotation3_coord, b% annotation3_fjust, b% annotation3_text, &
-            b% annotation3_ch, b% annotation3_lw)
+      if (show_annotation3 .and. len_trim(b% pg% annotation3_text) > 0) then
+         call pgsci(b% pg% annotation3_ci)
+         call pgscf(b% pg% annotation3_cf)
+         call do1_pgmtxt(b% pg% annotation3_side, b% pg% annotation3_disp, &
+            b% pg% annotation3_coord, b% pg% annotation3_fjust, b% pg% annotation3_text, &
+            b% pg% annotation3_ch, b% pg% annotation3_lw)
       end if
    end subroutine show_annotations
 
@@ -401,12 +401,13 @@ contains
       integer :: lw
       call pgqch(ch)
       call pgqlw(lw)
-      call pgsch(b% pgbinary_num_scale * ch)
-      call pgslw(b% pgbinary_box_lw)
+      call pgsch(b% pg% pgbinary_num_scale * ch)
+      call pgslw(b% pg% pgbinary_box_lw)
       call pgbox(str1, 0.0, 0, str2, 0.0, 0)
       call pgsch(ch)
       call pgslw(lw)
    end subroutine show_box_pgbinary
+
 
    subroutine draw_rect()
       real, dimension(5) :: xs, ys
@@ -427,14 +428,14 @@ contains
       real, intent(in) :: pad
       optional pad
       real :: ch, disp
-      if (.not. b% pgbinary_grid_show_title) return
+      if (.not. b% pg% pgbinary_grid_show_title) return
       if (len_trim(title) == 0) return
       call pgqch(ch)
-      disp = b% pgbinary_grid_title_disp
+      disp = b% pg% pgbinary_grid_title_disp
       if (present(pad)) disp = disp + pad
       call do1_pgmtxt('T', disp, &
-         b% pgbinary_grid_title_coord, b% pgbinary_grid_title_fjust, title, &
-         b% pgbinary_grid_title_scale * ch, b% pgbinary_grid_title_lw)
+         b% pg% pgbinary_grid_title_coord, b% pg% pgbinary_grid_title_fjust, title, &
+         b% pg% pgbinary_grid_title_scale * ch, b% pg% pgbinary_grid_title_lw)
    end subroutine show_grid_title_pgbinary
 
 
@@ -444,14 +445,14 @@ contains
       real, intent(in) :: pad
       optional pad
       real :: ch, disp
-      if (.not. b% pgbinary_show_title) return
+      if (.not. b% pg% pgbinary_show_title) return
       if (len_trim(title) == 0) return
       call pgqch(ch)
-      disp = b% pgbinary_title_disp
+      disp = b% pg% pgbinary_title_disp
       if (present(pad)) disp = disp + pad
       call do1_pgmtxt('T', disp, &
-         b% pgbinary_title_coord, b% pgbinary_title_fjust, title, &
-         b% pgbinary_title_scale * ch, b% pgbinary_title_lw)
+         b% pg% pgbinary_title_coord, b% pg% pgbinary_title_fjust, title, &
+         b% pg% pgbinary_title_scale * ch, b% pg% pgbinary_title_lw)
    end subroutine show_title_pgbinary
 
 
@@ -462,7 +463,7 @@ contains
       real, intent(in) :: pad, coord, fjust
       optional pad
       real :: disp
-      disp = b% pgbinary_title_disp
+      disp = b% pg% pgbinary_title_disp
       if (present(pad)) disp = disp + pad
       call pgmtxt('T', disp, coord, fjust, label)
    end subroutine show_title_label_pgmtxt_pgbinary
@@ -475,10 +476,10 @@ contains
       optional pad
       real :: ch, disp
       call pgqch(ch)
-      disp = b% pgbinary_xaxis_label_disp
+      disp = b% pg% pgbinary_xaxis_label_disp
       if (present(pad)) disp = disp + pad
       call do1_pgmtxt('B', disp, 0.5, 0.5, label, &
-         b% pgbinary_xaxis_label_scale * ch, b% pgbinary_xaxis_label_lw)
+         b% pg% pgbinary_xaxis_label_scale * ch, b% pg% pgbinary_xaxis_label_lw)
    end subroutine show_xaxis_label_pgbinary
 
 
@@ -489,7 +490,7 @@ contains
       real, intent(in) :: pad, coord, fjust
       optional pad
       real :: disp
-      disp = b% pgbinary_xaxis_label_disp
+      disp = b% pg% pgbinary_xaxis_label_disp
       if (present(pad)) disp = disp + pad
       call pgmtxt('B', disp, coord, fjust, label)
    end subroutine show_xaxis_label_pgmtxt_pgbinary
@@ -502,10 +503,10 @@ contains
       optional pad
       real :: ch, disp
       call pgqch(ch)
-      disp = b% pgbinary_left_yaxis_label_disp
+      disp = b% pg% pgbinary_left_yaxis_label_disp
       if (present(pad)) disp = disp + pad
       call do1_pgmtxt('L', disp, 0.5, 0.5, label, &
-         b% pgbinary_left_yaxis_label_scale * ch, b% pgbinary_left_yaxis_label_lw)
+         b% pg% pgbinary_left_yaxis_label_scale * ch, b% pg% pgbinary_left_yaxis_label_lw)
    end subroutine show_left_yaxis_label_pgbinary
 
 
@@ -516,10 +517,10 @@ contains
       optional pad
       real :: ch, disp
       call pgqch(ch)
-      disp = b% pgbinary_right_yaxis_label_disp
+      disp = b% pg% pgbinary_right_yaxis_label_disp
       if (present(pad)) disp = disp + pad
       call do1_pgmtxt('R', disp, 0.5, 0.5, label, &
-         b% pgbinary_right_yaxis_label_scale * ch, b% pgbinary_right_yaxis_label_lw)
+         b% pg% pgbinary_right_yaxis_label_scale * ch, b% pg% pgbinary_right_yaxis_label_lw)
    end subroutine show_right_yaxis_label_pgbinary
 
 
@@ -532,7 +533,7 @@ contains
       real :: ch, disp
       call pgqch(ch)
       call pgsch(1.1 * ch)
-      disp = b% pgbinary_left_yaxis_label_disp
+      disp = b% pg% pgbinary_left_yaxis_label_disp
       if (present(pad)) disp = disp + pad
       call pgmtxt('L', disp, coord, fjust, label)
       call pgsch(ch)
@@ -548,7 +549,7 @@ contains
       real :: ch, disp
       call pgqch(ch)
       call pgsch(1.1 * ch)
-      disp = b% pgbinary_right_yaxis_label_disp
+      disp = b% pg% pgbinary_right_yaxis_label_disp
       if (present(pad)) disp = disp + pad
       call pgmtxt('R', disp, coord, fjust, label)
       call pgsch(ch)
@@ -559,14 +560,14 @@ contains
       type (binary_info), pointer :: b
       character (len = 32) :: str
       real :: ch
-      if (.not. b% pgbinary_show_model_number) return
+      if (.not. b% pg% pgbinary_show_model_number) return
       write(str, '(i9)') b% model_number
       str = 'model ' // trim(adjustl(str))
       call pgqch(ch)
       call do1_pgmtxt('T', &
-         b% pgbinary_model_disp, b% pgbinary_model_coord, &
-         b% pgbinary_model_fjust, str, &
-         b% pgbinary_model_scale * ch, b% pgbinary_model_lw)
+         b% pg% pgbinary_model_disp, b% pg% pgbinary_model_coord, &
+         b% pg% pgbinary_model_fjust, str, &
+         b% pg% pgbinary_model_scale * ch, b% pg% pgbinary_model_lw)
    end subroutine show_model_number_pgbinary
 
 
@@ -576,24 +577,24 @@ contains
       real(dp) :: age
       real :: ch
       integer :: len, i, j, iE, n
-      if (.not. b% pgbinary_show_age) return
+      if (.not. b% pg% pgbinary_show_age) return
       age = b% binary_age
-      if (b% pgbinary_show_age_in_seconds) then
+      if (b% pg% pgbinary_show_age_in_seconds) then
          age = age * secyer
          units_str = 'secs'
-      else if (b% pgbinary_show_age_in_minutes) then
+      else if (b% pg% pgbinary_show_age_in_minutes) then
          age = age * secyer / 60
          units_str = 'mins'
-      else if (b% pgbinary_show_age_in_hours) then
+      else if (b% pg% pgbinary_show_age_in_hours) then
          age = age * secyer / (60 * 60)
          units_str = 'hrs'
-      else if (b% pgbinary_show_age_in_days) then
+      else if (b% pg% pgbinary_show_age_in_days) then
          age = age * secyer / (60 * 60 * 24)
          units_str = 'days'
-      else if (b% pgbinary_show_age_in_years) then
+      else if (b% pg% pgbinary_show_age_in_years) then
          !age = age
          units_str = 'yrs'
-      else if (b% pgbinary_show_log_age_in_years) then
+      else if (b% pg% pgbinary_show_log_age_in_years) then
          age = log10(max(1d-99, age))
          units_str = 'log yrs'
       else if (age * secyer < 60) then
@@ -649,9 +650,9 @@ contains
       age_str = 'age ' // trim(age_str) // ' ' // trim(units_str)
       call pgqch(ch)
       call do1_pgmtxt('T', &
-         b% pgbinary_age_disp, b% pgbinary_age_coord, &
-         b% pgbinary_age_fjust, age_str, &
-         b% pgbinary_age_scale * ch, b% pgbinary_age_lw)
+         b% pg% pgbinary_age_disp, b% pg% pgbinary_age_coord, &
+         b% pg% pgbinary_age_fjust, age_str, &
+         b% pg% pgbinary_age_scale * ch, b% pg% pgbinary_age_lw)
    end subroutine show_age_pgbinary
 
 

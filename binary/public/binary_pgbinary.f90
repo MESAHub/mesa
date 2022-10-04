@@ -139,25 +139,25 @@ module binary_pgbinary
       type (pgbinary_hist_node), pointer :: pgbinary_hist => null()
 
       procedure(pgbinary_decorator_interface), pointer, nopass :: &
-            History_Panels1_pgstar_decorator => null(), &
-            History_Panels2_pgstar_decorator => null(), &
-            History_Panels3_pgstar_decorator => null(), &
-            History_Panels4_pgstar_decorator => null(), &
-            History_Panels5_pgstar_decorator => null(), &
-            History_Panels6_pgstar_decorator => null(), &
-            History_Panels7_pgstar_decorator => null(), &
-            History_Panels8_pgstar_decorator => null(), &
-            History_Panels9_pgstar_decorator => null(), &
-            History_Track1_pgstar_decorator => null(), &
-            History_Track2_pgstar_decorator => null(), &
-            History_Track3_pgstar_decorator => null(), &
-            History_Track4_pgstar_decorator => null(), &
-            History_Track5_pgstar_decorator => null(), &
-            History_Track6_pgstar_decorator => null(), &
-            History_Track7_pgstar_decorator => null(), &
-            History_Track8_pgstar_decorator => null(), &
-            History_Track9_pgstar_decorator => null(), &
-            summary_history_pgstar_decorator => null()
+            History_Panels1_pgbinary_decorator => null(), &
+            History_Panels2_pgbinary_decorator => null(), &
+            History_Panels3_pgbinary_decorator => null(), &
+            History_Panels4_pgbinary_decorator => null(), &
+            History_Panels5_pgbinary_decorator => null(), &
+            History_Panels6_pgbinary_decorator => null(), &
+            History_Panels7_pgbinary_decorator => null(), &
+            History_Panels8_pgbinary_decorator => null(), &
+            History_Panels9_pgbinary_decorator => null(), &
+            History_Track1_pgbinary_decorator => null(), &
+            History_Track2_pgbinary_decorator => null(), &
+            History_Track3_pgbinary_decorator => null(), &
+            History_Track4_pgbinary_decorator => null(), &
+            History_Track5_pgbinary_decorator => null(), &
+            History_Track6_pgbinary_decorator => null(), &
+            History_Track7_pgbinary_decorator => null(), &
+            History_Track8_pgbinary_decorator => null(), &
+            History_Track9_pgbinary_decorator => null(), &
+            summary_history_pgbinary_decorator => null()
 
    end type pgbinary_controls
 

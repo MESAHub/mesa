@@ -97,7 +97,7 @@ contains
       character (len = 256) :: restart_filename, photo_filename
       integer(8) :: total, time0, time1, clock_rate
       logical :: doing_restart, first_try, continue_evolve_loop, &
-          get_history_info, write_history, write_terminal
+          get_history_info, write_history, write_terminal, will_read_pgbinary_inlist
       real(dp) :: sum_times, dt, timestep_factor
       type (binary_info), pointer :: b
       character (len = strlen) :: inlist_fname
@@ -697,9 +697,9 @@ contains
          ! do pgbinary stuff
          if (result == keep_going .and. b% job% pgbinary_flag) then
             will_read_pgbinary_inlist = .false.
-            if (b% pgbinary_interval <= 0) then
+            if (b% pg% pgbinary_interval <= 0) then
                will_read_pgbinary_inlist = .true.
-            else if(mod(b% model_number, b% pgbinary_interval) == 0) then
+            else if(mod(b% model_number, b% pg% pgbinary_interval) == 0) then
                will_read_pgbinary_inlist = .true.
             end if
             if (will_read_pgbinary_inlist) then
