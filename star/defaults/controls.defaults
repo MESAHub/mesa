@@ -4822,6 +4822,10 @@
 
       ! For now the 'Dutch' scheme can be used in either capacity.
 
+      ! NOTE: for schemes that scale with metallicitity, we use Zbase rather than Z (as long as Zbase > 0).
+      ! This is because wind mass loss rate is primarily determined by iron opacity,
+      ! which is unlikely to change during the evolution.
+
       ! ::
 
     hot_wind_scheme = ''
