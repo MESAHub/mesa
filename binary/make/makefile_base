@@ -42,6 +42,7 @@ SRCS = \
    pgbinary_star.f90 \
    pgbinary_grid.f90 \
    pgbinary.f90 \
+   pgbinary_lib.f90 \
    run_binary_support.f90 \
    binary_lib.f90 \
    mod_other_rlo_mdot.f90 \

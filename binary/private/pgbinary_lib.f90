@@ -23,8 +23,6 @@
 
 module pgbinary_lib
 
-   use const_def
-
    implicit none
 
 contains

@@ -32,7 +32,6 @@ module run_binary_support
    use binary_do_one_utils
    use binary_ce
    use binary_photos
-   use pgbinary_lib
 
    implicit none
 
@@ -70,6 +69,8 @@ contains
       use binary_history
       use binary_history_specs
       use run_star_support
+      use pgbinary_lib, only : read_pgbinary_inlist, update_pgbinary_plots, &
+         start_new_run_for_pgbinary, restart_run_for_pgbinary
 
       logical, intent(in) :: tst
 

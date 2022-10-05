@@ -1483,8 +1483,7 @@ contains
       integer, intent(out) :: ierr
 
       ierr = 0
-
-      pg = b% pg
+      pg => b% pg
 
       pg% file_device = file_device
       pg% file_extension = file_extension
