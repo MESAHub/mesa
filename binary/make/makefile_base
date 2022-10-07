@@ -39,6 +39,7 @@ SRCS = \
    pgbinary_summary_history.f90 \
    pgbinary_hist_track.f90 \
    pgbinary_history_panels.f90 \
+   pgbinary_orbit.f90 \
    pgbinary_star.f90 \
    pgbinary_grid.f90 \
    pgbinary.f90 \

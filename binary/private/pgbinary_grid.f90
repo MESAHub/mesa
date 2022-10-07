@@ -531,7 +531,10 @@ contains
             call do_Star2_plot(&
                b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% Star2_Title, &
                Grid_txt_scale_factor(i) * b% pg% Star2_txt_scale_factor, b% pg% Star2_plot_name, ierr)
-
+         case ('orbit')
+            call do_orbit_plot(&
+               b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% Orbit_title, &
+               Grid_txt_scale_factor(i) * b% pg% Orbit_txt_scale, ierr)
          case default
             ! check for "other" plot
             found_it = .false.

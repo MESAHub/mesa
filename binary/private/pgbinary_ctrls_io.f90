@@ -1315,6 +1315,24 @@ module pgbinary_ctrls_io
       star2_box_pad_bot, &
       star2_box_pad_top, &
 
+      show_mtrans_status, &
+
+      Orbit_win_flag, &
+      Orbit_file_flag, &
+      Orbit_file_interval, &
+      Orbit_file_dir, &
+      Orbit_file_prefix, &
+      Orbit_title, &
+      Orbit_win_width, &
+      Orbit_win_aspect_ratio, &
+      Orbit_xleft, &
+      Orbit_xright, &
+      Orbit_ybot, &
+      Orbit_ytop, &
+      Orbit_file_width, &
+      Orbit_file_aspect_ratio, &
+      Orbit_txt_scale, &
+
       annotation1_ci, &
       annotation1_ch, &
       annotation1_lw, &
@@ -1370,8 +1388,8 @@ contains
       type (binary_info), pointer :: b
       character(*), intent(in) :: filename
       integer, intent(out) :: ierr
-!      character (len = strlen) :: pgbinary_namelist_name
-!      pgbinary_namelist_name = ''
+      !      character (len = strlen) :: pgbinary_namelist_name
+      !      pgbinary_namelist_name = ''
       ierr = 0
       call set_default_pgbinary_controls
       call read_pgbinary_file(b, filename, 1, ierr)
@@ -2775,7 +2793,7 @@ contains
       pg% Grid9_file_interval = Grid9_file_interval
       pg% Grid9_file_width = Grid9_file_width
       pg% Grid9_file_aspect_ratio = Grid9_file_aspect_ratio
-      
+
       pg% Star1_win_flag = Star1_win_flag
       pg% Star1_file_flag = Star1_file_flag
       pg% Star1_file_interval = Star1_file_interval
@@ -2819,6 +2837,24 @@ contains
       pg% star2_box_pad_right = star2_box_pad_right
       pg% star2_box_pad_bot = star2_box_pad_bot
       pg% star2_box_pad_top = star2_box_pad_top
+
+      pg% show_mtrans_status = show_mtrans_status
+
+      pg% Orbit_win_flag = Orbit_win_flag
+      pg% Orbit_file_flag = Orbit_file_flag
+      pg% Orbit_file_interval = Orbit_file_interval
+      pg% Orbit_file_dir = Orbit_file_dir
+      pg% Orbit_file_prefix = Orbit_file_prefix
+      pg% Orbit_title = Orbit_title
+      pg% Orbit_win_width = Orbit_win_width
+      pg% Orbit_win_aspect_ratio = Orbit_win_aspect_ratio
+      pg% Orbit_xleft = Orbit_xleft
+      pg% Orbit_xright = Orbit_xright
+      pg% Orbit_ybot = Orbit_ybot
+      pg% Orbit_ytop = Orbit_ytop
+      pg% Orbit_file_width = Orbit_file_width
+      pg% Orbit_file_aspect_ratio = Orbit_file_aspect_ratio
+      pg% Orbit_txt_scale = Orbit_txt_scale
 
       pg% annotation1_ci = annotation1_ci
       pg% annotation1_ch = annotation1_ch

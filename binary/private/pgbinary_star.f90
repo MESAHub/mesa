@@ -158,6 +158,8 @@ contains
       real, intent(in) :: xleft, xright, ybot, ytop, Star_txt_scale_factor
       character (len = *), intent(in) :: Star_title, Star_plot_name
       integer, intent(out) :: ierr
+
+      character (len=strlen) :: title, status
       real, dimension(5) :: xs, ys
       logical, parameter :: star_subplot = .true.
 
@@ -168,6 +170,18 @@ contains
       if (.not. subplot) then  ! do title stuff
          call show_model_number_pgbinary(b)
          call show_age_pgbinary(b)
+      end if
+      if (b% pg% show_mtrans_status) then
+         if (Star_title /= '') title = trim(Star_title) // ":"
+         status = ' Detached'
+         if (b% mtransfer_rate /= 0d0) then
+            if (b% d_i == star_number) then
+               status = ' Donor'
+            else
+               status = ' Accretor'
+            end if
+         end if
+         title = trim(title) // status
       end if
       call show_grid_title_pgbinary(b, Star_title)
       call pgunsa

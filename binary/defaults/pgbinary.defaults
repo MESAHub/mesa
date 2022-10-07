@@ -2869,6 +2869,8 @@ star2_box_pad_right = 0.01
 star2_box_pad_bot = -0.01
 star2_box_pad_top = 0.01
 
+show_mtrans_status = .true.
+
 ! "annotation" strings -- provide args for PGMTXT
 
 ! ::
