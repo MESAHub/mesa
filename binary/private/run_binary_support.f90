@@ -137,15 +137,6 @@ contains
          return
       end if
 
-      ! setup pgbinary
-      if (.not. doing_restart) then
-         call start_new_run_for_pgbinary(b, ierr)
-         if (failed('start_new_run_for_pgbinary', ierr)) return
-      else
-         call restart_run_for_pgbinary(b, ierr)
-         if (failed('restart_run_for_pgbinary', ierr)) return
-      end if
-
       if (.not. doing_restart) then
          b% model_number = 0
          b% model_number_old = 0
@@ -301,6 +292,15 @@ contains
       call binary_private_def_init
       call binary_history_column_names_init(ierr)
       call set_binary_history_columns(b, b% job% binary_history_columns_file, ierr)
+
+      ! setup pgbinary
+      if (.not. doing_restart) then
+         call start_new_run_for_pgbinary(b, ierr)
+         if (failed('start_new_run_for_pgbinary', ierr)) return
+      else
+         call restart_run_for_pgbinary(b, ierr)
+         if (failed('restart_run_for_pgbinary', ierr)) return
+      end if
 
       if (b% job% show_binary_log_description_at_start .and. .not. doing_restart) then
          write(*, '(A)')

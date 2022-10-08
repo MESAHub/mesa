@@ -30,6 +30,7 @@ module pgbinary
    use chem_def, only : category_name
    use rates_def, only : i_rate
    use pgbinary_support
+   use pgstar, only : pgstar_clear, read_pgstar_data
 
    implicit none
 
@@ -89,6 +90,7 @@ contains
    subroutine do_restart_run_for_pgbinary(b, ierr)
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
+      logical :: fexists
       ierr = 0
       if (.not. b% job% pgbinary_flag) return
       call pgbinary_clear(b)
@@ -96,6 +98,21 @@ contains
       if (ierr /= 0) then
          write(*, *) 'failed in read_pgbinary_data'
          ierr = 0
+      end if
+      ! read pgstar if present
+      if (b% have_star_1) then
+         inquire(file = trim(b% s1% log_directory) // '/pgstar.dat', exist = fexists)
+         if (fexists) then
+            call pgstar_clear(b% s1)
+            call read_pgstar_data(b% s1, ierr)
+         end if
+      end if
+      if (b% have_star_2) then
+         inquire(file = trim(b% s2% log_directory) // '/pgstar.dat', exist = fexists)
+         if (fexists) then
+            call pgstar_clear(b% s2)
+            call read_pgstar_data(b% s2, ierr)
+         end if
       end if
    end subroutine do_restart_run_for_pgbinary
 
@@ -858,7 +875,7 @@ contains
       if (.not. associated(pg)) return
 
       n = b% number_of_binary_history_columns
-      fname = trim(b% log_directory) // '/pgbinary.dat'
+      fname = trim(b% photo_directory) // '/pgbinary.dat'
 
       if (associated(pg% next)) then
          open(newunit = iounit, file = trim(fname), action = 'write', &
@@ -899,7 +916,7 @@ contains
       include 'formats'
       ierr = 0
 
-      fname = trim(b% log_directory) // '/pgbinary.dat'
+      fname = trim(b% photo_directory) // '/pgbinary.dat'
       inquire(file = trim(fname), exist = fexist)
       if (.not.fexist) then
          if (dbg) write(*, *) 'failed to find ' // trim(fname)

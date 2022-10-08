@@ -98,7 +98,7 @@ contains
       a2 = 1 / (1 + b% m(2) / b% m(1))
       e = b% eccentricity
 
-      !$OMP PARALLEL DO PRIVATE(i) SCHEDULE(dynamic,2)
+
       do i = 1, num_points
          thetas(i) = i * (2 * pi / num_points)
          r1s(i) = a1 * (1 - e**2) / (1 + e * cos(thetas(i)))
@@ -108,7 +108,7 @@ contains
          x2s(i) = -r2s(i) * cos(thetas(i))  ! minus to flip orbit
          y2s(i) = -r2s(i) * sin(thetas(i))
       end do
-      !$OMP END PARALLEL DO
+
       x1s(num_points + 1) = x1s(1)
       x2s(num_points + 1) = x2s(1)
       y1s(num_points + 1) = y1s(1)
@@ -124,11 +124,16 @@ contains
       call pgsch(txt_scale)
       call pgslw(b% pg% pgbinary_lw)
       call pgwnad(-1.1 * xmax, 1.1 * xmax, -1.1 * xmax, 1.1 * xmax)
-      call show_box_pgbinary(b, 'BCN', 'BCNMV')
+      call show_box_pgbinary(b, 'BCSTN', 'BCSTNMV')
 
+      call pgsci(clr_Goldenrod)
       call pgline(num_points + 1, x1s, y1s)
+      call pgsci(clr_LightSkyBlue)
       call pgline(num_points + 1, x2s, y2s)
+      call pgsci(1)
       call pgpt(1, 0.0, 0.0, 5)
+      call show_xaxis_label_pgbinary(b, 'separation')
+      call show_left_yaxis_label_pgbinary(b, 'separation')
 
       call pgunsa
 

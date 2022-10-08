@@ -159,7 +159,7 @@ contains
       character (len = *), intent(in) :: Star_title, Star_plot_name
       integer, intent(out) :: ierr
 
-      character (len=strlen) :: title, status
+      character (len = strlen) :: title, status, mass
       real, dimension(5) :: xs, ys
       logical, parameter :: star_subplot = .true.
 
@@ -183,7 +183,7 @@ contains
          end if
          title = trim(title) // status
       end if
-      call show_grid_title_pgbinary(b, Star_title)
+      call show_grid_title_pgbinary(b, title)
       call pgunsa
 
       ierr = 0
@@ -203,6 +203,9 @@ contains
             call update_pgstar_data(b% s1, ierr)
             call plot_case(b% s1, b% star_ids(1))
             call update_pgstar_history_file(b% s1, ierr)
+         else
+            write(mass, '(f3.2)') b% m(1) / Msun
+            call pgmtxt('T', -1.0, 0.5, 0.5, 'Star 1 not simulated \n point mass of ' // mass // ' M\d\(2281)u\')
          end if
       case(2)
          if (b% have_star_2) then
@@ -218,6 +221,9 @@ contains
             call update_pgstar_data(b% s2, ierr)
             call plot_case(b% s2, b% star_ids(2))
             call update_pgstar_history_file(b% s2, ierr)
+         else
+            write(mass, '(f3.2)') b% m(2) / Msun
+            call pgmtxt('T', -1.0, 0.5, 0.5, 'Star 2 not simulated \n point mass of ' // mass // ' M\d\(2281)u\')
          end if
       end select
 

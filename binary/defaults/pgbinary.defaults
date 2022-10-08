@@ -2871,6 +2871,22 @@ star2_box_pad_top = 0.01
 
 show_mtrans_status = .true.
 
+Orbit_win_flag = .false.
+Orbit_file_flag = .false.
+Orbit_file_interval = 1
+Orbit_file_dir = 'png'
+Orbit_file_prefix = 'orbit_'
+Orbit_title = 'Orbit'
+Orbit_win_width = 7
+Orbit_win_aspect_ratio = 0.9
+Orbit_xleft = 0.1
+Orbit_xright = 0.9
+Orbit_ybot = 0.1
+Orbit_ytop = 0.9
+Orbit_file_width = -1
+Orbit_file_aspect_ratio = -1
+Orbit_txt_scale = 1.0
+
 ! "annotation" strings -- provide args for PGMTXT
 
 ! ::

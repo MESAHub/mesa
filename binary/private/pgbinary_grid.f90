@@ -310,8 +310,8 @@ contains
          do_History_Track1_plot, do_History_Track2_plot, do_History_Track3_plot, &
          do_History_Track4_plot, do_History_Track5_plot, do_History_Track6_plot, &
          do_History_Track7_plot, do_History_Track8_plot, do_History_Track9_plot
-      use pgbinary_star, only : &
-         do_Star1_plot, do_Star2_plot
+      use pgbinary_star, only : do_Star1_plot, do_Star2_plot
+      use pgbinary_orbit, only : do_orbit_plot
 
       type (binary_info), pointer :: b
       logical, intent(in) :: subplot
