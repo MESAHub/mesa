@@ -340,7 +340,7 @@
                 Y = surface_he4
                 ! use the Zbase as a proxy for Fe-group abundances
                 ! unlikely to change during the stellar evolution
-                if (s% kap_rq% Zbase /= -1) then
+                if (s% kap_rq% Zbase >= 0) then
                    Z = s% kap_rq% Zbase
                 else
                    if (dbg) write(*,*) 'Zbase not set, using present-day Z for wind'

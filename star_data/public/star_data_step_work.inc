@@ -327,6 +327,8 @@
          prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
+      real(dp), pointer, dimension(:) :: prev_mesh_D_ST_start, prev_mesh_nu_ST_start
+      logical :: prev_mesh_have_ST_start_info
 
       real(dp) :: gradT_excess_alpha ! 1 for full efficiency boost; 0 for no boost
       real(dp) :: gradT_excess_min_beta
