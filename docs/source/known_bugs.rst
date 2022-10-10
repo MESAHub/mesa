@@ -15,7 +15,7 @@ r22.05.1
 ========
 
 Convective Premixing
-------------
+--------------------
 
 Convective premixing (CPM) has not worked properly since release r15140. CPM was broken by the
 removal of the ``lnPgas_flag``, which caused some of the necessary EOS updates to be missed after
@@ -23,6 +23,25 @@ CPM updates the abundances in mixed cells. CPM does not need ``lnPgas_flag``, bu
 EOS updates at constant pressure. This will be fixed in future releases.
 
 See `gh-425 <https://github.com/MESAHub/mesa/issues/425>`_
+
+
+Invalid location for overshoot boundary
+---------------------------------------
+
+Sometimes MESA will crash with an error similar to this:
+
+.. code-block:: shell
+
+    s%top_conv_bdy(i)= F
+    D(k)   0.0000000000000000    
+    s%D_mix(k-1)   1.1101956346180402    
+    s%overshoot_D_min   100.00000000000000    
+    Invalid location for overshoot boundary: cz_bdy_dq, dq= -0.13040604669743103        1.4532774141478022E-003
+            0 terminate reason: nonzero_ierr
+
+This bug effects many previous versions of MESA as well. This has been fixed in `gh-400 <https://github.com/MESAHub/mesa/issues/400>`_ .
+The solution is to update to a newer MESA version.
+
 
 
 r21.12.1
