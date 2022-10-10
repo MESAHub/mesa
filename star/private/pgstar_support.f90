@@ -121,6 +121,8 @@ contains
    subroutine init_pgstar(ierr)
       integer, intent(out) :: ierr
 
+      if (have_initialized_pgstar) return
+
       call read_support_info(ierr)
       if (failed('read_support_info')) return
 
