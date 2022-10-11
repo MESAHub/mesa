@@ -716,7 +716,7 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) + b_r
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-                        
+
             n% eps_nuc_rate(i) = b_f * Qconv
             n% eps_nuc_rate(r_i) = b_r  * Qconv
             n% eps_neu_rate(i) = 0d0
@@ -863,7 +863,7 @@
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
             
             n% eps_nuc_rate(i) = b_f * Q  * Qconv
-            n% eps_nuc_rate(r_i) = b_r * Q  * Qconv
+            n% eps_nuc_rate(r_i) = -b_r * Q  * Qconv
             n% eps_neu_rate(i) = 0d0
             n% eps_neu_rate(r_i) = 0d0
                
@@ -1005,7 +1005,7 @@
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
       
             n% eps_nuc_rate(i) = b_f * Q  * Qconv
-            n% eps_nuc_rate(r_i) = b_r * Q  * Qconv
+            n% eps_nuc_rate(r_i) = -b_r * Q  * Qconv
             n% eps_neu_rate(i) = 0d0
             n% eps_neu_rate(r_i) = 0d0
 
