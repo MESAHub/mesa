@@ -190,7 +190,7 @@ contains
          allocate(b% binary_history_values(n))
       else if (size(b% binary_history_values, dim = 1) /= n) then
          ierr = -1
-         write(*, 2) 'bad size b% binary_history_values', &
+         write(*, 3) 'bad size b% binary_history_values', &
             size(b% binary_history_values, dim = 1), n
       end if
       vals => b% binary_history_values
@@ -199,7 +199,7 @@ contains
          allocate(b% binary_history_names(n))
       else if (size(b% binary_history_names, dim = 1) /= n) then
          ierr = -1
-         write(*, 2) 'bad size b% binary_history_names', &
+         write(*, 3) 'bad size b% binary_history_names', &
             size(b% binary_history_names, dim = 1), n
       end if
 
