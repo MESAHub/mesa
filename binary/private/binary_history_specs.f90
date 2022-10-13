@@ -281,13 +281,6 @@ contains
          deallocate(old_binary_history_column_spec)
          if (ierr /= 0) return
       end if
-      if (associated(b% binary_history_value_is_integer)) deallocate(b% binary_history_value_is_integer)
-      if (associated(b% binary_history_values)) deallocate(b% binary_history_values)
-      allocate(b% binary_history_value_is_integer(capacity), b% binary_history_values(capacity), stat = ierr)
-      if (ierr /= 0) return
-      b% binary_history_value_is_integer(:) = .false.
-      b% binary_history_values(:) = 0
-      !b% need_to_write_history = .false.
       if (dbg) write(*, *) 'binary num log columns', capacity
       if (dbg) call mesa_error(__FILE__, __LINE__, 'debug: set_binary_history_columns')
    end subroutine set_binary_history_columns
