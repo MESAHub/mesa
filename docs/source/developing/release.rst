@@ -98,7 +98,7 @@ Release steps
 
 To make an actual release (once testing is complete), first push the git tag made by the release script:
 
-- git push origin r12345
+- git push origin release/r12345
 
 This is the key bit, as the Github release will be anchored to this tag.
 
@@ -117,16 +117,19 @@ Once created this zip folder should be downloaded and checked that it installs a
 Zenodo
 ------
 
-Once the zip folder has been created it should be uploaded to Zenodo.
+Once the zip folder has been created it should be uploaded to Zenodo prior to sending a release announcement.
+This helps avoid swamping our GitHub bandwidth with user downloads.
 
-.. note::
-    TODO: Work out how we will do this in the future
+- For a pre-release, do not upload to the main MESA zenodo repository.
+  Instead upload to its own Zenodo entry. This can be done on a personal account.
+- Official releases need to be uploaded to `this MESA Zenodo page <https://doi.org/10.5281/zenodo.2602941>`_.
 
 Send an email to mesa-users
 ---------------------------
 
 Send an email announcing the release, this should include:
 
+- Link to Zenodo for dowload (not GitHub).
 - A brief summary of the changes
 - A link to the Changelog
 - Highlight any very disruptive changes that might have occurred
