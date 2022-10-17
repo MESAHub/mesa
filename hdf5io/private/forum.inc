@@ -84,7 +84,7 @@ end if
       
       #!!
       #! Same as ASSERT, but only if DEBUG is set
-      #!!
+            #!!
             
             #:def ASSERT_DEBUG(cond, message = None)
             #:if defined('DEBUG')

@@ -28,7 +28,7 @@ def cubic(obs, err, mdl, Ek):
 
 def combined(obs, err, mdl, Ek):
     X = np.power(np.array(mdl).reshape((-1, 1)), [[-1, 3]]) / (
-                np.array(Ek) * np.array(err)).reshape((-1, 1))
+            np.array(Ek) * np.array(err)).reshape((-1, 1))
     return np.linalg.lstsq(X, (np.array(obs) - np.array(mdl)) / np.array(err),
                            rcond=-1)[0]
 

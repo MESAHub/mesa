@@ -9,7 +9,7 @@ h = 6.6260693 * 10 ** (-34)  # j s
 k = 1.380658 * 10 ** (-23)  # J/K
 pc = 3.0857 * 10 ** 16  # m
 stefan = (2.0 * (np.pi ** 5) * (k ** 4)) / (
-            15 * (c ** 2) * (h ** 3))  # W k^-4 m^-2
+        15 * (c ** 2) * (h ** 3))  # W k^-4 m^-2
 lsun = 4.0 * np.pi * stefan * rsun ** 2 * teffsun ** 4  # j/s
 
 # Vega defines the colours to be 0
@@ -42,11 +42,11 @@ def do_one(f_in, vega_interp, teff):
     
     def bb_wave(wave, teff):
         return ((2 * np.pi * h * c ** 2) / (wave ** 5)) * (
-                    1.0 / (np.exp((h * c) / (wave * k * teff)) - 1.0))
+                1.0 / (np.exp((h * c) / (wave * k * teff)) - 1.0))
     
     def const(t):
         return mbolsun - 2.5 * np.log10((4.0 * np.pi * (
-                    10.0 * pc) ** 2 * stefan * t ** 4) / lsun) - magZero
+                10.0 * pc) ** 2 * stefan * t ** 4) / lsun) - magZero
     
     def topfunc(wave, t):
         return wave * (bb_wave(wave, t)) * (j_f_interp(wave) / j_norm)

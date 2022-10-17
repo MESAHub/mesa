@@ -31,7 +31,7 @@ Teff_star = 5800  # stellar Teff
 orb_sep = 0.05  # orbital sepration in AU (to set day-side flux)
 irrad_col = 300.0  # column depth for depositing stellar radiation as heat
 flux_dayside = sigma * Teff_star ** 4 * (
-            rs * rsun / orb_sep / au) ** 2  # flux hitting planet's dayside
+        rs * rsun / orb_sep / au) ** 2  # flux hitting planet's dayside
 Teq = (flux_dayside / 4.0 / sigma) ** 0.25
 
 # flags to skip steps
@@ -58,15 +58,15 @@ for i in range(1, imax + 1, 1):
                                                          0:6] + "_ME_" + str(
         rp) + "_RJ.mod"
     evolvemodel = "planet_evolve_" + str(mp)[0:6] + "_MJ_" + str(mcore)[
-                                                             0:6] + "_ME_" +\
+                                                             0:6] + "_ME_" + \
                   str(
-        rp) + "_RJ.mod"
+                      rp) + "_RJ.mod"
     
     if do_create_planet:
         inlist1 = "inlist_create_" + str(mp)[0:6] + "_MJ_" + str(mcore)[
-                                                             0:6] + "_ME_" +\
+                                                             0:6] + "_ME_" + \
                   str(
-            rp) + "_RJ"
+                      rp) + "_RJ"
         run_time = my.create_planet(mp_wo_core, rp, y, z, inlist1, createmodel)
     
     success = True
@@ -92,7 +92,7 @@ for i in range(1, imax + 1, 1):
     if do_put_in_core:
         if mcore > 0.0:
             inlist2 = "inlist_core_" + str(mp)[0:6] + "_MJ_" + str(mcore)[
-                                                               0:6] + "_ME_"\
+                                                               0:6] + "_ME_" \
                       + str(
                 rp) + "_RJ"
             run_time = my.put_core_in_planet(mcore, rhocore, inlist2,
@@ -105,7 +105,8 @@ for i in range(1, imax + 1, 1):
     
     if do_evolve_planet:
         inlist3 = "inlist_evolve_" + str(mp)[0:6] + "_MJ_" + str(mcore)[
-                                                             0:6] + "_ME_" + str(
+                                                             0:6] + "_ME_" +\
+                  str(
             rp) + "_RJ"
         run_time = my.evolve_planet(irrad_col, flux_dayside, maxage, inlist3,
                                     coremodel, evolvemodel)

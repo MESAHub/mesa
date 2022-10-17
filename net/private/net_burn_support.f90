@@ -208,7 +208,7 @@ end interface
       ! independent variable x. also input are the stepsize to be attempted htry,
       ! the required accuracy eps, and the vector yscal against which the error is
       ! scaled. on output, y and x are replaced by their new values, hdid is the
-   ! stepsize actually accomplished, and hnext is the estimated next stepsize.
+      ! stepsize actually accomplished, and hnext is the estimated next stepsize.
       ! dervs is a user supplied function that computes the right hand side of
       ! the equations.
       !

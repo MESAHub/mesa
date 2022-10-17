@@ -187,20 +187,34 @@ contains
          !Store answers in results array
          results(1) = boloMag
          results(2) = get_bc_by_name('V', logteff(i), log_g, M_div_h, info)
-         results(3) = get_bc_by_name('U', logteff(i), log_g, M_div_h, info) - get_bc_by_name('B', logteff(i), log_g, M_div_h, info)
-         results(4) = get_bc_by_name('B', logteff(i), log_g, M_div_h, info) - get_bc_by_name('V', logteff(i), log_g, M_div_h, info)
-         results(5) = get_bc_by_name('V', logteff(i), log_g, M_div_h, info) - get_bc_by_name('R', logteff(i), log_g, M_div_h, info)
-         results(6) = get_bc_by_name('V', logteff(i), log_g, M_div_h, info) - get_bc_by_name('I', logteff(i), log_g, M_div_h, info)
-         results(7) = get_bc_by_name('V', logteff(i), log_g, M_div_h, info) - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
-         results(8) = get_bc_by_name('R', logteff(i), log_g, M_div_h, info) - get_bc_by_name('I', logteff(i), log_g, M_div_h, info)
-         results(9) = get_bc_by_name('I', logteff(i), log_g, M_div_h, info) - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
-         results(10) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) - get_bc_by_name('H', logteff(i), log_g, M_div_h, info)
-         results(11) = get_bc_by_name('H', logteff(i), log_g, M_div_h, info) - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
-         results(12) = get_bc_by_name('K', logteff(i), log_g, M_div_h, info) - get_bc_by_name('L', logteff(i), log_g, M_div_h, info)
-         results(13) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
-         results(14) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) - get_bc_by_name('L', logteff(i), log_g, M_div_h, info)
-         results(15) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) - get_bc_by_name('Lprime', logteff(i), log_g, M_div_h, info)
-         results(16) = get_bc_by_name('K', logteff(i), log_g, M_div_h, info) - get_bc_by_name('M', logteff(i), log_g, M_div_h, info)
+         results(3) = get_bc_by_name('U', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('B', logteff(i), log_g, M_div_h, info)
+         results(4) = get_bc_by_name('B', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('V', logteff(i), log_g, M_div_h, info)
+         results(5) = get_bc_by_name('V', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('R', logteff(i), log_g, M_div_h, info)
+         results(6) = get_bc_by_name('V', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('I', logteff(i), log_g, M_div_h, info)
+         results(7) = get_bc_by_name('V', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
+         results(8) = get_bc_by_name('R', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('I', logteff(i), log_g, M_div_h, info)
+         results(9) = get_bc_by_name('I', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
+         results(10) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('H', logteff(i), log_g, M_div_h, info)
+         results(11) = get_bc_by_name('H', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
+         results(12) = get_bc_by_name('K', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('L', logteff(i), log_g, M_div_h, info)
+         results(13) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('K', logteff(i), log_g, M_div_h, info)
+         results(14) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('L', logteff(i), log_g, M_div_h, info)
+         results(15) = get_bc_by_name('J', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('Lprime', logteff(i), log_g, M_div_h, info)
+         results(16) = get_bc_by_name('K', logteff(i), log_g, M_div_h, info) &
+            - get_bc_by_name('M', logteff(i), log_g, M_div_h, info)
          
          if (info == 0) write(io_unit, '(99f15.8)') mass(i), logl(i), logteff(i), log_g, results
       
