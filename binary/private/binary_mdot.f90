@@ -100,8 +100,8 @@
             end if
             if (detachment) then
                if (b% report_rlo_solver_progress) then
-                  rlo_result = 'OK (detached)'
-                  call report_rlo_iter
+                     rlo_result = 'OK (detached)'
+                     call report_rlo_iter
                end if
                return
             end if
