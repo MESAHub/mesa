@@ -98,13 +98,6 @@
                check_implicit_rlo = retry
                return
             end if
-            if (detachment) then
-               if (b% report_rlo_solver_progress) then
-                     rlo_result = 'OK (detached)'
-                     call report_rlo_iter
-               end if
-               return
-            end if
          else if (b% mdot_scheme == "roche_lobe" .and. .not. b% use_other_rlo_mdot) then
             function_to_solve = (b% rl_relative_gap(b% d_i) &
                 + b% implicit_scheme_tolerance/2.0d0) * 2.0d0
@@ -114,7 +107,7 @@
                   rlo_result = 'OK (detached)'
                   call report_rlo_iter
                end if
-               return
+               detachment = .true.
             end if
          else if (b% mdot_scheme == "contact" .and. .not. b% use_other_rlo_mdot .and. .not. b% CE_flag) then
             if (b% point_mass_i /= 0) then
@@ -141,7 +134,7 @@
                      rlo_result = 'OK (detached)'
                      call report_rlo_iter
                   end if
-                  return
+                  detachment = .true.
                end if
             else
                if (q < 1d0) then
@@ -196,6 +189,8 @@
                return
             end if
          end if
+
+         if (detached) return
 
          if (abs(function_to_solve) <= b% implicit_scheme_tolerance) then
             if (b% report_rlo_solver_progress) then
