@@ -39,14 +39,13 @@ module accurate_sum_auto_diff_star_order1
       procedure mult_rdp_acc
    end interface operator(*)
    
-   interface operator
-      (/)
-   procedure div_acc_adr
-   procedure div_adr_acc
-   procedure div_acc_acc
-   procedure div_acc_rdp
-   procedure div_rdp_acc
-end interface operator(/)
+   interface operator(/)
+      procedure div_acc_adr
+      procedure div_adr_acc
+      procedure div_acc_acc
+      procedure div_acc_rdp
+      procedure div_rdp_acc
+   end interface operator(/)
    
    
    interface assignment(=)

@@ -37,8 +37,7 @@ module accurate_sum
       procedure mult_acc_acc
    end interface operator(*)
    
-   interface operator
-      (/)
+   interface operator(/)
    procedure div_acc_real
    procedure div_real_acc
    procedure div_acc_acc
